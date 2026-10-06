@@ -191,10 +191,10 @@ fn OpenTypeFontBlob::new(data : Bytes, index : Int) -> OpenTypeFontBlob? {
   }
   // Reject fonts with invalid post table version, fixes pdf.js issue 9462. Not sure if there
   // is a better fix, for some reason skrifa accepts the font which is completely invalid.
-  let invalid = match (try? f.post()) {
-    Ok(p) =>
-      !(p.version().to_major_minor() is ((1, 0) | (2, 0) | (2, 5) | (3, 0)))
-    Err(_) => false
+  let invalid = try f.post() catch {
+    _ => false
+  } noraise {
+    p => !(p.version().to_major_minor() is ((1, 0) | (2, 0) | (2, 5) | (3, 0)))
   }
   if invalid {
     return None
@@ -203,9 +203,10 @@ fn OpenTypeFontBlob::new(data : Bytes, index : Int) -> OpenTypeFontBlob? {
   // We store this separately because we want to be able to cache the subfonts
   // of a CFF OpenType font, which is not possible using the current skrifa API.
   // Hopefully there will be some way in the future.
-  let cff_blob = match (try? f.cff()) {
-    Ok(cff) => CffFontBlob::new(cff.offset_data().to_bytes())
-    Err(_) => None
+  let cff_blob = try f.cff() catch {
+    _ => None
+  } noraise {
+    cff => CffFontBlob::new(cff.offset_data().to_owned())
   }
   let outline_glyphs = @skrifa.outline_glyphs(f)
   let hinting_instance = if outline_glyphs.require_interpreter() {
@@ -251,7 +252,7 @@ fn OpenTypeFontBlob::glyph_names(
   // Note: We don't call the `glyph_name` method provided by read-fonts because
   // calling it repeatedly is very slow.
   let glyph_names = Map([])
-  guard (try? self.font_ref.post()) is Ok(post) else { return glyph_names }
+  let post = self.font_ref.post() catch { _ => return glyph_names }
   match post.version().to_major_minor() {
     (1, 0) =>
       for gid, name in @read_fonts.default_glyph_names[:] {
@@ -311,7 +312,11 @@ fn OpenTypeFontBlob::outline_glyph(
   guard self.outline_glyphs.get(glyph) is Some(outline) else {
     return @kurbo.BezPath::new()
   }
-  let _ = try? outline.draw(draw_settings, path)
+  try outline.draw(draw_settings, path) catch {
+    _ => ()
+  } noraise {
+    _ => ()
+  }
   path.take()
 }
 
@@ -329,9 +334,10 @@ fn OpenTypeFontBlob::map_codepoint(
   self : OpenTypeFontBlob,
   code : UInt,
 ) -> GlyphId? {
-  match (try? self.font_ref.cmap()) {
-    Ok(c) => c.map_codepoint(code)
-    Err(_) => None
+  try self.font_ref.cmap() catch {
+    _ => None
+  } noraise {
+    c => c.map_codepoint(code)
   }
 }
 
@@ -350,7 +356,7 @@ priv struct CmapRecord {
 fn OpenTypeFontBlob::cmap_records(
   self : OpenTypeFontBlob,
 ) -> Array[CmapRecord]? {
-  guard (try? self.font_ref.cmap()) is Ok(cmap) else { return None }
+  let cmap = self.font_ref.cmap() catch { _ => return None }
   Some(
     cmap
     .encoding_records()
@@ -363,10 +369,12 @@ fn OpenTypeFontBlob::cmap_records(
         Custom => 4
         Unknown => 5
       }
-      let subtable : ((UInt) -> GlyphId?)? = match
-        (try? record.subtable(cmap.offset_data())) {
-        Ok(st) => Some(c => st.map_codepoint(c))
-        Err(_) => None
+      let subtable : ((UInt) -> GlyphId?)? = try
+        record.subtable(cmap.offset_data())
+      catch {
+        _ => None
+      } noraise {
+        st => Some(c => st.map_codepoint(c))
       }
       { platform_id, encoding_id: record.encoding_id(), subtable, }
     }),
@@ -376,9 +384,10 @@ fn OpenTypeFontBlob::cmap_records(
 ///|
 /// The blob of the font's `CFF` table, if any.
 fn OpenTypeFontBlob::cff_blob(self : OpenTypeFontBlob) -> CffFontBlob? {
-  match (try? self.font_ref.cff()) {
-    Ok(cff) => CffFontBlob::new(cff.offset_data().to_bytes())
-    Err(_) => None
+  try self.font_ref.cff() catch {
+    _ => None
+  } noraise {
+    cff => CffFontBlob::new(cff.offset_data().to_owned())
   }
 }
 
@@ -413,5 +422,9 @@ fn OpenTypeFontBlob::charmap_map(self : OpenTypeFontBlob, c : Char) -> GlyphId? 
 ///|
 /// Whether the data is a valid OpenType font (`FontRef::from_index(data, 0).is_ok()`).
 fn is_open_type(data : Bytes) -> Bool {
-  (try? @read_fonts.FontRef::from_index(data[:], 0)) is Ok(_)
+  try @read_fonts.FontRef::from_index(data[:], 0) catch {
+    _ => false
+  } noraise {
+    _ => true
+  }
 }

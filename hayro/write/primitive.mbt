@@ -48,7 +48,7 @@ fn write_direct_number(n : @hayro_syntax.Number) -> @export.Obj {
   if float_num == float_num.floor() && !float_num.is_inf() {
     Int(f64_to_i32_sat(float_num))
   } else {
-    Real(float_num.to_float().to_double())
+    Real(Float::from_double(float_num).to_double())
   }
 }
 
@@ -128,7 +128,7 @@ fn write_indirect(
   match obj {
     // TODO: Handle `Crypt` filter
     Stream(s) => {
-      let data = s.raw_data().to_bytes()
+      let data = s.raw_data().to_owned()
       let dict = write_dict(s.dict(), ctx, true)
       (ctx.put_fn)(id, Stream(dict, data))
     }

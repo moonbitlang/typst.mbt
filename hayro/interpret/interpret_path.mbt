@@ -51,8 +51,8 @@ fn fill_path_impl(
     let bbox = fast_bounding_box(path)
     match
       (
-        f32_is_nearly_zero(bbox.width().to_float()),
-        f32_is_nearly_zero(bbox.height().to_float()),
+        f32_is_nearly_zero(Float::from_double(bbox.width())),
+        f32_is_nearly_zero(Float::from_double(bbox.height())),
       ) {
       (false, false) => {
         let draw_mode = DrawMode::Fill(fill_rule)

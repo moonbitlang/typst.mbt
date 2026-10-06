@@ -314,7 +314,7 @@ fn decode_sub_band_bitplanes(
       }
       component_info.size_info.precision + log_gain
     }
-    pow2i(r_b - exponent) * ((1.0 : Float) + mantissa.to_float() / 2048.0)
+    pow2i(r_b - exponent) * ((1.0 : Float) + Float::from_int(mantissa) / 2048.0)
   }
   let num_bitplanes = {
     let (exponent, _) = component_info.exponent_mantissa(
@@ -377,7 +377,9 @@ fn decode_sub_band_bitplanes(
           abort("index out of bounds")
         }
         for i in 0..<n {
-          let output = coefficient_get(decoded.unsafe_get(src + i)).to_float()
+          let output = Float::from_int(
+            coefficient_get(decoded.unsafe_get(src + i)),
+          )
           coefficients.unsafe_set(base_idx + i, output * dequantization_step)
         }
         base_idx += sb_width.reinterpret_as_int()
@@ -399,7 +401,9 @@ fn apply_sign_shift(
   for i in 0..<n {
     let channel = channel_data[i]
     let component_info = component_infos[i]
-    let offset = shl_u32(1, component_info.size_info.precision - 1).to_float()
+    let offset = Float::from_uint(
+      shl_u32(1, component_info.size_info.precision - 1),
+    )
     let data = channel.container.data
     // `chunks_exact_mut(8)` over the padded buffer.
     let len = data.length() / 8 * 8

@@ -103,7 +103,7 @@ fn codec_result(
   match stream.decoded_image(params) {
     Err(e) => "E \{codec_failure_name(e)}"
     Ok(r) => {
-      let out = StringBuilder::new()
+      let out = StringBuilder()
       out.write_string("\{r.data.length()}:\{codec_hex16(fnv(r.data))}")
       match r.image_data {
         None => out.write_string(" -")
@@ -140,11 +140,11 @@ fn check_codec_streams(filter : @syntax.Filter) -> Unit raise {
   let mut cur_path = ""
   let mut cur_streams : Map[String, @syntax.Stream] = Map([])
   for line in expected.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line.is_empty() || line.has_prefix("#") {
       continue
     }
-    let parts = line.split("\t").map(p => p.to_string()).to_array()
+    let parts = line.split("\t").map(p => p.to_owned()).to_array()
     let path = parts[0]
     if path != cur_path {
       cur_path = path

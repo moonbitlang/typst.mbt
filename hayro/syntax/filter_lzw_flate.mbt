@@ -124,7 +124,7 @@ fn lzw_decode_impl(data : BytesView, early_change : Bool) -> Bytes? {
   let table = LzwTable::new(early_change)
   let mut bit_size = table.code_length()
   let reader = BitReader::new(data)
-  let decoded = @buffer.new()
+  let decoded = Buffer()
   let mut prev : Int? = None
   while true {
     let next = match reader.read(bit_size) {

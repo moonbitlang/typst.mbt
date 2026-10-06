@@ -25,7 +25,7 @@ fn IntegerDecoder::decode(
 ) -> Int? {
   // A.2 step 1: "Set: PREV = 1"
   // `PREV` - Context prefix, contains bits decoded so far plus a leading 1.
-  let prev = Ref::new(1U)
+  let prev = Ref(1U)
 
   // A.2 step 2: "Follow the flowchart in Figure A.1. Decode each bit with
   // CX equal to 'IAx + PREV' where 'IAx' represents the identifier of the

@@ -32,7 +32,7 @@ fn colr_parse(boxes : ImageBoxes, data : BytesView) -> Unit raise DecodeError {
       guard reader.tail() is Some(profile_data) else {
         raise Format(InvalidBox)
       }
-      ColrColorSpace::Icc(profile_data.to_bytes())
+      ColrColorSpace::Icc(profile_data.to_owned())
     }
     _ => ColrColorSpace::Unknown
   }

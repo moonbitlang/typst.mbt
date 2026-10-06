@@ -419,8 +419,8 @@ fn decode_context(
   let mut scale_y : Float = 1.0
   let (width, height) = match decoded.image_data {
     Some(d) => {
-      scale_x = obj.width.to_float() / d.width.to_float()
-      scale_y = obj.height.to_float() / d.height.to_float()
+      scale_x = Float::from_int(obj.width) / Float::from_int(d.width)
+      scale_y = Float::from_int(obj.height) / Float::from_int(d.height)
       (d.width, d.height)
     }
     None => (obj.width, obj.height)
@@ -454,10 +454,10 @@ fn decode_context(
   }
   let decode_arr = match decode_arr_raw {
     Some(a) => read_f32_pairs(a)
-    None => color_space.default_decode_arr(bits_per_component.to_float())
+    None => color_space.default_decode_arr(Float::from_int(bits_per_component))
   }
   Some({
-    decoded_data: decoded.data.to_bytes(),
+    decoded_data: decoded.data.to_owned(),
     decoded_alpha: match decoded.image_data {
       Some(i) => i.alpha
       None => None
@@ -491,7 +491,7 @@ fn decode_mask(
   target_dimension : (Int, Int)?,
 ) -> DecodedMask? {
   guard decode_context(obj, target_dimension) is Some(ctx) else { return None }
-  let height = Ref::new(ctx.height)
+  let height = Ref(ctx.height)
   guard decode_mask_bytes(
       ctx.decoded_data,
       ctx.width,
@@ -527,19 +527,19 @@ fn decode_raster(
   target_dimension : (Int, Int)?,
 ) -> DecodedRaster? {
   guard decode_context(obj, target_dimension) is Some(ctx) else { return None }
-  let height = Ref::new(ctx.height)
+  let height = Ref(ctx.height)
   let is_default_decode = pairs_eq(
     ctx.decode_arr,
-    ctx.color_space.default_decode_arr(ctx.bits_per_component.to_float()),
+    ctx.color_space.default_decode_arr(Float::from_int(ctx.bits_per_component)),
   )
   let is_inverted_default_decode = pairs_eq(
     ctx.decode_arr,
     ctx.color_space.inverted_default_decode_arr(
-      ctx.bits_per_component.to_float(),
+      Float::from_int(ctx.bits_per_component),
     ),
   )
   let image_data = if ctx.bits_per_component == 8 &&
-    ctx.color_space.supports_u8() &&
+    ToRgb::supports_u8(ctx.color_space) &&
     obj.transfer_function is None &&
     (is_default_decode || is_inverted_default_decode) {
     // This is actually the most common case, where the PDF is embedded
@@ -588,7 +588,7 @@ fn decode_raster(
       )
     } else {
       let output_buf = FixedArray::make(ctx.width * height.val * 3, b'\x00')
-      guard ctx.color_space.convert_u8(data, output_buf) is Some(_) else {
+      guard ToRgb::convert_u8(ctx.color_space, data, output_buf) is Some(_) else {
         return None
       }
       Some(
@@ -642,7 +642,7 @@ fn decode_raster(
     let rgb_data = match (obj.transfer_function, rgb_data) {
       (Some(transfer_function), Some(rgb_data)) => {
         let apply_single = (data : Byte, function : @function.Function) => {
-          match function.eval([data.to_float() / 255.0]) {
+          match function.eval([Float::from_byte(data) / 255.0]) {
             Some(v) if v.length() > 0 => f32_as_u8(v[0] * 255.0 + 0.5)
             _ => data
           }
@@ -727,10 +727,10 @@ fn decode_mask_bytes(
   invert : Bool,
 ) -> Bytes? {
   let default_decode = color_space.default_decode_arr(
-    bits_per_component.to_float(),
+    Float::from_int(bits_per_component),
   )
   let inverted_default = color_space.inverted_default_decode_arr(
-    bits_per_component.to_float(),
+    Float::from_int(bits_per_component),
   )
   let fast_path = bits_per_component == 8 &&
     (
@@ -921,7 +921,7 @@ fn resolve_matte(
   // In theory, matte needs to be applied in the image's original color space,
   // but we always do it in RGB for now.
   let matte_rgb = FixedArray::make(3, b'\x00')
-  let _ = color_space.convert_f32(matte[:], matte_rgb, false)
+  let _ = ToRgb::convert_f32(color_space, matte[:], matte_rgb, false)
   guard ImageXObject::new(
       s_mask,
       _ => None,
@@ -954,11 +954,11 @@ fn unpremultiply(
         if a == 0 {
           continue
         }
-        let inv_alpha = (255.0 : Float) / a.to_float()
+        let inv_alpha = (255.0 : Float) / Float::from_byte(a)
         for c in 0..<3 {
-          let m = matte_rgb[c].to_float()
+          let m = Float::from_byte(matte_rgb[c])
           d[p * 3 + c] = f32_as_u8(
-            m + (d[p * 3 + c].to_float() - m) * inv_alpha,
+            m + (Float::from_byte(d[p * 3 + c]) - m) * inv_alpha,
           )
         }
       }
@@ -966,15 +966,15 @@ fn unpremultiply(
     }
     Luma(luma) => {
       let d = FixedArray::from_iter(luma.data.iter())
-      let m = matte_rgb[0].to_float()
+      let m = Float::from_byte(matte_rgb[0])
       let n = @cmp.minimum(d.length(), alpha.length())
       for i in 0..<n {
         let a = alpha[i]
         if a == 0 {
           continue
         }
-        let inv_alpha = (255.0 : Float) / a.to_float()
-        d[i] = f32_as_u8(m + (d[i].to_float() - m) * inv_alpha)
+        let inv_alpha = (255.0 : Float) / Float::from_byte(a)
+        d[i] = f32_as_u8(m + (Float::from_byte(d[i]) - m) * inv_alpha)
       }
       Luma({ ..luma, data: Bytes::from_array(d), })
     }
@@ -995,7 +995,7 @@ fn get_rgb_data(
     return None
   }
   let output = FixedArray::make(width * height * 3, b'\x00')
-  let _ = cs.convert_f32(decoded[:], output, false)
+  let _ = ToRgb::convert_f32(cs, decoded[:], output, false)
   Some({
     data: Bytes::from_array(output),
     width,
@@ -1106,7 +1106,7 @@ fn apply_decode_array(
     for i in 0..<n {
       let (d_min, d_max) = decode[i]
       decoded_arr.push(
-        interpolate(components[start + i].to_float(), d_min, d_max),
+        interpolate(Float::from_int(components[start + i]), d_min, d_max),
       )
     }
     start = end

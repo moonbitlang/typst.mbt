@@ -30,11 +30,11 @@ pub fn Rect::new(x0 : Double, y0 : Double, x1 : Double, y1 : Double) -> Rect {
 ///|
 /// The intersection of two rectangles.
 pub fn Rect::intersect(self : Rect, other : Rect) -> Rect {
-  let x0 = @math.maximum(self.x0, other.x0)
-  let y0 = @math.maximum(self.y0, other.y0)
-  let x1 = @math.minimum(self.x1, other.x1)
-  let y1 = @math.minimum(self.y1, other.y1)
-  Rect::new(x0, y0, @math.maximum(x1, x0), @math.maximum(y1, y0))
+  let x0 = @cmp.maximum(self.x0, other.x0)
+  let y0 = @cmp.maximum(self.y0, other.y0)
+  let x1 = @cmp.minimum(self.x1, other.x1)
+  let y1 = @cmp.minimum(self.y1, other.y1)
+  Rect::new(x0, y0, @cmp.maximum(x1, x0), @cmp.maximum(y1, y0))
 }
 
 ///|
@@ -64,10 +64,10 @@ fn rect_from_arr(array : PdfArray) -> Rect? {
   )
   Some(
     Rect::new(
-      @math.minimum(x0, x1),
-      @math.minimum(y0, y1),
-      @math.maximum(x1, x0),
-      @math.maximum(y1, y0),
+      @cmp.minimum(x0, x1),
+      @cmp.minimum(y0, y1),
+      @cmp.maximum(x1, x0),
+      @cmp.maximum(y1, y0),
     ),
   )
 }
@@ -184,11 +184,11 @@ pub fn Page::page_stream(self : Page) -> BytesView? {
     None => {
       let convert_single = (s : Stream) => s.decoded().to_option()
       let computed : BytesView? = match (self.inner.get("Contents") : Stream?) {
-        Some(stream) => convert_single(stream).map(d => d.to_bytes()[:])
+        Some(stream) => convert_single(stream).map(d => d.to_owned()[:])
         None =>
           match (self.inner.get("Contents") : PdfArray?) {
             Some(array) => {
-              let collected = @buffer.new()
+              let collected = Buffer()
               for stream in (array.iter() : Iter[Stream]) {
                 if convert_single(stream) is Some(data) {
                   collected.write_bytesview(data)
@@ -244,13 +244,13 @@ pub fn Page::intersected_crop_box(self : Page) -> Rect {
 /// but with special handling applied for zero-area pages).
 pub fn Page::base_dimensions(self : Page) -> (Float, Float) {
   let crop_box = self.intersected_crop_box()
-  if is_nearly_zero(crop_box.width().to_float()) ||
-    is_nearly_zero(crop_box.height().to_float()) {
-    (a4.width().to_float(), a4.height().to_float())
+  if is_nearly_zero(Float::from_double(crop_box.width())) ||
+    is_nearly_zero(Float::from_double(crop_box.height())) {
+    (Float::from_double(a4.width()), Float::from_double(a4.height()))
   } else {
     (
-      @math.maximum(crop_box.width(), 1.0).to_float(),
-      @math.maximum(crop_box.height(), 1.0).to_float(),
+      Float::from_double(@cmp.maximum(crop_box.width(), 1.0)),
+      Float::from_double(@cmp.maximum(crop_box.height(), 1.0)),
     )
   }
 }

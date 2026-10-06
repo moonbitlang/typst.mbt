@@ -11,5 +11,3 @@ import {
 supported_targets = "native"
 
 pkgtype(kind: "executable")
-
-warnings = "-deprecated"

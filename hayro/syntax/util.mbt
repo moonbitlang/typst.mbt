@@ -83,7 +83,7 @@ pub fn latin1_bytes(s : String) -> Bytes {
 ///|
 /// Encode bytes as a latin-1 string (each byte becomes a char).
 pub fn latin1_string(b : BytesView) -> String {
-  let sb = StringBuilder::new(size_hint=b.length())
+  let sb = StringBuilder(size_hint=b.length())
   for byte in b {
     sb.write_char(byte.to_int().unsafe_to_char())
   }

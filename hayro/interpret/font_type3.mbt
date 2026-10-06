@@ -123,7 +123,7 @@ fn Type3::glyph_width(self : Type3, code : Byte) -> Float {
     Some(Value(w)) => w
     _ => self.missing_width
   }
-  w * self.matrix.as_coeffs()[0].to_float() * units_per_em
+  w * Float::from_double(self.matrix.as_coeffs()[0]) * units_per_em
 }
 
 ///|

@@ -8,7 +8,7 @@ priv struct OcgState {
 
 ///|
 fn OcgState::dummy() -> OcgState {
-  { inactive_ocgs: @hashset.new(), visibility_stack: [], }
+  { inactive_ocgs: @hashset.HashSet([]), visibility_stack: [], }
 }
 
 ///|
@@ -25,7 +25,7 @@ fn OcgState::from_catalog(catalog : @hayro_syntax.Dict) -> OcgState {
   guard (oc_properties.get("D") : @hayro_syntax.Dict?) is Some(config) else {
     return OcgState::dummy()
   }
-  let inactive = @hashset.new()
+  let inactive = @hashset.HashSet([])
   let base_state = match (config.get("BaseState") : @hayro_syntax.Name?) {
     Some(b) => BaseState::from_name(b.as_str())
     None => None

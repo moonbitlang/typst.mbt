@@ -346,7 +346,7 @@ fn AESCipher::encrypt_cbc(
       result[chunk + i] = block[i]
     }
   }
-  Bytes::from_fixedarray(result)
+  Bytes::from_array(result)
 }
 
 ///|
@@ -391,8 +391,8 @@ fn AESCipher::decrypt_cbc(
     }
   }
   if len == n {
-    Bytes::from_fixedarray(result)
+    Bytes::from_array(result)
   } else {
-    Bytes::from_fixedarray(result, len~)
+    Bytes::from_array(result[:len])
   }
 }
