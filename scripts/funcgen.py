@@ -12,10 +12,10 @@ which call a handwritten implementation
 
 where E is `SourceError` for `SourceResult` returns and `HintedError` for
 `StrResult`/`HintedStrResult` returns. An upstream function that returns a
-plain value is ported without `raise` (the wrapper does not need it) unless
-its body raises; E is then `HintedError`. Missing
+plain value is ported without `raise`: the wrapper does not need it. Missing
 implementations get a stub in `library/funcs_todo_gen.mbt` that raises
-"... is not yet ported", so the package always compiles.
+"... is not yet ported" (as `HintedError` for a plain return), so the package
+always compiles.
 
 Non-trivial `#[default(..)]` values call `impl_<key>__<param>_default()`,
 which never raises (upstream's default is a plain expression).
