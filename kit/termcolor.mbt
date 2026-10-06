@@ -17,6 +17,16 @@ pub(all) enum Color {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with @debug.Debug::{to_repr}
+
+///|
 /// A color specification (`termcolor::ColorSpec`).
 pub(all) struct ColorSpec {
   fg : Color?
@@ -26,6 +36,16 @@ pub(all) struct ColorSpec {
   dimmed : Bool
   reset : Bool
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpec with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpec with @debug.Debug::{to_repr}
 
 ///|
 /// A new color specification (`ColorSpec::new`: no color, reset on).

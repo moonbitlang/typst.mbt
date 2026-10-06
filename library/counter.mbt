@@ -9,6 +9,11 @@
 pub(all) struct Counter(CounterKey) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Counter with Eq::{not_equal, equal}
+
+///|
 /// Create a new counter identified by a key.
 pub fn Counter::new(key : CounterKey) -> Counter {
   Counter(key)
@@ -639,12 +644,22 @@ pub impl IntoValue for Counter with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Counter with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Counter with fn from_value(v) {
   match v {
     Dyn(Counter(counter)) => counter
     v => raise HintedError(Counter::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Counter with FromValue::{from_value}
 
 ///|
 /// Identifies a counter.
@@ -657,6 +672,11 @@ pub(all) enum CounterKey {
   /// Counts through manual counters with the same key.
   Str(String)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterKey with Eq::{not_equal, equal}
 
 // cast! {
 //     CounterKey,
@@ -747,6 +767,11 @@ pub impl FromValue for CounterKey with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterKey with FromValue::{from_value}
+
+///|
 pub fn CounterKey::repr(self : CounterKey) -> String {
   match self {
     Page => "page"
@@ -765,6 +790,11 @@ pub(all) enum CounterUpdate {
   /// Apply the given function to the counter's state.
   Func(Func)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdate with Eq::{not_equal, equal}
 
 // cast! {
 //     CounterUpdate,
@@ -815,12 +845,22 @@ pub impl FromValue for CounterUpdate with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdate with FromValue::{from_value}
+
+///|
 /// Elements that have special counting behaviour (upstream `Count`): their
 /// update is given by [count_update].
 
 ///|
 /// Counts through elements with different levels.
 pub(all) struct CounterState(Array[Int64]) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterState with Eq::{not_equal, equal}
 
 ///|
 /// Get the initial counter state for the key.
@@ -925,6 +965,11 @@ pub extend CounterState with Reflect::{output, input, castable}
 pub impl IntoValue for CounterState with fn into_value(self) {
   Array(Arr::from_array(self.0.map(n => Int(n))))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterState with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for CounterState with fn from_value(v) {

@@ -12,6 +12,16 @@ pub(all) enum Base {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Base with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Base with @debug.Debug::{to_repr}
+
+///|
 /// The numeric value of the base.
 pub fn Base::value(self : Base) -> Int64 {
   match self {
@@ -36,9 +46,19 @@ pub impl Reflect for Base with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Base with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Base with fn into_value(self) {
   Int(self.value())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Base with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Base with fn from_value(v) {
@@ -47,6 +67,11 @@ pub impl FromValue for Base with fn from_value(v) {
     v => cast_fail_with(Type(Type::int()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Base with FromValue::{from_value}
 
 ///|
 /// Rust's `std::num::IntErrorKind`.
@@ -62,6 +87,16 @@ pub(all) suberror IntErrorKind {
   /// Value was zero (for non-zero types).
   Zero
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntErrorKind with @debug.Debug::{to_repr}
 
 ///|
 /// Rust's `char::to_digit` applied to a UTF-16 code unit.

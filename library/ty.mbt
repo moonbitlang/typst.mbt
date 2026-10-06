@@ -87,15 +87,30 @@ pub impl Eq for Type with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for Type with fn hash_combine(self, hasher) {
   hasher.combine_string(self.0.name)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Hash::{hash, hash_combine}
 
 ///|
 /// Order by long name (upstream `Ord for Type`).
 pub impl Compare for Type with fn compare(self, other) {
   compare_str(self.0.long_name, other.0.long_name)
 }
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// The type's short name, how in code it is referenced (e.g. `str`).
@@ -183,6 +198,7 @@ pub impl Show for Type with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
 pub extend Type with Show::{to_string}
 
 ///|

@@ -72,6 +72,21 @@ pub(all) enum NamedNumeralSystem {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamedNumeralSystem with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamedNumeralSystem with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamedNumeralSystem with @debug.Debug::{to_repr}
+
+///|
 /// All named numeral systems, in declaration order.
 pub fn NamedNumeralSystem::all() -> Array[NamedNumeralSystem] {
   [
@@ -625,12 +640,32 @@ pub(all) enum ChineseVariant {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChineseVariant with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChineseVariant with @debug.Debug::{to_repr}
+
+///|
 /// Upper or lower case Chinese numerals (upstream
 /// `chinese_number::ChineseCase`).
 pub(all) enum ChineseCase {
   Upper
   Lower
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChineseCase with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChineseCase with @debug.Debug::{to_repr}
 
 ///|
 /// A numeral system.
@@ -661,6 +696,16 @@ pub(all) enum RepresentationError {
   /// The number is too large.
   TooLarge
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RepresentationError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RepresentationError with @debug.Debug::{to_repr}
 
 ///|
 /// Represents the number in this numeral system.

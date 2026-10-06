@@ -43,6 +43,16 @@ pub(all) enum EntryType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with @debug.Debug::{to_repr}
+
+///|
 /// The strum `lowercase` serializations of the entry types.
 let entry_type_names : ReadOnlyArray[(String, EntryType)] = [
   ("article", Article),
@@ -92,6 +102,11 @@ pub impl Show for EntryType with fn output(self, logger) {
   }
   logger.write_string("unknown")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with Show::{to_string, output}
 
 ///|
 priv enum AuthorMode {

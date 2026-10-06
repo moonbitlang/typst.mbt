@@ -5,6 +5,16 @@
 pub(all) struct Transform(FixedArray[Double]) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with @debug.Debug::{to_repr}
+
+///|
 pub fn Transform::new(c : FixedArray[Double]) -> Transform {
   Transform(c)
 }
@@ -54,3 +64,8 @@ pub impl Mul for Transform with fn mul(self, other) {
     a[1] * b[4] + a[3] * b[5] + a[5],
   ])
 }
+
+///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Mul::{mul}

@@ -97,6 +97,7 @@ CORE_METHODS = {
     "Sub": ["sub"],
     "Mul": ["mul"],
     "Div": ["div"],
+    "Mod": ["mod"],
     "Neg": ["neg"],
     "BitOr": ["lor"],
 }
@@ -448,12 +449,12 @@ def insert(impls, only, dry):
             if lines[it["line"] - 1][it["col"] - 1:].startswith(("impl", "pub impl")):
                 head = re.compile(r"^(?:pub )?impl(?:\[[^\]]*\])? (?:@[\w/]+\.)?%s for %s\b" % (
                     re.escape(it["trait"].split(".")[-1]), re.escape(it["ty"])))
-                while e < len(lines):
-                    body = [l for l in lines[e + 1:next_start(e)] if l and not l.startswith(("//", "#"))]
-                    if body and head.match(body[0]):
-                        e = next_start(e)
-                    else:
-                        break
+                # after the last block of the impl, also when other items
+                # sit between its blocks
+                for s in starts:
+                    body = [l for l in lines[s + 1:next_start(s)] if l and not l.startswith(("//", "#"))]
+                    if s >= e and body and head.match(body[0]):
+                        e = next_start(s)
             while e - 1 > b and (lines[e - 1].strip() == "" or lines[e - 1].lstrip().startswith("//")) \
                     and not lines[e - 1].startswith("///|"):
                 e -= 1

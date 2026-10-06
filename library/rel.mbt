@@ -10,6 +10,21 @@ pub(all) struct Rel[T] {
 } derive(Default, Eq, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Hash::{hash, hash_combine}
+
+///|
 pub fn[T : Numeric] Rel::zero() -> Rel[T] {
   { rel: Ratio::zero(), abs: T::zero(), }
 }
@@ -82,6 +97,11 @@ pub impl Fold for Rel[Length] with fn fold(self, outer) {
 }
 
 ///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Fold::{fold}
+
+///|
 /// Upstream `PartialOrd for Rel<Length>`.
 pub fn Rel::partial_cmp_length(self : Rel[Length], other : Rel[Length]) -> Int? {
   if self.rel.is_zero() && other.rel.is_zero() {
@@ -99,14 +119,29 @@ pub impl[T : Numeric] Add for Rel[T] with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Add::{add}
+
+///|
 pub impl[T : Numeric] Sub for Rel[T] with fn sub(self, other) {
   { rel: self.rel - other.rel, abs: self.abs - other.abs, }
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Sub::{sub}
+
+///|
 pub impl[T : Numeric] Neg for Rel[T] with fn neg(self) {
   { rel: -self.rel, abs: -self.abs, }
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Neg::{neg}
 
 ///|
 pub impl[T : Numeric] Numeric for Rel[T] with fn zero() {
@@ -127,6 +162,12 @@ pub impl[T : Numeric] Numeric for Rel[T] with fn scale(self, factor) {
 pub impl[T : Numeric] Numeric for Rel[T] with fn div_scale(self, factor) {
   { rel: self.rel.div_by(factor), abs: self.abs.div_scale(factor), }
 }
+
+///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Numeric::{scale, is_finite, div_scale}
 
 ///|
 pub fn[T : Numeric] Rel::times(self : Rel[T], factor : Double) -> Rel[T] {

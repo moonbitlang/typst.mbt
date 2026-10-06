@@ -51,6 +51,11 @@ pub impl Fingerprint for ProcessColor with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColor with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for SpotColorant with fn fingerprint(self, state) {
   match self.name {
     None => state.write_discriminant(0)
@@ -69,6 +74,11 @@ pub impl Fingerprint for SpotColorant with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColorant with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Color with fn fingerprint(self, state) {
   match self {
     Process(c) => {
@@ -82,6 +92,11 @@ pub impl Fingerprint for Color with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for ColorSpace with fn fingerprint(self, state) {
@@ -107,6 +122,11 @@ pub impl Fingerprint for ColorSpace with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Fingerprint::{fingerprint}
 
 ///|
 /// `Smart<RelativeTo>`.
@@ -182,6 +202,11 @@ pub impl Fingerprint for Gradient with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gradient with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `TilingInner`: the frame (a `LazyHash`), the
 /// size, spacing, offset, angle and relative placement.
 pub impl Fingerprint for Tiling with fn fingerprint(self, state) {
@@ -194,6 +219,11 @@ pub impl Fingerprint for Tiling with fn fingerprint(self, state) {
   state.write_f64(self.angle.to_raw())
   state.write_relative(self.relative)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tiling with Fingerprint::{fingerprint}
 
 ///|
 /// The [fingerprint_flags] of the tiling's frame.
@@ -218,6 +248,11 @@ pub impl Fingerprint for Paint with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with Fingerprint::{fingerprint}
 
 ///|
 fn SipHasher128::write_cap(self : SipHasher128, cap : LineCap) -> Unit {
@@ -305,6 +340,11 @@ pub impl Fingerprint for Stroke with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `FixedStroke`.
 pub impl Fingerprint for FixedStroke with fn fingerprint(self, state) {
   state.write(self.paint)
@@ -324,6 +364,11 @@ pub impl Fingerprint for FixedStroke with fn fingerprint(self, state) {
   }
   state.write_ratio(self.miter_limit)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedStroke with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for Curve with fn fingerprint(self, state) {
@@ -351,6 +396,11 @@ pub impl Fingerprint for Curve with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Curve with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Transform with fn fingerprint(self, state) {
   state.write_ratio(self.sx)
   state.write_ratio(self.ky)
@@ -359,6 +409,11 @@ pub impl Fingerprint for Transform with fn fingerprint(self, state) {
   state.write_abs(self.tx)
   state.write_abs(self.ty)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `Shape`: geometry, fill, fill rule, stroke.
@@ -386,6 +441,11 @@ pub impl Fingerprint for Shape with fn fingerprint(self, state) {
   )
   state.write(self.stroke)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Shape with Fingerprint::{fingerprint}
 
 ///|
 /// `hash128` of font data (upstream `Bytes` hashes as the `u128` of its
@@ -416,6 +476,11 @@ pub impl Fingerprint for Font with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Font with Fingerprint::{fingerprint}
+
+///|
 /// Upstream `impl Hash for FontInstance`: the font, then the variations
 /// (`SmallVec<[(Tag, AxisValue); 2]>`).
 pub impl Fingerprint for FontInstance with fn fingerprint(self, state) {
@@ -435,6 +500,11 @@ pub impl Fingerprint for FontInstance with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInstance with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `Glyph`.
 pub impl Fingerprint for Glyph with fn fingerprint(self, state) {
   state.write_u32(self.id.to_int().reinterpret_as_uint())
@@ -447,6 +517,11 @@ pub impl Fingerprint for Glyph with fn fingerprint(self, state) {
   state.write(self.span)
   state.write_u32(self.span_offset.to_int().reinterpret_as_uint())
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Glyph with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `TextItem`: font, size, fill, stroke,
@@ -470,6 +545,11 @@ pub impl Fingerprint for TextItem with fn fingerprint(self, state) {
     state.write(glyph)
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextItem with Fingerprint::{fingerprint}
 
 ///|
 /// `Bytes`: upstream hashes the `u128` of the data's hash; the data itself
@@ -552,6 +632,11 @@ pub impl Fingerprint for Image with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Image with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `Destination`.
 pub impl Fingerprint for Destination with fn fingerprint(self, state) {
   match self {
@@ -569,6 +654,11 @@ pub impl Fingerprint for Destination with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Destination with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `Frame`: size, baseline, items and kind.
@@ -597,6 +687,11 @@ pub impl Fingerprint for Frame with fn fingerprint(self, state) {
     },
   )
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Frame with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `FrameItem`.
@@ -634,6 +729,11 @@ pub impl Fingerprint for FrameItem with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameItem with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `GroupItem`: frame, transform, clip curve,
 /// label and parent.
 pub impl Fingerprint for GroupItem with fn fingerprint(self, state) {
@@ -655,3 +755,8 @@ pub impl Fingerprint for GroupItem with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GroupItem with Fingerprint::{fingerprint}

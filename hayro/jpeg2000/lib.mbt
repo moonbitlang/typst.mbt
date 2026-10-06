@@ -53,9 +53,19 @@ pub(all) struct DecodeSettings {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeSettings with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for DecodeSettings with fn default() {
   { resolve_palette_indices: true, strict: false, target_resolution: None, }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeSettings with Default::{default}
 
 ///|
 /// A JPEG2000 image or codestream.
@@ -260,6 +270,16 @@ pub(all) enum ColorSpace {
     num_channels~ : Int
   )
 } derive(Debug, Eq)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Eq::{not_equal, equal}
 
 ///|
 /// Return the number of expected channels for the color space.

@@ -14,6 +14,21 @@ pub(all) enum Dir {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with @debug.Debug::{to_repr}
+
+///|
 /// Whether this direction points into the positive coordinate direction.
 ///
 /// The positive directions are left-to-right and top-to-bottom.
@@ -175,12 +190,22 @@ pub impl IntoValue for Dir with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Dir with fn from_value(value) {
   match value {
     Dyn(Dir(dir)) => dir
     _ => raise HintedError(CastInfo::Type(Type::direction()).error(value))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with FromValue::{from_value}
 
 ///|
 /// The direction with the given positivity for this axis.

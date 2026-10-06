@@ -49,6 +49,16 @@ pub(all) enum Language {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with @debug.Debug::{to_repr}
+
+///|
 /// `(variant, display name, serializations)`.
 let languages : ReadOnlyArray[(Language, String, ReadOnlyArray[String])] = [
   (Basque, "Basque", ["basque"]),
@@ -105,6 +115,11 @@ pub impl Show for Language with fn output(self, logger) {
     }
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with Show::{to_string, output}
 
 ///|
 /// Strum's `FromStr` (the display name and all serializations).

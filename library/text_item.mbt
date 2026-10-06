@@ -23,6 +23,11 @@ pub(all) struct TextItem {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextItem with Eq::{not_equal, equal}
+
+///|
 /// The width of the text run.
 pub fn TextItem::width(self : TextItem) -> Abs {
   sum_em(self.glyphs, g => g.x_advance).at(self.size)
@@ -81,6 +86,11 @@ pub impl Show for TextItem with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextItem with Show::{to_string, output}
+
+///|
 /// The sum of the given em values of some glyphs.
 fn sum_em(glyphs : ArrayView[Glyph], f : (Glyph) -> Em) -> Em {
   let mut sum = Em::zero()
@@ -117,6 +127,16 @@ pub(all) struct Glyph {
   /// The offset within the span.
   span_offset : UInt16
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Glyph with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Glyph with Hash::{hash, hash_combine}
 
 ///|
 /// The range of the glyph in its item's text (UTF-8 bytes).

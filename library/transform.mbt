@@ -9,6 +9,16 @@ pub(all) enum ScaleAmount {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaleAmount with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaleAmount with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for ScaleAmount with fn input() {
   CastInfo::Type(Type::ratio()).union_with(Type(Type::length()))
 }
@@ -35,6 +45,11 @@ pub impl IntoValue for ScaleAmount with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaleAmount with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ScaleAmount with fn from_value(v) {
   match v {
     Ratio(ratio) => Ratio(ratio)
@@ -42,6 +57,11 @@ pub impl FromValue for ScaleAmount with fn from_value(v) {
     v => raise HintedError(ScaleAmount::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaleAmount with FromValue::{from_value}
 
 ///|
 /// Upstream `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))`.
@@ -75,6 +95,16 @@ pub(all) struct Transform {
   tx : Abs
   ty : Abs
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Hash::{hash, hash_combine}
 
 ///|
 /// The identity transformation.

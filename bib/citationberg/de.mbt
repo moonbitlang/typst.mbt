@@ -17,6 +17,16 @@ pub(all) struct XmlDeError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend XmlDeError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend XmlDeError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for XmlDeError with fn output(self, logger) {
   logger.write_string("Deserialization error occured")
   if self.path is Some(path) {

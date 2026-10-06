@@ -13,6 +13,21 @@ pub(all) enum Alignment {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with @debug.Debug::{to_repr}
+
+///|
 /// The horizontal component.
 pub fn Alignment::x(self : Alignment) -> HAlignment? {
   match self {
@@ -223,6 +238,11 @@ pub impl Reflect for Alignment with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Alignment with fn into_value(self) {
   Dyn(Alignment(self))
 }
@@ -239,6 +259,11 @@ pub impl FromValue for Alignment with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with FromValue::{from_value}
+
+///|
 /// Where to align something horizontally.
 pub(all) enum HAlignment {
   Start
@@ -249,9 +274,29 @@ pub(all) enum HAlignment {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for HAlignment with fn default() {
   Start
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with Default::{default}
 
 ///|
 /// The inverse horizontal alignment.
@@ -316,6 +361,11 @@ pub impl Reflect for HAlignment with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for HAlignment with fn into_value(self) {
   Dyn(Alignment(H(self)))
 }
@@ -332,6 +382,11 @@ pub impl FromValue for HAlignment with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with FromValue::{from_value}
+
+///|
 /// A horizontal alignment which only allows `left`/`right` and `start`/`end`,
 /// thus excluding `center`.
 pub(all) enum OuterHAlignment {
@@ -342,9 +397,29 @@ pub(all) enum OuterHAlignment {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for OuterHAlignment with fn default() {
   Start
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with Default::{default}
 
 ///|
 /// Resolve to the absolute alignment.
@@ -401,9 +476,19 @@ pub impl Reflect for OuterHAlignment with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OuterHAlignment with fn into_value(self) {
   self.to_h().into_value()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for OuterHAlignment with fn from_value(value) {
@@ -414,6 +499,11 @@ pub impl FromValue for OuterHAlignment with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with FromValue::{from_value}
+
+///|
 /// Where to align something vertically.
 pub(all) enum VAlignment {
   Top
@@ -422,9 +512,34 @@ pub(all) enum VAlignment {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for VAlignment with fn default() {
   Top
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with Default::{default}
 
 ///|
 /// The inverse vertical alignment.
@@ -511,6 +626,11 @@ pub impl FromValue for VAlignment with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with FromValue::{from_value}
+
+///|
 /// A vertical alignment which only allows `top` and `bottom`, thus excluding
 /// `horizon`.
 pub(all) enum OuterVAlignment {
@@ -519,9 +639,34 @@ pub(all) enum OuterVAlignment {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for OuterVAlignment with fn default() {
   Top
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with Default::{default}
 
 ///|
 /// Resolve to the absolute alignment.
@@ -572,9 +717,19 @@ pub impl Reflect for OuterVAlignment with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OuterVAlignment with fn into_value(self) {
   self.to_v().into_value()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for OuterVAlignment with fn from_value(value) {
@@ -583,6 +738,11 @@ pub impl FromValue for OuterVAlignment with fn from_value(value) {
     _ => raise HintedError(CastInfo::Type(Type::alignment()).error(value))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with FromValue::{from_value}
 
 ///|
 /// A component of a [SpecificAlignment] (upstream bounds
@@ -605,6 +765,14 @@ pub impl AlignmentComponent for HAlignment with fn to_alignment(self) {
 }
 
 ///|
+#deprecated("call as `AlignmentComponent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HAlignment with AlignmentComponent::{
+  to_alignment,
+  try_from_alignment,
+}
+
+///|
 pub impl AlignmentComponent for OuterHAlignment with fn try_from_alignment(a) {
   OuterHAlignment::try_from(a)
 }
@@ -612,6 +780,14 @@ pub impl AlignmentComponent for OuterHAlignment with fn try_from_alignment(a) {
 ///|
 pub impl AlignmentComponent for OuterHAlignment with fn to_alignment(self) {
   H(self.to_h())
+}
+
+///|
+#deprecated("call as `AlignmentComponent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterHAlignment with AlignmentComponent::{
+  to_alignment,
+  try_from_alignment,
 }
 
 ///|
@@ -625,6 +801,14 @@ pub impl AlignmentComponent for VAlignment with fn to_alignment(self) {
 }
 
 ///|
+#deprecated("call as `AlignmentComponent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VAlignment with AlignmentComponent::{
+  to_alignment,
+  try_from_alignment,
+}
+
+///|
 pub impl AlignmentComponent for OuterVAlignment with fn try_from_alignment(a) {
   OuterVAlignment::try_from(a)
 }
@@ -632,6 +816,14 @@ pub impl AlignmentComponent for OuterVAlignment with fn try_from_alignment(a) {
 ///|
 pub impl AlignmentComponent for OuterVAlignment with fn to_alignment(self) {
   V(self.to_v())
+}
+
+///|
+#deprecated("call as `AlignmentComponent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OuterVAlignment with AlignmentComponent::{
+  to_alignment,
+  try_from_alignment,
 }
 
 ///|
@@ -643,6 +835,21 @@ pub(all) enum SpecificAlignment[H, V] {
   V(V)
   Both(H, V)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<SpecificAlignment<H, V>> for Alignment`.
@@ -686,12 +893,22 @@ pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAli
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[
   H,
   V,
 ] with fn into_value(self) {
   self.to_alignment().into_value()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with IntoValue::{into_value}
 
 ///|
 pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificAlignment[
@@ -711,6 +928,11 @@ pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificA
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificAlignment with FromValue::{from_value}
+
+///|
 /// A fixed alignment in the global coordinate space.
 ///
 /// For horizontal alignment, start is globally left and for vertical alignment
@@ -722,7 +944,22 @@ pub(all) enum FixedAlignment {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedAlignment with Eq::{not_equal, equal}
+
+///|
 pub extend FixedAlignment with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedAlignment with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedAlignment with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the position of this alignment in a container with the given

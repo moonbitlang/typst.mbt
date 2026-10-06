@@ -21,6 +21,16 @@ pub(all) enum FieldKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldKind with @debug.Debug::{to_repr}
+
+///|
 /// Metadata about an element field (upstream `FieldVtable`).
 pub struct FieldInfo {
   /// The field's index.
@@ -126,15 +136,30 @@ pub impl Eq for Element with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Element with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for Element with fn hash_combine(self, hasher) {
   hasher.combine_string(self.0.name)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Element with Hash::{hash, hash_combine}
 
 ///|
 /// Order by name (upstream `Ord for Element`).
 pub impl Compare for Element with fn compare(self, other) {
   compare_str(self.0.name, other.0.name)
 }
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Element with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Create an element descriptor.

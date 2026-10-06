@@ -14,6 +14,16 @@ pub(all) enum Number {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with @debug.Debug::{to_repr}
+
+///|
 /// Returns the number as a f64.
 pub fn Number::as_f64(self : Number) -> Double {
   match self {
@@ -110,6 +120,11 @@ fn skip_number(r : Reader) -> Unit? {
 pub impl Skippable for Number with fn skip(r, _) {
   skip_number(r)
 }
+
+///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with Skippable::{skip}
 
 ///|
 pub impl Readable for Number with fn read(r, _) {
@@ -224,6 +239,11 @@ pub impl ObjectLike for Number with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with ObjectLike::{from_object}
 
 ///|
 /// Skip an integer (`int_num!` skip).

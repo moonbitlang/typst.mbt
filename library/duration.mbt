@@ -5,6 +5,16 @@
 pub struct Duration(@time.Duration) derive(Eq, Hash, Compare)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Hash::{hash, hash_combine}
+
+///|
 pub extend Duration with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
@@ -184,9 +194,19 @@ pub impl IntoValue for Duration with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Duration with fn from_value(v) {
   match v {
     Duration(d) => d
     v => raise HintedError(Duration::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with FromValue::{from_value}

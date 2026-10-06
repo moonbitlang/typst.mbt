@@ -73,6 +73,11 @@ pub impl CacheKey for GlyphIdentifier with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphIdentifier with CacheKey::{cache_key}
+
+///|
 /// A glyph defined by an outline.
 pub struct OutlineGlyph {
   priv id : GlyphId
@@ -164,6 +169,11 @@ pub impl CacheKey for Type3Glyph with fn cache_key(self) {
     h.write_u32(self.glyph_id.to_u32())
   })
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type3Glyph with CacheKey::{cache_key}
 
 ///|
 priv struct Font {
@@ -378,6 +388,16 @@ pub(all) enum FontStretch {
   /// Ultra expanded.
   UltraExpanded
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with @debug.Debug::{to_repr}
 
 ///|
 fn FontStretch::from_string(s : String) -> FontStretch {

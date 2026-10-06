@@ -11,6 +11,21 @@
 pub(all) struct ModifierSet(String) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ModifierSet with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ModifierSet with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ModifierSet with @debug.Debug::{to_repr}
+
+///|
 /// Constructs a modifier set from a string, where modifiers are separated by
 /// the character `.`.
 ///

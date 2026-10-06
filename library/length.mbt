@@ -12,6 +12,21 @@ pub(all) struct Length {
 } derive(Default, Eq, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Hash::{hash, hash_combine}
+
+///|
 pub fn Length::zero() -> Length {
   { abs: Abs::zero(), em: Em::zero(), }
 }
@@ -180,14 +195,29 @@ pub impl Add for Length with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Add::{add}
+
+///|
 pub impl Sub for Length with fn sub(self, other) {
   { abs: self.abs - other.abs, em: self.em - other.em, }
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Sub::{sub}
+
+///|
 pub impl Neg for Length with fn neg(self) {
   { abs: -self.abs, em: -self.em, }
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Neg::{neg}
 
 ///|
 pub impl Numeric for Length with fn zero() {
@@ -208,6 +238,12 @@ pub impl Numeric for Length with fn scale(self, factor) {
 pub impl Numeric for Length with fn div_scale(self, factor) {
   self.div_by(factor)
 }
+
+///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Numeric::{scale, is_finite, div_scale}
 
 ///|
 pub fn Length::times(self : Length, factor : Double) -> Length {

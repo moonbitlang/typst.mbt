@@ -99,6 +99,21 @@ pub(all) struct GlyphRect {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphRect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphRect with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphRect with @debug.Debug::{to_repr}
+
+///|
 /// An OpenType font.
 ///
 /// Values of this type are cheap to clone and immutable.
@@ -216,6 +231,11 @@ pub impl Eq for Font with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Font with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for Font with fn hash_combine(self, hasher) {
   // Consistent with `Eq`: equal fonts have equal data lengths.
   hasher.combine(self.data.length())
@@ -223,11 +243,21 @@ pub impl Hash for Font with fn hash_combine(self, hasher) {
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Font with Hash::{hash, hash_combine}
+
+///|
 /// Upstream `Debug for Font`: `Font({family}, {variant:?})`.
 pub impl Show for Font with fn output(self, logger) {
   let info = self.info()
   logger.write_string("Font(\{info.family}, \{info.variant})")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Font with Show::{to_string, output}
 
 ///|
 /// An OpenType font with fixed variation coordinates.
@@ -428,16 +458,31 @@ pub impl Eq for FontInstance with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInstance with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for FontInstance with fn hash_combine(self, hasher) {
   hasher.combine(self.font)
   hasher.combine(self.variations)
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInstance with Hash::{hash, hash_combine}
+
+///|
 /// Upstream `Debug for FontInstance` (abridged).
 pub impl Show for FontInstance with fn output(self, logger) {
   logger.write_string("FontInstance { font: \{self.font} }")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInstance with Show::{to_string, output}
 
 // ---------------------------------------------------------------------------
 // The `otf` backend.

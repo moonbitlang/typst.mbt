@@ -157,6 +157,11 @@ pub impl Fingerprint for NativeRuleMap with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NativeRuleMap with Fingerprint::{fingerprint}
+
+///|
 /// The native show rule of `context` elements (upstream `CONTEXT_RULE`,
 /// `foundations/context.rs`).
 pub fn context_rule(

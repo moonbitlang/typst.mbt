@@ -936,6 +936,16 @@ pub(all) enum NonDecimalBase {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonDecimalBase with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonDecimalBase with @debug.Debug::{to_repr}
+
+///|
 /// The value of the base.
 pub fn NonDecimalBase::get(self : NonDecimalBase) -> Int {
   match self {

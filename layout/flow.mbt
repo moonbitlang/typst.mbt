@@ -164,6 +164,16 @@ pub(all) enum FlowMode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FlowMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FlowMode with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `From<FragmentKind> for FlowMode`.
 pub fn FlowMode::from_kind(value : @library.FragmentKind) -> FlowMode {
   match value {

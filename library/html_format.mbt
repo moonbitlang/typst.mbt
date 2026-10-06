@@ -19,6 +19,11 @@ pub(all) struct HtmlFormatOptions {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlFormatOptions with Eq::{not_equal, equal}
+
+///|
 /// The HTML format options configured by a document (upstream
 /// `options.get::<HtmlFormat>()`).
 pub fn HtmlFormatOptions::get(
@@ -35,6 +40,16 @@ pub fn HtmlFormatOptions::get(
 pub(all) struct PartialHtmlFormatOptions {
   pretty : Bool?
 } derive(Eq, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialHtmlFormatOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialHtmlFormatOptions with Default::{default}
 
 ///|
 /// Resolves the partial options to complete ones, given defaults.

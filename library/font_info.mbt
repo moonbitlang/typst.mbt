@@ -18,8 +18,33 @@ pub(all) struct FontInfo {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInfo with Hash::{hash, hash_combine}
+
+///|
 /// Bitflags describing characteristics of a font.
 pub(all) struct FontFlags(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFlags with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFlags with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFlags with @debug.Debug::{to_repr}
 
 ///|
 /// All glyphs have the same width.
@@ -82,6 +107,11 @@ pub impl Show for FontFlags with fn output(self, logger) {
     logger.write_string("FontFlags(" + names.join(" | ") + ")")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFlags with Show::{to_string, output}
 
 ///|
 /// Compute metadata for font at the `index` of the given data.
@@ -239,6 +269,11 @@ pub impl Show for FontInfo with fn output(self, logger) {
     "FontInfo { family: \{@unicode.rust_debug_str(self.family)}, variant: \{self.variant}, flags: \{self.flags}, axes: [\{axes}], coverage: Coverage(..) }",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontInfo with Show::{to_string, output}
 
 ///|
 /// Rust's `Debug` for an `f32`.
@@ -404,6 +439,16 @@ fn rust_str_trim(s : String) -> StringView {
 pub(all) struct Coverage(Array[UInt]) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Coverage with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Coverage with Hash::{hash, hash_combine}
+
+///|
 pub impl Default for Coverage with fn default() {
   Coverage([])
 }
@@ -512,6 +557,11 @@ fn Coverage::union(self : Coverage, other : Coverage) -> Coverage {
 pub impl Show for Coverage with fn output(_, logger) {
   logger.write_string("Coverage(..)")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Coverage with Show::{to_string, output}
 
 ///|
 /// Incrementally builds a [`Coverage`] set from a non-decreasing series of

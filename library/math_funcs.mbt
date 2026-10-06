@@ -132,6 +132,26 @@ pub(all) enum MathSize {
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathSize with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathSize with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathSize with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathSize with @debug.Debug::{to_repr}
+
+///|
 fn equation_elem_size_default() -> Value {
   MathSize::Text.into_value()
 }
@@ -184,6 +204,11 @@ pub impl FromValue for MathSize with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathSize with FromValue::{from_value}
+
+///|
 /// Base math styles used in Typst (upstream `codex::styling::MathVariant`).
 pub(all) enum MathVariant {
   Plain
@@ -194,6 +219,21 @@ pub(all) enum MathVariant {
   Chancery
   Roundhand
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariant with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariant with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariant with @debug.Debug::{to_repr}
 
 // Upstream `MathVariant` has no cast: it is only stored in the internal
 // `EquationElem::variant` field and never exposed to users. Its value form
@@ -247,6 +287,11 @@ pub impl IntoValue for MathVariant with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariant with IntoValue::{into_value}
+
+///|
 pub impl FromValue for MathVariant with fn from_value(v) {
   for variant in math_variants[:] {
     if v is Str(s) && s == variant.name() {
@@ -255,6 +300,11 @@ pub impl FromValue for MathVariant with fn from_value(v) {
   }
   raise HintedError(MathVariant::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariant with FromValue::{from_value}
 
 ///|
 /// `(i16, i16)` (the internal `EquationElem::script_scale` field), cast like

@@ -11,6 +11,16 @@ pub(all) enum RawChunk {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawChunk with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawChunk with @debug.Debug::{to_repr}
+
+///|
 /// The content of a field or abbreviation.
 pub type Field = Array[Spanned[RawChunk]]
 
@@ -56,6 +66,16 @@ pub(all) struct ParseError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with @debug.Debug::{to_repr}
+
+///|
 pub fn ParseError::new(span : Span, kind : ParseErrorKind) -> ParseError {
   { span, kind, }
 }
@@ -64,6 +84,11 @@ pub fn ParseError::new(span : Span, kind : ParseErrorKind) -> ParseError {
 pub impl Show for ParseError with fn output(self, logger) {
   logger.write_string("\{self.kind}: \{self.span.start}-\{self.span.end}")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with Show::{to_string, output}
 
 ///|
 /// Error conditions that might occur during initial parsing of the
@@ -86,6 +111,16 @@ pub(all) enum ParseErrorKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseErrorKind with @debug.Debug::{to_repr}
+
+///|
 /// A token that can be encountered during parsing.
 pub(all) enum Token {
   /// An identifier for a field key, citation type, abbreviation, or citation
@@ -104,6 +139,16 @@ pub(all) enum Token {
   /// A decimal point: `.`.
   DecimalPoint
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Token with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Token with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for ParseErrorKind with fn output(self, logger) {
@@ -140,6 +185,11 @@ pub impl Show for Token with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Token with Show::{to_string, output}
 
 ///|
 /// Parse a raw bibliography from a source string.

@@ -8,6 +8,11 @@ pub(all) enum ParseError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with Eq::{not_equal, equal}
+
+///|
 /// Errors related to file structure.
 pub(all) enum FormatError {
   /// Invalid file header signature.
@@ -23,6 +28,11 @@ pub(all) enum FormatError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatError with Eq::{not_equal, equal}
+
+///|
 /// Errors related to segment processing.
 pub(all) enum SegmentError {
   /// Unknown or reserved segment type.
@@ -36,6 +46,11 @@ pub(all) enum SegmentError {
   /// Missing required pattern dictionary.
   MissingPatternDictionary
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SegmentError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to Huffman decoding.
@@ -55,6 +70,11 @@ pub(all) enum HuffmanError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HuffmanError with Eq::{not_equal, equal}
+
+///|
 /// Errors related to region parameters.
 pub(all) enum RegionError {
   /// Invalid combination operator value.
@@ -68,6 +88,11 @@ pub(all) enum RegionError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RegionError with Eq::{not_equal, equal}
+
+///|
 /// Errors related to template configuration.
 pub(all) enum TemplateError {
   /// An invalid template value was used.
@@ -75,6 +100,11 @@ pub(all) enum TemplateError {
   /// Invalid adaptive template pixel location.
   InvalidAtPixel
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TemplateError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to symbol handling.
@@ -96,6 +126,11 @@ pub(all) enum SymbolError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SymbolError with Eq::{not_equal, equal}
+
+///|
 /// Arithmetic overflow errors.
 pub(all) enum OverflowError {
   /// Bitmap dimension computation overflowed.
@@ -111,6 +146,11 @@ pub(all) enum OverflowError {
   /// A symbol dictionary has too many symbols.
   SymbolCount
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OverflowError with Eq::{not_equal, equal}
 
 ///|
 /// The main error type for JBIG2 decoding operations.
@@ -136,6 +176,11 @@ pub(all) suberror DecodeError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeError with Eq::{not_equal, equal}
+
+///|
 pub impl Show for DecodeError with fn output(self, logger) {
   match self {
     Parse(e) => e.output(logger)
@@ -149,6 +194,11 @@ pub impl Show for DecodeError with fn output(self, logger) {
     Unsupported => logger.write_string("unsupported feature")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeError with Show::{to_string, output}
 
 ///|
 pub impl Show for OverflowError with fn output(self, logger) {

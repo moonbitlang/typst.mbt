@@ -82,6 +82,11 @@ pub impl Eq for SvgNode with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgNode with Eq::{not_equal, equal}
+
+///|
 fn SvgNode::d(self : SvgNode) -> NodeData {
   self.doc.nodes[self.id]
 }
@@ -645,6 +650,11 @@ pub impl FromValue for Opacity with fn parse(_, _, value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with FromValue::{parse}
+
+///|
 pub impl FromValue for Transform with fn parse(_, _, value) {
   let ts = @svgtypes.Transform::from_str(value) catch { _ => return None }
   let ts = Transform::from_row(
@@ -684,6 +694,11 @@ pub impl FromValue for Units with fn parse(_, _, value) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Units with FromValue::{parse}
 
 ///|
 pub impl FromValue for @svgtypes.AspectRatio with fn parse(_, _, value) {
@@ -751,6 +766,11 @@ pub impl FromValue for Visibility with fn parse(_, _, value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Visibility with FromValue::{parse}
+
+///|
 pub impl FromValue for SpreadMethod with fn parse(_, _, value) {
   match value {
     "pad" => Some(Pad)
@@ -759,6 +779,11 @@ pub impl FromValue for SpreadMethod with fn parse(_, _, value) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpreadMethod with FromValue::{parse}
 
 ///|
 pub impl FromValue for ShapeRendering with fn parse(_, _, value) {
@@ -771,6 +796,11 @@ pub impl FromValue for ShapeRendering with fn parse(_, _, value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShapeRendering with FromValue::{parse}
+
+///|
 pub impl FromValue for TextRendering with fn parse(_, _, value) {
   match value {
     "optimizeSpeed" => Some(TextRendering::OptimizeSpeed)
@@ -779,6 +809,11 @@ pub impl FromValue for TextRendering with fn parse(_, _, value) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextRendering with FromValue::{parse}
 
 ///|
 pub impl FromValue for ImageRendering with fn parse(_, _, value) {
@@ -792,6 +827,11 @@ pub impl FromValue for ImageRendering with fn parse(_, _, value) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageRendering with FromValue::{parse}
 
 ///|
 pub impl FromValue for BlendMode with fn parse(_, _, value) {
@@ -817,6 +857,11 @@ pub impl FromValue for BlendMode with fn parse(_, _, value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with FromValue::{parse}
+
+///|
 pub impl FromValue for SvgNode with fn parse(node, aid, value) {
   let id = if aid == AId::Href {
     Some(@svgtypes.IRI::from_str(value).0) catch {
@@ -830,3 +875,8 @@ pub impl FromValue for SvgNode with fn parse(node, aid, value) {
   guard id is Some(id) else { return None }
   node.document().element_by_id(id)
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgNode with FromValue::{parse}

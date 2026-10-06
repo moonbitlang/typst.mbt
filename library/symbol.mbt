@@ -19,6 +19,16 @@ pub struct Symbol {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with Hash::{hash, hash_combine}
+
+///|
 /// The internal representation of a [Symbol].
 priv enum SymbolInner {
   /// A native symbol that has no named variant.
@@ -305,6 +315,12 @@ pub impl Show for Symbol with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with Show::{to_string}
+
+///|
 /// Upstream `Repr for Symbol`.
 pub fn Symbol::repr(self : Symbol) -> String {
   match self.inner {
@@ -396,6 +412,11 @@ pub impl FromValue for SymbolVariant with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SymbolVariant with FromValue::{from_value}
+
+///|
 pub impl Reflect for Symbol with fn input() {
   Type(Type::symbol())
 }
@@ -411,9 +432,19 @@ pub impl Reflect for Symbol with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Symbol with fn into_value(self) {
   Symbol(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Symbol with fn from_value(v) {
@@ -422,3 +453,8 @@ pub impl FromValue for Symbol with fn from_value(v) {
     v => cast_fail_with(Type(Type::symbol()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with FromValue::{from_value}

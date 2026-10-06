@@ -79,6 +79,21 @@ pub(all) enum EntryType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with @debug.Debug::{to_repr}
+
+///|
 let entry_type_names : ReadOnlyArray[(EntryType, String, String)] = [
   (Article, "article", "Article"),
   (Chapter, "chapter", "Chapter"),
@@ -140,6 +155,11 @@ pub impl Show for EntryType with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntryType with Show::{to_string, output}
+
+///|
 /// Entry parents have implicit defaults. This function returns the default
 /// parent for this entry type.
 pub fn EntryType::default_parent(self : EntryType) -> EntryType {
@@ -169,6 +189,21 @@ pub(all) enum MaybeTyped[T] {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeTyped with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeTyped with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeTyped with @debug.Debug::{to_repr}
+
+///|
 /// Get the typed value, if it is present.
 pub fn[T] MaybeTyped::as_typed(self : MaybeTyped[T]) -> T? {
   match self {
@@ -184,6 +219,11 @@ pub impl[T : Show] Show for MaybeTyped[T] with fn output(self, logger) {
     String(s) => logger.write_string(s)
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeTyped with Show::{to_string, output}
 
 ///|
 /// Convert the value to a string.
@@ -268,6 +308,21 @@ pub(all) struct QualifiedUrl {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QualifiedUrl with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QualifiedUrl with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QualifiedUrl with @debug.Debug::{to_repr}
+
+///|
 /// Create a new qualified URL.
 pub fn QualifiedUrl::new(value : Url, visit_date : Date?) -> QualifiedUrl {
   { value, visit_date, }
@@ -302,6 +357,21 @@ pub(all) struct Publisher {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Publisher with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Publisher with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Publisher with @debug.Debug::{to_repr}
+
+///|
 /// Create a new publisher.
 pub fn Publisher::new(
   name : FormatString?,
@@ -327,12 +397,27 @@ pub fn Publisher::from_str(
 pub(all) struct SerialNumber(Map[String, String]) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SerialNumber with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SerialNumber with @debug.Debug::{to_repr}
+
+///|
 pub impl Hash for SerialNumber with fn hash_combine(self, hasher) {
   for k in self.sorted_keys() {
     hasher.combine_string(k)
     hasher.combine_string(self.0.get(k).unwrap())
   }
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SerialNumber with Hash::{hash, hash_combine}
 
 ///|
 /// The keys in `BTreeMap` order.

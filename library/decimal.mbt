@@ -15,9 +15,19 @@ pub impl Hash for Decimal with fn hash_combine(self, hasher) {
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decimal with Hash::{hash, hash_combine}
+
+///|
 pub impl Eq for Decimal with fn equal(self, other) {
   self.0.cmp(other.0) == 0
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decimal with Eq::{not_equal, equal}
 
 ///|
 pub impl Compare for Decimal with fn compare(self, other) {
@@ -281,6 +291,8 @@ pub fn Decimal::to_string(self : Decimal) -> String {
 pub impl Show for Decimal with fn output(self, logger) {
   logger.write_string(self.to_string())
 }
+// No `extend` for this impl, nothing is left to name: `to_string` is a regular
+// method of the type, and the `extend` of `Reflect` makes `output` one.
 
 ///|
 /// Upstream `Repr for Decimal`.
@@ -395,6 +407,11 @@ pub impl FromValue for ToDecimal with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToDecimal with FromValue::{from_value}
+
+///|
 pub impl Reflect for Decimal with fn input() {
   Type(Type::decimal())
 }
@@ -410,12 +427,17 @@ pub impl Reflect for Decimal with fn castable(v) {
 }
 
 ///|
-pub extend Decimal with Reflect::{input, castable}
+pub extend Decimal with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Decimal with fn into_value(self) {
   Decimal(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decimal with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Decimal with fn from_value(v) {
@@ -424,3 +446,8 @@ pub impl FromValue for Decimal with fn from_value(v) {
     v => raise HintedError(Decimal::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decimal with FromValue::{from_value}

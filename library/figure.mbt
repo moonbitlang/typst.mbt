@@ -11,6 +11,11 @@ pub(all) enum FigureKind {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureKind with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for FigureKind with fn input() {
   Element::input().union_with(Type(Type::str()))
 }
@@ -51,8 +56,18 @@ pub impl FromValue for FigureKind with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureKind with FromValue::{from_value}
+
+///|
 /// The caption of a figure (upstream `Packed<FigureCaption>`).
 pub(all) struct FigureCaption(Content) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureCaption with Eq::{not_equal, equal}
 
 ///|
 /// Create a new figure caption with the given body.
@@ -80,9 +95,19 @@ pub impl Reflect for FigureCaption with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureCaption with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FigureCaption with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureCaption with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FigureCaption with fn from_value(v) {
@@ -99,6 +124,11 @@ pub impl FromValue for FigureCaption with fn from_value(v) {
   }
   FigureCaption(FigureCaption::new(content).0.spanned(span))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureCaption with FromValue::{from_value}
 
 ///|
 /// Retrieves the locale separator.

@@ -53,9 +53,29 @@ fn cases_elem_delim_default() -> Value {
 pub(all) struct MathDelimiter(Char?) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathDelimiter with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathDelimiter with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathDelimiter with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for MathDelimiter with fn default() {
   MathDelimiter(None)
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathDelimiter with Default::{default}
 
 ///|
 pub fn MathDelimiter::none() -> MathDelimiter {
@@ -151,12 +171,32 @@ pub impl FromValue for MathDelimiter with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathDelimiter with FromValue::{from_value}
+
+///|
 /// A pair of delimiters (one closing, one opening) used for matrices, vectors
 /// and cases.
 pub(all) struct DelimiterPair {
   open : MathDelimiter
   close : MathDelimiter
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterPair with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterPair with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterPair with @debug.Debug::{to_repr}
 
 ///|
 pub fn DelimiterPair::paren() -> DelimiterPair {
@@ -225,6 +265,11 @@ pub impl FromValue for DelimiterPair with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterPair with FromValue::{from_value}
+
+///|
 /// Parameters specifying how augmentation lines should be drawn on a matrix.
 pub(all) struct Augment {
   hline : AugmentOffsets
@@ -233,9 +278,19 @@ pub(all) struct Augment {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Augment with Eq::{not_equal, equal}
+
+///|
 pub impl Default for Augment with fn default() {
   { hline: AugmentOffsets([]), vline: AugmentOffsets([]), stroke: Auto, }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Augment with Default::{default}
 
 ///|
 pub impl Fold for Augment with fn fold(self, outer) {
@@ -250,6 +305,11 @@ pub impl Fold for Augment with fn fold(self, outer) {
     },
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Augment with Fold::{fold}
 
 ///|
 pub impl Reflect for Augment with fn input() {
@@ -289,6 +349,11 @@ pub impl IntoValue for Augment with fn into_value(self) {
   }
   Dict(Dict::from_pairs(pairs))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Augment with IntoValue::{into_value}
 
 ///|
 /// Upstream's cast of `Augment` into a value (shown to users).
@@ -349,6 +414,21 @@ pub extend Augment with FromValue::{from_value}
 pub(all) struct AugmentOffsets(Array[Int64]) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AugmentOffsets with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AugmentOffsets with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AugmentOffsets with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for AugmentOffsets with fn input() {
   CastInfo::Type(Type::int()).union_with(Type(Type::array()))
 }
@@ -390,6 +470,11 @@ pub impl FromValue for AugmentOffsets with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AugmentOffsets with FromValue::{from_value}
+
+///|
 /// Augmentation parameters whose stroke lengths have been resolved (upstream
 /// `Augment<Abs>`).
 pub(all) struct ResolvedAugment {
@@ -397,6 +482,11 @@ pub(all) struct ResolvedAugment {
   vline : AugmentOffsets
   stroke : Smart[ResolvedStroke]
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedAugment with Eq::{not_equal, equal}
 
 ///|
 /// Upstream `Resolve for Augment`.

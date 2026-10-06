@@ -130,6 +130,21 @@ pub(all) struct Margin[T] {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Margin with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Margin with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Margin with @debug.Debug::{to_repr}
+
+///|
 /// Create an instance with four equal components.
 pub fn[T] Margin::splat(value : T?) -> Margin[T] {
   { sides: Sides::splat(value), two_sided: None, }
@@ -142,6 +157,11 @@ pub impl[T : Fold] Fold for Margin[T] with fn fold(self, outer) {
     two_sided: Fold::fold(self.two_sided, outer.two_sided),
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Margin with Fold::{fold}
 
 ///|
 pub impl[T : Reflect] Reflect for Margin[T] with fn input() {
@@ -157,6 +177,11 @@ pub impl[T : Reflect] Reflect for Margin[T] with fn output() {
 pub impl[T : Reflect] Reflect for Margin[T] with fn castable(value) {
   T::castable(value) || value is Dict(_)
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Margin with Reflect::{output, input, castable}
 
 ///|
 pub impl[T : IntoValue + Eq] IntoValue for Margin[T] with fn into_value(self) {
@@ -257,6 +282,21 @@ pub(all) enum PageBinding {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageBinding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageBinding with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageBinding with @debug.Debug::{to_repr}
+
+///|
 /// Whether to swap left and right margin for the page with this number.
 pub fn PageBinding::swap(self : PageBinding, number : Int) -> Bool {
   match self {
@@ -296,6 +336,11 @@ pub impl IntoValue for PageBinding with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageBinding with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PageBinding with fn from_value(v) {
   match v {
     Dyn(Alignment(H(Left))) => Left
@@ -305,11 +350,31 @@ pub impl FromValue for PageBinding with fn from_value(v) {
   }
 }
 
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageBinding with FromValue::{from_value}
+
 // PageRanges
 
 ///|
 /// A list of page ranges to be exported.
 pub(all) struct PageRanges(Array[PageRange]) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for PageRanges with fn input() {
@@ -335,6 +400,11 @@ pub impl IntoValue for PageRanges with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PageRanges with fn from_value(v) {
   if PageRange::castable(v) {
     return PageRanges([PageRange::from_value(v)])
@@ -344,6 +414,11 @@ pub impl FromValue for PageRanges with fn from_value(v) {
     v => raise HintedError(PageRanges::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with FromValue::{from_value}
 
 ///|
 /// Check if a page, given its number, should be included when exporting
@@ -370,6 +445,21 @@ pub(all) struct PageRange {
   start : Int?
   end : Int?
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRange with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRange with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for PageRange with fn input() {
@@ -461,6 +551,21 @@ pub(all) enum Parity {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Parity with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Parity with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Parity with @debug.Debug::{to_repr}
+
+///|
 let parity_names : ReadOnlyArray[String] = ["even", "odd"]
 
 ///|
@@ -490,6 +595,11 @@ pub impl IntoValue for Parity with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Parity with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Parity with fn from_value(v) {
   match str_names_find(parity_names, v) {
     Some(0) => Even
@@ -497,6 +607,11 @@ pub impl FromValue for Parity with fn from_value(v) {
     None => raise HintedError(Parity::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Parity with FromValue::{from_value}
 
 ///|
 /// Whether the given number matches the parity.
@@ -519,6 +634,21 @@ pub(all) struct Paper {
   /// The height of the paper in millimeters.
   height : Double
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paper with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paper with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paper with @debug.Debug::{to_repr}
 
 ///|
 /// The width of the paper.
@@ -582,6 +712,11 @@ pub impl FromValue for Paper with fn from_value(v) {
   }
   raise HintedError(Paper::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paper with FromValue::{from_value}
 
 ///|
 // All paper sizes in mm.

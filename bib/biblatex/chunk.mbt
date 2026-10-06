@@ -8,6 +8,16 @@ pub(all) struct Span {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with @debug.Debug::{to_repr}
+
+///|
 pub fn Span::new(start : Int, end : Int) -> Span {
   { start, end, }
 }
@@ -43,6 +53,16 @@ pub(all) struct Spanned[T] {
   /// The location in source code of the value.
   mut span : Span
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spanned with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spanned with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new instance from a value and its span.
@@ -82,6 +102,16 @@ pub(all) enum Chunk {
   /// Values nested in dollar signs.
   Math(String)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Chunk with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Chunk with @debug.Debug::{to_repr}
 
 ///|
 /// A vector of chunks.

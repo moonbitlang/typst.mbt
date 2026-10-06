@@ -22,9 +22,29 @@ pub(all) enum CitationForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for CitationForm with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with Default::{default}
 
 ///|
 let citation_form_casts : ReadOnlyArray[(String, CitationForm, String)] = [
@@ -77,6 +97,11 @@ pub impl IntoValue for CitationForm with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CitationForm with fn from_value(v) {
   if v is Str(s) {
     for entry in citation_form_casts[:] {
@@ -87,6 +112,11 @@ pub impl FromValue for CitationForm with fn from_value(v) {
   }
   raise HintedError(CitationForm::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationForm with FromValue::{from_value}
 
 ///|
 /// Upstream `Synthesize for Packed<CiteElem>`.

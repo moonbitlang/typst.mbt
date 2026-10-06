@@ -93,6 +93,12 @@ pub impl @library.Output for PagedDocument with fn create(
 }
 
 ///|
+// `introspector` is not named here: the type already has a method of this name.
+#deprecated("call as `Output::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedDocument with @library.Output::{create, target}
+
+///|
 /// A finished page.
 pub(all) struct Page {
   /// The frame that defines the page.

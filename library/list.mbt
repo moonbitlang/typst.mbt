@@ -6,6 +6,11 @@
 pub(all) struct ListItem(Content) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListItem with Eq::{not_equal, equal}
+
+///|
 /// Create a new list item with the given body.
 pub fn ListItem::new(body : Content) -> ListItem {
   ListItem(
@@ -29,9 +34,19 @@ pub impl Reflect for ListItem with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListItem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ListItem with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListItem with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ListItem with fn from_value(v) {
@@ -50,11 +65,21 @@ pub impl FromValue for ListItem with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListItem with FromValue::{from_value}
+
+///|
 /// A list's marker.
 pub(all) enum ListMarker {
   Content(Array[Content])
   Func(Func)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListMarker with Eq::{not_equal, equal}
 
 ///|
 pub impl Reflect for ListMarker with fn input() {
@@ -108,6 +133,11 @@ pub impl FromValue for ListMarker with fn from_value(v) {
     v => raise HintedError(ListMarker::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListMarker with FromValue::{from_value}
 
 ///|
 fn list_elem_marker_default() -> Value {

@@ -1,4 +1,6 @@
-// Generated arithmetic for scalar newtypes.
+// Arithmetic for the scalar newtypes (`Em`, `Angle`, `Ratio`, `Fr`).
+// Handwritten: it was added as `scalar_ops_gen.mbt` in 6deac1b, but no
+// generator for it has ever been in the repository.
 
 ///|
 pub impl Add for Em with fn add(self, other) {
@@ -6,14 +8,29 @@ pub impl Add for Em with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Add::{add}
+
+///|
 pub impl Sub for Em with fn sub(self, other) {
   Em(self.0 - other.0)
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Sub::{sub}
+
+///|
 pub impl Neg for Em with fn neg(self) {
   Em(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Neg::{neg}
 
 ///|
 pub impl Numeric for Em with fn zero() {
@@ -37,6 +54,12 @@ pub impl Numeric for Em with fn div_scale(self, factor) {
 }
 
 ///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Numeric::{scale, is_finite, div_scale}
+
+///|
 pub fn Em::times(self : Em, factor : Double) -> Em {
   Em(Scalar::new(self.0.0 * factor))
 }
@@ -57,14 +80,29 @@ pub impl Add for Angle with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Add::{add}
+
+///|
 pub impl Sub for Angle with fn sub(self, other) {
   Angle(self.0 - other.0)
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Sub::{sub}
+
+///|
 pub impl Neg for Angle with fn neg(self) {
   Angle(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Neg::{neg}
 
 ///|
 pub impl Numeric for Angle with fn zero() {
@@ -88,6 +126,12 @@ pub impl Numeric for Angle with fn div_scale(self, factor) {
 }
 
 ///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Numeric::{scale, is_finite, div_scale}
+
+///|
 pub fn Angle::times(self : Angle, factor : Double) -> Angle {
   Angle(Scalar::new(self.0.0 * factor))
 }
@@ -108,14 +152,29 @@ pub impl Add for Ratio with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Add::{add}
+
+///|
 pub impl Sub for Ratio with fn sub(self, other) {
   Ratio(self.0 - other.0)
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Sub::{sub}
+
+///|
 pub impl Neg for Ratio with fn neg(self) {
   Ratio(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Neg::{neg}
 
 ///|
 pub impl Numeric for Ratio with fn zero() {
@@ -139,6 +198,12 @@ pub impl Numeric for Ratio with fn div_scale(self, factor) {
 }
 
 ///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Numeric::{scale, is_finite, div_scale}
+
+///|
 pub fn Ratio::times(self : Ratio, factor : Double) -> Ratio {
   Ratio(Scalar::new(self.0.0 * factor))
 }
@@ -159,14 +224,29 @@ pub impl Add for Fr with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Add::{add}
+
+///|
 pub impl Sub for Fr with fn sub(self, other) {
   Fr(self.0 - other.0)
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Sub::{sub}
+
+///|
 pub impl Neg for Fr with fn neg(self) {
   Fr(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Neg::{neg}
 
 ///|
 pub impl Numeric for Fr with fn zero() {
@@ -188,6 +268,12 @@ pub impl Numeric for Fr with fn scale(self, factor) {
 pub impl Numeric for Fr with fn div_scale(self, factor) {
   Fr(Scalar::new(self.0.0 / factor))
 }
+
+///|
+// `zero` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Numeric::{scale, is_finite, div_scale}
 
 ///|
 pub fn Fr::times(self : Fr, factor : Double) -> Fr {

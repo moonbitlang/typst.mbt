@@ -10,6 +10,16 @@ pub(all) enum MaskType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with @debug.Debug::{to_repr}
+
+///|
 /// A transfer function to apply to the opacity values of a mask.
 pub struct TransferFunction(@function.Function)
 
@@ -54,6 +64,11 @@ pub impl Eq for SoftMask with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SoftMask with Eq::{not_equal, equal}
+
+///|
 pub impl CacheKey for SoftMask with fn cache_key(self) {
   // Upstream hashes the object id and the root transform's cache key.
   let root = CacheKey::cache_key(self.repr.root_transform)
@@ -63,6 +78,11 @@ pub impl CacheKey for SoftMask with fn cache_key(self) {
     h.write_u128(root)
   })
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SoftMask with CacheKey::{cache_key}
 
 ///|
 fn SoftMask::new(

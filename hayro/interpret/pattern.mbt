@@ -80,6 +80,11 @@ pub impl CacheKey for Pattern with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Pattern with CacheKey::{cache_key}
+
+///|
 /// A shading pattern.
 pub(all) struct ShadingPattern {
   /// The underlying shading of the pattern.
@@ -125,6 +130,11 @@ pub impl CacheKey for ShadingPattern with fn cache_key(self) {
     CacheKey::cache_key(self.matrix),
   ])
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShadingPattern with CacheKey::{cache_key}
 
 ///|
 /// A tiling pattern.
@@ -264,6 +274,11 @@ pub fn TilingPattern::interpret(
 pub impl CacheKey for TilingPattern with fn cache_key(self) {
   self.cache_key
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TilingPattern with CacheKey::{cache_key}
 
 ///|
 priv struct StencilPatternDevice {

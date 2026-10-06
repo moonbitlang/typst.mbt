@@ -5,7 +5,22 @@
 pub(all) struct Ratio(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Eq::{not_equal, equal}
+
+///|
 pub extend Ratio with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Hash::{hash, hash_combine}
 
 ///|
 pub fn Ratio::zero() -> Ratio {

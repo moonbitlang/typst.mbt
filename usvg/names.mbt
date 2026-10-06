@@ -60,6 +60,16 @@ pub(all) enum EId {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EId with Hash::{hash, hash_combine}
+
+///|
 /// Returns the ID for an element/attribute name.
 pub fn EId::from_str(text : String) -> EId? {
   match text {
@@ -455,6 +465,16 @@ pub(all) enum AId {
   YChannelSelector
   Z
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AId with Hash::{hash, hash_combine}
 
 ///|
 /// Returns the ID for an element/attribute name.

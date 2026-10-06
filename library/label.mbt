@@ -15,6 +15,21 @@
 pub(all) struct Label(String) derive(Eq, Hash, Compare)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Creates a label from a string (upstream `Label::new`). Returns `None` for
 /// an empty name.
 pub fn Label::new(name : String) -> Label? {

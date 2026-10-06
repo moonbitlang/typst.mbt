@@ -10,7 +10,27 @@ pub(all) struct U128 {
 } derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub extend U128 with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with @debug.Debug::{to_repr}
 
 ///|
 /// A SipHash-1-3 hasher with 128-bit output and zero keys (upstream

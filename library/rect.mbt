@@ -10,6 +10,16 @@ pub(all) struct Rect {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Hash::{hash, hash_combine}
+
+///|
 /// Create a new rectangle from the minimum/maximum coordinate.
 pub fn Rect::new(min : Point, max : Point) -> Rect {
   { min, max, }

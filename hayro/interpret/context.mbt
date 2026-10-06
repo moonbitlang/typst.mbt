@@ -26,6 +26,11 @@ pub impl Default for InterpreterCache with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InterpreterCache with Default::{default}
+
+///|
 /// A per-page interpretation context that borrows shared data from an
 /// [InterpreterCache].
 pub struct Context {

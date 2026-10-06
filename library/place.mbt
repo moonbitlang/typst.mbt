@@ -11,6 +11,21 @@ pub(all) enum PlacementScope {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlacementScope with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlacementScope with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlacementScope with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for PlacementScope with fn default() {
   Column
 }
@@ -58,6 +73,11 @@ pub impl FromValue for PlacementScope with fn from_value(v) {
     None => raise HintedError(PlacementScope::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlacementScope with FromValue::{from_value}
 
 ///|
 fn place_elem_scope_default() -> Value {

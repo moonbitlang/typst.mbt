@@ -5244,6 +5244,7 @@ pub fn Decimal::op_ge(Self, Self) -> Bool
 pub fn Decimal::op_gt(Self, Self) -> Bool
 pub fn Decimal::op_le(Self, Self) -> Bool
 pub fn Decimal::op_lt(Self, Self) -> Bool
+pub fn Decimal::output() -> CastInfo
 pub fn Decimal::repr(Self) -> String
 pub fn Decimal::round(Self, Int) -> Self?
 pub fn Decimal::to_f64(Self) -> Double?
@@ -7981,6 +7982,7 @@ pub fn Location::castable(Value) -> Bool
 pub fn Location::hash(Self) -> U128
 pub fn Location::input() -> CastInfo
 pub fn Location::new(U128) -> Self
+pub fn Location::output() -> CastInfo
 pub fn Location::page_numbering(Self, Engine, @moonbitlang/typst/syntax.Span) -> Numbering?
 pub fn Location::repr(Self) -> String
 pub fn Location::variant(Self, Int) -> Self
@@ -9399,6 +9401,7 @@ pub fn PdfStandards::default() -> Self
 pub fn PdfStandards::input() -> CastInfo
 pub fn PdfStandards::into_value(Self) -> Value
 pub fn PdfStandards::new(ArrayView[PdfStandard]) -> Self raise HintedError
+pub fn PdfStandards::output() -> CastInfo
 pub fn PdfStandards::standards(Self) -> Array[PdfStandard]
 pub impl Default for PdfStandards
 pub impl Show for PdfStandards
@@ -11640,6 +11643,7 @@ pub(all) enum Tag {
 pub fn Tag::castable(Value) -> Bool
 pub fn Tag::input() -> CastInfo
 pub fn Tag::location(Self) -> Location
+pub fn Tag::output() -> CastInfo
 pub fn Tag::to_string(Self) -> String
 pub impl Show for Tag
 pub impl Fingerprint for Tag
@@ -11673,6 +11677,7 @@ pub fn Target::default() -> Self
 pub fn Target::input() -> CastInfo
 pub fn Target::into_value(Self) -> Value
 pub fn Target::is_html(Self) -> Bool
+pub fn Target::output() -> CastInfo
 pub impl Show for Target
 pub impl Fingerprint for Target
 pub impl FromValue for Target
@@ -12471,6 +12476,7 @@ pub fn Version::op_ge(Self, Self) -> Bool
 pub fn Version::op_gt(Self, Self) -> Bool
 pub fn Version::op_le(Self, Self) -> Bool
 pub fn Version::op_lt(Self, Self) -> Bool
+pub fn Version::output() -> CastInfo
 pub fn Version::push(Self, UInt) -> Unit
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String

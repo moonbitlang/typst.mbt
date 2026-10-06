@@ -59,6 +59,16 @@ pub(all) enum WebImageFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WebImageFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WebImageFormat with @debug.Debug::{to_repr}
+
+///|
 /// The mime type for this format.
 pub fn WebImageFormat::mime(self : WebImageFormat) -> String {
   match self {
@@ -90,10 +100,25 @@ pub(all) struct WebImage {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WebImage with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WebImage with @debug.Debug::{to_repr}
+
+///|
 /// An error for image kinds whose web preparation is not ported yet.
 pub(all) suberror WebImageError {
   WebImageError(String)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WebImageError with @debug.Debug::{to_repr}
 
 ///|
 /// Prepare an image for embedding in SVG or HTML.

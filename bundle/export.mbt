@@ -46,6 +46,11 @@ pub impl Default for BundleOptions with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundleOptions with Default::{default}
+
+///|
 /// Exports a bundle into a raw virtual file system (upstream `export`, a
 /// reserved word in MoonBit).
 pub fn export_bundle(

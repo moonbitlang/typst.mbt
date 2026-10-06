@@ -79,6 +79,20 @@ fn main() {
         writeln!(out, "  {}", variant(s)).unwrap();
     }
     out.push_str("} derive(Eq, Hash, Debug)\n\n");
+    // The derived methods are not called as methods of `ArchivedStyle`: their
+    // promotion is explicit and deprecated (scripts/promotions.py).
+    for (tr, methods) in [
+        ("Eq", "not_equal, equal"),
+        ("Hash", "hash, hash_combine"),
+        ("@debug.Debug", "to_repr"),
+    ] {
+        let short = tr.rsplit('.').next().unwrap();
+        writeln!(
+            out,
+            "///|\n#deprecated(\"call as `{short}::m(x)`, or un-deprecate this `extend` to make it a method\")\n#doc(hidden)\npub extend ArchivedStyle with {tr}::{{{methods}}}\n"
+        )
+        .unwrap();
+    }
 
     // by_name
     out.push_str(

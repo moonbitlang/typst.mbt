@@ -16,11 +16,31 @@ pub(all) enum ExtractionQueryType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionQueryType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionQueryType with @debug.Debug::{to_repr}
+
+///|
 /// An extraction query.
 pub(all) struct ExtractionQuery {
   query_type : ExtractionQueryType
   page_index : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionQuery with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionQuery with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new page extraction query with the given page index.
@@ -40,6 +60,16 @@ pub(all) enum ExtractionError {
   /// An invalid page index was given.
   InvalidPageIndex(Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExtractionError with @debug.Debug::{to_repr}
 
 ///|
 /// The result of an extraction.

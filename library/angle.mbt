@@ -5,7 +5,22 @@
 pub(all) struct Angle(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Eq::{not_equal, equal}
+
+///|
 pub extend Angle with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Hash::{hash, hash_combine}
 
 ///|
 /// Different units of angular measurement.
@@ -13,6 +28,21 @@ pub(all) enum AngleUnit {
   Rad
   Deg
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with @debug.Debug::{to_repr}
 
 ///|
 fn AngleUnit::raw_scale(self : AngleUnit) -> Double {
@@ -30,6 +60,26 @@ pub(all) enum Quadrant {
   Third
   Fourth
 } derive(Eq, Hash, Debug, Compare)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quadrant with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quadrant with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quadrant with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quadrant with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 pub fn Angle::zero() -> Angle {

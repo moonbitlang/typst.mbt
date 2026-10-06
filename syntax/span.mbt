@@ -3,11 +3,31 @@
 pub struct FileId(UInt16) derive(Eq, Hash, Compare)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Upstream `Debug for FileId` is that of its rooted path
 /// (typst-syntax/src/path.rs:183).
 pub impl @debug.Debug for FileId with fn to_repr(self) {
   @debug.Debug::to_repr(self.get())
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileId with @debug.Debug::{to_repr}
 
 ///|
 pub fn FileId::into_raw(self : FileId) -> UInt16 {
@@ -26,8 +46,48 @@ pub fn FileId::into_raw(self : FileId) -> UInt16 {
 pub(all) struct Span(UInt64) derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Span with @debug.Debug::{to_repr}
+
+///|
 /// The unique number of a span within its source.
 pub(all) struct SpanNumber(UInt64) derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanNumber with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanNumber with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanNumber with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanNumber with @debug.Debug::{to_repr}
 
 ///|
 /// The possible kinds of span.
@@ -39,6 +99,16 @@ pub(all) enum SpanKind {
   /// A raw byte range in a file.
   Range(id~ : FileId, start~ : Int, end~ : Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpanKind with @debug.Debug::{to_repr}
 
 ///|
 /// The full range of numbers available for source file span numbering.
@@ -165,6 +235,21 @@ pub(all) struct SubRange {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubRange with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubRange with @debug.Debug::{to_repr}
+
+///|
 /// Create a new sub-range. Returns `None` if the range is empty.
 pub fn SubRange::new(start : Int, end : Int) -> SubRange? {
   if start < end {
@@ -195,6 +280,21 @@ pub(all) struct DiagSpan {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpan with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpan with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpan with @debug.Debug::{to_repr}
+
+///|
 /// The possible kinds of a diagnostic span.
 pub(all) enum DiagSpanKind {
   /// A span that does not point into any file.
@@ -204,6 +304,16 @@ pub(all) enum DiagSpanKind {
   /// A raw byte range in a file.
   Range(id~ : FileId, start~ : Int, end~ : Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpanKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpanKind with @debug.Debug::{to_repr}
 
 ///|
 /// The detached diagnostic span.
@@ -295,8 +405,38 @@ pub(all) struct Spanned[T] {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spanned with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spanned with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spanned with @debug.Debug::{to_repr}
+
+///|
 /// A value with a diagnostic span.
 pub(all) struct DiagSpanned[T] {
   v : T
   span : DiagSpan
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpanned with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpanned with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagSpanned with @debug.Debug::{to_repr}

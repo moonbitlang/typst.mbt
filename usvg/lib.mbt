@@ -43,6 +43,11 @@ pub impl Show for UsvgError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UsvgError with Show::{to_string, output}
+
+///|
 /// Processing options.
 pub(all) struct Options {
   /// Directory that will be used during relative paths resolving.

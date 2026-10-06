@@ -32,6 +32,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from typemap import mbt_type  # noqa: E402
 from elemgen import elem_var, snake, SKIP  # noqa: E402
+from promotions import deprecated_extend  # noqa: E402
 
 import json
 
@@ -122,6 +123,20 @@ def main():
             f"///|\npub impl NativeElement for {name} with fn elem() {{\n  {var}()\n}}\n\n"
             f"///|\npub impl NativeElement for {name} with fn from_content_unchecked(c) {{\n  {name}(c)\n}}\n\n"
             f"///|\npub impl NativeElement for {name} with fn into_content(self) {{\n  self.0\n}}\n"
+        )
+        # The impl's methods are not called as methods of the view (upstream
+        # code uses `Packed`'s own API, here `of` and `pack`): their promotion
+        # is explicit and deprecated (scripts/promotions.py). A handwritten
+        # method of the same name wins.
+        native = ["into_content", "elem", "from_content_unchecked"]
+        taken = [m for m in native if f"{name}::{m}" in methods]
+        if len(taken) == len(native):
+            sys.exit(f"viewgen: {name} has regular methods for all of NativeElement's: no `extend` is possible")
+        head, decl = deprecated_extend(name, "NativeElement", [m for m in native if m not in taken]).split("\n", 1)
+        defs.append(
+            head + "\n"
+            + "".join(f"// `{m}` is not named here: the type already has a method of this name.\n" for m in taken)
+            + decl
         )
         required = []
         for i, f in enumerate(e["fields"]):

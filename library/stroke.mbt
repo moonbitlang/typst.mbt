@@ -19,6 +19,11 @@ pub(all) struct Stroke {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Eq::{not_equal, equal}
+
+///|
 pub impl Default for Stroke with fn default() {
   {
     paint: Auto,
@@ -230,6 +235,11 @@ pub impl FromValue for Stroke with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with FromValue::{from_value}
+
+///|
 /// The line cap of a stroke.
 pub(all) enum LineCap {
   /// Square stroke cap with the edge at the stroke's end point.
@@ -239,6 +249,21 @@ pub(all) enum LineCap {
   /// Square stroke cap centered at the stroke's end point.
   Square
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with @debug.Debug::{to_repr}
 
 ///|
 fn LineCap::name(self : LineCap) -> String {
@@ -291,6 +316,11 @@ pub impl IntoValue for LineCap with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with IntoValue::{into_value}
+
+///|
 pub impl FromValue for LineCap with fn from_value(v) {
   match v {
     Str("butt") => Butt
@@ -299,6 +329,11 @@ pub impl FromValue for LineCap with fn from_value(v) {
     v => raise HintedError(LineCap::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with FromValue::{from_value}
 
 ///|
 /// The line join of a stroke.
@@ -312,6 +347,21 @@ pub(all) enum LineJoin {
   /// of the joined segments).
   Bevel
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with @debug.Debug::{to_repr}
 
 ///|
 fn LineJoin::name(self : LineJoin) -> String {
@@ -361,6 +411,11 @@ pub impl IntoValue for LineJoin with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with IntoValue::{into_value}
+
+///|
 pub impl FromValue for LineJoin with fn from_value(v) {
   match v {
     Str("miter") => Miter
@@ -371,6 +426,11 @@ pub impl FromValue for LineJoin with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with FromValue::{from_value}
+
+///|
 /// A line dash pattern.
 pub(all) struct DashPattern {
   /// The dash array.
@@ -378,6 +438,11 @@ pub(all) struct DashPattern {
   /// The dash phase.
   phase : Length
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashPattern with Eq::{not_equal, equal}
 
 ///|
 pub fn DashPattern::repr(self : DashPattern) -> String {
@@ -513,6 +578,11 @@ pub impl IntoValue for DashPattern with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashPattern with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DashPattern with fn from_value(v) {
   match v {
     Str(s) =>
@@ -540,11 +610,21 @@ pub impl FromValue for DashPattern with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashPattern with FromValue::{from_value}
+
+///|
 /// The length of a dash in a line dash pattern.
 pub(all) enum DashLength {
   LineWidth
   Length(Length)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashLength with Eq::{not_equal, equal}
 
 ///|
 pub fn DashLength::repr(self : DashLength) -> String {
@@ -581,6 +661,11 @@ pub impl IntoValue for DashLength with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashLength with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DashLength with fn from_value(v) {
   match v {
     Str("dot") => LineWidth
@@ -588,6 +673,11 @@ pub impl FromValue for DashLength with fn from_value(v) {
     v => raise HintedError(DashLength::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashLength with FromValue::{from_value}
 
 ///|
 /// Get a value by key, accepting either Auto or something convertible to

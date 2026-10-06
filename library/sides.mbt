@@ -14,6 +14,26 @@ pub(all) struct Sides[T] {
 } derive(Default, Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with @debug.Debug::{to_repr}
+
+///|
 /// Create a new instance from the four components.
 pub fn[T] Sides::new(left : T, top : T, right : T, bottom : T) -> Sides[T] {
   { left, top, right, bottom, }
@@ -103,6 +123,11 @@ pub impl[T : Reflect] Reflect for Sides[T?] with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with Reflect::{output, input, castable}
+
+///|
 pub impl[T : IntoValue + Eq] IntoValue for Sides[T?] with fn into_value(self) {
   if self.is_uniform() && self.left is Some(left) {
     return IntoValue::into_value(left)
@@ -166,6 +191,11 @@ pub impl[T : FromValue] FromValue for Sides[T?] with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with FromValue::{from_value}
+
+///|
 /// The four sides of objects.
 pub(all) enum Side {
   /// The left side.
@@ -177,6 +207,21 @@ pub(all) enum Side {
   /// The bottom side.
   Bottom
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with @debug.Debug::{to_repr}
 
 ///|
 /// The opposite side.
@@ -253,9 +298,19 @@ pub impl Reflect for Side with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Side with fn into_value(self) {
   Alignment::from_side(self).into_value()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Side with fn from_value(value) {
@@ -271,6 +326,11 @@ pub impl FromValue for Side with fn from_value(value) {
     _ => raise HintedError(CastInfo::Type(Type::alignment()).error(value))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with FromValue::{from_value}
 
 ///|
 pub impl[T : Fold] Fold for Sides[T?] with fn fold(self, outer) {

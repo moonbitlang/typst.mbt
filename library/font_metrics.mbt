@@ -127,6 +127,11 @@ pub(all) struct LineMetrics {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineMetrics with Eq::{not_equal, equal}
+
+///|
 /// Metrics for subscripts or superscripts.
 pub(all) struct ScriptMetrics {
   /// The width of those scripts, relative to the outer font size.
@@ -143,6 +148,11 @@ pub(all) struct ScriptMetrics {
   /// For superscripts, this is positive. For subscripts, this is negative.
   vertical_offset : Em
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptMetrics with Eq::{not_equal, equal}
 
 ///|
 /// The default subscript metrics (upstream `DEFAULT_SUBSCRIPT_METRICS` in
@@ -453,6 +463,21 @@ pub(all) enum VerticalFontMetric {
   /// The font's ascender, which typically exceeds the depth of all glyphs.
   Descender
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalFontMetric with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalFontMetric with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalFontMetric with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `TryInto<VerticalFontMetric> for TopEdgeMetric`.

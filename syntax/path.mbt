@@ -14,6 +14,16 @@ pub struct RootedPath {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RootedPath with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RootedPath with Hash::{hash, hash_combine}
+
+///|
 /// Create a rooted path from a root and a virtual path within the root.
 pub fn RootedPath::new(root : VirtualRoot, vpath : VirtualPath) -> RootedPath {
   { root, vpath, }
@@ -55,6 +65,11 @@ pub impl @debug.Debug for RootedPath with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RootedPath with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `Debug for RootedPath`.
 pub impl Show for RootedPath with fn output(self, logger) {
   match self.root {
@@ -76,6 +91,21 @@ pub(all) enum VirtualRoot {
   /// A root in a package.
   Package(PackageSpec)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualRoot with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualRoot with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualRoot with @debug.Debug::{to_repr}
 
 ///|
 /// An interner for rooted paths.
@@ -163,6 +193,16 @@ pub fn FileId::vpath(self : FileId) -> VirtualPath {
 pub struct VirtualPath {
   priv segments : Segments
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualPath with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualPath with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new virtual path.
@@ -375,6 +415,11 @@ pub fn VirtualPath::relative_from(
 pub impl @debug.Debug for VirtualPath with fn to_repr(self) {
   @debug.Repr::literal(self.to_string())
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualPath with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `Debug for VirtualPath`: the path with slash, debug-quoted.
@@ -607,6 +652,21 @@ pub(all) suberror PathError {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for PathError with fn output(self, logger) {
   match self {
     Escapes => logger.write_string("path escapes project root")
@@ -629,6 +689,21 @@ pub(all) suberror VirtualizeError {
   /// The file path contains non-UTF-8 encodable bytes.
   Utf8
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualizeError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualizeError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VirtualizeError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for VirtualizeError with fn output(self, logger) {
@@ -655,6 +730,21 @@ pub(all) suberror RealizeError {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RealizeError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RealizeError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RealizeError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for RealizeError with fn output(self, logger) {
   match self {
     Invalid(component) =>
@@ -663,6 +753,11 @@ pub impl Show for RealizeError with fn output(self, logger) {
       )
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RealizeError with Show::{to_string, output}
 
 // Unix semantics of Rust's `std::path` used by `virtualize` and `realize`.
 

@@ -46,6 +46,11 @@ pub(all) enum LinkTarget {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkTarget with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for LinkTarget with fn input() {
   Destination::input().union_with(input_of((Ty::new() : Ty[Label])))
 }
@@ -98,6 +103,11 @@ pub(all) enum Destination {
   /// An unresolved link to a location in the document.
   Location(Location)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Destination with Eq::{not_equal, equal}
 
 ///|
 pub impl Reflect for Destination with fn input() {
@@ -154,6 +164,21 @@ pub extend Destination with FromValue::{from_value}
 ///|
 /// A uniform resource locator with a maximum length.
 pub(all) struct Url(String) derive(Eq, Hash, Compare)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Create a URL from a string, checking the maximum length.
@@ -231,6 +256,16 @@ pub(all) enum UrlContactScheme {
   /// The `tel:` prefix.
   Tel
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UrlContactScheme with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UrlContactScheme with Hash::{hash, hash_combine}
 
 ///|
 pub fn UrlContactScheme::as_str(self : UrlContactScheme) -> String {

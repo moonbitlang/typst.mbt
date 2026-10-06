@@ -15,9 +15,29 @@ pub(all) enum FontStretch {
 } derive(Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Hash::{hash, hash_combine}
+
+///|
 pub impl Default for FontStretch with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Default::{default}
 
 ///|
 /// The numeric value of a stretch (`fontdb::Stretch::to_number`).
@@ -62,12 +82,22 @@ pub impl Eq for FontVariation with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariation with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for FontVariation with fn hash_combine(self, hasher) {
   for b in self.tag {
     hasher.combine_byte(b)
   }
   hasher.combine_uint(self.value.reinterpret_as_uint())
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariation with Hash::{hash, hash_combine}
 
 ///|
 /// A font style property.
@@ -79,6 +109,16 @@ pub(all) enum FontStyle {
   /// A typically-sloped version of the regular face.
   Oblique
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Hash::{hash, hash_combine}
 
 ///|
 pub impl Default for FontStyle with fn default() {
@@ -97,6 +137,11 @@ pub struct Font {
   priv weight : Int
   priv variations : Array[FontVariation]
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Font with Eq::{not_equal, equal}
 
 ///|
 /// A list of family names.
@@ -148,6 +193,11 @@ pub(all) enum DominantBaseline {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DominantBaseline with Eq::{not_equal, equal}
+
+///|
 pub impl Default for DominantBaseline with fn default() {
   Auto
 }
@@ -173,6 +223,11 @@ pub(all) enum AlignmentBaseline {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AlignmentBaseline with Eq::{not_equal, equal}
+
+///|
 pub impl Default for AlignmentBaseline with fn default() {
   Auto
 }
@@ -190,9 +245,19 @@ pub(all) enum BaselineShift {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselineShift with Eq::{not_equal, equal}
+
+///|
 pub impl Default for BaselineShift with fn default() {
   Baseline
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselineShift with Default::{default}
 
 ///|
 /// A length adjust property.
@@ -200,6 +265,11 @@ pub(all) enum LengthAdjust {
   Spacing
   SpacingAndGlyphs
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LengthAdjust with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for LengthAdjust with fn default() {
@@ -222,9 +292,19 @@ pub(all) enum FontOpticalSizing {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontOpticalSizing with Eq::{not_equal, equal}
+
+///|
 pub impl Default for FontOpticalSizing with fn default() {
   OpticalAuto
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontOpticalSizing with Default::{default}
 
 ///|
 /// A text span decoration style.
@@ -441,6 +521,11 @@ pub(all) enum TextAnchor {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextAnchor with Eq::{not_equal, equal}
+
+///|
 pub impl Default for TextAnchor with fn default() {
   Start
 }
@@ -547,6 +632,11 @@ pub(all) enum WritingMode {
   LeftToRight
   TopToBottom
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingMode with Eq::{not_equal, equal}
 
 ///|
 /// A text element.

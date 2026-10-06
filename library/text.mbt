@@ -14,6 +14,16 @@ pub(all) struct FontFamily {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFamily with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFamily with Hash::{hash, hash_combine}
+
+///|
 /// Create a named font family variant.
 pub fn FontFamily::new(string : String) -> FontFamily {
   FontFamily::with_coverage(string, None)
@@ -101,6 +111,16 @@ pub(all) enum Covers {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Covers with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Covers with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for Covers with fn input() {
   CastInfo::Value(
     Str("latin-in-cjk"),
@@ -151,10 +171,25 @@ pub impl FromValue for Covers with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Covers with FromValue::{from_value}
+
+///|
 /// Font family fallback list.
 ///
 /// Must contain at least one font.
 pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontList with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontList with Hash::{hash, hash_combine}
 
 ///|
 pub fn FontList::new(fonts : Array[FontFamily]) -> FontList raise HintedError {
@@ -206,6 +241,11 @@ pub impl FromValue for FontList with fn from_value(v) {
     v => raise HintedError(FontList::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontList with FromValue::{from_value}
 
 ///|
 /// The default font list (upstream
@@ -277,6 +317,16 @@ fn text_elem_stretch_default() -> Value {
 pub(all) struct TextSize(Length) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextSize with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextSize with Hash::{hash, hash_combine}
+
+///|
 pub impl Fold for TextSize with fn fold(self, outer) {
   // Multiply the two linear functions.
   TextSize({
@@ -316,6 +366,11 @@ pub impl Reflect for TextSize with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextSize with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TextSize with fn into_value(self) {
   Length(self.0)
 }
@@ -327,6 +382,11 @@ pub extend TextSize with IntoValue::{into_value}
 pub impl FromValue for TextSize with fn from_value(v) {
   TextSize(Length::from_value(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextSize with FromValue::{from_value}
 
 ///|
 let text_elem_size_default_value : Value = TextSize(
@@ -358,6 +418,16 @@ pub(all) enum TopEdge {
   /// An edge specified as a length.
   Length(Length)
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdge with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdge with Hash::{hash, hash_combine}
 
 ///|
 pub impl Reflect for TopEdge with fn input() {
@@ -400,6 +470,11 @@ pub impl FromValue for TopEdge with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdge with FromValue::{from_value}
+
+///|
 /// Metrics that describe the top edge of text.
 pub(all) enum TopEdgeMetric {
   /// The font's ascender, which typically exceeds the height of all glyphs.
@@ -413,6 +488,21 @@ pub(all) enum TopEdgeMetric {
   /// The top edge of the glyph's bounding box.
   Bounds
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdgeMetric with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdgeMetric with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdgeMetric with @debug.Debug::{to_repr}
 
 ///|
 let top_edge_metric_names : ReadOnlyArray[String] = [
@@ -485,6 +575,16 @@ pub(all) enum BottomEdge {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdge with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdge with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for BottomEdge with fn input() {
   BottomEdgeMetric::input().union_with(Type(Type::length()))
 }
@@ -525,6 +625,11 @@ pub impl FromValue for BottomEdge with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdge with FromValue::{from_value}
+
+///|
 /// Metrics that describe the bottom edge of text.
 pub(all) enum BottomEdgeMetric {
   /// The baseline on which the letters rest.
@@ -534,6 +639,21 @@ pub(all) enum BottomEdgeMetric {
   /// The bottom edge of the glyph's bounding box.
   Bounds
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdgeMetric with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdgeMetric with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdgeMetric with @debug.Debug::{to_repr}
 
 ///|
 let bottom_edge_metric_names : ReadOnlyArray[String] = [
@@ -601,6 +721,16 @@ fn text_elem_bottom_edge_default() -> Value {
 pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDir with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDir with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for TextDir with fn input() {
   input_of((Ty::new() : Ty[Smart[Dir]]))
 }
@@ -636,6 +766,11 @@ pub impl FromValue for TextDir with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDir with FromValue::{from_value}
+
+///|
 fn text_elem_dir_default() -> Value {
   TextDir(Auto).into_value()
 }
@@ -645,6 +780,16 @@ fn text_elem_dir_default() -> Value {
 ///|
 /// A selection into the Stylistic Alternates.
 pub(all) struct Alternates(Int64) derive(Eq, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alternates with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alternates with Hash::{hash, hash_combine}
 
 ///|
 pub extend Alternates with Default::{default}
@@ -685,6 +830,11 @@ pub impl FromValue for Alternates with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alternates with FromValue::{from_value}
+
+///|
 fn text_elem_alternates_default() -> Value {
   Alternates::default().into_value()
 }
@@ -692,6 +842,16 @@ fn text_elem_alternates_default() -> Value {
 ///|
 /// A set of stylistic sets to enable.
 pub(all) struct StylisticSets(Int) derive(Eq, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StylisticSets with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StylisticSets with Hash::{hash, hash_combine}
 
 ///|
 pub extend StylisticSets with Default::{default}
@@ -769,6 +929,11 @@ pub impl FromValue for StylisticSets with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StylisticSets with FromValue::{from_value}
+
+///|
 let text_elem_stylistic_set_default_value : Value = StylisticSets::default()
   .into_value()
   .shared()
@@ -793,6 +958,21 @@ pub(all) enum NumberType {
   /// OpenType `onum` font feature).
   OldStyle
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberType with @debug.Debug::{to_repr}
 
 ///|
 let number_type_names : ReadOnlyArray[String] = ["lining", "old-style"]
@@ -824,6 +1004,11 @@ pub impl IntoValue for NumberType with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberType with IntoValue::{into_value}
+
+///|
 pub impl FromValue for NumberType with fn from_value(v) {
   match str_names_find(number_type_names, v) {
     Some(0) => Lining
@@ -833,6 +1018,11 @@ pub impl FromValue for NumberType with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberType with FromValue::{from_value}
+
+///|
 /// The width of numbers / figures.
 pub(all) enum NumberWidth {
   /// Numbers with glyph-specific widths (the OpenType `pnum` font feature).
@@ -840,6 +1030,21 @@ pub(all) enum NumberWidth {
   /// Numbers of equal width (the OpenType `tnum` font feature).
   Tabular
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberWidth with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberWidth with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberWidth with @debug.Debug::{to_repr}
 
 ///|
 let number_width_names : ReadOnlyArray[String] = ["proportional", "tabular"]
@@ -871,6 +1076,11 @@ pub impl IntoValue for NumberWidth with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberWidth with IntoValue::{into_value}
+
+///|
 pub impl FromValue for NumberWidth with fn from_value(v) {
   match str_names_find(number_width_names, v) {
     Some(0) => Proportional
@@ -878,6 +1088,11 @@ pub impl FromValue for NumberWidth with fn from_value(v) {
     None => raise HintedError(NumberWidth::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberWidth with FromValue::{from_value}
 
 // FontFeatures
 
@@ -888,6 +1103,16 @@ pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive (
   Hash,
   Default,
 )
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFeatures with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFeatures with Hash::{hash, hash_combine}
 
 ///|
 pub extend FontFeatures with Default::{default}
@@ -969,9 +1194,19 @@ pub impl FromValue for FontFeatures with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFeatures with FromValue::{from_value}
+
+///|
 pub impl Fold for FontFeatures with fn fold(self, outer) {
   FontFeatures(outer.0 + self.0)
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFeatures with Fold::{fold}
 
 ///|
 let text_elem_features_default_value : Value = FontFeatures::default()
@@ -1018,9 +1253,24 @@ fn text_elem_variations_fold(inner : Value, outer : Value) -> Value {
 pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ItalicToggle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ItalicToggle with Hash::{hash, hash_combine}
+
+///|
 pub impl Fold for ItalicToggle with fn fold(self, outer) {
   ItalicToggle(self.0 != outer.0)
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ItalicToggle with Fold::{fold}
 
 ///|
 pub impl Reflect for ItalicToggle with fn input() {
@@ -1038,6 +1288,11 @@ pub impl Reflect for ItalicToggle with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ItalicToggle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ItalicToggle with fn into_value(self) {
   Bool(self.0)
 }
@@ -1049,6 +1304,11 @@ pub extend ItalicToggle with IntoValue::{into_value}
 pub impl FromValue for ItalicToggle with fn from_value(v) {
   ItalicToggle((FromValue::from_value(v) : Bool))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ItalicToggle with FromValue::{from_value}
 
 ///|
 fn text_elem_emph_default() -> Value {
@@ -1067,12 +1327,27 @@ fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
 pub(all) struct WeightDelta(Int64) derive(Eq, Hash, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightDelta with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightDelta with Hash::{hash, hash_combine}
+
+///|
 pub extend WeightDelta with Default::{default}
 
 ///|
 pub impl Fold for WeightDelta with fn fold(self, outer) {
   WeightDelta(outer.0 + self.0)
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightDelta with Fold::{fold}
 
 ///|
 pub impl Reflect for WeightDelta with fn input() {
@@ -1090,6 +1365,11 @@ pub impl Reflect for WeightDelta with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightDelta with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for WeightDelta with fn into_value(self) {
   Int(self.0)
 }
@@ -1101,6 +1381,11 @@ pub extend WeightDelta with IntoValue::{into_value}
 pub impl FromValue for WeightDelta with fn from_value(v) {
   WeightDelta((FromValue::from_value(v) : Int64))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightDelta with FromValue::{from_value}
 
 ///|
 fn text_elem_delta_default() -> Value {
@@ -1124,6 +1409,16 @@ pub(all) struct Costs {
   widow : Ratio?
   orphan : Ratio?
 } derive(Eq, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Costs with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Costs with Hash::{hash, hash_combine}
 
 ///|
 pub extend Costs with Default::{default}
@@ -1157,6 +1452,11 @@ pub impl Fold for Costs with fn fold(self, outer) {
     orphan: self.orphan |> opt_or(outer.orphan),
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Costs with Fold::{fold}
 
 ///|
 pub impl Reflect for Costs with fn input() {
@@ -1269,6 +1569,16 @@ fn text_elem_costs_fold(inner : Value, outer : Value) -> Value {
 pub(all) enum Never {} derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Never with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Never with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for Never with fn input() {
   Union([])
 }
@@ -1294,9 +1604,19 @@ pub impl IntoValue for Never with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Never with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Never with fn from_value(v) {
   raise HintedError(Never::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Never with FromValue::{from_value}
 
 ///|
 /// Default of `TextElem::fill` (upstream

@@ -1111,6 +1111,16 @@ pub(all) struct Stretch {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stretch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stretch with Hash::{hash, hash_combine}
+
+///|
 /// Creates a new empty stretch configuration.
 pub fn Stretch::new() -> Stretch {
   { x: None, y: None, }
@@ -1256,6 +1266,16 @@ pub(all) struct StretchInfo {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StretchInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StretchInfo with Hash::{hash, hash_combine}
+
+///|
 /// Creates new stretch info with the given target and short-fall.
 pub fn StretchInfo::new(target : Rel[Abs], short_fall : Em) -> StretchInfo {
   {
@@ -1344,3 +1364,13 @@ pub(all) enum MathPosition {
   /// Placed below the base.
   Below
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathPosition with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathPosition with @debug.Debug::{to_repr}

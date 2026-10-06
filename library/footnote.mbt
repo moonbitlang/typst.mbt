@@ -10,6 +10,11 @@ pub(all) enum FootnoteBody {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteBody with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for FootnoteBody with fn input() {
   Content::input().union_with(Type(Type::label()))
 }
@@ -50,8 +55,18 @@ pub impl FromValue for FootnoteBody with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteBody with FromValue::{from_value}
+
+///|
 /// A footnote (upstream `Packed<FootnoteElem>`).
 pub(all) struct FootnoteElem(Content) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteElem with Eq::{not_equal, equal}
 
 ///|
 /// Creates a new footnote that the passed content as its body.
@@ -77,9 +92,19 @@ pub impl Reflect for FootnoteElem with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteElem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FootnoteElem with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteElem with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FootnoteElem with fn from_value(v) {
@@ -96,6 +121,11 @@ pub impl FromValue for FootnoteElem with fn from_value(v) {
   }
   FootnoteElem(FootnoteElem::with_content(content).0.spanned(span))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteElem with FromValue::{from_value}
 
 ///|
 /// The alternative text of a footnote number: the footnote's local name

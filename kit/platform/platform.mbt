@@ -20,10 +20,25 @@ pub(all) enum ErrorKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorKind with @debug.Debug::{to_repr}
+
+///|
 /// An I/O error: its kind and the display text of Rust's `io::Error`.
 pub(all) suberror IoError {
   IoError(ErrorKind, String)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IoError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for IoError with fn output(self, logger) {
@@ -51,12 +66,32 @@ pub(all) enum FileKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FileKind with @debug.Debug::{to_repr}
+
+///|
 /// The operating system the program runs on.
 pub(all) enum Os {
   Linux
   MacOs
   Windows
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Os with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Os with @debug.Debug::{to_repr}
 
 ///|
 /// The error kind of an OS error number (POSIX numbering).

@@ -66,6 +66,11 @@ pub impl FromValue for ToAbs with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToAbs with FromValue::{from_value}
+
+///|
 /// Raises a value to some exponent.
 fn impl_calc_pow(
   span : @syntax.Span,
@@ -911,6 +916,11 @@ pub impl IntoValue for Num with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Num with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Num with fn from_value(v) {
   match v {
     Int(v) => Int(v)
@@ -918,6 +928,11 @@ pub impl FromValue for Num with fn from_value(v) {
     v => raise HintedError(Num::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Num with FromValue::{from_value}
 
 ///|
 /// A value which can be passed to functions that work with integers, floats,
@@ -1051,6 +1066,11 @@ pub impl IntoValue for DecNum with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecNum with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DecNum with fn from_value(v) {
   match v {
     Int(v) => Int(v)
@@ -1059,6 +1079,11 @@ pub impl FromValue for DecNum with fn from_value(v) {
     v => raise HintedError(DecNum::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecNum with FromValue::{from_value}
 
 ///|
 /// A value that can be passed to a trigonometric function.
@@ -1097,6 +1122,11 @@ pub impl FromValue for AngleLike with fn from_value(v) {
     v => raise HintedError(AngleLike::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleLike with FromValue::{from_value}
 
 ///|
 /// The error message when the result is too large to be represented.

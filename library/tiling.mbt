@@ -20,6 +20,11 @@ pub(all) struct Tiling {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tiling with Eq::{not_equal, equal}
+
+///|
 fn impl_tiling_construct__size_default() -> @syntax.Spanned[Smart[Axes[Length]]] {
   { v: Auto, span: @syntax.Span::detached(), }
 }
@@ -202,9 +207,19 @@ pub impl IntoValue for Tiling with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tiling with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Tiling with fn from_value(v) {
   match v {
     Tiling(t) => t
     v => raise HintedError(Tiling::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tiling with FromValue::{from_value}

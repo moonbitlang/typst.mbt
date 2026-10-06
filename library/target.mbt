@@ -26,6 +26,21 @@ pub(all) enum Target {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with @debug.Debug::{to_repr}
+
+///|
 /// The default target (`Paged`).
 pub fn Target::default() -> Target {
   Paged
@@ -44,6 +59,12 @@ pub impl Show for Target with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with Show::{to_string}
+
+///|
 /// Whether this is the HTML target.
 pub fn Target::is_html(self : Target) -> Bool {
   self == Html
@@ -59,6 +80,11 @@ pub impl Fingerprint for Target with fn fingerprint(self, state) {
     },
   )
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with Fingerprint::{fingerprint}
 
 ///|
 pub impl Reflect for Target with fn input() {
@@ -86,7 +112,7 @@ pub impl Reflect for Target with fn castable(v) {
 }
 
 ///|
-pub extend Target with Reflect::{input, castable}
+pub extend Target with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Target with fn into_value(self) {
@@ -109,6 +135,11 @@ pub impl FromValue for Target with fn from_value(v) {
     v => raise HintedError(Target::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with FromValue::{from_value}
 
 ///|
 /// `Default::default()` of `Target` (`TargetElem.target`).

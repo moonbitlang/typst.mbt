@@ -429,6 +429,19 @@ pub impl ResolvableCell for TableCell with fn default_cell() {
 }
 
 ///|
+#deprecated("call as `ResolvableCell::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCell with ResolvableCell::{
+  cell_y,
+  default_cell,
+  resolve_cell,
+  cell_x,
+  cell_colspan,
+  cell_rowspan,
+  cell_span,
+}
+
+///|
 pub impl ResolvableCell for GridCell with fn resolve_cell(
   self,
   x,
@@ -498,6 +511,19 @@ pub impl ResolvableCell for GridCell with fn default_cell() {
 }
 
 ///|
+#deprecated("call as `ResolvableCell::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridCell with ResolvableCell::{
+  cell_y,
+  default_cell,
+  resolve_cell,
+  cell_x,
+  cell_colspan,
+  cell_rowspan,
+  cell_span,
+}
+
+///|
 /// Represents an explicit grid line (horizontal or vertical) specified by the
 /// user.
 pub(all) struct Line {
@@ -524,11 +550,31 @@ pub(all) struct Line {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Line with Eq::{not_equal, equal}
+
+///|
 /// A range of rows `start..end` (upstream `Range<usize>`).
 pub(all) struct RowRange {
   start : Int
   end : Int
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowRange with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowRange with @debug.Debug::{to_repr}
 
 ///|
 /// Whether the range contains the given row.
@@ -556,6 +602,11 @@ pub(all) struct Header {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Header with Eq::{not_equal, equal}
+
+///|
 /// A repeatable grid footer. Stops at the last row.
 pub(all) struct Footer {
   /// The first row included in this footer.
@@ -567,6 +618,11 @@ pub(all) struct Footer {
   /// Used similarly to header level.
   level : Int
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Footer with Eq::{not_equal, equal}
 
 ///|
 /// The footer's range of included rows.
@@ -585,6 +641,11 @@ pub(all) struct Repeatable[T] {
   /// Whether the user requested the child to repeat.
   repeated : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Repeatable with Eq::{not_equal, equal}
 
 ///|
 /// Returns `Some` if the value is repeated, `None` otherwise.
@@ -689,6 +750,11 @@ pub(all) struct Cell {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cell with Eq::{not_equal, equal}
+
+///|
 /// Create a simple cell given its body.
 pub fn Cell::new(body : Content) -> Cell {
   {
@@ -715,6 +781,21 @@ pub(all) enum LinePosition {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinePosition with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinePosition with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinePosition with @debug.Debug::{to_repr}
+
+///|
 /// A grid entry.
 pub(all) enum Entry {
   /// An entry which holds a cell.
@@ -723,6 +804,11 @@ pub(all) enum Entry {
   /// this entry is merged with (`parent`).
   Merged(Int)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with Eq::{not_equal, equal}
 
 ///|
 /// Obtains the cell inside this entry, if this is not a merged cell.
@@ -774,6 +860,11 @@ pub(all) struct CellGrid {
   /// Whether this grid has gutters.
   has_gutter : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CellGrid with Eq::{not_equal, equal}
 
 ///|
 /// Generates the cell grid, given the tracks and cells.
@@ -2458,12 +2549,22 @@ pub impl IntoValue for CellGrid with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CellGrid with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CellGrid with fn from_value(v) {
   match v {
     Dyn(CellGrid(grid)) => grid
     v => raise HintedError(CellGrid::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CellGrid with FromValue::{from_value}
 
 ///|
 fn fingerprint_stroke(state : SipHasher128, stroke : ResolvedStroke?) -> Unit {
@@ -2542,3 +2643,8 @@ pub impl Fingerprint for CellGrid with fn fingerprint(self, state) {
   }
   state.write_bool(self.has_gutter)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CellGrid with Fingerprint::{fingerprint}

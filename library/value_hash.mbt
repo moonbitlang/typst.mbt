@@ -22,6 +22,11 @@ pub impl Fingerprint for Label with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Element with fn fingerprint(self, state) {
   // Elements are compared by identity; their keys are unique (their names
   // are not: `grid.cell` and `table.cell` are both `cell`).
@@ -29,15 +34,30 @@ pub impl Fingerprint for Element with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Element with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for NonZeroUSize with fn fingerprint(self, state) {
   state.write_i64(self.0)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroUSize with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for HintedString with fn fingerprint(self, state) {
   state.write_str(self.message)
   state.write(self.hints)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintedString with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for SourceDiagnostic with fn fingerprint(self, state) {
@@ -48,10 +68,20 @@ pub impl Fingerprint for SourceDiagnostic with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SourceDiagnostic with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Length with fn fingerprint(self, state) {
   state.write_f64(self.abs.to_raw())
   state.write_f64(self.em.get())
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for Value with fn fingerprint(self, state) {
@@ -179,6 +209,11 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with Fingerprint::{fingerprint}
+
+///|
 /// Upstream derives `Hash` for `Datetime`: a date, a time or both, with the
 /// nanoseconds that the repr does not show.
 pub impl Fingerprint for Datetime with fn fingerprint(self, state) {
@@ -208,6 +243,11 @@ pub impl Fingerprint for Datetime with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `Symbol`: a single value, a list of variants
@@ -242,6 +282,11 @@ pub impl Fingerprint for Symbol with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with Fingerprint::{fingerprint}
+
+///|
 /// `[(ModifierSet<S>, S, Option<S>)]`: modifiers, value and deprecation
 /// message of each variant.
 fn fingerprint_symbol_variants(
@@ -266,6 +311,11 @@ pub impl Fingerprint for Dict with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Args with fn fingerprint(self, state) {
   state.write(self.span)
   state.write_usize(self.items.length())
@@ -278,9 +328,19 @@ pub impl Fingerprint for Args with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Args with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Type with fn fingerprint(self, state) {
   state.write_str(self.0.long_name)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `Module`: the name and the shared inner data
@@ -308,6 +368,11 @@ pub impl Fingerprint for Module with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Module with Fingerprint::{fingerprint}
+
+///|
 /// Upstream `Hash for Scope`: the bindings in order, then `deduplicate` and
 /// `category`.
 pub impl Fingerprint for Scope with fn fingerprint(self, state) {
@@ -319,6 +384,11 @@ pub impl Fingerprint for Scope with fn fingerprint(self, state) {
   state.write_bool(self.deduplicate)
   state.write(self.category)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `Binding`: value, kind, span, `check_access`
@@ -349,6 +419,11 @@ pub impl Fingerprint for Binding with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Binding with Fingerprint::{fingerprint}
 
 ///|
 /// Upstream derives `Hash` for `BindingInfo`: category, feature, deprecation
@@ -434,6 +509,11 @@ pub impl Fingerprint for Category with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Category with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Func with fn fingerprint(self, state) {
   match self.inner {
     Native(data) => {
@@ -498,6 +578,11 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with Fingerprint::{fingerprint}
+
+///|
 /// Upstream `Hash for RawContent`: the element, the metadata (label,
 /// location, lifecycle), all stored fields and the span.
 pub impl Fingerprint for Content with fn fingerprint(self, state) {
@@ -549,9 +634,19 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Content with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Styles with fn fingerprint(self, state) {
   state.write(self.items)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Styles with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for Style with fn fingerprint(self, state) {
@@ -580,6 +675,11 @@ pub impl Fingerprint for Style with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Transformation with fn fingerprint(self, state) {
   match self {
     Content(c) => {
@@ -596,6 +696,11 @@ pub impl Fingerprint for Transformation with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transformation with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for Selector with fn fingerprint(self, state) {
@@ -650,6 +755,11 @@ pub impl Fingerprint for Selector with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Selector with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Numbering with fn fingerprint(self, state) {
   match self {
     Pattern(pattern) => {
@@ -667,9 +777,19 @@ pub impl Fingerprint for Numbering with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numbering with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for Counter with fn fingerprint(self, state) {
   state.write(self.0)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Counter with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for CounterKey with fn fingerprint(self, state) {
@@ -687,9 +807,19 @@ pub impl Fingerprint for CounterKey with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterKey with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for CounterState with fn fingerprint(self, state) {
   state.write(self.0)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterState with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for CounterUpdate with fn fingerprint(self, state) {
@@ -710,10 +840,20 @@ pub impl Fingerprint for CounterUpdate with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdate with Fingerprint::{fingerprint}
+
+///|
 pub impl Fingerprint for State with fn fingerprint(self, state) {
   state.write_str(self.key)
   state.write(self.init)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend State with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for StateUpdate with fn fingerprint(self, state) {
@@ -728,6 +868,11 @@ pub impl Fingerprint for StateUpdate with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StateUpdate with Fingerprint::{fingerprint}
 
 ///|
 pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
@@ -822,3 +967,8 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DynValue with Fingerprint::{fingerprint}

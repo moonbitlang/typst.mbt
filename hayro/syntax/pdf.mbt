@@ -20,6 +20,16 @@ pub(all) enum LoadPdfError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadPdfError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadPdfError with @debug.Debug::{to_repr}
+
+///|
 /// Try to read the given PDF file.
 ///
 /// Returns `Err` if it was unable to read it.
@@ -126,6 +136,21 @@ pub(all) enum PdfVersion {
   /// PDF 2.0.
   Pdf20
 } derive(Eq, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with @debug.Debug::{to_repr}
 
 ///|
 pub fn PdfVersion::as_str(self : PdfVersion) -> String {

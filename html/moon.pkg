@@ -5,6 +5,7 @@ import {
   "moonbitlang/typst/html_assets",
   "moonbitlang/core/hashset",
   "moonbitlang/typst/svg",
+  "moonbitlang/core/debug",
 }
 
 import {

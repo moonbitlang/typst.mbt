@@ -5,7 +5,22 @@
 pub(all) struct Fr(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Eq::{not_equal, equal}
+
+///|
 pub extend Fr with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Hash::{hash, hash_combine}
 
 ///|
 pub fn Fr::zero() -> Fr {

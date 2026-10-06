@@ -31,6 +31,21 @@ pub(all) enum Encoding {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for Encoding with fn input() {
   Union([Value(Str("utf8"), "The Unicode UTF-8 encoding.")])
 }
@@ -46,11 +61,21 @@ pub impl Reflect for Encoding with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Encoding with fn into_value(self) {
   match self {
     Utf8 => Str("utf8")
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Encoding with fn from_value(v) {
@@ -59,3 +84,8 @@ pub impl FromValue for Encoding with fn from_value(v) {
     v => raise HintedError(cast_error((Ty::new() : Ty[Encoding]), v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with FromValue::{from_value}

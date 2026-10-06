@@ -258,6 +258,11 @@ pub impl Show for Bibliography with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Bibliography with Show::{to_string, output}
+
+///|
 /// Decode on library from one data source.
 fn decode_library(loaded : Loaded) -> @hayagriva.Library raise SourceError {
   let data = within(loaded, () => bytes_as_str(loaded.data))
@@ -456,6 +461,16 @@ pub(all) enum CslSource {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslSource with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslSource with Hash::{hash, hash_combine}
+
+///|
 fn CslSource::default_source() -> CslSource {
   Named(InstituteOfElectricalAndElectronicsEngineers, None)
 }
@@ -517,6 +532,11 @@ pub impl Reflect for CslSource with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslSource with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for CslSource with fn from_value(value) {
   if value is Str(string) {
     if path_extension(string) is None {
@@ -541,6 +561,11 @@ pub impl FromValue for CslSource with fn from_value(value) {
   }
   Normal(DataSource::from_value(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslSource with FromValue::{from_value}
 
 ///|
 pub impl IntoValue for CslSource with fn into_value(self) {

@@ -125,6 +125,11 @@ pub impl FromValue for ArgumentKey with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArgumentKey with FromValue::{from_value}
+
+///|
 /// Look up an argument by index (among the positional ones; negative
 /// indices count from the back) or by name (the last one wins).
 fn Args::get(self : Args, key : ArgumentKey) -> Value? {

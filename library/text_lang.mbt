@@ -8,6 +8,26 @@
 pub(all) struct Lang(String) derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with @debug.Debug::{to_repr}
+
+///|
 pub let lang_arabic : Lang = Lang("ar")
 
 ///|
@@ -122,6 +142,11 @@ pub impl Reflect for Lang with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Lang with fn into_value(self) {
   Str(self.as_str())
 }
@@ -170,6 +195,26 @@ pub extend Lang with FromValue::{from_value}
 pub(all) struct Region(String) derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with @debug.Debug::{to_repr}
+
+///|
 /// Return the region code as an all uppercase string slice.
 pub fn Region::as_str(self : Region) -> String {
   self.0
@@ -201,9 +246,19 @@ pub impl Reflect for Region with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Region with fn into_value(self) {
   Str(self.as_str())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Region with fn from_value(v) {
@@ -216,6 +271,26 @@ pub extend Region with FromValue::{from_value}
 ///|
 /// An ISO 15924-type script identifier, stored lowercased.
 pub(all) struct WritingScript(String) derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with @debug.Debug::{to_repr}
 
 ///|
 /// Return the script as an all lowercase string slice.
@@ -250,9 +325,19 @@ pub impl Reflect for WritingScript with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for WritingScript with fn into_value(self) {
   Str(self.as_str())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for WritingScript with fn from_value(v) {
@@ -260,11 +345,36 @@ pub impl FromValue for WritingScript with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingScript with FromValue::{from_value}
+
+///|
 /// A locale consisting of a language and an optional region.
 pub(all) struct Locale {
   lang : Lang
   region : Region?
 } derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with @debug.Debug::{to_repr}
 
 ///|
 pub fn Locale::new(lang : Lang, region : Region?) -> Locale {
@@ -303,6 +413,11 @@ pub impl Reflect for Locale with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Locale with fn into_value(self) {
   Array(
     Arr::from_array([self.lang.into_value(), IntoValue::into_value(self.region)]),
@@ -310,10 +425,20 @@ pub impl IntoValue for Locale with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Locale with fn from_value(v) {
   let (lang, region) : (Lang, Region?) = FromValue::from_value(v)
   Locale::new(lang, region)
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with FromValue::{from_value}
 
 ///|
 pub fn Locale::rfc_3066(self : Locale) -> String {

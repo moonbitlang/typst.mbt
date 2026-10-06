@@ -24,6 +24,16 @@ pub(all) enum RawContent {
 } derive(Hash, Debug)
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with @debug.Debug::{to_repr}
+
+///|
 /// Returns or synthesizes the text content of the raw text.
 pub fn RawContent::get(self : RawContent) -> String {
   match self {
@@ -57,6 +67,11 @@ pub impl Eq for RawContent with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for RawContent with fn input() {
   Type(Type::str())
 }
@@ -72,6 +87,11 @@ pub impl Reflect for RawContent with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with Reflect::{output, input, castable}
+
+///|
 /// The stored form of the raw content (see [RawContent]). Upstream's cast
 /// to a string value is the field's output conversion,
 /// `raw_elem_text_output`.
@@ -83,12 +103,22 @@ pub impl IntoValue for RawContent with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RawContent with fn from_value(v) {
   match v {
     Dyn(RawContent(content)) => content
     v => Text(FromValue::from_value(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawContent with FromValue::{from_value}
 
 ///|
 /// The `text` field as users see it (upstream `RawContent`'s `IntoValue`:

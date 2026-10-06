@@ -128,11 +128,21 @@ pub impl Eq for PluginFunc with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PluginFunc with Eq::{not_equal, equal}
+
+///|
 /// Upstream `Hash for PluginFunc`.
 pub impl Fingerprint for PluginFunc with fn fingerprint(self, state) {
   self.plugin.fingerprint(state)
   state.write_str(self.name)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PluginFunc with Fingerprint::{fingerprint}
 
 ///|
 /// The persistent store data used for communication between store and host.

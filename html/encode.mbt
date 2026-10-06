@@ -8,6 +8,11 @@ pub(all) struct HtmlOptions {
 } derive(Eq, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlOptions with Eq::{not_equal, equal}
+
+///|
 pub extend HtmlOptions with Default::{default}
 
 ///|
@@ -16,6 +21,11 @@ pub(all) struct CompleteHtmlOptions {
   /// The resolved format options.
   format : @library.HtmlFormatOptions
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompleteHtmlOptions with Eq::{not_equal, equal}
 
 ///|
 /// Resolves the final options given those set by the document.

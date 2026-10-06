@@ -460,6 +460,11 @@ pub suberror RenderPanic {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderPanic with @debug.Debug::{to_repr}
+
+///|
 fn[T] must(x : T?) -> T raise RenderPanic {
   match x {
     Some(v) => v

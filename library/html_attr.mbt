@@ -10,6 +10,16 @@
 pub struct HtmlAttr(String) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with Hash::{hash, hash_combine}
+
+///|
 /// Intern an HTML attribute string at runtime.
 pub fn HtmlAttr::intern(string : String) -> HtmlAttr raise HintedError {
   if string.is_empty() {
@@ -54,6 +64,12 @@ pub impl Show for HtmlAttr with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with Show::{to_string}
+
+///|
 pub impl Reflect for HtmlAttr with fn input() {
   Type(Type::str())
 }
@@ -69,9 +85,19 @@ pub impl Reflect for HtmlAttr with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for HtmlAttr with fn into_value(self) {
   Str(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for HtmlAttr with fn from_value(v) {
@@ -81,12 +107,27 @@ pub impl FromValue for HtmlAttr with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttr with FromValue::{from_value}
+
+///|
 /// Attributes of an HTML element.
 ///
 /// Upstream this is a copy-on-write `EcoVec`; here the methods that modify
 /// the list mutate it in place, so callers must [HtmlAttrs::copy] a shared
 /// list first.
 pub struct HtmlAttrs(Array[(HtmlAttr, String)]) derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttrs with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttrs with Hash::{hash, hash_combine}
 
 ///|
 /// Creates an empty attribute list.
@@ -98,6 +139,11 @@ pub fn HtmlAttrs::new() -> HtmlAttrs {
 pub impl Default for HtmlAttrs with fn default() {
   HtmlAttrs::new()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttrs with Default::{default}
 
 ///|
 /// A copy of the list that can be modified independently.
@@ -180,6 +226,11 @@ pub impl Fold for HtmlAttrs with fn fold(self, outer) {
 }
 
 ///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttrs with Fold::{fold}
+
+///|
 pub impl Reflect for HtmlAttrs with fn input() {
   Type(Type::dict())
 }
@@ -220,6 +271,11 @@ pub impl FromValue for HtmlAttrs with fn from_value(v) {
     _ => cast_fail_with(HtmlAttrs::input(), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlAttrs with FromValue::{from_value}
 
 // Predefined constants for HTML attributes (upstream `attr::*`).
 
