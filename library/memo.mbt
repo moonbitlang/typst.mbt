@@ -162,6 +162,16 @@ fn[T, I : Eq] memoize(
     store.entries.clear()
     store.generation = generation
   }
+  // The traced span is not one per compilation (an evaluated string runs
+  // without): a result computed there replays no traced values.
+  let key = match engine.traced.0 {
+    None => key
+    Some(span) =>
+      memo_fingerprint(state => {
+        state.write_u128(key)
+        state.write(span)
+      })
+  }
   let parent = engine.introspector.recorder
   let backend = engine.introspector.backend
   if store.entries.get(key) is Some(entries) {
@@ -637,6 +647,10 @@ priv struct ClosureEntry {
   /// call.
   route : Route
   queried : Array[@syntax.FileId]
+  /// The files whose code ran in the call (see `traced_file_log`), for the
+  /// evaluation of a source file that reuses the call; `None` if the call
+  /// was not computed inside one, which then cannot reuse it.
+  traced_files : Array[@syntax.FileId]?
   /// The introspector the result was computed with.
   backend : &IntrospectorBackend
   /// The introspector reads of the call (`None`: none).
@@ -738,6 +752,133 @@ pub fn note_route_queries(ids : ArrayView[@syntax.FileId]) -> Unit {
       route_query_log.push(id)
     }
   }
+}
+
+///|
+/// The files whose code ran in the evaluations in progress that collect
+/// them, in order: an evaluation owns what was added since it started
+/// (not upstream: comemo tracks `Traced::get`, which every `Vm` asks for
+/// the file of its code, and reuses the evaluation of a source file if the
+/// traced span of the later evaluation gives the same answers, that is, if
+/// it lies in none of these files or is the same span). Only the
+/// evaluations of source files collect (`eval_source_memoized`), and the
+/// closure calls inside them, whose files are theirs; closure calls
+/// elsewhere do not, they have the traced span in their key.
+let traced_file_log : Ref[Array[@syntax.FileId]] = { val: [], }
+
+///|
+/// The number of evaluations that are collecting traced files.
+let traced_file_scopes : Ref[Int] = { val: 0, }
+
+///|
+/// Whether an evaluation is collecting traced files.
+pub fn traced_files_active() -> Bool {
+  traced_file_scopes.val > 0
+}
+
+///|
+/// Start collecting the traced files of an evaluation; returns the token
+/// for [traced_files_end].
+pub fn traced_files_begin() -> Int {
+  traced_file_scopes.val += 1
+  traced_file_log.val.length()
+}
+
+///|
+/// The files noted since the matching [traced_files_begin] (without
+/// repetitions), which ends the collection for this evaluation. The
+/// evaluations around it keep them (once each: the log does not grow with
+/// the number of calls). The result must not be modified.
+pub fn traced_files_end(start : Int) -> Array[@syntax.FileId] {
+  let log = traced_file_log.val
+  let files = if log.length() == start {
+    no_route_queries
+  } else {
+    let files = []
+    for id in log[start:] {
+      if !files.contains(id) {
+        files.push(id)
+      }
+    }
+    files
+  }
+  traced_file_scopes.val -= 1
+  if traced_file_scopes.val == 0 {
+    log.clear()
+  } else {
+    log.truncate(start)
+    log.append(files)
+  }
+  files
+}
+
+///|
+/// Record that code of the file `id` runs (a `Vm` asks `Traced::get(id)`).
+pub fn note_traced_file(id : @syntax.FileId) -> Unit {
+  if traced_file_scopes.val > 0 {
+    let log = traced_file_log.val
+    // Mostly the file of the call before.
+    if log.last() is Some(last) && last == id {
+      return
+    }
+    log.push(id)
+  }
+}
+
+///|
+/// [note_traced_file] for the files of a reused evaluation.
+pub fn note_traced_files(ids : ArrayView[@syntax.FileId]) -> Unit {
+  if traced_file_scopes.val > 0 {
+    for id in ids {
+      note_traced_file(id)
+    }
+  }
+}
+
+///|
+/// The collection of traced files that an evaluation with a traced span of
+/// its own set aside ([own_traced_begin]).
+pub struct OwnTraced {
+  priv log : Array[@syntax.FileId]
+  priv scopes : Int
+}
+
+///|
+/// Start an evaluation with a traced span of its own (an evaluated string
+/// runs without one, upstream `Traced::default().track()`): the files of
+/// its code are not those of the evaluations around it. Returns what
+/// [own_traced_end] restores.
+pub fn own_traced_begin() -> OwnTraced {
+  let saved = { log: traced_file_log.val, scopes: traced_file_scopes.val, }
+  traced_file_log.val = []
+  traced_file_scopes.val = 0
+  saved
+}
+
+///|
+/// End the evaluation that [own_traced_begin] started.
+pub fn own_traced_end(saved : OwnTraced) -> Unit {
+  traced_file_log.val = saved.log
+  traced_file_scopes.val = saved.scopes
+}
+
+///|
+/// Whether the traced spans `a` and `b` give the same answers for the files
+/// `asked` (`Traced::get`).
+pub fn traced_answers_equal(
+  a : Traced,
+  b : Traced,
+  asked : ArrayView[@syntax.FileId],
+) -> Bool {
+  if a.0 == b.0 {
+    return true
+  }
+  for id in asked {
+    if a.get(id) != b.get(id) {
+      return false
+    }
+  }
+  true
 }
 
 ///|
@@ -845,12 +986,14 @@ pub fn memoized_closure(
   state.write(args)
   // The traced span is not one per compilation: an evaluated string runs
   // without (`eval_root`), and a call that ran there traced nothing.
-  // (Upstream tracks `Traced::get`; the whole span is stricter.)
+  // (Upstream tracks `Traced::get`; the whole span is stricter, and what
+  // the call returns does not depend on it.)
   state.write(engine.traced.0)
   let base = state.finish128()
   let depth = engine.route.depth()
   let parent = engine.introspector.recorder
   let known = store.asked.get(base)
+  let collecting = traced_files_active()
   if known is Some(asked) {
     let state = SipHasher128::new()
     state.write_u128(base)
@@ -860,13 +1003,17 @@ pub fn memoized_closure(
       store.entries.get(key) is Some(entries) {
       for entry in entries {
         let shift = depth - entry.depth
-        if entry.matches(func, engine, context, args, shift) {
+        if (!collecting || entry.traced_files is Some(_)) &&
+          entry.matches(func, engine, context, args, shift) {
           fingerprint_flags.val = outer_flags
           closure_memo_counts[0] += 1
           // What the call did to its tracked arguments.
           context.reads = context.reads | entry.asked
           note_route_shift(entry.shift_lo - shift, entry.shift_hi - shift)
           note_route_queries(entry.queried)
+          if entry.traced_files is Some(files) {
+            note_traced_files(files)
+          }
           if entry.reads is Some(reads) && parent is Some(parent) {
             reads.merge_into(parent)
           }
@@ -905,10 +1052,12 @@ pub fn memoized_closure(
   route_shift_hi.val = route_shift_max
   route_shift_scopes.val += 1
   let queries = route_queries_begin()
+  let traced_start = if collecting { traced_files_begin() } else { -1 }
   let mut asked = 0
   let mut shift_lo = 0
   let mut shift_hi = 0
   let mut queried = no_route_queries
+  let mut traced_files : Array[@syntax.FileId]? = None
   // What the call did, it also did for the calls around it.
   let finish = () => {
     asked = context.reads
@@ -920,6 +1069,9 @@ pub fn memoized_closure(
     route_shift_scopes.val -= 1
     note_route_shift(shift_lo, shift_hi)
     queried = route_queries_end(queries)
+    if collecting {
+      traced_files = Some(traced_files_end(traced_start))
+    }
     if parent is Some(parent) {
       reads.merge_into(parent)
     }
@@ -958,6 +1110,7 @@ pub fn memoized_closure(
     shift_hi,
     route: engine.route,
     queried,
+    traced_files,
     backend: engine.introspector.backend,
     reads: if reads.calls.is_empty() && !reads.lossy {
       None

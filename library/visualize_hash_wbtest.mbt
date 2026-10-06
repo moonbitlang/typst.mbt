@@ -348,8 +348,8 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
     )
     assert_eq(flags, fingerprint_identity)
   }
-  let named = Module::new("m", scope(Int(1), detached))
-  let identified = Module::anonymous(scope(Int(1), detached), identified=true)
+  let named = Module::new("m", scope(Int(1), detached)).canonical()
+  let identified = Module::anonymous(scope(Int(1), detached)).canonical()
   for m in [named, named.with_name("n"), identified, identified.with_name("p")] {
     for _ in 0..<2 {
       let (_, flags) = fingerprint_and_flags(Value::Module(m))
@@ -360,6 +360,23 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
       assert_eq(flags, 0)
     }
   }
+  // A module is canonical because its maker says so: what is made of one
+  // is not, nor is a module that is just made.
+  for
+    m in [
+      Module::new("m", scope(Int(1), detached)),
+      named.with_scope(scope(Int(1), detached)),
+      named.with_content(Content::empty()),
+      identified.with_content(Content::empty()),
+    ] {
+    let (_, flags) = fingerprint_and_flags(Value::Module(m))
+    assert_eq(flags, fingerprint_identity)
+  }
+  // Making a module canonical does not change its hash.
+  assert_eq(
+    hash128(Value::Module(Module::new("m", scope(Int(1), detached)))),
+    hash128(Value::Module(named)),
+  )
   // The flag follows the inner data.
   let (_, flags) = fingerprint_and_flags(Value::Module(a.with_name("q")))
   assert_eq(flags, fingerprint_identity)

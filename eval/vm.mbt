@@ -27,7 +27,11 @@ pub fn Vm::new(
   target : @syntax.Span,
 ) -> Vm {
   let inspected = match target.id() {
-    Some(id) => engine.traced.get(id)
+    Some(id) => {
+      // `Traced::get` is tracked (see `@library.note_traced_file`).
+      @library.note_traced_file(id)
+      engine.traced.get(id)
+    }
     None => None
   }
   { engine, context, flow: None, scopes, inspected, }

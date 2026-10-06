@@ -165,3 +165,44 @@ test "trace: with imports, forwarded arguments and delayed errors" {
   @debug.assert_eq(errors, ["panicked with: no"])
   assert_true(values.length() >= 2)
 }
+
+///|
+test "trace: an evaluated string imports the module of the document" {
+  // The evaluated string runs without a traced span. Upstream tracks what
+  // the evaluation of a file asks of the span (`Traced::get` for the files
+  // whose code runs): `lib.typ` asks for itself, the span is elsewhere, and
+  // both imports give one module.
+  let files = [("lib.typ", "#let v = 1\n")]
+  let source =
+    #|#let load() = { import "lib.typ" as m; m }
+    #|#let a = eval("load()", scope: (load: load))
+    #|#let b = load()
+    #|#let same = a == b
+    #|#metadata(same)
+    #|
+  // The last `same`.
+  @debug.assert_eq(traced_at(source, "same", 1, files~), (["true"], []))
+  // A span in the imported file: the document's import evaluates it again
+  // (the string's evaluation traced nothing), and so does upstream.
+  @debug.assert_eq(
+    traced_at(source, "v", 0, files~, file="lib.typ"),
+    (["1"], []),
+  )
+  // The module is one for the evaluations of other files too.
+  let files = [
+    ("lib.typ", "#let v = 1\n"),
+    (
+      "mid.typ", "#import \"lib.typ\" as inner\n#let w = eval(\"m\", scope: (m: inner))\n",
+    ),
+  ]
+  let source =
+    #|#import "mid.typ": inner, w
+    #|#import "lib.typ" as direct
+    #|#let same = (inner == direct, w == direct, eval("import \"lib.typ\" as e; e") == direct)
+    #|#metadata(same)
+    #|
+  @debug.assert_eq(
+    traced_at(source, "same", 1, files~),
+    (["(true, true, true)"], []),
+  )
+}

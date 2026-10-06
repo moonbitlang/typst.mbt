@@ -395,7 +395,12 @@ fn Plugin::into_module(self : Plugin) -> Module {
   }
   // The functions' fingerprints carry the plugin; without functions two
   // plugins give modules that only differ in their identity.
-  Module::anonymous(scope, identified=scope.length() > 0)
+  let module_ = Module::anonymous(scope)
+  if scope.length() > 0 {
+    module_.canonical()
+  } else {
+    module_
+  }
 }
 
 ///|

@@ -260,7 +260,10 @@ priv struct EvalMemo {
   /// `Route::contains` calls, so only those answers must match).
   route : @library.Route
   queried : Array[@syntax.FileId]
+  /// The traced span and the files it was asked for (comemo tracks
+  /// `Traced::get`: only those answers must match).
   traced : @library.Traced
+  traced_files : Array[@syntax.FileId]
   result : Result[@library.Module, Array[@library.SourceDiagnostic]]
   sink : @library.Sink
 }
@@ -276,8 +279,9 @@ let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = Map([])
 /// Upstream `typst_eval::eval` is memoized by comemo, so importing the same
 /// file twice yields the same module (modules compare by identity). This
 /// mirrors that: the result and the sink effects (warnings, ...) are cached
-/// and replayed for the same world, library, source text, route and traced
-/// span.
+/// and replayed for the same world, library and source text, and for a
+/// route and a traced span that give the answers the evaluation got (the
+/// file ids it asked the route for, the files whose code ran in it).
 fn eval_source_memoized(
   engine : @library.Engine,
   source : @syntax.Source,
@@ -298,9 +302,15 @@ fn eval_source_memoized(
       memo.queried
       .iter()
       .all(q => memo.route.contains(q) == engine.route.contains(q)) &&
-      memo.traced.0 == engine.traced.0 {
-      // The evaluations around this one asked the same of their routes.
+      @library.traced_answers_equal(
+        memo.traced,
+        engine.traced,
+        memo.traced_files,
+      ) {
+      // The evaluations around this one asked the same of their routes
+      // and of their traced spans.
       @library.note_route_queries(memo.queried)
+      @library.note_traced_files(memo.traced_files)
       engine.sink.extend_from_sink(memo.sink)
       match memo.result {
         Ok(module_) => return module_
@@ -310,6 +320,7 @@ fn eval_source_memoized(
   }
   let sink = @library.Sink::new()
   let queries = @library.route_queries_begin()
+  let traced_start = @library.traced_files_begin()
   @library.note_route_query(id)
   let result : Result[@library.Module, Array[@library.SourceDiagnostic]] = try
     eval_source(
@@ -327,6 +338,7 @@ fn eval_source_memoized(
   }
   // Queries made here are also made by the enclosing evaluations.
   let queried = @library.route_queries_end(queries)
+  let traced_files = @library.traced_files_end(traced_start)
   entries.push({
     world: engine.world,
     library: engine.library,
@@ -334,6 +346,7 @@ fn eval_source_memoized(
     route: engine.route,
     queried,
     traced: engine.traced,
+    traced_files,
     result,
     sink,
   })

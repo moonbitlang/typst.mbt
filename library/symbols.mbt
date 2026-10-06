@@ -28,7 +28,7 @@ fn extend_scope_from_codex_module(scope : Scope, module_ : CodexModule) -> Unit 
         })
         Symbol(symbol)
       }
-      Module(m) => Module(Module::new(name, Scope::from_codex(m)))
+      Module(m) => Module(Module::new(name, Scope::from_codex(m)).canonical())
     }
     let scope_binding = scope.define_(name, value)
     if binding.deprecation is Some(message) {

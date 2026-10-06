@@ -54,9 +54,12 @@ pub fn eval_source(
 
   // Assemble the module.
   let name = id.vpath().file_stem().unwrap_or("")
+  // One module per evaluation of the file, which is memoized
+  // (`eval_source_memoized`; the main file is evaluated once).
   @library.Module::new(name, vm.scopes.top)
   .with_content(output)
   .with_file_id(id)
+  .canonical()
 }
 
 ///|
@@ -129,6 +132,12 @@ fn eval_root(
     traced: @library.Traced::new(),
     route: @library.Route::root(),
   }
+
+  // The traced span is the string's own (none): what its code asks of it is
+  // not asked of the span of the evaluations around it (not upstream; see
+  // `@library.own_traced_begin`).
+  let own_traced = @library.own_traced_begin()
+  defer @library.own_traced_end(own_traced)
 
   // Prepare VM.
   let scopes = @library.Scopes::new(Some(engine.library))

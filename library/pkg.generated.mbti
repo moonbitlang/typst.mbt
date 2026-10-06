@@ -2138,6 +2138,10 @@ pub fn note_route_queries(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
 
 pub fn note_route_query(@moonbitlang/typst/syntax.FileId) -> Unit
 
+pub fn note_traced_file(@moonbitlang/typst/syntax.FileId) -> Unit
+
+pub fn note_traced_files(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
+
 pub fn op_elem() -> Element
 
 pub let op_elem_limits : Int
@@ -2211,6 +2215,10 @@ pub fn overshell_elem() -> Element
 pub let overshell_elem_annotation : Int
 
 pub let overshell_elem_body : Int
+
+pub fn own_traced_begin() -> OwnTraced
+
+pub fn own_traced_end(OwnTraced) -> Unit
 
 pub fn pad_elem() -> Element
 
@@ -3247,6 +3255,14 @@ pub fn[T : ToCss] to_css(T, sink? : (HintedString) -> Unit) -> String
 pub fn to_style(Char, MathStyle) -> String
 
 pub fn[T] trace((@moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @moonbitlang/typst/syntax.Span, () -> T raise SourceError) -> T raise SourceError
+
+pub fn traced_answers_equal(Traced, Traced, ArrayView[@moonbitlang/typst/syntax.FileId]) -> Bool
+
+pub fn traced_files_active() -> Bool
+
+pub fn traced_files_begin() -> Int
+
+pub fn traced_files_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
 
 pub let typst_version : (Int, Int, Int)
 
@@ -8445,7 +8461,8 @@ pub fn ModifierSet::iter(Self) -> Array[String]
 pub struct Module {
   // private fields
 }
-pub fn Module::anonymous(Scope, identified? : Bool) -> Self
+pub fn Module::anonymous(Scope) -> Self
+pub fn Module::canonical(Self) -> Self
 pub fn Module::content(Self) -> Content
 pub fn Module::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Module::file_id(Self) -> @moonbitlang/typst/syntax.FileId?
@@ -8960,6 +8977,10 @@ pub fn OvershellElem::set_annotation(Content?) -> Style
 pub fn OvershellElem::with_annotation(Self, Content?) -> Self
 pub fn OvershellElem::with_body(Self, Content) -> Self
 pub impl NativeElement for OvershellElem
+
+pub struct OwnTraced {
+  // private fields
+}
 
 pub struct PadElem(Content)
 pub fn PadElem::body(Self) -> Content
