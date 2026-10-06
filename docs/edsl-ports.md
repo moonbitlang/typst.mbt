@@ -645,6 +645,218 @@ version measures thirteen blocks, and every constructor of the element
 finds its site through the hook; how the 0.4 ms divide between the two was
 not measured.
 
+### As built (step 4): `Chip`, `DataTable`, soft breaks in cells
+
+Both elements follow the conventions of step 3. Where the table above
+(written before any element existed) does not fit them, it is amended
+here; the amendments to the conventions themselves are at the end.
+
+**`Chip`** (`doc/kit/chip.mbt`, tests `doc/kit/chip_test.mbt`):
+`Chip(text : String, fill~, stroke~, radius~, inset~, outset~)` and
+`Chip::of(body, ..)` with the same parameters. It is `Box(label,
+inset=Sides(x=Em(0.6)), outset=Sides(y=Em(0.3)), fill~, stroke~, radius~)`,
+the label being the text with its spaces as U+00A0.
+
+- The parameters are `Box`'s, with its names and types. The two defaults
+  are the element's own and are its reason: the padding to the sides is
+  the box's inset, the padding above and below its outset (finding T1). In
+  em, so that they follow the size of the label; 0.6 and 0.3 are the
+  middle of what the ports wrote (4.5 to 6pt and 2.4 to 3.2pt around text
+  of 7pt in text of 9 to 10pt). No default for `fill`, `stroke` or
+  `radius`: a look is the caller's.
+- Not a parameter: `text~` of the table above. The style of the label is a
+  `Text` around the chip (`Text(Chip("ok", fill=soft), size=Pt(7),
+  fill=green)`): a parameter would repeat some of `Text`'s twenty-five, and
+  with the `Text` around the box the em of the paddings is the label's
+  size. Also not: a width, a height, `baseline` (convention 2; they are
+  what moves the label off the line), `clip`.
+- Two constructors, where the table has one `body`. A description is
+  opaque, so an element cannot tell a string from other content, and "a
+  string body gets no-break spaces" needs to know. `Chip(text)` takes the
+  string; `Chip::of(body)` takes content, which can be broken, as the
+  table says. Considered and not built: one constructor with a show rule
+  on the text `" "` inside the box (it works for every body, but it makes
+  three text runs of two words, with the space attributed to the call,
+  and the pages are then not those of the hand-written pill); one
+  constructor that asks `doc` whether its body is a string (then
+  `Chip(Text("two words"))`, the form every port wrote, is broken without
+  a diagnostic).
+- Established from the frames: the baselines of a paragraph of three lines
+  are the same with a chip in its second line and with a word in its
+  place (16.6, 29.7, 42.7 and 55.8pt; with the padding as the box's inset
+  the line of the chip and those after it are 3pt lower); the label is on
+  the baseline of its neighbours; in a column of 70pt a label of four
+  words is one run, where the same box without the element has three
+  lines.
+- What "does not wrap" is worth, which the table does not say: a box is
+  laid out in the width of its line and wraps only when its content is
+  wider than that, so the no-break spaces only ever act in a column that
+  is narrower than the label. There the label then runs out of its cell,
+  and the engine does not make the box wider than the line (the width of
+  a paragraph is at most the region's): the fill ends before the text.
+  That is pinned by a test and said in the documentation, with the remedy
+  (an `Auto` column, which is as wide as its chips). It is the engine's
+  S5 in another place, and a case for lint L3's successor (content outside
+  its container), not for the element.
+- No callback, no measuring: it can be built anywhere.
+
+**`DataTable`** (`doc/kit/data_table.mbt`, tests
+`doc/kit/data_table_test.mbt`): `DataTable(head, rows, columns~, inset~,
+align~, fill~, stroke~, radius~, breakable~, key~)`. It is
+
+```
+Seq([
+  SetTableCell(breakable=false),
+  Table([TableHeader(head), ..cells], columns~, inset~, align~, fill~,
+    stroke=Cells::all(Sides(bottom=stroke, rest=Stroke::none()))),
+])
+```
+
+and with `radius`, that sequence in `Block(.., radius~,
+stroke=Sides(all=stroke), clip=true)` with `TableHline(stroke=Stroke::
+none())` as the table's last child. Against the table above
+(`numeric~, mark~, frame~, header~, rule~, column_text~`):
+
+| There | As built | Why |
+|---|---|---|
+| `rule~` | `stroke : Stroke` | The primitive's name. One stroke, not `Cells[Sides[Stroke]]`: the element names the other sides (2.4), which is its reason, and a `Sides` is opaque. It is also the outline of the frame: all six framed helpers of the ports used one hairline for both |
+| `frame~` | `radius : Corners[Length]` | `Block`'s parameter; its presence is the choice of the frame, as for `Cards`. The frame has no fill of its own: the table's `fill` is clipped to it |
+| `numeric~` | `align : Cells[Alignment]` | The table's own parameter does it without a callback: `Cells::columns([Left, Right])`, which no port found (five wrote a `Cells` function) |
+| `mark~`, the fill of `header~` | `fill : Cells[Paint]` | The table's own. A tinted row was written by one author (two ports), a filled header by one: by the rule "not what one port needed" they are the caller's function, with the row offset documented (row 0 is the header) |
+| the text of `header~`, `column_text~` | rules of the document | `ShowSet(Select::table_cell(y=0), SetText(..))` and `..(x=2)..`: the element has no parameter for text (it would repeat `SetText`), and the rules reach its cells because it is a table. Tested inside the element, also with both on one cell (the later wins) |
+| "the three `Cells` functions built once" | no callback at all | An alignment per column and one stroke for all cells are values; the rule under the last row is taken away by a line (below). So the element can be built inside a callback, which the hand-written helpers could not |
+| | `inset : Cells[Sides[Length]]` | The table's own; every port set it |
+| | `breakable : Bool = false` | `TableCell`'s. The default is the element's ("cells unbreakable"), and it needs a way out: see the row higher than a page |
+
+`rows` (the tracks) and the gutters of `Table` are not parameters:
+`SetTable(..)` before the element sets them (tested with `row_gutter`),
+like the stroke of the rules when `stroke` is not given.
+
+- **Rows.** `head : Array[&IntoContent]`, `rows : Array[Array[&IntoContent]]`.
+  Each row is placed as a table places cells: every cell in the next
+  column that no cell from a row above takes, over its `colspan` columns,
+  and taking them for `rowspan` rows. A row that does not fill the columns
+  is `Keyed(key, site.invalid(message, arg=1))`: an error at `rows`, under
+  the key of the row, with ``` `rows[1]` has cells for 2 columns: this
+  `DataTable` has 3 columns ``` (N9; a `Table` of the same cells compiles
+  and shifts, pinned beside it). Also errors: a span into a column that a
+  cell from above takes, a span below the last row, a cell of the head
+  that spans rows (the header is one row), an item that a table does not
+  place in its row (a `TableCell` with `x` or `y`, a line, a header, a
+  footer), no `columns`. An empty head is no header (an empty
+  `TableHeader` is an empty row).
+- **One accessor in `doc`**, `Content::table_cell_spans() -> (Int, Int)?`:
+  the `(colspan, rowspan)` that a description takes as a child of a table
+  (`(1, 1)` for what a table makes a cell of; `None` for a child that is
+  not placed in order). The kit is outside `doc` and cannot read a
+  description; the Typst twin reads the same with `cell.func()` and
+  `cell.fields()`. It reads the description only: a cell that a callback
+  or `Markup` makes is one column for the count, and so is a span that a
+  rule of the document sets. Tested in `doc/composite_test.mbt`.
+- **Looks stay the table's.** The element never wraps or changes a cell:
+  what it sets is on the table (stroke) or a rule (breakable), so a
+  `TableCell` of the caller with a span behaves like every other cell (it
+  gets the fill of its row), and its own arguments win, as in any table.
+- **A row is not split.** `SetTableCell(breakable=false)` around the
+  table: a table has no parameter for it. The engine's fact, pinned: a row
+  of unbreakable cells that no page holds is moved to the next page and
+  runs out of it, without a diagnostic (S2 again). The element cannot
+  know without measuring, so `breakable=true` is the way out, and the
+  documentation says when. A row is as breakable as its least breakable
+  cell, so one `TableCell(.., breakable=true)` of the caller does not
+  split its row.
+- **At a page break inside a frame.** The engine draws, at the end of
+  every region that a table continues after, the line of the table's
+  bottom border, with the lines under that region's last row behind it
+  "so that they don't disappear" (`layout/grid_layouter.mbt`, upstream's
+  `render_fills_strokes`); and it draws every part of a broken block as a
+  whole box, with all four sides and corners. So a table whose rows have a rule under them but the last (what
+  every framed helper of the ports wrote, with a `Cells` function of `y ==
+  last`) has, on a page that it continues after, the rule of that page's
+  last row exactly on the bottom outline of the frame: two lines in one
+  place, which is the "double rule" one port reported (visible when rule
+  and outline differ, or when the paint is translucent). A line without a
+  stroke takes away the lines at its place, and one at the table's bottom
+  border does so at the end of every region. `DataTable` with a frame ends
+  with that line: no rule under the table's last row and none under the
+  last row of a page, without a callback. Without a frame there is a rule
+  under every row, also the last of a page.
+- **Keys.** Every cell of row `i` is `Keyed` with `key(i)`, by default
+  the index: a string of a row resolves to `rows` under that key, rows
+  from a loop are distinct occurrences, and a description of the caller
+  in a row has the key too.
+- **Twins** (`doc/twins/kit.mbt`): the functions `chip` and `data-table`,
+  the second with the element's check and messages (compared by hand on
+  eleven tables: the same ten errors, word for word); the pairs
+  `kit-chip`, `kit-data-table` and `kit-data-table-frame` (a framed table
+  over two pages with chips in a column, a row-dependent fill, spans,
+  split rows, rules of the document). The `edsl` stage has 47 pairs.
+- **Known limits.** Without a frame the element is a sequence (a rule and
+  a table), which the lint of adjacent text and `Para`'s rule for the
+  text after a block do not take for a block (`doc/lint.mbt` reads a
+  sequence as inline unless it is a `Para`): a false negative of L1
+  beside an unframed table, and an indent after one that is interpolated
+  into a `Para`. A `SetText` before the element sizes the em of the
+  frame's spacing too, as before any table.
+
+**`soft_breaks` in cells** (S5) is not built into the element: a cell of
+inline code is `Raw(@format.soft_breaks(name))` (the guide, 7.2). Tested
+in the kit and in the guide: `garden_bed_watering_schedule` in a column of
+80pt is one run that leaves its cell, and with soft breaks three runs
+inside it.
+
+**The measurement.** `doc/examples/report` got a second page: a table of
+ten beds (a header, a column of numbers, the row of the best bed tinted,
+a chip for the state of each bed), by hand as the ports wrote it (`pill`:
+a box with an outset and no-break spaces; `framed_table`: three `Cells`
+functions in a clipped block) and with the kit.
+
+| | helper lines | of them for the table | for the chip |
+|---|---|---|---|
+| before | 177 | 66 + 3 at the call | 15 |
+| after | 103 | 34 + 9 at the call | 9 |
+
+(`python3 scripts/edsl_helper_lines.py`; 32 lines are in both.) What is
+left in the helper with the kit is the caller's design: the fill function
+for the header and the marked row (13 lines), two rules for the text, and
+the call.
+
+The pages are identical: the SVG of both pages and the PDF bytes
+(`report_wbtest.mbt`). For that, the size of the cells' text is a show-set
+rule on the cells in the version with the kit, where the hand-written
+helper set it inside its frame: as a `SetText` before the element it
+would also be the em of the frame's spacing. Where the table continues on
+a next page the two differ, by the one rule described above (on a page
+that holds seven rows: 8 lines and 7, the same 40 text runs): there the
+element is right and the helper is what the port reported.
+
+Building and compiling one document (`report time 500`, embedded fonts,
+aarch64 macOS, means of 500 runs in three repetitions): 10.9, 11.0 and
+10.9 ms before; 11.4, 11.5 and 11.4 ms after. The table alone on a page
+(`report time 500 table`): 5.48, 5.52 and 5.46 ms before; 5.54, 5.59 and
+5.53 ms after, 1% slower. The rest of the difference is the cards of
+step 3.
+
+**Conventions amended** (`doc/kit/kit.mbt`, each marked "step 4"):
+
+1. An expansion can hold a rule of its own, scoped to it (convention 1).
+2. A parameter can be a part of a primitive's parameter, in that part's
+   type, where the element supplies the rest; per-cell parameters stay
+   per cell; no parameter for the style of text; a second constructor
+   `of` where a string is treated differently from content; `key` for
+   data by items (convention 2).
+3. Parts per item are keyed by index or by `key`; what an element has to
+   know about a description it asks `doc` (convention 3).
+4. No callback where a value of the primitive does the work; a callback
+   in an argument is the caller's; an element that does not measure still
+   says what it does at a page break (convention 4).
+5. What is wrong with one item is an error at the argument under the key
+   of the item (convention 5).
+6. The twin checks what the element checks (convention 6).
+7. For an element without a callback: that it can be built inside one,
+   and the engine's facts about what can leave the page or its place
+   (convention 7).
+
 ## 5. Marks (a trial, in the kit)
 
 Revision 8 decided that strings are never parsed, and guarantees that `_`,

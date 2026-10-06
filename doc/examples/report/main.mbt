@@ -4,6 +4,8 @@
 //     writes <dir>/before.pdf and <dir>/after.pdf
 //   moon run doc/examples/report --target native --release -- time [runs]
 //     compiles each version `runs` times (200) and prints the times
+//   moon run doc/examples/report --target native --release -- time [runs] table
+//     the same for the table of the beds alone, on a page of its own
 //
 // What the measurement is (docs/edsl-ports.md, section 9):
 // - helper lines: the lines of code of the top-level functions and
@@ -19,6 +21,22 @@
 /// The two versions, by name.
 fn versions() -> Array[(String, () -> Document)] {
   [("before", before), ("after", after)]
+}
+
+///|
+/// The table of the beds alone, in the two versions.
+fn tables() -> Array[(String, () -> Document)] {
+  let alone = (table : &IntoContent) => {
+    Document([
+      SetPage(width=Pt(420), height=Pt(595), margin=Sides(all=Pt(36))),
+      SetText(size=Pt(10), fill=ink),
+      table,
+    ])
+  }
+  [
+    ("table before", () => alone(bed_table_before(bed_columns))),
+    ("table after", () => alone(bed_table_after(bed_columns))),
+  ]
 }
 
 ///|
@@ -40,14 +58,14 @@ fn write_pdfs(dir : String) -> Unit raise {
 /// Build and compile each version `runs` times, in turns of ten: the mean
 /// time of a run in the fastest turn and over all turns, in milliseconds
 /// (the clock has milliseconds, so a turn is timed, not a run).
-fn time(runs : Int) -> Unit raise {
+fn time(runs : Int, versions : Array[(String, () -> Document)]) -> Unit raise {
   let world = @doc.DocWorld::in_memory()
   let turn = 10
   let turns = (runs + turn - 1) / turn
-  let times : Array[Array[UInt64]] = versions().map(_ => [])
+  let times : Array[Array[UInt64]] = versions.map(_ => [])
   // (One turn of each first: the fonts are parsed on first use.)
   for round in 0..<(turns + 1) {
-    for i, version in versions() {
+    for i, version in versions {
       let start = @env.now()
       for _ in 0..<turn {
         (version.1)().compile_paged(world).unwrap() |> ignore
@@ -62,7 +80,7 @@ fn time(runs : Int) -> Unit raise {
     let rounded = hundredths.round().to_int()
     "\{rounded / 100}.\{(rounded % 100).to_string().pad_start(2, '0')}"
   }
-  for i, version in versions() {
+  for i, version in versions {
     times[i].sort()
     let total = times[i].fold(init=0UL, (a, b) => a + b)
     println(
@@ -82,9 +100,16 @@ fn main {
         for c in args.get(2).unwrap_or("200") {
           runs = runs * 10 + (c.to_int() - '0'.to_int())
         }
-        time(runs)
+        time(
+          runs,
+          if args.get(3) is Some("table") {
+            tables()
+          } else {
+            versions()
+          },
+        )
       }
-      _ => println("usage: report pdf <dir> | report time [runs]")
+      _ => println("usage: report pdf <dir> | report time [runs] [table]")
     }
   }
   run() catch {

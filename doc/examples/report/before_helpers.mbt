@@ -74,3 +74,99 @@ fn note_cards(notes : Array[Note], columns : Int) -> Context {
     columns,
   )
 }
+
+// The helpers an author wrote for a status chip and for a framed table of
+// data before the kit had `Chip` and `DataTable` (findings H4 and H5): the
+// shape of the pills and of the table helpers of the ports.
+
+///|
+/// A status chip: a pill in a line of text. Its padding above and below is
+/// an outset, so that the line keeps its height, and its spaces are
+/// no-break spaces, so that it is not broken in a narrow column.
+fn pill(label : String, outcome : Outcome) -> Box {
+  let (soft, strong) = chip_paints(outcome)
+  Box(
+    Text(
+      label.replace_all(old=" ", new="\u{00A0}"),
+      size=Pt(7),
+      weight=SemiBold,
+      fill=strong,
+    ),
+    fill=soft,
+    inset=Sides(x=Pt(4.2)),
+    outset=Sides(y=Pt(2.1)),
+    radius=Corners(all=Pt(7)),
+  )
+}
+
+///|
+/// A table in a rounded frame: a header that repeats on every page, rows
+/// that are not split, a hairline under every row but the last, the
+/// columns `num` to the right, the rows `mark` (of the body, from 0)
+/// tinted.
+fn framed_table(
+  head : Array[String],
+  rows : Array[Array[&IntoContent]],
+  columns~ : Array[Sizing],
+  num? : Array[Int] = [],
+  mark? : Array[Int] = [],
+) -> Block {
+  let cells : Array[&IntoContent] = [
+    TableHeader(
+      head.map(h => {
+        let cell : &IntoContent = Text(
+          h.to_upper(),
+          size=Pt(7),
+          weight=SemiBold,
+          fill=muted,
+          tracking=Pt(0.35),
+        )
+        cell
+      }),
+    ),
+  ]
+  for row in rows {
+    for cell in row {
+      cells.push(cell)
+    }
+  }
+  let last = rows.length()
+  Block(
+    Seq([
+      SetText(size=Pt(8.6)),
+      SetTableCell(breakable=false),
+      Table(
+        cells,
+        columns~,
+        align=Cells((x, _) => {
+          if num.contains(x) {
+            @doc.Alignment::Both(Right, Top)
+          } else {
+            Both(Left, Top)
+          }
+        }),
+        inset=Cells::all(Sides(x=Pt(8), y=Pt(6))),
+        fill=Cells((_, y) => {
+          if y == 0 {
+            sunk
+          } else if mark.contains(y - 1) {
+            tint
+          } else {
+            None
+          }
+        }),
+        stroke=Cells((_, y) => {
+          if y == last {
+            Sides::none()
+          } else {
+            Sides(bottom=rule, rest=Stroke::none())
+          }
+        }),
+      ),
+    ]),
+    stroke=hairline,
+    radius=Corners(all=Pt(RADIUS)),
+    clip=true,
+    width=Pct(100),
+  )
+}
