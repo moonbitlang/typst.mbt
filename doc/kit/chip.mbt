@@ -22,13 +22,15 @@
 ///   by the padding; a `baseline` shift moves the label off the line.)
 ///   What is drawn above and below the line needs the room there: the
 ///   leading of a paragraph, the inset of a table cell.
-/// - **It stays on one line.** A box is laid out in the width of the line
-///   that it is in, and a label of several words in a narrow column is
-///   broken inside its box. With no-break spaces it is not. A chip that is
-///   wider than its line runs out of it, and its box, which is never wider
-///   than the line, ends before its text: give the column the room (an
-///   `Auto` column is as wide as its chips). The no-break spaces are the
-///   text: what a reader copies out of the PDF has them.
+/// - **It is not broken at a space.** A box is laid out in the width of
+///   the line that it is in, and a label of several words in a narrow
+///   column is broken inside its box. With no-break spaces it is one line.
+///   A chip that is wider than its line then runs out of it, and its box,
+///   which is never wider than the line, ends before its text: give the
+///   column the room (an `Auto` column is as wide as its chips). The
+///   no-break spaces are the text: what a reader copies out of the PDF has
+///   them. Only spaces are changed: a label can still be broken where text
+///   breaks without one (after a hyphen, at a line break in the string).
 ///
 /// It does not measure and creates no callback: it can be built anywhere,
 /// also in the cell of a table and inside a callback.
@@ -55,9 +57,10 @@
 /// change the spaces of content, so that body can be broken in a narrow
 /// column, like the body of any box.
 ///
-/// Provenance: the call. The label resolves to the `text` argument (a
-/// label with a space is not the characters of its literal: it resolves to
-/// the argument as a whole); an error in `fill` is at `fill`.
+/// Provenance: the call. The label resolves to the `text` argument, and
+/// with the source at hand to the characters of its literal (also where a
+/// space of the literal is a no-break space on the page). An error in
+/// `fill` is at `fill`.
 ///
 /// Twin: the function `chip` of `doc/twins/kit.mbt`, a `box`.
 pub struct Chip {

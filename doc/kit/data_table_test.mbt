@@ -299,6 +299,28 @@ test "data table: cells that span columns and rows are counted" {
       #|p1 line 9.8,109.5 150.5x0.0 0.5 luma(47.06%)
     ),
   )
+  // A row that cells from the row above fill is a row without cells.
+  let filled = compile([
+    @kit.DataTable(
+      [],
+      [
+        [TableCell("left", rowspan=2), TableCell("right", rowspan=2)],
+        [],
+        ["a", "b"],
+      ],
+      columns=[Pt(50), Pt(50)],
+    ),
+  ])
+  inspect(errors(filled) + warnings(filled), content="")
+  inspect(
+    lines_of_text(filled),
+    content=(
+      #|p1 15.0,21.6 "left"
+      #|p1 65.0,21.6 "right"
+      #|p1 15.0,38.2 "a"
+      #|p1 65.0,38.2 "b"
+    ),
+  )
   // What does not fit, with the spans counted.
   let message = (head : Array[&IntoContent], rows : Array[Array[&IntoContent]]) => {
     let report = compile([
@@ -359,16 +381,57 @@ test "data table: cells that span columns and rows are counted" {
       #|`head` has an item that a table does not place in its row (a `TableCell` with an `x` or a `y`, a line, a header or a footer): the rows of a `DataTable` hold cells [DataTable a0]
     ),
   )
-  // The count reads descriptions: a cell that a callback makes is one
-  // column for it, whatever the callback returns.
-  let unseen = compile([
-    @kit.DataTable([], [[Context(_ => "a"), "b", "c"]], columns=[
+  // A callback is one cell, whatever it returns: a table makes a cell of
+  // it. A sequence of one cell is that cell.
+  let callback = compile([
+    @kit.DataTable(
+      [],
+      [
+        [Context(_ => TableCell("a", colspan=2)), "b", "c"],
+        [Seq([TableCell("wide", colspan=2)]), "d"],
+      ],
+      columns=[Pt(50), Pt(50), Pt(50)],
+    ),
+  ])
+  inspect(errors(callback), content="")
+  inspect(
+    lines_of_text(callback),
+    content=(
+      #|p1 15.0,21.6 "a"
+      #|p1 65.0,21.6 "b"
+      #|p1 115.0,21.6 "c"
+      #|p1 15.0,38.2 "wide"
+      #|p1 115.0,38.2 "d"
+    ),
+  )
+  // The count reads the descriptions. A `Markup` is evaluated later: it is
+  // one column for the count, also the one that is nothing but a cell over
+  // two. This row fits its table, and is reported: such a cell is written
+  // as a `TableCell`.
+  let cell = @doc.Markup("#table.cell(colspan: 2)[wide]")
+  inspect(
+    lines_of_text(
+      compile([Table([cell, "c"], columns=[Pt(50), Pt(50), Pt(50)])]),
+    ),
+    content=(
+      #|p1 15.0,21.6 "wide"
+      #|p1 115.0,21.6 "c"
+    ),
+  )
+  inspect(
+    message([], [[cell, "c"]]),
+    content=(
+      #|`rows[0]` has cells for 2 columns: this `DataTable` has 3 columns [DataTable a1 0]
+    ),
+  )
+  let markup = compile([
+    @kit.DataTable([], [[@doc.Markup("*strong* text"), "b", "c"]], columns=[
       Auto,
       Auto,
       Auto,
     ]),
   ])
-  inspect(errors(unseen), content="")
+  inspect(errors(markup), content="")
 }
 
 ///|
@@ -816,6 +879,38 @@ test "data table: it has no callback, and can be built anywhere" {
 }
 
 ///|
+test "data table: it is a block for what reads descriptions" {
+  // The lint of adjacent text reports two neighbouring texts in an array
+  // that holds a block: the table is one, with a frame (a block) and
+  // without (a table under a rule of its own).
+  for radius in [None, Some(round)] {
+    let report = compile([
+      "One.",
+      Emph("Two."),
+      @kit.DataTable(head, two_columns(1), columns=[Auto, Auto], radius?),
+    ])
+    inspect(errors(report), content="")
+    assert_eq(report.lints.length(), 1)
+    // In the text of a `Para` the table ends the paragraph, and the text
+    // after it goes on without an indent, as after any block.
+    let indent = @doc.Value::dict([
+      ("amount", @doc.Value::length(Pt(20))),
+      ("all", @doc.Value::bool(true)),
+    ])
+    let table = @kit.DataTable(["A"], [["a"]], columns=[Auto], radius?)
+    let para = compile([
+      @doc.Set("par", [("first-line-indent", indent)]),
+      @doc.Para("Before \{table} after."),
+    ])
+    inspect(errors(para) + warnings(para), content="")
+    let starts = of_kind(drawn(para), "text")
+      .filter(run => run.text.has_prefix("Before") || run.text == "after.")
+      .map(run => "\{pt(run.x)} \{run.text}")
+    assert_eq(starts.join(" | "), "30.0 Before | 10.0 after.")
+  }
+}
+
+///|
 test "data table: a long word in a narrow column, with soft breaks" {
   // Finding S5: inline code without a place to break leaves its cell.
   let name = "garden_bed_watering_schedule"
@@ -985,6 +1080,28 @@ test "data table: provenance" {
     error_place(radius),
     content=(
       #|DataTable a7
+    ),
+  )
+  // A key that `Keyed` does not take is an error at `key`.
+  let reserved = compile([
+    @kit.DataTable(head, two_columns(2), columns=[Auto, Auto], key=row => {
+      if row == 1 {
+        "\u{FDD2}reserved"
+      } else {
+        "fine"
+      }
+    }),
+  ])
+  inspect(
+    errors(reserved),
+    content=(
+      #|the key of `rows[1]` starts with a reserved character (U+FDD2)
+    ),
+  )
+  inspect(
+    error_place(reserved),
+    content=(
+      #|DataTable a9
     ),
   )
   // An error in a cell is in its row: at the cell's own call under the

@@ -687,7 +687,12 @@ the label being the text with its spaces as U+00A0.
   the line of the chip and those after it are 3pt lower); the label is on
   the baseline of its neighbours; in a column of 70pt a label of four
   words is one run, where the same box without the element has three
-  lines.
+  lines. Only spaces are changed: the same label with hyphens for its
+  spaces is three lines in a chip too (pinned), so the contract is "not
+  broken at a space", not "one line".
+- Through the review loop: a selection in a label is the `text` argument,
+  and with the source file the characters of its literal, also in a label
+  with a space (`"to do"`: `do` is the literal's characters 4 and 5).
 - What "does not wrap" is worth, which the table does not say: a box is
   laid out in the width of its line and wraps only when its content is
   wider than that, so the no-break spaces only ever act in a column that
@@ -747,12 +752,23 @@ like the stroke of the rules when `stroke` is not given.
   `TableHeader` is an empty row).
 - **One accessor in `doc`**, `Content::table_cell_spans() -> (Int, Int)?`:
   the `(colspan, rowspan)` that a description takes as a child of a table
-  (`(1, 1)` for what a table makes a cell of; `None` for a child that is
+  (`(1, 1)` for what is not a cell of its own; `None` for a child that is
   not placed in order). The kit is outside `doc` and cannot read a
   description; the Typst twin reads the same with `cell.func()` and
-  `cell.fields()`. It reads the description only: a cell that a callback
-  or `Markup` makes is one column for the count, and so is a span that a
-  rule of the document sets. Tested in `doc/composite_test.mbt`.
+  `cell.fields()`. It sees a cell under `Keyed`, with a label, as the
+  only child of a `Seq` (which lowers to its child), in a composite, and
+  as a view; the last argument of a name wins. Its test
+  (`doc/composite_test.mbt`) puts each description first in a table and
+  compares the answer with the column in which the engine places the next
+  cell. (The first version answered `(1, 1)` for a sequence of one cell
+  and kept a position that a later `auto` took back; the review found
+  both, and the test against the engine is what would have.) Three things
+  are not in a description and are one column for the count: a `Markup`
+  (which is a cell with a span only if its source is nothing but one), a
+  computed span, and a span that a rule of the document sets. A row with
+  such a `Markup` is reported although it fits (pinned): the alternative,
+  not checking rows that hold a `Markup`, gives up the check for every
+  row with a piece of markup in it.
 - **Looks stay the table's.** The element never wraps or changes a cell:
   what it sets is on the table (stroke) or a rule (breakable), so a
   `TableCell` of the caller with a span behaves like every other cell (it
@@ -770,9 +786,10 @@ like the stroke of the rules when `stroke` is not given.
   bottom border, with the lines under that region's last row behind it
   "so that they don't disappear" (`layout/grid_layouter.mbt`, upstream's
   `render_fills_strokes`); and it draws every part of a broken block as a
-  whole box, with all four sides and corners. So a table whose rows have a rule under them but the last (what
-  every framed helper of the ports wrote, with a `Cells` function of `y ==
-  last`) has, on a page that it continues after, the rule of that page's
+  whole box, with all four sides and corners. So a table whose rows have
+  a rule under them but the last (what every framed helper of the ports
+  wrote, with a `Cells` function of `y == last`) has, on a page that it
+  continues after, the rule of that page's
   last row exactly on the bottom outline of the frame: two lines in one
   place, which is the "double rule" one port reported (visible when rule
   and outline differ, or when the paint is translucent). A line without a
@@ -784,20 +801,34 @@ like the stroke of the rules when `stroke` is not given.
 - **Keys.** Every cell of row `i` is `Keyed` with `key(i)`, by default
   the index: a string of a row resolves to `rows` under that key, rows
   from a loop are distinct occurrences, and a description of the caller
-  in a row has the key too.
+  in a row has the key too. A key that `Keyed` does not take (it starts
+  with U+FDD2) is an error at `key`, not at the cells that would carry
+  it.
 - **Twins** (`doc/twins/kit.mbt`): the functions `chip` and `data-table`,
-  the second with the element's check and messages (compared by hand on
-  eleven tables: the same ten errors, word for word); the pairs
-  `kit-chip`, `kit-data-table` and `kit-data-table-frame` (a framed table
-  over two pages with chips in a column, a row-dependent fill, spans,
-  split rows, rules of the document). The `edsl` stage has 47 pairs.
-- **Known limits.** Without a frame the element is a sequence (a rule and
-  a table), which the lint of adjacent text and `Para`'s rule for the
-  text after a block do not take for a block (`doc/lint.mbt` reads a
-  sequence as inline unless it is a `Para`): a false negative of L1
-  beside an unframed table, and an indent after one that is interpolated
-  into a `Para`. A `SetText` before the element sizes the em of the
-  frame's spacing too, as before any table.
+  the second with the element's check and messages. `doc/twins/
+  kit_wbtest.mbt` gives the function and the element the same ten
+  rejected inputs: the messages are the same after the `assertion failed:
+  ` that Typst's `assert` puts before its message. The pairs `kit-chip`,
+  `kit-data-table` and `kit-data-table-frame` (a framed table over two
+  pages with chips in a column, a row-dependent fill, spans, split rows,
+  rules of the document) are the documents that compile. The `edsl` stage
+  has 47 pairs.
+- **A block for what reads descriptions.** Without a frame the element is
+  a sequence: a rule and a table. `doc`'s lint of adjacent text and
+  `Para`'s rule for the text after a block took a sequence for inline
+  content unless it was a `Para`, so the table was no evidence of a flow
+  for L1 and the text after one in a `Para` was indented. A block around
+  the sequence would have hidden that at the price of a second box around
+  the table's own. Instead `is_block` (`doc/lint.mbt`) takes rules and
+  then one block for that block, which it is in the flow
+  (`[#set table.cell(..);#table(..)]`); other sequences are still not
+  looked into. Tested in `doc/lint_test.mbt` and `doc/para_test.mbt`, and
+  for the element with and without a frame.
+- **What it is not.** A `Table` can have cells with a position, lines and
+  a footer among its cells, a header of several rows, and a frame in
+  another stroke than its rules: a `DataTable` cannot, and says so. A
+  `SetText` before the element sizes the em of the frame's spacing too,
+  as before any table.
 
 **`soft_breaks` in cells** (S5) is not built into the element: a cell of
 inline code is `Raw(@format.soft_breaks(name))` (the guide, 7.2). Tested
@@ -826,9 +857,11 @@ The pages are identical: the SVG of both pages and the PDF bytes
 rule on the cells in the version with the kit, where the hand-written
 helper set it inside its frame: as a `SetText` before the element it
 would also be the em of the frame's spacing. Where the table continues on
-a next page the two differ, by the one rule described above (on a page
-that holds seven rows: 8 lines and 7, the same 40 text runs): there the
-element is right and the helper is what the port reported.
+a next page the two differ, by the one rule described above: on a page
+that holds seven rows, the text, the fills, the chips and the frames are
+drawn the same at the same places, and the hand-written table has one
+line more, under the last row of the first page. There the element is
+right and the helper is what the port reported.
 
 Building and compiling one document (`report time 500`, embedded fonts,
 aarch64 macOS, means of 500 runs in three repetitions): 10.9, 11.0 and
@@ -839,7 +872,8 @@ step 3.
 
 **Conventions amended** (`doc/kit/kit.mbt`, each marked "step 4"):
 
-1. An expansion can hold a rule of its own, scoped to it (convention 1).
+1. An expansion can hold a rule of its own, scoped to it, and is not
+   wrapped in a block for that (convention 1).
 2. A parameter can be a part of a primitive's parameter, in that part's
    type, where the element supplies the rest; per-cell parameters stay
    per cell; no parameter for the style of text; a second constructor
@@ -851,8 +885,10 @@ step 3.
    in an argument is the caller's; an element that does not measure still
    says what it does at a page break (convention 4).
 5. What is wrong with one item is an error at the argument under the key
-   of the item (convention 5).
-6. The twin checks what the element checks (convention 6).
+   of the item; a key of the caller's that `Keyed` does not take is an
+   error at `key` (convention 5).
+6. The twin checks what the element checks, and a test gives both the
+   same rejected input (convention 6).
 7. For an element without a callback: that it can be built inside one,
    and the engine's facts about what can leave the page or its place
    (convention 7).

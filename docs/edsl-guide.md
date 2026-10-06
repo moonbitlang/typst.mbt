@@ -789,6 +789,9 @@ error: `rows[1]` has cells for 2 columns: this `DataTable` has 3 columns
 
   A cell that spans columns or rows is a `TableCell`
   (`TableCell("Both beds", colspan=2)`) and is counted with its spans.
+  The count reads what you wrote, not what the engine makes of it: a
+  `Markup` is one column for it, and so is a span that a rule of the
+  document sets.
 - `columns` is required, for the reason of 6.1: fractions for the columns
   of text, `Auto` for the columns of labels, numbers and chips.
 - The header is on every page that the table continues on, and a row is
@@ -895,9 +898,11 @@ pub fn status(label : String, done~ : Bool) -> Text {
 - The label stands on the baseline of its line, and the line is as high
   as without the chip. What is drawn above and below the label needs the
   room there: the leading of the paragraph, the inset of the cell.
-- The spaces of the label are no-break spaces, so it stays on one line. A
-  chip that is wider than its column runs out of it (its box is as wide as
-  the column, its text goes on): a column of chips is `Auto`.
+- The spaces of the label are no-break spaces, so it is not broken at a
+  space. (Only spaces are changed: a label can still be broken after a
+  hyphen.) A chip that is wider than its column runs out of it (its box
+  is as wide as the column, its text goes on): a column of chips is
+  `Auto`.
 - The style of the label is a `Text` around the chip. The paddings are in
   em (`inset=Sides(x=Em(0.6))` and `outset=Sides(y=Em(0.3))` unless they
   are given), so they follow that size.

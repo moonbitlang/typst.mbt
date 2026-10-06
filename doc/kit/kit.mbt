@@ -9,7 +9,10 @@
 //    (Step 4.) The expansion can hold a rule of its own, scoped to it: a
 //    `Seq` of the rule and the primitive (`DataTable`'s cells are
 //    unbreakable by a `SetTableCell`, since a table has no parameter for
-//    it). Such an element is a sequence for what reads descriptions.
+//    it). It is not wrapped in a block for that, which would be a second
+//    box around the primitive's own. What reads descriptions in `doc` (the
+//    lint of adjacent text, `Para`) takes rules and then one block for
+//    that block.
 //
 // 2. Names and parameters. An element is a type with a constructor of its
 //    name (`Cards(..)`), like the elements of `doc`, and it is content
@@ -35,8 +38,13 @@
 //      around the element (`Chip`) or by rules of the document
 //      (`DataTable`: a show-set rule on the cells of a row or of a
 //      column), and the documentation says which rule reaches which
-//      part. What a primitive has and the element does not is set by a
-//      set rule before it (`SetTable(..)`).
+//      part. A parameter of the primitive that the element neither has
+//      nor sets itself is set by a set rule before it (`SetTable(..)`
+//      for the gutters); what the element sets itself is its contract,
+//      and the documentation says what is not reachable (in a
+//      `DataTable`: cells with a position, lines and a footer among the
+//      rows, a header of several rows, a frame in another stroke than the
+//      rules).
 //    - A description is opaque: an element cannot tell a string from
 //      other content. One that treats a string differently takes a
 //      `String`, and has a second constructor, `of`, for content
@@ -92,14 +100,18 @@
 //    The caller's arrays are copied: a description does not change with
 //    them. (Step 4.) What is wrong with one item of the caller's data is
 //    `Keyed(key, site.invalid(..))`: at the argument, under the key of the
-//    item, with a message that names the item (`rows[3]`).
+//    item, with a message that names the item (`rows[3]`). A key of the
+//    caller's that `Keyed` does not take is an error at `key`.
 //
 // 6. Twin. An element has a functional Typst twin: a Typst function with
 //    the same expansion (`doc/twins/kit.mbt`), and documents that use both
 //    are pairs of the `edsl` stage (structure, frames with memoization on
 //    and off, SVG, PDF, PNG). The function passes on only the arguments
-//    that it was given, as the element does. (Step 4.) It checks what the
-//    element checks, with the element's messages.
+//    that it was given, as the element does (and gives the element's own
+//    defaults, as the element does). (Step 4.) It checks what the element
+//    checks, with the element's messages after the `assertion failed: ` of
+//    Typst's `assert`, and a test gives both the same rejected input
+//    (`doc/twins/kit_wbtest.mbt`).
 //
 // 7. Tests (`<element>_test.mbt`): the expansion (the lowered content is
 //    that of the primitives written out); the property the element exists

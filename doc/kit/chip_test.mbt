@@ -218,6 +218,88 @@ test "chip: a label of several words stays on one line in a narrow column" {
     @kit.Chip::of(Text("awaiting a second review"), fill=soft),
   )
   assert_eq(lines_of_text(content), lines_of_text(box))
+  // Only spaces are changed. A label is still broken where text breaks
+  // without a space: after a hyphen.
+  let hyphens = in_cell(@kit.Chip("awaiting-a-second-review", fill=soft))
+  inspect(
+    lines_of_text(hyphens),
+    content=(
+      #|p1 21.0,21.6 "awaiting-a-"
+      #|p1 21.0,34.7 "second-"
+      #|p1 21.0,47.7 "review"
+      #|p1 85.0,21.6 "next"
+    ),
+  )
+}
+
+///|
+test "chip: a selection in the label, with and without the source" {
+  let report = compile([Par(@kit.Chip("done")), Par(@kit.Chip("to do"))])
+  inspect(errors(report), content="")
+  // A selection in a label is the `text` argument: as a whole while the
+  // source file is not read.
+  let text = report.review_text(title="Test")
+  let entry = (review : @doc.ReviewText, word : String) => {
+    // ("do" is in "done" first.)
+    let nth = if word == "do" { 1 } else { 0 }
+    review.feedback(review.find(word, nth~).unwrap(), "").origins[0]
+  }
+  // The argument, the tier, and the characters of the source with their
+  // place in the literal (its opening quote is 0).
+  let seen = (review : @doc.ReviewText, word : String) => {
+    let found = entry(review, word)
+    let source = found.source_ranges.map(range => {
+      " \{range.text} at \{range.start - found.origin.start_column}"
+    })
+    "\{place(found.origin)}: tier \{found.tier}\{source.join("")}"
+  }
+  inspect(
+    seen(text, "done"),
+    content=(
+      #|Chip a0: tier 2
+    ),
+  )
+  inspect(
+    seen(text, "do"),
+    content=(
+      #|Chip a0: tier 2
+    ),
+  )
+  // With the source: the characters of the literal, also for a label whose
+  // spaces are no-break spaces on the page.
+  // (The file as far as it is read: the two literals where their origins
+  // say they are, on one line or on two.)
+  let lines : Array[String] = []
+  for word in ["done", "do"] {
+    let origin = entry(text, word).origin
+    while lines.length() < origin.start_line {
+      lines.push("")
+    }
+    let literal = if word == "done" { "\"done\"" } else { "\"to do\"" }
+    let line = lines[origin.start_line - 1]
+    let gap = " ".repeat(origin.start_column - 1 - line.length())
+    lines[origin.start_line - 1] = line + gap + literal
+  }
+  let file = lines.join("\n") + "\n"
+  let with_source = report.review_text(sources=(name, _) => {
+    if name == "doc/kit/chip_test.mbt" {
+      Some(file)
+    } else {
+      None
+    }
+  })
+  inspect(
+    seen(with_source, "done"),
+    content=(
+      #|Chip a0: tier 3 done at 1
+    ),
+  )
+  inspect(
+    seen(with_source, "do"),
+    content=(
+      #|Chip a0: tier 3 do at 4
+    ),
+  )
 }
 
 ///|

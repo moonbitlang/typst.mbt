@@ -40,13 +40,18 @@
 ///   the columns is an error when the document is compiled, at the `rows`
 ///   argument under the key of that row, and the message names the row. A
 ///   `TableCell` among the cells is counted with its `colspan`, and its
-///   `rowspan` takes its columns in the rows below
-///   (`@doc.Content::table_cell_spans`). The count reads the descriptions:
-///   a cell that only the engine sees (the result of a callback or of
-///   `Markup`) is one column. An item that a table does not place in its
-///   row (a `TableCell` with an `x` or a `y`, a `TableHline`, a
-///   `TableVline`, a header, a footer) is an error. A cell of the head
-///   cannot span rows: the header is one row.
+///   `rowspan` takes its columns in the rows below: a row that cells from
+///   above fill is `[]`. An item that a table does not place in its row (a
+///   `TableCell` with an `x` or a `y`, a `TableHline`, a `TableVline`, a
+///   header, a footer) is an error. A cell of the head cannot span rows:
+///   the header is one row. The count reads the descriptions
+///   (`@doc.Content::table_cell_spans`), so three things are one column
+///   for it whatever the engine makes of them: a `Markup` (which is a cell
+///   with a span only if its source is nothing but one), a span that is
+///   computed, and a cell under a rule of the document that sets spans.
+///   There the check is not the engine's count (a row with such a
+///   `Markup` is reported although it fits): a cell that spans is written
+///   as a `TableCell` with its span.
 /// - **The header repeats** on every page that the table continues on
 ///   (`TableHeader`). Without a head (`[]`) there is no header.
 /// - **A row is not split** at the end of a page: its cells are
@@ -100,6 +105,8 @@
 ///   default its index (`"0"`, `"1"`, ..). Rows from data that is sorted
 ///   or filtered keep their identity with a key from the data
 ///   (`key=i => beds[i].id`). Two rows with one key are not told apart.
+///   A key that `Keyed` does not take (one that starts with U+FDD2) is an
+///   error at `key`.
 ///
 /// Not parameters: the text. The size of the table's text, the style of
 /// the header and of a column are rules of the document, which reach the
@@ -109,6 +116,14 @@
 /// (the later rule wins where both match). `Table`'s other parameters
 /// (`rows`, the gutters) are set by `SetTable(..)` before the element,
 /// as for any table.
+///
+/// What a `Table` can have and a `DataTable` cannot: cells with a position,
+/// lines and a footer among the rows, a header of more than one row, a
+/// frame in another stroke than the rules. A table with those is a
+/// `Table`.
+///
+/// For what reads descriptions (the lint of adjacent text, `Para`) it is a
+/// block, with a frame and without.
 ///
 /// Provenance: the call. A cell that is a plain string resolves to the
 /// `head` argument, or to the `rows` argument under the key of its row
@@ -174,9 +189,8 @@ fn misfit(
           message: "\{row_name(row)} has an item that a table does not place in its row (a `TableCell` with an `x` or a `y`, a line, a header or a footer): the rows of a `DataTable` hold cells",
         })
       }
-      // (A span below 1 is the engine's error, at the cell.)
-      let colspan = if colspan < 1 { 1 } else { colspan }
-      let rowspan = if rowspan < 1 { 1 } else { rowspan }
+      // (More columns than the table has are too many, however many.)
+      let colspan = if colspan > columns { columns + 1 } else { colspan }
       spans.push((colspan, rowspan))
       own += colspan
     }
@@ -270,7 +284,7 @@ pub fn DataTable::DataTable(
   })
   // The parameters by their index in this declaration, for `site.arg`:
   // head 0, rows 1, columns 2, inset 3, align 4, fill 5, stroke 6, radius
-  // 7, breakable 8.
+  // 7, breakable 8, key 9.
   let composite = @doc.Composite("DataTable", loc, args_loc, site => {
     // (Copies, and the caller's content converted once: a description
     // does not change when the caller's arrays do.)
@@ -282,6 +296,16 @@ pub fn DataTable::DataTable(
         "a `DataTable` needs its `columns`: a track for every cell of a row",
         arg=2,
       )
+    }
+    // A key that `Keyed` does not take is an error at `key`, not at the
+    // cells that would carry it.
+    for row, key in keys {
+      if key.has_prefix("\u{FDD2}") {
+        return site.invalid(
+          "the key of `rows[\{row}]` starts with a reserved character (U+FDD2)",
+          arg=9,
+        )
+      }
     }
     if misfit(tracks.length(), head, rows) is Some(misfit) {
       return if misfit.row < 0 {
