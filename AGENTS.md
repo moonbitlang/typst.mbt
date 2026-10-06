@@ -221,7 +221,8 @@
   `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
   facts this rests on (the "engine: .." tests).
 - EDSL kit (`doc/kit`, section 4 and the "As built" notes of steps 3 to 5
-  of `docs/edsl-ports.md`): elements that are not one Typst element
+  and of the rebuild in `docs/edsl-ports.md`): elements that are not one
+  Typst element
   (`Cards`, `Chip`, `DataTable`, `Canvas`),
   each an expansion into `doc`'s constructors with a functional Typst twin
   (`doc/twins/kit.mbt`, `doc/twins/kit_canvas.mbt`, pairs of the `edsl`
@@ -243,7 +244,13 @@
   arrow are computed in MoonBit and by the twin with the same operations
   in the same order (frames are compared bit for bit, and the engine's
   unit of length is 1/127pt: a measured length is used as a length, not as
-  a number of points to compute with). `doc/examples/report` holds one
+  a number of points to compute with). The surface of a framed
+  `DataTable` is `frame_fill` (the fill of the frame's block, beneath its
+  outline), not a fill of every cell: the engine paints a block's fill and
+  stroke before what the block clips, so a cell's fill is painted over the
+  edge of the outline. What the frames do not show is tested in pixels
+  against the primitive alone (`doc/kit/pixels_test.mbt`).
+  `doc/examples/report` holds one
   report written with hand-written helpers and with the kit (identical
   pages but for the labels of its chart, which the hand-written helper
   puts on an estimated baseline), and `scripts/edsl_helper_lines.py`

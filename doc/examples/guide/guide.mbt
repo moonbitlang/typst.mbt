@@ -325,9 +325,11 @@ pub fn short_row() -> DataTable {
 }
 
 ///|
-/// Section 7.2: the looks. A frame, a size for the text, a style for the
-/// header and for the numbers, and a tint for the row `marked`.
+/// Section 7.2: the looks. A frame with its surface, a size for the text,
+/// a header in small grey capitals, a font for the numbers, and a tint for
+/// the row `marked`.
 pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+  let head = ["Bed", "Crop", "Harvest (kg)"]
   let fill : Cells[Paint] = Cells((_, y) => {
     // Row 0 is the header, row `i + 1` is `rows[i]`.
     if y == 0 {
@@ -343,10 +345,16 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
     ShowSet(Select::table_cell(x=2), SetText(font=["DejaVu Sans Mono"])),
     ShowSet(
       Select::table_cell(y=0),
-      SetText(font=["Libertinus Serif"], size=Pt(7), weight=SemiBold),
+      SetText(
+        font=["Libertinus Serif"],
+        size=Pt(7),
+        weight=SemiBold,
+        fill=Luma(90),
+        tracking=Pt(0.3),
+      ),
     ),
     DataTable(
-      ["BED", "CROP", "HARVEST (KG)"],
+      head.map(label => label.to_upper() as &IntoContent),
       rows,
       columns=[Auto, Fr(1), Auto],
       inset=Cells::all(Sides(x=Pt(8), y=Pt(5))),
@@ -354,6 +362,7 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
       fill~,
       stroke=Stroke(thickness=Pt(0.5), paint=Luma(180)),
       radius=Corners(all=Pt(4)),
+      frame_fill=White,
     ),
   ])
 }

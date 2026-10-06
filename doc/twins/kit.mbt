@@ -18,7 +18,7 @@
 //   the same on both sides.
 
 ///|
-using @doc {type Pad, type SetGrid, type SetTable, type Stroke}
+using @doc {type Pad, type SetBlock, type SetGrid, type SetTable, type Stroke}
 
 ///|
 /// The Typst functions of the kit's elements: one string each, since the
@@ -133,6 +133,11 @@ let data_table_typ : String =
   #|    count > 0,
   #|    message: "a `DataTable` needs its `columns`: a track for every cell of a row",
   #|  )
+  #|  let framed = "radius" in named
+  #|  assert(
+  #|    framed or "frame-fill" not in named,
+  #|    message: "a `DataTable` has a frame only with a `radius`: `frame_fill` is the fill of the frame",
+  #|  )
   #|  // The columns and the rows that a cell takes; `none` for what a table
   #|  // does not place in its row.
   #|  let spans(cell) = {
@@ -212,7 +217,6 @@ let data_table_typ : String =
   #|  }
   #|  // The rule, or the default stroke.
   #|  let rule = named.at("stroke", default: stroke())
-  #|  let framed = "radius" in named
   #|  let cells = table(
   #|    columns: columns,
   #|    ..look,
@@ -225,7 +229,9 @@ let data_table_typ : String =
   #|  )
   #|  let ruled = [#set table.cell(breakable: named.at("breakable", default: false));#cells]
   #|  if framed {
-  #|    block(radius: named.radius, stroke: rule, clip: true, ruled)
+  #|    // The surface is the frame's: beneath its outline.
+  #|    let surface = if "frame-fill" in named { (fill: named.frame-fill) }
+  #|    block(..surface, stroke: rule, radius: named.radius, clip: true, ruled)
   #|  } else {
   #|    ruled
   #|  }
@@ -624,6 +630,98 @@ pub fn kit() -> Array[Twin] {
           Value::none(),
           twice,
           twice,
+        ])
+      },
+    ),
+    // `DataTable` with a surface: the fill of its frame, on a page that
+    // is not white.
+    twin(
+      "kit-data-table-surface",
+      [
+        data_table_typ,
+        chip_typ,
+        "#set page(width: 240pt, height: 160pt, margin: 12pt, fill: luma(235));",
+        // Over two pages: each part is a filled box. The header and a
+        // marked row have a fill of their own.
+        "#data-table(columns: (auto, 1fr, auto), align: (left, left, right), fill: (x, y) => if y == 0 { luma(225) } else if y == 4 { rgb(\"#eef\") }, stroke: 0.5pt + luma(120), radius: 4pt, frame-fill: white, ([#\"Bed\"], [#\"State\"], [#\"kg\"]), (\{garden_rows_typ()}))",
+        // Square corners; a surface that is not a colour; one that is
+        // none.
+        "#data-table(columns: (1fr, 1fr), stroke: 0.4pt + luma(120), radius: 0pt, frame-fill: white, ([#\"Square\"], [#\"frame\"]), (([#\"with a\"], [#\"surface\"]),))",
+        "#data-table(columns: (1fr, 1fr), stroke: none, radius: (top: 6pt), frame-fill: gradient.linear(white, luma(200)), (), (([#\"a gradient\"], [#\"beneath\"]),))",
+        "#data-table(columns: (1fr, 1fr), radius: 3pt, frame-fill: none, ([#\"No\"], [#\"surface\"]), ())",
+        // Under a rule for the fill of blocks: the frame without a fill of
+        // its own has the rule's, and none is none.
+        "#[#set block(fill: luma(215));#data-table(columns: (1fr, 1fr), radius: 2pt, ([#\"The\"], [#\"rule's\"]), ())#data-table(columns: (1fr, 1fr), radius: 2pt, frame-fill: none, ([#\"Still\"], [#\"none\"]), ())]",
+      ],
+      () => {
+        let fill : Cells[Paint] = Cells((_, y) => {
+          if y == 0 {
+            Luma(225)
+          } else if y == 4 {
+            Rgb("#eef")
+          } else {
+            None
+          }
+        })
+        Document([
+          // (The definitions of the two functions.)
+          Value::none(),
+          Value::none(),
+          SetPage(
+            width=Pt(240),
+            height=Pt(160),
+            margin=Sides(all=Pt(12)),
+            fill=Luma(235),
+          ),
+          @kit.DataTable(
+            ["Bed", "State", "kg"],
+            garden_rows(),
+            columns=[Auto, Fr(1), Auto],
+            align=Cells::columns([Left, Left, Right]),
+            fill~,
+            stroke=Stroke(thickness=Pt(0.5), paint=Luma(120)),
+            radius=Corners(all=Pt(4)),
+            frame_fill=White,
+          ),
+          @kit.DataTable(
+            ["Square", "frame"],
+            [["with a", "surface"]],
+            columns=[Fr(1), Fr(1)],
+            stroke=Stroke(thickness=Pt(0.4), paint=Luma(120)),
+            radius=Corners(all=Pt(0)),
+            frame_fill=White,
+          ),
+          @kit.DataTable(
+            [],
+            [["a gradient", "beneath"]],
+            columns=[Fr(1), Fr(1)],
+            stroke=Stroke::none(),
+            radius=Corners(top=Pt(6)),
+            frame_fill=Paint::linear([White, Luma(200)]),
+          ),
+          @kit.DataTable(
+            ["No", "surface"],
+            [],
+            columns=[Fr(1), Fr(1)],
+            radius=Corners(all=Pt(3)),
+            frame_fill=None,
+          ),
+          Seq([
+            SetBlock(fill=Luma(215)),
+            @kit.DataTable(
+              ["The", "rule's"],
+              [],
+              columns=[Fr(1), Fr(1)],
+              radius=Corners(all=Pt(2)),
+            ),
+            @kit.DataTable(
+              ["Still", "none"],
+              [],
+              columns=[Fr(1), Fr(1)],
+              radius=Corners(all=Pt(2)),
+              frame_fill=None,
+            ),
+          ]),
         ])
       },
     ),

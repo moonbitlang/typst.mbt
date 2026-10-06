@@ -1033,6 +1033,32 @@ test "section 7: a table of data is given by rows, and every row is checked" {
 }
 
 ///|
+/// The filled shapes of a frame that are not rectangles (a block with
+/// rounded corners is one), each as the size of the box around its
+/// outline and its fill.
+fn rounded_fills(frame : @library.Frame, out : Array[String]) -> Unit {
+  for entry in frame.items() {
+    match entry.1 {
+      Group(group) => rounded_fills(group.frame, out)
+      Shape({ geometry: Curve(curve), fill: Some(paint), .. }, _) => {
+        let mut right = 0.0
+        let mut bottom = 0.0
+        for item in curve.items() {
+          let end = match item {
+            Move(p) | Line(p) | Cubic(_, _, p) => p
+            Close => continue
+          }
+          right = if end.x.to_pt() > right { end.x.to_pt() } else { right }
+          bottom = if end.y.to_pt() > bottom { end.y.to_pt() } else { bottom }
+        }
+        out.push("\{pt(right)}x\{pt(bottom)} \{paint.repr()}")
+      }
+      _ => ()
+    }
+  }
+}
+
+///|
 test "section 7: the looks of a table of data" {
   let rows : Array[Array[&@doc.IntoContent]] = [
     ["North", "Beans", "4.5"],
@@ -1060,6 +1086,18 @@ test "section 7: the looks of a table of data" {
       #|41.4 rgb("#fdf3d7")
       #|10.0 luma(92.16%)
       #|41.4 rgb("#fdf3d7")
+    ),
+  )
+  // The surface is the fill of the frame, not of the cells: one white
+  // shape with rounded corners, as large as the frame.
+  let surfaces : Array[String] = []
+  if table.report.output() is Some(document) {
+    rounded_fills(document.pages()[0].frame, surfaces)
+  }
+  inspect(
+    surfaces.join("\n"),
+    content=(
+      #|180.0x65.0 luma(100%)
     ),
   )
   // The text: 9pt in the table, the header in its own size, the numbers

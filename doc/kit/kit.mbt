@@ -1,7 +1,8 @@
 // The kit: elements that are not one Typst element (docs/edsl-ports.md,
 // section 4). What the first element, `Cards`, settled for the ones that
-// follow, with what `Chip` and `DataTable` added (marked "step 4") and
-// what `Canvas` added (marked "step 5"):
+// follow, with what `Chip` and `DataTable` added (marked "step 4"), what
+// `Canvas` added (marked "step 5"), and what three documents that were
+// rebuilt with the kit added (marked "rebuild"):
 //
 // 1. An element is an expansion. It is defined by the constructors of
 //    `doc` that it expands to, and its documentation says which. It has no
@@ -74,6 +75,22 @@
 //      (`AnchorX` and `AnchorY` for `Alignment`: `Start` and `End` depend
 //      on the direction of the text, and the first baseline is not an
 //      alignment). Its cases have the primitive's names.
+//    (Rebuild.)
+//    - Two primitives of an expansion can have a parameter of one name
+//      (a `Table` and the `Block` around it both have `fill`). The name
+//      is that of the primitive that the element is (`fill` is the
+//      table's, per cell); the other one has the name of its part before
+//      it, in its own type (`frame_fill`, a `Paint`). Not a second
+//      meaning of one name by the form of its value, and not a name that
+//      no primitive has. A name without the part stays where only one
+//      primitive has it (`radius`) or where one value is passed to both
+//      (`stroke`).
+//    - Where one of two parameters could be taken for the other, the
+//      documentation says which is for what, with what the engine does
+//      that makes them differ: the surface of a framed table is the
+//      frame's fill, since a block's fill and outline are painted before
+//      what the block clips, and a fill of the cells over the outline's
+//      edge. An author should not have to find that in the pixels.
 //
 // 3. Provenance: `@doc.Composite`. The constructor takes `loc~` and
 //    `args_loc~` (`#callsite(autofill(loc, args_loc))`) and builds
@@ -145,7 +162,10 @@
 //    item, with a message that names the item (`rows[3]`). A key of the
 //    caller's that `Keyed` does not take is an error at `key`. (Step 5.) A
 //    number that is not finite is an error at its argument: the engine
-//    takes it for a length and places something somewhere.
+//    takes it for a length and places something somewhere. (Rebuild.) An
+//    argument for a part that the other arguments do not choose (a
+//    `frame_fill` without the `radius` that chooses the frame) is an error
+//    at it: an argument is not dropped.
 //
 // 6. Twin. An element has a functional Typst twin: a Typst function with
 //    the same expansion (`doc/twins/kit.mbt`), and documents that use both
@@ -180,4 +200,9 @@
 //    of a known size; the corners of the head of an arrow in the eight
 //    directions and on a curve), and every part has the tests of an
 //    element: its expansion, and an error in every argument that it
-//    passes on at that argument.
+//    passes on at that argument. (Rebuild.) What the frames do not show
+//    (how an outline and the fills beside it come out of the rasterizer)
+//    is tested in pixels, against a rendering of the primitive alone
+//    (`pixels_test.mbt`: the frame of a table against the same box
+//    without a table), with the order in which the engine paints as the
+//    frames have it beside it.
