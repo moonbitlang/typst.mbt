@@ -14,8 +14,10 @@ compares the results.
   the registry's archive, licence, role). The packages are **not** part of
   this repository: `scripts/packages.sh` downloads the archives from
   `https://packages.typst.org/preview/`, verifies them against the manifest
-  and unpacks them into `.repos/typst-packages/preview/<name>/<version>/`.
-  Their licences are those of their authors (the `licence` column, from
+  and makes `.repos/typst-packages/preview/<name>/<version>/` exactly what
+  they contain (`--check` verifies without changing anything or using the
+  network; anything in that directory that the manifest does not list is an
+  error). Their licences are those of their authors (the `licence` column, from
   each package's `typst.toml`).
 - `docs/<package>/<name>.typ`: the documents, one case each, written for
   this repository (original content: none is a copy of a package's examples
@@ -37,21 +39,24 @@ moon run tests/runner --target native --release -- packages [filter] [-v] [--tim
 
 The oracle (`oracle/src/packages.rs`) and the runner
 (`tests/runner/packages_stage.mbt`) compile every document in the same
-world: what `typst compile --ignore-system-fonts --creation-timestamp 0`
-sees (the standard library, the fonts embedded in the CLI, no system fonts,
-a fixed date). A template that asks for a font that is not embedded falls
-back in both and warns in both. They compare
+world: what `typst compile --ignore-system-fonts --creation-timestamp
+43200` sees (the standard library, the fonts embedded in the CLI, no system
+fonts, the fixed time of the test world: 1970-01-01, 12:00 UTC). A template
+that asks for a font that is not embedded falls back in both and warns in
+both. They compare
 
 - `packages frames`: the document in the `typst-frame-v1` format of the
   `paged` stage (every frame, glyph, shape, span and tag, floats as bits)
-  with the diagnostics, each followed by its tracepoints;
+  with the diagnostics, each followed by its tracepoints; locations inside
+  a package are written with the package (`"@preview/cetz:0.5.2/src/..."`);
 - `packages svg`: the SVG of the `svg` stage (merged pages), after renaming
   the hash-derived ids; the stage also reports how many are byte-identical.
 
 `scripts/packages_cli.py` runs the same documents through the two command
 line programs instead (an upstream `typst` binary and the port's `cli`) and
 compares what the stage cannot: the rendered diagnostics on stderr, the
-exit status, the PNG pixels at 72 ppi, and the time both need.
+exit status (1 for `error-*.typ`, else 0), the PNG pixels at 72 ppi, and
+the time both need.
 
 ## When a document differs
 
@@ -254,13 +259,13 @@ difference, and never edit a golden.
 - `handout-notes.typ`: handout mode with speaker notes on a second screen (simple theme): `config-common(handout: true, handout-subslides: ..)` keeps chosen subslides of each animated slide, `show-notes-on-second-screen: right` doubles the page width and puts the notes panel beside every slide, `handout-only`/`presentation-only` content, notes with pauses, per-subslide notes, Markdown-mode notes, a per-slide handout override, footnotes and a bibliography-free reference list. Engine paths: page width computed from config, `place` of a panel outside the margins, state read in the footer (current note), dropped subslides and their counters.
 - `long-generated.typ`: a long deck generated from data (dewdrop theme with the sidebar navigation): four rounds of three quiz questions, every question slide built by one function with a pause, `item-by-item` over a generated enum, `uncover` and `alternatives`; headings come out of `for` loops; a state is updated once per round and read in the footer and on a final summary that also queries the headings. About 80 pages. Engine paths: slides split out of code-generated sequences, progressive outline in the sidebar of every page, slide/page counters and `final()`, state across many pages, repeated layout of similar content (memoization, location disambiguation).
 - `minimal-default.typ`: a minimal deck: the default theme with no configuration at all, slides split by headings and by `---`, a few `#pause`s, one `#meanwhile`, plain lists, a table and an equation. Engine paths: the heading-driven slide splitter (content tree walk), subslide repetition with `hide`, slide and page counters, invisible headings.
-- `theme-aqua.typ`: 
-- `theme-default.typ`: 
-- `theme-dewdrop.typ`: 
-- `theme-metropolis.typ`: 
-- `theme-simple.typ`: 
-- `theme-stargazer.typ`: 
-- `theme-university.typ`: 
+- `theme-aqua.typ`: the aqua theme with title, outline and focus slides. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-default.typ`: the default theme without title, outline or focus slides (the bare theme). The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-dewdrop.typ`: the dewdrop theme with title, outline and focus slides, a footer function and the mini-slides navigation. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-metropolis.typ`: the metropolis theme with title and focus slides. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-simple.typ`: the simple theme with a footer and without title, outline or focus slides. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-stargazer.typ`: the stargazer theme with title, outline and focus slides. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
+- `theme-university.typ`: the university theme with title and focus slides. The same deck for every theme: `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a two-column slide with a table, equations with pauses and `touying-equation`, raw code, a figure, sections and subsections. Engine paths: the theme's show rules and page setup, heading-driven slide splitting, subslide repetition, counters and states read in headers and footers.
 - `theorems-numbly.typ`: theorems, lemmas, corollaries, definitions, examples and proofs (rainbow cosmos) inside the metropolis theme at 4:3 with `slide-level: 3`, numbly heading numbers, the theorem counter frozen across subslides, references to theorems, equations and figures on other slides (`@thm[-]`, `@thm[!!]`), `theorion-restate`, an outline of theorems, `touying-recall` of a labelled slide and of a labelled table, the theme's outline and focus slides, and an appendix with new numbering. Engine paths: rich counters inherited from headings, state/counter freezing by `update(at(..))`, figure kinds and outline targets, labels placed on last subslides only, queries for restating, numbering functions built from pattern strings.
 
 ### unequivocal-ams (0.1.2)

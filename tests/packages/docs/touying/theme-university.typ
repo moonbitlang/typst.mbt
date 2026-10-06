@@ -1,3 +1,9 @@
+// touying 0.8.0: the university theme with title and focus slides. The same deck for every theme:
+// `#pause` and `#meanwhile` in text and lists, `uncover`/`only`/`alternatives`, a
+// two-column slide with a table, equations with pauses and `touying-equation`, raw
+// code, a figure, sections and subsections. Engine paths: the theme's show
+// rules and page setup, heading-driven slide splitting, subslide repetition, counters
+// and states read in headers and footers.
 #import "@preview/touying:0.8.0": *
 #import themes.university: *
 

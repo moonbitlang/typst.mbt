@@ -529,14 +529,18 @@
   are pinned in `tests/packages/manifest.tsv` (name, version, sha256, size,
   licence, with the packages they import) and not committed:
   `scripts/packages.sh` fetches the archives from packages.typst.org,
-  verifies and unpacks them into `.repos/typst-packages` (`--check`:
-  verify only; a directory that the manifest does not list is an error).
+  verifies them and makes `.repos/typst-packages/preview` exactly what
+  they contain (`--check`: verify only, no network, nothing changed; a
+  namespace, package, version or archive that the manifest does not list
+  is an error).
   `scripts/goldens.sh packages` (oracle/src/packages.rs) compiles every
   document in the world of `typst compile --ignore-system-fonts`
   (`TestWorld::packages`: the standard library, the embedded fonts, the
-  test world's date) and dumps the frames like `paged` (`typst-frame-v1`;
+  test world's time) and dumps the frames like `paged` (`typst-frame-v1`;
   every diagnostic is followed by its tracepoints, `  trace <location>
-  <kind> <name>`) and the SVG like `svg`; `moon run tests/runner --target
+  <kind> <name>`; a location in a package is
+  `"@preview/<name>:<version>/<path>":start..end`) and the SVG like `svg`;
+  `moon run tests/runner --target
   native --release -- packages [filter] [--times]` compares them (labels
   `packages frames` and `packages svg` in `scripts/ci/stages.tsv`, goldens
   in `tests/golden/packages/{frames,svg}`). `scripts/packages_cli.py`
@@ -577,7 +581,8 @@
   regenerated `usvg/oracle_test.mbt` and `resvg/oracle_test.mbt` must be the
   committed ones (`scripts/ci/goldens_verify.sh`). `scripts/ci/data.sh`
   fetches the other test inputs without Rust (shallow upstream checkout, the
-  pinned packages (`scripts/packages.sh`; the `test-data` action caches
+  pinned packages with `--packages`, which only the `stages` job passes
+  (`scripts/packages.sh`; the `test-data` action then caches
   `.repos/typst-packages` under the manifest's hash), the
   oracle's locked revisions of typst-dev-assets, typst-assets and hayro in
   cargo's checkout layout, the `target/hayro`/`target/devassets` links, the
