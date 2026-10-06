@@ -1,18 +1,19 @@
 name: Test data
 description: >
   Fetch what the tests read besides the repository (scripts/ci/data.sh): the
-  upstream suite, the test suites of rustybuzz and resvg, the dev assets,
-  hayro's corpus and the pinned Typst packages of the `packages` stage.
+  upstream suite, the test suites of rustybuzz and resvg, the dev assets and
+  hayro's corpus; with `packages`, also the pinned Typst packages of the
+  `packages` stage.
+inputs:
+  packages:
+    description: >
+      Also fetch the Typst packages of the `packages` stage
+      (tests/packages/manifest.tsv). Only the job that runs the stages needs
+      them; the others do not depend on the package registry.
+    default: "false"
 runs:
   using: composite
   steps:
-    # The package archives (scripts/packages.sh verifies and unpacks them),
-    # so that a run does not depend on the package registry being reachable.
-    - name: Cached packages
-      uses: actions/cache@v4
-      with:
-        path: .repos/typst-packages
-        key: typst-packages-v1-${{ runner.os }}-${{ hashFiles('tests/packages/manifest.tsv') }}
     - name: brotli
       shell: bash
       run: |
@@ -24,6 +25,15 @@ runs:
             sudo apt-get install -y -q brotli
           fi
         fi
+    # The package archives, so that a run does not depend on the package
+    # registry being reachable (scripts/packages.sh verifies them against
+    # the manifest and rebuilds the unpacked tree from them either way).
+    - name: Cached packages
+      if: inputs.packages == 'true'
+      uses: actions/cache@v4
+      with:
+        path: .repos/typst-packages
+        key: typst-packages-v1-${{ runner.os }}-${{ hashFiles('tests/packages/manifest.tsv') }}
     - name: Fetch
       shell: bash
-      run: scripts/ci/data.sh
+      run: scripts/ci/data.sh ${{ inputs.packages == 'true' && '--packages' || '' }}
