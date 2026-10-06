@@ -2257,21 +2257,21 @@ pub impl FromValue for Component with fn from_value(v) {
 /// A module with all preset color maps.
 fn color_map() -> Module {
   let scope = Scope::new()
-  scope.define("turbo", Array(color_preset(color_map_turbo))) |> ignore
-  scope.define("cividis", Array(color_preset(color_map_cividis))) |> ignore
-  scope.define("rainbow", Array(color_preset(color_map_rainbow))) |> ignore
-  scope.define("spectral", Array(color_preset(color_map_spectral))) |> ignore
-  scope.define("viridis", Array(color_preset(color_map_viridis))) |> ignore
-  scope.define("inferno", Array(color_preset(color_map_inferno))) |> ignore
-  scope.define("magma", Array(color_preset(color_map_magma))) |> ignore
-  scope.define("plasma", Array(color_preset(color_map_plasma))) |> ignore
-  scope.define("rocket", Array(color_preset(color_map_rocket))) |> ignore
-  scope.define("mako", Array(color_preset(color_map_mako))) |> ignore
-  scope.define("coolwarm", Array(color_preset(color_map_coolwarm))) |> ignore
-  scope.define("vlag", Array(color_preset(color_map_vlag))) |> ignore
-  scope.define("icefire", Array(color_preset(color_map_icefire))) |> ignore
-  scope.define("flare", Array(color_preset(color_map_flare))) |> ignore
-  scope.define("crest", Array(color_preset(color_map_crest))) |> ignore
+  scope.define_("turbo", Array(color_preset(color_map_turbo))) |> ignore
+  scope.define_("cividis", Array(color_preset(color_map_cividis))) |> ignore
+  scope.define_("rainbow", Array(color_preset(color_map_rainbow))) |> ignore
+  scope.define_("spectral", Array(color_preset(color_map_spectral))) |> ignore
+  scope.define_("viridis", Array(color_preset(color_map_viridis))) |> ignore
+  scope.define_("inferno", Array(color_preset(color_map_inferno))) |> ignore
+  scope.define_("magma", Array(color_preset(color_map_magma))) |> ignore
+  scope.define_("plasma", Array(color_preset(color_map_plasma))) |> ignore
+  scope.define_("rocket", Array(color_preset(color_map_rocket))) |> ignore
+  scope.define_("mako", Array(color_preset(color_map_mako))) |> ignore
+  scope.define_("coolwarm", Array(color_preset(color_map_coolwarm))) |> ignore
+  scope.define_("vlag", Array(color_preset(color_map_vlag))) |> ignore
+  scope.define_("icefire", Array(color_preset(color_map_icefire))) |> ignore
+  scope.define_("flare", Array(color_preset(color_map_flare))) |> ignore
+  scope.define_("crest", Array(color_preset(color_map_crest))) |> ignore
   Module::new("map", scope)
 }
 

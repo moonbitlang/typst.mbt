@@ -64,7 +64,7 @@ fn eval_module_import(
     }
 
     // Define renamed module on the scope.
-    vm.define(new_name, source)
+    vm.define_(new_name, source)
   }
   let scope = source.scope().unwrap()
   match imp.imports() {
@@ -182,7 +182,7 @@ fn eval_module_include(
 ) -> @library.Content raise @library.SourceError {
   let source_span = inc.source().span()
   let source = eval_expr(vm, inc.source())
-  let module = match source {
+  let module_ = match source {
     Str(path) =>
       @library.trace(
         s => @library.world_range(vm.engine.world, s),
@@ -190,7 +190,7 @@ fn eval_module_include(
         inc.span(),
         () => import_(vm.engine, path, source_span),
       )
-    Module(module) => module
+    Module(module_) => module_
     // Upstream: `v if RootedPath::castable(&v)`.
     Dyn(RootedPath(path)) => {
       let id = path.intern()
@@ -204,7 +204,7 @@ fn eval_module_include(
     v =>
       @library.bail_at(source_span, "expected path or module, found \{v.ty()}")
   }
-  module.content()
+  module_.content()
 }
 
 ///|
@@ -301,7 +301,7 @@ fn eval_source_memoized(
       memo.traced.0 == engine.traced.0 {
       engine.sink.extend_from_sink(memo.sink)
       match memo.result {
-        Ok(module) => return module
+        Ok(module_) => return module_
         Err(errors) => raise @library.SourceError(errors)
       }
     }
@@ -321,7 +321,7 @@ fn eval_source_memoized(
   catch {
     @library.SourceError(errors) => Err(errors)
   } noraise {
-    module => Ok(module)
+    module_ => Ok(module_)
   }
   route_queries.pop() |> ignore
   // Queries made here are also made by the enclosing evaluations.
@@ -340,7 +340,7 @@ fn eval_source_memoized(
   })
   engine.sink.extend_from_sink(sink)
   match result {
-    Ok(module) => module
+    Ok(module_) => module_
     Err(errors) => raise @library.SourceError(errors)
   }
 }

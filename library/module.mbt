@@ -131,7 +131,7 @@ pub fn Module::content(self : Module) -> Content {
 /// Upstream `Repr for Module`.
 pub fn Module::repr(self : Module) -> String {
   match self.name {
-    Some(module) => "<module \{module}>"
+    Some(module_) => "<module \{module_}>"
     None => "<module>"
   }
 }

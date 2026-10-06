@@ -323,7 +323,7 @@ pub fn Type::location() -> Type {
 }
 
 ///|
-let module_type_data : NativeTypeData = NativeTypeData::new(
+let module__type_data : NativeTypeData = NativeTypeData::new(
   name="module",
   long_name="module",
   title="Module",
@@ -332,8 +332,8 @@ let module_type_data : NativeTypeData = NativeTypeData::new(
 
 ///|
 /// The `module` type (upstream `Module`).
-pub fn Type::module() -> Type {
-  Type(module_type_data)
+pub fn Type::module_() -> Type {
+  Type(module__type_data)
 }
 
 ///|
@@ -573,7 +573,7 @@ pub fn Type::all_native() -> Array[Type] {
     Type::label(),
     Type::length(),
     Type::location(),
-    Type::module(),
+    Type::module_(),
     Type::none(),
     Type::path(),
     Type::ratio(),

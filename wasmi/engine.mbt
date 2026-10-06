@@ -528,7 +528,7 @@ priv struct UncompiledFuncEntity {
   /// The Wasm binary bytes of the function body.
   bytes : BytesView
   /// The Wasm module of the Wasm function.
-  module : ModuleHeader
+  module_ : ModuleHeader
   /// Optional Wasm validation information, validated on first use
   /// (upstream `validation`, taken when compiling).
   mut validation : @wasmparser.FuncToValidate?
@@ -630,14 +630,14 @@ fn CodeMap::init_func_as_uncompiled(
   func : EngineFunc,
   func_idx : FuncIdx,
   bytes : BytesView,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   func_to_validate : @wasmparser.FuncToValidate?,
 ) -> Unit {
   guard self.funcs[func.0] is Uninit
   self.funcs[func.0] = Uncompiled({
     func_index: func_idx,
     bytes,
-    module,
+    module_,
     validation: func_to_validate,
   })
 }
@@ -712,7 +712,7 @@ fn UncompiledFuncEntity::compile(
       FuelMeteringDisabled => ()
     }
   }
-  let config = self.module.engine_upgrade().config
+  let config = self.module_.engine_upgrade().config
   // Note: upstream validates while translating (`ValidatingFuncTranslator`);
   // validating first yields the same result for valid bodies and the
   // validation error for invalid ones instead of translating them.
@@ -723,7 +723,7 @@ fn UncompiledFuncEntity::compile(
     }
     None => ()
   }
-  let translator = FuncTranslator::new(self.func_index, self.module)
+  let translator = FuncTranslator::new(self.func_index, self.module_)
   FuncTranslationDriver::new(0, self.bytes, config).translate(translator)
 }
 
@@ -865,7 +865,7 @@ pub fn Engine::translate_func(
   engine_func : EngineFunc,
   offset : Int,
   bytes : BytesView,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   func_to_validate : @wasmparser.FuncToValidate?,
 ) -> Unit raise WasmiError {
   match (self.config.get_compilation_mode(), func_to_validate) {
@@ -873,7 +873,7 @@ pub fn Engine::translate_func(
       if func_to_validate is Some(func_to_validate) {
         validate_func_body(func_to_validate, offset, bytes, self.config)
       }
-      let translator = FuncTranslator::new(func_index, module)
+      let translator = FuncTranslator::new(func_index, module_)
       let compiled = FuncTranslationDriver::new(offset, bytes, self.config).translate(
         translator,
       )
@@ -885,13 +885,13 @@ pub fn Engine::translate_func(
         engine_func,
         func_index,
         bytes,
-        module,
+        module_,
         None,
       )
     }
     (_, func_to_validate) =>
       self.code_map.init_func_as_uncompiled(
-        engine_func, func_index, bytes, module, func_to_validate,
+        engine_func, func_index, bytes, module_, func_to_validate,
       )
   }
 }

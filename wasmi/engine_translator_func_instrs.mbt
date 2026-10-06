@@ -120,7 +120,7 @@ pub fn InstrEncoder::try_replace_result(
   new_result : @ir.Slot,
   old_result : @ir.Slot,
   layout : StackLayout,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
 ) -> Bool raise WasmiError {
   if !(layout.stack_space(new_result) is Local) {
     // Case: cannot replace result if `new_result` isn't a local.
@@ -130,7 +130,7 @@ pub fn InstrEncoder::try_replace_result(
     // Case: cannot replace result without last instruction.
     return false
   }
-  guard relink_result(self.get(last_instr), module, new_result, old_result)
+  guard relink_result(self.get(last_instr), module_, new_result, old_result)
     is Some(relinked) else {
     // Case: it was impossible to relink the result of `last_instr.
     return false

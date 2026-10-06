@@ -240,7 +240,7 @@ pub fn fast_bounding_box(path : @kurbo.BezPath) -> @kurbo.Rect {
   let mut min_y = @double.infinity
   let mut max_x = @double.neg_infinity
   let mut max_y = @double.neg_infinity
-  let include = (x : Double, y : Double) => {
+  let include_ = (x : Double, y : Double) => {
     min_x = @kurbo.f64_min(min_x, x)
     min_y = @kurbo.f64_min(min_y, y)
     max_x = @kurbo.f64_max(max_x, x)
@@ -248,15 +248,15 @@ pub fn fast_bounding_box(path : @kurbo.BezPath) -> @kurbo.Rect {
   }
   for el in path.elements() {
     match el {
-      MoveTo(p) | LineTo(p) => include(p.x, p.y)
+      MoveTo(p) | LineTo(p) => include_(p.x, p.y)
       QuadTo(p1, p2) => {
-        include(p1.x, p1.y)
-        include(p2.x, p2.y)
+        include_(p1.x, p1.y)
+        include_(p2.x, p2.y)
       }
       CurveTo(p1, p2, p3) => {
-        include(p1.x, p1.y)
-        include(p2.x, p2.y)
-        include(p3.x, p3.y)
+        include_(p1.x, p1.y)
+        include_(p2.x, p2.y)
+        include_(p3.x, p3.y)
       }
       ClosePath => ()
     }

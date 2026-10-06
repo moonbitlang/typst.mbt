@@ -118,13 +118,13 @@ pub fn[T] Linker::allow_shadowing(self : Linker[T], allow : Bool) -> Linker[T] {
 /// Inserts a new definition.
 fn[T] Linker::insert(
   self : Linker[T],
-  module : String,
+  module_ : String,
   name : String,
   item : Definition[T],
 ) -> Unit raise WasmiError {
-  let key = (module, name)
+  let key = (module_, name)
   if self.definitions.contains(key) && !self.allow_shadowing {
-    let import_name = ImportName::new(module, name)
+    let import_name = ImportName::new(module_, name)
     raise Linker(DuplicateDefinition(import_name~))
   }
   self.definitions.set(key, item)
@@ -136,13 +136,13 @@ fn[T] Linker::insert(
 /// # Errors
 ///
 /// If there already is a definition under the same name for this [`Linker`].
-pub fn[T] Linker::define(
+pub fn[T] Linker::define_(
   self : Linker[T],
-  module : String,
+  module_ : String,
   name : String,
   item : Extern,
 ) -> Linker[T] raise WasmiError {
-  self.insert(module, name, Extern(item))
+  self.insert(module_, name, Extern(item))
   self
 }
 
@@ -156,12 +156,12 @@ pub fn[T] Linker::define(
 /// If there already is a definition under the same name for this [`Linker`].
 pub fn[T] Linker::func_new(
   self : Linker[T],
-  module : String,
+  module_ : String,
   name : String,
   ty : @wasmi_core.FuncType,
   func : (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError,
 ) -> Linker[T] raise WasmiError {
-  self.insert(module, name, HostFunc(ty, func))
+  self.insert(module_, name, HostFunc(ty, func))
   self
 }
 
@@ -172,10 +172,10 @@ pub fn[T] Linker::func_new(
 /// - Returns `None` if the definition is a [`Linker`] host function.
 pub fn[T] Linker::get(
   self : Linker[T],
-  module : String,
+  module_ : String,
   name : String,
 ) -> Extern? {
-  match self.definitions.get((module, name)) {
+  match self.definitions.get((module_, name)) {
     Some(Extern(item)) => Some(item)
     _ => None
   }
@@ -206,8 +206,8 @@ pub fn[T] Linker::instance(
       "assertion failed: Engine::same(store.as_context().store.engine(), self.engine())",
     )
   }
-  for export in instance.exports(store) {
-    let (name, item) = export
+  for export_ in instance.exports(store) {
+    let (name, item) = export_
     self.insert(module_name, name, Extern(item))
   }
   self
@@ -224,7 +224,7 @@ pub fn[T] Linker::instance(
 pub fn[T] Linker::instantiate_and_start(
   self : Linker[T],
   store : Store[T],
-  module : Module,
+  module_ : Module,
 ) -> Instance raise WasmiError {
   if !Engine::same(self.engine, store.inner.engine) {
     abort(
@@ -232,10 +232,10 @@ pub fn[T] Linker::instantiate_and_start(
     )
   }
   let externals = []
-  for imp in module.imports() {
+  for imp in module_.imports() {
     externals.push(self.process_import(store, imp))
   }
-  module.instantiate(store, externals)
+  module_.instantiate(store, externals)
 }
 
 ///|
@@ -249,7 +249,7 @@ fn[T] Linker::process_import(
   store : Store[T],
   imp : ImportType,
 ) -> Extern raise WasmiError {
-  let module_name = imp.module()
+  let module_name = imp.module_()
   let field_name = imp.name()
   guard self.definitions.get((module_name, field_name)) is Some(resolved) else {
     raise Linker(MissingDefinition(name=imp.name, ty=imp.ty))

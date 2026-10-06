@@ -23,19 +23,19 @@ pub fn native_func(
 ///|
 /// Define a native function in a scope.
 pub fn Scope::define_func(self : Scope, data : NativeFuncData) -> Binding {
-  self.define(data.name, Func(Func::native(data)))
+  self.define_(data.name, Func(Func::native(data)))
 }
 
 ///|
 /// Define a native type in a scope.
 pub fn Scope::define_type(self : Scope, ty : Type) -> Binding {
-  self.define(ty.short_name(), Type(ty))
+  self.define_(ty.short_name(), Type(ty))
 }
 
 ///|
 /// Define an element in a scope.
 pub fn Scope::define_elem(self : Scope, elem : Element) -> Binding {
-  self.define(elem.name(), Func(Func::element(elem)))
+  self.define_(elem.name(), Func(Func::element(elem)))
 }
 
 ///|
@@ -66,10 +66,10 @@ fn calc_module() -> Module {
   for f in generated_calc_funcs() {
     scope.define_func(f) |> ignore
   }
-  scope.define("inf", Float(@double.infinity)) |> ignore
-  scope.define("pi", Float(@math.PI)) |> ignore
-  scope.define("tau", Float(2.0 * @math.PI)) |> ignore
-  scope.define("e", Float(2.718281828459045)) |> ignore
+  scope.define_("inf", Float(@double.infinity)) |> ignore
+  scope.define_("pi", Float(@math.PI)) |> ignore
+  scope.define_("tau", Float(2.0 * @math.PI)) |> ignore
+  scope.define_("e", Float(2.718281828459045)) |> ignore
   Module::new("calc", scope)
 }
 
@@ -82,7 +82,7 @@ pub let typst_version : (Int, Int, Int) = @syntax.typst_version
 fn sys_module(inputs : Dict) -> Module {
   let scope = Scope::deduplicating()
   let (major, minor, patch) = typst_version
-  scope.define(
+  scope.define_(
     "version",
     Version(
       Version([
@@ -93,7 +93,7 @@ fn sys_module(inputs : Dict) -> Module {
     ),
   )
   |> ignore
-  scope.define("inputs", Dict(inputs)) |> ignore
+  scope.define_("inputs", Dict(inputs)) |> ignore
   Module::new("sys", scope)
 }
 
@@ -115,7 +115,7 @@ fn foundations_define(global : Scope, inputs : Dict) -> Unit {
       Type::func(),
       Type::args(),
       Type::type_(),
-      Type::module(),
+      Type::module_(),
       Type::regex(),
       Type::selector(),
       Type::datetime(),
@@ -128,8 +128,8 @@ fn foundations_define(global : Scope, inputs : Dict) -> Unit {
     global.define_type(ty) |> ignore
   }
   define_globals(global, "foundations")
-  global.define("calc", Module(calc_module())) |> ignore
-  global.define("sys", Module(sys_module(inputs))) |> ignore
+  global.define_("calc", Module(calc_module())) |> ignore
+  global.define_("sys", Module(sys_module(inputs))) |> ignore
   global.reset_category()
 }
 
@@ -333,24 +333,24 @@ pub fn math_module() -> Module {
 ///|
 /// Defines scoped items in the global scope (upstream `prelude`).
 fn prelude_define(global : Scope) -> Unit {
-  global.define("black", Color(color_black)) |> ignore
-  global.define("gray", Color(color_gray)) |> ignore
-  global.define("silver", Color(color_silver)) |> ignore
-  global.define("white", Color(color_white)) |> ignore
-  global.define("navy", Color(color_navy)) |> ignore
-  global.define("blue", Color(color_blue)) |> ignore
-  global.define("aqua", Color(color_aqua)) |> ignore
-  global.define("teal", Color(color_teal)) |> ignore
-  global.define("eastern", Color(color_eastern)) |> ignore
-  global.define("purple", Color(color_purple)) |> ignore
-  global.define("fuchsia", Color(color_fuchsia)) |> ignore
-  global.define("maroon", Color(color_maroon)) |> ignore
-  global.define("red", Color(color_red)) |> ignore
-  global.define("orange", Color(color_orange)) |> ignore
-  global.define("yellow", Color(color_yellow)) |> ignore
-  global.define("olive", Color(color_olive)) |> ignore
-  global.define("green", Color(color_green)) |> ignore
-  global.define("lime", Color(color_lime)) |> ignore
+  global.define_("black", Color(color_black)) |> ignore
+  global.define_("gray", Color(color_gray)) |> ignore
+  global.define_("silver", Color(color_silver)) |> ignore
+  global.define_("white", Color(color_white)) |> ignore
+  global.define_("navy", Color(color_navy)) |> ignore
+  global.define_("blue", Color(color_blue)) |> ignore
+  global.define_("aqua", Color(color_aqua)) |> ignore
+  global.define_("teal", Color(color_teal)) |> ignore
+  global.define_("eastern", Color(color_eastern)) |> ignore
+  global.define_("purple", Color(color_purple)) |> ignore
+  global.define_("fuchsia", Color(color_fuchsia)) |> ignore
+  global.define_("maroon", Color(color_maroon)) |> ignore
+  global.define_("red", Color(color_red)) |> ignore
+  global.define_("orange", Color(color_orange)) |> ignore
+  global.define_("yellow", Color(color_yellow)) |> ignore
+  global.define_("olive", Color(color_olive)) |> ignore
+  global.define_("green", Color(color_green)) |> ignore
+  global.define_("lime", Color(color_lime)) |> ignore
   global.define_func(native_color_luma()) |> ignore
   global.define_func(native_color_oklab()) |> ignore
   global.define_func(native_color_oklch()) |> ignore
@@ -436,8 +436,8 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   introspection_define(global)
   loading_define(global)
   symbols_define(global)
-  global.define("format", Module(format_module(self.formats))) |> ignore
-  global.define("math", Module(math)) |> ignore
+  global.define_("format", Module(format_module(self.formats))) |> ignore
+  global.define_("math", Module(math)) |> ignore
   prelude_define(global)
   // If available, add some items to the global prelude.
   global.prelude_path(["format", "html"]) |> ignore

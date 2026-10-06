@@ -105,7 +105,7 @@ fn recorded_query_validates(
 /// A closure over `node` capturing `x = value`.
 fn test_closure(node : @syntax.SyntaxNode, value : Value) -> Value {
   let captured = Scope::new()
-  captured.define("x", value) |> ignore
+  captured.define_("x", value) |> ignore
   Func(
     Func::closure({
       node: Context(node),

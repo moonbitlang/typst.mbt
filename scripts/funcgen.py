@@ -27,6 +27,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from typemap import mbt_type  # noqa: E402
+from typegen import accessor_name  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "library")
@@ -125,11 +126,9 @@ def defined_functions():
 
 def type_accessor(manifest):
     """Rust type ident -> `Type::x()` accessor (as in types_gen.mbt)."""
-    special = {"dictionary": "dict", "arguments": "args", "function": "func", "type": "type_"}
     acc = {}
     for t in manifest["types"]:
-        name = special.get(t["name"], t["name"].replace("-", "_"))
-        acc[t["ident"]] = f"Type::{name}()"
+        acc[t["ident"]] = f"Type::{accessor_name(t['name'])}()"
     acc.update({"i64": "Type::int()", "f64": "Type::float()", "bool": "Type::bool()"})
     return acc
 
@@ -334,7 +333,7 @@ def main():
                 cname = f"impl_{snake(ty)}_const_{mem['ident'].lower()}"
                 if cname not in defined:
                     todo.append(f"///|\n/// TODO: port constant `{ty}::{mem['ident']}`.\nfn {cname}() -> Value {{\n  None\n}}\n")
-                defs.append(f"    s.define({mbt_str(mem['ident'].lower().replace('_', '-'))}, {cname}()) |> ignore")
+                defs.append(f"    s.define_({mbt_str(mem['ident'].lower().replace('_', '-'))}, {cname}()) |> ignore")
             elif mem["kind"] == "verbatim" and re.fullmatch(r"#\[elem\] type (\w+);", mem["tokens"]):
                 ident = re.fullmatch(r"#\[elem\] type (\w+);", mem["tokens"]).group(1)
                 defs.append(f"    s.define_elem({elem_var(ident, elem_files.get(ident, s_file))}()) |> ignore")

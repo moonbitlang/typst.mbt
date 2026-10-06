@@ -451,10 +451,10 @@ pub fn ImmediateOperand::ty(Self) -> @core.ValType
 pub fn ImmediateOperand::val(Self) -> @core.TypedVal
 
 pub(all) struct ImportName {
-  module : String
+  module_ : String
   field : String
 }
-pub fn ImportName::module(Self) -> String
+pub fn ImportName::module_(Self) -> String
 pub fn ImportName::name(Self) -> String
 pub fn ImportName::new(String, String) -> Self
 pub impl Show for ImportName
@@ -463,7 +463,7 @@ pub(all) struct ImportType {
   name : ImportName
   ty : ExternType
 }
-pub fn ImportType::module(Self) -> String
+pub fn ImportType::module_(Self) -> String
 pub fn ImportType::name(Self) -> String
 pub fn ImportType::ty(Self) -> ExternType
 
@@ -584,7 +584,7 @@ pub struct Linker[T] {
   // private fields
 }
 pub fn[T] Linker::allow_shadowing(Self[T], Bool) -> Self[T]
-pub fn[T] Linker::define(Self[T], String, String, Extern) -> Self[T] raise WasmiError
+pub fn[T] Linker::define_(Self[T], String, String, Extern) -> Self[T] raise WasmiError
 pub fn[T] Linker::engine(Self[T]) -> Engine
 pub fn[T] Linker::func_new(Self[T], String, String, @core.FuncType, (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError) -> Self[T] raise WasmiError
 pub fn[T] Linker::get(Self[T], String, String) -> Extern?

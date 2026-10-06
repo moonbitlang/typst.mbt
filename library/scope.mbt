@@ -403,7 +403,7 @@ pub fn Scope::reset_category(self : Scope) -> Unit {
 
 ///|
 /// Bind a value to a name.
-pub fn Scope::define(self : Scope, name : String, value : Value) -> Binding {
+pub fn Scope::define_(self : Scope, name : String, value : Value) -> Binding {
   if self.deduplicate && self.map.contains(name) {
     abort("duplicate definition: \{name}")
   }
