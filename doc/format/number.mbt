@@ -210,16 +210,18 @@ pub fn percent(x : Double, digits? : Int = 1) -> String {
 let compact_units : ReadOnlyArray[String] = ["", "k", "M", "B"]
 
 ///|
-/// `x` in the largest of the units one, thousand ("k"), million ("M") and
-/// billion ("B") in which the rounded magnitude is at least 1, with
-/// `digits` decimals: `compact(1234.0)` is "1.2k", `compact(5.4e6)` is
-/// "5.4M", `compact(2.0e9, digits=0)` is "2B", `compact(-1500.0)` is
-/// "-1.5k".
+/// `x` in one of the units one, thousand ("k"), million ("M") and billion
+/// ("B"), with `digits` decimals: the smallest of them in which the rounded
+/// magnitude is below 1000, and a billion if there is none.
+/// `compact(1234.0)` is "1.2k", `compact(5.4e6)` is "5.4M", `compact(2.0e9,
+/// digits=0)` is "2B", `compact(-1500.0)` is "-1.5k".
 ///
 /// - Below a thousand there is no suffix, and the decimals are kept:
 ///   `compact(950.0)` is "950.0", `compact(0.25)` is "0.3"; use `digits=0`
 ///   for counts (`compact(950.0, digits=0)` is "950").
-/// - The unit is chosen after rounding, so "1000.0k" is never written:
+/// - The unit is chosen after rounding, so "1000.0k" is never written, and
+///   a value is not moved up before it reaches a thousand ("950.0", not
+///   "1.0k"):
 ///   `compact(999_949.0)` is "999.9k", `compact(999_950.0)` is "1.0M", and
 ///   `compact(999.95)` is "1.0k" (the double 999.95 is above 999.95).
 /// - A billion is the largest unit: `compact(2.5e13)` is "25000.0B", without

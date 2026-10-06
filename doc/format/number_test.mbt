@@ -345,7 +345,14 @@ test "grouped: toFixed with separators" {
     @format.grouped(x, digits~)
   })
   assert_eq(wrong, [])
-  assert_true(grouped_cases.length() >= 500)
+  // Most of the rows have a separator: the table is about grouping.
+  let mut separated = 0
+  for row in grouped_cases[:] {
+    if row.2.contains(",") {
+      separated += 1
+    }
+  }
+  assert_true(separated > 300 && grouped_cases.length() > 400)
 }
 
 ///|

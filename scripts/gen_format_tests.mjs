@@ -217,6 +217,8 @@ const seen = new Set();
 const fixedJs = [];
 const fixedLarge = [];
 const grouped = [];
+let groupedSeparated = 0;
+let groupedPlain = 0;
 let compared = 0;
 for (const [x, d] of pairs) {
   const key = hex(x) + '/' + d;
@@ -230,13 +232,17 @@ for (const [x, d] of pairs) {
       throw new Error(`exactRound differs from toFixed: ${x} at ${d}: ${ref} / ${js}`);
     }
     fixedJs.push(`  (${hex(x)}, ${d}, ${str(js)}),`);
-    // Not for the longest ones: the table is big enough.
-    if (js.length < 40 && grouped.length < 500) {
+    // Not for the longest ones, and mostly values of a thousand and more
+    // (the others have no separator): the table is big enough.
+    if (js.length < 40) {
       const parts = js.split('.');
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       const text = parts.join('.');
       if (text !== refGrouped(x, d, ',')) throw new Error(`grouping of ${js}`);
-      grouped.push(`  (${hex(x)}, ${d}, ${str(text)}),`);
+      const separated = text.includes(',');
+      if (separated ? groupedSeparated++ < 500 : groupedPlain++ < 100) {
+        grouped.push(`  (${hex(x)}, ${d}, ${str(text)}),`);
+      }
     }
   } else {
     // An integer: its digits, then zeros.
@@ -377,6 +383,7 @@ writeFileSync(
 
 console.error(
   `fixed: ${fixedJs.length} cases below 1e21 (toFixed and exactRound agree on all ${compared}), ` +
-    `${fixedLarge.length} of 1e21 and above; grouped: ${grouped.length}; grouped_int: ${groupedInt.length}; ` +
+    `${fixedLarge.length} of 1e21 and above; grouped: ${grouped.length} ` +
+    `(${Math.min(groupedSeparated, 500)} with separators); grouped_int: ${groupedInt.length}; ` +
     `percent: ${percent.length}; compact: ${compact.length}; decimal expansions: ${decimals.length}`,
 );
