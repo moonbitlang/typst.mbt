@@ -160,6 +160,14 @@
   Slice 4b: bodies under one `Keyed` key in one argument are distinct
   pieces (`Lower::keyed`, one counter per key path); the showcase keys
   its data-driven rows.
+- EDSL guide (`docs/edsl-guide.md`): what the ports of
+  `docs/edsl-ports.md` showed, for authors. Its samples are the functions
+  of `doc/examples/guide/guide.mbt` and what it says about them the tests
+  of `guide_test.mbt` there; after editing the guide or the samples (and
+  after `moon fmt`) run `python3 scripts/edsl_guide_check.py`.
+  `doc/ports_findings_test.mbt` pins what happens today for every finding
+  of the ports document (S1..S6, T1..T11): a step of that proposal that
+  changes one changes its test.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

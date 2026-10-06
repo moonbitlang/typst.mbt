@@ -1,0 +1,61 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/examples/guide"
+
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/system",
+}
+
+// Values
+pub fn apostrophes() -> @doc.Seq
+
+pub fn cards(Array[&@doc.IntoContent], columns? : Int) -> @doc.Grid
+
+pub fn code_size() -> @doc.ShowSet
+
+pub fn composed_lengths() -> @doc.Seq
+
+pub fn first_document() -> @doc.Document
+
+pub fn font_families() -> @doc.SetText
+
+pub fn fonts_of(String) -> @doc.DocWorld raise @system.SystemError
+
+pub fn guide() -> @doc.Document
+
+pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
+
+pub fn loose_title(&@doc.IntoContent) -> @doc.Seq
+
+#callsite(autofill(args_loc, loc))
+pub fn note(&@doc.IntoContent, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Block
+
+pub fn notes() -> @doc.Seq
+
+pub fn paragraphs() -> @doc.Seq
+
+pub fn plain_note(&@doc.IntoContent) -> @doc.Block
+
+pub fn prose_table(Array[@doc.Sizing]) -> @doc.Table
+
+pub fn ruled_table(Array[&@doc.IntoContent]) -> @doc.Table
+
+pub fn run_together() -> @doc.Seq
+
+pub fn stripes_captured() -> @doc.Seq
+
+pub fn stripes_in_show() -> @doc.Seq
+
+pub fn untitled_outline() -> @doc.Outline
+
+pub fn untyped_fields() -> @doc.Seq
+
+pub fn upper_case() -> @doc.Call
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

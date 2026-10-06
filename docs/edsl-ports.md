@@ -1,10 +1,11 @@
-# What fourteen ports showed, and what the EDSL changes (proposal, revision 4)
+# What fourteen ports showed, and what the EDSL changes (proposal, revision 5)
 
 Status: accepted for implementation after three review rounds by Codex
 (xhigh): `docs/edsl-reviews/ports-proposal-1.md` (eight required changes),
 `ports-proposal-2.md` (six) and `ports-proposal-3.md` (one); section 11 says
 how each is resolved. Details of later steps are settled in their pull
-requests. This document extends
+requests. Revision 5 corrects section 2 by the reproductions of step 0
+(`doc/ports_findings_test.mbt`): section 13. This document extends
 `docs/edsl-design.md` (revision 8); where the two disagree, that document
 holds until this one is accepted and folded into it.
 
@@ -67,11 +68,11 @@ documents.
 | # | What happens | n |
 |---|---|---|
 | S1 | Two adjacent inline items in a sequence (a `Prose`, a string, a `Text`) are typeset as one paragraph with nothing between them: "…incremental.Two execution modes…" | 3 |
-| S2a | A `Block` with a fixed height that meets a page break is split, and its content runs out below the fragment on the next page | 2 |
+| S2a | A `Block` with a fixed height that meets a page break is split, and when its content nearly fills the height the content runs out below the fragment on the next page | 2 |
 | S2b | A `Block` or `Box` with a fixed height does not grow: content runs out below it (a `Box` is laid out in an unbreakable region, a `Block` may fragment) | 2 + brief |
 | S3 | `Block(height=Pct(100))` in a grid cell takes the height of the region: every card is as high as the page, and an extra page appears (nothing is out of bounds) | 2 |
 | S4 | A character no font covers is drawn as an empty box; `warnings` is empty | 1 |
-| S5 | Inline code in a table cell does not break and runs over the cell border | 2 |
+| S5 | A long word of inline code in a table cell (an identifier, a path) does not break and runs over the cell border; raw text does break at spaces and at U+200B | 2 |
 | S6 | `Prose` turns `'` after a digit into a prime ("#1770′s") | 1 |
 
 ### 2.2 Things the scripts wrote again
@@ -95,14 +96,14 @@ documents.
 | T1 | `Box(baseline=)` (unmapped type) | `Grid(align=Horizon)`, `outset` |
 | T2 | `top_edge`/`bottom_edge` on text and highlight (unmapped) | `extra=[("top-edge", ..)]`, added gaps |
 | T3 | `Stroke(dash=)` is a `Value` | `Value::str("dotted")`, `Value::array(..)` |
-| T4 | No colour operations on `Paint` | 8-digit hex strings (an absolute alpha), a hand-written sRGB mixer |
+| T4 | No typed colour operations on `Paint` (`Value::call("color.mix", ..)` works; nobody found it) | 8-digit hex strings (an absolute alpha), a hand-written sRGB mixer |
 | T5 | No `Layout` (the size of the enclosing region) | page width typed in as a constant |
 | T6 | `Length`, `Sizing`, `Spacing` do not convert (`Rel(len)` exists; nobody found it) | helpers return `Double`, `Pt(px(14))` at 70 to 92 sites |
 | T7 | No `Upper`/`Lower` for content (`Call("upper", ..)` exists; nobody found it) | `s.to_upper()` on strings |
 | T8 | `Sides::none()` given as an inset fails at run time (located) | `Sides(all=Pt(0))` |
 | T9 | `Outline(title=NoneValue())` works; one author wrote `Value::none()` instead | documentation |
-| T10 | `Stroke(paint=None)` inside a table's `Cells` was reported without a source location (seen once, in the slide deck; the lowering path attaches the argument's span, so the cause is not known) | `Stroke::none()` |
-| T11 | `Ctx::measure` returns a size and drops the baseline the engine computes | `0.72 × size` |
+| T10 | Withdrawn. `Stroke(paint=None)` in a table is a located error in every variant tried (about 35, and against 0.1.3 and 0.1.4). The location is the nearest argument that has a site; when the stroke is a helper's parameter that is the helper's line, which is probably what was read as "no location" | `Stroke::none()` |
+| T11 | `Ctx::measure` returns a size and drops the baseline the engine computes. For one line of default text the measured height is the baseline offset (0.66 × size, not the 0.72 the ports assumed); the baseline is needed for content with insets | `0.72 × size` |
 
 ### 2.4 Behaviour that is Typst's, and stays
 
@@ -113,7 +114,9 @@ documents.
   sticky blocks form a group: a heading, a paragraph of controls and a table
   stay together only if the paragraph is sticky too (or shares the heading's
   block), which the port that hit this did not know.
-- `raw` sets its text size to 0.8em, and em sizes set on it compound.
+- `raw` sets its text size to 0.8em: an em size or an absolute size set
+  around a `raw` is scaled by it (`Text(Raw(..), size=Pt(9))` is 7.2pt); only
+  a show-set on `raw` with an absolute size gives that size.
 - A stroke dictionary that names one side leaves the others unspecified, and
   they fold from the outer value: for a table that is its default stroke.
 - Smart quotes follow Typst's rules (S6).
@@ -212,8 +215,8 @@ engine's explicit states, and the untyped escape (`extra=`, `Value`) stays.
   string (T7).
 - `Sides::zero()` (uniform `0pt`) for insets and margins. `Sides::none()`
   as an inset stays a located lowering error (T8).
-- T10: first a reproducer (section 10, step 0); the fix follows from its
-  cause and must keep the more precise locations nested errors have today.
+- T10 is withdrawn (section 2.3); the guide explains where the location of
+  a value's error points and how `#callsite` moves it to a helper's caller.
 
 ## 4. A kit (new package `doc/kit`)
 
@@ -259,7 +262,7 @@ says for each element whether it measures.
 
 | Element | Replaces | Expansion | Measures |
 |---|---|---|---|
-| `Chip(body, fill~, text~, stroke~, radius~, inset~)` | H4 | `Box` with insets, an outset for the vertical padding and a `baseline` shift; a string body gets no-break spaces. A content body can wrap in a narrow column (documented) | no |
+| `Chip(body, fill~, text~, stroke~, radius~, inset~)` | H4 | `Box` with horizontal insets and the vertical padding as an outset, which keeps the text on the line's baseline (a `baseline` shift would move it off; it is only for a box of fixed height); a string body gets no-break spaces. A content body can wrap in a narrow column (documented) | no |
 | `Cards(items, columns~, gutter~, fill~, stroke~, inset~)` | H3, S3 | a `Grid` whose cells carry fill, stroke and inset: the engine makes the cells of a row equally high. Square corners | no |
 | `Cards(.., radius~)` | H3 | with a radius the cells cannot draw the card: rows are measured at the column width from `Layout`, each card is a rounded unbreakable `Block` of the row's height. Measured and final content are the same descriptions with the same keys | yes |
 | `Flow(items, gap~, row_gap~, align~)` | H9 | `Layout` + `measure`, greedy rows, each row a `Grid` aligned on the cross axis; an item wider than the region gets a row of its own; an infinite width gives one row | yes |
@@ -338,7 +341,9 @@ What each can and cannot promise:
 - L2, missing glyphs (S4). From the frames: glyph id 0 in a text item, with
   the origin of that glyph's span (a text item can combine several origins)
   and the text of the cluster (a code-point sequence; for clusters beyond the
-  65,535 range limit, the item's text).
+  65,535 range limit, the item's text). In a world without any font the
+  text is not in the frames at all, so there is nothing to find; the engine's
+  "unknown font family" warning is what remains.
 - L3, content outside the page. From the frames: an item whose bounds leave
   the page by more than 1pt. Its origin is the item's span where it has one;
   decorations and other items with detached spans are reported with the
@@ -476,3 +481,18 @@ package; fonts by `font_paths` fixtures before any embedding decision.
    (`compile_*(.., lints=false)` turns them off).
 3. The engine side channel that fixed-container overflow (S2) needs: wanted?
    (Until answered: not built.)
+
+## 13. Corrections from the reproductions (revision 5)
+
+Step 0 wrote a test for every row of 2.1 and 2.3. All reproduce but one,
+and some are narrower than the ports reported:
+
+- T10 does not exist: the error is located. The coordinator's reading of
+  the slide deck's error was wrong.
+- S2a needs content that nearly fills the fixed height; S5 needs a long
+  word. Both rows are restated.
+- T4 and T7 are gaps of discovery (`Value::call`, `Call`), like T6 and T9.
+  The typed forms of 3.4 stay: four authors did not find the untyped ones.
+- `Chip` does not need `Box(baseline=)`; section 4 is corrected.
+- The baseline estimate the ports used (0.72 × size) was not the engine's
+  (0.66 for the default font), which is one more reason for `Size.baseline`.
