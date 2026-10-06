@@ -529,7 +529,10 @@ fn wasm_minimal_protocol_write_args_to_buffer(
   params : Array[@wasmi.Val],
   _results : Array[@wasmi.Val],
 ) -> Unit raise @wasmi.WasmiError {
-  guard params[0] is I32(ptr)
+  // Upstream's host function is typed (`ptr: u32`, plugin.rs:577) and
+  // `func_wrap` (plugin.rs:292) derives the signature from it, so the
+  // linker only ever calls it with one `i32`.
+  guard! params[0] is I32(ptr)
   let memory = caller_memory(caller)
   let data = caller.data()
   let arguments = data.args
@@ -560,7 +563,10 @@ fn wasm_minimal_protocol_send_result_to_host(
   params : Array[@wasmi.Val],
   _results : Array[@wasmi.Val],
 ) -> Unit raise @wasmi.WasmiError {
-  guard params is [I32(ptr), I32(len)]
+  // Upstream's host function is typed (`ptr: u32, len: u32`,
+  // plugin.rs:598) and `func_wrap` (plugin.rs:285) derives the signature
+  // from it, so the linker only ever calls it with two `i32`s.
+  guard! params is [I32(ptr), I32(len)]
   let ptr = ptr.reinterpret_as_uint()
   let len = len.reinterpret_as_uint()
   let memory = caller_memory(caller)

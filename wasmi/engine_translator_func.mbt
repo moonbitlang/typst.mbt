@@ -348,7 +348,9 @@ fn FuncTranslator::try_merge_copies(
   }
   if fused_copy is Some(fused_copy) {
     let success = self.instrs.try_replace_instr(last_instr, fused_copy)
-    guard success
+    // Upstream: `debug_assert!(success)`; `last_instr` is the encoder's
+    // last instruction, which `try_replace_instr` always replaces.
+    guard! success
     return Some(last_instr)
   }
   None
@@ -825,7 +827,8 @@ fn FuncTranslator::push_instr_with_result(
     consume_fuel_instr,
     fuel_costs,
   )
-  guard expected_iidx == actual_iidx
+  // Upstream: `assert_eq!(expected_iidx, actual_iidx)`.
+  guard! expected_iidx == actual_iidx
 }
 
 ///|

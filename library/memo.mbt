@@ -100,11 +100,11 @@ pub fn[T] with_layout_memo(
   let outer = memo_generation.val
   memo_counter.val += 1
   memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
-  let result = f() catch {
-    e => {
+  let result = {
+    errdefer {
       memo_generation.val = outer
-      raise e
     }
+    f()
   }
   memo_generation.val = outer
   result
@@ -176,11 +176,9 @@ fn[T, I : Eq] memoize(
     }
     engine.sink.extend_from_sink(sink)
   }
-  let output = f(inner) catch {
-    e => {
-      finish()
-      raise e
-    }
+  let output = {
+    errdefer finish()
+    f(inner)
   }
   finish()
   if !cacheable(output) {

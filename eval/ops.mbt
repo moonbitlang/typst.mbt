@@ -6,11 +6,15 @@ fn eval_unary(
   unary : @ast.Unary,
 ) -> @library.Value raise @library.SourceError {
   let expr = unary.expr()
+  // Upstream: `.map_err(|err| overflowing_int_negation_error(self,
+  // expr).err().unwrap_or(err))`.
   let value = eval_expr(vm, expr) catch {
-    err => {
-      overflowing_int_negation_error(unary, expr)
-      raise err
-    }
+    err =>
+      raise try overflowing_int_negation_error(unary, expr) catch {
+        custom => custom
+      } noraise {
+        _ => err
+      }
   }
   @library.at(unary.span(), () => {
     match unary.op() {
@@ -98,11 +102,9 @@ fn apply_assignment(
   let location = access(vm, lhs)
   let old = (location.get)()
   (location.set)(None)
-  let new = @library.at(binary.span(), () => op(old, rhs)) catch {
-    e => {
-      (location.set)(old)
-      raise e
-    }
+  let new = {
+    errdefer (location.set)(old)
+    @library.at(binary.span(), () => op(old, rhs))
   }
   (location.set)(new.shared())
   None

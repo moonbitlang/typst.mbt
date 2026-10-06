@@ -693,7 +693,9 @@ fn CodeMap::init_func_as_compiled(
   func : EngineFunc,
   entity : CompiledFuncEntity,
 ) -> Unit {
-  guard self.funcs[func.0] is Uninit
+  // Upstream: `assert!(matches!(self, Self::Uninit))`
+  // (`FuncEntity::init_compiled`).
+  guard! self.funcs[func.0] is Uninit
   self.funcs[func.0] = Compiled(entity)
 }
 
@@ -707,7 +709,9 @@ fn CodeMap::init_func_as_uncompiled(
   module_ : ModuleHeader,
   func_to_validate : @wasmparser.FuncToValidate?,
 ) -> Unit {
-  guard self.funcs[func.0] is Uninit
+  // Upstream: `assert!(matches!(self, Self::Uninit))`
+  // (`FuncEntity::init_uncompiled`).
+  guard! self.funcs[func.0] is Uninit
   self.funcs[func.0] = Uncompiled({
     func_index: func_idx,
     bytes,
@@ -732,19 +736,28 @@ fn CodeMap::get(
     Compiled(entity) => entity
     Uncompiled(uncompiled) => {
       self.funcs[func.0] = Compiling
-      let compiled = uncompiled.compile(fuel) catch {
-        error => {
-          if error.as_trap_code() is Some(OutOfFuel) {
-            // The function stays uncompiled and can be compiled again.
-            self.funcs[func.0] = Uncompiled(uncompiled)
-          } else {
-            self.funcs[func.0] = FailedToCompile
-          }
+      // Upstream holds the `Result` of the compilation and matches on it
+      // (engine/code_map.rs:374-392).
+      let compiled_func : Result[CompiledFuncEntity, WasmiError] = Ok(
+        uncompiled.compile(fuel),
+      ) catch {
+        error => Err(error)
+      }
+      match compiled_func {
+        Ok(compiled_func) => {
+          self.funcs[func.0] = Compiled(compiled_func)
+          compiled_func
+        }
+        Err(error) if error.as_trap_code() is Some(OutOfFuel) => {
+          // The function stays uncompiled and can be compiled again.
+          self.funcs[func.0] = Uncompiled(uncompiled)
+          raise error
+        }
+        Err(error) => {
+          self.funcs[func.0] = FailedToCompile
           raise error
         }
       }
-      self.funcs[func.0] = Compiled(compiled)
-      compiled
     }
     FailedToCompile =>
       raise WasmiError::from_translation(
