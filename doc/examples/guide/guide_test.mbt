@@ -1,0 +1,801 @@
+// What docs/edsl-guide.md says about its samples (`guide.mbt`), checked on
+// the laid-out pages. The page of each test is 200pt by 120pt with 10pt
+// margins and 10pt text, so the region is 180pt by 100pt; lengths are in
+// points from the page's top left corner.
+
+///|
+/// Something on a page: a rectangle (`"rect"`), a line (`"line"`: `w` and
+/// `h` are its end relative to its start) or a text run (`"text"`: `y` is
+/// its baseline, `w` its advance width, `h` its font size).
+priv struct Mark {
+  page : Int
+  kind : String
+  x : Double
+  y : Double
+  w : Double
+  h : Double
+  /// The text of a run and the family of its font.
+  text : String
+  family : String
+  /// The fill of a shape (`""`: none) and the dash pattern of its stroke
+  /// (`""`: solid, or no stroke).
+  fill : String
+  dash : String
+  /// The span of the first glyph of a run.
+  span : @syntax.Span
+}
+
+///|
+/// The marks of a frame at `(dx, dy)` on the page `page`. (No sample has a
+/// scaled or rotated group: a group is a translation.)
+fn collect_marks(
+  frame : @library.Frame,
+  dx : Double,
+  dy : Double,
+  page : Int,
+  out : Array[Mark],
+) -> Unit {
+  for entry in frame.items() {
+    let x = dx + entry.0.x.to_pt()
+    let y = dy + entry.0.y.to_pt()
+    match entry.1 {
+      Group(group) =>
+        collect_marks(
+          group.frame,
+          x + group.transform.tx.to_pt(),
+          y + group.transform.ty.to_pt(),
+          page,
+          out,
+        )
+      Text(text) =>
+        out.push({
+          page,
+          kind: "text",
+          x,
+          y,
+          w: text.width().to_pt(),
+          h: text.size.to_pt(),
+          text: text.text,
+          family: text.font.font().family(),
+          fill: "",
+          dash: "",
+          span: text.glyphs[0].span,
+        })
+      Shape(shape, span) => {
+        let (kind, w, h) = match shape.geometry {
+          Rect(size) => ("rect", size.x.to_pt(), size.y.to_pt())
+          Line(to) => ("line", to.x.to_pt(), to.y.to_pt())
+          Curve(_) => continue
+        }
+        let fill = match shape.fill {
+          Some(paint) => paint.repr()
+          None => ""
+        }
+        let dash = match shape.stroke {
+          Some({ dash: Some(pattern), .. }) =>
+            pattern.array.map(length => pt(length.to_pt())).join(" ")
+          _ => ""
+        }
+        out.push({
+          page,
+          kind,
+          x,
+          y,
+          w,
+          h,
+          text: "",
+          family: "",
+          fill,
+          dash,
+          span,
+        })
+      }
+      _ => ()
+    }
+  }
+}
+
+///|
+/// A length in points with one decimal.
+fn pt(x : Double) -> String {
+  let tenths = (x * 10.0).round().to_int()
+  let sign = if tenths < 0 { "-" } else { "" }
+  let tenths = tenths.abs()
+  "\{sign}\{tenths / 10}.\{tenths % 10}"
+}
+
+///|
+/// A compiled document and its marks.
+priv struct Pages {
+  report : @doc.CompileReport[@layout.PagedDocument]
+  marks : Array[Mark]
+}
+
+///|
+/// Compile `children` on the small page, with the embedded fonts or in
+/// `world`.
+fn pages(
+  children : Array[&@doc.IntoContent],
+  world? : @doc.DocWorld = @doc.DocWorld::in_memory(),
+) -> Pages {
+  let all : Array[&@doc.IntoContent] = [
+    @doc.SetPage(width=Pt(200), height=Pt(120), margin=@doc.Sides(all=Pt(10))),
+    @doc.SetText(size=Pt(10)),
+  ]
+  all.append(children)
+  let report = @doc.Document(all).compile_paged(world)
+  let marks = []
+  if report.output() is Some(document) {
+    for i, page in document.pages() {
+      collect_marks(page.frame, 0.0, 0.0, i + 1, marks)
+    }
+  }
+  { report, marks, }
+}
+
+///|
+/// The messages of the errors and of the warnings.
+fn Pages::errors(self : Pages) -> String {
+  self.report.errors.map(e => e.message).join(" | ")
+}
+
+///|
+fn Pages::warnings(self : Pages) -> String {
+  self.report.warnings.map(w => w.message).join(" | ")
+}
+
+///|
+/// The marks of one kind.
+fn Pages::of_kind(self : Pages, kind : String) -> Array[Mark] {
+  self.marks.filter(m => m.kind == kind)
+}
+
+///|
+/// One line per mark: the page, the kind, the position, then the size (and
+/// fill, and dash pattern) of a shape, or the advance width and the text
+/// of a run.
+fn Pages::listing(self : Pages) -> String {
+  self.marks
+  .map(m => {
+    if m.kind == "text" {
+      "p\{m.page} text \{pt(m.x)},\{pt(m.y)} w\{pt(m.w)} \{m.text.escape()}"
+    } else {
+      let fill = if m.fill == "" { "" } else { " \{m.fill}" }
+      let dash = if m.dash == "" { "" } else { " dash \{m.dash}" }
+      "p\{m.page} \{m.kind} \{pt(m.x)},\{pt(m.y)} \{pt(m.w)}x\{pt(m.h)}\{fill}\{dash}"
+    }
+  })
+  .join("\n")
+}
+
+///|
+/// The origin of the text run that contains `text`.
+fn Pages::origin(self : Pages, text : String) -> @doc.Origin raise {
+  for mark in self.marks {
+    if mark.kind == "text" && mark.text.contains(text) {
+      guard self.report.origins.resolve(mark.span) is Some(origin) else {
+        fail("no origin for \{text}")
+      }
+      return origin
+    }
+  }
+  fail("no text \{text}")
+}
+
+///|
+/// An origin without its line and column: `file (Constructor, argument n)`.
+fn place(origin : @doc.Origin) -> String {
+  let name = origin.file.split("/").collect().last().unwrap().to_owned()
+  name + origin.describe().replace(old=origin.position(), new="")
+}
+
+///|
+test "the samples compile to PDF without warnings" {
+  let world = @doc.DocWorld::in_memory()
+  for document in [@guide.first_document(), @guide.guide()] {
+    let compiled = document.compile_paged(world)
+    for diagnostic in compiled.errors {
+      println(diagnostic.render())
+    }
+    assert_true(compiled.errors.is_empty())
+    for diagnostic in compiled.warnings {
+      println(diagnostic.render())
+    }
+    assert_true(compiled.warnings.is_empty())
+    assert_true(compiled.pdf().unwrap().length() > 1000)
+  }
+}
+
+///|
+test "section 2: inline items in a sequence are one paragraph, `Par` separates them" {
+  let joined = pages([@guide.run_together()])
+  inspect(joined.errors(), content="")
+  inspect(joined.warnings(), content="")
+  inspect(
+    joined.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w172.0 "The first ends here.The second starts here."
+    ),
+  )
+  inspect(
+    pages([@guide.paragraphs()]).listing(),
+    content=(
+      #|p1 text 10.0,16.6 w78.6 "The first ends here."
+      #|p1 text 10.0,35.2 w94.0 "The second starts here."
+    ),
+  )
+  // A block between two inline items separates them.
+  let apart = pages([@doc.Seq(["One.", @doc.Block("Between."), "Two."])])
+  inspect(
+    apart.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w19.0 "One."
+      #|p1 text 10.0,35.2 w37.5 "Between."
+      #|p1 text 10.0,53.7 w20.0 "Two."
+    ),
+  )
+}
+
+///|
+/// Only the call's location is forwarded.
+#callsite(autofill(loc))
+fn call_only_note(body : &@doc.IntoContent, loc~ : SourceLoc) -> @doc.Block {
+  @doc.Block(body, inset=@doc.Sides(all=Pt(6)), loc~)
+}
+
+///|
+/// The body is wrapped in constructors of the helper.
+#callsite(autofill(loc, args_loc))
+fn titled_note(
+  title : String,
+  body : &@doc.IntoContent,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> @doc.Block {
+  @doc.Block(@doc.Seq([@doc.Strong(title), " ", body]), loc~, args_loc~)
+}
+
+///|
+/// The location is forwarded to more than one constructor.
+#callsite(autofill(loc, args_loc))
+fn shared_note(
+  title : String,
+  body : &@doc.IntoContent,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> @doc.Block {
+  @doc.Block(
+    @doc.Seq([@doc.Strong(title, loc~, args_loc~), " ", body], loc~, args_loc~),
+    loc~,
+    args_loc~,
+  )
+}
+
+///|
+/// The body is the second parameter of the helper and the first of the
+/// constructor.
+#callsite(autofill(loc, args_loc))
+fn labelled_note(
+  label : String,
+  body : &@doc.IntoContent,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> @doc.Block {
+  @doc.Block(body, label~, loc~, args_loc~)
+}
+
+///|
+/// An argument that the helper supplies is wrong.
+#callsite(autofill(loc, args_loc))
+fn broken_note(
+  body : &@doc.IntoContent,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> @doc.Block {
+  @doc.Block(body, inset=@doc.Sides::none(), loc~, args_loc~)
+}
+
+///|
+test "section 3: a helper with `#callsite` gives its element the caller's location" {
+  let notes = pages([@guide.notes()])
+  inspect(notes.errors(), content="")
+  let before = notes.origin("before")
+  let after = notes.origin("after")
+  let plain = notes.origin("in the helper")
+  let kept = notes.origin("at the call")
+  // Both are the body argument of a `Block` in guide.mbt ...
+  inspect(
+    place(plain),
+    content=(
+      #|guide.mbt (Block, argument 1)
+    ),
+  )
+  inspect(
+    place(kept),
+    content=(
+      #|guide.mbt (Block, argument 1)
+    ),
+  )
+  // ... the one of `note` on its line in `notes`, between the two texts,
+  // the one of `plain_note` on a line of the helper, which is above.
+  assert_eq(before.start_line + 1, after.start_line - 2)
+  assert_eq(kept.start_line, before.start_line + 2)
+  assert_true(plain.start_line < before.start_line)
+  // It is the argument of the call, which starts to the right of the
+  // call.
+  assert_true(kept.start_column > before.start_column)
+}
+
+///|
+test "section 3: what the location of a helper covers" {
+  let here = @guide.note("marker")
+  let marker = pages([here]).origin("marker")
+  let this_file = "guide_test.mbt"
+  assert_true(marker.file.has_suffix(this_file))
+  // Argument locations are read by position: the body, the first
+  // parameter of `Block`, gets the location of the helper's first
+  // argument, the three characters `"L"`.
+  let labelled = pages([labelled_note("L", "labelled body")])
+  let origin = labelled.origin("labelled body")
+  inspect(
+    place(origin),
+    content=(
+      #|guide_test.mbt (Block, argument 1)
+    ),
+  )
+  assert_true(origin.start_line > marker.start_line)
+  assert_eq(origin.end_column - origin.start_column, 3)
+  // Only `loc`: the call is the caller's, the arguments are the helper's.
+  let call_only = pages([call_only_note("call only")])
+  let origin = call_only.origin("call only")
+  inspect(
+    place(origin),
+    content=(
+      #|guide_test.mbt (Block, argument 1)
+    ),
+  )
+  assert_true(origin.start_line < marker.start_line)
+  // Constructors that the helper wraps around its parameters are on the
+  // helper's lines; the block itself is the caller's.
+  let titled = pages([titled_note("Title", "wrapped")])
+  inspect(
+    place(titled.origin("Title")),
+    content=(
+      #|guide_test.mbt (Strong, argument 1)
+    ),
+  )
+  inspect(
+    place(titled.origin("wrapped")),
+    content=(
+      #|guide_test.mbt (Seq, argument 1)
+    ),
+  )
+  assert_true(titled.origin("wrapped").start_line < marker.start_line)
+  // A location that is forwarded to several constructors is one origin,
+  // named after the one that is lowered first: the texts of the others
+  // are reported as its arguments.
+  let shared = pages([shared_note("Title", "shared")])
+  inspect(
+    place(shared.origin("Title")),
+    content=(
+      #|guide_test.mbt (Block, argument 1)
+    ),
+  )
+  inspect(
+    place(shared.origin("shared")),
+    content=(
+      #|guide_test.mbt (Block, argument 1)
+    ),
+  )
+  // Document, SetPage, SetText and one origin for the three constructors.
+  assert_eq(shared.report.origins.length(), 4)
+  // An error at an argument that the helper supplies is reported at the
+  // call of the helper.
+  let broken = pages([broken_note("x")])
+  inspect(
+    broken.errors(),
+    content=(
+      #|expected relative length or dictionary, found none
+    ),
+  )
+  guard broken.report.errors[0].location is Some(Edsl(origin)) else {
+    fail("expected an EDSL location")
+  }
+  inspect(
+    place(origin),
+    content=(
+      #|guide_test.mbt (Block)
+    ),
+  )
+  assert_true(origin.start_line > marker.start_line)
+}
+
+///|
+test "section 4: `Rel`, `Call`, `NoneValue()` and `extra`" {
+  // 4.1: the first column is 50% of 180pt less 10pt, and the block is 11pt
+  // and half of the font size (10pt) below the grid.
+  let lengths = pages([@guide.composed_lengths()])
+  inspect(lengths.errors(), content="")
+  inspect(
+    lengths.listing(),
+    content=(
+      #|p1 rect 10.0,10.0 80.0x5.0 luma(78.43%)
+      #|p1 rect 90.0,10.0 100.0x5.0 luma(78.43%)
+      #|p1 rect 10.0,31.0 180.0x5.0 luma(78.43%)
+    ),
+  )
+  // 4.2: `upper` on content keeps its structure (the emphasis).
+  let upper = pages([@guide.upper_case()])
+  inspect(upper.errors(), content="")
+  inspect(
+    upper.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w30.6 "QUIET "
+      #|p1 text 40.6,16.6 w32.2 "WORDS"
+    ),
+  )
+  // 4.3: the outline has its title unless it is `none`.
+  inspect(
+    pages([@doc.Outline()]).listing(),
+    content=(
+      #|p1 text 10.0,19.0 w57.7 "Contents"
+    ),
+  )
+  let untitled = pages([@guide.untitled_outline()])
+  inspect(untitled.errors(), content="")
+  inspect(untitled.listing(), content="")
+  // 4.4: the highlight from the x-height to the baseline, the box 2pt
+  // below the baseline, a dotted line, a half transparent fill.
+  let untyped = pages([@guide.untyped_fields()])
+  inspect(untyped.errors(), content="")
+  inspect(untyped.warnings(), content="")
+  inspect(
+    untyped.listing(),
+    content=(
+      #|p1 rect 10.0,12.3 19.4x4.3 rgb("#fffd11a1")
+      #|p1 text 10.0,16.6 w19.4 "tight"
+      #|p1 text 10.0,35.2 w29.5 "A chip "
+      #|p1 rect 39.5,30.6 52.8x6.6 luma(90.2%)
+      #|p1 text 39.5,37.2 w52.8 "moved down"
+      #|p1 line 10.0,49.2 60.0x0.0 dash 1.0 2.0
+      #|p1 rect 10.0,61.2 20.0x10.0 rgb("#1d758680")
+    ),
+  )
+}
+
+///|
+test "section 5: fonts come from the world" {
+  let text : Array[&@doc.IntoContent] = [@guide.font_families(), "mono"]
+  // The directory of the embedded fonts, read as a directory of the
+  // project.
+  let from_dir = pages(text, world=@guide.fonts_of("typst_assets/fonts/files"))
+  inspect(from_dir.errors(), content="")
+  inspect(from_dir.warnings(), content="")
+  inspect(
+    from_dir.of_kind("text").map(run => run.family).join(","),
+    content=(
+      #|DejaVu Sans Mono
+    ),
+  )
+  // A directory without fonts: each family of the list is reported, and
+  // the page has no text.
+  let empty = pages(text, world=@guide.fonts_of("docs"))
+  inspect(empty.errors(), content="")
+  inspect(
+    empty.warnings(),
+    content=(
+      #|unknown font family: dejavu sans mono | unknown font family: libertinus serif
+    ),
+  )
+  assert_eq(empty.of_kind("text").length(), 0)
+  // A family that the world does not have is reported where it is named,
+  // and the next one of the list is used.
+  let missing = pages([
+    @doc.SetText(font=["No Such Sans", "Libertinus Serif"]),
+    "serif",
+  ])
+  inspect(
+    missing.warnings(),
+    content=(
+      #|unknown font family: no such sans
+    ),
+  )
+  guard missing.report.warnings[0].location is Some(Edsl(origin)) else {
+    fail("expected an EDSL location")
+  }
+  inspect(
+    place(origin),
+    content=(
+      #|guide_test.mbt (SetText, argument 1)
+    ),
+  )
+  inspect(
+    missing.of_kind("text").map(run => run.family).join(","),
+    content=(
+      #|Libertinus Serif
+    ),
+  )
+}
+
+///|
+test "section 6: auto columns take their content's width" {
+  // The region is 180pt wide. The short text is 64.8pt wide and has 10pt
+  // of insets: its column gets that, the other one the rest, where the
+  // long text takes three lines.
+  let auto = pages([@guide.prose_table([Auto, Auto])])
+  inspect(auto.errors(), content="")
+  inspect(
+    auto.of_kind("rect").map(cell => pt(cell.w)).join(" "),
+    content=(
+      #|74.8 105.2
+    ),
+  )
+  inspect(
+    auto.of_kind("text").length(),
+    content=(
+      #|4
+    ),
+  )
+  // Fractions divide the width whatever the content is.
+  let weighted = pages([@guide.prose_table([Fr(1), Fr(2)])])
+  inspect(
+    weighted.of_kind("rect").map(cell => pt(cell.w)).join(" "),
+    content=(
+      #|60.0 120.0
+    ),
+  )
+}
+
+///|
+test "section 6: a sticky block stays with the block after it" {
+  // 40pt are taken; the heading and the line under it fit the rest of the
+  // page, the block after them does not.
+  let next = @doc.Block(
+    "one two three four five six seven eight nine ten eleven twelve",
+    breakable=false,
+    width=Pt(80),
+  )
+  let page_of = (pages : Pages, text : String) => {
+    pages.marks.filter(m => m.text.contains(text))[0].page
+  }
+  // A heading is sticky: it moves with the block after it.
+  let heading = pages([@doc.V(Pt(40)), @doc.Heading("Results"), next])
+  assert_eq(page_of(heading, "Results"), 2)
+  assert_eq(page_of(heading, "one two"), 2)
+  // The paragraph is not: the heading stays with it, and both stay
+  // behind.
+  let loose = pages([@doc.V(Pt(40)), @guide.loose_title(next)])
+  inspect(loose.errors(), content="")
+  assert_eq(page_of(loose, "Results"), 1)
+  assert_eq(page_of(loose, "Sorted"), 1)
+  assert_eq(page_of(loose, "one two"), 2)
+  // As one sticky block they move with the block.
+  let kept = pages([@doc.V(Pt(40)), @guide.kept_title(next)])
+  inspect(kept.errors(), content="")
+  assert_eq(page_of(kept, "Results"), 2)
+  assert_eq(page_of(kept, "Sorted"), 2)
+  assert_eq(page_of(kept, "one two"), 2)
+}
+
+///|
+test "section 6: the size of raw text" {
+  let size = (children : Array[&@doc.IntoContent]) => {
+    let raw = pages(children).marks.filter(m => m.text.contains("code"))[0]
+    pt(raw.h)
+  }
+  // In 10pt text raw text is 8pt.
+  inspect(
+    size([@doc.Raw("code")]),
+    content=(
+      #|8.0
+    ),
+  )
+  // A size that is set around it is multiplied with the 0.8em of `raw`,
+  // also an absolute one.
+  inspect(
+    size([@doc.Text(@doc.Raw("code"), size=Em(0.9))]),
+    content=(
+      #|7.2
+    ),
+  )
+  inspect(
+    size([@doc.Text(@doc.Raw("code"), size=Pt(9))]),
+    content=(
+      #|7.2
+    ),
+  )
+  // A show-set rule on `raw` is applied after that 0.8em: an absolute
+  // size is the size of the raw text, an em size is multiplied with the
+  // 0.8em again.
+  inspect(
+    size([@guide.code_size(), @doc.Raw("code")]),
+    content=(
+      #|9.0
+    ),
+  )
+  inspect(
+    size([
+      @doc.ShowSet(@doc.Select::raw(), @doc.SetText(size=Em(0.9))),
+      @doc.Raw("code"),
+    ]),
+    content=(
+      #|7.2
+    ),
+  )
+}
+
+///|
+test "section 6: the sides of a stroke that are not named" {
+  let cells : Array[&@doc.IntoContent] = ["a", "b", "c", "d"]
+  let rule = @doc.Stroke(thickness=Pt(0.5), paint=Luma(120))
+  let lines = (table : &@doc.IntoContent) => {
+    let mut across = 0
+    let mut down = 0
+    for line in pages([table]).of_kind("line") {
+      if line.h == 0.0 {
+        across += 1
+      } else {
+        down += 1
+      }
+    }
+    "\{across} across, \{down} down"
+  }
+  // Two rows of two cells. Only `bottom`: the other sides are the table's
+  // default stroke, so there is a rule above the first row and there are
+  // three rules down.
+  inspect(
+    lines(
+      @doc.Table(
+        cells,
+        columns=[Auto, Auto],
+        stroke=@doc.Cells::all(@doc.Sides(bottom=rule)),
+      ),
+    ),
+    content=(
+      #|3 across, 3 down
+    ),
+  )
+  // With `rest=Stroke::none()`: the two rules below the rows.
+  inspect(
+    lines(@guide.ruled_table(cells)),
+    content=(
+      #|2 across, 0 down
+    ),
+  )
+  // A grid has no default stroke.
+  inspect(
+    lines(
+      @doc.Grid(
+        cells,
+        columns=[Auto, Auto],
+        stroke=@doc.Cells::all(@doc.Sides(bottom=rule)),
+      ),
+    ),
+    content=(
+      #|2 across, 0 down
+    ),
+  )
+}
+
+///|
+test "section 6: the apostrophe" {
+  let text = (item : &@doc.IntoContent) => {
+    pages([item]).of_kind("text").map(run => run.text).join("|")
+  }
+  inspect(
+    text(@doc.Prose("Issue #1770's fix is in.")),
+    content=(
+      #|Issue #1770′s fix is in.
+    ),
+  )
+  inspect(
+    text(@guide.apostrophes()),
+    content=(
+      #|Issue #1770’s fix is in.|Issue #1770's fix is in.
+    ),
+  )
+}
+
+///|
+test "section 7: the cards of a row are equally high" {
+  let short = "One."
+  let long = "Two, with more text than the first card has, so that it needs three lines."
+  let cards = pages([@guide.cards([short, long])])
+  inspect(cards.errors(), content="")
+  inspect(cards.warnings(), content="")
+  let cells = cards.of_kind("rect")
+  inspect(
+    cells.map(cell => "\{pt(cell.w)}x\{pt(cell.h)}").join(" "),
+    content=(
+      #|86.0x74.9 86.0x74.9
+    ),
+  )
+  assert_eq(cells.length(), 2)
+  assert_eq(pt(cells[0].h), pt(cells[1].h))
+  assert_eq(pt(cells[0].y), pt(cells[1].y))
+  // A `GridCell` among the items is a card that differs.
+  let marked = pages([
+    @guide.cards([@doc.GridCell(short, fill=Luma(200)), long]),
+  ])
+  let cells = marked.of_kind("rect")
+  inspect(
+    cells.map(cell => "\{pt(cell.h)} \{cell.fill}").join(" | "),
+    content=(
+      #|74.9 luma(78.43%) | 74.9 luma(96.08%)
+    ),
+  )
+  // Blocks with a fill in the cells are as high as their own content.
+  let block = (body : String) => {
+    @doc.Block(body, inset=@doc.Sides(all=Pt(8)), fill=Luma(245))
+  }
+  let blocks = pages([
+    @doc.Grid([block(short), block(long)], columns=[Fr(1), Fr(1)], gutter=[
+      Pt(8),
+    ]),
+  ])
+  inspect(
+    blocks.of_kind("rect").map(cell => "\{pt(cell.w)}x\{pt(cell.h)}").join(" "),
+    content=(
+      #|35.0x22.6 82.4x74.9
+    ),
+  )
+}
+
+///|
+test "section 8: a callback cannot be created inside a callback" {
+  let nested = pages([@guide.stripes_in_show()])
+  inspect(
+    nested.errors(),
+    content=(
+      #|callbacks cannot be created inside a callback
+    ),
+  )
+  let error = nested.report.errors[0]
+  // (The text of the guide's section 8.)
+  inspect(
+    error.render(),
+    content=(
+      #|error: callbacks cannot be created inside a callback
+      #|  at doc/examples/guide/guide.mbt:234:14 (Cells)
+      #|  hint: create the callback before compiling and capture it
+      #|  hint: or use the `cx` of the enclosing callback
+      #|  while showing heading element at doc/examples/guide/guide.mbt:237:5 (Heading)
+    ),
+  )
+  inspect(
+    error.hints.map(hint => hint.message).join(" | "),
+    content=(
+      #|create the callback before compiling and capture it | or use the `cx` of the enclosing callback
+    ),
+  )
+  guard error.location is Some(Edsl(origin)) else {
+    fail("expected an EDSL location")
+  }
+  // The error is at the callback that was created too late; the trace
+  // names the callback that created it.
+  inspect(
+    place(origin),
+    content=(
+      #|guide.mbt (Cells)
+    ),
+  )
+  inspect(
+    error.trace.map(point => point.description).join(" | "),
+    content=(
+      #|while showing heading element
+    ),
+  )
+  // Created before compiling and captured, it is the fill of the grid:
+  // the row of index 1 (the second) is filled.
+  let captured = pages([@guide.stripes_captured()])
+  inspect(captured.errors(), content="")
+  inspect(
+    captured.listing(),
+    content=(
+      #|p1 rect 10.0,19.0 45.6x9.0 luma(90.2%)
+      #|p1 text 10.0,19.0 w45.6 "Striped"
+      #|p1 text 10.0,28.1 w35.1 "row 1"
+      #|p1 text 10.0,37.1 w35.1 "row 2"
+    ),
+  )
+}
