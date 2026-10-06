@@ -148,6 +148,15 @@ pub fn Cursor::read_u8(Self) -> Int raise ReadError
 pub fn Cursor::remaining(Self) -> FontData?
 pub fn Cursor::remaining_bytes(Self) -> Int
 
+pub struct DeviceRecord {
+  pixel_size : Int
+  max_width : Int
+  widths : BytesView
+}
+pub fn DeviceRecord::max_width(Self) -> Int
+pub fn DeviceRecord::pixel_size(Self) -> Int
+pub fn DeviceRecord::widths(Self) -> BytesView
+
 pub(all) struct EncodingRecord {
   platform : Int
   encoding : Int
@@ -195,6 +204,7 @@ pub fn FontRef::data(Self) -> FontData
 pub fn FontRef::data_for_tag(Self, String) -> FontData?
 pub fn FontRef::from_index(BytesView, Int) -> Self raise ReadError
 pub fn FontRef::glyf(Self) -> Glyf raise ReadError
+pub fn FontRef::hdmx(Self) -> Hdmx raise ReadError
 pub fn FontRef::head(Self) -> Head raise ReadError
 pub fn FontRef::hhea(Self) -> Hhea raise ReadError
 pub fn FontRef::hmtx(Self) -> Hmtx raise ReadError
@@ -224,6 +234,15 @@ pub fn Glyph::x_max(Self) -> Int
 pub fn Glyph::x_min(Self) -> Int
 pub fn Glyph::y_max(Self) -> Int
 pub fn Glyph::y_min(Self) -> Int
+
+pub struct Hdmx {
+  // private fields
+}
+pub fn Hdmx::num_records(Self) -> Int
+pub fn Hdmx::read(FontData, Int) -> Self raise ReadError
+pub fn Hdmx::record_for_size(Self, Int) -> DeviceRecord?
+pub fn Hdmx::size_device_record(Self) -> UInt
+pub fn Hdmx::version(Self) -> Int
 
 pub struct Head {
   data : FontData

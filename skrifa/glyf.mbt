@@ -16,6 +16,7 @@ const MAX_POINTS : Int = 65535
 pub struct GlyfOutlines {
   font : FontRef
   priv hmtx : @read_fonts.Hmtx
+  priv hdmx : @read_fonts.Hdmx?
   priv loca : @read_fonts.Loca
   priv glyf : @read_fonts.Glyf
   fpgm : BytesView
@@ -47,6 +48,7 @@ pub fn GlyfOutlines::new(font : FontRef) -> GlyfOutlines? {
   let glyf = font.glyf() catch { _ => return None }
   // GlyphHMetrics::new: hmtx is required
   let hmtx = font.hmtx() catch { _ => return None }
+  let hdmx = Some(font.hdmx()) catch { _ => None }
   let (
     glyph_count,
     max_function_defs,
@@ -93,6 +95,7 @@ pub fn GlyfOutlines::new(font : FontRef) -> GlyfOutlines? {
   Some({
     font,
     hmtx,
+    hdmx,
     loca,
     glyf,
     fpgm,
@@ -125,6 +128,44 @@ fn sat_u16(v : Int) -> Int {
 /// default location).
 fn GlyfOutlines::advance_width(self : GlyfOutlines, gid : GlyphId) -> Int {
   self.hmtx.advance(gid).unwrap_or(0)
+}
+
+///|
+/// The advance width of a glyph from the `hdmx` table, if it has a record
+/// for exactly this size.
+fn GlyfOutlines::hdmx_width(
+  self : GlyfOutlines,
+  ppem : Float,
+  glyph_id : GlyphId,
+) -> Int? {
+  guard self.hdmx is Some(hdmx) else { return None }
+  let ppem_u8 = f32_as_u8(ppem)
+  // Make sure our ppem is integral and fits into u8
+  if Float::from_int(ppem_u8) == ppem {
+    // <https://gitlab.freedesktop.org/freetype/freetype/-/blob/57617782464411201ce7bbc93b086c1b4d7d84a5/src/truetype/ttgload.c#L1996>
+    guard hdmx.record_for_size(ppem_u8) is Some(record) else { return None }
+    let widths = record.widths()
+    let index = glyph_id.to_u32()
+    if index < widths.length().reinterpret_as_uint() {
+      Some(widths[index.reinterpret_as_int()].to_int())
+    } else {
+      None
+    }
+  } else {
+    None
+  }
+}
+
+///|
+/// Rust's `f32 as u8`: truncates toward zero and saturates; NaN is 0.
+fn f32_as_u8(x : Float) -> Int {
+  if x.is_nan() || x <= 0.0 {
+    0
+  } else if x >= 255.0 {
+    255
+  } else {
+    x.to_double().to_int()
+  }
 }
 
 ///|
@@ -439,6 +480,24 @@ priv struct ScaledOutline {
   contours : ArrayView[Int]
   phantom_x : FixedArray[Int]
   phantom_y : FixedArray[Int]
+  /// The advance width from the `hdmx` table, if it applies.
+  hdmx_width : Int?
+}
+
+///|
+fn ScaledOutline::adjusted_lsb(self : ScaledOutline) -> F26Dot6 {
+  F26Dot6::from_bits(self.phantom_x[0])
+}
+
+///|
+fn ScaledOutline::adjusted_advance_width(self : ScaledOutline) -> F26Dot6 {
+  // Prefer widths from hdmx, otherwise take difference between first
+  // two phantom points
+  // <https://gitlab.freedesktop.org/freetype/freetype/-/blob/57617782464411201ce7bbc93b086c1b4d7d84a5/src/truetype/ttgload.c#L1996>
+  match self.hdmx_width {
+    Some(hdmx_width) => F26Dot6::from_i32(hdmx_width)
+    None => F26Dot6::from_bits(self.phantom_x[1] - self.phantom_x[0])
+  }
 }
 
 ///|
@@ -448,6 +507,18 @@ fn FreeTypeScaler::scale(
   glyph_id : GlyphId,
 ) -> ScaledOutline raise DrawError {
   self.load(glyph, glyph_id, 0)
+  // Use hdmx if hinting is requested and backward compatibility mode
+  // is not enabled.
+  // <https://gitlab.freedesktop.org/freetype/freetype/-/blob/80a507a6b8e3d2906ad2c8ba69329bd2fb2a85ef/src/truetype/ttgload.c#L2559>
+  let hdmx_width = if self.is_hinted &&
+    (match self.hinter {
+      Some(hinter) => !hinter.backward_compatibility()
+      None => true
+    }) {
+    self.outlines.hdmx_width(self.ppem, glyph_id)
+  } else {
+    None
+  }
   let n = self.point_count
   let xs = self.memory.scaled_x
   let x_shift = self.phantom_x[0]
@@ -463,6 +534,7 @@ fn FreeTypeScaler::scale(
     contours: self.memory.contours[0:self.contour_count],
     phantom_x: self.phantom_x,
     phantom_y: self.phantom_y,
+    hdmx_width,
   }
 }
 
