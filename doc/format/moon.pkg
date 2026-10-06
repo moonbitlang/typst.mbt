@@ -1,0 +1,7 @@
+// Formatting helpers for scripts that build documents: plain MoonBit on
+// core's builtins only. It must not import `doc` or the engine, so that a
+// script (or any other program) can use it without linking them.
+
+import {
+  "moonbitlang/core/string",
+} for "test"

@@ -85,6 +85,12 @@ deriving it.
 
 ### Added
 
+- `doc/format`, a new package without dependencies (it does not import
+  `doc` or the engine): `fixed(x, digits, trim?)` (the exact value of the
+  double rounded half away from zero, JavaScript's `toFixed`), `grouped`
+  and `grouped_int` (thousands separators), `percent`, `compact` (k, M, B),
+  `soft_breaks` (zero-width spaces after `_ / . : -`, for long words in
+  narrow cells) and `ticks` (round axis values).
 - `syntax`: `Debug` for `RootedPath` and `VirtualPath` (the text their
   `Show` already had, upstream's `Debug`).
 - `syntax`: the trait `NodeHasher` (`write_u64`, `write_str`) and
