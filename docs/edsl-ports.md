@@ -1222,9 +1222,13 @@ Block(.., fill=frame_fill, stroke=Sides(all=stroke), radius~, clip=true)
   `radius` and `stroke` keep their names: only the block has a radius, and
   one stroke is passed to both.
 - Without `radius` there is no frame, and `frame_fill` is an error at it
-  (convention 5: an argument is not dropped). The alternative, a frame
-  that either of two parameters chooses, would make a fill draw an
-  outline. A square frame is `radius=Corners(all=Pt(0))`, as before.
+  (convention 5: an argument is not dropped), also when it is `None`.
+  The alternative, a frame that either of two parameters chooses, would
+  make a fill draw an outline. A square frame is
+  `radius=Corners(all=Pt(0))`, as before.
+- Not given, the fill is the block's: none, or what a `SetBlock(fill=..)`
+  of the document sets (convention 1: what a rule does to the primitives,
+  it does to the element). `None` is no fill whatever the rules say.
 - Not built: **the existing `fill` reaching the frame when it is
   uniform.** A `Cells` is opaque (the kit would need an accessor in `doc`
   for "is one value"), the same paint would be drawn in two ways by the
@@ -1248,7 +1252,8 @@ The twin passes `frame-fill` on and rejects it without a radius in the
 element's words (`kit_wbtest.mbt`: eleven rejected inputs for
 `data-table`). The pair `kit-data-table-surface` is a framed table over
 two pages on a tinted page with a header and a marked row of their own
-fill, a square frame, a gradient, and `none`. The `edsl` stage has 51
+fill, a square frame, a gradient, `none`, and two frames under a rule for
+the fill of blocks (the rule's fill, and `none`). The `edsl` stage has 51
 pairs.
 
 `doc/examples/report` is unchanged: its page is white and neither version
