@@ -9,10 +9,10 @@ use comemo::Track;
 use ecow::EcoVec;
 use rustc_hash::FxHashSet;
 use typst::World;
-use typst::diag::{SourceDiagnostic, SourceResult, Warned};
+use typst::diag::{SourceDiagnostic, SourceResult, Tracepoint, Warned};
 use typst::engine::{Route, Sink, Traced};
 use typst::foundations::{Content, Repr};
-use typst_syntax::{DiagSpanKind, FileId};
+use typst_syntax::{DiagSpan, DiagSpanKind, FileId, VirtualRoot};
 
 use crate::collect;
 use crate::world::{TestWorld, parse_features};
@@ -117,6 +117,27 @@ pub fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &Sour
     }
 }
 
+/// The tracepoints of a diagnostic, innermost first, one line each:
+/// `  trace <location> <kind> <name>` with `kind` in `call|show|import|
+/// include` and the name in Rust debug format (`-` for a call of an
+/// unnamed function).
+pub fn write_trace(out: &mut String, world: &TestWorld, main: FileId, diag: &SourceDiagnostic) {
+    for point in &diag.trace {
+        let (kind, name) = match &point.v {
+            Tracepoint::Call(name) => ("call", name.as_ref()),
+            Tracepoint::Show(name) => ("show", Some(name)),
+            Tracepoint::Import(name) => ("import", Some(name)),
+            Tracepoint::Include(name) => ("include", Some(name)),
+        };
+        let name = match name {
+            Some(name) => format!("{:?}", name.as_str()),
+            None => "-".into(),
+        };
+        let span = DiagSpan::from(point.span);
+        writeln!(out, "  trace {} {kind} {name}", locate(world, main, span.get())).unwrap();
+    }
+}
+
 /// Internal errors name the Rust source location they occurred at; since the
 /// oracle builds Typst from `.repos/typst`, that location is an absolute path.
 /// Make it relative to the Typst repository like in upstream's test suite.
@@ -133,6 +154,9 @@ pub fn canonical_internal_error(msg: &str) -> String {
 }
 
 /// Render a diagnostic span as `start..end` (main file) or `path:start..end`.
+/// The path of a file of a real package (the `packages` stage; the
+/// packages of upstream's suite have the namespace `test`) starts with
+/// `@namespace/name:version/`.
 fn locate(world: &TestWorld, main: FileId, kind: DiagSpanKind) -> String {
     let (id, range) = match kind {
         DiagSpanKind::Detached => return "-".into(),
@@ -148,6 +172,13 @@ fn locate(world: &TestWorld, main: FileId, kind: DiagSpanKind) -> String {
     if id == main {
         format!("{}..{}", range.start, range.end)
     } else {
-        format!("{:?}:{}..{}", id.vpath().get_without_slash(), range.start, range.end)
+        let path = id.vpath().get_without_slash();
+        let path = match id.root() {
+            VirtualRoot::Package(spec) if spec.namespace != "test" => {
+                format!("@{}/{}:{}/{path}", spec.namespace, spec.name, spec.version)
+            }
+            _ => path.to_string(),
+        };
+        format!("{:?}:{}..{}", path.as_str(), range.start, range.end)
     }
 }

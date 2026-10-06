@@ -6,7 +6,8 @@
 #
 # Needs Rust (the toolchain of oracle/rust-toolchain.toml), moon (the `usvg`
 # and `resvg` stages format the oracle tests they regenerate) and python3.
-# Fetches the rest: the upstream sources (scripts/upstream.sh), the Unicode
+# Fetches the rest: the upstream sources (scripts/upstream.sh), the pinned
+# Typst packages of the `packages` stage (scripts/packages.sh), the Unicode
 # bidi conformance files of the `break` stage and the pinned wasm-tools of
 # the `wasm-spec` stage (into `.repos/`).
 #
@@ -20,6 +21,8 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 UPSTREAM_SHALLOW=${UPSTREAM_SHALLOW:-1} scripts/upstream.sh
+# The pinned packages of the `packages` stage.
+scripts/packages.sh
 
 # The Unicode bidi conformance files (the version of `bidi/`).
 UNICODE_VERSION=16.0.0

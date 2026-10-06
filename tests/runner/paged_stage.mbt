@@ -75,12 +75,18 @@ fn paged_report(rel : String, tc : TestCase) -> String {
 /// A span as `null` (detached) or `[path,start,end]` (`null`s if the range
 /// cannot be resolved).
 fn encode_span(world : TestWorld, span : @syntax.Span) -> String {
+  encode_world_span(world as &@library.World, span)
+}
+
+///|
+/// [encode_span] in any world.
+fn encode_world_span(world : &@library.World, span : @syntax.Span) -> String {
   let diag = @syntax.DiagSpan::from_span(span)
   match diag.get() {
     Detached => "null"
     Number(id~, num~, sub_range~) => {
       let path = json_str(file_path(id))
-      let range = try (world as &@library.World).source(id) catch {
+      let range = try world.source(id) catch {
         _ => None
       } noraise {
         source => source.range(num, sub_range)

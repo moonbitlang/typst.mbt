@@ -10,6 +10,7 @@ import {
   "moonbitlang/typst/html",
   "moonbitlang/typst/bundle",
   "moonbitlang/typst/layout",
+  "moonbitlang/typst/kit",
   "moonbitlang/typst/svg",
   "moonbitlang/typst/render",
   "moonbitlang/typst/skia",

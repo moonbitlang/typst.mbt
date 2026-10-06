@@ -33,6 +33,9 @@ document title of the HTML export (the plain text of the title's content).
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
+- `packages`: reductions of what the `packages` stage found (documents that
+  use real packages, tests/packages): each case is the engine behaviour a
+  package relied on, without the package.
 
 Usage: python3 scripts/gen_typst_oracle.py <path to upstream typst binary>
        (then `moon fmt`)
@@ -527,6 +530,39 @@ y
 #metadata(repr((text(red)[a].func(), text(red)[a].has("body"), text(red)[a].has("child"))))
 """,
     ),
+    (
+        "packages: a float without an alignment keeps the vertical alignment of its content",
+        "metadata",
+        r"""// charged-ieee: a table in `figure(placement: auto)`. The body of a float
+// is laid out with `Alignment::CENTER` if its alignment is `auto`
+// (`PlacedChild::layout`), which is horizontal only: boxes and cells keep
+// the inherited vertical alignment.
+#set page(width: 200pt, height: 200pt, margin: 20pt)
+#let at(label) = context metadata(repr(locate(label).position()))
+#let mark(name) = box(width: 6pt, height: 6pt)[#metadata(name)#label(name)]
+#place(auto, float: true, box(width: 60pt, height: 40pt, mark("a")))
+#place(top, float: true, box(width: 60pt, height: 40pt, mark("b")))
+#place(auto, float: true, grid(columns: 2, mark("c"), box(width: 6pt, height: 30pt)))
+#[
+  #set align(bottom)
+  #place(auto, float: true, box(width: 60pt, height: 40pt, mark("d")))
+  #place(auto, float: true, table(columns: 2, mark("e"), box(width: 6pt, height: 30pt)))
+]
+#at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)
+""",
+    ),
+    (
+        "packages: the text of the predefined math operators",
+        "metadata",
+        r"""// mitex: `\limsup` is `math.limsup`, whose text has a thin space (U+2009),
+// like `math.liminf` (`ops!` in typst-library/src/math/op.rs).
+#let ops = dictionary(math).pairs().filter(((_, v)) => type(v) == content and v.func() == math.op)
+#metadata(repr(ops.len()))
+#for (name, v) in ops {
+  metadata(repr((name, v.text.text.codepoints().map(str.to-unicode), v.limits)))
+}
+""",
+    ),
 ]
 
 
@@ -587,7 +623,8 @@ def main():
         "//\n"
         "// What upstream reports for documents that are not in its test suite:\n"
         "// raw text built by markup (lines), by the `raw` function (a string)\n"
-        "// and by `eval`; the keys of located elements in measurement. The\n"
+        "// and by `eval`; the keys of located elements in measurement; the\n"
+        "// reductions of what the `packages` stage found (tests/packages). The\n"
         "// helpers are in `oracle_helpers_wbtest.mbt`.\n"
     ]
     for name, kind, source in CASES:

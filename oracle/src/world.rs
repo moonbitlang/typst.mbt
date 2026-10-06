@@ -8,12 +8,14 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use comemo::Tracked;
 use parking_lot::Mutex;
 use rustc_hash::FxHashMap;
-use typst::diag::{FileError, FileResult, SourceResult, StrResult, bail};
+use typst::diag::{
+    FileError, FileResult, PackageError, SourceResult, StrResult, bail,
+};
 use typst::engine::Engine;
 use typst::foundations::{
     Array, Bytes, Content, Context, Datetime, Deprecation, Duration, IntoValue, Module,
@@ -46,6 +48,18 @@ impl TestWorld {
     pub fn new(source: Source, features: Option<Features>) -> Self {
         let base = singleton!(TestBase, TestBase::default());
         let library = base.lib.with_features(features);
+        Self { main: source, library, base }
+    }
+
+    /// The world of the `packages` stage (see `packages.rs`): the library
+    /// and the fonts of `typst compile --ignore-system-fonts` (no inputs,
+    /// no features, the embedded fonts), the project rooted at `root` and
+    /// packages read from `<packages>/<namespace>/<name>/<version>`. The
+    /// first call fixes both directories for the process.
+    pub fn packages(source: Source, root: &Path, packages: &Path) -> Self {
+        static BASE: OnceLock<TestBase> = OnceLock::new();
+        let base = BASE.get_or_init(|| TestBase::packages(root, packages));
+        let library = Arc::clone(&base.lib.base);
         Self { main: source, library, base }
     }
 
@@ -114,7 +128,37 @@ impl Default for TestBase {
             lib: Libraries::new(library()),
             book: LazyHash::new(FontBook::from_fonts(&fonts)),
             fonts,
-            files: FileStore::new(TestFiles),
+            files: FileStore::new(TestFiles::Suite),
+        }
+    }
+}
+
+impl TestBase {
+    /// The base of [`TestWorld::packages`].
+    fn packages(root: &Path, packages: &Path) -> Self {
+        // Like `typst-cli` with `--ignore-system-fonts`: the embedded fonts
+        // only.
+        let fonts: Vec<_> = typst_assets::fonts()
+            .flat_map(|data| Font::iter(Bytes::new(data)))
+            .collect();
+        // The library of `typst-cli` without inputs and features.
+        let lib = Library::builder([
+            typst_html::FORMAT,
+            typst_pdf::FORMAT,
+            typst_svg::FORMAT,
+            typst_render::FORMAT,
+            typst_bundle::FORMAT,
+        ])
+        .build();
+
+        Self {
+            lib: Libraries::new(lib),
+            book: LazyHash::new(FontBook::from_fonts(&fonts)),
+            fonts,
+            files: FileStore::new(TestFiles::Packages {
+                root: root.to_path_buf(),
+                packages: packages.to_path_buf(),
+            }),
         }
     }
 }
@@ -159,15 +203,37 @@ pub fn parse_features(params: &str) -> Features {
         .collect()
 }
 
-pub struct TestFiles;
+pub enum TestFiles {
+    /// The files of upstream's test world.
+    Suite,
+    /// The files of the `packages` stage: a project directory and a
+    /// directory of unpacked packages
+    /// (`<packages>/<namespace>/<name>/<version>`).
+    Packages { root: PathBuf, packages: PathBuf },
+}
 
 impl TestFiles {
     pub fn resolve(&self, id: FileId) -> FileResult<PathBuf> {
-        let root = match id.root() {
-            VirtualRoot::Project => PathBuf::new(),
-            VirtualRoot::Package(spec) => {
+        let root = match (self, id.root()) {
+            (Self::Suite, VirtualRoot::Project) => PathBuf::new(),
+            (Self::Suite, VirtualRoot::Package(spec)) => {
                 assert_eq!(spec.namespace, "test");
                 format!("tests/packages/{}-{}", spec.name, spec.version).into()
+            }
+            (Self::Packages { root, .. }, VirtualRoot::Project) => root.clone(),
+            (Self::Packages { packages, .. }, VirtualRoot::Package(spec)) => {
+                let dir = packages
+                    .join(spec.namespace.as_str())
+                    .join(spec.name.as_str())
+                    .join(spec.version.to_string());
+                // Like `typst-kit`'s package storage: a package that is not
+                // there is a package error, not a missing file.
+                if !dir.is_dir() {
+                    return Err(FileError::Package(PackageError::NotFound(
+                        spec.clone(),
+                    )));
+                }
+                dir
             }
         };
         id.vpath().realize(&root).map_err(Into::into)
@@ -198,7 +264,9 @@ impl FileLoader for TestFiles {
     fn load(&self, id: FileId) -> FileResult<Bytes> {
         let path = self.resolve(id)?;
 
-        if let Ok(suffix) = path.strip_prefix("assets/") {
+        if matches!(self, Self::Suite)
+            && let Ok(suffix) = path.strip_prefix("assets/")
+        {
             return typst_dev_assets::get(&suffix.to_string_lossy())
                 .map(Bytes::new)
                 .ok_or_else(|| FileError::NotFound(path));

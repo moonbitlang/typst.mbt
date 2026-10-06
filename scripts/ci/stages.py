@@ -124,6 +124,7 @@ def run_stage(runner, stage, expect, out_dir):
     seen = {}
     identical = {}
     fail_lines = []
+    labels = {label for label, _, _, _ in expect}
     for line in lines:
         if line.startswith("FAIL "):
             fail_lines.append(line)
@@ -131,12 +132,15 @@ def run_stage(runner, stage, expect, out_dir):
         m = SUMMARY_RE.match(line)
         if m:
             seen.setdefault(m["label"], []).append(m)
-        elif line.startswith(stage + ": "):
+            continue
+        # Notes of the stage, or of one of its labels (`packages svg: ...`).
+        m = IDENTICAL_RE.match(line)
+        if m and m["label"] in labels:
+            identical[m["label"]] = int(m["n"])
+        if line.startswith(stage + ": "):
             res.notes.append(line[len(stage) + 2 :])
-            m = IDENTICAL_RE.match(line)
-            if m:
-                identical[m["label"]] = int(m["n"])
-    labels = {label for label, _, _, _ in expect}
+        elif m and m["label"] in labels:
+            res.notes.append(line[len(stage) + 1 :])
     for label in seen:
         if label not in labels:
             res.problems.append(f"unexpected summary line `{label}: ...`")
