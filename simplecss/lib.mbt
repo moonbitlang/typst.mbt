@@ -64,6 +64,9 @@ pub impl Show for CssError with fn output(self, logger) {
 }
 
 ///|
+pub extend CssError with Show::{to_string, output}
+
+///|
 /// A position in text.
 ///
 /// Position indicates a row/line and a column in the original text. Starting

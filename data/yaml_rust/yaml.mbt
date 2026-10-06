@@ -398,6 +398,9 @@ pub impl Show for Yaml with fn output(self, logger) {
 }
 
 ///|
+pub extend Yaml with Show::{to_string, output}
+
+///|
 fn Yaml::variant_index(self : Yaml) -> Int {
   match self {
     Real(_) => 0

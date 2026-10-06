@@ -256,6 +256,7 @@ pub(all) enum AlignmentBaseline {
   Hanging
   Mathematical
 } derive(Eq)
+pub fn AlignmentBaseline::default() -> Self
 pub impl Default for AlignmentBaseline
 
 pub struct Attribute {
@@ -294,6 +295,9 @@ pub(all) enum BlendMode {
   Color
   Luminosity
 } derive(Eq)
+pub fn BlendMode::default() -> Self
+pub fn BlendMode::output(Self, &Logger) -> Unit
+pub fn BlendMode::to_string(Self) -> String
 pub impl Default for BlendMode
 pub impl Show for BlendMode
 pub impl FromValue for BlendMode
@@ -326,6 +330,7 @@ pub(all) enum ColorInterpolation {
   SRGB
   LinearRGB
 } derive(Eq)
+pub fn ColorInterpolation::default() -> Self
 pub impl Default for ColorInterpolation
 
 pub(all) enum ColorMatrixKind {
@@ -334,6 +339,7 @@ pub(all) enum ColorMatrixKind {
   HueRotate(Float)
   LuminanceToAlpha
 }
+pub fn ColorMatrixKind::default() -> Self
 pub impl Default for ColorMatrixKind
 
 pub(all) enum CompositeOperator {
@@ -388,6 +394,7 @@ pub(all) enum DominantBaseline {
   TextAfterEdge
   TextBeforeEdge
 } derive(Eq)
+pub fn DominantBaseline::default() -> Self
 pub impl Default for DominantBaseline
 
 pub(all) enum EId {
@@ -588,6 +595,7 @@ pub(all) struct FeTurbulence {
 pub struct Fill {
   // private fields
 }
+pub fn Fill::default() -> Self
 pub fn Fill::opacity(Self) -> NormalizedF32
 pub fn Fill::paint(Self) -> Paint
 pub fn Fill::rule(Self) -> FillRule
@@ -597,6 +605,7 @@ pub(all) enum FillRule {
   NonZero
   EvenOdd
 } derive(Eq)
+pub fn FillRule::default() -> Self
 pub impl Default for FillRule
 
 pub struct Filter {
@@ -679,6 +688,7 @@ pub(all) struct FontResolver {
   select_font : (Font, FontDatabase) -> Int?
   select_fallback : (Char, Array[Int], FontDatabase) -> Int?
 }
+pub fn FontResolver::default() -> Self
 pub fn FontResolver::default_fallback_selector() -> (Char, Array[Int], FontDatabase) -> Int?
 pub fn FontResolver::default_font_selector() -> (Font, FontDatabase) -> Int?
 pub impl Default for FontResolver
@@ -702,6 +712,7 @@ pub(all) enum FontStyle {
   Italic
   Oblique
 } derive(Eq, Hash)
+pub fn FontStyle::default() -> Self
 pub impl Default for FontStyle
 
 pub(all) struct FontVariation {
@@ -751,6 +762,7 @@ pub(all) struct ImageHrefResolver {
   resolve_data : (String, Bytes, Options) -> ImageKind?
   resolve_string : (String, Options) -> ImageKind?
 }
+pub fn ImageHrefResolver::default() -> Self
 pub fn ImageHrefResolver::default_data_resolver() -> (String, Bytes, Options) -> ImageKind?
 pub fn ImageHrefResolver::default_string_resolver() -> (String, Options) -> ImageKind?
 pub impl Default for ImageHrefResolver
@@ -771,6 +783,7 @@ pub(all) enum ImageRendering {
   CrispEdges
   Pixelated
 } derive(Eq)
+pub fn ImageRendering::default() -> Self
 pub impl Default for ImageRendering
 pub impl FromValue for ImageRendering
 
@@ -793,6 +806,7 @@ pub(all) enum LengthAdjust {
   Spacing
   SpacingAndGlyphs
 } derive(Eq)
+pub fn LengthAdjust::default() -> Self
 pub impl Default for LengthAdjust
 
 pub(all) enum LightSource {
@@ -806,6 +820,7 @@ pub(all) enum LineCap {
   Round
   Square
 } derive(Eq)
+pub fn LineCap::default() -> Self
 pub impl Default for LineCap
 
 pub(all) enum LineJoin {
@@ -814,6 +829,7 @@ pub(all) enum LineJoin {
   Round
   Bevel
 } derive(Eq)
+pub fn LineJoin::default() -> Self
 pub impl Default for LineJoin
 
 pub struct LinearGradient {
@@ -900,6 +916,7 @@ pub(all) struct Options {
   fontdb : FontDatabase
   style_sheet : String?
 }
+pub fn Options::default() -> Self
 pub impl Default for Options
 
 pub(all) enum Paint {
@@ -914,6 +931,7 @@ pub(all) enum PaintOrder {
   FillAndStroke
   StrokeAndFill
 } derive(Eq)
+pub fn PaintOrder::default() -> Self
 pub impl Default for PaintOrder
 
 pub struct Path {
@@ -992,6 +1010,7 @@ pub(all) enum ShapeRendering {
   CrispEdges
   GeometricPrecision
 } derive(Eq)
+pub fn ShapeRendering::default() -> Self
 pub fn ShapeRendering::use_shape_antialiasing(Self) -> Bool
 pub impl Default for ShapeRendering
 pub impl FromValue for ShapeRendering
@@ -1012,6 +1031,7 @@ pub(all) enum SpreadMethod {
   Reflect
   Repeat
 } derive(Eq)
+pub fn SpreadMethod::default() -> Self
 pub impl Default for SpreadMethod
 pub impl FromValue for SpreadMethod
 
@@ -1036,6 +1056,7 @@ pub fn Stroke::to_tiny_skia(Self) -> @tiny_skia_path.Stroke
 pub fn Stroke::width(Self) -> NonZeroPositiveF32
 
 pub struct StrokeMiterlimit(Float)
+pub fn StrokeMiterlimit::default() -> Self
 pub fn StrokeMiterlimit::get(Self) -> Float
 pub fn StrokeMiterlimit::new(Float) -> Self
 pub impl Default for StrokeMiterlimit
@@ -1092,6 +1113,7 @@ pub(all) enum TextAnchor {
   Middle
   End
 } derive(Eq)
+pub fn TextAnchor::default() -> Self
 pub impl Default for TextAnchor
 
 pub struct TextChunk {
@@ -1134,6 +1156,7 @@ pub(all) enum TextRendering {
   OptimizeLegibility
   GeometricPrecision
 } derive(Eq)
+pub fn TextRendering::default() -> Self
 pub impl Default for TextRendering
 pub impl FromValue for TextRendering
 
@@ -1205,6 +1228,7 @@ pub(all) enum Visibility {
   Hidden
   Collapse
 } derive(Eq)
+pub fn Visibility::default() -> Self
 pub impl Default for Visibility
 pub impl FromValue for Visibility
 
@@ -1217,6 +1241,7 @@ pub(all) struct WriteOptions {
   indent : @xmlwriter.Indent
   attributes_indent : @xmlwriter.Indent
 }
+pub fn WriteOptions::default() -> Self
 pub impl Default for WriteOptions
 
 pub(all) enum WritingMode {

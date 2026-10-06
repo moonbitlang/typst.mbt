@@ -20,6 +20,8 @@ pub(all) suberror CssError {
   InvalidAttributeSelector
   InvalidLanguagePseudoClass
 } derive(Eq, @debug.Debug)
+pub fn CssError::output(Self, &Logger) -> Unit
+pub fn CssError::to_string(Self) -> String
 pub impl Show for CssError
 
 // Types and methods

@@ -243,6 +243,9 @@ pub impl Show for ElemChildren with fn output(self, logger) {
 }
 
 ///|
+pub extend ElemChildren with Show::{to_string, output}
+
+///|
 /// The plain text of the children.
 pub fn ElemChildren::to_plain(self : ElemChildren) -> String {
   fmt_to_string(b => self.write_buf(b, Plain))
@@ -391,6 +394,9 @@ pub impl Default for Formatting with fn default() {
     vertical_align: None_,
   }
 }
+
+///|
+pub extend Formatting with Default::{default}
 
 ///|
 pub fn Formatting::add_text(self : Formatting, text : String) -> Formatted {
