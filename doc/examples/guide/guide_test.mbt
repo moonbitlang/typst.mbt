@@ -877,16 +877,52 @@ test "section 7: the cards of a row are equally high" {
   assert_eq(cells.length(), 2)
   assert_eq(pt(cells[0].h), pt(cells[1].h))
   assert_eq(pt(cells[0].y), pt(cells[1].y))
-  // A `GridCell` among the items is a card that differs.
-  let marked = pages([
-    @guide.cards([@doc.GridCell(short, fill=Luma(200)), long]),
-  ])
-  let cells = marked.of_kind("rect")
-  inspect(
-    cells.map(cell => "\{pt(cell.h)} \{cell.fill}").join(" | "),
-    content=(
-      #|74.9 luma(78.43%) | 74.9 luma(96.08%)
+  // Three to a row, the last row open: five cards. With a radius the text
+  // of the cards is where it is without one (their boxes are compared in
+  // `doc/kit/cards_test.mbt`).
+  let five : Array[&@doc.IntoContent] = [
+    short, "Two, with more.", short, short, "Five, with more.",
+  ]
+  let rounded = pages([@guide.rounded_cards(five)])
+  inspect(rounded.errors(), content="")
+  inspect(rounded.warnings(), content="")
+  let square = pages([
+    @kit.Cards(
+      five,
+      columns=@doc.Sizing::repeat(3, size=Fr(1)),
+      gutter=[Pt(8)],
+      inset=@doc.Sides(all=Pt(8)),
+      fill=Luma(245),
     ),
+  ])
+  assert_eq(square.of_kind("rect").length(), 5)
+  let texts = (pages : Pages) => {
+    pages
+    .of_kind("text")
+    .map(run => "\{run.page} \{pt(run.x)} \{pt(run.y)} \{run.text}")
+    .join("\n")
+  }
+  assert_eq(texts(rounded), texts(square))
+  // A click on a card leads to the call, a selection in it to the string.
+  let origin = cards.origin("One.")
+  assert_eq(origin.kind, "Cards")
+  assert_eq(origin.param, Some(0))
+  // With a radius it cannot be built inside a callback, and a column
+  // cannot be `Auto`; without one both are fine.
+  let late = (radius : @doc.Corners[@doc.Length]?) => {
+    pages([@doc.Layout((_, _) => @kit.Cards([short, long], radius?))]).errors()
+  }
+  inspect(late(None), content="")
+  inspect(
+    late(Some(@doc.Corners(all=Pt(4)))),
+    content="callbacks cannot be created inside a callback",
+  )
+  let auto = (radius : @doc.Corners[@doc.Length]?) => {
+    pages([@kit.Cards([short, long], columns=[Auto, Fr(1)], radius?)]).errors()
+  }
+  inspect(auto(None), content="")
+  assert_true(
+    auto(Some(@doc.Corners(all=Pt(4)))).contains("cannot have an `Auto` column"),
   )
   // Blocks with a fill in the cells are as high as their own content.
   let block = (body : String) => {

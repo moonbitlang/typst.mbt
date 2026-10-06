@@ -1,0 +1,25 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/kit"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/doc",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Cards {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Cards::Cards(Array[&@doc.IntoContent], columns? : Array[@doc.Sizing], gutter? : Array[@doc.Sizing], column_gutter? : Array[@doc.Sizing], row_gutter? : Array[@doc.Sizing], fill? : @doc.Paint, stroke? : @doc.Sides[@doc.Stroke], inset? : @doc.Sides[@doc.Length], radius? : @doc.Corners[@doc.Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl Show for Cards
+pub impl @debug.Debug for Cards
+pub impl @doc.IntoContent for Cards
+
+// Type aliases
+
+// Traits

@@ -136,7 +136,7 @@ fn Registry::entry(
   let ArgsLoc(arg_locs) = site.args
   self.entry_of(
     site.loc.to_string(),
-    site.kind,
+    site.origin_kind(),
     arg_locs.map(arg => arg.map(arg => arg.to_string())),
     keys,
   )

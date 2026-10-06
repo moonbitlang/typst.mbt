@@ -18,12 +18,14 @@ what, and the few statements that no test can check.
 ## 1. The prelude
 
 A package that writes documents imports `doc` (and `doc/system` for files,
-fonts and the date) in its `moon.pkg`:
+fonts and the date, `doc/kit` for the elements of section 7) in its
+`moon.pkg`:
 
 ```pkg
 import {
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
+  "moonbitlang/typst/doc/kit",
 }
 ```
 
@@ -675,25 +677,62 @@ else, and neither is reported:
   document: the page between its margins), not of the row: every card
   becomes that high, over a page break.
 
-The cells of a grid row are equally high. So the grid draws the cards: the
-fill, the stroke and the inset are the cells', and the items are plain
-content (`cards`):
+`Cards` of the kit does it. The kit is a package of its own
+(`moonbitlang/typst/doc/kit`, section 1), with elements that are made of
+the ones of `doc`:
 
 ```moonbit
-pub fn cards(items : Array[&IntoContent], columns? : Int = 2) -> Grid {
-  Grid(
+using @kit {type Cards}
+```
+
+The items are the bodies of the cards; the fill, the stroke and the inset
+are those of every card (`cards`):
+
+```moonbit
+pub fn cards(items : Array[&IntoContent]) -> Cards {
+  Cards(
     items,
-    columns=Sizing::repeat(columns, size=Fr(1)),
     gutter=[Pt(8)],
-    inset=Cells::all(Sides(all=Pt(8))),
-    fill=Cells::all(Luma(245)),
-    stroke=Cells::all(Sides(all=Stroke(paint=Luma(200), thickness=Pt(0.5)))),
+    inset=Sides(all=Pt(8)),
+    fill=Luma(245),
+    stroke=Sides(all=Stroke(paint=Luma(200), thickness=Pt(0.5))),
   )
 }
 ```
 
-A card that differs from the others is a `GridCell(body, fill=.., ..)`
-among the items. The corners are square: a cell has no radius.
+Underneath, the cards are the cells of a grid, and the engine makes the
+cells of a row equally high: the look is the cells'.
+
+- The parameters are the grid's and the cell's, with their names and
+  types. Without `columns` there is one row of equally wide cards;
+  `columns=Sizing::repeat(3, size=Fr(1))` is three to a row, and a last
+  row with fewer cards is left open.
+- A cell has no radius. With `radius` the cards are rounded blocks, and
+  every row is measured first to give its blocks one height
+  (`rounded_cards`):
+
+```moonbit
+pub fn rounded_cards(items : Array[&IntoContent]) -> Cards {
+  Cards(
+    items,
+    columns=Sizing::repeat(3, size=Fr(1)),
+    gutter=[Pt(8)],
+    inset=Sides(all=Pt(8)),
+    fill=Luma(245),
+    radius=Corners(all=Pt(4)),
+  )
+}
+```
+
+- The cards are the same boxes in both forms. They differ at the end of a
+  page: the grid breaks a row of cells like any row, and a rounded card is
+  not split (its row moves to the next page).
+- Measuring needs a callback, so `Cards` with a `radius` cannot be built
+  inside a callback (section 8), and its columns cannot be `Auto`.
+  Without a `radius` there is neither limit.
+- On the page it is one call: a click on a card leads to the `Cards(..)`
+  call, a selection in a card to the string or the description that you
+  passed as its item.
 
 ## 8. Callbacks cannot be created inside a callback
 
@@ -728,7 +767,9 @@ error: callbacks cannot be created inside a callback
 The location is the callback that came too late. It bites where it is not
 visible: a helper that builds a striped table (a `Cells` function) or
 measures (`Context`, `Layout`) works at the top level and fails when it is called
-from a show rule or from a `Context` callback. The ways out:
+from a show rule or from a `Context` callback. An element of the kit that
+measures is such a helper, and its documentation says so (`Cards` with a
+`radius`). The ways out:
 
 - create the callback once, outside, and capture it (`stripes_captured`):
 
@@ -780,7 +821,7 @@ of another callback; it is its creation that has to come first.
 | 5: `font_paths`, an unknown family, a world without fonts | G "section 5: fonts come from the world" |
 | 5: a character without a glyph is not reported | F "S4: .." |
 | 6.1 to 6.5 | G the five "section 6: .." tests, F "S5: ..", "S6: ..", "T10: .." |
-| 7: cells are equally high, blocks are not; fixed and relative heights | G "section 7: ..", F "S2a: ..", "S2b: ..", "S3: .." |
+| 7: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
 | 8: the error, its hints and location, and the captured callback | G "section 8: .." |
 
 Not checked by a test of this repository:

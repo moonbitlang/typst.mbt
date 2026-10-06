@@ -188,6 +188,20 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   cannot be built outside `doc` (it has a private field), and the new
   parameter is optional. `LintKind` will get more cases: match it with a
   wildcard.
+- `doc`: `Composite(name, loc, args_loc, build)` with `CompositeSite`
+  (`arg`, `invalid`): the hook for elements that a package outside `doc`
+  defines by an expansion into its constructors, with the provenance of
+  one constructor call. The constructors that run in `build` (and in the
+  callbacks that it creates) are the call of the composite;
+  `site.arg(i, v)` marks an argument of a constructor as the caller's
+  argument `i`; `site.invalid(message, arg?)` is an error at an argument or
+  at the call.
+- `doc/kit`, a new package on `doc` only: elements that are not one Typst
+  element. Its first is `Cards(items, columns?, gutter?, column_gutter?,
+  row_gutter?, fill?, stroke?, inset?, radius?)`: cards in rows, the cards
+  of a row equally high. Without `radius` they are the cells of a grid;
+  with it, rounded unbreakable blocks whose rows are measured first (a
+  callback, so it is built outside of callbacks).
 
 ### Not a change for users
 

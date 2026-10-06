@@ -109,12 +109,13 @@ fn Content::kind(self : Content) -> String {
     NShowRule(show) => show.origin.kind
     NLabelled(_, _, site, _) => site.kind
     NKeyed(_, body) => body.kind()
+    NComposite(_, site) => site.kind
     NContext(_, site) => site.kind
     NEval(node) => node.origin.kind
     NSpace(_) => "Space"
     NEngine(_) => "a view"
     NValue(_) => "a value"
-    NInvalid(_, site) => site.kind
+    NInvalid(_, site, _) => site.kind
   }
 }
 
@@ -183,7 +184,7 @@ pub fn Prose::Prose(
   let site = Site::new("Prose", loc, args_loc)
   {
     content: match prose_pieces(text, quotes, "Prose") {
-      Err(message) => Content::of(NInvalid(message, site))
+      Err(message) => Content::of(NInvalid(message, site, -1))
       Ok(children) => Content::of(NSeq(children, site))
     },
   }
@@ -264,8 +265,8 @@ fn prose_pieces(
           match prose_table.get(id) {
             Some(content) => {
               prose_table.remove(id)
-              match content.node {
-                NSetRule(_) | NShowRule(_) =>
+              match rule_of(content) {
+                Some(_) =>
                   problem = Some(
                     "`\{content.kind()}` is a rule and cannot be interpolated into prose",
                   )
