@@ -26,6 +26,9 @@ pub impl Reflect for FigureKind with fn castable(v) {
 }
 
 ///|
+pub extend FigureKind with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FigureKind with fn into_value(self) {
   match self {
     Elem(v) => v.into_value()

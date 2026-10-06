@@ -206,6 +206,9 @@ pub impl Reflect for InlineCallback with fn castable(v) {
 }
 
 ///|
+pub extend InlineCallback with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for InlineCallback with fn into_value(self) {
   Dyn(InlineCallback(self))
 }
@@ -353,6 +356,9 @@ pub impl Reflect for BaselinePos with fn castable(v) {
   VAlignment::castable(v) ||
   v is (Relative(_) | Length(_) | Ratio(_) | Dict(_))
 }
+
+///|
+pub extend BaselinePos with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for BaselinePos with fn into_value(self) {

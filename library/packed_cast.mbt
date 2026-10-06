@@ -68,6 +68,9 @@ pub impl Reflect for OutlineEntry with fn castable(v) {
 }
 
 ///|
+pub extend OutlineEntry with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OutlineEntry with fn into_value(self) {
   Content(self.0)
 }

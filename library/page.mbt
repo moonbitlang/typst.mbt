@@ -279,6 +279,9 @@ pub impl Reflect for PageBinding with fn castable(v) {
 }
 
 ///|
+pub extend PageBinding with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PageBinding with fn into_value(self) {
   match self {
     Left => Dyn(Alignment(alignment_left))
@@ -316,6 +319,9 @@ pub impl Reflect for PageRanges with fn output() {
 pub impl Reflect for PageRanges with fn castable(v) {
   PageRange::castable(v) || v is Array(_)
 }
+
+///|
+pub extend PageRanges with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PageRanges with fn into_value(self) {
@@ -373,6 +379,9 @@ pub impl Reflect for PageRange with fn output() {
 pub impl Reflect for PageRange with fn castable(v) {
   v is (Int(_) | Dict(_))
 }
+
+///|
+pub extend PageRange with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PageRange with fn into_value(self) {
@@ -458,6 +467,9 @@ pub impl Reflect for Parity with fn castable(v) {
 }
 
 ///|
+pub extend Parity with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Parity with fn into_value(self) {
   match self {
     Even => Str("even")
@@ -539,6 +551,9 @@ pub impl Reflect for Paper with fn output() {
 pub impl Reflect for Paper with fn castable(v) {
   v is Str(name) && Paper::from_name(name) is Some(_)
 }
+
+///|
+pub extend Paper with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Paper with fn into_value(self) {

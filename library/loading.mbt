@@ -25,6 +25,9 @@ pub impl Reflect for DataSource with fn castable(v) {
 }
 
 ///|
+pub extend DataSource with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DataSource with fn into_value(self) {
   match self {
     Path(v) => IntoValue::into_value(v)

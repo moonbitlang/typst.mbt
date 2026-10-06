@@ -34,6 +34,9 @@ pub impl Reflect for PlacementScope with fn castable(v) {
 }
 
 ///|
+pub extend PlacementScope with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PlacementScope with fn into_value(self) {
   match self {
     Column => Str("column")

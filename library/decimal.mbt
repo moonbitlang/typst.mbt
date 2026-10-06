@@ -377,6 +377,9 @@ pub impl Reflect for ToDecimal with fn castable(v) {
 }
 
 ///|
+pub extend ToDecimal with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToDecimal with fn from_value(v) {
   match v {
     Decimal(d) => Decimal(d)
@@ -402,6 +405,9 @@ pub impl Reflect for Decimal with fn output() {
 pub impl Reflect for Decimal with fn castable(v) {
   v is Decimal(_)
 }
+
+///|
+pub extend Decimal with Reflect::{input, castable}
 
 ///|
 pub impl IntoValue for Decimal with fn into_value(self) {

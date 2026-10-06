@@ -631,6 +631,9 @@ pub impl Reflect for Counter with fn castable(v) {
 }
 
 ///|
+pub extend Counter with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Counter with fn into_value(self) {
   Dyn(Counter(self))
 }
@@ -694,6 +697,9 @@ pub impl Reflect for CounterKey with fn castable(v) {
   Element::castable(v) ||
   LocatableSelector::castable(v)
 }
+
+///|
+pub extend CounterKey with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for CounterKey with fn into_value(self) {
@@ -777,6 +783,9 @@ pub impl Reflect for CounterUpdate with fn output() {
 pub impl Reflect for CounterUpdate with fn castable(v) {
   v is Dyn(CounterUpdate(_)) || CounterState::castable(v) || Func::castable(v)
 }
+
+///|
+pub extend CounterUpdate with Reflect::{output, input, castable}
 
 ///|
 /// Counter updates are stored as dynamic values in the (internal) `update`
@@ -902,6 +911,9 @@ pub impl Reflect for CounterState with fn output() {
 pub impl Reflect for CounterState with fn castable(v) {
   U64::castable(v) || Arr::castable(v)
 }
+
+///|
+pub extend CounterState with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for CounterState with fn into_value(self) {

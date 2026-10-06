@@ -2450,6 +2450,9 @@ pub impl Reflect for CellGrid with fn castable(v) {
 }
 
 ///|
+pub extend CellGrid with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CellGrid with fn into_value(self) {
   Dyn(CellGrid(self))
 }

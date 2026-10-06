@@ -229,6 +229,9 @@ pub impl Reflect for State with fn castable(v) {
 }
 
 ///|
+pub extend State with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for State with fn into_value(self) {
   Dyn(State(self))
 }
@@ -270,6 +273,9 @@ pub impl Reflect for StateUpdate with fn output() {
 pub impl Reflect for StateUpdate with fn castable(v) {
   Func::castable(v) || Value::castable(v)
 }
+
+///|
+pub extend StateUpdate with Reflect::{output, input, castable}
 
 ///|
 /// State updates are stored as dynamic values in the (internal) `update`

@@ -50,6 +50,9 @@ pub impl Reflect for FontFamily with fn castable(v) {
 }
 
 ///|
+pub extend FontFamily with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontFamily with fn into_value(self) {
   match self.covers {
     Some(covers) =>
@@ -110,6 +113,9 @@ pub impl Reflect for Covers with fn castable(v) {
 }
 
 ///|
+pub extend Covers with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Covers with fn into_value(self) {
   match self {
     LatinInCjk => Str("latin-in-cjk")
@@ -164,6 +170,9 @@ pub impl Reflect for FontList with fn output() {
 pub impl Reflect for FontList with fn castable(v) {
   FontFamily::castable(v) || v is Array(_)
 }
+
+///|
+pub extend FontList with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for FontList with fn into_value(self) {
@@ -348,6 +357,9 @@ pub impl Reflect for TopEdge with fn castable(v) {
 }
 
 ///|
+pub extend TopEdge with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TopEdge with fn into_value(self) {
   match self {
     Metric(metric) => metric.into_value()
@@ -411,6 +423,9 @@ pub impl Reflect for TopEdgeMetric with fn castable(v) {
 }
 
 ///|
+pub extend TopEdgeMetric with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
   for i, m in top_edge_metric_values[:] {
     if m == self {
@@ -456,6 +471,9 @@ pub impl Reflect for BottomEdge with fn output() {
 pub impl Reflect for BottomEdge with fn castable(v) {
   BottomEdgeMetric::castable(v) || v is Length(_)
 }
+
+///|
+pub extend BottomEdge with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for BottomEdge with fn into_value(self) {
@@ -515,6 +533,9 @@ pub impl Reflect for BottomEdgeMetric with fn castable(v) {
 }
 
 ///|
+pub extend BottomEdgeMetric with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
   for i, m in bottom_edge_metric_values[:] {
     if m == self {
@@ -559,6 +580,9 @@ pub impl Reflect for TextDir with fn castable(v) {
 }
 
 ///|
+pub extend TextDir with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TextDir with fn into_value(self) {
   self.0.into_value()
 }
@@ -597,6 +621,9 @@ pub impl Reflect for Alternates with fn output() {
 pub impl Reflect for Alternates with fn castable(v) {
   v is (Bool(_) | Int(_))
 }
+
+///|
+pub extend Alternates with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Alternates with fn into_value(self) {
@@ -655,6 +682,9 @@ pub impl Reflect for StylisticSets with fn output() {
 pub impl Reflect for StylisticSets with fn castable(v) {
   v is (None | Int(_) | Array(_))
 }
+
+///|
+pub extend StylisticSets with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for StylisticSets with fn into_value(self) {
@@ -732,6 +762,9 @@ pub impl Reflect for NumberType with fn castable(v) {
 }
 
 ///|
+pub extend NumberType with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NumberType with fn into_value(self) {
   match self {
     Lining => Str("lining")
@@ -776,6 +809,9 @@ pub impl Reflect for NumberWidth with fn castable(v) {
 }
 
 ///|
+pub extend NumberWidth with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NumberWidth with fn into_value(self) {
   match self {
     Proportional => Str("proportional")
@@ -816,6 +852,9 @@ pub impl Reflect for FontFeatures with fn output() {
 pub impl Reflect for FontFeatures with fn castable(v) {
   v is (Array(_) | Dict(_))
 }
+
+///|
+pub extend FontFeatures with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for FontFeatures with fn into_value(self) {
@@ -1066,6 +1105,9 @@ pub impl Reflect for Costs with fn castable(v) {
 }
 
 ///|
+pub extend Costs with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Costs with fn into_value(self) {
   // Only the entries that were set, so that the stored field value keeps
   // which costs were given (required for folding). Users see the full
@@ -1165,6 +1207,9 @@ pub impl Reflect for Never with fn output() {
 pub impl Reflect for Never with fn castable(_) {
   false
 }
+
+///|
+pub extend Never with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Never with fn into_value(self) {

@@ -103,6 +103,9 @@ pub impl Reflect for FillRule with fn castable(v) {
 }
 
 ///|
+pub extend FillRule with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FillRule with fn into_value(self) {
   match self {
     NonZero => Str("non-zero")

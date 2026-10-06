@@ -374,6 +374,9 @@ pub impl Reflect for TableHeaderScope with fn castable(v) {
 }
 
 ///|
+pub extend TableHeaderScope with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableHeaderScope with fn into_value(self) {
   match self {
     Both => Str("both")

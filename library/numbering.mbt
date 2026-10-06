@@ -81,6 +81,9 @@ pub impl Reflect for Numbering with fn castable(v) {
 }
 
 ///|
+pub extend Numbering with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Numbering with fn into_value(self) {
   match self {
     Pattern(pattern) => pattern.into_value()
@@ -299,6 +302,9 @@ pub impl Reflect for NumberingPattern with fn output() {
 pub impl Reflect for NumberingPattern with fn castable(v) {
   castable_of((Ty::new() : Ty[String]), v)
 }
+
+///|
+pub extend NumberingPattern with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for NumberingPattern with fn into_value(self) {

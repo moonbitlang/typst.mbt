@@ -252,6 +252,9 @@ pub impl Reflect for SmartQuoteSet with fn castable(v) {
 }
 
 ///|
+pub extend SmartQuoteSet with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for SmartQuoteSet with fn into_value(self) {
   Array(Arr::from_array([Str(self.open), Str(self.close)]))
 }
@@ -318,6 +321,9 @@ pub impl Reflect for SmartQuoteDict with fn output() {
 pub impl Reflect for SmartQuoteDict with fn castable(v) {
   v is Dict(_) || SmartQuoteSet::castable(v)
 }
+
+///|
+pub extend SmartQuoteDict with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for SmartQuoteDict with fn into_value(self) {

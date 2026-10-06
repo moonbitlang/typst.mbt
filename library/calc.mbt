@@ -41,6 +41,9 @@ pub impl Reflect for ToAbs with fn castable(v) {
 }
 
 ///|
+pub extend ToAbs with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToAbs with fn from_value(v) {
   match v {
     Int(v) =>
@@ -897,6 +900,9 @@ pub impl Reflect for Num with fn castable(v) {
 }
 
 ///|
+pub extend Num with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Num with fn into_value(self) {
   match self {
     Int(v) => Int(v)
@@ -1033,6 +1039,9 @@ pub impl Reflect for DecNum with fn castable(v) {
 }
 
 ///|
+pub extend DecNum with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DecNum with fn into_value(self) {
   match self {
     Int(v) => Int(v)
@@ -1075,6 +1084,9 @@ pub impl Reflect for AngleLike with fn output() {
 pub impl Reflect for AngleLike with fn castable(v) {
   v is (Int(_) | Float(_) | Angle(_))
 }
+
+///|
+pub extend AngleLike with Reflect::{output, input, castable}
 
 ///|
 pub impl FromValue for AngleLike with fn from_value(v) {

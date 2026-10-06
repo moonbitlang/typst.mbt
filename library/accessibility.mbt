@@ -76,6 +76,9 @@ pub impl Reflect for ArtifactKind with fn castable(v) {
 }
 
 ///|
+pub extend ArtifactKind with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ArtifactKind with fn into_value(self) {
   for i, kind in artifact_kind_values[:] {
     if kind == self {
@@ -148,6 +151,9 @@ pub impl Reflect for PdfMarkerTagKind with fn output() {
 pub impl Reflect for PdfMarkerTagKind with fn castable(v) {
   v is (Str(_) | Array(_))
 }
+
+///|
+pub extend PdfMarkerTagKind with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {

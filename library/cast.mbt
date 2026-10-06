@@ -184,6 +184,9 @@ pub impl Reflect for Value with fn castable(_) {
 }
 
 ///|
+pub extend Value with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Value with fn into_value(self) {
   self
 }
@@ -330,6 +333,9 @@ pub impl Reflect for Length with fn castable(v) {
 }
 
 ///|
+pub extend Length with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Length with fn into_value(self) {
   Length(self)
 }
@@ -473,6 +479,9 @@ pub impl Reflect for Content with fn castable(v) {
 }
 
 ///|
+pub extend Content with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Content with fn into_value(self) {
   Content(self)
 }
@@ -502,6 +511,9 @@ pub impl Reflect for Func with fn output() {
 pub impl Reflect for Func with fn castable(v) {
   v is (Func(_) | Type(_) | Symbol(_))
 }
+
+///|
+pub extend Func with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Func with fn into_value(self) {
@@ -560,6 +572,9 @@ pub impl Reflect for Arr with fn output() {
 pub impl Reflect for Arr with fn castable(v) {
   v is Array(_)
 }
+
+///|
+pub extend Arr with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Arr with fn into_value(self) {
@@ -644,6 +659,9 @@ pub impl Reflect for Label with fn output() {
 pub impl Reflect for Label with fn castable(v) {
   v is Label(_)
 }
+
+///|
+pub extend Label with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Label with fn into_value(self) {

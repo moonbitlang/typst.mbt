@@ -1907,6 +1907,9 @@ pub impl Reflect for Color with fn castable(v) {
 }
 
 ///|
+pub extend Color with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Color with fn into_value(self) {
   Color(self)
 }
@@ -1933,6 +1936,9 @@ pub impl Reflect for ProcessColor with fn output() {
 pub impl Reflect for ProcessColor with fn castable(v) {
   Color::castable(v)
 }
+
+///|
+pub extend ProcessColor with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for ProcessColor with fn into_value(self) {
@@ -1966,6 +1972,9 @@ pub impl Reflect for SpotColorant with fn castable(v) {
 }
 
 ///|
+pub extend SpotColorant with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for SpotColorant with fn into_value(self) {
   Dyn(SpotColorant(self))
 }
@@ -1995,6 +2004,9 @@ pub impl Reflect for SpotColorantName with fn output() {
 pub impl Reflect for SpotColorantName with fn castable(v) {
   v is (Str(_) | Symbol(_))
 }
+
+///|
+pub extend SpotColorantName with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for SpotColorantName with fn into_value(self) {
@@ -2028,6 +2040,9 @@ pub impl Reflect for ColorSpace with fn output() {
 pub impl Reflect for ColorSpace with fn castable(_) {
   true
 }
+
+///|
+pub extend ColorSpace with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for ColorSpace with fn into_value(self) {
@@ -2102,6 +2117,9 @@ pub impl Reflect for WeightedColor with fn castable(v) {
 }
 
 ///|
+pub extend WeightedColor with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for WeightedColor with fn into_value(self) {
   Array(Arr::from_array([Color(self.color), Float(self.weight)]))
 }
@@ -2157,6 +2175,9 @@ pub impl Reflect for RatioComponent with fn castable(v) {
 }
 
 ///|
+pub extend RatioComponent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RatioComponent with fn into_value(self) {
   Ratio(self.0)
 }
@@ -2194,6 +2215,9 @@ pub impl Reflect for ChromaComponent with fn castable(v) {
 }
 
 ///|
+pub extend ChromaComponent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ChromaComponent with fn into_value(self) {
   Float(self.0.to_double())
 }
@@ -2226,6 +2250,9 @@ pub impl Reflect for Component with fn output() {
 pub impl Reflect for Component with fn castable(v) {
   v is (Int(_) | Ratio(_))
 }
+
+///|
+pub extend Component with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Component with fn into_value(self) {

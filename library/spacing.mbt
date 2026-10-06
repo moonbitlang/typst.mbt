@@ -58,6 +58,9 @@ pub impl Reflect for Spacing with fn castable(value) {
 }
 
 ///|
+pub extend Spacing with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Spacing with fn into_value(self) {
   match self {
     Rel(rel) =>
@@ -132,6 +135,9 @@ pub impl Reflect for Sizing with fn output() {
 pub impl Reflect for Sizing with fn castable(value) {
   value is (Value::Auto | Relative(_) | Length(_) | Ratio(_) | Fraction(_))
 }
+
+///|
+pub extend Sizing with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Sizing with fn into_value(self) {

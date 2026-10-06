@@ -480,6 +480,9 @@ pub impl Reflect for VAlignment with fn castable(value) {
 }
 
 ///|
+pub extend VAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for VAlignment with fn into_value(self) {
   Dyn(Alignment(V(self)))
 }

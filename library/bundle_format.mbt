@@ -75,6 +75,9 @@ pub impl Reflect for AssetData with fn castable(v) {
 }
 
 ///|
+pub extend AssetData with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for AssetData with fn into_value(self) {
   Bytes(self.0)
 }

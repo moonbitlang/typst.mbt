@@ -24,6 +24,9 @@ pub impl Reflect for Supplement with fn castable(v) {
 }
 
 ///|
+pub extend Supplement with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Supplement with fn into_value(self) {
   match self {
     Content(v) => Content(v)
@@ -88,6 +91,9 @@ pub impl Reflect for RefForm with fn output() {
 pub impl Reflect for RefForm with fn castable(v) {
   str_names_find(ref_form_names, v) is Some(_)
 }
+
+///|
+pub extend RefForm with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for RefForm with fn into_value(self) {

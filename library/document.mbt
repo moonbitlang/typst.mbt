@@ -29,6 +29,9 @@ pub impl Reflect for DocumentFormat with fn castable(v) {
 }
 
 ///|
+pub extend DocumentFormat with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DocumentFormat with fn into_value(self) {
   match self {
     Paged(v) => v.into_value()
@@ -115,6 +118,9 @@ pub impl Reflect for PagedFormat with fn output() {
 pub impl Reflect for PagedFormat with fn castable(v) {
   str_names_find(paged_format_names, v) is Some(_)
 }
+
+///|
+pub extend PagedFormat with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PagedFormat with fn into_value(self) {

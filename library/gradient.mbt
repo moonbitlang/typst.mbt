@@ -635,6 +635,9 @@ pub impl Reflect for RelativeTo with fn castable(v) {
 }
 
 ///|
+pub extend RelativeTo with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RelativeTo with fn into_value(self) {
   match self {
     Self_ => Str("self")
@@ -674,6 +677,9 @@ pub impl Reflect for GradientStop with fn output() {
 pub impl Reflect for GradientStop with fn castable(v) {
   v is (Color(_) | Array(_))
 }
+
+///|
+pub extend GradientStop with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for GradientStop with fn into_value(self) {
@@ -732,6 +738,9 @@ pub impl Reflect for RatioOrAngle with fn output() {
 pub impl Reflect for RatioOrAngle with fn castable(v) {
   v is (Ratio(_) | Angle(_))
 }
+
+///|
+pub extend RatioOrAngle with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for RatioOrAngle with fn into_value(self) {
@@ -876,6 +885,9 @@ pub impl Reflect for Gradient with fn output() {
 pub impl Reflect for Gradient with fn castable(v) {
   v is Gradient(_)
 }
+
+///|
+pub extend Gradient with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Gradient with fn into_value(self) {

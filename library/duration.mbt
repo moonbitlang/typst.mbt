@@ -173,6 +173,9 @@ pub impl Reflect for Duration with fn castable(v) {
 }
 
 ///|
+pub extend Duration with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Duration with fn into_value(self) {
   Duration(self)
 }

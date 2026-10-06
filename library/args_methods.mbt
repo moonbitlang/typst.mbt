@@ -113,6 +113,9 @@ pub impl Reflect for ArgumentKey with fn castable(v) {
 }
 
 ///|
+pub extend ArgumentKey with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ArgumentKey with fn from_value(v) {
   match v {
     Int(v) => Index(v)

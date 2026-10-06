@@ -157,6 +157,9 @@ pub impl Reflect for MathSize with fn castable(v) {
 }
 
 ///|
+pub extend MathSize with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for MathSize with fn into_value(self) {
   match self {
     ScriptScript => Str("script-script")
@@ -231,6 +234,9 @@ pub impl Reflect for MathVariant with fn output() {
 pub impl Reflect for MathVariant with fn castable(v) {
   math_variants.iter().any(variant => v is Str(s) && s == variant.name())
 }
+
+///|
+pub extend MathVariant with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for MathVariant with fn into_value(self) {

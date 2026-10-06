@@ -716,6 +716,9 @@ pub impl Reflect for ToStr with fn castable(v) {
 }
 
 ///|
+pub extend ToStr with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToStr with fn from_value(v) {
   match v {
     Int(n) => Int(n)
@@ -781,6 +784,9 @@ pub impl Reflect for UnicodeNormalForm with fn output() {
 pub impl Reflect for UnicodeNormalForm with fn castable(v) {
   v is Str("nfc" | "nfd" | "nfkc" | "nfkd")
 }
+
+///|
+pub extend UnicodeNormalForm with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for UnicodeNormalForm with fn into_value(self) {
@@ -911,6 +917,9 @@ pub impl Reflect for Regex with fn castable(v) {
 }
 
 ///|
+pub extend Regex with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Regex with fn into_value(self) {
   Dyn(Regex(self))
 }
@@ -946,6 +955,9 @@ pub impl Reflect for StrPattern with fn output() {
 pub impl Reflect for StrPattern with fn castable(v) {
   str_castable(v) || Regex::castable(v)
 }
+
+///|
+pub extend StrPattern with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for StrPattern with fn into_value(self) {
@@ -990,6 +1002,9 @@ pub impl Reflect for StrSide with fn output() {
 pub impl Reflect for StrSide with fn castable(v) {
   castable_of((Ty::new() : Ty[Alignment]), v)
 }
+
+///|
+pub extend StrSide with Reflect::{output, input, castable}
 
 ///|
 pub impl FromValue for StrSide with fn from_value(v) {
@@ -1038,6 +1053,9 @@ pub impl Reflect for Replacement with fn output() {
 pub impl Reflect for Replacement with fn castable(v) {
   str_castable(v) || castable_of((Ty::new() : Ty[Func]), v)
 }
+
+///|
+pub extend Replacement with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Replacement with fn into_value(self) {

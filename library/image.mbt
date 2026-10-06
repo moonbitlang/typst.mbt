@@ -354,6 +354,9 @@ pub impl Reflect for ImageFit with fn castable(v) {
 }
 
 ///|
+pub extend ImageFit with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ImageFit with fn into_value(self) {
   match self {
     Cover => Str("cover")
@@ -474,6 +477,9 @@ pub impl Reflect for ImageFormat with fn castable(v) {
 }
 
 ///|
+pub extend ImageFormat with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ImageFormat with fn into_value(self) {
   match self {
     Raster(v) => v.into_value()
@@ -522,6 +528,9 @@ pub impl Reflect for VectorFormat with fn output() {
 pub impl Reflect for VectorFormat with fn castable(v) {
   v is Str("svg" | "pdf")
 }
+
+///|
+pub extend VectorFormat with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for VectorFormat with fn into_value(self) {
@@ -575,6 +584,9 @@ pub impl Reflect for ImageScaling with fn castable(v) {
 }
 
 ///|
+pub extend ImageScaling with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ImageScaling with fn into_value(self) {
   match self {
     Smooth => Str("smooth")
@@ -616,6 +628,9 @@ pub impl Reflect for RasterFormat with fn output() {
 pub impl Reflect for RasterFormat with fn castable(v) {
   ExchangeFormat::castable(v) || PixelFormat::castable(v)
 }
+
+///|
+pub extend RasterFormat with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for RasterFormat with fn into_value(self) {
@@ -713,6 +728,9 @@ pub impl Reflect for ExchangeFormat with fn castable(v) {
 }
 
 ///|
+pub extend ExchangeFormat with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ExchangeFormat with fn into_value(self) {
   match self {
     Png => Str("png")
@@ -758,6 +776,9 @@ pub impl Reflect for PixelFormat with fn output() {
 pub impl Reflect for PixelFormat with fn castable(v) {
   v is Dict(_)
 }
+
+///|
+pub extend PixelFormat with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PixelFormat with fn into_value(self) {
@@ -819,6 +840,9 @@ pub impl Reflect for PixelEncoding with fn output() {
 pub impl Reflect for PixelEncoding with fn castable(v) {
   v is Str("rgb8" | "rgba8" | "luma8" | "lumaa8")
 }
+
+///|
+pub extend PixelEncoding with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PixelEncoding with fn into_value(self) {

@@ -617,6 +617,9 @@ pub impl Reflect for Element with fn castable(v) {
 }
 
 ///|
+pub extend Element with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Element with fn into_value(self) {
   Func(Func::element(self))
 }

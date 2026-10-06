@@ -75,6 +75,9 @@ pub impl Reflect for Decoration with fn castable(v) {
 }
 
 ///|
+pub extend Decoration with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Decoration with fn into_value(self) {
   Dyn(Decoration(self))
 }

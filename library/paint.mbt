@@ -70,6 +70,9 @@ pub impl Reflect for Paint with fn castable(v) {
 }
 
 ///|
+pub extend Paint with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Paint with fn into_value(self) {
   match self {
     Solid(color) => Color(color)

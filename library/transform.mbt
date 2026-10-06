@@ -24,6 +24,9 @@ pub impl Reflect for ScaleAmount with fn castable(v) {
 }
 
 ///|
+pub extend ScaleAmount with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ScaleAmount with fn into_value(self) {
   match self {
     Ratio(ratio) => Ratio(ratio)

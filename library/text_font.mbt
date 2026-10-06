@@ -39,6 +39,9 @@ pub impl Reflect for FontStyle with fn castable(v) {
 }
 
 ///|
+pub extend FontStyle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontStyle with fn into_value(self) {
   Str(
     match self {
@@ -166,6 +169,9 @@ pub impl Reflect for FontWeight with fn castable(v) {
 }
 
 ///|
+pub extend FontWeight with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontWeight with fn into_value(self) {
   if self.0 % 100 == 0 && self.0 >= 100 && self.0 <= 900 {
     Str(font_weight_names[self.0 / 100 - 1])
@@ -239,6 +245,9 @@ pub impl Reflect for FontStretch with fn castable(v) {
 }
 
 ///|
+pub extend FontStretch with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontStretch with fn into_value(self) {
   Ratio(self.to_ratio())
 }
@@ -294,6 +303,9 @@ pub impl Reflect for OpenTypeTag with fn output() {
 pub impl Reflect for OpenTypeTag with fn castable(v) {
   str_castable(v)
 }
+
+///|
+pub extend OpenTypeTag with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for OpenTypeTag with fn into_value(self) {
@@ -400,6 +412,9 @@ pub impl Reflect for FontVariations with fn output() {
 pub impl Reflect for FontVariations with fn castable(v) {
   v is Dict(_)
 }
+
+///|
+pub extend FontVariations with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for FontVariations with fn into_value(self) {

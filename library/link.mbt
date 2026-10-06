@@ -61,6 +61,9 @@ pub impl Reflect for LinkTarget with fn castable(v) {
 }
 
 ///|
+pub extend LinkTarget with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for LinkTarget with fn into_value(self) {
   match self {
     Dest(v) => v.into_value()
@@ -110,6 +113,9 @@ pub impl Reflect for Destination with fn castable(v) {
   PagedPosition::castable(v) ||
   castable_of((Ty::new() : Ty[Location]), v)
 }
+
+///|
+pub extend Destination with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Destination with fn into_value(self) {
@@ -185,6 +191,9 @@ pub impl Reflect for Url with fn output() {
 pub impl Reflect for Url with fn castable(v) {
   castable_of((Ty::new() : Ty[String]), v)
 }
+
+///|
+pub extend Url with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Url with fn into_value(self) {

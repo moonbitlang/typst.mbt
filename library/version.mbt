@@ -160,6 +160,9 @@ pub impl Reflect for VersionComponents with fn castable(v) {
 }
 
 ///|
+pub extend VersionComponents with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for VersionComponents with fn from_value(v) {
   match v {
     Int(_) => {
@@ -188,6 +191,9 @@ pub impl Reflect for Version with fn output() {
 pub impl Reflect for Version with fn castable(v) {
   v is Version(_)
 }
+
+///|
+pub extend Version with Reflect::{input, castable}
 
 ///|
 pub impl IntoValue for Version with fn into_value(self) {

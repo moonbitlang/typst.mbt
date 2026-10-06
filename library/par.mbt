@@ -35,6 +35,9 @@ pub impl Reflect for JustificationLimits with fn castable(v) {
 }
 
 ///|
+pub extend JustificationLimits with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for JustificationLimits with fn into_value(self) {
   let dict = Dict::new()
   if self.spacing is Some(spacing) {
@@ -268,6 +271,9 @@ pub impl Reflect for Linebreaks with fn castable(v) {
 }
 
 ///|
+pub extend Linebreaks with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Linebreaks with fn into_value(self) {
   match self {
     Simple => Str("simple")
@@ -332,6 +338,9 @@ pub impl Reflect for FirstLineIndent with fn output() {
 pub impl Reflect for FirstLineIndent with fn castable(v) {
   v is (Length(_) | Dict(_))
 }
+
+///|
+pub extend FirstLineIndent with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for FirstLineIndent with fn into_value(self) {
@@ -416,6 +425,9 @@ pub impl Reflect for LineNumberingScope with fn output() {
 pub impl Reflect for LineNumberingScope with fn castable(v) {
   str_names_find(line_numbering_scope_names, v) is Some(_)
 }
+
+///|
+pub extend LineNumberingScope with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for LineNumberingScope with fn into_value(self) {

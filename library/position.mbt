@@ -129,6 +129,9 @@ pub impl Reflect for PagedPosition with fn castable(v) {
 }
 
 ///|
+pub extend PagedPosition with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PagedPosition with fn into_value(self) {
   Dict(self.to_dict())
 }

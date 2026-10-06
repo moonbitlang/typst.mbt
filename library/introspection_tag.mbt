@@ -95,6 +95,9 @@ pub impl Reflect for Tag with fn castable(v) {
 }
 
 ///|
+pub extend Tag with Reflect::{input, castable}
+
+///|
 pub impl IntoValue for Tag with fn into_value(self) {
   Dyn(Tag(self))
 }

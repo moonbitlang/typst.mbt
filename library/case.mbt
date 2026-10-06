@@ -49,6 +49,9 @@ pub impl Reflect for Caseable with fn castable(v) {
 }
 
 ///|
+pub extend Caseable with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Caseable with fn into_value(self) {
   match self {
     Str(v) => Str(v)
@@ -102,6 +105,9 @@ pub impl Reflect for Case with fn output() {
 pub impl Reflect for Case with fn castable(v) {
   v is Str("lower" | "upper")
 }
+
+///|
+pub extend Case with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Case with fn into_value(self) {

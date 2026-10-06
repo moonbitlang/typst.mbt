@@ -264,6 +264,9 @@ pub impl Reflect for Selector with fn castable(v) {
 }
 
 ///|
+pub extend Selector with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Selector with fn into_value(self) {
   Dyn(Selector(self))
 }
@@ -335,6 +338,9 @@ pub impl Reflect for LocatableSelector with fn castable(v) {
   Location::castable(v) ||
   Selector::castable(v)
 }
+
+///|
+pub extend LocatableSelector with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for LocatableSelector with fn into_value(self) {
@@ -409,6 +415,9 @@ pub impl Reflect for ShowableSelector with fn castable(v) {
   v is Dyn(Regex(_)) ||
   Selector::castable(v)
 }
+
+///|
+pub extend ShowableSelector with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for ShowableSelector with fn into_value(self) {
