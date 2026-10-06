@@ -3,44 +3,117 @@
 // report what they observe in `metadata` elements.
 
 ///|
-/// The paged document of a main source.
-fn oracle_compile(source : String) -> @layout.PagedDocument raise {
-  let warned : @library.Warned[
+/// The result of compiling a main source (with other files of the project).
+fn oracle_result(
+  source : String,
+  files : Array[(String, String)],
+) -> (
+  TestWorld,
+  @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
-  ] = compile(test_world(source))
-  match warned.output {
+  ],
+) {
+  let world = test_world(source, files~)
+  (world, compile(world))
+}
+
+///|
+/// The paged document of a main source.
+fn oracle_compile(
+  source : String,
+  files? : Array[(String, String)] = [],
+) -> @layout.PagedDocument raise {
+  match oracle_result(source, files).1.output {
     Ok(doc) => doc
     Err(errors) => fail(errors.map(e => e.message).join(" | "))
   }
 }
 
 ///|
-/// The values of the metadata elements of a document, which are strings.
-/// Memoization (`library/memo.mbt`) must not change them: the document is
-/// also compiled without it.
-fn oracle_metadata(source : String) -> Array[String] raise {
-  let memoized = oracle_metadata_once(source)
+/// Runs `f` with memoization (`library/memo.mbt`) and without it: it must
+/// not change what a document is.
+fn[T : Eq + @debug.Debug] oracle_memo_on_off(f : () -> T raise) -> T raise {
+  let memoized = f()
   @library.set_layout_memo_enabled(false)
   let plain = {
     defer @library.set_layout_memo_enabled(true)
-    oracle_metadata_once(source)
+    f()
   }
-  assert_eq(plain, memoized)
+  @debug.assert_eq(plain, memoized)
   memoized
 }
 
 ///|
-fn oracle_metadata_once(source : String) -> Array[String] raise {
-  let doc = oracle_compile(source)
+/// The values of the metadata elements of a document that are strings (the
+/// documents' own metadata holds other values), with memoization and
+/// without.
+fn oracle_metadata(
+  source : String,
+  files? : Array[(String, String)] = [],
+) -> Array[String] raise {
+  oracle_memo_on_off(() => oracle_strings(oracle_compile(source, files~)))
+}
+
+///|
+fn oracle_strings(doc : @layout.PagedDocument) -> Array[String] {
   let out = []
   for elem in doc.introspector().query(Elem(@library.metadata_elem(), None)) {
-    guard @library.MetadataElem::of(elem) is Some(metadata) &&
-      metadata.value() is Str(value) else {
-      fail("metadata without a string value")
+    if @library.MetadataElem::of(elem) is Some(metadata) &&
+      metadata.value() is Str(value) {
+      out.push(value)
     }
-    out.push(value)
   }
   out
+}
+
+///|
+/// The diagnostics of a document as the CLI prints them with
+/// `--diagnostic-format short` (`file:line:column: severity: message`, the
+/// errors first, hints without a span as ` = hint: ..` lines), then `--`
+/// and the metadata strings if it compiled; with memoization and without.
+fn oracle_report(
+  source : String,
+  files? : Array[(String, String)] = [],
+) -> Array[String] raise {
+  oracle_memo_on_off(() => {
+    let (world, warned) = oracle_result(source, files)
+    let out = []
+    let errors = match warned.output {
+      Ok(_) => []
+      Err(errors) => errors
+    }
+    for diagnostic in [..errors, ..warned.warnings] {
+      let severity = match diagnostic.severity {
+        Error => "error"
+        Warning => "warning"
+      }
+      let place = match
+        (diagnostic.span.id(), @library.world_range(world, diagnostic.span)) {
+        (Some(id), Some((start, _))) => {
+          let source = (world as &@library.World).source(id) catch {
+            _ => fail("no source")
+          }
+          guard source.lines().byte_to_line_column(start)
+            is Some((line, column)) else {
+            fail("no position")
+          }
+          "\{id.vpath().get_without_slash()}:\{line + 1}:\{column}: "
+        }
+        _ => ""
+      }
+      out.push("\{place}\{severity}: \{diagnostic.message}")
+      for hint in diagnostic.hints {
+        if hint.span.is_detached() {
+          out.push(" = hint: \{hint.v}")
+        }
+      }
+    }
+    if warned.output is Ok(doc) {
+      out.push("--")
+      out.append(oracle_strings(doc))
+    }
+    out
+  })
 }
 
 ///|

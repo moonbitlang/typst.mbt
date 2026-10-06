@@ -13,6 +13,14 @@ pub(all) struct Arg {
 }
 
 ///|
+/// The argument with its value marked shared (upstream: a clone of the
+/// argument): for an argument that is passed on while its `Args` keep it.
+pub fn Arg::shared(self : Arg) -> Arg {
+  self.value.v.shared() |> ignore
+  self
+}
+
+///|
 /// Captured arguments to a function.
 pub(all) struct Args {
   /// The callsite span for the function.

@@ -600,8 +600,12 @@ pub fn Element::settable_field_accessor(
 ) -> ((StyleChain) -> Value)? {
   for f in self.0.fields {
     if f.name == name && !f.internal && f.kind is (Settable | Ghost) {
+      // The value is the style chain's own (or a default that all chains
+      // share): upstream converts the resolved field into a new value
+      // (`IntoValue`), so it is handed out as shared, like a field of
+      // content (`Content::field_by_name`).
       return Some(styles => {
-        f.to_output(styles.get_value_with_local(self, f, None))
+        f.to_output(styles.get_value_with_local(self, f, None)).shared()
       })
     }
   }

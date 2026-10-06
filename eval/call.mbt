@@ -403,7 +403,13 @@ fn eval_args(
                 value: { v: value.shared(), span, },
               })
             }
-          Args(args) => items.append(args.items)
+          // Upstream extends with the items of its own clone of the
+          // arguments (`Eval for Ident` clones); here the arguments value
+          // still holds them, so they are passed on as shared.
+          Args(args) =>
+            for a in args.items {
+              items.push(a.shared())
+            }
           v => @library.bail_at(spread.span(), "cannot spread \{v.ty()}")
         }
     }
@@ -466,8 +472,10 @@ fn eval_math_args(
                 value: { v: value.shared(), span, },
               })
             }
+          // As in `eval_args`: the items stay in the spread value.
           Args(a) =>
             for a in a.items {
+              let a = a.shared()
               if a.name is None {
                 pos.push(a)
               } else {

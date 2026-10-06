@@ -62,8 +62,11 @@ fn impl_eval(
 ) -> Value raise SourceError {
   let { v: text, span, } = source_
   let scope = Scope::new()
+  // Upstream iterates its own clone of the dictionary (`for (key, value) in
+  // dict`); here the dictionary still holds the values that the evaluated
+  // code can now change through its variables.
   for key, value in scope_.iter() {
-    scope.bind(key, Binding::new(value, span)) |> ignore
+    scope.bind(key, Binding::new(value.shared(), span)) |> ignore
   }
   // We create a new, detached introspector for string evaluation.
   let engine = { ..engine, introspector: Introspector::empty(), }
