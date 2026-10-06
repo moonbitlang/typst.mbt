@@ -50,6 +50,16 @@ Typst source) are unchanged.
 - `hayro/interpret`: `GraphicsState` and `TextState`, `hayro/svg`:
   `SvgRenderer`, `otf`: `CffIndex` are no longer exported. They were
   abstract types that no public function accepted or returned.
+- `doc`: `Stroke(dash=..)` takes a `Dash` (it was a `Value`): write a
+  preset (`Dotted`, `Dashed`, ..), `Pattern([..], phase=..)`, or
+  `RawValue(v)` for the value passed before.
+- `doc`: the argument indices of origins (`Origin.param`, the ranges of
+  `ArgsLoc`) shift where parameters were added: by two from `lang` on in
+  `Text`/`SetText` and from `extent` on in `Highlight`/`SetHighlight`
+  (`top_edge`, `bottom_edge`), by one from `fill` on in `Box`/`SetBox`
+  (`baseline`).
+- `doc`: `Size` (the result of `Ctx::measure`) has a third field,
+  `baseline`; a pattern that names only `width` and `height` needs `..`.
 
 ### Changed: `Debug` output
 
@@ -91,6 +101,14 @@ deriving it.
   `DeviceRecord` (fields and accessors `pixel_size`, `max_width`,
   `widths`). `skrifa` uses it for the advance of hinted glyphs, like
   upstream.
+
+- `doc`: `Layout` (the size of the enclosing region, with `LayoutSize`);
+  `Size.baseline`; `Box(baseline=)`; `top_edge`/`bottom_edge` (`TopEdge`,
+  `BottomEdge`) on `Text`, `SetText`, `Highlight`, `SetHighlight`; `Dash`
+  and `DashLen`; colour operations on `Paint` (`transparentize`, `lighten`,
+  `darken`, `mix` with `ColorSpace`); `Length::sizing`, `Length::spacing`;
+  `Upper`, `Lower`; `Sides::zero`. See `docs/edsl-ports.md` and
+  `docs/edsl-guide.md`.
 
 ### Not a change for users
 

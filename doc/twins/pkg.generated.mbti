@@ -20,6 +20,8 @@ pub fn originals() -> Array[Original]
 
 pub fn phase2() -> Array[Twin]
 
+pub fn ports() -> Array[Twin]
+
 pub fn showcase() -> @doc.Document
 
 pub fn showcase_typst() -> String

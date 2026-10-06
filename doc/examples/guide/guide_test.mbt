@@ -430,7 +430,7 @@ test "section 3: what the location of a helper covers" {
 }
 
 ///|
-test "section 4: `Rel`, `Call`, `NoneValue()` and `extra`" {
+test "section 4: conversions, `Call`, `NoneValue()`, typed and untyped fields, `Layout`" {
   // 4.1: the first column is 50% of 180pt less 10pt, and the block is 11pt
   // and half of the font size (10pt) below the grid.
   let lengths = pages([@guide.composed_lengths()])
@@ -443,7 +443,16 @@ test "section 4: `Rel`, `Call`, `NoneValue()` and `extra`" {
       #|p1 rect 10.0,31.0 180.0x5.0 luma(78.43%)
     ),
   )
-  // 4.2: `upper` on content keeps its structure (the emphasis).
+  // 4.2: a function without a constructor, by its name.
+  let roman = pages([@guide.roman_numeral()])
+  inspect(roman.errors(), content="")
+  inspect(
+    roman.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w11.0 "IV."
+    ),
+  )
+  // `Upper` on content keeps its structure (the emphasis).
   let upper = pages([@guide.upper_case()])
   inspect(upper.errors(), content="")
   inspect(
@@ -465,11 +474,11 @@ test "section 4: `Rel`, `Call`, `NoneValue()` and `extra`" {
   inspect(untitled.listing(), content="")
   // 4.4: the highlight from the x-height to the baseline, the box 2pt
   // below the baseline, a dotted line, a half transparent fill.
-  let untyped = pages([@guide.untyped_fields()])
-  inspect(untyped.errors(), content="")
-  inspect(untyped.warnings(), content="")
+  let typed = pages([@guide.typed_fields()])
+  inspect(typed.errors(), content="")
+  inspect(typed.warnings(), content="")
   inspect(
-    untyped.listing(),
+    typed.listing(),
     content=(
       #|p1 rect 10.0,12.3 19.4x4.3 rgb("#fffd11a1")
       #|p1 text 10.0,16.6 w19.4 "tight"
@@ -478,6 +487,37 @@ test "section 4: `Rel`, `Call`, `NoneValue()` and `extra`" {
       #|p1 text 39.5,37.2 w52.8 "moved down"
       #|p1 line 10.0,49.2 60.0x0.0 dash 1.0 2.0
       #|p1 rect 10.0,61.2 20.0x10.0 rgb("#1d758680")
+    ),
+  )
+  // The untyped ways: a first line indented by 1em (10pt), the same dotted
+  // line and the same fill.
+  let untyped = pages([@guide.untyped_fields()])
+  inspect(untyped.errors(), content="")
+  inspect(untyped.warnings(), content="")
+  inspect(
+    untyped.listing(),
+    content=(
+      #|p1 text 20.0,16.6 w38.3 "Indented."
+      #|p1 line 10.0,28.6 60.0x0.0 dash 1.0 2.0
+      #|p1 rect 10.0,40.6 20.0x10.0 rgb("#1d758680")
+    ),
+  )
+  // 4.5: half of the region's width (180pt) and of a block's (100pt); the
+  // rectangle is as high as the baseline of the measured block is deep:
+  // its inset (4pt) and the height of one line (6.6pt).
+  let half = pages([
+    @guide.half_width(),
+    @doc.Block(@guide.half_width(), width=Pt(100)),
+  ])
+  inspect(half.errors(), content="")
+  inspect(half.warnings(), content="")
+  inspect(
+    half.listing(),
+    content=(
+      #|p1 rect 10.0,10.0 90.0x10.6 luma(78.43%)
+      #|p1 text 14.0,43.2 w15.7 "half"
+      #|p1 rect 10.0,59.2 50.0x10.6 luma(78.43%)
+      #|p1 text 14.0,92.3 w15.7 "half"
     ),
   )
 }

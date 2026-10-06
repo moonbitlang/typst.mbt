@@ -12,8 +12,6 @@ document.date: unmapped type Smart<Option<Datetime>>
 document.body: skipped by the specification (Content)
 text.stretch: unmapped type FontStretch
 text.cjk-latin-spacing: unmapped type Smart<Option<Never>>
-text.top-edge: unmapped type TopEdge
-text.bottom-edge: unmapped type BottomEdge
 text.script: unmapped type Smart<WritingScript>
 text.costs: unmapped type Costs
 text.alternates: unmapped type Alternates
@@ -24,10 +22,7 @@ text.text: skipped by the specification (EcoString)
 raw.syntaxes: unmapped type Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>
 raw.theme: unmapped type Smart<Option<Derived<DataSource, RawTheme>>>
 smartquote.quotes: unmapped type Smart<SmartQuoteDict>
-highlight.top-edge: unmapped type TopEdge
-highlight.bottom-edge: unmapped type BottomEdge
 page.binding: unmapped type Smart<Binding>
-box.baseline: unmapped type BaselinePos
 image.icc: unmapped type Smart<Derived<DataSource, Bytes>>
 bibliography.target: unmapped type Smart<LocatableSelector>
 
