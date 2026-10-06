@@ -41,7 +41,7 @@ fn init_project(command : InitCommand) -> Unit raise HintedFailure {
   }
 
   // Determine the directory at which we will create the project.
-  let project_dir = command.dir.unwrap_or(manifest.package.name)
+  let project_dir = command.dir.unwrap_or(manifest.package_.name)
 
   // Set up the project.
   scaffold_project(project_dir, package_path, template)

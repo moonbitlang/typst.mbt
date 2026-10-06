@@ -384,9 +384,9 @@ fn resolve_package(
 
   // Evaluate the entry point.
   let entrypoint = @library.at(span, () => {
-    @library.PathOrStr::Str(manifest.package.entrypoint).resolve(manifest_id)
+    @library.PathOrStr::Str(manifest.package_.entrypoint).resolve(manifest_id)
   })
-  (manifest.package.name, entrypoint.intern())
+  (manifest.package_.name, entrypoint.intern())
 }
 
 ///|

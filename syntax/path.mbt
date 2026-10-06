@@ -52,7 +52,7 @@ pub fn RootedPath::map(
 pub impl Show for RootedPath with fn output(self, logger) {
   match self.root {
     Project => Show::output(self.vpath, logger)
-    Package(package) => logger.write_string("\{package}\{self.vpath}")
+    Package(package_) => logger.write_string("\{package_}\{self.vpath}")
   }
 }
 

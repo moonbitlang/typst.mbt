@@ -168,7 +168,7 @@ pub struct Attribute {
 
 ///|
 /// Returns attribute's namespace URI.
-pub fn Attribute::namespace(self : Attribute) -> String? {
+pub fn Attribute::namespace_(self : Attribute) -> String? {
   self.data.name.ns(self.doc).map(fn(ns) { ns.uri })
 }
 
@@ -322,7 +322,7 @@ pub(all) struct ExpandedName {
 
 ///|
 /// Returns a namespace URI.
-pub fn ExpandedName::namespace(self : ExpandedName) -> String? {
+pub fn ExpandedName::namespace_(self : ExpandedName) -> String? {
   self.uri
 }
 

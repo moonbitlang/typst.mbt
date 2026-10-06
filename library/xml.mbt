@@ -37,7 +37,7 @@ fn convert_xml(node : @xml.Node) -> Value {
   if node.is_root() {
     return Array(children)
   }
-  let ns = match node.tag_name().namespace() {
+  let ns = match node.tag_name().namespace_() {
     Some(ns) => Value::Str(ns)
     None => None
   }

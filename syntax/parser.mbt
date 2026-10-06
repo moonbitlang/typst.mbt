@@ -573,15 +573,15 @@ fn code_expr(p : Parser) -> Unit {
 
 ///|
 /// Parses a code expression with at least the given precedence.
-fn code_expr_prec(p : Parser, atomic : Bool, min_prec : Int) -> Unit {
+fn code_expr_prec(p : Parser, atomic_ : Bool, min_prec : Int) -> Unit {
   p.with_depth(() => {
     let m = p.marker()
     if p.at_set(unary_op_set) {
-      if !atomic {
+      if !atomic_ {
         // Upstream: `ast::UnOp::from_kind(p.current()).unwrap()`.
         guard! UnOp::from_kind(p.current()) is Some(op)
         p.eat()
-        code_expr_prec(p, atomic, op.precedence())
+        code_expr_prec(p, atomic_, op.precedence())
         p.wrap(m, Unary)
       } else {
         p.unexpected()
@@ -590,7 +590,7 @@ fn code_expr_prec(p : Parser, atomic : Bool, min_prec : Int) -> Unit {
         )
       }
     } else {
-      code_primary(p, atomic)
+      code_primary(p, atomic_)
     }
     while true {
       if p.directly_at(LeftParen) || p.directly_at(LeftBracket) {
@@ -600,7 +600,7 @@ fn code_expr_prec(p : Parser, atomic : Bool, min_prec : Int) -> Unit {
       }
       let at_field_or_method = p.directly_at(Dot) &&
         p.lexer.copy().next().0 == Ident
-      if atomic && !at_field_or_method {
+      if atomic_ && !at_field_or_method {
         break
       }
       if p.eat_if(Dot) {
@@ -641,19 +641,19 @@ fn code_expr_prec(p : Parser, atomic : Bool, min_prec : Int) -> Unit {
 
 ///|
 /// Parses a primary in a code expression.
-fn code_primary(p : Parser, atomic : Bool) -> Unit {
+fn code_primary(p : Parser, atomic_ : Bool) -> Unit {
   let m = p.marker()
   match p.current() {
     Ident => {
       p.eat()
-      if !atomic && p.at(Arrow) {
+      if !atomic_ && p.at(Arrow) {
         p.wrap(m, Params)
         p.assert_at(Arrow)
         code_expr(p)
         p.wrap(m, Closure)
       }
     }
-    Underscore if !atomic => {
+    Underscore if !atomic_ => {
       p.eat()
       if p.at(Arrow) {
         p.wrap(m, Params)
@@ -669,12 +669,12 @@ fn code_primary(p : Parser, atomic : Bool) -> Unit {
     }
     LeftBrace => code_block(p)
     LeftBracket => content_block(p)
-    LeftParen => expr_with_paren(p, atomic)
+    LeftParen => expr_with_paren(p, atomic_)
     Dollar => equation(p)
     Let => let_binding(p)
     Set => set_rule(p)
     Show => show_rule(p)
-    Context => contextual(p, atomic)
+    Context => contextual(p, atomic_)
     If => conditional(p)
     While => while_loop(p)
     For => for_loop(p)
@@ -686,7 +686,7 @@ fn code_primary(p : Parser, atomic : Bool) -> Unit {
     Raw => p.eat()
     None | Auto | Int | Float | Bool | Numeric | Str | Label => p.eat()
     // Consume erroneous tokens for things like `#12p`, `#]`, or `#"abc\"`.
-    _ if atomic => p.unexpected()
+    _ if atomic_ => p.unexpected()
     _ => p.expected("expression")
   }
 }
@@ -804,10 +804,10 @@ fn show_rule(p : Parser) -> Unit {
 
 ///|
 /// Parses a contextual expression: `context text.lang`.
-fn contextual(p : Parser, atomic : Bool) -> Unit {
+fn contextual(p : Parser, atomic_ : Bool) -> Unit {
   let m = p.marker()
   p.assert_at(Context)
-  code_expr_prec(p, atomic, 0)
+  code_expr_prec(p, atomic_, 0)
   p.wrap(m, Contextual)
 }
 
@@ -947,8 +947,8 @@ fn return_stmt(p : Parser) -> Unit {
 
 ///|
 /// An expression that starts with a parenthesis.
-fn expr_with_paren(p : Parser, atomic : Bool) -> Unit {
-  if atomic {
+fn expr_with_paren(p : Parser, atomic_ : Bool) -> Unit {
+  if atomic_ {
     // Atomic expressions aren't modified by operators that follow them, so
     // our first guess of array/dict will be correct.
     parenthesized_or_array_or_dict(p) |> ignore
