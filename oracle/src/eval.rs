@@ -9,10 +9,10 @@ use comemo::Track;
 use ecow::EcoVec;
 use rustc_hash::FxHashSet;
 use typst::World;
-use typst::diag::{SourceDiagnostic, SourceResult, Warned};
+use typst::diag::{SourceDiagnostic, SourceResult, Tracepoint, Warned};
 use typst::engine::{Route, Sink, Traced};
 use typst::foundations::{Content, Repr};
-use typst_syntax::{DiagSpanKind, FileId};
+use typst_syntax::{DiagSpan, DiagSpanKind, FileId};
 
 use crate::collect;
 use crate::world::{TestWorld, parse_features};
@@ -114,6 +114,27 @@ pub fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &Sour
     for hint in &diag.hints {
         writeln!(out, "  hint {} {:?}", locate(world, main, hint.span.get()), hint.v.as_str())
             .unwrap();
+    }
+}
+
+/// The tracepoints of a diagnostic, innermost first, one line each:
+/// `  trace <location> <kind> <name>` with `kind` in `call|show|import|
+/// include` and the name in Rust debug format (`-` for a call of an
+/// unnamed function).
+pub fn write_trace(out: &mut String, world: &TestWorld, main: FileId, diag: &SourceDiagnostic) {
+    for point in &diag.trace {
+        let (kind, name) = match &point.v {
+            Tracepoint::Call(name) => ("call", name.as_ref()),
+            Tracepoint::Show(name) => ("show", Some(name)),
+            Tracepoint::Import(name) => ("import", Some(name)),
+            Tracepoint::Include(name) => ("include", Some(name)),
+        };
+        let name = match name {
+            Some(name) => format!("{:?}", name.as_str()),
+            None => "-".into(),
+        };
+        let span = DiagSpan::from(point.span);
+        writeln!(out, "  trace {} {kind} {name}", locate(world, main, span.get())).unwrap();
     }
 }
 

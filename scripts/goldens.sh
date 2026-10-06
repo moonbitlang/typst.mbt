@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg|raster|wasm-validate|wasm-spec ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg|packages|raster|wasm-validate|wasm-spec ...]
 #
+# `packages` compiles the documents of tests/packages/docs, which use real
+# packages of the Typst package registry (pinned by
+# tests/packages/manifest.tsv; fetch them with scripts/packages.sh first),
+# and dumps their frames like `paged` and their SVG like `svg`
+# (oracle/src/packages.rs).
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
 # (oracle/src/reparse.rs).
@@ -47,8 +52,18 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg render pdf-semantic pdftags shape shape-hb break usvg usvg-images resvg)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg render pdf-semantic pdftags shape shape-hb break usvg usvg-images resvg packages)
 for stage in "${stages[@]}"; do
+  if [ "$stage" = packages ]; then
+    # Exactly the pinned packages (no network access here).
+    scripts/packages.sh --check || {
+      echo "goldens.sh: fetch the packages with scripts/packages.sh" >&2
+      exit 1
+    }
+    rm -rf tests/golden/packages
+    "$ORACLE" packages tests/packages/docs .repos/typst-packages tests/golden/packages
+    continue
+  fi
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).
     rm -rf tests/golden/shape-hb

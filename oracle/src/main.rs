@@ -6,7 +6,9 @@
 //! without needing Rust at test time.
 //!
 //! Usage: `typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg> <suite-dir> <out-dir>`
-//! or `typst-oracle fonts <out-file>`.
+//! or `typst-oracle fonts <out-file>`, or
+//! `typst-oracle packages <docs-dir> <packages-dir> <out-dir>` (documents
+//! that use real packages, see `packages.rs`).
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -21,6 +23,7 @@ mod eval;
 mod font;
 mod fonts;
 mod html;
+mod packages;
 mod paged;
 mod pdf_semantic;
 mod pdftags;
@@ -125,6 +128,23 @@ fn main() {
             std::thread::Builder::new()
                 .stack_size(1 << 30)
                 .spawn(move || paged::dump_paged(&rel, &out, &revision, &manifest_sha))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
+        Some("packages") => {
+            // `packages <docs-dir> <packages-dir> <out-dir>`: the paths are
+            // used as given (see packages.rs).
+            let docs = PathBuf::from(&args[2]);
+            let packages = PathBuf::from(&args[3]);
+            let out = PathBuf::from(&args[4]);
+            let revision = std::fs::read_to_string("UPSTREAM_REV").unwrap().trim().to_string();
+            let manifest_sha = fonts::sha256_hex(fonts::manifest().as_bytes());
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || {
+                    packages::dump_packages(&docs, &packages, &out, &revision, &manifest_sha)
+                })
                 .unwrap()
                 .join()
                 .unwrap();
@@ -261,7 +281,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|render|usvg-images|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|render|usvg-images|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>\n       typst-oracle packages <docs-dir> <packages-dir> <out-dir>"
             );
             std::process::exit(2);
         }
