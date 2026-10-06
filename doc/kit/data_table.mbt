@@ -113,9 +113,10 @@
 ///   `Stroke::none()`: no lines. A cell with other lines has them as its
 ///   own (`TableCell(.., stroke=Sides(top=..))`).
 /// - `radius`: the corners of the frame, and the choice of a frame.
-/// - `frame_fill`: `Block`'s `fill`, for the frame; by default none. It
-///   has the name of its part because `fill` is the table's, per cell: a
-///   `Table` and a `Block` both have a `fill`, and the element is the
+/// - `frame_fill`: `Block`'s `fill`, for the frame; by default the
+///   block's (none, or what a `SetBlock(fill=..)` of the document sets).
+///   It has the name of its part because `fill` is the table's, per cell:
+///   a `Table` and a `Block` both have a `fill`, and the element is the
 ///   table. Without `radius` there is no frame, and it is an error at
 ///   `frame_fill`. (A frame with square corners: `radius=Corners(all=
 ///   Pt(0))`.)

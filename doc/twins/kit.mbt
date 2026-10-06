@@ -18,7 +18,7 @@
 //   the same on both sides.
 
 ///|
-using @doc {type Pad, type SetGrid, type SetTable, type Stroke}
+using @doc {type Pad, type SetBlock, type SetGrid, type SetTable, type Stroke}
 
 ///|
 /// The Typst functions of the kit's elements: one string each, since the
@@ -649,6 +649,9 @@ pub fn kit() -> Array[Twin] {
         "#data-table(columns: (1fr, 1fr), stroke: 0.4pt + luma(120), radius: 0pt, frame-fill: white, ([#\"Square\"], [#\"frame\"]), (([#\"with a\"], [#\"surface\"]),))",
         "#data-table(columns: (1fr, 1fr), stroke: none, radius: (top: 6pt), frame-fill: gradient.linear(white, luma(200)), (), (([#\"a gradient\"], [#\"beneath\"]),))",
         "#data-table(columns: (1fr, 1fr), radius: 3pt, frame-fill: none, ([#\"No\"], [#\"surface\"]), ())",
+        // Under a rule for the fill of blocks: the frame without a fill of
+        // its own has the rule's, and none is none.
+        "#[#set block(fill: luma(215));#data-table(columns: (1fr, 1fr), radius: 2pt, ([#\"The\"], [#\"rule's\"]), ())#data-table(columns: (1fr, 1fr), radius: 2pt, frame-fill: none, ([#\"Still\"], [#\"none\"]), ())]",
       ],
       () => {
         let fill : Cells[Paint] = Cells((_, y) => {
@@ -703,6 +706,22 @@ pub fn kit() -> Array[Twin] {
             radius=Corners(all=Pt(3)),
             frame_fill=None,
           ),
+          Seq([
+            SetBlock(fill=Luma(215)),
+            @kit.DataTable(
+              ["The", "rule's"],
+              [],
+              columns=[Fr(1), Fr(1)],
+              radius=Corners(all=Pt(2)),
+            ),
+            @kit.DataTable(
+              ["Still", "none"],
+              [],
+              columns=[Fr(1), Fr(1)],
+              radius=Corners(all=Pt(2)),
+              frame_fill=None,
+            ),
+          ]),
         ])
       },
     ),

@@ -862,11 +862,13 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
   (`fill=Cells::all(White)`): the engine paints what is in a clipped block
   after the block's outline, up to the outline's inner edge, and a fill
   there takes some of the outline away in the pixels that the outline
-  covers in part. At 110 pixels per inch, an outline of 0.5pt in grey 120
-  on a page in grey 225 has an inner column of pixels of 173 around a
-  filled frame and of 187 around filled cells; 5pt to the right, 213 and
-  240. `fill` is for the cells that differ from the surface: here the
-  header and the marked row. Without `radius` there is no frame, and
+  covers in part. At 110 pixels per inch, the left side of a frame at
+  10pt from the edge of the page, outlined with 0.5pt in grey 120 on a
+  page in grey 225, has an inner column of pixels of 173 around a filled
+  frame and of 187 around filled cells; 5pt to the right, 213 and 240
+  (how much depends on where the side falls among the pixels). `fill` is
+  for the cells that differ from the surface: here the header and the
+  marked row. Without `radius` there is no frame, and
   `frame_fill` is an error.
 - The text is not a parameter. Rules before the table reach its cells: a
   `SetText` for the size of the table's text, a show-set rule on the cells

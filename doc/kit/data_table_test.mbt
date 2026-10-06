@@ -766,15 +766,19 @@ fn box_alone(frame : Drawn) -> Pixels raise {
 ///|
 /// Where the outline of the table's frame on page `page` differs from the
 /// box alone: on its four sides and in its corners, but not where a rule
-/// of the table meets it.
+/// of the table meets it. (A rule is between two rows: one on the top or
+/// the bottom side of the frame would take that side out of the
+/// comparison, and is a failure.)
 fn frame_differences(
   report : @doc.CompileReport[@layout.PagedDocument],
   page : Int,
 ) -> String raise {
   let frame = frame_on(report, page)
-  let rules = of_kind(drawn(report), "line")
-    .filter(d => d.page == page)
-    .map(d => (d.y - 0.25, d.y + 0.25))
+  let lines = of_kind(drawn(report), "line").filter(d => d.page == page)
+  for line in lines {
+    assert_true(line.y > frame.y + 5.0 && line.y < frame.y + frame.h - 5.0)
+  }
+  let rules = lines.map(d => (d.y - 0.25, d.y + 0.25))
   outline_differences(
     pixels(report, page~),
     box_alone(frame),
@@ -898,7 +902,7 @@ test "data table: the surface of a frame" {
   )
   // On all four sides and in the corners: with the surface in the frame
   // the outline is the outline of the box alone, pixel for pixel; with
-  // the surface in the cells every pixel of its inner edge differs.
+  // the surface in the cells 1015 pixels of it differ.
   inspect(frame_differences(by_frame, 1), content="")
   inspect(
     frame_differences(by_cells, 1).split("\n").collect().length(),
@@ -1016,6 +1020,34 @@ test "data table: the surface of a frame" {
     content=(
       #|DataTable a8
     ),
+  )
+  // Also for a fill that is none: it is an argument for the frame.
+  let unframed_none = compile([
+    @kit.DataTable(head, two_columns(1), columns=[Auto, Auto], frame_fill=None),
+  ])
+  assert_eq(errors(unframed_none), errors(unframed))
+  // Without `frame_fill` the frame has the fill of the document's blocks,
+  // if a rule sets one; `None` is no fill whatever the rules say.
+  let ruled = (frame_fill : @doc.Paint?) => {
+    let report = compile([
+      Seq([
+        @doc.SetBlock(fill=Luma(200)),
+        @kit.DataTable(
+          head,
+          two_columns(1),
+          columns=[Fr(1), Fr(1)],
+          stroke=rule,
+          radius=round,
+          frame_fill?,
+        ),
+      ]),
+    ])
+    painted(report).split("\n").collect()[0].to_owned()
+  }
+  inspect(ruled(None), content="fill 10.00,10.00 180.00x33.16 luma(78.43%)")
+  inspect(
+    ruled(Some(None)),
+    content="stroke 10.00,10.00 180.00x33.16 0.50 luma(47.06%)",
   )
   // A square frame is a radius of nothing.
   let square = compile(

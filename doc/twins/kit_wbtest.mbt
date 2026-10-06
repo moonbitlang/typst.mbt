@@ -150,6 +150,14 @@ test "data-table: the function rejects what the element rejects, in its words" {
       #|the fill of a frame without a frame: a `DataTable` has a frame only with a `radius`: `frame_fill` is the fill of the frame
     ),
   )
+  // A fill that is none is an argument too.
+  assert_eq(
+    typst_error("columns: (auto,), frame-fill: none, ([A],), ()"),
+    "assertion failed: " +
+    first_error(
+      Document([@kit.DataTable(["A"], [], columns=[Auto], frame_fill=None)]),
+    ),
+  )
   // And both take rows that fit, with spans over columns and rows.
   let fits = "columns: (auto, auto, auto), ([A], table.cell(colspan: 2)[B]), ((table.cell(rowspan: 2)[t], [b], [c]), ([e], [f]), (table.cell(colspan: 3)[w],))"
   assert_eq(typst_error(fits), "")
