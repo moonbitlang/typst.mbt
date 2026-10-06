@@ -996,9 +996,9 @@ pub fn harvest_chart(beds : Array[(String, Double)], top : Double) -> Layout {
   canvas and these items create no callback, so they can be built inside
   one. (The ports typed the width of the page in, which is wrong as soon
   as a margin changes.)
-- An item is content, and the items are an array of content: several items
-  are one in a `Seq`, and `Keyed(key, ..)` gives the items of one row of
-  the data its key. A click on a bar leads to the line of its
+- An item is content, and the items are an array of content, drawn in
+  their order: several items are one in a `Seq`, and `Keyed(key, ..)`
+  gives the items of one row of the data its key. A click on a bar leads to the line of its
   `Canvas::rect`, with the key of its bed: every item is a call of its
   own, not a part of the canvas.
 - The style of the labels is a `Text` around the canvas, or around the
@@ -1052,8 +1052,10 @@ pub fn year() -> Canvas {
   the same path without a head.
 - The head points where the path arrives: along the last line, or along
   the tangent at the end of a curve. It is a triangle as long and as wide
-  as `head` (5.5pt unless it is given), in the paint of the stroke, and
-  the path ends inside it. A dashed arrow is a dashed stroke.
+  as `head` (5.5pt unless it is given), and the path ends inside it. It
+  is filled in the paint that the stroke names; for a stroke without a
+  paint that is black, so an arrow in a colour says so in its `stroke`.
+  A dashed arrow is a dashed stroke.
 - A box with its text is a `Canvas::rect` and a `Canvas::place` at its
   centre with the anchor `(Center, Horizon)`.
 - There are no nodes with names and no edges that find their way: where a
@@ -1081,7 +1083,8 @@ pub fn number_and_unit() -> Canvas {
   cannot be built inside a callback, and therefore not for a canvas that
   is built in a `Layout` for its width. There, `Bottom` does for a line of
   text, and for anything else the callback measures with its own context
-  (`cx.measure(body).baseline`) and anchors at `Top`.
+  (`cx.measure(body).baseline`; with `width=Pt(size.width)` for a body
+  that is broken into lines in the canvas) and anchors at `Top`.
 
 ## 8. Callbacks cannot be created inside a callback
 

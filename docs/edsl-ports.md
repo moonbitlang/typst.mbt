@@ -950,13 +950,13 @@ head~)`; `width=Auto`; `anchor=Baseline`):
 | points as two numbers | a point is a tuple `(x, y)` | As the points of `Line`, `Polygon` and `Curve` in `doc`, and as two ports passed them (`arrow([(140, 62), (172, 62)], ..)`): what a function of the caller returns for the side of a box is one value |
 | horizontal anchors by `Center` with `dx = x − width/2` | `Center` with `dx = Pt(x) - 50%`, likewise `Right` with `- 100%`, and `Horizon` and `Bottom` for `y` | The engine resolves a ratio in `dx` against the container that it aligns in, so the two cancel whatever the size is: `side × (S − w) + x − side × S = x − side × w`. The item does not need the size of the canvas, which is what lets an item be a description of its own. (One port wrote `dx=Diff(Pct(..), Pt(30))` for its ticks.) From the frames: a body of 20pt by 10pt at (50, 30) is at `50 − 20 × side`, `30 − 10 × side` for the nine anchors, in canvases of three sizes |
 | `anchor` | `anchor : (AnchorX, AnchorY)`, by default `(Left, Top)` | Two enums of the kit with `Place`'s names (`Left`, `Center`, `Right`; `Top`, `Horizon`, `Bottom`, `Baseline`). Not `@doc.Alignment`: it has `Start` and `End`, which depend on the direction of the text that the element does not know when it writes the offset, `Auto` and `None`, and no baseline |
-| `anchor=Baseline` measures | `(.., Baseline)`: the item is `Place(Layout((size, cx) => Place(body, .., dy=Pt(y) - baseline)))` | The first baseline is not an alignment of the engine. The body is measured as a `Place` lays it out (in the size of the canvas, not stretched: `cx.measure(body, width=.., height=..)`), so a body that is broken at the width of the canvas is measured in its lines (tested: a small word and then a large one that moves to the second line). It is the item that creates the callback and falls under the creation rule; the canvas does not. A line of text with the default edges ends at its baseline, so `Bottom` is its baseline without measuring, and the documentation says so |
+| `anchor=Baseline` measures | `(.., Baseline)`: the item is `Place(Layout((size, cx) => Place(body, .., dy=Pt(y) - baseline)))` | The first baseline is not an alignment of the engine. The body is measured as a `Place` lays it out: in the size of the canvas, not stretched, and under the alignment that the `Place` sets for its body (`cx.measure(Align(alignment, body), width=.., height=..)`). So a body that is broken at the width of the canvas is measured in its lines (tested: a small word and then a large one that moves to the second line), and a body that reads its alignment is measured as it is placed (tested: a `context` whose text is larger under `center + top`; the review found that the first version measured it under the alignment of the `Place` around the callback). It is the item that creates the callback and falls under the creation rule; the canvas does not. A line of text with the default edges ends at its baseline, so `Bottom` is its baseline without measuring, and the documentation says so |
 | `width=Auto`, from `Layout` | not built | It would need the items as a function of the width, which is `Layout` itself. A canvas and its other items create no callback, so the author writes `Layout((size, _) => Canvas(size.width, 80.0, chart(size.width)))` (the guide's first sample, and both figures of the measurement). The ports typed the width of the page in |
 | `line`, `rect`, `circle`, `curve` | thin: positions and sizes are numbers, `stroke`, `fill` and `radius` are the primitive's, in its types, passed on only when given | "No restyling": an item has no default of its own but the head of an arrow. `Rect`'s `inset` and `body`, `Curve`'s `fill_rule`, an ellipse and a polygon are not items: `Canvas::place(at, Rect(.., body=..))` places any shape |
 | `curve` | `Canvas::curve(start, segments)` with `Segment`: `LineTo(end)`, `QuadTo(control, end)`, `CubicTo(first, second, end)` | The drawing components of `Curve` in the coordinates of the canvas, typed, since the element has to read the last one for the head of an arrow. No `Move` and no `Close`: a path of a canvas is one line from its start to its end (which is what gives an arrow its end); a path of several parts or a closed one is a `Curve` of `doc`'s own components, placed. `QuadTo` had no use in the ports; it is there because `Curve` has it and the tangent of every component has to be defined |
 | `arrow(from, to, .., head~)`, a curve through control points | `Canvas::arrow(start, segments, stroke~, head~)`: the path of `curve` with a head at its end | One path type for both. A straight arrow is `[LineTo(b)]`, a bend two `LineTo`s (three of the twelve arrows of one port), the curve back a `CubicTo` |
 | the head | a filled triangle as long as `head` along the path and as wide across it, 5.5pt by default; in the paint of the stroke | Both ports with arrows drew that: 5.5pt long and 5.2pt wide, and 5.6pt by 5.6pt. One number, since nothing varied but the size with the stroke. Not built, for want of a use: an open head, other shapes, a head at the start, a width of its own |
-| "arrowheads are polygons" | the same, computed in MoonBit | The direction is that of the last line, or from the last control point of the last curve that is not its end; the path ends half the head before the tip (its end moved back along that direction, which keeps the tangent), so that the stroke ends inside the head; where the last arm is shorter than the head, half way. Tested as numbers from the frames: the tip, the base across the direction and `head` wide and `head` behind the tip, the order of the corners and the end of the path, in the eight directions, on a cubic and a quadratic curve, on a bend, with a control point on the end and with a last line shorter than the head |
+| "arrowheads are polygons" | the same, computed in MoonBit | The direction is that of the last line, or from the last control point of the last curve that is not its end; the path ends half the head before the tip, so that the stroke ends inside the head: its end is moved back along that direction, and the control points that are at the end move with it (left at the tip they turn the path back at its end, which the review found), which keeps the tangent; where the last arm is shorter than the head, half way. The direction is computed from the differences divided by the larger of them, so that no difference that is a number is too small or too large for it. Tested as numbers from the frames: the tip, the base across the direction and `head` wide and `head` behind the tip, the order of the corners and the end of the path, in the eight directions, on a cubic and a quadratic curve, on a bend, with one and with both control points on the end, with a last line shorter than the head and one of 1e-200pt; that the last arm of the drawn path points at the tip; and on the functions themselves with differences of 1e-200 and 1e200 (`canvas_wbtest.mbt`) |
 | | `clip : Bool`, `Block`'s, not clipped by default | What is outside the canvas is drawn there (pinned). Clipping by default would cut what is outside by design: half of the stroke of a line on the edge, a label centred under the last tick. Lint L3 is not built |
 | | `key : (Int) -> String`, by default the index | Convention 3, as for `DataTable` |
 | | no `fill`, `stroke`, `inset` | The ports' panels were blocks around the drawing; a background is the first item |
@@ -981,20 +981,29 @@ where the caller writes `Canvas::rect(..)`, and the canvas takes content:
   inside it (`Canvas::rect`, key "15", key "South").
 
 **One accessor in `doc`**, `Stroke::paint() -> Paint?`: the paint that a
-stroke was made with. The head of an arrow is filled in the paint of its
-line, and a `Stroke` is opaque outside `doc`; the Typst twin reads
-`stroke(..).paint`. The alternative, a `fill` beside the `stroke`, makes
+stroke was made with, as it was written (`None` for a stroke without one
+and for the paint `auto`, as a `Paint` or as a value; it reads the
+description, not what the rules of the document resolve a stroke to). The
+head of an arrow is filled in the paint of its line, and a `Stroke` is
+opaque outside `doc`; the Typst twin reads `stroke(..).paint`. The alternative, a `fill` beside the `stroke`, makes
 every coloured arrow name its colour twice and draws a black head when
 one is forgotten. A stroke without a paint gives a black head, which is
 what such a stroke is drawn in unless a rule of the document for curves
 says otherwise (pinned: there the head stays black, and the
-documentation says that an arrow in a colour names it).
+documentation says that an arrow in a colour names it). The polygon of
+the head has that fill and no stroke of its own, and is under the rules
+of the document like every part of an element: `SetPolygon(stroke=..)`
+outlines the heads (pinned).
 
 **Invalid arguments.** A coordinate or a size that is not finite, a
 negative size of the canvas, a negative `head`, an arrow without a
-segment and an arrow whose last segment has no length are errors at
-their arguments. The engine takes a NaN for a length and draws something
-somewhere, which is the kind of output the kit exists to prevent.
+segment and an arrow whose last segment gives it no direction (it ends
+where it starts, or its ends are so far apart that their difference is
+not a number) are errors at their arguments. The engine takes a NaN for
+a length and draws something somewhere, which is the kind of output the
+kit exists to prevent. What is checked is what the element computes
+with: a finite number that is too large for a length of the engine is
+the engine's matter, as in every `Pt(..)`.
 
 **A linear scale** is not built. In every port and in the measurement it
 is one function of one line (`left + (v - lo) / (hi - lo) * (right -
@@ -1032,7 +1041,8 @@ items the same 21 rejected inputs. What the pairs showed:
   twin: the frames of a canvas with a `Seq` among its items are the
   function's, its structure is not.
 - Typst has no value for the anchor `Baseline`: the function takes the
-  string `"baseline"`.
+  string `"baseline"`. And `key` is not content: the function has none
+  (it passes on `clip` only).
 
 **The measurement.** `doc/examples/report` got a third page with two
 figures from invented data: a chart of ten bars with their values, a
@@ -1053,21 +1063,26 @@ helper with the report's insets in it) is counted as what it exists for.
 
 | | helper lines | what the kit provides | the document's own |
 |---|---|---|---|
-| before | 447 | 266 | 181 |
+| before | 447 | 254 | 193 |
 | after | 253 | 0 | 253 |
-| of them for the two figures, before | 270 | 144 | 126 |
+| of them for the two figures, before | 270 | 132 | 138 |
 | for the two figures, after | 150 | 0 | 150 |
 
 The second column is what the kit takes away. The third grows, and that
-is the finding of the split: 72 lines in all, 24 of them in the figures.
+is the finding of the split: 60 lines in all, 12 of them in the figures.
 What the hand-written mechanisms had written into them (the look of a
 card, the insets of a table, the size and the paint of a label as the
-defaults of `label`) is written at the calls with the kit, and a call of
-an item is longer than a call of a helper that was made for this one
-document (a label is a `Text` in a `Canvas::place` with an anchor). The
-figures are 40 lines of measures, scales and styles that both versions
-share, and a function per figure that is 86 lines by hand and 110 with
-the kit.
+defaults of `label`, the control points of the curve back in
+`arrow_back`) is written at the calls with the kit, and a call of an
+item is longer than a call of a helper that was made for this one
+document (a label is a `Text` in a `Canvas::place` with an anchor). So
+the second column is an upper bound of what the kit provides: the items
+in it are counted whole, with the document's choices that they hold.
+What the kit does not have is in the third on both sides: the `Node` of
+the hand-written diagram with the sides of a box (12 lines; the kit has
+no nodes, and the version with it computes those sides where it uses
+them), the 40 lines of measures, scales and styles that both versions
+share, and a function per figure, 86 lines by hand and 110 with the kit.
 
 The pages: the first two are identical as before (the SVG of both and
 the PDF of the two versions with the same figures, byte for byte). The
@@ -1098,7 +1113,7 @@ aarch64 macOS, means of 500 runs in three repetitions): 13.29, 13.30 and
 14.01 ms before; 13.92, 13.89 and 14.71 ms after, 0.6 ms or under 5%
 more, of which 0.5 ms are the cards and the table of steps 3 and 4. The
 two figures alone (`report time 500 figures`): 2.02, 2.03 and 2.02 ms
-before; 2.23, 2.22 and 2.22 ms after, 0.2 ms or 10% more, for 59 items
+before; 2.23, 2.22 and 2.22 ms after, 0.2 ms or 10% more, for 60 items
 that are each a composite and two `Layout` callbacks.
 
 **Conventions amended** (`doc/kit/kit.mbt`, each marked "step 5"):

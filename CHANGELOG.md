@@ -236,8 +236,8 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   `AnchorX` (`Left`, `Center`, `Right`), `AnchorY` (`Top`, `Horizon`,
   `Bottom`, `Baseline`) and `Segment` (`LineTo`, `QuadTo`, `CubicTo`).
 - `doc`: `Stroke::paint()`, the paint that a stroke was made with (`None`
-  for one without): what `Canvas::arrow` fills its head with, since a
-  stroke is opaque outside `doc`.
+  for one without, or with `auto`): what `Canvas::arrow` fills its head
+  with, since a stroke is opaque outside `doc`.
 
 ### Not a change for users
 

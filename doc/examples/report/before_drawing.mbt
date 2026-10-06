@@ -79,6 +79,11 @@ fn canvas(height : Double, items : Array[&IntoContent]) -> Block {
   Block(Seq(items), width=Pt(TEXT_W), height=Pt(height))
 }
 
+// helper-lines: own
+//
+// Where the boxes of a diagram are: the kit has no nodes, and the version
+// with it computes the same sides where it uses them.
+
 ///|
 /// A box of a diagram, by its corner and its size.
 priv struct Node {
@@ -97,6 +102,8 @@ fn Node::cx(self : Node) -> Double {
 fn Node::cy(self : Node) -> Double {
   self.y + self.h / 2
 }
+
+// helper-lines: kit
 
 ///|
 /// A box of a diagram with its text in its middle.
