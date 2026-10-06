@@ -88,6 +88,49 @@ hand (it still prints the field as `unreachable`), and `wasmi/ir`'s
 `OutOfBoundsConst` and `wasmi`'s `Any` implement `Show` by hand instead of
 deriving it.
 
+### Changed: trait methods called through their type
+
+MoonBit is removing the rule that makes the methods of `impl Trait for T`
+callable as methods of `T` (`x.hash()`, `T::default()`). Every public impl
+and every trait derived for a public type now says which of its methods
+are methods of the type, with a `pub extend T with Trait::{..}`:
+
+- 547 more impls in 32 packages, the ones this repository itself calls
+  that way, declare it plainly (0.1.4 had 103 such declarations, in
+  `syntax/ast` and `wasmi/core`; now 650 in 34 packages). Their methods,
+  about 1,030 more, are now listed in the interfaces as methods of the
+  type (`pub fn T::m`) and are callable as before; most are in `library`
+  (the `Reflect`/`IntoValue`/`FromValue` casts, `Fingerprint`,
+  `Show::to_string`, `Default::default`), `usvg`, `wasmparser`, `otf` and
+  `bib/hayagriva`.
+- For every other public impl (4,438 declarations in 67 packages) the
+  declaration is deprecated and hidden from the interface: these methods
+  are not meant to be methods of the type. Calling one through the type
+  compiles as before, now with a warning that says what to write, e.g.
+  ``call as `Hash::m(x)`, or un-deprecate this `extend` to make it a
+  method``: write the call with its trait (`Hash::hash(x)`,
+  `Default::default()`, `@debug.Debug::to_repr(x)`).
+- `doc` (the EDSL): the conversion traits are called through the trait,
+  for every type alike. `x.to_value()` and `x.into_content()` on a
+  concrete facade or description type (`Length`, `Paint`, `Stroke`,
+  `Heading`, `Context`, ..), and `x.to_repr()`, which implicit promotion
+  allowed in 0.1.4, are deprecated: write `ToValue::to_value(x)`,
+  `IntoContent::into_content(x)`, `@debug.Debug::to_repr(x)`. Passing
+  such a value to a constructor, which is how documents use them (typed
+  parameters, `&IntoContent` for content, the bound `T : ToValue` of the
+  generic facades), is unchanged, and so are calls on a trait object and
+  printing with core's `debug(x)` / `debug_inspect(x)`. The interface of
+  `doc` lists none of these as methods, as in 0.1.4.
+
+Operators (`==`, `<`, `+`), string interpolation, `inspect`/`debug` and
+generic code with trait bounds call the trait and are not affected.
+
+Where two traits of a type have a method of the same name, one of them is
+the method of the type: `T::output()` is `Reflect`'s (the cast info, as in
+upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
+`Symbol`, `Tag`, `Target`, `Type` and `Version` in `library`; `Show`'s
+`output` of these types is `Show::output(x, logger)`.
+
 ### Added
 
 - `doc/format`, a new package without dependencies (it does not import
