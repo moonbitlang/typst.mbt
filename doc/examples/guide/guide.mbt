@@ -276,16 +276,30 @@ pub fn apostrophes() -> Seq {
 }
 
 ///|
-/// Section 7: cards of one row are equally high: the cells of the grid
-/// carry the fill, the stroke and the inset.
-pub fn cards(items : Array[&IntoContent], columns? : Int = 2) -> Grid {
-  Grid(
+using @kit {type Cards}
+
+///|
+/// Section 7: the cards of one row are equally high.
+pub fn cards(items : Array[&IntoContent]) -> Cards {
+  Cards(
     items,
-    columns=Sizing::repeat(columns, size=Fr(1)),
     gutter=[Pt(8)],
-    inset=Cells::all(Sides(all=Pt(8))),
-    fill=Cells::all(Luma(245)),
-    stroke=Cells::all(Sides(all=Stroke(paint=Luma(200), thickness=Pt(0.5)))),
+    inset=Sides(all=Pt(8)),
+    fill=Luma(245),
+    stroke=Sides(all=Stroke(paint=Luma(200), thickness=Pt(0.5))),
+  )
+}
+
+///|
+/// Section 7: with rounded corners, three to a row.
+pub fn rounded_cards(items : Array[&IntoContent]) -> Cards {
+  Cards(
+    items,
+    columns=Sizing::repeat(3, size=Fr(1)),
+    gutter=[Pt(8)],
+    inset=Sides(all=Pt(8)),
+    fill=Luma(245),
+    radius=Corners(all=Pt(4)),
   )
 }
 
@@ -343,6 +357,9 @@ pub fn guide() -> Document {
     prose_table([Fr(1), Fr(2)]),
     loose_title(ruled_table(["a", "b", "c", "d"])),
     kept_title(cards(["One.", "Two, with more text than the first card has."])),
+    rounded_cards([
+      "One.", "Two, with more text than the first card has.", "Three.", "Four.",
+    ]),
     apostrophes(),
     stripes_captured(),
   ])

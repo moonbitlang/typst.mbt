@@ -1,0 +1,18 @@
+// A small report written twice (docs/edsl-ports.md, sections 9 and 10,
+// step 3): with the helpers that an author wrote by hand before the kit
+// had the element (`before.mbt`, `before_helpers.mbt`), and with the kit
+// (`after.mbt`). The baseline for measuring what an element of the kit
+// replaces. See `main.mbt`.
+
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/kit",
+  "moonbitlang/typst/doc/system",
+  "moonbitlang/core/env",
+}
+
+import {
+  "moonbitlang/typst/layout",
+} for "wbtest"
+
+pkgtype(kind: "executable")

@@ -12,6 +12,8 @@ pub fn constructs() -> Array[Twin]
 
 pub fn full_showcase() -> @doc.Document
 
+pub fn kit() -> Array[Twin]
+
 pub fn long() -> @doc.Document
 
 pub fn longer() -> @doc.Document

@@ -258,13 +258,13 @@ fn Lowering::content(
     }
     // A lone inserted expression: a sequence of one.
     NCall(_) | NValue(_) => self.sequence([content], fallback, own=false)
-    NKeyed(_, _) if is_inserted(content) =>
+    NKeyed(_, _) | NComposite(_, _) if is_inserted(content) =>
       self.sequence([content], fallback, own=false)
     NSeq(children, site) => {
       let entry = self.entry(site)
       // Children without a location of their own (plain strings, values)
       // get distinct spans inside the array argument's (`Pieces`).
-      let pieces = Pieces::new(self.session.registry.arg_span(entry, 0))
+      let pieces = Pieces::new(self.param_span(site, entry, 0))
       let inner : Lowering = { ..self, pieces: Some(pieces), }
       inner.sequence(children[:], pieces.base, own=true)
     }
@@ -278,15 +278,23 @@ fn Lowering::content(
     // `show` directly in code and content blocks).
     NSetRule(set) => raise self.misplaced_rule(set.origin)
     NShowRule(show) => raise self.misplaced_rule(show.origin)
-    NInvalid(message, site) =>
-      raise error_at(self.session.registry.span(self.entry(site)), message)
+    NInvalid(message, site, param) =>
+      raise error_at(
+        self.session.registry.arg_span(self.entry(site), param),
+        message,
+      )
     NLabelled(body, label, site, label_param) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
-      let label_span = self.session.registry.arg_span(entry, label_param)
-      let body_span = self.session.registry.arg_span(entry, 0)
+      let label_span = self.param_span(site, entry, label_param)
+      let body_span = self.param_span(site, entry, 0)
       let body = self.at(body_span).content(body, body_span)
       self.labelled(body, label, span, label_span)
+    }
+    // What the `build` of a composite made.
+    NComposite(body, site) => {
+      let (inner, span) = self.composite(site)
+      inner.content(body, span)
     }
     NKeyed(key, body) => {
       self.check_key(key, fallback)
@@ -444,7 +452,7 @@ fn Lowering::sequence(
         self.take(pieces)
       _ => base
     }
-    match child.node {
+    match rule_of(child).unwrap_or(child.node) {
       NSetRule(set) => {
         let styles = self.set_rule(set)
         let tail = self.sequence(children[i:], base, own~)
@@ -519,9 +527,59 @@ fn Lowering::sequence(
 fn is_inserted(content : Content) -> Bool {
   match content.node {
     NCall(_) | NValue(_) => true
-    NKeyed(_, body) => is_inserted(body)
+    NKeyed(_, body) | NComposite(body, _) => is_inserted(body)
     _ => false
   }
+}
+
+///|
+/// For lowering the body of a composite (`NComposite`): the lowering
+/// context and the span of the body, which is the call (what has no
+/// location of its own in the result of `build` is not an argument of a
+/// constructor).
+fn Lowering::composite(
+  self : Lowering,
+  site : Site,
+) -> (Lowering, @syntax.Span) raise @library.SourceError {
+  let span = self.session.registry.span(self.entry(site))
+  (self.at(span), span)
+}
+
+///|
+/// The rule that a child of a sequence is, also as the result of a
+/// composite (which is what it is made of).
+fn rule_of(content : Content) -> Node? {
+  match content.node {
+    NSetRule(_) | NShowRule(_) => Some(content.node)
+    NComposite(body, _) => rule_of(body)
+    _ => Option::None
+  }
+}
+
+///|
+/// The value that a description is, also as the result of a composite:
+/// as an argument it is passed as the value (`none` reaches a content
+/// field as such).
+fn value_of(content : Content) -> Value? {
+  match content.node {
+    NValue(value) => Some(value)
+    NComposite(body, _) => value_of(body)
+    _ => Option::None
+  }
+}
+
+///|
+/// The span of the parameter `param` of the constructor with the site
+/// `site`, whose entry is `entry`: the argument's token; the line of the
+/// call if the argument has no location, or, for a constructor inside a
+/// composite, if it is not marked as an argument of the composite.
+fn Lowering::param_span(
+  self : Lowering,
+  site : Site,
+  entry : Int,
+  param : Int,
+) -> @syntax.Span {
+  self.session.registry.arg_span(entry, site.param(param))
 }
 
 ///|
@@ -536,9 +594,13 @@ fn Lowering::inserted(
     NCall(call) => {
       let entry = self.entry(call.origin)
       let span = self.session.registry.span(entry)
-      (self.call(call.func, call.args, entry, span), span)
+      (self.call(call.func, call.args, entry, span, site=call.origin), span)
     }
     NValue(value) => (self.value(value, fallback), fallback)
+    NComposite(body, site) => {
+      let (inner, span) = self.composite(site)
+      inner.inserted(body, span)
+    }
     NKeyed(key, body) => {
       self.check_key(key, fallback)
       let keys = self.keys.copy()
@@ -655,13 +717,16 @@ fn Lowering::func(
 
 ///|
 /// Lower arguments. Each argument is spanned with its parameter's location
-/// (`entry < 0` or `param < 0`: the call's span).
+/// (`entry < 0` or `param < 0`: the call's span). `site` is the site of
+/// the entry: the parameters of a constructor inside a composite are those
+/// of the composite that they were marked as (`Site::param`).
 fn Lowering::args(
   self : Lowering,
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,
   scopes? : Array[Pieces] = [],
+  site? : Site,
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []
   // Arguments that share a location (the arguments of a generic call, the
@@ -685,8 +750,12 @@ fn Lowering::args(
     } else {
       // A located argument: its token; an argument without a location:
       // the line of the call.
-      let base = if arg.param >= 0 {
-        self.session.registry.arg_span(entry, arg.param)
+      let param = match site {
+        Some(site) => site.param(arg.param)
+        Option::None => arg.param
+      }
+      let base = if param >= 0 {
+        self.session.registry.arg_span(entry, param)
       } else {
         span
       }
@@ -742,9 +811,10 @@ fn Lowering::call(
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,
+  site? : Site,
 ) -> @library.Value raise @library.SourceError {
   let func = self.func(func, span).spanned(span)
-  let args = self.args(args, entry, span)
+  let args = self.args(args, entry, span, site?)
   let result = self.trace_call(func.name(), span, () => {
     func.call(self.engine, self.context, args)
   })
@@ -824,7 +894,15 @@ fn Lowering::value(
     // A value in a content position is passed as the value (so that
     // `none` and `auto` reach a content field as such).
     VContent({ node: NValue(inner), }) => self.value(inner, span)
-    VContent(content) => @library.Value::Content(self.content(content, span))
+    VContent(content) =>
+      match (content.node, value_of(content)) {
+        // (Also where a composite made the value.)
+        (NComposite(_, site), Some(inner)) => {
+          let (lowering, span) = self.composite(site)
+          lowering.value(inner, span)
+        }
+        _ => @library.Value::Content(self.content(content, span))
+      }
     VLabel(name) =>
       self.call(
         FNative(@library.native_label_construct()),
@@ -874,7 +952,7 @@ fn Lowering::set_rule(
       }
     }
   }
-  let args = self.args(set.args, entry, span)
+  let args = self.args(set.args, entry, span, site=set.origin)
   target.set(self.engine, args).spanned(span).liftable()
 }
 
@@ -889,7 +967,7 @@ fn Lowering::show_rule(
   let scopes : Array[Pieces] = []
   let selector : @library.Selector? = match show.selector {
     Some(selector) => {
-      let pieces = pieces_of(scopes, self.session.registry.arg_span(entry, 0))
+      let pieces = pieces_of(scopes, self.param_span(show.origin, entry, 0))
       let selector_span = self.take(pieces)
       let inner : Lowering = { ..self, pieces: Some(pieces), }
       let selector = inner.value(selector, selector_span)
@@ -905,7 +983,8 @@ fn Lowering::show_rule(
       // The transformation is the last declared parameter.
       let pieces = pieces_of(
         scopes,
-        self.session.registry.arg_span(
+        self.param_span(
+          show.origin,
           entry,
           if show.selector is Some(_) {
             1
@@ -940,7 +1019,7 @@ fn Lowering::eval(
 ) -> @library.Content raise @library.SourceError {
   let entry = self.entry(node.origin)
   let span = self.session.registry.span(entry)
-  let source_span = self.session.registry.arg_span(entry, node.source_param)
+  let source_span = self.param_span(node.origin, entry, node.source_param)
   self.check_text(node.source, source_span)
   let scope = @library.Scope::new()
   // The values of the scope have no locations: each takes a span inside
@@ -978,7 +1057,7 @@ fn Lowering::eval(
         equation.field(@library.equation_elem_body)
       })
       let func = @library.Func::element(@library.equation_elem()).spanned(span)
-      let args = self.args(node.args, entry, span, scopes~)
+      let args = self.args(node.args, entry, span, scopes~, site=node.origin)
       args.items.insert(0, {
         span: source_span,
         name: None,

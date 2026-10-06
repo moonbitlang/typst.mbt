@@ -75,7 +75,8 @@ fn piece_call(elem : @library.Element) -> Content {
 /// key or a label.
 fn is_parbreak_piece(content : Content) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => is_parbreak_piece(body)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      is_parbreak_piece(body)
     NValue({ val: VCall(FElem(elem), _), }) => elem == @library.parbreak_elem()
     NCall({ func: FElem(elem), .. }) => elem == @library.parbreak_elem()
     _ => false
@@ -100,7 +101,8 @@ pub fn Para::Para(
   let site = Site::new("Para", loc, args_loc)
   let pieces = match prose_pieces(text, quotes, "Para") {
     Ok(pieces) => pieces
-    Err(message) => return { content: Content::of(NInvalid(message, site)), }
+    Err(message) =>
+      return { content: Content::of(NInvalid(message, site, -1)), }
   }
   // The options, as `set par(..)` for the sequence: the arguments of
   // `SetPar`, with the indices of this constructor's parameters.
