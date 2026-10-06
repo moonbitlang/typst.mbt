@@ -1209,6 +1209,15 @@ pub impl @builtin.Show for ParView
 pub impl @debug.Debug for ParView
 pub impl IntoContent for ParView
 
+pub struct Para {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Para::Para(String, quotes? : Bool, leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Para
+pub impl @debug.Debug for Para
+pub impl IntoContent for Para
+
 pub struct Parbreak {
   // private fields
 }

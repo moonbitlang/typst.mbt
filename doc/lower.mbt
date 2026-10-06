@@ -262,6 +262,12 @@ fn Lower::content(
       let inner : Lower = { ..self, pieces: Some(pieces), }
       inner.sequence(children[:], pieces.base, own=true)
     }
+    // The value of an argument that is a sequence without a site (the
+    // text of `Para`): its children are pieces of that argument, whose
+    // span `fallback` is. They take the spans after it from the
+    // argument's counter (`Lower::args`), so the words of the text resolve
+    // to the argument of the one call that has it.
+    NPieces(children) => self.sequence(children[:], fallback, own=true)
     // A rule outside a sequence styles nothing (Typst only allows `set` and
     // `show` directly in code and content blocks).
     NSetRule(set) => raise self.misplaced_rule(set.origin)

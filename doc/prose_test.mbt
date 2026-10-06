@@ -44,14 +44,14 @@ test "prose: a description interpolated into another string is an error" {
   let report = compile([@doc.Par("see \{@doc.Emph("this")}")])
   assert_eq(
     error_messages(report),
-    "`Emph` was interpolated into a string that is not the text of `Prose`",
+    "`Emph` was interpolated into a string that is not the text of `Prose` or `Para`",
   )
   assert_true(report.errors[0].hints[0].message.contains("Prose"))
   // Also as a value (the text of `Raw`).
   let report = compile([@doc.Raw("x \{@doc.Strong("y")}")])
   assert_eq(
     error_messages(report),
-    "`Strong` was interpolated into a string that is not the text of `Prose`",
+    "`Strong` was interpolated into a string that is not the text of `Prose` or `Para`",
   )
 }
 
@@ -65,7 +65,7 @@ test "prose: misuse is reported at the Prose call" {
   let report = compile([first, second])
   assert_eq(
     error_messages(report),
-    "an interpolated description of this text was already used by another `Prose`",
+    "an interpolated description of this text was already used by another `Prose` or `Para`",
   )
   assert_eq(origin_of(report.errors[0]).kind, "Prose")
   // A rule has no place in prose (the rule types cannot be interpolated;
@@ -146,7 +146,7 @@ test "prose: placeholders are found in every string that is lowered" {
     let report = compile([build("x\{@doc.Emph("e")}")])
     error_messages(report)
   }
-  let expected = "`Emph` was interpolated into a string that is not the text of `Prose`"
+  let expected = "`Emph` was interpolated into a string that is not the text of `Prose` or `Para`"
   // Literal text and string values.
   assert_eq(leak(s => @doc.Lit(s)), expected)
   assert_eq(leak(s => @doc.Value::str(s)), expected)
@@ -260,7 +260,7 @@ test "prose: a placeholder in a string that a function returns is a leak" {
   let files : Map[String, Bytes] = {
     "x.txt": @utf8.encode("see \{@doc.Emph("x")}"),
   }
-  let expected = "`Emph` was interpolated into a string that is not the text of `Prose`"
+  let expected = "`Emph` was interpolated into a string that is not the text of `Prose` or `Para`"
   let report = compile(
     [@doc.Call("read", positional=[@doc.Value::str("x.txt")])],
     files~,

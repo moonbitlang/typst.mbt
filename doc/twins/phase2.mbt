@@ -17,6 +17,7 @@ using @doc {
   type ShowWith,
   type Symbol,
   type Prose,
+  type Para,
 }
 
 ///|
@@ -422,6 +423,44 @@ pub fn phase2() -> Array[Twin] {
             ]),
           ),
           Par(Seq(["a", Space::newline(), "b"])),
+        ])
+      },
+    ),
+    // `Para` (docs/edsl-ports.md, section 3.1): `par(..)` around the
+    // functional expansion of the prose, with the options of `par` (in
+    // its order) and of `Prose`; two of them are two paragraphs; a label
+    // is attached to the paragraph.
+    twin(
+      "para",
+      [
+        page_typ, "#par[#\"Each\" #\"dot\" #\"is\" #smartquote(double: true)#\"one\"#smartquote(double: true)\n#\"complete\" #raw(\"trial\") #\"of\" #\"all\" #\"9\" #emph[#\"milestones\"]#\".\"]",
+        "#par(justify: true)[#\"One\" #\"line.\"]", "#par(leading: 0.4em, spacing: 14pt, justify: false, linebreaks: \"simple\", hanging-indent: 6pt, first-line-indent: 4pt)[#\"say\" #\"\\\"hi\\\"\"\n#\"汉字\"\n#\"汉字\" #\"and\" #\"it's\" #\"long\" #\"enough\" #\"to\" #\"need\" #\"a\" #\"second\" #\"line.\"]",
+        "#par[#\"Labelled.\"]<p>", "#par[]", "#[#par[#\"inner\"]]", "#par[#\"keyed\"]",
+      ],
+      () => {
+        let count = 9
+        Document([
+          page(),
+          (
+            $|Each dot is "one"
+            $|complete \{Raw("trial")} of all \{count} \{Emph("milestones")}.
+          )
+          |> Para,
+          Para("One line.", justify=true),
+          Para(
+            "say \"hi\"\n汉字\n汉字 and it's long enough to need a second line.",
+            quotes=false,
+            leading=Em(0.4),
+            spacing=Pt(14),
+            justify=false,
+            linebreaks="simple",
+            hanging_indent=Pt(6),
+            extra=[("first-line-indent", Value::length(Pt(4)))],
+          ),
+          Para("Labelled.", label="p"),
+          Para(""),
+          Seq([Para("inner")]),
+          Keyed("row", Para("keyed")),
         ])
       },
     ),

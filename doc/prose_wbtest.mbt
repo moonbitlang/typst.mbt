@@ -13,7 +13,7 @@ test "prose table: pending entries are dropped oldest first at the cap" {
   }
   // `first` was dropped, `used` was consumed: below the cutoff the table
   // cannot tell which, and says so.
-  let message = "an interpolated description of this text was already used by another `Prose`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
+  let message = "an interpolated description of this text was already used by another `Prose` or `Para`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
   guard Prose(first).content.node is NInvalid(text, _) else {
     fail("the dropped entry was found")
   }

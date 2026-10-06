@@ -471,6 +471,158 @@ test "source characters are not claimed where the literal is not the text" {
 }
 
 ///|
+test "source characters: the text of a Para resolves like the text of a Prose" {
+  // (docs/edsl-ports.md, section 3.1.) The same text as `Para(..)` and
+  // as `Par(Prose(..))`: the origin of its words is the text argument of
+  // the one call, and what is known of that argument is the same.
+  let tiers = (feedback : @doc.Feedback) => {
+    feedback.origins.map(o => (o.origin.kind, o.origin.param, o.tier, o.why))
+  }
+  // A literal over two lines with a hole: source characters on both
+  // sides of the interpolated description, the reflowed line break and
+  // the quotes that the engine sets.
+  let para = feedback_in(
+    [
+      (
+        $|Lines one with "quotes" and
+        $|a \{@doc.Emph("stressed")} second line.
+      )
+      |> @doc.Para,
+    ],
+    "and a stressed second",
+  )
+  let nested = feedback_in(
+    [
+      @doc.Par(
+        @doc.Prose(
+          (
+            $|Lines two with "quotes" and
+            $|a \{@doc.Emph("stressed")} second line.
+          ),
+        ),
+      ),
+    ],
+    "and a stressed second",
+  )
+  assert_eq(tiers(para), [("Para", Some(0), 3, ""), ("Emph", Some(0), 3, "")])
+  assert_eq(tiers(nested), [("Prose", Some(0), 3, ""), ("Emph", Some(0), 3, "")])
+  inspect(
+    chars_of(para, "$|Lines one with"),
+    content="+0:+26 and | +1:+2 a | +1:+29 second",
+  )
+  assert_eq(
+    chars_of(para, "$|Lines one with"),
+    chars_of(nested, "$|Lines two with"),
+  )
+  assert_eq(para.origins[0].rendered, nested.origins[0].rendered)
+  assert_eq(para.origins[0].pieces, nested.origins[0].pieces)
+  assert_eq(para.origins[0].excerpt.length(), 2)
+  assert_eq(para.origins[0].more, nested.origins[0].more)
+  let block = para.to_text()
+  assert_true(block.contains("        $|Lines one with \"quotes\" and\n"))
+  assert_true(block.contains(", Para(..), parameter 1"))
+  // The quotes are source characters, in a literal on the call's line.
+  let quoted = feedback_in(
+    [@doc.Para("Paragraph of \"cited words\" here.")],
+    "“cited",
+  )
+  assert_eq(tiers(quoted), [("Para", Some(0), 3, "")])
+  inspect(
+    chars_of(quoted, "\\\"cited words\\\" here.\")],"),
+    content=(
+      #|+0:+0 \"cited
+    ),
+  )
+  // The options of the call do not change what the text argument is.
+  let justified = feedback_in(
+    [@doc.Para("Options after the text.", justify=true, quotes=false)],
+    "after the",
+  )
+  assert_eq(tiers(justified), [("Para", Some(0), 3, "")])
+  inspect(chars_of(justified, "after the text.\","), content="+0:+0 after the")
+  // Where the literal is not the text, the reason is the one that a
+  // `Prose` gets: a variable, and an interpolated string.
+  let bound_text = "bound paragraph words"
+  let bound = feedback_in([@doc.Para(bound_text)], "bound")
+  let bound_nested = feedback_in([@doc.Par(@doc.Prose(bound_text))], "bound")
+  assert_eq(tiers(bound), [
+    (
+      "Para",
+      Some(0),
+      2,
+      "the argument is the variable `bound_text`: the text comes from a binding, not from a literal at this location",
+    ),
+  ])
+  assert_eq(
+    tiers(bound).map(t => (t.1, t.2, t.3)),
+    tiers(bound_nested).map(t => (t.1, t.2, t.3)),
+  )
+  let count = 3
+  let mixed = feedback_in([@doc.Para("counted \{count} times")], "times")
+  let mixed_nested = feedback_in(
+    [@doc.Par(@doc.Prose("counted \{count} times"))],
+    "times",
+  )
+  assert_eq(mixed.origins[0].tier, 2)
+  assert_true(
+    mixed.origins[0].why.contains(
+      "an interpolation or a computed element adds text",
+    ),
+  )
+  assert_eq(mixed.origins[0].why, mixed_nested.origins[0].why)
+  // A source line of the text leads to the boxes of its words on the
+  // page: the same boxes for both forms. (The lines with this text: the
+  // search below, then the two literals.)
+  let lines : Array[Int] = []
+  for i, line in @utf8.decode(@system.read(this_file)).split("\n").collect() {
+    if line.contains("$|Boxes of the first") {
+      lines.push(i + 1)
+    }
+  }
+  let boxes = (children : Array[&@doc.IntoContent], line : Int) => {
+    let text = @doc.Document(children)
+      .compile_paged(@doc.DocWorld::in_memory())
+      .review_text(sources=@system.sources())
+    text
+    .positions(this_file, line)
+    .map(r => {
+      "\{r.page}: \{(r.x * 10.0).round()} \{(r.y * 10.0).round()} \{(r.width * 10.0).round()} \{(r.height * 10.0).round()}"
+    })
+    .join(" | ")
+  }
+  let para_boxes = boxes(
+    [
+      (
+        $|Boxes of the first line
+        $|and of the second.
+      )
+      |> @doc.Para,
+    ],
+    lines[1],
+  )
+  let nested_boxes = boxes(
+    [
+      @doc.Par(
+        @doc.Prose(
+          (
+            $|Boxes of the first line
+            $|and of the second.
+          ),
+        ),
+      ),
+    ],
+    lines[2],
+  )
+  assert_eq(lines.length(), 3)
+  // The five words of the first line of the literal.
+  inspect(
+    para_boxes,
+    content="1: 709 671 265 110 | 1: 1001 671 90 110 | 1: 1119 671 143 110 | 1: 1289 671 180 110 | 1: 1497 671 168 110",
+  )
+  assert_eq(para_boxes, nested_boxes)
+}
+
+///|
 test "the showcase's feedback has source characters and excerpts" {
   let report = compile_document(@twins.full_showcase)
   let text = report.review_text(sources=@system.sources())

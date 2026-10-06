@@ -119,6 +119,9 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
           @debug.Repr::array(children.map(child => child.to_repr())),
         ),
       ])
+    // The text of `Para`, as its pieces.
+    NPieces(children) =>
+      @debug.Repr::array(children.map(child => child.to_repr()))
     NSetRule(set) => {
       let args = args_repr(set.args)
       if set.func is FPath(path) {
@@ -202,6 +205,11 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
 
 ///|
 pub impl @debug.Debug for Prose with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
+pub impl @debug.Debug for Para with fn to_repr(self) {
   self.content.to_repr()
 }
 
