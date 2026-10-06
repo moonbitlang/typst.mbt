@@ -14,6 +14,7 @@ using @doc {
   type Prose,
   type Lit,
   type Seq,
+  type Keyed,
   type Emph,
   type Text,
   type Raw,
@@ -278,7 +279,7 @@ pub fn apostrophes() -> Seq {
 }
 
 ///|
-using @kit {type Cards, type DataTable, type Chip}
+using @kit {type Cards, type DataTable, type Chip, type Canvas}
 
 ///|
 /// Section 7.1: the cards of one row are equally high.
@@ -377,6 +378,99 @@ pub fn status(label : String, done~ : Bool) -> Text {
 }
 
 ///|
+/// Section 7.4: a chart of bars that is as wide as its container. A bed is
+/// its name and its kilograms; `top` is the end of the scale.
+pub fn harvest_chart(beds : Array[(String, Double)], top : Double) -> Layout {
+  let grid = Stroke(paint=Luma(200), thickness=Pt(0.5))
+  Layout((size, _) => {
+    let left = 36.0
+    let x = (kilograms : Double) => {
+      left + kilograms / top * (size.width - left - 24.0)
+    }
+    let bottom = beds.length().to_double() * 14.0
+    let items : Array[&IntoContent] = []
+    for tick in @format.ticks(0.0, top, 6) {
+      items.push(Canvas::line((x(tick), 0.0), (x(tick), bottom), stroke=grid))
+      items.push(
+        Canvas::place(
+          (x(tick), bottom + 3.0),
+          @format.fixed(tick, 0),
+          anchor=(Center, Top),
+        ),
+      )
+    }
+    for i, bed in beds {
+      let (name, kilograms) = bed
+      let middle = i.to_double() * 14.0 + 7.0
+      items.push(
+        Keyed(
+          name,
+          Seq([
+            Canvas::place((left - 4.0, middle), name, anchor=(Right, Horizon)),
+            Canvas::rect(
+              (left, middle - 5.0),
+              x(kilograms) - left,
+              10.0,
+              fill=Rgb("#2a78d6"),
+            ),
+            Canvas::place(
+              (x(kilograms) + 3.0, middle),
+              @format.fixed(kilograms, 1),
+              anchor=(Left, Horizon),
+            ),
+          ]),
+        ),
+      )
+    }
+    Text(Canvas(size.width, bottom + 12.0, items), size=Pt(7))
+  })
+}
+
+///|
+/// Section 7.4: boxes and arrows.
+pub fn year() -> Canvas {
+  let pen = Stroke(paint=Luma(90), thickness=Pt(0.8))
+  let waiting = Stroke(paint=Luma(90), thickness=Pt(0.8), dash=Dashed)
+  let stage = (x : Double, name : String) => {
+    Seq([
+      Canvas::rect(
+        (x, 0.0),
+        50.0,
+        20.0,
+        stroke=Sides(all=pen),
+        radius=Corners(all=Pt(3)),
+      ),
+      Canvas::place((x + 25.0, 10.0), name, anchor=(Center, Horizon)),
+    ])
+  }
+  Canvas(180.0, 44.0, [
+    stage(0.0, "sow"),
+    stage(65.0, "plant"),
+    stage(130.0, "harvest"),
+    Canvas::arrow((50.0, 10.0), [LineTo((65.0, 10.0))], stroke=pen),
+    Canvas::arrow((115.0, 10.0), [LineTo((130.0, 10.0))], stroke=waiting),
+    Canvas::arrow(
+      (155.0, 20.0),
+      [CubicTo((155.0, 42.0), (25.0, 42.0), (25.0, 20.0))],
+      stroke=pen,
+    ),
+  ])
+}
+
+///|
+/// Section 7.4: a number and its unit, of two sizes, on one baseline.
+pub fn number_and_unit() -> Canvas {
+  Canvas(80.0, 24.0, [
+    Canvas::place(
+      (40.0, 20.0),
+      Text("38", size=Pt(20)),
+      anchor=(Right, Baseline),
+    ),
+    Canvas::place((42.0, 20.0), "kg", anchor=(Left, Baseline)),
+  ])
+}
+
+///|
 /// Section 8: a callback that is created inside a callback. Compiling it
 /// is an error.
 pub fn stripes_in_show() -> Seq {
@@ -442,6 +536,9 @@ pub fn guide() -> Document {
       1,
     ),
     apostrophes(),
+    harvest_chart([("North", 4.5), ("South", 12.0), ("West", 0.4)], 12.0),
+    year(),
+    number_and_unit(),
     stripes_captured(),
   ])
 }

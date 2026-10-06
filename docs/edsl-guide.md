@@ -44,6 +44,7 @@ using @doc {
   type Prose,
   type Lit,
   type Seq,
+  type Keyed,
   type Emph,
   type Text,
   type Raw,
@@ -673,7 +674,7 @@ pub fn apostrophes() -> Seq {
 
 A plain string (not the text of a `Prose` or `Para`) is never changed.
 
-## 7. The kit: cards, tables of data, chips
+## 7. The kit: cards, tables of data, chips, drawings
 
 The kit is a package of its own (`moonbitlang/typst/doc/kit`, section 1),
 with elements that are made of the ones of `doc`: each is what the ports
@@ -682,7 +683,7 @@ element says in its documentation what it is made of, and rules of the
 document reach those parts as they reach them anywhere.
 
 ```moonbit
-using @kit {type Cards, type DataTable, type Chip}
+using @kit {type Cards, type DataTable, type Chip, type Canvas}
 ```
 
 ### 7.1 Cards of equal height
@@ -914,6 +915,174 @@ pub fn status(label : String, done~ : Bool) -> Text {
 - It creates no callback, so it can be built anywhere, also in a row of a
   `DataTable` and inside a callback.
 
+### 7.4 A drawing: `Canvas`
+
+A chart or a diagram is content that is placed by coordinates. Every port
+with one wrote the same helpers for it: a block of a fixed size, a `Place`
+per item, a label that is put on its baseline by a guess at the height of
+its letters, a triangle for the head of an arrow. Two of these go wrong
+without a diagnostic. A block with a fixed height is split at the end of a
+page, and what is placed in it is then drawn from the top of its first
+part, over the footnotes and the margin. And the guess (`0.72 × size`) is
+not the font's (0.66 for the default one): every label is a little too
+high. `Canvas` is the block, which is not split, and its items are the
+placed things (`harvest_chart`):
+
+```moonbit
+pub fn harvest_chart(beds : Array[(String, Double)], top : Double) -> Layout {
+  let grid = Stroke(paint=Luma(200), thickness=Pt(0.5))
+  Layout((size, _) => {
+    let left = 36.0
+    let x = (kilograms : Double) => {
+      left + kilograms / top * (size.width - left - 24.0)
+    }
+    let bottom = beds.length().to_double() * 14.0
+    let items : Array[&IntoContent] = []
+    for tick in @format.ticks(0.0, top, 6) {
+      items.push(Canvas::line((x(tick), 0.0), (x(tick), bottom), stroke=grid))
+      items.push(
+        Canvas::place(
+          (x(tick), bottom + 3.0),
+          @format.fixed(tick, 0),
+          anchor=(Center, Top),
+        ),
+      )
+    }
+    for i, bed in beds {
+      let (name, kilograms) = bed
+      let middle = i.to_double() * 14.0 + 7.0
+      items.push(
+        Keyed(
+          name,
+          Seq([
+            Canvas::place((left - 4.0, middle), name, anchor=(Right, Horizon)),
+            Canvas::rect(
+              (left, middle - 5.0),
+              x(kilograms) - left,
+              10.0,
+              fill=Rgb("#2a78d6"),
+            ),
+            Canvas::place(
+              (x(kilograms) + 3.0, middle),
+              @format.fixed(kilograms, 1),
+              anchor=(Left, Horizon),
+            ),
+          ]),
+        ),
+      )
+    }
+    Text(Canvas(size.width, bottom + 12.0, items), size=Pt(7))
+  })
+}
+```
+
+- The origin is the top left corner of the canvas, x grows to the right
+  and y down, as for `Place`; the unit is the point, and a point is `(x,
+  y)`. A y axis that grows upwards is the scale's matter (`y = v => bottom
+  - v / top * height`), like every scale: a scale is one line of the
+  chart, and `@format.ticks` gives the values of its ticks.
+- An item is made by `Canvas::place` (content at a point), `Canvas::line`,
+  `Canvas::rect`, `Canvas::circle`, `Canvas::curve` or `Canvas::arrow`.
+  Positions and sizes are numbers; `stroke`, `fill` and `radius` are those
+  of `Line`, `Rect`, `Circle` and `Curve`, with their types.
+- `anchor` says which point of the body is at the point: `(Left | Center
+  | Right, Top | Horizon | Bottom)`, `(Left, Top)` unless it is given. The
+  engine does the aligning: nothing is measured, and nothing is guessed.
+  `Horizon` of a line of text is the middle between the top of its
+  capitals and its baseline, which is what centres a label on a bar. A
+  line of text ends at its baseline, so `Bottom` puts it on a baseline.
+- A canvas has a fixed size. One that is as wide as its container is built
+  in a `Layout` (section 4.5), from the width that it gives, as here: the
+  canvas and these items create no callback, so they can be built inside
+  one. (The ports typed the width of the page in, which is wrong as soon
+  as a margin changes.)
+- An item is content, and the items are an array of content: several items
+  are one in a `Seq`, and `Keyed(key, ..)` gives the items of one row of
+  the data its key. A click on a bar leads to the line of its
+  `Canvas::rect`, with the key of its bed: every item is a call of its
+  own, not a part of the canvas.
+- The style of the labels is a `Text` around the canvas, or around the
+  body of a label. A rule is not an item; it goes into a `Seq` with the
+  items that it is for.
+- What is placed outside the canvas is drawn there. `clip=true` cuts it
+  off at the edge, with the half of a stroke that lies on it.
+- A drawing in other units (the coordinates of an SVG) is scaled as a
+  whole: `Scale(canvas, factor=Pct(56.7), reflow=true)`. That scales its
+  strokes and its text too, which a factor on the coordinates does not.
+- A canvas that does not fit the rest of the page moves to the next page.
+  One that is higher than a page leaves it, without a diagnostic.
+
+Boxes and arrows (`year`):
+
+```moonbit
+pub fn year() -> Canvas {
+  let pen = Stroke(paint=Luma(90), thickness=Pt(0.8))
+  let waiting = Stroke(paint=Luma(90), thickness=Pt(0.8), dash=Dashed)
+  let stage = (x : Double, name : String) => {
+    Seq([
+      Canvas::rect(
+        (x, 0.0),
+        50.0,
+        20.0,
+        stroke=Sides(all=pen),
+        radius=Corners(all=Pt(3)),
+      ),
+      Canvas::place((x + 25.0, 10.0), name, anchor=(Center, Horizon)),
+    ])
+  }
+  Canvas(180.0, 44.0, [
+    stage(0.0, "sow"),
+    stage(65.0, "plant"),
+    stage(130.0, "harvest"),
+    Canvas::arrow((50.0, 10.0), [LineTo((65.0, 10.0))], stroke=pen),
+    Canvas::arrow((115.0, 10.0), [LineTo((130.0, 10.0))], stroke=waiting),
+    Canvas::arrow(
+      (155.0, 20.0),
+      [CubicTo((155.0, 42.0), (25.0, 42.0), (25.0, 20.0))],
+      stroke=pen,
+    ),
+  ])
+}
+```
+
+- An arrow is a path with a head at its end: from its first point through
+  its segments, `LineTo(end)`, `QuadTo(control, end)` and `CubicTo(first,
+  second, end)` (the components of `Curve`, in the coordinates of the
+  canvas). Two `LineTo`s are an arrow with a bend; `Canvas::curve` takes
+  the same path without a head.
+- The head points where the path arrives: along the last line, or along
+  the tangent at the end of a curve. It is a triangle as long and as wide
+  as `head` (5.5pt unless it is given), in the paint of the stroke, and
+  the path ends inside it. A dashed arrow is a dashed stroke.
+- A box with its text is a `Canvas::rect` and a `Canvas::place` at its
+  centre with the anchor `(Center, Horizon)`.
+- There are no nodes with names and no edges that find their way: where a
+  box is and where an arrow starts is the caller's arithmetic.
+
+A number and its unit, of two sizes, on one baseline (`number_and_unit`):
+
+```moonbit
+pub fn number_and_unit() -> Canvas {
+  Canvas(80.0, 24.0, [
+    Canvas::place(
+      (40.0, 20.0),
+      Text("38", size=Pt(20)),
+      anchor=(Right, Baseline),
+    ),
+    Canvas::place((42.0, 20.0), "kg", anchor=(Left, Baseline)),
+  ])
+}
+```
+
+- The anchor `Baseline` puts the first baseline of the body at the point,
+  whatever the body is (text with its descenders in its box, a block with
+  an inset, several lines). The item measures for it (`Size.baseline`,
+  section 4.5), so it creates a callback, and section 8 holds for it: it
+  cannot be built inside a callback, and therefore not for a canvas that
+  is built in a `Layout` for its width. There, `Bottom` does for a line of
+  text, and for anything else the callback measures with its own context
+  (`cx.measure(body).baseline`) and anchors at `Top`.
+
 ## 8. Callbacks cannot be created inside a callback
 
 Six constructors take a function that the engine calls during layout:
@@ -938,10 +1107,10 @@ pub fn stripes_in_show() -> Seq {
 
 ```text
 error: callbacks cannot be created inside a callback
-  at doc/examples/guide/guide.mbt:387:14 (Cells)
+  at doc/examples/guide/guide.mbt:481:14 (Cells)
   hint: create the callback before compiling and capture it
   hint: or use the `cx` of the enclosing callback
-  while showing heading element at doc/examples/guide/guide.mbt:390:5 (Heading)
+  while showing heading element at doc/examples/guide/guide.mbt:484:5 (Heading)
 ```
 
 The location is the callback that came too late. It bites where it is not
@@ -949,7 +1118,9 @@ visible: a helper that builds a striped table (a `Cells` function) or
 measures (`Context`, `Layout`) works at the top level and fails when it is called
 from a show rule or from a `Context` callback. An element of the kit that
 measures is such a helper, and its documentation says so (`Cards` with a
-`radius`; `Cards` without one, `DataTable` and `Chip` create no callback).
+`radius`, an item of a `Canvas` with the anchor `Baseline`; `Cards`
+without a radius, `DataTable`, `Chip`, `Canvas` and its other items create
+no callback).
 The ways out:
 
 - create the callback once, outside, and capture it (`stripes_captured`):
@@ -1005,6 +1176,7 @@ of another callback; it is its creation that has to come first.
 | 7.1: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: the cards ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
 | 7.2: the rows of a `DataTable` and their check, its lines, the header and the rows over pages; the frame, the fills and the rules for its text; soft breaks in a cell | G "section 7: a table of data ..", "section 7: the looks ..", "section 7: inline code ..", `doc/kit/data_table_test.mbt`, F "S5: .." |
 | 7.3: a `Chip` on the baseline of its line, the height of the line, one line in a narrow column | G "section 7: a chip ..", `doc/kit/chip_test.mbt`, F "T1: .." |
+| 7.4: a `Canvas` as wide as its container, its labels at their anchors, a click on a bar; arrows, labels on one baseline, the anchor that measures | G "section 7: a chart on a canvas ..", "section 7: arrows on a canvas ..", `doc/kit/canvas_test.mbt`, F "S2a: ..", "T11: .." |
 | 8: the error, its hints and location, and the captured callback | G "section 8: .." |
 
 Not checked by a test of this repository:
