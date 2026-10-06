@@ -46,7 +46,7 @@ fn impl_dir_const_btt() -> Value {
 
 ///|
 /// Returns a direction from a starting point.
-fn impl_dir_from(side_ : Side) -> Dir raise HintedError {
+fn impl_dir_from(side_ : Side) -> Dir {
   match side_ {
     Left => LTR
     Right => RTL
@@ -57,7 +57,7 @@ fn impl_dir_from(side_ : Side) -> Dir raise HintedError {
 
 ///|
 /// Returns a direction from an end point.
-fn impl_dir_to(side_ : Side) -> Dir raise HintedError {
+fn impl_dir_to(side_ : Side) -> Dir {
   match side_ {
     Right => LTR
     Left => RTL
@@ -68,7 +68,7 @@ fn impl_dir_to(side_ : Side) -> Dir raise HintedError {
 
 ///|
 /// The axis this direction belongs to.
-fn impl_dir_axis(self_ : Dir) -> Axis raise HintedError {
+fn impl_dir_axis(self_ : Dir) -> Axis {
   self_.axis()
 }
 
@@ -83,7 +83,7 @@ pub fn Dir::axis(self : Dir) -> Axis {
 
 ///|
 /// The corresponding sign, for use in calculations.
-fn impl_dir_sign(self_ : Dir) -> Int64 raise HintedError {
+fn impl_dir_sign(self_ : Dir) -> Int64 {
   match self_ {
     LTR | TTB => 1L
     RTL | BTT => -1L
@@ -92,7 +92,7 @@ fn impl_dir_sign(self_ : Dir) -> Int64 raise HintedError {
 
 ///|
 /// The start point of this direction, as an alignment.
-fn impl_dir_start(self_ : Dir) -> Side raise HintedError {
+fn impl_dir_start(self_ : Dir) -> Side {
   self_.start()
 }
 
@@ -109,7 +109,7 @@ pub fn Dir::start(self : Dir) -> Side {
 
 ///|
 /// The end point of this direction, as an alignment.
-fn impl_dir_end(self_ : Dir) -> Side raise HintedError {
+fn impl_dir_end(self_ : Dir) -> Side {
   self_.end()
 }
 
@@ -126,7 +126,7 @@ pub fn Dir::end(self : Dir) -> Side {
 
 ///|
 /// The inverse direction.
-fn impl_dir_inv(self_ : Dir) -> Dir raise HintedError {
+fn impl_dir_inv(self_ : Dir) -> Dir {
   self_.inv()
 }
 

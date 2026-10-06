@@ -55,9 +55,7 @@ pub fn Version::values(self : Version) -> Array[UInt] {
 /// Creates a new version (upstream `Version::construct`).
 ///
 /// It can have any number of components (even zero).
-fn impl_version_construct(
-  components_ : Array[VersionComponents],
-) -> Version raise HintedError {
+fn impl_version_construct(components_ : Array[VersionComponents]) -> Version {
   let version = Version::new()
   for c in components_ {
     match c {

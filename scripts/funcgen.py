@@ -10,11 +10,15 @@ which call a handwritten implementation
 
     impl_<key>(self?, engine?, context?, args?, span?, params...) -> T raise E
 
-where E is `SourceError` for `SourceResult` returns and `HintedError`
-otherwise. Missing implementations get a stub in `library/funcs_todo_gen.mbt`
-that raises "... is not yet ported", so the package always compiles.
+where E is `SourceError` for `SourceResult` returns and `HintedError` for
+`StrResult`/`HintedStrResult` returns. An upstream function that returns a
+plain value is ported without `raise`: the wrapper does not need it. Missing
+implementations get a stub in `library/funcs_todo_gen.mbt` that raises
+"... is not yet ported" (as `HintedError` for a plain return), so the package
+always compiles.
 
-Non-trivial `#[default(..)]` values call `impl_<key>__<param>_default()`.
+Non-trivial `#[default(..)]` values call `impl_<key>__<param>_default()`,
+which never raises (upstream's default is a plain expression).
 
 It also generates `register_scopes()` which builds the scopes of types,
 elements and functions (`#[scope]` blocks), and registers global functions.
@@ -223,7 +227,13 @@ def main():
                             )
                         dexpr = f"{dname}()"
                         val = f"{dexpr}.v" if spanned else dexpr
-                        info_default = f"Some(() => try {{ IntoValue::into_value({val}) }} catch {{ _ => None }})"
+                        if dname in defined:
+                            # Upstream's `#[default(..)]` is an infallible
+                            # expression; so is its port.
+                            info_default = f"Some(() => IntoValue::into_value({val}))"
+                        else:
+                            # The stub raises "not yet ported".
+                            info_default = f"Some(() => try {{ IntoValue::into_value({val}) }} catch {{ _ => None }})"
                     else:
                         dexpr = lit
                         info_default = f"Some(() => IntoValue::into_value(({lit} : {ity})))"

@@ -349,7 +349,7 @@ fn OutlinableElem::body(self : OutlinableElem) -> Content {
 // OutlineEntry methods.
 
 ///|
-fn impl_outline_entry_indented__gap_default() -> Length raise SourceError {
+fn impl_outline_entry_indented__gap_default() -> Length {
   Length::from_em(Em::new(0.5))
 }
 

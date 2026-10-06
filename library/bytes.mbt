@@ -87,13 +87,13 @@ fn BytesValue::locate_opt(self : BytesValue, index : Int64) -> Int? {
 ///   dedicated byte representation is much more efficient than the array
 ///   representation and thus typically used for large byte buffers (e.g.
 ///   image data).
-fn impl_bytes_construct(value_ : ToBytes) -> BytesValue raise HintedError {
+fn impl_bytes_construct(value_ : ToBytes) -> BytesValue {
   value_.0
 }
 
 ///|
 /// The length in bytes (upstream `Bytes::len`).
-fn impl_bytes_len(self_ : BytesValue) -> USize raise HintedError {
+fn impl_bytes_len(self_ : BytesValue) -> USize {
   USize(self_.len().to_int64())
 }
 
@@ -138,7 +138,7 @@ fn impl_bytes_slice(
 }
 
 ///|
-fn impl_bytes_slice__end_default() -> Int64? raise SourceError {
+fn impl_bytes_slice__end_default() -> Int64? {
   None
 }
 

@@ -148,16 +148,13 @@ fn state_sequence(
 
 ///|
 /// Create a new state identified by a key.
-fn impl_state_construct(
-  key_ : String,
-  init_ : Value,
-) -> State raise HintedError {
+fn impl_state_construct(key_ : String, init_ : Value) -> State {
   State::new(key_, init_)
 }
 
 ///|
 /// `Default::default()` of `Value`.
-fn impl_state_construct__init_default() -> Value raise SourceError {
+fn impl_state_construct__init_default() -> Value {
   None
 }
 
@@ -204,7 +201,7 @@ fn impl_state_update(
   self_ : State,
   span : @syntax.Span,
   update_ : StateUpdate,
-) -> Content raise HintedError {
+) -> Content {
   Content::new(state_update_elem(), [
     (state_update_elem_key, Str(self_.key)),
     (state_update_elem_update, update_.into_value()),

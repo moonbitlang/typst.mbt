@@ -508,7 +508,7 @@ fn impl_color_hsv(args : Args) -> Color raise SourceError {
 
 ///|
 /// Extracts the components of this color.
-fn impl_color_components(self_ : Color, alpha_ : Bool) -> Arr raise HintedError {
+fn impl_color_components(self_ : Color, alpha_ : Bool) -> Arr {
   match self_ {
     Process(c) => c.components(alpha_)
     Spot(c) => Arr::from_array([Ratio(c.tint)])
@@ -517,13 +517,13 @@ fn impl_color_components(self_ : Color, alpha_ : Bool) -> Arr raise HintedError 
 
 ///|
 /// Returns the constructor function for this color's space.
-fn impl_color_space(self_ : Color) -> ColorSpace raise HintedError {
+fn impl_color_space(self_ : Color) -> ColorSpace {
   self_.space()
 }
 
 ///|
 /// Returns the color's RGB(A) hex representation.
-fn impl_color_to_hex(self_ : Color) -> String raise HintedError {
+fn impl_color_to_hex(self_ : Color) -> String {
   match self_ {
     Process(c) => c.to_hex()
     Spot(c) => c.fallback().to_hex()
@@ -532,10 +532,7 @@ fn impl_color_to_hex(self_ : Color) -> String raise HintedError {
 
 ///|
 /// Lightens a color by a given factor.
-fn impl_color_lighten(
-  self_ : Color,
-  factor_ : Ratio,
-) -> Color raise HintedError {
+fn impl_color_lighten(self_ : Color, factor_ : Ratio) -> Color {
   match self_ {
     Process(c) => Process(c.lighten(factor_))
     Spot(c) => Spot(c.lighten(factor_))
@@ -544,7 +541,7 @@ fn impl_color_lighten(
 
 ///|
 /// Darkens a color by a given factor.
-fn impl_color_darken(self_ : Color, factor_ : Ratio) -> Color raise HintedError {
+fn impl_color_darken(self_ : Color, factor_ : Ratio) -> Color {
   match self_ {
     Process(c) => Process(c.darken(factor_))
     Spot(c) => Spot(c.darken(factor_))
@@ -584,7 +581,7 @@ fn impl_color_desaturate(
 }
 
 ///|
-fn impl_color_negate__space_default() -> Smart[ColorSpace] raise SourceError {
+fn impl_color_negate__space_default() -> Smart[ColorSpace] {
   Auto
 }
 
@@ -608,7 +605,7 @@ fn impl_color_negate(
 }
 
 ///|
-fn impl_color_rotate__space_default() -> ProcessColorSpace raise SourceError {
+fn impl_color_rotate__space_default() -> ProcessColorSpace {
   Oklch
 }
 
@@ -642,7 +639,7 @@ fn impl_color_rotate(
 }
 
 ///|
-fn impl_color_mix__space_default() -> Smart[ColorSpace] raise SourceError {
+fn impl_color_mix__space_default() -> Smart[ColorSpace] {
   Auto
 }
 
@@ -1751,6 +1748,9 @@ pub fn SpotColorantName::repr(self : SpotColorantName) -> String {
 
 ///|
 /// Create a new spot colorant.
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-library/src/visualize/color.rs:2347).
+#warnings("-unused_error_type")
 fn impl_spot_colorant_construct(
   name_ : SpotColorantName?,
   fallback_ : ProcessColor,

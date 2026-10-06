@@ -1,7 +1,7 @@
 // Port of `typst-library/src/visualize/polygon.rs` (`polygon.regular`).
 
 ///|
-fn impl_polygon_elem_regular__size_default() -> Length raise SourceError {
+fn impl_polygon_elem_regular__size_default() -> Length {
   Length::from_em(Em::new(1.0))
 }
 
@@ -19,7 +19,7 @@ fn impl_polygon_elem_regular(
   stroke_ : Smart[Stroke?]?,
   size_ : Length,
   vertices_ : U64,
-) -> Content raise HintedError {
+) -> Content {
   let vertices = vertices_.0.to_double()
   let n = vertices_.0.to_int()
   let radius = size_.div_by(2.0)

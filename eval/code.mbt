@@ -368,6 +368,9 @@ fn access_field(
 }
 
 ///|
+// Cannot fail; upstream's `Eval::eval` is `SourceResult` for every node
+// (typst-eval/src/code.rs:388).
+#warnings("-unused_error_type")
 fn eval_contextual(
   vm : Vm,
   contextual : @ast.Contextual,

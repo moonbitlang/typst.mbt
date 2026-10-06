@@ -4,6 +4,9 @@
 
 ///|
 /// Upstream `translate_unsupported_operator`.
+// Never returns (upstream panics too); keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/visit.rs:75).
+#warnings("-unused_error_type")
 pub fn FuncTranslator::translate_unsupported_operator(
   _self : FuncTranslator,
   name : String,
@@ -22,6 +25,9 @@ fn FuncTranslator::visit_unreachable(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/visit.rs:99).
+#warnings("-unused_error_type")
 fn FuncTranslator::visit_nop(_self : FuncTranslator) -> Unit raise WasmiError {
   ()
 }
@@ -375,6 +381,9 @@ fn FuncTranslator::visit_call_indirect(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/visit.rs:411).
+#warnings("-unused_error_type")
 fn FuncTranslator::visit_drop(self : FuncTranslator) -> Unit raise WasmiError {
   if !self.reachable {
     return

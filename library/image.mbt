@@ -843,6 +843,9 @@ pub impl FromValue for PixelEncoding with fn from_value(v) {
 
 ///|
 /// Upstream `Synthesize for Packed<ImageElem>`.
+// Cannot fail; a `Synthesize::synthesize` hook, `Ok(())` upstream
+// (typst-library/src/visualize/image/mod.rs:234).
+#warnings("-unused_error_type")
 fn image_elem_synthesize(
   _engine : Engine,
   content : Content,

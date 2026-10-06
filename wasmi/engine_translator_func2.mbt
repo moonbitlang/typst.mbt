@@ -396,6 +396,9 @@ fn FuncTranslator::translate_binary_consteval(
 
 ///|
 /// Upstream `no_opt_ri`: no optimization for `(reg, imm)` operands.
+// Cannot fail; an optimization callback, `Ok(false)` upstream
+// (wasmi 1.0.9 translator/func/mod.rs:1931).
+#warnings("-unused_error_type")
 fn no_opt_ri(
   _self : FuncTranslator,
   _lhs : Operand,

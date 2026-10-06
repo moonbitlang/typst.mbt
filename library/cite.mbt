@@ -87,6 +87,9 @@ pub impl FromValue for CitationForm with fn from_value(v) {
 
 ///|
 /// Upstream `Synthesize for Packed<CiteElem>`.
+// Cannot fail; a `Synthesize::synthesize` hook, `Ok(())` upstream
+// (typst-library/src/model/cite.rs:120).
+#warnings("-unused_error_type")
 fn cite_elem_synthesize(
   _engine : Engine,
   content : Content,

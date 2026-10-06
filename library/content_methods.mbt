@@ -3,13 +3,13 @@
 
 ///|
 /// The content's element function.
-fn impl_content_func(self_ : Content) -> Element raise HintedError {
+fn impl_content_func(self_ : Content) -> Element {
   self_.elem()
 }
 
 ///|
 /// Whether the content has the specified field.
-fn impl_content_has(self_ : Content, field_ : String) -> Bool raise HintedError {
+fn impl_content_has(self_ : Content, field_ : String) -> Bool {
   self_.has(field_)
 }
 
@@ -31,6 +31,6 @@ fn impl_content_at(
 
 ///|
 /// Returns the fields of this content.
-fn impl_content_fields(self_ : Content) -> Dict raise HintedError {
+fn impl_content_fields(self_ : Content) -> Dict {
   self_.fields()
 }

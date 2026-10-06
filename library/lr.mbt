@@ -3,46 +3,31 @@
 
 ///|
 /// Floors an expression.
-fn impl_math_floor(
-  size : Rel[Length]?,
-  body : Content,
-) -> Content raise HintedError {
+fn impl_math_floor(size : Rel[Length]?, body : Content) -> Content {
   delimited(body, '⌊', '⌋', size)
 }
 
 ///|
 /// Ceils an expression.
-fn impl_math_ceil(
-  size : Rel[Length]?,
-  body : Content,
-) -> Content raise HintedError {
+fn impl_math_ceil(size : Rel[Length]?, body : Content) -> Content {
   delimited(body, '⌈', '⌉', size)
 }
 
 ///|
 /// Rounds an expression.
-fn impl_math_round(
-  size : Rel[Length]?,
-  body : Content,
-) -> Content raise HintedError {
+fn impl_math_round(size : Rel[Length]?, body : Content) -> Content {
   delimited(body, '⌊', '⌉', size)
 }
 
 ///|
 /// Takes the absolute value of an expression.
-fn impl_math_abs(
-  size : Rel[Length]?,
-  body : Content,
-) -> Content raise HintedError {
+fn impl_math_abs(size : Rel[Length]?, body : Content) -> Content {
   delimited(body, '|', '|', size)
 }
 
 ///|
 /// Takes the norm of an expression.
-fn impl_math_norm(
-  size : Rel[Length]?,
-  body : Content,
-) -> Content raise HintedError {
+fn impl_math_norm(size : Rel[Length]?, body : Content) -> Content {
   delimited(body, '‖', '‖', size)
 }
 

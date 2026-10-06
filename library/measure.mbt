@@ -53,6 +53,6 @@ fn impl_measure(
 ///|
 /// Provides access to the current outer container's (or page's, if none)
 /// dimensions (width and height).
-fn impl_layout(span : @syntax.Span, func_ : Func) -> Content raise HintedError {
+fn impl_layout(span : @syntax.Span, func_ : Func) -> Content {
   LayoutElem::new(func_).pack().spanned(span)
 }

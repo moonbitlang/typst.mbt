@@ -15,7 +15,7 @@ fn impl_i64_const_min() -> Value {
 
 ///|
 /// Default of `int(base:)`: `Spanned::new(Base::Default, Span::detached())`.
-fn impl_i64_construct__base_default() -> @syntax.Spanned[Base] raise SourceError {
+fn impl_i64_construct__base_default() -> @syntax.Spanned[Base] {
   { v: Default, span: @syntax.Span::detached(), }
 }
 
@@ -90,7 +90,7 @@ fn HintedString::into_int_parse_error(
 
 ///|
 /// Calculates the sign of an integer.
-fn impl_i64_signum(self_ : Int64) -> Int64 raise HintedError {
+fn impl_i64_signum(self_ : Int64) -> Int64 {
   if self_ > 0L {
     1L
   } else if self_ < 0L {
@@ -102,25 +102,25 @@ fn impl_i64_signum(self_ : Int64) -> Int64 raise HintedError {
 
 ///|
 /// Calculates the bitwise NOT of an integer.
-fn impl_i64_bit_not(self_ : Int64) -> Int64 raise HintedError {
+fn impl_i64_bit_not(self_ : Int64) -> Int64 {
   self_.lnot()
 }
 
 ///|
 /// Calculates the bitwise AND between two integers.
-fn impl_i64_bit_and(self_ : Int64, rhs_ : Int64) -> Int64 raise HintedError {
+fn impl_i64_bit_and(self_ : Int64, rhs_ : Int64) -> Int64 {
   self_ & rhs_
 }
 
 ///|
 /// Calculates the bitwise OR between two integers.
-fn impl_i64_bit_or(self_ : Int64, rhs_ : Int64) -> Int64 raise HintedError {
+fn impl_i64_bit_or(self_ : Int64, rhs_ : Int64) -> Int64 {
   self_ | rhs_
 }
 
 ///|
 /// Calculates the bitwise XOR between two integers.
-fn impl_i64_bit_xor(self_ : Int64, rhs_ : Int64) -> Int64 raise HintedError {
+fn impl_i64_bit_xor(self_ : Int64, rhs_ : Int64) -> Int64 {
   self_ ^ rhs_
 }
 
@@ -137,11 +137,7 @@ fn impl_i64_bit_lshift(self_ : Int64, shift_ : U32) -> Int64 raise HintedError {
 
 ///|
 /// Shifts the operand's bits to the right by the specified amount.
-fn impl_i64_bit_rshift(
-  self_ : Int64,
-  shift_ : U32,
-  logical_ : Bool,
-) -> Int64 raise HintedError {
+fn impl_i64_bit_rshift(self_ : Int64, shift_ : U32, logical_ : Bool) -> Int64 {
   let shift = shift_.get()
   if logical_ {
     if shift >= 64L {
@@ -163,7 +159,7 @@ fn impl_i64_bit_rshift(
 
 ///|
 /// Default of `int.from-bytes(endian:)`.
-fn impl_i64_from_bytes__endian_default() -> Endianness raise SourceError {
+fn impl_i64_from_bytes__endian_default() -> Endianness {
   Little
 }
 
@@ -222,7 +218,7 @@ fn impl_i64_from_bytes(
 
 ///|
 /// Default of `int.to-bytes(endian:)`.
-fn impl_i64_to_bytes__endian_default() -> Endianness raise SourceError {
+fn impl_i64_to_bytes__endian_default() -> Endianness {
   Little
 }
 
@@ -232,7 +228,7 @@ fn impl_i64_to_bytes(
   self_ : Int64,
   endian_ : Endianness,
   size_ : USize,
-) -> BytesValue raise HintedError {
+) -> BytesValue {
   let array = int64_to_bytes(self_, endian_)
   let size = size_.get().to_int()
   let buf = FixedArray::make(size, b'\x00')

@@ -855,6 +855,9 @@ fn FuncTranslator::push_binary_instr_with_result(
 
 ///|
 /// Pushes an instruction parameter `param` to the list of instructions.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/mod.rs:1057).
+#warnings("-unused_error_type")
 fn FuncTranslator::push_param(
   self : FuncTranslator,
   param : @ir.Op,
@@ -864,6 +867,9 @@ fn FuncTranslator::push_param(
 
 ///|
 /// Copies the `br_table` targets (and the default target, last) into `buffer`.
+// Cannot fail: the targets upstream re-reads (`target?`) are already parsed
+// (wasmi 1.0.9 translator/func/mod.rs:1069).
+#warnings("-unused_error_type")
 fn FuncTranslator::copy_targets_from_br_table(
   table : @wasmparser.BrTable,
   buffer : Array[@wasmi_core.TypedVal],
@@ -1142,6 +1148,9 @@ fn FuncTranslator::translate_end_block(
 
 ///|
 /// Translates the end of a Wasm `loop` control frame.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/mod.rs:1336).
+#warnings("-unused_error_type")
 fn FuncTranslator::translate_end_loop(
   _self : FuncTranslator,
   _frame : FrameBase,
@@ -1264,6 +1273,9 @@ fn FuncTranslator::translate_end_if_or_else_only(
 
 ///|
 /// Translates the end of an unreachable Wasm control frame.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/mod.rs:1453).
+#warnings("-unused_error_type")
 fn FuncTranslator::translate_end_unreachable(
   self : FuncTranslator,
   _frame : ControlFrameKind,

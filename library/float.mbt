@@ -17,25 +17,25 @@ fn impl_f64_const_nan() -> Value {
 
 ///|
 /// Converts a value to a float.
-fn impl_f64_construct(value_ : ToFloat) -> Double raise HintedError {
+fn impl_f64_construct(value_ : ToFloat) -> Double {
   value_.0
 }
 
 ///|
 /// Checks if a float is not a number.
-fn impl_f64_is_nan(self_ : Double) -> Bool raise HintedError {
+fn impl_f64_is_nan(self_ : Double) -> Bool {
   self_.is_nan()
 }
 
 ///|
 /// Checks if a float is infinite.
-fn impl_f64_is_infinite(self_ : Double) -> Bool raise HintedError {
+fn impl_f64_is_infinite(self_ : Double) -> Bool {
   self_.is_inf()
 }
 
 ///|
 /// Calculates the sign of a floating point number (Rust's `f64::signum`).
-fn impl_f64_signum(self_ : Double) -> Double raise HintedError {
+fn impl_f64_signum(self_ : Double) -> Double {
   if self_.is_nan() {
     self_
   } else if self_.reinterpret_as_int64() < 0L {
@@ -47,7 +47,7 @@ fn impl_f64_signum(self_ : Double) -> Double raise HintedError {
 
 ///|
 /// Default of `float.from-bytes(endian:)`.
-fn impl_f64_from_bytes__endian_default() -> Endianness raise SourceError {
+fn impl_f64_from_bytes__endian_default() -> Endianness {
   Little
 }
 
@@ -80,7 +80,7 @@ fn impl_f64_from_bytes(
 
 ///|
 /// Default of `float.to-bytes(endian:)`.
-fn impl_f64_to_bytes__endian_default() -> Endianness raise SourceError {
+fn impl_f64_to_bytes__endian_default() -> Endianness {
   Little
 }
 

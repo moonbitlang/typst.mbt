@@ -7,7 +7,7 @@ fn render_image(
   state : State,
   image : @library.Image,
   size : @library.Axes[@library.Abs],
-) -> Unit raise RenderPanic {
+) -> Unit {
   let ts = state.transform
   let view_width = to_f32(size.x)
   let view_height = to_f32(size.y)
@@ -52,11 +52,7 @@ fn render_image(
 
 ///|
 /// Prepare a texture for an image at a scaled size.
-fn build_texture(
-  image : @library.Image,
-  w : UInt,
-  h : UInt,
-) -> @skia.Pixmap? raise RenderPanic {
+fn build_texture(image : @library.Image, w : UInt, h : UInt) -> @skia.Pixmap? {
   match image.kind() {
     Raster(raster) => {
       guard @skia.Pixmap::new(w, h) is Some(texture) else { return None }

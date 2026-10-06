@@ -784,6 +784,9 @@ pub fn TranslatorStack::new(engine : EngineWeak) -> TranslatorStack {
 
 ///|
 /// Register `amount` local variables.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:101).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::register_locals(
   self : TranslatorStack,
   amount : Int,
@@ -819,6 +822,9 @@ pub fn TranslatorStack::trunc(self : TranslatorStack, height : Int) -> Unit {
 
 ///|
 /// Pushes the function enclosing Wasm `block` onto the [`Stack`].
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:157).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_func_block(
   self : TranslatorStack,
   ty : BlockType,
@@ -840,6 +846,9 @@ pub fn TranslatorStack::push_func_block(
 
 ///|
 /// Pushes a Wasm `block` onto the [`Stack`].
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:178).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_block(
   self : TranslatorStack,
   ty : BlockType,
@@ -863,6 +872,9 @@ pub fn TranslatorStack::push_block(
 
 ///|
 /// Pushes a Wasm `loop` onto the [`Stack`].
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:198).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_loop(
   self : TranslatorStack,
   ty : BlockType,
@@ -886,6 +898,9 @@ pub fn TranslatorStack::push_loop(
 
 ///|
 /// Pushes a Wasm `if` onto the [`Stack`].
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:226).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_if(
   self : TranslatorStack,
   ty : BlockType,
@@ -953,6 +968,9 @@ pub fn TranslatorStack::push_else(
 
 ///|
 /// Pushes an unreachable Wasm control onto the [`Stack`].
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:277).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_unreachable(
   self : TranslatorStack,
   kind : ControlFrameKind,
@@ -971,6 +989,9 @@ pub fn TranslatorStack::pop_control(self : TranslatorStack) -> ControlFrame {
 
 ///|
 /// Pushes the top-most `else` operands from the control stack onto the operand stack.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:298).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_else_operands(
   self : TranslatorStack,
   frame : IfControlFrame,
@@ -1011,6 +1032,9 @@ pub fn TranslatorStack::peek_control_mut(
 
 ///|
 /// Pushes the [`Operand`] back to the [`Stack`].
+// Cannot fail; keeps upstream's `Result<OperandIdx, Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:342).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_operand(
   self : TranslatorStack,
   operand : Operand,
@@ -1020,6 +1044,9 @@ pub fn TranslatorStack::push_operand(
 
 ///|
 /// Pushes a local variable with index `local_idx` to the [`Stack`].
+// Cannot fail; keeps upstream's `Result<OperandIdx, Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:352).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_local(
   self : TranslatorStack,
   local_index : LocalIdx,
@@ -1030,6 +1057,9 @@ pub fn TranslatorStack::push_local(
 
 ///|
 /// Pushes a temporary with type `ty` on the [`Stack`].
+// Cannot fail; keeps upstream's `Result<OperandIdx, Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:362).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_temp(
   self : TranslatorStack,
   ty : @wasmi_core.ValType,
@@ -1040,6 +1070,9 @@ pub fn TranslatorStack::push_temp(
 
 ///|
 /// Pushes an immediate `value` on the [`Stack`].
+// Cannot fail; keeps upstream's `Result<OperandIdx, Error>`
+// (wasmi 1.0.9 translator/func/stack/mod.rs:372).
+#warnings("-unused_error_type")
 pub fn TranslatorStack::push_immediate(
   self : TranslatorStack,
   value : @wasmi_core.TypedVal,

@@ -508,6 +508,9 @@ fn layout_realized(
 
 ///|
 /// Ignore a MathML HTML element during paged export.
+// Cannot fail; the item layouters share `SourceResult<()>`
+// (typst-layout/src/math/mod.rs:554).
+#warnings("-unused_error_type")
 fn layout_mathml(
   item : @library.MathmlItem,
   ctx : MathContext,

@@ -583,7 +583,7 @@ fn ParseState::used_ids(self : ParseState) -> Array[String] {
 
 ///|
 /// Records an occurrence of an option.
-fn ParseState::start(self : ParseState, spec : ArgSpec) -> Unit raise CliError {
+fn ParseState::start(self : ParseState, spec : ArgSpec) -> Unit {
   let n = self.occurrences.get(spec.id).unwrap_or(0) + 1
   self.occurrences[spec.id] = n
   if !self.used.contains(spec.id) {

@@ -473,7 +473,7 @@ pub fn HeadingElem::resolve_level(
 
 ///|
 /// Create a new counter identified by a key.
-fn impl_counter_construct(key_ : CounterKey) -> Counter raise HintedError {
+fn impl_counter_construct(key_ : CounterKey) -> Counter {
   Counter::new(key_)
 }
 
@@ -491,12 +491,12 @@ fn impl_counter_get(
 }
 
 ///|
-fn impl_counter_display__numbering_default() -> Smart[Numbering] raise SourceError {
+fn impl_counter_display__numbering_default() -> Smart[Numbering] {
   Auto
 }
 
 ///|
-fn impl_counter_display__at_default() -> Smart[LocatableSelector] raise SourceError {
+fn impl_counter_display__at_default() -> Smart[LocatableSelector] {
   Auto
 }
 
@@ -599,7 +599,7 @@ fn impl_counter_final(
 
 ///|
 /// `NonZeroUsize::ONE`.
-fn impl_counter_step__level_default() -> NonZeroUSize raise SourceError {
+fn impl_counter_step__level_default() -> NonZeroUSize {
   NonZeroUSize(1L)
 }
 
@@ -609,7 +609,7 @@ fn impl_counter_step(
   self_ : Counter,
   span : @syntax.Span,
   level_ : NonZeroUSize,
-) -> Content raise HintedError {
+) -> Content {
   impl_counter_update(self_, span, Step(level_))
 }
 
@@ -619,7 +619,7 @@ fn impl_counter_update(
   self_ : Counter,
   span : @syntax.Span,
   update_ : CounterUpdate,
-) -> Content raise HintedError {
+) -> Content {
   Content::new(counter_update_elem(), [
     (counter_update_elem_key, self_.0.into_value()),
     (counter_update_elem_update, update_.into_value()),

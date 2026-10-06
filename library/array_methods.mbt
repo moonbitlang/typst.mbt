@@ -8,13 +8,13 @@
 
 ///|
 /// Converts a value to an array.
-fn impl_array_construct(value_ : ToArray) -> Arr raise HintedError {
+fn impl_array_construct(value_ : ToArray) -> Arr {
   value_.0
 }
 
 ///|
 /// The number of values in the array.
-fn impl_array_len(self_ : Arr) -> USize raise HintedError {
+fn impl_array_len(self_ : Arr) -> USize {
   USize(self_.len().to_int64())
 }
 
@@ -68,7 +68,7 @@ fn impl_array_at(
 
 ///|
 /// Adds a value to the end of the array.
-fn impl_array_push(self_ : Arr, value_ : Value) -> Unit raise HintedError {
+fn impl_array_push(self_ : Arr, value_ : Value) -> Unit {
   self_.make_mut().items.push(value_)
 }
 
@@ -111,7 +111,7 @@ fn impl_array_remove(
 
 ///|
 /// Default of `array.slice(end)`.
-fn impl_array_slice__end_default() -> Int64? raise SourceError {
+fn impl_array_slice__end_default() -> Int64? {
   None
 }
 
@@ -139,7 +139,7 @@ fn impl_array_slice(
 
 ///|
 /// Whether the array contains the specified value.
-fn impl_array_contains(self_ : Arr, value_ : Value) -> Bool raise HintedError {
+fn impl_array_contains(self_ : Arr, value_ : Value) -> Bool {
   self_.items.iter().any(v => equal(v, value_))
 }
 
@@ -192,13 +192,13 @@ fn impl_array_position(
 
 ///|
 /// Default of `range(start)`.
-fn impl_array_range__start_default() -> Int64 raise SourceError {
+fn impl_array_range__start_default() -> Int64 {
   0L
 }
 
 ///|
 /// Default of `range(step:)`: `NonZeroI64::new(1).unwrap()`.
-fn impl_array_range__step_default() -> NonZeroI64 raise SourceError {
+fn impl_array_range__step_default() -> NonZeroI64 {
   NonZeroI64(1L)
 }
 
@@ -459,7 +459,7 @@ fn impl_array_all(
 
 ///|
 /// Combine all nested arrays into a single flat one.
-fn impl_array_flatten(self_ : Arr) -> Arr raise HintedError {
+fn impl_array_flatten(self_ : Arr) -> Arr {
   Arr::from_array(array_flatten(self_))
 }
 
@@ -478,7 +478,7 @@ fn array_flatten(array : Arr) -> Array[Value] {
 
 ///|
 /// Return a new array with the same items, but in reverse order.
-fn impl_array_rev(self_ : Arr) -> Arr raise HintedError {
+fn impl_array_rev(self_ : Arr) -> Arr {
   let out = self_.items.map(v => v.shared())
   out.rev_in_place()
   Arr::from_array(out)
@@ -486,7 +486,7 @@ fn impl_array_rev(self_ : Arr) -> Arr raise HintedError {
 
 ///|
 /// Split the array at occurrences of the specified value.
-fn impl_array_split(self_ : Arr, at_ : Value) -> Arr raise HintedError {
+fn impl_array_split(self_ : Arr, at_ : Value) -> Arr {
   // Rust's `slice::split`: always yields at least one (possibly empty)
   // subslice.
   let out = []
@@ -505,13 +505,13 @@ fn impl_array_split(self_ : Arr, at_ : Value) -> Arr raise HintedError {
 
 ///|
 /// Default of `array.join(separator)`.
-fn impl_array_join__separator_default() -> Value? raise SourceError {
+fn impl_array_join__separator_default() -> Value? {
   None
 }
 
 ///|
 /// Default of `array.join(default:)`.
-fn impl_array_join__default_default() -> Value? raise SourceError {
+fn impl_array_join__default_default() -> Value? {
   None
 }
 
@@ -547,10 +547,7 @@ fn impl_array_join(
 ///|
 /// Returns an array with a copy of the separator value placed between
 /// adjacent elements.
-fn impl_array_intersperse(
-  self_ : Arr,
-  separator_ : Value,
-) -> Arr raise HintedError {
+fn impl_array_intersperse(self_ : Arr, separator_ : Value) -> Arr {
   let vec = []
   for i, value in self_.items {
     if i > 0 {
@@ -568,7 +565,7 @@ fn impl_array_chunks(
   self_ : Arr,
   chunk_size_ : NonZeroUSize,
   exact_ : Bool,
-) -> Arr raise HintedError {
+) -> Arr {
   let size = chunk_size_.get()
   let len = self_.len().to_int64()
   let out = []
@@ -595,10 +592,7 @@ fn impl_array_chunks(
 
 ///|
 /// Returns sliding windows of `window-size` elements over an array.
-fn impl_array_windows(
-  self_ : Arr,
-  window_size_ : NonZeroUSize,
-) -> Arr raise HintedError {
+fn impl_array_windows(self_ : Arr, window_size_ : NonZeroUSize) -> Arr {
   let size = window_size_.get()
   let len = self_.len().to_int64()
   let out = []

@@ -523,6 +523,9 @@ fn mul26(a : Int, s : F26Dot6) -> Int {
 }
 
 ///|
+// Cannot fail; keeps upstream's `Result<(), DrawError>`
+// (skrifa 0.42.1 src/outline/glyf/mod.rs:519).
+#warnings("-unused_error_type")
 fn FreeTypeScaler::load_empty(
   self : FreeTypeScaler,
   _glyph_id : GlyphId,

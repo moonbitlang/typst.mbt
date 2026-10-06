@@ -84,6 +84,8 @@ pub fn register(rules : @library.NativeRuleMap) -> Unit {
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:113).
+#warnings("-unused_error_type")
 fn strong_rule(
   elem : @library.StrongElem,
   _ : @library.Engine,
@@ -97,6 +99,8 @@ fn strong_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:120).
+#warnings("-unused_error_type")
 fn emph_rule(
   elem : @library.EmphElem,
   _ : @library.Engine,
@@ -116,6 +120,8 @@ fn tight_spacing(spacing : @library.Length) -> @library.Content {
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:123).
+#warnings("-unused_error_type")
 fn list_rule(
   elem : @library.ListElem,
   _ : @library.Engine,
@@ -137,6 +143,8 @@ fn list_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:142).
+#warnings("-unused_error_type")
 fn enum_rule(
   elem : @library.EnumElem,
   _ : @library.Engine,
@@ -158,6 +166,8 @@ fn enum_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:161).
+#warnings("-unused_error_type")
 fn terms_rule(
   elem : @library.TermsElem,
   _ : @library.Engine,
@@ -228,6 +238,8 @@ fn terms_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:219).
+#warnings("-unused_error_type")
 fn link_marker_rule(
   elem : @library.LinkMarker,
   _ : @library.Engine,
@@ -255,6 +267,8 @@ fn link_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:234).
+#warnings("-unused_error_type")
 fn direct_link_rule(
   elem : @library.DirectLinkElem,
   _ : @library.Engine,
@@ -265,6 +279,8 @@ fn direct_link_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:239).
+#warnings("-unused_error_type")
 fn divider_rule(
   elem : @library.DividerElem,
   _ : @library.Engine,
@@ -430,6 +446,8 @@ fn figure_caption_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:358).
+#warnings("-unused_error_type")
 fn quote_rule(
   elem : @library.QuoteElem,
   _ : @library.Engine,
@@ -689,6 +707,8 @@ fn bibliography_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:529).
+#warnings("-unused_error_type")
 fn csl_light_rule(
   elem : @library.CslLightElem,
   _ : @library.Engine,
@@ -698,6 +718,8 @@ fn csl_light_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:532).
+#warnings("-unused_error_type")
 fn csl_indent_rule(
   elem : @library.CslIndentElem,
   _ : @library.Engine,
@@ -707,6 +729,8 @@ fn csl_indent_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:535).
+#warnings("-unused_error_type")
 fn table_rule(
   elem : @library.TableElem,
   _ : @library.Engine,
@@ -757,6 +781,9 @@ fn super_rule(
 }
 
 ///|
+// Cannot fail; returns into a `ShowFn` like upstream
+// (typst-layout/src/rules.rs:565).
+#warnings("-unused_error_type")
 fn show_script(
   styles : @library.StyleChain,
   body : @library.Content,
@@ -790,6 +817,8 @@ fn decorated(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:585).
+#warnings("-unused_error_type")
 fn underline_rule(
   elem : @library.UnderlineElem,
   _ : @library.Engine,
@@ -811,6 +840,8 @@ fn underline_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:600).
+#warnings("-unused_error_type")
 fn overline_rule(
   elem : @library.OverlineElem,
   _ : @library.Engine,
@@ -832,6 +863,8 @@ fn overline_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:615).
+#warnings("-unused_error_type")
 fn strike_rule(
   elem : @library.StrikeElem,
   _ : @library.Engine,
@@ -853,6 +886,8 @@ fn strike_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:630).
+#warnings("-unused_error_type")
 fn highlight_rule(
   elem : @library.HighlightElem,
   _ : @library.Engine,
@@ -876,6 +911,8 @@ fn highlight_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:650).
+#warnings("-unused_error_type")
 fn smallcaps_rule(
   elem : @library.SmallcapsElem,
   _ : @library.Engine,
@@ -886,6 +923,8 @@ fn smallcaps_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:655).
+#warnings("-unused_error_type")
 fn raw_rule(
   elem : @library.RawElem,
   _ : @library.Engine,
@@ -909,6 +948,8 @@ fn raw_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:678).
+#warnings("-unused_error_type")
 fn raw_line_rule(
   elem : @library.RawLine,
   _ : @library.Engine,
@@ -918,6 +959,8 @@ fn raw_line_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:680).
+#warnings("-unused_error_type")
 fn align_rule(
   elem : @library.AlignElem,
   _ : @library.Engine,
@@ -927,6 +970,8 @@ fn align_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:683).
+#warnings("-unused_error_type")
 fn pad_rule(
   elem : @library.PadElem,
   _ : @library.Engine,
@@ -936,6 +981,8 @@ fn pad_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:687).
+#warnings("-unused_error_type")
 fn columns_rule(
   elem : @library.ColumnsElem,
   _ : @library.Engine,
@@ -945,6 +992,8 @@ fn columns_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:691).
+#warnings("-unused_error_type")
 fn stack_rule(
   elem : @library.StackElem,
   _ : @library.Engine,
@@ -954,6 +1003,8 @@ fn stack_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:695).
+#warnings("-unused_error_type")
 fn grid_rule(
   elem : @library.GridElem,
   _ : @library.Engine,
@@ -973,6 +1024,9 @@ fn grid_cell_rule(
 
 ///|
 /// Function with common code to display a grid cell or table cell.
+// Cannot fail; returns into a `ShowFn` like upstream
+// (typst-layout/src/rules.rs:704).
+#warnings("-unused_error_type")
 fn show_cell(
   body : @library.Content,
   inset : @library.Smart[@library.Sides[@library.Rel[@library.Length]?]],
@@ -996,6 +1050,8 @@ fn show_cell(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:725).
+#warnings("-unused_error_type")
 fn move_rule(
   elem : @library.MoveElem,
   _ : @library.Engine,
@@ -1005,6 +1061,8 @@ fn move_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:729).
+#warnings("-unused_error_type")
 fn scale_rule(
   elem : @library.ScaleElem,
   _ : @library.Engine,
@@ -1014,6 +1072,8 @@ fn scale_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:733).
+#warnings("-unused_error_type")
 fn rotate_rule(
   elem : @library.RotateElem,
   _ : @library.Engine,
@@ -1023,6 +1083,8 @@ fn rotate_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:737).
+#warnings("-unused_error_type")
 fn skew_rule(
   elem : @library.SkewElem,
   _ : @library.Engine,
@@ -1032,6 +1094,8 @@ fn skew_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:741).
+#warnings("-unused_error_type")
 fn repeat_rule(
   elem : @library.RepeatElem,
   _ : @library.Engine,
@@ -1041,6 +1105,8 @@ fn repeat_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:745).
+#warnings("-unused_error_type")
 fn hide_rule(
   elem : @library.HideElem,
   _ : @library.Engine,
@@ -1050,6 +1116,8 @@ fn hide_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:748).
+#warnings("-unused_error_type")
 fn layout_rule(
   elem : @library.LayoutElem,
   _ : @library.Engine,
@@ -1079,6 +1147,8 @@ fn layout_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:767).
+#warnings("-unused_error_type")
 fn image_rule(
   elem : @library.ImageElem,
   _ : @library.Engine,
@@ -1091,6 +1161,8 @@ fn image_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:774).
+#warnings("-unused_error_type")
 fn line_rule(
   elem : @library.LineElem,
   _ : @library.Engine,
@@ -1100,6 +1172,8 @@ fn line_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:778).
+#warnings("-unused_error_type")
 fn rect_rule(
   elem : @library.RectElem,
   _ : @library.Engine,
@@ -1112,6 +1186,8 @@ fn rect_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:785).
+#warnings("-unused_error_type")
 fn square_rule(
   elem : @library.SquareElem,
   _ : @library.Engine,
@@ -1124,6 +1200,8 @@ fn square_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:792).
+#warnings("-unused_error_type")
 fn ellipse_rule(
   elem : @library.EllipseElem,
   _ : @library.Engine,
@@ -1136,6 +1214,8 @@ fn ellipse_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:799).
+#warnings("-unused_error_type")
 fn circle_rule(
   elem : @library.CircleElem,
   _ : @library.Engine,
@@ -1148,6 +1228,8 @@ fn circle_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:806).
+#warnings("-unused_error_type")
 fn polygon_rule(
   elem : @library.PolygonElem,
   _ : @library.Engine,
@@ -1157,6 +1239,8 @@ fn polygon_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:810).
+#warnings("-unused_error_type")
 fn curve_rule(
   elem : @library.CurveElem,
   _ : @library.Engine,
@@ -1166,6 +1250,8 @@ fn curve_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:814).
+#warnings("-unused_error_type")
 fn equation_rule(
   elem : @library.EquationElem,
   _ : @library.Engine,
@@ -1179,6 +1265,8 @@ fn equation_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:823).
+#warnings("-unused_error_type")
 fn artifact_rule(
   elem : @library.ArtifactElem,
   _ : @library.Engine,
@@ -1188,6 +1276,8 @@ fn artifact_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-layout/src/rules.rs:825).
+#warnings("-unused_error_type")
 fn pdf_marker_tag_rule(
   elem : @library.PdfPdfMarkerTag,
   _ : @library.Engine,

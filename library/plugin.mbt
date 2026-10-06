@@ -521,6 +521,9 @@ fn caller_memory(caller : @wasmi.Caller[CallData]) -> @wasmi.Memory {
 
 ///|
 /// Write the arguments to the plugin function into the plugin's memory.
+// Cannot fail; host functions share the linker's raising type
+// (upstream returns `()`, typst-library/src/foundations/plugin.rs:577).
+#warnings("-unused_error_type")
 fn wasm_minimal_protocol_write_args_to_buffer(
   caller : @wasmi.Caller[CallData],
   params : Array[@wasmi.Val],
@@ -549,6 +552,9 @@ fn wasm_minimal_protocol_write_args_to_buffer(
 
 ///|
 /// Extracts the output of the plugin function from the plugin's memory.
+// Cannot fail; host functions share the linker's raising type
+// (upstream returns `()`, typst-library/src/foundations/plugin.rs:598).
+#warnings("-unused_error_type")
 fn wasm_minimal_protocol_send_result_to_host(
   caller : @wasmi.Caller[CallData],
   params : Array[@wasmi.Val],

@@ -79,7 +79,7 @@ fn impl_eval(
 
 ///|
 /// Returns a new function that has the given arguments pre-applied.
-fn impl_func_with(self_ : Func, args : Args) -> Func raise HintedError {
+fn impl_func_with(self_ : Func, args : Args) -> Func {
   let span = self_.span()
   { inner: With(self_, args.take()), span, }
 }

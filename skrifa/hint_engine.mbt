@@ -598,6 +598,9 @@ fn line_vector(
 }
 
 ///|
+// Cannot fail; every opcode handler returns `OpResult`
+// (skrifa 0.42.1 src/outline/glyf/hint/engine/graphics.rs:40).
+#warnings("-unused_error_type")
 fn Interp::op_svtca(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
   // The low bit of the opcode determines the axis to set (1 = x, 0 = y).
   let x = (opcode & 1) << 14
@@ -640,6 +643,9 @@ fn Interp::op_svtl(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
+// Cannot fail; every opcode handler returns `OpResult`
+// (skrifa 0.42.1 src/outline/glyf/hint/engine/graphics.rs:105).
+#warnings("-unused_error_type")
 fn Interp::op_sfvtpv(self : Interp) -> Unit raise HintErrorKind {
   let gs = self.graphics
   gs.freedom_x = gs.proj_x

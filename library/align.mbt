@@ -115,7 +115,7 @@ fn impl_alignment_const_bottom() -> Value {
 /// The axis this alignment belongs to: `{"horizontal"}` for horizontal
 /// alignments, `{"vertical"}` for vertical ones and `{none}` for 2D
 /// alignments.
-fn impl_alignment_axis(self_ : Alignment) -> Axis? raise HintedError {
+fn impl_alignment_axis(self_ : Alignment) -> Axis? {
   match self_ {
     H(_) => Some(X)
     V(_) => Some(Y)
@@ -125,7 +125,7 @@ fn impl_alignment_axis(self_ : Alignment) -> Axis? raise HintedError {
 
 ///|
 /// The inverse alignment.
-fn impl_alignment_inv(self_ : Alignment) -> Alignment raise HintedError {
+fn impl_alignment_inv(self_ : Alignment) -> Alignment {
   self_.inv()
 }
 

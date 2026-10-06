@@ -70,6 +70,8 @@ fn html_elem_css_default() -> Value {
 
 ///|
 /// `#[parse(Some(css::Properties::default()))]` of `HtmlElem.css`.
+// Cannot fail; a parse hook (typst-html/src/format.rs:216).
+#warnings("-unused_error_type")
 fn html_elem_css_parse(
   _engine : Engine,
   _args : Args,

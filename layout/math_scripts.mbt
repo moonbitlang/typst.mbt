@@ -58,6 +58,9 @@ fn layout_scripts(
 
 ///|
 /// Lays out a [`PrimesItem`].
+// Cannot fail; the item layouters share `SourceResult<()>`
+// (typst-layout/src/math/scripts.rs:73).
+#warnings("-unused_error_type")
 fn layout_primes(
   item : @library.PrimesItem,
   ctx : MathContext,

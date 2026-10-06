@@ -20,12 +20,12 @@ pub(all) struct Tiling {
 } derive(Eq)
 
 ///|
-fn impl_tiling_construct__size_default() -> @syntax.Spanned[Smart[Axes[Length]]] raise SourceError {
+fn impl_tiling_construct__size_default() -> @syntax.Spanned[Smart[Axes[Length]]] {
   { v: Auto, span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Axes[Length]] raise SourceError {
+fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Axes[Length]] {
   {
     v: Axes::new(Length::zero(), Length::zero()),
     span: @syntax.Span::detached(),
@@ -33,12 +33,12 @@ fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Axes[Length]] rai
 }
 
 ///|
-fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Axes[Rel[Length]]] raise SourceError {
+fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Axes[Rel[Length]]] {
   { v: Axes::new(Rel::zero(), Rel::zero()), span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_tiling_construct__angle_default() -> @syntax.Spanned[Angle] raise SourceError {
+fn impl_tiling_construct__angle_default() -> @syntax.Spanned[Angle] {
   { v: Angle::zero(), span: @syntax.Span::detached(), }
 }
 

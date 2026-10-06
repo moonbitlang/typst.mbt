@@ -4,6 +4,9 @@
 
 ///|
 /// Converts a value into a dictionary.
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-library/src/foundations/dict.rs:186).
+#warnings("-unused_error_type")
 fn impl_dict_construct(
   engine : Engine,
   value_ : @syntax.Spanned[ToDict],
@@ -23,7 +26,7 @@ fn impl_dict_construct(
 
 ///|
 /// The number of pairs in the dictionary.
-fn impl_dict_len(self_ : Dict) -> USize raise HintedError {
+fn impl_dict_len(self_ : Dict) -> USize {
   USize(self_.len().to_int64())
 }
 
@@ -51,11 +54,7 @@ fn impl_dict_at(
 ///|
 /// Inserts a new pair into the dictionary. If the dictionary already
 /// contains this key, the value is updated.
-fn impl_dict_insert(
-  self_ : Dict,
-  key_ : String,
-  value_ : Value,
-) -> Unit raise HintedError {
+fn impl_dict_insert(self_ : Dict, key_ : String, value_ : Value) -> Unit {
   self_.make_mut().insert(key_, value_)
 }
 
@@ -71,20 +70,20 @@ fn impl_dict_remove(
 
 ///|
 /// Returns the keys of the dictionary as an array in insertion order.
-fn impl_dict_keys(self_ : Dict) -> Arr raise HintedError {
+fn impl_dict_keys(self_ : Dict) -> Arr {
   Arr::from_array(self_.map.keys().map(k => Value::Str(k)).collect())
 }
 
 ///|
 /// Returns the values of the dictionary as an array in insertion order.
-fn impl_dict_values(self_ : Dict) -> Arr raise HintedError {
+fn impl_dict_values(self_ : Dict) -> Arr {
   Arr::from_array(self_.map.values().map(v => v.shared()).collect())
 }
 
 ///|
 /// Returns the keys and values of the dictionary as an array of pairs. Each
 /// pair is represented as an array of length two.
-fn impl_dict_pairs(self_ : Dict) -> Arr raise HintedError {
+fn impl_dict_pairs(self_ : Dict) -> Arr {
   let out = []
   for k, v in self_.map {
     out.push(Array(Arr::from_array([Str(k), v.shared()])))
