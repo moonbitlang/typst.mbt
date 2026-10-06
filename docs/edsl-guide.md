@@ -810,6 +810,7 @@ or rules of the document (`styled_table`):
 
 ```moonbit
 pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+  let head = ["Bed", "Crop", "Harvest (kg)"]
   let fill : Cells[Paint] = Cells((_, y) => {
     // Row 0 is the header, row `i + 1` is `rows[i]`.
     if y == 0 {
@@ -825,10 +826,16 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
     ShowSet(Select::table_cell(x=2), SetText(font=["DejaVu Sans Mono"])),
     ShowSet(
       Select::table_cell(y=0),
-      SetText(font=["Libertinus Serif"], size=Pt(7), weight=SemiBold),
+      SetText(
+        font=["Libertinus Serif"],
+        size=Pt(7),
+        weight=SemiBold,
+        fill=Luma(90),
+        tracking=Pt(0.3),
+      ),
     ),
     DataTable(
-      ["BED", "CROP", "HARVEST (KG)"],
+      head.map(label => label.to_upper() as &IntoContent),
       rows,
       columns=[Auto, Fr(1), Auto],
       inset=Cells::all(Sides(x=Pt(8), y=Pt(5))),
@@ -836,6 +843,7 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
       fill~,
       stroke=Stroke(thickness=Pt(0.5), paint=Luma(180)),
       radius=Corners(all=Pt(4)),
+      frame_fill=White,
     ),
   ])
 }
@@ -847,11 +855,30 @@ pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
   closes the table on every page. (Written by hand, with a rule under
   every row but the table's last, the engine draws the rule under the last
   row of a page on the outline of the frame.)
+- `frame_fill` is the surface of a framed table: on a page that is not
+  white, the white that the table stands on. It is the fill of the frame,
+  beneath its outline, and each part of a table that continues on the next
+  page is a filled box. The surface is not the fill of every cell
+  (`fill=Cells::all(White)`): the engine paints what is in a clipped block
+  after the block's outline, up to the outline's inner edge, and a fill
+  there takes some of the outline away in the pixels that the outline
+  covers in part. At 110 pixels per inch, an outline of 0.5pt in grey 120
+  on a page in grey 225 has an inner column of pixels of 173 around a
+  filled frame and of 187 around filled cells; 5pt to the right, 213 and
+  240. `fill` is for the cells that differ from the surface: here the
+  header and the marked row. Without `radius` there is no frame, and
+  `frame_fill` is an error.
 - The text is not a parameter. Rules before the table reach its cells: a
   `SetText` for the size of the table's text, a show-set rule on the cells
   of row 0 for the header and on the cells of a column for that column.
   Where two match, the later rule wins: the header's rule names the font
   again, so that the header of the numbers is not monospaced.
+- The header in small capitals is that rule and `to_upper` on the strings
+  of the head: capitals are other characters, not a property of text, and
+  a size, a weight, a colour and a tracking are (`SetText`). Every table
+  of the documents that were rebuilt with the kit has these five lines,
+  each with its own numbers; the element has no parameter for them, as it
+  has none for any text.
 - A fill that depends on the row is a `Cells` function, as for any table.
   Its row counts the header: row 0 is the header, and row `i + 1` is
   `rows[i]`. It is a callback (section 8): `styled_table` creates one and
@@ -1177,7 +1204,7 @@ of another callback; it is its creation that has to come first.
 | 5: a character without a glyph is not reported | F "S4: .." |
 | 6.1 to 6.5 | G the five "section 6: .." tests, F "S5: ..", "S6: ..", "T10: .." |
 | 7.1: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: the cards ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
-| 7.2: the rows of a `DataTable` and their check, its lines, the header and the rows over pages; the frame, the fills and the rules for its text; soft breaks in a cell | G "section 7: a table of data ..", "section 7: the looks ..", "section 7: inline code ..", `doc/kit/data_table_test.mbt`, F "S5: .." |
+| 7.2: the rows of a `DataTable` and their check, its lines, the header and the rows over pages; the frame and its surface (in pixels: `doc/kit/data_table_test.mbt`, "the surface of a frame"), the fills and the rules for its text; soft breaks in a cell | G "section 7: a table of data ..", "section 7: the looks ..", "section 7: inline code ..", `doc/kit/data_table_test.mbt`, F "S5: .." |
 | 7.3: a `Chip` on the baseline of its line, the height of the line, one line in a narrow column | G "section 7: a chip ..", `doc/kit/chip_test.mbt`, F "T1: .." |
 | 7.4: a `Canvas` as wide as its container, its labels at their anchors, a click on a bar; arrows, labels on one baseline, the anchor that measures | G "section 7: a chart on a canvas ..", "section 7: arrows on a canvas ..", `doc/kit/canvas_test.mbt`, F "S2a: ..", "T11: .." |
 | 8: the error, its hints and location, and the captured callback | G "section 8: .." |
