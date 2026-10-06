@@ -34,6 +34,24 @@
   `oracle/rustybuzz-tap`) and `shape-hb` (rustybuzz's own HarfBuzz test
   suite, `scripts/goldens.sh shape-hb`).
 - Before committing: `moon fmt && moon info && moon check`, run the runner.
+- Warnings: CI runs `moon check --deny-warn` on native, wasm-gc and wasm,
+  so all three must report no warning (some warnings exist on one target
+  only). The toolchain is deliberately not pinned: a compiler release
+  that adds a warning turns the check job red, and the fix is a source
+  change or an attribute as below, never removing `--deny-warn`. Fix a
+  warning where it is fixable. Code that must stay as it is to mirror
+  upstream (an item upstream also never reads, a `raise` that a uniform
+  function type requires) gets a per-declaration `#warnings("-<name>")`
+  with a note citing the upstream file:line; check upstream before
+  calling anything unused (it may be a missing port). Going forward, a
+  package-level `warnings = "-..."` in `moon.pkg` is the last resort,
+  for what has no narrower switch (an import used on one target only),
+  with a comment; "no warning" is still measured under the
+  package-level lines that predate this rule (e.g. `-deprecated` in
+  `hayro/*`), which are to be narrowed or removed, not extended. A panic
+  on a broken invariant is `guard!` (upstream's `assert!`/`unwrap()`);
+  cleanup before re-raising is `errdefer`. Warnings in `*_gen.mbt` are
+  fixed in the generator.
 - Run unit tests in parallel: `moon test --target native -j16` (24 cores).
 - Debug vs `--release` (native): a release rebuild takes ~80-95 s vs ~11 s
   for debug, but runs 2-3x faster (`break` stage 16 s -> 5.5 s). Use debug
