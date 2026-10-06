@@ -220,20 +220,35 @@
   interpolated block (`is_block`) in a run of its own (`NPieces`) with
   `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
   facts this rests on (the "engine: .." tests).
-- EDSL kit (`doc/kit`, section 4 and "As built (step 3)" of
-  `docs/edsl-ports.md`): elements that are not one Typst element (`Cards`, `Chip`,
-  `DataTable`),
+- EDSL kit (`doc/kit`, section 4 and the "As built" notes of steps 3 to 5
+  of `docs/edsl-ports.md`): elements that are not one Typst element
+  (`Cards`, `Chip`, `DataTable`, `Canvas`),
   each an expansion into `doc`'s constructors with a functional Typst twin
-  (`doc/twins/kit.mbt`, pairs of the `edsl` stage). The conventions are in
+  (`doc/twins/kit.mbt`, `doc/twins/kit_canvas.mbt`, pairs of the `edsl`
+  stage). The conventions are in
   the doc comment of `doc/kit/kit.mbt`: read them before adding an element.
   Provenance goes through `@doc.Composite` (`doc/composite.mbt`): one call
   site per element, forwarded arguments marked with `site.arg(i, v)`
   (`Site::param` maps a primitive's argument to the caller's), callbacks
   created in `build` re-enter its scope (`scoped_callback`). An element that
   measures creates a callback and falls under the creation rule. Nothing in
-  `doc` depends on the kit. `doc/examples/report` holds one report written
-  with hand-written helpers and with the kit (identical pages), and
-  `scripts/edsl_helper_lines.py` counts helper lines for that comparison.
+  `doc` depends on the kit. `Canvas` is an unbreakable block of a fixed
+  size in points with its origin at the top left; its items
+  (`Canvas::place`, `line`, `rect`, `circle`, `curve`, `arrow`) are the
+  caller's descriptions, each one `Place` and a composite of its own (a
+  click on a bar is the line of its `Canvas::rect`). An anchor is the
+  engine's alignment with an offset in per cent of the container
+  (`Pt(x) - 50%`), so an item does not know the size of its canvas and
+  only the anchor `Baseline` measures; the corners of the head of an
+  arrow are computed in MoonBit and by the twin with the same operations
+  in the same order (frames are compared bit for bit, and the engine's
+  unit of length is 1/127pt: a measured length is used as a length, not as
+  a number of points to compute with). `doc/examples/report` holds one
+  report written with hand-written helpers and with the kit (identical
+  pages but for the labels of its chart, which the hand-written helper
+  puts on an estimated baseline), and `scripts/edsl_helper_lines.py`
+  counts its helper lines in two classes, what the kit provides and the
+  document's own (`// helper-lines: kit` marks the first).
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`
