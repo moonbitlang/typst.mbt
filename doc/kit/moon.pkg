@@ -12,4 +12,5 @@ import {
   "moonbitlang/typst/doc/format",
   "moonbitlang/typst/library",
   "moonbitlang/typst/layout",
+  "moonbitlang/typst/codecs",
 } for "test"

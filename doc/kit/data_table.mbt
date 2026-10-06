@@ -28,8 +28,8 @@
 /// ])
 /// ```
 ///
-/// and with `radius`, that sequence in `Block(.., radius~,
-/// stroke=Sides(all=stroke), clip=true)`, the table ending with
+/// and with `radius`, that sequence in `Block(.., fill=frame_fill,
+/// stroke=Sides(all=stroke), radius~, clip=true)`, the table ending with
 /// `TableHline(stroke=Stroke::none())`. What it does that a `Table` of the
 /// same cells does not:
 ///
@@ -73,6 +73,19 @@
 ///   no rule under the last row of a page either: the line that ends the
 ///   table ends each of its parts. (Without a frame the rule under the
 ///   last row of a page is drawn, as under every row.)
+/// - **The surface** of a framed table is the frame's, `frame_fill`: on a
+///   page that is not white, the white that the table stands on. It is not
+///   the fill of every cell (`fill=Cells::all(..)`). The engine paints the
+///   fill of a block, then its outline, then what is in the block, clipped
+///   at the inner edge of the outline. So the frame's fill is beneath the
+///   outline, which comes out as the outline of a filled box, in every
+///   part of a table that continues on the next page. A fill of the cells
+///   is painted after the outline, and where the two meet, in the pixels
+///   that the outline covers in part, it takes some of the outline away:
+///   its inner edge is lighter, by an amount that depends on where the
+///   edge falls among the pixels. `fill` is for the cells that differ from
+///   the surface (a header, a marked row), whose fill meets the outline in
+///   that way in their rows, as in any clipped block.
 ///
 /// It does not measure and creates no callback: it can be built anywhere,
 /// also inside a callback. (A `Cells` function that the caller passes is
@@ -92,13 +105,21 @@
 ///   the row); by default the table's. The row of a cell counts the
 ///   header: with a head, row 0 is the header and row `i + 1` is
 ///   `rows[i]`. Numbers to the right: `align=Cells::columns([Left,
-///   Right])`. A marked row: `fill=Cells((_, y) => ..)`.
+///   Right])`. A marked row: `fill=Cells((_, y) => ..)`. (The surface of
+///   a framed table is not a `fill` of its cells: `frame_fill`.)
 /// - `stroke`: one `Stroke`, the rule under each row and the outline of
 ///   the frame; by default the default stroke (1pt, black; for the rules,
 ///   what a `SetTable(stroke=..)` of the document sets).
 ///   `Stroke::none()`: no lines. A cell with other lines has them as its
 ///   own (`TableCell(.., stroke=Sides(top=..))`).
 /// - `radius`: the corners of the frame, and the choice of a frame.
+/// - `frame_fill`: `Block`'s `fill`, for the frame; by default the
+///   block's (none, or what a `SetBlock(fill=..)` of the document sets).
+///   It has the name of its part because `fill` is the table's, per cell:
+///   a `Table` and a `Block` both have a `fill`, and the element is the
+///   table. Without `radius` there is no frame, and it is an error at
+///   `frame_fill`. (A frame with square corners: `radius=Corners(all=
+///   Pt(0))`.)
 /// - `breakable`: `TableCell`'s, for every cell. The default, `false`, is
 ///   the element's own: a row of data is not split. A `TableCell` of the
 ///   caller can say otherwise for itself.
@@ -129,7 +150,8 @@
 /// Provenance: the call. A cell that is a plain string resolves to the
 /// `head` argument, or to the `rows` argument under the key of its row
 /// (every cell of a row is `Keyed` with it, so descriptions of the caller
-/// in a row have that key too); an error in `fill` is at `fill`.
+/// in a row have that key too); an error in `fill` is at `fill`, one in
+/// `frame_fill` at `frame_fill`.
 ///
 /// Twin: the function `data-table` of `doc/twins/kit.mbt`.
 pub struct DataTable {
@@ -270,6 +292,7 @@ pub fn DataTable::DataTable(
   fill? : @doc.Cells[@doc.Paint],
   stroke? : @doc.Stroke,
   radius? : @doc.Corners[@doc.Length],
+  frame_fill? : @doc.Paint,
   breakable? : Bool = false,
   key? : (Int) -> String,
   loc~ : SourceLoc,
@@ -285,7 +308,7 @@ pub fn DataTable::DataTable(
   })
   // The parameters by their index in this declaration, for `site.arg`:
   // head 0, rows 1, columns 2, inset 3, align 4, fill 5, stroke 6, radius
-  // 7, breakable 8, key 9.
+  // 7, frame_fill 8, breakable 9, key 10.
   let composite = @doc.Composite("DataTable", loc, args_loc, site => {
     // (Copies, and the caller's content converted once: a description
     // does not change when the caller's arrays do.)
@@ -298,13 +321,21 @@ pub fn DataTable::DataTable(
         arg=2,
       )
     }
+    // The fill of a frame that is not there would be dropped without a
+    // word.
+    if frame_fill is Some(_) && radius is None {
+      return site.invalid(
+        "a `DataTable` has a frame only with a `radius`: `frame_fill` is the fill of the frame",
+        arg=8,
+      )
+    }
     // A key that `Keyed` does not take is an error at `key`, not at the
     // cells that would carry it.
     for row, key in keys {
       if key.has_prefix("\u{FDD2}") {
         return site.invalid(
           "the key of `rows[\{row}]` starts with a reserved character (U+FDD2)",
-          arg=9,
+          arg=10,
         )
       }
     }
@@ -355,7 +386,7 @@ pub fn DataTable::DataTable(
       ),
     )
     let ruled = @doc.Seq([
-      @doc.SetTableCell(breakable=site.arg(8, breakable)),
+      @doc.SetTableCell(breakable=site.arg(9, breakable)),
       table,
     ])
     match radius {
@@ -364,8 +395,11 @@ pub fn DataTable::DataTable(
         @doc.Content(
           @doc.Block(
             ruled,
-            radius=site.arg(7, radius),
+            // (Beneath the outline, which is beneath the cells: "The
+            // surface" above.)
+            fill?=site.arg(8, frame_fill),
             stroke=@doc.Sides(all=site.arg(6, rule)),
+            radius=site.arg(7, radius),
             clip=true,
           ),
         )

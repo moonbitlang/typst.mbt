@@ -725,7 +725,7 @@ none())` as the table's last child. Against the table above
 | There | As built | Why |
 |---|---|---|
 | `rule~` | `stroke : Stroke` | The primitive's name. One stroke, not `Cells[Sides[Stroke]]`: the element names the other sides (2.4), which is its reason, and a `Sides` is opaque. It is also the outline of the frame: all six framed helpers of the ports used one hairline for both |
-| `frame~` | `radius : Corners[Length]` | `Block`'s parameter; its presence is the choice of the frame, as for `Cards`. The frame has no fill of its own: the table's `fill` is clipped to it |
+| `frame~` | `radius : Corners[Length]` | `Block`'s parameter; its presence is the choice of the frame, as for `Cards`. The frame has no fill of its own: the table's `fill` is clipped to it (amended after the rebuild, below: `frame_fill`) |
 | `numeric~` | `align : Cells[Alignment]` | The table's own parameter does it without a callback: `Cells::columns([Left, Right])`, which no port found (five wrote a `Cells` function) |
 | `mark~`, the fill of `header~` | `fill : Cells[Paint]` | The table's own. A tinted row was written by one author (two ports), a filled header by one: by the rule "not what one port needed" they are the caller's function, with the row offset documented (row 0 is the header) |
 | the text of `header~`, `column_text~` | rules of the document | `ShowSet(Select::table_cell(y=0), SetText(..))` and `..(x=2)..`: the element has no parameter for text (it would repeat `SetText`), and the rules reach its cells because it is a table. Tested inside the element, also with both on one cell (the later wins) |
@@ -1143,6 +1143,184 @@ and 1.90 ms before; 2.09, 2.11 and 2.09 ms after, 0.2 ms or 10% more, for
    parts (convention 6).
 7. What an element computes is tested as numbers from the frames, and
    every part has the tests of an element (convention 7).
+
+### As built (after three documents were rebuilt): the surface of a `DataTable`, and its header
+
+Three of the documents of section 1 (bench, session-migrations,
+mooncakes-health) were rebuilt with the kit. `DataTable` replaced the
+table helpers of two of them (67 and 45 lines; 35 and 26 with the element)
+and the third's table, written in place. Two things came back.
+
+**The frame had no fill.** Two of the three tables are framed, both on a
+page that is not white, and both need a white surface behind their cells.
+The element had `fill`, the table's, per cell, and nothing for the frame
+(step 4: "the frame has no fill of its own"), so both ports gave every
+cell the surface (`fill=Cells::all(surface)`; in one, as the last branch
+of the function for its header and its marked rows). The hand-written
+helpers had filled their block.
+
+What the engine does (`layout/flow_block.mbt`, upstream's
+`flow/block.rs`, and `layout/shapes.mbt`): for each part of a block it
+wraps what the block holds in a group that is clipped to `clip_rect`, the
+inner edge of the block's stroke (the outline moved in by half the
+thickness), and then puts `fill_and_stroke` before that group: the fill on
+the outline of the block, the stroke on top of it. The order on the page
+is fill, stroke, clipped content. The renderer draws the clipped content
+through a mask with an antialiased edge (`render/lib.mbt`). So a fill of
+the cells is painted after the stroke, up to the edge where the stroke
+ends, and in the pixels that the stroke covers in part the two edges are
+both partial: the cell's fill takes some of the stroke away. From the
+frames of a table of two rows (`data_table_test.mbt`, "the surface of a
+frame"):
+
+```
+stroke 10.00,10.00 180.00x49.74 0.50 luma(47.06%)      fill 10.00,10.00 180.00x49.74 luma(100%)
+clip 10.25,10.25 179.50x49.24                          stroke 10.00,10.00 180.00x49.74 0.50 luma(47.06%)
+  fill 10.00,10.00 90.00x16.58 luma(100%)              clip 10.25,10.25 179.50x49.24
+  ..                                                     stroke 9.75,26.58 180.50x0.00 0.50 ..
+```
+
+(left: the surface in the cells; right: in the frame.) In pixels, at 110
+per inch, an outline of 0.5pt in grey 120, white cells, a page in grey
+225, the columns of pixels across the left side of the frame, against a
+page with nothing but the box (a block of the frame's size with the fill
+and the stroke):
+
+| the frame's left side at | the box alone | surface in the frame | surface in the cells | in both |
+|---|---|---|---|---|
+| 10pt | 206, 173 | 206, 173 | 206, 187 | 206, 194 |
+| 15pt | 178, 213 | 178, 213 | 178, 240 | |
+| 20pt | 153, 250 | 153, 250 | 149, 255 | |
+
+The inner column is lighter by 14, 27 and 5 levels: how much depends on
+where the edge falls among the pixels. It is not for want of something
+beneath: with the surface in the frame and in the cells too it is lighter
+still (194), and where the stroke sits within one column of pixels (20pt)
+the page shows beneath it instead (149 for 153). With the surface in the
+frame, and no fill in the cells, the outline is the box's: no pixel within
+three of the four sides differs, corners included (but where a rule of the
+table meets the outline), at the three places and on both pages of a table
+that continues on the next page (each part of a broken block gets the fill
+and the stroke of a whole box; the line without a stroke that ends a
+framed table leaves the bottom side of each part to the box). With the
+surface in the cells 1015 pixels of the outline of the table of two rows
+differ, and 1210 and 814 on the two pages of the long one.
+
+**`frame_fill : Paint`** is the fill of the block that is the frame:
+
+```
+Block(.., fill=frame_fill, stroke=Sides(all=stroke), radius~, clip=true)
+```
+
+- The name. A `Table` and a `Block` both have a `fill`, and the element
+  takes both. `fill` stays the table's (the element is a table, and
+  unframed tables have no other); the block's has the name of its part
+  before it. It is not `fill` under a second meaning, not a name that no
+  primitive has (`surface`, `background`, which is the content behind a
+  page in Typst), and not `block_fill`: the documentation calls the part
+  "the frame" throughout, and `radius` is "the corners of the frame".
+  `radius` and `stroke` keep their names: only the block has a radius, and
+  one stroke is passed to both.
+- Without `radius` there is no frame, and `frame_fill` is an error at it
+  (convention 5: an argument is not dropped), also when it is `None`.
+  The alternative, a frame that either of two parameters chooses, would
+  make a fill draw an outline. A square frame is
+  `radius=Corners(all=Pt(0))`, as before.
+- Not given, the fill is the block's: none, or what a `SetBlock(fill=..)`
+  of the document sets (convention 1: what a rule does to the primitives,
+  it does to the element). `None` is no fill whatever the rules say.
+- Not built: **the existing `fill` reaching the frame when it is
+  uniform.** A `Cells` is opaque (the kit would need an accessor in `doc`
+  for "is one value"), the same paint would be drawn in two ways by the
+  form of the value (`Cells::all(p)` beneath the outline, `Cells((_, _) =>
+  p)` over it; the frame also fills the gutters of a `SetTable`, the
+  cells do not), and the port that has a header fill and marked rows
+  writes a function, so it would keep the defect.
+- Not built: **a documented composition**, `Block(table, fill~, stroke~,
+  radius~, clip=true)` around an unframed `DataTable`. It is the five
+  lines per document that the element exists to remove, the stroke is
+  given twice, and the table inside does not end with the line that takes
+  the rule away under the last row of a page: the "double rule" of step 4
+  comes back.
+- What stays the engine's: a cell with a fill of its own (a header, a
+  marked row) meets the outline as any fill of a cell does. In the rows
+  of a header in grey 200 the inner column is 180 for the box's 173; the
+  rows without a fill are the box's. The hand-written helpers had the
+  same.
+
+The twin passes `frame-fill` on and rejects it without a radius in the
+element's words (`kit_wbtest.mbt`: eleven rejected inputs for
+`data-table`). The pair `kit-data-table-surface` is a framed table over
+two pages on a tinted page with a header and a marked row of their own
+fill, a square frame, a gradient, `none`, and two frames under a rule for
+the fill of blocks (the rule's fill, and `none`). The `edsl` stage has 51
+pairs.
+
+`doc/examples/report` is unchanged: its page is white and neither version
+gives its table a surface, so the two versions are the pages they were.
+
+**The header.** What each of the three writes for the header of its
+table, with the kit:
+
+| | bench | session-migrations | mooncakes-health |
+|---|---|---|---|
+| the head's strings in capitals (`to_upper`, one line) | yes | yes | yes |
+| a show-set rule on the cells of row 0 (four lines): size, colour, tracking | yes | yes, and a weight | yes, and a weight |
+| a fill for the header | no | yes | no |
+| rows that are marked with a fill | no | yes | no |
+| a rule under the header that is not the rule under the rows | no | no | no |
+| a frame, and a surface in the cells | no | yes | yes |
+
+Common to the three, and to `doc/examples/report`, are the five lines for
+the text of the header: capitals, and a smaller, grey, tracked face. The
+header fill and the marked rows are one port's (and the report's, which
+was written after it): its `Cells` function of nine lines, of which the
+last branch was the surface. No port draws a rule under its header that
+differs from the rule under its rows, by hand or with the kit: all three
+have one hairline for both.
+
+Decided: nothing in the element, and the recipe in the guide (7.2), tested
+in the element's test.
+
+- The common part is text. A `header` parameter for it is a parameter
+  for the style of text, which convention 2 excludes for the reason that
+  holds here: it would be `SetText` again (the three rules set three to
+  four of its parameters, each with its own numbers), or a parameter of
+  the type `SetText`, which is the rule itself written in another place. As a rule of the document it is four lines, it is what
+  an author of Typst writes, and the same line styles a column. Capitals
+  are not a property of text for the engine (`upper` is a function), and
+  an element that upper-cased its head would do so for the strings only,
+  not for content, as `Chip` had to distinguish; `to_upper` at the call
+  is one line and the caller's choice.
+- Helpers that build the values (a function that returns the
+  `Cells[Paint]` for "the header filled, these rows marked") were not
+  built. The evidence is one port. As a function of the kit it is a look
+  (a header and marked rows today, stripes or a row of totals next), in
+  a package whose elements have no parameter for one look of one row. As
+  a general form in `doc` (a value per row, as `Cells::columns` is a
+  value per column) it has no counterpart in Typst, where an array of
+  fills is per column, so it would be a callback under another name, and
+  the offset that the nine lines contain (row 0 is the header only if
+  there is a head) would move into it, where the table that knows about
+  the head cannot be seen. With `frame_fill` the function loses its last
+  branch and is what the report's already was: the header, the marked
+  rows, and `None`.
+- A `header` parameter was not proposed. Of what it could carry, the
+  text is excluded as above, the fill is one port's and is `fill`, and a
+  rule of its own under the header is in no port.
+
+**Conventions amended** (`doc/kit/kit.mbt`, each marked "rebuild"):
+
+1. Where two primitives of an expansion have a parameter of one name,
+   the name is that of the primitive that the element is, and the other
+   has the name of its part before it; the documentation says which of
+   the two is for what, with what the engine does that makes them differ
+   (convention 2).
+2. An argument for a part that the other arguments do not choose is an
+   error at it (convention 5).
+3. What the frames do not show is tested in pixels, against a rendering
+   of the primitive alone, beside the order in which the engine paints
+   (convention 7).
 
 ## 5. Marks (a trial, in the kit)
 

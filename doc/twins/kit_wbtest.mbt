@@ -117,6 +117,13 @@ test "data-table: the function rejects what the element rejects, in its words" {
       "columns: (), ([A],), (([a],),)",
       () => @kit.DataTable(["A"], [["a"]], columns=[]),
     ),
+    (
+      "the fill of a frame without a frame",
+      "columns: (auto, auto), frame-fill: white, ([A], [B]), (([a], [b]),)",
+      () => {
+        @kit.DataTable(["A", "B"], [["a", "b"]], columns=two, frame_fill=White)
+      },
+    ),
   ]
   let messages : Array[String] = []
   for entry in cases {
@@ -140,6 +147,15 @@ test "data-table: the function rejects what the element rejects, in its words" {
       #|a cell with a position: `rows[0]` has an item that a table does not place in its row (a `TableCell` with an `x` or a `y`, a line, a header or a footer): the rows of a `DataTable` hold cells
       #|a line in a row: `rows[0]` has an item that a table does not place in its row (a `TableCell` with an `x` or a `y`, a line, a header or a footer): the rows of a `DataTable` hold cells
       #|no columns: a `DataTable` needs its `columns`: a track for every cell of a row
+      #|the fill of a frame without a frame: a `DataTable` has a frame only with a `radius`: `frame_fill` is the fill of the frame
+    ),
+  )
+  // A fill that is none is an argument too.
+  assert_eq(
+    typst_error("columns: (auto,), frame-fill: none, ([A],), ()"),
+    "assertion failed: " +
+    first_error(
+      Document([@kit.DataTable(["A"], [], columns=[Auto], frame_fill=None)]),
     ),
   )
   // And both take rows that fit, with spans over columns and rows.
