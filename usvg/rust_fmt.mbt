@@ -1,8 +1,9 @@
-// Copies of the Rust float formatting helpers of `library/rust_fmt.mbt`
-// (`impl Display for f32/f64`), which usvg cannot import.
+// A copy of the Rust `f32` formatting helpers of `library/rust_fmt.mbt`
+// (`impl Display for f32`), which usvg cannot import. usvg formats no `f64`.
 
 ///|
-/// The shortest round-trip digits of an `f32` (see [shortest_digits]).
+/// The shortest round-trip digits of an `f32`
+/// (`core::num::flt2dec::strategy::dragon::format_shortest`).
 fn shortest_digits_f32(x : Float) -> (String, Int) {
   // `flt2dec::decode` for `f32`.
   let bits = x.abs().reinterpret_as_uint()
