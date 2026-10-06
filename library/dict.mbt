@@ -20,7 +20,7 @@ pub fn Dict::new() -> Dict {
 ///|
 /// Create a dictionary from pairs.
 pub fn Dict::from_pairs(pairs : ArrayView[(String, Value)]) -> Dict {
-  let map = {}
+  let map = Map([])
   for pair in pairs {
     map[pair.0] = pair.1
   }
@@ -30,7 +30,7 @@ pub fn Dict::from_pairs(pairs : ArrayView[(String, Value)]) -> Dict {
 ///|
 /// A fresh, unshared copy (values are marked shared).
 pub fn Dict::copy(self : Dict) -> Dict {
-  let map = {}
+  let map = Map([])
   for k, v in self.map {
     map[k] = v.shared()
   }

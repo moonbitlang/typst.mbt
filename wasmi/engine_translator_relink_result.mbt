@@ -31,7 +31,7 @@ impl @ir.VisitResults for RelinkVisitor with fn visit_result_regs(
 /// Returns the updated instruction if it has been relinked, `None` otherwise.
 pub fn relink_result(
   instr : @ir.Op,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   new_result : @ir.Slot,
   old_result : @ir.Slot,
 ) -> @ir.Op? {
@@ -42,7 +42,7 @@ pub fn relink_result(
       guard relink_call_internal(
           results,
           EngineFunc::from_internal(func),
-          module,
+          module_,
           new_result,
           old_result,
         )
@@ -55,7 +55,7 @@ pub fn relink_result(
       guard relink_call_internal(
           results,
           EngineFunc::from_internal(func),
-          module,
+          module_,
           new_result,
           old_result,
         )
@@ -65,14 +65,14 @@ pub fn relink_result(
       Some(CallInternal(results~, func~))
     }
     CallImported0(results~, func~) => {
-      guard relink_call_imported(results, func, module, new_result, old_result)
+      guard relink_call_imported(results, func, module_, new_result, old_result)
         is Some(results) else {
         return None
       }
       Some(CallImported0(results~, func~))
     }
     CallImported(results~, func~) => {
-      guard relink_call_imported(results, func, module, new_result, old_result)
+      guard relink_call_imported(results, func, module_, new_result, old_result)
         is Some(results) else {
         return None
       }
@@ -80,7 +80,7 @@ pub fn relink_result(
     }
     CallIndirect0(results~, func_type~) => {
       guard relink_call_indirect(
-          results, func_type, module, new_result, old_result,
+          results, func_type, module_, new_result, old_result,
         )
         is Some(results) else {
         return None
@@ -89,7 +89,7 @@ pub fn relink_result(
     }
     CallIndirect0Imm16(results~, func_type~) => {
       guard relink_call_indirect(
-          results, func_type, module, new_result, old_result,
+          results, func_type, module_, new_result, old_result,
         )
         is Some(results) else {
         return None
@@ -98,7 +98,7 @@ pub fn relink_result(
     }
     CallIndirect(results~, func_type~) => {
       guard relink_call_indirect(
-          results, func_type, module, new_result, old_result,
+          results, func_type, module_, new_result, old_result,
         )
         is Some(results) else {
         return None
@@ -107,7 +107,7 @@ pub fn relink_result(
     }
     CallIndirectImm16(results~, func_type~) => {
       guard relink_call_indirect(
-          results, func_type, module, new_result, old_result,
+          results, func_type, module_, new_result, old_result,
         )
         is Some(results) else {
         return None
@@ -159,15 +159,15 @@ fn relink_span(
 fn relink_call_internal(
   results : @ir.SlotSpan,
   func : EngineFunc,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   new_result : @ir.Slot,
   old_result : @ir.Slot,
 ) -> @ir.SlotSpan? {
-  guard module.get_func_index(func) is Some(module_func) else {
+  guard module_.get_func_index(func) is Some(module_func) else {
     abort("missing module func for compiled func: EngineFunc(\{func.0})")
   }
-  let engine = module.engine_upgrade()
-  let func_type = module.get_type_of_func(module_func)
+  let engine = module_.engine_upgrade()
+  let func_type = module_.get_type_of_func(module_func)
   let len_results = engine.resolve_func_type(func_type).len_results()
   if len_results != 1 {
     return None
@@ -179,12 +179,12 @@ fn relink_call_internal(
 fn relink_call_imported(
   results : @ir.SlotSpan,
   func : @ir.Func,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   new_result : @ir.Slot,
   old_result : @ir.Slot,
 ) -> @ir.SlotSpan? {
-  let engine = module.engine_upgrade()
-  let func_type = module.get_type_of_func(FuncIdx(func.0))
+  let engine = module_.engine_upgrade()
+  let func_type = module_.get_type_of_func(FuncIdx(func.0))
   let len_results = engine.resolve_func_type(func_type).results().length()
   if len_results != 1 {
     return None
@@ -196,12 +196,12 @@ fn relink_call_imported(
 fn relink_call_indirect(
   results : @ir.SlotSpan,
   func_type : @ir.FuncType,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
   new_result : @ir.Slot,
   old_result : @ir.Slot,
 ) -> @ir.SlotSpan? {
-  let engine = module.engine_upgrade()
-  let func_type = module.get_func_type(FuncTypeIdx(func_type.0))
+  let engine = module_.engine_upgrade()
+  let func_type = module_.get_func_type(FuncTypeIdx(func_type.0))
   let len_results = engine.resolve_func_type(func_type).results().length()
   if len_results != 1 {
     return None

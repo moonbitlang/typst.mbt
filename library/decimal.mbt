@@ -123,7 +123,7 @@ pub fn Decimal::round(self : Decimal, digits : Int) -> Decimal? {
   let num = num.round_dp_away_from_zero(0)
 
   // Multiply by 10^digits again, which can overflow and fail.
-  num.checked_mul(ten_to_digits).map(Decimal::Decimal(_))
+  num.checked_mul(ten_to_digits).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -131,7 +131,7 @@ pub fn Decimal::round(self : Decimal, digits : Int) -> Decimal? {
 ///
 /// Returns `None` on overflow or underflow.
 pub fn Decimal::checked_add(self : Decimal, other : Decimal) -> Decimal? {
-  self.0.checked_add(other.0).map(Decimal::Decimal(_))
+  self.0.checked_add(other.0).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -139,7 +139,7 @@ pub fn Decimal::checked_add(self : Decimal, other : Decimal) -> Decimal? {
 ///
 /// Returns `None` on overflow or underflow.
 pub fn Decimal::checked_sub(self : Decimal, other : Decimal) -> Decimal? {
-  self.0.checked_sub(other.0).map(Decimal::Decimal(_))
+  self.0.checked_sub(other.0).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -147,7 +147,7 @@ pub fn Decimal::checked_sub(self : Decimal, other : Decimal) -> Decimal? {
 ///
 /// Returns `None` on overflow or underflow.
 pub fn Decimal::checked_mul(self : Decimal, other : Decimal) -> Decimal? {
-  self.0.checked_mul(other.0).map(Decimal::Decimal(_))
+  self.0.checked_mul(other.0).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -155,7 +155,7 @@ pub fn Decimal::checked_mul(self : Decimal, other : Decimal) -> Decimal? {
 ///
 /// Returns `None` if `other` is zero, as well as on overflow or underflow.
 pub fn Decimal::checked_div(self : Decimal, other : Decimal) -> Decimal? {
-  self.0.checked_div(other.0).map(Decimal::Decimal(_))
+  self.0.checked_div(other.0).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -171,9 +171,9 @@ pub fn Decimal::checked_div_euclid(self : Decimal, other : Decimal) -> Decimal? 
   let q = q.trunc()
   if self.0.checked_rem(other.0) is Some(r) && r.negative {
     return if !other.0.negative {
-      q.checked_sub(rd_one).map(Decimal::Decimal(_))
+      q.checked_sub(rd_one).map(x => Decimal::Decimal(x))
     } else {
-      q.checked_add(rd_one).map(Decimal::Decimal(_))
+      q.checked_add(rd_one).map(x => Decimal::Decimal(x))
     }
   }
   Some(Decimal::Decimal(q))
@@ -190,7 +190,7 @@ pub fn Decimal::checked_div_euclid(self : Decimal, other : Decimal) -> Decimal? 
 pub fn Decimal::checked_rem_euclid(self : Decimal, other : Decimal) -> Decimal? {
   guard self.0.checked_rem(other.0) is Some(r) else { return None }
   if r.negative {
-    r.checked_add(other.0.abs()).map(Decimal::Decimal(_))
+    r.checked_add(other.0.abs()).map(x => Decimal::Decimal(x))
   } else {
     Some(Decimal::Decimal(r))
   }
@@ -201,7 +201,7 @@ pub fn Decimal::checked_rem_euclid(self : Decimal, other : Decimal) -> Decimal? 
 ///
 /// Returns `None` if `other` is zero, as well as on overflow or underflow.
 pub fn Decimal::checked_rem(self : Decimal, other : Decimal) -> Decimal? {
-  self.0.checked_rem(other.0).map(Decimal::Decimal(_))
+  self.0.checked_rem(other.0).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -209,7 +209,7 @@ pub fn Decimal::checked_rem(self : Decimal, other : Decimal) -> Decimal? {
 ///
 /// Returns `None` for invalid operands, as well as on overflow or underflow.
 pub fn Decimal::checked_powi(self : Decimal, other : Int64) -> Decimal? {
-  self.0.checked_powi(other).map(Decimal::Decimal(_))
+  self.0.checked_powi(other).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -230,7 +230,7 @@ pub fn Decimal::clamp(self : Decimal, min : Decimal, max : Decimal) -> Decimal {
 ///|
 /// Parse a decimal from a string exactly (upstream `FromStr for Decimal`).
 pub fn Decimal::from_str(s : String) -> Decimal? {
-  RustDecimal::from_str_exact(s).map(Decimal::Decimal(_))
+  RustDecimal::from_str_exact(s).map(x => Decimal::Decimal(x))
 }
 
 ///|
@@ -246,7 +246,7 @@ pub fn Decimal::from_int(i : Int64) -> Decimal {
 /// This can fail if the float is infinite or NaN, or otherwise cannot be
 /// represented by a decimal number.
 pub fn Decimal::try_from_f64(value : Double) -> Decimal? {
-  RustDecimal::from_f64_retain(value).map(Decimal::Decimal(_))
+  RustDecimal::from_f64_retain(value).map(x => Decimal::Decimal(x))
 }
 
 ///|

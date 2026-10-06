@@ -512,7 +512,7 @@ pub impl IntoValue for Func with fn into_value(self) {
 pub impl FromValue for Func with fn from_value(v) {
   match v {
     Func(f) => f
-    Type(ty) => ty.constructor()
+    Type(ty) => ty.constructor_()
     Symbol(symbol) => symbol.func()
     v => cast_fail_with(Type(Type::func()), v)
   }
@@ -688,8 +688,12 @@ pub impl[T : IntoValue] IntoValue for T? with fn into_value(self) {
 pub impl[T : FromValue] FromValue for T? with fn from_value(v) {
   match v {
     None => None
-    v if T::castable(v) => Some(T::from_value(v))
-    v => cast_fail_with(T::input().union_with(Type(Type::none())), v)
+    v if castable_of((Ty::new() : Ty[T]), v) => Some(T::from_value(v))
+    v =>
+      cast_fail_with(
+        input_of((Ty::new() : Ty[T])).union_with(Type(Type::none())),
+        v,
+      )
   }
 }
 

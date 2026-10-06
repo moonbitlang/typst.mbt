@@ -77,7 +77,7 @@ fn dedup_id_len(s : String, i : Int) -> Int? {
 /// order of first occurrence.
 fn canonicalize_svg_ids(svg : String) -> String {
   // Collect the defined IDs.
-  let defined : Map[String, Unit] = {}
+  let defined : Map[String, Unit] = Map([])
   let id_attr = "id=\""
   let mut i = 0
   while svg.view(start_offset=i).find(id_attr) is Some(at) {
@@ -93,8 +93,8 @@ fn canonicalize_svg_ids(svg : String) -> String {
     return svg
   }
   // Rename definitions and references in order of first occurrence.
-  let names : Map[String, String] = {}
-  let counters : Map[Char, Int] = {}
+  let names : Map[String, String] = Map([])
+  let counters : Map[Char, Int] = Map([])
   let out = StringBuilder()
   let mut last = 0
   let mut i = 0

@@ -250,7 +250,7 @@ fn OpenTypeFontBlob::glyph_names(
 ) -> Map[String, GlyphId] {
   // Note: We don't call the `glyph_name` method provided by read-fonts because
   // calling it repeatedly is very slow.
-  let glyph_names = {}
+  let glyph_names = Map([])
   guard (try? self.font_ref.post()) is Ok(post) else { return glyph_names }
   match post.version().to_major_minor() {
     (1, 0) =>

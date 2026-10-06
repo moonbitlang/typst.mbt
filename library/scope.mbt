@@ -403,7 +403,7 @@ pub fn Scope::reset_category(self : Scope) -> Unit {
 
 ///|
 /// Bind a value to a name.
-pub fn Scope::define(self : Scope, name : String, value : Value) -> Binding {
+pub fn Scope::define_(self : Scope, name : String, value : Value) -> Binding {
   if self.deduplicate && self.map.contains(name) {
     abort("duplicate definition: \{name}")
   }
@@ -442,7 +442,7 @@ pub fn Scope::length(self : Scope) -> Int {
 ///|
 /// A copy of the scope (bindings are copied).
 pub fn Scope::copy(self : Scope) -> Scope {
-  let map = {}
+  let map = Map([])
   for k, v in self.map {
     map[k] = v.copy()
   }

@@ -88,13 +88,13 @@ fn access_func_call(
   call : @ast.FuncCall,
 ) -> Place raise @library.SourceError {
   if call.callee() is FieldAccess(access_expr) {
-    let method = access_expr.field()
-    if is_accessor_method(method.get()) {
+    let method_ = access_expr.field()
+    if is_accessor_method(method_.get()) {
       let span = call.span()
       let args = eval_args(vm, call.args()).spanned(span)
       let value = access(vm, access_expr.target())
-      return trace_call(vm, Some(method.get()), span, () => {
-        call_method_access(value, method.get(), args, span)
+      return trace_call(vm, Some(method_.get()), span, () => {
+        call_method_access(value, method_.get(), args, span)
       })
     }
   }

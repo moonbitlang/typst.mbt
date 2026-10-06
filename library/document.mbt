@@ -171,13 +171,17 @@ pub impl[T : IntoValue] IntoValue for OneOrMultiple[T] with fn into_value(self) 
 
 ///|
 pub impl[T : FromValue] FromValue for OneOrMultiple[T] with fn from_value(value) {
-  if T::castable(value) {
+  if castable_of((Ty::new() : Ty[T]), value) {
     return OneOrMultiple([T::from_value(value)])
   }
   match value {
     Array(array) => OneOrMultiple(array.items.map(v => T::from_value(v)))
     _ =>
-      raise HintedError(T::input().union_with(Type(Type::array())).error(value))
+      raise HintedError(
+        input_of((Ty::new() : Ty[T]))
+        .union_with(Type(Type::array()))
+        .error(value),
+      )
   }
 }
 

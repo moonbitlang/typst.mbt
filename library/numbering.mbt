@@ -323,7 +323,7 @@ pub impl FromValue for NumberingPattern with fn from_value(v) {
 
 ///|
 /// Successfully parsed numbering patterns by pattern string.
-let numbering_pattern_cache : Map[String, NumberingPattern] = {}
+let numbering_pattern_cache : Map[String, NumberingPattern] = Map([])
 
 // Numbering defaults of element fields.
 

@@ -383,11 +383,11 @@ let empty_style_head : Array[Style] = []
 
 ///|
 /// Make the given chainable the first link of this chain.
-pub fn StyleChain::chain(self : StyleChain, local : Styles) -> StyleChain {
-  if local.is_empty() {
+pub fn StyleChain::chain(self : StyleChain, local_ : Styles) -> StyleChain {
+  if local_.is_empty() {
     self
   } else {
-    { head: local.items, tail: Some(self), memo_hash: None, }
+    { head: local_.items, tail: Some(self), memo_hash: None, }
   }
 }
 
@@ -540,7 +540,7 @@ pub fn StyleChain::get_value_with_local(
   self : StyleChain,
   elem : Element,
   info : FieldInfo,
-  local : Value?,
+  local_ : Value?,
 ) -> Value {
   match info.fold {
     Some(fold) => {
@@ -573,13 +573,13 @@ pub fn StyleChain::get_value_with_local(
         Some(f) => fold(f, default)
         None => default
       }
-      if local is Some(value) {
+      if local_ is Some(value) {
         res = fold(value, res)
       }
       res
     }
     None =>
-      match local {
+      match local_ {
         Some(value) => value
         None =>
           match self.first_property(elem, info.id) {
@@ -734,8 +734,8 @@ pub fn[T : FromValue + IntoValue + Fold] fold_of(
 ) -> (Value, Value) -> Value {
   (inner, outer) => {
     let folded = try {
-      let i : T = T::from_value(inner)
-      let o : T = T::from_value(outer)
+      let i : T = FromValue::from_value(inner)
+      let o : T = FromValue::from_value(outer)
       Some(IntoValue::into_value(Fold::fold(i, o)))
     } catch {
       _ => None

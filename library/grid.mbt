@@ -310,10 +310,13 @@ pub impl[T : FromValue] FromValue for Celled[T] with fn from_value(value) {
       }
       CelledArray(items)
     }
-    v if T::castable(v) => CelledValue(T::from_value(v))
+    v if castable_of((Ty::new() : Ty[T]), v) => CelledValue(T::from_value(v))
     v =>
       raise HintedError(
-        T::input().union_with(Arr::input()).union_with(Func::input()).error(v),
+        input_of((Ty::new() : Ty[T]))
+        .union_with(Arr::input())
+        .union_with(Func::input())
+        .error(v),
       )
   }
 }

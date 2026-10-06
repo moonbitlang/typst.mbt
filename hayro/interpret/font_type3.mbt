@@ -12,9 +12,9 @@ priv struct GlyphSimulator {
 
 ///|
 fn GlyphSimulator::new() -> GlyphSimulator {
-  let glyph_to_string = {}
+  let glyph_to_string = Map([])
   glyph_to_string[glyph_id_notdef.to_u32()] = "notdef"
-  let string_to_glyph = {}
+  let string_to_glyph = Map([])
   string_to_glyph["notdef"] = glyph_id_notdef
   { glyph_to_string, string_to_glyph, glyph_counter: 1, }
 }
@@ -79,7 +79,7 @@ fn Type3::new(
     },
   )
   let char_procs = {
-    let procs = {}
+    let procs = Map([])
     let dict = (dict.get("CharProcs") : @hayro_syntax.Dict?).unwrap_or(
       @hayro_syntax.Dict::empty(),
     )

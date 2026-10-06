@@ -28,4 +28,10 @@ pub impl Show for IrError with fn output(self, logger) {
 ///|
 /// Error when trying to convert a value into an immediate that cannot
 /// represent it (upstream `OutOfBoundsConst`).
-pub(all) suberror OutOfBoundsConst derive(Eq, Show)
+pub(all) suberror OutOfBoundsConst derive(Eq)
+
+///|
+/// What `derive(Show)` printed (deprecated as a derive).
+pub impl Show for OutOfBoundsConst with fn output(_self, logger) {
+  logger.write_string("OutOfBoundsConst")
+}

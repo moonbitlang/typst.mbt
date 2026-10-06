@@ -144,11 +144,11 @@ fn OutlineElem::realize_iter(
       bail_at(self.0.span(), "cannot outline \{elem.elem().name()}")
     }
     let level = outlinable.level()
-    let include = outlinable.outlined() && level <= depth
+    let include_ = outlinable.outlined() && level <= depth
     let entry = OutlineEntry(
       OutlineEntry::new(level, elem).pack().spanned(span),
     )
-    out.push((entry, level, include))
+    out.push((entry, level, include_))
   }
   out
 }
@@ -178,8 +178,8 @@ pub fn[T] OutlineNode::build_tree(
   let mut last_skipped_level : NonZeroUSize? = None
   let tree : Array[OutlineNode[T]] = []
   for item in flat {
-    let (entry, level, include) = item
-    if include {
+    let (entry, level, include_) = item
+    if include_ {
       let mut children = tree
 
       // Descend the tree through the latest included heading of each level

@@ -342,9 +342,9 @@ priv struct InstanceEntityBuilder {
 
 ///|
 /// Creates a new [`InstanceEntityBuilder`] optimized for the [`Module`].
-fn InstanceEntityBuilder::new(module : Module) -> InstanceEntityBuilder {
+fn InstanceEntityBuilder::new(module_ : Module) -> InstanceEntityBuilder {
   {
-    func_types: module.header.func_types,
+    func_types: module_.header.func_types,
     tables: [],
     funcs: [],
     memories: [],

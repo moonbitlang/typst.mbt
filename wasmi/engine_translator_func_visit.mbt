@@ -36,7 +36,7 @@ fn FuncTranslator::visit_block(
     return
   }
   self.preserve_all_locals()
-  let block_ty = BlockType::new(block_ty, self.module)
+  let block_ty = BlockType::new(block_ty, self.module_)
   let end_label = self.labels.new_label()
   self.stack.push_block(block_ty, end_label)
 }
@@ -51,7 +51,7 @@ fn FuncTranslator::visit_loop(
     return
   }
   self.preserve_all_locals()
-  let block_ty = BlockType::new(block_ty, self.module)
+  let block_ty = BlockType::new(block_ty, self.module_)
   let len_params = block_ty.len_params(self.engine)
   let continue_label = self.labels.new_label()
   let consume_fuel = self.stack.consume_fuel_instr()
@@ -95,7 +95,7 @@ fn FuncTranslator::visit_if(
       (reachability, consume_fuel_instr)
     }
   }
-  let block_ty = BlockType::new(block_ty, self.module)
+  let block_ty = BlockType::new(block_ty, self.module_)
   self.stack.push_if(block_ty, end_label, reachability, consume_fuel_instr)
 }
 
@@ -313,7 +313,7 @@ fn FuncTranslator::visit_call(
   let func_type = self.resolve_func_type(func_idx)
   let len_params = func_type.len_params()
   let results = self.call_regspan(len_params)
-  let instr = match self.module.get_engine_func(func_idx) {
+  let instr = match self.module_.get_engine_func(func_idx) {
     Some(engine_func) =>
       // Case: We are calling an internal function and can optimize
       //       this case by using the special instruction for it.
@@ -425,7 +425,7 @@ fn FuncTranslator::visit_global_get(
     return
   }
   let global_idx = GlobalIdx(global_index.reinterpret_as_int())
-  let (global_type, init_value) = self.module.get_global(global_idx)
+  let (global_type, init_value) = self.module_.get_global(global_idx)
   let content = global_type.content()
   if (global_type.mutability(), init_value) is (Const, Some(init_expr)) {
     if init_expr.eval_const() is Some(value) {
@@ -471,7 +471,7 @@ fn FuncTranslator::visit_global_set(
     }
   }
   // Note: at this point we handle the different immediate `global.set` instructions.
-  let (global_type, _init_value) = self.module.get_global(
+  let (global_type, _init_value) = self.module_.get_global(
     GlobalIdx(global_index.reinterpret_as_int()),
   )
   match global_type.content() {
@@ -788,7 +788,7 @@ fn FuncTranslator::visit_memory_size(
   if !self.reachable {
     return
   }
-  let index_ty = self.module
+  let index_ty = self.module_
     .get_type_of_memory(MemoryIdx(mem.reinterpret_as_int()))
     .index_ty()
     .ty()
@@ -808,7 +808,7 @@ fn FuncTranslator::visit_memory_grow(
   if !self.reachable {
     return
   }
-  let index_ty = self.module
+  let index_ty = self.module_
     .get_type_of_memory(MemoryIdx(mem.reinterpret_as_int()))
     .index_ty()
   let memory = @ir.Memory(mem.reinterpret_as_int())
@@ -1150,7 +1150,7 @@ fn FuncTranslator::visit_table_get(
   if !self.reachable {
     return
   }
-  let table_type = self.module.get_type_of_table(
+  let table_type = self.module_.get_type_of_table(
     TableIdx(table.reinterpret_as_int()),
   )
   let index = self.stack.pop()
@@ -1178,7 +1178,7 @@ fn FuncTranslator::visit_table_set(
   if !self.reachable {
     return
   }
-  let table_type = self.module.get_type_of_table(
+  let table_type = self.module_.get_type_of_table(
     TableIdx(table.reinterpret_as_int()),
   )
   let index_ty = table_type.index_ty()
@@ -1201,7 +1201,7 @@ fn FuncTranslator::visit_table_grow(
   if !self.reachable {
     return
   }
-  let table_type = self.module.get_type_of_table(
+  let table_type = self.module_.get_type_of_table(
     TableIdx(table.reinterpret_as_int()),
   )
   let index_ty = table_type.index_ty()
@@ -1245,7 +1245,7 @@ fn FuncTranslator::visit_table_size(
   if !self.reachable {
     return
   }
-  let table_type = self.module.get_type_of_table(
+  let table_type = self.module_.get_type_of_table(
     TableIdx(table.reinterpret_as_int()),
   )
   let index_ty = table_type.index_ty()
@@ -1268,7 +1268,7 @@ fn FuncTranslator::visit_return_call(
   let func_idx = FuncIdx(function_index.reinterpret_as_int())
   let func_type = self.resolve_func_type(func_idx)
   let len_params = func_type.len_params()
-  let instr = match self.module.get_engine_func(func_idx) {
+  let instr = match self.module_.get_engine_func(func_idx) {
     Some(engine_func) =>
       // Case: We are calling an internal function and can optimize
       //       this case by using the special instruction for it.

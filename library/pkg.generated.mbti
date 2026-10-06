@@ -9841,7 +9841,7 @@ pub struct Scope {
 pub fn Scope::bind(Self, String, Binding) -> Binding
 pub fn Scope::copy(Self) -> Self
 pub fn Scope::deduplicating() -> Self
-pub fn Scope::define(Self, String, Value) -> Binding
+pub fn Scope::define_(Self, String, Value) -> Binding
 pub fn Scope::define_elem(Self, Element) -> Binding
 pub fn Scope::define_func(Self, NativeFuncData) -> Binding
 pub fn Scope::define_type(Self, Type) -> Binding
@@ -11386,7 +11386,7 @@ pub fn Type::auto() -> Self
 pub fn Type::bool() -> Self
 pub fn Type::bytes() -> Self
 pub fn Type::color() -> Self
-pub fn Type::constructor(Self) -> Func raise HintedError
+pub fn Type::constructor_(Self) -> Func raise HintedError
 pub fn Type::content() -> Self
 pub fn Type::counter() -> Self
 pub fn Type::datetime() -> Self
@@ -11405,7 +11405,7 @@ pub fn Type::label() -> Self
 pub fn Type::length() -> Self
 pub fn Type::location() -> Self
 pub fn Type::long_name(Self) -> String
-pub fn Type::module() -> Self
+pub fn Type::module_() -> Self
 pub fn Type::none() -> Self
 pub fn Type::path() -> Self
 pub fn Type::ratio() -> Self

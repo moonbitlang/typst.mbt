@@ -92,7 +92,7 @@ fn pdf_semantic_golden(rel : String) -> Map[String, String] {
 }
 
 ///|
-let pdf_golden_cache : Map[String, Map[String, String]] = {}
+let pdf_golden_cache : Map[String, Map[String, String]] = Map([])
 
 ///|
 /// Where to save the exported PDFs (`--save-pdf=<dir>`).
@@ -1245,7 +1245,7 @@ fn Interp::font_info(
   if base.has_suffix("-Identity-H") {
     base = base.unsafe_substring(start=0, end=base.length() - 11)
   }
-  let to_unicode : Map[Int, String] = {}
+  let to_unicode : Map[Int, String] = Map([])
   if self.r.get(font, "ToUnicode") is Some(s) &&
     self.r.stream_data(s) is Some(data) {
     parse_to_unicode(data, to_unicode)
@@ -1684,8 +1684,8 @@ fn tokenize_cmap(text : String) -> Array[String] {
     c == '\n' ||
     c == '\r' ||
     c == '\t' ||
-    c == '\x0c' ||
-    c == '\x0b'
+    c == '\u{0c}' ||
+    c == '\u{0b}'
   }
   while i < chars.length() {
     let c = chars[i]

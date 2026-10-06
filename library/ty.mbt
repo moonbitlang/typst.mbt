@@ -12,7 +12,7 @@ pub struct NativeTypeData {
   /// The documentation for this type as a string.
   docs : String
   /// The constructor for this type, set when the scope is built.
-  priv mut constructor : NativeFuncData?
+  priv mut constructor_ : NativeFuncData?
   /// The associated scope, built lazily.
   priv mut scope : Scope?
   /// Builds the scope (and constructor) on first access.
@@ -31,7 +31,7 @@ pub fn NativeTypeData::new(
     long_name,
     title,
     docs,
-    constructor: None,
+    constructor_: None,
     scope: None,
     scope_init: _ => (),
   }
@@ -58,7 +58,7 @@ pub fn NativeTypeData::set_constructor(
   self : NativeTypeData,
   ctor : NativeFuncData,
 ) -> Unit {
-  self.constructor = Some(ctor)
+  self.constructor_ = Some(ctor)
 }
 
 ///|
@@ -115,9 +115,9 @@ pub fn Type::docs(self : Type) -> String {
 
 ///|
 /// Get the type's constructor.
-pub fn Type::constructor(self : Type) -> Func raise HintedError {
+pub fn Type::constructor_(self : Type) -> Func raise HintedError {
   self.0.ensure()
-  match self.0.constructor {
+  match self.0.constructor_ {
     Some(data) => Func::native(data)
     None => bail("type \{self} does not have a constructor")
   }

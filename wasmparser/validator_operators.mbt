@@ -18,23 +18,23 @@
 ///|
 struct OperatorValidator {
   locals : Locals
-  priv local_inits : LocalInits
+  local_inits : LocalInits
 
   // This is a list of flags for wasm features which are used to gate various
   // instructions.
   features : WasmFeatures
 
   // Temporary storage used during `match_stack_operands`
-  priv popped_types_tmp : Array[MaybeType]
+  popped_types_tmp : Array[MaybeType]
   /// The `control` list is the list of blocks that we're currently in.
-  priv control : Array[Frame]
+  control : Array[Frame]
   /// The `operands` is the current type stack.
-  priv operands : Array[MaybeType]
+  operands : Array[MaybeType]
   /// Offset of the `end` instruction which emptied the `control` stack, which
   /// must be the end of the function.
-  priv mut end_which_emptied_control : Int?
+  mut end_which_emptied_control : Int?
   /// Whether validation is happening in a shared context.
-  priv mut shared : Bool
+  mut shared : Bool
 }
 
 ///|
@@ -139,13 +139,13 @@ let max_locals_to_track : Int = 50
 ///|
 struct Locals {
   // Total number of locals in the function.
-  priv mut num_locals : UInt
+  mut num_locals : UInt
 
   // The first MAX_LOCALS_TO_TRACK locals in a function. This is used to
   // optimize the theoretically common case where most functions don't have
   // many locals and don't need a full binary search in the entire local space
   // below.
-  priv first : Array[ValType]
+  first : Array[ValType]
 
   // This is a "compressed" list of locals for this function. The list of
   // locals are represented as a list of tuples. The second element is the
@@ -157,7 +157,7 @@ struct Locals {
   // `local.{get,set,tee}`. We do a binary search for the index desired, and
   // it either lies in a "hole" where the maximum index is specified later,
   // or it's at the end of the list meaning it's out of bounds.
-  priv all : Array[(UInt, ValType)]
+  all : Array[(UInt, ValType)]
 }
 
 ///|
@@ -176,10 +176,23 @@ pub(all) struct Frame {
   /// The index, below which, this frame cannot modify the operand stack.
   height : Int
   /// Whether this frame is unreachable so far.
-  mut unreachable : Bool
+  mut unreachable_ : Bool
   /// The number of initializations in the stack at the time of its creation
   init_height : Int
-} derive(Debug)
+}
+
+///|
+/// Like `derive(Debug)`, but with upstream's field name: `unreachable` is a
+/// reserved word in MoonBit, so the field itself is `unreachable_`.
+pub impl Debug for Frame with fn to_repr(self) {
+  Repr::record({
+    "kind": Debug::to_repr(self.kind),
+    "block_type": Debug::to_repr(self.block_type),
+    "height": Debug::to_repr(self.height),
+    "unreachable": Debug::to_repr(self.unreachable_),
+    "init_height": Debug::to_repr(self.init_height),
+  })
+}
 
 ///|
 /// `OperatorValidatorTemp`: the operator validator together with the
@@ -417,7 +430,7 @@ fn OperatorValidator::new_func(
     kind: Block,
     block_type: FuncType(ty),
     height: 0,
-    unreachable: false,
+    unreachable_: false,
     init_height: 0,
   })
 
@@ -428,7 +441,7 @@ fn OperatorValidator::new_func(
   // Set up the function's locals.
   if sub_ty.composite_type.inner is Func(func_ty) {
     for ty in func_ty.params() {
-      ret.locals.define(1, ty) |> ignore
+      ret.locals.define_(1, ty) |> ignore
     }
     ret.local_inits.define_params(func_ty.params().length())
   } else {
@@ -457,7 +470,7 @@ fn OperatorValidator::new_const_expr(
     kind: Block,
     block_type: Type(ty),
     height: 0,
-    unreachable: false,
+    unreachable_: false,
     init_height: 0,
   })
   ret
@@ -475,7 +488,7 @@ fn OperatorValidator::define_locals(
   if count == 0 {
     return
   }
-  if !self.locals.define(count, ty) {
+  if !self.locals.define_(count, ty) {
     raise BinaryReaderError::new(
       "too many locals: locals exceed maximum", offset,
     )
@@ -726,7 +739,7 @@ fn OperatorValidatorTemp::pop_operand_slow(
     None => raise self.inner.err_beyond_end(self.offset)
   }
   let actual = if self.inner.operands.length() == control.height &&
-    control.unreachable {
+    control.unreachable_ {
     maybe_bottom
   } else if self.inner.operands.length() == control.height {
     let desc = match expected {
@@ -879,7 +892,7 @@ fn OperatorValidatorTemp::pop_maybe_shared_ref(
 ///|
 /// Fetches the type for the local at `idx`, returning an error if it's out
 /// of bounds.
-fn OperatorValidatorTemp::local(
+fn OperatorValidatorTemp::local_(
   self : OperatorValidatorTemp,
   idx : UInt,
 ) -> ValType raise BinaryReaderError {
@@ -892,14 +905,14 @@ fn OperatorValidatorTemp::local(
 ///|
 /// Flags the current control frame as unreachable, additionally truncating
 /// the currently active operand stack.
-fn OperatorValidatorTemp::unreachable(
+fn OperatorValidatorTemp::unreachable_(
   self : OperatorValidatorTemp,
 ) -> Unit raise BinaryReaderError {
   let control = match self.inner.control.last() {
     Some(frame) => frame
     None => raise self.inner.err_beyond_end(self.offset)
   }
-  control.unreachable = true
+  control.unreachable_ = true
   let new_height = control.height
   self.inner.operands.truncate(new_height)
 }
@@ -924,7 +937,7 @@ fn OperatorValidatorTemp::push_ctrl(
     kind,
     block_type: ty,
     height,
-    unreachable: false,
+    unreachable_: false,
     init_height,
   })
   // All of the parameters are now also available in this control frame,
@@ -1190,7 +1203,7 @@ fn OperatorValidatorTemp::check_return(
   for i = results.length() - 1; i >= 0; i = i - 1 {
     self.pop_operand(Some(results[i])) |> ignore
   }
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -1675,7 +1688,7 @@ fn OperatorValidatorTemp::visit_nop(
 fn OperatorValidatorTemp::visit_unreachable(
   self : OperatorValidatorTemp,
 ) -> Unit raise BinaryReaderError {
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -1820,7 +1833,7 @@ fn OperatorValidatorTemp::visit_throw(
   for i = params.length() - 1; i >= 0; i = i - 1 {
     self.pop_operand(Some(params[i])) |> ignore
   }
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -1828,7 +1841,7 @@ fn OperatorValidatorTemp::visit_throw_ref(
   self : OperatorValidatorTemp,
 ) -> Unit raise BinaryReaderError {
   self.pop_operand(Some(valtype_exnref)) |> ignore
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -1867,7 +1880,7 @@ fn OperatorValidatorTemp::visit_br(
   for i = types.length() - 1; i >= 0; i = i - 1 {
     self.pop_operand(Some(types[i])) |> ignore
   }
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -1903,7 +1916,7 @@ fn OperatorValidatorTemp::visit_br_table(
   for i = default_types.length() - 1; i >= 0; i = i - 1 {
     self.pop_operand(Some(default_types[i])) |> ignore
   }
-  self.unreachable()
+  self.unreachable_()
 }
 
 ///|
@@ -2026,7 +2039,7 @@ fn OperatorValidatorTemp::visit_local_get(
   self : OperatorValidatorTemp,
   local_index : UInt,
 ) -> Unit raise BinaryReaderError {
-  let ty = self.local(local_index)
+  let ty = self.local_(local_index)
   if self.inner.local_inits.is_uninit(local_index) {
     bail(self.offset, "uninitialized local: \{local_index}")
   }
@@ -2038,7 +2051,7 @@ fn OperatorValidatorTemp::visit_local_set(
   self : OperatorValidatorTemp,
   local_index : UInt,
 ) -> Unit raise BinaryReaderError {
-  let ty = self.local(local_index)
+  let ty = self.local_(local_index)
   self.pop_operand(Some(ty)) |> ignore
   self.inner.local_inits.set_init(local_index)
 }
@@ -2048,7 +2061,7 @@ fn OperatorValidatorTemp::visit_local_tee(
   self : OperatorValidatorTemp,
   local_index : UInt,
 ) -> Unit raise BinaryReaderError {
-  let expected_ty = self.local(local_index)
+  let expected_ty = self.local_(local_index)
   self.pop_operand(Some(expected_ty)) |> ignore
   self.inner.local_inits.set_init(local_index)
   self.push_operand(expected_ty)
@@ -4176,7 +4189,7 @@ fn OperatorValidatorTemp::visit_i64_mul_wide_u(
 /// Returns `true` if the definition was successful. Local variable
 /// definition is unsuccessful in case the amount of total variables
 /// after definition exceeds the allowed maximum number.
-fn Locals::define(self : Locals, count : UInt, ty : ValType) -> Bool {
+fn Locals::define_(self : Locals, count : UInt, ty : ValType) -> Bool {
   let n = self.num_locals.to_uint64() + count.to_uint64()
   if n > 0xFFFF_FFFFUL {
     return false

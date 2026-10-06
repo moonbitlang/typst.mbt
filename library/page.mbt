@@ -184,7 +184,7 @@ pub impl[T : IntoValue + Eq] IntoValue for Margin[T] with fn into_value(self) {
 
 ///|
 pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
-  if T::castable(value) {
+  if castable_of((Ty::new() : Ty[T]), value) {
     let v = T::from_value(value)
     return Margin::splat(Some(v))
   }
@@ -234,7 +234,9 @@ pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
       two_sided,
     }
   }
-  raise HintedError(T::input().union_with(Type(Type::dict())).error(value))
+  raise HintedError(
+    input_of((Ty::new() : Ty[T])).union_with(Type(Type::dict())).error(value),
+  )
 }
 
 // Binding

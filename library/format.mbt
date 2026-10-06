@@ -202,7 +202,7 @@ pub fn format_module(formats : Array[Format]) -> Module {
   let format = Scope::deduplicating()
   format.start_category(Format)
   for f in formats {
-    let binding = format.define(f.elem.name(), Func(Func::element(f.elem)))
+    let binding = format.define_(f.elem.name(), Func(Func::element(f.elem)))
     if f.feature is Some(feature) {
       binding.with_feature(feature) |> ignore
     }

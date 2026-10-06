@@ -26,8 +26,8 @@ fn build_outline(gc : GlobalContext) -> @export.Outline {
         !ranges.includes_page(page)
       }
     }
-    let include = bookmarked && visible
-    flat.push((elem, level, include))
+    let include_ = bookmarked && visible
+    flat.push((elem, level, include_))
   }
   let tree = @library.OutlineNode::build_tree(flat[:])
   let outline = @export.Outline::new()

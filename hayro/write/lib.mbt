@@ -353,7 +353,7 @@ fn collect_resources(
   resources : @hayro_syntax.Resources,
   get_dict : (@hayro_syntax.Resources) -> @hayro_syntax.Dict,
 ) -> Array[(@hayro_syntax.Name, @hayro_syntax.MaybeRef[@hayro_syntax.Object])] {
-  let map : Map[String, @hayro_syntax.MaybeRef[@hayro_syntax.Object]] = {}
+  let map : Map[String, @hayro_syntax.MaybeRef[@hayro_syntax.Object]] = Map([])
   collect_resources_inner(resources, get_dict, map)
   let keys = map.keys().collect()
   keys.sort_by(@hayro_syntax.compare_latin1)

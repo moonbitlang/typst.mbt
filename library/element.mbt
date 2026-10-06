@@ -497,7 +497,7 @@ pub fn Args::named_with(
 ///|
 /// Build a field info whose type is `T` (via its cast traits).
 pub fn[T : FromValue + IntoValue] field_of(
-  _ty : Ty[T],
+  ty : Ty[T],
   id~ : Int,
   name~ : String,
   docs? : String = "",
@@ -521,9 +521,9 @@ pub fn[T : FromValue + IntoValue] field_of(
     required: required || variadic,
     variadic,
     internal,
-    input: () => T::input(),
-    castable: T::castable,
-    cast: v => T::from_value(v).into_value(),
+    input: () => input_of(ty),
+    castable: v => castable_of(ty, v),
+    cast: v => IntoValue::into_value((FromValue::from_value(v) : T)),
     default,
     fold,
     parse,

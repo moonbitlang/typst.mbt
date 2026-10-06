@@ -54,18 +54,18 @@ fn ExternIdx::new(kind : @wasmparser.ExternalKind, index : UInt) -> ExternIdx {
 ///|
 /// The name of an import (`module::field`).
 pub(all) struct ImportName {
-  module : String
+  module_ : String
   field : String
 }
 
 ///|
-pub fn ImportName::new(module : String, field : String) -> ImportName {
-  { module, field, }
+pub fn ImportName::new(module_ : String, field : String) -> ImportName {
+  { module_, field, }
 }
 
 ///|
-pub fn ImportName::module(self : ImportName) -> String {
-  self.module
+pub fn ImportName::module_(self : ImportName) -> String {
+  self.module_
 }
 
 ///|
@@ -75,7 +75,7 @@ pub fn ImportName::name(self : ImportName) -> String {
 
 ///|
 pub impl Show for ImportName with fn output(self, f) {
-  f.write_string(self.module)
+  f.write_string(self.module_)
   f.write_string("::")
   f.write_string(self.field)
 }
@@ -847,8 +847,8 @@ pub(all) struct ImportType {
 }
 
 ///|
-pub fn ImportType::module(self : ImportType) -> String {
-  self.name.module
+pub fn ImportType::module_(self : ImportType) -> String {
+  self.name.module_
 }
 
 ///|

@@ -46,7 +46,7 @@ fn math_define_spacings(math : Scope) -> Unit {
     ] {
     let (name, title, docs, amount) = entry
     math
-    .define(
+    .define_(
       name,
       Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(amount))])),
     )

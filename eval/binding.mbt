@@ -14,7 +14,7 @@ fn eval_let_binding(
   }
   match v.kind() {
     Normal(pattern) => destructure(vm, pattern, value)
-    Closure(ident) => vm.define(ident, value)
+    Closure(ident) => vm.define_(ident, value)
   }
   None
 }
@@ -41,7 +41,7 @@ fn destructure(
 ) -> Unit raise @library.SourceError {
   destructure_impl(vm, pattern, value, (vm, expr, value) => {
     match expr {
-      Ident(ident) => vm.define(ident, value)
+      Ident(ident) => vm.define_(ident, value)
       _ => @library.bail_at(expr.span(), "cannot assign to this expression")
     }
   })
@@ -129,7 +129,7 @@ fn destructure_dict(
   f : (Vm, @ast.Expr, @library.Value) -> Unit raise @library.SourceError,
 ) -> Unit raise @library.SourceError {
   let mut sink : @ast.Expr? = None
-  let used : Map[String, Unit] = {}
+  let used : Map[String, Unit] = Map([])
   for p in destruct.items() {
     match p {
       Pattern(Normal(Ident(ident))) => {

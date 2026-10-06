@@ -16,8 +16,8 @@ fn symbols_define_math(math : Scope) -> Unit {
 }
 
 ///|
-fn extend_scope_from_codex_module(scope : Scope, module : CodexModule) -> Unit {
-  for entry in module.iter() {
+fn extend_scope_from_codex_module(scope : Scope, module_ : CodexModule) -> Unit {
+  for entry in module_.iter() {
     let (name, binding) = entry
     let mut data : NativeFuncData? = None
     let value : Value = match binding.def {
@@ -28,7 +28,7 @@ fn extend_scope_from_codex_module(scope : Scope, module : CodexModule) -> Unit {
       }
       Module(m) => Module(Module::new(name, Scope::from_codex(m)))
     }
-    let scope_binding = scope.define(name, value)
+    let scope_binding = scope.define_(name, value)
     if binding.deprecation is Some(message) {
       scope_binding.with_deprecation(Deprecation::new().with_message(message))
       |> ignore
@@ -46,9 +46,9 @@ fn extend_scope_from_codex_module(scope : Scope, module : CodexModule) -> Unit {
 
 ///|
 /// Upstream `From<codex::Module> for Scope`.
-fn Scope::from_codex(module : CodexModule) -> Scope {
+fn Scope::from_codex(module_ : CodexModule) -> Scope {
   let scope = Scope::new()
-  extend_scope_from_codex_module(scope, module)
+  extend_scope_from_codex_module(scope, module_)
   scope
 }
 

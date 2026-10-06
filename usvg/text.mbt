@@ -192,7 +192,7 @@ fn collect_text_chunks_impl(
       continue
     }
     if !parent.is_visible_element(state.opt) {
-      iter_state.chars_count += child.text().char_length()
+      iter_state.chars_count += child.text().char_count()
       continue
     }
     let anchor : TextAnchor = parent
@@ -205,7 +205,7 @@ fn collect_text_chunks_impl(
       Some(n) => n
       None => {
         // Skip this span.
-        iter_state.chars_count += child.text().char_length()
+        iter_state.chars_count += child.text().char_count()
         continue
       }
     }
@@ -763,7 +763,7 @@ fn resolve_positions_list(
       push_list(AId::Dy, (p, v) => p.dy = Some(v))
     } else if child.is_text() {
       // Advance the offset.
-      offset += child.text().char_length()
+      offset += child.text().char_count()
     }
   }
   list
@@ -798,7 +798,7 @@ fn resolve_rotate_list(text_node : SvgNode) -> Array[Float] {
       }
     } else if child.is_text() {
       // Advance the offset.
-      offset += child.text().char_length()
+      offset += child.text().char_count()
     }
   }
   list
@@ -918,7 +918,7 @@ fn count_chars(node : SvgNode) -> Int {
   let mut w = 0
   for n in node.descendants() {
     if n.is_text() {
-      w += n.text().char_length()
+      w += n.text().char_count()
     }
   }
   w

@@ -470,7 +470,7 @@ fn[T : BinarySearchValue] BinarySearchTable::parse(
     let segment_size = s.read_u16()
     let number_of_segments = s.read_u16()
     s.advance(6) // search_range + entry_selector + range_shift
-    if segment_size.to_int() != T::size() {
+    if segment_size.to_int() != size_of((None : T?)) {
       return None
     }
     if number_of_segments == 0 {

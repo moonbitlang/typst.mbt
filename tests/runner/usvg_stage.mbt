@@ -293,7 +293,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
   }
 
   // Glyphs.
-  let fonts : Map[String, @otf.Face] = {}
+  let fonts : Map[String, @otf.Face] = Map([])
   let mut glyph_passed = 0
   let mut glyph_failed = 0
   for line in read(golden_dir + "/usvg/glyphs.jsonl").split("\n") {

@@ -305,9 +305,9 @@ fn ModuleParser::process_exports(
   while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
           iter.next()
         })
-        is Some(export) {
-    let idx = ExternIdx::new(export.kind, export.index)
-    header.exports.set(export.name, idx)
+        is Some(export_) {
+    let idx = ExternIdx::new(export_.kind, export_.index)
+    header.exports.set(export_.name, idx)
   }
 }
 
