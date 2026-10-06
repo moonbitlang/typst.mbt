@@ -377,41 +377,47 @@ test "canvas items: what each expands to" {
       @kit.Canvas::arrow((10.0, 30.0), [LineTo((60.0, 30.0))], stroke=pen),
     ]),
     lowered([
-      Seq([
-        Place(
-          Curve(
-            [CurveMove((Pt(10), Pt(30))), CurveLine((Pt(57.25), Pt(30)))],
-            stroke=pen,
+      Place(
+        Seq([
+          Place(
+            Curve(
+              [CurveMove((Pt(10), Pt(30))), CurveLine((Pt(57.25), Pt(30)))],
+              stroke=pen,
+            ),
+            alignment=Both(Left, Top),
           ),
-          alignment=Both(Left, Top),
-        ),
-        Place(
-          Polygon(
-            [(Pt(60), Pt(30)), (Pt(54.5), Pt(32.75)), (Pt(54.5), Pt(27.25))],
-            fill=Blue,
+          Place(
+            Polygon(
+              [(Pt(60), Pt(30)), (Pt(54.5), Pt(32.75)), (Pt(54.5), Pt(27.25))],
+              fill=Blue,
+            ),
+            alignment=Both(Left, Top),
           ),
-          alignment=Both(Left, Top),
-        ),
-      ]),
+        ]),
+        alignment=Both(Left, Top),
+      ),
     ]),
   )
   // Without a stroke: the curve's own, and a black head.
   assert_eq(
     lowered([@kit.Canvas::arrow((10.0, 30.0), [LineTo((60.0, 30.0))], head=4.0)]),
     lowered([
-      Seq([
-        Place(
-          Curve([CurveMove((Pt(10), Pt(30))), CurveLine((Pt(58), Pt(30)))]),
-          alignment=Both(Left, Top),
-        ),
-        Place(
-          Polygon(
-            [(Pt(60), Pt(30)), (Pt(56), Pt(32)), (Pt(56), Pt(28))],
-            fill=Black,
+      Place(
+        Seq([
+          Place(
+            Curve([CurveMove((Pt(10), Pt(30))), CurveLine((Pt(58), Pt(30)))]),
+            alignment=Both(Left, Top),
           ),
-          alignment=Both(Left, Top),
-        ),
-      ]),
+          Place(
+            Polygon(
+              [(Pt(60), Pt(30)), (Pt(56), Pt(32)), (Pt(56), Pt(28))],
+              fill=Black,
+            ),
+            alignment=Both(Left, Top),
+          ),
+        ]),
+        alignment=Both(Left, Top),
+      ),
     ]),
   )
   debug_inspect(

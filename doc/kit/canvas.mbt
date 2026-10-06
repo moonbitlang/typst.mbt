@@ -92,9 +92,9 @@ pub struct Canvas {
 
 ///|
 /// An item of a [Canvas]: content that is placed at a point of the box
-/// that holds it. It is a `Place` with the alignment `Both(Left, Top)`
-/// (the anchors of `Canvas::place` have others), which takes no room, so
-/// the items of a canvas do not move each other.
+/// that holds it. Every item is one `Place`, with the alignment
+/// `Both(Left, Top)` (the anchors of `Canvas::place` have others): it
+/// takes no room, so the items of a canvas do not move each other.
 ///
 /// Positions and sizes are numbers of the coordinate system (`Double`, in
 /// points). What a shape is drawn in (`stroke`, `fill`, `radius`) has the
@@ -420,7 +420,10 @@ pub fn Canvas::place(
             site.arg(1, body),
             alignment=Both(horizontal, Top),
             dx~,
-            dy=Pt(y - baseline),
+            // (A difference of lengths, which the engine takes: it keeps
+            // lengths in a unit of its own, so the difference of the
+            // numbers of points is not always the same length.)
+            dy=Diff(Pt(y), Pt(baseline)),
           )
         })
         // The callback is a block: placed, it takes no room among the
@@ -710,9 +713,10 @@ fn arriving_from(
 ///   stroke=Stroke(paint=Blue, dash=Dashed))
 /// ```
 ///
-/// It is the `Curve` of `Canvas::curve` and a `Polygon`, each in a `Place`
-/// at the origin: `Seq([Place(Curve(.., stroke~)), Place(Polygon([tip,
-/// left, right], fill=..))])`.
+/// It is the `Curve` of `Canvas::curve` and a `Polygon`, each placed at the
+/// origin of one `Place`: `Place(Seq([Place(Curve(.., stroke~)),
+/// Place(Polygon([tip, left, right], fill=..))]))`, every alignment
+/// `Both(Left, Top)`.
 ///
 /// - **The head** is a filled triangle with its tip at the last point of
 ///   the path, as long as `head` along the path and as wide across it. It
@@ -803,19 +807,24 @@ pub fn Canvas::arrow(
         }
       None => Black
     }
-    @doc.Seq([
-      @doc.Place(
-        @doc.Curve(components(start, path), stroke?=site.arg(2, stroke)),
-        alignment=top_left(),
-      ),
-      @doc.Place(
-        @doc.Polygon(
-          [lengths(shape.tip), lengths(shape.left), lengths(shape.right)],
-          fill=site.arg(2, paint),
+    // One `Place`, like every item: the path and the head are placed in
+    // it, both at its origin, which is the origin of the canvas.
+    @doc.Place(
+      @doc.Seq([
+        @doc.Place(
+          @doc.Curve(components(start, path), stroke?=site.arg(2, stroke)),
+          alignment=top_left(),
         ),
-        alignment=top_left(),
-      ),
-    ])
+        @doc.Place(
+          @doc.Polygon(
+            [lengths(shape.tip), lengths(shape.left), lengths(shape.right)],
+            fill=site.arg(2, paint),
+          ),
+          alignment=top_left(),
+        ),
+      ]),
+      alignment=top_left(),
+    )
   })
   { composite, }
 }
