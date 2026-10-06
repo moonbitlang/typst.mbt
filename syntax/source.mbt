@@ -134,7 +134,8 @@ pub fn Source::range(
   match sub_range {
     Some(sr) => {
       let (s, e) = sr.to_absolute(start)
-      guard e <= end
+      // Upstream: `assert!(range.end <= overall.end)`.
+      guard! e <= end
       Some((s, e))
     }
     None => Some((start, end))

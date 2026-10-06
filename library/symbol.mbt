@@ -68,7 +68,8 @@ pub fn Symbol::single(value : String) -> Symbol {
 ///|
 /// Create a symbol with a static variant list.
 pub fn Symbol::list(list : Array[SymbolVariantData]) -> Symbol {
-  guard !list.is_empty()
+  // Upstream: `debug_assert!(!list.is_empty())` (symbol.rs:98).
+  guard! !list.is_empty()
   { inner: Complex(list), }
 }
 
@@ -81,7 +82,8 @@ pub fn Symbol::runtime_char(c : Char) -> Symbol {
 ///|
 /// Create a symbol with a runtime variant list.
 pub fn Symbol::runtime(list : Array[SymbolVariantData]) -> Symbol {
-  guard !list.is_empty()
+  // Upstream: `debug_assert!(!list.is_empty())` (symbol.rs:110).
+  guard! !list.is_empty()
   {
     inner: Modified({
       list: Runtime(list),

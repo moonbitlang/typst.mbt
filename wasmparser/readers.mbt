@@ -139,11 +139,11 @@ pub fn[T : FromReader] SectionLimitedIntoIter::next(
     )
   }
   self.remaining -= 1
-  let result = T::from_reader(self.section.reader) catch {
-    e => {
+  let result = {
+    errdefer {
       self.end = true
-      raise e
     }
+    T::from_reader(self.section.reader)
   }
   Some(result)
 }

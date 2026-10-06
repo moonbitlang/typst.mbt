@@ -578,7 +578,8 @@ fn code_expr_prec(p : Parser, atomic : Bool, min_prec : Int) -> Unit {
     let m = p.marker()
     if p.at_set(unary_op_set) {
       if !atomic {
-        guard UnOp::from_kind(p.current()) is Some(op)
+        // Upstream: `ast::UnOp::from_kind(p.current()).unwrap()`.
+        guard! UnOp::from_kind(p.current()) is Some(op)
         p.eat()
         code_expr_prec(p, atomic, op.precedence())
         p.wrap(m, Unary)

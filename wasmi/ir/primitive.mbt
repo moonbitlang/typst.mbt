@@ -102,8 +102,9 @@ pub fn BranchOffset16::init(
   self : BranchOffset16,
   valid_offset : BranchOffset,
 ) -> BranchOffset16 raise IrError {
-  guard valid_offset.is_init()
-  guard !self.is_init()
+  // Upstream: `assert!(valid_offset.is_init()); assert!(!self.is_init());`
+  guard! valid_offset.is_init()
+  guard! !self.is_init()
   BranchOffset16::try_from(valid_offset)
 }
 
@@ -168,8 +169,9 @@ pub fn BranchOffset::init(
   self : BranchOffset,
   valid_offset : BranchOffset,
 ) -> BranchOffset {
-  guard valid_offset.is_init()
-  guard !self.is_init()
+  // Upstream: `assert!(valid_offset.is_init()); assert!(!self.is_init());`
+  guard! valid_offset.is_init()
+  guard! !self.is_init()
   valid_offset
 }
 

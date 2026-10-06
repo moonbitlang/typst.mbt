@@ -219,7 +219,9 @@ fn ModuleParser::process_tables(
           iter.next()
         })
         is Some(table) {
-    guard table.init is RefNull
+    // Upstream: `assert!(matches!(table.init,
+    // wasmparser::TableInit::RefNull))`.
+    guard! table.init is RefNull
     header.tables.push(table_type_from_wasmparser(table.ty))
   }
 }
