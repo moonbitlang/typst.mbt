@@ -148,6 +148,29 @@ fn warning_messages(
 }
 
 ///|
+/// The lints of a report, one line each: the kind, where it is and what
+/// the hint points at (constructor and argument), and what follows the
+/// message's colon (for L1: what the page reads at the seam).
+fn lint_lines(report : @doc.CompileReport[@layout.PagedDocument]) -> String {
+  report.lints
+  .map(lint => {
+    let place = (location : @doc.Location?) => {
+      match location {
+        Some(Edsl(origin)) => what(origin)
+        Some(File(_)) => "(a file)"
+        None => "(nowhere)"
+      }
+    }
+    let tail = match lint.message.find(": ") {
+      Some(i) => lint.message.view(start_offset=i + 1).to_owned()
+      None => ""
+    }
+    "\{lint.kind.name()} \{place(lint.location)} after \{place(lint.hints[0].location)}:\{tail}"
+  })
+  .join("\n")
+}
+
+///|
 /// The line of the call of this function.
 #callsite(autofill(loc))
 fn line_here(loc~ : SourceLoc) -> Int {
@@ -201,19 +224,87 @@ test "S1: adjacent inline items are one paragraph with nothing between them" {
       #|p1 text 10.0,16.6 w171.6 "One ends here.Two starts here.Three.Four."
     ),
   )
-  // What separates them today: a paragraph each.
+  // Lint L1 (step 1 of the proposal) reports adjacent text items where
+  // the array also holds a block. This array holds none (the rules of
+  // `small_page` are no content), so by the lint's definition it could be
+  // the body of one paragraph, and nothing is reported.
+  inspect(lint_lines(report), content="")
+  // Under a heading, which is how the ports met it, each pair is
+  // reported: at the second item, with the first as a hint, and with
+  // what the page reads at the seam.
+  let line = line_here() + 5
+  let flow = compile(
+    [
+      ..small_page(),
+      @doc.Heading("Results"),
+      @doc.Prose("One ends here."),
+      @doc.Prose("Two starts here."),
+      "Three.",
+      @doc.Text("Four."),
+    ],
+  )
+  inspect(error_messages(flow), content="")
+  inspect(warning_messages(flow), content="")
+  inspect(
+    listing(of_kind(marks(flow), "text")),
+    content=(
+      #|p1 text 10.0,19.0 w46.8 "Results"
+      #|p1 text 10.0,33.1 w171.6 "One ends here.Two starts here.Three.Four."
+    ),
+  )
+  inspect(
+    lint_lines(flow),
+    content=(
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1): "One ends here.Two starts here."
+      #|adjacent-inline (Document, argument 1) after (Prose, argument 1): "Two starts here.Three."
+      #|adjacent-inline (Text, argument 1) after (Document, argument 1): "Three.Four."
+    ),
+  )
+  guard flow.lints[0].location is Some(Edsl(second)) else { fail("no origin") }
+  assert_eq(second.start_line, line + 1)
+  guard flow.lints[0].hints[0].location is Some(Edsl(first)) else {
+    fail("no origin")
+  }
+  assert_eq(first.start_line, line)
+  inspect(
+    flow.lints[0]
+    .render()
+    .replace_all(old=second.position(), new="N")
+    .replace_all(old=first.position(), new="N"),
+    content=(
+      #|lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "One ends here.Two starts here."
+      #|  at N (Prose, argument 1)
+      #|  hint: the text before it (N (Prose, argument 1))
+      #|  hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
+    ),
+  )
+  // `lints=false` turns the lints off.
+  let quiet = @doc.Document([
+    @doc.Heading("Results"),
+    @doc.Prose("One ends here."),
+    @doc.Prose("Two starts here."),
+  ]).compile_paged(@doc.DocWorld::in_memory(), lints=false)
+  inspect(lint_lines(quiet), content="")
+  // The fix: a paragraph each, `Para` (or `Par` around other content).
   let separate = compile(
     [
       ..small_page(),
-      @doc.Par(@doc.Prose("One ends here.")),
-      @doc.Par(@doc.Prose("Two starts here.")),
+      @doc.Heading("Results"),
+      @doc.Para("One ends here."),
+      @doc.Para("Two starts here."),
+      @doc.Par("Three."),
+      @doc.Par(@doc.Text("Four.")),
     ],
   )
+  inspect(lint_lines(separate), content="")
   inspect(
-    listing(marks(separate)),
+    listing(of_kind(marks(separate), "text")),
     content=(
-      #|p1 text 10.0,16.6 w60.8 "One ends here."
-      #|p1 text 10.0,35.2 w65.4 "Two starts here."
+      #|p1 text 10.0,19.0 w46.8 "Results"
+      #|p1 text 10.0,33.1 w60.8 "One ends here."
+      #|p1 text 10.0,51.7 w65.4 "Two starts here."
+      #|p1 text 10.0,70.3 w26.1 "Three."
+      #|p1 text 10.0,88.9 w20.5 "Four."
     ),
   )
 }

@@ -213,6 +213,7 @@ pub impl IntoContent for ColumnsView
 pub struct CompileReport[T] {
   errors : Array[Diagnostic]
   warnings : Array[Diagnostic]
+  lints : Array[Lint]
   origins : Origins
   // private fields
 }
@@ -448,9 +449,9 @@ pub struct Document {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Document::Document(Array[&IntoContent], dir? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
-pub fn[T : @library.Output] Document::compile(Self, &@library.World) -> CompileReport[T]
-pub fn Document::compile_paged(Self, &@library.World) -> CompileReport[@layout.PagedDocument]
-pub fn Document::lower(Self, &@library.World) -> CompileReport[@library.Content]
+pub fn[T : @library.Output] Document::compile(Self, &@library.World, lints? : Bool) -> CompileReport[T]
+pub fn Document::compile_paged(Self, &@library.World, lints? : Bool) -> CompileReport[@layout.PagedDocument]
+pub fn Document::lower(Self, &@library.World, lints? : Bool) -> CompileReport[@library.Content]
 pub impl @debug.Debug for Document
 pub impl IntoContent for Document
 
@@ -925,6 +926,19 @@ pub fn LinkView::view(Self) -> ContentView
 pub impl @builtin.Show for LinkView
 pub impl @debug.Debug for LinkView
 pub impl IntoContent for LinkView
+
+pub struct Lint {
+  kind : LintKind
+  message : String
+  hints : Array[Hint]
+  location : Location?
+}
+pub fn Lint::render(Self) -> String
+
+pub(all) enum LintKind {
+  AdjacentInline
+} derive(Eq)
+pub fn LintKind::name(Self) -> String
 
 pub struct List {
   // private fields
