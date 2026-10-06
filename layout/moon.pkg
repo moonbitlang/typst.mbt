@@ -12,6 +12,7 @@ import {
   "moonbitlang/core/double",
   "moonbitlang/core/cmp",
   "moonbitlang/core/int64",
+  "moonbitlang/core/debug",
 }
 
 // `core/math` is only used by `libm_other.mbt` (the non-native targets; native

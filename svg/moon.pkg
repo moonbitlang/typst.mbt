@@ -10,6 +10,7 @@ import {
   "moonbitlang/typst/hayro/interpret" @hayro_interpret,
   "moonbitlang/typst/hayro/svg" @hayro_svg,
   "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
+  "moonbitlang/core/debug",
 }
 
 options(

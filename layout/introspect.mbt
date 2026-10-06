@@ -200,10 +200,37 @@ pub impl @library.IntrospectorBackend for PagedIntrospector with fn path(_, _) {
 }
 
 ///|
+// `position` is not named here: the type already has a method of this name.
+#deprecated("call as `IntrospectorBackend::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedIntrospector with @library.IntrospectorBackend::{
+  document,
+  query_label,
+  path,
+  query_unique,
+  anchor,
+  page,
+  query_labelled,
+  page_supplement,
+  query_count_before,
+  query,
+  page_numbering,
+  query_first,
+  label_count,
+  locator,
+  pages,
+}
+
+///|
 /// Upstream `Debug for PagedIntrospector`.
 pub impl Show for PagedIntrospector with fn output(_, logger) {
   logger.write_string("PagedIntrospector(..)")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedIntrospector with Show::{to_string, output}
 
 ///|
 /// Builds the introspector.

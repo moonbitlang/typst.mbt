@@ -355,6 +355,11 @@ pub impl SvgDisplay for SvgTransform with fn fmt(self, f) {
 }
 
 ///|
+#deprecated("call as `SvgDisplay::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgTransform with SvgDisplay::{fmt}
+
+///|
 /// An SVG URL.
 pub(all) struct SvgUrl(DedupId)
 
@@ -367,6 +372,11 @@ pub impl SvgDisplay for SvgUrl with fn fmt(self, f) {
 }
 
 ///|
+#deprecated("call as `SvgDisplay::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgUrl with SvgDisplay::{fmt}
+
+///|
 /// A referenced SVG ID.
 pub(all) struct SvgIdRef(DedupId)
 
@@ -376,3 +386,8 @@ pub impl SvgDisplay for SvgIdRef with fn fmt(self, f) {
   f.push_str("#")
   f.push(id)
 }
+
+///|
+#deprecated("call as `SvgDisplay::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgIdRef with SvgDisplay::{fmt}

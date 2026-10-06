@@ -18,6 +18,11 @@ pub(all) struct SvgOptions {
 } derive(Eq, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgOptions with Eq::{not_equal, equal}
+
+///|
 pub extend SvgOptions with Default::{default}
 
 ///|
@@ -26,6 +31,11 @@ pub(all) struct CompleteSvgOptions {
   render_bleed : Bool
   format : SvgFormatOptions
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompleteSvgOptions with Eq::{not_equal, equal}
 
 ///|
 /// Resolves the final options given those set by the document.
@@ -579,6 +589,16 @@ pub(all) struct DedupId {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupId with Hash::{hash, hash_combine}
+
+///|
 pub impl SvgDisplay for DedupId with fn fmt(self, f) {
   f.push_char(self.kind)
   let digits = StringBuilder()
@@ -596,3 +616,8 @@ pub impl SvgDisplay for DedupId with fn fmt(self, f) {
   }
   f.push_str(digits.unsafe_substring(start~, end=digits.length()))
 }
+
+///|
+#deprecated("call as `SvgDisplay::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupId with SvgDisplay::{fmt}
