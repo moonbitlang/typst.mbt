@@ -914,3 +914,94 @@ and some are narrower than the ports reported:
 - `Chip` does not need `Box(baseline=)`; section 4 is corrected.
 - The baseline estimate the ports used (0.72 × size) was not the engine's
   (0.66 for the default font), which is one more reason for `Size.baseline`.
+
+## 14. Three papers (addendum)
+
+After the fourteen HTML pages, three papers were ported in full against
+`main`, each by one agent with the brief `_build/edsl-demo/papers/BRIEF.md`:
+Lovelace's Notes to Menabrea's memoir (1843; Notes A, F, G with the diagram
+of Note G; 22 pages, about 290 formulas and 420 formula cells), Einstein's
+"Foundation of the Generalised Theory of Relativity" (1916, Bose's
+translation of 1920; 39 pages, 684 formulas, 101 of them numbered), and
+Ramanujan's "Modular equations and approximations to π" (1914; 14 pages in
+two columns, 355 formulas). None needed embedded Typst source. The texts
+came from web transcriptions and were not checked against scans; only the
+Lovelace port is committed-quality as to rights (public domain worldwide),
+and the three packages stay outside the repository until that is decided.
+
+Mathematics is Typst math syntax in a string (`Equation(src, ..)`): the EDSL
+adds nothing to the formula itself. What the ports show is what surrounds
+it.
+
+### 14.1 Wrong output without a diagnostic
+
+| # | What happens | Papers |
+|---|---|---|
+| M1 | An unclosed or mismatched delimiter in a formula is not an error: `x^(n.` sets "(n." as the exponent, `(a + b]` is accepted. Two authors wrote an external bracket checker | 3 |
+| M2 | A block equation wider than its column is set over the neighbouring column | 1 (two columns) |
+| M3 | `Par(Prose(..))` with an interpolated block equation drops the equation with a warning (fixed by `Para`'s lowering, 3.1) | 2 |
+| M4 | A fixed-size `Block` holding a drawing splits at a page end (S2a again) | 1 |
+| M5 | Rows of `cases` and of `mat` are set in text style: fractions and nested matrices in a system behind a brace shrink unless each cell is wrapped in `display(..)` | 3 |
+
+### 14.2 What each paper wrote again
+
+| # | Helper | Lines |
+|---|---|---|
+| N1 | Inline formula in prose: `\{m("..")}` at 232 to 470 sites per paper, with a `#callsite` helper so errors point at the call | 5, plus the sites |
+| N2 | Numbered display with a label, an unnumbered one, and a guard that label and number agree | 30 to 45 |
+| N3 | An explicit equation tag ("(1a)", "(20a)"): one `Numbering::func` callback per equation | 101 callbacks in one paper |
+| N4 | A reference in the paper's own form: `Ref` prints "Equation 1", or "1" without the supplement, never "(8.)" | 3 to 4, at every reference |
+| N5 | A formula that does not break at a relation in running text: `Box(Equation(..))` | 1 |
+| N6 | A function in a formula's scope (Christoffel symbols): `Value::call("eval", ..)`, and the scope passed to every `Equation` | 12 |
+| N7 | A wide display in the middle of two-column text: end the columns, set the display, start balanced columns again | 55 |
+| N8 | Running header by parity with the page number outside | 35 to 45 |
+| N9 | A table by rows that checks the number of cells; a delimiter stretched over a row-spanning cell | 30 + 20 |
+
+### 14.3 Diagnostics
+
+- A formula error is located and has upstream's hints, but the location is
+  the call (or the helper, without `#callsite`) plus a byte range in the
+  string after interpolation; for a multi-line string that is not the line
+  of the typo, and no excerpt is shown.
+- One error per run (20 to 75 s per run for these documents in a debug
+  build).
+
+### 14.4 What follows
+
+In `doc` and the kit, each with the gates of section 4, after `Cards`:
+
+1. Lint L5, unbalanced delimiters in an `Equation` source (M1): on the
+   string, with Typst math's own tokens (so that `\(`, quoted text and
+   `mat(delim: ..)` are not misread); reported at the formula's location
+   with line and column inside the string.
+2. Formula error locations (14.3): map the engine's byte range to the line
+   and column of the literal in the MoonBit source, as `review_source` does
+   for prose, and print the excerpt. Reporting all errors of a run needs the
+   evaluator to continue after an error, which upstream does not do either:
+   not proposed.
+3. Lint L6, a block equation wider than its region (M2): from the frames,
+   where the equation's frame is wider than the region it was laid out in;
+   whether the frames carry that needs to be established first.
+4. Kit `Display(src, tag~, label~)`, `EqRef(label, form~)` and
+   `Inline(src)` (N2 to N5): an explicit tag without a callback per
+   equation, a reference that prints the tag in the equation's own
+   numbering form, an inline formula that does not break. Their twins are
+   `math.equation` with a numbering function, `ref`, and `box`.
+5. Typed `first_line_indent` (with `all`), `Select::footnote_entry()`, a
+   citation form without a mark, `Figure(kind=)`: the unmapped fields these
+   ports met, through the generator's type table.
+6. The guide gets a chapter on mathematics: escaping in `#|` and `$|`
+   strings, text and spacing in formulas, `display(..)` in `cases` and `mat`
+   (M5), prescripts, numbering, references, scopes with functions (N6),
+   what an error looks like; and one on papers: `Para` with displays and
+   indents, footnotes, `Cite` and `Bibliography` (title-casing, braces),
+   headers by `Context`, `Columns` with `balanced` and footnotes in columns
+   (N7).
+
+Not proposed: typed constructors for mathematics. Three papers and 1,330
+formulas were written as strings without one syntax failure in final work;
+the cost was in what is listed above, not in the notation.
+
+A two-column flow with spanning displays (N7) and a row-oriented table
+builder (N9) are candidates for the kit once `DataTable` and `Flow` exist;
+no design yet.
