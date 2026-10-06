@@ -34,14 +34,29 @@ pub impl Add for Length with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Add::{add}
+
+///|
 pub impl @builtin.Sub for Length with fn sub(self, other) {
   Diff(self, other)
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with @builtin.Sub::{sub}
+
+///|
 pub impl Neg for Length with fn neg(self) {
   Neg(self)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Neg::{neg}
 
 ///|
 /// `self * factor`.
@@ -74,12 +89,17 @@ pub impl ToValue for Length with fn to_value(self) {
     In(v) => Value::of(VNumeric(v, @library.NumericUnit::In))
     Em(v) => Value::of(VNumeric(v, @library.NumericUnit::Em))
     Pct(v) => Value::of(VNumeric(v, @library.NumericUnit::Percent))
-    Sum(a, b) => Value::of(VAdd(a.to_value(), b.to_value()))
-    Diff(a, b) => Value::of(VSub(a.to_value(), b.to_value()))
-    Neg(a) => Value::of(VNeg(a.to_value()))
-    Scaled(a, k) => Value::of(VMul(a.to_value(), Value::of(VFloat(k))))
+    Sum(a, b) => Value::of(VAdd(ToValue::to_value(a), ToValue::to_value(b)))
+    Diff(a, b) => Value::of(VSub(ToValue::to_value(a), ToValue::to_value(b)))
+    Neg(a) => Value::of(VNeg(ToValue::to_value(a)))
+    Scaled(a, k) => Value::of(VMul(ToValue::to_value(a), Value::of(VFloat(k))))
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with ToValue::{to_value}
 
 ///|
 /// The engine's `Spacing`: a length/ratio or a fraction of the remaining
@@ -112,9 +132,14 @@ pub impl ToValue for Spacing with fn to_value(self) {
     In(v) => Value::of(VNumeric(v, @library.NumericUnit::In))
     Em(v) => Value::of(VNumeric(v, @library.NumericUnit::Em))
     Pct(v) => Value::of(VNumeric(v, @library.NumericUnit::Percent))
-    Rel(length) => length.to_value()
+    Rel(length) => ToValue::to_value(length)
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spacing with ToValue::{to_value}
 
 ///|
 /// The engine's `Sizing` (also the size of a grid track): `auto`, a
@@ -153,9 +178,14 @@ pub impl ToValue for Sizing with fn to_value(self) {
     In(v) => Value::of(VNumeric(v, @library.NumericUnit::In))
     Em(v) => Value::of(VNumeric(v, @library.NumericUnit::Em))
     Pct(v) => Value::of(VNumeric(v, @library.NumericUnit::Percent))
-    Rel(length) => length.to_value()
+    Rel(length) => ToValue::to_value(length)
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sizing with ToValue::{to_value}
 
 ///|
 pub(all) enum Angle {
@@ -170,3 +200,8 @@ pub impl ToValue for Angle with fn to_value(self) {
     Rad(v) => Value::of(VNumeric(v, @library.NumericUnit::Rad))
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with ToValue::{to_value}

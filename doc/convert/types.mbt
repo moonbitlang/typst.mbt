@@ -22,6 +22,11 @@ pub(all) enum Tier {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tier with Eq::{not_equal, equal}
+
+///|
 pub impl Show for Tier with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -32,6 +37,9 @@ pub impl Show for Tier with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend Tier with Show::{to_string, output}
 
 ///|
 /// A fallback fragment: Typst source the translator could not type.

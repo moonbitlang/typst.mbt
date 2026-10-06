@@ -163,6 +163,11 @@ pub impl IntoContent for Content with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Content with IntoContent::{into_content}
+
+///|
 /// A plain string is literal text.
 pub impl IntoContent for String with fn into_content(self) {
   Content::of(NText(self, None))
@@ -217,6 +222,11 @@ pub impl IntoContent for Seq with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Seq with IntoContent::{into_content}
+
+///|
 /// Literal text with a source location of its own (a plain `String` inside
 /// an array shares the location of the array argument).
 pub struct Lit {
@@ -233,6 +243,11 @@ pub fn Lit::Lit(text : String, loc~ : SourceLoc) -> Lit {
 pub impl IntoContent for Lit with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lit with IntoContent::{into_content}
 
 ///|
 /// Content with a label: the twin of `[#body<label>]`.
@@ -266,6 +281,11 @@ pub impl IntoContent for Labelled with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Labelled with IntoContent::{into_content}
+
+///|
 /// Attaches a runtime occurrence key to the origins of everything inside
 /// `body` (data-driven content built at one call site). It does not change
 /// the content. A key must not start with the noncharacter U+FDD2, which
@@ -283,6 +303,11 @@ pub fn Keyed::Keyed(key : String, body : &IntoContent) -> Keyed {
 pub impl IntoContent for Keyed with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Keyed with IntoContent::{into_content}
 
 ///|
 /// Markup's space element (Typst's collapsing space, not the text `" "`).
@@ -308,6 +333,11 @@ pub fn Space::newline() -> Space {
 pub impl IntoContent for Space with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Space with IntoContent::{into_content}
 
 ///|
 /// Append the `extra` arguments of a generated constructor (at parameter

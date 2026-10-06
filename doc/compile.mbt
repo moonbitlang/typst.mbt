@@ -34,11 +34,21 @@ pub impl IntoContent for Document with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Document with IntoContent::{into_content}
+
+///|
 /// Whether a diagnostic is an error or a warning.
 pub(all) enum Severity {
   Error
   Warning
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with Eq::{not_equal, equal}
 
 ///|
 /// A range of a project or package file: a Typst source imported by
@@ -252,6 +262,11 @@ pub impl @builtin.Show for DocError with fn output(self, logger) {
   let DocError(errors) = self
   logger.write_string(errors.map(e => e.render()).join("\n"))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocError with @builtin.Show::{to_string, output}
 
 ///|
 /// The result of a compilation: the output or the errors, the warnings,
