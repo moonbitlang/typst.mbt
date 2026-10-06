@@ -293,7 +293,12 @@
   are recorded and replayed for validation (not across introspectors if a
   result's fingerprint was lossy or contained host closures:
   `fingerprint_flags_in`), sink effects are replayed, frames are cloned
-  (not cached if their tags hold host closures).
+  (not cached if their tags hold host closures). The same flag marks the
+  modules that their fingerprint does not identify (anonymous ones, but
+  those of plugins with functions: two plugins without functions give
+  modules that differ in nothing but their identity; upstream, which
+  compares hashes only, takes one for the other as the argument of a
+  memoized call, the port does not).
   Closure calls (`memoized_closure`, upstream's `#[comemo::memoize]` on
   `eval_closure`; without it a touying deck with cetz calls two million
   functions instead of 160 000) are keyed by the function and the arguments
@@ -302,7 +307,30 @@
   `try_*()`/`introspect()`: never read them another way), depth checks
   note how far the route may move (`Route::check_within`), imports note
   the file ids they ask routes for (`note_route_query`); results are
-  values (containers are marked shared). The capture analysis of a closure
+  values (containers are marked shared). In short: closure calls are
+  memoized for a compilation; the key is the function (the closure's hash
+  and its span), the arguments with their spans and the traced span; a
+  hit also needs equal arguments (`args_memo_equal`) and the same answers
+  for what the call asked of its context, of the route (depth checks,
+  `contains`) and of the introspector (recorded reads), and it replays the
+  call's sink effects and consumes the arguments.
+- Values are shared by reference with a flag where upstream clones:
+  arrays and dictionaries are mutable objects, `Value::shared` marks one
+  as having a second holder, and mutation copies a marked one
+  (`Arr::make_mut`, `Place::get_mut`). Whatever hands a value out of
+  storage that outlives the expression must mark it where upstream clones
+  it: a state's stops (`state.mbt`), a field of content or of the style
+  chain (`field_by_name`, `settable_field_accessor`), a binding (`Eval
+  for Ident`, captures, imports, module fields), the items of a container
+  (`at`, `first`, `values`, callbacks, the spread of `arguments`), the
+  scope of `eval`, a memoized result. A missing mark is silent until
+  somebody mutates: the test is the probe of `scripts/sharing_probes.py`,
+  `(array.pop)(E)` (a native mutator called on the temporary; also
+  `let x = (); x.push(E); x.at(0).push(0)`) followed by reading `E` again,
+  compared with upstream; add a source there for every new place that
+  stores values (`python3 scripts/sharing_probes.py <upstream> <port cli>`
+  prints a verdict per source; the oracle cases `sharing: ..` of
+  `typst/oracle_wbtest.mbt` run them with memoization on and off). The capture analysis of a closure
   or context expression is kept per syntax node for the compilation
   (`eval/captures.mbt`, not upstream: the identifiers that
   `CapturesVisitor` looks up are a function of the syntax, and
