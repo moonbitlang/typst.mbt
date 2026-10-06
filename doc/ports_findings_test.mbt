@@ -408,6 +408,30 @@ test "S5: inline raw text does not break and leaves its table cell" {
   let run = of_kind(all, "text")[0]
   assert_true(run.x + run.w > cells[0].x + cells[0].w)
   assert_true(run.x + run.w > cells[1].x + cells[1].w)
+  // What breaks it today: a zero-width space (U+200B) in the text is a
+  // place to break. It stays a character of the run's text.
+  let broken = compile(
+    [
+      ..small_page(),
+      @doc.Table(
+        [@doc.Raw("a_long_\u{200B}name_\u{200B}with_\u{200B}breaks"), "b"],
+        columns=[Pt(60), Pt(60)],
+        fill=@doc.Cells::all(Luma(230)),
+      ),
+    ],
+  )
+  let all = marks(broken)
+  let cell = of_kind(all, "rect")[0]
+  let runs = of_kind(all, "text").filter(run => run.text != "b")
+  inspect(
+    runs.map(run => run.text.replace_all(old="\u{200B}", new="")).join("|"),
+    content=(
+      #|a_long_|name_with_|breaks
+    ),
+  )
+  for run in runs {
+    assert_true(run.x + run.w < cell.x + cell.w)
+  }
 }
 
 ///|
