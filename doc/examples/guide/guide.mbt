@@ -513,6 +513,40 @@ pub fn stripes_captured() -> Seq {
 }
 
 ///|
+/// Section 9: a card with a character that the embedded fonts do not
+/// have.
+pub fn shipped_card() -> Block {
+  Block("Shipped \u{1F680} today", fill=Luma(235), inset=Sides(all=Pt(4)))
+}
+
+///|
+/// Section 9: a row that is wider than a page of 200pt.
+pub fn wide_row() -> Grid {
+  Grid(["Sown", "Planted", "Harvested"], columns=[Pt(90), Pt(90), Pt(90)])
+}
+
+///|
+/// Section 9: a bar and its label, which needs more room than the drawing
+/// has beside the bar.
+pub fn labelled_bar() -> Canvas {
+  Canvas(120.0, 16.0, [
+    Canvas::rect((0.0, 2.0), 90.0, 12.0, fill=Luma(200)),
+    Canvas::place((94.0, 8.0), "1,204 requests", anchor=(Left, Horizon)),
+  ])
+}
+
+///|
+/// Section 9: a block of a height that its text does not fit.
+pub fn low_card() -> Block {
+  Block(
+    "Water the beds in the morning, before the sun is on them.",
+    width=Pt(90),
+    height=Pt(24),
+    fill=Luma(235),
+  )
+}
+
+///|
 /// All samples that compile, as one document.
 pub fn guide() -> Document {
   Document([
