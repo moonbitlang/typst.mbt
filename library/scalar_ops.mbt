@@ -1,4 +1,6 @@
-// Generated arithmetic for scalar newtypes.
+// Arithmetic for the scalar newtypes (`Em`, `Angle`, `Ratio`, `Fr`).
+// Handwritten: it was added as `scalar_ops_gen.mbt` in 6deac1b, but no
+// generator for it has ever been in the repository.
 
 ///|
 pub impl Add for Em with fn add(self, other) {
