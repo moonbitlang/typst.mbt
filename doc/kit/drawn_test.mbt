@@ -15,8 +15,9 @@ priv struct Drawn {
   y : Double
   w : Double
   h : Double
-  /// The text of a run.
+  /// The text of a run, and the family of its font.
   text : String
+  family : String
   /// The fill of a box or of a run, as Typst prints it (`""`: none).
   fill : String
   /// The stroke of a box or of a line: its thickness and its paint
@@ -102,6 +103,7 @@ fn collect_drawn(
           w: text.width().to_pt(),
           h: text.size.to_pt(),
           text: text.text,
+          family: text.font.font().family(),
           fill: text.fill.repr(),
           stroke: "",
         })
@@ -125,6 +127,7 @@ fn collect_drawn(
               w: to.x.to_pt(),
               h: to.y.to_pt(),
               text: "",
+              family: "",
               fill,
               stroke,
             })
@@ -140,6 +143,7 @@ fn collect_drawn(
               w: right - left,
               h: bottom - top,
               text: "",
+              family: "",
               fill,
               stroke,
             })

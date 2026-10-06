@@ -400,3 +400,90 @@ pub impl @debug.Debug for Composite with fn to_repr(self) {
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
 pub extend Composite with @debug.Debug::{to_repr}
+
+///|
+/// The kind of child of a table that a called function makes: `"cell"`,
+/// `"line"` (a horizontal or a vertical line), `"section"` (a header or a
+/// footer), or `""` for every other function.
+fn table_child_kind(func : FuncRef) -> String {
+  match func {
+    FElem(elem) =>
+      if elem == @library.table_cell_elem() {
+        "cell"
+      } else if elem == @library.table_h_line_elem() ||
+        elem == @library.table_v_line_elem() {
+        "line"
+      } else if elem == @library.table_header_elem() ||
+        elem == @library.table_footer_elem() {
+        "section"
+      } else {
+        ""
+      }
+    FPath("table.cell") => "cell"
+    FPath("table.hline") | FPath("table.vline") => "line"
+    FPath("table.header") | FPath("table.footer") => "section"
+    FPath(_) | FNative(_) => ""
+  }
+}
+
+///|
+/// `Content::table_cell_spans` of a call of `func` with `args`.
+fn call_spans(func : FuncRef, args : Array[ArgNode]) -> (Int, Int)? {
+  match table_child_kind(func) {
+    "cell" => {
+      // (The last argument of a name wins, as in Typst.)
+      let mut colspan = 1
+      let mut rowspan = 1
+      let mut placed = false
+      for arg in args {
+        match (arg.name, arg.value.val) {
+          (Some("colspan"), VInt(n)) => colspan = n.to_int()
+          (Some("rowspan"), VInt(n)) => rowspan = n.to_int()
+          (Some("x"), VAuto) | (Some("y"), VAuto) => ()
+          (Some("x"), _) | (Some("y"), _) => placed = true
+          _ => ()
+        }
+      }
+      if placed {
+        Option::None
+      } else {
+        Some((colspan, rowspan))
+      }
+    }
+    "" => Some((1, 1))
+    _ => Option::None
+  }
+}
+
+///|
+/// The columns and the rows that a description takes as a child of a
+/// `Table` that places it after the child before it, as far as the
+/// description says:
+///
+/// - `Some((colspan, rowspan))` for a `TableCell` without an `x` or a `y`
+///   (a span is 1 unless the cell names it), also under `Keyed`, with a
+///   label, and as what an element is made of (a [Composite]);
+/// - `Some((1, 1))` for everything else that a table makes a cell of: a
+///   string, another element, a sequence, a callback;
+/// - `None` for a child that a table does not place that way: a
+///   `TableCell` with an `x` or a `y`, and a `TableHline`, a `TableVline`,
+///   a `TableHeader` or a `TableFooter`, which are not cells.
+///
+/// It reads the description, not the document: a cell that only the engine
+/// sees (the result of a callback or of `Markup`, a view) is one column
+/// and one row, and so is a span that is not an integer of the description
+/// (a computed value in `extra`) or that a rule of the document sets.
+///
+/// For packages of elements (`doc/kit`), to which a description is opaque:
+/// an element that takes the cells of a table by rows checks with it that
+/// every row fills the columns.
+pub fn Content::table_cell_spans(self : Content) -> (Int, Int)? {
+  match self.node {
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      body.table_cell_spans()
+    NCall(call) => call_spans(call.func, call.args)
+    NValue({ val: VContent(body), }) => body.table_cell_spans()
+    NValue({ val: VCall(func, args), }) => call_spans(func, args)
+    _ => Some((1, 1))
+  }
+}

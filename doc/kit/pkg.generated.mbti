@@ -31,6 +31,15 @@ pub impl Show for Chip
 pub impl @debug.Debug for Chip
 pub impl @doc.IntoContent for Chip
 
+pub struct DataTable {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn DataTable::DataTable(Array[&@doc.IntoContent], Array[Array[&@doc.IntoContent]], columns~ : Array[@doc.Sizing], inset? : @doc.Cells[@doc.Sides[@doc.Length]], align? : @doc.Cells[@doc.Alignment], fill? : @doc.Cells[@doc.Paint], stroke? : @doc.Stroke, radius? : @doc.Corners[@doc.Length], breakable? : Bool, key? : (Int) -> String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl Show for DataTable
+pub impl @debug.Debug for DataTable
+pub impl @doc.IntoContent for DataTable
+
 // Type aliases
 
 // Traits

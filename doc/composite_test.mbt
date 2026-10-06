@@ -754,3 +754,83 @@ test "composite: the lint of adjacent text reads an element as what it is made o
     content="adjacent-inline (Plain, argument 1) after (Plain, argument 1): \"One ends.Two starts.\"",
   )
 }
+
+///|
+/// A cell over two columns, as an element.
+#callsite(autofill(loc, args_loc))
+fn wide(body : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Wide", loc, args_loc, site => {
+    @doc.TableCell(site.arg(0, body), colspan=2)
+  })
+}
+
+///|
+test "table_cell_spans: what a description takes as a cell of a table" {
+  let spans = (cell : &@doc.IntoContent) => {
+    match @doc.Content(cell).table_cell_spans() {
+      Some((colspan, rowspan)) => "\{colspan}x\{rowspan}"
+      None => "-"
+    }
+  }
+  // What a table makes a cell of is one column and one row.
+  inspect(spans("text"), content="1x1")
+  inspect(spans(@doc.Emph("stressed")), content="1x1")
+  inspect(
+    spans(@doc.Seq([@doc.TableCell("in a sequence", colspan=2)])),
+    content="1x1",
+  )
+  inspect(spans(@doc.GridCell("of a grid", colspan=2)), content="1x1")
+  // A cell as it is described: the spans that it names, also with a key,
+  // with a label, as a call by name, as a value, and as what an element is
+  // made of.
+  inspect(spans(@doc.TableCell("a")), content="1x1")
+  inspect(spans(@doc.TableCell("a", colspan=3)), content="3x1")
+  inspect(spans(@doc.TableCell("a", colspan=2, rowspan=4)), content="2x4")
+  inspect(
+    spans(@doc.Keyed("k", @doc.TableCell("a", rowspan=2, label="cell"))),
+    content="1x2",
+  )
+  inspect(
+    spans(@doc.Labelled(@doc.TableCell("a", colspan=2), "cell")),
+    content="2x1",
+  )
+  let named = [("colspan", @doc.Value::int(2))]
+  inspect(spans(@doc.Call("table.cell", named~)), content="2x1")
+  inspect(spans(@doc.Value::call("table.cell", named~)), content="2x1")
+  inspect(spans(wide("a")), content="2x1")
+  // The last argument of a name wins, as in Typst.
+  inspect(
+    spans(
+      @doc.TableCell("a", colspan=2, extra=[("colspan", @doc.Value::int(3))]),
+    ),
+    content="3x1",
+  )
+  // Not placed after the child before it: a cell with a position, a line,
+  // a header, a footer.
+  inspect(spans(@doc.TableCell("a", x=1)), content="-")
+  inspect(spans(@doc.TableCell("a", y=0, colspan=2)), content="-")
+  inspect(spans(@doc.TableHline()), content="-")
+  inspect(spans(@doc.TableVline()), content="-")
+  inspect(spans(@doc.TableHeader(["a"])), content="-")
+  inspect(spans(@doc.TableFooter(["a"])), content="-")
+  inspect(spans(@doc.Call("table.hline")), content="-")
+  // (An explicit `auto` is no position.)
+  inspect(
+    spans(@doc.TableCell("a", extra=[("x", @doc.Value::auto())])),
+    content="1x1",
+  )
+  // What only the engine sees is not read: a cell that a callback makes,
+  // a span that is computed.
+  inspect(
+    spans(@doc.Context(_ => @doc.TableCell("a", colspan=2))),
+    content="1x1",
+  )
+  inspect(
+    spans(
+      @doc.TableCell("a", extra=[
+        ("colspan", @doc.Value::int(1).add(@doc.Value::int(1))),
+      ]),
+    ),
+    content="1x1",
+  )
+}
