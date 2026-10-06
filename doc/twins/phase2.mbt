@@ -17,6 +17,7 @@ using @doc {
   type ShowWith,
   type Symbol,
   type Prose,
+  type Para,
 }
 
 ///|
@@ -422,6 +423,62 @@ pub fn phase2() -> Array[Twin] {
             ]),
           ),
           Par(Seq(["a", Space::newline(), "b"])),
+        ])
+      },
+    ),
+    // `Para` (docs/edsl-ports.md, section 3.1): the functional expansion of
+    // the prose between two paragraph breaks, in a content block of its
+    // own; the options of `par` as a set rule in that block; the text
+    // after an interpolated block (a displayed formula, a list) in a block
+    // with `first-line-indent: 0pt`, up to the next block or blank line.
+    // The page indents every paragraph, so that the rule shows.
+    twin(
+      "para",
+      [
+        page_typ, "#set par(first-line-indent: (amount: 1em, all: true));", "#[#parbreak()#\"Each\" #\"dot\" #\"is\" #smartquote(double: true)#\"one\"#smartquote(double: true)\n#\"complete\" #raw(\"trial\") #\"of\" #\"all\" #\"9\" #emph[#\"milestones\"]#\".\"#parbreak()]",
+        "#[#set par(justify: true);#parbreak()#\"One\" #\"line.\"#parbreak()]", "#[#set par(leading: 0.4em, spacing: 14pt, justify: false, linebreaks: \"simple\", hanging-indent: 6pt, first-line-indent: 4pt);#parbreak()#\"say\" #\"\\\"hi\\\"\"\n#\"汉字\"\n#\"汉字\" #\"and\" #\"it's\" #\"long\" #\"enough\" #\"to\" #\"need\" #\"a\" #\"second\" #\"line.\"#parbreak()]",
+        "#[#parbreak()#\"Before\" #math.equation(block: true, eval(\"x^2\", mode: \"math\").body) #[#set par(first-line-indent: 0pt);#\"after\" #\"it,\"\n#\"and\" ]#math.equation(block: true, eval(\"y\", mode: \"math\").body)#parbreak()#\"A\" #\"new\" #\"paragraph\" #list([#\"item\"]) #[#set par(first-line-indent: 0pt);#\"and\" #\"its\" #\"end.\"]#parbreak()]",
+        "#[#parbreak()#parbreak()]", "#[#[#parbreak()#\"inner\"#parbreak()]]", "#[#parbreak()#\"keyed\"#parbreak()]",
+      ],
+      () => {
+        let count = 9
+        Document([
+          page(),
+          Set("par", [
+            (
+              "first-line-indent",
+              Value::dict([
+                ("amount", Value::length(Em(1))),
+                ("all", Value::bool(true)),
+              ]),
+            ),
+          ]),
+          (
+            $|Each dot is "one"
+            $|complete \{Raw("trial")} of all \{count} \{Emph("milestones")}.
+          )
+          |> Para,
+          Para("One line.", justify=true),
+          Para(
+            "say \"hi\"\n汉字\n汉字 and it's long enough to need a second line.",
+            quotes=false,
+            leading=Em(0.4),
+            spacing=Pt(14),
+            justify=false,
+            linebreaks="simple",
+            hanging_indent=Pt(6),
+            extra=[("first-line-indent", Value::length(Pt(4)))],
+          ),
+          (
+            $|Before \{Equation("x^2", block=true)} after it,
+            $|and \{Equation("y", block=true)}
+            $|
+            $|A new paragraph \{List(["item"])} and its end.
+          )
+          |> Para,
+          Para(""),
+          Seq([Para("inner")]),
+          Keyed("row", Para("keyed")),
         ])
       },
     ),

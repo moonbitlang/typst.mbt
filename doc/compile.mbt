@@ -261,7 +261,13 @@ pub struct CompileReport[T] {
   priv output : T?
   /// The errors (empty iff there is an output).
   errors : Array[Diagnostic]
+  /// The engine's warnings (upstream's).
   warnings : Array[Diagnostic]
+  /// The findings of the EDSL's lints (`lint.mbt`): what compiles but is
+  /// probably not what was meant. Empty with `lints=false`. The lints of
+  /// the description tree do not depend on whether the compilation
+  /// succeeded.
+  lints : Array[Lint]
   origins : Origins
   /// Resolves the diagnostics of exports started from this report.
   priv resolver : Resolver
@@ -351,18 +357,20 @@ fn[T] Session::report(
   self : Session,
   result : Result[T, Array[@library.SourceDiagnostic]],
   sink : @library.Sink,
+  lints : Array[Lint],
 ) -> CompileReport[T] {
   let origins = self.registry.freeze()
   let resolver : Resolver = { origins, world: self.base, }
   let warnings = resolver.diagnostics(@typst.deduplicate(sink.warnings()))
   match result {
     Ok(output) =>
-      { output: Some(output), errors: [], warnings, origins, resolver, }
+      { output: Some(output), errors: [], warnings, lints, origins, resolver, }
     Err(errors) =>
       {
         output: None,
         errors: resolver.diagnostics(errors),
         warnings,
+        lints,
         origins,
         resolver,
       }
@@ -370,10 +378,23 @@ fn[T] Session::report(
 }
 
 ///|
-/// Compile to any output of the engine.
+/// The lints of a document that need no layout (`lints`: whether lints
+/// run at all).
+fn Document::lints(self : Document, lints : Bool) -> Array[Lint] {
+  if lints {
+    self.lint_tree()
+  } else {
+    []
+  }
+}
+
+///|
+/// Compile to any output of the engine. The EDSL's lints run by default
+/// (`CompileReport::lints`); `lints=false` turns them off.
 pub fn[T : @library.Output] Document::compile(
   self : Document,
   world : &@library.World,
+  lints? : Bool = true,
 ) -> CompileReport[T] {
   let session = Session::new(world, dir=self.dir)
   let session_world : SessionWorld = { session, }
@@ -389,7 +410,7 @@ pub fn[T : @library.Output] Document::compile(
   } noraise {
     output => Ok(output)
   }
-  session.report(result, sink)
+  session.report(result, sink, self.lints(lints))
 }
 
 ///|
@@ -399,6 +420,7 @@ pub fn[T : @library.Output] Document::compile(
 pub fn Document::lower(
   self : Document,
   world : &@library.World,
+  lints? : Bool = true,
 ) -> CompileReport[@library.Content] {
   let session = Session::new(world, dir=self.dir)
   let session_world : SessionWorld = { session, }
@@ -417,7 +439,7 @@ pub fn Document::lower(
   } noraise {
     output => Ok(output)
   }
-  session.report(result, sink)
+  session.report(result, sink, self.lints(lints))
 }
 
 ///|
@@ -425,8 +447,9 @@ pub fn Document::lower(
 pub fn Document::compile_paged(
   self : Document,
   world : &@library.World,
+  lints? : Bool = true,
 ) -> CompileReport[@layout.PagedDocument] {
-  self.compile(world)
+  self.compile(world, lints~)
 }
 
 ///|

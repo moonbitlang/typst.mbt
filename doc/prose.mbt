@@ -104,6 +104,7 @@ fn Content::kind(self : Content) -> String {
     NText(_, _) => "text"
     NCall(call) => call.origin.kind
     NSeq(_, site) => site.kind
+    NPieces(_) => "text"
     NSetRule(set) => set.origin.kind
     NShowRule(show) => show.origin.kind
     NLabelled(_, _, site, _) => site.kind
@@ -119,8 +120,8 @@ fn Content::kind(self : Content) -> String {
 
 ///|
 /// If `text` contains a placeholder: a message for the error, naming the
-/// description that was interpolated. Strings other than the argument of
-/// `Prose` must not contain placeholders.
+/// description that was interpolated. Strings other than the text of
+/// `Prose` and `Para` must not contain placeholders.
 fn prose_leak(text : String) -> String? {
   // Most strings have no placeholder.
   guard text.contains_char(PROSE_OPEN) else { return Option::None }
@@ -137,7 +138,7 @@ fn prose_leak(text : String) -> String? {
       Option::None => "a description"
     }
     return Some(
-      "\{what} was interpolated into a string that is not the text of `Prose`",
+      "\{what} was interpolated into a string that is not the text of `Prose` or `Para`",
     )
   }
   Option::None
@@ -145,11 +146,12 @@ fn prose_leak(text : String) -> String? {
 
 ///|
 /// The hint of [prose_leak] errors.
-let prose_leak_hint : String = "only `Prose(..)` takes strings with interpolated descriptions; elsewhere use `Seq([..])`"
+let prose_leak_hint : String = "only `Prose(..)` and `Para(..)` take strings with interpolated descriptions; elsewhere use `Seq([..])`"
 
 ///|
 /// Running text: `text` with the descriptions interpolated into it
-/// (`\{Emph("x")}`), as inline content.
+/// (`\{Emph("x")}`), as inline content. A paragraph of running text is
+/// [Para].
 ///
 /// - White space (spaces, tabs, line breaks) between words is one space,
 ///   as in Typst markup; a line break of the string is a space too. A blank
@@ -179,6 +181,27 @@ pub fn Prose::Prose(
   args_loc~ : ArgsLoc,
 ) -> Prose {
   let site = Site::new("Prose", loc, args_loc)
+  {
+    content: match prose_pieces(text, quotes, "Prose") {
+      Err(message) => Content::of(NInvalid(message, site))
+      Ok(children) => Content::of(NSeq(children, site))
+    },
+  }
+}
+
+///|
+/// The pieces of running text (the text of `Prose` and of `Para`): the
+/// words, markup's spaces, the quotes, the paragraph breaks and the
+/// interpolated descriptions of `text`, in order; or the message of the
+/// error if the text cannot be lowered. `kind` is the constructor's name,
+/// for messages. No piece made here has a site: the caller gives the
+/// sequence one (`Prose`) or makes them the pieces of an argument of its
+/// own sequence (`Para`).
+fn prose_pieces(
+  text : String,
+  quotes : Bool,
+  kind : String,
+) -> Result[Array[Content], String] {
   let children : Array[Content] = []
   let word = StringBuilder()
   // The white space before the next piece: the number of line breaks in
@@ -253,26 +276,26 @@ pub fn Prose::Prose(
               problem = Some(
                 if id >= prose_serial.val {
                   // Not a number that an interpolation was given.
-                  "the text of `Prose` contains a reserved character (U+FDD0)"
+                  "the text of `\{kind}` contains a reserved character (U+FDD0)"
                 } else if id < prose_dropped_below.val {
                   // Consumed, or dropped at the cap: the table cannot
                   // tell which.
-                  "an interpolated description of this text was already used by another `Prose`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
+                  "an interpolated description of this text was already used by another `Prose` or `Para`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
                 } else {
-                  "an interpolated description of this text was already used by another `Prose`"
+                  "an interpolated description of this text was already used by another `Prose` or `Para`"
                 },
               )
           }
         }
         Option::None =>
           problem = Some(
-            "the text of `Prose` contains a reserved character (U+FDD0)",
+            "the text of `\{kind}` contains a reserved character (U+FDD0)",
           )
       }
     } else if c == PROSE_CLOSE {
       if problem is Option::None {
         problem = Some(
-          "the text of `Prose` contains a reserved character (U+FDD1)",
+          "the text of `\{kind}` contains a reserved character (U+FDD1)",
         )
       }
     } else if quotes && (c == '"' || c == '\'') {
@@ -287,11 +310,9 @@ pub fn Prose::Prose(
     }
   }
   flush()
-  {
-    content: match problem {
-      Some(message) => Content::of(NInvalid(message, site))
-      Option::None => Content::of(NSeq(children, site))
-    },
+  match problem {
+    Some(message) => Err(message)
+    Option::None => Ok(children)
   }
 }
 
@@ -309,6 +330,11 @@ pub impl @builtin.Show for Content with fn output(self, logger) {
 
 ///|
 pub impl @builtin.Show for Prose with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @builtin.Show for Para with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
 

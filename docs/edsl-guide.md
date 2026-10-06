@@ -37,6 +37,7 @@ using @doc {
   type SetText,
   type Heading,
   type Par,
+  type Para,
   type Prose,
   type Lit,
   type Seq,
@@ -50,6 +51,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Set,
+  type Equation,
   type Upper,
   type Layout,
   type Show,
@@ -131,11 +134,11 @@ using @doc {
 }
 ```
 
-## 2. A paragraph is a `Par`
+## 2. A paragraph is a `Para`
 
 Text in a sequence is inline content. Two inline items that follow each
 other (a `Prose`, a string, a `Text`) are one paragraph with nothing between
-them, and nothing is reported (`run_together`):
+them (`run_together`):
 
 ```moonbit
 pub fn run_together() -> Seq {
@@ -144,20 +147,127 @@ pub fn run_together() -> Seq {
 ```
 
 is typeset as the one line "The first ends here.The second starts here.".
-Each paragraph is a `Par` (`paragraphs`):
+It compiles without an error or a warning. A paragraph of text is a `Para`
+(`paragraphs`):
 
 ```moonbit
 pub fn paragraphs() -> Seq {
   Seq([
-    Par(Prose("The first ends here.")),
-    Par(Prose("The second starts here.")),
+    Heading("Notes"),
+    Para("The first ends here."),
+    (
+      $|The second starts here, with a "quoted" word
+      $|and \{Emph("stressed")} ones on its second line.
+    )
+    |> Para,
+    Para("The third is justified.", justify=true),
   ])
 }
 ```
 
+`Para(text, ..)` is a paragraph as it is in Typst source: text between two
+paragraph breaks. The text is the text of a `Prose` (white space is
+reflowed, `"` and `'` are smart quotes unless `quotes=false`, interpolated
+descriptions are the descriptions). A click on a word of it leads to the
+text argument of the `Para` call. Two `Para`s are two paragraphs wherever
+a paragraph can be (not inside a `Par`), and a blank line in the text of
+one is a paragraph break, too.
+The options are those of `par` (`justify`, `leading`, `spacing`,
+`linebreaks`, `hanging_indent`, and `extra` for the others); they are set
+for the paragraphs of the text (`set par(..)`), so they also hold for a
+paragraph inside it (a footnote, a box with paragraphs).
+
+A paragraph of a paper has displayed formulas in it. Interpolate them
+(`with_display`):
+
+```moonbit
+pub fn with_display() -> Seq {
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1.5))),
+    ("all", Value::bool(true)),
+  ])
+  Seq([
+    Set("par", [("first-line-indent", indent)]),
+    (
+      $|The sum of the first numbers is
+      $|\{Equation("sum_(k=1)^n k = (n (n + 1)) / 2", block=true)}
+      $|which the next paragraph uses.
+    )
+    |> Para,
+    Para("A new paragraph."),
+  ])
+}
+```
+
+For the engine a block ends the paragraph, and the text after it is a
+paragraph of its own. `Para` keeps that text from being indented like a new
+paragraph (for a block that the description shows: a formula, a list, a
+figure; not for one that a callback or a `Call` makes), so with the indent
+above "which the next paragraph uses." starts at the margin and "A new
+paragraph." is indented. About first-line indents, which are the engine's:
+
+- with `all: true` every paragraph that starts at the start edge is
+  indented, also the first one and the one after a heading (but not the
+  first one of a list item);
+- without it (`first-line-indent: 1.5em`) a paragraph is indented if it
+  follows a paragraph. A `Para` after a `Para` that *ends* with a formula
+  follows a block and is not indented; give it the indent by hand
+  (`extra=[("first-line-indent", Value::dict([("all", Value::bool(true))]))]`
+  keeps the document's amount), or set `all` for the document;
+- a `show par: set par(first-line-indent: ..)` of the document wins over
+  both the options of a `Para` and what it does after a formula.
+
+A list written as the next item after a `Para` is set off from it like
+after a blank line in Typst source; a list that belongs to the paragraph is
+interpolated into its text like the formula, where it attaches to the line
+before it.
+
+`Par(body)` is the `par` element: one paragraph with its properties as
+arguments, for inline content (`Par(Seq(["A chip ", Box(..)]))`). It cannot
+hold a block: a displayed formula in `Par(Prose(..))` is dropped with the
+warning `block may not occur inside of a paragraph and was ignored`, and a
+blank line in that text with `parbreak may not occur ..`. `Prose` is the
+text inside something else (a caption, a cell, the body of a `Text`).
+
 Block-level elements between inline items (a heading, a block, a table, a
 list) separate them as well; only neighbours that are both inline run
 together.
+
+### Lints
+
+What compiles but is probably not what was meant is reported by the EDSL's
+lints, in the `lints` of the report (`warnings` are the engine's). Print
+them like the warnings (`lints_of`):
+
+```moonbit
+pub fn lints_of(document : Document) -> Array[String] {
+  let compiled = document.compile_paged(DocWorld::in_memory())
+  compiled.lints.map(lint => lint.render())
+}
+```
+
+For `run_together` it gives:
+
+```text
+lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "…first ends here.The second start…"
+  at doc/examples/guide/guide.mbt:66:44 (Prose, argument 1)
+  hint: the text before it (doc/examples/guide/guide.mbt:66:14 (Prose, argument 1))
+  hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
+```
+
+This lint (`AdjacentInline`) looks at the arrays of `Document` and `Seq`.
+Two `Prose` that follow each other are always reported: a `Prose` drops the
+white space at its edges, so there is never anything between them. Other
+text next to text (a string, or a `Text`, `Strong`, `Emph` or `Link` around
+a string or a `Prose`) is reported if the array also holds a block (a
+heading, a table, a `Para`, a `Block`, a spacing, ..): then the array is a
+flow of blocks, and the two are probably meant as two paragraphs (the lint
+is a heuristic: one paragraph that is composed of several text items
+directly between blocks is reported, too; write it as one `Par(Seq([..]))`).
+Without a block the array can be the body of one paragraph
+(`Par(Seq(["Typeset with ", Emph("care"), "."]))`), so nothing is reported.
+The lint does not look into callbacks, `Call` or `Markup`.
+`compile_paged(world, lints=false)` turns the lints off.
 
 ## 3. Helpers that keep the caller's location
 
@@ -536,21 +646,21 @@ gradient, tiling, or auto, found none`.
 
 ### 6.5 Quotes
 
-`Prose` turns straight quotes into typographic ones by Typst's rules: `'`
-after a letter is an apostrophe, after a digit a prime, so "#1770's" is set
-as "#1770′s". Write the apostrophe as the character it is, or turn the
-quotes off for that text (`apostrophes`):
+`Prose` and `Para` turn straight quotes into typographic ones by Typst's
+rules: `'` after a letter is an apostrophe, after a digit a prime, so
+"#1770's" is set as "#1770′s". Write the apostrophe as the character it is,
+or turn the quotes off for that text (`apostrophes`):
 
 ```moonbit
 pub fn apostrophes() -> Seq {
   Seq([
-    Par(Prose("Issue #1770’s fix is in.")),
-    Par(Prose("Issue #1770's fix is in.", quotes=false)),
+    Para("Issue #1770’s fix is in."),
+    Para("Issue #1770's fix is in.", quotes=false),
   ])
 }
 ```
 
-A plain string (not `Prose`) is never changed.
+A plain string (not the text of a `Prose` or `Para`) is never changed.
 
 ## 7. Cards of equal height
 
@@ -660,7 +770,9 @@ of another callback; it is its creation that has to come first.
 | Statement | Test |
 |---|---|
 | The samples compile, and all but `stripes_in_show` without errors or warnings | G "the samples compile to PDF without warnings" |
-| 2: inline items run together, `Par` separates | G "section 2: ..", F "S1: .." |
+| 2: inline items run together, `Para` separates; the lint, where it reports and where not; a blank line in a `Para`; a displayed formula in a `Para` and in a `Par` | G "section 2: ..", F "S1: .." |
+| 2: what the engine does with paragraphs, blocks and first-line indents; `Para` is typeset like `Par(Prose(..))` where there is no block; a click leads to its text argument | `doc/para_test.mbt` (the "engine: .." tests first); with the source file, `doc/examples/review` "source characters: the text of a Para .." |
+| 2: what the lint takes for text and for a block | `doc/lint_test.mbt`, `doc/lint_wbtest.mbt` |
 | 3: `note` at the call, `plain_note` in the helper | G "section 3: a helper with `#callsite` .." |
 | 3: the five rules about what the location covers | G "section 3: what the location of a helper covers" |
 | 4.1 to 4.5 | G "section 4: ..", F "T1: .." to "T7: ..", "T9: ..", "T11: .." |

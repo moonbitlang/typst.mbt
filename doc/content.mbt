@@ -28,6 +28,11 @@ priv enum Node {
   NCall(CallNode)
   /// Several pieces of content (and rules, which style what follows them).
   NSeq(Array[Content], Site)
+  /// A sequence without a site of its own, inside a sequence that has
+  /// one: its children are further pieces of the argument that the outer
+  /// sequence's children are pieces of. `Para` puts the text after a
+  /// block into one, with the rule that styles it.
+  NPieces(Array[Content])
   /// A set rule.
   NSetRule(SetNode)
   /// A show rule.

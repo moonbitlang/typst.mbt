@@ -112,6 +112,7 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
       }
       @debug.Repr::ctor(name, args)
     }
+    NSeq(children, site) if site.kind == "Para" => para_repr(children)
     NSeq(children, site) =>
       @debug.Repr::ctor(site.kind, [
         (
@@ -119,6 +120,9 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
           @debug.Repr::array(children.map(child => child.to_repr())),
         ),
       ])
+    // A run of pieces without a site (the text after a block in `Para`).
+    NPieces(children) =>
+      @debug.Repr::array(children.map(child => child.to_repr()))
     NSetRule(set) => {
       let args = args_repr(set.args)
       if set.func is FPath(path) {
@@ -198,10 +202,44 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
   }
 }
 
+///|
+/// A `Para` as its call: the pieces of its text (without the paragraph
+/// breaks around them and the rules that lowering needs) and its options.
+fn para_repr(children : Array[Content]) -> @debug.Repr {
+  let pieces : Array[@debug.Repr] = []
+  let args : Array[(String?, @debug.Repr)] = []
+  let last = children.length() - 1
+  let mut opened = false
+  for i, child in children {
+    match child.node {
+      NSetRule(set) => args.append(args_repr(set.args))
+      NPieces(run) =>
+        for piece in run {
+          if !(piece.node is NSetRule(_)) {
+            pieces.push(piece.to_repr())
+          }
+        }
+      _ =>
+        if !opened && is_parbreak_piece(child) {
+          opened = true
+        } else if i != last {
+          pieces.push(child.to_repr())
+        }
+    }
+  }
+  args.insert(0, (Option::None, @debug.Repr::array(pieces)))
+  @debug.Repr::ctor("Para", args)
+}
+
 // The handwritten description types.
 
 ///|
 pub impl @debug.Debug for Prose with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
+pub impl @debug.Debug for Para with fn to_repr(self) {
   self.content.to_repr()
 }
 

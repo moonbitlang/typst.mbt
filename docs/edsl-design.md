@@ -389,16 +389,16 @@ own call site).
   pending. The table holds the 65,536 newest pending entries: beyond
   that the oldest is dropped, and a `Prose` whose text still names it
   fails with `an interpolated description of this text was already used
-  by another Prose, or dropped because more than 65536 descriptions were
-  interpolated since` (below the oldest pending number the table cannot
+  by another Prose or Para, or dropped because more than 65536 descriptions
+  were interpolated since` (below the oldest pending number the table cannot
   tell a consumed entry from a dropped one). A
   program that builds more than that many strings before turning the
   first into `Prose` must build and consume them in smaller batches.
 - *One use.* The text of a `Prose` can be used once: a second `Prose` of
   the same string value finds its descriptions taken and is an error at
   lowering (`an interpolated description of this text was already used by
-  another Prose`). Building the string again (a loop, a function) creates
-  new placeholders.
+  another Prose or Para`). Building the string again (a loop, a function)
+  creates new placeholders.
 - *Reserved characters.* In the text of `Prose` the two delimiter
   characters are reserved: a delimiter that is not part of a placeholder
   with a number that an interpolation was given is an error (`the text of
@@ -431,9 +431,9 @@ placeholder with a number that was given out (a delimiter character alone
 is ordinary, if unusual, text, which upstream's suite has), also the
 string that a called function returns, and fails
 with `` `Emph` was interpolated into a string that is not the text of
-`Prose` `` (naming the interpolated constructor from the table, if it is
-still there) at the string's origin, with the hint to use `Prose` or
-`Seq`. The text of a `Prose` that contains the delimiter characters
+`Prose` or `Para` `` (naming the interpolated constructor from the table, if
+it is still there) at the string's origin, with the hint to use `Prose`,
+`Para` or `Seq`. The text of a `Prose` that contains the delimiter characters
 without a valid placeholder is rejected (`the text of Prose contains a
 reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
 rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
@@ -460,6 +460,31 @@ paragraphs of one `Prose` with the same words are different elements, as
 in markup — and deduplicates diagnostics by span. Its spaces have no span,
 like `Space()`. Interpolated descriptions keep their own origins. `Lit`
 gives a text a location of its own in the EDSL source where that matters.
+
+**`Para`** (added by `docs/edsl-ports.md`, section 3.1). `Prose` is inline
+content, so two of them next to each other in a sequence are one paragraph
+with nothing between them. A paragraph of running text is
+
+```moonbit
+(
+  $|Each dot is one complete trial of all nine milestones.
+)
+|> Para
+Para("One line.", justify=true)
+```
+
+`Para(text, quotes~, ..)` is the text of a `Prose` between two paragraph
+breaks, which is what a paragraph is in Typst source; everything above
+holds for its text (the messages name `Para`). It is not the `par` element,
+whose body cannot hold a block: a paragraph of a paper has displayed
+formulas in it. The options of `par` are a set rule in the sequence, the
+text after an interpolated block is a nested sequence with
+`first-line-indent: 0pt` (the engine starts a new paragraph after a block),
+and a blank line in the text is a paragraph break like the two around it.
+Twin: `[#set par(..);#parbreak() .. #parbreak()]`. It is **one origin**:
+the sequence and its rules have the site of the `Para` call, and the text
+runs, quotes and breaks are pieces of that call's `text` argument (section
+12.2). There is no element to label, so `Para` has no `label`.
 
 ## 5. Lowering
 
@@ -1660,16 +1685,24 @@ main source; eval_source(..).content() })`, so the Typst path is unchanged.
 
 ```moonbit
 pub fn Document::Document(children : Array[&IntoContent], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Document
-pub fn[T : @library.Output] Document::compile(self : Document, world : &@library.World) -> CompileReport[T]
-pub fn Document::compile_paged(self : Document, world : &@library.World) -> CompileReport[@layout.PagedDocument]
-pub fn Document::lower(self : Document, world : &@library.World) -> CompileReport[@library.Content]   // tests, tools
+pub fn[T : @library.Output] Document::compile(self : Document, world : &@library.World, lints? : Bool = true) -> CompileReport[T]
+pub fn Document::compile_paged(self : Document, world : &@library.World, lints? : Bool = true) -> CompileReport[@layout.PagedDocument]
+pub fn Document::lower(self : Document, world : &@library.World, lints? : Bool = true) -> CompileReport[@library.Content]   // tests, tools
 
 pub struct CompileReport[T] {
   // private: output : T?, and a resolver for the diagnostics of exports
   errors : Array[Diagnostic]          // empty iff there is an output
-  warnings : Array[Diagnostic]
+  warnings : Array[Diagnostic]        // the engine's
+  lints : Array[Lint]                 // the EDSL's (docs/edsl-ports.md, section 6); empty with lints=false
   origins : Origins                   // immutable snapshot
 }
+pub struct Lint {
+  kind : LintKind                     // AdjacentInline (L1); later lints add cases
+  message : String
+  hints : Array[Hint]
+  location : Location?                // the origin as the review loop has it
+}
+pub fn Lint::render(self : Lint) -> String
 pub fn[T] CompileReport::output(self : CompileReport[T]) -> T?
 pub fn[T] CompileReport::unwrap(self : CompileReport[T]) -> T raise DocError
 pub fn CompileReport::pdf(self : CompileReport[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]

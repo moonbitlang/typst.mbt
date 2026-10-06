@@ -27,6 +27,8 @@ pub fn half_width() -> @doc.Layout
 
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
 
+pub fn lints_of(@doc.Document) -> Array[String]
+
 pub fn loose_title(&@doc.IntoContent) -> @doc.Seq
 
 #callsite(autofill(args_loc, loc))
@@ -57,6 +59,8 @@ pub fn untitled_outline() -> @doc.Outline
 pub fn untyped_fields() -> @doc.Seq
 
 pub fn upper_case() -> @doc.Upper
+
+pub fn with_display() -> @doc.Seq
 
 // Errors
 

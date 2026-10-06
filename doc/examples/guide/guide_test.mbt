@@ -226,7 +226,7 @@ test "the samples compile to PDF without warnings" {
 }
 
 ///|
-test "section 2: inline items in a sequence are one paragraph, `Par` separates them" {
+test "section 2: inline items in a sequence are one paragraph, `Para` separates them" {
   let joined = pages([@guide.run_together()])
   inspect(joined.errors(), content="")
   inspect(joined.warnings(), content="")
@@ -236,11 +236,105 @@ test "section 2: inline items in a sequence are one paragraph, `Par` separates t
       #|p1 text 10.0,16.6 w172.0 "The first ends here.The second starts here."
     ),
   )
+  // The lint (line and column numbers as N).
   inspect(
-    pages([@guide.paragraphs()]).listing(),
+    numberless(
+      @guide.lints_of(@doc.Document([@guide.run_together()])).join("\n"),
+    ),
     content=(
-      #|p1 text 10.0,16.6 w78.6 "The first ends here."
-      #|p1 text 10.0,35.2 w94.0 "The second starts here."
+      #|lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "…first ends here.The second start…"
+      #|  at doc/examples/guide/guide.mbt:N:N (Prose, argument N)
+      #|  hint: the text before it (doc/examples/guide/guide.mbt:N:N (Prose, argument N))
+      #|  hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
+    ),
+  )
+  // It is a field of the report, and `lints=false` turns the lints off.
+  let document = @doc.Document([@guide.run_together()])
+  let world = @doc.DocWorld::in_memory()
+  assert_eq(document.compile_paged(world).lints.length(), 1)
+  assert_eq(document.compile_paged(world, lints=false).lints.length(), 0)
+  // Other text than two `Prose` (a string, a `Text` around one) is
+  // reported next to text if the array also holds a block, here a
+  // heading; without one the array may be the body of one paragraph.
+  let strings : Array[&@doc.IntoContent] = [
+    "The first ends here.",
+    @doc.Text("The second starts here."),
+  ]
+  assert_eq(@guide.lints_of(@doc.Document(strings)), [])
+  assert_eq(
+    @guide.lints_of(@doc.Document([@doc.Heading("Notes"), ..strings])).length(),
+    1,
+  )
+  // A paragraph each.
+  let apart = pages([@guide.paragraphs()])
+  inspect(apart.errors(), content="")
+  inspect(apart.warnings(), content="")
+  inspect(
+    apart.listing(),
+    content=(
+      #|p1 text 10.0,19.0 w35.9 "Notes"
+      #|p1 text 10.0,33.1 w78.6 "The first ends here."
+      #|p1 text 10.0,51.7 w160.2 "The second starts here, with a “quoted” "
+      #|p1 text 10.0,64.8 w41.2 "word and "
+      #|p1 text 51.2,64.8 w30.1 "stressed"
+      #|p1 text 81.3,64.8 w97.1 " ones on its second line."
+      #|p1 text 10.0,83.4 w85.1 "The third is justified."
+    ),
+  )
+  assert_eq(@guide.lints_of(@doc.Document([@guide.paragraphs()])), [])
+  // The document of all samples has the one lint of `run_together`.
+  assert_eq(@guide.lints_of(@guide.guide()).length(), 1)
+  // A blank line in the text of a `Para` is a paragraph break.
+  let blank = pages([@doc.Para("One ends here.\n\nTwo starts here.")])
+  inspect(blank.warnings(), content="")
+  inspect(
+    blank.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w60.8 "One ends here."
+      #|p1 text 10.0,35.2 w65.4 "Two starts here."
+    ),
+  )
+  // A displayed formula in a `Para` is kept; the text after it is not
+  // indented, the next `Para` is.
+  let display = pages([@guide.with_display()])
+  inspect(display.errors(), content="")
+  inspect(display.warnings(), content="")
+  inspect(
+    display.listing(),
+    content=(
+      #|p1 text 25.0,16.6 w127.8 "The sum of the first numbers is"
+      #|p1 text 63.1,43.2 w14.4 "∑"
+      #|p1 text 67.8,31.7 w4.9 "𝑛"
+      #|p1 text 63.5,54.3 w4.2 "𝑘"
+      #|p1 text 67.7,54.3 w5.4 "="
+      #|p1 text 73.2,54.3 w4.0 "1"
+      #|p1 text 79.2,43.2 w5.4 "𝑘"
+      #|p1 text 87.3,43.2 w7.8 "="
+      #|p1 text 98.9,36.5 w6.0 "𝑛"
+      #|p1 text 104.9,36.5 w3.9 "("
+      #|p1 text 108.8,36.5 w6.0 "𝑛"
+      #|p1 text 117.0,36.5 w7.8 "+"
+      #|p1 text 127.0,36.5 w5.0 "1"
+      #|p1 text 132.0,36.5 w3.9 ")"
+      #|p1 text 114.9,50.1 w5.0 "2"
+      #|p1 line 98.9,40.7 37.0x0.0
+      #|p1 text 10.0,72.9 w127.8 "which the next paragraph uses."
+      #|p1 text 25.0,91.5 w73.4 "A new paragraph."
+    ),
+  )
+  // The `par` element cannot hold it: `Par(..)` is for inline content.
+  let dropped = pages([
+    @doc.Par(@doc.Prose("Before \{@doc.Equation("x", block=true)} after.")),
+  ])
+  inspect(
+    dropped.warnings(),
+    content="block may not occur inside of a paragraph and was ignored",
+  )
+  inspect(
+    dropped.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w29.1 "Before "
+      #|p1 text 39.1,16.6 w22.8 " after."
     ),
   )
   // A block between two inline items separates them.

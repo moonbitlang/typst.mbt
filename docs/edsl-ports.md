@@ -151,13 +151,116 @@ twin for each constructor. Nothing below changes those rules.
 @doc.Para("One line.", justify=true)
 ```
 
-`Para(text, ..)` is `Par(Prose(text, quotes~), ..par's options)`. Twin:
-`par(..)[..]` around the functional expansion of the prose (section 4.4 of
-revision 8), not `#par[text]`. Provenance: one site, `Para`, whose first
-argument is the prose text; the inner `Par` and `Prose` are built with that
-site and do not register sites of their own (the registry deduplicates by
-location and key path, so two differently shaped constructors must not share
-a location).
+`Para(text, ..)` is the text of a `Prose` between two paragraph breaks,
+with `par`'s options as a set rule for that text. Twin:
+`[#set par(..);#parbreak() .. #parbreak()]` around the functional expansion
+of the prose (section 4.4 of revision 8). Provenance: one site, `Para`,
+whose first argument is the prose text; no other site is registered (the
+registry deduplicates by location and key path, so two differently shaped
+constructors must not share a location).
+
+(As accepted, this section had `Para` as `Par(Prose(text), ..)`, the `par`
+element around the prose, and step 1 first built that. The evidence below
+replaced it.)
+
+As built (step 1): `Para(text, quotes~, leading~, spacing~, justify~,
+linebreaks~, hanging_indent~, extra~)` in `doc/para.mbt`.
+
+Why it is not the `par` element. Two ports of mathematics papers (22 pages
+with about 290 formulas; 39 pages with 214 displays) wrote paragraphs as
+the guide then taught, `Par(Prose(..))`, with displayed formulas
+interpolated. The engine drops a block in the body of `par` ("block may not
+occur inside of a paragraph and was ignored"). What the engine does, each
+point pinned by an "engine: .." test of `doc/para_test.mbt` on Typst
+source:
+
+- (a) `par[..]` cannot hold a block: it is dropped with that warning. Text
+  between paragraph breaks keeps it.
+- (b) A block ends the paragraph (realization: a block interrupts the
+  paragraph grouping), and the text after it is a paragraph of its own, in
+  the flow's situation "after something else" (`ParSituation::Other`; a
+  paragraph after a paragraph is `Consecutive`). The first-line indent is
+  for `Consecutive` paragraphs, or for all with `all: true`. So without
+  `all` the text after a display is not indented, and neither is a new
+  paragraph after a display; with `all` both are. Neither setting gives
+  what a paper wants.
+- (c) For text without blocks, `par(options)[text]` and
+  `[#set par(options);#parbreak() text #parbreak()]` are drawn the same
+  (text runs and shapes at the same positions, no diagnostics) in 17
+  containers (the flow, list and enum items, table and grid cells, blocks,
+  a box, a figure, a footnote, columns, a stack, `align`, a quote, `pad`,
+  `place`) under 5 settings of indents and options, 85 comparisons; both
+  are `par` elements for a query. They are not the same thing, and differ
+  in these places (each pinned):
+  1. options that are *set* reach the paragraphs inside the text (the entry
+     of a footnote, a box with paragraphs); the arguments of `par(..)` do
+     not;
+  2. a tight list attaches to a paragraph before it, but not across a
+     paragraph break: after the delimited text it is set off like after a
+     blank line in markup (5.5pt more at 10pt text); inside the delimited
+     text it attaches;
+  3. a `show par: set par(..)` of the document wins over a set rule around
+     the text and loses to an argument of `par(..)`;
+  4. without text there is no paragraph, where `par[]` is an empty one that
+     takes its spacing (and is one more result of `query(par)`);
+  5. inside a paragraph neither is one: the breaks are ignored with a
+     warning each and the text stays; a nested `par` is dropped.
+- (d) Paragraph breaks collapse, and one at the start or end of a container
+  is nothing (it only makes the text there a paragraph).
+
+What `Para` lowers to, from these facts: a sequence with the site of the
+call: `set par(..)` if an option is given, a paragraph break, the pieces of
+the prose, a paragraph break. The text after an interpolated block, up to
+the next block or blank line, is a nested sequence (the private node
+`NPieces`, whose children stay pieces of the text argument) that starts
+with `set par(first-line-indent: 0pt)`: the continuation is not indented
+under either setting, and nothing else is touched. So:
+
+- a displayed formula in a `Para` is kept, without a warning and with its
+  own origin; the text before and after it reads as one paragraph (an
+  interpolated `Parbreak()` is a paragraph break like a blank line, not a
+  block with a continuation);
+- the next `Para` is a new paragraph, and it is indented if indents are on
+  for all paragraphs (`all: true`), or if the `Para` before it ends with
+  text;
+- a blank line in the text is a paragraph break (two paragraphs, no
+  warning), where `Par(Prose(..))` has the engine's "parbreak may not occur
+  inside of a paragraph" and joined text;
+- origins, review text, tiers, source characters and `positions` are those
+  of the text of a `Prose` (`doc/para_test.mbt`, `doc/examples/review`),
+  and for text without blocks the frames are those of `Par(Prose(..))`.
+
+What the engine does not give, and the author still does by hand:
+
+- Without `all`, a `Para` after a `Para` that *ends* with a display is not
+  indented: it follows a block, like a paragraph after a figure or a list.
+  The author sets `all: true` for the document (then the first paragraph
+  and the one after a heading are indented, too), or gives that paragraph
+  its indent: `extra=[("first-line-indent", Value::dict([("all",
+  Value::bool(true))]))]`, which keeps the document's amount (the engine
+  folds the dictionary). `Para` cannot do it by itself: a description does
+  not know what comes before it, `all` on every `Para` would indent the
+  first paragraph and the one after a heading as well, and an empty
+  paragraph in between (the trick Typst users have) adds space.
+- A list (or another block) written as an item after a `Para` is set off
+  from it like after a blank line (difference 2 above). What belongs to
+  the paragraph is interpolated into its text, where it attaches as in
+  Typst source.
+- A `show par: set par(first-line-indent: ..)` of the document wins over
+  the continuation rule and over the options of a `Para` (difference 3).
+- The continuation rule is for blocks that the description shows (the
+  constructors lint L1 takes for blocks, `Equation(block=true)`); after a
+  block that a callback, a `Call`, `Markup` or a view makes, the text is
+  indented as the engine indents it.
+- The rule and the options are set rules, so they reach paragraphs nested
+  in that text: a footnote in the text after a display has an entry without
+  first-line indent when `all` is on (the rule sets the amount to `0pt`;
+  `all` is inherited).
+- `label` is gone: there is no `par` element to carry it. `extra` gives
+  further arguments to the `set par`.
+- `Para` is handwritten: an option that `Par` gains in the generator
+  (`scripts/docgen.py`) has to be added to it by hand; until then `extra`
+  reaches it.
 
 ### 3.2 `Layout`
 
@@ -380,11 +483,66 @@ What each can and cannot promise:
 
 - L1, adjacent inline items (S1). On the description tree, at author level:
   in the item array of `Document`, `Seq` or a kit container, two neighbours
-  that are each a string, a `Prose`, or a `Text`/`Strong`/`Emph`/`Link`
+  are reported
+  (a) if both are a bare `Prose` (the `Prose` itself, not one wrapped in
+  `Text`/`Strong`/`Emph`/`Link`), in any array, with or without a block in
+  it: a `Prose` drops the white space at its edges, so two in a row never
+  have anything between them;
+  (b) if each is a string, a `Prose`, or a `Text`/`Strong`/`Emph`/`Link`
   wrapping one, when the array also holds at least one block-level
-  constructor (so a purely inline sequence, as in a `Text` body, is not
-  reported). It is a heuristic: it does not see through callbacks, `Call`
-  or embedded content. `Para` is the fix it names.
+  constructor (so a purely inline sequence of strings and wrapped text, as
+  in a `Text` body, is not reported).
+  It is a heuristic: it does not see through callbacks, `Call` or embedded
+  content. `Para` is the fix it names.
+
+  As built (step 1, `doc/lint.mbt`; rule (a) was added after the first
+  implementation, which had only (b) and so missed the plainest form of S1,
+  `Document([Prose(..), Prose(..)])`):
+  - A lint is `Lint { kind : LintKind, message, hints : Array[Hint],
+    location : Location? }` with `render()`; `LintKind` has the one case
+    `AdjacentInline`. `Location` and `Hint` are those of diagnostics, so a
+    later lint can point into a file of the world or nowhere, and a hint
+    can carry a second place (for L1: the text before). A page number for
+    L2 and L3 is a field to add then. `lints` is on `CompileReport` (not on
+    `ExportReport`), also when the compilation failed; `lints?` is on
+    `compile`, `compile_paged` and `lower`.
+  - Block-level constructor: a call of an element that the engine keeps out
+    of a paragraph whatever its arguments are: what the show rules wrap in
+    a block unconditionally, the elements of the flow (`par`, `parbreak`,
+    `pagebreak`, `colbreak`, `v`, `place`, `block`), list items, and
+    `align`, whose style interrupts a paragraph; `raw`, `quote` and
+    `Equation` only with a literal `block=true`. `doc/lint_wbtest.mbt`
+    checks the list against the engine for all 77 constructors of the
+    generator's table, so a new element has to be classified.
+  - "A string" is a plain string. A `Lit` is not text for the lint: the
+    translator writes markup as a stream of `Lit`s and spaces between
+    `Parbreak`s, and counting it gave 11 reports on one correct document
+    (`doc/convert/sample/gen_showcase.mbt`). An empty string is not text.
+  - Neighbours are adjacent items of the array: a rule or anything else
+    between two texts hides the pair (a false negative; no document showed
+    a need to look through rules). `Keyed` and a label do not change what
+    an item is. A pair with a block interpolated at its seam (a `Prose`
+    that ends or starts with one) is not reported.
+  - The place of a lint is the argument that has the text, as the review
+    loop resolves that text on the page (`ReviewText::origin_positions`
+    finds its boxes); one source location is reported once, however often
+    its description is used or under how many keys.
+  - The walker looks into arguments of constructors and of set rules
+    (also the generic `Set`), into arrays, dictionaries and operands of
+    values, and into the texts of `Prose` and `Para`; not into `Call` and
+    call values, callbacks, `Markup`, `Equation` and views.
+  - Measured: no report on the documents of the tests of `doc` but those
+    written to show the defect, on the 42 documents of the `edsl` stage but
+    one (the twin `prose` puts two
+    `Prose` side by side on purpose; the stage does not look at lints), and
+    none on the fourteen ports as written. With their paragraph helpers
+    taken out, `typst-evaluation` and `session-migrations` report one pair
+    each, which is every adjacent pair they have (the first is the seam the
+    findings quote). Without the block condition of (b), about 30 places of
+    correct inline composition would be reported.
+  - Known false negatives: strings and wrapped text in an array without a
+    block; `Text(Seq([..]))`, which is what the mark parsers of two ports
+    produce; wrappers other than the four (`Highlight`, `Underline`).
 - L2, missing glyphs (S4). From the frames: glyph id 0 in a text item, with
   the origin of that glyph's span (a text item can combine several origins)
   and the text of the cluster (a code-point sequence; for clusters beyond the

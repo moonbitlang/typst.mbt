@@ -10,6 +10,7 @@ using @doc {
   type SetText,
   type Heading,
   type Par,
+  type Para,
   type Prose,
   type Lit,
   type Seq,
@@ -23,6 +24,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Set,
+  type Equation,
   type Upper,
   type Layout,
   type Show,
@@ -69,9 +72,42 @@ pub fn run_together() -> Seq {
 /// Section 2: a paragraph each.
 pub fn paragraphs() -> Seq {
   Seq([
-    Par(Prose("The first ends here.")),
-    Par(Prose("The second starts here.")),
+    Heading("Notes"),
+    Para("The first ends here."),
+    (
+      $|The second starts here, with a "quoted" word
+      $|and \{Emph("stressed")} ones on its second line.
+    )
+    |> Para,
+    Para("The third is justified.", justify=true),
   ])
+}
+
+///|
+/// Section 2: a paragraph with a displayed formula in it. Every paragraph
+/// of the page is indented; the text after the formula is not.
+pub fn with_display() -> Seq {
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1.5))),
+    ("all", Value::bool(true)),
+  ])
+  Seq([
+    Set("par", [("first-line-indent", indent)]),
+    (
+      $|The sum of the first numbers is
+      $|\{Equation("sum_(k=1)^n k = (n (n + 1)) / 2", block=true)}
+      $|which the next paragraph uses.
+    )
+    |> Para,
+    Para("A new paragraph."),
+  ])
+}
+
+///|
+/// Section 2: what the lints say of a document.
+pub fn lints_of(document : Document) -> Array[String] {
+  let compiled = document.compile_paged(DocWorld::in_memory())
+  compiled.lints.map(lint => lint.render())
 }
 
 ///|
@@ -234,8 +270,8 @@ pub fn ruled_table(cells : Array[&IntoContent]) -> Table {
 /// quotes at all.
 pub fn apostrophes() -> Seq {
   Seq([
-    Par(Prose("Issue #1770’s fix is in.")),
-    Par(Prose("Issue #1770's fix is in.", quotes=false)),
+    Para("Issue #1770’s fix is in."),
+    Para("Issue #1770's fix is in.", quotes=false),
   ])
 }
 
@@ -295,6 +331,7 @@ pub fn guide() -> Document {
     code_size(),
     run_together(),
     paragraphs(),
+    with_display(),
     notes(),
     composed_lengths(),
     roman_numeral(),
