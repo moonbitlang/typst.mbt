@@ -10,7 +10,9 @@ fn impl_f64_const_inf() -> Value {
 ///|
 /// A NaN value, as defined by the IEEE 754 standard (`float.nan`).
 fn impl_f64_const_nan() -> Value {
-  Float(@double.not_a_number)
+  // `f64::NAN`: MoonBit's `not_a_number` has another payload, which
+  // `to-bytes` and hashes show.
+  Float(0x7FF8000000000000L.reinterpret_as_double())
 }
 
 ///|
@@ -176,7 +178,10 @@ pub fn rust_parse_f64(s : String) -> Double? {
     return Some(if negative { -@double.infinity } else { @double.infinity })
   }
   if rest == "nan" {
-    return Some(@double.not_a_number)
+    // `f64::NAN` (MoonBit's `not_a_number` has another payload), negated
+    // after a `-` like upstream.
+    let nan = 0x7FF8000000000000L.reinterpret_as_double()
+    return Some(if negative { -nan } else { nan })
   }
   let is_digit = (j : Int) => {
     j < n && s.code_unit_at(j) >= '0' && s.code_unit_at(j) <= '9'

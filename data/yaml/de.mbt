@@ -515,7 +515,8 @@ fn parse_f64(scalar : String) -> Double? {
     return Some(@double.neg_infinity)
   }
   if scalar is (".nan" | ".NaN" | ".NAN") {
-    return Some(@double.not_a_number)
+    // `f64::NAN`.
+    return Some(0x7FF8000000000000L.reinterpret_as_double())
   }
   if rust_parse_f64(unpositive) is Some(float) {
     if !float.is_inf() && !float.is_nan() {

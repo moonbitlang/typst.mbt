@@ -158,6 +158,8 @@ priv struct MemoryError {
 priv struct PluginBase {
   /// The raw WebAssembly bytes.
   bytes : Bytes
+  /// The hash of the bytes (upstream `Bytes` carries a `LazyHash`).
+  bytes_hash : U128
   /// The compiled WebAssembly module.
   module : @wasmi.Module
   /// A linker used to create a `Store` for execution.
@@ -211,18 +213,23 @@ impl Eq for Plugin with fn equal(self, other) {
 ///|
 /// Upstream `Hash for Plugin`.
 fn Plugin::fingerprint(self : Plugin, state : SipHasher128) -> Unit {
-  state.write_usize(self.base.bytes.length())
-  state.write_bytes(self.base.bytes)
+  state.write_u128(self.base.bytes_hash)
   state.write_u128(self.fingerprint)
+}
+
+///|
+/// The hash of a plugin's bytes.
+fn plugin_bytes_hash(bytes : Bytes) -> U128 {
+  let state = SipHasher128::new()
+  state.write_usize(bytes.length())
+  state.write_bytes(bytes)
+  state.finish128()
 }
 
 ///|
 /// Create a plugin and turn it into a module.
 fn Plugin::module(bytes : Bytes) -> Module raise HintedError {
-  let state = SipHasher128::new()
-  state.write_usize(bytes.length())
-  state.write_bytes(bytes)
-  let key = state.finish128()
+  let key = plugin_bytes_hash(bytes)
   let entries = match plugin_module_cache.get(key) {
     Some(entries) => entries
     None => {
@@ -240,7 +247,7 @@ fn Plugin::module(bytes : Bytes) -> Module raise HintedError {
     }
   }
   let result : Result[Module, HintedError] = try
-    Plugin::new(bytes).into_module()
+    Plugin::new(bytes, bytes_hash=key).into_module()
   catch {
     e => Err(e)
   } noraise {
@@ -265,7 +272,10 @@ fn plugin_func_type(
 
 ///|
 /// Create a new plugin from raw WebAssembly bytes.
-fn Plugin::new(bytes : Bytes) -> Plugin raise HintedError {
+fn Plugin::new(
+  bytes : Bytes,
+  bytes_hash? : U128 = plugin_bytes_hash(bytes),
+) -> Plugin raise HintedError {
   let config = @wasmi.Config::default()
   // Disable relaxed SIMD as it can introduce non-determinism.
   config.wasm_relaxed_simd(false) |> ignore
@@ -296,7 +306,7 @@ fn Plugin::new(bytes : Bytes) -> Plugin raise HintedError {
   } catch {
     _ => abort("unreachable")
   }
-  let base = { bytes, module, linker, }
+  let base = { bytes, bytes_hash, module, linker, }
   let instance = PluginInstance::new(base, None)
   { base, snapshot: None, fingerprint: U128::default(), pool: [instance], }
 }

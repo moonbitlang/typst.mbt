@@ -145,13 +145,7 @@ pub impl Fingerprint for Decoration with fn fingerprint(self, state) {
       state.write_discriminant(3)
       state.write(IntoValue::into_value(fill))
       for side in s.iter() {
-        match side {
-          Some(fixed) => {
-            state.write(abs(fixed.thickness))
-            state.write(fixed.paint.into_value())
-          }
-          None => state.write_discriminant(0)
-        }
+        state.write(side)
       }
       state.write(top_edge.into_value())
       state.write(bottom_edge.into_value())
