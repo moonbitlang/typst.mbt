@@ -42,3 +42,6 @@ pub impl FromReader for ExternalKind with fn from_reader(reader) {
   let byte = reader.read_u8()
   BinaryReader::external_kind_from_byte(byte, offset)
 }
+
+///|
+pub extend ExternalKind with FromReader::{from_reader}

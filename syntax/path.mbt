@@ -48,6 +48,13 @@ pub fn RootedPath::map(
 }
 
 ///|
+/// Upstream `Debug for RootedPath` (typst-syntax/src/path.rs:62); the text
+/// is that of the `Show` impl below.
+pub impl @debug.Debug for RootedPath with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
+}
+
+///|
 /// Upstream `Debug for RootedPath`.
 pub impl Show for RootedPath with fn output(self, logger) {
   match self.root {
@@ -357,6 +364,13 @@ pub fn VirtualPath::relative_from(
     }
   }
   buf.join("/")
+}
+
+///|
+/// Upstream `Debug for VirtualPath` (typst-syntax/src/path.rs:386); the
+/// text is that of the `Show` impl below.
+pub impl @debug.Debug for VirtualPath with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
 }
 
 ///|

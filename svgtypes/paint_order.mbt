@@ -27,6 +27,9 @@ pub impl Default for PaintOrder with fn default() {
 }
 
 ///|
+pub extend PaintOrder with Default::{default}
+
+///|
 /// `From<[PaintOrderKind; 3]>`.
 pub fn PaintOrder::from_array(order : FixedArray[PaintOrderKind]) -> PaintOrder {
   { order, }

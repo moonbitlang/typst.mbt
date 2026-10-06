@@ -25,6 +25,9 @@ pub impl Default for ImageHrefResolver with fn default() {
 }
 
 ///|
+pub extend ImageHrefResolver with Default::{default}
+
+///|
 /// Creates a default
 /// [Data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 /// resolver closure.

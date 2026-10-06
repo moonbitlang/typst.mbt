@@ -25,6 +25,9 @@ pub impl Show for XmlDeError with fn output(self, logger) {
 }
 
 ///|
+pub extend XmlDeError with Show::{to_string, output}
+
+///|
 priv suberror DeErr {
   DeErr(String, String) // message, path
 }

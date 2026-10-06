@@ -28,6 +28,8 @@ pub(all) suberror SvgTypesError {
   InvalidString(Array[String], Int)
   InvalidNumber(Int)
 } derive(Eq, @debug.Debug)
+pub fn SvgTypesError::output(Self, &Logger) -> Unit
+pub fn SvgTypesError::to_string(Self) -> String
 pub impl Show for SvgTypesError
 
 pub(all) suberror TransformOriginError {
@@ -35,12 +37,16 @@ pub(all) suberror TransformOriginError {
   InvalidParameters
   ZIndexIsPercentage
 } derive(Eq, @debug.Debug)
+pub fn TransformOriginError::output(Self, &Logger) -> Unit
+pub fn TransformOriginError::to_string(Self) -> String
 pub impl Show for TransformOriginError
 
 pub(all) suberror ViewBoxError {
   InvalidNumber
   InvalidSize
 } derive(Eq, @debug.Debug)
+pub fn ViewBoxError::output(Self, &Logger) -> Unit
+pub fn ViewBoxError::to_string(Self) -> String
 pub impl Show for ViewBoxError
 
 // Types and methods
@@ -77,6 +83,7 @@ pub(all) struct AspectRatio {
   align : Align
   slice : Bool
 } derive(Eq, Hash, @debug.Debug)
+pub fn AspectRatio::default() -> Self
 pub fn AspectRatio::from_str(String) -> Self raise SvgTypesError
 pub impl Default for AspectRatio
 
@@ -143,6 +150,8 @@ pub(all) enum FontFamily {
   Monospace
   Named(String)
 } derive(Eq, Hash, @debug.Debug)
+pub fn FontFamily::output(Self, &Logger) -> Unit
+pub fn FontFamily::to_string(Self) -> String
 pub impl Show for FontFamily
 
 pub(all) struct FontShorthand {
@@ -165,6 +174,7 @@ pub(all) struct Length {
   number : Double
   unit : LengthUnit
 } derive(Eq, @debug.Debug)
+pub fn Length::default() -> Self
 pub fn Length::from_directional_position(DirectionalPosition) -> Self
 pub fn Length::from_str(String) -> Self raise SvgTypesError
 pub fn Length::new(Double, LengthUnit) -> Self
@@ -218,6 +228,7 @@ pub(all) enum PaintFallback {
 pub(all) struct PaintOrder {
   order : FixedArray[PaintOrderKind]
 } derive(Eq, @debug.Debug)
+pub fn PaintOrder::default() -> Self
 pub fn PaintOrder::from_array(FixedArray[PaintOrderKind]) -> Self
 pub fn PaintOrder::from_str(String) -> Self
 pub impl Default for PaintOrder
@@ -320,6 +331,7 @@ pub(all) struct Transform {
   e : Double
   f : Double
 } derive(Eq, @debug.Debug)
+pub fn Transform::default() -> Self
 pub fn Transform::from_str(String) -> Self raise SvgTypesError
 pub fn Transform::new(Double, Double, Double, Double, Double, Double) -> Self
 pub impl Default for Transform

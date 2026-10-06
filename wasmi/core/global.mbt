@@ -20,6 +20,9 @@ pub impl Show for GlobalError with fn output(self, logger) {
 }
 
 ///|
+pub extend GlobalError with Show::{to_string, output}
+
+///|
 /// The mutability of a global variable.
 pub(all) enum Mutability {
   /// The value of the global variable is a constant.

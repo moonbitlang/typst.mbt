@@ -177,6 +177,9 @@ pub impl Readable for Dict with fn read(r, ctx) {
 }
 
 ///|
+pub extend Dict with Readable::{read}
+
+///|
 pub impl ObjectLike for Dict with fn from_object(o) {
   match o {
     Dict(d) => Some(d)

@@ -32,6 +32,9 @@ pub impl Default for Transform with fn default() {
 }
 
 ///|
+pub extend Transform with Default::{default}
+
+///|
 /// Transform list token.
 pub(all) enum TransformListToken {
   Matrix(

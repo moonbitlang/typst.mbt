@@ -183,6 +183,9 @@ pub impl Show for ToPathError with fn output(self, f) {
 }
 
 ///|
+pub extend ToPathError with Show::{to_string, output}
+
+///|
 /// Runs `f`, returning `None` on error (Rust `.ok()`).
 fn[T] ok(f : () -> T raise) -> T? {
   try f() catch {

@@ -91,6 +91,9 @@ pub impl Default for BlendMode with fn default() {
 }
 
 ///|
+pub extend BlendMode with Default::{default}
+
+///|
 fn BlendMode::is_default(self : BlendMode) -> Bool {
   self.mix == Normal && self.compose == SrcOver
 }

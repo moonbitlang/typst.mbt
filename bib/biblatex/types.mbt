@@ -87,6 +87,9 @@ pub impl Show for TypeErrorKind with fn output(self, logger) {
 }
 
 ///|
+pub extend TypeErrorKind with Show::{to_string, output}
+
+///|
 /// Parse a Roman numeral like `roman_numerals_rs::RomanNumeral::from_str`.
 pub fn parse_roman(s : String) -> Int? {
   if s.is_empty() {

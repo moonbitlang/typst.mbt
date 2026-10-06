@@ -67,6 +67,9 @@ pub impl Show for DateError with fn output(self, logger) {
 }
 
 ///|
+pub extend DateError with Show::{to_string, output}
+
+///|
 /// Parse a date from a string.
 pub fn Date::from_str(source : String) -> Result[Date, DateError] {
   let s = @unscanny.Scanner::new(source)
@@ -203,6 +206,9 @@ pub impl Show for DurationError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend DurationError with Show::{to_string, output}
 
 ///|
 fn Duration::scan(
@@ -362,6 +368,9 @@ pub impl Show for Duration with fn output(self, logger) {
     logger.write_string("," + int_zero_pad(self.milliseconds.to_int64(), 3))
   }
 }
+
+///|
+pub extend Duration with Show::{to_string, output}
 
 ///|
 /// An half-open interval of durations.

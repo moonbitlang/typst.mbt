@@ -35,3 +35,6 @@ pub impl FromReader for ConstExpr with fn from_reader(reader) {
   let reader = reader.skip(r => r.skip_const_expr())
   { reader, }
 }
+
+///|
+pub extend ConstExpr with FromReader::{from_reader}

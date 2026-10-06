@@ -46,6 +46,9 @@ pub impl Show for FontFamily with fn output(self, logger) {
 }
 
 ///|
+pub extend FontFamily with Show::{to_string, output}
+
+///|
 pub fn Stream::parse_font_families(
   self : Stream,
 ) -> Array[FontFamily] raise SvgTypesError {

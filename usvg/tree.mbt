@@ -60,6 +60,9 @@ pub impl Default for Visibility with fn default() {
 }
 
 ///|
+pub extend Visibility with Default::{default}
+
+///|
 /// A shape rendering method.
 ///
 /// `shape-rendering` attribute in the SVG.
@@ -85,6 +88,9 @@ pub impl Default for ShapeRendering with fn default() {
 }
 
 ///|
+pub extend ShapeRendering with Default::{default}
+
+///|
 /// A text rendering method.
 ///
 /// `text-rendering` attribute in the SVG.
@@ -98,6 +104,9 @@ pub(all) enum TextRendering {
 pub impl Default for TextRendering with fn default() {
   OptimizeLegibility
 }
+
+///|
+pub extend TextRendering with Default::{default}
 
 ///|
 /// An image rendering method.
@@ -117,6 +126,9 @@ pub(all) enum ImageRendering {
 pub impl Default for ImageRendering with fn default() {
   OptimizeQuality
 }
+
+///|
+pub extend ImageRendering with Default::{default}
 
 ///|
 /// A blending mode property.
@@ -147,6 +159,9 @@ pub impl Default for BlendMode with fn default() {
 }
 
 ///|
+pub extend BlendMode with Default::{default}
+
+///|
 pub impl Show for BlendMode with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -171,6 +186,9 @@ pub impl Show for BlendMode with fn output(self, logger) {
 }
 
 ///|
+pub extend BlendMode with Show::{to_string, output}
+
+///|
 /// A spread method.
 ///
 /// `spreadMethod` attribute in the SVG.
@@ -184,6 +202,9 @@ pub(all) enum SpreadMethod {
 pub impl Default for SpreadMethod with fn default() {
   Pad
 }
+
+///|
+pub extend SpreadMethod with Default::{default}
 
 ///|
 /// A generic gradient.
@@ -423,6 +444,9 @@ pub impl Default for StrokeMiterlimit with fn default() {
 }
 
 ///|
+pub extend StrokeMiterlimit with Default::{default}
+
+///|
 pub impl Eq for StrokeMiterlimit with fn equal(self, other) {
   approx_eq_ulps(self.0, other.0, 4)
 }
@@ -443,6 +467,9 @@ pub impl Default for LineCap with fn default() {
 }
 
 ///|
+pub extend LineCap with Default::{default}
+
+///|
 /// A line join.
 ///
 /// `stroke-linejoin` attribute in the SVG.
@@ -457,6 +484,9 @@ pub(all) enum LineJoin {
 pub impl Default for LineJoin with fn default() {
   Miter
 }
+
+///|
+pub extend LineJoin with Default::{default}
 
 ///|
 /// A stroke style.
@@ -564,6 +594,9 @@ pub impl Default for FillRule with fn default() {
 }
 
 ///|
+pub extend FillRule with Default::{default}
+
+///|
 priv enum ContextElement {
   /// The current context element is a use node. Since we can get
   /// the bounding box of a use node only once we have converted
@@ -615,6 +648,9 @@ pub impl Default for Fill with fn default() {
     context_element: None,
   }
 }
+
+///|
+pub extend Fill with Default::{default}
 
 ///|
 /// A 8-bit RGB color.
@@ -1110,6 +1146,9 @@ pub(all) enum PaintOrder {
 pub impl Default for PaintOrder with fn default() {
   FillAndStroke
 }
+
+///|
+pub extend PaintOrder with Default::{default}
 
 ///|
 /// A path element.

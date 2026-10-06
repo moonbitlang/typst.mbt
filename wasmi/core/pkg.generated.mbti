@@ -933,6 +933,7 @@ pub(all) suberror FuelError {
 } derive(@debug.Debug)
 pub fn FuelError::fuel_metering_disabled() -> Self
 pub fn FuelError::out_of_fuel(UInt64) -> Self
+pub fn FuelError::output(Self, &Logger) -> Unit
 pub fn FuelError::to_string(Self) -> String
 pub impl Show for FuelError
 
@@ -947,6 +948,7 @@ pub(all) suberror GlobalError {
   ImmutableWrite
   TypeMismatch
 } derive(@debug.Debug)
+pub fn GlobalError::output(Self, &Logger) -> Unit
 pub fn GlobalError::to_string(Self) -> String
 pub impl Show for GlobalError
 
@@ -975,6 +977,7 @@ pub(all) suberror MemoryError {
   OutOfFuel(required_fuel~ : UInt64)
 } derive(@debug.Debug)
 pub fn MemoryError::from_limiter_error(LimiterError) -> Self
+pub fn MemoryError::output(Self, &Logger) -> Unit
 pub fn MemoryError::to_string(Self) -> String
 pub impl Show for MemoryError
 
@@ -995,6 +998,7 @@ pub(all) suberror TableError {
 } derive(@debug.Debug)
 pub fn TableError::from_fuel_error(FuelError) -> Self
 pub fn TableError::from_limiter_error(LimiterError) -> Self
+pub fn TableError::output(Self, &Logger) -> Unit
 pub fn TableError::to_string(Self) -> String
 pub impl Show for TableError
 

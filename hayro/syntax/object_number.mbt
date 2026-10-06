@@ -124,6 +124,9 @@ pub impl Readable for Number with fn read(r, _) {
 }
 
 ///|
+pub extend Number with Readable::{read}
+
+///|
 fn read_number_inner(r : Reader) -> Number? {
   guard r.peek_byte() is Some(peeked) else { return None }
   let negative = match peeked {

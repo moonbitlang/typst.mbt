@@ -91,6 +91,9 @@ pub impl Show for InstantiationError with fn output(self, f) {
 }
 
 ///|
+pub extend InstantiationError with Show::{to_string, output}
+
+///|
 /// Instantiates a new [`Instance`] from the given compiled [`Module`].
 ///
 /// Uses the given `context` to store the instance data to.

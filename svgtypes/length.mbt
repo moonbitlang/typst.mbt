@@ -50,6 +50,9 @@ pub impl Default for Length with fn default() {
 }
 
 ///|
+pub extend Length with Default::{default}
+
+///|
 pub fn Length::from_str(text : String) -> Length raise SvgTypesError {
   let s = Stream::from(text)
   let l = s.parse_length()

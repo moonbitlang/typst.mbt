@@ -189,6 +189,9 @@ pub impl Default for RawFaceTables with fn default() {
 }
 
 ///|
+pub extend RawFaceTables with Default::{default}
+
+///|
 /// Parsed face tables.
 ///
 /// Unlike `Face`, provides a low-level parsing abstraction over TrueType tables.

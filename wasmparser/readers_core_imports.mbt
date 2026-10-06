@@ -50,3 +50,6 @@ pub impl FromReader for TypeRef with fn from_reader(reader) {
     Tag => Tag(TagType::from_reader(reader))
   }
 }
+
+///|
+pub extend TypeRef with FromReader::{from_reader}

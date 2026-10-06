@@ -37,6 +37,9 @@ pub impl Default for FontResolver with fn default() {
 }
 
 ///|
+pub extend FontResolver with Default::{default}
+
+///|
 /// Creates a default font selection resolver.
 ///
 /// The default implementation forwards to `query` on the font database

@@ -109,6 +109,9 @@ pub impl Show for EnforcedLimitsError with fn output(self, f) {
 }
 
 ///|
+pub extend EnforcedLimitsError with Show::{to_string, output}
+
+///|
 /// The required minimum average number of bytes per function.
 pub(all) struct AvgBytesPerFunctionLimit {
   req_funcs_bytes : UInt

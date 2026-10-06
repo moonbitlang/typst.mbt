@@ -137,6 +137,9 @@ pub impl Show for WasmiError with fn output(self, f) {
 }
 
 ///|
+pub extend WasmiError with Show::{to_string, output}
+
+///|
 /// Upstream `WasmiError::to_string()` (the `Display` text).
 pub fn WasmiError::message(self : WasmiError) -> String {
   let buf = StringBuilder()
@@ -160,6 +163,9 @@ pub impl Show for ReadError with fn output(self, f) {
     UnknownError => f.write_string("encountered unknown error")
   }
 }
+
+///|
+pub extend ReadError with Show::{to_string, output}
 
 ///|
 /// Errors that can occur upon type checking function signatures (func/error.rs).
@@ -190,3 +196,6 @@ pub impl Show for FuncError with fn output(self, f) {
       f.write_string("encountered an incorrect number of results")
   }
 }
+
+///|
+pub extend FuncError with Show::{to_string, output}
