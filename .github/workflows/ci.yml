@@ -239,9 +239,7 @@ jobs:
           rustc --version
           rustc -O scripts/ci/probe.rs -o probe
           ./probe
-          rustc --edition 2024 -O scripts/ci/probe2.rs -o probe2
-          ./probe2
-          (cd oracle && rustc --version && rustc --edition 2024 -O ../scripts/ci/probe2.rs -o ../probe2-pinned && ../probe2-pinned) || true
+          scripts/ci/probe3.sh
 
   # The one check to require in the branch protection of `main`.
   required:
