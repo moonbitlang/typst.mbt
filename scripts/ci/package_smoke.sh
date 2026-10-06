@@ -5,6 +5,7 @@
 #
 # Packages the module like the publish workflow (`moon package`), unpacks
 # the zip and builds and runs a tiny consumer of `moonbitlang/typst/doc`
+# (and of `doc/kit`, a package of its own on top of it)
 # that depends on the unpacked package: only what is in the zip is there,
 # and moon does not run the `pre-build` steps of a dependency, so a package
 # without the generated font data fails here like 0.1.0-0.1.2 did for their
@@ -47,6 +48,7 @@ cat > "$work/consumer/cmd/moon.pkg.json" <<'EOF'
   "is-main": true,
   "import": [
     "moonbitlang/typst/doc",
+    "moonbitlang/typst/doc/kit",
     "moonbitlang/typst/doc/system"
   ]
 }
@@ -60,6 +62,7 @@ fn report() -> @doc.Document {
     @doc.Heading("Build times"),
     @doc.Prose("Plain text with \{@doc.Emph("emphasis")} and \{@doc.Raw("code")}."),
     @doc.Equation("sum_(k=1)^n k = (n(n+1))/2", block=true),
+    @kit.Cards(["native", "wasm-gc"], gutter=[Pt(6)], fill=Luma(235)),
   ])
 }
 
