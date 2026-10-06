@@ -223,24 +223,6 @@ jobs:
             _build/edsl-convert-*.log
           retention-days: 14
 
-  # TEMP (platform probe on the draft PR, not for main).
-  probe-rust:
-    name: TEMP probe (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-15, macos-26, ubuntu-latest]
-    steps:
-      - uses: actions/checkout@v5
-      - run: |
-          sw_vers 2> /dev/null || uname -a
-          rustc --version
-          rustc -O scripts/ci/probe.rs -o probe
-          ./probe
-          scripts/ci/probe3.sh
-
   # The one check to require in the branch protection of `main`.
   required:
     if: always()

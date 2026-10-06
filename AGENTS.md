@@ -446,30 +446,43 @@
   program), `stages` (every differential stage with the release runner,
   `scripts/ci/stages.py`) and `package as a dependency`
   (`scripts/ci/package_smoke.sh`: a consumer of `moonbitlang/typst/doc`
-  built against the unpacked `moon package` zip on native and wasm-gc);
-  nightly also the EDSL conversion sweep. The goldens are not stored
-  anywhere: the `goldens` job regenerates them on aarch64 macOS
-  (`scripts/ci/goldens.sh`: upstream checkout, oracle build, every
-  `scripts/goldens.sh` stage plus `wasm-spec` and `wasm-validate`; about
-  12 minutes) unless they are cached under `scripts/ci/goldens_key.sh`'s
-  hash of what determines them (`UPSTREAM_REV`, `oracle/**`, the golden
-  scripts, `tests/wasm`); the regenerated `usvg/oracle_test.mbt` and
-  `resvg/oracle_test.mbt` must be the committed ones
-  (`scripts/ci/goldens_verify.sh`). `scripts/ci/data.sh` fetches the other
-  test inputs without Rust (shallow upstream checkout, the oracle's locked
-  revisions of typst-dev-assets, typst-assets and hayro in cargo's checkout
-  layout, the `target/hayro`/`target/devassets` links, the CMap bundle).
-  The runner always exits with 0, so the verdict is `stages.py`'s: per
-  stage the number of cases and of skipped cases of `scripts/ci/stages.tsv`
-  (update it when the suite changes: `UPSTREAM_REV`, new twins, new wasm
-  tests), no failures besides `scripts/ci/known_failures/<stage>.txt` (the
-  replay stages), and the byte-identical counts. Run it locally after a
-  release build of the runner: `scripts/ci/stages.py [stage ...]` (logs and
-  per-case diffs of failures in `_build/ci/stages`). Platforms: aarch64
-  macOS (`macos-26`) is the reference, where everything must pass; unit
-  tests and stages also run on x86_64 Linux, where the tests that are
-  bit-exact only on the reference platform are listed in
-  `scripts/ci/known_failures/*.linux-x86_64.txt` (default NaN sign, the C
-  library's sin/cos): a new test of that kind goes on the list, a listed
-  one that passes must be removed. Apple's libm also changes between
-  macOS versions (`cosf` in a hayro PostScript oracle differs on macOS 15).
+  built against the unpacked `moon package` zip on native and wasm-gc); on
+  pushes to `main` and nightly also the EDSL conversion sweep (half an
+  hour). The goldens are not stored anywhere: the `goldens` job regenerates
+  them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream checkout, oracle
+  build, every `scripts/goldens.sh` stage plus `wasm-spec` and
+  `wasm-validate`; about 12 minutes) unless they are cached under
+  `scripts/ci/goldens_key.sh`'s hash of what determines them
+  (`UPSTREAM_REV`, `oracle/**`, the golden scripts, `tests/wasm`); the
+  regenerated `usvg/oracle_test.mbt` and `resvg/oracle_test.mbt` must be the
+  committed ones (`scripts/ci/goldens_verify.sh`). `scripts/ci/data.sh`
+  fetches the other test inputs without Rust (shallow upstream checkout, the
+  oracle's locked revisions of typst-dev-assets, typst-assets and hayro in
+  cargo's checkout layout, the `target/hayro`/`target/devassets` links, the
+  CMap bundle). The runner always exits with 0, so the verdict is
+  `stages.py`'s: per stage the number of cases and of skipped cases of
+  `scripts/ci/stages.tsv` (update it when the suite changes: `UPSTREAM_REV`,
+  new twins, new wasm tests), no failures besides
+  `scripts/ci/known_failures/<stage>.txt` (the replay stages), and the
+  byte-identical counts. Run it locally after a release build of the
+  runner: `scripts/ci/stages.py [stage ...]` (logs and per-case diffs of
+  failures in `_build/ci/stages`).
+- Platforms in CI: aarch64 macOS (`macos-26`) is the reference, where
+  everything must pass. Unit tests and stages also run on x86_64 Linux
+  against the same expectations; what fails there is listed with its cause
+  in `scripts/ci/known_failures/*.linux-x86_64.txt` (a new test of that
+  kind goes on the list after checking what the Rust crate gives on Linux;
+  a listed one that passes must be removed). The causes, from running the
+  Rust oracles on x86_64 Linux: (1) upstream itself differs there and the
+  port follows the platform: the default NaN of x86 has its sign bit set
+  (`0.0 / 0.0`, `sqrt`/`ln` of negatives), and Rust's float methods call
+  the C library (glibc and Apple's libm differ in the last place for
+  `sin`/`cos`/`tan`/`sinf`/`cosf`; Apple's also between macOS versions:
+  `cosf` in a hayro PostScript oracle differs on macOS 15); (2) upstream
+  differs there but the port gives the aarch64 result everywhere, so it
+  passes on Linux although the real crates would not: SIMD paths (hayro's
+  renderer in 121 of 784 oracle renderings and two `render` cases),
+  wasmi's NaN bits, `min`/`max` of signed zeros in tiny-skia-path; (3) the
+  port differs although upstream does not: `cbrt`, which Rust's std takes
+  from its own `libm` on Linux, not from glibc as `kurbo/libm_native.mbt`
+  does (`paged` `link-show`, 79 cases of the kurbo oracle).

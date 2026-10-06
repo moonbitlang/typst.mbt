@@ -19,7 +19,7 @@ rm -rf "$work" _build/publish
 mkdir -p "$work/consumer/cmd"
 
 # The pre-build step generates the font data on the first build or check.
-moon check --target native
+moon check --target native > "$work/check.log" 2>&1 || { tail -60 "$work/check.log"; exit 1; }
 moon package
 zips=(_build/publish/*.zip)
 [ ${#zips[@]} -eq 1 ] || { echo "package_smoke: expected one zip, got: ${zips[*]}" >&2; exit 1; }

@@ -28,7 +28,9 @@ hayro/render/oracle_test.mbt ("hayro::render matches the oracle")
 hayro/interpret/function/oracle_wbtest.mbt ("functions of test pdfs match hayro-interpret")
 hayro/svg/oracle_test.mbt ("hayro-svg matches the oracle")
 #
-# 2. As 1 for 590 of the 669 failing cases (of 3340); in the other 79
-#    (`solve_cubic` 58, `nearest` 21) kurbo gives the same result on both
-#    platforms and only the port differs on Linux: see paged.linux-x86_64.txt.
+# 2. Mostly as 1 (sin/cos/atan2/hypot of the C library: against expectations
+#    regenerated on Linux 3261 of the 3340 cases pass, against the committed
+#    ones 2671). In the other 79 (`solve_cubic` 58, `nearest` 21) only the
+#    port differs: its `cbrt` is glibc's, Rust's is not (see
+#    paged.linux-x86_64.txt).
 kurbo/stroke_oracle_test.mbt ("kurbo stroke oracle")
