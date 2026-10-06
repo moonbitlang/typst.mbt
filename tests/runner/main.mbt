@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images|resvg|edsl> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images|resvg|edsl|packages> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -212,6 +212,9 @@ fn main {
     // The WebAssembly spec test suite replayed with the wasmi port (see
     // `wasm_spec_stage.mbt`).
     "wasm-spec" => run_wasm_spec_stage(filter, verbose)
+    // Documents that use real packages (see `packages_stage.mbt`): frames
+    // and SVG like `paged` and `svg`.
+    "packages" => run_packages_stage(filter, verbose, args.contains("--times"))
     // The twins of the EDSL (`doc/twins`) against their Typst sources (see
     // `edsl_stage.mbt`).
     "edsl" => run_edsl_stage(filter, verbose)

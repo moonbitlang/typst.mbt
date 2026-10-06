@@ -84,8 +84,13 @@ impl @library.World for TestWorld with fn font(_self, index) {
 
 ///|
 impl @library.World for TestWorld with fn today(_self, offset) {
-  // Like upstream's test world: `typst_kit::datetime::Time::fixed` at
-  // 1970-01-01 12:00:00 UTC, shifted by the offset.
+  test_today(offset)
+}
+
+///|
+/// The date of upstream's test world: `typst_kit::datetime::Time::fixed` at
+/// 1970-01-01 12:00:00 UTC, shifted by the offset.
+fn test_today(offset : @library.Duration?) -> @library.Datetime? {
   let now = 12L * 3600L
   let with_offset = match offset {
     None => now
@@ -136,10 +141,16 @@ fn civil_from_days(days : Int64) -> (Int, Int, Int) {
 priv struct FileStore {
   files : Map[@syntax.FileId, Result[Bytes, @library.FileError]]
   sources : Map[@syntax.FileId, Result[@syntax.Source, @library.FileError]]
+  /// The loader (upstream `FileLoader::load`).
+  load : (@syntax.FileId) -> Bytes raise @library.FileError
 }
 
 ///|
-let file_store : FileStore = { files: Map([]), sources: Map([]), }
+let file_store : FileStore = {
+  files: Map([]),
+  sources: Map([]),
+  load: test_files_load,
+}
 
 ///|
 fn FileStore::file(
@@ -149,7 +160,7 @@ fn FileStore::file(
   let result = match self.files.get(id) {
     Some(result) => result
     None => {
-      let result = try test_files_load(id) catch {
+      let result = try (self.load)(id) catch {
         e => Err(e)
       } noraise {
         bytes => Ok(bytes)
@@ -572,6 +583,17 @@ fn write_source_diag(
   main : @syntax.FileId,
   diag : @library.SourceDiagnostic,
 ) -> Unit {
+  write_world_diag(out, world as &@library.World, main, diag)
+}
+
+///|
+/// [write_source_diag] in any world.
+fn write_world_diag(
+  out : StringBuilder,
+  world : &@library.World,
+  main : @syntax.FileId,
+  diag : @library.SourceDiagnostic,
+) -> Unit {
   let severity = match diag.severity {
     Error => "error"
     Warning => "warning"
@@ -588,16 +610,14 @@ fn write_source_diag(
 
 ///|
 fn locate(
-  world : TestWorld,
+  world : &@library.World,
   main : @syntax.FileId,
   span : @syntax.DiagSpan,
 ) -> String {
   let (id, start, end) = match span.get() {
     Detached => return "-"
     Number(id~, num~, sub_range~) => {
-      let source = (world as &@library.World).source(id) catch {
-        _ => return "?"
-      }
+      let source = world.source(id) catch { _ => return "?" }
       match source.range(num, sub_range) {
         Some((s, e)) => (id, s, e)
         None => return "?"
