@@ -252,6 +252,9 @@ pub impl Reflect for SmartQuoteSet with fn castable(v) {
 }
 
 ///|
+pub extend SmartQuoteSet with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for SmartQuoteSet with fn into_value(self) {
   Array(Arr::from_array([Str(self.open), Str(self.close)]))
 }
@@ -270,6 +273,9 @@ pub impl FromValue for SmartQuoteSet with fn from_value(v) {
     v => raise HintedError(SmartQuoteSet::input().error(v))
   }
 }
+
+///|
+pub extend SmartQuoteSet with FromValue::{from_value}
 
 ///|
 fn str_to_set(value : String) -> (String, String) raise HintedError {
@@ -320,6 +326,9 @@ pub impl Reflect for SmartQuoteDict with fn castable(v) {
 }
 
 ///|
+pub extend SmartQuoteDict with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for SmartQuoteDict with fn into_value(self) {
   Dict(
     Dict::from_pairs([
@@ -328,6 +337,9 @@ pub impl IntoValue for SmartQuoteDict with fn into_value(self) {
     ]),
   )
 }
+
+///|
+pub extend SmartQuoteDict with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for SmartQuoteDict with fn from_value(v) {
@@ -349,6 +361,9 @@ pub impl FromValue for SmartQuoteDict with fn from_value(v) {
     v => raise HintedError(SmartQuoteDict::input().error(v))
   }
 }
+
+///|
+pub extend SmartQuoteDict with FromValue::{from_value}
 
 ///|
 /// Custom capabilities of `SmartQuoteElem` (upstream `impl PlainText for

@@ -43,6 +43,9 @@ pub impl Show for FileError with fn output(self, logger) {
 }
 
 ///|
+pub extend FileError with Show::{to_string, output}
+
+///|
 /// An error that occurred while trying to load a package (upstream
 /// `diag::PackageError`).
 ///
@@ -77,6 +80,9 @@ pub impl Show for PackageError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend PackageError with Show::{to_string, output}
 
 ///|
 /// The environment in which typesetting occurs.

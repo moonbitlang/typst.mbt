@@ -46,6 +46,9 @@ pub impl Reflect for FracStyle with fn castable(v) {
 }
 
 ///|
+pub extend FracStyle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FracStyle with fn into_value(self) {
   match self {
     Vertical => Str("vertical")
@@ -53,6 +56,9 @@ pub impl IntoValue for FracStyle with fn into_value(self) {
     Horizontal => Str("horizontal")
   }
 }
+
+///|
+pub extend FracStyle with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FracStyle with fn from_value(v) {

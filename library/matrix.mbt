@@ -122,12 +122,18 @@ pub impl Reflect for MathDelimiter with fn castable(v) {
 }
 
 ///|
+pub extend MathDelimiter with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for MathDelimiter with fn into_value(self) {
   match self.0 {
     Some(c) => Str(c.to_string())
     None => None
   }
 }
+
+///|
+pub extend MathDelimiter with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for MathDelimiter with fn from_value(v) {
@@ -190,9 +196,15 @@ pub impl Reflect for DelimiterPair with fn castable(v) {
 }
 
 ///|
+pub extend DelimiterPair with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DelimiterPair with fn into_value(self) {
   Array(Arr::from_array([self.open.into_value(), self.close.into_value()]))
 }
+
+///|
+pub extend DelimiterPair with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for DelimiterPair with fn from_value(v) {
@@ -253,6 +265,9 @@ pub impl Reflect for Augment with fn output() {
 pub impl Reflect for Augment with fn castable(v) {
   v is Int(_) || v is Dict(_)
 }
+
+///|
+pub extend Augment with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Augment with fn into_value(self) {
@@ -327,6 +342,9 @@ pub impl FromValue for Augment with fn from_value(v) {
 }
 
 ///|
+pub extend Augment with FromValue::{from_value}
+
+///|
 /// The offsets at which augmentation lines should be drawn on a matrix.
 pub(all) struct AugmentOffsets(Array[Int64]) derive(Eq, Hash, Debug)
 
@@ -346,9 +364,15 @@ pub impl Reflect for AugmentOffsets with fn castable(v) {
 }
 
 ///|
+pub extend AugmentOffsets with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for AugmentOffsets with fn into_value(self) {
   Array(Arr::from_array(self.0.map(v => Int(v))))
 }
+
+///|
+pub extend AugmentOffsets with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for AugmentOffsets with fn from_value(v) {

@@ -135,6 +135,9 @@ pub impl Show for FilesError with fn output(self, logger) {
 }
 
 ///|
+pub extend FilesError with Show::{to_string, output}
+
+///|
 /// A minimal interface for accessing source files when rendering
 /// diagnostics (`codespan_reporting::files::Files`).
 pub(open) trait Files {

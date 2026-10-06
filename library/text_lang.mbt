@@ -127,6 +127,9 @@ pub impl IntoValue for Lang with fn into_value(self) {
 }
 
 ///|
+pub extend Lang with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Lang with fn from_value(v) {
   let string : String = (FromValue::from_value(v) : String)
   Lang::from_str(string) catch {
@@ -157,6 +160,9 @@ pub impl FromValue for Lang with fn from_value(v) {
     }
   }
 }
+
+///|
+pub extend Lang with FromValue::{from_value}
 
 ///|
 /// An identifier for a region somewhere in the world: an ISO 3166-1 alpha-2
@@ -203,6 +209,9 @@ pub impl IntoValue for Region with fn into_value(self) {
 pub impl FromValue for Region with fn from_value(v) {
   Region::from_str((FromValue::from_value(v) : String))
 }
+
+///|
+pub extend Region with FromValue::{from_value}
 
 ///|
 /// An ISO 15924-type script identifier, stored lowercased.
@@ -266,6 +275,9 @@ pub fn Locale::new(lang : Lang, region : Region?) -> Locale {
 pub impl Default for Locale with fn default() {
   Locale::new(lang_english, None)
 }
+
+///|
+pub extend Locale with Default::{default}
 
 ///|
 pub fn Locale::get_in(styles : StyleChain) -> Locale {

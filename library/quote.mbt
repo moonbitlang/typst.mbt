@@ -24,6 +24,9 @@ pub impl Reflect for Attribution with fn castable(v) {
 }
 
 ///|
+pub extend Attribution with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Attribution with fn into_value(self) {
   match self {
     Content(content) => Content(content)

@@ -67,6 +67,8 @@ pub(all) suberror PathError {
   Escapes
   Backslash
 } derive(Eq, Hash, @debug.Debug)
+pub fn PathError::output(Self, &Logger) -> Unit
+pub fn PathError::to_string(Self) -> String
 pub impl Show for PathError
 
 pub(all) suberror RealizeError {
@@ -79,6 +81,8 @@ pub(all) suberror VirtualizeError {
   Invalid(String)
   Utf8
 } derive(Eq, Hash, @debug.Debug)
+pub fn VirtualizeError::output(Self, &Logger) -> Unit
+pub fn VirtualizeError::to_string(Self) -> String
 pub impl Show for VirtualizeError
 
 // Types and methods
@@ -249,6 +253,8 @@ pub(all) struct PackageSpec {
   version : PackageVersion
 } derive(Eq, Hash)
 pub fn PackageSpec::from_str(String) -> Result[Self, String]
+pub fn PackageSpec::output(Self, &Logger) -> Unit
+pub fn PackageSpec::to_string(Self) -> String
 pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
 pub impl Show for PackageSpec
 pub impl @debug.Debug for PackageSpec
@@ -265,6 +271,8 @@ pub fn PackageVersion::matches_ge(Self, VersionBound) -> Bool
 pub fn PackageVersion::matches_gt(Self, VersionBound) -> Bool
 pub fn PackageVersion::matches_le(Self, VersionBound) -> Bool
 pub fn PackageVersion::matches_lt(Self, VersionBound) -> Bool
+pub fn PackageVersion::output(Self, &Logger) -> Unit
+pub fn PackageVersion::to_string(Self) -> String
 pub impl Show for PackageVersion
 pub impl @debug.Debug for PackageVersion
 
@@ -274,7 +282,9 @@ pub struct RootedPath {
 pub fn RootedPath::intern(Self) -> FileId
 pub fn RootedPath::map(Self, (VirtualPath) -> VirtualPath) -> Self
 pub fn RootedPath::new(VirtualRoot, VirtualPath) -> Self
+pub fn RootedPath::output(Self, &Logger) -> Unit
 pub fn RootedPath::root(Self) -> VirtualRoot
+pub fn RootedPath::to_string(Self) -> String
 pub fn RootedPath::vpath(Self) -> VirtualPath
 pub impl Show for RootedPath
 pub impl @debug.Debug for RootedPath
@@ -559,6 +569,8 @@ pub(all) struct VersionBound {
   patch : UInt?
 } derive(Compare, Eq, Hash)
 pub fn VersionBound::from_str(String) -> Result[Self, String]
+pub fn VersionBound::output(Self, &Logger) -> Unit
+pub fn VersionBound::to_string(Self) -> String
 pub impl Show for VersionBound
 pub impl @debug.Debug for VersionBound
 
@@ -568,6 +580,8 @@ pub(all) struct VersionlessPackageSpec {
 } derive(Eq, Hash)
 pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
 pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
+pub fn VersionlessPackageSpec::output(Self, &Logger) -> Unit
+pub fn VersionlessPackageSpec::to_string(Self) -> String
 pub impl Show for VersionlessPackageSpec
 pub impl @debug.Debug for VersionlessPackageSpec
 
@@ -583,9 +597,11 @@ pub fn VirtualPath::into_with_slash(Self) -> String
 pub fn VirtualPath::is_root(Self) -> Bool
 pub fn VirtualPath::join(Self, String) -> Self raise PathError
 pub fn VirtualPath::new(String) -> Self raise PathError
+pub fn VirtualPath::output(Self, &Logger) -> Unit
 pub fn VirtualPath::parent(Self) -> Self?
 pub fn VirtualPath::realize(Self, String) -> String raise RealizeError
 pub fn VirtualPath::relative_from(Self, Self) -> String
+pub fn VirtualPath::to_string(Self) -> String
 pub fn VirtualPath::virtualize(String, String) -> Self raise VirtualizeError
 pub fn VirtualPath::with_extension(Self, String) -> Self
 pub impl Show for VirtualPath

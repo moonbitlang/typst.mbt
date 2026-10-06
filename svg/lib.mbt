@@ -18,6 +18,9 @@ pub(all) struct SvgOptions {
 } derive(Eq, Default)
 
 ///|
+pub extend SvgOptions with Default::{default}
+
+///|
 /// Resolved settings for SVG export (upstream `SvgOptions<Complete>`).
 pub(all) struct CompleteSvgOptions {
   render_bleed : Bool

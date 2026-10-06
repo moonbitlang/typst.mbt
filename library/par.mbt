@@ -20,6 +20,9 @@ pub impl Default for JustificationLimits with fn default() {
 }
 
 ///|
+pub extend JustificationLimits with Default::{default}
+
+///|
 pub impl Reflect for JustificationLimits with fn input() {
   Type(Type::dict())
 }
@@ -35,6 +38,9 @@ pub impl Reflect for JustificationLimits with fn castable(v) {
 }
 
 ///|
+pub extend JustificationLimits with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for JustificationLimits with fn into_value(self) {
   let dict = Dict::new()
   if self.spacing is Some(spacing) {
@@ -45,6 +51,9 @@ pub impl IntoValue for JustificationLimits with fn into_value(self) {
   }
   Dict(dict)
 }
+
+///|
+pub extend JustificationLimits with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for JustificationLimits with fn from_value(v) {
@@ -141,6 +150,9 @@ pub impl[T : IntoValue] IntoValue for Limits[T] with fn into_value(self) {
     ]),
   )
 }
+
+///|
+pub extend Limits with IntoValue::{into_value}
 
 ///|
 pub impl[T] Fold for Limits[T] with fn fold(self, _) {
@@ -268,6 +280,9 @@ pub impl Reflect for Linebreaks with fn castable(v) {
 }
 
 ///|
+pub extend Linebreaks with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Linebreaks with fn into_value(self) {
   match self {
     Simple => Str("simple")
@@ -299,6 +314,9 @@ pub(all) struct FirstLineIndent {
 pub impl Default for FirstLineIndent with fn default() {
   { amount: Some(Length::zero()), all: Some(false), }
 }
+
+///|
+pub extend FirstLineIndent with Default::{default}
 
 ///|
 pub fn FirstLineIndent::amount(self : FirstLineIndent) -> Length {
@@ -334,6 +352,9 @@ pub impl Reflect for FirstLineIndent with fn castable(v) {
 }
 
 ///|
+pub extend FirstLineIndent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FirstLineIndent with fn into_value(self) {
   let dict = Dict::new()
   if self.amount is Some(amount) {
@@ -344,6 +365,9 @@ pub impl IntoValue for FirstLineIndent with fn into_value(self) {
   }
   Dict(dict)
 }
+
+///|
+pub extend FirstLineIndent with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FirstLineIndent with fn from_value(v) {
@@ -418,12 +442,18 @@ pub impl Reflect for LineNumberingScope with fn castable(v) {
 }
 
 ///|
+pub extend LineNumberingScope with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for LineNumberingScope with fn into_value(self) {
   match self {
     Document => Str("document")
     Page => Str("page")
   }
 }
+
+///|
+pub extend LineNumberingScope with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for LineNumberingScope with fn from_value(v) {

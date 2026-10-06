@@ -19,6 +19,9 @@ pub(all) struct U128 {
 } derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
+pub extend U128 with Default::{default}
+
+///|
 /// Create a 128-bit integer from a 64-bit one.
 pub fn U128::from_u64(lo : UInt64) -> U128 {
   { hi: 0, lo, }

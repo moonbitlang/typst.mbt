@@ -866,6 +866,9 @@ pub impl Reflect for ToArray with fn castable(v) {
 }
 
 ///|
+pub extend ToArray with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToArray with fn from_value(v) {
   match v {
     Array(v) => ToArray(v)

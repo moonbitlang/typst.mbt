@@ -145,6 +145,9 @@ pub impl Default for Alignment with fn default() {
 }
 
 ///|
+pub extend Alignment with Default::{default}
+
+///|
 /// Sum two alignments (upstream `Add for Alignment`).
 pub fn Alignment::add(
   self : Alignment,
@@ -191,6 +194,9 @@ pub impl Fold for Alignment with fn fold(self, outer) {
 }
 
 ///|
+pub extend Alignment with Fold::{fold}
+
+///|
 /// Upstream `From<Side> for Alignment`.
 pub fn Alignment::from_side(side : Side) -> Alignment {
   match side {
@@ -220,6 +226,9 @@ pub impl Reflect for Alignment with fn castable(value) {
 pub impl IntoValue for Alignment with fn into_value(self) {
   Dyn(Alignment(self))
 }
+
+///|
+pub extend Alignment with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Alignment with fn from_value(value) {
@@ -310,6 +319,9 @@ pub impl Reflect for HAlignment with fn castable(value) {
 pub impl IntoValue for HAlignment with fn into_value(self) {
   Dyn(Alignment(H(self)))
 }
+
+///|
+pub extend HAlignment with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for HAlignment with fn from_value(value) {
@@ -480,9 +492,15 @@ pub impl Reflect for VAlignment with fn castable(value) {
 }
 
 ///|
+pub extend VAlignment with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for VAlignment with fn into_value(self) {
   Dyn(Alignment(V(self)))
 }
+
+///|
+pub extend VAlignment with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for VAlignment with fn from_value(value) {
@@ -702,6 +720,9 @@ pub(all) enum FixedAlignment {
   Center
   End
 } derive(Eq, Compare, Hash, Debug)
+
+///|
+pub extend FixedAlignment with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Returns the position of this alignment in a container with the given

@@ -1298,6 +1298,9 @@ pub impl Default for StretchInfo with fn default() {
 }
 
 ///|
+pub extend StretchInfo with Default::{default}
+
+///|
 /// Combines two stretch infos (upstream `MulAssign for StretchInfo`).
 pub fn StretchInfo::mul(self : StretchInfo, rhs : StretchInfo) -> StretchInfo {
   let target = match self.buffer {

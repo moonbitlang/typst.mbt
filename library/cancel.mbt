@@ -41,6 +41,9 @@ pub impl Reflect for CancelAngle with fn castable(v) {
 }
 
 ///|
+pub extend CancelAngle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CancelAngle with fn into_value(self) {
   match self {
     Angle(v) => IntoValue::into_value(v)

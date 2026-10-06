@@ -631,6 +631,9 @@ pub impl Reflect for Counter with fn castable(v) {
 }
 
 ///|
+pub extend Counter with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Counter with fn into_value(self) {
   Dyn(Counter(self))
 }
@@ -696,6 +699,9 @@ pub impl Reflect for CounterKey with fn castable(v) {
 }
 
 ///|
+pub extend CounterKey with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CounterKey with fn into_value(self) {
   match self {
     Page => page_elem().into_value()
@@ -703,6 +709,9 @@ pub impl IntoValue for CounterKey with fn into_value(self) {
     Str(v) => Str(v)
   }
 }
+
+///|
+pub extend CounterKey with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for CounterKey with fn from_value(v) {
@@ -779,11 +788,17 @@ pub impl Reflect for CounterUpdate with fn castable(v) {
 }
 
 ///|
+pub extend CounterUpdate with Reflect::{output, input, castable}
+
+///|
 /// Counter updates are stored as dynamic values in the (internal) `update`
 /// field of `counter.update` elements.
 pub impl IntoValue for CounterUpdate with fn into_value(self) {
   Dyn(CounterUpdate(self))
 }
+
+///|
+pub extend CounterUpdate with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for CounterUpdate with fn from_value(v) {
@@ -904,6 +919,9 @@ pub impl Reflect for CounterState with fn castable(v) {
 }
 
 ///|
+pub extend CounterState with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CounterState with fn into_value(self) {
   Array(Arr::from_array(self.0.map(n => Int(n))))
 }
@@ -919,6 +937,9 @@ pub impl FromValue for CounterState with fn from_value(v) {
   }
   raise HintedError(CounterState::input().error(v))
 }
+
+///|
+pub extend CounterState with FromValue::{from_value}
 
 ///|
 /// Custom behavior of `counter.update`, `counter.display` (internal) and

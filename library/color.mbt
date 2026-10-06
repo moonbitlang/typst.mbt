@@ -1530,6 +1530,9 @@ pub impl Hash for ProcessColor with fn hash_combine(self, hasher) {
 }
 
 ///|
+pub extend ProcessColor with Hash::{hash, hash_combine}
+
+///|
 /// Constructs a new color from hex strings like the following:
 /// - `#aef` (shorthand, with leading hash),
 /// - `7a03c2` (without alpha),
@@ -1731,6 +1734,9 @@ pub impl Hash for SpotColorant with fn hash_combine(self, hasher) {
 }
 
 ///|
+pub extend SpotColorant with Hash::{hash, hash_combine}
+
+///|
 fn repr_opt_spot_name(name : SpotColorantName?) -> String {
   match name {
     None => "none"
@@ -1907,6 +1913,9 @@ pub impl Reflect for Color with fn castable(v) {
 }
 
 ///|
+pub extend Color with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Color with fn into_value(self) {
   Color(self)
 }
@@ -1918,6 +1927,9 @@ pub impl FromValue for Color with fn from_value(v) {
     v => raise HintedError(Color::input().error(v))
   }
 }
+
+///|
+pub extend Color with FromValue::{from_value}
 
 ///|
 pub impl Reflect for ProcessColor with fn input() {
@@ -1933,6 +1945,9 @@ pub impl Reflect for ProcessColor with fn output() {
 pub impl Reflect for ProcessColor with fn castable(v) {
   Color::castable(v)
 }
+
+///|
+pub extend ProcessColor with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for ProcessColor with fn into_value(self) {
@@ -1966,9 +1981,15 @@ pub impl Reflect for SpotColorant with fn castable(v) {
 }
 
 ///|
+pub extend SpotColorant with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for SpotColorant with fn into_value(self) {
   Dyn(SpotColorant(self))
 }
+
+///|
+pub extend SpotColorant with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for SpotColorant with fn from_value(v) {
@@ -1977,6 +1998,9 @@ pub impl FromValue for SpotColorant with fn from_value(v) {
     v => raise HintedError(SpotColorant::input().error(v))
   }
 }
+
+///|
+pub extend SpotColorant with FromValue::{from_value}
 
 ///|
 pub impl Reflect for SpotColorantName with fn input() {
@@ -1995,6 +2019,9 @@ pub impl Reflect for SpotColorantName with fn output() {
 pub impl Reflect for SpotColorantName with fn castable(v) {
   v is (Str(_) | Symbol(_))
 }
+
+///|
+pub extend SpotColorantName with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for SpotColorantName with fn into_value(self) {
@@ -2030,12 +2057,18 @@ pub impl Reflect for ColorSpace with fn castable(_) {
 }
 
 ///|
+pub extend ColorSpace with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ColorSpace with fn into_value(self) {
   match self {
     Process(s) => s.variant_constructor()
     Spot(s) => s.into_value()
   }
 }
+
+///|
+pub extend ColorSpace with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ColorSpace with fn from_value(v) {
@@ -2102,6 +2135,9 @@ pub impl Reflect for WeightedColor with fn castable(v) {
 }
 
 ///|
+pub extend WeightedColor with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for WeightedColor with fn into_value(self) {
   Array(Arr::from_array([Color(self.color), Float(self.weight)]))
 }
@@ -2157,6 +2193,9 @@ pub impl Reflect for RatioComponent with fn castable(v) {
 }
 
 ///|
+pub extend RatioComponent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RatioComponent with fn into_value(self) {
   Ratio(self.0)
 }
@@ -2194,6 +2233,9 @@ pub impl Reflect for ChromaComponent with fn castable(v) {
 }
 
 ///|
+pub extend ChromaComponent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ChromaComponent with fn into_value(self) {
   Float(self.0.to_double())
 }
@@ -2226,6 +2268,9 @@ pub impl Reflect for Component with fn output() {
 pub impl Reflect for Component with fn castable(v) {
   v is (Int(_) | Ratio(_))
 }
+
+///|
+pub extend Component with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Component with fn into_value(self) {

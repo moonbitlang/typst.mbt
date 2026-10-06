@@ -29,6 +29,9 @@ pub impl Reflect for DocumentFormat with fn castable(v) {
 }
 
 ///|
+pub extend DocumentFormat with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DocumentFormat with fn into_value(self) {
   match self {
     Paged(v) => v.into_value()
@@ -117,6 +120,9 @@ pub impl Reflect for PagedFormat with fn castable(v) {
 }
 
 ///|
+pub extend PagedFormat with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PagedFormat with fn into_value(self) {
   match self {
     Pdf => Str("pdf")
@@ -124,6 +130,9 @@ pub impl IntoValue for PagedFormat with fn into_value(self) {
     Svg => Str("svg")
   }
 }
+
+///|
+pub extend PagedFormat with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PagedFormat with fn from_value(v) {
@@ -136,6 +145,9 @@ pub impl FromValue for PagedFormat with fn from_value(v) {
 }
 
 ///|
+pub extend PagedFormat with FromValue::{from_value}
+
+///|
 /// One element, or multiple provided as an array.
 pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
 
@@ -143,6 +155,9 @@ pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
 pub impl[T] Default for OneOrMultiple[T] with fn default() {
   OneOrMultiple([])
 }
+
+///|
+pub extend OneOrMultiple with Default::{default}
 
 ///|
 pub impl[T] Fold for OneOrMultiple[T] with fn fold(self, outer) {
@@ -168,6 +183,9 @@ pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn castable(value) {
 pub impl[T : IntoValue] IntoValue for OneOrMultiple[T] with fn into_value(self) {
   IntoValue::into_value(self.0)
 }
+
+///|
+pub extend OneOrMultiple with IntoValue::{into_value}
 
 ///|
 pub impl[T : FromValue] FromValue for OneOrMultiple[T] with fn from_value(value) {

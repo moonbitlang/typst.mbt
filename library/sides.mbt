@@ -121,6 +121,9 @@ pub impl[T : IntoValue + Eq] IntoValue for Sides[T?] with fn into_value(self) {
 }
 
 ///|
+pub extend Sides with IntoValue::{into_value}
+
+///|
 pub impl[T : FromValue] FromValue for Sides[T?] with fn from_value(value) {
   let expected_keys = ["left", "top", "right", "bottom", "x", "y", "rest"]
   if value is Dict(dict) {
@@ -276,6 +279,9 @@ pub impl[T : Fold] Fold for Sides[T?] with fn fold(self, outer) {
   // `outer`, so we use `fold_or` to opt into such behavior.
   self.zip(outer).map(p => fold_or(p.0, p.1))
 }
+
+///|
+pub extend Sides with Fold::{fold}
 
 ///|
 /// Rust `Option::or`: keeps `self` if it is `Some`, otherwise `other`.

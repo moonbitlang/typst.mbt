@@ -70,6 +70,9 @@ pub impl Reflect for Paint with fn castable(v) {
 }
 
 ///|
+pub extend Paint with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Paint with fn into_value(self) {
   match self {
     Solid(color) => Color(color)
@@ -77,6 +80,9 @@ pub impl IntoValue for Paint with fn into_value(self) {
     Tiling(tiling) => Tiling(tiling)
   }
 }
+
+///|
+pub extend Paint with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Paint with fn from_value(v) {
@@ -87,3 +93,6 @@ pub impl FromValue for Paint with fn from_value(v) {
     v => raise HintedError(Paint::input().error(v))
   }
 }
+
+///|
+pub extend Paint with FromValue::{from_value}
