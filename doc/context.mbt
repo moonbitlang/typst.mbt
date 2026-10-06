@@ -77,10 +77,21 @@ pub fn[W] Ctx::query(
 }
 
 ///|
-/// A size in points.
+/// The measured size of content, in points (the dictionary that Typst's
+/// `measure` returns).
 pub struct Size {
   width : Double
   height : Double
+  /// The vertical position of the content's baseline relative to its top
+  /// edge, positive downwards: for text and for containers of text (a
+  /// block, a box, with their insets) the baseline of the first line, so
+  /// text can be placed on its baseline without an estimate from the font
+  /// size. With Typst's default text edges (cap height to baseline) it
+  /// equals the `height` of one line. A box whose `baseline` is set
+  /// reports the baseline it was given (`Box(.., baseline=Pt(2))`: 2pt
+  /// higher). Content without a baseline of its own (a shape, an image)
+  /// has it at the bottom (`height`); for empty content it is `0`.
+  baseline : Double
 }
 
 ///|
@@ -112,7 +123,7 @@ pub fn Ctx::measure(
     let length : @library.Length = @library.at(span, () => dict.get(name).cast())
     length.abs.to_pt()
   }
-  { width: side("width"), height: side("height"), }
+  { width: side("width"), height: side("height"), baseline: side("baseline"), }
 }
 
 // Counters.

@@ -2227,6 +2227,7 @@ pub impl[T : ToValue] ToValue for Sides[T]
 pub struct Size {
   width : Double
   height : Double
+  baseline : Double
 }
 
 pub(all) enum Sizing {

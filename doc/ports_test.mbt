@@ -47,6 +47,63 @@ fn svg_of(children : Array[&@doc.IntoContent]) -> String raise {
 }
 
 ///|
+test "`Ctx::measure` returns the engine's baseline" {
+  let sizes : Map[String, @doc.Size] = Map([])
+  let report = compile([
+    @doc.SetText(size=Pt(10)),
+    @doc.Context() <| cx => {
+      // Text with the default edges (cap height to baseline) ...
+      sizes["text"] = cx.measure("xg")
+      // ... and down to the descender: the baseline is above the bottom.
+      sizes["descender"] = cx.measure(@doc.Text("xg", bottom_edge=Descender))
+      sizes["ascender"] = cx.measure(
+        @doc.Text("xg", top_edge=Ascender, bottom_edge=Descender),
+      )
+      // Two lines: the baseline of the first.
+      sizes["two lines"] = cx.measure(@doc.Seq(["xg", @doc.Linebreak(), "xg"]))
+      sizes["empty"] = cx.measure(@doc.Seq([]))
+      // A block and a box that are higher than their text.
+      sizes["block"] = cx.measure(@doc.Block("xg", height=Pt(30)))
+      sizes["inset block"] = cx.measure(
+        @doc.Block("xg", inset=@doc.Sides(all=Pt(5))),
+      )
+      sizes["box"] = cx.measure(@doc.Box("xg", height=Pt(30)))
+      sizes["shifted box"] = cx.measure(@doc.Box("xg", baseline=Pt(2)))
+      // Without text: a shape.
+      sizes["rect"] = cx.measure(@doc.Rect(width=Pt(20), height=Pt(12)))
+      sizes["inline rect"] = cx.measure(
+        @doc.Box(@doc.Rect(width=Pt(20), height=Pt(12))),
+      )
+      ""
+    },
+  ])
+  inspect(error_messages(report), content="")
+  let lines = sizes
+    .iter()
+    .map(pair => {
+      let (name, size) = pair
+      "\{name}: \{fixed3(size.width)} x \{fixed3(size.height)}, baseline \{fixed3(size.baseline)}"
+    })
+    .collect()
+  inspect(
+    lines.join("\n"),
+    content=(
+      #|text: 9.900 x 6.580, baseline 6.580
+      #|descender: 9.900 x 9.040, baseline 6.580
+      #|ascender: 9.900 x 11.400, baseline 8.940
+      #|two lines: 9.900 x 19.660, baseline 6.580
+      #|empty: 0.000 x 0.000, baseline 0.000
+      #|block: 9.900 x 30.000, baseline 6.580
+      #|inset block: 19.900 x 16.580, baseline 11.580
+      #|box: 9.900 x 30.000, baseline 6.580
+      #|shifted box: 9.900 x 6.580, baseline 4.580
+      #|rect: 20.000 x 12.000, baseline 12.000
+      #|inline rect: 20.000 x 12.000, baseline 12.000
+    ),
+  )
+}
+
+///|
 test "`Box(baseline=)` is the shift form; the other forms go through `extra`" {
   inspect(
     lowered([@doc.Box("x", baseline=Pt(2))]),

@@ -1016,7 +1016,7 @@ test "T10: `Stroke(paint=None)` in a table is an error with a location" {
 }
 
 ///|
-test "T11: `Ctx::measure` gives a width and a height, no baseline" {
+test "T11: `Ctx::measure` gives a width, a height and the baseline" {
   let sizes : Array[String] = []
   let note = (size : String) => if !sizes.contains(size) { sizes.push(size) }
   let report = compile(
@@ -1025,24 +1025,34 @@ test "T11: `Ctx::measure` gives a width and a height, no baseline" {
       @doc.Context() <| cx => {
         // All fields of `Size`: a pattern that leaves one out is a warning
         // (`missing_pattern_field`), which `moon check --deny-warn` rejects.
-        let { width, height, } = cx.measure("Mg")
-        note("text \{pt(width)}x\{pt(height)}")
-        let { width, height, } = cx.measure(
+        let { width, height, baseline, } = cx.measure("Mg")
+        note("text \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
           @doc.Box("Mg", inset=@doc.Sides(y=Pt(3))),
         )
-        note("box \{pt(width)}x\{pt(height)}")
+        note("box \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
+          @doc.Block("Mg", inset=@doc.Sides(all=Pt(5)), height=Pt(40)),
+        )
+        note("block \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
+          @doc.Block(@doc.Seq(["Mg", @doc.Linebreak(), "Mg"])),
+        )
+        note("two lines \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
         ""
       },
     ],
   )
   inspect(error_messages(report), content="")
   // The height of text is from its top edge (the cap height) to its
-  // bottom edge (the baseline). Where the baseline is in a box with
-  // insets, or in any other content, is not in the result.
+  // bottom edge (the baseline), so for one line of default text the height
+  // is the baseline already. In a box or a block with insets, or one that
+  // is higher than its text, it is not: the baseline is that of the first
+  // line, from the top of what was measured.
   inspect(
     sizes.join(" | "),
     content=(
-      #|text 13.4x6.6 | box 13.4x12.6
+      #|text 13.4x6.6 baseline 6.6 | box 13.4x12.6 baseline 9.6 | block 23.4x40.0 baseline 11.6 | two lines 13.4x19.7 baseline 6.6
     ),
   )
 }
