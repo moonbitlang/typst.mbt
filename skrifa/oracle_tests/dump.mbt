@@ -115,6 +115,17 @@ pub impl @read_fonts.OutlinePen for TextPen with fn close(self) {
 }
 
 ///|
+#deprecated("call as `OutlinePen::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPen with @read_fonts.OutlinePen::{
+  close,
+  curve_to,
+  line_to,
+  quad_to,
+  move_to,
+}
+
+///|
 fn latin1(b : BytesView) -> String {
   let sb = StringBuilder()
   for c in b {

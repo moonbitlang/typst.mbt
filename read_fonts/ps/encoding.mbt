@@ -11,6 +11,16 @@ pub(all) enum PredefinedEncoding {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PredefinedEncoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PredefinedEncoding with @debug.Debug::{to_repr}
+
+///|
 /// Converts a character code to the associated glyph name according to
 /// the selected encoding.
 pub fn PredefinedEncoding::name(

@@ -3,6 +3,7 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/core/math",
   "moonbitlang/core/v128",
+  "moonbitlang/core/debug",
 }
 
 import {

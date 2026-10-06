@@ -16,6 +16,21 @@ pub(all) enum LengthUnit {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LengthUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LengthUnit with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LengthUnit with Hash::{hash, hash_combine}
+
+///|
 /// Representation of the [`<length>`] type.
 ///
 /// [`<length>`]: https://www.w3.org/TR/SVG2/types.html#InterfaceSVGLength
@@ -23,6 +38,16 @@ pub(all) struct Length {
   number : Double
   unit : LengthUnit
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs a new length.

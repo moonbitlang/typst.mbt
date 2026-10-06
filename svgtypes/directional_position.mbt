@@ -16,6 +16,21 @@ pub(all) enum DirectionalPosition {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DirectionalPosition with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DirectionalPosition with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DirectionalPosition with Hash::{hash, hash_combine}
+
+///|
 /// Checks whether the value can be a horizontal position.
 pub fn DirectionalPosition::is_horizontal(self : DirectionalPosition) -> Bool {
   self is (Center | Left | Right)

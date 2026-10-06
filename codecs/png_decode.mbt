@@ -15,6 +15,16 @@ pub(all) struct PixelDimensions {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelDimensions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelDimensions with @debug.Debug::{to_repr}
+
+///|
 /// PNG header information (upstream `png::Info`, partially).
 pub(all) struct PngInfo {
   width : UInt
@@ -29,6 +39,11 @@ pub(all) struct PngInfo {
   /// The decompressed ICC profile of the `iCCP` chunk.
   icc_profile : Bytes?
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngInfo with @debug.Debug::{to_repr}
 
 ///|
 /// Reads the chunks of a PNG up to the first `IDAT` chunk (upstream

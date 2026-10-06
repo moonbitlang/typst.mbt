@@ -8,6 +8,11 @@ enum Combine {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Combine with Eq::{not_equal, equal}
+
+///|
 priv struct ShiftedIntRect {
   shifted : ScreenIntRect
   shift : Int

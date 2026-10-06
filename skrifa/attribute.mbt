@@ -9,6 +9,16 @@ pub(all) struct Attributes {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Attributes with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Attributes with @debug.Debug::{to_repr}
+
+///|
 /// Extracts the stretch, style and weight attributes for the specified font.
 pub fn Attributes::new(font : FontRef) -> Attributes {
   if ok(() => font.os2()) is Some(os2) {
@@ -76,6 +86,16 @@ fn Attributes::from_head(head : @read_fonts.Head) -> Attributes {
 pub(all) struct Stretch(Float) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stretch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stretch with @debug.Debug::{to_repr}
+
+///|
 pub fn Stretch::normal() -> Stretch {
   Stretch(1.0)
 }
@@ -124,8 +144,28 @@ pub(all) enum Style {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with @debug.Debug::{to_repr}
+
+///|
 /// Visual weight class of a font, typically on a scale from 1.0 to 1000.0.
 pub(all) struct Weight(Float) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with @debug.Debug::{to_repr}
 
 ///|
 pub fn Weight::normal() -> Weight {

@@ -10,6 +10,16 @@ pub(all) enum IndexToLocationFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndexToLocationFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndexToLocationFormat with @debug.Debug::{to_repr}
+
+///|
 /// A [Font Header Table](https://docs.microsoft.com/en-us/typography/opentype/spec/head).
 pub(all) struct HeadTable {
   /// Units per EM.
@@ -22,6 +32,11 @@ pub(all) struct HeadTable {
   /// https://docs.microsoft.com/en-us/typography/opentype/spec/loca).
   index_to_location_format : IndexToLocationFormat
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HeadTable with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a table from raw data.
@@ -82,6 +97,11 @@ pub(all) struct HheaTable {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HheaTable with @debug.Debug::{to_repr}
+
+///|
 /// Parses a table from raw data.
 pub fn HheaTable::parse(data : BytesView) -> HheaTable? {
   // Do not check the exact length, because some fonts include
@@ -117,6 +137,16 @@ pub(all) struct VheaTable {
 } derive(Debug, Default)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VheaTable with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VheaTable with Default::{default}
+
+///|
 /// Parses a table from raw data.
 pub fn VheaTable::parse(data : BytesView) -> VheaTable? {
   // Do not check the exact length, because some fonts include
@@ -144,6 +174,11 @@ pub(all) struct MaxpTable {
   /// The total number of glyphs in the face (never zero).
   number_of_glyphs : UInt16
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaxpTable with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a table from raw data.
@@ -174,6 +209,11 @@ pub(all) struct HmtxMetrics {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HmtxMetrics with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for HmtxMetrics with fn size() {
   4
 }
@@ -187,6 +227,11 @@ pub impl FromData for HmtxMetrics with fn parse(data) {
     side_bearing: Int16::reinterpret_from_uint16(be_u16(data, 2)),
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HmtxMetrics with FromData::{size, parse}
 
 ///|
 /// A [Horizontal/Vertical Metrics Table](

@@ -18,6 +18,21 @@ pub(all) enum Align {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Align with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Align with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Align with Hash::{hash, hash_combine}
+
+///|
 /// Representation of the [`preserveAspectRatio`] attribute.
 ///
 /// SVG 2 removed the `defer` keyword, but we still support it.
@@ -36,6 +51,21 @@ pub(all) struct AspectRatio {
   /// - Set to `false` when `meet` value is present or value is not set at all.
   slice : Bool
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AspectRatio with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AspectRatio with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AspectRatio with Hash::{hash, hash_combine}
 
 ///|
 pub fn AspectRatio::from_str(text : String) -> AspectRatio raise SvgTypesError {

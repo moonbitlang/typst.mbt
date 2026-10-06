@@ -9,6 +9,16 @@ pub(all) struct Xyz {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Xyz with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Xyz with @debug.Debug::{to_repr}
+
+///|
 pub fn Xyz::new(x : Float, y : Float, z : Float) -> Xyz {
   { x, y, z, }
 }
@@ -27,6 +37,21 @@ pub(all) struct Xyzd {
 } derive(Eq, Debug, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Xyzd with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Xyzd with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Xyzd with Default::{default}
+
+///|
 pub fn Xyzd::new(x : Double, y : Double, z : Double) -> Xyzd {
   { x, y, z, }
 }
@@ -40,12 +65,42 @@ pub(all) struct Vector3d {
 } derive(Eq, Debug, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3d with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3d with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3d with Default::{default}
+
+///|
 /// 3-component float vector (`Vector3f`).
 pub(all) struct Vector3f {
   v0 : Float
   v1 : Float
   v2 : Float
 } derive(Eq, Debug, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3f with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3f with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector3f with Default::{default}
 
 ///|
 fn Vector3d::cast(self : Vector3d) -> Vector3f {
@@ -63,10 +118,30 @@ pub(all) struct Matrix3d {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix3d with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix3d with @debug.Debug::{to_repr}
+
+///|
 /// Row-major 3x3 float matrix (`Matrix3f`): `v[3 * row + col]`.
 pub(all) struct Matrix3f {
   v : FixedArray[Float]
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix3f with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix3f with @debug.Debug::{to_repr}
 
 ///|
 pub fn Matrix3d::identity() -> Matrix3d {

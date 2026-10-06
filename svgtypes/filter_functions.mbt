@@ -36,6 +36,16 @@ pub(all) enum FilterValue {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterValue with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterValue with @debug.Debug::{to_repr}
+
+///|
 /// A list of possible [`FilterValueListParser`] errors.
 pub(all) suberror FilterValueListParserError {
   /// Lengths with percentage values are not allowed.
@@ -51,6 +61,16 @@ pub(all) suberror FilterValueListParserError {
   /// Other errors.
   StreamErrors(SvgTypesError)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterValueListParserError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterValueListParserError with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream's `Display`.
@@ -70,6 +90,11 @@ pub impl Show for FilterValueListParserError with fn output(self, logger) {
     StreamErrors(e) => Show::output(e, logger)
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterValueListParserError with Show::{to_string, output}
 
 ///|
 /// A pull-based [`<filter-value-list>`] parser.

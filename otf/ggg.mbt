@@ -20,6 +20,11 @@ pub(all) struct RangeRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RangeRecord with @debug.Debug::{to_repr}
+
+///|
 /// Returns a [`RangeRecord`] for a glyph.
 pub fn LazyArray16::range(
   self : LazyArray16[RangeRecord],
@@ -83,6 +88,11 @@ pub impl FromData for RangeRecord with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RangeRecord with FromData::{size, parse}
+
+///|
 /// A [Coverage Table](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#coverage-table).
 pub(all) enum Coverage {
@@ -109,6 +119,9 @@ pub impl FromSlice for Coverage with fn parse_slice(data) {
     _ => raise Malformed
   }
 }
+
+///|
+pub extend Coverage with FromSlice::{parse_slice}
 
 ///|
 /// Parses a coverage table (`FromSlice::parse`).
@@ -231,4 +244,6 @@ pub impl[T] FromSlice for LazyOffsetArray16[T] with fn parse_slice(data) {
 }
 
 ///|
-extend Coverage with FromSlice::{parse_slice}
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LazyOffsetArray16 with FromSlice::{parse_slice}

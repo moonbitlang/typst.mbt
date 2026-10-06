@@ -15,6 +15,21 @@ pub(all) enum ExifContext {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExifContext with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExifContext with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExifContext with @debug.Debug::{to_repr}
+
+///|
 /// A field value (upstream `exif::Value`, numeric variants only).
 pub(all) enum ExifValue {
   Byte(Array[UInt])
@@ -25,6 +40,11 @@ pub(all) enum ExifValue {
   /// Any other type.
   Other
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExifValue with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the unsigned integer at `index` (upstream `Value::get_uint`).
@@ -86,6 +106,11 @@ pub let exif_tag_y_resolution : Int = 0x11b
 pub(all) suberror ExifError {
   ExifError(String)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExifError with @debug.Debug::{to_repr}
 
 ///|
 /// Parses the Exif data of an image file (upstream

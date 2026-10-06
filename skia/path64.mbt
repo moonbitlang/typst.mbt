@@ -147,10 +147,20 @@ enum SearchAxis {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SearchAxis with Eq::{not_equal, equal}
+
+///|
 struct Point64 {
   x : Double
   y : Double
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point64 with Eq::{not_equal, equal}
 
 ///|
 fn Point64::from_point(p : @path.Point) -> Point64 {

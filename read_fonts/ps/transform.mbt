@@ -74,6 +74,16 @@ pub(all) struct Transform {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with @debug.Debug::{to_repr}
+
+///|
 /// The transform that doesn't modify coordinates or metrics.
 pub fn Transform::identity() -> Transform {
   { matrix: FontMatrix::identity(), scale: None, }
@@ -114,6 +124,16 @@ pub(all) struct ScaledFontMatrix {
   /// The dynamic scale factor used when parsing this matrix.
   scale : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaledFontMatrix with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaledFontMatrix with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a font matrix using dynamic scaling factors.

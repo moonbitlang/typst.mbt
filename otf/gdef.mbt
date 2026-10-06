@@ -13,6 +13,26 @@ pub(all) enum GlyphClass {
 } derive(Eq, Compare, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphClass with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphClass with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphClass with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphClass with Hash::{hash, hash_combine}
+
+///|
 /// A [Glyph Definition Table](https://docs.microsoft.com/en-us/typography/opentype/spec/gdef).
 struct GdefTable {
   mut glyph_classes : ClassDefinition?
@@ -30,6 +50,11 @@ pub impl Default for GdefTable with fn default() {
     variation_store: None,
   }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GdefTable with Default::{default}
 
 ///|
 /// Parses a table from raw data.

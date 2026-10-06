@@ -25,6 +25,11 @@ pub(all) struct KerningPair {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend KerningPair with @debug.Debug::{to_repr}
+
+///|
 /// Returns left glyph ID.
 pub fn KerningPair::left(self : KerningPair) -> GlyphId {
   GlyphId((self.pair >> 16).reinterpret_as_int().to_uint16())
@@ -46,6 +51,11 @@ pub impl FromData for KerningPair with fn parse(data) {
   let s = Stream::new(data)
   { pair: s.read(), value: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend KerningPair with FromData::{size, parse}
 
 ///|
 /// A kerning subtable format.

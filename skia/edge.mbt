@@ -15,6 +15,11 @@ enum EdgeKind {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EdgeKind with Eq::{not_equal, equal}
+
+///|
 priv struct Edge {
   kind : EdgeKind
   // LineEdge. Imitate a linked list.

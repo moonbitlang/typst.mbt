@@ -17,6 +17,16 @@ pub(all) struct Arc {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Arc with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Arc with @debug.Debug::{to_repr}
+
+///|
 /// Create a new `Arc`.
 pub fn Arc::new(
   center : Point,

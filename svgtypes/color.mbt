@@ -12,6 +12,21 @@ pub(all) struct Color {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Hash::{hash, hash_combine}
+
+///|
 /// Constructs a new `Color` from RGB values.
 pub fn Color::new_rgb(red : Byte, green : Byte, blue : Byte) -> Color {
   { red, green, blue, alpha: 255, }

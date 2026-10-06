@@ -28,6 +28,16 @@ pub(all) enum LineBreakStrictness {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreakStrictness with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreakStrictness with @debug.Debug::{to_repr}
+
+///|
 /// An enum specifies the line break opportunities between letters. It can be
 /// passed as an argument when creating a line segmenter.
 pub(all) enum LineBreakWordOption {
@@ -38,6 +48,16 @@ pub(all) enum LineBreakWordOption {
   /// Breaking is forbidden within "word".
   KeepAll
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreakWordOption with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreakWordOption with @debug.Debug::{to_repr}
 
 ///|
 /// Options to tailor line-breaking behavior.

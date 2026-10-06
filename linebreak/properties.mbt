@@ -58,6 +58,21 @@ pub(all) enum LineBreak {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreak with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreak with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineBreak with @debug.Debug::{to_repr}
+
+///|
 let line_break_values : ReadOnlyArray[LineBreak] = [
   Unknown,
   Ambiguous,

@@ -11,6 +11,16 @@
 pub struct FiniteF32(Float) derive(Debug, Default)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF32 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF32 with Default::{default}
+
+///|
 pub fn FiniteF32::new(n : Float) -> FiniteF32? {
   if is_finite(n) {
     Some(FiniteF32(n))
@@ -36,6 +46,11 @@ pub impl Eq for FiniteF32 with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF32 with Eq::{not_equal, equal}
+
+///|
 pub impl Compare for FiniteF32 with fn compare(self, other) {
   if self.0 < other.0 {
     -1
@@ -47,13 +62,33 @@ pub impl Compare for FiniteF32 with fn compare(self, other) {
 }
 
 ///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF32 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Hash for FiniteF32 with fn hash_combine(self, hasher) {
   hasher.combine_uint(self.0.reinterpret_as_uint())
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF32 with Hash::{hash, hash_combine}
+
+///|
 /// An immutable, finite `f64`.
 pub struct FiniteF64(Double) derive(Debug, Default)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF64 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF64 with Default::{default}
 
 ///|
 pub fn FiniteF64::new(n : Double) -> FiniteF64? {
@@ -80,6 +115,11 @@ pub impl Eq for FiniteF64 with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF64 with Eq::{not_equal, equal}
+
+///|
 pub impl Compare for FiniteF64 with fn compare(self, other) {
   if self.0 < other.0 {
     -1
@@ -91,13 +131,48 @@ pub impl Compare for FiniteF64 with fn compare(self, other) {
 }
 
 ///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF64 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Hash for FiniteF64 with fn hash_combine(self, hasher) {
   hasher.combine_uint64(self.0.reinterpret_as_uint64())
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FiniteF64 with Hash::{hash, hash_combine}
+
+///|
 /// An immutable, finite `f32` that is known to be >= 0.
 pub struct PositiveF32(FiniteF32) derive(Debug, Default, Eq, Compare, Hash)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with Hash::{hash, hash_combine}
 
 ///|
 pub fn PositiveF32::zero() -> PositiveF32 {
@@ -133,6 +208,31 @@ pub fn PositiveF32::get_finite(self : PositiveF32) -> FiniteF32 {
 pub struct PositiveF64(FiniteF64) derive(Debug, Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Hash::{hash, hash_combine}
+
+///|
 pub fn PositiveF64::zero() -> PositiveF64 {
   PositiveF64(FiniteF64(0.0))
 }
@@ -166,6 +266,32 @@ pub fn PositiveF64::get_finite(self : PositiveF64) -> FiniteF64 {
 pub struct NonZeroPositiveF32(FiniteF32) derive(Debug, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF32 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF32 with Compare::{
+  op_lt,
+  op_le,
+  op_ge,
+  compare,
+  op_gt,
+}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF32 with Hash::{hash, hash_combine}
+
+///|
 pub fn NonZeroPositiveF32::new(n : Float) -> NonZeroPositiveF32? {
   if is_finite(n) && n > 0.0 {
     Some(NonZeroPositiveF32(FiniteF32(n)))
@@ -194,6 +320,32 @@ pub fn NonZeroPositiveF32::get_finite(self : NonZeroPositiveF32) -> FiniteF32 {
 pub struct NonZeroPositiveF64(FiniteF64) derive(Debug, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF64 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF64 with Compare::{
+  op_lt,
+  op_le,
+  op_ge,
+  compare,
+  op_gt,
+}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF64 with Hash::{hash, hash_combine}
+
+///|
 pub fn NonZeroPositiveF64::new(n : Double) -> NonZeroPositiveF64? {
   if is_finite_f64(n) && n > 0.0 {
     Some(NonZeroPositiveF64(FiniteF64(n)))
@@ -220,6 +372,26 @@ pub fn NonZeroPositiveF64::get_finite(self : NonZeroPositiveF64) -> FiniteF64 {
 ///|
 /// An immutable, finite `f32` in a 0..=1 range.
 pub struct NormalizedF32(FiniteF32) derive(Debug, Eq, Compare, Hash)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Hash::{hash, hash_combine}
 
 ///|
 pub fn NormalizedF32::zero() -> NormalizedF32 {
@@ -299,8 +471,33 @@ pub impl Mul for NormalizedF32 with fn mul(self, rhs) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Mul::{mul}
+
+///|
 /// An immutable, finite `f64` in a 0..=1 range.
 pub struct NormalizedF64(FiniteF64) derive(Debug, Eq, Compare, Hash)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF64 with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF64 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF64 with Hash::{hash, hash_combine}
 
 ///|
 pub fn NormalizedF64::zero() -> NormalizedF64 {
@@ -349,6 +546,11 @@ pub fn NormalizedF64::get_finite(self : NormalizedF64) -> FiniteF64 {
 pub impl Mul for NormalizedF64 with fn mul(self, rhs) {
   NormalizedF64::new_clamped(self.0.0 * rhs.0.0)
 }
+
+///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF64 with Mul::{mul}
 
 ///|
 fn clamp_f32(min : Float, val : Float, max : Float) -> Float {

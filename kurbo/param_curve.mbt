@@ -21,6 +21,16 @@ pub(all) struct Nearest {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Nearest with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Nearest with @debug.Debug::{to_repr}
+
+///|
 /// The default `ParamCurveArclen::inv_arclen`: solve for the parameter that
 /// has the given arclength from the start, by ITP root finding on the
 /// arclengths of subsegments.

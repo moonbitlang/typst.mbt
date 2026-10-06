@@ -14,6 +14,11 @@ pub(all) struct VerticalOriginMetrics {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalOriginMetrics with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for VerticalOriginMetrics with fn size() {
   4
 }
@@ -23,6 +28,11 @@ pub impl FromData for VerticalOriginMetrics with fn parse(data) {
   let s = Stream::new(data)
   { glyph_id: s.read(), y: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalOriginMetrics with FromData::{size, parse}
 
 ///|
 /// A [Vertical Origin Table](https://docs.microsoft.com/en-us/typography/opentype/spec/vorg).

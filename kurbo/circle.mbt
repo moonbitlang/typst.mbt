@@ -10,6 +10,16 @@ pub(all) struct Circle {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Circle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Circle with @debug.Debug::{to_repr}
+
+///|
 /// A new circle from center and radius.
 pub fn Circle::new(center : Point, radius : Double) -> Circle {
   { center, radius, }

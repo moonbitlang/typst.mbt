@@ -14,6 +14,16 @@ pub(all) struct Rect {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with @debug.Debug::{to_repr}
+
+///|
 /// The empty rectangle at the origin.
 pub let rect_zero : Rect = { x0: 0.0, y0: 0.0, x1: 0.0, y1: 0.0, }
 
@@ -177,3 +187,8 @@ pub fn Rect::contains(self : Rect, point : Point) -> Bool {
 pub impl Default for Rect with fn default() {
   rect_zero
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Default::{default}

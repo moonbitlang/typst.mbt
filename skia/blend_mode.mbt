@@ -64,9 +64,24 @@ pub(all) enum BlendMode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for BlendMode with fn default() {
   SourceOver
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Default::{default}
 
 ///|
 fn BlendMode::should_pre_scale_coverage(self : BlendMode) -> Bool {

@@ -7,6 +7,16 @@
 pub(all) struct F32x2(Float, Float) derive(Eq, Debug, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with @debug.Debug::{to_repr}
+
+///|
 pub extend F32x2 with Default::{default}
 
 ///|
@@ -63,9 +73,19 @@ pub impl Add for F32x2 with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with Add::{add}
+
+///|
 pub impl Sub for F32x2 with fn sub(self, other) {
   F32x2(self.0 - other.0, self.1 - other.1)
 }
+
+///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with Sub::{sub}
 
 ///|
 pub impl Mul for F32x2 with fn mul(self, other) {
@@ -73,9 +93,19 @@ pub impl Mul for F32x2 with fn mul(self, other) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with Mul::{mul}
+
+///|
 pub impl Div for F32x2 with fn div(self, other) {
   F32x2(self.0 / other.0, self.1 / other.1)
 }
+
+///|
+#deprecated("call as `Div::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32x2 with Div::{div}
 
 // A faster and more forgiving f32 min/max implementation.
 //

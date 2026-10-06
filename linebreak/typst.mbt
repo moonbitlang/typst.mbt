@@ -45,6 +45,21 @@ pub(all) enum Breakpoint {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Breakpoint with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Breakpoint with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Breakpoint with @debug.Debug::{to_repr}
+
+///|
 /// How to trim the end of a line.
 ///
 /// It's an invariant that `self.layout <= self.shaping`.
@@ -57,6 +72,16 @@ pub(all) struct Trim {
   /// are already trimmed here.
   shaping : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Trim with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Trim with @debug.Debug::{to_repr}
 
 ///|
 /// Create an instance with equal layout and shaping trim.

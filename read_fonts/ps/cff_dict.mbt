@@ -62,6 +62,16 @@ pub(all) enum DictOperator {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DictOperator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DictOperator with @debug.Debug::{to_repr}
+
+///|
 fn DictOperator::from_opcode(opcode : Int) -> DictOperator? {
   Some(
     match opcode {
@@ -234,6 +244,16 @@ pub(all) enum Entry {
   ForceBold(Bool)
   InitialRandomSeed(Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with @debug.Debug::{to_repr}
 
 ///|
 /// Given a byte slice containing DICT data, returns all operators with their

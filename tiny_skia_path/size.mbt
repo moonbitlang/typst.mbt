@@ -12,6 +12,21 @@ pub struct IntSize {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntSize with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntSize with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntSize with Hash::{hash, hash_combine}
+
+///|
 /// Creates a new `IntSize` from width and height.
 pub fn IntSize::from_wh(width : UInt, height : UInt) -> IntSize? {
   if width == 0 || height == 0 {
@@ -114,6 +129,21 @@ pub struct Size {
   priv width : NonZeroPositiveF32
   priv height : NonZeroPositiveF32
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Size with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Size with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Size with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new `Size` from width and height.

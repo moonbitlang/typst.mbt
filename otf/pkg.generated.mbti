@@ -438,6 +438,7 @@ pub(all) enum Coverage {
 pub fn Coverage::contains(Self, GlyphId) -> Bool
 pub fn Coverage::get(Self, GlyphId) -> UInt16?
 pub fn Coverage::parse(BytesView) -> Self?
+pub fn Coverage::parse_slice(BytesView) -> Self raise Malformed
 pub impl FromSlice for Coverage
 
 type CpalTable
@@ -1330,6 +1331,7 @@ type MathKern
 pub fn MathKern::count(Self) -> UInt16
 pub fn MathKern::height(Self, UInt16) -> MathValue?
 pub fn MathKern::kern(Self, UInt16) -> MathValue?
+pub fn MathKern::parse_slice(BytesView) -> Self raise Malformed
 pub impl @debug.Debug for MathKern
 pub impl FromSlice for MathKern
 

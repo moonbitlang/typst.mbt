@@ -43,6 +43,16 @@ pub(all) enum PathSegment {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSegment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSegment with @debug.Debug::{to_repr}
+
+///|
 /// Returns `true` if the segment is absolute.
 pub fn PathSegment::is_abs(self : PathSegment) -> Bool {
   match self {
@@ -362,6 +372,16 @@ pub(all) enum SimplePathSegment {
   Quadratic(x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
   ClosePath
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SimplePathSegment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SimplePathSegment with @debug.Debug::{to_repr}
 
 ///|
 /// A simplifying Path Data parser.

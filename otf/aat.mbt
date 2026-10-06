@@ -48,6 +48,11 @@ pub impl[T : FromData] FromData for GenericStateEntry[T] with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GenericStateEntry with FromData::{size, parse}
+
+///|
 /// Checks that entry has an offset.
 pub fn[T] GenericStateEntry::has_offset(self : GenericStateEntry[T]) -> Bool {
   (self.flags & 0x3FFF) != 0
@@ -98,6 +103,11 @@ pub type StateEntry = GenericStateEntry[Unit]
 ///|
 /// A type-safe wrapper for a kerning value offset.
 pub(all) struct ValueOffset(UInt16) derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValueOffset with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the next offset.

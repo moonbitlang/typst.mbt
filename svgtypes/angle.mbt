@@ -10,6 +10,21 @@ pub(all) enum AngleUnit {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AngleUnit with Hash::{hash, hash_combine}
+
+///|
 /// Representation of the [`<angle>`] type.
 ///
 /// [`<angle>`]: https://www.w3.org/TR/css-values-3/#angles
@@ -17,6 +32,16 @@ pub(all) struct Angle {
   number : Double
   unit : AngleUnit
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs a new angle.

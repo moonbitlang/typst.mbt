@@ -88,6 +88,16 @@ pub(all) enum PlatformId {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlatformId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlatformId with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for PlatformId with fn size() {
   2
 }
@@ -104,6 +114,11 @@ pub impl FromData for PlatformId with fn parse(data) {
     _ => raise Malformed
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlatformId with FromData::{size, parse}
 
 ///|
 fn is_unicode_encoding(platform_id : PlatformId, encoding_id : UInt16) -> Bool {

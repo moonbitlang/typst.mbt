@@ -14,6 +14,26 @@ pub(all) struct Range {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with @debug.Debug::{to_repr}
+
+///|
 pub fn Range::len(self : Range) -> Int {
   self.end - self.start
 }
@@ -41,6 +61,16 @@ pub(all) enum Direction {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with @debug.Debug::{to_repr}
+
+///|
 /// Bidi information about a single paragraph
 pub(all) struct ParagraphInfo {
   /// The paragraphs boundaries within the text, as byte indices.
@@ -50,6 +80,16 @@ pub(all) struct ParagraphInfo {
   /// <http://www.unicode.org/reports/tr9/#BD4>
   level : Level
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParagraphInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParagraphInfo with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the length of the paragraph in the source text.

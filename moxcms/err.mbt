@@ -7,6 +7,16 @@ pub(all) struct MalformedSize {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MalformedSize with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MalformedSize with @debug.Debug::{to_repr}
+
+///|
 pub(all) suberror CmsError {
   LaneSizeMismatch
   LaneMultipleOfChannels
@@ -36,6 +46,16 @@ pub(all) suberror CmsError {
   OutOfMemory(Int)
   IncorrectlyFormedLut(String)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CmsError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CmsError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for CmsError with fn output(self, logger) {
@@ -76,3 +96,8 @@ pub impl Show for CmsError with fn output(self, logger) {
   }
   logger.write_string(s)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CmsError with Show::{to_string, output}

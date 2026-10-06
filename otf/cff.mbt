@@ -27,6 +27,16 @@ pub(all) suberror CFFError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CFFError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CFFError with @debug.Debug::{to_repr}
+
+///|
 priv struct CffBuilder {
   builder : &OutlineBuilder
   bbox : RectF
@@ -70,6 +80,21 @@ fn CffBuilder::close(self : CffBuilder) -> Unit {
 pub(all) struct StringId(UInt16) derive(Eq, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringId with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for StringId with fn size() {
   2
 }
@@ -78,6 +103,11 @@ pub impl FromData for StringId with fn size() {
 pub impl FromData for StringId with fn parse(data) {
   StringId(FromData::parse(data))
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringId with FromData::{size, parse}
 
 ///|
 fn f32_abs(n : Float) -> Float {
