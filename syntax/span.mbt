@@ -1,6 +1,13 @@
 ///|
 /// An interned version of [RootedPath] (see `path.mbt`; non-zero, 16 bits).
-pub struct FileId(UInt16) derive(Eq, Hash, Compare, Debug)
+pub struct FileId(UInt16) derive(Eq, Hash, Compare)
+
+///|
+/// Upstream `Debug for FileId` is that of its rooted path
+/// (typst-syntax/src/path.rs:183).
+pub impl @debug.Debug for FileId with fn to_repr(self) {
+  @debug.Debug::to_repr(self.get())
+}
 
 ///|
 pub fn FileId::into_raw(self : FileId) -> UInt16 {

@@ -453,7 +453,7 @@ pub(all) struct PackageVersion {
   minor : UInt
   /// The package's patch version.
   patch : UInt
-} derive(Eq, Compare, Hash, Debug)
+} derive(Eq, Compare, Hash)
 
 ///|
 /// The current compiler version.
@@ -576,6 +576,13 @@ pub fn PackageVersion::from_str(s : String) -> Result[PackageVersion, String] {
 }
 
 ///|
+/// Upstream `Debug for PackageVersion` is its `Display`
+/// (typst-syntax/src/package.rs:457).
+pub impl @debug.Debug for PackageVersion with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
+}
+
+///|
 pub impl Show for PackageVersion with fn output(self, logger) {
   logger.write_string("\{self.major}.\{self.minor}.\{self.patch}")
 }
@@ -589,7 +596,7 @@ pub(all) struct VersionBound {
   minor : UInt?
   /// The bounds's patch version. Can only be present if minor is too.
   patch : UInt?
-} derive(Eq, Compare, Hash, Debug)
+} derive(Eq, Compare, Hash)
 
 ///|
 /// Parse a version bound like `0`, `0.1` or `0.1.0`.
@@ -623,6 +630,13 @@ pub fn VersionBound::from_str(s : String) -> Result[VersionBound, String] {
     return Err("version bound has unexpected fourth component: `\{rest}`")
   }
   Ok({ major, minor, patch, })
+}
+
+///|
+/// Upstream `Debug for VersionBound` is its `Display`
+/// (typst-syntax/src/package.rs:520).
+pub impl @debug.Debug for VersionBound with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
 }
 
 ///|
