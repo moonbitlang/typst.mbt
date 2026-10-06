@@ -25,6 +25,8 @@ pub(all) enum Tier {
   T3
   T4
 } derive(Eq)
+pub fn Tier::output(Self, &Logger) -> Unit
+pub fn Tier::to_string(Self) -> String
 pub impl Show for Tier
 
 pub struct Translation {

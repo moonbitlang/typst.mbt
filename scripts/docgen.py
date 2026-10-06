@@ -40,6 +40,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 from elemgen import elem_var  # noqa: E402
+from promotions import deprecated_extend  # noqa: E402
 
 MANIFEST = json.load(open(os.path.join(ROOT, "gen", "manifest.json")))
 
@@ -857,15 +858,18 @@ def emit_element(spec, out, coverage):
         out.append(
             f"pub impl IntoContent for {spec.name} with fn into_content(self) {{\n  self.content\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "IntoContent", ["into_content"]))
         out.append("///|")
         out.append("/// Interpolation into the text of `Prose`.")
         out.append(
             f"pub impl @builtin.Show for {spec.name} with fn output(self, logger) {{\n  prose_placeholder(self.content, logger)\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "@builtin.Show", ["to_string", "output"]))
         out.append("///|")
         out.append(
-            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  self.content.to_repr()\n}}\n"
+            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  @debug.Debug::to_repr(self.content)\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "@debug.Debug", ["to_repr"]))
 
     # --- set rule
     # Settable: every field that the function does not require (an optional
@@ -924,12 +928,14 @@ def emit_element(spec, out, coverage):
         out.append(
             f"pub impl IntoContent for {sname} with fn into_content(self) {{\n  Content::of(NSetRule(self.node))\n}}\n"
         )
+        out.append(deprecated_extend(sname, "IntoContent", ["into_content"]))
         out.append("///|")
         out.append(f"pub impl SetRule for {sname}\n")
         out.append("///|")
         out.append(
-            f"pub impl @debug.Debug for {sname} with fn to_repr(self) {{\n  Content::of(NSetRule(self.node)).to_repr()\n}}\n"
+            f"pub impl @debug.Debug for {sname} with fn to_repr(self) {{\n  @debug.Debug::to_repr(Content::of(NSetRule(self.node)))\n}}\n"
         )
+        out.append(deprecated_extend(sname, "@debug.Debug", ["to_repr"]))
 
     # --- view and selector
     if spec.view:
@@ -946,15 +952,18 @@ def emit_element(spec, out, coverage):
         out.append(
             f"pub impl IntoContent for {vname} with fn into_content(self) {{\n  Content::of(NEngine(self.content))\n}}\n"
         )
+        out.append(deprecated_extend(vname, "IntoContent", ["into_content"]))
         out.append("///|")
         out.append("/// Interpolation into the text of `Prose`.")
         out.append(
             f"pub impl @builtin.Show for {vname} with fn output(self, logger) {{\n  prose_placeholder(Content::of(NEngine(self.content)), logger)\n}}\n"
         )
+        out.append(deprecated_extend(vname, "@builtin.Show", ["to_string", "output"]))
         out.append("///|")
         out.append(
-            f"pub impl @debug.Debug for {vname} with fn to_repr(self) {{\n  Content::of(NEngine(self.content)).to_repr()\n}}\n"
+            f"pub impl @debug.Debug for {vname} with fn to_repr(self) {{\n  @debug.Debug::to_repr(Content::of(NEngine(self.content)))\n}}\n"
         )
+        out.append(deprecated_extend(vname, "@debug.Debug", ["to_repr"]))
         out.append("///|")
         out.append("/// The element as a generic view.")
         out.append(
@@ -1113,15 +1122,18 @@ def emit_function(spec, out):
         out.append(
             f"pub impl IntoContent for {spec.name} with fn into_content(self) {{\n  self.content\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "IntoContent", ["into_content"]))
         out.append("///|")
         out.append("/// Interpolation into the text of `Prose`.")
         out.append(
             f"pub impl @builtin.Show for {spec.name} with fn output(self, logger) {{\n  prose_placeholder(self.content, logger)\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "@builtin.Show", ["to_string", "output"]))
         out.append("///|")
         out.append(
-            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  self.content.to_repr()\n}}\n"
+            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  @debug.Debug::to_repr(self.content)\n}}\n"
         )
+        out.append(deprecated_extend(spec.name, "@debug.Debug", ["to_repr"]))
     else:
         out.append(f") -> {spec.owner} {{")
         out.append("  let positional : Array[Value] = []")

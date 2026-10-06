@@ -67,6 +67,11 @@ pub impl ToValue for Paint with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with ToValue::{to_value}
+
+///|
 /// A colour space, for [Paint::mix]: Typst's colour space values, which
 /// are the constructor functions of the spaces.
 pub(all) enum ColorSpace {
@@ -113,6 +118,11 @@ pub impl ToValue for ColorSpace with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with ToValue::{to_value}
+
+///|
 /// A percentage as the engine's ratio (the literal `50%`).
 fn percent_value(value : Double) -> Value {
   Value::of(VNumeric(value, @library.NumericUnit::Percent))
@@ -134,7 +144,7 @@ fn percent_value(value : Double) -> Value {
 pub fn Paint::transparentize(self : Paint, percent : Double) -> Paint {
   Value(
     Value::native(@library.native_color_transparentize(), [
-      self.to_value(),
+      ToValue::to_value(self),
       percent_value(percent),
     ]),
   )
@@ -146,7 +156,7 @@ pub fn Paint::transparentize(self : Paint, percent : Double) -> Paint {
 pub fn Paint::lighten(self : Paint, percent : Double) -> Paint {
   Value(
     Value::native(@library.native_color_lighten(), [
-      self.to_value(),
+      ToValue::to_value(self),
       percent_value(percent),
     ]),
   )
@@ -158,7 +168,7 @@ pub fn Paint::lighten(self : Paint, percent : Double) -> Paint {
 pub fn Paint::darken(self : Paint, percent : Double) -> Paint {
   Value(
     Value::native(@library.native_color_darken(), [
-      self.to_value(),
+      ToValue::to_value(self),
       percent_value(percent),
     ]),
   )
@@ -182,14 +192,14 @@ pub fn Paint::mix(
   let named : Array[(String, Value)] = []
   // `auto` is the default of the parameter.
   if !(space is Auto) {
-    named.push(("space", space.to_value()))
+    named.push(("space", ToValue::to_value(space)))
   }
   Value(
     Value::native(
       @library.native_color_mix(),
       [
-        Value::array([self.to_value(), percent_value(100.0 - weight)]),
-        Value::array([other.to_value(), percent_value(weight)]),
+        Value::array([ToValue::to_value(self), percent_value(100.0 - weight)]),
+        Value::array([ToValue::to_value(other), percent_value(weight)]),
       ],
       named~,
     ),
@@ -209,9 +219,14 @@ pub(all) enum DashLen {
 pub impl ToValue for DashLen with fn to_value(self) {
   match self {
     Dot => Value::str("dot")
-    Len(length) => length.to_value()
+    Len(length) => ToValue::to_value(length)
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DashLen with ToValue::{to_value}
 
 ///|
 /// The dash pattern of a stroke: Typst's predefined patterns by their
@@ -267,12 +282,17 @@ pub impl ToValue for Dash with fn to_value(self) {
     LooselyDashDotted => Value::str("loosely-dash-dotted")
     Pattern(array, phase~) =>
       Value::dict([
-        ("array", Value::array(array.map(length => length.to_value()))),
-        ("phase", phase.to_value()),
+        ("array", Value::array(array.map(length => ToValue::to_value(length)))),
+        ("phase", ToValue::to_value(phase)),
       ])
     RawValue(value) => value
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dash with ToValue::{to_value}
 
 ///|
 /// A stroke (`stroke(paint: .., thickness: .., ..)`).
@@ -291,10 +311,10 @@ pub fn Stroke::Stroke(
 ) -> Stroke {
   let named : Array[(String, Value)] = []
   if paint is Some(v) {
-    named.push(("paint", v.to_value()))
+    named.push(("paint", ToValue::to_value(v)))
   }
   if thickness is Some(v) {
-    named.push(("thickness", v.to_value()))
+    named.push(("thickness", ToValue::to_value(v)))
   }
   if cap is Some(v) {
     named.push(("cap", Value::str(v)))
@@ -303,7 +323,7 @@ pub fn Stroke::Stroke(
     named.push(("join", Value::str(v)))
   }
   if dash is Some(v) {
-    named.push(("dash", v.to_value()))
+    named.push(("dash", ToValue::to_value(v)))
   }
   if miter_limit is Some(v) {
     named.push(("miter-limit", Value::float(v)))
@@ -328,19 +348,24 @@ pub impl ToValue for Stroke with fn to_value(self) {
   self.value
 }
 
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with ToValue::{to_value}
+
 // Gradients: typed constructors for Typst's `gradient.*` functions.
 
 ///|
 /// The stops of a gradient: colours, or colours with offsets
 /// ([Paint::stop]).
 fn gradient_stops(stops : Array[Paint]) -> Array[Value] {
-  stops.map(stop => stop.to_value())
+  stops.map(stop => ToValue::to_value(stop))
 }
 
 ///|
 /// A colour stop of a gradient at an offset: `(color, 30%)`.
 pub fn Paint::stop(color : Paint, offset : Length) -> Paint {
-  Value(Value::array([color.to_value(), offset.to_value()]))
+  Value(Value::array([ToValue::to_value(color), ToValue::to_value(offset)]))
 }
 
 ///|
@@ -361,10 +386,10 @@ pub fn Paint::linear(
 ) -> Paint {
   let named : Array[(String, Value)] = []
   if angle is Some(v) {
-    named.push(("angle", v.to_value()))
+    named.push(("angle", ToValue::to_value(v)))
   }
   if dir is Some(v) {
-    named.push(("dir", v.to_value()))
+    named.push(("dir", ToValue::to_value(v)))
   }
   if relative is Some(v) {
     named.push(("relative", Value::str(v)))
@@ -390,16 +415,23 @@ pub fn Paint::radial(
 ) -> Paint {
   let named : Array[(String, Value)] = []
   if center is Some((x, y)) {
-    named.push(("center", Value::array([x.to_value(), y.to_value()])))
+    named.push(
+      ("center", Value::array([ToValue::to_value(x), ToValue::to_value(y)])),
+    )
   }
   if radius is Some(v) {
-    named.push(("radius", v.to_value()))
+    named.push(("radius", ToValue::to_value(v)))
   }
   if focal_center is Some((x, y)) {
-    named.push(("focal-center", Value::array([x.to_value(), y.to_value()])))
+    named.push(
+      (
+        "focal-center",
+        Value::array([ToValue::to_value(x), ToValue::to_value(y)]),
+      ),
+    )
   }
   if focal_radius is Some(v) {
-    named.push(("focal-radius", v.to_value()))
+    named.push(("focal-radius", ToValue::to_value(v)))
   }
   if relative is Some(v) {
     named.push(("relative", Value::str(v)))
@@ -423,10 +455,12 @@ pub fn Paint::conic(
 ) -> Paint {
   let named : Array[(String, Value)] = []
   if angle is Some(v) {
-    named.push(("angle", v.to_value()))
+    named.push(("angle", ToValue::to_value(v)))
   }
   if center is Some((x, y)) {
-    named.push(("center", Value::array([x.to_value(), y.to_value()])))
+    named.push(
+      ("center", Value::array([ToValue::to_value(x), ToValue::to_value(y)])),
+    )
   }
   if relative is Some(v) {
     named.push(("relative", Value::str(v)))
@@ -525,6 +559,11 @@ pub impl[T : ToValue] ToValue for Sides[T] with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sides with ToValue::{to_value}
+
+///|
 /// Values for the four corners of a box, like [Sides].
 pub struct Corners[T] {
   priv all : T?
@@ -590,6 +629,11 @@ pub impl[T : ToValue] ToValue for Corners[T] with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with ToValue::{to_value}
+
+///|
 /// An alignment (`left`, `center + horizon`, ...).
 pub(all) enum Alignment {
   /// Explicit `auto`, where the field accepts it.
@@ -614,6 +658,11 @@ pub impl Add for Alignment with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with Add::{add}
+
+///|
 pub impl ToValue for Alignment with fn to_value(self) {
   match self {
     Auto => Value::auto()
@@ -626,9 +675,14 @@ pub impl ToValue for Alignment with fn to_value(self) {
     Top => Value::global("top")
     Horizon => Value::global("horizon")
     Bottom => Value::global("bottom")
-    Both(a, b) => Value::of(VAdd(a.to_value(), b.to_value()))
+    Both(a, b) => Value::of(VAdd(ToValue::to_value(a), ToValue::to_value(b)))
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Alignment with ToValue::{to_value}
 
 ///|
 /// A numbering: a pattern (`"1.1"`) or a callback.
@@ -667,6 +721,11 @@ pub fn Numbering::none() -> Numbering {
 pub impl ToValue for Numbering with fn to_value(self) {
   self.value
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numbering with ToValue::{to_value}
 
 ///|
 /// A supplement (of references to headings, figures, equations): content
@@ -714,6 +773,11 @@ pub impl ToValue for Supplement with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Supplement with ToValue::{to_value}
+
+///|
 /// A per-cell value of a table or grid: one value for all cells, one per
 /// column, or a callback from the cell's column and row.
 #warnings("-unused_type_variable")
@@ -755,6 +819,11 @@ pub impl[T] ToValue for Cells[T] with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cells with ToValue::{to_value}
+
+///|
 /// The destination of a link.
 pub(all) enum LinkTarget {
   /// A URL.
@@ -773,6 +842,11 @@ pub impl ToValue for LinkTarget with fn to_value(self) {
     Dest(value) => value
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkTarget with ToValue::{to_value}
 
 ///|
 /// A data source: a path (resolved against the project root) or bytes.
@@ -796,6 +870,11 @@ pub impl IntoSource for Source with fn into_source(self) {
 }
 
 ///|
+#deprecated("call as `IntoSource::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Source with IntoSource::{into_source}
+
+///|
 pub impl IntoSource for String with fn into_source(self) {
   Path(self)
 }
@@ -817,9 +896,15 @@ pub impl ToValue for Source with fn to_value(self) {
     Path(path) => Value::str(path)
     Bytes(bytes) =>
       Value::engine(@library.Value::Bytes(@library.BytesValue::new(bytes)))
-    Many(sources) => Value::array(sources.map(source => source.to_value()))
+    Many(sources) =>
+      Value::array(sources.map(source => ToValue::to_value(source)))
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Source with ToValue::{to_value}
 
 ///|
 /// A font weight: a named weight or a number from 100 to 900.
@@ -853,6 +938,11 @@ pub impl ToValue for FontWeight with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with ToValue::{to_value}
+
+///|
 /// The top edge of text (`text.top-edge`, `highlight.top-edge`): a metric
 /// of the font or a length above the baseline.
 pub(all) enum TopEdge {
@@ -880,9 +970,14 @@ pub impl ToValue for TopEdge with fn to_value(self) {
     XHeight => Value::str("x-height")
     Baseline => Value::str("baseline")
     Bounds => Value::str("bounds")
-    Len(length) => length.to_value()
+    Len(length) => ToValue::to_value(length)
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TopEdge with ToValue::{to_value}
 
 ///|
 /// The bottom edge of text (`text.bottom-edge`, `highlight.bottom-edge`): a
@@ -905,9 +1000,14 @@ pub impl ToValue for BottomEdge with fn to_value(self) {
     Baseline => Value::str("baseline")
     Descender => Value::str("descender")
     Bounds => Value::str("bounds")
-    Len(length) => length.to_value()
+    Len(length) => ToValue::to_value(length)
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BottomEdge with ToValue::{to_value}
 
 ///|
 /// A direction (`ltr`, `rtl`, `ttb`, `btt`).
@@ -930,3 +1030,8 @@ pub impl ToValue for Dir with fn to_value(self) {
     Btt => Value::global("btt")
   }
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dir with ToValue::{to_value}

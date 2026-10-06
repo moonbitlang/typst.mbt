@@ -710,3 +710,5 @@ pub impl @syntax.NodeHasher for SipHasher128 with fn write_u64(self, v) {
 pub impl @syntax.NodeHasher for SipHasher128 with fn write_str(self, s) {
   SipHasher128::write_str(self, s)
 }
+// No `extend` for this impl, nothing is left to name: `write_u64` and
+// `write_str` are regular methods of the type.

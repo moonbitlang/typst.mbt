@@ -19,15 +19,24 @@ names its methods (the compiler reports the ones that lack it as
 
   so that a call through the type, in any package, is a warning.
 
-This script inserts the declarations that are missing. It works in a
+`moon check --deny-warn` (CI, on native, wasm-gc and wasm) enforces both
+halves: an impl without a complete declaration is `implicit_impl_as_method`,
+and a call through a deprecated declaration is a deprecation warning. New
+code, and new packages from their first commit, write the declaration by
+hand next to the impl; to make a method a method of the type, drop the two
+attributes.
+
+This script inserts the declarations that are missing, for when there are
+many (a newly ported package): the checkout then does not pass `moon check
+--deny-warn`, and afterwards it does. It works in a
 throwaway copy of the checkout to find them (the checkout is only changed by
 the insertion itself, which also puts the declarations after a `derive(..)`
 in the order of its list):
 
     scripts/promotions.py [--only=pkg,pkg] [--dry] [--jobs N]
 
-1. copy; remove moon.mod's `-implicit_impl_as_method`; `moon check` on
-   native, wasm-gc and wasm lists the impls without a complete `extend`;
+1. copy; `moon check` on native, wasm-gc and wasm lists the impls without a
+   complete `extend`;
 2. give each a hidden `extend` deprecated with a tag; a second `moon check`
    reports the tag at every call through the type, in every package: those
    impls get the plain form, the others the deprecated one;
@@ -51,6 +60,15 @@ one declaration must leave it out (with a comment that says who has it):
 - if neither or both: a core trait (`Show`, `Eq`, ..) yields to a trait of
   the port;
 - only then: the impl that comes first in the file.
+
+If nothing is left to name (`Show` of `Decimal`: `to_string` is a regular
+method, `output` is `Reflect`'s), there is no declaration, and a comment after
+the impl says so; the compiler asks for none.
+
+Two cases are only reported (`NOTE ..`) and finished by hand: an impl with
+nothing left to name (the comment), and an older `extend` of the same trait
+that names part of the methods (the script adds a second declaration for the
+rest; merge the two, a trait has one declaration).
 """
 import argparse
 import collections
@@ -63,7 +81,6 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SWITCH = 'warnings = "-implicit_impl_as_method"\n'
 TARGETS = ["native", "wasm-gc", "wasm"]
 TAG = "PROMOTION-PROBE"
 PROBE = "zz_promotion_probe%s.mbt"
@@ -463,6 +480,9 @@ def insert(impls, only, dry):
         for e, it in sorted(inserts, key=lambda x: (-x[0], -x[1]["line"], -x[1]["col"])):
             decl, methods = declaration(it)
             if not methods:
+                # An `extend` cannot be empty: the comment is written by hand.
+                print("NOTE %s:%d: nothing is left to name for `%s` of `%s`; say so in a comment after the impl" % (
+                    it["path"], it["line"], it["trait"], it["ty"]))
                 continue
             lines[e:e] = ["", "///|"] + decl + [""]
             n_meth += len(methods)
@@ -577,9 +597,6 @@ def main():
         copy = tempfile.mkdtemp(prefix="promotions-")
         try:
             copy_checkout(copy)
-            mod = os.path.join(copy, "moon.mod")
-            text = open(mod).read()
-            open(mod, "w").write(text.replace(SWITCH, ""))
             impls = find_impls(copy, args.jobs)
             need_import = find_calls(copy, impls, args.jobs)
         finally:

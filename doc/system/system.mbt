@@ -15,6 +15,11 @@ pub impl @builtin.Show for SystemError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SystemError with Show::{to_string, output}
+
+///|
 /// A world that reads project files below `root` (default: the working
 /// directory) and packages from the system's package directories.
 ///

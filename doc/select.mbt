@@ -21,6 +21,11 @@ pub impl[W] ToValue for Selector[W] with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Selector with ToValue::{to_value}
+
+///|
 /// The namespace of selector constructors (`Select::heading()`, ...).
 #warnings("-struct_never_constructed")
 pub struct Select {}
@@ -41,6 +46,11 @@ fn ContentView::new(content : @library.Content) -> ContentView {
 pub impl IntoContent for ContentView with fn into_content(self) {
   Content::of(NEngine(self.content))
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContentView with IntoContent::{into_content}
 
 ///|
 /// The qualified name of the content's element function is not stored by

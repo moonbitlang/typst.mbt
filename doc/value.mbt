@@ -88,7 +88,7 @@ pub fn Value::str(value : String) -> Value {
 ///|
 /// A length, ratio or relative length.
 pub fn Value::length(value : Length) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
@@ -99,29 +99,29 @@ pub fn Value::fr(value : Double) -> Value {
 
 ///|
 pub fn Value::angle(value : Angle) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
 /// A paint (a colour).
 pub fn Value::paint(value : Paint) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
 pub fn Value::stroke(value : Stroke) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
 pub fn Value::alignment(value : Alignment) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
 /// A track or box size (`auto`, a length, a fraction).
 pub fn Value::sizing(value : Sizing) -> Value {
-  value.to_value()
+  ToValue::to_value(value)
 }
 
 ///|
@@ -254,9 +254,19 @@ pub impl ToValue for Value with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with ToValue::{to_value}
+
+///|
 pub impl ToValue for Content with fn to_value(self) {
   Value::of(VContent(self))
 }
+
+///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Content with ToValue::{to_value}
 
 ///|
 pub impl ToValue for Bool with fn to_value(self) {
@@ -293,6 +303,11 @@ pub impl IntoContent for Value with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with IntoContent::{into_content}
+
+///|
 /// Explicit `none` for a content parameter (`header=NoneValue()`); as
 /// content it is empty.
 pub struct NoneValue {
@@ -310,6 +325,11 @@ pub impl IntoContent for NoneValue with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NoneValue with IntoContent::{into_content}
+
+///|
 /// Explicit `auto` for a content parameter (`title=AutoValue()`).
 pub struct AutoValue {
   priv content : Content
@@ -324,6 +344,11 @@ pub fn AutoValue::AutoValue() -> AutoValue {
 pub impl IntoContent for AutoValue with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AutoValue with IntoContent::{into_content}
 
 ///|
 pub impl[T : ToValue] ToValue for Array[T] with fn to_value(self) {

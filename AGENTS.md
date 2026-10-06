@@ -52,6 +52,41 @@
   on a broken invariant is `guard!` (upstream's `assert!`/`unwrap()`);
   cleanup before re-raising is `errdefer`. Warnings in `*_gen.mbt` are
   fixed in the generator.
+- Trait methods as methods of a type are explicit (MoonBit is removing the
+  implicit promotion of the methods of `impl Trait for T` to `x.m()` /
+  `T::m()`). Every public impl, and every trait derived for a public
+  type, has a `pub extend T with Trait::{all its methods}` directly after
+  the impl's last block (after the type for a derive, in the order of the
+  `derive(..)` list), one declaration per trait, generic types named bare.
+  If code calls a method of the impl through the type, the declaration is
+  plain. Otherwise it is preceded by ``#deprecated("call as `Trait::m(x)`,
+  or un-deprecate this `extend` to make it a method")`` and `#doc(hidden)`,
+  in this order: that keeps it out of the `.mbti` and makes such a call a
+  warning. So write `Trait::m(x)`, or, if the method is meant to be a
+  method of the type, drop the two attributes. A name can be a method of
+  a type once; where it is shared, one declaration leaves it out, with a
+  comment that says who has it: a regular method of the type wins;
+  between two impls, the trait whose method upstream calls as a method of
+  the type names it (`library`: `Reflect` names `output`, upstream's
+  `T::output()`, and `Show` lists `to_string`); if neither or both, a core
+  trait (`Show`, `Eq`, ..) yields to a trait of the port; only then file
+  order. If nothing is left to name, a comment after the impl says so
+  instead. Traits of other packages are named by the import's alias
+  (derived `Debug` is `@debug.Debug`, so the package imports
+  `moonbitlang/core/debug`; in `doc`, where `Show` and `Sub` are EDSL
+  types, `@builtin.Show` and `@builtin.Sub`). `doc` is the EDSL's public
+  API, not a port, so its surface is decided per trait, not by what `doc`
+  happens to call: `ToValue`, `IntoContent` and `@debug.Debug` are called
+  through the trait (`ToValue::to_value(x)`), and all their declarations
+  in `doc` are deprecated, none plain. Generators emit the
+  declarations of the impls they generate (the Python ones through
+  `promotions.deprecated_extend`). `moon check --deny-warn` is what
+  enforces the rule: an impl without a complete declaration is
+  `implicit_impl_as_method`, and a call through a deprecated declaration
+  is a deprecation warning. New packages follow it from their first
+  commit. `scripts/promotions.py` inserts missing declarations in bulk (a
+  newly ported package) and decides plain or deprecated with the compiler;
+  `scripts/promotions.py --dry` on a clean tree finds nothing.
 - Run unit tests in parallel: `moon test --target native -j16` (24 cores).
 - Debug vs `--release` (native): a release rebuild takes ~80-95 s vs ~11 s
   for debug, but runs 2-3x faster (`break` stage 16 s -> 5.5 s). Use debug
