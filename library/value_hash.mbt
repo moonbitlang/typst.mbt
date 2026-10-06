@@ -386,6 +386,26 @@ fn BindingInfo::fingerprint_fields(
       state.write_str(documentation.name)
       state.write_str(documentation.title)
       state.write_str(documentation.docs)
+      match documentation.since {
+        None => state.write_discriminant(0)
+        Some(since) => {
+          state.write_discriminant(1)
+          match since {
+            Forever => state.write_discriminant(0)
+            Version(major, minor, patch) => {
+              state.write_discriminant(1)
+              state.write_u32(major)
+              state.write_u32(minor)
+              state.write_u32(patch)
+            }
+            Unreleased => state.write_discriminant(2)
+          }
+        }
+      }
+      state.write_usize(documentation.keywords.length())
+      for keyword in documentation.keywords {
+        state.write_str(keyword)
+      }
     }
   }
 }

@@ -36,11 +36,7 @@ fn extend_scope_from_codex_module(scope : Scope, module_ : CodexModule) -> Unit 
       |> ignore
     }
     if data is Some(data) {
-      scope_binding.with_documentation({
-        name: data.name,
-        title: data.title,
-        docs: data.docs,
-      })
+      scope_binding.with_documentation(BindingDocumentation::from_func(data))
       |> ignore
     }
   }

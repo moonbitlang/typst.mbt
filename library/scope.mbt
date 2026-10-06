@@ -150,12 +150,63 @@ priv enum BindingKind {
 }
 
 ///|
-/// Documentation metadata for a binding.
+/// Documentation information for a binding.
+///
+/// Upstream's `def_site` (where the binding is defined in the Rust source,
+/// typst-library/src/foundations/scope.rs:565) is not ported: there is no
+/// Rust source location to record.
 pub(all) struct BindingDocumentation {
+  /// The name for the binding.
   name : String
+  /// The title for the binding.
   title : String
+  /// The documentation for the binding as a Typst markup.
   docs : String
+  /// The version of Typst the binding was introduced in.
+  since : Since?
+  /// The keywords associated with this binding.
+  keywords : ArrayView[String]
 } derive(Eq, Hash)
+
+///|
+/// Upstream `From<&'static NativeFuncData> for BindingDocumentation`.
+pub fn BindingDocumentation::from_func(
+  data : NativeFuncData,
+) -> BindingDocumentation {
+  {
+    name: data.name,
+    title: data.title,
+    docs: data.docs,
+    since: data.since,
+    keywords: data.keywords[:],
+  }
+}
+
+///|
+/// Upstream `From<&'static NativeTypeData> for BindingDocumentation`.
+pub fn BindingDocumentation::from_type(
+  data : NativeTypeData,
+) -> BindingDocumentation {
+  {
+    name: data.name,
+    title: data.title,
+    docs: data.docs,
+    since: data.since,
+    keywords: data.keywords[:],
+  }
+}
+
+///|
+/// Upstream `From<Element> for BindingDocumentation`.
+pub fn BindingDocumentation::from_elem(elem : Element) -> BindingDocumentation {
+  {
+    name: elem.name(),
+    title: elem.title(),
+    docs: elem.docs(),
+    since: elem.since(),
+    keywords: elem.keywords(),
+  }
+}
 
 ///|
 priv struct BindingInfo {
@@ -249,7 +300,13 @@ pub fn Binding::with_documentation(
   self : Binding,
   documentation : BindingDocumentation,
 ) -> Binding {
-  self.init_info().documentation = Some(documentation)
+  // The keywords are copied: upstream's are a static slice, and here the
+  // cached fingerprint of the info must not depend on an array that the
+  // caller can still change.
+  self.init_info().documentation = Some({
+    ..documentation,
+    keywords: documentation.keywords.to_owned()[:],
+  })
   self
 }
 
@@ -371,6 +428,51 @@ pub fn Binding::deprecation(self : Binding) -> Deprecation? {
 }
 
 ///|
+/// Whether the binding should be listed in the documentation.
+pub fn Binding::is_documented(self : Binding) -> Bool {
+  self.info is Some(info) && info.documentation is Some(_)
+}
+
+///|
+/// The documentation of the binding, if any.
+fn Binding::documentation(self : Binding) -> BindingDocumentation? {
+  self.info.bind(i => i.documentation)
+}
+
+///|
+/// The name for the binding.
+pub fn Binding::name(self : Binding) -> String? {
+  self.documentation().map(d => d.name)
+}
+
+///|
+/// The title for the binding.
+pub fn Binding::title(self : Binding) -> String? {
+  self.documentation().map(d => d.title)
+}
+
+///|
+/// The documentation for the binding, if any.
+pub fn Binding::docs(self : Binding) -> String? {
+  self.documentation().map(d => d.docs)
+}
+
+///|
+/// The version of Typst the binding was introduced in, if any.
+pub fn Binding::since(self : Binding) -> Since? {
+  self.documentation().bind(d => d.since)
+}
+
+///|
+/// The keywords associated with this binding.
+pub fn Binding::keywords(self : Binding) -> ArrayView[String] {
+  match self.documentation() {
+    Some(d) => d.keywords
+    None => []
+  }
+}
+
+///|
 /// A map from binding names to values (insertion ordered).
 pub struct Scope {
   priv map : Map[String, Binding]
@@ -408,9 +510,7 @@ pub fn Scope::define_(self : Scope, name : String, value : Value) -> Binding {
     abort("duplicate definition: \{name}")
   }
   let binding = Binding::detached(value)
-  if self.category is Some(c) {
-    binding.init_info().category = Some(c)
-  }
+  binding.init_info().category = self.category
   self.bind(name, binding)
 }
 

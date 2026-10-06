@@ -12,6 +12,7 @@ pub fn native_args_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="arguments",
         title="Construct",
+        since=Version(0, 10, 0),
         docs="Construct spreadable arguments in place.",
         keywords=[],
         contextual=false,
@@ -61,6 +62,7 @@ pub fn native_args_len() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="len",
         title="Length",
+        since=Version(0, 15, 0),
         docs="The number of arguments, positional or named.",
         keywords=[],
         contextual=false,
@@ -112,6 +114,7 @@ pub fn native_args_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Version(0, 12, 0),
         docs="Returns the positional argument at the specified index, or the named argument with the specified name.",
         keywords=[],
         contextual=false,
@@ -187,6 +190,7 @@ pub fn native_args_to_pos() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="pos",
         title="Positional",
+        since=Forever,
         docs="Returns the captured positional arguments as an array.",
         keywords=[],
         contextual=false,
@@ -238,6 +242,7 @@ pub fn native_args_to_named() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="named",
         title="Named",
+        since=Forever,
         docs="Returns the captured named arguments as a dictionary.",
         keywords=[],
         contextual=false,
@@ -289,6 +294,7 @@ pub fn native_args_filter() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="filter",
         title="Filter",
+        since=Version(0, 15, 0),
         docs="Produces a new `arguments` with only the arguments for which the value passes the test.",
         keywords=[],
         contextual=false,
@@ -352,6 +358,7 @@ pub fn native_args_map() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="map",
         title="Map",
+        since=Version(0, 15, 0),
         docs="Produces a new `arguments` by transforming each argument value with the passed function.",
         keywords=[],
         contextual=false,
@@ -415,6 +422,7 @@ pub fn native_array_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="array",
         title="Construct",
+        since=Version(0, 7, 0),
         docs="Converts a value to an array.",
         keywords=[],
         contextual=false,
@@ -466,6 +474,7 @@ pub fn native_array_len() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="len",
         title="Length",
+        since=Forever,
         docs="The number of values in the array.",
         keywords=[],
         contextual=false,
@@ -517,6 +526,7 @@ pub fn native_array_first() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="first",
         title="First",
+        since=Forever,
         docs="Returns the first item in the array. May be used on the left-hand side of an assignment. Returns the default value if the array is empty or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -580,6 +590,7 @@ pub fn native_array_last() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="last",
         title="Last",
+        since=Forever,
         docs="Returns the last item in the array. May be used on the left-hand side of an assignment. Returns the default value if the array is empty or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -643,6 +654,7 @@ pub fn native_array_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Returns the item at the specified index in the array. May be used on the left-hand side of an assignment. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -718,6 +730,7 @@ pub fn native_array_push() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="push",
         title="Push",
+        since=Forever,
         docs="Adds a value to the end of the array.",
         keywords=[],
         contextual=false,
@@ -781,6 +794,7 @@ pub fn native_array_pop() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="pop",
         title="Pop",
+        since=Forever,
         docs="Removes the last item from the array and returns it. Fails with an error if the array is empty.",
         keywords=[],
         contextual=false,
@@ -832,6 +846,7 @@ pub fn native_array_insert() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="insert",
         title="Insert",
+        since=Forever,
         docs="Inserts a value into the array at the specified index, shifting all subsequent elements to the right. Fails with an error if the index is out of bounds.",
         keywords=[],
         contextual=false,
@@ -907,6 +922,7 @@ pub fn native_array_remove() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="remove",
         title="Remove",
+        since=Forever,
         docs="Removes the value at the specified index from the array and return it.",
         keywords=[],
         contextual=false,
@@ -982,6 +998,7 @@ pub fn native_array_slice() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="slice",
         title="Slice",
+        since=Forever,
         docs="Extracts a subslice of the array. Fails with an error if the start or end index is out of bounds.",
         keywords=[],
         contextual=false,
@@ -1074,6 +1091,7 @@ pub fn native_array_contains() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="contains",
         title="Contains",
+        since=Forever,
         docs="Whether the array contains the specified value.",
         keywords=[],
         contextual=false,
@@ -1137,6 +1155,7 @@ pub fn native_array_find() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="find",
         title="Find",
+        since=Forever,
         docs="Searches for an item for which the given function returns `{true}` and returns the first match or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -1200,6 +1219,7 @@ pub fn native_array_position() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="position",
         title="Position",
+        since=Forever,
         docs="Searches for an item for which the given function returns `{true}` and returns the index of the first match or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -1263,6 +1283,7 @@ pub fn native_array_range() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="range",
         title="Range",
+        since=Forever,
         docs="Create an array consisting of a sequence of numbers.",
         keywords=[],
         contextual=false,
@@ -1357,6 +1378,7 @@ pub fn native_array_filter() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="filter",
         title="Filter",
+        since=Forever,
         docs="Produces a new array with only the items from the original one for which the given function returns `{true}`.",
         keywords=[],
         contextual=false,
@@ -1420,6 +1442,7 @@ pub fn native_array_map() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="map",
         title="Map",
+        since=Forever,
         docs="Produces a new array in which all items from the original one were transformed with the given function.",
         keywords=[],
         contextual=false,
@@ -1483,6 +1506,7 @@ pub fn native_array_enumerate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="enumerate",
         title="Enumerate",
+        since=Version(0, 2, 0),
         docs="Returns a new array with the values alongside their indices.",
         keywords=[],
         contextual=false,
@@ -1549,6 +1573,7 @@ pub fn native_array_zip() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="zip",
         title="Zip",
+        since=Version(0, 3, 0),
         docs="Zips the array with other arrays.",
         keywords=[],
         contextual=false,
@@ -1625,6 +1650,7 @@ pub fn native_array_fold() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="fold",
         title="Fold",
+        since=Forever,
         docs="Folds all items into a single value using an accumulator function.",
         keywords=[],
         contextual=false,
@@ -1700,6 +1726,7 @@ pub fn native_array_sum() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sum",
         title="Sum",
+        since=Version(0, 3, 0),
         docs="Sums all items (works for all types that can be added).",
         keywords=[],
         contextual=false,
@@ -1763,6 +1790,7 @@ pub fn native_array_product() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="product",
         title="Product",
+        since=Version(0, 3, 0),
         docs="Calculates the product of all items (works for all types that can be multiplied).",
         keywords=[],
         contextual=false,
@@ -1826,6 +1854,7 @@ pub fn native_array_any() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="any",
         title="Any",
+        since=Forever,
         docs="Whether the given function returns `{true}` for any item in the array.",
         keywords=[],
         contextual=false,
@@ -1889,6 +1918,7 @@ pub fn native_array_all() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="all",
         title="All",
+        since=Forever,
         docs="Whether the given function returns `{true}` for all items in the array.",
         keywords=[],
         contextual=false,
@@ -1952,6 +1982,7 @@ pub fn native_array_flatten() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="flatten",
         title="Flatten",
+        since=Forever,
         docs="Combine all nested arrays into a single flat one.",
         keywords=[],
         contextual=false,
@@ -2003,6 +2034,7 @@ pub fn native_array_rev() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rev",
         title="Reverse",
+        since=Forever,
         docs="Return a new array with the same items, but in reverse order.",
         keywords=[],
         contextual=false,
@@ -2054,6 +2086,7 @@ pub fn native_array_split() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="split",
         title="Split",
+        since=Forever,
         docs="Split the array at occurrences of the specified value.",
         keywords=[],
         contextual=false,
@@ -2117,6 +2150,7 @@ pub fn native_array_join() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="join",
         title="Join",
+        since=Forever,
         docs="Combine all items in the array into one.",
         keywords=[],
         contextual=false,
@@ -2216,6 +2250,7 @@ pub fn native_array_intersperse() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="intersperse",
         title="Intersperse",
+        since=Version(0, 8, 0),
         docs="Returns an array with a copy of the separator value placed between adjacent elements.",
         keywords=[],
         contextual=false,
@@ -2279,6 +2314,7 @@ pub fn native_array_chunks() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="chunks",
         title="Chunks",
+        since=Version(0, 11, 0),
         docs="Splits an array into non-overlapping chunks, starting at the beginning, ending with a single remainder chunk.",
         keywords=[],
         contextual=false,
@@ -2357,6 +2393,7 @@ pub fn native_array_windows() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="windows",
         title="Windows",
+        since=Version(0, 12, 0),
         docs="Returns sliding windows of `window-size` elements over an array.",
         keywords=[],
         contextual=false,
@@ -2420,6 +2457,7 @@ pub fn native_array_sorted() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sorted",
         title="Sorted",
+        since=Forever,
         docs="Return a sorted version of this array, optionally by a given key function. The sorting algorithm used is stable.",
         keywords=[],
         contextual=false,
@@ -2495,6 +2533,7 @@ pub fn native_array_dedup() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="dedup",
         title="Deduplicate",
+        since=Version(0, 7, 0),
         docs="Deduplicates all items in the array.",
         keywords=[],
         contextual=false,
@@ -2558,6 +2597,7 @@ pub fn native_array_to_dict() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-dict",
         title="To Dict",
+        since=Version(0, 12, 0),
         docs="Converts an array of pairs into a dictionary. The first value of each pair is the key, the second the value.",
         keywords=[],
         contextual=false,
@@ -2609,6 +2649,7 @@ pub fn native_array_reduce() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="reduce",
         title="Reduce",
+        since=Version(0, 12, 0),
         docs="Reduces the elements to a single one, by repeatedly applying a reducing operation.",
         keywords=[],
         contextual=false,
@@ -2672,6 +2713,7 @@ pub fn native_bytes_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bytes",
         title="Construct",
+        since=Version(0, 7, 0),
         docs="Converts a value to bytes.",
         keywords=[],
         contextual=false,
@@ -2723,6 +2765,7 @@ pub fn native_bytes_len() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="len",
         title="Length",
+        since=Version(0, 7, 0),
         docs="The length in bytes.",
         keywords=[],
         contextual=false,
@@ -2774,6 +2817,7 @@ pub fn native_bytes_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Version(0, 7, 0),
         docs="Returns the byte at the specified index. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -2849,6 +2893,7 @@ pub fn native_bytes_slice() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="slice",
         title="Slice",
+        since=Version(0, 7, 0),
         docs="Extracts a subslice of the bytes. Fails with an error if the start or end index is out of bounds.",
         keywords=[],
         contextual=false,
@@ -2941,6 +2986,7 @@ pub fn native_calc_abs() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="abs",
         title="Absolute",
+        since=Forever,
         docs="Calculates the absolute value of a numeric value.",
         keywords=[],
         contextual=false,
@@ -2992,6 +3038,7 @@ pub fn native_calc_pow() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="pow",
         title="Power",
+        since=Forever,
         docs="Raises a value to some exponent.",
         keywords=[],
         contextual=false,
@@ -3055,6 +3102,7 @@ pub fn native_calc_exp() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="exp",
         title="Exponential",
+        since=Version(0, 5, 0),
         docs="Raises a value to some exponent of $e$.",
         keywords=[],
         contextual=false,
@@ -3106,6 +3154,7 @@ pub fn native_calc_sqrt() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sqrt",
         title="Square Root",
+        since=Forever,
         docs="Calculates the square root of a number.",
         keywords=[],
         contextual=false,
@@ -3157,6 +3206,7 @@ pub fn native_calc_root() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="root",
         title="Root",
+        since=Version(0, 11, 0),
         docs="Calculates the real $n$#super[th] root of a number.",
         keywords=[],
         contextual=false,
@@ -3220,6 +3270,7 @@ pub fn native_calc_sin() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sin",
         title="Sine",
+        since=Forever,
         docs="Calculates the sine of an angle.",
         keywords=[],
         contextual=false,
@@ -3271,6 +3322,7 @@ pub fn native_calc_cos() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cos",
         title="Cosine",
+        since=Forever,
         docs="Calculates the cosine of an angle.",
         keywords=[],
         contextual=false,
@@ -3322,6 +3374,7 @@ pub fn native_calc_tan() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="tan",
         title="Tangent",
+        since=Forever,
         docs="Calculates the tangent of an angle.",
         keywords=[],
         contextual=false,
@@ -3373,6 +3426,7 @@ pub fn native_calc_asin() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="asin",
         title="Arcsine",
+        since=Forever,
         docs="Calculates the arcsine of a number.",
         keywords=[],
         contextual=false,
@@ -3424,6 +3478,7 @@ pub fn native_calc_acos() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="acos",
         title="Arccosine",
+        since=Forever,
         docs="Calculates the arccosine of a number.",
         keywords=[],
         contextual=false,
@@ -3475,6 +3530,7 @@ pub fn native_calc_atan() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="atan",
         title="Arctangent",
+        since=Forever,
         docs="Calculates the arctangent of a number.",
         keywords=[],
         contextual=false,
@@ -3526,6 +3582,7 @@ pub fn native_calc_atan2() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="atan2",
         title="Four-quadrant Arctangent",
+        since=Version(0, 3, 0),
         docs="Calculates the four-quadrant arctangent of a coordinate.",
         keywords=[],
         contextual=false,
@@ -3589,6 +3646,7 @@ pub fn native_calc_sinh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sinh",
         title="Hyperbolic Sine",
+        since=Forever,
         docs="Calculates the hyperbolic sine of a hyperbolic angle.",
         keywords=[],
         contextual=false,
@@ -3640,6 +3698,7 @@ pub fn native_calc_cosh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cosh",
         title="Hyperbolic Cosine",
+        since=Forever,
         docs="Calculates the hyperbolic cosine of a hyperbolic angle.",
         keywords=[],
         contextual=false,
@@ -3691,6 +3750,7 @@ pub fn native_calc_tanh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="tanh",
         title="Hyperbolic Tangent",
+        since=Forever,
         docs="Calculates the hyperbolic tangent of a hyperbolic angle.",
         keywords=[],
         contextual=false,
@@ -3742,6 +3802,7 @@ pub fn native_calc_asinh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="asinh",
         title="Inverse Hyperbolic Sine",
+        since=Version(0, 15, 0),
         docs="Calculates the inverse hyperbolic sine of a number.",
         keywords=[],
         contextual=false,
@@ -3793,6 +3854,7 @@ pub fn native_calc_acosh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="acosh",
         title="Inverse Hyperbolic Cosine",
+        since=Version(0, 15, 0),
         docs="Calculates the inverse hyperbolic cosine of a number.",
         keywords=[],
         contextual=false,
@@ -3844,6 +3906,7 @@ pub fn native_calc_atanh() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="atanh",
         title="Inverse Hyperbolic Tangent",
+        since=Version(0, 15, 0),
         docs="Calculates the inverse hyperbolic tangent of a number.",
         keywords=[],
         contextual=false,
@@ -3895,6 +3958,7 @@ pub fn native_calc_log() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="log",
         title="Logarithm",
+        since=Forever,
         docs="Calculates the logarithm of a number.",
         keywords=[],
         contextual=false,
@@ -3963,6 +4027,7 @@ pub fn native_calc_ln() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ln",
         title="Natural Logarithm",
+        since=Version(0, 5, 0),
         docs="Calculates the natural logarithm of a number.",
         keywords=[],
         contextual=false,
@@ -4014,6 +4079,7 @@ pub fn native_calc_erf() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="erf",
         title="Error Function",
+        since=Version(0, 15, 0),
         docs="Applies the error function to a number.",
         keywords=[],
         contextual=false,
@@ -4065,6 +4131,7 @@ pub fn native_calc_fact() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="fact",
         title="Factorial",
+        since=Version(0, 3, 0),
         docs="Calculates the factorial of a number.",
         keywords=[],
         contextual=false,
@@ -4116,6 +4183,7 @@ pub fn native_calc_perm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="perm",
         title="Permutation",
+        since=Version(0, 3, 0),
         docs="Calculates a permutation.",
         keywords=[],
         contextual=false,
@@ -4179,6 +4247,7 @@ pub fn native_calc_binom() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="binom",
         title="Binomial",
+        since=Version(0, 3, 0),
         docs="Calculates a binomial coefficient.",
         keywords=[],
         contextual=false,
@@ -4242,6 +4311,7 @@ pub fn native_calc_gcd() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="gcd",
         title="Greatest Common Divisor",
+        since=Version(0, 3, 0),
         docs="Calculates the greatest common divisor of two integers.",
         keywords=[],
         contextual=false,
@@ -4305,6 +4375,7 @@ pub fn native_calc_lcm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="lcm",
         title="Least Common Multiple",
+        since=Version(0, 3, 0),
         docs="Calculates the least common multiple of two integers.",
         keywords=[],
         contextual=false,
@@ -4368,6 +4439,7 @@ pub fn native_calc_floor() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="floor",
         title="Floor",
+        since=Forever,
         docs="Rounds a number down to the nearest integer.",
         keywords=[],
         contextual=false,
@@ -4419,6 +4491,7 @@ pub fn native_calc_ceil() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ceil",
         title="Ceil",
+        since=Forever,
         docs="Rounds a number up to the nearest integer.",
         keywords=[],
         contextual=false,
@@ -4470,6 +4543,7 @@ pub fn native_calc_trunc() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="trunc",
         title="Truncate",
+        since=Version(0, 3, 0),
         docs="Returns the integer part of a number.",
         keywords=[],
         contextual=false,
@@ -4521,6 +4595,7 @@ pub fn native_calc_fract() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="fract",
         title="Fractional",
+        since=Version(0, 3, 0),
         docs="Returns the fractional part of a number.",
         keywords=[],
         contextual=false,
@@ -4572,6 +4647,7 @@ pub fn native_calc_round() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="round",
         title="Round",
+        since=Forever,
         docs="Rounds a number to the nearest integer.",
         keywords=[],
         contextual=false,
@@ -4638,6 +4714,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="clamp",
         title="Clamp",
+        since=Forever,
         docs="Clamps a number between a minimum and maximum value.",
         keywords=[],
         contextual=false,
@@ -4713,6 +4790,7 @@ pub fn native_calc_min() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="min",
         title="Minimum",
+        since=Forever,
         docs="Determines the minimum of a sequence of values.",
         keywords=[],
         contextual=false,
@@ -4764,6 +4842,7 @@ pub fn native_calc_max() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="max",
         title="Maximum",
+        since=Forever,
         docs="Determines the maximum of a sequence of values.",
         keywords=[],
         contextual=false,
@@ -4815,6 +4894,7 @@ pub fn native_calc_even() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="even",
         title="Even",
+        since=Forever,
         docs="Determines whether an integer is even.",
         keywords=[],
         contextual=false,
@@ -4866,6 +4946,7 @@ pub fn native_calc_odd() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="odd",
         title="Odd",
+        since=Forever,
         docs="Determines whether an integer is odd.",
         keywords=[],
         contextual=false,
@@ -4917,6 +4998,7 @@ pub fn native_calc_rem() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rem",
         title="Remainder",
+        since=Version(0, 3, 0),
         docs="Calculates the remainder of two numbers (signed modulo).",
         keywords=["modulo", "modulus"],
         contextual=false,
@@ -4980,6 +5062,7 @@ pub fn native_calc_div_euclid() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="div-euclid",
         title="Euclidean Division",
+        since=Version(0, 10, 0),
         docs="Performs euclidean division of two numbers.",
         keywords=[],
         contextual=false,
@@ -5043,6 +5126,7 @@ pub fn native_calc_rem_euclid() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rem-euclid",
         title="Euclidean Remainder",
+        since=Version(0, 10, 0),
         docs="This calculates the least nonnegative remainder of a division (nonnegative modulo).",
         keywords=["modulo", "modulus"],
         contextual=false,
@@ -5106,6 +5190,7 @@ pub fn native_calc_quo() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="quo",
         title="Quotient",
+        since=Version(0, 3, 0),
         docs="Calculates the quotient (floored division) of two numbers.",
         keywords=[],
         contextual=false,
@@ -5169,6 +5254,7 @@ pub fn native_calc_norm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="norm",
         title="𝑝-Norm",
+        since=Version(0, 13, 0),
         docs="Calculates the $p$-norm of a sequence of values.",
         keywords=[],
         contextual=false,
@@ -5237,6 +5323,7 @@ pub fn native_content_func() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="func",
         title="Func",
+        since=Forever,
         docs="The content's element function. This function can be used to create the element contained in this content. It can be used in set and show rules for the element. Can be compared with global functions to check whether you have a specific kind of element.",
         keywords=[],
         contextual=false,
@@ -5288,6 +5375,7 @@ pub fn native_content_has() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="has",
         title="Has",
+        since=Forever,
         docs="Whether the content has the specified field.",
         keywords=[],
         contextual=false,
@@ -5351,6 +5439,7 @@ pub fn native_content_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Access the specified field on the content. Returns the default value if the field does not exist or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -5426,6 +5515,7 @@ pub fn native_content_fields() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="fields",
         title="Fields",
+        since=Version(0, 5, 0),
         docs="Returns the fields of this content.",
         keywords=[],
         contextual=false,
@@ -5477,6 +5567,7 @@ pub fn native_content_location() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="location",
         title="Location",
+        since=Forever,
         docs="The location of the content. This is only available on content returned by @query[query] or provided by a @reference:styling:show-rules[show rule], for other content it will be `{none}`. The resulting location can be used with @counter[counters], @state[state] and @query[queries].",
         keywords=[],
         contextual=false,
@@ -5528,6 +5619,7 @@ pub fn native_datetime_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="datetime",
         title="Construct",
+        since=Version(0, 5, 0),
         docs="Creates a new datetime.",
         keywords=[],
         contextual=false,
@@ -5641,6 +5733,7 @@ pub fn native_datetime_today() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="today",
         title="Today",
+        since=Version(0, 5, 0),
         docs="Returns the current date.",
         keywords=[],
         contextual=false,
@@ -5697,6 +5790,7 @@ pub fn native_datetime_display() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="display",
         title="Display",
+        since=Version(0, 5, 0),
         docs="Displays the datetime in a specified format.",
         keywords=[],
         contextual=false,
@@ -5765,6 +5859,7 @@ pub fn native_datetime_year() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="year",
         title="Year",
+        since=Version(0, 5, 0),
         docs="The year if it was specified, or `{none}` for times without a date.",
         keywords=[],
         contextual=false,
@@ -5816,6 +5911,7 @@ pub fn native_datetime_month() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="month",
         title="Month",
+        since=Version(0, 5, 0),
         docs="The month if it was specified, or `{none}` for times without a date.",
         keywords=[],
         contextual=false,
@@ -5867,6 +5963,7 @@ pub fn native_datetime_weekday() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="weekday",
         title="Weekday",
+        since=Version(0, 5, 0),
         docs="The weekday (counting Monday as 1) or `{none}` for times without a date.",
         keywords=[],
         contextual=false,
@@ -5918,6 +6015,7 @@ pub fn native_datetime_day() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="day",
         title="Day",
+        since=Version(0, 5, 0),
         docs="The day if it was specified, or `{none}` for times without a date.",
         keywords=[],
         contextual=false,
@@ -5969,6 +6067,7 @@ pub fn native_datetime_hour() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="hour",
         title="Hour",
+        since=Version(0, 5, 0),
         docs="The hour if it was specified, or `{none}` for dates without a time.",
         keywords=[],
         contextual=false,
@@ -6020,6 +6119,7 @@ pub fn native_datetime_minute() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="minute",
         title="Minute",
+        since=Version(0, 5, 0),
         docs="The minute if it was specified, or `{none}` for dates without a time.",
         keywords=[],
         contextual=false,
@@ -6071,6 +6171,7 @@ pub fn native_datetime_second() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="second",
         title="Second",
+        since=Version(0, 5, 0),
         docs="The second if it was specified, or `{none}` for dates without a time.",
         keywords=[],
         contextual=false,
@@ -6122,6 +6223,7 @@ pub fn native_datetime_ordinal() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ordinal",
         title="Ordinal",
+        since=Version(0, 5, 0),
         docs="The ordinal (day of the year), or `{none}` for times without a date.",
         keywords=[],
         contextual=false,
@@ -6173,6 +6275,7 @@ pub fn native_decimal_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="decimal",
         title="Construct",
+        since=Version(0, 12, 0),
         docs="Converts a value to a `decimal`.",
         keywords=[],
         contextual=false,
@@ -6224,6 +6327,7 @@ pub fn native_dict_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="dictionary",
         title="Construct",
+        since=Forever,
         docs="Converts a value into a dictionary.",
         keywords=[],
         contextual=false,
@@ -6275,6 +6379,7 @@ pub fn native_dict_len() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="len",
         title="Length",
+        since=Forever,
         docs="The number of pairs in the dictionary.",
         keywords=[],
         contextual=false,
@@ -6326,6 +6431,7 @@ pub fn native_dict_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Returns the value associated with the specified key in the dictionary.",
         keywords=[],
         contextual=false,
@@ -6401,6 +6507,7 @@ pub fn native_dict_insert() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="insert",
         title="Insert",
+        since=Forever,
         docs="Inserts a new pair into the dictionary. If the dictionary already contains this key, the value is updated.",
         keywords=[],
         contextual=false,
@@ -6476,6 +6583,7 @@ pub fn native_dict_remove() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="remove",
         title="Remove",
+        since=Forever,
         docs="Removes a pair from the dictionary by key and return the value.",
         keywords=[],
         contextual=false,
@@ -6551,6 +6659,7 @@ pub fn native_dict_keys() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="keys",
         title="Keys",
+        since=Forever,
         docs="Returns the keys of the dictionary as an array in insertion order.",
         keywords=[],
         contextual=false,
@@ -6602,6 +6711,7 @@ pub fn native_dict_values() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="values",
         title="Values",
+        since=Forever,
         docs="Returns the values of the dictionary as an array in insertion order.",
         keywords=[],
         contextual=false,
@@ -6653,6 +6763,7 @@ pub fn native_dict_pairs() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="pairs",
         title="Pairs",
+        since=Forever,
         docs="Returns the keys and values of the dictionary as an array of pairs. Each pair is represented as an array of length two.",
         keywords=[],
         contextual=false,
@@ -6704,6 +6815,7 @@ pub fn native_dict_filter() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="filter",
         title="Filter",
+        since=Version(0, 15, 0),
         docs="Produces a new dictionary with only the pairs from the original one for which the given function returns `{true}`.",
         keywords=[],
         contextual=false,
@@ -6767,6 +6879,7 @@ pub fn native_dict_map() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="map",
         title="Map",
+        since=Version(0, 15, 0),
         docs="Produces a new dictionary where the keys are the same, but the values are transformed with the given function.",
         keywords=[],
         contextual=false,
@@ -6830,6 +6943,7 @@ pub fn native_duration_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="duration",
         title="Construct",
+        since=Version(0, 8, 0),
         docs="Creates a new duration.",
         keywords=[],
         contextual=false,
@@ -6946,6 +7060,7 @@ pub fn native_duration_seconds() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="seconds",
         title="Seconds",
+        since=Version(0, 8, 0),
         docs="The duration expressed in seconds.",
         keywords=[],
         contextual=false,
@@ -6997,6 +7112,7 @@ pub fn native_duration_minutes() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="minutes",
         title="Minutes",
+        since=Version(0, 8, 0),
         docs="The duration expressed in minutes.",
         keywords=[],
         contextual=false,
@@ -7048,6 +7164,7 @@ pub fn native_duration_hours() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="hours",
         title="Hours",
+        since=Version(0, 8, 0),
         docs="The duration expressed in hours.",
         keywords=[],
         contextual=false,
@@ -7099,6 +7216,7 @@ pub fn native_duration_days() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="days",
         title="Days",
+        since=Version(0, 8, 0),
         docs="The duration expressed in days.",
         keywords=[],
         contextual=false,
@@ -7150,6 +7268,7 @@ pub fn native_duration_weeks() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="weeks",
         title="Weeks",
+        since=Version(0, 8, 0),
         docs="The duration expressed in weeks.",
         keywords=[],
         contextual=false,
@@ -7201,6 +7320,7 @@ pub fn native_f64_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="float",
         title="Construct",
+        since=Forever,
         docs="Converts a value to a float.",
         keywords=[],
         contextual=false,
@@ -7252,6 +7372,7 @@ pub fn native_f64_is_nan() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="is-nan",
         title="Is NaN",
+        since=Version(0, 11, 0),
         docs="Checks if a float is not a number.",
         keywords=[],
         contextual=false,
@@ -7303,6 +7424,7 @@ pub fn native_f64_is_infinite() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="is-infinite",
         title="Is Infinite",
+        since=Version(0, 11, 0),
         docs="Checks if a float is infinite.",
         keywords=[],
         contextual=false,
@@ -7354,6 +7476,7 @@ pub fn native_f64_signum() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="signum",
         title="Signum",
+        since=Version(0, 11, 0),
         docs="Calculates the sign of a floating point number.",
         keywords=[],
         contextual=false,
@@ -7405,6 +7528,7 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="from-bytes",
         title="From Bytes",
+        since=Version(0, 12, 0),
         docs="Interprets bytes as a float.",
         keywords=[],
         contextual=false,
@@ -7473,6 +7597,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-bytes",
         title="To Bytes",
+        since=Version(0, 12, 0),
         docs="Converts a float to bytes.",
         keywords=[],
         contextual=false,
@@ -7556,6 +7681,7 @@ pub fn native_func_with() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="with",
         title="With",
+        since=Forever,
         docs="Returns a new function that has the given arguments pre-applied.",
         keywords=[],
         contextual=false,
@@ -7617,6 +7743,7 @@ pub fn native_func_where() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="where",
         title="Where",
+        since=Forever,
         docs="Returns a selector that filters for elements belonging to this function whose fields have the values of the given arguments.",
         keywords=[],
         contextual=false,
@@ -7678,6 +7805,7 @@ pub fn native_i64_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="int",
         title="Construct",
+        since=Forever,
         docs="Converts a value to an integer. Raises an error if there is an attempt to parse an invalid string or produce an integer that doesn't fit into a 64-bit signed integer.",
         keywords=[],
         contextual=false,
@@ -7746,6 +7874,7 @@ pub fn native_i64_signum() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="signum",
         title="Signum",
+        since=Version(0, 11, 0),
         docs="Calculates the sign of an integer.",
         keywords=[],
         contextual=false,
@@ -7797,6 +7926,7 @@ pub fn native_i64_bit_not() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-not",
         title="Bitwise NOT",
+        since=Version(0, 11, 0),
         docs="Calculates the bitwise NOT of an integer.",
         keywords=[],
         contextual=false,
@@ -7848,6 +7978,7 @@ pub fn native_i64_bit_and() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-and",
         title="Bitwise AND",
+        since=Version(0, 11, 0),
         docs="Calculates the bitwise AND between two integers.",
         keywords=[],
         contextual=false,
@@ -7911,6 +8042,7 @@ pub fn native_i64_bit_or() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-or",
         title="Bitwise OR",
+        since=Version(0, 11, 0),
         docs="Calculates the bitwise OR between two integers.",
         keywords=[],
         contextual=false,
@@ -7974,6 +8106,7 @@ pub fn native_i64_bit_xor() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-xor",
         title="Bitwise XOR",
+        since=Version(0, 11, 0),
         docs="Calculates the bitwise XOR between two integers.",
         keywords=[],
         contextual=false,
@@ -8037,6 +8170,7 @@ pub fn native_i64_bit_lshift() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-lshift",
         title="Bitwise Left Shift",
+        since=Version(0, 11, 0),
         docs="Shifts the operand's bits to the left by the specified amount.",
         keywords=[],
         contextual=false,
@@ -8100,6 +8234,7 @@ pub fn native_i64_bit_rshift() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bit-rshift",
         title="Bitwise Right Shift",
+        since=Version(0, 11, 0),
         docs="Shifts the operand's bits to the right by the specified amount. Performs an arithmetic shift by default (extends the sign bit to the left, such that negative numbers stay negative), but that can be changed by the `logical` parameter.",
         keywords=[],
         contextual=false,
@@ -8178,6 +8313,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="from-bytes",
         title="From Bytes",
+        since=Version(0, 12, 0),
         docs="Converts bytes to an integer.",
         keywords=[],
         contextual=false,
@@ -8261,6 +8397,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-bytes",
         title="To Bytes",
+        since=Version(0, 12, 0),
         docs="Converts an integer to bytes.",
         keywords=[],
         contextual=false,
@@ -8344,6 +8481,7 @@ pub fn native_label_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="label",
         title="Construct",
+        since=Forever,
         docs="Creates a label from a string.",
         keywords=[],
         contextual=false,
@@ -8395,6 +8533,7 @@ pub fn native_panic() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="panic",
         title="Panic",
+        since=Forever,
         docs="Fails with an error.",
         keywords=["error"],
         contextual=false,
@@ -8446,6 +8585,7 @@ pub fn native_assert() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="assert",
         title="Assert",
+        since=Forever,
         docs="Ensures that a condition is fulfilled.",
         keywords=[],
         contextual=false,
@@ -8510,6 +8650,7 @@ pub fn native_assert_eq() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="eq",
         title="Assert Equal",
+        since=Version(0, 4, 0),
         docs="Ensures that two values are equal.",
         keywords=[],
         contextual=false,
@@ -8585,6 +8726,7 @@ pub fn native_assert_ne() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ne",
         title="Assert Not Equal",
+        since=Version(0, 4, 0),
         docs="Ensures that two values are not equal.",
         keywords=[],
         contextual=false,
@@ -8660,6 +8802,7 @@ pub fn native_eval() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="eval",
         title="Evaluate",
+        since=Forever,
         docs="Evaluates a string as Typst code.",
         keywords=[],
         contextual=false,
@@ -8743,6 +8886,7 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="path",
         title="Construct",
+        since=Version(0, 15, 0),
         docs="Creates a path from a string.",
         keywords=[],
         contextual=false,
@@ -8794,6 +8938,7 @@ pub fn native_plugin() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="plugin",
         title="Plugin",
+        since=Version(0, 8, 0),
         docs="Loads a WebAssembly module.",
         keywords=[],
         contextual=false,
@@ -8846,6 +8991,7 @@ pub fn native_plugin_transition() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="transition",
         title="Transition",
+        since=Version(0, 13, 0),
         docs="Calls a plugin function that has side effects and returns a new module with plugin functions that are guaranteed to have observed the results of the mutable call.",
         keywords=[],
         contextual=false,
@@ -8909,6 +9055,7 @@ pub fn native_repr() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="repr",
         title="Representation",
+        since=Forever,
         docs="Returns the string representation of a value.",
         keywords=[],
         contextual=false,
@@ -8960,6 +9107,7 @@ pub fn native_selector_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="selector",
         title="Construct",
+        since=Version(0, 3, 0),
         docs="Turns a value into a selector. The following values are accepted: - An element function like a `heading` or `figure`. - A @str[string] or @regex[regular expression]. - A `{<label>}`. - A @location. - A more complex selector like `{heading.where(level: 1)}`.",
         keywords=[],
         contextual=false,
@@ -9011,6 +9159,7 @@ pub fn native_selector_or() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="or",
         title="Or",
+        since=Version(0, 3, 0),
         docs="Selects all elements that match this or any of the other selectors.",
         keywords=[],
         contextual=false,
@@ -9074,6 +9223,7 @@ pub fn native_selector_and() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="and",
         title="And",
+        since=Version(0, 3, 0),
         docs="Selects all elements that match this and all of the other selectors.",
         keywords=[],
         contextual=false,
@@ -9137,6 +9287,7 @@ pub fn native_selector_before() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="before",
         title="Before",
+        since=Version(0, 3, 0),
         docs="Returns a modified selector that will only match elements that occur before the first match of `end`.",
         keywords=[],
         contextual=false,
@@ -9215,6 +9366,7 @@ pub fn native_selector_after() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="after",
         title="After",
+        since=Version(0, 3, 0),
         docs="Returns a modified selector that will only match elements that occur after the first match of `start`.",
         keywords=[],
         contextual=false,
@@ -9295,6 +9447,7 @@ pub fn native_selector_within() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="within",
         title="Within",
+        since=Version(0, 15, 0),
         docs="Returns a modified selector that will only match elements that are contained within any elements matching the `ancestor` selector.",
         keywords=[],
         contextual=false,
@@ -9358,6 +9511,7 @@ pub fn native_str_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="str",
         title="Construct",
+        since=Forever,
         docs="Converts a value to a string.",
         keywords=[],
         contextual=false,
@@ -9426,6 +9580,7 @@ pub fn native_str_len() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="len",
         title="Length",
+        since=Forever,
         docs="The length of the string in UTF-8 encoded bytes.",
         keywords=[],
         contextual=false,
@@ -9477,6 +9632,7 @@ pub fn native_str_first() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="first",
         title="First",
+        since=Forever,
         docs="Extracts the first grapheme cluster of the string.",
         keywords=[],
         contextual=false,
@@ -9540,6 +9696,7 @@ pub fn native_str_last() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="last",
         title="Last",
+        since=Forever,
         docs="Extracts the last grapheme cluster of the string.",
         keywords=[],
         contextual=false,
@@ -9603,6 +9760,7 @@ pub fn native_str_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Extracts the first grapheme cluster after the specified index. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
         keywords=[],
         contextual=false,
@@ -9678,6 +9836,7 @@ pub fn native_str_slice() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="slice",
         title="Slice",
+        since=Forever,
         docs="Extracts a substring of the string. Fails with an error if the start or end index is out of bounds.",
         keywords=[],
         contextual=false,
@@ -9770,6 +9929,7 @@ pub fn native_str_clusters() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="clusters",
         title="Clusters",
+        since=Forever,
         docs="Returns the grapheme clusters of the string as an array of substrings.",
         keywords=[],
         contextual=false,
@@ -9821,6 +9981,7 @@ pub fn native_str_codepoints() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="codepoints",
         title="Codepoints",
+        since=Forever,
         docs="Returns the Unicode codepoints of the string as an array of substrings.",
         keywords=[],
         contextual=false,
@@ -9872,6 +10033,7 @@ pub fn native_str_to_unicode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-unicode",
         title="To Unicode",
+        since=Version(0, 5, 0),
         docs="Converts a character into its corresponding code point.",
         keywords=[],
         contextual=false,
@@ -9923,6 +10085,7 @@ pub fn native_str_from_unicode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="from-unicode",
         title="From Unicode",
+        since=Version(0, 5, 0),
         docs="Converts a unicode code point into its corresponding string.",
         keywords=[],
         contextual=false,
@@ -9974,6 +10137,7 @@ pub fn native_str_normalize() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="normalize",
         title="Normalize",
+        since=Version(0, 14, 0),
         docs="Normalizes the string to the given Unicode normal form.",
         keywords=[],
         contextual=false,
@@ -10042,6 +10206,7 @@ pub fn native_str_contains() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="contains",
         title="Contains",
+        since=Forever,
         docs="Whether the string contains the specified pattern.",
         keywords=[],
         contextual=false,
@@ -10105,6 +10270,7 @@ pub fn native_str_starts_with() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="starts-with",
         title="Starts With",
+        since=Forever,
         docs="Whether the string starts with the specified pattern.",
         keywords=[],
         contextual=false,
@@ -10168,6 +10334,7 @@ pub fn native_str_ends_with() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ends-with",
         title="Ends With",
+        since=Forever,
         docs="Whether the string ends with the specified pattern.",
         keywords=[],
         contextual=false,
@@ -10231,6 +10398,7 @@ pub fn native_str_find() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="find",
         title="Find",
+        since=Forever,
         docs="Searches for the specified pattern in the string and returns the first match as a string or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -10294,6 +10462,7 @@ pub fn native_str_position() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="position",
         title="Position",
+        since=Forever,
         docs="Searches for the specified pattern in the string and returns the index of the first match as an integer or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -10357,6 +10526,7 @@ pub fn native_str_match() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="match",
         title="Match",
+        since=Forever,
         docs="Searches for the specified pattern in the string and returns a dictionary with details about the first match or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -10420,6 +10590,7 @@ pub fn native_str_matches() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="matches",
         title="Matches",
+        since=Forever,
         docs="Searches for the specified pattern in the string and returns an array of dictionaries with details about all matches. For details about the returned dictionaries, see @str.match[above].",
         keywords=[],
         contextual=false,
@@ -10483,6 +10654,7 @@ pub fn native_str_replace() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="replace",
         title="Replace",
+        since=Forever,
         docs="Replace at most `count` occurrences of the given pattern with a replacement string or function (beginning from the start). If no count is given, all occurrences are replaced.",
         keywords=[],
         contextual=false,
@@ -10572,6 +10744,7 @@ pub fn native_str_trim() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="trim",
         title="Trim",
+        since=Forever,
         docs="Removes matches of a pattern from one or both sides of the string, once or repeatedly and returns the resulting string.",
         keywords=[],
         contextual=false,
@@ -10667,6 +10840,7 @@ pub fn native_str_split() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="split",
         title="Split",
+        since=Forever,
         docs="Splits a string at matches of a specified pattern and returns an array of the resulting parts.",
         keywords=[],
         contextual=false,
@@ -10735,6 +10909,7 @@ pub fn native_str_rev() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rev",
         title="Reverse",
+        since=Version(0, 8, 0),
         docs="Reverses the string.",
         keywords=[],
         contextual=false,
@@ -10786,6 +10961,7 @@ pub fn native_regex_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="regex",
         title="Construct",
+        since=Forever,
         docs="Create a regular expression from a string.",
         keywords=[],
         contextual=false,
@@ -10837,6 +11013,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="symbol",
         title="Construct",
+        since=Forever,
         docs="Create a custom symbol with modifiers.",
         keywords=[],
         contextual=false,
@@ -10888,6 +11065,7 @@ pub fn native_target() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="target",
         title="Target",
+        since=Version(0, 13, 0),
         docs="Returns the current export target.",
         keywords=[],
         contextual=true,
@@ -10926,6 +11104,7 @@ pub fn native_type_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="type",
         title="Construct",
+        since=Version(0, 8, 0),
         docs="Determines a value's type.",
         keywords=[],
         contextual=false,
@@ -10977,6 +11156,7 @@ pub fn native_version_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="version",
         title="Construct",
+        since=Version(0, 9, 0),
         docs="Creates a new version.",
         keywords=[],
         contextual=false,
@@ -11028,6 +11208,7 @@ pub fn native_version_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Version(0, 9, 0),
         docs="Retrieves a component of a version.",
         keywords=[],
         contextual=false,
@@ -11091,6 +11272,7 @@ pub fn native_counter_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="counter",
         title="Construct",
+        since=Forever,
         docs="Create a new counter identified by a key.",
         keywords=[],
         contextual=false,
@@ -11142,6 +11324,7 @@ pub fn native_counter_get() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="get",
         title="Get",
+        since=Version(0, 11, 0),
         docs="Retrieves the value of the counter at the current location. Always returns an array of integers, even if the counter has just one number.",
         keywords=[],
         contextual=true,
@@ -11193,6 +11376,7 @@ pub fn native_counter_display() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="display",
         title="Display",
+        since=Forever,
         docs="Displays the value of the counter.",
         keywords=[],
         contextual=true,
@@ -11301,6 +11485,7 @@ pub fn native_counter_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Retrieves the value of the counter at the given location. Always returns an array of integers, even if the counter has just one number.",
         keywords=[],
         contextual=true,
@@ -11364,6 +11549,7 @@ pub fn native_counter_final() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="final",
         title="Final",
+        since=Forever,
         docs="Retrieves the value of the counter at the end of the document. Always returns an array of integers, even if the counter has just one number.",
         keywords=[],
         contextual=true,
@@ -11415,6 +11601,7 @@ pub fn native_counter_step() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="step",
         title="Step",
+        since=Forever,
         docs="Increases the value of the counter by one.",
         keywords=[],
         contextual=false,
@@ -11483,6 +11670,7 @@ pub fn native_counter_update() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="update",
         title="Update",
+        since=Forever,
         docs="Updates the value of the counter.",
         keywords=[],
         contextual=false,
@@ -11548,6 +11736,7 @@ pub fn native_here() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="here",
         title="Here",
+        since=Version(0, 11, 0),
         docs="Provides the current location in the document.",
         keywords=[],
         contextual=true,
@@ -11586,6 +11775,7 @@ pub fn native_locate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="locate",
         title="Locate",
+        since=Forever,
         docs="Determines the location of an element in the document.",
         keywords=[],
         contextual=true,
@@ -11637,6 +11827,7 @@ pub fn native_location_page() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="page",
         title="Page",
+        since=Forever,
         docs="Returns the page number for this location.",
         keywords=[],
         contextual=false,
@@ -11688,6 +11879,7 @@ pub fn native_location_page_numbering() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="page-numbering",
         title="Page Numbering",
+        since=Forever,
         docs="Returns the page numbering pattern of the page at this location. This can be used when displaying the page counter in order to obtain the local numbering. This is useful if you are building custom indices or outlines.",
         keywords=[],
         contextual=false,
@@ -11741,6 +11933,7 @@ pub fn native_location_position() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="position",
         title="Position",
+        since=Forever,
         docs="Returns a dictionary with the page number and the x, y position for this location. The page number starts at one and the coordinates are measured from the top-left of the page.",
         keywords=[],
         contextual=false,
@@ -11794,6 +11987,7 @@ pub fn native_query() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="query",
         title="Query",
+        since=Forever,
         docs="Finds elements in the document.",
         keywords=[],
         contextual=true,
@@ -11847,6 +12041,7 @@ pub fn native_state_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="state",
         title="Construct",
+        since=Forever,
         docs="Create a new state identified by a key.",
         keywords=[],
         contextual=false,
@@ -11915,6 +12110,7 @@ pub fn native_state_get() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="get",
         title="Get",
+        since=Version(0, 11, 0),
         docs="Retrieves the value of the state at the current location.",
         keywords=[],
         contextual=true,
@@ -11966,6 +12162,7 @@ pub fn native_state_at() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="at",
         title="At",
+        since=Forever,
         docs="Retrieves the value of the state at the given selector's unique match.",
         keywords=[],
         contextual=true,
@@ -12029,6 +12226,7 @@ pub fn native_state_final() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="final",
         title="Final",
+        since=Forever,
         docs="Retrieves the value of the state at the end of the document.",
         keywords=[],
         contextual=true,
@@ -12080,6 +12278,7 @@ pub fn native_state_update() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="update",
         title="Update",
+        since=Forever,
         docs="Updates the value of the state.",
         keywords=[],
         contextual=false,
@@ -12143,6 +12342,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="axis",
         title="Axis",
+        since=Version(0, 7, 0),
         docs="The axis this alignment belongs to. - `{\"horizontal\"}` for `start`, `left`, `center`, `right`, and `end` - `{\"vertical\"}` for `top`, `horizon`, and `bottom` - `{none}` for 2-dimensional alignments",
         keywords=[],
         contextual=false,
@@ -12194,6 +12394,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="inv",
         title="Inverse",
+        since=Version(0, 7, 0),
         docs="The inverse alignment.",
         keywords=[],
         contextual=false,
@@ -12245,6 +12446,7 @@ pub fn native_angle_to_rad() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rad",
         title="Radians",
+        since=Version(0, 7, 0),
         docs="Converts this angle to radians.",
         keywords=[],
         contextual=false,
@@ -12296,6 +12498,7 @@ pub fn native_angle_to_deg() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="deg",
         title="Degrees",
+        since=Version(0, 7, 0),
         docs="Converts this angle to degrees.",
         keywords=[],
         contextual=false,
@@ -12347,6 +12550,7 @@ pub fn native_dir_from() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="from",
         title="From",
+        since=Version(0, 14, 0),
         docs="Returns a direction from a starting point.",
         keywords=[],
         contextual=false,
@@ -12398,6 +12602,7 @@ pub fn native_dir_to() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to",
         title="To",
+        since=Version(0, 14, 0),
         docs="Returns a direction from an end point.",
         keywords=[],
         contextual=false,
@@ -12449,6 +12654,7 @@ pub fn native_dir_axis() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="axis",
         title="Axis",
+        since=Version(0, 7, 0),
         docs="The axis this direction belongs to, either `{\"horizontal\"}` or `{\"vertical\"}`.",
         keywords=[],
         contextual=false,
@@ -12500,6 +12706,7 @@ pub fn native_dir_sign() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sign",
         title="Sign",
+        since=Version(0, 14, 0),
         docs="The corresponding sign, for use in calculations.",
         keywords=[],
         contextual=false,
@@ -12551,6 +12758,7 @@ pub fn native_dir_start() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="start",
         title="Start",
+        since=Version(0, 7, 0),
         docs="The starting point of this direction.",
         keywords=[],
         contextual=false,
@@ -12602,6 +12810,7 @@ pub fn native_dir_end() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="end",
         title="End",
+        since=Version(0, 7, 0),
         docs="The end point of this direction.",
         keywords=[],
         contextual=false,
@@ -12653,6 +12862,7 @@ pub fn native_dir_inv() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="inv",
         title="Inverse",
+        since=Forever,
         docs="The inverse (opposite) direction.",
         keywords=["opposite"],
         contextual=false,
@@ -12704,6 +12914,7 @@ pub fn native_layout() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="layout",
         title="Layout",
+        since=Version(0, 2, 0),
         docs="Provides access to the current outer container's (or page's, if none) dimensions (width and height).",
         keywords=[],
         contextual=false,
@@ -12755,6 +12966,7 @@ pub fn native_length_to_pt() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="pt",
         title="Points",
+        since=Version(0, 7, 0),
         docs="Converts this length to points.",
         keywords=[],
         contextual=false,
@@ -12806,6 +13018,7 @@ pub fn native_length_to_mm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="mm",
         title="Millimeters",
+        since=Version(0, 7, 0),
         docs="Converts this length to millimeters.",
         keywords=[],
         contextual=false,
@@ -12857,6 +13070,7 @@ pub fn native_length_to_cm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cm",
         title="Centimeters",
+        since=Version(0, 7, 0),
         docs="Converts this length to centimeters.",
         keywords=[],
         contextual=false,
@@ -12908,6 +13122,7 @@ pub fn native_length_to_inches() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="inches",
         title="Inches",
+        since=Version(0, 7, 0),
         docs="Converts this length to inches.",
         keywords=[],
         contextual=false,
@@ -12959,6 +13174,7 @@ pub fn native_length_to_absolute() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-absolute",
         title="To Absolute",
+        since=Version(0, 11, 0),
         docs="Resolve this length to an absolute length.",
         keywords=[],
         contextual=false,
@@ -13010,6 +13226,7 @@ pub fn native_measure() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="measure",
         title="Measure",
+        since=Forever,
         docs="Measures the layouted size of content.",
         keywords=[],
         contextual=true,
@@ -13102,6 +13319,7 @@ pub fn native_cbor() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cbor",
         title="CBOR",
+        since=Version(0, 8, 0),
         docs="Reads structured data from a CBOR file.",
         keywords=[],
         contextual=false,
@@ -13154,6 +13372,7 @@ pub fn native_cbor_encode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="encode",
         title="Encode CBOR",
+        since=Version(0, 8, 0),
         docs="Encode structured data into CBOR bytes.",
         keywords=[],
         contextual=false,
@@ -13205,6 +13424,7 @@ pub fn native_csv() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="csv",
         title="CSV",
+        since=Forever,
         docs="Reads structured data from a CSV file.",
         keywords=[],
         contextual=false,
@@ -13290,6 +13510,7 @@ pub fn native_json() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="json",
         title="JSON",
+        since=Forever,
         docs="Reads structured data from a JSON file.",
         keywords=[],
         contextual=false,
@@ -13342,6 +13563,7 @@ pub fn native_json_encode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="encode",
         title="Encode JSON",
+        since=Version(0, 8, 0),
         docs="Encodes structured data into a JSON string.",
         keywords=[],
         contextual=false,
@@ -13408,6 +13630,7 @@ pub fn native_read() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="read",
         title="Read",
+        since=Forever,
         docs="Reads plain text or data from a file.",
         keywords=[],
         contextual=false,
@@ -13476,6 +13699,7 @@ pub fn native_toml() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="toml",
         title="TOML",
+        since=Version(0, 3, 0),
         docs="Reads structured data from a TOML file.",
         keywords=[],
         contextual=false,
@@ -13528,6 +13752,7 @@ pub fn native_toml_encode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="encode",
         title="Encode TOML",
+        since=Version(0, 8, 0),
         docs="Encodes structured data into a TOML string.",
         keywords=[],
         contextual=false,
@@ -13594,6 +13819,7 @@ pub fn native_xml() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="xml",
         title="XML",
+        since=Forever,
         docs="Reads structured data from an XML file.",
         keywords=[],
         contextual=false,
@@ -13645,6 +13871,7 @@ pub fn native_yaml() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="yaml",
         title="YAML",
+        since=Version(0, 1, 0),
         docs="Reads structured data from a YAML file.",
         keywords=[],
         contextual=false,
@@ -13697,6 +13924,7 @@ pub fn native_yaml_encode() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="encode",
         title="Encode YAML",
+        since=Version(0, 8, 0),
         docs="Encode structured data into a YAML string.",
         keywords=[],
         contextual=false,
@@ -13748,6 +13976,7 @@ pub fn native_math_floor() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="floor",
         title="Floor",
+        since=Forever,
         docs="Floors an expression.",
         keywords=[],
         contextual=false,
@@ -13811,6 +14040,7 @@ pub fn native_math_ceil() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="ceil",
         title="Ceil",
+        since=Forever,
         docs="Ceils an expression.",
         keywords=[],
         contextual=false,
@@ -13874,6 +14104,7 @@ pub fn native_math_round() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="round",
         title="Round",
+        since=Forever,
         docs="Rounds an expression.",
         keywords=[],
         contextual=false,
@@ -13937,6 +14168,7 @@ pub fn native_math_abs() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="abs",
         title="Abs",
+        since=Forever,
         docs="Takes the absolute value of an expression.",
         keywords=[],
         contextual=false,
@@ -14000,6 +14232,7 @@ pub fn native_math_norm() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="norm",
         title="Norm",
+        since=Forever,
         docs="Takes the norm of an expression.",
         keywords=[],
         contextual=false,
@@ -14063,6 +14296,7 @@ pub fn native_math_sqrt() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sqrt",
         title="Square Root",
+        since=Forever,
         docs="A square root.",
         keywords=[],
         contextual=false,
@@ -14114,6 +14348,7 @@ pub fn native_math_bold() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bold",
         title="Bold",
+        since=Forever,
         docs="Bold font style in math.",
         keywords=["mathbf"],
         contextual=false,
@@ -14165,6 +14400,7 @@ pub fn native_math_upright() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="upright",
         title="Upright",
+        since=Forever,
         docs="Upright (non-italic) font style in math.",
         keywords=["mathup"],
         contextual=false,
@@ -14216,6 +14452,7 @@ pub fn native_math_italic() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="italic",
         title="Italic",
+        since=Forever,
         docs="Italic font style in math.",
         keywords=["mathit"],
         contextual=false,
@@ -14267,6 +14504,7 @@ pub fn native_math_serif() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="serif",
         title="Serif",
+        since=Forever,
         docs="Serif (roman) font style in math.",
         keywords=["mathrm"],
         contextual=false,
@@ -14318,6 +14556,7 @@ pub fn native_math_sans() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sans",
         title="Sans Serif",
+        since=Forever,
         docs="Sans-serif font style in math.",
         keywords=["mathsf"],
         contextual=false,
@@ -14369,6 +14608,7 @@ pub fn native_math_cal() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cal",
         title="Calligraphic",
+        since=Forever,
         docs="Calligraphic (chancery) font style in math.",
         keywords=["mathcal", "chancery"],
         contextual=false,
@@ -14420,6 +14660,7 @@ pub fn native_math_scr() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="scr",
         title="Script Style",
+        since=Version(0, 14, 0),
         docs="Script (roundhand) font style in math.",
         keywords=["mathscr", "roundhand"],
         contextual=false,
@@ -14471,6 +14712,7 @@ pub fn native_math_frak() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="frak",
         title="Fraktur",
+        since=Forever,
         docs="Fraktur font style in math.",
         keywords=["mathfrak", "blackletter", "gothic"],
         contextual=false,
@@ -14522,6 +14764,7 @@ pub fn native_math_mono() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="mono",
         title="Monospace",
+        since=Forever,
         docs="Monospace font style in math.",
         keywords=["mathtt"],
         contextual=false,
@@ -14573,6 +14816,7 @@ pub fn native_math_bb() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="bb",
         title="Blackboard Bold",
+        since=Forever,
         docs="Blackboard bold (double-struck) font style in math.",
         keywords=["mathbb"],
         contextual=false,
@@ -14624,6 +14868,7 @@ pub fn native_math_display() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="display",
         title="Display Size",
+        since=Version(0, 5, 0),
         docs="Forced display style in math.",
         keywords=["displaystyle"],
         contextual=false,
@@ -14690,6 +14935,7 @@ pub fn native_math_inline() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="inline",
         title="Inline Size",
+        since=Version(0, 5, 0),
         docs="Forced inline (text) style in math.",
         keywords=["textstyle"],
         contextual=false,
@@ -14756,6 +15002,7 @@ pub fn native_math_script() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="script",
         title="Script Size",
+        since=Version(0, 5, 0),
         docs="Forced script style in math.",
         keywords=["scriptstyle"],
         contextual=false,
@@ -14822,6 +15069,7 @@ pub fn native_math_sscript() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sscript",
         title="Script-Script Size",
+        since=Version(0, 5, 0),
         docs="Forced second script style in math.",
         keywords=["scriptscriptstyle"],
         contextual=false,
@@ -14888,6 +15136,7 @@ pub fn native_numbering() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="numbering",
         title="Numbering",
+        since=Forever,
         docs="Applies a numbering to a sequence of numbers.",
         keywords=[],
         contextual=false,
@@ -14951,6 +15200,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="indented",
         title="Indented",
+        since=Version(0, 13, 0),
         docs="A helper function for producing an indented entry layout: Lays out a prefix and the rest of the entry in an indent-aware way.",
         keywords=[],
         contextual=true,
@@ -15051,6 +15301,7 @@ pub fn native_outline_entry_prefix() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="prefix",
         title="Prefix",
+        since=Version(0, 13, 0),
         docs="Formats the element's numbering (if any).",
         keywords=[],
         contextual=true,
@@ -15102,6 +15353,7 @@ pub fn native_outline_entry_inner() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="inner",
         title="Inner",
+        since=Version(0, 13, 0),
         docs="Creates the default inner content of the entry.",
         keywords=[],
         contextual=true,
@@ -15153,6 +15405,7 @@ pub fn native_outline_entry_body() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="body",
         title="Body",
+        since=Version(0, 13, 0),
         docs="The content which is displayed in place of the referred element at its entry in the outline. For a heading, this is its @heading.body[`body`]; for a figure a caption and for equations, it is empty.",
         keywords=[],
         contextual=false,
@@ -15204,6 +15457,7 @@ pub fn native_outline_entry_page() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="page",
         title="Page",
+        since=Version(0, 13, 0),
         docs="The page number of this entry's element, formatted with the numbering set for the referenced page.",
         keywords=[],
         contextual=true,
@@ -15255,6 +15509,7 @@ pub fn native_lower() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="lower",
         title="Lowercase",
+        since=Forever,
         docs="Converts a string or content to lowercase.",
         keywords=[],
         contextual=false,
@@ -15306,6 +15561,7 @@ pub fn native_upper() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="upper",
         title="Uppercase",
+        since=Forever,
         docs="Converts a string or content to uppercase.",
         keywords=[],
         contextual=false,
@@ -15357,6 +15613,7 @@ pub fn native_lorem() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="lorem",
         title="Lorem",
+        since=Forever,
         docs="Creates blind text.",
         keywords=["Blind Text"],
         contextual=false,
@@ -15408,6 +15665,7 @@ pub fn native_color_luma() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="luma",
         title="Luma",
+        since=Forever,
         docs="Create a grayscale color.",
         keywords=[],
         contextual=false,
@@ -15479,6 +15737,7 @@ pub fn native_color_oklab() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="oklab",
         title="Oklab",
+        since=Version(0, 9, 0),
         docs="Create an #link(\"https://bottosson.github.io/posts/oklab/\")[Oklab] color.",
         keywords=[],
         contextual=false,
@@ -15572,6 +15831,7 @@ pub fn native_color_oklch() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="oklch",
         title="Oklch",
+        since=Version(0, 10, 0),
         docs="Create an #link(\"https://bottosson.github.io/posts/oklab/\")[Oklch] color.",
         keywords=[],
         contextual=false,
@@ -15665,6 +15925,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="linear-rgb",
         title="Linear RGB",
+        since=Version(0, 9, 0),
         docs="Create an RGB(A) color with linear luma.",
         keywords=[],
         contextual=false,
@@ -15758,6 +16019,7 @@ pub fn native_color_rgb() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rgb",
         title="RGB",
+        since=Forever,
         docs="Create an RGB(A) color.",
         keywords=[],
         contextual=false,
@@ -15862,6 +16124,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="cmyk",
         title="CMYK",
+        since=Forever,
         docs="Create a CMYK color.",
         keywords=[],
         contextual=false,
@@ -15955,6 +16218,7 @@ pub fn native_color_hsl() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="hsl",
         title="HSL",
+        since=Version(0, 9, 0),
         docs="Create an HSL color.",
         keywords=[],
         contextual=false,
@@ -16048,6 +16312,7 @@ pub fn native_color_hsv() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="hsv",
         title="HSV",
+        since=Version(0, 9, 0),
         docs="Create an HSV color.",
         keywords=[],
         contextual=false,
@@ -16141,6 +16406,7 @@ pub fn native_color_components() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="components",
         title="Components",
+        since=Version(0, 9, 0),
         docs="Extracts the components of this color.",
         keywords=[],
         contextual=false,
@@ -16207,6 +16473,7 @@ pub fn native_color_space() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="space",
         title="Space",
+        since=Version(0, 9, 0),
         docs="Returns the constructor function for this color's space.",
         keywords=[],
         contextual=false,
@@ -16258,6 +16525,7 @@ pub fn native_color_to_hex() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="to-hex",
         title="To Hex",
+        since=Version(0, 9, 0),
         docs="Returns the color's RGB(A) hex representation (such as `#ffaa32` or `#020304fe`). The alpha component (last two digits in `#020304fe`) is omitted if it is equal to `ff` (255 / 100%).",
         keywords=[],
         contextual=false,
@@ -16309,6 +16577,7 @@ pub fn native_color_lighten() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="lighten",
         title="Lighten",
+        since=Forever,
         docs="Lightens a color by a given factor.",
         keywords=[],
         contextual=false,
@@ -16372,6 +16641,7 @@ pub fn native_color_darken() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="darken",
         title="Darken",
+        since=Forever,
         docs="Darkens a color by a given factor.",
         keywords=[],
         contextual=false,
@@ -16435,6 +16705,7 @@ pub fn native_color_saturate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="saturate",
         title="Saturate",
+        since=Version(0, 9, 0),
         docs="Increases the saturation of a color by a given factor.",
         keywords=[],
         contextual=false,
@@ -16498,6 +16769,7 @@ pub fn native_color_desaturate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="desaturate",
         title="Desaturate",
+        since=Version(0, 9, 0),
         docs="Decreases the saturation of a color by a given factor.",
         keywords=[],
         contextual=false,
@@ -16561,6 +16833,7 @@ pub fn native_color_negate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="negate",
         title="Negate",
+        since=Forever,
         docs="Produces the complementary color using a provided color space. You can think of it as the opposite side on a color wheel.",
         keywords=[],
         contextual=false,
@@ -16629,6 +16902,7 @@ pub fn native_color_rotate() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="rotate",
         title="Rotate",
+        since=Version(0, 9, 0),
         docs="Rotates the hue of the color by a given angle.",
         keywords=[],
         contextual=false,
@@ -16709,6 +16983,7 @@ pub fn native_color_mix() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="mix",
         title="Mix",
+        since=Version(0, 7, 0),
         docs="Create a color by mixing two or more colors.",
         keywords=[],
         contextual=false,
@@ -16777,6 +17052,7 @@ pub fn native_color_transparentize() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="transparentize",
         title="Transparentize",
+        since=Version(0, 11, 0),
         docs="Makes a color more transparent by a given factor.",
         keywords=[],
         contextual=false,
@@ -16840,6 +17116,7 @@ pub fn native_color_opacify() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="opacify",
         title="Opacify",
+        since=Version(0, 11, 0),
         docs="Makes a color more opaque by a given scale.",
         keywords=[],
         contextual=false,
@@ -16903,6 +17180,7 @@ pub fn native_spot_colorant_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="spot",
         title="Construct",
+        since=Version(0, 15, 0),
         docs="Create a new spot colorant.",
         keywords=[],
         contextual=false,
@@ -16966,6 +17244,7 @@ pub fn native_spot_colorant_tint() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="tint",
         title="Tint",
+        since=Version(0, 15, 0),
         docs="Create a spot color at a specific tint of this colorant.",
         keywords=[],
         contextual=false,
@@ -17029,6 +17308,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="linear",
         title="Linear Gradient",
+        since=Version(0, 9, 0),
         docs="Creates a new linear gradient, in which colors transition along a straight line.",
         keywords=[],
         contextual=false,
@@ -17138,6 +17418,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="radial",
         title="Radial Gradient",
+        since=Version(0, 9, 0),
         docs="Creates a new radial gradient, in which colors radiate away from an origin.",
         keywords=[],
         contextual=false,
@@ -17304,6 +17585,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="conic",
         title="Conic Gradient",
+        since=Version(0, 9, 0),
         docs="Creates a new conic gradient, in which colors change radially around a center point.",
         keywords=[],
         contextual=false,
@@ -17431,6 +17713,7 @@ pub fn native_gradient_sharp() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sharp",
         title="Sharp",
+        since=Version(0, 9, 0),
         docs="Creates a sharp version of this gradient.",
         keywords=[],
         contextual=false,
@@ -17512,6 +17795,7 @@ pub fn native_gradient_repeat() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="repeat",
         title="Repeat",
+        since=Version(0, 9, 0),
         docs="Repeats this gradient a given number of times, optionally mirroring it at every second repetition.",
         keywords=[],
         contextual=false,
@@ -17590,6 +17874,7 @@ pub fn native_gradient_kind() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="kind",
         title="Kind",
+        since=Version(0, 9, 0),
         docs="Returns the kind of this gradient.",
         keywords=[],
         contextual=false,
@@ -17641,6 +17926,7 @@ pub fn native_gradient_stops() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="stops",
         title="Stops",
+        since=Version(0, 9, 0),
         docs="Returns the stops of this gradient.",
         keywords=[],
         contextual=false,
@@ -17692,6 +17978,7 @@ pub fn native_gradient_space() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="space",
         title="Space",
+        since=Version(0, 9, 0),
         docs="Returns the mixing space of this gradient.",
         keywords=[],
         contextual=false,
@@ -17743,6 +18030,7 @@ pub fn native_gradient_relative() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="relative",
         title="Relative",
+        since=Version(0, 9, 0),
         docs="Returns the relative placement of this gradient.",
         keywords=[],
         contextual=false,
@@ -17794,6 +18082,7 @@ pub fn native_gradient_angle() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="angle",
         title="Angle",
+        since=Version(0, 9, 0),
         docs="Returns the angle of this gradient.",
         keywords=[],
         contextual=false,
@@ -17845,6 +18134,7 @@ pub fn native_gradient_center() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="center",
         title="Center",
+        since=Version(0, 13, 0),
         docs="Returns the center of this gradient.",
         keywords=[],
         contextual=false,
@@ -17896,6 +18186,7 @@ pub fn native_gradient_radius() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="radius",
         title="Radius",
+        since=Version(0, 13, 0),
         docs="Returns the radius of this gradient.",
         keywords=[],
         contextual=false,
@@ -17947,6 +18238,7 @@ pub fn native_gradient_focal_center() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="focal-center",
         title="Focal Center",
+        since=Version(0, 13, 0),
         docs="Returns the focal-center of this gradient.",
         keywords=[],
         contextual=false,
@@ -17998,6 +18290,7 @@ pub fn native_gradient_focal_radius() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="focal-radius",
         title="Focal Radius",
+        since=Version(0, 13, 0),
         docs="Returns the focal-radius of this gradient.",
         keywords=[],
         contextual=false,
@@ -18049,6 +18342,7 @@ pub fn native_gradient_sample() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="sample",
         title="Sample",
+        since=Version(0, 9, 0),
         docs="Sample the gradient at a given position.",
         keywords=[],
         contextual=false,
@@ -18112,6 +18406,7 @@ pub fn native_gradient_samples() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="samples",
         title="Samples",
+        since=Version(0, 9, 0),
         docs="Samples the gradient at multiple positions at once and returns the results as an array.",
         keywords=[],
         contextual=false,
@@ -18175,6 +18470,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="regular",
         title="Regular Polygon",
+        since=Version(0, 8, 0),
         docs="A regular polygon, defined by its size and number of vertices.",
         keywords=[],
         contextual=false,
@@ -18272,6 +18568,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="stroke",
         title="Construct",
+        since=Forever,
         docs="Converts a value to a stroke or constructs a stroke with the given parameters.",
         keywords=[],
         contextual=false,
@@ -18376,6 +18673,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="tiling",
         title="Construct",
+        since=Version(0, 13, 0),
         docs="Construct a new tiling.",
         keywords=[],
         contextual=false,
@@ -18524,6 +18822,7 @@ pub fn native_pdf_format_table_summary() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="table-summary",
         title="Table Summary",
+        since=Version(0, 14, 0),
         docs="A summary of the purpose and structure of a complex table.",
         keywords=[],
         contextual=false,
@@ -18589,6 +18888,7 @@ pub fn native_pdf_format_header_cell() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="header-cell",
         title="Header Cell",
+        since=Version(0, 14, 0),
         docs="Explicitly defines a cell as a header cell.",
         keywords=[],
         contextual=false,
@@ -18680,6 +18980,7 @@ pub fn native_pdf_format_data_cell() -> NativeFuncData {
       let d = NativeFuncData::new(
         name="data-cell",
         title="Data Cell",
+        since=Version(0, 14, 0),
         docs="Explicitly defines this cell as a data cell.",
         keywords=[],
         contextual=false,

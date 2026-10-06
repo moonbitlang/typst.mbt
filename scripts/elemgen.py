@@ -33,6 +33,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from typemap import mbt_type  # noqa: E402
+from typegen import mbt_since  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "library")
@@ -360,7 +361,8 @@ def main():
             f"    None => {{\n"
             f"      let e = Element::new(\n"
             f"        name={mbt_str(e['name'])},\n        title={mbt_str(e['title'])},\n        key={mbt_str(var)},\n"
-            f"        docs={mbt_str(e['doc'])},\n        keywords=[{kws}],\n        capabilities=[{caps}],\n"
+            + (f"        {mbt_since(e['since'])},\n" if e["since"] else "")
+            + f"        docs={mbt_str(e['doc'])},\n        keywords=[{kws}],\n        capabilities=[{caps}],\n"
             f"        fields=[\n" + "\n".join("    " + x for x in fields) + "\n        ],\n      )\n"
             f"      {var}_cell.val = Some(e)\n{init_call}      e\n    }}\n  }}\n}}\n"
         )

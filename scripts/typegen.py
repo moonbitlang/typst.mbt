@@ -36,6 +36,19 @@ def mbt_str(s):
     return json.dumps(s, ensure_ascii=False).replace("\\{", "\\\\{")
 
 
+def mbt_since(since):
+    """A manifest `since` (`"forever"`, `"unreleased"`, `"0.10.0"` or None) as
+    a `since=..` argument (upstream `Option<Since>`), or `None` if absent."""
+    if since is None:
+        return None
+    if since == "forever":
+        return "since=Forever"
+    if since == "unreleased":
+        return "since=Unreleased"
+    major, minor, patch = (int(x) for x in since.split("."))
+    return f"since=Version({major}, {minor}, {patch})"
+
+
 def main():
     manifest = json.load(open(os.path.join(ROOT, "gen", "manifest.json")))
     types = sorted(manifest["types"], key=lambda t: accessor_name(t["name"]))
@@ -48,7 +61,9 @@ def main():
             f"  name={mbt_str(t['name'])},\n"
             f"  long_name={mbt_str(t['title'].lower())},\n"
             f"  title={mbt_str(t['title'])},\n"
-            f"  docs={mbt_str(t['doc'])},\n)\n"
+            + (f"  {mbt_since(t['since'])},\n" if t["since"] else "")
+            + f"  docs={mbt_str(t['doc'])},\n"
+            f"  keywords=[{', '.join(mbt_str(k) for k in t['keywords'])}],\n)\n"
         )
         out.append(
             f"///|\n/// The `{t['name']}` type (upstream `{t['ident']}`).\n"

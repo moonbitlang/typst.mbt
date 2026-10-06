@@ -27,32 +27,73 @@ fn math_spacing(em : Em) -> Value {
 ///|
 /// Define the spacings in the math module.
 fn math_define_spacings(math : Scope) -> Unit {
-  for
-    entry in [
-      (
-        "thin", "Thin space", "A mathematical space of width one sixth of an em.",
-        math_thin,
-      ),
-      (
-        "med", "Medium space", "A mathematical space of width two ninths of an em.",
-        math_medium,
-      ),
-      (
-        "thick", "Thick space", "A mathematical space of width five eighteenths of an em.",
-        math_thick,
-      ),
-      ("quad", "Quad space", "A one-em wide mathematical space.", math_quad),
-      ("wide", "Wide space", "A two-em wide mathematical space.", math_wide),
-    ] {
-    let (name, title, docs, amount) = entry
-    math
-    .define_(
-      name,
-      Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(amount))])),
-    )
-    .with_documentation({ name, title, docs, })
-    |> ignore
-  }
+  math
+  .define_(
+    "thin",
+    Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(math_thin))])),
+  )
+  .with_documentation({
+    name: "thin",
+    title: "Thin space",
+    docs: "\n            A mathematical space of width one sixth of an em.\n\n            ```example\n            $\n              x y \\\n              x thin y\n            $\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
+  math
+  .define_(
+    "med",
+    Content(
+      Content::new(h_elem(), [(h_elem_amount, math_spacing(math_medium))]),
+    ),
+  )
+  .with_documentation({
+    name: "med",
+    title: "Medium space",
+    docs: "\n            A mathematical space of width two ninths of an em.\n\n            ```example\n            $ (lambda x. x) med y $\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
+  math
+  .define_(
+    "thick",
+    Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(math_thick))])),
+  )
+  .with_documentation({
+    name: "thick",
+    title: "Thick space",
+    docs: "\n            A mathematical space of width five eighteenths of an em.\n\n            ```example\n            $ x thick y $\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
+  math
+  .define_(
+    "quad",
+    Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(math_quad))])),
+  )
+  .with_documentation({
+    name: "quad",
+    title: "Quad space",
+    docs: "\n            A one-em wide mathematical space.\n\n            ```example\n            $\n              f(x) = cases(\n                1/x quad &\"if\" x != 0,\n                0 quad &\"otherwise\",\n              )\n            $\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
+  math
+  .define_(
+    "wide",
+    Content(Content::new(h_elem(), [(h_elem_amount, math_spacing(math_wide))])),
+  )
+  .with_documentation({
+    name: "wide",
+    title: "Wide space",
+    docs: "\n            A two-em wide mathematical space.\n\n            ```example\n            $\n              f(x) = cases(\n                1/x wide &\"if\" x != 0,\n                0 wide &\"otherwise\",\n              )\n            $\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
 }
 
 ///|
