@@ -1348,6 +1348,11 @@ pub(all) struct Rendered {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rendered with @debug.Debug::{to_repr}
+
+///|
 /// A fully rendered bibliography.
 pub(all) struct RenderedBibliography {
   /// Render the bibliography in a hanging indent.
@@ -1366,6 +1371,11 @@ pub(all) struct RenderedBibliography {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderedBibliography with @debug.Debug::{to_repr}
+
+///|
 /// A fully rendered bibliography item.
 pub(all) struct BibliographyItem {
   /// The item's key as specified in the bibliography.
@@ -1378,6 +1388,11 @@ pub(all) struct BibliographyItem {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BibliographyItem with @debug.Debug::{to_repr}
+
+///|
 /// A fully rendered citation.
 pub(all) struct RenderedCitation {
   /// The footnote number for this citation.
@@ -1385,6 +1400,11 @@ pub(all) struct RenderedCitation {
   /// The citation.
   citation : ElemChildren
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderedCitation with @debug.Debug::{to_repr}
 
 ///|
 priv enum Sorting {
@@ -2579,6 +2599,11 @@ fn IbidState::with_last(this : CitationItem, last : CitationItem?) -> IbidState 
 pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpecificLocator with Eq::{not_equal, equal}
+
+///|
 /// The type of content a `cs:text` element should yield for a locator.
 pub(all) enum LocatorPayload {
   /// Just print the string.
@@ -2590,10 +2615,20 @@ pub(all) enum LocatorPayload {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocatorPayload with Eq::{not_equal, equal}
+
+///|
 /// Wraps an object that is used to determine whether two locators are the
 /// same. (Upstream compares arbitrary payloads with `dyn Any`; here, the
 /// consumer provides a comparison key.)
 pub(all) struct TransparentLocator(String) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransparentLocator with Eq::{not_equal, equal}
 
 ///|
 /// Creates a new [`TransparentLocator`] with the given comparison key.
@@ -2619,6 +2654,16 @@ pub(all) enum Brackets {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Brackets with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Brackets with @debug.Debug::{to_repr}
+
+///|
 /// For what purpose to generate a citation.
 pub(all) enum CitePurpose {
   /// The citation will only contain the name of the author.
@@ -2631,6 +2676,21 @@ pub(all) enum CitePurpose {
   /// The citation will be well-suited for inclusion in prose.
   Prose
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitePurpose with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitePurpose with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitePurpose with @debug.Debug::{to_repr}
 
 ///|
 /// A special citation form to use for the [`CitationItem`].

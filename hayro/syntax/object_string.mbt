@@ -5,6 +5,16 @@
 pub(all) struct PdfString(Bytes) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfString with Hash::{hash, hash_combine}
+
+///|
 /// Returns the string data as a byte slice.
 pub fn PdfString::as_bytes(self : PdfString) -> Bytes {
   self.0
@@ -16,9 +26,19 @@ pub impl Show for PdfString with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfString with Show::{to_string, output}
+
+///|
 pub impl Skippable for PdfString with fn skip(r, _) {
   skip_string(r)
 }
+
+///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfString with Skippable::{skip}
 
 ///|
 fn skip_string(r : Reader) -> Unit? {
@@ -62,6 +82,11 @@ pub impl ObjectLike for PdfString with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfString with ObjectLike::{from_object}
 
 ///|
 fn is_ascii_hexdigit(b : Byte) -> Bool {

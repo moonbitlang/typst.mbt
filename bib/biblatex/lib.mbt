@@ -34,12 +34,27 @@ pub(all) enum RetrievalError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RetrievalError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RetrievalError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for RetrievalError with fn output(self, logger) {
   match self {
     Missing(s) => logger.write_string("field \{s} is missing")
     TypeError(err) => logger.write_string("\{err}")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RetrievalError with Show::{to_string, output}
 
 ///|
 fn[T] convert_result(r : Result[T, RetrievalError]) -> Result[T?, TypeError] {

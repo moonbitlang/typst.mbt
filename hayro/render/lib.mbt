@@ -49,6 +49,11 @@ pub impl Default for RenderSettings with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderSettings with Default::{default}
+
+///|
 /// `f64 as u16` (saturating, NaN maps to 0).
 fn f64_as_u16(x : Double) -> Int {
   if x != x || x <= 0.0 {

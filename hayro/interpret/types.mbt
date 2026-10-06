@@ -55,6 +55,11 @@ pub impl CacheKey for ClipPath with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ClipPath with CacheKey::{cache_key}
+
+///|
 /// A stencil image.
 pub struct StencilImage {
   priv paint : Paint
@@ -95,6 +100,11 @@ pub fn StencilImage::height(self : StencilImage) -> Int {
 pub impl CacheKey for StencilImage with fn cache_key(self) {
   CacheKey::cache_key(self.image_xobject)
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StencilImage with CacheKey::{cache_key}
 
 ///|
 /// A raster image.
@@ -145,6 +155,11 @@ pub impl CacheKey for RasterImage with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterImage with CacheKey::{cache_key}
+
+///|
 /// A type of image.
 pub enum Image {
   /// A stencil image.
@@ -178,6 +193,11 @@ pub impl CacheKey for Image with fn cache_key(self) {
     Raster(i) => CacheKey::cache_key(i)
   }
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Image with CacheKey::{cache_key}
 
 ///|
 /// A structure holding 3-channel RGB data.
@@ -292,6 +312,11 @@ pub impl CacheKey for Paint with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with CacheKey::{cache_key}
+
+///|
 /// Properties for a painted drawing operation.
 pub(all) struct DrawProps {
   /// The transform.
@@ -370,6 +395,21 @@ pub(all) enum FillRule {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with @debug.Debug::{to_repr}
+
+///|
 /// A blend mode.
 pub(all) enum BlendMode {
   /// Normal blend mode (default).
@@ -407,6 +447,26 @@ pub(all) enum BlendMode {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for BlendMode with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Default::{default}

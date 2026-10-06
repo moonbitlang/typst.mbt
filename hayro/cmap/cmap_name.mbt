@@ -169,6 +169,16 @@ pub(all) enum CMapName {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CMapName with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CMapName with @debug.Debug::{to_repr}
+
+///|
 /// Create a `CMapName` from raw bytes.
 pub fn CMapName::from_bytes(name : BytesView) -> CMapName {
   match name {

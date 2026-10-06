@@ -337,6 +337,11 @@ pub impl CacheKey for Shading with fn cache_key(self) {
 }
 
 ///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Shading with CacheKey::{cache_key}
+
+///|
 /// A triangle made up of three vertices.
 pub struct Triangle {
   /// The first vertex.

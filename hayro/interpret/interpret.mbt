@@ -50,6 +50,16 @@ pub(all) enum InterpreterWarning {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InterpreterWarning with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InterpreterWarning with @debug.Debug::{to_repr}
+
+///|
 /// interpret the contents of the page and render them into the device.
 pub fn interpret_page(
   page : @hayro_syntax.Page,

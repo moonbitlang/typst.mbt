@@ -7,6 +7,11 @@
 pub struct NormalizedF32(Float) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Eq::{not_equal, equal}
+
+///|
 /// An alias to `NormalizedF32`.
 pub type Opacity = NormalizedF32
 
@@ -72,8 +77,18 @@ pub impl Mul for NormalizedF32 with fn mul(self, rhs) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32 with Mul::{mul}
+
+///|
 /// An immutable, finite `f32` that is known to be >= 0.
 pub struct PositiveF32(Float) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF32 with Eq::{not_equal, equal}
 
 ///|
 pub fn PositiveF32::zero() -> PositiveF32 {
@@ -98,6 +113,11 @@ pub fn PositiveF32::get(self : PositiveF32) -> Float {
 ///|
 /// An immutable, finite `f32` that is known to be > 0.
 pub struct NonZeroPositiveF32(Float) derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroPositiveF32 with Eq::{not_equal, equal}
 
 ///|
 /// Creates a new `NonZeroPositiveF32` if the given value is > 0.

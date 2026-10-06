@@ -8,6 +8,21 @@ pub(all) struct PageRanges {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with @debug.Debug::{to_repr}
+
+///|
 /// Create a new `PageRanges` struct.
 pub fn PageRanges::new(ranges : Array[PageRangesPart]) -> PageRanges {
   { ranges, }
@@ -80,6 +95,11 @@ pub impl Show for PageRanges with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRanges with Show::{to_string, output}
+
+///|
 /// `impl FromStr for PageRanges`.
 pub fn PageRanges::from_str(
   s : String,
@@ -112,6 +132,21 @@ pub(all) enum PageRangesPart {
   /// A full range, e.g., `1n8--1n14`.
   Range(Numeric, Numeric)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPart with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPart with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPart with @debug.Debug::{to_repr}
 
 ///|
 /// The start of a range, if any.
@@ -190,6 +225,11 @@ pub impl Show for PageRangesPart with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPart with Show::{to_string, output}
+
+///|
 /// Parsing error for page ranges.
 pub(all) enum PageRangesPartErr {
   /// The string is malformed.
@@ -199,6 +239,16 @@ pub(all) enum PageRangesPartErr {
   /// An error from parsing a numeric value.
   NumericErr(NumericError)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPartErr with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangesPartErr with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for PageRangesPartErr with fn output(self, logger) {

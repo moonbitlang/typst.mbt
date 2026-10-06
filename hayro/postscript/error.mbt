@@ -15,6 +15,16 @@ pub(all) enum PsError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for PsError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -24,3 +34,8 @@ pub impl Show for PsError with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsError with Show::{to_string, output}

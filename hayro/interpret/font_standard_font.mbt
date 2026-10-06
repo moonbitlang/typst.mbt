@@ -34,6 +34,16 @@ pub(all) enum StandardFont {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StandardFont with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StandardFont with @debug.Debug::{to_repr}
+
+///|
 fn StandardFont::code_to_name(self : StandardFont, code : Byte) -> String? {
   match self {
     Symbol => symbol_get(code)

@@ -14,6 +14,16 @@ pub(all) enum Object {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Object with fn output(self, logger) {
   match self {
     Number(n) => logger.write_string("Number(\{n})")
@@ -22,6 +32,11 @@ pub impl Show for Object with fn output(self, logger) {
     Array(a) => logger.write_string("Array(\{a})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with Show::{to_string, output}
 
 ///|
 fn read_object(r : Reader) -> Result[Object, PsError] {

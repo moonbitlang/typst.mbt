@@ -120,6 +120,11 @@ pub(all) enum FilterInput {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterInput with Eq::{not_equal, equal}
+
+///|
 /// A color interpolation mode.
 ///
 /// The default is `ColorInterpolation::LinearRGB`.
@@ -127,6 +132,11 @@ pub(all) enum ColorInterpolation {
   SRGB
   LinearRGB
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorInterpolation with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for ColorInterpolation with fn default() {
@@ -230,6 +240,11 @@ pub(all) enum CompositeOperator {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeOperator with Eq::{not_equal, equal}
+
+///|
 /// A non-zero `f32`.
 ///
 /// Just like `f32` but immutable and guarantee to never be zero.
@@ -316,6 +331,11 @@ pub(all) enum EdgeMode {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EdgeMode with Eq::{not_equal, equal}
+
+///|
 /// A displacement map filter primitive.
 ///
 /// `feDisplacementMap` element in the SVG.
@@ -335,6 +355,11 @@ pub(all) enum ColorChannel {
   B
   A
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorChannel with Eq::{not_equal, equal}
 
 ///|
 /// A drop shadow filter primitive.
@@ -482,6 +507,11 @@ pub(all) enum MorphologyOperator {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorphologyOperator with Eq::{not_equal, equal}
+
+///|
 /// An offset filter primitive.
 ///
 /// `feOffset` element in the SVG.
@@ -518,3 +548,8 @@ pub(all) enum TurbulenceKind {
   FractalNoise
   Turbulence
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TurbulenceKind with Eq::{not_equal, equal}

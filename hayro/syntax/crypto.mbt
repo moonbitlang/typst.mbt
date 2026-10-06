@@ -28,6 +28,16 @@ pub(all) enum DecryptionError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecryptionError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecryptionError with @debug.Debug::{to_repr}
+
+///|
 priv enum DecryptorTag {
   /// Upstream `DecryptorTag::None` (renamed so it does not shadow
   /// `Option::None`).
@@ -62,6 +72,16 @@ pub(all) enum DecryptionTarget {
   String
   Stream
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecryptionTarget with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecryptionTarget with @debug.Debug::{to_repr}
 
 ///|
 fn Decryptor::decrypt(

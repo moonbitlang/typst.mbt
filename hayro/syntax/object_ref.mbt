@@ -11,6 +11,26 @@ pub(all) struct ObjRef {
 } derive(Eq, Hash, Debug, Compare)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Create a new object reference.
 pub fn ObjRef::new(obj_number : Int, gen_number : Int) -> ObjRef {
   { obj_number, gen_number, }
@@ -41,6 +61,11 @@ pub impl Skippable for ObjRef with fn skip(r, c) {
 }
 
 ///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with Skippable::{skip}
+
+///|
 pub impl Readable for ObjRef with fn read(r, _) {
   guard (r.read_without_context() : Int?) is Some(obj_ref) else { return None }
   r.skip_white_spaces()
@@ -49,6 +74,11 @@ pub impl Readable for ObjRef with fn read(r, _) {
   guard r.forward_tag(b"R") is Some(_) else { return None }
   Some(ObjRef::new(obj_ref, gen_num))
 }
+
+///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjRef with Readable::{read}
 
 ///|
 /// A struct that is either an object or a reference to an object.
@@ -103,6 +133,11 @@ pub impl[T : Skippable] Skippable for MaybeRef[T] with fn skip(
 }
 
 ///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeRef with Skippable::{skip}
+
+///|
 pub impl[T : Readable] Readable for MaybeRef[T] with fn read(r, ctx) {
   let obj : ObjRef? = r.read(ctx)
   if obj is Some(obj) {
@@ -111,6 +146,11 @@ pub impl[T : Readable] Readable for MaybeRef[T] with fn read(r, ctx) {
     r.read(ctx).map(v => NotRef(v))
   }
 }
+
+///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaybeRef with Readable::{read}
 
 ///|
 /// An indirect object.
@@ -148,6 +188,11 @@ pub impl[T : Readable] Readable for IndirectObject[T] with fn read(r, ctx) {
 }
 
 ///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndirectObject with Readable::{read}
+
+///|
 /// Skip an indirect object whose body is skipped by `skip`.
 fn skip_indirect(r : Reader, skip : (Reader, Bool) -> Unit?) -> Unit? {
   guard r.skip(fn(r, c) { ObjectIdentifier::skip(r, c) }, false) is Some(_) else {
@@ -165,3 +210,8 @@ fn skip_indirect(r : Reader, skip : (Reader, Bool) -> Unit?) -> Unit? {
 pub impl[T : Skippable] Skippable for IndirectObject[T] with fn skip(r, _) {
   skip_indirect(r, fn(r, c) { T::skip(r, c) })
 }
+
+///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndirectObject with Skippable::{skip}

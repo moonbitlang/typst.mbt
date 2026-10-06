@@ -33,6 +33,21 @@ pub(all) struct TitleCase {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TitleCase with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TitleCase with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TitleCase with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for TitleCase with fn default() {
   {
     always_capitalize_after_punctuation: true,
@@ -70,6 +85,21 @@ pub(all) struct SentenceCase {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SentenceCase with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SentenceCase with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SentenceCase with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for SentenceCase with fn default() {
   {
     capitalize_words_with_caps_inside: true,
@@ -105,9 +135,29 @@ pub(all) enum Case {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Case with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Case with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Case with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Case with fn default() {
   NoTransform
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Case with Default::{default}
 
 ///|
 /// Transform a string to a case.
@@ -687,6 +737,11 @@ pub impl FmtWrite for CaseFolder with fn write_str(self, s) {
 pub impl FmtWrite for CaseFolder with fn write_char(self, c) {
   self.push(c)
 }
+
+///|
+#deprecated("call as `FmtWrite::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CaseFolder with FmtWrite::{write_str, write_char}
 
 ///|
 /// Maps the characters inside of a string. The mapping function returns

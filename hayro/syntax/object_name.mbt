@@ -6,6 +6,16 @@
 pub(all) struct Name(String) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Hash::{hash, hash_combine}
+
+///|
 /// Create a new name from a sequence of bytes.
 pub fn Name::new(data : BytesView) -> Name? {
   if !bytes_contain(data, b'#') {
@@ -75,10 +85,20 @@ pub impl Show for Name with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Show::{to_string, output}
+
+///|
 /// Order names by their bytes.
 pub impl Compare for Name with fn compare(a, b) {
   compare_latin1(a.0, b.0)
 }
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 pub impl Readable for Name with fn read(r, _) {
@@ -108,6 +128,11 @@ pub impl ObjectLike for Name with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with ObjectLike::{from_object}
 
 ///|
 // This method is shared by `Name` and the parser for content stream operators (which behave like

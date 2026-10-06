@@ -45,6 +45,11 @@ pub(all) enum Units {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Units with Eq::{not_equal, equal}
+
+///|
 /// A visibility property.
 ///
 /// `visibility` attribute in the SVG.
@@ -53,6 +58,11 @@ pub(all) enum Visibility {
   Hidden
   Collapse
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Visibility with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for Visibility with fn default() {
@@ -71,6 +81,11 @@ pub(all) enum ShapeRendering {
   CrispEdges
   GeometricPrecision
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShapeRendering with Eq::{not_equal, equal}
 
 ///|
 /// Checks if anti-aliasing should be enabled.
@@ -101,6 +116,11 @@ pub(all) enum TextRendering {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextRendering with Eq::{not_equal, equal}
+
+///|
 pub impl Default for TextRendering with fn default() {
   OptimizeLegibility
 }
@@ -121,6 +141,11 @@ pub(all) enum ImageRendering {
   CrispEdges
   Pixelated
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageRendering with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for ImageRendering with fn default() {
@@ -152,6 +177,11 @@ pub(all) enum BlendMode {
   Color
   Luminosity
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for BlendMode with fn default() {
@@ -197,6 +227,11 @@ pub(all) enum SpreadMethod {
   Reflect
   Repeat
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpreadMethod with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for SpreadMethod with fn default() {
@@ -452,6 +487,11 @@ pub impl Eq for StrokeMiterlimit with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeMiterlimit with Eq::{not_equal, equal}
+
+///|
 /// A line cap.
 ///
 /// `stroke-linecap` attribute in the SVG.
@@ -460,6 +500,11 @@ pub(all) enum LineCap {
   Round
   Square
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for LineCap with fn default() {
@@ -479,6 +524,11 @@ pub(all) enum LineJoin {
   Round
   Bevel
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for LineJoin with fn default() {
@@ -589,6 +639,11 @@ pub(all) enum FillRule {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Eq::{not_equal, equal}
+
+///|
 pub impl Default for FillRule with fn default() {
   NonZero
 }
@@ -661,6 +716,11 @@ pub(all) struct Color {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
 /// Constructs a new `Color` from RGB values.
 pub fn Color::new_rgb(red : Int, green : Int, blue : Int) -> Color {
   { red, green, blue, }
@@ -699,6 +759,11 @@ pub impl Eq for Paint with fn equal(self, other) {
     _ => false
   }
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with Eq::{not_equal, equal}
 
 ///|
 /// A clip-path element.
@@ -757,9 +822,19 @@ pub(all) enum MaskType {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with Eq::{not_equal, equal}
+
+///|
 pub impl Default for MaskType with fn default() {
   Luminance
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with Default::{default}
 
 ///|
 /// A mask element.
@@ -1141,6 +1216,11 @@ pub(all) enum PaintOrder {
   FillAndStroke
   StrokeAndFill
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrder with Eq::{not_equal, equal}
 
 ///|
 pub impl Default for PaintOrder with fn default() {

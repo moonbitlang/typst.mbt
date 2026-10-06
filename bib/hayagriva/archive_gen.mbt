@@ -327,6 +327,21 @@ pub(all) enum ArchivedStyle {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArchivedStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArchivedStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArchivedStyle with @debug.Debug::{to_repr}
+
+///|
 /// Retrieve this style by name.
 pub fn ArchivedStyle::by_name(name : String) -> ArchivedStyle? {
   match name {

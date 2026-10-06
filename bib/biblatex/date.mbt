@@ -12,6 +12,16 @@ pub(all) struct Date {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with @debug.Debug::{to_repr}
+
+///|
 /// A single date or a range of dates.
 pub(all) enum DateValue {
   /// A single date.
@@ -23,6 +33,16 @@ pub(all) enum DateValue {
   /// A range of dates with known start and end.
   Between(Datetime, Datetime)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateValue with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateValue with @debug.Debug::{to_repr}
 
 ///|
 /// Timezone-unaware date and time.
@@ -44,6 +64,16 @@ pub(all) struct Datetime {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with @debug.Debug::{to_repr}
+
+///|
 /// A potentially timezone aware time.
 pub(all) struct Time {
   /// The hour (0-23).
@@ -57,6 +87,16 @@ pub(all) struct Time {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with @debug.Debug::{to_repr}
+
+///|
 /// A timezone offset.
 pub(all) enum TimeOffset {
   /// Time is UTC. Do not assume an origin timezone.
@@ -64,6 +104,16 @@ pub(all) enum TimeOffset {
   /// Offset relative to UTC. Positiveness, hour, and minute.
   Offset(positive~ : Bool, hours~ : Int, minutes~ : Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TimeOffset with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TimeOffset with @debug.Debug::{to_repr}
 
 ///|
 fn err(start : Int, end : Int, kind : TypeErrorKind) -> TypeError {
@@ -535,6 +585,11 @@ pub impl Show for Datetime with fn output(self, logger) {
     }
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with Show::{to_string, output}
 
 ///|
 fn parse_int(s : @unscanny.Scanner, min_digits : Int, max_digits : Int) -> Int? {

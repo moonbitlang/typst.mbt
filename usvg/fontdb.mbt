@@ -17,6 +17,11 @@ pub(all) enum DbStyle {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DbStyle with Eq::{not_equal, equal}
+
+///|
 /// A single font face info.
 pub(all) struct FaceInfo {
   /// An unique ID (overwritten by `push_face_info`).

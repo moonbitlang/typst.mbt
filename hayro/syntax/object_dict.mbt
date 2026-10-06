@@ -20,9 +20,19 @@ pub impl Eq for Dict with fn equal(a, b) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Eq::{not_equal, equal}
+
+///|
 pub impl Default for Dict with fn default() {
   Dict::empty()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Default::{default}
 
 ///|
 /// Create a new empty dictionary.
@@ -137,6 +147,11 @@ pub impl Show for Dict with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Show::{to_string, output}
+
+///|
 fn skip_dict(r : Reader, is_content_stream : Bool) -> Unit? {
   guard r.forward_tag(b"<<") is Some(_) else { return None }
   while true {
@@ -172,6 +187,11 @@ pub impl Skippable for Dict with fn skip(r, c) {
 }
 
 ///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Skippable::{skip}
+
+///|
 pub impl Readable for Dict with fn read(r, ctx) {
   read_dict_inner(r, ctx, Some(b"<<"), b">>")
 }
@@ -186,6 +206,11 @@ pub impl ObjectLike for Dict with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with ObjectLike::{from_object}
 
 ///|
 fn read_dict_inner(
@@ -302,3 +327,8 @@ pub fn InlineImageDict::get_dict(self : InlineImageDict) -> Dict {
 pub impl Readable for InlineImageDict with fn read(r, ctx) {
   read_dict_inner(r, ctx, None, b"ID").map(d => InlineImageDict(d))
 }
+
+///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InlineImageDict with Readable::{read}

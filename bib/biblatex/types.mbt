@@ -13,6 +13,16 @@ pub(all) struct TypeError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeError with @debug.Debug::{to_repr}
+
+///|
 pub fn TypeError::new(span : Span, kind : TypeErrorKind) -> TypeError {
   { span, kind, }
 }
@@ -32,6 +42,11 @@ fn TypeError::offset(self : TypeError, amount : Int) -> TypeError {
 pub impl Show for TypeError with fn output(self, logger) {
   logger.write_string("\{self.kind}: \{self.span.start}-\{self.span.end}")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeError with Show::{to_string, output}
 
 ///|
 /// Error conditions that might occur while parsing the chunks in a field
@@ -64,6 +79,16 @@ pub(all) enum TypeErrorKind {
   /// The year 0 CE or BCE does not exist.
   YearZeroCE
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeErrorKind with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for TypeErrorKind with fn output(self, logger) {
@@ -247,6 +272,16 @@ pub fn string_to_chunks(s : String) -> Chunks {
 pub(all) struct IntRange(Int64, Int64) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntRange with @debug.Debug::{to_repr}
+
+///|
 /// `impl Type for Range<u32>`.
 pub fn parse_range(
   chunks : ArrayView[Spanned[Chunk]],
@@ -379,6 +414,16 @@ pub(all) enum PermissiveType[T] {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PermissiveType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PermissiveType with @debug.Debug::{to_repr}
+
+///|
 /// `impl Type for PermissiveType<T>`: never fails.
 pub fn[T] parse_permissive(
   chunks : ArrayView[Spanned[Chunk]],
@@ -427,6 +472,16 @@ pub(all) enum Pagination {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Pagination with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Pagination with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Pagination with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -439,6 +494,11 @@ pub impl Show for Pagination with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Pagination with Show::{to_string, output}
 
 ///|
 /// `impl Type for Pagination`.
@@ -475,6 +535,16 @@ pub(all) enum EditorType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EditorType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EditorType with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for EditorType with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -491,6 +561,11 @@ pub impl Show for EditorType with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EditorType with Show::{to_string, output}
 
 ///|
 /// `impl Type for EditorType`.
@@ -525,6 +600,16 @@ pub(all) enum Gender {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gender with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gender with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Gender with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -537,6 +622,11 @@ pub impl Show for Gender with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gender with Show::{to_string, output}
 
 ///|
 /// Puts the gender into plural.
