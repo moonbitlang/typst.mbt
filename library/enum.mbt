@@ -56,11 +56,6 @@ fn enum_elem_number_align_default() -> Value {
 }
 
 ///|
-fn enum_elem_parents_default() -> Value {
-  Array(Arr::new())
-}
-
-///|
 /// Upstream `Fold for SmallVec`: the outer values extended by the inner ones.
 fn enum_elem_parents_fold(inner : Value, outer : Value) -> Value {
   match (inner, outer) {

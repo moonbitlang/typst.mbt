@@ -602,6 +602,10 @@ pub fn sequence_elem() -> Element {
 
 ///|
 /// Typed view of `sequence` content.
+// Only a namespace for the functions of upstream's `SequenceElem`
+// (foundations/content/mod.rs:247): a sequence is plain `Content` here and
+// the view is never built.
+#warnings("-unused_constructor")
 pub struct SequenceElem(Content)
 
 ///|
@@ -665,6 +669,9 @@ pub fn styled_elem() -> Element {
 
 ///|
 /// Typed view of `styled` content.
+// Only a namespace, like `SequenceElem` (upstream `StyledElem`,
+// foundations/content/mod.rs:385).
+#warnings("-unused_constructor")
 pub struct StyledElem(Content)
 
 ///|

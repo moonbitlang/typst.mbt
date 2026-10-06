@@ -42,7 +42,9 @@ Supported: `compile`/`c` (PDF, PNG, SVG, HTML, bundle; `--root`, `--input`,
 environment variables of upstream. Packages are served from the package
 data (`@local`, …) and cache directories; downloading packages from Typst
 Universe, `watch`, `update`, `completions`, `--open` and `--timings` are
-not supported. The embedded fonts are those of upstream (Libertinus Serif,
+not supported; `--jobs` is accepted for compatibility and has no effect
+(compilation is single-threaded). The embedded fonts are those of upstream
+(Libertinus Serif,
 New Computer Modern, DejaVu Sans Mono). On wasm, system font discovery
 reads every font file through moonrun's host API (slow; use
 `--ignore-system-fonts`), symlinks cannot be detected, the local time zone

@@ -88,12 +88,6 @@ pub impl FromValue for Decoration with fn from_value(v) {
 }
 
 ///|
-/// `Default::default()` of `SmallVec<[Decoration; 1]>` (TextElem.deco).
-fn text_elem_deco_default() -> Value {
-  IntoValue::into_value(([] : Array[Decoration]))
-}
-
-///|
 /// Upstream `Fold for SmallVec`: the outer decorations followed by the
 /// inner ones (TextElem.deco).
 fn text_elem_deco_fold(inner : Value, outer : Value) -> Value {

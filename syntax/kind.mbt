@@ -31,7 +31,7 @@ priv enum ModeAfter {
   /// Kinds that can be embedded in markup or math with a hash, but can also
   /// be used without a hash in other contexts.
   Embeddable
-} derive(Eq)
+}
 
 ///|
 pub impl Show for SyntaxKind with fn output(self, logger) {

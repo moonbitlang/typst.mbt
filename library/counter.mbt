@@ -555,22 +555,6 @@ fn impl_counter_display(
 }
 
 ///|
-/// Cast a value that is not `auto` into `T` with the error of `Smart<T>`
-/// (until `Smart` is ported).
-fn[T] smart_cast(
-  v : Value,
-  input : CastInfo,
-  castable : (Value) -> Bool,
-  from_value : (Value) -> T raise HintedError,
-) -> T raise HintedError {
-  if castable(v) {
-    from_value(v)
-  } else {
-    raise HintedError(input.union_with(Type(Type::auto())).error(v))
-  }
-}
-
-///|
 /// Retrieves the value of the counter at the given location. Always returns
 /// an array of integers, even if the counter has just one number.
 fn impl_counter_at(

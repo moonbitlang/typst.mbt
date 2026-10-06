@@ -213,7 +213,7 @@ priv enum BreakOpportunity {
   NoPdfUa(BreakPriority)
   /// The group can always be broken.
   Always(BreakPriority)
-} derive(Eq)
+}
 
 ///|
 fn BreakOpportunity::get(

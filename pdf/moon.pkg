@@ -8,7 +8,6 @@ import {
   "moonbitlang/typst/usvg",
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/tiny_skia_path",
-  "moonbitlang/typst/unicode",
   "moonbitlang/pdflite/export",
   "moonbitlang/pdflite/subsetter",
   "moonbitlang/typst/hayro/syntax" @hayro_syntax,

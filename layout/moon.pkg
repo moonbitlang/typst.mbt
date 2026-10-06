@@ -14,6 +14,11 @@ import {
   "moonbitlang/core/int64",
 }
 
+// `core/math` is only used by `libm_other.mbt` (the non-native targets; native
+// calls the C library), and moon.pkg has no per-target imports.
+
+warnings = "-unused_package"
+
 options(
   targets: {
     "libm_native.mbt": [ "native" ],

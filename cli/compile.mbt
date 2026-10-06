@@ -25,6 +25,10 @@ fn compile(args : CompileArgs) -> Unit raise HintedFailure {
 
 ///|
 /// A preprocessed `CompileCommand`.
+// `watching` and `input` are only read in watch mode upstream
+// (compile.rs:293, :308, :326, :589; watch.rs:64, :123), which this build
+// does not support.
+#warnings("-unused_field")
 priv struct CompileConfig {
   /// Static warnings to emit after compilation.
   warnings : Array[@library.HintedString]

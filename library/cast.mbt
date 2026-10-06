@@ -135,7 +135,7 @@ pub(open) trait FromValue: Reflect {
 ///|
 /// A phantom handle to call static trait methods for a concrete type:
 /// `input_of((Ty::new() : Ty[Smart[Length]]))`.
-pub struct Ty[T](Unit)
+pub struct Ty[_](Unit)
 
 ///|
 pub fn[T] Ty::new() -> Ty[T] {

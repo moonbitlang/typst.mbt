@@ -957,6 +957,9 @@ pub fn NonDecimalBase::name(self : NonDecimalBase) -> String {
 
 ///|
 /// Errors of Rust's `i64::from_str_radix`.
+// Like `core::num::IntErrorKind`, of which upstream only reads `Empty`
+// (typst-syntax/src/lexer.rs:1020).
+#warnings("-unused_constructor")
 priv enum IntParseError {
   Empty
   InvalidDigit

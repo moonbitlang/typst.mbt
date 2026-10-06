@@ -382,18 +382,6 @@ fn grid_elem_stroke_default() -> Value {
 }
 
 ///|
-/// `Smart::Auto` of `Smart<Option<Paint>>`.
-fn grid_cell_elem_fill_default() -> Value {
-  Auto
-}
-
-///|
-/// `Sides::splat(None)` of `Sides<Option<Option<Arc<Stroke>>>>`.
-fn grid_cell_elem_stroke_default() -> Value {
-  Dict(Dict::new())
-}
-
-///|
 /// `Some(Arc::new(Stroke::default()))` (GridHLine.stroke).
 fn grid_h_line_elem_stroke_default() -> Value {
   IntoValue::into_value((Some(Stroke::default()) : Stroke?))

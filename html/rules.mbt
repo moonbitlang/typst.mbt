@@ -62,20 +62,6 @@ pub fn register(rules : @library.NativeRuleMap) -> Unit {
 }
 
 ///|
-/// A rule whose port is pending: it fails with an error instead of silently
-/// producing wrong output.
-fn[T : @library.NativeElement] unported(
-  elem : T,
-  what : String,
-) -> @library.Content raise @library.SourceError {
-  let content = elem.into_content()
-  @library.bail_at(
-    content.span(),
-    "TODO: HTML export of `\{content.elem().name()}` is not ported yet (needs \{what})",
-  )
-}
-
-///|
 /// Upstream `BlockElem::packed`.
 fn block_packed(body : @library.Content) -> @library.Content {
   @library.BlockElem::new().with_body(Some(Content(body))).pack()

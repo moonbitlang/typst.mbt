@@ -56,6 +56,9 @@ pub struct NativeRuleMap {
 
 ///|
 /// A show rule that produces empty content.
+// The bound is upstream's (`fn empty<T: NativeElement>`,
+// foundations/styles.rs:1011).
+#warnings("-unused_trait_bound")
 fn[T : NativeElement] empty_rule() -> ShowFn[T] {
   (_, _, _) => Content::empty()
 }

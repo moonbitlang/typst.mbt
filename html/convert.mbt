@@ -435,6 +435,9 @@ fn handle_block(
 ///|
 /// Indicates that an element can be made block-level with a `display`
 /// property.
+// A unit error like upstream's (convert.rs:490): only its presence is
+// checked (`.is_ok()`, convert.rs:423).
+#warnings("-unused_constructor")
 priv struct Unblockable(Unit)
 
 ///|

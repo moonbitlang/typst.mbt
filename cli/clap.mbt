@@ -16,9 +16,11 @@ priv enum ArgKind {
   /// (`num_args = 0..=1, require_equals = true`); a bare occurrence takes
   /// `missing` as its value.
   OptionalValue(String)
-  /// An option whose value is optional but may also be the next argument
-  /// (`num_args = 0..=1` without `require_equals`, like `--color`).
-  LooseValue(String)
+  /// An option declared with a `default_missing_value` but without
+  /// `num_args = 0..=1` (upstream's `--color`): clap checks the number of
+  /// values before it applies that default, so the value is required and
+  /// the option parses like `Value`.
+  LooseValue
 }
 
 ///|
@@ -253,7 +255,7 @@ fn CommandSpec::usage(self : CommandSpec) -> String {
 fn ArgSpec::display(self : ArgSpec) -> String {
   match self.kind {
     Flag => "--\{self.long}"
-    Value | LooseValue(_) => "--\{self.long} <\{self.value_name}>"
+    Value | LooseValue => "--\{self.long} <\{self.value_name}>"
     OptionalValue(_) => "--\{self.long}[=<\{self.value_name}>]"
   }
 }
@@ -485,7 +487,7 @@ fn CommandSpec::parse(
         }
         OptionalValue(missing) =>
           state.occurrence(spec, Some(attached.unwrap_or(missing)), true)
-        LooseValue(_) | Value =>
+        LooseValue | Value =>
           match attached {
             Some(value) => state.occurrence(spec, Some(value), true)
             None => state.occurrence(spec, separate_value(), false)
@@ -513,7 +515,7 @@ fn CommandSpec::parse(
       state.resolve_pending()
       let spec = self.args[index]
       match spec.kind {
-        Flag | OptionalValue(_) | LooseValue(_) => state.flag(spec)
+        Flag | OptionalValue(_) | LooseValue => state.flag(spec)
         Value => {
           let rest = String::from_array(chars[k:])
           if rest.has_prefix("=") {

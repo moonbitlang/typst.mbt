@@ -478,7 +478,7 @@ priv enum ShapeKind {
   Circle
   /// A curve around two focal points.
   Ellipse
-} derive(Eq)
+}
 
 ///|
 /// Whether this shape kind is curvy.

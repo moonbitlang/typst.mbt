@@ -250,6 +250,8 @@ pub impl FromValue for MathVariant with fn from_value(v) {
 ///|
 /// `(i16, i16)` (the internal `EquationElem::script_scale` field), cast like
 /// upstream's tuple-free storage as a two-element array.
+// The bounds state what the tuple is for; no method of this impl needs them.
+#warnings("-unused_trait_bound")
 pub impl[A : Reflect, B : Reflect] Reflect for (A, B) with fn input() {
   Type(Type::array())
 }
