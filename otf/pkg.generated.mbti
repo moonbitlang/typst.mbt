@@ -466,7 +466,7 @@ pub(all) enum Device {
   Variation(VariationDevice)
 } derive(@debug.Debug)
 
-type ExtendedStateTable[T]
+type ExtendedStateTable[_]
 pub fn[T] ExtendedStateTable::class(Self[T], GlyphId) -> UInt16?
 pub fn[T : FromData] ExtendedStateTable::entry(Self[T], UInt16, UInt16) -> GenericStateEntry[T]?
 pub fn[T] ExtendedStateTable::parse(UInt16, Stream) -> Self[T]?
@@ -1113,7 +1113,7 @@ pub(all) struct LayoutTable {
 }
 pub fn LayoutTable::parse(BytesView) -> Self?
 
-pub struct LazyArray16[T] {
+pub struct LazyArray16[_] {
   data : BytesView
 }
 pub fn[T : FromData + Compare] LazyArray16::binary_search(Self[T], T) -> (UInt16, T)?
@@ -1130,7 +1130,7 @@ pub fn LazyArray16::range(Self[RangeRecord], GlyphId) -> RangeRecord?
 pub fn[T : FromData] LazyArray16::slice(Self[T], UInt16, UInt16) -> Self[T]?
 pub impl[T] Default for LazyArray16[T]
 
-pub struct LazyArray32[T] {
+pub struct LazyArray32[_] {
   data : BytesView
 }
 pub fn[T : FromData + Compare] LazyArray32::binary_search(Self[T], T) -> (UInt, T)?
@@ -1142,7 +1142,7 @@ pub fn[T : FromData] LazyArray32::len(Self[T]) -> UInt
 pub fn[T] LazyArray32::new(BytesView) -> Self[T]
 pub impl[T] Default for LazyArray32[T]
 
-pub struct LazyOffsetArray16[T] {
+pub struct LazyOffsetArray16[_] {
   data : BytesView
   offsets : LazyArray16[Offset16?]
 }
@@ -1223,7 +1223,7 @@ pub fn LookupSubtables::is_empty(Self) -> Bool
 pub fn[T : LookupSubtable] LookupSubtables::iter(Self) -> Iter[T]
 pub fn LookupSubtables::len(Self) -> UInt16
 
-type LookupSubtablesIter[T]
+type LookupSubtablesIter[_]
 pub fn[T : LookupSubtable] LookupSubtablesIter::next(Self[T]) -> T?
 
 type MarkArray
@@ -1722,7 +1722,7 @@ pub(all) struct RawFaceTables {
 }
 pub impl Default for RawFaceTables
 
-type RecordList[T]
+type RecordList[_]
 pub fn[T : RecordListItem] RecordList::find(Self[T], Tag) -> T?
 pub fn[T : RecordListItem] RecordList::get(Self[T], UInt16) -> T?
 pub fn[T] RecordList::index(Self[T], Tag) -> UInt16?

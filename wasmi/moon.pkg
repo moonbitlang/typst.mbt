@@ -7,5 +7,3 @@ import {
 import {
   "moonbitlang/core/debug",
 } for "wbtest"
-
-warnings = "-unused_type_variable"

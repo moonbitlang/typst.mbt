@@ -95,6 +95,8 @@ fn html_elem(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:94).
+#warnings("-unused_error_type")
 fn par_rule(
   elem : @library.ParElem,
   _ : @library.Engine,
@@ -104,6 +106,8 @@ fn par_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:97).
+#warnings("-unused_error_type")
 fn strong_rule(
   elem : @library.StrongElem,
   _ : @library.Engine,
@@ -113,6 +117,8 @@ fn strong_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:100).
+#warnings("-unused_error_type")
 fn emph_rule(
   elem : @library.EmphElem,
   _ : @library.Engine,
@@ -122,6 +128,8 @@ fn emph_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:103).
+#warnings("-unused_error_type")
 fn list_rule(
   elem : @library.ListElem,
   _ : @library.Engine,
@@ -145,6 +153,8 @@ fn list_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:122).
+#warnings("-unused_error_type")
 fn enum_rule(
   elem : @library.EnumElem,
   _ : @library.Engine,
@@ -177,6 +187,8 @@ fn enum_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:149).
+#warnings("-unused_error_type")
 fn terms_rule(
   elem : @library.TermsElem,
   _ : @library.Engine,
@@ -240,6 +252,8 @@ fn link_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:202).
+#warnings("-unused_error_type")
 fn direct_link_rule(
   elem : @library.DirectLinkElem,
   _ : @library.Engine,
@@ -252,6 +266,8 @@ fn direct_link_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:210).
+#warnings("-unused_error_type")
 fn divider_rule(
   elem : @library.DividerElem,
   _ : @library.Engine,
@@ -326,6 +342,8 @@ fn heading_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:263).
+#warnings("-unused_error_type")
 fn figure_rule(
   elem : @library.FigureElem,
   _ : @library.Engine,
@@ -361,6 +379,8 @@ fn figure_caption_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:295).
+#warnings("-unused_error_type")
 fn quote_rule(
   elem : @library.QuoteElem,
   _ : @library.Engine,
@@ -418,6 +438,8 @@ fn footnote_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:347).
+#warnings("-unused_error_type")
 fn footnote_marker_rule(
   _ : @library.FootnoteMarker,
   _ : @library.Engine,
@@ -427,6 +449,8 @@ fn footnote_marker_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:349).
+#warnings("-unused_error_type")
 fn footnote_container_rule(
   elem : @library.FootnoteContainer,
   engine : @library.Engine,
@@ -679,6 +703,8 @@ fn bibliography_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:556).
+#warnings("-unused_error_type")
 fn csl_light_rule(
   elem : @library.CslLightElem,
   _ : @library.Engine,
@@ -690,6 +716,8 @@ fn csl_light_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:563).
+#warnings("-unused_error_type")
 fn csl_indent_rule(
   elem : @library.CslIndentElem,
   _ : @library.Engine,
@@ -704,6 +732,8 @@ fn csl_indent_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:573).
+#warnings("-unused_error_type")
 fn table_rule(
   elem : @library.TableElem,
   _ : @library.Engine,
@@ -881,6 +911,8 @@ fn show_cell(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:687).
+#warnings("-unused_error_type")
 fn table_cell_rule(
   elem : @library.TableCell,
   _ : @library.Engine,
@@ -890,6 +922,8 @@ fn table_cell_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:689).
+#warnings("-unused_error_type")
 fn sub_rule(
   elem : @library.SubElem,
   _ : @library.Engine,
@@ -899,6 +933,8 @@ fn sub_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:692).
+#warnings("-unused_error_type")
 fn super_rule(
   elem : @library.SuperElem,
   _ : @library.Engine,
@@ -908,6 +944,8 @@ fn super_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:695).
+#warnings("-unused_error_type")
 fn underline_rule(
   elem : @library.UnderlineElem,
   _ : @library.Engine,
@@ -922,6 +960,8 @@ fn underline_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:705).
+#warnings("-unused_error_type")
 fn overline_rule(
   elem : @library.OverlineElem,
   _ : @library.Engine,
@@ -933,6 +973,8 @@ fn overline_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:712).
+#warnings("-unused_error_type")
 fn strike_rule(
   elem : @library.StrikeElem,
   _ : @library.Engine,
@@ -942,6 +984,8 @@ fn strike_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:715).
+#warnings("-unused_error_type")
 fn highlight_rule(
   elem : @library.HighlightElem,
   _ : @library.Engine,
@@ -951,6 +995,8 @@ fn highlight_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:718).
+#warnings("-unused_error_type")
 fn smallcaps_rule(
   elem : @library.SmallcapsElem,
   _ : @library.Engine,
@@ -963,6 +1009,8 @@ fn smallcaps_rule(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:726).
+#warnings("-unused_error_type")
 fn raw_rule(
   elem : @library.RawElem,
   _ : @library.Engine,
@@ -1008,6 +1056,8 @@ pub fn html_span_filled(
 }
 
 ///|
+// Cannot fail; a `ShowFn` like upstream's (typst-html/src/rules.rs:771).
+#warnings("-unused_error_type")
 fn raw_line_rule(
   elem : @library.RawLine,
   _ : @library.Engine,

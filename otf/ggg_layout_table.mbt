@@ -76,7 +76,7 @@ pub(open) trait RecordListItem {
 
 ///|
 /// A data storage used by [`ScriptList`], [`LanguageSystemList`] and [`FeatureList`] data types.
-struct RecordList[T] {
+struct RecordList[_] {
   data : BytesView
   records : LazyArray16[TagRecord]
 }

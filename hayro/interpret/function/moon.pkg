@@ -10,7 +10,9 @@ import {
   "moonbitlang/core/string",
 } for "wbtest"
 
-// `@math` is only used by the non-native fallbacks.
+// Outside the tests, `core/math` is only used by `libm_nonnative.mbt` (the
+// non-native targets; native calls the C library), and moon.pkg has no
+// per-target imports.
 
 warnings = "-unused_package"
 

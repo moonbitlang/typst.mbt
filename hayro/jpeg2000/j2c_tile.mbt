@@ -3,6 +3,9 @@
 
 ///|
 /// A single tile in the image.
+// `idx` is only read by upstream's `trace!` logging
+// (hayro-jpeg2000/src/j2c/decode.rs:47); logging is not ported.
+#warnings("-unused_field")
 priv struct Tile {
   /// The index of the tile, in row-major order.
   idx : UInt

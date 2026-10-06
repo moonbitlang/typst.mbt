@@ -53,6 +53,11 @@ priv enum ColrColorSpace {
 }
 
 ///|
+// All of them are produced by `from_raw`; like upstream, only `Cmyk`,
+// `Srgb`, `RommRgb`, `EsRgb`, `Greyscale`, `Sycc` and `CieLab` are ever
+// matched, the rest is unsupported (`_ => bail!(FormatError::Unsupported)`,
+// hayro-jpeg2000/src/lib.rs:524-541).
+#warnings("-unused_constructor")
 priv enum EnumeratedColorspace {
   BiLevel1
   YCbCr1
@@ -78,6 +83,9 @@ priv enum EnumeratedColorspace {
 }
 
 ///|
+// `rb` is parsed and never read: upstream takes the range of b from `ra`
+// (`let rb = lab.ra.unwrap_or(200)`, hayro-jpeg2000/src/lib.rs:646).
+#warnings("-unused_field")
 priv struct CieLab {
   rl : UInt?
   ol : UInt?
