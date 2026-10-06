@@ -14,11 +14,11 @@ test "prose table: pending entries are dropped oldest first at the cap" {
   // `first` was dropped, `used` was consumed: below the cutoff the table
   // cannot tell which, and says so.
   let message = "an interpolated description of this text was already used by another `Prose` or `Para`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
-  guard Prose(first).content.node is NInvalid(text, _) else {
+  guard Prose(first).content.node is NInvalid(text, _, _) else {
     fail("the dropped entry was found")
   }
   assert_eq(text, message)
-  guard Prose(used).content.node is NInvalid(text, _) else {
+  guard Prose(used).content.node is NInvalid(text, _, _) else {
     fail("the consumed entry was found")
   }
   assert_eq(text, message)
@@ -36,7 +36,7 @@ test "prose table: numbers stop before they could exceed 18 digits" {
   // Past it nothing is registered: the token is no placeholder.
   let text = "\{Emph("none")}"
   assert_eq(text, "\u{FDD0}\u{FDD1}")
-  guard Prose(text).content.node is NInvalid(message, _) else {
+  guard Prose(text).content.node is NInvalid(message, _, _) else {
     fail("an exhausted number was accepted")
   }
   assert_eq(

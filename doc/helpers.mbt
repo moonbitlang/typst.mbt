@@ -34,7 +34,7 @@ pub fn Quoted::Quoted(
       NValue(Value::of(VCall(FElem(@library.smart_quote_elem()), args))),
     )
   }
-  { content: Content::of(NSeq([quote(), body.into_content(), quote()], site)), }
+  { content: Content::of(NSeq([quote(), described(body), quote()], site)), }
 }
 
 ///|

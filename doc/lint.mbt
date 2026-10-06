@@ -79,7 +79,8 @@ pub fn Lint::render(self : Lint) -> String {
 /// of the enclosing `Keyed` wrappers.
 fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
   let ArgsLoc(arg_locs) = self.args
-  let (loc, param) = match param {
+  // (Inside a composite: the parameter of the composite, `Site::param`.)
+  let (loc, param) = match param.map(p => self.param(p)) {
     Some(p) if p >= 0 && p < arg_locs.length() && arg_locs[p] is Some(arg) =>
       (arg.to_string(), Some(p))
     _ => (self.loc.to_string(), Option::None)
@@ -94,7 +95,7 @@ fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
     start_column,
     end_line,
     end_column,
-    kind: self.kind,
+    kind: self.origin_kind(),
     keys: keys.copy(),
     param,
     text_range: Option::None,
@@ -232,7 +233,8 @@ fn says_block(args : Array[ArgNode]) -> Bool {
 /// or a key, a display equation, or a `Para`.
 fn is_block(content : Content) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => is_block(body)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      is_block(body)
     NCall(call) => is_block_call(call)
     NEval(node) => node.mode is Math && says_block(node.args)
     // A `Para`: its text is between two paragraph breaks.
@@ -273,7 +275,8 @@ fn wrapper_body(call : CallNode) -> ArgNode? {
 /// label or a key.
 fn is_text_item(content : Content) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => is_text_item(body)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      is_text_item(body)
     // (An empty string is nothing on the page.)
     NText(text, Option::None) => text != ""
     NSeq(_, site) => site.kind == "Prose"
@@ -306,6 +309,8 @@ fn text_origin(
     // (A label of a constructor is on a call, which has its own origin;
     // the body of `Labelled(body, label)` is that call's first argument.)
     NLabelled(body, _, own, _) => text_origin(body, own, 0, keys)
+    // (The result of a composite is its call.)
+    NComposite(body, own) => text_origin(body, own, -1, keys)
     NSeq(_, own) => own.origin(keys, Some(0))
     NCall(call) =>
       match wrapper_body(call) {
@@ -323,7 +328,8 @@ fn text_origin(
 /// which ends the paragraph there.
 fn block_at_edge(content : Content, last : Bool) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => block_at_edge(body, last)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      block_at_edge(body, last)
     NSeq(children, _) =>
       children.length() > 0 &&
       is_block(if last { children[children.length() - 1] } else { children[0] })
@@ -348,7 +354,8 @@ const SEAM_CHARS : Int = 16
 /// or a quote at the edge of a `Prose`).
 fn edge_text(content : Content, last : Bool) -> String? {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => edge_text(body, last)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      edge_text(body, last)
     NText(text, _) => Some(clip_text(text.to_array(), last, false))
     // A `Prose`: its words and the spaces between them, from the edge up
     // to a piece that is something else.
@@ -432,7 +439,8 @@ fn place_key(origin : Origin) -> String {
 /// Whether a description is a `Prose` itself, also with a label or a key.
 fn is_prose(content : Content) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => is_prose(body)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      is_prose(body)
     NSeq(_, site) => site.kind == "Prose"
     _ => false
   }
@@ -523,7 +531,7 @@ fn Linter::content(
         TStyle(set) => self.args(set.args, keys)
         TValue(value) => self.value(value, keys)
       }
-    NLabelled(body, _, _, _) => self.content(body, keys)
+    NLabelled(body, _, _, _) | NComposite(body, _) => self.content(body, keys)
     NKeyed(key, body) => {
       let keys = keys.copy()
       keys.push(key)
@@ -536,7 +544,7 @@ fn Linter::content(
     | NEngine(_)
     | NText(_, _)
     | NSpace(_)
-    | NInvalid(_, _) => ()
+    | NInvalid(_, _, _) => ()
   }
 }
 
