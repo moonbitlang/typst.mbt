@@ -1109,12 +1109,12 @@ long, the line ending in its middle), so that the figures differ only
 where one version is right.
 
 Building and compiling one document (`report time 500`, embedded fonts,
-aarch64 macOS, means of 500 runs in three repetitions): 13.29, 13.30 and
-14.01 ms before; 13.92, 13.89 and 14.71 ms after, 0.6 ms or under 5%
-more, of which 0.5 ms are the cards and the table of steps 3 and 4. The
-two figures alone (`report time 500 figures`): 2.02, 2.03 and 2.02 ms
-before; 2.23, 2.22 and 2.22 ms after, 0.2 ms or 10% more, for 60 items
-that are each a composite and two `Layout` callbacks.
+aarch64 macOS, means of 500 runs in three repetitions, on the final
+code): 13.15, 13.18 and 13.19 ms before; 13.82, 13.78 and 13.83 ms after,
+0.6 ms or 5% more, of which 0.5 ms are the cards and the table of steps
+3 and 4. The two figures alone (`report time 500 figures`): 1.91, 1.92
+and 1.90 ms before; 2.09, 2.11 and 2.09 ms after, 0.2 ms or 10% more, for
+60 items that are each a composite and two `Layout` callbacks.
 
 **Conventions amended** (`doc/kit/kit.mbt`, each marked "step 5"):
 
