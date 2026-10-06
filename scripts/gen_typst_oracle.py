@@ -551,6 +551,18 @@ y
 #at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)
 """,
     ),
+    (
+        "packages: the text of the predefined math operators",
+        "metadata",
+        r"""// mitex: `\limsup` is `math.limsup`, whose text has a thin space (U+2009),
+// like `math.liminf` (`ops!` in typst-library/src/math/op.rs).
+#let ops = dictionary(math).pairs().filter(((_, v)) => type(v) == content and v.func() == math.op)
+#metadata(repr(ops.len()))
+#for (name, v) in ops {
+  metadata(repr((name, v.text.text.codepoints().map(str.to-unicode), v.limits)))
+}
+""",
+    ),
 ]
 
 

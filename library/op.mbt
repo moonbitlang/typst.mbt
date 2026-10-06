@@ -28,8 +28,9 @@ let math_ops : ReadOnlyArray[(String, String, Bool)] = [
   ("ker", "ker", false),
   ("lg", "lg", false),
   ("lim", "lim", true),
-  ("liminf", "lim inf", true),
-  ("limsup", "lim sup", true),
+  // A thin space (U+2009), like upstream.
+  ("liminf", "lim\u{2009}inf", true),
+  ("limsup", "lim\u{2009}sup", true),
   ("ln", "ln", false),
   ("log", "log", false),
   ("max", "max", true),
