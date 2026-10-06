@@ -176,11 +176,10 @@ fn OutlineGlyph::draw_unhinted(
       ) catch {
         e => raise DrawError::ToPath(e)
       }
-      let px = scaled_outline.phantom_x
       {
         has_overlaps: outline.has_overlaps,
-        lsb: Some(F26Dot6::from_bits(px[0]).to_f32()),
-        advance_width: Some(F26Dot6::from_bits(px[1] - px[0]).to_f32()),
+        lsb: Some(scaled_outline.adjusted_lsb().to_f32()),
+        advance_width: Some(scaled_outline.adjusted_advance_width().to_f32()),
       }
     }
     CffKind(cff, glyph_id, subfont_ix) => {
@@ -439,12 +438,14 @@ fn HintingInstance::draw(
       ) catch {
         e => raise DrawError::ToPath(e)
       }
-      let px = scaled_outline.phantom_x
       {
         has_overlaps: outline.has_overlaps,
-        lsb: Some(F26Dot6::from_bits(px[0]).to_f32()),
+        lsb: Some(scaled_outline.adjusted_lsb().to_f32()),
         // When hinting is requested, we round the advance
-        advance_width: Some(F26Dot6::from_bits(px[1] - px[0]).round().to_f32()),
+        // <https://gitlab.freedesktop.org/freetype/freetype/-/blob/57617782464411201ce7bbc93b086c1b4d7d84a5/src/base/ftobjs.c#L889>
+        advance_width: Some(
+          scaled_outline.adjusted_advance_width().round().to_f32(),
+        ),
       }
     }
     _ => raise NoSources
