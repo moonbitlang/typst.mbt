@@ -183,8 +183,10 @@ fn run_resvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_owned())) {
-      Ok(Object(obj)) => obj
+    let obj = try @json.parse(line.to_owned()) catch {
+      _ => continue
+    } noraise {
+      Object(obj) => obj
       _ => continue
     }
     let name = json_string_field(obj, "name").unwrap_or("")
@@ -219,9 +221,10 @@ fn run_resvg_stage(filter : String?, verbose : Bool) -> Unit {
       },
     }
     let data = @fs.read_file_to_bytes(svg_path) catch { _ => b"" }
-    let actual = match (try? @usvg.Tree::from_data(data, opts)) {
-      Err(e) => "error: \{e}"
-      Ok(tree) =>
+    let actual = try @usvg.Tree::from_data(data, opts) catch {
+      e => "error: \{e}"
+    } noraise {
+      tree =>
         match resvg_render_case(tree, mode, scale, id) {
           None => "none"
           Some(pixmap) => {

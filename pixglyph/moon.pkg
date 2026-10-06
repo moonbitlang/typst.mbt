@@ -1,6 +1,12 @@
 import {
   "moonbitlang/typst/otf",
+  "moonbitlang/core/math",
 }
+
+// `core/math` is only used by `libm_other.mbt` (the non-native targets; native
+// calls the C library), and moon.pkg has no per-target imports.
+
+warnings = "-unused_package"
 
 options(
   targets: {

@@ -38,6 +38,7 @@ import {
   "moonbitlang/core/double",
   "moonbitlang/core/env",
   "moonbitlang/x/fs",
+  "moonbitlang/core/debug",
 } for "test"
 
 import {

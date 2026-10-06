@@ -5,6 +5,7 @@ import {
   "moonbitlang/core/cmp",
   "moonbitlang/core/math",
   "moonbitlang/core/v128",
+  "moonbitlang/core/debug",
 }
 
 import {

@@ -294,8 +294,10 @@ fn convert_doc(svg_doc : Document, opt : Options) -> Tree raise UsvgError {
     let s : String? = svg.attribute(AId::BackgroundColor)
     match s {
       Some(s) =>
-        match (try? @svgtypes.Paint::from_str(s)) {
-          Ok(Color(c)) => Some(c)
+        try @svgtypes.Paint::from_str(s) catch {
+          _ => None
+        } noraise {
+          Color(c) => Some(c)
           _ => None
         }
       None => None

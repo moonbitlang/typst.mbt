@@ -260,10 +260,10 @@ test "compile promotes delayed errors of the final iteration only" {
   ] = compile(test_world("Hello"))
   guard warned.output is Err(errors) else { fail("expected err") }
   inspect(creations.val, content="1")
-  inspect(
+  @debug.debug_inspect(
     errors.map(e => e.message),
     content=(
-      #|[delayed]
+      #|["delayed"]
     ),
   )
 }
@@ -275,10 +275,10 @@ test "compile checks the html feature" {
     Result[HtmlLike, Array[@library.SourceDiagnostic]],
   ] = compile(world)
   guard warned.output is Ok(_) else { fail("expected ok") }
-  inspect(
+  @debug.debug_inspect(
     warned.warnings.map(w => w.message),
     content=(
-      #|[html export is under active development and incomplete]
+      #|["html export is under active development and incomplete"]
     ),
   )
   let world = {
@@ -289,10 +289,10 @@ test "compile checks the html feature" {
     Result[HtmlLike, Array[@library.SourceDiagnostic]],
   ] = compile(world)
   guard warned.output is Err(errors) else { fail("expected err") }
-  inspect(
+  @debug.debug_inspect(
     errors.map(e => e.message),
     content=(
-      #|[html export is only available when `--features html` is passed]
+      #|["html export is only available when `--features html` is passed"]
     ),
   )
 }
@@ -303,10 +303,10 @@ test "compile reports evaluation errors" {
     test_world("#nope #nope"),
   )
   guard warned.output is Err(errors) else { fail("expected err") }
-  inspect(
+  @debug.debug_inspect(
     errors.map(e => e.message),
     content=(
-      #|[unknown variable `nope`]
+      #|["unknown variable `nope`"]
     ),
   )
 }

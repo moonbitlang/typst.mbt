@@ -2,7 +2,10 @@
 
 ///|
 fn libm_powf(x : Float, y : Float) -> Float {
-  x.pow(y)
+  // Like the deprecated `Float::pow`: a `Double` power, rounded. (`@math.pow`
+  // and the deprecated `Double::pow` only differ for a base of +-1 with an
+  // infinite or NaN exponent; the only caller passes 1/6.)
+  Float::from_double(@math.pow(x.to_double(), y.to_double()))
 }
 
 ///|

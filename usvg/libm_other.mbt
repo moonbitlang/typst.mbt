@@ -47,32 +47,32 @@ fn libm_asin(x : Double) -> Double {
 
 ///|
 fn libm_sinf(x : Float) -> Float {
-  @math.sin(x.to_double()).to_float()
+  Float::from_double(@math.sin(x.to_double()))
 }
 
 ///|
 fn libm_cosf(x : Float) -> Float {
-  @math.cos(x.to_double()).to_float()
+  Float::from_double(@math.cos(x.to_double()))
 }
 
 ///|
 fn libm_tanf(x : Float) -> Float {
-  @math.tan(x.to_double()).to_float()
+  Float::from_double(@math.tan(x.to_double()))
 }
 
 ///|
 fn libm_atan2f(y : Float, x : Float) -> Float {
-  @math.atan2(y.to_double(), x.to_double()).to_float()
+  Float::from_double(@math.atan2(y.to_double(), x.to_double()))
 }
 
 ///|
 fn libm_acosf(x : Float) -> Float {
-  @math.acos(x.to_double()).to_float()
+  Float::from_double(@math.acos(x.to_double()))
 }
 
 ///|
 fn libm_powf(x : Float, y : Float) -> Float {
-  @math.pow(x.to_double(), y.to_double()).to_float()
+  Float::from_double(@math.pow(x.to_double(), y.to_double()))
 }
 
 ///|
@@ -87,10 +87,10 @@ fn sincos_cos(x : Double) -> Double {
 
 ///|
 fn sincosf_sin(x : Float) -> Float {
-  @math.sin(x.to_double()).to_float()
+  Float::from_double(@math.sin(x.to_double()))
 }
 
 ///|
 fn sincosf_cos(x : Float) -> Float {
-  @math.cos(x.to_double()).to_float()
+  Float::from_double(@math.cos(x.to_double()))
 }

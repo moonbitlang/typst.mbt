@@ -480,10 +480,10 @@ fn first_byte(
 
 ///|
 test "gif interlaced rows" {
-  inspect(gif_interlaced_rows(0), content="[]")
-  inspect(gif_interlaced_rows(1), content="[0]")
-  inspect(gif_interlaced_rows(5), content="[0, 4, 2, 1, 3]")
-  inspect(
+  @debug.debug_inspect(gif_interlaced_rows(0), content="[]")
+  @debug.debug_inspect(gif_interlaced_rows(1), content="[0]")
+  @debug.debug_inspect(gif_interlaced_rows(5), content="[0, 4, 2, 1, 3]")
+  @debug.debug_inspect(
     gif_interlaced_rows(17),
     content="[0, 8, 16, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15]",
   )

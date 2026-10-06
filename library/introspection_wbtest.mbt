@@ -393,23 +393,26 @@ test "locator measurement" {
 test "element introspector queries" {
   let elems = sample()
   let metadata = metadata_elem().select()
-  inspect(values(elems.query(metadata)), content="[1, 2, 3, 4, 5, 6]")
-  inspect(values(elems.query(Location(loc(5)))), content="[5]")
-  inspect(values(elems.query(Location(loc(77)))), content="[]")
-  inspect(values(elems.query(Label(Label("b")))), content="[5, 6]")
-  inspect(values(elems.query_labelled()), content="[4, 5, 6]")
+  @debug.debug_inspect(
+    values(elems.query(metadata)),
+    content="[1, 2, 3, 4, 5, 6]",
+  )
+  @debug.debug_inspect(values(elems.query(Location(loc(5)))), content="[5]")
+  @debug.debug_inspect(values(elems.query(Location(loc(77)))), content="[]")
+  @debug.debug_inspect(values(elems.query(Label(Label("b")))), content="[5, 6]")
+  @debug.debug_inspect(values(elems.query_labelled()), content="[4, 5, 6]")
   // `or` is ordered by document position and deduplicated.
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(Or([Label(Label("b")), Location(loc(2)), Location(loc(5))])),
     ),
     content="[2, 5, 6]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(elems.query(And([metadata, Label(Label("b"))]))),
     content="[5, 6]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(
         Before(selector=metadata, end=Location(loc(4)), inclusive=true),
@@ -417,7 +420,7 @@ test "element introspector queries" {
     ),
     content="[1, 2, 3, 4]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(
         Before(selector=metadata, end=Location(loc(4)), inclusive=false),
@@ -425,7 +428,7 @@ test "element introspector queries" {
     ),
     content="[1, 2, 3]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(
         After(selector=metadata, start=Location(loc(4)), inclusive=true),
@@ -433,7 +436,7 @@ test "element introspector queries" {
     ),
     content="[4, 5, 6]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(
         After(selector=metadata, start=Location(loc(4)), inclusive=false),
@@ -442,11 +445,11 @@ test "element introspector queries" {
     content="[5, 6]",
   )
   // Descendants via start/end tags.
-  inspect(
+  @debug.debug_inspect(
     values(elems.query(Within(selector=metadata, ancestor=Location(loc(1))))),
     content="[2, 3]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(
       elems.query(
         Within(
@@ -457,18 +460,27 @@ test "element introspector queries" {
     ),
     content="[2, 3, 5]",
   )
-  inspect(
+  @debug.debug_inspect(
     values(elems.query(Within(selector=metadata, ancestor=Location(loc(6))))),
     content="[]",
   )
-  inspect(values(opt_list(elems.query_first(metadata))), content="[1]")
-  inspect(values(opt_list(elems.query_first(Label(Label("b"))))), content="[5]")
+  @debug.debug_inspect(
+    values(opt_list(elems.query_first(metadata))),
+    content="[1]",
+  )
+  @debug.debug_inspect(
+    values(opt_list(elems.query_first(Label(Label("b"))))),
+    content="[5]",
+  )
   inspect(elems.query_count_before(metadata, loc(4)), content="4")
   inspect(elems.query_count_before(metadata, loc(77)), content="6")
   inspect(elems.label_count(Label("b")), content="2")
   inspect(elems.label_count(Label("c")), content="0")
   // Unique queries and their errors.
-  inspect(values([elems.query_unique(Label(Label("a")))]), content="[4]")
+  @debug.debug_inspect(
+    values([elems.query_unique(Label(Label("a")))]),
+    content="[4]",
+  )
   let err = (f : () -> Content raise HintedError) => {
     try f() catch {
       HintedError(e) => e.message
@@ -496,14 +508,14 @@ test "element introspector queries" {
     err(() => elems.query_unique(heading_elem().select())),
     content="selector does not match any element",
   )
-  inspect(elems.range_of(loc(1)), content="Some((0, 3))")
-  inspect(elems.range_of(loc(4)), content="Some((3, 5))")
+  @debug.debug_inspect(elems.range_of(loc(1)), content="Some((0, 3))")
+  @debug.debug_inspect(elems.range_of(loc(4)), content="Some((3, 5))")
   // The closest element with the key after the base.
-  inspect(
+  @debug.debug_inspect(
     elems.locator(U128::from_u64(1000), loc(3)).map(l => l == loc(3)),
     content="Some(true)",
   )
-  inspect(elems.locator(U128::from_u64(1), loc(3)), content="None")
+  @debug.debug_inspect(elems.locator(U128::from_u64(1), loc(3)), content="None")
 }
 
 ///|
@@ -523,16 +535,16 @@ test "element introspector insertions and duplicates" {
     (),
   )
   let elems = builder.finalize()
-  inspect(values(elems.all()), content="[1, 9, 2]")
+  @debug.debug_inspect(values(elems.all()), content="[1, 9, 2]")
 
   // Rebuilding from an existing introspector keeps the order and ranges.
   let rebuilt = ElementIntrospectorBuilder::new()
   rebuilt.discover_elements(sample(), _ => ())
   let rebuilt = rebuilt.finalize()
-  inspect(values(rebuilt.all()), content="[1, 2, 3, 4, 5, 6]")
-  inspect(rebuilt.range_of(loc(1)), content="Some((0, 3))")
-  inspect(rebuilt.range_of(loc(4)), content="Some((3, 5))")
-  inspect(
+  @debug.debug_inspect(values(rebuilt.all()), content="[1, 2, 3, 4, 5, 6]")
+  @debug.debug_inspect(rebuilt.range_of(loc(1)), content="Some((0, 3))")
+  @debug.debug_inspect(rebuilt.range_of(loc(4)), content="Some((3, 5))")
+  @debug.debug_inspect(
     values(
       rebuilt.query(
         Within(selector=metadata_elem().select(), ancestor=Location(loc(4))),
@@ -627,16 +639,20 @@ test "convergence analysis" {
     [Introspector::empty(), doc(1), doc(2), doc(3), doc(4), doc(5)],
     engine.sink.introspections(),
   )
-  inspect(
+  @debug.debug_inspect(
     diags.map(d => [d.message] + d.hints.map(h => h.v)),
     content=(
-      #|[[document did not converge within five attempts, see 1 additional warning for more details, see https://typst.app/help/convergence for help], [number of metadata elements did not stabilize, the following numbers of elements were observed:
-      #|- run 1: 0
-      #|- run 2: 1
-      #|- run 3: 2
-      #|- run 4: 3
-      #|- run 5: 4
-      #|- final: 5]]
+      #|[
+      #|  [
+      #|    "document did not converge within five attempts",
+      #|    "see 1 additional warning for more details",
+      #|    "see https://typst.app/help/convergence for help",
+      #|  ],
+      #|  [
+      #|    "number of metadata elements did not stabilize",
+      #|    "the following numbers of elements were observed:\n- run 1: 0\n- run 2: 1\n- run 3: 2\n- run 4: 3\n- run 5: 4\n- final: 5",
+      #|  ],
+      #|]
     ),
   )
 

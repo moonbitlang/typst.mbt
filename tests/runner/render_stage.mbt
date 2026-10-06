@@ -73,9 +73,10 @@ fn compare_render_ref(tc : TestCase, pixmap : @skia.Pixmap) -> Unit {
     }
   }
   let tolerance = render_tolerance(tc.attrs)
-  let ok = match (try? @skia.Pixmap::decode_png(data[:])) {
-    Ok(old) => approx_equal(old, pixmap, tolerance)
-    Err(_) => false
+  let ok = try @skia.Pixmap::decode_png(data[:]) catch {
+    _ => false
+  } noraise {
+    old => approx_equal(old, pixmap, tolerance)
   }
   let (n, oks, missing) = render_ref_stats.val
   render_ref_stats.val = (n + 1, if ok { oks + 1 } else { oks }, missing)

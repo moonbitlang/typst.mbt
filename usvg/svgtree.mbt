@@ -167,9 +167,13 @@ pub fn[T : FromValue] SvgNode::try_attribute(self : SvgNode, aid : AId) -> T? {
 fn SvgNode::node_attribute(self : SvgNode, aid : AId) -> SvgNode? {
   guard (self.attribute(aid) : String?) is Some(value) else { return None }
   let id = if aid == AId::Href {
-    (try? @svgtypes.IRI::from_str(value)).map(v => v.0).to_option()
+    Some(@svgtypes.IRI::from_str(value).0) catch {
+      _ => None
+    }
   } else {
-    (try? @svgtypes.FuncIRI::from_str(value)).map(v => v.0).to_option()
+    Some(@svgtypes.FuncIRI::from_str(value).0) catch {
+      _ => None
+    }
   }
   guard id is Some(id) else { return None }
   self.document().element_by_id(id)
@@ -612,20 +616,23 @@ pub impl FromValue for String with fn parse(_, _, value) {
 
 ///|
 pub impl FromValue for Float with fn parse(_, _, value) {
-  (try? @svgtypes.Number::from_str(value))
-  .map(v => Float::from_double(v.0))
-  .to_option()
+  Some(Float::from_double(@svgtypes.Number::from_str(value).0)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.Length with fn parse(_, _, value) {
-  (try? @svgtypes.Length::from_str(value)).to_option()
+  Some(@svgtypes.Length::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 // TODO: to svgtypes?
 pub impl FromValue for Opacity with fn parse(_, _, value) {
-  guard (try? @svgtypes.Length::from_str(value)).to_option() is Some(length) else {
+  guard (Some(@svgtypes.Length::from_str(value)) catch { _ => None })
+    is Some(length) else {
     return None
   }
   if length.unit == @svgtypes.LengthUnit::Percent {
@@ -657,12 +664,16 @@ pub impl FromValue for Transform with fn parse(_, _, value) {
 
 ///|
 pub impl FromValue for @svgtypes.TransformOrigin with fn parse(_, _, value) {
-  (try? @svgtypes.TransformOrigin::from_str(value)).to_option()
+  Some(@svgtypes.TransformOrigin::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.ViewBox with fn parse(_, _, value) {
-  (try? @svgtypes.ViewBox::from_str(value)).to_option()
+  Some(@svgtypes.ViewBox::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
@@ -676,32 +687,44 @@ pub impl FromValue for Units with fn parse(_, _, value) {
 
 ///|
 pub impl FromValue for @svgtypes.AspectRatio with fn parse(_, _, value) {
-  (try? @svgtypes.AspectRatio::from_str(value)).to_option()
+  Some(@svgtypes.AspectRatio::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.PaintOrder with fn parse(_, _, value) {
-  (try? @svgtypes.PaintOrder::from_str(value)).to_option()
+  // Upstream: `svgtypes::PaintOrder::from_str(value).ok()`, which never
+  // fails (`svgtypes/paint_order.mbt`).
+  Some(@svgtypes.PaintOrder::from_str(value))
 }
 
 ///|
 pub impl FromValue for @svgtypes.Color with fn parse(_, _, value) {
-  (try? @svgtypes.Color::from_str(value)).to_option()
+  Some(@svgtypes.Color::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.Angle with fn parse(_, _, value) {
-  (try? @svgtypes.Angle::from_str(value)).to_option()
+  Some(@svgtypes.Angle::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.EnableBackground with fn parse(_, _, value) {
-  (try? @svgtypes.EnableBackground::from_str(value)).to_option()
+  Some(@svgtypes.EnableBackground::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
 pub impl FromValue for @svgtypes.Paint with fn parse(_, _, value) {
-  (try? @svgtypes.Paint::from_str(value)).to_option()
+  Some(@svgtypes.Paint::from_str(value)) catch {
+    _ => None
+  }
 }
 
 ///|
@@ -796,9 +819,13 @@ pub impl FromValue for BlendMode with fn parse(_, _, value) {
 ///|
 pub impl FromValue for SvgNode with fn parse(node, aid, value) {
   let id = if aid == AId::Href {
-    (try? @svgtypes.IRI::from_str(value)).map(v => v.0).to_option()
+    Some(@svgtypes.IRI::from_str(value).0) catch {
+      _ => None
+    }
   } else {
-    (try? @svgtypes.FuncIRI::from_str(value)).map(v => v.0).to_option()
+    Some(@svgtypes.FuncIRI::from_str(value).0) catch {
+      _ => None
+    }
   }
   guard id is Some(id) else { return None }
   node.document().element_by_id(id)

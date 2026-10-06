@@ -51,10 +51,10 @@ test "symbol deprecation" {
   }
   let s = s.modified(guard_, "curly").modified(guard_, "eq")
   inspect(s.get(), content="≽")
-  inspect(
+  @debug.debug_inspect(
     warnings,
     content=(
-      #|[`succ.curly.eq` is deprecated, use `succ.eq.slant` instead]
+      #|["`succ.curly.eq` is deprecated, use `succ.eq.slant` instead"]
     ),
   )
 }
@@ -62,17 +62,17 @@ test "symbol deprecation" {
 ///|
 test "symbol func" {
   let f = test_sym("arrow").func()
-  inspect(
+  @debug.debug_inspect(
     f.title(),
     content=(
-      #|Some(Accent (⃗))
+      #|Some("Accent (⃗)")
     ),
   )
   let f = test_sym("paren.l").func()
-  inspect(
+  @debug.debug_inspect(
     f.title(),
     content=(
-      #|Some(() Left/Right)
+      #|Some("() Left/Right")
     ),
   )
   let alpha = test_sym("alpha")

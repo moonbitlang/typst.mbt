@@ -2,3 +2,7 @@ import {
   "moonbitlang/typst/unicode",
   "moonbitlang/typst/bib/unscanny",
 }
+
+import {
+  "moonbitlang/core/debug",
+} for "test"

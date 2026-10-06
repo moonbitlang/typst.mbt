@@ -292,9 +292,10 @@ fn wasmi_run(bytes : Bytes) -> Unit raise @wasmparser.BinaryReaderError {
 
 ///|
 fn wasmi_outcome(bytes : Bytes) -> String {
-  match (try? wasmi_run(bytes)) {
-    Ok(_) => "ok"
-    Err(e) => e.to_string()
+  try wasmi_run(bytes) catch {
+    e => e.to_string()
+  } noraise {
+    _ => "ok"
   }
 }
 ''']

@@ -102,8 +102,10 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_owned())) {
-      Ok(Object(obj)) => obj
+    let obj = try @json.parse(line.to_owned()) catch {
+      _ => continue
+    } noraise {
+      Object(obj) => obj
       _ => continue
     }
     let name = json_string_field(obj, "name").unwrap_or("")
@@ -123,8 +125,18 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
       _ => b""
     }
     let diffs = []
-    match (try? @usvg.Tree::from_data(data, usvg_base_options())) {
-      Ok(tree) => {
+    try @usvg.Tree::from_data(data, usvg_base_options()) catch {
+      e => {
+        usvg_check(
+          diffs,
+          "error",
+          json_string_field(obj, "error").unwrap_or(""),
+          usvg_error_string(e),
+        )
+        actual_dump.write_string("=== \{name}\n\{usvg_error_string(e)}\n")
+      }
+    } noraise {
+      tree => {
         usvg_check(
           diffs,
           "error",
@@ -168,15 +180,6 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
         )
         actual_dump.write_string("=== \{name}\n\{svg}\n")
       }
-      Err(e) => {
-        usvg_check(
-          diffs,
-          "error",
-          json_string_field(obj, "error").unwrap_or(""),
-          usvg_error_string(e),
-        )
-        actual_dump.write_string("=== \{name}\n\{usvg_error_string(e)}\n")
-      }
     }
     if diffs.is_empty() {
       passed += 1
@@ -203,8 +206,10 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_owned())) {
-      Ok(Object(obj)) => obj
+    let obj = try @json.parse(line.to_owned()) catch {
+      _ => continue
+    } noraise {
+      Object(obj) => obj
       _ => continue
     }
     let name = json_string_field(obj, "name").unwrap_or("")
@@ -222,8 +227,16 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
       fontdb: db,
     }
     let diffs = []
-    match (try? @usvg.Tree::from_data(data, opts)) {
-      Ok(tree) => {
+    try @usvg.Tree::from_data(data, opts) catch {
+      e =>
+        usvg_check(
+          diffs,
+          "error",
+          json_string_field(obj, "error").unwrap_or(""),
+          usvg_error_string(e),
+        )
+    } noraise {
+      tree => {
         usvg_check(
           diffs,
           "error",
@@ -271,13 +284,6 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
         )
         actual_dump.write_string("=== \{name}\n\{svg}\n\{svg2}\n")
       }
-      Err(e) =>
-        usvg_check(
-          diffs,
-          "error",
-          json_string_field(obj, "error").unwrap_or(""),
-          usvg_error_string(e),
-        )
     }
     if diffs.is_empty() {
       passed += 1
@@ -300,8 +306,10 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_owned())) {
-      Ok(Object(obj)) => obj
+    let obj = try @json.parse(line.to_owned()) catch {
+      _ => continue
+    } noraise {
+      Object(obj) => obj
       _ => continue
     }
     let font = json_string_field(obj, "font").unwrap_or("")
@@ -376,13 +384,15 @@ fn usvg_glyph(face : @otf.Face, gid : Int) -> (String, @tiny_skia_path.Rect)? {
   if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
     data = @codecs.gzip_decompress(data[:]) catch { _ => return None }
   }
-  guard (try? @utf8.decode(data[:])).to_option() is Some(xml) else {
+  guard (Some(@utf8.decode(data[:])) catch { _ => None }) is Some(xml) else {
     return None
   }
-  guard (try? @xml.Document::parse(xml)).to_option() is Some(document) else {
+  guard (Some(@xml.Document::parse(xml)) catch { _ => None }) is Some(document) else {
     return None
   }
-  guard (try? @usvg.Tree::from_xmltree(document, @usvg.Options::default())).to_option()
+  guard (Some(@usvg.Tree::from_xmltree(document, @usvg.Options::default())) catch {
+      _ => None
+    })
     is Some(tree) else {
     return None
   }

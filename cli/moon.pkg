@@ -21,4 +21,5 @@ pkgtype(kind: "executable")
 
 import {
   "moonbitlang/core/env",
+  "moonbitlang/core/debug",
 } for "wbtest"

@@ -6,7 +6,7 @@ test "open takes any viewer" {
     } noraise {
       args =>
         match args.command {
-          Compile(c) => "\{c.open}"
+          Compile(c) => @debug.to_string(c.open)
           _ => "other"
         }
     }
@@ -14,7 +14,7 @@ test "open takes any viewer" {
   inspect(
     open(["compile", "a.typ", "--open=Preview"]),
     content=(
-      #|Some(Some(Preview))
+      #|Some(Some("Preview"))
     ),
   )
   inspect(open(["compile", "a.typ", "--open"]), content="Some(None)")

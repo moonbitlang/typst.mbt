@@ -1263,7 +1263,9 @@ fn FontDatabase::parse_face(self : FontDatabase, id : FontId) -> @otf.Face? {
     None => {
       let face = match self.face(id) {
         Some(info) =>
-          (try? @otf.Face::parse(info.source[:], info.index)).to_option()
+          Some(@otf.Face::parse(info.source[:], info.index)) catch {
+            _ => None
+          }
         None => None
       }
       self.parsed[id] = face

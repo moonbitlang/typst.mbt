@@ -80,8 +80,12 @@ test "scope repository" {
 ///|
 test "global scope repository" {
   assert_true(Scope::new("source.php") == Scope::new("source.php"))
-  assert_true((try? Scope::new("1.2.3.4.5.6.7.8")) is Ok(_))
-  assert_true((try? Scope::new("1.2.3.4.5.6.7.8.9")) is Err(_))
+  assert_true(
+    (Some(Scope::new("1.2.3.4.5.6.7.8")) catch { _ => None }) is Some(_),
+  )
+  assert_true(
+    (Some(Scope::new("1.2.3.4.5.6.7.8.9")) catch { _ => None }) is None,
+  )
 }
 
 ///|

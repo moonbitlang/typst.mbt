@@ -35,22 +35,26 @@ test "compilation modes validate function bodies" {
       }
     })
   }
-  inspect(
+  @debug.debug_inspect(
     run(Lazy),
     content=(
-      #|[good: ok 1, bad: err: type mismatch: expected a type but nothing on stack (at offset 0x1), bad: err: lazy function compilation encountered a Wasm validation or translation error]
+      #|[
+      #|  "good: ok 1",
+      #|  "bad: err: type mismatch: expected a type but nothing on stack (at offset 0x1)",
+      #|  "bad: err: lazy function compilation encountered a Wasm validation or translation error",
+      #|]
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     run(LazyTranslation),
     content=(
-      #|[load-err: type mismatch: expected a type but nothing on stack (at offset 0x31)]
+      #|["load-err: type mismatch: expected a type but nothing on stack (at offset 0x31)"]
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     run(Eager),
     content=(
-      #|[load-err: type mismatch: expected a type but nothing on stack (at offset 0x31)]
+      #|["load-err: type mismatch: expected a type but nothing on stack (at offset 0x31)"]
     ),
   )
 }

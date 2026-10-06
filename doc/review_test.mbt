@@ -1010,12 +1010,12 @@ test "keyed: bodies under one key in one argument are pieces of their own" {
   for glyph in glyphs {
     guard report.origins.resolve(glyph.1) is Some(origin) else { continue }
     assert_eq(origin.kind, "List")
-    spans[glyph.1] = "\{glyph.0} \{origin.keys}"
+    spans[glyph.1] = "\{glyph.0} \{@debug.to_string(origin.keys)}"
   }
   inspect(
     spans.values().collect().join(" | "),
     content=(
-      #|one [row] | two [row] | one [row] | one [other]
+      #|one ["row"] | two ["row"] | one ["row"] | one ["other"]
     ),
   )
   // Each is a piece in the feedback: three of one origin, one of another.
@@ -1023,10 +1023,10 @@ test "keyed: bodies under one key in one argument are pieces of their own" {
   let feedback = text.feedback(text.range(0, 3).unwrap(), "")
   inspect(
     feedback.origins
-    .map(o => "\{o.origin.keys}: \{o.pieces.join("/")}")
+    .map(o => "\{@debug.to_string(o.origin.keys)}: \{o.pieces.join("/")}")
     .join(" | "),
     content=(
-      #|[row]: one/two/one | [other]: one
+      #|["row"]: one/two/one | ["other"]: one
     ),
   )
   // Call values under one key, with arguments of their own: every text
@@ -1187,7 +1187,7 @@ test "what the review reports for callbacks, raw text, bibliographies and includ
   let text = report.review_text()
   let origin = (needle : String) => {
     let entry = text.feedback(text.find(needle).unwrap(), "").origins[0]
-    "\{entry.origin.kind} \{entry.origin.param} tier \{entry.tier}"
+    "\{entry.origin.kind} \{@debug.to_string(entry.origin.param)} tier \{entry.tier}"
   }
   inspect(origin("made"), content="Seq Some(0) tier 2")
   inspect(origin("inside"), content="Emph Some(0) tier 2")

@@ -28,8 +28,8 @@ test "clone is copy-on-write" {
   let b = a.clone()
   b.push(@library.Point::with_x(pt(2.0)), line_item())
   a.translate(@library.Point::with_x(pt(1.0)))
-  inspect(positions(a), content="[1]")
-  inspect(positions(b), content="[0, 2]")
+  @debug.debug_inspect(positions(a), content="[1]")
+  @debug.debug_inspect(positions(b), content="[0, 2]")
 }
 
 ///|
@@ -54,7 +54,7 @@ test "push_frame inlines small soft frames" {
   let parent = @library.Frame::soft(@library.Axes::new(pt(10.0), pt(10.0)))
   parent.push(@library.Point::zero(), line_item())
   parent.push_frame(@library.Point::with_x(pt(2.0)), child)
-  inspect(positions(parent), content="[0, 3]")
+  @debug.debug_inspect(positions(parent), content="[0, 3]")
   // Hard frames become groups.
   let hard = @library.Frame::hard(@library.Axes::new(pt(5.0), pt(5.0)))
   hard.push(@library.Point::zero(), line_item())
@@ -89,9 +89,9 @@ test "resize translates by alignment" {
       @library.FixedAlignment::End,
     ),
   )
-  inspect((offset.x.to_pt(), offset.y.to_pt()), content="(5, 20)")
+  @debug.debug_inspect((offset.x.to_pt(), offset.y.to_pt()), content="(5, 20)")
   inspect(frame.baseline().to_pt(), content="25")
-  inspect(positions(frame), content="[5]")
+  @debug.debug_inspect(positions(frame), content="[5]")
 }
 
 ///|
@@ -104,9 +104,12 @@ test "regions" {
     backlog: [pt(50.0), pt(60.0)][:],
   }
   let heights = regions.iter().take(5).map(s => s.y.to_pt()).collect()
-  inspect(heights, content="[100, 50, 60, 100, 100]")
+  @debug.debug_inspect(heights, content="[100, 50, 60, 100, 100]")
   let next = regions.next()
-  inspect((next.size.y.to_pt(), next.full.to_pt()), content="(50, 50)")
+  @debug.debug_inspect(
+    (next.size.y.to_pt(), next.full.to_pt()),
+    content="(50, 50)",
+  )
   inspect(regions.size.y.to_pt(), content="100")
   inspect(
     @library.Regions::from_region(
