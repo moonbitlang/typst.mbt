@@ -4560,6 +4560,7 @@ pub(all) struct Closure {
   captured : Scope
   num_pos_params : Int
   hash : LazyFingerprint
+  node_hash : LazyFingerprint
 }
 pub fn Closure::name(Self) -> String?
 

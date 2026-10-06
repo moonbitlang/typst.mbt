@@ -521,14 +521,16 @@ pub extend Category with Fingerprint::{fingerprint}
 fn Closure::fingerprint_lazy(self : Closure, state : SipHasher128) -> Unit {
   if !self.hash.write_cached(state) {
     self.hash.write(state, state => {
+      // The node as its 128-bit hash, computed once per node where the
+      // closures of an expression share `node_hash`.
       match self.node {
         Closure(node) => {
           state.write_discriminant(0)
-          node.hash_into(state)
+          self.node_hash.write(state, state => node.hash_into(state))
         }
         Context(node) => {
           state.write_discriminant(1)
-          node.hash_into(state)
+          self.node_hash.write(state, state => node.hash_into(state))
         }
       }
       state.write(self.defaults)

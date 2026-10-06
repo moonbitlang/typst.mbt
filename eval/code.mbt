@@ -376,13 +376,18 @@ fn eval_contextual(
   contextual : @ast.Contextual,
 ) -> @library.Content raise @library.SourceError {
   let body = contextual.body()
-  let captured = collect_captures(vm.scopes, body.to_untyped(), Context)
+  let { captured, node_hash, } = collect_captures(
+    vm.scopes,
+    body.to_untyped(),
+    Context,
+  )
   let closure : @library.Closure = {
     node: Context(body.to_untyped()),
     defaults: [],
     captured,
     num_pos_params: 0,
     hash: @library.LazyFingerprint::new(),
+    node_hash,
   }
   let func = @library.Func::closure(closure).spanned(body.span())
   @library.Content::new(@library.context_elem(), [

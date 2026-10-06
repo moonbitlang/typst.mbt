@@ -56,6 +56,11 @@ priv struct CaptureSite {
   node : @syntax.SyntaxNode
   /// The identifiers that the visitor tries to capture, in order.
   attempts : Array[CaptureAttempt]
+  /// The fingerprint of the node, for the closures made from it
+  /// (`@library.Closure.node_hash`): upstream hashes the syntax tree into
+  /// the hash of every closure, which is every time one is called for the
+  /// first time or compared.
+  node_hash : @library.LazyFingerprint
 }
 
 ///|
@@ -114,7 +119,11 @@ fn CaptureSite::of(node : @syntax.SyntaxNode) -> CaptureSite? {
 fn CaptureSite::new(node : @syntax.SyntaxNode) -> CaptureSite {
   let visitor = CapturesVisitor::recording()
   visitor.visit(node)
-  { node, attempts: visitor.recorded(), }
+  {
+    node,
+    attempts: visitor.recorded(),
+    node_hash: @library.LazyFingerprint::new(),
+  }
 }
 
 ///|
@@ -155,18 +164,30 @@ fn CaptureSite::captures(
 /// visitor.finish()
 /// ```
 ///
-/// with the traversal done once per node and compilation.
+/// with the traversal done once per node and compilation. Also returns the
+/// fingerprint cache of the node for the closure.
 fn collect_captures(
   scopes : @library.Scopes,
   node : @syntax.SyntaxNode,
   capturer : @library.Capturer,
-) -> @library.Scope {
+) -> Captures {
   match CaptureSite::of(node) {
-    Some(site) => site.captures(scopes, capturer)
+    Some(site) =>
+      { captured: site.captures(scopes, capturer), node_hash: site.node_hash, }
     None => {
       let visitor = CapturesVisitor::new(Some(scopes), capturer)
       visitor.visit(node)
-      visitor.finish()
+      {
+        captured: visitor.finish(),
+        node_hash: @library.LazyFingerprint::new(),
+      }
     }
   }
+}
+
+///|
+/// The result of [collect_captures].
+priv struct Captures {
+  captured : @library.Scope
+  node_hash : @library.LazyFingerprint
 }

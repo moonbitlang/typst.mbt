@@ -113,6 +113,7 @@ fn test_closure(node : @syntax.SyntaxNode, value : Value) -> Value {
       captured,
       num_pos_params: 0,
       hash: LazyFingerprint::new(),
+      node_hash: LazyFingerprint::new(),
     }),
   )
 }

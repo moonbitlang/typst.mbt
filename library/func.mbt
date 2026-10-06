@@ -118,6 +118,11 @@ pub(all) struct Closure {
   /// The fingerprint of the fields above (upstream wraps the closure in a
   /// `LazyHash`).
   hash : LazyFingerprint
+  /// The fingerprint of the syntax node, which `hash` covers (not upstream,
+  /// which hashes the tree into the hash of every closure): the closures
+  /// that one expression creates during a compilation share it
+  /// (`eval/captures.mbt`); a closure made another way has its own.
+  node_hash : LazyFingerprint
 }
 
 ///|

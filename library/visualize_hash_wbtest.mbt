@@ -315,6 +315,7 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
         captured,
         num_pos_params: 0,
         hash: LazyFingerprint::new(),
+        node_hash: LazyFingerprint::new(),
       }),
     )
   }

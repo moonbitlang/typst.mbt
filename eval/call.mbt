@@ -534,7 +534,11 @@ fn eval_closure_expr(
   }
 
   // Collect captured variables.
-  let captured = collect_captures(vm.scopes, closure.to_untyped(), Function)
+  let { captured, node_hash, } = collect_captures(
+    vm.scopes,
+    closure.to_untyped(),
+    Function,
+  )
 
   // Define the closure.
   let num_pos_params = closure
@@ -548,6 +552,7 @@ fn eval_closure_expr(
     captured,
     num_pos_params,
     hash: @library.LazyFingerprint::new(),
+    node_hash,
   }
   Func(@library.Func::closure(closure_data).spanned(closure.params().span()))
 }
