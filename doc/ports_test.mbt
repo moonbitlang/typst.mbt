@@ -755,3 +755,59 @@ test "`Length::sizing` and `Length::spacing` are `Rel`" {
     ),
   )
 }
+
+///|
+test "`Upper` and `Lower` set the case of content" {
+  // On content the function sets a text case property ...
+  assert_eq(
+    lowered([@doc.Upper("Loud")]),
+    lowered([@doc.Markup("#upper[#\"Loud\"]")]),
+  )
+  assert_eq(
+    lowered([@doc.Lower(@doc.Seq(["Quiet ", @doc.Emph("Words")]))]),
+    lowered([@doc.Markup("#lower[#[#\"Quiet \"#emph[#\"Words\"]]]")]),
+  )
+  inspect(
+    lowered([@doc.Upper("Loud")]),
+    content=(
+      #|styled(child: [Loud], ..)
+    ),
+  )
+  // ... which is not the string that `upper` of a string gives.
+  inspect(
+    lowered([@doc.Upper(@doc.Value::str("Loud"))]),
+    content=(
+      #|[LOUD]
+    ),
+  )
+  assert_eq(
+    svg_of([@doc.Upper(@doc.Seq(["Quiet ", @doc.Emph("Words")]))]),
+    svg_of([@doc.Markup("#upper[#[#\"Quiet \"#emph[#\"Words\"]]]")]),
+  )
+  // The constructors take `label` and `extra` like the elements.
+  let labelled = @doc.Document([@doc.Upper("x", label="up")])
+    .lower(@doc.DocWorld::in_memory())
+    .unwrap()
+  inspect(
+    match labelled.label() {
+      Some(label) => label.repr()
+      None => "no label"
+    },
+    content=(
+      #|<up>
+    ),
+  )
+  let extra = compile([@doc.Upper("x", extra=[("nope", @doc.Value::int(1))])])
+  inspect(
+    error_messages(extra),
+    content=(
+      #|unexpected argument: nope
+    ),
+  )
+  debug_inspect(
+    @doc.Lower("x"),
+    content=(
+      #|Lower("x")
+    ),
+  )
+}

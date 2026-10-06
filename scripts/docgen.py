@@ -160,6 +160,10 @@ LEAVES = {
     # metric names for each.
     "TopEdge": ("TopEdge", to_value),
     "BottomEdge": ("BottomEdge", to_value),
+    # `upper`/`lower` take a string or content; the facade passes content,
+    # for which the function sets a text case property (a string value
+    # goes through `Value`, as in every content position).
+    "Caseable": ("&IntoContent", lambda e: f"Value::content({e})"),
 }
 
 # Variadic parameters of values: engine type -> (MoonBit array type,
@@ -466,7 +470,8 @@ class F:
     """A facade of a native function (docs/edsl-design.md, section 6.4): a
     constructor with the function's parameters that lowers by calling it."""
 
-    def __init__(self, name, path, ident, parent=None, owner=None, doc=None):
+    def __init__(self, name, path, ident, parent=None, owner=None, doc=None,
+                 review=None, api=True):
         self.name = name      # EDSL type name, or the method name with `owner`
         self.path = path      # qualified Typst path (documentation)
         self.ident = ident    # the function's Rust identifier
@@ -475,12 +480,27 @@ class F:
         # `owner::name(..)` instead of a content type of its own.
         self.owner = owner
         self.doc = doc
+        # A note on the signature and the functional twin, as for elements.
+        self.review = review
+        # Whether the translator's table (`doc/convert/api_gen.mbt`) lists
+        # the facade. Not for a function whose result depends on the kind
+        # of its argument in a way the typed parameter does not keep.
+        self.api = api
 
 
 FUNCS = [
     F("Lorem", "lorem", "lorem"),
     F("PolygonRegular", "polygon.regular", "regular", parent="PolygonElem"),
     F("tiling", "tiling", "construct", parent="Tiling", owner="Paint"),
+    # Not in the translator's table: `upper("x")` on a string literal is the
+    # string `"X"`, which is not what the facade's content argument gives.
+    F("Upper", "upper", "upper", api=False,
+      review="`Upper(body)`: `body` is content, so the function sets a text "
+             "case property on it (`upper` of a string value, which gives "
+             "the converted string, is `Call(\"upper\", ..)` or a "
+             "`Value::str` body). Twin: `upper[#body]`."),
+    F("Lower", "lower", "lower", api=False,
+      review="`Lower(body)`: as `Upper`. Twin: `lower[#body]`."),
 ]
 
 
@@ -1033,17 +1053,21 @@ def emit_function(spec, out):
             Param(prm["name"], kind, m[0], m[1], prm["ty"])
         )
     ordered = required + optional
-    API_FUNCS.append({
-        "path": spec.path,
-        "name": spec.name,
-        "owner": spec.owner or "",
-        "params": [
-            (prm.field, prm.name, "Pos" if prm.kind == "pos" else "Named", prm.mty)
-            for prm in ordered
-        ],
-    })
+    if spec.api:
+        API_FUNCS.append({
+            "path": spec.path,
+            "name": spec.name,
+            "owner": spec.owner or "",
+            "params": [
+                (prm.field, prm.name, "Pos" if prm.kind == "pos" else "Named", prm.mty)
+                for prm in ordered
+            ],
+        })
     out.append("///|")
     out.append(doc_comment(f"`{spec.path}`: {doc}"))
+    if spec.review:
+        out.append("///")
+        out.append(doc_comment(spec.review))
     states = states_doc(ordered)
     if states:
         out.append("///")

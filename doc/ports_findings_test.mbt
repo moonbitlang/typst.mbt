@@ -870,8 +870,12 @@ test "T6: a composed length is a `Sizing` or a `Spacing` by `sizing()`, `spacing
 }
 
 ///|
-test "T7: upper case of content is `Call(\"upper\", ..)`" {
+test "T7: upper case of content is `Upper(..)`, or `Call(\"upper\", ..)`" {
   let report = compile(
+    [..small_page(), @doc.Upper(@doc.Seq(["quiet ", @doc.Emph("words")]))],
+  )
+  inspect(error_messages(report), content="")
+  let with_call = compile(
     [
       ..small_page(),
       @doc.Call("upper", positional=[
@@ -879,7 +883,7 @@ test "T7: upper case of content is `Call(\"upper\", ..)`" {
       ]),
     ],
   )
-  inspect(error_messages(report), content="")
+  assert_eq(listing(marks(with_call)), listing(marks(report)))
   inspect(
     listing(marks(report)),
     content=(

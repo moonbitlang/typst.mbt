@@ -14113,6 +14113,107 @@ pub fn Paint::tiling(
 }
 
 ///|
+/// `upper`: Converts a string or content to uppercase.
+///
+/// `Upper(body)`: `body` is content, so the function sets a text case
+/// property on it (`upper` of a string value, which gives the converted
+/// string, is `Call("upper", ..)` or a `Value::str` body). Twin:
+/// `upper[#body]`.
+pub struct Upper {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Upper::Upper(
+  text : &IntoContent,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Upper {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::content(text), param: 0, })
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_upper()),
+        args,
+        origin: Site::new("Upper", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Upper with fn into_content(self) {
+  self.content
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Upper with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @debug.Debug for Upper with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
+/// `lower`: Converts a string or content to lowercase.
+///
+/// `Lower(body)`: as `Upper`. Twin: `lower[#body]`.
+pub struct Lower {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Lower::Lower(
+  text : &IntoContent,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Lower {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::content(text), param: 0, })
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_lower()),
+        args,
+        origin: Site::new("Lower", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Lower with fn into_content(self) {
+  self.content
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Lower with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @debug.Debug for Lower with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// The generated element types: the name of each type, the qualified
 /// path of its Typst function and the engine element it constructs.
 pub fn generated_elements() -> Array[(String, String, @library.Element)] {

@@ -1046,6 +1046,15 @@ pub impl @builtin.Show for Lorem
 pub impl @debug.Debug for Lorem
 pub impl IntoContent for Lorem
 
+pub struct Lower {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Lower::Lower(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Lower
+pub impl @debug.Debug for Lower
+pub impl IntoContent for Lower
+
 pub struct Markup {
   // private fields
 }
@@ -2737,6 +2746,15 @@ pub fn UnderlineView::view(Self) -> ContentView
 pub impl @builtin.Show for UnderlineView
 pub impl @debug.Debug for UnderlineView
 pub impl IntoContent for UnderlineView
+
+pub struct Upper {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Upper::Upper(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Upper
+pub impl @debug.Debug for Upper
+pub impl IntoContent for Upper
 
 pub struct V {
   // private fields
