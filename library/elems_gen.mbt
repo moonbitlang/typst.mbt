@@ -1709,9 +1709,10 @@ pub fn page_elem() -> Element {
             (Ty::new() : Ty[Content]),
             id=18,
             name="body",
-            kind=Required,
+            kind=External,
             positional=true,
             required=true,
+            default=() => Content(Content::empty()),
           ),
         ],
       )
@@ -7788,9 +7789,10 @@ pub fn text_elem() -> Element {
             (Ty::new() : Ty[Content]),
             id=33,
             name="body",
-            kind=Required,
+            kind=External,
             positional=true,
             required=true,
+            default=() => Content(Content::empty()),
           ),
           field_of(
             (Ty::new() : Ty[String]),

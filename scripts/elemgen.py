@@ -264,12 +264,17 @@ def main():
             mty = mbt_type(f["ty"])
             if mty == "Value" and f["ty"] != "Value":
                 unmapped[f["ty"]] = unmapped.get(f["ty"], 0) + 1
-            if f["required"] or f["variadic"]:
+            # An external field is documentation only, whatever else it is
+            # marked as (`#[external] #[required] body` of `text` and `page`):
+            # upstream's `#[elem]` macro leaves it out of the element's
+            # fields, so `has("body")` is false and `.body` is an unknown
+            # field.
+            if f["external"]:
+                kind = "External"
+            elif f["required"] or f["variadic"]:
                 kind = "Required"
             elif f["synthesized"]:
                 kind = "Synthesized"
-            elif f["external"]:
-                kind = "External"
             elif f["ghost"]:
                 kind = "Ghost"
             else:
