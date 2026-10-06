@@ -104,6 +104,155 @@ test "`Ctx::measure` returns the engine's baseline" {
 }
 
 ///|
+test "`Layout` passes the size of the enclosing region" {
+  let seen : Array[String] = []
+  let layout = (name : String) => {
+    @doc.Layout() <| ((size, cx) => {
+      // The context has a location and styles: `measure` works.
+      let measured = cx.measure("xg", width=Pt(size.width))
+      let line = "\{name}: \{fixed3(size.width)} x \{fixed3(size.height)}, measured \{fixed3(measured.width)}"
+      if !seen.contains(line) {
+        seen.push(line)
+      }
+      @doc.Rect(width=Pt(size.width / 2.0), height=Pt(4))
+    })
+  }
+  let report = compile([
+    @doc.SetPage(width=Pt(200), height=Pt(100), margin=@doc.Sides(all=Pt(10))),
+    @doc.SetText(size=Pt(10)),
+    layout("page"),
+    // The base size of the container, not what remains of it.
+    @doc.Block(
+      @doc.Seq(["above", layout("block")]),
+      width=Pt(120),
+      height=Pt(40),
+    ),
+    @doc.Block(layout("auto block"), width=Pct(50)),
+    @doc.Box(layout("box"), width=Pt(90)),
+    @doc.Box(layout("auto box")),
+    @doc.Grid([layout("cell"), "b"], columns=[Pt(70), Fr(1)]),
+    @doc.Pad(layout("pad"), x=Pt(15)),
+  ])
+  inspect(error_messages(report), content="")
+  seen.sort()
+  inspect(
+    seen.join("\n"),
+    content=(
+      #|box: 90.000 x 80.000, measured 9.900
+      #|cell: 70.000 x 80.000, measured 9.900
+      #|pad: 150.000 x 80.000, measured 9.900
+      #|page: 180.000 x 80.000, measured 9.900
+      #|block: 120.000 x 40.000, measured 9.900
+      #|auto box: 180.000 x 80.000, measured 9.900
+      #|auto block: 90.000 x 80.000, measured 9.900
+    ),
+  )
+}
+
+///|
+test "a dimension of a `Layout` region can be infinite" {
+  let seen : Array[String] = []
+  let layout = (name : String) => {
+    @doc.Layout() <| ((size, _) => {
+      let line = "\{name}: \{fixed3(size.width)} x \{fixed3(size.height)}"
+      if !seen.contains(line) {
+        seen.push(line)
+      }
+      if size.height.is_inf() {
+        "unbounded"
+      } else {
+        "bounded"
+      }
+    })
+  }
+  let measured = layout("measured")
+  let report = compile([
+    // A page that grows with its content has no height.
+    @doc.SetPage(width=Pt(200), height=Auto, margin=@doc.Sides(all=Pt(10))),
+    layout("auto page"),
+    // Measuring lays out in an unbounded region, unless given a size.
+    @doc.Context() <| cx => {
+      cx.measure(measured) |> ignore
+      ""
+    },
+  ])
+  inspect(error_messages(report), content="")
+  seen.sort()
+  inspect(
+    seen.join("\n"),
+    content=(
+      #|measured: inf x inf
+      #|auto page: 180.000 x inf
+    ),
+  )
+  let wide = compile([
+    @doc.SetPage(width=Auto, height=Pt(50), margin=@doc.Sides(all=Pt(10))),
+    layout("wide page"),
+  ])
+  inspect(error_messages(wide), content="")
+  inspect(
+    seen.filter(line => line.has_prefix("wide")).join("\n"),
+    content=(
+      #|wide page: inf x 30.000
+    ),
+  )
+}
+
+///|
+test "a `Layout` cannot be created inside a callback" {
+  let nested = compile([
+    @doc.Context() <| _ => { @doc.Layout() <| ((_, _) => "inner") },
+  ])
+  inspect(
+    error_messages(nested),
+    content="callbacks cannot be created inside a callback",
+  )
+  inspect(origin_of(nested.errors[0]).kind, content="Layout")
+  inspect(
+    nested.errors[0].hints.map(h => h.message).join(" | "),
+    content="create the callback before compiling and capture it | or use the `cx` of the enclosing callback",
+  )
+  // The same inside another `Layout`.
+  let in_layout = compile([
+    @doc.Layout() <| ((_, _) => @doc.Layout() <| ((_, _) => "inner")),
+  ])
+  inspect(
+    error_messages(in_layout),
+    content="callbacks cannot be created inside a callback",
+  )
+  // Created before compiling and captured: fine, also in a show rule that
+  // runs several times, and inside another `Layout`.
+  let inner = @doc.Layout() <| ((size, _) => {
+    @doc.Line(length=Pt(size.width / 4.0))
+  })
+  let captured = compile([
+    @doc.Show(@doc.Select::heading()) <| ((it, _) => @doc.Seq([it, inner])),
+    @doc.Heading("One"),
+    @doc.Heading("Two"),
+    @doc.Layout() <| ((_, _) => @doc.Block(inner, width=Pt(80))),
+  ])
+  inspect(error_messages(captured), content="")
+  // An error raised by the callback is a diagnostic at the `Layout`.
+  let failing = compile([
+    @doc.Layout() <| ((_, _) => {
+      if true {
+        fail("boom")
+      }
+      "unreachable"
+    }),
+  ])
+  assert_true(failing.errors[0].message.contains("boom"))
+  inspect(origin_of(failing.errors[0]).kind, content="Layout")
+  // Its description.
+  debug_inspect(
+    inner,
+    content=(
+      #|Layout(<callback of Layout>)
+    ),
+  )
+}
+
+///|
 test "`Box(baseline=)` is the shift form; the other forms go through `extra`" {
   inspect(
     lowered([@doc.Box("x", baseline=Pt(2))]),

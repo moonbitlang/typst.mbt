@@ -856,6 +856,20 @@ pub impl @builtin.Show for Labelled
 pub impl @debug.Debug for Labelled
 pub impl IntoContent for Labelled
 
+pub struct Layout {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Layout::Layout(loc~ : SourceLoc, args_loc~ : ArgsLoc, (LayoutSize, Ctx) -> &IntoContent raise) -> Self
+pub impl @builtin.Show for Layout
+pub impl @debug.Debug for Layout
+pub impl IntoContent for Layout
+
+pub struct LayoutSize {
+  width : Double
+  height : Double
+}
+
 pub(all) enum Length {
   Auto
   None

@@ -736,19 +736,34 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
 }
 
 ///|
-test "T5: the size of the enclosing region is only known to Typst source" {
-  // There is no `Layout`: a `Context` callback has the location and the
-  // styles, and `measure` asks for the size of content, not of the region.
-  // Embedded Typst source can ask.
+test "T5: `Layout` gives the size of the enclosing region" {
+  // A `Context` callback has the location and the styles, and `measure`
+  // asks for the size of content, not of the region: `Layout` does.
   let report = compile(
     [
       ..small_page(),
-      @doc.Markup("#layout(size => [#size.width by #size.height])"),
+      @doc.Layout() <| ((size, _) => {
+        "\{size.width.to_int()}pt by \{size.height.to_int()}pt"
+      }),
     ],
   )
   inspect(error_messages(report), content="")
   inspect(
     of_kind(marks(report), "text").map(run => run.text).join(""),
+    content=(
+      #|180pt by 100pt
+    ),
+  )
+  // What worked before it, and still does: embedded Typst source.
+  let markup = compile(
+    [
+      ..small_page(),
+      @doc.Markup("#layout(size => [#size.width by #size.height])"),
+    ],
+  )
+  inspect(error_messages(markup), content="")
+  inspect(
+    of_kind(marks(markup), "text").map(run => run.text).join(""),
     content=(
       #|180pt by 100pt
     ),
