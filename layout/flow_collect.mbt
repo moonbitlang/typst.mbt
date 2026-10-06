@@ -608,7 +608,9 @@ fn PlacedChild::layout(
   base : @library.Axes[@library.Abs],
 ) -> @library.Frame raise @library.SourceError {
   let cached = self.cell.get_or_init(base, size_eq, base => {
-    let align = self.alignment.unwrap_or(Both(Center, Horizon))
+    // Upstream `Alignment::CENTER` is horizontal only (`H(Center)`): the
+    // vertical alignment of the content is inherited.
+    let align = self.alignment.unwrap_or(H(Center))
     let aligned = @library.Styles::from_array([
       @library.AlignElem::set_alignment(align),
     ])

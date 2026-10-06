@@ -565,6 +565,37 @@
   `.repos/wasm-testsuite`, extracted with the wasm-tools version named
   there). `wasmi/core/oracle_wbtest.mbt` checks
   wasmi_core against `gen_wasmi_core_tests`.
+- Real packages (`tests/packages/`, README there; the `packages` stage):
+  documents written for this repository
+  (`tests/packages/docs/<package>/<name>.typ`, each starting with a comment
+  that says what it exercises; `error-*.typ` fail on purpose inside a
+  package) that use packages of the Typst package registry. The packages
+  are pinned in `tests/packages/manifest.tsv` (name, version, sha256, size,
+  licence, with the packages they import) and not committed:
+  `scripts/packages.sh` fetches the archives from packages.typst.org,
+  verifies them and makes `.repos/typst-packages/preview` exactly what
+  they contain (`--check`: verify only, no network, nothing changed; a
+  namespace, package, version or archive that the manifest does not list
+  is an error).
+  `scripts/goldens.sh packages` (oracle/src/packages.rs) compiles every
+  document in the world of `typst compile --ignore-system-fonts`
+  (`TestWorld::packages`: the standard library, the embedded fonts, the
+  test world's time) and dumps the frames like `paged` (`typst-frame-v1`;
+  every diagnostic is followed by its tracepoints, `  trace <location>
+  <kind> <name>`; a location in a package is
+  `"@preview/<name>:<version>/<path>":start..end`) and the SVG like `svg`;
+  `moon run tests/runner --target
+  native --release -- packages [filter] [--times]` compares them (labels
+  `packages frames` and `packages svg` in `scripts/ci/stages.tsv`, goldens
+  in `tests/golden/packages/{frames,svg}`). `scripts/packages_cli.py`
+  compares the two command line programs on the same documents instead
+  (stderr byte for byte, exit status, pages, SVG bytes, PNG pixels at 72
+  ppi, times; it needs the upstream binary). A difference is reduced to a
+  document without the package, fixed, and the reduction becomes a
+  `packages:` case of `scripts/gen_typst_oracle.py`; never change a
+  document to hide a difference. A new package: its manifest line and those
+  of its imports, documents, the two counts in `stages.tsv`, the list in
+  the README.
 - Publishing: `moonbitlang/typst` is used as a dependency (e.g. by mbtx
   scripts importing `moonbitlang/typst@x.y.z/doc`), and moon does not run
   `pre-build` steps of dependencies. The package therefore ships the
@@ -584,14 +615,19 @@
   built against the unpacked `moon package` zip on native and wasm-gc); on
   pushes to `main` and nightly also the EDSL conversion sweep (half an
   hour). The goldens are not stored anywhere: the `goldens` job regenerates
-  them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream checkout, oracle
-  build, every `scripts/goldens.sh` stage plus `wasm-spec` and
-  `wasm-validate`; about 12 minutes) unless they are cached under
+  them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream checkout, the
+  pinned packages, oracle build, every `scripts/goldens.sh` stage plus
+  `wasm-spec` and `wasm-validate`; about 12 minutes, two of them for
+  `packages`) unless they are cached under
   `scripts/ci/goldens_key.sh`'s hash of what determines them
-  (`UPSTREAM_REV`, `oracle/**`, the golden scripts, `tests/wasm`); the
+  (`UPSTREAM_REV`, `oracle/**`, the golden scripts, `tests/wasm`,
+  `tests/packages/manifest.tsv` and `tests/packages/docs`); the
   regenerated `usvg/oracle_test.mbt` and `resvg/oracle_test.mbt` must be the
   committed ones (`scripts/ci/goldens_verify.sh`). `scripts/ci/data.sh`
   fetches the other test inputs without Rust (shallow upstream checkout, the
+  pinned packages with `--packages`, which only the `stages` job passes
+  (`scripts/packages.sh`; the `test-data` action then caches
+  `.repos/typst-packages` under the manifest's hash), the
   oracle's locked revisions of typst-dev-assets, typst-assets and hayro in
   cargo's checkout layout, the `target/hayro`/`target/devassets` links, the
   CMap bundle). The runner always exits with 0, so the verdict is

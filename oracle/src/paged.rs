@@ -140,7 +140,7 @@ use typst::{World, WorldExt};
 use typst_layout::PagedDocument;
 
 use crate::collect;
-use crate::eval::{deduplicate, write_diag};
+use crate::eval::{deduplicate, write_diag, write_trace};
 use crate::fonts::{json_str, sha256_hex};
 use crate::realize::Dumper;
 use crate::world::{TestWorld, parse_features};
@@ -205,46 +205,64 @@ pub fn paged_report(
         .map(parse_features);
     let source = TestWorld::main_source(path, test.body.clone());
     let world = TestWorld::new(source, features);
+    world_report(&world, &test.name, revision, manifest_sha, false).0
+}
 
-    let mut enc = Encoder::new(&world);
+/// Compile the main file of `world` to a paged document and encode it. Also
+/// returns the document if there is one (the `packages` stage exports it).
+/// With `traces`, every diagnostic is followed by its tracepoints (see
+/// `eval::write_trace`).
+pub fn world_report(
+    world: &TestWorld,
+    name: &str,
+    revision: &str,
+    manifest_sha: &str,
+    traces: bool,
+) -> (String, Option<PagedDocument>) {
+    let mut enc = Encoder::new(world);
+    enc.traces = traces;
     enc.record(&[
         json_str("header"),
         json_str("typst-frame-v1"),
         json_str(revision),
         json_str(manifest_sha),
-        json_str(&test.name),
+        json_str(name),
     ]);
 
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        typst::compile::<PagedDocument>(&world)
+        typst::compile::<PagedDocument>(world)
     }));
     let Ok(Warned { output, warnings }) = result else {
         enc.record(&[json_str("diagnostics"), json_str("panic"), "[]".into()]);
         enc.record(&[json_str("end")]);
-        return enc.out;
+        return (enc.out, None);
     };
 
     let warnings = deduplicate(warnings);
-    match output {
+    let doc = match output {
         Ok(doc) => {
             let lines = enc.diag_lines(&[], &warnings);
             enc.record(&[json_str("diagnostics"), json_str("ok"), lines]);
             enc.document(&doc);
+            Some(doc)
         }
         Err(errors) => {
             let errors = deduplicate(errors);
             let lines = enc.diag_lines(&errors, &warnings);
             enc.record(&[json_str("diagnostics"), json_str("err"), lines]);
+            None
         }
-    }
+    };
     enc.record(&[json_str("end")]);
-    enc.out
+    (enc.out, doc)
 }
 
 /// Encodes a paged document as `typst-frame-v1` records.
 struct Encoder<'a> {
     world: &'a TestWorld,
     out: String,
+    /// Whether diagnostics are written with their tracepoints.
+    traces: bool,
     /// Shared with canonical content (location numbering).
     dumper: Dumper,
     fonts: FxHashMap<String, usize>,
@@ -258,6 +276,7 @@ impl<'a> Encoder<'a> {
         Self {
             world,
             out: String::new(),
+            traces: false,
             dumper: Dumper::default(),
             fonts: FxHashMap::default(),
             images: FxHashMap::default(),
@@ -282,6 +301,9 @@ impl<'a> Encoder<'a> {
         let mut text = String::new();
         for diag in errors.iter().chain(warnings) {
             write_diag(&mut text, self.world, main, diag);
+            if self.traces {
+                write_trace(&mut text, self.world, main, diag);
+            }
         }
         array(text.lines().map(json_str))
     }

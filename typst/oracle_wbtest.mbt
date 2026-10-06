@@ -3,7 +3,8 @@
 //
 // What upstream reports for documents that are not in its test suite:
 // raw text built by markup (lines), by the `raw` function (a string)
-// and by `eval`; the keys of located elements in measurement. The
+// and by `eval`; the keys of located elements in measurement; the
+// reductions of what the `packages` stage found (tests/packages). The
 // helpers are in `oracle_helpers_wbtest.mbt`.
 
 ///|
@@ -277,6 +278,41 @@ test "oracle: closures: a repeated call gives an independent, equal result" {
     "(\n  (0, 1, 0, 1),\n  (1, 1.0, 1),\n  (\"0.0\", \"-0.0\", \"0\", \"0.0\"),\n  (\"1\", \"1.0\", \"100%\", \"1\"),\n)",
     "(2, 3, true, 3)", "(true, false, [a])", "(6765, 6765)", "(arguments(a: 2, 1), true, (1,), (b: 3))",
     "((0,), (2,))", "((1,), (2,))", "((2,), (2,))", "(0, 2)", "(1, 2)", "(2, 2)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: packages: a float without an alignment keeps the vertical alignment of its content" {
+  let source = "// charged-ieee: a table in `figure(placement: auto)`. The body of a float\n// is laid out with `Alignment::CENTER` if its alignment is `auto`\n// (`PlacedChild::layout`), which is horizontal only: boxes and cells keep\n// the inherited vertical alignment.\n#set page(width: 200pt, height: 200pt, margin: 20pt)\n#let at(label) = context metadata(repr(locate(label).position()))\n#let mark(name) = box(width: 6pt, height: 6pt)[#metadata(name)#label(name)]\n#place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"a\")))\n#place(top, float: true, box(width: 60pt, height: 40pt, mark(\"b\")))\n#place(auto, float: true, grid(columns: 2, mark(\"c\"), box(width: 6pt, height: 30pt)))\n#[\n  #set align(bottom)\n  #place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"d\")))\n  #place(auto, float: true, table(columns: 2, mark(\"e\"), box(width: 6pt, height: 30pt)))\n]\n#at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)\n"
+  let expected = [
+    "a", "b", "c", "d", "e", "(page: 1, x: 97pt, y: 20pt)", "(page: 1, x: 20pt, y: 76.5pt)",
+    "(page: 1, x: 94pt, y: 150pt)", "(page: 2, x: 97pt, y: 54pt)", "(page: 2, x: 89pt, y: 105.5pt)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: packages: the text of the predefined math operators" {
+  let source = "// mitex: `\\limsup` is `math.limsup`, whose text has a thin space (U+2009),\n// like `math.liminf` (`ops!` in typst-library/src/math/op.rs).\n#let ops = dictionary(math).pairs().filter(((_, v)) => type(v) == content and v.func() == math.op)\n#metadata(repr(ops.len()))\n#for (name, v) in ops {\n  metadata(repr((name, v.text.text.codepoints().map(str.to-unicode), v.limits)))\n}\n"
+  let expected = [
+    "42", "(\"arccos\", (97, 114, 99, 99, 111, 115), false)", "(\"arcsin\", (97, 114, 99, 115, 105, 110), false)",
+    "(\"arctan\", (97, 114, 99, 116, 97, 110), false)", "(\"arg\", (97, 114, 103), false)",
+    "(\"cos\", (99, 111, 115), false)", "(\"cosh\", (99, 111, 115, 104), false)",
+    "(\"cot\", (99, 111, 116), false)", "(\"coth\", (99, 111, 116, 104), false)",
+    "(\"csc\", (99, 115, 99), false)", "(\"csch\", (99, 115, 99, 104), false)", "(\"ctg\", (99, 116, 103), false)",
+    "(\"deg\", (100, 101, 103), false)", "(\"det\", (100, 101, 116), true)", "(\"dim\", (100, 105, 109), false)",
+    "(\"exp\", (101, 120, 112), false)", "(\"gcd\", (103, 99, 100), true)", "(\"lcm\", (108, 99, 109), true)",
+    "(\"hom\", (104, 111, 109), false)", "(\"id\", (105, 100), false)", "(\"im\", (105, 109), false)",
+    "(\"inf\", (105, 110, 102), true)", "(\"ker\", (107, 101, 114), false)", "(\"lg\", (108, 103), false)",
+    "(\"lim\", (108, 105, 109), true)", "(\n  \"liminf\",\n  (108, 105, 109, 8201, 105, 110, 102),\n  true,\n)",
+    "(\n  \"limsup\",\n  (108, 105, 109, 8201, 115, 117, 112),\n  true,\n)", "(\"ln\", (108, 110), false)",
+    "(\"log\", (108, 111, 103), false)", "(\"max\", (109, 97, 120), true)", "(\"min\", (109, 105, 110), true)",
+    "(\"mod\", (109, 111, 100), false)", "(\"Pr\", (80, 114), true)", "(\"sec\", (115, 101, 99), false)",
+    "(\"sech\", (115, 101, 99, 104), false)", "(\"sin\", (115, 105, 110), false)",
+    "(\"sinc\", (115, 105, 110, 99), false)", "(\"sinh\", (115, 105, 110, 104), false)",
+    "(\"sup\", (115, 117, 112), true)", "(\"tan\", (116, 97, 110), false)", "(\"tanh\", (116, 97, 110, 104), false)",
+    "(\"tg\", (116, 103), false)", "(\"tr\", (116, 114), false)",
   ]
   assert_eq(oracle_metadata(source), expected)
 }
