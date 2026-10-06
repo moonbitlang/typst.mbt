@@ -226,21 +226,73 @@ test "the samples compile to PDF without warnings" {
 }
 
 ///|
-test "section 2: inline items in a sequence are one paragraph, `Par` separates them" {
+test "section 2: inline items in a sequence are one paragraph, `Para` separates them" {
   let joined = pages([@guide.run_together()])
   inspect(joined.errors(), content="")
   inspect(joined.warnings(), content="")
   inspect(
     joined.listing(),
     content=(
-      #|p1 text 10.0,16.6 w172.0 "The first ends here.The second starts here."
+      #|p1 text 10.0,19.0 w35.9 "Notes"
+      #|p1 text 10.0,33.1 w172.0 "The first ends here.The second starts here."
     ),
   )
+  // The lint (line and column numbers as N).
   inspect(
-    pages([@guide.paragraphs()]).listing(),
+    numberless(
+      @guide.lints_of(@doc.Document([@guide.run_together()])).join("\n"),
+    ),
     content=(
-      #|p1 text 10.0,16.6 w78.6 "The first ends here."
-      #|p1 text 10.0,35.2 w94.0 "The second starts here."
+      #|lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "…first ends here.The second start…"
+      #|  at doc/examples/guide/guide.mbt:N:N (Prose, argument N)
+      #|  hint: the text before it (doc/examples/guide/guide.mbt:N:N (Prose, argument N))
+      #|  hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
+    ),
+  )
+  // It is a field of the report, and `lints=false` turns the lints off.
+  let document = @doc.Document([@guide.run_together()])
+  let world = @doc.DocWorld::in_memory()
+  assert_eq(document.compile_paged(world).lints.length(), 1)
+  assert_eq(document.compile_paged(world, lints=false).lints.length(), 0)
+  // Without a block in the array nothing is reported.
+  assert_eq(
+    @guide.lints_of(
+      @doc.Document([
+        @doc.Prose("The first ends here."),
+        @doc.Prose("The second starts here."),
+      ]),
+    ),
+    [],
+  )
+  // A paragraph each.
+  let apart = pages([@guide.paragraphs()])
+  inspect(apart.errors(), content="")
+  inspect(apart.warnings(), content="")
+  inspect(
+    apart.listing(),
+    content=(
+      #|p1 text 10.0,19.0 w35.9 "Notes"
+      #|p1 text 10.0,33.1 w78.6 "The first ends here."
+      #|p1 text 10.0,51.7 w160.2 "The second starts here, with a “quoted” "
+      #|p1 text 10.0,64.8 w41.2 "word and "
+      #|p1 text 51.2,64.8 w30.1 "stressed"
+      #|p1 text 81.3,64.8 w97.1 " ones on its second line."
+      #|p1 text 10.0,83.4 w85.1 "The third is justified."
+    ),
+  )
+  assert_eq(@guide.lints_of(@doc.Document([@guide.paragraphs()])), [])
+  // The document of all samples has the one lint of `run_together`.
+  assert_eq(@guide.lints_of(@guide.guide()).length(), 1)
+  // A blank line in the text of a `Para` is no second paragraph.
+  let blank = pages([@doc.Para("One ends here.\n\nTwo starts here.")])
+  inspect(
+    blank.warnings(),
+    content="parbreak may not occur inside of a paragraph and was ignored",
+  )
+  inspect(
+    blank.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w125.6 "One ends here.Two starts here."
     ),
   )
   // A block between two inline items separates them.

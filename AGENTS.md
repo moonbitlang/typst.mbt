@@ -168,6 +168,18 @@
   `doc/ports_findings_test.mbt` pins what happens today for every finding
   of the ports document (S1..S6, T1..T11): a step of that proposal that
   changes one changes its test.
+- EDSL lints (`doc/lint.mbt`; `docs/edsl-ports.md`, section 6):
+  `CompileReport::lints`, on by default, `lints=false` on `compile*`
+  turns them off; they are not the engine's `warnings`. L1 (adjacent
+  inline items) reads the description tree: two neighbours in the array
+  of a `Document` or `Seq` that are a string, a `Prose`, or a
+  `Text`/`Strong`/`Emph`/`Link` around one, if the array holds a block
+  (`is_block_call`). `doc/lint_wbtest.mbt` checks that list against the
+  engine for every constructor of `generated_elements()`: a new element
+  of `scripts/docgen.py` needs a sample there (block, inline or part).
+  `Para(text, ..)` (`doc/para.mbt`) is `Par(Prose(text), ..)` from one
+  call site: the pieces of the text are the value of the body argument
+  (`NPieces`) and take spans of the `Para` call's text argument.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

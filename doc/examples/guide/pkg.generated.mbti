@@ -25,6 +25,8 @@ pub fn guide() -> @doc.Document
 
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
 
+pub fn lints_of(@doc.Document) -> Array[String]
+
 pub fn loose_title(&@doc.IntoContent) -> @doc.Seq
 
 #callsite(autofill(args_loc, loc))

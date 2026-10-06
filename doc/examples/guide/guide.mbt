@@ -10,6 +10,7 @@ using @doc {
   type SetText,
   type Heading,
   type Par,
+  type Para,
   type Prose,
   type Lit,
   type Seq,
@@ -60,16 +61,33 @@ pub fn first_document() -> Document {
 ///|
 /// Section 2: two inline items in a sequence are one paragraph.
 pub fn run_together() -> Seq {
-  Seq([Prose("The first ends here."), Prose("The second starts here.")])
+  Seq([
+    Heading("Notes"),
+    Prose("The first ends here."),
+    Prose("The second starts here."),
+  ])
 }
 
 ///|
 /// Section 2: a paragraph each.
 pub fn paragraphs() -> Seq {
   Seq([
-    Par(Prose("The first ends here.")),
-    Par(Prose("The second starts here.")),
+    Heading("Notes"),
+    Para("The first ends here."),
+    (
+      $|The second starts here, with a "quoted" word
+      $|and \{Emph("stressed")} ones on its second line.
+    )
+    |> Para,
+    Para("The third is justified.", justify=true),
   ])
+}
+
+///|
+/// Section 2: what the lints say of a document.
+pub fn lints_of(document : Document) -> Array[String] {
+  let compiled = document.compile_paged(DocWorld::in_memory())
+  compiled.lints.map(lint => lint.render())
 }
 
 ///|
@@ -204,8 +222,8 @@ pub fn ruled_table(cells : Array[&IntoContent]) -> Table {
 /// quotes at all.
 pub fn apostrophes() -> Seq {
   Seq([
-    Par(Prose("Issue #1770’s fix is in.")),
-    Par(Prose("Issue #1770's fix is in.", quotes=false)),
+    Para("Issue #1770’s fix is in."),
+    Para("Issue #1770's fix is in.", quotes=false),
   ])
 }
 
