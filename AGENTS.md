@@ -441,27 +441,35 @@
   module: 0.1.0-0.1.2 were broken as dependencies for this reason.
 - CI (`.github/workflows/ci.yml`, scripts in `scripts/ci/`; the check to
   require for `main` is `required`): `check` (`moon check` on native,
-  wasm-gc, wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.sh`),
-  `stages` (every differential stage, `scripts/ci/stages.py`) and `package
-  as a dependency` (`scripts/ci/package_smoke.sh`: a consumer of
-  `moonbitlang/typst/doc` built against the unpacked `moon package` zip on
-  native and wasm-gc); nightly and on pushes to `main` also the EDSL
-  conversion sweep. The goldens are not stored anywhere: the `goldens` job
-  regenerates them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream
-  checkout, oracle build, every `scripts/goldens.sh` stage plus `wasm-spec`
-  and `wasm-validate`) and caches them under `scripts/ci/goldens_key.sh`'s
+  wasm-gc, wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.py`: the
+  packages in 4 shards per platform, since every test executable is a whole
+  program), `stages` (every differential stage with the release runner,
+  `scripts/ci/stages.py`) and `package as a dependency`
+  (`scripts/ci/package_smoke.sh`: a consumer of `moonbitlang/typst/doc`
+  built against the unpacked `moon package` zip on native and wasm-gc);
+  nightly also the EDSL conversion sweep. The goldens are not stored
+  anywhere: the `goldens` job regenerates them on aarch64 macOS
+  (`scripts/ci/goldens.sh`: upstream checkout, oracle build, every
+  `scripts/goldens.sh` stage plus `wasm-spec` and `wasm-validate`; about
+  12 minutes) unless they are cached under `scripts/ci/goldens_key.sh`'s
   hash of what determines them (`UPSTREAM_REV`, `oracle/**`, the golden
-  scripts, `tests/wasm`); a change of any of those regenerates them, and
-  the regenerated `usvg/oracle_test.mbt`/`resvg/oracle_test.mbt` must be the
-  committed ones. `scripts/ci/data.sh` fetches the other test inputs without
-  Rust (shallow upstream checkout, the oracle's locked revisions of
-  typst-dev-assets, typst-assets and hayro in cargo's checkout layout, the
-  `target/hayro`/`target/devassets` links, the CMap bundle). The runner
-  always exits with 0, so the verdict is `stages.py`'s: per stage the
-  number of cases and of skipped cases of `scripts/ci/stages.tsv` (update it
-  when the suite changes: `UPSTREAM_REV`, new twins, new wasm tests), no
-  failures besides `scripts/ci/known_failures/<stage>.txt` (the replay
-  stages; a listed case that passes must be removed), and the byte-identical
-  counts. Run it locally after a release build of the runner:
-  `scripts/ci/stages.py [stage ...]` (logs and per-case diffs of failures in
-  `_build/ci/stages`).
+  scripts, `tests/wasm`); the regenerated `usvg/oracle_test.mbt` and
+  `resvg/oracle_test.mbt` must be the committed ones
+  (`scripts/ci/goldens_verify.sh`). `scripts/ci/data.sh` fetches the other
+  test inputs without Rust (shallow upstream checkout, the oracle's locked
+  revisions of typst-dev-assets, typst-assets and hayro in cargo's checkout
+  layout, the `target/hayro`/`target/devassets` links, the CMap bundle).
+  The runner always exits with 0, so the verdict is `stages.py`'s: per
+  stage the number of cases and of skipped cases of `scripts/ci/stages.tsv`
+  (update it when the suite changes: `UPSTREAM_REV`, new twins, new wasm
+  tests), no failures besides `scripts/ci/known_failures/<stage>.txt` (the
+  replay stages), and the byte-identical counts. Run it locally after a
+  release build of the runner: `scripts/ci/stages.py [stage ...]` (logs and
+  per-case diffs of failures in `_build/ci/stages`). Platforms: aarch64
+  macOS (`macos-26`) is the reference, where everything must pass; unit
+  tests and stages also run on x86_64 Linux, where the tests that are
+  bit-exact only on the reference platform are listed in
+  `scripts/ci/known_failures/*.linux-x86_64.txt` (default NaN sign, the C
+  library's sin/cos): a new test of that kind goes on the list, a listed
+  one that passes must be removed. Apple's libm also changes between
+  macOS versions (`cosf` in a hayro PostScript oracle differs on macOS 15).

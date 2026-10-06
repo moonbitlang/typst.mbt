@@ -31,7 +31,14 @@ jobs:
         target: [native, wasm-gc, wasm]
     steps:
       - uses: actions/checkout@v5
-      - uses: ./.github/actions/setup-moon
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - name: moon version
+        run: |
+          moon version --all
+          moon update
       - name: Check
         run: moon check --target ${{ matrix.target }}
       - name: Format
@@ -99,9 +106,9 @@ jobs:
       - uses: ./.github/actions/setup-moon
       - uses: ./.github/actions/test-data
       - name: Unit tests
-        # Two build jobs on macOS: a test executable of the upper packages
-        # needs more than 3 GB to build, the runner has 7 GB.
-        run: scripts/ci/unit_tests.py --shard ${{ matrix.shard }}/4 ${{ runner.os == 'macOS' && '--jobs 2' || '' }}
+        # One build job at a time on macOS: a test executable of the upper
+        # packages needs more than 3 GB to build, the runner has 7 GB.
+        run: scripts/ci/unit_tests.py --shard ${{ matrix.shard }}/4 ${{ runner.os == 'macOS' && '--jobs 1' || '' }}
       - name: Upload the totals
         if: always()
         uses: actions/upload-artifact@v4
@@ -214,6 +221,46 @@ jobs:
             tests/edsl_gen/failed.txt
             _build/ci/edsl-suite.log
             _build/edsl-convert-*.log
+          retention-days: 14
+
+  # TEMP (platform probe on the draft PR, not for main).
+  probe-rust:
+    name: TEMP probe (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - run: |
+          sw_vers 2> /dev/null || uname -a
+          rustc --version
+          rustc -O scripts/ci/probe.rs -o probe
+          ./probe
+
+  probe-linux:
+    name: TEMP probe (Rust oracles on Linux)
+    needs: goldens
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - uses: ./.github/actions/test-data
+      - uses: actions/download-artifact@v4
+        with:
+          name: goldens
+      - run: |
+          mkdir golden-macos
+          tar -xzf goldens.tar.gz -C golden-macos
+          scripts/ci/probe_linux.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probe-linux
+          path: _build/ci/probe
           retention-days: 14
 
   # The one check to require in the branch protection of `main`.
