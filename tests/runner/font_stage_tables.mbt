@@ -14,7 +14,7 @@ priv struct Blocks {
 
 ///|
 fn Blocks::new(out : StringBuilder, prefix : String, count : Int) -> Blocks {
-  { out, prefix, count, block: StringBuilder::new(), start: 0, }
+  { out, prefix, count, block: StringBuilder(), start: 0, }
 }
 
 ///|
@@ -72,7 +72,7 @@ fn font_dump_layout(out : StringBuilder, face : @otf.Face) -> Unit {
       for lang in script.languages.iter() {
         langs.push(lang)
       }
-      let text = StringBuilder::new()
+      let text = StringBuilder()
       text.write_string("\{name} script \{esc(script.tag.to_string())}")
       for lang in langs {
         text.write_string(
@@ -92,7 +92,7 @@ fn font_dump_layout(out : StringBuilder, face : @otf.Face) -> Unit {
     let mut i = 0
     for lookup in table.lookups.iter() {
       let kinds = []
-      let text = StringBuilder::new()
+      let text = StringBuilder()
       for k in 0..<lookup.subtables.len().to_int() {
         let coverage = if name == "gsub" {
           let st : @otf.SubstitutionSubtable? = lookup.subtables.get(
@@ -167,7 +167,7 @@ fn math_value_opt(v : @otf.MathValue?) -> String {
 ///|
 fn math_construction(c : @otf.GlyphConstruction?) -> String {
   guard c is Some(c) else { return "-" }
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   for v in c.variants.iter() {
     text.write_string("\{v.variant_glyph.0}:\{v.advance_measurement},")
   }
@@ -185,7 +185,7 @@ fn math_construction(c : @otf.GlyphConstruction?) -> String {
 ///|
 fn math_kern(k : @otf.MathKern?) -> String {
   guard k is Some(k) else { return "-" }
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   text.write_string("\{k.count()}")
   for i in 0..<k.count().to_int() {
     text.write_string(",\{math_value_opt(k.height(i.to_uint16()))}")
@@ -264,7 +264,7 @@ fn font_dump_math(out : StringBuilder, face : @otf.Face) -> Unit {
   let blocks = Blocks::new(out, "math glyph", count)
   for gid in 0..<count {
     let g = @otf.GlyphId(gid.to_uint16())
-    let line = StringBuilder::new()
+    let line = StringBuilder()
     if math.glyph_info is Some(info) {
       let italic = match info.italic_corrections {
         Some(v) => math_value_opt(v.get(g))
@@ -444,7 +444,7 @@ fn font_dump_colr(out : StringBuilder, face : @otf.Face) -> Unit {
   let blocks = Blocks::new(out, "colr glyph", count)
   for gid in 0..<count {
     let g = @otf.GlyphId(gid.to_uint16())
-    let rec : ColrRecorder = { buf: StringBuilder::new(), }
+    let rec : ColrRecorder = { buf: StringBuilder(), }
     let res = face.paint_color_glyph(
       g,
       0,

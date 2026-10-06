@@ -43,7 +43,7 @@ fn realize_report(rel : String, tc : TestCase) -> String {
     }
     let info = @library.DocumentInfo::new()
     let options = @library.DocumentFormatOptions::new(formats=library.formats)
-    let fragment_kind = Ref::new(@library.FragmentKind::Block)
+    let fragment_kind = Ref(@library.FragmentKind::Block)
     let kind : @library.RealizationKind = if fragment {
       Fragment(kind=fragment_kind)
     } else {

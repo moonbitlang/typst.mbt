@@ -279,7 +279,7 @@ fn convert_stops(grad : SvgNode) -> Array[Stop] {
         _ => prev_offset.number
       }
       prev_offset = @svgtypes.Length::new_number(offset)
-      let offset = f32_bound(0.0, offset.to_float(), 1.0)
+      let offset = f32_bound(0.0, Float::from_double(offset), 1.0)
       let stop_color : String? = stop.attribute(AId::StopColor)
       let (color, opacity) = (match stop_color {
         Some("currentColor") =>

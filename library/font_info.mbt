@@ -279,7 +279,7 @@ let mac_roman_table : ReadOnlyArray[Char] = [
 ///|
 /// Decode mac roman encoded bytes into a string.
 fn decode_mac_roman(coded : BytesView) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for code in coded {
     let code = code.to_int()
     buf.write_char(
@@ -521,7 +521,7 @@ priv struct CoverageBuilder {
 ///|
 /// Create a new coverage builder with at least the given capacity.
 fn CoverageBuilder::with_capacity(capacity : Int) -> CoverageBuilder {
-  { runs: Array::new(capacity~), next: 0, }
+  { runs: Array(capacity~), next: 0, }
 }
 
 ///|
@@ -567,7 +567,7 @@ fn CoverageBuilder::add_codepoint_range(
 ///|
 /// Rust's `str::to_ascii_lowercase`.
 fn ascii_lowercase(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for c in s {
     buf.write_char(
       if c >= 'A' && c <= 'Z' {

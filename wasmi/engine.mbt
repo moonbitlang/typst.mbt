@@ -316,7 +316,7 @@ priv struct FuncTypeRegistry {
 ///|
 /// Returns a structural key of a function type.
 fn func_type_key(func_type : @wasmi_core.FuncType) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for ty in func_type.params() {
     buf.write_string(val_type_name(ty))
     buf.write_char(',')

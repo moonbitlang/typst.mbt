@@ -158,7 +158,7 @@ fn migrate_unterminated_tags(
 
   // Determine the set of tag locations which we won't migrate (because they
   // are terminated).
-  let excluded = @hashset.HashSet::new()
+  let excluded = @hashset.HashSet([])
   for i in start..<mid {
     if @library.TagElem::of(children[base + i].0) is Some(elem) &&
       elem.tag() is End(loc, _, _) {
@@ -183,7 +183,7 @@ fn migrate_unterminated_tags(
   // Partition the children using a *stable* sort. While it would be possible
   // to write a more efficient direct algorithm for this, the sort version is
   // less likely to have bugs and this is absolutely not on a hot path.
-  let area = children[base + start:base + end].to_array()
+  let area = children[base + start:base + end].to_owned()
   stable_sort_by(area, (a, b) => key(a).compare(key(b)))
   for i, pair in area {
     children[base + start + i] = pair

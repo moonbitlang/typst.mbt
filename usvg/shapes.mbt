@@ -26,23 +26,25 @@ fn convert_path_data(node : SvgNode) -> TinyPath? {
       Err(_) => break
     }
     match segment {
-      MoveTo(x~, y~) => builder.move_to(x.to_float(), y.to_float())
-      LineTo(x~, y~) => builder.line_to(x.to_float(), y.to_float())
+      MoveTo(x~, y~) =>
+        builder.move_to(Float::from_double(x), Float::from_double(y))
+      LineTo(x~, y~) =>
+        builder.line_to(Float::from_double(x), Float::from_double(y))
       Quadratic(x1~, y1~, x~, y~) =>
         builder.quad_to(
-          x1.to_float(),
-          y1.to_float(),
-          x.to_float(),
-          y.to_float(),
+          Float::from_double(x1),
+          Float::from_double(y1),
+          Float::from_double(x),
+          Float::from_double(y),
         )
       CurveTo(x1~, y1~, x2~, y2~, x~, y~) =>
         builder.cubic_to(
-          x1.to_float(),
-          y1.to_float(),
-          x2.to_float(),
-          y2.to_float(),
-          x.to_float(),
-          y.to_float(),
+          Float::from_double(x1),
+          Float::from_double(y1),
+          Float::from_double(x2),
+          Float::from_double(y2),
+          Float::from_double(x),
+          Float::from_double(y),
         )
       ClosePath => builder.close()
     }
@@ -182,9 +184,9 @@ fn points_to_path(
       let parser = @svgtypes.PointsParser::from(text)
       while parser.next() is Some((x, y)) {
         if builder.is_empty() {
-          builder.move_to(x.to_float(), y.to_float())
+          builder.move_to(Float::from_double(x), Float::from_double(y))
         } else {
-          builder.line_to(x.to_float(), y.to_float())
+          builder.line_to(Float::from_double(x), Float::from_double(y))
         }
       }
     }
@@ -269,12 +271,12 @@ fn @tiny_skia_path.PathBuilder::arc_to(
     Some(arc) =>
       arc.to_cubic_beziers(0.1, (p1, p2, p) => {
         self.cubic_to(
-          p1.x.to_float(),
-          p1.y.to_float(),
-          p2.x.to_float(),
-          p2.y.to_float(),
-          p.x.to_float(),
-          p.y.to_float(),
+          Float::from_double(p1.x),
+          Float::from_double(p1.y),
+          Float::from_double(p2.x),
+          Float::from_double(p2.y),
+          Float::from_double(p.x),
+          Float::from_double(p.y),
         )
       })
     None => self.line_to(x, y)

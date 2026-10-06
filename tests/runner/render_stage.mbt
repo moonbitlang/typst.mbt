@@ -19,7 +19,7 @@ let render_ref_dir = ".repos/typst/tests/ref/render"
 /// Counters of the comparison against the reference PNGs:
 /// (refs compared, matching within tolerance, missing refs for rendered
 /// documents).
-let render_ref_stats : Ref[(Int, Int, Int)] = Ref::new((0, 0, 0))
+let render_ref_stats : Ref[(Int, Int, Int)] = Ref((0, 0, 0))
 
 ///|
 /// Names of the tests whose rendering differs from the reference PNG.
@@ -29,7 +29,7 @@ let render_ref_failures : Array[String] = []
 /// Optional directory to write the raw premultiplied RGBA data of every
 /// rendered test to (`--raw=<dir>`), for comparison with the oracle's
 /// `ORACLE_RENDER_RAW` output.
-let render_raw_dir : Ref[String?] = Ref::new(None)
+let render_raw_dir : Ref[String?] = Ref(None)
 
 ///|
 /// Compile a single test case, render it and compare with the reference.
@@ -89,8 +89,8 @@ fn compare_render_ref(tc : TestCase, pixmap : @skia.Pixmap) -> Unit {
 fn render_tolerance(attrs : String) -> Int {
   for a in attrs.split(" ") {
     if a.has_prefix("tolerance(") && a.has_suffix(")") {
-      let s = a.to_string()
-      let v = s.substring(start=10, end=s.length() - 1)
+      let s = a.to_owned()
+      let v = s[10:s.length() - 1].to_owned()
       return @string.parse_int(v) catch { _ => 1 }
     }
   }
@@ -149,7 +149,7 @@ fn harness_render(
   ) catch {
     _ => return None
   }
-  let gap = @skia.roundf(pixel_per_pt * gap.to_pt().to_float())
+  let gap = @skia.roundf(pixel_per_pt * Float::from_double(gap.to_pt()))
   let mut y : Float = 0.0
   for page in document.pages() {
     let ts = @tiny_skia_path.Transform::from_scale(pixel_per_pt, pixel_per_pt).post_translate(
@@ -157,7 +157,9 @@ fn harness_render(
     )
     render_links(pixmap, ts, page.frame)
     y += @skia.fmax(
-        @skia.roundf(pixel_per_pt * page.frame.height().to_pt().to_float()),
+        @skia.roundf(
+          pixel_per_pt * Float::from_double(page.frame.height().to_pt()),
+        ),
         1.0,
       ) +
       gap
@@ -175,8 +177,8 @@ fn render_links(
   for entry in frame.items() {
     let (pos, item) = entry
     let ts = ts.pre_translate(
-      pos.x.to_pt().to_float(),
-      pos.y.to_pt().to_float(),
+      Float::from_double(pos.x.to_pt()),
+      Float::from_double(pos.y.to_pt()),
     )
     match item {
       Group(group) => {
@@ -184,8 +186,8 @@ fn render_links(
         render_links(canvas, ts, group.frame)
       }
       Link(_, size) => {
-        let w = size.x.to_pt().to_float()
-        let h = size.y.to_pt().to_float()
+        let w = Float::from_double(size.x.to_pt())
+        let h = Float::from_double(size.y.to_pt())
         let rect = @tiny_skia_path.Rect::from_xywh(0.0, 0.0, w, h).unwrap()
         let paint = @skia.Paint::default()
         paint.set_color_rgba8(40, 54, 99, 40)
@@ -202,12 +204,12 @@ fn harness_sk_transform(
   transform : @library.Transform,
 ) -> @tiny_skia_path.Transform {
   @tiny_skia_path.Transform::from_row(
-    transform.sx.get().to_float(),
-    transform.ky.get().to_float(),
-    transform.kx.get().to_float(),
-    transform.sy.get().to_float(),
-    transform.tx.to_pt().to_float(),
-    transform.ty.to_pt().to_float(),
+    Float::from_double(transform.sx.get()),
+    Float::from_double(transform.ky.get()),
+    Float::from_double(transform.kx.get()),
+    Float::from_double(transform.sy.get()),
+    Float::from_double(transform.tx.to_pt()),
+    Float::from_double(transform.ty.to_pt()),
   )
 }
 

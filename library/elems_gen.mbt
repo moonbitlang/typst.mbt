@@ -5,7 +5,7 @@
 //     1 Smart<TableCellKind>
 
 ///|
-let context_elem_cell : Ref[Element?] = Ref::new(None)
+let context_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Executes a `context` block. (upstream `ContextElem`, typst-library/src/foundations/context.rs)
@@ -43,7 +43,7 @@ pub fn context_elem() -> Element {
 pub let context_elem_func : Int = 0
 
 ///|
-let symbol_elem_cell : Ref[Element?] = Ref::new(None)
+let symbol_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A single character. (upstream `SymbolElem`, typst-library/src/foundations/symbol.rs)
@@ -80,7 +80,7 @@ pub fn symbol_elem() -> Element {
 pub let symbol_elem_text : Int = 0
 
 ///|
-let target_elem_cell : Ref[Element?] = Ref::new(None)
+let target_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// This element exists solely to host the `target` style chain field. It is never constructed and not visible to users. (upstream `TargetElem`, typst-library/src/foundations/target.rs)
@@ -115,7 +115,7 @@ pub fn target_elem() -> Element {
 pub let target_elem_target : Int = 0
 
 ///|
-let counter_update_elem_cell : Ref[Element?] = Ref::new(None)
+let counter_update_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Executes an update of a counter. (upstream `CounterUpdateElem`, typst-library/src/introspection/counter.rs)
@@ -164,7 +164,7 @@ pub let counter_update_elem_key : Int = 0
 pub let counter_update_elem_update : Int = 1
 
 ///|
-let counter_display_elem_cell : Ref[Element?] = Ref::new(None)
+let counter_display_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Executes a display of a counter. (upstream `CounterDisplayElem`, typst-library/src/introspection/counter.rs)
@@ -226,7 +226,7 @@ pub let counter_display_elem_numbering : Int = 1
 pub let counter_display_elem_both : Int = 2
 
 ///|
-let metadata_elem_cell : Ref[Element?] = Ref::new(None)
+let metadata_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Exposes a value to the query system without producing visible content. (upstream `MetadataElem`, typst-library/src/introspection/metadata.rs)
@@ -262,7 +262,7 @@ pub fn metadata_elem() -> Element {
 pub let metadata_elem_value : Int = 0
 
 ///|
-let state_update_elem_cell : Ref[Element?] = Ref::new(None)
+let state_update_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Executes an update of a state. (upstream `StateUpdateElem`, typst-library/src/introspection/state.rs)
@@ -311,7 +311,7 @@ pub let state_update_elem_key : Int = 0
 pub let state_update_elem_update : Int = 1
 
 ///|
-let tag_elem_cell : Ref[Element?] = Ref::new(None)
+let tag_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Holds a tag for a locatable element that was realized. (upstream `TagElem`, typst-library/src/introspection/tag.rs)
@@ -349,7 +349,7 @@ pub fn tag_elem() -> Element {
 pub let tag_elem_tag : Int = 0
 
 ///|
-let align_elem_cell : Ref[Element?] = Ref::new(None)
+let align_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Aligns content horizontally and vertically. (upstream `AlignElem`, typst-library/src/layout/align.rs)
@@ -397,7 +397,7 @@ pub let align_elem_alignment : Int = 0
 pub let align_elem_body : Int = 1
 
 ///|
-let columns_elem_cell : Ref[Element?] = Ref::new(None)
+let columns_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Separates a region into multiple equally sized columns. (upstream `ColumnsElem`, typst-library/src/layout/columns.rs)
@@ -474,7 +474,7 @@ pub let columns_elem_separator : Int = 3
 pub let columns_elem_body : Int = 4
 
 ///|
-let colbreak_elem_cell : Ref[Element?] = Ref::new(None)
+let colbreak_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Forces a column break. (upstream `ColbreakElem`, typst-library/src/layout/columns.rs)
@@ -505,7 +505,7 @@ pub fn colbreak_elem() -> Element {
 pub let colbreak_elem_weak : Int = 0
 
 ///|
-let box_elem_cell : Ref[Element?] = Ref::new(None)
+let box_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An inline-level container that sizes content. (upstream `BoxElem`, typst-library/src/layout/container.rs)
@@ -627,7 +627,7 @@ pub let box_elem_clip : Int = 8
 pub let box_elem_body : Int = 9
 
 ///|
-let inline_elem_cell : Ref[Element?] = Ref::new(None)
+let inline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An inline-level container that can produce arbitrary items that can break across lines. (upstream `InlineElem`, typst-library/src/layout/container.rs)
@@ -665,7 +665,7 @@ pub fn inline_elem() -> Element {
 pub let inline_elem_body : Int = 0
 
 ///|
-let block_elem_cell : Ref[Element?] = Ref::new(None)
+let block_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A block-level container. (upstream `BlockElem`, typst-library/src/layout/container.rs)
@@ -829,7 +829,7 @@ pub let block_elem_sticky : Int = 12
 pub let block_elem_body : Int = 13
 
 ///|
-let grid_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Arranges content in a grid. (upstream `GridElem`, typst-library/src/layout/grid/mod.rs)
@@ -971,7 +971,7 @@ pub let grid_elem_children : Int = 9
 pub let grid_elem_grid : Int = 10
 
 ///|
-let grid_header_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_header_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A repeatable grid header. (upstream `GridHeader`, typst-library/src/layout/grid/mod.rs)
@@ -1024,7 +1024,7 @@ pub let grid_header_elem_level : Int = 1
 pub let grid_header_elem_children : Int = 2
 
 ///|
-let grid_footer_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_footer_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A repeatable grid footer. (upstream `GridFooter`, typst-library/src/layout/grid/mod.rs)
@@ -1067,7 +1067,7 @@ pub let grid_footer_elem_repeat : Int = 0
 pub let grid_footer_elem_children : Int = 1
 
 ///|
-let grid_h_line_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_h_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal line in the grid. (upstream `GridHLine`, typst-library/src/layout/grid/mod.rs)
@@ -1139,7 +1139,7 @@ pub let grid_h_line_elem_stroke : Int = 3
 pub let grid_h_line_elem_position : Int = 4
 
 ///|
-let grid_v_line_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_v_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A vertical line in the grid. (upstream `GridVLine`, typst-library/src/layout/grid/mod.rs)
@@ -1211,7 +1211,7 @@ pub let grid_v_line_elem_stroke : Int = 3
 pub let grid_v_line_elem_position : Int = 4
 
 ///|
-let grid_cell_elem_cell : Ref[Element?] = Ref::new(None)
+let grid_cell_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A cell in the grid. You can use this function in the argument list of a grid to override grid style properties for an individual cell or manually positioning it within the grid. You can also use this function in show rules to apply certain styles to multiple cells at once. (upstream `GridCell`, typst-library/src/layout/grid/mod.rs)
@@ -1350,7 +1350,7 @@ pub let grid_cell_elem_breakable : Int = 9
 pub let grid_cell_elem_is_repeated : Int = 10
 
 ///|
-let hide_elem_cell : Ref[Element?] = Ref::new(None)
+let hide_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Hides content without affecting layout. (upstream `HideElem`, typst-library/src/layout/hide.rs)
@@ -1397,7 +1397,7 @@ pub let hide_elem_body : Int = 0
 pub let hide_elem_hidden : Int = 1
 
 ///|
-let layout_elem_cell : Ref[Element?] = Ref::new(None)
+let layout_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Executes a `layout` call. (upstream `LayoutElem`, typst-library/src/layout/layout.rs)
@@ -1433,7 +1433,7 @@ pub fn layout_elem() -> Element {
 pub let layout_elem_func : Int = 0
 
 ///|
-let pad_elem_cell : Ref[Element?] = Ref::new(None)
+let pad_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds spacing around content. (upstream `PadElem`, typst-library/src/layout/pad.rs)
@@ -1543,7 +1543,7 @@ pub let pad_elem_rest : Int = 6
 pub let pad_elem_body : Int = 7
 
 ///|
-let page_elem_cell : Ref[Element?] = Ref::new(None)
+let page_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Layouts its child onto one or multiple pages. (upstream `PageElem`, typst-library/src/layout/page.rs)
@@ -1768,7 +1768,7 @@ pub let page_elem_foreground : Int = 17
 pub let page_elem_body : Int = 18
 
 ///|
-let pagebreak_elem_cell : Ref[Element?] = Ref::new(None)
+let pagebreak_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A manual page break. (upstream `PagebreakElem`, typst-library/src/layout/page.rs)
@@ -1817,7 +1817,7 @@ pub let pagebreak_elem_to : Int = 1
 pub let pagebreak_elem_boundary : Int = 2
 
 ///|
-let place_elem_cell : Ref[Element?] = Ref::new(None)
+let place_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Places content relatively to its parent container. (upstream `PlaceElem`, typst-library/src/layout/place.rs)
@@ -1910,7 +1910,7 @@ pub let place_elem_dy : Int = 5
 pub let place_elem_body : Int = 6
 
 ///|
-let flush_elem_cell : Ref[Element?] = Ref::new(None)
+let flush_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Asks the layout algorithm to place pending floating elements before continuing with the content. (upstream `FlushElem`, typst-library/src/layout/place.rs)
@@ -1934,7 +1934,7 @@ pub fn flush_elem() -> Element {
 }
 
 ///|
-let repeat_elem_cell : Ref[Element?] = Ref::new(None)
+let repeat_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Repeats content to the available space. (upstream `RepeatElem`, typst-library/src/layout/repeat.rs)
@@ -1986,7 +1986,7 @@ pub let repeat_elem_gap : Int = 1
 pub let repeat_elem_justify : Int = 2
 
 ///|
-let h_elem_cell : Ref[Element?] = Ref::new(None)
+let h_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Inserts horizontal spacing into a paragraph. (upstream `HElem`, typst-library/src/layout/spacing.rs)
@@ -2028,7 +2028,7 @@ pub let h_elem_amount : Int = 0
 pub let h_elem_weak : Int = 1
 
 ///|
-let v_elem_cell : Ref[Element?] = Ref::new(None)
+let v_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Inserts vertical spacing into a flow of blocks. (upstream `VElem`, typst-library/src/layout/spacing.rs)
@@ -2082,7 +2082,7 @@ pub let v_elem_weak : Int = 1
 pub let v_elem_attach : Int = 2
 
 ///|
-let stack_elem_cell : Ref[Element?] = Ref::new(None)
+let stack_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Arranges content and spacing horizontally or vertically. (upstream `StackElem`, typst-library/src/layout/stack.rs)
@@ -2135,7 +2135,7 @@ pub let stack_elem_spacing : Int = 1
 pub let stack_elem_children : Int = 2
 
 ///|
-let move_elem_cell : Ref[Element?] = Ref::new(None)
+let move_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Moves content without affecting layout. (upstream `MoveElem`, typst-library/src/layout/transform.rs)
@@ -2191,7 +2191,7 @@ pub let move_elem_dy : Int = 1
 pub let move_elem_body : Int = 2
 
 ///|
-let rotate_elem_cell : Ref[Element?] = Ref::new(None)
+let rotate_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Rotates content without affecting layout. (upstream `RotateElem`, typst-library/src/layout/transform.rs)
@@ -2261,7 +2261,7 @@ pub let rotate_elem_reflow : Int = 2
 pub let rotate_elem_body : Int = 3
 
 ///|
-let scale_elem_cell : Ref[Element?] = Ref::new(None)
+let scale_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Scales content without affecting layout. (upstream `ScaleElem`, typst-library/src/layout/transform.rs)
@@ -2353,7 +2353,7 @@ pub let scale_elem_reflow : Int = 4
 pub let scale_elem_body : Int = 5
 
 ///|
-let skew_elem_cell : Ref[Element?] = Ref::new(None)
+let skew_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Skews content. (upstream `SkewElem`, typst-library/src/layout/transform.rs)
@@ -2424,7 +2424,7 @@ pub let skew_elem_reflow : Int = 3
 pub let skew_elem_body : Int = 4
 
 ///|
-let accent_elem_cell : Ref[Element?] = Ref::new(None)
+let accent_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Attaches an accent to a base. (upstream `AccentElem`, typst-library/src/math/accent.rs)
@@ -2491,7 +2491,7 @@ pub let accent_elem_size : Int = 2
 pub let accent_elem_dotless : Int = 3
 
 ///|
-let math_attach_elem_cell : Ref[Element?] = Ref::new(None)
+let math_attach_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A base with optional attachments. (upstream `AttachElem`, typst-library/src/math/attach.rs)
@@ -2563,7 +2563,7 @@ pub let math_attach_elem_tr : Int = 5
 pub let math_attach_elem_br : Int = 6
 
 ///|
-let primes_elem_cell : Ref[Element?] = Ref::new(None)
+let primes_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Grouped primes. (upstream `PrimesElem`, typst-library/src/math/attach.rs)
@@ -2599,7 +2599,7 @@ pub fn primes_elem() -> Element {
 pub let primes_elem_count : Int = 0
 
 ///|
-let scripts_elem_cell : Ref[Element?] = Ref::new(None)
+let scripts_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Forces a base to display attachments as scripts. (upstream `ScriptsElem`, typst-library/src/math/attach.rs)
@@ -2635,7 +2635,7 @@ pub fn scripts_elem() -> Element {
 pub let scripts_elem_body : Int = 0
 
 ///|
-let limits_elem_cell : Ref[Element?] = Ref::new(None)
+let limits_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Forces a base to display attachments as limits. (upstream `LimitsElem`, typst-library/src/math/attach.rs)
@@ -2677,7 +2677,7 @@ pub let limits_elem_body : Int = 0
 pub let limits_elem_inline : Int = 1
 
 ///|
-let stretch_elem_cell : Ref[Element?] = Ref::new(None)
+let stretch_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Stretches a glyph. (upstream `StretchElem`, typst-library/src/math/attach.rs)
@@ -2723,7 +2723,7 @@ pub let stretch_elem_body : Int = 0
 pub let stretch_elem_size : Int = 1
 
 ///|
-let cancel_elem_cell : Ref[Element?] = Ref::new(None)
+let cancel_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Displays a diagonal line over a part of an equation. (upstream `CancelElem`, typst-library/src/math/cancel.rs)
@@ -2816,7 +2816,7 @@ pub let cancel_elem_stroke : Int = 5
 pub let cancel_elem_background : Int = 6
 
 ///|
-let equation_elem_cell : Ref[Element?] = Ref::new(None)
+let equation_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A mathematical equation. (upstream `EquationElem`, typst-library/src/math/equation.rs)
@@ -2982,7 +2982,7 @@ pub let equation_elem_script_scale : Int = 11
 pub let equation_elem_locale : Int = 12
 
 ///|
-let frac_elem_cell : Ref[Element?] = Ref::new(None)
+let frac_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A mathematical fraction. (upstream `FracElem`, typst-library/src/math/frac.rs)
@@ -3063,7 +3063,7 @@ pub let frac_elem_num_deparenthesized : Int = 3
 pub let frac_elem_denom_deparenthesized : Int = 4
 
 ///|
-let binom_elem_cell : Ref[Element?] = Ref::new(None)
+let binom_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A binomial expression. (upstream `BinomElem`, typst-library/src/math/frac.rs)
@@ -3112,7 +3112,7 @@ pub let binom_elem_upper : Int = 0
 pub let binom_elem_lower : Int = 1
 
 ///|
-let lr_elem_cell : Ref[Element?] = Ref::new(None)
+let lr_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Scales delimiters. (upstream `LrElem`, typst-library/src/math/lr.rs)
@@ -3159,7 +3159,7 @@ pub let lr_elem_size : Int = 0
 pub let lr_elem_body : Int = 1
 
 ///|
-let mid_elem_cell : Ref[Element?] = Ref::new(None)
+let mid_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Scales delimiters vertically to the nearest surrounding `{lr()}` group. (upstream `MidElem`, typst-library/src/math/lr.rs)
@@ -3195,7 +3195,7 @@ pub fn mid_elem() -> Element {
 pub let mid_elem_body : Int = 0
 
 ///|
-let vec_elem_cell : Ref[Element?] = Ref::new(None)
+let vec_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A column vector. (upstream `VecElem`, typst-library/src/math/matrix.rs)
@@ -3262,7 +3262,7 @@ pub let vec_elem_gap : Int = 2
 pub let vec_elem_children : Int = 3
 
 ///|
-let mat_elem_cell : Ref[Element?] = Ref::new(None)
+let mat_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A matrix. (upstream `MatElem`, typst-library/src/math/matrix.rs)
@@ -3364,7 +3364,7 @@ pub let mat_elem_column_gap : Int = 5
 pub let mat_elem_rows : Int = 6
 
 ///|
-let cases_elem_cell : Ref[Element?] = Ref::new(None)
+let cases_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A case distinction. (upstream `CasesElem`, typst-library/src/math/matrix.rs)
@@ -3431,7 +3431,7 @@ pub let cases_elem_gap : Int = 2
 pub let cases_elem_children : Int = 3
 
 ///|
-let align_point_elem_cell : Ref[Element?] = Ref::new(None)
+let align_point_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A math alignment point: `&`, `&&`. (upstream `AlignPointElem`, typst-library/src/math/mod.rs)
@@ -3455,7 +3455,7 @@ pub fn align_point_elem() -> Element {
 }
 
 ///|
-let class_elem_cell : Ref[Element?] = Ref::new(None)
+let class_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Forced use of a certain math class. (upstream `ClassElem`, typst-library/src/math/mod.rs)
@@ -3502,7 +3502,7 @@ pub let class_elem_class : Int = 0
 pub let class_elem_body : Int = 1
 
 ///|
-let op_elem_cell : Ref[Element?] = Ref::new(None)
+let op_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A text operator in an equation. (upstream `OpElem`, typst-library/src/math/op.rs)
@@ -3544,7 +3544,7 @@ pub let op_elem_text : Int = 0
 pub let op_elem_limits : Int = 1
 
 ///|
-let root_elem_cell : Ref[Element?] = Ref::new(None)
+let root_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A general root. (upstream `RootElem`, typst-library/src/math/root.rs)
@@ -3591,7 +3591,7 @@ pub let root_elem_index : Int = 0
 pub let root_elem_radicand : Int = 1
 
 ///|
-let math_underline_elem_cell : Ref[Element?] = Ref::new(None)
+let math_underline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal line under content. (upstream `UnderlineElem`, typst-library/src/math/underover.rs)
@@ -3627,7 +3627,7 @@ pub fn math_underline_elem() -> Element {
 pub let math_underline_elem_body : Int = 0
 
 ///|
-let math_overline_elem_cell : Ref[Element?] = Ref::new(None)
+let math_overline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal line over content. (upstream `OverlineElem`, typst-library/src/math/underover.rs)
@@ -3663,7 +3663,7 @@ pub fn math_overline_elem() -> Element {
 pub let math_overline_elem_body : Int = 0
 
 ///|
-let underbrace_elem_cell : Ref[Element?] = Ref::new(None)
+let underbrace_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal brace under content, with an optional annotation below. (upstream `UnderbraceElem`, typst-library/src/math/underover.rs)
@@ -3710,7 +3710,7 @@ pub let underbrace_elem_body : Int = 0
 pub let underbrace_elem_annotation : Int = 1
 
 ///|
-let overbrace_elem_cell : Ref[Element?] = Ref::new(None)
+let overbrace_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal brace over content, with an optional annotation above. (upstream `OverbraceElem`, typst-library/src/math/underover.rs)
@@ -3757,7 +3757,7 @@ pub let overbrace_elem_body : Int = 0
 pub let overbrace_elem_annotation : Int = 1
 
 ///|
-let underbracket_elem_cell : Ref[Element?] = Ref::new(None)
+let underbracket_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal bracket under content, with an optional annotation below. (upstream `UnderbracketElem`, typst-library/src/math/underover.rs)
@@ -3804,7 +3804,7 @@ pub let underbracket_elem_body : Int = 0
 pub let underbracket_elem_annotation : Int = 1
 
 ///|
-let overbracket_elem_cell : Ref[Element?] = Ref::new(None)
+let overbracket_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal bracket over content, with an optional annotation above. (upstream `OverbracketElem`, typst-library/src/math/underover.rs)
@@ -3851,7 +3851,7 @@ pub let overbracket_elem_body : Int = 0
 pub let overbracket_elem_annotation : Int = 1
 
 ///|
-let underparen_elem_cell : Ref[Element?] = Ref::new(None)
+let underparen_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal parenthesis under content, with an optional annotation below. (upstream `UnderparenElem`, typst-library/src/math/underover.rs)
@@ -3898,7 +3898,7 @@ pub let underparen_elem_body : Int = 0
 pub let underparen_elem_annotation : Int = 1
 
 ///|
-let overparen_elem_cell : Ref[Element?] = Ref::new(None)
+let overparen_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal parenthesis over content, with an optional annotation above. (upstream `OverparenElem`, typst-library/src/math/underover.rs)
@@ -3945,7 +3945,7 @@ pub let overparen_elem_body : Int = 0
 pub let overparen_elem_annotation : Int = 1
 
 ///|
-let undershell_elem_cell : Ref[Element?] = Ref::new(None)
+let undershell_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal tortoise shell bracket under content, with an optional annotation below. (upstream `UndershellElem`, typst-library/src/math/underover.rs)
@@ -3992,7 +3992,7 @@ pub let undershell_elem_body : Int = 0
 pub let undershell_elem_annotation : Int = 1
 
 ///|
-let overshell_elem_cell : Ref[Element?] = Ref::new(None)
+let overshell_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal tortoise shell bracket over content, with an optional annotation above. (upstream `OvershellElem`, typst-library/src/math/underover.rs)
@@ -4039,7 +4039,7 @@ pub let overshell_elem_body : Int = 0
 pub let overshell_elem_annotation : Int = 1
 
 ///|
-let artifact_elem_cell : Ref[Element?] = Ref::new(None)
+let artifact_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Marks content as a PDF artifact. (upstream `ArtifactElem`, typst-library/src/model/accessibility.rs)
@@ -4085,7 +4085,7 @@ pub let artifact_elem_kind : Int = 0
 pub let artifact_elem_body : Int = 1
 
 ///|
-let pdf_marker_tag_elem_cell : Ref[Element?] = Ref::new(None)
+let pdf_marker_tag_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Used to delimit content for tagged PDF. (upstream `PdfMarkerTag`, typst-library/src/model/accessibility.rs)
@@ -4133,7 +4133,7 @@ pub let pdf_marker_tag_elem_body : Int = 0
 pub let pdf_marker_tag_elem_kind : Int = 1
 
 ///|
-let bibliography_elem_cell : Ref[Element?] = Ref::new(None)
+let bibliography_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A bibliography / reference listing. (upstream `BibliographyElem`, typst-library/src/model/bibliography.rs)
@@ -4264,7 +4264,7 @@ pub let bibliography_elem_sources_derived : Int = 8
 pub let bibliography_elem_style_derived : Int = 9
 
 ///|
-let csl_light_elem_cell : Ref[Element?] = Ref::new(None)
+let csl_light_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Translation of `font-weight="light"` in CSL. (upstream `CslLightElem`, typst-library/src/model/bibliography.rs)
@@ -4300,7 +4300,7 @@ pub fn csl_light_elem() -> Element {
 pub let csl_light_elem_body : Int = 0
 
 ///|
-let csl_indent_elem_cell : Ref[Element?] = Ref::new(None)
+let csl_indent_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Translation of `display="indent"` in CSL. (upstream `CslIndentElem`, typst-library/src/model/bibliography.rs)
@@ -4336,7 +4336,7 @@ pub fn csl_indent_elem() -> Element {
 pub let csl_indent_elem_body : Int = 0
 
 ///|
-let cite_elem_cell : Ref[Element?] = Ref::new(None)
+let cite_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Cite a work from the bibliography. (upstream `CiteElem`, typst-library/src/model/cite.rs)
@@ -4435,7 +4435,7 @@ pub let cite_elem_region : Int = 5
 pub let cite_elem_style_derived : Int = 6
 
 ///|
-let cite_group_elem_cell : Ref[Element?] = Ref::new(None)
+let cite_group_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A group of consecutive citations. (upstream `CiteGroup`, typst-library/src/model/cite.rs)
@@ -4471,7 +4471,7 @@ pub fn cite_group_elem() -> Element {
 pub let cite_group_elem_children : Int = 0
 
 ///|
-let divider_elem_cell : Ref[Element?] = Ref::new(None)
+let divider_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A thematic break that separates sections of content. (upstream `DividerElem`, typst-library/src/model/divider.rs)
@@ -4496,7 +4496,7 @@ pub fn divider_elem() -> Element {
 }
 
 ///|
-let document_elem_cell : Ref[Element?] = Ref::new(None)
+let document_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Manages metadata and is used to add a document file to a bundle. (upstream `DocumentElem`, typst-library/src/model/document.rs)
@@ -4604,7 +4604,7 @@ pub let document_elem_date : Int = 6
 pub let document_elem_body : Int = 7
 
 ///|
-let emph_elem_cell : Ref[Element?] = Ref::new(None)
+let emph_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Emphasizes content by toggling italics. (upstream `EmphElem`, typst-library/src/model/emph.rs)
@@ -4640,7 +4640,7 @@ pub fn emph_elem() -> Element {
 pub let emph_elem_body : Int = 0
 
 ///|
-let enum_elem_cell : Ref[Element?] = Ref::new(None)
+let enum_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A numbered list. (upstream `EnumElem`, typst-library/src/model/enum.rs)
@@ -4771,7 +4771,7 @@ pub let enum_elem_children : Int = 9
 pub let enum_elem_parents : Int = 10
 
 ///|
-let enum_item_elem_cell : Ref[Element?] = Ref::new(None)
+let enum_item_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An enumeration item. (upstream `EnumItem`, typst-library/src/model/enum.rs)
@@ -4818,7 +4818,7 @@ pub let enum_item_elem_number : Int = 0
 pub let enum_item_elem_body : Int = 1
 
 ///|
-let figure_elem_cell : Ref[Element?] = Ref::new(None)
+let figure_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A figure with an optional caption. (upstream `FigureElem`, typst-library/src/model/figure.rs)
@@ -4959,7 +4959,7 @@ pub let figure_elem_counter : Int = 10
 pub let figure_elem_locale : Int = 11
 
 ///|
-let figure_caption_elem_cell : Ref[Element?] = Ref::new(None)
+let figure_caption_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// The caption of a figure. This element can be used in set and show rules to customize the appearance of captions for all figures or figures of a specific kind. (upstream `FigureCaption`, typst-library/src/model/figure.rs)
@@ -5062,7 +5062,7 @@ pub let figure_caption_elem_counter : Int = 6
 pub let figure_caption_elem_figure_location : Int = 7
 
 ///|
-let footnote_elem_cell : Ref[Element?] = Ref::new(None)
+let footnote_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A footnote. (upstream `FootnoteElem`, typst-library/src/model/footnote.rs)
@@ -5111,7 +5111,7 @@ pub let footnote_elem_numbering : Int = 0
 pub let footnote_elem_body : Int = 1
 
 ///|
-let footnote_entry_elem_cell : Ref[Element?] = Ref::new(None)
+let footnote_entry_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An entry in a footnote list. (upstream `FootnoteEntry`, typst-library/src/model/footnote.rs)
@@ -5184,7 +5184,7 @@ pub let footnote_entry_elem_gap : Int = 3
 pub let footnote_entry_elem_indent : Int = 4
 
 ///|
-let footnote_container_elem_cell : Ref[Element?] = Ref::new(None)
+let footnote_container_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// In HTML export, this is inserted at the end of the body to display footnotes. In the future, we can expose this to allow customizing where the footnotes appear. It could also be exposed for paged export. (upstream `FootnoteContainer`, typst-library/src/model/footnote.rs)
@@ -5208,7 +5208,7 @@ pub fn footnote_container_elem() -> Element {
 }
 
 ///|
-let footnote_marker_elem_cell : Ref[Element?] = Ref::new(None)
+let footnote_marker_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// This is an empty element inserted by the HTML footnote rule to indicate the presence of the default footnote rule. It's only used by the error in `FootnoteContainer::unsupported_with_custom_dom` and could be removed if that's not needed anymore. (upstream `FootnoteMarker`, typst-library/src/model/footnote.rs)
@@ -5232,7 +5232,7 @@ pub fn footnote_marker_elem() -> Element {
 }
 
 ///|
-let heading_elem_cell : Ref[Element?] = Ref::new(None)
+let heading_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A section heading. (upstream `HeadingElem`, typst-library/src/model/heading.rs)
@@ -5366,7 +5366,7 @@ pub let heading_elem_body : Int = 8
 pub let heading_elem_numbers : Int = 9
 
 ///|
-let link_elem_cell : Ref[Element?] = Ref::new(None)
+let link_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Links to a URL or a location in the document. (upstream `LinkElem`, typst-library/src/model/link.rs)
@@ -5427,7 +5427,7 @@ pub let link_elem_body : Int = 1
 pub let link_elem_current : Int = 2
 
 ///|
-let direct_link_elem_cell : Ref[Element?] = Ref::new(None)
+let direct_link_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// This is a temporary hack to dispatch to - a raw link that does not go through `LinkElem` in paged - `LinkElem` in HTML (there is no equivalent to a direct link) (upstream `DirectLinkElem`, typst-library/src/model/link.rs)
@@ -5488,7 +5488,7 @@ pub let direct_link_elem_body : Int = 1
 pub let direct_link_elem_alt : Int = 2
 
 ///|
-let link_marker_elem_cell : Ref[Element?] = Ref::new(None)
+let link_marker_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An element that wraps all content that is @Content::linked to a destination. (upstream `LinkMarker`, typst-library/src/model/link.rs)
@@ -5537,7 +5537,7 @@ pub let link_marker_elem_body : Int = 0
 pub let link_marker_elem_alt : Int = 1
 
 ///|
-let list_elem_cell : Ref[Element?] = Ref::new(None)
+let list_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A bullet list. (upstream `ListElem`, typst-library/src/model/list.rs)
@@ -5642,7 +5642,7 @@ pub let list_elem_children : Int = 6
 pub let list_elem_depth : Int = 7
 
 ///|
-let list_item_elem_cell : Ref[Element?] = Ref::new(None)
+let list_item_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A bullet list item. (upstream `ListItem`, typst-library/src/model/list.rs)
@@ -5678,7 +5678,7 @@ pub fn list_item_elem() -> Element {
 pub let list_item_elem_body : Int = 0
 
 ///|
-let outline_elem_cell : Ref[Element?] = Ref::new(None)
+let outline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A table of contents, figures, or other elements. (upstream `OutlineElem`, typst-library/src/model/outline.rs)
@@ -5747,7 +5747,7 @@ pub let outline_elem_depth : Int = 2
 pub let outline_elem_indent : Int = 3
 
 ///|
-let outline_entry_elem_cell : Ref[Element?] = Ref::new(None)
+let outline_entry_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Represents an entry line in an outline. (upstream `OutlineEntry`, typst-library/src/model/outline.rs)
@@ -5815,7 +5815,7 @@ pub let outline_entry_elem_fill : Int = 2
 pub let outline_entry_elem_parent : Int = 3
 
 ///|
-let prefix_info_elem_cell : Ref[Element?] = Ref::new(None)
+let prefix_info_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Helper type for introspection-based prefix alignment. (upstream `PrefixInfo`, typst-library/src/model/outline.rs)
@@ -5875,7 +5875,7 @@ pub let prefix_info_elem_level : Int = 1
 pub let prefix_info_elem_inset : Int = 2
 
 ///|
-let par_elem_cell : Ref[Element?] = Ref::new(None)
+let par_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A logical subdivison of textual content. (upstream `ParElem`, typst-library/src/model/par.rs)
@@ -5983,7 +5983,7 @@ pub let par_elem_hanging_indent : Int = 6
 pub let par_elem_body : Int = 7
 
 ///|
-let parbreak_elem_cell : Ref[Element?] = Ref::new(None)
+let parbreak_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A paragraph break. (upstream `ParbreakElem`, typst-library/src/model/par.rs)
@@ -6007,7 +6007,7 @@ pub fn parbreak_elem() -> Element {
 }
 
 ///|
-let par_line_elem_cell : Ref[Element?] = Ref::new(None)
+let par_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A paragraph line. (upstream `ParLine`, typst-library/src/model/par.rs)
@@ -6082,7 +6082,7 @@ pub let par_line_elem_number_clearance : Int = 3
 pub let par_line_elem_numbering_scope : Int = 4
 
 ///|
-let par_line_marker_elem_cell : Ref[Element?] = Ref::new(None)
+let par_line_marker_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A marker used to indicate the presence of a line. (upstream `ParLineMarker`, typst-library/src/model/par.rs)
@@ -6155,7 +6155,7 @@ pub let par_line_marker_elem_number_margin : Int = 2
 pub let par_line_marker_elem_number_clearance : Int = 3
 
 ///|
-let quote_elem_cell : Ref[Element?] = Ref::new(None)
+let quote_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Displays a quote alongside an optional attribution. (upstream `QuoteElem`, typst-library/src/model/quote.rs)
@@ -6230,7 +6230,7 @@ pub let quote_elem_body : Int = 3
 pub let quote_elem_depth : Int = 4
 
 ///|
-let ref_elem_cell : Ref[Element?] = Ref::new(None)
+let ref_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A reference to a label or bibliography. (upstream `RefElem`, typst-library/src/model/reference.rs)
@@ -6305,7 +6305,7 @@ pub let ref_elem_citation : Int = 3
 pub let ref_elem_element : Int = 4
 
 ///|
-let strong_elem_cell : Ref[Element?] = Ref::new(None)
+let strong_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Strongly emphasizes content by increasing the font weight. (upstream `StrongElem`, typst-library/src/model/strong.rs)
@@ -6347,7 +6347,7 @@ pub let strong_elem_delta : Int = 0
 pub let strong_elem_body : Int = 1
 
 ///|
-let table_elem_cell : Ref[Element?] = Ref::new(None)
+let table_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A table of items. (upstream `TableElem`, typst-library/src/model/table.rs)
@@ -6506,7 +6506,7 @@ pub let table_elem_summary : Int = 10
 pub let table_elem_grid : Int = 11
 
 ///|
-let table_header_elem_cell : Ref[Element?] = Ref::new(None)
+let table_header_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A repeatable table header. (upstream `TableHeader`, typst-library/src/model/table.rs)
@@ -6559,7 +6559,7 @@ pub let table_header_elem_level : Int = 1
 pub let table_header_elem_children : Int = 2
 
 ///|
-let table_footer_elem_cell : Ref[Element?] = Ref::new(None)
+let table_footer_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A repeatable table footer. (upstream `TableFooter`, typst-library/src/model/table.rs)
@@ -6602,7 +6602,7 @@ pub let table_footer_elem_repeat : Int = 0
 pub let table_footer_elem_children : Int = 1
 
 ///|
-let table_h_line_elem_cell : Ref[Element?] = Ref::new(None)
+let table_h_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A horizontal line in the table. (upstream `TableHLine`, typst-library/src/model/table.rs)
@@ -6674,7 +6674,7 @@ pub let table_h_line_elem_stroke : Int = 3
 pub let table_h_line_elem_position : Int = 4
 
 ///|
-let table_v_line_elem_cell : Ref[Element?] = Ref::new(None)
+let table_v_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A vertical line in the table. See the docs for @grid.vline for more information regarding how to use this element's fields. (upstream `TableVLine`, typst-library/src/model/table.rs)
@@ -6746,7 +6746,7 @@ pub let table_v_line_elem_stroke : Int = 3
 pub let table_v_line_elem_position : Int = 4
 
 ///|
-let table_cell_elem_cell : Ref[Element?] = Ref::new(None)
+let table_cell_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A cell in the table. Use this to position a cell manually or to apply styling. To do the latter, you can either use the function to override the properties for a particular cell, or use it in show rules to apply certain styles to multiple cells at once. (upstream `TableCell`, typst-library/src/model/table.rs)
@@ -6897,7 +6897,7 @@ pub let table_cell_elem_kind : Int = 10
 pub let table_cell_elem_is_repeated : Int = 11
 
 ///|
-let terms_elem_cell : Ref[Element?] = Ref::new(None)
+let terms_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A list of terms and their descriptions. (upstream `TermsElem`, typst-library/src/model/terms.rs)
@@ -6991,7 +6991,7 @@ pub let terms_elem_children : Int = 5
 pub let terms_elem_within : Int = 6
 
 ///|
-let term_item_elem_cell : Ref[Element?] = Ref::new(None)
+let term_item_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A term list item. (upstream `TermItem`, typst-library/src/model/terms.rs)
@@ -7038,7 +7038,7 @@ pub let term_item_elem_term : Int = 0
 pub let term_item_elem_description : Int = 1
 
 ///|
-let title_elem_cell : Ref[Element?] = Ref::new(None)
+let title_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A document title. (upstream `TitleElem`, typst-library/src/model/title.rs)
@@ -7075,7 +7075,7 @@ pub fn title_elem() -> Element {
 pub let title_elem_body : Int = 0
 
 ///|
-let underline_elem_cell : Ref[Element?] = Ref::new(None)
+let underline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Underlines text. (upstream `UnderlineElem`, typst-library/src/text/deco.rs)
@@ -7158,7 +7158,7 @@ pub let underline_elem_background : Int = 4
 pub let underline_elem_body : Int = 5
 
 ///|
-let overline_elem_cell : Ref[Element?] = Ref::new(None)
+let overline_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds a line over text. (upstream `OverlineElem`, typst-library/src/text/deco.rs)
@@ -7241,7 +7241,7 @@ pub let overline_elem_background : Int = 4
 pub let overline_elem_body : Int = 5
 
 ///|
-let strike_elem_cell : Ref[Element?] = Ref::new(None)
+let strike_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Strikes through text. (upstream `StrikeElem`, typst-library/src/text/deco.rs)
@@ -7318,7 +7318,7 @@ pub let strike_elem_background : Int = 3
 pub let strike_elem_body : Int = 4
 
 ///|
-let highlight_elem_cell : Ref[Element?] = Ref::new(None)
+let highlight_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Highlights text with a background color. (upstream `HighlightElem`, typst-library/src/text/deco.rs)
@@ -7416,7 +7416,7 @@ pub let highlight_elem_radius : Int = 5
 pub let highlight_elem_body : Int = 6
 
 ///|
-let linebreak_elem_cell : Ref[Element?] = Ref::new(None)
+let linebreak_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Inserts a line break. (upstream `LinebreakElem`, typst-library/src/text/linebreak.rs)
@@ -7451,7 +7451,7 @@ pub fn linebreak_elem() -> Element {
 pub let linebreak_elem_justify : Int = 0
 
 ///|
-let text_elem_cell : Ref[Element?] = Ref::new(None)
+let text_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Customizes the look and layout of text in a variety of ways. (upstream `TextElem`, typst-library/src/text/mod.rs)
@@ -7901,7 +7901,7 @@ pub let text_elem_smallcaps : Int = 40
 pub let text_elem_shift_settings : Int = 41
 
 ///|
-let raw_elem_cell : Ref[Element?] = Ref::new(None)
+let raw_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Raw text with optional syntax highlighting. (upstream `RawElem`, typst-library/src/text/raw.rs)
@@ -8038,7 +8038,7 @@ pub let raw_elem_syntaxes_derived : Int = 8
 pub let raw_elem_theme_derived : Int = 9
 
 ///|
-let raw_line_elem_cell : Ref[Element?] = Ref::new(None)
+let raw_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A highlighted line of raw text. (upstream `RawLine`, typst-library/src/text/raw.rs)
@@ -8108,7 +8108,7 @@ pub let raw_line_elem_text : Int = 2
 pub let raw_line_elem_body : Int = 3
 
 ///|
-let sub_elem_cell : Ref[Element?] = Ref::new(None)
+let sub_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Renders text in subscript. (upstream `SubElem`, typst-library/src/text/shift.rs)
@@ -8174,7 +8174,7 @@ pub let sub_elem_size : Int = 2
 pub let sub_elem_body : Int = 3
 
 ///|
-let super_elem_cell : Ref[Element?] = Ref::new(None)
+let super_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Renders text in superscript. (upstream `SuperElem`, typst-library/src/text/shift.rs)
@@ -8240,7 +8240,7 @@ pub let super_elem_size : Int = 2
 pub let super_elem_body : Int = 3
 
 ///|
-let smallcaps_elem_cell : Ref[Element?] = Ref::new(None)
+let smallcaps_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Displays text in small capitals. (upstream `SmallcapsElem`, typst-library/src/text/smallcaps.rs)
@@ -8282,7 +8282,7 @@ pub let smallcaps_elem_all : Int = 0
 pub let smallcaps_elem_body : Int = 1
 
 ///|
-let smart_quote_elem_cell : Ref[Element?] = Ref::new(None)
+let smart_quote_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A language-aware quote that reacts to its context. (upstream `SmartQuoteElem`, typst-library/src/text/smartquote.rs)
@@ -8344,7 +8344,7 @@ pub let smart_quote_elem_alternative : Int = 2
 pub let smart_quote_elem_quotes : Int = 3
 
 ///|
-let space_elem_cell : Ref[Element?] = Ref::new(None)
+let space_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A text space. (upstream `SpaceElem`, typst-library/src/text/space.rs)
@@ -8383,7 +8383,7 @@ pub fn space_elem() -> Element {
 pub let space_elem_had_newline : Int = 0
 
 ///|
-let curve_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A curve consisting of movements, lines, and Bézier segments. (upstream `CurveElem`, typst-library/src/visualize/curve.rs)
@@ -8447,7 +8447,7 @@ pub let curve_elem_stroke : Int = 2
 pub let curve_elem_components : Int = 3
 
 ///|
-let curve_move_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_move_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Starts a new curve component. (upstream `CurveMove`, typst-library/src/visualize/curve.rs)
@@ -8493,7 +8493,7 @@ pub let curve_move_elem_start : Int = 0
 pub let curve_move_elem_relative : Int = 1
 
 ///|
-let curve_line_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds a straight line from the current point to a following one. (upstream `CurveLine`, typst-library/src/visualize/curve.rs)
@@ -8539,7 +8539,7 @@ pub let curve_line_elem_end : Int = 0
 pub let curve_line_elem_relative : Int = 1
 
 ///|
-let curve_quad_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_quad_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds a quadratic Bézier curve segment from the last point to `end`, using `control` as the control point. (upstream `CurveQuad`, typst-library/src/visualize/curve.rs)
@@ -8596,7 +8596,7 @@ pub let curve_quad_elem_end : Int = 1
 pub let curve_quad_elem_relative : Int = 2
 
 ///|
-let curve_cubic_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_cubic_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds a cubic Bézier curve segment from the last point to `end`, using `control-start` and `control-end` as the control points. (upstream `CurveCubic`, typst-library/src/visualize/curve.rs)
@@ -8664,7 +8664,7 @@ pub let curve_cubic_elem_end : Int = 2
 pub let curve_cubic_elem_relative : Int = 3
 
 ///|
-let curve_close_elem_cell : Ref[Element?] = Ref::new(None)
+let curve_close_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Closes the curve by adding a segment from the last point to the start of the curve (or the last preceding `curve.move` point). (upstream `CurveClose`, typst-library/src/visualize/curve.rs)
@@ -8699,7 +8699,7 @@ pub fn curve_close_elem() -> Element {
 pub let curve_close_elem_mode : Int = 0
 
 ///|
-let image_elem_cell : Ref[Element?] = Ref::new(None)
+let image_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A raster or vector graphic. (upstream `ImageElem`, typst-library/src/visualize/image/mod.rs)
@@ -8851,7 +8851,7 @@ pub let image_elem_source_derived : Int = 10
 pub let image_elem_icc_derived : Int = 11
 
 ///|
-let line_elem_cell : Ref[Element?] = Ref::new(None)
+let line_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A line from one point to another. (upstream `LineElem`, typst-library/src/visualize/line.rs)
@@ -8929,7 +8929,7 @@ pub let line_elem_angle : Int = 3
 pub let line_elem_stroke : Int = 4
 
 ///|
-let polygon_elem_cell : Ref[Element?] = Ref::new(None)
+let polygon_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A closed polygon. (upstream `PolygonElem`, typst-library/src/visualize/polygon.rs)
@@ -8993,7 +8993,7 @@ pub let polygon_elem_stroke : Int = 2
 pub let polygon_elem_vertices : Int = 3
 
 ///|
-let rect_elem_cell : Ref[Element?] = Ref::new(None)
+let rect_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A rectangle with optional content. (upstream `RectElem`, typst-library/src/visualize/shape.rs)
@@ -9099,7 +9099,7 @@ pub let rect_elem_outset : Int = 6
 pub let rect_elem_body : Int = 7
 
 ///|
-let square_elem_cell : Ref[Element?] = Ref::new(None)
+let square_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A square with optional content. (upstream `SquareElem`, typst-library/src/visualize/shape.rs)
@@ -9217,7 +9217,7 @@ pub let square_elem_outset : Int = 7
 pub let square_elem_body : Int = 8
 
 ///|
-let ellipse_elem_cell : Ref[Element?] = Ref::new(None)
+let ellipse_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An ellipse with optional content. (upstream `EllipseElem`, typst-library/src/visualize/shape.rs)
@@ -9312,7 +9312,7 @@ pub let ellipse_elem_outset : Int = 5
 pub let ellipse_elem_body : Int = 6
 
 ///|
-let circle_elem_cell : Ref[Element?] = Ref::new(None)
+let circle_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A circle with optional content. (upstream `CircleElem`, typst-library/src/visualize/shape.rs)
@@ -9419,7 +9419,7 @@ pub let circle_elem_outset : Int = 6
 pub let circle_elem_body : Int = 7
 
 ///|
-let html_format_elem_cell : Ref[Element?] = Ref::new(None)
+let html_format_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Typst's HTML export format (experimental). (upstream `HtmlFormat`, typst-html/src/format.rs)
@@ -9451,7 +9451,7 @@ pub fn html_format_elem() -> Element {
 pub let html_format_elem_pretty : Int = 0
 
 ///|
-let html_elem_cell : Ref[Element?] = Ref::new(None)
+let html_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An HTML element that can contain Typst content. (upstream `HtmlElem`, typst-html/src/format.rs)
@@ -9542,7 +9542,7 @@ pub let html_elem_parent : Int = 4
 pub let html_elem_role : Int = 5
 
 ///|
-let frame_elem_cell : Ref[Element?] = Ref::new(None)
+let frame_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// An element that lays out its content as an inline SVG. (upstream `FrameElem`, typst-html/src/format.rs)
@@ -9578,7 +9578,7 @@ pub fn frame_elem() -> Element {
 pub let frame_elem_body : Int = 0
 
 ///|
-let pdf_format_elem_cell : Ref[Element?] = Ref::new(None)
+let pdf_format_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Typst's PDF export format. (upstream `PdfFormat`, typst-pdf/src/format.rs)
@@ -9639,7 +9639,7 @@ pub let pdf_format_elem_tagged : Int = 2
 pub let pdf_format_elem_pretty : Int = 3
 
 ///|
-let pdf_attach_elem_cell : Ref[Element?] = Ref::new(None)
+let pdf_attach_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A file that will be attached to the output PDF. (upstream `AttachElem`, typst-pdf/src/format.rs)
@@ -9729,7 +9729,7 @@ pub let pdf_attach_elem_description : Int = 4
 pub let pdf_attach_elem_path_derived : Int = 5
 
 ///|
-let svg_format_elem_cell : Ref[Element?] = Ref::new(None)
+let svg_format_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Typst's SVG export format. (upstream `SvgFormat`, typst-svg/src/format.rs)
@@ -9760,7 +9760,7 @@ pub fn svg_format_elem() -> Element {
 pub let svg_format_elem_pretty : Int = 0
 
 ///|
-let png_format_elem_cell : Ref[Element?] = Ref::new(None)
+let png_format_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Typst's PNG export format. (upstream `PngFormat`, typst-render/src/format.rs)
@@ -9795,7 +9795,7 @@ pub fn png_format_elem() -> Element {
 pub let png_format_elem_ppi : Int = 0
 
 ///|
-let bundle_format_elem_cell : Ref[Element?] = Ref::new(None)
+let bundle_format_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Typst's bundle export format (experimental). (upstream `BundleFormat`, typst-bundle/src/format.rs)
@@ -9820,7 +9820,7 @@ pub fn bundle_format_elem() -> Element {
 }
 
 ///|
-let asset_elem_cell : Ref[Element?] = Ref::new(None)
+let asset_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Adds a custom file to a bundle. (upstream `AssetElem`, typst-bundle/src/format.rs)

@@ -223,7 +223,7 @@ fn collect_filter_children(
   cache : Cache,
 ) -> Array[Primitive] {
   let primitives : Array[Primitive] = []
-  let results : FilterResults = { names: Set::new(), idx: 1, }
+  let results : FilterResults = { names: Set([]), idx: 1, }
   let scale = if units == ObjectBoundingBox {
     if object_bbox is Some(object_bbox) {
       object_bbox.size()
@@ -617,8 +617,8 @@ fn convert_convolve_matrix(
   primitives : Array[Primitive],
 ) -> FilterKind? {
   fn parse_target(target : Float?, order : UInt) -> UInt? {
-    let default_target = f32_as_u32((order.to_float() / 2.0).floor())
-    let target = f32_as_i32(target.unwrap_or(default_target.to_float()))
+    let default_target = f32_as_u32((Float::from_uint(order) / 2.0).floor())
+    let target = f32_as_i32(target.unwrap_or(Float::from_uint(default_target)))
     if target < 0 || target >= order.reinterpret_as_int() {
       None
     } else {
@@ -820,8 +820,8 @@ fn convert_std_dev_attr(
     (Some(n1), None, None) => (n1, n1)
     _ => (0.0, 0.0)
   }
-  let std_dev_x = std_dev_x.to_float() * scale.width()
-  let std_dev_y = std_dev_y.to_float() * scale.height()
+  let std_dev_x = Float::from_double(std_dev_x) * scale.width()
+  let std_dev_y = Float::from_double(std_dev_y) * scale.height()
   let std_dev_x = PositiveF32::new(std_dev_x).unwrap_or(PositiveF32::zero())
   let std_dev_y = PositiveF32::new(std_dev_y).unwrap_or(PositiveF32::zero())
   (std_dev_x, std_dev_y)
@@ -1143,7 +1143,7 @@ fn convert_turbulence(fe : SvgNode) -> FilterKind {
 
 ///|
 fn convert_grayscale_function(amount : Double) -> FilterKind {
-  let amount = amount.min(1.0).to_float()
+  let amount = Float::from_double(amount.min(1.0))
   let one : Float = 1.0
   ColorMatrix({
     input: SourceGraphic,
@@ -1174,7 +1174,7 @@ fn convert_grayscale_function(amount : Double) -> FilterKind {
 
 ///|
 fn convert_sepia_function(amount : Double) -> FilterKind {
-  let amount = amount.min(1.0).to_float()
+  let amount = Float::from_double(amount.min(1.0))
   let one : Float = 1.0
   ColorMatrix({
     input: SourceGraphic,
@@ -1205,7 +1205,7 @@ fn convert_sepia_function(amount : Double) -> FilterKind {
 
 ///|
 fn convert_saturate_function(amount : Double) -> FilterKind {
-  let amount = PositiveF32::new(amount.to_float()).unwrap_or(
+  let amount = PositiveF32::new(Float::from_double(amount)).unwrap_or(
     PositiveF32::zero(),
   )
   ColorMatrix({ input: SourceGraphic, kind: Saturate(amount), })
@@ -1215,13 +1215,13 @@ fn convert_saturate_function(amount : Double) -> FilterKind {
 fn convert_hue_rotate_function(amount : @svgtypes.Angle) -> FilterKind {
   ColorMatrix({
     input: SourceGraphic,
-    kind: HueRotate(amount.to_degrees().to_float()),
+    kind: HueRotate(Float::from_double(amount.to_degrees())),
   })
 }
 
 ///|
 fn convert_invert_function(amount : Double) -> FilterKind {
-  let amount = amount.min(1.0).to_float()
+  let amount = Float::from_double(amount.min(1.0))
   let one : Float = 1.0
   ComponentTransfer({
     input: SourceGraphic,
@@ -1234,7 +1234,7 @@ fn convert_invert_function(amount : Double) -> FilterKind {
 
 ///|
 fn convert_opacity_function(amount : Double) -> FilterKind {
-  let amount = amount.min(1.0).to_float()
+  let amount = Float::from_double(amount.min(1.0))
   ComponentTransfer({
     input: SourceGraphic,
     func_r: Identity,
@@ -1246,7 +1246,7 @@ fn convert_opacity_function(amount : Double) -> FilterKind {
 
 ///|
 fn convert_brightness_function(amount : Double) -> FilterKind {
-  let amount = amount.to_float()
+  let amount = Float::from_double(amount)
   ComponentTransfer({
     input: SourceGraphic,
     func_r: Linear(slope=amount, intercept=0.0),
@@ -1258,7 +1258,7 @@ fn convert_brightness_function(amount : Double) -> FilterKind {
 
 ///|
 fn convert_contrast_function(amount : Double) -> FilterKind {
-  let amount = amount.to_float()
+  let amount = Float::from_double(amount)
   let half : Float = 0.5
   ComponentTransfer({
     input: SourceGraphic,

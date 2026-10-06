@@ -292,7 +292,7 @@ fn test_files_load(id : @syntax.FileId) -> Bytes raise @library.FileError {
 }
 
 ///|
-let test_library_cell : Ref[@library.Library?] = Ref::new(None)
+let test_library_cell : Ref[@library.Library?] = Ref(None)
 
 ///|
 /// The library with test-only definitions.
@@ -549,12 +549,12 @@ fn eval_report(rel : String, tc : TestCase) -> String {
 ///|
 fn parse_features(attrs : String) -> @library.Features? {
   for attr in attrs.split(" ") {
-    let attr = attr.to_string()
+    let attr = attr.to_owned()
     if attr.has_prefix("features(") && attr.has_suffix(")") {
       let inner = attr.unsafe_substring(start=9, end=attr.length() - 1)
       let list = []
       for p in inner.split(",") {
-        let p = p.trim(chars=" ").to_string()
+        let p = p.trim(chars=" ").to_owned()
         if @library.Feature::from_str(p) is Some(f) {
           list.push(f)
         }

@@ -6,7 +6,6 @@ import {
   "moonbitlang/core/math",
   "moonbitlang/core/bigint",
   "moonbitlang/core/hashset",
-  "moonbitlang/core/buffer",
   "moonbitlang/core/int64",
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/core/double",

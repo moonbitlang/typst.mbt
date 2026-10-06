@@ -60,7 +60,7 @@ fn Cache::new(fontdb : FontDatabase) -> Cache {
     masks: {},
     filters: {},
     paint: {},
-    all_ids: Set::new(),
+    all_ids: Set([]),
     linear_gradient_index: 0,
     radial_gradient_index: 0,
     pattern_index: 0,
@@ -189,10 +189,10 @@ fn SvgNode::parse_viewbox(self : SvgNode) -> NonZeroRect? {
     return None
   }
   NonZeroRect::from_xywh(
-    vb.x.to_float(),
-    vb.y.to_float(),
-    vb.w.to_float(),
-    vb.h.to_float(),
+    Float::from_double(vb.x),
+    Float::from_double(vb.y),
+    Float::from_double(vb.w),
+    Float::from_double(vb.h),
   )
 }
 
@@ -247,12 +247,12 @@ fn SvgNode::has_valid_transform(self : SvgNode, aid : AId) -> Bool {
   }
   let ts = @svgtypes.Transform::from_str(attr) catch { _ => return true }
   let ts = Transform::from_row(
-    ts.a.to_float(),
-    ts.b.to_float(),
-    ts.c.to_float(),
-    ts.d.to_float(),
-    ts.e.to_float(),
-    ts.f.to_float(),
+    Float::from_double(ts.a),
+    Float::from_double(ts.b),
+    Float::from_double(ts.c),
+    Float::from_double(ts.d),
+    Float::from_double(ts.e),
+    Float::from_double(ts.f),
   )
   ts.is_valid()
 }
@@ -447,12 +447,12 @@ fn resolve_svg_size(svg : SvgNode, opt : Options) -> (Size?, Bool) {
   let size = if view_box is Some(vbox) {
     let state = { ..state, view_box: vbox, }
     let w = if width.unit == @svgtypes.LengthUnit::Percent {
-      vbox.width() * (width.number.to_float() / 100.0)
+      vbox.width() * (Float::from_double(width.number) / 100.0)
     } else {
       svg.convert_user_length(AId::Width, state, def)
     }
     let h = if height.unit == @svgtypes.LengthUnit::Percent {
-      vbox.height() * (height.number.to_float() / 100.0)
+      vbox.height() * (Float::from_double(height.number) / 100.0)
     } else {
       svg.convert_user_length(AId::Height, state, def)
     }
@@ -627,6 +627,9 @@ impl Default for Isolation with fn default() {
 }
 
 ///|
+extend Isolation with Default::{default}
+
+///|
 impl FromValue for Isolation with fn parse(_, _, value) {
   match value {
     "auto" => Some(Auto)
@@ -792,7 +795,7 @@ fn convert_path(
   }
   if fill is Some(f) {
     if f.context_element is Some(PathNode(context_transform, context_bbox)) {
-      let paint = Ref::new(f.paint)
+      let paint = Ref(f.paint)
       process_paint(
         { get: () => paint.val, set: p => paint.val = p, },
         true,
@@ -808,7 +811,7 @@ fn convert_path(
   }
   if stroke is Some(s) {
     if s.context_element is Some(PathNode(context_transform, context_bbox)) {
-      let paint = Ref::new(s.paint)
+      let paint = Ref(s.paint)
       process_paint(
         { get: () => paint.val, set: p => paint.val = p, },
         true,

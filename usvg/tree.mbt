@@ -16,7 +16,7 @@ using @tiny_skia_path {
 }
 
 ///|
-let next_uid : Ref[Int] = Ref::new(0)
+let next_uid : Ref[Int] = Ref(0)
 
 ///|
 fn gen_uid() -> Int {
@@ -1322,7 +1322,7 @@ fn ImageKind::actual_size(self : ImageKind) -> Size? {
     JPEG(data) | PNG(data) | GIF(data) | WEBP(data) =>
       // Upstream warns: Image has an invalid size. Skipped.
       match imagesize_blob_size(data) {
-        Some((w, h)) => Size::from_wh(w.to_float(), h.to_float())
+        Some((w, h)) => Size::from_wh(Float::from_int(w), Float::from_int(h))
         None => None
       }
     SVG(svg) => Some(svg.size)

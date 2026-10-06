@@ -228,7 +228,7 @@ fn parse_decimal(s : String) -> Int {
 ///|
 /// Applies a mutation key (`cut:<len>` or `set:<pos>:<byte>`) to `bytes`.
 fn apply_wasm_mutation(bytes : Bytes, m : String) -> Bytes {
-  let parts = m.split(":").map(p => p.to_string()).collect()
+  let parts = m.split(":").map(p => p.to_owned()).collect()
   match parts[0] {
     "cut" => {
       let len = parse_decimal(parts[1])
@@ -239,7 +239,7 @@ fn apply_wasm_mutation(bytes : Bytes, m : String) -> Bytes {
       let byte = parse_decimal(parts[2])
       let a = bytes.to_fixedarray()
       a[pos] = byte.to_byte()
-      Bytes::from_fixedarray(a)
+      Bytes::from_array(a)
     }
     _ => abort("unknown mutation \{m}")
   }
@@ -263,7 +263,7 @@ fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
   let expected : Map[String, String] = {}
   let order = []
   for line in golden.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line == "" {
       continue
     }

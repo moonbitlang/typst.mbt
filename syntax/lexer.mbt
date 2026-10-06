@@ -1002,12 +1002,12 @@ fn parse_i64_radix(s : StringView, radix : Int) -> Result[Int64, IntParseError] 
     if !overflow {
       let d = d.to_int64()
       if neg {
-        if v < (@int64.min_value + d) / r {
+        if v < (@int64.MIN_VALUE + d) / r {
           overflow = true
         } else {
           v = v * r - d
         }
-      } else if v > (@int64.max_value - d) / r {
+      } else if v > (@int64.MAX_VALUE - d) / r {
         overflow = true
       } else {
         v = v * r + d

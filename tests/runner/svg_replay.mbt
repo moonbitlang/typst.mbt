@@ -430,7 +430,7 @@ fn dec_f64(json : Json) -> Double raise Unsupported {
 ///|
 fn dec_f32(json : Json) -> Float raise Unsupported {
   guard json is String(s) else { raise Unsupported("f32") }
-  hex_bits(s, "f32:").to_uint().reinterpret_as_float()
+  Float::reinterpret_from_uint(hex_bits(s, "f32:").to_uint())
 }
 
 ///|
@@ -606,7 +606,7 @@ fn image_assets() -> Map[String, Bytes] {
   }
   let m = {}
   fn walk(dir : String, rel : String) {
-    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_array()
+    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_owned()
     for entry in entries {
       let path = dir + "/" + entry
       let is_dir = @fs.is_dir(path) catch { _ => false }
@@ -634,7 +634,7 @@ fn image_assets() -> Map[String, Bytes] {
 }
 
 ///|
-let image_assets_cell : Ref[Map[String, Bytes]?] = Ref::new(None)
+let image_assets_cell : Ref[Map[String, Bytes]?] = Ref(None)
 
 ///|
 /// The project-relative paths (`assets/...`) of the image assets, by hash.

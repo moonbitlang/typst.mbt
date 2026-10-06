@@ -64,7 +64,7 @@ pub struct XmlWriter {
 /// Creates a new `XmlWriter`.
 pub fn XmlWriter::new(opt : Options) -> XmlWriter {
   {
-    buf: @buffer.new(),
+    buf: Buffer(),
     state: Empty,
     preserve_whitespaces: false,
     depth_stack: [],

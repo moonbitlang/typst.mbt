@@ -6,4 +6,5 @@ import {
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
   "moonbitlang/core/double",
+  "moonbitlang/core/math",
 }

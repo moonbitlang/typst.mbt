@@ -33,7 +33,7 @@ pub fn RawElem::packed_code(text : String) -> Content {
 pub struct RawElem(Content)
 
 ///|
-let space_shared_cell : Ref[Content?] = Ref::new(None)
+let space_shared_cell : Ref[Content?] = Ref(None)
 
 ///|
 /// Typed view of `space` content.

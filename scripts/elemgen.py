@@ -352,7 +352,7 @@ def main():
         if f"{var}_local_name_key" in defined:
             init_call += f"      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, {var}_local_name_key()))\n"
         out.append(
-            f"///|\nlet {var}_cell : Ref[Element?] = Ref::new(None)\n\n"
+            f"///|\nlet {var}_cell : Ref[Element?] = Ref(None)\n\n"
             f"///|\n/// {e['doc'] or e['title']} (upstream `{e['ident']}`, {e['file']})\n"
             f"pub fn {var}() -> Element {{\n"
             f"  match {var}_cell.val {{\n"

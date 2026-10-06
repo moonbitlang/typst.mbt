@@ -870,8 +870,8 @@ fn rescale_buf(
 ///|
 fn DecWide::to_decimal(self : DecWide) -> RustDecimal? {
   let data = self.data.copy()
-  let scale = Ref::new(self.scale)
-  let upper = Ref::new(upper_word_n(data, 6))
+  let scale = Ref(self.scale)
+  let upper = Ref(upper_word_n(data, 6))
   if upper.val <= 2 && scale.val <= rd_max_scale {
     return Some(
       RustDecimal::from_parts(
@@ -925,8 +925,8 @@ fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
       pos += 1
     }
   }
-  let upper = Ref::new(upper_word_n(product, 12))
-  let scale = Ref::new(scale)
+  let upper = Ref(upper_word_n(product, 12))
+  let scale = Ref(scale)
   if upper.val <= 5 {
     let data = FixedArray::make(6, 0U)
     for i in 0..<6 {
@@ -935,7 +935,7 @@ fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
     let max_wide_scale = 57
     if scale.val > max_wide_scale {
       let mut excess = scale.val - max_wide_scale
-      let u = Ref::new(upper_word_n(data, 6))
+      let u = Ref(upper_word_n(data, 6))
       while excess > 0 {
         let power_idx = if excess < 9 { excess } else { 9 }
         div_buf_by_power(data, u, powers_10_u32[power_idx])
@@ -1192,10 +1192,10 @@ fn RustDecimal::to_f64(self : RustDecimal) -> Double {
 /// `ToPrimitive::to_i64`: truncates, `None` if out of range.
 fn RustDecimal::to_i64(self : RustDecimal) -> Int64? {
   let d = self.trunc()
-  let max = @bigint.BigInt::from_int64(@int64.max_value)
+  let max = @bigint.BigInt::from_int64(@int64.MAX_VALUE)
   if d.mantissa > max {
     if self.negative && d.mantissa == max + big_one {
-      return Some(@int64.min_value)
+      return Some(@int64.MIN_VALUE)
     }
     return None
   }

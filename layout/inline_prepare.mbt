@@ -86,7 +86,7 @@ fn prepare(
   }
 
   // Build the mapping from byte to item indices.
-  let indices = Array::new(capacity=text.len())
+  let indices = Array(capacity=text.len())
   for i, entry in items {
     let (s, e, _) = entry
     for _ in s..<e {

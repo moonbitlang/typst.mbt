@@ -132,7 +132,7 @@ fn layout_fragment_compute(
   let locator = @library.Locator::link(link).split()
   let engine = engine.with_route(@library.Route::extend_(engine.route))
   @library.at(content.span(), () => engine.route.check_layout_depth())
-  let kind = Ref::new(@library.FragmentKind::Block)
+  let kind = Ref(@library.FragmentKind::Block)
   let children = (engine.library.routines.realize)(
     Fragment(kind~),
     engine,
@@ -315,7 +315,7 @@ fn Work::new(children : Array[Child]) -> Work {
     footnotes: [],
     footnote_spill: None,
     tags: [],
-    skips: @hashset.HashSet::new(),
+    skips: @hashset.HashSet([]),
   }
 }
 
@@ -373,7 +373,7 @@ fn Work::done(self : Work) -> Bool {
 /// set.
 fn Work::extend_skips(self : Work, skips : Array[@library.Location]) -> Unit {
   if !skips.is_empty() {
-    let set = @hashset.HashSet::new()
+    let set = @hashset.HashSet([])
     for loc in self.skips {
       set.add(loc)
     }

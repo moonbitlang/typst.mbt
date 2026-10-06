@@ -9,7 +9,7 @@ fn convert_length(
   state : State,
 ) -> Float {
   let dpi = state.opt.dpi
-  let n = length.number.to_float()
+  let n = Float::from_double(length.number)
   match length.unit {
     None | Px => n
     Em => n * resolve_font_size(node, state)
@@ -86,7 +86,7 @@ fn convert_list(node : SvgNode, aid : AId, state : State) -> Array[Float]? {
 
 ///|
 fn convert_percent(length : @svgtypes.Length, base : Float) -> Float {
-  base * length.number.to_float() / 100.0
+  base * Float::from_double(length.number) / 100.0
 }
 
 ///|
@@ -99,7 +99,7 @@ fn resolve_font_size(node : SvgNode, state : State) -> Float {
     let length : @svgtypes.Length? = n.try_attribute(AId::FontSize)
     if length is Some(length) {
       let dpi = state.opt.dpi
-      let n = length.number.to_float()
+      let n = Float::from_double(length.number)
       font_size = match length.unit {
         None | Px => n
         Em => n * font_size
@@ -112,7 +112,7 @@ fn resolve_font_size(node : SvgNode, state : State) -> Float {
         Percent =>
           // If `font-size` has percent units that it's value
           // is relative to the parent node `font-size`.
-          length.number.to_float() * font_size * 0.01
+          Float::from_double(length.number) * font_size * 0.01
       }
     } else {
       let name : String? = n.attribute(AId::FontSize)

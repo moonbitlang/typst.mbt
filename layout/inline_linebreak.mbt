@@ -788,7 +788,7 @@ priv struct CumulativeVec {
 /// Create a new instance with the given capacity.
 fn CumulativeVec::with_capacity(capacity : Int) -> CumulativeVec {
   let total = @library.Abs::zero()
-  let summed = Array::new(capacity~)
+  let summed = Array(capacity~)
   summed.push(total)
   { total, summed, }
 }
@@ -847,7 +847,7 @@ priv struct CumulativeIntVec {
 
 ///|
 fn CumulativeIntVec::with_capacity(capacity : Int) -> CumulativeIntVec {
-  let summed = Array::new(capacity~)
+  let summed = Array(capacity~)
   summed.push(0)
   { total: 0, summed, }
 }

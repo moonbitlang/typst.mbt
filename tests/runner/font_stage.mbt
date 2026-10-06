@@ -16,7 +16,7 @@ fn run_font_stage(filter : String?, verbose : Bool) -> Unit {
         index += 1
         continue
       }
-      let text = StringBuilder::new()
+      let text = StringBuilder()
       font_dump_face(text, index, bytes, face_index)
       let actual = text.to_string()
       if dump_actual.val {
@@ -88,7 +88,7 @@ fn fnv_bytes(data : BytesView) -> UInt64 {
 /// Zero-padded lowercase hex.
 fn hex_pad(n : UInt64, width : Int) -> String {
   let digits = "0123456789abcdef"
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let chars = []
   let mut v = n
   while v != 0 {
@@ -112,7 +112,7 @@ fn hex16(n : UInt64) -> String {
 ///|
 /// Escapes a string to printable ASCII.
 fn esc(s : String) -> String {
-  let out = StringBuilder::new()
+  let out = StringBuilder()
   for c in s {
     if c >= ' ' && c <= '~' && c != '"' && c != '\\' {
       out.write_char(c)
@@ -294,7 +294,7 @@ fn font_dump_face(
     let text = match name.to_string() {
       Some(s) => "\"" + esc(s) + "\""
       None => {
-        let buf = StringBuilder::new()
+        let buf = StringBuilder()
         buf.write_string("bytes:")
         for b in name.name {
           buf.write_string(hex_pad(b.to_uint64(), 2))
@@ -405,12 +405,12 @@ fn font_dump_cmap(out : StringBuilder, face : @otf.Face) -> Unit {
     out.write_string("cmap -\n")
     return
   }
-  let all : @hashset.HashSet[UInt] = @hashset.new()
+  let all : @hashset.HashSet[UInt] = @hashset.HashSet([])
   let mut i = 0
   for subtable in cmap.subtables.iter() {
     let cps = []
     subtable.codepoints(cp => cps.push(cp))
-    let text = StringBuilder::new()
+    let text = StringBuilder()
     for cp in cps {
       text.write_string("\{cp}:\{gid_opt(subtable.glyph_index(cp))};")
       all.add(cp)
@@ -424,11 +424,11 @@ fn font_dump_cmap(out : StringBuilder, face : @otf.Face) -> Unit {
   // Face-level lookups over the union of all mapped code points.
   let all = all.iter().to_array()
   all.sort()
-  let text = StringBuilder::new()
-  let vs_text = StringBuilder::new()
+  let text = StringBuilder()
+  let vs_text = StringBuilder()
   let mut found = 0
   let mut vs_found = 0
-  let samples = StringBuilder::new()
+  let samples = StringBuilder()
   for k, cp in all {
     if cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF) {
       continue
@@ -469,7 +469,7 @@ fn font_dump_kern(out : StringBuilder, face : @otf.Face) -> Unit {
       Format2(_) => 2
       Format3(_) => 3
     }
-    let text = StringBuilder::new()
+    let text = StringBuilder()
     if subtable.format is Format0(st) {
       for pair in st.pairs.iter() {
         text.write_string(
@@ -502,12 +502,12 @@ fn font_dump_cff(out : StringBuilder, face : @otf.Face) -> Unit {
   out.write_string(
     "cff glyphs \{cff.number_of_glyphs()} matrix \{ff(m.sx)} \{ff(m.ky)} \{ff(m.kx)} \{ff(m.sy)} \{ff(m.tx)} \{ff(m.ty)}\n",
   )
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   for code in 0..<=255 {
     text.write_string("\{gid_opt(cff.glyph_index(code.to_byte()))};")
   }
   out.write_string("cff glyph_index fnv \{hex16(fnv(text.to_string()))}\n")
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   let count = cff.number_of_glyphs().to_int()
   for gid in 0..<count {
     let g = @otf.GlyphId(gid.to_uint16())
@@ -532,11 +532,11 @@ fn font_dump_glyphs(
   label : String,
 ) -> Unit {
   let count = face.number_of_glyphs().to_int()
-  let block = StringBuilder::new()
+  let block = StringBuilder()
   let mut block_start = 0
   for gid in 0..<count {
     let g = @otf.GlyphId(gid.to_uint16())
-    let path : PathBuilder = { buf: StringBuilder::new(), }
+    let path : PathBuilder = { buf: StringBuilder(), }
     let bbox = face.outline_glyph(g, path)
     let path = path.buf.to_string()
     let raster = match face.glyph_raster_image(g, 0xFFFF) {

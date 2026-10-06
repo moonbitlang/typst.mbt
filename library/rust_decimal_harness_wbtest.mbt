@@ -5,7 +5,7 @@
 let harness_failures : Array[String] = []
 
 ///|
-let harness_checks : Ref[Int] = Ref::new(0)
+let harness_checks : Ref[Int] = Ref(0)
 
 ///|
 fn hparse(s : String) -> RustDecimal {
@@ -114,7 +114,7 @@ fn chks(s : String, want : String) -> Unit {
 fn report() -> Unit raise {
   if !harness_failures.is_empty() {
     let n = harness_failures.length()
-    let shown = harness_failures[0:if n > 40 { 40 } else { n }].to_array()
+    let shown = harness_failures[0:if n > 40 { 40 } else { n }].to_owned()
     fail("\{n} of \{harness_checks.val} checks failed:\n" + shown.join("\n"))
   }
 }

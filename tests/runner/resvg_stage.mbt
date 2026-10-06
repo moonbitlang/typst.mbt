@@ -10,7 +10,7 @@ let resvg_tests_dir = ".repos/resvg/crates/resvg/tests"
 
 ///|
 /// Where to dump the raw RGBA of each case (`--raw=<dir>`).
-let resvg_raw_dir : Ref[String?] = Ref::new(None)
+let resvg_raw_dir : Ref[String?] = Ref(None)
 
 ///|
 /// Rust's `str` ordering (by code points).
@@ -183,7 +183,7 @@ fn run_resvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_string())) {
+    let obj = match (try? @json.parse(line.to_owned())) {
       Ok(Object(obj)) => obj
       _ => continue
     }

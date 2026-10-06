@@ -307,14 +307,14 @@ fn rand_mask(r : Rng, w : UInt, h : UInt) -> @skia.Mask? {
     return None
   }
   let m = @skia.Mask::new(w, h).unwrap()
-  if rand_path(r, w.to_float(), h.to_float()) is Some(p) {
+  if rand_path(r, Float::from_uint(w), Float::from_uint(h)) is Some(p) {
     let fr : @skia.FillRule = if r.bool() { Winding } else { EvenOdd }
     let aa = r.bool()
     let ts = rand_transform(r)
     m.fill_path(p, fr, aa, ts)
   }
   if r.bool() {
-    if rand_path(r, w.to_float(), h.to_float()) is Some(p) {
+    if rand_path(r, Float::from_uint(w), Float::from_uint(h)) is Some(p) {
       m.intersect_path(p, Winding, true, @path.Transform::identity())
     }
   }
@@ -339,8 +339,8 @@ fn scene(seed : UInt, stroke_widths : Bool, hair : Bool) -> @skia.Pixmap {
   }
   let w = 8U + r.below(70)
   let h = 8U + r.below(70)
-  let wf = w.to_float()
-  let hf = h.to_float()
+  let wf = Float::from_uint(w)
+  let hf = Float::from_uint(h)
   let pixmap = @skia.Pixmap::new(w, h).unwrap()
   if r.bool() {
     pixmap.fill(rand_color(r))

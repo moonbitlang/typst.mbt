@@ -222,7 +222,7 @@ fn Validators::to_and_list(self : Validators) -> String {
     1 => names[0]
     2 => "\{names[0]} and \{names[1]}"
     n => {
-      let buf = StringBuilder::new()
+      let buf = StringBuilder()
       for i in 0..<(n - 1) {
         buf.write_string("\{names[i]}, ")
       }

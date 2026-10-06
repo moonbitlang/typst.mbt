@@ -81,6 +81,13 @@ Import `moonbitlang/typst/doc` and `moonbitlang/typst/doc/system` (file
 and font access). Plain strings are literal text and are never parsed as
 markup; `Markup(..)` and `Equation(..)` are the explicit escape hatches.
 
+`compiled.review_html()` writes a self-contained preview page for
+reviewing a document: clicking or selecting rendered text shows the MoonBit
+call that produced it (file, line, and the source characters for string
+literals and `Prose` blocks), a comment can be attached, and the packaged
+feedback copied for the author. `Keyed(key, ..)` names the data row of
+loop-built content. See `docs/edsl-review.md`.
+
 ## Testing
 
 ```sh

@@ -612,7 +612,9 @@ pub impl FromValue for String with fn parse(_, _, value) {
 
 ///|
 pub impl FromValue for Float with fn parse(_, _, value) {
-  (try? @svgtypes.Number::from_str(value)).map(v => v.0.to_float()).to_option()
+  (try? @svgtypes.Number::from_str(value))
+  .map(v => Float::from_double(v.0))
+  .to_option()
 }
 
 ///|
@@ -627,9 +629,9 @@ pub impl FromValue for Opacity with fn parse(_, _, value) {
     return None
   }
   if length.unit == @svgtypes.LengthUnit::Percent {
-    Some(Opacity::new_clamped(length.number.to_float() / 100.0))
+    Some(Opacity::new_clamped(Float::from_double(length.number) / 100.0))
   } else if length.unit == @svgtypes.LengthUnit::None {
-    Some(Opacity::new_clamped(length.number.to_float()))
+    Some(Opacity::new_clamped(Float::from_double(length.number)))
   } else {
     None
   }
@@ -639,12 +641,12 @@ pub impl FromValue for Opacity with fn parse(_, _, value) {
 pub impl FromValue for Transform with fn parse(_, _, value) {
   let ts = @svgtypes.Transform::from_str(value) catch { _ => return None }
   let ts = Transform::from_row(
-    ts.a.to_float(),
-    ts.b.to_float(),
-    ts.c.to_float(),
-    ts.d.to_float(),
-    ts.e.to_float(),
-    ts.f.to_float(),
+    Float::from_double(ts.a),
+    Float::from_double(ts.b),
+    Float::from_double(ts.c),
+    Float::from_double(ts.d),
+    Float::from_double(ts.e),
+    Float::from_double(ts.f),
   )
   if ts.is_valid() {
     Some(ts)
@@ -708,7 +710,7 @@ pub impl FromValue for Array[Float] with fn parse(_, _, value) {
   let p = @svgtypes.NumberListParser::from(value)
   while p.next() is Some(n) {
     match n {
-      Ok(n) => list.push(n.to_float())
+      Ok(n) => list.push(Float::from_double(n))
       Err(_) => return None
     }
   }

@@ -573,5 +573,5 @@ fn wasm_minimal_protocol_send_result_to_host(
       return
     }
   }
-  data.output = Bytes::from_fixedarray(buffer)
+  data.output = Bytes::from_array(buffer)
 }

@@ -529,7 +529,7 @@ fn MultiSpill::layout(
 
   // The remaining regions are ephemeral and may be replaced.
   let backlog = committed.copy()
-  backlog.append(regions.backlog.to_array())
+  backlog.append(regions.backlog.to_owned())
 
   // Remove unnecessary backlog items to prevent it from growing
   // unnecessarily, changing the region's hash.

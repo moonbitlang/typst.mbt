@@ -75,7 +75,7 @@ pub fn FontStyle::from_str(s : String) -> FontStyle raise ParseThemeError {
         "underline" => font_style_underline
         "italic" => font_style_italic
         "normal" | "regular" => FontStyle::empty()
-        s => raise IncorrectFontStyle(s.to_string())
+        s => raise IncorrectFontStyle(s.to_owned())
       },
     )
   }

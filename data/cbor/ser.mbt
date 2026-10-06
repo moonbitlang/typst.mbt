@@ -97,7 +97,7 @@ fn write_float(buf : Buffer, v : Double) -> Unit {
       write_be(buf, bits.to_uint64(), 2)
     }
     None => {
-      let single = v.to_float()
+      let single = Float::from_double(v)
       if single.to_double().reinterpret_as_uint64() == v.reinterpret_as_uint64() {
         buf.write_byte(b'\xfa')
         write_be(buf, single.reinterpret_as_uint().to_uint64(), 4)

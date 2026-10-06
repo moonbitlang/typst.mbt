@@ -35,8 +35,8 @@ fn checked_mul_i64(a : Int64, b : Int64) -> Int64 raise HintedError {
   }
   let r = a * b
   if r / b != a ||
-    (a == -1L && b == @int64.min_value) ||
-    (b == -1L && a == @int64.min_value) {
+    (a == -1L && b == @int64.MIN_VALUE) ||
+    (b == -1L && a == @int64.MIN_VALUE) {
     bail(too_large())
   }
   r
@@ -131,7 +131,7 @@ pub fn pos(value : Value) -> Value raise HintedError {
 /// Compute the negation of a value.
 pub fn neg(value : Value) -> Value raise HintedError {
   match value {
-    Int(v) => if v == @int64.min_value { bail(too_large()) } else { Int(-v) }
+    Int(v) => if v == @int64.MIN_VALUE { bail(too_large()) } else { Int(-v) }
     Float(v) => Float(-v)
     Decimal(v) => Decimal(v.neg())
     Length(v) => Length(-v)
