@@ -246,6 +246,9 @@ pub impl Readable for Stream with fn read(r, ctx) {
 }
 
 ///|
+pub extend Stream with Readable::{read}
+
+///|
 pub impl ObjectLike for Stream with fn from_object(o) {
   match o {
     Stream(s) => Some(s)

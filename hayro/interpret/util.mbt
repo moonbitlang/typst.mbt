@@ -10,6 +10,9 @@ pub(all) struct U128 {
 } derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
+pub extend U128 with Default::{default}
+
+///|
 /// A SipHash-1-3 hasher with 128-bit output and zero keys (upstream
 /// `siphasher::sip128::SipHasher13::new()`).
 pub struct Hasher128 {

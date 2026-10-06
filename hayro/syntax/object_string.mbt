@@ -53,6 +53,9 @@ pub impl Readable for PdfString with fn read(r, ctx) {
 }
 
 ///|
+pub extend PdfString with Readable::{read}
+
+///|
 pub impl ObjectLike for PdfString with fn from_object(o) {
   match o {
     String(s) => Some(s)

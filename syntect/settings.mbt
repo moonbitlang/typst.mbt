@@ -57,6 +57,9 @@ pub impl Show for Settings with fn output(self, logger) {
 }
 
 ///|
+pub extend Settings with Show::{to_string, output}
+
+///|
 fn write_json_str(logger : &Logger, s : String) -> Unit {
   logger.write_char('"')
   for c in s {

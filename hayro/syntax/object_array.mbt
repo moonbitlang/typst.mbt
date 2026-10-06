@@ -106,6 +106,9 @@ pub impl Readable for PdfArray with fn read(r, ctx) {
 }
 
 ///|
+pub extend PdfArray with Readable::{read}
+
+///|
 pub impl ObjectLike for PdfArray with fn from_object(o) {
   match o {
     Array(a) => Some(a)
