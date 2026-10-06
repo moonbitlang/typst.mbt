@@ -248,6 +248,21 @@ pub fn CompileReport::review_text(Self[@layout.PagedDocument], title? : String, 
 pub fn CompileReport::svg_pages(Self[@layout.PagedDocument], options? : @svg.SvgOptions) -> ExportReport[Array[String]]
 pub fn[T] CompileReport::unwrap(Self[T]) -> T raise DocError
 
+pub struct Composite {
+  // private fields
+}
+pub fn Composite::Composite(String, SourceLoc, ArgsLoc, (CompositeSite) -> &IntoContent) -> Self
+pub impl @builtin.Show for Composite
+pub impl @debug.Debug for Composite
+pub impl IntoContent for Composite
+
+pub struct CompositeSite {
+  // private fields
+}
+#callsite(autofill(loc))
+pub fn[T] CompositeSite::arg(Self, Int, T, loc~ : SourceLoc) -> T
+pub fn CompositeSite::invalid(Self, String) -> Content
+
 pub struct Content {
   // private fields
 }

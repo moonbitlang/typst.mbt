@@ -109,6 +109,7 @@ fn Content::kind(self : Content) -> String {
     NShowRule(show) => show.origin.kind
     NLabelled(_, _, site, _) => site.kind
     NKeyed(_, body) => body.kind()
+    NComposite(_, site) => site.kind
     NContext(_, site) => site.kind
     NEval(node) => node.origin.kind
     NSpace(_) => "Space"

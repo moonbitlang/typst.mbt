@@ -176,6 +176,9 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
         (Option::None, @debug.Repr::string(key)),
         (Option::None, @debug.Debug::to_repr(body)),
       ])
+    // A composite: its name around what it is made of.
+    NComposite(body, site) =>
+      @debug.Repr::ctor(site.kind, [(Option::None, @debug.Debug::to_repr(body))])
     NContext(_, _) =>
       @debug.Repr::ctor("Context", [
         (Option::None, @debug.Repr::literal("<callback>")),

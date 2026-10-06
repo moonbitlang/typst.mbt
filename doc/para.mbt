@@ -75,7 +75,8 @@ fn piece_call(elem : @library.Element) -> Content {
 /// key or a label.
 fn is_parbreak_piece(content : Content) -> Bool {
   match content.node {
-    NKeyed(_, body) | NLabelled(body, _, _, _) => is_parbreak_piece(body)
+    NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
+      is_parbreak_piece(body)
     NValue({ val: VCall(FElem(elem), _), }) => elem == @library.parbreak_elem()
     NCall({ func: FElem(elem), .. }) => elem == @library.parbreak_elem()
     _ => false

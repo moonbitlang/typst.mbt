@@ -137,7 +137,7 @@ pub fn Value::dict(pairs : Array[(String, Value)]) -> Value {
 ///|
 /// Content as a value.
 pub fn Value::content(body : &IntoContent) -> Value {
-  Value::of(VContent(body.into_content()))
+  Value::of(VContent(described(body)))
 }
 
 ///|
@@ -380,5 +380,10 @@ fn Callback::new(
 ) -> Callback {
   let serial = callback_serial.val
   callback_serial.val = serial + 1
+  // A callback that the `build` of a composite creates is a part of it.
+  let invoke = match composite_scope.val {
+    Some(scope) => composite_callback(scope.site, invoke)
+    Option::None => invoke
+  }
   { serial, origin, invoke, }
 }

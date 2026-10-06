@@ -42,6 +42,10 @@ priv enum Node {
   NLabelled(Content, String, Site, Int)
   /// Content whose origins carry a runtime occurrence key.
   NKeyed(String, Content)
+  /// A composite: what its `build` made (`composite.mbt`). It lowers to
+  /// that content. Parameter 0 of the site is the body: the caller's
+  /// argument that the result of `build` was marked as, or none.
+  NComposite(Content, Site)
   /// A `context` callback.
   NContext(Callback, Site)
   /// Typst source evaluated by the front end (markup or math).
@@ -61,21 +65,32 @@ priv enum Node {
 /// The source location of a constructor call: the call itself and one
 /// optional location per declared parameter.
 priv struct Site {
+  /// The call that origins report, and its arguments: the constructor's
+  /// own call, or, for a constructor that ran inside the `build` of a
+  /// composite (`owner`), the call of the composite.
   loc : SourceLoc
   args : ArgsLoc
   /// The constructor's name.
   kind : String
+  /// For a constructor that ran inside the `build` of a composite: how its
+  /// call is seen from the composite's (`composite.mbt`).
+  owner : Owner?
 }
 
 ///|
+/// The site of a constructor call. Inside the `build` of a composite it is
+/// the composite's call (`Scope::own`).
 fn Site::new(kind : String, loc : SourceLoc, args : ArgsLoc) -> Site {
-  { loc, args, kind, }
+  match composite_scope.val {
+    Some(scope) => scope.own(kind, loc, args)
+    Option::None => { loc, args, kind, owner: Option::None, }
+  }
 }
 
 ///|
 /// An origin without argument locations.
 fn Site::of_call(kind : String, loc : SourceLoc) -> Site {
-  { loc, args: ArgsLoc([]), kind, }
+  Site::new(kind, loc, ArgsLoc([]))
 }
 
 ///|
@@ -154,7 +169,7 @@ fn Content::of(node : Node) -> Content {
 /// Erases the type of a description. Useful where the branches of an `if`
 /// or `match` produce different description types.
 pub fn Content::Content(body : &IntoContent) -> Content {
-  body.into_content()
+  described(body)
 }
 
 ///|
@@ -176,7 +191,7 @@ pub impl IntoContent for String with fn into_content(self) {
 ///|
 /// Convert and snapshot an array of content.
 fn snapshot(children : Array[&IntoContent]) -> Array[Content] {
-  children.map(c => c.into_content())
+  children.map(described)
 }
 
 ///|
@@ -211,7 +226,7 @@ pub fn[T : IntoContent] Seq::of(
 ) -> Seq {
   {
     content: Content::of(
-      NSeq(items.map(c => c.into_content()), Site::new("Seq", loc, args_loc)),
+      NSeq(items.map(c => described(c)), Site::new("Seq", loc, args_loc)),
     ),
   }
 }
@@ -265,12 +280,7 @@ pub fn Labelled::Labelled(
 ) -> Labelled {
   {
     content: Content::of(
-      NLabelled(
-        body.into_content(),
-        label,
-        Site::new("Labelled", loc, args_loc),
-        1,
-      ),
+      NLabelled(described(body), label, Site::new("Labelled", loc, args_loc), 1),
     ),
   }
 }
@@ -296,7 +306,7 @@ pub struct Keyed {
 
 ///|
 pub fn Keyed::Keyed(key : String, body : &IntoContent) -> Keyed {
-  { content: Content::of(NKeyed(key, body.into_content())), }
+  { content: Content::of(NKeyed(key, described(body))), }
 }
 
 ///|
