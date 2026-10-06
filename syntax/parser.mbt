@@ -1812,7 +1812,7 @@ fn Parser::expect_closing_delimiter(
 ) -> Bool {
   let at = self.eat_if(kind)
   if !at {
-    self.nodes[open].convert_to_error("unclosed delimiter")
+    self.nodes[open].convert_to_error("unclosed delimiter (CI BREAK)")
   }
   at
 }
