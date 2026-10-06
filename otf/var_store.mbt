@@ -21,6 +21,9 @@ pub impl Default for ItemVariationStore with fn default() {
 }
 
 ///|
+pub extend ItemVariationStore with Default::{default}
+
+///|
 /// Parses an item variation store starting at the stream's position.
 pub fn ItemVariationStore::parse(s : Stream) -> ItemVariationStore? {
   let s = s.copy()

@@ -32,3 +32,6 @@ pub impl FromReader for GlobalType with fn from_reader(reader) {
   }
   { content_type, mutable: (flags & 0b01) > 0, shared: (flags & 0b10) > 0, }
 }
+
+///|
+pub extend GlobalType with FromReader::{from_reader}

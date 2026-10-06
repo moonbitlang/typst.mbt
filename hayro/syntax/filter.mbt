@@ -95,7 +95,7 @@ pub fn ascii_hex_decode(data : BytesView) -> Bytes? {
     }
   }
   let data = data[:end]
-  let decoded = @buffer.new(size_hint=(data.length() + 1) / 2)
+  let decoded = Buffer(size_hint=(data.length() + 1) / 2)
   let mut hi : Int? = None
   for b in data {
     if is_white_space_character(b) {
@@ -144,7 +144,7 @@ pub fn ascii_85_decode(data : BytesView) -> Bytes? {
     }
     None
   }
-  let decoded = @buffer.new(size_hint=data.length() * 4 / 5)
+  let decoded = Buffer(size_hint=data.length() * 4 / 5)
   let group : Array[Byte] = []
   let flush_group = () => {
     let n = group.length()
@@ -205,7 +205,7 @@ pub fn ascii_85_decode(data : BytesView) -> Bytes? {
 ///|
 pub fn run_length_decode(data : BytesView) -> Bytes? {
   let reader = Reader::new(data)
-  let decoded = @buffer.new()
+  let decoded = Buffer()
   while true {
     guard reader.read_byte() is Some(length) else { return None }
     let length = length.to_int()

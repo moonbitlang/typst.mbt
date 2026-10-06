@@ -268,6 +268,9 @@ pub fn Scope::debug(self : Scope) -> String {
 pub(all) struct MatchPower(Double) derive(Eq, Compare, Debug)
 
 ///|
+pub extend MatchPower with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub fn ScopeStack::new() -> ScopeStack {
   { clear_stack: [], scopes: [], }
 }

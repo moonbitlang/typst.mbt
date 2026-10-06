@@ -14,10 +14,10 @@
 // expressions and the fallback fragments go to standard error.
 //
 // The printed file names every type of `doc` that generated code can
-// mention, so its package should have
-// `warnings = "-unused_type_declaration"` (as the shard packages of
-// `tests/edsl_gen` do). A `using` declaration holds for a whole package:
-// with several translations in one package, all but one are printed with
+// mention, so its `using` declaration carries
+// `#warnings("-unused_type_declaration")` for the ones this translation
+// does not use. A `using` declaration holds for a whole package: with
+// several translations in one package, all but one are printed with
 // `--no-using`.
 
 ///|
@@ -39,7 +39,9 @@ fn render(
 ) -> String {
   let out = StringBuilder()
   if using_ {
-    out.write_string("///|\nusing @doc {\n")
+    out.write_string(
+      "///|\n#warnings(\"-unused_type_declaration\")\nusing @doc {\n",
+    )
     let names = @convert.api_type_names()
     names.append(handwritten_types)
     for name in names {

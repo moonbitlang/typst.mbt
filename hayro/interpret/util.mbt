@@ -10,6 +10,9 @@ pub(all) struct U128 {
 } derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
+pub extend U128 with Default::{default}
+
+///|
 /// A SipHash-1-3 hasher with 128-bit output and zero keys (upstream
 /// `siphasher::sip128::SipHasher13::new()`).
 pub struct Hasher128 {
@@ -228,8 +231,8 @@ pub fn f64_is_nearly_greater_or_equal(x : Double, other : Double) -> Bool {
 ///|
 /// `PointExt::nearly_same`.
 fn point_nearly_same(a : @kurbo.Point, b : @kurbo.Point) -> Bool {
-  f32_is_nearly_equal(a.x.to_float(), b.x.to_float()) &&
-  f32_is_nearly_equal(a.y.to_float(), b.y.to_float())
+  f32_is_nearly_equal(Float::from_double(a.x), Float::from_double(b.x)) &&
+  f32_is_nearly_equal(Float::from_double(a.y), Float::from_double(b.y))
 }
 
 ///|

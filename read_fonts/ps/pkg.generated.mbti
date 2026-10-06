@@ -47,6 +47,8 @@ pub(all) suberror PsError {
   InvalidSeacCode(Int)
   Read(@read_fonts.ReadError)
 }
+pub fn PsError::output(Self, &Logger) -> Unit
+pub fn PsError::to_string(Self) -> String
 pub impl Show for PsError
 
 // Types and methods

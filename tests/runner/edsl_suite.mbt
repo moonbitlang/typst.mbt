@@ -74,7 +74,8 @@ fn case_path(rel : String) -> String {
 }
 
 ///|
-/// The types of `doc` that generated code may name.
+/// The types of `doc` that generated code may name; a shard that does not
+/// use all of them must not warn about the rest.
 fn edsl_using() -> String {
   let names = @convert.api_type_names()
   names.append([
@@ -85,7 +86,9 @@ fn edsl_using() -> String {
     "Prose", "Content",
   ])
   let out = StringBuilder()
-  out.write_string("///|\nusing @doc {\n")
+  out.write_string(
+    "///|\n#warnings(\"-unused_type_declaration\")\nusing @doc {\n",
+  )
   for name in names {
     out.write_string("  type \{name},\n")
   }

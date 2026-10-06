@@ -143,7 +143,7 @@ fn sect_with_horizontal(src : ArrayView[@path.Point], y : Float) -> Float {
     // The computed X value might still exceed [X0..X1] due to quantum flux
     // when the doubles were added and subtracted, so we have to pin the
     // answer :(
-    pin_unsorted_f64(result, x0, x1).to_float()
+    Float::from_double(pin_unsorted_f64(result, x0, x1))
   }
 }
 
@@ -171,7 +171,7 @@ fn sect_with_vertical(src : ArrayView[@path.Point], x : Float) -> Float {
     let x1 = src[1].x.to_double()
     let y1 = src[1].y.to_double()
     let result = y0 + (x.to_double() - x0) * (y1 - y0) / (x1 - x0)
-    result.to_float()
+    Float::from_double(result)
   }
 }
 

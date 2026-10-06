@@ -67,3 +67,6 @@ pub impl FromReader for TableType with fn from_reader(reader) {
   }
   { element_type, table64, initial, maximum, shared, }
 }
+
+///|
+pub extend TableType with FromReader::{from_reader}

@@ -345,7 +345,7 @@ fn draw_bitmap_glyph(
   guard ttf.glyph_raster_image(gid, 0xFFFF) is Some(img) && img.format == PNG else {
     return false
   }
-  let data = img.data.to_bytes()
+  let data = img.data.to_owned()
   guard decode_png_image(data) is Some(image) else { return false }
   let upem = ttf.units_per_em().to_int().to_double()
   let s = upem / img.pixels_per_em.to_int().to_double()

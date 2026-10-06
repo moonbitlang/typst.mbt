@@ -212,6 +212,9 @@ pub impl Show for PageRangesPartErr with fn output(self, logger) {
 }
 
 ///|
+pub extend PageRangesPartErr with Show::{to_string, output}
+
+///|
 /// `impl FromStr for PageRangesPart`.
 pub fn PageRangesPart::from_str(
   s : String,

@@ -17,6 +17,7 @@ pub(all) struct Affixes {
   prefix : String?
   suffix : String?
 } derive(Eq, Hash, @debug.Debug)
+pub fn Affixes::default() -> Self
 pub impl Default for Affixes
 
 pub(all) enum BaseLanguage {
@@ -179,6 +180,7 @@ pub(all) enum DateParts {
   YearMonth
   YearMonthDay
 } derive(Eq, Hash, @debug.Debug)
+pub fn DateParts::default() -> Self
 pub fn DateParts::has_day(Self) -> Bool
 pub fn DateParts::has_month(Self) -> Bool
 pub impl Default for DateParts
@@ -199,6 +201,8 @@ pub(all) enum DateVariable {
   Submitted
 } derive(Eq, Hash, @debug.Debug)
 pub fn DateVariable::from_str(String) -> Self?
+pub fn DateVariable::output(Self, &Logger) -> Unit
+pub fn DateVariable::to_string(Self) -> String
 pub impl Show for DateVariable
 
 pub(all) enum DelimiterBehavior {
@@ -310,6 +314,7 @@ pub(all) struct Formatting {
   vertical_align : VerticalAlign?
 } derive(Eq, Hash, @debug.Debug)
 pub fn Formatting::apply(Self, Self) -> Self
+pub fn Formatting::default() -> Self
 pub fn Formatting::is_empty(Self) -> Bool
 pub impl Default for Formatting
 
@@ -385,6 +390,7 @@ pub(all) struct InheritableNameOptions {
   sort_separator : String?
 } derive(Eq, @debug.Debug)
 pub fn InheritableNameOptions::apply(Self, Self) -> Self
+pub fn InheritableNameOptions::default() -> Self
 pub impl Default for InheritableNameOptions
 
 pub(all) enum Kind {
@@ -587,6 +593,7 @@ pub(all) struct Name {
   formatting : Formatting
   affixes : Affixes
 } derive(Eq, @debug.Debug)
+pub fn Name::default() -> Self
 pub fn Name::name_part_family(Self) -> NamePart?
 pub fn Name::name_part_given(Self) -> NamePart?
 pub fn Name::options(Self, InheritableNameOptions) -> NameOptions
@@ -673,6 +680,8 @@ pub(all) enum NameVariable {
   Translator
 } derive(Eq, Hash, @debug.Debug)
 pub fn NameVariable::from_str(String) -> Self?
+pub fn NameVariable::output(Self, &Logger) -> Unit
+pub fn NameVariable::to_string(Self) -> String
 pub impl Show for NameVariable
 
 pub(all) struct Names {
@@ -764,6 +773,8 @@ pub(all) enum NumberVariable {
 } derive(Eq, Hash, @debug.Debug)
 pub fn NumberVariable::from_str(String) -> Self?
 pub fn NumberVariable::is_number_of_variable(Self) -> Bool
+pub fn NumberVariable::output(Self, &Logger) -> Unit
+pub fn NumberVariable::to_string(Self) -> String
 pub impl Show for NumberVariable
 
 pub struct OrdinalLookup {
@@ -899,6 +910,7 @@ pub(all) enum PageRangeFormat {
   Minimal
   MinimalTwo
 } derive(Eq, Hash, @debug.Debug)
+pub fn PageRangeFormat::default() -> Self
 pub fn PageRangeFormat::format(Self, (String) -> Unit, String, String, String?) -> Unit
 pub impl Default for PageRangeFormat
 
@@ -906,6 +918,8 @@ pub(all) enum PageVariable {
   Page
 } derive(Eq, Hash, @debug.Debug)
 pub fn PageVariable::from_str(String) -> Self?
+pub fn PageVariable::output(Self, &Logger) -> Unit
+pub fn PageVariable::to_string(Self) -> String
 pub impl Show for PageVariable
 
 pub(all) enum RenderingElement {
@@ -992,6 +1006,8 @@ pub(all) enum StandardVariable {
   YearSuffix
 } derive(Eq, Hash, @debug.Debug)
 pub fn StandardVariable::from_str(String) -> Self?
+pub fn StandardVariable::output(Self, &Logger) -> Unit
+pub fn StandardVariable::to_string(Self) -> String
 pub impl Show for StandardVariable
 
 pub(all) enum Style {
@@ -1040,6 +1056,8 @@ pub(all) enum StyleValidationError {
   MissingParent
   MissingClassAttr
 } derive(Eq, @debug.Debug)
+pub fn StyleValidationError::output(Self, &Logger) -> Unit
+pub fn StyleValidationError::to_string(Self) -> String
 pub impl Show for StyleValidationError
 
 pub(all) enum SubsequentAuthorSubstituteRule {
@@ -1166,6 +1184,8 @@ pub(all) struct XmlDeError {
   message : String
   path : String?
 } derive(Eq, @debug.Debug)
+pub fn XmlDeError::output(Self, &Logger) -> Unit
+pub fn XmlDeError::to_string(Self) -> String
 pub impl Show for XmlDeError
 
 // Type aliases

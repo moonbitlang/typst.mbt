@@ -48,7 +48,7 @@ fn hex_u64(v : UInt64) -> String {
 
 ///|
 fn hex_bytes(data : BytesView) -> String {
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   for b in data {
     let s = b.to_int().to_string(radix=16)
     if s.length() == 1 {
@@ -136,7 +136,7 @@ fn f32_hex(v : Float) -> String {
 
 ///|
 fn summary(data : Bytes) -> String {
-  let out = StringBuilder::new()
+  let out = StringBuilder()
   let pdf = match @syntax.Pdf::new(data) {
     Ok(pdf) => pdf
     Err(Invalid) => return "load invalid\n"
@@ -148,14 +148,14 @@ fn summary(data : Bytes) -> String {
   // lines are sorted.
   let lines = []
   for o in pdf.objects() {
-    let line = StringBuilder::new()
+    let line = StringBuilder()
     dump_object(o, line)
     lines.push(line.to_string())
   }
   // The lines are ASCII, so code unit order is byte order.
   lines.sort_by((a, b) => @syntax.compare_latin1(a, b))
   let count = lines.length()
-  let dump = StringBuilder::new()
+  let dump = StringBuilder()
   for l in lines {
     dump.write_string(l)
     dump.write_char('\n')
@@ -187,7 +187,7 @@ fn summary(data : Bytes) -> String {
       None => out.write_string("  stream none\n")
     }
     let ops = page.typed_operations()
-    let names = StringBuilder::new()
+    let names = StringBuilder()
     let mut n = 0
     while ops.next() is Some(op) {
       names.write_string(op.name())
@@ -208,14 +208,14 @@ test "oracle dump" {
     return
   }
   guard spec.split(":").collect() is [name, out] else { return }
-  guard oracle_file(name.to_string()) is Some(data) else { return }
+  guard oracle_file(name.to_owned()) is Some(data) else { return }
   guard @syntax.Pdf::new(data) is Ok(pdf) else { return }
-  let dump = StringBuilder::new()
+  let dump = StringBuilder()
   for o in pdf.objects() {
     dump_object(o, dump)
     dump.write_char('\n')
   }
-  @fs.write_string_to_file(out.to_string(), dump.to_string())
+  @fs.write_string_to_file(out.to_owned(), dump.to_string())
 }
 
 ///|

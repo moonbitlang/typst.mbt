@@ -87,6 +87,8 @@ pub(all) suberror IoError {
   IoError(ErrorKind, String)
 } derive(@debug.Debug)
 pub fn IoError::kind(Self) -> ErrorKind
+pub fn IoError::output(Self, &Logger) -> Unit
+pub fn IoError::to_string(Self) -> String
 pub impl Show for IoError
 
 // Types and methods

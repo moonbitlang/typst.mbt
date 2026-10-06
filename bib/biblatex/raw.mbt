@@ -124,6 +124,9 @@ pub impl Show for ParseErrorKind with fn output(self, logger) {
 }
 
 ///|
+pub extend ParseErrorKind with Show::{to_string, output}
+
+///|
 pub impl Show for Token with fn output(self, logger) {
   logger.write_string(
     match self {

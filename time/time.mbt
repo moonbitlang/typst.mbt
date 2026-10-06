@@ -16,6 +16,9 @@ pub struct Time {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+pub extend Time with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 fn Time::from_hms_nanos_unchecked(
   hour : Int,
   minute : Int,

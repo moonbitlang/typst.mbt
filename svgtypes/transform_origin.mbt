@@ -78,6 +78,9 @@ pub impl Show for TransformOriginError with fn output(self, logger) {
 }
 
 ///|
+pub extend TransformOriginError with Show::{to_string, output}
+
+///|
 fn parse_part(stream : Stream) -> Position? {
   try stream.parse_directional_position() catch {
     _ =>

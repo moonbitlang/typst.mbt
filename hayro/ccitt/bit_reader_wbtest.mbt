@@ -6,5 +6,12 @@ test "bit reader position beyond 2^31 bits" {
   r.bit_offset = 1L << 31
   assert_eq(r.byte_pos(), 1 << 28)
   assert_true(r.at_end())
-  assert_true((try? r.read_bit()) is Err(UnexpectedEof))
+  assert_true(
+    try r.read_bit() catch {
+      UnexpectedEof => true
+      _ => false
+    } noraise {
+      _ => false
+    },
+  )
 }

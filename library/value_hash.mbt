@@ -784,7 +784,7 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
         Project => state.write_discriminant(0)
         Package(spec) => {
           state.write_discriminant(1)
-          state.write_str(spec.namespace)
+          state.write_str(spec.namespace_)
           state.write_str(spec.name)
           state.write_u32(spec.version.major)
           state.write_u32(spec.version.minor)

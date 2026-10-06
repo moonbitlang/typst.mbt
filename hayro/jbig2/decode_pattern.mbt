@@ -119,7 +119,7 @@ fn pattern_decode(
   let shifted_patterns : Array[UInt] = if pattern_width <= WORD_BITS &&
     pattern_height <= WORD_BITS {
     let h = pattern_height.reinterpret_as_int()
-    let data = Array::new(capacity=patterns.length() * 32 * h * 2)
+    let data = Array(capacity=patterns.length() * 32 * h * 2)
     for pattern in patterns {
       for k in 0..<32 {
         for y in 0..<h {

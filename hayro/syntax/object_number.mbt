@@ -26,8 +26,8 @@ pub fn Number::as_f64(self : Number) -> Double {
 /// Returns the number as a f32.
 pub fn Number::as_f32(self : Number) -> Float {
   match self {
-    Real(r) => r.to_float()
-    Integer(i) => i.to_float()
+    Real(r) => Float::from_double(r)
+    Integer(i) => Float::from_int64(i)
   }
 }
 
@@ -122,6 +122,9 @@ pub impl Readable for Number with fn read(r, _) {
     }
   }
 }
+
+///|
+pub extend Number with Readable::{read}
 
 ///|
 fn read_number_inner(r : Reader) -> Number? {
@@ -302,12 +305,16 @@ pub impl ObjectLike for Int64 with fn from_object(o) {
 
 ///|
 pub impl Readable for UInt with fn read(r, _) {
-  read_int_in_range(r, 0L, 4294967295L).map(v => v.to_uint64().to_uint())
+  read_int_in_range(r, 0L, 4294967295L).map(v => {
+    v.reinterpret_as_uint64().to_uint()
+  })
 }
 
 ///|
 pub impl ObjectLike for UInt with fn from_object(o) {
-  int_from_object(o, 0L, 4294967295L).map(v => v.to_uint64().to_uint())
+  int_from_object(o, 0L, 4294967295L).map(v => {
+    v.reinterpret_as_uint64().to_uint()
+  })
 }
 
 // `usize`.
@@ -372,13 +379,13 @@ pub impl Skippable for Float with fn skip(r, _) {
 ///|
 pub impl Readable for Float with fn read(r, _) {
   guard (r.read_without_context() : Number?) is Some(n) else { return None }
-  Some(n.as_f64().to_float())
+  Some(Float::from_double(n.as_f64()))
 }
 
 ///|
 pub impl ObjectLike for Float with fn from_object(o) {
   match o {
-    Number(n) => Some(n.as_f64().to_float())
+    Number(n) => Some(Float::from_double(n.as_f64()))
     _ => None
   }
 }

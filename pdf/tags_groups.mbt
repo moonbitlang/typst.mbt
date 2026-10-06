@@ -58,7 +58,7 @@ fn Groups::propagate_lang(
   if !group.kind.has_lang() {
     return Some(lang)
   }
-  let parent = Ref::new(group.lang)
+  let parent = Ref(group.lang)
   let res = propagate_lang(parent, Some(lang))
   group.lang = parent.val
   res

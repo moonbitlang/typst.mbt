@@ -21,6 +21,9 @@ pub impl Default for Transform with fn default() {
 }
 
 ///|
+pub extend Transform with Default::{default}
+
+///|
 /// Creates an identity transform.
 pub fn Transform::identity() -> Transform {
   { sx: 1.0, kx: 0.0, ky: 0.0, sy: 1.0, tx: 0.0, ty: 0.0, }

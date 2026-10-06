@@ -43,6 +43,9 @@ pub impl Show for UrlParseError with fn output(self, logger) {
 }
 
 ///|
+pub extend UrlParseError with Show::{to_string, output}
+
+///|
 fn special_default_port(scheme : String) -> Int? {
   match scheme {
     "http" | "ws" => Some(80)

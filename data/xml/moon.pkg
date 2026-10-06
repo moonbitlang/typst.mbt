@@ -3,8 +3,3 @@ import {
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/typst/unicode",
 }
-
-// Upstream names the `ExpandedName::namespace` / `Attribute::namespace`
-// methods `namespace`, which MoonBit reserves.
-
-warnings = "-reserved_keyword"

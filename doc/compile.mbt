@@ -166,7 +166,7 @@ fn Resolver::locate(self : Resolver, span : @syntax.DiagSpan) -> Location? {
   guard span.id() is Some(id) else { return None }
   let package_spec = match id.root() {
     Project => Option::None
-    Package(spec) => Some("@\{spec.namespace}/\{spec.name}:\{spec.version}")
+    Package(spec) => Some("@\{spec.namespace_}/\{spec.name}:\{spec.version}")
   }
   let path = id.vpath().get_without_slash()
   // The byte range: numbered spans through the parsed source, raw ranges

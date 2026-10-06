@@ -230,7 +230,7 @@ fn select_standard_font(
 ///|
 /// Rust's `str::to_ascii_lowercase`.
 fn ascii_lowercase(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for c in s {
     if c >= 'A' && c <= 'Z' {
       buf.write_char(Int::unsafe_to_char(c.to_int() + 32))

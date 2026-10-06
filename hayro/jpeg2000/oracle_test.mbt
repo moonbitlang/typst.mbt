@@ -46,7 +46,7 @@ fn jpx_oracle_line(data : Bytes, settings_name : String) -> String {
     strict,
     target_resolution: None,
   }
-  let out = StringBuilder::new()
+  let out = StringBuilder()
   let image = @jpeg2000.Image::new(data[:], settings) catch {
     e => {
       out.write_string("E \{e}")
@@ -110,11 +110,11 @@ test "jpx oracle" {
   let mut cur_path = ""
   let mut cur_data = b""
   for line in expected.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line.is_empty() || line.has_prefix("#") {
       continue
     }
-    let parts = line.split("\t").map(p => p.to_string()).collect()
+    let parts = line.split("\t").map(p => p.to_owned()).collect()
     if parts[0] != cur_path {
       cur_path = parts[0]
       cur_data = @fs.read_file_to_bytes(root + cur_path)

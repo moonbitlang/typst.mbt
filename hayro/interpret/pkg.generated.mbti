@@ -430,6 +430,7 @@ pub(all) struct StrokeProps {
   dash_array : Array[Float]
   dash_offset : Float
 }
+pub fn StrokeProps::default() -> Self
 pub impl Default for StrokeProps
 
 pub struct SvgGradient {
@@ -497,6 +498,7 @@ pub(all) struct U128 {
   hi : UInt64
   lo : UInt64
 } derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub fn U128::default() -> Self
 pub impl CacheKey for U128
 
 // Type aliases

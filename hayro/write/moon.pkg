@@ -3,5 +3,3 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/pdflite/export",
 }
-
-warnings = "-deprecated"

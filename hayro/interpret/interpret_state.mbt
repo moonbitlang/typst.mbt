@@ -206,12 +206,13 @@ fn TextState::apply_code_advance(
     advance / units_per_em * self.font_size + self.char_space + word_space
   }
   let tx : Float = if horizontal {
-    base_advance(glyph_advance.x.to_float()) * self.horizontal_scaling_()
+    base_advance(Float::from_double(glyph_advance.x)) *
+    self.horizontal_scaling_()
   } else {
     0.0
   }
   let ty : Float = if !horizontal {
-    base_advance(glyph_advance.y.to_float())
+    base_advance(Float::from_double(glyph_advance.y))
   } else {
     0.0
   }

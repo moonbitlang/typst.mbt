@@ -14,8 +14,6 @@ import {
   "moonbitlang/core/encoding/utf8",
 } for "test"
 
-warnings = "-deprecated"
-
 options(
   targets: {
     "libm_native.mbt": [ "native" ],

@@ -134,6 +134,9 @@ pub impl Default for ColorInterpolation with fn default() {
 }
 
 ///|
+pub extend ColorInterpolation with Default::{default}
+
+///|
 /// A blend filter primitive.
 ///
 /// `feBlend` element in the SVG.
@@ -168,6 +171,9 @@ pub impl Default for ColorMatrixKind with fn default() {
     0.0, 0.0, 1.0, 0.0,
   ])
 }
+
+///|
+pub extend ColorMatrixKind with Default::{default}
 
 ///|
 /// A component-wise remapping filter primitive.

@@ -314,6 +314,9 @@ pub impl[T] Default for LazyArray16[T] with fn default() {
 }
 
 ///|
+pub extend LazyArray16 with Default::{default}
+
+///|
 /// Creates a new `LazyArray`.
 pub fn[T] LazyArray16::new(data : BytesView) -> LazyArray16[T] {
   { data, }
@@ -470,6 +473,9 @@ pub struct LazyArray32[_] {
 pub impl[T] Default for LazyArray32[T] with fn default() {
   { data: empty_data, }
 }
+
+///|
+pub extend LazyArray32 with Default::{default}
 
 ///|
 /// Creates a new `LazyArray`.
@@ -660,6 +666,9 @@ pub struct Stream {
 pub impl Default for Stream with fn default() {
   { data: empty_data, offset: 0, }
 }
+
+///|
+pub extend Stream with Default::{default}
 
 ///|
 /// Creates a new `Stream` parser.
@@ -934,6 +943,9 @@ pub impl Offset for Offset16 with fn is_null(self) {
 }
 
 ///|
+pub extend Offset16 with Offset::{is_null, to_usize}
+
+///|
 pub impl FromData for Offset16 with fn size() {
   2
 }
@@ -956,6 +968,9 @@ pub impl Offset for Offset24 with fn to_usize(self) {
 pub impl Offset for Offset24 with fn is_null(self) {
   self.0 == 0
 }
+
+///|
+pub extend Offset24 with Offset::{is_null, to_usize}
 
 ///|
 pub impl FromData for Offset24 with fn size() {
@@ -988,6 +1003,9 @@ pub impl Offset for Offset32 with fn to_usize(self) {
 pub impl Offset for Offset32 with fn is_null(self) {
   self.0 == 0
 }
+
+///|
+pub extend Offset32 with Offset::{is_null, to_usize}
 
 ///|
 pub impl FromData for Offset32 with fn size() {

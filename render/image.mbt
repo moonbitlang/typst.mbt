@@ -28,7 +28,8 @@ fn render_image(
       ts.sx / musl_cosf(theta)
     },
   )
-  let aspect = image.width().to_float() / image.height().to_float()
+  let aspect = Float::from_double(image.width()) /
+    Float::from_double(image.height())
   let w = @skia.f32_to_u32(
     @skia.ceilf(scale_x * @skia.fmax(view_width, aspect * view_height)),
   )

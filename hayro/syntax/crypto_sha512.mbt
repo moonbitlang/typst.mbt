@@ -129,7 +129,7 @@ fn sha512_calculate(data : BytesView) -> Bytes {
     0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
   ]
   sha512_calculate_with_initial_values(data, h)
-  let result : Array[Byte] = Array::new(capacity=64)
+  let result : Array[Byte] = Array(capacity=64)
   for hash_word in h {
     write_u64_be(result, hash_word)
   }

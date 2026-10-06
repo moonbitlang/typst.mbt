@@ -132,7 +132,7 @@ fn OutlineFont::glyph_advance_width(
   match self {
     Type1(t) => t.glyph_width(char_code.to_byte())
     TrueType(t) => Some(t.glyph_width(char_code.to_byte()))
-    Type0(t) => Some(t.code_advance(char_code).x.to_float())
+    Type0(t) => Some(Float::from_double(t.code_advance(char_code).x))
   }
 }
 

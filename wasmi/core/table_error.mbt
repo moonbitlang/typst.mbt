@@ -52,6 +52,9 @@ pub impl Show for TableError with fn output(self, logger) {
 }
 
 ///|
+pub extend TableError with Show::{to_string, output}
+
+///|
 /// `impl From<LimiterError> for TableError`
 pub fn TableError::from_limiter_error(error : LimiterError) -> TableError {
   match error {

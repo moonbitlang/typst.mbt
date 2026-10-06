@@ -98,6 +98,7 @@ pub struct Date {
 pub fn Date::add_duration(Self, Duration) -> Self
 pub fn Date::checked_add(Self, Duration) -> Self?
 pub fn Date::checked_sub(Self, Duration) -> Self?
+pub fn Date::compare(Self, Self) -> Int
 pub fn Date::day(Self) -> Int
 pub fn Date::format(Self, ArrayView[FormatItem]) -> String raise Format
 pub fn Date::format_item(Self, FormatItem) -> String raise Format
@@ -112,7 +113,12 @@ pub fn Date::minimum() -> Self
 pub fn Date::monday_based_week(Self) -> Int
 pub fn Date::month(Self) -> Month
 pub fn Date::next_day(Self) -> Self?
+pub fn Date::op_ge(Self, Self) -> Bool
+pub fn Date::op_gt(Self, Self) -> Bool
+pub fn Date::op_le(Self, Self) -> Bool
+pub fn Date::op_lt(Self, Self) -> Bool
 pub fn Date::ordinal(Self) -> Int
+pub fn Date::output(Self, &Logger) -> Unit
 pub fn Date::previous_day(Self) -> Self?
 pub fn Date::saturating_add(Self, Duration) -> Self
 pub fn Date::saturating_sub(Self, Duration) -> Self
@@ -123,6 +129,7 @@ pub fn Date::to_calendar_date(Self) -> (Int, Month, Int)
 pub fn Date::to_iso_week_date(Self) -> (Int, Int, Weekday)
 pub fn Date::to_julian_day(Self) -> Int
 pub fn Date::to_ordinal_date(Self) -> (Int, Int)
+pub fn Date::to_string(Self) -> String
 pub fn Date::weekday(Self) -> Weekday
 pub fn Date::with_hms(Self, Int, Int, Int) -> PrimitiveDateTime raise ComponentRange
 pub fn Date::with_time(Self, Time) -> PrimitiveDateTime
@@ -153,12 +160,14 @@ pub fn Duration::minutes(Int64) -> Self
 pub fn Duration::mul_f64(Self, Double) -> Self
 pub fn Duration::nanoseconds(Int64) -> Self
 pub fn Duration::new(Int64, Int) -> Self
+pub fn Duration::output(Self, &Logger) -> Unit
 pub fn Duration::saturating_seconds_f64(Double) -> Self
 pub fn Duration::seconds(Int64) -> Self
 pub fn Duration::seconds_f64(Double) -> Self
 pub fn Duration::subsec_microseconds(Self) -> Int
 pub fn Duration::subsec_milliseconds(Self) -> Int
 pub fn Duration::subsec_nanoseconds(Self) -> Int
+pub fn Duration::to_string(Self) -> String
 pub fn Duration::weeks(Int64) -> Self
 pub fn Duration::whole_days(Self) -> Int64
 pub fn Duration::whole_hours(Self) -> Int64
@@ -214,6 +223,7 @@ pub struct PrimitiveDateTime {
 pub fn PrimitiveDateTime::add_duration(Self, Duration) -> Self
 pub fn PrimitiveDateTime::checked_add(Self, Duration) -> Self?
 pub fn PrimitiveDateTime::checked_sub(Self, Duration) -> Self?
+pub fn PrimitiveDateTime::compare(Self, Self) -> Int
 pub fn PrimitiveDateTime::date(Self) -> Date
 pub fn PrimitiveDateTime::day(Self) -> Int
 pub fn PrimitiveDateTime::format(Self, ArrayView[FormatItem]) -> String raise Format
@@ -227,6 +237,10 @@ pub fn PrimitiveDateTime::monday_based_week(Self) -> Int
 pub fn PrimitiveDateTime::month(Self) -> Month
 pub fn PrimitiveDateTime::nanosecond(Self) -> Int
 pub fn PrimitiveDateTime::new(Date, Time) -> Self
+pub fn PrimitiveDateTime::op_ge(Self, Self) -> Bool
+pub fn PrimitiveDateTime::op_gt(Self, Self) -> Bool
+pub fn PrimitiveDateTime::op_le(Self, Self) -> Bool
+pub fn PrimitiveDateTime::op_lt(Self, Self) -> Bool
 pub fn PrimitiveDateTime::ordinal(Self) -> Int
 pub fn PrimitiveDateTime::saturating_add(Self, Duration) -> Self
 pub fn PrimitiveDateTime::saturating_sub(Self, Duration) -> Self
@@ -259,6 +273,7 @@ pub struct Time {
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Time::add_duration(Self, Duration) -> Self
 pub fn Time::as_hms(Self) -> (Int, Int, Int)
+pub fn Time::compare(Self, Self) -> Int
 pub fn Time::duration_since(Self, Self) -> Duration
 pub fn Time::duration_until(Self, Self) -> Duration
 pub fn Time::format(Self, ArrayView[FormatItem]) -> String raise Format
@@ -272,6 +287,10 @@ pub fn Time::midnight() -> Self
 pub fn Time::millisecond(Self) -> Int
 pub fn Time::minute(Self) -> Int
 pub fn Time::nanosecond(Self) -> Int
+pub fn Time::op_ge(Self, Self) -> Bool
+pub fn Time::op_gt(Self, Self) -> Bool
+pub fn Time::op_le(Self, Self) -> Bool
+pub fn Time::op_lt(Self, Self) -> Bool
 pub fn Time::second(Self) -> Int
 pub fn Time::sub_duration(Self, Duration) -> Self
 pub fn Time::sub_time(Self, Self) -> Duration

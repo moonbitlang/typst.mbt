@@ -17,7 +17,7 @@ pub let typst_version : (Int, Int, Int) = (0, 15, 1)
 /// The `unknown_fields` contains fields which were found but not expected.
 pub(all) struct PackageManifest {
   /// Details about the package itself.
-  package : PackageInfo
+  package_ : PackageInfo
   /// Details about the template, if the package is one.
   template : TemplateInfo?
   /// The tools section for third-party configuration.
@@ -110,17 +110,17 @@ pub fn PackageManifest::validate(
   self : PackageManifest,
   spec : PackageSpec,
 ) -> Result[Unit, String] {
-  if self.package.name != spec.name {
+  if self.package_.name != spec.name {
     return Err(
-      "package manifest contains mismatched name `\{self.package.name}`",
+      "package manifest contains mismatched name `\{self.package_.name}`",
     )
   }
-  if self.package.version != spec.version {
+  if self.package_.version != spec.version {
     return Err(
-      "package manifest contains mismatched version \{self.package.version}",
+      "package manifest contains mismatched version \{self.package_.version}",
     )
   }
-  if self.package.compiler is Some(required) {
+  if self.package_.compiler is Some(required) {
     let current = PackageVersion::compiler()
     if !current.matches_ge(required) {
       return Err(
@@ -135,13 +135,13 @@ pub fn PackageManifest::validate(
 fn de_manifest(
   root : Map[String, TomlValue],
 ) -> PackageManifest raise TomlError {
-  let mut package : PackageInfo? = None
+  let mut package_ : PackageInfo? = None
   let mut template : TemplateInfo? = None
   let mut tool = { sections: [], }
   let unknown_fields = []
   for key, value in root {
     match key {
-      "package" => package = Some(de_package_info(value))
+      "package" => package_ = Some(de_package_info(value))
       "template" => template = Some(de_template_info(value))
       "tool" =>
         match value {
@@ -151,8 +151,8 @@ fn de_manifest(
       _ => unknown_fields.push(key)
     }
   }
-  guard package is Some(package) else { raise de_missing("package") }
-  { package, template, tool, unknown_fields, }
+  guard package_ is Some(package_) else { raise de_missing("package") }
+  { package_, template, tool, unknown_fields, }
 }
 
 ///|
@@ -275,23 +275,23 @@ fn de_missing(field : String) -> TomlError {
 /// Identifies a package.
 pub(all) struct PackageSpec {
   /// The namespace the package lives in.
-  namespace : String
+  namespace_ : String
   /// The name of the package within its namespace.
   name : String
   /// The package's version.
   version : PackageVersion
-} derive(Eq, Hash, Debug)
+} derive(Eq, Hash)
 
 ///|
 pub fn PackageSpec::versionless(self : PackageSpec) -> VersionlessPackageSpec {
-  { namespace: self.namespace, name: self.name, }
+  { namespace_: self.namespace_, name: self.name, }
 }
 
 ///|
 /// Parse a package specification like `@preview/example:0.1.0`.
 pub fn PackageSpec::from_str(s : String) -> Result[PackageSpec, String] {
   let s = PkgScanner::{ text: s, cursor: 0, }
-  let namespace = match parse_namespace(s) {
+  let namespace_ = match parse_namespace(s) {
     Ok(v) => v
     Err(e) => return Err(e)
   }
@@ -303,22 +303,29 @@ pub fn PackageSpec::from_str(s : String) -> Result[PackageSpec, String] {
     Ok(v) => v
     Err(e) => return Err(e)
   }
-  Ok({ namespace, name, version, })
+  Ok({ namespace_, name, version, })
+}
+
+///|
+/// Upstream `Debug for PackageSpec` is its `Display`
+/// (typst-syntax/src/package.rs:256).
+pub impl @debug.Debug for PackageSpec with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
 }
 
 ///|
 pub impl Show for PackageSpec with fn output(self, logger) {
-  logger.write_string("@\{self.namespace}/\{self.name}:\{self.version}")
+  logger.write_string("@\{self.namespace_}/\{self.name}:\{self.version}")
 }
 
 ///|
 /// Identifies a package, but not a specific version of it.
 pub(all) struct VersionlessPackageSpec {
   /// The namespace the package lives in.
-  namespace : String
+  namespace_ : String
   /// The name of the package within its namespace.
   name : String
-} derive(Eq, Hash, Debug)
+} derive(Eq, Hash)
 
 ///|
 /// Fill in the `version` to get a complete [`PackageSpec`].
@@ -326,7 +333,7 @@ pub fn VersionlessPackageSpec::at(
   self : VersionlessPackageSpec,
   version : PackageVersion,
 ) -> PackageSpec {
-  { namespace: self.namespace, name: self.name, version, }
+  { namespace_: self.namespace_, name: self.name, version, }
 }
 
 ///|
@@ -335,7 +342,7 @@ pub fn VersionlessPackageSpec::from_str(
   s : String,
 ) -> Result[VersionlessPackageSpec, String] {
   let s = PkgScanner::{ text: s, cursor: 0, }
-  let namespace = match parse_namespace(s) {
+  let namespace_ = match parse_namespace(s) {
     Ok(v) => v
     Err(e) => return Err(e)
   }
@@ -346,12 +353,19 @@ pub fn VersionlessPackageSpec::from_str(
   if !s.done() {
     return Err("unexpected version in versionless package specification")
   }
-  Ok({ namespace, name, })
+  Ok({ namespace_, name, })
+}
+
+///|
+/// Upstream `Debug for VersionlessPackageSpec` is its `Display`
+/// (typst-syntax/src/package.rs:302).
+pub impl @debug.Debug for VersionlessPackageSpec with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
 }
 
 ///|
 pub impl Show for VersionlessPackageSpec with fn output(self, logger) {
-  logger.write_string("@\{self.namespace}/\{self.name}")
+  logger.write_string("@\{self.namespace_}/\{self.name}")
 }
 
 ///|
@@ -397,13 +411,13 @@ fn parse_namespace(s : PkgScanner) -> Result[String, String] {
   if !s.eat_if('@') {
     return Err("package specification must start with '@'")
   }
-  let namespace = s.eat_until('/')
-  if namespace.is_empty() {
+  let namespace_ = s.eat_until('/')
+  if namespace_.is_empty() {
     Err("package specification is missing namespace")
-  } else if !is_ident(namespace) {
-    Err("`\{namespace}` is not a valid package namespace")
+  } else if !is_ident(namespace_) {
+    Err("`\{namespace_}` is not a valid package namespace")
   } else {
-    Ok(namespace)
+    Ok(namespace_)
   }
 }
 
@@ -439,7 +453,7 @@ pub(all) struct PackageVersion {
   minor : UInt
   /// The package's patch version.
   patch : UInt
-} derive(Eq, Compare, Hash, Debug)
+} derive(Eq, Compare, Hash)
 
 ///|
 /// The current compiler version.
@@ -562,6 +576,13 @@ pub fn PackageVersion::from_str(s : String) -> Result[PackageVersion, String] {
 }
 
 ///|
+/// Upstream `Debug for PackageVersion` is its `Display`
+/// (typst-syntax/src/package.rs:457).
+pub impl @debug.Debug for PackageVersion with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
+}
+
+///|
 pub impl Show for PackageVersion with fn output(self, logger) {
   logger.write_string("\{self.major}.\{self.minor}.\{self.patch}")
 }
@@ -575,7 +596,7 @@ pub(all) struct VersionBound {
   minor : UInt?
   /// The bounds's patch version. Can only be present if minor is too.
   patch : UInt?
-} derive(Eq, Compare, Hash, Debug)
+} derive(Eq, Compare, Hash)
 
 ///|
 /// Parse a version bound like `0`, `0.1` or `0.1.0`.
@@ -609,6 +630,13 @@ pub fn VersionBound::from_str(s : String) -> Result[VersionBound, String] {
     return Err("version bound has unexpected fourth component: `\{rest}`")
   }
   Ok({ major, minor, patch, })
+}
+
+///|
+/// Upstream `Debug for VersionBound` is its `Display`
+/// (typst-syntax/src/package.rs:520).
+pub impl @debug.Debug for VersionBound with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
 }
 
 ///|

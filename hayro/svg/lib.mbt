@@ -76,19 +76,22 @@ fn SvgRenderer::write_transform(
   transform : @kurbo.Affine,
 ) -> Unit {
   let c = transform.as_coeffs()
-  let has_scale = !@interpret.f32_is_nearly_equal(c[0].to_float(), 1.0) ||
-    !@interpret.f32_is_nearly_equal(c[3].to_float(), 1.0)
-  let has_skew = !@interpret.f32_is_nearly_equal(c[1].to_float(), 0.0) ||
-    !@interpret.f32_is_nearly_equal(c[2].to_float(), 0.0)
-  let has_translate = !@interpret.f32_is_nearly_equal(c[4].to_float(), 0.0) ||
-    !@interpret.f32_is_nearly_equal(c[5].to_float(), 0.0)
+  let has_scale = !@interpret.f32_is_nearly_equal(Float::from_double(c[0]), 1.0) ||
+    !@interpret.f32_is_nearly_equal(Float::from_double(c[3]), 1.0)
+  let has_skew = !@interpret.f32_is_nearly_equal(Float::from_double(c[1]), 0.0) ||
+    !@interpret.f32_is_nearly_equal(Float::from_double(c[2]), 0.0)
+  let has_translate = !@interpret.f32_is_nearly_equal(
+      Float::from_double(c[4]),
+      0.0,
+    ) ||
+    !@interpret.f32_is_nearly_equal(Float::from_double(c[5]), 0.0)
   let is_identity = !has_scale && !has_skew && !has_translate
   if !is_identity {
     let transform = match (has_scale, has_skew, has_translate) {
       (true, false, false) =>
-        "scale(\{f32_str(c[0].to_float())} \{f32_str(c[3].to_float())})"
+        "scale(\{f32_str(Float::from_double(c[0]))} \{f32_str(Float::from_double(c[3]))})"
       (false, false, true) =>
-        "translate(\{f32_str(c[4].to_float())} \{f32_str(c[5].to_float())})"
+        "translate(\{f32_str(Float::from_double(c[4]))} \{f32_str(Float::from_double(c[5]))})"
       _ => "matrix(\{convert_transform(transform)})"
     }
     self.xml.write_attribute("transform", transform)
@@ -423,7 +426,11 @@ fn SvgRenderer::finish(self : SvgRenderer) -> String {
 
 ///|
 fn convert_transform(transform : @kurbo.Affine) -> String {
-  transform.as_coeffs().iter().map(c => f32_str(c.to_float())).join(" ")
+  transform
+  .as_coeffs()
+  .iter()
+  .map(c => f32_str(Float::from_double(c)))
+  .join(" ")
 }
 
 ///|
@@ -492,6 +499,9 @@ impl Show for Id with fn output(self, logger) {
   logger.write_char(self.kind)
   logger.write_string(self.index.to_string())
 }
+
+///|
+extend Id with Show::{to_string}
 
 ///|
 /// Rust's `impl Display for f32`.

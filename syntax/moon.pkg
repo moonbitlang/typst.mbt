@@ -7,8 +7,5 @@ import {
   "moonbitlang/core/int64",
   "moonbitlang/core/cmp",
   "moonbitlang/core/hashset",
+  "moonbitlang/core/debug",
 }
-
-// Upstream names the `PackageSpec` field `namespace`, which MoonBit reserves.
-
-warnings = "-reserved_keyword"

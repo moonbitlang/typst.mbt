@@ -10,6 +10,9 @@ pub struct PrimitiveDateTime {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+pub extend PrimitiveDateTime with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Create a new `PrimitiveDateTime` from the provided `Date` and `Time`.
 pub fn PrimitiveDateTime::new(date : Date, time : Time) -> PrimitiveDateTime {
   { date, time, }

@@ -200,8 +200,8 @@ fn intersect(
     path_1.strip(path_1.strips_len() - 1).strip_y(),
     path_2.strip(path_2.strips_len() - 1).strip_y(),
   )
-  let path_1_idx = Ref::new(0)
-  let path_2_idx = Ref::new(0)
+  let path_1_idx = Ref(0)
+  let path_2_idx = Ref(0)
   // Use binary search to determine the first index of whichever path has a
   // smaller y.
   if path_1_start_y < cur_y {
@@ -209,7 +209,7 @@ fn intersect(
   } else if path_2_start_y < cur_y {
     path_2_idx.val = first_strip_at_or_after(path_2, cur_y)
   }
-  let strip_state : Ref[StripState?] = Ref::new(None)
+  let strip_state : Ref[StripState?] = Ref(None)
   // Iterate over each strip row and handle them.
   while cur_y <= end_y {
     let p1_iter = RowIterator::new(path_1, path_1_idx, cur_y)

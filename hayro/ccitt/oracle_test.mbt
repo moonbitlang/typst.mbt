@@ -66,7 +66,7 @@ test "hayro-ccitt matches the oracle" {
   let expected = @fs.read_file_to_string(dir + "oracle.tsv")
     .split("\n")
     .filter(l => !l.is_empty() && !l.has_prefix("#"))
-    .map(l => l.to_string())
+    .map(l => l.to_owned())
     .to_array()
   let mismatches = []
   let mut index = 0
@@ -74,7 +74,7 @@ test "hayro-ccitt matches the oracle" {
     if line.is_empty() || line.has_prefix("#") {
       continue
     }
-    let f = line.split("\t").map(p => p.to_string()).to_array()
+    let f = line.split("\t").map(p => p.to_owned()).to_array()
     let data = @fs.read_file_to_bytes(dir + "files/" + f[0])
     let k = @string.parse_int(f[3])
     let settings : @ccitt.DecodeSettings = {
@@ -92,7 +92,7 @@ test "hayro-ccitt matches the oracle" {
       },
       invert_black: f[7] == "1",
     }
-    let recorder = { out: @buffer.new(), rows: 0, }
+    let recorder = { out: Buffer(), rows: 0, }
     let ctx = @ccitt.DecoderContext::new(settings)
     let result = try @ccitt.decode(data[:], recorder, ctx) catch {
       e => "E \{e}"

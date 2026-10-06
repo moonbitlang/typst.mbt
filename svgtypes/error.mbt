@@ -71,3 +71,6 @@ pub impl Show for SvgTypesError with fn output(self, logger) {
       logger.write_string("invalid number at position \{pos}")
   }
 }
+
+///|
+pub extend SvgTypesError with Show::{to_string, output}

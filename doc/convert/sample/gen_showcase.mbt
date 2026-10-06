@@ -1,4 +1,5 @@
 ///|
+#warnings("-unused_type_declaration")
 using @doc {
   type Heading,
   type SetHeading,

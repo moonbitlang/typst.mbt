@@ -111,7 +111,7 @@ fn jpx_scale(
     return None
   }
   let div_factor : Float = 255.0
-  let mul_factor = ((1U << (bit_per_component & 31)) - 1).to_float()
+  let mul_factor = Float::from_uint((1U << (bit_per_component & 31)) - 1)
   let bits_per_row = width.to_uint64() *
     num_components.to_uint64() *
     bit_per_component.to_uint64()

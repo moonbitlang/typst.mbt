@@ -145,7 +145,7 @@ pub fn Diagnosis::default() -> Self
 pub fn Diagnosis::either(Self) -> Bool
 pub fn Diagnosis::or(Self, Self) -> Self
 
-pub struct FileId(UInt16) derive(Compare, Eq, Hash, @debug.Debug)
+pub struct FileId(UInt16) derive(Compare, Eq, Hash)
 pub fn FileId::from_raw(UInt16) -> Self
 pub fn FileId::get(Self) -> RootedPath
 pub fn FileId::into_raw(Self) -> UInt16
@@ -153,6 +153,7 @@ pub fn FileId::new(RootedPath) -> Self
 pub fn FileId::root(Self) -> VirtualRoot
 pub fn FileId::unique(RootedPath) -> Self
 pub fn FileId::vpath(Self) -> VirtualPath
+pub impl @debug.Debug for FileId
 
 pub struct Lines {
   // private fields
@@ -234,7 +235,7 @@ pub(all) struct PackageInfo {
 }
 
 pub(all) struct PackageManifest {
-  package : PackageInfo
+  package_ : PackageInfo
   template : TemplateInfo?
   tool : ToolInfo
   unknown_fields : Array[String]
@@ -243,19 +244,20 @@ pub fn PackageManifest::from_toml(String) -> Result[Self, String]
 pub fn PackageManifest::validate(Self, PackageSpec) -> Result[Unit, String]
 
 pub(all) struct PackageSpec {
-  namespace : String
+  namespace_ : String
   name : String
   version : PackageVersion
-} derive(Eq, Hash, @debug.Debug)
+} derive(Eq, Hash)
 pub fn PackageSpec::from_str(String) -> Result[Self, String]
 pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
 pub impl Show for PackageSpec
+pub impl @debug.Debug for PackageSpec
 
 pub(all) struct PackageVersion {
   major : UInt
   minor : UInt
   patch : UInt
-} derive(Compare, Eq, Hash, @debug.Debug)
+} derive(Compare, Eq, Hash)
 pub fn PackageVersion::compiler() -> Self
 pub fn PackageVersion::from_str(String) -> Result[Self, String]
 pub fn PackageVersion::matches_eq(Self, VersionBound) -> Bool
@@ -264,6 +266,7 @@ pub fn PackageVersion::matches_gt(Self, VersionBound) -> Bool
 pub fn PackageVersion::matches_le(Self, VersionBound) -> Bool
 pub fn PackageVersion::matches_lt(Self, VersionBound) -> Bool
 pub impl Show for PackageVersion
+pub impl @debug.Debug for PackageVersion
 
 pub struct RootedPath {
   // private fields
@@ -274,6 +277,7 @@ pub fn RootedPath::new(VirtualRoot, VirtualPath) -> Self
 pub fn RootedPath::root(Self) -> VirtualRoot
 pub fn RootedPath::vpath(Self) -> VirtualPath
 pub impl Show for RootedPath
+pub impl @debug.Debug for RootedPath
 
 pub(all) enum Side {
   Before
@@ -553,17 +557,19 @@ pub(all) struct VersionBound {
   major : UInt
   minor : UInt?
   patch : UInt?
-} derive(Compare, Eq, Hash, @debug.Debug)
+} derive(Compare, Eq, Hash)
 pub fn VersionBound::from_str(String) -> Result[Self, String]
 pub impl Show for VersionBound
+pub impl @debug.Debug for VersionBound
 
 pub(all) struct VersionlessPackageSpec {
-  namespace : String
+  namespace_ : String
   name : String
-} derive(Eq, Hash, @debug.Debug)
+} derive(Eq, Hash)
 pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
 pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
 pub impl Show for VersionlessPackageSpec
+pub impl @debug.Debug for VersionlessPackageSpec
 
 pub struct VirtualPath {
   // private fields
@@ -583,6 +589,7 @@ pub fn VirtualPath::relative_from(Self, Self) -> String
 pub fn VirtualPath::virtualize(String, String) -> Self raise VirtualizeError
 pub fn VirtualPath::with_extension(Self, String) -> Self
 pub impl Show for VirtualPath
+pub impl @debug.Debug for VirtualPath
 
 pub(all) enum VirtualRoot {
   Project

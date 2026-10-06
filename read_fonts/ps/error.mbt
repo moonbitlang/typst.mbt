@@ -80,6 +80,9 @@ pub impl Show for PsError with fn output(self, f) {
 }
 
 ///|
+pub extend PsError with Show::{to_string, output}
+
+///|
 fn oob() -> PsError {
   Read(@read_fonts.ReadError::OutOfBounds)
 }

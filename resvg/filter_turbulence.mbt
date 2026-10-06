@@ -81,7 +81,7 @@ fn turbulence_apply(
         gradient,
       )
       let n = if fractal_noise { (n * 255.0 + 255.0) / 2.0 } else { n * 255.0 }
-      f32_to_u8(f32_bound(0.0, n.to_float(), 255.0) + 0.5)
+      f32_to_u8(f32_bound(0.0, Float::from_double(n), 255.0) + 0.5)
     }
     let r = turb(0)
     let g = turb(1)

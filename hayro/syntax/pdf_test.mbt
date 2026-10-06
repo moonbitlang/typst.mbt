@@ -22,7 +22,7 @@ fn describe(name : String) -> String {
     Err(Invalid) => "error invalid"
     Err(Decryption(_)) => "error decryption"
     Ok(pdf) => {
-      let sb = StringBuilder::new()
+      let sb = StringBuilder()
       sb.write_string(
         "version=\{pdf.version().as_str()} pages=\{pdf.pages().length()}",
       )

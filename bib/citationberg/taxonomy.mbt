@@ -190,6 +190,9 @@ pub impl Show for StandardVariable with fn output(self, logger) {
 }
 
 ///|
+pub extend StandardVariable with Show::{to_string, output}
+
+///|
 /// Number variables as the CSL spec knows them, though we separate between
 /// number variables and page ranges.
 pub(all) enum NumberOrPageVariable {
@@ -249,6 +252,9 @@ pub fn PageVariable::from_str(s : String) -> PageVariable? {
 pub impl Show for PageVariable with fn output(_, logger) {
   logger.write_string("page")
 }
+
+///|
+pub extend PageVariable with Show::{to_string, output}
 
 ///|
 /// Variables that can be formatted as numbers.
@@ -317,6 +323,9 @@ pub impl Show for NumberVariable with fn output(self, logger) {
 }
 
 ///|
+pub extend NumberVariable with Show::{to_string, output}
+
+///|
 /// Check if the variable starts with `number-of-` to control contextual
 /// label behavior.
 pub fn NumberVariable::is_number_of_variable(self : NumberVariable) -> Bool {
@@ -363,6 +372,9 @@ pub impl Show for DateVariable with fn output(self, logger) {
     }
   }
 }
+
+///|
+pub extend DateVariable with Show::{to_string, output}
 
 ///|
 /// Variables that can be formatted as names.
@@ -449,6 +461,9 @@ pub impl Show for NameVariable with fn output(self, logger) {
     }
   }
 }
+
+///|
+pub extend NameVariable with Show::{to_string, output}
 
 ///|
 /// Localizable terms.

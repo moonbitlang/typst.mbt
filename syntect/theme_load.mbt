@@ -324,6 +324,9 @@ pub impl Show for LoadingError with fn output(self, logger) {
 }
 
 ///|
+pub extend LoadingError with Show::{to_string, output}
+
+///|
 /// Loads a theme given a readable stream (upstream
 /// `ThemeSet::load_from_reader`).
 pub fn ThemeSet::load_from_reader(bytes : Bytes) -> Theme raise LoadingError {

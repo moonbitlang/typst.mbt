@@ -239,6 +239,9 @@ pub impl Show for UnpackedIndex with fn output(self, logger) {
 }
 
 ///|
+pub extend UnpackedIndex with Show::{to_string, output}
+
+///|
 /// Represents a recursive type group in a WebAssembly module.
 pub struct RecGroup {
   priv inner : RecGroupInner
@@ -465,6 +468,9 @@ pub impl Show for CompositeType with fn output(self, logger) {
 }
 
 ///|
+pub extend CompositeType with Show::{to_string, output}
+
+///|
 /// Unwrap a `FuncType` or panic.
 pub fn CompositeType::unwrap_func(self : CompositeType) -> FuncType {
   match self.inner {
@@ -676,6 +682,9 @@ pub impl Show for ValType with fn output(self, logger) {
 }
 
 ///|
+pub extend ValType with Show::{to_string, output}
+
+///|
 /// Alias for the wasm `funcref` type.
 pub let valtype_funcref : ValType = Ref(reftype_funcref)
 
@@ -824,6 +833,9 @@ pub impl Show for RefType with fn output(self, logger) {
       }
   }
 }
+
+///|
+pub extend RefType with Show::{to_string, output}
 
 // These bits are valid for all `RefType`s.
 
@@ -1452,6 +1464,9 @@ pub impl FromReader for StorageType with fn from_reader(reader) {
 }
 
 ///|
+pub extend StorageType with FromReader::{from_reader}
+
+///|
 pub impl FromReader for ValType with fn from_reader(reader) {
   // Decoding value types is sort of subtle because the space of what's
   // being decoded here is actually spread out across an number of
@@ -1543,6 +1558,9 @@ pub impl FromReader for ValType with fn from_reader(reader) {
 }
 
 ///|
+pub extend ValType with FromReader::{from_reader}
+
+///|
 pub impl FromReader for RefType with fn from_reader(reader) {
   // NB: See `FromReader<'a> for ValType` for a table of how this
   // interacts with other value encodings.
@@ -1574,6 +1592,9 @@ pub impl FromReader for RefType with fn from_reader(reader) {
     }
   }
 }
+
+///|
+pub extend RefType with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for HeapType with fn from_reader(reader) {
@@ -1625,6 +1646,9 @@ pub impl FromReader for HeapType with fn from_reader(reader) {
 }
 
 ///|
+pub extend HeapType with FromReader::{from_reader}
+
+///|
 pub impl FromReader for AbstractHeapType with fn from_reader(reader) {
   match reader.read_u8() {
     0x70 => Func
@@ -1648,6 +1672,9 @@ pub impl FromReader for AbstractHeapType with fn from_reader(reader) {
       )
   }
 }
+
+///|
+pub extend AbstractHeapType with FromReader::{from_reader}
 
 ///|
 /// Represents a table's type.
@@ -1883,6 +1910,9 @@ pub impl FromReader for SubType with fn from_reader(reader) {
 }
 
 ///|
+pub extend SubType with FromReader::{from_reader}
+
+///|
 pub impl FromReader for FuncType with fn from_reader(reader) {
   let n = reader.read_iter(MAX_WASM_FUNCTION_PARAMS, "function params")
   let params_results = []
@@ -1896,6 +1926,9 @@ pub impl FromReader for FuncType with fn from_reader(reader) {
   }
   FuncType::from_raw_parts(params_results, len_params)
 }
+
+///|
+pub extend FuncType with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for FieldType with fn from_reader(reader) {
@@ -1916,9 +1949,15 @@ pub impl FromReader for FieldType with fn from_reader(reader) {
 }
 
 ///|
+pub extend FieldType with FromReader::{from_reader}
+
+///|
 pub impl FromReader for ArrayType with fn from_reader(reader) {
   ArrayType(FieldType::from_reader(reader))
 }
+
+///|
+pub extend ArrayType with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for StructType with fn from_reader(reader) {
@@ -1929,6 +1968,9 @@ pub impl FromReader for StructType with fn from_reader(reader) {
   }
   { fields, }
 }
+
+///|
+pub extend StructType with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for ContType with fn from_reader(reader) {
@@ -1948,3 +1990,6 @@ pub impl FromReader for ContType with fn from_reader(reader) {
   }
   { idx, }
 }
+
+///|
+pub extend ContType with FromReader::{from_reader}

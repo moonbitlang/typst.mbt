@@ -119,7 +119,7 @@ fn parse_tag_name(node : @xml.Node) -> EId? {
   if !node.is_element() {
     return None
   }
-  match node.tag_name().namespace() {
+  match node.tag_name().namespace_() {
     None => ()
     Some(ns) if ns == svg_ns => ()
     _ => return None
@@ -214,7 +214,7 @@ fn parse_svg_element(
 
   // Copy presentational attributes first.
   for attr in xml_node.attributes() {
-    match attr.namespace() {
+    match attr.namespace_() {
       None => ()
       Some(ns) if ns == svg_ns || ns == xlink_ns || ns == xml_namespace_ns => ()
       _ => continue

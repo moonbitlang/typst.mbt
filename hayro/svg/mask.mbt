@@ -146,7 +146,7 @@ fn sampled_transfer_function(
 ) -> String {
   let parts = []
   for i in 0..<=255 {
-    parts.push(f32_str(transfer_function.apply(i.to_float() / 255.0)))
+    parts.push(f32_str(transfer_function.apply(Float::from_int(i) / 255.0)))
   }
   parts.join(" ")
 }

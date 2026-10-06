@@ -13,6 +13,5 @@ import {
   "moonbitlang/typst/hayro/syntax" @hayro_syntax,
   "moonbitlang/typst/hayro/write" @hayro_write,
   "moonbitlang/core/math",
+  "moonbitlang/core/cmp",
 }
-
-warnings = "-deprecated"

@@ -7,6 +7,6 @@ test "ccitt issue1258" {
     params,
     ImageDecodeParams::default(),
   ).unwrap()
-  assert_eq(decoded.data.to_bytes(), b"\x00\x00\x00\x00\x00\x00\x00\x00")
+  assert_eq(decoded.data.to_owned(), b"\x00\x00\x00\x00\x00\x00\x00\x00")
   assert_eq(decoded.image_data.unwrap().height, 1)
 }

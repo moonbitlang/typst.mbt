@@ -99,7 +99,7 @@ fn image_from_raw(
   }
   // `from_raw` keeps the whole buffer, but only the first `len` bytes are
   // part of the image.
-  { color, width, height, data: data[0:len].to_bytes(), }
+  { color, width, height, data: data[0:len].to_owned(), }
 }
 
 ///|

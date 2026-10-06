@@ -152,6 +152,8 @@ pub fn Yaml::into_vec(Self) -> Array[Self]?
 pub fn Yaml::is_array(Self) -> Bool
 pub fn Yaml::is_badvalue(Self) -> Bool
 pub fn Yaml::is_null(Self) -> Bool
+pub fn Yaml::output(Self, &Logger) -> Unit
+pub fn Yaml::to_string(Self) -> String
 pub impl Compare for Yaml
 pub impl Show for Yaml
 
