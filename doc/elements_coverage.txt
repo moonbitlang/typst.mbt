@@ -27,7 +27,6 @@ smartquote.quotes: unmapped type Smart<SmartQuoteDict>
 highlight.top-edge: unmapped type TopEdge
 highlight.bottom-edge: unmapped type BottomEdge
 page.binding: unmapped type Smart<Binding>
-box.baseline: unmapped type BaselinePos
 image.icc: unmapped type Smart<Derived<DataSource, Bytes>>
 bibliography.target: unmapped type Smart<LocatableSelector>
 

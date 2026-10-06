@@ -812,6 +812,7 @@ let api_elems : ReadOnlyArray[ApiElem] = [
       ("body", "body", Pos, "&IntoContent"),
       ("width", "width", Named, "Sizing"),
       ("height", "height", Named, "Length"),
+      ("baseline", "baseline", Named, "Length"),
       ("fill", "fill", Named, "Paint"),
       ("stroke", "stroke", Named, "Sides[Stroke]"),
       ("radius", "radius", Named, "Corners[Length]"),
@@ -821,13 +822,16 @@ let api_elems : ReadOnlyArray[ApiElem] = [
     ],
     positional: ["body"],
     order: [
-      "body", "width", "height", "fill", "stroke", "radius", "inset", "outset", "clip",
+      "body", "width", "height", "baseline", "fill", "stroke", "radius", "inset",
+      "outset", "clip",
     ],
     settable: [
-      "body", "width", "height", "fill", "stroke", "radius", "inset", "outset", "clip",
+      "body", "width", "height", "baseline", "fill", "stroke", "radius", "inset",
+      "outset", "clip",
     ],
     where_: [
-      "width", "height", "fill", "stroke", "radius", "inset", "outset", "clip",
+      "width", "height", "baseline", "fill", "stroke", "radius", "inset", "outset",
+      "clip",
     ],
   },
   {

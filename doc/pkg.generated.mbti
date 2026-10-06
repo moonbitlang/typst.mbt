@@ -110,7 +110,7 @@ pub struct Box {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @builtin.Show for Box
 pub impl @debug.Debug for Box
 pub impl IntoContent for Box
@@ -1437,7 +1437,7 @@ pub struct Select {
 pub fn Select::align() -> Selector[AlignView]
 pub fn Select::bibliography(full? : Bool, style? : String, group? : String) -> Selector[BibliographyView]
 pub fn Select::block(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool) -> Selector[BlockView]
-pub fn Select::box(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
+pub fn Select::box(width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
 pub fn Select::circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[CircleView]
 pub fn Select::cite(form? : String, style? : String) -> Selector[CiteView]
 pub fn Select::colbreak(weak? : Bool) -> Selector[ColbreakView]
@@ -1578,7 +1578,7 @@ pub struct SetBox {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBox::SetBox(body? : &IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBox::SetBox(body? : &IntoContent, width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @debug.Debug for SetBox
 pub impl IntoContent for SetBox
 pub impl SetRule for SetBox

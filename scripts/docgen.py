@@ -153,6 +153,9 @@ LEAVES = {
     # A length or ratio; the function form goes through `extra`.
     "OutlineIndent": ("Length", to_value),
     "ScaleAmount": ("Length", to_value),
+    # The shift of a box's baseline (`box(baseline: 2pt)`); the alignment
+    # and `(at:, shift:)` forms go through `extra`.
+    "BaselinePos": ("Length", to_value),
 }
 
 # Variadic parameters of values: engine type -> (MoonBit array type,
@@ -365,7 +368,11 @@ ELEMENTS = [
              "body-less form). `spacing` is the external shorthand read by "
              "the `above`/`below` parsers. Twin: `block(.., body)`."),
     E("Box", "BoxElem", "box", pos=["body"],
-      review="`Box(body, ..)`: as `Block`. Twin: `box(.., body)`."),
+      review="`Box(body, ..)`: as `Block`. `baseline` is the shift form of "
+             "the field (`box(baseline: 2pt)`: how far the box is moved down "
+             "from the text baseline, a length or a ratio of the box's "
+             "height); the alignment form and the `(at:, shift:)` form go "
+             "through `extra`. Twin: `box(.., body)`."),
     E("Pad", "PadElem", "pad", ext=["x", "y", "rest"],
       review="`Pad(body, left?, .., x?, y?, rest?)`: `x`, `y` and `rest` are "
              "external shorthands read by the side parsers. Twin: "

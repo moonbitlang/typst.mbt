@@ -493,8 +493,7 @@ test "S6: `Prose` turns `'` after a digit into a prime" {
 // Section 2.3: typed API gaps, with the way around each that works today.
 
 ///|
-test "T1: `Box` has no typed `baseline`; `outset` and `extra` are the ways around" {
-  // (`box.baseline` is in doc/elements_coverage.txt: unmapped type.)
+test "T1: `Box(baseline=)` is typed; `outset` and `extra` still work" {
   let line = (chip : @doc.Box) => {
     listing(marks(compile([..small_page(), @doc.Par(@doc.Seq(["Mg ", chip]))])))
   }
@@ -526,18 +525,24 @@ test "T1: `Box` has no typed `baseline`; `outset` and `extra` are the ways aroun
       #|p1 text 28.9,16.6 w17.6 "chip"
     ),
   )
-  // `baseline` through `extra`: the box is moved down by that much.
+  // `baseline`: the box is moved down by that much.
   inspect(
-    line(
-      @doc.Box("chip", fill=Luma(220), extra=[
-        ("baseline", @doc.Value::length(Pt(3))),
-      ]),
-    ),
+    line(@doc.Box("chip", fill=Luma(220), baseline=Pt(3))),
     content=(
       #|p1 text 10.0,16.6 w15.9 "Mg "
       #|p1 rect 25.9,13.0 17.6x6.6 luma(86.27%)
       #|p1 text 25.9,19.6 w17.6 "chip"
     ),
+  )
+  // The same through `extra`, which also takes the forms of the field
+  // that the typed parameter does not (an alignment, `(at:, shift:)`).
+  assert_eq(
+    line(
+      @doc.Box("chip", fill=Luma(220), extra=[
+        ("baseline", @doc.Value::length(Pt(3))),
+      ]),
+    ),
+    line(@doc.Box("chip", fill=Luma(220), baseline=Pt(3))),
   )
 }
 

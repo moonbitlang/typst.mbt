@@ -7330,7 +7330,10 @@ pub fn Select::block(
 ///|
 /// `box`: An inline-level container that sizes content.
 ///
-/// `Box(body, ..)`: as `Block`. Twin: `box(.., body)`.
+/// `Box(body, ..)`: as `Block`. `baseline` is the shift form of the field
+/// (`box(baseline: 2pt)`: how far the box is moved down from the text
+/// baseline, a length or a ratio of the box's height); the alignment form and
+/// the `(at:, shift:)` form go through `extra`. Twin: `box(.., body)`.
 ///
 /// Explicit states besides a value:
 /// - `height`: `auto` as `Auto`
@@ -7345,6 +7348,7 @@ pub fn Box::Box(
   body : &IntoContent,
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7358,7 +7362,7 @@ pub fn Box::Box(
 ) -> Box {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 10, })
   } else {
     args.push({ name: None, value: Value::content(body), param: 0, })
   }
@@ -7368,25 +7372,28 @@ pub fn Box::Box(
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
+  if baseline is Some(v) {
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 3, })
+  }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 9, })
   }
-  push_extra(args, extra, 9, positional=["body"])
+  push_extra(args, extra, 10, positional=["body"])
   {
     content: labelled_call(
       {
@@ -7395,7 +7402,7 @@ pub fn Box::Box(
         origin: Site::new("Box", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -7432,6 +7439,7 @@ pub fn SetBox::SetBox(
   body? : &IntoContent,
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7444,7 +7452,7 @@ pub fn SetBox::SetBox(
 ) -> SetBox {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 10, })
   } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 0, })
   }
@@ -7454,25 +7462,28 @@ pub fn SetBox::SetBox(
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
+  if baseline is Some(v) {
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 3, })
+  }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 9, })
   }
-  push_extra(args, extra, 9, positional=["body"])
+  push_extra(args, extra, 10, positional=["body"])
   {
     node: {
       func: FElem(@library.box_elem()),
@@ -7530,6 +7541,7 @@ pub fn BoxView::view(self : BoxView) -> ContentView {
 pub fn Select::box(
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7543,6 +7555,9 @@ pub fn Select::box(
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
+  }
+  if baseline is Some(v) {
+    fields.push(("baseline", ToValue::to_value(v)))
   }
   if fill is Some(v) {
     fields.push(("fill", ToValue::to_value(v)))
