@@ -13,7 +13,7 @@ priv enum XRefError {
 ///|
 /// Parse the "root" xref from the PDF.
 fn root_xref(data : Bytes, password : Bytes) -> Result[XRef, XRefError] {
-  let xref_map = Map::new()
+  let xref_map = Map([])
   guard find_last_xref_pos(data[:]) is Some(xref_pos) else { Err(Unknown) }
   guard populate_xref_impl(data[:], xref_pos, xref_map) is Some(trailer) else {
     Err(Unknown)
@@ -51,7 +51,7 @@ fn fallback_xref_map_inner(
   password : Bytes,
 ) -> (Map[ObjectIdentifier, EntryType], XRefInput?) {
   let mut dummy_ctx = dummy_ctx
-  let mut xref_map : Map[ObjectIdentifier, EntryType] = Map::new()
+  let mut xref_map : Map[ObjectIdentifier, EntryType] = Map([])
   let trailer_dicts : Array[Dict] = []
   let mut root_ref : ObjectIdentifier? = None
   let mut r = Reader::new(data[:])
@@ -255,7 +255,7 @@ fn XRef::new(
   // and then populate the data.
   let repr : SomeRepr = {
     data,
-    decoded: Map::new(),
+    decoded: Map([]),
     xref_map,
     repaired,
     decryptor: NoDecryptor,
@@ -387,7 +387,7 @@ pub fn XRef::objects(self : XRef) -> Array[Object] {
           r.xref_map.get(ObjectIdentifier::new(id.reinterpret_as_int(), 0)) {
           Some(Normal(offset)) =>
             (offset.to_int64(), index.reinterpret_as_int())
-          _ => (@int64.max_value, 0)
+          _ => (@int64.MAX_VALUE, 0)
         }
     }
     elements.push((id, offset))
@@ -441,7 +441,7 @@ pub fn XRef::decrypt(
   target : DecryptionTarget,
 ) -> Bytes? {
   match self.inner {
-    None => Some(data.to_bytes())
+    None => Some(data.to_owned())
     Some(r) => r.decryptor.decrypt(id, data, target)
   }
 }
@@ -531,7 +531,7 @@ fn XRef::decoded_object_stream(
     None => {
       let stream : Stream? = self.get_with(id, ctx)
       let decoded = match stream {
-        Some(stream) => stream.decoded().to_option().map(d => d.to_bytes()[:])
+        Some(stream) => stream.decoded().to_option().map(d => d.to_owned()[:])
         None => None
       }
       repr.decoded[id] = decoded
@@ -619,7 +619,7 @@ fn populate_xref_impl(
   pos : Int,
   xref_map : Map[ObjectIdentifier, EntryType],
 ) -> BytesView? {
-  let visited = @hashset.new()
+  let visited = @hashset.HashSet([])
   populate_xref_impl_inner(data, pos, xref_map, visited)
 }
 

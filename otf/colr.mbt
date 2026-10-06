@@ -196,6 +196,16 @@ pub(all) enum GradientExtend {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientExtend with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientExtend with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for GradientExtend with fn size() {
   1
 }
@@ -209,6 +219,11 @@ pub impl FromData for GradientExtend with fn parse(data) {
     _ => raise Malformed
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientExtend with FromData::{size, parse}
 
 ///|
 /// A [color stop](
@@ -331,6 +346,11 @@ pub(all) struct ColorStop {
   /// The color of the color stop.
   color : RgbaColor
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorStop with @debug.Debug::{to_repr}
 
 ///|
 /// A [linear gradient](https://learn.microsoft.com/en-us/typography/opentype/spec/colr#formats-4-and-5-paintlineargradient-paintvarlineargradient)
@@ -550,6 +570,16 @@ pub(all) enum CompositeMode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeMode with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for CompositeMode with fn size() {
   1
 }
@@ -588,6 +618,11 @@ pub impl FromData for CompositeMode with fn parse(data) {
     _ => raise Malformed
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeMode with FromData::{size, parse}
 
 ///|
 /// A trait for color glyph painting (`colr::Painter`).

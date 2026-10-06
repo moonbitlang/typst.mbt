@@ -213,6 +213,12 @@ pub impl Show for XmlError with fn output(self, logger) {
 }
 
 ///|
+// `to_string` is not named here: the type already has a method of this name.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend XmlError with Show::{output}
+
+///|
 /// Parsing options (upstream `ParsingOptions`).
 ///
 /// The upstream `entity_resolver` option is not supported: external entities

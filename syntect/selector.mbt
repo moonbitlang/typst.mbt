@@ -12,12 +12,22 @@ pub(all) struct ScopeSelector {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeSelector with Eq::{not_equal, equal}
+
+///|
 /// A selector set that matches anything matched by any of its component
 /// selectors.
 pub(all) struct ScopeSelectors {
   /// The selectors, if any of them match, that this matches
   selectors : Array[ScopeSelector]
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeSelectors with Eq::{not_equal, equal}
 
 ///|
 /// Checks if this selector matches the given stack, returning the match

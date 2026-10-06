@@ -52,42 +52,42 @@ pub fn rintf(x : Float) -> Float {
 
 ///|
 pub fn sinf(x : Float) -> Float {
-  @math.sin(x.to_double()).to_float()
+  Float::from_double(@math.sin(x.to_double()))
 }
 
 ///|
 pub fn cosf(x : Float) -> Float {
-  @math.cos(x.to_double()).to_float()
+  Float::from_double(@math.cos(x.to_double()))
 }
 
 ///|
 pub fn tanf(x : Float) -> Float {
-  @math.tan(x.to_double()).to_float()
+  Float::from_double(@math.tan(x.to_double()))
 }
 
 ///|
 pub fn acosf(x : Float) -> Float {
-  @math.acos(x.to_double()).to_float()
+  Float::from_double(@math.acos(x.to_double()))
 }
 
 ///|
 pub fn atan2f(y : Float, x : Float) -> Float {
-  @math.atan2(y.to_double(), x.to_double()).to_float()
+  Float::from_double(@math.atan2(y.to_double(), x.to_double()))
 }
 
 ///|
 pub fn powf(x : Float, y : Float) -> Float {
-  @math.pow(x.to_double(), y.to_double()).to_float()
+  Float::from_double(@math.pow(x.to_double(), y.to_double()))
 }
 
 ///|
 pub fn fmaf(x : Float, y : Float, z : Float) -> Float {
-  (x.to_double() * y.to_double() + z.to_double()).to_float()
+  Float::from_double(x.to_double() * y.to_double() + z.to_double())
 }
 
 ///|
 pub fn fmodf(x : Float, y : Float) -> Float {
   let xd = x.to_double()
   let yd = y.to_double()
-  (xd - (xd / yd).trunc() * yd).to_float()
+  Float::from_double(xd - (xd / yd).trunc() * yd)
 }

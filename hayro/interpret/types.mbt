@@ -141,7 +141,7 @@ pub fn RasterImage::height(self : RasterImage) -> Int {
 
 ///|
 pub impl CacheKey for RasterImage with fn cache_key(self) {
-  self.obj.cache_key()
+  CacheKey::cache_key(self.obj)
 }
 
 ///|
@@ -356,6 +356,9 @@ pub impl Default for StrokeProps with fn default() {
     dash_offset: 0.0,
   }
 }
+
+///|
+pub extend StrokeProps with Default::{default}
 
 ///|
 /// A fill rule.

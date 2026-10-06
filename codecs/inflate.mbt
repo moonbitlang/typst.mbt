@@ -12,6 +12,11 @@ pub(all) suberror InflateError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InflateError with @debug.Debug::{to_repr}
+
+///|
 /// Decompresses a zlib stream. With `verify_checksum`, the Adler-32 trailer
 /// must match and no bytes may hide between the DEFLATE body and the trailer;
 /// without it (like the `png` crate's default for image data), the DEFLATE

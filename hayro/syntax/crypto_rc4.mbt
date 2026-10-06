@@ -39,7 +39,7 @@ fn Rc4::decrypt(self : Rc4, data : BytesView) -> Bytes {
     self.s[self.b] = tmp
     output[i] = data[i] ^ self.s[(tmp + tmp2) & 0xff].to_byte()
   }
-  Bytes::from_fixedarray(output)
+  Bytes::from_array(output)
 }
 
 ///|

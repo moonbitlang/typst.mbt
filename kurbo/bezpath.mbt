@@ -17,6 +17,16 @@ pub(all) enum PathEl {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathEl with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathEl with @debug.Debug::{to_repr}
+
+///|
 /// Is this path element finite?
 pub fn PathEl::is_finite(self : PathEl) -> Bool {
   match self {
@@ -57,6 +67,16 @@ pub fn PathEl::transform(self : PathEl, t : Affine) -> PathEl {
 pub struct BezPath {
   priv elements : Array[PathEl]
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BezPath with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BezPath with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new path.
@@ -187,6 +207,16 @@ pub(all) enum PathSeg {
   /// A cubic bezier segment.
   Cubic(CubicBez)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSeg with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSeg with @debug.Debug::{to_repr}
 
 ///|
 /// Transform path elements into path segments.

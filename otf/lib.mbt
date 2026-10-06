@@ -12,6 +12,31 @@
 pub(all) struct GlyphId(UInt16) derive(Eq, Compare, Hash, Default, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for GlyphId with fn size() {
   2
 }
@@ -20,6 +45,11 @@ pub impl FromData for GlyphId with fn size() {
 pub impl FromData for GlyphId with fn parse(data) {
   GlyphId(FromData::parse(data))
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with FromData::{size, parse}
 
 ///|
 /// A TrueType font magic.
@@ -55,6 +85,26 @@ impl FromData for Magic with fn parse(data) {
 ///
 /// The number is stored as f2.16
 pub struct NormalizedCoordinate(Int16) derive(Eq, Default, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedCoordinate with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedCoordinate with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedCoordinate with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedCoordinate with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new coordinate.
@@ -127,8 +177,36 @@ pub(all) struct Variation {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variation with @debug.Debug::{to_repr}
+
+///|
 /// A 4-byte tag.
 pub(all) struct Tag(UInt) derive(Eq, Compare, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Eq::{not_equal, equal}
+
+///|
+pub extend Tag with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Default::{default}
 
 ///|
 /// Creates a `Tag` from bytes.
@@ -206,9 +284,17 @@ pub impl Show for Tag with fn output(self, logger) {
 }
 
 ///|
+pub extend Tag with Show::{to_string, output}
+
+///|
 pub impl Debug for Tag with fn to_repr(self) {
   Repr::literal("Tag(\{self})")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for Tag with fn size() {
@@ -219,6 +305,11 @@ pub impl FromData for Tag with fn size() {
 pub impl FromData for Tag with fn parse(data) {
   Tag(FromData::parse(data))
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with FromData::{size, parse}
 
 ///|
 /// A line metrics.
@@ -232,6 +323,16 @@ pub(all) struct LineMetrics {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineMetrics with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineMetrics with @debug.Debug::{to_repr}
+
+///|
 /// A rectangle.
 ///
 /// Doesn't guarantee that `x_min` <= `x_max` and/or `y_min` <= `y_max`.
@@ -241,6 +342,21 @@ pub(all) struct Rect {
   x_max : Int16
   y_max : Int16
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Hash::{hash, hash_combine}
 
 ///|
 fn Rect::zero() -> Rect {
@@ -271,6 +387,16 @@ pub(all) struct RectF {
   /// The vertical maximum of the rect.
   mut y_max : Float
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RectF with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RectF with @debug.Debug::{to_repr}
 
 ///|
 let f32_max : Float = Float::reinterpret_from_uint(0x7f7fffff)
@@ -352,6 +478,11 @@ pub(all) struct Transform {
   /// The 'f' component of the transform.
   f : Float
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
 
 ///|
 /// Creates a new transform with the specified components.
@@ -439,11 +570,19 @@ pub impl Default for Transform with fn default() {
 }
 
 ///|
+pub extend Transform with Default::{default}
+
+///|
 pub impl Debug for Transform with fn to_repr(self) {
   Repr::literal(
     "Transform(\{self.a} \{self.b} \{self.c} \{self.d} \{self.e} \{self.f})",
   )
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with @debug.Debug::{to_repr}
 
 ///|
 /// A float point.
@@ -453,6 +592,16 @@ pub(all) struct PointF {
   /// The Y-axis coordinate.
   mut y : Float
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PointF with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PointF with @debug.Debug::{to_repr}
 
 ///|
 /// Phantom points.
@@ -470,6 +619,11 @@ pub(all) struct PhantomPoints {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PhantomPoints with @debug.Debug::{to_repr}
+
+///|
 /// A RGBA color in the sRGB color space.
 pub(all) struct RgbaColor {
   mut red : Byte
@@ -477,6 +631,21 @@ pub(all) struct RgbaColor {
   mut blue : Byte
   mut alpha : Byte
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RgbaColor with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RgbaColor with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RgbaColor with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new `RgbaColor`.
@@ -566,6 +735,16 @@ pub(all) enum RasterImageFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterImageFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterImageFormat with @debug.Debug::{to_repr}
+
+///|
 /// A glyph's raster image.
 ///
 /// Note, that glyph metrics are in pixels and not in font units.
@@ -600,6 +779,11 @@ pub(all) struct TableRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableRecord with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for TableRecord with fn size() {
   16
 }
@@ -609,6 +793,11 @@ pub impl FromData for TableRecord with fn parse(data) {
   let s = Stream::new(data)
   { tag: s.read(), check_sum: s.read(), offset: s.read(), length: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableRecord with FromData::{size, parse}
 
 ///|
 /// A list of font face parsing errors.
@@ -630,6 +819,16 @@ pub(all) suberror FaceParsingError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FaceParsingError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FaceParsingError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for FaceParsingError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -642,3 +841,8 @@ pub impl Show for FaceParsingError with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FaceParsingError with Show::{to_string, output}

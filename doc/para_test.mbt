@@ -1,13 +1,7 @@
 // `Para` (docs/edsl-ports.md, section 3.1): the same paragraph as
 // `Par(Prose(..))`, from one call site. Each test compares the two forms.
 // The comparison of source characters, which needs the source file, is in
-// `doc/examples/review`.
-
-///|
-/// The representation of what a document lowers to (no spans in it).
-fn lowered(children : Array[&@doc.IntoContent]) -> String raise {
-  @doc.Document(children).lower(@doc.DocWorld::in_memory()).unwrap().repr()
-}
+// `doc/examples/review`. (`lowered` is the helper of `ports_test.mbt`.)
 
 ///|
 test "para: the content of Par(Prose(..)), with the options of both" {
@@ -105,15 +99,25 @@ test "para: a blank line in the text is not a second paragraph" {
   // The text of a `Prose` has a paragraph break at a blank line, and a
   // `par` cannot hold one: the engine's warning, at the text, and one
   // paragraph without the break. `Par(Prose(..))` is the same.
-  let report = compile(
-    [..small_page(), @doc.Para("One ends here.\n\nTwo starts here.")],
-  )
+  let line = line_here() + 1
+  let para = @doc.Para("One ends here.\n\nTwo starts here.")
+  let report = compile([..small_page(), para])
   inspect(error_messages(report), content="")
+  // The warning is the engine's, in `warnings`, and the only one; its
+  // location is the text argument of the `Para` call.
+  assert_eq(report.warnings.length(), 1)
+  assert_true(report.warnings[0].severity == Warning)
   inspect(
     warning_messages(report),
     content="parbreak may not occur inside of a paragraph and was ignored",
   )
-  inspect(what(origin_of(report.warnings[0])), content="(Para, argument 1)")
+  let at = origin_of(report.warnings[0])
+  inspect(what(at), content="(Para, argument 1)")
+  assert_eq(at.kind, "Para")
+  assert_eq(at.file, "doc/para_test.mbt")
+  assert_eq(at.start_line, line)
+  // It is no lint.
+  assert_eq(report.lints.length(), 0)
   inspect(
     listing(marks(report)),
     content=(

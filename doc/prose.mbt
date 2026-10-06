@@ -394,6 +394,11 @@ pub impl @builtin.Show for Context with fn output(self, logger) {
 }
 
 ///|
+pub impl @builtin.Show for Layout with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 pub impl @builtin.Show for CounterStep with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }

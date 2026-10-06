@@ -50,6 +50,20 @@ pub fn Length::scale(self : Length, factor : Double) -> Length {
 }
 
 ///|
+/// The length as a track or box size: `Rel(self)` of [Sizing]. For a helper
+/// that computes a `Length` and passes it where a `Sizing` is expected
+/// (`columns=[width.sizing(), Fr(1)]`).
+pub fn Length::sizing(self : Length) -> Sizing {
+  Rel(self)
+}
+
+///|
+/// The length as a spacing: `Rel(self)` of [Spacing] (`V(gap.spacing())`).
+pub fn Length::spacing(self : Length) -> Spacing {
+  Rel(self)
+}
+
+///|
 pub impl ToValue for Length with fn to_value(self) {
   match self {
     Auto => Value::auto()

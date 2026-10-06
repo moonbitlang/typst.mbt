@@ -97,6 +97,21 @@ pub struct MemoryType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryType with @debug.Debug::{to_repr}
+
+///|
 /// A builder for [`MemoryType`]s.
 ///
 /// Constructed via [`MemoryType::builder`] or via [`MemoryTypeBuilder::default`].

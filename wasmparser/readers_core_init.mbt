@@ -12,6 +12,11 @@ pub impl Eq for ConstExpr with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ConstExpr with Eq::{not_equal, equal}
+
+///|
 /// Constructs a new `ConstExpr` from the given data and offset.
 pub fn ConstExpr::new(reader : BinaryReader) -> ConstExpr {
   { reader, }
@@ -35,3 +40,6 @@ pub impl FromReader for ConstExpr with fn from_reader(reader) {
   let reader = reader.skip(r => r.skip_const_expr())
   { reader, }
 }
+
+///|
+pub extend ConstExpr with FromReader::{from_reader}

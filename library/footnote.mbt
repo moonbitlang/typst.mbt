@@ -25,12 +25,18 @@ pub impl Reflect for FootnoteBody with fn castable(v) {
 }
 
 ///|
+pub extend FootnoteBody with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FootnoteBody with fn into_value(self) {
   match self {
     Content(v) => Content(v)
     Reference(v) => Label(v)
   }
 }
+
+///|
+pub extend FootnoteBody with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FootnoteBody with fn from_value(v) {

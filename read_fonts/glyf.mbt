@@ -358,6 +358,16 @@ pub(all) enum Anchor {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Anchor with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Anchor with @debug.Debug::{to_repr}
+
+///|
 /// Transform for a composite component (2.14 values).
 pub(all) struct ComponentTransform {
   xx : F2Dot14
@@ -367,6 +377,16 @@ pub(all) struct ComponentTransform {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentTransform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentTransform with @debug.Debug::{to_repr}
+
+///|
 /// A reference to another glyph. Part of [CompositeGlyph].
 pub(all) struct Component {
   flags : Int
@@ -374,6 +394,16 @@ pub(all) struct Component {
   anchor : Anchor
   transform : ComponentTransform
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the components of the composite glyph.

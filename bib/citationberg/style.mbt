@@ -80,6 +80,9 @@ pub impl Show for StyleValidationError with fn output(self, logger) {
 }
 
 ///|
+pub extend StyleValidationError with Show::{to_string, output}
+
+///|
 /// A style with its own formatting rules.
 pub(all) struct IndependentStyleSettings {
   /// How the citations are displayed.
@@ -276,6 +279,9 @@ pub(all) enum PageRangeFormat {
 pub impl Default for PageRangeFormat with fn default() {
   Expanded
 }
+
+///|
+pub extend PageRangeFormat with Default::{default}
 
 ///|
 /// Use a page range format to format a range of pages.
@@ -1097,6 +1103,9 @@ pub impl Default for DateParts with fn default() {
 }
 
 ///|
+pub extend DateParts with Default::{default}
+
+///|
 /// Check if the date shall contain a month.
 pub fn DateParts::has_month(self : DateParts) -> Bool {
   self is (YearMonth | YearMonthDay)
@@ -1567,6 +1576,9 @@ pub impl Default for Name with fn default() {
 }
 
 ///|
+pub extend Name with Default::{default}
+
+///|
 /// Retrieve [`NamePart`] configuration for the given name.
 pub fn Name::name_part_given(self : Name) -> NamePart? {
   for p in self.parts {
@@ -1683,6 +1695,9 @@ pub impl Default for InheritableNameOptions with fn default() {
     sort_separator: None,
   }
 }
+
+///|
+pub extend InheritableNameOptions with Default::{default}
 
 ///|
 /// Definite name options. Obtain from [`Name::options`] using
@@ -2496,6 +2511,9 @@ pub impl Default for Formatting with fn default() {
 }
 
 ///|
+pub extend Formatting with Default::{default}
+
+///|
 /// Check if this formatting is empty.
 pub fn Formatting::is_empty(self : Formatting) -> Bool {
   self.font_style is None &&
@@ -2606,6 +2624,9 @@ pub(all) struct Affixes {
 pub impl Default for Affixes with fn default() {
   { prefix: None, suffix: None, }
 }
+
+///|
+pub extend Affixes with Default::{default}
 
 ///|
 /// On which layout level to display the citation.

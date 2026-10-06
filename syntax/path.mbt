@@ -48,13 +48,23 @@ pub fn RootedPath::map(
 }
 
 ///|
+/// Upstream `Debug for RootedPath` (typst-syntax/src/path.rs:62); the text
+/// is that of the `Show` impl below.
+pub impl @debug.Debug for RootedPath with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
+}
+
+///|
 /// Upstream `Debug for RootedPath`.
 pub impl Show for RootedPath with fn output(self, logger) {
   match self.root {
     Project => Show::output(self.vpath, logger)
-    Package(package) => logger.write_string("\{package}\{self.vpath}")
+    Package(package_) => logger.write_string("\{package_}\{self.vpath}")
   }
 }
+
+///|
+pub extend RootedPath with Show::{to_string, output}
 
 ///|
 /// The root of a virtual file system.
@@ -360,10 +370,20 @@ pub fn VirtualPath::relative_from(
 }
 
 ///|
+/// Upstream `Debug for VirtualPath` (typst-syntax/src/path.rs:386); the
+/// text is that of the `Show` impl below.
+pub impl @debug.Debug for VirtualPath with fn to_repr(self) {
+  @debug.Repr::literal(self.to_string())
+}
+
+///|
 /// Upstream `Debug for VirtualPath`: the path with slash, debug-quoted.
 pub impl Show for VirtualPath with fn output(self, logger) {
   logger.write_string(@unicode.rust_debug_str(self.get_with_slash()))
 }
+
+///|
+pub extend VirtualPath with Show::{to_string, output}
 
 ///|
 /// A component in a virtual path.
@@ -595,6 +615,9 @@ pub impl Show for PathError with fn output(self, logger) {
 }
 
 ///|
+pub extend PathError with Show::{to_string, output}
+
+///|
 /// An error that can occur in [`VirtualPath::virtualize`].
 pub(all) suberror VirtualizeError {
   /// A normal path error.
@@ -618,6 +641,9 @@ pub impl Show for VirtualizeError with fn output(self, logger) {
     Utf8 => logger.write_string("path contains non-UTF-8 bytes")
   }
 }
+
+///|
+pub extend VirtualizeError with Show::{to_string, output}
 
 ///|
 /// An error that can occur in [`VirtualPath::realize`].

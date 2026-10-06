@@ -63,6 +63,21 @@ fn combine_type_sizes(
 pub(all) struct ValidatorId(Int) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValidatorId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValidatorId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValidatorId with @debug.Debug::{to_repr}
+
+///|
 let validator_id_counter : Ref[Int] = { val: 0, }
 
 ///|

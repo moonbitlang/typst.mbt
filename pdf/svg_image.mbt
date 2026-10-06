@@ -187,7 +187,7 @@ fn krilla_sampled(
     }
   }
   let alpha = if has_alpha && (sixteen || !all_opaque) {
-    Some(Bytes::from_fixedarray(alpha_buf))
+    Some(Bytes::from_array(alpha_buf))
   } else {
     None
   }
@@ -200,7 +200,7 @@ fn krilla_sampled(
     } else {
       Luma
     },
-    data: Samples(Bytes::from_fixedarray(color_buf), alpha),
+    data: Samples(Bytes::from_array(color_buf), alpha),
     icc: if sixteen {
       None
     } else {

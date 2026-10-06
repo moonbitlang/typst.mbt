@@ -183,6 +183,9 @@ pub impl[T : IntoValue + Eq] IntoValue for Margin[T] with fn into_value(self) {
 }
 
 ///|
+pub extend Margin with IntoValue::{into_value}
+
+///|
 pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
   if castable_of((Ty::new() : Ty[T]), value) {
     let v = T::from_value(value)
@@ -239,6 +242,9 @@ pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
   )
 }
 
+///|
+pub extend Margin with FromValue::{from_value}
+
 // Binding
 
 ///|
@@ -279,6 +285,9 @@ pub impl Reflect for PageBinding with fn castable(v) {
 }
 
 ///|
+pub extend PageBinding with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PageBinding with fn into_value(self) {
   match self {
     Left => Dyn(Alignment(alignment_left))
@@ -316,6 +325,9 @@ pub impl Reflect for PageRanges with fn output() {
 pub impl Reflect for PageRanges with fn castable(v) {
   PageRange::castable(v) || v is Array(_)
 }
+
+///|
+pub extend PageRanges with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PageRanges with fn into_value(self) {
@@ -375,6 +387,9 @@ pub impl Reflect for PageRange with fn castable(v) {
 }
 
 ///|
+pub extend PageRange with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PageRange with fn into_value(self) {
   let nr = (n : Int?) => {
     match n {
@@ -384,6 +399,9 @@ pub impl IntoValue for PageRange with fn into_value(self) {
   }
   Dict(Dict::from_pairs([("from", nr(self.start)), ("to", nr(self.end))]))
 }
+
+///|
+pub extend PageRange with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PageRange with fn from_value(v) {
@@ -416,6 +434,9 @@ pub impl FromValue for PageRange with fn from_value(v) {
     v => raise HintedError(PageRange::input().error(v))
   }
 }
+
+///|
+pub extend PageRange with FromValue::{from_value}
 
 ///|
 fn parse_page_number(nr : Int64) -> Int raise HintedError {
@@ -456,6 +477,9 @@ pub impl Reflect for Parity with fn output() {
 pub impl Reflect for Parity with fn castable(v) {
   str_names_find(parity_names, v) is Some(_)
 }
+
+///|
+pub extend Parity with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Parity with fn into_value(self) {
@@ -541,9 +565,15 @@ pub impl Reflect for Paper with fn castable(v) {
 }
 
 ///|
+pub extend Paper with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Paper with fn into_value(self) {
   Str(self.name)
 }
+
+///|
+pub extend Paper with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Paper with fn from_value(v) {

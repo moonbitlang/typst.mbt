@@ -133,6 +133,9 @@ pub impl IntoValue for PathOrStr with fn into_value(self) {
 }
 
 ///|
+pub extend PathOrStr with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PathOrStr with fn from_value(v) {
   if path_castable_of((Ty::new() : Ty[RootedPath]), v) {
     Path(v.cast())
@@ -235,6 +238,9 @@ pub impl FromValue for BundlePath with fn from_value(v) {
   }
   BundlePath::new(path)
 }
+
+///|
+pub extend BundlePath with FromValue::{from_value}
 
 ///|
 /// Format the user-facing error message for virtual path casts.

@@ -134,8 +134,16 @@ pub impl Show for Trap with fn output(self, logger) {
 }
 
 ///|
+pub extend Trap with Show::{to_string, output}
+
+///|
 /// An invalid [`TrapCode`] integer value.
 pub(all) suberror InvalidTrapCode derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InvalidTrapCode with @debug.Debug::{to_repr}
 
 ///|
 /// Error type which can be thrown by wasm code or by host environment.
@@ -210,6 +218,21 @@ pub(all) suberror TrapCode {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrapCode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrapCode with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrapCode with @debug.Debug::{to_repr}
+
+///|
 /// `impl From<TrapCode> for u8`
 pub fn TrapCode::to_u8(self : TrapCode) -> Byte {
   match self {
@@ -274,3 +297,6 @@ pub fn TrapCode::trap_message(self : TrapCode) -> String {
 pub impl Show for TrapCode with fn output(self, logger) {
   logger.write_string(self.trap_message())
 }
+
+///|
+pub extend TrapCode with Show::{to_string, output}

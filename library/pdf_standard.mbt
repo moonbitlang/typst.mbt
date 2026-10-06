@@ -22,6 +22,9 @@ pub impl Default for PdfVersion with fn default() {
 }
 
 ///|
+pub extend PdfVersion with Default::{default}
+
+///|
 let pdf_version_min : PdfVersion = Pdf14
 
 ///|
@@ -292,6 +295,9 @@ pub impl Default for PdfStandards with fn default() {
 }
 
 ///|
+pub extend PdfStandards with Default::{default}
+
+///|
 fn pdf_format_elem_standard_default() -> Value {
   PdfStandards::default().into_value()
 }
@@ -412,9 +418,15 @@ pub impl Reflect for PdfStandards with fn castable(v) {
 }
 
 ///|
+pub extend PdfStandards with Reflect::{input, castable}
+
+///|
 pub impl IntoValue for PdfStandards with fn into_value(self) {
   Array(Arr::from_array(self.standards().map(s => s.into_value())))
 }
+
+///|
+pub extend PdfStandards with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PdfStandards with fn from_value(v) {
@@ -557,6 +569,9 @@ pub impl Reflect for PdfStandard with fn castable(v) {
 }
 
 ///|
+pub extend PdfStandard with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PdfStandard with fn into_value(self) {
   for entry in pdf_standard_casts[:] {
     if entry.1 == self {
@@ -565,6 +580,9 @@ pub impl IntoValue for PdfStandard with fn into_value(self) {
   }
   abort("unreachable")
 }
+
+///|
+pub extend PdfStandard with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PdfStandard with fn from_value(v) {
@@ -658,6 +676,9 @@ pub impl Reflect for AttachedFileRelationship with fn output() {
 pub impl Reflect for AttachedFileRelationship with fn castable(v) {
   v is Str("source" | "data" | "alternative" | "supplement")
 }
+
+///|
+pub extend AttachedFileRelationship with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for AttachedFileRelationship with fn into_value(self) {

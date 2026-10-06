@@ -97,6 +97,11 @@ pub impl Show for FuelCostsProvider with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuelCostsProvider with Show::{to_string, output}
+
+///|
 /// Applies `f` to either `self.custom` or [`DefaultFuelCosts`] if `self.custom` is `None`.
 fn FuelCostsProvider::apply(
   self : FuelCostsProvider,
@@ -209,6 +214,11 @@ pub(all) suberror FuelError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuelError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for FuelError with fn output(self, logger) {
   match self {
     FuelMeteringDisabled => logger.write_string("fuel metering is disabled")
@@ -216,6 +226,9 @@ pub impl Show for FuelError with fn output(self, logger) {
       logger.write_string("ouf of fuel. required=\{required_fuel}")
   }
 }
+
+///|
+pub extend FuelError with Show::{to_string, output}
 
 ///|
 /// Returns an error indicating that fuel metering has been disabled.

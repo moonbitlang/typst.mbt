@@ -20,6 +20,21 @@ pub(all) struct Point {
 } derive(Eq, Debug, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Default::{default}
+
+///|
 /// Creates a new `Point`.
 pub fn Point::from_xy(x : Float, y : Float) -> Point {
   { x, y, }
@@ -225,9 +240,19 @@ pub impl Neg for Point with fn neg(self) {
 }
 
 ///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Neg::{neg}
+
+///|
 pub impl Add for Point with fn add(self, other) {
   Point::from_xy(self.x + other.x, self.y + other.y)
 }
+
+///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Add::{add}
 
 ///|
 pub impl Sub for Point with fn sub(self, other) {
@@ -235,6 +260,16 @@ pub impl Sub for Point with fn sub(self, other) {
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Sub::{sub}
+
+///|
 pub impl Mul for Point with fn mul(self, other) {
   Point::from_xy(self.x * other.x, self.y * other.y)
 }
+
+///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Mul::{mul}

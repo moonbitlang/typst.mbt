@@ -39,6 +39,16 @@ pub(all) suberror CssError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssError with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `Display`.
 pub impl Show for CssError with fn output(self, logger) {
   match self {
@@ -64,6 +74,9 @@ pub impl Show for CssError with fn output(self, logger) {
 }
 
 ///|
+pub extend CssError with Show::{to_string, output}
+
+///|
 /// A position in text.
 ///
 /// Position indicates a row/line and a column in the original text. Starting
@@ -72,6 +85,16 @@ pub(all) struct TextPos {
   row : UInt
   col : UInt
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs a new `TextPos`.
@@ -86,12 +109,27 @@ pub impl Show for TextPos with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with Show::{to_string, output}
+
+///|
 /// A declaration.
 pub(all) struct Declaration {
   name : String
   value : String
   important : Bool
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Declaration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Declaration with @debug.Debug::{to_repr}
 
 ///|
 /// A rule.
@@ -103,11 +141,21 @@ pub(all) struct Rule {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rule with @debug.Debug::{to_repr}
+
+///|
 /// A style sheet.
 pub(all) struct StyleSheet {
   /// A list of rules.
   mut rules : Array[Rule]
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleSheet with @debug.Debug::{to_repr}
 
 ///|
 /// Creates an empty style sheet.
@@ -195,6 +243,11 @@ pub impl Show for StyleSheet with fn output(self, logger) {
     }
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleSheet with Show::{to_string, output}
 
 ///|
 fn consume_statement(s : Stream, rules : Array[Rule]) -> Unit raise CssError {

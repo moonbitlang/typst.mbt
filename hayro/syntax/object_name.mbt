@@ -30,7 +30,7 @@ pub fn Name::from_string(s : String) -> Name {
 ///|
 /// Create a new name from bytes that may contain escape sequences.
 pub fn Name::new_escaped(data : BytesView) -> Name? {
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   let r = Reader::new(data)
   while r.read_byte() is Some(b) {
     if b == b'#' {
@@ -91,9 +91,15 @@ pub impl Readable for Name with fn read(r, _) {
 }
 
 ///|
+pub extend Name with Readable::{read}
+
+///|
 pub impl Skippable for Name with fn skip(r, _) {
   skip_name_like(r, true)
 }
+
+///|
+pub extend Name with Skippable::{skip}
 
 ///|
 pub impl ObjectLike for Name with fn from_object(o) {

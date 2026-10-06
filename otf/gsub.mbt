@@ -60,6 +60,11 @@ pub impl FromSlice for Sequence with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sequence with FromSlice::{parse_slice}
+
+///|
 /// A list of [`Sequence`] tables.
 pub type SequenceList = LazyOffsetArray16[Sequence]
 
@@ -101,6 +106,11 @@ pub impl FromSlice for AlternateSet with fn parse_slice(data) {
   let alternates = s.read_array16(count)
   { alternates, }
 }
+
+///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AlternateSet with FromSlice::{parse_slice}
 
 ///|
 /// A set of [`AlternateSet`].
@@ -146,6 +156,11 @@ pub impl FromSlice for Ligature with fn parse_slice(data) {
   let components = s.read_array16(req(u16_checked_sub(count, 1)))
   { glyph, components, }
 }
+
+///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ligature with FromSlice::{parse_slice}
 
 ///|
 /// A [`Ligature`] set.
@@ -231,6 +246,11 @@ pub(all) enum SubstitutionSubtable {
 pub impl LookupSubtable for SubstitutionSubtable with fn parse(data, kind) {
   substitution_subtable_parse(data, kind)
 }
+
+///|
+#deprecated("call as `LookupSubtable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubstitutionSubtable with LookupSubtable::{parse}
 
 ///|
 fn substitution_subtable_parse(

@@ -21,6 +21,9 @@ pub impl Default for FontStyle with fn default() {
 }
 
 ///|
+pub extend FontStyle with Default::{default}
+
+///|
 let font_style_names : ReadOnlyArray[String] = ["normal", "italic", "oblique"]
 
 ///|
@@ -39,6 +42,9 @@ pub impl Reflect for FontStyle with fn castable(v) {
 }
 
 ///|
+pub extend FontStyle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontStyle with fn into_value(self) {
   Str(
     match self {
@@ -48,6 +54,9 @@ pub impl IntoValue for FontStyle with fn into_value(self) {
     },
   )
 }
+
+///|
+pub extend FontStyle with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontStyle with fn from_value(v) {
@@ -126,6 +135,9 @@ pub impl Default for FontWeight with fn default() {
 }
 
 ///|
+pub extend FontWeight with Default::{default}
+
+///|
 /// Create a font weight from a number between 100 and 900, clamping it if
 /// necessary.
 pub fn FontWeight::from_number(weight : Int) -> FontWeight {
@@ -166,6 +178,9 @@ pub impl Reflect for FontWeight with fn castable(v) {
 }
 
 ///|
+pub extend FontWeight with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontWeight with fn into_value(self) {
   if self.0 % 100 == 0 && self.0 >= 100 && self.0 <= 900 {
     Str(font_weight_names[self.0 / 100 - 1])
@@ -173,6 +188,9 @@ pub impl IntoValue for FontWeight with fn into_value(self) {
     Int(self.0.to_int64())
   }
 }
+
+///|
+pub extend FontWeight with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontWeight with fn from_value(v) {
@@ -187,6 +205,9 @@ pub impl FromValue for FontWeight with fn from_value(v) {
 }
 
 ///|
+pub extend FontWeight with FromValue::{from_value}
+
+///|
 /// The width of a font (stored in thousandths, 500 - 2000).
 pub(all) struct FontStretch(Int) derive(Eq, Hash, Compare, Debug)
 
@@ -198,6 +219,9 @@ pub let font_stretch_normal : FontStretch = FontStretch(1000)
 pub impl Default for FontStretch with fn default() {
   font_stretch_normal
 }
+
+///|
+pub extend FontStretch with Default::{default}
 
 ///|
 /// Create a font stretch from a ratio between 0.5 and 2.0, clamping it if
@@ -239,9 +263,15 @@ pub impl Reflect for FontStretch with fn castable(v) {
 }
 
 ///|
+pub extend FontStretch with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontStretch with fn into_value(self) {
   Ratio(self.to_ratio())
 }
+
+///|
+pub extend FontStretch with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontStretch with fn from_value(v) {
@@ -296,6 +326,9 @@ pub impl Reflect for OpenTypeTag with fn castable(v) {
 }
 
 ///|
+pub extend OpenTypeTag with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OpenTypeTag with fn into_value(self) {
   Str(self.0)
 }
@@ -335,6 +368,9 @@ pub impl FromValue for OpenTypeTag with fn from_value(v) {
   OpenTypeTag::from_bytes_lossy(v)
 }
 
+///|
+pub extend OpenTypeTag with FromValue::{from_value}
+
 // variations.rs
 
 ///|
@@ -362,11 +398,17 @@ pub impl IntoValue for AxisValue with fn into_value(self) {
 }
 
 ///|
+pub extend AxisValue with IntoValue::{into_value}
+
+///|
 pub impl FromValue for AxisValue with fn from_value(v) {
   let f : Double = (FromValue::from_value(v) : Double)
   // Round to `f32` precision like upstream's `v as f32`.
   AxisValue(Float::from_double(f).to_double())
 }
+
+///|
+pub extend AxisValue with FromValue::{from_value}
 
 ///|
 /// OpenType font variation settings.
@@ -380,6 +422,9 @@ pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive (
 pub impl Default for FontVariations with fn default() {
   FontVariations([])
 }
+
+///|
+pub extend FontVariations with Default::{default}
 
 ///|
 pub impl Fold for FontVariations with fn fold(self, outer) {
@@ -402,6 +447,9 @@ pub impl Reflect for FontVariations with fn castable(v) {
 }
 
 ///|
+pub extend FontVariations with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontVariations with fn into_value(self) {
   let dict = Dict::new()
   for pair in self.0 {
@@ -409,6 +457,9 @@ pub impl IntoValue for FontVariations with fn into_value(self) {
   }
   Dict(dict)
 }
+
+///|
+pub extend FontVariations with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontVariations with fn from_value(v) {

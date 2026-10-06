@@ -16,9 +16,22 @@ pub(all) struct Transform {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Transform with fn default() {
   Transform::identity()
 }
+
+///|
+pub extend Transform with Default::{default}
 
 ///|
 /// Creates an identity transform.

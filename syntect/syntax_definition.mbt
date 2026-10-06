@@ -15,6 +15,21 @@ pub(all) struct ContextId {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextId with @debug.Debug::{to_repr}
+
+///|
 /// The main data structure representing a syntax definition loaded from a
 /// `.sublime-syntax` file
 ///
@@ -96,6 +111,11 @@ pub(all) enum ContextReference {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextReference with Eq::{not_equal, equal}
+
+///|
 /// Upstream's `Debug` (used by error messages).
 pub impl Show for ContextReference with fn output(self, logger) {
   match self {
@@ -115,6 +135,11 @@ pub impl Show for ContextReference with fn output(self, logger) {
       )
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextReference with Show::{to_string, output}
 
 ///|
 fn debug_opt_str(s : String?) -> String {

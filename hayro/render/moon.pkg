@@ -7,8 +7,6 @@ import {
   "moonbitlang/core/cmp",
 }
 
-warnings = "-deprecated"
-
 import {
   "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
   "moonbitlang/x/fs",

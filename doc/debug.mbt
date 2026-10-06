@@ -269,6 +269,11 @@ pub impl @debug.Debug for Context with fn to_repr(self) {
 }
 
 ///|
+pub impl @debug.Debug for Layout with fn to_repr(self) {
+  self.into_content().to_repr()
+}
+
+///|
 pub impl @debug.Debug for CounterStep with fn to_repr(self) {
   self.into_content().to_repr()
 }

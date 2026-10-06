@@ -1,5 +1,3 @@
 import {
   "moonbitlang/typst/doc",
 }
-
-warnings = "-unused_type_declaration-unused_value"

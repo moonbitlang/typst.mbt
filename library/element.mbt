@@ -98,6 +98,8 @@ pub struct ElementData {
   key : String
   /// The element's title case name (e.g. `Heading`).
   title : String
+  /// The version of Typst the element was introduced in.
+  since : Since?
   /// Documentation.
   docs : String
   /// Search keywords.
@@ -140,6 +142,7 @@ pub fn Element::new(
   name~ : String,
   title~ : String,
   key? : String = name,
+  since? : Since,
   docs? : String = "",
   keywords? : Array[String] = [],
   capabilities? : Array[String] = [],
@@ -149,6 +152,7 @@ pub fn Element::new(
     name,
     key,
     title,
+    since,
     docs,
     keywords,
     capabilities,
@@ -182,9 +186,21 @@ pub fn Element::title(self : Element) -> String {
 }
 
 ///|
+/// The version of Typst the element was introduced in.
+pub fn Element::since(self : Element) -> Since? {
+  self.0.since
+}
+
+///|
 /// Documentation for the element.
 pub fn Element::docs(self : Element) -> String {
   self.0.docs
+}
+
+///|
+/// Search keywords for the element.
+pub fn Element::keywords(self : Element) -> ArrayView[String] {
+  self.0.keywords[:]
 }
 
 ///|
@@ -617,9 +633,15 @@ pub impl Reflect for Element with fn castable(v) {
 }
 
 ///|
+pub extend Element with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Element with fn into_value(self) {
   Func(Func::element(self))
 }
+
+///|
+pub extend Element with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Element with fn from_value(v) {
@@ -628,6 +650,9 @@ pub impl FromValue for Element with fn from_value(v) {
     None => bail("expected element")
   }
 }
+
+///|
+pub extend Element with FromValue::{from_value}
 
 ///|
 /// A Typst element that is defined by a native type (upstream

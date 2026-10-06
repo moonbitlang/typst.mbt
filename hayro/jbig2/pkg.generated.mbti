@@ -30,6 +30,8 @@ pub(all) enum FormatError {
   UnknownPageHeight
   EmptyPage
 } derive(Eq)
+pub fn FormatError::output(Self, &Logger) -> Unit
+pub fn FormatError::to_string(Self) -> String
 pub impl Show for FormatError
 
 pub(all) enum HuffmanError {
@@ -40,6 +42,8 @@ pub(all) enum HuffmanError {
   ConflictingCodes
   PrefixLengthTooLarge
 } derive(Eq)
+pub fn HuffmanError::output(Self, &Logger) -> Unit
+pub fn HuffmanError::to_string(Self) -> String
 pub impl Show for HuffmanError
 
 pub struct Image {
@@ -60,11 +64,15 @@ pub(all) enum OverflowError {
   Index
   SymbolCount
 } derive(Eq)
+pub fn OverflowError::output(Self, &Logger) -> Unit
+pub fn OverflowError::to_string(Self) -> String
 pub impl Show for OverflowError
 
 pub(all) enum ParseError {
   UnexpectedEof
 } derive(Eq)
+pub fn ParseError::output(Self, &Logger) -> Unit
+pub fn ParseError::to_string(Self) -> String
 pub impl Show for ParseError
 
 pub(all) enum RegionError {
@@ -73,6 +81,8 @@ pub(all) enum RegionError {
   InvalidMmrData
   GrayScaleOutOfRange
 } derive(Eq)
+pub fn RegionError::output(Self, &Logger) -> Unit
+pub fn RegionError::to_string(Self) -> String
 pub impl Show for RegionError
 
 pub(all) enum SegmentError {
@@ -82,6 +92,8 @@ pub(all) enum SegmentError {
   MissingEndMarker
   MissingPatternDictionary
 } derive(Eq)
+pub fn SegmentError::output(Self, &Logger) -> Unit
+pub fn SegmentError::to_string(Self) -> String
 pub impl Show for SegmentError
 
 pub(all) enum SymbolError {
@@ -93,12 +105,16 @@ pub(all) enum SymbolError {
   InvalidStripDelta
   TooManyInstances
 } derive(Eq)
+pub fn SymbolError::output(Self, &Logger) -> Unit
+pub fn SymbolError::to_string(Self) -> String
 pub impl Show for SymbolError
 
 pub(all) enum TemplateError {
   Invalid
   InvalidAtPixel
 } derive(Eq)
+pub fn TemplateError::output(Self, &Logger) -> Unit
+pub fn TemplateError::to_string(Self) -> String
 pub impl Show for TemplateError
 
 // Type aliases

@@ -25,6 +25,9 @@ pub impl Show for XmlDeError with fn output(self, logger) {
 }
 
 ///|
+pub extend XmlDeError with Show::{to_string, output}
+
+///|
 priv suberror DeErr {
   DeErr(String, String) // message, path
 }
@@ -48,7 +51,7 @@ priv enum XChild {
 
 ///|
 fn qualified_attr_name(node : @xml.Node, a : @xml.Attribute) -> String {
-  match a.namespace() {
+  match a.namespace_() {
     Some(ns) if ns == @xml.NS_XML_URI => "xml:" + a.name()
     Some(ns) =>
       match node.lookup_prefix(ns) {

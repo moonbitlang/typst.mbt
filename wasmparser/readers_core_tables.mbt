@@ -43,6 +43,11 @@ pub impl FromReader for Table with fn from_reader(reader) {
 }
 
 ///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Table with FromReader::{from_reader}
+
+///|
 pub impl FromReader for TableType with fn from_reader(reader) {
   let element_type = RefType::from_reader(reader)
   let pos = reader.original_position()
@@ -67,3 +72,6 @@ pub impl FromReader for TableType with fn from_reader(reader) {
   }
   { element_type, table64, initial, maximum, shared, }
 }
+
+///|
+pub extend TableType with FromReader::{from_reader}

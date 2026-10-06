@@ -410,6 +410,17 @@ pub impl CharstringContext for Type1Font with fn weight_vector(self) {
 }
 
 ///|
+#deprecated("call as `CharstringContext::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type1Font with CharstringContext::{
+  subr,
+  seac_components,
+  kind,
+  weight_vector,
+  global_subr,
+}
+
+///|
 /// Associates character codes with glyph names and ids.
 pub struct Type1Encoding {
   priv encoding : T1RawEncoding

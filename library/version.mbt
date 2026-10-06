@@ -115,6 +115,9 @@ pub impl Compare for Version with fn compare(self, other) {
 }
 
 ///|
+pub extend Version with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Eq for Version with fn equal(self, other) {
   self.compare(other) == 0
 }
@@ -160,6 +163,9 @@ pub impl Reflect for VersionComponents with fn castable(v) {
 }
 
 ///|
+pub extend VersionComponents with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for VersionComponents with fn from_value(v) {
   match v {
     Int(_) => {
@@ -190,6 +196,9 @@ pub impl Reflect for Version with fn castable(v) {
 }
 
 ///|
+pub extend Version with Reflect::{input, castable}
+
+///|
 pub impl IntoValue for Version with fn into_value(self) {
   Version(self)
 }
@@ -199,5 +208,77 @@ pub impl FromValue for Version with fn from_value(v) {
   match v {
     Version(version) => version
     v => raise HintedError(Version::input().error(v))
+  }
+}
+
+///|
+/// When a feature was introduced.
+pub(all) enum Since {
+  /// The feature was introduced before Typst 0.1.0.
+  Forever
+  /// The feature was introduced in a version released after Typst 0.1.0
+  /// (upstream `Version([u32; 3])`).
+  Version(UInt, UInt, UInt)
+  /// The feature is not present in any official Typst release.
+  Unreleased
+} derive(Eq, Hash)
+
+///|
+/// Upstream derives `Debug`; the version is an array there.
+pub impl @debug.Debug for Since with fn to_repr(self) {
+  match self {
+    Forever => @debug.Repr::literal("Forever")
+    Version(major, minor, patch) =>
+      @debug.Repr::literal("Version([\{major}, \{minor}, \{patch}])")
+    Unreleased => @debug.Repr::literal("Unreleased")
+  }
+}
+
+///|
+pub impl Reflect for Since with fn input() {
+  Union([
+    Value(Str("forever"), ""),
+    Value(Str("unreleased"), ""),
+    Version::input(),
+  ])
+}
+
+///|
+pub impl Reflect for Since with fn output() {
+  Since::input()
+}
+
+///|
+pub impl Reflect for Since with fn castable(v) {
+  v is (Str("forever" | "unreleased") | Version(_))
+}
+
+///|
+pub extend Since with Reflect::{input, output, castable}
+
+///|
+pub impl IntoValue for Since with fn into_value(self) {
+  match self {
+    Forever => Str("forever")
+    Version(major, minor, patch) => Version(Version([major, minor, patch]))
+    Unreleased => Str("unreleased")
+  }
+}
+
+///|
+pub extend Since with IntoValue::{into_value}
+
+///|
+pub impl FromValue for Since with fn from_value(v) {
+  match v {
+    Str("forever") => Forever
+    Str("unreleased") => Unreleased
+    Version(v) => {
+      guard v.values() is [major, minor, patch] else {
+        bail("expected a version with exactly three components")
+      }
+      Version(major, minor, patch)
+    }
+    v => raise HintedError(Since::input().error(v))
   }
 }

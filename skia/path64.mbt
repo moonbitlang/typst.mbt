@@ -87,7 +87,7 @@ fn approximately_equal_half(x : Double, other : Double) -> Bool {
 fn almost_dequal_ulps64(x : Double, other : Double) -> Bool {
   let max = scalar_max.to_double()
   if x.abs() < max && other.abs() < max {
-    almost_dequal_ulps(x.to_float(), other.to_float())
+    almost_dequal_ulps(Float::from_double(x), Float::from_double(other))
   } else {
     (x - other).abs() / dmax(x.abs(), other.abs()) <
     (f32_epsilon * 16.0).to_double()
@@ -147,10 +147,20 @@ enum SearchAxis {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SearchAxis with Eq::{not_equal, equal}
+
+///|
 struct Point64 {
   x : Double
   y : Double
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point64 with Eq::{not_equal, equal}
 
 ///|
 fn Point64::from_point(p : @path.Point) -> Point64 {
@@ -159,7 +169,7 @@ fn Point64::from_point(p : @path.Point) -> Point64 {
 
 ///|
 fn Point64::to_point(self : Point64) -> @path.Point {
-  @path.Point::from_xy(self.x.to_float(), self.y.to_float())
+  @path.Point::from_xy(Float::from_double(self.x), Float::from_double(self.y))
 }
 
 ///|

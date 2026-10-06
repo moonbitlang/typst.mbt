@@ -122,9 +122,19 @@ pub impl Eq for Regex with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for Regex with fn hash_combine(self, hasher) {
   hasher.combine(self.pattern)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Hash::{hash, hash_combine}
 
 ///|
 pub impl Show for Regex with fn output(self, logger) {
@@ -134,12 +144,27 @@ pub impl Show for Regex with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Show::{to_string, output}
+
+///|
 /// A match: UTF-8 byte offsets into the haystack and the matched text.
 pub(all) struct Match {
   start : Int
   end : Int
   text : String
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Match with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Match with @debug.Debug::{to_repr}
 
 ///|
 /// The capture groups of a match. Group 0 is the overall match.

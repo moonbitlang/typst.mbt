@@ -37,6 +37,9 @@ pub impl Show for Tracepoint with fn output(self, logger) {
 }
 
 ///|
+pub extend Tracepoint with Show::{to_string, output}
+
+///|
 /// An error or warning in a source or text file.
 pub(all) struct SourceDiagnostic {
   /// Whether the diagnostic is an error or a warning.

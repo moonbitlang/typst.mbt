@@ -122,6 +122,11 @@ pub impl[K : Eq, V : Eq] Eq for LinkedHashMap[K, V] with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkedHashMap with Eq::{not_equal, equal}
+
+///|
 pub impl[K : Hash, V : Hash] Hash for LinkedHashMap[K, V] with fn hash_combine(
   self,
   hasher,
@@ -131,6 +136,11 @@ pub impl[K : Hash, V : Hash] Hash for LinkedHashMap[K, V] with fn hash_combine(
     hasher.combine(v)
   }
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkedHashMap with Hash::{hash, hash_combine}
 
 ///|
 /// Lexicographic comparison of the entry sequences.
@@ -161,6 +171,11 @@ pub impl[K : Compare, V : Compare] Compare for LinkedHashMap[K, V] with fn compa
 }
 
 ///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkedHashMap with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Rust's `{:?}` (`debug_map`) format: `{k: v, k2: v2}`.
 pub impl[K : Show, V : Show] Show for LinkedHashMap[K, V] with fn output(
   self,
@@ -181,8 +196,18 @@ pub impl[K : Show, V : Show] Show for LinkedHashMap[K, V] with fn output(
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkedHashMap with Show::{to_string, output}
+
+///|
 pub impl[K : Debug, V : Debug] Debug for LinkedHashMap[K, V] with fn to_repr(
   self,
 ) {
   Repr(self.map)
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkedHashMap with @debug.Debug::{to_repr}

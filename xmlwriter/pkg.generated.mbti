@@ -21,6 +21,7 @@ pub(all) struct Options {
   indent : Indent
   attributes_indent : Indent
 } derive(@debug.Debug)
+pub fn Options::default() -> Self
 pub impl Default for Options
 
 pub struct XmlWriter {

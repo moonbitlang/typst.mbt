@@ -10,6 +10,11 @@ pub(all) suberror GlobalError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for GlobalError with fn output(self, logger) {
   let message = match self {
     ImmutableWrite => "tried to write to immutable global variable"
@@ -20,6 +25,9 @@ pub impl Show for GlobalError with fn output(self, logger) {
 }
 
 ///|
+pub extend GlobalError with Show::{to_string, output}
+
+///|
 /// The mutability of a global variable.
 pub(all) enum Mutability {
   /// The value of the global variable is a constant.
@@ -27,6 +35,21 @@ pub(all) enum Mutability {
   /// The value of the global variable is mutable.
   Var
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Mutability with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Mutability with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Mutability with @debug.Debug::{to_repr}
 
 ///|
 /// Returns `true` if this mutability is [`Mutability::Const`].
@@ -48,6 +71,21 @@ pub struct GlobalType {
   /// The mutability of the global variable.
   mutability : Mutability
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalType with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new [`GlobalType`] from the given [`ValType`] and [`Mutability`].

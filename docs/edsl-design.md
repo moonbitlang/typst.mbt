@@ -1447,7 +1447,7 @@ report.mbt:57:9-57:40@acme/report TableCell key="row-17" a0=report.mbt:57:19-57:
   origin. The spans of a further occurrence are bytes of another line
   than the call, so for trace-point suppression they count as the first
   byte of the argument (or line) of the origin itself
-  (`Lower::trace_range`): a later piece is inside every earlier one and
+  (`Lowering::trace_range`): a later piece is inside every earlier one and
   inside the call's line, in every block, so an error at any argument is
   inside its call, the arguments of a call value, which are taken after
   the call's own span, are inside that, and no span of another line
@@ -1458,7 +1458,7 @@ report.mbt:57:9-57:40@acme/report TableCell key="row-17" a0=report.mbt:57:19-57:
   a piece of the enclosing argument under the keys: of the argument's
   token (or line) in the origin's occurrence under the keys. The pieces
   of an argument under one path of keys have a counter of their own
-  (`Lower::keyed`): the first body is that token itself, a second body
+  (`Lowering::keyed`): the first body is that token itself, a second body
   under the same keys — another cell of a row whose cells have the row's
   key — is the next piece, and what is inside a body takes further
   pieces from that counter. The counters of an argument's key paths are

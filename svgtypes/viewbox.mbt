@@ -10,6 +10,16 @@ pub(all) suberror ViewBoxError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ViewBoxError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ViewBoxError with @debug.Debug::{to_repr}
+
+///|
 /// Upstream's `Display`.
 pub impl Show for ViewBoxError with fn output(self, logger) {
   match self {
@@ -17,6 +27,9 @@ pub impl Show for ViewBoxError with fn output(self, logger) {
     InvalidSize => logger.write_string("viewBox has a negative or zero size")
   }
 }
+
+///|
+pub extend ViewBoxError with Show::{to_string, output}
 
 ///|
 /// Representation of the [`<viewBox>`] type.
@@ -28,6 +41,16 @@ pub(all) struct ViewBox {
   w : Double
   h : Double
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ViewBox with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ViewBox with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new `ViewBox`.

@@ -82,6 +82,9 @@ pub impl Show for TranslationError with fn output(self, f) {
 }
 
 ///|
+pub extend TranslationError with Show::{to_string, output}
+
+///|
 /// Rust `Debug` of a wasmparser value type (for unsupported types only).
 fn debug_wasmparser_val_type(ty : @wasmparser.ValType) -> String {
   match ty {

@@ -109,6 +109,9 @@ pub impl[T : IntoValue] IntoValue for Axes[T] with fn into_value(self) {
 }
 
 ///|
+pub extend Axes with IntoValue::{into_value}
+
+///|
 /// The two layouting axes.
 pub(all) enum Axis {
   /// The horizontal axis.

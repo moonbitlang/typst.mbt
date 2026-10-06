@@ -20,11 +20,21 @@ pub struct PathBuilder {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathBuilder with @debug.Debug::{to_repr}
+
+///|
 /// Same as upstream's `#[derive(Default)]` (note: `move_to_required` is
 /// `false` here, unlike `PathBuilder::new`).
 pub impl Default for PathBuilder with fn default() {
   { verbs: [], points: [], last_move_to_index: 0, move_to_required: false, }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathBuilder with Default::{default}
 
 ///|
 /// Creates a deep copy of the builder (`Clone`).

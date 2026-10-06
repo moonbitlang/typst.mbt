@@ -3,6 +3,7 @@ import {
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/math",
   "moonbitlang/core/cmp",
+  "moonbitlang/core/debug",
 }
 
 import {

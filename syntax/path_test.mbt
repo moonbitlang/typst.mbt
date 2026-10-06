@@ -143,3 +143,28 @@ test "file id interning" {
   assert_true(id3.get() == a)
   assert_eq(id1.vpath().get_without_slash(), "a/b.typ")
 }
+
+///|
+/// Upstream's manual `Debug` impls (path.rs:62, :183, :386): a virtual path
+/// is its text with a slash, debug-quoted; a rooted path prefixes the
+/// package; a file id prints its rooted path.
+test "path debug" {
+  let project = @syntax.RootedPath::new(Project, vp("src/a b.typ"))
+  assert_eq(@debug.to_string(project.vpath()), "\"/src/a b.typ\"")
+  assert_eq(@debug.to_string(project), "\"/src/a b.typ\"")
+  assert_eq(@debug.to_string(project.intern()), "\"/src/a b.typ\"")
+  assert_eq(@debug.to_string(vp("a\"b\u{7f}.typ")), "\"/a\\\"b\\u{7f}.typ\"")
+  guard! @syntax.PackageSpec::from_str("@preview/foo:0.1.0") is Ok(spec)
+  let packaged = @syntax.RootedPath::new(Package(spec), vp("lib.typ"))
+  assert_eq(@debug.to_string(packaged), "@preview/foo:0.1.0\"/lib.typ\"")
+  assert_eq(
+    @debug.to_string(packaged.intern()),
+    "@preview/foo:0.1.0\"/lib.typ\"",
+  )
+  assert_eq(
+    @debug.to_string(Some(packaged.intern())),
+    "Some(@preview/foo:0.1.0\"/lib.typ\")",
+  )
+  // `VirtualRoot` derives `Debug` upstream too.
+  assert_eq(@debug.to_string(packaged.root()), "Package(@preview/foo:0.1.0)")
+}

@@ -31,6 +31,9 @@ pub impl Default for Stroke with fn default() {
 }
 
 ///|
+pub extend Stroke with Default::{default}
+
+///|
 /// Create a stroke from a paint and a thickness.
 pub fn Stroke::from_pair(paint : Paint, thickness : Length) -> Stroke {
   { ..Stroke::default(), paint: Custom(paint), thickness: Custom(thickness), }
@@ -159,6 +162,9 @@ pub impl Fold for Stroke with fn fold(self, outer) {
 }
 
 ///|
+pub extend Stroke with Fold::{fold}
+
+///|
 pub impl Reflect for Stroke with fn input() {
   Length::input()
   .union_with(Color::input())
@@ -180,9 +186,15 @@ pub impl Reflect for Stroke with fn castable(v) {
 }
 
 ///|
+pub extend Stroke with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Stroke with fn into_value(self) {
   Dyn(Stroke(self))
 }
+
+///|
+pub extend Stroke with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Stroke with fn from_value(v) {
@@ -271,6 +283,9 @@ pub impl Reflect for LineCap with fn castable(v) {
 }
 
 ///|
+pub extend LineCap with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for LineCap with fn into_value(self) {
   Str(self.name())
 }
@@ -336,6 +351,9 @@ pub impl Reflect for LineJoin with fn output() {
 pub impl Reflect for LineJoin with fn castable(v) {
   v is Str("miter" | "round" | "bevel")
 }
+
+///|
+pub extend LineJoin with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for LineJoin with fn into_value(self) {
@@ -484,6 +502,9 @@ pub impl Reflect for DashPattern with fn castable(v) {
 }
 
 ///|
+pub extend DashPattern with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DashPattern with fn into_value(self) {
   let dict = Dict::new()
   dict.insert("array", IntoValue::into_value(self.array))
@@ -547,6 +568,9 @@ pub impl Reflect for DashLength with fn output() {
 pub impl Reflect for DashLength with fn castable(v) {
   v is (Str("dot") | Length(_))
 }
+
+///|
+pub extend DashLength with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for DashLength with fn into_value(self) {

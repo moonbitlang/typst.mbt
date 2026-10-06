@@ -142,10 +142,8 @@ fn compute_attrs(
   let mut emph : Bool? = None
   let mut script : ResolvedScript? = None
   let mut background : @export.NaiveRgbColor?? = None
-  let resolved_deco : Ref[(@library.Content, ResolvedTextDeco)?] = Ref::new(
-    None,
-  )
-  let err : Ref[@library.SourceDiagnostic?] = Ref::new(None)
+  let resolved_deco : Ref[(@library.Content, ResolvedTextDeco)?] = Ref(None)
+  let err : Ref[@library.SourceDiagnostic?] = Ref(None)
   for i = items.length() - 1; i >= 0; i = i - 1 {
     let (_, attr) = items[i]
     match attr {

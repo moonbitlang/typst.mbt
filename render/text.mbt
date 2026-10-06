@@ -122,7 +122,7 @@ fn render_outline_glyph(
       return
     }
     guard builder.0.finish() is Some(path) else { return }
-    let scale = to_f32(text.size) / text.font.units_per_em().to_float()
+    let scale = to_f32(text.size) / Float::from_double(text.font.units_per_em())
     let rule : @skia.FillRule = Winding
 
     // Flip vertically because font design coordinate
@@ -139,7 +139,7 @@ fn render_outline_glyph(
         line_cap: to_sk_line_cap(stroke.cap),
         line_join: to_sk_line_join(stroke.join),
         dash,
-        miter_limit: stroke.miter_limit.get().to_float(),
+        miter_limit: Float::from_double(stroke.miter_limit.get()),
       }
       canvas.stroke_path(path, paint, sk_stroke, ts, state.mask)
     }

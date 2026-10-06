@@ -38,6 +38,16 @@ pub(all) struct Point {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with @debug.Debug::{to_repr}
+
+///|
 /// The point (0, 0).
 pub let point_zero : Point = { x: 0.0, y: 0.0, }
 
@@ -97,6 +107,16 @@ pub(all) struct Vec2 {
   /// The y-coordinate.
   y : Double
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vec2 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vec2 with @debug.Debug::{to_repr}
 
 ///|
 /// The vector (0, 0).
@@ -214,11 +234,26 @@ pub impl Add for Vec2 with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vec2 with Add::{add}
+
+///|
 pub impl Sub for Vec2 with fn sub(self, other) {
   { x: self.x - other.x, y: self.y - other.y, }
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vec2 with Sub::{sub}
+
+///|
 pub impl Neg for Vec2 with fn neg(self) {
   { x: -self.x, y: -self.y, }
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vec2 with Neg::{neg}

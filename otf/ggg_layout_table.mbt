@@ -241,6 +241,11 @@ pub impl RecordListItem for Script with fn parse(tag, data) {
 }
 
 ///|
+#deprecated("call as `RecordListItem::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Script with RecordListItem::{parse}
+
+///|
 /// A [Language System Table](https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#language-system-table).
 pub(all) struct LanguageSystem {
   /// Language tag.
@@ -265,6 +270,11 @@ pub impl RecordListItem for LanguageSystem with fn parse(tag, data) {
 }
 
 ///|
+#deprecated("call as `RecordListItem::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LanguageSystem with RecordListItem::{parse}
+
+///|
 /// A [Feature](https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#feature-table).
 pub(all) struct Feature {
   tag : Tag
@@ -279,3 +289,8 @@ pub impl RecordListItem for Feature with fn parse(tag, data) {
   let lookup_indices = s.read_array16(count)
   { tag, lookup_indices, }
 }
+
+///|
+#deprecated("call as `RecordListItem::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with RecordListItem::{parse}

@@ -211,6 +211,8 @@ pub(all) enum ChunkKind {
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct ChunkedStrParseError(Int) derive(Eq, @debug.Debug)
+pub fn ChunkedStrParseError::output(Self, &Logger) -> Unit
+pub fn ChunkedStrParseError::to_string(Self) -> String
 pub impl Show for ChunkedStrParseError
 
 pub(all) struct ChunkedString(Array[StringChunk]) derive(Eq, Hash, @debug.Debug)
@@ -226,11 +228,13 @@ pub fn ChunkedString::from_string(String) -> Self
 pub fn ChunkedString::is_empty(Self) -> Bool
 pub fn ChunkedString::len(Self) -> Int
 pub fn ChunkedString::new() -> Self
+pub fn ChunkedString::output(Self, &Logger) -> Unit
 pub fn ChunkedString::push_char(Self, Char, ChunkKind) -> Unit
 pub fn ChunkedString::push_chunk(Self, StringChunk) -> Unit
 pub fn ChunkedString::push_str(Self, String, ChunkKind) -> Unit
 pub fn ChunkedString::to_lowercase(Self) -> String
 pub fn ChunkedString::to_str(Self) -> String
+pub fn ChunkedString::to_string(Self) -> String
 pub fn ChunkedString::to_uppercase(Self) -> String
 pub impl Show for ChunkedString
 pub impl FmtWrite for ChunkedString
@@ -282,6 +286,8 @@ pub(all) enum DateError {
   MonthOutOfBounds
   DayOutOfBounds(Int)
 } derive(Eq, @debug.Debug)
+pub fn DateError::output(Self, &Logger) -> Unit
+pub fn DateError::to_string(Self) -> String
 pub impl Show for DateError
 
 pub(all) struct Duration {
@@ -293,12 +299,16 @@ pub(all) struct Duration {
 } derive(Eq, Hash, @debug.Debug)
 pub fn Duration::cmp(Self, Self) -> Int
 pub fn Duration::from_str(String) -> Result[Self, DurationError]
+pub fn Duration::output(Self, &Logger) -> Unit
+pub fn Duration::to_string(Self) -> String
 pub impl Show for Duration
 
 pub(all) enum DurationError {
   Malformed
   TooLarge
 } derive(Eq, Hash, @debug.Debug)
+pub fn DurationError::output(Self, &Logger) -> Unit
+pub fn DurationError::to_string(Self) -> String
 pub impl Show for DurationError
 
 pub(all) struct DurationRange {
@@ -338,8 +348,10 @@ pub fn ElemChildren::has_content(Self) -> Bool
 pub fn ElemChildren::is_empty(Self) -> Bool
 pub fn ElemChildren::last_text(Self) -> Formatted?
 pub fn ElemChildren::new() -> Self
+pub fn ElemChildren::output(Self, &Logger) -> Unit
 pub fn ElemChildren::remove_any_meta(Self) -> ElemChild?
 pub fn ElemChildren::to_plain(Self) -> String
+pub fn ElemChildren::to_string(Self) -> String
 pub fn[W : FmtWrite] ElemChildren::write_buf(Self, W, BufWriteFormat) -> Unit
 pub impl Show for ElemChildren
 
@@ -490,7 +502,9 @@ pub fn FormatString::format_sentence_case(Self, SentenceCase) -> String
 pub fn FormatString::format_title_case(Self, TitleCase) -> String
 pub fn FormatString::from_str(String) -> Result[Self, ChunkedStrParseError]
 pub fn FormatString::new() -> Self
+pub fn FormatString::output(Self, &Logger) -> Unit
 pub fn FormatString::select(Self, @citationberg.LongShortForm) -> ChunkedString
+pub fn FormatString::to_string(Self) -> String
 pub fn FormatString::with_short(String, String) -> Self
 pub fn FormatString::with_value(String) -> Self
 pub impl Show for FormatString
@@ -509,6 +523,7 @@ pub(all) struct Formatting {
 } derive(Eq, Hash, @debug.Debug)
 pub fn Formatting::add_text(Self, String) -> Formatted
 pub fn Formatting::apply(Self, @citationberg.Formatting) -> Self
+pub fn Formatting::default() -> Self
 pub impl Default for Formatting
 
 pub(all) struct LanguageIdentifier {
@@ -566,7 +581,9 @@ pub fn Numeric::from_str(String) -> Result[Self, NumericError]
 pub fn Numeric::is_plural(Self, Bool) -> Bool
 pub fn Numeric::new(Int) -> Self
 pub fn Numeric::nth(Self, Int) -> Int?
+pub fn Numeric::output(Self, &Logger) -> Unit
 pub fn Numeric::single_number(Self) -> Int?
+pub fn Numeric::to_string(Self) -> String
 pub fn Numeric::will_transform(Self) -> Bool
 pub fn[W : FmtWrite] Numeric::with_form(Self, W, @citationberg.NumberForm, @citationberg.GrammarGender?, @citationberg.OrdinalLookup) -> Unit
 pub impl Show for Numeric
@@ -588,6 +605,8 @@ pub(all) enum NumericError {
   NotADelimiter
   MissingDelimiter
 } derive(Eq, @debug.Debug)
+pub fn NumericError::output(Self, &Logger) -> Unit
+pub fn NumericError::to_string(Self) -> String
 pub impl Show for NumericError
 
 pub(all) enum NumericValue {
@@ -627,6 +646,8 @@ pub(all) enum PageRangesPartErr {
   Empty
   NumericErr(NumericError)
 } derive(Eq, @debug.Debug)
+pub fn PageRangesPartErr::output(Self, &Logger) -> Unit
+pub fn PageRangesPartErr::to_string(Self) -> String
 pub impl Show for PageRangesPartErr
 
 pub(all) struct Person {
@@ -656,6 +677,8 @@ pub(all) enum PersonError {
   Empty
   UnknownRole
 } derive(Eq, @debug.Debug)
+pub fn PersonError::output(Self, &Logger) -> Unit
+pub fn PersonError::to_string(Self) -> String
 pub impl Show for PersonError
 
 pub(all) enum PersonRole {
@@ -702,6 +725,8 @@ pub(all) struct QualifiedUrl {
 } derive(Eq, Hash, @debug.Debug)
 pub fn QualifiedUrl::from_str(String) -> Result[Self, UrlParseError]
 pub fn QualifiedUrl::new(Url, Date?) -> Self
+pub fn QualifiedUrl::output(Self, &Logger) -> Unit
+pub fn QualifiedUrl::to_string(Self) -> String
 pub impl Show for QualifiedUrl
 
 pub(all) struct Rendered {
@@ -744,6 +769,7 @@ pub(all) struct SentenceCase {
   trim_start : Bool
   trim_end : Bool
 } derive(Eq, Hash, @debug.Debug)
+pub fn SentenceCase::default() -> Self
 pub impl Default for SentenceCase
 
 pub(all) struct SerialNumber(Map[String, String]) derive(Eq, @debug.Debug)
@@ -758,6 +784,8 @@ pub struct StrBuf {
 }
 pub fn StrBuf::new() -> Self
 pub fn StrBuf::to_string(Self) -> String
+pub fn StrBuf::write_char(Self, Char) -> Unit
+pub fn StrBuf::write_str(Self, String) -> Unit
 pub impl FmtWrite for StrBuf
 
 pub(all) struct StringChunk {
@@ -769,6 +797,8 @@ pub fn StringChunk::len(Self) -> Int
 pub fn StringChunk::math(String) -> Self
 pub fn StringChunk::new(String, ChunkKind) -> Self
 pub fn StringChunk::normal(String) -> Self
+pub fn StringChunk::output(Self, &Logger) -> Unit
+pub fn StringChunk::to_string(Self) -> String
 pub fn StringChunk::verbatim(String) -> Self
 pub impl Show for StringChunk
 
@@ -782,6 +812,7 @@ pub(all) struct TitleCase {
   trim_start : Bool
   trim_end : Bool
 } derive(Eq, Hash, @debug.Debug)
+pub fn TitleCase::default() -> Self
 pub impl Default for TitleCase
 
 pub(all) struct TransparentLocator(String) derive(Eq)
@@ -802,6 +833,8 @@ pub(all) enum UrlParseError {
   InvalidDomainCharacter
   RelativeUrlWithoutBase
 } derive(Eq, @debug.Debug)
+pub fn UrlParseError::output(Self, &Logger) -> Unit
+pub fn UrlParseError::to_string(Self) -> String
 pub impl Show for UrlParseError
 
 pub(all) struct YamlLoadError {

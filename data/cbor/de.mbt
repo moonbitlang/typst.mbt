@@ -18,6 +18,11 @@ pub(all) suberror CborError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CborError with @debug.Debug::{to_repr}
+
+///|
 /// The message Typst shows for the error (upstream `format_cbor_error`;
 /// ciborium's own `Display` just forwards to `Debug`).
 pub fn CborError::message(self : CborError) -> String {

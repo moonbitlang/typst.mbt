@@ -303,7 +303,7 @@ fn write_xobject(
 ///|
 /// A real number written as an `f32` (pdf-writer's `Rect`/matrix entries).
 fn f32_obj(v : Double) -> @export.Obj {
-  Real(v.to_float().to_double())
+  Real(Float::from_double(v).to_double())
 }
 
 ///|

@@ -16,6 +16,16 @@ pub(all) struct QuadCoeff {
 } derive(Debug, Default)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QuadCoeff with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QuadCoeff with Default::{default}
+
+///|
 pub fn QuadCoeff::from_points(points : ArrayView[Point]) -> QuadCoeff {
   let c = points[0].to_f32x2()
   let p1 = points[1].to_f32x2()
@@ -37,6 +47,16 @@ pub(all) struct CubicCoeff {
   c : F32x2
   d : F32x2
 } derive(Debug, Default)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CubicCoeff with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CubicCoeff with Default::{default}
 
 ///|
 pub fn CubicCoeff::from_points(points : ArrayView[Point]) -> CubicCoeff {

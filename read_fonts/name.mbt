@@ -43,6 +43,11 @@ pub(all) struct NameRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameRecord with @debug.Debug::{to_repr}
+
+///|
 pub fn Name::name_record(self : Name) -> Array[NameRecord] {
   let recs = self.data.read_array(6, self.count(), 12) catch {
     _ => FontData::empty()
@@ -96,6 +101,16 @@ pub(all) enum NameEncoding {
   MacRoman
   Unknown
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameEncoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameEncoding with @debug.Debug::{to_repr}
 
 ///|
 pub fn NameEncoding::new(platform_id : Int, encoding_id : Int) -> NameEncoding {

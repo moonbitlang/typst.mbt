@@ -18,6 +18,16 @@ pub(all) enum Indent {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Indent with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Indent with @debug.Debug::{to_repr}
+
+///|
 /// An XML writing options.
 pub(all) struct Options {
   /// Use single quote marks instead of double quote.
@@ -29,9 +39,17 @@ pub(all) struct Options {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Options with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Options with fn default() {
   { use_single_quote: false, indent: Spaces(4), attributes_indent: None, }
 }
+
+///|
+pub extend Options with Default::{default}
 
 ///|
 priv enum State {

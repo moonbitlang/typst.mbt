@@ -415,7 +415,7 @@ let ding_bats_base64 : String =
   #|CxWbe52CkJCQkAsVkIadlJubm5sLA64WC5qFlx6CnYCYC5mL9wI+t6yZC/utBfc1Bw4TlFTsGwsfjY0FCwWJBws=
 
 ///|
-let ding_bats_cell : Ref[Bytes?] = Ref::new(None)
+let ding_bats_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Ding Bats Font.
@@ -660,7 +660,7 @@ let symbol_base64 : String =
   #|+xcLFammqp+4G6oLih/8KVQGDpCQj46NCw==
 
 ///|
-let symbol_cell : Ref[Bytes?] = Ref::new(None)
+let symbol_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Symbol Font.
@@ -917,7 +917,7 @@ let fixed_base64 : String =
   #|9xBCBgv3Dx7wVAcOBvsu+wQLAfelxAMLwvczwws=
 
 ///|
-let fixed_cell : Ref[Bytes?] = Ref::new(None)
+let fixed_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Fixed font.
@@ -1180,7 +1180,7 @@ let fixed_bold_base64 : String =
   #|C/eW4QFu+SYDC/cjFb3KRb8FC8X7w/cNBQ6h2B72KQcOFfcD9yMLMN78EDgL0fgMAQuL6fePCw==
 
 ///|
-let fixed_bold_cell : Ref[Bytes?] = Ref::new(None)
+let fixed_bold_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Fixed Bold font.
@@ -1458,7 +1458,7 @@ let fixed_bold_italic_base64 : String =
   #|97YFCwX7RQZ5MooKC2XK+2b7LgUOBftCC1UVdzMF99cGC/dzdwELFfcDBgso+0IqCwae6AULBfuQBgsF7AYL9yAFC/tWBQs=
 
 ///|
-let fixed_bold_italic_cell : Ref[Bytes?] = Ref::new(None)
+let fixed_bold_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Fixed Bold Italic font.
@@ -1731,7 +1731,7 @@ let fixed_italic_base64 : String =
   #|C/d4dwELFd0GC/cfBgv4WgUL9wgFCwU7Bgs=
 
 ///|
-let fixed_italic_cell : Ref[Bytes?] = Ref::new(None)
+let fixed_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Fixed Italic font.
@@ -1952,7 +1952,7 @@ let sans_base64 : String =
   #|uwsnMQoOWlhoPowfDvcdWQr3BYp3Egt90/gq0wu45fey5Qv3VNn7VAt812B2CzMGDg==
 
 ///|
-let sans_cell : Ref[Bytes?] = Ref::new(None)
+let sans_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Sans font.
@@ -2191,7 +2191,7 @@ let sans_bold_base64 : String =
   #|CgYLFfcL9wn7CwYLdwH3ePcTA7MLPJh2+J53AbELFfcH9wj7BwYL+YgF+xMGDgHQfQoLFfcKBsQLBfsxBgsF+y8GC4lCWn8L
 
 ///|
-let sans_bold_cell : Ref[Bytes?] = Ref::new(None)
+let sans_bold_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Sans Bold font.
@@ -2432,7 +2432,7 @@ let sans_bold_italic_base64 : String =
   #|Bgs=
 
 ///|
-let sans_bold_italic_cell : Ref[Bytes?] = Ref::new(None)
+let sans_bold_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Sans Bold Italic font.
@@ -2671,7 +2671,7 @@ let sans_italic_base64 : String =
   #|94TUAb73hBUL+KyNdqh20sELBqOQlpwL9kwKC/Tv+J3vCwZ9h4VyCwac3wULBp3cBQv4dHjcC/chBQsV5gYL9x8FCw==
 
 ///|
-let sans_italic_cell : Ref[Bytes?] = Ref::new(None)
+let sans_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Sans Italic font.
@@ -2954,7 +2954,7 @@ let serif_base64 : String =
   #|wH8eC/tu3zfxC/dU+0F3Cxr7OAcLcmseC/cGAws=
 
 ///|
-let serif_cell : Ref[Bytes?] = Ref::new(None)
+let serif_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Serif font.
@@ -3236,7 +3236,7 @@ let serif_bold_base64 : String =
   #|qgv7Vfs1+xf7bgv3BtH3BgsSpPcfC/eDrQYL
 
 ///|
-let serif_bold_cell : Ref[Bytes?] = Ref::new(None)
+let serif_bold_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Serif Bold font.
@@ -3536,7 +3536,7 @@ let serif_bold_italic_base64 : String =
   #|agWEnAuLaRtm942wB2gLclj7OVj7Ux4LdlQKC/vO+zp2+f13CxqHioaKCxX3dJ4GC/dABcbNC/ca1fcaC3SIHQsVy70L
 
 ///|
-let serif_bold_italic_cell : Ref[Bytes?] = Ref::new(None)
+let serif_bold_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Serif Bold Italic font.
@@ -3843,7 +3843,7 @@ let serif_italic_base64 : String =
   #|AQswpx+bVQt3AbzWAwsW91qbBgtnbqivHwt796WbBwsVmwoLm/tRewcLrPeXrAvEp9QLm/tbCxuDhQs=
 
 ///|
-let serif_italic_cell : Ref[Bytes?] = Ref::new(None)
+let serif_italic_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 /// Foxit Serif Italic font.

@@ -86,6 +86,9 @@ pub(all) struct ThemeSettings {
 } derive(Default)
 
 ///|
+pub extend ThemeSettings with Default::{default}
+
+///|
 /// A component of a theme meant to highlight a specific thing (e.g string
 /// literals) in a certain way.
 pub(all) struct ThemeItem {
@@ -102,3 +105,8 @@ pub(all) enum UnderlineOption {
   StippledUnderline
   SquigglyUnderline
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderlineOption with Eq::{not_equal, equal}

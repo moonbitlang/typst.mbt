@@ -5,6 +5,11 @@
 pub(all) struct Affine(FixedArray[Double]) derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affine with @debug.Debug::{to_repr}
+
+///|
 pub impl Eq for Affine with fn equal(self, other) {
   let a = self.0
   let b = other.0
@@ -15,6 +20,11 @@ pub impl Eq for Affine with fn equal(self, other) {
   a[4] == b[4] &&
   a[5] == b[5]
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affine with Eq::{not_equal, equal}
 
 ///|
 /// Construct an affine transform from coefficients.
@@ -140,6 +150,11 @@ pub impl Mul for Affine with fn mul(self, other) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affine with Mul::{mul}
+
+///|
 /// Pre-scale (`self * Affine::scale(scale)`).
 pub fn Affine::pre_scale(self : Affine, scale : Double) -> Affine {
   self * Affine::scale(scale)
@@ -170,3 +185,6 @@ pub fn Affine::then_scale(self : Affine, scale : Double) -> Affine {
 pub impl Default for Affine with fn default() {
   Affine::identity()
 }
+
+///|
+pub extend Affine with Default::{default}

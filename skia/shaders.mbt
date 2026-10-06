@@ -14,9 +14,24 @@ pub(all) enum SpreadMode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpreadMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpreadMode with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for SpreadMode with fn default() {
   Pad
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpreadMode with Default::{default}
 
 ///|
 /// A shader specifies the source color(s) for what is being drawn.
@@ -133,6 +148,16 @@ pub(all) enum FilterQuality {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterQuality with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FilterQuality with @debug.Debug::{to_repr}
+
+///|
 /// Controls how a pixmap should be blended.
 ///
 /// Like `Paint`, but for `Pixmap`.
@@ -150,6 +175,9 @@ pub(all) struct PixmapPaint {
 pub impl Default for PixmapPaint with fn default() {
   { opacity: 1.0, blend_mode: SourceOver, quality: Nearest, }
 }
+
+///|
+pub extend PixmapPaint with Default::{default}
 
 ///|
 /// A pattern shader.

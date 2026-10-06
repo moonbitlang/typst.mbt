@@ -9,12 +9,22 @@ pub(all) enum Fill {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fill with Eq::{not_equal, equal}
+
+///|
 /// Describes how a paint is extended beyond its natural bounds.
 pub(all) enum Extend {
   Pad
   Repeat
   Reflect
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Extend with Eq::{not_equal, equal}
 
 ///|
 /// Image quality for the sampler.
@@ -25,6 +35,11 @@ pub(all) enum ImageQuality {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageQuality with Eq::{not_equal, equal}
+
+///|
 /// Parameters which specify how to sample an image.
 pub(all) struct ImageSampler {
   x_extend : Extend
@@ -32,6 +47,11 @@ pub(all) struct ImageSampler {
   quality : ImageQuality
   alpha : Float
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageSampler with Eq::{not_equal, equal}
 
 ///|
 /// Defines the color mixing function for a blend operation.
@@ -55,6 +75,11 @@ pub(all) enum Mix {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Mix with Eq::{not_equal, equal}
+
+///|
 /// Defines the layer composition function for a blend operation.
 pub(all) enum Compose {
   Clear
@@ -74,11 +99,21 @@ pub(all) enum Compose {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Compose with Eq::{not_equal, equal}
+
+///|
 /// Blend mode consisting of color mixing and composition functions.
 pub(all) struct BlendMode {
   mix : Mix
   compose : Compose
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlendMode with Eq::{not_equal, equal}
 
 ///|
 pub fn BlendMode::new(mix : Mix, compose : Compose) -> BlendMode {
@@ -89,6 +124,9 @@ pub fn BlendMode::new(mix : Mix, compose : Compose) -> BlendMode {
 pub impl Default for BlendMode with fn default() {
   { mix: Normal, compose: SrcOver, }
 }
+
+///|
+pub extend BlendMode with Default::{default}
 
 ///|
 fn BlendMode::is_default(self : BlendMode) -> Bool {

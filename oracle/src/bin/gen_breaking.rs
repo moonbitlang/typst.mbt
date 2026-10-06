@@ -688,6 +688,20 @@ fn gen_hypher(krate: &Path, dest: &Path) {
         writeln!(out, "  {v}").unwrap();
     }
     out.push_str("} derive(Eq, Hash, Debug)\n\n");
+    // The derived methods are not called as methods of `Lang`: their
+    // promotion is explicit and deprecated (scripts/promotions.py).
+    for (tr, methods) in [
+        ("Eq", "not_equal, equal"),
+        ("Hash", "hash, hash_combine"),
+        ("@debug.Debug", "to_repr"),
+    ] {
+        let short = tr.rsplit('.').next().unwrap();
+        writeln!(
+            out,
+            "///|\n#deprecated(\"call as `{short}::m(x)`, or un-deprecate this `extend` to make it a method\")\n#doc(hidden)\npub extend Lang with {tr}::{{{methods}}}\n"
+        )
+        .unwrap();
+    }
 
     out.push_str(
         "///|\n/// Select a language using its two-letter ISO 639-1 code.\npub fn Lang::from_iso(code : String) -> Lang? {\n  match code {\n",

@@ -73,6 +73,11 @@ pub impl Debug for HintingDevice with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintingDevice with @debug.Debug::{to_repr}
+
+///|
 /// A [Device Table](https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#devVarIdxTbls)
 /// indexes into [Item Variation Store](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/otvarcommonformats#IVS).
@@ -82,12 +87,22 @@ pub(all) struct VariationDevice {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariationDevice with @debug.Debug::{to_repr}
+
+///|
 /// A [Device Table](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#devVarIdxTbls).
 pub(all) enum Device {
   Hinting(HintingDevice)
   Variation(VariationDevice)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Device with @debug.Debug::{to_repr}
 
 ///|
 fn Device::parse(data : BytesView) -> Device? {
@@ -200,6 +215,11 @@ pub(all) struct ValueRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValueRecord with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for ValueRecord with fn default() {
   {
     x_placement: 0,
@@ -212,6 +232,11 @@ pub impl Default for ValueRecord with fn default() {
     y_advance_device: None,
   }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValueRecord with Default::{default}
 
 ///|
 // Raises only on parsing error.
@@ -349,6 +374,11 @@ pub impl Debug for ValueRecordsArray with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValueRecordsArray with @debug.Debug::{to_repr}
+
+///|
 /// A [Single Adjustment Positioning Subtable](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#SP).
 pub(all) enum SingleAdjustment {
@@ -475,6 +505,11 @@ pub impl Debug for PairSet with fn to_repr(_) {
   Repr::literal("PairSet { ... }")
 }
 
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PairSet with @debug.Debug::{to_repr}
+
 // Essentially a `LazyOffsetArray16` but stores additional data required to parse [`PairSet`].
 
 ///|
@@ -521,6 +556,11 @@ pub fn PairSets::is_empty(self : PairSets) -> Bool {
 pub impl Debug for PairSets with fn to_repr(_) {
   Repr::literal("PairSets { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PairSets with @debug.Debug::{to_repr}
 
 ///|
 /// A [`ValueRecord`] pairs matrix used by [`PairAdjustment`].
@@ -582,6 +622,11 @@ pub fn ClassMatrix::get(
 pub impl Debug for ClassMatrix with fn to_repr(_) {
   Repr::literal("ClassMatrix { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ClassMatrix with @debug.Debug::{to_repr}
 
 ///|
 /// A [Pair Adjustment Positioning Subtable](
@@ -709,6 +754,11 @@ pub fn CursiveAnchorSet::is_empty(self : CursiveAnchorSet) -> Bool {
 pub impl Debug for CursiveAnchorSet with fn to_repr(_) {
   Repr::literal("CursiveAnchorSet { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CursiveAnchorSet with @debug.Debug::{to_repr}
 
 ///|
 /// A [Cursive Attachment Positioning Subtable](
@@ -847,6 +897,11 @@ pub impl Debug for LigatureArray with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LigatureArray with @debug.Debug::{to_repr}
+
+///|
 priv struct MarkRecord {
   class : Class
   mark_anchor : Offset16
@@ -907,6 +962,11 @@ pub impl Debug for MarkArray with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MarkArray with @debug.Debug::{to_repr}
+
+///|
 /// An [Anchor Table](https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#anchor-tables).
 ///
 /// The *Anchor Table Format 2: Design Units Plus Contour Point* is not supported.
@@ -920,6 +980,11 @@ pub(all) struct Anchor {
   /// A [`Device`] table with vertical value.
   y_device : Device?
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Anchor with @debug.Debug::{to_repr}
 
 ///|
 fn Anchor::parse(data : BytesView) -> Anchor? {
@@ -999,6 +1064,11 @@ pub impl Debug for AnchorMatrix with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AnchorMatrix with @debug.Debug::{to_repr}
+
+///|
 /// A [Mark-to-Mark Attachment Positioning Subtable](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#MMP).
 pub(all) struct MarkToMarkAdjustment {
@@ -1048,6 +1118,11 @@ pub(all) enum PositioningSubtable {
 pub impl LookupSubtable for PositioningSubtable with fn parse(data, kind) {
   positioning_subtable_parse(data, kind)
 }
+
+///|
+#deprecated("call as `LookupSubtable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositioningSubtable with LookupSubtable::{parse}
 
 ///|
 fn positioning_subtable_parse(

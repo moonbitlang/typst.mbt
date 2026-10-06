@@ -23,6 +23,16 @@ pub(all) enum ColorSpace {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with @debug.Debug::{to_repr}
+
+///|
 /// Number of color channels present for a certain colorspace.
 fn ColorSpace::num_components(self : ColorSpace) -> Int {
   match self {

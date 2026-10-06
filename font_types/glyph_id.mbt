@@ -6,6 +6,26 @@
 pub(all) struct GlyphId(UInt) derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with @debug.Debug::{to_repr}
+
+///|
 pub fn GlyphId::new(raw : UInt) -> GlyphId {
   GlyphId(raw)
 }
@@ -46,11 +66,26 @@ pub impl Show for GlyphId with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphId with Show::{to_string, output}
+
+///|
 /// Two dimensional point with fixed point coordinates.
 pub(all) struct Point[T] {
   x : T
   y : T
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with @debug.Debug::{to_repr}
 
 ///|
 pub fn[T] Point::new(x : T, y : T) -> Point[T] {
@@ -72,6 +107,16 @@ pub(all) struct FontMatrix {
   dx : Fixed
   dy : Fixed
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontMatrix with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontMatrix with @debug.Debug::{to_repr}
 
 ///|
 pub fn FontMatrix::identity() -> FontMatrix {
@@ -117,8 +162,38 @@ pub(all) struct BoundingBox[T] {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundingBox with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundingBox with @debug.Debug::{to_repr}
+
+///|
 /// A 4-byte OpenType tag, stored as a big-endian `UInt`.
 pub(all) struct Tag(UInt) derive(Eq, Compare, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a tag from a 4 character ASCII string.
@@ -148,3 +223,8 @@ pub impl Show for Tag with fn output(self, logger) {
     logger.write_char(Int::unsafe_to_char(c))
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Show::{to_string, output}

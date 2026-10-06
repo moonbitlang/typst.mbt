@@ -56,6 +56,9 @@ pub impl Default for ResolvedStroke with fn default() {
   }
 }
 
+///|
+pub extend ResolvedStroke with Default::{default}
+
 // Decorations are only stored in the internal `TextElem::deco` property;
 // as values, they are internal dynamic values.
 
@@ -73,6 +76,9 @@ pub impl Reflect for Decoration with fn output() {
 pub impl Reflect for Decoration with fn castable(v) {
   v is Dyn(Decoration(_))
 }
+
+///|
+pub extend Decoration with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Decoration with fn into_value(self) {

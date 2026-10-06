@@ -13,6 +13,24 @@ pub struct Date {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Eq::{not_equal, equal}
+
+///|
+pub extend Date with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with @debug.Debug::{to_repr}
+
+///|
 let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int]] = [
   [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
   [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335],
@@ -511,3 +529,6 @@ pub impl Show for Date with fn output(self, logger) {
   logger.write_string("-")
   logger.write_string(zero_pad(day, 2))
 }
+
+///|
+pub extend Date with Show::{to_string, output}

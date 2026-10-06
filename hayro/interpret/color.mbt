@@ -75,7 +75,7 @@ pub fn AlphaColor::components(self : AlphaColor) -> FixedArray[Float] {
 
 ///|
 fn u8_to_f32(x : Byte) -> Float {
-  x.to_float() * (1.0 / 255.0)
+  Float::from_byte(x) * (1.0 / 255.0)
 }
 
 ///|
@@ -398,7 +398,7 @@ pub fn ColorSpace::to_rgba(
         f32_to_u8(c[3]),
       ])
       let output = FixedArray::make(3, b'\x00')
-      if cmyk_transform().convert_u8(input, output) is Some(_) {
+      if ToRgb::convert_u8(cmyk_transform(), input, output) is Some(_) {
         AlphaColor::from_rgba8(output[0], output[1], output[2], alpha)
       } else {
         alpha_color_black
@@ -422,10 +422,10 @@ impl ToRgb for ColorSpace with fn convert_f32(self, input, output, manual_scale)
           f32_to_u8(input[2]),
           f32_to_u8(input[3]),
         ])
-        cmyk_transform().convert_u8(converted, output)
+        ToRgb::convert_u8(cmyk_transform(), converted, output)
       } else {
         let converted = Bytes::from_iter(input.iter().map(f32_to_u8))
-        cmyk_transform().convert_u8(converted, output)
+        ToRgb::convert_u8(cmyk_transform(), converted, output)
       }
     DeviceGray => {
       let n = @cmp.minimum(input.length(), output.length() / 3)
@@ -444,14 +444,14 @@ impl ToRgb for ColorSpace with fn convert_f32(self, input, output, manual_scale)
       }
       Some(())
     }
-    Pattern(i) => i.convert_f32(input, output, manual_scale)
-    Indexed(i) => i.convert_f32(input, output, manual_scale)
-    ICCBased(i) => i.convert_f32(input, output, manual_scale)
-    CalGray(i) => i.convert_f32(input, output, manual_scale)
-    CalRgb(i) => i.convert_f32(input, output, manual_scale)
-    Lab(i) => i.convert_f32(input, output, manual_scale)
-    Separation(i) => i.convert_f32(input, output, manual_scale)
-    DeviceN(i) => i.convert_f32(input, output, manual_scale)
+    Pattern(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    Indexed(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    ICCBased(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    CalGray(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    CalRgb(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    Lab(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    Separation(i) => ToRgb::convert_f32(i, input, output, manual_scale)
+    DeviceN(i) => ToRgb::convert_f32(i, input, output, manual_scale)
   }
 }
 
@@ -461,21 +461,21 @@ impl ToRgb for ColorSpace with fn supports_u8(self) {
     DeviceCmyk => true
     DeviceGray => true
     DeviceRgb => true
-    Pattern(i) => i.supports_u8()
-    Indexed(i) => i.supports_u8()
-    ICCBased(i) => i.supports_u8()
-    CalGray(i) => i.supports_u8()
-    CalRgb(i) => i.supports_u8()
-    Lab(i) => i.supports_u8()
-    Separation(i) => i.supports_u8()
-    DeviceN(i) => i.supports_u8()
+    Pattern(i) => ToRgb::supports_u8(i)
+    Indexed(i) => ToRgb::supports_u8(i)
+    ICCBased(i) => ToRgb::supports_u8(i)
+    CalGray(i) => ToRgb::supports_u8(i)
+    CalRgb(i) => ToRgb::supports_u8(i)
+    Lab(i) => ToRgb::supports_u8(i)
+    Separation(i) => ToRgb::supports_u8(i)
+    DeviceN(i) => ToRgb::supports_u8(i)
   }
 }
 
 ///|
 impl ToRgb for ColorSpace with fn convert_u8(self, input, output) {
   match self.inner {
-    DeviceCmyk => cmyk_transform().convert_u8(input, output)
+    DeviceCmyk => ToRgb::convert_u8(cmyk_transform(), input, output)
     DeviceGray => {
       let n = @cmp.minimum(input.length(), output.length() / 3)
       for i in 0..<n {
@@ -492,22 +492,22 @@ impl ToRgb for ColorSpace with fn convert_u8(self, input, output) {
       }
       Some(())
     }
-    Pattern(i) => i.convert_u8(input, output)
-    Indexed(i) => i.convert_u8(input, output)
-    ICCBased(i) => i.convert_u8(input, output)
-    CalGray(i) => i.convert_u8(input, output)
-    CalRgb(i) => i.convert_u8(input, output)
-    Lab(i) => i.convert_u8(input, output)
-    Separation(i) => i.convert_u8(input, output)
-    DeviceN(i) => i.convert_u8(input, output)
+    Pattern(i) => ToRgb::convert_u8(i, input, output)
+    Indexed(i) => ToRgb::convert_u8(i, input, output)
+    ICCBased(i) => ToRgb::convert_u8(i, input, output)
+    CalGray(i) => ToRgb::convert_u8(i, input, output)
+    CalRgb(i) => ToRgb::convert_u8(i, input, output)
+    Lab(i) => ToRgb::convert_u8(i, input, output)
+    Separation(i) => ToRgb::convert_u8(i, input, output)
+    DeviceN(i) => ToRgb::convert_u8(i, input, output)
   }
 }
 
 ///|
 impl ToRgb for ColorSpace with fn is_none(self) {
   match self.inner {
-    Separation(s) => s.is_none()
-    DeviceN(d) => d.is_none()
+    Separation(s) => ToRgb::is_none(s)
+    DeviceN(d) => ToRgb::is_none(d)
     _ => false
   }
 }
@@ -799,9 +799,9 @@ impl ToRgb for Lab with fn convert_f32(self, input, output, manual_scale) {
       scaled.push(a)
       scaled.push(b)
     }
-    self.profile.convert_f32(scaled[:], output, manual_scale)
+    ToRgb::convert_f32(self.profile, scaled[:], output, manual_scale)
   } else {
-    self.profile.convert_f32(input, output, manual_scale)
+    ToRgb::convert_f32(self.profile, input, output, manual_scale)
   }
 }
 
@@ -848,7 +848,7 @@ fn Indexed::new(array : @hayro_syntax.PdfArray, cache : Cache) -> Indexed? {
     let temp = []
     for _ in 0..<num_components {
       guard pos < data.length() else { return None }
-      temp.push(data[pos].to_float() / 255.0)
+      temp.push(Float::from_byte(data[pos]) / 255.0)
       pos += 1
     }
     vals.push(temp)
@@ -861,13 +861,20 @@ impl ToRgb for Indexed with fn convert_f32(self, input, output, _) {
   let nc = self.base.num_components()
   let indexed = FixedArray::make(input.length() * nc, (0.0 : Float))
   for i in 0..<input.length() {
-    let idx = f32_as_u32(f32_clamp(input[i], 0.0, self.hival.to_float()) + 0.5)
+    let idx = f32_as_u32(
+      f32_clamp(input[i], 0.0, Float::from_int(self.hival)) + 0.5,
+    )
     let v = self.values[idx]
     for j in 0..<nc {
       indexed[i * nc + j] = v[j]
     }
   }
-  self.base.convert_f32(Array::from_fixed_array(indexed)[:], output, true)
+  ToRgb::convert_f32(
+    self.base,
+    Array::from_fixed_array(indexed)[:],
+    output,
+    true,
+  )
 }
 
 ///|
@@ -909,7 +916,7 @@ impl ToRgb for Separation with fn convert_f32(self, input, output, _) {
       evaluated.push(v)
     }
   }
-  self.alternate_space.convert_f32(evaluated[:], output, false)
+  ToRgb::convert_f32(self.alternate_space, evaluated[:], output, false)
 }
 
 ///|
@@ -955,7 +962,7 @@ impl ToRgb for DeviceN with fn convert_f32(self, input, output, _) {
   let evaluated = []
   let n = self.num_components
   for k in 0..<(input.length() / n) {
-    let chunk = input[k * n:(k + 1) * n].to_array()
+    let chunk = input[k * n:(k + 1) * n].to_owned()
     let out = self.tint_transform
       .eval(chunk)
       .unwrap_or(self.alternate_space.initial_color())
@@ -963,7 +970,7 @@ impl ToRgb for DeviceN with fn convert_f32(self, input, output, _) {
       evaluated.push(v)
     }
   }
-  self.alternate_space.convert_f32(evaluated[:], output, false)
+  ToRgb::convert_f32(self.alternate_space, evaluated[:], output, false)
 }
 
 ///|
@@ -1146,7 +1153,7 @@ pub fn Color::from_rgba(rgba : AlphaColor) -> Color {
 }
 
 ///|
-let cmyk_transform_cell : Ref[ICCProfile?] = Ref::new(None)
+let cmyk_transform_cell : Ref[ICCProfile?] = Ref(None)
 
 ///|
 fn cmyk_transform() -> ICCProfile {
@@ -1246,7 +1253,7 @@ fn get_f32_array(
 }
 
 ///|
-let lab_icc_cell : Ref[Bytes?] = Ref::new(None)
+let lab_icc_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 fn lab_icc() -> Bytes {
@@ -1261,7 +1268,7 @@ fn lab_icc() -> Bytes {
 }
 
 ///|
-let cgats_icc_cell : Ref[Bytes?] = Ref::new(None)
+let cgats_icc_cell : Ref[Bytes?] = Ref(None)
 
 ///|
 fn cgats001_compat_v2_micro_icc() -> Bytes {
@@ -1277,7 +1284,7 @@ fn cgats001_compat_v2_micro_icc() -> Bytes {
 
 ///|
 fn decode_base64(s : String) -> Bytes {
-  let clean = StringBuilder::new()
+  let clean = StringBuilder()
   for c in s {
     if c != '\n' {
       clean.write_char(c)

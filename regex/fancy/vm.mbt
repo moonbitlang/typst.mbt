@@ -162,6 +162,11 @@ pub impl Show for Insn with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Insn with Show::{to_string, output}
+
+///|
 /// Sequence of instructions for the VM to execute.
 pub struct Prog {
   /// Instructions of the program

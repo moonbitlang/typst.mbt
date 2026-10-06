@@ -15,6 +15,11 @@
 pub suberror Malformed derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Malformed with @debug.Debug::{to_repr}
+
+///|
 /// Unwraps an option or raises `Malformed` (Rust's `?` on `Option`).
 pub fn[T] req(x : T?) -> T raise Malformed {
   match x {
@@ -142,6 +147,16 @@ fn be_u32(data : BytesView, i : Int) -> UInt {
 pub(all) struct U24(UInt) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U24 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U24 with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for U24 with fn size() {
   3
 }
@@ -152,8 +167,23 @@ pub impl FromData for U24 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U24 with FromData::{size, parse}
+
+///|
 /// A 16-bit signed fixed number with the low 14 bits of fraction (2.14).
 pub(all) struct F2DOT14(Int16) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2DOT14 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2DOT14 with @debug.Debug::{to_repr}
 
 ///|
 /// Converts i16 to f32.
@@ -177,8 +207,23 @@ pub impl FromData for F2DOT14 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2DOT14 with FromData::{size, parse}
+
+///|
 /// A 32-bit signed fixed-point number (16.16).
 pub(all) struct Fixed(Float) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for Fixed with fn size() {
@@ -190,6 +235,11 @@ pub impl FromData for Fixed with fn parse(data) {
   let n : Int = FromData::parse(data)
   Fixed(Float::from_int(n) / 65536.0)
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with FromData::{size, parse}
 
 ///|
 pub fn Fixed::apply_float_delta(self : Fixed, delta : Float) -> Float {
@@ -312,6 +362,9 @@ pub struct LazyArray16[_] {
 pub impl[T] Default for LazyArray16[T] with fn default() {
   { data: empty_data, }
 }
+
+///|
+pub extend LazyArray16 with Default::{default}
 
 ///|
 /// Creates a new `LazyArray`.
@@ -472,6 +525,9 @@ pub impl[T] Default for LazyArray32[T] with fn default() {
 }
 
 ///|
+pub extend LazyArray32 with Default::{default}
+
+///|
 /// Creates a new `LazyArray`.
 pub fn[T] LazyArray32::new(data : BytesView) -> LazyArray32[T] {
   { data, }
@@ -583,6 +639,11 @@ pub impl[T] Default for LazyOffsetArray16[T] with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LazyOffsetArray16 with Default::{default}
+
+///|
 /// Creates a new `LazyOffsetArray16`.
 pub fn[T] LazyOffsetArray16::new(
   data : BytesView,
@@ -660,6 +721,9 @@ pub struct Stream {
 pub impl Default for Stream with fn default() {
   { data: empty_data, offset: 0, }
 }
+
+///|
+pub extend Stream with Default::{default}
 
 ///|
 /// Creates a new `Stream` parser.
@@ -924,6 +988,16 @@ pub impl[T : Offset] FromData for T? with fn parse(data) {
 pub(all) struct Offset16(UInt16) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with @debug.Debug::{to_repr}
+
+///|
 pub impl Offset for Offset16 with fn to_usize(self) {
   self.0.to_int()
 }
@@ -932,6 +1006,9 @@ pub impl Offset for Offset16 with fn to_usize(self) {
 pub impl Offset for Offset16 with fn is_null(self) {
   self.0 == 0
 }
+
+///|
+pub extend Offset16 with Offset::{is_null, to_usize}
 
 ///|
 pub impl FromData for Offset16 with fn size() {
@@ -944,8 +1021,23 @@ pub impl FromData for Offset16 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with FromData::{size, parse}
+
+///|
 /// A type-safe u24 offset.
 pub(all) struct Offset24(UInt) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset24 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset24 with @debug.Debug::{to_repr}
 
 ///|
 pub impl Offset for Offset24 with fn to_usize(self) {
@@ -956,6 +1048,9 @@ pub impl Offset for Offset24 with fn to_usize(self) {
 pub impl Offset for Offset24 with fn is_null(self) {
   self.0 == 0
 }
+
+///|
+pub extend Offset24 with Offset::{is_null, to_usize}
 
 ///|
 pub impl FromData for Offset24 with fn size() {
@@ -969,8 +1064,23 @@ pub impl FromData for Offset24 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset24 with FromData::{size, parse}
+
+///|
 /// A type-safe u32 offset.
 pub(all) struct Offset32(UInt) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset32 with @debug.Debug::{to_repr}
 
 ///|
 /// Converts the offset to `usize`. Offsets that do not fit into a
@@ -990,6 +1100,9 @@ pub impl Offset for Offset32 with fn is_null(self) {
 }
 
 ///|
+pub extend Offset32 with Offset::{is_null, to_usize}
+
+///|
 pub impl FromData for Offset32 with fn size() {
   4
 }
@@ -998,6 +1111,11 @@ pub impl FromData for Offset32 with fn size() {
 pub impl FromData for Offset32 with fn parse(data) {
   Offset32(be_u32(data, 0))
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset32 with FromData::{size, parse}
 
 ///|
 pub fn i16_bound(min : Int16, val : Int16, max : Int16) -> Int16 {

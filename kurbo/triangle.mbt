@@ -12,6 +12,16 @@ pub(all) struct Triangle {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Triangle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Triangle with @debug.Debug::{to_repr}
+
+///|
 /// A new [`Triangle`] from three vertices ([`Point`]s).
 pub fn Triangle::new(a : Point, b : Point, c : Point) -> Triangle {
   { a, b, c, }

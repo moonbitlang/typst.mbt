@@ -28,6 +28,11 @@ pub(all) suberror TableError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableError with @debug.Debug::{to_repr}
+
+///|
 /// Rust's `Display` of [TableError].
 pub impl Show for TableError with fn output(self, logger) {
   let message = match self {
@@ -50,6 +55,9 @@ pub impl Show for TableError with fn output(self, logger) {
   }
   logger.write_string(message)
 }
+
+///|
+pub extend TableError with Show::{to_string, output}
 
 ///|
 /// `impl From<LimiterError> for TableError`

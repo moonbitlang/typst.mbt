@@ -51,6 +51,16 @@ pub(all) enum Event {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Event with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Event with @debug.Debug::{to_repr}
+
+///|
 fn Event::empty_scalar() -> Event {
   // a null scalar
   Event::Scalar("~", Plain, 0, None)

@@ -177,6 +177,9 @@ pub impl Readable for Dict with fn read(r, ctx) {
 }
 
 ///|
+pub extend Dict with Readable::{read}
+
+///|
 pub impl ObjectLike for Dict with fn from_object(o) {
   match o {
     Dict(d) => Some(d)
@@ -191,7 +194,7 @@ fn read_dict_inner(
   start_tag : Bytes?,
   end_tag : Bytes,
 ) -> Dict? {
-  let offsets = Map::new(capacity=8)
+  let offsets = Map([], capacity=8)
   let data = parse_dict_with(r, ctx, start_tag, end_tag, fn(name, offset, _) {
     offsets[name.0] = offset
     Some(())

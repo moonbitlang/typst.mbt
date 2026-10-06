@@ -297,3 +297,6 @@ pub impl Show for Person with fn output(self, logger) {
     logger.write_string(" " + self.suffix)
   }
 }
+
+///|
+pub extend Person with Show::{to_string, output}

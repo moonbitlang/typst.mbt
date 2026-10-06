@@ -24,6 +24,11 @@ pub(all) enum StoreValueKind {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StoreValueKind with Eq::{not_equal, equal}
+
+///|
 /// Store operators with wrapping (upstream `StoreWrapOperator`).
 pub(all) struct StoreWrapOperator {
   kind : StoreValueKind

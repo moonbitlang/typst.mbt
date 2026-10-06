@@ -44,6 +44,11 @@ pub impl Show for ParseThemeError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseThemeError with Show::{to_string, output}
+
+///|
 pub fn UnderlineOption::from_str(
   s : String,
 ) -> UnderlineOption raise ParseThemeError {
@@ -322,6 +327,9 @@ pub impl Show for LoadingError with fn output(self, logger) {
     ReadSettings(_) => logger.write_string("Invalid syntax theme settings")
   }
 }
+
+///|
+pub extend LoadingError with Show::{to_string, output}
 
 ///|
 /// Loads a theme given a readable stream (upstream

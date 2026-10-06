@@ -135,6 +135,9 @@ pub impl Show for PersonError with fn output(self, logger) {
 }
 
 ///|
+pub extend PersonError with Show::{to_string, output}
+
+///|
 /// This function expects a list of strings with its length between one and
 /// three. The first part will be interpreted as the `<prefix> <Name>`, the
 /// second part as the given name and the third part as the suffix.

@@ -23,6 +23,8 @@ pub fn fonts_of(String) -> @doc.DocWorld raise @system.SystemError
 
 pub fn guide() -> @doc.Document
 
+pub fn half_width() -> @doc.Layout
+
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
 
 pub fn lints_of(@doc.Document) -> Array[String]
@@ -40,6 +42,8 @@ pub fn plain_note(&@doc.IntoContent) -> @doc.Block
 
 pub fn prose_table(Array[@doc.Sizing]) -> @doc.Table
 
+pub fn roman_numeral() -> @doc.Call
+
 pub fn ruled_table(Array[&@doc.IntoContent]) -> @doc.Table
 
 pub fn run_together() -> @doc.Seq
@@ -48,11 +52,13 @@ pub fn stripes_captured() -> @doc.Seq
 
 pub fn stripes_in_show() -> @doc.Seq
 
+pub fn typed_fields() -> @doc.Seq
+
 pub fn untitled_outline() -> @doc.Outline
 
 pub fn untyped_fields() -> @doc.Seq
 
-pub fn upper_case() -> @doc.Call
+pub fn upper_case() -> @doc.Upper
 
 // Errors
 

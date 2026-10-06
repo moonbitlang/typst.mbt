@@ -32,6 +32,21 @@ pub(all) enum FontFamily {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFamily with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFamily with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontFamily with Hash::{hash, hash_combine}
+
+///|
 /// Upstream's `Display`.
 pub impl Show for FontFamily with fn output(self, logger) {
   let str = match self {
@@ -44,6 +59,9 @@ pub impl Show for FontFamily with fn output(self, logger) {
   }
   logger.write_string(str)
 }
+
+///|
+pub extend FontFamily with Show::{to_string, output}
 
 ///|
 pub fn Stream::parse_font_families(
@@ -113,6 +131,21 @@ pub(all) struct FontShorthand {
   /// The font family.
   font_family : String
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontShorthand with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontShorthand with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontShorthand with Hash::{hash, hash_combine}
 
 ///|
 /// Parses the `font` shorthand from a string.

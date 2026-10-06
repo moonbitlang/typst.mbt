@@ -7,6 +7,16 @@
 pub(all) struct IRI(String) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IRI with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IRI with @debug.Debug::{to_repr}
+
+///|
 /// Parsers a `IRI` from a string.
 ///
 /// By the SVG spec, the ID must contain only [Name] characters,
@@ -28,6 +38,16 @@ pub fn IRI::from_str(text : String) -> IRI raise SvgTypesError {
 ///
 /// [`<FuncIRI>`]: https://www.w3.org/TR/SVG11/types.html#DataTypeFuncIRI
 pub(all) struct FuncIRI(String) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncIRI with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncIRI with @debug.Debug::{to_repr}
 
 ///|
 /// Parsers a `FuncIRI` from a string.

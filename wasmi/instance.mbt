@@ -17,6 +17,11 @@ pub(all) enum Extern {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Extern with Eq::{not_equal, equal}
+
+///|
 pub impl Show for Extern with fn output(self, f) {
   match self {
     Global(g) => f.write_string("Global(\{g})")
@@ -25,6 +30,11 @@ pub impl Show for Extern with fn output(self, f) {
     Func(func) => f.write_string("Func(\{func})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Extern with Show::{to_string, output}
 
 ///|
 /// Returns the underlying global variable if `self` is a global variable.
@@ -135,6 +145,11 @@ pub impl Show for ExternType with fn output(self, f) {
     Func(ty) => f.write_string("Func(\{debug_func_type(ty)})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternType with Show::{to_string, output}
 
 ///|
 /// An instantiated WebAssembly [`Module`].

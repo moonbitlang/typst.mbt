@@ -16,6 +16,11 @@ pub(all) struct MathValue {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathValue with @debug.Debug::{to_repr}
+
+///|
 fn MathValue::parse(data : BytesView, parent : BytesView) -> MathValue? {
   let record : MathValueRecord = FromData::parse(data) catch {
     _ => return None
@@ -75,6 +80,11 @@ pub impl FromSlice for MathValues with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathValues with FromSlice::{parse_slice}
+
+///|
 /// Returns the value for the glyph or `None` if it is not covered.
 pub fn MathValues::get(self : MathValues, glyph : GlyphId) -> MathValue? {
   guard self.coverage.get(glyph) is Some(index) else { return None }
@@ -88,6 +98,11 @@ pub impl Debug for MathValues with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathValues with @debug.Debug::{to_repr}
+
+///|
 /// A [Math Constants Table](https://learn.microsoft.com/en-us/typography/opentype/spec/math#mathconstants-table).
 struct MathConstants {
   data : BytesView
@@ -99,9 +114,19 @@ pub impl FromSlice for MathConstants with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathConstants with FromSlice::{parse_slice}
+
+///|
 pub impl Debug for MathConstants with fn to_repr(_) {
   Repr::literal("Constants { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathConstants with @debug.Debug::{to_repr}
 
 ///|
 /// Read an `i16` at an offset into the table.
@@ -762,9 +787,17 @@ pub impl FromSlice for MathKern with fn parse_slice(data) {
 }
 
 ///|
+pub extend MathKern with FromSlice::{parse_slice}
+
+///|
 pub impl Debug for MathKern with fn to_repr(_) {
   Repr::literal("Kern { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathKern with @debug.Debug::{to_repr}
 
 ///|
 priv struct MathKernInfoRecord {
@@ -823,6 +856,11 @@ pub(all) struct MathKernInfo {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathKernInfo with @debug.Debug::{to_repr}
+
+///|
 /// A [Math Kern Info Table](https://docs.microsoft.com/en-us/typography/opentype/spec/math#mathkerninfo-table).
 struct MathKernInfos {
   data : BytesView
@@ -840,6 +878,11 @@ pub impl FromSlice for MathKernInfos with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathKernInfos with FromSlice::{parse_slice}
+
+///|
 /// Returns the kerning info for the glyph or `None` if it is not covered.
 pub fn MathKernInfos::get(
   self : MathKernInfos,
@@ -854,6 +897,11 @@ pub fn MathKernInfos::get(
 pub impl Debug for MathKernInfos with fn to_repr(_) {
   Repr::literal("KernInfos { ... }")
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathKernInfos with @debug.Debug::{to_repr}
 
 ///|
 /// A [Math Glyph Info Table](https://learn.microsoft.com/en-us/typography/opentype/spec/math#mathglyphinfo-table).
@@ -879,8 +927,23 @@ pub impl FromSlice for MathGlyphInfo with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathGlyphInfo with FromSlice::{parse_slice}
+
+///|
 /// Glyph part flags.
 pub(all) struct PartFlags(UInt16) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartFlags with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartFlags with @debug.Debug::{to_repr}
 
 ///|
 pub fn PartFlags::extender(self : PartFlags) -> Bool {
@@ -898,6 +961,11 @@ pub impl FromData for PartFlags with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartFlags with FromData::{size, parse}
+
+///|
 /// Details for a glyph part in an assembly.
 pub(all) struct GlyphPart {
   /// Glyph ID for the part.
@@ -911,6 +979,11 @@ pub(all) struct GlyphPart {
   /// Part flags.
   part_flags : PartFlags
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphPart with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for GlyphPart with fn size() {
@@ -928,6 +1001,11 @@ pub impl FromData for GlyphPart with fn parse(data) {
     part_flags: s.read(),
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphPart with FromData::{size, parse}
 
 ///|
 /// A [Glyph Assembly Table](https://learn.microsoft.com/en-us/typography/opentype/spec/math#glyphassembly-table).
@@ -948,6 +1026,11 @@ pub impl FromSlice for GlyphAssembly with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphAssembly with FromSlice::{parse_slice}
+
+///|
 /// Description of math glyph variants.
 pub(all) struct GlyphVariant {
   /// The ID of the variant glyph.
@@ -955,6 +1038,11 @@ pub(all) struct GlyphVariant {
   /// Advance width/height, in design units, of the variant glyph.
   advance_measurement : UInt16
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphVariant with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for GlyphVariant with fn size() {
@@ -966,6 +1054,11 @@ pub impl FromData for GlyphVariant with fn parse(data) {
   let s = Stream::new(data)
   { variant_glyph: s.read(), advance_measurement: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphVariant with FromData::{size, parse}
 
 ///|
 /// A [Math Glyph Construction Table](
@@ -985,6 +1078,11 @@ pub impl FromSlice for GlyphConstruction with fn parse_slice(data) {
   let variants = s.read_array16(variant_count)
   { assembly, variants, }
 }
+
+///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphConstruction with FromSlice::{parse_slice}
 
 ///|
 /// A mapping from glyphs to
@@ -1025,6 +1123,11 @@ pub impl Debug for GlyphConstructions with fn to_repr(_) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphConstructions with @debug.Debug::{to_repr}
+
+///|
 /// A [Math Variants Table](
 /// https://learn.microsoft.com/en-us/typography/opentype/spec/math#mathvariants-table).
 pub(all) struct MathVariants {
@@ -1056,6 +1159,11 @@ pub impl FromSlice for MathVariants with fn parse_slice(data) {
     ),
   }
 }
+
+///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathVariants with FromSlice::{parse_slice}
 
 ///|
 /// A [Math Table](https://docs.microsoft.com/en-us/typography/opentype/spec/math).
@@ -1092,6 +1200,3 @@ fn[T : FromSlice] math_parse_at_offset16(s : Stream, data : BytesView) -> T? {
   guard slice_from(data, offset.to_usize()) is Some(data) else { return None }
   opt(() => T::parse_slice(data))
 }
-
-///|
-extend MathKern with FromSlice::{parse_slice}

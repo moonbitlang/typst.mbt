@@ -21,6 +21,16 @@ pub(all) struct Stroke {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with @debug.Debug::{to_repr}
+
+///|
 /// Options for path stroking.
 pub struct StrokeOpts {
   priv opt_level : StrokeOptLevel
@@ -31,6 +41,16 @@ pub struct StrokeOpts {
   /// is truncated there.
   priv stable_dash_order : Bool
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeOpts with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeOpts with @debug.Debug::{to_repr}
 
 ///|
 /// Optimization level for computing stroke outlines.
@@ -48,15 +68,33 @@ pub(all) enum StrokeOptLevel {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeOptLevel with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeOptLevel with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for StrokeOpts with fn default() {
   let opt_level = StrokeOptLevel::Subdivide
   { opt_level, stable_dash_order: false, }
 }
 
 ///|
+pub extend StrokeOpts with Default::{default}
+
+///|
 pub impl Default for Stroke with fn default() {
   Stroke::new(1.0)
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Default::{default}
 
 ///|
 /// Creates a new stroke with the specified width.
@@ -171,6 +209,11 @@ pub struct StrokeCtx {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeCtx with @debug.Debug::{to_repr}
+
+///|
 /// Create a new (empty) stroke context.
 pub fn StrokeCtx::new() -> StrokeCtx {
   {
@@ -191,6 +234,11 @@ pub fn StrokeCtx::new() -> StrokeCtx {
 pub impl Default for StrokeCtx with fn default() {
   StrokeCtx::new()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeCtx with Default::{default}
 
 ///|
 /// Return the path that defines the expanded stroke.

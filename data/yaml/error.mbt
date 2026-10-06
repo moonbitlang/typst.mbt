@@ -11,11 +11,31 @@ pub(all) struct Location {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with @debug.Debug::{to_repr}
+
+///|
 /// `serde_yaml::Error` as Typst sees it: `message` is exactly its `Display`
 /// output and `location` is `error.location()`.
 pub(all) suberror YamlError {
   YamlError(message~ : String, location~ : Location?)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlError with @debug.Debug::{to_repr}
 
 ///|
 /// A libyaml `yaml_mark_t`: 0-based byte index, line and column.

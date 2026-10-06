@@ -135,6 +135,9 @@ pub impl IntoValue for Scalar with fn into_value(self) {
 }
 
 ///|
+pub extend Scalar with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Scalar with fn from_value(v) {
   Scalar::new(FromValue::from_value(v))
 }

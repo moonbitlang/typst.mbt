@@ -83,9 +83,9 @@ fn dct_decode(
     while i < buf.length() {
       // (`chunks_mut(4)`: a trailing chunk may be shorter.)
       let n = @cmp.minimum(4, buf.length() - i)
-      let y = buf[i].to_float()
-      let cb : Float = if n > 1 { buf[i + 1].to_float() } else { 0 }
-      let cr : Float = if n > 2 { buf[i + 2].to_float() } else { 0 }
+      let y = Float::from_byte(buf[i])
+      let cb : Float = if n > 1 { Float::from_byte(buf[i + 1]) } else { 0 }
+      let cr : Float = if n > 2 { Float::from_byte(buf[i + 2]) } else { 0 }
       if n > 2 {
         buf[i] = f32_as_u8((434.456 : Float) - y - (1.402 : Float) * cr).to_byte()
         buf[i + 1] = f32_as_u8(

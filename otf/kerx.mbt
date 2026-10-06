@@ -51,6 +51,11 @@ pub(all) struct KerxEntryData {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend KerxEntryData with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for KerxEntryData with fn size() {
   2
 }
@@ -60,6 +65,11 @@ pub impl FromData for KerxEntryData with fn parse(data) {
   let s = Stream::new(data)
   { action_index: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend KerxEntryData with FromData::{size, parse}
 
 ///|
 /// A format 1 subtable.

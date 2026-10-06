@@ -65,6 +65,21 @@ pub(all) enum Weight {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with Hash::{hash, hash_combine}
+
+///|
 /// Returns a numeric representation of a weight.
 pub fn Weight::to_number(self : Weight) -> UInt16 {
   match self {
@@ -103,6 +118,11 @@ pub impl Default for Weight with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weight with Default::{default}
+
+///|
 /// A face [width](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass).
 pub(all) enum Width {
   UltraCondensed
@@ -115,6 +135,26 @@ pub(all) enum Width {
   ExtraExpanded
   UltraExpanded
 } derive(Eq, Compare, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Width with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Width with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Width with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Width with Hash::{hash, hash_combine}
 
 ///|
 /// Returns a numeric representation of a width.
@@ -138,6 +178,11 @@ pub impl Default for Width with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Width with Default::{default}
+
+///|
 /// Face [permissions](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#fst).
 pub(all) enum Permissions {
   Installable
@@ -145,6 +190,26 @@ pub(all) enum Permissions {
   PreviewAndPrint
   Editable
 } derive(Eq, Compare, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Permissions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Permissions with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Permissions with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Permissions with Hash::{hash, hash_combine}
 
 ///|
 /// A face style.
@@ -158,9 +223,29 @@ pub(all) enum Style {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Hash::{hash, hash_combine}
+
+///|
 pub impl Default for Style with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Default::{default}
 
 ///|
 /// A script metrics used by subscript and superscript.
@@ -176,6 +261,21 @@ pub(all) struct ScriptMetrics {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptMetrics with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptMetrics with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptMetrics with Hash::{hash, hash_combine}
+
+///|
 /// [Unicode Ranges](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ur).
 ///
 /// A `u128` upstream; stored as low and high 64 bits.
@@ -183,6 +283,19 @@ pub(all) struct UnicodeRanges {
   lo : UInt64
   hi : UInt64
 } derive(Eq, Default, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeRanges with Eq::{not_equal, equal}
+
+///|
+pub extend UnicodeRanges with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeRanges with @debug.Debug::{to_repr}
 
 ///|
 /// Checks if ranges contain the specified character.

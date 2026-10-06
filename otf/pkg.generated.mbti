@@ -438,6 +438,7 @@ pub(all) enum Coverage {
 pub fn Coverage::contains(Self, GlyphId) -> Bool
 pub fn Coverage::get(Self, GlyphId) -> UInt16?
 pub fn Coverage::parse(BytesView) -> Self?
+pub fn Coverage::parse_slice(BytesView) -> Self raise Malformed
 pub impl FromSlice for Coverage
 
 type CpalTable
@@ -764,6 +765,7 @@ pub(all) enum IndexToLocationFormat {
 } derive(Eq, @debug.Debug)
 
 type ItemVariationStore
+pub fn ItemVariationStore::default() -> Self
 pub fn ItemVariationStore::parse(Stream) -> Self?
 pub fn ItemVariationStore::parse_delta(Self, UInt16, UInt16, ArrayView[NormalizedCoordinate]) -> Float?
 pub fn ItemVariationStore::region_indices(Self, UInt16) -> LazyArray16[UInt16]?
@@ -1094,8 +1096,10 @@ pub(all) enum Language {
   Yi_PRC
   Yoruba_Nigeria
 } derive(Eq, @debug.Debug)
+pub fn Language::output(Self, &Logger) -> Unit
 pub fn Language::primary_language(Self) -> String
 pub fn Language::region(Self) -> String
+pub fn Language::to_string(Self) -> String
 pub impl Show for Language
 
 pub(all) struct LanguageSystem {
@@ -1119,6 +1123,7 @@ pub struct LazyArray16[_] {
 pub fn[T : FromData + Compare] LazyArray16::binary_search(Self[T], T) -> (UInt16, T)?
 pub fn[T : FromData] LazyArray16::binary_search_by(Self[T], (T) -> Int) -> (UInt16, T)?
 pub fn[T] LazyArray16::data(Self[T]) -> BytesView
+pub fn[T] LazyArray16::default() -> Self[T]
 pub fn[T : FromData] LazyArray16::get(Self[T], UInt16) -> T?
 pub fn[T : FromData] LazyArray16::get_r(Self[T], UInt16) -> T raise Malformed
 pub fn[T : FromData] LazyArray16::is_empty(Self[T]) -> Bool
@@ -1135,6 +1140,7 @@ pub struct LazyArray32[_] {
 }
 pub fn[T : FromData + Compare] LazyArray32::binary_search(Self[T], T) -> (UInt, T)?
 pub fn[T : FromData] LazyArray32::binary_search_by(Self[T], (T) -> Int) -> (UInt, T)?
+pub fn[T] LazyArray32::default() -> Self[T]
 pub fn[T : FromData] LazyArray32::get(Self[T], UInt) -> T?
 pub fn[T : FromData] LazyArray32::is_empty(Self[T]) -> Bool
 pub fn[T : FromData] LazyArray32::iter(Self[T]) -> Iter[T]
@@ -1325,6 +1331,7 @@ type MathKern
 pub fn MathKern::count(Self) -> UInt16
 pub fn MathKern::height(Self, UInt16) -> MathValue?
 pub fn MathKern::kern(Self, UInt16) -> MathValue?
+pub fn MathKern::parse_slice(BytesView) -> Self raise Malformed
 pub impl @debug.Debug for MathKern
 pub impl FromSlice for MathKern
 
@@ -1372,6 +1379,7 @@ pub(all) struct Matrix {
   tx : Float
   ty : Float
 } derive(Eq, @debug.Debug)
+pub fn Matrix::default() -> Self
 pub impl Default for Matrix
 
 pub(all) struct MaxpTable {
@@ -1489,10 +1497,12 @@ pub fn Name::to_string(Self) -> String?
 pub struct NameTable {
   names : Names
 }
+pub fn NameTable::default() -> Self
 pub fn NameTable::parse(BytesView) -> Self?
 pub impl Default for NameTable
 
 type Names
+pub fn Names::default() -> Self
 pub fn Names::get(Self, UInt16) -> Name?
 pub fn Names::is_empty(Self) -> Bool
 pub fn Names::iter(Self) -> Iter[Name]
@@ -1505,14 +1515,20 @@ pub fn NormalizedCoordinate::from_i16(Int16) -> Self
 pub fn NormalizedCoordinate::get(Self) -> Int16
 
 pub(all) struct Offset16(UInt16) derive(Eq, @debug.Debug)
+pub fn Offset16::is_null(Self) -> Bool
+pub fn Offset16::to_usize(Self) -> Int
 pub impl FromData for Offset16
 pub impl Offset for Offset16
 
 pub(all) struct Offset24(UInt) derive(Eq, @debug.Debug)
+pub fn Offset24::is_null(Self) -> Bool
+pub fn Offset24::to_usize(Self) -> Int
 pub impl FromData for Offset24
 pub impl Offset for Offset24
 
 pub(all) struct Offset32(UInt) derive(Eq, @debug.Debug)
+pub fn Offset32::is_null(Self) -> Bool
+pub fn Offset32::to_usize(Self) -> Int
 pub impl FromData for Offset32
 pub impl Offset for Offset32
 
@@ -1720,6 +1736,7 @@ pub(all) struct RawFaceTables {
   mut mvar : BytesView?
   mut vvar : BytesView?
 }
+pub fn RawFaceTables::default() -> Self
 pub impl Default for RawFaceTables
 
 type RecordList[_]
@@ -1942,6 +1959,7 @@ pub fn Stream::advance_checked(Self, Int) -> Unit raise Malformed
 pub fn Stream::at_end(Self) -> Bool
 pub fn Stream::copy(Self) -> Self
 pub fn Stream::data(Self) -> BytesView
+pub fn Stream::default() -> Self
 pub fn Stream::jump_to_end(Self) -> Unit
 pub fn Stream::new(BytesView) -> Self
 pub fn Stream::new_at(BytesView, Int) -> Self?
@@ -2042,12 +2060,19 @@ pub impl FromData for TableRecord
 
 pub(all) struct Tag(UInt) derive(Compare, Default, Eq, Hash)
 pub fn Tag::as_u32(Self) -> UInt
+pub fn Tag::compare(Self, Self) -> Int
 pub fn Tag::from_bytes(Bytes) -> Self
 pub fn Tag::from_bytes_lossy(BytesView) -> Self
 pub fn Tag::from_str(String) -> Self
 pub fn Tag::is_null(Self) -> Bool
+pub fn Tag::op_ge(Self, Self) -> Bool
+pub fn Tag::op_gt(Self, Self) -> Bool
+pub fn Tag::op_le(Self, Self) -> Bool
+pub fn Tag::op_lt(Self, Self) -> Bool
+pub fn Tag::output(Self, &Logger) -> Unit
 pub fn Tag::to_bytes(Self) -> Bytes
 pub fn Tag::to_chars(Self) -> Array[Char]
+pub fn Tag::to_string(Self) -> String
 pub impl Show for Tag
 pub impl @debug.Debug for Tag
 pub impl FromData for Tag
@@ -2090,6 +2115,7 @@ pub(all) struct Transform {
   f : Float
 } derive(Eq)
 pub fn Transform::combine(Self, Self) -> Self
+pub fn Transform::default() -> Self
 pub fn Transform::is_default(Self) -> Bool
 pub fn Transform::new(Float, Float, Float, Float, Float, Float) -> Self
 pub fn Transform::new_rotate(Float) -> Self
@@ -2119,6 +2145,7 @@ pub(all) struct UnicodeRanges {
   hi : UInt64
 } derive(Default, Eq, @debug.Debug)
 pub fn UnicodeRanges::contains_char(Self, Char) -> Bool
+pub fn UnicodeRanges::default() -> Self
 
 pub(all) struct ValueOffset(UInt16) derive(@debug.Debug)
 pub fn ValueOffset::next(Self) -> Self

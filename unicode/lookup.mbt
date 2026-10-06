@@ -161,6 +161,21 @@ pub(all) enum MathClass {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathClass with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathClass with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathClass with Hash::{hash, hash_combine}
+
+///|
 let math_classes : ReadOnlyArray[MathClass] = [
   Normal,
   Alphabetic,

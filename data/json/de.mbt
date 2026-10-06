@@ -29,6 +29,16 @@ pub(all) enum ErrorCode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorCode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorCode with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for ErrorCode with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -58,11 +68,21 @@ pub impl Show for ErrorCode with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorCode with Show::{to_string, output}
+
+///|
 /// A JSON syntax error with its 1-based line and 0-based byte column
 /// (upstream `serde_json::Error`).
 pub(all) suberror JsonError {
   JsonError(code~ : ErrorCode, line~ : Int, column~ : Int)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend JsonError with @debug.Debug::{to_repr}
 
 ///|
 /// The line at which the error occurred (1-based).

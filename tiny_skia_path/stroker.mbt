@@ -37,6 +37,16 @@ pub(all) struct Stroke {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Stroke with fn default() {
   {
     width: 1.0,
@@ -46,6 +56,11 @@ pub impl Default for Stroke with fn default() {
     dash: None,
   }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stroke with Default::{default}
 
 ///|
 /// Draws at the beginning and end of an open path contour.
@@ -59,9 +74,24 @@ pub(all) enum LineCap {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for LineCap with fn default() {
   Butt
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCap with Default::{default}
 
 ///|
 /// Specifies how corners are drawn when a shape is stroked.
@@ -89,9 +119,24 @@ pub(all) enum LineJoin {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for LineJoin with fn default() {
   Miter
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineJoin with Default::{default}
 
 ///|
 let quad_recursive_limit : Int = 3
@@ -183,6 +228,11 @@ pub struct PathStroker {
 pub impl Default for PathStroker with fn default() {
   PathStroker::new()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathStroker with Default::{default}
 
 ///|
 /// Creates a new PathStroker.

@@ -189,7 +189,7 @@ fn draw_svg_glyph(
   // krilla draws color glyphs y-down (`draw_color_glyph` flips the y-axis).
   surface.push_transform(@export.Transform::from_scale(1.0, -1.0))
   let drawn = render_svg_glyph(
-    doc.data.to_bytes(),
+    doc.data.to_owned(),
     context_color,
     gid.0.to_int(),
     (upem, upem),

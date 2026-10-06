@@ -31,9 +31,9 @@ fn round_f32(x : Float) -> Float {
 ///|
 fn pow2i(exp : Int) -> Float {
   if exp >= 0 {
-    shl_u32(1, exp).to_float()
+    Float::from_uint(shl_u32(1, exp))
   } else {
-    (1.0 : Float) / shl_u32(1, -exp).to_float()
+    (1.0 : Float) / Float::from_uint(shl_u32(1, -exp))
   }
 }
 

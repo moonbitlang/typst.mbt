@@ -5,6 +5,26 @@
 pub(all) struct Sid(Int) derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sid with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sid with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sid with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sid with @debug.Debug::{to_repr}
+
+///|
 /// Creates an identifier from a 16-bit unsigned integer.
 pub fn Sid::new(raw : Int) -> Sid {
   Sid(raw & 0xFFFF)

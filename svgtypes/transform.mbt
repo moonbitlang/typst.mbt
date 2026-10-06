@@ -14,6 +14,16 @@ pub(all) struct Transform {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transform with @debug.Debug::{to_repr}
+
+///|
 /// Constructs a new transform.
 pub fn Transform::new(
   a : Double,
@@ -32,6 +42,9 @@ pub impl Default for Transform with fn default() {
 }
 
 ///|
+pub extend Transform with Default::{default}
+
+///|
 /// Transform list token.
 pub(all) enum TransformListToken {
   Matrix(
@@ -48,6 +61,16 @@ pub(all) enum TransformListToken {
   SkewX(angle~ : Double)
   SkewY(angle~ : Double)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformListToken with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformListToken with @debug.Debug::{to_repr}
 
 ///|
 /// A pull-based [`<transform-list>`] parser.

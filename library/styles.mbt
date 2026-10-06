@@ -342,6 +342,9 @@ pub impl Reflect for Transformation with fn castable(v) {
 }
 
 ///|
+pub extend Transformation with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for Transformation with fn from_value(v) {
   if Content::castable(v) {
     Content(Content::from_value(v))

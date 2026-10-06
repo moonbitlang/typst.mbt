@@ -51,6 +51,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Upper,
+  type Layout,
   type Show,
   type ShowSet,
   type Select,
@@ -281,14 +283,14 @@ What the passed location covers:
 Rows that a loop builds from data are on one line too, with or without a
 helper; `Keyed(key, ..)` tells them apart (section 4.2 of the design).
 
-## 4. Values that have no typed form yet
+## 4. Conversions, calls, explicit states and untyped values
 
-### 4.1 `Rel`: a `Length` as a `Sizing` or a `Spacing`
+### 4.1 `sizing()` and `spacing()`: a `Length` as a `Sizing` or a `Spacing`
 
 `Length`, `Sizing` and `Spacing` are three enums with the same cases, so
 `Pt(8)` is accepted wherever one of them is expected. A value that already
-is a `Length` (a sum, the result of a function) is not: it is wrapped in
-`Rel(..)`, a case of `Sizing` and of `Spacing` (`composed_lengths`):
+is a `Length` (a sum, the result of a function) is not: it is converted
+with `.sizing()` or `.spacing()` (`composed_lengths`):
 
 ```moonbit
 pub fn composed_lengths() -> Seq {
@@ -296,30 +298,41 @@ pub fn composed_lengths() -> Seq {
   let gap : Length = Pt(11) + Em(0.5)
   let bar = Rect(width=Pct(100), height=Pt(5), fill=Luma(200))
   Seq([
-    Grid([bar, bar], columns=[Rel(narrow), Fr(1)]),
-    Block(bar, above=Rel(gap)),
+    Grid([bar, bar], columns=[narrow.sizing(), Fr(1)]),
+    Block(bar, above=gap.spacing()),
   ])
 }
 ```
 
 A helper that computes sizes can return `Length` and be used for widths
-(`Length`), tracks (`Rel(..)`) and gaps (`Rel(..)`) alike.
+(`Length`), tracks (`.sizing()`) and gaps (`.spacing()`) alike. Both are
+the case `Rel(length)` of their enum, which can be written as well.
 
 ### 4.2 `Call`: any function of Typst
 
 `Call(path, positional=.., named=..)` calls a function of Typst's standard
-library by its name; `Value::content(..)` passes content to it. There is no
-`Upper` constructor, but there is `upper` (`upper_case`):
+library by its name, for what has no constructor; `Value::content(..)`
+passes content to it (`roman_numeral`):
 
 ```moonbit
-pub fn upper_case() -> Call {
-  Call("upper", positional=[Value::content(Seq(["quiet ", Emph("words")]))])
+pub fn roman_numeral() -> Call {
+  Call("numbering", positional=[Value::str("I."), Value::int(4)])
+}
+```
+
+`Value::call(..)` is the same call as a value, for an argument (4.4).
+
+Text case has constructors, `Upper(body)` and `Lower(body)`, which the
+ports did not have and wrote as `Call("upper", ..)` (`upper_case`):
+
+```moonbit
+pub fn upper_case() -> Upper {
+  Upper(Seq(["quiet ", Emph("words")]))
 }
 ```
 
 The content keeps its structure: the emphasis stays. (`s.to_upper()` on a
-MoonBit string is the other way, for plain strings.) `Value::call(..)` is
-the same call as a value, for an argument (4.4).
+MoonBit string is the other way, for plain strings.)
 
 ### 4.3 `NoneValue()`: no content
 
@@ -340,27 +353,48 @@ documentation of each constructor lists them.
 
 ### 4.4 `extra` and `Value`: fields and values without a facade
 
+What the ports needed untyped is typed now: the edges of text
+(`top_edge`, `bottom_edge` of `Text`, `SetText` and `Highlight`), the
+baseline shift of a box (`Box(baseline=..)`), the dash of a stroke (`Dash`:
+`Dotted`, `Dashed`, .., `Pattern([Len(Pt(4)), Dot], phase=Pt(0))`) and the
+operations on a colour (`transparentize`, `lighten`, `darken`, `mix`,
+with percentages as numbers) (`typed_fields`):
+
+```moonbit
+pub fn typed_fields() -> Seq {
+  let teal : Paint = Rgb("#1d7586")
+  Seq([
+    Par(Highlight("tight", top_edge=XHeight, bottom_edge=Baseline)),
+    Par(Seq(["A chip ", Box("moved down", fill=Luma(230), baseline=Pt(2))])),
+    Line(length=Pt(60), stroke=Stroke(dash=Dotted)),
+    Rect(width=Pt(20), height=Pt(10), fill=teal.transparentize(50)),
+  ])
+}
+```
+
+`transparentize(50)` scales the alpha the colour has (Typst's meaning); it
+does not set it. `a.mix(b, weight=30)` gives `b` 30 percent, in Oklab
+unless `space=` says otherwise (`Srgb`, `LinearRgb`, ..).
+
 A field without a typed parameter is set through `extra`, by its Typst name
-and with a `Value`. `doc/elements_coverage.txt` lists these fields; the
-ports needed `top-edge` and `bottom-edge` (of `text` and `highlight`) and
-`baseline` (of `box`). The dash of a `Stroke` is a `Value`, and an operation
-on a colour is a call of Typst's function (`untyped_fields`):
+and with a `Value`; `doc/elements_coverage.txt` lists these fields. The
+same way reaches the forms of a field that its typed parameter does not
+have (the baseline of a box as an alignment). A dash as any value is
+`RawValue(..)`, a paint `Paint::Value(..)` (`untyped_fields`):
 
 ```moonbit
 pub fn untyped_fields() -> Seq {
-  let edges = [
-    ("top-edge", Value::str("x-height")),
-    ("bottom-edge", Value::str("baseline")),
-  ]
-  let lowered = [("baseline", Value::length(Pt(2)))]
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1))),
+    ("all", Value::bool(true)),
+  ])
   let half = Value::call("color.transparentize", positional=[
     Value::paint(Rgb("#1d7586")),
     Value::length(Pct(50)),
   ])
   Seq([
-    Par(Highlight("tight", extra=edges)),
-    Par(Seq(["A chip ", Box("moved down", fill=Luma(230), extra=lowered)])),
-    Line(length=Pt(60), stroke=Stroke(dash=Value::str("dotted"))),
+    Par("Indented.", extra=[("first-line-indent", indent)]),
+    Line(length=Pt(60), stroke=Stroke(dash=RawValue(Value::str("dotted")))),
     Rect(width=Pt(20), height=Pt(10), fill=Paint::Value(half)),
   ])
 }
@@ -377,6 +411,35 @@ chips:
   line higher by the vertical inset. The vertical padding as an `outset`
   draws the same rectangle and leaves the line as it is.
 - `baseline` moves the box down by the given length.
+
+### 4.5 `Layout`: the size of the container
+
+`Layout((size, cx) => ..)` is content that is made when its container is
+laid out, from the container's size in points (`half_width`):
+
+```moonbit
+pub fn half_width() -> Layout {
+  Layout((size, cx) => {
+    let label = cx.measure(Block("half", inset=Sides(all=Pt(4))))
+    Seq([
+      Rect(width=Pt(size.width / 2), height=Pt(label.baseline), fill=Luma(200)),
+      Block("half", inset=Sides(all=Pt(4))),
+    ])
+  })
+}
+```
+
+- `size` is the width and height of the enclosing container (a block or
+  box with that dimension, a grid cell, the page between its margins), not
+  the space that is left in it. A dimension that nothing bounds is
+  infinite (`size.height.is_inf()`): the height of a page with `height:
+  auto`, and both while the content is measured.
+- `cx` is the context of a `Context` callback: `cx.measure(body)` gives
+  the `width`, the `height` and the `baseline` of content, the distance of
+  the first line's baseline from the top. For one line of text with
+  Typst's default edges that is its height; for a block with insets, as
+  here, it is not.
+- It is a callback: section 8 holds for it.
 
 ## 5. Fonts
 
@@ -583,8 +646,9 @@ among the items. The corners are square: a cell has no radius.
 
 ## 8. Callbacks cannot be created inside a callback
 
-Five constructors take a function that the engine calls during layout:
-`Context`, `Show`, `Cells(f)`, `Numbering::func` and `Supplement::func`.
+Six constructors take a function that the engine calls during layout:
+`Context`, `Layout`, `Show`, `Cells(f)`, `Numbering::func` and
+`Supplement::func`.
 Each must be created before the document is compiled. One that is created
 while a callback runs is an error when it is reached (`stripes_in_show`):
 
@@ -604,15 +668,15 @@ pub fn stripes_in_show() -> Seq {
 
 ```text
 error: callbacks cannot be created inside a callback
-  at doc/examples/guide/guide.mbt:234:14 (Cells)
+  at doc/examples/guide/guide.mbt:264:14 (Cells)
   hint: create the callback before compiling and capture it
   hint: or use the `cx` of the enclosing callback
-  while showing heading element at doc/examples/guide/guide.mbt:237:5 (Heading)
+  while showing heading element at doc/examples/guide/guide.mbt:267:5 (Heading)
 ```
 
 The location is the callback that came too late. It bites where it is not
 visible: a helper that builds a striped table (a `Cells` function) or
-measures (`Context`) works at the top level and fails when it is called
+measures (`Context`, `Layout`) works at the top level and fails when it is called
 from a show rule or from a `Context` callback. The ways out:
 
 - create the callback once, outside, and capture it (`stripes_captured`):
@@ -660,7 +724,7 @@ of another callback; it is its creation that has to come first.
 | 2: what the lint takes for text and for a block | `doc/lint_test.mbt`, `doc/lint_wbtest.mbt` |
 | 3: `note` at the call, `plain_note` in the helper | G "section 3: a helper with `#callsite` .." |
 | 3: the five rules about what the location covers | G "section 3: what the location of a helper covers" |
-| 4.1 to 4.4 | G "section 4: ..", F "T1: .." to "T4: ..", "T6: ..", "T7: ..", "T9: .." |
+| 4.1 to 4.5 | G "section 4: ..", F "T1: .." to "T7: ..", "T9: ..", "T11: .." |
 | 4.4: errors of untyped values and their locations | F "T2: ..", "T3: .." |
 | 5: `font_paths`, an unknown family, a world without fonts | G "section 5: fonts come from the world" |
 | 5: a character without a glyph is not reported | F "S4: .." |

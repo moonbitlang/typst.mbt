@@ -32,6 +32,21 @@ pub(all) enum Yaml {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Yaml with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Yaml with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Yaml with @debug.Debug::{to_repr}
+
+///|
 /// `yaml_rust::yaml::Hash`.
 pub fn new_hash() -> LinkedHashMap[Yaml, Yaml] {
   LinkedHashMap::new()
@@ -136,6 +151,11 @@ pub impl MarkedEventReceiver for YamlLoader with fn on_event(self, ev, _) {
     _ => () // ignore
   }
 }
+
+///|
+#deprecated("call as `MarkedEventReceiver::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlLoader with MarkedEventReceiver::{on_event}
 
 ///|
 fn YamlLoader::insert_new_node(self : YamlLoader, node : (Yaml, Int)) -> Unit {
@@ -398,6 +418,9 @@ pub impl Show for Yaml with fn output(self, logger) {
 }
 
 ///|
+pub extend Yaml with Show::{to_string, output}
+
+///|
 fn Yaml::variant_index(self : Yaml) -> Int {
   match self {
     Real(_) => 0
@@ -435,6 +458,11 @@ pub impl Compare for Yaml with fn compare(self, other) {
     _ => self.variant_index().compare(other.variant_index())
   }
 }
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Yaml with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Rust `str` ordering (by code point).

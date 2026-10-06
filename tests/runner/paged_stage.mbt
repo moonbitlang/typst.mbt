@@ -101,6 +101,6 @@ fn file_path(id : @syntax.FileId) -> String {
   let path = id.vpath().get_without_slash()
   match id.root() {
     Project => path
-    Package(spec) => "@\{spec.namespace}/\{spec.name}:\{spec.version}/\{path}"
+    Package(spec) => "@\{spec.namespace_}/\{spec.name}:\{spec.version}/\{path}"
   }
 }

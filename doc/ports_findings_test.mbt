@@ -581,11 +581,12 @@ test "S6: `Prose` turns `'` after a digit into a prime" {
   )
 }
 
-// Section 2.3: typed API gaps, with the way around each that works today.
+// Section 2.3: typed API gaps. Step 2 of the proposal closed T1 to T8 and
+// T11: each test shows the typed form and, beside it, the way around that
+// the ports used, which still works (the escapes stay).
 
 ///|
-test "T1: `Box` has no typed `baseline`; `outset` and `extra` are the ways around" {
-  // (`box.baseline` is in doc/elements_coverage.txt: unmapped type.)
+test "T1: `Box(baseline=)` is typed; `outset` and `extra` still work" {
   let line = (chip : @doc.Box) => {
     listing(marks(compile([..small_page(), @doc.Par(@doc.Seq(["Mg ", chip]))])))
   }
@@ -617,25 +618,29 @@ test "T1: `Box` has no typed `baseline`; `outset` and `extra` are the ways aroun
       #|p1 text 28.9,16.6 w17.6 "chip"
     ),
   )
-  // `baseline` through `extra`: the box is moved down by that much.
+  // `baseline`: the box is moved down by that much.
   inspect(
-    line(
-      @doc.Box("chip", fill=Luma(220), extra=[
-        ("baseline", @doc.Value::length(Pt(3))),
-      ]),
-    ),
+    line(@doc.Box("chip", fill=Luma(220), baseline=Pt(3))),
     content=(
       #|p1 text 10.0,16.6 w15.9 "Mg "
       #|p1 rect 25.9,13.0 17.6x6.6 luma(86.27%)
       #|p1 text 25.9,19.6 w17.6 "chip"
     ),
   )
+  // The same through `extra`, which also takes the forms of the field
+  // that the typed parameter does not (an alignment, `(at:, shift:)`).
+  assert_eq(
+    line(
+      @doc.Box("chip", fill=Luma(220), extra=[
+        ("baseline", @doc.Value::length(Pt(3))),
+      ]),
+    ),
+    line(@doc.Box("chip", fill=Luma(220), baseline=Pt(3))),
+  )
 }
 
 ///|
-test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
-  // (`text.top-edge`, `highlight.top-edge` and the bottom edges are in
-  // doc/elements_coverage.txt: unmapped types.)
+test "T2: `top_edge` and `bottom_edge` are typed; `extra` still reaches them" {
   let shown = (item : &@doc.IntoContent) => {
     listing(marks(compile([..small_page(), @doc.Par(item)])))
   }
@@ -649,16 +654,21 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   )
   // ... or as the edges say.
   inspect(
+    shown(@doc.Highlight("xo", top_edge=XHeight, bottom_edge=Baseline)),
+    content=(
+      #|p1 rect 10.0,12.3 9.9x4.3 rgb("#fffd11a1")
+      #|p1 text 10.0,16.6 w9.9 "xo"
+    ),
+  )
+  // The same through `extra`, as the ports wrote it.
+  assert_eq(
     shown(
       @doc.Highlight("xo", extra=[
         ("top-edge", @doc.Value::str("x-height")),
         ("bottom-edge", @doc.Value::str("baseline")),
       ]),
     ),
-    content=(
-      #|p1 rect 10.0,12.3 9.9x4.3 rgb("#fffd11a1")
-      #|p1 text 10.0,16.6 w9.9 "xo"
-    ),
+    shown(@doc.Highlight("xo", top_edge=XHeight, bottom_edge=Baseline)),
   )
   // The edges of text decide the height of its line: of a box around it.
   inspect(
@@ -671,10 +681,7 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   inspect(
     shown(
       @doc.Box(
-        @doc.Text("xo", extra=[
-          ("top-edge", @doc.Value::str("bounds")),
-          ("bottom-edge", @doc.Value::str("bounds")),
-        ]),
+        @doc.Text("xo", top_edge=Bounds, bottom_edge=Bounds),
         fill=Luma(220),
       ),
     ),
@@ -683,7 +690,26 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
       #|p1 text 10.0,14.4 w9.9 "xo"
     ),
   )
-  // A wrong name is the engine's cast error, at the `extra` argument.
+  assert_eq(
+    shown(
+      @doc.Box(
+        @doc.Text("xo", extra=[
+          ("top-edge", @doc.Value::str("bounds")),
+          ("bottom-edge", @doc.Value::str("bounds")),
+        ]),
+        fill=Luma(220),
+      ),
+    ),
+    shown(
+      @doc.Box(
+        @doc.Text("xo", top_edge=Bounds, bottom_edge=Bounds),
+        fill=Luma(220),
+      ),
+    ),
+  )
+  // The typed parameters only have the names of their edge. Through
+  // `extra` a wrong name is the engine's cast error, at the `extra`
+  // argument (two parameters later than before: the two edges).
   let wrong = compile([
     @doc.Text("xo", extra=[("top-edge", @doc.Value::str("descender"))]),
   ])
@@ -696,46 +722,56 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   inspect(
     what(origin_of(wrong.errors[0])),
     content=(
-      #|(Text, argument 25)
+      #|(Text, argument 27)
     ),
   )
 }
 
 ///|
-test "T3: the dash of a `Stroke` is a `Value`" {
-  let report = compile(
-    [
-      ..small_page(),
-      @doc.Line(
-        length=Pt(50),
-        stroke=@doc.Stroke(thickness=Pt(1), dash=@doc.Value::str("dotted")),
-      ),
-      @doc.Line(
-        length=Pt(50),
-        stroke=@doc.Stroke(
-          thickness=Pt(1),
-          dash=@doc.Value::array([
-            @doc.Value::length(Pt(4)),
-            @doc.Value::length(Pt(2)),
-          ]),
+test "T3: the dash of a `Stroke` is a `Dash`; a `Value` goes through `RawValue`" {
+  let lines = (first : @doc.Dash, second : @doc.Dash) => {
+    let report = compile(
+      [
+        ..small_page(),
+        @doc.Line(
+          length=Pt(50),
+          stroke=@doc.Stroke(thickness=Pt(1), dash=first),
         ),
-      ),
-    ],
-  )
-  inspect(error_messages(report), content="")
-  // `"dotted"` is a dash as long as the line is wide (1pt) and a gap of
-  // 2pt.
+        @doc.Line(
+          length=Pt(50),
+          stroke=@doc.Stroke(thickness=Pt(1), dash=second),
+        ),
+      ],
+    )
+    if !report.errors.is_empty() {
+      fail(error_messages(report))
+    }
+    listing(marks(report))
+  }
+  // `Dotted` is a dash as long as the line is wide (1pt) and a gap of 2pt.
   inspect(
-    listing(marks(report)),
+    lines(Dotted, Pattern([Len(Pt(4)), Len(Pt(2))], phase=Pt(0))),
     content=(
       #|p1 line 10.0,10.0 50.0x0.0 dash 1.0 2.0
       #|p1 line 10.0,22.0 50.0x0.0 dash 4.0 2.0
     ),
   )
-  // A name that is no dash pattern is an error when the document is
-  // compiled, at the argument that holds the stroke.
+  // What the ports wrote while the parameter was a `Value` is the case
+  // `RawValue` now (`dash=Value::str(..)` no longer type-checks).
+  assert_eq(
+    lines(
+      RawValue(@doc.Value::str("dotted")),
+      RawValue(
+        @doc.Value::array([@doc.Value::length(Pt(4)), @doc.Value::length(Pt(2))]),
+      ),
+    ),
+    lines(Dotted, Pattern([Len(Pt(4)), Len(Pt(2))], phase=Pt(0))),
+  )
+  // The typed cases have no wrong names. An untyped name that is no dash
+  // pattern is an error when the document is compiled, at the argument
+  // that holds the stroke.
   let wrong = compile([
-    @doc.Line(stroke=@doc.Stroke(dash=@doc.Value::str("dots"))),
+    @doc.Line(stroke=@doc.Stroke(dash=RawValue(@doc.Value::str("dots")))),
   ])
   inspect(
     error_messages(wrong),
@@ -752,7 +788,7 @@ test "T3: the dash of a `Stroke` is a `Value`" {
 }
 
 ///|
-test "T4: colour operations are calls of Typst's functions on a `Value`" {
+test "T4: colour operations are methods of `Paint`, the calls of Typst's functions" {
   let swatch = (fill : @doc.Paint) => {
     @doc.Rect(width=Pt(20), height=Pt(10), fill~)
   }
@@ -762,7 +798,8 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
       ..small_page(),
       // What the ports wrote: the alpha as two more hex digits.
       swatch(Rgb("#1d758680")),
-      // Typst's own operations, through the generic call.
+      // Typst's own operations, through the generic call (which still
+      // works) ...
       swatch(
         Value(
           @doc.Value::call("color.transparentize", positional=[
@@ -788,6 +825,11 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
           ),
         ),
       ),
+      // ... and as the typed operations, which are these calls: the same
+      // functions with the colour as first argument.
+      swatch(teal.transparentize(50)),
+      swatch(teal.mix(White)),
+      swatch(teal.mix(White, space=Srgb)),
     ],
   )
   inspect(error_messages(report), content="")
@@ -798,19 +840,67 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
       #|rgb("#1d758680")
       #|oklab(76.01%, -0.034, -0.023)
       #|rgb("#8ebac3")
+      #|rgb("#1d758680")
+      #|oklab(76.01%, -0.034, -0.023)
+      #|rgb("#8ebac3")
     ),
+  )
+  // The typed and the untyped form lower to the same value (the typed
+  // `mix` writes the weights out: half each by default).
+  let lowered = (fill : @doc.Paint) => {
+    @doc.Document([@doc.Rect(fill~)])
+    .lower(@doc.DocWorld::in_memory())
+    .unwrap()
+    .repr()
+  }
+  let call = (
+    path : String,
+    positional : Array[@doc.Value],
+    named : Array[(String, @doc.Value)],
+  ) => {
+    let paint : @doc.Paint = Value(@doc.Value::call(path, positional~, named~))
+    lowered(paint)
+  }
+  assert_eq(
+    lowered(teal.transparentize(50)),
+    call(
+      "color.transparentize",
+      [@doc.Value::paint(teal), @doc.Value::length(Pct(50))],
+      [],
+    ),
+  )
+  let weighted = (paint : @doc.Paint, percent : Double) => {
+    @doc.Value::array([
+      @doc.Value::paint(paint),
+      @doc.Value::length(Pct(percent)),
+    ])
+  }
+  assert_eq(
+    lowered(teal.mix(White, weight=30, space=Srgb)),
+    call("color.mix", [weighted(teal, 70), weighted(White, 30)], [
+      ("space", @doc.Value::global("rgb")),
+    ]),
+  )
+  assert_eq(
+    lowered(teal.mix(White)),
+    call("color.mix", [weighted(teal, 50), weighted(White, 50)], []),
+  )
+  assert_eq(
+    lowered(teal.mix(White)),
+    call("color.mix", [@doc.Value::paint(teal), @doc.Value::paint(White)], []),
   )
 }
 
 ///|
-test "T5: the size of the enclosing region is only known to Typst source" {
-  // There is no `Layout`: a `Context` callback has the location and the
-  // styles, and `measure` asks for the size of content, not of the region.
-  // Embedded Typst source can ask.
+test "T5: `Layout` gives the size of the enclosing region" {
+  // A `Context` callback has the location and the styles, and `measure`
+  // asks for the size of content, not of the region: `Layout` does.
   let report = compile(
     [
       ..small_page(),
-      @doc.Markup("#layout(size => [#size.width by #size.height])"),
+      @doc.Layout() <| ((size, _) => {
+        "\{size.width.to_int()}pt by \{size.height.to_int()}pt"
+      }),
     ],
   )
   inspect(error_messages(report), content="")
@@ -820,24 +910,46 @@ test "T5: the size of the enclosing region is only known to Typst source" {
       #|180pt by 100pt
     ),
   )
+  // What worked before it, and still does: embedded Typst source.
+  let markup = compile(
+    [
+      ..small_page(),
+      @doc.Markup("#layout(size => [#size.width by #size.height])"),
+    ],
+  )
+  inspect(error_messages(markup), content="")
+  inspect(
+    of_kind(marks(markup), "text").map(run => run.text).join(""),
+    content=(
+      #|180pt by 100pt
+    ),
+  )
 }
 
 ///|
-test "T6: a composed length is a `Sizing` or a `Spacing` through `Rel`" {
+test "T6: a composed length is a `Sizing` or a `Spacing` by `sizing()`, `spacing()` or `Rel`" {
   // `Length`, `Sizing` and `Spacing` are three enums with the same cases;
   // a `Length` value (a sum, or the result of a helper) becomes one of
-  // the others with `Rel(..)`.
+  // the others with `.sizing()` and `.spacing()`, which are `Rel(..)`.
   let half : @doc.Length = Pct(50) - Pt(10)
   let gap : @doc.Length = Pt(11) + Em(0.5)
   let bar = @doc.Rect(width=Pct(100), height=Pt(5), fill=Luma(200))
   let report = compile(
     [
       ..small_page(),
+      @doc.Grid([bar, bar], columns=[half.sizing(), Fr(1)]),
+      @doc.Block(bar, above=gap.spacing()),
+    ],
+  )
+  inspect(error_messages(report), content="")
+  let with_rel = compile(
+    [
+      ..small_page(),
       @doc.Grid([bar, bar], columns=[Rel(half), Fr(1)]),
       @doc.Block(bar, above=Rel(gap)),
     ],
   )
-  inspect(error_messages(report), content="")
+  assert_eq(listing(marks(with_rel)), listing(marks(report)))
   // The first column is 50% of 180pt less 10pt; the block is 11pt and half
   // of the 10pt font size below the grid.
   inspect(
@@ -851,8 +963,12 @@ test "T6: a composed length is a `Sizing` or a `Spacing` through `Rel`" {
 }
 
 ///|
-test "T7: upper case of content is `Call(\"upper\", ..)`" {
+test "T7: upper case of content is `Upper(..)`, or `Call(\"upper\", ..)`" {
   let report = compile(
+    [..small_page(), @doc.Upper(@doc.Seq(["quiet ", @doc.Emph("words")]))],
+  )
+  inspect(error_messages(report), content="")
+  let with_call = compile(
     [
       ..small_page(),
       @doc.Call("upper", positional=[
@@ -860,7 +976,7 @@ test "T7: upper case of content is `Call(\"upper\", ..)`" {
       ]),
     ],
   )
-  inspect(error_messages(report), content="")
+  assert_eq(listing(marks(with_call)), listing(marks(report)))
   inspect(
     listing(marks(report)),
     content=(
@@ -915,13 +1031,18 @@ test "T8: `Sides::none()` as an inset is an error at the argument" {
       #|(SetPage, argument 5)
     ),
   )
-  // No inset is a length of zero.
+  // No inset is a length of zero: `Sides::zero()`, which is
+  // `Sides(all=Pt(0))`.
   let zero = compile(
+    [..small_page(), @doc.Block("a", inset=@doc.Sides::zero(), fill=Luma(220))],
+  )
+  let written_out = compile(
     [
       ..small_page(),
       @doc.Block("a", inset=@doc.Sides(all=Pt(0)), fill=Luma(220)),
     ],
   )
+  assert_eq(listing(marks(written_out)), listing(marks(zero)))
   inspect(
     listing(marks(zero)),
     content=(
@@ -1083,7 +1204,7 @@ test "T10: `Stroke(paint=None)` in a table is an error with a location" {
 }
 
 ///|
-test "T11: `Ctx::measure` gives a width and a height, no baseline" {
+test "T11: `Ctx::measure` gives a width, a height and the baseline" {
   let sizes : Array[String] = []
   let note = (size : String) => if !sizes.contains(size) { sizes.push(size) }
   let report = compile(
@@ -1092,24 +1213,34 @@ test "T11: `Ctx::measure` gives a width and a height, no baseline" {
       @doc.Context() <| cx => {
         // All fields of `Size`: a pattern that leaves one out is a warning
         // (`missing_pattern_field`), which `moon check --deny-warn` rejects.
-        let { width, height, } = cx.measure("Mg")
-        note("text \{pt(width)}x\{pt(height)}")
-        let { width, height, } = cx.measure(
+        let { width, height, baseline, } = cx.measure("Mg")
+        note("text \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
           @doc.Box("Mg", inset=@doc.Sides(y=Pt(3))),
         )
-        note("box \{pt(width)}x\{pt(height)}")
+        note("box \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
+          @doc.Block("Mg", inset=@doc.Sides(all=Pt(5)), height=Pt(40)),
+        )
+        note("block \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
+        let { width, height, baseline, } = cx.measure(
+          @doc.Block(@doc.Seq(["Mg", @doc.Linebreak(), "Mg"])),
+        )
+        note("two lines \{pt(width)}x\{pt(height)} baseline \{pt(baseline)}")
         ""
       },
     ],
   )
   inspect(error_messages(report), content="")
   // The height of text is from its top edge (the cap height) to its
-  // bottom edge (the baseline). Where the baseline is in a box with
-  // insets, or in any other content, is not in the result.
+  // bottom edge (the baseline), so for one line of default text the height
+  // is the baseline already. In a box or a block with insets, or one that
+  // is higher than its text, it is not: the baseline is that of the first
+  // line, from the top of what was measured.
   inspect(
     sizes.join(" | "),
     content=(
-      #|text 13.4x6.6 | box 13.4x12.6
+      #|text 13.4x6.6 baseline 6.6 | box 13.4x12.6 baseline 9.6 | block 23.4x40.0 baseline 11.6 | two lines 13.4x19.7 baseline 6.6
     ),
   )
 }

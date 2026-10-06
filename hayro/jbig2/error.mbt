@@ -165,6 +165,9 @@ pub impl Show for OverflowError with fn output(self, logger) {
 }
 
 ///|
+pub extend OverflowError with Show::{to_string, output}
+
+///|
 pub impl Show for ParseError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -172,6 +175,9 @@ pub impl Show for ParseError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend ParseError with Show::{to_string, output}
 
 ///|
 pub impl Show for FormatError with fn output(self, logger) {
@@ -187,6 +193,9 @@ pub impl Show for FormatError with fn output(self, logger) {
 }
 
 ///|
+pub extend FormatError with Show::{to_string, output}
+
+///|
 pub impl Show for SegmentError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -198,6 +207,9 @@ pub impl Show for SegmentError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend SegmentError with Show::{to_string, output}
 
 ///|
 pub impl Show for HuffmanError with fn output(self, logger) {
@@ -214,6 +226,9 @@ pub impl Show for HuffmanError with fn output(self, logger) {
 }
 
 ///|
+pub extend HuffmanError with Show::{to_string, output}
+
+///|
 pub impl Show for RegionError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -226,6 +241,9 @@ pub impl Show for RegionError with fn output(self, logger) {
 }
 
 ///|
+pub extend RegionError with Show::{to_string, output}
+
+///|
 pub impl Show for TemplateError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -234,6 +252,9 @@ pub impl Show for TemplateError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend TemplateError with Show::{to_string, output}
 
 ///|
 pub impl Show for SymbolError with fn output(self, logger) {
@@ -249,6 +270,9 @@ pub impl Show for SymbolError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend SymbolError with Show::{to_string, output}
 
 ///|
 /// `x.ok_or(err)?`: unwrap `x` or raise `err` (upstream's `?` on

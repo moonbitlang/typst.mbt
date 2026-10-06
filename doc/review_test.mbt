@@ -280,10 +280,7 @@ test "click: what the origin lookup decides differently from upstream, like the 
       length=Pt(60),
       stroke=@doc.Stroke(
         thickness=Pt(4),
-        dash=@doc.Value::array([
-          @doc.Value::length(Pt(10)),
-          @doc.Value::length(Pt(10)),
-        ]),
+        dash=Pattern([Len(Pt(10)), Len(Pt(10))], phase=Pt(0)),
       ),
     ),
   ])
@@ -297,10 +294,13 @@ test "click: what the origin lookup decides differently from upstream, like the 
       length=Pt(60),
       stroke=@doc.Stroke(
         thickness=Pt(4),
-        dash=@doc.Value::array([
-          @doc.Value::length(Pt(0.000000001)),
-          @doc.Value::length(Pt(0.000000001)),
-        ]),
+        // The untyped form of the pattern.
+        dash=RawValue(
+          @doc.Value::array([
+            @doc.Value::length(Pt(0.000000001)),
+            @doc.Value::length(Pt(0.000000001)),
+          ]),
+        ),
       ),
     ),
   ])

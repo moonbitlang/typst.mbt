@@ -209,7 +209,7 @@ fn test_files_resolve(id : @syntax.FileId) -> String raise @library.FileError {
   let root = match id.root() {
     Project => ""
     Package(spec) => {
-      guard spec.namespace == "test" else {
+      guard spec.namespace_ == "test" else {
         abort("unexpected package namespace")
       }
       "tests/packages/\{spec.name}-\{spec.version}"

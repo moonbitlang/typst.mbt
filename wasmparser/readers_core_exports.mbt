@@ -18,6 +18,16 @@ pub(all) enum ExternalKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternalKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternalKind with @debug.Debug::{to_repr}
+
+///|
 /// Represents an export in a WebAssembly module.
 pub(all) struct Export {
   /// The name of the exported item.
@@ -29,6 +39,16 @@ pub(all) struct Export {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Export with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Export with @debug.Debug::{to_repr}
+
+///|
 pub impl FromReader for Export with fn from_reader(reader) {
   let name = reader.read_string()
   let kind = ExternalKind::from_reader(reader)
@@ -37,8 +57,16 @@ pub impl FromReader for Export with fn from_reader(reader) {
 }
 
 ///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Export with FromReader::{from_reader}
+
+///|
 pub impl FromReader for ExternalKind with fn from_reader(reader) {
   let offset = reader.original_position()
   let byte = reader.read_u8()
   BinaryReader::external_kind_from_byte(byte, offset)
 }
+
+///|
+pub extend ExternalKind with FromReader::{from_reader}

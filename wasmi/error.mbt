@@ -137,6 +137,9 @@ pub impl Show for WasmiError with fn output(self, f) {
 }
 
 ///|
+pub extend WasmiError with Show::{to_string, output}
+
+///|
 /// Upstream `WasmiError::to_string()` (the `Display` text).
 pub fn WasmiError::message(self : WasmiError) -> String {
   let buf = StringBuilder()
@@ -154,12 +157,20 @@ pub(all) enum ReadError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ReadError with Eq::{not_equal, equal}
+
+///|
 pub impl Show for ReadError with fn output(self, f) {
   match self {
     EndOfStream => f.write_string("encountered unexpected end of stream")
     UnknownError => f.write_string("encountered unknown error")
   }
 }
+
+///|
+pub extend ReadError with Show::{to_string, output}
 
 ///|
 /// Errors that can occur upon type checking function signatures (func/error.rs).
@@ -177,6 +188,11 @@ pub(all) enum FuncError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncError with Eq::{not_equal, equal}
+
+///|
 pub impl Show for FuncError with fn output(self, f) {
   match self {
     ExportedFuncNotFound => f.write_string("could not find exported function")
@@ -190,3 +206,6 @@ pub impl Show for FuncError with fn output(self, f) {
       f.write_string("encountered an incorrect number of results")
   }
 }
+
+///|
+pub extend FuncError with Show::{to_string, output}

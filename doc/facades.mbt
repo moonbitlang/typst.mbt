@@ -67,6 +67,214 @@ pub impl ToValue for Paint with fn to_value(self) {
 }
 
 ///|
+/// A colour space, for [Paint::mix]: Typst's colour space values, which
+/// are the constructor functions of the spaces.
+pub(all) enum ColorSpace {
+  /// Typst's default (`auto`): Oklab, or the spot colorant that all the
+  /// colours share.
+  Auto
+  /// `oklab`.
+  Oklab
+  /// `oklch`.
+  Oklch
+  /// `rgb` (sRGB). Not named `Rgb`: that is the colour `Rgb("#..")` of
+  /// [Paint], which must stay unambiguous as `@doc.Rgb(..)`.
+  Srgb
+  /// `color.linear-rgb`.
+  LinearRgb
+  /// `luma` (D65 gray). Not named `Luma` or `Gray`, which are cases of
+  /// [Paint].
+  Grayscale
+  /// `cmyk`.
+  Cmyk
+  /// `color.hsl`.
+  Hsl
+  /// `color.hsv`.
+  Hsv
+}
+
+///|
+pub impl ToValue for ColorSpace with fn to_value(self) {
+  // The engine identifies a space by its constructor function.
+  let space = (func : @library.NativeFuncData) => {
+    Value::engine(@library.Value::Func(@library.Func::native(func)))
+  }
+  match self {
+    Auto => Value::auto()
+    Oklab => space(@library.native_color_oklab())
+    Oklch => space(@library.native_color_oklch())
+    Srgb => space(@library.native_color_rgb())
+    LinearRgb => space(@library.native_color_linear_rgb())
+    Grayscale => space(@library.native_color_luma())
+    Cmyk => space(@library.native_color_cmyk())
+    Hsl => space(@library.native_color_hsl())
+    Hsv => space(@library.native_color_hsv())
+  }
+}
+
+///|
+/// A percentage as the engine's ratio (the literal `50%`).
+fn percent_value(value : Double) -> Value {
+  Value::of(VNumeric(value, @library.NumericUnit::Percent))
+}
+
+///|
+/// The colour made more transparent (`color.transparentize(percent%)`):
+/// for a percentage from 0 to 100 its alpha is multiplied by
+/// `1 - percent / 100`. This scales the alpha the colour has, it does not
+/// set it: `transparentize(30)` of an opaque colour has 70% alpha, and of
+/// that colour again 49%. A negative percentage makes the colour more
+/// opaque, like Typst's `opacify`: the alpha `a` becomes
+/// `a + (1 - a) * (-percent / 100)`. The result is clamped to 0..1 by
+/// Typst, whose error for a colour without an alpha component (CMYK) it
+/// also is.
+///
+/// Defined for colours: a gradient or a tiling is Typst's cast error at the
+/// argument the paint is passed in (`expected color, found gradient`).
+pub fn Paint::transparentize(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_transparentize(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour lightened by a percentage (`color.lighten(percent%)`).
+/// Defined for colours, like [Paint::transparentize].
+pub fn Paint::lighten(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_lighten(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour darkened by a percentage (`color.darken(percent%)`).
+/// Defined for colours, like [Paint::transparentize].
+pub fn Paint::darken(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_darken(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour mixed with `other`, which gets `weight` percent of the
+/// mixture: `color.mix((self, (100 - weight)%), (other, weight%), space:
+/// ..)`. `space` is the colour space the channels are mixed in; `Auto` is
+/// Typst's default (Oklab, or the spot colorant both colours share).
+///
+/// This is Typst's mixture, which averages the channels without
+/// premultiplying alpha; it is not CSS's `color-mix` for colours of
+/// different alpha. Defined for colours, like [Paint::transparentize].
+pub fn Paint::mix(
+  self : Paint,
+  other : Paint,
+  weight? : Double = 50,
+  space? : ColorSpace = Auto,
+) -> Paint {
+  let named : Array[(String, Value)] = []
+  // `auto` is the default of the parameter.
+  if !(space is Auto) {
+    named.push(("space", space.to_value()))
+  }
+  Value(
+    Value::native(
+      @library.native_color_mix(),
+      [
+        Value::array([self.to_value(), percent_value(100.0 - weight)]),
+        Value::array([other.to_value(), percent_value(weight)]),
+      ],
+      named~,
+    ),
+  )
+}
+
+///|
+/// One length of a dash pattern.
+pub(all) enum DashLen {
+  /// A length equal to the thickness of the line (`"dot"`).
+  Dot
+  /// A length.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for DashLen with fn to_value(self) {
+  match self {
+    Dot => Value::str("dot")
+    Len(length) => length.to_value()
+  }
+}
+
+///|
+/// The dash pattern of a stroke: Typst's predefined patterns by their
+/// names, or the lengths of the dashes and gaps.
+pub(all) enum Dash {
+  /// Explicit `auto`: the pattern is inherited (by default, none).
+  Auto
+  /// Explicit `none`: no pattern.
+  None
+  /// `"solid"`: the empty pattern (a solid line, but not `none`: the
+  /// stroke has a pattern, which is not inherited).
+  Solid
+  /// `"dotted"`.
+  Dotted
+  /// `"densely-dotted"`.
+  DenselyDotted
+  /// `"loosely-dotted"`.
+  LooselyDotted
+  /// `"dashed"`.
+  Dashed
+  /// `"densely-dashed"`.
+  DenselyDashed
+  /// `"loosely-dashed"`.
+  LooselyDashed
+  /// `"dash-dotted"`.
+  DashDotted
+  /// `"densely-dash-dotted"`.
+  DenselyDashDotted
+  /// `"loosely-dash-dotted"`.
+  LooselyDashDotted
+  /// Alternating lengths of dashes and gaps, and where in the pattern the
+  /// line starts: `(array: (10pt, 5pt, "dot", 5pt), phase: 10pt)`.
+  Pattern(Array[DashLen], phase~ : Length)
+  /// Any value the field accepts (a pattern name as a string, an array, a
+  /// dictionary).
+  RawValue(Value)
+}
+
+///|
+pub impl ToValue for Dash with fn to_value(self) {
+  match self {
+    Auto => Value::auto()
+    None => Value::none()
+    Solid => Value::str("solid")
+    Dotted => Value::str("dotted")
+    DenselyDotted => Value::str("densely-dotted")
+    LooselyDotted => Value::str("loosely-dotted")
+    Dashed => Value::str("dashed")
+    DenselyDashed => Value::str("densely-dashed")
+    LooselyDashed => Value::str("loosely-dashed")
+    DashDotted => Value::str("dash-dotted")
+    DenselyDashDotted => Value::str("densely-dash-dotted")
+    LooselyDashDotted => Value::str("loosely-dash-dotted")
+    Pattern(array, phase~) =>
+      Value::dict([
+        ("array", Value::array(array.map(length => length.to_value()))),
+        ("phase", phase.to_value()),
+      ])
+    RawValue(value) => value
+  }
+}
+
+///|
 /// A stroke (`stroke(paint: .., thickness: .., ..)`).
 pub struct Stroke {
   priv value : Value
@@ -78,7 +286,7 @@ pub fn Stroke::Stroke(
   thickness? : Length,
   cap? : String,
   join? : String,
-  dash? : Value,
+  dash? : Dash,
   miter_limit? : Double,
 ) -> Stroke {
   let named : Array[(String, Value)] = []
@@ -95,7 +303,7 @@ pub fn Stroke::Stroke(
     named.push(("join", Value::str(v)))
   }
   if dash is Some(v) {
-    named.push(("dash", v))
+    named.push(("dash", v.to_value()))
   }
   if miter_limit is Some(v) {
     named.push(("miter-limit", Value::float(v)))
@@ -289,6 +497,14 @@ pub fn[T] Sides::auto() -> Sides[T] {
 /// Explicit `none` for the field as a whole, where it accepts it.
 pub fn[T] Sides::none() -> Sides[T] {
   { all: Option::None, sides: [], state: Some(Value::none()), }
+}
+
+///|
+/// No inset, outset, padding or margin: `0pt` on all sides
+/// (`Sides(all=Pt(0))`). An inset is a length on each side and has no
+/// `none`: `Sides::none()` there is Typst's cast error.
+pub fn Sides::zero() -> Sides[Length] {
+  { all: Some(Pt(0)), sides: [], state: Option::None, }
 }
 
 ///|
@@ -633,6 +849,63 @@ pub impl ToValue for FontWeight with fn to_value(self) {
     ExtraBold => Value::str("extrabold")
     Black => Value::str("black")
     Weight(n) => Value::int(n.to_int64())
+  }
+}
+
+///|
+/// The top edge of text (`text.top-edge`, `highlight.top-edge`): a metric
+/// of the font or a length above the baseline.
+pub(all) enum TopEdge {
+  /// `"ascender"`: the font's ascender, which typically exceeds the height
+  /// of all glyphs.
+  Ascender
+  /// `"cap-height"`: the approximate height of uppercase letters.
+  CapHeight
+  /// `"x-height"`: the approximate height of non-ascending lowercase
+  /// letters.
+  XHeight
+  /// `"baseline"`: the baseline on which the letters rest.
+  Baseline
+  /// `"bounds"`: the top edge of the glyphs' bounding box.
+  Bounds
+  /// A length above the baseline.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for TopEdge with fn to_value(self) {
+  match self {
+    Ascender => Value::str("ascender")
+    CapHeight => Value::str("cap-height")
+    XHeight => Value::str("x-height")
+    Baseline => Value::str("baseline")
+    Bounds => Value::str("bounds")
+    Len(length) => length.to_value()
+  }
+}
+
+///|
+/// The bottom edge of text (`text.bottom-edge`, `highlight.bottom-edge`): a
+/// metric of the font or a length above the baseline (negative: below it).
+pub(all) enum BottomEdge {
+  /// `"baseline"`: the baseline on which the letters rest.
+  Baseline
+  /// `"descender"`: the font's descender, which typically exceeds the depth
+  /// of all glyphs.
+  Descender
+  /// `"bounds"`: the bottom edge of the glyphs' bounding box.
+  Bounds
+  /// A length above the baseline.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for BottomEdge with fn to_value(self) {
+  match self {
+    Baseline => Value::str("baseline")
+    Descender => Value::str("descender")
+    Bounds => Value::str("bounds")
+    Len(length) => length.to_value()
   }
 }
 

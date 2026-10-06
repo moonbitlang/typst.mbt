@@ -404,6 +404,8 @@ pub(all) enum ParseErrorKind {
   DuplicateKey(String)
   ResolutionError(TypeErrorKind)
 } derive(Eq, @debug.Debug)
+pub fn ParseErrorKind::output(Self, &Logger) -> Unit
+pub fn ParseErrorKind::to_string(Self) -> String
 pub impl Show for ParseErrorKind
 
 pub(all) enum PermissiveType[T] {
@@ -421,7 +423,9 @@ pub(all) struct Person {
   given_initials : String?
   use_prefix : Bool?
 } derive(Eq, @debug.Debug)
+pub fn Person::output(Self, &Logger) -> Unit
 pub fn Person::parse(ArrayView[Spanned[Chunk]]) -> Self
+pub fn Person::to_string(Self) -> String
 pub impl Show for Person
 
 pub(all) struct RawBibliography {
@@ -509,6 +513,8 @@ pub(all) enum TypeErrorKind {
   UnknownLangId
   YearZeroCE
 } derive(Eq, @debug.Debug)
+pub fn TypeErrorKind::output(Self, &Logger) -> Unit
+pub fn TypeErrorKind::to_string(Self) -> String
 pub impl Show for TypeErrorKind
 
 // Type aliases

@@ -13,6 +13,11 @@ pub(all) struct StatAxisValue {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValue with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for StatAxisValue with fn size() {
   6
 }
@@ -24,6 +29,11 @@ pub impl FromData for StatAxisValue with fn parse(data) {
   let value : Fixed = s.read()
   { axis_index, value, }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValue with FromData::{size, parse}
 
 ///|
 /// Iterator over axis value subtables.
@@ -107,6 +117,11 @@ pub(all) struct StatAxisRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisRecord with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for StatAxisRecord with fn size() {
   8
 }
@@ -116,6 +131,11 @@ pub impl FromData for StatAxisRecord with fn parse(data) {
   let s = Stream::new(data)
   { tag: s.read(), name_id: s.read(), ordering: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisRecord with FromData::{size, parse}
 
 ///|
 /// [Flags](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#flags) for [`StatAxisValueSubtable`].
@@ -148,6 +168,11 @@ pub impl Debug for StatAxisValueFlags with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueFlags with @debug.Debug::{to_repr}
+
+///|
 /// Axis value subtable [format 1](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-1).
 pub(all) struct StatAxisValueSubtableFormat1 {
   /// Zero-based index into [`StatTable::axes`].
@@ -159,6 +184,11 @@ pub(all) struct StatAxisValueSubtableFormat1 {
   /// Numeric value for this record.
   value : Fixed
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat1 with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for StatAxisValueSubtableFormat1 with fn size() {
@@ -177,6 +207,11 @@ pub impl FromData for StatAxisValueSubtableFormat1 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat1 with FromData::{size, parse}
+
+///|
 /// Axis value subtable [format 2](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-2).
 pub(all) struct StatAxisValueSubtableFormat2 {
   /// Zero-based index into [`StatTable::axes`].
@@ -192,6 +227,11 @@ pub(all) struct StatAxisValueSubtableFormat2 {
   /// The maximum value for this record.
   range_max_value : Fixed
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat2 with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for StatAxisValueSubtableFormat2 with fn size() {
@@ -212,6 +252,11 @@ pub impl FromData for StatAxisValueSubtableFormat2 with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat2 with FromData::{size, parse}
+
+///|
 /// Axis value subtable [format 3](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-3).
 pub(all) struct StatAxisValueSubtableFormat3 {
   /// Zero-based index into [`StatTable::axes`].
@@ -225,6 +270,11 @@ pub(all) struct StatAxisValueSubtableFormat3 {
   /// Numeric value for a style-linked mapping.
   linked_value : Fixed
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat3 with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for StatAxisValueSubtableFormat3 with fn size() {
@@ -242,6 +292,11 @@ pub impl FromData for StatAxisValueSubtableFormat3 with fn parse(data) {
     linked_value: s.read(),
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StatAxisValueSubtableFormat3 with FromData::{size, parse}
 
 ///|
 /// Axis value subtable [format 4](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-4).

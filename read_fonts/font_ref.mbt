@@ -66,6 +66,11 @@ pub(all) struct TableRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableRecord with @debug.Debug::{to_repr}
+
+///|
 pub fn TableDirectory::table_records(
   self : TableDirectory,
 ) -> Array[TableRecord] {

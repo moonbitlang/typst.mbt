@@ -42,6 +42,11 @@ pub(all) struct SettingName {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SettingName with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for SettingName with fn size() {
   4
 }
@@ -51,6 +56,11 @@ pub impl FromData for SettingName with fn parse(data) {
   let s = Stream::new(data)
   { setting: s.read(), name_index: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SettingName with FromData::{size, parse}
 
 ///|
 /// A feature names.

@@ -13,12 +13,32 @@ pub(all) enum BarycentricWeightScale {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BarycentricWeightScale with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BarycentricWeightScale with @debug.Debug::{to_repr}
+
+///|
 /// Defines the interpolation method (only the default `Linear` is available
 /// without the `options` feature).
 pub(all) enum InterpolationMethod {
   /// Trilinear/Quadlinear interpolation
   Linear
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InterpolationMethod with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InterpolationMethod with @debug.Debug::{to_repr}
 
 ///|
 /// Declares additional transformation options.
@@ -34,6 +54,16 @@ pub(all) struct TransformOptions {
   /// Barycentric weights scale.
   barycentric_weight_scale : BarycentricWeightScale
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOptions with @debug.Debug::{to_repr}
 
 ///|
 pub fn TransformOptions::default() -> TransformOptions {
@@ -67,6 +97,16 @@ pub(all) enum Layout {
   Inks14
   Inks15
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with @debug.Debug::{to_repr}
 
 ///|
 pub fn Layout::channels(self : Layout) -> Int {

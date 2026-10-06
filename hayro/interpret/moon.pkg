@@ -15,5 +15,3 @@ import {
   "moonbitlang/core/double",
   "moonbitlang/core/cmp",
 }
-
-warnings = "-deprecated"

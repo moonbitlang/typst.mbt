@@ -5,6 +5,9 @@
 pub struct Duration(@time.Duration) derive(Eq, Hash, Compare)
 
 ///|
+pub extend Duration with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Whether the duration is empty / zero.
 pub fn Duration::is_zero(self : Duration) -> Bool {
   self.0.is_zero()
@@ -171,6 +174,9 @@ pub impl Reflect for Duration with fn output() {
 pub impl Reflect for Duration with fn castable(v) {
   v is Duration(_)
 }
+
+///|
+pub extend Duration with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Duration with fn into_value(self) {

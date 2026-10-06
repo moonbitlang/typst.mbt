@@ -26,6 +26,16 @@ pub struct StrokeDash {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeDash with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrokeDash with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new stroke dashing object.
 pub fn StrokeDash::new(
   dash_array : Array[Float],

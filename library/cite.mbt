@@ -64,6 +64,9 @@ pub impl Reflect for CitationForm with fn castable(v) {
 }
 
 ///|
+pub extend CitationForm with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CitationForm with fn into_value(self) {
   for entry in citation_form_casts[:] {
     if entry.1 == self {

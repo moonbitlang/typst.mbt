@@ -20,8 +20,8 @@ fn box_blur_apply(
   sigma_y : Double,
   src : @skia.Pixmap,
 ) -> Unit {
-  let boxes_horz = create_box_gauss(sigma_x.to_float())
-  let boxes_vert = create_box_gauss(sigma_y.to_float())
+  let boxes_horz = create_box_gauss(Float::from_double(sigma_x))
+  let boxes_vert = create_box_gauss(Float::from_double(sigma_y))
   let width = src.width()
   let height = src.height()
   let frontbuf = src.pixels()

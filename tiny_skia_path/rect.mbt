@@ -15,6 +15,16 @@ pub struct IntRect {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntRect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntRect with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new `IntRect`.
 pub fn IntRect::from_xywh(
   x : Int,
@@ -216,11 +226,31 @@ pub struct Rect {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Rect with fn output(self, logger) {
   logger.write_string(
     "Rect { left: \{self.left.get()}, top: \{self.top.get()}, right: \{self.right.get()}, bottom: \{self.bottom.get()} }",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Show::{to_string, output}
 
 ///|
 /// Creates new `Rect`.
@@ -531,11 +561,26 @@ pub struct NonZeroRect {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroRect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroRect with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for NonZeroRect with fn output(self, logger) {
   logger.write_string(
     "NonZeroRect { left: \{self.left.get()}, top: \{self.top.get()}, right: \{self.right.get()}, bottom: \{self.bottom.get()} }",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NonZeroRect with Show::{to_string, output}
 
 ///|
 /// Creates new `NonZeroRect`.

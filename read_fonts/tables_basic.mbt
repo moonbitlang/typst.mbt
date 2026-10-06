@@ -30,6 +30,16 @@ fn u32_at(d : FontData, p : Int) -> UInt {
 pub(all) struct Version16Dot16(UInt) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version16Dot16 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version16Dot16 with @debug.Debug::{to_repr}
+
+///|
 /// Returns the separate major & minor version numbers.
 pub fn Version16Dot16::to_major_minor(self : Version16Dot16) -> (Int, Int) {
   let major = (self.0 >> 16).reinterpret_as_int()

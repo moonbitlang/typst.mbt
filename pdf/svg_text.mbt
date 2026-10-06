@@ -187,7 +187,9 @@ fn SvgFonts::retrieve(
           .get_or_load(info.source, info.index.reinterpret_as_int())
           .map(font => {
             font,
-            face: (try? @otf.Face::parse(info.source[:], info.index)).to_option(),
+            face: Some(@otf.Face::parse(info.source[:], info.index)) catch {
+              _ => None
+            },
           })
         None => None
       }
@@ -211,7 +213,8 @@ fn SvgFonts::resolve_variations(
       let axes = self.db
         .with_face_data(id, (data, index) => {
           let axes : Array[FixedArray[Byte]] = []
-          if (try? @otf.Face::parse(data[:], index)) is Ok(font) {
+          let face = Some(@otf.Face::parse(data[:], index)) catch { _ => None }
+          if face is Some(font) {
             for axis in font.variation_axes().iter() {
               axes.push(FixedArray::from_iter(axis.tag.to_bytes().iter()))
             }
@@ -286,7 +289,9 @@ fn SvgFontCache::get_or_load(
     None => {
       let font = @export.Font::new(data, index)
       if font is Some(f) {
-        let face = (try? @otf.Face::parse(data[:], index.reinterpret_as_uint())).to_option()
+        let face = Some(@otf.Face::parse(data[:], index.reinterpret_as_uint())) catch {
+          _ => None
+        }
         if face is Some(ttf) && color_glyph_hook_face(ttf) is Some(hook) {
           f.set_color_glyphs(hook)
         }

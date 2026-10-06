@@ -81,12 +81,18 @@ pub impl Reflect for Numbering with fn castable(v) {
 }
 
 ///|
+pub extend Numbering with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Numbering with fn into_value(self) {
   match self {
     Pattern(pattern) => pattern.into_value()
     Func(func) => Func(func)
   }
 }
+
+///|
+pub extend Numbering with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Numbering with fn from_value(v) {
@@ -301,9 +307,15 @@ pub impl Reflect for NumberingPattern with fn castable(v) {
 }
 
 ///|
+pub extend NumberingPattern with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NumberingPattern with fn into_value(self) {
   Str(self.to_string())
 }
+
+///|
+pub extend NumberingPattern with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for NumberingPattern with fn from_value(v) {
@@ -320,6 +332,9 @@ pub impl FromValue for NumberingPattern with fn from_value(v) {
   }
   raise HintedError(NumberingPattern::input().error(v))
 }
+
+///|
+pub extend NumberingPattern with FromValue::{from_value}
 
 ///|
 /// Successfully parsed numbering patterns by pattern string.

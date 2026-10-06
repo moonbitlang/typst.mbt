@@ -14,6 +14,26 @@ pub struct Duration {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with @debug.Debug::{to_repr}
+
+///|
 let i64_min : Int64 = -9223372036854775808L
 
 ///|
@@ -440,6 +460,11 @@ pub impl Add for Duration with fn add(self, rhs) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Add::{add}
+
+///|
 pub impl Sub for Duration with fn sub(self, rhs) {
   match self.checked_sub(rhs) {
     Some(d) => d
@@ -448,12 +473,22 @@ pub impl Sub for Duration with fn sub(self, rhs) {
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Sub::{sub}
+
+///|
 pub impl Neg for Duration with fn neg(self) {
   match self.checked_neg() {
     Some(d) => d
     None => abort("overflow when negating duration")
   }
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Neg::{neg}
 
 ///|
 /// `Mul<f64> for Duration`.
@@ -500,3 +535,6 @@ pub impl Show for Duration with fn output(self, logger) {
   item("µs", (nanoseconds / 1_000 % 1_000).to_uint64())
   item("ns", (nanoseconds % 1_000).to_uint64())
 }
+
+///|
+pub extend Duration with Show::{to_string, output}

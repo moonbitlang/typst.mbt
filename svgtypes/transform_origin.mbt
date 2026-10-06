@@ -45,6 +45,16 @@ pub(all) struct TransformOrigin {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOrigin with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOrigin with @debug.Debug::{to_repr}
+
+///|
 /// Constructs a new transform origin.
 pub fn TransformOrigin::new(
   x_offset : Length,
@@ -66,6 +76,16 @@ pub(all) suberror TransformOriginError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOriginError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOriginError with @debug.Debug::{to_repr}
+
+///|
 /// Upstream's `Display`.
 pub impl Show for TransformOriginError with fn output(self, logger) {
   match self {
@@ -76,6 +96,9 @@ pub impl Show for TransformOriginError with fn output(self, logger) {
     ZIndexIsPercentage => logger.write_string("z-index cannot be a percentage")
   }
 }
+
+///|
+pub extend TransformOriginError with Show::{to_string, output}
 
 ///|
 fn parse_part(stream : Stream) -> Position? {

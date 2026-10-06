@@ -105,6 +105,16 @@ enum Stage {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stage with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stage with @debug.Debug::{to_repr}
+
+///|
 /// Whether the stage has a lowp implementation (upstream: its entry in
 /// `lowp::STAGES` is not `null_fn`).
 fn Stage::has_lowp(self : Stage) -> Bool {
@@ -221,6 +231,11 @@ struct GradientColor {
   b : Float
   a : Float
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientColor with Eq::{not_equal, equal}
 
 ///|
 fn GradientColor::new(

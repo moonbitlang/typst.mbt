@@ -158,7 +158,7 @@
   on the pages of what a source line produced (`doc/review_positions.mbt`;
   the page has a "Source line" field with the same rule in `Core`).
   Slice 4b: bodies under one `Keyed` key in one argument are distinct
-  pieces (`Lower::keyed`, one counter per key path); the showcase keys
+  pieces (`Lowering::keyed`, one counter per key path); the showcase keys
   its data-driven rows.
 - EDSL guide (`docs/edsl-guide.md`): what the ports of
   `docs/edsl-ports.md` showed, for authors. Its samples are the functions

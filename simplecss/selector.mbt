@@ -14,6 +14,16 @@ pub(all) enum AttributeOperator {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttributeOperator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttributeOperator with @debug.Debug::{to_repr}
+
+///|
 /// Checks that value is matching the operator.
 pub fn AttributeOperator::matches(
   self : AttributeOperator,
@@ -48,6 +58,16 @@ pub(all) enum PseudoClass {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PseudoClass with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PseudoClass with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `Display`.
 pub impl Show for PseudoClass with fn output(self, logger) {
   match self {
@@ -60,6 +80,11 @@ pub impl Show for PseudoClass with fn output(self, logger) {
     Lang(lang) => logger.write_string("lang(\{lang})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PseudoClass with Show::{to_string, output}
 
 ///|
 /// A trait to query an element node metadata.
@@ -114,6 +139,11 @@ priv struct Component {
 struct Selector {
   components : Array[Component]
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Selector with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a selector from a string.
@@ -340,6 +370,11 @@ pub impl Show for Selector with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Selector with Show::{to_string, output}
+
+///|
 /// A selector token.
 pub(all) enum SelectorToken {
   /// `*`
@@ -363,6 +398,16 @@ pub(all) enum SelectorToken {
   /// `a + b`
   AdjacentCombinator
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SelectorToken with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SelectorToken with @debug.Debug::{to_repr}
 
 ///|
 /// A selector tokenizer.

@@ -415,8 +415,8 @@ fn Triangle::barycentric_coords(
   let denom = d00 * d11 - d01 * d01
   let v = (d11 * d20 - d01 * d21) / denom
   let w = (d00 * d21 - d01 * d20) / denom
-  let u = (1.0 - v - w).to_float()
-  (u, v.to_float(), w.to_float())
+  let u = Float::from_double(1.0 - v - w)
+  (u, Float::from_double(v), Float::from_double(w))
 }
 
 ///|
@@ -505,7 +505,7 @@ fn bilinear_colors(
       u * (1.0 - v) * c3[i].to_double() +
       u * v * c2[i].to_double() +
       (1.0 - u) * v * c1[i].to_double()
-    result.push(val.to_float())
+    result.push(Float::from_double(val))
   }
   result
 }
@@ -688,7 +688,7 @@ fn InterpolationHelpers::new(
 ///|
 /// Rust's `u32 as f32`.
 fn u32_as_f32(n : UInt) -> Float {
-  n.to_uint64().to_double().to_float()
+  Float::from_double(n.to_uint64().to_double())
 }
 
 ///|

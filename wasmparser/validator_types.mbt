@@ -14,6 +14,26 @@ pub(all) struct CoreTypeId {
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CoreTypeId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CoreTypeId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CoreTypeId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CoreTypeId with @debug.Debug::{to_repr}
+
+///|
 fn CoreTypeId::from_index(index : UInt) -> CoreTypeId {
   { index, }
 }
@@ -30,6 +50,26 @@ pub fn CoreTypeId::index(self : CoreTypeId) -> Int {
 pub(all) struct RecGroupId {
   index : UInt
 } derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroupId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroupId with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroupId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroupId with @debug.Debug::{to_repr}
 
 ///|
 fn RecGroupId::from_index(index : UInt) -> RecGroupId {
@@ -125,6 +165,16 @@ pub(all) enum EntityType {
   /// The entity is a tag.
   Tag(CoreTypeId)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntityType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EntityType with @debug.Debug::{to_repr}
 
 ///|
 fn EntityType::info(self : EntityType, types : TypeList) -> TypeInfo {

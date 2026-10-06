@@ -92,8 +92,8 @@ fn SvgRenderer::draw_rect_impl(
 /// Write the SVG representation of this path with `f32` precision
 /// (`BezPathExt::to_svg_f32`).
 fn to_svg_f32(path : @kurbo.BezPath) -> String {
-  let buf = StringBuilder::new()
-  let p = (x : Double) => f32_str(x.to_float())
+  let buf = StringBuilder()
+  let p = (x : Double) => f32_str(Float::from_double(x))
   for i, el in path.elements() {
     if i > 0 {
       buf.write_char(' ')

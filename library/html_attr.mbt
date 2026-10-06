@@ -195,9 +195,15 @@ pub impl Reflect for HtmlAttrs with fn castable(v) {
 }
 
 ///|
+pub extend HtmlAttrs with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for HtmlAttrs with fn into_value(self) {
   Dict(Dict::from_pairs(self.0.map(pair => (pair.0.resolve(), Str(pair.1)))))
 }
+
+///|
+pub extend HtmlAttrs with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for HtmlAttrs with fn from_value(v) {

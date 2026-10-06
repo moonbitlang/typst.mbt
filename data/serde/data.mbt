@@ -31,6 +31,16 @@ pub(all) enum Data {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Data with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Data with @debug.Debug::{to_repr}
+
+///|
 /// The map key under which the `toml` crate exposes datetimes to
 /// `deserialize_any` (upstream `toml_datetime::__unstable::FIELD`).
 pub let toml_datetime_field : String = "$__toml_private_datetime"

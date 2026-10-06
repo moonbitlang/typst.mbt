@@ -85,6 +85,11 @@ pub impl FromSlice for SequenceRule with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SequenceRule with FromSlice::{parse_slice}
+
+///|
 /// A set of [`SequenceRule`]s.
 pub type SequenceRuleSet = LazyOffsetArray16[SequenceRule]
 
@@ -103,6 +108,11 @@ pub(all) struct SequenceLookupRecord {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SequenceLookupRecord with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for SequenceLookupRecord with fn size() {
   4
 }
@@ -112,3 +122,8 @@ pub impl FromData for SequenceLookupRecord with fn parse(data) {
   let s = Stream::new(data)
   { sequence_index: s.read(), lookup_list_index: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SequenceLookupRecord with FromData::{size, parse}

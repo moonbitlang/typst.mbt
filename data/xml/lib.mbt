@@ -28,6 +28,16 @@ pub(all) struct TextPos {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with @debug.Debug::{to_repr}
+
+///|
 /// Constructs a new `TextPos`.
 pub fn TextPos::new(row : Int, col : Int) -> TextPos {
   { row, col, }
@@ -38,6 +48,11 @@ pub fn TextPos::new(row : Int, col : Int) -> TextPos {
 pub impl Show for TextPos with fn output(self, logger) {
   logger.write_string("\{self.row}:\{self.col}")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextPos with Show::{to_string, output}
 
 ///|
 /// An XML tree container (upstream `Document`).
@@ -112,11 +127,31 @@ pub(all) enum NodeType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NodeType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NodeType with @debug.Debug::{to_repr}
+
+///|
 /// A processing instruction.
 pub(all) struct PI {
   target : String
   value : String?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PI with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PI with @debug.Debug::{to_repr}
 
 ///|
 /// A short range (indices into a document-internal array).
@@ -168,7 +203,7 @@ pub struct Attribute {
 
 ///|
 /// Returns attribute's namespace URI.
-pub fn Attribute::namespace(self : Attribute) -> String? {
+pub fn Attribute::namespace_(self : Attribute) -> String? {
   self.data.name.ns(self.doc).map(fn(ns) { ns.uri })
 }
 
@@ -219,6 +254,16 @@ pub struct Namespace {
   priv name : String?
   priv uri : String
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Namespace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Namespace with @debug.Debug::{to_repr}
 
 ///|
 /// Returns namespace name/prefix.
@@ -321,8 +366,13 @@ pub(all) struct ExpandedName {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExpandedName with Eq::{not_equal, equal}
+
+///|
 /// Returns a namespace URI.
-pub fn ExpandedName::namespace(self : ExpandedName) -> String? {
+pub fn ExpandedName::namespace_(self : ExpandedName) -> String? {
   self.uri
 }
 
@@ -342,6 +392,11 @@ pub impl Show for ExpandedName with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExpandedName with Show::{to_string, output}
+
+///|
 /// A node in a document.
 pub struct Node {
   /// The tree containing the node.
@@ -354,6 +409,11 @@ pub struct Node {
 pub impl Eq for Node with fn equal(self, other) {
   self.id == other.id && physical_equal(self.doc, other.doc)
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Node with Eq::{not_equal, equal}
 
 ///|
 fn Node::d(self : Node) -> NodeData {
@@ -739,6 +799,11 @@ pub impl @debug.Debug for Node with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Node with @debug.Debug::{to_repr}
+
+///|
 /// Formats similar to upstream `impl Debug for Node`.
 pub impl Show for Node with fn output(self, logger) {
   match self.d().kind {
@@ -784,3 +849,8 @@ pub impl Show for Node with fn output(self, logger) {
     Text(text) => logger.write_string("Text(\{@unicode.rust_debug_str(text)})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Node with Show::{to_string, output}

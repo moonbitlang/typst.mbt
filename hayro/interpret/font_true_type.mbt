@@ -320,7 +320,7 @@ fn EmbeddedKind::new(dict : @hayro_syntax.Dict) -> EmbeddedKind? {
   let (encoding, differences) = read_encoding(dict)
   guard (descriptor.get("FontFile2") : @hayro_syntax.Stream?) is Some(s) &&
     s.decoded() is Ok(d) &&
-    OpenTypeFontBlob::new(d.to_bytes(), 0) is Some(base_font) else {
+    OpenTypeFontBlob::new(d.to_owned(), 0) is Some(base_font) else {
     return None
   }
   let glyph_names = base_font.glyph_names()

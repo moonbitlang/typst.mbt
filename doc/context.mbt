@@ -8,7 +8,7 @@
 /// engine and context, so capability errors (`can only be used when context
 /// is known`), casts and tracked introspection are Typst's.
 pub struct Ctx {
-  priv lower : Lower
+  priv lower : Lowering
   /// The invocation token: cleared when the callback returns.
   priv alive : @ref.Ref[Bool]
   /// The span of the callback.
@@ -77,10 +77,21 @@ pub fn[W] Ctx::query(
 }
 
 ///|
-/// A size in points.
+/// The measured size of content, in points (the dictionary that Typst's
+/// `measure` returns).
 pub struct Size {
   width : Double
   height : Double
+  /// The vertical position of the content's baseline relative to its top
+  /// edge, positive downwards: for text and for containers of text (a
+  /// block, a box, with their insets) the baseline of the first line, so
+  /// text can be placed on its baseline without an estimate from the font
+  /// size. With Typst's default text edges (cap height to baseline) it
+  /// equals the `height` of one line. A box whose `baseline` is set
+  /// reports the baseline it was given (`Box(.., baseline=Pt(2))`: 2pt
+  /// higher). Content without a baseline of its own (a shape, an image)
+  /// has it at the bottom (`height`); for empty content it is `0`.
+  baseline : Double
 }
 
 ///|
@@ -112,7 +123,7 @@ pub fn Ctx::measure(
     let length : @library.Length = @library.at(span, () => dict.get(name).cast())
     length.abs.to_pt()
   }
-  { width: side("width"), height: side("height"), }
+  { width: side("width"), height: side("height"), baseline: side("baseline"), }
 }
 
 // Counters.
@@ -352,5 +363,81 @@ pub fn Context::Context(
 
 ///|
 pub impl IntoContent for Context with fn into_content(self) {
+  self.content
+}
+
+// Layout callbacks.
+
+///|
+/// The size a [Layout] callback receives, in points: the dictionary that
+/// Typst's `layout` passes to its function, which has a `width` and a
+/// `height` (and no baseline: it is not the [Size] that `measure` returns).
+///
+/// It is the base size of the enclosing region: the width and height of the
+/// container (a block or box with that dimension, a grid cell, the page
+/// without its margins; where the container does not fix a dimension, that
+/// of the region around it), not the space that remains on the page. A
+/// dimension that nothing bounds is infinite: the height on a page with
+/// `height: auto`, the width on one with `width: auto`, and both while the
+/// content is measured (`cx.measure(..)` without a `width` or `height`).
+/// Check `is_inf()` before computing with it.
+pub struct LayoutSize {
+  width : Double
+  height : Double
+}
+
+///|
+/// Content that depends on the size of its container
+/// (`layout(size => ..)`).
+///
+/// The callback receives the size of the enclosing region and the context
+/// of the invocation, which has a location and styles, so `cx.measure(..)`
+/// works in it. The result is laid out as a block. Like every callback it
+/// cannot be created inside another callback.
+///
+/// Twin: `layout(size => ..)`.
+pub struct Layout {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Layout::Layout(
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+  f : (LayoutSize, Ctx) -> &IntoContent raise,
+) -> Layout {
+  let site = Site::new("Layout", loc, args_loc)
+  let callback = Callback::new(site, (cx, args) => {
+    // The dictionary of the engine's layout rule (`regions.base()`).
+    let size : @library.Dict = args.expect("size")
+    let side = (name : String) => {
+      let length : @library.Length = size.get(name).cast()
+      length.abs.to_pt()
+    }
+    Value::content(f({ width: side("width"), height: side("height"), }, cx))
+  })
+  // `layout` is a public function: it is called like one, with the host
+  // function as its argument. The callback is the third declared
+  // parameter: `ArgsLoc` counts the autofilled ones.
+  {
+    content: Content::of(
+      NCall({
+        func: FNative(@library.native_layout()),
+        args: [
+          {
+            name: Option::None,
+            value: Value::of(VCallback(callback)),
+            param: 2,
+          },
+        ],
+        origin: site,
+      }),
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Layout with fn into_content(self) {
   self.content
 }

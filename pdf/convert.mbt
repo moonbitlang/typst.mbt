@@ -73,8 +73,8 @@ fn convert_pages(
     let width = to_f32(typst_page.frame.width() + bleed.left + bleed.right)
     let height = to_f32(typst_page.frame.height() + bleed.top + bleed.bottom)
     guard @export.PageSettings::from_wh(
-        @math.maximum(width, 3.0),
-        @math.maximum(height, 3.0),
+        @cmp.maximum(width, 3.0),
+        @cmp.maximum(height, 3.0),
       )
       is Some(settings) else {
       raise @library.SourceError([
@@ -476,7 +476,7 @@ fn finish(
 
 ///|
 fn validators_to_comma_list(v : @export.Validators) -> String {
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   for i, val in v.to_array() {
     if i != 0 {
       sb.write_string(", ")
@@ -494,7 +494,7 @@ fn validators_to_and_list(v : @export.Validators) -> String {
     1 => names[0]
     2 => "\{names[0]} and \{names[1]}"
     _ => {
-      let sb = StringBuilder::new()
+      let sb = StringBuilder()
       for i in 0..<(names.length() - 1) {
         sb.write_string("\{names[i]}, ")
       }

@@ -146,6 +146,21 @@ pub(all) enum Join {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Join with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Join with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Join with Hash::{hash, hash_combine}
+
+///|
 /// Defines the shape to be drawn at the ends of a stroke.
 pub(all) enum Cap {
   /// Flat cap.
@@ -155,6 +170,21 @@ pub(all) enum Cap {
   /// Rounded cap with radius equal to half the stroke width.
   Round
 } derive(Eq, Debug, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cap with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cap with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cap with Hash::{hash, hash_combine}
 
 ///|
 /// Solve an arbitrary function for a zero-crossing.

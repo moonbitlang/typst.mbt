@@ -18,6 +18,16 @@ pub(all) struct VariationAxis {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariationAxis with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariationAxis with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for VariationAxis with fn size() {
   20
 }
@@ -40,6 +50,11 @@ pub impl FromData for VariationAxis with fn parse(data) {
     hidden: ((flags >> 3) & 1) == 1,
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariationAxis with FromData::{size, parse}
 
 ///|
 /// Returns a normalized variation coordinate for this axis.
@@ -108,6 +123,11 @@ pub(all) struct AxisValueMap {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValueMap with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for AxisValueMap with fn size() {
   4
 }
@@ -117,6 +137,11 @@ pub impl FromData for AxisValueMap with fn parse(data) {
   let s = Stream::new(data)
   { from_coordinate: s.read(), to_coordinate: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValueMap with FromData::{size, parse}
 
 ///|
 /// A list of segment maps.

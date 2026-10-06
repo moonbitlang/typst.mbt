@@ -9,7 +9,7 @@ fn load(cell : Ref[Bytes?], b64 : String) -> Bytes {
   match cell.val {
     Some(b) => b
     None => {
-      let clean = StringBuilder::new()
+      let clean = StringBuilder()
       for c in b64 {
         if c != '\n' {
           clean.write_char(c)

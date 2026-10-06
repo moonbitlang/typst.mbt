@@ -145,6 +145,9 @@ pub impl Reflect for ToDict with fn castable(v) {
 }
 
 ///|
+pub extend ToDict with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToDict with fn from_value(v) {
   match v {
     Module(m) => ToDict(m)

@@ -17,6 +17,11 @@ pub impl FromReader for Global with fn from_reader(reader) {
 }
 
 ///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Global with FromReader::{from_reader}
+
+///|
 pub impl FromReader for GlobalType with fn from_reader(reader) {
   let content_type = ValType::from_reader(reader)
   let flags = reader.read_u8()
@@ -32,3 +37,6 @@ pub impl FromReader for GlobalType with fn from_reader(reader) {
   }
   { content_type, mutable: (flags & 0b01) > 0, shared: (flags & 0b10) > 0, }
 }
+
+///|
+pub extend GlobalType with FromReader::{from_reader}

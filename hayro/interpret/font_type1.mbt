@@ -174,7 +174,7 @@ fn Type1BlobKind::new(dict : @hayro_syntax.Dict) -> Type1BlobKind? {
     return None
   }
   guard data.decoded() is Ok(decoded) else { return None }
-  guard Type1FontBlob::new(decoded.to_bytes()) is Some(font) else {
+  guard Type1FontBlob::new(decoded.to_owned()) is Some(font) else {
     return None
   }
   let (encoding, encodings) = read_encoding(dict)
@@ -294,7 +294,7 @@ fn CffKind::new(dict : @hayro_syntax.Dict) -> CffKind? {
     return None
   }
   guard data.decoded() is Ok(decoded) else { return None }
-  guard CffFontBlob::new(decoded.to_bytes()) is Some(font) else { return None }
+  guard CffFontBlob::new(decoded.to_owned()) is Some(font) else { return None }
   let (encoding, encodings) = read_encoding(dict)
   guard read_widths(dict, descriptor) is Some((widths, missing_width)) else {
     return None

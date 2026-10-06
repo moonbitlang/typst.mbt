@@ -11,6 +11,21 @@ pub(all) enum PaintOrderKind {
 } derive(Eq, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrderKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrderKind with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrderKind with Hash::{hash, hash_combine}
+
+///|
 /// Representation of the [`paint-order`] property.
 ///
 /// [`paint-order`]: https://www.w3.org/TR/SVG2/painting.html#PaintOrder
@@ -22,9 +37,22 @@ pub(all) struct PaintOrder {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrder with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintOrder with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for PaintOrder with fn default() {
   { order: [Fill, Stroke, Markers], }
 }
+
+///|
+pub extend PaintOrder with Default::{default}
 
 ///|
 /// `From<[PaintOrderKind; 3]>`.

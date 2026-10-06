@@ -80,6 +80,37 @@ pub struct NormalizedF32Exclusive(FiniteF32) derive (
 )
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32Exclusive with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32Exclusive with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32Exclusive with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32Exclusive with Compare::{
+  op_lt,
+  op_le,
+  op_ge,
+  compare,
+  op_gt,
+}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NormalizedF32Exclusive with Hash::{hash, hash_combine}
+
+///|
 /// A predefined 0.5 value.
 pub fn NormalizedF32Exclusive::half() -> NormalizedF32Exclusive {
   NormalizedF32Exclusive(FiniteF32(0.5))

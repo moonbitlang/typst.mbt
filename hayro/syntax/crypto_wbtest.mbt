@@ -5,7 +5,7 @@
 
 ///|
 fn crypto_test_hex(data : Bytes) -> String {
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   for b in data {
     let s = b.to_int()
     sb.write_char("0123456789abcdef"[s >> 4].unsafe_to_char())

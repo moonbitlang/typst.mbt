@@ -12,6 +12,16 @@ pub(all) enum MaskType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MaskType with @debug.Debug::{to_repr}
+
+///|
 /// A mask.
 ///
 /// During drawing over `Pixmap`, mask's black (0) "pixels" would block

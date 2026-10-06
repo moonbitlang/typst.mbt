@@ -29,7 +29,7 @@ fn stretch_glyph(
 fn strip_subset_prefix(name : String) -> String {
   match name.find("+") {
     Some(i) if i == 6 && name.length() >= 7 =>
-      name.view(start_offset=7).to_string()
+      name.view(start_offset=7).to_owned()
     _ => name
   }
 }
@@ -641,7 +641,7 @@ fn read_to_unicode(
   let data : Bytes? = match (dict.get("ToUnicode") : @hayro_syntax.Stream?) {
     Some(s) =>
       match s.decoded() {
-        Ok(d) => Some(d.to_bytes())
+        Ok(d) => Some(d.to_owned())
         Err(_) => None
       }
     None => None

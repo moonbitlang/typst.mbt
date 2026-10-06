@@ -9,6 +9,16 @@ pub(all) enum ToneReprCurve {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToneReprCurve with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToneReprCurve with @debug.Debug::{to_repr}
+
+///|
 let f_powf : (Float, Float) -> Float = @pxfm.f_powf
 
 ///|

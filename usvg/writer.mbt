@@ -49,6 +49,9 @@ pub impl Default for WriteOptions with fn default() {
 }
 
 ///|
+pub extend WriteOptions with Default::{default}
+
+///|
 /// Writes `usvg::Tree` back to SVG.
 pub fn Tree::to_string(self : Tree, opt : WriteOptions) -> String {
   writer_convert(self, opt)

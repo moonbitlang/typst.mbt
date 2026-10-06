@@ -24,6 +24,9 @@ pub impl Reflect for Supplement with fn castable(v) {
 }
 
 ///|
+pub extend Supplement with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Supplement with fn into_value(self) {
   match self {
     Content(v) => Content(v)
@@ -72,6 +75,9 @@ pub impl Default for RefForm with fn default() {
 }
 
 ///|
+pub extend RefForm with Default::{default}
+
+///|
 let ref_form_names : ReadOnlyArray[String] = ["normal", "page"]
 
 ///|
@@ -90,12 +96,18 @@ pub impl Reflect for RefForm with fn castable(v) {
 }
 
 ///|
+pub extend RefForm with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RefForm with fn into_value(self) {
   match self {
     Normal => Str("normal")
     Page => Str("page")
   }
 }
+
+///|
+pub extend RefForm with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for RefForm with fn from_value(v) {

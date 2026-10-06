@@ -12,6 +12,16 @@ pub(all) struct Style {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Hash::{hash, hash_combine}
+
+///|
 /// A change to a [`Style`] applied incrementally by a theme rule
 ///
 /// Fields left empty (as `None`) will not modify the corresponding field on a
@@ -24,6 +34,16 @@ pub(all) struct StyleModifier {
   /// Style of the font
   font_style : FontStyle?
 } derive(Eq, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleModifier with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleModifier with Default::{default}
 
 ///|
 /// RGBA color, directly from the theme
@@ -45,11 +65,46 @@ pub(all) struct Color {
 } derive(Eq, Hash, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Default::{default}
+
+///|
 /// The color-independent styling of a font - i.e. bold, italicized, and/or
 /// underlined
 pub(all) struct FontStyle {
   bits : Byte
 } derive(Eq, Compare, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Default::{default}
 
 ///|
 /// Bold font style
@@ -105,6 +160,11 @@ pub impl BitOr for FontStyle with fn lor(self, other) {
 }
 
 ///|
+#deprecated("call as `BitOr::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with BitOr::{lor}
+
+///|
 /// Upstream's `Debug` (`BOLD | ITALIC`, `(empty)`).
 pub impl Show for FontStyle with fn output(self, logger) {
   let mut empty = true
@@ -138,6 +198,11 @@ pub impl Show for FontStyle with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Show::{to_string, output}
+
+///|
 /// Black color (`#000000`)
 pub let color_black : Color = { r: 0x00, g: 0x00, b: 0x00, a: 0xFF, }
 
@@ -152,6 +217,11 @@ pub impl Show for Color with fn output(self, logger) {
     "Color { r/g/b/a: \{self.r.to_int()}/\{self.g.to_int()}/\{self.b.to_int()}/\{self.a.to_int()} }",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Show::{to_string, output}
 
 ///|
 /// Applies the other modifier to this style to make a new style

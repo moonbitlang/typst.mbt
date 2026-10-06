@@ -32,7 +32,7 @@ fn fnv1a64(data : FixedArray[Byte]) -> UInt64 {
 ///|
 fn hex64(v : UInt64) -> String {
   let digits = "0123456789abcdef"
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = 15; i >= 0; i = i - 1 {
     buf.write_char(digits[((v >> (i * 4)) & 0xf).to_int()].unsafe_to_char())
   }
@@ -49,11 +49,11 @@ test "hayro::render matches the oracle" {
   let mismatches = []
   let mut checked = 0
   for line in expected.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line.is_empty() || line.has_prefix("#") {
       continue
     }
-    let parts = line.split("\t").map(p => p.to_string()).to_array()
+    let parts = line.split("\t").map(p => p.to_owned()).to_array()
     let path = root + parts[0]
     let page = @string.parse_int(parts[1])
     let scale = Float::from_double(@string.parse_double(parts[2]))

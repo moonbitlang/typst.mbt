@@ -6,6 +6,16 @@ pub(all) enum TEncoding {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TEncoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TEncoding with @debug.Debug::{to_repr}
+
+///|
 pub(all) enum TScalarStyle {
   Any
   Plain
@@ -16,6 +26,16 @@ pub(all) enum TScalarStyle {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TScalarStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TScalarStyle with @debug.Debug::{to_repr}
+
+///|
 /// A position in the input. `index` counts chars (code points), `line` starts
 /// from 1 and `col` from 0.
 pub struct Marker {
@@ -23,6 +43,16 @@ pub struct Marker {
   priv line : Int
   priv col : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Marker with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Marker with @debug.Debug::{to_repr}
 
 ///|
 fn Marker::new(index : Int, line : Int, col : Int) -> Marker {
@@ -50,6 +80,16 @@ pub(all) suberror ScanError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScanError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScanError with @debug.Debug::{to_repr}
+
+///|
 pub fn ScanError::new(loc : Marker, info : String) -> ScanError {
   ScanError(mark=loc, info~)
 }
@@ -73,6 +113,11 @@ pub impl Show for ScanError with fn output(self, logger) {
   let ScanError(mark~, info~) = self
   logger.write_string("\{info} at line \{mark.line} column \{mark.col + 1}")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScanError with Show::{to_string, output}
 
 ///|
 pub(all) enum TokenType {
@@ -104,7 +149,27 @@ pub(all) enum TokenType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TokenType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TokenType with @debug.Debug::{to_repr}
+
+///|
 pub(all) struct Token(Marker, TokenType) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Token with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Token with @debug.Debug::{to_repr}
 
 ///|
 priv struct SimpleKey {

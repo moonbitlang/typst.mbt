@@ -86,6 +86,9 @@ pub impl Default for FontStyle with fn default() {
 }
 
 ///|
+pub extend FontStyle with Default::{default}
+
+///|
 /// Text font properties.
 pub struct Font {
   priv families : Array[@svgtypes.FontFamily]
@@ -150,6 +153,9 @@ pub impl Default for DominantBaseline with fn default() {
 }
 
 ///|
+pub extend DominantBaseline with Default::{default}
+
+///|
 /// An alignment baseline property.
 pub(all) enum AlignmentBaseline {
   Auto
@@ -170,6 +176,9 @@ pub(all) enum AlignmentBaseline {
 pub impl Default for AlignmentBaseline with fn default() {
   Auto
 }
+
+///|
+pub extend AlignmentBaseline with Default::{default}
 
 ///|
 /// A baseline shift property.
@@ -196,6 +205,9 @@ pub(all) enum LengthAdjust {
 pub impl Default for LengthAdjust with fn default() {
   Spacing
 }
+
+///|
+pub extend LengthAdjust with Default::{default}
 
 ///|
 /// A font optical sizing property.
@@ -432,6 +444,9 @@ pub(all) enum TextAnchor {
 pub impl Default for TextAnchor with fn default() {
   Start
 }
+
+///|
+pub extend TextAnchor with Default::{default}
 
 ///|
 /// A path used by text-on-path.

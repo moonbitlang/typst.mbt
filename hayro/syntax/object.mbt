@@ -145,6 +145,9 @@ pub impl Skippable for Object with fn skip(r, is_content_stream) {
 }
 
 ///|
+pub extend Object with Skippable::{skip}
+
+///|
 pub impl Readable for Object with fn read(r, ctx) {
   guard r.peek_byte() is Some(peeked) else { return None }
   match peeked {
@@ -216,6 +219,9 @@ pub impl Skippable for ObjectIdentifier with fn skip(r, _) {
   r.skip_white_spaces_and_comments()
   r.forward_tag(b"obj")
 }
+
+///|
+pub extend ObjectIdentifier with Skippable::{skip}
 
 ///|
 /// A convenience function that extracts a dict and a stream from an object.

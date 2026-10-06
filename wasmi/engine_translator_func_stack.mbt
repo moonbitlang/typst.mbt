@@ -139,6 +139,16 @@ pub fn ImmediateOperand::ty(self : ImmediateOperand) -> @wasmi_core.ValType {
 pub(all) struct OperandIdx(Int) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OperandIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OperandIdx with @debug.Debug::{to_repr}
+
+///|
 /// The links of a local variable operand on the operand stack.
 priv struct LocalLink {
   /// The index of the local variable.
@@ -524,6 +534,16 @@ pub(all) enum ControlFrameKind {
   If
   Else
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ControlFrameKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ControlFrameKind with @debug.Debug::{to_repr}
 
 ///|
 /// An entry on the [`ControlStack`].

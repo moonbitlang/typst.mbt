@@ -10,6 +10,24 @@ pub struct PrimitiveDateTime {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrimitiveDateTime with Eq::{not_equal, equal}
+
+///|
+pub extend PrimitiveDateTime with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrimitiveDateTime with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrimitiveDateTime with @debug.Debug::{to_repr}
+
+///|
 /// Create a new `PrimitiveDateTime` from the provided `Date` and `Time`.
 pub fn PrimitiveDateTime::new(date : Date, time : Time) -> PrimitiveDateTime {
   { date, time, }
@@ -233,3 +251,8 @@ pub impl Show for PrimitiveDateTime with fn output(self, logger) {
   logger.write_string(" ")
   Show::output(self.time, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrimitiveDateTime with Show::{to_string, output}

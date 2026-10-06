@@ -25,7 +25,7 @@ fn k_sinf(x : Double) -> Float {
   let w = z * z
   let r = s3 + z * s4
   let s = z * x
-  (x + s * (s1 + z * s2) + s * w * r).to_float()
+  Float::from_double(x + s * (s1 + z * s2) + s * w * r)
 }
 
 ///|
@@ -37,7 +37,7 @@ fn k_cosf(x : Double) -> Float {
   let z = x * x
   let w = z * z
   let r = c2 + z * c3
-  (1.0 + z * c0 + w * c1 + w * z * r).to_float()
+  Float::from_double(1.0 + z * c0 + w * c1 + w * z * r)
 }
 
 ///|

@@ -109,6 +109,9 @@ pub impl Show for EnforcedLimitsError with fn output(self, f) {
 }
 
 ///|
+pub extend EnforcedLimitsError with Show::{to_string, output}
+
+///|
 /// The required minimum average number of bytes per function.
 pub(all) struct AvgBytesPerFunctionLimit {
   req_funcs_bytes : UInt
@@ -159,6 +162,11 @@ pub(all) enum CompilationMode {
   /// The Wasm code is validated and translated lazily on first use.
   Lazy
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompilationMode with Eq::{not_equal, equal}
 
 ///|
 /// Configuration for an [`Engine`].
@@ -308,6 +316,21 @@ pub struct DedupFuncType {
   priv guard_idx : Int
   priv entity_idx : Int
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupFuncType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupFuncType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DedupFuncType with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the entity index if the guard index matches (upstream
@@ -510,6 +533,26 @@ pub fn BlockType::func_type_of(
 ///|
 /// A reference to a compiled function stored in the [`CodeMap`] of an [`Engine`].
 pub(all) struct EngineFunc(Int) derive(Eq, Compare, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EngineFunc with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EngineFunc with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EngineFunc with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EngineFunc with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<InternalFunc> for EngineFunc`.
