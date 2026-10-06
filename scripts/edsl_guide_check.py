@@ -8,14 +8,19 @@ A fenced block of the guide is compared with a file of the package
 
     ```moonbit   consecutive lines of guide.mbt (the compiled samples)
     ```text      consecutive lines of an expected output in guide_test.mbt
-                 (the `#|` lines of an `inspect`)
+                 (the `#|` lines of an `inspect`), where every number is
+                 compared as `N`: the test expects source positions as
+                 `N:N`, the guide shows the ones of one revision
     ```pkg       consecutive lines of moon.pkg
 
 Trailing white space is ignored. A block without a language is not checked;
-they are listed. Exits with 1 if a block is not found.
+they are listed. A fence has to be three backticks at the start of a line:
+any other fence (indented, longer, `~~~`) is an error, so that no block is
+skipped silently. Exits with 1 if a block is not found.
 """
 
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,13 +34,17 @@ def lines_of(path):
         return [line.rstrip() for line in f.read().split("\n")]
 
 
+def numberless(lines):
+    return [re.sub(r"[0-9]+", "N", line) for line in lines]
+
+
 def expected_outputs(lines):
     """The lines of a test file with the `#|` of expected outputs removed."""
     out = []
     for line in lines:
         stripped = line.lstrip()
         out.append(stripped[2:] if stripped.startswith("#|") else line)
-    return out
+    return numberless(out)
 
 
 def blocks(lines):
@@ -43,10 +52,18 @@ def blocks(lines):
     out = []
     start = None
     for i, line in enumerate(lines):
+        stripped = line.lstrip()
+        if stripped.startswith("~~~") or (
+            stripped.startswith("```")
+            and (line != stripped or line.startswith("````"))
+        ):
+            sys.exit(f"{GUIDE}:{i + 1}: unsupported fence: {line}")
         if not line.startswith("```"):
             continue
         if start is None:
             start = i
+        elif line != "```":
+            sys.exit(f"{GUIDE}:{i + 1}: a fence inside a block: {line}")
         else:
             out.append((lines[start][3:].strip(), start + 1, lines[start + 1 : i]))
             start = None
@@ -69,6 +86,8 @@ def main():
     unchecked = []
     failed = []
     for language, line, block in blocks(lines_of(GUIDE)):
+        if language == "text":
+            block = numberless(block)
         if language == "":
             unchecked.append(line)
         elif language not in sources:

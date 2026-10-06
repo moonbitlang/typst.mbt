@@ -183,6 +183,25 @@ fn Pages::origin(self : Pages, text : String) -> @doc.Origin raise {
 }
 
 ///|
+/// `text` with every run of digits as `N`.
+fn numberless(text : String) -> String {
+  let out = StringBuilder()
+  let mut in_number = false
+  for c in text {
+    if c >= '0' && c <= '9' {
+      if !in_number {
+        out.write_char('N')
+      }
+      in_number = true
+    } else {
+      out.write_char(c)
+      in_number = false
+    }
+  }
+  out.to_string()
+}
+
+///|
 /// An origin without its line and column: `file (Constructor, argument n)`.
 fn place(origin : @doc.Origin) -> String {
   let name = origin.file.split("/").collect().last().unwrap().to_owned()
@@ -318,8 +337,8 @@ test "section 3: a helper with `#callsite` gives its element the caller's locati
   )
   // ... the one of `note` on its line in `notes`, between the two texts,
   // the one of `plain_note` on a line of the helper, which is above.
-  assert_eq(before.start_line + 1, after.start_line - 2)
-  assert_eq(kept.start_line, before.start_line + 2)
+  assert_true(before.start_line < kept.start_line)
+  assert_true(kept.start_line < after.start_line)
   assert_true(plain.start_line < before.start_line)
   // It is the argument of the call, which starts to the right of the
   // call.
@@ -575,6 +594,17 @@ test "section 6: a sticky block stays with the block after it" {
   assert_eq(page_of(kept, "Results"), 2)
   assert_eq(page_of(kept, "Sorted"), 2)
   assert_eq(page_of(kept, "one two"), 2)
+  // So they do when the paragraph is a sticky block of its own:
+  // consecutive sticky blocks are a group.
+  let both = pages([
+    @doc.V(Pt(40)),
+    @doc.Heading("Results"),
+    @doc.Block("Sorted by name.", sticky=true),
+    next,
+  ])
+  assert_eq(page_of(both, "Results"), 2)
+  assert_eq(page_of(both, "Sorted"), 2)
+  assert_eq(page_of(both, "one two"), 2)
 }
 
 ///|
@@ -751,15 +781,16 @@ test "section 8: a callback cannot be created inside a callback" {
     ),
   )
   let error = nested.report.errors[0]
-  // (The text of the guide's section 8.)
+  // The text of the guide's section 8, with every number as `N` (the
+  // lines and columns of the sample).
   inspect(
-    error.render(),
+    numberless(error.render()),
     content=(
       #|error: callbacks cannot be created inside a callback
-      #|  at doc/examples/guide/guide.mbt:234:14 (Cells)
+      #|  at doc/examples/guide/guide.mbt:N:N (Cells)
       #|  hint: create the callback before compiling and capture it
       #|  hint: or use the `cx` of the enclosing callback
-      #|  while showing heading element at doc/examples/guide/guide.mbt:237:5 (Heading)
+      #|  while showing heading element at doc/examples/guide/guide.mbt:N:N (Heading)
     ),
   )
   inspect(

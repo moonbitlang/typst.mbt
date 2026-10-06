@@ -8,7 +8,8 @@ the reference for the API.
 Every MoonBit sample below is a function of `doc/examples/guide/guide.mbt`,
 named in the line above the sample, and is compiled with the package
 (`python3 scripts/edsl_guide_check.py` checks that the samples here are the
-text of that file, and the error of section 8 the one its test expects).
+text of that file, and the error of section 8 the one its test expects, but
+for its line and column numbers).
 What the guide says a sample does is checked by a test of
 `doc/examples/guide/guide_test.mbt`; what it says about the findings of the
 ports, by `doc/ports_findings_test.mbt`. Section 9 lists which test checks
@@ -373,7 +374,7 @@ say what is meant.
 | Behaviour | What to write |
 |---|---|
 | An `Auto` column takes the width of its content; several columns of prose do not share the width in proportion | fractions as weights: `columns=[Fr(1), Fr(2)]` |
-| `sticky` ties a block to the block after it; a heading and a paragraph under it do not both stay with what follows | one sticky `Block` around the two |
+| `sticky` ties a block to the block after it; a heading and a paragraph under it do not both stay with what follows | the paragraph in a sticky `Block`, or one sticky `Block` around the two |
 | `raw` sets its text to 0.8em, and sizes set around it are multiplied with that | a show-set rule on `raw` with an absolute size |
 | A stroke that names one side leaves the other sides to the outer value, which for a table is its default stroke | `rest=Stroke::none()` |
 | Smart quotes: `'` after a digit is a prime | the character `’`, or `quotes=false` |
@@ -410,7 +411,10 @@ pub fn loose_title(next : &IntoContent) -> Seq {
 ```
 
 the heading stays with the paragraph, and both stay behind when `next` does
-not fit the page. As one sticky block they move with it (`kept_title`):
+not fit the page. Consecutive sticky blocks are a group, so the paragraph as
+a sticky block of its own (`Block("Sorted by name.", sticky=true)`) moves
+with `next`, and the heading with it. Or the two are one sticky block
+(`kept_title`):
 
 ```moonbit
 pub fn kept_title(next : &IntoContent) -> Seq {
@@ -438,9 +442,10 @@ pub fn code_size() -> ShowSet {
 An em size in that rule is multiplied with the 0.8em again (`Em(0.9)` gives
 7.2pt in 10pt text).
 
-Inline raw text does not break, so in a narrow table cell it runs over the
-cell's border. A zero-width space (U+200B) in the string is a place where
-it may break; it stays a character of the text.
+Raw text is not hyphenated and breaks only where text may break (at a
+space), so a long identifier in a narrow table cell runs over the cell's
+border. A zero-width space (U+200B) in the string is a place where it may
+break; it stays a character of the text.
 
 ### 6.4 The sides of a stroke
 

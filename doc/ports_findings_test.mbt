@@ -375,7 +375,7 @@ test "S4: a character no font covers is glyph 0, without a warning" {
 }
 
 ///|
-test "S5: inline raw text does not break and leaves its table cell" {
+test "S5: a long word of inline raw text does not break and leaves its table cell" {
   let report = compile(
     [
       ..small_page(),
@@ -408,8 +408,27 @@ test "S5: inline raw text does not break and leaves its table cell" {
   let run = of_kind(all, "text")[0]
   assert_true(run.x + run.w > cells[0].x + cells[0].w)
   assert_true(run.x + run.w > cells[1].x + cells[1].w)
-  // What breaks it today: a zero-width space (U+200B) in the text is a
-  // place to break. It stays a character of the run's text.
+  // Raw text is not hyphenated, but it breaks where text may break: at a
+  // space, and so at a zero-width space (U+200B), which stays a character
+  // of the run's text.
+  let spaced = compile(
+    [
+      ..small_page(),
+      @doc.Table([@doc.Raw("a long name with breaks"), "b"], columns=[
+        Pt(60),
+        Pt(60),
+      ]),
+    ],
+  )
+  inspect(
+    of_kind(marks(spaced), "text")
+    .filter(run => run.text != "b")
+    .map(run => run.text)
+    .join("|"),
+    content=(
+      #|a long |name with |breaks
+    ),
+  )
   let broken = compile(
     [
       ..small_page(),
