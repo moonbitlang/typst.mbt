@@ -23,6 +23,7 @@ gen=tests/edsl_gen
 generator=_build/edsl-convert-runner
 
 rm -f "$gen"/s*/gen_cases.mbt "$gen/failed.txt" "$gen/manifest.tsv"
+mkdir -p _build
 moon build --target native --release tests/runner -j"$jobs" > _build/edsl-convert-build.log 2>&1 || {
   grep -A12 "^Error" _build/edsl-convert-build.log | head -60
   echo "edsl_convert: the runner does not build without generated code"
