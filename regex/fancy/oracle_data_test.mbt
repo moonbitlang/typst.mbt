@@ -2,9 +2,7 @@
 // `fancy-regex` crate (0.16.2). Do not edit.
 
 ///|
-/// (pattern, builder flags, [(haystack, description)]); the build error
-/// is in place of the haystacks when building fails.
-let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_0 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "^(\\w+) (\\1)$",
     "",
@@ -5998,6 +5996,10 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
       ),
     ],
   ),
+]
+
+///|
+let oracle_cases_1 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "\\s*(?<=[() ])(@\\w+)(\\([^)]*\\))?\\s*",
     "o",
@@ -10885,6 +10887,10 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
       ),
     ],
   ),
+]
+
+///|
+let oracle_cases_2 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "\\G\\d*",
     "",
@@ -15815,6 +15821,10 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
       ("a\u{0}b", "m=false @0:none @1:none @2:none @3:none pre1:none iter:"),
     ],
   ),
+]
+
+///|
+let oracle_cases_3 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "[\\x41-\\x5A]+",
     "o",
@@ -20405,6 +20415,10 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
       ),
     ],
   ),
+]
+
+///|
+let oracle_cases_4 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "|a",
     "",
@@ -25571,6 +25585,10 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
     "ok",
     [("b", "m=true @0:[0..1] @1:none pre0:none iter:[0..1]")],
   ),
+]
+
+///|
+let oracle_cases_5 : Array[(String, String, String, Array[(String, String)])] = [
   (
     "[a-z]",
     "om",
@@ -31345,4 +31363,12 @@ let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
     "error: Error compiling regex: Regex error: error parsing pattern 0",
     [],
   ),
+]
+
+///|
+/// (pattern, builder flags, [(haystack, description)]); the build error
+/// is in place of the haystacks when building fails.
+let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
+  ..oracle_cases_0, ..oracle_cases_1, ..oracle_cases_2, ..oracle_cases_3, ..oracle_cases_4,
+  ..oracle_cases_5,
 ]

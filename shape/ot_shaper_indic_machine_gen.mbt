@@ -243,7 +243,13 @@ let indic_syllable_machine_start : Int = 31
 let indic_syllable_machine_first_final : Int = 31
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 let indic_syllable_machine_error : Int = -1
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 let indic_syllable_machine_en_main : Int = 31

@@ -119,7 +119,13 @@ let khmer_syllable_machine_start : Int = 21
 let khmer_syllable_machine_first_final : Int = 21
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 let khmer_syllable_machine_error : Int = -1
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 let khmer_syllable_machine_en_main : Int = 21

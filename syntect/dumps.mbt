@@ -180,10 +180,11 @@ fn Decoder::context(self : Decoder, table : Array[Scope]) -> Context {
 
 ///|
 /// Loads a syntax set from the compact serialization: the header (scope
-/// table and syntax metadata) and the contexts of each syntax.
+/// table and syntax metadata) and the contexts of each syntax, which
+/// `contexts` returns by syntax index when they are first needed.
 pub fn SyntaxSet::from_compact(
   header : String,
-  contexts : ReadOnlyArray[String],
+  contexts : (Int) -> String,
 ) -> SyntaxSet {
   let d : Decoder = { s: header, pos: 0, }
   let nscopes = d.int()
@@ -210,7 +211,7 @@ pub fn SyntaxSet::from_compact(
       hidden~,
       variables={},
       loader=() => {
-        let cd : Decoder = { s: contexts[i], pos: 0, }
+        let cd : Decoder = { s: contexts(i), pos: 0, }
         let contexts = Array::makei(ncontexts, _ => cd.context(table))
         {
           context_ids: { "__start": { syntax_index: i, context_index: start, } },
