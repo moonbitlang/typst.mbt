@@ -285,11 +285,12 @@ fn convert_stops(grad : SvgNode) -> Array[Stop] {
         Some("currentColor") =>
           stop.find_attribute(AId::Color).unwrap_or(@svgtypes.Color::black())
         Some(value) =>
-          match (try? @svgtypes.Color::from_str(value)) {
-            Ok(c) => c
-            Err(_) =>
+          try @svgtypes.Color::from_str(value) catch {
+            _ =>
               // Upstream warns: Failed to parse stop-color value.
               @svgtypes.Color::black()
+          } noraise {
+            c => c
           }
         _ => @svgtypes.Color::black()
       }).split_alpha()

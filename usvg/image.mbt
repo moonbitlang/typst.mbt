@@ -239,11 +239,12 @@ fn get_image_data_format(data : Bytes) -> ImageFormat? {
 ///|
 /// Tries to load the `ImageData` content as an SVG image or emits a warning and returns `None`.
 fn load_sub_svg(data : Bytes, opt : Options) -> ImageKind? {
-  match (try? Tree::from_data_nested(data, opt)) {
-    Ok(tree) => Some(SVG(tree))
-    Err(_) =>
+  try Tree::from_data_nested(data, opt) catch {
+    _ =>
       // Upstream warns: Failed to load nested SVG image.
       None
+  } noraise {
+    tree => Some(SVG(tree))
   }
 }
 

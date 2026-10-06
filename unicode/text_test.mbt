@@ -24,44 +24,50 @@ test "normalization" {
 
 ///|
 test "properties" {
-  inspect(
+  @debug.debug_inspect(
     @unicode.canonical_general_category("letter"),
     content=(
-      #|Some(Letter)
+      #|Some("Letter")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @unicode.canonical_general_category("l"),
     content=(
-      #|Some(Letter)
+      #|Some("Letter")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @unicode.canonical_script("greek"),
     content=(
-      #|Some(Greek)
+      #|Some("Greek")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @unicode.canonical_property_name("whitespace"),
     content=(
-      #|Some(White_Space)
+      #|Some("White_Space")
     ),
   )
   let letter = @unicode.general_category_ranges("Letter").unwrap()
-  inspect(letter[0], content="(65, 90)")
+  @debug.debug_inspect(letter[0], content="(65, 90)")
   let lu = @unicode.general_category_ranges("Uppercase_Letter").unwrap()
-  inspect(lu[0], content="(65, 90)")
+  @debug.debug_inspect(lu[0], content="(65, 90)")
   let cn = @unicode.general_category_ranges("Unassigned").unwrap()
-  inspect(cn[0], content="(888, 889)")
-  inspect(@unicode.script_ranges("Greek").unwrap()[0], content="(880, 883)")
-  inspect(
+  @debug.debug_inspect(cn[0], content="(888, 889)")
+  @debug.debug_inspect(
+    @unicode.script_ranges("Greek").unwrap()[0],
+    content="(880, 883)",
+  )
+  @debug.debug_inspect(
     @unicode.bool_property_ranges("White_Space").unwrap()[0],
     content="(9, 13)",
   )
-  inspect(@unicode.simple_fold_next('k'.to_int()), content="Some(8490)")
-  inspect(@unicode.simple_fold_next(8490), content="Some(75)")
-  inspect(
+  @debug.debug_inspect(
+    @unicode.simple_fold_next('k'.to_int()),
+    content="Some(8490)",
+  )
+  @debug.debug_inspect(@unicode.simple_fold_next(8490), content="Some(75)")
+  @debug.debug_inspect(
     @unicode.chars_with_case_variants('a'.to_int(), 'c'.to_int()),
     content="[97, 98, 99]",
   )

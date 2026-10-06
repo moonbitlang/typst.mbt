@@ -155,9 +155,8 @@ fn convert_paint(
   opacity : Ref[Opacity],
   cache : Cache,
 ) -> (Paint, ContextElement?)? {
-  let paint = match (try? @svgtypes.Paint::from_str(value)) {
-    Ok(v) => v
-    Err(_) =>
+  let paint = try @svgtypes.Paint::from_str(value) catch {
+    _ =>
       if aid == AId::Fill {
         // Upstream warns: Failed to parse fill value. Fallback to black.
         @svgtypes.Paint::Color(@svgtypes.Color::black())
@@ -165,6 +164,8 @@ fn convert_paint(
         // Upstream warns: Failed to parse stroke value. Fallback to no stroke.
         return None
       }
+  } noraise {
+    v => v
   }
   match paint {
     None => None

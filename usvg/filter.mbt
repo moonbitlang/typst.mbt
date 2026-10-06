@@ -958,11 +958,12 @@ fn convert_lighting_color(node : SvgNode) -> Color {
       .unwrap_or(@svgtypes.Color::black())
       .split_alpha().0
     Some(value) =>
-      match (try? @svgtypes.Color::from_str(value)) {
-        Ok(c) => c.split_alpha().0
-        Err(_) =>
+      try @svgtypes.Color::from_str(value) catch {
+        _ =>
           // Upstream warns: Failed to parse lighting-color value.
           Color::white()
+      } noraise {
+        c => c.split_alpha().0
       }
     _ => Color::white()
   }

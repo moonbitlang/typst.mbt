@@ -215,7 +215,9 @@ fn BitmapImage::clone(self : BitmapImage) -> BitmapImage {
 /// call; variations are set on it).
 fn FontDatabase::fresh_face(self : FontDatabase, id : FontId) -> @otf.Face? {
   guard self.face(id) is Some(info) else { return None }
-  (try? @otf.Face::parse(info.source[:], info.index)).to_option()
+  Some(@otf.Face::parse(info.source[:], info.index)) catch {
+    _ => None
+  }
 }
 
 ///|
@@ -362,8 +364,10 @@ fn FontDatabase::svg(self : FontDatabase, id : FontId, glyph_id : Int) -> Node? 
   guard font.glyph_svg_image(@otf.GlyphId(glyph_id.to_uint16())) is Some(image) else {
     return None
   }
-  guard (try? Tree::from_data(image.data.to_owned(), Options::default()))
-    is Ok(tree) else {
+  guard (Some(Tree::from_data(image.data.to_owned(), Options::default())) catch {
+      _ => None
+    })
+    is Some(tree) else {
     return None
   }
 
@@ -414,7 +418,9 @@ fn FontDatabase::colr(
     return None
   }
   svg.end_element()
-  (try? Tree::from_data(@utf8.encode(svg.end_document()), Options::default())).to_option()
+  Some(Tree::from_data(@utf8.encode(svg.end_document()), Options::default())) catch {
+    _ => None
+  }
 }
 
 ///|

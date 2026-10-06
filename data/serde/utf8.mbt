@@ -74,10 +74,13 @@ pub fn decode_utf8(bytes : BytesView) -> String? {
 
 ///|
 test "utf8_error" {
-  inspect(utf8_error(b"abc"), content="None")
-  inspect(utf8_error(b"a\xffb"), content="Some((1, Some(1)))")
-  inspect(utf8_error(b"a\xe2\x82"), content="Some((1, None))")
-  inspect(utf8_error(b"a\xe2\x82x"), content="Some((1, Some(2)))")
-  inspect(utf8_error(b"\xed\xa0\x80"), content="Some((0, Some(1)))")
+  @debug.debug_inspect(utf8_error(b"abc"), content="None")
+  @debug.debug_inspect(utf8_error(b"a\xffb"), content="Some((1, Some(1)))")
+  @debug.debug_inspect(utf8_error(b"a\xe2\x82"), content="Some((1, None))")
+  @debug.debug_inspect(utf8_error(b"a\xe2\x82x"), content="Some((1, Some(2)))")
+  @debug.debug_inspect(
+    utf8_error(b"\xed\xa0\x80"),
+    content="Some((0, Some(1)))",
+  )
   inspect(decode_utf8(b"h\xc3\xa9").unwrap(), content="hé")
 }

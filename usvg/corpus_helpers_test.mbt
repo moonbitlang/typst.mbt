@@ -16,11 +16,8 @@ fn corpus_case(input : String) -> String {
     let h = x.reinterpret_as_uint().to_string(radix=16)
     String::make(8 - h.length(), '0') + h
   }
-  match (try? @usvg.Tree::from_data(@utf8.encode(input), opts)) {
-    Ok(tree) =>
-      "size \{bits(tree.size().width())} \{bits(tree.size().height())}\n" +
-      tree.to_string(@usvg.WriteOptions::default())
-    Err(e) =>
+  try @usvg.Tree::from_data(@utf8.encode(input), opts) catch {
+    e =>
       "error " +
       (match e {
         NotAnUtf8Str => "NotAnUtf8Str"
@@ -29,5 +26,9 @@ fn corpus_case(input : String) -> String {
         InvalidSize => "InvalidSize"
         ParsingFailed(e) => "ParsingFailed: \{e.to_string()}"
       })
+  } noraise {
+    tree =>
+      "size \{bits(tree.size().width())} \{bits(tree.size().height())}\n" +
+      tree.to_string(@usvg.WriteOptions::default())
   }
 }

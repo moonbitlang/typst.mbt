@@ -4,14 +4,14 @@ test "output paths" {
   inspect(with_extension("main", "svg"), content="main.svg")
   inspect(with_extension("a.b/main.typ", ""), content="a.b/main")
   inspect(with_extension(".hidden", "pdf"), content=".hidden.pdf")
-  inspect(
+  @debug.debug_inspect(
     path_extension("out.PDF"),
     content=(
-      #|Some(PDF)
+      #|Some("PDF")
     ),
   )
-  inspect(path_extension("dir.x/out"), content="None")
-  inspect(path_extension(".pdf"), content="None")
+  @debug.debug_inspect(path_extension("dir.x/out"), content="None")
+  @debug.debug_inspect(path_extension(".pdf"), content="None")
 }
 
 ///|
@@ -27,31 +27,31 @@ test "page templates" {
 
 ///|
 test "relative paths" {
-  inspect(
+  @debug.debug_inspect(
     diff_paths("/a/b/c.typ", "/a/b"),
     content=(
-      #|Some(c.typ)
+      #|Some("c.typ")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     diff_paths("/a/x/c.typ", "/a/b"),
     content=(
-      #|Some(../x/c.typ)
+      #|Some("../x/c.typ")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     diff_paths("/a/b", "/a/b"),
     content=(
-      #|Some()
+      #|Some("")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     diff_paths("/a", "/a/b/c"),
     content=(
-      #|Some(../..)
+      #|Some("../..")
     ),
   )
-  inspect(diff_paths("rel", "/a"), content="None")
+  @debug.debug_inspect(diff_paths("rel", "/a"), content="None")
 }
 
 ///|
@@ -67,7 +67,7 @@ test "page ranges" {
       Invalid(msg) => msg
       _ => "?"
     } noraise {
-      r => "\{r.start}..\{r.end}"
+      r => "\{@debug.to_string(r.start)}..\{@debug.to_string(r.end)}"
     }
   }
   inspect(show("3"), content="Some(3)..Some(3)")
@@ -141,7 +141,7 @@ test "argument parsing" {
       args =>
         match args.command {
           Compile(c) =>
-            "compile \{c.input.to_string()} \{c.output.map(o => o.to_string())} inputs=\{c.world.inputs} pages=\{c.pages.map(p => p.length())} pretty=\{c.pretty}"
+            "compile \{c.input.to_string()} \{@debug.to_string(c.output.map(o => o.to_string()))} inputs=\{@debug.to_string(c.world.inputs)} pages=\{@debug.to_string(c.pages.map(p => p.length()))} pretty=\{@debug.to_string(c.pretty)}"
           _ => "other"
         }
     }
@@ -151,13 +151,13 @@ test "argument parsing" {
       "c", "a.typ", "--input", "k = v", "-i", "x=1", "--pages=1,3-", "--pretty",
     ]),
     content=(
-      #|compile a.typ None inputs=[(k, v), (x, 1)] pages=Some(2) pretty=Some(true)
+      #|compile a.typ None inputs=[("k", "v"), ("x", "1")] pages=Some(2) pretty=Some(true)
     ),
   )
   inspect(
     parse(["compile", "--", "-", "out.svg"]),
     content=(
-      #|compile stdin Some(out.svg) inputs=[] pages=None pretty=None
+      #|compile stdin Some("out.svg") inputs=[] pages=None pretty=None
     ),
   )
   inspect(

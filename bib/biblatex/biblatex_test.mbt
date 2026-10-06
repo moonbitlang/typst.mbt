@@ -31,10 +31,10 @@ test "parse basic" {
       #|]
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     e.author().unwrap().map(p => p.to_string()),
     content=(
-      #|[Rick Astley, Linda Morris]
+      #|["Rick Astley", "Linda Morris"]
     ),
   )
   debug_inspect(e.pages().unwrap(), content="Typed([IntRange(192, 219)])")

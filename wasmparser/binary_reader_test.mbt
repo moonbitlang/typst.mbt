@@ -8,9 +8,10 @@ fn reader(bytes : Bytes) -> @wasmparser.BinaryReader {
 
 ///|
 fn err_string(f : () -> Unit raise @wasmparser.BinaryReaderError) -> String {
-  match (try? f()) {
-    Ok(_) => "ok"
-    Err(e) => e.to_string()
+  try f() catch {
+    e => e.to_string()
+  } noraise {
+    _ => "ok"
   }
 }
 

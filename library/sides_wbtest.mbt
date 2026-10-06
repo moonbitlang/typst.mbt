@@ -13,10 +13,10 @@ test "sides cast" {
   let pt = (x : Double) => Value::Length(Length::from_abs(Abs::pt(x)))
   let d = Dict::from_pairs([("x", pt(1.0)), ("top", pt(2.0))])
   let s : Sides[Rel[Length]?] = Value::Dict(d).cast()
-  inspect(
+  @debug.debug_inspect(
     s.iter().map(v => v.map(r => r.repr_length()).unwrap_or("-")).collect(),
     content=(
-      #|[0% + 1pt, 0% + 2pt, 0% + 1pt, -]
+      #|["0% + 1pt", "0% + 2pt", "0% + 1pt", "-"]
     ),
   )
   // The original dictionary is not modified.

@@ -269,7 +269,7 @@ pub fn Scope::prelude_path(self : Scope, path : Array[String]) -> Binding? {
     if binding.feature() is Some(new) {
       if path_feature is Some(prev) && prev != new {
         abort(
-          "cannot prelude from path \{path} because it's gated by two different features: `\{prev}` and `\{new}`",
+          "cannot prelude from path [\{path.join(", ")}] because it's gated by two different features: `\{prev}` and `\{new}`",
         )
       }
       path_feature = Some(new)

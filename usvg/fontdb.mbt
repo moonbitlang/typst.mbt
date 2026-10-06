@@ -382,7 +382,8 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
 ///|
 /// Parses the face metadata (upstream `parse_face_info`).
 fn parse_face_info(data : Bytes, index : UInt) -> FaceInfo? {
-  guard (try? @otf.Face::parse(data[:], index)).to_option() is Some(face) else {
+  guard (Some(@otf.Face::parse(data[:], index)) catch { _ => None })
+    is Some(face) else {
     return None
   }
   guard parse_face_names(face) is Some((families, post_script_name)) else {

@@ -23,7 +23,9 @@ fn extend_scope_from_codex_module(scope : Scope, module_ : CodexModule) -> Unit 
     let value : Value = match binding.def {
       Symbol(s) => {
         let symbol = Symbol::from_codex(s)
-        data = (try? symbol.func()).to_option().bind(func => func.to_native())
+        data = (Some(symbol.func()) catch { _ => None }).bind(func => {
+          func.to_native()
+        })
         Symbol(symbol)
       }
       Module(m) => Module(Module::new(name, Scope::from_codex(m)))

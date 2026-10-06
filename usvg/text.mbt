@@ -429,7 +429,7 @@ fn convert_font(node : SvgNode, state : State) -> Font {
     None => ""
   }
   // Upstream warns: Failed to parse {} value: '{}'. Falling back to {}.
-  let families = (try? @svgtypes.parse_font_families(font_families)).unwrap_or([])
+  let families = @svgtypes.parse_font_families(font_families) catch { _ => [] }
   if families.is_empty() {
     families.push(Named(state.opt.font_family))
   }
@@ -583,9 +583,10 @@ fn rust_parse_f32(s : String) -> Float? {
     return None
   }
   // Decimal -> f32 with a single rounding.
-  match (try? @string.parse_double(s)) {
-    Ok(d) => Some(decimal_to_f32(s, d))
-    Err(_) => None
+  try @string.parse_double(s) catch {
+    _ => None
+  } noraise {
+    d => Some(decimal_to_f32(s, d))
   }
 }
 

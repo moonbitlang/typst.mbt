@@ -278,10 +278,10 @@ test "unknown elements are ignored with a warning" {
   ]
   let nodes = convert_to_nodes(engine, locator, pairs, Block, Normal)
   inspect(nodes.length(), content="0")
-  inspect(
+  @debug.debug_inspect(
     engine.sink.warnings().map(w => w.message),
     content=(
-      #|[colbreak was ignored during HTML export]
+      #|["colbreak was ignored during HTML export"]
     ),
   )
 }
@@ -359,7 +359,7 @@ test "document: html element not alone" {
     text("Text"),
   ])
   let msg = try encode_document(content) catch {
-    @library.SourceError(errors) => errors.map(e => e.message).to_string()
+    @library.SourceError(errors) => @debug.to_string(errors.map(e => e.message))
     e => e.to_string()
   } noraise {
     _ => "ok"
@@ -367,7 +367,7 @@ test "document: html element not alone" {
   inspect(
     msg,
     content=(
-      #|[`<html>` element must be the only element in the document]
+      #|["`<html>` element must be the only element in the document"]
     ),
   )
 }
@@ -478,8 +478,8 @@ test "introspector: positions" {
     .html_position(c.location().unwrap())
     .map(p => p.element().to_owned())
   }
-  inspect(pos(m1), content="Some([1, 0])")
-  inspect(pos(m2), content="Some([1, 1, 0])")
+  @debug.debug_inspect(pos(m1), content="Some([1, 0])")
+  @debug.debug_inspect(pos(m2), content="Some([1, 1, 0])")
   inspect(
     @library.IntrospectorBackend::query(
       introspector,
@@ -539,13 +539,13 @@ test "link anchors" {
       #|<!DOCTYPE html><html><body><span id="intro">hello</span><span id="loc-1"></span></body></html>
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @library.IntrospectorBackend::anchor(
       doc.introspector(),
       target.location().unwrap(),
     ),
     content=(
-      #|Some(intro)
+      #|Some("intro")
     ),
   )
 }
@@ -555,7 +555,7 @@ test "routines: html_mathml_body and html_span_filled" {
   let math = @library.HtmlElem::new(@library.tag_mathml_math)
     .with_body(Some(text("x")))
     .pack()
-  inspect(
+  @debug.debug_inspect(
     html_mathml_body(math, @library.StyleChain::empty()).map(b => b is Some(_)),
     content="Some(true)",
   )

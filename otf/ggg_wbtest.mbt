@@ -49,33 +49,36 @@ test "layout table with extension lookup and feature variations" {
   let t = LayoutTable::parse(ggg_test_gsub()).unwrap()
   inspect(t.scripts.len(), content="0")
   inspect(t.features.len(), content="1")
-  inspect(t.features.index(Tag::from_str("liga")), content="Some(0)")
+  @debug.debug_inspect(
+    t.features.index(Tag::from_str("liga")),
+    content="Some(0)",
+  )
   inspect(t.features.find(Tag::from_str("kern")) is None, content="true")
   let feature = t.features.find(Tag::from_str("liga")).unwrap()
-  inspect(feature.lookup_indices.iter().collect(), content="[0]")
+  @debug.debug_inspect(feature.lookup_indices.iter().collect(), content="[0]")
   let lookup = t.lookups.get(0).unwrap()
   inspect(lookup.flags.use_mark_filtering_set(), content="true")
-  inspect(lookup.mark_filtering_set, content="Some(5)")
+  @debug.debug_inspect(lookup.mark_filtering_set, content="Some(5)")
   inspect(lookup.subtables.len(), content="1")
   let sub : SubstitutionSubtable = lookup.subtables.get(0).unwrap()
   guard sub is Single(Format1(coverage~, delta~)) else { fail("not single") }
   inspect(delta, content="3")
-  inspect(coverage.get(GlyphId(9)), content="None")
-  inspect(coverage.get(GlyphId(15)), content="Some(5)")
-  inspect(coverage.get(GlyphId(21)), content="None")
+  @debug.debug_inspect(coverage.get(GlyphId(9)), content="None")
+  @debug.debug_inspect(coverage.get(GlyphId(15)), content="Some(5)")
+  @debug.debug_inspect(coverage.get(GlyphId(21)), content="None")
   let v = t.variations.unwrap()
-  inspect(v.find_index([]), content="None")
-  inspect(
+  @debug.debug_inspect(v.find_index([]), content="None")
+  @debug.debug_inspect(
     v.find_index([NormalizedCoordinate::from_i16(10000)]),
     content="Some(0)",
   )
-  inspect(
+  @debug.debug_inspect(
     v.find_index([NormalizedCoordinate::from_i16(-10000)]),
     content="None",
   )
   let f = v.find_substitute(0, 0).unwrap()
   inspect(f.tag, content="DFLT")
-  inspect(f.lookup_indices.iter().collect(), content="[0, 7]")
+  @debug.debug_inspect(f.lookup_indices.iter().collect(), content="[0, 7]")
   inspect(v.find_substitute(1, 0) is None, content="true")
 }
 

@@ -23,14 +23,18 @@ fn heading_elem_synthesize(
     //
     // A more comprehensive fix might introduce the error catching logic
     // of show rules for synthesis, too.
-    let numbers = try? Counter::of(heading_elem()).display_at(
-      engine,
-      location,
-      styles,
-      numbering,
-      content.span(),
-    )
-    if numbers is Ok(numbers) {
+    let numbers = Some(
+      Counter::of(heading_elem()).display_at(
+        engine,
+        location,
+        styles,
+        numbering,
+        content.span(),
+      ),
+    ) catch {
+      _ => None
+    }
+    if numbers is Some(numbers) {
       elem = elem.with_numbers(numbers.plain_text())
     }
   }

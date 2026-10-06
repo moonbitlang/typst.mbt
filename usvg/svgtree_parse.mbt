@@ -290,8 +290,12 @@ fn parse_svg_element(
       insert_attribute(AId::MarkerMid, val, imp)
       insert_attribute(AId::MarkerEnd, val, imp)
     } else if declaration.name == "font" {
-      match (try? @svgtypes.FontShorthand::from_str(val)) {
-        Ok(shorthand) => {
+      try @svgtypes.FontShorthand::from_str(val) catch {
+        _ =>
+          // Upstream warns: Failed to parse font value.
+          ()
+      } noraise {
+        shorthand => {
           // First we need to reset all values to their default.
           insert_attribute(AId::FontStyle, "normal", imp)
           insert_attribute(AId::FontVariant, "normal", imp)
@@ -322,9 +326,6 @@ fn parse_svg_element(
           insert_attribute(AId::FontSize, shorthand.font_size, imp)
           insert_attribute(AId::FontFamily, shorthand.font_family, imp)
         }
-        Err(_) =>
-          // Upstream warns: Failed to parse font value.
-          ()
       }
     } else if AId::from_str(declaration.name) is Some(aid) {
       // Parse only the presentation attributes.
@@ -478,7 +479,8 @@ fn resolve_href(
         None => return None
       }
   }
-  guard (try? @svgtypes.IRI::from_str(link_value)) is Ok(link_id) else {
+  guard (Some(@svgtypes.IRI::from_str(link_value)) catch { _ => None })
+    is Some(link_id) else {
     return None
   }
   id_map.get(link_id.0)
@@ -647,7 +649,8 @@ fn find_recursive_pattern(aid : AId, doc : Document) -> Int? {
         Some(v) => v
         None => continue
       }
-      if (try? @svgtypes.Paint::from_str(value)) is Ok(FuncIRI(link_id, _)) {
+      if (Some(@svgtypes.Paint::from_str(value)) catch { _ => None })
+        is Some(FuncIRI(link_id, _)) {
         if link_id == pattern_node.element_id() {
           // If a pattern child has a link to the pattern itself
           // then we have to replace it with `none`.
@@ -660,8 +663,8 @@ fn find_recursive_pattern(aid : AId, doc : Document) -> Int? {
               Some(v) => v
               None => continue
             }
-            if (try? @svgtypes.Paint::from_str(value2))
-              is Ok(FuncIRI(link_id2, _)) {
+            if (Some(@svgtypes.Paint::from_str(value2)) catch { _ => None })
+              is Some(FuncIRI(link_id2, _)) {
               if link_id2 == pattern_node.element_id() {
                 return Some(node2.id)
               }

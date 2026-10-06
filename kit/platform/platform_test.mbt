@@ -22,32 +22,32 @@ test "double backslashes are not UNC prefixes on Unix" {
 
 ///|
 test "path helpers" {
-  inspect(
+  @debug.debug_inspect(
     @platform.parent("/a/b/c.typ"),
     content=(
-      #|Some(/a/b)
+      #|Some("/a/b")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @platform.parent("/a"),
     content=(
-      #|Some(/)
+      #|Some("/")
     ),
   )
-  inspect(@platform.parent("/"), content="None")
-  inspect(
+  @debug.debug_inspect(@platform.parent("/"), content="None")
+  @debug.debug_inspect(
     @platform.parent("c.typ"),
     content=(
-      #|Some()
+      #|Some("")
     ),
   )
-  inspect(
+  @debug.debug_inspect(
     @platform.file_name("/a/b/c.typ"),
     content=(
-      #|Some(c.typ)
+      #|Some("c.typ")
     ),
   )
-  inspect(@platform.file_name("/a/.."), content="None")
+  @debug.debug_inspect(@platform.file_name("/a/.."), content="None")
   inspect(@platform.join("/a", "b"), content="/a/b")
   inspect(@platform.join("/a/", "b"), content="/a/b")
   inspect(@platform.join("/a", "/b"), content="/b")

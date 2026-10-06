@@ -83,7 +83,9 @@ fn parse_svg_text_element_impl(
 
 ///|
 fn resolve_tref_text(xml : @xml.Document, href : String) -> String? {
-  guard (try? @svgtypes.IRI::from_str(href)) is Ok(iri) else { return None }
+  guard (Some(@svgtypes.IRI::from_str(href)) catch { _ => None }) is Some(iri) else {
+    return None
+  }
   let id = iri.0
 
   // Find linked element in the original tree.

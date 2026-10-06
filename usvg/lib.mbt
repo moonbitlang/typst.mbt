@@ -206,5 +206,7 @@ pub fn decompress_svgz(data : Bytes) -> Bytes raise UsvgError {
 ///|
 /// `std::str::from_utf8`.
 fn utf8_decode_strict(data : Bytes) -> String? {
-  (try? @utf8.decode(data[:])).to_option()
+  Some(@utf8.decode(data[:])) catch {
+    _ => None
+  }
 }

@@ -10,10 +10,10 @@ fn read_all(
   let out = StringBuilder()
   try {
     if headers {
-      out.write_string("headers \{reader.headers()}\n")
+      out.write_string("headers [\{reader.headers().join(", ")}]\n")
     }
     while reader.read_record() is Some(record) {
-      out.write_string("\{record}\n")
+      out.write_string("[\{record.join(", ")}]\n")
     }
   } catch {
     @csv.CsvError(kind) => out.write_string("error \{fmt_kind(kind)}\n")

@@ -1335,9 +1335,10 @@ fn write_span(
       Fantasy => "fantasy"
       Named(s) =>
         // Only quote if absolutely necessary
-        match (try? @svgtypes.parse_font_families(s)) {
-          Ok(_) => s
-          Err(_) => if opt.use_single_quote { "\"\{s}\"" } else { "'\{s}'" }
+        try @svgtypes.parse_font_families(s) catch {
+          _ => if opt.use_single_quote { "\"\{s}\"" } else { "'\{s}'" }
+        } noraise {
+          _ => s
         }
     }
   }

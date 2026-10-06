@@ -225,7 +225,7 @@ test "libm: sweeps" {
       }
     }
     if h != expected {
-      failures.push("\{name} \{xr} \{yr}")
+      failures.push("\{name} \{@debug.to_string(xr)} \{@debug.to_string(yr)}")
     }
   }
   assert_eq(failures, [])
