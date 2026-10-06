@@ -208,11 +208,14 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   baseline, the line keeps its height), and the spaces of the label are
   no-break spaces. `Chip::of(body, ..)` is the same box around content.
 - `doc/kit`: `DataTable(head, rows, columns~, inset?, align?, fill?,
-  stroke?, radius?, breakable?, key?)`, a table of data given by rows: a
-  header that repeats, rows that are not split, one stroke as the rule
-  under each row with no other line, and with `radius` a rounded frame.
-  A row whose cells do not fill the columns (spans counted) is an error at
-  `rows` under the key of the row.
+  stroke?, radius?, frame_fill?, breakable?, key?)`, a table of data given
+  by rows: a header that repeats, rows that are not split, one stroke as
+  the rule under each row with no other line, and with `radius` a rounded
+  frame. A row whose cells do not fill the columns (spans counted) is an
+  error at `rows` under the key of the row. `frame_fill` is the fill of
+  the frame, the surface of a framed table on a page that is not white
+  (`fill` is the table's, per cell: a fill of every cell is painted over
+  the edge of the frame's outline); without `radius` it is an error.
 - `doc`: `Content::table_cell_spans()`, the columns and the rows that a
   description takes as a cell of a table (`None` for a child that a table
   does not place in its row): what `DataTable` counts with, since a
