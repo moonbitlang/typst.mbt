@@ -200,6 +200,19 @@ pub impl @builtin.Show for ColbreakView
 pub impl @debug.Debug for ColbreakView
 pub impl IntoContent for ColbreakView
 
+pub(all) enum ColorSpace {
+  Auto
+  Oklab
+  Oklch
+  Srgb
+  LinearRgb
+  Grayscale
+  Cmyk
+  Hsl
+  Hsv
+}
+pub impl ToValue for ColorSpace
+
 pub struct Columns {
   // private fields
 }
@@ -1230,11 +1243,15 @@ pub(all) enum Paint {
   Value(Value)
 }
 pub fn Paint::conic(Array[Self], angle? : Angle, center? : (Length, Length), relative? : String) -> Self
+pub fn Paint::darken(Self, Double) -> Self
+pub fn Paint::lighten(Self, Double) -> Self
 pub fn Paint::linear(Array[Self], angle? : Angle, dir? : Dir, relative? : String) -> Self
 pub fn Paint::map(String) -> Array[Self]
+pub fn Paint::mix(Self, Self, weight? : Double, space? : ColorSpace) -> Self
 pub fn Paint::radial(Array[Self], center? : (Length, Length), radius? : Length, focal_center? : (Length, Length), focal_radius? : Length, relative? : String) -> Self
 pub fn Paint::stop(Self, Length) -> Self
 pub fn Paint::tiling(&IntoContent, size? : (Length, Length), spacing? : (Length, Length), offset? : (Length, Length), angle? : Angle, relative? : String) -> Self
+pub fn Paint::transparentize(Self, Double) -> Self
 pub impl ToValue for Paint
 
 pub struct Par {

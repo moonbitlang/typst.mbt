@@ -695,7 +695,7 @@ test "T3: the dash of a `Stroke` is a `Dash`; a `Value` goes through `RawValue`"
 }
 
 ///|
-test "T4: colour operations are calls of Typst's functions on a `Value`" {
+test "T4: colour operations are methods of `Paint`, the calls of Typst's functions" {
   let swatch = (fill : @doc.Paint) => {
     @doc.Rect(width=Pt(20), height=Pt(10), fill~)
   }
@@ -705,7 +705,8 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
       ..small_page(),
       // What the ports wrote: the alpha as two more hex digits.
       swatch(Rgb("#1d758680")),
-      // Typst's own operations, through the generic call.
+      // Typst's own operations, through the generic call (which still
+      // works) ...
       swatch(
         Value(
           @doc.Value::call("color.transparentize", positional=[
@@ -731,6 +732,11 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
           ),
         ),
       ),
+      // ... and as the typed operations, which are these calls: the same
+      // functions with the colour as first argument.
+      swatch(teal.transparentize(50)),
+      swatch(teal.mix(White)),
+      swatch(teal.mix(White, space=Srgb)),
     ],
   )
   inspect(error_messages(report), content="")
@@ -741,7 +747,54 @@ test "T4: colour operations are calls of Typst's functions on a `Value`" {
       #|rgb("#1d758680")
       #|oklab(76.01%, -0.034, -0.023)
       #|rgb("#8ebac3")
+      #|rgb("#1d758680")
+      #|oklab(76.01%, -0.034, -0.023)
+      #|rgb("#8ebac3")
     ),
+  )
+  // The typed and the untyped form lower to the same value (the typed
+  // `mix` writes the weights out: half each by default).
+  let lowered = (fill : @doc.Paint) => {
+    @doc.Document([@doc.Rect(fill~)])
+    .lower(@doc.DocWorld::in_memory())
+    .unwrap()
+    .repr()
+  }
+  let call = (
+    path : String,
+    positional : Array[@doc.Value],
+    named : Array[(String, @doc.Value)],
+  ) => {
+    let paint : @doc.Paint = Value(@doc.Value::call(path, positional~, named~))
+    lowered(paint)
+  }
+  assert_eq(
+    lowered(teal.transparentize(50)),
+    call(
+      "color.transparentize",
+      [@doc.Value::paint(teal), @doc.Value::length(Pct(50))],
+      [],
+    ),
+  )
+  let weighted = (paint : @doc.Paint, percent : Double) => {
+    @doc.Value::array([
+      @doc.Value::paint(paint),
+      @doc.Value::length(Pct(percent)),
+    ])
+  }
+  assert_eq(
+    lowered(teal.mix(White, weight=30, space=Srgb)),
+    call("color.mix", [weighted(teal, 70), weighted(White, 30)], [
+      ("space", @doc.Value::global("rgb")),
+    ]),
+  )
+  assert_eq(
+    lowered(teal.mix(White)),
+    call("color.mix", [weighted(teal, 50), weighted(White, 50)], []),
+  )
+  assert_eq(
+    lowered(teal.mix(White)),
+    call("color.mix", [@doc.Value::paint(teal), @doc.Value::paint(White)], []),
   )
 }
 

@@ -540,3 +540,192 @@ test "`Stroke(dash=)`: states, presets, patterns and the untyped escape" {
     ),
   )
 }
+
+///|
+test "colour operations on `Paint` are Typst's methods" {
+  let fill = (paint : @doc.Paint) => lowered([@doc.Rect(fill=paint)])
+  let typst = (source : String) => {
+    lowered([@doc.Markup("#rect(fill: \{source})")])
+  }
+  let blue : @doc.Paint = Rgb("#1f4e79")
+  let green : @doc.Paint = Rgb("#7fc8a9")
+  assert_eq(
+    fill(blue.transparentize(30)),
+    typst("rgb(\"#1f4e79\").transparentize(30%)"),
+  )
+  // The alpha is scaled, not set.
+  assert_eq(
+    fill(blue.transparentize(30).transparentize(30)),
+    typst("rgb(\"#1f4e79\").transparentize(51%)"),
+  )
+  // A negative amount adds opacity (Typst's `opacify`): 20% alpha becomes
+  // 60%, not 30%.
+  let faint : @doc.Paint = Rgb("#1f4e7933")
+  inspect(
+    fill(faint.transparentize(-50)),
+    content=(
+      #|rect(fill: rgb("#1f4e7999"))
+    ),
+  )
+  assert_eq(
+    fill(faint.transparentize(-50)),
+    typst("rgb(\"#1f4e7933\").opacify(50%)"),
+  )
+  assert_eq(fill(blue.lighten(25)), typst("rgb(\"#1f4e79\").lighten(25%)"))
+  assert_eq(fill(blue.darken(12.5)), typst("rgb(\"#1f4e79\").darken(12.5%)"))
+  assert_eq(fill(@doc.Paint::lighten(Red, 40)), typst("red.lighten(40%)"))
+  // `mix`: the other colour gets `weight` percent; the default is half.
+  assert_eq(
+    fill(blue.mix(green, weight=40, space=Srgb)),
+    typst(
+      "color.mix((rgb(\"#1f4e79\"), 60%), (rgb(\"#7fc8a9\"), 40%), space: rgb)",
+    ),
+  )
+  assert_eq(
+    fill(blue.mix(green)),
+    typst("color.mix((rgb(\"#1f4e79\"), 50%), (rgb(\"#7fc8a9\"), 50%))"),
+  )
+  assert_eq(
+    fill(blue.mix(green)),
+    typst("color.mix(rgb(\"#1f4e79\"), rgb(\"#7fc8a9\"))"),
+  )
+  // `Auto` is Typst's default space, Oklab.
+  assert_eq(fill(blue.mix(green)), fill(blue.mix(green, space=Oklab)))
+  let spaces : Array[(@doc.ColorSpace, String)] = [
+    (Oklab, "oklab"),
+    (Oklch, "oklch"),
+    (Srgb, "rgb"),
+    (LinearRgb, "color.linear-rgb"),
+    (Grayscale, "luma"),
+    (Cmyk, "cmyk"),
+    (Hsl, "color.hsl"),
+    (Hsv, "color.hsv"),
+  ]
+  for pair in spaces {
+    assert_eq(
+      fill(blue.mix(green, weight=25, space=pair.0)),
+      typst(
+        "color.mix((rgb(\"#1f4e79\"), 75%), (rgb(\"#7fc8a9\"), 25%), space: \{pair.1})",
+      ),
+    )
+  }
+  inspect(
+    [
+      fill(blue.transparentize(30)),
+      fill(blue.lighten(25)),
+      fill(blue.darken(12.5)),
+      fill(blue.mix(green, weight=40, space=Srgb)),
+      fill(blue.mix(green)),
+    ].join("\n"),
+    content=(
+      #|rect(fill: rgb("#1f4e79b2"))
+      #|rect(fill: rgb("#577a9a"))
+      #|rect(fill: rgb("#1b446a"))
+      #|rect(fill: rgb("#457f8c"))
+      #|rect(fill: oklab(59.48%, -0.057, -0.031))
+    ),
+  )
+}
+
+///|
+test "`@doc.Rgb(..)` and `@doc.Luma(..)` without an expected type are colours" {
+  // As in 0.1.4. The cases of `ColorSpace` are named `Srgb` and
+  // `Grayscale` for this: a second enum of the package with a case `Rgb`
+  // or `Luma` would make these two lines ambiguous constructors (error
+  // 4124), and this file would not compile.
+  let c = @doc.Rgb("#fff")
+  let g = @doc.Luma(128)
+  inspect(
+    lowered([@doc.Rect(fill=c), @doc.Rect(fill=g)]),
+    content=(
+      #|sequence(
+      #|  rect(fill: rgb("#ffffff")),
+      #|  rect(fill: luma(50.2%)),
+      #|)
+    ),
+  )
+  // The spaces lower to Typst's `rgb` and `luma`.
+  let typst = (source : String) => {
+    lowered([@doc.Markup("#rect(fill: \{source})")])
+  }
+  assert_eq(
+    lowered([@doc.Rect(fill=c.mix(g, space=Srgb))]),
+    typst("color.mix((rgb(\"#fff\"), 50%), (luma(128), 50%), space: rgb)"),
+  )
+  assert_eq(
+    lowered([@doc.Rect(fill=c.mix(g, space=Grayscale))]),
+    typst("color.mix((rgb(\"#fff\"), 50%), (luma(128), 50%), space: luma)"),
+  )
+}
+
+///|
+test "a colour operation on a paint that is not a colour is Typst's error" {
+  let gradient = @doc.Paint::linear([Red, Blue])
+  let transparent = compile([@doc.Rect(fill=gradient.transparentize(30))])
+  inspect(
+    error_messages(transparent),
+    content=(
+      #|expected color, found gradient
+    ),
+  )
+  inspect(
+    origin_arg(transparent.errors[0]),
+    content=(
+      #|Rect, argument 2
+    ),
+  )
+  let mixed = compile([@doc.Rect(fill=@doc.Paint::mix(Red, gradient))])
+  inspect(
+    error_messages(mixed),
+    content=(
+      #|expected color, found gradient
+    ),
+  )
+  let tiling = compile([@doc.Rect(fill=@doc.Paint::tiling("x").lighten(10))])
+  inspect(
+    error_messages(tiling),
+    content=(
+      #|expected color, found tiling
+    ),
+  )
+  // States are not colours either.
+  let auto = compile([@doc.Rect(fill=@doc.Paint::darken(Auto, 10))])
+  inspect(
+    error_messages(auto),
+    content=(
+      #|expected color, found auto
+    ),
+  )
+  // Typst's own limit: a CMYK colour has no alpha.
+  let cmyk : @doc.Paint = Value(
+    @doc.Value::call("cmyk", positional=[
+      @doc.Value::length(Pct(10)),
+      @doc.Value::length(Pct(20)),
+      @doc.Value::length(Pct(30)),
+      @doc.Value::length(Pct(40)),
+    ]),
+  )
+  let no_alpha = compile([@doc.Rect(fill=cmyk.transparentize(50))])
+  inspect(
+    error_messages(no_alpha),
+    content=(
+      #|CMYK does not have an alpha component
+    ),
+  )
+  // Inside a stroke the error is at the argument that holds the stroke.
+  let in_stroke = compile([
+    @doc.Rect(stroke=@doc.Sides(all=@doc.Stroke(paint=gradient.darken(10)))),
+  ])
+  inspect(
+    error_messages(in_stroke),
+    content=(
+      #|expected color, found gradient
+    ),
+  )
+  inspect(
+    origin_arg(in_stroke.errors[0]),
+    content=(
+      #|Rect, argument 3
+    ),
+  )
+}

@@ -67,6 +67,136 @@ pub impl ToValue for Paint with fn to_value(self) {
 }
 
 ///|
+/// A colour space, for [Paint::mix]: Typst's colour space values, which
+/// are the constructor functions of the spaces.
+pub(all) enum ColorSpace {
+  /// Typst's default (`auto`): Oklab, or the spot colorant that all the
+  /// colours share.
+  Auto
+  /// `oklab`.
+  Oklab
+  /// `oklch`.
+  Oklch
+  /// `rgb` (sRGB). Not named `Rgb`: that is the colour `Rgb("#..")` of
+  /// [Paint], which must stay unambiguous as `@doc.Rgb(..)`.
+  Srgb
+  /// `color.linear-rgb`.
+  LinearRgb
+  /// `luma` (D65 gray). Not named `Luma` or `Gray`, which are cases of
+  /// [Paint].
+  Grayscale
+  /// `cmyk`.
+  Cmyk
+  /// `color.hsl`.
+  Hsl
+  /// `color.hsv`.
+  Hsv
+}
+
+///|
+pub impl ToValue for ColorSpace with fn to_value(self) {
+  // The engine identifies a space by its constructor function.
+  let space = (func : @library.NativeFuncData) => {
+    Value::engine(@library.Value::Func(@library.Func::native(func)))
+  }
+  match self {
+    Auto => Value::auto()
+    Oklab => space(@library.native_color_oklab())
+    Oklch => space(@library.native_color_oklch())
+    Srgb => space(@library.native_color_rgb())
+    LinearRgb => space(@library.native_color_linear_rgb())
+    Grayscale => space(@library.native_color_luma())
+    Cmyk => space(@library.native_color_cmyk())
+    Hsl => space(@library.native_color_hsl())
+    Hsv => space(@library.native_color_hsv())
+  }
+}
+
+///|
+/// A percentage as the engine's ratio (the literal `50%`).
+fn percent_value(value : Double) -> Value {
+  Value::of(VNumeric(value, @library.NumericUnit::Percent))
+}
+
+///|
+/// The colour made more transparent (`color.transparentize(percent%)`):
+/// for a percentage from 0 to 100 its alpha is multiplied by
+/// `1 - percent / 100`. This scales the alpha the colour has, it does not
+/// set it: `transparentize(30)` of an opaque colour has 70% alpha, and of
+/// that colour again 49%. A negative percentage makes the colour more
+/// opaque, like Typst's `opacify`: the alpha `a` becomes
+/// `a + (1 - a) * (-percent / 100)`. The result is clamped to 0..1 by
+/// Typst, whose error for a colour without an alpha component (CMYK) it
+/// also is.
+///
+/// Defined for colours: a gradient or a tiling is Typst's cast error at the
+/// argument the paint is passed in (`expected color, found gradient`).
+pub fn Paint::transparentize(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_transparentize(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour lightened by a percentage (`color.lighten(percent%)`).
+/// Defined for colours, like [Paint::transparentize].
+pub fn Paint::lighten(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_lighten(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour darkened by a percentage (`color.darken(percent%)`).
+/// Defined for colours, like [Paint::transparentize].
+pub fn Paint::darken(self : Paint, percent : Double) -> Paint {
+  Value(
+    Value::native(@library.native_color_darken(), [
+      self.to_value(),
+      percent_value(percent),
+    ]),
+  )
+}
+
+///|
+/// The colour mixed with `other`, which gets `weight` percent of the
+/// mixture: `color.mix((self, (100 - weight)%), (other, weight%), space:
+/// ..)`. `space` is the colour space the channels are mixed in; `Auto` is
+/// Typst's default (Oklab, or the spot colorant both colours share).
+///
+/// This is Typst's mixture, which averages the channels without
+/// premultiplying alpha; it is not CSS's `color-mix` for colours of
+/// different alpha. Defined for colours, like [Paint::transparentize].
+pub fn Paint::mix(
+  self : Paint,
+  other : Paint,
+  weight? : Double = 50,
+  space? : ColorSpace = Auto,
+) -> Paint {
+  let named : Array[(String, Value)] = []
+  // `auto` is the default of the parameter.
+  if !(space is Auto) {
+    named.push(("space", space.to_value()))
+  }
+  Value(
+    Value::native(
+      @library.native_color_mix(),
+      [
+        Value::array([self.to_value(), percent_value(100.0 - weight)]),
+        Value::array([other.to_value(), percent_value(weight)]),
+      ],
+      named~,
+    ),
+  )
+}
+
+///|
 /// One length of a dash pattern.
 pub(all) enum DashLen {
   /// A length equal to the thickness of the line (`"dot"`).
