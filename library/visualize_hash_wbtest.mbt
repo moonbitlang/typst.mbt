@@ -332,14 +332,14 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   distinct(Module(a))
   distinct(Module(b))
   distinct(Module(a.with_name("a")))
-  // Modules compare by identity: their fingerprint is flagged, also from
-  // the cache.
+  // Modules compare by identity, which is no flag of their fingerprint (a
+  // compilation has one module per file and plugin), also from the cache.
   let other = Module::anonymous(scope(Int(1), detached))
   assert_false(a == other)
   assert_eq(hash128(Value::Module(a)), hash128(Value::Module(other)))
   for _ in 0..<2 {
     let (_, flags) = fingerprint_and_flags(Value::Module(a))
-    assert_eq(flags, fingerprint_identity)
+    assert_eq(flags, 0)
   }
   // A module in its own scope (which evaluation cannot build) terminates.
   let cyclic = Scope::new()

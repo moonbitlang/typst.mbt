@@ -12,25 +12,26 @@
 //   resolved locator and the route (stricter than upstream, which only
 //   tracks what the call observes).
 // - Fingerprints do not always distinguish what the computation can
-//   observe: host closures and modules compare by identity but fingerprint
-//   by their key or structurally (and a `Fingerprint` that does not capture
-//   all data marks itself lossy; none does at the moment). So an entry also
-//   keeps the arguments and is only reused if they are equal
-//   ([values_memo_equal]: `==`, but recursing into content, styles, arrays,
-//   dictionaries, functions and dynamic values, where Typst's equality is
-//   looser). Closures compare by their hash, like upstream's
-//   (`closures_equal`): equal fingerprints are equal closures.
-// - Layout results whose tags hold values that compare by identity (host
-//   closures, modules) are not cached ([frame_cacheable]), the counter
-//   sequence only holds numbers, and the state sequence is not memoized.
+//   observe: host closures compare by identity but fingerprint by their key
+//   (and a `Fingerprint` that does not capture all data marks itself lossy;
+//   none does at the moment). So an entry also keeps the arguments and is
+//   only reused if they are equal ([values_memo_equal]: `==`, but recursing
+//   into content, styles, arrays, dictionaries, functions and dynamic
+//   values, where Typst's equality is looser). Closures compare by their
+//   hash, like upstream's (`closures_equal`): equal fingerprints are equal
+//   closures. Modules compare by identity, and a compilation has one module
+//   object per evaluated file and per plugin: equal fingerprints are the
+//   same module.
+// - Layout results whose tags hold host closures are not cached
+//   ([frame_cacheable]), the counter sequence only holds numbers, and the
+//   state sequence is not memoized.
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
 //   produce the same results on the current introspector and none of the
-//   recorded results had a lossy fingerprint or contained values compared by
-//   identity (host closures, modules). Its reads are then merged into
-//   the caller's recorder (as if the call had been executed), so convergence
-//   checking is unaffected.
+//   recorded results had a lossy fingerprint or contained host closures.
+//   Its reads are then merged into the caller's recorder (as if the call
+//   had been executed), so convergence checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
 //   traced values) are recorded into a fresh [Sink] and replayed into the
 //   caller's sink, both after computing and on every reuse.
@@ -529,9 +530,9 @@ pub fn memoized_layout(
 }
 
 ///|
-/// Whether a laid-out frame can be reused: its tags must not hold values
-/// that compare by identity (host closures, modules). The same holds for
-/// the frames of its tiling paints.
+/// Whether a laid-out frame can be reused: its tags must not hold host
+/// closures (`fingerprint_identity`). The same holds for the frames of its
+/// tiling paints.
 fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {

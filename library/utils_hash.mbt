@@ -334,11 +334,12 @@ pub fn[T : Fingerprint] SipHasher128::write(
 /// capture all of the data that upstream's `Hash` covers (no impl does at
 /// the moment; such an impl must call [mark_fingerprint_lossy]),
 /// [fingerprint_identity] if it contains a value that compares by identity
-/// (host closures and modules, whose fingerprints are a key and structural;
-/// closures do not: they compare by their hash, like upstream's). Equal
-/// fingerprints with flags do not prove interchangeable values, and a lossy
-/// fingerprint gives elements a location key that upstream would not give
-/// them.
+/// and can be told apart from a value with the same fingerprint (host
+/// closures, whose fingerprint is a key of the host's; not closures, which
+/// compare by their hash like upstream's, and not modules, see their
+/// `Fingerprint`). Equal fingerprints with flags do not prove
+/// interchangeable values, and a lossy fingerprint gives elements a
+/// location key that upstream would not give them.
 let fingerprint_flags : Ref[Int] = { val: 0, }
 
 ///|

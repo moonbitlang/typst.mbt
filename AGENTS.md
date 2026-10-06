@@ -239,10 +239,13 @@
   is loose; host closures and modules by identity). Closures compare by
   their hash, like upstream's `Arc<LazyHash<Closure>>` (`closures_equal`:
   one closure expression evaluated twice with the same captures gives equal
-  functions), so equal fingerprints are equal closures. Introspector reads
+  functions), so equal fingerprints are equal closures; modules are one
+  object per evaluated file and per plugin in a compilation. Only host
+  closures flag a fingerprint as identity-bearing. Introspector reads
   are recorded and replayed for validation (not across introspectors if a
-  result's fingerprint was lossy or contained host closures or modules:
-  `fingerprint_flags_in`), sink effects are replayed, frames are cloned.
+  result's fingerprint was lossy or contained host closures:
+  `fingerprint_flags_in`), sink effects are replayed, frames are cloned
+  (not cached if their tags hold host closures).
   Closure calls (`memoized_closure`, upstream's `#[comemo::memoize]` on
   `eval_closure`; without it a touying deck with cetz calls two million
   functions instead of 160 000) are keyed by the function and the arguments
