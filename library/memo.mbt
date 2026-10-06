@@ -604,7 +604,8 @@ fn paint_cacheable(paint : Paint) -> Bool {
 //   `engine.mbt`), and for `Route::contains` the file ids that were asked
 //   for ([note_route_query]), whose answers must be the same on the route
 //   of a later call.
-// - The world, the library and the traced span are fixed for a compilation.
+// - The traced span is part of the fingerprint (an evaluated string runs
+//   without one). The world and the library are fixed for a compilation.
 // - Results are values: containers are marked shared, so that a mutation
 //   through one holder copies them. A result may hold closures that the
 //   call created: they are equal to the ones a repeated call would create
@@ -836,6 +837,10 @@ pub fn memoized_closure(
   let state = SipHasher128::new()
   state.write(func)
   state.write(args)
+  // The traced span is not one per compilation: an evaluated string runs
+  // without (`eval_root`), and a call that ran there traced nothing.
+  // (Upstream tracks `Traced::get`; the whole span is stricter.)
+  state.write(engine.traced.0)
   let base = state.finish128()
   let depth = engine.route.depth()
   let parent = engine.introspector.recorder
@@ -862,6 +867,9 @@ pub fn memoized_closure(
           if entry.sink is Some(sink) {
             engine.sink.extend_from_sink(sink)
           }
+          // The call consumed all of its arguments (`args.finish()`), which
+          // a caller that passed its own arguments on goes on to check.
+          args.items.clear()
           return entry.output
         }
       }

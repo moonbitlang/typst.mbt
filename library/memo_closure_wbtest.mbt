@@ -120,12 +120,53 @@ test "closure memo: equal functions and arguments are one call" {
   memo_call(memo_test_func(2), engine, context, [Int(1), Str("a")], body)
   |> ignore
   assert_eq(runs, before + 2)
-  // The arguments of a call that is in the cache are left alone.
+  // The arguments of a call that is in the cache are consumed like those of
+  // a call that runs: a caller that passed its own arguments on finishes
+  // them afterwards.
   let args = Args::new(f.span, [Int(1), Str("a")])
   guard f.inner is Closure(closure) else { fail("not a closure") }
   memoized_closure(f, closure, engine, context, args, body) |> ignore
-  assert_eq(args.items.length(), 2)
   assert_eq(runs, before + 2)
+  assert_eq(args.items.length(), 0)
+  args.finish()
+  // And the cached call still has them.
+  let args = Args::new(f.span, [Int(1), Str("a")])
+  let again = memoized_closure(f, closure, engine, context, args, body)
+  assert_true(again == first)
+  assert_eq(runs, before + 2)
+}
+
+///|
+test "closure memo: a result depends on the traced span" {
+  memo_test_begin()
+  defer memo_test_end()
+  let span = @syntax.Span::from_range(memo_file("t.typ"), 1, 2)
+  let other = @syntax.Span::from_range(memo_file("t.typ"), 3, 4)
+  let mut runs = 0
+  // Traces its value if anything is traced, like a `Vm` whose span is
+  // inspected.
+  let body : ClosureBody = (_, _, engine, _, _) => {
+    runs += 1
+    if engine.traced.0 is Some(_) {
+      engine.sink.value(Int(7), None)
+    }
+    Int(7)
+  }
+  let f = memo_test_func(1)
+  let values = (traced : Traced) => {
+    let engine = { ..memo_engine(), traced, }
+    memo_call(f, engine, Context::none(), [], body) |> ignore
+    engine.sink.values().length()
+  }
+  // An evaluated string runs without tracing; the document's own call
+  // then still traces, and the other way round.
+  assert_eq(values(Traced::new()), 0)
+  assert_eq(values(Traced::new(traced=span)), 1)
+  assert_eq(values(Traced::new()), 0)
+  assert_eq(values(Traced::new(traced=span)), 1)
+  assert_eq(runs, 2)
+  assert_eq(values(Traced::new(traced=other)), 1)
+  assert_eq(runs, 3)
 }
 
 ///|
