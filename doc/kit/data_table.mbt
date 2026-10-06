@@ -55,7 +55,8 @@
 /// - **The header repeats** on every page that the table continues on
 ///   (`TableHeader`). Without a head (`[]`) there is no header.
 /// - **A row is not split** at the end of a page: its cells are
-///   unbreakable, and it moves to the next page as a whole. A row that is
+///   unbreakable (by a rule, which a table inside a cell inherits), and it
+///   moves to the next page as a whole. A row that is
 ///   higher than a page fits no page and leaves it, without a diagnostic,
 ///   like any unbreakable block: for a table with such rows,
 ///   `breakable=true`.

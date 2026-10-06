@@ -864,11 +864,14 @@ line more, under the last row of the first page. There the element is
 right and the helper is what the port reported.
 
 Building and compiling one document (`report time 500`, embedded fonts,
-aarch64 macOS, means of 500 runs in three repetitions): 10.9, 11.0 and
-10.9 ms before; 11.4, 11.5 and 11.4 ms after. The table alone on a page
-(`report time 500 table`): 5.48, 5.52 and 5.46 ms before; 5.54, 5.59 and
-5.53 ms after, 1% slower. The rest of the difference is the cards of
-step 3.
+aarch64 macOS, means of 500 runs in three repetitions, on the final
+code): 11.8, 12.0 and 11.8 ms before; 12.3, 12.5 and 12.3 ms after, 0.5 ms
+or 4% more. The table alone on a page (`report time 500 table`): 5.71,
+5.71 and 5.74 ms before; 5.82, 5.79 and 5.83 ms after, 0.1 ms or under 2%
+more. The rest of the difference is the cards of step 3 (0.4 ms there).
+(The machine was busier than for step 3, whose report took 6.1 ms: an
+earlier run of the same comparison gave 10.9 and 11.4 ms, 5.49 and
+5.55 ms. The differences are the same in both.)
 
 **Conventions amended** (`doc/kit/kit.mbt`, each marked "step 4"):
 
