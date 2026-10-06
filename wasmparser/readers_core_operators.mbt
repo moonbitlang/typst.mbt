@@ -245,6 +245,9 @@ pub impl FromReader for TryTable with fn from_reader(reader) {
 }
 
 ///|
+pub extend TryTable with FromReader::{from_reader}
+
+///|
 pub impl FromReader for Catch with fn from_reader(reader) {
   match reader.read_u8() {
     0x00 => {
@@ -262,6 +265,9 @@ pub impl FromReader for Catch with fn from_reader(reader) {
     x => reader.invalid_leading_byte(x, "catch")
   }
 }
+
+///|
+pub extend Catch with FromReader::{from_reader}
 
 ///|
 /// A representation of dispatch tables on `resume` and `resume_throw`
@@ -298,6 +304,9 @@ pub impl FromReader for ResumeTable with fn from_reader(reader) {
 }
 
 ///|
+pub extend ResumeTable with FromReader::{from_reader}
+
+///|
 pub impl FromReader for Handle with fn from_reader(reader) {
   match reader.read_u8() {
     0x00 => {
@@ -309,3 +318,6 @@ pub impl FromReader for Handle with fn from_reader(reader) {
     x => reader.invalid_leading_byte(x, "on clause")
   }
 }
+
+///|
+pub extend Handle with FromReader::{from_reader}

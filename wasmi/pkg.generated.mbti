@@ -263,6 +263,8 @@ pub(all) enum EnforcedLimitsError {
   TooManyResults(limit~ : Int)
   MinAvgBytesPerFunction(limit~ : UInt, avg~ : UInt)
 }
+pub fn EnforcedLimitsError::output(Self, &Logger) -> Unit
+pub fn EnforcedLimitsError::to_string(Self) -> String
 pub impl Show for EnforcedLimitsError
 
 pub struct Engine {
@@ -381,6 +383,8 @@ pub(all) enum FuncError {
   MismatchingResultType
   MismatchingResultLen
 } derive(Eq)
+pub fn FuncError::output(Self, &Logger) -> Unit
+pub fn FuncError::to_string(Self) -> String
 pub impl Show for FuncError
 
 pub(all) struct FuncIdx(Int) derive(Eq, @debug.Debug)
@@ -531,6 +535,8 @@ pub(all) enum InstantiationError {
   FailedToInstantiateMemory(@core.MemoryError)
   FailedToInstantiateTable(@core.TableError)
 }
+pub fn InstantiationError::output(Self, &Logger) -> Unit
+pub fn InstantiationError::to_string(Self) -> String
 pub impl Show for InstantiationError
 
 pub(all) struct Instr(Int) derive(Compare, Eq, Hash, @debug.Debug)
@@ -600,6 +606,8 @@ pub(all) enum LinkerError {
   MissingDefinition(name~ : ImportName, ty~ : ExternType)
   InvalidTypeDefinition(name~ : ImportName, expected~ : ExternType, found~ : ExternType)
 }
+pub fn LinkerError::output(Self, &Logger) -> Unit
+pub fn LinkerError::to_string(Self) -> String
 pub impl Show for LinkerError
 
 pub(all) struct LocalIdx(UInt) derive(Eq, @debug.Debug)
@@ -712,6 +720,8 @@ pub(all) enum ReadError {
   EndOfStream
   UnknownError
 } derive(Eq)
+pub fn ReadError::output(Self, &Logger) -> Unit
+pub fn ReadError::to_string(Self) -> String
 pub impl Show for ReadError
 
 type Stack
@@ -843,6 +853,8 @@ pub(all) enum TranslationError {
   TooManyLocalVariables
   LazyCompilationFailed
 }
+pub fn TranslationError::output(Self, &Logger) -> Unit
+pub fn TranslationError::to_string(Self) -> String
 pub impl Show for TranslationError
 
 pub(all) struct TranslatorStack {

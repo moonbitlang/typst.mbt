@@ -34,6 +34,9 @@ pub impl Show for LinkerError with fn output(self, f) {
 }
 
 ///|
+pub extend LinkerError with Show::{to_string, output}
+
+///|
 /// A definition stored in a [`Linker`].
 priv enum Definition[T] {
   /// An external item from an [`Instance`](crate::Instance).

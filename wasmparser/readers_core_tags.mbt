@@ -8,3 +8,6 @@ pub impl FromReader for TagType with fn from_reader(reader) {
   }
   { kind: Exception, func_type_idx: reader.read_var_u32(), }
 }
+
+///|
+pub extend TagType with FromReader::{from_reader}

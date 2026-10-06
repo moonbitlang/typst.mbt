@@ -30,3 +30,6 @@ pub impl FromReader for MemoryType with fn from_reader(reader) {
   }
   { memory64, shared, initial, maximum, page_size_log2, }
 }
+
+///|
+pub extend MemoryType with FromReader::{from_reader}
