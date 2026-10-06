@@ -1,0 +1,25 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/format"
+
+// Values
+pub fn compact(Double, digits? : Int) -> String
+
+pub fn fixed(Double, Int, trim? : Bool) -> String
+
+pub fn grouped(Double, digits? : Int, sep? : String) -> String
+
+pub fn grouped_int(Int64, sep? : String) -> String
+
+pub fn percent(Double, digits? : Int) -> String
+
+pub fn soft_breaks(String, after? : String) -> String
+
+pub fn ticks(Double, Double, Int) -> Array[Double]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
