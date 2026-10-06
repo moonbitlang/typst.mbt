@@ -322,7 +322,7 @@ fn blocky_raw(s : Scanner, nodes : Array[SyntaxNode]) -> Unit {
       if taken >= dedent {
         break
       }
-      offset += c.utf16_len()
+      offset += c.len_utf16()
       taken += 1
     }
     scanner_eat_newline(s) |> ignore
