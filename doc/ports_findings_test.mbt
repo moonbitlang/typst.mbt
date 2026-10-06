@@ -490,7 +490,9 @@ test "S6: `Prose` turns `'` after a digit into a prime" {
   )
 }
 
-// Section 2.3: typed API gaps, with the way around each that works today.
+// Section 2.3: typed API gaps. Step 2 of the proposal closed T1 to T8 and
+// T11: each test shows the typed form and, beside it, the way around that
+// the ports used, which still works (the escapes stay).
 
 ///|
 test "T1: `Box(baseline=)` is typed; `outset` and `extra` still work" {

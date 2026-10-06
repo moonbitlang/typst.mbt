@@ -23,6 +23,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Upper,
+  type Layout,
   type Show,
   type ShowSet,
   type Select,
@@ -107,15 +109,21 @@ pub fn composed_lengths() -> Seq {
   let gap : Length = Pt(11) + Em(0.5)
   let bar = Rect(width=Pct(100), height=Pt(5), fill=Luma(200))
   Seq([
-    Grid([bar, bar], columns=[Rel(narrow), Fr(1)]),
-    Block(bar, above=Rel(gap)),
+    Grid([bar, bar], columns=[narrow.sizing(), Fr(1)]),
+    Block(bar, above=gap.spacing()),
   ])
 }
 
 ///|
 /// Section 4.2: any Typst function by its name.
-pub fn upper_case() -> Call {
-  Call("upper", positional=[Value::content(Seq(["quiet ", Emph("words")]))])
+pub fn roman_numeral() -> Call {
+  Call("numbering", positional=[Value::str("I."), Value::int(4)])
+}
+
+///|
+/// Section 4.2: text case has constructors.
+pub fn upper_case() -> Upper {
+  Upper(Seq(["quiet ", Emph("words")]))
 }
 
 ///|
@@ -125,24 +133,46 @@ pub fn untitled_outline() -> Outline {
 }
 
 ///|
-/// Section 4.4: fields without a typed parameter, and values the facades
-/// do not cover.
+/// Section 4.4: what the ports wrote untyped has typed forms.
+pub fn typed_fields() -> Seq {
+  let teal : Paint = Rgb("#1d7586")
+  Seq([
+    Par(Highlight("tight", top_edge=XHeight, bottom_edge=Baseline)),
+    Par(Seq(["A chip ", Box("moved down", fill=Luma(230), baseline=Pt(2))])),
+    Line(length=Pt(60), stroke=Stroke(dash=Dotted)),
+    Rect(width=Pt(20), height=Pt(10), fill=teal.transparentize(50)),
+  ])
+}
+
+///|
+/// Section 4.4: a field without a typed parameter, and values as the
+/// facades take them untyped.
 pub fn untyped_fields() -> Seq {
-  let edges = [
-    ("top-edge", Value::str("x-height")),
-    ("bottom-edge", Value::str("baseline")),
-  ]
-  let lowered = [("baseline", Value::length(Pt(2)))]
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1))),
+    ("all", Value::bool(true)),
+  ])
   let half = Value::call("color.transparentize", positional=[
     Value::paint(Rgb("#1d7586")),
     Value::length(Pct(50)),
   ])
   Seq([
-    Par(Highlight("tight", extra=edges)),
-    Par(Seq(["A chip ", Box("moved down", fill=Luma(230), extra=lowered)])),
+    Par("Indented.", extra=[("first-line-indent", indent)]),
     Line(length=Pt(60), stroke=Stroke(dash=RawValue(Value::str("dotted")))),
     Rect(width=Pt(20), height=Pt(10), fill=Paint::Value(half)),
   ])
+}
+
+///|
+/// Section 4.5: content that depends on the size of its container.
+pub fn half_width() -> Layout {
+  Layout((size, cx) => {
+    let label = cx.measure(Block("half", inset=Sides(all=Pt(4))))
+    Seq([
+      Rect(width=Pt(size.width / 2), height=Pt(label.baseline), fill=Luma(200)),
+      Block("half", inset=Sides(all=Pt(4))),
+    ])
+  })
 }
 
 ///|
@@ -267,9 +297,12 @@ pub fn guide() -> Document {
     paragraphs(),
     notes(),
     composed_lengths(),
+    roman_numeral(),
     upper_case(),
     untitled_outline(),
+    typed_fields(),
     untyped_fields(),
+    half_width(),
     prose_table([Fr(1), Fr(2)]),
     loose_title(ruled_table(["a", "b", "c", "d"])),
     kept_title(cards(["One.", "Two, with more text than the first card has."])),
