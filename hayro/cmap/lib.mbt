@@ -392,12 +392,27 @@ pub(all) enum BfString {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BfString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BfString with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for BfString with fn output(self, logger) {
   match self {
     Char(c) => logger.write_string("Char(\{c.to_int()})")
     String(s) => logger.write_string("String(\{s})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BfString with Show::{to_string, output}
 
 ///|
 /// Metadata extracted from a cmap file.
@@ -409,6 +424,16 @@ pub(all) struct Metadata {
   /// The writing mode.
   writing_mode : WritingMode?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Metadata with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Metadata with @debug.Debug::{to_repr}
 
 ///|
 /// The registry+ordering family of a CID character collection.
@@ -428,9 +453,24 @@ pub(all) enum CidFamily {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CidFamily with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CidFamily with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for CidFamily with fn output(self, logger) {
   logger.write_string(@debug.to_string(self))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CidFamily with Show::{to_string, output}
 
 ///|
 /// Create a `CidFamily` from raw registry and ordering byte strings.
@@ -487,9 +527,24 @@ pub(all) struct CharacterCollection {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CharacterCollection with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CharacterCollection with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for CharacterCollection with fn output(self, logger) {
   logger.write_string(@debug.to_string(self))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CharacterCollection with Show::{to_string, output}
 
 ///|
 /// The writing mode of a cmap.
@@ -501,11 +556,31 @@ pub(all) enum WritingMode {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingMode with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for WritingMode with fn default() {
   Horizontal
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingMode with Default::{default}
+
+///|
 pub impl Show for WritingMode with fn output(self, logger) {
   logger.write_string(@debug.to_string(self))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WritingMode with Show::{to_string, output}

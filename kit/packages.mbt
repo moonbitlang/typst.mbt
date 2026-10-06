@@ -105,6 +105,16 @@ pub fn SystemPackages::latest_version(
 pub(all) struct FsPackages(String) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FsPackages with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FsPackages with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new handle that serves packages from the given directory.
 pub fn FsPackages::new(path : String) -> FsPackages {
   FsPackages(path)

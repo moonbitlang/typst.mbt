@@ -23,6 +23,16 @@ pub(all) struct IndependentStyle {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndependentStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndependentStyle with @debug.Debug::{to_repr}
+
+///|
 /// A dependent CSL style.
 pub(all) struct DependentStyle {
   /// The style's metadata.
@@ -37,6 +47,16 @@ pub(all) struct DependentStyle {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DependentStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DependentStyle with @debug.Debug::{to_repr}
+
+///|
 /// A CSL style.
 pub(all) enum Style {
   /// An independent style.
@@ -44,6 +64,16 @@ pub(all) enum Style {
   /// A dependent style.
   Dependent(DependentStyle)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with @debug.Debug::{to_repr}
 
 ///|
 /// Get the style's metadata.
@@ -65,6 +95,16 @@ pub(all) enum StyleValidationError {
   /// An independent style was missing the `class` attribute on `cs:style`
   MissingClassAttr
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleValidationError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleValidationError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for StyleValidationError with fn output(self, logger) {
@@ -100,8 +140,33 @@ pub(all) struct IndependentStyleSettings {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndependentStyleSettings with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndependentStyleSettings with @debug.Debug::{to_repr}
+
+///|
 /// An RFC 1766 language code.
 pub(all) struct LocaleCode(String) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleCode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleCode with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleCode with @debug.Debug::{to_repr}
 
 ///|
 /// Get the US English locale.
@@ -115,6 +180,11 @@ pub impl Show for LocaleCode with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleCode with Show::{to_string, output}
+
+///|
 /// The base language in a [`LocaleCode`].
 pub(all) enum BaseLanguage {
   /// A language code.
@@ -124,6 +194,16 @@ pub(all) enum BaseLanguage {
   /// An unregistered / experimental language code.
   Unregistered(String)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaseLanguage with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaseLanguage with @debug.Debug::{to_repr}
 
 ///|
 /// Get the language code.
@@ -260,6 +340,21 @@ pub(all) enum StyleClass {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleClass with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleClass with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleClass with @debug.Debug::{to_repr}
+
+///|
 /// How to reformat page ranges.
 pub(all) enum PageRangeFormat {
   /// “321–28”
@@ -274,6 +369,21 @@ pub(all) enum PageRangeFormat {
   /// “321–28”
   MinimalTwo
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangeFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangeFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageRangeFormat with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for PageRangeFormat with fn default() {
@@ -421,6 +531,21 @@ pub(all) enum DemoteNonDroppingParticle {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DemoteNonDroppingParticle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DemoteNonDroppingParticle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DemoteNonDroppingParticle with @debug.Debug::{to_repr}
+
+///|
 /// Citation style metadata
 pub(all) struct StyleInfo {
   /// The authors of the style
@@ -456,6 +581,16 @@ pub(all) struct StyleInfo {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleInfo with @debug.Debug::{to_repr}
+
+///|
 /// A string annotated with a locale.
 pub(all) struct LocalString {
   /// The string's locale.
@@ -463,6 +598,16 @@ pub(all) struct LocalString {
   /// The string's value.
   value : String
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalString with @debug.Debug::{to_repr}
 
 ///|
 /// A person affiliated with the style.
@@ -476,6 +621,16 @@ pub(all) struct StyleAttribution {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleAttribution with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleAttribution with @debug.Debug::{to_repr}
+
+///|
 /// Which category this style belongs in.
 pub(all) enum StyleCategory {
   /// Which format the citations are in. May only appear once as a child of
@@ -485,6 +640,16 @@ pub(all) enum StyleCategory {
   /// a child of `category`.
   Field(Field)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleCategory with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleCategory with @debug.Debug::{to_repr}
 
 ///|
 /// What type of in-text citation is used.
@@ -500,6 +665,21 @@ pub(all) enum CitationFormat {
   /// The citation appears as a foot- or endnote.
   Note
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CitationFormat with @debug.Debug::{to_repr}
 
 ///|
 /// In which academic field the style is used.
@@ -534,6 +714,21 @@ pub(all) enum Field {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Field with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Field with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Field with @debug.Debug::{to_repr}
+
+///|
 /// A link with more information about the style.
 pub(all) struct InfoLink {
   /// The link's URL.
@@ -545,6 +740,16 @@ pub(all) struct InfoLink {
   /// The link's locale.
   locale : LocaleCode?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InfoLink with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InfoLink with @debug.Debug::{to_repr}
 
 ///|
 /// How a link relates to the style.
@@ -561,11 +766,36 @@ pub(all) enum InfoLinkRel {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InfoLinkRel with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InfoLinkRel with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InfoLinkRel with @debug.Debug::{to_repr}
+
+///|
 /// An ISO 8601 chapter 5.4 timestamp.
 pub(all) struct Timestamp {
   /// The timestamp's value.
   raw : String
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Timestamp with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Timestamp with @debug.Debug::{to_repr}
 
 ///|
 /// A license description.
@@ -577,6 +807,16 @@ pub(all) struct License {
   /// The license string's locale.
   lang : LocaleCode?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend License with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend License with @debug.Debug::{to_repr}
 
 ///|
 /// Formatting instructions for in-text or note citations.
@@ -615,6 +855,16 @@ pub(all) struct Citation {
   /// Options for the names within.
   name_options : InheritableNameOptions
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Citation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Citation with @debug.Debug::{to_repr}
 
 ///|
 /// Return the default value for `cite_group_delimiter` if implicitly needed
@@ -676,6 +926,21 @@ pub(all) enum DisambiguationRule {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DisambiguationRule with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DisambiguationRule with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DisambiguationRule with @debug.Debug::{to_repr}
+
+///|
 /// Whether this rule allows full first names or only initials.
 pub fn DisambiguationRule::allows_full_first_names(
   self : DisambiguationRule,
@@ -706,6 +971,21 @@ pub(all) enum Collapse {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Collapse with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Collapse with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Collapse with @debug.Debug::{to_repr}
+
+///|
 /// Formatting instructions for the bibliography.
 pub(all) struct Bibliography {
   /// How items are sorted within the citation.
@@ -730,6 +1010,16 @@ pub(all) struct Bibliography {
   /// Options for the names within.
   name_options : InheritableNameOptions
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Bibliography with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Bibliography with @debug.Debug::{to_repr}
 
 ///|
 /// Return a bibliography with default settings and the given layout.
@@ -758,6 +1048,21 @@ pub(all) enum SecondFieldAlign {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SecondFieldAlign with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SecondFieldAlign with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SecondFieldAlign with @debug.Debug::{to_repr}
+
+///|
 /// How to replace subsequent identical names in a bibliography.
 pub(all) enum SubsequentAuthorSubstituteRule {
   /// When all names match, replace.
@@ -771,11 +1076,36 @@ pub(all) enum SubsequentAuthorSubstituteRule {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsequentAuthorSubstituteRule with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsequentAuthorSubstituteRule with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsequentAuthorSubstituteRule with @debug.Debug::{to_repr}
+
+///|
 /// How to sort elements in a bibliography or citation.
 pub(all) struct Sort {
   /// The ordered list of sorting keys.
   keys : Array[SortKey]
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sort with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sort with @debug.Debug::{to_repr}
 
 ///|
 /// A sorting key.
@@ -791,6 +1121,16 @@ pub(all) enum SortKey {
     sort_direction~ : SortDirection
   )
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SortKey with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SortKey with @debug.Debug::{to_repr}
 
 ///|
 /// Retrieve the sort direction.
@@ -809,6 +1149,21 @@ pub(all) enum SortDirection {
   /// Sort in descending order.
   Descending
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SortDirection with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SortDirection with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SortDirection with @debug.Debug::{to_repr}
 
 ///|
 /// A formatting rule.
@@ -832,6 +1187,16 @@ pub(all) struct Layout {
   /// Delimit pieces of the output.
   delimiter : String?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with @debug.Debug::{to_repr}
 
 ///|
 /// Return a layout.
@@ -919,6 +1284,16 @@ pub(all) enum LayoutRenderingElement {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LayoutRenderingElement with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LayoutRenderingElement with @debug.Debug::{to_repr}
+
+///|
 /// Find the child element that will render the given variable.
 pub fn LayoutRenderingElement::find_variable_element(
   self : LayoutRenderingElement,
@@ -967,6 +1342,16 @@ pub(all) enum RenderingElement {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderingElement with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderingElement with @debug.Debug::{to_repr}
+
+///|
 /// Print a term or variable.
 pub(all) struct Text {
   /// The term or variable to print.
@@ -988,6 +1373,16 @@ pub(all) struct Text {
   /// Transform the text case.
   text_case : TextCase?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Text with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Text with @debug.Debug::{to_repr}
 
 ///|
 /// Return a text with default settings and the given target.
@@ -1049,6 +1444,16 @@ pub(all) enum TextTarget {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextTarget with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextTarget with @debug.Debug::{to_repr}
+
+///|
 /// Formats a date.
 pub(all) struct Date {
   /// The date to format.
@@ -1075,6 +1480,16 @@ pub(all) struct Date {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with @debug.Debug::{to_repr}
+
+///|
 /// Whether this is a localized or a standalone date.
 pub fn Date::is_localized(self : Date) -> Bool {
   self.form is Some(_)
@@ -1090,12 +1505,42 @@ pub(all) enum DateForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateForm with @debug.Debug::{to_repr}
+
+///|
 /// Which parts of a date should be included.
 pub(all) enum DateParts {
   Year
   YearMonth
   YearMonthDay
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateParts with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateParts with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateParts with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for DateParts with fn default() {
@@ -1140,6 +1585,16 @@ pub(all) struct DatePart {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DatePart with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DatePart with @debug.Debug::{to_repr}
+
+///|
 /// Retrieve the default delimiter for the date part.
 pub let date_part_default_delimiter : String = "–"
 
@@ -1158,6 +1613,21 @@ pub(all) enum DatePartName {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DatePartName with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DatePartName with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DatePartName with @debug.Debug::{to_repr}
+
+///|
 /// Any allowable date part format.
 pub(all) enum DateAnyForm {
   /// “1”
@@ -1173,12 +1643,42 @@ pub(all) enum DateAnyForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateAnyForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateAnyForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateAnyForm with @debug.Debug::{to_repr}
+
+///|
 /// Strongly typed date part formats.
 pub(all) enum DateStrongAnyForm {
   Day(DateDayForm)
   Month(DateMonthForm)
   Year(LongShortForm)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateStrongAnyForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateStrongAnyForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateStrongAnyForm with @debug.Debug::{to_repr}
 
 ///|
 /// Get a strongly typed date form for a name. Must return `Some` for valid
@@ -1238,6 +1738,21 @@ pub(all) enum DateDayForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateDayForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateDayForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateDayForm with @debug.Debug::{to_repr}
+
+///|
 /// How a month is formatted.
 pub(all) enum DateMonthForm {
   /// “January”
@@ -1251,11 +1766,41 @@ pub(all) enum DateMonthForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateMonthForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateMonthForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateMonthForm with @debug.Debug::{to_repr}
+
+///|
 /// Whether to format something in long or short form.
 pub(all) enum LongShortForm {
   Long
   Short
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LongShortForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LongShortForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LongShortForm with @debug.Debug::{to_repr}
 
 ///|
 /// Renders a number.
@@ -1275,6 +1820,16 @@ pub(all) struct Number {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with @debug.Debug::{to_repr}
+
+///|
 /// How a number is formatted.
 pub(all) enum NumberForm {
   /// “1”
@@ -1286,6 +1841,21 @@ pub(all) enum NumberForm {
   /// “I”
   Roman
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberForm with @debug.Debug::{to_repr}
 
 ///|
 /// Renders a list of names.
@@ -1341,6 +1911,16 @@ pub(all) struct Names {
   /// Set layout level.
   display : Display?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Names with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Names with @debug.Debug::{to_repr}
 
 ///|
 /// Return names with default settings and the given variables.
@@ -1534,6 +2114,21 @@ pub(all) enum NameLabelPosition {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameLabelPosition with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameLabelPosition with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameLabelPosition with @debug.Debug::{to_repr}
+
+///|
 /// Possible children for a `cs:names` element.
 pub(all) enum NamesChild {
   /// A `cs:name` element.
@@ -1545,6 +2140,16 @@ pub(all) enum NamesChild {
   /// A `cs:substitute` element.
   Substitute(Substitute)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamesChild with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamesChild with @debug.Debug::{to_repr}
 
 ///|
 /// Configuration of how to print names.
@@ -1562,6 +2167,16 @@ pub(all) struct Name {
   /// Add prefix and suffix.
   affixes : Affixes
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for Name with fn default() {
@@ -1674,6 +2289,16 @@ pub(all) struct InheritableNameOptions {
   /// `name-as-sort-order` is Some.
   sort_separator : String?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InheritableNameOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InheritableNameOptions with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for InheritableNameOptions with fn default() {
@@ -1815,6 +2440,21 @@ pub(all) enum NameAnd {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAnd with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAnd with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAnd with @debug.Debug::{to_repr}
+
+///|
 /// When delimiters shall be inserted.
 pub(all) enum DelimiterBehavior {
   /// Only used for lists with more than one (`-precedes-et-al`) or two
@@ -1829,6 +2469,21 @@ pub(all) enum DelimiterBehavior {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterBehavior with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterBehavior with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DelimiterBehavior with @debug.Debug::{to_repr}
+
+///|
 /// How many name parts to print.
 pub(all) enum NameForm {
   /// Print all name parts
@@ -1840,6 +2495,21 @@ pub(all) enum NameForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameForm with @debug.Debug::{to_repr}
+
+///|
 /// In which order to print the names.
 pub(all) enum NameAsSortOrder {
   /// Only the first name is turned around.
@@ -1847,6 +2517,21 @@ pub(all) enum NameAsSortOrder {
   /// All names are turned around.
   All
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAsSortOrder with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAsSortOrder with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameAsSortOrder with @debug.Debug::{to_repr}
 
 ///|
 /// How to format a given name part.
@@ -1862,6 +2547,16 @@ pub(all) struct NamePart {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamePart with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamePart with @debug.Debug::{to_repr}
+
+///|
 /// Which part of the name a [`NamePart`] applies to.
 pub(all) enum NamePartName {
   /// The given name.
@@ -1869,6 +2564,21 @@ pub(all) enum NamePartName {
   /// The family name.
   Family
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamePartName with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamePartName with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NamePartName with @debug.Debug::{to_repr}
 
 ///|
 /// Configure the et al. abbreviation.
@@ -1880,6 +2590,16 @@ pub(all) struct EtAl {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EtAl with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EtAl with @debug.Debug::{to_repr}
+
+///|
 /// Which term to use for et al.
 pub(all) enum EtAlTerm {
   /// “et al.”
@@ -1887,6 +2607,21 @@ pub(all) enum EtAlTerm {
   /// “and others”
   AndOthers
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EtAlTerm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EtAlTerm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EtAlTerm with @debug.Debug::{to_repr}
 
 ///|
 pub fn EtAlTerm::to_term(self : EtAlTerm) -> Term {
@@ -1904,6 +2639,16 @@ pub(all) struct Substitute {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Substitute with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Substitute with @debug.Debug::{to_repr}
+
+///|
 /// Print a label for a number variable.
 pub(all) struct Label {
   /// The variable for which to print the label.
@@ -1911,6 +2656,16 @@ pub(all) struct Label {
   /// The form of the label.
   label : VariablelessLabel
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with @debug.Debug::{to_repr}
 
 ///|
 /// A label without its variable.
@@ -1932,6 +2687,16 @@ pub(all) struct VariablelessLabel {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariablelessLabel with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariablelessLabel with @debug.Debug::{to_repr}
+
+///|
 /// How to pluralize a label.
 pub(all) enum LabelPluralize {
   /// Match plurality of the variable.
@@ -1941,6 +2706,21 @@ pub(all) enum LabelPluralize {
   /// Always use the singular form.
   Never
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelPluralize with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelPluralize with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelPluralize with @debug.Debug::{to_repr}
 
 ///|
 /// A group of formatting instructions that is only shown if no variable is
@@ -1967,6 +2747,16 @@ pub(all) struct Group {
   /// Set layout level.
   display : Display?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Group with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Group with @debug.Debug::{to_repr}
 
 ///|
 /// Obtain a `Formatting`.
@@ -1997,6 +2787,16 @@ pub(all) struct Choose {
   /// The formatting instructions to use if no branch matches.
   otherwise : ElseBranch?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Choose with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Choose with @debug.Debug::{to_repr}
 
 ///|
 /// Return all branches with a condition.
@@ -2047,6 +2847,16 @@ pub(all) struct ChooseBranch {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseBranch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseBranch with @debug.Debug::{to_repr}
+
+///|
 /// Retrieve the test of this branch. Valid CSL files must return `Some`
 /// here.
 pub fn ChooseBranch::test_(self : ChooseBranch) -> ChooseTest? {
@@ -2079,6 +2889,16 @@ pub(all) struct ElseBranch {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElseBranch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElseBranch with @debug.Debug::{to_repr}
+
+///|
 /// A single test in a conditional group.
 pub(all) enum ChooseTest {
   /// Other than this choose, two elements would result in the same
@@ -2100,6 +2920,16 @@ pub(all) enum ChooseTest {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseTest with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseTest with @debug.Debug::{to_repr}
+
+///|
 /// Possible positions of a citation in the citations to the same item.
 pub(all) enum TestPosition {
   /// The first citation to the item.
@@ -2116,6 +2946,21 @@ pub(all) enum TestPosition {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TestPosition with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TestPosition with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TestPosition with @debug.Debug::{to_repr}
+
+///|
 /// How to handle the set of tests in a conditional group.
 pub(all) enum ChooseMatch {
   /// All tests must match.
@@ -2125,6 +2970,21 @@ pub(all) enum ChooseMatch {
   /// No test must match.
   None_
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseMatch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseMatch with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChooseMatch with @debug.Debug::{to_repr}
 
 ///|
 /// Check whether the iterator of tests is true for this match type.
@@ -2146,6 +3006,16 @@ pub(all) struct CslMacro {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslMacro with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslMacro with @debug.Debug::{to_repr}
+
+///|
 /// Root element of a locale file.
 pub(all) struct LocaleFile {
   /// The version of the locale file.
@@ -2163,6 +3033,16 @@ pub(all) struct LocaleFile {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleFile with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleFile with @debug.Debug::{to_repr}
+
+///|
 /// Supplemental localization data in a citation style.
 pub(all) struct Locale {
   /// Which languages or dialects this data applies to. Must be `Some` if
@@ -2177,6 +3057,16 @@ pub(all) struct Locale {
   /// Style options for the locale.
   style_options : LocaleOptions?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locale with @debug.Debug::{to_repr}
 
 ///|
 /// `impl From<LocaleFile> for Locale`.
@@ -2383,11 +3273,31 @@ pub(all) struct LocaleInfo {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleInfo with @debug.Debug::{to_repr}
+
+///|
 /// Term localization container.
 pub(all) struct Terms {
   /// The terms.
   terms : Array[LocalizedTerm]
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Terms with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Terms with @debug.Debug::{to_repr}
 
 ///|
 /// A localized term.
@@ -2410,6 +3320,16 @@ pub(all) struct LocalizedTerm {
   /// Specify which grammatical gender this ordinal term matches
   gender_form : GrammarGender?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalizedTerm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalizedTerm with @debug.Debug::{to_repr}
 
 ///|
 /// Get the singular variant of this term translation. Shall be defined for
@@ -2441,6 +3361,21 @@ pub(all) enum TermForm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermForm with @debug.Debug::{to_repr}
+
+///|
 /// Which form is the next fallback if this form is not available.
 pub fn TermForm::fallback(self : TermForm) -> TermForm? {
   match self {
@@ -2465,11 +3400,41 @@ pub(all) enum OrdinalMatch {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OrdinalMatch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OrdinalMatch with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OrdinalMatch with @debug.Debug::{to_repr}
+
+///|
 /// A grammatical gender. Use `None` for neutral.
 pub(all) enum GrammarGender {
   Feminine
   Masculine
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GrammarGender with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GrammarGender with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GrammarGender with @debug.Debug::{to_repr}
 
 ///|
 /// Options for the locale.
@@ -2485,6 +3450,16 @@ pub(all) struct LocaleOptions {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocaleOptions with @debug.Debug::{to_repr}
+
+///|
 /// Formatting properties.
 pub(all) struct Formatting {
   /// Set the font style.
@@ -2498,6 +3473,21 @@ pub(all) struct Formatting {
   /// Choose vertical alignment.
   vertical_align : VerticalAlign?
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for Formatting with fn default() {
@@ -2545,9 +3535,29 @@ pub(all) enum FontStyle {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FontStyle with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Default::{default}
 
 ///|
 /// Font variant.
@@ -2559,9 +3569,29 @@ pub(all) enum FontVariant {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FontVariant with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Default::{default}
 
 ///|
 /// Font weight.
@@ -2575,9 +3605,29 @@ pub(all) enum FontWeight {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FontWeight with fn default() {
   Normal
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Default::{default}
 
 ///|
 /// Text decoration.
@@ -2589,9 +3639,29 @@ pub(all) enum TextDecoration {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDecoration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDecoration with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDecoration with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for TextDecoration with fn default() {
   None_
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextDecoration with Default::{default}
 
 ///|
 /// Vertical alignment.
@@ -2607,9 +3677,29 @@ pub(all) enum VerticalAlign {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalAlign with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalAlign with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalAlign with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for VerticalAlign with fn default() {
   None_
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VerticalAlign with Default::{default}
 
 ///|
 /// Prefixes and suffixes.
@@ -2619,6 +3709,21 @@ pub(all) struct Affixes {
   /// The suffix.
   suffix : String?
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affixes with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affixes with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Affixes with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for Affixes with fn default() {
@@ -2642,6 +3747,21 @@ pub(all) enum Display {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Display with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Display with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Display with @debug.Debug::{to_repr}
+
+///|
 /// How to format text.
 pub(all) enum TextCase {
   /// lowercase.
@@ -2657,6 +3777,21 @@ pub(all) enum TextCase {
   /// Title case. Only applies to English.
   TitleCase
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextCase with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextCase with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextCase with @debug.Debug::{to_repr}
 
 ///|
 /// Check whether this case can be applied to languages other than English.

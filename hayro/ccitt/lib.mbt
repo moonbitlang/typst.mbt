@@ -23,6 +23,11 @@ pub(all) suberror DecodeError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeError with Eq::{not_equal, equal}
+
+///|
 pub impl Show for DecodeError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -35,6 +40,11 @@ pub impl Show for DecodeError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeError with Show::{to_string, output}
+
+///|
 /// The encoding mode for CCITT fax decoding.
 pub(all) enum EncodingMode {
   /// Group 4 (MMR).
@@ -44,6 +54,16 @@ pub(all) enum EncodingMode {
   /// Group 3 2D (MR).
   Group3_2D(k~ : UInt)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EncodingMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EncodingMode with @debug.Debug::{to_repr}
 
 ///|
 /// Settings to apply during decoding.

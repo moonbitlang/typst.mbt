@@ -8,12 +8,27 @@ pub(all) enum Number {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Number with fn output(self, logger) {
   match self {
     Integer(v) => logger.write_string("Integer(\{v})")
     Real(v) => logger.write_string("Real(\{v})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Number with Show::{to_string, output}
 
 ///|
 /// Return the value as an `i32`. Reals are truncated (saturating like Rust's

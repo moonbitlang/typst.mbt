@@ -16,6 +16,21 @@ pub(all) struct Date {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with @debug.Debug::{to_repr}
+
+///|
 /// Order two dates according to the CSL specification.
 pub fn Date::csl_cmp(self : Date, other : Date) -> Int {
   let ord_fn = (a : Int?, b : Int?) => {
@@ -56,6 +71,16 @@ pub(all) enum DateError {
   /// The day is out of bounds.
   DayOutOfBounds(Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for DateError with fn output(self, logger) {
@@ -173,6 +198,11 @@ pub impl Show for Date with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Show::{to_string, output}
+
+///|
 /// A duration.
 pub(all) struct Duration {
   /// Days (24 hours).
@@ -188,6 +218,21 @@ pub(all) struct Duration {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Duration with @debug.Debug::{to_repr}
+
+///|
 /// Errors that can occur when parsing a string to a duration
 pub(all) enum DurationError {
   /// The string is malformed.
@@ -196,6 +241,21 @@ pub(all) enum DurationError {
   /// (i.e. `01:61:48`).
   TooLarge
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for DurationError with fn output(self, logger) {
@@ -382,6 +442,21 @@ pub(all) struct DurationRange {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationRange with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationRange with @debug.Debug::{to_repr}
+
+///|
 /// Create a new duration range.
 pub fn DurationRange::new(start : Duration, end : Duration?) -> DurationRange {
   { start, end: end.unwrap_or(start), }
@@ -417,6 +492,11 @@ pub impl Show for DurationRange with fn output(self, logger) {
     logger.write_string("-" + self.end.to_string())
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DurationRange with Show::{to_string, output}
 
 ///|
 /// `impl FromStr for DurationRange`.

@@ -123,6 +123,16 @@ pub(all) struct UtcDateTime {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UtcDateTime with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UtcDateTime with @debug.Debug::{to_repr}
+
+///|
 /// The date and time of a UNIX timestamp (`chrono::DateTime::
 /// from_timestamp(secs, 0)`), or `None` if it is out of chrono's range.
 pub fn UtcDateTime::from_timestamp(timestamp : Int64) -> UtcDateTime? {

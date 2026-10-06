@@ -8,9 +8,24 @@ pub struct Name {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Name with fn output(self, logger) {
   logger.write_string("Name(\{self.data}, literal=\{self.literal})")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Name with Show::{to_string, output}
 
 ///|
 fn Name::new(data : BytesView, literal : Bool) -> Name {

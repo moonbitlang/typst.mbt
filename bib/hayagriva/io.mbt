@@ -19,9 +19,24 @@ pub(all) struct YamlLoadError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlLoadError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlLoadError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for YamlLoadError with fn output(self, logger) {
   logger.write_string(self.message)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend YamlLoadError with Show::{to_string, output}
 
 ///|
 priv suberror De {
@@ -808,12 +823,27 @@ pub(all) enum BibLaTeXError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BibLaTeXError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BibLaTeXError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for BibLaTeXError with fn output(self, logger) {
   match self {
     Parse(err) => logger.write_string("biblatex parse error: \{err}")
     Type(err) => logger.write_string("biblatex type error: \{err}")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BibLaTeXError with Show::{to_string, output}
 
 ///|
 /// Parse a bibliography from a BibLaTeX source string.

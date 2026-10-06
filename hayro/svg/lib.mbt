@@ -55,6 +55,11 @@ pub impl Default for SvgRenderSettings with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgRenderSettings with Default::{default}
+
+///|
 priv struct SvgRenderer {
   render_settings : SvgRenderSettings
   mut xml : @xmlwriter.XmlWriter

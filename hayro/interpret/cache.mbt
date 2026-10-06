@@ -164,3 +164,8 @@ pub impl CacheKey for @kurbo.Rect with fn cache_key(self) {
 pub impl CacheKey for U128 with fn cache_key(self) {
   hash128(h => h.write_u128(self))
 }
+
+///|
+#deprecated("call as `CacheKey::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with CacheKey::{cache_key}

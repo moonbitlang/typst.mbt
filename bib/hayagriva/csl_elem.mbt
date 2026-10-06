@@ -12,6 +12,21 @@ pub(all) struct Elem {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Elem with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Elem with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Elem with @debug.Debug::{to_repr}
+
+///|
 fn Elem::str_len(self : Elem) -> Int {
   let mut n = 0
   for c in self.children.0 {
@@ -77,6 +92,11 @@ pub impl Show for Elem with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Elem with Show::{to_string, output}
+
+///|
 /// Merge adjacent text nodes with the same formatting.
 pub fn simplify_children(children : ElemChildren) -> ElemChildren {
   // Upstream consumes its argument; copy it so that merging text in place
@@ -122,8 +142,38 @@ pub(all) enum ElemMeta {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemMeta with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemMeta with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemMeta with @debug.Debug::{to_repr}
+
+///|
 /// A container for element children with useful methods.
 pub(all) struct ElemChildren(Array[ElemChild]) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChildren with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChildren with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChildren with @debug.Debug::{to_repr}
 
 ///|
 /// Create an empty `ElemChildren`.
@@ -267,6 +317,21 @@ pub(all) enum ElemChild {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChild with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChild with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChild with @debug.Debug::{to_repr}
+
+///|
 /// A deep copy.
 pub fn ElemChild::copy(self : ElemChild) -> ElemChild {
   match self {
@@ -350,6 +415,11 @@ pub impl Show for ElemChild with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElemChild with Show::{to_string, output}
+
+///|
 /// The format with which to write an element.
 pub(all) enum BufWriteFormat {
   /// Just write text.
@@ -361,6 +431,16 @@ pub(all) enum BufWriteFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BufWriteFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BufWriteFormat with @debug.Debug::{to_repr}
+
+///|
 /// A piece of formatted text.
 pub(all) struct Formatted {
   /// The text.
@@ -368,6 +448,21 @@ pub(all) struct Formatted {
   /// The formatting.
   formatting : Formatting
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatted with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatted with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatted with @debug.Debug::{to_repr}
 
 ///|
 /// Some formatting information.
@@ -383,6 +478,21 @@ pub(all) struct Formatting {
   /// Whether the text is superscript or subscript.
   vertical_align : @citationberg.VerticalAlign
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Formatting with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for Formatting with fn default() {

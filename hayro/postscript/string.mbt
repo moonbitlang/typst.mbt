@@ -14,6 +14,16 @@ pub struct PsString {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsString with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for PsString with fn output(self, logger) {
   match self.inner {
     Literal(d) => logger.write_string("Literal(\{d})")
@@ -21,6 +31,11 @@ pub impl Show for PsString with fn output(self, logger) {
     Ascii85(d) => logger.write_string("Ascii85(\{d})")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PsString with Show::{to_string, output}
 
 ///|
 fn PsString::from_literal(data : BytesView) -> PsString {

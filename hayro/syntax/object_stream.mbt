@@ -13,9 +13,19 @@ pub impl Eq for Stream with fn equal(a, b) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stream with Eq::{not_equal, equal}
+
+///|
 pub impl Show for Stream with fn output(self, logger) {
   logger.write_string("Stream (len: \{self.data.length()})")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stream with Show::{to_string, output}
 
 ///|
 /// Additional parameters for decoding images.
@@ -60,6 +70,16 @@ pub(all) enum DecodeFailure {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeFailure with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecodeFailure with @debug.Debug::{to_repr}
+
+///|
 /// An image color space.
 pub(all) enum ImageColorSpace {
   /// Grayscale color space.
@@ -71,6 +91,16 @@ pub(all) enum ImageColorSpace {
   /// An unknown color space.
   Unknown(Int)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageColorSpace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageColorSpace with @debug.Debug::{to_repr}
 
 ///|
 /// Additional data that is extracted from some image streams.
@@ -228,6 +258,11 @@ pub impl Skippable for Stream with fn skip(_, _) {
 }
 
 ///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stream with Skippable::{skip}
+
+///|
 pub impl Readable for Stream with fn read(r, ctx) {
   guard (r.read_with_context(ctx) : Dict?) is Some(dict) else { return None }
   if dict.contains_key("F") {
@@ -255,6 +290,11 @@ pub impl ObjectLike for Stream with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Stream with ObjectLike::{from_object}
 
 ///|
 fn parse_proper(r : Reader, dict : Dict) -> Stream? {

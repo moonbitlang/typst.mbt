@@ -11,9 +11,29 @@ pub(all) struct Url {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Url with fn output(self, logger) {
   logger.write_string(self.serialization)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Url with Show::{to_string, output}
 
 ///|
 /// Errors that can occur during parsing (`url::ParseError`).
@@ -26,6 +46,16 @@ pub(all) enum UrlParseError {
   InvalidDomainCharacter
   RelativeUrlWithoutBase
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UrlParseError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UrlParseError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for UrlParseError with fn output(self, logger) {

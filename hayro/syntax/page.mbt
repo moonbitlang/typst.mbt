@@ -22,6 +22,16 @@ pub(all) struct Rect {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with @debug.Debug::{to_repr}
+
+///|
 /// A new rectangle from minimum and maximum coordinates.
 pub fn Rect::new(x0 : Double, y0 : Double, x1 : Double, y1 : Double) -> Rect {
   { x0, y0, x1, y1, }
@@ -79,12 +89,22 @@ pub impl Readable for Rect with fn read(r, ctx) {
 }
 
 ///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with Readable::{read}
+
+///|
 pub impl ObjectLike for Rect with fn from_object(o) {
   match o {
     Array(arr) => rect_from_arr(arr)
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rect with ObjectLike::{from_object}
 
 ///|
 // <https://github.com/apache/pdfbox/blob/a53a70db16ea3133994120bcf1e216b9e760c05b/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/common/PDRectangle.java#L38>
@@ -114,6 +134,16 @@ pub(all) enum Rotation {
   /// A rotation of 270 degrees.
   FlippedHorizontal
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rotation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rotation with @debug.Debug::{to_repr}
 
 ///|
 /// A PDF page.

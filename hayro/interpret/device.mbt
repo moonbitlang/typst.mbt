@@ -99,3 +99,20 @@ pub impl Device for DummyDevice with fn pop_clip(_) {
 pub impl Device for DummyDevice with fn pop_transparency_group(_) {
   ()
 }
+
+///|
+#deprecated("call as `Device::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DummyDevice with Device::{
+  draw_path,
+  pop_clip,
+  draw_rect,
+  begin_marked_content,
+  end_marked_content,
+  pop_transparency_group,
+  draw_image,
+  draw_glyph,
+  push_clip_path,
+  push_clip_rect,
+  push_transparency_group,
+}

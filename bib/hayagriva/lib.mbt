@@ -98,6 +98,21 @@ pub(all) struct LanguageIdentifier {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LanguageIdentifier with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LanguageIdentifier with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LanguageIdentifier with @debug.Debug::{to_repr}
+
+///|
 /// Parse a language identifier like `unic_langid`.
 pub fn LanguageIdentifier::parse(s : String) -> LanguageIdentifier? {
   let parts = @unscanny.split_by(s, c => c == '-' || c == '_')
@@ -172,6 +187,11 @@ pub impl Show for LanguageIdentifier with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LanguageIdentifier with Show::{to_string, output}
+
+///|
 /// A citable item in a bibliography.
 pub(all) struct Entry {
   /// The key of the entry.
@@ -241,6 +261,21 @@ pub(all) struct Entry {
   /// associated to.
   mut parents : Array[Entry]
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Entry with @debug.Debug::{to_repr}
 
 ///|
 /// Construct a new, empty entry.

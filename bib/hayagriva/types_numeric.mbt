@@ -12,6 +12,21 @@ pub(all) struct Numeric {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numeric with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numeric with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numeric with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new `Numeric` from a number.
 pub fn Numeric::new(value : Int) -> Numeric {
   { value: Number(value), prefix: None, suffix: None, }
@@ -305,6 +320,16 @@ pub(all) enum NumericError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for NumericError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -344,6 +369,21 @@ pub(all) enum NumericValue {
   /// A set of numbers.
   Set(Array[(Int, NumericDelimiter?)])
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericValue with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericValue with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericValue with @debug.Debug::{to_repr}
 
 ///|
 /// Return the length of the numeric value.
@@ -389,6 +429,21 @@ pub(all) enum NumericDelimiter {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericDelimiter with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericDelimiter with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericDelimiter with @debug.Debug::{to_repr}
+
+///|
 /// Get the character representation of the delimiter.
 pub fn NumericDelimiter::as_char(self : NumericDelimiter) -> Char {
   match self {
@@ -415,6 +470,11 @@ pub fn[W : FmtWrite] NumericDelimiter::fmt(
 pub impl Show for NumericDelimiter with fn output(self, logger) {
   logger.write_string(fmt_to_string(b => self.fmt(b)))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericDelimiter with Show::{to_string, output}
 
 ///|
 fn is_delimiter(c : Char) -> Bool {

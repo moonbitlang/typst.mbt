@@ -17,6 +17,21 @@ pub(all) enum Variable {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variable with @debug.Debug::{to_repr}
+
+///|
 /// Check if the variable starts with `number-of-` to control contextual
 /// label behavior.
 pub fn Variable::is_number_of_variable(self : Variable) -> Bool {
@@ -36,6 +51,11 @@ pub impl Show for Variable with fn output(self, logger) {
     Page(v) => logger.write_string(v.to_string())
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variable with Show::{to_string, output}
 
 ///|
 /// Parse a variable (untagged: standard, page, number, date, name).
@@ -109,6 +129,21 @@ pub(all) enum StandardVariable {
   VolumeTitle
   YearSuffix
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StandardVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StandardVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StandardVariable with @debug.Debug::{to_repr}
 
 ///|
 let standard_variable_names : ReadOnlyArray[(StandardVariable, String)] = [
@@ -203,6 +238,21 @@ pub(all) enum NumberOrPageVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberOrPageVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberOrPageVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberOrPageVariable with @debug.Debug::{to_repr}
+
+///|
 pub fn NumberOrPageVariable::from_str(s : String) -> NumberOrPageVariable? {
   if PageVariable::from_str(s) is Some(v) {
     return Some(Page(v))
@@ -238,6 +288,21 @@ pub(all) enum PageVariable {
   /// (e.g. a journal issue).
   Page
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageVariable with @debug.Debug::{to_repr}
 
 ///|
 pub fn PageVariable::from_str(s : String) -> PageVariable? {
@@ -277,6 +342,21 @@ pub(all) enum NumberVariable {
   Version
   Volume
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberVariable with @debug.Debug::{to_repr}
 
 ///|
 let number_variable_names : ReadOnlyArray[(NumberVariable, String)] = [
@@ -344,6 +424,21 @@ pub(all) enum DateVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DateVariable with @debug.Debug::{to_repr}
+
+///|
 let date_variable_names : ReadOnlyArray[(DateVariable, String)] = [
   (Accessed, "accessed"),
   (AvailableDate, "available-date"),
@@ -407,6 +502,21 @@ pub(all) enum NameVariable {
   SeriesCreator
   Translator
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameVariable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameVariable with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NameVariable with @debug.Debug::{to_repr}
 
 ///|
 let name_variable_names : ReadOnlyArray[(NameVariable, String)] = [
@@ -481,6 +591,21 @@ pub(all) enum Term {
   /// Terms that are not defined via types, name or number variables.
   Other(OtherTerm)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Term with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Term with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Term with @debug.Debug::{to_repr}
 
 ///|
 /// Parse a term (untagged: kind, name variable, number variable, locator,
@@ -628,6 +753,21 @@ pub(all) enum Kind {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Kind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Kind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Kind with @debug.Debug::{to_repr}
+
+///|
 let kind_names : ReadOnlyArray[(Kind, String)] = [
   (Article, "article"),
   (ArticleJournal, "article-journal"),
@@ -697,6 +837,11 @@ pub impl Show for Kind with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Kind with Show::{to_string, output}
+
+///|
 /// A locator.
 pub(all) enum Locator {
   Act
@@ -732,6 +877,21 @@ pub(all) enum Locator {
   /// the locator's `cs:label` element.
   Custom
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locator with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locator with @debug.Debug::{to_repr}
 
 ///|
 pub fn Locator::from_str(s : String) -> Locator? {
@@ -887,6 +1047,21 @@ pub(all) enum OtherTerm {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OtherTerm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OtherTerm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OtherTerm with @debug.Debug::{to_repr}
+
+///|
 /// Whether this is a numbered ordinal term.
 pub fn OtherTerm::is_n_ordinal(self : OtherTerm) -> Bool {
   self is (OrdinalN(_) | LongOrdinal(_))
@@ -939,12 +1114,32 @@ pub(all) enum TermConversionError {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermConversionError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermConversionError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermConversionError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for TermConversionError with fn output(self, logger) {
   match self {
     OutOfRange => logger.write_string("value out of range")
     Unknown => logger.write_string("unknown term")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermConversionError with Show::{to_string, output}
 
 ///|
 /// Rust's `str::parse::<u8>` with its error kinds.
@@ -1240,6 +1435,11 @@ pub impl Show for OtherTerm with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OtherTerm with Show::{to_string, output}
+
+///|
 /// Seasons of the year.
 pub(all) enum Season {
   /// Spring (CSL season 01).
@@ -1251,6 +1451,21 @@ pub(all) enum Season {
   /// Winter (CSL season 04).
   Winter
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Season with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Season with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Season with @debug.Debug::{to_repr}
 
 ///|
 /// Converts a season number in the range 1-4 (as defined by the CSL spec)

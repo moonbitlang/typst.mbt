@@ -45,6 +45,11 @@ pub impl Eq for Object with fn equal(a, b) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with Eq::{not_equal, equal}
+
+///|
 /// Try casting the object to a specific subtype.
 pub fn[T : ObjectLike] Object::cast(self : Object) -> T? {
   T::from_object(self)
@@ -122,6 +127,11 @@ pub impl ObjectLike for Object with fn from_object(o) {
 }
 
 ///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with ObjectLike::{from_object}
+
+///|
 pub impl Skippable for Object with fn skip(r, is_content_stream) {
   guard r.peek_byte() is Some(peeked) else { return None }
   match peeked {
@@ -180,6 +190,11 @@ pub impl Readable for Object with fn read(r, ctx) {
 }
 
 ///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Object with Readable::{read}
+
+///|
 /// An identifier for a PDF object.
 pub(all) struct ObjectIdentifier {
   /// The object number.
@@ -187,6 +202,26 @@ pub(all) struct ObjectIdentifier {
   /// The generation number.
   gen_number : Int
 } derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjectIdentifier with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjectIdentifier with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjectIdentifier with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjectIdentifier with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new `ObjectIdentifier`.
@@ -210,6 +245,11 @@ pub impl Readable for ObjectIdentifier with fn read(r, _) {
   guard r.forward_tag(b"obj") is Some(_) else { return None }
   Some({ obj_number, gen_number, })
 }
+
+///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ObjectIdentifier with Readable::{read}
 
 ///|
 pub impl Skippable for ObjectIdentifier with fn skip(r, _) {

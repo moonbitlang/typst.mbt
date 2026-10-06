@@ -12,6 +12,21 @@ pub(all) struct FormatString {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatString with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatString with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new empty `FormatStr`.
 pub fn FormatString::new() -> FormatString {
   { value: ChunkedString::new(), short: None, }
@@ -84,6 +99,21 @@ pub fn FormatString::from_str(
 ///|
 /// A string whose elements can set whether they do case folding.
 pub(all) struct ChunkedString(Array[StringChunk]) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedString with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedString with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new empty `ChunkedString`.
@@ -256,6 +286,16 @@ fn is_chunk_control(c : Char) -> Bool {
 pub(all) struct ChunkedStrParseError(Int) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedStrParseError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedStrParseError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for ChunkedStrParseError with fn output(self, logger) {
   logger.write_string("unmatched closing brace at position \{self.0}")
 }
@@ -311,6 +351,11 @@ pub impl FmtWrite for ChunkedString with fn write_char(self, c) {
 }
 
 ///|
+#deprecated("call as `FmtWrite::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkedString with FmtWrite::{write_str, write_char}
+
+///|
 pub impl Show for ChunkedString with fn output(self, logger) {
   for chunk in self.0 {
     logger.write_string(chunk.to_string())
@@ -328,6 +373,21 @@ pub(all) struct StringChunk {
   /// Whether the chunk is subject to case folding or contains math.
   kind : ChunkKind
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringChunk with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringChunk with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StringChunk with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new `StrChunk` from a string and a kind.
@@ -417,3 +477,18 @@ pub(all) enum ChunkKind {
   /// The contained markup is expected to be evaluated using Typst.
   Math
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChunkKind with @debug.Debug::{to_repr}

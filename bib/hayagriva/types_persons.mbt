@@ -10,6 +10,21 @@ pub(all) struct PersonsWithRoles {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonsWithRoles with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonsWithRoles with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonsWithRoles with @debug.Debug::{to_repr}
+
+///|
 /// Create a new list of persons with a common role.
 pub fn PersonsWithRoles::new(
   names : Array[Person],
@@ -68,6 +83,21 @@ pub(all) enum PersonRole {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonRole with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonRole with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonRole with @debug.Debug::{to_repr}
+
+///|
 /// Serde (kebab-case) names of the person roles.
 pub fn PersonRole::from_str(s : String) -> PersonRole? {
   match s {
@@ -113,6 +143,21 @@ pub(all) struct Person {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Person with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Person with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Person with @debug.Debug::{to_repr}
+
+///|
 /// Error that may occur when parsing a slice of strings as a name.
 pub(all) enum PersonError {
   /// The name has too many parts to be appropriately parsed.
@@ -122,6 +167,16 @@ pub(all) enum PersonError {
   /// The role is unknown.
   UnknownRole
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PersonError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for PersonError with fn output(self, logger) {

@@ -15,6 +15,11 @@ pub impl Eq for PdfArray with fn equal(a, b) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfArray with Eq::{not_equal, equal}
+
+///|
 /// An empty array.
 pub fn PdfArray::empty() -> PdfArray {
   { data: b""[:], ctx: ReaderContext::dummy(), }
@@ -71,6 +76,11 @@ pub impl Show for PdfArray with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfArray with Show::{to_string, output}
+
+///|
 fn skip_array(r : Reader, is_content_stream : Bool) -> Unit? {
   guard r.forward_tag(b"[") is Some(_) else { return None }
   while true {
@@ -98,6 +108,11 @@ pub impl Skippable for PdfArray with fn skip(r, c) {
 }
 
 ///|
+#deprecated("call as `Skippable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfArray with Skippable::{skip}
+
+///|
 pub impl Readable for PdfArray with fn read(r, ctx) {
   guard r.skip(skip_array, ctx.in_content_stream()) is Some(bytes) else {
     return None
@@ -115,6 +130,11 @@ pub impl ObjectLike for PdfArray with fn from_object(o) {
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfArray with ObjectLike::{from_object}
 
 ///|
 /// An iterator over the array that allows reading a different object each
@@ -171,12 +191,22 @@ pub impl[T : ObjectLike] Readable for Vector[T] with fn read(r, ctx) {
 }
 
 ///|
+#deprecated("call as `Readable::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector with Readable::{read}
+
+///|
 pub impl[T : ObjectLike] ObjectLike for Vector[T] with fn from_object(o) {
   match o {
     Array(a) => Some(Vector(a.to_vec()))
     _ => None
   }
 }
+
+///|
+#deprecated("call as `ObjectLike::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Vector with ObjectLike::{from_object}
 
 ///|
 /// A fixed-size array of objects (upstream `[T; C]: ObjectLike`); `n` is

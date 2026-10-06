@@ -10,6 +10,21 @@ pub(all) enum UnOp {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnOp with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnOp with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnOp with @debug.Debug::{to_repr}
+
+///|
 /// Try to convert the token into a unary operation.
 pub fn UnOp::from_kind(token : SyntaxKind) -> UnOp? {
   match token {
@@ -64,6 +79,21 @@ pub(all) enum BinOp {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinOp with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinOp with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinOp with @debug.Debug::{to_repr}
+
+///|
 /// Try to convert the token into a binary operation.
 pub fn BinOp::from_kind(token : SyntaxKind) -> BinOp? {
   match token {
@@ -108,6 +138,21 @@ pub(all) enum Assoc {
   Left
   Right
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Assoc with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Assoc with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Assoc with @debug.Debug::{to_repr}
 
 ///|
 /// The associativity of this operator.

@@ -283,6 +283,16 @@ pub(all) struct PackageSpec {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageSpec with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageSpec with Hash::{hash, hash_combine}
+
+///|
 pub fn PackageSpec::versionless(self : PackageSpec) -> VersionlessPackageSpec {
   { namespace_: self.namespace_, name: self.name, }
 }
@@ -314,6 +324,11 @@ pub impl @debug.Debug for PackageSpec with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageSpec with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for PackageSpec with fn output(self, logger) {
   logger.write_string("@\{self.namespace_}/\{self.name}:\{self.version}")
 }
@@ -329,6 +344,16 @@ pub(all) struct VersionlessPackageSpec {
   /// The name of the package within its namespace.
   name : String
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionlessPackageSpec with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionlessPackageSpec with Hash::{hash, hash_combine}
 
 ///|
 /// Fill in the `version` to get a complete [`PackageSpec`].
@@ -365,6 +390,11 @@ pub fn VersionlessPackageSpec::from_str(
 pub impl @debug.Debug for VersionlessPackageSpec with fn to_repr(self) {
   @debug.Repr::literal(self.to_string())
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionlessPackageSpec with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for VersionlessPackageSpec with fn output(self, logger) {
@@ -460,6 +490,21 @@ pub(all) struct PackageVersion {
   /// The package's patch version.
   patch : UInt
 } derive(Eq, Compare, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageVersion with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageVersion with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageVersion with Hash::{hash, hash_combine}
 
 ///|
 /// The current compiler version.
@@ -589,6 +634,11 @@ pub impl @debug.Debug for PackageVersion with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackageVersion with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for PackageVersion with fn output(self, logger) {
   logger.write_string("\{self.major}.\{self.minor}.\{self.patch}")
 }
@@ -606,6 +656,21 @@ pub(all) struct VersionBound {
   /// The bounds's patch version. Can only be present if minor is too.
   patch : UInt?
 } derive(Eq, Compare, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionBound with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionBound with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionBound with Hash::{hash, hash_combine}
 
 ///|
 /// Parse a version bound like `0`, `0.1` or `0.1.0`.
@@ -647,6 +712,11 @@ pub fn VersionBound::from_str(s : String) -> Result[VersionBound, String] {
 pub impl @debug.Debug for VersionBound with fn to_repr(self) {
   @debug.Repr::literal(self.to_string())
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionBound with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for VersionBound with fn output(self, logger) {

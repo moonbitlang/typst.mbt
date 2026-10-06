@@ -53,6 +53,21 @@ pub(all) enum Tag {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with @debug.Debug::{to_repr}
+
+///|
 /// The list of all tags, in the same order as they are defined.
 pub let tag_list : ReadOnlyArray[Tag] = [
   Comment,

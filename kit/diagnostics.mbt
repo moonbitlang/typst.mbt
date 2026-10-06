@@ -20,6 +20,16 @@ pub(all) enum DiagnosticFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagnosticFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DiagnosticFormat with @debug.Debug::{to_repr}
+
+///|
 /// Emits diagnostic messages to a writable, colorized output.
 pub fn emit_diagnostics(
   dest : ColorWriter,

@@ -28,6 +28,16 @@ pub(all) struct Person {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Person with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Person with @debug.Debug::{to_repr}
+
+///|
 fn Person::simple(
   name : String,
   given_name : String,

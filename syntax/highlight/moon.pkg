@@ -1,6 +1,7 @@
 import {
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/syntax/ast",
+  "moonbitlang/core/debug",
 }
 
 import {
