@@ -129,29 +129,32 @@ test "canvas: the functions reject what the element and its items reject, in the
     assert_eq(canvas_error(call), "assertion failed: " + message)
     messages.push("\{name}: \{message}")
   }
-  inspect(messages.join("\n"), content=(
-    #|a width that is not a number: the `width` of a `Canvas` must be a finite number of points that is not negative
-    #|a negative width: the `width` of a `Canvas` must be a finite number of points that is not negative
-    #|a height without an end: the `height` of a `Canvas` must be a finite number of points that is not negative
-    #|a negative height: the `height` of a `Canvas` must be a finite number of points that is not negative
-    #|a point of `place`: the coordinates of `Canvas::place` must be finite numbers of points
-    #|the start of a line: the coordinates of `Canvas::line` must be finite numbers of points
-    #|the end of a line: the coordinates of `Canvas::line` must be finite numbers of points
-    #|the corner of a rectangle: the coordinates of `Canvas::rect` must be finite numbers of points
-    #|the width of a rectangle: the sizes of `Canvas::rect` must be finite numbers of points
-    #|the height of a rectangle: the sizes of `Canvas::rect` must be finite numbers of points
-    #|the centre of a circle: the coordinates of `Canvas::circle` must be finite numbers of points
-    #|the radius of a circle: the sizes of `Canvas::circle` must be finite numbers of points
-    #|the start of a curve: the coordinates of `Canvas::curve` must be finite numbers of points
-    #|a control point of a curve: the coordinates of `Canvas::curve` must be finite numbers of points
-    #|the start of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
-    #|a point of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
-    #|an arrow without a segment: `Canvas::arrow` needs a segment: a path from `start` to where the arrow points
-    #|an arrow to where it starts: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
-    #|an arrow whose last curve is a point: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
-    #|a negative head: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
-    #|a head that is not a number: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
-  ))
+  inspect(
+    messages.join("\n"),
+    content=(
+      #|a width that is not a number: the `width` of a `Canvas` must be a finite number of points that is not negative
+      #|a negative width: the `width` of a `Canvas` must be a finite number of points that is not negative
+      #|a height without an end: the `height` of a `Canvas` must be a finite number of points that is not negative
+      #|a negative height: the `height` of a `Canvas` must be a finite number of points that is not negative
+      #|a point of `place`: the coordinates of `Canvas::place` must be finite numbers of points
+      #|the start of a line: the coordinates of `Canvas::line` must be finite numbers of points
+      #|the end of a line: the coordinates of `Canvas::line` must be finite numbers of points
+      #|the corner of a rectangle: the coordinates of `Canvas::rect` must be finite numbers of points
+      #|the width of a rectangle: the sizes of `Canvas::rect` must be finite numbers of points
+      #|the height of a rectangle: the sizes of `Canvas::rect` must be finite numbers of points
+      #|the centre of a circle: the coordinates of `Canvas::circle` must be finite numbers of points
+      #|the radius of a circle: the sizes of `Canvas::circle` must be finite numbers of points
+      #|the start of a curve: the coordinates of `Canvas::curve` must be finite numbers of points
+      #|a control point of a curve: the coordinates of `Canvas::curve` must be finite numbers of points
+      #|the start of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
+      #|a point of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
+      #|an arrow without a segment: `Canvas::arrow` needs a segment: a path from `start` to where the arrow points
+      #|an arrow to where it starts: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
+      #|an arrow whose last curve is a point: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
+      #|a negative head: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
+      #|a head that is not a number: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
+    ),
+  )
   // And both take what is at the edge of that: a canvas without a size, a
   // head without one, a curve whose last control point is its end.
   let fits = "#canvas(0, 0, canvas-arrow((0, 0), ((\"line\", (9, 9)),), head: 0), canvas-arrow((0, 0), ((\"cubic\", (5, 0), (9, 9), (9, 9)),)))"
