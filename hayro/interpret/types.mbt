@@ -141,7 +141,7 @@ pub fn RasterImage::height(self : RasterImage) -> Int {
 
 ///|
 pub impl CacheKey for RasterImage with fn cache_key(self) {
-  self.obj.cache_key()
+  CacheKey::cache_key(self.obj)
 }
 
 ///|

@@ -2,8 +2,6 @@ import {
   "moonbitlang/x/fs",
 } for "test"
 
-warnings = "-deprecated"
-
 options(
   targets: {
     "math_native.mbt": [ "native" ],

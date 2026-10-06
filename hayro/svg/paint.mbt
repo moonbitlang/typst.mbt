@@ -106,7 +106,7 @@ fn SvgRenderer::svg_paint(
     Color(c) => {
       let rgba8 = c.to_rgba().to_rgba8()
       let color = "#\{hex2(rgba8[0])}\{hex2(rgba8[1])}\{hex2(rgba8[2])}"
-      let alpha = rgba8[3].to_float() / 255.0
+      let alpha = Float::from_byte(rgba8[3]) / 255.0
       (color, alpha)
     }
     Pattern(p) => {
@@ -434,8 +434,8 @@ fn render_shading_texture(
 ) -> (DynamicImage, @kurbo.Affine) {
   let scale : Float = 1.0
   let inv_scale : Float = 1.0 / scale
-  let base_width = @interpret.f32_max(bbox.width().to_float(), 1.0)
-  let base_height = @interpret.f32_max(bbox.height().to_float(), 1.0)
+  let base_width = @interpret.f32_max(Float::from_double(bbox.width()), 1.0)
+  let base_height = @interpret.f32_max(Float::from_double(bbox.height()), 1.0)
   let width = @interpret.f32_as_u32((base_width * scale).ceil())
   let height = @interpret.f32_as_u32((base_height * scale).ceil())
   let (x_advance, y_advance) = x_y_advances(

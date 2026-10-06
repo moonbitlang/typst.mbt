@@ -375,7 +375,7 @@ fn interleave_and_convert(image : DecodedImage, buf : FixedArray[Byte]) -> Unit 
     let mut o = 0
     for sample in 0..<max_len {
       for channel in components {
-        let divisor = (shl_u32(1, channel.bit_depth) - 1).to_float()
+        let divisor = Float::from_uint(shl_u32(1, channel.bit_depth) - 1)
         buf[o] = f32_to_u8(
           round_f32(channel.container.data[sample] / divisor * mul_factor),
         ).to_byte()
@@ -470,7 +470,7 @@ fn resolve_palette_indices(
         }
         let column_info = palette.columns[column_idx]
         let samples = component.container.truncated()
-        let mapped : Array[Float] = Array::new(
+        let mapped : Array[Float] = Array(
           capacity=samples.length() + SIMD_WIDTH,
         )
         for sample in samples {
@@ -478,7 +478,7 @@ fn resolve_palette_indices(
           guard palette.map(index, column_idx) is Some(value) else {
             raise Color(PaletteResolutionFailed)
           }
-          mapped.push(value.to_float())
+          mapped.push(Float::from_uint64(value))
         }
         resolved.push({
           container: SimdBuffer::new(mapped),
@@ -520,25 +520,25 @@ fn cielab_to_rgb(
   )
 
   // Copied from OpenJPEG.
-  let min_l = -(rl.to_float() * ol.to_float()) /
-    (shl_i32(1, prec0) - 1).to_float()
-  let max_l = min_l + rl.to_float()
-  let min_a = -(ra.to_float() * oa.to_float()) /
-    (shl_i32(1, prec1) - 1).to_float()
-  let max_a = min_a + ra.to_float()
-  let min_b = -(rb.to_float() * ob.to_float()) /
-    (shl_i32(1, prec2) - 1).to_float()
-  let max_b = min_b + rb.to_float()
+  let min_l = -(Float::from_uint(rl) * Float::from_uint(ol)) /
+    Float::from_int(shl_i32(1, prec0) - 1)
+  let max_l = min_l + Float::from_uint(rl)
+  let min_a = -(Float::from_uint(ra) * Float::from_uint(oa)) /
+    Float::from_int(shl_i32(1, prec1) - 1)
+  let max_a = min_a + Float::from_uint(ra)
+  let min_b = -(Float::from_uint(rb) * Float::from_uint(ob)) /
+    Float::from_int(shl_i32(1, prec2) - 1)
+  let max_b = min_b + Float::from_uint(rb)
   let bit_max = shl_u32(1, bit_depth) - 1
 
   // Note that we are not doing the actual conversion with the ICC profile yet,
   // just decoding the raw LAB values.
   // We leave applying the ICC profile to the user.
-  let divisor_l = (shl_i32(1, prec0) - 1).to_float()
-  let divisor_a = (shl_i32(1, prec1) - 1).to_float()
-  let divisor_b = (shl_i32(1, prec2) - 1).to_float()
-  let scale_l_final = bit_max.to_float() / 100.0
-  let scale_ab_final = bit_max.to_float() / 255.0
+  let divisor_l = Float::from_int(shl_i32(1, prec0) - 1)
+  let divisor_a = Float::from_int(shl_i32(1, prec1) - 1)
+  let divisor_b = Float::from_int(shl_i32(1, prec2) - 1)
+  let scale_l_final = Float::from_uint(bit_max) / 100.0
+  let scale_ab_final = Float::from_uint(bit_max) / 255.0
   let l_offset = min_l * scale_l_final
   let l_scale = (max_l - min_l) / divisor_l * scale_l_final
   let a_offset = (min_a + 128.0) * scale_ab_final
@@ -583,8 +583,8 @@ fn sycc_to_rgb(
   components : Array[ComponentData],
   bit_depth : Int,
 ) -> Unit raise DecodeError {
-  let offset = shl_u32(1, bit_depth - 1).to_float()
-  let max_value = (shl_u32(1, bit_depth) - 1).to_float()
+  let offset = Float::from_uint(shl_u32(1, bit_depth - 1))
+  let max_value = Float::from_uint(shl_u32(1, bit_depth) - 1)
   if components.length() < 3 {
     raise Color(SyccConversionFailed)
   }

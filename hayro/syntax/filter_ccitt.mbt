@@ -136,17 +136,21 @@ fn ccitt_decode(
   // into an RGBA8 image.
   let (decoded, bpc) = if image_params.is_indexed {
     let decoder : CcittBitPackDecoder = {
-      output: @buffer.new(),
+      output: Buffer(),
       decoded_rows: 0,
       buffer: 0,
       bit_count: 0,
     }
     let context = @ccitt.DecoderContext::new(settings)
-    let result = try? @ccitt.decode(data, decoder, context)
+    let failed = try @ccitt.decode(data, decoder, context) catch {
+      _ => true
+    } noraise {
+      _ => false
+    }
 
     // If we decoded at least one row, let's be lenient and return what we got.
     // See also 0001763.pdf.
-    if result is Err(_) && decoder.decoded_rows == 0 {
+    if failed && decoder.decoded_rows == 0 {
       return None
     }
     (decoder.output.to_bytes(), 1)
@@ -157,13 +161,17 @@ fn ccitt_decode(
       decoded_rows: 0,
     }
     let context = @ccitt.DecoderContext::new(settings)
-    let result = try? @ccitt.decode(data, decoder, context)
-    if result is Err(_) && decoder.decoded_rows == 0 {
+    let failed = try @ccitt.decode(data, decoder, context) catch {
+      _ => true
+    } noraise {
+      _ => false
+    }
+    if failed && decoder.decoded_rows == 0 {
       return None
     }
     let output = decoder.output
     // `truncate(idx)` on failure.
-    let len = if result is Err(_) && decoder.idx < output.length() {
+    let len = if failed && decoder.idx < output.length() {
       decoder.idx
     } else {
       output.length()

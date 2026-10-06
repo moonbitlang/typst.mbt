@@ -76,8 +76,12 @@ fn jp2_parse(
           }
           match child_box.box_type {
             CHANNEL_DEFINITION => {
-              let ok = try? cdef_parse(boxes, child_box.data)
-              if ok is Err(_) && settings.strict {
+              let failed = try cdef_parse(boxes, child_box.data) catch {
+                _ => true
+              } noraise {
+                _ => false
+              }
+              if failed && settings.strict {
                 raise Format(InvalidBox)
               }
               // If not strict decoding, just assume default
@@ -85,8 +89,12 @@ fn jp2_parse(
             }
             COLOUR_SPECIFICATION => colr_parse(boxes, child_box.data)
             PALETTE => {
-              let ok = try? pclr_parse(boxes, child_box.data)
-              if ok is Err(_) && settings.strict {
+              let failed = try pclr_parse(boxes, child_box.data) catch {
+                _ => true
+              } noraise {
+                _ => false
+              }
+              if failed && settings.strict {
                 raise Format(InvalidBox)
               }
 

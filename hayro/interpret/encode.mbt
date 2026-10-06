@@ -202,7 +202,7 @@ fn sample_triangles(
   triangles : Array[Triangle],
   transform : @kurbo.Affine,
 ) -> Map[Int, ColorComponents] {
-  let map : Map[Int, ColorComponents] = Map::new()
+  let map : Map[Int, ColorComponents] = Map([])
   for t in triangles {
     let t = {
       let p0 = transform.apply(t.p0.point)
@@ -262,7 +262,11 @@ fn EncodedShadingType::eval(
       if !domain.contains(pos) {
         Some(bg_color)
       } else {
-        guard function.eval([pos.x.to_float(), pos.y.to_float()]) is Some(out) else {
+        guard function.eval([
+            Float::from_double(pos.x),
+            Float::from_double(pos.y),
+          ])
+          is Some(out) else {
           return None
         }
         // TODO: Clamp out-of-range values.
@@ -271,7 +275,7 @@ fn EncodedShadingType::eval(
     RadialAxial({ function, params, domain, extend_, }) => {
       let (t0, t1) = (domain[0], domain[1])
       let mut t = match params {
-        Axial => pos.x.to_float()
+        Axial => Float::from_double(pos.x)
         Radial(p1~, r~) =>
           radial_pos(pos, p1, r, extend_[0], extend_[1]).unwrap_or(F32_MIN)
       }
@@ -345,12 +349,12 @@ fn radial_pos(
   min_extend : Bool,
   max_extend : Bool,
 ) -> Float? {
-  let r0 = r.x.to_float()
-  let dx = p1.x.to_float()
-  let dy = p1.y.to_float()
-  let dr = r.y.to_float() - r0
-  let px = pos.x.to_float()
-  let py = pos.y.to_float()
+  let r0 = Float::from_double(r.x)
+  let dx = Float::from_double(p1.x)
+  let dy = Float::from_double(p1.y)
+  let dr = Float::from_double(r.y) - r0
+  let px = Float::from_double(pos.x)
+  let py = Float::from_double(pos.y)
   let a = dx * dx + dy * dy - dr * dr
   let b = (-2.0 : Float) * (px * dx + py * dy + r0 * dr)
   let c = px * px + py * py - r0 * r0

@@ -30,7 +30,7 @@ fn md5_calculate(data : BytesView) -> Bytes {
     0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476,
   ]
   let original_len = data.length()
-  let message : Array[Byte] = Array::new(capacity=original_len + 72)
+  let message : Array[Byte] = Array(capacity=original_len + 72)
   for b in data {
     message.push(b)
   }
@@ -80,7 +80,7 @@ fn md5_calculate(data : BytesView) -> Bytes {
       state[i] = state[i] + working_vars[i]
     }
   }
-  let result : Array[Byte] = Array::new(capacity=16)
+  let result : Array[Byte] = Array(capacity=16)
   for word in state {
     write_u32_le(result, word)
   }

@@ -126,10 +126,10 @@ fn read_literal(r : Reader) -> Bytes? {
     }
   }
   if plain {
-    return Some(data.to_bytes())
+    return Some(data.to_owned())
   }
   let r = Reader::new(data)
-  let result = @buffer.new()
+  let result = Buffer()
   while r.read_byte() is Some(byte) {
     match byte {
       b'\\' => {

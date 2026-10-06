@@ -63,7 +63,7 @@ test "hayro-jbig2 matches the oracle" {
   let expected = @fs.read_file_to_string(dir + "oracle.tsv")
     .split("\n")
     .filter(l => !l.is_empty() && !l.has_prefix("#"))
-    .map(l => l.to_string())
+    .map(l => l.to_owned())
     .to_array()
   let mismatches = []
   let mut index = 0
@@ -71,14 +71,14 @@ test "hayro-jbig2 matches the oracle" {
     if line.is_empty() || line.has_prefix("#") {
       continue
     }
-    let f = line.split("\t").map(p => p.to_string()).to_array()
+    let f = line.split("\t").map(p => p.to_owned()).to_array()
     let data = @fs.read_file_to_bytes(dir + "files/" + f[0])
     let globals = if f[1] == "-" {
       None
     } else {
       Some(@fs.read_file_to_bytes(dir + "files/" + f[1]))
     }
-    let recorder = { out: @buffer.new(), rows: 0, }
+    let recorder = { out: Buffer(), rows: 0, }
     let result = try {
       if f[2] == "file" {
         @jbig2.Image::new(data[:])

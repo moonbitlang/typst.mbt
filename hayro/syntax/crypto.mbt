@@ -71,7 +71,7 @@ fn Decryptor::decrypt(
   target : DecryptionTarget,
 ) -> Bytes? {
   match self {
-    NoDecryptor => Some(data.to_bytes())
+    NoDecryptor => Some(data.to_owned())
     Decryptor::Rc4(key~) => decrypt_rc4(key, data, id)
     Decryptor::Aes128(key~, dict~) | Decryptor::Aes256(key~, dict~) => {
       let crypt_dict = match target {
@@ -79,7 +79,7 @@ fn Decryptor::decrypt(
         Stream => dict.stream_filter
       }
       match crypt_dict.cfm {
-        NoneTag => Some(data.to_bytes())
+        NoneTag => Some(data.to_owned())
         DecryptorTag::Rc4 => decrypt_rc4(key, data, id)
         DecryptorTag::Aes128 => decrypt_aes128(key, data, id)
         DecryptorTag::Aes256 => decrypt_aes256(key, data)
@@ -237,7 +237,7 @@ fn decrypt_rc_aes(
   // the string or stream to be encrypted (see 7.3.10, "Indirect objects"). If the
   // string is a direct object, use the identifier of the indirect object containing
   // it.
-  let key_buf : Array[Byte] = Array::new(capacity=n + 9)
+  let key_buf : Array[Byte] = Array(capacity=n + 9)
   for b in key {
     key_buf.push(b)
   }
@@ -286,7 +286,7 @@ fn DecryptorData::from_dict(
   dict : Dict,
   default_length : Int,
 ) -> DecryptorData? {
-  let mappings : Map[String, CryptDictionary] = Map::new()
+  let mappings : Map[String, CryptDictionary] = Map([])
   if (dict.get("CF") : Dict?) is Some(dict) {
     for key in dict.keys() {
       if (dict.get(key.0) : Dict?) is Some(dict) &&
@@ -353,7 +353,7 @@ fn compute_hash_rev56(
   // Take the SHA-256 hash of the original input to the algorithm and name the resulting
   // 32 bytes, K.
   let mut k = {
-    let input = @buffer.new()
+    let input = Buffer()
     input.write_bytesview(password)
     input.write_bytesview(validation_salt)
     if user_string is Some(user_string) {
@@ -377,14 +377,14 @@ fn compute_hash_rev56(
     // password or creating the user key, K1 is the concatenation of the input
     // password and K.
     let k1 = {
-      let single = @buffer.new()
+      let single = Buffer()
       single.write_bytesview(password)
       single.write_bytes(k)
       if user_string is Some(user_string) {
         single.write_bytesview(user_string)
       }
       let single = single.contents()
-      let repeated = @buffer.new(size_hint=single.length() * 64)
+      let repeated = Buffer(size_hint=single.length() * 64)
       for _ in 0..<64 {
         repeated.write_bytes(single)
       }
@@ -442,7 +442,7 @@ fn compute_hash_rev56(
   }
 
   // The first 32 bytes of the final K are the output of the algorithm.
-  Ok(k[:32].to_bytes())
+  Ok(k[:32].to_owned())
 }
 
 ///|
@@ -456,12 +456,12 @@ fn decryption_key_rev1234(
   permissions : UInt,
   id : Bytes,
 ) -> Result[Bytes, DecryptionError] {
-  let md5_input = @buffer.new()
+  let md5_input = Buffer()
 
   // TODO: Convert to PDFDocEncoding.
   // a) Pad or truncate password to 32 bytes using PASSWORD_PADDING.
   let copy_len = @cmp.minimum(password.length(), 32)
-  let padded_password = @buffer.new(size_hint=32)
+  let padded_password = Buffer(size_hint=32)
   padded_password.write_bytesview(password[:copy_len])
   if copy_len < 32 {
     padded_password.write_bytesview(password_padding[:32 - copy_len])
@@ -503,7 +503,7 @@ fn decryption_key_rev1234(
       hash = md5_calculate(hash[:byte_length])
     }
   }
-  let decryption_key = hash[:byte_length].to_bytes()
+  let decryption_key = hash[:byte_length].to_owned()
   Ok(decryption_key)
 }
 
@@ -530,7 +530,7 @@ fn authenticate_user_password_rev234(
     2 => if result != user_string { return Err(PasswordProtected) }
     3 | 4 =>
       if user_string.length() < 16 ||
-        result[:16].to_bytes() != user_string[:16].to_bytes() {
+        result[:16].to_owned() != user_string[:16].to_owned() {
         return Err(PasswordProtected)
       }
     _ => abort("unreachable")
@@ -555,7 +555,7 @@ fn user_password_rev2(decryption_key : Bytes) -> Bytes {
 fn user_password_rev34(decryption_key : Bytes, id : Bytes) -> Bytes {
   // a) Create a file encryption key based on the user password string.
   let rc = Rc4::new(decryption_key[:])
-  let input = @buffer.new()
+  let input = Buffer()
   // b) Initialise the MD5 hash function and pass the 32-byte padding string.
   input.write_bytes(password_padding)
 
@@ -636,7 +636,7 @@ fn decryption_key_rev56(
     Ok(h) => h
     Err(e) => return Err(e)
   }
-  if owner_check == owner_hash.to_bytes() {
+  if owner_check == owner_hash.to_owned() {
     // d) Compute an intermediate owner key by computing a hash using algorithm 2.B with an input string
     // consisting of the UTF-8 owner password concatenated with the 8 bytes of owner Key Salt,
     // concatenated with the 48-byte U string. The 32-byte result is the key used to decrypt the 32-byte OE string
@@ -662,7 +662,7 @@ fn decryption_key_rev56(
     Ok(h) => h
     Err(e) => return Err(e)
   }
-  if user_check == user_hash.to_bytes() {
+  if user_check == user_hash.to_owned() {
     // e) Compute an intermediate user key by computing a hash using algorithm 2.B with an input string
     // consisting of the UTF-8 user password concatenated with the 8 bytes of user Key Salt. The 32-byte result
     // is the key used to decrypt the 32-byte UE string using AES-256 in CBC mode with no padding and an

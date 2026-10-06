@@ -87,9 +87,9 @@ fn EncodedRadialAxialShading::native_gradient_kind(
     Radial(p1~, r~) =>
       Radial(
         start_center=@kurbo.point_zero,
-        start_radius=r.x.to_float(),
+        start_radius=Float::from_double(r.x),
         end_center=p1,
-        end_radius=r.y.to_float(),
+        end_radius=Float::from_double(r.y),
       )
   }
 }
@@ -183,7 +183,7 @@ fn EncodedRadialAxialShading::normalized_stitching_bounds(
     .map(bound => (bound - t0) / dt)
     .filter(bound => bound > 0.0 && bound < 1.0)
   if dt < 0.0 {
-    bounds.rev_inplace()
+    bounds.rev_in_place()
   }
   bounds
 }

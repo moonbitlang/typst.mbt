@@ -408,7 +408,7 @@ fn CidFontType::new(descriptor : @hayro_syntax.Dict) -> CidFontType? {
   guard stream is Some(stream) && stream.decoded() is Ok(data) else {
     return None
   }
-  let data = data.to_bytes()
+  let data = data.to_owned()
   if is_open_type(data) {
     // It's an OpenType font, either TrueType or CFF.
     match OpenTypeFontBlob::new(data, 0) {

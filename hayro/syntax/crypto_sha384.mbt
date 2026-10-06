@@ -10,7 +10,7 @@ fn sha384_calculate(data : BytesView) -> Bytes {
     0x67332667ffc00b31, 0x8eb44a8768581511, 0xdb0c2e0d64f98fa7, 0x47b5481dbefa4fa4,
   ]
   sha512_calculate_with_initial_values(data, h)
-  let result : Array[Byte] = Array::new(capacity=48)
+  let result : Array[Byte] = Array(capacity=48)
   for i in 0..<6 {
     write_u64_be(result, h[i])
   }

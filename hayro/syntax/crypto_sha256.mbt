@@ -108,7 +108,7 @@ fn sha256_calculate(data : BytesView) -> Bytes {
     h[6] = h[6] + g
     h[7] = h[7] + h_var
   }
-  let result : Array[Byte] = Array::new(capacity=32)
+  let result : Array[Byte] = Array(capacity=32)
   for hash_word in h {
     write_u32_be(result, hash_word)
   }

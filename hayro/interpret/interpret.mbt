@@ -537,7 +537,7 @@ pub fn interpret(
       }
       NextLineAndSetLeading(tx, ty) => {
         let (tx, ty) = (tx.as_f64(), ty.as_f64())
-        context.get().text_state.leading = (-ty).to_float()
+        context.get().text_state.leading = Float::from_double(-ty)
         next_line(context, tx, ty)
       }
       ShapeGlyph(_, _, _, _, _, _) => ()
