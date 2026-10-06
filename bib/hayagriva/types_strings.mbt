@@ -68,6 +68,9 @@ pub impl Show for FormatString with fn output(self, logger) {
 }
 
 ///|
+pub extend FormatString with Show::{to_string, output}
+
+///|
 /// `impl FromStr for FormatString`.
 pub fn FormatString::from_str(
   s : String,
@@ -258,6 +261,9 @@ pub impl Show for ChunkedStrParseError with fn output(self, logger) {
 }
 
 ///|
+pub extend ChunkedStrParseError with Show::{to_string, output}
+
+///|
 /// `impl FromStr for ChunkedString`.
 pub fn ChunkedString::from_str(
   s : String,
@@ -312,6 +318,9 @@ pub impl Show for ChunkedString with fn output(self, logger) {
 }
 
 ///|
+pub extend ChunkedString with Show::{to_string, output}
+
+///|
 /// A chunk of a string.
 pub(all) struct StringChunk {
   /// The string value.
@@ -364,6 +373,9 @@ pub impl Show for StringChunk with fn output(self, logger) {
     logger.write_string(self.value)
   }
 }
+
+///|
+pub extend StringChunk with Show::{to_string, output}
 
 ///|
 /// Writes the chunk as a parenthesized string.

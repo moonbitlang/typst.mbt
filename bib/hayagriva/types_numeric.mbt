@@ -84,6 +84,9 @@ pub impl Show for Numeric with fn output(self, logger) {
 }
 
 ///|
+pub extend Numeric with Show::{to_string, output}
+
+///|
 /// Format the value with a given form.
 pub fn[W : FmtWrite] Numeric::with_form(
   self : Numeric,
@@ -312,6 +315,9 @@ pub impl Show for NumericError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend NumericError with Show::{to_string, output}
 
 ///|
 /// Eat a number from the scanner, assuming leading whitespaces and zeros

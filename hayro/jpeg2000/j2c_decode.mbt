@@ -84,6 +84,9 @@ pub impl Default for DecoderContext with fn default() {
 }
 
 ///|
+pub extend DecoderContext with Default::{default}
+
+///|
 fn DecoderContext::reset(
   self : DecoderContext,
   header : Header,

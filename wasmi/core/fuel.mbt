@@ -218,6 +218,9 @@ pub impl Show for FuelError with fn output(self, logger) {
 }
 
 ///|
+pub extend FuelError with Show::{to_string, output}
+
+///|
 /// Returns an error indicating that fuel metering has been disabled.
 pub fn FuelError::fuel_metering_disabled() -> FuelError {
   FuelMeteringDisabled

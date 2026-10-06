@@ -128,6 +128,9 @@ pub impl Default for Options with fn default() {
 }
 
 ///|
+pub extend Options with Default::{default}
+
+///|
 /// Parses `Tree` from an SVG data.
 ///
 /// Can contain an SVG string or a gzip compressed data.

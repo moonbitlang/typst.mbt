@@ -500,3 +500,6 @@ pub impl Show for Duration with fn output(self, logger) {
   item("µs", (nanoseconds / 1_000 % 1_000).to_uint64())
   item("ns", (nanoseconds % 1_000).to_uint64())
 }
+
+///|
+pub extend Duration with Show::{to_string, output}

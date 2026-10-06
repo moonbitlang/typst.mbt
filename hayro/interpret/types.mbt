@@ -358,6 +358,9 @@ pub impl Default for StrokeProps with fn default() {
 }
 
 ///|
+pub extend StrokeProps with Default::{default}
+
+///|
 /// A fill rule.
 pub(all) enum FillRule {
   /// Non-zero filling.

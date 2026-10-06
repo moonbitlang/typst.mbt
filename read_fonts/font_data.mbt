@@ -37,6 +37,9 @@ pub impl Show for ReadError with fn output(self, logger) {
 }
 
 ///|
+pub extend ReadError with Show::{to_string, output}
+
+///|
 fn hex_upper8(v : UInt) -> String {
   let digits = "0123456789ABCDEF"
   let sb = StringBuilder()

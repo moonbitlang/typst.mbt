@@ -38,6 +38,9 @@ pub impl FmtWrite for StrBuf with fn write_char(self, c) {
 }
 
 ///|
+pub extend StrBuf with FmtWrite::{write_str, write_char}
+
+///|
 /// Format a value into a string with a writer function.
 fn fmt_to_string(f : (StrBuf) -> Unit) -> String {
   let b = StrBuf::new()

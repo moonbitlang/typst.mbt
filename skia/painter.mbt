@@ -42,6 +42,9 @@ pub impl Default for Paint with fn default() {
 }
 
 ///|
+pub extend Paint with Default::{default}
+
+///|
 /// Returns a copy of the paint.
 pub fn Paint::clone(self : Paint) -> Paint {
   { ..self, }

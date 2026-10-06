@@ -112,6 +112,7 @@ pub fn Dict::is_empty(Self) -> Bool
 pub fn Dict::keys(Self) -> Array[Name]
 pub fn Dict::len(Self) -> Int
 pub fn Dict::obj_id(Self) -> ObjectIdentifier?
+pub fn Dict::read(Reader, ReaderContext) -> Self?
 pub impl Default for Dict
 pub impl Eq for Dict
 pub impl Show for Dict
@@ -209,6 +210,8 @@ pub fn Name::new(BytesView) -> Self?
 pub fn Name::new_escaped(BytesView) -> Self?
 pub fn Name::new_unescaped(BytesView) -> Self
 pub fn Name::raw(Self) -> String
+pub fn Name::read(Reader, ReaderContext) -> Self?
+pub fn Name::skip(Reader, Bool) -> Unit?
 pub impl Compare for Name
 pub impl Show for Name
 pub impl ObjectLike for Name
@@ -224,6 +227,7 @@ pub fn Number::as_f64(Self) -> Double
 pub fn Number::as_i64(Self) -> Int64
 pub fn Number::from_f32(Float) -> Self
 pub fn Number::from_i32(Int) -> Self
+pub fn Number::read(Reader, ReaderContext) -> Self?
 pub impl ObjectLike for Number
 pub impl Readable for Number
 pub impl Skippable for Number
@@ -257,6 +261,7 @@ pub fn Object::into_name(Self) -> Name?
 pub fn Object::into_number(Self) -> Number?
 pub fn Object::into_stream(Self) -> Stream?
 pub fn Object::into_string(Self) -> PdfString?
+pub fn Object::skip(Reader, Bool) -> Unit?
 pub impl Eq for Object
 pub impl ObjectLike for Object
 pub impl Readable for Object
@@ -267,6 +272,7 @@ pub(all) struct ObjectIdentifier {
   gen_number : Int
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn ObjectIdentifier::new(Int, Int) -> Self
+pub fn ObjectIdentifier::skip(Reader, Bool) -> Unit?
 pub fn ObjectIdentifier::to_ref(Self) -> ObjRef
 pub impl Readable for ObjectIdentifier
 pub impl Skippable for ObjectIdentifier
@@ -318,6 +324,7 @@ pub fn PdfArray::empty() -> Self
 pub fn PdfArray::flex_iter(Self) -> FlexArrayIter
 pub fn[T : ObjectLike] PdfArray::iter(Self) -> Iter[T]
 pub fn PdfArray::raw_iter(Self) -> Iter[MaybeRef[Object]]
+pub fn PdfArray::read(Reader, ReaderContext) -> Self?
 pub fn[T : ObjectLike] PdfArray::to_fixed(Self, Int) -> Array[T]?
 pub fn[T : ObjectLike] PdfArray::to_vec(Self) -> Array[T]
 pub impl Eq for PdfArray
@@ -328,6 +335,7 @@ pub impl Skippable for PdfArray
 
 pub(all) struct PdfString(Bytes) derive(Eq, Hash)
 pub fn PdfString::as_bytes(Self) -> Bytes
+pub fn PdfString::read(Reader, ReaderContext) -> Self?
 pub impl Show for PdfString
 pub impl ObjectLike for PdfString
 pub impl Readable for PdfString
@@ -451,6 +459,7 @@ pub fn Stream::filters(Self) -> Array[Filter]
 pub fn Stream::new(BytesView, Dict) -> Self
 pub fn Stream::obj_id(Self) -> ObjectIdentifier
 pub fn Stream::raw_data(Self) -> BytesView
+pub fn Stream::read(Reader, ReaderContext) -> Self?
 pub impl Eq for Stream
 pub impl Show for Stream
 pub impl ObjectLike for Stream

@@ -131,6 +131,9 @@ pub(all) struct Variation {
 pub(all) struct Tag(UInt) derive(Eq, Compare, Hash, Default)
 
 ///|
+pub extend Tag with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Creates a `Tag` from bytes.
 pub fn Tag::from_bytes(bytes : Bytes) -> Tag {
   Tag(
@@ -204,6 +207,9 @@ pub impl Show for Tag with fn output(self, logger) {
     logger.write_char(c)
   }
 }
+
+///|
+pub extend Tag with Show::{to_string, output}
 
 ///|
 pub impl Debug for Tag with fn to_repr(self) {
@@ -437,6 +443,9 @@ pub fn Transform::is_default(self : Transform) -> Bool {
 pub impl Default for Transform with fn default() {
   { a: 1.0, b: 0.0, c: 0.0, d: 1.0, e: 0.0, f: 0.0, }
 }
+
+///|
+pub extend Transform with Default::{default}
 
 ///|
 pub impl Debug for Transform with fn to_repr(self) {

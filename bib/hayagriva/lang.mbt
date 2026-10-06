@@ -47,6 +47,9 @@ pub impl Default for TitleCase with fn default() {
 }
 
 ///|
+pub extend TitleCase with Default::{default}
+
+///|
 /// Rules for the sentence case transformation.
 pub(all) struct SentenceCase {
   /// Capitalize words that contain caps in a non-start position (e. g.
@@ -77,6 +80,9 @@ pub impl Default for SentenceCase with fn default() {
     trim_end: true,
   }
 }
+
+///|
+pub extend SentenceCase with Default::{default}
 
 ///|
 /// Which case to transform to

@@ -42,6 +42,9 @@ pub impl Show for ParseSyntaxError with fn output(self, logger) {
 }
 
 ///|
+pub extend ParseSyntaxError with Show::{to_string, output}
+
+///|
 fn[R] get_key(
   map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   key : String,

@@ -58,6 +58,9 @@ pub impl Default for Matrix with fn default() {
 }
 
 ///|
+pub extend Matrix with Default::{default}
+
+///|
 priv struct TopDict {
   mut charset_offset : Int?
   mut encoding_offset : Int?

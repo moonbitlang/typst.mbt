@@ -36,6 +36,9 @@ pub impl Show for BinaryReaderError with fn output(self, logger) {
 }
 
 ///|
+pub extend BinaryReaderError with Show::{to_string, output}
+
+///|
 fn BinaryReaderError::new_kind(
   kind : BinaryReaderErrorKind,
   message : String,

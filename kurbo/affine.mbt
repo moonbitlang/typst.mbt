@@ -170,3 +170,6 @@ pub fn Affine::then_scale(self : Affine, scale : Double) -> Affine {
 pub impl Default for Affine with fn default() {
   Affine::identity()
 }
+
+///|
+pub extend Affine with Default::{default}

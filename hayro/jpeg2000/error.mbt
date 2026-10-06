@@ -146,6 +146,9 @@ pub impl Show for FormatError with fn output(self, logger) {
 }
 
 ///|
+pub extend FormatError with Show::{to_string, output}
+
+///|
 pub impl Show for MarkerError with fn output(self, logger) {
   match self {
     Invalid => logger.write_string("invalid marker")
@@ -156,6 +159,9 @@ pub impl Show for MarkerError with fn output(self, logger) {
       logger.write_string("failed to parse \{marker} marker")
   }
 }
+
+///|
+pub extend MarkerError with Show::{to_string, output}
 
 ///|
 pub impl Show for TileError with fn output(self, logger) {
@@ -169,6 +175,9 @@ pub impl Show for TileError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend TileError with Show::{to_string, output}
 
 ///|
 pub impl Show for ValidationError with fn output(self, logger) {
@@ -190,6 +199,9 @@ pub impl Show for ValidationError with fn output(self, logger) {
 }
 
 ///|
+pub extend ValidationError with Show::{to_string, output}
+
+///|
 pub impl Show for DecodingError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -205,6 +217,9 @@ pub impl Show for DecodingError with fn output(self, logger) {
 }
 
 ///|
+pub extend DecodingError with Show::{to_string, output}
+
+///|
 pub impl Show for ColorError with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -215,3 +230,6 @@ pub impl Show for ColorError with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend ColorError with Show::{to_string, output}

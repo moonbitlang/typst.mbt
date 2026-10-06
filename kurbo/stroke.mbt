@@ -54,6 +54,9 @@ pub impl Default for StrokeOpts with fn default() {
 }
 
 ///|
+pub extend StrokeOpts with Default::{default}
+
+///|
 pub impl Default for Stroke with fn default() {
   Stroke::new(1.0)
 }

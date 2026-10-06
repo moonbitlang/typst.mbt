@@ -19,6 +19,9 @@ pub impl Show for ViewBoxError with fn output(self, logger) {
 }
 
 ///|
+pub extend ViewBoxError with Show::{to_string, output}
+
+///|
 /// Representation of the [`<viewBox>`] type.
 ///
 /// [`<viewBox>`]: https://www.w3.org/TR/SVG2/coords.html#ViewBoxAttribute

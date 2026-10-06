@@ -73,6 +73,8 @@ pub(all) suberror ReadError {
   MetricIsMissing(@font_types.Tag)
   MalformedData(String)
 }
+pub fn ReadError::output(Self, &Logger) -> Unit
+pub fn ReadError::to_string(Self) -> String
 pub impl Show for ReadError
 
 // Types and methods

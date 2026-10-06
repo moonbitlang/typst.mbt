@@ -13,6 +13,9 @@ pub struct Date {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+pub extend Date with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int]] = [
   [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
   [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335],
@@ -511,3 +514,6 @@ pub impl Show for Date with fn output(self, logger) {
   logger.write_string("-")
   logger.write_string(zero_pad(day, 2))
 }
+
+///|
+pub extend Date with Show::{to_string, output}

@@ -152,6 +152,9 @@ pub impl Default for PixmapPaint with fn default() {
 }
 
 ///|
+pub extend PixmapPaint with Default::{default}
+
+///|
 /// A pattern shader.
 ///
 /// Essentially a `SkImageShader`.

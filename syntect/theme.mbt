@@ -86,6 +86,9 @@ pub(all) struct ThemeSettings {
 } derive(Default)
 
 ///|
+pub extend ThemeSettings with Default::{default}
+
+///|
 /// A component of a theme meant to highlight a specific thing (e.g string
 /// literals) in a certain way.
 pub(all) struct ThemeItem {

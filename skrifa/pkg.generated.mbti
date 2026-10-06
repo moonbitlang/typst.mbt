@@ -46,6 +46,8 @@ pub(all) suberror ToPathError {
   ExpectedCubic(Int)
   PointFlagMismatch(num_points~ : Int, num_flags~ : Int)
 }
+pub fn ToPathError::output(Self, &Logger) -> Unit
+pub fn ToPathError::to_string(Self) -> String
 pub impl Show for ToPathError
 
 // Types and methods

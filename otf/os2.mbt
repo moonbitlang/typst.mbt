@@ -185,6 +185,9 @@ pub(all) struct UnicodeRanges {
 } derive(Eq, Default, Debug)
 
 ///|
+pub extend UnicodeRanges with Default::{default}
+
+///|
 /// Checks if ranges contain the specified character.
 pub fn UnicodeRanges::contains_char(self : UnicodeRanges, c : Char) -> Bool {
   let range = char_range_index(c)

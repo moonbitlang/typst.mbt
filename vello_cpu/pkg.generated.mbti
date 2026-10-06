@@ -28,6 +28,7 @@ pub(all) struct BlendMode {
   mix : Mix
   compose : Compose
 } derive(Eq)
+pub fn BlendMode::default() -> Self
 pub fn BlendMode::is_destructive(Self) -> Bool
 pub fn BlendMode::new(Mix, Compose) -> Self
 pub impl Default for BlendMode

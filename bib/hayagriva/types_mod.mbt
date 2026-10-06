@@ -290,6 +290,9 @@ pub impl Show for QualifiedUrl with fn output(self, logger) {
 }
 
 ///|
+pub extend QualifiedUrl with Show::{to_string, output}
+
+///|
 /// A publisher, possibly with a location.
 pub(all) struct Publisher {
   /// Publisher of the item.
