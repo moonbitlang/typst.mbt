@@ -1,11 +1,12 @@
 // `DataTable` (docs/edsl-ports.md, section 4; findings H5, N9 and S5):
 // what it expands to, the check of its rows, the header on every page,
 // rows that are not split, the lines it draws with and without a frame and
-// at the end of a page, the looks that are the table's and the rules of
-// the document that reach its cells, and the provenance of its parts. The
-// pairs with a Typst twin are in `doc/twins/kit.mbt`. The page is that of
-// `cards_test.mbt`: 200pt by 120pt with 10pt margins and 10pt text, so a
-// row of one line is 16.6pt high (5pt of inset above and below).
+// at the end of a page, the surface of a frame (in pixels), the looks that
+// are the table's and the rules of the document that reach its cells, and
+// the provenance of its parts. The pairs with a Typst twin are in
+// `doc/twins/kit.mbt`. The page is that of `cards_test.mbt`: 200pt by
+// 120pt with 10pt margins and 10pt text, so a row of one line is 16.6pt
+// high (5pt of inset above and below).
 
 ///|
 using @doc {
@@ -709,6 +710,339 @@ test "data table: the frame, and the end of a page" {
 }
 
 ///|
+/// A page of the tests that is not white.
+fn tinted_page() -> Array[&IntoContent] {
+  [
+    SetPage(
+      width=Pt(200),
+      height=Pt(120),
+      margin=Sides(all=Pt(10)),
+      fill=Luma(225),
+    ),
+    SetText(size=Pt(10)),
+  ]
+}
+
+///|
+/// The frame of the table on page `page`: the box that has a stroke.
+fn frame_on(
+  report : @doc.CompileReport[@layout.PagedDocument],
+  page : Int,
+) -> Drawn raise {
+  of_kind(drawn(report), "box").filter(d => d.stroke != "" && d.page == page)[0]
+}
+
+///|
+/// A page that holds nothing but a white rounded box with the outline of
+/// `frame`, at its place and of its size: what the frame of a table is
+/// without the table.
+fn box_alone(frame : Drawn) -> Pixels raise {
+  let report = compile(
+    [
+      Pad(
+        Block(
+          Seq([]),
+          width=Pt(frame.w),
+          height=@doc.Length::Pt(frame.h).sizing(),
+          fill=White,
+          stroke=Sides(all=rule),
+          radius=round,
+        ),
+        left=Pt(frame.x - 10.0),
+      ),
+    ],
+    setup=tinted_page(),
+  )
+  let alone = frame_on(report, 1)
+  assert_eq([pt(alone.x), pt(alone.y), pt(alone.w), pt(alone.h)], [
+    pt(frame.x),
+    pt(frame.y),
+    pt(frame.w),
+    pt(frame.h),
+  ])
+  pixels(report)
+}
+
+///|
+/// Where the outline of the table's frame on page `page` differs from the
+/// box alone: on its four sides and in its corners, but not where a rule
+/// of the table meets it.
+fn frame_differences(
+  report : @doc.CompileReport[@layout.PagedDocument],
+  page : Int,
+) -> String raise {
+  let frame = frame_on(report, page)
+  let rules = of_kind(drawn(report), "line")
+    .filter(d => d.page == page)
+    .map(d => (d.y - 0.25, d.y + 0.25))
+  outline_differences(
+    pixels(report, page~),
+    box_alone(frame),
+    (frame.x, frame.y, frame.w, frame.h),
+    skip=rules,
+  )
+}
+
+///|
+/// A framed table of `count` rows with the fill of its cells and of its
+/// frame.
+fn surfaced(
+  fill : Cells[@doc.Paint]?,
+  frame_fill : @doc.Paint?,
+  count? : Int = 2,
+) -> @kit.DataTable {
+  @kit.DataTable(
+    head,
+    two_columns(count),
+    columns=[Fr(1), Fr(1)],
+    fill?,
+    stroke=rule,
+    radius=round,
+    frame_fill?,
+  )
+}
+
+///|
+test "data table: the surface of a frame" {
+  // The expansion: the fill of the block that is the frame.
+  assert_eq(
+    lowered([
+      @kit.DataTable(
+        head,
+        two_columns(1),
+        columns=[Auto, Fr(1)],
+        stroke=rule,
+        radius=round,
+        frame_fill=White,
+      ),
+    ]),
+    lowered([
+      Block(
+        Seq([
+          SetTableCell(breakable=false),
+          Table(
+            [
+              TableHeader(["A", "B"]),
+              "a0",
+              "b0",
+              TableHline(stroke=Stroke::none()),
+            ],
+            columns=[Auto, Fr(1)],
+            stroke=Cells::all(Sides(bottom=rule, rest=Stroke::none())),
+          ),
+        ]),
+        fill=White,
+        stroke=Sides(all=rule),
+        radius=round,
+        clip=true,
+      ),
+    ]),
+  )
+  // A framed table on a page that is not white, its surface given in the
+  // two ways: as the fill of every cell (all that the element had), and as
+  // the fill of the frame.
+  let by_cells = compile(
+    [surfaced(Some(Cells::all(White)), None)],
+    setup=tinted_page(),
+  )
+  let by_frame = compile([surfaced(None, Some(White))], setup=tinted_page())
+  inspect(errors(by_cells) + errors(by_frame), content="")
+  // What the engine paints, in its order (`layout/flow_block.mbt`): the
+  // block's fill, then its stroke, both on the outline of the block; then
+  // what is in the block, clipped to the inner edge of the stroke (half
+  // its thickness inside the outline: `clip_rect`). So the fills of the
+  // cells are painted after the outline, up to the edge where it ends ..
+  inspect(
+    painted(by_cells),
+    content=(
+      #|stroke 10.00,10.00 180.00x49.74 0.50 luma(47.06%)
+      #|clip 10.25,10.25 179.50x49.24
+      #|  fill 10.00,10.00 90.00x16.58 luma(100%)
+      #|  fill 10.00,26.58 90.00x16.58 luma(100%)
+      #|  fill 10.00,43.16 90.00x16.58 luma(100%)
+      #|  fill 100.00,10.00 90.00x16.58 luma(100%)
+      #|  fill 100.00,26.58 90.00x16.58 luma(100%)
+      #|  fill 100.00,43.16 90.00x16.58 luma(100%)
+      #|  stroke 9.75,26.58 180.50x0.00 0.50 luma(47.06%)
+      #|  stroke 9.75,43.16 180.50x0.00 0.50 luma(47.06%)
+    ),
+  )
+  // .. and the fill of the frame before it, beneath it.
+  inspect(
+    painted(by_frame),
+    content=(
+      #|fill 10.00,10.00 180.00x49.74 luma(100%)
+      #|stroke 10.00,10.00 180.00x49.74 0.50 luma(47.06%)
+      #|clip 10.25,10.25 179.50x49.24
+      #|  stroke 9.75,26.58 180.50x0.00 0.50 luma(47.06%)
+      #|  stroke 9.75,43.16 180.50x0.00 0.50 luma(47.06%)
+    ),
+  )
+  // In pixels (110 per inch; the left side of the frame, in a row of
+  // pixels through the first row of the table): the page, the two columns
+  // that the outline of 0.5pt touches, the surface. The box alone has the
+  // outline as it is drawn on its fill.
+  let alone = box_alone(frame_on(by_frame, 1))
+  let row = alone.pixel(35.0)
+  inspect(alone.across(row, 12, 18), content="225 225 206 173 255 255")
+  // With the surface in the cells the inner column of the outline is
+  // lighter: the fill of a cell is painted over it through the clip,
+  // whose edge is antialiased in the pixels where the outline's is.
+  inspect(
+    pixels(by_cells).across(row, 12, 18),
+    content="225 225 206 187 255 255",
+  )
+  inspect(
+    pixels(by_frame).across(row, 12, 18),
+    content="225 225 206 173 255 255",
+  )
+  // On all four sides and in the corners: with the surface in the frame
+  // the outline is the outline of the box alone, pixel for pixel; with
+  // the surface in the cells every pixel of its inner edge differs.
+  inspect(frame_differences(by_frame, 1), content="")
+  inspect(
+    frame_differences(by_cells, 1).split("\n").collect().length(),
+    content="1015",
+  )
+  // Not for want of a fill beneath: with the surface in the frame and in
+  // the cells too, the inner column is lighter still.
+  let both = compile(
+    [surfaced(Some(Cells::all(White)), Some(White))],
+    setup=tinted_page(),
+  )
+  inspect(pixels(both).across(row, 12, 18), content="225 225 206 194 255 255")
+  // How much depends on where the outline falls among the pixels: the
+  // same tables 5pt and 10pt further to the right, the surface in the
+  // cells and in the frame. (Where the page is darker than the surface
+  // it also shows beneath the outline, which the cells do not reach
+  // under: 149 for 153 in the second pair.)
+  let moved : Array[String] = []
+  for left in [5.0, 10.0] {
+    let from = alone.pixel(10.0 + left) - 1
+    for
+      table in [
+        surfaced(Some(Cells::all(White)), None),
+        surfaced(None, Some(White)),
+      ] {
+      let report = compile([Pad(table, left=Pt(left))], setup=tinted_page())
+      moved.push(
+        "\{pt(10.0 + left)}pt: " + pixels(report).across(row, from, from + 4),
+      )
+    }
+    let report = compile(
+      [Pad(surfaced(None, Some(White)), left=Pt(left))],
+      setup=tinted_page(),
+    )
+    assert_eq(frame_differences(report, 1), "")
+  }
+  inspect(
+    moved.join("\n"),
+    content=(
+      #|15.0pt: 225 178 240 255
+      #|15.0pt: 225 178 213 255
+      #|20.0pt: 225 149 255 255
+      #|20.0pt: 225 153 250 255
+    ),
+  )
+  // At the end of a page: a table of eight rows is framed on both pages,
+  // and each part is a whole box with its surface. Top, bottom, sides and
+  // corners of both parts are those of the box alone.
+  let long = compile(
+    [surfaced(None, Some(White), count=8)],
+    setup=tinted_page(),
+  )
+  inspect(
+    listing(drawn(long).filter(d => d.kind == "box")),
+    content=(
+      #|p1 box 10.0,10.0 180.0x99.5 luma(100%)
+      #|p1 box 10.0,10.0 180.0x99.5 stroke 0.5 luma(47.06%)
+      #|p2 box 10.0,10.0 180.0x66.3 luma(100%)
+      #|p2 box 10.0,10.0 180.0x66.3 stroke 0.5 luma(47.06%)
+    ),
+  )
+  inspect(frame_differences(long, 1), content="")
+  inspect(frame_differences(long, 2), content="")
+  let long_cells = compile(
+    [surfaced(Some(Cells::all(White)), None, count=8)],
+    setup=tinted_page(),
+  )
+  inspect(
+    [1, 2]
+    .map(page => {
+      frame_differences(long_cells, page).split("\n").collect().length()
+    })
+    .map(count => count.to_string())
+    .join(" "),
+    content="1210 814",
+  )
+  // The cells that differ from the surface keep their fill (a header, a
+  // marked row), and it meets the outline as every fill of a cell does:
+  // in the rows of those cells the inner column takes some of it, in the
+  // other rows the outline is the box's.
+  let header : Cells[@doc.Paint] = Cells((_, y) => {
+    if y == 0 {
+      Luma(200)
+    } else {
+      None
+    }
+  })
+  let with_header = compile(
+    [surfaced(Some(header), Some(White))],
+    setup=tinted_page(),
+  )
+  let in_header = alone.pixel(18.0)
+  inspect(
+    pixels(with_header).across(in_header, 12, 18),
+    content="225 225 206 180 200 200",
+  )
+  inspect(
+    pixels(with_header).across(row, 12, 18),
+    content="225 225 206 173 255 255",
+  )
+  // A frame is the choice of `radius`: without one there is nothing that
+  // `frame_fill` fills, which is an error at it and not a fill that is
+  // dropped.
+  let unframed = compile([
+    @kit.DataTable(head, two_columns(1), columns=[Auto, Auto], frame_fill=White),
+  ])
+  inspect(
+    errors(unframed),
+    content=(
+      #|a `DataTable` has a frame only with a `radius`: `frame_fill` is the fill of the frame
+    ),
+  )
+  inspect(
+    error_place(unframed),
+    content=(
+      #|DataTable a8
+    ),
+  )
+  // A square frame is a radius of nothing.
+  let square = compile(
+    [
+      @kit.DataTable(
+        head,
+        two_columns(1),
+        columns=[Fr(1), Fr(1)],
+        stroke=rule,
+        radius=Corners(all=Pt(0)),
+        frame_fill=White,
+      ),
+    ],
+    setup=tinted_page(),
+  )
+  inspect(
+    painted(square),
+    content=(
+      #|fill 10.00,10.00 180.00x33.16 luma(100%)
+      #|stroke 10.00,10.00 180.00x33.16 0.50 luma(47.06%)
+      #|clip 10.25,10.25 179.50x32.66
+      #|  stroke 9.75,26.58 180.50x0.00 0.50 luma(47.06%)
+    ),
+  )
+}
+
+///|
 test "data table: alignment, fills and insets are the table's, per cell" {
   // Numbers to the right: an alignment per column.
   let rows : Array[Array[&IntoContent]] = [
@@ -796,6 +1130,35 @@ test "data table: the text is styled by the rules of the document" {
       #|second: 8.0pt Libertinus Serif
       #|1204: 8.0pt DejaVu Sans Mono
       #|after: 10.0pt Libertinus Serif
+    ),
+  )
+  // The header of the documents that were rebuilt with the kit, which all
+  // three wrote: the strings of the head in capitals, and one rule for
+  // the text of the cells of row 0. Nothing of it is the element's.
+  let labels = ["Name", "Count"]
+  let capitals = compile([
+    Seq([
+      ShowSet(
+        Select::table_cell(y=0),
+        SetText(size=Pt(6), fill=Luma(90), tracking=Pt(0.3)),
+      ),
+      @kit.DataTable(
+        labels.map(label => label.to_upper() as &IntoContent),
+        [["first", "7"]],
+        columns=[Fr(1), Auto],
+      ),
+    ]),
+  ])
+  inspect(errors(capitals) + warnings(capitals), content="")
+  inspect(
+    of_kind(drawn(capitals), "text")
+    .map(run => "\{run.text}: \{pt(run.h)}pt \{run.fill}")
+    .join("\n"),
+    content=(
+      #|NAME: 6.0pt luma(35.29%)
+      #|COUNT: 6.0pt luma(35.29%)
+      #|first: 10.0pt luma(0%)
+      #|7: 10.0pt luma(0%)
     ),
   )
   // `Table`'s other parameters come from a set rule, as for any table.
@@ -1082,6 +1445,27 @@ test "data table: provenance" {
       #|DataTable a7
     ),
   )
+  let surface = compile([
+    @kit.DataTable(
+      head,
+      [],
+      columns=[Auto, Auto],
+      radius=round,
+      frame_fill=paint,
+    ),
+  ])
+  inspect(
+    errors(surface),
+    content=(
+      #|expected color, gradient, tiling, or none, found string
+    ),
+  )
+  inspect(
+    error_place(surface),
+    content=(
+      #|DataTable a8
+    ),
+  )
   // A key that `Keyed` does not take is an error at `key`.
   let reserved = compile([
     @kit.DataTable(head, two_columns(2), columns=[Auto, Auto], key=row => {
@@ -1101,7 +1485,7 @@ test "data table: provenance" {
   inspect(
     error_place(reserved),
     content=(
-      #|DataTable a9
+      #|DataTable a10
     ),
   )
   // An error in a cell is in its row: at the cell's own call under the

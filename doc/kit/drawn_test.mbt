@@ -1,5 +1,6 @@
 // What is on the pages of a compiled document, for the tests of `Chip` and
-// `DataTable`: boxes, lines and text runs, with what they are drawn in.
+// `DataTable`: boxes, lines and text runs, with what they are drawn in;
+// and the order in which a page paints its shapes, with what clips them.
 // (`cards_test.mbt` has the page of the tests, `compile` and the helpers
 // for origins.)
 
@@ -209,4 +210,78 @@ fn lines_of_text(
   of_kind(drawn(report), "text")
   .map(d => "p\{d.page} \{pt(d.x)},\{pt(d.y)} \{shown(d.text)}")
   .join("\n")
+}
+
+///|
+/// The shapes of a frame at `(dx, dy)` in the order in which they are
+/// drawn, one line each, with what clips them: a group that clips is a
+/// line `clip` with the box around its path, and what it holds is indented
+/// under it. A shape is `fill` or `stroke` with the box around its outline
+/// (a line: its start and its extent) and its paint. Text is left out.
+/// (`hundredths` is in `canvas_test.mbt`.)
+fn collect_painted(
+  frame : @library.Frame,
+  dx : Double,
+  dy : Double,
+  indent : String,
+  out : Array[String],
+) -> Unit {
+  for entry in frame.items() {
+    let x = dx + entry.0.x.to_pt()
+    let y = dy + entry.0.y.to_pt()
+    let boxed = (box : (Double, Double, Double, Double)) => {
+      let (left, top, right, bottom) = box
+      let at = "\{hundredths(x + left)},\{hundredths(y + top)}"
+      "\{at} \{hundredths(right - left)}x\{hundredths(bottom - top)}"
+    }
+    match entry.1 {
+      Group(group) => {
+        let gx = x + group.transform.tx.to_pt()
+        let gy = y + group.transform.ty.to_pt()
+        guard group.clip is Some(curve) else {
+          collect_painted(group.frame, gx, gy, indent, out)
+          continue
+        }
+        guard outline_box(Curve(curve)) is Some((left, top, right, bottom)) else {
+          continue
+        }
+        let at = "\{hundredths(gx + left)},\{hundredths(gy + top)}"
+        out.push(
+          "\{indent}clip \{at} \{hundredths(right - left)}x\{hundredths(bottom - top)}",
+        )
+        collect_painted(group.frame, gx, gy, indent + "  ", out)
+      }
+      Shape(shape, _) => {
+        let at = match shape.geometry {
+          Line(to) => {
+            let extent = "\{hundredths(to.x.to_pt())}x\{hundredths(to.y.to_pt())}"
+            "\{hundredths(x)},\{hundredths(y)} \{extent}"
+          }
+          geometry => {
+            guard outline_box(geometry) is Some(box) else { continue }
+            boxed(box)
+          }
+        }
+        if shape.fill is Some(paint) {
+          out.push("\{indent}fill \{at} \{paint.repr()}")
+        }
+        if shape.stroke is Some(stroke) {
+          let thickness = hundredths(stroke.thickness.to_pt())
+          out.push("\{indent}stroke \{at} \{thickness} \{stroke.paint.repr()}")
+        }
+      }
+      _ => ()
+    }
+  }
+}
+
+///|
+/// What page `page` (from 1) of a compiled document paints, in its order.
+fn painted(
+  report : @doc.CompileReport[@layout.PagedDocument],
+  page? : Int = 1,
+) -> String raise {
+  let out = []
+  collect_painted(report.unwrap().pages()[page - 1].frame, 0.0, 0.0, "", out)
+  out.join("\n")
 }
