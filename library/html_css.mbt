@@ -16,6 +16,16 @@
 pub struct CssProperties(Array[CssProperty]) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperties with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperties with Hash::{hash, hash_combine}
+
+///|
 /// Creates an empty list.
 pub fn CssProperties::new() -> CssProperties {
   CssProperties([])
@@ -25,6 +35,11 @@ pub fn CssProperties::new() -> CssProperties {
 pub impl Default for CssProperties with fn default() {
   CssProperties::new()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperties with Default::{default}
 
 ///|
 /// A copy of the list that can be modified independently.
@@ -125,6 +140,11 @@ pub impl Reflect for CssProperties with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperties with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CssProperties with fn into_value(self) {
   Dyn(HtmlCss(self))
 }
@@ -139,6 +159,11 @@ pub impl FromValue for CssProperties with fn from_value(v) {
     _ => bail("expected CSS properties, found \{v.ty()}")
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperties with FromValue::{from_value}
 
 ///|
 /// Rust's `str` ordering (MoonBit's `String::compare` orders by length
@@ -216,6 +241,21 @@ pub struct CssProperty {
   /// The property's serialized value, e.g. `block`.
   value : String
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperty with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperty with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssProperty with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new property pair from its parts.
@@ -468,15 +508,30 @@ pub impl ToCss for Abs with fn emit(self, w) {
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with ToCss::{emit}
+
+///|
 pub impl ToCss for Em with fn emit(self, w) {
   w.emit(CssNumber(self.get()))
   w.write("em")
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with ToCss::{emit}
+
+///|
 pub impl ToCss for Length with fn emit(self, w) {
   w.calc().sum(self.em).sum(self.abs).finish()
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with ToCss::{emit}
 
 ///|
 pub impl ToCss for Angle with fn emit(self, w) {
@@ -485,15 +540,30 @@ pub impl ToCss for Angle with fn emit(self, w) {
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with ToCss::{emit}
+
+///|
 pub impl ToCss for Ratio with fn emit(self, w) {
   w.emit(CssNumberWithPrecision(self.get() * 100.0, 2))
   w.write("%")
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with ToCss::{emit}
+
+///|
 pub impl ToCss for Rel[Length] with fn emit(self, w) {
   w.calc().sum(self.rel).sum(self.abs.em).sum(self.abs.abs).finish()
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with ToCss::{emit}
 
 ///|
 pub impl ToCss for Paint with fn emit(self, w) {
@@ -503,6 +573,11 @@ pub impl ToCss for Paint with fn emit(self, w) {
     Tiling(_) => w.fail("tiling")
   }
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with ToCss::{emit}
 
 ///|
 pub impl ToCss for Color with fn emit(self, w) {
@@ -516,6 +591,11 @@ pub impl ToCss for Color with fn emit(self, w) {
     Hsl(_) | Hsv(_) => w.emit(process.to_hsl())
   }
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with ToCss::{emit}
 
 ///|
 pub impl ToCss for Rgb with fn emit(self, w) {
@@ -550,6 +630,11 @@ pub impl ToCss for Rgb with fn emit(self, w) {
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rgb with ToCss::{emit}
+
+///|
 pub impl ToCss for Oklab with fn emit(self, w) {
   w
   .call("oklab", Space)
@@ -561,6 +646,11 @@ pub impl ToCss for Oklab with fn emit(self, w) {
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklab with ToCss::{emit}
+
+///|
 pub impl ToCss for Oklch with fn emit(self, w) {
   w
   .call("oklch", Space)
@@ -570,6 +660,11 @@ pub impl ToCss for Oklch with fn emit(self, w) {
   .maybe_alpha_arg(self.alpha.to_double())
   .finish()
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklch with ToCss::{emit}
 
 ///|
 pub impl ToCss for LinearRgb with fn emit(self, w) {
@@ -584,6 +679,11 @@ pub impl ToCss for LinearRgb with fn emit(self, w) {
 }
 
 ///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinearRgb with ToCss::{emit}
+
+///|
 pub impl ToCss for Hsl with fn emit(self, w) {
   w
   .call("hsl", Space)
@@ -593,6 +693,11 @@ pub impl ToCss for Hsl with fn emit(self, w) {
   .maybe_alpha_arg(self.alpha.to_double())
   .finish()
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Hsl with ToCss::{emit}
 
 ///|
 /// palette's `IntoStimulus<f32> for u8` (as used by `into_format`), widened
@@ -606,6 +711,11 @@ fn css_u8_to_f32(x : Int) -> Double {
 pub impl ToCss for CssDisplay with fn emit(self, w) {
   w.write(self.as_str())
 }
+
+///|
+#deprecated("call as `ToCss::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssDisplay with ToCss::{emit}
 
 ///|
 /// Convert a raw degree value into an `Angle`.

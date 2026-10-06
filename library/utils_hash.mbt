@@ -19,7 +19,27 @@ pub(all) struct U128 {
 } derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub extend U128 with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with @debug.Debug::{to_repr}
 
 ///|
 /// Create a 128-bit integer from a 64-bit one.
@@ -46,6 +66,11 @@ pub impl Show for U128 with fn output(self, logger) {
   logger.write_string(hex(self.hi))
   logger.write_string(hex(self.lo))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Show::{to_string, output}
 
 ///|
 /// A SipHash-1-3 hasher with 128-bit output and zero keys (upstream
@@ -412,6 +437,11 @@ pub impl Fingerprint for U128 with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend U128 with Fingerprint::{fingerprint}
+
+///|
 pub impl[T : Fingerprint] Fingerprint for T? with fn fingerprint(self, state) {
   match self {
     None => state.write_discriminant(0)
@@ -558,9 +588,19 @@ pub impl Eq for LazyFingerprint with fn equal(_, _) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LazyFingerprint with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for LazyFingerprint with fn hash_combine(_, _) {
   ()
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LazyFingerprint with Hash::{hash, hash_combine}
 
 ///|
 /// Forget the cached fingerprint (the owner's data is about to change).

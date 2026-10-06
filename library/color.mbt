@@ -50,6 +50,16 @@ pub(all) struct Cmyk {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cmyk with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Cmyk with @debug.Debug::{to_repr}
+
+///|
 /// A spot color.
 pub(all) struct SpotColor {
   /// Which colorant to apply.
@@ -57,6 +67,11 @@ pub(all) struct SpotColor {
   /// How much of the colorant to apply to the medium.
   tint : Ratio
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColor with Eq::{not_equal, equal}
 
 ///|
 /// A spot colorant from which spot colors can be created.
@@ -68,6 +83,11 @@ pub(all) struct SpotColorant {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColorant with Eq::{not_equal, equal}
+
+///|
 /// The name of a spot colorant.
 pub(all) enum SpotColorantName {
   /// The special `"all"` colorant that applies to all separation colorants.
@@ -77,6 +97,11 @@ pub(all) enum SpotColorantName {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColorantName with Eq::{not_equal, equal}
+
+///|
 /// A color space for color manipulation.
 pub(all) enum ColorSpace {
   /// A mixable color space with a well-defined color model.
@@ -84,6 +109,11 @@ pub(all) enum ColorSpace {
   /// A spot colorant.
   Spot(SpotColorant)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Eq::{not_equal, equal}
 
 ///|
 /// A color space for color manipulation.
@@ -105,6 +135,16 @@ pub(all) enum ProcessColorSpace {
   /// The CMYK color space.
   Cmyk
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColorSpace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColorSpace with @debug.Debug::{to_repr}
 
 // Constants.
 
@@ -913,6 +953,11 @@ pub impl Eq for Color with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for Color with fn hash_combine(self, hasher) {
   match self {
     Process(c) => {
@@ -926,6 +971,11 @@ pub impl Hash for Color with fn hash_combine(self, hasher) {
     }
   }
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Hash::{hash, hash_combine}
 
 ///|
 /// Constructs a new color from hex strings like `#aef`, `7a03c2` or
@@ -1511,6 +1561,11 @@ pub impl Eq for ProcessColor with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColor with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for ProcessColor with fn hash_combine(self, hasher) {
   hasher.combine_int(
     match self {
@@ -1921,6 +1976,11 @@ pub impl IntoValue for Color with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Color with fn from_value(v) {
   match v {
     Color(c) => c
@@ -1955,6 +2015,11 @@ pub impl IntoValue for ProcessColor with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColor with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ProcessColor with fn from_value(v) {
   if Color::castable(v) {
     match Color::from_value(v) {
@@ -1964,6 +2029,11 @@ pub impl FromValue for ProcessColor with fn from_value(v) {
   }
   raise HintedError(ProcessColor::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColor with FromValue::{from_value}
 
 ///|
 pub impl Reflect for SpotColorant with fn input() {
@@ -2032,6 +2102,11 @@ pub impl IntoValue for SpotColorantName with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColorantName with IntoValue::{into_value}
+
+///|
 pub impl FromValue for SpotColorantName with fn from_value(v) {
   match v {
     Str("all") => All
@@ -2040,6 +2115,11 @@ pub impl FromValue for SpotColorantName with fn from_value(v) {
     v => raise HintedError(SpotColorantName::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpotColorantName with FromValue::{from_value}
 
 ///|
 pub impl Reflect for ColorSpace with fn input() {
@@ -2087,6 +2167,11 @@ pub impl FromValue for ColorSpace with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with FromValue::{from_value}
+
+///|
 pub impl Reflect for ProcessColorSpace with fn input() {
   Any
 }
@@ -2102,9 +2187,19 @@ pub impl Reflect for ProcessColorSpace with fn castable(_) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColorSpace with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ProcessColorSpace with fn into_value(self) {
   self.variant_constructor()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColorSpace with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ProcessColorSpace with fn from_value(v) {
@@ -2118,6 +2213,11 @@ pub impl FromValue for ProcessColorSpace with fn from_value(v) {
     None => bail(expected)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ProcessColorSpace with FromValue::{from_value}
 
 ///|
 pub impl Reflect for WeightedColor with fn input() {
@@ -2143,6 +2243,11 @@ pub impl IntoValue for WeightedColor with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightedColor with IntoValue::{into_value}
+
+///|
 pub impl FromValue for WeightedColor with fn from_value(v) {
   match v {
     Color(color) => { color, weight: 1.0, }
@@ -2158,6 +2263,11 @@ pub impl FromValue for WeightedColor with fn from_value(v) {
     v => raise HintedError(WeightedColor::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WeightedColor with FromValue::{from_value}
 
 ///|
 /// A weight for color mixing (upstream `Weight`): a float or a ratio.
@@ -2201,6 +2311,11 @@ pub impl IntoValue for RatioComponent with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RatioComponent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RatioComponent with fn from_value(v) {
   match v {
     Ratio(r) =>
@@ -2212,6 +2327,11 @@ pub impl FromValue for RatioComponent with fn from_value(v) {
     v => raise HintedError(RatioComponent::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RatioComponent with FromValue::{from_value}
 
 ///|
 /// A chroma color component: a ratio (relative to 0.4) or a float.
@@ -2241,6 +2361,11 @@ pub impl IntoValue for ChromaComponent with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChromaComponent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ChromaComponent with fn from_value(v) {
   match v {
     Int(i) => ChromaComponent(f32_(i.to_double()))
@@ -2249,6 +2374,11 @@ pub impl FromValue for ChromaComponent with fn from_value(v) {
     v => raise HintedError(ChromaComponent::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChromaComponent with FromValue::{from_value}
 
 ///|
 /// An integer or ratio component.
@@ -2278,6 +2408,11 @@ pub impl IntoValue for Component with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Component with fn from_value(v) {
   match v {
     Int(i) =>
@@ -2295,6 +2430,11 @@ pub impl FromValue for Component with fn from_value(v) {
     v => raise HintedError(Component::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with FromValue::{from_value}
 
 // Preset color maps.
 

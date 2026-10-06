@@ -373,3 +373,9 @@ pub impl @library.Output for HtmlDocument with fn create(
 ) {
   html_document(engine, content, styles)
 }
+
+///|
+// `introspector` is not named here: the type already has a method of this name.
+#deprecated("call as `Output::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlDocument with @library.Output::{create, target}

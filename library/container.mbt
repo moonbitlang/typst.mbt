@@ -99,9 +99,19 @@ pub(all) enum BlockBody {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockBody with Eq::{not_equal, equal}
+
+///|
 pub impl Default for BlockBody with fn default() {
   Content(Content::empty())
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockBody with Default::{default}
 
 ///|
 pub impl Reflect for BlockBody with fn input() {
@@ -121,6 +131,11 @@ pub impl Reflect for BlockBody with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockBody with Reflect::{output, input, castable}
+
+///|
 /// Upstream casts callbacks to `auto`; since element fields are stored as
 /// values here, the callbacks are kept in internal dynamic values instead
 /// (which display like `auto`).
@@ -133,6 +148,11 @@ pub impl IntoValue for BlockBody with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockBody with IntoValue::{into_value}
+
+///|
 pub impl FromValue for BlockBody with fn from_value(v) {
   match v {
     Dyn(BlockSingleCallback(callback)) => SingleLayouter(callback)
@@ -140,6 +160,11 @@ pub impl FromValue for BlockBody with fn from_value(v) {
     v => Content(FromValue::from_value(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockBody with FromValue::{from_value}
 
 // Manual closure implementations for layout callbacks (upstream module
 // `callbacks`). Each stores the type-erased captured element and a function
@@ -191,6 +216,11 @@ pub impl Eq for InlineCallback with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InlineCallback with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for InlineCallback with fn input() {
   Type(Type::auto())
 }
@@ -214,12 +244,22 @@ pub impl IntoValue for InlineCallback with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InlineCallback with IntoValue::{into_value}
+
+///|
 pub impl FromValue for InlineCallback with fn from_value(v) {
   match v {
     Dyn(InlineCallback(callback)) => callback
     v => raise HintedError(InlineCallback::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InlineCallback with FromValue::{from_value}
 
 ///|
 /// A single-region layout callback of a `BlockElem`.
@@ -263,6 +303,11 @@ pub impl Eq for BlockSingleCallback with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockSingleCallback with Eq::{not_equal, equal}
+
+///|
 /// A multi-region layout callback of a `BlockElem`.
 pub struct BlockMultiCallback {
   priv captured : Content
@@ -304,6 +349,11 @@ pub impl Eq for BlockMultiCallback with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockMultiCallback with Eq::{not_equal, equal}
+
+///|
 /// Defines how to determine the baseline of a box.
 ///
 /// Here `None` means unspecified and fields set to it are inherited.
@@ -314,6 +364,16 @@ pub(all) struct BaselinePos {
   /// Amount to shift the baseline by.
   shift : Rel[Length]?
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselinePos with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselinePos with Hash::{hash, hash_combine}
 
 ///|
 pub impl Default for BaselinePos with fn default() {
@@ -340,6 +400,11 @@ pub fn BaselinePos::shift(self : BaselinePos) -> Rel[Length] {
 pub impl Fold for BaselinePos with fn fold(self, outer) {
   { at: self.at |> opt_or(outer.at), shift: self.shift |> opt_or(outer.shift), }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselinePos with Fold::{fold}
 
 ///|
 pub impl Reflect for BaselinePos with fn input() {
@@ -401,6 +466,11 @@ pub impl FromValue for BaselinePos with fn from_value(v) {
     v => raise HintedError(BaselinePos::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BaselinePos with FromValue::{from_value}
 
 ///|
 fn box_elem_baseline_default() -> Value {

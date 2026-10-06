@@ -10,6 +10,22 @@
 pub(all) struct Location(U128) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with Eq::{not_equal, equal}
+
+///|
+// `hash` is not named here: the type already has a method of this name.
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with Hash::{hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with @debug.Debug::{to_repr}
+
+///|
 /// Create a new location from a unique hash.
 pub fn Location::new(hash : U128) -> Location {
   Location(hash)
@@ -39,6 +55,12 @@ pub impl Show for Location with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with Show::{to_string}
+
+///|
 pub fn Location::repr(self : Location) -> String {
   ignore(self)
   "location(..)"
@@ -50,12 +72,32 @@ pub impl Fingerprint for Location with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with Fingerprint::{fingerprint}
+
+///|
 /// Can be used to have a location as a key in an ordered set or map.
 ///
 /// [Location] itself does not implement `Compare` because comparing hashes
 /// like this has no semantic meaning. The potential for misuse (e.g. checking
 /// whether locations have a particular relative ordering) is relatively high.
 pub(all) struct LocationKey(U128) derive(Eq, Hash, Compare)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocationKey with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocationKey with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocationKey with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Create a location key from a location.
@@ -79,12 +121,17 @@ pub impl Reflect for Location with fn castable(v) {
 }
 
 ///|
-pub extend Location with Reflect::{input, castable}
+pub extend Location with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Location with fn into_value(self) {
   Dyn(Location(self))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Location with fn from_value(v) {
@@ -93,6 +140,11 @@ pub impl FromValue for Location with fn from_value(v) {
     v => raise HintedError(CastInfo::Type(Type::location()).error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Location with FromValue::{from_value}
 
 ///|
 /// Returns the page number for this location.

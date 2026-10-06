@@ -47,6 +47,11 @@ pub impl @library.Output for Bundle with fn create(engine, content, styles) {
 }
 
 ///|
+#deprecated("call as `Output::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Bundle with @library.Output::{create, introspector, target}
+
+///|
 /// A single file in the bundle.
 pub(all) enum BundleFile {
   /// A document in one of the supported output formats, resulting from a

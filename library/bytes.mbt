@@ -9,6 +9,16 @@
 pub struct BytesValue(Bytes) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BytesValue with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BytesValue with Hash::{hash, hash_combine}
+
+///|
 /// Create a buffer from a byte sequence.
 pub fn BytesValue::new(data : Bytes) -> BytesValue {
   BytesValue(data)
@@ -210,6 +220,11 @@ pub impl FromValue for ToBytes with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToBytes with FromValue::{from_value}
+
+///|
 pub impl Reflect for BytesValue with fn input() {
   Type(Type::bytes())
 }
@@ -233,12 +248,22 @@ pub impl IntoValue for BytesValue with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BytesValue with IntoValue::{into_value}
+
+///|
 pub impl FromValue for BytesValue with fn from_value(v) {
   match v {
     Bytes(b) => b
     v => raise HintedError(BytesValue::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BytesValue with FromValue::{from_value}
 
 ///|
 /// The out of bounds access error message.

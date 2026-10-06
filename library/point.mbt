@@ -11,6 +11,21 @@ pub(all) struct Point {
 } derive(Eq, Hash, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Default::{default}
+
+///|
 /// The origin point.
 pub fn Point::zero() -> Point {
   { x: Abs::zero(), y: Abs::zero(), }
@@ -163,9 +178,19 @@ pub impl Sub for Point with fn sub(self, other) {
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Sub::{sub}
+
+///|
 pub impl Neg for Point with fn neg(self) {
   { x: -self.x, y: -self.y, }
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Neg::{neg}
 
 ///|
 /// Upstream `Debug for Point`.
@@ -176,7 +201,17 @@ pub impl Show for Point with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Show::{to_string, output}
+
+///|
 pub impl Fingerprint for Point with fn fingerprint(self, state) {
   state.write_f64(self.x.to_raw())
   state.write_f64(self.y.to_raw())
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Point with Fingerprint::{fingerprint}

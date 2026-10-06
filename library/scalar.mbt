@@ -5,6 +5,11 @@
 pub(all) struct Scalar(Double) derive(Default)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Default::{default}
+
+///|
 pub fn Scalar::new(x : Double) -> Scalar {
   Scalar(if x.is_nan() { 0.0 } else { x })
 }
@@ -45,9 +50,19 @@ pub impl Eq for Scalar with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Eq::{not_equal, equal}
+
+///|
 pub impl Compare for Scalar with fn compare(self, other) {
   self.0.compare(other.0)
 }
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 pub impl Hash for Scalar with fn hash_combine(self, hasher) {
@@ -57,9 +72,19 @@ pub impl Hash for Scalar with fn hash_combine(self, hasher) {
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Hash::{hash, hash_combine}
+
+///|
 pub impl Add for Scalar with fn add(self, other) {
   Scalar::new(self.0 + other.0)
 }
+
+///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Add::{add}
 
 ///|
 pub impl Sub for Scalar with fn sub(self, other) {
@@ -67,9 +92,19 @@ pub impl Sub for Scalar with fn sub(self, other) {
 }
 
 ///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Sub::{sub}
+
+///|
 pub impl Mul for Scalar with fn mul(self, other) {
   Scalar::new(self.0 * other.0)
 }
+
+///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Mul::{mul}
 
 ///|
 pub impl Div for Scalar with fn div(self, other) {
@@ -77,9 +112,19 @@ pub impl Div for Scalar with fn div(self, other) {
 }
 
 ///|
+#deprecated("call as `Div::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Div::{div}
+
+///|
 pub impl Neg for Scalar with fn neg(self) {
   Scalar::new(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Neg::{neg}
 
 ///|
 /// Rust `f64 % f64` (truncated remainder, like C `fmod`).
@@ -130,6 +175,11 @@ pub impl Reflect for Scalar with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Scalar with fn into_value(self) {
   Float(self.get())
 }
@@ -141,6 +191,11 @@ pub extend Scalar with IntoValue::{into_value}
 pub impl FromValue for Scalar with fn from_value(v) {
   Scalar::new(FromValue::from_value(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scalar with FromValue::{from_value}
 
 ///|
 /// The default of `PngFormat::ppi` (`typst-render/src/format.rs`).

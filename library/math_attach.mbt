@@ -13,6 +13,16 @@ pub(all) enum MathLimits {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathLimits with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathLimits with @debug.Debug::{to_repr}
+
+///|
 /// The default limit configuration if the given character is the base.
 pub fn MathLimits::for_char(c : Char) -> MathLimits {
   MathLimits::for_char_with_class(c, @unicode.default_math_class(c))

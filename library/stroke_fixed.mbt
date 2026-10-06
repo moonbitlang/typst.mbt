@@ -20,6 +20,11 @@ pub(all) struct ResolvedStroke {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedStroke with Eq::{not_equal, equal}
+
+///|
 /// A resolved dash pattern (upstream `DashPattern<Abs, DashLength<Abs>>`).
 pub(all) struct ResolvedDashPattern {
   /// The dash array.
@@ -29,11 +34,21 @@ pub(all) struct ResolvedDashPattern {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedDashPattern with Eq::{not_equal, equal}
+
+///|
 /// A resolved dash length (upstream `DashLength<Abs>`).
 pub(all) enum ResolvedDashLength {
   LineWidth
   Length(Abs)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedDashLength with Eq::{not_equal, equal}
 
 ///|
 /// Resolve the length, taking the thickness into account (upstream
@@ -84,6 +99,11 @@ pub impl Fold for ResolvedStroke with fn fold(self, outer) {
     miter_limit: self.miter_limit.or_(outer.miter_limit),
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedStroke with Fold::{fold}
 
 ///|
 /// Convert back to a stroke with (already resolved) lengths (upstream
@@ -159,6 +179,11 @@ pub(all) struct FixedStroke {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedStroke with Eq::{not_equal, equal}
+
+///|
 /// A fully resolved dash pattern (upstream `DashPattern<Abs, Abs>`).
 pub(all) struct FixedDashPattern {
   /// The dash array.
@@ -166,6 +191,11 @@ pub(all) struct FixedDashPattern {
   /// The dash phase.
   phase : Abs
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedDashPattern with Eq::{not_equal, equal}
 
 ///|
 /// Create a stroke from a paint and a thickness.

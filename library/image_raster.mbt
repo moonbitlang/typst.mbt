@@ -16,6 +16,16 @@ pub struct DynamicImage {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DynamicImage with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DynamicImage with Hash::{hash, hash_combine}
+
+///|
 /// A decoded raster image.
 pub struct RasterImage {
   priv data : Bytes
@@ -41,11 +51,21 @@ pub impl Eq for RasterImage with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterImage with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for RasterImage with fn hash_combine(self, hasher) {
   hasher.combine(self.data)
   hasher.combine(self.format)
   hasher.combine(self.icc)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterImage with Hash::{hash, hash_combine}
 
 ///|
 /// Decode a raster image.

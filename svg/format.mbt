@@ -9,6 +9,11 @@ pub(all) struct SvgFormatOptions {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgFormatOptions with Eq::{not_equal, equal}
+
+///|
 /// The SVG format options configured by a document (upstream
 /// `options.get::<SvgFormat>()`).
 pub fn SvgFormatOptions::get(
@@ -25,6 +30,16 @@ pub fn SvgFormatOptions::get(
 pub(all) struct PartialSvgFormatOptions {
   pretty : Bool?
 } derive(Eq, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialSvgFormatOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialSvgFormatOptions with Default::{default}
 
 ///|
 /// Resolves the partial options to complete ones, given defaults.

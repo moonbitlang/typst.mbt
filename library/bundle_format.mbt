@@ -60,6 +60,16 @@ pub fn asset_unsupported_rule(
 pub(all) struct AssetData(BytesValue) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AssetData with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AssetData with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for AssetData with fn input() {
   CastInfo::Type(Type::str()).union_with(Type(Type::bytes()))
 }
@@ -83,6 +93,11 @@ pub impl IntoValue for AssetData with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AssetData with IntoValue::{into_value}
+
+///|
 pub impl FromValue for AssetData with fn from_value(v) {
   if castable_of((Ty::new() : Ty[String]), v) {
     AssetData(BytesValue::from_string(v.cast()))
@@ -92,3 +107,8 @@ pub impl FromValue for AssetData with fn from_value(v) {
     raise HintedError(AssetData::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AssetData with FromValue::{from_value}

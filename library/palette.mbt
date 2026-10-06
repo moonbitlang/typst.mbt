@@ -157,6 +157,11 @@ pub(all) struct Luma {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Luma with @debug.Debug::{to_repr}
+
+///|
 /// An Oklab color with alpha (palette `Oklaba<f32>`).
 pub(all) struct Oklab {
   l : Float
@@ -164,6 +169,11 @@ pub(all) struct Oklab {
   b : Float
   alpha : Float
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklab with @debug.Debug::{to_repr}
 
 ///|
 /// An Oklch color with alpha (palette `Oklcha<f32>`). The hue is stored in
@@ -176,6 +186,11 @@ pub(all) struct Oklch {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklch with @debug.Debug::{to_repr}
+
+///|
 /// An sRGB color with alpha (palette `Srgba<f32>`).
 pub(all) struct Rgb {
   red : Float
@@ -185,6 +200,11 @@ pub(all) struct Rgb {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rgb with @debug.Debug::{to_repr}
+
+///|
 /// A linear sRGB color with alpha (palette `LinSrgba<f32>`).
 pub(all) struct LinearRgb {
   red : Float
@@ -192,6 +212,11 @@ pub(all) struct LinearRgb {
   blue : Float
   alpha : Float
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinearRgb with @debug.Debug::{to_repr}
 
 ///|
 /// An HSL color with alpha (palette `Hsla<Srgb, f32>`). The hue is stored in
@@ -204,6 +229,11 @@ pub(all) struct Hsl {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Hsl with @debug.Debug::{to_repr}
+
+///|
 /// An HSV color with alpha (palette `Hsva<Srgb, f32>`).
 pub(all) struct Hsv {
   hue : Float
@@ -211,6 +241,11 @@ pub(all) struct Hsv {
   value : Float
   alpha : Float
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Hsv with @debug.Debug::{to_repr}
 
 ///|
 /// A CIE XYZ color with D65 white point (palette `Xyz<D65, f32>`, internal).
@@ -228,12 +263,22 @@ pub impl Eq for Luma with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Luma with Eq::{not_equal, equal}
+
+///|
 pub impl Eq for Oklab with fn equal(self, other) {
   self.l == other.l &&
   self.a == other.a &&
   self.b == other.b &&
   self.alpha == other.alpha
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklab with Eq::{not_equal, equal}
 
 ///|
 pub impl Eq for Oklch with fn equal(self, other) {
@@ -244,12 +289,22 @@ pub impl Eq for Oklch with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Oklch with Eq::{not_equal, equal}
+
+///|
 pub impl Eq for Rgb with fn equal(self, other) {
   self.red == other.red &&
   self.green == other.green &&
   self.blue == other.blue &&
   self.alpha == other.alpha
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rgb with Eq::{not_equal, equal}
 
 ///|
 pub impl Eq for LinearRgb with fn equal(self, other) {
@@ -260,6 +315,11 @@ pub impl Eq for LinearRgb with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinearRgb with Eq::{not_equal, equal}
+
+///|
 pub impl Eq for Hsl with fn equal(self, other) {
   hue_eq(self.hue, other.hue) &&
   self.saturation == other.saturation &&
@@ -268,12 +328,22 @@ pub impl Eq for Hsl with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Hsl with Eq::{not_equal, equal}
+
+///|
 pub impl Eq for Hsv with fn equal(self, other) {
   hue_eq(self.hue, other.hue) &&
   self.saturation == other.saturation &&
   self.value == other.value &&
   self.alpha == other.alpha
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Hsv with Eq::{not_equal, equal}
 
 // The sRGB transfer function (palette `encoding::Srgb`).
 

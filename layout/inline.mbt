@@ -215,6 +215,21 @@ pub(all) enum ParSituation {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParSituation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParSituation with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParSituation with @debug.Debug::{to_repr}
+
+///|
 /// Raw values from a `ParElem` or style chain. Used to initialize a
 /// [`InlineConfig`].
 priv struct ConfigBase {

@@ -5,7 +5,22 @@
 pub(all) struct Abs(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Eq::{not_equal, equal}
+
+///|
 pub extend Abs with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Hash::{hash, hash_combine}
 
 ///|
 pub(all) enum AbsUnit {
@@ -14,6 +29,21 @@ pub(all) enum AbsUnit {
   Cm
   In
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbsUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbsUnit with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbsUnit with @debug.Debug::{to_repr}
 
 ///|
 let abs_eps : Double = 1.0e-4
@@ -180,9 +210,19 @@ pub impl Add for Abs with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Add::{add}
+
+///|
 pub impl Sub for Abs with fn sub(self, other) {
   Abs(self.0 - other.0)
 }
+
+///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Sub::{sub}
 
 ///|
 pub impl Neg for Abs with fn neg(self) {
@@ -196,6 +236,11 @@ pub extend Abs with Neg::{neg}
 pub impl Mod for Abs with fn mod(self, other) {
   Abs(Scalar::new(rust_rem(self.to_raw(), other.to_raw())))
 }
+
+///|
+#deprecated("call as `Mod::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Mod::{mod}
 
 ///|
 pub impl Numeric for Abs with fn zero() {
@@ -213,6 +258,13 @@ pub impl Numeric for Abs with fn scale(self, factor) {
 }
 
 ///|
+// `zero` is not named here: the type already has a method of this name.
+// `is_finite` is not named here: the type already has a method of this name.
+#deprecated("call as `Numeric::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Numeric::{scale, div_scale}
+
+///|
 pub fn Abs::repr(self : Abs) -> String {
   format_float_with_unit(self.to_pt(), "pt")
 }
@@ -221,6 +273,11 @@ pub fn Abs::repr(self : Abs) -> String {
 pub impl IntoValue for Abs with fn into_value(self) {
   Length(Length::from_abs(self))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with IntoValue::{into_value}
 
 // Upstream `Abs` only casts into a value (as a length); it is stored in
 // internal fields (e.g. `PrefixInfo::inset`). Casting back takes the absolute
@@ -242,6 +299,11 @@ pub impl Reflect for Abs with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for Abs with fn from_value(v) {
   match v {
     Length(l) => l.abs
@@ -250,6 +312,16 @@ pub impl FromValue for Abs with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with FromValue::{from_value}
+
+///|
 pub impl Fold for Abs with fn fold(self, _) {
   self
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Abs with Fold::{fold}

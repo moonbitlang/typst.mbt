@@ -10,6 +10,11 @@ pub(all) enum Gradient {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gradient with Eq::{not_equal, equal}
+
+///|
 /// A gradient that interpolates between two colors along an axis.
 pub(all) struct LinearGradient {
   /// The color stops of this gradient.
@@ -23,6 +28,11 @@ pub(all) struct LinearGradient {
   /// Whether to anti-alias the gradient (used for sharp gradients).
   anti_alias : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinearGradient with Eq::{not_equal, equal}
 
 ///|
 /// A gradient that interpolates between two colors along a circle.
@@ -46,6 +56,11 @@ pub(all) struct RadialGradient {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RadialGradient with Eq::{not_equal, equal}
+
+///|
 /// A gradient that interpolates between two colors radially around a center
 /// point.
 pub(all) struct ConicGradient {
@@ -62,6 +77,11 @@ pub(all) struct ConicGradient {
   /// Whether to anti-alias the gradient (used for sharp gradients).
   anti_alias : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ConicGradient with Eq::{not_equal, equal}
 
 ///|
 fn gradient_too_few_stops(span : @syntax.Span) -> SourceDiagnostic {
@@ -617,6 +637,21 @@ pub(all) enum RelativeTo {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RelativeTo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RelativeTo with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RelativeTo with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for RelativeTo with fn input() {
   Union([
     Value(Str("self"), "Relative to itself (its own bounding box)."),
@@ -646,6 +681,11 @@ pub impl IntoValue for RelativeTo with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RelativeTo with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RelativeTo with fn from_value(v) {
   match v {
     Str("self") => Self_
@@ -655,6 +695,11 @@ pub impl FromValue for RelativeTo with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RelativeTo with FromValue::{from_value}
+
+///|
 /// A color stop.
 pub(all) struct GradientStop {
   /// The color for this stop.
@@ -662,6 +707,11 @@ pub(all) struct GradientStop {
   /// The offset of the stop along the gradient.
   offset : Ratio?
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientStop with Eq::{not_equal, equal}
 
 ///|
 pub impl Reflect for GradientStop with fn input() {
@@ -690,6 +740,11 @@ pub impl IntoValue for GradientStop with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientStop with IntoValue::{into_value}
+
+///|
 pub impl FromValue for GradientStop with fn from_value(v) {
   match v {
     Color(color) => { color, offset: None, }
@@ -707,11 +762,21 @@ pub impl FromValue for GradientStop with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientStop with FromValue::{from_value}
+
+///|
 /// A ratio or an angle.
 pub(all) enum RatioOrAngle {
   Ratio(Ratio)
   Angle(Angle)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RatioOrAngle with Eq::{not_equal, equal}
 
 ///|
 /// Converts to a ratio in `[0, 1]`.
@@ -751,6 +816,11 @@ pub impl IntoValue for RatioOrAngle with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RatioOrAngle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RatioOrAngle with fn from_value(v) {
   match v {
     Ratio(ratio) => Ratio(ratio)
@@ -758,6 +828,11 @@ pub impl FromValue for RatioOrAngle with fn from_value(v) {
     v => raise HintedError(RatioOrAngle::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RatioOrAngle with FromValue::{from_value}
 
 ///|
 /// Pre-processes the stops, checking that they are valid and computing the
@@ -895,9 +970,19 @@ pub impl IntoValue for Gradient with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gradient with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Gradient with fn from_value(v) {
   match v {
     Gradient(g) => g
     v => raise HintedError(Gradient::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Gradient with FromValue::{from_value}

@@ -17,6 +17,11 @@ pub(all) enum Tag {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Eq::{not_equal, equal}
+
+///|
 /// Access the location of the tag.
 pub fn Tag::location(self : Tag) -> Location {
   match self {
@@ -37,6 +42,7 @@ pub impl Show for Tag with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
 pub extend Tag with Show::{to_string}
 
 ///|
@@ -57,6 +63,11 @@ pub impl Fingerprint for Tag with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with Fingerprint::{fingerprint}
+
+///|
 /// Flags of a [Tag].
 pub(all) struct TagFlags {
   /// Whether the element will be inserted into the [Introspector]. Either
@@ -66,6 +77,21 @@ pub(all) struct TagFlags {
   /// Whether the element is `Tagged`.
   tagged : Bool
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagFlags with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagFlags with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagFlags with @debug.Debug::{to_repr}
 
 ///|
 /// Whether any flag is set.
@@ -78,6 +104,11 @@ pub impl Fingerprint for TagFlags with fn fingerprint(self, state) {
   state.write_bool(self.introspectable)
   state.write_bool(self.tagged)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagFlags with Fingerprint::{fingerprint}
 
 // Internal codec: tags are stored as `Value::Dyn(Tag(..))` in the internal,
 // required `tag` field of `TagElem`. They are never exposed to users.
@@ -98,12 +129,17 @@ pub impl Reflect for Tag with fn castable(v) {
 }
 
 ///|
-pub extend Tag with Reflect::{input, castable}
+pub extend Tag with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Tag with fn into_value(self) {
   Dyn(Tag(self))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Tag with fn from_value(v) {
@@ -112,6 +148,11 @@ pub impl FromValue for Tag with fn from_value(v) {
     v => raise HintedError(Tag::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tag with FromValue::{from_value}
 
 ///|
 /// Creates a tag element and directly packs it into type-erased content

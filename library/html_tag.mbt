@@ -12,6 +12,16 @@
 pub struct HtmlTag(String) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with Hash::{hash, hash_combine}
+
+///|
 /// Intern an HTML tag string at runtime.
 pub fn HtmlTag::intern(string : String) -> HtmlTag raise HintedError {
   if string.is_empty() {
@@ -98,6 +108,12 @@ pub impl Show for HtmlTag with fn output(self, logger) {
 }
 
 ///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with Show::{to_string}
+
+///|
 pub impl Reflect for HtmlTag with fn input() {
   Type(Type::str())
 }
@@ -113,9 +129,19 @@ pub impl Reflect for HtmlTag with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for HtmlTag with fn into_value(self) {
   Str(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for HtmlTag with fn from_value(v) {
@@ -123,6 +149,11 @@ pub impl FromValue for HtmlTag with fn from_value(v) {
   let s : String = v.cast()
   HtmlTag::intern(s)
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlTag with FromValue::{from_value}
 
 ///|
 /// Whether the value is castable to `Str`.

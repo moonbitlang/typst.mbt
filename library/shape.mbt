@@ -16,6 +16,11 @@ pub(all) struct Shape {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Shape with Eq::{not_equal, equal}
+
+///|
 /// A shape's geometry.
 pub(all) enum Geometry {
   /// A line to a point (relative to its position).
@@ -25,6 +30,11 @@ pub(all) enum Geometry {
   /// A curve consisting of movements, lines, and Bézier segments.
   Curve(Curve)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Geometry with Eq::{not_equal, equal}
 
 ///|
 /// Fill the geometry without a stroke.
@@ -74,6 +84,21 @@ pub(all) enum FillRule {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FillRule with fn default() {
   NonZero
 }
@@ -117,6 +142,11 @@ pub impl IntoValue for FillRule with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FillRule with fn from_value(v) {
   match v {
     Str("non-zero") => NonZero
@@ -124,6 +154,11 @@ pub impl FromValue for FillRule with fn from_value(v) {
     v => raise HintedError(FillRule::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with FromValue::{from_value}
 
 // SquareElem: `size` sets both `width` and `height`.
 

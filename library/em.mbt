@@ -7,7 +7,22 @@
 pub(all) struct Em(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Eq::{not_equal, equal}
+
+///|
 pub extend Em with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with Hash::{hash, hash_combine}
 
 ///|
 pub fn Em::zero() -> Em {
@@ -95,3 +110,8 @@ pub fn Em::is_zero(self : Em) -> Bool {
 pub impl IntoValue for Em with fn into_value(self) {
   Length(Length::from_em(self))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Em with IntoValue::{into_value}

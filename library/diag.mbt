@@ -13,6 +13,21 @@ pub(all) enum Severity {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with @debug.Debug::{to_repr}
+
+///|
 /// A part of a diagnostic's trace.
 pub(all) enum Tracepoint {
   /// A function call.
@@ -24,6 +39,21 @@ pub(all) enum Tracepoint {
   /// A file include.
   Include(String)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tracepoint with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tracepoint with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tracepoint with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for Tracepoint with fn output(self, logger) {
@@ -54,6 +84,21 @@ pub(all) struct SourceDiagnostic {
   /// Additional hints to the user.
   hints : Array[@syntax.DiagSpanned[String]]
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SourceDiagnostic with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SourceDiagnostic with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SourceDiagnostic with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new, bare error.
@@ -167,6 +212,21 @@ pub(all) struct HintedString {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintedString with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintedString with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintedString with @debug.Debug::{to_repr}
+
+///|
 pub fn HintedString::new(message : String) -> HintedString {
   { message, hints: [], }
 }
@@ -212,10 +272,20 @@ pub(all) suberror HintedError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintedError with @debug.Debug::{to_repr}
+
+///|
 /// An error with spans: upstream `SourceResult` error.
 pub(all) suberror SourceError {
   SourceError(Array[SourceDiagnostic])
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SourceError with @debug.Debug::{to_repr}
 
 ///|
 /// Raise a [HintedError] with a message (upstream `bail!("...")`).

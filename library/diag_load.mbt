@@ -16,10 +16,30 @@ pub(all) struct LoadError {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadError with @debug.Debug::{to_repr}
+
+///|
 /// A data-loading error (upstream `LoadResult<T>`'s error).
 pub(all) suberror LoadErr {
   LoadErr(LoadError)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadErr with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new error from a position in a text file, a base message (e.g.
@@ -183,6 +203,21 @@ pub(all) enum ReportTextPos {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ReportTextPos with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ReportTextPos with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ReportTextPos with @debug.Debug::{to_repr}
+
+///|
 /// Creates a position from a pre-existing range and line-column pair.
 pub fn ReportTextPos::full(
   start : Int,
@@ -250,6 +285,21 @@ pub(all) struct LineCol {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCol with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCol with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineCol with @debug.Debug::{to_repr}
+
+///|
 /// Constructs the line/column pair from 0-based indices.
 pub fn LineCol::zero_based(line : Int, col : Int) -> LineCol {
   { line, col, }
@@ -310,6 +360,16 @@ pub(all) struct Utf8Error {
   /// input was reached unexpectedly.
   error_len : Int?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Utf8Error with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Utf8Error with @debug.Debug::{to_repr}
 
 ///|
 /// Validate UTF-8 like Rust's `std::str::from_utf8`.

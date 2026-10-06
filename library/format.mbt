@@ -15,6 +15,11 @@ pub(all) struct SpannedValue[T] {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpannedValue with Eq::{not_equal, equal}
+
+///|
 /// Create a new spanned value with a detached span.
 pub fn[T] SpannedValue::detached(v : T) -> SpannedValue[T] {
   { v, span: @syntax.Span::detached(), }
@@ -89,6 +94,11 @@ pub impl Fingerprint for FormatOptions with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatOptions with Fingerprint::{fingerprint}
+
+///|
 /// A list of format options that have been configured by the document.
 pub struct DocumentFormatOptions(Array[FormatOptions])
 
@@ -149,6 +159,11 @@ pub impl Fingerprint for DocumentFormatOptions with fn fingerprint(self, state) 
     state.write(o)
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormatOptions with Fingerprint::{fingerprint}
 
 ///|
 /// An export format with an associated format element.

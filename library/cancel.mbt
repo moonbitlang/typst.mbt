@@ -25,6 +25,11 @@ pub(all) enum CancelAngle {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CancelAngle with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for CancelAngle with fn input() {
   CastInfo::Type(Type::angle()).union_with(Type(Type::func()))
 }
@@ -52,6 +57,11 @@ pub impl IntoValue for CancelAngle with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CancelAngle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CancelAngle with fn from_value(v) {
   if castable_of((Ty::new() : Ty[Angle]), v) {
     Angle(v.cast())
@@ -61,3 +71,8 @@ pub impl FromValue for CancelAngle with fn from_value(v) {
     raise HintedError(CancelAngle::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CancelAngle with FromValue::{from_value}

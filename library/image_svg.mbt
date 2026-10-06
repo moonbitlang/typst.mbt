@@ -26,6 +26,11 @@ pub impl Eq for SvgImage with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgImage with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for SvgImage with fn hash_combine(self, hasher) {
   hasher.combine(self.data)
   hasher.combine(self.resolved)
@@ -33,6 +38,11 @@ pub impl Hash for SvgImage with fn hash_combine(self, hasher) {
     hasher.combine(font)
   }
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgImage with Hash::{hash, hash_combine}
 
 ///|
 /// Decode an SVG image without fonts.

@@ -9,6 +9,11 @@ pub(all) enum Attribution {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Attribution with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for Attribution with fn input() {
   Content::input().union_with(Type(Type::label()))
 }
@@ -35,6 +40,11 @@ pub impl IntoValue for Attribution with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Attribution with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Attribution with fn from_value(v) {
   if Content::castable(v) {
     return Content(Content::from_value(v))
@@ -44,6 +54,11 @@ pub impl FromValue for Attribution with fn from_value(v) {
     v => raise HintedError(Attribution::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Attribution with FromValue::{from_value}
 
 ///|
 /// Realize as an em dash followed by text or a citation.

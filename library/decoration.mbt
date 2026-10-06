@@ -14,6 +14,11 @@ pub(all) struct Decoration {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with Eq::{not_equal, equal}
+
+///|
 /// A kind of decorative line.
 pub(all) enum DecoLine {
   Underline(
@@ -41,6 +46,11 @@ pub(all) enum DecoLine {
     radius~ : Corners[Rel[Abs]]
   )
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DecoLine with Eq::{not_equal, equal}
 
 ///|
 /// A stroke whose fields are all unspecified (upstream
@@ -86,12 +96,22 @@ pub impl IntoValue for Decoration with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Decoration with fn from_value(v) {
   match v {
     Dyn(Decoration(deco)) => deco
     v => raise HintedError(Decoration::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with FromValue::{from_value}
 
 ///|
 /// Upstream `Fold for SmallVec`: the outer decorations followed by the
@@ -155,3 +175,8 @@ pub impl Fingerprint for Decoration with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with Fingerprint::{fingerprint}

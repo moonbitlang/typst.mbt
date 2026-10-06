@@ -11,6 +11,16 @@ pub(all) enum Spacing {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spacing with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Spacing with Hash::{hash, hash_combine}
+
+///|
 /// Spacing from a length (upstream `From<Length> for Spacing`).
 pub fn Spacing::from_length(length : Length) -> Spacing {
   Rel(Rel::new(Ratio::zero(), length))
@@ -102,6 +112,16 @@ pub(all) enum Sizing {
   /// parent.
   Fr(Fr)
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sizing with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sizing with Hash::{hash, hash_combine}
 
 ///|
 pub impl Default for Sizing with fn default() {

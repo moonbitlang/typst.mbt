@@ -10,6 +10,16 @@ pub(all) enum DataSource {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DataSource with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DataSource with Hash::{hash, hash_combine}
+
+///|
 pub impl Reflect for DataSource with fn input() {
   input_of((Ty::new() : Ty[PathOrStr])).union_with(Type(Type::bytes()))
 }
@@ -101,6 +111,16 @@ pub(all) struct Loaded {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Loaded with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Loaded with Hash::{hash, hash_combine}
+
+///|
 pub fn Loaded::new(
   source : @syntax.Spanned[LoadSource],
   bytes : Bytes,
@@ -116,6 +136,16 @@ pub(all) enum LoadSource {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadSource with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadSource with Hash::{hash, hash_combine}
+
+///|
 /// A value that can be read from a file.
 pub(all) enum Readable {
   /// A decoded string.
@@ -123,6 +153,16 @@ pub(all) enum Readable {
   /// Raw bytes.
   Bytes(Bytes)
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Readable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Readable with Hash::{hash, hash_combine}
 
 ///|
 pub fn Readable::into_bytes(self : Readable) -> Bytes {
@@ -153,12 +193,22 @@ pub impl Reflect for Readable with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Readable with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Readable with fn into_value(self) {
   match self {
     Str(v) => Str(v)
     Bytes(v) => Bytes(BytesValue(v))
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Readable with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Readable with fn from_value(v) {
@@ -170,6 +220,11 @@ pub impl FromValue for Readable with fn from_value(v) {
     raise HintedError(cast_error((Ty::new() : Ty[Readable]), v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Readable with FromValue::{from_value}
 
 ///|
 pub impl Fingerprint for Loaded with fn fingerprint(self, state) {
@@ -184,3 +239,8 @@ pub impl Fingerprint for Loaded with fn fingerprint(self, state) {
   state.write_usize(self.data.length())
   state.write_bytes(self.data)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Loaded with Fingerprint::{fingerprint}

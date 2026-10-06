@@ -84,6 +84,11 @@ pub(all) enum Timezone {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Timezone with Eq::{not_equal, equal}
+
+///|
 /// Settings for PDF export.
 pub(all) struct PdfOptions {
   /// If not `Auto`, shall be a string that uniquely and stably identifies

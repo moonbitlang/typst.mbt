@@ -193,10 +193,37 @@ pub impl @library.IntrospectorBackend for HtmlIntrospector with fn path(_, _) {
 }
 
 ///|
+#deprecated("call as `IntrospectorBackend::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlIntrospector with @library.IntrospectorBackend::{
+  document,
+  query_label,
+  path,
+  query_unique,
+  anchor,
+  page,
+  query_labelled,
+  page_supplement,
+  query_count_before,
+  query,
+  page_numbering,
+  position,
+  query_first,
+  label_count,
+  locator,
+  pages,
+}
+
+///|
 /// Upstream `Debug for HtmlIntrospector`.
 pub impl Show for HtmlIntrospector with fn output(_, logger) {
   logger.write_string("HtmlIntrospector(..)")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlIntrospector with Show::{to_string, output}
 
 ///|
 /// Constructs the [HtmlIntrospector].

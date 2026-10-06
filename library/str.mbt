@@ -739,6 +739,11 @@ pub impl FromValue for ToStr with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToStr with FromValue::{from_value}
+
+///|
 /// A Unicode normalization form.
 pub(all) enum UnicodeNormalForm {
   /// Canonical composition where e.g. accented letters are turned into a
@@ -752,6 +757,16 @@ pub(all) enum UnicodeNormalForm {
   /// Like NFD, but using the Unicode compatibility decompositions.
   Nfkd
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeNormalForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeNormalForm with Hash::{hash, hash_combine}
 
 ///|
 pub impl Reflect for UnicodeNormalForm with fn input() {
@@ -799,6 +814,11 @@ pub impl IntoValue for UnicodeNormalForm with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeNormalForm with IntoValue::{into_value}
+
+///|
 pub impl FromValue for UnicodeNormalForm with fn from_value(v) {
   match v {
     Str("nfc") => Nfc
@@ -808,6 +828,11 @@ pub impl FromValue for UnicodeNormalForm with fn from_value(v) {
     v => raise HintedError(UnicodeNormalForm::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeNormalForm with FromValue::{from_value}
 
 ///|
 /// Converts a match of a string pattern into a dictionary.
@@ -869,6 +894,16 @@ fn str_string_is_empty() -> String {
 pub struct Regex {
   inner : @regex.Regex
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Hash::{hash, hash_combine}
 
 ///|
 /// Create a new regular expression.
@@ -936,6 +971,11 @@ pub impl FromValue for Regex with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with FromValue::{from_value}
+
+///|
 /// A pattern which can be searched for in a string.
 pub(all) enum StrPattern {
   /// Just a string.
@@ -971,6 +1011,11 @@ pub impl IntoValue for StrPattern with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrPattern with IntoValue::{into_value}
+
+///|
 pub impl FromValue for StrPattern with fn from_value(v) {
   if str_castable(v) {
     Str(v.cast())
@@ -982,6 +1027,11 @@ pub impl FromValue for StrPattern with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrPattern with FromValue::{from_value}
+
+///|
 /// A side of a string.
 pub(all) enum StrSide {
   /// The logical start of the string, may be left or right depending on the
@@ -990,6 +1040,11 @@ pub(all) enum StrSide {
   /// The logical end of the string.
   End
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrSide with Eq::{not_equal, equal}
 
 ///|
 pub impl Reflect for StrSide with fn input() {
@@ -1025,12 +1080,22 @@ pub impl FromValue for StrSide with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrSide with FromValue::{from_value}
+
+///|
 pub impl IntoValue for StrSide with fn into_value(self) {
   match self {
     Start => alignment_start.into_value()
     End => alignment_end.into_value()
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrSide with IntoValue::{into_value}
 
 ///|
 /// A replacement for a matched string.
@@ -1069,6 +1134,11 @@ pub impl IntoValue for Replacement with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Replacement with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Replacement with fn from_value(v) {
   if str_castable(v) {
     Str(v.cast())
@@ -1078,3 +1148,8 @@ pub impl FromValue for Replacement with fn from_value(v) {
     raise HintedError(Replacement::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Replacement with FromValue::{from_value}

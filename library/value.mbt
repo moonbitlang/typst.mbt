@@ -108,6 +108,16 @@ pub(all) enum NumericUnit {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericUnit with @debug.Debug::{to_repr}
+
+///|
 /// The type of this value.
 pub fn Value::ty(self : Value) -> Type {
   match self {
@@ -279,6 +289,11 @@ pub fn Value::scope(self : Value) -> Scope? {
 pub impl Eq for Value with fn equal(self, other) {
   equal(self, other)
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with Eq::{not_equal, equal}
 
 ///|
 /// Attach a span to the value, if possible.

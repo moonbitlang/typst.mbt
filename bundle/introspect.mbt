@@ -237,10 +237,37 @@ pub impl @library.IntrospectorBackend for BundleIntrospector with fn path(
 }
 
 ///|
+#deprecated("call as `IntrospectorBackend::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundleIntrospector with @library.IntrospectorBackend::{
+  document,
+  query_label,
+  path,
+  query_unique,
+  anchor,
+  page,
+  query_labelled,
+  page_supplement,
+  query_count_before,
+  query,
+  page_numbering,
+  position,
+  query_first,
+  label_count,
+  locator,
+  pages,
+}
+
+///|
 /// Upstream `Debug for BundleIntrospector`.
 pub impl Show for BundleIntrospector with fn output(_, logger) {
   logger.write_string("BundleIntrospector(..)")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundleIntrospector with Show::{to_string, output}
 
 ///|
 /// An introspector for a bundle document.

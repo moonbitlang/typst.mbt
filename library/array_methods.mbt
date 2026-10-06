@@ -885,3 +885,8 @@ pub impl FromValue for ToArray with fn from_value(v) {
     v => raise HintedError(ToArray::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToArray with FromValue::{from_value}

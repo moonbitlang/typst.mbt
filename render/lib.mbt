@@ -10,6 +10,11 @@ pub(all) struct PngFormatOptions {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngFormatOptions with Eq::{not_equal, equal}
+
+///|
 /// The PNG format options configured by a document (upstream
 /// `options.get::<PngFormat>()`).
 pub fn PngFormatOptions::get(
@@ -30,6 +35,16 @@ pub fn PngFormatOptions::get(
 pub(all) struct PartialPngFormatOptions {
   ppi : Double?
 } derive(Eq, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialPngFormatOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PartialPngFormatOptions with Default::{default}
 
 ///|
 /// Resolves the partial options to complete ones, given defaults.
@@ -54,11 +69,26 @@ pub(all) struct RenderOptions {
 } derive(Eq, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RenderOptions with Default::{default}
+
+///|
 /// Resolved settings for raster export (upstream `RenderOptions<Complete>`).
 pub(all) struct CompleteRenderOptions {
   render_bleed : Bool
   format : PngFormatOptions
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompleteRenderOptions with Eq::{not_equal, equal}
 
 ///|
 /// Resolves the final options given those set by the document.

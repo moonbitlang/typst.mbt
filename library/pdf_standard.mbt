@@ -17,6 +17,26 @@ pub(all) enum PdfVersion {
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfVersion with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for PdfVersion with fn default() {
   Pdf17
 }
@@ -56,6 +76,21 @@ pub(all) enum Archival {
   A4F
   A4E
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Archival with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Archival with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Archival with @debug.Debug::{to_repr}
 
 ///|
 pub fn Archival::as_str(self : Archival) -> String {
@@ -103,6 +138,21 @@ pub(all) enum Accessibility {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accessibility with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accessibility with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accessibility with @debug.Debug::{to_repr}
+
+///|
 pub fn Accessibility::as_str(self : Accessibility) -> String {
   match self {
     UA1 => "PDF/UA-1"
@@ -136,6 +186,21 @@ pub(all) enum Validator {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validator with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validator with @debug.Debug::{to_repr}
+
+///|
 pub fn Validator::min(self : Validator) -> PdfVersion? {
   match self {
     A(a) => a.min()
@@ -165,6 +230,21 @@ pub(all) struct Validators {
   a : Archival?
   ua : Accessibility?
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validators with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validators with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Validators with @debug.Debug::{to_repr}
 
 ///|
 pub fn Validators::is_empty(self : Validators) -> Bool {
@@ -243,6 +323,21 @@ pub(all) struct PdfConfiguration {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfConfiguration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfConfiguration with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfConfiguration with @debug.Debug::{to_repr}
+
+///|
 /// An error that occurred while building a configuration (krilla
 /// `ConfigurationError`).
 priv enum PdfConfigurationError {
@@ -285,9 +380,25 @@ pub(all) struct PdfStandards {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandards with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandards with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for PdfStandards with fn output(_self, logger) {
   logger.write_string("PdfStandards(..)")
 }
+
+///|
+// `output` is not named here: the `extend` of `Reflect` makes it a method of the type.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandards with Show::{to_string}
 
 ///|
 pub impl Default for PdfStandards with fn default() {
@@ -418,7 +529,7 @@ pub impl Reflect for PdfStandards with fn castable(v) {
 }
 
 ///|
-pub extend PdfStandards with Reflect::{input, castable}
+pub extend PdfStandards with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PdfStandards with fn into_value(self) {
@@ -442,6 +553,11 @@ pub impl FromValue for PdfStandards with fn from_value(v) {
     v => raise HintedError(PdfStandards::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandards with FromValue::{from_value}
 
 ///|
 /// A PDF standard that Typst can enforce conformance with.
@@ -483,6 +599,21 @@ pub(all) enum PdfStandard {
   /// PDF/UA-1.
   UA_1
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandard with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandard with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandard with @debug.Debug::{to_repr}
 
 ///|
 let pdf_standard_casts : ReadOnlyArray[(String, PdfStandard, String)] = [
@@ -596,6 +727,11 @@ pub impl FromValue for PdfStandard with fn from_value(v) {
   raise HintedError(PdfStandard::input().error(v))
 }
 
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfStandard with FromValue::{from_value}
+
 // AttachElem
 
 ///|
@@ -655,6 +791,21 @@ pub(all) enum AttachedFileRelationship {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttachedFileRelationship with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttachedFileRelationship with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttachedFileRelationship with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for AttachedFileRelationship with fn input() {
   Union([
     Value(Str("source"), "The PDF document was created from the source file."),
@@ -691,6 +842,11 @@ pub impl IntoValue for AttachedFileRelationship with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttachedFileRelationship with IntoValue::{into_value}
+
+///|
 pub impl FromValue for AttachedFileRelationship with fn from_value(v) {
   match v {
     Str("source") => Source
@@ -700,3 +856,8 @@ pub impl FromValue for AttachedFileRelationship with fn from_value(v) {
     v => raise HintedError(AttachedFileRelationship::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AttachedFileRelationship with FromValue::{from_value}

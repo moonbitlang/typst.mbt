@@ -237,6 +237,21 @@ pub(all) struct SmartQuoteSet {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteSet with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteSet with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteSet with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for SmartQuoteSet with fn input() {
   CastInfo::Type(Type::array()).union_with(Type(Type::str()))
 }
@@ -258,6 +273,11 @@ pub extend SmartQuoteSet with Reflect::{output, input, castable}
 pub impl IntoValue for SmartQuoteSet with fn into_value(self) {
   Array(Arr::from_array([Str(self.open), Str(self.close)]))
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteSet with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for SmartQuoteSet with fn from_value(v) {
@@ -309,6 +329,21 @@ pub(all) struct SmartQuoteDict {
   double : Smart[SmartQuoteSet]
   single : Smart[SmartQuoteSet]
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteDict with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteDict with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteDict with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for SmartQuoteDict with fn input() {

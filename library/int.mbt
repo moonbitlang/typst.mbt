@@ -284,6 +284,21 @@ pub(all) enum Endianness {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Endianness with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Endianness with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Endianness with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for Endianness with fn input() {
   Union([
     Value(
@@ -319,6 +334,11 @@ pub impl IntoValue for Endianness with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Endianness with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Endianness with fn from_value(v) {
   match v {
     Str("big") => Big
@@ -326,6 +346,11 @@ pub impl FromValue for Endianness with fn from_value(v) {
     v => raise HintedError(Endianness::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Endianness with FromValue::{from_value}
 
 ///|
 /// A value that can be cast to an integer.
@@ -371,6 +396,11 @@ pub impl FromValue for ToInt with fn from_value(v) {
     v => raise HintedError(ToInt::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToInt with FromValue::{from_value}
 
 ///|
 /// Convert a float to an integer, failing if it is out of range (upstream

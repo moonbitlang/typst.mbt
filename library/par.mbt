@@ -12,6 +12,16 @@ pub(all) struct JustificationLimits {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend JustificationLimits with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend JustificationLimits with Hash::{hash, hash_combine}
+
+///|
 pub impl Default for JustificationLimits with fn default() {
   {
     spacing: Some(limits_spacing_default()),
@@ -111,12 +121,22 @@ pub impl FromValue for JustificationLimits with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend JustificationLimits with FromValue::{from_value}
+
+///|
 pub impl Fold for JustificationLimits with fn fold(self, outer) {
   {
     spacing: fold_or(self.spacing, outer.spacing),
     tracking: fold_or(self.tracking, outer.tracking),
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend JustificationLimits with Fold::{fold}
 
 ///|
 /// Determines the minimum and maximum size by or to which spacing may be shrunk
@@ -127,6 +147,16 @@ pub(all) struct Limits[T] {
   /// Maximum allowable adjustment.
   max : T
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Limits with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Limits with Hash::{hash, hash_combine}
 
 ///|
 fn limits_spacing_default() -> Limits[Rel[Length]] {
@@ -158,6 +188,11 @@ pub extend Limits with IntoValue::{into_value}
 pub impl[T] Fold for Limits[T] with fn fold(self, _) {
   self
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Limits with Fold::{fold}
 
 ///|
 /// Cast limits from a dictionary, validating them with the given checks.
@@ -262,6 +297,21 @@ pub(all) enum Linebreaks {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Linebreaks with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Linebreaks with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Linebreaks with @debug.Debug::{to_repr}
+
+///|
 let linebreaks_names : ReadOnlyArray[String] = ["simple", "optimized"]
 
 ///|
@@ -291,6 +341,11 @@ pub impl IntoValue for Linebreaks with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Linebreaks with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Linebreaks with fn from_value(v) {
   match str_names_find(linebreaks_names, v) {
     Some(0) => Simple
@@ -298,6 +353,11 @@ pub impl FromValue for Linebreaks with fn from_value(v) {
     None => raise HintedError(Linebreaks::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Linebreaks with FromValue::{from_value}
 
 ///|
 /// Configuration for first line indent.
@@ -309,6 +369,16 @@ pub(all) struct FirstLineIndent {
   /// Whether to indent all paragraphs, not just consecutive ones.
   all : Bool?
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FirstLineIndent with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FirstLineIndent with Hash::{hash, hash_combine}
 
 ///|
 pub impl Default for FirstLineIndent with fn default() {
@@ -335,6 +405,11 @@ pub impl Fold for FirstLineIndent with fn fold(self, outer) {
     all: self.all |> opt_or(outer.all),
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FirstLineIndent with Fold::{fold}
 
 ///|
 pub impl Reflect for FirstLineIndent with fn input() {
@@ -394,6 +469,11 @@ pub impl FromValue for FirstLineIndent with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FirstLineIndent with FromValue::{from_value}
+
+///|
 let par_elem_first_line_indent_default_value : Value = FirstLineIndent::default()
   .into_value()
   .shared()
@@ -422,6 +502,21 @@ pub(all) enum LineNumberingScope {
   /// every new page.
   Page
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineNumberingScope with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineNumberingScope with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineNumberingScope with @debug.Debug::{to_repr}
 
 ///|
 let line_numbering_scope_names : ReadOnlyArray[String] = ["document", "page"]
@@ -463,6 +558,11 @@ pub impl FromValue for LineNumberingScope with fn from_value(v) {
     None => raise HintedError(LineNumberingScope::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineNumberingScope with FromValue::{from_value}
 
 ///|
 fn par_line_elem_numbering_scope_default() -> Value {

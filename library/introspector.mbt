@@ -150,6 +150,28 @@ pub impl IntrospectorBackend for EmptyIntrospector with fn path(_, _) {
   None
 }
 
+///|
+#deprecated("call as `IntrospectorBackend::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EmptyIntrospector with IntrospectorBackend::{
+  document,
+  query_label,
+  path,
+  query_unique,
+  anchor,
+  page,
+  query_labelled,
+  page_supplement,
+  query_count_before,
+  query,
+  page_numbering,
+  position,
+  query_first,
+  label_count,
+  locator,
+  pages,
+}
+
 // The facade.
 
 ///|

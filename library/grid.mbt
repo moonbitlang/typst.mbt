@@ -7,6 +7,16 @@
 pub(all) struct TrackSizings(Array[Sizing]) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackSizings with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackSizings with Hash::{hash, hash_combine}
+
+///|
 pub impl Default for TrackSizings with fn default() {
   TrackSizings([])
 }
@@ -37,9 +47,19 @@ pub impl Reflect for TrackSizings with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackSizings with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TrackSizings with fn into_value(self) {
   IntoValue::into_value(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackSizings with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TrackSizings with fn from_value(value) {
@@ -63,12 +83,22 @@ pub impl FromValue for TrackSizings with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackSizings with FromValue::{from_value}
+
+///|
 /// Any child of a grid element.
 pub(all) enum GridChild {
   Header(Content)
   Footer(Content)
   Item(GridItem)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridChild with Eq::{not_equal, equal}
 
 ///|
 pub impl Reflect for GridChild with fn input() {
@@ -86,6 +116,11 @@ pub impl Reflect for GridChild with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridChild with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for GridChild with fn into_value(self) {
   match self {
     Header(header) => Content(header)
@@ -95,6 +130,11 @@ pub impl IntoValue for GridChild with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridChild with IntoValue::{into_value}
+
+///|
 pub impl FromValue for GridChild with fn from_value(value) {
   if Content::castable(value) {
     let v : Content = Content::from_value(value)
@@ -102,6 +142,11 @@ pub impl FromValue for GridChild with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridChild with FromValue::{from_value}
 
 ///|
 /// Upstream `TryFrom<Content> for GridChild`.
@@ -134,6 +179,11 @@ pub(all) enum GridItem {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridItem with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for GridItem with fn input() {
   Content::input()
 }
@@ -149,6 +199,11 @@ pub impl Reflect for GridItem with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridItem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for GridItem with fn into_value(self) {
   match self {
     HLine(hline) => Content(hline)
@@ -158,6 +213,11 @@ pub impl IntoValue for GridItem with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridItem with IntoValue::{into_value}
+
+///|
 pub impl FromValue for GridItem with fn from_value(value) {
   if Content::castable(value) {
     let v : Content = Content::from_value(value)
@@ -165,6 +225,11 @@ pub impl FromValue for GridItem with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridItem with FromValue::{from_value}
 
 ///|
 /// Upstream `TryFrom<Content> for GridItem`.
@@ -246,9 +311,19 @@ pub impl Reflect for GridCell with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridCell with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for GridCell with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridCell with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for GridCell with fn from_value(value) {
@@ -258,6 +333,11 @@ pub impl FromValue for GridCell with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridCell with FromValue::{from_value}
 
 ///|
 /// A value that can be configured per cell.
@@ -274,9 +354,19 @@ pub(all) enum Celled[T] {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Celled with Eq::{not_equal, equal}
+
+///|
 pub impl[T : Default] Default for Celled[T] with fn default() {
   CelledValue(T::default())
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Celled with Default::{default}
 
 ///|
 pub impl[T : Reflect] Reflect for Celled[T] with fn input() {
@@ -292,6 +382,11 @@ pub impl[T : Reflect] Reflect for Celled[T] with fn output() {
 pub impl[T : Reflect] Reflect for Celled[T] with fn castable(value) {
   Arr::castable(value) || Func::castable(value) || T::castable(value)
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Celled with Reflect::{output, input, castable}
 
 ///|
 pub impl[T : IntoValue] IntoValue for Celled[T] with fn into_value(self) {
@@ -328,12 +423,22 @@ pub impl[T : FromValue] FromValue for Celled[T] with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Celled with FromValue::{from_value}
+
+///|
 pub impl[T : Fold] Fold for Celled[T] with fn fold(self, outer) {
   match (self, outer) {
     (CelledValue(inner), CelledValue(outer)) => CelledValue(inner.fold(outer))
     (self_, _) => self_
   }
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Celled with Fold::{fold}
 
 // Field defaults of the grid elements.
 

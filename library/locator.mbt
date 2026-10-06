@@ -107,6 +107,11 @@ pub impl Show for Locator with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Locator with Show::{to_string, output}
+
+///|
 /// The fully resolved value of a locator.
 priv enum Resolved {
   /// The full hash, incorporating the local_hash and all outer information.

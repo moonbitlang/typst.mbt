@@ -7,6 +7,11 @@
 pub(all) struct EnumItem(Content) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumItem with Eq::{not_equal, equal}
+
+///|
 /// Create a new enum item with the given body.
 pub fn EnumItem::new(body : Content) -> EnumItem {
   EnumItem(
@@ -30,9 +35,19 @@ pub impl Reflect for EnumItem with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumItem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for EnumItem with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumItem with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for EnumItem with fn from_value(v) {
@@ -49,6 +64,11 @@ pub impl FromValue for EnumItem with fn from_value(v) {
   }
   EnumItem(EnumItem::new(content).0.spanned(span))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumItem with FromValue::{from_value}
 
 ///|
 fn enum_elem_number_align_default() -> Value {

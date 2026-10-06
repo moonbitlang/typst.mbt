@@ -205,6 +205,21 @@ pub(all) enum LeftRightAlternator {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LeftRightAlternator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LeftRightAlternator with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LeftRightAlternator with @debug.Debug::{to_repr}
+
+///|
 /// Returns the current value and advances the alternator (upstream
 /// `Iterator::next`, which always yields).
 pub fn LeftRightAlternator::next(

@@ -10,6 +10,11 @@ pub(all) enum DocumentPosition {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentPosition with Eq::{not_equal, equal}
+
+///|
 /// Returns the paged position, if this is one.
 pub fn DocumentPosition::as_paged(self : DocumentPosition) -> PagedPosition? {
   match self {
@@ -71,6 +76,11 @@ pub impl Fingerprint for DocumentPosition with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentPosition with Fingerprint::{fingerprint}
+
+///|
 /// A physical position in a paged document.
 pub(all) struct PagedPosition {
   /// The page, starting at 1.
@@ -78,6 +88,11 @@ pub(all) struct PagedPosition {
   /// The exact coordinates on the page (from the top left, as usual).
   point : Point
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedPosition with Eq::{not_equal, equal}
 
 ///|
 /// The origin of the first page.
@@ -100,6 +115,11 @@ pub impl Fingerprint for PagedPosition with fn fingerprint(self, state) {
   state.write_i64(self.page.0)
   state.write(self.point)
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedPosition with Fingerprint::{fingerprint}
 
 // cast! {
 //     PagedPosition,
@@ -168,6 +188,11 @@ pub(all) struct HtmlPosition {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlPosition with Eq::{not_equal, equal}
+
+///|
 /// Create a position pointing to an element.
 pub fn HtmlPosition::new(element : Array[Int]) -> HtmlPosition {
   { element, inner: None, }
@@ -207,6 +232,11 @@ pub impl Fingerprint for HtmlPosition with fn fingerprint(self, state) {
 }
 
 ///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlPosition with Fingerprint::{fingerprint}
+
+///|
 /// A precise position inside of an HTML element.
 pub(all) enum InnerHtmlPosition {
   /// If the element is a frame, this specifies the position inside of the
@@ -215,6 +245,11 @@ pub(all) enum InnerHtmlPosition {
   /// If the element is a text node, this specifies the character offset.
   Character(Int)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InnerHtmlPosition with Eq::{not_equal, equal}
 
 ///|
 pub impl Fingerprint for InnerHtmlPosition with fn fingerprint(self, state) {
@@ -229,3 +264,8 @@ pub impl Fingerprint for InnerHtmlPosition with fn fingerprint(self, state) {
     }
   }
 }
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InnerHtmlPosition with Fingerprint::{fingerprint}
