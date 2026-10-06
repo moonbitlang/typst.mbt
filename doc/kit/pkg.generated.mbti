@@ -11,6 +11,47 @@ import {
 // Errors
 
 // Types and methods
+pub(all) enum AnchorX {
+  Left
+  Center
+  Right
+}
+
+pub(all) enum AnchorY {
+  Top
+  Horizon
+  Bottom
+  Baseline
+}
+
+pub struct Canvas {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::Canvas(Double, Double, Array[&@doc.IntoContent], clip? : Bool, key? : (Int) -> String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::arrow((Double, Double), Array[Segment], stroke? : @doc.Stroke, head? : Double, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::circle((Double, Double), Double, fill? : @doc.Paint, stroke? : @doc.Stroke, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::curve((Double, Double), Array[Segment], fill? : @doc.Paint, stroke? : @doc.Stroke, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::line((Double, Double), (Double, Double), stroke? : @doc.Stroke, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::place((Double, Double), &@doc.IntoContent, anchor? : (AnchorX, AnchorY), loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+#callsite(autofill(args_loc, loc))
+pub fn Canvas::rect((Double, Double), Double, Double, fill? : @doc.Paint, stroke? : @doc.Sides[@doc.Stroke], radius? : @doc.Corners[@doc.Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> CanvasItem
+pub impl Show for Canvas
+pub impl @debug.Debug for Canvas
+pub impl @doc.IntoContent for Canvas
+
+pub struct CanvasItem {
+  // private fields
+}
+pub impl Show for CanvasItem
+pub impl @debug.Debug for CanvasItem
+pub impl @doc.IntoContent for CanvasItem
+
 pub struct Cards {
   // private fields
 }
@@ -39,6 +80,12 @@ pub fn DataTable::DataTable(Array[&@doc.IntoContent], Array[Array[&@doc.IntoCont
 pub impl Show for DataTable
 pub impl @debug.Debug for DataTable
 pub impl @doc.IntoContent for DataTable
+
+pub(all) enum Segment {
+  LineTo((Double, Double))
+  QuadTo((Double, Double), (Double, Double))
+  CubicTo((Double, Double), (Double, Double), (Double, Double))
+}
 
 // Type aliases
 
