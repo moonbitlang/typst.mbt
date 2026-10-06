@@ -942,6 +942,268 @@ test "section 7: the cards of a row are equally high" {
 }
 
 ///|
+/// The lines of a compiled document: how many go across and how many down.
+fn Pages::lines(self : Pages) -> String {
+  let mut across = 0
+  let mut down = 0
+  for line in self.of_kind("line") {
+    if line.h == 0.0 {
+      across += 1
+    } else {
+      down += 1
+    }
+  }
+  "\{across} across, \{down} down"
+}
+
+///|
+test "section 7: a table of data is given by rows, and every row is checked" {
+  let rows : Array[Array[&@doc.IntoContent]] = [
+    ["North", "Beans", "4.5"],
+    ["South", "Chard", "12.0"],
+  ]
+  let table = pages([@guide.harvest_table(rows)])
+  inspect(table.errors(), content="")
+  inspect(table.warnings(), content="")
+  // A rule under the header and under each row, and no other line.
+  inspect(
+    table.lines(),
+    content=(
+      #|3 across, 0 down
+    ),
+  )
+  // The numbers and their header end where their column ends.
+  let ends = table
+    .of_kind("text")
+    .filter(run => ["Harvest (kg)", "4.5", "12.0"].contains(run.text))
+    .map(run => pt(run.x + run.w))
+  inspect(
+    ends.join(" "),
+    content=(
+      #|185.0 185.0 185.0
+    ),
+  )
+  // A row with a cell too few: the text of the guide, with every number
+  // as `N`.
+  let short = pages([@guide.short_row()])
+  inspect(
+    numberless(short.report.errors[0].render()),
+    content=(
+      #|error: `rows[N]` has cells for N columns: this `DataTable` has N columns
+      #|  at doc/examples/guide/guide.mbt:N:N (DataTable, argument N, key "N")
+    ),
+  )
+  // A cell that spans is counted with its span.
+  let spanned = pages([
+    @guide.harvest_table([
+      ["North", "Beans", "4.5"],
+      [@doc.TableCell("Both beds", colspan=2), "16.5"],
+    ]),
+  ])
+  inspect(spanned.errors(), content="")
+  // Over pages: the header is on each, and a row of three lines is not
+  // split.
+  let many : Array[Array[&@doc.IntoContent]] = Array::makei(4, i => {
+    ["Bed \{i + 1}", "A crop that needs a second line in its column.", "1.0"]
+  })
+  let long = pages([@guide.harvest_table(many)])
+  inspect(long.errors(), content="")
+  let texts = long.of_kind("text")
+  let crop = texts.filter(run => run.text == "Crop")
+  // Per page: the header, the rows, and the lines of text in the second
+  // column, which are three for every row.
+  let per_page : Array[String] = []
+  for header in crop {
+    let on_page = texts.filter(run => run.page == header.page)
+    let rows = on_page.filter(run => run.text.has_prefix("Bed ")).length()
+    let lines = on_page
+      .filter(run => pt(run.x) == pt(header.x) && run.text != "Crop")
+      .length()
+    per_page.push("p\{header.page}: \{rows} rows, \{lines} lines")
+  }
+  inspect(
+    per_page.join("\n"),
+    content=(
+      #|p1: 1 rows, 3 lines
+      #|p2: 1 rows, 3 lines
+      #|p3: 1 rows, 3 lines
+      #|p4: 1 rows, 3 lines
+    ),
+  )
+}
+
+///|
+test "section 7: the looks of a table of data" {
+  let rows : Array[Array[&@doc.IntoContent]] = [
+    ["North", "Beans", "4.5"],
+    ["South", "Chard", "12.0"],
+    ["West", "Kale", "3.1"],
+  ]
+  let table = pages([@guide.styled_table(rows, 1), "after"])
+  inspect(table.errors(), content="")
+  inspect(table.warnings(), content="")
+  // In a frame: a rule under the header and under every row but the last.
+  inspect(
+    table.lines(),
+    content=(
+      #|3 across, 0 down
+    ),
+  )
+  // The fills of the header and of the marked row (`rows[1]`), cell by
+  // cell.
+  inspect(
+    table.of_kind("rect").map(cell => "\{pt(cell.y)} \{cell.fill}").join("\n"),
+    content=(
+      #|10.0 luma(92.16%)
+      #|41.4 rgb("#fdf3d7")
+      #|10.0 luma(92.16%)
+      #|41.4 rgb("#fdf3d7")
+      #|10.0 luma(92.16%)
+      #|41.4 rgb("#fdf3d7")
+    ),
+  )
+  // The text: 9pt in the table, the header in its own size, the numbers
+  // in their font, the text after the sequence as before.
+  inspect(
+    table
+    .of_kind("text")
+    .map(run => "\{run.text}: \{pt(run.h)} \{run.family}")
+    .join("\n"),
+    content=(
+      #|BED: 7.0 Libertinus Serif
+      #|CROP: 7.0 Libertinus Serif
+      #|HARVEST (KG): 7.0 Libertinus Serif
+      #|North: 9.0 Libertinus Serif
+      #|Beans: 9.0 Libertinus Serif
+      #|4.5: 9.0 DejaVu Sans Mono
+      #|South: 9.0 Libertinus Serif
+      #|Chard: 9.0 Libertinus Serif
+      #|12.0: 9.0 DejaVu Sans Mono
+      #|West: 9.0 Libertinus Serif
+      #|Kale: 9.0 Libertinus Serif
+      #|3.1: 9.0 DejaVu Sans Mono
+      #|after: 10.0 Libertinus Serif
+    ),
+  )
+  // `styled_table` creates a `Cells` function: it cannot be called inside
+  // a callback. `DataTable` itself creates none.
+  let late = pages([@doc.Context(_ => @guide.styled_table(rows, 1))])
+  inspect(
+    late.errors(),
+    content=(
+      #|callbacks cannot be created inside a callback
+    ),
+  )
+  let plain = pages([@doc.Context(_ => @guide.harvest_table(rows))])
+  inspect(plain.errors(), content="")
+  // The cells of a row resolve to the `rows` argument under the key of
+  // the row.
+  let origin = table.origin("Chard")
+  inspect(
+    place(origin),
+    content=(
+      #|guide.mbt (DataTable, argument 2, key "1")
+    ),
+  )
+  inspect(
+    origin.keys.join("/"),
+    content=(
+      #|1
+    ),
+  )
+}
+
+///|
+test "section 7: inline code in a cell breaks where it has soft breaks" {
+  let name = "garden_bed_watering_schedule"
+  let table = (cell : &@doc.IntoContent) => {
+    pages([
+      @kit.DataTable(["Name", "Bed"], [[cell, "North"]], columns=[Pt(80), Fr(1)]),
+    ])
+  }
+  // Without them it runs over its column, which ends at 90pt.
+  let whole = table(@doc.Raw(name)).of_kind("text")[2]
+  assert_eq(whole.text, name)
+  assert_true(whole.x + whole.w > 90.0)
+  // With them it is broken inside its cell.
+  let broken = table(@guide.code_cell(name))
+  inspect(broken.errors(), content="")
+  let runs = broken.of_kind("text").filter(run => run.family.contains("Mono"))
+  inspect(
+    runs.map(run => run.text.replace_all(old="\u{200B}", new="")).join("|"),
+    content=(
+      #|garden_bed_|watering_|schedule
+    ),
+  )
+  for run in runs {
+    assert_true(run.x + run.w <= 85.0)
+  }
+}
+
+///|
+test "section 7: a chip is on the baseline of its line and stays on one line" {
+  let words = "word ".repeat(7)
+  let line = (item : &@doc.IntoContent) => {
+    let out : Array[String] = []
+    for
+      run in pages([@doc.Par(@doc.Seq([words, item, " ", words, words]))]).of_kind(
+        "text",
+      ) {
+      if !out.contains(pt(run.y)) {
+        out.push(pt(run.y))
+      }
+    }
+    out.join(" ")
+  }
+  // The baselines of three lines of text, with a chip in the second and
+  // with a word in its place.
+  let chip = @guide.status("needs water", done=false)
+  inspect(
+    line(chip),
+    content=(
+      #|16.6 29.7 42.7 55.8
+    ),
+  )
+  assert_eq(line(chip), line(@doc.Text("needs water", size=Pt(7))))
+  // A box with the padding as its inset makes its line higher.
+  let box = @doc.Text(
+    @doc.Box("needs water", inset=@doc.Sides(x=Em(0.6), y=Em(0.3))),
+    size=Pt(7),
+  )
+  assert_true(line(box) != line(chip))
+  // The label is one run, in the size and the weight of the `Text`
+  // around the chip, with no-break spaces.
+  let label = pages([@doc.Par(chip)]).of_kind("text")
+  inspect(
+    label
+    .map(run => "\{run.text.replace_all(old="\u{00A0}", new="~")}: \{pt(run.h)}")
+    .join("|"),
+    content=(
+      #|needs~water: 7.0
+    ),
+  )
+  // In a column of 50pt the label is one line, where a box breaks it.
+  let cell = (item : &@doc.IntoContent) => {
+    pages([@doc.Table([item, "x"], columns=[Pt(50), Fr(1)])])
+    .of_kind("text")
+    .filter(run => run.text != "x")
+    .length()
+  }
+  inspect(
+    cell(chip),
+    content=(
+      #|1
+    ),
+  )
+  inspect(
+    cell(@doc.Box("needs water", inset=@doc.Sides(x=Em(0.6)))),
+    content=(
+      #|2
+    ),
+  )
+}
+
+///|
 test "section 8: a callback cannot be created inside a callback" {
   let nested = pages([@guide.stripes_in_show()])
   inspect(

@@ -2,6 +2,7 @@ import {
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
   "moonbitlang/typst/doc/kit",
+  "moonbitlang/typst/doc/format",
 }
 
 import {

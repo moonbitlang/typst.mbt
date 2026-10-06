@@ -202,6 +202,21 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   of a row equally high. Without `radius` they are the cells of a grid;
   with it, rounded unbreakable blocks whose rows are measured first (a
   callback, so it is built outside of callbacks).
+- `doc/kit`: `Chip(text, fill?, stroke?, radius?, inset?, outset?)`, a
+  label in a box in a line of text: the padding to the sides is the box's
+  inset and the padding above and below its outset (the label stays on the
+  baseline, the line keeps its height), and the spaces of the label are
+  no-break spaces. `Chip::of(body, ..)` is the same box around content.
+- `doc/kit`: `DataTable(head, rows, columns~, inset?, align?, fill?,
+  stroke?, radius?, breakable?, key?)`, a table of data given by rows: a
+  header that repeats, rows that are not split, one stroke as the rule
+  under each row with no other line, and with `radius` a rounded frame.
+  A row whose cells do not fill the columns (spans counted) is an error at
+  `rows` under the key of the row.
+- `doc`: `Content::table_cell_spans()`, the columns and the rows that a
+  description takes as a cell of a table (`None` for a child that a table
+  does not place in its row): what `DataTable` counts with, since a
+  description is opaque outside `doc`.
 
 ### Not a change for users
 
