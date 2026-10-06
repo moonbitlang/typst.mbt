@@ -319,6 +319,9 @@ pub impl Show for PackageSpec with fn output(self, logger) {
 }
 
 ///|
+pub extend PackageSpec with Show::{to_string, output}
+
+///|
 /// Identifies a package, but not a specific version of it.
 pub(all) struct VersionlessPackageSpec {
   /// The namespace the package lives in.
@@ -367,6 +370,9 @@ pub impl @debug.Debug for VersionlessPackageSpec with fn to_repr(self) {
 pub impl Show for VersionlessPackageSpec with fn output(self, logger) {
   logger.write_string("@\{self.namespace_}/\{self.name}")
 }
+
+///|
+pub extend VersionlessPackageSpec with Show::{to_string, output}
 
 ///|
 /// A minimal string scanner (the parts of `unscanny::Scanner` used here).
@@ -588,6 +594,9 @@ pub impl Show for PackageVersion with fn output(self, logger) {
 }
 
 ///|
+pub extend PackageVersion with Show::{to_string, output}
+
+///|
 /// A version bound for compatibility specification.
 pub(all) struct VersionBound {
   /// The bounds's major version.
@@ -649,6 +658,9 @@ pub impl Show for VersionBound with fn output(self, logger) {
     logger.write_string(".\{patch}")
   }
 }
+
+///|
+pub extend VersionBound with Show::{to_string, output}
 
 ///|
 /// Parse an unsigned 32-bit integer like Rust's `u32::from_str`: decimal

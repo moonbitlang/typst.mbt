@@ -188,6 +188,9 @@ pub impl Reflect for CloseMode with fn castable(v) {
 }
 
 ///|
+pub extend CloseMode with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CloseMode with fn into_value(self) {
   match self {
     Smooth => Str("smooth")

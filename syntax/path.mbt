@@ -64,6 +64,9 @@ pub impl Show for RootedPath with fn output(self, logger) {
 }
 
 ///|
+pub extend RootedPath with Show::{to_string, output}
+
+///|
 /// The root of a virtual file system.
 pub(all) enum VirtualRoot {
   /// The canonical root of the Typst project.
@@ -380,6 +383,9 @@ pub impl Show for VirtualPath with fn output(self, logger) {
 }
 
 ///|
+pub extend VirtualPath with Show::{to_string, output}
+
+///|
 /// A component in a virtual path.
 priv enum Component {
   Root
@@ -609,6 +615,9 @@ pub impl Show for PathError with fn output(self, logger) {
 }
 
 ///|
+pub extend PathError with Show::{to_string, output}
+
+///|
 /// An error that can occur in [`VirtualPath::virtualize`].
 pub(all) suberror VirtualizeError {
   /// A normal path error.
@@ -632,6 +641,9 @@ pub impl Show for VirtualizeError with fn output(self, logger) {
     Utf8 => logger.write_string("path contains non-UTF-8 bytes")
   }
 }
+
+///|
+pub extend VirtualizeError with Show::{to_string, output}
 
 ///|
 /// An error that can occur in [`VirtualPath::realize`].

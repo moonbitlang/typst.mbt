@@ -5,6 +5,9 @@
 pub(all) struct Angle(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+pub extend Angle with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Different units of angular measurement.
 pub(all) enum AngleUnit {
   Rad

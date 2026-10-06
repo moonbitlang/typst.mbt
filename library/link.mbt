@@ -61,12 +61,18 @@ pub impl Reflect for LinkTarget with fn castable(v) {
 }
 
 ///|
+pub extend LinkTarget with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for LinkTarget with fn into_value(self) {
   match self {
     Dest(v) => v.into_value()
     Label(v) => IntoValue::into_value(v)
   }
 }
+
+///|
+pub extend LinkTarget with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for LinkTarget with fn from_value(v) {
@@ -78,6 +84,9 @@ pub impl FromValue for LinkTarget with fn from_value(v) {
     raise HintedError(LinkTarget::input().error(v))
   }
 }
+
+///|
+pub extend LinkTarget with FromValue::{from_value}
 
 ///|
 /// A link destination.
@@ -112,6 +121,9 @@ pub impl Reflect for Destination with fn castable(v) {
 }
 
 ///|
+pub extend Destination with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Destination with fn into_value(self) {
   match self {
     Url(v) => v.into_value()
@@ -119,6 +131,9 @@ pub impl IntoValue for Destination with fn into_value(self) {
     Location(v) => IntoValue::into_value(v)
   }
 }
+
+///|
+pub extend Destination with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Destination with fn from_value(v) {
@@ -132,6 +147,9 @@ pub impl FromValue for Destination with fn from_value(v) {
     raise HintedError(Destination::input().error(v))
   }
 }
+
+///|
+pub extend Destination with FromValue::{from_value}
 
 ///|
 /// A uniform resource locator with a maximum length.
@@ -187,14 +205,23 @@ pub impl Reflect for Url with fn castable(v) {
 }
 
 ///|
+pub extend Url with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Url with fn into_value(self) {
   Str(self.0)
 }
 
 ///|
+pub extend Url with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Url with fn from_value(v) {
   Url::new(FromValue::from_value(v))
 }
+
+///|
+pub extend Url with FromValue::{from_value}
 
 ///|
 /// A contact scheme of a URL.

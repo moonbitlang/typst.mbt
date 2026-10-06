@@ -310,6 +310,9 @@ pub impl Show for StrError with fn output(self, logger) {
 }
 
 ///|
+pub extend StrError with Show::{to_string, output}
+
+///|
 /// Rust's `str::trim` (Unicode `White_Space`).
 pub fn rust_trim(s : String) -> String {
   let chars = s.to_array()

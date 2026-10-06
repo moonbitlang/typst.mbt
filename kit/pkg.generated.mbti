@@ -42,11 +42,15 @@ pub(all) suberror FilesError {
   InvalidCharBoundary(Int)
   Io(String)
 }
+pub fn FilesError::output(Self, &Logger) -> Unit
+pub fn FilesError::to_string(Self) -> String
 pub impl Show for FilesError
 
 pub(all) suberror StrError {
   StrError(String)
 }
+pub fn StrError::output(Self, &Logger) -> Unit
+pub fn StrError::to_string(Self) -> String
 pub impl Show for StrError
 
 // Types and methods

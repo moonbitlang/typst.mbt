@@ -86,6 +86,9 @@ pub impl Reflect for Target with fn castable(v) {
 }
 
 ///|
+pub extend Target with Reflect::{input, castable}
+
+///|
 pub impl IntoValue for Target with fn into_value(self) {
   match self {
     Paged => Str("paged")
@@ -93,6 +96,9 @@ pub impl IntoValue for Target with fn into_value(self) {
     Bundle => Str("bundle")
   }
 }
+
+///|
+pub extend Target with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Target with fn from_value(v) {

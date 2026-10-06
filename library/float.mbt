@@ -132,6 +132,9 @@ pub impl Reflect for ToFloat with fn castable(v) {
 }
 
 ///|
+pub extend ToFloat with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToFloat with fn from_value(v) {
   match v {
     Float(v) => ToFloat(v)

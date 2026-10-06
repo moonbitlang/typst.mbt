@@ -552,6 +552,9 @@ pub impl IntoValue for CslSource with fn into_value(self) {
 }
 
 ///|
+pub extend CslSource with IntoValue::{into_value}
+
+///|
 /// Maps from style names to their replacements.
 ///
 /// TODO: Fully move this into hayagriva somehow.

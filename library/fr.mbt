@@ -5,6 +5,9 @@
 pub(all) struct Fr(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+pub extend Fr with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub fn Fr::zero() -> Fr {
   Fr(Scalar(0.0))
 }

@@ -7,6 +7,9 @@
 pub(all) struct Depth(Int64) derive(Eq, Hash, Default)
 
 ///|
+pub extend Depth with Default::{default}
+
+///|
 pub impl Fold for Depth with fn fold(self, outer) {
   Depth(outer.0 + self.0)
 }
@@ -30,6 +33,9 @@ pub impl Reflect for Depth with fn castable(v) {
 pub impl IntoValue for Depth with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend Depth with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Depth with fn from_value(v) {

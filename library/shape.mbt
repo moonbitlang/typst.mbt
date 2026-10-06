@@ -79,6 +79,9 @@ pub impl Default for FillRule with fn default() {
 }
 
 ///|
+pub extend FillRule with Default::{default}
+
+///|
 pub impl Reflect for FillRule with fn input() {
   Union([
     Value(
@@ -101,6 +104,9 @@ pub impl Reflect for FillRule with fn output() {
 pub impl Reflect for FillRule with fn castable(v) {
   v is Str("non-zero" | "even-odd")
 }
+
+///|
+pub extend FillRule with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for FillRule with fn into_value(self) {

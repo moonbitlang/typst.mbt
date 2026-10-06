@@ -184,3 +184,6 @@ pub impl Default for FixedStroke with fn default() {
     miter_limit: Ratio::new(4.0),
   }
 }
+
+///|
+pub extend FixedStroke with Default::{default}

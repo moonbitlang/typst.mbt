@@ -39,6 +39,9 @@ pub impl Default for ArtifactKind with fn default() {
 }
 
 ///|
+pub extend ArtifactKind with Default::{default}
+
+///|
 let artifact_kind_names : ReadOnlyArray[String] = [
   "header", "footer", "watermark", "page-number", "line-number", "redaction", "bates",
   "page", "pagination-other", "layout", "background", "other",
@@ -76,6 +79,9 @@ pub impl Reflect for ArtifactKind with fn castable(v) {
 }
 
 ///|
+pub extend ArtifactKind with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ArtifactKind with fn into_value(self) {
   for i, kind in artifact_kind_values[:] {
     if kind == self {
@@ -84,6 +90,9 @@ pub impl IntoValue for ArtifactKind with fn into_value(self) {
   }
   None
 }
+
+///|
+pub extend ArtifactKind with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ArtifactKind with fn from_value(v) {
@@ -150,6 +159,9 @@ pub impl Reflect for PdfMarkerTagKind with fn castable(v) {
 }
 
 ///|
+pub extend PdfMarkerTagKind with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {
   match self {
     Bibliography(numbered) =>
@@ -164,6 +176,9 @@ pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {
     }
   }
 }
+
+///|
+pub extend PdfMarkerTagKind with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PdfMarkerTagKind with fn from_value(v) {

@@ -173,6 +173,9 @@ pub impl[T : IntoValue] IntoValue for Smart[T] with fn into_value(self) {
 }
 
 ///|
+pub extend Smart with IntoValue::{into_value}
+
+///|
 pub impl[T : FromValue] FromValue for Smart[T] with fn from_value(value) {
   match value {
     Value::Auto => Auto
@@ -185,3 +188,6 @@ pub impl[T : FromValue] FromValue for Smart[T] with fn from_value(value) {
       )
   }
 }
+
+///|
+pub extend Smart with FromValue::{from_value}

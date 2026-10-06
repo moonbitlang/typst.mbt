@@ -337,6 +337,9 @@ pub impl Default for TableHeaderScope with fn default() {
 }
 
 ///|
+pub extend TableHeaderScope with Default::{default}
+
+///|
 pub fn TableHeaderScope::refers_to_column(self : TableHeaderScope) -> Bool {
   match self {
     Both => true
@@ -374,6 +377,9 @@ pub impl Reflect for TableHeaderScope with fn castable(v) {
 }
 
 ///|
+pub extend TableHeaderScope with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableHeaderScope with fn into_value(self) {
   match self {
     Both => Str("both")
@@ -391,6 +397,9 @@ pub impl FromValue for TableHeaderScope with fn from_value(v) {
     v => raise HintedError(TableHeaderScope::input().error(v))
   }
 }
+
+///|
+pub extend TableHeaderScope with FromValue::{from_value}
 
 // Field defaults of the table elements.
 
@@ -493,6 +502,9 @@ pub impl Default for TableCell with fn default() {
   .with_colspan(NonZeroUSize(1L))
   .with_rowspan(NonZeroUSize(1L))
 }
+
+///|
+pub extend TableCell with Default::{default}
 
 ///|
 /// The internal `kind` field of the cell, taking styles into account

@@ -167,6 +167,9 @@ pub impl Reflect for Dir with fn castable(value) {
 }
 
 ///|
+pub extend Dir with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Dir with fn into_value(self) {
   Dyn(Dir(self))
 }

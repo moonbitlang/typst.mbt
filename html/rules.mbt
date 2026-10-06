@@ -1073,7 +1073,7 @@ fn image_rule(
   engine : @library.Engine,
   styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  let span = elem.into_content().span()
+  let span = elem.pack().span()
   let image = elem.decode(engine, styles)
   let attrs = @library.HtmlAttrs::new()
   let src = @library.at(span, () => {

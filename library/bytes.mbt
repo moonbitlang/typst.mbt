@@ -183,6 +183,9 @@ pub impl Reflect for ToBytes with fn castable(v) {
 }
 
 ///|
+pub extend ToBytes with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for ToBytes with fn from_value(v) {
   match v {
     Str(_) | Symbol(_) => {
@@ -220,6 +223,9 @@ pub impl Reflect for BytesValue with fn output() {
 pub impl Reflect for BytesValue with fn castable(v) {
   v is Bytes(_)
 }
+
+///|
+pub extend BytesValue with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for BytesValue with fn into_value(self) {

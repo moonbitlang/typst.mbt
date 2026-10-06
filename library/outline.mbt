@@ -26,6 +26,9 @@ pub impl Reflect for OutlineIndent with fn castable(v) {
 }
 
 ///|
+pub extend OutlineIndent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OutlineIndent with fn into_value(self) {
   match self {
     Rel(v) => Relative(v)

@@ -115,6 +115,9 @@ pub impl Compare for Version with fn compare(self, other) {
 }
 
 ///|
+pub extend Version with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Eq for Version with fn equal(self, other) {
   self.compare(other) == 0
 }
@@ -160,6 +163,9 @@ pub impl Reflect for VersionComponents with fn castable(v) {
 }
 
 ///|
+pub extend VersionComponents with Reflect::{output, input, castable}
+
+///|
 pub impl FromValue for VersionComponents with fn from_value(v) {
   match v {
     Int(_) => {
@@ -188,6 +194,9 @@ pub impl Reflect for Version with fn output() {
 pub impl Reflect for Version with fn castable(v) {
   v is Version(_)
 }
+
+///|
+pub extend Version with Reflect::{input, castable}
 
 ///|
 pub impl IntoValue for Version with fn into_value(self) {

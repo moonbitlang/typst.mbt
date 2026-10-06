@@ -617,9 +617,15 @@ pub impl Reflect for Element with fn castable(v) {
 }
 
 ///|
+pub extend Element with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Element with fn into_value(self) {
   Func(Func::element(self))
 }
+
+///|
+pub extend Element with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Element with fn from_value(v) {
@@ -628,6 +634,9 @@ pub impl FromValue for Element with fn from_value(v) {
     None => bail("expected element")
   }
 }
+
+///|
+pub extend Element with FromValue::{from_value}
 
 ///|
 /// A Typst element that is defined by a native type (upstream
