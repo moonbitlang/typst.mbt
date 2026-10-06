@@ -2500,6 +2500,7 @@ pub struct Stroke {
 pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Dash, miter_limit? : Double) -> Self
 pub fn Stroke::auto() -> Self
 pub fn Stroke::none() -> Self
+pub fn Stroke::paint(Self) -> Paint?
 pub impl ToValue for Stroke
 
 pub struct Strong {
