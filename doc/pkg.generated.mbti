@@ -922,6 +922,8 @@ pub(all) enum Length {
   Scaled(Length, Double)
 }
 pub fn Length::scale(Self, Double) -> Self
+pub fn Length::sizing(Self) -> Sizing
+pub fn Length::spacing(Self) -> Spacing
 pub impl Add for Length
 pub impl Neg for Length
 pub impl @builtin.Sub for Length

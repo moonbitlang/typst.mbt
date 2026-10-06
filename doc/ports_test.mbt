@@ -729,3 +729,29 @@ test "a colour operation on a paint that is not a colour is Typst's error" {
     ),
   )
 }
+
+///|
+test "`Length::sizing` and `Length::spacing` are `Rel`" {
+  let gap : @doc.Length = Pt(6) + Em(0.5)
+  assert_eq(
+    lowered([@doc.V(gap.spacing()), @doc.Grid(["a"], columns=[gap.sizing()])]),
+    lowered([@doc.V(Rel(gap)), @doc.Grid(["a"], columns=[Rel(gap)])]),
+  )
+  inspect(
+    lowered([@doc.V(gap.spacing()), @doc.Box("x", width=gap.sizing())]),
+    content=(
+      #|sequence(
+      #|  v(amount: 6pt + 0.5em),
+      #|  box(width: 0% + 6pt + 0.5em, body: [x]),
+      #|)
+    ),
+  )
+  // The states pass through.
+  let auto : @doc.Length = Auto
+  inspect(
+    lowered([@doc.Box("x", width=auto.sizing())]),
+    content=(
+      #|box(width: auto, body: [x])
+    ),
+  )
+}

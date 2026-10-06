@@ -834,21 +834,29 @@ test "T5: `Layout` gives the size of the enclosing region" {
 }
 
 ///|
-test "T6: a composed length is a `Sizing` or a `Spacing` through `Rel`" {
+test "T6: a composed length is a `Sizing` or a `Spacing` by `sizing()`, `spacing()` or `Rel`" {
   // `Length`, `Sizing` and `Spacing` are three enums with the same cases;
   // a `Length` value (a sum, or the result of a helper) becomes one of
-  // the others with `Rel(..)`.
+  // the others with `.sizing()` and `.spacing()`, which are `Rel(..)`.
   let half : @doc.Length = Pct(50) - Pt(10)
   let gap : @doc.Length = Pt(11) + Em(0.5)
   let bar = @doc.Rect(width=Pct(100), height=Pt(5), fill=Luma(200))
   let report = compile(
     [
       ..small_page(),
+      @doc.Grid([bar, bar], columns=[half.sizing(), Fr(1)]),
+      @doc.Block(bar, above=gap.spacing()),
+    ],
+  )
+  inspect(error_messages(report), content="")
+  let with_rel = compile(
+    [
+      ..small_page(),
       @doc.Grid([bar, bar], columns=[Rel(half), Fr(1)]),
       @doc.Block(bar, above=Rel(gap)),
     ],
   )
-  inspect(error_messages(report), content="")
+  assert_eq(listing(marks(with_rel)), listing(marks(report)))
   // The first column is 50% of 180pt less 10pt; the block is 11pt and half
   // of the 10pt font size below the grid.
   inspect(
