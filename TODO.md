@@ -182,10 +182,10 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   (10pt three times before), and closures of one `eval` call with the same
   text but different trees. Remaining differences in kind, not in what is
   told apart: the hash values are not upstream's (payload encodings; only
-  the SVG exporter's inputs are byte-exact), datetimes, decimals,
-  alignments and directions are written as their repr plus the builtin
-  32-bit hash (`write_leaf`; these reprs show all data, unlike those of
-  symbols and durations, which are hashed structurally), native
+  the SVG exporter's inputs are byte-exact), decimals, alignments and
+  directions are written as their repr plus the builtin 32-bit hash
+  (`write_leaf`; these reprs show all data, unlike those of symbols,
+  datetimes and durations, which are hashed structurally), native
   functions by name, title and docs (upstream: identity;
   `typst/fingerprint_wbtest.mbt` checks they are distinct), the
   documentation of a captured library binding lacks upstream's `since`,

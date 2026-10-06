@@ -5030,6 +5030,7 @@ pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
 pub fn Datetime::sub_duration(Self, Duration) -> Self
 pub fn Datetime::weekday(Self) -> Int?
 pub fn Datetime::year(Self) -> Int?
+pub impl Fingerprint for Datetime
 pub impl FromValue for Datetime
 pub impl IntoValue for Datetime
 pub impl Reflect for Datetime

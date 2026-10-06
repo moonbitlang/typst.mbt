@@ -381,6 +381,33 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   assert_eq(collect(first).length(), 1)
   assert_eq(hash128(Value::Module(first)), first_hash)
   assert_eq(hash128(Value::Module(second)), second_hash)
+  // The same through content, which caches the hash of its fields: content
+  // in the inner module that holds the outer one is cut short while the
+  // outer module is hashed, and must not keep that result.
+  let elem = TextElem::packed("x").elem()
+  let outer_scope = Scope::new()
+  let inner_scope = Scope::new()
+  let outer = Module::anonymous(outer_scope)
+  let inner = Module::anonymous(inner_scope)
+  let back = Content::from_fields(elem, [Some(Module(outer))])
+  outer_scope.bind("b", Binding::new(Module(inner), detached)) |> ignore
+  outer_scope.bind("f", Binding::new(Func(Func::host(host)), detached))
+  |> ignore
+  inner_scope.bind("c", Binding::new(Content(back), detached)) |> ignore
+  let (outer_hash, outer_flags) = fingerprint_and_flags(Value::Module(outer))
+  assert_true((outer_flags & fingerprint_host) != 0)
+  for _ in 0..<2 {
+    for m in [inner, outer] {
+      let hosts = collect(m)
+      assert_eq(hosts.length(), 1)
+      assert_true(physical_equal(hosts[0], host))
+    }
+    let (_, back_flags) = fingerprint_and_flags(Value::Content(back))
+    assert_true((back_flags & fingerprint_host) != 0)
+    let (_, inner_flags) = fingerprint_and_flags(Value::Module(inner))
+    assert_true((inner_flags & fingerprint_host) != 0)
+    assert_eq(hash128(Value::Module(outer)), outer_hash)
+  }
   let node = @syntax.parse_code("x")
   distinct(closure(node, scope(Module(a), detached)))
   distinct(closure(node, scope(Module(b), detached)))

@@ -126,7 +126,7 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Datetime(v) => {
       state.write_discriminant(18)
-      state.write_leaf(v.repr(), v)
+      state.write(v)
     }
     Decimal(v) => {
       state.write_discriminant(19)
@@ -174,6 +174,37 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     Dyn(v) => {
       state.write_discriminant(29)
       state.write(v)
+    }
+  }
+}
+
+///|
+/// Upstream derives `Hash` for `Datetime`: a date, a time or both, with the
+/// nanoseconds that the repr does not show.
+pub impl Fingerprint for Datetime with fn fingerprint(self, state) {
+  let date = (date : @time.Date) => {
+    state.write_usize(date.year())
+    state.write_usize(date.ordinal())
+  }
+  let time = (time : @time.Time) => {
+    state.write_usize(time.hour())
+    state.write_usize(time.minute())
+    state.write_usize(time.second())
+    state.write_usize(time.nanosecond())
+  }
+  match self {
+    Date(v) => {
+      state.write_discriminant(0)
+      date(v)
+    }
+    Time(v) => {
+      state.write_discriminant(1)
+      time(v)
+    }
+    Datetime(v) => {
+      state.write_discriminant(2)
+      date(v.date())
+      time(v.time())
     }
   }
 }
@@ -458,18 +489,15 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   lifecycle.sort()
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
-  let cached = match self.data_hash.val {
-    // A collector of host closures must visit the fields that hold some.
-    Some((_, flags)) if fingerprint_hosts.val is Some(_) &&
-      (flags & fingerprint_host) != 0 => Option::None
-    cached => cached
-  }
+  let cached = self.data_hash.val
   let data = match cached {
-    Some((h, flags)) => {
+    // A collector of host closures must visit the fields that hold some.
+    Some((h, flags)) if !(fingerprint_hosts.val is Some(_) &&
+      (flags & fingerprint_host) != 0) => {
       mark_fingerprint_flags(flags)
       h
     }
-    None => {
+    _ => {
       let inner = SipHasher128::new()
       let flags = fingerprint_flags_in(() => {
         inner.write_usize(self.fields.length())
@@ -477,9 +505,23 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
           inner.write(field)
         }
       })
-      let h = inner.finish128()
-      self.data_hash.val = Some((h, flags))
-      h
+      match cached {
+        // Only the collector needed the visit: the fields and their
+        // fingerprint are what they were.
+        Some((h, flags)) => {
+          mark_fingerprint_flags(flags)
+          h
+        }
+        None => {
+          let h = inner.finish128()
+          // Not if a cycle cut the fields short (see [LazyFingerprint]):
+          // the hash and the flags would be incomplete.
+          if !lazy_fingerprint_cut() {
+            self.data_hash.val = Some((h, flags))
+          }
+          h
+        }
+      }
     }
   }
   state.write_u128(data)
@@ -592,7 +634,10 @@ pub impl Fingerprint for Numbering with fn fingerprint(self, state) {
   match self {
     Pattern(pattern) => {
       state.write_discriminant(0)
+      // The pattern string determines the pieces and the suffix (patterns
+      // are only made by parsing one); `trimmed` is set afterwards.
       state.write(pattern.into_value())
+      state.write_bool(pattern.trimmed)
     }
     Func(func) => {
       state.write_discriminant(1)

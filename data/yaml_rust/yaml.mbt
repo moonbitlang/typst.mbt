@@ -45,7 +45,8 @@ fn parse_f64(v : String) -> Double? {
     ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF" =>
       Some(@double.infinity)
     "-.inf" | "-.Inf" | "-.INF" => Some(@double.neg_infinity)
-    ".nan" | "NaN" | ".NAN" => Some(@double.not_a_number)
+    // `f64::NAN`.
+    ".nan" | "NaN" | ".NAN" => Some(0x7FF8000000000000L.reinterpret_as_double())
     _ => rust_parse_f64(v)
   }
 }

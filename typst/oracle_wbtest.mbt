@@ -193,3 +193,56 @@ test "oracle: location keys: other values" {
   ]
   assert_eq(oracle_metadata(source), expected)
 }
+
+///|
+test "oracle: location keys: field values are hashed as they are cast" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Field values that are spelled differently but cast to the same data.\n#check((10pt, 10pt + 0%, 10pt + 0em, 10pt).map(s => [#rect(width: s)<r>]))\n#check((1pt, stroke(1pt), (thickness: 1pt), 1pt + 0em, 1pt).map(s => [#rect(stroke: s)<r>]))\n#check((5pt, (rest: 5pt), (x: 5pt, y: 5pt), (left: 5pt, rest: 5pt), 5pt + 0%, 5pt).map(s => [#rect(inset: s)<r>]))\n#check((1pt, (rest: 1pt), (top: 1pt, bottom: 1pt), 1pt).map(s => [#rect(radius: s)<r>]))\n#check((red, rgb(\"#ff4136\"), rgb(255, 65, 54), red).map(s => [#rect(fill: s)<r>]))\n#check((2, (auto, auto), (auto,) * 2, 2).map(s => [#grid(columns: s)<r>]))\n#check((1pt, 1pt + 0%, 1pt).map(s => [#move(dx: s)[]<r>]))\n#check((1em, 1em + 0pt, 1em).map(s => [#h(s)<r>]))\n#check((100%, 100% + 0pt, 1fr, 100%).map(s => [#box(width: s)<r>]))\n#check((90deg, 1.5707963267948966rad, 90.0deg, 90deg).map(s => [#rotate(s)[]<r>]))\n#check((2, 2.0, 200%, 2).map(s => [#scale(x: s * 50%)[]<r>]))\n#check((\"1.\", numbering.with(\"1.\"), \"1.\").map(s => [#heading(numbering: s)[]<r>]))\n#check((3, 3.0).map(s => [#polygon.regular(vertices: 3, size: s * 1pt)<r>]))\n#check((\"https://a.b\", \"https://a.b\").map(s => [#link(s)[]<r>]))\n#check((1, 1.0, \"1\", 1).map(s => [#box(metadata(s))<r>]))\n#check((left, start, left).map(s => [#align(s)[]<r>]))\n#check(((x: 1pt), (left: 1pt, right: 1pt), (rest: 0pt, x: 1pt), (x: 1pt)).map(s => [#pad(..s)[]<r>]))\n#check(((1pt, 2pt), (1pt + 0%, 2pt), (1pt, 2pt)).map(s => [#line(end: (1pt, 2pt), start: s)<r>]))\n#check((0pt, 0pt + 0%, auto, 0pt).map(s => [#block(spacing: 1pt, above: s)[]<r>]))\n#check((1, 1.0, 1).map(s => [#box(v(s * 1pt, weak: true))<r>]))\n"
+  let expected = [
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "20pt",
+    "20pt", "10pt", "10pt", "20pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "30pt", "10pt",
+    "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "10pt",
+    "30pt", "10pt", "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "30pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: negative zeros and NaNs" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Negative zeros: equal values with different bits.\n#check((10pt, 10pt + -0%, 10pt - 0%, 10pt).map(s => [#rect(width: s)<r>]))\n#check((0pt, -0pt, 0pt, 0em, -0em, 0pt).map(s => [#h(s)<r>]))\n#check((0%, -0%, 0%).map(s => [#rect(width: s)<r>]))\n#check((0deg, -0deg, 0deg).map(s => [#rotate(s)[]<r>]))\n#check((0.0, -0.0, 0.0).map(s => [#box(metadata(s))<r>]))\n#check((0fr, -0fr, 0fr).map(s => [#h(s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#grid(columns: (s,))[]<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#move(dx: s)[]<r>]))\n#check((1pt, 1pt + -0em, 1pt).map(s => [#rect(stroke: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(inset: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(radius: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#box(metadata(s))<r>]))\n#check((rgb(0, 0, 0), rgb(-0%, 0%, 0%), rgb(0, 0, 0)).map(s => [#rect(fill: s)<r>]))\n#check((float.nan, -float.nan, float.inf - float.inf, float.nan).map(s => [#box(metadata(s))<r>]))\n"
+  let expected = [
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: floats: the bits of NaN values" {
+  let source = "#let b(x) = if type(x) == float { array(x.to-bytes(endian: \"big\")).map(v => str(v, base: 16)).join(\"\") } else { repr(x) }\n#let n = float.nan\n#let row(..xs) = metadata(xs.pos().map(b).join(\" \"))\n#row(float.nan, -float.nan, -n, float.inf - float.inf, 0.0 * float.inf, -(float.inf - float.inf))\n#row(float(\"nan\"), float(\"-nan\"), float(\"+nan\"), float(\"NaN\"), float(\"-NaN\"), float(\"NAN\"))\n#row(..yaml(bytes(\"[.nan, .NaN, .NAN, -.nan, +.nan, .inf, -.inf]\")))\n#row(..toml(bytes(\"a = [nan, -nan, +nan, inf, -inf]\")).a)\n#row(float.nan + 1, float.nan * -1, calc.abs(-float.nan), calc.pow(float.nan, 1), calc.abs(float.nan))\n#row(float.nan * 1%, float.nan / 2, calc.ln(float.nan), calc.sin(float.nan), calc.rem(float.nan, 2))\n#row(..cbor(cbor.encode((float.nan, -float.nan))))\n#row(eval(\"float.nan\"), eval(\"-float.nan\"), eval(\"float.inf * 0\", mode: \"code\"))\n"
+  let expected = [
+    "7ff8000000 fff8000000 fff8000000 7ff8000000 7ff8000000 fff8000000", "7ff8000000 fff8000000 7ff8000000 7ff8000000 fff8000000 7ff8000000",
+    "7ff8000000 7ff8000000 7ff8000000 \"-.nan\" \"+.nan\" 7ff0000000 fff0000000",
+    "7ff8000000 fff8000000 7ff8000000 7ff0000000 fff0000000", "7ff8000000 7ff8000000 7ff8000000 00000000 7ff8000000",
+    "0% 7ff8000000 7ff8000000 7ff8000000 7ff8000000", "7ff8000000 fff8000000", "7ff8000000 fff8000000 7ff8000000",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}

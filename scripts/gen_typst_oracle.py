@@ -25,7 +25,11 @@ document title of the HTML export (the plain text of the title's content).
   `library/visualize_hash.mbt`) were once written through their `repr`:
   strokes, gradients, tilings (upstream hashes the laid-out frame), colours
   and the other dynamic values, and closures (syntax tree, captured
-  bindings).
+  bindings). Field values are hashed as the field's type stores them: two
+  spellings that cast to one value share a key, values that are equal but
+  differ in their bits (negative zeros, NaNs) do not.
+- `floats`: NaN values have the bits of Rust's `f64::NAN`, negated where
+  upstream negates (`float("-nan")`, TOML's `-nan`).
 
 Usage: python3 scripts/gen_typst_oracle.py <path to upstream typst binary>
        (then `moon fmt`)
@@ -437,6 +441,70 @@ y
 #check((arguments(1, a: 2), arguments(1, a: 3), arguments(1, a: 2), (a: 1), (a: 1, b: 2), (a: 1)).map(s => [#box(metadata(s))<r>]))
 #check((int, float, int, rect, circle, rect, calc.pow, calc.sin, calc.pow, rect.with(width: 1pt), rect.with(width: 2pt), rect.with(width: 1pt)).map(s => [#box(metadata(s))<r>]))
 #check((heading.where(level: 1), heading.where(level: 2), heading.where(level: 1), counter("a"), counter("b"), counter("a"), state("a", 1), state("a", 2), state("a", 1)).map(s => [#box(metadata(s))<r>]))
+""",
+    ),
+    (
+        "location keys: field values are hashed as they are cast",
+        "metadata",
+        KEYS
+        + r"""// Field values that are spelled differently but cast to the same data.
+#check((10pt, 10pt + 0%, 10pt + 0em, 10pt).map(s => [#rect(width: s)<r>]))
+#check((1pt, stroke(1pt), (thickness: 1pt), 1pt + 0em, 1pt).map(s => [#rect(stroke: s)<r>]))
+#check((5pt, (rest: 5pt), (x: 5pt, y: 5pt), (left: 5pt, rest: 5pt), 5pt + 0%, 5pt).map(s => [#rect(inset: s)<r>]))
+#check((1pt, (rest: 1pt), (top: 1pt, bottom: 1pt), 1pt).map(s => [#rect(radius: s)<r>]))
+#check((red, rgb("#ff4136"), rgb(255, 65, 54), red).map(s => [#rect(fill: s)<r>]))
+#check((2, (auto, auto), (auto,) * 2, 2).map(s => [#grid(columns: s)<r>]))
+#check((1pt, 1pt + 0%, 1pt).map(s => [#move(dx: s)[]<r>]))
+#check((1em, 1em + 0pt, 1em).map(s => [#h(s)<r>]))
+#check((100%, 100% + 0pt, 1fr, 100%).map(s => [#box(width: s)<r>]))
+#check((90deg, 1.5707963267948966rad, 90.0deg, 90deg).map(s => [#rotate(s)[]<r>]))
+#check((2, 2.0, 200%, 2).map(s => [#scale(x: s * 50%)[]<r>]))
+#check(("1.", numbering.with("1."), "1.").map(s => [#heading(numbering: s)[]<r>]))
+#check((3, 3.0).map(s => [#polygon.regular(vertices: 3, size: s * 1pt)<r>]))
+#check(("https://a.b", "https://a.b").map(s => [#link(s)[]<r>]))
+#check((1, 1.0, "1", 1).map(s => [#box(metadata(s))<r>]))
+#check((left, start, left).map(s => [#align(s)[]<r>]))
+#check(((x: 1pt), (left: 1pt, right: 1pt), (rest: 0pt, x: 1pt), (x: 1pt)).map(s => [#pad(..s)[]<r>]))
+#check(((1pt, 2pt), (1pt + 0%, 2pt), (1pt, 2pt)).map(s => [#line(end: (1pt, 2pt), start: s)<r>]))
+#check((0pt, 0pt + 0%, auto, 0pt).map(s => [#block(spacing: 1pt, above: s)[]<r>]))
+#check((1, 1.0, 1).map(s => [#box(v(s * 1pt, weak: true))<r>]))
+""",
+    ),
+    (
+        "location keys: negative zeros and NaNs",
+        "metadata",
+        KEYS
+        + r"""// Negative zeros: equal values with different bits.
+#check((10pt, 10pt + -0%, 10pt - 0%, 10pt).map(s => [#rect(width: s)<r>]))
+#check((0pt, -0pt, 0pt, 0em, -0em, 0pt).map(s => [#h(s)<r>]))
+#check((0%, -0%, 0%).map(s => [#rect(width: s)<r>]))
+#check((0deg, -0deg, 0deg).map(s => [#rotate(s)[]<r>]))
+#check((0.0, -0.0, 0.0).map(s => [#box(metadata(s))<r>]))
+#check((0fr, -0fr, 0fr).map(s => [#h(s)<r>]))
+#check((10pt, 10pt + -0%, 10pt).map(s => [#grid(columns: (s,))[]<r>]))
+#check((10pt, 10pt + -0%, 10pt).map(s => [#move(dx: s)[]<r>]))
+#check((1pt, 1pt + -0em, 1pt).map(s => [#rect(stroke: s)<r>]))
+#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(inset: s)<r>]))
+#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(radius: s)<r>]))
+#check((10pt, 10pt + -0%, 10pt).map(s => [#box(metadata(s))<r>]))
+#check((rgb(0, 0, 0), rgb(-0%, 0%, 0%), rgb(0, 0, 0)).map(s => [#rect(fill: s)<r>]))
+#check((float.nan, -float.nan, float.inf - float.inf, float.nan).map(s => [#box(metadata(s))<r>]))
+""",
+    ),
+    (
+        "floats: the bits of NaN values",
+        "metadata",
+        r"""#let b(x) = if type(x) == float { array(x.to-bytes(endian: "big")).map(v => str(v, base: 16)).join("") } else { repr(x) }
+#let n = float.nan
+#let row(..xs) = metadata(xs.pos().map(b).join(" "))
+#row(float.nan, -float.nan, -n, float.inf - float.inf, 0.0 * float.inf, -(float.inf - float.inf))
+#row(float("nan"), float("-nan"), float("+nan"), float("NaN"), float("-NaN"), float("NAN"))
+#row(..yaml(bytes("[.nan, .NaN, .NAN, -.nan, +.nan, .inf, -.inf]")))
+#row(..toml(bytes("a = [nan, -nan, +nan, inf, -inf]")).a)
+#row(float.nan + 1, float.nan * -1, calc.abs(-float.nan), calc.pow(float.nan, 1), calc.abs(float.nan))
+#row(float.nan * 1%, float.nan / 2, calc.ln(float.nan), calc.sin(float.nan), calc.rem(float.nan, 2))
+#row(..cbor(cbor.encode((float.nan, -float.nan))))
+#row(eval("float.nan"), eval("-float.nan"), eval("float.inf * 0", mode: "code"))
 """,
     ),
 ]

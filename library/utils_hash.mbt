@@ -533,6 +533,16 @@ let lazy_cut : Ref[Int] = { val: lazy_no_cut, }
 let lazy_no_cut : Int = 0x7fffffff
 
 ///|
+/// Whether the fingerprint computation that just ended inside a running
+/// [LazyFingerprint] computation may have been cut short by a cycle, so
+/// that its result must not be cached. (Conservative: a cycle found earlier
+/// in the same owner counts too. Outside of running computations it is
+/// false.)
+fn lazy_fingerprint_cut() -> Bool {
+  lazy_cut.val != lazy_no_cut
+}
+
+///|
 /// An empty cache.
 pub fn LazyFingerprint::new() -> LazyFingerprint {
   { cached: false, busy: 0, hash: u128_zero, flags: 0, }
