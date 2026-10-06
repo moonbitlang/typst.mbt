@@ -637,13 +637,13 @@ files are split by the rule of section 9, and
 card.) The pages are identical: the SVG of every page and the PDF bytes are
 equal (`report_wbtest.mbt`). Building and compiling one document
 (`moon run doc/examples/report --target native --release -- time 500`,
-the embedded fonts, aarch64 macOS) takes about 5.9 ms before and 6.2 ms
-after (the mean of 500 runs, in three repetitions; 5.4 ms and 5.7 ms in the
-fastest turn of ten runs). The version with the kit is about 5% slower.
-What differs in the work: it measures five rows as grids where the
-hand-written version measures thirteen blocks, and every constructor of
-the element finds its site through the hook; how the 0.3 ms divide
-between the two was not measured.
+the embedded fonts, aarch64 macOS) takes about 6.1 ms before and 6.5 ms
+after (the means of 500 runs in three repetitions: 5.9, 6.2 and 6.1 ms;
+6.3, 6.6 and 6.6 ms). The version with the kit is about 7% slower. What
+differs in the work: it measures five rows as grids where the hand-written
+version measures thirteen blocks, and every constructor of the element
+finds its site through the hook; how the 0.4 ms divide between the two was
+not measured.
 
 ## 5. Marks (a trial, in the kit)
 
