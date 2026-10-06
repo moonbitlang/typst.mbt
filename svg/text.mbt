@@ -13,11 +13,11 @@ priv enum RenderedGlyph {
 
 ///|
 /// The rendered outlines of glyphs, by the key of `render_glyph`.
-let glyph_paths : Map[@library.U128, RenderedGlyph?] = {}
+let glyph_paths : Map[@library.U128, RenderedGlyph?] = Map([])
 
 ///|
 /// The bounding boxes of glyphs (by font and glyph).
-let glyph_bboxes : Map[@library.U128, @otf.Rect?] = {}
+let glyph_bboxes : Map[@library.U128, @otf.Rect?] = Map([])
 
 ///|
 /// `text.font.ttf().glyph_bounding_box(id)`, memoized (not upstream: it

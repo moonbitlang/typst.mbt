@@ -7,13 +7,10 @@
 // relies on them (see `paint_server.mbt`).
 
 ///|
-using @tiny_skia_path {
-  type Transform,
-  type Rect,
-  type NonZeroRect,
-  type Size,
-  type Path as TinyPath,
-}
+using @tiny_skia_path {type Transform, type Rect, type NonZeroRect, type Size}
+
+///|
+type TinyPath = @tiny_skia_path.Path
 
 ///|
 let next_uid : Ref[Int] = Ref(0)

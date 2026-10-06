@@ -138,7 +138,7 @@ fn run_shape_stage(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let by_font : Array[(String, Int, Int)] = []
-  let by_script : Map[String, (Int, Int)] = {}
+  let by_script : Map[String, (Int, Int)] = Map([])
   for file in files {
     let mut fp = 0
     let mut ff = 0
@@ -440,7 +440,7 @@ fn run_shape_hb_stage(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let mut skipped = 0
-  let by_prefix : Map[String, (Int, Int)] = {}
+  let by_prefix : Map[String, (Int, Int)] = Map([])
   for file in files {
     for line in read(dir + "/" + file).split("\n") {
       let line = line.to_owned()

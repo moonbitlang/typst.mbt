@@ -378,7 +378,7 @@ fn range_of(source : @syntax.Source, span : @syntax.DiagSpan) -> String {
 ///|
 /// Split a golden file into per-test sections.
 fn split_golden(text : String) -> Map[String, String] {
-  let out = {}
+  let out = Map([])
   let mut name : String? = None
   let buf = StringBuilder()
   for line in text.split("\n") {

@@ -158,7 +158,7 @@ pub impl[T : FromValue] FromValue for Corners[T?] with fn from_value(value) {
       return corners
     }
   }
-  if T::castable(value) {
+  if castable_of((Ty::new() : Ty[T]), value) {
     Corners::splat(Some(T::from_value(value)))
   } else if value is Dict(dict) {
     let keys = dict.map.keys().collect()
@@ -166,7 +166,9 @@ pub impl[T : FromValue] FromValue for Corners[T?] with fn from_value(value) {
     // objects with other sets of expected keys.
     bail(Dict::unexpected_keys(keys, None))
   } else {
-    raise HintedError(T::input().union_with(Type(Type::dict())).error(value))
+    raise HintedError(
+      input_of((Ty::new() : Ty[T])).union_with(Type(Type::dict())).error(value),
+    )
   }
 }
 

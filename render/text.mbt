@@ -76,7 +76,7 @@ impl @otf.OutlineBuilder for WrappedPathBuilder with fn close(self) {
 
 ///|
 /// The loaded `pixglyph` glyphs (see [load_pixglyph]).
-let pixglyphs : Map[(@library.FontInstance, UInt16), @pixglyph.Glyph?] = {}
+let pixglyphs : Map[(@library.FontInstance, UInt16), @pixglyph.Glyph?] = Map([])
 
 ///|
 /// `@pixglyph.Glyph::load(text.font.ttf(), id)`, memoized (not upstream:

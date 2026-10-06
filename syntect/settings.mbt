@@ -159,7 +159,7 @@ pub fn read_plist(bytes : Bytes) -> Settings raise SettingsError {
         Array(items)
       }
       StartDictionary => {
-        let map = {}
+        let map = Map([])
         while true {
           let e = next()
           match e {

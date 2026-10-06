@@ -442,7 +442,7 @@ pub fn Scope::length(self : Scope) -> Int {
 ///|
 /// A copy of the scope (bindings are copied).
 pub fn Scope::copy(self : Scope) -> Scope {
-  let map = {}
+  let map = Map([])
   for k, v in self.map {
     map[k] = v.copy()
   }

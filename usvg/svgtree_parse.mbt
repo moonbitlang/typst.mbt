@@ -60,7 +60,7 @@ fn svgtree_parse(
   let doc : Document = { nodes: [], attrs: [], links: {}, }
 
   // build a map of id -> node for resolve_href
-  let id_map : Map[String, @xml.Node] = {}
+  let id_map : Map[String, @xml.Node] = Map([])
   for node in xml.descendants() {
     if node.attribute("id") is Some(id) {
       if !id_map.contains(id) {
@@ -98,7 +98,7 @@ fn svgtree_parse(
   }
 
   // Collect all elements with `id` attribute.
-  let links = {}
+  let links = Map([])
   for node in doc.descendants() {
     let id : String? = node.attribute(AId::Id)
     if id is Some(id) {
@@ -590,12 +590,12 @@ priv struct XmlNode(@xml.Node)
 
 ///|
 impl @simplecss.Element for XmlNode with fn parent_element(self) {
-  self.0.parent_element().map(XmlNode(_))
+  self.0.parent_element().map(x => XmlNode(x))
 }
 
 ///|
 impl @simplecss.Element for XmlNode with fn prev_sibling_element(self) {
-  self.0.prev_sibling_element().map(XmlNode(_))
+  self.0.prev_sibling_element().map(x => XmlNode(x))
 }
 
 ///|

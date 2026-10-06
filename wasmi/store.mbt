@@ -218,7 +218,25 @@ pub(all) enum Any {
   U32(UInt)
   Str(String)
   Other
-} derive(Eq, Show)
+} derive(Eq)
+
+///|
+/// What `derive(Show)` printed (deprecated as a derive).
+pub impl Show for Any with fn output(self, logger) {
+  match self {
+    U32(value) => {
+      logger.write_string("U32(")
+      Show::output(value, logger)
+      logger.write_string(")")
+    }
+    Str(value) => {
+      logger.write_string("Str(")
+      Show::output(value, logger)
+      logger.write_string(")")
+    }
+    Other => logger.write_string("Other")
+  }
+}
 
 ///|
 /// A data segment entity (upstream `DataSegmentEntity`).

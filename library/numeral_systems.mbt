@@ -209,7 +209,7 @@ pub fn NamedNumeralSystem::from_shorthand(
 /// The systems by shorthand (the first system with a given shorthand wins,
 /// like upstream's linear search over all systems).
 let shorthand_systems : Map[String, NamedNumeralSystem] = {
-  let map = {}
+  let map = Map([])
   for system in NamedNumeralSystem::all() {
     if system.shorthand() is Some(shorthand) && !map.contains(shorthand) {
       map[shorthand] = system

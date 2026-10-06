@@ -201,12 +201,3 @@ fn Scanner::before(self : Scanner) -> String {
 fn Scanner::after(self : Scanner) -> String {
   self.get(self.cursor, self.text.length())
 }
-
-///|
-fn Char::utf16_len(self : Char) -> Int {
-  if self.to_int() >= 0x10000 {
-    2
-  } else {
-    1
-  }
-}

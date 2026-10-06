@@ -152,7 +152,7 @@ pub fn interpret(
   device : &Device,
 ) -> Unit {
   let num_states = context.num_states()
-  let font_dict_cache : Map[String, @hayro_syntax.Dict] = {}
+  let font_dict_cache : Map[String, @hayro_syntax.Dict] = Map([])
   context.save_state()
   while ops.next() is Some(op) {
     match op {

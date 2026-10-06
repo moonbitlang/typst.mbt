@@ -775,10 +775,10 @@ fn collect_named_destinations(
   anchors : Array[(@library.Location, String)],
   pic : PageIndexConverter,
 ) -> Map[@library.Location, @export.NamedDestination] {
-  let locs_to_names : Map[@library.Location, @export.NamedDestination] = {}
+  let locs_to_names : Map[@library.Location, @export.NamedDestination] = Map([])
   // Find all headings that have a label and are the first among other
   // headings with the same label.
-  let seen : Map[String, Unit] = {}
+  let seen : Map[String, Unit] = Map([])
   let headings = typst_document
     .introspector()
     .query(@library.heading_elem().select())
@@ -823,7 +823,7 @@ fn PageIndexConverter::new(
   document : @layout.PagedDocument,
   options : CompletePdfOptions,
 ) -> PageIndexConverter {
-  let page_indices : Map[Int, Int] = {}
+  let page_indices : Map[Int, Int] = Map([])
   let mut skipped_pages = 0
   for i in 0..<document.pages().length() {
     match options.format.pages.v {

@@ -267,7 +267,7 @@ priv struct EvalMemo {
 
 ///|
 /// Memoized file evaluations by file id.
-let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = {}
+let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = Map([])
 
 ///|
 /// Evaluate a source file like `eval_source`, but return the same module for

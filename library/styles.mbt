@@ -734,8 +734,8 @@ pub fn[T : FromValue + IntoValue + Fold] fold_of(
 ) -> (Value, Value) -> Value {
   (inner, outer) => {
     let folded = try {
-      let i : T = T::from_value(inner)
-      let o : T = T::from_value(outer)
+      let i : T = FromValue::from_value(inner)
+      let o : T = FromValue::from_value(outer)
       Some(IntoValue::into_value(Fold::fold(i, o)))
     } catch {
       _ => None

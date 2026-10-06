@@ -276,7 +276,7 @@ pub fn SyntaxSetBuilder::build(self : SyntaxSetBuilder) -> SyntaxSet {
     _ => [],
   )
   for syntax_index, syntax_definition in syntax_definitions {
-    let context_ids = {}
+    let context_ids = Map([])
     let contexts = syntax_definition.contexts.to_array()
     // Sort the values of the HashMap so that the contexts in the resulting
     // SyntaxSet have a deterministic order for serializing. Because we're

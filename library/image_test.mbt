@@ -27,7 +27,6 @@ fn raster_summary(data : Bytes, format : String) -> String {
   }
   let image = @library.RasterImage::plain(data, Exchange(format)) catch {
     @library.HintedError(err) => return "err \{err.message}"
-    _ => return "err"
   }
   let dpi = match image.dpi() {
     Some(dpi) => @library.rust_debug_f64(dpi)
@@ -103,7 +102,6 @@ test "decode PNG pixels like upstream" {
 fn svg_summary(data : Bytes) -> String {
   let svg = @library.SvgImage::new(data) catch {
     @library.LoadErr(err) => return "err \{err.message}"
-    _ => return "err"
   }
   "\{@library.rust_debug_f64(svg.width())} \{@library.rust_debug_f64(svg.height())}"
 }

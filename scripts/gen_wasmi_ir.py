@@ -288,7 +288,8 @@ def main():
         w(f"pub fn Op::{getter}(self : Op) -> {mty}? {{")
         w("  match self {")
         for name, fields in matching:
-            w(f"    {name}({fname}~, ..) => Some({fname})")
+            rest = ", .." if len(fields) > 1 else ""
+            w(f"    {name}({fname}~{rest}) => Some({fname})")
         w("    _ => None")
         w("  }")
         w("}")

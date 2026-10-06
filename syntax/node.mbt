@@ -158,9 +158,11 @@ fn InnerNode::new(children : Array[SyntaxNode]) -> InnerNode {
 ///|
 /// Descend through warnings to the underlying data.
 fn Node::base(self : Node) -> Node {
-  loop self {
-    Warning(w, _) => continue w.child
-    other => other
+  for node = self {
+    match node {
+      Warning(w, _) => continue w.child
+      other => break other
+    }
   }
 }
 

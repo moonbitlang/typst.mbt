@@ -64,7 +64,7 @@ fn paged_golden(rel : String) -> Map[String, String] {
 }
 
 ///|
-let paged_golden_cache : Map[String, Map[String, String]] = {}
+let paged_golden_cache : Map[String, Map[String, String]] = Map([])
 
 ///|
 priv suberror Unsupported {
@@ -604,7 +604,7 @@ fn image_assets() -> Map[String, Bytes] {
   if image_assets_cell.val is Some(m) {
     return m
   }
-  let m = {}
+  let m = Map([])
   fn walk(dir : String, rel : String) {
     let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_owned()
     for entry in entries {
@@ -638,7 +638,7 @@ let image_assets_cell : Ref[Map[String, Bytes]?] = Ref(None)
 
 ///|
 /// The project-relative paths (`assets/...`) of the image assets, by hash.
-let image_asset_paths : Map[String, String] = {}
+let image_asset_paths : Map[String, String] = Map([])
 
 ///|
 /// Decode an SVG asset like `ImageElem::decode` does (with the default font

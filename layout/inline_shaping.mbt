@@ -14,7 +14,7 @@ let hyphen_char : Char = '-'
 ///|
 /// The cached rustybuzz faces of all font instances (upstream stores the
 /// face in the `FontInstance`).
-let rusty_faces : Map[@library.FontInstance, @shape.Face] = {}
+let rusty_faces : Map[@library.FontInstance, @shape.Face] = Map([])
 
 ///|
 /// A reference to the underlying `rustybuzz` face of a font instance
@@ -45,7 +45,7 @@ priv struct PlanKey {
 } derive(Eq, Hash)
 
 ///|
-let shape_plans : Map[PlanKey, @shape.ShapePlan] = {}
+let shape_plans : Map[PlanKey, @shape.ShapePlan] = Map([])
 
 ///|
 /// Create a shape plan (memoized like upstream's `#[comemo::memoize]`).

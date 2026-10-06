@@ -176,8 +176,12 @@ pub impl[T : IntoValue] IntoValue for Smart[T] with fn into_value(self) {
 pub impl[T : FromValue] FromValue for Smart[T] with fn from_value(value) {
   match value {
     Value::Auto => Auto
-    v if T::castable(v) => Custom(T::from_value(v))
+    v if castable_of((Ty::new() : Ty[T]), v) => Custom(T::from_value(v))
     _ =>
-      raise HintedError(T::input().union_with(auto_value_input()).error(value))
+      raise HintedError(
+        input_of((Ty::new() : Ty[T]))
+        .union_with(auto_value_input())
+        .error(value),
+      )
   }
 }

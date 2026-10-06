@@ -82,7 +82,7 @@ fn read_encoding(dict : @hayro_syntax.Dict) -> (Encoding, Map[Int, String]) {
     }
   }
 
-  let map = {}
+  let map = Map([])
   if (dict.get("Encoding") : @hayro_syntax.Dict?) is Some(encoding_dict) {
     if (encoding_dict.get("Differences") : @hayro_syntax.PdfArray?)
       is Some(differences) {
