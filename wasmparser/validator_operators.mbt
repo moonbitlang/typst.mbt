@@ -179,7 +179,20 @@ pub(all) struct Frame {
   mut unreachable_ : Bool
   /// The number of initializations in the stack at the time of its creation
   init_height : Int
-} derive(Debug)
+}
+
+///|
+/// Like `derive(Debug)`, but with upstream's field name: `unreachable` is a
+/// reserved word in MoonBit, so the field itself is `unreachable_`.
+pub impl Debug for Frame with fn to_repr(self) {
+  Repr::record({
+    "kind": Debug::to_repr(self.kind),
+    "block_type": Debug::to_repr(self.block_type),
+    "height": Debug::to_repr(self.height),
+    "unreachable": Debug::to_repr(self.unreachable_),
+    "init_height": Debug::to_repr(self.init_height),
+  })
+}
 
 ///|
 /// `OperatorValidatorTemp`: the operator validator together with the
