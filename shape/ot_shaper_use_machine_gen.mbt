@@ -330,10 +330,19 @@ let use_syllable_machine_eof_trans : ReadOnlyArray[Int] = [
 const USE_SYLLABLE_MACHINE_START : Int = 1
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 const USE_SYLLABLE_MACHINE_FIRST_FINAL : Int = 1
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 const USE_SYLLABLE_MACHINE_ERROR : Int = -1
 
 ///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
 const USE_SYLLABLE_MACHINE_EN_MAIN : Int = 1

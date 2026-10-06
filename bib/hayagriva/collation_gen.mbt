@@ -2,23 +2,6 @@
 // Collation data of the ICU root collator (icu_collator 2.3.1).
 
 ///|
-let collation_compressible_leads : ReadOnlyArray[Int] = [
-  0x61, 0x62, 0x65, 0x66, 0x67, 0x7C, 0x7D, 0x7E, 0xFE,
-]
-
-///|
-/// Ranges of code points covered by `collation_table_data`.
-let collation_ranges : ReadOnlyArray[(Int, Int)] = [
-  (0x0000, 0x0700),
-  (0x1100, 0x1200),
-  (0x1D00, 0x2200),
-  (0x2460, 0x2500),
-  (0x3000, 0x3190),
-  (0xFB00, 0xFB50),
-  (0xFF00, 0xFFF0),
-]
-
-///|
 /// One line per code point: `cp first rest end sec ter` (hex, `-` = none).
 let collation_table_data : String =
   #|0 - - - - -

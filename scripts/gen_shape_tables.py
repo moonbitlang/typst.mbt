@@ -141,6 +141,20 @@ def rust_static_scalars(src):
     return re.findall(r'static (\w+): i32 = (-?\d+);', src)
 
 
+def emit_ragel_scalar(keyword, name, value, driver):
+    """One scalar of a Ragel machine (`start`, `first_final`, `error`,
+    `en_main`). Ragel emits all four, and upstream compiles the module with
+    `#![allow(dead_code)]`; the ones the hand-ported driver does not name get
+    the per-declaration equivalent."""
+    driver_src = open(os.path.join(OUT, driver)).read()
+    out = '///|\n'
+    if not re.search(r'\b%s\b' % re.escape(name), driver_src):
+        out += ('// Emitted by Ragel and unused by the driver, as upstream\n'
+                '// (`#![allow(dead_code)]`).\n'
+                '#warnings("-unused_value")\n')
+    return out + '%s %s : Int = %s\n\n' % (keyword, name, value)
+
+
 def gen_ragel_machine(module, out_name):
     """Writes the data tables of a Ragel machine; the driver is ported by hand.
     Leading underscores of the Ragel names are dropped."""
@@ -148,8 +162,9 @@ def gen_ragel_machine(module, out_name):
     out = HEADER % module
     for name, values in rust_static_arrays(src):
         out += emit_ints(name.lstrip('_'), 'Ragel table `%s`.' % name, values, 16)
+    driver = out_name.replace('_gen.mbt', '.mbt')
     for name, value in rust_static_scalars(src):
-        out += '///|\nconst %s : Int = %s\n\n' % (name.upper(), value)
+        out += emit_ragel_scalar('const', name.upper(), value, driver)
     open(os.path.join(OUT, out_name), 'w').write(out)
 
 
@@ -267,8 +282,8 @@ def gen_machine(name):
         vals = [v.strip() for v in body.split(',') if v.strip()]
         assert len(vals) == int(n), var
         out += emit_ints(var.lstrip('_'), '`%s: [%s; %s]`' % (var, typ, n), vals, 20)
-    for var, val in re.findall(r'static (\w+): i32 = (-?\d+);', src):
-        out += '///|\nlet %s : Int = %s\n\n' % (var, val)
+    for var, val in rust_static_scalars(src):
+        out += emit_ragel_scalar('let', var, val, 'ot_shaper_%s_machine.mbt' % name)
     open(os.path.join(OUT, 'ot_shaper_%s_machine_gen.mbt' % name), 'w').write(out)
 
 # --- tag_table.rs (HarfBuzz gen-tag-table.py output) -------------------------
