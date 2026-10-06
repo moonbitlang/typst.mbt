@@ -22,6 +22,11 @@ pub(all) enum LaneTy {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LaneTy with Eq::{not_equal, equal}
+
+///|
 /// The number of lanes of a [`LaneTy`].
 fn LaneTy::lanes(self : LaneTy) -> Int {
   match self {

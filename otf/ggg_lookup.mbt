@@ -30,6 +30,11 @@ pub impl FromSlice for Lookup with fn parse_slice(data) {
 }
 
 ///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lookup with FromSlice::{parse_slice}
+
+///|
 /// A trait for parsing Lookup subtables.
 ///
 /// Internal use only.
@@ -121,6 +126,16 @@ pub fn[T : LookupSubtable] LookupSubtablesIter::next(
 pub(all) struct LookupFlags(UInt16) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LookupFlags with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LookupFlags with @debug.Debug::{to_repr}
+
+///|
 pub fn LookupFlags::right_to_left(self : LookupFlags) -> Bool {
   (self.0 & 0x0001) != 0
 }
@@ -164,6 +179,11 @@ pub impl FromData for LookupFlags with fn size() {
 pub impl FromData for LookupFlags with fn parse(data) {
   LookupFlags(FromData::parse(data))
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LookupFlags with FromData::{size, parse}
 
 ///|
 fn[T] parse_extension_lookup(

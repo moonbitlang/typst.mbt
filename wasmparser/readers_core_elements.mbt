@@ -111,3 +111,8 @@ pub impl FromReader for Element with fn from_reader(reader) {
   let range = { start: elem_start, end: elem_end, }
   { kind, items, range, }
 }
+
+///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Element with FromReader::{from_reader}

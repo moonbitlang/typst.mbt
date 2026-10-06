@@ -18,6 +18,16 @@ pub(all) enum NumTy {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumTy with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumTy with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `<T as Typed>::TY`.
 pub fn NumTy::val_type(self : NumTy) -> @wasmi_core.ValType {
   match self {

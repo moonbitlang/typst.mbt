@@ -5,6 +5,21 @@
 pub(all) struct Sign(Bool) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sign with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sign with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Sign with @debug.Debug::{to_repr}
+
+///|
 /// Creates a positive [`Sign`].
 pub fn Sign::pos() -> Sign {
   Sign(true)
@@ -55,6 +70,21 @@ pub fn Sign::to_f64(self : Sign) -> Double {
 /// This defines how much the instruction pointer is offset
 /// upon taking the respective branch.
 pub(all) struct BranchOffset16(Int) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset16 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset16 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset16 with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<i16> for BranchOffset16`.
@@ -122,6 +152,21 @@ pub fn BranchOffset16::to_i16(self : BranchOffset16) -> Int {
 pub(all) struct BranchOffset(Int) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BranchOffset with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `From<i32> for BranchOffset`.
 pub fn BranchOffset::from_i32(index : Int) -> BranchOffset {
   BranchOffset(index)
@@ -185,6 +230,21 @@ pub fn BranchOffset::to_i32(self : BranchOffset) -> Int {
 /// The accumulated fuel to execute a block via [`Op::ConsumeFuel`]
 /// (upstream `u32`).
 pub(all) struct BlockFuel(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockFuel with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockFuel with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockFuel with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<u32> for BlockFuel`.
@@ -262,6 +322,21 @@ pub(all) enum Comparator {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Comparator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Comparator with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Comparator with @debug.Debug::{to_repr}
+
+///|
 let comparators : ReadOnlyArray[Comparator] = [
   I32Eq,
   I32Ne,
@@ -329,6 +404,16 @@ pub(all) struct ComparatorAndOffset {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComparatorAndOffset with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComparatorAndOffset with @debug.Debug::{to_repr}
+
+///|
 /// Create a new [`ComparatorAndOffset`].
 pub fn ComparatorAndOffset::new(
   cmp : Comparator,
@@ -361,6 +446,21 @@ pub fn ComparatorAndOffset::as_u64(self : ComparatorAndOffset) -> UInt64 {
 /// A typed shift amount for shift and rotate instructions (upstream
 /// `ShiftAmount<T>`, a [`Const16`]).
 pub(all) struct ShiftAmount(Const16) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftAmount with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftAmount with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftAmount with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<ShiftAmount<T>> for T` (`i32`).
@@ -418,12 +518,57 @@ pub fn ShiftAmount::of_u32(input : UInt, bits : UInt) -> ShiftAmount? {
 pub(all) struct Offset64(UInt64) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64 with @debug.Debug::{to_repr}
+
+///|
 /// The high 32 bits of an [`Offset64`].
 pub(all) struct Offset64Hi(UInt) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Hi with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Hi with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Hi with @debug.Debug::{to_repr}
+
+///|
 /// The low 32 bits of an [`Offset64`].
 pub(all) struct Offset64Lo(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Lo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Lo with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset64Lo with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new [`Offset64`] lo-hi pair from the given `offset`.
@@ -450,6 +595,21 @@ pub fn Offset64::to_u64(self : Offset64) -> UInt64 {
 pub(all) struct Offset8(Int) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset8 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset8 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset8 with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `TryFrom<u64> for Offset8`.
 pub fn Offset8::try_from_u64(address : UInt64) -> Offset8? {
   if address <= 0xFFUL {
@@ -468,6 +628,21 @@ pub fn Offset8::to_u64(self : Offset8) -> UInt64 {
 ///|
 /// A 16-bit encoded load or store address offset (upstream `Const16<u64>`).
 pub(all) struct Offset16(Int) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Offset16 with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `TryFrom<u64> for Offset16`.
@@ -490,6 +665,21 @@ pub fn Offset16::to_u64(self : Offset16) -> UInt64 {
 pub(all) struct Address(UInt64) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address with @debug.Debug::{to_repr}
+
+///|
 /// Upstream `TryFrom<u64> for Address` (`usize` is 64-bit).
 pub fn Address::try_from_u64(address : UInt64) -> Address? {
   Some(Address(address))
@@ -504,6 +694,21 @@ pub fn Address::to_u64(self : Address) -> UInt64 {
 ///|
 /// A 32-bit memory address used for some load and store instructions.
 pub(all) struct Address32(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address32 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Address32 with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `TryFrom<Address> for Address32`.
@@ -524,3 +729,18 @@ pub fn Address32::to_u64(self : Address32) -> UInt64 {
 ///|
 /// A SIMD lane index immediate (upstream `ImmLaneIdx<N>`).
 pub(all) struct ImmLaneIdx(Int) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx with @debug.Debug::{to_repr}

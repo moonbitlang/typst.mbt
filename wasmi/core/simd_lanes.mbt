@@ -13,6 +13,11 @@
 pub(all) suberror OutOfBoundsLaneIdx derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutOfBoundsLaneIdx with @debug.Debug::{to_repr}
+
+///|
 /// A byte with values in the range 0–1 identifying a lane.
 ///
 /// Upstream `ImmLaneIdx<2>`. Values are masked to the valid range when used
@@ -20,20 +25,95 @@ pub(all) suberror OutOfBoundsLaneIdx derive(Debug)
 pub(all) struct ImmLaneIdx2(Byte) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx2 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx2 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx2 with @debug.Debug::{to_repr}
+
+///|
 /// A byte with values in the range 0–3 identifying a lane.
 pub(all) struct ImmLaneIdx4(Byte) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx4 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx4 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx4 with @debug.Debug::{to_repr}
 
 ///|
 /// A byte with values in the range 0–7 identifying a lane.
 pub(all) struct ImmLaneIdx8(Byte) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx8 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx8 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx8 with @debug.Debug::{to_repr}
+
+///|
 /// A byte with values in the range 0–15 identifying a lane.
 pub(all) struct ImmLaneIdx16(Byte) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx16 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx16 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx16 with @debug.Debug::{to_repr}
+
+///|
 /// A byte with values in the range 0–31 identifying a lane.
 pub(all) struct ImmLaneIdx32(Byte) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx32 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImmLaneIdx32 with @debug.Debug::{to_repr}
 
 ///|
 /// `TryFrom<u8> for ImmLaneIdx<2>`

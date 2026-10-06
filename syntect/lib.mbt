@@ -20,3 +20,8 @@ pub impl Show for SyntectError with fn output(self, logger) {
     ScopeError(e) => logger.write_string("Scope error: \{e}")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntectError with Show::{to_string, output}

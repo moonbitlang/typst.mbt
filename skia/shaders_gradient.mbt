@@ -14,6 +14,11 @@ pub(all) struct GradientStop {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GradientStop with Eq::{not_equal, equal}
+
+///|
 /// Creates a new gradient point.
 ///
 /// `position` will be clamped to a 0..=1 range.
@@ -390,6 +395,11 @@ struct FocalData {
   focal_x : Float // f
   is_swapped : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FocalData with Eq::{not_equal, equal}
 
 ///|
 /// Returns the focal data and the updated matrix.

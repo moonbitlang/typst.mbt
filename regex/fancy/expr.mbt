@@ -58,6 +58,16 @@ pub(all) enum Expr {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Expr with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Expr with @debug.Debug::{to_repr}
+
+///|
 /// Type of look-around assertion as used for a look-around expression.
 pub(all) enum LookAround {
   /// Look-ahead assertion, e.g. `(?=a)`
@@ -69,6 +79,16 @@ pub(all) enum LookAround {
   /// Negative look-behind assertion, e.g. `(?<!a)`
   LookBehindNeg
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LookAround with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LookAround with @debug.Debug::{to_repr}
 
 ///|
 /// Type of assertions
@@ -90,6 +110,16 @@ pub(all) enum Assertion {
   /// Not word boundary
   NotWordBoundary
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Assertion with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Assertion with @debug.Debug::{to_repr}
 
 ///|
 fn Assertion::is_hard(self : Assertion) -> Bool {

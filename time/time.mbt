@@ -16,7 +16,22 @@ pub struct Time {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with Eq::{not_equal, equal}
+
+///|
 pub extend Time with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with @debug.Debug::{to_repr}
 
 ///|
 fn Time::from_hms_nanos_unchecked(
@@ -270,3 +285,8 @@ pub impl Show for Time with fn output(self, logger) {
   logger.write_string(".")
   logger.write_string(truncated_subsecond_from_nanos(self.nanosecond))
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Time with Show::{to_string, output}

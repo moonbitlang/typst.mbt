@@ -44,6 +44,11 @@ pub impl Show for ParseThemeError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseThemeError with Show::{to_string, output}
+
+///|
 pub fn UnderlineOption::from_str(
   s : String,
 ) -> UnderlineOption raise ParseThemeError {

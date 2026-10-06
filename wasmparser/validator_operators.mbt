@@ -195,6 +195,11 @@ pub impl Debug for Frame with fn to_repr(self) {
 }
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Frame with @debug.Debug::{to_repr}
+
+///|
 /// `OperatorValidatorTemp`: the operator validator together with the
 /// resources and the offset of the current operator.
 pub struct OperatorValidatorTemp {

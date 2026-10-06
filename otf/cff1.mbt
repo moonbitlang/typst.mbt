@@ -53,6 +53,16 @@ pub(all) struct Matrix {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Matrix with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Matrix with fn default() {
   { sx: 0.001, ky: 0.0, kx: 0.0, sy: 0.001, tx: 0.0, ty: 0.0, }
 }

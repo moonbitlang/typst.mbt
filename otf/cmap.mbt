@@ -201,6 +201,11 @@ pub impl Default for CmapSubtables with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CmapSubtables with Default::{default}
+
+///|
 /// Returns a subtable at an index.
 pub fn CmapSubtables::get(
   self : CmapSubtables,
@@ -374,6 +379,11 @@ pub impl FromData for SubHeaderRecord with fn parse(data) {
     id_range_offset: s.read(),
   }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubHeaderRecord with FromData::{size, parse}
 
 ///|
 /// A [format 2](https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-2-high-byte-mapping-through-table)
@@ -793,6 +803,11 @@ pub impl FromData for SequentialMapGroup with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SequentialMapGroup with FromData::{size, parse}
+
+///|
 /// Calls `f` for each code point of a group (`start..=end`).
 fn SequentialMapGroup::each_codepoint(
   self : SequentialMapGroup,
@@ -974,6 +989,11 @@ pub impl FromData for VariationSelectorRecord with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VariationSelectorRecord with FromData::{size, parse}
+
+///|
 pub struct UVSMappingRecord {
   unicode_value : UInt
   glyph_id : GlyphId
@@ -989,6 +1009,11 @@ pub impl FromData for UVSMappingRecord with fn parse(data) {
   let s = Stream::new(data)
   { unicode_value: (s.read() : U24).0, glyph_id: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UVSMappingRecord with FromData::{size, parse}
 
 ///|
 pub struct UnicodeRangeRecord {
@@ -1015,6 +1040,11 @@ pub impl FromData for UnicodeRangeRecord with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnicodeRangeRecord with FromData::{size, parse}
+
+///|
 /// A result of a variation glyph mapping.
 pub(all) enum GlyphVariationResult {
   /// Glyph was found in the variation encoding table.
@@ -1025,6 +1055,16 @@ pub(all) enum GlyphVariationResult {
   /// in this case.
   UseDefault
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphVariationResult with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphVariationResult with @debug.Debug::{to_repr}
 
 ///|
 /// A [format 14](https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-14-unicode-variation-sequences)

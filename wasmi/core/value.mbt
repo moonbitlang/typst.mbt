@@ -27,6 +27,26 @@ pub(all) enum ValType {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with @debug.Debug::{to_repr}
+
+///|
 /// Rust's `Debug` of [ValType] (the variant name).
 pub impl Show for ValType with fn output(self, logger) {
   logger.write_string(
@@ -41,6 +61,9 @@ pub impl Show for ValType with fn output(self, logger) {
     },
   )
 }
+
+///|
+pub extend ValType with Show::{to_string, output}
 
 ///|
 /// Returns `true` if [`ValType`] is a Wasm numeric type.
@@ -70,6 +93,21 @@ pub struct V128 {
   lo : UInt64
   hi : UInt64
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a [`V128`] from the low and high 64 bits of its `u128` value

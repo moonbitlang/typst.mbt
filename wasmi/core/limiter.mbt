@@ -16,6 +16,11 @@ pub(all) suberror LimiterError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LimiterError with @debug.Debug::{to_repr}
+
+///|
 /// Rust's `Display` of [LimiterError].
 pub impl Show for LimiterError with fn output(self, logger) {
   let message = match self {
@@ -29,6 +34,9 @@ pub impl Show for LimiterError with fn output(self, logger) {
   }
   logger.write_string(message)
 }
+
+///|
+pub extend LimiterError with Show::{to_string, output}
 
 ///|
 /// `impl From<MemoryError> for LimiterError`
@@ -182,3 +190,8 @@ pub fn ResourceLimiterRef::as_resource_limiter(
 pub impl Show for ResourceLimiterRef with fn output(_self, logger) {
   logger.write_string("ResourceLimiterRef(...)")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResourceLimiterRef with Show::{to_string, output}

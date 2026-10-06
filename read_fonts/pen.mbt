@@ -35,6 +35,16 @@ pub(all) enum PathElement {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathElement with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathElement with @debug.Debug::{to_repr}
+
+///|
 /// Pen that records all path elements.
 pub(all) struct RecordingPen {
   elements : Array[PathElement]
@@ -79,6 +89,17 @@ pub impl OutlinePen for RecordingPen with fn close(self) {
 }
 
 ///|
+#deprecated("call as `OutlinePen::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecordingPen with OutlinePen::{
+  close,
+  curve_to,
+  line_to,
+  quad_to,
+  move_to,
+}
+
+///|
 /// Pen that drops all drawing output into the ether.
 pub(all) struct NullPen {}
 
@@ -114,3 +135,8 @@ pub impl OutlinePen for NullPen with fn curve_to(
 pub impl OutlinePen for NullPen with fn close(_self) {
   ()
 }
+
+///|
+#deprecated("call as `OutlinePen::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NullPen with OutlinePen::{close, curve_to, line_to, quad_to, move_to}

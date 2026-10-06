@@ -200,6 +200,11 @@ pub(all) struct GlyphPosition {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphPosition with @debug.Debug::{to_repr}
+
+///|
 fn GlyphPosition::new() -> GlyphPosition {
   { x_advance: 0, y_advance: 0, x_offset: 0, y_offset: 0, var_: 0, }
 }
@@ -274,6 +279,11 @@ pub(all) struct GlyphInfo {
   mut var1 : UInt
   mut var2 : UInt
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlyphInfo with @debug.Debug::{to_repr}
 
 ///|
 fn GlyphInfo::new() -> GlyphInfo {

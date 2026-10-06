@@ -11,6 +11,16 @@ pub(all) struct Decoration {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Decoration with @debug.Debug::{to_repr}
+
+///|
 /// Bounding box with float coordinates.
 pub(all) struct BoundingBox {
   x_min : Float
@@ -18,6 +28,16 @@ pub(all) struct BoundingBox {
   x_max : Float
   y_max : Float
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundingBox with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundingBox with @debug.Debug::{to_repr}
 
 ///|
 /// Metrics that apply to all glyphs in a font.
@@ -51,6 +71,16 @@ pub(all) struct Metrics {
   /// Union of minimum and maximum extents for all glyphs in the font.
   mut bounds : BoundingBox?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Metrics with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Metrics with @debug.Debug::{to_repr}
 
 ///|
 fn f(v : Int) -> Float {

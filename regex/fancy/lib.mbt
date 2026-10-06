@@ -73,6 +73,16 @@ pub struct SyntaxConfig {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxConfig with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxConfig with @debug.Debug::{to_repr}
+
+///|
 fn SyntaxConfig::default() -> SyntaxConfig {
   {
     case_insensitive: false,
@@ -314,6 +324,12 @@ pub fn Regex::to_string(self : Regex) -> String {
 pub impl Show for Regex with fn output(self, logger) {
   logger.write_string(self.as_str())
 }
+
+///|
+// `to_string` is not named here: the type already has a method of this name.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regex with Show::{output}
 
 ///|
 /// Parse and compile a regex with default options, see `RegexBuilder`.
@@ -757,11 +773,21 @@ pub impl Show for Match with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Match with Show::{to_string, output}
+
+///|
 pub impl Eq for Match with fn equal(self, other) {
   self.start() == other.start() &&
   self.end() == other.end() &&
   self.as_str() == other.as_str()
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Match with Eq::{not_equal, equal}
 
 ///|
 /// An iterator over all non-overlapping matches for a particular string.

@@ -12,6 +12,16 @@ pub(all) struct WasmFeatures {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WasmFeatures with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend WasmFeatures with Hash::{hash, hash_combine}
+
+///|
 /// The WebAssembly `mutable-global` proposal.
 pub const MUTABLE_GLOBAL : UInt = 1
 

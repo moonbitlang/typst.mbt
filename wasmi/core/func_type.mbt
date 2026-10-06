@@ -15,6 +15,11 @@ pub(all) suberror FuncTypeError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncTypeError with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for FuncTypeError with fn output(self, logger) {
   match self {
     TooManyFunctionParams =>
@@ -23,6 +28,9 @@ pub impl Show for FuncTypeError with fn output(self, logger) {
       logger.write_string("encountered a function with too many results")
   }
 }
+
+///|
+pub extend FuncTypeError with Show::{to_string, output}
 
 ///|
 /// A function type representing a function's parameter and result types.
@@ -36,6 +44,16 @@ pub struct FuncType {
   /// Combined parameter and result types.
   params_results : FixedArray[ValType]
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with Hash::{hash, hash_combine}
 
 ///|
 /// The maximum number of parameter types allowed of a [`FuncType`].
@@ -116,3 +134,6 @@ pub impl Show for FuncType with fn output(self, logger) {
     "FuncType { params: \{list(self.params())}, results: \{list(self.results())} }",
   )
 }
+
+///|
+pub extend FuncType with Show::{to_string, output}

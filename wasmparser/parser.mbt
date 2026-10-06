@@ -35,6 +35,16 @@ pub(all) enum Encoding {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Encoding with @debug.Debug::{to_repr}
+
+///|
 /// An incremental parser of a binary WebAssembly module or component.
 ///
 /// This type is intended to be used to incrementally parse a WebAssembly module

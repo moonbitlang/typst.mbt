@@ -158,6 +158,11 @@ pub impl Show for RegexError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RegexError with Show::{to_string, output}
+
+///|
 /// The formatted message of the error.
 pub fn RegexError::message(self : RegexError) -> String {
   match self {

@@ -12,6 +12,11 @@ struct Strip {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Strip with Eq::{not_equal, equal}
+
+///|
 /// The bit mask for `fill_gap` packed into `packed_alpha_idx_fill_gap`.
 const FILL_GAP_MASK : UInt = 0x80000000
 

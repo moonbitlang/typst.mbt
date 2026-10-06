@@ -34,6 +34,11 @@ pub impl Eq for F32 with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32 with Eq::{not_equal, equal}
+
+///|
 /// `PartialOrd::partial_cmp`: `None` if either value is NaN.
 pub fn F32::partial_cmp(self : F32, other : F32) -> Int? {
   let a = self.to_float()
@@ -60,6 +65,9 @@ pub impl Show for F32 with fn output(self, logger) {
 }
 
 ///|
+pub extend F32 with Show::{to_string, output}
+
+///|
 /// Rust's `Debug` of [F32].
 pub impl Debug for F32 with fn to_repr(self) {
   if self.to_float().is_nan() {
@@ -67,6 +75,11 @@ pub impl Debug for F32 with fn to_repr(self) {
   }
   Repr::literal(rust_debug_f32(self.to_float()))
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F32 with @debug.Debug::{to_repr}
 
 ///|
 /// A 64-bit `f64` type.
@@ -102,6 +115,11 @@ pub impl Eq for F64 with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F64 with Eq::{not_equal, equal}
+
+///|
 /// `PartialOrd::partial_cmp`: `None` if either value is NaN.
 pub fn F64::partial_cmp(self : F64, other : F64) -> Int? {
   let a = self.to_float()
@@ -128,6 +146,9 @@ pub impl Show for F64 with fn output(self, logger) {
 }
 
 ///|
+pub extend F64 with Show::{to_string, output}
+
+///|
 /// Rust's `Debug` of [F64].
 pub impl Debug for F64 with fn to_repr(self) {
   if self.to_float().is_nan() {
@@ -135,6 +156,11 @@ pub impl Debug for F64 with fn to_repr(self) {
   }
   Repr::literal(rust_debug_f64(self.to_float()))
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F64 with @debug.Debug::{to_repr}
 
 ///|
 /// Rust's `{:X}` of an unsigned integer.

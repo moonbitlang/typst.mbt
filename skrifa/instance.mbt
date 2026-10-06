@@ -17,6 +17,16 @@ pub using @font_types {type GlyphId, type Fixed, type F26Dot6, type F2Dot14}
 pub(all) struct Size(Float?) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Size with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Size with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new font size from the given value in pixels per em units.
 pub fn Size::new(ppem : Float) -> Size {
   Size(Some(ppem))
@@ -144,6 +154,11 @@ pub impl Show for DrawError with fn output(self, f) {
       )
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DrawError with Show::{to_string, output}
 
 ///|
 /// Errors that can occur when converting an outline to a path.

@@ -36,6 +36,11 @@ pub impl Show for ParsingError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParsingError with Show::{to_string, output}
+
+///|
 /// Keeps the current parser state (the internal syntax interpreter stack)
 /// between lines of parsing.
 ///

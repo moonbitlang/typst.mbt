@@ -126,3 +126,8 @@ pub impl FromSlice for ChainedSequenceRule with fn parse_slice(data) {
   let lookups = s.read_array16(lookup_count)
   { backtrack, input, lookahead, lookups, }
 }
+
+///|
+#deprecated("call as `FromSlice::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ChainedSequenceRule with FromSlice::{parse_slice}

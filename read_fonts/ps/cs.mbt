@@ -15,6 +15,16 @@ pub(all) enum CharstringKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CharstringKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CharstringKind with @debug.Debug::{to_repr}
+
+///|
 /// Trait that provides context for charstring evaluation.
 pub(open) trait CharstringContext {
   /// Returns the type of the charstring.
@@ -106,6 +116,17 @@ pub impl CharstringContext for CffContext with fn subr(self, index) {
 ///|
 pub impl CharstringContext for CffContext with fn weight_vector(_self) {
   []
+}
+
+///|
+#deprecated("call as `CharstringContext::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CffContext with CharstringContext::{
+  subr,
+  seac_components,
+  kind,
+  weight_vector,
+  global_subr,
 }
 
 ///|
@@ -1219,6 +1240,22 @@ pub impl CommandSink for TransformSink with fn finish(self) {
 }
 
 ///|
+#deprecated("call as `CommandSink::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformSink with CommandSink::{
+  close,
+  finish,
+  curve_to,
+  hstem,
+  counter_mask,
+  hint_mask,
+  line_to,
+  clear_hints,
+  vstem,
+  move_to,
+}
+
+///|
 priv enum PendingElement {
   Move(Fixed, Fixed)
   Line(Fixed, Fixed)
@@ -1352,6 +1389,22 @@ pub impl CommandSink for NopFilterSink with fn finish(self) {
 }
 
 ///|
+#deprecated("call as `CommandSink::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NopFilterSink with CommandSink::{
+  close,
+  finish,
+  curve_to,
+  hstem,
+  counter_mask,
+  hint_mask,
+  line_to,
+  clear_hints,
+  vstem,
+  move_to,
+}
+
+///|
 /// Adapter that forwards charstring commands to an [OutlinePen].
 pub struct PenSink {
   pen : &@read_fonts.OutlinePen
@@ -1425,4 +1478,20 @@ pub impl CommandSink for PenSink with fn clear_hints(_self) {
 ///|
 pub impl CommandSink for PenSink with fn finish(_self) {
   ()
+}
+
+///|
+#deprecated("call as `CommandSink::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PenSink with CommandSink::{
+  close,
+  finish,
+  curve_to,
+  hstem,
+  counter_mask,
+  hint_mask,
+  line_to,
+  clear_hints,
+  vstem,
+  move_to,
 }

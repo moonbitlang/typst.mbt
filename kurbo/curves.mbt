@@ -11,6 +11,16 @@ pub(all) struct Line {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Line with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Line with @debug.Debug::{to_repr}
+
+///|
 /// Create a new line.
 pub fn Line::new(p0 : Point, p1 : Point) -> Line {
   { p0, p1, }
@@ -29,6 +39,16 @@ pub(all) struct QuadBez {
   p1 : Point
   p2 : Point
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QuadBez with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QuadBez with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new quadratic Bézier segment.
@@ -77,6 +97,16 @@ pub(all) struct CubicBez {
   p2 : Point
   p3 : Point
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CubicBez with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CubicBez with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new cubic Bézier segment.
@@ -541,6 +571,16 @@ pub(all) enum CuspType {
   /// Cusp has two closely spaced inflection points.
   DoubleInflection
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CuspType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CuspType with @debug.Debug::{to_repr}
 
 ///|
 /// Preprocess a cubic Bézier to ease numerical robustness.

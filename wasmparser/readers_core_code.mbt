@@ -71,6 +71,11 @@ pub impl FromReader for FunctionBody with fn from_reader(reader) {
 }
 
 ///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FunctionBody with FromReader::{from_reader}
+
+///|
 /// A reader for a function body's locals.
 pub struct LocalsReader {
   priv reader : BinaryReader

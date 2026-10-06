@@ -12,6 +12,11 @@ pub(all) suberror ImageError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageError with @debug.Debug::{to_repr}
+
+///|
 /// Raise a decoding error for the given format (upstream
 /// `ImageError::Decoding(DecodingError::new(format.into(), err))`).
 fn[T] decoding_error(format : String, message : String) -> T raise ImageError {
@@ -30,6 +35,21 @@ pub(all) enum ColorType {
   Rgb16
   Rgba16
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorType with @debug.Debug::{to_repr}
 
 ///|
 /// The number of channels of the color type.
@@ -55,6 +75,11 @@ pub(all) struct ImageInfo {
   /// The embedded ICC profile, if any (upstream `ImageDecoder::icc_profile`).
   icc : Bytes?
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageInfo with @debug.Debug::{to_repr}
 
 ///|
 /// A big-endian 16-bit load.

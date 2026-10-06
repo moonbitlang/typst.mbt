@@ -114,6 +114,11 @@ pub impl AllocConst for StackLayout with fn alloc_const(self, value) {
 }
 
 ///|
+#deprecated("call as `AllocConst::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StackLayout with AllocConst::{alloc_const}
+
+///|
 /// The [`StackSpace`] of a [`Slot`].
 pub(all) enum StackSpace {
   /// Stack slot referring to a local variable.
@@ -123,6 +128,16 @@ pub(all) enum StackSpace {
   /// Stack slot referring to a temporary stack operand.
   Temp
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StackSpace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StackSpace with @debug.Debug::{to_repr}
 
 ///|
 /// A pool of deduplicated function local constant values.

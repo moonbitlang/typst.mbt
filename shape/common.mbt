@@ -23,9 +23,29 @@ pub(all) enum Direction {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for Direction with fn default() {
   Invalid
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Direction with Default::{default}
 
 ///|
 pub fn Direction::is_horizontal(self : Direction) -> Bool {
@@ -151,6 +171,21 @@ pub fn Direction::from_str(s : String) -> Direction? {
 pub(all) struct Language(String) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with @debug.Debug::{to_repr}
+
+///|
 /// Returns the language as a string.
 pub fn Language::as_str(self : Language) -> String {
   self.0
@@ -187,11 +222,31 @@ fn ascii_lowercase(s : String) -> String {
 pub(all) struct Script(@otf.Tag) derive(Eq, Compare, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Script with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Script with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Script with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Script with fn output(self, logger) {
   logger.write_string("Script(")
   logger.write_string(tag_string(self.0))
   logger.write_string(")")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Script with Show::{to_string, output}
 
 ///|
 fn Script::from_bytes(b : Bytes) -> Script {
@@ -830,6 +885,21 @@ pub(all) struct Feature {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with @debug.Debug::{to_repr}
+
+///|
 /// Create a new `Feature` applying to the inclusive cluster range
 /// `start..=end` (rustybuzz's `Feature::new` with resolved range bounds).
 pub fn Feature::new(
@@ -940,6 +1010,16 @@ pub(all) struct Variation {
   tag : @otf.Tag
   value : Float
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Variation with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a `Variation` from a string like `wght=500`.

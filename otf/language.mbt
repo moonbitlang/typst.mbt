@@ -216,6 +216,16 @@ pub(all) enum Language {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Language with @debug.Debug::{to_repr}
+
+///|
 let language_table : ReadOnlyArray[(UInt16, Language, String, String)] = [
   (0x0000, Unknown, "Unknown", "Unknown"),
   (0x0436, Afrikaans_SouthAfrica, "Afrikaans", "South Africa"),

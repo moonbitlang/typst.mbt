@@ -11,9 +11,24 @@ pub(all) enum FillRule {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FillRule with fn default() {
   Winding
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FillRule with Default::{default}
 
 ///|
 /// Controls how a shape should be painted.

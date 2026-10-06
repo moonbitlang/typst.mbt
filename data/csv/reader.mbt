@@ -17,6 +17,16 @@ pub(all) struct Position {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Position with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Position with @debug.Debug::{to_repr}
+
+///|
 /// The kind of a CSV error (upstream `csv::ErrorKind`, as far as it can
 /// occur when reading from a byte slice).
 pub(all) enum ErrorKind {
@@ -28,10 +38,25 @@ pub(all) enum ErrorKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ErrorKind with @debug.Debug::{to_repr}
+
+///|
 /// A CSV error (upstream `csv::Error`).
 pub(all) suberror CsvError {
   CsvError(ErrorKind)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CsvError with @debug.Debug::{to_repr}
 
 ///|
 /// The position of the error, if available (upstream `ErrorKind::position`).

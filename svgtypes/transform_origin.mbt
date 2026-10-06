@@ -45,6 +45,16 @@ pub(all) struct TransformOrigin {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOrigin with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOrigin with @debug.Debug::{to_repr}
+
+///|
 /// Constructs a new transform origin.
 pub fn TransformOrigin::new(
   x_offset : Length,
@@ -64,6 +74,16 @@ pub(all) suberror TransformOriginError {
   /// z-index is not a percentage.
   ZIndexIsPercentage
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOriginError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransformOriginError with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream's `Display`.

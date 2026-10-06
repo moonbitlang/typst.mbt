@@ -12,6 +12,16 @@ pub(all) struct Blues {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Blues with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Blues with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new set of blues from the given values.
 pub fn Blues::new(values : Array[@font_types.Fixed]) -> Blues {
   let blues = []
@@ -45,6 +55,16 @@ pub(all) struct StemSnaps {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StemSnaps with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StemSnaps with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new set of stem snaps for the given values.
 pub fn StemSnaps::new(values : Array[@font_types.Fixed]) -> StemSnaps {
   let v = []
@@ -70,6 +90,16 @@ pub(all) struct HintingParams {
   mut blue_fuzz : @font_types.Fixed
   mut language_group : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintingParams with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintingParams with @debug.Debug::{to_repr}
 
 ///|
 pub fn HintingParams::default() -> HintingParams {

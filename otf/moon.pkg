@@ -2,6 +2,7 @@ import {
   "moonbitlang/core/math",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
+  "moonbitlang/core/debug",
 }
 
 import {

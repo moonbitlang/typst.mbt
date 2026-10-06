@@ -6,6 +6,16 @@
 pub(all) struct LocalIdx(UInt) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocalIdx with @debug.Debug::{to_repr}
+
+///|
 /// A input parameter to a translation or construction routine.
 pub(all) enum Input[T] {
   /// A [`Slot`] operand.

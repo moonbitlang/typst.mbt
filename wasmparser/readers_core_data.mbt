@@ -57,3 +57,8 @@ pub impl FromReader for Data with fn from_reader(reader) {
     range: { start: segment_start, end: data.range().end, },
   }
 }
+
+///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Data with FromReader::{from_reader}

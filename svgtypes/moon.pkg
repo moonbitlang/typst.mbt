@@ -3,6 +3,7 @@ import {
   "moonbitlang/core/math",
   "moonbitlang/core/string",
   "moonbitlang/typst/unicode",
+  "moonbitlang/core/debug",
 }
 
 options(

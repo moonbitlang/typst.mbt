@@ -14,6 +14,16 @@ pub(all) enum PlatformId {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlatformId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlatformId with @debug.Debug::{to_repr}
+
+///|
 pub fn PlatformId::new(raw : Int) -> PlatformId {
   match raw {
     0 => Unicode
@@ -52,6 +62,11 @@ pub(all) struct EncodingRecord {
   encoding : Int
   subtable_offset : UInt
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EncodingRecord with @debug.Debug::{to_repr}
 
 ///|
 pub fn EncodingRecord::platform_id(self : EncodingRecord) -> PlatformId {

@@ -1,3 +1,4 @@
 import {
   "moonbitlang/typst/font_types",
+  "moonbitlang/core/debug",
 }

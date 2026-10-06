@@ -16,6 +16,16 @@ pub(all) enum OutlineGlyphFormat {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineGlyphFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineGlyphFormat with @debug.Debug::{to_repr}
+
+///|
 /// Information and adjusted metrics generated while drawing an outline
 /// glyph.
 pub(all) struct AdjustedMetrics {
@@ -29,6 +39,16 @@ pub(all) struct AdjustedMetrics {
   /// scaler.
   advance_width : Float?
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AdjustedMetrics with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AdjustedMetrics with @debug.Debug::{to_repr}
 
 ///|
 fn AdjustedMetrics::default() -> AdjustedMetrics {
@@ -309,6 +329,16 @@ pub(all) struct HintingOptions {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintingOptions with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HintingOptions with @debug.Debug::{to_repr}
+
+///|
 /// Specifies the backend to use when applying hints.
 pub(all) enum Engine {
   /// The TrueType or PostScript interpreter.
@@ -318,6 +348,16 @@ pub(all) enum Engine {
   /// Selects the engine based on the same rules that FreeType uses.
   AutoFallback
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Engine with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Engine with @debug.Debug::{to_repr}
 
 ///|
 /// Defines the target settings for hinting.
@@ -334,6 +374,16 @@ pub(all) enum Target {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Target with @debug.Debug::{to_repr}
+
+///|
 /// Mode selector for a smooth hinting target.
 pub(all) enum SmoothMode {
   Normal
@@ -341,6 +391,16 @@ pub(all) enum SmoothMode {
   Lcd
   VerticalLcd
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmoothMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmoothMode with @debug.Debug::{to_repr}
 
 ///|
 /// Modes that control hinting when using embedded instructions.

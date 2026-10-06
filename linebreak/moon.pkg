@@ -2,6 +2,7 @@ import {
   "moonbitlang/typst/unicode",
   "moonbitlang/typst/hypher",
   "moonbitlang/typst/syntax",
+  "moonbitlang/core/debug",
 }
 
 import {

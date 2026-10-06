@@ -22,6 +22,11 @@ pub(all) enum Settings {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Settings with Eq::{not_equal, equal}
+
+///|
 /// The JSON representation (upstream `Value::to_string`).
 pub impl Show for Settings with fn output(self, logger) {
   match self {
@@ -106,6 +111,11 @@ pub impl Show for SettingsError with fn output(self, logger) {
     Plist(e) => logger.write_string("Incorrect Plist syntax: \{e}")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SettingsError with Show::{to_string, output}
 
 ///|
 /// A plist event (upstream `plist::stream::Event`).

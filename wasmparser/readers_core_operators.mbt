@@ -15,6 +15,21 @@ pub(all) enum BlockType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockType with @debug.Debug::{to_repr}
+
+///|
 /// The kind of a control flow `Frame`.
 pub(all) enum FrameKind {
   /// A Wasm `block` control block.
@@ -52,6 +67,16 @@ pub(all) enum FrameKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with @debug.Debug::{to_repr}
+
+///|
 /// Represents a memory immediate in a WebAssembly memory instruction.
 pub(all) struct MemArg {
   /// Alignment, stored as `n` where the actual alignment is `2^n`
@@ -78,6 +103,16 @@ pub(all) struct MemArg {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemArg with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemArg with @debug.Debug::{to_repr}
+
+///|
 /// A br_table entries representation.
 ///
 /// Upstream keeps a reader over the targets; they are already decoded here.
@@ -87,11 +122,36 @@ pub(all) struct BrTable {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BrTable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BrTable with @debug.Debug::{to_repr}
+
+///|
 /// An IEEE binary32 immediate floating point value, represented as a u32
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
 pub(all) struct Ieee32(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee32 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee32 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee32 with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the underlying bits of the 32-bit float.
@@ -107,6 +167,21 @@ pub fn Ieee32::bits(self : Ieee32) -> UInt {
 pub(all) struct Ieee64(UInt64) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee64 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ieee64 with @debug.Debug::{to_repr}
+
+///|
 /// Gets the underlying bits of the 64-bit float.
 pub fn Ieee64::bits(self : Ieee64) -> UInt64 {
   self.0
@@ -115,6 +190,21 @@ pub fn Ieee64::bits(self : Ieee64) -> UInt64 {
 ///|
 /// Represents a 128-bit vector value (16 bytes, little endian).
 pub(all) struct V128(Bytes) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend V128 with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the bytes of the 128-bit vector value.
@@ -139,6 +229,21 @@ pub(all) enum Ordering {
   /// operations in the same order.
   SeqCst
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ordering with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ordering with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ordering with @debug.Debug::{to_repr}
 
 ///|
 /// A reader for a core WebAssembly function's operators.
@@ -221,6 +326,16 @@ pub(all) struct TryTable {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TryTable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TryTable with @debug.Debug::{to_repr}
+
+///|
 /// Catch clauses that can be specified in [`TryTable`].
 pub(all) enum Catch {
   /// Equivalent of `catch`
@@ -232,6 +347,16 @@ pub(all) enum Catch {
   /// Equivalent of `catch_all_ref`
   AllRef(label~ : UInt)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Catch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Catch with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromReader for TryTable with fn from_reader(reader) {
@@ -279,6 +404,16 @@ pub(all) struct ResumeTable {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResumeTable with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResumeTable with @debug.Debug::{to_repr}
+
+///|
 /// Handle clauses that can be specified in [`ResumeTable`].
 pub(all) enum Handle {
   /// Equivalent of `(on $tag $lbl)`.
@@ -286,6 +421,16 @@ pub(all) enum Handle {
   /// Equivalent of `(on $tag switch)`.
   OnSwitch(tag~ : UInt)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Handle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Handle with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the number of entries in the table.

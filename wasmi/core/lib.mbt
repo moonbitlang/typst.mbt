@@ -23,30 +23,3 @@ pub extend MemoryTypeBuilder with Default::{default}
 
 ///|
 pub extend ResourceLimiterRef with Default::{default}
-
-///|
-pub extend Trap with Show::{to_string}
-
-///|
-pub extend TrapCode with Show::{to_string}
-
-///|
-pub extend LimiterError with Show::{to_string}
-
-///|
-pub extend FuncTypeError with Show::{to_string}
-
-///|
-pub extend UntypedError with Show::{to_string}
-
-///|
-pub extend FuncType with Show::{to_string}
-
-///|
-pub extend ValType with Show::{to_string}
-
-///|
-pub extend F32 with Show::{to_string}
-
-///|
-pub extend F64 with Show::{to_string}

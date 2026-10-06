@@ -46,6 +46,11 @@ pub impl Default for Tracks with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Tracks with Default::{default}
+
+///|
 /// Returns a track at index.
 pub fn Tracks::get(self : Tracks, index : UInt16) -> Track? {
   guard self.records.get(index) is Some(record) else { return None }
@@ -118,6 +123,11 @@ pub(all) struct TrackData {
 pub impl Default for TrackData with fn default() {
   { tracks: Default::default(), sizes: LazyArray16::default(), }
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrackData with Default::{default}
 
 ///|
 fn TrackData::parse(

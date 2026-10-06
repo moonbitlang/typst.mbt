@@ -11,6 +11,26 @@ pub(all) enum PathVerb {
 } derive(Eq, Compare, Debug, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathVerb with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathVerb with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathVerb with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathVerb with Hash::{hash, hash_combine}
+
+///|
 /// A Bezier path.
 ///
 /// Can be created via [`PathBuilder`].
@@ -33,6 +53,16 @@ pub struct Path {
   priv points : Array[Point]
   priv bounds : Rect
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Path with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Path with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the number of segments in the path.
@@ -206,6 +236,16 @@ pub(all) enum PathSegment {
   CubicTo(Point, Point, Point)
   Close
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSegment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathSegment with @debug.Debug::{to_repr}
 
 ///|
 /// A path segments iterator.

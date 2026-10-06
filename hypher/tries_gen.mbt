@@ -54,6 +54,21 @@ pub(all) enum Lang {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lang with @debug.Debug::{to_repr}
+
+///|
 /// Select a language using its two-letter ISO 639-1 code.
 pub fn Lang::from_iso(code : String) -> Lang? {
   match code {

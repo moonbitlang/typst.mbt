@@ -6,6 +6,26 @@
 pub(all) struct Instr(Int) derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instr with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instr with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instr with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instr with @debug.Debug::{to_repr}
+
+///|
 /// Creates an [`Instr`] from the given `usize` value.
 pub fn Instr::from_usize(value : Int) -> Instr {
   Instr(value)
@@ -41,6 +61,16 @@ priv enum Label {
 ///|
 /// A reference to an [`Label`].
 pub(all) struct LabelRef(Int) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelRef with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelRef with @debug.Debug::{to_repr}
 
 ///|
 /// The label registry.

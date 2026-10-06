@@ -18,6 +18,16 @@ pub(all) enum PaintFallback {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintFallback with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PaintFallback with @debug.Debug::{to_repr}
+
+///|
 /// Representation of the [`<paint>`] type.
 ///
 /// `<icccolor>` isn't supported.
@@ -43,6 +53,16 @@ pub(all) enum Paint {
   /// The `context-stroke` value.
   ContextStroke
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with @debug.Debug::{to_repr}
 
 ///|
 /// Parses a `Paint` from a string.

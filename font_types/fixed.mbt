@@ -5,14 +5,74 @@
 pub(all) struct Fixed(Int) derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with @debug.Debug::{to_repr}
+
+///|
 /// 32-bit signed fixed point number with 6 bits of fraction.
 pub(all) struct F26Dot6(Int) derive(Eq, Compare, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with @debug.Debug::{to_repr}
 
 ///|
 /// 16-bit signed fixed point number with 14 bits of fraction.
 ///
 /// The raw value is stored sign-extended in an `Int`.
 pub(all) struct F2Dot14(Int) derive(Eq, Compare, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2Dot14 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2Dot14 with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2Dot14 with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F2Dot14 with @debug.Debug::{to_repr}
 
 // ---------------------------------------------------------------------------
 // Fixed (16.16)
@@ -122,9 +182,19 @@ pub impl Add for Fixed with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Add::{add}
+
+///|
 pub impl Sub for Fixed with fn sub(self, other) {
   Fixed(self.0 - other.0)
 }
+
+///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Sub::{sub}
 
 ///|
 pub impl Mul for Fixed with fn mul(self, other) {
@@ -132,14 +202,29 @@ pub impl Mul for Fixed with fn mul(self, other) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Mul::{mul}
+
+///|
 pub impl Div for Fixed with fn div(self, other) {
   Fixed(fixed_div_bits(self.0, other.0))
 }
 
 ///|
+#deprecated("call as `Div::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Div::{div}
+
+///|
 pub impl Neg for Fixed with fn neg(self) {
   Fixed(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fixed with Neg::{neg}
 
 ///|
 /// Multiplies `self` by `a` and divides the product by `b`.
@@ -279,9 +364,19 @@ pub impl Add for F26Dot6 with fn add(self, other) {
 }
 
 ///|
+#deprecated("call as `Add::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Add::{add}
+
+///|
 pub impl Sub for F26Dot6 with fn sub(self, other) {
   F26Dot6(self.0 - other.0)
 }
+
+///|
+#deprecated("call as `Sub::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Sub::{sub}
 
 ///|
 pub impl Mul for F26Dot6 with fn mul(self, other) {
@@ -289,14 +384,29 @@ pub impl Mul for F26Dot6 with fn mul(self, other) {
 }
 
 ///|
+#deprecated("call as `Mul::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Mul::{mul}
+
+///|
 pub impl Div for F26Dot6 with fn div(self, other) {
   F26Dot6(fixed_div_bits(self.0, other.0))
 }
 
 ///|
+#deprecated("call as `Div::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Div::{div}
+
+///|
 pub impl Neg for F26Dot6 with fn neg(self) {
   F26Dot6(-self.0)
 }
+
+///|
+#deprecated("call as `Neg::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend F26Dot6 with Neg::{neg}
 
 // ---------------------------------------------------------------------------
 // F2Dot14

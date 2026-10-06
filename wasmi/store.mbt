@@ -116,11 +116,26 @@ pub(all) struct Func {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Func with fn output(self, f) {
   f.write_string(
     "Func(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: FuncIdx(\{self.idx + 1}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with Show::{to_string, output}
 
 ///|
 /// A Wasm linear memory reference.
@@ -130,11 +145,26 @@ pub(all) struct Memory {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Memory with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Memory with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Memory with fn output(self, f) {
   f.write_string(
     "Memory(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: MemoryIdx(\{self.idx}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Memory with Show::{to_string, output}
 
 ///|
 /// A Wasm table reference.
@@ -144,11 +174,26 @@ pub(all) struct Table {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Table with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Table with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Table with fn output(self, f) {
   f.write_string(
     "Table(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: TableIdx(\{self.idx}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Table with Show::{to_string, output}
 
 ///|
 /// A Wasm global variable reference.
@@ -158,11 +203,26 @@ pub(all) struct Global {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Global with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Global with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Global with fn output(self, f) {
   f.write_string(
     "Global(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: GlobalIdx(\{self.idx}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Global with Show::{to_string, output}
 
 ///|
 /// An instantiated WebAssembly [`Module`].
@@ -172,11 +232,26 @@ pub(all) struct Instance {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instance with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instance with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for Instance with fn output(self, f) {
   f.write_string(
     "Instance(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: InstanceIdx(\{self.idx}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Instance with Show::{to_string, output}
 
 ///|
 /// A reference to a data segment.
@@ -186,11 +261,31 @@ pub(all) struct DataSegment {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DataSegment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DataSegment with Hash::{hash, hash_combine}
+
+///|
 /// A reference to an element segment.
 pub(all) struct ElementSegment {
   priv store : Int
   priv idx : Int
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElementSegment with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ElementSegment with Hash::{hash, hash_combine}
 
 ///|
 /// Represents an opaque reference to any data within WebAssembly.
@@ -200,11 +295,26 @@ pub(all) struct ExternRef {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternRef with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternRef with Hash::{hash, hash_combine}
+
+///|
 pub impl Show for ExternRef with fn output(self, f) {
   f.write_string(
     "ExternRef(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: ExternRefIdx(\{self.idx + 1}) })",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExternRef with Show::{to_string, output}
 
 ///|
 /// An externally defined object (upstream `ExternRefEntity`, a boxed `dyn Any`).
@@ -219,6 +329,11 @@ pub(all) enum Any {
   Str(String)
   Other
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Any with Eq::{not_equal, equal}
 
 ///|
 /// What `derive(Show)` printed (deprecated as a derive).
@@ -237,6 +352,11 @@ pub impl Show for Any with fn output(self, logger) {
     Other => logger.write_string("Other")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Any with Show::{to_string, output}
 
 ///|
 /// A data segment entity (upstream `DataSegmentEntity`).
@@ -512,6 +632,11 @@ pub(all) enum Val {
   /// A nullable [`ExternRef`] reference.
   ExternRef(ExternRef?)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Val with Eq::{not_equal, equal}
 
 ///|
 /// Creates new default value of given type.

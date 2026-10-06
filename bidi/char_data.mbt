@@ -35,6 +35,21 @@ pub(all) enum BidiClass {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BidiClass with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BidiClass with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BidiClass with @debug.Debug::{to_repr}
+
+///|
 let bidi_classes : ReadOnlyArray[BidiClass] = [
   AL,
   AN,
@@ -98,6 +113,16 @@ pub(all) struct BidiMatchedOpeningBracket {
   /// Whether or not the requested bracket was an opening bracket. True for opening
   is_open : Bool
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BidiMatchedOpeningBracket with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BidiMatchedOpeningBracket with @debug.Debug::{to_repr}
 
 ///|
 /// If this character is a bracket according to BidiBrackets.txt,

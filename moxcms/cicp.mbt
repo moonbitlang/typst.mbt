@@ -19,6 +19,16 @@ pub(all) enum CicpColorPrimaries {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CicpColorPrimaries with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CicpColorPrimaries with @debug.Debug::{to_repr}
+
+///|
 fn CicpColorPrimaries::try_from(value : Int) -> CicpColorPrimaries {
   // Values 0, 3, 13–21, 23–255 are all reserved so all map to the same
   // variant.
@@ -61,6 +71,16 @@ pub(all) enum TransferCharacteristics {
   Smpte428
   Hlg
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransferCharacteristics with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TransferCharacteristics with @debug.Debug::{to_repr}
 
 ///|
 fn TransferCharacteristics::try_from(value : Int) -> TransferCharacteristics {
@@ -112,6 +132,16 @@ pub(all) enum MatrixCoefficients {
   ChromaticityDerivedCL
   ICtCp
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MatrixCoefficients with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MatrixCoefficients with @debug.Debug::{to_repr}
 
 ///|
 fn MatrixCoefficients::try_from(

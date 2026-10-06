@@ -8,6 +8,21 @@ pub(all) suberror ComponentRange {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentRange with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentRange with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentRange with @debug.Debug::{to_repr}
+
+///|
 fn ComponentRange::unconditional(name : String) -> ComponentRange {
   ComponentRange(name~, is_conditional=false)
 }
@@ -39,6 +54,11 @@ pub impl Show for ComponentRange with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ComponentRange with Show::{to_string, output}
+
+///|
 /// The format description provided was not valid.
 pub(all) suberror InvalidFormatDescription {
   /// There was a bracket pair that was opened but not closed.
@@ -64,6 +84,16 @@ pub(all) suberror InvalidFormatDescription {
     index~ : Int
   )
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InvalidFormatDescription with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InvalidFormatDescription with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for InvalidFormatDescription with fn output(self, logger) {
@@ -94,6 +124,11 @@ pub impl Show for InvalidFormatDescription with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InvalidFormatDescription with Show::{to_string, output}
+
+///|
 /// An error occurred when formatting.
 pub(all) suberror Format {
   /// The type being formatted does not contain sufficient information to
@@ -107,6 +142,16 @@ pub(all) suberror Format {
   /// A value of `std::io::Error` was returned internally.
   StdIo(String)
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Format with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Format with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for Format with fn output(self, logger) {
@@ -123,3 +168,8 @@ pub impl Show for Format with fn output(self, logger) {
     StdIo(err) => logger.write_string(err)
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Format with Show::{to_string, output}

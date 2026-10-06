@@ -135,6 +135,11 @@ pub impl Show for Bitmap with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Bitmap with Show::{to_string, output}
+
+///|
 /// Builds the glyph outline.
 priv struct Builder {
   segments : Array[Segment]

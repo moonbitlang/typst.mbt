@@ -17,6 +17,26 @@
 pub(all) struct SlotSpan(Slot) derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpan with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpan with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpan with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpan with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new [`SlotSpan`] starting with the given `start` [`Slot`].
 pub fn SlotSpan::new(head : Slot) -> SlotSpan {
   SlotSpan(head)
@@ -55,6 +75,26 @@ pub fn SlotSpan::has_overlapping_copies(
 /// A [`SlotSpan`] with a statically known number of [`Slot`] (upstream
 /// `FixedSlotSpan<N>`; only `N = 2` is used by Wasmi's instructions).
 pub(all) struct FixedSlotSpan(SlotSpan) derive(Eq, Compare, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedSlotSpan with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedSlotSpan with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedSlotSpan with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FixedSlotSpan with @debug.Debug::{to_repr}
 
 ///|
 /// Returns an array of the results represented by `self` (`N = 2`).
@@ -129,6 +169,26 @@ pub(all) struct BoundedSlotSpan {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundedSlotSpan with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundedSlotSpan with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundedSlotSpan with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoundedSlotSpan with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new [`BoundedSlotSpan`] from the given `span` and `len`.
 pub fn BoundedSlotSpan::new(span : SlotSpan, len : Int) -> BoundedSlotSpan {
   { span, len, }
@@ -177,6 +237,16 @@ pub(all) struct SlotSpanIter {
   /// The last [`Slot`] in the [`SlotSpanIter`].
   mut last : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpanIter with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SlotSpanIter with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a [`SlotSpanIter`] from then given raw `start` and `end` [`Slot`].

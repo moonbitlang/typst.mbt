@@ -28,6 +28,11 @@ pub(all) struct MorxFeature {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxFeature with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for MorxFeature with fn size() {
   12
 }
@@ -44,6 +49,11 @@ pub impl FromData for MorxFeature with fn parse(data) {
 }
 
 ///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxFeature with FromData::{size, parse}
+
+///|
 /// A contextual subtable state table trailing data.
 pub(all) struct MorxContextualEntryData {
   /// A mark index.
@@ -51,6 +61,11 @@ pub(all) struct MorxContextualEntryData {
   /// A current index.
   current_index : UInt16
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxContextualEntryData with @debug.Debug::{to_repr}
 
 ///|
 pub impl FromData for MorxContextualEntryData with fn size() {
@@ -62,6 +77,11 @@ pub impl FromData for MorxContextualEntryData with fn parse(data) {
   let s = Stream::new(data)
   { mark_index: s.read(), current_index: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxContextualEntryData with FromData::{size, parse}
 
 ///|
 /// A contextual subtable.
@@ -150,6 +170,11 @@ pub(all) struct MorxInsertionEntryData {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxInsertionEntryData with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for MorxInsertionEntryData with fn size() {
   4
 }
@@ -159,6 +184,11 @@ pub impl FromData for MorxInsertionEntryData with fn parse(data) {
   let s = Stream::new(data)
   { current_insert_index: s.read(), marked_insert_index: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxInsertionEntryData with FromData::{size, parse}
 
 ///|
 /// An insertion subtable.
@@ -197,6 +227,11 @@ pub(all) enum MorxSubtableKind {
 ///|
 /// A subtable coverage.
 pub(all) struct MorxCoverage(Byte) derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MorxCoverage with @debug.Debug::{to_repr}
 
 ///|
 /// If true, this subtable will process glyphs in logical order

@@ -15,6 +15,16 @@ pub let alpha_u8_opaque : Int = 0xFF
 pub(all) struct ColorU8(UInt) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorU8 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorU8 with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new color.
 pub fn ColorU8::from_rgba(r : Int, g : Int, b : Int, a : Int) -> ColorU8 {
   ColorU8(pack_rgba(r, g, b, a))
@@ -65,6 +75,16 @@ pub fn ColorU8::premultiply(self : ColorU8) -> PremultipliedColorU8 {
 ///|
 /// An 8-bit, premultiplied RGBA color value.
 pub(all) struct PremultipliedColorU8(UInt) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PremultipliedColorU8 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PremultipliedColorU8 with @debug.Debug::{to_repr}
 
 ///|
 pub let premultiplied_color_u8_transparent : PremultipliedColorU8 = PremultipliedColorU8(
@@ -203,6 +223,16 @@ pub(all) struct Color {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Color with @debug.Debug::{to_repr}
+
+///|
 /// A transparent color.
 pub let color_transparent : Color = { r: 0.0, g: 0.0, b: 0.0, a: 0.0, }
 
@@ -321,6 +351,16 @@ pub(all) struct PremultipliedColor {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PremultipliedColor with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PremultipliedColor with @debug.Debug::{to_repr}
+
+///|
 pub fn PremultipliedColor::red(self : PremultipliedColor) -> Float {
   self.r
 }
@@ -395,9 +435,24 @@ pub(all) enum ColorSpace {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for ColorSpace with fn default() {
   Linear
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColorSpace with Default::{default}
 
 ///|
 fn ColorSpace::expand_channel(self : ColorSpace, x : Float) -> Float {

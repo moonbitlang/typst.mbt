@@ -16,6 +16,16 @@ pub(all) enum PngColorType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngColorType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngColorType with @debug.Debug::{to_repr}
+
+///|
 /// The numeric code of the color type.
 pub fn PngColorType::code(self : PngColorType) -> Int {
   match self {

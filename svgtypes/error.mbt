@@ -39,6 +39,16 @@ pub(all) suberror SvgTypesError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgTypesError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgTypesError with @debug.Debug::{to_repr}
+
+///|
 /// Upstream's `Display`.
 pub impl Show for SvgTypesError with fn output(self, logger) {
   match self {

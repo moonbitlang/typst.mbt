@@ -157,6 +157,11 @@ pub(all) enum ReadError {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ReadError with Eq::{not_equal, equal}
+
+///|
 pub impl Show for ReadError with fn output(self, f) {
   match self {
     EndOfStream => f.write_string("encountered unexpected end of stream")
@@ -181,6 +186,11 @@ pub(all) enum FuncError {
   /// Specified an incorrect number of results.
   MismatchingResultLen
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncError with Eq::{not_equal, equal}
 
 ///|
 pub impl Show for FuncError with fn output(self, f) {

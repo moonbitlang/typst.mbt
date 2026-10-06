@@ -11,6 +11,21 @@ pub(all) struct AnkrPoint {
 } derive(Eq, Default, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AnkrPoint with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AnkrPoint with Default::{default}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AnkrPoint with @debug.Debug::{to_repr}
+
+///|
 pub impl FromData for AnkrPoint with fn size() {
   4
 }
@@ -20,6 +35,11 @@ pub impl FromData for AnkrPoint with fn parse(data) {
   let s = Stream::new(data)
   { x: s.read(), y: s.read(), }
 }
+
+///|
+#deprecated("call as `FromData::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AnkrPoint with FromData::{size, parse}
 
 ///|
 /// An [Anchor Point Table](

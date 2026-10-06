@@ -15,6 +15,16 @@ pub(all) suberror FancyError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FancyError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FancyError with @debug.Debug::{to_repr}
+
+///|
 /// An error for the result of parsing a regex pattern.
 pub(all) enum ParseError {
   /// General parsing error
@@ -52,6 +62,16 @@ pub(all) enum ParseError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with @debug.Debug::{to_repr}
+
+///|
 /// An error as the result of compiling a regex.
 pub(all) enum CompileError {
   /// Regex crate error. Upstream wraps a `regex_automata` `BuildError`
@@ -75,6 +95,16 @@ pub(all) enum CompileError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompileError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompileError with @debug.Debug::{to_repr}
+
+///|
 /// An error as the result of executing a regex.
 pub(all) enum RuntimeError {
   /// Max stack size exceeded for backtracking while executing regex.
@@ -83,6 +113,16 @@ pub(all) enum RuntimeError {
   /// Configure using `RegexBuilder::backtrack_limit`.
   BacktrackLimitExceeded
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RuntimeError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RuntimeError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for ParseError with fn output(self, logger) {
@@ -113,6 +153,11 @@ pub impl Show for ParseError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseError with Show::{to_string, output}
+
+///|
 pub impl Show for CompileError with fn output(self, logger) {
   match self {
     InnerError(_) => logger.write_string("Regex error: error parsing pattern 0")
@@ -137,6 +182,11 @@ pub impl Show for CompileError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompileError with Show::{to_string, output}
+
+///|
 pub impl Show for RuntimeError with fn output(self, logger) {
   match self {
     StackOverflow =>
@@ -145,6 +195,11 @@ pub impl Show for RuntimeError with fn output(self, logger) {
       logger.write_string("Max limit for backtracking count exceeded")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RuntimeError with Show::{to_string, output}
 
 ///|
 /// The upstream `Display` text.
@@ -165,3 +220,9 @@ pub impl Show for FancyError with fn output(self, logger) {
       logger.write_string("Error executing regex: \{runtime_error}")
   }
 }
+
+///|
+// `to_string` is not named here: the type already has a method of this name.
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FancyError with Show::{output}

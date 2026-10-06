@@ -10,6 +10,21 @@ pub(all) enum IndexType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndexType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndexType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IndexType with @debug.Debug::{to_repr}
+
+///|
 /// Returns the [`ValType`] associated to `self`.
 pub fn IndexType::ty(self : IndexType) -> ValType {
   match self {
