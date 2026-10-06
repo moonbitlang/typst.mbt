@@ -1,0 +1,4 @@
+# x86_64 Linux (measured in CI): the x position and the length of one
+# underline segment differ in the last places from the golden
+# (f64 40896031a40e1a57 / 406e6b107a05074c instead of ...1a56 / ...0750).
+FAIL model/link.typ :: link-show

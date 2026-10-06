@@ -1,0 +1,22 @@
+# Unit tests that fail on x86_64 Linux (measured in CI): their expectations
+# come from the Rust crates as they run on aarch64 macOS, and the ports are
+# bit-exact there only. One `<file> ("<test name>")` per line;
+# scripts/ci/unit_tests.py fails on any failure that is not listed, and on
+# listed tests that pass.
+#
+# The default NaN of x86 has its sign bit set (0.0 / 0.0, ln and sqrt of
+# negative numbers): the NaN's bytes in CBOR, ffc00000 instead of 7fc00000.
+data/cbor/cbor_test.mbt ("encode")
+hayro/interpret/function/oracle_wbtest.mbt ("postscript programs match hayro-interpret")
+# pattern_shading_type1_6.pdf (a PostScript function shading), 1 of 784.
+hayro/interpret/function/oracle_wbtest.mbt ("functions of test pdfs match hayro-interpret")
+hayro/render/oracle_test.mbt ("hayro::render matches the oracle")
+hayro/svg/oracle_test.mbt ("hayro-svg matches the oracle")
+# Results that go through the C library's sin/cos (`__sincos_stret` on Apple
+# platforms, see AGENTS.md on kurbo) and differ in the last place: 669 of
+# 3340 stroke cases, 19 of 114 transforms, 121 of 525 arcs, one rotation
+# sweep.
+kurbo/stroke_oracle_test.mbt ("kurbo stroke oracle")
+svgtypes/oracle_test.mbt ("oracle transform")
+svgtypes/oracle_test.mbt ("oracle simple_path")
+tiny_skia_path/oracle_wbtest.mbt ("8 rotation sweep")

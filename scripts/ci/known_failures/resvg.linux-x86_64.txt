@@ -1,0 +1,3 @@
+# x86_64 Linux (measured in CI): the pixmap hash differs from the one of the
+# resvg crate on aarch64 macOS.
+FAIL tests/structure/image/no-width-and-height-on-svg

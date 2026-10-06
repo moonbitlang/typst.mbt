@@ -44,13 +44,13 @@ jobs:
   # (scripts/ci/goldens_key.sh), on the platform the ports are bit-exact on
   # (aarch64 macOS). The other jobs get them as an artifact of this run.
   goldens:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
       - name: Key
         id: key
-        run: echo "key=goldens-v1-macos15-arm64-$(scripts/ci/goldens_key.sh)" >> "$GITHUB_OUTPUT"
+        run: echo "key=goldens-v1-macos26-arm64-$(scripts/ci/goldens_key.sh)" >> "$GITHUB_OUTPUT"
       - name: Cached goldens
         id: cache
         uses: actions/cache/restore@v4
@@ -82,27 +82,56 @@ jobs:
           compression-level: 0
           retention-days: 3
 
+  # Every test executable is a whole program: the packages are split into
+  # shards that build and run their tests in parallel jobs
+  # (scripts/ci/unit_tests.py).
   unit:
-    name: unit tests (${{ matrix.os }})
+    name: unit tests (${{ matrix.os }}, ${{ matrix.shard }}/4)
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 120
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, ubuntu-latest]
+        os: [macos-26, ubuntu-latest]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-moon
       - uses: ./.github/actions/test-data
       - name: Unit tests
-        run: scripts/ci/unit_tests.sh --target native
+        # Two build jobs on macOS: a test executable of the upper packages
+        # needs more than 3 GB to build, the runner has 7 GB.
+        run: scripts/ci/unit_tests.py --shard ${{ matrix.shard }}/4 ${{ runner.os == 'macOS' && '--jobs 2' || '' }}
+      - name: Upload the totals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-totals-${{ matrix.os }}-${{ matrix.shard }}
+          path: _build/ci/unit/totals.json
+          retention-days: 3
       - name: Upload the log
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-tests-${{ matrix.os }}
+          name: unit-tests-${{ matrix.os }}-${{ matrix.shard }}
           path: _build/ci/unit
           retention-days: 14
+
+  # All shards ran, and together they ran the whole suite.
+  unit-total:
+    name: unit tests
+    if: always()
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: unit-totals-*
+          path: totals
+      - name: Totals
+        run: scripts/ci/unit_tests.py --sum totals --shards 4
 
   stages:
     name: stages (${{ matrix.os }})
@@ -112,7 +141,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, ubuntu-latest]
+        os: [macos-26, ubuntu-latest]
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-moon
@@ -155,7 +184,7 @@ jobs:
   # pull requests.
   edsl-sweep:
     name: EDSL conversion sweep
-    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+    # TEMP (measuring on the draft PR): if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
     needs: goldens
     runs-on: ubuntu-latest
     timeout-minutes: 240
@@ -190,7 +219,7 @@ jobs:
   # The one check to require in the branch protection of `main`.
   required:
     if: always()
-    needs: [check, goldens, unit, stages, package]
+    needs: [check, goldens, unit, unit-total, stages, package]
     runs-on: ubuntu-latest
     steps:
       - name: All jobs succeeded
