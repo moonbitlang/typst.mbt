@@ -754,3 +754,178 @@ test "composite: the lint of adjacent text reads an element as what it is made o
     content="adjacent-inline (Plain, argument 1) after (Plain, argument 1): \"One ends.Two starts.\"",
   )
 }
+
+///|
+/// A cell over two columns, as an element.
+#callsite(autofill(loc, args_loc))
+fn wide(body : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Wide", loc, args_loc, site => {
+    @doc.TableCell(site.arg(0, body), colspan=2)
+  })
+}
+
+///|
+/// The spans of a description as a cell, `-` for a child that a table does
+/// not place in order.
+fn spans(cell : &@doc.IntoContent) -> String {
+  match @doc.Content(cell).table_cell_spans() {
+    Some((colspan, rowspan)) => "\{colspan}x\{rowspan}"
+    None => "-"
+  }
+}
+
+///|
+/// What the engine does with `child` as the first child of a table of four
+/// columns of 30pt: the column of the cell after it (the columns that
+/// `child` takes, if it is placed first), or the error.
+fn column_after(child : &@doc.IntoContent) -> String raise {
+  let report = compile(
+    [
+      ..small_page(),
+      @doc.Table([child, "probe"], columns=[Pt(30), Pt(30), Pt(30), Pt(30)]),
+    ],
+  )
+  guard error_messages(report) == "" else { return error_messages(report) }
+  let probe = of_kind(marks(report), "text").filter(run => run.text == "probe")[0]
+  // (The page has a margin of 10pt, a cell an inset of 5pt.)
+  ((probe.x - 15.0) / 30.0).round().to_int().to_string()
+}
+
+///|
+test "table_cell_spans: what a description takes as a cell of a table" {
+  // The answer for a description, and the column in which the engine puts
+  // the next cell: they are the same number wherever the description is
+  // placed in order.
+  let both = (cell : &@doc.IntoContent) => {
+    "\{spans(cell)}, next in column \{column_after(cell)}"
+  }
+  // What a table makes a cell of is one column and one row.
+  inspect(both("text"), content="1x1, next in column 1")
+  inspect(both(@doc.Emph("stressed")), content="1x1, next in column 1")
+  inspect(
+    both(@doc.Seq([@doc.TableCell("a", colspan=2), "b"])),
+    content="1x1, next in column 1",
+  )
+  inspect(
+    both(@doc.Seq([@doc.SetText(size=Pt(8)), @doc.TableCell("a", colspan=2)])),
+    content="1x1, next in column 1",
+  )
+  // A cell as it is described: the spans that it names, also with a key,
+  // with a label, as the only child of a sequence (which lowers to its
+  // child), as a call by name, as a value, and as what an element is made
+  // of.
+  inspect(both(@doc.TableCell("a")), content="1x1, next in column 1")
+  inspect(both(@doc.TableCell("a", colspan=3)), content="3x1, next in column 3")
+  inspect(
+    both(@doc.TableCell("a", colspan=2, rowspan=4)),
+    content="2x4, next in column 2",
+  )
+  inspect(
+    both(@doc.Keyed("k", @doc.TableCell("a", colspan=2, label="cell"))),
+    content="2x1, next in column 2",
+  )
+  inspect(
+    both(@doc.Labelled(@doc.TableCell("a", colspan=2), "cell")),
+    content="2x1, next in column 2",
+  )
+  inspect(
+    both(@doc.Seq([@doc.TableCell("a", colspan=2)])),
+    content="2x1, next in column 2",
+  )
+  inspect(
+    both(
+      @doc.Seq([@doc.Seq([@doc.Keyed("k", @doc.TableCell("a", colspan=3))])]),
+    ),
+    content="3x1, next in column 3",
+  )
+  let positional = [@doc.Value::content("a")]
+  let named = [("colspan", @doc.Value::int(2))]
+  inspect(
+    both(@doc.Call("table.cell", positional~, named~)),
+    content="2x1, next in column 2",
+  )
+  inspect(
+    both(@doc.Value::call("table.cell", positional~, named~)),
+    content="2x1, next in column 2",
+  )
+  inspect(both(wide("a")), content="2x1, next in column 2")
+  // The last argument of a name wins, as in Typst: a span, and a position
+  // that is `auto` again.
+  inspect(
+    both(
+      @doc.TableCell("a", colspan=2, extra=[("colspan", @doc.Value::int(3))]),
+    ),
+    content="3x1, next in column 3",
+  )
+  inspect(
+    both(@doc.TableCell("a", x=2, extra=[("x", @doc.Value::auto())])),
+    content="1x1, next in column 1",
+  )
+  inspect(
+    both(@doc.TableCell("a", extra=[("x", @doc.Value::auto())])),
+    content="1x1, next in column 1",
+  )
+  // Not placed after the child before it: a cell with a position (the
+  // next cell is the first that is placed in order), a line, a header, a
+  // footer.
+  inspect(both(@doc.TableCell("a", x=1)), content="-, next in column 0")
+  inspect(
+    both(@doc.TableCell("a", y=1, colspan=2)),
+    content="-, next in column 0",
+  )
+  inspect(both(@doc.TableHline()), content="-, next in column 0")
+  inspect(both(@doc.TableVline()), content="-, next in column 0")
+  inspect(both(@doc.Call("table.hline")), content="-, next in column 0")
+  inspect(both(@doc.TableHeader(["a"])), content="-, next in column 0")
+  inspect(spans(@doc.TableFooter(["a"])), content="-")
+  // A view of a cell that a table has placed has its position as fields:
+  // emitted again it is a cell with that position.
+  let seen : Array[String] = []
+  let shown = compile(
+    [
+      ..small_page(),
+      @doc.Show(@doc.Select::table_cell()) <| ((it, _) => {
+        if !seen.contains(spans(it)) {
+          seen.push(spans(it))
+        }
+        it
+      }),
+      @doc.Table([@doc.TableCell("a", colspan=2)], columns=[Auto, Auto]),
+    ],
+  )
+  inspect(error_messages(shown), content="")
+  inspect(seen.join(" "), content="-")
+  // A callback is not a cell, whatever it returns: the table makes a cell
+  // of it.
+  inspect(
+    both(@doc.Context(_ => @doc.TableCell("a", colspan=2))),
+    content="1x1, next in column 1",
+  )
+  // What a table rejects is the engine's error, and one cell here.
+  let of_grid = @doc.GridCell("of a grid", colspan=2)
+  inspect(spans(of_grid), content="1x1")
+  inspect(
+    column_after(of_grid),
+    content="cannot use `grid.cell` as a table cell",
+  )
+  // What the description does not show. A `Markup` is evaluated when the
+  // document is compiled: one that is nothing but a cell is that cell.
+  inspect(
+    both(@doc.Markup("#table.cell(colspan: 2)[a]")),
+    content="1x1, next in column 2",
+  )
+  inspect(both(@doc.Markup("*strong* text")), content="1x1, next in column 1")
+  // A span that is computed, or larger than an `Int`, or less than 1.
+  inspect(
+    both(
+      @doc.TableCell("a", colspan=3, extra=[
+        ("colspan", @doc.Value::int(1).add(@doc.Value::int(1))),
+      ]),
+    ),
+    content="1x1, next in column 2",
+  )
+  inspect(
+    spans(@doc.TableCell("a", colspan=9_000_000_000L, rowspan=0)),
+    content="2147483647x1",
+  )
+}

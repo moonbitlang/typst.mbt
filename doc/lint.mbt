@@ -230,7 +230,8 @@ fn says_block(args : Array[ArgNode]) -> Bool {
 
 ///|
 /// Whether a description is a block (`is_block_call`), also with a label
-/// or a key, a display equation, or a `Para`.
+/// or a key, a display equation, a `Para`, or a block under rules of its
+/// own.
 fn is_block(content : Content) -> Bool {
   match content.node {
     NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
@@ -238,9 +239,24 @@ fn is_block(content : Content) -> Bool {
     NCall(call) => is_block_call(call)
     NEval(node) => node.mode is Math && says_block(node.args)
     // A `Para`: its text is between two paragraph breaks.
-    NSeq(_, site) => site.kind == "Para"
+    NSeq(children, site) => site.kind == "Para" || is_ruled_block(children)
     _ => false
   }
+}
+
+///|
+/// Whether the children of a sequence are rules and then one block, which
+/// they style (`[#set table.cell(..);#table(..)]`): that sequence is the
+/// block in the flow. An element that gives its block a rule of its own is
+/// one (`doc/kit`'s `DataTable`). (Other sequences are not looked into: a
+/// sequence can hold anything.)
+fn is_ruled_block(children : Array[Content]) -> Bool {
+  let last = children.length() - 1
+  guard last >= 1 && is_block(children[last]) else { return false }
+  for i in 0..<last {
+    guard rule_of(children[i]) is Some(_) else { return false }
+  }
+  true
 }
 
 ///|

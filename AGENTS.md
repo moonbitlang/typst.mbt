@@ -221,7 +221,8 @@
   `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
   facts this rests on (the "engine: .." tests).
 - EDSL kit (`doc/kit`, section 4 and "As built (step 3)" of
-  `docs/edsl-ports.md`): elements that are not one Typst element (`Cards`),
+  `docs/edsl-ports.md`): elements that are not one Typst element (`Cards`, `Chip`,
+  `DataTable`),
   each an expansion into `doc`'s constructors with a functional Typst twin
   (`doc/twins/kit.mbt`, pairs of the `edsl` stage). The conventions are in
   the doc comment of `doc/kit/kit.mbt`: read them before adding an element.

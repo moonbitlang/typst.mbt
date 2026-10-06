@@ -15,6 +15,8 @@ using @doc {
   type Lit,
   type Seq,
   type Emph,
+  type Text,
+  type Raw,
   type Block,
   type Box,
   type Grid,
@@ -276,10 +278,10 @@ pub fn apostrophes() -> Seq {
 }
 
 ///|
-using @kit {type Cards}
+using @kit {type Cards, type DataTable, type Chip}
 
 ///|
-/// Section 7: the cards of one row are equally high.
+/// Section 7.1: the cards of one row are equally high.
 pub fn cards(items : Array[&IntoContent]) -> Cards {
   Cards(
     items,
@@ -291,7 +293,7 @@ pub fn cards(items : Array[&IntoContent]) -> Cards {
 }
 
 ///|
-/// Section 7: with rounded corners, three to a row.
+/// Section 7.1: with rounded corners, three to a row.
 pub fn rounded_cards(items : Array[&IntoContent]) -> Cards {
   Cards(
     items,
@@ -300,6 +302,77 @@ pub fn rounded_cards(items : Array[&IntoContent]) -> Cards {
     inset=Sides(all=Pt(8)),
     fill=Luma(245),
     radius=Corners(all=Pt(4)),
+  )
+}
+
+///|
+/// Section 7.2: a table of data, given by rows.
+pub fn harvest_table(rows : Array[Array[&IntoContent]]) -> DataTable {
+  DataTable(
+    ["Bed", "Crop", "Harvest (kg)"],
+    rows,
+    columns=[Auto, Fr(1), Auto],
+    align=Cells::columns([Left, Left, Right]),
+    stroke=Stroke(thickness=Pt(0.5), paint=Luma(120)),
+  )
+}
+
+///|
+/// Section 7.2: a row with a cell too few. Compiling it is an error.
+pub fn short_row() -> DataTable {
+  harvest_table([["North", "Beans", "4.5"], ["South", "12.0"]])
+}
+
+///|
+/// Section 7.2: the looks. A frame, a size for the text, a style for the
+/// header and for the numbers, and a tint for the row `marked`.
+pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+  let fill : Cells[Paint] = Cells((_, y) => {
+    // Row 0 is the header, row `i + 1` is `rows[i]`.
+    if y == 0 {
+      Luma(235)
+    } else if y == marked + 1 {
+      Rgb("#fdf3d7")
+    } else {
+      None
+    }
+  })
+  Seq([
+    SetText(size=Pt(9)),
+    ShowSet(Select::table_cell(x=2), SetText(font=["DejaVu Sans Mono"])),
+    ShowSet(
+      Select::table_cell(y=0),
+      SetText(font=["Libertinus Serif"], size=Pt(7), weight=SemiBold),
+    ),
+    DataTable(
+      ["BED", "CROP", "HARVEST (KG)"],
+      rows,
+      columns=[Auto, Fr(1), Auto],
+      inset=Cells::all(Sides(x=Pt(8), y=Pt(5))),
+      align=Cells::columns([Left, Left, Right]),
+      fill~,
+      stroke=Stroke(thickness=Pt(0.5), paint=Luma(180)),
+      radius=Corners(all=Pt(4)),
+    ),
+  ])
+}
+
+///|
+/// Section 7.2: inline code in a cell, which may break after `_ / . : -`.
+pub fn code_cell(code : String) -> Raw {
+  Raw(@format.soft_breaks(code))
+}
+
+///|
+/// Section 7.3: a status label.
+pub fn status(label : String, done~ : Bool) -> Text {
+  let soft : Paint = if done { Rgb("#dff3e4") } else { Rgb("#fdf3d7") }
+  let ink : Paint = if done { Rgb("#1c6b33") } else { Rgb("#8a5a00") }
+  Text(
+    Chip(label, fill=soft, radius=Corners(all=Pt(8))),
+    size=Pt(7),
+    weight=SemiBold,
+    fill=ink,
   )
 }
 
@@ -360,6 +433,14 @@ pub fn guide() -> Document {
     rounded_cards([
       "One.", "Two, with more text than the first card has.", "Three.", "Four.",
     ]),
+    harvest_table([["North", "Beans", "4.5"], ["South", "Chard", "12.0"]]),
+    styled_table(
+      [
+        ["North", code_cell("garden_bed_watering_schedule"), "4.5"],
+        ["South", status("needs water", done=false), "12.0"],
+      ],
+      1,
+    ),
     apostrophes(),
     stripes_captured(),
   ])

@@ -267,6 +267,7 @@ pub struct Content {
   // private fields
 }
 pub fn Content::Content(&IntoContent) -> Self
+pub fn Content::table_cell_spans(Self) -> (Int, Int)?
 pub impl @builtin.Show for Content
 pub impl @debug.Debug for Content
 pub impl IntoContent for Content

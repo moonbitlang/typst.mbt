@@ -8,8 +8,8 @@ the reference for the API.
 Every MoonBit sample below is a function of `doc/examples/guide/guide.mbt`,
 named in the line above the sample, and is compiled with the package
 (`python3 scripts/edsl_guide_check.py` checks that the samples here are the
-text of that file, and the error of section 8 the one its test expects, but
-for its line and column numbers).
+text of that file, and the errors of sections 7.2 and 8 the ones their
+tests expect, but for their line and column numbers).
 What the guide says a sample does is checked by a test of
 `doc/examples/guide/guide_test.mbt`; what it says about the findings of the
 ports, by `doc/ports_findings_test.mbt`. Section 9 lists which test checks
@@ -18,14 +18,15 @@ what, and the few statements that no test can check.
 ## 1. The prelude
 
 A package that writes documents imports `doc` (and `doc/system` for files,
-fonts and the date, `doc/kit` for the elements of section 7) in its
-`moon.pkg`:
+fonts and the date, `doc/kit` for the elements of section 7, `doc/format`
+for numbers as text and for soft breaks) in its `moon.pkg`:
 
 ```pkg
 import {
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
   "moonbitlang/typst/doc/kit",
+  "moonbitlang/typst/doc/format",
 }
 ```
 
@@ -44,6 +45,8 @@ using @doc {
   type Lit,
   type Seq,
   type Emph,
+  type Text,
+  type Raw,
   type Block,
   type Box,
   type Grid,
@@ -252,8 +255,8 @@ For `run_together` it gives:
 
 ```text
 lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "…first ends here.The second start…"
-  at doc/examples/guide/guide.mbt:66:44 (Prose, argument 1)
-  hint: the text before it (doc/examples/guide/guide.mbt:66:14 (Prose, argument 1))
+  at doc/examples/guide/guide.mbt:70:44 (Prose, argument 1)
+  hint: the text before it (doc/examples/guide/guide.mbt:70:14 (Prose, argument 1))
   hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
 ```
 
@@ -465,6 +468,9 @@ chips:
   draws the same rectangle and leaves the line as it is.
 - `baseline` moves the box down by the given length.
 
+`Chip` of the kit (section 7.3) is the box with its padding divided that
+way.
+
 ### 4.5 `Layout`: the size of the container
 
 `Layout((size, cx) => ..)` is content that is made when its container is
@@ -551,7 +557,7 @@ say what is meant.
 | An `Auto` column takes the width of its content; several columns of prose do not share the width in proportion | fractions as weights: `columns=[Fr(1), Fr(2)]` |
 | `sticky` ties a block to the block after it; a heading and a paragraph under it do not both stay with what follows | the paragraph in a sticky `Block`, or one sticky `Block` around the two |
 | `raw` sets its text to 0.8em, and sizes set around it are multiplied with that | a show-set rule on `raw` with an absolute size |
-| A stroke that names one side leaves the other sides to the outer value, which for a table is its default stroke | `rest=Stroke::none()` |
+| A stroke that names one side leaves the other sides to the outer value, which for a table is its default stroke | `rest=Stroke::none()`; for a table of data, `DataTable` (section 7.2), which names them |
 | Smart quotes: `'` after a digit is a prime | the character `’`, or `quotes=false` |
 
 ### 6.1 Columns
@@ -571,7 +577,8 @@ In a width of 180pt, `prose_table([Auto, Auto])` gives the first column the
 105.2pt, where the long text takes three lines. `prose_table([Fr(1),
 Fr(2)])` gives 60pt and 120pt whatever the cells hold. Columns that are
 narrower than their content and should stay so (a label, a number) are
-`Auto`; columns of prose get fractions.
+`Auto`; columns of prose get fractions. (That is why `DataTable`, section
+7.2, has no default for its columns.)
 
 ### 6.2 Sticky blocks
 
@@ -620,7 +627,8 @@ An em size in that rule is multiplied with the 0.8em again (`Em(0.9)` gives
 Raw text is not hyphenated and breaks only where text may break (at a
 space), so a long identifier in a narrow table cell runs over the cell's
 border. A zero-width space (U+200B) in the string is a place where it may
-break; it stays a character of the text.
+break; it stays a character of the text. `soft_breaks` of `doc/format`
+inserts them (section 7.2).
 
 ### 6.4 The sides of a stroke
 
@@ -640,7 +648,8 @@ pub fn ruled_table(cells : Array[&IntoContent]) -> Table {
 ```
 
 A `Grid` has no default stroke, so there `Sides(bottom=rule)` alone draws
-only the rules.
+only the rules. A table of data with a rule under each row is `DataTable`
+(section 7.2): its `stroke` is the rule, and it names the other sides.
 
 `Stroke::none()` is no stroke. `Stroke(paint=None)` is not: the paint of a
 stroke cannot be `none`, and compiling it is the error `expected color,
@@ -664,7 +673,19 @@ pub fn apostrophes() -> Seq {
 
 A plain string (not the text of a `Prose` or `Para`) is never changed.
 
-## 7. Cards of equal height
+## 7. The kit: cards, tables of data, chips
+
+The kit is a package of its own (`moonbitlang/typst/doc/kit`, section 1),
+with elements that are made of the ones of `doc`: each is what the ports
+wrote by hand in every script, with the choices of section 6 made. An
+element says in its documentation what it is made of, and rules of the
+document reach those parts as they reach them anywhere.
+
+```moonbit
+using @kit {type Cards, type DataTable, type Chip}
+```
+
+### 7.1 Cards of equal height
 
 Cards in a row should be equally high. A `Block` does not do that: it is as
 high as its own content. Two things that look like the way do something
@@ -677,16 +698,8 @@ else, and neither is reported:
   document: the page between its margins), not of the row: every card
   becomes that high, over a page break.
 
-`Cards` of the kit does it. The kit is a package of its own
-(`moonbitlang/typst/doc/kit`, section 1), with elements that are made of
-the ones of `doc`:
-
-```moonbit
-using @kit {type Cards}
-```
-
-The items are the bodies of the cards; the fill, the stroke and the inset
-are those of every card (`cards`):
+`Cards` does it. The items are the bodies of the cards; the fill, the
+stroke and the inset are those of every card (`cards`):
 
 ```moonbit
 pub fn cards(items : Array[&IntoContent]) -> Cards {
@@ -734,6 +747,173 @@ pub fn rounded_cards(items : Array[&IntoContent]) -> Cards {
   call, a selection in a card to the string or the description that you
   passed as its item.
 
+### 7.2 A table of data
+
+A `Table` takes its cells as one array and starts a new row whenever the
+columns are full. A table that is built from data is a loop that pushes
+cells, and a row with a cell too few moves every cell after it one column
+to the left: the document compiles. Around each table the ports wrote the
+same fifty lines: a header that repeats, a rule under each row with the
+other sides named (6.4), a function for the alignment of the numbers, a
+rounded frame.
+
+`DataTable` takes the head and the rows (`harvest_table`):
+
+```moonbit
+pub fn harvest_table(rows : Array[Array[&IntoContent]]) -> DataTable {
+  DataTable(
+    ["Bed", "Crop", "Harvest (kg)"],
+    rows,
+    columns=[Auto, Fr(1), Auto],
+    align=Cells::columns([Left, Left, Right]),
+    stroke=Stroke(thickness=Pt(0.5), paint=Luma(120)),
+  )
+}
+```
+
+- Every row has to fill the columns. One that does not (`short_row`):
+
+```moonbit
+pub fn short_row() -> DataTable {
+  harvest_table([["North", "Beans", "4.5"], ["South", "12.0"]])
+}
+```
+
+  is an error when the document is compiled, at the `rows` argument under
+  the key of the row:
+
+```text
+error: `rows[1]` has cells for 2 columns: this `DataTable` has 3 columns
+  at doc/examples/guide/guide.mbt:313:5 (DataTable, argument 2, key "1")
+```
+
+  A cell that spans columns or rows is a `TableCell`
+  (`TableCell("Both beds", colspan=2)`) and is counted with its spans.
+  The count reads what you wrote, not what the engine makes of it: a
+  `Markup` is one column for it, and so is a span that a rule of the
+  document sets.
+- `columns` is required, for the reason of 6.1: fractions for the columns
+  of text, `Auto` for the columns of labels, numbers and chips.
+- The header is on every page that the table continues on, and a row is
+  not split at the end of a page: it moves to the next page as a whole.
+  (A row that is higher than a page fits none and leaves it; a table
+  whose rows are paragraphs is `breakable=true`.)
+- `stroke` is one stroke: the rule under each row. The cells have no other
+  line (6.4).
+- `inset`, `align` and `fill` are the table's, per cell.
+  `Cells::columns([..])` is one value per column: that is how the numbers
+  go to the right.
+
+The looks that the ports gave their tables are parameters of the element
+or rules of the document (`styled_table`):
+
+```moonbit
+pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+  let fill : Cells[Paint] = Cells((_, y) => {
+    // Row 0 is the header, row `i + 1` is `rows[i]`.
+    if y == 0 {
+      Luma(235)
+    } else if y == marked + 1 {
+      Rgb("#fdf3d7")
+    } else {
+      None
+    }
+  })
+  Seq([
+    SetText(size=Pt(9)),
+    ShowSet(Select::table_cell(x=2), SetText(font=["DejaVu Sans Mono"])),
+    ShowSet(
+      Select::table_cell(y=0),
+      SetText(font=["Libertinus Serif"], size=Pt(7), weight=SemiBold),
+    ),
+    DataTable(
+      ["BED", "CROP", "HARVEST (KG)"],
+      rows,
+      columns=[Auto, Fr(1), Auto],
+      inset=Cells::all(Sides(x=Pt(8), y=Pt(5))),
+      align=Cells::columns([Left, Left, Right]),
+      fill~,
+      stroke=Stroke(thickness=Pt(0.5), paint=Luma(180)),
+      radius=Corners(all=Pt(4)),
+    ),
+  ])
+}
+```
+
+- `radius` puts the table in a rounded frame, outlined in `stroke`, that
+  clips the fills of the cells at its corners. The table then has no rule
+  under its last row, and none under the last row of a page: the frame
+  closes the table on every page. (Written by hand, with a rule under
+  every row but the table's last, the engine draws the rule under the last
+  row of a page on the outline of the frame.)
+- The text is not a parameter. Rules before the table reach its cells: a
+  `SetText` for the size of the table's text, a show-set rule on the cells
+  of row 0 for the header and on the cells of a column for that column.
+  Where two match, the later rule wins: the header's rule names the font
+  again, so that the header of the numbers is not monospaced.
+- A fill that depends on the row is a `Cells` function, as for any table.
+  Its row counts the header: row 0 is the header, and row `i + 1` is
+  `rows[i]`. It is a callback (section 8): `styled_table` creates one and
+  cannot be called inside a callback. `DataTable` creates none.
+- A cell of a row resolves to the `rows` argument under the key of its
+  row, which is its index. Rows from data that is sorted or filtered keep
+  their identity with `key=i => data[i].id`.
+- What `Table` has and `DataTable` does not (`rows`, the gutters) is set
+  by a `SetTable(..)` before it.
+
+A long word of inline code in a narrow column runs over its cell (6.3).
+`soft_breaks` of `doc/format` gives it places to break (`code_cell`):
+
+```moonbit
+pub fn code_cell(code : String) -> Raw {
+  Raw(@format.soft_breaks(code))
+}
+```
+
+It inserts a zero-width space after each `_ / . : -`. They are characters
+of the text: a reader who copies the name out of the PDF copies them too.
+
+### 7.3 Chips
+
+A status label in a line of text or in a cell is a box. By the two facts
+of 4.4, its padding above and below has to be the box's outset: as an
+inset it makes the line with the label higher than the others. And a box
+is laid out in the width of its line, so a label of two words in a narrow
+column is broken inside its box. `Chip` is the box with both settled
+(`status`):
+
+```moonbit
+pub fn status(label : String, done~ : Bool) -> Text {
+  let soft : Paint = if done { Rgb("#dff3e4") } else { Rgb("#fdf3d7") }
+  let ink : Paint = if done { Rgb("#1c6b33") } else { Rgb("#8a5a00") }
+  Text(
+    Chip(label, fill=soft, radius=Corners(all=Pt(8))),
+    size=Pt(7),
+    weight=SemiBold,
+    fill=ink,
+  )
+}
+```
+
+- The label stands on the baseline of its line, and the line is as high
+  as without the chip. What is drawn above and below the label needs the
+  room there: the leading of the paragraph, the inset of the cell.
+- The spaces of the label are no-break spaces, so it is not broken at a
+  space. (Only spaces are changed: a label can still be broken after a
+  hyphen.) A chip that is wider than its column runs out of it (its box
+  is as wide as the column, its text goes on): a column of chips is
+  `Auto`.
+- The style of the label is a `Text` around the chip. The paddings are in
+  em (`inset=Sides(x=Em(0.6))` and `outset=Sides(y=Em(0.3))` unless they
+  are given), so they follow that size.
+- `fill`, `stroke` and `radius` are the box's; a chip without them is its
+  label with room around it.
+- `Chip::of(body, ..)` is the same box around content that is not a
+  string. The element cannot change the spaces of content: that body can
+  be broken.
+- It creates no callback, so it can be built anywhere, also in a row of a
+  `DataTable` and inside a callback.
+
 ## 8. Callbacks cannot be created inside a callback
 
 Six constructors take a function that the engine calls during layout:
@@ -758,10 +938,10 @@ pub fn stripes_in_show() -> Seq {
 
 ```text
 error: callbacks cannot be created inside a callback
-  at doc/examples/guide/guide.mbt:264:14 (Cells)
+  at doc/examples/guide/guide.mbt:387:14 (Cells)
   hint: create the callback before compiling and capture it
   hint: or use the `cx` of the enclosing callback
-  while showing heading element at doc/examples/guide/guide.mbt:267:5 (Heading)
+  while showing heading element at doc/examples/guide/guide.mbt:390:5 (Heading)
 ```
 
 The location is the callback that came too late. It bites where it is not
@@ -769,7 +949,8 @@ visible: a helper that builds a striped table (a `Cells` function) or
 measures (`Context`, `Layout`) works at the top level and fails when it is called
 from a show rule or from a `Context` callback. An element of the kit that
 measures is such a helper, and its documentation says so (`Cards` with a
-`radius`). The ways out:
+`radius`; `Cards` without one, `DataTable` and `Chip` create no callback).
+The ways out:
 
 - create the callback once, outside, and capture it (`stripes_captured`):
 
@@ -821,7 +1002,9 @@ of another callback; it is its creation that has to come first.
 | 5: `font_paths`, an unknown family, a world without fonts | G "section 5: fonts come from the world" |
 | 5: a character without a glyph is not reported | F "S4: .." |
 | 6.1 to 6.5 | G the five "section 6: .." tests, F "S5: ..", "S6: ..", "T10: .." |
-| 7: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
+| 7.1: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: the cards ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
+| 7.2: the rows of a `DataTable` and their check, its lines, the header and the rows over pages; the frame, the fills and the rules for its text; soft breaks in a cell | G "section 7: a table of data ..", "section 7: the looks ..", "section 7: inline code ..", `doc/kit/data_table_test.mbt`, F "S5: .." |
+| 7.3: a `Chip` on the baseline of its line, the height of the line, one line in a narrow column | G "section 7: a chip ..", `doc/kit/chip_test.mbt`, F "T1: .." |
 | 8: the error, its hints and location, and the captured callback | G "section 8: .." |
 
 Not checked by a test of this repository:

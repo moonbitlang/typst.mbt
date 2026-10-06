@@ -76,12 +76,136 @@ let to_change : Array[Note] = [
 ]
 
 ///|
-/// The report around its three groups of cards: the row of tiles and the
-/// two groups of notes, which the two versions build differently.
+/// How a bed ended the season.
+priv enum Outcome {
+  Harvested
+  Growing
+  Lost
+}
+
+///|
+/// What the table says about an outcome.
+fn Outcome::label(self : Outcome) -> String {
+  match self {
+    Harvested => "harvested"
+    Growing => "still growing"
+    Lost => "lost to the wind"
+  }
+}
+
+///|
+/// A bed: its name, what grew in it, when it was sown, what it gave in
+/// kilograms, and how it ended.
+priv struct Bed {
+  id : String
+  crop : String
+  sown : String
+  kilograms : Double
+  outcome : Outcome
+}
+
+///|
+let beds : Array[Bed] = [
+  {
+    id: "N1",
+    crop: "Tomatoes, a tall variety",
+    sown: "12 May",
+    kilograms: 3.4,
+    outcome: Lost,
+  },
+  {
+    id: "N2",
+    crop: "Runner beans on the fence",
+    sown: "14 May",
+    kilograms: 9.8,
+    outcome: Harvested,
+  },
+  { id: "N3", crop: "Chard", sown: "14 May", kilograms: 6.1, outcome: Growing, },
+  {
+    id: "E1",
+    crop: "Tomatoes, a bush variety",
+    sown: "19 May",
+    kilograms: 11.2,
+    outcome: Harvested,
+  },
+  {
+    id: "E2",
+    crop: "Courgettes",
+    sown: "19 May",
+    kilograms: 4.7,
+    outcome: Harvested,
+  },
+  { id: "E3", crop: "Kale", sown: "2 June", kilograms: 1.9, outcome: Growing, },
+  {
+    id: "S1",
+    crop: "Lettuce, then radishes",
+    sown: "5 May",
+    kilograms: 0.6,
+    outcome: Harvested,
+  },
+  {
+    id: "S2",
+    crop: "Sweet peas, for the bees",
+    sown: "5 May",
+    kilograms: 0.0,
+    outcome: Lost,
+  },
+  { id: "S3", crop: "Leeks", sown: "9 June", kilograms: 0.3, outcome: Growing, },
+  {
+    id: "W1",
+    crop: "Herbs",
+    sown: "21 May",
+    kilograms: 0.2,
+    outcome: Harvested,
+  },
+]
+
+///|
+/// The table of the beds: its head, and its columns (the crop takes what
+/// the others leave).
+let bed_head : Array[String] = ["Bed", "Crop", "Sown", "Harvest (kg)", "State"]
+
+///|
+let bed_columns : Array[Sizing] = [Auto, Fr(1), Auto, Auto, Auto]
+
+///|
+/// The rows of the table of the beds. `state` draws how a bed ended, which
+/// the two versions do differently.
+fn[T : IntoContent] bed_rows(
+  state : (String, Outcome) -> T,
+) -> Array[Array[&IntoContent]] {
+  beds.map(bed => {
+    let row : Array[&IntoContent] = [
+      bed.id,
+      bed.crop,
+      bed.sown,
+      @format.fixed(bed.kilograms, 1),
+      state(bed.outcome.label(), bed.outcome),
+    ]
+    row
+  })
+}
+
+///|
+/// The bed that gave the most: its row is marked.
+fn best_bed() -> Int {
+  let mut best = 0
+  for i, bed in beds {
+    if bed.kilograms > beds[best].kilograms {
+      best = i
+    }
+  }
+  best
+}
+
+///|
+/// The report around what the two versions build differently: the row of
+/// tiles, the two groups of notes, and the table of the beds.
 fn report(
   tile_row : &IntoContent,
   worked_cards : &IntoContent,
   change_cards : &IntoContent,
+  bed_table : &IntoContent,
 ) -> Document {
   Document([
     SetPage(width=Pt(420), height=Pt(595), margin=Sides(all=Pt(36))),
@@ -102,6 +226,12 @@ fn report(
       "Five notes from the last meeting of the season, in the order in which they came up.",
     ),
     change_cards,
+    Pagebreak(),
+    Heading("Bed by bed", level=2),
+    Para(
+      "Ten of the fourteen beds were weighed. The bed that gave the most is marked; three are still in the ground.",
+    ),
+    bed_table,
     Para(
       "The beds are covered for the winter. The next meeting is on the first Saturday of March.",
     ),

@@ -6,6 +6,7 @@
 
 import {
   "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/format",
   "moonbitlang/typst/doc/kit",
   "moonbitlang/typst/doc/system",
   "moonbitlang/core/env",
@@ -13,6 +14,7 @@ import {
 
 import {
   "moonbitlang/typst/layout",
+  "moonbitlang/typst/library",
 } for "wbtest"
 
 pkgtype(kind: "executable")
