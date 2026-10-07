@@ -179,7 +179,7 @@ test "recompile: the sweep changes every file once and then nothing is left" {
   // undone with the next one.
   inspect(edits.length(), content="4")
   inspect(edits[0], content="fonts")
-  inspect(edits[2], content="two-files")
+  inspect(edits[2], content="change-letter")
   inspect(edits[3], content="everything-back")
   assert_true(project.content(main) == first)
   inspect(recompile_test_show(files, "on-disk.txt"), content="ok disk")

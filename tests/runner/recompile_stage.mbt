@@ -25,7 +25,8 @@
 //    compiled, once as it is and once with memoization off
 //    (`@library.set_layout_memo_enabled(false)`), each after
 //    `@library.evict(1)` has dropped what the process keeps by content.
-//    Each must give what the watch loop gave at that step.
+//    Each must give what the watch loop gave at that step. (The documents
+//    that take long have the second reference only.)
 //
 // The phases are not interleaved on purpose. A cache that outlives a
 // compilation may keep only the last one: with a fresh compilation between
@@ -120,6 +121,11 @@ priv struct RecompileStats {
   mut changed : Int
   /// Steps that gave other files to watch than the step before.
   mut rewatched : Int
+  /// Steps of the watch loop with a source whose tree is not what a parse
+  /// gives, and those of them that gave something else than a fresh
+  /// compilation (which is not a failure).
+  mut reparsed : Int
+  mut reparsed_differing : Int
   /// By the kind of the edit.
   edits : Map[String, EditCount]
 }
@@ -229,6 +235,8 @@ fn run_recompile_stage(
     errors: 0,
     changed: 0,
     rewatched: 0,
+    reparsed: 0,
+    reparsed_differing: 0,
     edits: Map([]),
   }
   let failures = []
@@ -274,7 +282,8 @@ fn run_recompile_stage(
             Random(options.steps)
           }
           let name = if sequence < 0 { "sweep" } else { sequence.to_string() }
-          match run_sequence(document, seed, name, rng, plan, stats, options) {
+          match
+            run_sequence(document, seed, name, rng, plan, heavy, stats, options) {
             None => passed += 1
             Some(failure) => {
               failed += 1
@@ -306,6 +315,11 @@ fn run_recompile_stage(
   println(
     "recompile: \{stats.documents} documents, \{stats.sequences} sequences, \{stats.steps} steps, \{stats.compilations} compilations; of the steps \{stats.errors} did not compile, \{stats.changed} changed the pages, \{stats.rewatched} changed the dependencies",
   )
+  if stats.reparsed > 0 {
+    println(
+      "recompile: \{stats.reparsed} steps had a source whose reparsed tree is not what a parse gives; \{stats.reparsed_differing} of them gave something else than a fresh compilation and were not compared",
+    )
+  }
   if args.contains("--edits") {
     let kinds = stats.edits.keys().to_array()
     kinds.sort_by(@library.compare_str)
@@ -352,8 +366,14 @@ priv enum Plan {
 }
 
 ///|
-/// The kind of an edit: the first word of what it says it did.
+/// The kind of an edit: the first word of what it says it did, after what
+/// the sweep undoes along with it.
 fn edit_kind(edit : String) -> String {
+  let mut edit = edit
+  while edit.has_prefix("undo ") || edit.has_prefix("fonts 0 + ") {
+    guard edit.find(" + ") is Some(i) else { break }
+    edit = edit.unsafe_substring(start=i + 3, end=edit.length())
+  }
   if edit.contains(" + ") {
     return "two-files"
   }
@@ -373,6 +393,7 @@ fn run_sequence(
   name : String,
   rng : Rng,
   plan : Plan,
+  heavy : Bool,
   stats : RecompileStats,
   options : RecompileOptions,
 ) -> String? {
@@ -427,6 +448,14 @@ fn run_sequence(
         "\{dir}/step\{step}/digest.txt",
         @utf8.encode(compiled.digest()),
       )
+      // A compilation of a tree that a parse does not give is not what a
+      // new process gives either.
+      if !compiled.reparsed.is_empty() {
+        write_file(
+          "\{dir}/step\{step}/reparsed.txt",
+          @utf8.encode(compiled.reparsed.join("\n")),
+        )
+      }
     }
     project.note(ids)
     stats.steps += 1
@@ -455,13 +484,22 @@ fn run_sequence(
   done[done.length() - 1].compiled.document = None
 
   // The references. Every step is compared; what differs is shown for the
-  // first that does.
+  // first that does. A document that takes long has the reference without
+  // memoization only (the one that no memo of the process reaches).
   let steps = done.length() - 1
+  let references = if heavy { [false] } else { [true, false] }
   let mut failure : (Int, String)? = None
   let also : Array[Int] = []
   let mut before : Compiled? = None
   for step, at in done {
-    for memoized in [true, false] {
+    // A tree that a parse does not give (upstream's reparser) is no stale
+    // result: the step is counted, not compared.
+    let reparsed = !at.compiled.reparsed.is_empty()
+    if reparsed {
+      stats.reparsed += 1
+    }
+    let mut differing = false
+    for memoized in references {
       @library.evict(1)
       @library.set_layout_memo_enabled(memoized)
       let fresh = RecompileWorld::new(
@@ -478,6 +516,18 @@ fn run_sequence(
         before = Some(expected)
       }
       guard expected.difference(at.compiled) is Some((parts, detail)) else {
+        continue
+      }
+      if reparsed {
+        if !differing {
+          differing = true
+          stats.reparsed_differing += 1
+          if options.verbose {
+            println(
+              "NOTE \{document.name} :: seed=\{seed} sequence=\{name} step=\{step}: not compared, the reparsed tree of \{at.compiled.reparsed.join(", ")} is not what a parse gives (\{parts.join(", ")} differ)",
+            )
+          }
+        }
         continue
       }
       if failure is Some((first, _)) {

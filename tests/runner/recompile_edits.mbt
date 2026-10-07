@@ -720,7 +720,8 @@ fn Project::edit(self : Project, rng : Rng) -> String {
 /// compilation can depend on while the rest stays as it is. A result that
 /// is kept and that depends on something its key does not hold is found
 /// here, without luck: the date and `sys.inputs` (each only if a known
-/// file reads it), the fonts, the main file, then every other known file
+/// file reads it), the fonts (for one step), the main file, then every
+/// other known file
 /// (at most `files` of them, spread over the list from a place that the
 /// seed chooses), each with a plausible edit, and at the end everything
 /// back to what it was at first. A change after which the document does
@@ -850,7 +851,16 @@ fn Project::sweep(
   }
   if sweep.stage == 3 {
     sweep.stage = 4
-    return edit(self.origin)
+    // The fonts come back with the edit of the main file: without its
+    // default font a document is another document (and a slow one).
+    let back = if self.variant.fonts != 0 {
+      self.variant = { ..self.variant, fonts: 0, }
+      "fonts 0 + "
+    } else {
+      ""
+    }
+    sweep.last = Some(File(self.origin, self.content(self.origin)))
+    return Some(undo + back + self.careful_edit(rng, self.origin))
   }
   if sweep.stage == 4 {
     if sweep.at == 0 {

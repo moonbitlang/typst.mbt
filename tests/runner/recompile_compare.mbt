@@ -28,6 +28,10 @@
 //   parsed it. A diagnostic inside a data file makes that file a source of
 //   the store, here as in the CLI.)
 //
+// - A compilation whose sources are not what a parse of their text gives
+//   is marked ([RecompileWorld::reparsed]): upstream's reparser has such
+//   cases, and they are not stale results.
+//
 // What it does not see: values that print alike and are not alike (two
 // functions with the same name, two modules), since elements are written
 // with their `repr`.
@@ -44,6 +48,9 @@ priv struct Compiled {
   /// The document, until the step after it has checked that it is still
   /// what it was (`recompile_stage.mbt`).
   mut document : @layout.PagedDocument?
+  /// The sources of the compilation whose tree is not what a parse gives
+  /// ([RecompileWorld::reparsed]).
+  reparsed : Array[String]
 }
 
 ///|
@@ -201,6 +208,7 @@ fn recompile_compile(
   // Before the dump touches the world.
   let ids = world.files.dependencies()
   let dependencies = world.dependencies().join("\n")
+  let reparsed = world.reparsed()
   let dyn_world = world as &@library.World
   let diagnostics = StringBuilder()
   let mut frames = ""
@@ -263,6 +271,7 @@ fn recompile_compile(
     pdf,
     ok: document is Some(_),
     document,
+    reparsed,
   }
   (compiled, ids)
 }

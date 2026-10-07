@@ -168,7 +168,13 @@ def task(args, document, seed):
         messages.append(f"EMPTY {document} seed={seed}: nothing was compared")
     else:
         # Cold references.
-        steps = steps_of(snap)
+        # (Not the steps whose sources were reparsed into a tree that a
+        # parse does not give: a new process parses.)
+        steps = [
+            d
+            for d in steps_of(snap)
+            if not os.path.exists(os.path.join(d, "reparsed.txt"))
+        ]
         rng = random.Random(f"{seed}/{document}")
         for step_dir in rng.sample(steps, min(args.cold, len(steps))):
             with open(os.path.join(step_dir, "digest.txt"), encoding="utf-8") as f:

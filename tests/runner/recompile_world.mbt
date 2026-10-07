@@ -243,6 +243,8 @@ priv struct RecompileWorld {
   /// The libraries this world had, by their inputs: a host that goes back
   /// to earlier inputs may well go back to the library it built for them.
   libraries : Map[Int, @library.Library]
+  /// The files that were given out as sources since the last reset.
+  sourced : Map[@syntax.FileId, Unit]
 }
 
 ///|
@@ -260,6 +262,7 @@ fn RecompileWorld::new(
     variant,
     library,
     libraries: Map([(variant.inputs, library)]),
+    sourced: Map([]),
   }
 }
 
@@ -300,6 +303,30 @@ fn RecompileWorld::set_variant(
 /// is read from the variant.)
 fn RecompileWorld::reset(self : RecompileWorld) -> Unit {
   self.files.reset()
+  self.sourced.clear()
+}
+
+///|
+/// The sources that were given out since the last reset whose syntax tree
+/// is not what a parse of their text gives (apart from spans).
+///
+/// A source that was edited in place is reparsed in part, and upstream's
+/// reparser, which the port follows, is not always equivalent to a parse:
+/// `##let x #let= 4` with its first character deleted keeps a node of the
+/// old tree and reports "expected pattern", which a parse of the new text
+/// does not (so `typst watch` prints an error that `typst compile` does
+/// not, upstream too). The compilation of such a tree is not comparable
+/// with a compilation from scratch. Only reads sources that the store
+/// already has, so it changes nothing.
+fn RecompileWorld::reparsed(self : RecompileWorld) -> Array[String] {
+  let out = []
+  for id, _ in self.sourced {
+    let source = self.files.source(id) catch { _ => continue }
+    if !source.root().spanless_eq(@syntax.parse(source.text())) {
+      out.push(file_path(id))
+    }
+  }
+  out
 }
 
 ///|
@@ -327,7 +354,9 @@ impl @library.World for RecompileWorld with fn main(self) {
 
 ///|
 impl @library.World for RecompileWorld with fn source(self, id) {
-  self.files.source(id)
+  let source = self.files.source(id)
+  self.sourced[id] = ()
+  source
 }
 
 ///|
