@@ -14,6 +14,7 @@ import {
   "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/kit",
   "moonbitlang/typst/kit/platform",
+  "moonbitlang/typst/kit/watcher",
   "moonbitlang/core/encoding/utf8",
 }
 
@@ -23,3 +24,13 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/debug",
 } for "wbtest"
+
+// `watch` needs a file system watcher, which exists on the native and wasm
+// targets (`kit/watcher`).
+
+options(
+  targets: {
+    "watch.mbt": [ "native", "wasm" ],
+    "watch_unsupported.mbt": [ "wasm-gc", "js" ],
+  },
+)

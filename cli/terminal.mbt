@@ -30,9 +30,31 @@ fn flush_terminal(out : @kit.ColorWriter) -> Unit {
 }
 
 ///|
+/// Clears the entire screen.
+fn clear_screen(out : @kit.ColorWriter) -> Unit {
+  // We don't want to clear anything that is not a TTY.
+  if out.supports_color() {
+    // Clear the screen and then move the cursor to the top left corner.
+    out.write("\u{1B}[2J\u{1B}[1;1H")
+  }
+}
+
+///|
 /// The style of an error header (`Styles::header_error`).
 fn header_error_style() -> @kit.ColorSpec {
   @kit.ColorSpec::new().with_bold().with_intense().with_fg(Red)
+}
+
+///|
+/// The style of a warning header (`Styles::header_warning`).
+fn header_warning_style() -> @kit.ColorSpec {
+  @kit.ColorSpec::new().with_bold().with_intense().with_fg(Yellow)
+}
+
+///|
+/// The style of a note header (`Styles::header_note`).
+fn header_note_style() -> @kit.ColorSpec {
+  @kit.ColorSpec::new().with_bold().with_intense().with_fg(Green)
 }
 
 ///|

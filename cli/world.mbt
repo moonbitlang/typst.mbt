@@ -135,6 +135,17 @@ fn SystemWorld::reset(self : SystemWorld) -> Unit {
 }
 
 ///|
+/// Forcibly scan fonts instead of doing it lazily upon the first access.
+///
+/// Does nothing if the fonts were already scanned.
+// Only `watch` calls it (watch.rs:58), which not every target has
+// (`watch_unsupported.mbt`).
+#warnings("-unused_value")
+fn SystemWorld::scan_fonts(self : SystemWorld) -> Unit {
+  self.font_store() |> ignore
+}
+
+///|
 /// The fonts, discovered on first access.
 fn SystemWorld::font_store(self : SystemWorld) -> @kit.FontStore {
   match self.fonts.val {

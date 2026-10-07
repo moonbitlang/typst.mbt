@@ -86,10 +86,7 @@ fn print_clap_error(message : String, usage : String?) -> Unit {
 fn dispatch(args : CliArguments) -> Unit raise HintedFailure {
   match args.command {
     Compile(command) => compile(command)
-    Watch(_) =>
-      raise bail(
-        "watching files is not supported by this build (no file system events); use `typst compile` instead",
-      )
+    Watch(command) => watch(command)
     Init(command) => init_project(command)
     Query(command) => query(command)
     Eval(command) => eval(command)

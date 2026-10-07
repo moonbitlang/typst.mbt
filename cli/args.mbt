@@ -45,15 +45,15 @@ priv struct CliArguments {
 
 ///|
 /// What to do.
-// The arguments of `watch` and `completions` are parsed (and validated)
-// like upstream's, but those commands are not supported by this build
-// (README.md); upstream reads them in typst-cli/src/main.rs:72 and :78.
+// The arguments of `completions` are parsed (and validated) like
+// upstream's, but the command is not supported by this build (README.md);
+// upstream reads them in typst-cli/src/main.rs:78.
 #warnings("-unused_field")
 priv enum Command {
   /// Compiles an input file into a supported output format.
   Compile(CompileArgs)
   /// Watches an input file and recompiles on changes.
-  Watch(CompileArgs)
+  Watch(WatchCommand)
   /// Initializes a new project from a template.
   Init(InitCommand)
   /// Processes an input file to extract provided metadata (deprecated, use
@@ -124,6 +124,38 @@ priv struct InfoCommand {
 }
 
 ///|
+/// Watches an input file and recompiles on changes.
+priv struct WatchCommand {
+  /// Arguments for compilation.
+  args : CompileArgs
+  /// Stops the watcher from taking over the terminal.
+  ///
+  /// With this flag, the watcher will only ever print normal output lines,
+  /// not clear or reconfigure the terminal.
+  no_fullscreen : Bool
+  /// Arguments for the HTTP server.
+  server : ServerArgs
+}
+
+///|
+/// Arguments for the HTTP server (upstream's `http-server` feature, which
+/// the upstream executable is built with).
+// The server itself is not ported: `no_reload` and `port` only configure
+// it (typst-cli/src/compile.rs:222).
+#warnings("-unused_field")
+priv struct ServerArgs {
+  /// Disables the built-in HTTP server for HTML export.
+  no_serve : Bool
+  /// Disables the injected live reload script for HTML export. The HTML
+  /// that is written to disk isn't affected either way.
+  no_reload : Bool
+  /// The port where HTML is served.
+  ///
+  /// Defaults to the first free port in the range 3000-3005.
+  port : Int?
+}
+
+///|
 /// Arguments for compilation and watching.
 priv struct CompileArgs {
   input : Input
@@ -189,7 +221,8 @@ priv enum Input {
 
 ///|
 // Upstream's `Display` (args.rs:592) is only used for the HTTP server of
-// `watch` (compile.rs:217, `cfg(feature = "http-server")`).
+// `watch` (compile.rs:217, `cfg(feature = "http-server")`), which is not
+// ported.
 #warnings("-unused_value")
 fn Input::to_string(self : Input) -> String {
   match self {
@@ -206,9 +239,6 @@ priv enum Output {
 }
 
 ///|
-// Upstream's `Display` (args.rs:628) is only used by the status of `watch`
-// (watch.rs:131).
-#warnings("-unused_value")
 fn Output::to_string(self : Output) -> String {
   match self {
     Stdout => "stdout"
@@ -234,6 +264,15 @@ priv enum OutputFormat {
   Html
   Bundle
 } derive(Eq)
+
+///|
+/// Whether this format results in a `PagedDocument`.
+// Only `watch` asks (watch.rs:57), which not every target has
+// (`watch_unsupported.mbt`).
+#warnings("-unused_value")
+fn OutputFormat::is_paged(self : OutputFormat) -> Bool {
+  self is (Pdf | Png | Svg)
+}
 
 ///|
 /// Which format to use for a generated dependency file.
@@ -597,6 +636,24 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
         help="Stops the watcher from taking over the terminal",
       ),
     )
+    args.push(
+      flag("no-serve", help="Disables the built-in HTTP server for HTML export"),
+    )
+    args.push(
+      flag(
+        "no-reload",
+        help="Disables the injected live reload script for HTML export. The HTML that is written to disk isn't affected either way",
+      ),
+    )
+    args.push(
+      opt(
+        "port",
+        "PORT",
+        validate=v => parse_port(v) |> ignore,
+        empty=Pass,
+        help="The port where HTML is served",
+      ),
+    )
   }
   {
     key: if watch {
@@ -695,25 +752,31 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
     raise MissingSubcommand
   }
   let command = match name {
-    "compile" | "c" =>
-      Compile(
-        compile_args(
-          compile_spec(
-            "typst compile", "Compiles an input file into a supported output format",
-            false,
-          ),
-          rest,
-        ),
+    "compile" | "c" => {
+      let spec = compile_spec(
+        "typst compile", "Compiles an input file into a supported output format",
+        false,
       )
-    "watch" | "w" =>
-      Watch(
-        compile_args(
-          compile_spec(
-            "typst watch", "Watches an input file and recompiles on changes", true,
-          ),
-          rest,
-        ),
+      Compile(compile_args(spec, spec.parse(rest)))
+    }
+    "watch" | "w" => {
+      let spec = compile_spec(
+        "typst watch", "Watches an input file and recompiles on changes", true,
       )
+      let m = spec.parse(rest)
+      Watch({
+        args: compile_args(spec, m),
+        no_fullscreen: m.flag("no-fullscreen"),
+        server: {
+          no_serve: m.flag("no-serve"),
+          no_reload: m.flag("no-reload"),
+          port: match m.value("port") {
+            Some(v) => Some(parse_port(v))
+            None => None
+          },
+        },
+      })
+    }
     "init" => {
       let spec : CommandSpec = {
         key: "init",
@@ -1051,11 +1114,7 @@ fn parse_bool(value : String, name : String) -> Bool raise CliError {
 }
 
 ///|
-fn compile_args(
-  spec : CommandSpec,
-  argv : Array[String],
-) -> CompileArgs raise CliError {
-  let m = spec.parse(argv)
+fn compile_args(spec : CommandSpec, m : Matches) -> CompileArgs raise CliError {
   guard m.positional(0) is Some(input) else { raise missing(spec, "INPUT") }
   let input = parse_input(input, "<INPUT>")
   let output = match m.positional(1) {
@@ -1202,6 +1261,22 @@ fn parse_jobs(v : String) -> Int raise CliError {
         "invalid value '\{v}' for '--jobs <JOBS>': \{usize_error(v)}",
       )
   }
+}
+
+///|
+/// The value parser of `--port` (`u16`: clap parses an `i64` and checks the
+/// range).
+fn parse_port(v : String) -> Int raise CliError {
+  let n = parse_i64(v) catch {
+    @kit.StrError(msg) =>
+      raise Invalid("invalid value '\{v}' for '--port <PORT>': \{msg}")
+  }
+  if n < 0L || n > 65535L {
+    raise Invalid(
+      "invalid value '\{v}' for '--port <PORT>': \{n} is not in 0..=65535",
+    )
+  }
+  n.to_int()
 }
 
 ///|
