@@ -117,3 +117,50 @@ test "an evaluation outside of a compilation sees the files as they are then" {
   edit_file(world, "b.typ", "#let b = [four]\n")
   inspect(evaluated_directly(world), content="a sees four")
 }
+
+///|
+/// What a string evaluates to outside of a compilation, as a host evaluates
+/// one (`doc`'s `lower` for a fragment of Typst source).
+fn evaluated_string(world : TestWorld, code : String) -> String {
+  let engine : @library.Engine = {
+    library: world.library,
+    world,
+    introspector: @library.Introspector::empty(),
+    traced: @library.Traced::new(),
+    sink: @library.Sink::new(),
+    route: @library.Route::root(),
+  }
+  // (With the main file's id, so that paths resolve.)
+  try
+    @eval.eval_string_mapped(
+      engine,
+      @library.Context::none(),
+      code,
+      world.main.id(),
+      Code,
+      @library.Scope::new(),
+    )
+  catch {
+    @library.SourceError(errors) =>
+      "error: " + errors.map(e => e.message).join(" | ")
+  } noraise {
+    value => value.repr()
+  }
+}
+
+///|
+test "a string evaluated outside of a compilation imports a file once" {
+  // The route of a string is the root, like that of a file evaluated on its
+  // own: its imports must not each start an evaluation of their own, or the
+  // module of `a.typ` is one object here and another inside `b.typ`
+  // (upstream's suite: `import-nested-item`, as `doc` lowers it).
+  let world = test_world("", files=[
+    ("a.typ", "#let x = 1\n"),
+    ("b.typ", "#import \"a.typ\"\n"),
+  ])
+  let code = "{ import \"a.typ\" as direct; import \"b.typ\": a; direct == a }"
+  inspect(evaluated_string(world, code), content="true")
+  // And the next evaluation sees the files as they are then.
+  edit_file(world, "a.typ", "#let x = 2\n")
+  inspect(evaluated_string(world, "{ import \"b.typ\": a; a.x }"), content="2")
+}

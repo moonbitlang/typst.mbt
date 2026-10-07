@@ -19,7 +19,8 @@ pub fn eval_source(
   // (Not upstream: the modules of imported files are kept for a
   // compilation, or for one evaluation outside of one; see
   // `EvalMemos::of`.)
-  @library.note_evaluation(route)
+  @library.evaluation_begin()
+  defer @library.evaluation_end()
 
   // Prepare the engine.
   let engine : @library.Engine = {
@@ -119,6 +120,13 @@ fn eval_root(
   mode : @syntax.SyntaxMode,
   scope : @library.Scope,
 ) -> @library.Value raise @library.SourceError {
+
+  // (Not upstream: a string that a host evaluates outside of a compilation
+  // is an evaluation of its own, and the files it imports belong to it:
+  // its route is the root, like that of a file evaluated on its own. See
+  // `@library.evaluation_begin`.)
+  @library.evaluation_begin()
+  defer @library.evaluation_end()
 
   // Check for well-formedness.
   let (errors, warnings) = root.errors_and_warnings()

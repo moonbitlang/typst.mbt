@@ -445,6 +445,11 @@ pub fn Document::lower(
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
+  // One evaluation for the whole lowering, as a compilation is one: the
+  // fragments of Typst source in the document share the modules of the
+  // files they import.
+  @library.evaluation_begin()
+  defer @library.evaluation_end()
   let result : Result[@library.Content, Array[@library.SourceDiagnostic]] = try
     self.lower_initial(
       session,

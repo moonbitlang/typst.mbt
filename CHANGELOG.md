@@ -164,7 +164,8 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   files were not read again. Memoized module evaluations now end with the
   compilation (`library`: `compilation_epoch()`), and outside of one with
   the evaluation (`eval_source` with the root route; `library`:
-  `note_evaluation(route)`). Within one compilation nothing changes: a
+  `evaluation_begin()`/`evaluation_end()`: a string that is evaluated outside
+  of a compilation and the files it imports are one evaluation). Within one compilation nothing changes: a
   file is still evaluated once.
 
 - Damaged PNG images: the decoder checked no chunk CRC and allocated the
