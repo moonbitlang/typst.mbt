@@ -458,6 +458,38 @@
   pure functions of their arguments plus the tracked engine parts whose
   results cannot contain values created during the call that compare by
   identity (the state sequence is not memoized).
+- Results kept by content (`library/memo_content.mbt`; the first slice of
+  the incremental-compilation design): functions that upstream memoizes without
+  a tracked argument, pure in what their arguments hash to, are kept for
+  the process, not for a compilation: decoding a raster image
+  (`RasterImage::new`, upstream `new_impl`; a deck with 28 screenshots
+  decoded each of them for every layout of every introspection iteration:
+  5.5 s, 1.4 GB; now once: 1.8 s, 0.3 GB). Rules for such a cache: the
+  key is exactly what upstream hashes (read the Rust signature and the
+  `Hash` impls: `RasterImage::new` hashes the data, the format and the
+  ICC profile that was passed, not the one found in the file), and the
+  comment at the lookup says where it differs and why; the hash of large
+  data is `data_hash(bytes)`, computed once per `Bytes` object (upstream's
+  `LazyHash` inside `Bytes`; kept by the object's identity, and dropped by
+  `evict` once the object was not asked for between two calls, since a
+  world reads its files again after a reset); entries have comemo's ages
+  (`ContentCache`: `evict(max_age)` makes every entry older by one and
+  drops those above `max_age`, a hit makes it young; a cache of another
+  package reaches `evict` through `register_evictor`), where the decode
+  caches of `evict`'s own list are dropped as a whole on every
+  `max_age`-th call; a result is immutable or copied for every caller;
+  an error is kept if upstream's function returns a `Result` (comemo
+  keeps it), and copied on the way out (`HintedString::clone`: hints are a
+  mutable array); and the cache obeys `set_layout_memo_enabled`, in a
+  compilation and outside of one (`content_memo_enabled()`), so that the
+  runner's comparison of memoization on and off covers it. Tests
+  (`library/memo_content_wbtest.mbt`, `typst/content_memo_wbtest.mbt`):
+  one input per argument of the key that differs in nothing else, the
+  same bytes in two objects, a broken input used twice, a file that
+  changes behind its path between two compilations of one world, `evict`.
+  They cost memory, not time: decoded pixels stay until `max_age`
+  compilations did not use them, and a process that never calls `evict`
+  keeps every image it ever decoded.
 - Performance: non-intrinsic core functions (`Byte::to_uint`,
   `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
   `Double::floor`/`to_int`, ...) are compiled into the core bundle and are

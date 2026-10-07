@@ -108,3 +108,38 @@ test "SipHasher128: strings and short integers hash as their bytes" {
     }
   }
 }
+
+///|
+test "SipHasher128: write_bytes hashes what a write_u8 per byte hashes" {
+  let mut seed = 0xD1B54A32D192ED03UL
+  let next = () => {
+    seed = seed ^ (seed << 13)
+    seed = seed ^ (seed >> 7)
+    seed = seed ^ (seed << 17)
+    seed
+  }
+  let data = Bytes::makei(96, _ => (next() >> 24).to_byte())
+  // Every pending-word length before the bytes, every length, views at
+  // every offset of a word, and more bytes after them.
+  for before in 0..<9 {
+    for offset in 0..<9 {
+      for length in 0..<70 {
+        let a = SipHasher128::new()
+        let b = SipHasher128::new()
+        for i in 0..<before {
+          a.write_u8(data[i])
+          ref_write_u8(b, data[i])
+        }
+        a.write_bytes(data[offset:offset + length])
+        for i in offset..<(offset + length) {
+          ref_write_u8(b, data[i])
+        }
+        a.write_u32(0xDEADBEEFU)
+        for i in 0..<4 {
+          ref_write_u8(b, (0xDEADBEEFU >> (8 * i)).to_byte())
+        }
+        assert_eq(a.finish128(), b.finish128())
+      }
+    }
+  }
+}

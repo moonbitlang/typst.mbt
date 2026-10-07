@@ -232,6 +232,13 @@ pub fn HintedString::new(message : String) -> HintedString {
 }
 
 ///|
+/// A copy with hints of its own (upstream `Clone`): [HintedString::hint]
+/// changes the array.
+pub fn HintedString::clone(self : HintedString) -> HintedString {
+  { message: self.message, hints: self.hints.copy(), }
+}
+
+///|
 /// Adds a single hint.
 pub fn HintedString::hint(self : HintedString, hint : String) -> Unit {
   self.hints.push(hint)

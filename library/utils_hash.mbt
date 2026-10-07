@@ -179,12 +179,47 @@ pub fn SipHasher128::write_u64(self : SipHasher128, v : UInt64) -> Unit {
 
 ///|
 /// Write bytes.
+///
+/// What a call of `write_u8` per byte does, a word at a time where the
+/// bytes fill whole words (image and font data is hashed here).
 pub fn SipHasher128::write_bytes(
   self : SipHasher128,
   bytes : BytesView,
 ) -> Unit {
-  for b in bytes {
-    self.write_u8(b)
+  let data = bytes.data()
+  let start = bytes.start_offset()
+  let n = bytes.length()
+  // All reads below are of `data[start + i]` with `0 <= i < n`, inside the
+  // view.
+  let mut i = 0
+  // Until the pending word is full.
+  while i < n && self.ntail != 0 {
+    self.write_u8(data.unsafe_get(start + i))
+    i += 1
+  }
+  // Whole words (little endian).
+  let words_end = i + (n - i) / 8 * 8
+  self.length += UInt64::extend_uint((words_end - i).reinterpret_as_uint())
+  while i < words_end {
+    let p = start + i
+    let lo = data.unsafe_get(p).to_int() |
+      (data.unsafe_get(p + 1).to_int() << 8) |
+      (data.unsafe_get(p + 2).to_int() << 16) |
+      (data.unsafe_get(p + 3).to_int() << 24)
+    let hi = data.unsafe_get(p + 4).to_int() |
+      (data.unsafe_get(p + 5).to_int() << 8) |
+      (data.unsafe_get(p + 6).to_int() << 16) |
+      (data.unsafe_get(p + 7).to_int() << 24)
+    self.compress(
+      UInt64::extend_uint(lo.reinterpret_as_uint()) |
+      (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32),
+    )
+    i += 8
+  }
+  // The rest.
+  while i < n {
+    self.write_u8(data.unsafe_get(start + i))
+    i += 1
   }
 }
 

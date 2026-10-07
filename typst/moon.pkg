@@ -10,5 +10,6 @@ import {
 
 import {
   "moonbitlang/typst/syntax/ast",
+  "moonbitlang/typst/codecs",
   "moonbitlang/core/debug",
 } for "wbtest"

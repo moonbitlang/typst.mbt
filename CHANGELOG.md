@@ -174,6 +174,20 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   that is kept by content for the process (decoded `raw` syntaxes and
   themes, bibliographies, CSL styles, PDF documents, plugins and the
   results of their calls), which otherwise only grows when files change.
+- `library`: decoded raster images are kept by content (upstream memoizes
+  `RasterImage::new_impl`): `RasterImage::new` decodes equal data with an
+  equal format and ICC argument once per process and returns the same
+  image, also for a decoding error. An image that is on many pages, or
+  laid out again in a later introspection iteration or in the next
+  compilation of `typst watch`, was decoded every time. `evict(max_age)`
+  drops an image that `max_age` calls in a row did not use; a process
+  that compiles many documents and never calls `evict` keeps them all.
+  With `set_layout_memo_enabled(false)` nothing is kept. New for caches of
+  this kind: `ContentCache[T]` (`new`, `get`, `insert`, `evict`, `length`;
+  results by a fingerprint, with comemo's ages), `register_evictor(f)`
+  (what `evict` calls with its `max_age`), `data_hash(bytes)` (`hash128`
+  of data, computed once per `Bytes` object), `content_memo_enabled()`,
+  and `HintedString::clone()`.
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
   family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in
