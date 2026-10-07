@@ -131,8 +131,35 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 `Symbol`, `Tag`, `Target`, `Type` and `Version` in `library`; `Show`'s
 `output` of these types is `Show::output(x, logger)`.
 
+### Fixed
+
+- Compiling a world again after its files changed (as `typst watch` and a
+  host that keeps a `World` do): a module of an imported file was found
+  again by the text of that file alone, so it was reused although a file
+  that it imports or reads (`json`, `read`, ..) had changed, and those
+  files were not read again. Memoized module evaluations now end with the
+  compilation (`library`: `compilation_epoch()`). Within one compilation
+  nothing changes: a file is still evaluated once.
+
 ### Added
 
+- The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
+  the port of `typst-cli`'s, without its HTTP server for HTML export.
+- `kit/watcher`, a new package (upstream's `watcher` feature of typst-kit):
+  `Watcher` (`new(output, tasks)`, and the `async` functions
+  `update(paths)` and `wait()`), `run` (runs a function on the event loop
+  of `moonbitlang/async` and hands it the `Tasks` for a watcher) on the
+  native and wasm targets. On wasm-gc and js, where there are no file
+  system events, the package is `unsupported : String` alone. The module
+  has a new dependency for it, `moonbitlang/async` (0.22.4); only this
+  package imports it, so a program links that runtime only if it imports
+  `kit/watcher`.
+- `kit/platform`: `monotonic_nanos()` (a clock for durations),
+  `raise_fd_limit()` (raises the soft limit of open files to the hard one)
+  and `os_error(code)` (the `IoError` of an OS error number).
+- `library`: `format_duration(nanoseconds)` (upstream
+  `typst_utils::format_duration`: `2.85 s`, `294.82 ms`, `1 h 4 min`).
+- `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/format`, a new package without dependencies (it does not import
   `doc` or the engine): `fixed(x, digits, trim?)` (the exact value of the
   double rounded half away from zero, JavaScript's `toFixed`), `grouped`

@@ -800,7 +800,7 @@ EDITS = {
 }
 
 
-def bench(binaries, edits):
+def bench(binaries, edits, extra):
     """Times compilations in a watch session."""
     rows = []
     for document in ("long.typ", "longer.typ"):
@@ -818,7 +818,8 @@ def bench(binaries, edits):
                     output = "out.pdf" if fmt == "pdf" else "out-{p}.svg"
                     session = Session(
                         command,
-                        [document, output, "--no-fullscreen", "--ignore-system-fonts"],
+                        [document, output, "--no-fullscreen", "--ignore-system-fonts"]
+                        + extra,
                         directory,
                     )
                     session.wait_compiled(0, timeout=600)
@@ -859,6 +860,9 @@ def main():
     parser.add_argument("--only", action="append", help="run only this scenario")
     parser.add_argument("--bench", action="store_true", help="time compilations instead")
     parser.add_argument("--edits", type=int, default=5, help="edits per --bench session")
+    parser.add_argument(
+        "--jobs", default=None, help="--jobs for --bench (upstream's threads; the port has one)"
+    )
     parser.add_argument("--keep", action="store_true", help="keep the directories")
     parser.add_argument("-v", "--verbose", action="store_true")
     options = parser.parse_args()
@@ -888,7 +892,7 @@ def main():
             print("watch_check: no upstream binary, checking the port alone")
 
     if options.bench:
-        bench(binaries, options.edits)
+        bench(binaries, options.edits, ["--jobs", options.jobs] if options.jobs else [])
         return
 
     failed = False
