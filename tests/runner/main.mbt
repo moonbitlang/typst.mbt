@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images|resvg|edsl|packages> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images|resvg|edsl|packages|recompile> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -218,6 +218,9 @@ fn main {
     // The twins of the EDSL (`doc/twins`) against their Typst sources (see
     // `edsl_stage.mbt`).
     "edsl" => run_edsl_stage(filter, verbose)
+    // One world compiled again after every edit of its files, against
+    // compilations from scratch (see `recompile_stage.mbt`).
+    "recompile" => run_recompile_stage(args, filter, verbose)
     // The upstream suite converted to the EDSL (docs/edsl-convert.md):
     // generate the conversions, and compare them with the Typst path.
     "edsl-convert" => {

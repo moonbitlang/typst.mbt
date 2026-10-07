@@ -1,0 +1,214 @@
+// What the `recompile` stage (`recompile_stage.mbt`) compares: everything a
+// compilation gives its host, as the host sees it.
+//
+// What it guarantees:
+//
+// - Two compilations are equal here only if a user could not tell them
+//   apart: the same files to watch, the same errors and warnings at the
+//   same places with the same hints and tracepoints, the same pages (every
+//   frame item, every tag with its element, every glyph's place in the
+//   source), the same SVG and the same PDF, byte for byte.
+// - Nothing is compared that a user cannot see and that differs between a
+//   file that was edited in place and the same text parsed from scratch:
+//   span numbers. A span is written as what it points at, in the world of
+//   its own compilation: file, line and column, and the byte range
+//   (`recompile_place`, `encode_world_span`). A span number that the
+//   world's source no longer has is written as unresolved, so a diagnostic
+//   or a glyph that kept a span of an earlier parse is a difference.
+//   Location hashes, which contain span numbers, are written as their
+//   order of appearance (the frame dump's `keys`).
+// - The dependencies are read first, before anything here asks the world
+//   for a source to resolve a span in: they are what the compilation
+//   accessed, not what its dump did.
+
+///|
+/// What a compilation gave.
+priv struct Compiled {
+  /// One string per part of [compiled_parts].
+  parts : Array[String]
+  /// The PDF.
+  pdf : Bytes
+  /// Whether the document compiled.
+  ok : Bool
+}
+
+///|
+/// The parts of a compilation, in the order they are compared.
+let compiled_parts : ReadOnlyArray[String] = [
+  "dependencies", "diagnostics", "frames", "svg", "pdf diagnostics", "pdf",
+]
+
+///|
+/// Where a span points in the world: `file:line:column-line:column
+/// (start..end)`, lines and columns from 1 as the CLI prints them.
+fn recompile_place(world : &@library.World, span : @syntax.DiagSpan) -> String {
+  guard span.id() is Some(id) else { return "-" }
+  let path = file_path(id)
+  let source = world.source(id) catch { _ => return "\{path}:?" }
+  let (start, end) = match span.get() {
+    Detached => return "-"
+    Number(num~, sub_range~, ..) =>
+      match source.range(num, sub_range) {
+        Some(range) => range
+        None => return "\{path}:?"
+      }
+    Range(start~, end~, ..) => (start, end)
+  }
+  let lines = source.lines()
+  let at = (byte : Int) => {
+    match lines.byte_to_line_column(byte) {
+      Some((line, column)) => "\{line + 1}:\{column + 1}"
+      None => "?"
+    }
+  }
+  "\{path}:\{at(start)}-\{at(end)} (\{start}..\{end})"
+}
+
+///|
+/// Diagnostics with their hints and tracepoints.
+fn recompile_diagnostics(
+  out : StringBuilder,
+  world : &@library.World,
+  diagnostics : Array[@library.SourceDiagnostic],
+) -> Unit {
+  for diagnostic in diagnostics {
+    let severity = match diagnostic.severity {
+      Error => "error"
+      Warning => "warning"
+    }
+    out.write_string(
+      "\{severity} \{recompile_place(world, diagnostic.span)} \{@unicode.rust_debug_str(diagnostic.message)}\n",
+    )
+    for hint in diagnostic.hints {
+      out.write_string(
+        "  hint \{recompile_place(world, hint.span)} \{@unicode.rust_debug_str(hint.v)}\n",
+      )
+    }
+    for point in diagnostic.trace {
+      let (kind, name) = match point.v {
+        Call(name) => ("call", name)
+        Show(name) => ("show", Some(name))
+        Import(name) => ("import", Some(name))
+        Include(name) => ("include", Some(name))
+      }
+      let name = match name {
+        Some(name) => @unicode.rust_debug_str(name)
+        None => "-"
+      }
+      let at = recompile_place(world, @syntax.DiagSpan::from_span(point.span))
+      out.write_string("  trace \{at} \{kind} \{name}\n")
+    }
+  }
+}
+
+///|
+/// Compiles the world as it is and dumps what came out. Also returns the
+/// dependencies as ids.
+fn recompile_compile(
+  world : RecompileWorld,
+) -> (Compiled, Array[@syntax.FileId]) {
+  let warned : @library.Warned[
+    Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+  ] = @typst.compile(world)
+  // Before the dump touches the world.
+  let ids = world.files.dependencies()
+  let dependencies = world.dependencies().join("\n")
+  let dyn_world = world as &@library.World
+  let diagnostics = StringBuilder()
+  let mut frames = ""
+  let mut svg = ""
+  let pdf_diagnostics = StringBuilder()
+  let mut pdf : Bytes = b""
+  let ok = match warned.output {
+    Ok(doc) => {
+      diagnostics.write_string("ok\n")
+      recompile_diagnostics(diagnostics, dyn_world, warned.warnings)
+      // (A span is looked up in its file's tree: once per span, not once
+      // per glyph.)
+      let places : Map[@syntax.Span, String] = Map([])
+      let enc = FrameEncoder::new(span => {
+        match places.get(span) {
+          Some(place) => place
+          None => {
+            let place = encode_world_span(dyn_world, span)
+            places[span] = place
+            place
+          }
+        }
+      })
+      enc.document(doc)
+      frames = enc.out.to_string()
+      svg = @svg.svg_merged(
+        doc,
+        { render_bleed: false, format: { pretty: Some(true), }, },
+        @library.Abs::pt(1.0),
+      )
+      let exported = make_live(doc)
+      match exported.output {
+        Ok(bytes) => {
+          pdf_diagnostics.write_string("ok\n")
+          pdf = bytes
+        }
+        Err(errors) => {
+          pdf_diagnostics.write_string("err\n")
+          recompile_diagnostics(pdf_diagnostics, dyn_world, errors)
+        }
+      }
+      recompile_diagnostics(pdf_diagnostics, dyn_world, exported.warnings)
+      true
+    }
+    Err(errors) => {
+      diagnostics.write_string("err\n")
+      recompile_diagnostics(diagnostics, dyn_world, errors)
+      recompile_diagnostics(diagnostics, dyn_world, warned.warnings)
+      false
+    }
+  }
+  let compiled = {
+    parts: [
+      dependencies,
+      diagnostics.to_string(),
+      frames,
+      svg,
+      pdf_diagnostics.to_string(),
+      "\{pdf.length()} bytes, sha256 \{sha256_hex(pdf[:])}",
+    ],
+    pdf,
+    ok,
+  }
+  (compiled, ids)
+}
+
+///|
+/// The parts in which two compilations differ, and what differs in the
+/// first of them.
+fn Compiled::difference(
+  expected : Compiled,
+  actual : Compiled,
+) -> (Array[String], String)? {
+  let parts = []
+  let mut detail = ""
+  for i, part in compiled_parts[:] {
+    if expected.parts[i] == actual.parts[i] {
+      continue
+    }
+    if parts.is_empty() {
+      detail = if part == "pdf" {
+        let n = @cmp.minimum(expected.pdf.length(), actual.pdf.length())
+        let mut at = 0
+        while at < n && expected.pdf[at] == actual.pdf[at] {
+          at += 1
+        }
+        "  - \{expected.parts[i]}\n  + \{actual.parts[i]}\n  (first difference at byte \{at})"
+      } else {
+        first_diff(expected.parts[i], actual.parts[i])
+      }
+    }
+    parts.push(part)
+  }
+  if parts.is_empty() {
+    None
+  } else {
+    Some((parts, detail))
+  }
+}

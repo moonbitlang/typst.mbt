@@ -91,7 +91,14 @@ impl @library.World for TestWorld with fn today(_self, offset) {
 /// The date of upstream's test world: `typst_kit::datetime::Time::fixed` at
 /// 1970-01-01 12:00:00 UTC, shifted by the offset.
 fn test_today(offset : @library.Duration?) -> @library.Datetime? {
-  let now = 12L * 3600L
+  today_on(0, offset)
+}
+
+///|
+/// The date at 12:00:00 UTC of the `day`-th day after 1970-01-01, shifted
+/// by the offset.
+fn today_on(day : Int, offset : @library.Duration?) -> @library.Datetime? {
+  let now = day.to_int64() * 86400L + 12L * 3600L
   let with_offset = match offset {
     None => now
     Some(offset) => {
