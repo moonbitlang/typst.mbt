@@ -11,9 +11,10 @@
 // file slot of a world) keeps the returned source instead.
 //
 // An edited source shares with the one before every syntax node that the
-// edit did not write to (the header of `node.mbt` says which it copies), so
-// those nodes keep their span numbers, and a closure or a module that holds
-// nodes of the old tree is not affected by the edit.
+// edit did not write to (the header of `node.mbt` says which it copies:
+// the ancestors of what is replaced, and the neighbours it has to
+// renumber), so those nodes keep their span numbers, and a closure or a
+// module that holds nodes of the old tree is not affected by the edit.
 
 ///|
 /// A Typst source file containing the full source text, a mapping from byte
@@ -111,8 +112,12 @@ pub fn Source::replace(self : Source, new : String) -> (Source, (Int, Int)) {
 ///
 /// Returns the edited source and the range in it that was ultimately
 /// reparsed. `self` is unchanged (upstream edits `self` and returns the
-/// range): the new source has its own lines and its own root, which shares
-/// the nodes outside of the edit with the root of `self`.
+/// range): the new source has its own lines and its own root. Its tree
+/// shares with the tree of `self` the nodes that the edit did not write to:
+/// all but the nodes that were replaced, their ancestors (copies with the
+/// same span numbers) and, where the span numbers around the replacement
+/// ran out, the neighbours that were renumbered (copies with new numbers,
+/// although their text was not reparsed).
 ///
 /// Aborts if the range is out of bounds.
 pub fn Source::edit(

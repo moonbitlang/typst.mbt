@@ -91,6 +91,30 @@ fn snapshot(node : @syntax.SyntaxNode) -> String {
 }
 
 ///|
+/// Everything that can be read from the lines of a source: the text, its
+/// lengths, and the byte and UTF-16 start of every line.
+fn lines_snapshot(lines : @syntax.Lines) -> String {
+  let buf = StringBuilder()
+  buf.write_string(
+    "\{lines.len_bytes()} bytes, \{lines.len_utf16()} units, \{lines.len_lines()} lines:",
+  )
+  for line in 0..<lines.len_lines() {
+    // `?`: line starts that are not places in the text any more.
+    match lines.line_to_byte(line) {
+      Some(byte) =>
+        match lines.byte_to_utf16(byte) {
+          Some(unit) => buf.write_string(" \{byte}/\{unit}")
+          None => buf.write_string(" \{byte}/?")
+        }
+      None => buf.write_string(" ?")
+    }
+  }
+  buf.write_char('\n')
+  buf.write_string(lines.text())
+  buf.to_string()
+}
+
+///|
 /// The nodes of a tree, in pre-order.
 fn all_nodes(root : @syntax.SyntaxNode) -> Array[@syntax.SyntaxNode] {
   let out = []
@@ -206,6 +230,7 @@ test "an edit leaves the source and every node of its tree as they were" {
       assert_true(held.any(h => h.node.kind().name() == kind))
     }
     let lines = source.lines()
+    let lines_before = lines_snapshot(lines)
     let start = offset_of(persistent_text, edit.find)
     let end = start + @syntax.utf8_len(edit.find)
     let (edited, _) = source.edit(start, end, edit.with_)
@@ -219,11 +244,8 @@ test "an edit leaves the source and every node of its tree as they were" {
     assert_false(physical_equal(edited, source))
     assert_eq(source.text(), persistent_text)
     assert_true(physical_equal(source.lines(), lines))
-    assert_eq(lines.text(), persistent_text)
-    assert_eq(
-      lines.len_lines(),
-      @syntax.Lines::new(persistent_text).len_lines(),
-    )
+    assert_eq(lines_snapshot(lines), lines_before)
+    assert_eq(lines_before, lines_snapshot(@syntax.Lines::new(persistent_text)))
     let changed = changed_names(held)
     if !changed.is_empty() {
       fail("\{edit.name}: changed under their holder: \{changed.join(", ")}")

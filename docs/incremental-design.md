@@ -689,10 +689,10 @@ array), one reference per child of each, copied and counted, and a copy of
 the line starts before the edit: in these runs 1 µs for the small source
 and up to 0.6 ms for the large one at its end, where the line starts were
 35 000 objects to count and are a block of values now. The `reparse` stage
-(30 336 edits) takes 1.79 s instead of 1.78 s (1.93 s with its new check
-that the source before each edit is unchanged), the `recompile` stage
-33.9 s instead of 34.0 s, and a compilation from scratch what it took
-(`bench/long.typ`: 228 ms and 231 ms).
+(30 336 edits) takes 1.79 s instead of 1.78 s (and 0.17 s more with its
+new check that the source before each edit is unchanged), the `recompile`
+stage 33.9 s instead of 34.0 s, and a compilation from scratch what it
+took (`bench/long.typ`: 228 ms and 231 ms).
 
 **Spans.** A kept result holds spans: in content, in frames (glyphs,
 links, tags), in the diagnostics of its sink. They are valid if the nodes

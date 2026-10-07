@@ -12,7 +12,7 @@
 //   where they are, how their pages are numbered), the same SVG and the
 //   same PDF, byte for byte.
 // - Nothing is compared that a user cannot see and that differs between a
-//   file that was edited in place and the same text parsed from scratch:
+//   file that was edited and the same text parsed from scratch:
 //   span numbers. A span is written as what it points at, in the world of
 //   its own compilation: file, line and column, and the byte range
 //   (`recompile_place`, `encode_world_span`). A span number that the

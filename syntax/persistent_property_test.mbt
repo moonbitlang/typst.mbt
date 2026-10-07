@@ -156,8 +156,9 @@ fn check_document(
   let rng : EditRng = { state: seed, }
   let typed_at = boundary(rng, text)
   let mut source = @syntax.Source::detached(text)
-  // Every source the document was, with the hash of its tree.
-  let history : Array[(@syntax.Source, String, UInt64)] = []
+  // Every source the document was, with its lines, their snapshot and the
+  // hash of its tree.
+  let history : Array[(@syntax.Source, @syntax.Lines, String, UInt64)] = []
   let mut incremental = 0
   for step in 0..<edits {
     let old_text = source.text()
@@ -169,7 +170,9 @@ fn check_document(
       let node = nodes[rng.below(nodes.length())]
       held.push(Held::new(node.kind().name(), node))
     }
-    history.push((source, old_text, tree_hash(source.root())))
+    let lines = source.lines()
+    let lines_before = lines_snapshot(lines)
+    history.push((source, lines, lines_before, tree_hash(source.root())))
     let new_text = if typing {
       let words = ["w ", "*b* ", "#x ", "_e_ ", "$x$ ", "[c] "]
       old_text.unsafe_substring(start=0, end=typed_at) +
@@ -201,13 +204,20 @@ fn check_document(
     if source.text() != old_text || snapshot(source.root()) != before {
       fail("\{place}: the source before the edit changed")
     }
+    if !physical_equal(source.lines(), lines) ||
+      lines_snapshot(lines) != lines_before {
+      fail("\{place}: the lines of the source before the edit changed")
+    }
     let changed = changed_names(held)
     if !changed.is_empty() {
       fail("\{place}: held nodes changed: \{changed.join(", ")}")
     }
     for i, entry in history {
-      let (earlier, text, hash) = entry
-      if earlier.text() != text || tree_hash(earlier.root()) != hash {
+      let (earlier, lines, lines_before, hash) = entry
+      if !physical_equal(earlier.lines(), lines) ||
+        lines_snapshot(lines) != lines_before ||
+        earlier.text() != lines.text() ||
+        tree_hash(earlier.root()) != hash {
         fail("\{place}: the source before edit \{i} changed")
       }
     }
@@ -228,9 +238,10 @@ fn check_document(
 
 ///|
 test "random edits leave every earlier source and its nodes as they were" {
+  // The documents of this repository are required: a test that finds none
+  // must not pass. (The tests run in the module's root.)
   guard repository_root() is Some(root) else {
-    println("persistent edits: the repository's files were not found")
-    return
+    fail("the repository's files were not found from the working directory")
   }
   let documents = []
   typ_files(root + "tests/recompile/docs", documents)

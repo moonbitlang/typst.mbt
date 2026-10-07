@@ -28,8 +28,10 @@ file guarantees.
 instead of the disk. After an edit the world is reset as `SystemWorld::reset`
 does; a file that was a source before is then the source that
 `Source::replace` made of the one the slot had: its text replaced and its
-tree reparsed in part, so the nodes outside of the reparsed range, which
-the new tree shares with the old one, keep their span numbers. That
+tree reparsed in part, so the nodes outside of the reparsed range keep
+their span numbers (they are the nodes of the old tree; only where the
+numbers around the new nodes run out are neighbours renumbered, as
+copies). That
 matters: span numbers are in the keys of memoized calls and in the hashes of
 located elements, and a fresh parse numbers the same text differently.
 

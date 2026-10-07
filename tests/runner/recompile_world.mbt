@@ -9,9 +9,11 @@
 //   reads memory instead of the file system. `RecompileWorld::reset` is
 //   `SystemWorld::reset`: every slot becomes stale, a file is loaded again
 //   on its next access, and the source of a file that was a source before
-//   is the same `Source` object with its text replaced and its tree
-//   reparsed incrementally (`Source::replace`), so its nodes outside of the
-//   reparsed range keep their span numbers and the others get new ones.
+//   is what `Source::replace` made of the slot's source: its text replaced
+//   and its tree reparsed incrementally, so its nodes outside of the
+//   reparsed range keep their span numbers (unless the numbers around the
+//   new nodes run out and neighbours are renumbered) and the others get
+//   new ones.
 //   A fresh world numbers the same text differently. Spans are in the keys
 //   of memoized calls and in the hashes of located elements, which is why
 //   the incremental side must not be given new sources.
@@ -310,7 +312,7 @@ fn RecompileWorld::reset(self : RecompileWorld) -> Unit {
 /// The sources that were given out since the last reset whose syntax tree
 /// is not what a parse of their text gives (apart from spans).
 ///
-/// A source that was edited in place is reparsed in part, and upstream's
+/// A source that was made by an edit is reparsed in part, and upstream's
 /// reparser, which the port follows, is not always equivalent to a parse:
 /// `##let x #let= 4` with its first character deleted keeps a node of the
 /// old tree and reports "expected pattern", which a parse of the new text
