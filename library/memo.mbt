@@ -148,14 +148,30 @@ pub fn compilation_epoch() -> Int {
 }
 
 ///|
-/// Notes that a source file is evaluated on its own, not as the import of
-/// another evaluation (`route` is the root): outside of a compilation this
-/// starts a new [compilation_epoch], since nothing says that the world's
-/// files are what they were for the evaluation before.
-pub fn note_evaluation(route : Route) -> Unit {
-  if compilation_depth.val == 0 && route.outer is None && route.id is None {
+/// The number of evaluations in progress that a host started outside of a
+/// compilation ([evaluation_begin]), one inside the other.
+let evaluation_depth : Ref[Int] = { val: 0, }
+
+///|
+/// Enters an evaluation: of a source file (`eval_source`) or of a string
+/// (`eval_string`), or what a host puts around several of them (`doc`'s
+/// `lower`). Outside of a compilation the outermost one starts a new
+/// [compilation_epoch], since nothing says that the world's files are what
+/// they were for the evaluation before; the evaluations inside it (the
+/// files it imports, also those a string imports, whose route is the root)
+/// share it, so that a file imported twice is one module. Every call is
+/// followed by [evaluation_end].
+pub fn evaluation_begin() -> Unit {
+  if compilation_depth.val == 0 && evaluation_depth.val == 0 {
     compilation_counter.val += 1
   }
+  evaluation_depth.val += 1
+}
+
+///|
+/// Leaves an evaluation ([evaluation_begin]).
+pub fn evaluation_end() -> Unit {
+  evaluation_depth.val -= 1
 }
 
 ///|

@@ -960,6 +960,10 @@ pub let equation_elem_supplement : Int
 
 pub let equation_elem_variant : Int
 
+pub fn evaluation_begin() -> Unit
+
+pub fn evaluation_end() -> Unit
+
 pub fn evict(Int) -> Unit
 
 pub fn exp10(Int) -> Double
@@ -2143,8 +2147,6 @@ pub fn neq(Value, Value) -> Value raise HintedError
 pub fn not_(Value) -> Value raise HintedError
 
 pub fn not_in(BindingGuard, Value, Value) -> Value raise HintedError
-
-pub fn note_evaluation(Route) -> Unit
 
 pub fn note_route_queries(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
 
