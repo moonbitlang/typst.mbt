@@ -140,10 +140,12 @@ test "decimal orderings are -1, 0 or 1" {
   inspect(compare(Int(1L), Decimal(big)), content="-1")
   inspect(compare(Decimal(big), Int(1L)), content="1")
   let span = @syntax.Span::detached()
+  // Both the maximum and the minimum are more than one limb away from the
+  // first value.
   let values : Array[@syntax.Spanned[Value]] = [
-    { v: Decimal(big), span, },
     { v: Decimal(small), span, },
     { v: Decimal(bigger), span, },
+    { v: Decimal(big), span, },
     { v: Decimal(tiny), span, },
   ]
   inspect(
