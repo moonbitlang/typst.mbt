@@ -21,7 +21,8 @@
 // fontdb and `FontInfo::new` look at every face on its own. Here the faces
 // of a collection that is read in ranges share what they have in common: a
 // table at one place of the file is read once, and the coverage of a `cmap`
-// table is computed once (`FontFile::tables`, `FontFile::coverages`). What
+// table is computed once (`FontFile::tables`, `FontFile::coverages`; what
+// is kept for that is bounded by the file's size, `FontFile::retain`). What
 // a face gets is what its whole file gives: `fontdb_wbtest.mbt`.
 
 ///|
@@ -237,6 +238,8 @@ priv struct FontFile {
   /// they are of: the largest of these tables and half of the work of
   /// `FontInfo::new`.
   coverages : Map[UInt64, @library.Coverage]
+  /// The bytes that `tables` and `coverages` hold (`FontFile::retain`).
+  mut retained : Int64
 }
 
 ///|
@@ -280,6 +283,7 @@ fn FontFile::open(path : String) -> FontFile raise @platform.IoError {
       faces: None,
       tables: Map([]),
       coverages: Map([]),
+      retained: 0L,
     }
   }
   // Small files are cheaper to read whole.
@@ -298,6 +302,7 @@ fn FontFile::whole(data : Bytes) -> FontFile {
     faces: None,
     tables: Map([]),
     coverages: Map([]),
+    retained: 0L,
   }
 }
 
@@ -383,8 +388,31 @@ fn FontFile::table(self : FontFile, offset : UInt, length : UInt) -> Bytes? {
     return data
   }
   let data = self.read_table(offset, length)
-  self.tables[key] = data
+  let bytes = match data {
+    Some(data) => data.length()
+    None => 0
+  }
+  if self.retain(bytes) {
+    self.tables[key] = data
+  }
   data
+}
+
+///|
+/// Whether the file may keep `bytes` more for its other faces. What it
+/// keeps is bounded by its size: the tables of a collection are parts of
+/// the file, and together no more than the file, unless the table records
+/// of its faces are made to overlap (5000 faces with a table of 800 kB
+/// each, at one place with 5000 lengths, fit into 1 MB). Beyond the bound
+/// nothing is kept, and a face reads and computes what it needs for itself.
+fn FontFile::retain(self : FontFile, bytes : Int) -> Bool {
+  // (An entry is not free either.)
+  let more = bytes.to_int64() + 64L
+  if more > self.size - self.retained {
+    return false
+  }
+  self.retained += more
+  true
 }
 
 ///|
@@ -416,7 +444,9 @@ fn FontFile::info(self : FontFile, probe : Probe) -> @library.FontInfo? {
     Some(coverage) => coverage
     None => {
       let coverage = @library.Coverage::from_ttf(ttf)
-      self.coverages[key] = coverage
+      if self.retain(4 * coverage.0.length()) {
+        self.coverages[key] = coverage
+      }
       coverage
     }
   }

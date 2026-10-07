@@ -724,8 +724,9 @@
   must also be identical across native, wasm-gc and wasm.
 - Font discovery (`kit/fontdb.mbt`, whose header lists how it differs from
   fontdb) is what every compilation without `--ignore-system-fonts` pays
-  first: 34 ms for the 1339 faces in 502 files of macOS 26 (upstream's
-  fontdb: 77 ms). A file is opened once and read through its descriptor
+  first: `typst fonts` takes 41 ms for the 1339 faces in 502 files of
+  macOS 26 (upstream: 76 ms; 7 ms of each are not discovery). A file is
+  opened once and read through its descriptor
   (`@platform.RangedFile`, `pread`; the whole file on the wasm targets),
   not mapped: reading the pieces costs what touching them in a mapping
   costs, and a file that is truncated meanwhile gives short reads, which
@@ -733,7 +734,8 @@
   tables that fontdb's admission and `FontInfo::from_ttf` look at are read
   (`is_probe_table`: extend it when either reads another table), the faces
   of a collection share the tables they have in common and the coverage of
-  a `cmap` (`FontFile::tables`, `coverages`), and a directory is listed
+  a `cmap` (`FontFile::tables`, `coverages`; they keep no more than the
+  file's size, since table records may overlap), and a directory is listed
   once with the kinds of its entries (`@platform.read_dir_entries`, not
   `@fs.read_dir`). `Coverage::from_ttf` (`library/font_info.mbt`) adds the
   segments and groups of a subtable as ranges, read from the bytes

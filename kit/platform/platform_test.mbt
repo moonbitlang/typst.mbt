@@ -166,13 +166,28 @@ test "ranged file: pieces, the end of the file, closing" {
     _ => "ok"
   }
   inspect(negative, content="Invalid argument (os error 22)")
-  // Nothing is read from a closed file, and closing twice is fine.
+  // A closed file fails (the same way on every target), and closing twice
+  // is fine.
   file.close()
   file.close()
-  let closed = (file.read(0L, 10) catch { _ => b"" }).length()
-  inspect(closed, content="0")
-  let closed = file.size() catch { _ => 0L }
-  inspect(closed, content="0")
+  let closed = try file.read(0L, 10) catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    bytes => "\{bytes.length()} bytes"
+  }
+  inspect(closed, content="Other: Bad file descriptor (os error 9)")
+  let closed = try file.read(-1L, 10) catch {
+    e => e.to_string()
+  } noraise {
+    bytes => "\{bytes.length()} bytes"
+  }
+  inspect(closed, content="Bad file descriptor (os error 9)")
+  let closed = try file.size() catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    size => "\{size} bytes"
+  }
+  inspect(closed, content="Other: Bad file descriptor (os error 9)")
 }
 
 ///|

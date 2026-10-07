@@ -97,7 +97,8 @@ pub fn read_file(path : String) -> Bytes raise IoError {
 /// A file that is open for ranged reads: here the whole file, which is all
 /// that the host can read.
 pub struct RangedFile {
-  priv mut data : Bytes
+  /// `None` once the file is closed.
+  priv mut data : Bytes?
 }
 
 ///|
@@ -110,16 +111,23 @@ pub fn supports_ranged_reads() -> Bool {
 ///|
 /// Opens a file for ranged reads.
 pub fn RangedFile::open(path : String) -> RangedFile raise IoError {
-  { data: read_file(path), }
+  { data: Some(read_file(path)), }
+}
+
+///|
+/// The file's bytes, or the error of the native backend for a closed file.
+fn RangedFile::bytes(self : RangedFile) -> Bytes raise IoError {
+  match self.data {
+    Some(data) => data
+    // EBADF
+    None => raise os_error(9)
+  }
 }
 
 ///|
 /// The size of the file in bytes.
-///
-/// (`raise` as on native, where this asks the system.)
-#warnings("-unused_error_type")
 pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
-  self.data.length().to_int64()
+  self.bytes().length().to_int64()
 }
 
 ///|
@@ -130,10 +138,11 @@ pub fn RangedFile::read(
   offset : Int64,
   len : Int,
 ) -> Bytes raise IoError {
+  let data = self.bytes()
   if offset < 0L || len < 0 {
-    raise IoError(Other, "Invalid argument (os error 22)")
+    // EINVAL
+    raise os_error(22)
   }
-  let data = self.data
   let start = if offset > data.length().to_int64() {
     data.length()
   } else {
@@ -148,9 +157,9 @@ pub fn RangedFile::read(
 }
 
 ///|
-/// Closes the file. Reads give nothing afterwards.
+/// Closes the file. Reads fail afterwards.
 pub fn RangedFile::close(self : RangedFile) -> Unit {
-  self.data = b""
+  self.data = None
 }
 
 ///|

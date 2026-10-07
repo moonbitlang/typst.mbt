@@ -656,6 +656,83 @@ test "scan: collections" {
 }
 
 ///|
+/// A collection of `n` faces that all have the tables of one font, of which
+/// it holds one copy.
+fn one_body(font : Bytes, n : Int) -> Bytes {
+  let all = records(font, 0)
+  let directory = 12 + 16 * all.length()
+  let body = 12 + 4 * n + n * directory
+  let mut moved = font[:directory].to_owned()
+  for record in all {
+    moved = patch(
+      moved,
+      record.at,
+      record.offset + body.reinterpret_as_uint(),
+      record.length,
+    )
+  }
+  let mut header = b"ttcf\x00\x01\x00\x00" + u32(n.reinterpret_as_uint())
+  let mut directories = b""
+  for k in 0..<n {
+    header = header + u32((12 + 4 * n + k * directory).reinterpret_as_uint())
+    directories = directories + moved
+  }
+  header + directories + font
+}
+
+///|
+test "scan: what a collection keeps for its faces is bounded" {
+  // The faces of a collection share the tables that discovery has read. A
+  // file can be made to have many large tables in little space: here 60
+  // faces whose `post` tables are the outlines of the font, each one byte
+  // shorter than the one before, 60 tables of the size of the file.
+  let (_, large, _) = test_fonts()
+  let n = 60
+  let mut data = one_body(large, n)
+  let outlines = record(large, "glyf")
+  guard outlines.length > 100000U else { abort("the embedded fonts changed") }
+  // Where the font's bytes are in the collection: after the header and the
+  // table directories.
+  let directory = (be32(data, 16) - be32(data, 12)).reinterpret_as_int()
+  let body = (12 + 4 * n + n * directory).reinterpret_as_uint()
+  for k in 0..<n {
+    let base = be32(data, 12 + 4 * k).reinterpret_as_int()
+    for record in records(data, base) {
+      if record.tag == "post" {
+        data = patch(
+          data,
+          record.at,
+          outlines.offset + body,
+          outlines.length - k.reinterpret_as_uint(),
+        )
+      }
+    }
+  }
+  let indices = Array::makei(n, k => k.to_string()).join(" ")
+  // All faces are found, and they are what the whole file gives.
+  inspect(
+    scanned("bounded", [("overlapping.ttc", data)]) ==
+    "overlapping.ttc: \{indices}",
+    content="true",
+  )
+  // And what was kept for them is no more than the file.
+  let file = FontFile::open("_build/kit_fonts_test/bounded/overlapping.ttc")
+  defer file.close()
+  let mut found = 0
+  for index in 0U..<file.fonts_in_collection().unwrap_or(0) {
+    if file.probe_face(index) is Some(probe) && file.info(probe) is Some(_) {
+      found += 1
+    }
+  }
+  inspect(found, content="60")
+  inspect(file.retained <= file.size, content="true")
+  // (Not every table was kept: with ranged reads, the second `post` did not
+  // fit any more.)
+  let kept = file.tables.length()
+  inspect(kept == 0 || kept < n, content="true")
+}
+
+///|
 /// A font with other character maps: `cmap` tables that do not parse, and
 /// subtables of formats 4 and 12 that are not what they should be.
 fn cmap_variants(large : Bytes) -> Array[(String, Bytes)] {
