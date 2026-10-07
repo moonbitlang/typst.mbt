@@ -283,17 +283,19 @@ were made while the stage grew:
   again in a process of their own): nothing.
 
 Found on the way, not by a step that differs (neither is about compiling
-again, and neither is fixed here):
+again, and neither was fixed with the stage; the first has been since):
 
-- **A PNG with a damaged header kills the process or is accepted.** The
-  PNG reader does not check the checksums of chunks (`codecs/png_decode.mbt`
-  says so). With one bit of the width flipped (`flip-bit @16` of a 16 by 16
-  image, in the soak) upstream reports `failed to decode image (Format
-  error decoding Png: CRC error: ...)`; the port, depending on the bit,
-  reports another error, aborts in an allocation or in
-  `PngExpander::row`, or compiles the document with the damaged image.
-  Reduction: `tests/recompile/docs/book/data/squares.png` with byte 16
-  xor `0x04` (abort) or `0x80` (accepted), and `#image("p.png")`.
+- **A PNG with a damaged header killed the process or was accepted.** The
+  PNG reader did not check the checksums of chunks. With one bit of the
+  width flipped (`flip-bit @16` of a 16 by 16 image, in the soak) upstream
+  reports `failed to decode image (Format error decoding Png: CRC error:
+  ...)`; the port, depending on the bit, reported another error, aborted
+  in an allocation or in `PngExpander::row`, or compiled the document with
+  the damaged image. Reduction: `tests/recompile/docs/book/data/squares.png`
+  with byte 16 xor `0x04` (abort) or `0x80` (accepted), and
+  `#image("p.png")`. Fixed since: the decoder is a port of the `png`
+  crate's, with an oracle of damaged files (`codecs/png_oracle_test.mbt`;
+  AGENTS.md, "PNG decoding").
 - **Two files, one relative path, two themes.** `raw_theme_derived` and
   `raw_syntaxes_derived` (`library/text_raw.mbt`) are tables of the
   process that are found by the source *as it was written*. Two files in
