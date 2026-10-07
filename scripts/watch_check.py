@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """End-to-end check of `typst watch` (a local check, not a CI stage).
 
+What this script checks is the command line program: that the watcher sees
+a change, what the program prints and what it writes, in a handful of
+scenarios with real file events and the upstream binary. That a compilation
+after an edit gives exactly what a compilation from scratch gives, for
+thousands of seeded edits of many documents, is checked in process by the
+`recompile` stage of the differential runner (tests/recompile/README.md),
+which is a CI stage and tests the engine, not this program.
+
     scripts/watch_check.py [--typst CMD] [--upstream BIN | --no-upstream]
                            [--only NAME] [--bench] [--keep] [-v]
 
