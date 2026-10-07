@@ -94,31 +94,61 @@ pub fn read_file(path : String) -> Bytes raise IoError {
 }
 
 ///|
-/// The file most recently read by `read_range` (files can only be read
-/// whole here).
-let range_cache : Ref[(String, Bytes)?] = { val: None, }
+/// A file that is open for ranged reads: here the whole file, which is all
+/// that the host can read.
+pub struct RangedFile {
+  /// `None` once the file is closed.
+  priv mut data : Bytes?
+}
 
 ///|
-/// Reads up to `len` bytes at `offset` of a file.
-pub fn read_range(
-  path : String,
+/// Whether ranged reads are cheap (otherwise, a `RangedFile` holds the
+/// whole file).
+pub fn supports_ranged_reads() -> Bool {
+  false
+}
+
+///|
+/// Opens a file for ranged reads.
+pub fn RangedFile::open(path : String) -> RangedFile raise IoError {
+  { data: Some(read_file(path)), }
+}
+
+///|
+/// The file's bytes, or the error of the native backend for a closed file.
+fn RangedFile::bytes(self : RangedFile) -> Bytes raise IoError {
+  match self.data {
+    Some(data) => data
+    // EBADF
+    None => raise os_error(9)
+  }
+}
+
+///|
+/// The size of the file in bytes.
+pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
+  self.bytes().length().to_int64()
+}
+
+///|
+/// Reads up to `len` bytes at `offset`: fewer only if the file ends
+/// before.
+pub fn RangedFile::read(
+  self : RangedFile,
   offset : Int64,
   len : Int,
 ) -> Bytes raise IoError {
-  let data = match range_cache.val {
-    Some((p, data)) if p == path => data
-    _ => {
-      let data = read_file(path)
-      range_cache.val = Some((path, data))
-      data
-    }
+  let data = self.bytes()
+  if offset < 0L || len < 0 {
+    // EINVAL
+    raise os_error(22)
   }
   let start = if offset > data.length().to_int64() {
     data.length()
   } else {
     offset.to_int()
   }
-  let end = if start + len > data.length() {
+  let end = if len > data.length() - start {
     data.length()
   } else {
     start + len
@@ -127,20 +157,9 @@ pub fn read_range(
 }
 
 ///|
-/// Whether ranged reads are cheap (otherwise, `read_range` reads the whole
-/// file).
-pub fn supports_ranged_reads() -> Bool {
-  false
-}
-
-///|
-/// The size of a file in bytes.
-pub fn file_size(path : String) -> Int64 raise IoError {
-  read_range(path, 0L, 0) |> ignore
-  match range_cache.val {
-    Some((_, data)) => data.length().to_int64()
-    None => 0L
-  }
+/// Closes the file. Reads fail afterwards.
+pub fn RangedFile::close(self : RangedFile) -> Unit {
+  self.data = None
 }
 
 ///|
@@ -212,6 +231,13 @@ pub fn read_dir(path : String) -> Array[String] raise IoError {
     @fs.IOError(message) => raise fs_error(message, path)
   }
   entries.to_owned()
+}
+
+///|
+/// Lists the entries of a directory (`fs::read_dir`). The host tells no
+/// kinds.
+pub fn read_dir_entries(path : String) -> Array[DirEntry] raise IoError {
+  read_dir(path).map(name => { name, kind: None, })
 }
 
 ///|

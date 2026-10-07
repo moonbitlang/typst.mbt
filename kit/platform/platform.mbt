@@ -76,6 +76,16 @@ pub extend FileKind with Eq::{not_equal, equal}
 pub extend FileKind with @debug.Debug::{to_repr}
 
 ///|
+/// An entry of a directory (`fs::DirEntry`): its name and, if the listing of
+/// the directory told it, its kind (`DirEntry::file_type`, which does not
+/// follow symlinks and asks the system only if the listing did not tell: ask
+/// `lstat_kind` then).
+pub(all) struct DirEntry {
+  name : String
+  kind : FileKind?
+}
+
+///|
 /// The operating system the program runs on.
 pub(all) enum Os {
   Linux

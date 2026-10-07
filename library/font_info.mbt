@@ -1,5 +1,16 @@
 // Port of `typst-library/src/text/font/info.rs` and `exceptions.rs` (the
 // table itself is generated into font_exceptions_gen.mbt).
+//
+// Not upstream, for font discovery, which computes a `FontInfo` for every
+// face of the system (`kit/fontdb.mbt`); what is computed is upstream's,
+// encoding for encoding (`kit/fontdb_wbtest.mbt`):
+// - the coverage is a function of its own, `Coverage::from_ttf`, and
+//   `FontInfo::from_ttf_with_coverage` takes one that is known (the faces
+//   of a collection share `cmap` tables);
+// - it is built from the ranges of a subtable's segments and groups, not
+//   from single codepoints, and a subtable that an earlier encoding record
+//   points to as well is skipped;
+// - `Coverage::union` merges the runs of two coverages as it reads them.
 
 ///|
 /// Properties of a single font.
@@ -136,6 +147,18 @@ pub fn FontInfo::iter(data : Bytes) -> Array[FontInfo] {
 ///|
 /// Compute metadata for a single ttf-parser face.
 pub fn FontInfo::from_ttf(ttf : @otf.Face) -> FontInfo? {
+  FontInfo::from_ttf_with_coverage(ttf, None)
+}
+
+///|
+/// `FontInfo::from_ttf` for a face whose coverage may be known already
+/// (not upstream, whose `from_ttf` is the body of this function: the faces
+/// of a collection often share one `cmap` table, and font discovery
+/// computes its coverage once, with `Coverage::from_ttf`).
+pub fn FontInfo::from_ttf_with_coverage(
+  ttf : @otf.Face,
+  coverage : Coverage?,
+) -> FontInfo? {
   let ps_name = find_name(ttf, @otf.name_id_post_script_name)
   let exception = match ps_name {
     Some(name) => find_exception(name)
@@ -203,26 +226,9 @@ pub fn FontInfo::from_ttf(ttf : @otf.Face) -> FontInfo? {
   }
 
   // Determine the unicode coverage.
-  let mut coverage = Coverage([])
-  if ttf.tables().cmap is Some(cmap) {
-    for subtable in cmap.subtables.iter() {
-      if subtable.is_unicode() {
-        let subtable_coverage = CoverageBuilder::with_capacity(
-          coverage.0.length(),
-        )
-        // Ranges instead of single codepoints (performance; the same
-        // coverage).
-        subtable.codepoint_ranges(
-          // We expect codepoints in CMAP subtables to be already sorted
-          (start, end) => {
-            subtable_coverage.add_codepoint_range(
-              (start, if end == 0xFFFFFFFFU { end } else { end + 1 }),
-            )
-          },
-        )
-        coverage = coverage.union(subtable_coverage.build())
-      }
-    }
+  let coverage = match coverage {
+    Some(coverage) => coverage
+    None => Coverage::from_ttf(ttf)
   }
   let mut flags = FontFlags::empty()
   flags = flags.set(font_flags_monospace, ttf.is_monospaced())
@@ -457,6 +463,58 @@ pub impl Default for Coverage with fn default() {
 pub extend Coverage with Default::{default}
 
 ///|
+/// The unicode coverage of a face (in upstream a part of
+/// `FontInfo::from_ttf`: "Determine the unicode coverage").
+pub fn Coverage::from_ttf(ttf : @otf.Face) -> Coverage {
+  let mut coverage = Coverage([])
+  if ttf.tables().cmap is Some(cmap) {
+    // The offsets of the subtables that are in `coverage`.
+    let seen : Array[UInt] = []
+    let mut index : UInt16 = 0
+    for subtable in cmap.subtables.iter() {
+      let offset = cmap.subtables.offset(index)
+      index += 1
+      if subtable.is_unicode() {
+        // Not upstream: a subtable that an earlier record points to as well
+        // adds nothing. Most fonts have two records for each of their
+        // subtables (one of the Unicode and one of the Windows platform).
+        // The encoding stays the same: what is built from one subtable is
+        // one set, the union of two sets is their union, and a set has one
+        // encoding (its ranges, in order, each as long as it can be).
+        if offset is Some(offset) {
+          if seen.contains(offset) {
+            continue
+          }
+          seen.push(offset)
+        }
+        let subtable_coverage = CoverageBuilder::with_capacity(
+          coverage.0.length(),
+        )
+        // Ranges instead of single codepoints (performance; the same
+        // coverage: a codepoint is added as `c..c.saturating_add(1)`, and
+        // adding those of `start..=end` in order is adding
+        // `start..end.saturating_add(1)`).
+        subtable.codepoint_ranges(
+          // We expect codepoints in CMAP subtables to be already sorted
+          (start, end) => {
+            subtable_coverage.add_codepoint_range(
+              start,
+              if end == 0xFFFFFFFFU {
+                end
+              } else {
+                end + 1
+              },
+            )
+          },
+        )
+        coverage = coverage.union(subtable_coverage.build())
+      }
+    }
+  }
+  coverage
+}
+
+///|
 /// Encode a vector of codepoints.
 pub fn Coverage::from_vec(codepoints : Array[UInt]) -> Coverage {
   let codepoints = codepoints.copy()
@@ -522,33 +580,48 @@ fn Coverage::iter_ranges(self : Coverage) -> Iter[(UInt, UInt)] {
 ///|
 /// Returns an encoding of the set of codepoints covered by either `self` or
 /// `other`.
+///
+/// The ranges of both (`iter_ranges`) are read off the runs as they are
+/// merged, without a list of them: this runs for every subtable of every
+/// face that font discovery finds.
 fn Coverage::union(self : Coverage, other : Coverage) -> Coverage {
-  let capacity = if self.0.length() > other.0.length() {
-    self.0.length()
+  let left = self.0
+  let right = other.0
+  let capacity = if left.length() > right.length() {
+    left.length()
   } else {
-    other.0.length()
+    right.length()
   }
   let builder = CoverageBuilder::with_capacity(capacity)
-  let self_ranges = self.iter_ranges().to_array()
-  let other_ranges = other.iter_ranges().to_array()
+  // The index of the next range's gap and the end of the range before it.
   let mut i = 0
+  let mut left_offset : UInt = 0
   let mut j = 0
-  while i < self_ranges.length() && j < other_ranges.length() {
-    let self_range = self_ranges[i]
-    let other_range = other_ranges[j]
-    if self_range.0 < other_range.0 {
-      builder.add_codepoint_range(self_range)
-      i += 1
+  let mut right_offset : UInt = 0
+  while i + 1 < left.length() && j + 1 < right.length() {
+    let left_start = left_offset + left[i]
+    let right_start = right_offset + right[j]
+    if left_start < right_start {
+      left_offset = left_start + left[i + 1]
+      builder.add_codepoint_range(left_start, left_offset)
+      i += 2
     } else {
-      builder.add_codepoint_range(other_range)
-      j += 1
+      right_offset = right_start + right[j + 1]
+      builder.add_codepoint_range(right_start, right_offset)
+      j += 2
     }
   }
-  for k in i..<self_ranges.length() {
-    builder.add_codepoint_range(self_ranges[k])
+  while i + 1 < left.length() {
+    let start = left_offset + left[i]
+    left_offset = start + left[i + 1]
+    builder.add_codepoint_range(start, left_offset)
+    i += 2
   }
-  for k in j..<other_ranges.length() {
-    builder.add_codepoint_range(other_ranges[k])
+  while j + 1 < right.length() {
+    let start = right_offset + right[j]
+    right_offset = start + right[j + 1]
+    builder.add_codepoint_range(start, right_offset)
+    j += 2
   }
   builder.build()
 }
@@ -591,18 +664,20 @@ fn CoverageBuilder::add_codepoint(
   codepoint : UInt,
 ) -> Unit {
   let end = if codepoint == 0xFFFFFFFFU { codepoint } else { codepoint + 1 }
-  self.add_codepoint_range((codepoint, end))
+  self.add_codepoint_range(codepoint, end)
 }
 
 ///|
 /// Add a continuous range of codepoints to the set being built. Ranges must
 /// be added in non-decreasing order of start codepoint, but may intersect
 /// or be contained in previously added ranges.
+///
+/// (Upstream's `Range<u32>` as its two ends: a tuple is an allocation.)
 fn CoverageBuilder::add_codepoint_range(
   self : CoverageBuilder,
-  range : (UInt, UInt),
+  start : UInt,
+  end : UInt,
 ) -> Unit {
-  let (start, end) = range
   if end <= self.next || start >= end {
     return
   } else if start <= self.next && self.runs.length() > 0 {
