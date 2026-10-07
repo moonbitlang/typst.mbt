@@ -192,6 +192,26 @@ int typst_platform_stat_kind(moonbit_bytes_t path) {
   return 3;
 }
 
+// Whether two paths refer to the same file, i.e. to the same device and
+// inode (the `same-file` crate): 1 or 0, -1 on error, -2 where this is not
+// implemented.
+MOONBIT_FFI_EXPORT
+int typst_platform_same_file(moonbit_bytes_t path1, moonbit_bytes_t path2) {
+  typst_platform_errno = 0;
+#ifdef _WIN32
+  return -2;
+#else
+  struct stat st1;
+  struct stat st2;
+  if (stat((const char *)path1, &st1) != 0 ||
+      stat((const char *)path2, &st2) != 0) {
+    typst_platform_errno = errno != 0 ? errno : EIO;
+    return -1;
+  }
+  return st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino ? 1 : 0;
+#endif
+}
+
 // The size of the file at `path` (following symlinks), or -1 on error.
 MOONBIT_FFI_EXPORT
 int64_t typst_platform_file_size(moonbit_bytes_t path) {

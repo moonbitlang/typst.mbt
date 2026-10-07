@@ -38,6 +38,8 @@ pub fn is_absolute(String) -> Bool
 
 pub fn is_dir(String) -> Bool
 
+pub fn is_same_file(String, String) -> Bool raise IoError
+
 pub fn join(String, String) -> String
 
 pub fn knows_local_time_zone() -> Bool

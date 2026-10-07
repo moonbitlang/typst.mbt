@@ -319,6 +319,15 @@ pub fn knows_local_time_zone() -> Bool {
 }
 
 ///|
+/// Whether two paths refer to the same file (the `same-file` crate's
+/// `is_same_file`). The host does not tell devices and inodes, so the
+/// paths are compared after `canonicalize`: links to one file are told
+/// apart here. An error if one of them does not exist.
+pub fn is_same_file(path1 : String, path2 : String) -> Bool raise IoError {
+  canonicalize(path1) == canonicalize(path2)
+}
+
+///|
 /// The `io::Error` for an OS error number of the host
 /// (`io::Error::from_raw_os_error`). There is no `strerror` here: the
 /// numbers that Linux and macOS share have their text, the others none.

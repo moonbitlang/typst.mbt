@@ -91,3 +91,27 @@ test "monotonic clock" {
   }
   inspect(sum > 0 && @platform.monotonic_nanos() >= start, content="true")
 }
+
+///|
+test "is_same_file" {
+  // The directory of the tests is the module's or the package's.
+  let dir = if @platform.exists("kit/platform") { "kit/platform" } else { "." }
+  let file = @platform.join(dir, "moon.pkg")
+  inspect(@platform.is_same_file(file, file), content="true")
+  inspect(
+    @platform.is_same_file(file, @platform.join(dir, "./moon.pkg")),
+    content="true",
+  )
+  inspect(
+    @platform.is_same_file(file, @platform.join(dir, "platform.mbt")),
+    content="false",
+  )
+  let missing = try
+    @platform.is_same_file(file, @platform.join(dir, "no-such-file"))
+  catch {
+    err => err.kind() == NotFound
+  } noraise {
+    _ => false
+  }
+  inspect(missing, content="true")
+}

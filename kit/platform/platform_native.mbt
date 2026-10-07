@@ -278,6 +278,24 @@ pub fn knows_local_time_zone() -> Bool {
 }
 
 ///|
+#borrow(path1, path2)
+extern "C" fn ffi_same_file(path1 : Bytes, path2 : Bytes) -> Int = "typst_platform_same_file"
+
+///|
+/// Whether two paths refer to the same file: to the same device and inode
+/// (the `same-file` crate's `is_same_file`), so also through symlinks and
+/// hard links. An error if one of them cannot be opened.
+pub fn is_same_file(path1 : String, path2 : String) -> Bool raise IoError {
+  match ffi_same_file(c_path(path1), c_path(path2)) {
+    1 => true
+    0 => false
+    // (Windows: the canonical paths are compared.)
+    -2 => canonicalize(path1) == canonicalize(path2)
+    _ => raise os_error(ffi_last_error())
+  }
+}
+
+///|
 extern "C" fn ffi_monotonic_nanos() -> Int64 = "typst_platform_monotonic_nanos"
 
 ///|
