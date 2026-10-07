@@ -88,8 +88,14 @@ fn Status::color(self : Status) -> @kit.ColorSpec {
 /// milliseconds since the UNIX epoch.
 fn local_time(now_ms : Int64) -> String {
   let secs = floor_div(now_ms, 1000L)
-  let local_secs = secs + @platform.local_offset(secs).to_int64()
-  let of_day = local_secs - floor_div(local_secs, 86400L) * 86400L
+  time_of_day(secs + @platform.local_offset(secs).to_int64())
+}
+
+///|
+/// The time of day of a number of seconds since some midnight, as
+/// `%H:%M:%S`.
+fn time_of_day(secs : Int64) -> String {
+  let of_day = secs - floor_div(secs, 86400L) * 86400L
   let two = (n : Int64) => if n < 10L { "0\{n}" } else { n.to_string() }
   "\{two(of_day / 3600L)}:\{two(of_day % 3600L / 60L)}:\{two(of_day % 60L)}"
 }

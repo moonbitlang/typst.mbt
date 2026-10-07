@@ -47,6 +47,8 @@ import time
 import zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The command of the CLI under test.
+PORT = None
 STATUS = re.compile(
     rb"^\[\d\d:\d\d:\d\d\] (compiled (successfully in .*|with warnings in .*|with errors))$"
 )
@@ -396,6 +398,7 @@ class Runner:
             return
         printed = normalize(last_cycle(session.text(start), self.fullscreen), self.dir)
         status = session.statuses(start)[-1]
+        log(f"[{self.name}]   {status}")
         if expect != "compile" and not status.startswith(expect):
             self.problems.append(f"{name}: expected `{expect}`, got `{status}`")
         produced = None
@@ -561,6 +564,89 @@ def scenario_main(r):
     r.step("the main file, at the end", lambda: p.write_main(words=30))
 
 
+SYNTAX = """%%YAML 1.2
+---
+name: Check
+file_extensions: [chk]
+scope: source.chk
+contexts:
+  main:
+    - match: '\\b%s\\b'
+      scope: keyword.control.chk
+"""
+
+DATA = """#set page(width: 12cm, height: auto, margin: 1cm)
+#set raw(syntaxes: "check.sublime-syntax", theme: "theme.tmTheme")
+#let rows = csv("table.csv")
+#table(columns: 2, ..rows.flatten())
+YAML: #yaml("config.yaml").name, TOML: #toml("config.toml").name,
+XML: #xml("doc.xml").first().children.first().
+#image("figure.pdf", width: 2cm)
+#image("photo.jpg", width: 2cm)
+```chk
+foo bar
+```
+"""
+
+# Files that a scenario needs and that are made with the CLI under test.
+MADE = {}
+
+
+def made_pdf(command, text):
+    """A PDF of a one-line document (the same bytes for every binary)."""
+    if text not in MADE:
+        directory = tempfile.mkdtemp(prefix="watch-made-")
+        try:
+            write(os.path.join(directory, "doc.typ"), text)
+            code, stderr = compile_fresh(
+                command,
+                ["--ignore-system-fonts", "--creation-timestamp", "0"],
+                directory,
+                "doc.typ",
+                "doc.pdf",
+            )
+            if code != 0:
+                raise Failure("could not make a PDF:\n" + stderr.decode(errors="replace"))
+            MADE[text] = open(os.path.join(directory, "doc.pdf"), "rb").read()
+        finally:
+            shutil.rmtree(directory, ignore_errors=True)
+    return MADE[text]
+
+
+def scenario_data(r):
+    """Data files, a PDF and a JPEG image, a syntax definition."""
+    path = lambda name: os.path.join(r.dir, name)
+    page = "#set page(width: 3cm, height: 2cm, fill: %s)\n%s\n"
+    write(path("main.typ"), DATA)
+    write(path("check.sublime-syntax"), SYNTAX % "foo")
+    write(path("theme.tmTheme"), theme("#004488"))
+    write(path("table.csv"), "a,b\n1,2\n")
+    write(path("config.yaml"), "name: first\n")
+    write(path("config.toml"), 'name = "first"\n')
+    write(path("doc.xml"), "<doc>first</doc>\n")
+    write(path("figure.pdf"), made_pdf(PORT, page % ("aqua", "One")))
+    photo = open(os.path.join(ROOT, "bench/glacier.jpg"), "rb").read()
+    write(path("photo.jpg"), photo)
+    r.start(["--ignore-system-fonts"], "out.svg")
+    r.step("initial compilation")
+    r.step("csv", lambda: write(path("table.csv"), "a,b\n1,2\n3,4\n"))
+    r.step("yaml", lambda: replace(path("config.yaml"), "name: second\n"))
+    r.step("toml", lambda: move_away_and_write(path("config.toml"), 'name = "second"\n'))
+    r.step("xml", lambda: write(path("doc.xml"), "<doc>second</doc>\n"))
+    r.step(
+        "image (PDF)",
+        lambda: replace(path("figure.pdf"), made_pdf(PORT, page % ("yellow", "Two"))),
+    )
+    # Another JPEG: the same picture with a comment segment after the SOI
+    # marker would decode alike, so cut the scan short instead.
+    r.step("image (JPEG)", lambda: write(path("photo.jpg"), photo[: len(photo) * 2 // 3] + b"\xff\xd9"))
+    r.step(
+        "syntax definition",
+        lambda: write(path("check.sublime-syntax"), SYNTAX % "bar"),
+    )
+    r.step("the main file", lambda: write(path("main.typ"), DATA + "End.\n"))
+
+
 def scenario_fullscreen(r):
     """The status of the default mode, with colors and screen clearing."""
     write(os.path.join(r.dir, "main.typ"), "= Fullscreen\nText.\n")
@@ -646,6 +732,7 @@ def scenario_html(r):
 
 SCENARIOS = [
     ("main", scenario_main),
+    ("data", scenario_data),
     ("fullscreen", scenario_fullscreen),
     ("missing", scenario_missing),
     ("pages", scenario_pages),
@@ -789,6 +876,8 @@ def main():
     if not os.path.exists(command[0]):
         sys.exit(f"watch_check: {command[0]} does not exist (build the CLI first)")
     binaries = [("port", command)]
+    global PORT
+    PORT = command
     upstream = options.upstream or os.path.join(ROOT, ".repos/typst/target/release/typst")
     if not options.no_upstream:
         if os.path.exists(upstream):
