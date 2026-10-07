@@ -194,8 +194,24 @@ fn Dumper::value(self : Dumper, value : @library.Value) -> String {
 }
 
 ///|
+/// Whether a style is the derived half of a property that upstream stores
+/// as one `Derived<S, D>` value: the port keeps the loaded data in an
+/// internal companion field `<field>-derived` (`scripts/elemgen.py`), set
+/// by the same rule. Upstream's dump has one property for the two.
+fn is_derived_companion(style : @library.Style) -> Bool {
+  guard style is Property(p) else { return false }
+  guard p.elem.fields().get(p.id) is Some(info) else { return false }
+  info.internal && info.name.has_suffix("-derived")
+}
+
+///|
 fn Dumper::styles(self : Dumper, styles : @library.Styles) -> String {
-  styles.iter().map(s => self.style(s)).collect().join(", ")
+  styles
+  .iter()
+  .filter(s => !is_derived_companion(s))
+  .map(s => self.style(s))
+  .collect()
+  .join(", ")
 }
 
 ///|
@@ -242,6 +258,13 @@ fn Dumper::chain(self : Dumper, chain : @library.StyleChain) -> String {
   let links = chain.links()
   links.rev_in_place()
   links
-  .map(link => "{" + link.map(s => self.style(s)).join(", ") + "}")
+  .map(link => {
+    "{" +
+    link
+    .filter(s => !is_derived_companion(s))
+    .map(s => self.style(s))
+    .join(", ") +
+    "}"
+  })
   .join(" ")
 }

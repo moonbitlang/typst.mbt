@@ -66,6 +66,11 @@ Typst source) are unchanged.
 - `doc`: `Size` (the result of `Ctx::measure`) has a third field,
   `baseline`; a pattern that names only `width` and `height` needs `..`.
 
+- `library`: the `pub(all)` enum `DynValue` has two new cases,
+  `RawSyntax(RawSyntax)` and `RawTheme(RawTheme)` (the decoded syntaxes and
+  the theme of a raw element, in its internal fields `syntaxes-derived`
+  and `theme-derived`); a `match` over all cases must handle them.
+
 ### Changed: `Debug` output
 
 These types print with core's `Debug` (`@debug.to_string`, `debug_inspect`,
@@ -149,6 +154,22 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   number in 200). The fix is in `moonbitlang/pdflite` 0.3.8, which the
   module now depends on (it was 0.3.6).
 
+- Raw text whose `theme` or `syntaxes` are paths: the decoded files were
+  looked up by the path as it was written when the text was highlighted,
+  so two files in different directories that both say
+  `#set raw(theme: "theme.tmTheme")` shared the theme of the one that was
+  evaluated last. The decoded theme and syntaxes are now stored with the
+  field, in the element or the set rule (upstream's `Derived`), and
+  syntaxes of nested set rules are folded with their sources.
+
+- PDF export: raster images with the same bytes were taken for one image
+  and embedded once, the first one for all of them: the same bytes read as
+  pixels of another format (`format: (encoding: "luma8", ..)` and
+  `"rgb8"`, or other dimensions), or the same file with another `icc`
+  profile. An image is now identified as upstream identifies it, by its
+  data, format and ICC profile (a JPEG, which is embedded as it is, still
+  by its data).
+
 ### Added
 
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
@@ -174,6 +195,30 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   that is kept by content for the process (decoded `raw` syntaxes and
   themes, bibliographies, CSL styles, PDF documents, plugins and the
   results of their calls), which otherwise only grows when files change.
+- `library`: decoded raster images are kept by content (upstream memoizes
+  `RasterImage::new_impl`): `RasterImage::new` decodes equal data with an
+  equal format and ICC argument once per process and returns the same
+  image, also for a decoding error. An image that is on many pages, or
+  laid out again in a later introspection iteration or in the next
+  compilation of `typst watch`, was decoded every time. An image stays
+  for `max_age` calls of `evict(max_age)` that find it unused and goes
+  with the next (comemo's rule); a process that compiles many documents
+  and never calls `evict` keeps them all.
+  With `set_layout_memo_enabled(false)` nothing is kept. New for caches of
+  this kind: `ContentCache[T]` (`new`, `get`, `insert`, `evict`, `length`;
+  results by a fingerprint, with comemo's ages), `register_evictor(f)`
+  (what `evict` calls with its `max_age`), `data_hash(bytes)` (`hash128`
+  of data, computed once per `Bytes` object), `content_memo_enabled()`,
+  and `HintedString::clone()`.
+- `library`: highlighted raw text is kept by content in the same way
+  (upstream memoizes `Packed<RawElem>::highlight`): a raw element with
+  equal fields, spans and styles is highlighted once per process, not once
+  per introspection iteration and compilation.
+- `pdf`: the image conversion of the exporter is kept by content too
+  (upstream memoizes `convert_raster`): a raster image is converted once
+  per process and `interpolate` flag, not once per place it is drawn at.
+  `library`: `RasterImage::hash128()`, the hash of an image (its data,
+  format and ICC profile; upstream `Hash for RasterImage`).
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
   family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in

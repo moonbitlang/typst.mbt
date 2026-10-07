@@ -973,6 +973,14 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
         }
       }
     }
+    RawSyntax(v) => {
+      state.write_discriminant(11)
+      state.write(v)
+    }
+    RawTheme(v) => {
+      state.write_discriminant(12)
+      state.write(v)
+    }
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)

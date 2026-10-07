@@ -165,12 +165,6 @@ fn convert_hayro_pdf_version(
 }
 
 ///|
-/// A key identifying the raster data of an image.
-fn raster_key(raster : @library.RasterImage) -> String {
-  bytes_key(raster.data())
-}
-
-///|
 /// A key identifying image data.
 fn bytes_key(data : Bytes) -> String {
   // FNV-1a over the data.
@@ -182,19 +176,76 @@ fn bytes_key(data : Bytes) -> String {
 }
 
 ///|
+/// The converted raster images (upstream `#[comemo::memoize]` on
+/// `convert_raster`), see [convert_raster].
+let raster_cache : @library.ContentCache[Result[@export.Image, String]] = @library.ContentCache::new()
+
+///|
 /// Convert a raster image.
+///
+/// Upstream's function is `#[comemo::memoize]`d: the lookup is here, the
+/// function is [convert_raster_impl]. The key is what upstream hashes, the
+/// two arguments: the image (`Hash for RasterImage`: its data, format and
+/// ICC profile, [@library.RasterImage::hash128]) and `interpolate`. Like
+/// comemo it keeps the `Result`. The converted image is immutable and
+/// shared by its occurrences, like krilla's (`Arc<ImageRepr>`); what
+/// belongs to an occurrence (the transform, the tag, the location, the
+/// span of an error) stays in [handle_image].
+///
+/// Kept beyond the export (`library/memo_content.mbt`): an image that is on
+/// many pages, or in the next export of `typst watch`, is converted once.
+/// The exporter still writes it once per document and compresses it for
+/// each (krilla keeps the compressed stream in its image).
 fn convert_raster(
   raster : @library.RasterImage,
   interpolate : Bool,
 ) -> Result[@export.Image, String] {
-  let key = raster_key(raster)
+  if !@library.content_memo_enabled() {
+    return convert_raster_impl(raster, interpolate)
+  }
+  let state = @library.SipHasher128::new()
+  state.write_u128(raster.hash128())
+  state.write_bool(interpolate)
+  let key = state.finish128()
+  match raster_cache.get(key) {
+    Some(result) => result
+    None => {
+      let result = convert_raster_impl(raster, interpolate)
+      raster_cache.insert(key, result)
+      result
+    }
+  }
+}
+
+///|
+/// Upstream `convert_raster`.
+///
+/// The exporter embeds images with one key once, as krilla embeds images
+/// with one hash once (`ImageRepr.sip`). The key is krilla's: for a JPEG,
+/// which is embedded as it is, the data alone (`from_jpeg_with_icc`: the
+/// same file inside an SVG is the same image); for the others the image
+/// (`from_custom`: the hash of the `PdfRasterImage`, which is the raster
+/// image's: the same data in another pixel format or with another profile
+/// is another image).
+fn convert_raster_impl(
+  raster : @library.RasterImage,
+  interpolate : Bool,
+) -> Result[@export.Image, String] {
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
   if raster.format() == Exchange(Jpg) {
     return Ok(
-      convert_jpeg(key, raster.data(), width, height, raster.icc(), interpolate),
+      convert_jpeg(
+        bytes_key(raster.data()),
+        raster.data(),
+        width,
+        height,
+        raster.icc(),
+        interpolate,
+      ),
     )
   }
+  let key = "\{raster.hash128()}"
   let dynamic = raster.dynamic()
   // The ICC profile is only kept for 8-bit images that are used as is.
   convert_samples(
@@ -343,25 +394,61 @@ fn convert_samples(
   if buf.length() < n * channels * bpc {
     return Err("image data is truncated")
   }
-  let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
-  let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
   let color_channels = if has_color { 3 } else { 1 }
-  let sample = (i : Int) => {
+  // Every read below is of `buf[i]` with `i < n * channels * bpc`, which is
+  // at most `buf.length()`; every write is inside its buffer of
+  // `n * color_channels` or `n` bytes.
+  let color_data = if color is (L8 | Rgb8) && buf.length() == n * channels {
+    // Pure luma8 or rgb8 image, can use it directly.
+    buf
+  } else {
+    let out = FixedArray::make(n * color_channels, b'\x00')
     if sixteen {
       // Little-endian 16-bit samples are converted like `to_rgb8`.
-      u16_to_u8(buf[i].to_int() | (buf[i + 1].to_int() << 8))
+      let stride = channels * 2
+      for p in 0..<n {
+        let base = p * stride
+        for c in 0..<color_channels {
+          let i = base + c * 2
+          out.unsafe_set(
+            p * color_channels + c,
+            u16_to_u8(
+              buf.unsafe_get(i).to_int() | (buf.unsafe_get(i + 1).to_int() << 8),
+            ),
+          )
+        }
+      }
     } else {
-      buf[i]
+      for p in 0..<n {
+        let base = p * channels
+        for c in 0..<color_channels {
+          out.unsafe_set(p * color_channels + c, buf.unsafe_get(base + c))
+        }
+      }
     }
+    out.unsafe_reinterpret_as_bytes()
   }
-  for p in 0..<n {
-    let base = p * channels * bpc
-    for c in 0..<color_channels {
-      color_buf[p * color_channels + c] = sample(base + c * bpc)
+  let alpha_data = if has_alpha {
+    let out = FixedArray::make(n, b'\x00')
+    if sixteen {
+      let stride = channels * 2
+      for p in 0..<n {
+        let i = p * stride + (channels - 1) * 2
+        out.unsafe_set(
+          p,
+          u16_to_u8(
+            buf.unsafe_get(i).to_int() | (buf.unsafe_get(i + 1).to_int() << 8),
+          ),
+        )
+      }
+    } else {
+      for p in 0..<n {
+        out.unsafe_set(p, buf.unsafe_get(p * channels + channels - 1))
+      }
     }
-    if has_alpha {
-      alpha_buf[p] = sample(base + (channels - 1) * bpc)
-    }
+    Some(out.unsafe_reinterpret_as_bytes())
+  } else {
+    None
   }
   let icc = if sixteen { None } else { icc }
   Ok({
@@ -373,14 +460,7 @@ fn convert_samples(
     } else {
       Luma
     },
-    data: Samples(
-      Bytes::from_array(color_buf),
-      if has_alpha {
-        Some(Bytes::from_array(alpha_buf))
-      } else {
-        None
-      },
-    ),
+    data: Samples(color_data, alpha_data),
     icc,
     interpolate,
     inverted_cmyk: false,

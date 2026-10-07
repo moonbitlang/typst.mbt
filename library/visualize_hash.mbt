@@ -560,6 +560,41 @@ fn SipHasher128::write_data(self : SipHasher128, data : Bytes) -> Unit {
 }
 
 ///|
+/// Upstream derives `Hash` for `RasterFormat`, `ExchangeFormat` and
+/// `PixelFormat`.
+fn SipHasher128::write_raster_format(
+  self : SipHasher128,
+  format : RasterFormat,
+) -> Unit {
+  match format {
+    Exchange(format) => {
+      self.write_discriminant(0)
+      self.write_discriminant(
+        match format {
+          Png => 0
+          Jpg => 1
+          Gif => 2
+          Webp => 3
+        },
+      )
+    }
+    Pixel(format) => {
+      self.write_discriminant(1)
+      self.write_discriminant(
+        match format.encoding {
+          Rgb8 => 0
+          Rgba8 => 1
+          Luma8 => 2
+          Lumaa8 => 3
+        },
+      )
+      self.write_i64(format.width.0)
+      self.write_i64(format.height.0)
+    }
+  }
+}
+
+///|
 /// Upstream derives `Hash` for `ImageInner` (kind, alt text, scaling) with
 /// the handwritten impls of the kinds: raster images are defined by data,
 /// format and ICC profile, SVGs by data and used fonts (and whether fonts
@@ -570,32 +605,7 @@ pub impl Fingerprint for Image with fn fingerprint(self, state) {
     Raster(raster) => {
       state.write_discriminant(0)
       state.write_data(raster.data)
-      match raster.format {
-        Exchange(format) => {
-          state.write_discriminant(0)
-          state.write_discriminant(
-            match format {
-              Png => 0
-              Jpg => 1
-              Gif => 2
-              Webp => 3
-            },
-          )
-        }
-        Pixel(format) => {
-          state.write_discriminant(1)
-          state.write_discriminant(
-            match format.encoding {
-              Rgb8 => 0
-              Rgba8 => 1
-              Luma8 => 2
-              Lumaa8 => 3
-            },
-          )
-          state.write_i64(format.width.0)
-          state.write_i64(format.height.0)
-        }
-      }
+      state.write_raster_format(raster.format)
       match raster.icc {
         None => state.write_discriminant(0)
         Some(icc) => {

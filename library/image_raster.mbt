@@ -39,15 +39,21 @@ pub struct RasterImage {
   priv exif_rotation : UInt?
   priv icc : Bytes?
   priv dpi : Double?
+  /// [RasterImage::hash128], once it was asked for.
+  priv mut hash : U128?
 }
 
 ///|
 /// The image is fully defined by data, format, and ICC profile (upstream
 /// `Hash for RasterImageInner`).
 pub impl Eq for RasterImage with fn equal(self, other) {
-  self.data == other.data &&
-  self.format == other.format &&
-  self.icc == other.icc
+  // One image is one object while it is kept ([RasterImage::new]).
+  physical_equal(self, other) ||
+  (
+    self.data == other.data &&
+    self.format == other.format &&
+    self.icc == other.icc
+  )
 }
 
 ///|
@@ -69,7 +75,63 @@ pub extend RasterImage with Hash::{hash, hash_combine}
 
 ///|
 /// Decode a raster image.
+///
+/// Upstream's `new` calls `new_impl`, which is `#[comemo::memoize]`d: the
+/// lookup is here. The key is what upstream hashes, the three arguments:
+/// the data (as the hash of the `Bytes`, [data_hash]), the format and the
+/// ICC profile that was passed (`Smart<Bytes>`: `auto`, or the hash of the
+/// given profile; not the profile that decoding finds in the file). Like
+/// comemo it keeps the `Result`: a broken image is decoded once, and every
+/// use reports the same error. The image is immutable and shared by all
+/// its users, like upstream's (`Arc<RasterImageInner>`).
+///
+/// Kept beyond the compilation (`memo_content.mbt`): an image that is laid
+/// out on every page, or again in the next introspection iteration or the
+/// next compilation of `typst watch`, is decoded once.
 pub fn RasterImage::new(
+  data : Bytes,
+  format : RasterFormat,
+  icc : Smart[Bytes],
+) -> RasterImage raise HintedError {
+  if !content_memo_enabled() {
+    return RasterImage::new_impl(data, format, icc)
+  }
+  let state = SipHasher128::new()
+  state.write_u128(data_hash(data))
+  state.write_raster_format(format)
+  match icc {
+    Auto => state.write_discriminant(0)
+    Custom(icc) => {
+      state.write_discriminant(1)
+      state.write_u128(data_hash(icc))
+    }
+  }
+  let key = state.finish128()
+  match raster_image_cache.get(key) {
+    Some(Ok(image)) => image
+    Some(Err(error)) => raise HintedError(error.clone())
+    None => {
+      let image = RasterImage::new_impl(data, format, icc) catch {
+        HintedError(error) => {
+          raster_image_cache.insert(key, Err(error.clone()))
+          raise HintedError(error)
+        }
+      }
+      raster_image_cache.insert(key, Ok(image))
+      image
+    }
+  }
+}
+
+///|
+/// The decoded raster images (upstream `#[comemo::memoize]` on
+/// `RasterImage::new_impl`), see [RasterImage::new]. An error is copied for
+/// whoever gets it (its hints are a mutable array).
+let raster_image_cache : ContentCache[Result[RasterImage, HintedString]] = ContentCache::new()
+
+///|
+/// The internal, non-generic implementation.
+fn RasterImage::new_impl(
   data : Bytes,
   format : RasterFormat,
   icc : Smart[Bytes],
@@ -123,6 +185,7 @@ pub fn RasterImage::new(
         exif_rotation: exif_rot,
         icc,
         dpi,
+        hash: None,
       }
     }
     Pixel(format) => {
@@ -158,6 +221,7 @@ pub fn RasterImage::new(
         exif_rotation: None,
         icc: icc.custom(),
         dpi: None,
+        hash: None,
       }
     }
   }
@@ -229,6 +293,34 @@ pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage {
 /// Access the ICC profile, if any.
 pub fn RasterImage::icc(self : RasterImage) -> Bytes? {
   self.icc
+}
+
+///|
+/// `hash128` of the image (upstream `Hash for RasterImageInner`: "the image
+/// is fully defined by data, format, and ICC profile"; the profile is the
+/// one the image has, passed or found in the file): what a memoized
+/// function of an image is keyed by (typst-pdf's `convert_raster`). Cheap,
+/// like upstream's: the data is hashed once per object ([data_hash]), the
+/// result is kept in the image.
+pub fn RasterImage::hash128(self : RasterImage) -> U128 {
+  match self.hash {
+    Some(hash) => hash
+    None => {
+      let state = SipHasher128::new()
+      state.write_u128(data_hash(self.data))
+      state.write_raster_format(self.format)
+      match self.icc {
+        None => state.write_discriminant(0)
+        Some(icc) => {
+          state.write_discriminant(1)
+          state.write_u128(data_hash(icc))
+        }
+      }
+      let hash = state.finish128()
+      self.hash = Some(hash)
+      hash
+    }
+  }
 }
 
 ///|

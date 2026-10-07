@@ -118,6 +118,8 @@ pub fn[T] with_layout_memo(
   memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
   if compilation_depth.val == 0 {
     compilation_counter.val += 1
+    // The world may have other files now than in the compilation before.
+    sweep_data_hashes()
   }
   compilation_depth.val += 1
   let result = {
@@ -172,16 +174,28 @@ let evictions : Ref[Int] = { val: 0, }
 /// files change would keep every version of them. They have no age, so
 /// they are dropped as a whole on every `max_age`-th call instead (decoding
 /// them again is all it costs). Must not be called during a compilation.
+///
+/// The results kept by content (`memo_content.mbt`: decoded raster images,
+/// highlighted raw text, the PDF exporter's images) have ages like
+/// comemo's: each call makes them older by one and drops those that were
+/// not found for more than `max_age` calls. The hashes of data that are
+/// kept by the identity of the `Bytes` are swept ([sweep_data_hashes]).
 pub fn evict(max_age : Int) -> Unit {
+  for evictor in evictors {
+    evictor(max_age)
+  }
+  if max_age == 0 {
+    data_hashes.clear()
+  } else {
+    sweep_data_hashes()
+  }
   evictions.val += 1
   if evictions.val < max_age {
     return
   }
   evictions.val = 0
   raw_syntax_cache.clear()
-  raw_syntaxes_derived.clear()
   raw_theme_cache.clear()
-  raw_theme_derived.clear()
   bibliography_cache.clear()
   csl_style_cache.clear()
   works_cache.val = None

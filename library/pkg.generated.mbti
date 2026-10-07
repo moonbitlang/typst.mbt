@@ -748,6 +748,8 @@ pub fn compilation_epoch() -> Int
 
 pub fn contains(BindingGuard, Value, Value) -> Bool?
 
+pub fn content_memo_enabled() -> Bool
+
 pub fn context_elem() -> Element
 
 pub let context_elem_func : Int
@@ -823,6 +825,8 @@ pub let curve_quad_elem_control : Int
 pub let curve_quad_elem_end : Int
 
 pub let curve_quad_elem_relative : Int
+
+pub fn data_hash(Bytes) -> U128
 
 pub let decimal_one : Decimal
 
@@ -2519,6 +2523,8 @@ pub let ref_elem_supplement : Int
 pub let ref_elem_target : Int
 
 pub fn regex_escape(String) -> String
+
+pub fn register_evictor((Int) -> Unit) -> Unit
 
 pub fn rem_euclid(Double, Double) -> Double
 
@@ -4781,6 +4787,15 @@ pub impl FromValue for Content
 pub impl IntoValue for Content
 pub impl Reflect for Content
 
+pub struct ContentCache[T] {
+  // private fields
+}
+pub fn[T] ContentCache::evict(Self[T], Int) -> Unit
+pub fn[T] ContentCache::get(Self[T], U128) -> T?
+pub fn[T] ContentCache::insert(Self[T], U128, T) -> Unit
+pub fn[T] ContentCache::length(Self[T]) -> Int
+pub fn[T] ContentCache::new() -> Self[T]
+
 pub struct Context {
   // private fields
 }
@@ -5588,6 +5603,8 @@ pub(all) enum DynValue {
   Decoration(Decoration)
   Loaded(Loaded)
   RawContent(RawContent)
+  RawSyntax(RawSyntax)
+  RawTheme(RawTheme)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -7190,6 +7207,7 @@ pub(all) struct HintedString {
   message : String
   hints : Array[String]
 } derive(Eq, Hash, @debug.Debug)
+pub fn HintedString::clone(Self) -> Self
 pub fn HintedString::hint(Self, String) -> Unit
 pub fn HintedString::into_error_at(Self, @moonbitlang/typst/syntax.Span) -> SourceDiagnostic
 pub fn HintedString::into_warning_at(Self, @moonbitlang/typst/syntax.Span) -> SourceDiagnostic
@@ -9806,6 +9824,7 @@ pub fn RasterImage::dpi(Self) -> Double?
 pub fn RasterImage::dynamic(Self) -> DynamicImage
 pub fn RasterImage::exif_rotation(Self) -> UInt?
 pub fn RasterImage::format(Self) -> RasterFormat
+pub fn RasterImage::hash128(Self) -> U128
 pub fn RasterImage::height(Self) -> UInt
 pub fn RasterImage::icc(Self) -> Bytes?
 pub fn RasterImage::new(Bytes, RasterFormat, Smart[Bytes]) -> Self raise HintedError

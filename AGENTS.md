@@ -458,6 +458,69 @@
   pure functions of their arguments plus the tracked engine parts whose
   results cannot contain values created during the call that compare by
   identity (the state sequence is not memoized).
+- Results kept by content (`library/memo_content.mbt`; slice 0 of
+  `docs/incremental-design.md`): functions that upstream memoizes without
+  a tracked argument, pure in what their arguments hash to, are kept for
+  the process, not for a compilation: decoding a raster image
+  (`RasterImage::new`, upstream `new_impl`; a deck with 28 screenshots
+  decoded each of them for every layout of every introspection iteration:
+  5.5 s, 1.4 GB; now once: 1.8 s, 0.3 GB) and highlighting raw text
+  (`RawElem::highlight`: the element, the style chain, compared exactly
+  like the arguments of `memoize`, and the identity of the routines table,
+  which upstream hashes to nothing because a program has one;
+  `bench/showcase.typ` recompiles in 62 ms instead of 79 ms). Highlighting
+  is only a function of its arguments because the decoded syntaxes and
+  the theme of a raw element are in its companion fields
+  `syntaxes-derived` and `theme-derived` (upstream's `Derived`: the
+  parsers of the fields put them there, `raw_elem_syntaxes_derived_fold`
+  folds them like the sources, `DynValue::RawSyntax`/`RawTheme` hash and
+  compare as the hash of their bytes): never look derived data up by its
+  source, a path means another file in another directory and after an
+  edit. Source and derived data are two fields here and one value
+  upstream, and a typed view can set the source alone (`with_theme`): a
+  companion holds its source with the data (`raw_derived_pair`) and is
+  only taken for that source. A result that had to ask the world (an
+  element without the companion of its source) is not kept. The realize
+  dump of the runner leaves the companions out (upstream has one property
+  for the two). The third is the PDF exporter's image
+  conversion (`pdf/image.mbt` `convert_raster`: the image, as
+  `RasterImage::hash128()`, upstream's `Hash for RasterImage`, and
+  `interpolate`). Rules for such a cache: the
+  key is exactly what upstream hashes (read the Rust signature and the
+  `Hash` impls: `RasterImage::new` hashes the data, the format and the
+  ICC profile that was passed, not the one found in the file), and the
+  comment at the lookup says where it differs and why; the hash of large
+  data is `data_hash(bytes)`, computed once per `Bytes` object (upstream's
+  `LazyHash` inside `Bytes`; kept by the object's identity, which keeps
+  the object, so the table is swept when a compilation starts and by
+  every `evict`, and an entry goes with the third sweep after it was
+  asked for: a world reads its files again after a reset, and an export
+  copies the bitmap of a glyph; `Bytes` are immutable, never hash the view
+  of a buffer that is still written to); entries have comemo's ages
+  (`ContentCache`: `evict(max_age)` makes every entry older by one and
+  drops those above `max_age`, so an entry survives `max_age` calls
+  without a hit and goes with the next; a hit makes it young; a cache of
+  another
+  package reaches `evict` through `register_evictor`), where the decode
+  caches of `evict`'s own list are dropped as a whole on every
+  `max_age`-th call; a result is immutable or copied for every caller;
+  an error is kept if upstream's function returns a `Result` (comemo
+  keeps it), and copied on the way out (`HintedString::clone`: hints are a
+  mutable array); and the cache obeys `set_layout_memo_enabled`, in a
+  compilation and outside of one (`content_memo_enabled()`), so that the
+  runner's comparison of memoization on and off covers it. Tests
+  (`library/memo_content_wbtest.mbt`, `library/text_raw_memo_wbtest.mbt`,
+  `typst/content_memo_wbtest.mbt`, `pdf/image_wbtest.mbt`,
+  `doc/pdf_images_test.mbt`):
+  one input per argument of the key that differs in nothing else, the
+  same bytes in two objects, a broken input used twice, a file that
+  changes behind its path between two compilations of one world, `evict`.
+  They cost memory, not time: decoded pixels (4 bytes per pixel of an
+  RGBA image) and, for an image with an alpha channel or 16-bit samples,
+  the exporter's converted samples (as much again) stay until `max_age`
+  compilations did not use them, and a process that never calls `evict`
+  keeps every image it ever decoded. A watch session whose images are
+  rewritten on every save holds up to `max_age` + 1 versions of them.
 - Performance: non-intrinsic core functions (`Byte::to_uint`,
   `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
   `Double::floor`/`to_int`, ...) are compiled into the core bundle and are
@@ -659,7 +722,21 @@
   (upstream frames from the `paged` goldens), and `pdf-extract-check` /
   `pdftags-check` (our readers on upstream's PDFs, saved by the oracle with
   `ORACLE_SAVE_PDF=<dir>`; pass `--upstream-pdfs=<dir>`). Upstream PDF byte
-  hashes are not a goal.
+  hashes are not a goal. An exporter image (`@export.Image`) is embedded
+  once per `key` and `interpolate`; the key is krilla's identity of an
+  image (`ImageRepr.sip`): the hash of the raster image (data, format, ICC
+  profile) for converted samples, the data alone for a JPEG, which is
+  embedded as it is (the same file inside an SVG is the same image). Not
+  the data alone for both: the same bytes are other pixels in another
+  pixel format. (krilla does not have `interpolate` in the identity of a
+  JPEG, so upstream embeds a JPEG that is used smooth and pixelated once,
+  with the flag of the first use; pdflite embeds it twice.) The PNG of a
+  bitmap glyph is identified by its data like a PNG inside an SVG
+  (krilla's `Image::from_png` for both; `decode_png_image`). The export of
+  a document with images is the compression of their samples in pdflite
+  (the deck of `memo_content.mbt`'s numbers: 515 of 550 ms, as much as
+  upstream's with `--jobs 1`), again in every export: krilla keeps the
+  compressed stream in its image, pdflite's image does not.
 - PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
   `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts

@@ -4,8 +4,10 @@
 // `theme` fields.
 //
 // `Derived<S, D>` fields store only their source value `S` (see
-// `scripts/typemap.py`); the derived syntaxes/themes are recorded when the
-// field is parsed and looked up by their source when highlighting.
+// `scripts/typemap.py`); the derived syntaxes and theme are in the companion
+// fields `syntaxes-derived` and `theme-derived`, each with the source it
+// was loaded from (`raw_derived_pair`), where the parsers of the fields put
+// them, in the element or in the styles like the fields themselves.
 
 ///|
 /// The content of the raw text.
@@ -200,14 +202,95 @@ fn raw_elem_synthesize(
 }
 
 ///|
-/// Highlights the raw text into lines (upstream `Packed<RawElem>::highlight`).
+/// A highlighted raw element: the arguments of [RawElem::highlight] and its
+/// result.
+priv struct RawHighlight {
+  elem : Content
+  styles : StyleChain
+  routines : Routines
+  lines : Array[RawLine]
+}
+
+///|
+/// The highlighted lines of raw elements (upstream `#[comemo::memoize]` on
+/// `Packed<RawElem>::highlight`), see [RawElem::highlight]: per key the
+/// results for arguments that differ in what the key does not tell apart.
+let raw_highlight_cache : ContentCache[Array[RawHighlight]] = ContentCache::new()
+
+///|
+/// Highlights the raw text into lines (upstream `Packed<RawElem>::highlight`,
+/// which is `#[comemo::memoize]`d: the lookup is here, the function is
+/// [RawElem::highlight_impl]).
+///
+/// The key is what upstream hashes: the element (`Hash for Packed<RawElem>`:
+/// its fields, with the lines of the text and their spans, the syntaxes and
+/// the theme with their decoded data, and its span, label, location and
+/// lifecycle) and the style chain. Like the memoized calls of `memo.mbt` a
+/// result is only reused for equal arguments, since a fingerprint does not
+/// identify a host closure in the styles. Upstream's third argument, the
+/// routines, hashes to nothing (`impl Hash for Routines`: a program has one
+/// table); here a host can build another table with another
+/// `html_span_filled`, which highlighting for HTML calls, so a result
+/// belongs to the table it was made with.
+///
+/// Kept beyond the compilation (`memo_content.mbt`): a function of the
+/// element and the styles alone, since the decoded syntaxes and the theme
+/// are in them ([RawElem::derived_syntaxes], [RawElem::derived_theme]) and
+/// the world is not asked. If it had to be asked (an element whose derived
+/// data is missing), the result is not kept.
 fn RawElem::highlight(
   self : RawElem,
   engine : Engine,
   styles : StyleChain,
 ) -> Array[RawLine] {
-  let elem = self
   let routines = engine.routines()
+  if !content_memo_enabled() {
+    return self.highlight_impl(engine, routines, styles, Ref(false))
+  }
+  let key = memo_fingerprint(state => {
+    state.write(self.0)
+    state.write_u128(styles.memo_hash())
+  })
+  let found = raw_highlight_cache.get(key)
+  if found is Some(entries) {
+    for entry in entries {
+      if physical_equal(entry.routines, routines) &&
+        content_memo_equal(entry.elem, self.0) &&
+        chain_memo_equal(entry.styles, styles) {
+        // The lines are immutable content; the array is the caller's.
+        return entry.lines.copy()
+      }
+    }
+  }
+  let read_world = Ref(false)
+  let lines = self.highlight_impl(engine, routines, styles, read_world)
+  if !read_world.val {
+    let entry = { elem: self.0, styles, routines, lines: lines.copy(), }
+    match found {
+      Some(entries) => {
+        if entries.length() >= memo_max_entries {
+          entries.remove(0) |> ignore
+        }
+        entries.push(entry)
+      }
+      None => raw_highlight_cache.insert(key, [entry])
+    }
+  }
+  lines
+}
+
+///|
+/// Upstream `Packed<RawElem>::highlight`. `read_world` is set if derived
+/// data had to be loaded from the world (not upstream, where it is always
+/// in the element or the styles).
+fn RawElem::highlight_impl(
+  self : RawElem,
+  engine : Engine,
+  routines : Routines,
+  styles : StyleChain,
+  read_world : Ref[Bool],
+) -> Array[RawLine] {
+  let elem = self
   let lines = raw_preprocess(elem.text(), styles, elem.0.span())
   let count = lines.length().to_int64()
   let lang = match elem.lang(styles) {
@@ -233,7 +316,7 @@ fn RawElem::highlight(
   let theme : @syntect.Theme = match elem.theme(styles) {
     Auto => raw_theme()
     Custom(Some(source)) =>
-      match RawTheme::derived(engine, source, elem.0.span()) {
+      match elem.derived_theme(engine, styles, source, read_world) {
         Some(theme) => theme.get()
         None => return non_highlighted_result(lines)
       }
@@ -299,7 +382,8 @@ fn RawElem::highlight(
       },
     ).highlight()
   } else if lang is Some(token) &&
-    RawSyntax::find(engine, elem, styles, token) is Some((syntax_set, syntax)) {
+    elem.find_syntax(engine, styles, token, read_world)
+    is Some((syntax_set, syntax)) {
     let highlighter = @syntect.HighlightLines::new(syntax, theme)
     for i, entry in lines {
       let (line, line_span) = entry
@@ -419,7 +503,9 @@ fn raw_theme_item(
 let raw_theme_cell : Ref[@syntect.Theme?] = Ref(None)
 
 ///|
-/// The default theme (upstream `RAW_THEME`).
+/// The default theme (upstream `RAW_THEME`, a static). It is one object for
+/// the process and must not be changed: highlighted text is kept
+/// ([RawElem::highlight]) as a function of the element and the styles.
 pub fn raw_theme() -> @syntect.Theme {
   match raw_theme_cell.val {
     Some(theme) => return theme
@@ -484,7 +570,8 @@ pub fn raw_theme() -> @syntect.Theme {
 }
 
 ///|
-/// The built-in syntaxes (upstream `RAW_SYNTAXES`).
+/// The built-in syntaxes (upstream `RAW_SYNTAXES`, a static). Like
+/// [raw_theme] they must not be changed.
 pub fn raw_syntaxes() -> @syntect.SyntaxSet {
   @two_face.extra_no_newlines()
 }
@@ -493,6 +580,21 @@ pub fn raw_syntaxes() -> @syntect.SyntaxSet {
 /// A loaded syntax.
 pub struct RawSyntax {
   priv set : @syntect.SyntaxSet
+  /// `hash128` of the bytes it was decoded from: what a syntax hashes and
+  /// compares as (upstream `ManuallyHash<SyntaxSet>`).
+  priv hash : U128
+}
+
+///|
+/// Upstream `PartialEq for ManuallyHash`: the hashes.
+impl Eq for RawSyntax with fn equal(self, other) {
+  self.hash == other.hash
+}
+
+///|
+/// Upstream `Hash for ManuallyHash`: the hash.
+impl Fingerprint for RawSyntax with fn fingerprint(self, state) {
+  state.write_u128(self.hash)
 }
 
 ///|
@@ -501,49 +603,15 @@ pub struct RawSyntax {
 let raw_syntax_cache : Array[(Bytes, RawSyntax)] = []
 
 ///|
-/// Records the derived data of a source, replacing an earlier entry for an
-/// equal source (the most recently parsed one wins when a relative path is
-/// used from different files).
-fn[S : Eq, D] record_derived(
-  table : Array[(S, D)],
-  source : S,
-  derived : D,
-) -> Unit {
-  for i, entry in table {
-    if entry.0 == source {
-      table.remove(i) |> ignore
-      break
-    }
-  }
-  table.push((source, derived))
-}
-
-///|
-/// Looks up the derived data of a source.
-fn[S : Eq, D] lookup_derived(table : Array[(S, D)], source : S) -> D? {
-  for entry in table {
-    if entry.0 == source {
-      return Some(entry.1)
-    }
-  }
-  None
-}
-
-///|
-/// The derived syntaxes of data sources, recorded when the `syntaxes` field
-/// is parsed (upstream stores them in the field as a `Derived`).
-let raw_syntaxes_derived : Array[(Array[DataSource], Array[RawSyntax])] = []
-
-///|
-/// Load syntaxes from data sources (upstream returns a `Derived`).
+/// Load syntaxes from data sources (upstream returns a `Derived`: the
+/// sources are the field's value, the list goes into its companion field
+/// `syntaxes-derived`, see [raw_elem_syntaxes_parse]).
 fn RawSyntax::load(
   world : &World,
   sources : @syntax.Spanned[OneOrMultiple[DataSource]],
 ) -> Array[RawSyntax] raise SourceError {
   let loaded = load_many({ v: sources.v.0, span: sources.span, }, world)
-  let list = loaded.map(data => within(data, () => RawSyntax::decode(data.data)))
-  record_derived(raw_syntaxes_derived, sources.v.0, list)
-  list
+  loaded.map(data => within(data, () => RawSyntax::decode(data.data)))
 }
 
 ///|
@@ -559,7 +627,7 @@ fn RawSyntax::decode(bytes : Bytes) -> RawSyntax raise LoadErr {
   }
   let builder = @syntect.SyntaxSetBuilder::new()
   builder.add(syntax)
-  let syntax = { set: builder.build(), }
+  let syntax = { set: builder.build(), hash: data_hash(bytes), }
   raw_syntax_cache.push((bytes, syntax))
   syntax
 }
@@ -570,29 +638,125 @@ fn RawSyntax::get(self : RawSyntax) -> @syntect.SyntaxSet {
 }
 
 ///|
-/// Finds the syntax for a language token, preferring user-provided syntaxes
-/// over built-in ones.
-fn RawSyntax::find(
-  engine : Engine,
-  elem : RawElem,
-  styles : StyleChain,
-  token : String,
-) -> (@syntect.SyntaxSet, @syntect.SyntaxReference)? {
-  let sources = elem.syntaxes(styles).0
-  let derived = if sources.is_empty() {
-    []
+/// What was loaded from a source, with the source: the stored form of the
+/// derived half of a `Derived<DataSource, D>`.
+///
+/// Upstream has source and derived data in one value. Here they are two
+/// fields that the field's parser sets together, and the typed views can
+/// set the source alone (`with_theme`, `set_syntaxes`): the pair says which
+/// source its data is of, so that data is never taken for another source's
+/// ([raw_derived_of]).
+fn raw_derived_pair(source : DataSource, derived : DynValue) -> Value {
+  Array(Arr::from_array([source.into_value(), Dyn(derived)]))
+}
+
+///|
+/// The derived data of a pair, if the pair is of this source.
+fn raw_derived_of(pair : Value, source : DataSource) -> DynValue? {
+  guard pair is Array(pair) && pair.items is [stored, Dyn(derived)] else {
+    return None
+  }
+  if stored == source.into_value() {
+    Some(derived)
   } else {
-    match lookup_derived(raw_syntaxes_derived, sources) {
-      Some(derived) => derived
-      None =>
-        RawSyntax::load(engine.world, {
-          v: OneOrMultiple(sources),
-          span: elem.0.span(),
-        }) catch {
-          _ => []
-        }
+    None
+  }
+}
+
+///|
+/// The stored form of the syntaxes of data sources (the companion field
+/// `syntaxes-derived`; upstream `Derived::derived`, a `Vec<RawSyntax>`): a
+/// pair per source.
+fn raw_syntaxes_value(
+  sources : Array[DataSource],
+  list : Array[RawSyntax],
+) -> Value {
+  Array(
+    Arr::from_array(
+      list.mapi((i, syntax) => raw_derived_pair(sources[i], RawSyntax(syntax))),
+    ),
+  )
+}
+
+///|
+/// The stored form of the theme of a data source (the companion field
+/// `theme-derived`; upstream `Derived::derived`).
+fn raw_theme_value(source : DataSource, theme : RawTheme) -> Value {
+  raw_derived_pair(source, RawTheme(theme))
+}
+
+///|
+/// `#[fold]` of the derived part of `RawElem::syntaxes` (upstream `Fold for
+/// Derived<S, D>` folds the source and the derived data alike, and `Fold
+/// for Vec<T>` puts the outer items first), so that the folded syntaxes are
+/// those of the folded sources.
+fn raw_elem_syntaxes_derived_fold(inner : Value, outer : Value) -> Value {
+  match (inner, outer) {
+    (Array(inner), Array(outer)) => {
+      let items = outer.items.copy()
+      items.append(inner.items)
+      Array(Arr::from_array(items))
+    }
+    _ => inner
+  }
+}
+
+///|
+/// The syntaxes of the element's sources (upstream `elem.syntaxes
+/// .get_cloned(styles).derived`): what the parser of the field loaded, from
+/// the element or the styles.
+///
+/// Not upstream: if that is not there for every source, in order (a field
+/// that was set without its parser), the sources are loaded from the world,
+/// and `read_world` is set.
+fn RawElem::derived_syntaxes(
+  self : RawElem,
+  engine : Engine,
+  styles : StyleChain,
+  read_world : Ref[Bool],
+) -> Array[RawSyntax] {
+  let sources = self.syntaxes(styles).0
+  if sources.is_empty() {
+    return []
+  }
+  let e = raw_elem()
+  let stored = styles.get_value_with_local(
+    e,
+    e.fields()[raw_elem_syntaxes_derived],
+    self.0.field_raw(raw_elem_syntaxes_derived),
+  )
+  if stored is Array(stored) && stored.items.length() == sources.length() {
+    let derived = []
+    for i, item in stored.items {
+      guard raw_derived_of(item, sources[i]) is Some(RawSyntax(syntax)) else {
+        break
+      }
+      derived.push(syntax)
+    }
+    if derived.length() == sources.length() {
+      return derived
     }
   }
+  read_world.val = true
+  RawSyntax::load(engine.world, {
+    v: OneOrMultiple(sources),
+    span: self.0.span(),
+  }) catch {
+    _ => []
+  }
+}
+
+///|
+/// Finds the syntax for a language token, preferring user-provided syntaxes
+/// over built-in ones.
+fn RawElem::find_syntax(
+  self : RawElem,
+  engine : Engine,
+  styles : StyleChain,
+  token : String,
+  read_world : Ref[Bool],
+) -> (@syntect.SyntaxSet, @syntect.SyntaxReference)? {
+  let derived = self.derived_syntaxes(engine, styles, read_world)
   let sets = derived.map(syntax => syntax.get())
   sets.push(raw_syntaxes())
   for set in sets {
@@ -628,6 +792,21 @@ fn syntax_error_pos(error : @syntect.ParseSyntaxError) -> ReportTextPos {
 /// A loaded theme.
 pub struct RawTheme {
   priv theme : @syntect.Theme
+  /// `hash128` of the bytes it was decoded from: what a theme hashes and
+  /// compares as (upstream `ManuallyHash<synt::Theme>`).
+  priv hash : U128
+}
+
+///|
+/// Upstream `PartialEq for ManuallyHash`: the hashes.
+impl Eq for RawTheme with fn equal(self, other) {
+  self.hash == other.hash
+}
+
+///|
+/// Upstream `Hash for ManuallyHash`: the hash.
+impl Fingerprint for RawTheme with fn fingerprint(self, state) {
+  state.write_u128(self.hash)
 }
 
 ///|
@@ -636,19 +815,15 @@ pub struct RawTheme {
 let raw_theme_cache : Array[(Bytes, RawTheme)] = []
 
 ///|
-/// The derived themes of data sources, recorded when the `theme` field is
-/// parsed (upstream stores them in the field as a `Derived`).
-let raw_theme_derived : Array[(DataSource, RawTheme)] = []
-
-///|
+/// Load a theme from a data source (upstream returns a `Derived`: the
+/// source is the field's value, the theme goes into its companion field
+/// `theme-derived`, see [raw_elem_theme_parse]).
 fn RawTheme::load(
   world : &World,
   source : @syntax.Spanned[DataSource],
 ) -> RawTheme raise SourceError {
   let loaded = source.v.load(source.span, world)
-  let theme = within(loaded, () => RawTheme::decode(loaded.data))
-  record_derived(raw_theme_derived, source.v, theme)
-  theme
+  within(loaded, () => RawTheme::decode(loaded.data))
 }
 
 ///|
@@ -661,26 +836,39 @@ fn RawTheme::decode(bytes : Bytes) -> RawTheme raise LoadErr {
   let theme = @syntect.ThemeSet::load_from_reader(bytes) catch {
     e => raise LoadErr(format_theme_error(e))
   }
-  let theme = { theme, }
+  let theme = { theme, hash: data_hash(bytes), }
   raw_theme_cache.push((bytes, theme))
   theme
 }
 
 ///|
-/// The theme of a data source (upstream `theme.derived`).
-fn RawTheme::derived(
+/// The theme of the element's data source (upstream `theme.derived`): what
+/// the parser of the field loaded, from the element or the styles.
+///
+/// Not upstream: if that is not there for this source (a field that was
+/// set without its parser), the source is loaded from the world, and
+/// `read_world` is set.
+fn RawElem::derived_theme(
+  self : RawElem,
   engine : Engine,
+  styles : StyleChain,
   source : DataSource,
-  span : @syntax.Span,
+  read_world : Ref[Bool],
 ) -> RawTheme? {
-  match lookup_derived(raw_theme_derived, source) {
-    Some(theme) => Some(theme)
-    None =>
-      try RawTheme::load(engine.world, { v: source, span, }) catch {
-        _ => None
-      } noraise {
-        theme => Some(theme)
-      }
+  let e = raw_elem()
+  let stored = styles.get_value_with_local(
+    e,
+    e.fields()[raw_elem_theme_derived],
+    self.0.field_raw(raw_elem_theme_derived),
+  )
+  if raw_derived_of(stored, source) is Some(RawTheme(theme)) {
+    return Some(theme)
+  }
+  read_world.val = true
+  try RawTheme::load(engine.world, { v: source, span: self.0.span(), }) catch {
+    _ => None
+  } noraise {
+    theme => Some(theme)
   }
 }
 
@@ -703,14 +891,18 @@ fn format_theme_error(error : @syntect.LoadingError) -> LoadError {
 fn raw_elem_syntaxes_parse(
   engine : Engine,
   args : Args,
-  _locals : ParseLocals,
+  locals : ParseLocals,
 ) -> Value? raise SourceError {
   let sources : @syntax.Spanned[OneOrMultiple[DataSource]]? = args.named_spanned(
     "syntaxes",
   )
   match sources {
     Some(sources) => {
-      RawSyntax::load(engine.world, sources) |> ignore
+      let list = RawSyntax::load(engine.world, sources)
+      locals.set(
+        "syntaxes-derived",
+        Some(raw_syntaxes_value(sources.v.0, list)),
+      )
       Some(sources.v.into_value())
     }
     None => None
@@ -722,12 +914,13 @@ fn raw_elem_syntaxes_parse(
 fn raw_elem_theme_parse(
   engine : Engine,
   args : Args,
-  _locals : ParseLocals,
+  locals : ParseLocals,
 ) -> Value? raise SourceError {
   let theme : @syntax.Spanned[Smart[DataSource?]]? = args.named_spanned("theme")
   match theme {
     Some({ v: Custom(Some(source)), span, }) => {
-      RawTheme::load(engine.world, { v: source, span, }) |> ignore
+      let theme = RawTheme::load(engine.world, { v: source, span, })
+      locals.set("theme-derived", Some(raw_theme_value(source, theme)))
       Some(Smart::Custom(Some(source)).into_value())
     }
     Some({ v: Custom(None), .. }) => Some(Smart::Custom(None).into_value())

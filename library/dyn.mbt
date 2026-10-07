@@ -57,6 +57,15 @@ pub(all) enum DynValue {
   /// evaluator created from the lines of raw syntax, upstream
   /// `RawContent::Lines`; see `RawContent`)
   RawContent(RawContent)
+  /// `text/raw.rs` (internal: a decoded syntax in the companion field
+  /// `syntaxes-derived` of raw elements, which holds a pair of source and
+  /// syntax per source; upstream the derived part of
+  /// `Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>`)
+  RawSyntax(RawSyntax)
+  /// `text/raw.rs` (internal: the decoded theme in the companion field
+  /// `theme-derived` of raw elements, a pair of source and theme; upstream
+  /// the derived part of `Derived<DataSource, RawTheme>`)
+  RawTheme(RawTheme)
 } derive(Eq)
 
 ///|
@@ -98,6 +107,8 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Upstream casts `RawContent` to its string; it is only stored in the
     // `text` field of raw elements.
     RawContent(_) => Type::str()
+    // Like `Loaded`: only stored in internal fields.
+    RawSyntax(_) | RawTheme(_) => Type::bytes()
   }
 }
 
@@ -124,6 +135,8 @@ pub fn DynValue::repr(self : DynValue) -> String {
     Decoration(_) => "decoration(..)"
     Loaded(_) => "loaded(..)"
     RawContent(v) => repr_str(v.get())
+    RawSyntax(_) => "syntax(..)"
+    RawTheme(_) => "theme(..)"
   }
 }
 
