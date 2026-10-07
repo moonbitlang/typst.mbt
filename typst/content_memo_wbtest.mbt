@@ -1,5 +1,5 @@
 // What is kept by content beyond a compilation (`library/memo_content.mbt`:
-// decoded raster images), seen from documents: a
+// decoded raster images, highlighted raw text), seen from documents: a
 // world whose files change between compilations, as in `typst watch`, must
 // give what a first compilation of the changed files gives, and what
 // compilations without memoization give.
@@ -87,6 +87,269 @@ fn files_strings(world : FilesWorld) -> Array[String] {
     Ok(doc) => oracle_strings(doc)
     Err(errors) => errors.map(e => "error: " + e.message)
   }
+}
+
+///|
+/// A theme that colours keywords.
+fn files_theme(keyword : String) -> Bytes {
+  @utf8.encode(
+    (
+      #|<?xml version="1.0" encoding="UTF-8"?>
+      #|<plist version="1.0"><dict>
+      #|<key>name</key><string>Test</string>
+      #|<key>settings</key><array>
+      #|<dict><key>settings</key><dict>
+      #|<key>foreground</key><string>#000000</string>
+      #|</dict></dict>
+      #|<dict><key>scope</key><string>keyword, storage</string>
+      #|<key>settings</key><dict>
+      #|<key>foreground</key><string>KEYWORD</string>
+      #|</dict></dict>
+      #|</array></dict></plist>
+      #|
+    ).replace(old="KEYWORD", new=keyword),
+  )
+}
+
+///|
+/// A syntax for the language `foo` in which `word` is a keyword.
+fn files_syntax(word : String) -> Bytes {
+  @utf8.encode(
+    (
+      #|%YAML 1.2
+      #|---
+      #|name: Foo
+      #|file_extensions: [foo]
+      #|scope: source.foo
+      #|contexts:
+      #|  main:
+      #|    - match: \bWORD\b
+      #|      scope: keyword.foo
+      #|
+    ).replace(old="WORD", new=word),
+  )
+}
+
+///|
+/// Reports every piece of highlighted text with its fill, and the lines.
+let files_raw_prelude : String =
+  #|#show raw: it => {
+  #|  show text: t => context {
+  #|    metadata(t.text + " " + repr(text.fill))
+  #|    t
+  #|  }
+  #|  metadata("lines " + str(it.lines.len()))
+  #|  it
+  #|}
+  #|
+
+///|
+test "raw: a theme and a syntax that change behind their paths" {
+  let reports = oracle_memo_on_off(() => {
+    let world = files_world(
+      [
+        (
+          "main.typ",
+          files_raw_prelude +
+          "#set raw(theme: \"t.tmTheme\", syntaxes: \"foo.sublime-syntax\")\n" +
+          "```rust\nlet x = 1;\n```\n```foo\nfoo bar\n```\n",
+        ),
+      ],
+      [
+        ("t.tmTheme", files_theme("#ff0000")),
+        ("foo.sublime-syntax", files_syntax("foo")),
+      ],
+    )
+    let reports = [files_strings(world).join(" | ")]
+    // The set rule read the two files; highlighting did not ask the world.
+    assert_eq(world.reads, 2)
+    // The same sources, another theme: `typst watch` after the theme file
+    // was saved (and its `evict` after the compilation).
+    @library.evict(10)
+    world.files[files_id("t.tmTheme")] = files_theme("#0000ff")
+    reports.push(files_strings(world).join(" | "))
+    // Another syntax.
+    @library.evict(10)
+    world.files[files_id("foo.sublime-syntax")] = files_syntax("bar")
+    reports.push(files_strings(world).join(" | "))
+    // And back to the first files: what was highlighted for them then.
+    @library.evict(10)
+    world.files[files_id("t.tmTheme")] = files_theme("#ff0000")
+    world.files[files_id("foo.sublime-syntax")] = files_syntax("foo")
+    reports.push(files_strings(world).join(" | "))
+    // A broken theme, twice, and its repair.
+    world.files[files_id("t.tmTheme")] = b"<plist"
+    reports.push(files_strings(world).join(" | "))
+    reports.push(files_strings(world).join(" | "))
+    world.files[files_id("t.tmTheme")] = files_theme("#00ff00")
+    reports.push(files_strings(world).join(" | "))
+    reports
+  })
+  inspect(
+    reports.join("\n"),
+    content=(
+      #|lines 1 | let rgb("#ff0000") |  x  luma(0%) | = rgb("#ff0000") |   luma(0%) | 1 luma(0%) | ; luma(0%) | lines 1 | foo rgb("#ff0000") |  bar luma(0%)
+      #|lines 1 | let rgb("#0000ff") |  x  luma(0%) | = rgb("#0000ff") |   luma(0%) | 1 luma(0%) | ; luma(0%) | lines 1 | foo rgb("#0000ff") |  bar luma(0%)
+      #|lines 1 | let rgb("#0000ff") |  x  luma(0%) | = rgb("#0000ff") |   luma(0%) | 1 luma(0%) | ; luma(0%) | lines 1 | foo  luma(0%) | bar rgb("#0000ff")
+      #|lines 1 | let rgb("#ff0000") |  x  luma(0%) | = rgb("#ff0000") |   luma(0%) | 1 luma(0%) | ; luma(0%) | lines 1 | foo rgb("#ff0000") |  bar luma(0%)
+      #|error: failed to parse theme (Invalid syntax theme settings)
+      #|error: failed to parse theme (Invalid syntax theme settings)
+      #|lines 1 | let rgb("#00ff00") |  x  luma(0%) | = rgb("#00ff00") |   luma(0%) | 1 luma(0%) | ; luma(0%) | lines 1 | foo rgb("#00ff00") |  bar luma(0%)
+    ),
+  )
+}
+
+///|
+test "raw: the same relative path in two directories" {
+  // The field says `theme.tmTheme` in both files: what was loaded is part
+  // of the element and of the styles.
+  let part =
+    #|#let part(body) = {
+    #|  set raw(theme: "theme.tmTheme", syntaxes: "foo.sublime-syntax")
+    #|  body
+    #|}
+    #|#let block = part[```foo foo bar```]
+    #|
+  let reports = oracle_memo_on_off(() => {
+    let world = files_world(
+      [
+        (
+          "main.typ",
+          files_raw_prelude +
+          "#import \"a/part.typ\" as a\n#import \"b/part.typ\" as b\n" +
+          "#a.block #b.block #a.part[```foo foo bar```] #b.part[```foo foo bar```]\n" +
+          // Folded: the syntaxes of both, the outer one first; the theme of
+          // the inner one.
+          "#a.part(b.part[```foo foo bar```]) #b.part(a.part[```foo foo bar```])\n",
+        ),
+        ("a/part.typ", part),
+        ("b/part.typ", part),
+      ],
+      [
+        ("a/theme.tmTheme", files_theme("#ff0000")),
+        ("b/theme.tmTheme", files_theme("#0000ff")),
+        ("a/foo.sublime-syntax", files_syntax("foo")),
+        ("b/foo.sublime-syntax", files_syntax("bar")),
+      ],
+    )
+    files_strings(world)
+  })
+  inspect(
+    reports.join("\n"),
+    content=(
+      #|lines 1
+      #|foo rgb("#ff0000")
+      #| bar luma(0%)
+      #|lines 1
+      #|foo  luma(0%)
+      #|bar rgb("#0000ff")
+      #|lines 1
+      #|foo rgb("#ff0000")
+      #| bar luma(0%)
+      #|lines 1
+      #|foo  luma(0%)
+      #|bar rgb("#0000ff")
+      #|lines 1
+      #|foo rgb("#0000ff")
+      #| bar luma(0%)
+      #|lines 1
+      #|foo  luma(0%)
+      #|bar rgb("#ff0000")
+    ),
+  )
+}
+
+///|
+test "raw: blocks that differ in one argument of highlighting" {
+  let theme = "bytes(\"" +
+    @utf8.decode(files_theme("#ff0000")).replace_all(old="\"", new="\\\"") +
+    "\")"
+  let reports = oracle_memo_on_off(() => {
+    let world = files_world(
+      [
+        (
+          "main.typ",
+          files_raw_prelude +
+          // The same text as Rust, as Python, without a language.
+          "```rust\nlet x = 1;\n```\n```py\nlet x = 1;\n```\n```\nlet x = 1;\n```\n" +
+          // In another theme, and without one.
+          "#raw(\"let x = 1;\", lang: \"rust\", theme: " +
+          theme +
+          ")\n#raw(\"let x = 1;\", lang: \"rust\", theme: none)\n" +
+          // With tabs of two sizes (from the styles: like upstream,
+          // highlighting does not read the element's own `tab-size`).
+          "#raw(\"let\\tx\", lang: \"rust\") #raw(\"let\\tx\", lang: \"rust\", tab-size: 8)\n" +
+          "#[#set raw(tab-size: 8)\n#raw(\"let\\tx\", lang: \"rust\")]\n" +
+          // In text of another colour and size: highlighted the same, the
+          // rest of the text takes the colour.
+          "#text(fill: blue, size: 20pt)[```rust\nlet x = 1;\n```]\n" +
+          // And the first again.
+          "```rust\nlet x = 1;\n```\n",
+        ),
+      ],
+      [],
+    )
+    let first = files_strings(world)
+    // A second compilation of the same world gives the same.
+    @library.evict(10)
+    assert_eq(files_strings(world), first)
+    first
+  })
+  inspect(
+    reports.join("\n"),
+    content=(
+      #|lines 1
+      #|let rgb("#d73948")
+      #| x  luma(0%)
+      #|= rgb("#d73948")
+      #|  luma(0%)
+      #|1 rgb("#b60157")
+      #|; luma(0%)
+      #|lines 1
+      #|let luma(0%)
+      #|  luma(0%)
+      #|x luma(0%)
+      #|  luma(0%)
+      #|= rgb("#d73948")
+      #|  luma(0%)
+      #|1 rgb("#b60157")
+      #|; luma(0%)
+      #|lines 1
+      #|let x = 1; luma(0%)
+      #|lines 1
+      #|let rgb("#ff0000")
+      #| x  luma(0%)
+      #|= rgb("#ff0000")
+      #|  luma(0%)
+      #|1 luma(0%)
+      #|; luma(0%)
+      #|lines 1
+      #|let x = 1; luma(0%)
+      #|lines 1
+      #|let rgb("#d73948")
+      #| x luma(0%)
+      #|lines 1
+      #|let rgb("#d73948")
+      #| x luma(0%)
+      #|lines 1
+      #|let rgb("#d73948")
+      #|     x luma(0%)
+      #|lines 1
+      #|let rgb("#d73948")
+      #| x  rgb("#0074d9")
+      #|= rgb("#d73948")
+      #|  rgb("#0074d9")
+      #|1 rgb("#b60157")
+      #|; rgb("#0074d9")
+      #|lines 1
+      #|let rgb("#d73948")
+      #| x  luma(0%)
+      #|= rgb("#d73948")
+      #|  luma(0%)
+      #|1 rgb("#b60157")
+      #|; luma(0%)
+    ),
+  )
 }
 
 ///|

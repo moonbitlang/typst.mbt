@@ -12,4 +12,5 @@ import {
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/typst/codecs",
   "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
 } for "wbtest"

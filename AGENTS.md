@@ -464,7 +464,20 @@
   the process, not for a compilation: decoding a raster image
   (`RasterImage::new`, upstream `new_impl`; a deck with 28 screenshots
   decoded each of them for every layout of every introspection iteration:
-  5.5 s, 1.4 GB; now once: 1.8 s, 0.3 GB). Rules for such a cache: the
+  5.5 s, 1.4 GB; now once: 1.8 s, 0.3 GB) and highlighting raw text
+  (`RawElem::highlight`: the element, the style chain, compared exactly
+  like the arguments of `memoize`, and the identity of the routines table,
+  which upstream hashes to nothing because a program has one;
+  `bench/showcase.typ` recompiles in 62 ms instead of 79 ms). Highlighting
+  is only a function of its arguments because the decoded syntaxes and
+  the theme of a raw element are in its companion fields
+  `syntaxes-derived` and `theme-derived` (upstream's `Derived`: the
+  parsers of the fields put them there, `raw_elem_syntaxes_derived_fold`
+  folds them like the sources, `DynValue::RawSyntax`/`RawTheme` hash and
+  compare as the hash of their bytes): never look derived data up by its
+  source, a path means another file in another directory and after an
+  edit. A result that had to ask the world (an element without its
+  companion) is not kept. Rules for such a cache: the
   key is exactly what upstream hashes (read the Rust signature and the
   `Hash` impls: `RasterImage::new` hashes the data, the format and the
   ICC profile that was passed, not the one found in the file), and the
@@ -483,7 +496,8 @@
   mutable array); and the cache obeys `set_layout_memo_enabled`, in a
   compilation and outside of one (`content_memo_enabled()`), so that the
   runner's comparison of memoization on and off covers it. Tests
-  (`library/memo_content_wbtest.mbt`, `typst/content_memo_wbtest.mbt`):
+  (`library/memo_content_wbtest.mbt`, `library/text_raw_memo_wbtest.mbt`,
+  `typst/content_memo_wbtest.mbt`):
   one input per argument of the key that differs in nothing else, the
   same bytes in two objects, a broken input used twice, a file that
   changes behind its path between two compilations of one world, `evict`.

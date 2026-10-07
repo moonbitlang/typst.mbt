@@ -13,6 +13,9 @@ rules and field access glue. This script generates the equivalent data tables
   Value) -> Bool` for field types whose stored value is not what upstream's
   `IntoValue` gives users, or whose `PartialEq` is not the equality of the
   stored values (`FieldInfo.output`, `FieldInfo.eq`),
+* `<elem>_<field>_derived_fold(Value, Value) -> Value` for the derived data
+  of a `#[fold]` field of type `Derived<S, D>` (its companion field
+  `<field>-derived`; upstream folds source and derived data together),
 * capability impls, wired into the element's hooks when defined:
   `<elem>_synthesize(Engine, Content, StyleChain) -> Content raise SourceError`
   (`Synthesize`), `<elem>_show_set(Content, StyleChain) -> Styles`
@@ -339,12 +342,19 @@ def main():
         # and the loaded data in an internal `<field>-derived` field, filled
         # by the field's `#[parse]` hook through `ParseLocals` under the key
         # `<field>-derived` (see `DynValue::Loaded`).
+        # A `#[fold]` field folds its derived data with its sources (upstream
+        # `Fold for Derived<S, D>`): the companion's fold is the handwritten
+        # `<elem>_<field>_derived_fold`, if there is one.
         derived = [f for f in e["fields"] if "Derived<" in f["ty"]]
         for k, f in enumerate(derived):
             dname = f"{f['name']}-derived"
+            fold = ""
+            fname = f"{var}_{snake(f['ident'])}_derived_fold"
+            if f["fold"] and fname in defined:
+                fold = f"fold={fname}, "
             fields.append(
                 f"    field_of((Ty::new() : Ty[Value]), id={len(e['fields']) + k}, "
-                f"name={mbt_str(dname)}, kind=Settable, internal=true, "
+                f"name={mbt_str(dname)}, kind=Settable, internal=true, {fold}"
                 f"parse=(_, _, locals) => locals.get({mbt_str(dname)})),"
             )
         caps = ", ".join(mbt_str(c) for c in e["capabilities"])

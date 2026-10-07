@@ -8080,6 +8080,7 @@ pub fn raw_elem() -> Element {
             name="syntaxes-derived",
             kind=Settable,
             internal=true,
+            fold=raw_elem_syntaxes_derived_fold,
             parse=(_, _, locals) => locals.get("syntaxes-derived"),
           ),
           field_of(

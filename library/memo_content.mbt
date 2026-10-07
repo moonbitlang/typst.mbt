@@ -2,12 +2,13 @@
 // constraints).
 //
 // Upstream memoizes some functions that have no tracked argument: pure
-// functions of what their arguments hash to. The one here is decoding a
-// raster image (`RasterImage::new_impl`, `image_raster.mbt`), whose result
-// is expensive and that a document asks for again and again. Unlike the
-// memoized calls of `memo.mbt` it needs no world, introspector, route or
-// sink, so a result is valid for as long as the process runs, within a
-// compilation and in the next one.
+// functions of what their arguments hash to. The ones here are those whose
+// results are expensive and that a document asks for again and again:
+// decoding a raster image (`RasterImage::new_impl`, `image_raster.mbt`) and
+// highlighting raw text (`Packed<RawElem>::highlight`, `text_raw.mbt`).
+// Unlike the memoized calls of `memo.mbt` they need no world, introspector,
+// route or sink, so a result is valid for as long as the process runs,
+// within a compilation and in the next one.
 //
 // - A result is found by the 128-bit fingerprint of the arguments, as
 //   comemo finds it by their hash. Large data (the bytes of an image) is
@@ -22,8 +23,9 @@
 //   in a compilation and outside of one (an export): the switch exists to
 //   compare results with and without memoization, and these are memoized
 //   results. With it off nothing is looked up and nothing is stored.
-// - Results are immutable objects (images), shared like upstream's, which
-//   are behind `Arc`s.
+// - Results are immutable objects (images, content) or copied by the caller
+//   (the array of highlighted lines), like upstream's, which are behind
+//   `Arc`s or cloned out of the cache.
 // - Errors are kept like results (comemo caches the `Result`): the second
 //   use of a broken image reports what the first did.
 

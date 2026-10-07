@@ -66,6 +66,11 @@ Typst source) are unchanged.
 - `doc`: `Size` (the result of `Ctx::measure`) has a third field,
   `baseline`; a pattern that names only `width` and `height` needs `..`.
 
+- `library`: the `pub(all)` enum `DynValue` has two new cases,
+  `RawSyntax(RawSyntax)` and `RawTheme(RawTheme)` (the decoded syntaxes and
+  the theme of a raw element, in its internal fields `syntaxes-derived`
+  and `theme-derived`); a `match` over all cases must handle them.
+
 ### Changed: `Debug` output
 
 These types print with core's `Debug` (`@debug.to_string`, `debug_inspect`,
@@ -149,6 +154,14 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   number in 200). The fix is in `moonbitlang/pdflite` 0.3.8, which the
   module now depends on (it was 0.3.6).
 
+- Raw text whose `theme` or `syntaxes` are paths: the decoded files were
+  looked up by the path as it was written when the text was highlighted,
+  so two files in different directories that both say
+  `#set raw(theme: "theme.tmTheme")` shared the theme of the one that was
+  evaluated last. The decoded theme and syntaxes are now stored with the
+  field, in the element or the set rule (upstream's `Derived`), and
+  syntaxes of nested set rules are folded with their sources.
+
 ### Added
 
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
@@ -188,6 +201,10 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   (what `evict` calls with its `max_age`), `data_hash(bytes)` (`hash128`
   of data, computed once per `Bytes` object), `content_memo_enabled()`,
   and `HintedString::clone()`.
+- `library`: highlighted raw text is kept by content in the same way
+  (upstream memoizes `Packed<RawElem>::highlight`): a raw element with
+  equal fields, spans and styles is highlighted once per process, not once
+  per introspection iteration and compilation.
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
   family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in

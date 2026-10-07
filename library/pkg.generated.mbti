@@ -5603,6 +5603,8 @@ pub(all) enum DynValue {
   Decoration(Decoration)
   Loaded(Loaded)
   RawContent(RawContent)
+  RawSyntax(RawSyntax)
+  RawTheme(RawTheme)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??

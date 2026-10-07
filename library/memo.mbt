@@ -173,9 +173,10 @@ let evictions : Ref[Int] = { val: 0, }
 /// they are dropped as a whole on every `max_age`-th call instead (decoding
 /// them again is all it costs). Must not be called during a compilation.
 ///
-/// The results kept by content (`memo_content.mbt`: decoded raster images)
-/// have ages like comemo's: each call makes them older by one and drops those that were
-/// not found for more than `max_age` calls.
+/// The results kept by content (`memo_content.mbt`: decoded raster images,
+/// highlighted raw text) have ages like comemo's: each call makes them
+/// older by one and drops those that were not found for more than `max_age`
+/// calls.
 pub fn evict(max_age : Int) -> Unit {
   for evictor in evictors {
     evictor(max_age)
@@ -187,9 +188,7 @@ pub fn evict(max_age : Int) -> Unit {
   }
   evictions.val = 0
   raw_syntax_cache.clear()
-  raw_syntaxes_derived.clear()
   raw_theme_cache.clear()
-  raw_theme_derived.clear()
   bibliography_cache.clear()
   csl_style_cache.clear()
   works_cache.val = None
