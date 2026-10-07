@@ -113,7 +113,7 @@ pub async fn Watcher::update(
   // Not upstream: start watching the new paths, one `@fs.Watcher` for all
   // of a directory (see `notify.mbt`).
   self.watcher.commit() catch {
-    NotifyError(err, path~) =>
+    NotifyError(_, path~) as err =>
       raise @kit.StrError(
         match path {
           Some(path) =>

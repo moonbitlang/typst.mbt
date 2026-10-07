@@ -52,6 +52,8 @@ pub fn now_ms() -> Int64
 
 pub fn os() -> Os
 
+pub fn os_error(Int) -> IoError
+
 pub fn parent(String) -> String?
 
 pub fn print_stderr(String) -> Unit

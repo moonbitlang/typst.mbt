@@ -68,8 +68,9 @@ fn c_path(path : String) -> Bytes raise IoError {
 }
 
 ///|
-/// The `io::Error` for an OS error number.
-fn os_error(code : Int) -> IoError {
+/// The `io::Error` for an OS error number
+/// (`io::Error::from_raw_os_error`).
+pub fn os_error(code : Int) -> IoError {
   let message = @utf8.decode_lossy(ffi_strerror(code))
   IoError(kind_of_errno(code), "\{message} (os error \{code})")
 }

@@ -369,7 +369,10 @@ async test "update: a path that cannot be watched" {
     // The root directory has no parent to watch it from.
     try watcher.update(["/"]) catch {
       @kit.StrError(message) =>
-        inspect(message, content="failed to watch \"/\" (No path was found.)")
+        inspect(
+          message,
+          content="failed to watch \"/\" (No path was found. about [\"/\"])",
+        )
     } noraise {
       _ => fail("expected an error")
     }

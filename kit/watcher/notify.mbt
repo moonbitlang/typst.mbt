@@ -221,16 +221,34 @@ priv struct Event {
 }
 
 ///|
-/// An error of the watcher (`notify::Error`: its `Display`, and the path it
-/// is about).
+/// An error of the watcher (`notify::Error`: the `Display` of its kind, and
+/// the path it is about).
 priv suberror NotifyError {
   NotifyError(String, path~ : String?)
 }
 
 ///|
 impl Show for NotifyError with fn output(self, logger) {
-  let NotifyError(message, ..) = self
-  logger.write_string(message)
+  let NotifyError(error, path~) = self
+  match path {
+    None => logger.write_string(error)
+    Some(path) =>
+      logger.write_string("\{error} about [\{@unicode.rust_debug_str(path)}]")
+  }
+}
+
+///|
+/// An error of `@fs.Watcher` for a path as notify reports it: an
+/// `io::Error`, but an exhausted inotify as `ErrorKind::MaxFilesWatch`
+/// (notify-8.0.0/src/inotify.rs:448).
+fn NotifyError::io(err : Error, path : String?) -> NotifyError {
+  let error = match err {
+    @os_error.OSError(28, ..) if @platform.os() == Linux =>
+      "OS file watch limit reached."
+    @os_error.OSError(errno, ..) => @platform.os_error(errno).to_string()
+    err => err.to_string()
+  }
+  NotifyError(error, path~)
 }
 
 ///|
@@ -403,7 +421,7 @@ async fn RecommendedWatcher::commit(
           first = Some(paths[0])
           break
         }
-        raise NotifyError(err.to_string(), path=first)
+        raise NotifyError::io(err, first)
       }
     }
     for paths in names.values() {

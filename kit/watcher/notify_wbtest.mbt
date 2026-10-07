@@ -178,11 +178,15 @@ async test "a directory that cannot be watched" {
     let dir = scratch("gone")
     let (watcher, _) = RecommendedWatcher::new(group)
     watcher.watch("\{dir}/missing/a.typ")
+    // Like notify's error for a path it cannot watch: the `io::Error` and
+    // the path.
     try watcher.commit() catch {
-      NotifyError(_, path~) =>
+      err =>
         inspect(
-          path.unwrap_or("no path"),
-          content="_build/kit_watcher_test/gone/missing/a.typ",
+          err,
+          content=(
+            #|No such file or directory (os error 2) about ["_build/kit_watcher_test/gone/missing/a.typ"]
+          ),
         )
     } noraise {
       _ => fail("expected an error")

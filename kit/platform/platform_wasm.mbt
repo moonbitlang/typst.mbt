@@ -319,6 +319,32 @@ pub fn knows_local_time_zone() -> Bool {
 }
 
 ///|
+/// The `io::Error` for an OS error number of the host
+/// (`io::Error::from_raw_os_error`). There is no `strerror` here: the
+/// numbers that Linux and macOS share have their text, the others none.
+pub fn os_error(code : Int) -> IoError {
+  let message = match code {
+    1 => "Operation not permitted"
+    2 => "No such file or directory"
+    4 => "Interrupted system call"
+    5 => "Input/output error"
+    9 => "Bad file descriptor"
+    12 => "Cannot allocate memory"
+    13 => "Permission denied"
+    17 => "File exists"
+    20 => "Not a directory"
+    21 => "Is a directory"
+    22 => "Invalid argument"
+    23 => "Too many open files in system"
+    24 => "Too many open files"
+    28 => "No space left on device"
+    30 => "Read-only file system"
+    _ => return IoError(kind_of_errno(code), "os error \{code}")
+  }
+  IoError(kind_of_errno(code), "\{message} (os error \{code})")
+}
+
+///|
 /// A clock in nanoseconds for measuring durations (the wall clock here,
 /// which the host only gives in milliseconds).
 pub fn monotonic_nanos() -> Int64 {

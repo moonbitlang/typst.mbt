@@ -71,3 +71,23 @@ test "file errors" {
     content="InvalidInput: file name contained an unexpected NUL byte",
   )
 }
+
+///|
+test "os errors" {
+  inspect(
+    @platform.os_error(2),
+    content="No such file or directory (os error 2)",
+  )
+  inspect(@platform.os_error(24), content="Too many open files (os error 24)")
+  @debug.debug_inspect(@platform.os_error(2).kind(), content="NotFound")
+}
+
+///|
+test "monotonic clock" {
+  let start = @platform.monotonic_nanos()
+  let mut sum = 0
+  for i in 0..<100000 {
+    sum += i
+  }
+  inspect(sum > 0 && @platform.monotonic_nanos() >= start, content="true")
+}
