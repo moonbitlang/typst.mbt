@@ -29,7 +29,7 @@ priv struct PngDamageChunk {
 priv struct PngDamageCase {
   desc : String
   data : Bytes
-  /// Decode with the limits of `png::Decoder::new` instead of `image`'s.
+  /// Decode with `png::Decoder::new` (`decode_png_frame`) instead of `image`.
   direct : Bool
 }
 
@@ -396,14 +396,15 @@ fn png_damage(seed : Bytes, seed_index : Int) -> Array[PngDamageCase] {
 /// What the decoder makes of a PNG, in the terms of `decode_image` and
 /// `decode_direct` in `gen_png_golden.rs` (like `image_case`).
 fn png_damage_outcome_of(data : Bytes, direct : Bool) -> String {
-  let (info, buf) = try {
-    if direct {
-      @codecs.decode_png(data, limits=Default)
-    } else {
-      @codecs.decode_png(data)
+  let (info, buf) = if direct {
+    @codecs.decode_png_frame(data) catch {
+      Decoding(msg) => return "error: \{msg}"
+      OutputBufferSize => return "error: output buffer size"
     }
-  } catch {
-    @codecs.ImageError(msg) => return "error: \{msg}"
+  } else {
+    @codecs.decode_png(data) catch {
+      @codecs.ImageError(msg) => return "error: \{msg}"
+    }
   }
   let h = webp_fnv1a(buf).to_string(radix=16)
   let color = match info.color {

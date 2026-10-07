@@ -21,8 +21,8 @@
 //! buffer> icc=<length or none>` or `error: <message>`; `panic` where
 //! upstream panics. The cases with other dimensions also record what
 //! `png::Decoder::new` (its default limit of 64 MiB, as krilla and tiny-skia
-//! call it) with `Transformations::EXPAND` gives, in the same terms, and run
-//! in a child process each, since upstream allocates the frame that the
+//! call it) with `Transformations::EXPAND` gives (the error is the `png`
+//! crate's there), and run in a child process each, since upstream allocates the frame that the
 //! header claims before it reads a row: `abort` where that kills the
 //! process.
 //!
@@ -77,20 +77,11 @@ fn decode_image(data: &[u8]) -> String {
 
 /// What `png::Decoder::new` (the default limits) with
 /// `Transformations::EXPAND`, `read_info` and `next_frame` make of a PNG
-/// (krilla's `decode_png`), in the terms of `decode_image`: the errors as
-/// `ImageError::from_png` maps them, the samples in native byte order.
+/// (krilla's `decode_png`): the pixels in the terms of `decode_image` (the
+/// samples in native byte order) or `error: <png::DecodingError>`.
 fn decode_direct(data: &[u8]) -> String {
     fn error(err: png::DecodingError) -> String {
-        match err {
-            png::DecodingError::IoError(err) => format!("error: {err}"),
-            err @ png::DecodingError::Format(_) => {
-                format!("error: Format error decoding Png: {err}")
-            }
-            err @ png::DecodingError::Parameter(_) => {
-                format!("error: The parameter is malformed: {err}")
-            }
-            png::DecodingError::LimitsExceeded => "error: Memory limit exceeded".to_string(),
-        }
+        format!("error: {err}")
     }
     let result = std::panic::catch_unwind(|| {
         let mut decoder = png::Decoder::new(Cursor::new(data));
@@ -100,7 +91,7 @@ fn decode_direct(data: &[u8]) -> String {
             Err(err) => return error(err),
         };
         let Some(size) = reader.output_buffer_size() else {
-            return "error: Memory limit exceeded".to_string();
+            return "error: output buffer size".to_string();
         };
         let mut buf = vec![0; size];
         let info = match reader.next_frame(&mut buf) {

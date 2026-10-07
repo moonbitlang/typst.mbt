@@ -1,6 +1,7 @@
 // Port of the `png` crate (v0.18.1) `src/decoder/transform.rs` and
 // `src/decoder/transform/palette.rs` for `Transformations::EXPAND` (the
-// expansion of palettes, sub-byte samples and `tRNS` transparency), and of
+// expansion of palettes, sub-byte samples and `tRNS` transparency) with or
+// without `STRIP_16` (the more significant byte of a 16-bit sample), and of
 // what upstream `image::codecs::png::PngDecoder` and
 // `DynamicImage::from_decoder` add to the `png` crate's `Reader`
 // (`png_reader.mbt`): 16-bit samples are returned in native (little-endian)
@@ -8,7 +9,8 @@
 // decoded (APNG frames are not).
 
 ///|
-/// The functions of upstream's `transform.rs` for `Transformations::EXPAND`.
+/// The functions of upstream's `transform.rs` for `Transformations::EXPAND`
+/// with or without `STRIP_16`.
 priv enum PngTransformKind {
   /// `palette::create_expansion_into_rgba8`
   ExpandPalettedIntoRgba8
@@ -20,6 +22,8 @@ priv enum PngTransformKind {
   ExpandGrayU8
   ExpandTrnsLine
   ExpandTrnsLine16
+  ExpandTrnsAndStripLine16
+  TransformRowStrip16
   CopyRow
 }
 
@@ -35,9 +39,14 @@ priv struct PngTransform {
 ///|
 /// Returns a transformation function that should be applied to image rows
 /// based on decoded image metadata (`info`), for the transformation
-/// `Transformations::EXPAND` (upstream `create_transform_fn`).
-fn PngTransform::new(info : StreamInfo) -> PngTransform raise DecodingError {
+/// `Transformations::EXPAND`, with `STRIP_16` if `strip16` (upstream
+/// `create_transform_fn`).
+fn PngTransform::new(
+  info : StreamInfo,
+  strip16 : Bool,
+) -> PngTransform raise DecodingError {
   let trns = info.trns is Some(_)
+  let strip16 = info.bit_depth == 16 && strip16
   let kind = match info.color_type {
     Indexed => {
       guard info.palette is Some(palette) else {
@@ -64,10 +73,12 @@ fn PngTransform::new(info : StreamInfo) -> PngTransform raise DecodingError {
     Grayscale | Rgb if trns =>
       if info.bit_depth == 8 {
         ExpandTrnsLine
+      } else if strip16 {
+        ExpandTrnsAndStripLine16
       } else {
         ExpandTrnsLine16
       }
-    _ => CopyRow
+    _ => if strip16 { TransformRowStrip16 } else { CopyRow }
   }
   { kind, rgba_palette: [], }
 }
@@ -131,6 +142,34 @@ fn PngTransform::apply(
       // `output_buffer.copy_from_slice(row)`
       guard! row_len == len
       output.unsafe_blit(start, row, row_start, len)
+    }
+    TransformRowStrip16 => {
+      let samples = @cmp.minimum(row_len / 2, len)
+      for i in 0..<samples {
+        output.unsafe_set(start + i, row.unsafe_get(row_start + 2 * i))
+      }
+    }
+    ExpandTrnsAndStripLine16 => {
+      // A pixel is transparent if its samples of 16 bits are the `tRNS`
+      // chunk.
+      let channels = info.color_type.samples()
+      let size = 2 * channels
+      let trns = info.trns.unwrap_or(b"")
+      let pixels = @cmp.minimum(row_len / size, len / (channels + 1))
+      for x in 0..<pixels {
+        let src = row_start + x * size
+        let dst = start + x * (channels + 1)
+        let mut transparent = trns.length() == size
+        for k in 0..<size {
+          if transparent && row.unsafe_get(src + k) != trns[k] {
+            transparent = false
+          }
+        }
+        for i in 0..<channels {
+          output.unsafe_set(dst + i, row.unsafe_get(src + 2 * i))
+        }
+        output.unsafe_set(dst + channels, if transparent { 0x00 } else { 0xFF })
+      }
     }
     ExpandTrnsLine | ExpandTrnsLine16 => {
       // Upstream `expand_trns_line` and `expand_trns_line16`: a pixel is
@@ -309,30 +348,72 @@ pub fn is_limit_error(message : String) -> Bool {
 /// `DynamicImage::from_decoder`). Returns the header information and the
 /// samples in row-major order.
 ///
-/// With `limits=Default` this is what `png::Decoder::new` with
-/// `Transformations::EXPAND`, `read_info` and `next_frame` give (krilla and,
-/// up to its `STRIP_16`, tiny-skia), in the byte order above; the callers
-/// of that only ask whether it fails.
-///
 /// What a damaged file gives is what upstream gives: the same error or the
 /// same pixels (see `png_stream.mbt`). No input makes this allocate for
 /// more rows than the file has data for.
-pub fn decode_png(
-  data : BytesView,
-  limits? : PngLimits = Unlimited,
-) -> (ImageInfo, Bytes) raise ImageError {
-  decode_png_frame(data, limits.limits()) catch {
+pub fn decode_png(data : BytesView) -> (ImageInfo, Bytes) raise ImageError {
+  // `PngDecoder::new` passes `Limits::no_limits()`.
+  let reader = PngReader::read_info(data, PngLimits::Unlimited.limits(), false) catch {
+    err => raise image_error_from_png(err)
+  }
+  // `decoder_to_vec`: `total_bytes()` (the dimensions times the bytes of a
+  // pixel) is more than `isize::MAX`.
+  if reader.output_buffer_size() is None {
+    raise image_error_from_png(LimitsExceeded)
+  }
+  // `PngDecoder::read_image`
+  read_png_frame(reader, data.length()) catch {
     err => raise image_error_from_png(err)
   }
 }
 
 ///|
-fn decode_png_frame(
+/// What decoding a PNG with the `png` crate itself fails with
+/// ([decode_png_frame]).
+pub(all) suberror PngFrameError {
+  /// A `png::DecodingError` of `read_info` or `next_frame`: its `Display`
+  /// output.
+  Decoding(String)
+  /// `Reader::output_buffer_size()` is `None`: the frame has more than
+  /// `isize::MAX` bytes. (krilla reports "image is too large", tiny-skia
+  /// `DecodingError::LimitsExceeded`.)
+  OutputBufferSize
+} derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngFrameError with @debug.Debug::{to_repr}
+
+///|
+/// Decodes the pixels of a PNG image with the `png` crate as krilla and
+/// tiny-skia call it: `png::Decoder::new` (the default limits),
+/// `set_transformations(Transformations::EXPAND)` (with `strip16`:
+/// `normalize_to_color8()`, the more significant byte of a 16-bit sample),
+/// `read_info`, a buffer of `output_buffer_size()` bytes and `next_frame`.
+/// Returns what [decode_png] returns (16-bit samples in little-endian
+/// order; the `png` crate's are big-endian).
+pub fn decode_png_frame(
   data : BytesView,
-  limits : Limits,
+  strip16? : Bool = false,
+) -> (ImageInfo, Bytes) raise PngFrameError {
+  let reader = PngReader::read_info(data, PngLimits::Default.limits(), strip16) catch {
+    err => raise Decoding(err.to_string())
+  }
+  if reader.output_buffer_size() is None {
+    raise OutputBufferSize
+  }
+  read_png_frame(reader, data.length()) catch {
+    err => raise Decoding(err.to_string())
+  }
+}
+
+///|
+/// Reads the frame of a reader whose frame has a size.
+fn read_png_frame(
+  reader : PngReader,
+  input_len : Int,
 ) -> (ImageInfo, Bytes) raise DecodingError {
-  // `PngDecoder::with_limits`
-  let reader = PngReader::read_info(data, limits)
   let info = reader.info()
   let (color_type, bits) = reader.output_color_type()
   let sixteen = bits == 16
@@ -346,13 +427,7 @@ fn decode_png_frame(
   }
   // `ImageDecoder::icc_profile`
   let icc = info.icc_profile
-  // `decoder_to_vec`: `total_bytes()` (the dimensions times the bytes of a
-  // pixel) is more than `isize::MAX`.
-  if reader.output_buffer_size() is None {
-    raise LimitsExceeded
-  }
-  // `PngDecoder::read_image`
-  let buf = reader.next_frame(data.length())
+  let buf = reader.next_frame(input_len)
   // PNG images are big endian. For 16 bit per channel and larger types,
   // the buffer may need to be reordered to native endianness per the
   // contract of `read_image`.

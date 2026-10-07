@@ -58,7 +58,7 @@ pub fn read_png_info(
   data : BytesView,
   limits? : PngLimits = Unlimited,
 ) -> PngInfo raise ImageError {
-  let reader = PngReader::read_info(data, limits.limits()) catch {
+  let reader = PngReader::read_info(data, limits.limits(), false) catch {
     err => raise image_error_from_png(err)
   }
   let info = reader.info()

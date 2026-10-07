@@ -995,10 +995,13 @@ fn SubframeInfo::new(info : StreamInfo) -> SubframeInfo {
 ///
 /// Provides a high level that iterates over lines or whole images.
 ///
-/// The output transformation is upstream's `Transformations::EXPAND`, which
-/// `image` and krilla set.
+/// The output transformations are upstream's `Transformations::EXPAND`,
+/// which `image` and krilla set, with or without `STRIP_16` (together
+/// `Transformations::normalize_to_color8()`, which tiny-skia sets).
 priv struct PngReader {
   decoder : ReadDecoder
+  /// Output transformations: whether `Transformations::STRIP_16` is set.
+  strip16 : Bool
   mut bpp : Int
   mut subframe : SubframeInfo
   /// How many frames remain to be decoded.  Decremented after each `IDAT` or `fdAT` sequence.
@@ -1015,16 +1018,18 @@ priv struct PngReader {
 ///|
 /// Create a new decoder configuration with custom limits and read all meta
 /// data until the first IDAT chunk (upstream `Decoder::new_with_limits`,
-/// `set_transformations(Transformations::EXPAND)` and `read_info`).
+/// `set_transformations` and `read_info`).
 fn PngReader::read_info(
   data : BytesView,
   limits : Limits,
+  strip16 : Bool,
 ) -> PngReader raise DecodingError {
   let read_decoder = { reader: data, decoder: StreamingDecoder::new(limits), }
   let info = read_decoder.read_header_info()
   let unfiltering_buffer = UnfilteringBuffer::new(info)
   let reader = {
     decoder: read_decoder,
+    strip16,
     bpp: 1,
     subframe: SubframeInfo::not_yet_init(),
     // Temporary value - fixed below after reading `acTL` and `fcTL`.
@@ -1261,7 +1266,7 @@ fn PngReader::transform_row(
   let transform_fn = match self.transform_fn {
     Some(transform_fn) => transform_fn
     None => {
-      let transform_fn = PngTransform::new(info)
+      let transform_fn = PngTransform::new(info, self.strip16)
       self.transform_fn = Some(transform_fn)
       transform_fn
     }
@@ -1271,10 +1276,15 @@ fn PngReader::transform_row(
 
 ///|
 /// Returns the color type and the number of bits per sample
-/// of the data returned by `next_frame`, for `Transformations::EXPAND`.
+/// of the data returned by `next_frame`, for `Transformations::EXPAND` with
+/// or without `STRIP_16`.
 fn PngReader::output_color_type(self : PngReader) -> (PngColorType, Int) {
   let info = self.info()
-  let bits = if info.bit_depth < 8 { 8 } else { info.bit_depth }
+  let bits = if info.bit_depth < 8 || (info.bit_depth == 16 && self.strip16) {
+    8
+  } else {
+    info.bit_depth
+  }
   let has_trns = info.trns is Some(_)
   let color_type = match info.color_type {
     Grayscale if has_trns => GrayscaleAlpha
