@@ -1,0 +1,33 @@
+# The references of the paper, as its footnotes give them: no titles, and
+# the paper's abbreviations. Bibliographic data only: the footnotes
+# themselves are not reproduced (see ../README.md). The braces keep the
+# style from writing the names of the journals in title case ("D. Wiss. Zu
+# Göttingen").
+hilbert1915:
+  type: article
+  author: Hilbert, D.
+  date: 1915
+  page-range: 3
+  parent:
+    type: periodical
+    title: "{Nachr. d. K. Gesellsch. d. Wiss. zu Göttingen, Math.-phys. Klasse}"
+
+einstein1915:
+  type: article
+  author: Einstein, A.
+  date: 1915
+  page-range: 831
+  parent:
+    type: periodical
+    title: "{Sitzungsber. d. Preuß. Akad. d. Wiss.}"
+    volume: 47
+
+schwarzschild1916:
+  type: article
+  author: Schwarzschild, K.
+  date: 1916
+  page-range: 189
+  parent:
+    type: periodical
+    title: "{Sitzungsber. d. Preuß. Akad. d. Wiss.}"
+    volume: 7
