@@ -10,7 +10,7 @@ proposes; do not rewrite them to newer idioms (`Para`, the kit).
 
 | Package | Paper | Pages | Formulas |
 | --- | --- | --- | --- |
-| `lovelace-1843` | Ada Lovelace, Notes A, F and G to Menabrea's memoir on the Analytical Engine (1843) | 22 | about 290, and 420 formula cells in the diagram of Note G |
+| `lovelace-1843` | Ada Lovelace, Notes A, F and G to Menabrea's memoir on the Analytical Engine (1843) | 22 | about 290, and about 400 more in the cells of the diagram of Note G |
 | `einstein-1916` | A. Einstein, "The Foundation of the Generalised Theory of Relativity" (1916), in S. N. Bose's translation (1920), without footnotes | 38 | 669, 101 of them numbered |
 | `ramanujan-1914` | S. Ramanujan, "Modular equations and approximations to π" (1914) | 14, two columns | 355, 50 of them numbered |
 
@@ -103,8 +103,8 @@ package (`.moonignore`).
   page's own statement some of its notes are translations made by Wikisource
   contributors, which are licensed CC BY-SA and are not Bose's text of 1920.
   Neither the port nor its comments tell which notes are which, so none is
-  reproduced, and nothing under a share-alike licence is in this directory.
-  The three works that the footnotes cite (Hilbert 1915, Einstein 1915,
+  reproduced: no footnote of the transcription is in this directory or in
+  the history of its commits. The three works that the footnotes cite (Hilbert 1915, Einstein 1915,
   Schwarzschild 1916) are kept as a list of references: authors, journals
   in the paper's abbreviations, years and pages (`refs.yml`), which is
   bibliographic data, not text of the notes. The first build of this port
@@ -113,15 +113,26 @@ package (`.moonignore`).
   (1920; he died in 1974) are in the public domain in the United States,
   because they were published before January 1, 1931. The translation is
   also in the public domain in countries where copyright ends 50 years
-  after the author's death. It is **not** in the public domain where the
-  term is longer: in India, where it was published (60 years after the
-  author's death: until the end of 2034), and in the countries with a term
-  of 70 years, among them the member states of the European Union and the
-  United Kingdom (until the end of 2044). Whoever distributes the PDF or
-  this text there needs to take that into account.
+  after the author's death. It is **not** in the public domain in India,
+  where it was published (60 years after the author's death: until the end
+  of 2034), nor in the countries with a term of 70 years, among them the
+  member states of the European Union and the United Kingdom. How long it
+  lasts in those depends on the country: until the end of 2044 at the
+  latest, and until the end of 2034 where the term of a foreign work is
+  limited to that of its country of origin (the rule of the shorter term:
+  article 7 of the European Union's term directive, section 12(6) of the
+  United Kingdom's act). Whoever distributes the PDF or this text there
+  needs to take that into account.
+- Not established: that every word of the body is Bose's. The transcription
+  is an edited text. By its own account its notation was replaced by
+  Einstein's, and the review of this commit reports that the page also says
+  "some slight inaccuracies were corrected" (the page was not read again
+  for this commit). The body was not compared with the edition of 1920, so
+  a correction of wording by a Wikisource contributor, if there is one, is
+  still in it. Removing the footnotes removes what the page itself
+  identifies as translated by its contributors, and no more than that.
 - Known errors: none were recorded by the port; the text is as found in the
-  transcription (which is itself an edited text: notation replaced, as it
-  says).
+  transcription.
 
 ### Ramanujan 1914
 
@@ -163,8 +174,10 @@ section 14, and no lint reports it yet) and writes every formula in the
 paper's order to `_build/papers/ramanujan-1914-math.txt` (kind, a tab, the
 source). The script parses the subset of Typst math that the port uses and
 evaluates both sides of every statement without a free variable but `n`
-(the class invariants `G_n` and `g_n` come from their product definitions)
-with 60 digits.
+(the class invariants `G_n` and `g_n` come from their product definitions).
+A statement with `n` is evaluated at `n = 22` only. The arithmetic is
+decimal with 60 digits, except sines, tangents and the gamma function,
+which go through binary floats (about 16 digits).
 
 Its output is to be read, not a verdict (it always exits with 0): a `diff`
 is expected where the paper says "approximately" or ends a series with

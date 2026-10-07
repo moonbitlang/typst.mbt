@@ -350,14 +350,16 @@ fn colophon() -> Array[&IntoContent] {
           $|Bose died in 1974) are in the public domain in the United States,
           $|where Wikisource marks both so because they were published before
           $|January 1, 1931. The translation is also in the public domain
-          $|where copyright ends 50 years after the author's death, and it is
-          $|not where the term is longer: in India, where it was published
-          $|(60 years, until the end of 2034), and in the countries with a
-          $|term of 70 years, among them those of the European Union and the
-          $|United Kingdom (until the end of 2044). The numbers of the
-          $|formulas (29), (41a), (54) and (70), which the transcription
+          $|where copyright ends 50 years after the author's death. It is not
+          $|in India, where it was published (60 years: until the end of
+          $|2034), nor in the countries with a term of 70 years, among them
+          $|those of the European Union and the United Kingdom (until the end
+          $|of 2044 at the latest, and of 2034 where the term of a foreign
+          $|work is limited to that of its country of origin). The numbers of
+          $|the formulas (29), (41a), (54) and (70), which the transcription
           $|lacks and the text refers to, are those of the original; the
-          $|diagram in § 22 is drawn again from the text.
+          $|diagram in § 22 is drawn again from the text. The text was not
+          $|compared with the edition of 1920.
         ),
       ),
       size=Pt(9),

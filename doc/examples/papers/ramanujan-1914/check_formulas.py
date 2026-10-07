@@ -14,6 +14,11 @@ prints is to be read: a "diff" is expected where the paper says
 "approximately" or ends a series with dots, and is a wrong formula (in the
 port or in its source) otherwise; "BAD" is a decimal expansion whose printed
 digits are not the first digits of the value.
+
+Limits: a statement with n is evaluated at n = 22 only; the arithmetic is
+decimal with 60 digits, but sines, tangents and the gamma function go
+through binary floats (about 16 digits), so a statement with one of them
+that holds is printed as a "diff" of that size.
 """
 import re
 import sys
@@ -368,7 +373,9 @@ def main(path):
                 digits = claim[1]
                 shown = [v for v, note in vals if isinstance(note, tuple)][0]
                 other = [v for v, note in vals if not isinstance(note, tuple)][0]
-                ok = abs(other - shown) < D(10) ** -digits
+                # (truncated, not rounded: 3.14160 is not how pi begins)
+                excess = other - shown if shown >= 0 else shown - other
+                ok = 0 <= excess < D(10) ** -digits
                 tag = 'ok   ' if ok else 'BAD  '
                 counts['exact' if ok else 'bad'] += 1
                 if not ok or '-v' in sys.argv:

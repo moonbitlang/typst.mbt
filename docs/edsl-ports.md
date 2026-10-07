@@ -1746,7 +1746,9 @@ and one label of its diagram was moved into its block (the only lint of
 the three papers on the `main` they were committed to). Lovelace's Notes
 and Ramanujan's paper are in the public domain; Bose's translation of
 1920 is in the United States and where the term is the author's life plus
-50 years, and is not where it is longer (the README says where). The
+50 years, and is not in India or in the countries with a term of 70 years
+(the README says until when, and what was not established about the
+transcription's text). The
 packages are the before-state for the work of 14.4: they are not rewritten
 to `Para` or the kit.
 
