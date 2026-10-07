@@ -377,7 +377,9 @@ fn split_path(path : String) -> (String, String)? {
 ///
 /// A file system that ignores case or normalizes names (APFS, HFS+, NTFS)
 /// opens a file under a name that differs from the entry `@fs.Watcher`
-/// reads from the directory. Matching too much only costs a compilation.
+/// reads from the directory. Matching too much only costs a compilation;
+/// a file whose entry is not found under this key (a file system that
+/// folds names in yet another way) is not watched.
 fn name_key(name : StringView) -> String {
   @unicode.to_lowercase(@unicode.nfd(name))
 }
