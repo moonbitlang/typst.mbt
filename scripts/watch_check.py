@@ -771,7 +771,10 @@ def scenario_pages(r):
     for i in (1, 2, 3):
         path = os.path.join(r.dir, f"page-{i}.svg")
         rewritten = os.stat(path).st_mtime_ns != times[i]
-        if rewritten != (i == 2):
+        # Upstream exports the pages in parallel and fills its cache in the
+        # order in which they finish, so it may write an unchanged page
+        # again; the port exports them in order.
+        if rewritten != (i == 2) and (i == 2 or r.name == "port"):
             r.problems.append(
                 f"pages: page {i} was {'rewritten' if rewritten else 'not rewritten'}"
             )
