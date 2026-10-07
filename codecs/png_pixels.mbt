@@ -1,321 +1,368 @@
-// Port of the pixel decoding of the `png` crate (v0.18.1) with
-// `Transformations::EXPAND` as used by upstream `image::codecs::png::
-// PngDecoder` (`src/decoder/stream.rs`, `src/decoder/unfiltering_buffer.rs`,
-// `src/decoder/transform.rs`, `src/decoder/transform/palette.rs`,
-// `src/adam7.rs`): IDAT decompression, unfiltering, Adam7 deinterlacing and
-// the expansion of palettes, sub-byte samples and `tRNS` transparency.
-// 16-bit samples are returned in native (little-endian) byte order like
-// `PngDecoder::read_image`. Only the default image is decoded (APNG frames
-// are not).
+// Port of the `png` crate (v0.18.1) `src/decoder/transform.rs` and
+// `src/decoder/transform/palette.rs` for `Transformations::EXPAND` (the
+// expansion of palettes, sub-byte samples and `tRNS` transparency), and of
+// what upstream `image::codecs::png::PngDecoder` and
+// `DynamicImage::from_decoder` add to the `png` crate's `Reader`
+// (`png_reader.mbt`): 16-bit samples are returned in native (little-endian)
+// byte order like `PngDecoder::read_image`. Only the default image is
+// decoded (APNG frames are not).
 
 ///|
-/// The chunks needed to decode the pixels.
-priv struct PngData {
-  palette : Bytes?
-  /// The `tRNS` chunk, normalized like upstream `parse_trns`.
-  trns : Bytes?
-  idat : Bytes
+/// The functions of upstream's `transform.rs` for `Transformations::EXPAND`.
+priv enum PngTransformKind {
+  /// `palette::create_expansion_into_rgba8`
+  ExpandPalettedIntoRgba8
+  /// `palette::create_expansion_into_rgb8` for a bit depth of eight
+  Expand8bitIntoRgb8
+  /// `palette::create_expansion_into_rgb8` for the other bit depths
+  ExpandIntoRgb8
+  ExpandGrayU8WithTrns
+  ExpandGrayU8
+  ExpandTrnsLine
+  ExpandTrnsLine16
+  CopyRow
 }
 
 ///|
-fn read_png_data(data : BytesView, info : PngInfo) -> PngData raise ImageError {
-  let mut pos = 8
-  let mut palette = None
-  let mut trns = None
-  let idat = Buffer()
-  let mut seen_idat = false
-  while pos + 8 <= data.length() {
-    let len = u32_be(data, pos).reinterpret_as_int()
-    let ty = data[pos + 4:pos + 8]
-    let start = pos + 8
-    if len < 0 || start + len + 4 > data.length() {
-      decoding_error("Png", "Unexpected end of data within a chunk.")
-    }
-    let chunk = data[start:start + len]
-    if ty == b"IDAT" {
-      idat.write_bytesview(chunk)
-      seen_idat = true
-    } else if seen_idat {
-      // The image data ends with the first non-IDAT chunk.
-      break
-    } else if ty == b"PLTE" {
-      palette = Some(chunk.to_owned())
-    } else if ty == b"tRNS" && trns is None {
-      let sixteen = info.bit_depth == 16
-      trns = match info.color_type {
-        Grayscale => {
-          if len < 2 {
-            decoding_error(
-              "Png",
-              "Not enough palette entries, expect 2 got \{len}.",
-            )
-          }
-          Some(if sixteen { chunk.to_owned() } else { chunk[1:2].to_owned() })
-        }
-        Rgb => {
-          if len < 6 {
-            decoding_error(
-              "Png",
-              "Not enough palette entries, expect 6 got \{len}.",
-            )
-          }
-          Some(
-            if sixteen {
-              chunk.to_owned()
-            } else {
-              Bytes::from_array([chunk[1], chunk[3], chunk[5]])
-            },
-          )
-        }
-        Indexed => Some(chunk.to_owned())
-        _ =>
-          decoding_error(
-            "Png",
-            "Transparency chunk found for color type \{info.color_type.code()}.",
-          )
+/// A function that can transform a decompressed, unfiltered row into the
+/// final pixels (upstream `TransformFn`).
+priv struct PngTransform {
+  kind : PngTransformKind
+  /// The RGBA palette, four bytes per entry (upstream `create_rgba_palette`).
+  rgba_palette : FixedArray[Byte]
+}
+
+///|
+/// Returns a transformation function that should be applied to image rows
+/// based on decoded image metadata (`info`), for the transformation
+/// `Transformations::EXPAND` (upstream `create_transform_fn`).
+fn PngTransform::new(info : StreamInfo) -> PngTransform raise DecodingError {
+  let trns = info.trns is Some(_)
+  let kind = match info.color_type {
+    Indexed => {
+      guard info.palette is Some(palette) else {
+        raise Format("Missing palette of indexed image.")
+      }
+      // (A bit depth of sixteen was caught earlier.)
+      return {
+        kind: if trns {
+          ExpandPalettedIntoRgba8
+        } else if info.bit_depth == 8 {
+          Expand8bitIntoRgb8
+        } else {
+          ExpandIntoRgb8
+        },
+        rgba_palette: create_rgba_palette(palette, info.trns),
       }
     }
-    pos = start + len + 4
+    Grayscale | GrayscaleAlpha if info.bit_depth < 8 =>
+      if trns {
+        ExpandGrayU8WithTrns
+      } else {
+        ExpandGrayU8
+      }
+    Grayscale | Rgb if trns =>
+      if info.bit_depth == 8 {
+        ExpandTrnsLine
+      } else {
+        ExpandTrnsLine16
+      }
+    _ => CopyRow
   }
-  if !seen_idat {
-    decoding_error("Png", "Unexpected end of data before image end.")
-  }
-  { palette, trns, idat: idat.to_bytes(), }
+  { kind, rgba_palette: [], }
 }
 
 ///|
-/// Reverses a row filter in place (upstream `unfilter`).
-fn unfilter_row(
-  filter : Int,
-  bpp : Int,
-  previous : FixedArray[Byte],
-  current : FixedArray[Byte],
-) -> Unit raise ImageError {
-  let len = current.length()
-  match filter {
-    0 => ()
-    1 =>
-      for i in bpp..<len {
-        current[i] = current[i] + current[i - bpp]
+/// Upstream `create_rgba_palette`.
+///
+/// Upstream panics here (an index out of range) if the length of the
+/// palette is not a multiple of three, which the decoder accepts for a
+/// `PLTE` chunk (any length from 3 to 768). That is an error here, the one
+/// that a `PLTE` chunk of any other wrong length is.
+fn create_rgba_palette(
+  palette : Bytes,
+  trns : Bytes?,
+) -> FixedArray[Byte] raise DecodingError {
+  if palette.length() % 3 != 0 {
+    raise Format("Chunk length wrong: \{chunk_type_debug(PNG_PLTE)}")
+  }
+  let trns = match trns {
+    Some(trns) if trns.length() <= palette.length() / 3 => trns
+    _ => b""
+  }
+  let rgba_palette = FixedArray::make(4 * 256, b'\x00')
+  for i in 0..<256 {
+    rgba_palette[4 * i + 3] = b'\xFF'
+  }
+  for i in 0..<(palette.length() / 3) {
+    rgba_palette[4 * i] = palette[3 * i]
+    rgba_palette[4 * i + 1] = palette[3 * i + 1]
+    rgba_palette[4 * i + 2] = palette[3 * i + 2]
+  }
+  for i in 0..<trns.length() {
+    rgba_palette[4 * i + 3] = trns[i]
+  }
+  rgba_palette
+}
+
+///|
+/// Transforms the row `row[row_start..row_start + row_len]` into
+/// `output[start..start + len]`.
+fn PngTransform::apply(
+  self : PngTransform,
+  row : FixedArray[Byte],
+  row_start : Int,
+  row_len : Int,
+  output : FixedArray[Byte],
+  start : Int,
+  len : Int,
+  info : StreamInfo,
+) -> Unit {
+  // The accesses below are within these ranges.
+  guard! row_start >= 0 &&
+    row_len >= 0 &&
+    row_start <= row.length() - row_len &&
+    start >= 0 &&
+    len >= 0 &&
+    start <= output.length() - len
+  let bit_depth = info.bit_depth
+  match self.kind {
+    CopyRow => {
+      // `output_buffer.copy_from_slice(row)`
+      guard! row_len == len
+      output.unsafe_blit(start, row, row_start, len)
+    }
+    ExpandTrnsLine | ExpandTrnsLine16 => {
+      // Upstream `expand_trns_line` and `expand_trns_line16`: a pixel is
+      // transparent if its samples are the `tRNS` chunk.
+      let alpha_size = if self.kind is ExpandTrnsLine16 { 2 } else { 1 }
+      let size = info.color_type.samples() * alpha_size
+      let trns = info.trns.unwrap_or(b"")
+      let pixels = @cmp.minimum(row_len / size, len / (size + alpha_size))
+      for x in 0..<pixels {
+        let src = row_start + x * size
+        let dst = start + x * (size + alpha_size)
+        let mut transparent = trns.length() == size
+        for k in 0..<size {
+          let v = row.unsafe_get(src + k)
+          output.unsafe_set(dst + k, v)
+          if transparent && v != trns[k] {
+            transparent = false
+          }
+        }
+        let alpha : Byte = if transparent { 0x00 } else { 0xFF }
+        for k in 0..<alpha_size {
+          output.unsafe_set(dst + size + k, alpha)
+        }
       }
-    2 =>
-      for i in 0..<len {
-        current[i] = current[i] + previous[i]
+    }
+    ExpandGrayU8 => {
+      let scaling_factor = 255 / ((1 << bit_depth) - 1)
+      let pixels = unpack_bits_pixels(row_len, len, 1, bit_depth)
+      for x in 0..<pixels {
+        let val = unpack_bits_sample(row, row_start, x, bit_depth)
+        output.unsafe_set(start + x, (val * scaling_factor).to_byte())
       }
-    3 =>
-      for i in 0..<len {
-        let a = if i >= bpp { current[i - bpp].to_int() } else { 0 }
-        current[i] = current[i] + ((a + previous[i].to_int()) / 2).to_byte()
+    }
+    ExpandGrayU8WithTrns => {
+      let scaling_factor = 255 / ((1 << bit_depth) - 1)
+      // (`tRNS` of a grayscale image of less than sixteen bits is one byte.)
+      let trns = match info.trns {
+        Some(trns) => trns[0].to_int()
+        None => -1
       }
-    4 =>
-      for i in 0..<len {
-        let a = if i >= bpp { current[i - bpp].to_int() } else { 0 }
-        let c = if i >= bpp { previous[i - bpp].to_int() } else { 0 }
-        current[i] = current[i] +
-          filter_paeth(a, previous[i].to_int(), c).to_byte()
+      let pixels = unpack_bits_pixels(row_len, len, 2, bit_depth)
+      for x in 0..<pixels {
+        let pixel = unpack_bits_sample(row, row_start, x, bit_depth)
+        output.unsafe_set(
+          start + 2 * x + 1,
+          if pixel == trns {
+            0x00
+          } else {
+            0xFF
+          },
+        )
+        output.unsafe_set(start + 2 * x, (pixel * scaling_factor).to_byte())
       }
-    _ => decoding_error("Png", "Unknown filter method (\{filter}).")
+    }
+    ExpandPalettedIntoRgba8 => {
+      let palette = self.rgba_palette
+      guard! palette.length() == 1024
+      let pixels = unpack_bits_pixels(row_len, len, 4, bit_depth)
+      for x in 0..<pixels {
+        let i = 4 * unpack_bits_sample(row, row_start, x, bit_depth)
+        let dst = start + 4 * x
+        output.unsafe_set(dst, palette.unsafe_get(i))
+        output.unsafe_set(dst + 1, palette.unsafe_get(i + 1))
+        output.unsafe_set(dst + 2, palette.unsafe_get(i + 2))
+        output.unsafe_set(dst + 3, palette.unsafe_get(i + 3))
+      }
+    }
+    Expand8bitIntoRgb8 | ExpandIntoRgb8 => {
+      // (`expand_8bit_into_rgb8` writes four bytes of an entry and the
+      // next pixel over the fourth; the result is the same.)
+      let palette = self.rgba_palette
+      guard! palette.length() == 1024
+      let pixels = unpack_bits_pixels(row_len, len, 3, bit_depth)
+      for x in 0..<pixels {
+        let i = 4 * unpack_bits_sample(row, row_start, x, bit_depth)
+        let dst = start + 3 * x
+        output.unsafe_set(dst, palette.unsafe_get(i))
+        output.unsafe_set(dst + 1, palette.unsafe_get(i + 1))
+        output.unsafe_set(dst + 2, palette.unsafe_get(i + 2))
+      }
+    }
   }
 }
 
 ///|
-/// The Adam7 passes: (x start, y start, x step, y step).
-let adam7_passes : ReadOnlyArray[(Int, Int, Int, Int)] = [
-  (0, 0, 8, 8),
-  (4, 0, 8, 8),
-  (0, 4, 4, 8),
-  (2, 0, 4, 4),
-  (0, 2, 2, 4),
-  (1, 0, 2, 2),
-  (0, 1, 1, 2),
-]
+/// How many pixels upstream `unpack_bits` writes: the chunks of `channels`
+/// bytes of the output (for which the input has samples, which upstream
+/// asserts).
+fn unpack_bits_pixels(
+  input_len : Int,
+  output_len : Int,
+  channels : Int,
+  bit_depth : Int,
+) -> Int {
+  @cmp.minimum(output_len / channels, input_len * (8 / bit_depth))
+}
+
+///|
+/// The sample `i` of a row of samples of `bit_depth` bits (1, 2, 4 or 8)
+/// that starts at `input[start]`: upstream `unpack_bits` shifts through
+/// `[7, 6, 5, 4, 3, 2, 1, 0]`, `[6, 4, 2, 0]`, `[4, 0]` or `[0]`. The byte is
+/// in bounds for the pixels of `unpack_bits_pixels`.
+fn unpack_bits_sample(
+  input : FixedArray[Byte],
+  start : Int,
+  i : Int,
+  bit_depth : Int,
+) -> Int {
+  if bit_depth == 8 {
+    return input.unsafe_get(start + i).to_int()
+  }
+  let per_byte = 8 / bit_depth
+  let curr = input.unsafe_get(start + i / per_byte).to_int()
+  let shift = 8 - bit_depth * (i % per_byte + 1)
+  (curr >> shift) & ((1 << bit_depth) - 1)
+}
+
+///|
+/// The limit on the bytes that the decoder allocates besides the frame
+/// (upstream `png::Limits::bytes`): chunk data, text chunks, the ICC
+/// profile and the buffer of an output row.
+pub(all) enum PngLimits {
+  /// No limit (`usize::MAX`): `image::codecs::png::PngDecoder::new`, which
+  /// passes `image::Limits::no_limits()`.
+  Unlimited
+  /// `png::Limits::default()`, 64 MiB: `png::Decoder::new`, as krilla and
+  /// tiny-skia call it.
+  Default
+}
+
+///|
+fn PngLimits::limits(self : PngLimits) -> Limits {
+  match self {
+    Unlimited => { bytes: 0xFFFFFFFFFFFFFFFFUL, }
+    Default => { bytes: 1024UL * 1024UL * 64UL, }
+  }
+}
+
+///|
+/// Upstream `ImageError::from_png` followed by `impl Display for
+/// ImageError`.
+fn image_error_from_png(err : DecodingError) -> ImageError {
+  match err {
+    // `ImageError::IoError(err)`
+    IoError(_) => ImageError(err.to_string())
+    // The input image was not a valid PNG.
+    Format(_) => ImageError("Format error decoding Png: \{err.to_string()}")
+    // Other is used when:
+    // - The decoder is polled for more animation frames despite being done (or not being animated
+    //   in the first place).
+    // - The output buffer does not have the required size.
+    Parameter(_) => ImageError("The parameter is malformed: \{err.to_string()}")
+    // `ImageError::Limits(LimitError::from_kind(LimitErrorKind::
+    // InsufficientMemory))`
+    LimitsExceeded => ImageError(limit_error_insufficient_memory)
+  }
+}
+
+///|
+/// The `Display` output of upstream's `LimitErrorKind::InsufficientMemory`.
+let limit_error_insufficient_memory : String = "Memory limit exceeded"
+
+///|
+/// Whether `message`, the payload of an [ImageError], is the `Display`
+/// output of an upstream `image::ImageError::Limits(_)` (of its kinds
+/// `InsufficientMemory` and `DimensionError`; no other variant of
+/// `ImageError` prints these). Upstream's callers match on the variant:
+/// Typst reports "file is too large" for it.
+pub fn is_limit_error(message : String) -> Bool {
+  message == limit_error_insufficient_memory ||
+  message == "Image size exceeds limit"
+}
 
 ///|
 /// Decodes the pixels of a PNG image (upstream `PngDecoder::new` followed by
 /// `DynamicImage::from_decoder`). Returns the header information and the
 /// samples in row-major order.
-pub fn decode_png(data : BytesView) -> (ImageInfo, Bytes) raise ImageError {
-  let info = read_png_info(data)
-  let chunks = read_png_data(data, info)
-  if info.color_type is Indexed && chunks.palette is None {
-    decoding_error("Png", "Palette required, but not found.")
+///
+/// With `limits=Default` this is what `png::Decoder::new` with
+/// `Transformations::EXPAND`, `read_info` and `next_frame` give (krilla and,
+/// up to its `STRIP_16`, tiny-skia), in the byte order above; the callers
+/// of that only ask whether it fails.
+///
+/// What a damaged file gives is what upstream gives: the same error or the
+/// same pixels (see `png_stream.mbt`). No input makes this allocate for
+/// more rows than the file has data for.
+pub fn decode_png(
+  data : BytesView,
+  limits? : PngLimits = Unlimited,
+) -> (ImageInfo, Bytes) raise ImageError {
+  decode_png_frame(data, limits.limits()) catch {
+    err => raise image_error_from_png(err)
   }
-  let raw = zlib_decompress(chunks.idat[:], verify_checksum=false) catch {
-    InflateError(err) => decoding_error("Png", "Corrupt deflate stream. \{err}")
-  }
-  let width = info.width.reinterpret_as_int()
-  let height = info.height.reinterpret_as_int()
-  let depth = info.bit_depth
-  let samples = info.color_type.samples()
-  let bits_per_pixel = samples * depth
-  let bpp = @cmp.maximum(1, bits_per_pixel / 8)
-  let color = info.output_color_type()
-  let out_bpp = color.channel_count() * (if depth == 16 { 2 } else { 1 })
-  let out = FixedArray::make(width * height * out_bpp, b'\x00')
-  let expand = PngExpander::new(info, chunks)
-  let mut pos = 0
-  let passes = if info.interlaced { adam7_passes } else { [(0, 0, 1, 1)] }
-  for pass in passes[:] {
-    let (x0, y0, dx, dy) = pass
-    let pass_width = if width > x0 { (width - x0 + dx - 1) / dx } else { 0 }
-    let pass_height = if height > y0 { (height - y0 + dy - 1) / dy } else { 0 }
-    if pass_width == 0 || pass_height == 0 {
-      continue
-    }
-    let row_len = (pass_width * bits_per_pixel + 7) / 8
-    let mut previous = FixedArray::make(row_len, b'\x00')
-    let expanded = FixedArray::make(pass_width * out_bpp, b'\x00')
-    for py in 0..<pass_height {
-      if pos + 1 + row_len > raw.length() {
-        decoding_error("Png", "Unexpected end of data before image end.")
-      }
-      let filter = raw[pos].to_int()
-      let current = FixedArray::makei(row_len, i => raw[pos + 1 + i])
-      pos += 1 + row_len
-      unfilter_row(filter, bpp, previous, current)
-      expand.row(current, pass_width, expanded)
-      let y = y0 + py * dy
-      for px in 0..<pass_width {
-        let x = x0 + px * dx
-        let dst = (y * width + x) * out_bpp
-        for k in 0..<out_bpp {
-          out[dst + k] = expanded[px * out_bpp + k]
-        }
-      }
-      previous = current
-    }
-  }
-
-  // PNG images are big endian; the samples are returned in native (little)
-  // endian order.
-  if depth == 16 {
-    for i = 0; i + 1 < out.length(); i = i + 2 {
-      let hi = out[i]
-      out[i] = out[i + 1]
-      out[i + 1] = hi
-    }
-  }
-  let image_info = {
-    width: info.width,
-    height: info.height,
-    color,
-    icc: info.icc_profile,
-  }
-  (image_info, Bytes::makei(out.length(), i => out[i]))
 }
 
 ///|
-/// Expands the samples of a row (upstream `create_transform_fn` with
-/// `Transformations::EXPAND`).
-priv struct PngExpander {
-  info : PngInfo
-  trns : Bytes?
-  /// The RGBA palette (upstream `create_rgba_palette`).
-  rgba_palette : FixedArray[(Byte, Byte, Byte, Byte)]
-}
-
-///|
-fn PngExpander::new(info : PngInfo, chunks : PngData) -> PngExpander {
-  let rgba_palette = FixedArray::make(256, (b'\x00', b'\x00', b'\x00', b'\xFF'))
-  if chunks.palette is Some(palette) {
-    let entries = palette.length() / 3
-    let trns = match chunks.trns {
-      Some(trns) if trns.length() <= entries => trns
-      _ => b""
-    }
-    for i in 0..<@cmp.minimum(entries, 256) {
-      let alpha = if i < trns.length() { trns[i] } else { b'\xFF' }
-      rgba_palette[i] = (
-        palette[3 * i],
-        palette[3 * i + 1],
-        palette[3 * i + 2],
-        alpha,
-      )
+fn decode_png_frame(
+  data : BytesView,
+  limits : Limits,
+) -> (ImageInfo, Bytes) raise DecodingError {
+  // `PngDecoder::with_limits`
+  let reader = PngReader::read_info(data, limits)
+  let info = reader.info()
+  let (color_type, bits) = reader.output_color_type()
+  let sixteen = bits == 16
+  let color : ColorType = match color_type {
+    Grayscale => if sixteen { L16 } else { L8 }
+    GrayscaleAlpha => if sixteen { La16 } else { La8 }
+    Rgb => if sixteen { Rgb16 } else { Rgb8 }
+    Rgba => if sixteen { Rgba16 } else { Rgba8 }
+    // (Expanded to RGB or RGBA.)
+    Indexed => abort("unreachable")
+  }
+  // `ImageDecoder::icc_profile`
+  let icc = info.icc_profile
+  // `decoder_to_vec`: `total_bytes()` (the dimensions times the bytes of a
+  // pixel) is more than `isize::MAX`.
+  if reader.output_buffer_size() is None {
+    raise LimitsExceeded
+  }
+  // `PngDecoder::read_image`
+  let buf = reader.next_frame(data.length())
+  // PNG images are big endian. For 16 bit per channel and larger types,
+  // the buffer may need to be reordered to native endianness per the
+  // contract of `read_image`.
+  if sixteen {
+    for i = 0; i + 1 < buf.length(); i = i + 2 {
+      let hi = buf.unsafe_get(i)
+      buf.unsafe_set(i, buf.unsafe_get(i + 1))
+      buf.unsafe_set(i + 1, hi)
     }
   }
-  { info, trns: chunks.trns, rgba_palette, }
-}
-
-///|
-/// Unpacks the `i`-th sample of a row with sub-byte (or 8-bit) samples
-/// (upstream `unpack_bits`).
-fn unpack_sample(row : FixedArray[Byte], i : Int, depth : Int) -> Int {
-  if depth == 8 {
-    return row[i].to_int()
-  }
-  let per_byte = 8 / depth
-  let byte = row[i / per_byte].to_int()
-  let shift = 8 - depth * (i % per_byte + 1)
-  (byte >> shift) & ((1 << depth) - 1)
-}
-
-///|
-fn PngExpander::row(
-  self : PngExpander,
-  row : FixedArray[Byte],
-  width : Int,
-  out : FixedArray[Byte],
-) -> Unit {
-  let info = self.info
-  let depth = info.bit_depth
-  match info.color_type {
-    Indexed => {
-      let alpha = self.trns is Some(_)
-      let n = if alpha { 4 } else { 3 }
-      for x in 0..<width {
-        let (r, g, b, a) = self.rgba_palette[unpack_sample(row, x, depth)]
-        out[n * x] = r
-        out[n * x + 1] = g
-        out[n * x + 2] = b
-        if alpha {
-          out[n * x + 3] = a
-        }
-      }
-    }
-    Grayscale if depth < 8 => {
-      let scaling_factor = 255 / ((1 << depth) - 1)
-      match self.trns {
-        Some(trns) =>
-          for x in 0..<width {
-            let pixel = unpack_sample(row, x, depth)
-            out[2 * x + 1] = if pixel == trns[0].to_int() {
-              b'\x00'
-            } else {
-              b'\xFF'
-            }
-            out[2 * x] = (pixel * scaling_factor).to_byte()
-          }
-        None =>
-          for x in 0..<width {
-            out[x] = (unpack_sample(row, x, depth) * scaling_factor).to_byte()
-          }
-      }
-    }
-    Grayscale | Rgb if self.trns is Some(trns) => {
-      // Upstream `expand_trns_line` / `expand_trns_line16`.
-      let size = info.color_type.samples() * (if depth == 16 { 2 } else { 1 })
-      let alpha_size = if depth == 16 { 2 } else { 1 }
-      for x in 0..<width {
-        let mut transparent = trns.length() == size
-        for k in 0..<size {
-          let v = row[x * size + k]
-          out[x * (size + alpha_size) + k] = v
-          if transparent && v != trns[k] {
-            transparent = false
-          }
-        }
-        for k in 0..<alpha_size {
-          out[x * (size + alpha_size) + size + k] = if transparent {
-            b'\x00'
-          } else {
-            b'\xFF'
-          }
-        }
-      }
-    }
-    _ =>
-      for i in 0..<out.length() {
-        out[i] = row[i]
-      }
-  }
+  let image_info = { width: info.width, height: info.height, color, icc, }
+  (image_info, Bytes::from_array(buf[:]))
 }

@@ -14,7 +14,7 @@ pub fn decode_gif_image(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
-pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
+pub fn decode_png(BytesView, limits? : PngLimits) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_webp(BytesView) -> WebpImage raise ImageError
 
@@ -36,13 +36,15 @@ pub fn gzip_decompress(BytesView) -> Bytes raise InflateError
 
 pub fn inflate_read_to_end(BytesView, zlib~ : Bool) -> Bytes raise InflateError
 
+pub fn is_limit_error(String) -> Bool
+
 pub fn jpeg_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn png_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn read_exif_from_container(BytesView) -> Exif raise ExifError
 
-pub fn read_png_info(BytesView) -> PngInfo raise ImageError
+pub fn read_png_info(BytesView, limits? : PngLimits) -> PngInfo raise ImageError
 
 pub fn resize_exact(UInt, UInt, ColorType, Bytes, UInt, UInt, FilterType) -> Bytes
 
@@ -206,6 +208,11 @@ pub(all) struct PngInfo {
   icc_profile : Bytes?
 } derive(@debug.Debug)
 pub fn PngInfo::output_color_type(Self) -> ColorType
+
+pub(all) enum PngLimits {
+  Unlimited
+  Default
+}
 
 pub struct StoredOnlyCompressor {
   // private fields
