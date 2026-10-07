@@ -86,6 +86,65 @@ test "name_key" {
 }
 
 ///|
+/// The entries that names resolve to among the entries of a directory.
+fn resolved(entries : Array[String], names : Array[String]) -> String {
+  let wanted : Map[String, Array[String]] = Map([])
+  for name in names {
+    wanted[name] = ["/dir/\{name}"]
+  }
+  let lines = []
+  for entry, paths in resolve_names_in(entries, wanted) {
+    lines.push("\{entry} <- \{paths.join(" ")}")
+  }
+  lines.sort()
+  lines.join("; ")
+}
+
+///|
+test "resolve_names_in" {
+  // A name that is an entry is that entry, whatever else is there: on a
+  // file system that tells `report.pdf` from `REPORT.pdf`, a change of one
+  // is not a change of the other.
+  inspect(
+    resolved(["report.pdf", "REPORT.pdf", "main.typ"], ["report.pdf"]),
+    content="report.pdf <- /dir/report.pdf",
+  )
+  // A name that is not an entry is found under another spelling, which is
+  // how a file system that ignores case or normalizes names opened it.
+  inspect(
+    resolved(["Chapter.typ", "main.typ"], ["chapter.typ", "main.typ"]),
+    content="main.typ <- /dir/main.typ; Chapter.typ <- /dir/chapter.typ",
+  )
+  inspect(
+    resolved(["e\u{301}.typ"], ["\u{e9}.typ"]) ==
+    "e\u{301}.typ <- /dir/\u{e9}.typ",
+    content="true",
+  )
+  // Two spellings of one entry.
+  inspect(
+    resolved(["Chapter.typ"], ["chapter.typ", "CHAPTER.typ"]),
+    content="Chapter.typ <- /dir/chapter.typ /dir/CHAPTER.typ",
+  )
+  // No entry, or no single one: the name as it is.
+  inspect(resolved(["a.typ"], ["b.typ"]), content="b.typ <- /dir/b.typ")
+  inspect(
+    resolved(["Report.pdf", "REPORT.pdf"], ["report.pdf"]),
+    content="report.pdf <- /dir/report.pdf",
+  )
+}
+
+///|
+test "sites" {
+  @debug.debug_inspect(
+    sites("no/such/file.typ"),
+    content=(
+      #|[("no/such", "file.typ")]
+    ),
+  )
+  @debug.debug_inspect(sites("/"), content="[]")
+}
+
+///|
 async test "the events of changes to watched paths" {
   @async.with_task_group(group => {
     let dir = scratch("events")
@@ -191,5 +250,80 @@ async test "a directory that cannot be watched" {
     } noraise {
       _ => fail("expected an error")
     }
+  })
+}
+
+///|
+async test "a path that is watched later in a directory" {
+  @async.with_task_group(group => {
+    let dir = scratch("later")
+    let a = "\{dir}/a.typ"
+    let b = "\{dir}/b.typ"
+    write(a, "a")
+    write(b, "b")
+    let (watcher, rx) = RecommendedWatcher::new(group)
+    watcher.watch(a)
+    watcher.commit()
+    guard watcher.dirs.get(dir) is Some(first) else { fail("no watcher") }
+    // What happens to the first path before the directory gets its new
+    // watcher is reported by the old one.
+    write(a, "changed")
+    watcher.watch(b)
+    watcher.commit()
+    guard watcher.dirs.get(dir) is Some(second) else { fail("no watcher") }
+    inspect(physical_equal(first, second), content="false")
+    inspect(watcher.dirs.length(), content="1")
+    inspect(drain(rx, dir), content="modify a.typ")
+    // Both paths are reported, also when the old watcher is gone.
+    write(b, "changed")
+    inspect(drain(rx, dir), content="modify b.typ")
+    @async.sleep(LINGER + 200)
+    write(a, "changed again")
+    inspect(drain(rx, dir), content="modify a.typ")
+    write(b, "changed again")
+    inspect(drain(rx, dir), content="modify b.typ")
+  })
+}
+
+///|
+async test "a link is watched where it is and where its file is" {
+  @async.with_task_group(group => {
+    let dir = scratch("link")
+    @fs.mkdir("\{dir}/data")
+    let file = "\{dir}/data/table.csv"
+    let link = "\{dir}/table.csv"
+    write(file, "1")
+    @fs.symlink(target="data/table.csv", link)
+    guard @platform.lstat_kind(link) is Symlink else {
+      // This target cannot tell a link.
+      return
+    }
+    inspect(sites(link).length(), content="2")
+    let (watcher, rx) = RecommendedWatcher::new(group)
+    watcher.watch(link)
+    watcher.commit()
+    inspect(watcher.dirs.length(), content="2")
+    // The file is written in place.
+    write(file, "2")
+    inspect(drain(rx, dir), content="modify table.csv")
+    // The file is replaced: neither the link nor its directory changes.
+    write("\{file}.tmp", "3")
+    @fs.rename("\{file}.tmp", file, replace=true)
+    inspect(drain(rx, dir), content="remove table.csv, create table.csv")
+    // The link is made to point elsewhere.
+    write("\{dir}/data/other.csv", "4")
+    @fs.remove(link)
+    @fs.symlink(target="data/other.csv", link)
+    inspect(drain(rx, dir), content="remove table.csv, create table.csv")
+    // Watched anew, the link's new file is followed.
+    watcher.unwatch(link)
+    watcher.watch(link)
+    watcher.commit()
+    write("\{dir}/data/other.csv", "5")
+    inspect(drain(rx, dir), content="modify table.csv")
+    // (Once the watcher of the old file is gone.)
+    @async.sleep(LINGER + 200)
+    write(file, "6")
+    inspect(rx.recv_timeout(Some(400)) is None, content="true")
   })
 }

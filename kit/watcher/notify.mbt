@@ -10,28 +10,34 @@
 //   recursively and tells which entries it follows through `ignored_paths`.
 //   A path is therefore watched through a watcher of its parent directory
 //   that ignores every other entry (and with them everything below the
-//   directory's subdirectories). One watcher serves all the paths of a
-//   directory that are registered together. `ignored_paths` is consulted
-//   when a directory is scanned, so a path that is registered later gets a
-//   watcher of its own instead of a place in a running one. Hence `watch`
-//   only records the path, and `commit` starts the watchers.
+//   directory's subdirectories); one watcher serves all the paths of a
+//   directory. `ignored_paths` is consulted when a directory is scanned,
+//   so a running watcher cannot take another path: a new one is started
+//   for all the paths of the directory, and the old one runs on for a
+//   moment (`LINGER`) to report what it already knows. Hence `watch` only
+//   records the path, and `commit` starts the watchers.
+// - notify follows a symbolic link to the file. Here a link is watched
+//   where it is and, on the targets that can tell a link, where its file
+//   is (`sites`).
 // - `@fs.Watcher` follows names: when an entry is removed and created
 //   again (or replaced by a rename, as editors that write a temporary file
 //   do), it follows the new file. notify's inotify backend follows the
 //   inode and drops the watch, which `Watcher::wait` works around by
 //   unwatching the path and watching it again after the next compilation.
-//   The bridge keeps that protocol, because the directory itself may be
-//   the thing that was replaced (`rm -r figures; mkdir figures; ..`), and
-//   then only a new watcher sees the new files: a removal is reported as
-//   `Remove(File)` and a rename away as `Modify(Name(From))`. What the
-//   bridge adds is that a path stays reported between `unwatch` and the
-//   `commit` that follows (and its old watcher a moment longer): events
-//   that arrive while the compilation runs are not lost, as they are with
-//   notify until the path is watched again.
+//   The bridge keeps that protocol, because something above the entry may
+//   be what was replaced (`rm -r figures; mkdir figures; ..`, the file of a
+//   link), and then only a new watcher sees the new file: a removal is
+//   reported as `Remove(File)` and a rename away as `Modify(Name(From))`.
+//   What the bridge adds is that a path stays reported between `unwatch`
+//   and the `commit` that follows: events that arrive while the
+//   compilation runs are not lost, as they are with notify until the path
+//   is watched again.
 // - `@fs.Watcher` reports the net change of a directory since the last
 //   `wait` (`Modify`, `Create`, `Remove`, `Rename`), not single operations:
 //   access, metadata and the kinds of a data change are not told apart. Its
 //   own debouncing is turned off, the batching is `Watcher::wait`'s.
+// - Watching a file needs its directory to be readable (notify's inotify
+//   and kqueue backends only need the file).
 // - Not watched: the entries of a watched directory (a dependency that is a
 //   directory only reports its own removal and creation), and a watched
 //   directory that is renamed while its files stay (notify's FSEvents
@@ -277,11 +283,11 @@ async fn Receiver::recv_timeout(
 ///|
 /// A `@fs.Watcher` of one directory.
 priv struct DirWatcher {
-  /// The paths the watcher was started for, by the key of their file names.
-  /// This is what `ignored_paths` lets through, for as long as it runs.
+  /// The directory.
+  dir : String
+  /// The entries of the directory that `ignored_paths` lets through, with
+  /// the paths they are watched for.
   names : Map[String, Array[String]]
-  /// How many of these paths are still watched through it.
-  mut owned : Int
   /// The task that forwards its events.
   mut task : @async.Task[Unit]?
 }
@@ -291,8 +297,8 @@ priv struct DirWatcher {
 priv enum Watch {
   /// Recorded by `watch`; watched from the next `commit` on.
   Pending
-  /// Watched through this watcher.
-  Watched(DirWatcher)
+  /// Watched in these directories under these names (see [`sites`]).
+  Watched(Array[(String, String)])
 }
 
 ///|
@@ -308,16 +314,19 @@ priv struct RecommendedWatcher {
   /// The paths that were unwatched since the last `commit`. Their events
   /// are still reported.
   retired : Map[String, Unit]
-  /// The watchers no path is watched through any more, to be stopped by the
-  /// next `commit`.
+  /// The running watcher of every directory with watched paths.
+  dirs : Map[String, DirWatcher]
+  /// The watchers that were replaced or are no longer needed, to be stopped
+  /// a moment after the next `commit`.
   idle : Array[DirWatcher]
 }
 
 ///|
-/// How long a watcher that is no longer needed keeps running after a
-/// `commit`, in milliseconds: long enough to report what happened to its
-/// files before the `commit` (events the operating system queued while a
-/// compilation was running).
+/// How long a watcher that was replaced or is no longer needed keeps
+/// running after a `commit`, in milliseconds: long enough to report what
+/// happened to its files before the `commit` (events the operating system
+/// queued while a compilation was running, which a new watcher never
+/// sees).
 const LINGER : Int = 1000
 
 ///|
@@ -327,7 +336,15 @@ fn RecommendedWatcher::new(
   group : @async.TaskGroup[Unit],
 ) -> (RecommendedWatcher, Receiver) {
   let tx = @aqueue.Queue(kind=Unbounded)
-  ({ tx, group, paths: Map([]), retired: Map([]), idle: [], }, Receiver(tx))
+  let watcher = {
+    tx,
+    group,
+    paths: Map([]),
+    retired: Map([]),
+    dirs: Map([]),
+    idle: [],
+  }
+  (watcher, Receiver(tx))
 }
 
 ///|
@@ -350,13 +367,9 @@ fn RecommendedWatcher::unwatch(
   match self.paths.get(path) {
     None => ()
     Some(Pending) => self.paths.remove(path)
-    Some(Watched(watcher)) => {
+    Some(Watched(_)) => {
       self.paths.remove(path)
       self.retired[path] = ()
-      watcher.owned -= 1
-      if watcher.owned == 0 {
-        self.idle.push(watcher)
-      }
     }
   }
 }
@@ -373,15 +386,87 @@ fn split_path(path : String) -> (String, String)? {
 }
 
 ///|
-/// The key under which the names of a directory's entries are compared.
+/// Where a path is watched: the directories to watch for it and its name
+/// in each.
+///
+/// A symbolic link is watched in two places: where it is (it can be
+/// removed, or made to point elsewhere) and where its file is (which can
+/// be replaced; notify watches the file a link points to). The wasm
+/// targets cannot tell a link and only watch it where it is.
+fn sites(path : String) -> Array[(String, String)] {
+  guard split_path(path) is Some(site) else { return [] }
+  let sites = [site]
+  let is_link = (@platform.lstat_kind(path) catch { _ => File }) is Symlink
+  if is_link {
+    let target = @platform.canonicalize(path) catch { _ => path }
+    if split_path(target) is Some(target) && target != site {
+      sites.push(target)
+    }
+  }
+  sites
+}
+
+///|
+/// The key under which a name is looked for among the entries of a
+/// directory if it is not one of them.
 ///
 /// A file system that ignores case or normalizes names (APFS, HFS+, NTFS)
 /// opens a file under a name that differs from the entry `@fs.Watcher`
-/// reads from the directory. Matching too much only costs a compilation;
-/// a file whose entry is not found under this key (a file system that
-/// folds names in yet another way) is not watched.
+/// reads from the directory.
 fn name_key(name : StringView) -> String {
   @unicode.to_lowercase(@unicode.nfd(name))
+}
+
+///|
+/// The entries of a directory under which `@fs.Watcher` reports the given
+/// names (see [`resolve_names_in`]).
+fn resolve_names(
+  dir : String,
+  wanted : Map[String, Array[String]],
+) -> Map[String, Array[String]] {
+  let entries = @platform.read_dir(dir) catch {
+    // The watcher will fail for the same reason, and say so.
+    _ => return wanted
+  }
+  resolve_names_in(entries, wanted)
+}
+
+///|
+/// The entries among `entries` under which the given names are found: the
+/// name itself if it is an entry, else the one entry with its key, else
+/// (no such entry, or several) the name. A file whose entry is found
+/// neither way (a file system that folds names in yet another way) is not
+/// watched.
+fn resolve_names_in(
+  entries : Array[String],
+  wanted : Map[String, Array[String]],
+) -> Map[String, Array[String]] {
+  let exact : Map[String, Unit] = Map([])
+  let folded : Map[String, Array[String]] = Map([])
+  for entry in entries {
+    exact[entry] = ()
+    let key = name_key(entry)
+    match folded.get(key) {
+      Some(same) => same.push(entry)
+      None => folded[key] = [entry]
+    }
+  }
+  let names : Map[String, Array[String]] = Map([])
+  for name, paths in wanted {
+    let entry = if exact.contains(name) {
+      name
+    } else {
+      match folded.get(name_key(name)) {
+        Some([entry]) => entry
+        _ => name
+      }
+    }
+    match names.get(entry) {
+      Some(known) => known.append(paths)
+      None => names[entry] = paths
+    }
+  }
+  names
 }
 
 ///|
@@ -390,50 +475,70 @@ fn name_key(name : StringView) -> String {
 async fn RecommendedWatcher::commit(
   self : RecommendedWatcher,
 ) -> Unit raise NotifyError {
-  // One watcher per directory for the new paths.
-  let dirs : Map[String, DirWatcher] = Map([])
-  for path, watch in self.paths {
+  // The directories of the new paths get a new watcher. That is also what
+  // watches a path again that was unwatched because its file was removed:
+  // the new watcher looks at what is there now.
+  let renew : Map[String, String] = Map([])
+  for path, watch in self.paths.copy() {
     guard watch is Pending else { continue }
-    guard split_path(path) is Some((dir, name)) else {
+    let sites = sites(path)
+    if sites.is_empty() {
       raise NotifyError("No path was found.", path=Some(path))
     }
-    let watcher = match dirs.get(dir) {
-      Some(watcher) => watcher
-      None => {
-        let watcher = { names: Map([]), owned: 0, task: None, }
-        dirs[dir] = watcher
-        watcher
+    for site in sites {
+      if !renew.contains(site.0) {
+        renew[site.0] = path
       }
     }
-    let key = name_key(name)
-    match watcher.names.get(key) {
-      Some(paths) => paths.push(path)
-      None => watcher.names[key] = [path]
-    }
-    watcher.owned += 1
+    self.paths[path] = Watched(sites)
   }
-  for dir, watcher in dirs {
-    let names = watcher.names
-    let inner = @fs.Watcher(dir, debounce_timeout=0, ignored_paths=path => {
-      !names.contains(name_key(path))
-    }) catch {
-      err => {
-        let mut first = None
-        for paths in names.values() {
-          first = Some(paths[0])
-          break
+
+  // Everything that is watched in these directories, old and new, and the
+  // directories that are in use at all.
+  let wanted : Map[String, Map[String, Array[String]]] = Map([])
+  let used : Map[String, Unit] = Map([])
+  for path, watch in self.paths {
+    guard watch is Watched(sites) else { continue }
+    for site in sites {
+      let (dir, name) = site
+      used[dir] = ()
+      guard renew.contains(dir) else { continue }
+      let names = match wanted.get(dir) {
+        Some(names) => names
+        None => {
+          let names = Map([])
+          wanted[dir] = names
+          names
         }
-        raise NotifyError::io(err, first)
+      }
+      match names.get(name) {
+        Some(paths) => paths.push(path)
+        None => names[name] = [path]
       }
     }
-    for paths in names.values() {
-      for path in paths {
-        self.paths[path] = Watched(watcher)
-      }
+  }
+  for dir, wanted in wanted {
+    let names = resolve_names(dir, wanted)
+    let inner = @fs.Watcher(dir, debounce_timeout=0, ignored_paths=entry => {
+      !names.contains(entry)
+    }) catch {
+      err => raise NotifyError::io(err, renew.get(dir))
     }
+    let watcher = { dir, names, task: None, }
     watcher.task = Some(
       self.group.spawn(no_wait=true, () => self.forward(watcher, inner)),
     )
+    // The watcher it replaces has seen what happened until now.
+    if self.dirs.get(dir) is Some(old) {
+      self.idle.push(old)
+    }
+    self.dirs[dir] = watcher
+  }
+  for dir, watcher in self.dirs.copy() {
+    if !used.contains(dir) {
+      self.dirs.remove(dir)
+      self.idle.push(watcher)
+    }
   }
 
   // From here on the new watchers report the paths that were unwatched and
@@ -460,15 +565,15 @@ fn RecommendedWatcher::reports(
 }
 
 ///|
-/// Sends an event for every reported path with the given name in a
-/// watcher's directory.
+/// Sends an event for every reported path that is watched under the given
+/// entry of a watcher's directory.
 async fn RecommendedWatcher::send(
   self : RecommendedWatcher,
   watcher : DirWatcher,
-  name : String,
+  entry : String,
   kind : EventKind,
 ) -> Unit {
-  guard watcher.names.get(name_key(name)) is Some(paths) else { return }
+  guard watcher.names.get(entry) is Some(paths) else { return }
   for path in paths {
     if self.reports(path) {
       self.tx.put(Ok({ kind, paths: [path], }))
@@ -489,12 +594,17 @@ async fn RecommendedWatcher::forward(
     let events = inner.wait() catch {
       _ => {
         // The watcher gave up, which is what happens when its directory is
-        // removed. Its paths are not watched any more: report that like
-        // notify reports the watches it drops.
-        for paths in watcher.names.values() {
-          for path in paths {
-            if self.reports(path) {
-              self.tx.put(Ok({ kind: Remove(File), paths: [path], }))
+        // removed. Unless it was replaced already, its paths are not
+        // watched any more: report that like notify reports the watches it
+        // drops.
+        if self.dirs.get(watcher.dir) is Some(current) &&
+          physical_equal(current, watcher) {
+          self.dirs.remove(watcher.dir)
+          for paths in watcher.names.values() {
+            for path in paths {
+              if self.reports(path) {
+                self.tx.put(Ok({ kind: Remove(File), paths: [path], }))
+              }
             }
           }
         }
@@ -503,9 +613,9 @@ async fn RecommendedWatcher::forward(
     }
     for event in events {
       match event {
-        Modify(name) => self.send(watcher, name, Modify(Data(Any)))
-        Create(name) => self.send(watcher, name, Create(Any))
-        Remove(name) => self.send(watcher, name, Remove(File))
+        Modify(entry) => self.send(watcher, entry, Modify(Data(Any)))
+        Create(entry) => self.send(watcher, entry, Create(Any))
+        Remove(entry) => self.send(watcher, entry, Remove(File))
         Rename(old~, new~) => {
           self.send(watcher, old, Modify(Name(From)))
           self.send(watcher, new, Modify(Name(To)))

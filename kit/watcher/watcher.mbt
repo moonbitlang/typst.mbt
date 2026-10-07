@@ -146,7 +146,7 @@ pub async fn Watcher::wait(self : Watcher) -> Unit raise @kit.StrError {
     // watched until a certain point, to hinder a barrage of events from
     // preventing recompilations.
     let mut relevant = false
-    let batch_start = @async.now()
+    let batch_start = @platform.monotonic_nanos()
     for ;; {
       // `first.into_iter().chain(iter::from_fn(..)).take_while(..)`
       let event = match first {
@@ -160,7 +160,8 @@ pub async fn Watcher::wait(self : Watcher) -> Unit raise @kit.StrError {
             None => break
           }
       }
-      if @async.now() - batch_start > STARVE_TIMEOUT.to_int64() {
+      if @platform.monotonic_nanos() - batch_start >
+        STARVE_TIMEOUT.to_int64() * 1000000L {
         break
       }
       let event = match event {
@@ -208,15 +209,10 @@ pub async fn Watcher::wait(self : Watcher) -> Unit raise @kit.StrError {
 /// Whether two paths refer to the same file (the `same-file` crate's
 /// `is_same_file(..).unwrap_or(false)`: `false` if either cannot be
 /// opened).
-///
-/// The crate compares the files' device and inode numbers; the platform
-/// layer has neither, so this compares the canonical paths: two hard links
-/// to one file are told apart, and so is everything but the spelling on
-/// wasm, where paths are only normalized lexically.
 fn is_same_file(path1 : String, path2 : String) -> Bool {
-  let canonical1 = @platform.canonicalize(path1) catch { _ => return false }
-  let canonical2 = @platform.canonicalize(path2) catch { _ => return false }
-  @platform.exists(path1) && @platform.exists(path2) && canonical1 == canonical2
+  @platform.is_same_file(path1, path2) catch {
+    _ => false
+  }
 }
 
 ///|

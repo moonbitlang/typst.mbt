@@ -56,20 +56,39 @@ async fn inject(watcher : Watcher, kind : EventKind, path : String) -> Unit {
 }
 
 ///|
+/// The running watchers of the underlying watcher: their directories (below
+/// the tests' directory) with the entries they follow.
+fn running(watcher : Watcher) -> String {
+  let lines = []
+  for dir, running in watcher.watcher.dirs {
+    let entries = running.names.keys().to_array()
+    entries.sort()
+    let dir = dir.strip_prefix("_build/kit_watcher_test/").unwrap_or(dir)
+    lines.push("\{dir}: \{entries.join(" ")}")
+  }
+  // (Shorter lines first: the order of strings.)
+  lines.sort()
+  lines.join("; ")
+}
+
+///|
 async test "update watches exactly the listed files" {
   @async.with_task_group(group => {
     let dir = scratch("update")
     let a = "\{dir}/a.typ"
     let b = "\{dir}/b.typ"
     let c = "\{dir}/c.typ"
+    let d = "\{dir}/sub/d.typ"
     write(a, "a")
     write(b, "b")
+    @fs.mkdir("\{dir}/sub")
+    write(d, "d")
     let watcher = Watcher::new(None, group)
-    watcher.update([a, b, c])
+    watcher.update([a, b, c, d])
     // Existing files are watched, the others are polled for.
     inspect(
       keys(watcher.watched),
-      content="_build/kit_watcher_test/update/a.typ _build/kit_watcher_test/update/b.typ",
+      content="_build/kit_watcher_test/update/a.typ _build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/sub/d.typ",
     )
     inspect(
       keys(watcher.missing),
@@ -77,41 +96,60 @@ async test "update watches exactly the listed files" {
     )
     inspect(
       registered(watcher),
-      content="_build/kit_watcher_test/update/a.typ _build/kit_watcher_test/update/b.typ",
+      content="_build/kit_watcher_test/update/a.typ _build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/sub/d.typ",
     )
-    // One watcher for the directory of both.
-    guard watcher.watcher.paths.get(a) is Some(Watched(first)) &&
-      watcher.watcher.paths.get(b) is Some(Watched(second)) else {
-      fail("not watched")
+    // One watcher per directory.
+    inspect(running(watcher), content="update/sub: d.typ; update: a.typ b.typ")
+    guard watcher.watcher.dirs.get(dir) is Some(first) else {
+      fail("no watcher")
     }
-    inspect(physical_equal(first, second), content="true")
-    inspect(first.owned, content="2")
+    guard watcher.watcher.dirs.get("\{dir}/sub") is Some(sub) else {
+      fail("no watcher")
+    }
 
-    // A file that is no longer listed is unwatched, a new one is watched
-    // (by a watcher of its own), a missing one is not missing any more.
+    // A file that is no longer listed is unwatched, a new one is watched,
+    // a missing one is not missing any more. The directory of the new one
+    // has a new watcher for its files (the old one cannot take another),
+    // the other directory keeps its watcher.
     write(c, "c")
-    watcher.update([b, c])
+    watcher.update([b, c, d])
     inspect(
       keys(watcher.watched),
-      content="_build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/c.typ",
+      content="_build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/c.typ _build/kit_watcher_test/update/sub/d.typ",
     )
     inspect(keys(watcher.missing), content="")
     inspect(
       registered(watcher),
-      content="_build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/c.typ",
+      content="_build/kit_watcher_test/update/b.typ _build/kit_watcher_test/update/c.typ _build/kit_watcher_test/update/sub/d.typ",
     )
-    inspect(first.owned, content="1")
-    inspect(keys(watcher.watcher.retired), content="")
-    guard watcher.watcher.paths.get(c) is Some(Watched(third)) else {
-      fail("not watched")
+    inspect(running(watcher), content="update/sub: d.typ; update: b.typ c.typ")
+    guard watcher.watcher.dirs.get(dir) is Some(second) else {
+      fail("no watcher")
     }
-    inspect(physical_equal(first, third), content="false")
+    inspect(physical_equal(first, second), content="false")
+    guard watcher.watcher.dirs.get("\{dir}/sub") is Some(still) else {
+      fail("no watcher")
+    }
+    inspect(physical_equal(sub, still), content="true")
+    inspect(keys(watcher.watcher.retired), content="")
 
-    // Nothing is listed: nothing is watched, and the watchers are released.
+    // The same list again changes nothing.
+    watcher.update([b, c, d])
+    guard watcher.watcher.dirs.get(dir) is Some(third) else {
+      fail("no watcher")
+    }
+    inspect(physical_equal(second, third), content="true")
+
+    // A directory without listed files loses its watcher.
+    watcher.update([b])
+    inspect(running(watcher), content="update: b.typ c.typ")
+    inspect(registered(watcher), content="_build/kit_watcher_test/update/b.typ")
+
+    // Nothing is listed: nothing is watched.
     watcher.update([])
     inspect(keys(watcher.watched), content="")
     inspect(registered(watcher), content="")
-    inspect(first.owned + third.owned, content="0")
+    inspect(running(watcher), content="")
     inspect(watcher.watcher.idle.length(), content="0")
   })
 }
@@ -434,6 +472,12 @@ async test "is_same_file" {
   inspect(is_same_file(a, a), content="true")
   inspect(is_same_file(a, "\{dir}/./a.typ"), content="true")
   inspect(is_same_file(a, b), content="false")
+  // Another name of the file (where a link can be told).
+  @fs.symlink(target="a.typ", "\{dir}/link.typ")
+  if @platform.lstat_kind("\{dir}/link.typ") is Symlink {
+    inspect(is_same_file(a, "\{dir}/link.typ"), content="true")
+    inspect(is_same_file(b, "\{dir}/link.typ"), content="false")
+  }
   // A file that does not exist is the same as none, not even as itself.
   inspect(is_same_file(a, "\{dir}/c.typ"), content="false")
   inspect(is_same_file("\{dir}/c.typ", "\{dir}/c.typ"), content="false")
