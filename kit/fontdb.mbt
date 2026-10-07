@@ -17,6 +17,12 @@
 // of a macOS 26 installation, either way), and a file that is truncated
 // while it is read gives short reads, which are faces that do not parse,
 // where a mapping gives SIGBUS (fontdb has that exposure).
+//
+// fontdb and `FontInfo::new` look at every face on its own. Here the faces
+// of a collection that is read in ranges share what they have in common: a
+// table at one place of the file is read once, and the coverage of a `cmap`
+// table is computed once (`FontFile::tables`, `FontFile::coverages`). What
+// a face gets is what its whole file gives: `fontdb_wbtest.mbt`.
 
 ///|
 /// A discovered font face: where it lives and its metadata.
@@ -132,11 +138,11 @@ fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
     None => 1U
   }
   for index in 0U..<n {
-    guard file.probe_face(index) is Some((data, at)) else { continue }
+    guard file.probe_face(index) is Some(probe) else { continue }
     // `fontdb::parse_face_info`.
-    guard admit_face(data, at) else { continue }
+    guard admit_face(probe.data, probe.index) else { continue }
     // `db.with_face_data(face.id, FontInfo::new)`.
-    guard @library.FontInfo::new(data, at) is Some(info) else { continue }
+    guard file.info(probe) is Some(info) else { continue }
     self.faces.push({ path, index, info, })
   }
 }
@@ -186,11 +192,22 @@ fn is_mac_roman(name : @otf.Name) -> Bool {
 }
 
 ///|
-/// The tables that face admission and `FontInfo::from_ttf` read (the first
-/// three are required by `Face::parse`).
-let probe_tables : ReadOnlyArray[String] = [
-  "head", "hhea", "maxp", "name", "OS/2", "post", "cmap", "fvar", "MATH",
-]
+const TAG_CMAP : UInt = 0x636D6170U
+
+///|
+/// Whether a table is one that face admission and `FontInfo::from_ttf` read
+/// (the first three are required by `Face::parse`).
+fn is_probe_table(tag : UInt) -> Bool {
+  match tag {
+    // head, hhea, maxp
+    0x68656164U | 0x68686561U | 0x6D617870U => true
+    // name, OS/2, post
+    0x6E616D65U | 0x4F532F32U | 0x706F7374U => true
+    // cmap, fvar, MATH
+    TAG_CMAP | 0x66766172U | 0x4D415448U => true
+    _ => false
+  }
+}
 
 ///|
 /// A font file being probed: either fully loaded or read in ranges.
@@ -200,6 +217,38 @@ priv struct FontFile {
   mut data : Bytes?
   /// The open file, if it is read in ranges.
   file : @platform.RangedFile?
+  /// The number of faces, if this is a collection that is read in ranges
+  /// (set by `fonts_in_collection`).
+  mut faces : UInt?
+  /// Of a collection that is read in ranges: the tables read so far, by
+  /// their place in the file (`table_key`). The faces of a collection share
+  /// tables: of the system fonts of macOS 26, 1339 faces in 502 files,
+  /// every second table that discovery needs is one that an earlier face
+  /// of the file has as well.
+  tables : Map[UInt64, Bytes?]
+  /// And the coverages computed so far, by the place of the `cmap` table
+  /// they are of: the largest of these tables and half of the work of
+  /// `FontInfo::new`.
+  coverages : Map[UInt64, @library.Coverage]
+}
+
+///|
+/// The place of a table in a file as a key: its offset and its length.
+fn table_key(offset : UInt, length : UInt) -> UInt64 {
+  (offset.to_uint64() << 32) | length.to_uint64()
+}
+
+///|
+/// What to parse a face from.
+priv struct Probe {
+  /// The whole file, or a standalone font with the face's relevant tables.
+  data : Bytes
+  /// The index of the face in `data`.
+  index : UInt
+  /// For a face of a collection that is read in ranges: the place of its
+  /// `cmap` table in the file. The table is in `data` unless its coverage
+  /// is known (`FontFile::info`).
+  cmap : UInt64?
 }
 
 ///|
@@ -210,19 +259,38 @@ const WHOLE_FILE_LIMIT : Int64 = 262144L
 ///|
 fn FontFile::open(path : String) -> FontFile raise @platform.IoError {
   if !@platform.supports_ranged_reads() {
-    let data = @platform.read_file(path)
-    return { size: data.length().to_int64(), data: Some(data), file: None, }
+    return FontFile::whole(@platform.read_file(path))
   }
   let file = @platform.RangedFile::open(path)
   errdefer file.close()
   let size = file.size()
   if size > WHOLE_FILE_LIMIT {
-    return { size, data: None, file: Some(file), }
+    return {
+      size,
+      data: None,
+      file: Some(file),
+      faces: None,
+      tables: Map([]),
+      coverages: Map([]),
+    }
   }
   // Small files are cheaper to read whole.
   let data = file.read(0L, size.to_int())
   file.close()
-  { size: data.length().to_int64(), data: Some(data), file: None, }
+  FontFile::whole(data)
+}
+
+///|
+/// A file that was read completely.
+fn FontFile::whole(data : Bytes) -> FontFile {
+  {
+    size: data.length().to_int64(),
+    data: Some(data),
+    file: None,
+    faces: None,
+    tables: Map([]),
+    coverages: Map([]),
+  }
 }
 
 ///|
@@ -291,42 +359,97 @@ fn FontFile::fonts_in_collection(self : FontFile) -> UInt? {
   if be_u32(header, 0) != 0x74746366U {
     return None
   }
-  Some(be_u32(header, 8))
+  let count = be_u32(header, 8)
+  if self.data is None {
+    self.faces = Some(count)
+  }
+  Some(count)
 }
 
 ///|
-/// The data to parse a face from and the index to parse it at: the whole
-/// file at the face's index or, with ranged reads, a standalone font with
-/// the face's relevant tables (at index 0). `None` if the face cannot be
-/// parsed at all (like `ttf_parser::RawFace::parse` failing).
-fn FontFile::probe_face(self : FontFile, index : UInt) -> (Bytes, UInt)? {
+/// The table at a place of a collection that is read in ranges, or `None`
+/// if it is not all in the file. Read once for all faces that have it.
+fn FontFile::table(self : FontFile, offset : UInt, length : UInt) -> Bytes? {
+  let key = table_key(offset, length)
+  if self.tables.get(key) is Some(data) {
+    return data
+  }
+  let data = self.read_table(offset, length)
+  self.tables[key] = data
+  data
+}
+
+///|
+/// The table at a place of the file, or `None` if it is not all there.
+fn FontFile::read_table(
+  self : FontFile,
+  offset : UInt,
+  length : UInt,
+) -> Bytes? {
+  if length > 0x7FFFFFFFU {
+    None
+  } else {
+    self.read(offset.to_int64(), length.reinterpret_as_int())
+  }
+}
+
+///|
+/// `FontInfo::new` for a face. For the faces of a collection that is read
+/// in ranges, the coverage of a `cmap` table is computed for the first
+/// face that has the table and taken from there by the others.
+fn FontFile::info(self : FontFile, probe : Probe) -> @library.FontInfo? {
+  guard probe.cmap is Some(key) else {
+    return @library.FontInfo::new(probe.data, probe.index)
+  }
+  let ttf = @otf.Face::parse(probe.data[:], probe.index) catch {
+    _ => return None
+  }
+  let coverage = match self.coverages.get(key) {
+    Some(coverage) => coverage
+    None => {
+      let coverage = @library.Coverage::from_ttf(ttf)
+      self.coverages[key] = coverage
+      coverage
+    }
+  }
+  @library.FontInfo::from_ttf_with_coverage(ttf, Some(coverage))
+}
+
+///|
+/// What to parse a face from: the whole file at the face's index or, with
+/// ranged reads, a standalone font with the face's relevant tables (at
+/// index 0). `None` if the face cannot be parsed at all (like
+/// `ttf_parser::RawFace::parse` failing).
+fn FontFile::probe_face(self : FontFile, index : UInt) -> Probe? {
   if self.data is Some(data) {
-    return Some((data, index))
+    return Some({ data, index, cmap: None, })
   }
   // Locate the face's offset table.
-  guard self.read(0L, 4) is Some(magic) else { return None }
-  let magic = be_u32(magic, 0)
-  let face_offset = if magic == 0x74746366U {
-    guard self.read(8L, 4) is Some(count) else { return None }
-    let count = be_u32(count, 0)
-    let records_end = 12L + count.to_int64() * 4L
-    if records_end > self.size || index >= count {
-      return None
+  let face_offset = match self.faces {
+    Some(count) => {
+      let records_end = 12L + count.to_int64() * 4L
+      if records_end > self.size || index >= count {
+        return None
+      }
+      guard self.read(12L + index.to_int64() * 4L, 4) is Some(offset) else {
+        return None
+      }
+      let offset = be_u32(offset, 0).to_int64()
+      if offset < records_end {
+        return None
+      }
+      offset
     }
-    guard self.read(12L + index.to_int64() * 4L, 4) is Some(offset) else {
-      return None
-    }
-    let offset = be_u32(offset, 0).to_int64()
-    if offset < records_end {
-      return None
-    }
-    offset
-  } else if index != 0U {
-    return None
-  } else {
-    0L
+    None => if index != 0U { return None } else { 0L }
   }
-  guard self.read(face_offset, 12) is Some(header) else { return None }
+  // The offset table and, in the same read, as many table records as most
+  // fonts have.
+  let rest = self.size - face_offset
+  if rest < 12L {
+    return None
+  }
+  let first = if rest < 12L + 16L * 32L { rest.to_int() } else { 12 + 16 * 32 }
+  guard self.read(face_offset, first) is Some(header) else { return None }
   let face_magic = be_u32(header, 0)
   guard face_magic == 0x00010000U ||
     face_magic == 0x74727565U ||
@@ -334,33 +457,51 @@ fn FontFile::probe_face(self : FontFile, index : UInt) -> (Bytes, UInt)? {
     return None
   }
   let num_tables = be_u16(header, 4)
-  guard self.read(face_offset + 12L, num_tables * 16) is Some(records) else {
-    return None
+  let records = if 12 + num_tables * 16 <= first {
+    header
+  } else {
+    guard self.read(face_offset, 12 + num_tables * 16) is Some(header) else {
+      return None
+    }
+    header
   }
   // Collect the relevant tables. Fall back to the whole file for unsorted
   // or duplicate table records (where lookups in a subset could behave
   // differently from lookups in the full table directory).
+  let shared = self.faces is Some(_)
   let tables : Array[(UInt, UInt, Bytes?)] = []
+  let mut cmap : UInt64? = None
   let mut prev = -1L
   for i in 0..<num_tables {
-    let at = i * 16
+    let at = 12 + i * 16
     let tag = be_u32(records, at)
     if tag.to_int64() <= prev {
-      return self.all().map(data => (data, index))
+      guard self.all() is Some(data) else { return None }
+      return Some({ data, index, cmap: None, })
     }
     prev = tag.to_int64()
-    if probe_tables.contains(@otf.Tag(tag).to_string()) {
+    if is_probe_table(tag) {
       let offset = be_u32(records, at + 8)
       let length = be_u32(records, at + 12)
-      let data = if length > 0x7FFFFFFFU {
-        None
+      let data = if !shared {
+        self.read_table(offset, length)
+      } else if tag == TAG_CMAP {
+        let key = table_key(offset, length)
+        cmap = Some(key)
+        // The coverage of this table is known: the face does without the
+        // table itself (nothing else in `FontInfo::from_ttf` and nothing
+        // in the face's admission reads it).
+        if self.coverages.contains(key) {
+          continue
+        }
+        self.read_table(offset, length)
       } else {
-        self.read(offset.to_int64(), length.reinterpret_as_int())
+        self.table(offset, length)
       }
       tables.push((tag, be_u32(records, at + 4), data))
     }
   }
-  Some((build_sfnt(face_magic, tables), 0U))
+  Some({ data: build_sfnt(face_magic, tables), index: 0U, cmap, })
 }
 
 ///|

@@ -439,6 +439,32 @@ test "scan: table records that point elsewhere" {
 }
 
 ///|
+/// A font with `n` more table records, of empty tables whose tags come
+/// after all others.
+fn with_more_tables(data : Bytes, n : Int) -> Bytes {
+  let all = records(data, 0)
+  let end = 12 + 16 * all.length()
+  let mut out = data[:end].to_owned()
+  for i in 0..<n {
+    // "zz" and two digits.
+    let tag = 0x7A7A3030U +
+      ((i / 10) << 8).reinterpret_as_uint() +
+      (i % 10).reinterpret_as_uint()
+    out = out + u32(tag) + zeros(12)
+  }
+  out = splice(out + data[end:].to_owned(), 4, u16(all.length() + n))
+  for record in all {
+    out = patch(
+      out,
+      record.at,
+      record.offset + (16 * n).reinterpret_as_uint(),
+      record.length,
+    )
+  }
+  out
+}
+
+///|
 test "scan: table directories" {
   let (small, large, _) = test_fonts()
   let files = []
@@ -477,6 +503,16 @@ test "scan: table directories" {
     files.push(("too-many-\{size}.ttf", splice(data, 4, u16(0xFFFF))))
     files.push(("none-\{size}.ttf", splice(data, 4, u16(0))))
     files.push(("fewer-\{size}.ttf", splice(data, 4, u16(all.length() - 3))))
+    // More table records than discovery reads at first (32), and one more.
+    files.push(
+      ("32-tables-\{size}.ttf", with_more_tables(data, 32 - all.length())),
+    )
+    files.push(
+      ("33-tables-\{size}.ttf", with_more_tables(data, 33 - all.length())),
+    )
+    files.push(
+      ("90-tables-\{size}.ttf", with_more_tables(data, 90 - all.length())),
+    )
   }
   inspect(
     scanned("directories", files),
@@ -487,12 +523,18 @@ test "scan: table directories" {
       #|too-many-small.ttf: -
       #|none-small.ttf: -
       #|fewer-small.ttf: -
+      #|32-tables-small.ttf: 0
+      #|33-tables-small.ttf: 0
+      #|90-tables-small.ttf: 0
       #|unsorted-large.ttf: 0
       #|reversed-large.ttf: -
       #|twice-large.ttf: 0
       #|too-many-large.ttf: -
       #|none-large.ttf: -
       #|fewer-large.ttf: -
+      #|32-tables-large.ttf: 0
+      #|33-tables-large.ttf: 0
+      #|90-tables-large.ttf: 0
     ),
   )
 }
@@ -514,17 +556,45 @@ test "scan: collections" {
       shared = patch(shared, record.at, of_first[i].offset, of_first[i].length)
     }
   }
-  let mut shorter = shared
-  for record in records(shorter, be32(shorter, 16).reinterpret_as_int()) {
-    if record.tag == "cmap" {
-      shorter = patch(shorter, record.at, record.offset, record.length - 4000)
+  // The collection with the record of a table of its face `k` changed.
+  let with_record = (
+    data : Bytes,
+    k : Int,
+    tag : String,
+    change : (Record) -> (UInt, UInt),
+  ) => {
+    let mut out = data
+    for record in records(data, be32(data, 12 + 4 * k).reinterpret_as_int()) {
+      if record.tag == tag {
+        let (offset, length) = change(record)
+        out = patch(out, record.at, offset, length)
+      }
     }
+    out
   }
-  for record in records(shorter, be32(shorter, 20).reinterpret_as_int()) {
-    if record.tag == "name" {
-      shorter = patch(shorter, record.at, record.offset, 30)
-    }
+  let shorter = with_record(
+    with_record(shared, 1, "cmap", r => (r.offset, r.length - 4000)),
+    2,
+    "name",
+    r => (r.offset, 30),
+  )
+  // The first face of a `cmap` has no name (so its coverage is not
+  // computed); no face has its `cmap` in the file; the second face has
+  // another table as its `cmap`, and no `post` (it is not monospaced).
+  let unnamed = with_record(shared, 0, "name", r => (r.offset, 30))
+  let mut outside = shared
+  for k in 0..<3 {
+    outside = with_record(outside, k, "cmap", r => (0xFFFFFF00U, r.length))
   }
+  let name = records(shared, be32(shared, 12).reinterpret_as_int()).filter(r => {
+      r.tag == "name"
+    })[0]
+  let other = with_record(
+    with_record(shared, 1, "cmap", _ => (name.offset, name.length)),
+    1,
+    "post",
+    r => (r.offset, 0),
+  )
   inspect(
     scanned("collections", [
       ("three.ttc", ttc([small, large, large])),
@@ -533,6 +603,9 @@ test "scan: collections" {
       ("mixed.TTC", ttc([otf, large])),
       ("shared.ttc", shared),
       ("shared-shorter.ttc", shorter),
+      ("shared-unnamed-first.ttc", unnamed),
+      ("shared-cmap-outside.ttc", outside),
+      ("shared-other-cmap.ttc", other),
       ("count-5.ttc", ttc([small, large], count=5)),
       ("count-0.ttc", ttc([small, large], count=0)),
       ("count-1.ttc", ttc([small, large], count=1)),
@@ -561,6 +634,9 @@ test "scan: collections" {
       #|mixed.TTC: 0 1
       #|shared.ttc: 0 1 2
       #|shared-shorter.ttc: 0 1
+      #|shared-unnamed-first.ttc: 1 2
+      #|shared-cmap-outside.ttc: 0 1 2
+      #|shared-other-cmap.ttc: 0 1 2
       #|count-5.ttc: 1
       #|count-0.ttc: -
       #|count-1.ttc: 0
