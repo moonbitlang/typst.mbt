@@ -1,5 +1,16 @@
 // Port of `typst-library/src/text/font/info.rs` and `exceptions.rs` (the
 // table itself is generated into font_exceptions_gen.mbt).
+//
+// Not upstream, for font discovery, which computes a `FontInfo` for every
+// face of the system (`kit/fontdb.mbt`); what is computed is upstream's,
+// encoding for encoding (`kit/fontdb_wbtest.mbt`):
+// - the coverage is a function of its own, `Coverage::from_ttf`, and
+//   `FontInfo::from_ttf_with_coverage` takes one that is known (the faces
+//   of a collection share `cmap` tables);
+// - it is built from the ranges of a subtable's segments and groups, not
+//   from single codepoints, and a subtable that an earlier encoding record
+//   points to as well is skipped;
+// - `Coverage::union` merges the runs of two coverages as it reads them.
 
 ///|
 /// Properties of a single font.

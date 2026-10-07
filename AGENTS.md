@@ -722,6 +722,30 @@
   typst-cli` in `.repos/typst`): SVG/HTML/PNG pixels, diagnostics, help,
   `fonts --variants`, `query`/`eval`/`info` output are identical; outputs
   must also be identical across native, wasm-gc and wasm.
+- Font discovery (`kit/fontdb.mbt`, whose header lists how it differs from
+  fontdb) is what every compilation without `--ignore-system-fonts` pays
+  first: 34 ms for the 1339 faces in 502 files of macOS 26 (upstream's
+  fontdb: 77 ms). A file is opened once and read through its descriptor
+  (`@platform.RangedFile`, `pread`; the whole file on the wasm targets),
+  not mapped: reading the pieces costs what touching them in a mapping
+  costs, and a file that is truncated meanwhile gives short reads, which
+  are faces that do not parse, where a mapping gives SIGBUS. Only the
+  tables that fontdb's admission and `FontInfo::from_ttf` look at are read
+  (`is_probe_table`: extend it when either reads another table), the faces
+  of a collection share the tables they have in common and the coverage of
+  a `cmap` (`FontFile::tables`, `coverages`), and a directory is listed
+  once with the kinds of its entries (`@platform.read_dir_entries`, not
+  `@fs.read_dir`). `Coverage::from_ttf` (`library/font_info.mbt`) adds the
+  segments and groups of a subtable as ranges, read from the bytes
+  (`CmapSubtable::codepoint_ranges`), and skips a subtable that an earlier
+  encoding record points to; the encoding must stay upstream's.
+  `kit/fontdb_wbtest.mbt` holds both to their references on truncated,
+  malformed and non-font files: what discovery finds in a file is what the
+  whole file gives, and a coverage is what upstream's algorithm gives
+  codepoint by codepoint. There is no cache on disk (upstream has none).
+  After a change, `fonts --variants` and the pages of a document that uses
+  system fonts and their fallback must be what they were, and what
+  upstream's are.
 - `typst watch` (`cli/watch.mbt`, `cli/watch_status.mbt`: `watch.rs`;
   `kit/watcher/watcher.mbt`: typst-kit's `watcher.rs`, same constants and
   loop) runs on `moonbitlang/async`'s `@fs.Watcher` through the bridge

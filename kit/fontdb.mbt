@@ -260,7 +260,8 @@ priv struct Probe {
 
 ///|
 /// Files up to this size are read whole: that is one read, and their faces
-/// are parsed in place.
+/// are parsed in place. (Measured on the system fonts of macOS 26: the same
+/// time for limits from 16 KiB to 256 KiB, 5 ms of 42 more for 1 MiB.)
 const WHOLE_FILE_LIMIT : Int64 = 262144L
 
 ///|
