@@ -310,11 +310,17 @@ async test "a link is watched where it is and where its file is" {
     write("\{file}.tmp", "3")
     @fs.rename("\{file}.tmp", file, replace=true)
     inspect(drain(rx, dir), content="remove table.csv, create table.csv")
-    // The link is made to point elsewhere.
+    // The link is made to point elsewhere. kqueue reports it; with inotify
+    // nothing is reported (the header of `notify.mbt`), as with notify's
+    // inotify backend, which watches the file the link pointed to.
     write("\{dir}/data/other.csv", "4")
     @fs.remove(link)
     @fs.symlink(target="data/other.csv", link)
-    inspect(drain(rx, dir), content="remove table.csv, create table.csv")
+    let repointed = drain(rx, dir)
+    inspect(
+      repointed == "remove table.csv, create table.csv" || repointed == "",
+      content="true",
+    )
     // Watched anew, the link's new file is followed.
     watcher.unwatch(link)
     watcher.watch(link)

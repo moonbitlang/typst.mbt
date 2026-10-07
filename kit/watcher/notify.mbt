@@ -42,7 +42,11 @@
 //   directory only reports its own removal and creation), and a watched
 //   directory that is renamed while its files stay (notify's FSEvents
 //   backend follows paths and reports it; its inotify backend does not
-//   either).
+//   either). On Linux also a link that is made to point elsewhere (removed
+//   and created again under its name): `@fs.Watcher`'s inotify backend
+//   reports no change for it, and notify's watches the file the link
+//   pointed to, which does not change. The link's new file is followed
+//   once the path is watched again.
 
 ///|
 /// An event describing open or close operations on files
