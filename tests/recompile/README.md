@@ -26,9 +26,12 @@ file guarantees.
 **The world** is the CLI's: files are kept in `@kit.FileStore`, the store of
 `cli/world.mbt` (a port of typst-kit's), over a loader that reads memory
 instead of the disk. After an edit the world is reset as `SystemWorld::reset`
-does; a file that was a source before is then the same `Source` object with
-its text replaced and its tree reparsed in place (`Source::replace`), so
-the nodes outside of the reparsed range keep their span numbers. That
+does; a file that was a source before is then the source that
+`Source::replace` made of the one the slot had: its text replaced and its
+tree reparsed in part, so the nodes outside of the reparsed range keep
+their span numbers (they are the nodes of the old tree; only where the
+numbers around the new nodes run out are neighbours renumbered, as
+copies). That
 matters: span numbers are in the keys of memoized calls and in the hashes of
 located elements, and a fresh parse numbers the same text differently.
 
@@ -252,9 +255,9 @@ On `main` (4877742) the stage found one thing, and it is upstream's:
 
 - **Compiling again is not always compiling from scratch, because
   reparsing is not always parsing.** `##let nope #let= 4`, then its first
-  character deleted: the source that was edited in place has one error
-  more than a parse of the new text ("expected pattern" besides "the
-  character `#` is not valid in code"). Upstream does the same: its `typst
+  character deleted: the source that was edited (reparsed in part) has
+  one error more than a parse of the new text ("expected pattern" besides
+  "the character `#` is not valid in code"). Upstream does the same: its `typst
   watch` prints both errors after that edit and its `typst compile` one.
   The port follows the reparser (the `reparse` stage compares the two), so
   the stage does not call this a failure: it checks every source of every
@@ -315,15 +318,19 @@ And two things that are not bugs today:
 
 - **The CLI's world and upstream's.** `@kit.FileStore` is typst-kit's state
   machine slot for slot (stale sources, byte order marks, invalid UTF-8,
-  `reset`, `dependencies`), and `SystemWorld::reset` is upstream's. The
-  difference is one level down: upstream's `Source` is copy-on-write
-  (`Arc::make_mut` in `Source::replace` and in the reparser), so whoever
-  holds a source or a syntax node of the compilation before keeps what it
-  held; the port's `Source` and `SyntaxNode` are objects that
-  `Source::replace` edits in place (`syntax/source.mbt`,
-  `syntax/reparser.mbt`). Nothing reads a node of an earlier compilation
-  today. A cache that keeps a closure, a module or content across a reset
-  keeps nodes that the next reparse rewrites under it.
+  `reset`, `dependencies`), and `SystemWorld::reset` is upstream's. One
+  level down there was a difference, which is gone: upstream's `Source` is
+  copy-on-write (`Arc::make_mut` in `Source::replace` and in the
+  reparser), so whoever holds a source or a syntax node of the compilation
+  before keeps what it held, and the port's `Source` and `SyntaxNode` were
+  objects that `Source::replace` edited in place. Now an edit returns a
+  new source and copies the nodes it writes to (`syntax/source.mbt`,
+  `syntax/reparser.mbt`; the rule is in the header of `syntax/node.mbt`):
+  a cache that keeps a closure, a module or content across a reset keeps
+  the nodes they were made from. This stage does not show that (nothing
+  reads a node of an earlier compilation yet); `syntax/persistent_test.mbt`,
+  `syntax/persistent_property_test.mbt` and `typst/persistent_wbtest.mbt`
+  do.
 - **Aborts.** A document can make the compiler abort where upstream
   panics: `box(inset: (left: 100%), block(width: 10pt))` measured with
   `width: auto` is "frame size must be finite" here and `assertion failed:

@@ -5,9 +5,15 @@
 // the parser works on UTF-16 indices and the byte ranges handed to
 // [reparse_block] and [reparse_markup] must be converted.
 //
-// Upstream replaces the root with `*root = parse(text)` when incremental
-// reparsing fails; here the root node object is overwritten in place so that
-// holders of the root (e.g. [Source]) observe the new tree.
+// Upstream edits the tree through `&mut SyntaxNode`: the nodes it writes to
+// are made unique by `Arc::make_mut` on the way (`children_mut`,
+// `update_parent`, `replace_children` and `numberize` all go through
+// `inner_and_span_mut`, node.rs:85), so a tree that somebody else holds is
+// left as it was. Here [reparse] returns the new root and the tree it was
+// given stays as it is: it works on copies of the nodes it writes to (the
+// root, and each child before [try_reparse] descends into it), which is the
+// rule in the header of `node.mbt`. A reparse that fails halfway has written
+// to copies only.
 
 ///|
 /// Refresh the given syntax node with as little parsing as possible.
@@ -17,13 +23,20 @@
 /// range in the new text that was ultimately reparsed.
 ///
 /// The high-level API for this function is [Source::edit].
+///
+/// Upstream takes `root: &mut SyntaxNode` (reparser.rs:13). Here `root` is
+/// not written to: the refreshed tree is returned with the range, and it
+/// shares with `root` every node that the edit did not have to write to.
 fn reparse(
   root : SyntaxNode,
   text : Lines,
   replaced_start : Int,
   replaced_end : Int,
   replacement_len : Int,
-) -> (Int, Int) {
+) -> (SyntaxNode, (Int, Int)) {
+  // Upstream writes to the root's record through `node.children_mut()`
+  // (reparser.rs:64), which copies it if it is shared.
+  let node = root.make_mut()
   match
     try_reparse(
       text,
@@ -31,21 +44,19 @@ fn reparse(
       replaced_end,
       replacement_len,
       None,
-      root,
+      node,
       0,
     ) {
-    Some(range) => range
+    Some(range) => (node, range)
     None => {
       let id = root.span().id()
-      let fresh = parse(text.text())
-      root.data = fresh.data
-      root.span = fresh.span
+      let root = parse(text.text())
       if id is Some(id) {
         root.numberize(id, span_full_start, span_full_end) catch {
           _ => abort("failed to number reparsed source")
         }
       }
-      (0, text.len_bytes())
+      (root, (0, text.len_bytes()))
     }
   }
 }
@@ -84,6 +95,10 @@ fn reparse_utf16(text : Lines, byte_idx : Int) -> Int {
 /// We also do not currently reparse math in any capacity, but it would not be
 /// too difficult to include equations as another kind of block, or reparse math
 /// expressions similarly to markup expressions.
+///
+/// `node` is written to: it must be a copy that this edit made
+/// ([SyntaxNode::make_mut]). Its children are those of the tree before the
+/// edit until they are replaced here.
 fn try_reparse(
   text : Lines,
   replaced_start : Int,
@@ -110,6 +125,15 @@ fn try_reparse(
       let prev_desc = child.descendants()
       let new_len = prev_len + replacement_len - (replaced_end - replaced_start)
       let new_range = (start_offset, start_offset + new_len)
+
+      // Not upstream: the recursive call writes to the child, which is of
+      // the tree before the edit, so it gets a copy that takes the child's
+      // place in `node` (whose children array is this edit's). Upstream's
+      // call copies the child's record itself, in its `children_mut()`
+      // (reparser.rs:64), which it always reaches: an inner child that
+      // surrounds the edit has overlapping children.
+      let child = child.make_mut()
+      children[overlap_start] = child
 
       // Recursively descend and try to reparse at a lower level.
       if try_reparse(

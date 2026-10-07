@@ -87,19 +87,26 @@ test "source file edit" {
     after : String,
   ) raise {
     let reference = Lines::new(after)
-    let edited = Lines::new(prev)
-    edited.edit(start, end, replacement)
+    let before = Lines::new(prev)
+    let original = Lines::new(prev)
+    let edited = original.edit(start, end, replacement)
     assert_eq(edited.text(), reference.text())
     assert_eq(line_starts(edited), line_starts(reference))
     assert_eq(edited.len_bytes(), reference.len_bytes())
-    let replaced = Lines::new(prev)
     let new = utf8_slice(prev, 0, start) +
       replacement +
       utf8_slice(prev, end, utf8_len(prev))
-    assert_true(replaced.replace(new))
+    guard original.replace(new) is Some(replaced) else {
+      fail("no change from \{prev} to \{new}")
+    }
     assert_eq(replaced.text(), reference.text())
     assert_eq(line_starts(replaced), line_starts(reference))
     assert_eq(replaced.len_bytes(), reference.len_bytes())
+    // The lines that were edited are what they were (upstream: a clone
+    // taken before the edit).
+    assert_eq(original.text(), before.text())
+    assert_eq(line_starts(original), line_starts(before))
+    assert_eq(original.len_bytes(), before.len_bytes())
   }
 
   // Test inserting at the beginning.
@@ -126,5 +133,5 @@ test "replacement range" {
   assert_eq(lines.replacement_range("ä💛b"), None)
   // The common prefix/suffix must not split the multi-byte chars.
   assert_eq(lines.replacement_range("ä💚b"), Some((2, 1)))
-  assert_eq(lines.replace("ä💛b"), false)
+  assert_true(lines.replace("ä💛b") is None)
 }

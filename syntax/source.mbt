@@ -1,10 +1,20 @@
 // Port of `crates/typst-syntax/src/source.rs`.
 //
-// Upstream `Source` is a reference-counted, copy-on-write handle. Here it is a
-// mutable object: [Source::edit] and [Source::replace] update the text, the
-// line metadata and the syntax tree in place (the root node object is kept,
-// see [reparse]). Callers that need the previous tree must
-// [SyntaxNode::deep_clone] it before editing.
+// Upstream `Source` is a reference-counted, copy-on-write handle
+// (`Arc<LazyHash<SourceInner>>`, source.rs:24): `edit` and `replace` take
+// `&mut self` and write through `Arc::make_mut` (:107), so a `Source` that
+// was cloned before keeps its text, its lines and its tree. The port has no
+// reference count to ask, so a `Source` never changes: [Source::edit] and
+// [Source::replace] return the edited source, and the one they were called
+// on stays what it was, for whoever holds it. That is what a clone taken
+// before the edit is upstream; the holder of upstream's `&mut Source` (a
+// file slot of a world) keeps the returned source instead.
+//
+// An edited source shares with the one before every syntax node that the
+// edit did not write to (the header of `node.mbt` says which it copies:
+// the ancestors of what is replaced, and the neighbours it has to
+// renumber), so those nodes keep their span numbers, and a closure or a
+// module that holds nodes of the old tree is not affected by the edit.
 
 ///|
 /// A Typst source file containing the full source text, a mapping from byte
@@ -37,6 +47,9 @@ pub fn Source::detached(text : String) -> Source {
 
 ///|
 /// Create a new source file with an already created syntax tree.
+///
+/// This publishes the tree (see the header of `node.mbt`): the caller must
+/// not write to it afterwards.
 pub fn Source::with_root(
   id : FileId,
   text : String,
@@ -47,6 +60,9 @@ pub fn Source::with_root(
 
 ///|
 /// The root node of the file's untyped syntax tree.
+///
+/// For reading: the nodes of a source are immutable (see the header of
+/// `node.mbt`).
 pub fn Source::root(self : Source) -> SyntaxNode {
   self.root
 }
@@ -77,11 +93,13 @@ pub fn Source::lines(self : Source) -> Lines {
 /// to produce the smallest single edit that transforms old into new and
 /// then calls [Source::edit] with it.
 ///
-/// Returns the (UTF-8 byte) range in the new source that was ultimately
-/// reparsed.
-pub fn Source::replace(self : Source, new : String) -> (Int, Int) {
+/// Returns the source with the new text and the (UTF-8 byte) range in it
+/// that was ultimately reparsed. `self` is unchanged (upstream edits `self`
+/// and returns the range); if the text is the same, `self` is returned with
+/// the range `(0, 0)`.
+pub fn Source::replace(self : Source, new : String) -> (Source, (Int, Int)) {
   guard self.lines.replacement_range(new) is Some((prefix, suffix)) else {
-    return (0, 0)
+    return (self, (0, 0))
   }
   let old_len = self.lines.len_bytes()
   let replacement = utf8_slice(new, prefix, utf8_len(new) - suffix)
@@ -92,7 +110,14 @@ pub fn Source::replace(self : Source, new : String) -> (Int, Int) {
 /// Edit the source file by replacing the given (UTF-8 byte) range
 /// `start..end` with `replacement`.
 ///
-/// Returns the range in the new source that was ultimately reparsed.
+/// Returns the edited source and the range in it that was ultimately
+/// reparsed. `self` is unchanged (upstream edits `self` and returns the
+/// range): the new source has its own lines and its own root. Its tree
+/// shares with the tree of `self` the nodes that the edit did not write to:
+/// all but the nodes that were replaced, their ancestors (copies with the
+/// same span numbers) and, where the span numbers around the replacement
+/// ran out, the neighbours that were renumbered (copies with new numbers,
+/// although their text was not reparsed).
 ///
 /// Aborts if the range is out of bounds.
 pub fn Source::edit(
@@ -100,12 +125,23 @@ pub fn Source::edit(
   start : Int,
   end : Int,
   replacement : String,
-) -> (Int, Int) {
+) -> (Source, (Int, Int)) {
+  // Upstream: `let inner = &mut **Arc::make_mut(&mut self.0);`
+  // (source.rs:107), a copy of the record if the source is shared. Here the
+  // record is always a new one, made below.
+
   // Update the text and lines.
-  self.lines.edit(start, end, replacement)
+  let lines = self.lines.edit(start, end, replacement)
 
   // Incrementally reparse the replaced range.
-  reparse(self.root, self.lines, start, end, utf8_len(replacement))
+  let (root, range) = reparse(
+    self.root,
+    lines,
+    start,
+    end,
+    utf8_len(replacement),
+  )
+  ({ id: self.id, root, lines, }, range)
 }
 
 ///|

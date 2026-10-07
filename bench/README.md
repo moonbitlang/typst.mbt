@@ -30,4 +30,8 @@ To profile, run e.g. `moon run --profile --target native --release cli --
 query --ignore-system-fonts bench/longer.typ heading` (macOS: needs Xcode's
 `xctrace`).
 
+What an edit of a source costs (`Source::edit`, `Source::replace`, beside
+a parse) is measured by `moon run tests/edit_bench --target native
+--release`; its header says how to count the allocations of one edit.
+
 [hyperfine]: https://github.com/sharkdp/hyperfine

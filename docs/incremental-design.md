@@ -131,15 +131,16 @@ Read in `~/.cargo/registry/src/*/comemo-0.5.1` and `.repos/typst`.
   and keeps the source for its lifetime; a compilation of `doc` runs in a
   `SessionWorld` (`doc/session.mbt`) that is made for that compilation.
 - `Source::replace` and `Source::edit` (`syntax/source.mbt`,
-  `syntax/reparser.mbt`) change the tree in place: `SyntaxNode::
-  replace_children` and `update_parent` (`syntax/node.mbt`) change the
-  children, lengths and numbering bounds of the nodes on the path from the
-  root to the edit, `InnerNode::numberize` renumbers the siblings in the
-  range it had to widen, and a failed incremental reparse overwrites the
-  root's data. A closure holds the node of its body (`Closure.node`,
-  `library/func.mbt`). So, unlike upstream, a closure of the previous
-  compilation whose body contains or adjoins the edit sees its tree change
-  under it (section 5.4).
+  `syntax/reparser.mbt`) changed the tree in place when this was written:
+  `SyntaxNode::replace_children` and `update_parent` (`syntax/node.mbt`)
+  changed the children, lengths and numbering bounds of the nodes on the
+  path from the root to the edit, `InnerNode::numberize` renumbered the
+  siblings in the range it had to widen, and a failed incremental reparse
+  overwrote the root's data. A closure holds the node of its body
+  (`Closure.node`, `library/func.mbt`). So, unlike upstream, a closure of
+  the previous compilation whose body contains or adjoins the edit saw its
+  tree change under it (section 5.4). (No longer: the syntax half of step
+  3 of slice 1 is built, see "As built" in 5.4.)
 - What outlives a compilation: the content-keyed decode caches that
   `@library.evict` drops as a whole on every `max_age`-th call (raw
   syntaxes and themes, bibliographies, CSL styles, PDF documents, plugins
@@ -635,6 +636,64 @@ table stays per compilation; with persistent trees it could be kept
 longer, which is not proposed before it is measured (it is part of the
 evaluation column of 3.4).
 
+*As built* (the syntax half of step 3; the header of `syntax/node.mbt` is
+the contract, with every function that writes to a node and whom it is
+for). The copies are the ones named above, and they are enough: the
+reparser writes through `children_mut`, `update_parent` and
+`replace_children` only, each on a node that it copied itself
+(`SyntaxNode::make_mut`: the node, its inner record, its children array,
+the warnings around it; the root in `reparse`, a child in `try_reparse`
+before the recursive call), and `numberize` after an edit writes to the
+replacement, which the parser just made, and to the neighbours that
+`replace_children` takes into the renumbered range, which it replaces by
+`deep_clone`s first. A path node keeps its span number (only the nodes of
+a renumbered range get new ones), so a copy differs from the node before
+in its children, its length, its count of descendants and its diagnosis.
+Upstream copies the same records, and only if they are shared.
+
+It goes further than this section proposed in one point: a `Source` and a
+`Lines` are immutable too, and `Source::edit`/`replace`
+(`Lines::edit`/`replace`) return the edited value. Whoever holds a source
+across an edit has what a clone taken before the edit is upstream
+(`source.rs:24`, `:107`); the file slot of a world keeps the source that
+`replace` returned (`kit/files.mbt`). A source therefore has one state for
+its lifetime: its fingerprint (5.2) can be kept in the object, as
+upstream's `LazyHash` is, and the revision number of 5.2 is not needed to
+tell states apart.
+
+Measured (`moon run tests/edit_bench --target native --release`; one
+character inserted or removed, the source before the edit dropped; the best
+of three rounds on a machine that was not quiet, so a few per cent are
+noise). "In place" is the port before (68aea3a), "persistent" the copies
+alone, "now" with the line starts and the diagnosis flags as value types
+(they were an allocation per line behind the edit and per child of the
+edited node):
+
+| `Source::edit` | in place | persistent | now | parse |
+| --- | ---: | ---: | ---: | ---: |
+| `bench/longer.typ` (555 bytes, the edit 17 nodes deep), time | 6.3 µs | 7.3 µs | 6.7 µs | 60 µs |
+| allocations | 279 | 371 | 267 | 3 230 |
+| a source of 1 MB (51 842 children of the root), start, time | 3.4 ms | 3.4 ms | 3.2 ms | 85 to 91 ms |
+| middle | 2.6 ms | 2.8 ms | 2.5 ms | |
+| end | 2.4 ms | 3.0 ms | 2.0 ms | |
+| allocations: start, middle, end | 34 867, 17 711, 51 908 | 34 894, 17 723, 51 940 | 121, 331, 94 | 3.78 million (4.27 before) |
+
+`Source::replace` adds the comparison of the two texts (2 to 4 ms for 1 MB,
+unchanged). An edit was linear in the file before, with a small constant,
+and is: the text is copied, the line starts behind the edit are computed
+again, and the reparser walks the children of the node it edits for their
+lengths and their diagnosis (a profile of the edit at the end of the 1 MB
+source: a third the text, half those walks). What persistence adds is five
+allocations per node on the path (the node, its record, its children
+array), one reference per child of each, copied and counted, and a copy of
+the line starts before the edit: in these runs 1 µs for the small source
+and up to 0.6 ms for the large one at its end, where the line starts were
+35 000 objects to count and are a block of values now. The `reparse` stage
+(30 336 edits) takes 1.79 s instead of 1.78 s (and 0.17 s more with its
+new check that the source before each edit is unchanged), the `recompile`
+stage 33.9 s instead of 34.0 s, and a compilation from scratch what it
+took (`bench/long.typ`: 228 ms and 231 ms).
+
 **Spans.** A kept result holds spans: in content, in frames (glyphs,
 links, tags), in the diagnostics of its sink. They are valid if the nodes
 they name are still in their sources with the same numbers. That follows
@@ -978,9 +1037,12 @@ of entries of each after `longer.typ` and after the `packages` stage.
 - **A host that keeps a world** (`@typst.compile`): the contract is
   comemo's. The world may change between compilations and not during one;
   the host calls `@library.evict(n)` between compilations or memory grows
-  with every distinct compilation; it keeps its `Library` and returns the
-  same `Source` object for a file, edited with `Source::replace` or
-  `Source::edit`. A host that makes a new `Source` for a changed file gets
+  with every distinct compilation; it keeps its `Library` and, for a file
+  that changed, returns the source that `Source::replace` or `Source::edit`
+  of the file's last source returned (as built, 5.4: an edit returns a new
+  source that shares the nodes it did not touch; for an unchanged file,
+  `replace` returns the same object). A host that makes a new `Source` for
+  a changed file gets
   the numbering of a fresh parse, which differs from the old one in most of
   the file: little that came from that file is found again. A world that
   returns the same `Bytes` object for an unchanged file saves its hashing.
@@ -1362,12 +1424,16 @@ Kept or introduced, each stricter than upstream unless said:
    `make_mut` at `:91`), which the renumbering (`numberize`, `:516`) and
    the replacement of children use. Whoever holds a node keeps what it
    had. The port cannot ask whether a node is shared and copies always; no
-   holder of a node can tell the difference. What deviates is today's
-   port, which writes in place. A `Source` is another matter and stays as
-   it is: upstream's is a handle whose clone keeps the old state
-   (`source.rs:24`, `make_mut` at `:107`), the port's is one object that
-   an edit changes for everyone who holds it. Nothing that is kept holds a
-   `Source`: entries hold fingerprints of sources and nodes.
+   holder of a node can tell the difference. What deviated was the port
+   as it was, which wrote in place. A `Source` was to be another matter
+   and stay one object that an edit changes for everyone who holds it
+   (upstream's is a handle whose clone keeps the old state, `source.rs:24`,
+   `make_mut` at `:107`), on the ground that nothing that is kept holds a
+   `Source`. As built it does not stay so: a `Source` never changes and an
+   edit returns a new one (5.4), which is what a clone is upstream, for
+   every holder and without a rule about who may hold one. The difference
+   to upstream that remains is in the signature: `edit` and `replace`
+   return the source instead of changing `self`.
 10. **Descriptors of native functions, elements and types are
     fingerprinted by a number given when they are made** (5.4); upstream
     hashes their address. Today's port fingerprints their texts.

@@ -1,6 +1,17 @@
 // The `reparse` stage: incremental reparsing through `Source::edit` and
 // `Source::replace`, compared against `oracle/src/reparse.rs`, which applies
 // the same seeded pseudo-random edits with the same generator.
+//
+// Per edit the report has the reparsed range, a hash of the tree's debug
+// output, a hash of all span numbers in pre-order, the line starts, and
+// whether the tree is what a parse of the text gives; at the end the tree
+// and its diagnostics with their ranges. So the tree after every edit, with
+// its numbers, is upstream's.
+//
+// Not in upstream's report: an edit must leave the source it was applied to
+// as it was (`syntax/node.mbt`). The source before every edit is hashed
+// with its text, its whole tree and its line starts before and after, and a
+// difference is a line of the report, which then differs from upstream's.
 
 ///|
 /// Number of edits applied to every test body.
@@ -60,6 +71,44 @@ fn Fnv::write_u64(self : Fnv, v : UInt64) -> Unit {
   for i in 0..<8 {
     self.h = (self.h ^ ((v >> (8 * i)) & 0xffUL)) * 0x100000001b3UL
   }
+}
+
+///|
+impl @syntax.NodeHasher for Fnv with fn write_u64(self, v) {
+  self.write_u64(v)
+}
+
+///|
+impl @syntax.NodeHasher for Fnv with fn write_str(self, s) {
+  for i in 0..<s.length() {
+    self.h = (self.h ^ s.code_unit_at(i).to_int().to_uint64()) * 0x100000001b3UL
+  }
+  self.write_u64(s.length().to_uint64())
+}
+
+///|
+/// A hash of what a holder of a source can read from it: the text and what
+/// upstream's `Hash for SyntaxNode` covers of the tree (kinds, texts,
+/// spans, lengths, descendants, diagnoses, numbering bounds, messages and
+/// hints).
+///
+/// `lines` are the lines that were taken from the source before the edit:
+/// their text and the byte and UTF-16 start of every line are hashed too,
+/// and whether the source still has them.
+fn source_state(source : @syntax.Source, lines : @syntax.Lines) -> UInt64 {
+  let hash = Fnv::new()
+  @syntax.NodeHasher::write_str(hash, source.text())
+  source.root().hash_into(hash)
+  @syntax.NodeHasher::write_str(hash, lines.text())
+  hash.write_u64(lines.len_bytes().to_uint64())
+  hash.write_u64(lines.len_utf16().to_uint64())
+  for l in 0..<lines.len_lines() {
+    let byte = lines.line_to_byte(l).unwrap()
+    hash.write_u64(byte.to_uint64())
+    hash.write_u64(lines.byte_to_utf16(byte).unwrap().to_uint64())
+  }
+  hash.write_u64(if physical_equal(source.lines(), lines) { 1 } else { 0 })
+  hash.h
 }
 
 ///|
@@ -137,11 +186,13 @@ fn reparse_report(text : String) -> String {
   let seed = Fnv::new()
   seed.write(@utf8.encode(text))
   let rng = { state: seed.h, }
-  let source = @syntax.Source::detached(text)
+  let mut source = @syntax.Source::detached(text)
   for i in 0..<reparse_edits {
     let bytes = @utf8.encode(source.text())
     let edit = next_edit(rng, bytes)
-    let (rs, re) = if edit.whole {
+    let held_lines = source.lines()
+    let before = source_state(source, held_lines)
+    let (edited, (rs, re)) = if edit.whole {
       let old = source.text()
       let new = @syntax.utf8_slice(old, 0, edit.start) +
         edit.with_ +
@@ -150,6 +201,10 @@ fn reparse_report(text : String) -> String {
     } else {
       source.edit(edit.start, edit.end, edit.with_)
     }
+    if source_state(source, held_lines) != before {
+      buf.write_string("edit \{i}: the source before the edit changed\n")
+    }
+    source = edited
     let root = source.root()
     let tree = Fnv::new()
     tree.write(@utf8.encode(root.debug_tree()))

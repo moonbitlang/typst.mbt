@@ -183,6 +183,11 @@ fn[L : FileLoader] FileSlot::file(
 
 ///|
 /// Retrieves the source for this slot. Returns the new state of the slot.
+///
+/// Upstream returns a clone of the slot's source (files.rs:206, :230), which
+/// keeps its text and tree when the slot's source is edited after a reset.
+/// Here a `Source` never changes (`syntax/source.mbt`), so the slot's source
+/// itself is returned, and after a reset the slot holds the edited one.
 fn[L : FileLoader] FileSlot::source(
   self : FileSlot,
   loader : L,
@@ -219,11 +224,11 @@ fn[L : FileLoader] FileSlot::source(
   } noraise {
     text =>
       match stale {
-        // If we have a stale source file, reuse it.
-        Some(source) => {
-          source.replace(text) |> ignore
-          Ok(source)
-        }
+        // If we have a stale source file, reuse it. (Upstream:
+        // `source.replace(new)` on the slot's own source, files.rs:216.
+        // Here `replace` returns the edited source and the stale one, which
+        // an earlier compilation may still hold, stays as it was.)
+        Some(source) => Ok(source.replace(text).0)
         None => Ok(@syntax.Source::new(id, text))
       }
   }

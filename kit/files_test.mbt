@@ -14,6 +14,10 @@ impl @kit.FileLoader for TestLoader with fn load(self, id) {
     "c.bin" => b"a\xFF\xFF\xFFb"
     "d.typ" => @utf8.encode(self.generation.val.to_string())
     "e.bin" if self.generation.val > 3 => @utf8.encode("A secret")
+    "f.typ" =>
+      @utf8.encode(
+        "= Title\n\n#let f(x) = { x + \{self.generation.val} }\n\nThe end.\n",
+      )
     path => raise @library.FileError::NotFound(path)
   }
 }
@@ -77,7 +81,8 @@ test "file store: reset reloads and tracks dependencies" {
     names.sort_by((a, b) => @library.compare_str(a, b))
     names
   }
-  inspect(store.source(id("a.typ")).text(), content="Hello from A")
+  let a = store.source(id("a.typ"))
+  inspect(a.text(), content="Hello from A")
   let d = store.source(id("d.typ"))
   inspect(d.text(), content="1")
   ignore(store.file(id("e.bin"))) catch {
@@ -86,12 +91,20 @@ test "file store: reset reloads and tracks dependencies" {
   @debug.debug_inspect(deps(), content="[\"a.typ\", \"d.typ\", \"e.bin\"]")
   store.loader().generation.val = 5
   store.reset()
-  // The stale source is edited in place.
+  // The stale source is edited: the slot has the edited source, and the
+  // one that was handed out before the reset is what it was (upstream: a
+  // clone of the slot's source, which `Source::replace` does not change).
   let d2 = store.source(id("d.typ"))
-  inspect(physical_equal(d, d2), content="true")
+  inspect(physical_equal(d, d2), content="false")
   inspect(d2.text(), content="5")
+  inspect(d.text(), content="1")
+  inspect(d.root().full_text(), content="1")
+  inspect(physical_equal(store.source(id("d.typ")), d2), content="true")
   inspect(@utf8.decode(store.file(id("e.bin"))), content="A secret")
   @debug.debug_inspect(deps(), content="[\"d.typ\", \"e.bin\"]")
+  // A file whose text is the same after a reset has the same source.
+  inspect(physical_equal(store.source(id("a.typ")), a), content="true")
+  @debug.debug_inspect(deps(), content="[\"a.typ\", \"d.typ\", \"e.bin\"]")
 }
 
 ///|
@@ -154,4 +167,34 @@ test "fixed time today" {
 test "rust trim" {
   inspect(@kit.rust_trim(" \t key \u{3000}"), content="key")
   inspect(@kit.rust_trim(""), content="")
+}
+
+///|
+test "file store: a source after a reset shares the nodes outside of the edit" {
+  let store = new_store()
+  let before = store.source(id("f.typ"))
+  let heading = before.root().children()[0]
+  inspect(heading.full_text(), content="= Title")
+  let numbers = (source : @syntax.Source) => {
+    source.root().children().map(node => node.span().number())
+  }
+  store.loader().generation.val = 22
+  store.reset()
+  let after = store.source(id("f.typ"))
+  inspect(
+    after.text(),
+    content="= Title\n\n#let f(x) = { x + 22 }\n\nThe end.\n",
+  )
+  // The tree was edited, not parsed anew: the nodes around the edit are the
+  // same objects, so the spans that an earlier compilation holds still
+  // name them.
+  inspect(physical_equal(after.root().children()[0], heading), content="true")
+  assert_eq(numbers(after), numbers(before))
+  // And the source of before the reset is what it was.
+  inspect(
+    before.text(),
+    content="= Title\n\n#let f(x) = { x + 1 }\n\nThe end.\n",
+  )
+  inspect(before.root().full_text() == before.text(), content="true")
+  inspect(physical_equal(before.root().children()[0], heading), content="true")
 }
