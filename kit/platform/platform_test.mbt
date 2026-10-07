@@ -115,3 +115,103 @@ test "is_same_file" {
   }
   inspect(missing, content="true")
 }
+
+///|
+test "read_dir: the entries without `.` and `..`" {
+  let dir = "_build/kit_platform_test/listing"
+  @platform.create_dir_all(@platform.join(dir, "sub"))
+  @platform.write_file(@platform.join(dir, "a.txt"), b"a")
+  @platform.write_file(@platform.join(dir, ".hidden"), b"")
+  @platform.write_file(@platform.join(dir, "sub/inside"), b"")
+  let names = @platform.read_dir(dir)
+  names.sort()
+  inspect(names.join(", "), content="sub, a.txt, .hidden")
+  let entries = @platform.read_dir_entries(dir).map(entry => entry.name)
+  entries.sort()
+  inspect(entries.join(", "), content="sub, a.txt, .hidden")
+  inspect(
+    @platform.read_dir(@platform.join(dir, "sub")).join(", "),
+    content="inside",
+  )
+}
+
+///|
+/// Writes a file for a test below the build directory and returns its path.
+fn scratch_file(name : String, data : Bytes) -> String raise {
+  let dir = "_build/kit_platform_test"
+  @platform.create_dir_all(dir)
+  let path = @platform.join(dir, name)
+  @platform.write_file(path, data)
+  path
+}
+
+///|
+test "ranged file: pieces, the end of the file, closing" {
+  let data = Bytes::makei(1000, i => (i % 251).to_byte())
+  let path = scratch_file("ranged.bin", data)
+  let file = @platform.RangedFile::open(path)
+  inspect(file.size(), content="1000")
+  inspect(file.read(0L, 1000) == data, content="true")
+  inspect(file.read(250L, 4) == b"\xfa\x00\x01\x02", content="true")
+  inspect(file.read(996L, 4) == b"\xf3\xf4\xf5\xf6", content="true")
+  inspect(file.read(10L, 0).length(), content="0")
+  // A piece that ends beyond the file is cut, one that starts there is
+  // empty.
+  inspect(file.read(990L, 100) == data[990:].to_owned(), content="true")
+  inspect(file.read(1000L, 5).length(), content="0")
+  inspect(file.read(5000000000L, 5).length(), content="0")
+  let negative = try file.read(-1L, 5) catch {
+    e => e.to_string()
+  } noraise {
+    _ => "ok"
+  }
+  inspect(negative, content="Invalid argument (os error 22)")
+  // A closed file fails (the same way on every target), and closing twice
+  // is fine.
+  file.close()
+  file.close()
+  let closed = try file.read(0L, 10) catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    bytes => "\{bytes.length()} bytes"
+  }
+  inspect(closed, content="Other: Bad file descriptor (os error 9)")
+  let closed = try file.read(-1L, 10) catch {
+    e => e.to_string()
+  } noraise {
+    bytes => "\{bytes.length()} bytes"
+  }
+  inspect(closed, content="Bad file descriptor (os error 9)")
+  let closed = try file.size() catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    size => "\{size} bytes"
+  }
+  inspect(closed, content="Other: Bad file descriptor (os error 9)")
+}
+
+///|
+test "ranged file: errors of open" {
+  let missing = try
+    @platform.RangedFile::open("/nonexistent/typst-mbt-test")
+  catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    _ => "ok"
+  }
+  inspect(missing, content="NotFound: No such file or directory (os error 2)")
+  // The directory of the tests is the module's or the package's.
+  let dir = if @platform.exists("kit/platform") { "kit/platform" } else { "." }
+  let directory = try @platform.RangedFile::open(dir) catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    _ => "ok"
+  }
+  inspect(directory, content="IsADirectory: Is a directory (os error 21)")
+  let nul = try @platform.RangedFile::open("a\u{0}b") catch {
+    e => @debug.to_string(e.kind())
+  } noraise {
+    _ => "ok"
+  }
+  inspect(nul, content="InvalidInput")
+}

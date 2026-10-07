@@ -19,6 +19,7 @@
 #include <io.h>
 #include <windows.h>
 #else
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -127,50 +128,121 @@ moonbit_bytes_t typst_platform_read_file(moonbit_bytes_t path) {
   return bytes;
 }
 
-// Reads up to `len` bytes at `offset`. On failure, returns empty bytes and
-// sets the last error.
+// Ranged reads (font discovery): a file is opened once and then read in
+// pieces through its descriptor, without a stream and its buffer (a stream
+// per piece cost an `open`, an `fstat`, a seek and a buffer each time).
+//
+// The file is read, not mapped: a mapping of a file that is truncated
+// while it is mapped raises SIGBUS on access, whereas a read past the new
+// end is a short read, which the caller sees as a missing piece.
+
+// Opens a file for ranged reads. Returns a descriptor, or -1 and sets the
+// last error. Directories are refused like in `typst_platform_read_file`.
 MOONBIT_FFI_EXPORT
-moonbit_bytes_t typst_platform_read_range(moonbit_bytes_t path, int64_t offset,
-                                          int32_t len) {
+int typst_platform_ranged_open(moonbit_bytes_t path) {
   typst_platform_errno = 0;
   errno = 0;
-  FILE *f = fopen((const char *)path, "rb");
-  if (f == NULL) {
-    typst_platform_errno = errno != 0 ? errno : EIO;
-    return typst_platform_empty();
-  }
 #ifdef _WIN32
-  int seek = _fseeki64(f, offset, SEEK_SET);
+  int fd = _open((const char *)path, _O_RDONLY | _O_BINARY);
 #else
-  int seek = fseeko(f, (off_t)offset, SEEK_SET);
+  int fd = open((const char *)path, O_RDONLY | O_CLOEXEC);
 #endif
-  if (seek != 0) {
+  if (fd < 0) {
     typst_platform_errno = errno != 0 ? errno : EIO;
-    fclose(f);
-    return typst_platform_empty();
+    return -1;
   }
-  if (len < 0) {
-    fclose(f);
+  struct stat st;
+  if (fstat(fd, &st) == 0 && S_ISDIR(st.st_mode)) {
+#ifdef _WIN32
+    _close(fd);
+#else
+    close(fd);
+#endif
+    typst_platform_errno = EISDIR;
+    return -1;
+  }
+  return fd;
+}
+
+// The size of an open file, or -1 and the last error.
+MOONBIT_FFI_EXPORT
+int64_t typst_platform_ranged_size(int fd) {
+  typst_platform_errno = 0;
+  errno = 0;
+#ifdef _WIN32
+  struct _stat64 st;
+  if (_fstat64(fd, &st) != 0) {
+#else
+  struct stat st;
+  if (fstat(fd, &st) != 0) {
+#endif
+    typst_platform_errno = errno != 0 ? errno : EIO;
+    return -1;
+  }
+  return (int64_t)st.st_size;
+}
+
+// Reads up to `len` bytes at `offset` of an open file; fewer only at the
+// end of the file. The caller bounds `len` by the file's size. On failure,
+// returns empty bytes and sets the last error.
+MOONBIT_FFI_EXPORT
+moonbit_bytes_t typst_platform_ranged_read(int fd, int64_t offset,
+                                           int32_t len) {
+  typst_platform_errno = 0;
+  if (len < 0 || offset < 0) {
     typst_platform_errno = EINVAL;
     return typst_platform_empty();
   }
-  unsigned char *buf = (unsigned char *)malloc(len > 0 ? (size_t)len : 1);
-  if (buf == NULL) {
-    fclose(f);
-    typst_platform_errno = ENOMEM;
+  if (len == 0) {
     return typst_platform_empty();
   }
-  size_t got = fread(buf, 1, (size_t)len, f);
-  if (got < (size_t)len && ferror(f)) {
+#ifdef _WIN32
+  errno = 0;
+  if (_lseeki64(fd, offset, SEEK_SET) < 0) {
     typst_platform_errno = errno != 0 ? errno : EIO;
-    free(buf);
-    fclose(f);
     return typst_platform_empty();
   }
-  fclose(f);
-  moonbit_bytes_t bytes = typst_platform_copy(buf, got);
-  free(buf);
-  return bytes;
+#endif
+  moonbit_bytes_t bytes = moonbit_make_bytes_raw(len);
+  int32_t got = 0;
+  while (got < len) {
+    errno = 0;
+#ifdef _WIN32
+    int n = _read(fd, bytes + got, (unsigned int)(len - got));
+#else
+    ssize_t n = pread(fd, bytes + got, (size_t)(len - got),
+                      (off_t)(offset + got));
+#endif
+    if (n < 0) {
+      if (errno == EINTR) {
+        continue;
+      }
+      typst_platform_errno = errno != 0 ? errno : EIO;
+      moonbit_decref(bytes);
+      return typst_platform_empty();
+    }
+    if (n == 0) {
+      break;
+    }
+    got += (int32_t)n;
+  }
+  if (got == len) {
+    return bytes;
+  }
+  // A short read (the range ends beyond the file).
+  moonbit_bytes_t part = typst_platform_copy(bytes, (size_t)got);
+  moonbit_decref(bytes);
+  return part;
+}
+
+// Closes a descriptor of `typst_platform_ranged_open`.
+MOONBIT_FFI_EXPORT
+void typst_platform_ranged_close(int fd) {
+#ifdef _WIN32
+  _close(fd);
+#else
+  close(fd);
+#endif
 }
 
 // The kind of file at `path`, following symlinks: 1 = file, 2 = directory,
@@ -212,18 +284,6 @@ int typst_platform_same_file(moonbit_bytes_t path1, moonbit_bytes_t path2) {
 #endif
 }
 
-// The size of the file at `path` (following symlinks), or -1 on error.
-MOONBIT_FFI_EXPORT
-int64_t typst_platform_file_size(moonbit_bytes_t path) {
-  typst_platform_errno = 0;
-  struct stat st;
-  if (stat((const char *)path, &st) != 0) {
-    typst_platform_errno = errno != 0 ? errno : EIO;
-    return -1;
-  }
-  return (int64_t)st.st_size;
-}
-
 // Like `typst_platform_stat_kind`, but does not follow symlinks; a symlink
 // is reported as 4.
 MOONBIT_FFI_EXPORT
@@ -247,6 +307,83 @@ int typst_platform_lstat_kind(moonbit_bytes_t path) {
     return 2;
   }
   return 3;
+#endif
+}
+
+// Lists a directory (Rust's `fs::read_dir`): for every entry but `.` and
+// `..`, in the system's order, a byte for its kind and its name with a
+// terminating NUL. The kind is what the directory says about the entry, as
+// `typst_platform_lstat_kind` numbers it, or 0 if it does not say (some file
+// systems; then `DirEntry::file_type` asks with `lstat`, and so does the
+// caller). On failure, returns empty bytes and sets the last error; ENOSYS
+// on Windows, where the caller lists the directory another way.
+MOONBIT_FFI_EXPORT
+moonbit_bytes_t typst_platform_read_dir(moonbit_bytes_t path) {
+  typst_platform_errno = 0;
+#ifdef _WIN32
+  (void)path;
+  typst_platform_errno = ENOSYS;
+  return typst_platform_empty();
+#else
+  errno = 0;
+  DIR *dir = opendir((const char *)path);
+  if (dir == NULL) {
+    typst_platform_errno = errno != 0 ? errno : EIO;
+    return typst_platform_empty();
+  }
+  size_t cap = 4096;
+  size_t len = 0;
+  unsigned char *buf = (unsigned char *)malloc(cap);
+  if (buf == NULL) {
+    closedir(dir);
+    typst_platform_errno = ENOMEM;
+    return typst_platform_empty();
+  }
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    const char *name = entry->d_name;
+    if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+      continue;
+    }
+    size_t name_len = strlen(name);
+    // The kind, the name and its NUL.
+    size_t need = len + name_len + 2;
+    if (need > (size_t)INT32_MAX) {
+      free(buf);
+      closedir(dir);
+      typst_platform_errno = EFBIG;
+      return typst_platform_empty();
+    }
+    if (need > cap) {
+      size_t new_cap = cap * 2 > need ? cap * 2 : need;
+      unsigned char *grown = (unsigned char *)realloc(buf, new_cap);
+      if (grown == NULL) {
+        free(buf);
+        closedir(dir);
+        typst_platform_errno = ENOMEM;
+        return typst_platform_empty();
+      }
+      buf = grown;
+      cap = new_cap;
+    }
+    unsigned char kind = 0;
+#ifdef DT_UNKNOWN
+    switch (entry->d_type) {
+    case DT_UNKNOWN: kind = 0; break;
+    case DT_REG: kind = 1; break;
+    case DT_DIR: kind = 2; break;
+    case DT_LNK: kind = 4; break;
+    default: kind = 3; break;
+    }
+#endif
+    buf[len] = kind;
+    memcpy(buf + len + 1, name, name_len + 1);
+    len = need;
+  }
+  closedir(dir);
+  moonbit_bytes_t bytes = typst_platform_copy(buf, len);
+  free(buf);
+  return bytes;
 #endif
 }
 

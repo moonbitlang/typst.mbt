@@ -28,8 +28,6 @@ pub fn exit(Int) -> Unit
 
 pub fn file_name(String) -> String?
 
-pub fn file_size(String) -> Int64 raise IoError
-
 pub fn flush_stderr() -> Unit
 
 pub fn flush_stdout() -> Unit
@@ -66,9 +64,9 @@ pub fn raise_fd_limit() -> Unit
 
 pub fn read_dir(String) -> Array[String] raise IoError
 
-pub fn read_file(String) -> Bytes raise IoError
+pub fn read_dir_entries(String) -> Array[DirEntry] raise IoError
 
-pub fn read_range(String, Int64, Int) -> Bytes raise IoError
+pub fn read_file(String) -> Bytes raise IoError
 
 pub fn read_stdin() -> Bytes raise IoError
 
@@ -100,6 +98,11 @@ pub fn IoError::to_string(Self) -> String
 pub impl Show for IoError
 
 // Types and methods
+pub(all) struct DirEntry {
+  name : String
+  kind : FileKind?
+}
+
 pub(all) enum ErrorKind {
   NotFound
   PermissionDenied
@@ -122,6 +125,14 @@ pub(all) enum Os {
   MacOs
   Windows
 } derive(Eq, @debug.Debug)
+
+pub struct RangedFile {
+  // private fields
+}
+pub fn RangedFile::close(Self) -> Unit
+pub fn RangedFile::open(String) -> Self raise IoError
+pub fn RangedFile::read(Self, Int64, Int) -> Bytes raise IoError
+pub fn RangedFile::size(Self) -> Int64 raise IoError
 
 // Type aliases
 
