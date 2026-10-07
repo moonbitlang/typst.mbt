@@ -16,11 +16,6 @@ fn libm_tan(x : Double) -> Double {
 }
 
 ///|
-fn libm_cbrt(x : Double) -> Double {
-  @math.cbrt(x)
-}
-
-///|
 fn libm_log2(x : Double) -> Double {
   @math.log2(x)
 }
