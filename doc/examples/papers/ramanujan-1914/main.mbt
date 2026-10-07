@@ -191,6 +191,9 @@ fn run(check : Bool) -> Unit raise {
   for diagnostic in compiled.warnings {
     println(diagnostic.render())
   }
+  for lint in compiled.lints {
+    println(lint.render())
+  }
   let document = compiled.unwrap()
   println(
     "\{document.pages().length()} pages, \{audit.formulas.length()} formulas, \{audit.numbered} numbered",

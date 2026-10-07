@@ -418,6 +418,9 @@ fn run() -> Unit raise {
   for diagnostic in compiled.warnings {
     println(diagnostic.render())
   }
+  for lint in compiled.lints {
+    println(lint.render())
+  }
   let pages = compiled.unwrap().pages().length()
   println("\{pages} pages")
   let out = "_build/papers/einstein-1916"

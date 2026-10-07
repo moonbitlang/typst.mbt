@@ -16,6 +16,9 @@ fn run() -> Unit raise {
   for diagnostic in compiled.warnings {
     println(diagnostic.render())
   }
+  for lint in compiled.lints {
+    println(lint.render())
+  }
   let document = compiled.unwrap()
   println("\{document.pages().length()} pages")
   let out = "_build/papers/lovelace-1843"
