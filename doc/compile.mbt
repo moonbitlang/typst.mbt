@@ -354,6 +354,7 @@ fn Document::lower_initial(
     keys: [],
     pieces: Option::None,
     containers: [],
+    stack: 0,
   }
   lower.check_text(self.dir, @syntax.Span::detached())
   if virtual_file(self.dir, "<edsl-origins>") is Option::None {
@@ -414,7 +415,7 @@ pub fn[T : @library.Output] Document::compile(
   world : &@library.World,
   lints? : Bool = true,
 ) -> CompileReport[T] {
-  let session = Session::new(world, dir=self.dir)
+  let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
@@ -440,7 +441,7 @@ pub fn Document::lower(
   world : &@library.World,
   lints? : Bool = true,
 ) -> CompileReport[@library.Content] {
-  let session = Session::new(world, dir=self.dir)
+  let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()

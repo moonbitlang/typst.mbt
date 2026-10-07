@@ -480,7 +480,7 @@ test "S4: a character no font covers is glyph 0, without a warning: a lint repor
   inspect(
     page_lints(report),
     content=(
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // A font family that does not exist is the engine's warning; a glyph

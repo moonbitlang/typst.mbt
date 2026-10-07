@@ -16,8 +16,10 @@ priv struct Lowering {
   /// `Lowering::args`).
   pieces : Pieces?
   /// The blocks and boxes with a size of their own whose arguments are
-  /// being lowered (`Registry::container`), outermost first.
+  /// being lowered (`Registry::container`), outermost first, and the
+  /// number of that stack (`Registry::stack`).
   containers : Array[Int]
+  stack : Int
 }
 
 ///|
@@ -159,8 +161,8 @@ fn Lowering::entry(
   site : Site,
 ) -> Int raise @library.SourceError {
   let entry = self.session.registry.entry(site, self.keys)
-  if !self.containers.is_empty() {
-    self.session.registry.note_inside(entry, self.containers)
+  if self.session.lints {
+    self.session.registry.note_stack(entry, self.stack)
   }
   entry
 }
@@ -618,7 +620,7 @@ fn Lowering::inserted(
     NCall(call) => {
       let entry = self.entry(call.origin)
       let span = self.session.registry.span(entry)
-      guard sizes_container(call) else {
+      guard self.session.lints && sizes_container(call) else {
         return (
           self.call(call.func, call.args, entry, span, site=call.origin),
           span,
@@ -628,7 +630,15 @@ fn Lowering::inserted(
       // its own is inside it.
       let registry = self.session.registry
       let id = registry.container(entry)
-      let inner : Lowering = { ..self, containers: [..self.containers, id], }
+      if call.args.any(arg => arg.name is Some("fill" | "stroke")) {
+        registry.containers[id].decorated = true
+      }
+      let containers = [..self.containers, id]
+      let inner : Lowering = {
+        ..self,
+        stack: registry.stack(containers),
+        containers,
+      }
       let value = inner.call(
         call.func,
         call.args,

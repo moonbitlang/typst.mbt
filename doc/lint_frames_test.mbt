@@ -48,7 +48,7 @@ test "lint L2: a character that no font has, at the call that has it" {
   inspect(
     page_lints(report),
     content=(
-      #|missing-glyph (Block, argument 1) p1: no font has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Block, argument 1) p1: no font of this text has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // As text: the location is the argument that has the character, the
@@ -59,10 +59,10 @@ test "lint L2: a character that no font has, at the call that has it" {
   inspect(
     rendered(lint),
     content=(
-      #|lint[missing-glyph]: no font has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
+      #|lint[missing-glyph]: no font of this text has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
       #|  at LINE (Block, argument 1)
       #|  on page 1
-      #|  hint: use a font that has it: name its family in the `font` of `SetText` or `Text`; a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)
+      #|  hint: use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)
     ),
   )
   // The place is where the review loop finds the glyph on the page.
@@ -91,8 +91,8 @@ test "lint L2: the origin is the glyph's, the text the cluster's" {
       @doc.Par(@doc.Seq(["one \u{4e2d} ", @doc.Text("two \u{6587}")])),
     ]),
     content=(
-      #|missing-glyph (Seq, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
-      #|missing-glyph (Text, argument 1) p1: no font has a glyph for "文" (U+6587): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Seq, argument 1) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Text, argument 1) p1: no font of this text has a glyph for "文" (U+6587): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // Every character of a run that no font has is one glyph of the font's
@@ -102,10 +102,10 @@ test "lint L2: the origin is the glyph's, the text the cluster's" {
   inspect(
     lints_on_page(["a \u{1F468}\u{200D}\u{1F469}\u{FE0F} b"]),
     content=(
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for "👨" (U+1F468): it is drawn as the missing glyph of Libertinus Serif
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for U+200D: it is drawn as the missing glyph of Libertinus Serif
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for "👩" (U+1F469): it is drawn as the missing glyph of Libertinus Serif
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for U+FE0F: it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for "👨" (U+1F468): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for U+200D: it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for "👩" (U+1F469): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for U+FE0F: it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // In a formula: the location is in the source string.
@@ -113,7 +113,7 @@ test "lint L2: the origin is the glyph's, the text the cluster's" {
   inspect(
     page_lints(formula),
     content=(
-      #|missing-glyph (Equation, bytes 4..7 of the source string) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of New Computer Modern Math
+      #|missing-glyph (Equation, bytes 4..7 of the source string) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of New Computer Modern Math
     ),
   )
   guard formula.lints[0].location is Some(Edsl(origin)) else {
@@ -124,7 +124,7 @@ test "lint L2: the origin is the glyph's, the text the cluster's" {
   inspect(
     lints_on_page([@doc.Text("a\u{4e2d}b", fallback=false)]),
     content=(
-      #|missing-glyph (Text, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Text, argument 1) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // A family that the world does not have is the engine's warning; the
@@ -141,7 +141,7 @@ test "lint L2: the origin is the glyph's, the text the cluster's" {
   inspect(
     page_lints(family),
     content=(
-      #|missing-glyph (Text, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Text, argument 1) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
 }
@@ -166,7 +166,7 @@ test "lint L2: what is not a missing glyph" {
   inspect(
     lints_on_page(["a\u{1}b"]),
     content=(
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for U+0001: it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for U+0001: it is drawn as the missing glyph of Libertinus Serif
     ),
   )
   // Text that every font covers, in the three embedded families.
@@ -201,7 +201,7 @@ test "lint L2: one lint per call site and character, with a count" {
   inspect(
     page_lints(report),
     content=(
-      #|missing-glyph (Text, argument 1, key "row 0") p1: no font has a glyph for "😀" (U+1F600): it is drawn as the missing glyph of Libertinus Serif, 200 times
+      #|missing-glyph (Text, argument 1, key "row 0") p1: no font of this text has a glyph for "😀" (U+1F600): it is drawn as the missing glyph of Libertinus Serif, 200 times
     ),
   )
   // The same character at two call sites is two lints, and one call site
@@ -213,8 +213,8 @@ test "lint L2: one lint per call site and character, with a count" {
       @doc.Text("second \u{4e2d}"),
     ]),
     content=(
-      #|missing-glyph (Document, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
-      #|missing-glyph (Text, argument 1) p2: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Document, argument 1) p1: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Text, argument 1) p2: no font of this text has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
 }
@@ -234,7 +234,7 @@ test "lint L2: beyond 65,535 bytes of an item the character is not known" {
   inspect(
     page_lints(report),
     content=(
-      #|missing-glyph (Text, argument 1) p1: no font has a glyph for a character of "abcdefghijabcdef…" (a text of more than 65,535 bytes: the page does not say which): it is drawn as the missing glyph of Libertinus Serif
+      #|missing-glyph (Text, argument 1) p1: no font of this text has a glyph for a character of "abcdefghijabcdef…" (a text of more than 65,535 bytes: the page does not say which): it is drawn as the missing glyph of Libertinus Serif
     ),
   )
 }
@@ -1013,6 +1013,192 @@ test "lint L3: which frame is a container's" {
     ]),
     content=(
       #|outside-container (Markup, bytes 17..47 of the source string) p1: a shape leaves its container (Block, 80pt by 20pt) at the right by 10pt
+    ),
+  )
+}
+
+///|
+/// An element that is built from a block of a size and a rectangle that
+/// is placed in it: one call site for both.
+#callsite(autofill(loc, args_loc))
+fn swatch(
+  dx : Double,
+  fill? : @doc.Paint,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> @doc.Composite {
+  @doc.Composite("Swatch", loc, args_loc, _ => {
+    @doc.Block(
+      @doc.Place(
+        @doc.Rect(width=Pt(10), height=Pt(10), fill=Luma(100)),
+        dx=Pt(dx),
+      ),
+      width=Pt(20),
+      height=Pt(20),
+      fill?,
+    )
+  })
+}
+
+///|
+test "lint L3: frames of one size, call sites in several places, and what an element builds" {
+  // A box of the size of the block around it, scaled to a half: each
+  // frame is the frame of its own call, by the order in which they were
+  // lowered. The box's fill with its outset is its own.
+  inspect(
+    lints_on_page([
+      @doc.Block(
+        @doc.Place(
+          @doc.Scale(
+            @doc.Box(
+              "in",
+              width=Pt(100),
+              height=Pt(100),
+              fill=Luma(220),
+              outset=@doc.Sides(all=Pt(6)),
+            ),
+            factor=Pct(50),
+            origin=Both(Left, Top),
+          ),
+          dx=Pt(25),
+          dy=Pt(25),
+        ),
+        width=Pt(100),
+        height=Pt(100),
+      ),
+    ]),
+    content="",
+  )
+  // A description that is used in a container and outside of it says
+  // nothing about where it is: a block that has the container's size by a
+  // set rule, with that description in it, is not taken for the
+  // container.
+  let label = @doc.Text("ok")
+  inspect(
+    lints_on_page([
+      @doc.Block(label, width=Pt(80), height=Pt(20)),
+      @doc.SetBlock(width=Pt(80), height=Pt(20)),
+      @doc.Block(@doc.Seq([label, @doc.Place(slab(8, 8), dx=Pt(90))])),
+    ]),
+    content="",
+  )
+  // The container itself is still known by what is in it alone.
+  inspect(
+    lints_on_page([
+      @doc.Block(
+        @doc.Seq([label, @doc.Place(slab(8, 8), dx=Pt(90))]),
+        width=Pt(80),
+        height=Pt(20),
+      ),
+      @doc.SetBlock(width=Pt(80), height=Pt(20)),
+      @doc.Block(label),
+    ]),
+    content=(
+      #|outside-container (Rect) p1: a shape leaves its container (Block, 80pt by 20pt) at the right by 18pt
+    ),
+  )
+  // What an element builds in its block has the element's call site, like
+  // the block: it is content of the block.
+  inspect(
+    lints_on_page([swatch(30)]),
+    content=(
+      #|outside-container (Swatch) p1: a shape leaves its container (Swatch, 20pt by 20pt) at the right by 20pt
+    ),
+  )
+  inspect(lints_on_page([swatch(5)]), content="")
+  // With a fill the block draws a shape with that call site itself: then a
+  // shape of the call site is not told from it, and none is reported.
+  inspect(lints_on_page([swatch(30, fill=Luma(230))]), content="")
+  // The size of a frame is computed: an inset in per cent makes it
+  // 60.00000000000001pt.
+  inspect(
+    lints_on_page([
+      @doc.Block(
+        @doc.Place(slab(10, 5), dx=Pt(100)),
+        width=Pt(60),
+        height=Pt(20),
+        inset=@doc.Sides(left=Pct(3), right=Pct(3)),
+        breakable=false,
+      ),
+    ]),
+    content=(
+      #|outside-container (Rect) p1: a shape leaves its container (Block, 60pt by 20pt) at the right by 51.8pt
+    ),
+  )
+  // One helper for containers of two sizes: the message is about the
+  // farthest, with the size of the frame that it left.
+  let panel = (width : Double) => {
+    @doc.Block(
+      @doc.Place(@doc.Text("past", size=Pt(8)), dx=Pt(125)),
+      width=Pt(width),
+      height=Pt(20),
+    )
+  }
+  inspect(
+    lints_on_page([panel(100), panel(60)]),
+    content=(
+      #|outside-container (Text, argument 1) p1: text leaves its container (Block, 60pt by 20pt) at the right by 78.3pt (the farthest of 2)
+    ),
+  )
+  // One function's drawing, once in a panel of a fixed size and once on
+  // its own: what is in it is in the drawing both times (and in the panel
+  // once, which says nothing of the panel).
+  let chart = () => {
+    drawing(60, 12, [@doc.Place(@doc.Text("a label", size=Pt(8)), dx=Pt(50))])
+  }
+  inspect(
+    lints_on_page([@doc.Block(chart(), width=Pt(150), height=Pt(30)), chart()]),
+    content=(
+      #|outside-container (Text, argument 1) p1: text leaves its container (Block, 60pt by 12pt) at the right by 11pt (the farthest of 2)
+    ),
+  )
+}
+
+///|
+test "lint L3: dashes, and the pieces of a tall delimiter" {
+  // A dashed line is drawn where its dashes are: one dash of 10pt and a
+  // gap of 10pt along 18pt end at the dash. The same line without dashes
+  // is 8pt outside.
+  let line = (dash : @doc.Dash) => {
+    page_lints(
+      compile([
+        @doc.SetPage(
+          width=Pt(200),
+          height=Pt(120),
+          margin=@doc.Sides(all=Pt(0)),
+        ),
+        @doc.Place(
+          @doc.Line(
+            start=(Pt(0), Pt(0)),
+            end_=(Pt(18), Pt(0)),
+            stroke=@doc.Stroke(thickness=Pt(2), dash~),
+          ),
+          dx=Pt(190),
+          dy=Pt(50),
+        ),
+      ]),
+    )
+  }
+  inspect(line(Pattern([Len(Pt(10)), Len(Pt(10))], phase=Pt(0))), content="")
+  inspect(
+    line(Solid),
+    content=(
+      #|outside-page (Line) p1: a shape leaves the page at the right by 8pt
+    ),
+  )
+  // A delimiter that a formula builds for a tall body is one text item
+  // whose glyphs are stacked upwards from its pen by their vertical
+  // advances: here 400pt, around a box of 200pt on the baseline. Moved up
+  // so that its foot is on the page, it leaves the page at the top.
+  inspect(
+    lints_on_page([
+      @doc.Place(
+        @doc.Equation("lr((#box(height: 200pt)))", block=true),
+        dy=Pt(-320),
+      ),
+    ]),
+    content=(
+      #|outside-page (Equation, bytes 3..4 of the source string) p1: text leaves the page at the top by 310pt (the farthest of 2)
     ),
   )
 }

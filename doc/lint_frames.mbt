@@ -208,13 +208,14 @@ priv struct Finding {
   indirect : Bool
   /// The page of the first.
   page : Int
-  /// `MissingGlyph`: the characters. Otherwise what left: `text`, `a
-  /// shape`, `an image`.
-  subject : String
+  /// `MissingGlyph`: the characters. Otherwise what left, of the farthest:
+  /// `text`, `a shape`, `an image`.
+  mut subject : String
   /// `MissingGlyph`: the family of the font.
   font : String
-  /// `OutsideContainer`: the container's origin, and what it is.
-  container : (Origin, String)?
+  /// `OutsideContainer`: the container's origin, and what it is, with the
+  /// size of the frame that the farthest left.
+  mut container : (Origin, String)?
   /// How many there are, and the item of the last one (a run of text
   /// counts once, however many of its glyphs are found).
   mut count : Int
@@ -244,11 +245,11 @@ fn Finding::lint(self : Finding) -> Lint {
   let message = match self.kind {
     MissingGlyph => {
       hints.push({
-        message: "use a font that has it: name its family in the `font` of `SetText` or `Text`; a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)",
+        message: "use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)",
         location: Option::None,
       })
       let times = if self.count > 1 { ", \{self.count} times" } else { "" }
-      "no font has a glyph for \{self.subject}: it is drawn as the missing glyph of \{self.font}\{times}"
+      "no font of this text has a glyph for \{self.subject}: it is drawn as the missing glyph of \{self.font}\{times}"
     }
     _ => {
       let of = match self.container {
@@ -303,10 +304,10 @@ priv struct Leaving {
   slack : (Double, Double)
   location : Location?
   indirect : Bool
-  /// The entry of its span if it is a shape with the span of a call
-  /// itself: what a call draws of its own (the fill and the stroke of a
-  /// block).
-  own : Int?
+  /// For a shape with the span of a call itself (not of an argument) that
+  /// is the call of a container: that container (`-1`: none). It can be
+  /// what the container draws itself (`FrameLinter::own_shape`).
+  own : Int
 }
 
 ///|
@@ -337,10 +338,10 @@ priv struct FrameLinter {
   /// The finding of each kind and place.
   index : Map[String, Int]
   fonts : Array[FontInk]
-  /// The sizes that containers were built with: by their width, with the
-  /// height where one was given, and by their height alone.
-  by_width : Map[Double, Array[(Int, Double?)]]
-  by_height : Map[Double, Array[Int]]
+  /// The sizes that containers were built with: by the keys of their
+  /// width and of their height (`size_key`; `NO_SIDE` for a side that was
+  /// not given), the containers with that width and height in points.
+  sizes : Map[Int64, Map[Int64, Array[(Int, Double?, Double?)]]]
   /// The page that is walked (from 1) and its box, with the bleed.
   mut page : Int
   mut page_box : @kurbo.Rect
@@ -358,35 +359,49 @@ priv struct FrameLinter {
 }
 
 ///|
+/// How far the size of a frame may be from the size that a container was
+/// built with, in points: the engine computes with floating point numbers
+/// (a block of 60pt with an inset in per cent has a frame of
+/// 60.00000000000001pt).
+const SIZE_TOLERANCE : Double = 1.0e-6
+
+///|
+/// The key of a side that was not given.
+const NO_SIDE : Int64 = -9223372036854775808L
+
+///|
+/// The key of a length in the table of sizes: lengths that are equal but
+/// for `SIZE_TOLERANCE` have the same key or keys that follow each other.
+fn size_key(length : Double) -> Int64 {
+  (length * 1024.0).round().to_int64()
+}
+
+///|
 fn FrameLinter::new(origins : Origins, resolver : Resolver) -> FrameLinter {
-  let by_width : Map[Double, Array[(Int, Double?)]] = Map([])
-  let by_height : Map[Double, Array[Int]] = Map([])
+  let sizes : Map[Int64, Map[Int64, Array[(Int, Double?, Double?)]]] = Map([])
   for id, container in origins.containers {
     for size in container.sizes {
-      match size {
-        (Some(width), height) => {
-          let list = match by_width.get(width.to_pt()) {
-            Some(list) => list
-            Option::None => {
-              let list = []
-              by_width[width.to_pt()] = list
-              list
-            }
-          }
-          list.push((id, height.map(h => h.to_pt())))
+      let w = size.0.map(width => width.to_pt())
+      let h = size.1.map(height => height.to_pt())
+      let kw = match w {
+        Some(w) => size_key(w)
+        Option::None => NO_SIDE
+      }
+      let kh = match h {
+        Some(h) => size_key(h)
+        Option::None => NO_SIDE
+      }
+      let row = match sizes.get(kw) {
+        Some(row) => row
+        Option::None => {
+          let row : Map[Int64, Array[(Int, Double?, Double?)]] = Map([])
+          sizes[kw] = row
+          row
         }
-        (Option::None, Some(height)) => {
-          let list = match by_height.get(height.to_pt()) {
-            Some(list) => list
-            Option::None => {
-              let list = []
-              by_height[height.to_pt()] = list
-              list
-            }
-          }
-          list.push(id)
-        }
-        (Option::None, Option::None) => ()
+      }
+      match row.get(kh) {
+        Some(list) => list.push((id, w, h))
+        Option::None => row[kh] = [(id, w, h)]
       }
     }
   }
@@ -396,8 +411,7 @@ fn FrameLinter::new(origins : Origins, resolver : Resolver) -> FrameLinter {
     findings: [],
     index: Map([]),
     fonts: [],
-    by_width,
-    by_height,
+    sizes,
     page: 0,
     page_box: @kurbo.rect_zero,
     item: 0,
@@ -486,8 +500,12 @@ fn FrameLinter::found(
         finding.last_item = item
       }
       if amount > finding.amount {
+        // The message is about the farthest: what it is, and what it left.
+        let farthest = make()
         finding.amount = amount
         finding.side = side
+        finding.subject = farthest.subject
+        finding.container = farthest.container
       }
     }
     Option::None => {
@@ -617,37 +635,79 @@ fn FrameLinter::walking(self : FrameLinter, mat : @kurbo.Affine) -> Unit {
 }
 
 ///|
-/// Whether a shape with the entry `entry` of its span is what the
-/// container `id` draws of its own: its fill and its stroke, which an
-/// outset puts outside of it on purpose.
-fn FrameLinter::own_shape(self : FrameLinter, own : Int?, id : Int) -> Bool {
-  own is Some(entry) &&
-  self.origins.entries[entry].loc == self.origins.containers[id].loc
+/// Whether something that leaves the frame `held` is what the container
+/// `id` draws itself, not its content: its fill and its stroke, which an
+/// outset puts outside on purpose. They are shapes with the span of the
+/// container's call, and so is every shape that a composite builds in its
+/// container (one call site for all that it builds). What tells them
+/// apart: the container was called with a `fill` or a `stroke`, or the
+/// shape covers the whole frame (a fill from a set rule).
+fn FrameLinter::own_shape(
+  self : FrameLinter,
+  leaving : Leaving,
+  id : Int,
+  held : Held,
+) -> Bool {
+  leaving.own == id &&
+  (
+    self.origins.containers[id].decorated ||
+    (
+      leaving.rect.x0 <= held.box.x0 + LINT_TOLERANCE &&
+      leaving.rect.y0 <= held.box.y0 + LINT_TOLERANCE &&
+      leaving.rect.x1 >= held.box.x1 - LINT_TOLERANCE &&
+      leaving.rect.y1 >= held.box.y1 - LINT_TOLERANCE
+    )
+  )
 }
 
 ///|
 /// Something with the span `span` is in the frames that may be
-/// containers: a frame holds what was lowered inside a container that had
-/// its size, so it is that container's.
-fn FrameLinter::evidence(
-  self : FrameLinter,
-  span : @syntax.Span,
-  shape : Bool,
-) -> Unit {
-  guard self.unconfirmed > 0 &&
-    self.origins.entry_of(span) is Some((entry, argument)) else {
+/// containers: it tells which of them is the frame of which container.
+///
+/// Its call site was lowered under a stack of containers (in the arguments
+/// of the innermost, which was lowered in the arguments of the next, ..),
+/// and the frame of a container holds what was lowered in its arguments.
+/// So the frames around the item are those containers' frames, in that
+/// order, with other frames between them: from the inside, each container
+/// of the stack is the nearest frame around the item that has a size of
+/// that container and is outside the frame of the container before it. A
+/// container whose frame is not there (it was split, or the item was
+/// moved out of it: a footnote, a float) is passed over.
+///
+/// The occurrences of a call site have the same spans, so the stack is
+/// what all of them were lowered under (`Registry::note_stack`): a
+/// description that is used in a container and outside of it tells
+/// nothing. What has the span of a container's own call (its fill, a plain
+/// string as its body, what a composite builds in it) is in that
+/// container.
+fn FrameLinter::evidence(self : FrameLinter, span : @syntax.Span) -> Unit {
+  guard self.unconfirmed > 0 && self.origins.entry_of(span) is Some((entry, _)) else {
     return
   }
-  let inside = self.origins.inside[entry]
-  guard !inside.is_empty() else { return }
-  let own = if shape && !argument { Some(entry) } else { Option::None }
-  for held in self.held {
-    for k, id in held.containers {
-      if !held.confirmed[k] && inside.contains(id) && !self.own_shape(own, id) {
-        held.confirmed[k] = true
-        self.unconfirmed -= 1
+  let own = self.origins.own[entry]
+  let under = self.origins.under[entry]
+  guard own >= 0 || !under.is_empty() else { return }
+  let mut limit = self.held.length() - 1
+  let confirm = (id : Int) => {
+    for h = limit; h >= 0; h = h - 1 {
+      let held = self.held[h]
+      for k, candidate in held.containers {
+        if candidate == id {
+          if !held.confirmed[k] {
+            held.confirmed[k] = true
+            self.unconfirmed -= 1
+          }
+          limit = h - 1
+          return
+        }
       }
     }
+  }
+  if own >= 0 {
+    confirm(own)
+  }
+  for k = under.length() - 1; k >= 0; k = k - 1 {
+    confirm(under[k])
   }
 }
 
@@ -714,9 +774,9 @@ fn FrameLinter::drawing(
         location,
         indirect,
         own: if shape && self.origins.entry_of(span) is Some((entry, false)) {
-          Some(entry)
+          self.origins.own[entry]
         } else {
-          Option::None
+          -1
         },
       })
     }
@@ -891,7 +951,7 @@ fn FrameLinter::text(
         continue
       }
       last = Some(glyph.span)
-      self.evidence(glyph.span, false)
+      self.evidence(glyph.span)
     }
   }
   let ink = self.ink(text.font)
@@ -900,8 +960,11 @@ fn FrameLinter::text(
     Some(stroke) => stroke.thickness.to_pt() / 2.0
     Option::None => 0.0
   }
-  // All glyphs at once: nearly every item is inside.
+  // All glyphs at once: nearly every item is inside. The pen moves along
+  // the line by the advance of a glyph, and upwards by its vertical
+  // advance (the pieces of a delimiter that a formula builds).
   let mut pen = x
+  let mut rise = 0.0
   let mut missing = false
   let mut x0 = 1.0e300
   let mut y0 = 1.0e300
@@ -914,7 +977,7 @@ fn FrameLinter::text(
     }
     if ink.has(id) {
       let gx = pen + glyph.x_offset.get() * size
-      let gy = y - glyph.y_offset.get() * size
+      let gy = y - rise - glyph.y_offset.get() * size
       let left = gx + ink.boxes[4 * id] * size
       let top = gy + ink.boxes[4 * id + 1] * size
       let right = gx + ink.boxes[4 * id + 2] * size
@@ -933,6 +996,7 @@ fn FrameLinter::text(
       }
     }
     pen += glyph.x_advance.get() * size
+    rise += glyph.y_advance.get() * size
   }
   if missing {
     self.missing(text)
@@ -944,13 +1008,15 @@ fn FrameLinter::text(
   let chars = ItemText::new(text.text)
   let cap = text.font.metrics().cap_height.get() * size
   pen = x
+  rise = 0.0
   for glyph in text.glyphs {
     let advance = glyph.x_advance.get() * size
     let id = glyph.id.to_int()
     let gx = pen + glyph.x_offset.get() * size
     // The baseline of the glyph.
-    let base = y - glyph.y_offset.get() * size
+    let base = y - rise - glyph.y_offset.get() * size
     pen += advance
+    rise += glyph.y_advance.get() * size
     guard ink.has(id) else { continue }
     let box = @kurbo.Rect::new(
       gx + ink.boxes[4 * id] * size - pad,
@@ -980,12 +1046,16 @@ fn FrameLinter::text(
 }
 
 ///|
+/// How many periods of a dash pattern the outline of a stroke is made
+/// with (`FrameLinter::shape`).
+const MAX_DASH_PERIODS : Double = 2000.0
+
+///|
 /// A shape at `(x, y)` in a frame with the transform `mat`. A shape that
 /// draws nothing is nothing.
 ///
 /// What is drawn is the interior of a filled shape and the outline of its
-/// stroke (a dashed line counts as a whole line): that is what the page
-/// cuts off. In a container a shape is where its path is: the engine
+/// stroke, with its dashes: that is what the page cuts off. In a container a shape is where its path is: the engine
 /// draws a stroke on the path, half of it to either side, and gives it no
 /// room, so the stroke of what fills its container (the frame of a
 /// drawing, the rules of a table) is outside by half by the engine's
@@ -1005,7 +1075,7 @@ fn FrameLinter::shape(
   }
   guard filled || stroke is Some(_) else { return }
   self.item += 1
-  self.evidence(span, true)
+  self.evidence(span)
   // A box around it first: of its points and of what a stroke can reach.
   let (x0, y0, x1, y1) = shape_box(shape, x, y)
   guard !self.within(mat, x0, y0, x1, y1) else { return }
@@ -1024,7 +1094,25 @@ fn FrameLinter::shape(
     paths.push(@kurbo.BezPath::from_vec(closed_path(path)))
   }
   if stroke is Some(stroke) {
-    let outline = stroke_outline(path, stroke, false)
+    // The dashes as they are drawn, unless there are too many to make
+    // (the box around the shape, `x0..y1`, is longer than any of its
+    // lines if it is of lines): then the line as a whole, which is more.
+    let dashed = match stroke.dash {
+      Some(dash) => {
+        let mut period = 0.0
+        let mut regular = !dash.array.is_empty()
+        for length in dash.array {
+          let length = length.to_pt()
+          regular = regular && length >= 0.0 && length < 1.0e9
+          period += length
+        }
+        regular &&
+        period > 0.0 &&
+        (x1 - x0 + (y1 - y0)) / period < MAX_DASH_PERIODS
+      }
+      Option::None => false
+    }
+    let outline = stroke_outline(path, stroke, dashed)
     if has_segments(outline.elements()) {
       paths.push(outline)
     }
@@ -1040,9 +1128,9 @@ fn FrameLinter::shape(
 }
 
 ///|
-/// The frames with the size `width` by `height` that containers were
-/// built with: the containers, and whether their width and their height
-/// were given.
+/// The containers that were built with the size `width` by `height` of a
+/// frame (but for `SIZE_TOLERANCE`), and for each whether its width and
+/// its height were given.
 fn FrameLinter::sized(
   self : FrameLinter,
   width : Double,
@@ -1050,27 +1138,36 @@ fn FrameLinter::sized(
 ) -> (Array[Int], Array[(Bool, Bool)]) {
   let containers : Array[Int] = []
   let fixed : Array[(Bool, Bool)] = []
-  let add = (id : Int, x : Bool, y : Bool) => {
-    for k, other in containers {
-      if other == id {
-        fixed[k] = (fixed[k].0 || x, fixed[k].1 || y)
-        return
+  let kw = size_key(width)
+  let kh = size_key(height)
+  for row_key in [kw - 1, kw, kw + 1, NO_SIDE] {
+    guard self.sizes.get(row_key) is Some(row) else { continue }
+    for key in [kh - 1, kh, kh + 1, NO_SIDE] {
+      guard row.get(key) is Some(list) else { continue }
+      for entry in list {
+        let (id, w, h) = entry
+        let x = match w {
+          Some(w) => {
+            guard (w - width).abs() <= SIZE_TOLERANCE else { continue }
+            true
+          }
+          Option::None => false
+        }
+        let y = match h {
+          Some(h) => {
+            guard (h - height).abs() <= SIZE_TOLERANCE else { continue }
+            true
+          }
+          Option::None => false
+        }
+        match containers.search(id) {
+          Some(k) => fixed[k] = (fixed[k].0 || x, fixed[k].1 || y)
+          Option::None => {
+            containers.push(id)
+            fixed.push((x, y))
+          }
+        }
       }
-    }
-    containers.push(id)
-    fixed.push((x, y))
-  }
-  if self.by_width.get(width) is Some(list) {
-    for entry in list {
-      match entry.1 {
-        Some(h) => if h == height { add(entry.0, true, true) }
-        Option::None => add(entry.0, true, false)
-      }
-    }
-  }
-  if self.by_height.get(height) is Some(list) {
-    for id in list {
-      add(id, false, true)
     }
   }
   (containers, fixed)
@@ -1103,7 +1200,7 @@ fn FrameLinter::close(self : FrameLinter, held : Held) -> Unit {
     }
     let (x, y) = held.fixed[k]
     for leaving in held.leaving {
-      guard !self.own_shape(leaving.own, id) else { continue }
+      guard !self.own_shape(leaving, id, held) else { continue }
       let (amount, side) = leaves(
         leaving.rect,
         held.box,
@@ -1180,8 +1277,7 @@ fn FrameLinter::group(
     return
   }
   let mut held : Held? = Option::None
-  if frame.kind().is_hard() &&
-    !(self.by_width.is_empty() && self.by_height.is_empty()) {
+  if frame.kind().is_hard() && !self.sizes.is_empty() {
     let width = frame.width().to_pt()
     let height = frame.height().to_pt()
     let (containers, fixed) = self.sized(width, height)
@@ -1260,7 +1356,7 @@ fn FrameLinter::frame(
       Shape(shape, span) => self.shape(shape, span, x, y, mat)
       Image(_, size, span) => {
         self.item += 1
-        self.evidence(span, false)
+        self.evidence(span)
         let right = x + size.x.to_pt()
         let bottom = y + size.y.to_pt()
         if !self.within(mat, x, y, right, bottom) {

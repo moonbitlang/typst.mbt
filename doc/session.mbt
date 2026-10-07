@@ -14,15 +14,23 @@ priv struct Session {
   /// The serial of the first callback description that did not exist when
   /// the compilation started.
   start_serial : Int
+  /// Whether the lints run: lowering then notes what the lint of
+  /// containers needs (`Container` in `origin.mbt`).
+  lints : Bool
 }
 
 ///|
-fn Session::new(base : &@library.World, dir? : String = "") -> Session {
+fn Session::new(
+  base : &@library.World,
+  dir? : String = "",
+  lints? : Bool = true,
+) -> Session {
   {
     base,
     registry: Registry::new(dir~),
     hosts: {},
     start_serial: callback_serial.val,
+    lints,
   }
 }
 
@@ -124,18 +132,18 @@ fn Session::host(
         (session.registry.span(entry), session.registry.entries[entry].keys)
       _ => (span, keys)
     }
+    let stack = session.registry.lowered_under.get(loc).unwrap_or(0)
+    let containers = session.registry.stacks[stack]
     let lower : Lowering = {
       session,
       engine,
       context,
       keys,
       pieces: Option::None,
-      // What a callback returns is inside the containers that the
-      // callback is in.
-      containers: match session.registry.inside.get(loc) {
-        Some(containers) => containers.copy()
-        None => []
-      },
+      // What a callback returns is in the containers that the callback is
+      // in: those that all occurrences of its call site are in.
+      containers,
+      stack,
     }
     let cx : Ctx = { lower, alive: { val: true, }, span, }
     let result = try (callback.invoke)(cx, args) catch {

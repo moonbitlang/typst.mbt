@@ -1204,9 +1204,10 @@ lints=false)` turns all of them off.
 One reads the description (section 2: `AdjacentInline`). The other three
 read the laid-out pages, so they are in the report of `compile_paged`
 only: `lower` and a compilation to another output (`compile` for HTML)
-have no pages, and a document with errors has none either. Their cost is
-under one per cent of a compilation (measured: 0.35 ms of 70 ms for 18
-pages, 2.9 ms of 404 ms for 100).
+have no pages, and a document with errors has none either. They look at
+every glyph of the document once; on a report of 18 pages that took
+0.35 ms of a compilation of 70 ms, and on one of 100 pages 3 ms of about 400 ms
+(section 10 says what was measured).
 
 **A character that no font has** (`MissingGlyph`). The fonts of the world
 are tried in the order of section 5; what none of them has is drawn as the
@@ -1220,10 +1221,10 @@ pub fn shipped_card() -> Block {
 ```
 
 ```text
-lint[missing-glyph]: no font has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
+lint[missing-glyph]: no font of this text has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
   at doc/examples/guide/guide.mbt:519:9 (Block, argument 1)
   on page 1
-  hint: use a font that has it: name its family in the `font` of `SetText` or `Text`; a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)
+  hint: use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)
 ```
 
 - The place is the argument that has the character, the font is the one
@@ -1242,7 +1243,8 @@ lint[missing-glyph]: no font has a glyph for "🚀" (U+1F680): it is drawn as th
 - Not seen: text in a world without any font (it is not on the page at
   all, and the engine warns only of a family that is named); what a font
   draws for a character that it does have (an empty glyph, a "last
-  resort" font's own boxes).
+  resort" font's own boxes, and the box that the engine draws for a
+  bitmap glyph that it cannot decode).
 
 **Content outside the page** (`OutsidePage`). Text, a shape or an image
 that leaves the page by more than a point (`wide_row`, on a page of
@@ -1267,18 +1269,20 @@ lint[outside-page]: text leaves the page at the right by 31.7pt
   page's fill is not an item at all.
 - What counts is what is drawn, since that is what is cut off: of a glyph
   the box of its outline (not its line, which is higher than its
-  letters), of a shape its interior and its stroke, of an image its box;
-  through every rotation and scaling around it, and only what a clip
-  around it leaves. So a full stop that hangs over the edge of a
-  justified line is reported on a page without a margin, and half of a
-  4pt stroke on the edge is.
+  letters), of a shape its interior and its stroke with its dashes, of
+  an image its box; through every rotation and scaling around it. A clip
+  around it counts as the box of the clip: what round corners or a
+  turned clip cut away beyond that can still be reported. So a full stop
+  that hangs over the edge of a justified line is reported on a page
+  without a margin, and half of a 4pt stroke on the edge is.
 - The side and the amount are those of the farthest item of the call, and
   "(the farthest of 5)" counts its lines or shapes. What the engine drew
   without a source location (the marker of a list item, a decoration) has
   the place of the element that it is part of, and a hint says so; a page
   number that leaves the page has no place, only its page.
 - Not seen: what is inside the page but over other content, or past the
-  edge of a column or a cell.
+  edge of a column or a cell; a glyph that is a bitmap or an SVG document
+  only (an emoji of a colour font), which has no outline to measure.
 
 **Content outside a block or box of a fixed size** (`OutsideContainer`).
 A `Block` or `Box` that is given a width or a height in absolute units is
@@ -1340,10 +1344,17 @@ lint[outside-container]: text leaves its container (Block, 90pt by 24pt) at the 
   and the measured `Cards` are not split); a size in per cent or em, or
   from a set rule; a block made by Typst source (`Markup`, `Call`); the
   cells of a grid or a table, `Rect` and the other shapes with a body, a
-  column; a container with nothing in it that the EDSL lowered inside its
-  call. The frames do not record which block had its size given: the
-  EDSL notes the size and what it lowers inside the call, and takes a
-  frame of exactly that size that holds such content for the block's.
+  column.
+- How a block is found on the page: the pages do not record which block
+  had its size given, or which frame is the frame of which call. The
+  EDSL notes the size of the call and what it lowers inside the call's
+  arguments, and takes a frame of that size that holds such content for
+  the block's. So a container is not seen if nothing in it tells: if it
+  is empty, or if all that is in it is also used outside of it (one
+  `label` value, or the calls of one helper function, in two different
+  charts say nothing of either chart; in two charts that one function
+  builds they do). And an element that gives its block a fill and also
+  draws shapes of its own in it has them taken for the fill.
 
 ## 10. What is checked where
 
@@ -1383,4 +1394,7 @@ Not checked by a test of this repository:
 - the 39 s of section 5, which is the ports' measurement.
 - the times of section 9: a release build, the in-memory world, a
   synthetic report of headings, paragraphs, tables, cards of a fixed size
-  and drawings; the lints of the pages were timed alone, over 20 runs.
+  and drawings (30,536 and 174,092 glyphs, two call sites of containers);
+  the lints of the pages were timed alone, over 20 runs. A document whose
+  content is mostly outside of something is slower: what leaves is
+  measured exactly.

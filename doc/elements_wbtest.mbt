@@ -19,6 +19,7 @@ fn test_lower() -> Lowering {
     keys: [],
     pieces: Option::None,
     containers: [],
+    stack: 0,
   }
 }
 

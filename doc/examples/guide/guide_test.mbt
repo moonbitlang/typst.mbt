@@ -1433,10 +1433,10 @@ test "section 9: the lints of the pages" {
   inspect(
     numberless(@guide.lints_of(small(@guide.shipped_card())).join("\n")),
     content=(
-      #|lint[missing-glyph]: no font has a glyph for "🚀" (U+NFN): it is drawn as the missing glyph of Libertinus Serif
+      #|lint[missing-glyph]: no font of this text has a glyph for "🚀" (U+NFN): it is drawn as the missing glyph of Libertinus Serif
       #|  at doc/examples/guide/guide.mbt:N:N (Block, argument N)
       #|  on page N
-      #|  hint: use a font that has it: name its family in the `font` of `SetText` or `Text`; a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section N)
+      #|  hint: use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section N)
     ),
   )
   // Content outside the page.
