@@ -39,6 +39,8 @@ pub struct RasterImage {
   priv exif_rotation : UInt?
   priv icc : Bytes?
   priv dpi : Double?
+  /// [RasterImage::hash128], once it was asked for.
+  priv mut hash : U128?
 }
 
 ///|
@@ -183,6 +185,7 @@ fn RasterImage::new_impl(
         exif_rotation: exif_rot,
         icc,
         dpi,
+        hash: None,
       }
     }
     Pixel(format) => {
@@ -218,6 +221,7 @@ fn RasterImage::new_impl(
         exif_rotation: None,
         icc: icc.custom(),
         dpi: None,
+        hash: None,
       }
     }
   }
@@ -289,6 +293,34 @@ pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage {
 /// Access the ICC profile, if any.
 pub fn RasterImage::icc(self : RasterImage) -> Bytes? {
   self.icc
+}
+
+///|
+/// `hash128` of the image (upstream `Hash for RasterImageInner`: "the image
+/// is fully defined by data, format, and ICC profile"; the profile is the
+/// one the image has, passed or found in the file): what a memoized
+/// function of an image is keyed by (typst-pdf's `convert_raster`). Cheap,
+/// like upstream's: the data is hashed once per object ([data_hash]), the
+/// result is kept in the image.
+pub fn RasterImage::hash128(self : RasterImage) -> U128 {
+  match self.hash {
+    Some(hash) => hash
+    None => {
+      let state = SipHasher128::new()
+      state.write_u128(data_hash(self.data))
+      state.write_raster_format(self.format)
+      match self.icc {
+        None => state.write_discriminant(0)
+        Some(icc) => {
+          state.write_discriminant(1)
+          state.write_u128(data_hash(icc))
+        }
+      }
+      let hash = state.finish128()
+      self.hash = Some(hash)
+      hash
+    }
+  }
 }
 
 ///|

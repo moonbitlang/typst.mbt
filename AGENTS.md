@@ -477,7 +477,10 @@
   compare as the hash of their bytes): never look derived data up by its
   source, a path means another file in another directory and after an
   edit. A result that had to ask the world (an element without its
-  companion) is not kept. Rules for such a cache: the
+  companion) is not kept. The third is the PDF exporter's image
+  conversion (`pdf/image.mbt` `convert_raster`: the image, as
+  `RasterImage::hash128()`, upstream's `Hash for RasterImage`, and
+  `interpolate`). Rules for such a cache: the
   key is exactly what upstream hashes (read the Rust signature and the
   `Hash` impls: `RasterImage::new` hashes the data, the format and the
   ICC profile that was passed, not the one found in the file), and the
@@ -497,13 +500,17 @@
   compilation and outside of one (`content_memo_enabled()`), so that the
   runner's comparison of memoization on and off covers it. Tests
   (`library/memo_content_wbtest.mbt`, `library/text_raw_memo_wbtest.mbt`,
-  `typst/content_memo_wbtest.mbt`):
+  `typst/content_memo_wbtest.mbt`, `pdf/image_wbtest.mbt`,
+  `doc/pdf_images_test.mbt`):
   one input per argument of the key that differs in nothing else, the
   same bytes in two objects, a broken input used twice, a file that
   changes behind its path between two compilations of one world, `evict`.
-  They cost memory, not time: decoded pixels stay until `max_age`
+  They cost memory, not time: decoded pixels (4 bytes per pixel of an
+  RGBA image) and, for an image with an alpha channel or 16-bit samples,
+  the exporter's converted samples (as much again) stay until `max_age`
   compilations did not use them, and a process that never calls `evict`
-  keeps every image it ever decoded.
+  keeps every image it ever decoded. A watch session whose images are
+  rewritten on every save holds up to `max_age` + 1 versions of them.
 - Performance: non-intrinsic core functions (`Byte::to_uint`,
   `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
   `Double::floor`/`to_int`, ...) are compiled into the core bundle and are
@@ -705,7 +712,19 @@
   (upstream frames from the `paged` goldens), and `pdf-extract-check` /
   `pdftags-check` (our readers on upstream's PDFs, saved by the oracle with
   `ORACLE_SAVE_PDF=<dir>`; pass `--upstream-pdfs=<dir>`). Upstream PDF byte
-  hashes are not a goal.
+  hashes are not a goal. An exporter image (`@export.Image`) is embedded
+  once per `key` and `interpolate`; the key is krilla's identity of an
+  image (`ImageRepr.sip`): the hash of the raster image (data, format, ICC
+  profile) for converted samples, the data alone for a JPEG, which is
+  embedded as it is (the same file inside an SVG is the same image). Not
+  the data alone for both: the same bytes are other pixels in another
+  pixel format. (krilla does not have `interpolate` in the identity of a
+  JPEG, so upstream embeds a JPEG that is used smooth and pixelated once,
+  with the flag of the first use; pdflite embeds it twice.) The export of
+  a document with images is the compression of their samples in pdflite
+  (the deck of `memo_content.mbt`'s numbers: 515 of 550 ms, as much as
+  upstream's with `--jobs 1`), again in every export: krilla keeps the
+  compressed stream in its image, pdflite's image does not.
 - PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
   `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts

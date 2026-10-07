@@ -12,6 +12,16 @@ pub fn RasterImage::synthetic(
   height~ : UInt,
   dpi? : Double,
 ) -> RasterImage {
+  // Not the hash of the image that decoding the data gives: what is kept
+  // for an image by its hash (the PDF exporter's conversion) must not be
+  // taken for the other's, in a process that makes both.
+  let state = SipHasher128::new()
+  state.write_str("synthetic")
+  state.write_u128(data_hash(data))
+  state.write_raster_format(format)
+  state.write_u32(width)
+  state.write_u32(height)
+  let hash = state.finish128()
   {
     data,
     format,
@@ -28,6 +38,7 @@ pub fn RasterImage::synthetic(
     exif_rotation: None,
     icc: None,
     dpi,
+    hash: Some(hash),
   }
 }
 

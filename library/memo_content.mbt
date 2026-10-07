@@ -4,11 +4,12 @@
 // Upstream memoizes some functions that have no tracked argument: pure
 // functions of what their arguments hash to. The ones here are those whose
 // results are expensive and that a document asks for again and again:
-// decoding a raster image (`RasterImage::new_impl`, `image_raster.mbt`) and
-// highlighting raw text (`Packed<RawElem>::highlight`, `text_raw.mbt`).
-// Unlike the memoized calls of `memo.mbt` they need no world, introspector,
-// route or sink, so a result is valid for as long as the process runs,
-// within a compilation and in the next one.
+// decoding a raster image (`RasterImage::new_impl`, `image_raster.mbt`),
+// highlighting raw text (`Packed<RawElem>::highlight`, `text_raw.mbt`) and
+// the image conversion of the PDF exporter (typst-pdf's `convert_raster`,
+// `pdf/image.mbt`). Unlike the memoized calls of `memo.mbt` they need no
+// world, introspector, route or sink, so a result is valid for as long as
+// the process runs, within a compilation and in the next one.
 //
 // - A result is found by the 128-bit fingerprint of the arguments, as
 //   comemo finds it by their hash. Large data (the bytes of an image) is

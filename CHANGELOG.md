@@ -162,6 +162,14 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   field, in the element or the set rule (upstream's `Derived`), and
   syntaxes of nested set rules are folded with their sources.
 
+- PDF export: raster images with the same bytes were taken for one image
+  and embedded once, the first one for all of them: the same bytes read as
+  pixels of another format (`format: (encoding: "luma8", ..)` and
+  `"rgb8"`, or other dimensions), or the same file with another `icc`
+  profile. An image is now identified as upstream identifies it, by its
+  data, format and ICC profile (a JPEG, which is embedded as it is, still
+  by its data).
+
 ### Added
 
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
@@ -205,6 +213,11 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   (upstream memoizes `Packed<RawElem>::highlight`): a raw element with
   equal fields, spans and styles is highlighted once per process, not once
   per introspection iteration and compilation.
+- `pdf`: the image conversion of the exporter is kept by content too
+  (upstream memoizes `convert_raster`): a raster image is converted once
+  per process and `interpolate` flag, not once per place it is drawn at.
+  `library`: `RasterImage::hash128()`, the hash of an image (its data,
+  format and ICC profile; upstream `Hash for RasterImage`).
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
   family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in

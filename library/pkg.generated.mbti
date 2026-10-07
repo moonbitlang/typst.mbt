@@ -9824,6 +9824,7 @@ pub fn RasterImage::dpi(Self) -> Double?
 pub fn RasterImage::dynamic(Self) -> DynamicImage
 pub fn RasterImage::exif_rotation(Self) -> UInt?
 pub fn RasterImage::format(Self) -> RasterFormat
+pub fn RasterImage::hash128(Self) -> U128
 pub fn RasterImage::height(Self) -> UInt
 pub fn RasterImage::icc(Self) -> Bytes?
 pub fn RasterImage::new(Bytes, RasterFormat, Smart[Bytes]) -> Self raise HintedError

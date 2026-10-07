@@ -174,9 +174,9 @@ let evictions : Ref[Int] = { val: 0, }
 /// them again is all it costs). Must not be called during a compilation.
 ///
 /// The results kept by content (`memo_content.mbt`: decoded raster images,
-/// highlighted raw text) have ages like comemo's: each call makes them
-/// older by one and drops those that were not found for more than `max_age`
-/// calls.
+/// highlighted raw text, the PDF exporter's images) have ages like
+/// comemo's: each call makes them older by one and drops those that were
+/// not found for more than `max_age` calls.
 pub fn evict(max_age : Int) -> Unit {
   for evictor in evictors {
     evictor(max_age)
