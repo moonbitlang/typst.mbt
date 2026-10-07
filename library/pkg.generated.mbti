@@ -1078,6 +1078,8 @@ pub let footnote_entry_elem_separator : Int
 
 pub fn footnote_marker_elem() -> Element
 
+pub fn format_duration(Int64) -> String
+
 pub fn format_float(Double, precision? : Int, Bool, String) -> String
 
 pub fn format_float_component(Double) -> String
