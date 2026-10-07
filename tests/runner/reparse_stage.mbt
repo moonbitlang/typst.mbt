@@ -1,6 +1,17 @@
 // The `reparse` stage: incremental reparsing through `Source::edit` and
 // `Source::replace`, compared against `oracle/src/reparse.rs`, which applies
 // the same seeded pseudo-random edits with the same generator.
+//
+// Per edit the report has the reparsed range, a hash of the tree's debug
+// output, a hash of all span numbers in pre-order, the line starts, and
+// whether the tree is what a parse of the text gives; at the end the tree
+// and its diagnostics with their ranges. So the tree after every edit, with
+// its numbers, is upstream's.
+//
+// Not in upstream's report: an edit must leave the source it was applied to
+// as it was (`syntax/node.mbt`). The source before every edit is hashed
+// with its text and its whole tree before and after, and a difference is a
+// line of the report, which then differs from upstream's.
 
 ///|
 /// Number of edits applied to every test body.
@@ -60,6 +71,31 @@ fn Fnv::write_u64(self : Fnv, v : UInt64) -> Unit {
   for i in 0..<8 {
     self.h = (self.h ^ ((v >> (8 * i)) & 0xffUL)) * 0x100000001b3UL
   }
+}
+
+///|
+impl @syntax.NodeHasher for Fnv with fn write_u64(self, v) {
+  self.write_u64(v)
+}
+
+///|
+impl @syntax.NodeHasher for Fnv with fn write_str(self, s) {
+  for i in 0..<s.length() {
+    self.h = (self.h ^ s.code_unit_at(i).to_int().to_uint64()) * 0x100000001b3UL
+  }
+  self.write_u64(s.length().to_uint64())
+}
+
+///|
+/// A hash of everything a holder of a source can read from it: the text and
+/// what upstream's `Hash for SyntaxNode` covers of the tree (kinds, texts,
+/// spans, lengths, descendants, diagnoses, numbering bounds, messages and
+/// hints).
+fn source_state(source : @syntax.Source) -> UInt64 {
+  let hash = Fnv::new()
+  @syntax.NodeHasher::write_str(hash, source.text())
+  source.root().hash_into(hash)
+  hash.h
 }
 
 ///|
@@ -141,6 +177,7 @@ fn reparse_report(text : String) -> String {
   for i in 0..<reparse_edits {
     let bytes = @utf8.encode(source.text())
     let edit = next_edit(rng, bytes)
+    let before = source_state(source)
     let (edited, (rs, re)) = if edit.whole {
       let old = source.text()
       let new = @syntax.utf8_slice(old, 0, edit.start) +
@@ -149,6 +186,9 @@ fn reparse_report(text : String) -> String {
       source.replace(new)
     } else {
       source.edit(edit.start, edit.end, edit.with_)
+    }
+    if source_state(source) != before {
+      buf.write_string("edit \{i}: the source before the edit changed\n")
     }
     source = edited
     let root = source.root()
