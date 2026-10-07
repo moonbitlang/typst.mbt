@@ -1,5 +1,36 @@
 // Tests of what only the native backend has: files that are read in ranges
-// through a descriptor.
+// through a descriptor, and directories that tell the kinds of their
+// entries.
+
+///|
+test "read_dir_entries: kinds and errors" {
+  let dir = "_build/kit_platform_test/kinds"
+  @platform.create_dir_all(@platform.join(dir, "sub"))
+  @platform.write_file(@platform.join(dir, "a.txt"), b"a")
+  let lines = []
+  for entry in @platform.read_dir_entries(dir) {
+    // The directory tells the kind, or the system does.
+    let kind = match entry.kind {
+      Some(kind) => kind
+      None => @platform.lstat_kind(@platform.join(dir, entry.name))
+    }
+    lines.push("\{entry.name}: \{@debug.to_string(kind)}")
+  }
+  lines.sort()
+  inspect(lines.join(", "), content="sub: Dir, a.txt: File")
+  let missing = try @platform.read_dir_entries(dir + "/nowhere") catch {
+    e => "\{@debug.to_string(e.kind())}: \{e}"
+  } noraise {
+    _ => "ok"
+  }
+  inspect(missing, content="NotFound: No such file or directory (os error 2)")
+  let file = try @platform.read_dir_entries(dir + "/a.txt") catch {
+    e => e.to_string()
+  } noraise {
+    _ => "ok"
+  }
+  inspect(file, content="Not a directory (os error 20)")
+}
 
 ///|
 test "ranged file: a file that gets shorter while it is open" {

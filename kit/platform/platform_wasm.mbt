@@ -225,6 +225,13 @@ pub fn read_dir(path : String) -> Array[String] raise IoError {
 }
 
 ///|
+/// Lists the entries of a directory (`fs::read_dir`). The host tells no
+/// kinds.
+pub fn read_dir_entries(path : String) -> Array[DirEntry] raise IoError {
+  read_dir(path).map(name => { name, kind: None, })
+}
+
+///|
 /// Whether a path exists (`Path::exists`).
 pub fn exists(path : String) -> Bool {
   !path.contains_char('\u{0}') && @fs.path_exists(path)

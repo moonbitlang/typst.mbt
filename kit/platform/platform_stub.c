@@ -19,6 +19,7 @@
 #include <io.h>
 #include <windows.h>
 #else
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -306,6 +307,83 @@ int typst_platform_lstat_kind(moonbit_bytes_t path) {
     return 2;
   }
   return 3;
+#endif
+}
+
+// Lists a directory (Rust's `fs::read_dir`): for every entry but `.` and
+// `..`, in the system's order, a byte for its kind and its name with a
+// terminating NUL. The kind is what the directory says about the entry, as
+// `typst_platform_lstat_kind` numbers it, or 0 if it does not say (some file
+// systems; then `DirEntry::file_type` asks with `lstat`, and so does the
+// caller). On failure, returns empty bytes and sets the last error; ENOSYS
+// on Windows, where the caller lists the directory another way.
+MOONBIT_FFI_EXPORT
+moonbit_bytes_t typst_platform_read_dir(moonbit_bytes_t path) {
+  typst_platform_errno = 0;
+#ifdef _WIN32
+  (void)path;
+  typst_platform_errno = ENOSYS;
+  return typst_platform_empty();
+#else
+  errno = 0;
+  DIR *dir = opendir((const char *)path);
+  if (dir == NULL) {
+    typst_platform_errno = errno != 0 ? errno : EIO;
+    return typst_platform_empty();
+  }
+  size_t cap = 4096;
+  size_t len = 0;
+  unsigned char *buf = (unsigned char *)malloc(cap);
+  if (buf == NULL) {
+    closedir(dir);
+    typst_platform_errno = ENOMEM;
+    return typst_platform_empty();
+  }
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    const char *name = entry->d_name;
+    if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+      continue;
+    }
+    size_t name_len = strlen(name);
+    // The kind, the name and its NUL.
+    size_t need = len + name_len + 2;
+    if (need > (size_t)INT32_MAX) {
+      free(buf);
+      closedir(dir);
+      typst_platform_errno = EFBIG;
+      return typst_platform_empty();
+    }
+    if (need > cap) {
+      size_t new_cap = cap * 2 > need ? cap * 2 : need;
+      unsigned char *grown = (unsigned char *)realloc(buf, new_cap);
+      if (grown == NULL) {
+        free(buf);
+        closedir(dir);
+        typst_platform_errno = ENOMEM;
+        return typst_platform_empty();
+      }
+      buf = grown;
+      cap = new_cap;
+    }
+    unsigned char kind = 0;
+#ifdef DT_UNKNOWN
+    switch (entry->d_type) {
+    case DT_UNKNOWN: kind = 0; break;
+    case DT_REG: kind = 1; break;
+    case DT_DIR: kind = 2; break;
+    case DT_LNK: kind = 4; break;
+    default: kind = 3; break;
+    }
+#endif
+    buf[len] = kind;
+    memcpy(buf + len + 1, name, name_len + 1);
+    len = need;
+  }
+  closedir(dir);
+  moonbit_bytes_t bytes = typst_platform_copy(buf, len);
+  free(buf);
+  return bytes;
 #endif
 }
 

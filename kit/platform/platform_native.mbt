@@ -33,6 +33,10 @@ extern "C" fn ffi_lstat_kind(path : Bytes) -> Int = "typst_platform_lstat_kind"
 
 ///|
 #borrow(path)
+extern "C" fn ffi_read_dir(path : Bytes) -> Bytes = "typst_platform_read_dir"
+
+///|
+#borrow(path)
 extern "C" fn ffi_realpath(path : Bytes) -> Bytes = "typst_platform_realpath"
 
 ///|
@@ -211,15 +215,48 @@ pub fn create_dir(path : String) -> Unit raise IoError {
 ///|
 /// Lists the names of the entries of a directory (`fs::read_dir`).
 pub fn read_dir(path : String) -> Array[String] raise IoError {
-  match ffi_stat_kind(c_path(path)) {
-    2 => ()
-    0 => raise os_error(ffi_last_error())
-    _ => raise os_error(20)
+  read_dir_entries(path).map(entry => entry.name)
+}
+
+///|
+/// Lists the entries of a directory (`fs::read_dir`), in the system's
+/// order, with their kinds where the directory tells them.
+///
+/// (Not through `@fs.read_dir`, which reads a directory twice, tells no
+/// kinds and writes to stderr if it cannot open the directory.)
+pub fn read_dir_entries(path : String) -> Array[DirEntry] raise IoError {
+  if os() == Windows {
+    match ffi_stat_kind(c_path(path)) {
+      2 => ()
+      0 => raise os_error(ffi_last_error())
+      _ => raise os_error(20)
+    }
+    let names = @fs.read_dir(path) catch {
+      @fs.IOError(message) => raise IoError(Other, message)
+    }
+    return names.map(name => { name, kind: None, })
   }
-  let entries = @fs.read_dir(path) catch {
-    @fs.IOError(message) => raise IoError(Other, message)
+  let listing = ffi_read_dir(c_path(path))
+  check_last_error()
+  let entries = []
+  let mut at = 0
+  while at < listing.length() {
+    let kind : FileKind? = match listing[at] {
+      1 => Some(File)
+      2 => Some(Dir)
+      3 => Some(Other)
+      4 => Some(Symlink)
+      _ => None
+    }
+    let start = at + 1
+    let mut end = start
+    while listing[end] != 0 {
+      end += 1
+    }
+    entries.push({ name: @utf8.decode_lossy(listing[start:end]), kind, })
+    at = end + 1
   }
-  entries.to_owned()
+  entries
 }
 
 ///|

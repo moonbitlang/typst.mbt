@@ -117,6 +117,25 @@ test "is_same_file" {
 }
 
 ///|
+test "read_dir: the entries without `.` and `..`" {
+  let dir = "_build/kit_platform_test/listing"
+  @platform.create_dir_all(@platform.join(dir, "sub"))
+  @platform.write_file(@platform.join(dir, "a.txt"), b"a")
+  @platform.write_file(@platform.join(dir, ".hidden"), b"")
+  @platform.write_file(@platform.join(dir, "sub/inside"), b"")
+  let names = @platform.read_dir(dir)
+  names.sort()
+  inspect(names.join(", "), content="sub, a.txt, .hidden")
+  let entries = @platform.read_dir_entries(dir).map(entry => entry.name)
+  entries.sort()
+  inspect(entries.join(", "), content="sub, a.txt, .hidden")
+  inspect(
+    @platform.read_dir(@platform.join(dir, "sub")).join(", "),
+    content="inside",
+  )
+}
+
+///|
 /// Writes a file for a test below the build directory and returns its path.
 fn scratch_file(name : String, data : Bytes) -> String raise {
   let dir = "_build/kit_platform_test"

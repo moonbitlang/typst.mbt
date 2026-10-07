@@ -71,9 +71,15 @@ fn FontDb::load_fonts_dir(self : FontDb, dir : String) -> Unit {
 /// deduplicating symlinked entries (`Database::canonicalize`).
 fn canonicalize_entry(
   path : String,
+  kind : @platform.FileKind?,
   seen : @hashset.HashSet[String],
 ) -> (String, @platform.FileKind)? {
-  let file_type = @platform.lstat_kind(path) catch { _ => return None }
+  // `entry.file_type()`: what the directory said, or else what the system
+  // says.
+  let file_type = match kind {
+    Some(kind) => kind
+    None => @platform.lstat_kind(path) catch { _ => return None }
+  }
   if file_type != Symlink {
     if seen.length() > 0 {
       if seen.contains(path) {
@@ -101,10 +107,11 @@ fn FontDb::load_fonts_dir_impl(
   dir : String,
   seen : @hashset.HashSet[String],
 ) -> Unit {
-  let entries = @platform.read_dir(dir) catch { _ => return }
-  for name in entries {
-    let entry = @platform.join(dir, name)
-    guard canonicalize_entry(entry, seen) is Some((path, file_type)) else {
+  let entries = @platform.read_dir_entries(dir) catch { _ => return }
+  for entry in entries {
+    let kind = entry.kind
+    let entry = @platform.join(dir, entry.name)
+    guard canonicalize_entry(entry, kind, seen) is Some((path, file_type)) else {
       continue
     }
     if file_type == File {
