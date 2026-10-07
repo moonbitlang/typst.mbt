@@ -65,6 +65,10 @@ class Failure(Exception):
     pass
 
 
+class Skip(Exception):
+    """A scenario that the CLI under test cannot run."""
+
+
 class Session:
     """A running `typst watch`."""
 
@@ -178,6 +182,19 @@ def last_cycle(text, fullscreen):
     if fullscreen:
         start = max(0, start - 3)
     return b"\n".join(lines[start:])
+
+
+def diagnostics_of(cycle):
+    """The diagnostics of a compilation: what follows its status line and
+    the blank line after it."""
+    lines = cycle.split(b"\n")
+    last = None
+    for i, line in enumerate(lines):
+        if STATUS.match(line):
+            last = i
+    if last is None:
+        return cycle
+    return b"\n".join(lines[last + 2 :])
 
 
 def normalize(text, directory):
@@ -335,10 +352,10 @@ class Project:
         ]
 
 
-def compile_fresh(command, args, cwd, source, output):
+def compile_fresh(command, args, cwd, source, output, global_args=()):
     """`typst compile` in a new process; returns (status, stderr)."""
     result = subprocess.run(
-        command + ["compile", source, output] + args,
+        command + list(global_args) + ["compile", source, output] + args,
         cwd=cwd,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
@@ -360,7 +377,9 @@ class Runner:
         self.session = None
         self.fullscreen = False
         self.fresh_args = []
+        self.global_args = []
         self.output = None
+        self.first = True
 
     def start(
         self,
@@ -375,14 +394,28 @@ class Runner:
         self.output = output
         self.source = source
         self.fresh_args = fresh_args if fresh_args is not None else args
+        self.global_args = list(global_args)
+        self.first = True
         flags = [] if fullscreen else ["--no-fullscreen"]
         self.session = Session(
             self.command, [source, output] + flags + args, self.dir, global_args
         )
 
-    def step(self, name, action=None, expect="compile", compare=True, timeout=120.0):
+    def step(
+        self,
+        name,
+        action=None,
+        expect="compiled successfully",
+        compare=True,
+        timeout=120.0,
+    ):
+        """Does something and waits for the recompilation, whose status must
+        start with `expect` (`quiet`: there must be none)."""
         session = self.session
-        start = session.mark()
+        # The first step looks at everything: the initial compilation may be
+        # over before it starts to look.
+        start = 0 if self.first else session.mark()
+        self.first = False
         log(f"[{self.name}] {name}")
         if action is not None:
             action()
@@ -396,28 +429,40 @@ class Runner:
             self.problems.append(f"{name}: {failure}")
             self.records.append((name, b"<failed>", None))
             return
-        printed = normalize(last_cycle(session.text(start), self.fullscreen), self.dir)
+        cycle = last_cycle(session.text(start), self.fullscreen)
         status = session.statuses(start)[-1]
         log(f"[{self.name}]   {status}")
-        if expect != "compile" and not status.startswith(expect):
+        if not status.startswith(expect):
             self.problems.append(f"{name}: expected `{expect}`, got `{status}`")
         produced = None
-        if compare and not status.startswith("compiled with errors"):
-            produced = self.compare_with_fresh(name)
-        self.records.append((name, printed, produced))
+        if compare:
+            produced = self.compare_with_fresh(name, status, diagnostics_of(cycle))
+        self.records.append((name, normalize(cycle, self.dir), produced))
 
-    def compare_with_fresh(self, name):
-        """Compares the watcher's output with a fresh compilation."""
+    def compare_with_fresh(self, name, status, diagnostics):
+        """Compares what the watcher made of the files with a fresh
+        compilation: whether it succeeds, its diagnostics, its output."""
         fresh_dir = tempfile.mkdtemp(prefix="watch-fresh-")
         try:
             fresh = os.path.join(fresh_dir, os.path.basename(self.output))
             code, stderr = compile_fresh(
-                self.command, self.fresh_args, self.dir, self.source, fresh
+                self.command, self.fresh_args, self.dir, self.source, fresh, self.global_args
             )
-            if code != 0:
+            failed = status.startswith("compiled with errors")
+            if (code != 0) != failed:
                 self.problems.append(
-                    f"{name}: the fresh compilation failed:\n{stderr.decode(errors='replace')}"
+                    f"{name}: `{status}`, but a fresh compilation exits with {code}:\n"
+                    + stderr.decode(errors="replace")
                 )
+                return None
+            if normalize(stderr, self.dir) != normalize(diagnostics, self.dir):
+                self.problems.append(
+                    f"{name}: the diagnostics differ from a fresh compilation's:\n"
+                    + diagnostics.decode(errors="replace")
+                    + "\n--- fresh\n"
+                    + stderr.decode(errors="replace")
+                )
+            if failed:
                 return None
             produced = b""
             for entry in sorted(os.listdir(fresh_dir)):
@@ -647,6 +692,28 @@ def scenario_data(r):
     r.step("the main file", lambda: write(path("main.typ"), DATA + "End.\n"))
 
 
+def scenario_links(r):
+    """A dependency that is a symbolic link."""
+    if any(part.endswith(".wasm") for part in r.command):
+        raise Skip("the wasm build cannot tell a symbolic link")
+    path = lambda name: os.path.join(r.dir, name)
+    os.makedirs(path("store"))
+    write(path("store/data.txt"), "one")
+    write(path("store/other.txt"), "other")
+    os.symlink("store/data.txt", path("data.txt"))
+    write(path("main.typ"), '#read("data.txt")\n')
+    r.start(["--ignore-system-fonts"], "out.svg")
+    r.step("initial compilation")
+    r.step("the link's file, written in place", lambda: write(path("store/data.txt"), "two"))
+    r.step(
+        "the link's file, replaced by a rename",
+        lambda: replace(path("store/data.txt"), "three"),
+    )
+    r.step("and written in place again", lambda: write(path("store/data.txt"), "four"))
+    r.step("the main file", lambda: write(path("main.typ"), '#read("data.txt")!\n'))
+    r.step("the link's file, once more", lambda: write(path("store/data.txt"), "five"))
+
+
 def scenario_fullscreen(r):
     """The status of the default mode, with colors and screen clearing."""
     write(os.path.join(r.dir, "main.typ"), "= Fullscreen\nText.\n")
@@ -733,6 +800,7 @@ def scenario_html(r):
 SCENARIOS = [
     ("main", scenario_main),
     ("data", scenario_data),
+    ("links", scenario_links),
     ("fullscreen", scenario_fullscreen),
     ("missing", scenario_missing),
     ("pages", scenario_pages),
@@ -750,6 +818,9 @@ def run_scenario(name, scenario, binaries, keep):
         runner.dir = os.path.realpath(tempfile.mkdtemp(prefix=f"watch-{name}-{label}-"))
         try:
             scenario(runner)
+        except Skip as skip:
+            shutil.rmtree(runner.dir, ignore_errors=True)
+            return None, [str(skip)]
         except Failure as failure:
             runner.problems.append(str(failure))
         finally:
@@ -900,7 +971,9 @@ def main():
         if options.only and name not in options.only:
             continue
         steps, problems = run_scenario(name, scenario, binaries, options.keep)
-        if problems:
+        if steps is None:
+            print(f"skip {name}: {problems[0]}")
+        elif problems:
             failed = True
             print(f"FAIL {name}")
             for problem in problems:
