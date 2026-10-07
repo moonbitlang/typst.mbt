@@ -228,6 +228,24 @@ pub fn font_families() -> SetText {
 }
 
 ///|
+/// Section 5: text in the embedded sans-serif family. The heading and the
+/// emphasis are the family's own bold and italic.
+pub fn sans_report() -> Seq {
+  Seq([
+    SetText(font=["IBM Plex Sans"]),
+    Heading("Build times"),
+    Para("Debug: 11 s. Release: \{Emph("eight times")} that."),
+  ])
+}
+
+///|
+/// Section 5: the sans-serif family for the characters that the text's
+/// font lacks.
+pub fn sans_for_symbols() -> SetText {
+  SetText(font=["Libertinus Serif", "IBM Plex Sans"])
+}
+
+///|
 /// Section 6, columns: a table with two columns of prose.
 pub fn prose_table(columns : Array[Sizing]) -> Table {
   let short = "A short remark."

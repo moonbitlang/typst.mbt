@@ -14,6 +14,8 @@ import {
 // Values
 pub fn generated_elements() -> Array[(String, String, @library.Element)]
 
+pub fn sans_fonts() -> Array[(@library.Font, @library.FontInfo)]
+
 pub fn standard_library() -> @library.Library
 
 pub fn typst_fonts() -> Array[@library.Font]

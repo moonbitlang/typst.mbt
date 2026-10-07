@@ -63,6 +63,10 @@ pub fn ruled_table(Array[&@doc.IntoContent]) -> @doc.Table
 
 pub fn run_together() -> @doc.Seq
 
+pub fn sans_for_symbols() -> @doc.SetText
+
+pub fn sans_report() -> @doc.Seq
+
 pub fn shipped_card() -> @doc.Block
 
 pub fn short_row() -> @kit.DataTable
