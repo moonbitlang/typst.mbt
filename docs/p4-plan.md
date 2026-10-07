@@ -387,8 +387,8 @@ is stored once as a UTF-8 indexed `Utf8Str` (`inline_text.mbt`); substrings
 are `Utf8Slice`s. Inline-private types that clash with flow's names are
 prefixed (`InlineItem`, `InlineConfig`, `InlineCollector`,
 `collect_inline`). `Glyphs` keeps upstream's `Cow` semantics (shared until
-`to_mut`). `libm_native.mbt` binds the C libm (`cbrt`, `atan2`, `sin`,
-`cos`) like `svg/` for kurbo's `solve_cubic`.
+`to_mut`). `libm_native.mbt` binds the C libm (`atan2`, `sin`, `cos`) like
+`svg/` for kurbo's `solve_cubic`, whose `cbrt` is `@libm.f64_cbrt`.
 
 **Shared with math:** `rusty(font)` (cached `@shape.Face` per
 `FontInstance`, upstream `FontInstance::rusty`), `create_shape_plan`

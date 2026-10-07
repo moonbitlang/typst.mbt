@@ -1,9 +1,0 @@
-# x86_64 Linux: a difference of the port, not of upstream; the same cause as
-# `link-show` in paged.linux-x86_64.txt. The underline of a link evades the
-# glyphs with kurbo's `solve_cubic` (typst-layout `deco.rs`), which calls
-# `f64::cbrt`: on Linux Rust links the `cbrt` of its own compiler-builtins,
-# while `kurbo/libm_native.mbt` binds the C library's (glibc's there). One
-# underline segment on page 4 differs by 2 ulp in its x position and 4 ulp
-# in its length (f64 40a109edd0ce251c / 40956ce3de66cb4a instead of
-# ...251e / ...cb46); the SVG, which rounds, is identical.
-FAIL frames/arkheion/pollinator-preprint.typ :: pollinator-preprint

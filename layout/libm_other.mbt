@@ -6,11 +6,6 @@ fn libm_atan2(y : Double, x : Double) -> Double {
 }
 
 ///|
-fn libm_cbrt(x : Double) -> Double {
-  @math.cbrt(x)
-}
-
-///|
 fn libm_sin(x : Double) -> Double {
   @math.sin(x)
 }
