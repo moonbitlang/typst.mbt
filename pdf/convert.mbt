@@ -272,6 +272,10 @@ priv struct GlobalContext {
   fonts_backward : Array[(@export.Font, @library.FontInstance)]
   /// The fonts shared between Typst text and SVG images.
   svg_fonts : SvgFontCache
+  /// The first image inside an SVG image that could not be decoded: the
+  /// span of the SVG image and the error (krilla's `KrillaError::Image`,
+  /// which `Document::finish` returns).
+  mut svg_image_error : (@syntax.Span, String)?
   /// The extraction state of each embedded PDF document (by data key).
   pdf_extractions : Map[String, @hayro_write.ExtractionContext]
   /// Mapping between images and their span.
@@ -304,6 +308,7 @@ fn GlobalContext::new(
     fonts_forward: {},
     fonts_backward: [],
     svg_fonts: SvgFontCache::new(),
+    svg_image_error: None,
     pdf_extractions: {},
     image_to_spans: {},
     image_spans: {},
@@ -431,6 +436,15 @@ fn finish(
   document : @export.Document,
   gc : GlobalContext,
 ) -> Bytes raise @library.SourceError {
+  // `KrillaError::Image(_, loc, err)` of an image inside an SVG.
+  if gc.svg_image_error is Some((span, err)) {
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(
+        span,
+        "failed to process image (\{err})",
+      ),
+    ])
+  }
   document.finish() catch {
     FontError(f, err) =>
       raise @library.SourceError([

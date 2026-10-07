@@ -196,9 +196,13 @@ pub fn Pixmap::encode_png(self : Pixmap) -> Bytes {
 ///
 /// Only 8-bit images are supported. Index PNGs are not supported.
 pub fn Pixmap::decode_png(data : BytesView) -> Pixmap raise @codecs.ImageError {
-  // `normalize_to_color8`: palette, low bit depths and tRNS expanded, 16-bit
-  // stripped. `decode_png` already expands everything to 8/16-bit samples.
-  let (info, buf) = @codecs.decode_png(data)
+  // `png::Decoder::new` (its default limits) with `normalize_to_color8`:
+  // palette, low bit depths and tRNS expanded, 16-bit stripped.
+  let (info, buf) = @codecs.decode_png_frame(data, strip16=true) catch {
+    Decoding(msg) => raise @codecs.ImageError(msg)
+    // `DecodingError::LimitsExceeded`
+    OutputBufferSize => raise @codecs.ImageError("limits are exceeded")
+  }
   let width = info.width
   let height = info.height
   guard @path.IntSize::from_wh(width, height) is Some(size) else {
@@ -209,15 +213,8 @@ pub fn Pixmap::decode_png(data : BytesView) -> Pixmap raise @codecs.ImageError {
   }
   let pixels = FixedArray::make(len, 0U)
   let channels = info.color.channel_count()
-  let sixteen = info.color is (L16 | La16 | Rgb16 | Rgba16)
-  // Samples are stored little-endian for 16-bit images; `strip16` keeps the
-  // most significant byte.
   fn sample(i : Int) -> Int {
-    if sixteen {
-      buf[i * 2 + 1].to_int()
-    } else {
-      buf[i].to_int()
-    }
+    buf[i].to_int()
   }
 
   for i in 0..<len {

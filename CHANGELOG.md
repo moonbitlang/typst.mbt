@@ -167,6 +167,35 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   `note_evaluation(route)`). Within one compilation nothing changes: a
   file is still evaluated once.
 
+- Damaged PNG images: the decoder checked no chunk CRC and allocated the
+  frame that the header claims, so a file with a damaged header either
+  killed the process in an allocation or was shown as if it were sound.
+  Decoding now follows the `png` crate step by step (`codecs`: a port of
+  its `StreamingDecoder` and `Reader` and of `fdeflate`'s decompressor):
+  a file gives the error that upstream gives, with its text (`failed to
+  decode image (Format error decoding Png: CRC error: expected 0x.. have
+  0x.. while decoding ChunkType { type: IHDR, .. } chunk.)`, `unexpected
+  end of file`, `Corrupt deflate stream. ..`, ..), or upstream's pixels
+  where upstream accepts it (a wrong CRC in an ancillary chunk, which is
+  ignored; a wrong Adler-32; a missing `IEND`). Nothing is allocated for
+  the dimensions alone. Decoding is also faster (12 ms instead of 65 ms
+  for a 5.4 megapixel screenshot). With it:
+  - a raster image over the decoder's limits is `file is too large`, as
+    upstream reports it (it was `failed to decode image (Memory limit
+    exceeded)`; also for GIF frames);
+  - PDF export of an SVG that holds a PNG which cannot be decoded fails
+    with `failed to process image (..)` like upstream (the image was left
+    out);
+  - an image inside an SVG whose header claims a size that leaves it no
+    height in its box no longer aborts (upstream panics; the image is left
+    out), and the size of a PNG of 2^31 pixels and more is read as upstream
+    reads it.
+
+  `codecs`: `decode_png` is what the `image` crate does, the new
+  `decode_png_frame(data, strip16?)` (error: `PngFrameError`) what
+  `png::Decoder::new` does for krilla and tiny-skia; `read_png_info` takes
+  `limits? : PngLimits`; `is_limit_error(message)`.
+
 - PDF export: a coordinate that lies exactly halfway between two shortest
   decimals is written with the even digit, as upstream writes it
   (`142.20312`, it was `142.20313`: a difference of 0.00001pt in about one

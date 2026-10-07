@@ -243,13 +243,20 @@ fn SvgFonts::resolve_variations(
 ///|
 /// The exporter fonts of the document by font data (compared by identity)
 /// and face index, for fonts without variations.
+///
+/// What the SVG images of a document share is here; besides the fonts, the
+/// error of the first image inside an SVG that cannot be decoded (krilla
+/// decodes an image when the document is written and fails with
+/// `KrillaError::Image`: see `svg_png_image`), until the caller that drew
+/// the SVG takes it.
 priv struct SvgFontCache {
   entries : Array[(Bytes, Int, @export.Font?)]
+  mut image_error : String?
 }
 
 ///|
 fn SvgFontCache::new() -> SvgFontCache {
-  { entries: [], }
+  { entries: [], image_error: None, }
 }
 
 ///|

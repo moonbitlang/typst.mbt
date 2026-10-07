@@ -52,6 +52,13 @@ document title of the HTML export (the plain text of the title's content).
 - `packages`: reductions of what the `packages` stage found (documents that
   use real packages, tests/packages): each case is the engine behaviour a
   package relied on, without the package.
+- `images`: a damaged PNG is reported with the decoder's own words (the
+  `image` and `png` crates'): the CRC of a critical chunk is checked, a
+  file that ends early is "unexpected end of file", a frame of more than
+  `isize::MAX` bytes is "file is too large"; an ancillary chunk with a
+  wrong CRC is ignored and the end of the file is not looked at. (The
+  oracle of the decoder is `codecs/png_oracle_test.mbt`; these pin what
+  Typst makes of its errors.)
 
 Usage: python3 scripts/gen_typst_oracle.py <path to upstream typst binary>
        (then `moon fmt`)
@@ -770,6 +777,63 @@ CASES += [
 """,
     ),
 ]
+
+
+def png_cases():
+    """Documents with one damaged PNG each (`tests/recompile/docs/book/data/
+    squares.png`, 16 by 16 pixels, as bytes)."""
+    import struct
+    import zlib
+
+    with open(os.path.join(ROOT, "tests", "recompile", "docs", "book", "data", "squares.png"), "rb") as f:
+        png = f.read()
+
+    def chunk(kind, data, crc_xor=0):
+        return (struct.pack(">I", len(data)) + kind + data
+                + struct.pack(">I", zlib.crc32(kind + data) ^ crc_xor))
+
+    def flip(data, at, mask):
+        out = bytearray(data)
+        out[at] ^= mask
+        return bytes(out)
+
+    ihdr, rest = png[16:29], png[33:]
+    damaged = [
+        ("a bit of the width (the CRC of the header)", flip(png, 16, 0x04)),
+        ("another bit of the width", flip(png, 16, 0x80)),
+        ("a bit of the image data (the CRC of its chunk)", flip(png, 0x30, 0x01)),
+        ("a file that ends in the image data", png[:60]),
+        ("a file that ends before its last chunk", png[:-12]),
+        ("a wrong signature", flip(png, 1, 0x20)),
+        ("a header that claims 2^32 - 1 pixels a side",
+         png[:8] + chunk(b"IHDR", b"\xff" * 8 + ihdr[8:]) + rest),
+        ("a header that claims more rows than the data has",
+         png[:8] + chunk(b"IHDR", ihdr[:4] + struct.pack(">I", 65536) + ihdr[8:]) + rest),
+        ("a bit depth that the colour type does not have",
+         png[:8] + chunk(b"IHDR", ihdr[:8] + b"\x04" + ihdr[9:]) + rest),
+        ("an unknown critical chunk", png[:33] + chunk(b"ABCD", b"") + rest),
+    ]
+    accepted = [
+        ("the file", png),
+        ("an ancillary chunk with a wrong CRC", png[:33] + chunk(b"gAMA", b"\0\1\x86\xa0", 1) + rest),
+        ("a wrong Adler-32", png[:33] + chunk(b"IDAT", flip(png[41:-16], len(png) - 58, 0x01)) + png[-12:]),
+        ("eight bytes instead of the last chunk", png[:-12] + bytes(8)),
+        ("bytes after the last chunk", png + b"more"),
+    ]
+
+    def literal(data):
+        return "bytes((" + ", ".join(str(b) for b in data) + "))"
+
+    cases = []
+    for what, data in damaged:
+        cases.append((f"images: a damaged PNG: {what}", "report", f"#image({literal(data)})\n"))
+    source = "".join(
+        f"// {what}\n#context metadata(repr(measure(image({literal(data)})).width))\n" for what, data in accepted)
+    cases.append(("images: damage that the PNG decoder accepts", "report", source))
+    return cases
+
+
+CASES += png_cases()
 CASES += sharing_probes.cases()
 
 
@@ -865,6 +929,7 @@ def main():
         "// raw text built by markup (lines), by the `raw` function (a string)\n"
         "// and by `eval`; the keys of located elements in measurement; the\n"
         "// reductions of what the `packages` stage found (tests/packages);\n"
+        "// what a damaged PNG is reported as;\n"
         "// closure equality, memoized calls and the sharing of values\n"
         "// (`scripts/sharing_probes.py`). The helpers are in\n"
         "// `oracle_helpers_wbtest.mbt`.\n"

@@ -5,6 +5,7 @@
 // raw text built by markup (lines), by the `raw` function (a string)
 // and by `eval`; the keys of located elements in measurement; the
 // reductions of what the `packages` stage found (tests/packages);
+// what a damaged PNG is reported as;
 // closure equality, memoized calls and the sharing of values
 // (`scripts/sharing_probes.py`). The helpers are in
 // `oracle_helpers_wbtest.mbt`.
@@ -380,6 +381,99 @@ test "oracle: memo: modules of plugins without functions" {
     "(true, false, true)", "(true, false, true)", "(true, false, false, true)", "(10pt,)",
   ]
   assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a bit of the width (the CRC of the header)" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 4, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: CRC error: expected 0x90916836 have 0x502802a0 while decoding ChunkType { type: IHDR, critical: true, private: false, reserved: false, safecopy: false } chunk.)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: another bit of the width" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 128, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: CRC error: expected 0x90916836 have 0x30fb4d21 while decoding ChunkType { type: IHDR, critical: true, private: false, reserved: false, safecopy: false } chunk.)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a bit of the image data (the CRC of its chunk)" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 1, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: CRC error: expected 0x6168fe8d have 0xc2fed6c1 while decoding ChunkType { type: IDAT, critical: true, private: false, reserved: false, safecopy: false } chunk.)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a file that ends in the image data" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (unexpected end of file)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a file that ends before its last chunk" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (unexpected end of file)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a wrong signature" {
+  let source = "#image(bytes((137, 112, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = ["main.typ:1:1: error: unknown image format"]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a header that claims 2^32 - 1 pixels a side" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 255, 255, 255, 255, 255, 255, 255, 255, 8, 2, 0, 0, 0, 93, 148, 185, 105, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = ["main.typ:1:1: error: file is too large"]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a header that claims more rows than the data has" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 1, 0, 0, 8, 2, 0, 0, 0, 95, 237, 106, 51, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: IDAT or fDAT chunk does not have enough data for image.)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: a bit depth that the colour type does not have" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 4, 2, 0, 0, 0, 85, 97, 133, 55, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: Invalid color/depth combination in header: Rgb/Four)",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: a damaged PNG: an unknown critical chunk" {
+  let source = "#image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 0, 65, 66, 67, 68, 219, 23, 32, 165, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))\n"
+  let expected = [
+    "main.typ:1:1: error: failed to decode image (Format error decoding Png: Unrecognized critical chunk: ChunkType { type: ABCD, critical: true, private: false, reserved: false, safecopy: false })",
+  ]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: images: damage that the PNG decoder accepts" {
+  let source = "// the file\n#context metadata(repr(measure(image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))).width))\n// an ancillary chunk with a wrong CRC\n#context metadata(repr(measure(image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 4, 103, 65, 77, 65, 0, 1, 134, 160, 49, 232, 150, 94, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))).width))\n// a wrong Adler-32\n#context metadata(repr(measure(image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 190, 22, 111, 206, 27, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130)))).width))\n// eight bytes instead of the last chunk\n#context metadata(repr(measure(image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 0, 0, 0, 0)))).width))\n// bytes after the last chunk\n#context metadata(repr(measure(image(bytes((137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 2, 0, 0, 0, 144, 145, 104, 54, 0, 0, 0, 52, 73, 68, 65, 84, 120, 218, 99, 248, 79, 34, 96, 0, 226, 85, 198, 229, 64, 4, 225, 159, 217, 237, 2, 68, 16, 54, 86, 113, 178, 52, 144, 236, 36, 146, 53, 16, 116, 6, 178, 56, 89, 26, 104, 239, 135, 209, 120, 160, 122, 60, 0, 0, 211, 217, 161, 191, 97, 104, 254, 141, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130, 109, 111, 114, 101)))).width))\n"
+  let expected = ["--", "16pt", "16pt", "16pt", "16pt", "16pt"]
+  assert_eq(oracle_report(source), expected)
 }
 
 ///|

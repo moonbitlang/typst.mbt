@@ -2627,6 +2627,7 @@ dependencies = [
  "libm",
  "parking_lot",
  "pic-scale",
+ "png",
  "proc-macro2",
  "quick-xml 0.38.4",
  "quote",

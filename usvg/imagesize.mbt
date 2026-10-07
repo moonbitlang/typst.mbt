@@ -47,8 +47,10 @@ fn imagesize_image_type(data : Bytes) -> ImageSizeType? {
 }
 
 ///|
-/// `imagesize::blob_size`: the `(width, height)` of an image.
-fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
+/// `imagesize::blob_size`: the `(width, height)` of an image. (A PNG's
+/// are the eight bytes after the type of its first chunk, whatever the
+/// chunk is and whether its CRC is right: `imagesize` checks neither.)
+fn imagesize_blob_size(data : Bytes) -> (UInt, UInt)? {
   let n = data.length()
   let u16_be = (pos : Int) => {
     if pos + 2 <= n {
@@ -104,11 +106,12 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
     Png => {
       guard u32_be(0x10) is Some(w) else { return None }
       guard u32_be(0x14) is Some(h) else { return None }
-      Some((w.reinterpret_as_int(), h.reinterpret_as_int()))
+      Some((w, h))
     }
     Gif =>
       match (u16_le(6), u16_le(8)) {
-        (Some(w), Some(h)) => Some((w, h))
+        (Some(w), Some(h)) =>
+          Some((w.reinterpret_as_uint(), h.reinterpret_as_uint()))
         _ => None
       }
     Jpeg => {
@@ -149,7 +152,7 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
       }
       guard u16_be(pos) is Some(h) else { return None }
       guard u16_be(pos + 2) is Some(w) else { return None }
-      Some((w, h))
+      Some((w.reinterpret_as_uint(), h.reinterpret_as_uint()))
     }
     Webp => {
       if n < 16 {
@@ -158,21 +161,20 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
       match data[15] {
         b' ' =>
           match (u16_le(0x1A), u16_le(0x1C)) {
-            (Some(w), Some(h)) => Some((w, h))
+            (Some(w), Some(h)) =>
+              Some((w.reinterpret_as_uint(), h.reinterpret_as_uint()))
             _ => None
           }
         b'L' => {
           guard u32_le(0x15) is Some(dims) else { return None }
-          Some(
-            (
-              (dims & 0x3FFF).reinterpret_as_int() + 1,
-              ((dims >> 14) & 0x3FFF).reinterpret_as_int() + 1,
-            ),
-          )
+          Some(((dims & 0x3FFF) + 1, ((dims >> 14) & 0x3FFF) + 1))
         }
         b'X' =>
           match (u24_le(0x18), u24_le(0x1B)) {
-            (Some(w), Some(h)) => Some((w + 1, h + 1))
+            (Some(w), Some(h)) =>
+              Some(
+                ((w + 1).reinterpret_as_uint(), (h + 1).reinterpret_as_uint()),
+              )
             _ => None
           }
         _ => None

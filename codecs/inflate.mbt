@@ -1,9 +1,10 @@
 // DEFLATE decompression with zlib (RFC 1950) and gzip (RFC 1952) framing, on
-// top of `moonbit-community/flate`. Upstream uses the `png` crate (IDAT; it
-// ignores the Adler-32 checksum by default), `fdeflate::decompress_to_vec_
-// bounded` (PNG `iCCP` chunks) and `flate2`'s `GzDecoder` (SVGZ files);
-// decompression is deterministic, so any conforming inflater yields the same
-// bytes.
+// top of `moonbit-community/flate`, where upstream only observes the
+// decompressed bytes: `flate2`'s `GzDecoder` (SVGZ files) and `read_to_end`
+// (hayro-syntax); decompression is deterministic, so any conforming inflater
+// yields the same bytes. The PNG decoder does not go through here: which
+// error a damaged stream gives, and when, is the `fdeflate` crate's
+// (`fdeflate_decompress.mbt`).
 
 ///|
 /// A decompression error.
@@ -19,8 +20,8 @@ pub extend InflateError with @debug.Debug::{to_repr}
 ///|
 /// Decompresses a zlib stream. With `verify_checksum`, the Adler-32 trailer
 /// must match and no bytes may hide between the DEFLATE body and the trailer;
-/// without it (like the `png` crate's default for image data), the DEFLATE
-/// payload is decoded and anything after its final block is ignored.
+/// without it, the DEFLATE payload is decoded and anything after its final
+/// block is ignored.
 pub fn zlib_decompress(
   data : BytesView,
   verify_checksum? : Bool = true,
