@@ -135,39 +135,74 @@ pub fn CmapSubtable::codepoints(
 ///|
 /// Calls `f(start, end)` for each inclusive range of codepoints defined in
 /// this table, in the order of [CmapSubtable::codepoints] (not in ttf-parser:
-/// formats 4 and 12 report their segments and groups at once instead of
+/// formats 4, 12 and 13 report their segments and groups at once instead of
 /// every codepoint; the others report single codepoints).
+///
+/// The segments and groups are read from the raw big-endian fields: font
+/// discovery computes the coverage of every face of the system with this,
+/// some two million groups, and a parsed value for each is most of its
+/// time.
 pub fn CmapSubtable::codepoint_ranges(
   self : CmapSubtable,
   f : (UInt, UInt) -> Unit,
 ) -> Unit {
   match self.format {
     SegmentMappingToDeltaValues(subtable) => {
-      let n = if subtable.start_codes.len() < subtable.end_codes.len() {
-        subtable.start_codes.len()
+      let starts = subtable.start_codes.data
+      let ends = subtable.end_codes.data
+      // (`zip`: as many as the shorter array has.)
+      let n = if starts.length() < ends.length() {
+        starts.length() / 2
       } else {
-        subtable.end_codes.len()
+        ends.length() / 2
       }
-      for i in 0..<n.to_int() {
-        let start = subtable.start_codes.get(i.to_uint16()).unwrap()
-        let end = subtable.end_codes.get(i.to_uint16()).unwrap()
+      for i in 0..<n {
+        let at = 2 * i
+        let start = (starts[at].to_int() << 8) | starts[at + 1].to_int()
+        let end = (ends[at].to_int() << 8) | ends[at + 1].to_int()
         // OxFFFF value is special and indicates codes end.
         if start == end && start == 0xFFFF {
           break
         }
         if start <= end {
-          f(start.to_uint(), end.to_uint())
+          f(start.reinterpret_as_uint(), end.reinterpret_as_uint())
         }
       }
     }
-    SegmentedCoverage(subtable) =>
-      for group in subtable.groups.iter() {
-        if group.start_char_code <= group.end_char_code {
-          f(group.start_char_code, group.end_char_code)
-        }
-      }
+    SegmentedCoverage(subtable) => group_ranges(subtable.groups, f)
+    ManyToOneRangeMappings(subtable) => group_ranges(subtable.groups, f)
     _ => self.codepoints(c => f(c, c))
   }
+}
+
+///|
+/// Calls `f(start, end)` for the codepoints of each group of a format 12 or
+/// 13 subtable (`start..=end`: nothing if the start is after the end).
+fn group_ranges(
+  groups : LazyArray32[SequentialMapGroup],
+  f : (UInt, UInt) -> Unit,
+) -> Unit {
+  let data = groups.data
+  // Whole groups only, like `LazyArray32::len`.
+  let n = data.length() / 12
+  for i in 0..<n {
+    let at = 12 * i
+    let start = be_u32_int(data, at)
+    let end = be_u32_int(data, at + 4)
+    if start <= end {
+      f(start, end)
+    }
+  }
+}
+
+///|
+/// `be_u32` with the conversions that are compiled in place.
+#inline
+fn be_u32_int(data : BytesView, i : Int) -> UInt {
+  ((data[i].to_int() << 24) |
+  (data[i + 1].to_int() << 16) |
+  (data[i + 2].to_int() << 8) |
+  data[i + 3].to_int()).reinterpret_as_uint()
 }
 
 ///|

@@ -580,8 +580,9 @@ test "scan: collections" {
 }
 
 ///|
-test "scan: character maps" {
-  let (_, large, _) = test_fonts()
+/// A font with other character maps: `cmap` tables that do not parse, and
+/// subtables of formats 4 and 12 that are not what they should be.
+fn cmap_variants(large : Bytes) -> Array[(String, Bytes)] {
   let table = record(large, "cmap")
   let offset = table.offset.reinterpret_as_int()
   let length = table.length.reinterpret_as_int()
@@ -718,8 +719,14 @@ test "scan: character maps" {
     files.push(("format-8-at-\{k}.ttf", with_cmap(splice(cmap, at, u16(8)))))
     files.push(("format-99-at-\{k}.ttf", with_cmap(splice(cmap, at, u16(99)))))
   }
+  files
+}
+
+///|
+test "scan: character maps" {
+  let (_, large, _) = test_fonts()
   inspect(
-    scanned("cmaps", files),
+    scanned("cmaps", cmap_variants(large)),
     content=(
       #|zeros.ttf: 0
       #|ones.ttf: 0
@@ -748,6 +755,134 @@ test "scan: character maps" {
       #|format-99-at-1.ttf: 0
       #|format-8-at-2.ttf: 0
       #|format-99-at-2.ttf: 0
+    ),
+  )
+}
+
+///|
+/// Upstream's `CoverageBuilder` (`info.rs`).
+priv struct ReferenceBuilder {
+  runs : Array[UInt]
+  mut next : UInt
+}
+
+///|
+fn ReferenceBuilder::add_codepoint_range(
+  self : ReferenceBuilder,
+  start : UInt,
+  end : UInt,
+) -> Unit {
+  if end <= self.next || start >= end {
+    return
+  } else if start <= self.next && self.runs.length() > 0 {
+    let last = self.runs.length() - 1
+    self.runs[last] = self.runs[last] + (end - self.next)
+  } else {
+    self.runs.push(start - self.next)
+    self.runs.push(end - start)
+  }
+  self.next = end
+}
+
+///|
+/// Upstream's `Coverage::iter_ranges`.
+fn reference_ranges(runs : Array[UInt]) -> Array[(UInt, UInt)] {
+  let out = []
+  let mut offset = 0U
+  for i in 0..<(runs.length() / 2) {
+    offset += runs[2 * i]
+    let start = offset
+    offset += runs[2 * i + 1]
+    out.push((start, offset))
+  }
+  out
+}
+
+///|
+/// Upstream's `Coverage::union`.
+fn reference_union(left : Array[UInt], right : Array[UInt]) -> Array[UInt] {
+  let builder = ReferenceBuilder::{ runs: [], next: 0, }
+  let left = reference_ranges(left)
+  let right = reference_ranges(right)
+  let mut i = 0
+  let mut j = 0
+  while i < left.length() && j < right.length() {
+    if left[i].0 < right[j].0 {
+      builder.add_codepoint_range(left[i].0, left[i].1)
+      i += 1
+    } else {
+      builder.add_codepoint_range(right[j].0, right[j].1)
+      j += 1
+    }
+  }
+  for k in i..<left.length() {
+    builder.add_codepoint_range(left[k].0, left[k].1)
+  }
+  for k in j..<right.length() {
+    builder.add_codepoint_range(right[k].0, right[k].1)
+  }
+  builder.runs
+}
+
+///|
+/// The coverage of a face as upstream's `FontInfo::from_ttf` computes it:
+/// every codepoint of every Unicode subtable is added on its own, and the
+/// subtables are united.
+fn reference_coverage(face : @otf.Face) -> Array[UInt] {
+  let mut coverage : Array[UInt] = []
+  if face.tables().cmap is Some(cmap) {
+    for subtable in cmap.subtables.iter() {
+      if subtable.is_unicode() {
+        let builder = ReferenceBuilder::{ runs: [], next: 0, }
+        subtable.codepoints(c => {
+          // `c..c.saturating_add(1)`
+          let end = if c == 0xFFFFFFFFU { c } else { c + 1 }
+          builder.add_codepoint_range(c, end)
+        })
+        coverage = reference_union(coverage, builder.runs)
+      }
+    }
+  }
+  coverage
+}
+
+///|
+test "coverage: from ranges as from single codepoints" {
+  // `FontInfo` adds the segments and groups of a subtable as ranges and
+  // unites the subtables without listing their ranges. That must be the
+  // encoding that upstream gets codepoint by codepoint.
+  let mut faces = 0
+  let check = (name : String, data : Bytes) => {
+    let count = @otf.fonts_in_collection(data[:]).unwrap_or(1)
+    for index in 0U..<count {
+      let face = @otf.Face::parse(data[:], index) catch { _ => continue }
+      guard @library.FontInfo::from_ttf(face) is Some(info) else { continue }
+      guard info.coverage.0 == reference_coverage(face) else {
+        fail("\{name}, face \{index}: not upstream's coverage")
+      }
+      faces += 1
+    }
+  }
+  for i, font in @assets_fonts.fonts() {
+    check("embedded font \{i}", font)
+  }
+  inspect(
+    faces,
+    content=(
+      #|17
+    ),
+  )
+  let (_, large, _) = test_fonts()
+  for file in cmap_variants(large) {
+    // (A group that ends at 2^32 - 1 takes minutes codepoint by codepoint.)
+    if file.0 != "format12-to-the-last.ttf" {
+      check(file.0, file.1)
+    }
+  }
+  inspect(
+    faces,
+    content=(
+      #|43
     ),
   )
 }
