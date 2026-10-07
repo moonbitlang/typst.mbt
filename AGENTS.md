@@ -724,8 +724,8 @@
   must also be identical across native, wasm-gc and wasm.
 - Font discovery (`kit/fontdb.mbt`, whose header lists how it differs from
   fontdb) is what every compilation without `--ignore-system-fonts` pays
-  first: `typst fonts` takes 41 ms for the 1339 faces in 502 files of
-  macOS 26 (upstream: 76 ms; 7 ms of each are not discovery). A file is
+  first: `typst fonts` takes 42 ms for the 1339 faces in 502 files of
+  macOS 26 (upstream: 82 ms; 7 ms of each are not discovery). A file is
   opened once and read through its descriptor
   (`@platform.RangedFile`, `pread`; the whole file on the wasm targets),
   not mapped: reading the pieces costs what touching them in a mapping
