@@ -48,10 +48,37 @@ pub fn typst_fonts() -> Array[@library.Font] {
 }
 
 ///|
+/// The embedded sans-serif family, IBM Plex Sans (regular, italic, medium,
+/// bold, bold italic; `doc/fonts`), each font with the entry under which a
+/// world lists it in its font book: the font's info without its coverage.
+///
+/// The engine picks a fallback font for a character among the fonts of the
+/// book whose coverage has it (`FontBook::select_fallback`), by similarity
+/// to the font of the text and not by their order, so a family that is
+/// added to a book takes characters from the fonts that had them. An entry
+/// without coverage is found by its name (`font=["IBM Plex Sans"]`) and
+/// never as a fallback: a document that does not name the family is laid
+/// out as if it were not there. The worlds of `doc` add these entries
+/// after all other fonts, so that a font of the same family that the
+/// caller provides wins a tie.
+pub fn sans_fonts() -> Array[(@library.Font, @library.FontInfo)] {
+  let fonts : Array[(@library.Font, @library.FontInfo)] = []
+  for data in @doc_fonts.sans() {
+    for font in @library.Font::iter(data) {
+      fonts.push(
+        (font, { ..font.info(), coverage: @library.Coverage::default(), }),
+      )
+    }
+  }
+  fonts
+}
+
+///|
 /// A world without OS access: `files` are the project files by
 /// root-relative path (`"assets/chart.png"`), `fonts` are font files, to
-/// which the embedded Typst fonts are added unless `embedded_fonts` is
-/// false; `today` is the date as `(year, month, day)`.
+/// which the embedded fonts are added unless `embedded_fonts` is false:
+/// the Typst fonts (`typst_fonts`) and, by name only, IBM Plex Sans
+/// (`sans_fonts`); `today` is the date as `(year, month, day)`.
 pub fn DocWorld::in_memory(
   files? : Map[String, Bytes] = {},
   fonts? : Array[Bytes] = [],
@@ -66,6 +93,12 @@ pub fn DocWorld::in_memory(
     all.append(typst_fonts())
   }
   let book = @library.FontBook::from_fonts(all)
+  if embedded_fonts {
+    for entry in sans_fonts() {
+      all.push(entry.0)
+      book.push(entry.1)
+    }
+  }
   // Normalize the keys to virtual paths without the leading slash.
   let by_path : Map[String, Bytes] = Map([])
   for path, data in files {

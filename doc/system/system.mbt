@@ -23,9 +23,11 @@ pub extend SystemError with Show::{to_string, output}
 /// A world that reads project files below `root` (default: the working
 /// directory) and packages from the system's package directories.
 ///
-/// Fonts: the embedded Typst fonts and the system fonts (each unless
-/// disabled) plus the fonts found under `font_paths`. `today` fixes the
-/// date as `(year, month, day)`; otherwise the system date is used.
+/// Fonts: the embedded fonts and the system fonts (each unless disabled)
+/// plus the fonts found under `font_paths`. The embedded fonts are the
+/// Typst fonts and, by name only and after all others, IBM Plex Sans
+/// (`@doc.sans_fonts`). `today` fixes the date as `(year, month, day)`;
+/// otherwise the system date is used.
 pub fn world(
   root? : String = ".",
   embedded_fonts? : Bool = true,
@@ -47,6 +49,11 @@ pub fn world(
   }
   for path in font_paths {
     fonts.extend_all(@kit.scan(path))
+  }
+  if embedded_fonts {
+    for entry in @doc.sans_fonts() {
+      fonts.push((@kit.FontSource::Loaded(entry.0), entry.1))
+    }
   }
   let date : (@library.Duration?) -> @library.Datetime? = match today {
     Some((year, month, day)) => {
