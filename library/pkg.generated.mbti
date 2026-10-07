@@ -744,6 +744,8 @@ pub fn compare(Value, Value) -> Int raise HintedError
 
 pub fn compare_str(String, String) -> Int
 
+pub fn compilation_epoch() -> Int
+
 pub fn contains(BindingGuard, Value, Value) -> Bool?
 
 pub fn context_elem() -> Element

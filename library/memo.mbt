@@ -101,6 +101,14 @@ pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
 }
 
 ///|
+/// The number of compilations that were started ([compilation_epoch]).
+let compilation_counter : Ref[Int] = { val: 0, }
+
+///|
+/// The number of compilations in progress (one inside the other).
+let compilation_depth : Ref[Int] = { val: 0, }
+
+///|
 /// Run `f` (a compilation) with fresh memoization caches.
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
@@ -108,14 +116,33 @@ pub fn[T] with_layout_memo(
   let outer = memo_generation.val
   memo_counter.val += 1
   memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
+  if compilation_depth.val == 0 {
+    compilation_counter.val += 1
+  }
+  compilation_depth.val += 1
   let result = {
     errdefer {
       memo_generation.val = outer
+      compilation_depth.val -= 1
     }
     f()
   }
   memo_generation.val = outer
+  compilation_depth.val -= 1
   result
+}
+
+///|
+/// A number that changes whenever a compilation starts (not one inside
+/// another), with memoization on or off: unlike [memo_compilation] it is
+/// never zero in a compilation, and it keeps its value after one.
+///
+/// For results that must be shared within a compilation and are only valid
+/// while the world's files are what they were: a world may change its files
+/// between two compilations (`typst watch`; comemo checks what a memoized
+/// call read from the world before it reuses a result).
+pub fn compilation_epoch() -> Int {
+  compilation_counter.val
 }
 
 ///|
