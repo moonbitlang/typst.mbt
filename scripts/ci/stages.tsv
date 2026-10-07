@@ -38,3 +38,5 @@ wasm-spec	wasm-spec	65449	1242	-
 edsl	edsl	51	0	-
 packages	packages frames	99	0	-
 packages	packages svg	99	0	99
+recompile	recompile	232	0	-
+recompile	recompile packages	3	0	-
