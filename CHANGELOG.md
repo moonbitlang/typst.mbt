@@ -136,7 +136,7 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 - `libm`, a new package: `cbrt`, a port of the `libm` crate's correctly
   rounded cube root, and `f64_cbrt`, Rust's `f64::cbrt` (the C library's
   `cbrt` on Apple targets and Windows, `cbrt` everywhere else, as Rust
-  links it). `kurbo`, `layout` and `svg` call it in `solve_cubic`: on
+  links it for its glibc and wasm targets). `kurbo`, `layout` and `svg` call it in `solve_cubic`: on
   Linux the roots of a cubic (the gaps of an underline, offsets of
   strokes) are now upstream's to the last bit, where glibc's `cbrt` could
   be an ulp off; on the wasm and js targets it replaces `@math.cbrt`.

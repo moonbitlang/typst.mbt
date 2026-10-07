@@ -548,12 +548,15 @@
   defines some C math symbols itself, from its `libm`
   (`compiler-builtins/src/math/mod.rs`, `full_availability`: what is "well
   tested in `libm` and known to provide similar performance to system
-  `libm`, as well as the same or better accuracy"), `cbrt` among them, on
-  every target but Windows and Apple's, and the linker takes them before
-  the C library's. So on Linux (and on Rust's wasm targets) `f64::cbrt` is
+  `libm`, as well as the same or better accuracy"), `cbrt` among them,
+  weakly, on every target but Windows and Apple's, and a definition in the
+  executable wins over a shared C library's. So on the glibc targets (what
+  the oracle is on Linux) and on Rust's wasm targets `f64::cbrt` is
   `libm::cbrt`, the correctly rounded cube root after CORE-MATH, which
   glibc's is not; on macOS it is Apple's, which is not correctly rounded
-  either (an ulp off for 8% of random doubles, macOS 26.4). `libm/` holds
+  either (an ulp off for 8% of random doubles, macOS 26.4). (A Rust binary
+  with a statically linked C library, musl's by default, may get that
+  library's `cbrt`; the port does not follow that.) `libm/` holds
   both: `@libm.cbrt`, a port of the crate's
   `src/math/cbrt.rs` (0.2.16; `fma` is `@pxfm.fma`, exact on every target),
   and `@libm.f64_cbrt`, which is the C library's `cbrt` on Apple targets
@@ -570,7 +573,9 @@
   1.09 million cases, in `libm/cbrt_cases_wbtest.mbt` from
   `oracle/src/bin/gen_libm_cbrt_tests.rs`; its `--check-std` compares the
   platform's `f64::cbrt` with the crate and must find no difference on
-  Linux).
+  x86_64 Linux with glibc). The test fails with a C compiler that contracts
+  `a * b + c` across statements (gcc for aarch64: `-ffp-contract=off`),
+  like the tests of the other float ports.
 - PDF images in SVG/HTML go through hayro (`svg/image.mbt` `pdf_to_svg`):
   `hayro/interpret` (hayro-interpret: interpreter, `Device` trait, colors,
   fonts, shadings; `function` sub-package), `hayro/svg` (hayro-svg),

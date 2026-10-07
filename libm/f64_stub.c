@@ -1,7 +1,8 @@
 // Which `cbrt` Rust's `f64::cbrt` reaches on this platform (see
-// `f64_native.mbt`): the system's on Windows and Apple targets, the one of
-// Rust's own compiler-builtins (its `libm`, ported in `cbrt.mbt`)
-// everywhere else.
+// `f64_native.mbt`): the system's on Windows and Apple targets, where
+// compiler-builtins does not define the symbol, and the one of
+// compiler-builtins (its `libm`, ported in `cbrt.mbt`) everywhere else, as
+// on the glibc targets.
 
 #include <moonbit.h>
 #include <stdint.h>

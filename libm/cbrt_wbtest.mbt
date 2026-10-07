@@ -169,3 +169,35 @@ test "cbrt: spot checks" {
     0xd29ce68655d962f3UL,
   )
 }
+
+///|
+/// The bits of the hexadecimal float literals of `cbrt.rs`'s tables. `cbrt`
+/// does not reach `cbrt_wlist` (the directed rounding modes), so the oracle
+/// says nothing about it.
+test "cbrt: tables" {
+  fn bits(t : ReadOnlyArray[Double]) -> Array[UInt64] {
+    t[:].map(x => x.reinterpret_as_uint64())
+  }
+
+  assert_eq(bits(cbrt_escale), [
+    0x3ff0000000000000UL, 0x3ff428a2f98d728bUL, 0x3ff965fea53d6e3dUL,
+  ])
+  assert_eq(bits(cbrt_c), [
+    0x3fe1b0babccfef9cUL, 0x3fe2c9a3e94d1da5UL, 0xbfc4dc30b1a1ddbaUL, 0x3f97a8d3e4ec9b07UL,
+  ])
+  assert_eq(bits(cbrt_off), [0x3ca0000000000000UL, 0UL, 0UL, 0UL])
+  let wlist : Array[(UInt64, UInt64)] = [
+    (0x3ff3a9ccd7f022dbUL, 0x3ff1236160ba9b93UL),
+    (0x3ff7845d2faac6feUL, 0x3ff23115e657e49cUL),
+    (0x3ffd1ef81cbbbe71UL, 0x3ff388fb44cdcf5aUL),
+    (0x4000a2014f62987cUL, 0x3ff46bcbf47dc1e8UL),
+    (0x400fe18a044a5501UL, 0x3ff95decfec9c904UL),
+    (0x401a6bb8c803147bUL, 0x3ffe05335a6401deUL),
+    (0x401ac8538a031cbdUL, 0x3ffe281d87098de8UL),
+  ]
+  assert_eq(cbrt_wlist.length(), wlist.length())
+  for i, entry in wlist {
+    let (a, b) = cbrt_wlist[i]
+    assert_eq((a.reinterpret_as_uint64(), b.reinterpret_as_uint64()), entry)
+  }
+}

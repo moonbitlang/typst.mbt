@@ -8,6 +8,12 @@
 // `ReadOnlyArray`s (static data, no allocation per call); `hf64!("0x1p-53")`
 // is written `0x1.0p-53` (MoonBit's hexadecimal float literals need the
 // point).
+//
+// Like every port of floating-point code here, it relies on the C compiler
+// of the native backend rounding each product and sum on its own: Apple
+// clang and compilers for x86_64 without FMA instructions do, gcc for
+// aarch64 would have to be told (`-ffp-contract=off`). `cbrt_wbtest.mbt`
+// fails where that does not hold.
 
 // SPDX-License-Identifier: MIT
 // origin: core-math/src/binary64/cbrt/cbrt.c
