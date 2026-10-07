@@ -1,0 +1,9 @@
+- name: Ada
+  role: author
+  since: 1843
+- name: Grace
+  role: editor
+  since: 1952
+- name: Donald
+  role: typesetter
+  since: 1978
