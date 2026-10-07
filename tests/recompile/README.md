@@ -263,16 +263,24 @@ On `main` (4877742) the stage found one thing, and it is upstream's:
   2000, `suite/introspection/locate.typ/locate-between-pages`, the second
   random sequence, after 12 edits.)
 
-Otherwise no step of any sequence differed from its references: the default run, and the
-soak runs of `scripts/recompile_soak.py`: an hour on 18 cores (seeds 1000
-to 1038 on the 120 documents of the default run with four random sequences
-of 12 edits and the sweep each, 4,680 runs, 261,196 steps, 783,588
-compilations; seeds 5000 to 5006 on the 99 documents with packages, 693
-runs, 15,470 steps, 46,410 compilations), and 18 minutes more with
-references in new processes (seeds 2000 to 2004 and 6000 to 6002: 897
-runs, 37,578 steps, 112,734 compilations, 2,391 steps compiled again in a
-process of their own). 21 runs aborted, and aborted again from scratch: 20
-of them were `box-inset-ratio` (see "Running"), one was the PNG below.
+Otherwise no step of any sequence differed from its references: in the
+default run, and in the soak runs of `scripts/recompile_soak.py`, which
+were made while the stage grew:
+
+- an hour on 18 cores with its first version (seeds 1000 to 1038 on the
+  120 documents of the default run with four random sequences of 12 edits
+  and the sweep each: 4,680 runs, 261,196 steps, 783,588 compilations;
+  seeds 5000 to 5006 on the 99 documents with packages: 693 runs, 15,470
+  steps, 46,410 compilations). 21 runs aborted, and aborted again from
+  scratch: 20 of them were `box-inset-ratio` (see "Running"), one was the
+  PNG below;
+- 18 minutes with the fonts, the introspector and the references in new
+  processes (seeds 2000 to 2004 and 6000 to 6002: 897 runs, 37,578 steps,
+  112,734 compilations, 2,391 steps compiled again in a process of their
+  own), which found the reparsed tree above;
+- 10 minutes with the stage as it is (seeds 3000 to 3004 and 7000 to
+  7001: 798 runs, 36,453 steps, 105,707 compilations, 2,196 steps compiled
+  again in a process of their own): nothing.
 
 Found on the way, not by a step that differs (neither is about compiling
 again, and neither is fixed here):
