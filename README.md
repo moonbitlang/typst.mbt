@@ -18,6 +18,7 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 | `kit/`, `kit/platform/` | Port of `typst-kit` (files, packages, fonts, diagnostics) and OS access for native and wasm |
 | `cli/` | Port of `typst-cli`: the `typst` command line |
 | `typst_assets/fonts/` | The fonts embedded into the CLI (generated) |
+| `doc/fonts/` | IBM Plex Sans, the sans-serif family of the EDSL's worlds (generated the same way; the CLI does not load it) |
 | `scripts/` | `upstream.sh` (pinned checkout), `goldens.sh` (regenerate goldens) |
 
 ## Command-line interface
@@ -83,6 +84,8 @@ fn run() -> Unit raise {
 Import `moonbitlang/typst/doc` and `moonbitlang/typst/doc/system` (file
 and font access). Plain strings are literal text and are never parsed as
 markup; `Markup(..)` and `Equation(..)` are the explicit escape hatches.
+Besides Typst's embedded fonts the worlds of the EDSL have a sans-serif
+family, IBM Plex Sans (`SetText(font=["IBM Plex Sans"])`).
 
 `compiled.review_html()` writes a self-contained preview page for
 reviewing a document: clicking or selecting rendered text shows the MoonBit

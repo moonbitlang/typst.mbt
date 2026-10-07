@@ -58,6 +58,11 @@ CLI
   DejaVu Sans Mono ......................... SIL Open Font License 1.1 /
                                              Bitstream Vera license
 
+Document EDSL (doc/, not part of Typst)
+  IBM Plex Sans, Copyright 2017 IBM Corp. with Reserved Font Name "Plex"
+  (doc/fonts/files, unmodified font files; see the LICENSE.txt there)
+  .......................................... SIL Open Font License 1.1
+
 ================================================================================
 Typst's own NOTICE follows.
 ================================================================================
