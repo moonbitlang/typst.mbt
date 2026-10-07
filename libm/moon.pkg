@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/typst/moxcms/pxfm",
+}
+
+options(
+  "native-stub": [ "f64_stub.c" ],
+  targets: {
+    "f64_native.mbt": [ "native" ],
+    "f64_native_wbtest.mbt": [ "native" ],
+    "f64_other.mbt": [ "not", "native" ],
+    "f64_other_wbtest.mbt": [ "not", "native" ],
+  },
+)
