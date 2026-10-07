@@ -87,6 +87,8 @@ image-webp = "=0.2.4"
 gif = "=0.14.2"
 # The `image` crate as typst-library uses it (gen_image_golden).
 image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
+# The PNG decoder `image`, tiny-skia and krilla decode with (gen_png_golden).
+png = "=0.18.1"
 base64 = "0.22"
 # tiny-skia-path (gen_tiny_skia_path_tests).
 tiny-skia-path = "=0.12.0"

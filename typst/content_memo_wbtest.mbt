@@ -402,8 +402,8 @@ test "images: a file that changes behind its path, and a broken one" {
     content=(
       #|a.png 4pt 3pt | b.png 4pt 3pt | a.png 4pt 3pt
       #|a.png 8pt 3pt | b.png 4pt 3pt | a.png 8pt 3pt
-      #|error: failed to decode image (Format error decoding Png: Unexpected end of data within a chunk.)
-      #|error: failed to decode image (Format error decoding Png: Unexpected end of data within a chunk.)
+      #|error: failed to decode image (unexpected end of file)
+      #|error: failed to decode image (unexpected end of file)
       #|a.png 4pt 3pt | b.png 4pt 3pt | a.png 4pt 3pt
     ),
   )

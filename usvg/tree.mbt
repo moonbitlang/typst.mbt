@@ -1438,7 +1438,12 @@ fn ImageKind::actual_size(self : ImageKind) -> Size? {
     JPEG(data) | PNG(data) | GIF(data) | WEBP(data) =>
       // Upstream warns: Image has an invalid size. Skipped.
       match imagesize_blob_size(data) {
-        Some((w, h)) => Size::from_wh(Float::from_int(w), Float::from_int(h))
+        // `size.width as f32` of a `usize`
+        Some((w, h)) =>
+          Size::from_wh(
+            Float::from_double(w.to_double()),
+            Float::from_double(h.to_double()),
+          )
         None => None
       }
     SVG(svg) => Some(svg.size)

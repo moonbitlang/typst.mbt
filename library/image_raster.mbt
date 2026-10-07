@@ -594,5 +594,10 @@ fn png_dpi(data : BytesView) -> Double? {
 ///|
 /// Format the user-facing raster graphic decoding error message.
 fn format_image_error(error : String) -> String {
-  "failed to decode image (\{error})"
+  // `image::ImageError::Limits(_)`
+  if @codecs.is_limit_error(error) {
+    "file is too large"
+  } else {
+    "failed to decode image (\{error})"
+  }
 }

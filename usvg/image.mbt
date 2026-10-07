@@ -159,7 +159,21 @@ fn convert_image_inner(
     rect.width() - aligned_size.width(),
     rect.height() - aligned_size.height(),
   )
-  let view_box = aligned_size.to_non_zero_rect(aligned_x, aligned_y)
+  // Upstream: `aligned_size.to_non_zero_rect(aligned_x, aligned_y)`, which
+  // panics (`unwrap` of `None`) if the size is lost next to the position:
+  // an image so much wider than tall (or the reverse) that it has no
+  // height in its box, as the header of a damaged PNG may claim (the size
+  // is read without any check, see `imagesize_blob_size`). Such an image is
+  // left out here, like one with an invalid size.
+  guard NonZeroRect::from_xywh(
+      aligned_x,
+      aligned_y,
+      aligned_size.width(),
+      aligned_size.height(),
+    )
+    is Some(view_box) else {
+    return None
+  }
   let image_ts = Transform::from_row(
     view_box.width() / actual_size.width(),
     0.0,

@@ -22,7 +22,9 @@ fn svg_image_render(
       surface.draw_image(image, size)
     }
     PNG(d) => {
-      guard svg_png_image(d) is Some(image) else { return None }
+      guard svg_png_image(d, process_context.fonts.cache) is Some(image) else {
+        return None
+      }
       surface.draw_image(image, size)
     }
     GIF(d) => {
@@ -72,17 +74,30 @@ fn svg_jpeg_image(data : Bytes) -> @export.Image? {
 /// krilla `Image::from_png(data, false)`: PNGs that allow it are embedded as
 /// is (`PngData`), others are decoded with the `EXPAND` transformation.
 ///
-/// TODO: krilla decodes lazily and reports decoding errors (after valid
-/// metadata) when writing the PDF ("failed to process image"); such images
-/// are skipped here. Deviation: 16-bit images are reduced to 8 bits (krilla
-/// keeps 16 bits per component).
-fn svg_png_image(data : Bytes) -> @export.Image? {
+/// A PNG whose metadata cannot be read (`png_metadata`: `read_info` fails)
+/// is not an image, and krilla-svg skips it. krilla decodes the others when
+/// the document is written, and an error then (after valid metadata) fails
+/// the export (`KrillaError::Image`, "failed to process image"): it is
+/// noted in `cache` for the caller that draws the SVG.
+///
+/// Deviation: 16-bit images are reduced to 8 bits (krilla keeps 16 bits per
+/// component).
+fn svg_png_image(data : Bytes, cache : SvgFontCache) -> @export.Image? {
   // `png_metadata`.
-  let info = @codecs.read_png_info(data[:]) catch { _ => return None }
+  let info = @codecs.read_png_info(data[:], limits=Default) catch {
+    _ => return None
+  }
   let width = info.width.reinterpret_as_int()
   let height = info.height.reinterpret_as_int()
   let key = bytes_key(data)
   if PngData::new(data[:]) is Some(png) {
+    // krilla writes an image without data for chunks of image data that
+    // are all empty, and a negative dimension for one of 2^31 pixels and
+    // more (`as i32`); the exporter rejects both ("the PNG image data is
+    // empty", "the PNG image is empty"), so such an image is left out.
+    if png.idat.length() == 0 || width < 0 || height < 0 {
+      return None
+    }
     let colorspace : @export.ImageColorspace = match png.color_type {
       Grayscale => Luma
       _ => Rgb
@@ -98,7 +113,22 @@ fn svg_png_image(data : Bytes) -> @export.Image? {
       inverted_cmyk: false,
     })
   }
-  let (info, pixels) = @codecs.decode_png(data[:]) catch { _ => return None }
+  // `decode_png`
+  let (info, pixels) = @codecs.decode_png_frame(data[:]) catch {
+    err => {
+      if cache.image_error is None {
+        cache.image_error = Some(
+          match err {
+            // `reader.next_frame(..).map_err(|e| e.to_string())`
+            Decoding(msg) => msg
+            // `reader.output_buffer_size().ok_or("image is too large")`
+            OutputBufferSize => "image is too large"
+          },
+        )
+      }
+      return None
+    }
+  }
   Some(krilla_sampled(key, width, height, info.color, pixels, info.icc))
 }
 

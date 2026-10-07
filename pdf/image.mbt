@@ -53,6 +53,14 @@ fn handle_image(
           gc.svg_fonts,
         )
         |> ignore
+        // An image inside the SVG that cannot be decoded fails the export
+        // with the location of this image (krilla's `sc.location`).
+        if gc.svg_fonts.image_error is Some(err) {
+          gc.svg_fonts.image_error = None
+          if gc.svg_image_error is None {
+            gc.svg_image_error = Some((span, err))
+          }
+        }
       }
     Pdf(pdf) =>
       if to_export_size(size) is Some(size) {

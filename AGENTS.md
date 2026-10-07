@@ -705,6 +705,34 @@
   pixmap hashes compared with the real crate. Raster decoders for it live
   in `codecs/` (GIF, WebP); `scripts/goldens.sh raster` regenerates their
   oracle tests.
+- PNG decoding (`codecs/png_stream.mbt`, `png_reader.mbt`,
+  `png_pixels.mbt`, `fdeflate_decompress.mbt`, `fdeflate_huffman.mbt`) is a
+  port of the `png` crate 0.18.1 (`StreamingDecoder`, `ReadDecoder`,
+  `Reader`, `UnfilteringBuffer`) on the decompressor of `fdeflate` 0.3.7,
+  in upstream's order of steps: what a damaged file gives (which error is
+  found first, or which pixels) is part of the port. The CRC of every chunk
+  is checked (a mismatch is an error in a critical chunk and makes an
+  ancillary chunk ignored), the Adler-32 of the image data is not: the
+  `png` crate's defaults. Two entry points: `decode_png`
+  (`image::codecs::png::PngDecoder::new`, no limit: Typst's raster images,
+  whose `ImageError::Limits` is "file is too large", `is_limit_error`) and
+  `decode_png_frame` (`png::Decoder::new`, 64 MiB, the `png` crate's error
+  text: krilla in `pdf/svg_image.mbt`, tiny-skia in `skia/pixmap.mbt` with
+  `strip16`); `read_png_info` is `read_info`. Nothing is allocated for what
+  a header claims: the frame grows with the rows that are read
+  (`FrameBuffer`), where upstream's callers allocate it first (and abort
+  at 2^62 bytes). Where upstream panics, the decoder reports an error (a
+  `PLTE` chunk whose length is not a multiple of three) and usvg leaves
+  the image out (one that has no height left in its box; `imagesize` reads
+  a PNG's size without any check). `codecs/png_oracle_test.mbt`
+  (`scripts/goldens.sh raster`: `oracle/src/bin/gen_png_golden.rs`) holds a
+  hash of what the `image` crate makes of each of 29 351 damaged copies of
+  the seeds of `png_corpus.txt` (`scripts/gen_png_corpus.py`), and
+  `codecs/png_damage_test.mbt` makes the same copies: keep its
+  `png_damage` equal to the generator's `damage`.
+  `scripts/png_damage_cli.py` compares the two command line programs on
+  damaged PNGs (as an image, as bytes, inside an SVG; diagnostics, exit
+  status, pages; it needs the upstream binary, so it is not a CI stage).
 - Bundle export (`bundle/`, port of typst-bundle; `BundleFormat`/`AssetElem`
   and the bundle-only rules live in `library/bundle_format.mbt`) is checked
   by the `bundle` stage (`scripts/goldens.sh bundle`, oracle/src/bundle.rs):

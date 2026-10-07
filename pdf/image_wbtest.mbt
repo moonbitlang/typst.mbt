@@ -371,7 +371,9 @@ test "the PNG of a bitmap glyph is identified like a PNG inside an SVG" {
   // krilla makes both with `Image::from_png`, whose identity is the data:
   // the same PNG as a glyph and inside an SVG is one image of the file.
   guard decode_png_image(png) is Some(glyph) else { fail("not decoded") }
-  guard svg_png_image(png) is Some(in_svg) else { fail("not decoded") }
+  guard svg_png_image(png, SvgFontCache::new()) is Some(in_svg) else {
+    fail("not decoded")
+  }
   assert_eq(glyph.key, bytes_key(png))
   assert_eq(glyph.key, in_svg.key)
   assert_false(glyph.interpolate)
