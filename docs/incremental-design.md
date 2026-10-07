@@ -1,9 +1,10 @@
 # Incremental compilation: design
 
-Status: design, not implemented. Revision 3 (2026-10-07). Revisions 1 and
+Status: design, not implemented. Revision 4 (2026-10-07). Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
-with the verdict "request changes"; revision 3 answers the second review
-and has not been reviewed. Upstream
+with the verdict "request changes"; revision 3 answered the second review;
+revision 4 records the coordinator's decisions (section 11) and costs the
+alternative for module equality (5.4). Upstream
 `e58a63af`, comemo 0.5.1. Measurements: aarch64 macOS, native release,
 `--ignore-system-fonts`, PDF output, other agents building on the same
 machine (medians of five; the spread is given where it matters).
@@ -664,6 +665,77 @@ plugin's bytes (and of its transitions) in its fingerprint; two loads of
 one file are then equal and two files are not, with and without functions,
 which is what upstream's `==` says for them in a from-scratch compilation.
 
+**Equality by content, or identity kept.** Both ways, costed.
+
+(a) *By content*, as above. It differs from upstream where a compilation
+from scratch holds two module objects with equal contents. No document that
+the command line compiles does: a file has one module there (a second
+evaluation needs another answer of the route or of the traced span, and
+there is no traced span), and `sys.inputs` holds strings. The two cases
+need a host. One document for the first, a line for the second:
+
+    // a.typ
+    #let probe(v) = v
+
+    // main.typ
+    #import "a.typ" as m
+    #let n = eval("import \"a.typ\" as m; m", mode: "code")
+    #let r = (m == n)
+    #m.probe(r)
+    #r
+
+    // with a host that put another library's `math` into `sys.inputs`
+    #let r = (sys.inputs.m == math)
+
+| how `r` is obtained | upstream | port today | port with (a) |
+| --- | --- | --- | --- |
+| the command line (`typst query main.typ "<r>" --field value`, with `#metadata(r) <r>` for the last line) | `true` | `true` | `true` |
+| `trace` at the last `r` of `main.typ` | `true` | `true` | `true` |
+| `trace` at the `v` of `probe`'s body: `a.typ` holds the traced span and is evaluated once with it and once, for the string, without | `false` | `false` | `true` |
+| two libraries | `false` | `false` | `true` |
+
+Upstream's column is a throwaway program on the oracle's dependencies that
+calls `typst::trace` with a world in memory, the port's a throwaway test
+beside `typst/memo_trace_wbtest.mbt`; neither is in the repository. The
+last column is not run, (a) does not exist: it is what the rule gives (the
+two modules of `a.typ` bind `probe` to closures with one hash; the two
+`math` modules bind the same native functions and symbols, which are one
+object each in a process).
+
+(b) *Identity kept.* A module entry that is valid hands out the object it
+has; a file that is evaluated again gets a new object, also when what it
+holds is equal. Upstream's `==` then holds in every compilation from
+scratch. To be sound across compilations it needs three things.
+
+- The new object must not be taken for the old one by a key. Today it is:
+  a closure that captured the old module and one that captured the new
+  have one hash (`closures_equal`, `library/value_hash.mbt`), so a kept
+  call of the first is found for the second and returns what holds the old
+  object. The module's identity has to enter its fingerprint (a number per
+  evaluation), against the rule that a fingerprint covers what upstream's
+  `Hash` covers.
+- A module entry must live as long as anything that imported its file is
+  found. Otherwise the file is evaluated again next to a kept holder of
+  the old object, which is the shape of review 1, finding 4. A hit has to
+  renew the module entries of the sources it read.
+- Hits. After an edit that leaves a file's module equal (a comment, white
+  space), everything that holds the module as a value misses once. With
+  `#import "utils.typ"` and `utils.f(..)`, which is how touying's files use
+  each other, that is every closure of every importing file. Measured with
+  the probe by an edit of `touying/0.8.0/src/utils.typ` that changes the
+  module's fingerprint and none of its bindings (text appended to the
+  file): the touying document recompiles in 137 ms, with 3171 closure
+  calls and all 19 paragraphs computed again, against 34 ms and 18 calls
+  for a comment in the same file when closures that captured equal modules
+  are equal (which is today's comparison and (a)'s). From scratch it is
+  155 ms.
+
+The recommendation is (a). It differs from upstream in two cases that need
+a host and in no document the command line compiles. (b) buys agreement in
+those two cases with a fingerprint that is no longer upstream's, a rule
+between stores, and a recompilation close to from scratch after a comment
+in a shared file of a package.
+
 **What compares by identity.** By Typst's `==` (`library/ops.mbt`,
 `library/func.mbt`, `library/dyn.mbt`; the inventory is in review 2,
 finding 11): native functions, element functions and types, by their
@@ -742,7 +814,13 @@ comemo's rule. Every entry of every store has an age. `@library.evict
 age to zero. A compilation no longer clears anything; a process that never
 calls `evict` keeps everything, as a process using comemo does, and
 `evict(0)` drops everything. `typst watch` calls `evict(10)` after each
-recompilation, where it calls it today. Four entries per key stay the
+recompilation, where it calls it today: `max_age` is upstream's 10
+(decided, section 11). What that holds, for `longer.typ`: 116 MB with
+nothing changed and 358 MB after ten edits that each changed every
+heading, both measured (6.2); eleven times the stores of one compilation,
+about 1.1 GB, if ten edits in a row each changed every paragraph, which is
+not measured. Slice 1 measures the peak in the harness's soak run before
+it is merged (section 8). Four entries per key stay the
 limit (`memo_max_entries`, first in, first out): comemo's tree has no such
 limit, and none of the measured documents reaches it.
 
@@ -875,13 +953,14 @@ validation cost; the expectations of the later slices are restated then.
 
 No new machinery: each is a pure function of what is in its key, so it can
 be kept for a compilation, an export or the process without validation.
-Each helps a single compilation.
+Each helps a single compilation. It needs nothing of the harness and is
+being built first (decided, section 11).
 
 | step | key | files | expected |
 | --- | --- | --- | --- |
 | 0a `RasterImage::new` (upstream `RasterImage::new_impl`) | the data's hash, kept by the identity of the `Bytes` as `font_data_hash` keeps a font's; format; ICC profile | `library/image_raster.mbt`, `library/memo.mbt` (dropped by `evict` like the decode caches of today until slice 1 gives it ages) | the deck: first compilation 1710 ms to 651 ms, recompilation 1690 ms to 501 ms, heap 461 MB to 101 MB; `showcase.typ`: 345 ms to 245 ms, 268 ms to 71 ms |
 | 0b `RawElem::highlight` | the element, the style chain, and the library object (the function calls `routines.html_span_filled`; upstream hashes the routines) | `library/text_raw.mbt`; first the raw element's derived data (5.5) | `showcase.typ`: recompilation 71 ms to 50 ms; the handbook: 92 ms to 74 ms |
-| 0c `convert_raster` (typst-pdf): one conversion per image and export, then kept between exports; tagging, locations and error spans stay per occurrence in `handle_image` | the raster image, `interpolate` | `pdf/image.mbt`, `pdf/convert.mbt`; then `moonbitlang/pdflite` `export` (an image keeps its encoded stream) | not established: an export of the deck converts 72 times for 28 images (137 to 143 ms of 290 to 305 ms); what the rest, the compression, costs per image and per occurrence is not measured. Smallest experiment: the conversion cache alone, in `pdf/` |
+| 0c `convert_raster` (typst-pdf): one conversion per image and export, then kept between exports; tagging, locations and error spans stay per occurrence in `handle_image` | the raster image, `interpolate` | `pdf/image.mbt`, `pdf/convert.mbt` | not established: an export of the deck converts 72 times for 28 images (137 to 143 ms of 290 to 305 ms). The conversion cache is built first and its gain measured. What the rest of `handle_image` costs, the compression, per image and per occurrence, is measured with it; the change in `moonbitlang/pdflite` (an image keeps its encoded stream) follows only if that number is worth it (decided, section 11) |
 
 Risk: memory (decoded pixels of every image of the last `max_age`
 compilations: 6.2). Left out: SVG images (`SvgImage::with_fonts_images`
@@ -924,7 +1003,11 @@ steps, each merged on its own; results cannot become stale before step 5.
    results.
 5. **Ages.** `evict` as in 6.1; the stores stop clearing themselves, one
    store per commit in the order modules, closure calls, layouts, counter
-   sequences and works, each with the harness and its numbers.
+   sequences and works, each with the harness and its numbers. Before the
+   last of them is merged: the peak of the live heap over the harness's
+   soak run (more edits than `max_age`, among them edits that reach every
+   paragraph), for `longer.typ` and a package document, in place of the
+   bound of 6.1 that is not measured.
 
 Expected (the "kept" and "+ slice 0" columns of 3.3, optimistic as said):
 `long.typ` 234 ms to 92 ms after an edit at the end, `longer.typ` 1247 ms
@@ -1176,8 +1259,14 @@ Kept or introduced, each stricter than upstream unless said:
    per tracked reference and until `evict`. Same observable behaviour
    under the same contract. A world may declare files that change during a
    scope, which comemo's contract does not allow.
-9. **Syntax trees are copied where they are edited, always** (upstream:
-   where they are shared).
+9. **Persistent edits are upstream's semantics, not a deviation.**
+   Upstream's source and nodes are `Arc`s that are written through
+   `Arc::make_mut`: `Source::edit` (`typst-syntax/src/source.rs:107`),
+   every write to an inner node (`SyntaxNode::inner_and_span_mut`,
+   `node.rs:91`; the renumbering, `node.rs:398`). Whoever holds the old
+   source or a node of it keeps what it had. The port cannot ask whether a
+   node is shared and copies always; no holder can tell the difference.
+   What deviates is today's port, which writes in place.
 10. **Looser than upstream: the modules of files, plugins and libraries
     compare by what they hold** (5.4). Differs from upstream in a
     from-scratch compilation where two such objects with equal contents
@@ -1204,29 +1293,35 @@ Upstream quirks the port does not reproduce:
   by a memoized call that is handed it again after the file changed (an
   SVG's linked images, deviation 11).
 
-## 11. Open questions
+## 11. Decisions and open questions
 
-1. Module equality by content (deviation 10): accepted, or keep identity
-   and with it upstream's quirk (and then the harness cannot require
+Decided on 2026-10-07 by the coordinator of this work:
+
+- `max_age` is upstream's 10. The measured and the unmeasured bound are in
+  6.1, and slice 1 measures the peak in the harness's soak run.
+- Slice 0c is the conversion cache in `pdf/` first, with its measured gain;
+  the change in `moonbitlang/pdflite` follows only if the measurement says
+  that compression is worth it.
+- Persistent edits in the reparser: accepted (section 10, item 9: they are
+  upstream's semantics).
+- Slice 0 is built first, before the harness, which it does not need.
+- A third review round on 5.2, 5.4 and 9.1: `docs/reviews/
+  incremental-design-3.md`.
+
+Leaning towards "accepted" by the coordinator; the owner may overrule:
+
+1. **Module equality by content** (deviation 10). 5.4 costs it against
+   keeping identity and recommends it: it differs from upstream in two
+   cases that need a host and in no document the command line compiles;
+   keeping identity costs a fingerprint that is not upstream's, a rule
+   between stores, and 137 ms instead of 34 ms after a comment in a shared
+   file of touying. If it is overruled, the harness cannot require
    equality with a compilation from scratch for documents that compare
-   modules)? The alternative that keeps both, interning by fingerprint,
-   needs weak references.
-2. `max_age`: upstream's 10, or less for `typst watch` given 6.2?
-3. Slice 0c changes `moonbitlang/pdflite`. Is that scheduled with it, or
-   does 0c stop at the conversion cache inside `pdf/`?
-4. Persistent edits change a faithfully ported file (`reparser.mbt`). The
-   alternative is to keep editing in place and to argue that a changed node
-   is never reached from a kept result that is reused (it holds by the
-   keys, but nothing checks it). The design prefers the property that can
-   be stated locally.
-5. Slice 0 does not need the harness. Merge it first?
-6. `compile_with` gets a parameter for volatile files, `Library` stops
-   being a record that hosts can build or update, and `Introspector::query`
-   returns a view: changes of the public surface that `doc` and other
-   hosts see. Acceptable in a minor version?
-7. Revision 3 has not been reviewed. A third round on sections 5.2
-   (volatile files), 5.4 (module equality, the classification of identity)
-   and 9.1 (the checked mode) before slice 1 starts?
+   modules, or (b) of 5.4 is built.
+2. **The public surface.** `compile_with` gets a parameter for volatile
+   files, `Library` stops being a record that hosts can build or update,
+   and `Introspector::query` returns a view. `doc` and other hosts see all
+   three. In a minor version?
 
 ## Appendix A. The probe
 
