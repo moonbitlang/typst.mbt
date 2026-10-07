@@ -37,6 +37,25 @@ Typst source) are unchanged.
 
 ### Breaking: changed
 
+- `syntax`: a `Source` and a `Lines` never change, and an edit returns the
+  edited value instead of changing the one it is called on (upstream
+  edits `&mut self` through `Arc::make_mut`, so a clone taken before keeps
+  the old state; here every holder of the old value does).
+  `Source::edit(Int, Int, String)` and `Source::replace(String)` return
+  `(Source, (Int, Int))`, the edited source and the reparsed range (they
+  returned the range); `Lines::edit(Int, Int, String)` returns the edited
+  `Lines` (it returned `Unit`), and `Lines::replace(String)` returns
+  `Lines?`, `None` if the text is the same (it returned a `Bool`). A world
+  that keeps its sources stores what the edit returned: `source =
+  source.replace(text).0`. `replace` with the same text returns the same
+  object. The edited source shares with the one before every syntax node
+  that the edit did not have to write to; no node of a source is written
+  to any more (an edit used to change the nodes on the way to it, and the
+  root, in place), so a node that is held across an edit, by a closure for
+  one, stays what it was. `SyntaxNode::synthesize` and `synthesize_ranges`
+  still write to the tree they are called on: they are for a tree that the
+  caller parsed and has not handed out (`deep_clone` one that comes from a
+  `Source`).
 - `syntect`: `SyntaxSet::from_compact(String, ReadOnlyArray[String])` is
   now `from_compact(String, (Int) -> String)`: the contexts are given as a
   function of the syntax index (the embedded data is stored in pieces and
