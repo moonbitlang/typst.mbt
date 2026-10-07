@@ -196,3 +196,8 @@ statements that hold, 59 with a difference, 79 that it cannot evaluate, and
 - Sections 11 and 12: `19/16 sqrt(7) = 3.14180…` (the value is 3.14182…)
   and `(9^2 + 19^2/22)^(1/4) = 3.14159265262…` (the value is
   3.14159265258…).
+
+The entries of Table II and the two decimal expansions are the
+transcription's: its markup has `\sqrt{22/12}`, `3.14180\ldots` and
+`3.14159265262\ldots` (read again on 2026-10-07), so they are not the
+port's. Whether they are the paper's of 1914 was not checked.
