@@ -4,8 +4,10 @@
 // `theme` fields.
 //
 // `Derived<S, D>` fields store only their source value `S` (see
-// `scripts/typemap.py`); the derived syntaxes/themes are recorded when the
-// field is parsed and looked up by their source when highlighting.
+// `scripts/typemap.py`); the derived syntaxes and theme are in the companion
+// fields `syntaxes-derived` and `theme-derived`, each with the source it
+// was loaded from (`raw_derived_pair`), where the parsers of the fields put
+// them, in the element or in the styles like the fields themselves.
 
 ///|
 /// The content of the raw text.
@@ -501,7 +503,9 @@ fn raw_theme_item(
 let raw_theme_cell : Ref[@syntect.Theme?] = Ref(None)
 
 ///|
-/// The default theme (upstream `RAW_THEME`).
+/// The default theme (upstream `RAW_THEME`, a static). It is one object for
+/// the process and must not be changed: highlighted text is kept
+/// ([RawElem::highlight]) as a function of the element and the styles.
 pub fn raw_theme() -> @syntect.Theme {
   match raw_theme_cell.val {
     Some(theme) => return theme
@@ -566,7 +570,8 @@ pub fn raw_theme() -> @syntect.Theme {
 }
 
 ///|
-/// The built-in syntaxes (upstream `RAW_SYNTAXES`).
+/// The built-in syntaxes (upstream `RAW_SYNTAXES`, a static). Like
+/// [raw_theme] they must not be changed.
 pub fn raw_syntaxes() -> @syntect.SyntaxSet {
   @two_face.extra_no_newlines()
 }
@@ -633,10 +638,51 @@ fn RawSyntax::get(self : RawSyntax) -> @syntect.SyntaxSet {
 }
 
 ///|
+/// What was loaded from a source, with the source: the stored form of the
+/// derived half of a `Derived<DataSource, D>`.
+///
+/// Upstream has source and derived data in one value. Here they are two
+/// fields that the field's parser sets together, and the typed views can
+/// set the source alone (`with_theme`, `set_syntaxes`): the pair says which
+/// source its data is of, so that data is never taken for another source's
+/// ([raw_derived_of]).
+fn raw_derived_pair(source : DataSource, derived : DynValue) -> Value {
+  Array(Arr::from_array([source.into_value(), Dyn(derived)]))
+}
+
+///|
+/// The derived data of a pair, if the pair is of this source.
+fn raw_derived_of(pair : Value, source : DataSource) -> DynValue? {
+  guard pair is Array(pair) && pair.items is [stored, Dyn(derived)] else {
+    return None
+  }
+  if stored == source.into_value() {
+    Some(derived)
+  } else {
+    None
+  }
+}
+
+///|
 /// The stored form of the syntaxes of data sources (the companion field
-/// `syntaxes-derived`; upstream `Derived::derived`, a `Vec<RawSyntax>`).
-fn raw_syntaxes_value(list : Array[RawSyntax]) -> Value {
-  Array(Arr::from_array(list.map(syntax => Value::Dyn(RawSyntax(syntax)))))
+/// `syntaxes-derived`; upstream `Derived::derived`, a `Vec<RawSyntax>`): a
+/// pair per source.
+fn raw_syntaxes_value(
+  sources : Array[DataSource],
+  list : Array[RawSyntax],
+) -> Value {
+  Array(
+    Arr::from_array(
+      list.mapi((i, syntax) => raw_derived_pair(sources[i], RawSyntax(syntax))),
+    ),
+  )
+}
+
+///|
+/// The stored form of the theme of a data source (the companion field
+/// `theme-derived`; upstream `Derived::derived`).
+fn raw_theme_value(source : DataSource, theme : RawTheme) -> Value {
+  raw_derived_pair(source, RawTheme(theme))
 }
 
 ///|
@@ -660,9 +706,9 @@ fn raw_elem_syntaxes_derived_fold(inner : Value, outer : Value) -> Value {
 /// .get_cloned(styles).derived`): what the parser of the field loaded, from
 /// the element or the styles.
 ///
-/// Not upstream: if that is not there for every source (a field that was
-/// set without its parser), the sources are loaded from the world, and
-/// `read_world` is set.
+/// Not upstream: if that is not there for every source, in order (a field
+/// that was set without its parser), the sources are loaded from the world,
+/// and `read_world` is set.
 fn RawElem::derived_syntaxes(
   self : RawElem,
   engine : Engine,
@@ -681,10 +727,11 @@ fn RawElem::derived_syntaxes(
   )
   if stored is Array(stored) && stored.items.length() == sources.length() {
     let derived = []
-    for item in stored.items {
-      if item is Dyn(RawSyntax(syntax)) {
-        derived.push(syntax)
+    for i, item in stored.items {
+      guard raw_derived_of(item, sources[i]) is Some(RawSyntax(syntax)) else {
+        break
       }
+      derived.push(syntax)
     }
     if derived.length() == sources.length() {
       return derived
@@ -798,8 +845,9 @@ fn RawTheme::decode(bytes : Bytes) -> RawTheme raise LoadErr {
 /// The theme of the element's data source (upstream `theme.derived`): what
 /// the parser of the field loaded, from the element or the styles.
 ///
-/// Not upstream: if that is not there (a field that was set without its
-/// parser), the source is loaded from the world, and `read_world` is set.
+/// Not upstream: if that is not there for this source (a field that was
+/// set without its parser), the source is loaded from the world, and
+/// `read_world` is set.
 fn RawElem::derived_theme(
   self : RawElem,
   engine : Engine,
@@ -813,7 +861,7 @@ fn RawElem::derived_theme(
     e.fields()[raw_elem_theme_derived],
     self.0.field_raw(raw_elem_theme_derived),
   )
-  if stored is Dyn(RawTheme(theme)) {
+  if raw_derived_of(stored, source) is Some(RawTheme(theme)) {
     return Some(theme)
   }
   read_world.val = true
@@ -851,7 +899,10 @@ fn raw_elem_syntaxes_parse(
   match sources {
     Some(sources) => {
       let list = RawSyntax::load(engine.world, sources)
-      locals.set("syntaxes-derived", Some(raw_syntaxes_value(list)))
+      locals.set(
+        "syntaxes-derived",
+        Some(raw_syntaxes_value(sources.v.0, list)),
+      )
       Some(sources.v.into_value())
     }
     None => None
@@ -869,7 +920,7 @@ fn raw_elem_theme_parse(
   match theme {
     Some({ v: Custom(Some(source)), span, }) => {
       let theme = RawTheme::load(engine.world, { v: source, span, })
-      locals.set("theme-derived", Some(Dyn(RawTheme(theme))))
+      locals.set("theme-derived", Some(raw_theme_value(source, theme)))
       Some(Smart::Custom(Some(source)).into_value())
     }
     Some({ v: Custom(None), .. }) => Some(Smart::Custom(None).into_value())

@@ -200,9 +200,10 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   equal format and ICC argument once per process and returns the same
   image, also for a decoding error. An image that is on many pages, or
   laid out again in a later introspection iteration or in the next
-  compilation of `typst watch`, was decoded every time. `evict(max_age)`
-  drops an image that `max_age` calls in a row did not use; a process
-  that compiles many documents and never calls `evict` keeps them all.
+  compilation of `typst watch`, was decoded every time. An image stays
+  for `max_age` calls of `evict(max_age)` that find it unused and goes
+  with the next (comemo's rule); a process that compiles many documents
+  and never calls `evict` keeps them all.
   With `set_layout_memo_enabled(false)` nothing is kept. New for caches of
   this kind: `ContentCache[T]` (`new`, `get`, `insert`, `evict`, `length`;
   results by a fingerprint, with comemo's ages), `register_evictor(f)`

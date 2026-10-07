@@ -363,3 +363,28 @@ test "convert_raster: memoization off, and evict" {
   assert_false(physical_equal(again, kept))
   assert_true(again.key == kept.key && same_data(again, kept))
 }
+
+///|
+test "the PNG of a bitmap glyph is identified like a PNG inside an SVG" {
+  test_reset()
+  let png = test_png(6, 4, 4, 9)
+  // krilla makes both with `Image::from_png`, whose identity is the data:
+  // the same PNG as a glyph and inside an SVG is one image of the file.
+  guard decode_png_image(png) is Some(glyph) else { fail("not decoded") }
+  guard svg_png_image(png) is Some(in_svg) else { fail("not decoded") }
+  assert_eq(glyph.key, bytes_key(png))
+  assert_eq(glyph.key, in_svg.key)
+  assert_false(glyph.interpolate)
+  guard glyph.data is Samples(color, Some(alpha)) else { fail("no alpha") }
+  assert_eq((color.length(), alpha.length()), (6 * 4 * 3, 6 * 4))
+  // The same file as an image of the document is another one (krilla's
+  // `from_custom`), as upstream.
+  let direct = test_converted(
+    @library.RasterImage::plain(png, Exchange(Png)),
+    false,
+  )
+  assert_true(direct.key != glyph.key)
+  assert_true(same_data(direct, glyph))
+  // A glyph's image is not an entry of the document's conversions.
+  assert_eq(raster_cache.length(), 1)
+}

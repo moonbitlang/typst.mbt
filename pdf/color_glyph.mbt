@@ -364,10 +364,22 @@ fn draw_bitmap_glyph(
 }
 
 ///|
-/// Decode a PNG into an exporter image.
+/// Decode a PNG into an exporter image (krilla's bitmap glyphs:
+/// `Image::from_png`). Its identity is its data, like that of a PNG inside
+/// an SVG (`svg_png_image`), so that the two are one image of the file; not
+/// that of a raster image of the document ([convert_raster]).
 fn decode_png_image(data : Bytes) -> @export.Image? {
   let raster = @library.RasterImage::plain(data, Exchange(Png)) catch {
     _ => return None
   }
-  convert_raster(raster, false).to_option()
+  let dynamic = raster.dynamic()
+  convert_samples(
+    bytes_key(data),
+    raster.width().reinterpret_as_int(),
+    raster.height().reinterpret_as_int(),
+    dynamic.color,
+    dynamic.buf,
+    raster.icc(),
+    false,
+  ).to_option()
 }

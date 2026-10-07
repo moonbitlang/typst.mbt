@@ -58,12 +58,13 @@ pub(all) enum DynValue {
   /// `RawContent::Lines`; see `RawContent`)
   RawContent(RawContent)
   /// `text/raw.rs` (internal: a decoded syntax in the companion field
-  /// `syntaxes-derived` of raw elements, an array of them; upstream the
-  /// derived part of `Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>`)
+  /// `syntaxes-derived` of raw elements, which holds a pair of source and
+  /// syntax per source; upstream the derived part of
+  /// `Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>`)
   RawSyntax(RawSyntax)
   /// `text/raw.rs` (internal: the decoded theme in the companion field
-  /// `theme-derived` of raw elements; upstream the derived part of
-  /// `Derived<DataSource, RawTheme>`)
+  /// `theme-derived` of raw elements, a pair of source and theme; upstream
+  /// the derived part of `Derived<DataSource, RawTheme>`)
   RawTheme(RawTheme)
 } derive(Eq)
 

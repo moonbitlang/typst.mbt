@@ -249,13 +249,48 @@ test "data_hash: once per object, dropped when the object is not asked for" {
   // Short data is not filed.
   assert_eq(data_hash(b"short"), data_hash_uncached(b"short"))
   assert_eq(data_hashes.length(), 1)
-  // An object that was not asked for between two calls of `evict` goes.
+  // The table is swept when a compilation starts and by `evict`; an entry
+  // goes with the third sweep after it was asked for. A watch session:
+  // compile, evict, compile, evict, ...
+  let objects = () => {
+    data_hashes.get(data_probe(data)).map(b => b.length()).unwrap_or(0)
+  }
+  // The first compilation used both objects (above).
   evict(10)
-  ignore(data_hash(data))
+  // The second one reads the file again: `copy` is the new object, `data`
+  // is not asked for any more.
+  let mut inside = 0
+  with_layout_memo(() => {
+    ignore(data_hash(copy))
+    // Not a compilation of its own: nothing is swept inside one.
+    with_layout_memo(() => ())
+    inside = objects()
+  })
+  assert_eq(inside, 2)
+  // With the `evict` after it, `data` goes.
   evict(10)
-  assert_eq(data_hashes.get(data_probe(data)).map(b => b.length()), Some(1))
-  evict(10)
-  evict(10)
+  assert_eq(objects(), 1)
+  // An object that every compilation asks for stays (a host that hands out
+  // the same `Bytes` again).
+  for _ in 0..<5 {
+    with_layout_memo(() => ignore(data_hash(copy)))
+    evict(10)
+  }
+  assert_eq(objects(), 1)
+  // Exports without a compilation, each with a copy of its own (a glyph's
+  // bitmap) and an `evict` after it: bounded.
+  for _ in 0..<10 {
+    ignore(data_hash(memo_test_copy(data)))
+    evict(10)
+  }
+  assert_true(objects() <= 3)
+  // Compilations without `evict`: bounded too.
+  for _ in 0..<10 {
+    with_layout_memo(() => ignore(data_hash(memo_test_copy(data))))
+  }
+  assert_true(objects() <= 3)
+  // `evict(0)` drops all of them.
+  evict(0)
   assert_eq(data_hashes.length(), 0)
   assert_eq(data_hash(data), expected)
 }

@@ -458,8 +458,8 @@
   pure functions of their arguments plus the tracked engine parts whose
   results cannot contain values created during the call that compare by
   identity (the state sequence is not memoized).
-- Results kept by content (`library/memo_content.mbt`; the first slice of
-  the incremental-compilation design): functions that upstream memoizes without
+- Results kept by content (`library/memo_content.mbt`; slice 0 of
+  `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
   the process, not for a compilation: decoding a raster image
   (`RasterImage::new`, upstream `new_impl`; a deck with 28 screenshots
@@ -476,8 +476,13 @@
   folds them like the sources, `DynValue::RawSyntax`/`RawTheme` hash and
   compare as the hash of their bytes): never look derived data up by its
   source, a path means another file in another directory and after an
-  edit. A result that had to ask the world (an element without its
-  companion) is not kept. The third is the PDF exporter's image
+  edit. Source and derived data are two fields here and one value
+  upstream, and a typed view can set the source alone (`with_theme`): a
+  companion holds its source with the data (`raw_derived_pair`) and is
+  only taken for that source. A result that had to ask the world (an
+  element without the companion of its source) is not kept. The realize
+  dump of the runner leaves the companions out (upstream has one property
+  for the two). The third is the PDF exporter's image
   conversion (`pdf/image.mbt` `convert_raster`: the image, as
   `RasterImage::hash128()`, upstream's `Hash for RasterImage`, and
   `interpolate`). Rules for such a cache: the
@@ -486,11 +491,16 @@
   ICC profile that was passed, not the one found in the file), and the
   comment at the lookup says where it differs and why; the hash of large
   data is `data_hash(bytes)`, computed once per `Bytes` object (upstream's
-  `LazyHash` inside `Bytes`; kept by the object's identity, and dropped by
-  `evict` once the object was not asked for between two calls, since a
-  world reads its files again after a reset); entries have comemo's ages
+  `LazyHash` inside `Bytes`; kept by the object's identity, which keeps
+  the object, so the table is swept when a compilation starts and by
+  every `evict`, and an entry goes with the third sweep after it was
+  asked for: a world reads its files again after a reset, and an export
+  copies the bitmap of a glyph; `Bytes` are immutable, never hash the view
+  of a buffer that is still written to); entries have comemo's ages
   (`ContentCache`: `evict(max_age)` makes every entry older by one and
-  drops those above `max_age`, a hit makes it young; a cache of another
+  drops those above `max_age`, so an entry survives `max_age` calls
+  without a hit and goes with the next; a hit makes it young; a cache of
+  another
   package reaches `evict` through `register_evictor`), where the decode
   caches of `evict`'s own list are dropped as a whole on every
   `max_age`-th call; a result is immutable or copied for every caller;
@@ -720,7 +730,9 @@
   the data alone for both: the same bytes are other pixels in another
   pixel format. (krilla does not have `interpolate` in the identity of a
   JPEG, so upstream embeds a JPEG that is used smooth and pixelated once,
-  with the flag of the first use; pdflite embeds it twice.) The export of
+  with the flag of the first use; pdflite embeds it twice.) The PNG of a
+  bitmap glyph is identified by its data like a PNG inside an SVG
+  (krilla's `Image::from_png` for both; `decode_png_image`). The export of
   a document with images is the compression of their samples in pdflite
   (the deck of `memo_content.mbt`'s numbers: 515 of 550 ms, as much as
   upstream's with `--jobs 1`), again in every export: krilla keeps the

@@ -14,7 +14,8 @@
 // - A result is found by the 128-bit fingerprint of the arguments, as
 //   comemo finds it by their hash. Large data (the bytes of an image) is
 //   hashed once per `Bytes` object ([data_hash]), where upstream keeps the
-//   hash in the `Bytes` (`LazyHash`).
+//   hash in the `Bytes` (`LazyHash`). `Bytes` are immutable: an object that
+//   is the view of a buffer somebody still writes to must not be hashed.
 // - Lifetime is comemo's: every entry has an age, a hit sets it to zero,
 //   [evict] adds one to each and drops those above `max_age`. A process
 //   that never calls [evict] keeps everything, as one using comemo does.
@@ -124,8 +125,8 @@ pub fn[T] ContentCache::length(self : ContentCache[T]) -> Int {
 priv struct DataHashEntry {
   data : Bytes
   hash : U128
-  /// Whether the hash was asked for since the last [evict].
-  mut used : Bool
+  /// The number of [sweep_data_hashes] calls since the hash was asked for.
+  mut age : Int
 }
 
 ///|
@@ -135,8 +136,14 @@ priv struct DataHashEntry {
 /// are filed under what is cheap to read of them ([data_probe]).
 ///
 /// An entry keeps its data alive, and an object that the world has replaced
-/// (a file is read again after `World::reset`) is never asked for again:
-/// [evict] drops the entries that were not used since its last call.
+/// (a file is read again after `World::reset`) or that was made for one
+/// call (the copy of a glyph's bitmap in an export) is never asked for
+/// again. So the table is swept where the things are that ask for hashes:
+/// when a compilation starts and in every [evict] ([sweep_data_hashes]). An
+/// entry goes with the third sweep after it was last asked for: in a watch
+/// session, whose sweeps are the start of a compilation and the `evict`
+/// after it, that is a compilation later, and the objects of a host that
+/// hands out the same `Bytes` again are hashed once. `evict(0)` drops all.
 let data_hashes : Map[Int, Array[DataHashEntry]] = Map([])
 
 ///|
@@ -172,17 +179,17 @@ pub fn data_hash(data : Bytes) -> U128 {
     Some(bucket) => {
       for entry in bucket {
         if physical_equal(entry.data, data) {
-          entry.used = true
+          entry.age = 0
           return entry.hash
         }
       }
       let hash = data_hash_uncached(data)
-      bucket.push({ data, hash, used: true, })
+      bucket.push({ data, hash, age: 0, })
       hash
     }
     None => {
       let hash = data_hash_uncached(data)
-      data_hashes[probe] = [{ data, hash, used: true, }]
+      data_hashes[probe] = [{ data, hash, age: 0, }]
       hash
     }
   }
@@ -198,17 +205,22 @@ fn data_hash_uncached(data : Bytes) -> U128 {
 }
 
 ///|
-/// Drops the hashes of the objects that were not asked for since the last
-/// call (see [data_hashes]).
-fn evict_data_hashes() -> Unit {
+/// The sweeps an entry of [data_hashes] stays for after it was asked for.
+let data_hash_max_age : Int = 2
+
+///|
+/// Makes the hashes of [data_hashes] older by one and drops those of the
+/// objects that were not asked for in more than [data_hash_max_age] sweeps:
+/// called when a compilation starts and by [evict].
+fn sweep_data_hashes() -> Unit {
   let dropped = []
   for probe, bucket in data_hashes {
-    bucket.retain(entry => entry.used)
+    for entry in bucket {
+      entry.age += 1
+    }
+    bucket.retain(entry => entry.age <= data_hash_max_age)
     if bucket.is_empty() {
       dropped.push(probe)
-    }
-    for entry in bucket {
-      entry.used = false
     }
   }
   for probe in dropped {

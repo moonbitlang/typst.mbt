@@ -119,7 +119,7 @@ fn raw_test_with_theme(elem : RawElem, theme : Bytes) -> RawElem raise {
   RawElem(
     elem.with_theme(Custom(Some(Bytes(theme)))).0.with_field(
       raw_elem_theme_derived,
-      Dyn(RawTheme(decoded)),
+      raw_theme_value(Bytes(theme), decoded),
     ),
   )
 }
@@ -231,7 +231,7 @@ test "highlight: language, text, tab size, theme and syntaxes are in the key" {
     RawElem(
       raw_test_with_theme(foo, red).with_syntaxes(OneOrMultiple([Bytes(bytes)])).0.with_field(
         raw_elem_syntaxes_derived,
-        raw_syntaxes_value([syntax]),
+        raw_syntaxes_value([Bytes(bytes)], [syntax]),
       ),
     )
   }
@@ -261,7 +261,7 @@ test "highlight: the same path with another theme behind it" {
       .with_lang(Some("rust"))
       .with_theme(Custom(Some(source))).0.with_field(
         raw_elem_theme_derived,
-        Dyn(RawTheme(decoded)),
+        raw_theme_value(source, decoded),
       ),
     )
   }
@@ -284,7 +284,7 @@ test "highlight: the same path with another theme behind it" {
           Property::new(
             raw_elem(),
             raw_elem_theme_derived,
-            Dyn(RawTheme(decoded)),
+            raw_theme_value(source, decoded),
           ),
         ),
       ]),
@@ -324,7 +324,7 @@ test "highlight: folded syntaxes, and derived data that is missing" {
         Property::new(
           raw_elem(),
           raw_elem_syntaxes_derived,
-          raw_syntaxes_value([decode(bytes)]),
+          raw_syntaxes_value([Bytes(bytes)], [decode(bytes)]),
         ),
       ),
     ])
@@ -438,4 +438,82 @@ test "highlight: evict" {
   )
   evict(0)
   assert_eq(raw_highlight_cache.length(), 0)
+}
+
+///|
+test "highlight: derived data is only taken for the source it is of" {
+  raw_test_reset()
+  let engine = memo_engine()
+  let styles = StyleChain::empty()
+  let red = raw_test_theme("#ff0000")
+  let blue = raw_test_theme("#0000ff")
+  let rust = RawElem::new(Text("let x = 1;")).with_lang(Some("rust"))
+  // A typed view replaces the source of a parsed element: the theme that
+  // was loaded for the old source is not the new one's.
+  let replaced = raw_test_with_theme(rust, red).with_theme(
+    Custom(Some(Bytes(blue))),
+  )
+  let read_world = Ref(false)
+  guard replaced.derived_theme(engine, styles, Bytes(blue), read_world)
+    is Some(theme) else {
+    fail("no theme")
+  }
+  assert_true(read_world.val)
+  assert_true(theme == (RawTheme::decode(blue) catch { _ => fail("theme") }))
+  let dump = raw_test_dump(raw_test_highlight(replaced, engine, styles))
+  assert_true(dump.contains("0000ff") && !dump.contains("ff0000"))
+  // (Loaded from the world, so not kept.)
+  assert_eq(raw_highlight_cache.length(), 0)
+  // A source in the element, another one's theme in the styles.
+  let chain = styles.chain(
+    Styles::from_array([
+      RawElem::set_theme(Custom(Some(Bytes(red)))),
+      Property(
+        Property::new(
+          raw_elem(),
+          raw_elem_theme_derived,
+          raw_theme_value(
+            Bytes(red),
+            RawTheme::decode(red) catch {
+              _ => fail("theme")
+            },
+          ),
+        ),
+      ),
+    ]),
+  )
+  let local_ = rust.with_theme(Custom(Some(Bytes(blue))))
+  let dump = raw_test_dump(raw_test_highlight(local_, engine, chain))
+  assert_true(dump.contains("0000ff") && !dump.contains("ff0000"))
+  // The styles' own pair is taken.
+  let dump = raw_test_dump(raw_test_highlight(rust, engine, chain))
+  assert_true(dump.contains("ff0000") && !dump.contains("0000ff"))
+  assert_eq(raw_highlight_cache.length(), 1)
+  // The same for syntaxes: a replaced list of the same length.
+  let foo = raw_test_syntax("foo")
+  let bar = raw_test_syntax("bar")
+  let decode = (bytes : Bytes) => {
+    RawSyntax::decode(bytes) catch {
+      _ => fail("invalid syntax")
+    }
+  }
+  let parsed = RawElem(
+    raw_test_with_theme(
+      RawElem::new(Text("foo bar")).with_lang(Some("foo")),
+      red,
+    ).with_syntaxes(OneOrMultiple([Bytes(foo)])).0.with_field(
+      raw_elem_syntaxes_derived,
+      raw_syntaxes_value([Bytes(foo)], [decode(foo)]),
+    ),
+  )
+  let read_world = Ref(false)
+  let kept = parsed.derived_syntaxes(engine, styles, read_world)
+  assert_true(!read_world.val && kept.length() == 1 && kept[0] == decode(foo))
+  let swapped = parsed.with_syntaxes(OneOrMultiple([Bytes(bar)]))
+  let loaded = swapped.derived_syntaxes(engine, styles, read_world)
+  assert_true(
+    read_world.val && loaded.length() == 1 && loaded[0] == decode(bar),
+  )
+  let dump = raw_test_dump(raw_test_highlight(swapped, engine, styles))
+  inspect(dump, content="foo bar: foo <rgb(\"#ff0000\") 4 bar>\n")
 }
