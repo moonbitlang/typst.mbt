@@ -319,6 +319,20 @@ pub fn knows_local_time_zone() -> Bool {
 }
 
 ///|
+/// A clock in nanoseconds for measuring durations (the wall clock here,
+/// which the host only gives in milliseconds).
+pub fn monotonic_nanos() -> Int64 {
+  now_ms() * 1000000L
+}
+
+///|
+/// Raises the soft limit of open file descriptors (not possible here: the
+/// limit is the host's).
+pub fn raise_fd_limit() -> Unit {
+
+}
+
+///|
 let os_cell : Ref[Os?] = { val: None, }
 
 ///|

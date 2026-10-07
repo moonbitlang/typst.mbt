@@ -277,6 +277,27 @@ pub fn knows_local_time_zone() -> Bool {
 }
 
 ///|
+extern "C" fn ffi_monotonic_nanos() -> Int64 = "typst_platform_monotonic_nanos"
+
+///|
+/// A monotonic clock in nanoseconds, for measuring durations (Rust's
+/// `Instant`).
+pub fn monotonic_nanos() -> Int64 {
+  ffi_monotonic_nanos()
+}
+
+///|
+extern "C" fn ffi_raise_fd_limit() = "typst_platform_raise_fd_limit"
+
+///|
+/// Raises the soft limit of open file descriptors to the hard limit, for
+/// programs that keep many files open (watching: kqueue needs a descriptor
+/// per watched file, and the default soft limit of macOS is 256).
+pub fn raise_fd_limit() -> Unit {
+  ffi_raise_fd_limit()
+}
+
+///|
 /// The operating system.
 pub fn os() -> Os {
   match ffi_os() {
