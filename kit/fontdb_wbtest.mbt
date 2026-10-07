@@ -1,0 +1,753 @@
+// Tests of font discovery (`scan`) on directories with good, truncated,
+// malformed and non-font files. Discovery reads as little of a file as it
+// can, so the reference for every file is what the whole file gives: for
+// every index of the collection, fontdb's admission (`admit_face`) and
+// `FontInfo::new` on the file's bytes. A file is skipped silently if
+// nothing parses, like upstream.
+//
+// The fonts are the embedded ones: one below the size up to which discovery
+// reads a file whole, and one above it.
+//
+// (What these tests cannot make is checked by hand with the two command
+// line programs: files and directories without read permission, links to
+// files and directories, dangling ones and cycles.)
+
+///|
+fn be16(data : Bytes, at : Int) -> Int {
+  (data[at].to_int() << 8) | data[at + 1].to_int()
+}
+
+///|
+fn be32(data : Bytes, at : Int) -> UInt {
+  (data[at].to_uint() << 24) |
+  (data[at + 1].to_uint() << 16) |
+  (data[at + 2].to_uint() << 8) |
+  data[at + 3].to_uint()
+}
+
+///|
+fn u16(v : Int) -> Bytes {
+  [(v >> 8).to_byte(), v.to_byte()]
+}
+
+///|
+fn u32(v : UInt) -> Bytes {
+  [(v >> 24).to_byte(), (v >> 16).to_byte(), (v >> 8).to_byte(), v.to_byte()]
+}
+
+///|
+fn zeros(n : Int) -> Bytes {
+  Bytes::make(n, b'\x00')
+}
+
+///|
+/// A copy of `data` with the bytes at `at` replaced by `new`.
+fn splice(data : Bytes, at : Int, new : Bytes) -> Bytes {
+  data[:at].to_owned() + new + data[at + new.length():].to_owned()
+}
+
+///|
+/// A table record of a face: where the record is, and what it says.
+struct Record {
+  at : Int
+  tag : String
+  offset : UInt
+  length : UInt
+}
+
+///|
+/// The table records of the face whose table directory is at `base`.
+fn records(data : Bytes, base : Int) -> Array[Record] {
+  let out = []
+  for i in 0..<be16(data, base + 4) {
+    let at = base + 12 + 16 * i
+    let tag = StringBuilder()
+    for k in 0..<4 {
+      tag.write_char(data[at + k].to_int().unsafe_to_char())
+    }
+    out.push({
+      at,
+      tag: tag.to_string(),
+      offset: be32(data, at + 8),
+      length: be32(data, at + 12),
+    })
+  }
+  out
+}
+
+///|
+fn record(data : Bytes, tag : String) -> Record {
+  for record in records(data, 0) {
+    if record.tag == tag {
+      return record
+    }
+  }
+  abort("no table \{tag}")
+}
+
+///|
+/// A copy of `data` whose record at `at` has this offset and length.
+fn patch(data : Bytes, at : Int, offset : UInt, length : UInt) -> Bytes {
+  splice(data, at + 8, u32(offset) + u32(length))
+}
+
+///|
+/// A collection of whole fonts, one after another.
+fn ttc(fonts : Array[Bytes], count? : UInt, offsets? : Array[UInt]) -> Bytes {
+  let mut pos = 12 + 4 * fonts.length()
+  let starts = []
+  let mut body = b""
+  for font in fonts {
+    starts.push(pos.reinterpret_as_uint())
+    let mut moved = font
+    for record in records(font, 0) {
+      moved = patch(
+        moved,
+        record.at,
+        record.offset + pos.reinterpret_as_uint(),
+        record.length,
+      )
+    }
+    body = body + moved
+    pos += font.length()
+  }
+  let mut header = b"ttcf\x00\x01\x00\x00" +
+    u32(count.unwrap_or(fonts.length().reinterpret_as_uint()))
+  for start in offsets.unwrap_or(starts) {
+    header = header + u32(start)
+  }
+  header + body
+}
+
+///|
+/// The embedded font files that the tests use: one that discovery reads
+/// whole, one that it reads in ranges, and an OpenType font with CFF
+/// outlines of that kind.
+fn test_fonts() -> (Bytes, Bytes, Bytes) {
+  let mut small = b""
+  let mut large = b""
+  let mut otf = b""
+  for font in @assets_fonts.fonts() {
+    let truetype = be32(font, 0) == 0x00010000U
+    if truetype && font.length() <= 262144 && small.length() == 0 {
+      small = font
+    }
+    if truetype && font.length() > 262144 && large.length() == 0 {
+      large = font
+    }
+    if !truetype && font.length() > 262144 && otf.length() == 0 {
+      otf = font
+    }
+  }
+  guard small.length() > 0 && large.length() > 0 && otf.length() > 0 else {
+    abort("the embedded fonts changed")
+  }
+  (small, large, otf)
+}
+
+///|
+/// What the whole file gives: the faces by index. Nothing for a file
+/// without one of fontdb's extensions.
+fn reference(name : String, data : Bytes) -> Array[(UInt, @library.FontInfo)] {
+  let out = []
+  let file_name = match name.rev_find("/") {
+    Some(i) => name[i + 1:].to_owned()
+    None => name
+  }
+  // (Rust's `Path::extension`: a name that starts with its only dot has
+  // none.)
+  let extension = match file_name.rev_find(".") {
+    Some(i) if i > 0 => file_name[i + 1:].to_owned()
+    _ => ""
+  }
+  guard ["ttf", "ttc", "TTF", "TTC", "otf", "otc", "OTF", "OTC"].contains(
+    extension,
+  ) else {
+    return out
+  }
+  let count = match @otf.fonts_in_collection(data[:]) {
+    Some(count) => {
+      // No face parses if the offsets of the faces are not all there. (A
+      // count of 2^32 - 1 would also take a while.)
+      if count.to_int64() * 4L > data.length().to_int64() - 12L {
+        return out
+      }
+      count
+    }
+    None => 1U
+  }
+  for index in 0U..<count {
+    if admit_face(data, index) &&
+      @library.FontInfo::new(data, index) is Some(info) {
+      out.push((index, info))
+    }
+  }
+  out
+}
+
+///|
+/// Writes the files into a directory of their own, scans it, checks every
+/// file against the reference and gives the indices of the faces found per
+/// file (`-` for none).
+fn scanned(name : String, files : Array[(String, Bytes)]) -> String raise {
+  let dir = "_build/kit_fonts_test/\{name}"
+  for file in files {
+    let path = @platform.join(dir, file.0)
+    @platform.create_dir_all(@platform.parent(path).unwrap())
+    @platform.write_file(path, file.1)
+  }
+  let found : Map[String, Array[(UInt, @library.FontInfo)]] = Map([])
+  for entry in scan(dir) {
+    guard entry.0 is Path(path~, index~) else { continue }
+    let file = path[dir.length() + 1:].to_owned()
+    match found.get(file) {
+      Some(faces) => faces.push((index, entry.1))
+      None => found[file] = [(index, entry.1)]
+    }
+  }
+  let lines = []
+  for file in files {
+    let faces = found.get(file.0).unwrap_or([])
+    if faces != reference(file.0, file.1) {
+      fail("\{file.0}: not what the whole file gives")
+    }
+    let indices = if faces.is_empty() {
+      "-"
+    } else {
+      faces.map(face => face.0.to_string()).join(" ")
+    }
+    lines.push("\{file.0}: \{indices}")
+  }
+  lines.join("\n")
+}
+
+///|
+test "scan: extensions, subdirectories, files that are not fonts" {
+  let (small, large, otf) = test_fonts()
+  let noise = Bytes::makei(300000, i => (i * 7919 + (i >> 8) * 31).to_byte())
+  inspect(
+    scanned("plain", [
+      ("small.ttf", small),
+      ("large.ttf", large),
+      ("cff.otf", otf),
+      ("upper.TTF", large),
+      ("mixed.Ttf", large),
+      ("other.ttx", large),
+      ("text.txt", large),
+      ("noext", large),
+      (".ttf", large),
+      (".hidden.otf", otf),
+      ("sub/deeper/inside.OTF", otf),
+      ("dir.ttf/inside.ttf", small),
+      ("text.ttf", b"this is not a font\n"),
+      ("empty.otf", b""),
+      ("three.ttf", b"\x00\x01\x00"),
+      ("zeros-small.ttf", zeros(5000)),
+      ("zeros-large.ttf", zeros(400000)),
+      ("noise-large.otf", noise),
+      ("woff-small.ttf", splice(small, 0, b"wOFF")),
+      ("woff-large.ttf", splice(large, 0, b"wOFF")),
+      ("true-large.ttf", splice(large, 0, b"true")),
+    ]),
+    content=(
+      #|small.ttf: 0
+      #|large.ttf: 0
+      #|cff.otf: 0
+      #|upper.TTF: 0
+      #|mixed.Ttf: -
+      #|other.ttx: -
+      #|text.txt: -
+      #|noext: -
+      #|.ttf: -
+      #|.hidden.otf: 0
+      #|sub/deeper/inside.OTF: 0
+      #|dir.ttf/inside.ttf: 0
+      #|text.ttf: -
+      #|empty.otf: -
+      #|three.ttf: -
+      #|zeros-small.ttf: -
+      #|zeros-large.ttf: -
+      #|noise-large.otf: -
+      #|woff-small.ttf: -
+      #|woff-large.ttf: -
+      #|true-large.ttf: 0
+    ),
+  )
+}
+
+///|
+test "scan: truncated files" {
+  let (small, large, otf) = test_fonts()
+  inspect(
+    scanned("truncated", [
+      ("header-small.ttf", small[:8].to_owned()),
+      ("directory-small.ttf", small[:100].to_owned()),
+      ("tables-small.ttf", small[:20000].to_owned()),
+      ("half-small.ttf", small[:small.length() / 2].to_owned()),
+      ("tail-small.ttf", small[:small.length() - 1000].to_owned()),
+      ("header-large.ttf", large[:8].to_owned() + zeros(300000)),
+      ("directory-large.ttf", large[:100].to_owned() + zeros(300000)),
+      ("tables-large.ttf", large[:300000].to_owned()),
+      ("tail-large.ttf", large[:large.length() - 1000].to_owned()),
+      ("last-byte-large.ttf", large[:large.length() - 1].to_owned()),
+      ("cff-large.otf", otf[:280000].to_owned()),
+    ]),
+    content=(
+      #|header-small.ttf: -
+      #|directory-small.ttf: -
+      #|tables-small.ttf: -
+      #|half-small.ttf: -
+      #|tail-small.ttf: 0
+      #|header-large.ttf: -
+      #|directory-large.ttf: -
+      #|tables-large.ttf: 0
+      #|tail-large.ttf: 0
+      #|last-byte-large.ttf: 0
+      #|cff-large.otf: 0
+    ),
+  )
+}
+
+///|
+test "scan: table records that point elsewhere" {
+  let (small, large, _) = test_fonts()
+  let files = []
+  for font in [("small", small), ("large", large)] {
+    let (size, data) = font
+    for tag in ["cmap", "name", "OS/2", "head", "post", "maxp", "hhea"] {
+      let record = record(data, tag)
+      let name = tag.replace(old="/", new="")
+      let end = data.length().reinterpret_as_uint()
+      files.push(
+        (
+          "past-end-\{name}-\{size}.ttf",
+          patch(data, record.at, end - 10, record.length),
+        ),
+      )
+      files.push(
+        (
+          "far-\{name}-\{size}.ttf",
+          patch(data, record.at, 0xFFFFFF00U, record.length),
+        ),
+      )
+      files.push(
+        (
+          "huge-\{name}-\{size}.ttf",
+          patch(data, record.at, record.offset, 0xFFFFFFFFU),
+        ),
+      )
+      files.push(
+        ("empty-\{name}-\{size}.ttf", patch(data, record.at, record.offset, 0)),
+      )
+      files.push(
+        ("short-\{name}-\{size}.ttf", patch(data, record.at, record.offset, 7)),
+      )
+      files.push(
+        ("start-\{name}-\{size}.ttf", patch(data, record.at, 0, record.length)),
+      )
+    }
+  }
+  inspect(
+    scanned("records", files),
+    content=(
+      #|past-end-cmap-small.ttf: 0
+      #|far-cmap-small.ttf: 0
+      #|huge-cmap-small.ttf: 0
+      #|empty-cmap-small.ttf: 0
+      #|short-cmap-small.ttf: 0
+      #|start-cmap-small.ttf: 0
+      #|past-end-name-small.ttf: -
+      #|far-name-small.ttf: -
+      #|huge-name-small.ttf: -
+      #|empty-name-small.ttf: -
+      #|short-name-small.ttf: -
+      #|start-name-small.ttf: -
+      #|past-end-OS2-small.ttf: 0
+      #|far-OS2-small.ttf: 0
+      #|huge-OS2-small.ttf: 0
+      #|empty-OS2-small.ttf: 0
+      #|short-OS2-small.ttf: 0
+      #|start-OS2-small.ttf: 0
+      #|past-end-head-small.ttf: -
+      #|far-head-small.ttf: -
+      #|huge-head-small.ttf: -
+      #|empty-head-small.ttf: -
+      #|short-head-small.ttf: -
+      #|start-head-small.ttf: -
+      #|past-end-post-small.ttf: 0
+      #|far-post-small.ttf: 0
+      #|huge-post-small.ttf: 0
+      #|empty-post-small.ttf: 0
+      #|short-post-small.ttf: 0
+      #|start-post-small.ttf: 0
+      #|past-end-maxp-small.ttf: -
+      #|far-maxp-small.ttf: -
+      #|huge-maxp-small.ttf: -
+      #|empty-maxp-small.ttf: -
+      #|short-maxp-small.ttf: 0
+      #|start-maxp-small.ttf: 0
+      #|past-end-hhea-small.ttf: -
+      #|far-hhea-small.ttf: -
+      #|huge-hhea-small.ttf: -
+      #|empty-hhea-small.ttf: -
+      #|short-hhea-small.ttf: -
+      #|start-hhea-small.ttf: 0
+      #|past-end-cmap-large.ttf: 0
+      #|far-cmap-large.ttf: 0
+      #|huge-cmap-large.ttf: 0
+      #|empty-cmap-large.ttf: 0
+      #|short-cmap-large.ttf: 0
+      #|start-cmap-large.ttf: 0
+      #|past-end-name-large.ttf: -
+      #|far-name-large.ttf: -
+      #|huge-name-large.ttf: -
+      #|empty-name-large.ttf: -
+      #|short-name-large.ttf: -
+      #|start-name-large.ttf: -
+      #|past-end-OS2-large.ttf: 0
+      #|far-OS2-large.ttf: 0
+      #|huge-OS2-large.ttf: 0
+      #|empty-OS2-large.ttf: 0
+      #|short-OS2-large.ttf: 0
+      #|start-OS2-large.ttf: 0
+      #|past-end-head-large.ttf: -
+      #|far-head-large.ttf: -
+      #|huge-head-large.ttf: -
+      #|empty-head-large.ttf: -
+      #|short-head-large.ttf: -
+      #|start-head-large.ttf: -
+      #|past-end-post-large.ttf: 0
+      #|far-post-large.ttf: 0
+      #|huge-post-large.ttf: 0
+      #|empty-post-large.ttf: 0
+      #|short-post-large.ttf: 0
+      #|start-post-large.ttf: 0
+      #|past-end-maxp-large.ttf: -
+      #|far-maxp-large.ttf: -
+      #|huge-maxp-large.ttf: -
+      #|empty-maxp-large.ttf: -
+      #|short-maxp-large.ttf: 0
+      #|start-maxp-large.ttf: 0
+      #|past-end-hhea-large.ttf: -
+      #|far-hhea-large.ttf: -
+      #|huge-hhea-large.ttf: -
+      #|empty-hhea-large.ttf: -
+      #|short-hhea-large.ttf: -
+      #|start-hhea-large.ttf: 0
+    ),
+  )
+}
+
+///|
+test "scan: table directories" {
+  let (small, large, _) = test_fonts()
+  let files = []
+  for font in [("small", small), ("large", large)] {
+    let (size, data) = font
+    let all = records(data, 0)
+    // Two records exchanged, all in reverse order, one twice.
+    let (a, b) = (all[2], all[5])
+    files.push(
+      (
+        "unsorted-\{size}.ttf",
+        splice(
+          splice(data, a.at, data[b.at:b.at + 16].to_owned()),
+          b.at,
+          data[a.at:a.at + 16].to_owned(),
+        ),
+      ),
+    )
+    let mut reversed = data
+    for i, record in all {
+      let other = all[all.length() - 1 - i]
+      reversed = splice(
+        reversed,
+        record.at,
+        data[other.at:other.at + 16].to_owned(),
+      )
+    }
+    files.push(("reversed-\{size}.ttf", reversed))
+    files.push(
+      (
+        "twice-\{size}.ttf",
+        splice(data, all[4].at, data[all[3].at:all[3].at + 16].to_owned()),
+      ),
+    )
+    // More tables than the file has room for, none.
+    files.push(("too-many-\{size}.ttf", splice(data, 4, u16(0xFFFF))))
+    files.push(("none-\{size}.ttf", splice(data, 4, u16(0))))
+    files.push(("fewer-\{size}.ttf", splice(data, 4, u16(all.length() - 3))))
+  }
+  inspect(
+    scanned("directories", files),
+    content=(
+      #|unsorted-small.ttf: 0
+      #|reversed-small.ttf: -
+      #|twice-small.ttf: 0
+      #|too-many-small.ttf: -
+      #|none-small.ttf: -
+      #|fewer-small.ttf: -
+      #|unsorted-large.ttf: 0
+      #|reversed-large.ttf: -
+      #|twice-large.ttf: 0
+      #|too-many-large.ttf: -
+      #|none-large.ttf: -
+      #|fewer-large.ttf: -
+    ),
+  )
+}
+
+///|
+test "scan: collections" {
+  let (small, large, otf) = test_fonts()
+  let two = ttc([small, large])
+  let first = be32(two, 12)
+  let second = be32(two, 16)
+  // Three faces that share all their tables, like the collections of a
+  // system; then one whose second face has a shorter `cmap` at the same
+  // place and whose third has a shorter `name`.
+  let mut shared = ttc([large, large, large])
+  let of_first = records(shared, be32(shared, 12).reinterpret_as_int())
+  for k in 1..<3 {
+    let base = be32(shared, 12 + 4 * k).reinterpret_as_int()
+    for i, record in records(shared, base) {
+      shared = patch(shared, record.at, of_first[i].offset, of_first[i].length)
+    }
+  }
+  let mut shorter = shared
+  for record in records(shorter, be32(shorter, 16).reinterpret_as_int()) {
+    if record.tag == "cmap" {
+      shorter = patch(shorter, record.at, record.offset, record.length - 4000)
+    }
+  }
+  for record in records(shorter, be32(shorter, 20).reinterpret_as_int()) {
+    if record.tag == "name" {
+      shorter = patch(shorter, record.at, record.offset, 30)
+    }
+  }
+  inspect(
+    scanned("collections", [
+      ("three.ttc", ttc([small, large, large])),
+      ("one-small.ttc", ttc([small])),
+      ("cff.otc", ttc([otf, otf])),
+      ("mixed.TTC", ttc([otf, large])),
+      ("shared.ttc", shared),
+      ("shared-shorter.ttc", shorter),
+      ("count-5.ttc", ttc([small, large], count=5)),
+      ("count-0.ttc", ttc([small, large], count=0)),
+      ("count-1.ttc", ttc([small, large], count=1)),
+      ("count-2-31.ttc", ttc([small, large], count=0x7FFFFFFFU)),
+      ("count-2-32.ttc", ttc([small, large], count=0xFFFFFFFFU)),
+      ("count-2-32-small.ttc", ttc([small], count=0xFFFFFFFFU)),
+      (
+        "second-past-end.ttc",
+        ttc([small, large], offsets=[
+          first,
+          two.length().reinterpret_as_uint() + 5,
+        ]),
+      ),
+      ("first-in-header.ttc", ttc([small, large], offsets=[4, second])),
+      ("both-second.ttc", ttc([small, large], offsets=[second, second])),
+      ("exchanged.ttc", ttc([small, large], offsets=[second, first])),
+      ("cut-in-second.ttc", two[:second.reinterpret_as_int() + 200].to_owned()),
+      ("cut-small.ttc", two[:5000].to_owned()),
+      ("header-only.otc", two[:12].to_owned()),
+      ("header-only-large.otc", two[:12].to_owned() + zeros(300000)),
+    ]),
+    content=(
+      #|three.ttc: 0 1 2
+      #|one-small.ttc: 0
+      #|cff.otc: 0 1
+      #|mixed.TTC: 0 1
+      #|shared.ttc: 0 1 2
+      #|shared-shorter.ttc: 0 1
+      #|count-5.ttc: 1
+      #|count-0.ttc: -
+      #|count-1.ttc: 0
+      #|count-2-31.ttc: -
+      #|count-2-32.ttc: -
+      #|count-2-32-small.ttc: -
+      #|second-past-end.ttc: 0
+      #|first-in-header.ttc: 1
+      #|both-second.ttc: 0 1
+      #|exchanged.ttc: 0 1
+      #|cut-in-second.ttc: 0
+      #|cut-small.ttc: -
+      #|header-only.otc: -
+      #|header-only-large.otc: -
+    ),
+  )
+}
+
+///|
+test "scan: character maps" {
+  let (_, large, _) = test_fonts()
+  let table = record(large, "cmap")
+  let offset = table.offset.reinterpret_as_int()
+  let length = table.length.reinterpret_as_int()
+  let cmap = large[offset:offset + length].to_owned()
+  // The font with another `cmap` of the same length.
+  let with_cmap = (new : Bytes) => splice(large, offset, new)
+  let count = be16(cmap, 2)
+  let files = [
+    ("zeros.ttf", with_cmap(zeros(length))),
+    ("ones.ttf", with_cmap(Bytes::make(length, b'\xff'))),
+    ("too-many-subtables.ttf", with_cmap(splice(cmap, 2, u16(0xFFFF)))),
+    ("no-subtables.ttf", with_cmap(splice(cmap, 2, u16(0)))),
+  ]
+  // All encoding records point to the first subtable, past the table, in
+  // reverse order.
+  let mut same = cmap
+  let mut past = cmap
+  let mut reversed = cmap
+  for k in 0..<count {
+    same = splice(same, 4 + 8 * k + 4, cmap[8:12].to_owned())
+    past = splice(past, 4 + 8 * k + 4, u32(table.length + 100))
+    let other = 4 + 8 * (count - 1 - k) + 4
+    reversed = splice(reversed, 4 + 8 * k + 4, cmap[other:other + 4].to_owned())
+  }
+  files.push(("same-subtable.ttf", with_cmap(same)))
+  files.push(("subtables-past-end.ttf", with_cmap(past)))
+  files.push(("subtables-reversed.ttf", with_cmap(reversed)))
+  let seen = []
+  for k in 0..<count {
+    let at = be32(cmap, 4 + 8 * k + 4).reinterpret_as_int()
+    if seen.contains(at) {
+      continue
+    }
+    seen.push(at)
+    let format = be16(cmap, at)
+    if format == 4 {
+      let segments = be16(cmap, at + 6) / 2
+      let ends = at + 14
+      let starts = ends + 2 * segments + 2
+      // Two segments exchanged, a start after its end, more segments than
+      // there are, the end mark first, a start of 0 after others.
+      files.push(
+        (
+          "format4-unsorted.ttf",
+          with_cmap(
+            splice(
+              splice(cmap, starts, cmap[starts + 2:starts + 4].to_owned()),
+              starts + 2,
+              cmap[starts:starts + 2].to_owned(),
+            ),
+          ),
+        ),
+      )
+      files.push(
+        ("format4-inverted.ttf", with_cmap(splice(cmap, starts, u16(0xFFFE)))),
+      )
+      files.push(
+        ("format4-count.ttf", with_cmap(splice(cmap, at + 6, u16(0xFFFE)))),
+      )
+      files.push(
+        ("format4-odd-count.ttf", with_cmap(splice(cmap, at + 6, u16(7)))),
+      )
+      files.push(
+        ("format4-count-1.ttf", with_cmap(splice(cmap, at + 6, u16(1)))),
+      )
+      files.push(
+        (
+          "format4-end-first.ttf",
+          with_cmap(
+            splice(splice(cmap, ends, u16(0xFFFF)), starts, u16(0xFFFF)),
+          ),
+        ),
+      )
+      files.push(
+        (
+          "format4-from-0.ttf",
+          with_cmap(
+            splice(splice(cmap, starts + 6, u16(0)), ends + 6, u16(0xFFFF)),
+          ),
+        ),
+      )
+    }
+    if format == 12 {
+      let groups = at + 16
+      // Two groups exchanged, a start after its end, more groups than there
+      // are, a group up to the last code, the same groups as format 13.
+      files.push(
+        (
+          "format12-unsorted.ttf",
+          with_cmap(
+            splice(
+              splice(cmap, groups, cmap[groups + 12:groups + 24].to_owned()),
+              groups + 12,
+              cmap[groups:groups + 12].to_owned(),
+            ),
+          ),
+        ),
+      )
+      files.push(
+        (
+          "format12-inverted.ttf",
+          with_cmap(splice(cmap, groups, u32(0x00100000U))),
+        ),
+      )
+      files.push(
+        (
+          "format12-count.ttf",
+          with_cmap(splice(cmap, at + 12, u32(0x0FFFFFFFU))),
+        ),
+      )
+      files.push(
+        ("format12-no-groups.ttf", with_cmap(splice(cmap, at + 12, u32(0)))),
+      )
+      files.push(
+        (
+          "format12-to-the-last.ttf",
+          with_cmap(splice(cmap, groups + 4, u32(0xFFFFFFFFU))),
+        ),
+      )
+      files.push(
+        (
+          "format12-from-0.ttf",
+          with_cmap(
+            splice(
+              splice(cmap, groups + 36, u32(0)),
+              groups + 40,
+              u32(0x10FFFFU),
+            ),
+          ),
+        ),
+      )
+      files.push(("format13.ttf", with_cmap(splice(cmap, at, u16(13)))))
+    }
+    files.push(("format-8-at-\{k}.ttf", with_cmap(splice(cmap, at, u16(8)))))
+    files.push(("format-99-at-\{k}.ttf", with_cmap(splice(cmap, at, u16(99)))))
+  }
+  inspect(
+    scanned("cmaps", files),
+    content=(
+      #|zeros.ttf: 0
+      #|ones.ttf: 0
+      #|too-many-subtables.ttf: 0
+      #|no-subtables.ttf: 0
+      #|same-subtable.ttf: 0
+      #|subtables-past-end.ttf: 0
+      #|subtables-reversed.ttf: 0
+      #|format4-unsorted.ttf: 0
+      #|format4-inverted.ttf: 0
+      #|format4-count.ttf: 0
+      #|format4-odd-count.ttf: 0
+      #|format4-count-1.ttf: 0
+      #|format4-end-first.ttf: 0
+      #|format4-from-0.ttf: 0
+      #|format-8-at-0.ttf: 0
+      #|format-99-at-0.ttf: 0
+      #|format12-unsorted.ttf: 0
+      #|format12-inverted.ttf: 0
+      #|format12-count.ttf: 0
+      #|format12-no-groups.ttf: 0
+      #|format12-to-the-last.ttf: 0
+      #|format12-from-0.ttf: 0
+      #|format13.ttf: 0
+      #|format-8-at-1.ttf: 0
+      #|format-99-at-1.ttf: 0
+      #|format-8-at-2.ttf: 0
+      #|format-99-at-2.ttf: 0
+    ),
+  )
+}

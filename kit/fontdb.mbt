@@ -118,7 +118,19 @@ fn FontDb::load_fonts_dir_impl(
 fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
   let file = FontFile::open(path) catch { _ => return }
   defer file.close()
-  let n = file.fonts_in_collection().unwrap_or(1U)
+  let n = match file.fonts_in_collection() {
+    Some(n) => {
+      // `RawFace::parse` reads the offsets of all faces before it looks
+      // for one, so no face parses if the file is too short for them.
+      // (Not in fontdb, which tries every index: a count of 2^32 - 1 is 12
+      // bytes of a file and minutes of failing parses.)
+      if n.to_int64() * 4L > file.size - 12L {
+        return
+      }
+      n
+    }
+    None => 1U
+  }
   for index in 0U..<n {
     guard file.probe_face(index) is Some((data, at)) else { continue }
     // `fontdb::parse_face_info`.
