@@ -151,14 +151,19 @@ impl FromData for NameRecord with fn size() {
 
 ///|
 impl FromData for NameRecord with fn parse(data) {
-  let s = Stream::new(data)
+  // The fields at their places instead of a `Stream` over them: a look for
+  // a name parses the records before it, and font discovery looks for six
+  // names in every face of the system.
+  if data.length() < 12 {
+    raise Malformed
+  }
   {
-    platform_id: s.read(),
-    encoding_id: s.read(),
-    language_id: s.read(),
-    name_id: s.read(),
-    length: s.read(),
-    offset: s.read(),
+    platform_id: FromData::parse(data),
+    encoding_id: be_u16(data, 2),
+    language_id: be_u16(data, 4),
+    name_id: be_u16(data, 6),
+    length: be_u16(data, 8),
+    offset: Offset16(be_u16(data, 10)),
   }
 }
 

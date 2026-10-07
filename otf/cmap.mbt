@@ -186,9 +186,10 @@ fn group_ranges(
   // Whole groups only, like `LazyArray32::len`.
   let n = data.length() / 12
   for i in 0..<n {
+    // Unchecked: `at + 7 < 12 * n <= data.length()`.
     let at = 12 * i
-    let start = be_u32_int(data, at)
-    let end = be_u32_int(data, at + 4)
+    let start = be_u32_unchecked(data, at)
+    let end = be_u32_unchecked(data, at + 4)
     if start <= end {
       f(start, end)
     }
@@ -196,13 +197,14 @@ fn group_ranges(
 }
 
 ///|
-/// `be_u32` with the conversions that are compiled in place.
+/// `be_u32` without bounds checks: the caller has `0 <= i` and
+/// `i + 3 < data.length()`.
 #inline
-fn be_u32_int(data : BytesView, i : Int) -> UInt {
-  ((data[i].to_int() << 24) |
-  (data[i + 1].to_int() << 16) |
-  (data[i + 2].to_int() << 8) |
-  data[i + 3].to_int()).reinterpret_as_uint()
+fn be_u32_unchecked(data : BytesView, i : Int) -> UInt {
+  ((data.unsafe_get(i).to_int() << 24) |
+  (data.unsafe_get(i + 1).to_int() << 16) |
+  (data.unsafe_get(i + 2).to_int() << 8) |
+  data.unsafe_get(i + 3).to_int()).reinterpret_as_uint()
 }
 
 ///|
