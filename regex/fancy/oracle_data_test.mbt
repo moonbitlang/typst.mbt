@@ -2,7 +2,9 @@
 // `fancy-regex` crate (0.16.2). Do not edit.
 
 ///|
-let oracle_cases_0 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_0 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "^(\\w+) (\\1)$",
     "",
@@ -5999,7 +6001,9 @@ let oracle_cases_0 : Array[(String, String, String, Array[(String, String)])] = 
 ]
 
 ///|
-let oracle_cases_1 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_1 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "\\s*(?<=[() ])(@\\w+)(\\([^)]*\\))?\\s*",
     "o",
@@ -10890,7 +10894,9 @@ let oracle_cases_1 : Array[(String, String, String, Array[(String, String)])] = 
 ]
 
 ///|
-let oracle_cases_2 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_2 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "\\G\\d*",
     "",
@@ -15824,7 +15830,9 @@ let oracle_cases_2 : Array[(String, String, String, Array[(String, String)])] = 
 ]
 
 ///|
-let oracle_cases_3 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_3 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "[\\x41-\\x5A]+",
     "o",
@@ -20418,7 +20426,9 @@ let oracle_cases_3 : Array[(String, String, String, Array[(String, String)])] = 
 ]
 
 ///|
-let oracle_cases_4 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_4 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "|a",
     "",
@@ -25588,7 +25598,9 @@ let oracle_cases_4 : Array[(String, String, String, Array[(String, String)])] = 
 ]
 
 ///|
-let oracle_cases_5 : Array[(String, String, String, Array[(String, String)])] = [
+let oracle_cases_5 : ReadOnlyArray[
+  (String, String, String, ReadOnlyArray[(String, String)]),
+] = [
   (
     "[a-z]",
     "om",
@@ -31367,8 +31379,12 @@ let oracle_cases_5 : Array[(String, String, String, Array[(String, String)])] = 
 
 ///|
 /// (pattern, builder flags, [(haystack, description)]); the build error
-/// is in place of the haystacks when building fails.
-let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [
-  ..oracle_cases_0, ..oracle_cases_1, ..oracle_cases_2, ..oracle_cases_3, ..oracle_cases_4,
-  ..oracle_cases_5,
+/// is in place of the haystacks when building fails. The tables are
+/// `ReadOnlyArray`s (static data): as `Array` literals the test's init
+/// function has more locals than a debug wasm module may have.
+let oracle_cases : ReadOnlyArray[
+  ReadOnlyArray[(String, String, String, ReadOnlyArray[(String, String)])],
+] = [
+  oracle_cases_0, oracle_cases_1, oracle_cases_2, oracle_cases_3, oracle_cases_4,
+  oracle_cases_5,
 ]
