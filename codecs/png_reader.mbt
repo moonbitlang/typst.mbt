@@ -541,6 +541,162 @@ fn png_paeth(a : Int, b : Int, c : Int) -> Int {
 }
 
 ///|
+/// The `Sub` filter of a row (upstream `unfilter` for `Sub`, with a loop
+/// per `BytesPerPixel`): for pixels of up to four bytes the pixel to the
+/// left is kept in variables, so that a byte does not wait for the store of
+/// the byte of the pixel before it. The caller has checked the range
+/// `current[cur..cur + len]`.
+fn png_unfilter_sub(
+  bpp : Int,
+  current : FixedArray[Byte],
+  cur : Int,
+  len : Int,
+) -> Unit {
+  match bpp {
+    1 => {
+      let mut a0 = 0
+      for i in 0..<len {
+        a0 = a0 + current.unsafe_get(cur + i).to_int()
+        current.unsafe_set(cur + i, a0.to_byte())
+      }
+    }
+    2 => {
+      let mut a0 = 0
+      let mut a1 = 0
+      let n = len - len % 2
+      for i = 0; i < n; i = i + 2 {
+        a0 = a0 + current.unsafe_get(cur + i).to_int()
+        a1 = a1 + current.unsafe_get(cur + i + 1).to_int()
+        current.unsafe_set(cur + i, a0.to_byte())
+        current.unsafe_set(cur + i + 1, a1.to_byte())
+      }
+    }
+    3 => {
+      let mut a0 = 0
+      let mut a1 = 0
+      let mut a2 = 0
+      let n = len - len % 3
+      for i = 0; i < n; i = i + 3 {
+        a0 = a0 + current.unsafe_get(cur + i).to_int()
+        a1 = a1 + current.unsafe_get(cur + i + 1).to_int()
+        a2 = a2 + current.unsafe_get(cur + i + 2).to_int()
+        current.unsafe_set(cur + i, a0.to_byte())
+        current.unsafe_set(cur + i + 1, a1.to_byte())
+        current.unsafe_set(cur + i + 2, a2.to_byte())
+      }
+    }
+    4 => {
+      let mut a0 = 0
+      let mut a1 = 0
+      let mut a2 = 0
+      let mut a3 = 0
+      let n = len - len % 4
+      for i = 0; i < n; i = i + 4 {
+        a0 = a0 + current.unsafe_get(cur + i).to_int()
+        a1 = a1 + current.unsafe_get(cur + i + 1).to_int()
+        a2 = a2 + current.unsafe_get(cur + i + 2).to_int()
+        a3 = a3 + current.unsafe_get(cur + i + 3).to_int()
+        current.unsafe_set(cur + i, a0.to_byte())
+        current.unsafe_set(cur + i + 1, a1.to_byte())
+        current.unsafe_set(cur + i + 2, a2.to_byte())
+        current.unsafe_set(cur + i + 3, a3.to_byte())
+      }
+    }
+    // Six and eight (samples of sixteen bits).
+    _ =>
+      for i in bpp..<len {
+        current.unsafe_set(
+          cur + i,
+          (current.unsafe_get(cur + i).to_int() +
+          current.unsafe_get(cur + i - bpp).to_int()).to_byte(),
+        )
+      }
+  }
+}
+
+///|
+/// The `Paeth` filter of a row of pixels of four bytes with a previous row
+/// (upstream `filter::paeth::unfilter` for `BytesPerPixel::Four`): the
+/// pixel to the left and the one above it are kept in variables, so that a
+/// byte does not wait for the store of the byte four before it. The caller
+/// has checked the ranges `current[cur..cur + len]` and `previous[prev..
+/// prev + len]`.
+fn png_unfilter_paeth4(
+  previous : FixedArray[Byte],
+  prev : Int,
+  current : FixedArray[Byte],
+  cur : Int,
+  len : Int,
+) -> Unit {
+  let mut a0 = 0
+  let mut a1 = 0
+  let mut a2 = 0
+  let mut a3 = 0
+  let mut c0 = 0
+  let mut c1 = 0
+  let mut c2 = 0
+  let mut c3 = 0
+  // `current_len & !3`
+  let n = len - len % 4
+  for i = 0; i < n; i = i + 4 {
+    let b0 = previous.unsafe_get(prev + i).to_int()
+    let b1 = previous.unsafe_get(prev + i + 1).to_int()
+    let b2 = previous.unsafe_get(prev + i + 2).to_int()
+    let b3 = previous.unsafe_get(prev + i + 3).to_int()
+    a0 = (current.unsafe_get(cur + i).to_int() + png_paeth(a0, b0, c0)) & 0xFF
+    a1 = (current.unsafe_get(cur + i + 1).to_int() + png_paeth(a1, b1, c1)) &
+      0xFF
+    a2 = (current.unsafe_get(cur + i + 2).to_int() + png_paeth(a2, b2, c2)) &
+      0xFF
+    a3 = (current.unsafe_get(cur + i + 3).to_int() + png_paeth(a3, b3, c3)) &
+      0xFF
+    current.unsafe_set(cur + i, a0.to_byte())
+    current.unsafe_set(cur + i + 1, a1.to_byte())
+    current.unsafe_set(cur + i + 2, a2.to_byte())
+    current.unsafe_set(cur + i + 3, a3.to_byte())
+    c0 = b0
+    c1 = b1
+    c2 = b2
+    c3 = b3
+  }
+}
+
+///|
+/// [png_unfilter_paeth4] for pixels of three bytes (`BytesPerPixel::Three`).
+fn png_unfilter_paeth3(
+  previous : FixedArray[Byte],
+  prev : Int,
+  current : FixedArray[Byte],
+  cur : Int,
+  len : Int,
+) -> Unit {
+  let mut a0 = 0
+  let mut a1 = 0
+  let mut a2 = 0
+  let mut c0 = 0
+  let mut c1 = 0
+  let mut c2 = 0
+  // `current_len / 3 * 3`
+  let n = len - len % 3
+  for i = 0; i < n; i = i + 3 {
+    let b0 = previous.unsafe_get(prev + i).to_int()
+    let b1 = previous.unsafe_get(prev + i + 1).to_int()
+    let b2 = previous.unsafe_get(prev + i + 2).to_int()
+    a0 = (current.unsafe_get(cur + i).to_int() + png_paeth(a0, b0, c0)) & 0xFF
+    a1 = (current.unsafe_get(cur + i + 1).to_int() + png_paeth(a1, b1, c1)) &
+      0xFF
+    a2 = (current.unsafe_get(cur + i + 2).to_int() + png_paeth(a2, b2, c2)) &
+      0xFF
+    current.unsafe_set(cur + i, a0.to_byte())
+    current.unsafe_set(cur + i + 1, a1.to_byte())
+    current.unsafe_set(cur + i + 2, a2.to_byte())
+    c0 = b0
+    c1 = b1
+    c2 = b2
+  }
+}
+
+///|
 /// Reverses the filter of a row in place (upstream `filter::unfilter`):
 /// `current[cur..cur + len]` with the previous row `previous[prev..prev +
 /// len]`, or without one if `!has_previous` (then it is treated as if it
@@ -567,14 +723,7 @@ fn png_unfilter(
     // NoFilter
     0 => ()
     // Sub (and `Paeth` without a previous row)
-    1 =>
-      for i in bpp..<len {
-        current.unsafe_set(
-          cur + i,
-          (current.unsafe_get(cur + i).to_int() +
-          current.unsafe_get(cur + i - bpp).to_int()).to_byte(),
-        )
-      }
+    1 => png_unfilter_sub(bpp, current, cur, len)
     // Up (`NoFilter` without a previous row)
     2 =>
       if has_previous {
@@ -619,33 +768,33 @@ fn png_unfilter(
     // Paeth
     _ =>
       if has_previous {
-        for i in 0..<@cmp.minimum(bpp, len) {
-          // `filter_paeth(0, b, 0)` is `b`.
-          current.unsafe_set(
-            cur + i,
-            (current.unsafe_get(cur + i).to_int() +
-            previous.unsafe_get(prev + i).to_int()).to_byte(),
-          )
-        }
-        for i in bpp..<len {
-          current.unsafe_set(
-            cur + i,
-            (current.unsafe_get(cur + i).to_int() +
-            png_paeth(
-              current.unsafe_get(cur + i - bpp).to_int(),
-              previous.unsafe_get(prev + i).to_int(),
-              previous.unsafe_get(prev + i - bpp).to_int(),
-            )).to_byte(),
-          )
+        if bpp == 4 {
+          png_unfilter_paeth4(previous, prev, current, cur, len)
+        } else if bpp == 3 {
+          png_unfilter_paeth3(previous, prev, current, cur, len)
+        } else {
+          for i in 0..<@cmp.minimum(bpp, len) {
+            // `filter_paeth(0, b, 0)` is `b`.
+            current.unsafe_set(
+              cur + i,
+              (current.unsafe_get(cur + i).to_int() +
+              previous.unsafe_get(prev + i).to_int()).to_byte(),
+            )
+          }
+          for i in bpp..<len {
+            current.unsafe_set(
+              cur + i,
+              (current.unsafe_get(cur + i).to_int() +
+              png_paeth(
+                current.unsafe_get(cur + i - bpp).to_int(),
+                previous.unsafe_get(prev + i).to_int(),
+                previous.unsafe_get(prev + i - bpp).to_int(),
+              )).to_byte(),
+            )
+          }
         }
       } else {
-        for i in bpp..<len {
-          current.unsafe_set(
-            cur + i,
-            (current.unsafe_get(cur + i).to_int() +
-            current.unsafe_get(cur + i - bpp).to_int()).to_byte(),
-          )
-        }
+        png_unfilter_sub(bpp, current, cur, len)
       }
   }
 }
