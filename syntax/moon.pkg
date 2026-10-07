@@ -9,3 +9,9 @@ import {
   "moonbitlang/core/hashset",
   "moonbitlang/core/debug",
 }
+
+// The documents of `persistent_property_test.mbt`.
+
+import {
+  "moonbitlang/x/fs",
+} for "test"
