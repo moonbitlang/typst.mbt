@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+name: Tally
+file_extensions: [tally]
+scope: source.tally
+contexts:
+  main:
+    - match: \b[0-9]+\b
+      scope: constant.numeric.tally
+    - match: \b(count|sum)\b
+      scope: keyword.control.tally
