@@ -289,7 +289,9 @@ let eval_memo : EvalMemos = { epoch: 0, entries: Map([]), }
 /// made of what the evaluation read from the world: the files it imported
 /// and loaded. Those are fixed during a compilation (`World`'s contract)
 /// and may be different in the next one with the same world (`typst
-/// watch`), so the entries of earlier compilations are dropped. (Upstream:
+/// watch`), so the entries of earlier compilations are dropped; outside of
+/// a compilation, those of earlier evaluations (`eval_source` with the root
+/// route; an evaluated string belongs to what came before it). (Upstream:
 /// comemo validates the world accesses of a memoized `eval` and thereby
 /// repeats them, which is also what makes these files dependencies of the
 /// later compilation.)

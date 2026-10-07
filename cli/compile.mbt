@@ -334,7 +334,9 @@ fn compile_once(
   match warned.output {
     // Print success message and possibly warnings.
     Ok(_) => {
-      let duration = @platform.monotonic_nanos() - start
+      // (Not negative: the clock of the wasm targets is the wall clock.)
+      let elapsed = @platform.monotonic_nanos() - start
+      let duration = if elapsed < 0L { 0L } else { elapsed }
       if config.watching {
         if warnings.is_empty() {
           Status::Success(duration).print(config)

@@ -81,3 +81,39 @@ test "a file is evaluated once in a compilation" {
   inspect(evaluated_text(world), content="true")
   inspect(evaluated_text(world), content="true")
 }
+
+///|
+/// The text a world's main file evaluates to, without a compilation.
+fn evaluated_directly(world : TestWorld) -> String {
+  try
+    @eval.eval_source(
+      world,
+      world.library,
+      @library.Traced::new(),
+      @library.Sink::new(),
+      @library.Route::root(),
+      world.main,
+    )
+  catch {
+    @library.SourceError(errors) =>
+      "error: " + errors.map(e => e.message).join(" | ")
+  } noraise {
+    module_ => module_.content().plain_text()
+  }
+}
+
+///|
+test "an evaluation outside of a compilation sees the files as they are then" {
+  let world = test_world("#import \"a.typ\": a\n#a", files=[
+    ("a.typ", "#import \"b.typ\": b\n#let a = [a sees #b]\n"),
+    ("b.typ", "#let b = [one]\n"),
+  ])
+  inspect(evaluated_directly(world), content="a sees one")
+  edit_file(world, "b.typ", "#let b = [two]\n")
+  inspect(evaluated_directly(world), content="a sees two")
+  // A compilation, and an evaluation after it.
+  edit_file(world, "b.typ", "#let b = [three]\n")
+  inspect(evaluated_text(world), content="a sees three")
+  edit_file(world, "b.typ", "#let b = [four]\n")
+  inspect(evaluated_directly(world), content="a sees four")
+}

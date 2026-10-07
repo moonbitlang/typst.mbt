@@ -100,9 +100,7 @@ async fn watching(
     compile_once(world, config)
 
     // Evict the cache.
-    //
-    // (Upstream's `comemo::evict(10)`. There is nothing to evict: this
-    // port's memoization lives for one compilation, `library/memo.mbt`.)
+    @library.evict(10)
   }
 }
 
