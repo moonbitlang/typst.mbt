@@ -3,7 +3,9 @@
 // article with the EDSL. The text is in the public domain; it follows the
 // transcription at https://ramanujan.sirinudi.org/Volumes/published/ram06.html
 //
-// Usage (from the repository root):
+// Usage (from the repository root; the directory must exist, and
+// `../README.md` has the rest: rights, the checker of the formulas):
+//   mkdir -p _build/papers
 //   moon run doc/examples/papers/ramanujan-1914 --target native
 //   moon run doc/examples/papers/ramanujan-1914 --target native -- --check
 // The first writes _build/papers/ramanujan-1914.pdf and one PNG per page.

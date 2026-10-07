@@ -1,9 +1,11 @@
 // Ada Lovelace's Notes A, F and G to Menabrea's "Sketch of the Analytical
 // Engine" (Scientific Memoirs, vol. 3, 1843), set with the EDSL.
 //
-// Usage (from the repository root):
+// Usage (from the repository root; the directory must exist):
+//   mkdir -p _build/papers
 //   moon run doc/examples/papers/lovelace-1843 --target native
-// writes `_build/papers/lovelace-1843.pdf` and one PNG per page.
+// writes `_build/papers/lovelace-1843.pdf` and one PNG per page. Source,
+// rights and what is left out: `../README.md` and the colophon.
 
 ///|
 fn run() -> Unit raise {
