@@ -202,7 +202,13 @@
   after `moon fmt`) run `python3 scripts/edsl_guide_check.py`.
   `doc/ports_findings_test.mbt` pins what happens today for every finding
   of the ports document (S1..S6, T1..T11): a step of that proposal that
-  changes one changes its test.
+  changes one changes its test. `doc/examples/papers` holds three papers
+  (Lovelace 1843, Einstein 1916 in Bose's translation without its
+  footnotes, Ramanujan 1914; the README there has sources, rights and
+  what is omitted: change no text without reading it), each an executable
+  with a `paper_wbtest.mbt` that it compiles without a lint; they are the
+  before-state of section 14 of the ports document, so do not rewrite
+  them to `Para` or the kit.
 - EDSL lints (`doc/lint.mbt`; `docs/edsl-ports.md`, section 6):
   `CompileReport::lints`, on by default, `lints=false` on `compile*`
   turns them off; they are not the engine's `warnings`. L1 (adjacent

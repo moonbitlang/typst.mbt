@@ -1732,9 +1732,23 @@ of Note G; 22 pages, about 290 formulas and 420 formula cells), Einstein's
 translation of 1920; 39 pages, 684 formulas, 101 of them numbered), and
 Ramanujan's "Modular equations and approximations to π" (1914; 14 pages in
 two columns, 355 formulas). None needed embedded Typst source. The texts
-came from web transcriptions and were not checked against scans; only the
-Lovelace port is committed-quality as to rights (public domain worldwide),
-and the three packages stay outside the repository until that is decided.
+came from web transcriptions and were not checked against scans.
+
+The three packages are in the repository as examples,
+`doc/examples/papers/<paper>` (decided after this addendum was written;
+`doc/examples/papers/README.md` has sources, rights, what is omitted and
+the known errors). The numbers above and the findings below are those of
+the ports as they were built. What was committed differs in one paper:
+the Einstein port has none of the transcription's sixteen footnotes (some
+are translations by Wikisource's contributors, licensed CC BY-SA, and the
+port cannot tell them from Bose's), so it has 38 pages and 669 formulas,
+and one label of its diagram was moved into its block (the only lint of
+the three papers on the `main` they were committed to). Lovelace's Notes
+and Ramanujan's paper are in the public domain; Bose's translation of
+1920 is in the United States and where the term is the author's life plus
+50 years, and is not where it is longer (the README says where). The
+packages are the before-state for the work of 14.4: they are not rewritten
+to `Para` or the kit.
 
 Mathematics is Typst math syntax in a string (`Equation(src, ..)`): the EDSL
 adds nothing to the formula itself. What the ports show is what surrounds
