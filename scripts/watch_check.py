@@ -763,7 +763,9 @@ def scenario_pages(r):
         for i in (1, 2, 3):
             times[i] = os.stat(os.path.join(r.dir, f"page-{i}.svg")).st_mtime_ns
         time.sleep(0.05)
-        write(main, text % "b")
+        # (Replaced, not written in place: a compilation of the file while
+        # it is empty would write other pages.)
+        replace(main, text % "b")
 
     r.step("the second page changes", remember)
     for i in (1, 2, 3):
@@ -776,7 +778,7 @@ def scenario_pages(r):
 
     def remove_page():
         os.remove(os.path.join(r.dir, "page-3.svg"))
-        write(main, text % "c")
+        replace(main, text % "c")
 
     r.step("an unchanged page whose file is gone is written again", remove_page)
 
