@@ -762,7 +762,11 @@ fn light_ray_figure() -> Align {
         at(146, 34, Text("Light-ray", size=Pt(8.5), style="italic")),
       ]),
       width=Pt(220),
-      height=Pt(128),
+      // The label of the axis of x_2 stands above the origin of the
+      // coordinates (at -4): 4pt of room for it at the top, or it leaves
+      // the block.
+      height=Pt(132),
+      inset=Sides(top=Pt(4)),
       breakable=false,
       above=Em(1.2),
       below=Em(1.2),
