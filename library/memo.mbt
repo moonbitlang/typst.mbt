@@ -101,6 +101,14 @@ pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
 }
 
 ///|
+/// The number of compilations that were started ([compilation_epoch]).
+let compilation_counter : Ref[Int] = { val: 0, }
+
+///|
+/// The number of compilations in progress (one inside the other).
+let compilation_depth : Ref[Int] = { val: 0, }
+
+///|
 /// Run `f` (a compilation) with fresh memoization caches.
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
@@ -108,14 +116,79 @@ pub fn[T] with_layout_memo(
   let outer = memo_generation.val
   memo_counter.val += 1
   memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
+  if compilation_depth.val == 0 {
+    compilation_counter.val += 1
+  }
+  compilation_depth.val += 1
   let result = {
     errdefer {
       memo_generation.val = outer
+      compilation_depth.val -= 1
     }
     f()
   }
   memo_generation.val = outer
+  compilation_depth.val -= 1
   result
+}
+
+///|
+/// A number that changes whenever a compilation starts (not one inside
+/// another), with memoization on or off: unlike [memo_compilation] it is
+/// never zero in a compilation, and it keeps its value after one.
+///
+/// For results that must be shared within a compilation and are only valid
+/// while the world's files are what they were: a world may change its files
+/// between two compilations (`typst watch`; comemo checks what a memoized
+/// call read from the world before it reuses a result).
+pub fn compilation_epoch() -> Int {
+  compilation_counter.val
+}
+
+///|
+/// Notes that a source file is evaluated on its own, not as the import of
+/// another evaluation (`route` is the root): outside of a compilation this
+/// starts a new [compilation_epoch], since nothing says that the world's
+/// files are what they were for the evaluation before.
+pub fn note_evaluation(route : Route) -> Unit {
+  if compilation_depth.val == 0 && route.outer is None && route.id is None {
+    compilation_counter.val += 1
+  }
+}
+
+///|
+/// The number of [evict] calls since the caches were dropped.
+let evictions : Ref[Int] = { val: 0, }
+
+///|
+/// Evict the caches (upstream `comemo::evict(max_age)`, which drops the
+/// memoized results that were not used for `max_age` evictions; a watching
+/// compiler calls it after every compilation).
+///
+/// Memoized calls end with their compilation here. What outlives it is
+/// data decoded from bytes, found again by its content: syntaxes and
+/// themes of `raw`, bibliographies and CSL styles, PDF documents, plugins
+/// and the results of their calls. A process that compiles a world whose
+/// files change would keep every version of them. They have no age, so
+/// they are dropped as a whole on every `max_age`-th call instead (decoding
+/// them again is all it costs). Must not be called during a compilation.
+pub fn evict(max_age : Int) -> Unit {
+  evictions.val += 1
+  if evictions.val < max_age {
+    return
+  }
+  evictions.val = 0
+  raw_syntax_cache.clear()
+  raw_syntaxes_derived.clear()
+  raw_theme_cache.clear()
+  raw_theme_derived.clear()
+  bibliography_cache.clear()
+  csl_style_cache.clear()
+  works_cache.val = None
+  pdf_document_cache.clear()
+  plugin_call_cache.clear()
+  plugin_transition_cache.clear()
+  plugin_module_cache.clear()
 }
 
 ///|

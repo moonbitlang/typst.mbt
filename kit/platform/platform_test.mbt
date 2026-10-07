@@ -71,3 +71,47 @@ test "file errors" {
     content="InvalidInput: file name contained an unexpected NUL byte",
   )
 }
+
+///|
+test "os errors" {
+  inspect(
+    @platform.os_error(2),
+    content="No such file or directory (os error 2)",
+  )
+  inspect(@platform.os_error(24), content="Too many open files (os error 24)")
+  @debug.debug_inspect(@platform.os_error(2).kind(), content="NotFound")
+}
+
+///|
+test "monotonic clock" {
+  let start = @platform.monotonic_nanos()
+  let mut sum = 0
+  for i in 0..<100000 {
+    sum += i
+  }
+  inspect(sum > 0 && @platform.monotonic_nanos() >= start, content="true")
+}
+
+///|
+test "is_same_file" {
+  // The directory of the tests is the module's or the package's.
+  let dir = if @platform.exists("kit/platform") { "kit/platform" } else { "." }
+  let file = @platform.join(dir, "moon.pkg")
+  inspect(@platform.is_same_file(file, file), content="true")
+  inspect(
+    @platform.is_same_file(file, @platform.join(dir, "./moon.pkg")),
+    content="true",
+  )
+  inspect(
+    @platform.is_same_file(file, @platform.join(dir, "platform.mbt")),
+    content="false",
+  )
+  let missing = try
+    @platform.is_same_file(file, @platform.join(dir, "no-such-file"))
+  catch {
+    err => err.kind() == NotFound
+  } noraise {
+    _ => false
+  }
+  inspect(missing, content="true")
+}

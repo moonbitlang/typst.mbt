@@ -269,8 +269,47 @@ priv struct EvalMemo {
 }
 
 ///|
+/// The memoized file evaluations of a compilation.
+priv struct EvalMemos {
+  /// The compilation the entries belong to
+  /// ([@library.compilation_epoch]).
+  mut epoch : Int
+  /// The evaluations by file id.
+  entries : Map[@syntax.FileId, Array[EvalMemo]]
+}
+
+///|
 /// Memoized file evaluations by file id.
-let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = Map([])
+let eval_memo : EvalMemos = { epoch: 0, entries: Map([]), }
+
+///|
+/// The memoized evaluations of a file in the current compilation.
+///
+/// An entry is found again by the text of its file, but its module is also
+/// made of what the evaluation read from the world: the files it imported
+/// and loaded. Those are fixed during a compilation (`World`'s contract)
+/// and may be different in the next one with the same world (`typst
+/// watch`), so the entries of earlier compilations are dropped; outside of
+/// a compilation, those of earlier evaluations (`eval_source` with the root
+/// route; an evaluated string belongs to what came before it). (Upstream:
+/// comemo validates the world accesses of a memoized `eval` and thereby
+/// repeats them, which is also what makes these files dependencies of the
+/// later compilation.)
+fn EvalMemos::of(self : EvalMemos, id : @syntax.FileId) -> Array[EvalMemo] {
+  let epoch = @library.compilation_epoch()
+  if self.epoch != epoch {
+    self.entries.clear()
+    self.epoch = epoch
+  }
+  match self.entries.get(id) {
+    Some(entries) => entries
+    None => {
+      let entries = []
+      self.entries[id] = entries
+      entries
+    }
+  }
+}
 
 ///|
 /// Evaluate a source file like `eval_source`, but return the same module for
@@ -281,20 +320,14 @@ let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = Map([])
 /// mirrors that: the result and the sink effects (warnings, ...) are cached
 /// and replayed for the same world, library and source text, and for a
 /// route and a traced span that give the answers the evaluation got (the
-/// file ids it asked the route for, the files whose code ran in it).
+/// file ids it asked the route for, the files whose code ran in it), within
+/// one compilation ([EvalMemos::of]).
 fn eval_source_memoized(
   engine : @library.Engine,
   source : @syntax.Source,
 ) -> @library.Module raise @library.SourceError {
   let id = source.id()
-  let entries = match eval_memo.get(id) {
-    Some(entries) => entries
-    None => {
-      let entries = []
-      eval_memo[id] = entries
-      entries
-    }
-  }
+  let entries = eval_memo.of(id)
   for memo in entries {
     if physical_equal(memo.world, engine.world) &&
       physical_equal(memo.library, engine.library) &&

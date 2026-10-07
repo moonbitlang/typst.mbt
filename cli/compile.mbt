@@ -16,7 +16,7 @@ fn bail(message : String) -> HintedFailure {
 ///|
 /// Execute a compilation command.
 fn compile(args : CompileArgs) -> Unit raise HintedFailure {
-  let config = CompileConfig::new(args, false)
+  let config = CompileConfig::new(args)
   let world = SystemWorld::new(Some(args.input), args.world, args.process) catch {
     err => raise bail("\{err}")
   }
@@ -25,15 +25,13 @@ fn compile(args : CompileArgs) -> Unit raise HintedFailure {
 
 ///|
 /// A preprocessed `CompileCommand`.
-// `watching` and `input` are only read in watch mode upstream
-// (compile.rs:293, :308, :326, :589; watch.rs:64, :123), which this build
-// does not support.
-#warnings("-unused_field")
 priv struct CompileConfig {
   /// Static warnings to emit after compilation.
   warnings : Array[@library.HintedString]
   /// Whether we are watching.
   watching : Bool
+  /// Whether to clear the terminal on recompilation (only while watching).
+  fullscreen : Bool
   /// Path to input Typst file or stdin.
   input : Input
   /// Path to output file (PDF, PNG, SVG, or HTML).
@@ -62,6 +60,9 @@ priv struct CompileConfig {
   deps_format : DepsFormat
   /// The PPI (pixels per inch) to use for PNG export.
   ppi : Double?
+  /// The export cache for images, used for caching output files in `typst
+  /// watch` sessions with images.
+  export_cache : ExportCache
 }
 
 ///|
@@ -105,9 +106,27 @@ fn trim_trailing_slashes(path : String) -> String {
 
 ///|
 /// Preprocess a `CompileCommand`, producing a compilation config.
-fn CompileConfig::new(
+fn CompileConfig::new(args : CompileArgs) -> CompileConfig raise HintedFailure {
+  CompileConfig::new_impl(args, None)
+}
+
+///|
+/// Preprocess a `WatchCommand`, producing a compilation config.
+// Only `watch` calls it (watch.rs:21), which not every target has
+// (`watch_unsupported.mbt`).
+#warnings("-unused_value")
+fn CompileConfig::watching(
+  command : WatchCommand,
+) -> CompileConfig raise HintedFailure {
+  CompileConfig::new_impl(command.args, Some(command))
+}
+
+///|
+/// The shared implementation of [`CompileConfig::new`] and
+/// [`CompileConfig::watching`].
+fn CompileConfig::new_impl(
   args : CompileArgs,
-  watching : Bool,
+  watch : WatchCommand?,
 ) -> CompileConfig raise HintedFailure {
   let warnings = []
   let input = args.input
@@ -216,6 +235,10 @@ fn CompileConfig::new(
       },
     )
   }
+  let fullscreen = match watch {
+    Some(command) => !command.no_fullscreen
+    None => true
+  }
   let mut deps = args.deps
   let mut deps_format = args.deps_format
   if args.make_deps is Some(path) && deps is None {
@@ -227,14 +250,24 @@ fn CompileConfig::new(
       ),
     )
   }
-  match (output, deps, watching) {
-    (Stdout, _, true) =>
+  match (output, deps, watch) {
+    (Stdout, _, Some(_)) =>
       raise bail("cannot write document to stdout in watch mode")
-    (_, Some(Stdout), true) =>
+    (_, Some(Stdout), Some(_)) =>
       raise bail("cannot write dependencies to stdout in watch mode")
     (Stdout, Some(Stdout), _) =>
       raise bail("cannot write both output and dependencies to stdout")
     _ => ()
+  }
+  // Not ported: upstream serves the HTML or the bundle over HTTP while
+  // watching (compile.rs:217, its `http-server` feature; the server is
+  // created before the checks above).
+  if watch is Some(command) &&
+    !command.server.no_serve &&
+    output_format is (Html | Bundle) {
+    raise bail(
+      "the built-in HTTP server for HTML export is not supported by this build; pass `--no-serve`",
+    )
   }
   let creation_timestamp = match args.world.creation_timestamp {
     Some(time) =>
@@ -260,7 +293,7 @@ fn CompileConfig::new(
   }
   {
     warnings,
-    watching,
+    watching: watch is Some(_),
     input,
     output,
     output_format,
@@ -272,17 +305,25 @@ fn CompileConfig::new(
     ppi: args.ppi,
     diagnostic_format: args.process.diagnostic_format,
     open: args.open,
+    export_cache: ExportCache::new(),
     deps,
     deps_format,
+    fullscreen,
   }
 }
 
 ///|
 /// Compile a single time.
+///
+/// Returns whether it compiled without errors.
 fn compile_once(
   world : SystemWorld,
   config : CompileConfig,
 ) -> Unit raise HintedFailure {
+  let start = @platform.monotonic_nanos()
+  if config.watching {
+    Status::Compiling.print(config)
+  }
   let warned = compile_and_export(world, config)
   let warnings : Array[@library.SourceDiagnostic] = warned.warnings.copy()
 
@@ -293,6 +334,16 @@ fn compile_once(
   match warned.output {
     // Print success message and possibly warnings.
     Ok(_) => {
+      // (Not negative: the clock of the wasm targets is the wall clock.)
+      let elapsed = @platform.monotonic_nanos() - start
+      let duration = if elapsed < 0L { 0L } else { elapsed }
+      if config.watching {
+        if warnings.is_empty() {
+          Status::Success(duration).print(config)
+        } else {
+          Status::PartialSuccess(duration).print(config)
+        }
+      }
       print_diagnostics(world, [], warnings, config.diagnostic_format) catch {
         err => raise bail("failed to print diagnostics (\{err})")
       }
@@ -302,6 +353,9 @@ fn compile_once(
     // Print failure message and diagnostics.
     Err(errors) => {
       set_failed()
+      if config.watching {
+        Status::Error.print(config)
+      }
       print_diagnostics(world, errors, warnings, config.diagnostic_format) catch {
         err => raise bail("failed to print diagnostics (\{err})")
       }
@@ -614,14 +668,24 @@ fn export_image_pages(
     let (i, page) = entry
     // Use output with converted path.
     let output = match config.output {
-      Path(path) =>
-        Output::Path(
-          if can_handle_multiple {
-            format_template(path, i + 1, pages.length())
-          } else {
-            path
-          },
-        )
+      Path(path) => {
+        let path = if can_handle_multiple {
+          format_template(path, i + 1, pages.length())
+        } else {
+          path
+        }
+
+        // If we are not watching, don't use the cache.
+        // If the frame is in the cache, skip it.
+        // If the file does not exist, always create it.
+        if config.watching &&
+          config.export_cache.is_cached(i, page) &&
+          @platform.exists(path) {
+          outputs.push(Output::Path(path))
+          continue
+        }
+        Output::Path(path)
+      }
       Stdout => Stdout
     }
     export_image_page(page, output)
@@ -730,6 +794,43 @@ fn svg_options(config : CompileConfig) -> @svg.SvgOptions {
 /// Creates options for PNG export.
 fn png_options(config : CompileConfig) -> @render.RenderOptions {
   { render_bleed: false, format: { ppi: config.ppi, }, }
+}
+
+///|
+/// Caches exported files so that we can avoid re-exporting them if they
+/// haven't changed.
+///
+/// This is done by having a list of size `files.len()` that contains the
+/// hashes of the last rendered frame in each file. If a new frame is
+/// inserted, this will invalidate the rest of the cache, this is deliberate
+/// as to decrease the complexity and memory usage of such a cache.
+priv struct ExportCache {
+  /// The hashes of last compilation's frames.
+  cache : Array[@library.U128]
+}
+
+///|
+/// Creates a new export cache.
+fn ExportCache::new() -> ExportCache {
+  { cache: Array(capacity=32), }
+}
+
+///|
+/// Returns true if the entry is cached and appends the new hash to the
+/// cache (for the next compilation).
+fn ExportCache::is_cached(
+  self : ExportCache,
+  i : Int,
+  page : @layout.Page,
+) -> Bool {
+  let hash = @library.hash128(page)
+  if i >= self.cache.length() {
+    self.cache.push(hash)
+    return false
+  }
+  let cached = self.cache[i]
+  self.cache[i] = hash
+  cached == hash
 }
 
 ///|

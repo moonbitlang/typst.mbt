@@ -33,17 +33,20 @@ moon run cli --target wasm-gc -- compile input.typ 'page-{p}.svg'
 moon run cli --target native -- compile --format html --features html in.typ
 moon run cli --target native -- eval 'query(heading).len()' --in input.typ
 moon run cli --target native -- fonts --variants
+moon run cli --target native --release -- watch input.typ output.pdf
 ```
 
 Supported: `compile`/`c` (PDF, PNG, SVG, HTML, bundle; `--root`, `--input`,
 `--font-path`, `--ignore-system-fonts`, `--ignore-embedded-fonts`,
 `--pages`, `--ppi`, `--pretty`, `--pdf-standard`, `--pdf-tagged`,
 `--creation-timestamp`/`SOURCE_DATE_EPOCH`, `--features`, `--deps`,
-`--diagnostic-format`, `-` for stdin/stdout), `eval`, `query`, `fonts`,
+`--diagnostic-format`, `-` for stdin/stdout), `watch`/`w` (native and wasm;
+`--no-fullscreen`), `eval`, `query`, `fonts`,
 `info`, `init` (templates from local package directories) and the
 environment variables of upstream. Packages are served from the package
 data (`@local`, …) and cache directories; downloading packages from Typst
-Universe, `watch`, `update`, `completions`, `--open` and `--timings` are
+Universe, `update`, `completions`, `--open`, `--timings` and the HTTP
+server of `watch` for HTML export (pass `--no-serve`) are
 not supported; `--jobs` is accepted for compatibility and has no effect
 (compilation is single-threaded). The embedded fonts are those of upstream
 (Libertinus Serif,
@@ -51,6 +54,22 @@ New Computer Modern, DejaVu Sans Mono). On wasm, system font discovery
 reads every font file through moonrun's host API (slow; use
 `--ignore-system-fonts`), symlinks cannot be detected, the local time zone
 is UTC and only text can be written to stdout.
+
+`watch` recompiles when a file that the last compilation read changes
+(sources, imported and included files, data files, images, package files),
+is replaced, removed or created, like upstream's, and prints the same
+status. Every recompilation starts from scratch (upstream reuses the
+results of the previous one). It watches files through
+[`moonbitlang/async`](https://github.com/moonbitlang/async), which only
+the CLI links: the wasm-gc build has no file system events and reports
+that `watch` is not supported. On macOS a watched file is an open file
+(kqueue): the native build raises its limit of open files to the hard
+limit, the wasm build runs with the limit of the shell (`ulimit -n`). On
+Linux every directory with watched files takes an inotify instance
+(`fs.inotify.max_user_instances`). The directory of a watched file must be
+readable. The wasm build cannot tell a symbolic link: it does not notice
+when the file that a link points to is replaced (written in place, it
+does).
 
 ## Documents as MoonBit code (experimental)
 

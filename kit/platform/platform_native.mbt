@@ -68,8 +68,9 @@ fn c_path(path : String) -> Bytes raise IoError {
 }
 
 ///|
-/// The `io::Error` for an OS error number.
-fn os_error(code : Int) -> IoError {
+/// The `io::Error` for an OS error number
+/// (`io::Error::from_raw_os_error`).
+pub fn os_error(code : Int) -> IoError {
   let message = @utf8.decode_lossy(ffi_strerror(code))
   IoError(kind_of_errno(code), "\{message} (os error \{code})")
 }
@@ -274,6 +275,45 @@ pub fn local_offset(timestamp : Int64) -> Int {
 /// Whether the local time zone is known (otherwise, UTC is assumed).
 pub fn knows_local_time_zone() -> Bool {
   true
+}
+
+///|
+#borrow(path1, path2)
+extern "C" fn ffi_same_file(path1 : Bytes, path2 : Bytes) -> Int = "typst_platform_same_file"
+
+///|
+/// Whether two paths refer to the same file: to the same device and inode
+/// (the `same-file` crate's `is_same_file`), so also through symlinks and
+/// hard links. An error if one of them cannot be opened.
+pub fn is_same_file(path1 : String, path2 : String) -> Bool raise IoError {
+  match ffi_same_file(c_path(path1), c_path(path2)) {
+    1 => true
+    0 => false
+    // (Windows: the canonical paths are compared.)
+    -2 => canonicalize(path1) == canonicalize(path2)
+    _ => raise os_error(ffi_last_error())
+  }
+}
+
+///|
+extern "C" fn ffi_monotonic_nanos() -> Int64 = "typst_platform_monotonic_nanos"
+
+///|
+/// A monotonic clock in nanoseconds, for measuring durations (Rust's
+/// `Instant`).
+pub fn monotonic_nanos() -> Int64 {
+  ffi_monotonic_nanos()
+}
+
+///|
+extern "C" fn ffi_raise_fd_limit() = "typst_platform_raise_fd_limit"
+
+///|
+/// Raises the soft limit of open file descriptors to the hard limit, for
+/// programs that keep many files open (watching: kqueue needs a descriptor
+/// per watched file, and the default soft limit of macOS is 256).
+pub fn raise_fd_limit() -> Unit {
+  ffi_raise_fd_limit()
 }
 
 ///|

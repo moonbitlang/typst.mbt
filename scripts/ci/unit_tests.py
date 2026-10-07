@@ -248,7 +248,8 @@ def run(args):
             md += ["", "```"] + detail + ["```"]
         for p in problems:
             print(f"::error title=unit tests ({label})::{p}")
-        for line in (shown if unexpected else detail)[:40]:
+        # The job log shows what the tests said, not only which failed.
+        for line in detail[:80] if detail else shown[:40]:
             print(line[:600])
     else:
         md += [f"ok: {totals_text}; {timing}"]

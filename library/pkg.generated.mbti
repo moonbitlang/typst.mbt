@@ -744,6 +744,8 @@ pub fn compare(Value, Value) -> Int raise HintedError
 
 pub fn compare_str(String, String) -> Int
 
+pub fn compilation_epoch() -> Int
+
 pub fn contains(BindingGuard, Value, Value) -> Bool?
 
 pub fn context_elem() -> Element
@@ -954,6 +956,8 @@ pub let equation_elem_supplement : Int
 
 pub let equation_elem_variant : Int
 
+pub fn evict(Int) -> Unit
+
 pub fn exp10(Int) -> Double
 
 pub fn families(StyleChain) -> Array[FontFamily]
@@ -1077,6 +1081,8 @@ pub let footnote_entry_elem_note : Int
 pub let footnote_entry_elem_separator : Int
 
 pub fn footnote_marker_elem() -> Element
+
+pub fn format_duration(Int64) -> String
 
 pub fn format_float(Double, precision? : Int, Bool, String) -> String
 
@@ -2133,6 +2139,8 @@ pub fn neq(Value, Value) -> Value raise HintedError
 pub fn not_(Value) -> Value raise HintedError
 
 pub fn not_in(BindingGuard, Value, Value) -> Value raise HintedError
+
+pub fn note_evaluation(Route) -> Unit
 
 pub fn note_route_queries(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
 

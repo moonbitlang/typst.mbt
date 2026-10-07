@@ -20,6 +20,7 @@
 #include <windows.h>
 #else
 #include <fcntl.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #endif
 
@@ -189,6 +190,26 @@ int typst_platform_stat_kind(moonbit_bytes_t path) {
     return 2;
   }
   return 3;
+}
+
+// Whether two paths refer to the same file, i.e. to the same device and
+// inode (the `same-file` crate): 1 or 0, -1 on error, -2 where this is not
+// implemented.
+MOONBIT_FFI_EXPORT
+int typst_platform_same_file(moonbit_bytes_t path1, moonbit_bytes_t path2) {
+  typst_platform_errno = 0;
+#ifdef _WIN32
+  return -2;
+#else
+  struct stat st1;
+  struct stat st2;
+  if (stat((const char *)path1, &st1) != 0 ||
+      stat((const char *)path2, &st2) != 0) {
+    typst_platform_errno = errno != 0 ? errno : EIO;
+    return -1;
+  }
+  return st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino ? 1 : 0;
+#endif
 }
 
 // The size of the file at `path` (following symlinks), or -1 on error.
@@ -376,6 +397,48 @@ int typst_platform_local_offset(int64_t timestamp) {
     return 0;
   }
   return (int)local.tm_gmtoff;
+#endif
+}
+
+// A monotonic clock in nanoseconds (Rust's `Instant`).
+MOONBIT_FFI_EXPORT
+int64_t typst_platform_monotonic_nanos(void) {
+#ifdef _WIN32
+  LARGE_INTEGER frequency;
+  LARGE_INTEGER counter;
+  QueryPerformanceFrequency(&frequency);
+  QueryPerformanceCounter(&counter);
+  int64_t seconds = counter.QuadPart / frequency.QuadPart;
+  int64_t rest = counter.QuadPart % frequency.QuadPart;
+  return seconds * 1000000000 + rest * 1000000000 / frequency.QuadPart;
+#else
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+    return 0;
+  }
+  return (int64_t)ts.tv_sec * 1000000000 + (int64_t)ts.tv_nsec;
+#endif
+}
+
+// Raises the soft limit of open file descriptors to the hard limit (on
+// macOS at most `OPEN_MAX`, beyond which `setrlimit` fails).
+MOONBIT_FFI_EXPORT
+void typst_platform_raise_fd_limit(void) {
+#ifndef _WIN32
+  struct rlimit limit;
+  if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+    return;
+  }
+  rlim_t wanted = limit.rlim_max;
+#ifdef __APPLE__
+  if (wanted > OPEN_MAX) {
+    wanted = OPEN_MAX;
+  }
+#endif
+  if (wanted != RLIM_INFINITY && limit.rlim_cur < wanted) {
+    limit.rlim_cur = wanted;
+    setrlimit(RLIMIT_NOFILE, &limit);
+  }
 #endif
 }
 

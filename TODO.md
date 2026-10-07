@@ -35,8 +35,12 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   - [ ] package downloads from Typst Universe (needs an HTTP client; today a
     missing `@preview` package is reported as not found), and `init` of
     unversioned `@preview` templates (needs the package index);
-  - [ ] `watch` (needs file system events or polling + sleep), the HTTP
-    server, `--open`, `--timings`, `completions`, `update`;
+  - [x] `watch` (native and wasm, on `moonbitlang/async`'s `@fs.Watcher`;
+    `kit/watcher`, `scripts/watch_check.py`). Every recompilation starts
+    from scratch: memoization lives for one compilation
+    (`library/memo.mbt`), upstream's comemo cache for the session;
+  - [ ] the HTTP server of `watch` (HTML export), `--open`, `--timings`,
+    `completions`, `update`;
   - [ ] wasm: system font discovery reads whole files byte by byte through
     moonrun's host API (~15 s for macOS' fonts; ranged reads would need a
     host API), no symlink detection (duplicate faces, no cycle protection),

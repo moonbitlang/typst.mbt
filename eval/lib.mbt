@@ -16,6 +16,11 @@ pub fn eval_source(
     abort("Tried to cyclicly evaluate a source file")
   }
 
+  // (Not upstream: the modules of imported files are kept for a
+  // compilation, or for one evaluation outside of one; see
+  // `EvalMemos::of`.)
+  @library.note_evaluation(route)
+
   // Prepare the engine.
   let engine : @library.Engine = {
     library,

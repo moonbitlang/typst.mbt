@@ -38,6 +38,8 @@ pub fn is_absolute(String) -> Bool
 
 pub fn is_dir(String) -> Bool
 
+pub fn is_same_file(String, String) -> Bool raise IoError
+
 pub fn join(String, String) -> String
 
 pub fn knows_local_time_zone() -> Bool
@@ -46,15 +48,21 @@ pub fn local_offset(Int64) -> Int
 
 pub fn lstat_kind(String) -> FileKind raise IoError
 
+pub fn monotonic_nanos() -> Int64
+
 pub fn now_ms() -> Int64
 
 pub fn os() -> Os
+
+pub fn os_error(Int) -> IoError
 
 pub fn parent(String) -> String?
 
 pub fn print_stderr(String) -> Unit
 
 pub fn print_stdout(String) -> Unit raise IoError
+
+pub fn raise_fd_limit() -> Unit
 
 pub fn read_dir(String) -> Array[String] raise IoError
 
