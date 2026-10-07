@@ -143,6 +143,12 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   `note_evaluation(route)`). Within one compilation nothing changes: a
   file is still evaluated once.
 
+- PDF export: a coordinate that lies exactly halfway between two shortest
+  decimals is written with the even digit, as upstream writes it
+  (`142.20312`, it was `142.20313`: a difference of 0.00001pt in about one
+  number in 200). The fix is in `moonbitlang/pdflite` 0.3.8, which the
+  module now depends on (it was 0.3.6).
+
 ### Added
 
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
