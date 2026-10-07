@@ -295,6 +295,41 @@
   puts on an estimated baseline), and `scripts/edsl_helper_lines.py`
   counts its helper lines in two classes, what the kit provides and the
   document's own (`// helper-lines: kit` marks the first).
+- EDSL fonts (`doc/fonts`; `docs/edsl-guide.md`, section 5): IBM Plex Sans
+  in regular, italic, bold, bold italic and medium, the sans-serif family
+  that Typst's embedded fonts lack. SIL OFL 1.1 with the reserved font
+  name "Plex": the files of `doc/fonts/files` stay byte for byte what they
+  are (no subsetting, no renaming; a release replaces whole files; where
+  each is from, its release and hash are in `doc/fonts/fonts.mbt`: the
+  upright faces are release 3.2, the italics 3.005). Built like
+  `typst_assets/fonts`, by its generator (`gen-fonts --prefix=doc_font`:
+  two font packages in one executable need C symbols of their own). Only
+  the worlds of `doc` load it (`@doc.sans_fonts`, in
+  `DocWorld::in_memory` and `@system.world`, under `embedded_fonts`):
+  nothing that `cli/` or `kit/` imports may import `doc/fonts` (the
+  release `cli` executable is the same file with and without the
+  package), and of the runner's stages only `edsl` uses these worlds. It
+  is in a world's font book by name only, after all other fonts.
+  `FontBook::select_fallback` does not take the first font that has a
+  character: among all fonts whose coverage has it, it takes the most
+  similar to the text's font (monospace or not, serif or not, shared
+  first words of the family names, then the shorter family name), so a
+  family that is added with its coverage takes characters from the fonts
+  that had them, wherever it is in the book (with IBM Plex Sans, 43
+  characters of Libertinus Serif text: U+2713, 16 arrows, 13 currency
+  signs, U+FB01, U+FB02 and others from New Computer Modern, its math
+  font and DejaVu Sans Mono, and 7 that were missing glyphs; text in
+  another font tries Libertinus Serif before any fallback, the tail of
+  `families`, so there it is what that lacks too, U+2B0E in raw text for
+  one). So the entries of `sans_fonts` have an empty
+  coverage (`FontInfo.coverage` is read by `select_fallback` only):
+  `select` finds the family by its name, a fallback never does, and a
+  document that does not name the family is laid out as without it
+  (`doc/sans_test.mbt` compares SVG and PDF with a world of the Typst
+  fonts alone and shows what the coverage would change). After all other
+  fonts: a caller's files of the family (`fonts`, `font_paths`, the
+  system's) win a tie (`doc/system/system_test.mbt`). A family that is
+  added to a world of `doc` is added the same way.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`
@@ -760,9 +795,11 @@
 - Publishing: `moonbitlang/typst` is used as a dependency (e.g. by mbtx
   scripts importing `moonbitlang/typst@x.y.z/doc`), and moon does not run
   `pre-build` steps of dependencies. The package therefore ships the
-  generated font data (`typst_assets/fonts/fonts_gen.c`,
-  `fonts_wasm_gen.mbt`: gitignored but deliberately not in `.moonignore`);
-  the publish workflow checks that they are in the zip. Verify a release as
+  generated font data (`fonts_gen.c` and `fonts_wasm_gen.mbt` of
+  `typst_assets/fonts` and of `doc/fonts`: gitignored but deliberately not
+  in `.moonignore`); the publish workflow checks that they are in the zip
+  (`scripts/ci/package_smoke.sh`, whose consumer also sets text in the
+  family of `doc/fonts`). Verify a release as
   a dependency (a scratch module with `"deps": {"moonbitlang/typst": ..}`,
   native and wasm-gc), not only by building the unpacked package as the root
   module: 0.1.0-0.1.2 were broken as dependencies for this reason.

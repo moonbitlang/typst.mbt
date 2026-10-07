@@ -10,6 +10,7 @@ import {
   "moonbitlang/typst/kurbo",
   "moonbitlang/typst/unicode",
   "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
+  "moonbitlang/typst/doc/fonts" @doc_fonts,
   "moonbitlang/core/builtin",
   "moonbitlang/core/ref",
   "moonbitlang/core/debug",

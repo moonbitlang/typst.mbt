@@ -169,6 +169,15 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   themes, bibliographies, CSL styles, PDF documents, plugins and the
   results of their calls), which otherwise only grows when files change.
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
+- `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
+  family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in
+  regular, italic, bold, bold italic and medium. `doc`: `sans_fonts()`,
+  its fonts with their font book entries; `DocWorld::in_memory` and
+  `@system.world` add them under `embedded_fonts`, so
+  `Text(font=["IBM Plex Sans"])` works without font files of the user.
+  The family is found by its name only and is no fallback font: a
+  document that does not name it is laid out as before. The Typst
+  command line does not load the package.
 - `libm`, a new package: `cbrt`, a port of the `libm` crate's correctly
   rounded cube root, and `f64_cbrt`, Rust's `f64::cbrt` (the C library's
   `cbrt` on Apple targets and Windows, `cbrt` everywhere else, as Rust
