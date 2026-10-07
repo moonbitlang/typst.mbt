@@ -220,6 +220,39 @@
   interpolated block (`is_block`) in a run of its own (`NPieces`) with
   `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
   facts this rests on (the "engine: .." tests).
+- EDSL lints of the pages (`doc/lint_frames.mbt`, its header says what
+  frames hold; the "As built" note of L2 and L3 in section 6 of
+  `docs/edsl-ports.md`; `docs/edsl-guide.md`, section 9): one walk over
+  the frames of `compile_paged` (not `lower`, not the generic `compile`:
+  no pages). L2 `MissingGlyph`: glyph 0 in a text item, at the origin of
+  the glyph's span (not the item's), one lint per source location and
+  cluster with a count. L3 `OutsidePage`: what is drawn (the box of a
+  glyph's outline, a shape's interior and the kurbo outline of its
+  stroke, an image) beyond the page with its bleed by more than
+  `LINT_TOLERANCE` (1pt), through all transforms, inside the boxes of the
+  clips; what has a detached span is at the innermost element around it
+  by the frames' tags, or at the page only. `OutsideContainer`: the same
+  against a `Block`/`Box` that was called with an absolute `width` or
+  `height`. Frames do not say whose a frame is, so lowering notes it
+  (`Container` in `doc/origin.mbt`: per call site the sizes it had, and
+  for every call site the stack of containers in whose arguments it was
+  lowered, of several stacks what they share from the innermost;
+  `Lowering.containers`, also for what callbacks return; not with
+  `lints=false`), and the hard frames around an item are matched with its
+  stack from the inside by their sizes (`FrameLinter::evidence`); only
+  the given sides count, and there a glyph is the part of its box between
+  baseline and cap height, a shape its path without its stroke, and a
+  mark may hang (`hang_of`, a copy of `overhang` in
+  `layout/inline_line.mbt`: keep them equal). Occurrences of one call
+  site have the same spans: nothing may be concluded for one that does
+  not hold for all. No engine change: a lint
+  that needs one stops there. The paths of `curve_to_kurbo` are in the
+  engine's unit (1/127pt, `raw_to_pt`). Every glyph of a document is
+  looked at: nothing may allocate per glyph on the path that finds
+  nothing (under 1% of a compilation, measured as in section 10 of the
+  guide). Tests: `doc/lint_frames_test.mbt` (its "engine: .." test pins
+  what frames say of blocks), `doc/lint_frames_wbtest.mbt` (the embedded
+  fonts give glyph 0 to U+0000 and U+FFFF only).
 - EDSL kit (`doc/kit`, section 4 and the "As built" notes of steps 3 to 5
   and of the rebuild in `docs/edsl-ports.md`): elements that are not one
   Typst element
