@@ -138,8 +138,10 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   again by the text of that file alone, so it was reused although a file
   that it imports or reads (`json`, `read`, ..) had changed, and those
   files were not read again. Memoized module evaluations now end with the
-  compilation (`library`: `compilation_epoch()`). Within one compilation
-  nothing changes: a file is still evaluated once.
+  compilation (`library`: `compilation_epoch()`), and outside of one with
+  the evaluation (`eval_source` with the root route; `library`:
+  `note_evaluation(route)`). Within one compilation nothing changes: a
+  file is still evaluated once.
 
 ### Added
 
@@ -155,10 +157,17 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   package imports it, so a program links that runtime only if it imports
   `kit/watcher`.
 - `kit/platform`: `monotonic_nanos()` (a clock for durations),
-  `raise_fd_limit()` (raises the soft limit of open files to the hard one)
-  and `os_error(code)` (the `IoError` of an OS error number).
+  `raise_fd_limit()` (raises the soft limit of open files to the hard one),
+  `os_error(code)` (the `IoError` of an OS error number) and
+  `is_same_file(path1, path2)` (the same device and inode, like the
+  `same-file` crate; on wasm the same canonical path).
 - `library`: `format_duration(nanoseconds)` (upstream
   `typst_utils::format_duration`: `2.85 s`, `294.82 ms`, `1 h 4 min`).
+- `library`: `evict(max_age)`, for a process that compiles again and again
+  (upstream `comemo::evict`): on every `max_age`-th call it drops the data
+  that is kept by content for the process (decoded `raw` syntaxes and
+  themes, bibliographies, CSL styles, PDF documents, plugins and the
+  results of their calls), which otherwise only grows when files change.
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/format`, a new package without dependencies (it does not import
   `doc` or the engine): `fixed(x, digits, trim?)` (the exact value of the

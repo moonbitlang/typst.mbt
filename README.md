@@ -65,7 +65,10 @@ that `watch` is not supported. On macOS a watched file is an open file
 (kqueue): the native build raises its limit of open files to the hard
 limit, the wasm build runs with the limit of the shell (`ulimit -n`). On
 Linux every directory with watched files takes an inotify instance
-(`fs.inotify.max_user_instances`).
+(`fs.inotify.max_user_instances`). The directory of a watched file must be
+readable. The wasm build cannot tell a symbolic link: it does not notice
+when the file that a link points to is replaced (written in place, it
+does).
 
 ## Documents as MoonBit code (experimental)
 
