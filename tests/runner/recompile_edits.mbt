@@ -8,7 +8,7 @@
 //   every platform (the `Rng` of the `reparse` stage, no library's; no
 //   clock; files are chosen from a list in a fixed order).
 // - Edits only go through [Project::set] and [Project::variant]: bytes of
-//   files and the three things that are not files. Nothing here touches
+//   files and the four things that are not files. Nothing here touches
 //   the engine or a world.
 // - Every content a file had is kept ([Project::versions]), so that a file
 //   can go back to one (A, B, A).
@@ -305,7 +305,18 @@ fn Project::plausible(
   let sites = Sites::of(text)
   let utf8 = (s : String) => @utf8.encode(s)
   for _ in 0..<4 {
-    match rng.below(9) {
+    let roll = rng.below(100)
+    match (if roll < 2 { 9 } else { roll % 9 }) {
+      // A byte order mark at the start comes or goes (rarely).
+      9 =>
+        return if bytes.length() >= 3 &&
+          bytes[0] == b'\xef' &&
+          bytes[1] == b'\xbb' &&
+          bytes[2] == b'\xbf' {
+          Some((splice(bytes, 0, 3, b""), "remove-bom"))
+        } else {
+          Some((splice(bytes, 0, 0, b"\xef\xbb\xbf"), "add-bom"))
+        }
       // Words inside text.
       0 | 1 if !sites.text.is_empty() => {
         let (start, len) = rng.pick(sites.text[:])
@@ -489,8 +500,11 @@ fn Project::data_plausible(
     return Some((splice(bytes, at, at + 1, digit), "change-digit @\{at}"))
   }
   if !letters.is_empty() {
+    // Another letter.
     let at = rng.pick(letters[:])
-    let letter = Bytes::makei(1, _ => (rng.below(26) + 'a').to_byte())
+    let old = (bytes[at].to_int() | 0x20) - 'a'
+    let new = (old + 1 + rng.below(25)) % 26
+    let letter = Bytes::makei(1, _ => (new + 'a').to_byte())
     return Some((splice(bytes, at, at + 1, letter), "change-letter @\{at}"))
   }
   None
@@ -663,7 +677,12 @@ fn Project::edit(self : Project, rng : Rng) -> String {
     self.variant = { ..self.variant, inputs, }
     return "inputs \{inputs}"
   }
-  if roll < 25 {
+  if roll < 23 {
+    let fonts = 1 - self.variant.fonts
+    self.variant = { ..self.variant, fonts, }
+    return "fonts \{fonts}"
+  }
+  if roll < 28 {
     // Another file of the project becomes the main file.
     let files = self.known.filter(id => {
       is_typ(id) && id != self.variant.main && id.root() is Project
@@ -674,7 +693,7 @@ fn Project::edit(self : Project, rng : Rng) -> String {
       return "main \{file_path(main)}"
     }
   }
-  if roll < 35 {
+  if roll < 38 {
     // Two files at once.
     if self.file_edit(rng, None) is Some((first, id)) {
       // The repair of a step undoes one file: the first's.
@@ -701,25 +720,37 @@ fn Project::edit(self : Project, rng : Rng) -> String {
 /// compilation can depend on while the rest stays as it is. A result that
 /// is kept and that depends on something its key does not hold is found
 /// here, without luck: the date and `sys.inputs` (each only if a known
-/// file reads it), the main file, then every other known file (at most
-/// `files` of them, spread over the list), each with a plausible edit, and
-/// at the end everything back to what it was at first. An edit after which
-/// the document does not compile is undone with the next one, so that
-/// every file is changed in a document that works.
+/// file reads it), the fonts, the main file, then every other known file
+/// (at most `files` of them, spread over the list from a place that the
+/// seed chooses), each with a plausible edit, and at the end everything
+/// back to what it was at first. A change after which the document does
+/// not compile is undone with the next one, so that everything is changed
+/// in a document that works.
 priv struct Sweep {
   /// How many of the other files are edited at most.
   files : Int
+  /// Whether the fonts change.
+  fonts : Bool
   mut stage : Int
   /// The other files, once the sweep gets to them.
   mut plan : Array[@syntax.FileId]
   mut at : Int
-  /// The file of the last edit and what it held before.
-  mut last : (@syntax.FileId, Bytes?)?
+  /// What the last step changed, to undo it.
+  mut last : SweepUndo?
 }
 
 ///|
-fn Sweep::new(files : Int) -> Sweep {
-  { files, stage: 0, plan: [], at: 0, last: None, }
+/// What undoes a step of the sweep.
+priv enum SweepUndo {
+  /// A file and what it held before.
+  File(@syntax.FileId, Bytes?)
+  /// What was not a file before.
+  Variant(Variant)
+}
+
+///|
+fn Sweep::new(files : Int, fonts : Bool) -> Sweep {
+  { files, fonts, stage: 0, plan: [], at: 0, last: None, }
 }
 
 ///|
@@ -776,57 +807,79 @@ fn Project::sweep(
   sweep : Sweep,
   ok : Bool,
 ) -> String? {
-  // An edit that broke the document is undone together with the next.
+  // A change that broke the document is undone together with the next.
   let undo = match sweep.last {
-    Some((id, before)) if !ok => {
+    Some(File(id, before)) if !ok => {
       self.set(id, before)
       "undo \{file_path(id)} + "
+    }
+    Some(Variant(before)) if !ok => {
+      self.variant = before
+      "undo + "
     }
     _ => ""
   }
   sweep.last = None
+  let vary = (variant : Variant, what : String) => {
+    sweep.last = Some(Variant(self.variant))
+    self.variant = variant
+    Some(undo + what)
+  }
   if sweep.stage == 0 {
     sweep.stage = 1
     if self.mentions(b"today(") {
-      self.variant = { ..self.variant, day: self.variant.day + 1, }
-      return Some("today \{self.variant.day}")
+      let day = self.variant.day + 1
+      return vary({ ..self.variant, day, }, "today \{day}")
     }
   }
   if sweep.stage == 1 {
     sweep.stage = 2
     if self.mentions(b"sys.inputs") {
-      self.variant = { ..self.variant, inputs: 1, }
-      return Some("inputs 1")
+      return vary({ ..self.variant, inputs: 1, }, "inputs 1")
     }
-  }
-  let edit = (id : @syntax.FileId) => {
-    sweep.last = Some((id, self.content(id)))
-    Some(undo + self.careful_edit(rng, id))
   }
   if sweep.stage == 2 {
     sweep.stage = 3
-    return edit(self.origin)
+    if sweep.fonts {
+      return vary({ ..self.variant, fonts: 1, }, "fonts 1")
+    }
+  }
+  let edit = (id : @syntax.FileId) => {
+    sweep.last = Some(File(id, self.content(id)))
+    Some(undo + self.careful_edit(rng, id))
   }
   if sweep.stage == 3 {
+    sweep.stage = 4
+    return edit(self.origin)
+  }
+  if sweep.stage == 4 {
     if sweep.at == 0 {
       let others = self.known.filter(id => id != self.origin)
       let n = @cmp.minimum(others.length(), sweep.files)
-      sweep.plan = Array::makei(n, i => others[i * others.length() / n])
+      // If not all are edited, which ones depends on the seed.
+      let first = if n < others.length() {
+        rng.below(others.length())
+      } else {
+        0
+      }
+      sweep.plan = Array::makei(n, i => {
+        others[(first + i * others.length() / n) % others.length()]
+      })
     }
     if sweep.at < sweep.plan.length() {
       let id = sweep.plan[sweep.at]
       sweep.at += 1
       return edit(id)
     }
-    sweep.stage = 4
-  }
-  if sweep.stage == 4 {
     sweep.stage = 5
+  }
+  if sweep.stage == 5 {
+    sweep.stage = 6
     let ids = self.versions.keys().to_array()
     for id in ids {
       self.set(id, self.versions[id][0])
     }
-    self.variant = { main: self.origin, inputs: 0, day: 0, }
+    self.variant = { main: self.origin, inputs: 0, day: 0, fonts: 0, }
     return Some("everything-back")
   }
   None

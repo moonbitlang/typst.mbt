@@ -136,7 +136,7 @@ let recompile_suite : ReadOnlyArray[(String, ReadOnlyArray[String])] = [
       "layout-in-page-call", "issue-6822-layout-multiple", "layout-in-fixed-size-block",
     ],
   ),
-  ("layout/container.typ", ["box-inset-ratio"]),
+  ("layout/container.typ", ["box-baseline-context"]),
   // Imports and includes.
   (
     "scripting/import.typ",

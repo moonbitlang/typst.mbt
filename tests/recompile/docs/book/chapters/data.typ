@@ -33,6 +33,9 @@ The ratio is #settings.layout.ratio and the columns are
 
 #theorem[There are #lines.len() notes and #people.len() people.]
 
+// A file that is a module for one reader and text for another.
+The shared module has #read("../lib/shared.typ").split("\n").len() lines.
+
 #context {
   let size = measure(text(size: config.size * 1pt, config.title))
   [The title is #calc.round(size.width.pt(), digits: 2) points wide. ]

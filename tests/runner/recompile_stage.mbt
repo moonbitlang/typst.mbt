@@ -5,7 +5,8 @@
 //
 //   recompile [filter] [--seed=N] [--rounds=N] [--sequences=N] [--steps=N]
 //             [--all] [--only=NAME] [--list] [--names] [--edits] [--verbose]
-//             [--times] [--trace] [--fresh]
+//             [--times] [--trace] [--snapshots=DIR]
+//   recompile --replay=DIR [--all]
 //
 // A case is a sequence of edits of one document (`recompile_edits.mbt`):
 // the sweep, which changes everything the document depends on once, and
@@ -17,7 +18,9 @@
 //    reset and compiled again, exactly as `cli/watch.mbt` does
 //    (`world.reset()`, the compilation with its exports,
 //    `@library.evict(10)`). What every compilation gave is kept
-//    (`recompile_compare.mbt`), with a snapshot of the files.
+//    (`recompile_compare.mbt`), with a snapshot of the files. After every
+//    compilation the document of the step before is exported again: it
+//    must still be what it was (a host may hold it while it compiles).
 // 2. The references: for every step, a fresh world of the snapshot is
 //    compiled, once as it is and once with memoization off
 //    (`@library.set_layout_memo_enabled(false)`), each after
@@ -28,9 +31,22 @@
 // compilation may keep only the last one: with a fresh compilation between
 // two steps of the loop it would never be asked for the step before, and
 // the stage would pass without testing it. Nothing in phase 1 touches
-// engine state but what the watch loop of the CLI does. (The sequences of a
-// run do follow each other in one process, as the compilations of several
-// worlds of one host do.)
+// engine state but what the watch loop of the CLI does, except that it
+// exports both an SVG and a PDF, and the SVG of the document before once
+// more. (The sequences of a run do follow each other in one process, as the
+// compilations of several worlds of one host do.)
+//
+// A reference in the same process cannot see through a cache that neither
+// `set_layout_memo_enabled(false)` turns off nor `evict(1)` drops. For that
+// there is a reference in another process: `--snapshots=DIR` writes the
+// files of every step before it is compiled and a digest of what it gave
+// after, and `--replay=DIR/<document>/<sequence>/step<N>` compiles one such
+// snapshot as the first compilation of a process and prints its digest
+// (`scripts/recompile_soak.py` compares them). The snapshot that has no
+// digest is the one whose compilation killed the runner: an edit can make
+// the compiler abort where upstream panics (a frame of infinite size, for
+// one), and replaying that snapshot tells whether the abort has anything
+// to do with compiling again.
 //
 // Sizes: by default every document runs the sweep and `default_sequences`
 // random sequences of `default_steps` edits; the documents that take long
@@ -38,15 +54,10 @@
 // That is the CI run. `--sequences` and `--steps` size the random sequences
 // of every document, `--rounds` repeats everything with that many seeds
 // counting up from `--seed`, and `--all` adds `bench/longer` and every
-// document of `tests/packages/docs`: soak runs
-// (`scripts/recompile_soak.py`). A failure names the seed, the sequence
-// and the step, and its files are written to `_build/recompile/`.
-//
-// An edit can make the compiler abort where upstream panics (a frame of
-// infinite size, for one), and the runner with it: `--trace` prints every
-// sequence and edit before it runs, and `--fresh` runs the same edits with
-// a fresh world for every step and compares nothing, which tells whether
-// the abort has anything to do with compiling again.
+// document of `tests/packages/docs`: soak runs. A failure names the seed,
+// the sequence and the step, and its files are written to
+// `_build/recompile/`. `--trace` prints every sequence and edit before it
+// runs.
 
 ///|
 /// The random sequences of a document.
@@ -81,8 +92,8 @@ priv struct RecompileOptions {
   steps : Int
   verbose : Bool
   times : Bool
-  /// Every step is compiled in a fresh world, and nothing is compared.
-  fresh : Bool
+  /// Where the snapshots of the steps are written, if anywhere.
+  snapshots : String?
 }
 
 ///|
@@ -95,7 +106,9 @@ priv struct EditCount {
 }
 
 ///|
-/// The counts of a run.
+/// The counts of a run. What the steps did is counted on the references
+/// without memoization, not on the watch loop: with a stale result the
+/// loop would say that nothing changed.
 priv struct RecompileStats {
   mut documents : Int
   mut sequences : Int
@@ -121,7 +134,7 @@ priv struct RecompileStep {
 }
 
 ///|
-/// The value of `--name=N`.
+/// The value of `--name=N` (not negative).
 fn int_option(args : Array[String], name : String) -> Int? {
   let prefix = "--\{name}="
   for arg in args {
@@ -130,7 +143,20 @@ fn int_option(args : Array[String], name : String) -> Int? {
       let n = @string.parse_int(value) catch {
         _ => abort("recompile: bad value of --\{name}: \{value}")
       }
+      guard n >= 0 else { abort("recompile: bad value of --\{name}: \{value}") }
       return Some(n)
+    }
+  }
+  None
+}
+
+///|
+/// The value of `--name=TEXT`.
+fn string_option(args : Array[String], name : String) -> String? {
+  let prefix = "--\{name}="
+  for arg in args {
+    if arg.has_prefix(prefix) {
+      return Some(arg.unsafe_substring(start=prefix.length(), end=arg.length()))
     }
   }
   None
@@ -150,7 +176,7 @@ fn run_recompile_stage(
     steps: int_option(args, "steps").unwrap_or(default_steps),
     verbose,
     times: args.contains("--times"),
-    fresh: args.contains("--fresh"),
+    snapshots: string_option(args, "snapshots"),
   }
   let all = args.contains("--all")
   let missing : Array[String] = []
@@ -169,14 +195,13 @@ fn run_recompile_stage(
     println("recompile: \{packages_dir} is missing (run scripts/packages.sh)")
     groups.push(("recompile packages", []))
   }
+  if string_option(args, "replay") is Some(dir) {
+    replay_snapshot(dir, [..groups[0].1, ..groups[1].1])
+    return
+  }
   // `--only=<name>`: the document of that name (a filter also selects the
   // documents whose names contain it).
-  let mut only : String? = None
-  for arg in args {
-    if arg.has_prefix("--only=") {
-      only = Some(arg.unsafe_substring(start=7, end=arg.length()))
-    }
-  }
+  let only = string_option(args, "only")
   let selected = (name : String) => {
     !(filter is Some(f) && !name.contains(f)) &&
     !(only is Some(only) && name != only)
@@ -236,7 +261,14 @@ fn run_recompile_stage(
           }
           let plan : Plan = if sequence < 0 {
             Sweep(
-              Sweep::new(if heavy { heavy_sweep_files } else { sweep_files }),
+              Sweep::new(
+                if heavy {
+                  heavy_sweep_files
+                } else {
+                  sweep_files
+                },
+                !heavy,
+              ),
             )
           } else {
             Random(options.steps)
@@ -284,13 +316,18 @@ fn run_recompile_stage(
       )
     }
   }
+  // A run that compared nothing is not a run that passed.
+  if stats.steps == 0 && failures.is_empty() {
+    println("recompile: nothing was selected")
+    @sys.exit(2)
+  }
 }
 
 ///|
 /// Prints what the first compilation of a document gives (`--list`).
 fn list_document(document : Document) -> Unit {
   let files = FileSet::new(document.base, document.files)
-  let variant : Variant = { main: document.main, inputs: 0, day: 0, }
+  let variant : Variant = { main: document.main, inputs: 0, day: 0, fonts: 0, }
   let world = RecompileWorld::new(document.flavor, files, variant)
   let start = @env.now()
   let (compiled, ids) = recompile_compile(world)
@@ -329,7 +366,7 @@ fn edit_kind(edit : String) -> String {
 ///|
 /// Runs a sequence. Returns the `FAIL` line (and, verbosely, what differs)
 /// if a step of the watch loop gave something else than a fresh
-/// compilation.
+/// compilation, or changed the document of the step before.
 fn run_sequence(
   document : Document,
   seed : Int,
@@ -340,13 +377,18 @@ fn run_sequence(
   options : RecompileOptions,
 ) -> String? {
   let files = FileSet::new(document.base, document.files)
-  let variant : Variant = { main: document.main, inputs: 0, day: 0, }
+  let variant : Variant = { main: document.main, inputs: 0, day: 0, fonts: 0, }
   let project = Project::new(files, variant)
   stats.sequences += 1
+  let snapshots = options.snapshots.map(dir => {
+    "\{dir}/\{document.name}/seed\{seed}-sequence-\{name}"
+  })
 
   // The watch loop (`cli/watch.mbt`).
   let world = RecompileWorld::new(document.flavor, files, variant)
   let done : Array[RecompileStep] = []
+  // The steps during whose compilation the document before them changed.
+  let disturbed : Array[Int] = []
   for step = 0; ; step = step + 1 {
     let edit = if step == 0 {
       "the first compilation"
@@ -370,67 +412,54 @@ fn run_sequence(
     if trace_tests.val {
       println("TRACE   step \{step}: \{edit}")
     }
-    // Recompile.
-    let (compiled, ids) = if options.fresh {
-      let snapshot = world.snapshot()
-      recompile_compile(
-        RecompileWorld::new(document.flavor, snapshot.files, snapshot.variant),
-      )
-    } else {
-      recompile_compile(world)
+    let snapshot = world.snapshot()
+    if snapshots is Some(dir) {
+      write_snapshot("\{dir}/step\{step}", document.name, snapshot)
     }
+    // Recompile.
+    let (compiled, ids) = recompile_compile(world)
     // Evict the cache.
     if step > 0 {
       @library.evict(10)
     }
+    if snapshots is Some(dir) {
+      write_file(
+        "\{dir}/step\{step}/digest.txt",
+        @utf8.encode(compiled.digest()),
+      )
+    }
     project.note(ids)
     stats.steps += 1
     stats.compilations += 1
-    if !compiled.ok {
-      stats.errors += 1
-    }
     if done.last() is Some(before) {
-      let changed = before.compiled.parts[2] != compiled.parts[2]
+      // The document of the step before is what it was.
+      if before.compiled.document is Some(doc) {
+        if recompile_svg(doc) != before.compiled.parts[part_svg] {
+          disturbed.push(step)
+        }
+        before.compiled.document = None
+      }
       if trace_tests.val {
         let status = if compiled.ok { "compiled" } else { "did not compile" }
-        let pages = if changed { "other pages" } else { "the same pages" }
+        let pages = if before.compiled.parts[part_frames] !=
+          compiled.parts[part_frames] {
+          "other pages"
+        } else {
+          "the same pages"
+        }
         println("TRACE     \{status}, \{pages}")
       }
-      if changed {
-        stats.changed += 1
-      }
-      if before.compiled.parts[0] != compiled.parts[0] {
-        stats.rewatched += 1
-      }
-      let kind = edit_kind(edit)
-      let count = match stats.edits.get(kind) {
-        Some(count) => count
-        None => {
-          let count : EditCount = { steps: 0, errors: 0, changed: 0, }
-          stats.edits[kind] = count
-          count
-        }
-      }
-      count.steps += 1
-      if !compiled.ok {
-        count.errors += 1
-      }
-      if changed {
-        count.changed += 1
-      }
     }
-    done.push({ edit, snapshot: world.snapshot(), compiled, })
+    done.push({ edit, snapshot, compiled, })
   }
-
-  if options.fresh {
-    return None
-  }
+  done[done.length() - 1].compiled.document = None
 
   // The references. Every step is compared; what differs is shown for the
   // first that does.
   let steps = done.length() - 1
-  let mut failure : (Int, StringBuilder)? = None
+  let mut failure : (Int, String)? = None
   let also : Array[Int] = []
+  let mut before : Compiled? = None
   for step, at in done {
     for memoized in [true, false] {
       @library.evict(1)
@@ -442,13 +471,20 @@ fn run_sequence(
       )
       let (expected, _) = recompile_compile(fresh)
       @library.set_layout_memo_enabled(true)
+      expected.document = None
       stats.compilations += 1
+      if !memoized {
+        count_step(stats, at.edit, before, expected)
+        before = Some(expected)
+      }
       guard expected.difference(at.compiled) is Some((parts, detail)) else {
         continue
       }
-      if failure is Some(_) {
-        also.push(step)
-        break
+      if failure is Some((first, _)) {
+        if first != step && !also.contains(step) {
+          also.push(step)
+        }
+        continue
       }
       let reference = if memoized {
         "a fresh compilation"
@@ -465,19 +501,77 @@ fn run_sequence(
         out.write_string("\n\{detail}\n  (files in \{dir})")
       }
       dump_failure(dir, done, step, parts[0], expected, at.compiled)
-      failure = Some((step, out))
-      break
+      failure = Some((step, out.to_string()))
     }
   }
-  guard failure is Some((step, detail)) else { return None }
-  let also = if also.is_empty() {
-    ""
-  } else {
-    " (also at \{also.map(s => s.to_string()).join(", ")})"
+  let said = []
+  if failure is Some((step, detail)) {
+    let also = if also.is_empty() {
+      ""
+    } else {
+      " (also at \{also.map(s => s.to_string()).join(", ")})"
+    }
+    said.push("step=\{step} of \{steps}\{also}: \{detail}")
   }
-  Some(
-    "FAIL \{document.name} :: seed=\{seed} sequence=\{name} step=\{step} of \{steps}\{also}: \{detail.to_string()}",
-  )
+  if !disturbed.is_empty() {
+    let at = disturbed.map(s => s.to_string()).join(", ")
+    said.push(
+      "the compilation of step \{at} changed the document of the step before",
+    )
+  }
+  if said.is_empty() {
+    None
+  } else {
+    Some(
+      "FAIL \{document.name} :: seed=\{seed} sequence=\{name} \{said.join("; ")}",
+    )
+  }
+}
+
+///|
+/// Counts what a step did, on its reference without memoization and the
+/// one of the step before.
+fn count_step(
+  stats : RecompileStats,
+  edit : String,
+  before : Compiled?,
+  compiled : Compiled,
+) -> Unit {
+  if !compiled.ok {
+    stats.errors += 1
+  }
+  guard before is Some(before) else { return }
+  let changed = before.parts[part_frames] != compiled.parts[part_frames]
+  if changed {
+    stats.changed += 1
+  }
+  if before.parts[0] != compiled.parts[0] {
+    stats.rewatched += 1
+  }
+  let kind = edit_kind(edit)
+  let count = match stats.edits.get(kind) {
+    Some(count) => count
+    None => {
+      let count : EditCount = { steps: 0, errors: 0, changed: 0, }
+      stats.edits[kind] = count
+      count
+    }
+  }
+  count.steps += 1
+  if !compiled.ok {
+    count.errors += 1
+  }
+  if changed {
+    count.changed += 1
+  }
+}
+
+///|
+fn write_file(path : String, content : Bytes) -> Unit {
+  ensure_parent_dir(path)
+  @fs.write_bytes_to_file(path, content) catch {
+    _ => println("recompile: cannot write \{path}")
+  }
 }
 
 ///|
@@ -492,29 +586,25 @@ fn dump_failure(
   expected : Compiled,
   actual : Compiled,
 ) -> Unit {
-  let write = (path : String, content : Bytes) => {
-    let path = dir + "/" + path
-    ensure_parent_dir(path)
-    @fs.write_bytes_to_file(path, content) catch {
-      _ => ()
-    }
-  }
   let edits = StringBuilder()
   for i in 0..<=step {
     let variant = done[i].snapshot.variant
     edits.write_string(
-      "step \{i}: \{done[i].edit} (main \{file_path(variant.main)}, inputs \{variant.inputs}, day \{variant.day})\n",
+      "step \{i}: \{done[i].edit} (main \{file_path(variant.main)}, inputs \{variant.inputs}, day \{variant.day}, fonts \{variant.fonts})\n",
     )
   }
-  write("edits.txt", @utf8.encode(edits.to_string()))
+  write_file("\{dir}/edits.txt", @utf8.encode(edits.to_string()))
   let index = compiled_parts[:].search(part).unwrap_or(0)
   let name = part.replace_all(old=" ", new="-")
   if part == "pdf" {
-    write("expected.pdf", expected.pdf)
-    write("actual.pdf", actual.pdf)
+    write_file("\{dir}/expected.pdf", expected.pdf)
+    write_file("\{dir}/actual.pdf", actual.pdf)
   } else {
-    write("expected-\{name}.txt", @utf8.encode(expected.parts[index]))
-    write("actual-\{name}.txt", @utf8.encode(actual.parts[index]))
+    write_file(
+      "\{dir}/expected-\{name}.txt",
+      @utf8.encode(expected.parts[index]),
+    )
+    write_file("\{dir}/actual-\{name}.txt", @utf8.encode(actual.parts[index]))
   }
   for i in [step - 1, step] {
     if i < 0 {
@@ -525,9 +615,114 @@ fn dump_failure(
         .replace_all(old="@", new="_")
         .replace_all(old=":", new="_")
       match content {
-        Some(bytes) => write("step\{i}/\{path}", bytes)
-        None => write("step\{i}/\{path}.removed", b"")
+        Some(bytes) => write_file("\{dir}/step\{i}/\{path}", bytes)
+        None => write_file("\{dir}/step\{i}/\{path}.removed", b"")
       }
     }
   }
+}
+
+///|
+/// Writes a snapshot: `meta.txt` (the document, what is not a file, and
+/// the edited files by their names) and the bytes of the edited files as
+/// `files/<number>`.
+fn write_snapshot(dir : String, document : String, snapshot : Snapshot) -> Unit {
+  let variant = snapshot.variant
+  let meta = StringBuilder()
+  meta.write_string("document \{document}\n")
+  meta.write_string("main \{file_path(variant.main)}\n")
+  meta.write_string("inputs \{variant.inputs}\n")
+  meta.write_string("day \{variant.day}\n")
+  meta.write_string("fonts \{variant.fonts}\n")
+  let mut n = 0
+  for id, content in snapshot.files.overlay {
+    match content {
+      Some(bytes) => {
+        meta.write_string("file \{n} \{file_path(id)}\n")
+        write_file("\{dir}/files/\{n}", bytes)
+        n += 1
+      }
+      None => meta.write_string("removed \{file_path(id)}\n")
+    }
+  }
+  write_file("\{dir}/meta.txt", @utf8.encode(meta.to_string()))
+}
+
+///|
+/// The file that [file_path] names.
+fn file_of_path(path : String) -> @syntax.FileId {
+  guard path.has_prefix("@") else { return project_file(path) }
+  // `@namespace/name:version/path`.
+  guard path.find(":") is Some(colon) &&
+    path.view(start_offset=colon).find("/") is Some(slash) else {
+    abort("recompile: bad file name in a snapshot: \{path}")
+  }
+  let slash = colon + slash
+  guard @syntax.PackageSpec::from_str(path.unsafe_substring(start=0, end=slash))
+    is Ok(spec) else {
+    abort("recompile: bad package in a snapshot: \{path}")
+  }
+  let vpath = @syntax.VirtualPath::new(
+    path.unsafe_substring(start=slash + 1, end=path.length()),
+  ) catch {
+    e => abort(e.to_string())
+  }
+  @syntax.RootedPath::new(Package(spec), vpath).intern()
+}
+
+///|
+/// Compiles a snapshot in a fresh world, as the first compilation of this
+/// process, and prints the digest of what it gave (`--replay`).
+fn replay_snapshot(dir : String, documents : Array[Document]) -> Unit {
+  let meta = read("\{dir}/meta.txt")
+  let mut name = ""
+  let mut main = ""
+  let numbers : Map[String, Int] = Map([])
+  let overlay : Array[(@syntax.FileId, Bytes?)] = []
+  for line in meta.split("\n") {
+    let line = line.to_owned()
+    guard line.find(" ") is Some(space) else { continue }
+    let key = line.unsafe_substring(start=0, end=space)
+    let value = line.unsafe_substring(start=space + 1, end=line.length())
+    match key {
+      "document" => name = value
+      "main" => main = value
+      "inputs" | "day" | "fonts" =>
+        numbers[key] = @string.parse_int(value) catch {
+          _ => abort("recompile: bad \{key} in \{dir}/meta.txt")
+        }
+      "file" => {
+        guard value.find(" ") is Some(space) else {
+          abort("recompile: bad line in \{dir}/meta.txt: \{line}")
+        }
+        let number = value.unsafe_substring(start=0, end=space)
+        let path = value.unsafe_substring(start=space + 1, end=value.length())
+        let bytes = @fs.read_file_to_bytes("\{dir}/files/\{number}") catch {
+          _ => abort("recompile: cannot read \{dir}/files/\{number}")
+        }
+        overlay.push((file_of_path(path), Some(bytes)))
+      }
+      "removed" => overlay.push((file_of_path(value), None))
+      _ => abort("recompile: bad line in \{dir}/meta.txt: \{line}")
+    }
+  }
+  guard documents.iter().find_first(d => d.name == name) is Some(document) else {
+    abort("recompile: no document `\{name}` (\{dir}/meta.txt; --all?)")
+  }
+  let files = FileSet::new(document.base, [])
+  for entry in overlay {
+    files.overlay[entry.0] = entry.1
+  }
+  let variant : Variant = {
+    main: file_of_path(main),
+    inputs: numbers.get("inputs").unwrap_or(0),
+    day: numbers.get("day").unwrap_or(0),
+    fonts: numbers.get("fonts").unwrap_or(0),
+  }
+  let world = RecompileWorld::new(document.flavor, files, variant)
+  let (compiled, _) = recompile_compile(world)
+  for i, part in compiled_parts[:] {
+    println("PART \{part} \{sha256_hex(@utf8.encode(compiled.parts[i])[:])}")
+  }
+  println("DIGEST \{compiled.digest()}")
 }

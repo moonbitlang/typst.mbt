@@ -19,12 +19,12 @@
 //   accessed since the last reset, i.e. what a watcher would watch.
 // - A world is fresh if it is made by `RecompileWorld::new`: a new file
 //   store (new sources, parsed from scratch) and a library object that no
-//   incremental world has. Fonts are shared (see the README for what else
-//   is: `tests/recompile/README.md`).
+//   incremental world has. The `Font` objects are shared (see the README
+//   for what else is: `tests/recompile/README.md`).
 //
 // What changes between two compilations is a [FileSet] (the bytes of the
 // files) and a [Variant] (what is not a file: the main file, `sys.inputs`,
-// the date). A [Snapshot] of both is all a fresh world needs.
+// the date, the fonts). A [Snapshot] of both is all a fresh world needs.
 
 ///|
 /// The files of a project: those on disk, which never change during a run,
@@ -164,24 +164,51 @@ fn Flavor::library(self : Flavor, inputs : Int) -> @library.Library {
         None => lib
       }
     }
+    // No feature is on unless it is asked for, as in the CLI.
     Plain | Packages =>
-      @typst.library_builder(formats).with_inputs(dict).build()
+      @typst.library_builder(formats)
+      .with_features(@library.Features([]))
+      .with_inputs(dict)
+      .build()
   }
 }
 
 ///|
-fn Flavor::book(self : Flavor) -> @library.FontBook {
-  match self {
-    Suite(_) | Plain => test_font_book()
-    Packages => packages_font_book()
-  }
-}
+/// The family that the font sets of the harness differ in: the default
+/// font of text.
+let recompile_dropped_family : String = "Libertinus Serif"
 
 ///|
-fn Flavor::fonts(self : Flavor) -> Array[@library.Font] {
-  match self {
-    Suite(_) | Plain => test_fonts()
-    Packages => packages_fonts()
+/// The font sets of the flavors, by flavor and number.
+let recompile_font_sets : Map[String, (Array[@library.Font], @library.FontBook)] = Map([],
+)
+
+///|
+/// A font set of a flavor: 0 is all its fonts, 1 those that are not of
+/// [recompile_dropped_family] (text in the default font is then set in a
+/// fallback font, so every page changes).
+fn Flavor::font_set(
+  self : Flavor,
+  set : Int,
+) -> (Array[@library.Font], @library.FontBook) {
+  let (kind, all, book) = match self {
+    Suite(_) | Plain => ("test", test_fonts(), test_font_book())
+    Packages => ("embedded", packages_fonts(), packages_font_book())
+  }
+  if set == 0 {
+    return (all, book)
+  }
+  let key = "\{kind}/\{set}"
+  match recompile_font_sets.get(key) {
+    Some(fonts) => fonts
+    None => {
+      let fonts = all.filter(font => {
+        font.info().family != recompile_dropped_family
+      })
+      let entry = (fonts, @library.FontBook::from_fonts(fonts))
+      recompile_font_sets[key] = entry
+      entry
+    }
   }
 }
 
@@ -194,6 +221,8 @@ priv struct Variant {
   inputs : Int
   /// The date, in days since 1970-01-01 (upstream's test world: 0).
   day : Int
+  /// The font set ([Flavor::font_set]).
+  fonts : Int
 }
 
 ///|
@@ -288,7 +317,7 @@ impl @library.World for RecompileWorld with fn library(self) {
 
 ///|
 impl @library.World for RecompileWorld with fn book(self) {
-  self.flavor.book()
+  self.flavor.font_set(self.variant.fonts).1
 }
 
 ///|
@@ -308,7 +337,7 @@ impl @library.World for RecompileWorld with fn file(self, id) {
 
 ///|
 impl @library.World for RecompileWorld with fn font(self, index) {
-  self.flavor.fonts().get(index)
+  self.flavor.font_set(self.variant.fonts).0.get(index)
 }
 
 ///|
