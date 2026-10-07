@@ -324,6 +324,11 @@
 - MoonBit's `String::compare` (and `Array[String]::sort`) orders by length
   first. Use `compare_str` (code-point = Rust `str` order) wherever upstream
   sorts or compares strings.
+- `Compare::compare` promises only the sign of its result: core's `BigInt`
+  returns -1, 0 or 1 on native, wasm and js, and a difference of limb counts
+  on wasm-gc. Where the port passes an ordering on as a value (Rust's
+  `Ordering`, compared with `==`), normalize it to -1, 0 or 1 at the source
+  (`RustDecimal::cmp`; `calc.max` of two decimals was wrong on wasm-gc).
 - MoonBit's `Array::sort_by`/`sort_by_key` are unstable; Rust's `sort_by`/
   `sort_by_key` are stable. Where ties are distinguishable, break them by
   original index (or use `stable_sort` on `Compare` types).
@@ -504,7 +509,9 @@
   oracles (`pic_scale/oracle_wbtest.mbt`, `hayro/render/oracle_test.mbt`,
   which needs the `target/hayro` and `target/devassets` symlinks to the
   hayro and typst-dev-assets checkouts, else it is silently skipped) must
-  pass on native, wasm and wasm-gc. (5) Aliasing: an output that may alias
+  pass on native; on wasm and wasm-gc `pic_scale`'s passes and
+  `hayro/render`'s fails 3 of 784 renderings (the non-native math fallbacks
+  are not bit-exact; unit tests are not run on these targets in CI). (5) Aliasing: an output that may alias
   an input (`physical_equal` on the arrays) runs the scalar twin, since the
   blocks read ahead of their writes (also overlapping output rows, and a
   scratch accumulator aliasing an input); contracts the lanes rely on are
