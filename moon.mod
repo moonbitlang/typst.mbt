@@ -18,4 +18,5 @@ import {
   "moonbitlang/x@0.5.5",
   "moonbitlang/pdflite@0.3.6",
   "moonbit-community/flate@0.8.5",
+  "moonbitlang/async@0.22.4",
 }

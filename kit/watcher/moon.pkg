@@ -1,0 +1,34 @@
+import {
+  "moonbitlang/typst/kit",
+  "moonbitlang/typst/kit/platform",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/async",
+  "moonbitlang/async/aqueue",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/signal",
+}
+
+import {
+  "moonbitlang/core/debug",
+} for "wbtest"
+
+// Upstream's `watcher` feature of typst-kit, as a package of its own: it is
+// the only one that depends on `moonbitlang/async`, so only an executable
+// that imports it (the CLI) links the asynchronous runtime.
+//
+// `@fs.Watcher` exists on the native and wasm targets only. On the others
+// the package is `unsupported.mbt` alone, and moon.pkg has no per-target
+// imports.
+
+warnings = "-unused_package"
+
+options(
+  targets: {
+    "notify.mbt": [ "native", "wasm" ],
+    "notify_wbtest.mbt": [ "native", "wasm" ],
+    "runtime.mbt": [ "native", "wasm" ],
+    "unsupported.mbt": [ "wasm-gc", "js" ],
+    "watcher.mbt": [ "native", "wasm" ],
+    "watcher_wbtest.mbt": [ "native", "wasm" ],
+  },
+)
