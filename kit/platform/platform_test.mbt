@@ -171,6 +171,8 @@ test "ranged file: pieces, the end of the file, closing" {
   file.close()
   let closed = (file.read(0L, 10) catch { _ => b"" }).length()
   inspect(closed, content="0")
+  let closed = file.size() catch { _ => 0L }
+  inspect(closed, content="0")
 }
 
 ///|

@@ -128,9 +128,20 @@ pub fn RangedFile::open(path : String) -> RangedFile raise IoError {
 ///|
 /// The size of the file in bytes.
 pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
+  self.check_open()
   let size = ffi_ranged_size(self.fd)
   check_last_error()
   size
+}
+
+///|
+/// A closed file has no descriptor: the system is not asked (the C library
+/// of Windows aborts on an invalid one).
+fn RangedFile::check_open(self : RangedFile) -> Unit raise IoError {
+  if self.fd < 0 {
+    // EBADF
+    raise os_error(9)
+  }
 }
 
 ///|
@@ -141,6 +152,7 @@ pub fn RangedFile::read(
   offset : Int64,
   len : Int,
 ) -> Bytes raise IoError {
+  self.check_open()
   let bytes = ffi_ranged_read(self.fd, offset, len)
   check_last_error()
   bytes
