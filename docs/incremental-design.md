@@ -3,8 +3,10 @@
 Status: design, not implemented. Revision 4 (2026-10-07). Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
 with the verdict "request changes"; revision 3 answered the second review;
-revision 4 records the coordinator's decisions (section 11) and costs the
-alternative for module equality (5.4). Upstream
+revision 4 records the coordinator's decisions (section 11), costs the
+alternative for module equality (5.4) and answers a third review
+(`docs/reviews/incremental-design-3.md`, "request changes", on 5.2, 5.4 and
+9.1); what it changed in answer has not been reviewed. Upstream
 `e58a63af`, comemo 0.5.1. Measurements: aarch64 macOS, native release,
 `--ignore-system-fonts`, PDF output, other agents building on the same
 machine (medians of five; the spread is given where it matters).
@@ -45,8 +47,8 @@ it. Section 3 has the measurements the order rests on.
   is not incremental compilation.
 - The design mirrors comemo: results are found by a fingerprint of their
   hashed arguments, are valid if the tracked arguments answer the recorded
-  questions as before, age by one with every `evict` and are dropped at
-  `max_age`. Where the port deviates (section 10) it is stricter, with one
+  questions as before, age by one with every `evict` and are dropped when
+  their age exceeds `max_age`. Where the port deviates (section 10) it is stricter, with one
   exception that is said there (equality of modules).
 - The numbers for what is not built are a probe's, which validated less
   than the design does: they are upper bounds of the gain.
@@ -457,10 +459,12 @@ their own `&World`.
 
 A host function gets the engine and can capture anything else. The
 contract is the one a native function has: what it returns depends on its
-arguments and on what it reads through the engine. The design relies on
-it only for host functions that a library defines in its scope, which the
-library's serial number covers (5.3). Any other host function is in the
-fingerprint of whatever holds it, with `fingerprint_identity` set, and
+arguments and on what it reads through the engine, and it does not make a
+new value that compares by identity on every call (a host function, a
+module, a descriptor of a function, element or type). The design relies
+on it only for host functions that a library defines in its scope, which
+the library's serial number covers (5.3). Any other host function is in
+the fingerprint of whatever holds it, with `fingerprint_identity` set, and
 such entries end with their compilation (5.4).
 
 **The contract of a world**, as today plus what validation needs: it does
@@ -500,14 +504,31 @@ also while callbacks are lowered during layout, and markup snippets whose
 files come into being then (`Registry::register` and `Registry::snippet`,
 `doc/origin.mbt`; their ids are interned from the paths `<edsl-origins>`
 and `<edsl-markup-N>`, so Typst code can name them). Such files are
-declared by a predicate that the entry point of a scope takes
-(`compile_with` gets a parameter; `doc` passes "is one of the session's
-virtual paths", which also holds for a snippet that does not exist yet).
-A read of a volatile file is not answered from the table, and it marks
-the log: a memoized call whose part of the log holds the mark is not
-stored, and the mark stays for its callers. So nothing that depends on a
-volatile file, directly or through a call, is ever found again, in its
-scope or later. (What `doc` builds from its registry without the world,
+declared by a predicate on file ids that the entry point of a scope takes
+(`compile_with` gets a parameter). `doc`'s predicate is by path, not by
+what the registry holds at the moment: the project-rooted ids that
+`virtual_file` makes in the session's directory for `<edsl-origins>` and
+for `<edsl-markup-N>` with any `N`, so that a snippet that does not exist
+yet, whose read today falls through to the caller's world, is covered.
+The engines of `History::compute` use the scope's predicate. Three rules
+follow from it.
+
+- A read of a volatile file is not answered from the table, and it marks
+  the log. A memoized call whose part of the log holds the mark is not
+  stored, also when it ends with an error that would be kept (a module's);
+  the mark survives the deduplication at the end of a call and stays for
+  the callers.
+- A module entry is not stored for a file that is volatile itself (its
+  source is read before the entry's part of the log starts,
+  `eval/import.mbt`, `import_file`).
+- An entry that exists is not taken if one of its source or file reads is
+  volatile in the scope at hand, whatever the file answers now. Stores
+  cross worlds and file ids are interned by path: an entry that another
+  world stored for a real file `<edsl-origins>` must not be found, and
+  stamped, in a session whose listing happens to start equal.
+
+So nothing that depends on a volatile file, directly or through a call, is
+ever found, in its scope or in another. (What `doc` builds from its registry without the world,
 the spans of lowered content, is not affected: equal content with equal
 spans means the same under any session's registry, since spans are
 resolved through the registry of the report at hand, `doc/review_click.mbt`,
@@ -521,9 +542,9 @@ deduplicated, paired with the fingerprints from the table and kept in the
 entry, and the log is cut back to the deduplicated reads, which are
 thereby the caller's too. A failed read is pushed before it raises.
 
-**On a hit.** An entry is valid for the world if, for each of its reads,
-the table's fingerprint is the entry's (an entry has no volatile reads).
-An entry that passed is stamped with the scope's token and its world reads
+**On a hit.** An entry is valid for the world if none of its reads is
+volatile in this scope and, for each of them, the table's fingerprint is
+the entry's. An entry that passed is stamped with the scope's token and its world reads
 are not checked again in that scope. The stamp is about the world only: the arguments, the context, the
 route and the introspector reads are checked on every lookup, as today.
 The reads of a reused entry are pushed to the log, as if the call had run:
@@ -638,16 +659,36 @@ two is `false` where a from-scratch compilation has one object and says
 compare by pointer. The port cannot intern the modules (no weak
 references: the table would keep every version of the main file's content)
 and does not copy the quirk. Two identified modules are equal if they are
-the same object, or if their fingerprints are equal and what they hold is:
-the same name and file, scopes that bind the same names to equal values,
-equal contents, by the exact comparison that memoized arguments get
-(`values_memo_equal`: functions and types by what Typst's `==` says, which
-is identity for native, element and host functions; closures by their
-hash; modules by this rule). The fingerprint says no quickly, and it is
-what tells two plugins' modules apart (below); the comparison is what a
-fingerprint cannot give (two native functions with one name and one
-documentation have one fingerprint). Then two objects for one evaluated
-file are indistinguishable. This changes `==` from the
+the same object, or if their names and fingerprints are equal and, where
+the fingerprints carry `fingerprint_identity`, they visit the same host
+functions and unidentified modules, as objects, in the same order (the
+comparison that `IntrospectionRecorder::validate` makes for the results of
+reads, `fingerprint_output_hosts`). That is the relation the stores
+already use: a closure that captured one of two such modules has the hash
+of the one that captured the other (`closures_equal`), so whatever the
+fingerprint does not tell apart is one value for every kept call, and `==`
+must not tell it apart either. A relation that compares what the modules
+hold with Typst's `==` instead does not do that: a module that exports
+`float.nan` would differ from its own re-evaluation, and a function that
+returns the module it captured would then return one that is unequal to
+the current one (review 3, finding 2). The fingerprint has the float's
+bits, ends on cycles and is kept with the module.
+
+For this the fingerprint must tell apart what `==` tells apart inside a
+module. One thing it does not, today and within one compilation: native
+functions, elements and types compare by their descriptor object
+(`library/func.mbt`, `library/element.mbt`, `library/ty.mbt`) and
+fingerprint by name, title and documentation, by key, by long name
+(`library/value_hash.mbt`). Two native functions that a host makes with the
+same texts are one argument for every memoized call, and a closure that
+captured a module holding the one is found for the module holding the
+other (review 3, finding 3). Upstream hashes the descriptor's address
+(`typst-utils/src/static.rs:32`, `Hash for Static`). A descriptor gets a
+process-wide number when it is made, and that number is its fingerprint.
+(Tests that pin the fingerprint of a value that holds a descriptor change.)
+
+Then two objects for one evaluated file are indistinguishable. This
+changes `==` from the
 moment it is merged, in every compilation, wherever two such objects with
 equal contents meet. In a from-scratch compilation that is: a file that
 is evaluated twice (under IDE tracing a file that holds the traced span is
@@ -662,8 +703,9 @@ fingerprint is that of an empty scope, and it compares by identity, which
 only works while the cache of loaded plugins lives exactly as long as
 everything that holds its modules. A plugin's module gets the hash of the
 plugin's bytes (and of its transitions) in its fingerprint; two loads of
-one file are then equal and two files are not, with and without functions,
-which is what upstream's `==` says for them in a from-scratch compilation.
+the same bytes in the same state are then equal and others are not, with
+and without functions, which is what upstream's `==` says for them in a
+from-scratch compilation.
 
 **Equality by content, or identity kept.** Both ways, costed.
 
@@ -700,7 +742,11 @@ beside `typst/memo_trace_wbtest.mbt`; neither is in the repository. The
 last column is not run, (a) does not exist: it is what the rule gives (the
 two modules of `a.typ` bind `probe` to closures with one hash; the two
 `math` modules bind the same native functions and symbols, which are one
-object each in a process).
+object each in a process, `library/funcs_gen.mbt`). Review 3 looked for a
+document that the command line compiles with two such modules (a file
+under two routes, `include`, a package under two names, `eval` with a
+scope, `plugin`, `std` and `math` reached two ways, a file that fails) and
+found none (its finding 11).
 
 (b) *Identity kept.* A module entry that is valid hands out the object it
 has; a file that is evaluated again gets a new object, also when what it
@@ -711,30 +757,38 @@ scratch. To be sound across compilations it needs three things.
   a closure that captured the old module and one that captured the new
   have one hash (`closures_equal`, `library/value_hash.mbt`), so a kept
   call of the first is found for the second and returns what holds the old
-  object. The module's identity has to enter its fingerprint (a number per
-  evaluation), against the rule that a fingerprint covers what upstream's
-  `Hash` covers.
-- A module entry must live as long as anything that imported its file is
-  found. Otherwise the file is evaluated again next to a kept holder of
-  the old object, which is the shape of review 1, finding 4. A hit has to
-  renew the module entries of the sources it read.
+  object. The module's identity has to enter what makes two keys
+  interchangeable. That can be its fingerprint (a number per evaluation,
+  against the rule that a fingerprint covers what upstream's `Hash`
+  covers), a second component of every key beside the fingerprint, or a
+  comparison of closures by what they captured instead of by their hash
+  (a walk of the captured scopes on every lookup).
+- The producer of an identity must live as long as anything that holds
+  the identity is found: the module entry of that source in that state,
+  and for a plugin's module the entry of its load or transition. Otherwise
+  the file is evaluated again next to a kept holder of the old object,
+  which is the shape of review 1, finding 4. A hit has to renew exactly
+  those entries, and the limit of four entries per key must not push them
+  out.
 - Hits. After an edit that leaves a file's module equal (a comment, white
   space), everything that holds the module as a value misses once. With
   `#import "utils.typ"` and `utils.f(..)`, which is how touying's files use
-  each other, that is every closure of every importing file. Measured with
-  the probe by an edit of `touying/0.8.0/src/utils.typ` that changes the
-  module's fingerprint and none of its bindings (text appended to the
-  file): the touying document recompiles in 137 ms, with 3171 closure
-  calls and all 19 paragraphs computed again, against 34 ms and 18 calls
-  for a comment in the same file when closures that captured equal modules
-  are equal (which is today's comparison and (a)'s). From scratch it is
-  155 ms.
+  each other, that is every closure of every importing file. A proxy for
+  it, with the probe: an edit of `touying/0.8.0/src/utils.typ` that
+  changes the module's fingerprint and none of its bindings (text appended
+  to the file, which also changes what an `include` of it would give;
+  nothing includes it). The touying document then recompiles in 137 ms,
+  with 3171 closure calls and all 19 paragraphs computed again, against
+  34 ms and 18 calls for a comment in the same file when closures that
+  captured equal modules are equal (which is today's comparison and
+  (a)'s). From scratch it is 155 ms. It is the probe's number, with what
+  the probe leaves out (section 8), and no implementation of (b).
 
 The recommendation is (a). It differs from upstream in two cases that need
 a host and in no document the command line compiles. (b) buys agreement in
-those two cases with a fingerprint that is no longer upstream's, a rule
-between stores, and a recompilation close to from scratch after a comment
-in a shared file of a package.
+those two cases with keys that carry module identities, a rule between
+stores, and a recompilation close to from scratch after a comment in a
+shared file of a package.
 
 **What compares by identity.** By Typst's `==` (`library/ops.mbt`,
 `library/func.mbt`, `library/dyn.mbt`; the inventory is in review 2,
@@ -742,13 +796,18 @@ finding 11): native functions, element functions and types, by their
 descriptor; host functions; modules that are not identified. Everything
 else compares by value (closures by their hash, plugins by their bytes and
 transitions), or is never equal (styles, gradients, tilings). Descriptors
-are made when a library is built and belong to it: the library's serial
-number in the key covers them, on the condition of 5.3 that a library does
-not change. What is made while a document compiles and compares by
-identity is then only what a host brings: host functions and modules it
-builds. Their fingerprints carry `fingerprint_identity`. Such a value can
-enter a kept result, which includes its sink (traced values) and its kept
-errors, in four ways, and each is closed:
+are objects of the process: the generated ones are made once, on first use,
+and shared by every library (`library/funcs_gen.mbt`,
+`library/types_gen.mbt`; the tables of `library/html_typed.mbt`,
+`library/accent.mbt`, `library/lr.mbt`), and a host can make more
+(`NativeFuncData::new`, the constructors of types and elements). With
+their number as their fingerprint (above) they need no flag: equal
+fingerprints are the same descriptor. What is left that compares by
+identity and that a fingerprint does not identify is what a host brings:
+host functions and modules it builds. Their fingerprints carry
+`fingerprint_identity`. Such a value can enter a kept result, which
+includes its sink (traced values) and its kept errors, in five ways, and
+each is closed:
 
 - from an argument, a captured variable or the context of the call: the
   key carries the flag, and an entry whose key carries it ends with its
@@ -759,11 +818,14 @@ errors, in four ways, and each is closed:
   today);
 - from the library's scope: the library is in the key;
 - from a frame's tags: such a frame is not kept (`frame_cacheable`, as
-  today).
+  today);
+- made by a host function during the call: one that is reached through a
+  value is in the key, with the flag; one that the library defines must
+  not make one per call (the contract of 5.2).
 
-Nothing else creates one inside a call. This is an invariant of the
-engine, not something an entry checks when it is stored (that would
-fingerprint every result); the checked mode of 9.1 checks it.
+The engine's own functions create none. This is an invariant, not
+something an entry checks when it is stored (that would fingerprint every
+result); the checked mode of 9.1 checks it.
 
 **Mutable results.** The rule: what an entry keeps and what it hands out
 are different objects wherever the type can be written, on storing and on
@@ -811,8 +873,10 @@ looked at):
 
 comemo's rule. Every entry of every store has an age. `@library.evict
 (max_age)` adds one to each and drops those above `max_age`; a hit sets the
-age to zero. A compilation no longer clears anything; a process that never
-calls `evict` keeps everything, as a process using comemo does, and
+age to zero. A compilation no longer clears the stores (what ends with a
+compilation or a scope by 5.2 and 5.4 is never stored or is dropped then:
+entries keyed by a host's values, readers of volatile files); a process
+that never calls `evict` keeps the rest, as a process using comemo does, and
 `evict(0)` drops everything. `typst watch` calls `evict(10)` after each
 recompilation, where it calls it today: `max_age` is upstream's 10
 (decided, section 11). What that holds, for `longer.typ`: 116 MB with
@@ -941,8 +1005,9 @@ of entries of each after `longer.typ` and after the `packages` stage.
 
 The order follows section 3: first what is worth most and needs nothing
 new, then the machinery with the stores that exist, then the missing
-functions by their measured gain. Every slice ends with the harness of
-section 9 green and with its rows of section 3.3 measured again. The
+functions by their measured gain. Slices 1 to 3 each end with the harness
+of section 9 green; every slice ends with its rows of section 3.3 measured
+again. The
 expected numbers are the probe's and are optimistic: the probe validated
 no world reads for closure calls and layouts, compared no arguments where
 it found entries by key, copied no diagnostics and no documents, and
@@ -994,9 +1059,10 @@ steps, each merged on its own; results cannot become stale before step 5.
    main file through the same store (`typst/lib.mbt`); the library made
    only by its builder, immutable, with its serial number in every key
    (5.3).
-4. **Identity and ownership.** Plugin modules identified by their bytes;
-   module equality (5.4; this step changes `==` where two modules with
-   equal contents meet, in every compilation); entries whose key carries
+4. **Identity and ownership.** Descriptors fingerprinted by their number;
+   plugin modules identified by their bytes; module equality (5.4; this
+   step changes `==` where two modules with equal contents meet, in every
+   compilation); entries whose key carries
    `fingerprint_identity` end with their compilation; the introspector's
    `query` returns a view or a copy, and its serial number replaces the
    object in entries; the copies and views of 5.4's rule for mutable
@@ -1135,7 +1201,16 @@ main file. Sequences longer than `max_age + 2`, with `max_age` 0, 1 and
   that reads a file; the file changes: the convergence warning and the
   pages (5.2);
 - two libraries made from one builder with different rules or routines,
-  the same document under each (5.3).
+  the same document under each (5.3);
+- a file that exports `float.nan` and is imported as a module; a function
+  `get() = m` in the main file and `get() == m` on the page; a comment in
+  the imported file changes (5.4);
+- a library with two native functions that have the same name, title and
+  documentation; a file that exports one of them, chosen by `read`; a
+  function `get() = m.x` in the main file; the choice changes (5.4);
+- a call stored under a plain world that read a real file named
+  `<edsl-origins>`, then a `doc` session in that directory whose listing
+  starts with the same bytes and grows (5.2).
 
 **Mutation checks.** The harness is only evidence if it fails when a
 validation is missing. Each of these, switched on by a build flag, must
@@ -1156,31 +1231,52 @@ make it fail, and the flag list is part of the stage:
 | 10 | the capture table finds an analysis by span alone, without the node | an edit after which another closure expression has the span of an old one, both evaluated in one compilation (as `eval/captures_wbtest.mbt` tests today) |
 | 11 | introspector reads are not validated across compilations | an edit that moves a heading to another page under an outline |
 | 12 | the library is not in the key | `sys.inputs` changes |
-| 13 | modules compare by identity | a comment-only edit of an imported file whose module the document compares with `==` |
+| 13 | modules compare by identity | a comment-only edit of an imported file; the main file's `get() = m` returns the module it captured, and the page shows `get() == m` (a module passed as an argument proves nothing: it misses under identity) |
 | 14 | the sink of a reused entry is not replayed | a warning inside a kept closure call must be reported by every recompilation |
 | 15 | raw elements keep their theme by path | changed bytes of a `.tmTheme` |
-| 16 | `Works::generate` keeps its last result by introspector | changed bytes of the `.bib` file |
+| 16 | `Works::generate` keeps its last result by introspector | changed bytes of the `.bib` file, with two paragraphs that cite: the second one found the works of the first under the same introspector, and it must be the one that is kept and found |
 | 17 | the stamp of one scope is taken for another's | the nested compilation above |
 | 18 | diagnostics are shared with entries | the imported error above |
-| 19 | a call that read a volatile file is stored | the `doc` scenario above |
-| 20 | an SVG image's fingerprint leaves out its linked images | the tiling above |
-| 21 | the engines of `History::compute` get the untracked world | the document above that does not converge |
+| 19 | the predicate calls a volatile file stable | the `doc` scenarios above (one flag for the listing, one for a snippet that does not exist yet) |
+| 20a | an SVG image's fingerprint leaves out its linked images | the tiling above, captured by a function instead of passed to one (an argument is also compared exactly, which would hide the fault) |
+| 20b | an SVG image's equality leaves out its linked images | the tiling above, passed to `id` |
+| 21 | the engines of `History::compute` get the untracked world | the document above that does not converge; the call that reads the file must run inside the history, not be found from the layout |
+| 22 | descriptors are fingerprinted by their texts | the two native functions above |
 
 Each flag removes one recording, one validation, one replay or one copy,
 and each scenario must show that the entry in question was found (the
 counters of 9.2), or the check proves nothing.
 
 **A checked mode.** A build flag under which a hit is followed by a shadow
-run of the function and a comparison. The shadow run gets snapshots of the
-arguments (a closure call consumes them; the entry has a copy), runs with
-every store switched off, so that it is built from nothing that is kept,
-and with a sink of its own, stores nothing and replays nothing. Compared,
-exactly and not by fingerprint (`values_memo_equal`, frames item by item):
-the result; the sink (diagnostics with traces and hints, traced values and
-styles, introspections by their fingerprints). And the invariant of 5.4:
-every host function and unidentified module in the kept result is, as an
-object, among those of the key, of the library or of the results of the
-entry's introspector reads. comemo has nothing like it (its debug
+run of the function and a comparison.
+
+- What runs: the function, captures, arguments and context of the call at
+  hand, not what the entry kept (a copy of the arguments is taken before
+  the lookup, since a closure call consumes them), with the route,
+  locator, traced span and world of the call.
+- Isolated from the call: every store off, so that nothing kept goes into
+  it; a sink, an introspection recorder and a world log of its own; the
+  context's read flags, the route's shift bounds, the route-query and
+  traced-file logs saved before and restored after. It stores nothing and
+  replays nothing. It asks the same table of answers as the call, so it
+  does not test that table (mutation checks 1 to 6 do), and it never meets
+  a volatile file (such an entry is not found, 5.2).
+- Compared, by fingerprint (which has spans, locations, lifecycles and
+  the bits of floats) and by the exact comparison where the fingerprint is
+  flagged (host functions and unidentified modules as objects): the
+  result, by kind: a value; frames; a module (5.4's relation: with stores
+  off its imports are new objects); pages and a document with their
+  frames, info and options; works with their maps and errors; a counter
+  sequence. The sink: diagnostics with spans, hints and traces, traced
+  values and styles. Introspections are closures and cannot be compared:
+  their number is. Shared flags of arrays and dictionaries are not part
+  of it.
+- The invariant of 5.4, by reachability: every host function and
+  unidentified module in the kept result is, as an object, reachable from
+  the key, from the library, or from the result of one of the entry's
+  introspector reads.
+
+comemo has nothing like it (its debug
 assertions catch a memoized function whose tracked calls differ between
 two runs: `tree.rs`, `MissingCall`; `constraint.rs`); it is what makes
 "equal to from scratch" checkable per entry instead of per document. The
@@ -1259,23 +1355,31 @@ Kept or introduced, each stricter than upstream unless said:
    per tracked reference and until `evict`. Same observable behaviour
    under the same contract. A world may declare files that change during a
    scope, which comemo's contract does not allow.
-9. **Persistent edits are upstream's semantics, not a deviation.**
-   Upstream's source and nodes are `Arc`s that are written through
-   `Arc::make_mut`: `Source::edit` (`typst-syntax/src/source.rs:107`),
-   every write to an inner node (`SyntaxNode::inner_and_span_mut`,
-   `node.rs:91`; the renumbering, `node.rs:398`). Whoever holds the old
-   source or a node of it keeps what it had. The port cannot ask whether a
-   node is shared and copies always; no holder can tell the difference.
-   What deviates is today's port, which writes in place.
-10. **Looser than upstream: the modules of files, plugins and libraries
-    compare by what they hold** (5.4). Differs from upstream in a
+9. **Persistent edits are upstream's semantics for nodes, not a
+   deviation.** Upstream's nodes are `Arc`s that are written through
+   `Arc::make_mut`: every write to an inner node goes through
+   `SyntaxNode::inner_and_span_mut` (`typst-syntax/src/node.rs:85`, the
+   `make_mut` at `:91`), which the renumbering (`numberize`, `:516`) and
+   the replacement of children use. Whoever holds a node keeps what it
+   had. The port cannot ask whether a node is shared and copies always; no
+   holder of a node can tell the difference. What deviates is today's
+   port, which writes in place. A `Source` is another matter and stays as
+   it is: upstream's is a handle whose clone keeps the old state
+   (`source.rs:24`, `make_mut` at `:107`), the port's is one object that
+   an edit changes for everyone who holds it. Nothing that is kept holds a
+   `Source`: entries hold fingerprints of sources and nodes.
+10. **Descriptors of native functions, elements and types are
+    fingerprinted by a number given when they are made** (5.4); upstream
+    hashes their address. Today's port fingerprints their texts.
+11. **Looser than upstream: the modules of files, plugins and libraries
+    compare by their fingerprints** (5.4). Differs from upstream in a
     from-scratch compilation where two such objects with equal contents
     meet: a file evaluated twice under IDE tracing, modules of two
     libraries in one evaluation.
-11. **An SVG image's fingerprint and equality include the images it links**
+12. **An SVG image's fingerprint and equality include the images it links**
     (5.5); upstream's cover its bytes and fonts.
-12. **Not memoized**: the rows of section 4 that say so.
-13. **One thread**: upstream lays out page runs in parallel.
+13. **Not memoized**: the rows of section 4 that say so.
+14. **One thread**: upstream lays out page runs in parallel.
 
 Upstream quirks the port does not reproduce:
 
@@ -1284,14 +1388,14 @@ Upstream quirks the port does not reproduce:
   by their bytes), and in general anything whose `Hash` is coarser than its
   `==`.
 - A module that a kept result returns and the module of the same file
-  evaluated again are different objects and compare unequal (deviation 10).
+  evaluated again are different objects and compare unequal (deviation 11).
 - comemo keeps a result whose constraint is satisfied even if the nested
   results it was built from were evicted and recomputed as other objects.
   The port has the same structure; it is harmless here because nothing
   that is made during a compilation and kept compares by identity (5.4).
 - A value built from a file whose hash does not cover the file is reused
   by a memoized call that is handed it again after the file changed (an
-  SVG's linked images, deviation 11).
+  SVG's linked images, deviation 12).
 
 ## 11. Decisions and open questions
 
@@ -1306,11 +1410,13 @@ Decided on 2026-10-07 by the coordinator of this work:
   upstream's semantics).
 - Slice 0 is built first, before the harness, which it does not need.
 - A third review round on 5.2, 5.4 and 9.1: `docs/reviews/
-  incremental-design-3.md`.
+  incremental-design-3.md`. Its verdict is "request changes"; its nine
+  findings are answered in this revision, and those answers are not
+  reviewed.
 
 Leaning towards "accepted" by the coordinator; the owner may overrule:
 
-1. **Module equality by content** (deviation 10). 5.4 costs it against
+1. **Module equality by content** (deviation 11). 5.4 costs it against
    keeping identity and recommends it: it differs from upstream in two
    cases that need a host and in no document the command line compiles;
    keeping identity costs a fingerprint that is not upstream's, a rule
