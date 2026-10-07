@@ -1418,3 +1418,65 @@ test "section 8: a callback cannot be created inside a callback" {
     ),
   )
 }
+
+///|
+test "section 9: the lints of the pages" {
+  let small = (item : &@doc.IntoContent) => {
+    @doc.Document([
+      @doc.SetPage(width=Pt(200), height=Pt(120), margin=@doc.Sides(all=Pt(10))),
+      @doc.SetText(size=Pt(10)),
+      item,
+    ])
+  }
+  // A character that no font of the world has (numbers as N, also those
+  // of the code point: `U+1F680`).
+  inspect(
+    numberless(@guide.lints_of(small(@guide.shipped_card())).join("\n")),
+    content=(
+      #|lint[missing-glyph]: no font of this text has a glyph for "🚀" (U+NFN): it is drawn as the missing glyph of Libertinus Serif
+      #|  at doc/examples/guide/guide.mbt:N:N (Block, argument N)
+      #|  on page N
+      #|  hint: use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section N)
+    ),
+  )
+  // Content outside the page.
+  inspect(
+    numberless(@guide.lints_of(small(@guide.wide_row())).join("\n")),
+    content=(
+      #|lint[outside-page]: text leaves the page at the right by N.Npt
+      #|  at doc/examples/guide/guide.mbt:N:N (Grid, argument N)
+      #|  on page N
+      #|  hint: what is outside the page is cut off: look for a width, a height or an offset that puts it there, a block that cannot break and is higher than the page, a word or a row that is wider
+    ),
+  )
+  // Content outside a drawing, and outside a block of a fixed height.
+  inspect(
+    numberless(@guide.lints_of(small(@guide.labelled_bar())).join("\n")),
+    content=(
+      #|lint[outside-container]: text leaves its container (Canvas, Npt by Npt) at the right by N.Npt
+      #|  at doc/examples/guide/guide.mbt:N:N (Canvas::place, argument N, key "N")
+      #|  on page N
+      #|  hint: the container (doc/examples/guide/guide.mbt:N:N (Canvas))
+      #|  hint: a block or box with a size of its own does not grow with its content, and cuts nothing off unless `clip=true`
+    ),
+  )
+  inspect(
+    numberless(@guide.lints_of(small(@guide.low_card())).join("\n")),
+    content=(
+      #|lint[outside-container]: text leaves its container (Block, Npt by Npt) at the bottom by N.Npt
+      #|  at doc/examples/guide/guide.mbt:N:N (Block, argument N)
+      #|  on page N
+      #|  hint: the container (doc/examples/guide/guide.mbt:N:N (Block))
+      #|  hint: a block or box with a size of its own does not grow with its content, and cuts nothing off unless `clip=true`
+    ),
+  )
+  // With room, and with a font that has the character, nothing is said:
+  // the document of all the other samples has the one lint of section 2.
+  assert_eq(@guide.lints_of(@guide.guide()).length(), 1)
+  // Turned off, and without pages (`lower`): no lint of the pages.
+  let document = small(@guide.shipped_card())
+  let world = @doc.DocWorld::in_memory()
+  assert_eq(document.compile_paged(world).lints.length(), 1)
+  assert_eq(document.compile_paged(world, lints=false).lints.length(), 0)
+  assert_eq(document.lower(world).lints.length(), 0)
+}

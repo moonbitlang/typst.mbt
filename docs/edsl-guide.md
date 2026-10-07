@@ -12,7 +12,7 @@ text of that file, and the errors of sections 7.2 and 8 the ones their
 tests expect, but for their line and column numbers).
 What the guide says a sample does is checked by a test of
 `doc/examples/guide/guide_test.mbt`; what it says about the findings of the
-ports, by `doc/ports_findings_test.mbt`. Section 9 lists which test checks
+ports, by `doc/ports_findings_test.mbt`. Section 10 lists which test checks
 what, and the few statements that no test can check.
 
 ## 1. The prelude
@@ -273,7 +273,8 @@ directly between blocks is reported, too; write it as one `Par(Seq([..]))`).
 Without a block the array can be the body of one paragraph
 (`Par(Seq(["Typeset with ", Emph("care"), "."]))`), so nothing is reported.
 The lint does not look into callbacks, `Call` or `Markup`.
-`compile_paged(world, lints=false)` turns the lints off.
+`compile_paged(world, lints=false)` turns the lints off. Section 9 has the
+other lints, which read the pages.
 
 ## 3. Helpers that keep the caller's location
 
@@ -540,11 +541,11 @@ What is and is not reported:
 - A family that the world does not have is a warning (`unknown font
   family: ..`) at the `font` argument, and the next family of the list is
   used.
-- A character that no font of the world covers is not reported: it is set
-  as glyph 0 of a font (the font's mark for a missing character, usually
-  an empty box), and `warnings` is empty. Text in a script the embedded
-  fonts do not cover (CJK, for example) needs a font from `font_paths`,
-  and only the rendered page shows that it is missing.
+- A character that no font of the world covers is no warning of the
+  engine: it is set as glyph 0 of a font (the font's mark for a missing
+  character, usually an empty box), and `warnings` is empty. It is a lint
+  (`MissingGlyph`, section 9). Text in a script the embedded fonts do not
+  cover (CJK, for example) needs a font from `font_paths`.
 - In a world without any font, each named family is a warning and the text
   is not on the page at all.
 
@@ -690,11 +691,13 @@ using @kit {type Cards, type DataTable, type Chip, type Canvas}
 
 Cards in a row should be equally high. A `Block` does not do that: it is as
 high as its own content. Two things that look like the way do something
-else, and neither is reported:
+else, and the engine reports neither:
 
 - a fixed `height` does not grow: content that needs more runs out below
-  the block (and a block that is split at a page break loses the space at
-  the break, so its content can run out although it fits the height);
+  the block, which a lint reports (`OutsideContainer`, section 9); and a
+  block that is split at a page break loses the space at the break, so
+  its content can run out although it fits the height, which no lint
+  sees;
 - `height=Pct(100)` is the height of the region (at the top level of a
   document: the page between its margins), not of the row: every card
   becomes that high, over a page break.
@@ -1039,7 +1042,9 @@ pub fn harvest_chart(beds : Array[(String, Double)], top : Double) -> Layout {
   whole: `Scale(canvas, factor=Pct(56.7), reflow=true)`. That scales its
   strokes and its text too, which a factor on the coordinates does not.
 - A canvas that does not fit the rest of the page moves to the next page.
-  One that is higher than a page leaves it, without a diagnostic.
+  One that is higher than a page leaves it; a lint reports what of it is
+  outside the page (`OutsidePage`, section 9), and what an item draws
+  outside of its canvas (`OutsideContainer`).
 
 Boxes and arrows (`year`):
 
@@ -1187,7 +1192,171 @@ pub fn stripes_captured() -> Seq {
 A callback description can be used any number of times, also in the result
 of another callback; it is its creation that has to come first.
 
-## 9. What is checked where
+## 9. Lints: what a report says of a document that compiles
+
+A document that compiles can still be wrong on the page, and the engine
+says nothing. The EDSL looks for four such things; what it finds is in the
+`lints` of the report (section 2 prints them: `lints_of`), each with its
+kind, a message, the place in the source, hints and, for what was found on
+a page, the page. `warnings` stay the engine's. `compile_paged(world,
+lints=false)` turns all of them off.
+
+One reads the description (section 2: `AdjacentInline`). The other three
+read the laid-out pages, so they are in the report of `compile_paged`
+only: `lower` and a compilation to another output (`compile` for HTML)
+have no pages, and a document with errors has none either. They look at
+every glyph of the document once; on a report of 18 pages that took
+0.35 ms of a compilation of 70 ms, and on one of 100 pages 3 ms of about 400 ms
+(section 10 says what was measured).
+
+**A character that no font has** (`MissingGlyph`). The fonts of the world
+are tried in the order of section 5; what none of them has is drawn as the
+first font's glyph for a missing character, usually an empty box
+(`shipped_card`, with the embedded fonts):
+
+```moonbit
+pub fn shipped_card() -> Block {
+  Block("Shipped \u{1F680} today", fill=Luma(235), inset=Sides(all=Pt(4)))
+}
+```
+
+```text
+lint[missing-glyph]: no font of this text has a glyph for "🚀" (U+1F680): it is drawn as the missing glyph of Libertinus Serif
+  at doc/examples/guide/guide.mbt:519:9 (Block, argument 1)
+  on page 1
+  hint: use a font that has it: name its family in the `font` of `SetText` or `Text` (with `fallback=false` only those are tried, otherwise every font of the world); a font that is not embedded comes from `font_paths` or from the system's fonts (docs/edsl-guide.md, section 5)
+```
+
+- The place is the argument that has the character, the font is the one
+  that drew the box. One call and one character are one lint, with a
+  count: a table of a hundred rows from one function is one lint that says
+  "100 times", under the key of its first row.
+- A character that shows nothing is named by its code point (`U+0001`).
+  Characters that are ignored by default (a soft hyphen, a joiner, a
+  variation selector, a zero width space) are not glyphs at all next to
+  text that a font has, and a tab or a line break is none either. Inside
+  a run that no font has, the engine draws the box for each of them, and
+  each is reported: an emoji of three people joined by U+200D is three
+  boxes for the people and two for the joiners.
+- In a line of more than 65,535 bytes the pages do not say which character
+  a glyph is; the lint then quotes the start of the line.
+- Not seen: text in a world without any font (it is not on the page at
+  all, and the engine warns only of a family that is named); what a font
+  draws for a character that it does have (an empty glyph, a "last
+  resort" font's own boxes, and the box that the engine draws for a
+  bitmap glyph that it cannot decode).
+
+**Content outside the page** (`OutsidePage`). Text, a shape or an image
+that leaves the page by more than a point (`wide_row`, on a page of
+200pt):
+
+```moonbit
+pub fn wide_row() -> Grid {
+  Grid(["Sown", "Planted", "Harvested"], columns=[Pt(90), Pt(90), Pt(90)])
+}
+```
+
+```text
+lint[outside-page]: text leaves the page at the right by 31.7pt
+  at doc/examples/guide/guide.mbt:525:8 (Grid, argument 1)
+  on page 1
+  hint: what is outside the page is cut off: look for a width, a height or an offset that puts it there, a block that cannot break and is higher than the page, a word or a row that is wider
+```
+
+- The page is the paper: the margin is on it (a header, a page number, a
+  footnote, what is placed there), and so is the bleed of
+  `SetPage(bleed=..)`. A background that covers the page is on it; the
+  page's fill is not an item at all.
+- What counts is what is drawn, since that is what is cut off: of a glyph
+  the box of its outline (not its line, which is higher than its
+  letters), of a shape its interior and its stroke with its dashes, of
+  an image its box; through every rotation and scaling around it. A clip
+  around it counts as the box of the clip: what round corners or a
+  turned clip cut away beyond that can still be reported. So a full stop
+  that hangs over the edge of a justified line is reported on a page
+  without a margin, and half of a 4pt stroke on the edge is.
+- The side and the amount are those of the farthest item of the call, and
+  "(the farthest of 5)" counts its lines or shapes. What the engine drew
+  without a source location (the marker of a list item, a decoration) has
+  the place of the element that it is part of, and a hint says so; a page
+  number that leaves the page has no place, only its page.
+- Not seen: what is inside the page but over other content, or past the
+  edge of a column or a cell; a glyph that is a bitmap or an SVG document
+  only (an emoji of a colour font), which has no outline to measure.
+
+**Content outside a block or box of a fixed size** (`OutsideContainer`).
+A `Block` or `Box` that is given a width or a height in absolute units is
+that size whatever is in it (section 7.1), and so is what is built from
+one, like the `Canvas` of section 7.4 (`labelled_bar`, `low_card`):
+
+```moonbit
+pub fn labelled_bar() -> Canvas {
+  Canvas(120.0, 16.0, [
+    Canvas::rect((0.0, 2.0), 90.0, 12.0, fill=Luma(200)),
+    Canvas::place((94.0, 8.0), "1,204 requests", anchor=(Left, Horizon)),
+  ])
+}
+```
+
+```text
+lint[outside-container]: text leaves its container (Canvas, 120pt by 16pt) at the right by 30.9pt
+  at doc/examples/guide/guide.mbt:534:32 (Canvas::place, argument 2, key "1")
+  on page 1
+  hint: the container (doc/examples/guide/guide.mbt:532:3 (Canvas))
+  hint: a block or box with a size of its own does not grow with its content, and cuts nothing off unless `clip=true`
+```
+
+```moonbit
+pub fn low_card() -> Block {
+  Block(
+    "Water the beds in the morning, before the sun is on them.",
+    width=Pt(90),
+    height=Pt(24),
+    fill=Luma(235),
+  )
+}
+```
+
+```text
+lint[outside-container]: text leaves its container (Block, 90pt by 24pt) at the bottom by 8.7pt
+  at doc/examples/guide/guide.mbt:542:5 (Block, argument 1)
+  on page 1
+  hint: the container (doc/examples/guide/guide.mbt:541:3 (Block))
+  hint: a block or box with a size of its own does not grow with its content, and cuts nothing off unless `clip=true`
+```
+
+- The place is what left, the first hint is the container. Only the sides
+  that were given count: with a width alone, a word that cannot break is
+  found at the right, and the height is the content's.
+- Nothing is cut off in a container, so what counts is where content was
+  set, as the engine sets it: a glyph between its baseline and the cap
+  height (the descenders of the last line are below every block, and a
+  card that is as high as its lines has them outside by the engine's
+  choice), a shape at its path (a stroke is half outside of what it goes
+  around), and a mark that hangs over the end of a line is let hang. What
+  the container draws itself (its fill and stroke, with an `outset`) is
+  not its content. What is placed outside on purpose is still outside,
+  and reported: `clip=true` says that it is meant to be cut.
+- A container that is built while the page is laid out (in a `Layout`,
+  for a canvas as wide as its column) is seen like any other.
+- Not seen: a block that is split at the end of a page (each part is
+  lower than the block, so nothing tells that it is that block: `Canvas`
+  and the measured `Cards` are not split); a size in per cent or em, or
+  from a set rule; a block made by Typst source (`Markup`, `Call`); the
+  cells of a grid or a table, `Rect` and the other shapes with a body, a
+  column.
+- How a block is found on the page: the pages do not record which block
+  had its size given, or which frame is the frame of which call. The
+  EDSL notes the size of the call and what it lowers inside the call's
+  arguments, and takes a frame of that size that holds such content for
+  the block's. So a container is not seen if nothing in it tells: if it
+  is empty, or if all that is in it is also used outside of it (one
+  `label` value, or the calls of one helper function, in two different
+  charts say nothing of either chart; in two charts that one function
+  builds they do). And an element that gives its block a fill and also
+  draws shapes of its own in it has them taken for the fill.
+
+## 10. What is checked where
 
 `G` is `doc/examples/guide/guide_test.mbt`, `F` is
 `doc/ports_findings_test.mbt`.
@@ -1203,13 +1372,15 @@ of another callback; it is its creation that has to come first.
 | 4.1 to 4.5 | G "section 4: ..", F "T1: .." to "T7: ..", "T9: ..", "T11: .." |
 | 4.4: errors of untyped values and their locations | F "T2: ..", "T3: .." |
 | 5: `font_paths`, an unknown family, a world without fonts | G "section 5: fonts come from the world" |
-| 5: a character without a glyph is not reported | F "S4: .." |
+| 5: a character without a glyph is no warning, and a lint | F "S4: .." |
 | 6.1 to 6.5 | G the five "section 6: .." tests, F "S5: ..", "S6: ..", "T10: .." |
 | 7.1: `Cards` in both forms, blocks are not equally high; fixed and relative heights | G "section 7: the cards ..", `doc/kit/cards_test.mbt`, F "S2a: ..", "S2b: ..", "S3: .." |
 | 7.2: the rows of a `DataTable` and their check, its lines, the header and the rows over pages; the frame and its surface (in pixels: `doc/kit/data_table_test.mbt`, "the surface of a frame"), the fills and the rules for its text; soft breaks in a cell | G "section 7: a table of data ..", "section 7: the looks ..", "section 7: inline code ..", `doc/kit/data_table_test.mbt`, F "S5: .." |
 | 7.3: a `Chip` on the baseline of its line, the height of the line, one line in a narrow column | G "section 7: a chip ..", `doc/kit/chip_test.mbt`, F "T1: .." |
 | 7.4: a `Canvas` as wide as its container, its labels at their anchors, a click on a bar; arrows, labels on one baseline, the anchor that measures | G "section 7: a chart on a canvas ..", "section 7: arrows on a canvas ..", `doc/kit/canvas_test.mbt`, F "S2a: ..", "T11: .." |
 | 8: the error, its hints and location, and the captured callback | G "section 8: .." |
+| 9: the three lints of the pages on the samples, and that they are off with `lints=false` and without pages | G "section 9: .." |
+| 9: what each lint of the pages reports and does not (the characters that are no glyphs, the bleed and the margin, what is turned, scaled and clipped, the sides of a container, what hangs, a block that is split), and what the engine's frames say of a block | `doc/lint_frames_test.mbt` (the "engine: .." test), `doc/lint_frames_wbtest.mbt`, F "S2a: ..", "S2b: ..", "S4: .." |
 
 Not checked by a test of this repository:
 
@@ -1221,3 +1392,9 @@ Not checked by a test of this repository:
   declaration, `trait IntoContent` and a `#callsite` helper behave as in a
   package.
 - the 39 s of section 5, which is the ports' measurement.
+- the times of section 9: a release build, the in-memory world, a
+  synthetic report of headings, paragraphs, tables, cards of a fixed size
+  and drawings (30,536 and 174,092 glyphs, two call sites of containers);
+  the lints of the pages were timed alone, over 20 runs. A document whose
+  content is mostly outside of something is slower: what leaves is
+  measured exactly.

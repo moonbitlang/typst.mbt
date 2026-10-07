@@ -34,9 +34,13 @@ pub fn harvest_table(Array[Array[&@doc.IntoContent]]) -> @kit.DataTable
 
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
 
+pub fn labelled_bar() -> @kit.Canvas
+
 pub fn lints_of(@doc.Document) -> Array[String]
 
 pub fn loose_title(&@doc.IntoContent) -> @doc.Seq
+
+pub fn low_card() -> @doc.Block
 
 #callsite(autofill(args_loc, loc))
 pub fn note(&@doc.IntoContent, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Block
@@ -59,6 +63,8 @@ pub fn ruled_table(Array[&@doc.IntoContent]) -> @doc.Table
 
 pub fn run_together() -> @doc.Seq
 
+pub fn shipped_card() -> @doc.Block
+
 pub fn short_row() -> @kit.DataTable
 
 pub fn status(String, done~ : Bool) -> @doc.Text
@@ -76,6 +82,8 @@ pub fn untitled_outline() -> @doc.Outline
 pub fn untyped_fields() -> @doc.Seq
 
 pub fn upper_case() -> @doc.Upper
+
+pub fn wide_row() -> @doc.Grid
 
 pub fn with_display() -> @doc.Seq
 

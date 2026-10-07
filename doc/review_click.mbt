@@ -97,6 +97,20 @@ fn curve_stroke_contains(
   needle : @library.Point,
   dashed : Bool,
 ) -> Bool {
+  let outline = stroke_outline(curve_to_kurbo(curve), stroke, dashed)
+  guard has_segments(outline.elements()) else { return false }
+  outline.contains(@kurbo.Point::new(needle.x.to_raw(), needle.y.to_raw()))
+}
+
+///|
+/// The outline of the stroke `stroke` along `path` (upstream
+/// `Curve::to_kurbo_stroke` with a tolerance of 0.01); without `dashed`,
+/// of the line as a whole.
+fn stroke_outline(
+  path : Array[@kurbo.PathEl],
+  stroke : @library.FixedStroke,
+  dashed : Bool,
+) -> @kurbo.BezPath {
   let cap = match stroke.cap {
     Butt => @kurbo.Cap::Butt
     Round => @kurbo.Cap::Round
@@ -118,9 +132,7 @@ fn curve_stroke_contains(
     )
   }
   let opts : @kurbo.StrokeOpts = Default::default()
-  let outline = @kurbo.stroke(curve_to_kurbo(curve).iter(), style, opts, 0.01)
-  guard has_segments(outline.elements()) else { return false }
-  outline.contains(@kurbo.Point::new(needle.x.to_raw(), needle.y.to_raw()))
+  @kurbo.stroke(path.iter(), style, opts, 0.01)
 }
 
 ///|

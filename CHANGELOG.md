@@ -188,6 +188,18 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   cannot be built outside `doc` (it has a private field), and the new
   parameter is optional. `LintKind` will get more cases: match it with a
   wildcard.
+- `doc`: the lints of the pages. `LintKind` has three more cases:
+  `MissingGlyph` (a character that no font has a glyph for),
+  `OutsidePage` (text, a shape or an image that leaves the page with its
+  bleed by more than a point) and `OutsideContainer` (the same for a
+  `Block` or `Box` that was built with a width or a height in absolute
+  units, so also for the kit's `Canvas`). `Lint` has a new field `page :
+  Int?`, the page of the finding (`None` for `AdjacentInline`), and
+  `Lint::render` prints it (`on page N`). They are in the report of
+  `Document::compile_paged`, which now holds more lints than before for a
+  document that has such a defect; `lower` and the generic `compile` have
+  no pages and so none of them. `Lint` cannot be built outside `doc`
+  (its fields are read-only there), so the new field breaks nothing.
 - `doc`: `Composite(name, loc, args_loc, build)` with `CompositeSite`
   (`arg`, `invalid`): the hook for elements that a package outside `doc`
   defines by an expansion into its constructors, with the provenance of

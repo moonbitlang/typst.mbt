@@ -1437,20 +1437,148 @@ What each can and cannot promise:
   the origin of that glyph's span (a text item can combine several origins)
   and the text of the cluster (a code-point sequence; for clusters beyond the
   65,535 range limit, the item's text). In a world without any font the
-  text is not in the frames at all, so there is nothing to find; the engine's
-  "unknown font family" warning is what remains.
+  text is not in the frames at all, so there is nothing to find; the engine
+  warns of a family that is named, and of nothing if none is.
 - L3, content outside the page. From the frames: an item whose bounds leave
   the page by more than 1pt. Its origin is the item's span where it has one;
   decorations and other items with detached spans are reported with the
-  origin of the nearest enclosing group that has one, or with the page only.
-  Not covered: overflow of a fixed-size container (S2). Frames do not record
-  which container had a fixed size or where it was declared; that needs a
-  side channel from layout (container identity, bounds, origin, clipping,
+  origin of the innermost element around them that has one (by the tags of
+  the frames: a group has no span), or with the page only.
+  The same for a `Block` or `Box` that was built with a width or a height in
+  absolute units (S2b, and the items of a `Canvas`), as far as that block is
+  one frame: see "As built". Not covered: a block that is split (S2a), sizes
+  that are relative, the cells of a grid. Frames do not record which
+  container had a fixed size or where it was declared; that needs a side
+  channel from layout (container identity, bounds, origin, clipping,
   fragments), which is an engine instrumentation decision outside this
-  proposal. Until then S2 is answered by the kit (apart from `Canvas`, whose
-  height the author gives and which is unbreakable, its elements take no
-  fixed heights, and measured cards are unbreakable) and the guide. S3 has no
-  out-of-bounds geometry at all and is answered by `Cards`.
+  proposal. S2a is answered by the kit (`Canvas` and the measured `Cards`
+  are unbreakable) and the guide. S3 has no out-of-bounds geometry at all
+  and is answered by `Cards`.
+
+  As built (step 6, `doc/lint_frames.mbt`, one walk over the pages of
+  `compile_paged`; `lower` and the generic `compile` have no pages, and a
+  document with errors has none):
+  - A lint has `page : Int?` (the first page of its findings), and
+    `render()` prints it. `LintKind` has `MissingGlyph`, `OutsidePage` and
+    `OutsideContainer`. One source location is one lint, as for L1, with
+    the keys of its first occurrence and a count ("100 times", "the
+    farthest of 5").
+  - L2. Glyph 0 is in a frame for one reason: no font of the list, and with
+    `fallback` none of the world, has a glyph for a character, and the
+    first font sets its glyph 0 for it (`shape_tofus` in
+    `layout/inline_shaping.mbt`, the same in `layout/math_shaping.mbt`); a
+    glyph 0 that shaping with a font returns is never kept, but shaped
+    again with the next font. So the lint has no false positive from a font
+    that draws something on purpose: in the embedded fonts only U+0000 and
+    U+FFFF (the end of a format 4 map) are given glyph 0, and a text with
+    one of them shows the missing glyph, too. What the proposal did not
+    say:
+    a run that no font has is set character by character, so a joiner or a
+    variation selector inside it is a box of its own, and is reported by
+    its code point (`U+200D`); next to text that a font has, the characters
+    that are ignored by default are no glyphs at all, and a tab and a line
+    break are none. A control character (U+0001) that no font has is a box
+    like any other, and reported. In a formula the location is the range of
+    the source string. The message says "no font of this text": with
+    `fallback=false`, or a font that covers only some characters, another
+    font of the world may have it. Not seen: a font that has an empty or a
+    wrong glyph for a character, and the box that the engine draws for a
+    bitmap glyph that it cannot decode (`library/font_color.mbt`: a glyph
+    with another id than 0).
+  - L3, the page. The page is its frame with the bleed around it: the
+    engine lays the background and the foreground out in that box
+    (`layout/pages_finalize.mbt`), puts the header and the footer into the
+    margins, and keeps the fill out of the frame, so nothing is exempt by
+    its role and nothing has to be: what is in the margin is on the page.
+    Bounds are what is drawn, which is what the page cuts off: of a glyph
+    the box of its outline, widened by half of a text stroke (not its
+    advance and the font's ascent: a line at the top of a page is higher
+    than its letters); of a shape its interior, if it is filled, and the
+    outline of its stroke (kurbo's, as the click search builds it, with its
+    dashes unless there are more than 2,000 periods of them); of an image
+    its box. A glyph is at its pen, which moves by both advances (the
+    pieces of a tall delimiter are stacked by the vertical one). They are
+    transformed
+    through every group: a path is transformed and then measured, so a
+    turned circle is a circle; a glyph and an image are the box of their
+    four corners. A clip is the box of its path (more than the clip for
+    round corners or a turned clip: what is cut away can count as drawn,
+    never the other way round). A group whose transform has no inverse
+    draws nothing. Glyphs that are bitmaps or SVG documents only (the
+    emoji of a colour font) have no outline box and are not seen.
+  - L3, containers. The investigation: a group has no span, `block` and
+    `box` have no tag (they are not locatable), every block that a show
+    rule makes is a hard frame as well, and a block without a fill has no
+    item with its own span; so nothing in the frames says that a frame is
+    the frame of a call, or that its size was given (the "engine: .." test
+    of `doc/lint_frames_test.mbt` pins this). The description tree does not
+    have it either: a chart as wide as its column is built in a `Layout`
+    callback, which is the case of the ports. What the EDSL has is
+    lowering, which runs for callbacks, too: it notes, per call site, the
+    sizes that a `Block` or `Box` was called with where they are absolute
+    (read from the element that the call returns), and for every call site
+    the stack of containers in whose arguments it was lowered (nothing of
+    it with `lints=false`). The occurrences of one call site have the same
+    spans, so of several stacks only what they share from the innermost
+    container outwards is kept: a description that is used in a container
+    and outside of it is in none.
+    On the page an item says which frames are whose: the hard frames
+    around it are the frames of the containers of its stack, in that
+    order, with other frames between them. From the inside, each container
+    of the stack is the nearest hard frame around the item that has a size
+    of that container (but for 10^-6 pt: a frame's size is computed) and
+    is outside the frame of the container before it; a container whose
+    frame is not there (it was split, or the item is a footnote or a
+    float) is passed over. A hard frame is never dissolved into the frame
+    around it. Every item in a frame that is some container's is then
+    compared with its box, along the sides that were given.
+    What counts there is where content is set, not all that is drawn,
+    since nothing is cut off: the part of a glyph's box between its
+    baseline and the cap height (the engine's default box of a line: the
+    descenders of the last line are below every block), a shape's path
+    without its stroke (a stroke takes no room), and a mark may hang over
+    the end of its line by what `text.overhang` lets it (the first form,
+    with drawn bounds, reported every justified paragraph in a block of a
+    fixed width and every card of `Cards` without an inset). The
+    container's own fill and stroke are not its content: a shape with the
+    span of the container's call, if the call had a `fill` or a `stroke`
+    or the shape covers the whole frame (a fill from a set rule). What a
+    composite builds in its block has that span, too, so with a fill its
+    shapes are taken for the fill. Content that is placed outside on
+    purpose is reported.
+    It can be wrong where a frame has, by coincidence, the size of a
+    container and holds something that was only ever lowered in that
+    container. It does not see: a block that is split
+    (S2a: its parts have other heights), sizes in per cent or em or from a
+    set rule, blocks of Typst source, cells, shapes with a body, and a
+    container in which nothing is that is in it wherever it is used.
+    What the engine would have to record to do without the inference, and
+    to see a split block: on the group of the frame that
+    `layout_single_block`, `layout_multi_block` (`layout/flow_block.mbt`)
+    and `layout_box` (`layout/inline_box.mbt`) make hard, the span of the
+    element, which of its width and height were given, and for a split
+    block the height that was asked for and the part's offset in it
+    (a field of `GroupItem` beside `label`, which the exporters ignore).
+    That is a change of a ported type, and stays the owner's decision
+    (section 12, question 3).
+  - Cost: every glyph of a document is looked at; the pass that finds
+    nothing allocates nothing per glyph (the boxes of a font's glyphs are
+    kept per font). Measured on a synthetic report (headings, paragraphs,
+    tables, cards of a fixed size, drawings; release, the in-memory
+    world): 18 pages and 30,536 glyphs, 0.35 ms of a compilation of 70 ms;
+    100 pages and 174,092 glyphs, 3 ms of about 400 ms. Noting the containers
+    while lowering is within the noise of those times.
+  - Measured on the documents of the repository: the report of
+    `doc/examples/report` in both versions (its test asserts no lint) and
+    the guide's document of all samples have none. Of the 51 pairs of the
+    `edsl` stage four have findings, all meant: the canvas of the pair
+    `kit-canvas` that shows what is outside of a canvas (a rectangle 20pt
+    past its edge and the label "out" centred on it), and the "汉字" of
+    the pairs `prose`, `newline-space` and `para`, which the embedded
+    fonts do not have. The other findings are in tests that were written
+    to show a defect (S2b, S4, a canvas of no size, a table that cannot
+    break and is higher than its page, placeholders of noncharacters, a
+    line of 70,000 bytes).
 - L4, ambiguous origins. On the description tree the author passes to
   `compile_*`, before lowering: more than a threshold of distinct positions
   in the tree that hold one call site with one key path. Content returned by
@@ -1575,7 +1703,9 @@ package; fonts by `font_paths` fixtures before any embedding decision.
 2. Lints on by default? Decided by the owner on 2026-10-06: yes
    (`compile_*(.., lints=false)` turns them off).
 3. The engine side channel that fixed-container overflow (S2) needs: wanted?
-   (Until answered: not built.)
+   (Until answered: not built. Step 6 reports S2b without it, by what
+   lowering knows; S2a, a block that is split, still needs it: section 6,
+   "As built", says what the engine would record.)
 
 ## 13. Corrections from the reproductions (revision 5)
 

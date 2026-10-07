@@ -353,6 +353,8 @@ fn Document::lower_initial(
     context: @library.Context::none(),
     keys: [],
     pieces: Option::None,
+    containers: [],
+    stack: 0,
   }
   lower.check_text(self.dir, @syntax.Span::detached())
   if virtual_file(self.dir, "<edsl-origins>") is Option::None {
@@ -405,13 +407,15 @@ fn Document::lints(self : Document, lints : Bool) -> Array[Lint] {
 
 ///|
 /// Compile to any output of the engine. The EDSL's lints run by default
-/// (`CompileReport::lints`); `lints=false` turns them off.
+/// (`CompileReport::lints`); `lints=false` turns them off. Here they are
+/// the lints of the description tree: the lints that read the pages need
+/// a paged document and are made by `compile_paged`.
 pub fn[T : @library.Output] Document::compile(
   self : Document,
   world : &@library.World,
   lints? : Bool = true,
 ) -> CompileReport[T] {
-  let session = Session::new(world, dir=self.dir)
+  let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
@@ -437,7 +441,7 @@ pub fn Document::lower(
   world : &@library.World,
   lints? : Bool = true,
 ) -> CompileReport[@library.Content] {
-  let session = Session::new(world, dir=self.dir)
+  let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
@@ -458,13 +462,23 @@ pub fn Document::lower(
 }
 
 ///|
-/// Compile to a paged document (for PDF, SVG and PNG export).
+/// Compile to a paged document (for PDF, SVG and PNG export). Its report
+/// also has the lints that read the pages (`lint_frames.mbt`: missing
+/// glyphs, content outside the page or outside a container of a fixed
+/// size), if the compilation succeeded.
 pub fn Document::compile_paged(
   self : Document,
   world : &@library.World,
   lints? : Bool = true,
 ) -> CompileReport[@layout.PagedDocument] {
-  self.compile(world, lints~)
+  let report : CompileReport[@layout.PagedDocument] = self.compile(
+    world,
+    lints~,
+  )
+  if lints && report.output is Some(document) {
+    report.lints.append(lint_pages(document, report.origins, report.resolver))
+  }
+  report
 }
 
 ///|

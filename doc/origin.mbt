@@ -60,6 +60,10 @@ priv struct Entry {
   /// Whether a text of more than 65,535 bytes was lowered with this origin,
   /// so that glyph offsets are not reliable.
   mut long_text : Bool
+  /// The stack of containers that the entry was last noted under
+  /// (`Registry::note_stack`; `-1`: none yet), so that lowering the same
+  /// call again costs nothing.
+  mut noted : Int
 }
 
 ///|
@@ -91,6 +95,47 @@ priv struct Registry {
   /// it.
   dir : String
   origins : @syntax.FileId
+  /// The blocks and boxes that were lowered with a size of their own, by
+  /// the location of their call (`Container`).
+  containers : Array[Container]
+  container_index : Map[String, Int]
+  /// The stacks of containers that something was lowered under (the
+  /// containers whose arguments were being lowered, outermost first), each
+  /// once: the first is the empty one. And for the location of every call
+  /// the stack that it was lowered under: if there were several, what
+  /// they have in common from the innermost container outwards
+  /// (`Registry::note_stack`).
+  stacks : Array[Array[Int]]
+  stack_index : Map[String, Int]
+  lowered_under : Map[String, Int]
+}
+
+///|
+/// A `block` or `box` that was called with a width or a height, for the
+/// lint of content outside a container of a fixed size (`lint_frames.mbt`).
+/// The frames do not say which frame is whose, or whether its size was
+/// given: lowering notes what the EDSL knows, which is the size that a
+/// call was made with and what was lowered inside its arguments.
+///
+/// A container is a location (a call site): a description that is lowered
+/// several times, in a callback or under several keys, is one container
+/// with every size that it had. Occurrences of one call site cannot be
+/// told apart on the page (their spans are the same), so only what holds
+/// for all of them is known of one: the containers that every occurrence
+/// was lowered in, from the innermost outwards.
+priv struct Container {
+  /// The entry of the call that was lowered first.
+  entry : Int
+  /// The call's location (`Entry::loc`).
+  loc : String
+  /// The sizes that the call had: its width and its height where they are
+  /// absolute lengths (`None`: `auto`, or relative to something). Only
+  /// sizes with at least one of them, each once (`seen`).
+  sizes : Array[(@library.Abs?, @library.Abs?)]
+  seen : Map[String, Unit]
+  /// Whether a call had a `fill` or a `stroke`: what the block draws
+  /// itself, with the span of its call.
+  mut decorated : Bool
 }
 
 ///|
@@ -112,6 +157,131 @@ fn Registry::new(dir? : String = "") -> Registry {
     snippets: [],
     snippet_index: {},
     source: None,
+    containers: [],
+    container_index: {},
+    stacks: [[]],
+    stack_index: { "": 0 },
+    lowered_under: {},
+  }
+}
+
+///|
+/// The container of the call with the entry `entry`, registered on first
+/// use.
+fn Registry::container(self : Registry, entry : Int) -> Int {
+  let loc = self.entries[entry].loc
+  match self.container_index.get(loc) {
+    Some(id) => id
+    None => {
+      let id = self.containers.length()
+      self.containers.push({
+        entry,
+        loc,
+        sizes: [],
+        seen: {},
+        decorated: false,
+      })
+      self.container_index[loc] = id
+      id
+    }
+  }
+}
+
+///|
+/// The number of a stack of containers (outermost first).
+fn Registry::stack(self : Registry, containers : Array[Int]) -> Int {
+  let key = containers.map(id => id.to_string()).join(",")
+  match self.stack_index.get(key) {
+    Some(stack) => stack
+    None => {
+      let stack = self.stacks.length()
+      self.stacks.push(containers.copy())
+      self.stack_index[key] = stack
+      stack
+    }
+  }
+}
+
+///|
+/// Note that the call with the entry `entry` was lowered under the stack
+/// `stack` of containers: in their arguments.
+///
+/// What a container's own call site makes inside the container (a
+/// composite that builds the block and what is in it has one call site for
+/// all of it) is noted like the container itself, under the stack around
+/// it: whether something with that location is in the container is asked
+/// when it is met on a page (`FrameLinter::evidence`).
+fn Registry::note_stack(self : Registry, entry : Int, stack : Int) -> Unit {
+  let e = self.entries[entry]
+  guard e.noted != stack else { return }
+  e.noted = stack
+  let stack = match self.container_index.get(e.loc) {
+    Some(own) =>
+      match self.stacks[stack].search(own) {
+        Some(at) => self.stack(self.stacks[stack][:at].to_owned())
+        None => stack
+      }
+    None => stack
+  }
+  match self.lowered_under.get(e.loc) {
+    None => self.lowered_under[e.loc] = stack
+    Some(known) =>
+      if known != stack {
+        // What the two have in common, from the innermost container: a
+        // description that is used in a container and outside of it is
+        // in no container for certain.
+        let a = self.stacks[known]
+        let b = self.stacks[stack]
+        let mut common = 0
+        while common < a.length() &&
+              common < b.length() &&
+              a[a.length() - 1 - common] == b[b.length() - 1 - common] {
+          common += 1
+        }
+        self.lowered_under[e.loc] = self.stack(
+          a[a.length() - common:].to_owned(),
+        )
+      }
+  }
+}
+
+///|
+/// The length of the field `name` of an element if it was given as an
+/// absolute length: not `auto`, a fraction, or a length with a part in em
+/// or in per cent.
+fn fixed_length(content : @library.Content, name : String) -> @library.Abs? {
+  let value = content.get_by_name(name) catch { _ => return None }
+  let length = match value {
+    Length(length) => length
+    Relative(rel) if rel.rel.is_zero() => rel.abs
+    _ => return None
+  }
+  guard length.em.is_zero() && length.abs.is_finite() else { return None }
+  Some(length.abs)
+}
+
+///|
+/// Note the size that the container `id` was called with: `value` is what
+/// its call returned.
+fn Registry::note_size(
+  self : Registry,
+  id : Int,
+  value : @library.Value,
+) -> Unit {
+  guard value is Content(content) else { return }
+  let size = (fixed_length(content, "width"), fixed_length(content, "height"))
+  guard size.0 is Some(_) || size.1 is Some(_) else { return }
+  let container = self.containers[id]
+  let raw = (side : @library.Abs?) => {
+    match side {
+      Some(length) => length.to_raw().to_string()
+      None => "-"
+    }
+  }
+  let key = "\{raw(size.0)} \{raw(size.1)}"
+  if !container.seen.contains(key) {
+    container.seen[key] = ()
+    container.sizes.push(size)
   }
 }
 
@@ -223,6 +393,7 @@ fn Registry::entry_of(
     end,
     args,
     long_text: false,
+    noted: -1,
   })
   self.index[dedup] = i
   i
@@ -490,6 +661,13 @@ pub struct Origins {
   priv snippets : Array[Snippet]
   /// The file of the origin listing.
   priv file : @syntax.FileId
+  /// The containers of a fixed size (`Container`). Per entry: the
+  /// containers that every occurrence of its call site was lowered under,
+  /// outermost first, and the container that is at its call site (`-1`:
+  /// none).
+  priv containers : Array[Container]
+  priv under : Array[Array[Int]]
+  priv own : Array[Int]
 }
 
 ///|
@@ -503,6 +681,7 @@ fn Registry::freeze(self : Registry) -> Origins {
       end: e.end,
       args: e.args.copy(),
       long_text: e.long_text,
+      noted: e.noted,
     }),
     listing: self.listing.to_string(),
     snippets: self.snippets.map(s => {
@@ -513,6 +692,23 @@ fn Registry::freeze(self : Registry) -> Origins {
       source: None,
     }),
     file: self.origins,
+    containers: self.containers.map(c => {
+      entry: c.entry,
+      loc: c.loc,
+      sizes: c.sizes.copy(),
+      seen: {},
+      decorated: c.decorated,
+    }),
+    // (By the location: the further occurrences of an origin that lowering
+    // registers for keys and pieces are entries that were never lowered
+    // themselves.)
+    under: self.entries.map(e => {
+      match self.lowered_under.get(e.loc) {
+        Some(stack) => self.stacks[stack]
+        None => []
+      }
+    }),
+    own: self.entries.map(e => self.container_index.get(e.loc).unwrap_or(-1)),
   }
 }
 
@@ -654,6 +850,41 @@ pub fn Origins::resolve_range(
     }
     Detached => None
   }
+}
+
+///|
+/// The entry that an engine span refers to and whether the span is one of
+/// its arguments, without building the origin: for the checks that look
+/// at every item of a document.
+fn Origins::entry_of(self : Origins, span : @syntax.Span) -> (Int, Bool)? {
+  match @syntax.DiagSpan::from_span(span).get() {
+    Range(id~, start~, end~) =>
+      if id == self.file {
+        guard self.entry_at(start) is Some(entry) else { return None }
+        for arg in self.entries[entry].args {
+          if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
+            return Some((entry, true))
+          }
+        }
+        Some((entry, false))
+      } else {
+        self.snippet_entry(id)
+      }
+    Number(id~, ..) => self.snippet_entry(id)
+    Detached => None
+  }
+}
+
+///|
+/// The entry of the `Markup` or `Equation` call whose source is the file
+/// `id`: what is in the source is in its source argument.
+fn Origins::snippet_entry(self : Origins, id : @syntax.FileId) -> (Int, Bool)? {
+  for snippet in self.snippets {
+    if snippet.id == id {
+      return Some((snippet.entry, true))
+    }
+  }
+  None
 }
 
 ///|
