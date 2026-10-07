@@ -12,7 +12,16 @@ extern "C" fn ffi_read_file(path : Bytes) -> Bytes = "typst_platform_read_file"
 
 ///|
 #borrow(path)
-extern "C" fn ffi_read_range(path : Bytes, offset : Int64, len : Int) -> Bytes = "typst_platform_read_range"
+extern "C" fn ffi_ranged_open(path : Bytes) -> Int = "typst_platform_ranged_open"
+
+///|
+extern "C" fn ffi_ranged_size(fd : Int) -> Int64 = "typst_platform_ranged_size"
+
+///|
+extern "C" fn ffi_ranged_read(fd : Int, offset : Int64, len : Int) -> Bytes = "typst_platform_ranged_read"
+
+///|
+extern "C" fn ffi_ranged_close(fd : Int) = "typst_platform_ranged_close"
 
 ///|
 #borrow(path)
@@ -21,10 +30,6 @@ extern "C" fn ffi_stat_kind(path : Bytes) -> Int = "typst_platform_stat_kind"
 ///|
 #borrow(path)
 extern "C" fn ffi_lstat_kind(path : Bytes) -> Int = "typst_platform_lstat_kind"
-
-///|
-#borrow(path)
-extern "C" fn ffi_file_size(path : Bytes) -> Int64 = "typst_platform_file_size"
 
 ///|
 #borrow(path)
@@ -92,30 +97,58 @@ pub fn read_file(path : String) -> Bytes raise IoError {
 }
 
 ///|
-/// Reads up to `len` bytes at `offset` of a file.
-pub fn read_range(
-  path : String,
-  offset : Int64,
-  len : Int,
-) -> Bytes raise IoError {
-  let bytes = ffi_read_range(c_path(path), offset, len)
-  check_last_error()
-  bytes
+/// A file that is open for ranged reads: here a descriptor that is read
+/// with `pread`, so that a piece costs one system call (`platform_stub.c`
+/// says why the file is not mapped). It must be closed.
+pub struct RangedFile {
+  priv mut fd : Int
 }
 
 ///|
-/// Whether ranged reads are cheap (otherwise, `read_range` reads the whole
-/// file).
+/// Whether ranged reads are cheap (otherwise, a `RangedFile` holds the
+/// whole file).
 pub fn supports_ranged_reads() -> Bool {
   true
 }
 
 ///|
-/// The size of a file in bytes.
-pub fn file_size(path : String) -> Int64 raise IoError {
-  let size = ffi_file_size(c_path(path))
+/// Opens a file for ranged reads.
+pub fn RangedFile::open(path : String) -> RangedFile raise IoError {
+  let fd = ffi_ranged_open(c_path(path))
+  if fd < 0 {
+    raise os_error(ffi_last_error())
+  }
+  { fd, }
+}
+
+///|
+/// The size of the file in bytes.
+pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
+  let size = ffi_ranged_size(self.fd)
   check_last_error()
   size
+}
+
+///|
+/// Reads up to `len` bytes at `offset`: fewer only if the file ends
+/// before. `len` must not exceed the file's size.
+pub fn RangedFile::read(
+  self : RangedFile,
+  offset : Int64,
+  len : Int,
+) -> Bytes raise IoError {
+  let bytes = ffi_ranged_read(self.fd, offset, len)
+  check_last_error()
+  bytes
+}
+
+///|
+/// Closes the file. Reads fail afterwards.
+pub fn RangedFile::close(self : RangedFile) -> Unit {
+  if self.fd >= 0 {
+    ffi_ranged_close(self.fd)
+    self.fd = -1
+  }
 }
 
 ///|

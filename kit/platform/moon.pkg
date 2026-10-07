@@ -20,6 +20,7 @@ options(
   "native-stub": [ "platform_stub.c" ],
   targets: {
     "platform_native.mbt": [ "native", "llvm" ],
+    "platform_native_test.mbt": [ "native", "llvm" ],
     "platform_wasm.mbt": [ "wasm", "wasm-gc" ],
   },
 )

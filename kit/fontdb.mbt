@@ -10,6 +10,13 @@
 // look at (`probe_tables`), which are reassembled into a small standalone
 // font. Small files, unusual fonts (unsorted or duplicate table records)
 // and platforms without cheap ranged reads (wasm) read the whole file.
+//
+// A file is opened once (`@platform.RangedFile`) and its pieces are read
+// from that descriptor. It is not mapped: reading the pieces costs what
+// touching them in a mapping costs (10 ms for the 1339 faces in 502 files
+// of a macOS 26 installation, either way), and a file that is truncated
+// while it is read gives short reads, which are faces that do not parse,
+// where a mapping gives SIGBUS (fontdb has that exposure).
 
 ///|
 /// A discovered font face: where it lives and its metadata.
@@ -110,6 +117,7 @@ fn FontDb::load_fonts_dir_impl(
 /// those that fontdb admits and for which typst can compute metadata.
 fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
   let file = FontFile::open(path) catch { _ => return }
+  defer file.close()
   let n = file.fonts_in_collection().unwrap_or(1U)
   for index in 0U..<n {
     guard file.probe_face(index) is Some((data, at)) else { continue }
@@ -175,57 +183,79 @@ let probe_tables : ReadOnlyArray[String] = [
 ///|
 /// A font file being probed: either fully loaded or read in ranges.
 priv struct FontFile {
-  path : String
   size : Int64
   /// The whole file, if it was read completely.
-  data : Bytes?
+  mut data : Bytes?
+  /// The open file, if it is read in ranges.
+  file : @platform.RangedFile?
 }
 
 ///|
+/// Files up to this size are read whole: that is one read, and their faces
+/// are parsed in place.
+const WHOLE_FILE_LIMIT : Int64 = 262144L
+
+///|
 fn FontFile::open(path : String) -> FontFile raise @platform.IoError {
-  if @platform.supports_ranged_reads() {
-    let size = @platform.file_size(path)
-    // Small files are cheaper to read whole.
-    if size > 262144L {
-      return { path, size, data: None, }
-    }
+  if !@platform.supports_ranged_reads() {
+    let data = @platform.read_file(path)
+    return { size: data.length().to_int64(), data: Some(data), file: None, }
   }
-  let data = @platform.read_file(path)
-  { path, size: data.length().to_int64(), data: Some(data), }
+  let file = @platform.RangedFile::open(path)
+  errdefer file.close()
+  let size = file.size()
+  if size > WHOLE_FILE_LIMIT {
+    return { size, data: None, file: Some(file), }
+  }
+  // Small files are cheaper to read whole.
+  let data = file.read(0L, size.to_int())
+  file.close()
+  { size: data.length().to_int64(), data: Some(data), file: None, }
+}
+
+///|
+/// Closes the file.
+fn FontFile::close(self : FontFile) -> Unit {
+  if self.file is Some(file) {
+    file.close()
+  }
 }
 
 ///|
 /// Reads exactly `len` bytes at `offset`, or `None` if the file is too
-/// short.
+/// short (also if it got shorter since it was opened).
 fn FontFile::read(self : FontFile, offset : Int64, len : Int) -> Bytes? {
-  if offset < 0L || len < 0 || offset + len.to_int64() > self.size {
+  if offset < 0L || len < 0 || len.to_int64() > self.size - offset {
     return None
   }
-  match self.data {
-    Some(data) => {
-      let start = offset.to_int()
-      Some(data[start:start + len].to_owned())
-    }
-    None => {
-      let bytes = @platform.read_range(self.path, offset, len) catch {
-        _ => return None
-      }
-      if bytes.length() == len {
-        Some(bytes)
-      } else {
-        None
-      }
-    }
+  if self.data is Some(data) {
+    let start = offset.to_int()
+    return Some(data[start:start + len].to_owned())
+  }
+  guard self.file is Some(file) else { return None }
+  let bytes = file.read(offset, len) catch { _ => return None }
+  if bytes.length() == len {
+    Some(bytes)
+  } else {
+    None
   }
 }
 
 ///|
-/// The whole file.
+/// The whole file. It is kept, so the remaining faces are parsed in place.
 fn FontFile::all(self : FontFile) -> Bytes? {
-  match self.data {
-    Some(data) => Some(data)
-    None => Some(@platform.read_file(self.path)) catch { _ => None }
+  if self.data is Some(data) {
+    return Some(data)
   }
+  guard self.file is Some(file) else { return None }
+  // (`fs::read` of a larger file fails as well.)
+  guard self.size <= 0x7FFFFFFFL else { return None }
+  let size = self.size.to_int()
+  let data = file.read(0L, size) catch { _ => return None }
+  // The file got shorter since it was opened.
+  guard data.length() == size else { return None }
+  self.data = Some(data)
+  Some(data)
 }
 
 ///|

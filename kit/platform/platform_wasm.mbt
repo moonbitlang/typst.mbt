@@ -94,31 +94,52 @@ pub fn read_file(path : String) -> Bytes raise IoError {
 }
 
 ///|
-/// The file most recently read by `read_range` (files can only be read
-/// whole here).
-let range_cache : Ref[(String, Bytes)?] = { val: None, }
+/// A file that is open for ranged reads: here the whole file, which is all
+/// that the host can read.
+pub struct RangedFile {
+  priv mut data : Bytes
+}
 
 ///|
-/// Reads up to `len` bytes at `offset` of a file.
-pub fn read_range(
-  path : String,
+/// Whether ranged reads are cheap (otherwise, a `RangedFile` holds the
+/// whole file).
+pub fn supports_ranged_reads() -> Bool {
+  false
+}
+
+///|
+/// Opens a file for ranged reads.
+pub fn RangedFile::open(path : String) -> RangedFile raise IoError {
+  { data: read_file(path), }
+}
+
+///|
+/// The size of the file in bytes.
+///
+/// (`raise` as on native, where this asks the system.)
+#warnings("-unused_error_type")
+pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
+  self.data.length().to_int64()
+}
+
+///|
+/// Reads up to `len` bytes at `offset`: fewer only if the file ends
+/// before.
+pub fn RangedFile::read(
+  self : RangedFile,
   offset : Int64,
   len : Int,
 ) -> Bytes raise IoError {
-  let data = match range_cache.val {
-    Some((p, data)) if p == path => data
-    _ => {
-      let data = read_file(path)
-      range_cache.val = Some((path, data))
-      data
-    }
+  if offset < 0L || len < 0 {
+    raise IoError(Other, "Invalid argument (os error 22)")
   }
+  let data = self.data
   let start = if offset > data.length().to_int64() {
     data.length()
   } else {
     offset.to_int()
   }
-  let end = if start + len > data.length() {
+  let end = if len > data.length() - start {
     data.length()
   } else {
     start + len
@@ -127,20 +148,9 @@ pub fn read_range(
 }
 
 ///|
-/// Whether ranged reads are cheap (otherwise, `read_range` reads the whole
-/// file).
-pub fn supports_ranged_reads() -> Bool {
-  false
-}
-
-///|
-/// The size of a file in bytes.
-pub fn file_size(path : String) -> Int64 raise IoError {
-  read_range(path, 0L, 0) |> ignore
-  match range_cache.val {
-    Some((_, data)) => data.length().to_int64()
-    None => 0L
-  }
+/// Closes the file. Reads give nothing afterwards.
+pub fn RangedFile::close(self : RangedFile) -> Unit {
+  self.data = b""
 }
 
 ///|
