@@ -137,11 +137,11 @@ fn reparse_report(text : String) -> String {
   let seed = Fnv::new()
   seed.write(@utf8.encode(text))
   let rng = { state: seed.h, }
-  let source = @syntax.Source::detached(text)
+  let mut source = @syntax.Source::detached(text)
   for i in 0..<reparse_edits {
     let bytes = @utf8.encode(source.text())
     let edit = next_edit(rng, bytes)
-    let (rs, re) = if edit.whole {
+    let (edited, (rs, re)) = if edit.whole {
       let old = source.text()
       let new = @syntax.utf8_slice(old, 0, edit.start) +
         edit.with_ +
@@ -150,6 +150,7 @@ fn reparse_report(text : String) -> String {
     } else {
       source.edit(edit.start, edit.end, edit.with_)
     }
+    source = edited
     let root = source.root()
     let tree = Fnv::new()
     tree.write(@utf8.encode(root.debug_tree()))

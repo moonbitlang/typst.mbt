@@ -1,8 +1,13 @@
 // Port of `crates/typst-syntax/src/lines.rs`.
 //
-// Upstream `Lines<S>` is generic over the text buffer and reference-counted
-// (copy-on-write on `edit`). Here the text is always a `String` and `Lines` is
-// a mutable object: `edit` and `replace` update it in place.
+// Upstream `Lines<S>` is generic over the text buffer and reference-counted:
+// `edit` and `replace` take `&mut self` and write through `Arc::make_mut`
+// (lines.rs:210), so a clone that somebody else holds keeps the old text.
+// Here the text is always a `String` and a `Lines` never changes: `edit` and
+// `replace` return the edited value, and whoever holds the old one (a
+// `Source` that was edited, a diagnostic renderer) keeps it. The cost is a
+// copy of the line starts before the edit; those after it are computed again
+// in both.
 //
 // All indices are UTF-8 byte offsets, UTF-16 code unit offsets, line and
 // column numbers exactly like upstream. Upstream takes `usize`; negative
@@ -12,10 +17,11 @@
 /// A text buffer and metadata about lines.
 pub struct Lines {
   /// The text.
-  priv mut text : String
+  priv text : String
   /// The UTF-8 byte length of the text.
-  priv mut len : Int
-  /// The start of every line.
+  priv len : Int
+  /// The start of every line. Never written to after [Lines::new] or
+  /// [Lines::edit] returned.
   priv lines : Array[Line]
 }
 
@@ -208,16 +214,16 @@ pub fn Lines::line_column_to_byte(
 /// to produce the smallest single edit that transforms old into new and
 /// then calls [`edit`](Self::edit) with it.
 ///
-/// Returns whether any changes were made.
-pub fn Lines::replace(self : Lines, new : String) -> Bool {
+/// Returns the lines of the new text, or `None` if no changes were made
+/// (upstream, which edits `self`: whether any were). `self` is unchanged.
+pub fn Lines::replace(self : Lines, new : String) -> Lines? {
   guard self.replacement_range(new) is Some((prefix, suffix)) else {
-    return false
+    return None
   }
   let old_len = self.len
   let new_len = utf8_len(new)
   let replacement = utf8_slice(new, prefix, new_len - suffix)
-  self.edit(prefix, old_len - suffix, replacement)
-  true
+  Some(self.edit(prefix, old_len - suffix, replacement))
 }
 
 ///|
@@ -255,13 +261,17 @@ pub fn Lines::replacement_range(self : Lines, new : String) -> (Int, Int)? {
 /// Edit the source file by replacing the given byte range `start..end` with
 /// `replacement`.
 ///
+/// Returns the lines of the edited text; `self` is unchanged (upstream edits
+/// `self`, through `Arc::make_mut`, lines.rs:210: a clone keeps the text
+/// before the edit).
+///
 /// Aborts if the range is out of bounds or not on char boundaries.
 pub fn Lines::edit(
   self : Lines,
   start : Int,
   end : Int,
   replacement : String,
-) -> Unit {
+) -> Lines {
   let start_byte = start
   guard self.byte_to_utf16(start_byte) is Some(start_utf16) &&
     self.byte_to_line(start_byte) is Some(line) &&
@@ -272,23 +282,25 @@ pub fn Lines::edit(
 
   // Update the text itself.
   let text = self.text
-  self.text = text.unsafe_substring(start=0, end=start_utf16) +
+  let text = text.unsafe_substring(start=0, end=start_utf16) +
     replacement +
     text.unsafe_substring(start=end_utf16, end=text.length())
-  self.len = self.len - (end - start) + utf8_len(replacement)
+  let len = self.len - (end - start) + utf8_len(replacement)
 
-  // Remove invalidated line starts.
-  self.lines.truncate(line + 1)
+  // Remove invalidated line starts: the others are copied, `self` keeps
+  // its own.
+  let lines = self.lines[:line + 1].to_owned()
 
   // Handle adjoining of \r and \n.
   if start_utf16 > 0 &&
-    self.text.code_unit_at(start_utf16 - 1) == '\r' &&
+    text.code_unit_at(start_utf16 - 1) == '\r' &&
     replacement.has_prefix("\n") {
-    self.lines.unsafe_pop() |> ignore
+    lines.unsafe_pop() |> ignore
   }
 
   // Recalculate the line starts after the edit.
-  lines_from(self.lines, self.text, start_byte, start_utf16)
+  lines_from(lines, text, start_byte, start_utf16)
+  { text, len, lines, }
 }
 
 ///|

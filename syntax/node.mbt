@@ -1,9 +1,82 @@
+// Port of `crates/typst-syntax/src/node.rs`.
+//
+// # Who may write to a node
+//
+// Upstream's nodes are values with `Arc`s inside (`Node::Inner(Arc<InnerNode>,
+// ..)`, `Error(Arc<ErrorNode>, ..)`, `Warning(Arc<WarningWrapper>, ..)`), and
+// every write goes through `Arc::make_mut` (`inner_and_span_mut`, node.rs:85;
+// `hints_mut`, :99; `synthesize_with`, :398; `convert_to_kind`, :484): a
+// record that somebody else holds is copied before it is written, so whoever
+// holds a node keeps what it held. A closure holds the node of its body, a
+// module the closures; after `Source::edit` they still describe the text
+// they were made from.
+//
+// Here a node is an object with mutable fields and there is no reference
+// count to ask. The rule that gives the same semantics:
+//
+// 1. **A node is owned by the parse or the edit that made it until it is
+//    published, and immutable from then on.** A node is made by the lexer
+//    and the parser ([parse], [parse_code], [parse_math], [reparse_block],
+//    [reparse_markup]), by a constructor ([SyntaxNode::leaf],
+//    [SyntaxNode::inner], [SyntaxNode::error], [SyntaxNode::placeholder]) or
+//    as a copy ([SyntaxNode::deep_clone], [SyntaxNode::make_mut]). It is
+//    published when it is handed to anybody who may keep it: when it becomes
+//    the root of a [Source] ([Source::new], [Source::with_root],
+//    [Source::edit]), and when its maker returns it to code outside of this
+//    package that does not own it alone.
+// 2. **Only its owner writes to it.** The functions that write, and whom
+//    they are for:
+//    - while a tree is built (lexer and parser, on the nodes of the parse
+//      that runs): [SyntaxNode::warn], [SyntaxNode::warn_at],
+//      [SyntaxNode::hint], [SyntaxNode::hint_at], [SyntaxNode::with_hints],
+//      [SyntaxNode::convert_to_kind], [SyntaxNode::convert_to_error],
+//      [SyntaxNode::expected], [SyntaxNode::unexpected],
+//      [SyntaxNode::children_mut];
+//    - [SyntaxNode::numberize], on a tree that was just parsed
+//      ([Source::new], and [reparse] when it parses the whole text);
+//    - during an edit (`reparser.mbt`), on the copies of that edit only:
+//      [SyntaxNode::children_mut], [SyntaxNode::update_parent],
+//      [SyntaxNode::replace_children], which numbers the nodes it puts in
+//      and, where it has to renumber their neighbours, copies of those;
+//    - [SyntaxNode::synthesize] and [SyntaxNode::synthesize_ranges], the
+//      two that are public: for a tree that its caller made and has not
+//      given away (the evaluator calls them on what `parse` returned for a
+//      string, `eval/lib.mbt`). Never for a tree that came out of a
+//      [Source], nor for a tree built from nodes of one
+//      ([SyntaxNode::inner] takes the children as they are): copy it first
+//      ([SyntaxNode::deep_clone]).
+// 3. **What an edit copies** (`reparse`, `try_reparse`,
+//    [SyntaxNode::replace_children]): the root; every node on the way from
+//    the root to the innermost node whose children are replaced, each with
+//    its inner record, its children array (not the children) and the
+//    warnings wrapped around it ([SyntaxNode::make_mut], the copy that
+//    `Arc::make_mut` makes of a shared record); and, with all their
+//    descendants, the neighbours of the replaced children that have to be
+//    renumbered when the numbers between them run out
+//    ([SyntaxNode::deep_clone]). The replacement comes from the parser and
+//    is the edit's own. Nothing else is written, so everything else is
+//    shared between the tree before and the tree after: the same objects,
+//    with the same spans.
+//
+// The fields are private, so only this package can break the rule, and of
+// what it exports only the two `synthesize` functions write. The compiler
+// does not check the rest: see the note on [SyntaxNode::make_mut].
+//
+// The cost, against upstream: `Arc::make_mut` copies a record only if it is
+// shared, this port always. Per edit that is, for the root and each node on
+// the path, one node, one inner record and one array of as many references
+// as the node has children (for top-level markup: one per word and space of
+// the file), with a reference count taken for each child on the native
+// backend. Upstream pays the same when a compilation still holds the tree
+// (its copy of a `Vec<SyntaxNode>` clones every child), and nothing when
+// nobody does.
+
 ///|
 /// A node in the untyped syntax tree.
 ///
-/// Unlike upstream (which uses copy-on-write `Arc`s), nodes are mutable
-/// objects. The parser only ever mutates nodes it exclusively owns; use
-/// [SyntaxNode::deep_clone] whenever a node must be duplicated.
+/// Unlike upstream (which uses copy-on-write `Arc`s), nodes are objects with
+/// mutable fields that are written by their owner only and by nobody once
+/// they are published (see the header of this file).
 pub struct SyntaxNode {
   /// The underlying node data, potentially with wrapped warning messages.
   priv mut data : Node
@@ -275,6 +348,74 @@ pub fn SyntaxNode::placeholder(kind : SyntaxKind) -> SyntaxNode {
 /// A fully independent copy of this node and its subtree.
 pub fn SyntaxNode::deep_clone(self : SyntaxNode) -> SyntaxNode {
   { data: self.data.deep_clone(), span: self.span, }
+}
+
+///|
+/// The copy that `Arc::make_mut` makes of a shared record, one level deep:
+/// the inner record with its children array (the children are the same
+/// objects) and the warnings wrapped around it.
+fn Node::make_mut(self : Node) -> Node {
+  match self {
+    // Immutable.
+    Leaf(_, _, _) => self
+    Inner(inner, kind) =>
+      Inner(
+        {
+          len: inner.len,
+          descendants: inner.descendants,
+          diagnosis: inner.diagnosis,
+          upper: inner.upper,
+          children: inner.children.copy(),
+        },
+        kind,
+      )
+    // Not written by an edit: only `hints_mut` and `synthesize` write to an
+    // error, and those are for trees that are being built.
+    Error(_) => self
+    Warning(w, kind) =>
+      Warning(
+        {
+          child: w.child.make_mut(),
+          sub_range: w.sub_range,
+          message: w.message,
+          hints: w.hints.copy(),
+        },
+        kind,
+      )
+  }
+}
+
+///|
+/// A node that an edit may write to in place of this one, which stays as it
+/// is: this node's kind, span and data, with a copy of the inner record, of
+/// its children array (not of the children) and of the warnings around it.
+///
+/// Not upstream, where it is implicit: every write to an inner node goes
+/// through `inner_and_span_mut` (node.rs:85-96), whose `Arc::make_mut`
+/// (:91, and :93 for a warning) copies exactly this if the record is shared
+/// and nothing if it is not. The port cannot ask, so the reparser calls this
+/// for every node it is about to write to that it did not make itself, and
+/// puts the copy where the node was (the node itself is an object here,
+/// with its span; upstream's is a value inside its parent's `Vec`, copied
+/// with the parent's record).
+///
+/// On enforcing the rule of this file's header with types: a tree under
+/// construction and a published tree would have to be two types, a private
+/// one with mutable fields for the lexer, the parser and the reparser, and
+/// the public one without. Publishing is then either a copy of the whole
+/// tree, which doubles the allocations of every parse, or a conversion
+/// that costs nothing, which MoonBit has for a wrapper around one node
+/// (`struct SyntaxNode(Builder)`) but not for the array of children inside
+/// it: `children()` could no longer be a view of the stored array, and
+/// every reader of a tree (`syntax/ast`, the evaluator, the highlighter,
+/// `LinkedNode`) goes through it. `synthesize` would move to the private
+/// type, with entry points that parse and synthesize in one step. That is
+/// a change of the reading interface of the whole package for a guarantee
+/// that concerns two public functions and this package's own code, so it
+/// is not done here; if it is, start from how often `children()` is called
+/// on the paths that matter.
+fn SyntaxNode::make_mut(self : SyntaxNode) -> SyntaxNode {
+  { data: self.data.make_mut(), span: self.span, }
 }
 
 ///|
@@ -597,6 +738,9 @@ fn SyntaxNode::inner_node(self : SyntaxNode) -> InnerNode? {
 
 ///|
 /// Assign spans to each node.
+///
+/// Writes to every node of the subtree: for a tree that its caller owns
+/// (see the header of this file).
 fn SyntaxNode::numberize(
   self : SyntaxNode,
   id : FileId,
@@ -686,6 +830,9 @@ pub fn SyntaxNode::is_inner(self : SyntaxNode) -> Bool {
 
 ///|
 /// The node's children, mutably (empty for non-inner nodes).
+///
+/// The stored array: for a node that its caller owns (the parser's while it
+/// builds, the reparser's copies).
 fn SyntaxNode::children_mut(self : SyntaxNode) -> Array[SyntaxNode] {
   match self.inner_node() {
     Some(inner) => inner.children
@@ -704,6 +851,9 @@ fn SyntaxNode::upper(self : SyntaxNode) -> UInt64 {
 
 ///|
 /// Update this node after changes were made to one of its children.
+///
+/// Writes to this node: it must be the caller's copy
+/// ([SyntaxNode::make_mut]).
 fn SyntaxNode::update_parent(
   self : SyntaxNode,
   prev_len : Int,
@@ -720,6 +870,14 @@ fn SyntaxNode::update_parent(
 
 ///|
 /// Replaces a range of children with a replacement and renumbers them.
+///
+/// Writes to this node, which must be the caller's copy
+/// ([SyntaxNode::make_mut]), and to the nodes of `replacement`, which must
+/// be the caller's too (they come from the parser). The children that stay
+/// are not written to: where they have to be renumbered, copies take their
+/// place.
+///
+/// May have changed this node and the replacement if it raises.
 fn SyntaxNode::replace_children(
   self : SyntaxNode,
   from : Int,
@@ -777,9 +935,27 @@ fn SyntaxNode::replace_children(
   let mut right = 0
   let max_left = start
   let max_right = inner.children.length() - end
+  // Not upstream: the children that this call may write to. Those of
+  // `start..end` are the replacement, which the caller made. The others are
+  // of the tree before the edit and may be held by somebody: before they
+  // are renumbered they are replaced by copies of their whole subtrees
+  // (`numberize` writes the span of every node and the upper bound of every
+  // inner node). Upstream reaches them through `inner_and_span_mut`
+  // (node.rs:524 from the loop at :712), whose `Arc::make_mut` copies a
+  // shared record on the way down.
+  let mut owned_start = start
+  let mut owned_end = end
   while true {
     let rs = start - left
     let re = end + right
+    for i in rs..<owned_start {
+      inner.children[i] = inner.children[i].deep_clone()
+    }
+    for i in owned_end..<re {
+      inner.children[i] = inner.children[i].deep_clone()
+    }
+    owned_start = rs
+    owned_end = re
     let start_number = if rs == 0 {
       self.span.number() + 1
     } else {
@@ -822,6 +998,10 @@ fn next_power_of_two(n : Int) -> Int {
 /// with the identity mapper `RangeMapper::new(Some(0..len))` (the text is
 /// the whole file `id`): every node receives the range span of its own
 /// range and sub-ranges are kept.
+///
+/// Writes to every node of the tree: only for a tree that the caller made
+/// and that nobody else holds (see the header of this file), never for one
+/// that is or was in a [Source].
 pub fn SyntaxNode::synthesize_ranges(self : SyntaxNode, id : FileId) -> Unit {
   self.synthesize_ranges_at(0, id)
 }
@@ -856,6 +1036,10 @@ fn SyntaxNode::synthesize_ranges_at(
 ///|
 /// Set a synthetic span for the node and all its descendants, and add hints
 /// with the original indices to any syntax errors or warnings.
+///
+/// Writes to every node of the tree: only for a tree that the caller made
+/// and that nobody else holds (see the header of this file), never for one
+/// that is or was in a [Source].
 pub fn SyntaxNode::synthesize(self : SyntaxNode, span : Span) -> Unit {
   self.synthesize_at(0, span)
 }

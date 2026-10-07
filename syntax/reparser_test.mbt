@@ -73,10 +73,12 @@ fn check(
   expected : Reparse,
 ) -> Unit {
   let source = @syntax.Source::detached(text)
-  let orig_tree = source.root().deep_clone()
+  let orig_tree = source.root()
   // `Source::edit()` is the public interface for reparsing.
   let (start, end) = edit.into_range(text)
-  let (rs, re) = source.edit(start, end, with_)
+  let (source, (rs, re)) = source.edit(start, end, with_)
+  // A copy: `synthesize` writes to the tree, and the source's is not its
+  // caller's.
   let reparsed_tree = source.root().deep_clone()
   let normal_parse = @syntax.parse(source.text())
   reparsed_tree.synthesize(@syntax.Span::detached())
@@ -205,11 +207,18 @@ test "reparse non-ascii" {
 ///|
 /// `Source::replace`.
 test "source replace" {
-  let source = @syntax.Source::detached("abc~def~gh~")
-  let (s, e) = source.replace("abc~d+f~gh~")
+  let original = @syntax.Source::detached("abc~def~gh~")
+  let (source, (s, e)) = original.replace("abc~d+f~gh~")
   inspect(@syntax.utf8_slice(source.text(), s, e), content="abc~d+f~")
-  assert_eq(source.replace("abc~d+f~gh~"), (0, 0))
+  // The same text: the same source.
+  let (same, range) = source.replace("abc~d+f~gh~")
+  assert_eq(range, (0, 0))
+  assert_true(physical_equal(same, source))
   inspect(source.lines().len_lines(), content="1")
-  source.replace("abc\nd+f~gh~") |> ignore
-  inspect(source.lines().len_lines(), content="2")
+  let (third, _) = source.replace("abc\nd+f~gh~")
+  inspect(third.lines().len_lines(), content="2")
+  // The sources that were replaced are what they were.
+  inspect(original.text(), content="abc~def~gh~")
+  inspect(source.text(), content="abc~d+f~gh~")
+  inspect(source.lines().len_lines(), content="1")
 }

@@ -34,12 +34,12 @@ fn evaluated_text(world : TestWorld) -> String {
 }
 
 ///|
-/// Replaces the text of a file of the world in place, as `FileStore` does
-/// after a reset.
+/// Replaces the text of a file of the world by an edit of its source, as
+/// `FileStore` does after a reset.
 fn edit_file(world : TestWorld, file : String, text : String) -> Unit raise {
-  for source in world.files.values() {
-    if source.id().vpath().get_without_slash() == file {
-      source.replace(text) |> ignore
+  for id, source in world.files {
+    if id.vpath().get_without_slash() == file {
+      world.files[id] = source.replace(text).0
       return
     }
   }
