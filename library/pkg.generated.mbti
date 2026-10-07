@@ -4939,6 +4939,7 @@ pub impl NativeElement for CounterUpdateElem
 pub(all) struct Coverage(Array[UInt]) derive(Eq, Hash)
 pub fn Coverage::contains(Self, UInt) -> Bool
 pub fn Coverage::default() -> Self
+pub fn Coverage::from_ttf(@otf.Face) -> Self
 pub fn Coverage::from_vec(Array[UInt]) -> Self
 pub fn Coverage::iter(Self) -> Iter[UInt]
 pub impl Default for Coverage
@@ -6279,6 +6280,7 @@ pub(all) struct FontInfo {
   coverage : Coverage
 } derive(Eq, Hash)
 pub fn FontInfo::from_ttf(@otf.Face) -> Self?
+pub fn FontInfo::from_ttf_with_coverage(@otf.Face, Coverage?) -> Self?
 pub fn FontInfo::is_last_resort(Self) -> Bool
 pub fn FontInfo::iter(Bytes) -> Array[Self]
 pub fn FontInfo::new(Bytes, UInt) -> Self?

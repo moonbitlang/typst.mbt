@@ -369,6 +369,7 @@ pub fn CmapSubtables::get(Self, UInt16) -> CmapSubtable?
 pub fn CmapSubtables::is_empty(Self) -> Bool
 pub fn CmapSubtables::iter(Self) -> Iter[CmapSubtable]
 pub fn CmapSubtables::len(Self) -> UInt16
+pub fn CmapSubtables::offset(Self, UInt16) -> UInt?
 pub impl Default for CmapSubtables
 
 pub struct CmapTable {

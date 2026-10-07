@@ -275,6 +275,15 @@ pub fn CmapSubtables::get(
 }
 
 ///|
+/// The offset in the table of the subtable at an index (not in ttf-parser:
+/// several encoding records of a table usually point to one subtable, and
+/// whoever walks all subtables, like the coverage of a font, can tell).
+pub fn CmapSubtables::offset(self : CmapSubtables, index : UInt16) -> UInt? {
+  guard self.records.get(index) is Some(record) else { return None }
+  Some(record.offset.0)
+}
+
+///|
 /// Returns the number of subtables.
 pub fn CmapSubtables::len(self : CmapSubtables) -> UInt16 {
   self.records.len()

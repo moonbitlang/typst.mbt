@@ -136,6 +136,18 @@ pub fn FontInfo::iter(data : Bytes) -> Array[FontInfo] {
 ///|
 /// Compute metadata for a single ttf-parser face.
 pub fn FontInfo::from_ttf(ttf : @otf.Face) -> FontInfo? {
+  FontInfo::from_ttf_with_coverage(ttf, None)
+}
+
+///|
+/// `FontInfo::from_ttf` for a face whose coverage may be known already
+/// (not upstream, whose `from_ttf` is the body of this function: the faces
+/// of a collection often share one `cmap` table, and font discovery
+/// computes its coverage once, with `Coverage::from_ttf`).
+pub fn FontInfo::from_ttf_with_coverage(
+  ttf : @otf.Face,
+  coverage : Coverage?,
+) -> FontInfo? {
   let ps_name = find_name(ttf, @otf.name_id_post_script_name)
   let exception = match ps_name {
     Some(name) => find_exception(name)
@@ -203,33 +215,9 @@ pub fn FontInfo::from_ttf(ttf : @otf.Face) -> FontInfo? {
   }
 
   // Determine the unicode coverage.
-  let mut coverage = Coverage([])
-  if ttf.tables().cmap is Some(cmap) {
-    for subtable in cmap.subtables.iter() {
-      if subtable.is_unicode() {
-        let subtable_coverage = CoverageBuilder::with_capacity(
-          coverage.0.length(),
-        )
-        // Ranges instead of single codepoints (performance; the same
-        // coverage: a codepoint is added as `c..c.saturating_add(1)`, and
-        // adding those of `start..=end` in order is adding
-        // `start..end.saturating_add(1)`).
-        subtable.codepoint_ranges(
-          // We expect codepoints in CMAP subtables to be already sorted
-          (start, end) => {
-            subtable_coverage.add_codepoint_range(
-              start,
-              if end == 0xFFFFFFFFU {
-                end
-              } else {
-                end + 1
-              },
-            )
-          },
-        )
-        coverage = coverage.union(subtable_coverage.build())
-      }
-    }
+  let coverage = match coverage {
+    Some(coverage) => coverage
+    None => Coverage::from_ttf(ttf)
   }
   let mut flags = FontFlags::empty()
   flags = flags.set(font_flags_monospace, ttf.is_monospaced())
@@ -462,6 +450,58 @@ pub impl Default for Coverage with fn default() {
 
 ///|
 pub extend Coverage with Default::{default}
+
+///|
+/// The unicode coverage of a face (in upstream a part of
+/// `FontInfo::from_ttf`: "Determine the unicode coverage").
+pub fn Coverage::from_ttf(ttf : @otf.Face) -> Coverage {
+  let mut coverage = Coverage([])
+  if ttf.tables().cmap is Some(cmap) {
+    // The offsets of the subtables that are in `coverage`.
+    let seen : Array[UInt] = []
+    let mut index : UInt16 = 0
+    for subtable in cmap.subtables.iter() {
+      let offset = cmap.subtables.offset(index)
+      index += 1
+      if subtable.is_unicode() {
+        // Not upstream: a subtable that an earlier record points to as well
+        // adds nothing. Most fonts have two records for each of their
+        // subtables (one of the Unicode and one of the Windows platform).
+        // The encoding stays the same: what is built from one subtable is
+        // one set, the union of two sets is their union, and a set has one
+        // encoding (its ranges, in order, each as long as it can be).
+        if offset is Some(offset) {
+          if seen.contains(offset) {
+            continue
+          }
+          seen.push(offset)
+        }
+        let subtable_coverage = CoverageBuilder::with_capacity(
+          coverage.0.length(),
+        )
+        // Ranges instead of single codepoints (performance; the same
+        // coverage: a codepoint is added as `c..c.saturating_add(1)`, and
+        // adding those of `start..=end` in order is adding
+        // `start..end.saturating_add(1)`).
+        subtable.codepoint_ranges(
+          // We expect codepoints in CMAP subtables to be already sorted
+          (start, end) => {
+            subtable_coverage.add_codepoint_range(
+              start,
+              if end == 0xFFFFFFFFU {
+                end
+              } else {
+                end + 1
+              },
+            )
+          },
+        )
+        coverage = coverage.union(subtable_coverage.build())
+      }
+    }
+  }
+  coverage
+}
 
 ///|
 /// Encode a vector of codepoints.
