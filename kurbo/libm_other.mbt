@@ -36,11 +36,6 @@ fn libm_log2(x : Double) -> Double {
 }
 
 ///|
-fn libm_cbrt(x : Double) -> Double {
-  @math.cbrt(x)
-}
-
-///|
 fn libm_hypot(x : Double, y : Double) -> Double {
   @math.hypot(x, y)
 }

@@ -118,3 +118,42 @@ fn report() -> Unit raise {
     fail("\{n} of \{harness_checks.val} checks failed:\n" + shown.join("\n"))
   }
 }
+
+///|
+/// An ordering is `-1`, `0` or `1` (upstream's `Ordering`) on every target,
+/// also where the mantissas differ by more than one limb of `BigInt`: there
+/// `BigInt`'s own `compare` gives the difference of the limb counts on
+/// wasm-gc, and `calc.max` (`ordering == goal`) kept its first argument.
+test "decimal orderings are -1, 0 or 1" {
+  let small = Decimal::from_str("1").unwrap()
+  let big = Decimal::from_str("20000000000000000000").unwrap()
+  let bigger = Decimal::from_str("30000000000000000000").unwrap()
+  let tiny = Decimal::from_str("0.0000000000000000000000000001").unwrap()
+  inspect(small.compare(big), content="-1")
+  inspect(big.compare(small), content="1")
+  inspect(small.neg().compare(big.neg()), content="1")
+  inspect(big.neg().compare(small.neg()), content="-1")
+  inspect(bigger.compare(tiny), content="1")
+  inspect(tiny.compare(bigger), content="-1")
+  inspect(big.compare(big), content="0")
+  inspect(compare(Decimal(small), Decimal(bigger)), content="-1")
+  inspect(compare(Int(1L), Decimal(big)), content="-1")
+  inspect(compare(Decimal(big), Int(1L)), content="1")
+  let span = @syntax.Span::detached()
+  // Both the maximum and the minimum are more than one limb away from the
+  // first value.
+  let values : Array[@syntax.Spanned[Value]] = [
+    { v: Decimal(small), span, },
+    { v: Decimal(bigger), span, },
+    { v: Decimal(big), span, },
+    { v: Decimal(tiny), span, },
+  ]
+  inspect(
+    impl_calc_max(span, values).repr(),
+    content="decimal(\"30000000000000000000\")",
+  )
+  inspect(
+    impl_calc_min(span, values).repr(),
+    content="decimal(\"0.0000000000000000000000000001\")",
+  )
+}

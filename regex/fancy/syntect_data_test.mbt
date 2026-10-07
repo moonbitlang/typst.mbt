@@ -4,7 +4,7 @@
 
 ///|
 /// Every regex with its build result ("ok" or the error).
-let syntect_regexes : Array[(String, String)] = [
+let syntect_regexes : ReadOnlyArray[(String, String)] = [
   ("", "ok"),
   ("\n", "ok"),
   ("\n|$|(?=\\{\\s*\\}.*$)|(?=\\{.*?[:;])|(?=\\{)(?!.+\\}.*$)", "ok"),
@@ -15042,7 +15042,7 @@ let syntect_regexes : Array[(String, String)] = [
 ]
 
 ///|
-let syntect_lines : Array[String] = [
+let syntect_lines : ReadOnlyArray[String] = [
   "fn main() { let x = 42; }", "  // comment here", "<div class=\"a\">text</div>",
   "def foo(bar, baz=1):", "\"str \\\"esc\\\" end\" 'c'", "#include <stdio.h>", "SELECT * FROM t WHERE a = 'b';",
   "x = 0x1F + 3.14e-10 - 1_000", "@media screen { .a { color: #fff; } }", "$ echo \"${HOME}\" | grep -v foo",
@@ -15050,7 +15050,7 @@ let syntect_lines : Array[String] = [
 
 ///|
 /// (regex, [description per line])
-let syntect_matches : Array[(String, Array[String])] = [
+let syntect_matches : ReadOnlyArray[(String, ReadOnlyArray[String])] = [
   (
     "",
     [

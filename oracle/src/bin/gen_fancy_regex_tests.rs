@@ -687,14 +687,14 @@ fn main() {
         }
     }
     for (i, part) in parts.iter().enumerate() {
-        writeln!(out, "///|\nlet oracle_cases_{i} : Array[(String, String, String, Array[(String, String)])] = [").unwrap();
+        writeln!(out, "///|\nlet oracle_cases_{i} : ReadOnlyArray[(String, String, String, ReadOnlyArray[(String, String)])] = [").unwrap();
         out.push_str(part);
         out.push_str("]\n\n");
     }
-    out.push_str("///|\n/// (pattern, builder flags, [(haystack, description)]); the build error\n/// is in place of the haystacks when building fails.\n");
-    out.push_str("let oracle_cases : Array[(String, String, String, Array[(String, String)])] = [\n");
+    out.push_str("///|\n/// (pattern, builder flags, [(haystack, description)]); the build error\n/// is in place of the haystacks when building fails. The tables are\n/// `ReadOnlyArray`s (static data): as `Array` literals the test's init\n/// function has more locals than a debug wasm module may have.\n");
+    out.push_str("let oracle_cases : ReadOnlyArray[\n  ReadOnlyArray[(String, String, String, ReadOnlyArray[(String, String)])],\n] = [\n");
     for i in 0..parts.len() {
-        writeln!(out, "  ..oracle_cases_{i},").unwrap();
+        writeln!(out, "  oracle_cases_{i},").unwrap();
     }
     out.push_str("]\n");
     std::fs::write(root.join("regex/fancy/oracle_data_test.mbt"), out).unwrap();
@@ -717,7 +717,7 @@ fn main() {
     out.push_str("// `fancy-regex` crate (0.16.2) and the regexes of syntect's syntaxes\n");
     out.push_str("// (two-face `extra_no_newlines`). Do not edit.\n\n");
     out.push_str("///|\n/// Every regex with its build result (\"ok\" or the error).\n");
-    out.push_str("let syntect_regexes : Array[(String, String)] = [\n");
+    out.push_str("let syntect_regexes : ReadOnlyArray[(String, String)] = [\n");
     let mut ok = vec![];
     for r in &regexes {
         let res = match build(r, "o") {
@@ -730,7 +730,7 @@ fn main() {
         writeln!(out, "  ({}, {}),", mbt_str(r), mbt_str(&res)).unwrap();
     }
     out.push_str("]\n\n");
-    out.push_str("///|\nlet syntect_lines : Array[String] = [\n");
+    out.push_str("///|\nlet syntect_lines : ReadOnlyArray[String] = [\n");
     for l in CODE_LINES {
         writeln!(out, "  {},", mbt_str(l)).unwrap();
     }
@@ -740,7 +740,7 @@ fn main() {
     // `(0, len)`, `(mid, len)` and `(0, mid)` (`mid`: the middle char
     // boundary).
     out.push_str("///|\n/// (regex, [description per line])\n");
-    out.push_str("let syntect_matches : Array[(String, Array[String])] = [\n");
+    out.push_str("let syntect_matches : ReadOnlyArray[(String, ReadOnlyArray[String])] = [\n");
     for (i, (r, re)) in ok.iter().enumerate() {
         if i % 8 != 0 {
             continue;

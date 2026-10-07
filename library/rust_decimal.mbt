@@ -132,14 +132,37 @@ fn RustDecimal::cmp(self : RustDecimal, other : RustDecimal) -> Int {
   if self.negative != other.negative {
     return if self.negative { -1 } else { 1 }
   }
-  let scale = if self.scale > other.scale { self.scale } else { other.scale }
-  let a = self.mantissa * rd_pow10(scale - self.scale)
-  let b = other.mantissa * rd_pow10(scale - other.scale)
-  let ord = a.compare(b)
+  // We know both signs are the same here so flip it here.
+  // Negative is handled differently. i.e. 0.5 > 0.01 however -0.5 < -0.01
   if self.negative {
-    -ord
+    rd_cmp_internal(other, self)
   } else {
-    ord
+    rd_cmp_internal(self, other)
+  }
+}
+
+///|
+/// rust_decimal's `cmp_internal`: the `Ordering` (`-1`, `0` or `1`) of two
+/// decimals, ignoring their signs.
+///
+/// The result is built here and is not `BigInt`'s `compare`:
+/// `Compare::compare` only promises the sign of its result, and `BigInt`'s is
+/// the difference of the limb counts on wasm-gc (core's `bigint_default.mbt`:
+/// `1N.compare(100000000000000000000N)` is `-2`) where native, wasm and js
+/// give `-1`, `0` or `1`. An ordering of this port is one of the three values
+/// of upstream's `Ordering`, and code compares them (`calc.min`/`calc.max`:
+/// `ordering == goal`).
+fn rd_cmp_internal(d1 : RustDecimal, d2 : RustDecimal) -> Int {
+  let scale = if d1.scale > d2.scale { d1.scale } else { d2.scale }
+  let a = d1.mantissa * rd_pow10(scale - d1.scale)
+  let b = d2.mantissa * rd_pow10(scale - d2.scale)
+  let ord = a.compare(b)
+  if ord < 0 {
+    -1
+  } else if ord > 0 {
+    1
+  } else {
+    0
   }
 }
 

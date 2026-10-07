@@ -141,33 +141,37 @@ fn report(failures : Array[String], total : Int) -> Unit raise {
 test "fancy-regex oracle" {
   let failures = []
   let mut total = 0
-  for case in oracle_cases {
-    let (pattern, flags, build, hays) = case
-    total += 1
-    let p = @unicode.rust_debug_str(pattern)
-    let re = build_with(pattern, flags) catch {
-      e => {
-        let actual = "error: \{e}"
-        if actual != build {
-          failures.push(
-            "build \{p} /\{flags}:\n  expected \{build}\n  actual   \{actual}",
-          )
+  for part in oracle_cases[:] {
+    for case in part[:] {
+      let (pattern, flags, build, hays) = case
+      total += 1
+      let p = @unicode.rust_debug_str(pattern)
+      let re = build_with(pattern, flags) catch {
+        e => {
+          let actual = "error: \{e}"
+          if actual != build {
+            failures.push(
+              "build \{p} /\{flags}:\n  expected \{build}\n  actual   \{actual}",
+            )
+          }
+          continue
         }
+      }
+      if build != "ok" {
+        failures.push(
+          "build \{p} /\{flags}:\n  expected \{build}\n  actual   ok",
+        )
         continue
       }
-    }
-    if build != "ok" {
-      failures.push("build \{p} /\{flags}:\n  expected \{build}\n  actual   ok")
-      continue
-    }
-    for h in hays {
-      let (hay, expected) = h
-      total += 1
-      let actual = describe(re, hay)
-      if actual != expected {
-        failures.push(
-          "\{p} /\{flags} on \{@unicode.rust_debug_str(hay)}:\n  expected \{expected}\n  actual   \{actual}",
-        )
+      for h in hays[:] {
+        let (hay, expected) = h
+        total += 1
+        let actual = describe(re, hay)
+        if actual != expected {
+          failures.push(
+            "\{p} /\{flags} on \{@unicode.rust_debug_str(hay)}:\n  expected \{expected}\n  actual   \{actual}",
+          )
+        }
       }
     }
   }
@@ -177,7 +181,7 @@ test "fancy-regex oracle" {
 ///|
 test "syntect regexes build" {
   let failures = []
-  for case in syntect_regexes {
+  for case in syntect_regexes[:] {
     let (pattern, expected) = case
     let actual = try build_with(pattern, "o") catch {
       e => "error: \{e}"
@@ -197,8 +201,8 @@ test "syntect regexes build" {
 test "syntect regexes match" {
   let failures = []
   let mut total = 0
-  let lines = syntect_lines.map(l => @fancy.Text::new(l))
-  for case in syntect_matches {
+  let lines = syntect_lines[:].map(l => @fancy.Text::new(l))
+  for case in syntect_matches[:] {
     let (pattern, expected) = case
     let re = build_with(pattern, "o")
     for i, line in lines {

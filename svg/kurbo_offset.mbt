@@ -164,7 +164,7 @@ fn solve_cubic(
   if d < 0.0 {
     let sq = (-0.25 * d).sqrt()
     let r = -0.5 * de
-    let t1 = libm_cbrt(r + sq) + libm_cbrt(r - sq)
+    let t1 = @libm.f64_cbrt(r + sq) + @libm.f64_cbrt(r - sq)
     result.push(t1 - c2)
   } else if d == 0.0 {
     let t1 = copysign((-d0).sqrt(), de)

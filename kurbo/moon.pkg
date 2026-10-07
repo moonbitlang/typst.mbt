@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/typst/libm",
   "moonbitlang/core/math",
   "moonbitlang/core/debug",
 }
