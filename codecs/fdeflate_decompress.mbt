@@ -307,7 +307,10 @@ fn Decompressor::read_code_length_codes(
   self : Decompressor,
 ) -> Unit raise DecompressionError {
   self.fill_buffer()
-  if self.nbits + (self.in_end - self.in_pos) * 8 < 3 * self.hclen {
+  // `nbits + remaining_input.len() * 8 < 3 * hclen` (at most 57 bits; the
+  // product does not fit an `Int` for an input of 2^28 bytes).
+  let remaining_input = self.in_end - self.in_pos
+  if remaining_input < 8 && self.nbits + remaining_input * 8 < 3 * self.hclen {
     return
   }
   let code_length_lengths = FixedArray::make(19, 0)

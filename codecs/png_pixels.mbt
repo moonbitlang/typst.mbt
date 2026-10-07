@@ -264,7 +264,16 @@ fn unpack_bits_pixels(
   channels : Int,
   bit_depth : Int,
 ) -> Int {
-  @cmp.minimum(output_len / channels, input_len * (8 / bit_depth))
+  let per_byte = 8 / bit_depth
+  let pixels = output_len / channels
+  // (Not `input_len * per_byte`, which does not fit an `Int` for a row of
+  // 2^28 bytes.)
+  if input_len >=
+    pixels / per_byte + (if pixels % per_byte > 0 { 1 } else { 0 }) {
+    pixels
+  } else {
+    input_len * per_byte
+  }
 }
 
 ///|

@@ -1388,9 +1388,12 @@ fn StreamingDecoder::parse_iccp(
 }
 
 ///|
-/// The largest size of an allocation here (the length of an array is an
-/// `Int`); upstream's is `isize::MAX`.
-const PNG_MAX_ALLOCATION : UInt64 = 0x7FFFFFFF
+/// The largest size of an allocation here; upstream's is `isize::MAX`. The
+/// length of an array is an `Int`, and offsets into a buffer are added to
+/// (by the length of a back-reference, by the growth of a buffer, by a
+/// pixel) before they are compared with its length: 64 KiB below `Int`'s
+/// largest value, no such sum overflows.
+const PNG_MAX_ALLOCATION : UInt64 = 0x7FFF0000
 
 ///|
 fn StreamingDecoder::parse_iccp_raw(
