@@ -125,6 +125,44 @@ pub(all) struct Page {
 }
 
 ///|
+/// Upstream derives `Hash` for `Page`: frame, bleed, fill, numbering,
+/// supplement and number.
+pub impl @library.Fingerprint for Page with fn fingerprint(self, state) {
+  state.write(self.frame)
+  state.write_f64(self.bleed.left.to_raw())
+  state.write_f64(self.bleed.top.to_raw())
+  state.write_f64(self.bleed.right.to_raw())
+  state.write_f64(self.bleed.bottom.to_raw())
+  match self.fill {
+    Auto => state.write_discriminant(0)
+    Custom(fill) => {
+      state.write_discriminant(1)
+      match fill {
+        None => state.write_discriminant(0)
+        Some(paint) => {
+          state.write_discriminant(1)
+          state.write(paint)
+        }
+      }
+    }
+  }
+  match self.numbering {
+    None => state.write_discriminant(0)
+    Some(numbering) => {
+      state.write_discriminant(1)
+      state.write(numbering)
+    }
+  }
+  state.write(self.supplement)
+  state.write_u64(self.number)
+}
+
+///|
+#deprecated("call as `Fingerprint::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Page with @library.Fingerprint::{fingerprint}
+
+///|
 /// Get the configured background or `None` if it is `Auto`.
 ///
 /// This is used in PDF export.
