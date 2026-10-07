@@ -617,6 +617,83 @@ test "section 4: conversions, `Call`, `NoneValue()`, typed and untyped fields, `
 }
 
 ///|
+/// The text runs of a frame, one line each: the text and the PostScript
+/// name of the font that draws it.
+fn collect_faces(frame : @library.Frame, out : Array[String]) -> Unit {
+  for entry in frame.items() {
+    match entry.1 {
+      Group(group) => collect_faces(group.frame, out)
+      Text(text) =>
+        out.push(
+          "\{text.text.escape()} \{text.font.font().post_script_name().unwrap_or("-")}",
+        )
+      _ => ()
+    }
+  }
+}
+
+///|
+/// `collect_faces` of the pages of a compiled document.
+fn Pages::faces(self : Pages) -> String raise {
+  let out = []
+  for page in self.report.unwrap().pages() {
+    collect_faces(page.frame, out)
+  }
+  out.join("\n")
+}
+
+///|
+test "section 5: the embedded sans-serif family" {
+  // By its name, with its own bold and italic.
+  let report = pages([@guide.sans_report()])
+  inspect(report.errors(), content="")
+  inspect(report.warnings(), content="")
+  inspect(
+    report.faces(),
+    content=(
+      #|"Build times" IBMPlexSans-Bold
+      #|"Debug: 11 s. Release: " IBMPlexSans-Regular
+      #|"eight times" IBMPlexSans-Italic
+      #|" that." IBMPlexSans-Regular
+    ),
+  )
+  // A document that does not name it does not get it: the check mark,
+  // which Libertinus Serif lacks and IBM Plex Sans has, is the one of
+  // before.
+  let unnamed = pages(["done \u{2713}"])
+  inspect(
+    unnamed.faces(),
+    content=(
+      #|"done " LibertinusSerif-Regular
+      #|"✓" NewCMMath-Regular
+    ),
+  )
+  // Named after the text's font, it is tried before the other fonts.
+  let named = pages([@guide.sans_for_symbols(), "done \u{2713}"])
+  inspect(named.warnings(), content="")
+  inspect(
+    named.faces(),
+    content=(
+      #|"done " LibertinusSerif-Regular
+      #|"✓" IBMPlexSans-Regular
+    ),
+  )
+  // In both worlds, and not without the embedded fonts.
+  let system = @system.world(system_fonts=false)
+  assert_true(@library.World::book(system).contains_family("ibm plex sans"))
+  let bare = pages(
+    [@guide.sans_report()],
+    world=@doc.DocWorld::in_memory(embedded_fonts=false),
+  )
+  inspect(
+    bare.warnings(),
+    content=(
+      #|unknown font family: ibm plex sans
+    ),
+  )
+}
+
+///|
 test "section 5: fonts come from the world" {
   let text : Array[&@doc.IntoContent] = [@guide.font_families(), "mono"]
   // The directory of the embedded fonts, read as a directory of the
