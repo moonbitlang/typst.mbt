@@ -233,8 +233,11 @@ test "sans: italic, bold and medium are the family's own faces" {
 
 ///|
 /// Characters that IBM Plex Sans has and the font of the text lacks, for
-/// each of the embedded Typst families: in body text, in raw text and in
-/// a formula.
+/// each of the embedded Typst families: in body text, in raw text, in
+/// text in New Computer Modern and in a formula (New Computer Modern
+/// Math). Text in another font than Libertinus Serif tries that one
+/// before any fallback (the tail of the list of families), so only what
+/// Libertinus Serif lacks as well reaches the choice among all fonts.
 fn fallback_probe() -> Array[&@doc.IntoContent] {
   [
     ..small_page(),
@@ -248,6 +251,7 @@ fn fallback_probe() -> Array[&@doc.IntoContent] {
         "New Computer Modern",
       ]),
     ),
+    @doc.Equation("x + \u{2153} + \"fifth \u{2155}\""),
   ]
 }
 
@@ -265,12 +269,13 @@ test "sans: a document that does not name the family is laid out as without it" 
   inspect(
     fonts_of(with_sans),
     content=(
-      #|LibertinusSerif-Regular: c h e k r o u b l s v n t [❌] ẞ ₿ ⅓ ₂ �
+      #|LibertinusSerif-Regular: c h e k r o u b l s v n t [❌] ẞ ₿ ⅓ ₂ � ⅕
       #|NewCMMath-Regular: ✓ ↩ ⬎
       #|NewCM10-Regular: ₽ t h i r d w o
       #|DejaVuSansMono: ⅐ v i ệ t
       #|LibertinusSerif-Italic: c h e k r o u b l i g a t
       #|NewCM10-Italic: ₽ ﬁ
+      #|NewCMMath-Book: 𝑥 + f i t h
     ),
   )
   assert_eq(fonts_of(with_sans), fonts_of(without))
@@ -287,12 +292,13 @@ test "sans: a document that does not name the family is laid out as without it" 
   inspect(
     fonts_of(covering),
     content=(
-      #|LibertinusSerif-Regular: c h e k r o u b l s v n t ẞ ₿ ⅓ ₂ �
+      #|LibertinusSerif-Regular: c h e k r o u b l s v n t ẞ ₿ ⅓ ₂ � ⅕
       #|IBMPlexSans-Regular: ✓ ₽ ↩ ⅐ ❌ ⬎
       #|LibertinusSerif-Italic: c h e k r o u b l i g a t
       #|IBMPlexSans-Italic: ✓ ₽ ﬁ
       #|DejaVuSansMono: v i ệ t
       #|NewCM10-Regular: t h i r d w o
+      #|NewCMMath-Book: 𝑥 + f i t h
     ),
   )
 }

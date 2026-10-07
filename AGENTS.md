@@ -315,12 +315,13 @@
   similar to the text's font (monospace or not, serif or not, shared
   first words of the family names, then the shorter family name), so a
   family that is added with its coverage takes characters from the fonts
-  that had them, wherever it is in the book (with IBM Plex Sans: U+2713,
-  some arrows and currency signs of Libertinus Serif text, superscript
-  digits and fractions of New Computer Modern text, Vietnamese letters of
-  raw text: 43, 39 and 87 characters; and, where a text has no font of
-  its own, nearly every character at weight 500, which no Typst font
-  has). So the entries of `sans_fonts` have an empty
+  that had them, wherever it is in the book (with IBM Plex Sans, 43
+  characters of Libertinus Serif text: U+2713, 16 arrows, 13 currency
+  signs, U+FB01, U+FB02 and others from New Computer Modern, its math
+  font and DejaVu Sans Mono, and 7 that were missing glyphs; text in
+  another font tries Libertinus Serif before any fallback, the tail of
+  `families`, so there it is what that lacks too, U+2B0E in raw text for
+  one). So the entries of `sans_fonts` have an empty
   coverage (`FontInfo.coverage` is read by `select_fallback` only):
   `select` finds the family by its name, a fallback never does, and a
   document that does not name the family is laid out as without it

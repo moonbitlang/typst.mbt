@@ -530,17 +530,17 @@ pub fn sans_report() -> Seq {
 " that." IBMPlexSans-Regular
 ```
 
-It is in the world by its name only. For a character that the font of a
-text lacks, the engine takes the font of the world that has it and is most
-similar to the text's font (not the first one: among equals the family
-with the shorter name), so a family that is added to a world takes
-characters from the fonts that had them: with IBM Plex Sans, the check
-mark, some arrows and currency signs of serif text, for example. The
-worlds of `doc` therefore leave it out of that choice. A document that does
-not name the family is laid out as if it were not there, which is also
-what the Typst command line gives for the same source. To have it for the
-characters that the text's font lacks, name it after that font
-(`sans_for_symbols`):
+It is in the world by its name only. For a character that the fonts of a
+text lack (the families it names, then Libertinus Serif), the engine takes
+the font of the world that has it and is most similar to the text's font
+(not the first one: among equals the family with the shorter name), so a
+family that is added to a world takes characters from the fonts that had
+them: with IBM Plex Sans, the check mark, some arrows and currency signs
+of text in Libertinus Serif, for example. The worlds of `doc` therefore
+leave it out of that choice. A document that does not name the family is
+laid out as if it were not there, which is also what the Typst command
+line gives for the same source. To have it for the characters that the
+text's font lacks, name it after that font (`sans_for_symbols`):
 
 ```moonbit
 pub fn sans_for_symbols() -> SetText {
@@ -551,8 +551,9 @@ pub fn sans_for_symbols() -> SetText {
 The family has Latin, Cyrillic and Greek letters and the punctuation and
 symbols of reports (curly quotes, dashes, the ellipsis, ×, −, ±, →, ≤, ≥,
 ≠, ≈, •, €, ✓) in all of its faces. It lacks ⇒, ▲, ▼, ■, ●, ○, ◆, ★, ✗,
-☐ and ☑: in a text set in it they come from the Typst fonts (a serif or
-monospaced glyph, not a missing one). Its upright faces are an earlier
+☐ and ☑: in a text set in it they come from the Typst fonts (from
+Libertinus Serif if that has them: a glyph of another design, not a
+missing one). Its upright faces are an earlier
 release (3.2) than its italics (3.005), with the same metrics; the italics
 have 51 characters more, of which a report may have the hyphens U+2010 and
 U+2011 (non-breaking): in upright text these two come from Libertinus
