@@ -137,6 +137,10 @@ priv struct WarningWrapper {
 
 ///|
 /// Whether a node has diagnostic errors and/or warnings in it or its children.
+///
+/// A value type, as upstream's is `Copy`: an edit asks every child of a
+/// node for it ([Diagnosis::any]), which must not allocate per child.
+#valtype
 pub(all) struct Diagnosis {
   errors : Bool
   warnings : Bool
@@ -180,7 +184,11 @@ pub fn Diagnosis::or(self : Diagnosis, other : Diagnosis) -> Diagnosis {
 
 ///|
 fn Diagnosis::any(nodes : ArrayView[SyntaxNode]) -> Diagnosis {
-  nodes.fold(init=Diagnosis::default(), (d, n) => d.or(n.diagnosis()))
+  let mut diagnosis = Diagnosis::default()
+  for node in nodes {
+    diagnosis = diagnosis.or(node.diagnosis())
+  }
+  diagnosis
 }
 
 ///|

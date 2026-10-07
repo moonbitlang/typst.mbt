@@ -27,6 +27,10 @@ pub struct Lines {
 
 ///|
 /// Metadata about a line.
+///
+/// A value type: every edit computes the starts of the lines behind it
+/// again ([lines_from]) and copies those before it.
+#valtype
 priv struct Line {
   /// The UTF-8 byte offset where the line starts.
   byte_idx : Int
