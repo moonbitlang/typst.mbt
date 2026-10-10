@@ -189,26 +189,28 @@ pub fn Ieee64::bits(self : Ieee64) -> UInt64 {
 
 ///|
 /// Represents a 128-bit vector value (16 bytes, little endian).
-pub(all) struct V128(Bytes) derive(Eq, Hash, Debug)
+///
+/// Upstream `V128`, a reserved type name in MoonBit.
+pub(all) struct V128Value(Bytes) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with Eq::{not_equal, equal}
+pub extend V128Value with Eq::{not_equal, equal}
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with Hash::{hash, hash_combine}
+pub extend V128Value with Hash::{hash, hash_combine}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with @debug.Debug::{to_repr}
+pub extend V128Value with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the bytes of the 128-bit vector value.
-pub fn V128::bytes(self : V128) -> Bytes {
+pub fn V128Value::bytes(self : V128Value) -> Bytes {
   self.0
 }
 

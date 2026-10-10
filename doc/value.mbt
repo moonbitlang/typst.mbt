@@ -32,7 +32,7 @@ priv enum Val {
   /// `label(name)`.
   VLabel(String)
   /// The result of a function call.
-  VCall(FuncRef, Array[ArgNode])
+  VCall(Callee, Array[ArgNode])
   /// A binding of the library's global scope by qualified name (`red`,
   /// `color.map.rainbow`, `heading`).
   VGlobal(String)

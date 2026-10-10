@@ -75,7 +75,7 @@ pub(all) enum Expr {
   /// An integer: `120`.
   Int(IntLit)
   /// A floating-point number: `1.2`, `10e-4`.
-  Float(Float)
+  Float(FloatLit)
   /// A numeric value with a unit: `12pt`, `3cm`, `2em`, `90deg`, `50%`.
   Numeric(Numeric)
   /// A quoted string: `"..."`.
@@ -166,7 +166,7 @@ pub impl AstNode for Expr with fn from_untyped(node) {
     Auto => Some(Expr::Auto(Auto::{ node, }))
     Bool => Some(Expr::Bool(BoolLit::{ node, }))
     Int => Some(Expr::Int(IntLit::{ node, }))
-    Float => Some(Expr::Float(Float::{ node, }))
+    Float => Some(Expr::Float(FloatLit::{ node, }))
     Numeric => Some(Expr::Numeric(Numeric::{ node, }))
     Str => Some(Expr::Str(Str::{ node, }))
     CodeBlock => Some(Expr::CodeBlock(CodeBlock::{ node, }))

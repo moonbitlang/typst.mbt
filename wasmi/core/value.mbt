@@ -83,13 +83,14 @@ pub fn ValType::is_ref(self : ValType) -> Bool {
 }
 
 ///|
-/// The Wasm `simd` proposal's `v128` type.
+/// The Wasm `simd` proposal's `v128` type (upstream `V128`, a reserved type
+/// name in MoonBit).
 ///
 /// Upstream stores the 16 little-endian bytes of a `u128`; here the value is
 /// split into its low and high 64 bits (`lo` holds bytes 0..8 = lanes with
 /// the lowest indices).
 #valtype
-pub struct V128 {
+pub struct V128Value {
   lo : UInt64
   hi : UInt64
 } derive(Eq, Hash, Debug)
@@ -97,40 +98,40 @@ pub struct V128 {
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with Eq::{not_equal, equal}
+pub extend V128Value with Eq::{not_equal, equal}
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with Hash::{hash, hash_combine}
+pub extend V128Value with Hash::{hash, hash_combine}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
-pub extend V128 with @debug.Debug::{to_repr}
+pub extend V128Value with @debug.Debug::{to_repr}
 
 ///|
-/// Creates a [`V128`] from the low and high 64 bits of its `u128` value
+/// Creates a [`V128Value`] from the low and high 64 bits of its `u128` value
 /// (upstream `V128::from(u128)`).
-pub fn V128::from_lo_hi(lo : UInt64, hi : UInt64) -> V128 {
+pub fn V128Value::from_lo_hi(lo : UInt64, hi : UInt64) -> V128Value {
   { lo, hi, }
 }
 
 ///|
 /// Returns the low 64 bits of the `u128` value of `self`.
-pub fn V128::lo(self : V128) -> UInt64 {
+pub fn V128Value::lo(self : V128Value) -> UInt64 {
   self.lo
 }
 
 ///|
 /// Returns the high 64 bits of the `u128` value of `self`.
-pub fn V128::hi(self : V128) -> UInt64 {
+pub fn V128Value::hi(self : V128Value) -> UInt64 {
   self.hi
 }
 
 ///|
-/// Creates a [`V128`] from its 16 little-endian bytes.
-pub fn V128::from_le_bytes(bytes : ArrayView[Byte]) -> V128 {
+/// Creates a [`V128Value`] from its 16 little-endian bytes.
+pub fn V128Value::from_le_bytes(bytes : ArrayView[Byte]) -> V128Value {
   let mut lo = 0UL
   let mut hi = 0UL
   for i in 0..<8 {
@@ -142,7 +143,7 @@ pub fn V128::from_le_bytes(bytes : ArrayView[Byte]) -> V128 {
 
 ///|
 /// Returns the 16 little-endian bytes of `self`.
-pub fn V128::to_le_bytes(self : V128) -> FixedArray[Byte] {
+pub fn V128Value::to_le_bytes(self : V128Value) -> FixedArray[Byte] {
   FixedArray::makei(16, i => {
     let w = if i < 8 { self.lo } else { self.hi }
     (w >> (8 * (i & 7))).to_byte()

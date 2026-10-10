@@ -86,13 +86,14 @@
 // Instead of panicking, accessors return placeholder nodes (see
 // [`AstNode::placeholder`]).
 //
-// Upstream type names are kept, with three exceptions: the node structs `Int`
-// and `Bool` are called `IntLit` and `BoolLit`, and the enum `Unit` is called
-// `NumericUnit` (the `Expr` variants keep their upstream names `Int` and
-// `Bool`). A package-level type with one of these builtin names breaks the
-// test driver that `moon test` generates inside every package. The nodes
-// `Array`, `Float`, `Ref` and `None` do keep their names; inside this package
-// the builtin array type is therefore written `@builtin.Array`.
+// Upstream type names are kept, with these exceptions: the node structs
+// `Int`, `Bool`, `Float` and `Array` are called `IntLit`, `BoolLit`,
+// `FloatLit` and `ArrayLit`, and the enum `Unit` is called `NumericUnit`
+// (the `Expr` variants keep their upstream names `Int`, `Bool`, `Float` and
+// `Array`). `Float` is a reserved type name in MoonBit, and a package-level
+// type with one of the other builtin names breaks the test driver that
+// `moon test` generates inside every package. The nodes `Ref` and `None` do
+// keep their names.
 
 ///|
 /// A typed AST node.

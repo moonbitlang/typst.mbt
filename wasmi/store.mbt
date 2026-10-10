@@ -626,7 +626,7 @@ pub(all) enum Val {
   /// Value of 64-bit IEEE 754-2008 floating point number (as bits).
   F64(UInt64)
   /// 128-bit Wasm `simd` proposal vector.
-  V128(@wasmi_core.V128)
+  V128(@wasmi_core.V128Value)
   /// A nullable [`Func`] reference.
   FuncRef(Func?)
   /// A nullable [`ExternRef`] reference.
@@ -646,7 +646,7 @@ pub fn Val::default(value_type : @wasmi_core.ValType) -> Val {
     I64 => I64(0)
     F32 => F32(0)
     F64 => F64(0)
-    V128 => V128(@wasmi_core.V128::from_lo_hi(0, 0))
+    V128 => V128(@wasmi_core.V128Value::from_lo_hi(0, 0))
     FuncRef => FuncRef(None)
     ExternRef => ExternRef(None)
   }

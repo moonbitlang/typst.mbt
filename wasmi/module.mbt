@@ -372,7 +372,9 @@ pub fn ConstExpr::new(expr : @wasmparser.ConstExpr) -> ConstExpr {
       V128Const(value~) =>
         Const(
           @wasmi_core.UntypedVal::from_v128(
-            @wasmi_core.V128::from_le_bytes(value.bytes().to_fixedarray()[:]),
+            @wasmi_core.V128Value::from_le_bytes(
+              value.bytes().to_fixedarray()[:],
+            ),
           ),
         )
       GlobalGet(global_index~) => Global(global_index)

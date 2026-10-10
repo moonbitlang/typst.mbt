@@ -110,7 +110,7 @@ fn load_u128_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let i = access_index(memory_len, address, 16)
   { lo: read_u64_le(memory, i), hi: read_u64_le(memory, i + 8), }
 }
@@ -168,7 +168,7 @@ fn store_u128_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
 ) -> Unit raise TrapCode {
   let i = access_index(memory_len, address, 16)
   write_u64_le(memory, i, value.lo)
