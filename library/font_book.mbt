@@ -12,12 +12,14 @@ pub struct FontBook {
   /// Memoized indices of the fonts covering a char (not upstream; cleared by
   /// `push`).
   priv covering : Map[Int, Array[Int]]
+  /// The state of the book ([FontBook::edition]).
+  priv mut edition : Int
 }
 
 ///|
 /// Create a new, empty font book.
 pub fn FontBook::new() -> FontBook {
-  { families: {}, infos: [], selected: {}, covering: {}, }
+  { families: {}, infos: [], selected: {}, covering: {}, edition: 0, }
 }
 
 ///|
@@ -51,6 +53,7 @@ pub fn FontBook::from_fonts(fonts : Array[Font]) -> FontBook {
 pub fn FontBook::push(self : FontBook, info : FontInfo) -> Unit {
   self.selected.clear()
   self.covering.clear()
+  self.edition = next_font_book_edition()
   let index = self.infos.length()
   let family = @unicode.to_lowercase(info.family)
   match self.families.get(family) {
@@ -58,6 +61,30 @@ pub fn FontBook::push(self : FontBook, info : FontInfo) -> Unit {
     None => self.families[family] = [index]
   }
   self.infos.push(info)
+}
+
+///|
+/// The number of book states made so far ([FontBook::edition]).
+let font_book_editions : Ref[Int] = { val: 0, }
+
+///|
+fn next_font_book_edition() -> Int {
+  font_book_editions.val += 1
+  font_book_editions.val
+}
+
+///|
+/// The number of this state of the book (not upstream): zero for a book
+/// without fonts, otherwise one that no other state of any book in the
+/// process has, a new one with every [FontBook::push]. It is what the tracked world takes a book for
+/// (`tracked_world.mbt`). Upstream's world hands out its book as
+/// `&LazyHash<FontBook>` and comemo compares the hash of the infos;
+/// hashing the infos of a system's fonts with their coverage (1354 faces
+/// on macOS 26) takes 3 ms, 1 % of a compilation that uses them, so a book
+/// is the same answer only as the same object in the same state. What a
+/// book hands out is for reading: it changes by `push` alone.
+pub fn FontBook::edition(self : FontBook) -> Int {
+  self.edition
 }
 
 ///|

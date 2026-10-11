@@ -2,8 +2,27 @@
 
 ///|
 /// Evaluate a source file and return the resulting module.
+///
+/// (Not upstream: an evaluation that is not inside a scope of the world is
+/// one of its own, `library/tracked_world.mbt`. Inside it the modules of
+/// imported files are kept, `eval_source_memoized`.)
 pub fn eval_source(
-  world : &@library.World,
+  world : @library.TrackedWorld,
+  library : @library.Library,
+  traced : @library.Traced,
+  sink : @library.Sink,
+  route : @library.Route,
+  source : @syntax.Source,
+) -> @library.Module raise @library.SourceError {
+  world.scoped(() => {
+    eval_source_impl(world, library, traced, sink, route, source)
+  })
+}
+
+///|
+/// The rest of `eval_source`.
+fn eval_source_impl(
+  world : @library.TrackedWorld,
   library : @library.Library,
   traced : @library.Traced,
   sink : @library.Sink,
@@ -15,12 +34,6 @@ pub fn eval_source(
   if route.contains(id) {
     abort("Tried to cyclicly evaluate a source file")
   }
-
-  // (Not upstream: the modules of imported files are kept for a
-  // compilation, or for one evaluation outside of one; see
-  // `EvalMemos::of`.)
-  @library.evaluation_begin()
-  defer @library.evaluation_end()
 
   // Prepare the engine.
   let engine : @library.Engine = {
@@ -113,6 +126,11 @@ pub fn eval_string_mapped(
 
 ///|
 /// Evaluate a parsed string (the rest of `eval_string`).
+///
+/// (Not upstream: an evaluation that is not inside a scope of the engine's
+/// world, the selector of `typst query` or the expression of `typst eval`,
+/// is a scope of its own, `library/tracked_world.mbt`; `eval` called
+/// during a compilation runs in the compilation's.)
 fn eval_root(
   engine : @library.Engine,
   context : @library.Context,
@@ -120,13 +138,17 @@ fn eval_root(
   mode : @syntax.SyntaxMode,
   scope : @library.Scope,
 ) -> @library.Value raise @library.SourceError {
+  engine.world.scoped(() => eval_root_impl(engine, context, root, mode, scope))
+}
 
-  // (Not upstream: a string that a host evaluates outside of a compilation
-  // is an evaluation of its own, and the files it imports belong to it:
-  // its route is the root, like that of a file evaluated on its own. See
-  // `@library.evaluation_begin`.)
-  @library.evaluation_begin()
-  defer @library.evaluation_end()
+///|
+fn eval_root_impl(
+  engine : @library.Engine,
+  context : @library.Context,
+  root : @syntax.SyntaxNode,
+  mode : @syntax.SyntaxMode,
+  scope : @library.Scope,
+) -> @library.Value raise @library.SourceError {
 
   // Check for well-formedness.
   let (errors, warnings) = root.errors_and_warnings()

@@ -12,7 +12,7 @@ fn raw_elems(source : @syntax.Source) -> Array[@library.RawElem] raise {
     files: Map([]),
   }
   let content = @eval.eval_source(
-    world,
+    @library.TrackedWorld::new(world),
     world.library,
     @library.Traced::new(),
     @library.Sink::new(),

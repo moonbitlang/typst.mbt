@@ -9,7 +9,7 @@ import {
 // Values
 pub fn[T : @library.Output] compile(&@library.World) -> @library.Warned[Result[T, Array[@library.SourceDiagnostic]]]
 
-pub fn[T : @library.Output] compile_with(&@library.World, @library.Traced, @library.Sink, (@library.Library) -> @library.Content raise @library.SourceError) -> T raise @library.SourceError
+pub fn[T : @library.Output] compile_with(&@library.World, @library.Traced, @library.Sink, (@library.TrackedWorld, @library.Library) -> @library.Content raise @library.SourceError, volatile_files? : (@syntax.FileId) -> Bool) -> T raise @library.SourceError
 
 pub fn deduplicate(Array[@library.SourceDiagnostic]) -> Array[@library.SourceDiagnostic]
 

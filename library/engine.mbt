@@ -155,7 +155,10 @@ impl World with fn font(_, _) {
 
 ///|
 /// Map a span to a byte range in its file (upstream `WorldExt::range`).
-pub fn world_range(world : &World, span : @syntax.DiagSpan) -> (Int, Int)? {
+pub fn world_range(
+  world : TrackedWorld,
+  span : @syntax.DiagSpan,
+) -> (Int, Int)? {
   match span.get() {
     Detached => None
     Number(id~, num~, sub_range~) =>
@@ -192,7 +195,7 @@ pub(all) struct Library {
 /// Holds all data needed during compilation.
 pub(all) struct Engine {
   /// The compilation environment.
-  world : &World
+  world : TrackedWorld
   /// The standard library.
   library : Library
   /// Provides access to information about the document.

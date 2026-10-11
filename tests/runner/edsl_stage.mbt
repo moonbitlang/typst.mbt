@@ -359,7 +359,7 @@ fn check_pair(
     let sink = @library.Sink::new()
     let evaluated = try
       @eval.eval_source(
-        world,
+        @library.TrackedWorld::new(world),
         base.library(),
         @library.Traced::new(),
         sink,

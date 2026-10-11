@@ -446,9 +446,10 @@
   values (containers are marked shared). In short: closure calls are
   memoized for a compilation; the key is the function (the closure's hash
   and its span), the arguments with their spans and the traced span; a
-  hit also needs equal arguments (`args_memo_equal`) and the same answers
-  for what the call asked of its context, of the route (depth checks,
-  `contains`) and of the introspector (recorded reads), and it replays the
+  hit also needs equal arguments (`args_memo_equal`), the same library
+  object and the same answers for what the call asked of its context, of
+  the route (depth checks, `contains`), of the introspector (recorded
+  reads) and of the world (the tracked world, below), and it replays the
   call's sink effects and consumes the arguments.
 - Values are shared by reference with a flag where upstream clones:
   arrays and dictionaries are mutable objects, `Value::shared` marks one
@@ -485,6 +486,57 @@
   pure functions of their arguments plus the tracked engine parts whose
   results cannot contain values created during the call that compare by
   identity (the state sequence is not memoized).
+- The tracked world (`library/tracked_world.mbt`; step 1 of slice 1 of
+  `docs/incremental-design.md`, section 5.2): `Engine.world` is a
+  `TrackedWorld`, upstream's `Tracked<dyn World>`. Engine code never holds
+  a `&World` (`python3 scripts/tracked_world_check.py` holds that: run it
+  after touching anything that carries a world), and the five tracked
+  methods (`source`, `file`, `book`, `font`, `today`) record what the
+  memoized calls in progress read. A *scope* (`TrackedWorld::scoped`: a
+  compilation, `Document::lower`, an `eval_source` or `eval_string` that
+  is not inside one) is a stretch of work in which the world is fixed.
+  Nothing is memoized for an engine whose world is in no scope: a host or
+  a test that wants memoization makes one tracked world
+  (`TrackedWorld::new(world)`) and opens its scope, and an engine made per
+  call is another world each time. Every entry of `memoize`,
+  `memoized_closure` and `eval_source_memoized` keeps the reads of its
+  call with fingerprints of the answers (`WorldReads`), is only taken if
+  they hold in the scope at hand (`validate`, which is the last condition
+  of a hit that is looked at: it asks the world for what the scope has no
+  answer for, in the order of the call's first reads and up to the first
+  that differs, and notes the reads of an entry that is taken for the
+  calls around it), and compares the library by identity. Rules: a new
+  read of the world is a method of `TrackedWorld` with a fingerprint of
+  its answer and a case in the spy of `memo_check.mbt`; a new store calls
+  `reads_begin`, then `reads_end` when the call returns and `reads_abort`
+  when it raises, before it decides anything about storing, does not
+  store what `is_volatile()`, and validates last; answers are identified
+  without hashing what is large: a source that `Source::new` made by its
+  text and the result of an edit by the number of the object
+  (`Source::is_pristine`, `Source::serial`; hashing a tree takes 35 times
+  as long as hashing its text), a file by
+  `data_hash`, a font book and a font by the object (`FontBook::edition`,
+  `Font::serial`: hashing a system's book took 3 ms and the data of one
+  font collection 24 ms, so a world must hand out the book and font
+  objects it has, not make them per call); files that change during a
+  scope are declared when the tracked world is made (`volatile_files`;
+  `doc`'s `Registry::changes`), and what reads one, or reads through
+  another tracked world, is not stored. The stores still end with their
+  compilation, so validation decides only where an engine of another
+  world is used inside a compilation. What proves the recording is
+  `@library.set_memo_check(true)` (the runner's `--check-reads` on the
+  `paged`, `packages`, `edsl` and `recompile` stages: every result that
+  is kept is computed again from scratch, under a spy below the tracked
+  world, and must have asked exactly the reads its entry keeps: 1.5
+  million entries, no difference), the tests of
+  `library/tracked_world_wbtest.mbt`, `typst/tracked_world_wbtest.mbt`
+  and `doc/volatile_test.mbt`, and the mutation checks of section 9.1 of
+  the design: run `--check-reads` after changing a store, a tracked
+  method or anything that reads the world. A read that is in the scope's
+  answers and in the part of the call in progress allocates nothing; a
+  compilation allocates a few dozen objects in `tracked_world.mbt` in all
+  (`scripts/alloc_sites.py`), and the whole of it costs 0.1 to 0.8 % of
+  the instructions of a compilation (section 5.2 of the design, "Costs").
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
@@ -893,8 +945,8 @@
   scratch: nothing is cached across compilations but the export cache, so
   whatever is kept for the process must be keyed by content
   (`@library.evict(10)` drops those caches where upstream calls
-  `comemo::evict(10)`) or end with the compilation
-  (`@library.compilation_epoch()`: the memo of module evaluations in
+  `comemo::evict(10)`) or end with the compilation or with its scope
+  (`TrackedWorld::scope_token`: the memo of module evaluations in
   `eval/import.mbt` was by world identity and file text, and went stale
   when a file that a module imports or reads changed;
   `typst/recompile_wbtest.mbt`). After touching `kit/watcher`,
@@ -924,7 +976,9 @@
   `bench/`, 111 tests of upstream's suite, the projects of
   `tests/recompile/docs` and three documents with packages. A failure
   names seed, sequence and step (`--only=<document> --seed=N -v` runs it
-  again; files in `_build/recompile/`). Nothing is cached across
+  again; files in `_build/recompile/`; `--check-reads` runs the
+  recording check of the tracked world on every compilation). Nothing is
+  cached across
   compilations today, so it passes by construction; it is the gate for
   anything that will be: the watch loop of a sequence runs with nothing
   in between (the references come after it), and a new cache must be off

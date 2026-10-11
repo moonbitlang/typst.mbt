@@ -17,7 +17,7 @@ fn realize_report(rel : String, tc : TestCase) -> String {
   let library = { ..library, rules: @library.NativeRuleMap::new(), }
   let world : TestWorld = { main: source, library, }
   let content = @eval.eval_source(
-    world,
+    @library.TrackedWorld::new(world),
     library,
     @library.Traced::new(),
     @library.Sink::new(),
@@ -32,7 +32,7 @@ fn realize_report(rel : String, tc : TestCase) -> String {
     let dumper = Dumper::new()
     let sink = @library.Sink::new()
     let engine : @library.Engine = {
-      world,
+      world: @library.TrackedWorld::new(world),
       library,
       introspector: @library.Introspector::empty(),
       traced: @library.Traced::new(),

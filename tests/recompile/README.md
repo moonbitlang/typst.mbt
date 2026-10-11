@@ -140,7 +140,8 @@ what the process shares:
   the module evaluations of `eval/import.mbt`. They end with their
   compilation today. The second reference of every step runs with
   memoization off, which does not ask the first four at all; the module
-  evaluations are found by world identity, and the world is new.
+  evaluations are found in the scope that made them only (a compilation
+  is one, `library/tracked_world.mbt`).
 - The fonts (`Font` objects, shared by all worlds of the runner) and what
   is computed from a font alone: shaping faces and plans
   (`layout/inline_shaping.mbt`), glyph frames, outlines and boxes
@@ -166,6 +167,14 @@ lands.
 moon run tests/runner --target native --release -- recompile [filter] [-v]
 python3 scripts/ci/stages.py recompile      # the verdict CI uses
 ```
+
+`--check-reads` also runs the recording check of the tracked world on
+every compilation of the stage (`@library.set_memo_check`: every result
+that a store keeps is computed a second time from scratch, and the world
+reads of its entry must be what that run asked of the world): a line
+`READS <document> seed=.. sequence=..: ..` per entry that differs and a
+total at the end (`read check: 120000 entries checked, 0 differ in 0
+cases`). The stage's own verdict must be the same with it.
 
 The default run is the CI run: 120 documents, 235 sequences (232 and 3 in `scripts/ci/stages.tsv`), 1407
 steps and 4199 compilations with their exports, about 35 s on an M-series
@@ -208,14 +217,41 @@ and run `recompile -v`.
 
 | Mutation | Failing sequences, of 235 | First at | Seen in |
 |---|---|---|---|
-| 1. `eval/import.mbt`, `EvalMemos::of`: the entries are not cleared when the epoch changes (the bug that the watch work found) | 17 | step 1 in 13 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 12 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 3, the pages in 4 |
-| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo and the counter memo outlive the compilation) | 67 | step 1 in 60 of them (`bench/tiny`, sweep, first) | the pages, in all of them |
-| 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared | 13 | step 0 in 6 of them (the first compilation of a document, after other documents), step 1 in 4 | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
+| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_source_memoized` does not ask for `memo.scope == scope`, `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` is `true`): the bug that the watch work found | 19 | step 1 in 13 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 12 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 3, the pages in 6 |
+| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo and the counter memo outlive the compilation), and `world.validate(entry.world)` is `true` | 67 | step 1 in 60 of them (`bench/tiny`, sweep, first) | the pages, in all of them |
+| 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared, and `engine.world.validate(self.world)` in `ClosureEntry::matches` is `true` | 12 | step 1 in 9 of them | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
+
+These are the three mutations of the stage's first version, on the code
+as it is since the tracked world (`library/tracked_world.mbt`; step 1 of
+slice 1 of `docs/incremental-design.md`): every entry of the three stores
+keeps what its call read of the world and is only taken if the world
+still answers the same, so "the store is not cleared" alone no longer
+makes a result stale, and each mutation also turns that validation off.
+With the validation left on, the same three give:
+
+| The store outlives its compilation, world reads validated | Failing sequences | What is left |
+|---|---|---|
+| 1. module entries | 4 | three at "everything back" (`project/book`, `project/notes`, `suite/visualize/rect.typ`): a file that has an earlier text again has other span numbers, and an entry is found by the text of its file until it is found by the source's fingerprint (step 3 of the design); one diagnostic with a tracepoint too many (`import-cyclic-in-other-file`): the error that an entry keeps is the object that every import adds a tracepoint to (step 4) |
+| 2. layouts and counter sequences | 0 | |
+| 3. closure calls | 0 | |
+
+That is what the validation is for, and it is not yet a licence to keep a
+store: the design lists what else a kept result depends on (state outside
+the arguments, identity, mutable results; its sections 5.3 to 5.5), which
+these sequences do not all reach, and the soak has not run on a kept
+store. The date, the fonts, `sys.inputs` and the files that a call reads
+are no longer among the things a key does not hold: they are the reads
+and the library of the entry.
+
+What the recording itself is worth cannot be seen by this stage while
+nothing is kept; the recording check can (`--check-reads`, below).
 
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
 
-What the mutations showed about the stage and about the engine:
+What the mutations showed about the stage and about the engine (as first
+run, before the tracked world: the keys of memoized calls then held none
+of what is listed at the end; the counts were 17, 67 and 13):
 
 - Mutation 1 is found without an edit of the right file: the files that a
   reused module would have read are missing from the dependencies after

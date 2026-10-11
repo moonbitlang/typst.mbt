@@ -88,7 +88,13 @@ fn oracle_report(
         Warning => "warning"
       }
       let place = match
-        (diagnostic.span.id(), @library.world_range(world, diagnostic.span)) {
+        (
+          diagnostic.span.id(),
+          @library.world_range(
+            @library.TrackedWorld::new(world),
+            diagnostic.span,
+          ),
+        ) {
         (Some(id), Some((start, _))) => {
           let source = (world as &@library.World).source(id) catch {
             _ => fail("no source")

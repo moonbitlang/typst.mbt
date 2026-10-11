@@ -96,7 +96,7 @@ pub fn BibliographyElem::has(
 ///|
 /// Find all bibliography keys.
 pub fn BibliographyElem::keys(
-  world : &World,
+  world : TrackedWorld,
   introspector : Introspector,
 ) -> Array[(Label, String?)] {
   let vec = []
@@ -118,7 +118,7 @@ pub fn BibliographyElem::keys(
 /// constructed, so this cannot fail in practice.
 pub fn BibliographyElem::database(
   self : BibliographyElem,
-  world : &World,
+  world : TrackedWorld,
 ) -> Bibliography {
   let sources : @syntax.Spanned[OneOrMultiple[DataSource]] = {
     v: self.sources(),
@@ -133,7 +133,7 @@ pub fn BibliographyElem::database(
 /// The loaded style (upstream `style.derived`).
 pub fn BibliographyElem::csl_style(
   self : BibliographyElem,
-  world : &World,
+  world : TrackedWorld,
 ) -> CslStyle {
   let source : CslSource = self.style(StyleChain::empty()).cast() catch {
       _ => CslSource::default_source()
@@ -179,7 +179,7 @@ let bibliography_cache : Array[(Array[(LoadSource, Bytes)], Bibliography)] = []
 ///|
 /// Load a bibliography from data sources.
 fn Bibliography::load(
-  world : &World,
+  world : TrackedWorld,
   sources : @syntax.Spanned[OneOrMultiple[DataSource]],
 ) -> Bibliography raise SourceError {
   let loaded = load_many({ v: sources.v.0, span: sources.span, }, world)
@@ -480,7 +480,7 @@ fn CslSource::default_source() -> CslSource {
 /// loaded once (when the element was constructed).
 fn CslSource::derived_style(
   self : CslSource,
-  world : &World,
+  world : TrackedWorld,
   span : @syntax.Span,
 ) -> CslStyle {
   match self {

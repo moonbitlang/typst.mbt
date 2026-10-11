@@ -197,6 +197,10 @@ fn recompile_svg(doc : @layout.PagedDocument) -> String {
 }
 
 ///|
+/// The sequence that is running, for the lines of `--check-reads`.
+let read_check_case : Ref[String] = Ref("")
+
+///|
 /// Compiles the world as it is and dumps what came out. Also returns the
 /// dependencies as ids.
 fn recompile_compile(
@@ -205,6 +209,7 @@ fn recompile_compile(
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
   ] = @typst.compile(world)
+  read_check_drain(read_check_case.val) |> ignore
   // Before the dump touches the world.
   let ids = world.files.dependencies()
   let dependencies = world.dependencies().join("\n")

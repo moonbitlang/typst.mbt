@@ -59,7 +59,7 @@ fn wb_engine(introspector : Introspector) -> Engine {
   let library = wb_library()
   let world : WbWorld = { library, }
   {
-    world,
+    world: TrackedWorld::new(world),
     library,
     introspector,
     traced: Traced::new(),
@@ -627,7 +627,8 @@ test "convergence analysis" {
   let engine = wb_engine(doc(1))
   ignore(engine.introspect(query_introspection(metadata, span)))
   let converged = analyze(
-    world,
+    TrackedWorld::new(world),
+    engine.library,
     [Introspector::empty(), doc(1), doc(2), doc(3), doc(3), doc(3)],
     engine.sink.introspections(),
   )
@@ -635,7 +636,8 @@ test "convergence analysis" {
 
   // Not converged: the number of elements keeps changing.
   let diags = analyze(
-    world,
+    TrackedWorld::new(world),
+    engine.library,
     [Introspector::empty(), doc(1), doc(2), doc(3), doc(4), doc(5)],
     engine.sink.introspections(),
   )
@@ -662,7 +664,8 @@ test "convergence analysis" {
   ignore(engine.introspect(state_final_introspection(st, span)))
   inspect(
     analyze(
-      world,
+      TrackedWorld::new(world),
+      engine.library,
       [Introspector::empty(), doc(1), doc(1), doc(1), doc(1), doc(1)],
       engine.sink.introspections(),
     ).length(),

@@ -664,7 +664,10 @@ fn decode_svg_asset(sha : String, data : Bytes) -> @library.SvgImage? {
     f.as_str()
   })
   let (image, _) = @library.SvgImage::with_fonts_images(
-    data, world, families, svg_file,
+    data,
+    @library.TrackedWorld::new(world),
+    families,
+    svg_file,
   ) catch {
     _ => return None
   }

@@ -86,7 +86,7 @@ fn evaluate_expression(
   // Map spans to ranges in the string.
   let library = @library.World::library(world)
   let engine : @library.Engine = {
-    world,
+    world: @library.TrackedWorld::new(world),
     library,
     introspector,
     traced: @library.Traced::new(),

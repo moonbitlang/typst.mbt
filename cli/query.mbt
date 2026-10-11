@@ -103,7 +103,7 @@ fn retrieve(
 ) -> Array[@library.Content] raise HintedFailure {
   let library = @library.World::library(world)
   let engine : @library.Engine = {
-    world,
+    world: @library.TrackedWorld::new(world),
     library,
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),

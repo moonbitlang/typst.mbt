@@ -282,6 +282,7 @@ fn run_packages_stage(filter : String?, verbose : Bool, times : Bool) -> Unit {
     }
     let start = @env.now()
     let (frames, svg) = packages_reports(group, name)
+    let unrecorded = read_check_drain(rel)
     if times {
       println("TIME \{@env.now() - start} ms \{rel}")
     }
@@ -306,7 +307,7 @@ fn run_packages_stage(filter : String?, verbose : Bool, times : Bool) -> Unit {
         }
         canonicalize_svg_ids(actual[k]) == canonicalize_svg_ids(expected)
       }
-      if ok {
+      if ok && unrecorded == 0 {
         passed[k] += 1
       } else {
         failed[k] += 1
