@@ -94,23 +94,101 @@ priv struct MemoEntry[T, I] {
   sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
   compilation : Int
+  /// The number of [evict] calls since the entry was stored or found
+  /// (comemo's age).
+  mut age : Int
   /// The result.
   output : T
 }
 
 ///|
 /// The cached results of one memoized function.
+///
+/// With `kept`, an entry outlives its compilation: a later one finds it
+/// if its arguments, its library, its introspector reads and its world
+/// reads are what they were ([memoize]). Its lifetime is comemo's
+/// (`comemo/src/memoize.rs`, `CacheData::evict` and `lookup`): every
+/// [evict] makes it older by one, being found makes it young, and it is
+/// dropped when it was not found for more than `max_age` calls. An entry
+/// whose key holds a host closure ends with its compilation
+/// ([MemoKey::compilation]).
 priv struct MemoStore[T, I] {
-  /// The compilation the entries belong to.
+  /// Whether the entries outlive their compilation. (The stores are
+  /// being kept one after the other: the layouts are, the counter
+  /// sequence and the works are still emptied when a compilation starts.)
+  kept : Bool
+  /// For a store that is not kept: the compilation the entries belong to.
   mut generation : Int
   mut entries : Map[U128, Array[MemoEntry[T, I]]]
+  /// The keys of the entries that end with their compilation.
+  bound : Array[U128]
+  /// Whether [evict] and the end of a compilation know the store.
+  mut registered : Bool
   /// Whether [set_memo_check] knows the store (`memo_check.mbt`).
   mut checked : Bool
 }
 
 ///|
-fn[T, I] MemoStore::new() -> MemoStore[T, I] {
-  { generation: 0, entries: {}, checked: false, }
+fn[T, I] MemoStore::new(kept? : Bool = false) -> MemoStore[T, I] {
+  {
+    kept,
+    generation: 0,
+    entries: {},
+    bound: [],
+    registered: false,
+    checked: false,
+  }
+}
+
+///|
+/// comemo's `evict` for one store: every entry gets older by one, and
+/// those that were not found for more than `max_age` calls are dropped
+/// (all of them for zero).
+fn[T, I] MemoStore::evict(self : MemoStore[T, I], max_age : Int) -> Unit {
+  let empty = []
+  for key, entries in self.entries {
+    entries.retain(entry => {
+      entry.age += 1
+      entry.age <= max_age
+    })
+    if entries.is_empty() {
+      empty.push(key)
+    }
+  }
+  for key in empty {
+    self.entries.remove(key)
+  }
+}
+
+///|
+/// Drops the entries that ended with their compilation
+/// ([end_compilation_entries]).
+fn[T, I] MemoStore::end_compilation(self : MemoStore[T, I]) -> Unit {
+  for key in self.bound {
+    guard self.entries.get(key) is Some(entries) else { continue }
+    entries.retain(entry => entry.compilation == 0)
+    if entries.is_empty() {
+      self.entries.remove(key)
+    }
+  }
+  self.bound.clear()
+}
+
+///|
+/// The number of results that the store keeps.
+fn[T, I] MemoStore::length(self : MemoStore[T, I]) -> Int {
+  let mut count = 0
+  for _, entries in self.entries {
+    count += entries.length()
+  }
+  count
+}
+
+///|
+/// The number of layouts (paragraphs and fragments) that the store of
+/// [memoized_layout] keeps (for tests and measurements).
+pub fn layout_memo_entries() -> Int {
+  layout_store.length()
 }
 
 ///|
@@ -348,8 +426,9 @@ fn[T, I : Eq] memoize(
   if generation == 0 || !world.in_scope() || !key.memoizable() {
     return f(engine)
   }
-  if store.generation != generation {
+  if !store.kept && store.generation != generation {
     store.entries.clear()
+    store.bound.clear()
     store.generation = generation
   }
   let compilation = key.compilation()
@@ -378,6 +457,8 @@ fn[T, I : Eq] memoize(
         // Last: this makes the world reads that the scope has no answer
         // for and notes them for the calls around this one.
         world.validate(entry.world) {
+        // A hit makes the entry young (comemo: `lookup` stores age 0).
+        entry.age = 0
         if parent is Some(parent) {
           entry.reads.merge_into(parent)
         }
@@ -427,8 +508,9 @@ fn[T, I : Eq] memoize(
   if world_reads.is_volatile() || asked_route || !cacheable(output) {
     return output
   }
-  // The store may belong to another compilation by now (a nested one).
-  guard store.generation == generation else { return output }
+  // A store that ends with its compilation may belong to another one by
+  // now (a nested one).
+  guard store.kept || store.generation == generation else { return output }
   if memo_check_enabled() {
     if !store.checked {
       store.checked = true
@@ -457,7 +539,16 @@ fn[T, I : Eq] memoize(
       Some(sink.kept())
     },
     compilation,
+    age: 0,
     output: copy(output),
+  }
+  if !store.registered {
+    store.registered = true
+    register_evictor(max_age => store.evict(max_age))
+    compilation_enders.push(() => store.end_compilation())
+  }
+  if compilation != 0 {
+    store.bound.push(key)
   }
   match store.entries.get(key) {
     Some(entries) => {
@@ -945,7 +1036,9 @@ fn chain_memo_equal(a : StyleChain, b : StyleChain) -> Bool {
 }
 
 ///|
-let layout_store : MemoStore[Array[Frame], LayoutInput] = MemoStore::new()
+let layout_store : MemoStore[Array[Frame], LayoutInput] = MemoStore::new(
+  kept=true,
+)
 
 ///|
 /// Memoize a layout function of `content` and `styles` (and `extra`

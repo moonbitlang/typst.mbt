@@ -15,7 +15,6 @@
 fn memo_test_next_compilation() -> Unit {
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
-  layout_store.generation = memo_generation.val
 }
 
 ///|

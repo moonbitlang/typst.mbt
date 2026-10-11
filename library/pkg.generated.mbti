@@ -1368,6 +1368,8 @@ pub let layout_elem_func : Int
 
 pub fn layout_memo_active() -> Bool
 
+pub fn layout_memo_entries() -> Int
+
 pub fn leq(Value, Value) -> Value raise HintedError
 
 pub fn libm_erf(Double) -> Double

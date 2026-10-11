@@ -214,10 +214,14 @@ pub fn register_memo_check_store(set_aside : () -> () -> Unit) -> Unit {
 fn[T, I] MemoStore::set_aside(self : MemoStore[T, I]) -> () -> Unit {
   let entries = self.entries
   let generation = self.generation
+  let bound = self.bound.copy()
   self.entries = {}
+  self.bound.clear()
   () => {
     self.entries = entries
     self.generation = generation
+    self.bound.clear()
+    self.bound.append(bound)
   }
 }
 
