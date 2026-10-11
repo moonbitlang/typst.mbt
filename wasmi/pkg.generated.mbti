@@ -900,7 +900,7 @@ pub(all) enum Val {
   I64(Int64)
   F32(UInt)
   F64(UInt64)
-  V128(@core.V128)
+  V128(@core.V128Value)
   FuncRef(Func?)
   ExternRef(ExternRef?)
 } derive(Eq)

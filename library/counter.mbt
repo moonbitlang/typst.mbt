@@ -331,6 +331,7 @@ fn counter_sequence(
     engine => {
       counter_sequence_impl(counter, selector, engine, engine.introspector)
     },
+    label=_ => "counter sequence",
   )
 }
 

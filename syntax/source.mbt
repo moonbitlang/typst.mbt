@@ -26,6 +26,25 @@ pub struct Source {
   priv id : FileId
   priv root : SyntaxNode
   priv lines : Lines
+  /// The number of the source ([Source::serial]).
+  priv serial : Int
+  /// Whether the tree is the one [Source::new] made of the text
+  /// ([Source::is_pristine]).
+  priv pristine : Bool
+  /// Two words that a caller keeps with the source ([Source::set_memo]).
+  priv mut memo : Bool
+  priv mut memo_hi : UInt64
+  priv mut memo_lo : UInt64
+}
+
+///|
+/// The number of sources made so far ([Source::serial]).
+let source_serials : Ref[Int] = { val: 0, }
+
+///|
+fn next_source_serial() -> Int {
+  source_serials.val += 1
+  source_serials.val
 }
 
 ///|
@@ -35,7 +54,16 @@ pub fn Source::new(id : FileId, text : String) -> Source {
   root.numberize(id, span_full_start, span_full_end) catch {
     _ => abort("failed to number source file")
   }
-  { id, lines: Lines::new(text), root, }
+  {
+    id,
+    lines: Lines::new(text),
+    root,
+    serial: next_source_serial(),
+    pristine: true,
+    memo: false,
+    memo_hi: 0,
+    memo_lo: 0,
+  }
 }
 
 ///|
@@ -55,7 +83,64 @@ pub fn Source::with_root(
   text : String,
   root : SyntaxNode,
 ) -> Source {
-  { id, lines: Lines::new(text), root, }
+  {
+    id,
+    lines: Lines::new(text),
+    root,
+    serial: next_source_serial(),
+    pristine: false,
+    memo: false,
+    memo_hi: 0,
+    memo_lo: 0,
+  }
+}
+
+///|
+/// The number of this source (not upstream, whose `Source` is a value
+/// behind a `LazyHash`: two sources with one hash are one). No other
+/// source of the process has it: a source never changes, and an edit
+/// returns another source with another number. It identifies the text and
+/// the numbered tree without hashing the tree.
+pub fn Source::serial(self : Source) -> Int {
+  self.serial
+}
+
+///|
+/// Whether the source is what [Source::new] made of its text: its tree,
+/// span numbers included, is then a function of the id and the text
+/// (parsing and numbering are deterministic). The result of an edit is
+/// not: a reparse keeps the numbers of the nodes it does not touch, so the
+/// same text can have other numbers. Nor is a source made around a tree
+/// that was given ([Source::with_root]).
+pub fn Source::is_pristine(self : Source) -> Bool {
+  self.pristine
+}
+
+///|
+/// Whether [Source::set_memo] was called for the source.
+pub fn Source::has_memo(self : Source) -> Bool {
+  self.memo
+}
+
+///|
+/// The two words kept by [Source::set_memo] (zero without).
+pub fn Source::memo_hi(self : Source) -> UInt64 {
+  self.memo_hi
+}
+
+///|
+pub fn Source::memo_lo(self : Source) -> UInt64 {
+  self.memo_lo
+}
+
+///|
+/// Keeps two words with the source: for a hash of it, which this package
+/// cannot compute (upstream: the `LazyHash` around `SourceInner`). A
+/// source never changes, so what is kept is about it for its lifetime.
+pub fn Source::set_memo(self : Source, hi : UInt64, lo : UInt64) -> Unit {
+  self.memo = true
+  self.memo_hi = hi
+  self.memo_lo = lo
 }
 
 ///|
@@ -141,7 +226,19 @@ pub fn Source::edit(
     end,
     utf8_len(replacement),
   )
-  ({ id: self.id, root, lines, }, range)
+  (
+    {
+      id: self.id,
+      root,
+      lines,
+      serial: next_source_serial(),
+      pristine: false,
+      memo: false,
+      memo_hi: 0,
+      memo_lo: 0,
+    },
+    range,
+  )
 }
 
 ///|

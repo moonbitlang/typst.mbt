@@ -301,7 +301,7 @@ pub(all) enum Expr {
   Auto(Auto)
   Bool(BoolLit)
   Int(IntLit)
-  Float(Float)
+  Float(FloatLit)
   Numeric(Numeric)
   Str(Str)
   CodeBlock(CodeBlock)
@@ -347,15 +347,15 @@ pub fn FieldAccess::target(Self) -> Expr
 pub fn FieldAccess::to_untyped(Self) -> @syntax.SyntaxNode
 pub impl AstNode for FieldAccess
 
-pub struct Float {
+pub struct FloatLit {
   node : @syntax.SyntaxNode
 }
-pub fn Float::from_untyped(@syntax.SyntaxNode) -> Self?
-pub fn Float::get(Self) -> Double
-pub fn Float::placeholder() -> Self
-pub fn Float::span(Self) -> @syntax.Span
-pub fn Float::to_untyped(Self) -> @syntax.SyntaxNode
-pub impl AstNode for Float
+pub fn FloatLit::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn FloatLit::get(Self) -> Double
+pub fn FloatLit::placeholder() -> Self
+pub fn FloatLit::span(Self) -> @syntax.Span
+pub fn FloatLit::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for FloatLit
 
 pub struct ForLoop {
   node : @syntax.SyntaxNode

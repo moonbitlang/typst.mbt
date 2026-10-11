@@ -1214,32 +1214,32 @@ pub extend IntLit with AstNode::{from_untyped, to_untyped, span, placeholder}
 
 ///|
 /// A floating-point number: `1.2`, `10e-4`.
-pub struct Float {
+pub struct FloatLit {
   /// The underlying syntax node.
   node : @syntax.SyntaxNode
 }
 
 ///|
-pub impl AstNode for Float with fn from_untyped(node) {
+pub impl AstNode for FloatLit with fn from_untyped(node) {
   if node.kind() is Float {
-    Some(Float::{ node, })
+    Some(FloatLit::{ node, })
   } else {
     None
   }
 }
 
 ///|
-pub impl AstNode for Float with fn to_untyped(self) {
+pub impl AstNode for FloatLit with fn to_untyped(self) {
   self.node
 }
 
 ///|
-pub impl AstNode for Float with fn placeholder() {
-  Float::{ node: @syntax.SyntaxNode::placeholder(Float), }
+pub impl AstNode for FloatLit with fn placeholder() {
+  FloatLit::{ node: @syntax.SyntaxNode::placeholder(Float), }
 }
 
 ///|
-pub extend Float with AstNode::{from_untyped, to_untyped, span, placeholder}
+pub extend FloatLit with AstNode::{from_untyped, to_untyped, span, placeholder}
 
 ///|
 /// A numeric value with a unit: `12pt`, `3cm`, `2em`, `90deg`, `50%`.

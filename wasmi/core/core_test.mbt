@@ -137,7 +137,7 @@ test "memory static buffer and growth" {
 
 ///|
 test "untyped and typed values" {
-  let v = @core.UntypedVal::from_v128(@core.V128::from_lo_hi(1, 2))
+  let v = @core.UntypedVal::from_v128(@core.V128Value::from_lo_hi(1, 2))
   // Scalar writes keep the high bits (`write_lo64`), `from_*` clears them.
   inspect(v.write_i32(-1).hi64(), content="2")
   inspect(v.write_i32(-1).to_bits64(), content="4294967295")

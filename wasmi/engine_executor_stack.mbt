@@ -648,7 +648,7 @@ fn ValueStack::drain(self : ValueStack, from : Int, to : Int) -> Int {
 /// Returns the [`UntypedVal`] of the cell at `index`.
 fn ValueStack::get(self : ValueStack, index : Int) -> @wasmi_core.UntypedVal {
   @wasmi_core.UntypedVal::from_v128(
-    @wasmi_core.V128::from_lo_hi(
+    @wasmi_core.V128Value::from_lo_hi(
       self.lo.unsafe_get(index),
       self.hi.unsafe_get(index),
     ),

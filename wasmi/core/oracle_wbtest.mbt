@@ -68,7 +68,7 @@ fn hf64(v : Double) -> String {
 }
 
 ///|
-fn hv(v : V128) -> String {
+fn hv(v : V128Value) -> String {
   hex_n(v.hi, 16) + hex_n(v.lo, 16)
 }
 
@@ -126,7 +126,7 @@ fn a_f64(s : String) -> Double {
 }
 
 ///|
-fn a_v128(s : String) -> V128 {
+fn a_v128(s : String) -> V128Value {
   {
     hi: parse_hex(s.view(end_offset=16)),
     lo: parse_hex(s.view(start_offset=16)),
@@ -207,22 +207,22 @@ fn dd_b(f : (Double, Double) -> Bool) -> OracleFn {
 }
 
 ///|
-fn v_v(f : (V128) -> V128) -> OracleFn {
+fn v_v(f : (V128Value) -> V128Value) -> OracleFn {
   a => hv(f(a_v128(a[0])))
 }
 
 ///|
-fn vv_v(f : (V128, V128) -> V128) -> OracleFn {
+fn vv_v(f : (V128Value, V128Value) -> V128Value) -> OracleFn {
   a => hv(f(a_v128(a[0]), a_v128(a[1])))
 }
 
 ///|
-fn vvv_v(f : (V128, V128, V128) -> V128) -> OracleFn {
+fn vvv_v(f : (V128Value, V128Value, V128Value) -> V128Value) -> OracleFn {
   a => hv(f(a_v128(a[0]), a_v128(a[1]), a_v128(a[2])))
 }
 
 ///|
-fn vu_v(f : (V128, UInt) -> V128) -> OracleFn {
+fn vu_v(f : (V128Value, UInt) -> V128Value) -> OracleFn {
   a => hv(f(a_v128(a[0]), a_u32(a[1])))
 }
 
@@ -494,7 +494,7 @@ fn oracle_float_ops(ops : Map[String, OracleFn]) -> Unit {
 
 ///|
 fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
-  let unary : Array[(String, (V128) -> V128)] = [
+  let unary : Array[(String, (V128Value) -> V128Value)] = [
     ("i64x2_neg", i64x2_neg),
     ("i32x4_neg", i32x4_neg),
     ("i16x8_neg", i16x8_neg),
@@ -553,7 +553,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
   for p in unary {
     ops[p.0] = v_v(p.1)
   }
-  let to_bool : Array[(String, (V128) -> Bool)] = [
+  let to_bool : Array[(String, (V128Value) -> Bool)] = [
     ("i8x16_all_true", i8x16_all_true),
     ("i16x8_all_true", i16x8_all_true),
     ("i32x4_all_true", i32x4_all_true),
@@ -564,7 +564,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
     let f = p.1
     ops[p.0] = a => hb(f(a_v128(a[0])))
   }
-  let to_u32 : Array[(String, (V128) -> UInt)] = [
+  let to_u32 : Array[(String, (V128Value) -> UInt)] = [
     ("i8x16_bitmask", i8x16_bitmask),
     ("i16x8_bitmask", i16x8_bitmask),
     ("i32x4_bitmask", i32x4_bitmask),
@@ -574,7 +574,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
     let f = p.1
     ops[p.0] = a => h32(f(a_v128(a[0])))
   }
-  let binary : Array[(String, (V128, V128) -> V128)] = [
+  let binary : Array[(String, (V128Value, V128Value) -> V128Value)] = [
     ("i8x16_swizzle", i8x16_swizzle),
     ("i8x16_relaxed_swizzle", i8x16_relaxed_swizzle),
     ("i64x2_add", i64x2_add),
@@ -707,7 +707,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
   for p in binary {
     ops[p.0] = vv_v(p.1)
   }
-  let ternary : Array[(String, (V128, V128, V128) -> V128)] = [
+  let ternary : Array[(String, (V128Value, V128Value, V128Value) -> V128Value)] = [
     ("v128_bitselect", v128_bitselect),
     ("i8x16_relaxed_laneselect", i8x16_relaxed_laneselect),
     ("i16x8_relaxed_laneselect", i16x8_relaxed_laneselect),
@@ -722,7 +722,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
   for p in ternary {
     ops[p.0] = vvv_v(p.1)
   }
-  let shifts : Array[(String, (V128, UInt) -> V128)] = [
+  let shifts : Array[(String, (V128Value, UInt) -> V128Value)] = [
     ("i8x16_shl", i8x16_shl),
     ("i16x8_shl", i16x8_shl),
     ("i32x4_shl", i32x4_shl),
@@ -843,8 +843,8 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
   let simd_loads : Array[
     (
       String,
-      (FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode,
-      (FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode,
+      (FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode,
+      (FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode,
     ),
   ] = [
     ("v128_load", v128_load, v128_load_at),
@@ -1009,7 +1009,7 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
     v128_store_at(m, l, a, a_v128(v))
   })
   let lane_store = (
-    f : (FixedArray[Byte], Int, UInt64, UInt64, V128, String) -> Unit raise TrapCode,
+    f : (FixedArray[Byte], Int, UInt64, UInt64, V128Value, String) -> Unit raise TrapCode,
   ) => {
     (a : Array[String]) => {
       let m = mem_init()
@@ -1020,7 +1020,7 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
     }
   }
   let lane_store_at = (
-    f : (FixedArray[Byte], Int, UInt64, V128, String) -> Unit raise TrapCode,
+    f : (FixedArray[Byte], Int, UInt64, V128Value, String) -> Unit raise TrapCode,
   ) => {
     (a : Array[String]) => {
       let m = mem_init()

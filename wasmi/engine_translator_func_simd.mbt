@@ -48,13 +48,13 @@ fn LaneTy::lane_idx(self : LaneTy, lane : Int) -> @ir.ImmLaneIdx {
 
 ///|
 /// Converts an immediate [`TypedVal`] into a [`V128`].
-fn typed_v128(value : @wasmi_core.TypedVal) -> @wasmi_core.V128 {
+fn typed_v128(value : @wasmi_core.TypedVal) -> @wasmi_core.V128Value {
   value.untyped().read_v128()
 }
 
 ///|
 /// Converts a [`V128`] into an immediate [`TypedVal`].
-fn v128_typed(value : @wasmi_core.V128) -> @wasmi_core.TypedVal {
+fn v128_typed(value : @wasmi_core.V128Value) -> @wasmi_core.TypedVal {
   @wasmi_core.TypedVal::from_v128(value)
 }
 
@@ -73,7 +73,7 @@ fn FuncTranslator::immediate_to_operand(
 fn FuncTranslator::translate_simd_splat(
   self : FuncTranslator,
   make_instr : (@ir.Slot, @ir.Slot) -> @ir.Op,
-  const_eval : (@wasmi_core.TypedVal) -> @wasmi_core.V128,
+  const_eval : (@wasmi_core.TypedVal) -> @wasmi_core.V128Value,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -100,7 +100,7 @@ fn FuncTranslator::translate_extract_lane(
   lane : Int,
   result_ty : @wasmi_core.ValType,
   make_instr : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx) -> @ir.Op,
-  const_eval : (@wasmi_core.V128, Int) -> @wasmi_core.TypedVal,
+  const_eval : (@wasmi_core.V128Value, Int) -> @wasmi_core.TypedVal,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -124,7 +124,7 @@ fn FuncTranslator::translate_extract_lane(
 /// A Wasm `replace_lane` operator (upstream `SimdReplaceLane`).
 priv struct SimdReplaceLane {
   item_ty : LaneTy
-  const_eval : (@wasmi_core.V128, Int, @wasmi_core.TypedVal) -> @wasmi_core.V128
+  const_eval : (@wasmi_core.V128Value, Int, @wasmi_core.TypedVal) -> @wasmi_core.V128Value
   replace_lane : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx) -> @ir.Op
   replace_lane_imm : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx, @wasmi_core.TypedVal) -> @ir.Op
   replace_lane_imm_param : (@wasmi_core.TypedVal) -> @ir.Op?
@@ -331,7 +331,7 @@ fn FuncTranslator::translate_simd_unary(
   self : FuncTranslator,
   result_ty : @wasmi_core.ValType,
   make_instr : (@ir.Slot, @ir.Slot) -> @ir.Op,
-  const_eval : (@wasmi_core.V128) -> @wasmi_core.TypedVal,
+  const_eval : (@wasmi_core.V128Value) -> @wasmi_core.TypedVal,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -356,7 +356,7 @@ fn FuncTranslator::translate_simd_unary(
 fn FuncTranslator::translate_simd_binary(
   self : FuncTranslator,
   make_instr : (@ir.Slot, @ir.Slot, @ir.Slot) -> @ir.Op,
-  const_eval : (@wasmi_core.V128, @wasmi_core.V128) -> @wasmi_core.V128,
+  const_eval : (@wasmi_core.V128Value, @wasmi_core.V128Value) -> @wasmi_core.V128Value,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -382,7 +382,11 @@ fn FuncTranslator::translate_simd_binary(
 fn FuncTranslator::translate_simd_ternary(
   self : FuncTranslator,
   make_instr : (@ir.Slot, @ir.Slot, @ir.Slot) -> @ir.Op,
-  const_eval : (@wasmi_core.V128, @wasmi_core.V128, @wasmi_core.V128) -> @wasmi_core.V128,
+  const_eval : (
+    @wasmi_core.V128Value,
+    @wasmi_core.V128Value,
+    @wasmi_core.V128Value,
+  ) -> @wasmi_core.V128Value,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -417,7 +421,7 @@ fn FuncTranslator::translate_simd_shift(
   bits : UInt,
   make_instr : (@ir.Slot, @ir.Slot, @ir.Slot) -> @ir.Op,
   make_instr_imm : (@ir.Slot, @ir.Slot, @ir.ShiftAmount) -> @ir.Op,
-  const_eval : (@wasmi_core.V128, UInt) -> @wasmi_core.V128,
+  const_eval : (@wasmi_core.V128Value, UInt) -> @wasmi_core.V128Value,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -543,7 +547,7 @@ fn FuncTranslator::translate_v128_store_lane(
     @wasmparser.MemArg,
     Operand,
     Int,
-    @wasmi_core.V128,
+    @wasmi_core.V128Value,
   ) -> Unit raise WasmiError,
 ) -> Unit raise WasmiError {
   if !self.reachable {
@@ -808,7 +812,7 @@ fn FuncTranslator::visit_v128_const(
   if !self.reachable {
     return
   }
-  let v128 = @wasmi_core.V128::from_le_bytes(bytes[:])
+  let v128 = @wasmi_core.V128Value::from_le_bytes(bytes[:])
   self.stack.push_immediate(v128_typed(v128)) |> ignore
 }
 
@@ -839,7 +843,9 @@ fn FuncTranslator::visit_i8x16_shuffle(
   let lhs = self.layout.operand_to_reg(lhs)
   let rhs = self.layout.operand_to_reg(rhs)
   let selector = self.layout.const_to_reg(
-    @wasmi_core.UntypedVal::from_v128(@wasmi_core.V128::from_le_bytes(lanes[:])),
+    @wasmi_core.UntypedVal::from_v128(
+      @wasmi_core.V128Value::from_le_bytes(lanes[:]),
+    ),
   )
   self.push_instr_with_result(
     V128,

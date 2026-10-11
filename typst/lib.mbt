@@ -71,8 +71,10 @@ fn[T : @library.Output] compile_impl(
   traced : @library.Traced,
   sink : @library.Sink,
 ) -> T raise @library.SourceError {
-  compile_with(world, traced, sink, library => {
-    // Fetch the main source file once.
+  compile_with(world, traced, sink, (tracked, library) => {
+    // Fetch the main source file once. (Upstream reads `main` and its
+    // source through the tracked world, outside of every memoized
+    // function, where nothing records them; the port asks the world.)
     let main = world.main()
     let main = world.source(main) catch {
       err =>
@@ -81,7 +83,7 @@ fn[T : @library.Output] compile_impl(
 
     // First evaluate the main source file into a module.
     @eval.eval_source(
-      world,
+      tracked,
       library,
       traced,
       sink,
@@ -93,8 +95,12 @@ fn[T : @library.Output] compile_impl(
 
 ///|
 /// `compile_impl` with the evaluation step as a parameter (not upstream):
-/// `evaluate` receives the world's library and produces the content that is
-/// laid out. Everything else is the compiler's, in upstream's order: the
+/// `evaluate` receives the tracked world of the compilation and the
+/// world's library and produces the content that is laid out; an engine
+/// it builds must hold that tracked world. `volatile_files` says which
+/// files of the world change during the compilation (none of a world that
+/// keeps `World`'s contract; `library/tracked_world.mbt`): what reads one
+/// is not memoized. Everything else is the compiler's, in upstream's order: the
 /// target feature checks, the library and target styles, the evaluation,
 /// the memoization lifetime, the relayout loop with tracked introspection,
 /// the convergence warnings and the promotion of delayed errors. Used by
@@ -103,9 +109,26 @@ pub fn[T : @library.Output] compile_with(
   world : &@library.World,
   traced : @library.Traced,
   sink : @library.Sink,
-  evaluate : (@library.Library) -> @library.Content raise @library.SourceError,
+  evaluate : (@library.TrackedWorld, @library.Library) -> @library.Content raise @library.SourceError,
+  volatile_files? : (@syntax.FileId) -> Bool,
 ) -> T raise @library.SourceError {
   let library = world.library()
+  // The compilation is a scope of the world: the world does not change
+  // during it, and what its memoized calls read of it is recorded
+  // (upstream: `world.track()`).
+  let world = @library.TrackedWorld::new(world, volatile_files?)
+  world.scoped(() => compile_scoped(world, library, traced, sink, evaluate))
+}
+
+///|
+/// The rest of `compile_with`, in the scope of the tracked world.
+fn[T : @library.Output] compile_scoped(
+  world : @library.TrackedWorld,
+  library : @library.Library,
+  traced : @library.Traced,
+  sink : @library.Sink,
+  evaluate : (@library.TrackedWorld, @library.Library) -> @library.Content raise @library.SourceError,
+) -> T raise @library.SourceError {
   match T::target() {
     Paged => ()
     Html => warn_or_error_for_html(library.features, sink)
@@ -124,7 +147,7 @@ pub fn[T : @library.Output] compile_with(
   let document = @library.with_layout_memo(() => {
     // First produce the content (the Typst path evaluates the main source
     // file into a module).
-    let content = evaluate(library)
+    let content = evaluate(world, library)
     let history : Array[T] = []
     let mut document : T? = None
 
@@ -159,6 +182,7 @@ pub fn[T : @library.Output] compile_with(
         introspectors.push(doc.introspector())
         let warnings = @library.analyze(
           world,
+          library,
           introspectors,
           subsink.introspections(),
         )

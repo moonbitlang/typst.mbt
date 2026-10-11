@@ -12,7 +12,7 @@ pub fn v128_store(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  value : V128,
+  value : V128Value,
 ) -> Unit raise TrapCode {
   store_u128_at(memory, memory_len, effective_address(ptr, offset), value)
 }
@@ -27,7 +27,7 @@ pub fn v128_store_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
 ) -> Unit raise TrapCode {
   store_u128_at(memory, memory_len, address, value)
 }
@@ -44,7 +44,7 @@ pub fn v128_store8_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx16,
 ) -> Unit raise TrapCode {
   v128_store8_lane_at(
@@ -68,7 +68,7 @@ pub fn v128_store16_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx8,
 ) -> Unit raise TrapCode {
   v128_store16_lane_at(
@@ -92,7 +92,7 @@ pub fn v128_store32_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx4,
 ) -> Unit raise TrapCode {
   v128_store32_lane_at(
@@ -116,7 +116,7 @@ pub fn v128_store64_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx2,
 ) -> Unit raise TrapCode {
   v128_store64_lane_at(
@@ -138,7 +138,7 @@ pub fn v128_store8_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx16,
 ) -> Unit raise TrapCode {
   store_u8_at(
@@ -159,7 +159,7 @@ pub fn v128_store16_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx8,
 ) -> Unit raise TrapCode {
   store_u16_at(
@@ -180,7 +180,7 @@ pub fn v128_store32_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx4,
 ) -> Unit raise TrapCode {
   store_u32_at(
@@ -201,7 +201,7 @@ pub fn v128_store64_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  value : V128,
+  value : V128Value,
   imm : ImmLaneIdx2,
 ) -> Unit raise TrapCode {
   store_u64_at(
@@ -224,7 +224,7 @@ pub fn v128_load(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_u128_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -238,7 +238,7 @@ pub fn v128_load_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_u128_at(memory, memory_len, address)
 }
 
@@ -254,7 +254,7 @@ pub fn v128_load32_zero(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load32_zero_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -270,7 +270,7 @@ pub fn v128_load64_zero(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load64_zero_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -284,7 +284,7 @@ pub fn v128_load32_zero_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let bits = load_u32_at(memory, memory_len, address)
   { lo: bits.to_uint64(), hi: 0, }
 }
@@ -299,7 +299,7 @@ pub fn v128_load64_zero_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let bits = load_u64_at(memory, memory_len, address)
   { lo: bits, hi: 0, }
 }
@@ -316,7 +316,7 @@ pub fn v128_load8_splat(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load8_splat_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -332,7 +332,7 @@ pub fn v128_load16_splat(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load16_splat_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -348,7 +348,7 @@ pub fn v128_load32_splat(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load32_splat_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -364,7 +364,7 @@ pub fn v128_load64_splat(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load64_splat_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -378,7 +378,7 @@ pub fn v128_load8_splat_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   i8x16_splat(load_u8_at(memory, memory_len, address).to_int())
 }
 
@@ -392,7 +392,7 @@ pub fn v128_load16_splat_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   i16x8_splat(load_u16_at(memory, memory_len, address))
 }
 
@@ -406,7 +406,7 @@ pub fn v128_load32_splat_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   i32x4_splat(load_u32_at(memory, memory_len, address).reinterpret_as_int())
 }
 
@@ -420,7 +420,7 @@ pub fn v128_load64_splat_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let v = load_u64_at(memory, memory_len, address)
   { lo: v, hi: v, }
 }
@@ -437,9 +437,9 @@ pub fn v128_load8_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx16,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load8_lane_at(
     memory,
     memory_len,
@@ -461,9 +461,9 @@ pub fn v128_load16_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx8,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load16_lane_at(
     memory,
     memory_len,
@@ -485,9 +485,9 @@ pub fn v128_load32_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx4,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load32_lane_at(
     memory,
     memory_len,
@@ -509,9 +509,9 @@ pub fn v128_load64_lane(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx2,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load64_lane_at(
     memory,
     memory_len,
@@ -531,9 +531,9 @@ pub fn v128_load8_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx16,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let value = load_u8_at(memory, memory_len, address)
   x.with_lane_bits(8, lane.to_u8().to_int(), value.to_uint64())
 }
@@ -548,9 +548,9 @@ pub fn v128_load16_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx8,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let value = load_u16_at(memory, memory_len, address)
   x.with_lane_bits(16, lane.to_u8().to_int(), value.to_uint64())
 }
@@ -565,9 +565,9 @@ pub fn v128_load32_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx4,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let value = load_u32_at(memory, memory_len, address)
   x.with_lane_bits(32, lane.to_u8().to_int(), value.to_uint64())
 }
@@ -582,9 +582,9 @@ pub fn v128_load64_lane_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-  x : V128,
+  x : V128Value,
   lane : ImmLaneIdx2,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   let value = load_u64_at(memory, memory_len, address)
   x.with_lane_bits(64, lane.to_u8().to_int(), value)
 }
@@ -592,8 +592,8 @@ pub fn v128_load64_lane_at(
 ///|
 /// `V128::load_nxm`: interprets `bits` as array of `bits / 2`-wide narrow
 /// items (`narrow` bits each) and distributes the (sign) extended items.
-fn load_nxm(bits : UInt64, narrow : Int, signed : Bool) -> V128 {
-  let src : V128 = { lo: bits, hi: 0, }
+fn load_nxm(bits : UInt64, narrow : Int, signed : Bool) -> V128Value {
+  let src : V128Value = { lo: bits, hi: 0, }
   if narrow == 32 {
     let ext = (j : Int) => {
       if signed {
@@ -621,7 +621,7 @@ pub fn v128_load8x8_s(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load8x8_s_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -637,7 +637,7 @@ pub fn v128_load8x8_u(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load8x8_u_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -653,7 +653,7 @@ pub fn v128_load16x4_s(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load16x4_s_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -669,7 +669,7 @@ pub fn v128_load16x4_u(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load16x4_u_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -685,7 +685,7 @@ pub fn v128_load32x2_s(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load32x2_s_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -701,7 +701,7 @@ pub fn v128_load32x2_u(
   memory_len : Int,
   ptr : UInt64,
   offset : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   v128_load32x2_u_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -715,7 +715,7 @@ pub fn v128_load8x8_s_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 8, true)
 }
 
@@ -729,7 +729,7 @@ pub fn v128_load8x8_u_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 8, false)
 }
 
@@ -743,7 +743,7 @@ pub fn v128_load16x4_s_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 16, true)
 }
 
@@ -757,7 +757,7 @@ pub fn v128_load16x4_u_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 16, false)
 }
 
@@ -771,7 +771,7 @@ pub fn v128_load32x2_s_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 32, true)
 }
 
@@ -785,6 +785,6 @@ pub fn v128_load32x2_u_at(
   memory : FixedArray[Byte],
   memory_len : Int,
   address : UInt64,
-) -> V128 raise TrapCode {
+) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 32, false)
 }

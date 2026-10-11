@@ -352,7 +352,7 @@ fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
   let sink = @library.Sink::new()
   let evaluated = try
     @eval.eval_source(
-      world,
+      @library.TrackedWorld::new(world),
       library,
       @library.Traced::new(),
       sink,

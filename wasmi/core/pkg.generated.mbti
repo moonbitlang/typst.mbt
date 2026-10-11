@@ -62,67 +62,67 @@ pub fn f32_sub(Float, Float) -> Float
 
 pub fn f32_trunc(Float) -> Float
 
-pub fn f32x4_abs(V128) -> V128
+pub fn f32x4_abs(V128Value) -> V128Value
 
-pub fn f32x4_add(V128, V128) -> V128
+pub fn f32x4_add(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_ceil(V128) -> V128
+pub fn f32x4_ceil(V128Value) -> V128Value
 
-pub fn f32x4_convert_i32x4_s(V128) -> V128
+pub fn f32x4_convert_i32x4_s(V128Value) -> V128Value
 
-pub fn f32x4_convert_i32x4_u(V128) -> V128
+pub fn f32x4_convert_i32x4_u(V128Value) -> V128Value
 
-pub fn f32x4_demote_f64x2_zero(V128) -> V128
+pub fn f32x4_demote_f64x2_zero(V128Value) -> V128Value
 
-pub fn f32x4_div(V128, V128) -> V128
+pub fn f32x4_div(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_eq(V128, V128) -> V128
+pub fn f32x4_eq(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_extract_lane(V128, ImmLaneIdx4) -> Float
+pub fn f32x4_extract_lane(V128Value, ImmLaneIdx4) -> Float
 
-pub fn f32x4_floor(V128) -> V128
+pub fn f32x4_floor(V128Value) -> V128Value
 
-pub fn f32x4_ge(V128, V128) -> V128
+pub fn f32x4_ge(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_gt(V128, V128) -> V128
+pub fn f32x4_gt(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_le(V128, V128) -> V128
+pub fn f32x4_le(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_lt(V128, V128) -> V128
+pub fn f32x4_lt(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_max(V128, V128) -> V128
+pub fn f32x4_max(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_min(V128, V128) -> V128
+pub fn f32x4_min(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_mul(V128, V128) -> V128
+pub fn f32x4_mul(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_ne(V128, V128) -> V128
+pub fn f32x4_ne(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_nearest(V128) -> V128
+pub fn f32x4_nearest(V128Value) -> V128Value
 
-pub fn f32x4_neg(V128) -> V128
+pub fn f32x4_neg(V128Value) -> V128Value
 
-pub fn f32x4_pmax(V128, V128) -> V128
+pub fn f32x4_pmax(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_pmin(V128, V128) -> V128
+pub fn f32x4_pmin(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_relaxed_madd(V128, V128, V128) -> V128
+pub fn f32x4_relaxed_madd(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn f32x4_relaxed_max(V128, V128) -> V128
+pub fn f32x4_relaxed_max(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_relaxed_min(V128, V128) -> V128
+pub fn f32x4_relaxed_min(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_relaxed_nmadd(V128, V128, V128) -> V128
+pub fn f32x4_relaxed_nmadd(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn f32x4_replace_lane(V128, ImmLaneIdx4, Float) -> V128
+pub fn f32x4_replace_lane(V128Value, ImmLaneIdx4, Float) -> V128Value
 
-pub fn f32x4_splat(Float) -> V128
+pub fn f32x4_splat(Float) -> V128Value
 
-pub fn f32x4_sqrt(V128) -> V128
+pub fn f32x4_sqrt(V128Value) -> V128Value
 
-pub fn f32x4_sub(V128, V128) -> V128
+pub fn f32x4_sub(V128Value, V128Value) -> V128Value
 
-pub fn f32x4_trunc(V128) -> V128
+pub fn f32x4_trunc(V128Value) -> V128Value
 
 pub fn f64_abs(Double) -> Double
 
@@ -176,165 +176,165 @@ pub fn f64_sub(Double, Double) -> Double
 
 pub fn f64_trunc(Double) -> Double
 
-pub fn f64x2_abs(V128) -> V128
+pub fn f64x2_abs(V128Value) -> V128Value
 
-pub fn f64x2_add(V128, V128) -> V128
+pub fn f64x2_add(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_ceil(V128) -> V128
+pub fn f64x2_ceil(V128Value) -> V128Value
 
-pub fn f64x2_convert_low_i32x4_s(V128) -> V128
+pub fn f64x2_convert_low_i32x4_s(V128Value) -> V128Value
 
-pub fn f64x2_convert_low_i32x4_u(V128) -> V128
+pub fn f64x2_convert_low_i32x4_u(V128Value) -> V128Value
 
-pub fn f64x2_div(V128, V128) -> V128
+pub fn f64x2_div(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_eq(V128, V128) -> V128
+pub fn f64x2_eq(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_extract_lane(V128, ImmLaneIdx2) -> Double
+pub fn f64x2_extract_lane(V128Value, ImmLaneIdx2) -> Double
 
-pub fn f64x2_floor(V128) -> V128
+pub fn f64x2_floor(V128Value) -> V128Value
 
-pub fn f64x2_ge(V128, V128) -> V128
+pub fn f64x2_ge(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_gt(V128, V128) -> V128
+pub fn f64x2_gt(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_le(V128, V128) -> V128
+pub fn f64x2_le(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_lt(V128, V128) -> V128
+pub fn f64x2_lt(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_max(V128, V128) -> V128
+pub fn f64x2_max(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_min(V128, V128) -> V128
+pub fn f64x2_min(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_mul(V128, V128) -> V128
+pub fn f64x2_mul(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_ne(V128, V128) -> V128
+pub fn f64x2_ne(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_nearest(V128) -> V128
+pub fn f64x2_nearest(V128Value) -> V128Value
 
-pub fn f64x2_neg(V128) -> V128
+pub fn f64x2_neg(V128Value) -> V128Value
 
-pub fn f64x2_pmax(V128, V128) -> V128
+pub fn f64x2_pmax(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_pmin(V128, V128) -> V128
+pub fn f64x2_pmin(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_promote_low_f32x4(V128) -> V128
+pub fn f64x2_promote_low_f32x4(V128Value) -> V128Value
 
-pub fn f64x2_relaxed_madd(V128, V128, V128) -> V128
+pub fn f64x2_relaxed_madd(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn f64x2_relaxed_max(V128, V128) -> V128
+pub fn f64x2_relaxed_max(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_relaxed_min(V128, V128) -> V128
+pub fn f64x2_relaxed_min(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_relaxed_nmadd(V128, V128, V128) -> V128
+pub fn f64x2_relaxed_nmadd(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn f64x2_replace_lane(V128, ImmLaneIdx2, Double) -> V128
+pub fn f64x2_replace_lane(V128Value, ImmLaneIdx2, Double) -> V128Value
 
-pub fn f64x2_splat(Double) -> V128
+pub fn f64x2_splat(Double) -> V128Value
 
-pub fn f64x2_sqrt(V128) -> V128
+pub fn f64x2_sqrt(V128Value) -> V128Value
 
-pub fn f64x2_sub(V128, V128) -> V128
+pub fn f64x2_sub(V128Value, V128Value) -> V128Value
 
-pub fn f64x2_trunc(V128) -> V128
+pub fn f64x2_trunc(V128Value) -> V128Value
 
-pub fn i16x8_abs(V128) -> V128
+pub fn i16x8_abs(V128Value) -> V128Value
 
-pub fn i16x8_add(V128, V128) -> V128
+pub fn i16x8_add(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_add_sat_s(V128, V128) -> V128
+pub fn i16x8_add_sat_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_add_sat_u(V128, V128) -> V128
+pub fn i16x8_add_sat_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_all_true(V128) -> Bool
+pub fn i16x8_all_true(V128Value) -> Bool
 
-pub fn i16x8_avgr_u(V128, V128) -> V128
+pub fn i16x8_avgr_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_bitmask(V128) -> UInt
+pub fn i16x8_bitmask(V128Value) -> UInt
 
-pub fn i16x8_eq(V128, V128) -> V128
+pub fn i16x8_eq(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extadd_pairwise_i8x16_s(V128) -> V128
+pub fn i16x8_extadd_pairwise_i8x16_s(V128Value) -> V128Value
 
-pub fn i16x8_extadd_pairwise_i8x16_u(V128) -> V128
+pub fn i16x8_extadd_pairwise_i8x16_u(V128Value) -> V128Value
 
-pub fn i16x8_extend_high_i8x16_s(V128) -> V128
+pub fn i16x8_extend_high_i8x16_s(V128Value) -> V128Value
 
-pub fn i16x8_extend_high_i8x16_u(V128) -> V128
+pub fn i16x8_extend_high_i8x16_u(V128Value) -> V128Value
 
-pub fn i16x8_extend_low_i8x16_s(V128) -> V128
+pub fn i16x8_extend_low_i8x16_s(V128Value) -> V128Value
 
-pub fn i16x8_extend_low_i8x16_u(V128) -> V128
+pub fn i16x8_extend_low_i8x16_u(V128Value) -> V128Value
 
-pub fn i16x8_extmul_high_i8x16_s(V128, V128) -> V128
+pub fn i16x8_extmul_high_i8x16_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extmul_high_i8x16_u(V128, V128) -> V128
+pub fn i16x8_extmul_high_i8x16_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extmul_low_i8x16_s(V128, V128) -> V128
+pub fn i16x8_extmul_low_i8x16_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extmul_low_i8x16_u(V128, V128) -> V128
+pub fn i16x8_extmul_low_i8x16_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extract_lane_s(V128, ImmLaneIdx8) -> Int
+pub fn i16x8_extract_lane_s(V128Value, ImmLaneIdx8) -> Int
 
-pub fn i16x8_extract_lane_u(V128, ImmLaneIdx8) -> UInt
+pub fn i16x8_extract_lane_u(V128Value, ImmLaneIdx8) -> UInt
 
-pub fn i16x8_ge_s(V128, V128) -> V128
+pub fn i16x8_ge_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_ge_u(V128, V128) -> V128
+pub fn i16x8_ge_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_gt_s(V128, V128) -> V128
+pub fn i16x8_gt_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_gt_u(V128, V128) -> V128
+pub fn i16x8_gt_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_le_s(V128, V128) -> V128
+pub fn i16x8_le_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_le_u(V128, V128) -> V128
+pub fn i16x8_le_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_lt_s(V128, V128) -> V128
+pub fn i16x8_lt_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_lt_u(V128, V128) -> V128
+pub fn i16x8_lt_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_max_s(V128, V128) -> V128
+pub fn i16x8_max_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_max_u(V128, V128) -> V128
+pub fn i16x8_max_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_min_s(V128, V128) -> V128
+pub fn i16x8_min_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_min_u(V128, V128) -> V128
+pub fn i16x8_min_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_mul(V128, V128) -> V128
+pub fn i16x8_mul(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_narrow_i32x4_s(V128, V128) -> V128
+pub fn i16x8_narrow_i32x4_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_narrow_i32x4_u(V128, V128) -> V128
+pub fn i16x8_narrow_i32x4_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_ne(V128, V128) -> V128
+pub fn i16x8_ne(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_neg(V128) -> V128
+pub fn i16x8_neg(V128Value) -> V128Value
 
-pub fn i16x8_q15mulr_sat_s(V128, V128) -> V128
+pub fn i16x8_q15mulr_sat_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_relaxed_dot_i8x16_i7x16_s(V128, V128) -> V128
+pub fn i16x8_relaxed_dot_i8x16_i7x16_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_relaxed_laneselect(V128, V128, V128) -> V128
+pub fn i16x8_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn i16x8_relaxed_q15mulr_s(V128, V128) -> V128
+pub fn i16x8_relaxed_q15mulr_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_replace_lane(V128, ImmLaneIdx8, Int) -> V128
+pub fn i16x8_replace_lane(V128Value, ImmLaneIdx8, Int) -> V128Value
 
-pub fn i16x8_shl(V128, UInt) -> V128
+pub fn i16x8_shl(V128Value, UInt) -> V128Value
 
-pub fn i16x8_shr_s(V128, UInt) -> V128
+pub fn i16x8_shr_s(V128Value, UInt) -> V128Value
 
-pub fn i16x8_shr_u(V128, UInt) -> V128
+pub fn i16x8_shr_u(V128Value, UInt) -> V128Value
 
-pub fn i16x8_splat(Int) -> V128
+pub fn i16x8_splat(Int) -> V128Value
 
-pub fn i16x8_sub(V128, V128) -> V128
+pub fn i16x8_sub(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_sub_sat_s(V128, V128) -> V128
+pub fn i16x8_sub_sat_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_sub_sat_u(V128, V128) -> V128
+pub fn i16x8_sub_sat_u(V128Value, V128Value) -> V128Value
 
 pub fn i32_add(Int, Int) -> Int
 
@@ -442,101 +442,101 @@ pub fn i32_trunc_sat_f64_u(Double) -> UInt
 
 pub fn i32_wrap_i64(Int64) -> Int
 
-pub fn i32x4_abs(V128) -> V128
+pub fn i32x4_abs(V128Value) -> V128Value
 
-pub fn i32x4_add(V128, V128) -> V128
+pub fn i32x4_add(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_all_true(V128) -> Bool
+pub fn i32x4_all_true(V128Value) -> Bool
 
-pub fn i32x4_bitmask(V128) -> UInt
+pub fn i32x4_bitmask(V128Value) -> UInt
 
-pub fn i32x4_dot_i16x8_s(V128, V128) -> V128
+pub fn i32x4_dot_i16x8_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_eq(V128, V128) -> V128
+pub fn i32x4_eq(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extadd_pairwise_i16x8_s(V128) -> V128
+pub fn i32x4_extadd_pairwise_i16x8_s(V128Value) -> V128Value
 
-pub fn i32x4_extadd_pairwise_i16x8_u(V128) -> V128
+pub fn i32x4_extadd_pairwise_i16x8_u(V128Value) -> V128Value
 
-pub fn i32x4_extend_high_i16x8_s(V128) -> V128
+pub fn i32x4_extend_high_i16x8_s(V128Value) -> V128Value
 
-pub fn i32x4_extend_high_i16x8_u(V128) -> V128
+pub fn i32x4_extend_high_i16x8_u(V128Value) -> V128Value
 
-pub fn i32x4_extend_low_i16x8_s(V128) -> V128
+pub fn i32x4_extend_low_i16x8_s(V128Value) -> V128Value
 
-pub fn i32x4_extend_low_i16x8_u(V128) -> V128
+pub fn i32x4_extend_low_i16x8_u(V128Value) -> V128Value
 
-pub fn i32x4_extmul_high_i16x8_s(V128, V128) -> V128
+pub fn i32x4_extmul_high_i16x8_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extmul_high_i16x8_u(V128, V128) -> V128
+pub fn i32x4_extmul_high_i16x8_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extmul_low_i16x8_s(V128, V128) -> V128
+pub fn i32x4_extmul_low_i16x8_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extmul_low_i16x8_u(V128, V128) -> V128
+pub fn i32x4_extmul_low_i16x8_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extract_lane(V128, ImmLaneIdx4) -> Int
+pub fn i32x4_extract_lane(V128Value, ImmLaneIdx4) -> Int
 
-pub fn i32x4_ge_s(V128, V128) -> V128
+pub fn i32x4_ge_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_ge_u(V128, V128) -> V128
+pub fn i32x4_ge_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_gt_s(V128, V128) -> V128
+pub fn i32x4_gt_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_gt_u(V128, V128) -> V128
+pub fn i32x4_gt_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_le_s(V128, V128) -> V128
+pub fn i32x4_le_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_le_u(V128, V128) -> V128
+pub fn i32x4_le_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_lt_s(V128, V128) -> V128
+pub fn i32x4_lt_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_lt_u(V128, V128) -> V128
+pub fn i32x4_lt_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_max_s(V128, V128) -> V128
+pub fn i32x4_max_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_max_u(V128, V128) -> V128
+pub fn i32x4_max_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_min_s(V128, V128) -> V128
+pub fn i32x4_min_s(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_min_u(V128, V128) -> V128
+pub fn i32x4_min_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_mul(V128, V128) -> V128
+pub fn i32x4_mul(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_ne(V128, V128) -> V128
+pub fn i32x4_ne(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_neg(V128) -> V128
+pub fn i32x4_neg(V128Value) -> V128Value
 
-pub fn i32x4_relaxed_dot_i8x16_i7x16_add_s(V128, V128, V128) -> V128
+pub fn i32x4_relaxed_dot_i8x16_i7x16_add_s(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn i32x4_relaxed_laneselect(V128, V128, V128) -> V128
+pub fn i32x4_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn i32x4_relaxed_trunc_f32x4_s(V128) -> V128
+pub fn i32x4_relaxed_trunc_f32x4_s(V128Value) -> V128Value
 
-pub fn i32x4_relaxed_trunc_f32x4_u(V128) -> V128
+pub fn i32x4_relaxed_trunc_f32x4_u(V128Value) -> V128Value
 
-pub fn i32x4_relaxed_trunc_f64x2_s_zero(V128) -> V128
+pub fn i32x4_relaxed_trunc_f64x2_s_zero(V128Value) -> V128Value
 
-pub fn i32x4_relaxed_trunc_f64x2_u_zero(V128) -> V128
+pub fn i32x4_relaxed_trunc_f64x2_u_zero(V128Value) -> V128Value
 
-pub fn i32x4_replace_lane(V128, ImmLaneIdx4, Int) -> V128
+pub fn i32x4_replace_lane(V128Value, ImmLaneIdx4, Int) -> V128Value
 
-pub fn i32x4_shl(V128, UInt) -> V128
+pub fn i32x4_shl(V128Value, UInt) -> V128Value
 
-pub fn i32x4_shr_s(V128, UInt) -> V128
+pub fn i32x4_shr_s(V128Value, UInt) -> V128Value
 
-pub fn i32x4_shr_u(V128, UInt) -> V128
+pub fn i32x4_shr_u(V128Value, UInt) -> V128Value
 
-pub fn i32x4_splat(Int) -> V128
+pub fn i32x4_splat(Int) -> V128Value
 
-pub fn i32x4_sub(V128, V128) -> V128
+pub fn i32x4_sub(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_trunc_sat_f32x4_s(V128) -> V128
+pub fn i32x4_trunc_sat_f32x4_s(V128Value) -> V128Value
 
-pub fn i32x4_trunc_sat_f32x4_u(V128) -> V128
+pub fn i32x4_trunc_sat_f32x4_u(V128Value) -> V128Value
 
-pub fn i32x4_trunc_sat_f64x2_s_zero(V128) -> V128
+pub fn i32x4_trunc_sat_f64x2_s_zero(V128Value) -> V128Value
 
-pub fn i32x4_trunc_sat_f64x2_u_zero(V128) -> V128
+pub fn i32x4_trunc_sat_f64x2_u_zero(V128Value) -> V128Value
 
 pub fn i64_add(Int64, Int64) -> Int64
 
@@ -668,141 +668,141 @@ pub fn i64_trunc_sat_f64_s(Double) -> Int64
 
 pub fn i64_trunc_sat_f64_u(Double) -> UInt64
 
-pub fn i64x2_abs(V128) -> V128
+pub fn i64x2_abs(V128Value) -> V128Value
 
-pub fn i64x2_add(V128, V128) -> V128
+pub fn i64x2_add(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_all_true(V128) -> Bool
+pub fn i64x2_all_true(V128Value) -> Bool
 
-pub fn i64x2_bitmask(V128) -> UInt
+pub fn i64x2_bitmask(V128Value) -> UInt
 
-pub fn i64x2_eq(V128, V128) -> V128
+pub fn i64x2_eq(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_extend_high_i32x4_s(V128) -> V128
+pub fn i64x2_extend_high_i32x4_s(V128Value) -> V128Value
 
-pub fn i64x2_extend_high_i32x4_u(V128) -> V128
+pub fn i64x2_extend_high_i32x4_u(V128Value) -> V128Value
 
-pub fn i64x2_extend_low_i32x4_s(V128) -> V128
+pub fn i64x2_extend_low_i32x4_s(V128Value) -> V128Value
 
-pub fn i64x2_extend_low_i32x4_u(V128) -> V128
+pub fn i64x2_extend_low_i32x4_u(V128Value) -> V128Value
 
-pub fn i64x2_extmul_high_i32x4_s(V128, V128) -> V128
+pub fn i64x2_extmul_high_i32x4_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_extmul_high_i32x4_u(V128, V128) -> V128
+pub fn i64x2_extmul_high_i32x4_u(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_extmul_low_i32x4_s(V128, V128) -> V128
+pub fn i64x2_extmul_low_i32x4_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_extmul_low_i32x4_u(V128, V128) -> V128
+pub fn i64x2_extmul_low_i32x4_u(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_extract_lane(V128, ImmLaneIdx2) -> Int64
+pub fn i64x2_extract_lane(V128Value, ImmLaneIdx2) -> Int64
 
-pub fn i64x2_ge_s(V128, V128) -> V128
+pub fn i64x2_ge_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_gt_s(V128, V128) -> V128
+pub fn i64x2_gt_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_le_s(V128, V128) -> V128
+pub fn i64x2_le_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_lt_s(V128, V128) -> V128
+pub fn i64x2_lt_s(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_mul(V128, V128) -> V128
+pub fn i64x2_mul(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_ne(V128, V128) -> V128
+pub fn i64x2_ne(V128Value, V128Value) -> V128Value
 
-pub fn i64x2_neg(V128) -> V128
+pub fn i64x2_neg(V128Value) -> V128Value
 
-pub fn i64x2_relaxed_laneselect(V128, V128, V128) -> V128
+pub fn i64x2_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn i64x2_replace_lane(V128, ImmLaneIdx2, Int64) -> V128
+pub fn i64x2_replace_lane(V128Value, ImmLaneIdx2, Int64) -> V128Value
 
-pub fn i64x2_shl(V128, UInt) -> V128
+pub fn i64x2_shl(V128Value, UInt) -> V128Value
 
-pub fn i64x2_shr_s(V128, UInt) -> V128
+pub fn i64x2_shr_s(V128Value, UInt) -> V128Value
 
-pub fn i64x2_shr_u(V128, UInt) -> V128
+pub fn i64x2_shr_u(V128Value, UInt) -> V128Value
 
-pub fn i64x2_splat(Int64) -> V128
+pub fn i64x2_splat(Int64) -> V128Value
 
-pub fn i64x2_sub(V128, V128) -> V128
+pub fn i64x2_sub(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_abs(V128) -> V128
+pub fn i8x16_abs(V128Value) -> V128Value
 
-pub fn i8x16_add(V128, V128) -> V128
+pub fn i8x16_add(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_add_sat_s(V128, V128) -> V128
+pub fn i8x16_add_sat_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_add_sat_u(V128, V128) -> V128
+pub fn i8x16_add_sat_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_all_true(V128) -> Bool
+pub fn i8x16_all_true(V128Value) -> Bool
 
-pub fn i8x16_avgr_u(V128, V128) -> V128
+pub fn i8x16_avgr_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_bitmask(V128) -> UInt
+pub fn i8x16_bitmask(V128Value) -> UInt
 
-pub fn i8x16_eq(V128, V128) -> V128
+pub fn i8x16_eq(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_extract_lane_s(V128, ImmLaneIdx16) -> Int
+pub fn i8x16_extract_lane_s(V128Value, ImmLaneIdx16) -> Int
 
-pub fn i8x16_extract_lane_u(V128, ImmLaneIdx16) -> UInt
+pub fn i8x16_extract_lane_u(V128Value, ImmLaneIdx16) -> UInt
 
-pub fn i8x16_ge_s(V128, V128) -> V128
+pub fn i8x16_ge_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_ge_u(V128, V128) -> V128
+pub fn i8x16_ge_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_gt_s(V128, V128) -> V128
+pub fn i8x16_gt_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_gt_u(V128, V128) -> V128
+pub fn i8x16_gt_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_le_s(V128, V128) -> V128
+pub fn i8x16_le_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_le_u(V128, V128) -> V128
+pub fn i8x16_le_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_lt_s(V128, V128) -> V128
+pub fn i8x16_lt_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_lt_u(V128, V128) -> V128
+pub fn i8x16_lt_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_max_s(V128, V128) -> V128
+pub fn i8x16_max_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_max_u(V128, V128) -> V128
+pub fn i8x16_max_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_min_s(V128, V128) -> V128
+pub fn i8x16_min_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_min_u(V128, V128) -> V128
+pub fn i8x16_min_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_mul(V128, V128) -> V128
+pub fn i8x16_mul(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_narrow_i16x8_s(V128, V128) -> V128
+pub fn i8x16_narrow_i16x8_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_narrow_i16x8_u(V128, V128) -> V128
+pub fn i8x16_narrow_i16x8_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_ne(V128, V128) -> V128
+pub fn i8x16_ne(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_neg(V128) -> V128
+pub fn i8x16_neg(V128Value) -> V128Value
 
-pub fn i8x16_popcnt(V128) -> V128
+pub fn i8x16_popcnt(V128Value) -> V128Value
 
-pub fn i8x16_relaxed_laneselect(V128, V128, V128) -> V128
+pub fn i8x16_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn i8x16_relaxed_swizzle(V128, V128) -> V128
+pub fn i8x16_relaxed_swizzle(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_replace_lane(V128, ImmLaneIdx16, Int) -> V128
+pub fn i8x16_replace_lane(V128Value, ImmLaneIdx16, Int) -> V128Value
 
-pub fn i8x16_shl(V128, UInt) -> V128
+pub fn i8x16_shl(V128Value, UInt) -> V128Value
 
-pub fn i8x16_shr_s(V128, UInt) -> V128
+pub fn i8x16_shr_s(V128Value, UInt) -> V128Value
 
-pub fn i8x16_shr_u(V128, UInt) -> V128
+pub fn i8x16_shr_u(V128Value, UInt) -> V128Value
 
-pub fn i8x16_shuffle(V128, V128, FixedArray[ImmLaneIdx32]) -> V128
+pub fn i8x16_shuffle(V128Value, V128Value, FixedArray[ImmLaneIdx32]) -> V128Value
 
-pub fn i8x16_splat(Int) -> V128
+pub fn i8x16_splat(Int) -> V128Value
 
-pub fn i8x16_sub(V128, V128) -> V128
+pub fn i8x16_sub(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_sub_sat_s(V128, V128) -> V128
+pub fn i8x16_sub_sat_s(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_sub_sat_u(V128, V128) -> V128
+pub fn i8x16_sub_sat_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_swizzle(V128, V128) -> V128
+pub fn i8x16_swizzle(V128Value, V128Value) -> V128Value
 
 pub fn likely(Bool) -> Bool
 
@@ -824,107 +824,107 @@ pub fn store64_at(FixedArray[Byte], Int, UInt64, UInt64) -> Unit raise TrapCode
 
 pub fn unlikely(Bool) -> Bool
 
-pub fn v128_and(V128, V128) -> V128
+pub fn v128_and(V128Value, V128Value) -> V128Value
 
-pub fn v128_andnot(V128, V128) -> V128
+pub fn v128_andnot(V128Value, V128Value) -> V128Value
 
-pub fn v128_any_true(V128) -> Bool
+pub fn v128_any_true(V128Value) -> Bool
 
-pub fn v128_bitselect(V128, V128, V128) -> V128
+pub fn v128_bitselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn v128_load(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx8) -> V128 raise TrapCode
+pub fn v128_load16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
 
-pub fn v128_load16_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx8) -> V128 raise TrapCode
+pub fn v128_load16_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
 
-pub fn v128_load16_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load16_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load16_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load16x4_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load16x4_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load16x4_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load16x4_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx4) -> V128 raise TrapCode
+pub fn v128_load32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
 
-pub fn v128_load32_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx4) -> V128 raise TrapCode
+pub fn v128_load32_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
 
-pub fn v128_load32_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load32_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load32_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load32_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_zero_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load32_zero_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load32x2_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load32x2_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load32x2_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load32x2_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx2) -> V128 raise TrapCode
+pub fn v128_load64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
 
-pub fn v128_load64_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx2) -> V128 raise TrapCode
+pub fn v128_load64_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
 
-pub fn v128_load64_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load64_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load64_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load64_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_zero_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load64_zero_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx16) -> V128 raise TrapCode
+pub fn v128_load8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
 
-pub fn v128_load8_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx16) -> V128 raise TrapCode
+pub fn v128_load8_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
 
-pub fn v128_load8_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load8_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load8_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load8x8_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load8x8_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+pub fn v128_load8x8_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load8x8_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+pub fn v128_load_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_not(V128) -> V128
+pub fn v128_not(V128Value) -> V128Value
 
-pub fn v128_or(V128, V128) -> V128
+pub fn v128_or(V128Value, V128Value) -> V128Value
 
-pub fn v128_store(FixedArray[Byte], Int, UInt64, UInt64, V128) -> Unit raise TrapCode
+pub fn v128_store(FixedArray[Byte], Int, UInt64, UInt64, V128Value) -> Unit raise TrapCode
 
-pub fn v128_store16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx8) -> Unit raise TrapCode
+pub fn v128_store16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
 
-pub fn v128_store16_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx8) -> Unit raise TrapCode
+pub fn v128_store16_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
 
-pub fn v128_store32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx4) -> Unit raise TrapCode
+pub fn v128_store32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
 
-pub fn v128_store32_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx4) -> Unit raise TrapCode
+pub fn v128_store32_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
 
-pub fn v128_store64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx2) -> Unit raise TrapCode
+pub fn v128_store64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
 
-pub fn v128_store64_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx2) -> Unit raise TrapCode
+pub fn v128_store64_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
 
-pub fn v128_store8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx16) -> Unit raise TrapCode
+pub fn v128_store8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
 
-pub fn v128_store8_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx16) -> Unit raise TrapCode
+pub fn v128_store8_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
 
-pub fn v128_store_at(FixedArray[Byte], Int, UInt64, V128) -> Unit raise TrapCode
+pub fn v128_store_at(FixedArray[Byte], Int, UInt64, V128Value) -> Unit raise TrapCode
 
-pub fn v128_xor(V128, V128) -> V128
+pub fn v128_xor(V128Value, V128Value) -> V128Value
 
 // Errors
 pub(all) suberror FuelError {
@@ -1279,7 +1279,7 @@ pub fn TypedVal::from_i32(Int) -> Self
 pub fn TypedVal::from_i64(Int64) -> Self
 pub fn TypedVal::from_u32(UInt) -> Self
 pub fn TypedVal::from_u64(UInt64) -> Self
-pub fn TypedVal::from_v128(V128) -> Self
+pub fn TypedVal::from_v128(V128Value) -> Self
 pub fn TypedVal::new(ValType, UntypedVal) -> Self
 pub fn TypedVal::to_bool(Self) -> Bool
 pub fn TypedVal::to_f32(Self) -> Float
@@ -1288,7 +1288,7 @@ pub fn TypedVal::to_i32(Self) -> Int
 pub fn TypedVal::to_i64(Self) -> Int64
 pub fn TypedVal::to_u32(Self) -> UInt
 pub fn TypedVal::to_u64(Self) -> UInt64
-pub fn TypedVal::to_v128(Self) -> V128
+pub fn TypedVal::to_v128(Self) -> V128Value
 pub fn TypedVal::ty(Self) -> ValType
 pub fn TypedVal::untyped(Self) -> UntypedVal
 
@@ -1307,7 +1307,7 @@ pub fn UntypedVal::from_i64(Int64) -> Self
 pub fn UntypedVal::from_i8(Int) -> Self
 pub fn UntypedVal::from_u32(UInt) -> Self
 pub fn UntypedVal::from_u64(UInt64) -> Self
-pub fn UntypedVal::from_v128(V128) -> Self
+pub fn UntypedVal::from_v128(V128Value) -> Self
 pub fn UntypedVal::hi64(Self) -> UInt64
 pub fn UntypedVal::read_bool(Self) -> Bool
 pub fn UntypedVal::read_f32(Self) -> Float
@@ -1320,7 +1320,7 @@ pub fn UntypedVal::read_u16(Self) -> Int
 pub fn UntypedVal::read_u32(Self) -> UInt
 pub fn UntypedVal::read_u64(Self) -> UInt64
 pub fn UntypedVal::read_u8(Self) -> Int
-pub fn UntypedVal::read_v128(Self) -> V128
+pub fn UntypedVal::read_v128(Self) -> V128Value
 pub fn UntypedVal::to_bits64(Self) -> UInt64
 pub fn UntypedVal::write_bool(Self, Bool) -> Self
 pub fn UntypedVal::write_f32(Self, Float) -> Self
@@ -1331,18 +1331,18 @@ pub fn UntypedVal::write_i64(Self, Int64) -> Self
 pub fn UntypedVal::write_i8(Self, Int) -> Self
 pub fn UntypedVal::write_u32(Self, UInt) -> Self
 pub fn UntypedVal::write_u64(Self, UInt64) -> Self
-pub fn UntypedVal::write_v128(Self, V128) -> Self
+pub fn UntypedVal::write_v128(Self, V128Value) -> Self
 pub impl Default for UntypedVal
 
-pub struct V128 {
+pub struct V128Value {
   lo : UInt64
   hi : UInt64
 } derive(Eq, Hash, @debug.Debug)
-pub fn V128::from_le_bytes(ArrayView[Byte]) -> Self
-pub fn V128::from_lo_hi(UInt64, UInt64) -> Self
-pub fn V128::hi(Self) -> UInt64
-pub fn V128::lo(Self) -> UInt64
-pub fn V128::to_le_bytes(Self) -> FixedArray[Byte]
+pub fn V128Value::from_le_bytes(ArrayView[Byte]) -> Self
+pub fn V128Value::from_lo_hi(UInt64, UInt64) -> Self
+pub fn V128Value::hi(Self) -> UInt64
+pub fn V128Value::lo(Self) -> UInt64
+pub fn V128Value::to_le_bytes(Self) -> FixedArray[Byte]
 
 pub(all) enum ValType {
   I32

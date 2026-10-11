@@ -113,7 +113,7 @@ let test_library : @library.Library = {
 ///|
 fn test_engine() -> @library.Engine {
   {
-    world: DummyWorld::{ library: test_library, },
+    world: @library.TrackedWorld::new(DummyWorld::{ library: test_library, }),
     library: test_library,
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),

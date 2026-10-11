@@ -96,7 +96,7 @@ fn Site::of_call(kind : String, loc : SourceLoc) -> Site {
 
 ///|
 /// The function called by a [CallNode] or [SetNode].
-priv enum FuncRef {
+priv enum Callee {
   /// An element function.
   FElem(@library.Element)
   /// A native function.
@@ -119,14 +119,14 @@ priv struct ArgNode {
 
 ///|
 priv struct CallNode {
-  func : FuncRef
+  func : Callee
   args : Array[ArgNode]
   origin : Site
 }
 
 ///|
 priv struct SetNode {
-  func : FuncRef
+  func : Callee
   args : Array[ArgNode]
   origin : Site
 }

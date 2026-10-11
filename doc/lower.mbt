@@ -755,7 +755,7 @@ fn Lowering::global(
 /// The function a reference denotes.
 fn Lowering::func(
   self : Lowering,
-  func : FuncRef,
+  func : Callee,
   span : @syntax.Span,
 ) -> @library.Func raise @library.SourceError {
   match func {
@@ -860,7 +860,7 @@ fn Lowering::args(
 /// Call a function like the evaluator's `call_func`.
 fn Lowering::call(
   self : Lowering,
-  func : FuncRef,
+  func : Callee,
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,

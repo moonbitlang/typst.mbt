@@ -895,7 +895,7 @@ pub(all) enum Operator {
   V128Store16Lane(memarg~ : MemArg, lane~ : Byte)
   V128Store32Lane(memarg~ : MemArg, lane~ : Byte)
   V128Store64Lane(memarg~ : MemArg, lane~ : Byte)
-  V128Const(value~ : V128)
+  V128Const(value~ : V128Value)
   I8x16Shuffle(lanes~ : FixedArray[Byte])
   I8x16ExtractLaneS(lane~ : Byte)
   I8x16ExtractLaneU(lane~ : Byte)
@@ -1471,8 +1471,8 @@ pub fn UnpackedIndex::pack(Self) -> PackedIndex?
 pub fn UnpackedIndex::to_string(Self) -> String
 pub impl Show for UnpackedIndex
 
-pub(all) struct V128(Bytes) derive(Eq, Hash, @debug.Debug)
-pub fn V128::bytes(Self) -> Bytes
+pub(all) struct V128Value(Bytes) derive(Eq, Hash, @debug.Debug)
+pub fn V128Value::bytes(Self) -> Bytes
 
 pub(all) enum ValType {
   I32
@@ -2191,7 +2191,7 @@ pub fn WasmProposalValidator::visit_v128_and(Self) -> Unit raise BinaryReaderErr
 pub fn WasmProposalValidator::visit_v128_andnot(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_v128_any_true(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_v128_bitselect(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_v128_const(Self, V128) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_v128_const(Self, V128Value) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_v128_load(Self, MemArg) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_v128_load16_lane(Self, MemArg, Byte) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_v128_load16_splat(Self, MemArg) -> Unit raise BinaryReaderError

@@ -87,7 +87,7 @@ test "a file is evaluated once in a compilation" {
 fn evaluated_directly(world : TestWorld) -> String {
   try
     @eval.eval_source(
-      world,
+      @library.TrackedWorld::new(world),
       world.library,
       @library.Traced::new(),
       @library.Sink::new(),
@@ -124,7 +124,7 @@ test "an evaluation outside of a compilation sees the files as they are then" {
 fn evaluated_string(world : TestWorld, code : String) -> String {
   let engine : @library.Engine = {
     library: world.library,
-    world,
+    world: @library.TrackedWorld::new(world),
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),
     sink: @library.Sink::new(),

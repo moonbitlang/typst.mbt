@@ -91,7 +91,7 @@ pub fn TypedVal::from_f64(value : Double) -> TypedVal {
 
 ///|
 /// `From<V128>` (`ValType::V128`).
-pub fn TypedVal::from_v128(value : V128) -> TypedVal {
+pub fn TypedVal::from_v128(value : V128Value) -> TypedVal {
   TypedVal::new(V128, UntypedVal::from_v128(value))
 }
 
@@ -139,6 +139,6 @@ pub fn TypedVal::to_f64(self : TypedVal) -> Double {
 
 ///|
 /// `From<TypedVal> for V128`
-pub fn TypedVal::to_v128(self : TypedVal) -> V128 {
+pub fn TypedVal::to_v128(self : TypedVal) -> V128Value {
   self.value.read_v128()
 }

@@ -6,7 +6,7 @@
 
 ///|
 /// The representation of a function reference.
-fn FuncRef::describe(self : FuncRef) -> String {
+fn Callee::describe(self : Callee) -> String {
   match self {
     FElem(elem) => elem.name()
     FNative(func) => func.name

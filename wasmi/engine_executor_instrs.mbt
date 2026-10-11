@@ -1537,7 +1537,10 @@ fn Executor::get_stack_slot(
 ) -> @wasmi_core.UntypedVal {
   let i = self.sp + slot.0
   @wasmi_core.UntypedVal::from_v128(
-    @wasmi_core.V128::from_lo_hi(self.lo.unsafe_get(i), self.hi.unsafe_get(i)),
+    @wasmi_core.V128Value::from_lo_hi(
+      self.lo.unsafe_get(i),
+      self.hi.unsafe_get(i),
+    ),
   )
 }
 
@@ -1594,9 +1597,12 @@ fn Executor::get_stack_slot_as_f64(self : Executor, slot : @ir.Slot) -> Double {
 fn Executor::get_stack_slot_as_v128(
   self : Executor,
   slot : @ir.Slot,
-) -> @wasmi_core.V128 {
+) -> @wasmi_core.V128Value {
   let i = self.sp + slot.0
-  @wasmi_core.V128::from_lo_hi(self.lo.unsafe_get(i), self.hi.unsafe_get(i))
+  @wasmi_core.V128Value::from_lo_hi(
+    self.lo.unsafe_get(i),
+    self.hi.unsafe_get(i),
+  )
 }
 
 ///|
@@ -1674,7 +1680,7 @@ fn Executor::set_stack_slot_as_bool(
 fn Executor::set_stack_slot_as_v128(
   self : Executor,
   slot : @ir.Slot,
-  value : @wasmi_core.V128,
+  value : @wasmi_core.V128Value,
 ) -> Unit {
   let i = self.sp + slot.0
   self.lo.unsafe_set(i, value.lo())

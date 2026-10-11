@@ -56,7 +56,7 @@ TYPES = {
     "$crate::BrTable<'a>": "BrTable",
     "$crate::Ieee32": "Ieee32",
     "$crate::Ieee64": "Ieee64",
-    "$crate::V128": "V128",
+    "$crate::V128": "V128Value",
     "$crate::HeapType": "HeapType",
     "$crate::RefType": "RefType",
     "$crate::ValType": "ValType",

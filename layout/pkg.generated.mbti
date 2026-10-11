@@ -192,7 +192,7 @@ pub impl FrameModify for @library.Fragment
 pub impl FrameModify for @library.Frame
 
 pub(open) trait SharedShapingContext {
-  fn world(Self) -> &@library.World
+  fn world(Self) -> @library.TrackedWorld
   fn used(Self) -> Array[@library.FontInstance]
   fn first(Self) -> @library.FontInstance?
   fn variant(Self) -> @library.FontVariant

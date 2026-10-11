@@ -51,20 +51,39 @@ fn memo_file(path : String) -> @syntax.FileId {
 }
 
 ///|
-/// Start a compilation's memoization for the rest of a test.
+/// The world of the engines of a test: one, since results are only kept
+/// for a world that is in a scope.
+let memo_test_world : Ref[TrackedWorld?] = { val: None, }
+
+///|
+/// Start a compilation's memoization for the rest of a test: its stores
+/// and the scope of the world of [memo_engine].
 fn memo_test_begin() -> Unit {
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
+  let world = wb_engine(Introspector::empty()).world
+  world.open()
+  memo_test_world.val = Some(world)
 }
 
 ///|
 fn memo_test_end() -> Unit {
   memo_generation.val = 0
+  if memo_test_world.val is Some(world) {
+    world.close()
+    memo_test_world.val = None
+  }
 }
 
 ///|
-fn memo_engine() -> Engine {
-  wb_engine(Introspector::new(FixedBackend([])))
+fn memo_engine(
+  introspector? : Introspector = Introspector::new(FixedBackend([])),
+) -> Engine {
+  let engine = wb_engine(introspector)
+  match memo_test_world.val {
+    Some(world) => { ..engine, world, }
+    None => engine
+  }
 }
 
 ///|
@@ -184,21 +203,33 @@ test "closure memo: off outside of a compilation and when disabled" {
   set_layout_memo_enabled(false)
   {
     defer set_layout_memo_enabled(true)
-    with_layout_memo(() => {
-      memo_call(f, engine, Context::none(), [], body) |> ignore
-      memo_call(f, engine, Context::none(), [], body) |> ignore
+    engine.world.scoped(() => {
+      with_layout_memo(() => {
+        memo_call(f, engine, Context::none(), [], body) |> ignore
+        memo_call(f, engine, Context::none(), [], body) |> ignore
+      })
     })
   }
   assert_eq(runs, 4)
-  // Each compilation has its own results.
+  // Not for a world that is in no scope.
   with_layout_memo(() => {
     memo_call(f, engine, Context::none(), [], body) |> ignore
     memo_call(f, engine, Context::none(), [], body) |> ignore
   })
-  assert_eq(runs, 5)
-  with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
-  |> ignore
   assert_eq(runs, 6)
+  // Each compilation has its own results.
+  engine.world.scoped(() => {
+    with_layout_memo(() => {
+      memo_call(f, engine, Context::none(), [], body) |> ignore
+      memo_call(f, engine, Context::none(), [], body) |> ignore
+    })
+  })
+  assert_eq(runs, 7)
+  engine.world.scoped(() => {
+    with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
+  })
+  |> ignore
+  assert_eq(runs, 8)
 }
 
 ///|
@@ -371,8 +402,8 @@ test "closure memo: what is asked of the context can grow" {
   let c1 = Context::new(location=l1)
   let c2 = Context::new(location=l2)
   let elem = TextElem::packed("x")
-  let empty = wb_engine(Introspector::new(FixedBackend([])))
-  let full = wb_engine(Introspector::new(FixedBackend([elem])))
+  let empty = memo_engine()
+  let full = memo_engine(introspector=Introspector::new(FixedBackend([elem])))
   let mut runs = 0
   // Asks for the location only if the document has labelled elements.
   let body : ClosureBody = (_, _, engine, context, _) => {
@@ -588,7 +619,9 @@ test "closure memo: sink effects and introspector reads are the caller's" {
   let f = memo_test_func(1)
   let run = (backend : FixedBackend) => {
     let recorder = IntrospectionRecorder::new()
-    let engine = wb_engine(Introspector::new(backend).track_with(recorder))
+    let engine = memo_engine(
+      introspector=Introspector::new(backend).track_with(recorder),
+    )
     let value = memo_call(f, engine, Context::none(), [], body)
     (value, engine.sink.warnings().length(), recorder.len())
   }
@@ -615,7 +648,9 @@ test "closure memo: sink effects and introspector reads are the caller's" {
     bail_at(@syntax.Span::detached(), "failed")
   }
   let recorder = IntrospectionRecorder::new()
-  let engine = wb_engine(Introspector::new(one).track_with(recorder))
+  let engine = memo_engine(
+    introspector=Introspector::new(one).track_with(recorder),
+  )
   let failed = try
     memo_call(memo_test_func(2), engine, Context::none(), [], failing)
   catch {

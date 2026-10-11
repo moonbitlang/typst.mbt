@@ -143,7 +143,7 @@ fn SpecCtx::arg(self : SpecCtx, arg : String) -> @wasmi.Val? {
     "v128" => {
       let hi = spec_parse_hex(v.unsafe_substring(start=0, end=16))
       let lo = spec_parse_hex(v.unsafe_substring(start=16, end=32))
-      Some(V128(@wasmi_core.V128::from_lo_hi(lo, hi)))
+      Some(V128(@wasmi_core.V128Value::from_lo_hi(lo, hi)))
     }
     "funcref" => if v == "null" { Some(FuncRef(None)) } else { None }
     "externref" =>

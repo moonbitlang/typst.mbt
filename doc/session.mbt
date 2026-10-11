@@ -83,6 +83,18 @@ impl @library.World for SessionWorld with fn today(self, offset) {
 }
 
 ///|
+/// The tracked world of a session: the session's virtual files are the
+/// ones that change during a compilation ([Registry::changes]).
+fn Session::tracked(
+  self : Session,
+  world : SessionWorld,
+) -> @library.TrackedWorld {
+  @library.TrackedWorld::new(world, volatile_files=id => {
+    self.registry.changes(id)
+  })
+}
+
+///|
 /// An error diagnostic at a span.
 fn error_at(span : @syntax.Span, message : String) -> @library.SourceError {
   @library.SourceError([@library.SourceDiagnostic::error_at(span, message)])

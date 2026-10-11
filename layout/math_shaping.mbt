@@ -3,7 +3,7 @@
 ///|
 /// Shape some text in math.
 fn math_shape(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   styles : @library.StyleChain,
   features : Array[@shape.Feature],
   text : String,
@@ -24,7 +24,7 @@ fn math_shape(
 ///|
 /// Internal shaping implementation.
 fn math_shape_impl(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   variant : @library.FontVariant,
   features : Array[@shape.Feature],
   language : @shape.Language,
@@ -116,7 +116,7 @@ fn feat_fallback(
 /// Holds shaping results and metadata for shaping some text (upstream
 /// `math::shaping::ShapingContext`).
 priv struct MathShapingContext {
-  world : &@library.World
+  world : @library.TrackedWorld
   used : Array[@library.FontInstance]
   variant : @library.FontVariant
   features : Array[@shape.Feature]

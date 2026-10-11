@@ -150,7 +150,7 @@ pub fn UntypedVal::read_bool(self : UntypedVal) -> Bool {
 
 ///|
 /// `ReadAs<V128>`
-pub fn UntypedVal::read_v128(self : UntypedVal) -> V128 {
+pub fn UntypedVal::read_v128(self : UntypedVal) -> V128Value {
   { lo: self.lo64, hi: self.hi64, }
 }
 
@@ -212,7 +212,10 @@ pub fn UntypedVal::write_f64(self : UntypedVal, value : Double) -> UntypedVal {
 
 ///|
 /// `WriteAs<V128>`
-pub fn UntypedVal::write_v128(_self : UntypedVal, value : V128) -> UntypedVal {
+pub fn UntypedVal::write_v128(
+  _self : UntypedVal,
+  value : V128Value,
+) -> UntypedVal {
   UntypedVal::from_v128(value)
 }
 
@@ -274,7 +277,7 @@ pub fn UntypedVal::from_f64(value : Double) -> UntypedVal {
 
 ///|
 /// `From<V128>`
-pub fn UntypedVal::from_v128(value : V128) -> UntypedVal {
+pub fn UntypedVal::from_v128(value : V128Value) -> UntypedVal {
   { lo64: value.lo, hi64: value.hi, }
 }
 

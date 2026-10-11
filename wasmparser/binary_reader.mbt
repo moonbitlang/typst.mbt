@@ -1832,9 +1832,11 @@ fn BinaryReader::read_lane_index(
 }
 
 ///|
-fn BinaryReader::read_v128(self : BinaryReader) -> V128 raise BinaryReaderError {
+fn BinaryReader::read_v128(
+  self : BinaryReader,
+) -> V128Value raise BinaryReaderError {
   let bytes = self.read_bytes(16)
-  V128(bytes.to_owned())
+  V128Value(bytes.to_owned())
 }
 
 ///|

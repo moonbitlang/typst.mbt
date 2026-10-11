@@ -90,7 +90,7 @@ fn strip_base_prefix(text : String) -> (NonDecimalBase?, String) {
 
 ///|
 /// Get the floating-point value.
-pub fn Float::get(self : Float) -> Double {
+pub fn FloatLit::get(self : FloatLit) -> Double {
   rust_parse_f64(self.node.leaf_text()).unwrap_or(0.0)
 }
 
