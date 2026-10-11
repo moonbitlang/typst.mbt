@@ -106,6 +106,13 @@ Typst source) are unchanged.
   has, not make them per call: the tracked world takes a book and a font
   for the same answer only as the same object (`FontBook::edition`,
   `Font::serial`). It stays correct otherwise, and finds less again.
+- `eval`: `eval_source` is memoized like upstream's `eval` (the store of
+  module evaluations, which only imports went through): two calls in one
+  scope of a world with the same source, library, route and traced span
+  give the same module, and the second replays the warnings of the first
+  instead of evaluating. The main file of a compilation is evaluated
+  through it. An evaluation is found by the source, with its span
+  numbers (`@library.source_fingerprint`), not by the text of its file.
 - `doc`: `Stroke(dash=..)` takes a `Dash` (it was a `Value`): write a
   preset (`Dotted`, `Dashed`, ..), `Pattern([..], phase=..)`, or
   `RawValue(v)` for the value passed before.
@@ -253,6 +260,16 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   field, in the element or the set rule (upstream's `Derived`), and
   syntaxes of nested set rules are folded with their sources.
 
+- A file that fails and is imported more than once in a compilation (from
+  two `context` blocks, whose errors are delayed) was reported with the
+  tracepoints of all imports that found its evaluation; it has that of
+  its own import, as upstream's. The store of module evaluations keeps a
+  copy of an error and hands out copies.
+- A file that is imported at two depths of the call stack is evaluated
+  again where the route is deeper than the depth checks of its first
+  evaluation allow (upstream tracks `Route::within`): a document whose
+  second import no longer fits the maximum call depth compiled, and now
+  fails with upstream's "maximum function call depth exceeded".
 - PDF export: raster images with the same bytes were taken for one image
   and embedded once, the first one for all of them: the same bytes read as
   pixels of another format (`format: (encoding: "luma8", ..)` and
@@ -277,6 +294,13 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 - `syntax`: `Source::serial`, `is_pristine`, and a slot of two words that
   a caller keeps with a source (`has_memo`, `memo_hi`, `memo_lo`,
   `set_memo`).
+- `library`: `source_fingerprint(Source)`, what a memoized evaluation of a
+  source is found by; `RouteShifts` (`allows`, `note_reused`),
+  `route_shifts_begin` and `route_shifts_end`, the depth checks of a
+  memoized evaluation of a source file; `SourceDiagnostic::clone`, a copy
+  with a trace and hints of its own.
+- `eval`: `module_memo_stats()`, how many evaluations of source files were
+  found and how many computed (for tests and measurements).
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
   the port of `typst-cli`'s, without its HTTP server for HTML export.
 - `kit/watcher`, a new package (upstream's `watcher` feature of typst-kit):
