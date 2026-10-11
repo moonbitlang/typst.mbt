@@ -406,7 +406,9 @@
   `bench/README.md`); profile with `moon run --profile --target native
   --release cli -- query --ignore-system-fonts bench/longer.typ heading`.
   comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
-  `layout_fragment_impl`, the counter sequence, the works of a
+  `layout_fragment_impl`, the blocks of a flow (`layout_single_impl`,
+  `layout_multi_impl`; below: "The block level of the flow"), the
+  counter sequence, the works of a
   bibliography (`Works::generate`) and closure calls
   (`eval_closure`, see below) are memoized, within a compilation (its
   evaluation and its introspection iterations) and from one compilation
@@ -786,6 +788,60 @@
   `eval/import_wbtest.mbt` and `library/memo_closure_wbtest.mbt`,
   `library/memo_identity_wbtest.mbt`; the `recompile` stage and
   `scripts/recompile_soak.py` are the gate.
+- The block level of the flow (slice 2 of `docs/incremental-design.md`,
+  "Slice 2 as built" in its section 8): `layout_single_impl` and
+  `layout_multi_impl` (`layout/flow_collect.mbt`) are memoized like
+  upstream's (`typst-layout/src/flow/collect.rs:420` and `:520`), through
+  `memoized_layout`, the store of paragraphs and fragments. The key is
+  the block element, the style chain and the region or regions (every
+  field: size, expand, `full`, the backlog and `last`), plus the resolved
+  locator and the route, like every layout key; the store gives the rest
+  (the library compared, the traced span, introspector reads and world
+  reads validated, the sink replayed, ages, limits, copies of the
+  frames). Every block, table, grid, list, shape, image and display
+  equation of a flow goes through it, so what an element stores is in
+  keys twice, as a fingerprint and for the exact comparison of
+  arguments. Rules. (1) A type that an element stores has a `Fingerprint`
+  and a case in the comparison (`values_memo_equal`, `dyns_memo_equal`)
+  that both cover what upstream's `Hash` and `PartialEq` cover, and the
+  comparison must call two values of the same content the same argument
+  whatever objects they are: a case that says "not the same object" makes
+  every layout around it miss in every iteration and compilation, and
+  nothing fails (`CellGrid`, which every realization of a grid or table
+  makes anew, did: no table was ever found again). A cell grid is
+  compared component by component (`library/memo_grid.mbt`); a new field
+  of a grid type goes into its `Fingerprint`, into that comparison and
+  into the list of variants of `library/memo_grid_wbtest.mbt`, which has
+  one grid per component. (A value that is not equal to itself, a float that
+  is NaN, is still the same argument only as the same object; upstream
+  hashes the bits.)
+  (2) A layout callback (`InlineCallback`, `BlockSingleCallback`,
+  `BlockMultiCallback`) is fingerprinted and compared as its kind and its
+  captured element; upstream hashes the function pointer too. That is
+  the same thing only while an element type has one callback per kind:
+  keep it so in `layout/rules.mbt`. A callback for plain content
+  (`BlockElem::multi_layouter_content`, the test runner's `bounds`) is
+  told apart from the callback of its content's rule
+  (`BlockMultiCallback.typed`); whoever makes such callbacks gives equal
+  content one function. (3) A layout that is found is a set of frames
+  that the store also holds: they are copy-on-write clones, safe under
+  every method of the frame one was handed (also `hide`, which goes into
+  groups), and not safe against writing to a frame taken out of a group
+  of an `items()` view, which is read-only by the contract of
+  `frame.mbt`; nothing in the engine or an exporter does that, and it
+  must stay so. (4) `@layout.block_memo_stats()` counts the block
+  layouts that were found and that were computed; tests assert hits
+  with it (`typst/block_memo_wbtest.mbt`: one test per part of the key
+  and per validation; `library/memo_frames_wbtest.mbt` for the copies;
+  `tests/recompile/docs/blocks` and the block-level mutations of
+  `tests/recompile/README.md` for the stage). (5) Costs: the fingerprint
+  of a grid is computed once per realized grid or table (it is part of
+  the element's cached data hash, where upstream's `LazyHash` is), not
+  per lookup, and compared once per lookup that finds a candidate; the
+  design's note has the shares. A first compilation of a document that
+  needs several introspection iterations gets faster (blocks are found
+  from the second on); one that converges in one iteration and is all
+  tables pays for the keys without a hit.
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for

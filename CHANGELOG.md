@@ -425,6 +425,15 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   with a trace and hints of its own.
 - `eval`: `module_memo_stats()`, how many evaluations of source files were
   found and how many computed (for tests and measurements).
+- `layout`: `block_memo_stats()`, how many layouts of blocks were found in
+  the store of memoized layouts and how many computed (for tests and
+  measurements). The layouts of blocks (`layout_single_impl`,
+  `layout_multi_impl`: every block, table, grid, list, shape, image and
+  display equation of a flow) are memoized like upstream's since slice 2
+  of `docs/incremental-design.md`: a later introspection iteration and a
+  later compilation of the process find them like paragraphs, and
+  `@library.layout_memo_entries()` counts their entries with those of
+  paragraphs and fragments. Nothing in an output changes.
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
   the port of `typst-cli`'s, without its HTTP server for HTML export.
 - `kit/watcher`, a new package (upstream's `watcher` feature of typst-kit):
