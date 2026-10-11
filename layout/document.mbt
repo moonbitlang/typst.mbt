@@ -30,6 +30,80 @@ pub fn PagedDocument::new(
 }
 
 ///|
+/// The document as an entry of a memoized layout keeps it (not upstream,
+/// whose `PagedDocument: Clone` shares what cannot be written to: an
+/// `EcoVec` of pages, frames with shared items, an `Arc` of the
+/// introspector; `layout_document_impl` in `pages.mbt`).
+///
+/// Another document with other pages, whose frames are copy-on-write
+/// clones, another info (its authors and keywords are arrays) and other
+/// format options. The introspector is the same object: it is made once
+/// from the pages as they were laid out, it answers the same for as long
+/// as it lives, and what it hands out is for reading. That it is the same
+/// matters: it is the introspector that the next iteration of a
+/// compilation lays the document out against, and an entry computed with
+/// it is found by its number (`@library.Introspector::serial`).
+///
+/// It is also the first half of what an entry hands out; the second is
+/// [PagedDocument::owned].
+fn PagedDocument::kept(self : PagedDocument) -> PagedDocument {
+  {
+    pages: self.pages.map(Page::kept),
+    info: self.info.copy(),
+    options: self.options.copy(),
+    introspector: self.introspector,
+    paged_introspector: self.paged_introspector,
+  }
+}
+
+///|
+/// The page with a copy-on-write clone of its frame (see
+/// [PagedDocument::kept]).
+fn Page::kept(self : Page) -> Page {
+  { ..self, frame: self.frame.clone(), }
+}
+
+///|
+/// The document as a memoized layout hands it to its caller, which may be
+/// a host: with pages whose frames share no frame and no group with
+/// anything that an entry keeps, at any depth (`@library.Frame::
+/// deep_clone`).
+///
+/// A copy-on-write clone is not enough here. The frames of a document are
+/// made of the frames that the entries of page runs, paragraphs and
+/// fragments keep, pushed into one another as clones, and a clone shares
+/// its groups with what it was cloned from: a holder that takes a group
+/// out of `Frame::items` and writes to it (its transform, its frame)
+/// would write to the kept layouts. So the document of a computation and
+/// the document that an entry hands out both get frames and groups of
+/// their own, all the way down; the info and the format options are
+/// already the caller's ([PagedDocument::kept], or the computation's
+/// own). What the items of a frame hold besides frames is shared (glyphs,
+/// curves, images, the content of tags): items are values.
+fn PagedDocument::owned(self : PagedDocument) -> PagedDocument {
+  { ..self, pages: self.pages.map(Page::owned), }
+}
+
+///|
+/// The page with a frame of its own ([PagedDocument::owned]).
+fn Page::owned(self : Page) -> Page {
+  { ..self, frame: self.frame.deep_clone(), }
+}
+
+///|
+/// Whether the document may be kept by an entry: no frame of its pages
+/// holds a host closure in its tags or in the frame of a tiling, nor does
+/// a fill (`@library.frame_cacheable`, the rule of every kept layout).
+fn PagedDocument::cacheable(self : PagedDocument) -> Bool {
+  for page in self.pages {
+    if !@library.frame_cacheable(page.frame) || !fill_cacheable(page.fill) {
+      return false
+    }
+  }
+  true
+}
+
+///|
 /// The document's finished pages.
 pub fn PagedDocument::pages(self : PagedDocument) -> ArrayView[Page] {
   self.pages[:]

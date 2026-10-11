@@ -16,6 +16,10 @@ pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@lib
 
 pub fn create_shape_plan(@library.FontInstance, @shape.Direction, @shape.Script, @shape.Language?, ArrayView[@shape.Feature]) -> @shape.ShapePlan
 
+pub fn document_memo_entries() -> Int
+
+pub fn document_memo_stats() -> (Int, Int)
+
 pub fn features(@library.StyleChain) -> Array[@shape.Feature]
 
 pub fn fill_and_stroke(@library.Frame, @library.Paint?, @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]], @library.Corners[@library.Rel[@library.Abs]], @syntax.Span) -> Unit
@@ -99,6 +103,10 @@ pub fn layout_table(@library.TableElem, @library.Engine, @library.Locator, @libr
 pub fn[T : FrameModify] modified(T, FrameModifiers) -> T
 
 pub fn modify_text(@library.Frame, @library.StyleChain) -> Unit
+
+pub fn page_run_memo_entries() -> Int
+
+pub fn page_run_memo_stats() -> (Int, Int)
 
 pub fn register(@library.NativeRuleMap) -> Unit
 

@@ -53,7 +53,7 @@ second only). The phases are not interleaved: a cache
 that keeps the last compilation only would otherwise never be asked for the
 step before, and the stage would pass without testing it.
 
-**The documents** (122 by default, and the five of the sequences that are
+**The documents** (123 by default, and the five of the sequences that are
 pinned to upstream's watch, below):
 
 - 3 of `bench/` (`tiny`, `long`, `showcase`: the documents whose
@@ -68,7 +68,7 @@ pinned to upstream's watch, below):
   PNG, JPEG, GIF, WebP, SVG with linked images, PDF, pixmaps, syntaxes and
   themes of `raw`, bibliographies, plugins). Some fail on purpose. Tests
   that upstream only evaluates are compiled to pages like the others.
-- 5 projects written for this stage (`docs/`), because the suite has no
+- 6 projects written for this stage (`docs/`), because the suite has no
   document of several files: `book` (a main file that includes chapters,
   which import a shared module, which reads a JSON file; CSV, TOML, YAML,
   text, a bibliography in an author-date style with citations inside
@@ -80,13 +80,20 @@ pinned to upstream's watch, below):
   `linked` (an SVG that links a PNG, as an image, in a tiling that is
   handed to functions and in one that a function captured: what the pages
   show is in a file that no element names, and whose bytes are in no
-  element) and `blocks` (what the block level of the flow keeps: tables
+  element), `blocks` (what the block level of the flow keeps: tables
   with a header, a footer, lines and a cell that spans, a grid, blocks in
   blocks, a block that breaks across three pages with a footnote of its
   own, shapes, one block three times; and four blocks whose layout
   depends on what is neither their text nor their styles: one reads a
   CSV file while it is laid out, one asks the document about a file that
-  is included after it, one reads `sys.inputs`, one warns).
+  is included after it, one reads `sys.inputs`, one warns) and
+  `pages` (many page runs, for the runs and the documents
+  that a compilation keeps: page set rules in the middle, a header that
+  queries the document, a footer with the number of pages and with what
+  a function read from a file when the footer was laid out, an outline,
+  footnotes across pages, columns, runs that are the same child for
+  child and span for span, a blank page for the parity, two-sided
+  margins, a second numbering).
 - 3 documents with real packages (`tests/packages/docs`: a touying deck, an
   ilm book with a bibliography, cmarker with its plugin and a Markdown
   file), if `.repos/typst-packages` is there; all 99 with `--all`. They
@@ -167,7 +174,9 @@ what the process shares:
   reference: everything that has an age. That is the stores of memoized
   calls (`layout_store`, the counter sequence, the works of a
   bibliography, `closure_store` in `library/memo.mbt`; the module
-  evaluations of `eval/import.mbt`), the results kept by content
+  evaluations of `eval/import.mbt`; since slice 3 the page runs and
+  documents of `layout`, with the answers that the read accelerator keeps
+  for their introspectors), the results kept by content
   (`library/memo_content.mbt`: decoded raster images, highlighted raw
   text, the PDF exporter's images) and the caches of data decoded from
   bytes (syntaxes and themes of `raw`, bibliographies, CSL styles, PDF
@@ -377,9 +386,9 @@ again). The stage's own verdict
 must be the same with it, the count of pinned steps included: a second run
 of the check must leave no trace in what has an age.
 
-The default run is the CI run: 127 documents, 244 sequences (236, 3 with
-packages and 5 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1476
-steps and 4406 compilations with their exports, about 40 s on an M-series
+The default run is the CI run: 128 documents, 246 sequences (238, 3 with
+packages and 5 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1489
+steps and 4445 compilations with their exports, about 40 s on an M-series
 machine. `--sequences=N` and `--steps=N` size
 the random sequences of every document, `--seed=N` and `--rounds=N` choose
 the seeds, `--all` adds `bench/longer` and every document with packages,
@@ -416,9 +425,9 @@ That the stage catches stale results is shown by putting bugs in, one at a
 time, and running the default stage (seed 1). They are not in the tree; to
 repeat one, change the code as said, build the runner in release and run
 `recompile -v`. All numbers are of the tree as it was when a table was
-made, with every store kept (242 sequences then; 244 since the project
-`blocks`, for the tables of "The block level"); with the seed that a
-failure prints, each is
+made, with every store kept (242 sequences then; 246 since the projects
+`blocks` and `pages`, for the tables of "The block level, page runs and
+documents"); with the seed that a failure prints, each is
 repeated by `recompile --only=<document> --seed=1 -v` on the mutated tree.
 
 The three stores, each with the validation of its world reads off (the
@@ -503,42 +512,63 @@ the design's section 5.5):
 | 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats` | the page images in all three (the page hashes as before, so the loop keeps the image it had), and in one of them the PDF; the frames and the SVG of the loop are those of the reference |
 | 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process (a result found without its key holding the file and without a read of it) | 1 | `suite/model/bibliography.typ/bibliography-multiple-files`, sweep, step 3 | the pages; the dependencies and the diagnostics where the bibliography file is no longer read |
 
-### The block level
+### The block level, page runs and documents
 
-The layouts of blocks are entries of the store of layouts since slice 2 of
-the design (`layout_single_impl` and `layout_multi_impl` in
+Slices 2 and 3 of the design keep the layouts of blocks
+(`layout_single_impl` and `layout_multi_impl` in
 `layout/flow_collect.mbt`, upstream's two memoized functions of
-`flow/collect.rs`). They have the validations of every entry of that
-store, so mutation 2 above is also theirs; to show that the stage sees a
-block that is stale *by itself*, each of these is put in for blocks alone
-(a switch that only the two functions pass: the paragraphs and fragments
-inside a block keep their validations and would otherwise hide it). The
-stage has 244 sequences since the project `blocks` was added, which is
-the document that several of these need; the tests are those of
-`typst/block_memo_wbtest.mbt` (13) and `library/memo_frames_wbtest.mbt`.
+`flow/collect.rs`, in the store of paragraphs and fragments), of page
+runs and of the document (`layout/pages_run.mbt`, `layout/pages.mbt`,
+`library/memo_pages.mbt`), and the answers of the read accelerator by
+introspector (`library/introspector.mbt`). The projects `blocks` and
+`pages` were written for them. The tables below are of the tree that has
+both (246 sequences; the tables above are of the tree before, of 242):
+all mutations of both slices run again there, 75 in all, each put in by
+a script on a copy of the tree, one at a time, never committed, on the
+default `recompile` stage (seed 1) and on the unit tests. The numbers
+that each slice had alone are in its note in the design
+(`docs/incremental-design.md`, section 8). The tests: B is
+`typst/block_memo_wbtest.mbt` (13 tests), P `typst/pages_memo_wbtest.mbt`
+(12), T `typst/layers_memo_wbtest.mbt` (4: the levels together), R
+`layout/pages_run_wbtest.mbt`, F `library/memo_frames_wbtest.mbt`, A
+`library/read_accelerator_wbtest.mbt` (6). The numbers in brackets are
+those of section 9.1 of the design.
 
-| Mutation, for blocks alone | Failing sequences, of 244 | First at | Tests that fail |
+**Blocks.** The entries of blocks have the validations of every entry of
+the store of layouts, so mutation 2 above is also theirs; to show that
+the stage sees a block that is stale *by itself*, each of these is put in
+for blocks alone (a switch that only the two functions set: the
+paragraphs and fragments inside a block keep their validations and would
+otherwise hide it).
+
+| Mutation, for blocks alone | Failing sequences, of 246 | First at | Tests that fail |
 |---|---|---|---|
-| the world reads of an entry are not validated | 47, in 40 documents | `project/blocks`, sweep, step 2 (the fonts) | "a block that reads a file is laid out again when the file changes" |
-| the introspector reads of an entry are not validated | 42, in 25 documents | `bench/long`, sweep, step 0: the first compilation, whose second iteration finds the blocks of the first | 3: "a block whose content queries the document ..", "the same block at three places ..", "a block that breaks .." |
-| the locator is not in the key | 2 | `project/blocks`, sweep, step 0 (one block three times: all three say where the first is) | 2: "the same block at three places is three layouts", and the count of what an empty store finds |
-| the regions are not in the key of `layout_multi_impl` | 10, in 9 documents | `bench/long`, sweep, step 0 | 2 |
-| the region is not in the key of `layout_single_impl` | 14, in 9 documents | `bench/long`, sweep, step 0 | 1 |
-| the backlog and `last` are not in the key (the size, the flags and `full` are) | 2 | `project/blocks`, sweep, step 0 (the block that breaks, on the page of its footnote) | "a block that breaks is laid out for the regions it gets" |
-| the styles are neither in the key nor compared | 17, in 16 documents | `project/book`, sweep, step 5 | "the same block under other styles is another layout" |
-| the sink of an entry that is found is not replayed | 2 | `project/blocks`, sweep, step 0 (the warning of the block that warns is missing) | "the warnings of a block that is found are reported again" |
-| the route is not in the key | 0 | no sequence: in a document the route of a layout is as deep as the layout is nested, and what is nested differently has another locator. It decides one thing, the error at the maximum layout depth | "a block is laid out for the route it is on" (a host's block on routes of two depths) |
-| the library is not compared | 0 | no sequence: a block of a document that can tell two libraries apart has another key under each (the closure of a `context` block captured `sys` with the inputs; default styles are in the chain). For closure calls and module evaluations the comparison is the first line (the row "[12]" above) | "a block whose callback asks the library is laid out per library" (a host's callback that asks for a feature) |
+| the world reads of an entry are not validated [1 to 6] | 47, in 41 documents | `project/blocks`, sweep, step 2 (the fonts) | B, "a block that reads a file is laid out again when the file changes"; two tests of linked images |
+| the introspector reads of an entry are not validated [11] | 42, in 25 documents | `bench/long`, sweep, step 0: the first compilation, whose second iteration finds the blocks of the first | 16: 3 of B ("a block whose content queries the document ..", "the same block at three places ..", "a block that breaks .."), 2 of T, 10 of P, one of the works |
+| the introspector reads of an entry that is found are not its caller's (new: the levels together) | 4, in 3 documents | `project/blocks`, sweep, step 5: a run that was laid out around a found block is found where the block's read says otherwise | 4: T, "the reads of a block that is found are those of the run and of the document around it" and "a block found inside a run found inside a document found ..", and 2 of B |
+| the locator is not in the key | 2 | `project/blocks`, sweep, step 0 (one block three times: all three say where the first is) | B, "the same block at three places is three layouts" and "a table and a block are found again .." |
+| the regions are not in the key of `layout_multi_impl` | 10, in 9 documents | `bench/long`, sweep, step 0 | 2 of B |
+| the region is not in the key of `layout_single_impl` | 16, in 10 documents | `bench/long`, sweep, step 0 | 1 of B |
+| the backlog and `last` are not in the key (the size, the flags and `full` are) | 2 | `project/blocks`, sweep, step 0 (the block that breaks, on the page of its footnote) | B, "a block that breaks is laid out for the regions it gets" |
+| the styles are neither in the key nor compared | 18, in 17 documents | `project/book`, sweep, step 5 | B, "the same block under other styles is another layout" |
+| the sink of an entry that is found is not replayed [14] | 2 | `project/blocks`, sweep, step 0 (the warning of the block that warns is missing) | B, "the warnings of a block that is found are reported again"; T, "a block found inside a run found inside a document found .." |
+| the route is not in the key | 0 | no sequence: in a document the route of a layout is as deep as the layout is nested, and what is nested differently has another locator. It decides one thing, the error at the maximum layout depth | B, "a block is laid out for the route it is on" (a host's block on routes of two depths) |
+| the library is not compared [12] | 0 | no sequence: a block of a document that can tell two libraries apart has another key under each (the closure of a `context` block captured `sys` with the inputs; default styles are in the chain) | B, "a block whose callback asks the library is laid out per library" (a host's callback that asks for a feature) |
 | an entry keeps the frames that its caller has (no copy when it is stored) | 0 | no sequence and no test: the callers of the two functions keep what they get in a `CachedCell` and hand out clones | |
 | an entry hands out the frames that it keeps (no copy when it is found) | 0 | the same | |
 
-The copies, then, for every layout of the store, where they are what
-keeps a result from the callers before:
+The copies, then, for every entry of `memoize` (layouts, and since slice
+3 page runs and documents), where they are what keeps a result from the
+callers before:
 
-| Mutation | Failing sequences, of 244 | First at | Tests that fail |
+| Mutation | Failing sequences, of 246 | First at | Tests that fail |
 |---|---|---|---|
-| `memoize` keeps the result that it returns to the caller that computed it | 40, in 25 documents | `bench/long`, sweep, step 0 | `library/memo_frames_wbtest.mbt`, and 2 of the block tests |
-| `memoize` hands out the result that it keeps | 26, in 18 documents | `bench/long`, sweep, step 0 | the same test, and 1 of the block tests |
+| `memoize` keeps the result that it returns to the caller that computed it | 33, in 21 documents | `bench/long`, sweep, step 0 | F; R; B, the tables test; P, "what a caller writes to a document it was handed .." |
+| `memoize` hands out the result that it keeps | 18, in 14 documents | `bench/long`, sweep, step 0 | the same four |
+
+(Slice 2 alone had 40 and 26: a page run that is found hands on frames
+that `finalize_page` does not write to, and a run that is found asks
+for no block.)
 
 What a block is found by besides its text, styles and place is what it
 holds, and for a grid or a table that is the cell grid, which every
@@ -550,10 +580,51 @@ fail, `library/memo_grid_wbtest.mbt`, with one grid per component:
 
 | Mutation | What fails |
 |---|---|
-| the comparison as it was: two grids are equal only as the same object | all three tests of that file, and the block tests that find a table: none is found again (`bench/long`: 114 block layouts computed in every recompilation instead of none) |
-| the comparison leaves out one of: `has_gutter`; the number of entries; `cols`; `rows`; `headers`; `footer`; `vlines`; `hlines`; the parent of a merged entry; whether an entry is a cell or merged; the cells; a cell's `colspan`, `rowspan`, `breakable`, `stroke_overridden`, `fill`, `stroke`, the stroke of its left, top, right or bottom side, its `body`; a line's `index`, `start`, `end`, `position`, `stroke`; the number of lines before a track (31 mutations) | "a grid that differs in one component is another argument", each at the grid that differs in that component |
+| the comparison as it was: two grids are equal only as the same object | all three tests of that file, and four of B (the tests that find a table) |
+| the comparison leaves out one of: `has_gutter`; the number of entries; `cols`; `rows`; `headers`; `footer`; `vlines`; `hlines`; the cells; the parent of a merged entry; whether an entry is a cell or merged; a cell's `colspan`, `rowspan`, `breakable`, `stroke_overridden`, `fill`, `stroke`, the stroke of its left, top, right or bottom side, its `body`; the number of tracks with lines; the number of lines before a track; a line's `index`, `start`, `end`, `position`, `stroke` (29 mutations, one per clause of the comparison; slice 2 counted 31) | "a grid that differs in one component is another argument", each at the grid that differs in that component (seven of them also "host closures in a body, a fill and a stroke ..") |
 | the body of a cell is compared with `==`; the host closures of a tiling in a fill, or in a stroke, are not compared as objects (3 mutations) | "host closures in a body, a fill and a stroke are compared as objects" |
 | a callback for plain content has the fingerprint of the callback of its content's rule, or compares equal to it (2 mutations) | `library/memo_callback_wbtest.mbt` |
+
+**Page runs and documents.**
+
+| what was broken | failing sequences, of 246 | first exposed at, and what else exposes it |
+| --- | ---: | --- |
+| page runs: the world reads of an entry are not validated [1 to 6, for this store] | 61, in 52 documents | `bench/tiny`, sweep, step 1 (the fonts); P, "a layout that failed inside a function read the file for its tracepoint"; B, "a block that reads a file ..": its run is found |
+| documents: the same | 73, in 61 documents | `bench/tiny`, sweep, step 1; the same tests |
+| page runs: the introspector reads of an entry are not validated [11] | 39, in 23 documents | `project/blocks`, sweep, step 0 (the first compilation differs from one without memoization: a later iteration takes the run of the first); 16 tests |
+| documents: the same [11] | 134, in 76 documents | `bench/long`, sweep, step 0 (the document of the first iteration is taken for the second, and the compilation ends with it); the watch loop gives upstream's watch output at 11 of the 18 pinned steps; 44 tests |
+| page runs: the introspector reads of an entry that is found are not its caller's | 3 | `suite/introspection/counter.typ/counter-page`, sweep, step 2; 7 tests, among them T, "the reads of a block that is found .." |
+| documents: the same (the constraint of the loop stays empty, and the loop stops after the first iteration that finds its document) | 70, in 54 documents | `project/blocks`, sweep, step 4; the watch loop gives upstream's watch output at 13 of the 18 pinned steps; 13 tests |
+| page runs and documents: the sink of an entry that is found is not replayed [14] | 17, in 10 documents | `project/blocks`, sweep, step 4 (the warning of its block is gone); P, "a document that is found says what its layout said"; T, "a block found inside a run found inside a document found .."; B, "the warnings of a block that is found .." |
+| page runs and documents: the library is not compared [12] | 0 | no sequence: the libraries of the stage differ in `sys.inputs`, which the main file is evaluated with, to other content and another key. P, "a document and a page run are those of their library" |
+| page runs: the locator is not in the key | 2 | `project/pages`, the sweep and the random sequence, step 0 (its empty pages: the children of any other run hold their locations); P, "runs with the same children are told apart by where they are" |
+| the document of a bundle: the locator is not in the key | 0 | no sequence, and the `bundle` stage passes (39 of 39: no bundle of the suite has two documents with the same content). P, "the documents of a bundle are told apart by where they are" |
+| page runs: the styles of the children are neither in the key nor compared | 7 | `suite/introspection/counter.typ/counter-display-matching-numbering-full`, random sequence, step 4; B, "the same block under other styles is another layout" (its run is found) |
+| page runs: the initial styles are neither in the key nor compared | 3 | `project/pages`, random sequence, step 4 |
+| page runs: an entry hands out the pages it keeps | 0 | no sequence and no document: `finalize_page` moves the frames it is handed and does not write to them. R (a caller that writes) |
+| documents: an entry keeps the document that it hands on (`kept` is the identity) | 0 | no sequence (the stage exports a held document again; it does not write to one). P, "what a caller writes to a document it was handed is not written to the kept one" |
+| documents: what an entry keeps has the info it was made of; the format options | 0, 0 | the same test, for each |
+| documents: a caller gets the frames and groups of the kept layouts (`owned` is the identity) | 0 | no sequence. P, "what a caller writes to a group inside a page it was handed is written to no kept layout"; T, "what a caller writes to the groups of a document is written to no kept block" |
+| the frame of an HTML document is the clone of the kept layout | 0 | no sequence, and the `html` stage passes. T, "the frame of an HTML document is not the frame of the kept layout" |
+| documents: what an entry keeps has the page frames it was made of, not clones | 0 | nothing, and nothing can: since the caller gets frames of its own it never holds what the entry keeps. The clone is the cheap half of `PagedDocument::kept` being a document of its own, not what protects the entry |
+| page runs and documents: every result may be kept (`cacheable` is always true) | 0 | nothing: `edsl` 51 of 51, `library/memo_identity_wbtest.mbt` 7 of 7. An entry whose key holds a host closure ends with its compilation, and a result that got one from an introspector read is taken for that introspector only; the test is the rule of every kept layout (`frame_cacheable`), kept here as there |
+| the accelerator answers for any introspector | the runner aborts (exit status 134) | before the first sequence is done, as in step 5: a kept layout holds locations that the introspector at hand does not know. A, 5 tests; 13 others |
+| the accelerator has one answer per introspector, whatever the read | the runner aborts | the same; A, all tests; 13 others |
+| the accelerator: a new introspector starts with the older answers of the one asked before it | the runner aborts | the same; A, "answers stay for the compilation after the one that asked" |
+| the accelerator: the answers of an introspector that stays are never dropped | 0 | A, "of an introspector that stays, the answers that are no longer asked for go" (growth, not a wrong answer) |
+| the accelerator keeps a table for the empty introspectors too | 0 | A, "the answers of the empty introspectors are not a table" (growth, not a wrong answer) |
+
+The count of pinned steps is 18 under every mutation that lets the stage
+finish, but the two named. Four rows are of copies that no document can
+reach and that unit tests hold; two (`cacheable`, the clone in `kept`)
+and the two copies of blocks are of guards that nothing can reach, and
+are said to be that.
+
+`scripts/recompile_soak.py --minutes 20` on the merged tree, with cold
+references: 128 documents, seeds 9300 to 9311, 21.9 minutes with 8 jobs
+(the mutation checks ran beside it): 1536 runs, 7440 sequences, 84 712
+steps, 250 752 compilations, 4548 steps compiled again as the first
+compilation of a new process; 0 failures, 0 aborts.
 
 ### How the stores came to be kept
 

@@ -2,8 +2,10 @@
 //
 // Layout of content into a [PagedDocument].
 //
-// Upstream memoizes `layout_document_impl` and lays out page runs in
-// parallel; here everything is computed sequentially, in the same order.
+// Upstream memoizes `layout_document_impl` and
+// `layout_document_for_bundle_impl`, and so does the port
+// (`library/memo_pages.mbt`). Upstream lays out page runs in parallel; here
+// everything is computed sequentially, in the same order.
 
 ///|
 /// Layout content into a document.
@@ -17,7 +19,79 @@ pub fn layout_document(
   content : @library.Content,
   styles : @library.StyleChain,
 ) -> PagedDocument raise @library.SourceError {
-  layout_document_common(engine, content, @library.Locator::root(), styles)
+  layout_document_impl(engine, content, styles)
+}
+
+///|
+/// The kept documents ([layout_document_impl],
+/// [layout_document_for_bundle_impl]; upstream has a cache per function,
+/// here the name of the function is in the key).
+let document_memo : @library.PageMemo[PagedDocument] = @library.PageMemo::new(
+  "layout of the document",
+)
+
+///|
+/// How many documents were answered by a kept layout and how many were
+/// laid out since the process started (for tests and measurements, like
+/// `@library.closure_memo_stats`). A compilation lays the document out
+/// once per iteration of its introspection loop.
+pub fn document_memo_stats() -> (Int, Int) {
+  document_memo.stats()
+}
+
+///|
+/// The number of documents that are kept (for tests and measurements).
+pub fn document_memo_entries() -> Int {
+  document_memo.entries()
+}
+
+///|
+/// The internal implementation of `layout_document` (memoized like
+/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/mod.rs:55`;
+/// see `library/memo_pages.mbt`).
+///
+/// Upstream hashes the library, the content and the styles, and tracks the
+/// world, the introspector, the traced span, the sink (mutably) and the
+/// route. Here the content and the styles are the key, with the route
+/// (which the keys of all layouts hold in full, `library/memo.mbt`) and
+/// the traced span; the library is compared, the world and the
+/// introspector are tracked, and the sink is replayed.
+///
+/// What an entry keeps is a copy of the document, and what the caller
+/// gets, computed or found, is a document whose frames are its own all
+/// the way down (`PagedDocument::kept`, `PagedDocument::owned`).
+fn layout_document_impl(
+  engine : @library.Engine,
+  content : @library.Content,
+  styles : @library.StyleChain,
+) -> PagedDocument raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    return layout_document_common(
+      engine,
+      content,
+      @library.Locator::root(),
+      styles,
+    )
+  }
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_document")
+    state.write(content)
+    state.write_u128(styles.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  @library.memoized_pages(
+    document_memo,
+    engine,
+    key,
+    Some(content),
+    [][:],
+    styles,
+    PagedDocument::kept,
+    PagedDocument::cacheable,
+    engine => {
+      layout_document_common(engine, content, @library.Locator::root(), styles)
+    },
+  ).owned()
 }
 
 ///|
@@ -28,8 +102,56 @@ pub fn layout_document_for_bundle(
   locator : @library.Locator,
   styles : @library.StyleChain,
 ) -> PagedDocument raise @library.SourceError {
-  let link = @library.LocatorLink::new(locator)
-  layout_document_common(engine, content, @library.Locator::link(link), styles)
+  layout_document_for_bundle_impl(engine, content, locator, styles)
+}
+
+///|
+/// The internal implementation of `layout_document_for_bundle` (memoized
+/// like upstream's, `typst-layout/src/pages/mod.rs:102`).
+///
+/// As [layout_document_impl]; upstream tracks the locator besides, and
+/// the key has it resolved, as the keys of all layouts do.
+fn layout_document_for_bundle_impl(
+  engine : @library.Engine,
+  content : @library.Content,
+  locator : @library.Locator,
+  styles : @library.StyleChain,
+) -> PagedDocument raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    let link = @library.LocatorLink::new(locator)
+    return layout_document_common(
+      engine,
+      content,
+      @library.Locator::link(link),
+      styles,
+    )
+  }
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_document_for_bundle")
+    state.write(content)
+    state.write_u128(styles.memo_hash())
+    state.write_u128(locator.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  @library.memoized_pages(
+    document_memo,
+    engine,
+    key,
+    Some(content),
+    [][:],
+    styles,
+    PagedDocument::kept,
+    PagedDocument::cacheable,
+    engine => {
+      let link = @library.LocatorLink::new(locator)
+      layout_document_common(
+        engine,
+        content,
+        @library.Locator::link(link),
+        styles,
+      )
+    },
+  ).owned()
 }
 
 ///|

@@ -1119,7 +1119,7 @@ fn kept_value(value : Value) -> Value {
 /// closures (`fingerprint_identity`), which compare by identity and whose
 /// fingerprint is a key of the host's. The same holds for the frames of
 /// its tiling paints.
-fn frame_cacheable(frame : Frame) -> Bool {
+pub fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {
       Group(group) => if !frame_cacheable(group.frame) { return false }
@@ -1156,7 +1156,7 @@ fn frame_cacheable(frame : Frame) -> Bool {
 ///|
 /// See [frame_cacheable]: the fingerprint of a tiling's frame (computed
 /// once per tiling) records whether it holds such values.
-fn paint_cacheable(paint : Paint) -> Bool {
+pub fn paint_cacheable(paint : Paint) -> Bool {
   match paint {
     Tiling(tiling) =>
       (tiling.frame_fingerprint_flags() & fingerprint_identity) == 0

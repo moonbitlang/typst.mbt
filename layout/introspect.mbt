@@ -63,10 +63,15 @@ pub fn PagedIntrospector::elements(
 ///|
 /// Returns the locations that the paged document links to via
 /// `FrameItem::Link`.
+///
+/// A copy (upstream hands out a reference that cannot be written to): a
+/// document that a memoized layout keeps and the documents that it hands
+/// out have one introspector (`PagedDocument::kept`), so what it holds is
+/// for reading.
 pub fn PagedIntrospector::frame_link_targets(
   self : PagedIntrospector,
 ) -> @hashset.HashSet[@library.Location] {
-  self.frame_link_targets
+  self.frame_link_targets.copy()
 }
 
 ///|

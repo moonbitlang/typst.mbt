@@ -148,7 +148,10 @@ fn handle(
         @library.Axes::splat(false),
       ),
     )
-    let node = Frame(HtmlFrame::new(frame, styles, span))
+    // (Not upstream: the frame goes into a document, which a host holds
+    // and can write to, and it is a clone of what the store of layouts
+    // keeps, which shares its groups with it. See `Frame::deep_clone`.)
+    let node = Frame(HtmlFrame::new(frame.deep_clone(), styles, span))
     // A frame is block-level by default like a Typst `image`. It can
     // be wrapped in a `box` to omit the `display` annotation.
     make_block_level(node).unwrap()
