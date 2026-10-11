@@ -1193,6 +1193,11 @@ pub impl FromValue for FontFeatures with fn from_value(v) {
     }
     Dict(values) => {
       let out = []
+      // (The default, read for every run of text that is shaped: no
+      // iterator over a map without entries.)
+      if values.map.is_empty() {
+        return FontFeatures(out)
+      }
       let mut i = 0
       for k, v in values.map {
         let hint = tag_hint_helper(i, repr_str(k))

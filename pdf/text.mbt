@@ -65,7 +65,9 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
     }
   }
   t.glyphs.map(g => {
-    let (start, end) = g.range()
+    // (`let (start, end) = g.range()`, without the tuple.)
+    let start = g.range_start.to_int()
+    let end = g.range_end.to_int()
     {
       glyph_id: g.id.to_int(),
       text_start: map(start),

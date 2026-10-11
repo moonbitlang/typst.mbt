@@ -8061,7 +8061,7 @@ pub impl FromValue for LocatableSelector
 pub impl IntoValue for LocatableSelector
 pub impl Reflect for LocatableSelector
 
-pub(all) struct Location(U128) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Location(U128) derive(Eq, @debug.Debug)
 pub fn Location::castable(Value) -> Bool
 pub fn Location::hash(Self) -> U128
 pub fn Location::input() -> CastInfo
@@ -8070,6 +8070,7 @@ pub fn Location::output() -> CastInfo
 pub fn Location::page_numbering(Self, Engine, @moonbitlang/typst/syntax.Span) -> Numbering?
 pub fn Location::repr(Self) -> String
 pub fn Location::variant(Self, Int) -> Self
+pub impl Hash for Location
 pub impl Show for Location
 pub impl Fingerprint for Location
 pub impl FromValue for Location
