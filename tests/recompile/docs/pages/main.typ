@@ -60,6 +60,13 @@ that of the last on page #context locate(<last>).page() of
   leaf[The same leaf, #context counter(page).display().]
 }
 
+// Empty pages one after the other: runs without children under the same
+// styles, whose headers and footers get their locations from where the
+// run is.
+#pagebreak()
+#pagebreak()
+#pagebreak()
+
 // A blank page for the parity, and pages with their own numbering.
 #pagebreak(to: "odd")
 #set page(flipped: false, columns: 1, fill: none, numbering: "i")
