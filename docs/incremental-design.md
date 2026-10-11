@@ -3890,7 +3890,11 @@ frames around them. How the 28 MB divide between the two was not
 measured. The block level is slice 2: with it a page run that is laid
 out again holds clones of kept block frames, and what an edit leaves
 should come down towards the children and the page frames; that is to
-be measured when the two slices are together.
+be measured when the two slices are together. (It was, and this
+paragraph's supposition was wrong: the frames are 2.6 MB of what an edit
+leaves, and the rest is the realized content of each iteration, which
+the children, the tags of the page frames and the document's
+introspector reach. "Slices 2 and 3 together", "Memory".)
 
 *A bound, proposed and not built.* The plateau more than doubles for
 edits at the end, so here is what a smaller age for the entries of these
@@ -4247,13 +4251,419 @@ What they would take, now that the store is generic:
   the run (the fingerprints of its children, which the paragraphs' keys
   then find computed), 1.2 ms for the exact comparison and the test of
   what may be kept, and 1.5 ms for the introspector of the new document.
-- The memory of a session is dominated by the frames of blocks that no
-  entry keeps and every iteration lays out again (above). Measure it
-  again when slice 2 is merged, before deciding on a smaller age.
+- The memory of a session was supposed here to be dominated by the
+  frames of blocks that no entry keeps and every iteration lays out
+  again (above), to be measured again when slice 2 is merged, before
+  deciding on a smaller age. It was measured, and it is the realized
+  content of each iteration, not the frames ("Slices 2 and 3 together",
+  "Memory").
 - A document entry is only as good as the content is stable: every edit
   of the main file that changes a span changes the key. What would find
   more is below the document (the block level) or beside it (page runs,
   for documents that are made of many).
+
+#### Slices 2 and 3 together
+
+The two slices were built on two branches from one base (`565eac6`) and
+measured alone, each in its note above. This is the tree that has both:
+the block level merged into the branch of the page level. What each note
+says of its own slice holds; what is here is what changes when the three
+levels (blocks, page runs, the document) are in one tree.
+
+**What interacts.** A result that is found asks for nothing beneath it,
+and a result that is laid out finds what is beneath it. So:
+
+- A document that is found asks for no page run, and a page run that is
+  found asks for no block. Six tests of slice 2 expected a block to be
+  asked for by a compilation that now finds the document or the run
+  around it; they lay the run out again where they meant "the blocks are
+  found" (a rectangle more at the end), and say that nothing is asked
+  where they compiled the same text twice.
+- A page run that is laid out again finds its blocks, and their reads
+  are not made. They must be reads of the run's entry and of the
+  document: `memoize` merges the reads of an entry that is found into
+  the recorder of its caller, at every level. The test
+  (`typst/layers_memo_wbtest.mbt`, "the reads of a block that is found
+  are those of the run and of the document around it"): a block reads
+  the final value of a counter; the rectangle beside it changes, so the
+  run is laid out and the block found; then another run steps the
+  counter once more, and the run of the block, whose children are what
+  they were, is rejected by the read that the block made two
+  compilations ago. With the reads of a found block not merged
+  (mutation below) the page shows the old value.
+- All three found: a block that warns, in a run, in a document. Whichever
+  level is found, the warning is reported once, as from scratch, and
+  the counters of the three stores say that nothing beneath the level
+  that was found was asked ("a block found inside a run found inside a
+  document found says what a compilation from scratch says").
+- The frames. Slice 2's review noted that a frame taken out of a group
+  of an `items()` view and written to is the store's object. For a
+  paged document that is closed: what `layout_document` returns has
+  frames and groups of its own at every depth (`Frame::deep_clone`),
+  also where they came from kept blocks, and the test writes to every
+  group of a document and then lays the run out again of the kept
+  blocks ("what a caller writes to the groups of a document is written
+  to no kept block"). What else a host can reach:
+  - the frame of an `html.frame` element in an HTML document, which is
+    the clone of a kept fragment: a deep copy since this merge
+    (`html/convert.mbt`; the last test of that file fails without it);
+  - the documents of a bundle: the paged ones are those of
+    `layout_document_for_bundle`, the HTML ones have the frames above;
+  - `@layout.layout_fragment`, `layout_frame` and the other layout
+    functions of the engine, called by a host directly: they return
+    clones, as the engine needs them. A host that calls them and writes
+    to a group calls `deep_clone` first; nothing in the repository does
+    (`doc` compiles and reads);
+  - what an item holds besides frames (glyphs, curves, the content of
+    tags) is shared everywhere, as before: items are values.
+
+**The stage.** 128 documents (slice 2's project `blocks` and slice 3's
+`pages`), 246 sequences (238, 3 with packages, 5 pinned), 1489 steps,
+4445 compilations; none fails, and the watch loop gives upstream's watch
+output at the 18 pinned steps.
+
+**Mutation checks**, all of both slices again on the merged tree (75
+mutations: a script per mutation in four copies of the tree, never
+committed), with one more for the two levels together.
+`tests/recompile/README.md` has the tables. In short, against each
+slice alone (failing sequences of the default stage; alone of 244,
+together of 246):
+
+| what was broken | alone | together |
+| --- | ---: | ---: |
+| blocks: world reads not validated | 47 | 47 |
+| blocks: introspector reads not validated | 42 | 42 |
+| blocks: the reads of an entry that is found are not its caller's (new) | | 4 |
+| blocks: the locator, the regions of `layout_multi_impl`, the region of `layout_single_impl`, the backlog and `last` not in the key | 2, 10, 14, 2 | 2, 10, 16, 2 |
+| blocks: the styles neither in the key nor compared; the sink not replayed | 17, 2 | 18, 2 |
+| blocks: the route not in the key; the library not compared; the two copies | 0 | 0 (the same tests) |
+| `memoize` keeps what it returns; hands out what it keeps | 40, 26 | 33, 18 |
+| the grid comparison: as it was, 29 clauses left out one by one, 3 looser, 2 for callbacks | unit tests | the same unit tests, every one |
+| page runs: world reads; introspector reads not validated | 56, 35 | 61, 39 |
+| documents: the same | 70, 132 | 73, 134 |
+| page runs: reads of a found entry not the caller's; documents: the same | 3, 67 | 3, 70 |
+| page level: the sink not replayed | 15 | 17 |
+| page runs: the locator; the children's styles; the initial styles | 2, 7, 2 | 2, 7, 3 |
+| page level: the library; the bundle's locator; the copies (five); the deep copy; `cacheable` | 0 | 0 (the same tests; the frame of an HTML document: one test more) |
+| the accelerator: three that give a wrong answer | the runner aborts | the runner aborts |
+
+No mutation that a sequence saw alone is hidden by the other slice: the
+counts are what they were or higher (the documents of the other slice's
+project), but for the two copies of `memoize`, which fewer sequences
+see (33 and 18 for 40 and 26) because a page run that is found hands on
+frames that `finalize_page` does not write to and asks for no block. The
+count of pinned steps is 18 under every mutation that lets the stage
+finish but two of the documents' (11 with their reads not validated, 13
+with their reads not merged).
+
+**Gates on the merged tree.** `moon test --target native -j16`: 6197
+tests, none failing. `moon check` on native, wasm-gc and wasm: the five
+known warnings. Every stage of `scripts/ci/stages.py` (locally all but
+the two that fail on this machine without the change: one stale golden
+of `pdf-semantic`, short inputs of `wasm-validate`). The recording check:
+`paged` 51 339 entries, `edsl` 122 740, `recompile` 131 678, `packages`
+1 360 939; no entry differs, 18 pinned steps under it.
+`scripts/tracked_world_check.py`: nothing. `scripts/watch_check.py`: 14
+scenarios pass on native. The EDSL conversion sweep: 4549 cases pass,
+none fails. The soak: 128 documents, seeds 9300 to 9311, 21.9 minutes
+with 8 jobs: 1536 runs, 7440 sequences, 84 712 steps, 250 752
+compilations, 4548 cold references; 0 failures, 0 aborts.
+
+**Measured.** As in the notes above (five watch sessions per binary and
+document, medians of 25 recompilations, milliseconds). "Step 5" is
+`main` at `565eac6`; "blocks" and "pages" are the two slices alone, from
+their own notes (other sessions on the same machine: compare them with
+their own "before" there, not with these columns to the millisecond).
+
+| document | edit | step 5 | blocks | pages | both | upstream | both / upstream |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `long.typ` | first compilation | 235 | 234 | 225 | 233 | 107 | 2.2 |
+|  | end | 91.1 | 56.6 | 84.6 | 55.7 | 24.1 | 2.3 |
+|  | middle | 103 | 67.7 | 94.9 | 64.1 | 28.0 | 2.3 |
+|  | comment | 96.5 | 59.9 | 37.6 | 41.5 | 13.9 | 3.0 |
+| `longer.typ` | first compilation | 1180 | 1130 | 1100 | 1090 | 523 | 2.1 |
+|  | end | 485 | 282 | 414 | 278 | 127 | 2.2 |
+|  | middle | 544 | 335 | 457 | 335 | 144 | 2.3 |
+|  | comment | 560 | 307 | 178 | 201 | 65.2 | 3.1 |
+| `showcase.typ` | first compilation | 239 | 239 | 227 | 234 | 165 | 1.4 |
+|  | end | 24.1 | 20.4 | 21.7 | 20.0 | 8.3 | 2.4 |
+|  | middle | 25.2 | 20.3 | 21.8 | 20.5 | 8.4 | 2.4 |
+|  | imported | 26.8 | 22.3 | 23.7 | 23.3 | 9.7 | 2.4 |
+|  | comment | 25.5 | 20.2 | 15.8 | 17.9 | 6.8 | 2.6 |
+| touying | first compilation | 191 | 195 | 191 | 192 | 145 | 1.3 |
+|  | end | 24.8 | 19.3 | 19.5 | 18.8 | 10.8 | 1.7 |
+|  | middle | 25.0 | 20.5 | 19.7 | 19.6 | 11.9 | 1.6 |
+|  | imported | 113 | 114 | 112 | 112 | 86.1 | 1.3 |
+|  | comment | 21.1 | 14.6 | 7.7 | 7.5 | 3.5 | 2.1 |
+| handbook | first compilation | 158 | 156 | 156 | 159 | 104 | 1.5 |
+|  | end | 27.4 | 25.8 | 25.6 | 25.5 | 9.7 | 2.6 |
+|  | middle | 27.6 | 25.9 | 26.7 | 25.0 | 9.7 | 2.6 |
+|  | imported | 73.8 | 73.7 | 72.8 | 73.8 | 22.9 | 3.2 |
+|  | comment | 26.8 | 25.8 | 17.0 | 16.8 | 5.3 | 3.2 |
+| `book` | first compilation | 93.2 | 93.6 | 96.3 | 93.7 | 68.8 | 1.4 |
+|  | end | 11.1 | 11.5 | 13.0 | 10.8 | 4.3 | 2.5 |
+|  | middle | 11.4 | 11.3 | 15.0 | 11.1 | 4.6 | 2.4 |
+|  | imported | 15.0 | 15.8 | 21.4 | 15.0 | 6.5 | 2.3 |
+|  | comment | 11.2 | 11.6 | 10.7 | 7.5 | 2.5 | 3.0 |
+| `chain` | first compilation | 5.0 | 4.9 | 5.2 | 5.1 | 3.8 | 1.3 |
+|  | end | 2.9 | 2.9 | 3.2 | 2.9 | 1.1 | 2.6 |
+|  | middle | 2.6 | 2.8 | 3.0 | 2.8 | 1.1 | 2.5 |
+|  | imported | 2.6 | 2.6 | 2.5 | 2.2 | 0.8 | 2.8 |
+|  | comment | 2.5 | 2.5 | 2.5 | 2.3 | 0.8 | 2.9 |
+| `notes` | first compilation | 16.5 | 15.6 | 17.1 | 16.4 | 8.5 | 1.9 |
+|  | end | 7.7 | 6.9 | 7.9 | 6.8 | 3.1 | 2.2 |
+|  | middle | 8.1 | 7.3 | 7.7 | 6.9 | 2.8 | 2.5 |
+|  | imported | 9.5 | 9.0 | 9.4 | 8.8 | 3.8 | 2.3 |
+|  | comment | 7.8 | 7.0 | 7.0 | 6.3 | 2.5 | 2.5 |
+| `linked` | first compilation | 3.2 | 3.2 | 3.3 | 3.1 | 3.0 | 1.0 |
+|  | end | 2.2 | 2.4 | 2.4 | 2.1 | 1.2 | 1.8 |
+|  | middle | 1.9 | 2.1 | 2.1 | 1.9 | 1.2 | 1.6 |
+|  | comment | 1.7 | 2.0 | 1.7 | 1.6 | 0.9 | 1.8 |
+| deck | first compilation | 558 | 555 | 571 | 558 | 77.7 | 7.2 |
+|  | end | 16.1 | 15.3 | 18.5 | 15.4 | 14.5 | 1.1 |
+|  | middle | 16.1 | 16.3 | 19.4 | 15.5 | 14.7 | 1.1 |
+|  | comment | 16.8 | 16.0 | 17.4 | 14.3 | 13.1 | 1.1 |
+
+(Measured in two halves. The first four documents with other builds
+running beside them, as every table of this document so far. The other
+six were first measured on the machine at rest and came out two to
+three times slower in their short recompilations for every binary,
+upstream's too (a process that wakes for a few milliseconds on an idle
+machine is, it seems, not given a fast core at once). They were measured
+again with two busy processes beside them, which is the state of the
+earlier tables, and those are the rows above.)
+
+The two slices add up where they are about different recompilations, and
+the better one decides where they are about the same:
+
+- *After an edit* (end, middle) the block level decides, and the page
+  level adds little to it: `long.typ` 91 ms to 56 ms (blocks alone 57,
+  pages alone 85), `longer.typ` 485 ms to 278 ms (282, 414), the touying
+  document 24.8 ms to 18.8 ms (19.3, 19.5: either level finds what the
+  edit left alone, and both do not find it twice).
+- *After a comment*, where nothing on the pages changes, the page level
+  decides: `long.typ` 97 ms to 42 ms (blocks alone 60), `longer.typ`
+  560 ms to 201 ms (307), the touying document 21.1 ms to 7.5 ms (14.6),
+  the handbook 26.8 ms to 16.8 ms (25.8). `book` gains from having both:
+  11.2 ms to 7.5 ms, where either alone left it at 11 (the document of
+  its first iteration is laid out after every edit of the main file, for
+  the tracepoint; with blocks kept that layout finds its blocks).
+- *An edit of an imported file that reaches every page* (the theme of the
+  touying deck, the header of the handbook) is what it was, with either
+  and with both: every layout has other styles.
+- *A first compilation* is within the spread of step 5's in every row.
+
+Against upstream, for the bench and package documents (`long.typ`,
+`longer.typ`, `showcase.typ`, the touying document, the handbook), the
+merged tree is at 1.7 to 2.6 times after an edit at the end and 2.1 to
+3.2 times after a comment, where step 5 had 2.0 to 3.9 and 3.9 to 8.0.
+That is near the ratios of the first compilations (1.3 to 2.2): what is
+left is what both programs do in every recompilation, the export and
+the document-level realization (below).
+
+*What a first compilation and a one-shot `typst compile` pay*
+(instructions retired, the least of twelve runs each in turns; "blocks"
+is the merged tree with the page level switched off):
+
+| workload | step 5 | blocks | merged | merged against step 5 |
+| --- | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.7 M | 64.8 M | 64.8 M | +0.20 % |
+| `long.typ` to PDF | 3261.8 M | 3140.7 M | 3145.9 M | -3.55 % |
+| `longer.typ` to PDF | 15819.1 M | 15200.5 M | 15231.9 M | -3.71 % |
+| `query longer.typ heading` | 13373.3 M | 12749.8 M | 12768.9 M | -4.52 % |
+| `showcase.typ` to PDF | 3784.0 M | 3734.1 M | 3735.2 M | -1.29 % |
+| touying `theme-metropolis.typ` to PDF | 2597.1 M | 2563.7 M | 2571.4 M | -0.99 % |
+| ilm `bakers-handbook.typ` to PDF | 2279.5 M | 2270.9 M | 2272.8 M | -0.29 % |
+| the book of `tests/recompile/docs` to PDF | 1380.7 M | 1380.7 M | 1380.8 M | +0.01 % |
+| the pages of `tests/recompile/docs` to PDF | 308.8 M | 308.4 M | 310.0 M | +0.39 % |
+| the blocks of `tests/recompile/docs` to PDF | 309.0 M | 307.6 M | 309.3 M | +0.10 % |
+| 30 tables of 408 cells to PDF | 11957.2 M | 12427.0 M | 12440.1 M | +4.04 % |
+
+The page level adds 0.1 to 0.5 % to what the block level gives or takes
+(`long.typ` -3.71 % with blocks alone, -3.55 % with both), within its
+budget by itself. The last row is slice 2's stress document as its note
+describes it, made again (30 tables of 8 columns and 51 rows, 39 pages,
+one iteration, 36 828 block lookups of which 38 are found): +3.9 % with
+blocks alone and +4.0 % with both. That row is over the budget of 5.2
+for the reason that slice 2's note gives, and the page level is 0.1 of
+it.
+
+**Memory.** `scripts/watch_check.py --bench-memory`, resident set size
+after 200 edits (the plateau; megabytes):
+
+| document | edits | step 5 | blocks | pages | merged | upstream |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `longer.typ` | first compilation | 171 | 188 | 188 | 199 | 313 |
+| | at the end | 224 | 241 | 624 | 492 | 2217 |
+| | every heading | 324 | 357 | 701 | 581 | 2437 |
+| | every paragraph | 1112 | 1409 | 1455 | 1578 | 3412 |
+| touying | at the end | 86 | | 97 | 96 | |
+| | in the middle | 86 | | 96 | 95 | |
+| | the theme of the package | 159 | | 174 | 181 | |
+| deck | at the end | 256 | | 260 | 256 | |
+| | every slide | 259 | | 263 | 263 | |
+
+(An empty cell was not measured.)
+
+*Does the block level bring the page level's plateau down?* Partly: for
+edits at the end 624 MB to 492 MB, for edits of every heading 701 MB to
+581 MB. Not to slice 2's 241 MB, and the note of slice 3 was wrong about
+why. It supposed that the 28 MB of frames per edit were frames of
+blocks that every iteration lays out anew. The frames were the smaller
+part. Taken apart on the merged tree (the same session with parts of
+the entries left out; megabytes that an edit at the end leaves at the
+plateau, three iterations):
+
+| | per edit |
+| --- | ---: |
+| the page level off (slice 2 alone): the module of the main file | 4.7 |
+| run entries with neither frames nor children: their reads, sinks, keys | 5.0 |
+| run entries with frames and without children | 15.3 |
+| run entries as they are (no document kept) | 20.4 |
+| document entries without frames: the introspector, the info | 16.5 |
+| document entries as they are (no run kept) | 20.2 |
+| both, with no frames in either | 24.0 |
+| both as they are | 26.6 |
+
+So an edit leaves 21.9 MB in the two page-level stores, of which the run
+entries alone would hold 15.7 and the document entries alone 15.5: they
+share 9.3. The frames themselves are 2.6 MB (the last two rows); the
+block level did take the rest of them (slice 3 alone: 28). What the
+entries hold is the *realized content* of each iteration, three times
+per compilation: the document-level realization makes every element of
+the document anew (the located copy of each paragraph, heading and
+table, a table with its resolved grid), and each iteration's is reached
+from three places that are kept: the children of the run (deviation 3:
+the arguments are kept for the exact comparison; 5.1 MB that nothing
+else reaches), the tags in the page frames (10.3 MB with the frames,
+for a run entry without its children), and the elements of the
+document's introspector (11.8 MB with its maps and its cached queries,
+for a document entry without its frames). A block that is found keeps
+the element it was laid out for; the element that the next realization
+makes for the same block is another object, held by the run around it.
+The sinks are not it (1738 introspections per layout), nor the reads.
+
+*Per store, at the plateau of edits at the end* (entries counted by a
+throwaway build after the fourteenth edit; bytes from the table above
+times eleven compilations, so an estimate):
+
+| store | entries | estimate |
+| --- | ---: | ---: |
+| module evaluations | 11 | 52 MB |
+| page runs | 33 | 173 MB alone |
+| documents | 33 | 170 MB alone; 241 MB with the runs (102 MB shared) |
+| layouts: paragraphs, fragments, blocks | 371, 954, 1721 | within the 199 MB of the first compilation, which had 360, 24 845 and 12 988 |
+| closure calls | 2700 | as in step 5 |
+
+(The layouts shrink because of what both notes say: what is beneath a
+block that is found is not asked for and goes after eleven evictions.
+The resident set does not shrink with them.)
+
+*The numbers for a decision on a smaller age.* Not built: an age that is
+not comemo's is the owner's decision (slice 3's note has what it costs
+in principle). On the merged tree, an age of `n` evictions for the
+entries of page runs and documents and ten for everything else:
+
+| `longer.typ`, plateau (MB) | at the end | every heading | every paragraph |
+| --- | ---: | ---: | ---: |
+| step 5 | 224 | 324 | 1112 |
+| blocks alone | 241 | 357 | 1409 |
+| merged, age 10 (as built) | 492 | 581 | 1578 |
+| merged, age 2 | 301 | 409 | 1448 |
+| merged, age 1 | 279 | 390 | 1433 |
+| upstream | 2217 | 2437 | 3412 |
+
+It would save 191 to 213 MB of 492 for edits at the end, 172 to 191 of
+581 for edits of every heading, and 130 to 145 of 1578 where every
+paragraph changes (there the layouts of eleven generations are most of
+it, at any age of the page level). What it costs in hits on the merged
+tree is less than for slice 3 alone, because a run that is laid out
+again finds its blocks. An edit at the end after one, two and three
+recompilations that found the document: the touying document 18.5, 19.2
+and 20.1 ms with age 1 where it takes 18.6, 17.9 and 17.5 ms as built
+(slice 3 alone: 22 to 24 for 18 to 19.5), the handbook 25.4 to 26.7 ms
+for 25.2 to 26.2. (After twelve such recompilations everything beneath
+the document is gone at any age of the page level, as in upstream: the
+touying document 152 ms, the handbook 80 ms, `longer.typ` 1130 ms.) So
+the cost in time is one or two milliseconds of an edit that follows a
+save without a change; what remains is the cost in principle, an age
+that is not comemo's. The merged tree at age ten holds 22 %, 24 % and
+46 % of upstream's resident set in these sessions.
+
+Two things would bring the plateau down without touching an age, and
+neither is built: not keeping the children of a run (59 MB of the 492;
+it is deviation 3 for one store, and comemo keeps no argument), and
+realizing to the elements that the kept blocks hold (so that an
+iteration makes no second copy of what is found), which is a change of
+realization, not of a store.
+
+**What is left**, by phase, with both slices in (timers of a throwaway
+build in a watching process, medians of fifteen recompilations,
+milliseconds).
+
+*After a recompilation in which everything is found* ("the same bytes":
+the main file written again as it is; "a comment": the text of a comment
+at its end changed):
+
+| | `longer.typ`, the same bytes | a comment | touying, the same bytes | a comment |
+| --- | ---: | ---: | ---: | ---: |
+| the recompilation (status line) | 164 | 180 | 7.6 | 7.5 |
+| evaluation: the main module found, or evaluated with every closure call found | 0.23 | 12.5 | 1.73 | 2.12 |
+| realization of the document, page runs, blocks | 0 | 0 | 0 | 0 |
+| the key of the document | 0.01 | 1.98 | 0.00 | 0.00 |
+| finding the three document entries (the exact comparison of the content, the world reads) | 0.58 | 3.57 | 0.07 | 0.07 |
+| the convergence checks | 0.26 | 0.24 | 0.03 | 0.03 |
+| three documents with frames of their own | 2.35 | 1.58 | 0.18 | 0.19 |
+| the rest of the compilation | 0.4 | 0.5 | 0.1 | 0.0 |
+| export (PDF) | 156 | 158 | 5.1 | 5.0 |
+
+Nothing changed here with the block level: what is found at the top asks
+for nothing beneath. 95 % of `longer.typ` and 67 % of the touying
+document is the PDF writer after a save without a change; after a
+comment 88 % and 67 %, and the rest is the evaluation of the main file
+and the comparison of its content.
+
+*After an edit at the end*, where the document and its page run are laid
+out again and what is beneath them is found:
+
+| | `long.typ` | `longer.typ` | touying | handbook |
+| --- | ---: | ---: | ---: | ---: |
+| the recompilation (status line) | 53.8 | 265 | 18.1 | 25.5 |
+| evaluation | 2.70 | 12.3 | 6.19 | 1.40 |
+| the key of the document, finding nothing | 0.73 | 4.42 | 0.26 | 0.23 |
+| realization of the document (three iterations) | 8.21 | 41.4 | 2.63 | 4.79 |
+| the keys of the page runs | 1.73 | 8.81 | 1.18 | 0.29 |
+| page runs: found, laid out | 0, 3 | 0, 3 | 61, 2 | 26, 3 |
+| the flow of the runs that are laid out | 4.67 | 26.3 | 0.17 | 1.01 |
+| blocks asked for in it, laid out | 473, 0 | 2343, 0 | 0, 0 | 6, 0 |
+| storing and finding the runs (comparison, the test of the frames, validation) | 0.48 | 3.47 | 0.82 | 1.96 |
+| finalizing the pages | 0.20 | 1.44 | 0.48 | 0.54 |
+| the introspectors of the new documents | 0.78 | 4.65 | 0.62 | 0.36 |
+| three documents with frames of their own | 0.14 | 0.84 | 0.10 | 0.06 |
+| the convergence checks | 0.15 | 0.93 | 0.19 | 0.13 |
+| export (PDF) | 33.2 | 156 | 4.98 | 14.5 |
+
+(A paragraph that is not in a block is asked for by the flow and found;
+the blocks of `long.typ` and `longer.typ` are their tables, equations
+and the cells in them, each found at the top and not asked beneath.)
+With both levels, the flow of `longer.typ` is 26 ms where the page
+level alone had 204 ms and step 5 more; what a recompilation after an
+edit does now is, in this order: the export (62 % of `long.typ`, 59 %
+of `longer.typ`, 28 % of the touying document, 57 % of the handbook),
+the realization of the document (15 %, 16 %, 15 %, 19 %), evaluation
+(5 %, 5 %, 34 %, 5 %), and then the keys of the page level (the
+fingerprints of the content and of the realized children: 4 % of
+`longer.typ`), the flow, and the introspectors. Evaluation and layout
+together, the `G` of 9.2 against upstream's phases of 3.4: `long.typ`
+20.0 ms for 12.5, 1.6; `longer.typ` 105 ms for 63.5, 1.7; the handbook
+10.7 ms for 5.3, 2.0. All are under the 2.5 that the design asked for
+after slice 3.
+
+What comes after the two slices is therefore not memoization: the PDF
+writer, three times upstream's for the same pages (156 ms for about 55
+of `longer.typ`), and the document-level realization, which upstream
+repeats in every iteration too and which is also what every kept page
+run and document holds in memory (above).
 
 ### Not scheduled
 
