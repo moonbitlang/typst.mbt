@@ -314,9 +314,9 @@ fn counter_sequence(
   selector : Selector,
   engine : Engine,
   introspector : Introspector,
-) -> Array[(CounterState, Int64)] raise SourceError {
-  // Memoized like upstream (see `memo.mbt`). The sequence is not mutated by
-  // its users (they copy the states they modify).
+) -> ArrayView[(CounterState, Int64)] raise SourceError {
+  // Memoized like upstream (see `memo.mbt`). The sequence is what the
+  // store keeps: a view, and its users copy the states they modify.
   let key = memo_fingerprint(state => {
     state.write(counter)
     state.write(selector)
@@ -332,7 +332,7 @@ fn counter_sequence(
       counter_sequence_impl(counter, selector, engine, engine.introspector)
     },
     label=_ => "counter sequence",
-  )
+  )[:]
 }
 
 ///|

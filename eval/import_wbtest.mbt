@@ -442,6 +442,51 @@ test "module store: a caller that writes to the errors it got does not write to 
 }
 
 ///|
+test "module store: the warnings an entry keeps are not those of the sinks it is replayed into" {
+  // A sink's diagnostics are objects that their holder can append hints
+  // and tracepoints to, and an entry replays its sink into the sink of
+  // every evaluation that finds it: copies, of a copy that the entry keeps
+  // (`@library.Sink::kept`).
+  with_kept_store(() => {
+    let world = store_world("#import \"a.typ\": x as x\n#x", sources=[
+      ("a.typ", "#let x = [a]\n"),
+    ])
+    let warnings = () => {
+      let before = module_memo_stats()
+      let sink = @library.Sink::new()
+      eval_source(
+        @library.TrackedWorld::new(world),
+        world.library,
+        @library.Traced::new(),
+        sink,
+        @library.Route::root(),
+        world.main,
+      )
+      |> ignore
+      let seen = sink
+        .warnings()
+        .map(warning => "\{warning.message}: \{warning.hints.length()} hints")
+      // What a host can do with the warnings it was given.
+      for warning in sink.warnings() {
+        warning.hint("a hint of the host's")
+      }
+      let after = module_memo_stats()
+      "\{seen.join("; ")} (found \{after.0 - before.0})"
+    }
+    inspect(
+      warnings(),
+      content="unnecessary import rename to same name: 0 hints (found 0)",
+    )
+    for _ in 0..<2 {
+      inspect(
+        warnings(),
+        content="unnecessary import rename to same name: 0 hints (found 1)",
+      )
+    }
+  })
+}
+
+///|
 test "module store: an entry of an outer scope is found in a scope inside it if its reads hold there" {
   // No kept store here: both scopes are open. The inner world has the
   // sources of the outer one and, the second time, another data file.

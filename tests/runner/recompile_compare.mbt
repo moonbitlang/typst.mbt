@@ -153,7 +153,7 @@ fn recompile_introspector(
 ) -> String {
   let introspector = @library.Output::introspector(doc)
   let out = StringBuilder()
-  let dump = (kind : String, elems : Array[@library.Content]) => {
+  let dump = (kind : String, elems : ArrayView[@library.Content]) => {
     for elem in elems {
       let label = match elem.label() {
         Some(label) => label.repr()

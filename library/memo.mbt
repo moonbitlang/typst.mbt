@@ -44,9 +44,15 @@
 //   had been executed), so convergence checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
 //   traced values) are recorded into a fresh [Sink] and replayed into the
-//   caller's sink, both after computing and on every reuse.
+//   caller's sink, both after computing and on every reuse. The entry
+//   keeps a copy of them and replays copies ([Sink::kept],
+//   [Sink::extend_from_kept]): a diagnostic is an object that its holder
+//   appends tracepoints and hints to, and the styles of a traced value can
+//   be written to.
 // - Results are copied for every caller where they are mutable (frames are
 //   copy-on-write; values mark their containers shared).
+// - An entry does not keep the introspector it was computed with, only its
+//   number ([Introspector::serial]).
 // - Errors are not cached (the call is simply executed again).
 //
 // - World reads of the call (sources, files, the font book, fonts, the
@@ -78,12 +84,14 @@ priv struct MemoEntry[T, I] {
   library : Library
   /// The world reads of the call.
   world : WorldReads
-  /// The introspector the result was computed with.
-  backend : &IntrospectorBackend
+  /// The introspector the result was computed with
+  /// ([Introspector::serial]).
+  introspector : Int
   /// The introspector reads of the call.
   reads : IntrospectionRecorder
-  /// The sink side effects of the call.
-  sink : Sink
+  /// The sink side effects of the call (`None`: none), as a copy that no
+  /// caller has ([Sink::kept]).
+  sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
   compilation : Int
   /// The result.
@@ -348,14 +356,14 @@ fn[T, I : Eq] memoize(
     }
   }
   let parent = engine.introspector.recorder
-  let backend = engine.introspector.backend
+  let introspector = engine.introspector.serial
   if store.entries.get(key) is Some(entries) {
     for entry in entries {
       if compilation_finds(entry.compilation) &&
         entry.input == input &&
         physical_equal(entry.library, engine.library) &&
         (
-          physical_equal(entry.backend, backend) ||
+          entry.introspector == introspector ||
           (!entry.reads.lossy && entry.reads.validate(engine.introspector))
         ) &&
         // Last: this makes the world reads that the scope has no answer
@@ -364,7 +372,9 @@ fn[T, I : Eq] memoize(
         if parent is Some(parent) {
           entry.reads.merge_into(parent)
         }
-        engine.sink.extend_from_sink(entry.sink)
+        if entry.sink is Some(kept) {
+          engine.sink.extend_from_kept(kept)
+        }
         // The key holds the whole route: for a closure call around this
         // one, the result is that of this depth only. (An entry that
         // tracks its route asked nothing of it.)
@@ -430,9 +440,13 @@ fn[T, I : Eq] memoize(
     input,
     library: engine.library,
     world: world_reads,
-    backend,
+    introspector,
     reads,
-    sink,
+    sink: if sink.is_empty() {
+      None
+    } else {
+      Some(sink.kept())
+    },
     compilation,
     output: copy(output),
   }
@@ -1041,11 +1055,13 @@ priv struct ClosureEntry {
   library : Library
   /// The world reads of the call.
   world : WorldReads
-  /// The introspector the result was computed with.
-  backend : &IntrospectorBackend
+  /// The introspector the result was computed with
+  /// ([Introspector::serial]).
+  introspector : Int
   /// The introspector reads of the call (`None`: none).
   reads : IntrospectionRecorder?
-  /// The sink side effects of the call (`None`: none).
+  /// The sink side effects of the call (`None`: none), as a copy that no
+  /// caller has ([Sink::kept]).
   sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
   compilation : Int
@@ -1395,7 +1411,7 @@ fn ClosureEntry::matches(
       return false
     }
   }
-  guard physical_equal(self.backend, engine.introspector.backend) ||
+  guard self.introspector == engine.introspector.serial ||
     (match self.reads {
       None => true
       Some(reads) => !reads.lossy && reads.validate(engine.introspector)
@@ -1472,8 +1488,8 @@ pub fn memoized_closure(
           if entry.reads is Some(reads) && parent is Some(parent) {
             reads.merge_into(parent)
           }
-          if entry.sink is Some(sink) {
-            engine.sink.extend_from_sink(sink)
+          if entry.sink is Some(kept) {
+            engine.sink.extend_from_kept(kept)
           }
           // The call consumed all of its arguments (`args.finish()`), which
           // a caller that passed its own arguments on goes on to check.
@@ -1602,7 +1618,7 @@ pub fn memoized_closure(
     traced_files,
     library: engine.library,
     world: world_reads,
-    backend: engine.introspector.backend,
+    introspector: engine.introspector.serial,
     reads: if reads.calls.is_empty() && !reads.lossy {
       None
     } else {
@@ -1611,7 +1627,7 @@ pub fn memoized_closure(
     sink: if sink.is_empty() {
       None
     } else {
-      Some(sink)
+      Some(sink.kept())
     },
     compilation: key.compilation(),
     output: output.shared(),

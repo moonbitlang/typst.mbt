@@ -569,6 +569,18 @@ pub impl[T : Fingerprint] Fingerprint for Array[T] with fn fingerprint(
 }
 
 ///|
+/// A view of a slice hashes as the slice.
+pub impl[T : Fingerprint] Fingerprint for ArrayView[T] with fn fingerprint(
+  self,
+  state,
+) {
+  state.write_usize(self.length())
+  for item in self {
+    state.write(item)
+  }
+}
+
+///|
 pub impl[A : Fingerprint, B : Fingerprint] Fingerprint for (A, B) with fn fingerprint(
   self,
   state,

@@ -134,7 +134,7 @@ fn retrieve(
   ) catch {
     @library.HintedError(err) => raise HintedFailure(err)
   }
-  introspector.query(selector.0)
+  introspector.query(selector.0).to_owned()
 }
 
 ///|

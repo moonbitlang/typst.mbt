@@ -355,6 +355,54 @@ pub fn Sink::extend_from_sink(self : Sink, other : Sink) -> Unit {
 }
 
 ///|
+/// A copy of the sink for a store that keeps the effects of a call, to be
+/// replayed with [Sink::extend_from_kept] (not upstream: comemo keeps the
+/// arguments of the calls that a function made on its `TrackedMut<Sink>`
+/// and replays them, each argument a clone).
+///
+/// What is in a sink is not all immutable: a diagnostic is an object whose
+/// `trace` and `hints` are appended to by whoever holds it (`trace` in
+/// `diag.mbt`; a delayed error that is promoted is raised and passes
+/// through the tracepoints of whoever compiled), the styles of a traced
+/// value are a list that can be written to, and so is a traced array or
+/// dictionary. The sink of the call is handed on to the caller's as it is;
+/// the entry keeps this copy, which no caller ever holds, and every replay
+/// hands out copies again.
+pub fn Sink::kept(self : Sink) -> Sink {
+  let kept = Sink::new()
+  kept.extend_from_kept(self)
+  kept
+}
+
+///|
+/// Extend from the sink that a store keeps ([Sink::kept]): like
+/// [Sink::extend_from_sink], with a copy of every diagnostic and of the
+/// styles of every traced value, whose containers are marked shared.
+/// Introspections are immutable.
+pub fn Sink::extend_from_kept(self : Sink, kept : Sink) -> Unit {
+  self.introspections.append(kept.introspections)
+  for error in kept.delayed {
+    self.delayed.push(error.clone())
+  }
+  for warning in kept.warnings {
+    if self.warnings_set.add_and_check((warning.span, warning.message)) {
+      self.warnings.push(warning.clone())
+    }
+  }
+  for value in kept.values {
+    if self.values.length() >= sink_max_values {
+      break
+    }
+    let (value, styles) = value
+    let styles = match styles {
+      Some(styles) => Some(styles.copy())
+      None => None
+    }
+    self.values.push((value.shared(), styles))
+  }
+}
+
+///|
 /// Trace an introspection.
 pub fn Sink::introspection(self : Sink, introspection : Introspection) -> Unit {
   self.introspections.push(introspection)

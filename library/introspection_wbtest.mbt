@@ -200,7 +200,7 @@ fn discover(
 }
 
 ///|
-fn values(list : Array[Content]) -> Array[Int64] {
+fn values(list : ArrayView[Content]) -> Array[Int64] {
   list.map(c => {
     match MetadataElem::of(c) {
       Some(m) =>

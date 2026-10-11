@@ -699,7 +699,7 @@ fn compute_auto_indents(
 /// Determines the maximum prefix inset (prefix width + gap) at each outline
 /// level, for the outline with the given `loc`. Levels for which there is no
 /// information available yield `None`.
-fn determine_prefix_widths(elems : Array[Content]) -> Array[Abs?] {
+fn determine_prefix_widths(elems : ArrayView[Content]) -> Array[Abs?] {
   let widths : Array[Abs?] = []
   for elem in elems {
     let info = PrefixInfo::of(elem).unwrap()

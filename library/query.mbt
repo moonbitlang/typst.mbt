@@ -44,7 +44,7 @@ fn impl_query(
 pub fn query_introspection(
   selector : Selector,
   span : @syntax.Span,
-) -> Introspect[Array[Content]] {
+) -> Introspect[ArrayView[Content]] {
   Introspect::new((_, introspector) => introspector.query(selector), history => {
     let lengths = history.map(vec => vec.length())
     let things = format_selector(selector, "elements")

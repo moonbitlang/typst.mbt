@@ -47,7 +47,7 @@ pub fn html(
   )
   let link_resolver = @library.LateLinkResolver::new(
     None,
-    @library.Introspector::new(document.introspector()),
+    @library.Output::introspector(document),
   )
   html_encode(document.root(), pretty=options.format.pretty.v, link_resolver~)
 }
