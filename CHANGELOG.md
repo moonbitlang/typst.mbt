@@ -271,7 +271,9 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 - `pdf`: what is kept of a converted image is the image as the file
   embeds it, its samples compressed, as krilla's images are (no change of
   the interface; `moonbitlang/pdflite` 0.3.9, `Image::deflated`). An
-  export after the first in a process compresses no raster image: the
+  export does not compress a raster image again that an earlier export
+  of the process embedded, for as long as `evict` keeps it (images inside
+  SVGs and bitmap glyphs are made, and compressed, for every export): the
   second export of a deck of 28 screenshots takes 6 ms instead of 371 ms,
   and `typst watch` recompiles it to a PDF in 53 ms instead of 420 ms.
   The converted samples are no longer held between exports (72 MB of the

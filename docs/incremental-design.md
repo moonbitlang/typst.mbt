@@ -1141,8 +1141,10 @@ were decided:
 - Determinism: a PDF is byte for byte what it was, from kept images or
   not. `Samples` and `Deflated` are written by one function in pdflite,
   and here the exporter is still given `Samples` when memoization is off,
-  so every comparison of memoization on and off (the `edsl` and
-  `recompile` stages, `doc/pdf_images_test.mbt`) compares the two forms.
+  so a comparison of PDFs with memoization on and off compares the two
+  forms: the `recompile` stage, `pdf/image_wbtest.mbt` and
+  `doc/pdf_images_test.mbt` (the `edsl` stage exports with memoization on
+  only).
 - Memory: what is kept is the compressed streams (about the size of the
   images in the file) and no longer the converted samples; nothing else
   read them. An image is compressed right after it is converted, so the

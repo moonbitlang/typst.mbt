@@ -143,7 +143,9 @@ test "pdf: an image kept by one export is the same bytes in the next, whatever t
     let report = compile([@doc.Markup(text)]).pdf(options=options(standards))
     match report.output() {
       Some(bytes) => Ok(bytes)
-      None => Err(report.errors.map(e => e.message).join(" | "))
+      // With their places: a kept image is drawn at other places in other
+      // documents.
+      None => Err(report.errors.map(e => e.render()).join("\n"))
     }
   }
   let cases : Array[(String, Array[@library.PdfStandard])] = [
@@ -155,6 +157,7 @@ test "pdf: an image kept by one export is the same bytes in the next, whatever t
     // PDF/A-1 has no transparency and PDF/A no interpolation: errors of a
     // document, which the next one does not inherit.
     (source, [A_1b]),
+    ("// The same images,\n// two lines further down.\n" + source, [A_1b]),
     (source + smooth, [A_3b]),
     (source + smooth, [V_2_0]),
     (source, [A_4]),
@@ -182,8 +185,29 @@ test "pdf: an image kept by one export is the same bytes in the next, whatever t
       #|ok
       #|ok
       #|ok
-      #|PDF/A-1b error: the image contains transparency | PDF/A-1b error: the image contains transparency
-      #|PDF/A-3b error: the image has smooth scaling
+      #|error: PDF/A-1b error: the image contains transparency
+      #|  at doc/pdf_images_test.mbt:143:27 (Markup, bytes 364..408 of the source string)
+      #|  hint: try exporting with a different standard that supports transparency
+      #|  hint: or convert the image to a non-transparent one
+      #|  hint: you might have to convert SVGs into non-transparent bitmap images
+      #|error: PDF/A-1b error: the image contains transparency
+      #|  at doc/pdf_images_test.mbt:143:27 (Markup, bytes 565..642 of the source string)
+      #|  hint: try exporting with a different standard that supports transparency
+      #|  hint: or convert the image to a non-transparent one
+      #|  hint: you might have to convert SVGs into non-transparent bitmap images
+      #|error: PDF/A-1b error: the image contains transparency
+      #|  at doc/pdf_images_test.mbt:143:27 (Markup, bytes 411..455 of the source string)
+      #|  hint: try exporting with a different standard that supports transparency
+      #|  hint: or convert the image to a non-transparent one
+      #|  hint: you might have to convert SVGs into non-transparent bitmap images
+      #|error: PDF/A-1b error: the image contains transparency
+      #|  at doc/pdf_images_test.mbt:143:27 (Markup, bytes 612..689 of the source string)
+      #|  hint: try exporting with a different standard that supports transparency
+      #|  hint: or convert the image to a non-transparent one
+      #|  hint: you might have to convert SVGs into non-transparent bitmap images
+      #|error: PDF/A-3b error: the image has smooth scaling
+      #|  at doc/pdf_images_test.mbt:143:27 (Markup, bytes 794..857 of the source string)
+      #|  hint: set the `scaling` attribute to `pixelated`
       #|ok
       #|ok
     ),

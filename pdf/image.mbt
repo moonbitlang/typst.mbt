@@ -207,10 +207,12 @@ let raster_cache : @library.ContentCache[Result[@export.Image, String]] = @libra
 /// ([@export.Image::deflated]): krilla's image is made of the compressed
 /// channels alone (`Image::from_custom` calls `deflate_encode` when the
 /// image is made, `SampledRepr`), and upstream's memoized `convert_raster`
-/// hands that image to every later export. So an export after the first
-/// compresses no image, and the converted samples (three bytes and one of
-/// alpha per pixel, where the image was not embedded as decoded) are not
-/// kept. The exporter writes the same bytes for both forms, so with
+/// hands that image to every later export. So an export does not compress
+/// again an image that an earlier one embedded (while `evict` keeps it;
+/// the images inside SVGs and of bitmap glyphs do not come from here and
+/// are made for every export), and the converted samples (three bytes and
+/// one of alpha per pixel, where the image was not embedded as decoded)
+/// are not kept. The exporter writes the same bytes for both forms, so with
 /// memoization off, where nothing is kept and an image is converted for
 /// every place it is drawn at, the samples go to the exporter as they are
 /// and it compresses them once per document, as it embeds them once.

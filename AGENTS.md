@@ -804,8 +804,10 @@
   stream, `/Interpolate`, validation) is made per document and never
   kept; the two forms must give the same bytes (pdflite writes both
   through one function; with memoization off the exporter is given
-  `Samples`, so every comparison of memoization on and off, the `edsl`
-  and `recompile` stages and `doc/pdf_images_test.mbt`, compares them);
+  `Samples`, so a comparison of PDFs with memoization on and off
+  compares them: the `recompile` stage, `pdf/image_wbtest.mbt` and
+  `doc/pdf_images_test.mbt`; the `edsl` stage exports with memoization
+  on only);
   nothing may read the samples of a kept image. Not kept, so compressed
   in every export: the images inside SVGs and of bitmap glyphs (made per
   export), ICC profiles, content streams and fonts (krilla memoizes the
