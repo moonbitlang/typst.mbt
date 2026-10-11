@@ -46,7 +46,10 @@ fn Cited::new(text : String, files : Array[(String, Bytes)]) -> Cited raise {
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
   ] = compile(world)
-  guard warned.output is Ok(document) else { fail("the document compiles") }
+  let document = match warned.output {
+    Ok(document) => document
+    Err(errors) => fail(errors.map(error => error.message).join("; "))
+  }
   let tracked = @library.TrackedWorld::new(world)
   let engine : @library.Engine = {
     world: tracked,
@@ -148,6 +151,30 @@ test "works: an entry of the store is found by its key and taken if the files an
     cited.step(),
     content=(
       #|D. Knuth, Beta. 1984. (generated 1)
+    ),
+  )
+}
+
+///|
+test "works: math in an entry is evaluated on a route of its own" {
+  // The entry of the works tracks its route and is not kept if the call
+  // asked the route anything. The math of a title is evaluated from the
+  // root of a new route (upstream `show_math`, `eval_string`), whose depth
+  // checks are not questions to the route of the call: with them taken
+  // for such, a bibliography with a formula in it was generated for every
+  // citation.
+  // (The world has no fonts, and an equation cannot be laid out without
+  // one: the bibliography is generated and not shown.)
+  let cited = Cited::new(
+    "#show bibliography: none\n@knuth\n#bibliography(\"refs.bib\")",
+    [("refs.bib", outside_bib("On $sqrt(2)$ and $x^2$"))],
+  )
+  let steps = @library.with_layout_memo(() => [cited.step(), cited.step()])
+  inspect(
+    steps.join("\n"),
+    content=(
+      #|D. Knuth, On 2 and x2. 1984. (generated 1)
+      #|D. Knuth, On 2 and x2. 1984. (generated 0)
     ),
   )
 }

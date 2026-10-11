@@ -1551,14 +1551,19 @@ fn show_math(ctx : ShowCtx, math : String) -> Content {
     sink: Sink::new(),
     route: Route::root(),
   }
-  let value = (engine.library.routines.eval_string)(
-    engine,
-    Context::none(),
-    math,
-    ctx.span,
-    @syntax.SyntaxMode::Math,
-    Scope::new(),
-  ) catch {
+  // The evaluation starts at the root of a route (upstream `eval_string`
+  // makes its own): its depth checks ask nothing of the route of the call
+  // that generates the works, which is tracked.
+  let value = with_own_route(() => {
+    (engine.library.routines.eval_string)(
+      engine,
+      Context::none(),
+      math,
+      ctx.span,
+      @syntax.SyntaxMode::Math,
+      Scope::new(),
+    )
+  }) catch {
     _ => return TextElem::packed(math).spanned(ctx.span)
   }
   value.display()

@@ -49,8 +49,43 @@ test "memoize: a call that tracks its route is found on every route, unless it a
     call(1, 4, _ => note_route_shift(0, 0)) |> ignore
   }
   assert_eq(runs, 8)
+  // What is asked of a route of its own is asked of nobody's (the math of
+  // a bibliography entry is evaluated from the root of a new route).
+  for depth in [1, 7] {
+    call(depth, 5, _ => {
+      with_own_route(() => {
+        memo_route(3).check_within(64) |> ignore
+        note_route_query(memo_file("a.typ"))
+      }) catch {
+        _ => ()
+      }
+    })
+    |> ignore
+  }
+  assert_eq(runs, 9)
   // The bookkeeping is back where it was.
   assert_eq(route_shift_scopes.val, 0)
+  assert_eq(route_query_scopes.val, 0)
+}
+
+///|
+test "memoize: a route of its own leaves what the calls around it collected" {
+  let a = memo_file("a.typ")
+  let b = memo_file("b.typ")
+  let c = memo_file("c.typ")
+  let outer = route_queries_begin()
+  note_route_query(a)
+  let inside = with_own_route(() => {
+    note_route_query(b)
+    // A call in there that collects, and is the only one that does: it
+    // empties the log when it ends.
+    let inner = route_queries_begin()
+    note_route_query(c)
+    route_queries_end(inner)
+  })
+  assert_true(inside == [c])
+  note_route_query(a)
+  assert_true(route_queries_end(outer) == [a])
   assert_eq(route_query_scopes.val, 0)
 }
 
@@ -164,21 +199,34 @@ test "works: the errors they keep are copies for whoever catches them" {
 }
 
 ///|
-test "svg: an image is its data, its fonts and the data of the images it links" {
+test "svg: an image is its data, its fonts, what they were chosen for and the data of the images it links" {
   let data : Bytes = b"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>"
-  let image = (links : Array[U128]) => {
+  let image = (links : Array[U128], selections : Array[Int]) => {
     let svg = SvgImage::new(data) catch { _ => abort("an SVG") }
-    Image::plain(Svg({ ..svg, links, }))
+    Image::plain(Svg({ ..svg, links, selections, }))
   }
   let a = hash128("a")
   let b = hash128("b")
-  // Upstream's identity for an image that links nothing.
-  assert_true(image([]) == image([]))
-  assert_eq(hash128(image([])), hash128(image([])))
-  assert_true(image([a]) == image([a]))
-  assert_eq(hash128(image([a])), hash128(image([a])))
-  // The linked data, its number and its order.
-  let all = [image([]), image([a]), image([b]), image([a, b]), image([b, a])]
+  // Upstream's identity for an image that links nothing and has no text.
+  assert_true(image([], []) == image([], []))
+  assert_eq(hash128(image([], [])), hash128(image([], [])))
+  assert_true(image([a], [0, -1]) == image([a], [0, -1]))
+  assert_eq(hash128(image([a], [0, -1])), hash128(image([a], [0, -1])))
+  // The linked data, its number and its order; the answers of the font
+  // resolver, their number and their order (with real fonts:
+  // `doc/svg_identity_test.mbt`).
+  let all = [
+    image([], []),
+    image([a], []),
+    image([b], []),
+    image([a, b], []),
+    image([b, a], []),
+    image([], [0]),
+    image([], [-1]),
+    image([], [0, 1]),
+    image([], [1, 0]),
+    image([a], [0]),
+  ]
   for i in 0..<all.length() {
     for j in 0..<all.length() {
       if i != j {

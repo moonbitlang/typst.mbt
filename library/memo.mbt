@@ -405,6 +405,41 @@ fn RouteMark::end(self : RouteMark) -> Bool {
   lo != route_shift_min || hi != route_shift_max || !queried.is_empty()
 }
 
+///|
+/// Runs `f`, which works on a route of its own and not on one that extends
+/// the route of the calls in progress (upstream: `eval_string` starts at
+/// `Route::default()`, and its route is no tracked argument of whoever
+/// calls it). What is asked of routes is noted in state of the process
+/// (`route_shift_lo`, [route_query_log]), which cannot tell one route from
+/// another: without this, a depth check on the fresh route counts as a
+/// question to the route of the memoized calls around `f`, which binds a
+/// closure call to its depth and keeps an entry that tracks its route from
+/// being stored ([memoize], `tracks_route`).
+fn[T] with_own_route(f : () -> T raise SourceError) -> T raise SourceError {
+  let lo = route_shift_lo.val
+  let hi = route_shift_hi.val
+  let scopes = route_shift_scopes.val
+  let query_scopes = route_query_scopes.val
+  // (A memoized call inside `f` empties the log when it is the only one
+  // that collects.)
+  let queries = if route_query_log.is_empty() {
+    no_route_queries
+  } else {
+    route_query_log.copy()
+  }
+  route_shift_scopes.val = 0
+  route_query_scopes.val = 0
+  defer {
+    route_shift_lo.val = lo
+    route_shift_hi.val = hi
+    route_shift_scopes.val = scopes
+    route_query_scopes.val = query_scopes
+    route_query_log.clear()
+    route_query_log.append(queries)
+  }
+  f()
+}
+
 // Exact comparison of memoized arguments.
 
 ///|
