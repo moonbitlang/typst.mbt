@@ -171,7 +171,18 @@ pub fn world_range(
 
 ///|
 /// Definition of Typst's standard library.
-pub(all) struct Library {
+///
+/// A library is made by [LibraryBuilder::build] and by nothing else, and it
+/// is never changed afterwards: not its fields (other packages can read
+/// them and cannot write or build the record) and nothing that is reached
+/// through them (the scopes of its modules, `sys.inputs`, the styles, the
+/// rule map, the formats). That is what lets a memoized call have the
+/// library in its key as a number ([Library::serial]) where upstream has
+/// its hash (`&LazyHash<Library>`, an argument of every memoized function
+/// that builds an engine): upstream's library cannot change behind the
+/// hash either, since it is only reached through `&LazyHash`.
+/// (`docs/incremental-design.md`, section 5.3.)
+pub struct Library {
   /// The function pointers into the compiler.
   routines : Routines
   /// The module that contains the definitions that are available everywhere.
@@ -186,9 +197,13 @@ pub(all) struct Library {
   /// The standard library as a value. Used to provide the `std` module.
   std : Binding
   /// In-development features that were enabled.
-  mut features : Features
+  features : Features
   /// Registered export formats.
   formats : Array[Format]
+  /// The number of the library ([Library::serial]).
+  priv serial : Int64
+  /// What the number adds to a key ([Library::keyed]).
+  priv mix : UInt64
 }
 
 ///|

@@ -33,11 +33,7 @@ let font_manifest_sha : String = {
 fn paged_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let main_id = source.id()
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let enc = FrameEncoder::new(span => encode_span(world, span))
   enc.header(upstream_revision, font_manifest_sha, tc.name)

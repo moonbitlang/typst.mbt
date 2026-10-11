@@ -153,19 +153,7 @@ fn Flavor::library(self : Flavor, inputs : Int) -> @library.Library {
     @library.bundle_format(),
   ]
   match self {
-    Suite(features) => {
-      let lib = @typst.library_builder(formats)
-        .with_features(@library.Features::all())
-        .with_global(define_test_globals)
-        .with_inputs(dict)
-        .build()
-      define_test_colors(lib)
-      define_test_styles(lib)
-      match features {
-        Some(features) => { ..lib, features, }
-        None => lib
-      }
-    }
+    Suite(features) => new_test_library(features, inputs=dict)
     // No feature is on unless it is asked for, as in the CLI.
     Plain | Packages =>
       @typst.library_builder(formats)

@@ -410,7 +410,7 @@ is kept but the CLI's page hashes for PNG and SVG.
 | package files | the same calls with a package root | the same |
 | fonts | `World::book()`, `World::font(index)` | recorded reads, fingerprints of the book and of the font |
 | the date | `World::today(offset)` | recorded read, fingerprint of the answer |
-| `sys.inputs`, features, formats, routines: the library | `World::library()`, once per compilation (`typst/lib.mbt`, `compile_with`); then `Engine.library` | the library is compared by identity in every entry (step 1 of slice 1) and becomes part of every key (5.3) |
+| `sys.inputs`, features, formats, routines: the library | `World::library()`, once per compilation (`typst/lib.mbt`, `compile_with`); then `Engine.library` | the library's number is in every key (step 3; 5.3). In step 1 it was compared by identity in every entry |
 | the main file | `World::main()`, once per compilation (`compile_impl`), outside of every memoized function, as upstream | nothing depends on it but the source it names, which is read through the tracked world and is the key of its evaluation (step 3) |
 | the traced span | `Engine.traced` | in the key (closure calls, layouts) or validated by its answers (modules); unchanged |
 
@@ -703,7 +703,8 @@ that is rejected are not.
 stores in step 1 (module entries did so before): a closure that evaluates
 `sys.inputs.x` reads nothing of the world, and two libraries can meet in
 one compilation through an engine that a host builds. Step 3 replaces the
-comparison by the serial number in the key (5.3).
+comparison by the serial number in the key (5.3; built, section 8, "Step
+3 as built").
 
 **Costs.** Measured in step 1 (aarch64 macOS, native release, other
 agents building on the same machine). The budget for recording plus
@@ -817,6 +818,11 @@ keeps the first store.
   nothing reachable from it (scopes, styles, rules, `sys.inputs`, formats)
   is written after `build`. Two libraries with equal contents do not share
   results; a host that wants reuse keeps its library, as the CLI does.
+  (Built as the last commit of step 3: section 8, "Step 3 as built",
+  which also lists what a host could do to a library before. That
+  nothing reachable from it is written after `build` is a contract; the
+  record itself can no longer be built, updated or assigned to outside of
+  its package.)
 - **Introspector.** Unchanged: the recorded reads are replayed on the
   introspector of the call (`IntrospectionRecorder::validate`), with the
   shortcut for the introspector the entry was computed with. Across
@@ -1438,7 +1444,7 @@ The port, `eval_source` (public, memoized) around `eval_source_impl`:
 | | upstream | port |
 | --- | --- | --- |
 | the source | its hash: id, text, numbered tree | found by `@library.source_fingerprint`: the id and the text of a source that `Source::new` parsed, the id and the number of the object for the result of an edit (step 1's fingerprint of the world's answer, 5.2); and the entry keeps the source and is only taken for the same one (`same_source`: one object, or two parses of one text of one file) |
-| the library | its hash | compared by identity, as in step 1 (5.3 has what replaces it) |
+| the library | its hash | its number, hashed into the key (`Library::serial`); the entry does not hold the library ("The library" below) |
 | the world | tracked | the recorded reads, validated last (`TrackedWorld::validate`, step 1) |
 | the route | tracked: `contains`, `within` | the answers of `contains` for the ids that were asked (as before), and the depth: by how much the route may be deeper or shallower without changing the answer of a depth check of the evaluation (`RouteShifts`, as closure calls have it; new) |
 | the traced span | tracked: `get` | the answers for the files whose code ran (as before) |
@@ -1495,6 +1501,7 @@ computed from scratch.
 | found by the fingerprint, valid by reads and depth (the first commit) | 1 | |
 | and the kept errors copied | 0 | |
 | the step as committed (with the review's fixes) | 0 | 0 |
+| and with the library's number in the keys in place of the comparison | 0 | 0 |
 
 The four: `project/book`, `project/notes` and
 `suite/visualize/rect.typ` at "everything back" (frames: the old text
@@ -1548,7 +1555,7 @@ its stores end with their compilation).
 | every source is fingerprinted by its text, also the result of an edit (the answer of the world's `source`; the module store still compares the source) | that test, and `library/tracked_world_wbtest.mbt`, "an entry is rejected if one answer differs". Kept store: 2 sequences (`project/chain`, `import-cyclic-in-other-file`: a module that is taken although a file it imported has other span numbers) |
 | the main file's source is read of the raw world | `scripts/tracked_world_check.py` and nothing else, by construction: the read is outside of every memoized call, as upstream's is, the entry of the main file is found by the source it is handed, and what imports the main file reads it through the tracked world itself. Kept store: 0 |
 | a kept error is handed out as the object it is (number 18 there) | `eval/import_wbtest.mbt`, two tests; `typst/oracle_wbtest.mbt`, the two "a file that fails, imported .." cases, in one compilation. Kept store: 1 sequence (`import-cyclic-in-other-file`) |
-| the library is not compared (number 12 there) | `library/tracked_world_wbtest.mbt`, "the library is compared (`sys.inputs`)" (step 1's); `eval/import_wbtest.mbt`, "the library is part of what an entry is for" |
+| the library is not noticed (number 12 there: its number left out of the three keys) | `library/tracked_world_wbtest.mbt`, "the library is compared (`sys.inputs`)", "the library is in the key as its number", "closure calls with two libraries are two calls"; `eval/import_wbtest.mbt`, "the library is part of what an entry is for". Kept store: 1 sequence (`project/notes`, where the sweep changes `sys.inputs`) |
 | an entry is taken for any source with its fingerprint (review) | `eval/import_wbtest.mbt`, "an entry is only taken for the source it was computed for" |
 | the recording check substitutes any entry's module (review) | `eval/import_wbtest.mbt`, "the recording check repeats an import with the module of the world at hand" |
 
@@ -1562,15 +1569,15 @@ step 1's).
 the least of twelve runs each, in turns (instructions retired and cycles
 of `/usr/bin/time -l`).
 
-| workload | instructions, before | cycles, before | instructions, after | cycles, after |
-| --- | ---: | ---: | ---: | ---: |
-| `tiny.typ` to PDF | 64.5 M | 26.8 M | 64.7 M (+0.33 %) | 27.0 M (+0.7 %) |
-| `query long.typ heading` | 2964.8 M | 730.2 M | 2965.1 M (+0.01 %) | 745.3 M (+2.1 %) |
-| `long.typ` to PDF | 3526.4 M | 857.8 M | 3527.2 M (+0.02 %) | 868.4 M (+1.2 %) |
-| `query longer.typ heading` | 14877.5 M | 3756.7 M | 14882.3 M (+0.03 %) | 3725.2 M (-0.8 %) |
-| `showcase.typ` to PDF, system fonts | 4404.1 M | 1021.7 M | 4402.3 M (-0.04 %) | 1026.9 M (+0.5 %) |
-| `showcase.typ` to PDF, embedded fonts | 3807.1 M | 822.3 M | 3809.5 M (+0.06 %) | 816.4 M (-0.7 %) |
-| touying `theme-metropolis.typ` to PDF | 2663.0 M | 694.6 M | 2668.0 M (+0.19 %) | 704.8 M (+1.5 %) |
+| workload | instructions, before | cycles, before | instructions, step 3 | cycles, step 3 | instructions, with the library commit | cycles, with the library commit |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.5 M | 26.8 M | 64.7 M (+0.33 %) | 27.0 M (+0.7 %) | 64.7 M (+0.35 %) | 27.8 M (+3.7 %) |
+| `query long.typ heading` | 2964.8 M | 730.2 M | 2965.1 M (+0.01 %) | 745.3 M (+2.1 %) | 2965.2 M (+0.02 %) | 737.7 M (+1.0 %) |
+| `long.typ` to PDF | 3526.4 M | 857.8 M | 3527.2 M (+0.02 %) | 868.4 M (+1.2 %) | 3528.1 M (+0.05 %) | 869.0 M (+1.3 %) |
+| `query longer.typ heading` | 14877.5 M | 3756.7 M | 14882.3 M (+0.03 %) | 3725.2 M (-0.8 %) | 14886.2 M (+0.06 %) | 3719.8 M (-1.0 %) |
+| `showcase.typ` to PDF, system fonts | 4404.1 M | 1021.7 M | 4402.3 M (-0.04 %) | 1026.9 M (+0.5 %) | 4400.9 M (-0.07 %) | 1018.8 M (-0.3 %) |
+| `showcase.typ` to PDF, embedded fonts | 3807.1 M | 822.3 M | 3809.5 M (+0.06 %) | 816.4 M (-0.7 %) | 3807.4 M (+0.01 %) | 821.8 M (-0.1 %) |
+| touying `theme-metropolis.typ` to PDF | 2663.0 M | 694.6 M | 2668.0 M (+0.19 %) | 704.8 M (+1.5 %) | 2667.9 M (+0.18 %) | 700.9 M (+0.9 %) |
 
 First compilation and recompilation in a watch session (medians of five
 sessions with five edits each, one character appended; nothing is kept
@@ -1580,12 +1587,16 @@ yet, so a recompilation is a compilation from scratch in all builds):
 | --- | --- | ---: | ---: |
 | `long.typ` | before | 249.5 ms (247.0 to 259.5) | 252.4 ms (243.8 to 261.7) |
 |  | step 3 | 258.3 ms (251.2 to 266.1) | 267.4 ms (255.2 to 371.8) |
+|  | with the library commit | 259.7 ms (254.1 to 260.8) | 268.0 ms (254.4 to 347.6) |
 | `longer.typ` | before | 1360.0 ms (1340.0 to 1370.0) | 1410.0 ms (1360.0 to 1450.0) |
 |  | step 3 | 1280.0 ms (1250.0 to 1360.0) | 1320.0 ms (1220.0 to 1440.0) |
+|  | with the library commit | 1330.0 ms (1310.0 to 1340.0) | 1390.0 ms (1260.0 to 1480.0) |
 | `showcase.typ` | before | 252.6 ms (235.1 to 261.2) | 55.7 ms (47.8 to 95.2) |
 |  | step 3 | 250.4 ms (245.5 to 272.2) | 56.1 ms (49.8 to 78.5) |
+|  | with the library commit | 251.3 ms (244.6 to 254.3) | 56.6 ms (53.5 to 67.6) |
 | touying `theme-metropolis.typ` | before | 247.6 ms (206.2 to 276.3) | 231.5 ms (169.2 to 341.4) |
 |  | step 3 | 264.0 ms (216.5 to 275.9) | 202.0 ms (178.5 to 371.4) |
+|  | with the library commit | 218.6 ms (212.5 to 258.0) | 186.7 ms (174.2 to 216.7) |
 
 The sessions ran while other builds used the machine: their medians
 differ by several per cent in both directions, with no sign in common
@@ -1596,7 +1607,10 @@ spread. The budget of 5.2 (1 % of a compilation from scratch) holds.
 
 What the step adds to a compilation: the fingerprint of the main file's
 source (a hash of its text, once per source object), an entry for the
-main file with its reads, and per import two integers for the depth.
+main file with its reads, and per import two integers for the depth. The
+library commit takes a comparison of two objects out of every lookup and
+puts the library's number into the key: an addition per layout call and
+eight bytes more to hash per closure call.
 
 **Review.** One round by Codex on the diff, "request changes". Fixed:
 the store took a fingerprint's word for the source (the entry keeps and
@@ -1607,7 +1621,67 @@ the world got around (the script lists the uses it allows). Not
 changed: `Source::serial` and `Font::serial`, step 1's, are counters of
 32 bits, which come round after 2^32 sources or fonts of one process;
 the fingerprint of a world's answer is what could then be equal for two
-sources, and a module entry compares the source itself.
+sources, and a module entry compares the source itself. On the library
+commit: the key of a module evaluation added the library's number to the
+fingerprint of the source, which is not a hash for the result of an edit,
+so two pairs of numbers could give one key (it is hashed now); and the
+number was a counter of 32 bits (it has 64).
+
+**The library** (the last commit of the step; the change of the public
+surface is the owner's to approve, section 11, and the commit can be
+dropped: the commits before it compare the library by identity as step 1
+did, and everything above holds for them).
+
+Upstream's world hands out `&LazyHash<Library>`, and every memoized
+function that builds an engine has the library as a hashed argument: the
+key is the hash of all the library holds, and nothing can change behind
+it, since a library is only reached through the `LazyHash`. The port's
+`Library` was a record that anyone could build, update and write to.
+After `build`, a host could: build another by record update that shares
+every part (`{ ..library, features: f }`, which the test runner did for
+every test with features, and `{ ..library, rules: .. }`), which is why
+a number in the record could not identify a library; assign `features`
+(a `mut` field); push to the array inside `Features` and to `formats`;
+write to `styles` (`Styles::push`, `set`, `apply`, `apply_one`, `unset`:
+the runner did, for its page size), to `rules` (`NativeRuleMap::register`,
+`replace`), to the scopes of `global` and `math` and of every module
+reachable from them (`Scope::define_`, `define_func`, `define_elem`,
+`define_type`, `bind`, `start_category`, `reset_category`: the runner
+did, for its test colours), to a binding (`Binding::set_value`, the
+`with_*` methods, also of `std`) and to the dictionary of `sys.inputs`
+that it gave the builder (`Dict::insert`, `remove`). `routines` has no
+field that can be assigned.
+
+The commit: `Library` is `pub struct`, so its fields are read everywhere
+and the record is made in `library` only, where `LibraryBuilder::build`
+is the one place; `features` is not `mut`; `build` copies what its caller
+still holds (the inputs, the features, the formats); and a library has a
+number (`Library::serial`, 64 bits) that is in the key of the three
+stores, in place of the comparison of the objects, which their entries no
+longer hold. What is left is a contract that the types do not hold:
+nothing reachable from a library is written after `build` (its scopes,
+styles, rule map and bindings are objects with public methods that
+write). What a host wants in a library goes through the builder
+(`with_global`, `with_inputs`, `with_features`, and the new
+`with_styles`). Two libraries from one builder are two numbers; a host
+that wants results to be found again keeps its library, as the CLI and
+`doc` do.
+
+What breaks: a record literal or update of a `Library` and an assignment
+to `features` no longer compile.
+
+    // before
+    let library = @typst.library(formats)
+    let library = { ..library, features: Features([Html]) }
+    // after
+    let library = @typst.library_builder(formats)
+      .with_features(Features([Html]))
+      .build()
+
+In the repository that was the test runner (12 places and its writes
+after `build`: `tests/runner/test_world.mbt` has a library per set of
+features now, built with the hooks) and one test of `typst`. `doc`, the
+CLI and `kit` build their libraries with the builder and did not change.
 
 ### Slice 2: the block level
 
@@ -1968,7 +2042,8 @@ Kept or introduced, each stricter than upstream unless said:
 6. **Results that hold identity-compared values are not kept** (frames,
    introspector reads), entries keyed by them end with their compilation,
    the state sequence is not memoized.
-7. **The library is identified by a serial number**, not by its hash.
+7. **The library is identified by a serial number**, not by its hash
+   (step 3).
 8. **The answers of the world are kept per scope**, comemo's accelerator
    per tracked reference and until `evict`. Same observable behaviour
    under the same contract. A world may declare files that change during a
@@ -2056,8 +2131,10 @@ Leaning towards "accepted" by the coordinator; the owner may overrule:
    equality with a compilation from scratch for documents that compare
    modules, or (b) of 5.4 is built.
 2. **The public surface.** `Library` stops being a record that hosts can
-   build or update, and `Introspector::query` returns a view. `doc` and
-   other hosts see both. In a minor version? (Step 1 made its part of the
+   build or update (built, as the last commit of step 3, which can be
+   dropped if this is overruled), and `Introspector::query` returns a
+   view. `doc` and other hosts see both. In a minor version? (Step 1 made
+   its part of the
    change: `Engine.world` is a `TrackedWorld`, `compile_with` has a
    parameter for volatile files and hands its callback the tracked world,
    `eval_source`, `world_range`, `analyze`, the loading functions and

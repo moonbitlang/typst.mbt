@@ -338,11 +338,7 @@ fn suite_frames(doc : @layout.PagedDocument, dumper : StructDumper) -> String {
 fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
   let checks : CaseChecks = { checks: [], }
   let source = TestWorld::main_source(case_path(case_.rel), case_.tc.body)
-  let library = test_library()
-  let library = match parse_features(case_.tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(case_.tc.attrs))
   let world : TestWorld = { main: source, library, }
   let status = (ok : Bool) => if ok { "ok" } else { "error" }
 

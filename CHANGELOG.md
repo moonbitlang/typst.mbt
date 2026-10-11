@@ -106,6 +106,20 @@ Typst source) are unchanged.
   has, not make them per call: the tracked world takes a book and a font
   for the same answer only as the same object (`FontBook::edition`,
   `Font::serial`). It stays correct otherwise, and finds less again.
+- `library`: a `Library` can no longer be built or updated as a record,
+  and its `features` cannot be assigned: the struct is `pub` (it was
+  `pub(all)`, with `mut features`) and has a private field. A library is
+  made by `LibraryBuilder::build` and not changed afterwards, which is
+  what lets the engine identify it by a number in the keys of memoized
+  calls (upstream hashes it; `docs/incremental-design.md`, section 5.3).
+  Instead of `{ ..library, features: f }` write
+  `library_builder(formats).with_features(f).build()`; default styles
+  that were pushed to `library.styles` after `build` go through
+  `LibraryBuilder::with_styles`, definitions through `with_global`.
+  Reading the fields is unchanged. Two libraries, also from one builder,
+  share no memoized results: keep the library to compile again with it.
+  `build` copies the inputs, the features and the formats it was given.
+  The `pub(all)` struct `LibraryBuilder` has a new field, `styling`.
 - `eval`: `eval_source` is memoized like upstream's `eval` (the store of
   module evaluations, which only imports went through): two calls in one
   scope of a world with the same source, library, route and traced span
@@ -301,6 +315,10 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   with a trace and hints of its own.
 - `eval`: `module_memo_stats()`, how many evaluations of source files were
   found and how many computed (for tests and measurements).
+- `library`: `Library::serial()`, a number that no other library of the
+  process has, and `Library::keyed(key)`, a memoization key with it;
+  `LibraryBuilder::with_styles(f)`, which sets default styles while the
+  library is built.
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
   the port of `typst-cli`'s, without its HTTP server for HTML export.
 - `kit/watcher`, a new package (upstream's `watcher` feature of typst-kit):

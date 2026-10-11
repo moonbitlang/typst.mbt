@@ -51,8 +51,10 @@
 //   the calls around it, as if the call had run. A call that read a file
 //   that changes during a scope is not cached. Nothing is looked up or
 //   stored for an engine whose world is not in a scope.
-// - The library is compared by identity (upstream hashes it into the key
-//   of every memoized function that builds an engine).
+// - The library is in every key, as its number (`Library::serial`,
+//   `Library::keyed`; upstream hashes the library into the key of every
+//   memoized function that builds an engine). A library is made by its
+//   builder alone and never changes, so the number is the library.
 //
 // Caches only live for one compilation ([with_layout_memo]: its evaluation
 // and its introspection iterations). The world reads of an entry are
@@ -65,8 +67,6 @@
 priv struct MemoEntry[T, I] {
   /// The arguments that must be equal for reuse (beyond the key).
   input : I
-  /// The library the result was computed with.
-  library : Library
   /// The world reads of the call.
   world : WorldReads
   /// The introspector the result was computed with.
@@ -244,6 +244,8 @@ fn[T, I : Eq] memoize(
     store.entries.clear()
     store.generation = generation
   }
+  // The library (upstream: a hashed argument of the memoized function).
+  let key = engine.library.keyed(key)
   // The traced span is not one per compilation (an evaluated string runs
   // without): a result computed there replays no traced values.
   let key = match engine.traced.0 {
@@ -259,7 +261,6 @@ fn[T, I : Eq] memoize(
   if store.entries.get(key) is Some(entries) {
     for entry in entries {
       if entry.input == input &&
-        physical_equal(entry.library, engine.library) &&
         (
           physical_equal(entry.backend, backend) ||
           (!entry.reads.lossy && entry.reads.validate(engine.introspector))
@@ -325,7 +326,6 @@ fn[T, I : Eq] memoize(
   }
   let entry = {
     input,
-    library: engine.library,
     world: world_reads,
     backend,
     reads,
@@ -743,7 +743,7 @@ fn paint_cacheable(paint : Paint) -> Bool {
 //   without one). The world is tracked like upstream's `Tracked<dyn World>`
 //   (`tracked_world.mbt`): the reads of a call are kept with their answers,
 //   which must be the same in the scope of a later call. The library is
-//   compared by identity (upstream hashes it).
+//   part of the fingerprint, as its number (upstream hashes it).
 // - Results are values: containers are marked shared, so that a mutation
 //   through one holder copies them. A result may hold closures that the
 //   call created: they are equal to the ones a repeated call would create
@@ -773,8 +773,6 @@ priv struct ClosureEntry {
   /// evaluation of a source file that reuses the call; `None` if the call
   /// was not computed inside one, which then cannot reuse it.
   traced_files : Array[@syntax.FileId]?
-  /// The library the result was computed with.
-  library : Library
   /// The world reads of the call.
   world : WorldReads
   /// The introspector the result was computed with.
@@ -1099,8 +1097,7 @@ fn ClosureEntry::matches(
 ) -> Bool {
   guard self.shift_lo <= shift &&
     shift <= self.shift_hi &&
-    self.func.span == func.span &&
-    physical_equal(self.library, engine.library) else {
+    self.func.span == func.span else {
     return false
   }
   guard funcs_memo_equal(self.func, func) else { return false }
@@ -1175,6 +1172,8 @@ pub fn memoized_closure(
   // (Upstream tracks `Traced::get`; the whole span is stricter, and what
   // the call returns does not depend on it.)
   state.write(engine.traced.0)
+  // And the library (upstream: `library: &LazyHash<Library>`, hashed).
+  state.write_i64(engine.library.serial())
   let base = state.finish128()
   let depth = engine.route.depth()
   let parent = engine.introspector.recorder
@@ -1322,7 +1321,6 @@ pub fn memoized_closure(
     route: engine.route,
     queried,
     traced_files,
-    library: engine.library,
     world: world_reads,
     backend: engine.introspector.backend,
     reads: if reads.calls.is_empty() && !reads.lossy {

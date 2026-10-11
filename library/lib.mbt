@@ -428,6 +428,8 @@ pub(all) struct LibraryBuilder {
   mut features : Features
   /// Additional global definitions.
   extra : Array[(Scope) -> Unit]
+  /// What sets the default styles ([LibraryBuilder::with_styles]).
+  styling : Array[(Styles) -> Unit]
   /// Routines into the compiler.
   routines : Routines
   /// The `sys.inputs` dictionary.
@@ -445,6 +447,7 @@ pub fn Library::builder(
   {
     features: Features::all(),
     extra: [],
+    styling: [],
     routines,
     inputs: Dict::new(),
     formats,
@@ -482,12 +485,58 @@ pub fn LibraryBuilder::with_global(
 }
 
 ///|
+/// Set default styles: `f` is called with the styles of the library that
+/// is built, which are empty before (not upstream, whose test world writes
+/// to `lib.styles` before it wraps the library in its hash; here a library
+/// is not written to once it is built).
+pub fn LibraryBuilder::with_styles(
+  self : LibraryBuilder,
+  f : (Styles) -> Unit,
+) -> LibraryBuilder {
+  self.styling.push(f)
+  self
+}
+
+///|
+/// The number of libraries built so far ([Library::serial]).
+let library_serials : Ref[Int64] = { val: 0, }
+
+///|
+/// The number of the library (not upstream, which identifies a library by
+/// the hash of all it holds): no other library of the process has it (64
+/// bits: a counter that does not come round). A
+/// library never changes, so the number says all there is to say about it
+/// to a memoized call, and two libraries that hold the same share no
+/// results: a host that wants results to be reused keeps its library.
+pub fn Library::serial(self : Library) -> Int64 {
+  self.serial
+}
+
+///|
+/// `key` with the library in it: the key of a memoized call that depends
+/// on the library (upstream: every memoized function that builds an engine
+/// hashes its `library` argument). `key` must be a hash: the number is
+/// added with an odd multiplier, not hashed in, so that the keys of one
+/// library stay as distinct as they were and the keys of two libraries
+/// for one call differ, at the cost of an addition per call (`memoize`).
+/// A store that makes its key itself writes [Library::serial] into the
+/// hash instead (closure calls, module evaluations).
+pub fn Library::keyed(self : Library, key : U128) -> U128 {
+  { hi: key.hi, lo: key.lo + self.mix, }
+}
+
+///|
 /// Build the library.
+///
+/// The only place that makes a [Library]: what is built is not written to
+/// afterwards, by the builder (its hooks have run) or by anyone else.
 pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   ensure_scopes()
   let math = math_module()
   let global = Scope::deduplicating()
-  foundations_define(global, self.inputs)
+  // (Copies of what the builder was given and its caller still holds: the
+  // inputs here, the features and the formats below.)
+  foundations_define(global, self.inputs.copy())
   model_define(global)
   text_define(global)
   layout_define(global)
@@ -510,14 +559,22 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   for format in self.formats {
     format.register_rules(rules)
   }
+  let styles = Styles::new()
+  for f in self.styling {
+    f(styles)
+  }
+  library_serials.val += 1
+  let serial = library_serials.val
   {
     routines: self.routines,
     global,
     math,
-    styles: Styles::new(),
+    styles,
     rules,
     std: Binding::detached(Module(global)),
-    features: self.features,
-    formats: self.formats,
+    features: Features(self.features.0.copy()),
+    formats: self.formats.copy(),
+    serial,
+    mix: serial.reinterpret_as_uint64() * 0x9E3779B97F4A7C15UL,
   }
 }

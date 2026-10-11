@@ -107,11 +107,7 @@ fn pdf_compile(
 ) -> (TestWorld, @syntax.FileId, @layout.PagedDocument)? {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let id = source.id()
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
