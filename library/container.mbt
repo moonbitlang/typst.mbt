@@ -82,7 +82,9 @@ pub fn BlockElem::multi_layouter_content(
   captured : Content,
   f : (Content, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError,
 ) -> BlockElem {
-  BlockElem::new().with_body(Some(MultiLayouter({ captured, f, })))
+  BlockElem::new().with_body(
+    Some(MultiLayouter({ captured, f, typed: false, })),
+  )
 }
 
 ///|
@@ -312,6 +314,24 @@ pub extend BlockSingleCallback with Eq::{not_equal, equal}
 pub struct BlockMultiCallback {
   priv captured : Content
   priv f : (Content, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError
+  /// Whether the callback was made for a typed element
+  /// ([BlockMultiCallback::new]) and not for plain content
+  /// ([BlockElem::multi_layouter_content]).
+  ///
+  /// Upstream's callbacks hash their captured element and their function
+  /// pointer (`#[derive(Hash)]`, `layout/container.rs:609`); a function
+  /// has no identity here. The fingerprint of a callback is its kind and
+  /// its captured element, which says which function it is as long as an
+  /// element type has one callback per kind: that holds for the show rules
+  /// of `layout/rules.mbt` (keep it so), and it does not hold between
+  /// them and a callback for plain content, which may capture an element
+  /// that has a rule. So the two are told apart, in the fingerprint and
+  /// in the comparison of memoized arguments (`value_hash.mbt`,
+  /// `dyns_memo_equal`): a block that lays out a `pad` element with
+  /// `layout_pad` and one that lays out the same element with a host's
+  /// function are two blocks to a memoized layout. (Whoever makes
+  /// callbacks for plain content gives equal content one function.)
+  priv typed : Bool
 }
 
 ///|
@@ -324,6 +344,7 @@ pub fn[T : NativeElement] BlockMultiCallback::new(
     f: (c, engine, locator, styles, regions) => {
       f(T::from_content_unchecked(c), engine, locator, styles, regions)
     },
+    typed: true,
   }
 }
 

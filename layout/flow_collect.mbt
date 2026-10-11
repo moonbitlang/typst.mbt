@@ -412,8 +412,51 @@ fn SingleChild::layout(
 }
 
 ///|
-/// The internal implementation of [SingleChild::layout].
+/// The cached, internal implementation of [SingleChild::layout] (memoized
+/// like upstream's `#[comemo::memoize]`, typst-layout/src/flow/collect.rs:420;
+/// see `library/memo.mbt`).
+///
+/// Upstream hashes `library`, `elem`, `styles` and `region`, tracks the
+/// world, the introspector, the traced span, the route and the locator, and
+/// replays the sink. Here the key is the element, the style chain and the
+/// region, plus the resolved locator and the whole route, as for paragraphs
+/// and fragments (stricter than tracking them: `docs/incremental-design.md`,
+/// section 10, item 1); the store compares the library, validates the
+/// introspector reads and the world reads, replays the sink and has the
+/// traced span in the key (`@library.memoized_layout`).
 fn layout_single_impl(
+  engine : @library.Engine,
+  elem : @library.BlockElem,
+  locator : @library.Locator,
+  styles : @library.StyleChain,
+  region : @library.LayoutRegion,
+) -> @library.Frame raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    return layout_single_compute(engine, elem, locator, styles, region)
+  }
+  block_memo_counts[0] += 1
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_single")
+    state.write(elem.0)
+    state.write_u128(styles.memo_hash())
+    state.write_f64(region.size.x.to_raw())
+    state.write_f64(region.size.y.to_raw())
+    state.write_bool(region.expand.x)
+    state.write_bool(region.expand.y)
+    state.write_u128(locator.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  @library.memoized_layout(engine, key, elem.0, styles, None, engine => {
+    block_memo_counts[1] += 1
+    @library.Fragment::frame(
+      layout_single_compute(engine, elem, locator, styles, region),
+    )
+  }).into_frame()
+}
+
+///|
+/// The uncached body of [layout_single_impl].
+fn layout_single_compute(
   engine : @library.Engine,
   elem : @library.BlockElem,
   locator : @library.Locator,
@@ -489,8 +532,54 @@ fn MultiChild::layout_full(
 }
 
 ///|
-/// The internal implementation of [MultiChild::layout_full].
+/// The cached, internal implementation of [MultiChild::layout_full]
+/// (memoized like upstream's `#[comemo::memoize]`,
+/// typst-layout/src/flow/collect.rs:520; see [layout_single_impl] for what
+/// the key holds and what the store validates: the same, with the regions
+/// in the place of the region).
 fn layout_multi_impl(
+  engine : @library.Engine,
+  elem : @library.BlockElem,
+  locator : @library.Locator,
+  styles : @library.StyleChain,
+  regions : @library.Regions,
+) -> @library.Fragment raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    return layout_multi_compute(engine, elem, locator, styles, regions)
+  }
+  block_memo_counts[0] += 1
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_multi")
+    state.write(elem.0)
+    state.write_u128(styles.memo_hash())
+    state.write_f64(regions.size.x.to_raw())
+    state.write_f64(regions.size.y.to_raw())
+    state.write_bool(regions.expand.x)
+    state.write_bool(regions.expand.y)
+    state.write_f64(regions.full.to_raw())
+    state.write_usize(regions.backlog.length())
+    for height in regions.backlog {
+      state.write_f64(height.to_raw())
+    }
+    match regions.last {
+      Some(last) => {
+        state.write_discriminant(1)
+        state.write_f64(last.to_raw())
+      }
+      None => state.write_discriminant(0)
+    }
+    state.write_u128(locator.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  @library.memoized_layout(engine, key, elem.0, styles, None, engine => {
+    block_memo_counts[1] += 1
+    layout_multi_compute(engine, elem, locator, styles, regions)
+  })
+}
+
+///|
+/// The uncached body of [layout_multi_impl].
+fn layout_multi_compute(
   engine : @library.Engine,
   elem : @library.BlockElem,
   locator : @library.Locator,
@@ -503,6 +592,23 @@ fn layout_multi_impl(
   layout_and_modify(styles, styles => {
     layout_multi_block(elem, engine, locator, styles, regions)
   })
+}
+
+///|
+/// The calls of [layout_single_impl] and [layout_multi_impl] in
+/// compilations with memoization, and those among them that were computed
+/// (the others were found in the store).
+let block_memo_counts : FixedArray[Int] = [0, 0]
+
+///|
+/// The number of block layouts (`layout_single_impl`, `layout_multi_impl`)
+/// that were found in the store of memoized layouts and that were computed,
+/// in this process (for tests and measurements, like
+/// `@library.closure_memo_stats`). A layout that the recording check
+/// (`@library.set_memo_check`) computes a second time counts as computed
+/// twice, and one that raised as computed.
+pub fn block_memo_stats() -> (Int, Int) {
+  (block_memo_counts[0] - block_memo_counts[1], block_memo_counts[1])
 }
 
 ///|

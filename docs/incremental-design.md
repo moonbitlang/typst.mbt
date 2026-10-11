@@ -1,15 +1,17 @@
 # Incremental compilation: design
 
-Status: slice 0 and slice 1 are built (5.5, "As built"; section 8, "Step 3
-as built", "Step 4 as built" and "Step 5 as built"): the stores of
-memoized calls outlive their compilation, with comemo's ages, and `typst
-watch` recompiles a small edit in a fraction of a first compilation. Slices
-2 and 3 are design.
+Status: all four slices are built. Slices 0 and 1 (5.5, "As built";
+section 8, "Step 3 as built", "Step 4 as built" and "Step 5 as built"):
+the stores of memoized calls outlive their compilation, with comemo's
+ages, and `typst watch` recompiles a small edit in a fraction of a first
+compilation. Slice 2 (section 8, "Slice 2 as built"): the block level of
+the flow is kept. Slice 3 (section 8, "Slice 3 as built"): page runs and
+the document are kept, and a recompilation after which the content is
+what it was is the export and little else. The two were built at the same
+time on two branches; section 8, "Slices 2 and 3 together", has them
+measured as one.
 Module equality was decided by the owner on 2026-10-11, against the
 recommendation of revisions 3 and 4: exactly as upstream (5.4, "Modules").
-Slice 3 is built (section 8, "Slice 3 as built"): page runs and the
-document are kept, and a recompilation after which the content is what it
-was is the export and little else.
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
 recording check); revision 4 elsewhere. Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
@@ -388,7 +390,7 @@ S sink (mutable), R route, C context, L locator.
 | `layout_document_impl`, `layout_document_for_bundle_impl` | library, content, styles | W I T S R (the bundle variant also L) | not memoized (`layout/pages.mbt`). Since slice 3: `memoized_pages`, kept across compilations; key: content, styles, route (the bundle variant: the resolved locator too) | only when nothing changed |
 | `layout_page_run_impl` | library, children, initial styles | W I T S R L | not memoized (`layout/pages_run.mbt`). Since slice 3: `memoized_pages`, kept across compilations; key: children with their styles, initial styles, the resolved locator, route | decks (a run per slide); else only when nothing changed |
 | `layout_fragment_impl` | library, content, styles, regions, column | W I T S R L | `memoized_layout`, per compilation; key also has the resolved locator and the whole route | yes |
-| `layout_single_impl`, `layout_multi_impl` | library, block, styles, region(s) | W I T S R L | not memoized (`layout/flow_collect.mbt`) | yes: 40 % of what is left of `long.typ` |
+| `layout_single_impl`, `layout_multi_impl` | library, block, styles, region(s) | W I T S R L | not memoized (`layout/flow_collect.mbt`); since slice 2 `memoized_layout`, keyed like fragments (section 8, "Slice 2 as built") | yes: 40 % of what is left of `long.typ` |
 | `layout_par_impl` | library, par, styles, region, expand, situation | W I T S R L | `memoized_layout`, per compilation | yes |
 | counter `sequence_impl` | library, counter, selector | W I T S R | `memoize`, per compilation | small |
 | state `sequence_impl` | library, state | W I T S R | not memoized, on purpose: its values may hold what compares by identity (`library/memo.mbt`, header) | not measured |
@@ -3091,6 +3093,490 @@ Expected ("+ blocks"): `long.typ` 92 ms to 56 ms, `longer.typ` 507 ms to
 nothing for the deck. Risk: low; the machinery is the fragments'. Left
 out: the locator as a tracked argument (section 10).
 
+#### Slice 2 as built
+
+The layouts of blocks are memoized: every block, table, grid, list, shape,
+image and display equation of a flow is found again by a later
+introspection iteration and by a later compilation, like a paragraph.
+After an edit at the end, `bench/long.typ` recompiles in 57 ms where it
+took 97 ms, `longer.typ` in 282 ms where it took 503 ms ("Measured"
+below).
+
+**Upstream's functions, and the port's keys.**
+`typst-layout/src/flow/collect.rs`:
+
+    #[comemo::memoize]                                   // :420
+    fn layout_single_impl(
+        world: Tracked<dyn World + '_>,
+        library: &LazyHash<Library>,
+        introspector: Tracked<dyn Introspector + '_>,
+        traced: Tracked<Traced>,
+        sink: TrackedMut<Sink>,
+        route: Tracked<Route>,
+        elem: &Packed<BlockElem>,
+        locator: Tracked<Locator>,
+        styles: StyleChain,
+        region: Region,
+    ) -> SourceResult<Frame>
+
+and `layout_multi_impl` (`:520`), the same with `regions: Regions` and
+`SourceResult<Fragment>`. To comemo, `library`, `elem`, `styles` and
+`region` or `regions` are hashed, the world, the introspector, the traced
+span, the route and the locator are tracked, and the sink is tracked
+mutably (its calls are replayed). In the port
+(`layout/flow_collect.mbt`, the two functions under their names, each
+with its body in `layout_single_compute` and `layout_multi_compute`):
+
+| argument | upstream | the port |
+| --- | --- | --- |
+| `elem` | hashed | in the key (`Fingerprint for Content`), and kept and compared (`content_memo_equal`, deviation 3) |
+| `styles` | hashed | in the key (`StyleChain::memo_hash`), kept and compared (`chain_memo_equal`) |
+| `region` | hashed (`size`, `expand`) | in the key: both sizes, both flags |
+| `regions` | hashed (`size`, `expand`, `full`, `backlog`, `last`) | in the key: the sizes, the flags, `full`, the backlog with its length, `last` with whether there is one |
+| `library` | hashed | compared as an object by the store (deviation 7) |
+| `locator` | tracked | the resolved locator in the key (`Locator::memo_hash`, deviation 1) |
+| `route` | tracked | the whole route in the key (`Route::memo_hash`, deviation 1) |
+| `traced` | tracked | the span in the key (in `memoize`, deviation 2) |
+| `world` | tracked | the reads of the call recorded and validated (`TrackedWorld`, 5.2) |
+| `introspector` | tracked | the reads of the call recorded and replayed to validate |
+| `sink` | tracked mutably | a copy kept and replayed |
+
+Both go through `memoized_layout`, the store of paragraphs and fragments,
+with a key that starts with the name of the function, so they have what
+that store has without a line of their own: ages and the evictor, the
+limit of four young results per key, the end with its compilation of an
+entry whose key holds a host closure, the recording check. Errors are not
+kept (deviation 5); the `CachedCell` of the child keeps the last one, as
+before.
+
+**What was in the way: the grid.** As the design said. Verified first,
+with the two functions memoized and the comparison as it was: a
+recompilation of `long.typ` found 359 block layouts and computed 114, in
+every compilation: 38 per iteration in three iterations, the number of
+the probe, of a document with 36 tables. `dyns_memo_equal` answered `false` for two
+`CellGrid` values that are not the same object, and the synthesized
+`grid` field of a grid or table (upstream `Arc<CellGrid>`,
+`layout/grid/mod.rs:412`, `model/table.rs:281`) is made anew by every
+realization. With the comparison below: 473 found, none computed.
+
+The comparison (`library/memo_grid.mbt`, `cell_grids_memo_equal`) covers
+what upstream's `#[derive(PartialEq, Hash)]` of the grid types covers
+(`typst-library/src/layout/grid/resolve.rs`), which is also what the
+port's `Fingerprint for CellGrid` writes, field by field:
+
+| type | upstream | compared |
+| --- | --- | --- |
+| `CellGrid` | `:657` | `entries`, `cols`, `rows`, `vlines`, `hlines`, `headers`, `footer`, `has_gutter` |
+| `Entry` | `:628` | a cell, or the parent it is merged with |
+| `Cell` | `:571` | `body`, `fill`, `colspan`, `rowspan`, `stroke` (four sides), `stroke_overridden`, `breakable` |
+| `Line` | `:396` | `index`, `start`, `end`, `stroke`, `position` |
+| `Header`, `Footer` | `:426`, `:445` | `range` (`start`, `end`), `level`, `short_lived` |
+| `Repeatable` | `:470` | the child, `repeated` |
+
+It is finer than `==` where every comparison of arguments is: the body of
+a cell by all stored fields (`content_memo_equal`), and a tiling in a
+fill or a stroke with the host closures of its frame as objects
+(`hosts_memo_equal`). The cheap parts are compared first.
+
+*What it costs.* Counted (a counter in a local build): a compilation of
+`long.typ` makes 108 grids that are fingerprinted (36 tables in three
+iterations), fingerprints each once and compares 114 pairs, for 473 block
+lookups; the table document below 30, 30 and 35 per recompilation. So
+the fingerprint of a grid is computed once per realized grid, not per
+lookup: it is part of the fingerprint of the element that holds it, which
+a `Content` caches (`data_hash`), and that is where upstream's `LazyHash`
+is (the fields of a packed element). There is nothing to cache besides.
+Sampled (`/usr/bin/sample`, 1 ms, a watching process that recompiles
+after edits at the end; shares of the samples inside compilations):
+
+| document | a recompilation | the grids fingerprinted | the grids compared | all arguments compared | for scale: the grids resolved (realization) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `long.typ` (36 tables, 25 pages) | 57 ms | 2.2 % | 0.7 % | 3.4 % | 5.1 % |
+| 30 tables of 408 cells each (12 240 cells, 42 pages) | 150 ms | 4.8 % | 1.9 % | 2.2 % | 11.3 % |
+
+A third of the fingerprint is the strokes of the cells, four per cell,
+each written as the value it would be (`fingerprint_stroke`): the place
+to look if a table document needs it.
+
+**The other values that the comparison takes for different although they
+are the same.** Looked for in `values_memo_equal`, `dyns_memo_equal` and
+the `Eq` of every type they leave to `==`:
+
+- `CellGrid` was the only case of `DynValue` that answered by identity.
+  Every other payload either has a case that walks into it (states,
+  counters, selectors, tags, the layout callbacks, the lines of raw
+  text) or an `Eq` that compares what it holds (alignments, directions,
+  regular expressions, spot colorants, strokes and decorations with
+  their paints, locations, paths, CSS properties, loaded data, syntaxes
+  and themes by the hash of their bytes).
+- A value that is not equal to itself: a float that is NaN (`float.nan`
+  as a value; a length that is NaN is equal to itself). `==` says
+  `false`, so it is the same argument only as the same object (the
+  comparison starts with identity, which is why a later iteration of one
+  compilation finds it), and after an edit of its file the paragraph,
+  the block or the closure call that holds it is computed again. Held
+  by: any field of an element, any style property, any argument of a
+  closure call, directly or in an array or a dictionary. Upstream hashes
+  the bits and finds it. Not changed here: it is the comparison of every
+  store, not the block level's, what it costs is a computation, and a
+  NaN in content is rare.
+- A module is taken by its hash (the owner's decision, 5.4), a closure by
+  its hash and its host closures, a native function, an element and a
+  type by the descriptor: none of them says
+  "different" for the same thing.
+
+**Layout callbacks: looser than upstream, and one case closed.**
+Upstream's `InlineCallback`, `BlockSingleCallback` and
+`BlockMultiCallback` hash their captured element and their function
+pointer (`layout/container.rs:609`, `#[derive(Hash)]`; `PartialEq`
+compares the captured element alone, `:648`). A function has no identity
+here, and the port's fingerprint of a callback is its kind and its
+captured element. That is the same key as long as an element type has
+one callback per kind, which holds for the show rules of
+`layout/rules.mbt` (22 element types with a block callback and one with
+an inline callback besides, each with one function per kind). It did not hold between them and
+`BlockElem::multi_layouter_content`, which captures any content (the
+test runner's `bounds`): a block that lays out a `pad` element with
+`layout_pad` and one that lays out the same element with a host's
+function had one fingerprint and compared equal. No document was found
+that puts two such blocks at one place with the same styles (the element
+of a rule is prepared, the content that a function is handed is not, and
+one inside the other is another locator), but with blocks memoized that
+is the key of a layout, so the two are told apart now
+(`BlockMultiCallback.typed`, in the fingerprint and in the comparison;
+`library/memo_callback_wbtest.mbt`). What remains is the rule: one
+callback per kind for an element type, and one function for equal
+content among the callbacks for plain content (section 10, item 21).
+
+**Mutable results.** `memoize` keeps `copy(output)` and hands out
+`copy(entry.output)`, and for a layout `copy` is a copy-on-write clone
+of every frame (`Frame::clone`: the item array is shared and both frames
+are marked; the first write through either copies the array and clones
+the groups in it, `frame.mbt`). That is what both functions return (a
+`Frame`, kept as a fragment of one, and a `Fragment`), so it covers them
+as it covers paragraphs:
+
+- The callers: `SingleChild::layout`, `MultiChild::layout_full` and
+  through it `MultiSpill::layout`. Each keeps what it gets in its
+  `CachedCell` and hands out clones, so the copies of the store are a
+  second layer here: with either of them removed for blocks alone no
+  test and no sequence fails (below); the rule is tested at the store
+  (`library/memo_frames_wbtest.mbt`, which fails without either).
+- Tags are items like any other, with their content, which is immutable.
+  A frame whose tags hold a host closure, or whose text or shapes are
+  painted with a tiling whose frame holds one, is not kept
+  (`frame_cacheable`, asked for every frame of a result, at every
+  depth): a block's frame has nothing that a fragment's has not (its
+  fill and stroke are shapes).
+- What a clone does not protect: a frame taken out of a group of an
+  `items()` view and written to directly. The nested frame is one object
+  in the store's array and in the caller's until the caller's array is
+  copied, and a write that does not go through the frame that owns the
+  array copies nothing. `items()` is a read-only view by the contract of
+  `frame.mbt`; every write to a frame in the engine and in the exporters
+  was looked at (`grep` for the methods that write, on anything reached
+  through `.frame`): `Frame::hide` goes into groups after the copy, and
+  `layout/pages.mbt` writes to the frame of a page it made. A host that
+  holds a document and does it writes to what the stores keep, for
+  paragraphs and fragments since step 5 and for blocks now. It would
+  take a deep copy per hit to rule that out, and the same host can write
+  to the glyphs of a text item, which no copy of frames reaches; the
+  line is where `frame.mbt` draws it. `typst/block_memo_wbtest.mbt`,
+  "the frames of a kept layout are not those of the document", is the
+  test of what holds: every page of a document hidden, moved, resized,
+  emptied, and the next compilation finds the layouts as they were.
+
+**Tests** (each fails without what it names):
+
+- `library/memo_grid_wbtest.mbt`: two grids built from the same cells
+  are one argument (the test of the comparison as it was: `false`); 40
+  grids that differ from it in one component each are other arguments,
+  to the comparison and to the fingerprint, and the same inside an
+  element; host closures in a body, a fill, a stroke and the stroke of a
+  line are compared as objects.
+- `typst/block_memo_wbtest.mbt`, with `@layout.block_memo_stats()`, the
+  number of block layouts that were found and that were computed: a
+  table, a grid, blocks in blocks, a block that breaks and shapes are
+  found by the next compilation (none computed) and after an edit at the
+  end (at most two computed); blocks are found by the later iterations
+  of one compilation; tables that differ in a cell, a fill, a stroke,
+  the stroke of one cell, a column size, a header flag, a line or a
+  footer are laid out, with the table that did not change found, and
+  give the pages of a compilation without memoization; one block at
+  three places is three layouts; a block that breaks is laid out for
+  the regions it gets; the same block under other styles; a block that
+  reads a file, one that queries the document and one under another
+  library are laid out again; a host's block on routes of two depths
+  and under two libraries that its callback tells apart; the warnings
+  of a block that is found are reported again; the frames.
+- `library/memo_callback_wbtest.mbt`, `library/memo_frames_wbtest.mbt`.
+
+**The document of the stage.** `tests/recompile/docs/blocks` (the README
+there describes it): what the block level keeps, and four blocks whose
+layout depends on what is neither their text nor their styles. The
+existing documents exposed the validations of world reads and of
+introspector reads for blocks alone (40 and 25 documents), but not the
+locator, the regions after the first, the library and the sink, each of
+which the new document exposes: 127 documents, 244 sequences, 1476
+steps, 4406 compilations; none fails, and the watch loop gives
+upstream's watch output at the 18 pinned steps.
+
+**Mutation checks.** Each put in by a script on the tree, one at a time,
+never committed; the default `recompile` stage (244 sequences, seed 1)
+and the tests above. A mutation "for blocks" is behind a switch that
+only the two functions pass, so that the paragraphs and fragments inside
+a block, which have the same validations, do not hide it.
+
+| what was broken, for blocks alone (number in 9.1) | failing sequences | first exposed at; tests |
+| --- | ---: | --- |
+| the world reads of an entry are not validated [1 to 6, for this store] | 47, in 40 documents | `project/blocks`, sweep, step 2 (the fonts); "a block that reads a file is laid out again when the file changes" |
+| the introspector reads of an entry are not validated [11] | 42, in 25 documents | `bench/long`, sweep, step 0 (the second iteration of the first compilation); 3 tests |
+| the locator is not in the key | 2 | `project/blocks`, sweep, step 0; "the same block at three places is three layouts" |
+| the regions are not in the key of `layout_multi_impl` | 10 | `bench/long`, sweep, step 0; 2 tests |
+| the region is not in the key of `layout_single_impl` | 14 | `bench/long`, sweep, step 0; 1 test |
+| the backlog and `last` are not in the key | 2 | `project/blocks`, sweep, step 0; "a block that breaks is laid out for the regions it gets" |
+| the styles are neither in the key nor compared | 17 | `project/book`, sweep, step 5; "the same block under other styles is another layout" |
+| the sink of an entry that is found is not replayed [14] | 2 | `project/blocks`, sweep, step 0 (a warning is missing); "the warnings of a block that is found are reported again" |
+| the route is not in the key | 0 | no sequence: in a document the route of a layout is as deep as the layout is nested, and what is nested differently has another locator. "a block is laid out for the route it is on": a host's block on routes of two depths, the deeper one a level too deep |
+| the library is not compared [12] | 0 | no sequence: a block of a document that can tell two libraries apart has another key under each (the closure of a `context` block captured `sys`; default styles are in the chain). "a block whose callback asks the library is laid out per library": a host's callback that asks for a feature |
+| an entry keeps the frames its caller has; an entry hands out the frames it keeps | 0 and 0 | nothing: `CachedCell` clones |
+| the same two for every layout of the store | 40 and 26 | `bench/long`, sweep, step 0; `library/memo_frames_wbtest.mbt` |
+| the grid comparison as it was (equal only as the same object) | 0 | all of `library/memo_grid_wbtest.mbt` and the block tests that find a table; `long.typ` computes 114 block layouts in every recompilation |
+| the grid comparison leaves out one component (31 mutations, one per field compared), compares a body with `==`, or leaves the host closures of a fill or a stroke to `==` (3) | 0 | each fails "a grid that differs in one component .." at the grid that differs in it, or "host closures in a body, a fill and a stroke .." |
+| a callback for plain content is the callback of its content's rule, to the fingerprint or to the comparison | 0 | `library/memo_callback_wbtest.mbt` |
+
+Two mutations fail no sequence because no document can tell: the route
+(determined by where a layout is) and the library (determined by what a
+block holds); each has a test with a host's callback, which the review
+asked for. One pair is exposed by nothing: the copies for blocks alone,
+a second layer under `CachedCell`'s. The grid comparison cannot fail a
+sequence: a grid is a function of the fields of its element and of the
+styles, which are in the key themselves, so two different grids never
+meet under one key in a document, and a too coarse comparison is only
+ever asked about grids that are equal. It is a unit under test, one grid
+per component, and so is its fingerprint (no two of the 41 grids share
+one). `tests/recompile/README.md`, "The block level", has the table in
+full.
+
+**The recording check** (`--check-reads`): `paged` 45 820 entries,
+`edsl` 122 459, `recompile` 116 341, `packages` 1 359 403; no entry
+differs, and the verdicts of the stages are what they are without it
+(the 18 pinned steps included). There are more entries than before
+(`paged` 33 509, `recompile` 80 787): every block is one.
+
+**Soak.** `scripts/recompile_soak.py --minutes 20` with the runner of the
+slice and cold references (three steps of every run compiled again as
+the first compilation of a new process): 127 documents, seeds 12000 to
+12009, 30.0 minutes with 10 jobs (the runs in flight are finished; the
+mutation checks and the measurements of the slice ran beside it): 1270
+runs, 6150 sequences, 70 015 steps, 207 225 compilations, 3760 cold
+references; 0 failures, 0 aborts.
+
+**Measured.** As in step 5: aarch64 macOS, native release, PDF output,
+`--ignore-system-fonts`, `scripts/watch_check.py --bench`, five watch
+sessions of every binary in turns, each a first compilation and five
+edits of every kind; medians of the 25 recompilations and of the five
+first compilations, milliseconds. "Before" is `main` at `565eac6`. The
+machine was not quiet (the mutation checks of this slice and the
+conversion sweep ran on it): the least of a row is up to a tenth below
+its median.
+
+| document | edit | before | after | upstream | after / upstream |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `long.typ` | first compilation | 239 | 234 | 111 | 2.1 |
+|  | end | 97.0 | 56.6 | 25.3 | 2.2 |
+|  | middle | 106 | 67.7 | 29.3 | 2.3 |
+|  | comment | 101 | 59.9 | 14.0 | 4.3 |
+| `longer.typ` | first compilation | 1170 | 1130 | 523 | 2.2 |
+|  | end | 503 | 282 | 125 | 2.3 |
+|  | middle | 547 | 335 | 148 | 2.3 |
+|  | comment | 510 | 307 | 67.3 | 4.6 |
+| `showcase.typ` | first compilation | 240 | 239 | 164 | 1.5 |
+|  | end | 23.9 | 20.4 | 7.9 | 2.6 |
+|  | middle | 24.3 | 20.3 | 8.0 | 2.6 |
+|  | imported | 26.0 | 22.3 | 9.2 | 2.4 |
+|  | comment | 24.2 | 20.2 | 6.4 | 3.1 |
+| touying | first compilation | 198 | 195 | 147 | 1.3 |
+|  | end | 24.8 | 19.3 | 10.8 | 1.8 |
+|  | middle | 25.9 | 20.5 | 11.4 | 1.8 |
+|  | imported | 116 | 114 | 86.7 | 1.3 |
+|  | comment | 20.3 | 14.6 | 3.5 | 4.2 |
+| handbook | first compilation | 156 | 156 | 105 | 1.5 |
+|  | end | 28.8 | 25.8 | 9.6 | 2.7 |
+|  | middle | 28.0 | 25.9 | 9.9 | 2.6 |
+|  | imported | 74.4 | 73.7 | 22.1 | 3.3 |
+|  | comment | 28.5 | 25.8 | 5.3 | 4.9 |
+| `book` | first compilation | 92.6 | 93.6 | 70.1 | 1.3 |
+|  | end | 11.7 | 11.5 | 4.2 | 2.7 |
+|  | middle | 12.1 | 11.3 | 4.6 | 2.5 |
+|  | imported | 15.8 | 15.8 | 6.5 | 2.4 |
+|  | comment | 12.2 | 11.6 | 2.6 | 4.5 |
+| `chain` | first compilation | 5.0 | 4.9 | 3.8 | 1.3 |
+|  | end | 2.9 | 2.9 | 1.2 | 2.4 |
+|  | middle | 2.6 | 2.8 | 1.2 | 2.2 |
+|  | imported | 2.6 | 2.6 | 0.9 | 2.9 |
+|  | comment | 2.6 | 2.5 | 0.9 | 2.9 |
+| `notes` | first compilation | 15.3 | 15.6 | 8.4 | 1.9 |
+|  | end | 7.6 | 6.9 | 2.9 | 2.4 |
+|  | middle | 7.6 | 7.3 | 3.0 | 2.5 |
+|  | imported | 9.5 | 9.0 | 3.6 | 2.5 |
+|  | comment | 7.9 | 7.0 | 2.5 | 2.8 |
+| `linked` | first compilation | 3.3 | 3.2 | 3.0 | 1.1 |
+|  | end | 2.4 | 2.4 | 1.2 | 1.9 |
+|  | middle | 2.2 | 2.1 | 1.4 | 1.5 |
+|  | comment | 2.0 | 2.0 | 1.0 | 2.0 |
+| deck | first compilation | 544 | 555 | 77.3 | 7.2 |
+|  | end | 15.2 | 15.3 | 14.5 | 1.1 |
+|  | middle | 16.4 | 16.3 | 13.9 | 1.2 |
+|  | comment | 14.8 | 16.0 | 13.3 | 1.2 |
+
+Against the "+ blocks" column of 3.3, after an edit at the end:
+
+| document | expected | measured |
+| --- | ---: | ---: |
+| `long.typ` | 92 to 56 | 97.0 to 56.6 |
+| `longer.typ` | 507 to 313 | 503 to 282 |
+| touying | 22 to 18 | 24.8 to 19.3 |
+| handbook | 30 to 26 | 28.8 to 25.8 |
+| deck | nothing | 15.2 and 15.3 |
+
+No row misses. `longer.typ` gains more than the probe had (221 ms where
+it had 194); the probe's tree was `main` of a week before, without the
+accelerator of introspector reads and the native work of pull request 74,
+and the difference was not looked into. Where blocks buy little, they are not what is left: `showcase.typ` (its
+recompilation is the export of its images and its raw blocks, 24 ms to
+20 ms), the projects (12 ms and under), the deck (paragraphs and
+images), and an edit of a package's theme, after which every block has
+other styles (the touying document 117 ms to 114 ms, the handbook 74 ms
+both). After a comment the port still lays out the flow and exports
+(`long.typ` 60 ms where upstream takes 14): that is slice 3's.
+
+*Where the rest goes* after an edit at the end of `long.typ` (sampled as
+above, shares of a recompilation): export 61 %; the layout of the
+document 31 %, of which the document-level realization is 16 points (5
+of them resolving the grids of the tables, which upstream repeats too)
+and the flow 12, with the block level in it: its keys, its comparisons
+and the one block that is laid out are 6; evaluation 5 %.
+
+*What a first compilation and a one-shot `typst compile` pay.* Against
+the base of the slice, the least of twelve runs each in turns
+(instructions retired and cycles of `/usr/bin/time -l`):
+
+| workload | instructions before | after | change | cycles before | after | change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.5 M | 64.5 M | -0.02 % | 24.5 M | 24.8 M | +1.32 % |
+| `long.typ` to PDF | 3260.1 M | 3139.5 M | -3.70 % | 779.5 M | 757.5 M | -2.82 % |
+| `longer.typ` to PDF | 15816.1 M | 15205.0 M | -3.86 % | 3812.5 M | 3695.7 M | -3.06 % |
+| `query longer.typ heading` | 13372.8 M | 12746.9 M | -4.68 % | 3280.2 M | 3153.7 M | -3.86 % |
+| `showcase.typ` to PDF | 3779.0 M | 3731.9 M | -1.25 % | 825.2 M | 818.0 M | -0.87 % |
+| touying `theme-metropolis.typ` to PDF | 2597.5 M | 2564.2 M | -1.28 % | 680.0 M | 665.7 M | -2.10 % |
+| ilm `bakers-handbook.typ` to PDF | 2279.6 M | 2270.4 M | -0.41 % | 547.6 M | 550.0 M | +0.42 % |
+| the book of `tests/recompile/docs` to PDF | 1380.8 M | 1381.4 M | +0.04 % | 333.5 M | 336.5 M | +0.91 % |
+| the blocks of `tests/recompile/docs` to PDF | 309.3 M | 308.9 M | -0.16 % | 89.2 M | 89.0 M | -0.29 % |
+| 30 tables of 408 cells to PDF | 14016.8 M | 14492.1 M | +3.39 % | 3464.9 M | 3700.8 M | +6.81 % |
+
+A first compilation gains where a document needs more than one
+introspection iteration, since the blocks of the first are found by the
+second (`long.typ` and `longer.typ` have three: 3.7 and 3.9 %), and pays
+nothing that can be measured where blocks are few. It pays where a
+document is all tables and converges in one iteration, the last row: a
+key per table, which is the fingerprint of its children and of its grid
+(what upstream hashes for the same key), an entry, and one walk over its
+frames (`frame_cacheable`), without a hit to pay it back: 3.4 % of the
+instructions, and 46 MB of the peak, since the entries keep their
+arguments (deviation 3: the realized table with its grid) until the
+process ends. The budget of 5.2, 1 % of a compilation from scratch, holds
+for every document of the measurements and not for that one.
+
+**Memory.** `scripts/watch_check.py --bench-memory`, `longer.typ`, the
+resident set size of the watching process after the first compilation
+and after 10, 50 and 200 edits, every edit a text that the session has
+not had:
+
+| edits | binary | first | after 10 | after 50 | after 200 | peak |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| at the end | before | 171 MB | 219 MB | 224 MB | 224 MB | 224 MB |
+| at the end | after | 188 MB | 237 MB | 241 MB | 241 MB | 241 MB |
+| at the end | upstream | 311 MB | 1963 MB | 2202 MB | 2255 MB | 2255 MB |
+| every heading | before | 171 MB | 311 MB | 324 MB | 324 MB | 324 MB |
+| every heading | after | 189 MB | 341 MB | 357 MB | 357 MB | 357 MB |
+| every heading | upstream | 313 MB | 2163 MB | 2375 MB | 2417 MB | 2417 MB |
+| every paragraph | before | 171 MB | 1024 MB | 1111 MB | 1111 MB | 1111 MB |
+| every paragraph | after | 188 MB | 1294 MB | 1409 MB | 1409 MB | 1409 MB |
+| every paragraph | upstream | 312 MB | 2984 MB | 3355 MB | 3421 MB | 3421 MB |
+
+Every plateau is still one: what a session holds is what its last eleven
+compilations used. The entries of blocks add 17 MB to a first
+compilation of `longer.typ` (121 pages, 180 tables) and to a session
+of edits at the end, 33 MB where
+every heading changes, and 298 MB (27 %) where every edit changes the
+size of the text, after which every block of the document is another
+layout: eleven generations of all of them. What an entry of a block
+keeps is what an entry of a paragraph keeps, the arguments (the realized
+element, with its grid for a table: deviation 3), the reads and the
+frames; the frames share their item arrays with the page that the block
+went into until one of the two is written to, so they cost less than
+they hold.
+
+
+**Review.** One round by Codex (`gpt-6-astra`, reasoning effort high)
+on the diff of the slice, asked for two blocks that the key takes for
+one, a kept frame that a caller can write to, and an input of the block
+layout that is neither in the key nor in the recorded reads (regions,
+the locator, styles reached through the content, the engine's route),
+and whether the mutations that nothing exposed are equivalent. The
+verdict was "approve": no defect found for any of the three, by reading
+(the grid types against upstream's fields; the encoding of the regions;
+the callback sites of `layout/rules.mbt`; every consumer of the frames
+through distribution, composition, page finalization and the exporters;
+the process state that layout reads).
+
+Taken up:
+
+- *The route and the library are not equivalent mutants.* A host can
+  tell: one block with a callback of its own, laid out from a root
+  locator on routes of depth 70 and 71, whose callback checks the layout
+  depth (the second must fail); and a callback that returns another
+  frame under a library with another feature. Both are tests now
+  (above); a document cannot do either.
+- *Coverage of the grid test*: no variant for the start of a header's
+  range alone, and the override flags varied on one side. Four grids
+  more.
+
+Agreed with and not changed:
+
+- Two host callbacks of one kind that capture equal content and do
+  different things have one key. That is the rule of deviation 21 (one
+  function for equal content), older than this slice for fragments.
+- A frame taken out of a group of an `items()` view and written to is
+  the store's (above, "Mutable results"): the contract of `frame.mbt`.
+- The copies of the store for blocks alone are equivalent mutants under
+  the callers there are.
+- The mutation of the styles removes them from the key and from the
+  comparison together; with the hash alone removed the comparison still
+  rejects the entry.
+
+It ran nothing (its sandbox was read-only and the test executables it
+found were older than the tree).
+
+**For slice 3 and later.**
+
+- The flow around the blocks and the document-level realization are
+  what a recompilation of a document of text still does besides the
+  export (28 % of `long.typ` after an edit at the end, and the same
+  after a comment): page runs and the document.
+- A block that keeps being found does not ask for the paragraphs inside
+  it, which then get old and go after eleven evictions, as comemo's do
+  under a memoized call that hits. An edit inside such a block lays out
+  all of its paragraphs again.
+- The comparison of arguments calls a NaN another argument (above).
+- `frame_cacheable` walks the frames of every result, so the frames of a
+  block inside a block inside a block are walked three times in a
+  compilation that computes all three. Not visible in the documents
+  here (0.3 % of the table document).
+- The fingerprint of a grid writes every stroke of every cell as a value
+  (a third of it).
+
 ### Slice 3: page runs and the document
 
 `layout_page_run` and `layout_document_common` (and the bundle variant,
@@ -4127,7 +4613,10 @@ Kept or introduced, each stricter than upstream unless said:
    tracks them). A result is not reused at another position in its flow
    even if it never asked where it is. Reason: what it would take to track
    them (a second level of keys, as `ClosureStore.asked` has for the
-   context) is not justified by a measurement yet.
+   context) is not justified by a measurement yet. Blocks since slice 2:
+   a block that never asks where it is (a shape, a block of text without
+   located elements) is laid out once per place, where upstream finds the
+   layout of the first place for every other.
 2. **The traced span is in the keys of closure calls and layouts**
    (upstream tracks `Traced::get`). Only IDE tracing sees it.
 3. **Arguments are also compared exactly** (`values_memo_equal`), not only
@@ -4229,6 +4718,14 @@ Kept or introduced, each stricter than upstream unless said:
     under it.
 20. **`doc` evicts** (step 5): a compilation or lowering of `doc` ends
     with `evict(10)`. Upstream has no such host.
+21. **A layout callback is its kind and its captured element** (slice 2),
+    in fingerprints and in the comparison of arguments. Upstream hashes
+    the function pointer too (`layout/container.rs:609`). Not stricter:
+    the same key only while an element type has one callback per kind,
+    which the show rules of `layout/rules.mbt` keep, and while equal
+    content gets one function from whoever makes callbacks for plain
+    content (`BlockElem::multi_layouter_content`, which is told apart
+    from the callbacks of the rules: `BlockMultiCallback.typed`).
 
 Upstream quirks the port reproduces since step 4 (the owner's decision
 on module equality, 5.4):
@@ -4262,7 +4759,12 @@ Upstream quirks the port does not reproduce:
 
 - Two values with one hash are one argument for comemo where the port
   compares arguments exactly and the comparison is finer than the hash.
-  For modules it no longer is (above).
+  For modules it no longer is (above). A value that is not equal to
+  itself is the case that costs: a float that is NaN, in a field of an
+  element or in an argument, is found again by comemo (it hashes the
+  bits) and here only as the same object, which a later iteration has
+  and a later compilation of an edited file has not (section 8, "Slice 2
+  as built").
 - comemo keeps a result whose constraint is satisfied even if the nested
   results it was built from were evicted and recomputed as other objects.
   The port has the same structure; it is harmless here because nothing
