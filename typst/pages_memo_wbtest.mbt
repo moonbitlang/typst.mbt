@@ -572,6 +572,46 @@ test "pages: a document and a page run are those of their library" {
 }
 
 ///|
+test "pages: runs with the same children are told apart by where they are" {
+  // Empty pages one after the other are runs without children under the
+  // same styles. What tells them apart is their locator, which the key
+  // holds (upstream tracks it): the elements of their footers get their
+  // locations from it. With one layout for all of them, the footers
+  // would be one element at one place.
+  let source = "#set page(width: 100pt, height: 100pt, margin: 20pt, footer: context metadata(\"page \" + str(here().page())))\n" +
+    "#rect(width: 10pt, height: 10pt)\n" +
+    "#pagebreak()\n#pagebreak()\n#pagebreak()\n#pagebreak()\n" +
+    "#rect(width: 10pt, height: 10pt)\n"
+  let says = oracle_memo_on_off(() => {
+    @library.evict(0)
+    let step = pages_world(source).step()
+    (step.says(), step.document().pages().length())
+  })
+  inspect(says.0, content="page 1 page 2 page 3 page 4 page 5")
+  inspect(says.1, content="5")
+  // And in a watching process, with a page more before them.
+  @library.evict(0)
+  let world = pages_world(source)
+  inspect(world.step().says(), content="page 1 page 2 page 3 page 4 page 5")
+  world.edit(
+    source.replace(
+      old="#rect(width: 10pt, height: 10pt)\n#pagebreak()",
+      new="#rect(width: 10pt, height: 10pt)\n#pagebreak()\n#rect(width: 12pt, height: 12pt)\n#pagebreak()",
+    ),
+  )
+  let second = world.step()
+  inspect(
+    second.says(),
+    content="page 1 page 2 page 3 page 4 page 5 page 6",
+  )
+  @library.evict(10)
+  inspect(
+    world.step().says(),
+    content="page 1 page 2 page 3 page 4 page 5 page 6",
+  )
+}
+
+///|
 test "pages: a document that is found says what its layout said" {
   // A delayed error of a block's `context`, and a warning: the sink of
   // the layout, which a hit replays.
