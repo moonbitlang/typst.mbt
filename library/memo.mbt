@@ -777,8 +777,9 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
       content_memo_equal(x.captured, y.captured)
     (BlockMultiCallback(x), BlockMultiCallback(y)) =>
       content_memo_equal(x.captured, y.captured)
-    // Holds content compared loosely by `==`.
-    (CellGrid(_), CellGrid(_)) => false
+    // Holds content, which `==` compares loosely, and is made anew by every
+    // realization of its grid or table (`memo_grid.mbt`).
+    (CellGrid(x), CellGrid(y)) => cell_grids_memo_equal(x, y)
     // `==` ignores the spans of the lines, which highlighting gives to the
     // raw lines.
     (RawContent(Lines(x)), RawContent(Lines(y))) => {
