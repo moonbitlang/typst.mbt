@@ -39,6 +39,148 @@ fn layout_page_run(
   locator : @library.Locator,
   initial : @library.StyleChain,
 ) -> Array[LayoutedPage] raise @library.SourceError {
+  layout_page_run_impl(engine, children, locator, initial)
+}
+
+///|
+/// The kept page runs ([layout_page_run_impl]).
+let page_run_memo : @library.PageMemo[Array[LayoutedPage]] = @library.PageMemo::new(
+  "layout of a page run",
+)
+
+///|
+/// How many page runs were answered by a kept layout and how many were
+/// laid out since the process started (for tests and measurements, like
+/// `@library.closure_memo_stats`).
+pub fn page_run_memo_stats() -> (Int, Int) {
+  page_run_memo.stats()
+}
+
+///|
+/// The number of page runs that are kept (for tests and measurements).
+pub fn page_run_memo_entries() -> Int {
+  page_run_memo.entries()
+}
+
+///|
+/// The internal implementation of `layout_page_run` (memoized like
+/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/run.rs:75`;
+/// see `library/memo_pages.mbt`).
+///
+/// Upstream hashes the library, the children and the initial styles, and
+/// tracks the world, the introspector, the traced span, the sink (mutably),
+/// the route and the locator. Here the children and the initial styles
+/// are the key, with the resolved locator and the route (which the keys of
+/// all layouts hold in full, `library/memo.mbt`) and the traced span; the
+/// library is compared, the world and the introspector are tracked, and
+/// the sink is replayed.
+fn layout_page_run_impl(
+  engine : @library.Engine,
+  children : ArrayView[@library.Pair],
+  locator : @library.Locator,
+  initial : @library.StyleChain,
+) -> Array[LayoutedPage] raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    return layout_page_run_compute(engine, children, locator, initial)
+  }
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_page_run")
+    state.write_usize(children.length())
+    for i in 0..<children.length() {
+      let (child, styles) = children[i]
+      state.write(child)
+      state.write_u128(styles.memo_hash())
+    }
+    state.write_u128(initial.memo_hash())
+    state.write_u128(locator.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  @library.memoized_pages(
+    page_run_memo,
+    engine,
+    key,
+    None,
+    children,
+    initial,
+    copy_layouted_pages,
+    layouted_pages_cacheable,
+    engine => layout_page_run_compute(engine, children, locator, initial),
+  )
+}
+
+///|
+/// The pages of a run as an entry keeps them and as it hands them out:
+/// other objects with copy-on-write clones of the frames, which
+/// `finalize_page` moves into the frame of the page (upstream:
+/// `Vec<LayoutedPage>: Clone`, with frames whose items are shared).
+fn copy_layouted_pages(pages : Array[LayoutedPage]) -> Array[LayoutedPage] {
+  pages.map(LayoutedPage::kept)
+}
+
+///|
+/// The page with clones of its frames (see [copy_layouted_pages]).
+fn LayoutedPage::kept(self : LayoutedPage) -> LayoutedPage {
+  {
+    ..self,
+    inner: self.inner.clone(),
+    header: clone_frame(self.header),
+    footer: clone_frame(self.footer),
+    background: clone_frame(self.background),
+    foreground: clone_frame(self.foreground),
+  }
+}
+
+///|
+fn clone_frame(frame : @library.Frame?) -> @library.Frame? {
+  match frame {
+    Some(frame) => Some(frame.clone())
+    None => None
+  }
+}
+
+///|
+/// Whether the pages of a run may be kept: no frame of them holds a host
+/// closure in its tags or in the frame of a tiling, nor does the fill
+/// (`@library.frame_cacheable`, the rule of every kept layout).
+fn layouted_pages_cacheable(pages : Array[LayoutedPage]) -> Bool {
+  for page in pages {
+    if !@library.frame_cacheable(page.inner) ||
+      !frame_option_cacheable(page.header) ||
+      !frame_option_cacheable(page.footer) ||
+      !frame_option_cacheable(page.background) ||
+      !frame_option_cacheable(page.foreground) ||
+      !fill_cacheable(page.fill) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn frame_option_cacheable(frame : @library.Frame?) -> Bool {
+  match frame {
+    Some(frame) => @library.frame_cacheable(frame)
+    None => true
+  }
+}
+
+///|
+/// Whether the fill of a page may be kept (see [layouted_pages_cacheable]).
+fn fill_cacheable(fill : @library.Smart[@library.Paint?]) -> Bool {
+  match fill {
+    Custom(Some(paint)) => @library.paint_cacheable(paint)
+    _ => true
+  }
+}
+
+///|
+/// The uncached body of [layout_page_run_impl].
+fn layout_page_run_compute(
+  engine : @library.Engine,
+  children : ArrayView[@library.Pair],
+  locator : @library.Locator,
+  initial : @library.StyleChain,
+) -> Array[LayoutedPage] raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link).split()
   let engine = engine.with_route(@library.Route::extend_(engine.route))

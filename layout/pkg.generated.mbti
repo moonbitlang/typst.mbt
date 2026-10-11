@@ -98,6 +98,10 @@ pub fn[T : FrameModify] modified(T, FrameModifiers) -> T
 
 pub fn modify_text(@library.Frame, @library.StyleChain) -> Unit
 
+pub fn page_run_memo_entries() -> Int
+
+pub fn page_run_memo_stats() -> (Int, Int)
+
 pub fn register(@library.NativeRuleMap) -> Unit
 
 pub fn rusty(@library.FontInstance) -> @shape.Face
