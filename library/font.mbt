@@ -125,12 +125,33 @@ pub struct Font {
   priv index : UInt
   /// The parsed face.
   priv face : &FontFace
+  /// The number of the object ([Font::serial]).
+  priv serial : Int
 }
+
+///|
+/// The number of fonts made so far ([Font::serial]).
+let font_serials : Ref[Int] = { val: 0, }
 
 ///|
 /// Create a font from its data, collection index and parsed face.
 pub fn Font::new(data : Bytes, index : UInt, face : &FontFace) -> Font {
-  { data, index, face, }
+  font_serials.val += 1
+  { data, index, face, serial: font_serials.val, }
+}
+
+///|
+/// The number of this font object (not upstream): no other font of the
+/// process has it. It is what the tracked world takes a font for
+/// (`tracked_world.mbt`): upstream's comemo compares `Hash for Font`, the
+/// hash of the data and the index, and hashing the data of a system font
+/// collection takes 24 ms (PingFang, in `bench/showcase.typ`: 8 % of its
+/// compilation). A world that wants results found again hands out the
+/// font object it has, as font stores do. (`Fingerprint for Font` and
+/// `==` are upstream's: where a font is part of a key or of a frame's
+/// hash, it is its data and index.)
+pub fn Font::serial(self : Font) -> Int {
+  self.serial
 }
 
 ///|
