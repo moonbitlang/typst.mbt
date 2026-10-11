@@ -139,6 +139,9 @@ Typst source) are unchanged.
   reached them). The process holds more between compilations: the frames
   of the documents and page runs of the last eleven compilations under
   `evict(10)`.
+- `html`: the frame of an `html.frame` element in an `HtmlDocument` has
+  frames and groups of its own (`Frame::deep_clone`): it was the clone of
+  a kept layout, which shares its groups.
 - `layout`: `PagedIntrospector::frame_link_targets()` returns a copy of
   the set (it returned the set that the introspector keeps, which a kept
   document and the documents handed out share).

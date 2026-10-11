@@ -869,7 +869,8 @@
   (`PagedDocument::owned`, `Frame::deep_clone`), because `Frame::clone`
   shares the groups of the items as objects and a host can write to a
   group it takes out of `Frame::items`. Whatever else hands frames of
-  kept layouts to a holder outside the engine does the same; inside the
+  kept layouts to a holder outside the engine does the same (the frame
+  of an `html.frame` element, `html/convert.mbt`); inside the
   engine a clone is right. Items other than groups are values and
   shared. (3) The reads of a found document are validated against the
   document's own introspector by the loop: `ReadAccelerator` keeps the
@@ -878,14 +879,16 @@
   empty introspectors), and an `ElementIntrospector` forgets its cached
   queries at 65 536, since an introspector now lives as long as its
   document is found. (4) Ages are comemo's here too, although a session
-  that changes its one page run with every edit then holds the frames
-  of eleven compilations (`longer.typ`: 624 MB where slice 1 held
-  224 MB, upstream 2.2 GB; most of it frames that the flow builds anew
-  in every iteration, which the block level, once kept, should share): a
-  smaller age
-  for these two stores is measured in the design's note and not built,
-  because an entry that goes earlier than comemo's is recomputed where
-  upstream's watch finds it. (5) What is beneath a result that is found
+  that changes its one page run with every edit then holds what the
+  page-level entries of eleven compilations hold (`longer.typ`, with the
+  block level: 492 MB where slice 1 held 224 MB and the block level alone
+  241 MB, upstream 2.2 GB). That is not frames (the block level shares
+  them) but the realized content of every iteration, which the children
+  of a run, the tags of the page frames and the introspector of a kept
+  document reach: the design's note "Slices 2 and 3 together" has it
+  taken apart. A smaller age for these two stores is measured there and
+  not built, because an entry that goes earlier than comemo's is
+  recomputed where upstream's watch finds it: the owner's decision. (5) What is beneath a result that is found
   is not asked for and gets old: after eleven recompilations in a row
   that find the document, an edit is close to a first compilation, in
   upstream too. (6) Things that look like misses and are upstream's: a
@@ -897,9 +900,17 @@
   what an empty document lacks is laid out again after every edit of
   that file. Counters: `@layout.page_run_memo_stats()`,
   `document_memo_stats()`. Tests: `typst/pages_memo_wbtest.mbt`,
-  `library/read_accelerator_wbtest.mbt`, the project
-  `tests/recompile/docs/pages`; mutation checks in
-  `tests/recompile/README.md`.
+  `layout/pages_run_wbtest.mbt`, `library/read_accelerator_wbtest.mbt`,
+  the project `tests/recompile/docs/pages`; mutation checks in
+  `tests/recompile/README.md`. (7) The levels together
+  (`typst/layers_memo_wbtest.mbt`): what is found asks for nothing
+  beneath it, so a test that means "the block is found" must make its
+  compilation lay the page run out again (an edit elsewhere in the run;
+  the same text finds the document, and a change in another run finds
+  the run), and what is laid out again finds what is beneath it, whose
+  reads, warnings and frames must be those of the entry around it too
+  (`memoize` merges the reads and the sink of an entry that is found
+  into its caller's).
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
