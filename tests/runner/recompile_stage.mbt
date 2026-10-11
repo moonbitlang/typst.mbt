@@ -18,7 +18,9 @@
 //    reset and compiled again, exactly as `cli/watch.mbt` does
 //    (`world.reset()`, the compilation with its exports,
 //    `@library.evict(10)`). What every compilation gave is kept
-//    (`recompile_compare.mbt`), with a snapshot of the files. After every
+//    (`recompile_compare.mbt`), with a snapshot of the files. The loop
+//    also has the CLI's cache of page hashes and exports an image of a
+//    page only if the page's hash changed (`PageFiles`). After every
 //    compilation the document of the step before is exported again: it
 //    must still be what it was (a host may hold it while it compiles).
 // 2. The references: for every step, a fresh world of the snapshot is
@@ -33,8 +35,8 @@
 // two steps of the loop it would never be asked for the step before, and
 // the stage would pass without testing it. Nothing in phase 1 touches
 // engine state but what the watch loop of the CLI does, except that it
-// exports both an SVG and a PDF, and the SVG of the document before once
-// more. (The sequences of a run do follow each other in one process, as the
+// exports an SVG, a PDF and the images of the pages that changed, and the
+// SVG of the document before once more. (The sequences of a run do follow each other in one process, as the
 // compilations of several worlds of one host do.)
 //
 // A reference in the same process cannot see through a cache that neither
@@ -408,6 +410,8 @@ fn run_sequence(
 
   // The watch loop (`cli/watch.mbt`).
   let world = RecompileWorld::new(document.flavor, files, variant)
+  // The page images that the loop has written so far (its export cache).
+  let pages = PageFiles::new()
   let done : Array[RecompileStep] = []
   // The steps during whose compilation the document before them changed.
   let disturbed : Array[Int] = []
@@ -439,7 +443,7 @@ fn run_sequence(
       write_snapshot("\{dir}/step\{step}", document.name, snapshot)
     }
     // Recompile.
-    let (compiled, ids) = recompile_compile(world)
+    let (compiled, ids) = recompile_compile(world, pages~)
     // Evict the cache.
     if step > 0 {
       @library.evict(10)

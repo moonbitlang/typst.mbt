@@ -1,7 +1,8 @@
 # Incremental compilation: design
 
-Status: slice 0, step 1 of slice 1 and the engine half of its step 3 are
-built (section 8, "Step 3 as built"); the rest is design.
+Status: slice 0, steps 1 and 2 of slice 1 (5.5, "As built") and the
+engine half of its step 3 are built (section 8, "Step 3 as built"); the
+rest is design.
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
 recording check); revision 4 elsewhere. Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
@@ -115,7 +116,10 @@ persistent edits of step 3 of slice 1, and step 1 of slice 1, which
 changed what this section and the inventory of section 4 say about the
 stores: their entries keep what the call read of the world and compare
 the library (5.2), `compilation_epoch` is gone, and a module entry
-belongs to a scope. And the engine half of step 3: a module evaluation is
+belongs to a scope. Step 2, after which the last paragraph of this
+section is history: the tables of raw text and the cell of the works are
+gone, and an SVG image is also the images it links (5.5, "As built").
+And the engine half of step 3: a module evaluation is
 found by the fingerprint of its source, and the main file goes through
 the same store.)
 
@@ -376,11 +380,11 @@ S sink (mutable), R route, C context, L locator.
 | `html_document_impl`, `html_document_for_bundle_impl`, `html_block_fragment_impl` | as the paged ones; the fragment also `whitespace` | W I T S R (L) | not memoized (`html/`) | not measured (no HTML document here) |
 | `bundle_impl`, bundle `export_pdf`/`png`/`svg`/`html` | bundle parts / document, options | W I T S R / the link resolver (not `export_png`) | not memoized (`bundle/`) | not measured |
 | `Image::new_impl`, `RasterImage::new_impl` | kind, alt, scaling / data, format, icc | none | not memoized: `RasterImage::new` decodes on every layout of the image (`library/image_raster.mbt`) | yes: 71 % of the deck, 73 % of `showcase.typ` |
-| `SvgImage::new`, `SvgImage::with_fonts_images` | data (, families, file) | none / W | not memoized (`library/image_svg.mbt`) | not visible in `showcase.typ` (one small SVG) |
+| `SvgImage::new`, `SvgImage::with_fonts_images` | data (, families, file) | none / W | not memoized (`library/image_svg.mbt`); since step 2 of slice 1 the image is identified by its linked images too (5.5) | not visible in `showcase.typ` (one small SVG) |
 | `PdfDocument::new`, `PdfImage::new` | data / document, page | none | decode cache (`pdf_document_cache`) / cheap | no |
 | `Packed<RawElem>::highlight` | element, routines, styles | none | not memoized (`library/text_raw.mbt`, `raw_elem_synthesize`) | yes: half of what is left of `showcase.typ`, a fifth of the handbook |
 | `RawSyntax::decode`, `RawTheme::decode` | bytes | none | decode caches | no |
-| `Bibliography::decode`, `CslStyle::from_data`, `from_archived`, `Works::generate_impl` | data / style / elements | none / W I T S R | decode caches; `works_cache` keeps the last introspector's works | not visible |
+| `Bibliography::decode`, `CslStyle::from_data`, `from_archived`, `Works::generate_impl` | data / style / elements | none / W I T S R | decode caches; `works_cache` kept the last introspector's works; since step 2 of slice 1 `Works::generate` is an entry of `memoize`, per compilation (5.5) | not visible |
 | `Plugin::call`, `transition`, `module` | plugin, arguments / bytes | none | decode caches (`library/plugin.mbt`) | not measured |
 | `Font::instantiate`, `instantiate_impl`, `glyph_frame`, `font_overhang_table`, `create_shape_plan` | font (, variations, glyph, shaping key) | none | process caches | already there |
 | math `GlyphFragment::planned`, `base` | styles, text or glyph, class, math size, stretch or features | W | not memoized (`layout/math_glyph.mbt`) | not visible (equations are 19 % of what is left of `long.typ`, all of it removed by the block level) |
@@ -1160,6 +1164,187 @@ looked at):
 | the images an SVG links (`library/image_svg.mbt`) | **breaks 2.** Decoding an SVG reads its linked images from the world; the equality and the fingerprint of an `SvgImage` cover its bytes and fonts, not those images (`library/visualize_hash.mbt`). The layout that decoded it has the read. A value that holds the decoded image does not show it: a tiling lays out its body when it is made and keeps the frame, and a closure call that is handed a tiling made after the linked PNG changed finds its entry for the old one. Upstream's `SvgImage` hashes the same two things. The image keeps the fingerprints of the files it loaded, and its fingerprint and equality include them |
 | the file id interner (`syntax/path.mbt`), syntect's scopes, usvg's ids | not caches: identities that kept values hold. Never reset |
 
+**As built** (step 2 of slice 1). The three rows that break a rule are
+repaired; the first was before this step.
+
+*Raw text.* Done by slice 0b: the tables are gone, the decoded syntaxes
+and the theme are in the companion fields `syntaxes-derived` and
+`theme-derived` with their sources (`raw_derived_pair`,
+`library/text_raw.mbt`), and `typst/content_memo_wbtest.mbt` has the two
+directories that name different themes by one relative path.
+
+*The works of a bibliography.* Upstream
+(`typst-library/src/model/bibliography.rs:711` to `:758`): `generate`
+makes the introspection that lists the bibliographies and citation groups
+and hands the list to `generate_impl`, which is memoized with the library
+and that list hashed and the world, the introspector, the traced span, the
+sink and the route tracked. The list's hash has the loaded data in it,
+since an element's `sources` and `style` are `Derived` values whose two
+parts are both hashed: a changed `.bib` file is another key. `Works::
+generate` is now that, as an entry of `memoize` (`works_store`):
+
+- The key is the fingerprints of the elements, with spans and locations,
+  and the traced span (stricter than upstream, like every entry); the
+  entry keeps the elements for the exact comparison; the library is
+  compared by identity.
+- The files are not in the key, because the port's elements hold the
+  sources only. `generate_impl` loads them (`BibliographyElem::database`,
+  `csl_style`, and `CslSource::derived_style` for the style of a
+  citation), through the tracked world, and decoding is found by the
+  bytes. So the `.bib` file, the CSL style and every other file that is
+  named are world reads of the entry: it is only taken if they answer the
+  same, and its reads become those of the call that finds it, as if it
+  had loaded them. That is rule 2's second way, and it is how a change of
+  the file invalidates the works: the read `File(refs.bib)` of the entry
+  has another fingerprint, the entry is rejected, the works are generated
+  from the new data, and every call around is recomputed for the same
+  reason, since the read is in its entry too.
+- The introspector reads (the query of a bibliography's `target`) and the
+  sink are recorded and replayed as for every entry.
+- The route is not in the key, unlike the design above said and unlike the
+  layouts' and the counter sequence's. Upstream tracks it and the call
+  asks it nothing (`show_math` evaluates with a route of its own), so
+  upstream has one result per list of elements. With the whole route in
+  the key the works were generated once per depth at which a citation or
+  a bibliography is shown, in every iteration: 7 times instead of 3 for
+  the ilm handbook, which the cell had at 3. `memoize` got what a closure
+  call has, for the entries that ask for it (`tracks_route`): what the
+  call asks of routes is noticed (depth checks, `Route::contains`, a
+  routed entry found inside), a call that asked is not kept, and a hit
+  does not bind the closure call around it to its depth. What is asked
+  of routes is noted in state of the process, which cannot tell one
+  route from another, and the math of an entry is evaluated from the
+  root of a new route: its depth checks counted as questions to the
+  tracked route, and a bibliography with a formula in a title was
+  generated for every citation (the review of this step found it).
+  `show_math` runs in `with_own_route`, which sets that state aside.
+  The same holds for every `eval_string`, whose other callers are not
+  treated so: a closure that calls `eval` gets its depth bounds from the
+  checks on the route of the evaluated string too, which finds it at
+  fewer depths than upstream would and is not wrong.
+- Errors that the works keep (a key that no bibliography has, a style
+  without a bibliography) are raised as copies, as upstream clones them
+  (`:764`, `:780`): `trace` adds tracepoints to the errors it catches, and
+  the same works now serve every call of an iteration and the iterations
+  after it.
+
+What it changes besides: the works were generated once per memoized call
+that asked for them (every block or cell with a citation in it, in every
+layout); they are generated once per list of elements now (the book of
+`tests/recompile/docs`: 13 times, now 3; a table of twelve cells that
+cite: 75, now 3; the handbook and `showcase.typ`: 3 and 3, whose citations
+are all at the top of the flow, where the cell worked). With
+memoization off they are generated for every call, where the cell used
+to answer the top of the flow: no cache that the runner's comparison
+cannot turn off is left.
+
+*SVG images.* Upstream (`typst-library/src/visualize/image/svg.rs`):
+`Hash for SvgImageInner` covers the data and a hash of the fonts that were
+used (`:143`), not the linked images. `with_fonts_images` is memoized
+(`:52`) with the data, the families and the file of the SVG hashed and the
+world tracked; `ImageResolver::load_or_error` reads the linked file through
+that world (`:481`), so the read is in the constraint of the call and of
+every memoized call around it. That is what the port has had since step 1:
+the read is the tracked world's (`SvgImageResolver::load_or_error`), and
+the recording check sees it. What upstream does not have is an identity
+that tells two decoded images apart, and it shows: `Image::new_impl` is
+memoized on the hash of the kind (`image/mod.rs:447`), so of two SVG files
+with the same bytes in two directories, each next to its own `photo.png`,
+both show the first photo, on the page, in a tiling and in the PDF
+(`e58a63af`; the port showed both, and does). And a watching upstream
+keeps the first photo after the file changed. So the port does not mirror
+the hash: an `SvgImage` keeps `data_hash` of every linked file it loaded,
+in order (`SvgImage::links`), and its equality, its `Hash` and its
+fingerprint include them (deviation 12). The fonts have the same gap, which
+the review of this step found: upstream hashes a font when it is first
+loaded, so `font_hash` says which fonts a tree uses and not what for. An
+SVG with a text in each of two fonts and a third text that names none is
+one image whichever of the two the third text got from the families of
+the text around the image (in a function `shown(font) = text(font: font,
+image("t.svg"))` the two images also have one span). The tree is a
+function of the data and of what the two resolvers answered, so the
+image also keeps the answers of the font resolver in order, as places in
+its list of fonts (`SvgImage::selections`; `doc/svg_identity_test.mbt`
+has the SVG, with the embedded fonts). What the links repair today, with
+nothing kept across compilations: the hash of a page. `typst watch` with
+one image per page exports a page again only if its hash changed
+(`cli/compile.mbt`, `ExportCache`), and the page of an SVG whose linked
+image changed hashed the same, so its PNG kept the old photo. What it
+repairs for step 5 is the tiling of the table above.
+
+*Everything else*, from the code (every top-level `let` of `library`,
+`layout`, `eval`, `realize`, `html`, `pdf`, `svg`, `render`, `typst`,
+`syntax` and `bundle` whose type is not a scalar or a `ReadOnlyArray`,
+and the mutable fields of what outlives a call; the other packages have
+constant tables, the counters of wasmi and usvg, and what `doc` and the
+CLI keep for themselves):
+
+| state | what it is | verdict |
+| --- | --- | --- |
+| `layout_store`, `counter_sequence_store` (`MemoStore`), `closure_store`, `works_store`; `eval_memo` (`eval/import.mbt`) | the stores of memoized calls: found by key, taken by their arguments, library, context, route, introspector reads and world reads | stores; they end with their compilation (modules: with their scope) until step 5 |
+| `capture_sites` (`eval/captures.mbt`) | the capture analysis of a closure or context expression, by span and node object, for one compilation | rule 1: a function of the node, which never changes since the persistent edits |
+| `raw_syntax_cache`, `raw_theme_cache`, `csl_style_cache` (by bytes), `bibliography_cache` (by sources and bytes), `pdf_document_cache` (by bytes), `plugin_call_cache`, `plugin_transition_cache` (by the hash of plugin, function and arguments), `plugin_module_cache` (by hash and bytes) | the decode caches that `evict` drops as a whole | rule 1. For step 4: the plugin caches raise the errors they keep as the kept objects, and a plugin's module is one object only until its cache is dropped |
+| `raster_image_cache`, `raw_highlight_cache`, `pdf`'s `raster_cache` (`ContentCache`) | slice 0: by upstream's hash, with ages | rule 1 |
+| `numbering_pattern_cache` | parsed patterns by their string | rule 1 |
+| `glyph_frame_cache`, `overhang_tables`, `rusty_faces`, `shape_plans`; `svg`'s `glyph_paths`, `glyph_bboxes`; `render`'s `pixglyphs` | by font instance (data, index, variations) and glyph, the plans also by direction, script, language and features, the paths also by scale | rule 1: functions of the font's data. Never dropped (6.3) |
+| `font_data_hashes`, `data_hashes` | hashes by the identity of `Bytes` | rule 1; an entry keeps its object, so an identity is not reused |
+| in objects: `FontBook.selected` and `covering`; `OtfFontFace.instances`; `StyleChain.memo_hash`; the `LazyFingerprint` of closures, tilings, modules and capture sites; `RasterImage.hash`; the memo of a `Source`; `ElementIntrospector.queries`; the scopes and parameters of native functions, types and elements | what an object computes once of itself | rule 1 with the object as the key: a book's caches are cleared by `push`, with which its edition changes; an introspector's query cache is by the selector's hash, as upstream's, and hands out its arrays (step 4) |
+| `CachedCell` (`layout/flow_collect.mbt`) | the last layout of a child of a flow, by region, in the child that one flow layout collected (upstream's `CachedCell`) | scratch of that layout: every use is inside the call that made it. It keeps errors and raises them as kept (step 4) |
+| `accent_funcs_cell`, `lr_funcs_cell`, `codex_sym_cell`, `codex_emoji_cell`, `color_map_cell`, `sequence_elem_cell`, `styled_elem_cell`, `space_shared_cell`, `space_newline_cell`, `html_typed_funcs_cell`, `lorem_chain_cell`, `cmyk_grid_cell`, `raw_theme_cell`, the 443 cells of generated elements and functions and the 39 type descriptors, `scopes_registered`, the hooks of an element descriptor (`<elem>_init`); hayagriva's styles, locales and collation table, hypher's tries, the normalization indices | constants that are built on first use | written once |
+| `exception_map`, `shorthand_systems`, `rd_pow10_table`, `fallback_families`, `empty_style_head`, `text_base_local_styles`, the `*_default_value`s, `no_route_queries`, `no_world_reads`, `volatile_world_reads`, the grouping rules of `realize`, `routines`, the syntax sets | constants in containers | nothing writes to them (looked at every use) |
+| `route_shift_lo`, `route_shift_hi`, `route_shift_scopes`, `route_query_log`, `route_query_scopes`, `traced_file_log`, `traced_file_scopes`, `fingerprint_flags`, `fingerprint_hosts`, `fingerprint_output_hosts`, `lazy_depth`, `lazy_cut`, `spare_shaping_buffer`, `recording_worlds`, `open_world_scopes`, `compilation_depth`, `memo_generation`, the recording check's own | scratch of calls in progress | put back when the call ends |
+| `memo_enabled`, `memo_counter`, `evictions`, `evictors`, `closure_memo_counts`, `works_generations` | switches, counts and the list of evictors | no result depends on them |
+| `font_serials`, `font_book_editions`, `source_serials`, `world_scope_tokens`, the file id interner, syntect's scope repository and pattern counter, usvg's ids | identities | never reset |
+
+Nothing else breaks a rule. Three things on the list are step 4's (the
+rule for mutable results of 5.4): errors that the plugin caches and a
+`CachedCell` keep and raise, the arrays that a `Works`, a
+`RenderedBibliography` and an introspector's query hand out, and the
+module of a plugin after its cache was dropped.
+
+*Review.* One round by Codex on the diff of the step, asked for state
+that a memoized call reads and that is neither in its key nor in its
+recorded reads; the verdict was "request changes" with three findings.
+Two are repaired and said above where they belong: the fonts of an SVG
+image (which font for which text), and the math of a bibliography entry
+(a route of its own). The third is about the harness and is the
+paragraph that follows.
+
+One thing outside the engine is of the same kind and is left as it is,
+because it is upstream's CLI: the export cache of `typst watch` holds the
+hash of a page and not the options the page is exported with, and those
+can come from the document (`#set format.png(ppi: 72)`). After an edit of
+that number alone the port and upstream both keep the PNG of the old
+resolution (checked with both binaries). The `recompile` stage renders at
+a fixed resolution and does not see it.
+
+*Cost.* Against the base of the step (`main` at `95acf25`), the least of
+twelve runs each in turns, both binaries in one directory (the path of
+the executable alone moves the count of `tiny.typ` by 0.4 %):
+
+| workload | instructions before | after | change |
+| --- | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.7 M | 64.7 M | +0.01 % |
+| `query long.typ heading` | 2962.2 M | 2963.5 M | +0.04 % |
+| `long.typ` to PDF | 3525.3 M | 3526.2 M | +0.03 % |
+| `showcase.typ` to PDF, embedded fonts | 3806.7 M | 3807.0 M | +0.01 % |
+| `showcase.typ` to PDF, system fonts | 4374.3 M | 4379.7 M | +0.12 % |
+| touying `theme-metropolis.typ` to PDF | 2664.8 M | 2663.9 M | -0.03 % |
+| ilm `bakers-handbook.typ` to PDF | 2344.5 M | 2344.0 M | -0.02 % |
+| the book of `tests/recompile/docs` to PDF | 1735.6 M | 1403.0 M | -19.2 % |
+| `linked` of `tests/recompile/docs` to PDF | 78.7 M | 78.8 M | +0.14 % |
+
+Nothing moves but the book, whose citations are inside blocks: the works
+of a document whose citations are at the top of the flow were generated
+three times before and are generated three times now. In a watch session
+(five sessions of five edits at the end, the durations of the status
+lines) the book's first compilation goes from 127.5 ms to 103.5 ms and
+its recompilation from 75.1 ms to 56.6 ms; `long.typ`, `showcase.typ` and
+the handbook are where they were, inside a spread of a few per cent, and
+so are the workloads of `bench/run.sh`. The `recompile` stage takes 40 s
+where it took 35 s: one document more, and the images of every page of
+every reference.
+
 ## 6. Lifetime and memory
 
 ### 6.1 Ages
@@ -1465,7 +1650,19 @@ Step 1 is built.
    overhead against the budget of 5.2 ("Costs").
 2. **State outside the arguments** (5.5): the raw element's derived data,
    if slice 0b has not done it; `Works::generate` as an entry of `memoize`;
-   the linked images in an SVG image's fingerprint and equality.
+   the linked images in an SVG image's fingerprint and equality. Built
+   (5.5, "As built"; the raw element's part was slice 0b's):
+   `library/bibliography.mbt` (`works_store`), `library/memo.mbt`
+   (`tracks_route`), `library/image_svg.mbt` and
+   `library/visualize_hash.mbt` (`SvgImage::links`). What proves it:
+   `typst/state_outside_wbtest.mbt`, `library/works_wbtest.mbt`, the
+   recording check, the page images of the `recompile` stage with the
+   project `linked`, the scenario `linked` of `scripts/watch_check.py`,
+   and the mutation checks of 9.1 that belong to this step. It changes one
+   output: the pages that `typst watch` writes as images after an image
+   that an SVG links has changed. It costs nothing that can be measured,
+   and a document with citations inside blocks compiles faster (5.5,
+   "Cost").
 3. **Sources.** Built, the library last ("Step 3 as built" below).
    Persistent edits in `syntax/reparser.mbt`,
    `syntax/node.mbt` and `syntax/source.mbt` (built: "As built" in 5.4;
@@ -1915,7 +2112,10 @@ something that is not the world. A cache of the process that hides a read
 introspector, and every memoized call has an introspector object of its
 own (`track_with`), so within one memoized call the works are generated
 by that call before they are found by it; it stays a violation of rule 1
-of 5.5 for step 2, outside of what this check sees.
+of 5.5 for step 2, outside of what this check sees. (Step 2 replaced it
+by an entry of `memoize`, which the check does see: with it the stages
+have 31 211, 390, 351, 1 307 363, 82 589 and 120 825 entries, still none
+that differs.)
 
 Run over every document of the `paged`, `html`, `bundle`, `packages`,
 `edsl` and `recompile` stages it checks 1.54 million entries (31 075,
@@ -1962,6 +2162,33 @@ that is in the caller's part of the log is not logged for the call inside
 storing into a store whose generation changed during the call (a nested
 compilation) has no effect while a store is emptied when it sees another
 generation.
+
+**The mutation checks of step 2.** 15 was slice 0b's. 16, 20a and 20b are
+this step's; each was put in by hand, never committed, and run against
+the tests of the step (S: `typst/state_outside_wbtest.mbt`, L:
+`library/works_wbtest.mbt`), the recording check and the `recompile`
+stage, which since this step also keeps the page hashes of a watching
+compiler and its page images (`tests/recompile/README.md`).
+
+| # | what was broken | what exposed it |
+| --- | --- | --- |
+| 16 | (a) the works are found by the engine's introspector object and the elements again, in a cell (the code as it was) | S: "one engine in two scopes, with a bibliography that changes in between" (the second scope has the book of the first), "an entry of the store is found by its key and taken if the files answer the same", "a CSL style that changes behind its path", "generated once for all the calls of an iteration that cite" (75 generations for 3). Not the recording check and no document, as said above: a memoized call has an introspector object of its own, so the cell hid no read from an entry, only from a host that keeps an engine |
+| | (b) the works are found by their elements alone, in a cache of the process that `evict` drops with the decode caches (what the cell is as soon as two calls share an introspector object) | check: `paged` 6 entries in 3 tests (the entry of a layout has the read of the `.bib` file that its run from scratch, which finds the works, does not make); the `recompile` stage: 7 sequences, among them the sweeps of `bibliography-multiple-files` and `bibliography-before-content`; `paged`: 15 tests |
+| 20a | the fingerprint of an SVG image leaves out its linked images | the `recompile` stage: 3 sequences, "page images differ from a fresh compilation" at the step of the sweep that gives `art/photo.png` the content of another PNG (`project/linked`, the project of this step) and in the sweep and the random sequence of `image-svg-linked-many-formats`: the page hashed the same, so the watch loop kept its image. S: "a linked image that changes is another page", "a tiling of an SVG is as good as the images the SVG links". L: "an image is its data, its fonts and the data of the images it links". `scripts/watch_check.py`, scenario `linked` (what the code before the step fails) |
+| 20b | the equality of an SVG image leaves them out | S: "a tiling of an SVG is as good as the images the SVG links"; L: the same test as for 20a. No document: nothing that compares arguments is kept across compilations yet |
+| | the equality of an SVG image leaves out which font was chosen for what | `doc/svg_identity_test.mbt`: "an image is also which font was chosen for which text" (two pages with other pixels and one image) |
+| | the math of a bibliography entry is evaluated without `with_own_route` | S: "math in an entry is evaluated on a route of its own" (the works are generated again by the second call) |
+| | the works raise the errors they keep, not copies | L: "the errors they keep are copies for whoever catches them" (the second catch sees the tracepoint and the hint of the first) |
+| | a call that asked its route is kept by an entry that tracks its route | L: "a call that tracks its route is found on every route, unless it asked one" |
+| | a hit of an entry that tracks its route binds the closure call around it to its depth | L: "what is asked of a route inside a tracking call is the caller's too" |
+
+Of the scenarios 16 and 20a ask for (an edit that must expose the fault
+through a kept result), the works one is there as far as it can be before
+step 5: the entry that is kept and found within a compilation is the one
+that the edit of the `.bib` file must reject, and (b) is that fault. The
+tiling "captured by a function" and "passed to `id`" are pages of
+`project/linked`; they pass by construction until closure calls are kept,
+and are there for the step that keeps them.
 
 **A checked mode.** A build flag under which a hit is followed by a shadow
 run of the function and a comparison.
@@ -2107,9 +2334,19 @@ Kept or introduced, each stricter than upstream unless said:
     meet: a file evaluated twice under IDE tracing, modules of two
     libraries in one evaluation.
 12. **An SVG image's fingerprint and equality include the images it links**
-    (5.5); upstream's cover its bytes and fonts.
+    (5.5); upstream's cover its bytes and fonts. Built in step 2 of slice
+    1, with which font was chosen for which text besides (upstream's hash
+    has the fonts that were loaded). It is the one deviation here that shows without a watching
+    process: upstream memoizes `Image::new_impl` on that hash, so two SVG
+    files with the same bytes next to different linked images are one
+    image there, and the port shows two.
 13. **Not memoized**: the rows of section 4 that say so.
 14. **One thread**: upstream lays out page runs in parallel.
+15. **The works of a bibliography are found by their elements and by what
+    their call read of the world** (5.5, "As built"), where upstream's
+    elements carry the loaded bibliography and style in their hash. The
+    same results are found again; the port's elements hold the sources
+    only. Not stricter and not looser: another place for the same data.
 
 Upstream quirks the port does not reproduce:
 
@@ -2125,7 +2362,11 @@ Upstream quirks the port does not reproduce:
   that is made during a compilation and kept compares by identity (5.4).
 - A value built from a file whose hash does not cover the file is reused
   by a memoized call that is handed it again after the file changed (an
-  SVG's linked images, deviation 12).
+  SVG's linked images, deviation 12). In upstream that call is
+  `Image::new_impl` itself, which every image goes through: checked with
+  the binary of `e58a63af`, two SVG files of the same bytes next to a red
+  and a blue `img.png` are two red squares, as images, as tilings and in
+  the PDF.
 
 ## 11. Decisions and open questions
 

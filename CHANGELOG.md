@@ -260,6 +260,31 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   field, in the element or the set rule (upstream's `Derived`), and
   syntaxes of nested set rules are folded with their sources.
 
+- `typst watch` with one PNG per page (`page-{p}.png`): a page that shows
+  an SVG whose linked image (`<image href="photo.png"/>`) changed was not
+  written again and kept the old image, since the hash of an SVG image covered
+  its data and its fonts and not the images it links. A decoded SVG image
+  is now also identified by the data of the linked files it loaded and
+  by which of its fonts was chosen for which text (two decodings of one
+  SVG that set a text without a font family in different fonts of the
+  text around the image, both of which the SVG also names, were one
+  image): `==`, `Hash` and `Fingerprint` of `SvgImage` (and with it of
+  `Image`, frames, tilings and pages) include both. Upstream's hash does
+  not, and upstream shows one image for two SVG files with the same
+  bytes next to different linked images; the port shows two, as before.
+- The works of a bibliography (`Works::generate`) were kept in a cell and
+  found by the engine's introspector object, whatever the bibliography
+  files were by then: a host that kept an engine and called it again
+  after a `.bib` file or a CSL style changed got the works of the first
+  call. They are a memoized call of the compilation now, found by the
+  bibliography and citation elements and taken only if the files they
+  were loaded from still are what they were (upstream memoizes
+  `Works::generate_impl`). The works are also generated once for all
+  citations of an iteration, where every block or table cell with a
+  citation generated them again (a table of twelve cells that cite: 75
+  times, now 3), and the errors they keep are raised as copies, as
+  upstream clones them (a citation of a key that no bibliography has
+  could gather the tracepoints of earlier layouts).
 - A file that fails and is imported more than once in a compilation (from
   two `context` blocks, whose errors are delayed) was reported with the
   tracepoints of all imports that found its evaluation; it has that of
@@ -270,6 +295,7 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   evaluation allow (upstream tracks `Route::within`): a document whose
   second import no longer fits the maximum call depth compiled, and now
   fails with upstream's "maximum function call depth exceeded".
+
 - PDF export: raster images with the same bytes were taken for one image
   and embedded once, the first one for all of them: the same bytes read as
   pixels of another format (`format: (encoding: "luma8", ..)` and
@@ -286,6 +312,12 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   `reads_end`, `reads_abort`, `validate`), `WorldReads` (`is_volatile`,
   `length`, `describe`), `WorldReadsMark`, `world_scope_open`.
   `FontBook::edition`, `Font::serial`.
+- `library`: `SvgImage::links()`, the hashes of the data of the linked
+  images that a decoded SVG was built from, and `SvgImage::selections()`,
+  what its font resolver answered (both are part of the image's
+  identity), and `works_generation_count()`, how often the works of a
+  bibliography were generated since the process started (for tests and
+  measurements).
 - `library`: a check of what memoized calls record of the world, for
   tests: `set_memo_check`, `memo_check_enabled`, `take_memo_check_report`,
   `memo_check_reads`, `memo_check_running_now`,

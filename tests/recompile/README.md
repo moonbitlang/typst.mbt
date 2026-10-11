@@ -45,7 +45,7 @@ second only). The phases are not interleaved: a cache
 that keeps the last compilation only would otherwise never be asked for the
 step before, and the stage would pass without testing it.
 
-**The documents** (120 by default):
+**The documents** (121 by default):
 
 - 3 of `bench/` (`tiny`, `long`, `showcase`: the documents whose
   recompilation `scripts/watch_check.py --bench` measures; `longer`, which
@@ -59,15 +59,19 @@ step before, and the stage would pass without testing it.
   PNG, JPEG, GIF, WebP, SVG with linked images, PDF, pixmaps, syntaxes and
   themes of `raw`, bibliographies, plugins). Some fail on purpose. Tests
   that upstream only evaluates are compiled to pages like the others.
-- 3 projects written for this stage (`docs/`), because the suite has no
+- 4 projects written for this stage (`docs/`), because the suite has no
   document of several files: `book` (a main file that includes chapters,
   which import a shared module, which reads a JSON file; CSV, TOML, YAML,
   text, a bibliography in an author-date style with citations inside
   blocks, images, a syntax and a theme, a file that is read both as a
   module and as text), `chain` (imports in a chain and in a diamond over
   one data file, a function that reads the file when it is called, every
-  file a document of its own) and `notes` (pages computed from the
-  document, with functions that read the date and `sys.inputs`).
+  file a document of its own), `notes` (pages computed from the
+  document, with functions that read the date and `sys.inputs`) and
+  `linked` (an SVG that links a PNG, as an image, in a tiling that is
+  handed to functions and in one that a function captured: what the pages
+  show is in a file that no element names, and whose bytes are in no
+  element).
 - 3 documents with real packages (`tests/packages/docs`: a touying deck, an
   ilm book with a bibliography, cmarker with its plugin and a Markdown
   file), if `.repos/typst-packages` is there; all 99 with `--all`. They
@@ -107,7 +111,8 @@ warnings in their order with their hints and tracepoints; the pages in the
 `paged` stage's `typst-frame-v1` format (every item, tag and glyph); what
 the document's introspector answers (labelled elements, headings, figures,
 metadata: their positions, the numbering and supplement of their pages);
-the SVG and the PDF, byte for byte; the diagnostics of the PDF export.
+the SVG and the PDF, byte for byte; the diagnostics of the PDF export; and
+the images of the pages as a watching compiler leaves them (below).
 Spans are compared as what they point at in the world of their own
 compilation (file, line, column, byte range), not as numbers: that is exact
 about what a user sees, and a span number that a reparsed source no longer
@@ -115,6 +120,21 @@ has is written as unresolved, which differs. Location hashes are compared
 as their order of appearance. Besides, the document of every step is
 exported once more after the next compilation and must be what it was: a
 host may hold a document while it compiles the next.
+
+**The page images** are the one thing that `typst watch` keeps across
+compilations by a fingerprint today, so the stage does what it does. With
+one image per page (`typst watch main.typ page-{p}.png`) the CLI keeps the
+hash of every page and writes a page again only if its hash is not what
+it was after the compilation before (`cli/compile.mbt`, `ExportCache`).
+The watch loop of a sequence has that cache (`PageFiles` in
+`recompile_compare.mbt`): it renders the pages whose hash changed and
+keeps the image it had of every other page. A reference has no cache and
+renders all of them. Both must have the same pixels on every page (at 36
+ppi: what is tested is whether a page was written again, not how it is
+drawn). That fails where the hash of a page says less than its pixels:
+the fingerprint of some item of a frame leaves out something that shows.
+It did for an SVG image whose linked image changed (`project/linked`;
+"Mutation checks").
 
 One kind of step is counted and not compared: a step in which a source was
 reparsed into a tree that a parse of its text does not give
@@ -129,19 +149,21 @@ scratch) and a new library object. It shares with the worlds before it only
 what the process shares:
 
 - What `@library.evict` drops: the caches of data decoded from bytes
-  (syntaxes and themes of `raw`, bibliographies, CSL styles, the works of a
-  document, PDF documents, plugins and the results of their calls), and two
-  tables that are found by the *path as written*, not by content
-  (`raw_theme_derived`, `raw_syntaxes_derived` in `library/text_raw.mbt`;
-  see "Findings"). The stage calls `@library.evict(1)` before every
-  reference, so a reference decodes everything again.
-- The memoized calls (`layout_store`, the counter sequence, `closure_store`
-  in `library/memo.mbt`, the capture analysis of `eval/captures.mbt`) and
-  the module evaluations of `eval/import.mbt`. They end with their
-  compilation today. The second reference of every step runs with
-  memoization off, which does not ask the first four at all; the module
-  evaluations, of the main file too, end with the scope that stored them
-  (a compilation is one, `library/tracked_world.mbt`).
+  (syntaxes and themes of `raw`, bibliographies, CSL styles, PDF
+  documents, plugins and the results of their calls). The stage calls
+  `@library.evict(1)` before every reference, so a reference decodes
+  everything again.
+- The results kept by content (`library/memo_content.mbt`: decoded raster
+  images, highlighted raw text, the PDF exporter's images), which are
+  found by what upstream hashes and are not asked with memoization off.
+- The memoized calls (`layout_store`, the counter sequence, the works of
+  a bibliography, `closure_store` in `library/memo.mbt`, the capture
+  analysis of `eval/captures.mbt`) and the module evaluations of
+  `eval/import.mbt`. They end with their compilation today. The second
+  reference of every step runs with memoization off, which does not ask
+  the first five at all; the module evaluations, of the main file too,
+  end with the scope that stored them (a compilation is one,
+  `library/tracked_world.mbt`).
 - The fonts (`Font` objects, shared by all worlds of the runner) and what
   is computed from a font alone: shaping faces and plans
   (`layout/inline_shaping.mbt`), glyph frames, outlines and boxes
@@ -149,6 +171,13 @@ what the process shares:
 - The interned file ids (`syntax/path.mbt`), parsed numbering patterns,
   constant tables that are built on first use, hayagriva's built-in styles
   and locales.
+
+(The whole list of what the process keeps, with what each thing is found
+by, is in section 5.5 of `docs/incremental-design.md`, "As built". Two
+things were on this list that are gone: tables of the syntaxes and themes
+of `raw` that were found by the path as it was written, and a cell with
+the last works of a bibliography that was found by the engine's
+introspector object.)
 
 So a reference in the same process is as good as two rules: **a cache that
 is added must be off with `set_layout_memo_enabled(false)` or be dropped by
@@ -173,11 +202,11 @@ every compilation of the stage (`@library.set_memo_check`: every result
 that a store keeps is computed a second time from scratch, and the world
 reads of its entry must be what that run asked of the world): a line
 `READS <document> seed=.. sequence=..: ..` per entry that differs and a
-total at the end (`read check: 120000 entries checked, 0 differ in 0
+total at the end (`read check: 120825 entries checked, 0 differ in 0
 cases`). The stage's own verdict must be the same with it.
 
-The default run is the CI run: 120 documents, 235 sequences (232 and 3 in `scripts/ci/stages.tsv`), 1407
-steps and 4199 compilations with their exports, about 35 s on an M-series
+The default run is the CI run: 121 documents, 237 sequences (234 and 3 in `scripts/ci/stages.tsv`), 1421
+steps and 4241 compilations with their exports, about 40 s on an M-series
 machine. `--sequences=N` and `--steps=N` size
 the random sequences of every document, `--seed=N` and `--rounds=N` choose
 the seeds, `--all` adds `bench/longer` and every document with packages,
@@ -215,10 +244,10 @@ one at a time, and running the default stage (seed 1). They are not in the
 tree; to repeat one, change the code as said, build the runner in release
 and run `recompile -v`.
 
-| Mutation | Failing sequences, of 235 | First at | Seen in |
+| Mutation | Failing sequences, of 237 | First at | Seen in |
 |---|---|---|---|
-| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 120 | step 1 in 92 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 115 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 25 |
-| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo and the counter memo outlive the compilation), and `world.validate(entry.world)` is `true` | 67 | step 1 in 60 of them (`bench/tiny`, sweep, first) | the pages, in all of them |
+| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 122 | step 1 in 94 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 117 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 26 |
+| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo, the counter memo and the works of a bibliography outlive the compilation), and `world.validate(entry.world)` is `true` | 69 | step 1 in 61 of them (`bench/tiny`, sweep, first) | the pages in 68 of them; in one the dependencies and the diagnostics alone (works that are found do not read the bibliography file) |
 | 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared, and `engine.world.validate(self.world)` in `ClosureEntry::matches` is `true` | 12 | step 1 in 9 of them | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
 
 These are the three mutations of the stage's first version, on the code
@@ -232,7 +261,7 @@ With the validation left on, the same three give:
 | The store outlives its compilation, world reads validated | Failing sequences | What is left |
 |---|---|---|
 | 1. module entries | 0 | (4 before step 3 of the design: three at "everything back", where a file that has an earlier text again has other span numbers and an entry was found by the text of its file, and one diagnostic with a tracepoint too many, since the error that an entry kept was the object that every import adds a tracepoint to. An entry is found by the fingerprint of its source now and keeps a copy of its errors) |
-| 2. layouts and counter sequences | 0 | |
+| 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same kind of store) | 0 | |
 | 3. closure calls | 0 | |
 
 That is what the validation is for, and it is not yet a licence to keep a
@@ -246,11 +275,25 @@ and the library of the entry.
 What the recording itself is worth cannot be seen by this stage while
 nothing is kept; the recording check can (`--check-reads`, below).
 
+Two more, for the state that step 2 of the design repaired (state that a
+result depends on and that is neither an argument nor a recorded read;
+the design's section 5.5), run on the default stage of 237 sequences:
+
+| Mutation | Failing sequences | First at | Seen in |
+|---|---|---|---|
+| 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats`, sweep and random sequence | the page images: the page hashes as before, so the loop keeps the image it had, and the reference has other pixels. Nothing else differs: the frames, the SVG and the PDF of the loop are those of the reference. This is what `typst watch` did with PNG pages |
+| 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process that `evict` drops with the decode caches (what the cell of the last works was for two calls that share an introspector object: a result found without its key holding the file and without a read of it) | 7 | the sweep of `project/book` (from its eighth step on), and sweeps and random sequences of the suite's bibliography and citation tests (`bibliography-basic`, `bibliography-multiple-files`, `bibliography-before-content`, `issue-3481-cite-location` twice, `issue-785-cite-locate`) | the pages in all of them, the diagnostics in six (a document that compiles from scratch fails in the loop). Also `paged`: 15 tests fail, and `paged --check-reads`: 6 entries in 3 tests |
+
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
 
+All the counts of this section were measured again on the tree that has
+both step 2 and step 3 of the design (237 sequences: the project
+`linked` is two of them): 122, 69 and 12 without validation, none with
+it, 3 and 7.
+
 The first mutation fails in half of all sequences since step 3 (19 before
-it): the main file's evaluation is an entry of the same store, so a store
+it, of 235): the main file's evaluation is an entry of the same store, so a store
 that is kept without validation answers every recompilation whose main
 file is the source it was, whatever else changed.
 
@@ -340,8 +383,11 @@ again, and neither was fixed with the stage; the first has been since):
   `#image("p.png")`. Fixed since: the decoder is a port of the `png`
   crate's, with an oracle of damaged files (`codecs/png_oracle_test.mbt`;
   AGENTS.md, "PNG decoding").
-- **Two files, one relative path, two themes.** `raw_theme_derived` and
-  `raw_syntaxes_derived` (`library/text_raw.mbt`) are tables of the
+- **Two files, one relative path, two themes.** (Fixed since: the decoded
+  syntaxes and the theme are kept with the field, as upstream's `Derived`
+  does; `typst/content_memo_wbtest.mbt`, "the same relative path in two
+  directories".) `raw_theme_derived` and
+  `raw_syntaxes_derived` (`library/text_raw.mbt`) were tables of the
   process that are found by the source *as it was written*. Two files in
   different directories that both say `#set raw(theme: "t.tmTheme")` name
   different files with the same string, and every raw block is highlighted
@@ -379,8 +425,15 @@ And two things that are not bugs today:
 
 ## What it does not cover
 
-- Only paged documents with their SVG and PDF: not the HTML and bundle
-  targets, not PNG, no export options but the document's own.
+- Only paged documents with their SVG, their PDF and small images of
+  their pages: not the HTML and bundle targets, not PNG at the resolution
+  and with the options of an export, no export options but the document's
+  own. In particular not what the CLI's cache of page hashes does when
+  only the options of the export change, which a document can set
+  (`#set format.png(ppi: 72)`): the cache holds the hash of the page and
+  not the options, as upstream's does, so `typst watch` keeps the PNG of
+  the old resolution in both programs. The page images of this stage
+  have one resolution.
 - The features and the styles of a world's library never change; fonts
   change between two sets only.
 - The traced span of the IDE functions (`@typst.trace`).

@@ -6,6 +6,13 @@
 // recomputed from the source when needed. This is cheap because the decoded
 // data is cached by the loaded bytes (upstream memoizes `Bibliography::decode`
 // and `CslStyle::from_data` with comemo).
+//
+// So an element here names its files and does not hold them: every use of
+// the derived data must load it through the tracked world of the engine
+// at hand ([BibliographyElem::database], [BibliographyElem::csl_style],
+// [CslSource::derived_style]), so that the read is that of the memoized
+// call in progress. Never find it another way (a table by source, the
+// last result): `docs/incremental-design.md`, section 5.5.
 
 ///|
 /// Upstream `Synthesize for Packed<BibliographyElem>`.
@@ -640,28 +647,103 @@ pub(all) struct RenderedEntry {
 }
 
 ///|
-/// Memoization of [Works::generate] (upstream uses comemo): the last
-/// generated works for an introspector and a list of elements.
-let works_cache : Ref[(Introspector, Array[Content], Works)?] = { val: None, }
+/// The hashed argument of [Works::generate_impl] that is not the library:
+/// the document's bibliographies and citation groups (upstream
+/// `bibs_and_groups: &[Content]`). The key of an entry has their
+/// fingerprints; the entry keeps them for the exact comparison that every
+/// memoized call makes (`memo.mbt`).
+priv struct WorksInput(Array[Content])
+
+///|
+impl Eq for WorksInput with fn equal(self, other) {
+  let a = self.0
+  let b = other.0
+  if physical_equal(a, b) {
+    return true
+  }
+  if a.length() != b.length() {
+    return false
+  }
+  for i in 0..<a.length() {
+    if !content_memo_equal(a[i], b[i]) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// The memoized results of [Works::generate_impl].
+let works_store : MemoStore[Works, WorksInput] = MemoStore::new()
+
+///|
+/// How often [Works::generate_impl] ran since the process started.
+let works_generations : Ref[Int] = { val: 0, }
+
+///|
+/// How often the works of a document were generated (not found) since the
+/// process started, for tests and measurements.
+pub fn works_generation_count() -> Int {
+  works_generations.val
+}
 
 ///|
 /// Generates and formats all bibliographies and citations.
-// Cannot fail; upstream's `.at(span)` wraps an always-`Ok` `generate_impl`
-// (typst-library/src/model/bibliography.rs:711).
-#warnings("-unused_error_type")
+///
+/// Upstream memoizes `generate_impl` with comemo
+/// (typst-library/src/model/bibliography.rs:726): the library and
+/// `bibs_and_groups` are hashed, the world, the introspector, the traced
+/// span, the sink and the route are tracked. Here it is an entry of
+/// [memoize] with the rules of `memo.mbt`:
+///
+/// - The key is the fingerprints of the elements (with their spans and
+///   locations, like upstream's `Hash for Content`) and, stricter than
+///   upstream, the traced span; the library is compared by identity.
+/// - The route is not in the key: the works of a document are the same
+///   wherever a citation asks for them, and upstream's call asks nothing
+///   of its route (`show_math` evaluates with a route of its own). A key
+///   with the route generated the works once per nesting depth at which a
+///   citation or bibliography is shown, in every iteration. Should the
+///   call ask its route anything, the result is not kept (`tracks_route`
+///   of [memoize]).
+/// - Upstream's elements hold the data they were loaded from
+///   (`Derived<OneOrMultiple<DataSource>, Bibliography>`,
+///   `Derived<CslSource, CslStyle>`: both parts are hashed), so a changed
+///   `.bib` file or CSL style is another key there. The port's elements
+///   hold the sources only, and `generate_impl` loads them again
+///   ([BibliographyElem::database], [CslSource::derived_style]) through the
+///   tracked world: those reads are the entry's, which is only taken if the
+///   files still answer the same, and they become the reads of every call
+///   that finds the entry.
+/// - The introspector reads (a bibliography's `target`) and the sink are
+///   recorded and replayed like those of every entry.
+///
+/// (Before, the last works were kept in a cell and found by the identity
+/// of the engine's introspector object, whatever the files were by then,
+/// and a call that found them recorded no read of them.)
 pub fn Works::generate(
   engine : Engine,
   span : @syntax.Span,
 ) -> Works raise SourceError {
   let bibs_and_groups = engine.introspect(bibliography_introspection(span))
-  if works_cache.val is Some((introspector, elems, works)) &&
-    physical_equal(introspector, engine.introspector) &&
-    elems == bibs_and_groups {
-    return works
-  }
-  let works = Works::generate_impl(engine, bibs_and_groups)
-  works_cache.val = Some((engine.introspector, bibs_and_groups, works))
-  works
+  let key = memo_fingerprint(state => {
+    state.write_usize(bibs_and_groups.length())
+    for elem in bibs_and_groups {
+      state.write(elem)
+    }
+  })
+  memoize(
+    works_store,
+    engine,
+    key,
+    WorksInput(bibs_and_groups),
+    // Nothing writes to the works, and what they raise is a copy
+    // ([Works::citation]).
+    works => works,
+    engine => Works::generate_impl(engine, bibs_and_groups),
+    label=_ => "works",
+    tracks_route=true,
+  )
 }
 
 ///|
@@ -670,6 +752,7 @@ fn Works::generate_impl(
   engine : Engine,
   bibs_and_groups : Array[Content],
 ) -> Works {
+  works_generations.val += 1
   let engine = { ..engine, route: Route::extend_(engine.route), }
 
   // Prepare bibliographies and citation groups for rendering with
@@ -694,10 +777,26 @@ pub fn Works::citation(
 ) -> Content raise SourceError {
   match self.groups.get(loc) {
     Some(Ok(content)) => content
-    Some(Err(errors)) => raise SourceError(errors)
+    // Upstream `.cloned()`: the works keep their errors, and whoever
+    // catches one adds tracepoints and hints to it.
+    Some(Err(errors)) => raise SourceError(clone_diagnostics(errors))
     None =>
       raise SourceError([citation_could_not_be_located().into_error_at(span)])
   }
+}
+
+///|
+/// A copy of diagnostics that are kept (upstream `EcoVec<SourceDiagnostic>:
+/// Clone`): `trace` and `hints` are arrays that the holder of a diagnostic
+/// appends to (`trace` in `diag.mbt`).
+fn clone_diagnostics(
+  errors : Array[SourceDiagnostic],
+) -> Array[SourceDiagnostic] {
+  let copies = []
+  for error in errors {
+    copies.push(error.clone())
+  }
+  copies
 }
 
 ///|
@@ -709,7 +808,8 @@ pub fn Works::bibliography(
 ) -> RenderedBibliography raise SourceError {
   match self.bibliographies.get(loc) {
     Some(Ok(bib)) => bib
-    Some(Err(errors)) => raise SourceError(errors)
+    // Upstream `.map_err(Clone::clone)`.
+    Some(Err(errors)) => raise SourceError(clone_diagnostics(errors))
     None =>
       raise SourceError([
         bibliography_could_not_be_located().into_error_at(span),
@@ -1447,14 +1547,19 @@ fn show_math(ctx : ShowCtx, math : String) -> Content {
     sink: Sink::new(),
     route: Route::root(),
   }
-  let value = (engine.library.routines.eval_string)(
-    engine,
-    Context::none(),
-    math,
-    ctx.span,
-    @syntax.SyntaxMode::Math,
-    Scope::new(),
-  ) catch {
+  // The evaluation starts at the root of a route (upstream `eval_string`
+  // makes its own): its depth checks ask nothing of the route of the call
+  // that generates the works, which is tracked.
+  let value = with_own_route(() => {
+    (engine.library.routines.eval_string)(
+      engine,
+      Context::none(),
+      math,
+      ctx.span,
+      @syntax.SyntaxMode::Math,
+      Scope::new(),
+    )
+  }) catch {
     _ => return TextElem::packed(math).spanned(ctx.span)
   }
   value.display()

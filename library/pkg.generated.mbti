@@ -3364,6 +3364,8 @@ pub fn[T] with_layout_memo(() -> T raise SourceError) -> T raise SourceError
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
+pub fn works_generation_count() -> Int
+
 pub fn world_range(TrackedWorld, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
 
 pub fn world_scope_open(Int) -> Bool
@@ -11424,7 +11426,9 @@ pub struct SvgImage {
 }
 pub fn SvgImage::data(Self) -> Bytes
 pub fn SvgImage::height(Self) -> Double
+pub fn SvgImage::links(Self) -> ArrayView[U128]
 pub fn SvgImage::new(Bytes) -> Self raise LoadErr
+pub fn SvgImage::selections(Self) -> ArrayView[Int]
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
 pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double

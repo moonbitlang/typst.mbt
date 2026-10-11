@@ -722,6 +722,51 @@ def scenario_links(r):
     r.step("the link's file, once more", lambda: write(path("store/data.txt"), "five"))
 
 
+def scenario_linked(r):
+    """An SVG that links a PNG, exported as PNG pages: a page is exported
+    again if its hash changed, and the hash of an SVG image must cover the
+    images it links.
+
+    Upstream's does not, and its `Image::new` is memoized on that hash: it
+    keeps showing the first photo (`e58a63af`). So its pages are not
+    compared with a fresh compilation, only its status lines with the
+    port's (nor are the files of the two compared: the pixels of their PNGs
+    are the same, the compressed bytes are not)."""
+    path = lambda name: os.path.join(r.dir, name)
+    linked = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="20">'
+        '<image href="photo.png" width="20" height="20"/></svg>'
+    )
+    write(path("art.svg"), linked % 20)
+    write(path("photo.png"), png(4, 4, (200, 30, 30)))
+    write(
+        path("main.typ"),
+        "#set page(width: 4cm, height: 3cm)\n"
+        '#image("art.svg", width: 1cm)\n'
+        "#pagebreak()\n"
+        '#box(width: 1cm, height: 1cm, fill: tiling(size: (5mm, 5mm), image("art.svg", width: 5mm)))\n',
+    )
+    port = r.name == "port"
+    r.start(["--ignore-system-fonts"], "page-{p}.png")
+    r.step("initial compilation", compare=port)
+    r.step(
+        "the linked image",
+        lambda: replace(path("photo.png"), png(4, 4, (30, 30, 200))),
+        compare=port,
+    )
+    r.step(
+        "the linked image, written in place",
+        lambda: write(path("photo.png"), png(4, 4, (30, 200, 30))),
+        compare=port,
+    )
+    r.step(
+        "the first image again",
+        lambda: replace(path("photo.png"), png(4, 4, (200, 30, 30))),
+        compare=port,
+    )
+    r.step("the SVG", lambda: write(path("art.svg"), linked % 30), compare=port)
+
+
 def scenario_fullscreen(r):
     """The status of the default mode, with colors and screen clearing."""
     write(os.path.join(r.dir, "main.typ"), "= Fullscreen\nText.\n")
@@ -814,6 +859,7 @@ SCENARIOS = [
     ("main", scenario_main),
     ("data", scenario_data),
     ("links", scenario_links),
+    ("linked", scenario_linked),
     ("fullscreen", scenario_fullscreen),
     ("missing", scenario_missing),
     ("pages", scenario_pages),

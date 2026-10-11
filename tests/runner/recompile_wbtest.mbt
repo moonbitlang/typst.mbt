@@ -196,3 +196,62 @@ test "recompile: a snapshot names its files so that they are found again" {
     assert_eq(file_path(file_of_path(path)), path)
   }
 }
+
+///|
+test "recompile: a page image is written again only if the hash of its page changed" {
+  // The CLI's rule (`ExportCache`): the files of a watching compiler are
+  // those of the last compilation only where the page hashes say so.
+  let filled = (red : Float) => {
+    let frame = @library.Frame::soft(size(20.0, 10.0))
+    frame.push(
+      pos(0.0, 0.0),
+      Shape(
+        @library.Geometry::Rect(size(20.0, 10.0)).filled(
+          Solid(rgb(red, 0.0, 0.0)),
+        ),
+        @syntax.Span::detached(),
+      ),
+    )
+    page(frame)
+  }
+  let lines = (pages : PageFiles, document : Array[@layout.Page]) => {
+    let written = pages.write(
+      @layout.PagedDocument::new(
+        document,
+        @library.DocumentInfo::new(),
+        @library.DocumentFormatOptions::new(),
+      ),
+    )
+    written.split("\n").map(line => line.to_owned()).collect()
+  }
+  let files = PageFiles::new()
+  let first = lines(files, [filled(1.0), filled(0.5)])
+  // (Two lines and what follows the last line break.)
+  inspect(first.length(), content="3")
+  assert_true(first[0].has_prefix("page 1: 10x5 "))
+  assert_true(first[1].has_prefix("page 2: 10x5 "))
+  assert_true(files.files[0] != files.files[1])
+  // The same pages again: the same files, which are what a compiler
+  // without files writes.
+  assert_eq(lines(files, [filled(1.0), filled(0.5)]), first)
+  assert_eq(lines(PageFiles::new(), [filled(1.0), filled(0.5)]), first)
+  // One page changes and one is new: the file of the first stays.
+  let image = files.files[1]
+  let third = lines(files, [filled(1.0), filled(0.25), filled(0.5)])
+  assert_eq(third[0], first[0])
+  assert_true(files.files[1] != image)
+  assert_eq(files.files[2], image)
+  // A page whose hash did not change keeps its file, whatever is in it:
+  // that is the cache, and where a fingerprint that says too little shows.
+  files.files[0] = "stale"
+  let kept = lines(files, [filled(1.0), filled(0.25), filled(0.5)])
+  inspect(kept[0], content="page 1: stale")
+  // A shorter document leaves the files of the pages it no longer has, and
+  // their hashes: a page that comes back as it was is not written.
+  lines(files, [filled(0.75)]) |> ignore
+  files.files[2] = "left on disk"
+  let back = lines(files, [filled(0.75), filled(0.25), filled(0.5)])
+  inspect(back[0], content="page 1: " + files.files[0])
+  assert_true(back[0] != "page 1: stale")
+  inspect(back[2], content="page 3: left on disk")
+}

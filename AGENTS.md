@@ -406,7 +406,8 @@
   `bench/README.md`); profile with `moon run --profile --target native
   --release cli -- query --ignore-system-fonts bench/longer.typ heading`.
   comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
-  `layout_fragment_impl`, the counter sequence and closure calls
+  `layout_fragment_impl`, the counter sequence, the works of a
+  bibliography (`Works::generate`) and closure calls
   (`eval_closure`, see below) are memoized for one compilation (its
   evaluation and its introspection iterations). A memoized call's key must
   fingerprint every argument except the engine (content, `StyleChain::
@@ -537,6 +538,62 @@
   compilation allocates a few dozen objects in `tracked_world.mbt` in all
   (`scripts/alloc_sites.py`), and the whole of it costs 0.1 to 0.8 % of
   the instructions of a compilation (section 5.2 of the design, "Costs").
+- State outside the arguments (step 2 of slice 1 of
+  `docs/incremental-design.md`, section 5.5, whose "As built" note lists
+  every piece of state that the engine keeps for the process or in a
+  long-lived object, with what it is found by: add a row for a new one).
+  Two rules. A cache that is not a store of memoized calls is a function
+  of its key, and computing a missing value reads neither the world nor
+  the introspector. What is derived from a file is part of the value that
+  names the file, covered by that value's fingerprint and equality, or it
+  is read through the tracked world by every call that uses it; a
+  recorded read alone is not enough for a value that is handed on,
+  because it tells the call that built the value, not the call that is
+  given an equal-looking one later. Where each rule was broken: the works
+  of a bibliography were kept in a cell and found by the engine's
+  introspector object, and they are loaded from files (the port's
+  bibliography and citation elements hold the sources, not upstream's
+  `Derived` data). `Works::generate` is an entry of `memoize` now
+  (upstream memoizes `generate_impl`): the key is the fingerprints of the
+  elements, the `.bib` files and CSL styles are world reads of the entry,
+  which is how a changed file gives other works and how the calls that
+  find the entry get the read; its route is tracked and not in the key
+  (`tracks_route` of `memoize`: what the call asks of routes is noticed
+  as for a closure call, a call that asked is not kept, and a hit binds
+  nobody to a depth; with the route in the key the works were generated
+  once per depth at which something cites, in every iteration; what is
+  asked of routes is noted in state of the process, so code that works
+  on a route of its own inside such a call, like the math of an entry
+  that `show_math` evaluates from a root route, runs in
+  `with_own_route`, or its depth checks keep the entry from being
+  stored); the
+  errors that the works keep are raised as copies (upstream clones them:
+  `trace` appends to the errors it catches, so never raise a kept
+  diagnostic itself). And an SVG image was its data and its fonts, as
+  upstream's `Hash` has it, while its tree holds the images it links: a
+  decoded image now keeps the hashes of the linked files it loaded
+  (`SvgImage::links`) and what the font resolver answered for every
+  selection (`SvgImage::selections`: upstream's `font_hash` has the
+  fonts that were loaded, not which text got which), and its equality,
+  `Hash` and fingerprint include both: the tree is a function of the
+  data and of what the two resolvers answered, and so must the identity
+  be. Upstream does not, and shows one image for two SVG files of the
+  same bytes next to different linked images (`Image::new_impl` is
+  memoized on that hash): do not "fix" the port back to upstream's hash.
+  The read of a linked file is the tracked world's, in
+  `SvgImageResolver::load_or_error`. What depends on a page's hash today
+  is `typst watch` with one image per page (`ExportCache` in
+  `cli/compile.mbt` writes a page again only if its hash changed): a
+  `Fingerprint` of anything in a frame that leaves out something that
+  shows is a stale page there, which the `recompile` stage's page images
+  and the scenario `linked` of `scripts/watch_check.py` test. (That cache
+  does not hold the options a page is exported with, as upstream's does
+  not: after an edit of `#set format.png(ppi: ..)` alone both keep the
+  old PNG.) Tests:
+  `typst/state_outside_wbtest.mbt`, `library/works_wbtest.mbt`,
+  `doc/svg_identity_test.mbt` (with real fonts); the
+  mutation checks are in section 9.1 of the design and in
+  `tests/recompile/README.md`.
 - Module evaluations (`eval/import.mbt`; step 3 of slice 1 of the design,
   "Step 3 as built" in its section 8): `@eval.eval_source` is upstream's
   memoized `eval`, one function and one store for the main file of a
@@ -1004,9 +1061,12 @@
   when a file that a module imports or reads changed;
   `typst/recompile_wbtest.mbt`). After touching `kit/watcher`,
   `cli/watch*.mbt`, `compile_once` or a process-global cache run
-  `python3 scripts/watch_check.py` for native and wasm (8 scenarios against
+  `python3 scripts/watch_check.py` for native and wasm (9 scenarios against
   a fresh compile and against upstream's status lines and SVG bytes; it
-  needs the upstream binary and real file events, so it is not a CI stage).
+  needs the upstream binary and real file events, so it is not a CI stage;
+  in the scenario `linked`, PNG pages of an SVG whose linked image
+  changes, only the port's files are compared, since upstream keeps the
+  first image).
   It is the end-to-end check of the CLI (does the watcher see the change,
   what is printed and written); that a compilation after an edit gives
   what a compilation from scratch gives is the `recompile` stage's.
@@ -1017,7 +1077,10 @@
   every step must give what a fresh world of the same files gives, with
   memoization and without: the dependencies, the diagnostics (places,
   hints, tracepoints), the frames, what the introspector answers, the SVG
-  and the PDF bytes; spans are compared as what they point at, since a
+  and the PDF bytes, and the images of the pages as a watching compiler
+  leaves them (the loop has the CLI's cache of page hashes and renders a
+  page only if its hash changed; a reference renders all); spans are
+  compared as what they point at, since a
   source that was edited (reparsed in part, the rest of its nodes kept)
   and a fresh parse number them differently; and the document of a step
   must still export to the same
@@ -1032,7 +1095,8 @@
   again; files in `_build/recompile/`; `--check-reads` runs the
   recording check of the tracked world on every compilation). Nothing is
   cached across
-  compilations today, so it passes by construction; it is the gate for
+  compilations today but those page hashes, so the rest passes by
+  construction; it is the gate for
   anything that will be: the watch loop of a sequence runs with nothing
   in between (the references come after it), and a new cache must be off
   with `set_layout_memo_enabled(false)` or dropped by `evict(1)`, or the
@@ -1044,12 +1108,12 @@
   abort where upstream panics. What a compilation reads that is not in an
   element's fingerprint today: the date, `sys.inputs` (through the
   library's module), files that a function reads when it is called, the
-  fonts, and the data of `Derived` fields, which the port does not store
-  in the field (bibliographies and CSL styles are loaded again from their
-  source; the syntaxes and themes of `raw` are found in a table by the
-  path as it was written, so two files that name different themes by the
-  same relative path get the one that was parsed last: a known bug, see
-  the README).
+  fonts, the images that an SVG links (in the decoded image's
+  fingerprint, not in the element's), and the data of the `Derived`
+  fields that the port does not store in the field: bibliographies and
+  CSL styles are loaded again from their source, through the tracked
+  world, by the call that generates the works. (The syntaxes and themes
+  of `raw` are stored with the field since slice 0b.)
 - WASM plugins (`library/plugin.mbt`, port of `foundations/plugin.rs`) run
   on a port of wasmi 1.0.9: `wasmparser/` (wasmparser 0.228.0, core
   modules: reader, parser, validator; operator tables generated by

@@ -12,17 +12,29 @@ pub struct SvgImage {
   /// `font_hash` is zero without one and the hash of the used fonts, also
   /// of none, with one).
   priv resolved : Bool
+  /// What the font resolver answered, in the order in which it was asked
+  /// (`select_font`, `select_fallback`): the place in `fonts` of the font
+  /// it chose, or -1 for none (not upstream, see [SvgImage::links]).
+  priv selections : Array[Int]
+  /// The hashes of the data of the images that the SVG links (`<image
+  /// href="photo.png"/>`), in the order in which they were loaded (not
+  /// upstream, see [SvgImage::links]).
+  priv links : Array[U128]
   priv tree : @usvg.Tree
 }
 
 ///|
 /// An SVG is identified by its data and the used fonts (upstream: "We
 /// can't hash a usvg tree directly, but the raw SVG data + a hash of all
-/// used fonts gives us something similar.").
+/// used fonts gives us something similar."), and by the rest of what its
+/// tree was built from: which font was chosen for what, and the data of
+/// the images it links ([SvgImage::links]).
 pub impl Eq for SvgImage with fn equal(self, other) {
   self.data == other.data &&
   self.resolved == other.resolved &&
-  self.fonts == other.fonts
+  self.fonts == other.fonts &&
+  self.selections == other.selections &&
+  self.links == other.links
 }
 
 ///|
@@ -36,6 +48,13 @@ pub impl Hash for SvgImage with fn hash_combine(self, hasher) {
   hasher.combine(self.resolved)
   for font in self.fonts {
     hasher.combine(font)
+  }
+  for selection in self.selections {
+    hasher.combine(selection)
+  }
+  for link in self.links {
+    hasher.combine(link.hi)
+    hasher.combine(link.lo)
   }
 }
 
@@ -51,7 +70,16 @@ pub fn SvgImage::new(data : Bytes) -> SvgImage raise LoadErr {
     e => raise LoadErr(format_usvg_error(e))
   }
   let (width, height) = tree_size(tree)
-  { data, width, height, fonts: [], resolved: false, tree, }
+  {
+    data,
+    width,
+    height,
+    fonts: [],
+    resolved: false,
+    selections: [],
+    links: [],
+    tree,
+  }
 }
 
 ///|
@@ -109,9 +137,61 @@ pub fn SvgImage::with_fonts_images(
   }
   let (width, height) = tree_size(tree)
   (
-    { data, width, height, fonts: font_resolver.used, resolved: true, tree, },
+    {
+      data,
+      width,
+      height,
+      fonts: font_resolver.used,
+      resolved: true,
+      selections: font_resolver.selections,
+      links: image_resolver.loaded,
+      tree,
+    },
     warnings,
   )
+}
+
+///|
+/// The hashes of the data of the linked images that the tree was built
+/// from, in the order in which they were loaded ([data_hash] of each).
+///
+/// Not upstream, whose `Hash for SvgImageInner` covers the data and the
+/// fonts (typst-library/src/visualize/image/svg.rs:143) and leaves the
+/// linked images to comemo: `with_fonts_images` is memoized (`svg.rs:52`),
+/// `world` is tracked, and `ImageResolver::load_or_error` reads the linked
+/// file through it (`svg.rs:481`), so that call and every memoized call around
+/// it is computed again when the file changes. The port records the same
+/// read (`SvgImageResolver::load_or_error`, through the tracked world).
+/// That tells the calls that *decode* the image. It does not tell whoever
+/// is handed the decoded image, or a frame or a tiling that holds it: two
+/// trees from the same SVG data with different linked images were one
+/// image, for a memoized call that has one in an argument, for a kept
+/// frame, and for the page hashes by which `typst watch` decides whether
+/// to export a page again. Upstream has that fault, and one more:
+/// `Image::new_impl` is memoized on the hash of the kind
+/// (`image/mod.rs:447`), so of two SVG
+/// files with the same bytes in two directories, each next to its own
+/// `photo.png`, both show the first one's photo (0.15.1-dev, `e58a63af`).
+/// So the identity of an image here is upstream's plus what that leaves
+/// out (`docs/incremental-design.md`, 5.5 and deviation 12 of section 10).
+///
+/// The fonts are the same matter. Upstream hashes a font when it is first
+/// loaded, so its `font_hash` says which fonts a tree uses and not what
+/// for: an SVG with a text in each of two fonts and a third text that
+/// names none is the same image whichever of the two the third one got
+/// from the families of the text around the image. The tree is a function
+/// of the data and of what the two resolvers answered, so the image keeps
+/// the answers of the font resolver too, in order ([SvgImage::selections]).
+pub fn SvgImage::links(self : SvgImage) -> ArrayView[U128] {
+  self.links[:]
+}
+
+///|
+/// What the font resolver answered while the tree was built, in order: for
+/// every selection of a font and of a fallback the place of the chosen
+/// font in the list of used fonts, or -1 for none (see [SvgImage::links]).
+pub fn SvgImage::selections(self : SvgImage) -> ArrayView[Int] {
+  self.selections[:]
 }
 
 ///|
@@ -249,6 +329,11 @@ priv struct SvgFontResolver {
   from_id : Map[@usvg.FontId, Font]
   /// All used fonts (upstream accumulates their hash).
   used : Array[Font]
+  /// Where the font of a fontdb ID is in `used` (not upstream).
+  place : Map[@usvg.FontId, Int]
+  /// What was answered to every selection, in order: a place in `used`,
+  /// or -1 (not upstream: [SvgImage::selections]).
+  selections : Array[Int]
 }
 
 ///|
@@ -258,7 +343,31 @@ fn SvgFontResolver::new(
   book : FontBook,
   families : Array[String],
 ) -> SvgFontResolver {
-  { book, world, families, to_id: {}, from_id: {}, used: [], }
+  {
+    book,
+    world,
+    families,
+    to_id: {},
+    from_id: {},
+    used: [],
+    place: {},
+    selections: [],
+  }
+}
+
+///|
+/// Notes the answer to a selection and returns it.
+fn SvgFontResolver::answer(
+  self : SvgFontResolver,
+  id : @usvg.FontId?,
+) -> @usvg.FontId? {
+  self.selections.push(
+    match id {
+      Some(id) => self.place.get(id).unwrap_or(-1)
+      None => -1
+    },
+  )
+  id
 }
 
 ///|
@@ -291,11 +400,11 @@ fn SvgFontResolver::select_font(
   for named in names {
     if self.book.select(named.to_lower(), variant) is Some(index) {
       if self.get_or_load(index, db) is Some(id) {
-        return Some(id)
+        return self.answer(Some(id))
       }
     }
   }
-  None
+  self.answer(None)
 }
 
 ///|
@@ -323,11 +432,11 @@ fn SvgFontResolver::select_fallback(
 
   // Select the font.
   guard self.book.select_fallback(like, variant, c.to_string()) is Some(index) else {
-    return None
+    return self.answer(None)
   }
   match self.get_or_load(index, db) {
-    Some(id) if !exclude_fonts.contains(id) => Some(id)
-    _ => None
+    Some(id) if !exclude_fonts.contains(id) => self.answer(Some(id))
+    _ => self.answer(None)
   }
 }
 
@@ -382,6 +491,7 @@ fn SvgFontResolver::load(
     },
     monospaced: info.flags.contains(font_flags_monospace),
   })
+  self.place[id] = self.used.length()
   self.used.push(font)
   self.to_id[index] = Some(id)
   self.from_id[id] = font
@@ -418,6 +528,9 @@ priv struct SvgImageResolver {
   svg_file : @syntax.FileId?
   /// The first error that occurred when loading a linked image, if any.
   mut error : LoadError?
+  /// The hashes of the data of the files that were loaded, in order (not
+  /// upstream: [SvgImage::links]).
+  loaded : Array[U128]
 }
 
 ///|
@@ -425,7 +538,7 @@ fn SvgImageResolver::new(
   world : TrackedWorld,
   svg_file : @syntax.FileId?,
 ) -> SvgImageResolver {
-  { world, svg_file, error: None, }
+  { world, svg_file, error: None, loaded: [], }
 }
 
 ///|
@@ -507,6 +620,10 @@ fn SvgImageResolver::load_or_error(
     Other(None) => bail("unspecified error")
     err => bail("unexpected error: \{err}")
   }
+  // What the tree is built from besides the SVG's own data. Every file
+  // that is read counts, also one that turns out not to be an image: the
+  // load then fails as a whole, and there is no image to identify.
+  self.loaded.push(data_hash(bytes))
   let format = match determine_format_from_path(href_file.vpath()) {
     Some(format) => Some(format)
     None => ImageFormat::detect(bytes)
