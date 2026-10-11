@@ -128,6 +128,14 @@ fn grid_test_variants() -> Array[(String, () -> CellGrid)] {
       },
     ),
     (
+      "vlines: before one track more",
+      () => {
+        let grid = grid_test_grid()
+        grid.vlines.push([])
+        grid
+      },
+    ),
+    (
       "hlines: one less",
       () => { ..grid_test_grid(), hlines: [[], [], [], []], },
     ),
@@ -195,6 +203,36 @@ fn grid_test_variants() -> Array[(String, () -> CellGrid)] {
           Cell({
             ..grid_test_cell("c"),
             stroke: { ..Sides::splat(Some(grid_test_stroke(1.0))), left: None, },
+          }),
+        )
+      },
+    ),
+    (
+      "cell: the stroke of the top",
+      () => {
+        grid_test_with_entry(
+          3,
+          Cell({
+            ..grid_test_cell("c"),
+            stroke: {
+              ..Sides::splat(Some(grid_test_stroke(1.0))),
+              top: Some(grid_test_stroke(0.5)),
+            },
+          }),
+        )
+      },
+    ),
+    (
+      "cell: the stroke of the right",
+      () => {
+        grid_test_with_entry(
+          3,
+          Cell({
+            ..grid_test_cell("c"),
+            stroke: {
+              ..Sides::splat(Some(grid_test_stroke(1.0))),
+              right: Some(grid_test_stroke(0.25)),
+            },
           }),
         )
       },
