@@ -636,15 +636,68 @@ pub fn IntrospectionRecorder::validate(
 /// across compilations the candidates of earlier compilations are
 /// validated too, and are mostly rejected only after that hash. An
 /// introspector answers the same forever ([Introspector::serial]), so the
-/// fingerprint of an answer is computed once per introspector. Only the
-/// answers of the introspector that was asked last are kept.
+/// fingerprint of an answer is computed once per introspector.
+///
+/// It is a table by introspector (slice 3 of `docs/incremental-design.md`;
+/// it kept the answers of the introspector that was asked last only). A
+/// document that is found again has the introspector it had
+/// (`layout/document.mbt`, `PagedDocument::kept`), and the compilation
+/// that finds it validates what the compilation that laid it out
+/// validated: the reads of the document against the document's own
+/// introspector, which is every read of the document, replayed once per
+/// recompilation in which nothing changed. With the table that is a
+/// lookup per read. Two things are not in it. The answers of the empty
+/// introspectors, which all have the number zero: every later compilation
+/// asks them, of reads that hold the locations of its own documents, so
+/// their table would grow with a session; they are kept while the empty
+/// introspector is the one that is asked, as before. And what was not
+/// asked in two [evict] calls in a row ([read_answers_max_age]): an
+/// introspector that no compilation asks any more is that of a document
+/// that changed.
 priv struct ReadAccelerator {
+  /// The introspector that was asked last, and its answers.
   mut serial : Int64
   mut answers : Map[U128, U128]
+  /// The answers of the other introspectors (not of the empty ones).
+  tables : Map[Int64, ReadAnswers]
+  /// Counts the lookups in `tables`: the time of [ReadAnswers].
+  mut clock : Int
+  /// Whether [evict] knows the table.
+  mut registered : Bool
 }
 
 ///|
-let read_accelerator : ReadAccelerator = { serial: -1L, answers: {}, }
+/// The answers of one introspector ([ReadAccelerator]).
+priv struct ReadAnswers {
+  answers : Map[U128, U128]
+  /// The number of [evict] calls since the answers were asked for.
+  mut age : Int
+  /// When they were last asked for (`ReadAccelerator.clock`).
+  mut used : Int
+}
+
+///|
+/// The greatest age of the answers of an introspector (comemo drops its
+/// accelerator with every `evict`, `comemo/src/accelerate.rs`; here the
+/// answers that the compilation before the `evict` asked for stay, for
+/// the next one).
+let read_answers_max_age : Int = 1
+
+///|
+/// The greatest number of introspectors whose answers are kept, for a
+/// process that never calls [evict]: the one that was not asked for the
+/// longest makes room. (A compilation asks at most five and an empty
+/// one.)
+let read_answers_max_tables : Int = 16
+
+///|
+let read_accelerator : ReadAccelerator = {
+  serial: -1L,
+  answers: {},
+  tables: {},
+  clock: 0,
+  registered: false,
+}
 
 ///|
 /// The answers known for the introspector with this number.
@@ -652,11 +705,67 @@ fn ReadAccelerator::of(
   self : ReadAccelerator,
   serial : Int64,
 ) -> Map[U128, U128] {
-  if self.serial != serial {
-    self.serial = serial
+  if self.serial == serial {
+    return self.answers
+  }
+  self.serial = serial
+  if serial == 0L {
     self.answers = {}
+    return self.answers
+  }
+  self.clock += 1
+  match self.tables.get(serial) {
+    Some(kept) => {
+      kept.age = 0
+      kept.used = self.clock
+      self.answers = kept.answers
+    }
+    None => {
+      if !self.registered {
+        self.registered = true
+        register_evictor(max_age => self.evict(max_age))
+      }
+      if self.tables.length() >= read_answers_max_tables {
+        let mut oldest = serial
+        let mut used = self.clock
+        for other, kept in self.tables {
+          if kept.used < used {
+            oldest = other
+            used = kept.used
+          }
+        }
+        self.tables.remove(oldest)
+      }
+      self.answers = {}
+      self.tables[serial] = { answers: self.answers, age: 0, used: self.clock, }
+    }
   }
   self.answers
+}
+
+///|
+/// [evict] for the answers of introspectors: those that were not asked for
+/// since the call before this one are dropped, and all of them for zero.
+fn ReadAccelerator::evict(self : ReadAccelerator, max_age : Int) -> Unit {
+  let max_age = if max_age < read_answers_max_age {
+    max_age
+  } else {
+    read_answers_max_age
+  }
+  let old = []
+  for serial, kept in self.tables {
+    kept.age += 1
+    if kept.age > max_age {
+      old.push(serial)
+    }
+  }
+  for serial in old {
+    self.tables.remove(serial)
+  }
+  // The next lookup goes through the table, which makes what it finds
+  // young.
+  self.serial = -1L
+  self.answers = {}
 }
 
 ///|
