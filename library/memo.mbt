@@ -169,29 +169,23 @@ pub fn[T] with_layout_memo(
 }
 
 ///|
-/// The number of [evict] calls since the caches were dropped.
-let evictions : Ref[Int] = { val: 0, }
-
-///|
-/// Evict the caches (upstream `comemo::evict(max_age)`, which drops the
-/// memoized results that were not used for `max_age` evictions; a watching
-/// compiler calls it after every compilation).
+/// Evict the caches (upstream `comemo::evict(max_age)`,
+/// `comemo/src/memoize.rs:100`): every kept result gets older by one, and
+/// those that were not found for more than `max_age` calls are dropped; a
+/// result that is found is young again (`CacheData::evict` and `lookup`,
+/// `:150` and `:166`). `evict(0)` drops everything. A watching compiler
+/// calls it after every recompilation (`cli/watch.mbt`, where upstream
+/// calls `comemo::evict(10)`); a process that never calls it keeps what it
+/// computed, as one using comemo does.
 ///
-/// Memoized calls end with their compilation here. What outlives it is
-/// data decoded from bytes, found again by its content: syntaxes and
-/// themes of `raw`, bibliographies and CSL styles, PDF documents, plugins
-/// and the results of their calls. (The works of a bibliography were
-/// among them, in a cell that was found by the engine's introspector
-/// object; they are an entry of [memoize] now.) A process that compiles a world whose
-/// files change would keep every version of them. They have no age, so
-/// they are dropped as a whole on every `max_age`-th call instead (decoding
-/// them again is all it costs). Must not be called during a compilation.
-///
-/// The results kept by content (`memo_content.mbt`: decoded raster images,
-/// highlighted raw text, the PDF exporter's images) have ages like
-/// comemo's: each call makes them older by one and drops those that were
-/// not found for more than `max_age` calls. The hashes of data that are
-/// kept by the identity of the `Bytes` are swept ([sweep_data_hashes]).
+/// What has an age: the results kept by content (`memo_content.mbt`:
+/// decoded raster images, highlighted raw text, the PDF exporter's images)
+/// and the decode caches (syntaxes and themes of `raw`, bibliographies and
+/// CSL styles, PDF documents, plugins and the results of their calls,
+/// parsed numbering patterns), each a [ContentCache] that registered
+/// itself ([register_evictor], comemo's `register_evictor`). The hashes of
+/// data that are kept by the identity of the `Bytes` are swept
+/// ([sweep_data_hashes]).
 pub fn evict(max_age : Int) -> Unit {
   for evictor in evictors {
     evictor(max_age)
@@ -201,19 +195,6 @@ pub fn evict(max_age : Int) -> Unit {
   } else {
     sweep_data_hashes()
   }
-  evictions.val += 1
-  if evictions.val < max_age {
-    return
-  }
-  evictions.val = 0
-  raw_syntax_cache.clear()
-  raw_theme_cache.clear()
-  bibliography_cache.clear()
-  csl_style_cache.clear()
-  pdf_document_cache.clear()
-  plugin_call_cache.clear()
-  plugin_transition_cache.clear()
-  plugin_module_cache.clear()
 }
 
 ///|

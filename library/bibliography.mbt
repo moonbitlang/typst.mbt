@@ -179,9 +179,10 @@ fn Bibliography::empty() -> Bibliography {
 }
 
 ///|
-/// Decoded bibliographies, keyed by the loaded data (upstream memoizes
-/// `Bibliography::decode`).
-let bibliography_cache : Array[(Array[(LoadSource, Bytes)], Bibliography)] = []
+/// Decoded bibliographies, by the hash of the loaded data: the sources
+/// and their bytes (upstream memoizes `Bibliography::decode`), with
+/// comemo's ages ([ContentCache]).
+let bibliography_cache : ContentCache[Bibliography] = ContentCache::new()
 
 ///|
 /// Load a bibliography from data sources.
@@ -196,11 +197,21 @@ fn Bibliography::load(
 ///|
 /// Decode a bibliography from loaded data sources.
 fn Bibliography::decode(data : Array[Loaded]) -> Bibliography raise SourceError {
-  let key = data.map(d => (d.source.v, d.data))
-  for entry in bibliography_cache {
-    if entry.0 == key {
-      return entry.1
+  let state = SipHasher128::new()
+  state.write_usize(data.length())
+  for d in data {
+    match d.source.v {
+      Path(id) => {
+        state.write_discriminant(0)
+        state.write_u32(id.into_raw().to_uint())
+      }
+      Bytes => state.write_discriminant(1)
     }
+    state.write_u128(data_hash(d.data))
+  }
+  let key = state.finish128()
+  if bibliography_cache.get(key) is Some(map) {
+    return map
   }
   let map = Bibliography::empty()
   let duplicates : Array[String] = []
@@ -229,10 +240,7 @@ fn Bibliography::decode(data : Array[Loaded]) -> Bibliography raise SourceError 
     let span = data[0].source.span
     bail_at(span, "duplicate bibliography keys: \{duplicates.join(", ")}")
   }
-  if bibliography_cache.length() >= 64 {
-    bibliography_cache.remove(0) |> ignore
-  }
-  bibliography_cache.push((key, map))
+  bibliography_cache.insert(key, map)
   map
 }
 
@@ -392,9 +400,9 @@ pub struct CslStyle {
 }
 
 ///|
-/// Styles loaded from data, keyed by their bytes (upstream memoizes
-/// `CslStyle::from_data`).
-let csl_style_cache : Array[(Bytes, CslStyle)] = []
+/// Styles loaded from data, by the hash of their bytes (upstream memoizes
+/// `CslStyle::from_data`), with comemo's ages ([ContentCache]).
+let csl_style_cache : ContentCache[CslStyle] = ContentCache::new()
 
 ///|
 /// Load a CSL style from a data source (upstream returns a
@@ -432,10 +440,9 @@ pub fn CslStyle::from_archived(archived : @hayagriva.ArchivedStyle) -> CslStyle 
 ///|
 /// Load a CSL style from file contents.
 pub fn CslStyle::from_data(bytes : Bytes) -> CslStyle raise LoadErr {
-  for entry in csl_style_cache {
-    if entry.0 == bytes {
-      return entry.1
-    }
+  let key = data_hash(bytes)
+  if csl_style_cache.get(key) is Some(style) {
+    return style
   }
   let text = bytes_as_str(bytes)
   let style = match @citationberg.IndependentStyle::from_xml(text) {
@@ -445,10 +452,7 @@ pub fn CslStyle::from_data(bytes : Bytes) -> CslStyle raise LoadErr {
         LoadError::text(NoPos, "failed to load CSL style", err.to_string()),
       )
   }
-  if csl_style_cache.length() >= 32 {
-    csl_style_cache.remove(0) |> ignore
-  }
-  csl_style_cache.push((bytes, style))
+  csl_style_cache.insert(key, style)
   style
 }
 

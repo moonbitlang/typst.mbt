@@ -1,0 +1,134 @@
+{
+ "generated": "by scripts/gen_recompile_upstream.py from the upstream binary. DO NOT EDIT.",
+ "upstream": "typst 0.15.1 (e58a63af)",
+ "what": "The modules of plugins, which are memoized by the plugin's bytes (`Plugin::module`) and compare by identity. A plugin that is loaded in every compilation stays one module however long the session is; one that an imported file loaded is the module of that evaluation until its entry is evicted, ten recompilations after the last one that asked for it, and then another module than the one a kept call returns.",
+ "steps": [
+  {
+   "edit": "the project",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n",
+    "early.typ": "#let p = plugin(\"p.wasm\")\n// comment 0\n",
+    "late.typ": "#let r = plugin(\"r.wasm\")\n// comment 0\n"
+   },
+   "binary": {
+    "p.wasm": "0061736d010000000503010001070a01066d656d6f72790200",
+    "q.wasm": "0061736d010000000503010002070a01066d656d6f72790200",
+    "r.wasm": "0061736d010000000503010003070a01066d656d6f72790200"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (1)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 1\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (2)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 2\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (3)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 3\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (4)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 4\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (5)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 5\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (6)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 6\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (7)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 7\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (8)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 8\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (9)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 9\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the main file, with nothing that matters (10)",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 10\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "a comment in early.typ, ten evictions after its plugin was loaded",
+   "files": {
+    "early.typ": "#let p = plugin(\"p.wasm\")\n// comment 1\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "a comment in late.typ, eleven evictions after its plugin was loaded",
+   "files": {
+    "late.typ": "#let r = plugin(\"r.wasm\")\n// comment 1\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#ff4136\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>"
+  },
+  {
+   "edit": "the main file, with nothing that matters",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"early.typ\": p\n#import \"late.typ\": r\n#let q = plugin(\"q.wasm\")\n#let early() = p\n#let late() = r\n#let mine() = q\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n// A plugin that the main file loads in every compilation.\n#cell(mine() == q)\n// Plugins that imported files loaded, which are not evaluated again\n// while they do not change.\n#cell(early() == p)#cell(late() == r)\n// 11\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#ff4136\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>"
+  },
+  {
+   "edit": "another comment in early.typ",
+   "files": {
+    "early.typ": "#let p = plugin(\"p.wasm\")\n// comment 2\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"matrix(1 0 0 -1 10 10)\"/><g transform=\"translate(12.75)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(22.75)\"><path fill=\"#ff4136\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>"
+  }
+ ]
+}

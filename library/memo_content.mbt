@@ -19,12 +19,24 @@
 // - Lifetime is comemo's: every entry has an age, a hit sets it to zero,
 //   [evict] adds one to each and drops those above `max_age`. A process
 //   that never calls [evict] keeps everything, as one using comemo does.
-//   (The decode caches of `evict`'s own list have no ages and are dropped
-//   as a whole.)
-// - They are used whenever memoization is on ([set_layout_memo_enabled]),
-//   in a compilation and outside of one (an export): the switch exists to
-//   compare results with and without memoization, and these are memoized
-//   results. With it off nothing is looked up and nothing is stored.
+//   The decode caches are of the same kind ([ContentCache]): syntaxes and
+//   themes of `raw`, bibliographies, CSL styles, PDF documents, plugins and
+//   the results of their calls (upstream memoizes `RawSyntax::decode`,
+//   `RawTheme::decode`, `Bibliography::decode`, `CslStyle::from_data`,
+//   `PdfDocument::new`, `Plugin::module`, `PluginFunc::call` and
+//   `transition`). They were dropped as a whole on every `max_age`-th
+//   [evict] before the stores of memoized calls outlived a compilation;
+//   a kept call that holds the module of a plugin needs the plugin's
+//   entry to live as long as comemo's does, or `==` between that module
+//   and the plugin loaded again says something else than upstream's watch.
+// - The three caches of results are used whenever memoization is on
+//   ([set_layout_memo_enabled]), in a compilation and outside of one (an
+//   export): the switch exists to compare results with and without
+//   memoization, and these are memoized results. With it off nothing is
+//   looked up and nothing is stored. The decode caches do not ask the
+//   switch, as they never did: that a plugin loaded twice is one module
+//   is something a document can see (`==`), with one compilation and with
+//   memoization off. `evict(0)` empties them like everything else.
 // - Results are immutable objects (images, content) or copied by the caller
 //   (the array of highlighted lines), like upstream's, which are behind
 //   `Arc`s or cloned out of the cache.
@@ -117,6 +129,12 @@ pub fn[T] ContentCache::evict(self : ContentCache[T], max_age : Int) -> Unit {
 /// The number of results.
 pub fn[T] ContentCache::length(self : ContentCache[T]) -> Int {
   self.entries.length()
+}
+
+///|
+/// Drops every result (`evict(0)` for this cache alone).
+pub fn[T] ContentCache::clear(self : ContentCache[T]) -> Unit {
+  self.entries.clear()
 }
 
 // The hash of data.

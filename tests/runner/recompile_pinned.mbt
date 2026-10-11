@@ -60,8 +60,9 @@ let pinned_as_upstream_expected : Int = 0
 priv struct PinnedStep {
   /// What the step does, for the trace.
   edit : String
-  /// The files it writes.
-  files : Array[(String, String)]
+  /// The files it writes: text, and files that are no text (a plugin),
+  /// which a fixture holds as hexadecimal digits.
+  files : Array[(String, Bytes)]
   /// The SVG of the first page of a fresh compilation by upstream.
   fresh : String
   /// What upstream's watching process wrote, if that is something else.
@@ -101,7 +102,18 @@ fn pinned_parse(name : String, text : String) -> Pinned {
       guard content is String(content) else {
         pinned_bad(name, "a file that is no text")
       }
-      written.push((path, content))
+      written.push((path, @utf8.encode(content)))
+    }
+    if fields.get("binary") is Some(binary) {
+      guard binary is Object(binary) else {
+        pinned_bad(name, "binary files that are no object")
+      }
+      for path, content in binary {
+        guard content is String(digits) && pinned_hex(digits) is Some(bytes) else {
+          pinned_bad(name, "a binary file that is not hexadecimal digits")
+        }
+        written.push((path, bytes))
+      }
     }
     let watch = match fields.get("watch") {
       Some(String(svg)) => Some(svg)
@@ -112,6 +124,30 @@ fn pinned_parse(name : String, text : String) -> Pinned {
   }
   guard steps.length() > 1 else { pinned_bad(name, "no edits") }
   { name, steps, }
+}
+
+///|
+/// The bytes that hexadecimal digits spell.
+fn pinned_hex(digits : String) -> Bytes? {
+  guard digits.length() % 2 == 0 else { return None }
+  let digit = (c : UInt16) => {
+    let c = c.to_int()
+    if c >= '0' && c <= '9' {
+      c - '0'
+    } else if c >= 'a' && c <= 'f' {
+      c - 'a' + 10
+    } else {
+      -1
+    }
+  }
+  let bytes : Array[Byte] = []
+  for i in 0..<(digits.length() / 2) {
+    let hi = digit(digits.unsafe_get(2 * i))
+    let lo = digit(digits.unsafe_get(2 * i + 1))
+    guard hi >= 0 && lo >= 0 else { return None }
+    bytes.push((hi * 16 + lo).to_byte())
+  }
+  Some(Bytes::from_array(bytes))
 }
 
 ///|
@@ -140,9 +176,7 @@ fn Pinned::document(self : Pinned) -> Document {
     flavor: Plain,
     main: project_file("main.typ"),
     base: id => raise @library.FileError::NotFound(file_path(id)),
-    files: self.steps[0].files.map(file => {
-      (project_file(file.0), @utf8.encode(file.1))
-    }),
+    files: self.steps[0].files.map(file => (project_file(file.0), file.1)),
   }
 }
 

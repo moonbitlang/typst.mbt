@@ -99,8 +99,74 @@ def module_nan(comment):
     return "#let v = float.nan\n// comment %d\n" % comment
 
 
-# name -> (what the scenario shows, [(note, {path: text})]); the first step
-# is the project, the others write the files they name.
+def memory_only_plugin(pages):
+    """A plugin that exports its memory (of `pages` pages) and no function:
+    `(module (memory (export "memory") <pages>))`. Its module is an empty
+    scope, so the modules of two such plugins have one hash."""
+    return (
+        b"\x00asm\x01\x00\x00\x00"
+        + b"\x05\x03\x01\x00" + bytes([pages])
+        + b"\x07\x0a\x01\x06memory\x02\x00"
+    )
+
+
+PLUGIN_MAIN = (
+    "#set page(width: 60pt, height: 20pt, margin: 0pt)\n"
+    '#import "early.typ": p\n'
+    '#import "late.typ": r\n'
+    '#let q = plugin("q.wasm")\n'
+    "#let early() = p\n"
+    "#let late() = r\n"
+    "#let mine() = q\n"
+    + CELL
+    + "// A plugin that the main file loads in every compilation.\n"
+    "#cell(mine() == q)\n"
+    "// Plugins that imported files loaded, which are not evaluated again\n"
+    "// while they do not change.\n"
+    "#cell(early() == p)#cell(late() == r)\n"
+)
+
+
+def plugin_file(name, comment):
+    return '#let %s = plugin("%s.wasm")\n// comment %d\n' % (name, name, comment)
+
+
+def plugin_steps():
+    """`comemo::evict(10)` after every recompilation: the result of
+    `Plugin::module` goes when it was not asked for in eleven of them. The
+    main file changes ten times, then `early.typ` (ten evictions since its
+    plugin was loaded: the module is found), then `late.typ` (eleven: the
+    plugin is loaded again, as another module)."""
+    steps = [
+        (
+            "the project",
+            {
+                "main.typ": PLUGIN_MAIN,
+                "early.typ": plugin_file("p", 0),
+                "late.typ": plugin_file("r", 0),
+                "p.wasm": memory_only_plugin(1),
+                "q.wasm": memory_only_plugin(2),
+                "r.wasm": memory_only_plugin(3),
+            },
+        )
+    ]
+    for i in range(1, 11):
+        steps.append(
+            ("the main file, with nothing that matters (%d)" % i,
+             {"main.typ": PLUGIN_MAIN + "// %d\n" % i})
+        )
+    steps.append(("a comment in early.typ, ten evictions after its plugin was loaded",
+                  {"early.typ": plugin_file("p", 1)}))
+    steps.append(("a comment in late.typ, eleven evictions after its plugin was loaded",
+                  {"late.typ": plugin_file("r", 1)}))
+    steps.append(("the main file, with nothing that matters",
+                  {"main.typ": PLUGIN_MAIN + "// 11\n"}))
+    steps.append(("another comment in early.typ", {"early.typ": plugin_file("p", 2)}))
+    return steps
+
+
+# name -> (what the scenario shows, [(note, {path: text or bytes})]); the
+# first step is the project, the others write the files they name.
 SCENARIOS = {
     "getter": (
         "The smallest case: a function that returns the module it captured, "
@@ -142,7 +208,21 @@ SCENARIOS = {
             ("a.typ as it was at first", {"a.typ": module_a(0)}),
         ],
     ),
+    "plugin": (
+        "The modules of plugins, which are memoized by the plugin's bytes "
+        "(`Plugin::module`) and compare by identity. A plugin that is loaded "
+        "in every compilation stays one module however long the session is; "
+        "one that an imported file loaded is the module of that evaluation "
+        "until its entry is evicted, ten recompilations after the last one "
+        "that asked for it, and then another module than the one a kept "
+        "call returns.",
+        plugin_steps(),
+    ),
 }
+
+
+def data(content):
+    return content if isinstance(content, bytes) else content.encode()
 
 
 def record(binary, steps):
@@ -152,8 +232,8 @@ def record(binary, steps):
     recorded = []
     session = None
     try:
-        for path, text in steps[0][1].items():
-            watch_check.write(os.path.join(work, path), text.encode())
+        for path, content in steps[0][1].items():
+            watch_check.write(os.path.join(work, path), data(content))
         session = watch_check.Session([binary], args, work)
         session.wait_compiled(0)
         statuses = session.statuses(0)
@@ -164,8 +244,8 @@ def record(binary, steps):
                 # Let the watcher see one change, not half of one.
                 time.sleep(0.3)
                 mark = session.mark()
-                for path, text in files.items():
-                    watch_check.write(os.path.join(work, path), text.encode())
+                for path, content in files.items():
+                    watch_check.write(os.path.join(work, path), data(content))
                 session.wait_compiled(mark)
                 statuses = session.statuses(mark)
                 # The SVG on disk is this step's only if the watching
@@ -193,6 +273,21 @@ def record(binary, steps):
     return recorded
 
 
+def step_json(note, files, fresh, watched):
+    step = {
+        "edit": note,
+        "files": {p: c for p, c in files.items() if not isinstance(c, bytes)},
+    }
+    # Files that are no text, as hexadecimal digits.
+    binary = {p: c.hex() for p, c in files.items() if isinstance(c, bytes)}
+    if binary:
+        step["binary"] = binary
+    step["fresh"] = fresh
+    # Only where it is another: what the watching process wrote.
+    step["watch"] = watched if watched != fresh else None
+    return step
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != "--check"]
     check = "--check" in sys.argv[1:]
@@ -214,13 +309,7 @@ def main():
             "upstream": version,
             "what": what,
             "steps": [
-                {
-                    "edit": note,
-                    "files": files,
-                    "fresh": fresh,
-                    # Only where it is another: what the watching process wrote.
-                    "watch": watched if watched != fresh else None,
-                }
+                step_json(note, files, fresh, watched)
                 for (note, files), (fresh, watched) in zip(steps, recorded)
             ],
         }

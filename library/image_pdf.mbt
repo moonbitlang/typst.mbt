@@ -47,13 +47,15 @@ pub impl Hash for PdfDocument with fn hash_combine(self, hasher) {
 pub extend PdfDocument with Hash::{hash, hash_combine}
 
 ///|
-/// Cache of loaded documents (upstream memoizes `PdfDocument::new`).
-let pdf_document_cache : Map[Bytes, PdfDocument] = Map([])
+/// Cache of loaded documents (upstream memoizes `PdfDocument::new`), by
+/// the hash of the data, with comemo's ages ([ContentCache]).
+let pdf_document_cache : ContentCache[PdfDocument] = ContentCache::new()
 
 ///|
 /// Loads a PDF document.
 pub fn PdfDocument::new(data : Bytes) -> PdfDocument raise LoadPdfError {
-  if pdf_document_cache.get(data) is Some(doc) {
+  let key = data_hash(data)
+  if pdf_document_cache.get(key) is Some(doc) {
     return doc
   }
   let pdf = match @hayro_syntax.Pdf::new(data) {
@@ -63,7 +65,7 @@ pub fn PdfDocument::new(data : Bytes) -> PdfDocument raise LoadPdfError {
   }
   let pages = pdf.pages().iter().map(p => p.render_dimensions()).collect()
   let doc = { pdf: Some(pdf), data, pages, }
-  pdf_document_cache[data] = doc
+  pdf_document_cache.insert(key, doc)
   doc
 }
 

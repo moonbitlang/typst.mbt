@@ -75,23 +75,32 @@ pub fn PluginFunc::transition(
 /// The results of memoized plugin function calls and transitions (upstream
 /// `#[comemo::memoize]`), keyed by the 128-bit hash of the function and
 /// arguments. Like comemo, only the hash of the inputs is kept (not the
-/// arguments themselves). An error that is kept is raised as a copy
-/// ([raise_kept]).
-let plugin_call_cache : Map[U128, Result[Bytes, HintedError]] = Map([])
+/// arguments themselves), and an entry has comemo's age ([ContentCache]:
+/// it goes when it was not asked for in more than `max_age` calls of
+/// [evict]). An error that is kept is raised as a copy ([raise_kept]).
+let plugin_call_cache : ContentCache[Result[Bytes, HintedError]] = ContentCache::new()
 
 ///|
-let plugin_transition_cache : Map[U128, Result[Module, HintedError]] = Map([])
+let plugin_transition_cache : ContentCache[Result[Module, HintedError]] = ContentCache::new()
 
 ///|
 /// The modules of memoized plugin loads (upstream `#[comemo::memoize]` on
-/// `Plugin::module`), keyed by the hash of the bytes.
-let plugin_module_cache : Map[U128, Array[(Bytes, Result[Module, HintedError])]] = Map([],
-)
+/// `Plugin::module`), keyed by the hash of the bytes, with comemo's ages.
+///
+/// The age is what a document can see: a module compares by identity
+/// (`==`), a memoized call that is found again returns the module it
+/// returned before, and upstream's watch gives `true` for the two exactly
+/// as long as its entry of `Plugin::module` is alive: while the plugin is
+/// loaded again at least once in `max_age` + 1 compilations
+/// (`tests/recompile/upstream/plugin.json` is the upstream binary's watch).
+let plugin_module_cache : ContentCache[
+  Array[(Bytes, Result[Module, HintedError])],
+] = ContentCache::new()
 
 ///|
 /// Memoizes `f` for the plugin function `func` and its arguments.
 fn[R] memoized(
-  cache : Map[U128, Result[R, HintedError]],
+  cache : ContentCache[Result[R, HintedError]],
   func : PluginFunc,
   args : Array[Bytes],
   f : () -> R raise HintedError,
@@ -112,7 +121,7 @@ fn[R] memoized(
       } noraise {
         v => Ok(v)
       }
-      cache.set(key, result)
+      cache.insert(key, result)
       result
     }
   }
@@ -251,12 +260,13 @@ fn plugin_bytes_hash(bytes : Bytes) -> U128 {
 ///|
 /// Create a plugin and turn it into a module.
 fn Plugin::module_(bytes : Bytes) -> Module raise HintedError {
-  let key = plugin_bytes_hash(bytes)
+  // (The hash of `plugin_bytes_hash`, computed once per `Bytes` object.)
+  let key = data_hash(bytes)
   let entries = match plugin_module_cache.get(key) {
     Some(entries) => entries
     None => {
       let entries = []
-      plugin_module_cache.set(key, entries)
+      plugin_module_cache.insert(key, entries)
       entries
     }
   }

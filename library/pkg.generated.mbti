@@ -4808,6 +4808,7 @@ pub impl Reflect for Content
 pub struct ContentCache[T] {
   // private fields
 }
+pub fn[T] ContentCache::clear(Self[T]) -> Unit
 pub fn[T] ContentCache::evict(Self[T], Int) -> Unit
 pub fn[T] ContentCache::get(Self[T], U128) -> T?
 pub fn[T] ContentCache::insert(Self[T], U128, T) -> Unit
