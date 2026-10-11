@@ -44,8 +44,11 @@ impl @library.World for PagesWorld with fn today(_, _) {
 }
 
 ///|
-fn pages_world(text : String) -> PagesWorld {
-  { main: @syntax.Source::detached(text), library: library([]), }
+fn pages_world(
+  text : String,
+  library? : @library.Library = library([]),
+) -> PagesWorld {
+  { main: @syntax.Source::detached(text), library, }
 }
 
 ///|
@@ -524,6 +527,48 @@ test "pages: what a caller writes to a group inside a page it was handed is writ
   // What compilations from scratch give.
   let after = document_prints(fourth)
   assert_eq(world.scratch(), after)
+}
+
+///|
+test "pages: a document and a page run are those of their library" {
+  // Upstream hashes the library into the key of every memoized function
+  // that builds an engine; here an entry is taken for the library object
+  // it was computed with. Two libraries with the same styles and other
+  // formats: the content, the styles and the children of the run are the
+  // same, and the format options of the document are not.
+  @library.evict(0)
+  let source = three_runs("#c.step()")
+  let plain = pages_world(source)
+  let first = plain.step()
+  inspect(
+    first.counts,
+    content="documents: 0 found, 2 computed; page runs: 2 found, 4 computed",
+  )
+  let with_formats = pages_world(
+    source,
+    library=library(@library.default_formats()),
+  )
+  let second = with_formats.step()
+  inspect(
+    second.counts,
+    content="documents: 0 found, 2 computed; page runs: 2 found, 4 computed",
+  )
+  let first = document_prints(first.document())
+  let second = document_prints(second.document())
+  // The pages are the same, the format options (the last line) are those
+  // of each library.
+  assert_eq(second[0:3].to_owned(), first[0:3].to_owned())
+  assert_false(second[second.length() - 1] == first[first.length() - 1])
+  // Each library finds its own.
+  inspect(
+    plain.step().counts,
+    content="documents: 2 found, 0 computed; page runs: 0 found, 0 computed",
+  )
+  inspect(
+    with_formats.step().counts,
+    content="documents: 2 found, 0 computed; page runs: 0 found, 0 computed",
+  )
+  assert_eq(document_prints(with_formats.step().document()), second)
 }
 
 ///|
