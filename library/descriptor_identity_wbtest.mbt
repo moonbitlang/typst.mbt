@@ -11,12 +11,9 @@
 /// they return, which no fingerprint sees).
 fn descriptor_test_twins() -> (NativeFuncData, NativeFuncData) {
   let make = (answer : Int64) => {
-    NativeFuncData::new(
-      name="twin",
-      title="Twin",
-      docs="One of two.",
-      (_, _, _) => Int(answer),
-    )
+    NativeFuncData::new(name="twin", title="Twin", docs="One of two.", (_, _, _) => {
+      Int(answer)
+    })
   }
   (make(1), make(2))
 }

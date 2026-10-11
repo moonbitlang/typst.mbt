@@ -195,7 +195,7 @@ fn ReadTest::ran(self : ReadTest, tag : Int) -> Int {
 /// The world reads that the entries of the call `tag` keep, without the
 /// fingerprints.
 fn ReadTest::kept(self : ReadTest, tag : Int) -> String {
-  let key = memo_fingerprint(state => state.write_usize(tag))
+  let key = memo_fingerprint(state => state.write_usize(tag)).hash()
   let entries = self.store.entries.get(key).unwrap_or([])
   entries
   .map(entry => entry.world.reads.map(read => read.describe()).join(", "))
@@ -555,8 +555,11 @@ test "world reads: the reads of an entry that is taken are its caller's" {
     assert_eq((t.ran(1), t.ran(3), t.ran(2)), (2, 2, 2))
     // In a scope in which the inner entry is found again and the outer
     // ones are not there: the reads come from the entry.
-    t.store.entries.remove(memo_fingerprint(state => state.write_usize(1)))
-    t.store.entries.remove(memo_fingerprint(state => state.write_usize(3)))
+    for tag in [1, 3] {
+      t.store.entries.remove(
+        memo_fingerprint(state => state.write_usize(tag)).hash(),
+      )
+    }
     t.scope(engine => assert_eq(t.call(engine, 1, middle), 3))
     assert_eq((t.ran(1), t.ran(3), t.ran(2)), (3, 3, 2))
     inspect(t.kept(1), content="file(a.txt)")

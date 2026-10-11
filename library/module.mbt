@@ -9,23 +9,6 @@ priv struct ModuleInner {
   /// and their scope is not modified once they are built, so they are
   /// hashed once; see `value_hash.mbt` and [LazyFingerprint]).
   hash : LazyFingerprint
-  /// Whether the fingerprint identifies the module in a compilation: two
-  /// modules with this fingerprint are the same object (not upstream, whose
-  /// memoization compares hashes only; see `memo.mbt`). Modules compare by
-  /// identity, so this is only so where whoever makes the module says it
-  /// ([Module::canonical]):
-  /// - the library's modules;
-  /// - the module of an evaluated source file (`eval_source_memoized`
-  ///   returns one object per file; under IDE tracing a file that holds the
-  ///   traced span is evaluated again for an evaluated string, which has no
-  ///   traced span, upstream too);
-  /// - the module of a plugin that exports functions: their fingerprints
-  ///   carry the plugin, and a plugin is loaded once per content
-  ///   (`plugin_module_cache`, `plugin_transition_cache`).
-  /// It is not so for a plugin that exports no function (all of them have
-  /// the same fingerprint) and for what an embedder builds. A fingerprint
-  /// that covers such a module is marked `fingerprint_identity`.
-  identified : Bool
 }
 
 ///|
@@ -48,7 +31,6 @@ pub fn Module::new(name : String, scope : Scope) -> Module {
       content: Content::empty(),
       file_id: None,
       hash: LazyFingerprint::new(),
-      identified: false,
     },
   }
 }
@@ -63,20 +45,7 @@ pub fn Module::anonymous(scope : Scope) -> Module {
       content: Content::empty(),
       file_id: None,
       hash: LazyFingerprint::new(),
-      identified: false,
     },
-  }
-}
-
-///|
-/// The module, as the one module with its fingerprint in a compilation
-/// (not upstream; see `ModuleInner.identified`). For the last step of
-/// making a module that is made once: the changes below make a module that
-/// is not canonical.
-pub fn Module::canonical(self : Module) -> Module {
-  {
-    name: self.name,
-    inner: { ..self.inner, hash: LazyFingerprint::new(), identified: true, },
   }
 }
 
@@ -91,12 +60,7 @@ pub fn Module::with_name(self : Module, name : String) -> Module {
 pub fn Module::with_scope(self : Module, scope : Scope) -> Module {
   {
     name: self.name,
-    inner: {
-      ..self.inner,
-      scope,
-      hash: LazyFingerprint::new(),
-      identified: false,
-    },
+    inner: { ..self.inner, scope, hash: LazyFingerprint::new(), },
   }
 }
 
@@ -105,12 +69,7 @@ pub fn Module::with_scope(self : Module, scope : Scope) -> Module {
 pub fn Module::with_content(self : Module, content : Content) -> Module {
   {
     name: self.name,
-    inner: {
-      ..self.inner,
-      content,
-      hash: LazyFingerprint::new(),
-      identified: false,
-    },
+    inner: { ..self.inner, content, hash: LazyFingerprint::new(), },
   }
 }
 
@@ -123,7 +82,6 @@ pub fn Module::with_file_id(self : Module, file_id : @syntax.FileId) -> Module {
       ..self.inner,
       file_id: Some(file_id),
       hash: LazyFingerprint::new(),
-      identified: false,
     },
   }
 }
@@ -184,7 +142,17 @@ pub fn Module::repr(self : Module) -> String {
 }
 
 ///|
-/// Upstream `PartialEq for Module`: same name and same shared inner data.
+/// Upstream `PartialEq for Module` (`foundations/module.rs`): the same name
+/// and the same shared inner data, as an object:
+///
+///     self.name == other.name && Arc::ptr_eq(&self.inner, &other.inner)
+///
+/// Two modules that hold the same are not equal. Memoized calls do not ask
+/// this: they take arguments by their hashes, upstream's (comemo) and the
+/// port's (`modules_memo_equal` in `memo.mbt`), so a call that is found
+/// can return a module that was evaluated earlier and that `==` tells from
+/// the module of the same file evaluated now. Upstream has that, and the
+/// port has it with it (`docs/incremental-design.md`, section 5.4).
 pub impl Eq for Module with fn equal(self, other) {
   self.name == other.name && physical_equal(self.inner, other.inner)
 }

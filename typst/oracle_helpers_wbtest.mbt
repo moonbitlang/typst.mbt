@@ -55,6 +55,27 @@ fn oracle_metadata(
 }
 
 ///|
+/// [oracle_metadata] for a document whose answers are those of memoized
+/// calls that take one argument for another, as upstream's do: two modules
+/// with one hash (`library/memo.mbt`, `modules_memo_equal`). With
+/// memoization off every call is computed and the document says something
+/// else, which upstream has no way to say; that the two differ is checked,
+/// so that a case of this kind is one that needs it.
+fn oracle_memoized(
+  source : String,
+  files? : Array[(String, String)] = [],
+) -> Array[String] raise {
+  let memoized = oracle_strings(oracle_compile(source, files~))
+  @library.set_layout_memo_enabled(false)
+  let plain = {
+    defer @library.set_layout_memo_enabled(true)
+    oracle_strings(oracle_compile(source, files~))
+  }
+  assert_false(plain == memoized)
+  memoized
+}
+
+///|
 fn oracle_strings(doc : @layout.PagedDocument) -> Array[String] {
   let out = []
   for elem in doc.introspector().query(Elem(@library.metadata_elem(), None)) {

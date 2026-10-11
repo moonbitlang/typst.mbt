@@ -81,7 +81,7 @@ test "memo: a layout result depends on the traced span" {
   let span = @syntax.Span::from_range(memo_file("t.typ"), 1, 2)
   let content = TextElem::packed("x")
   let styles = StyleChain::empty()
-  let key = hash128("layout")
+  let key = memo_fingerprint(state => state.write_str("layout"))
   let mut runs = 0
   let layout = (traced : Traced) => {
     let engine = { ..memo_engine(), traced, }

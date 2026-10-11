@@ -224,7 +224,7 @@ pub fn format_module(formats : Array[Format]) -> Module {
       binding.with_feature(feature) |> ignore
     }
   }
-  Module::new("format", format).canonical()
+  Module::new("format", format)
 }
 
 // The formats of the export crates (`typst_<crate>::FORMAT`).

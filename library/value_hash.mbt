@@ -353,16 +353,10 @@ pub extend Type with Fingerprint::{fingerprint}
 /// (scope, content, file). The inner data is hashed once per module (not
 /// upstream; see [LazyFingerprint]).
 pub impl Fingerprint for Module with fn fingerprint(self, state) {
-  // Modules compare by the identity of their inner data. That is only a
-  // flag of the fingerprint (see `fingerprint_flags`) for the modules that
-  // their fingerprint does not identify (`ModuleInner.identified`:
-  // anonymous modules, but those of plugins with functions). The others
-  // are one object per evaluated source file and per plugin in a
-  // compilation: where memoization compares results by their fingerprints,
-  // an equal fingerprint is the same module.
-  if !self.inner.identified {
-    fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
-  }
+  // Modules compare by the identity of their inner data (`Eq for Module`),
+  // and that is no flag of the fingerprint: memoized calls take a module
+  // by its hash, as upstream's do. (Two modules of one hash are one
+  // argument: two plugins that export no function, a file evaluated twice.)
   state.write(self.name)
   let inner = self.inner
   if inner.hash.write_cached(state) {

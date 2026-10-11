@@ -112,7 +112,7 @@ fn calc_module() -> Module {
     keywords: [],
   })
   |> ignore
-  Module::new("calc", scope).canonical()
+  Module::new("calc", scope)
 }
 
 ///|
@@ -153,7 +153,7 @@ fn sys_module(inputs : Dict) -> Module {
     keywords: [],
   })
   |> ignore
-  Module::new("sys", scope).canonical()
+  Module::new("sys", scope)
 }
 
 ///|
@@ -386,7 +386,7 @@ pub fn math_module() -> Module {
 
   // Symbols.
   symbols_define_math(math)
-  Module::new("math", math).canonical()
+  Module::new("math", math)
 }
 
 ///|
@@ -505,7 +505,7 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   for f in self.extra {
     f(global)
   }
-  let global = Module::new("global", global).canonical()
+  let global = Module::new("global", global)
   let rules = (self.routines.rules)()
   for format in self.formats {
     format.register_rules(rules)

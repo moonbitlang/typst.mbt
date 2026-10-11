@@ -87,7 +87,6 @@ fn eval_source_impl(
   @library.Module::new(name, vm.scopes.top)
   .with_content(output)
   .with_file_id(id)
-  .canonical()
 }
 
 ///|

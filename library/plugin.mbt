@@ -393,14 +393,11 @@ fn Plugin::into_module(self : Plugin) -> Module {
       scope.bind(name, Binding::detached(Func(Func::plugin(func)))) |> ignore
     }
   }
-  // The functions' fingerprints carry the plugin; without functions two
-  // plugins give modules that only differ in their identity.
-  let module_ = Module::anonymous(scope)
-  if scope.length() > 0 {
-    module_.canonical()
-  } else {
-    module_
-  }
+  // (The hash of the module is that of its functions, which carry the
+  // plugin. Two plugins that export no function give two modules with one
+  // hash, upstream's too: `==` tells them apart and a memoized call does
+  // not, `typst/oracle_wbtest.mbt`, "modules: ..".)
+  Module::anonymous(scope)
 }
 
 ///|

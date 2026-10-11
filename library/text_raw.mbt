@@ -208,6 +208,9 @@ priv struct RawHighlight {
   elem : Content
   styles : StyleChain
   routines : Routines
+  /// The compilation the entry ends with ([MemoKey::compilation]): its
+  /// own, if the element or the styles hold a host closure.
+  compilation : Int
   lines : Array[RawLine]
 }
 
@@ -251,10 +254,19 @@ fn RawElem::highlight(
     state.write(self.0)
     state.write_u128(styles.memo_hash())
   })
+  // The rule of every key ([MemoKey]): nothing under a lossy fingerprint,
+  // and a result whose arguments hold a host closure ends with its
+  // compilation (outside of one it is found by nobody, and not kept).
+  let compilation = key.compilation()
+  if !key.memoizable() || compilation < 0 {
+    return self.highlight_impl(engine, routines, styles, Ref(false))
+  }
+  let key = key.hash()
   let found = raw_highlight_cache.get(key)
   if found is Some(entries) {
     for entry in entries {
-      if physical_equal(entry.routines, routines) &&
+      if compilation_finds(entry.compilation) &&
+        physical_equal(entry.routines, routines) &&
         content_memo_equal(entry.elem, self.0) &&
         chain_memo_equal(entry.styles, styles) {
         // The lines are immutable content; the array is the caller's.
@@ -265,7 +277,13 @@ fn RawElem::highlight(
   let read_world = Ref(false)
   let lines = self.highlight_impl(engine, routines, styles, read_world)
   if !read_world.val {
-    let entry = { elem: self.0, styles, routines, lines: lines.copy(), }
+    let entry = {
+      elem: self.0,
+      styles,
+      routines,
+      compilation,
+      lines: lines.copy(),
+    }
     match found {
       Some(entries) => {
         if entries.length() >= memo_max_entries {

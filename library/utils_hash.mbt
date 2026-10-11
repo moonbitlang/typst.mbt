@@ -369,13 +369,17 @@ pub fn[T : Fingerprint] SipHasher128::write(
 /// capture all of the data that upstream's `Hash` covers (no impl does at
 /// the moment; such an impl must call [mark_fingerprint_lossy]),
 /// [fingerprint_identity] if it contains a value that compares by identity
-/// and can be told apart from a value with the same fingerprint (host
-/// closures, whose fingerprint is a key of the host's, and the modules that
-/// their fingerprint does not identify, see `ModuleInner.identified`; not
-/// closures, which compare by their hash like upstream's). Equal
+/// and that is another value than one with the same fingerprint to what is
+/// memoized: host closures, whose fingerprint is a key of the host's and
+/// which upstream does not have. Not closures, which compare by their hash
+/// like upstream's; not native functions, elements and types, whose
+/// fingerprint is the number of their descriptor; and not modules, which
+/// compare by identity for `==` and which memoized calls take by their
+/// hash, as upstream's do. Equal
 /// fingerprints with flags do not prove
 /// interchangeable values, and a lossy fingerprint gives elements a
-/// location key that upstream would not give them.
+/// location key that upstream would not give them. What the flags of a key
+/// mean for its entry is said in one place, [MemoKey] (`memo.mbt`).
 let fingerprint_flags : Ref[Int] = { val: 0, }
 
 ///|

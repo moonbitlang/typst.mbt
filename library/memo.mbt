@@ -21,22 +21,25 @@
 //   into content, styles, arrays, dictionaries, functions and dynamic
 //   values, where Typst's equality is looser). Closures compare by their
 //   hash, like upstream's (`closures_equal`): equal fingerprints are equal
-//   closures. Modules compare by identity, and a compilation has one module
-//   object per evaluated file and per plugin with functions: equal
-//   fingerprints are the same module. (Upstream compares hashes only: two
-//   plugins without functions are the same argument for its memoized calls,
-//   `(a, b).map(m => m == a)` is `(true, true)` there. The port keeps them
-//   apart: their fingerprints are flagged like those of host closures.)
-// - Layout results whose tags hold host closures or modules that their
-//   fingerprint does not identify are not cached ([frame_cacheable]), the
-//   counter sequence only holds numbers, and the state sequence is not
-//   memoized.
+//   closures, if the host closures they captured are the same objects
+//   ([closures_memo_equal]).
+// - Modules are taken by their hash, as upstream's memoized calls take
+//   them (comemo compares the hashes of the arguments), although `==`
+//   compares the objects ([modules_memo_equal]). Two plugins without
+//   functions are the same argument: `(a, b).map(m => m == a)` is
+//   `(true, true)`, upstream's answer. And a call that is found returns
+//   the module it returned before, which `==` tells from the module of the
+//   same file evaluated later. (The owner's decision of 2026-10-11:
+//   exactly as upstream. The port told such modules apart before, by
+//   identity, and was the stricter one.)
+// - Layout results whose tags hold host closures are not cached
+//   ([frame_cacheable]), the counter sequence only holds numbers, and the
+//   state sequence is not memoized.
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
 //   produce the same results on the current introspector and none of the
-//   recorded results had a lossy fingerprint or contained host closures or
-//   modules that their fingerprint does not identify.
+//   recorded results had a lossy fingerprint or contained host closures.
 //   Its reads are then merged into the caller's recorder (as if the call
 //   had been executed), so convergence checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
@@ -55,6 +58,10 @@
 //   stored for an engine whose world is not in a scope.
 // - The library is compared by identity (upstream hashes it into the key
 //   of every memoized function that builds an engine).
+//
+// - What the flags of a key's fingerprint mean for its entry is one rule
+//   for every store ([MemoKey]): nothing is kept under a lossy key, and an
+//   entry whose key holds a host closure ends with its compilation.
 //
 // Caches only live for one compilation ([with_layout_memo]: its evaluation
 // and its introspection iterations). The world reads of an entry are
@@ -77,6 +84,8 @@ priv struct MemoEntry[T, I] {
   reads : IntrospectionRecorder
   /// The sink side effects of the call.
   sink : Sink
+  /// The compilation the entry ends with ([MemoKey::compilation]).
+  compilation : Int
   /// The result.
   output : T
 }
@@ -214,11 +223,80 @@ pub fn memo_compilation() -> Int {
 }
 
 ///|
-/// The fingerprint written by `f` (a memoization key).
-pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> U128 {
+/// The key of a memoized call: the fingerprint of its hashed arguments,
+/// with the flags of that fingerprint (`fingerprint_flags` in
+/// `utils_hash.mbt`), which say what the fingerprint does not: whether an
+/// equal one is the same arguments, and for how long.
+///
+/// This is the one place that decides it, for every store of memoized
+/// calls (`memoize`, [memoized_closure]) and for the results kept by
+/// content whose key can hold such values (highlighted raw text):
+/// [MemoKey::memoizable] and [MemoKey::compilation]. (The module store of
+/// `eval/import.mbt` has no key of this kind: an entry is a source and a
+/// library, compared as objects.) What is said of results is said where
+/// they are made: frames whose tags hold host closures are not kept
+/// ([frame_cacheable]), and an entry whose introspector reads returned
+/// them is only taken for the introspector it was computed with
+/// (`IntrospectionRecorder.lossy`).
+#valtype
+pub struct MemoKey {
+  priv hash : U128
+  priv flags : Int
+}
+
+///|
+/// The fingerprint written by `f` (a memoization key), with its flags.
+pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> MemoKey {
   let state = SipHasher128::new()
+  let outer = fingerprint_flags.val
+  fingerprint_flags.val = 0
   f(state)
-  state.finish128()
+  let flags = fingerprint_flags.val
+  fingerprint_flags.val = outer | flags
+  { hash: state.finish128(), flags, }
+}
+
+///|
+/// The fingerprint.
+pub fn MemoKey::hash(self : MemoKey) -> U128 {
+  self.hash
+}
+
+///|
+/// Whether a result may be looked up and kept under this key: not if its
+/// fingerprint leaves out data (`fingerprint_lossy`; no fingerprint does
+/// today). A call with such a key is computed every time.
+pub fn MemoKey::memoizable(self : MemoKey) -> Bool {
+  (self.flags & fingerprint_lossy) == 0
+}
+
+///|
+/// The compilation that an entry under this key ends with, for
+/// [compilation_finds]: zero if any compilation may find it.
+///
+/// A key that holds a host closure (`fingerprint_identity`) can only be
+/// the key of the same closures, as objects, and those are a
+/// compilation's: a host makes its closures per compilation (`doc`'s
+/// `Session.hosts`), and the keys that tell them apart are only promised
+/// to be unique within one. So an entry under such a key is never found by
+/// a later compilation, whatever its store keeps
+/// (`docs/incremental-design.md`, section 5.4). Outside of a compilation
+/// it is found by nobody.
+pub fn MemoKey::compilation(self : MemoKey) -> Int {
+  if (self.flags & fingerprint_identity) == 0 {
+    0
+  } else if memo_generation.val == 0 {
+    -1
+  } else {
+    memo_generation.val
+  }
+}
+
+///|
+/// Whether the compilation in progress may find an entry that ends with
+/// the compilation `bound` ([MemoKey::compilation]).
+pub fn compilation_finds(bound : Int) -> Bool {
+  bound == 0 || bound == memo_generation.val
 }
 
 ///|
@@ -238,7 +316,7 @@ pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> U128 {
 fn[T, I : Eq] memoize(
   store : MemoStore[T, I],
   engine : Engine,
-  key : U128,
+  key : MemoKey,
   input : I,
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
@@ -250,28 +328,31 @@ fn[T, I : Eq] memoize(
 ) -> T raise SourceError {
   let generation = memo_generation.val
   let world = engine.world
-  if generation == 0 || !world.in_scope() {
+  if generation == 0 || !world.in_scope() || !key.memoizable() {
     return f(engine)
   }
   if store.generation != generation {
     store.entries.clear()
     store.generation = generation
   }
+  let compilation = key.compilation()
   // The traced span is not one per compilation (an evaluated string runs
   // without): a result computed there replays no traced values.
   let key = match engine.traced.0 {
-    None => key
-    Some(span) =>
-      memo_fingerprint(state => {
-        state.write_u128(key)
-        state.write(span)
-      })
+    None => key.hash
+    Some(span) => {
+      let state = SipHasher128::new()
+      state.write_u128(key.hash)
+      state.write(span)
+      state.finish128()
+    }
   }
   let parent = engine.introspector.recorder
   let backend = engine.introspector.backend
   if store.entries.get(key) is Some(entries) {
     for entry in entries {
-      if entry.input == input &&
+      if compilation_finds(entry.compilation) &&
+        entry.input == input &&
         physical_equal(entry.library, engine.library) &&
         (
           physical_equal(entry.backend, backend) ||
@@ -352,6 +433,7 @@ fn[T, I : Eq] memoize(
     backend,
     reads,
     sink,
+    compilation,
     output: copy(output),
   }
   match store.entries.get(key) {
@@ -496,6 +578,7 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     (Styles(x), Styles(y)) => styles_memo_equal(x.items, y.items)
     (Func(x), Func(y)) => funcs_memo_equal(x, y)
     (Args(x), Args(y)) => args_memo_equal(x, y)
+    (Module(x), Module(y)) => modules_memo_equal(x, y)
     (Dyn(x), Dyn(y)) => dyns_memo_equal(x, y)
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
@@ -636,8 +719,88 @@ fn funcs_memo_equal(a : Func, b : Func) -> Bool {
   match (a.inner, b.inner) {
     (With(f1, a1), With(f2, a2)) =>
       funcs_memo_equal(f1, f2) && args_memo_equal(a1, a2)
+    (Closure(x), Closure(y)) => closures_memo_equal(x, y)
     _ => a == b
   }
+}
+
+///|
+/// Whether two closures are one argument of a memoized call: equal as
+/// closures are (`closures_equal`: by their hash, as upstream's), and with
+/// the same host closures among what they captured, as objects and in the
+/// order in which the hash visits them. A host closure's part in a hash is
+/// its key, which says which function it is only as long as the host keeps
+/// its keys apart; the entry does not take the hash's word for it, as it
+/// does not for a host closure that is an argument itself.
+fn closures_memo_equal(a : Closure, b : Closure) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  // The flags of the closures' data are not those of a fingerprint that may
+  // be running around this comparison.
+  let outer = fingerprint_flags.val
+  fingerprint_flags.val = 0
+  let x = SipHasher128::new()
+  a.fingerprint_lazy(x)
+  let y = SipHasher128::new()
+  b.fingerprint_lazy(y)
+  let flags = fingerprint_flags.val
+  fingerprint_flags.val = outer
+  x.finish128() == y.finish128() &&
+  (
+    (flags & fingerprint_host) == 0 ||
+    same_hosts(() => a.fingerprint_lazy(SipHasher128::new()), () => {
+      b.fingerprint_lazy(SipHasher128::new())
+    })
+  )
+}
+
+///|
+/// Whether two modules are one argument of a memoized call. Upstream's
+/// memoized calls (comemo) take their arguments by their hashes, and
+/// `Hash for Module` is the name and what the module holds: two module
+/// objects that hold the same are one argument there, although `==` tells
+/// them apart (`PartialEq for Module` compares the objects). The port
+/// follows: the same fingerprint is the same argument. So
+/// `(a, b).map(m => m == a)` is `(true, true)` for two plugins without
+/// functions, as upstream's is (`typst/oracle_wbtest.mbt`, "modules: ..").
+/// Host closures in what the modules hold are compared as objects, as
+/// everywhere (upstream has none).
+fn modules_memo_equal(a : Module, b : Module) -> Bool {
+  if a == b {
+    return true
+  }
+  let outer = fingerprint_flags.val
+  fingerprint_flags.val = 0
+  let x = hash128(a)
+  let y = hash128(b)
+  let flags = fingerprint_flags.val
+  fingerprint_flags.val = outer
+  x == y &&
+  (
+    (flags & fingerprint_host) == 0 ||
+    same_hosts(() => hash128(a) |> ignore, () => hash128(b) |> ignore)
+  )
+}
+
+///|
+/// Whether two fingerprint computations visit the same host closures, as
+/// objects, in the same order (for values whose fingerprints are equal:
+/// the walks then have one shape).
+fn same_hosts(a : () -> Unit, b : () -> Unit) -> Bool {
+  let outer = fingerprint_flags.val
+  let x = fingerprint_hosts_in(a)
+  let y = fingerprint_hosts_in(b)
+  fingerprint_flags.val = outer
+  if x.length() != y.length() {
+    return false
+  }
+  for i in 0..<x.length() {
+    if !physical_equal(x[i], y[i]) {
+      return false
+    }
+  }
+  true
 }
 
 ///|
@@ -745,7 +908,7 @@ let layout_store : MemoStore[Array[Frame], LayoutInput] = MemoStore::new()
 /// use the engine it is given.
 pub fn memoized_layout(
   engine : Engine,
-  key : U128,
+  key : MemoKey,
   content : Content,
   styles : StyleChain,
   extra : Content?,
@@ -765,10 +928,10 @@ pub fn memoized_layout(
 }
 
 ///|
-/// Whether a laid-out frame can be reused: its tags must not hold values
-/// that compare by identity and that their fingerprint does not identify
-/// (`fingerprint_identity`: host closures, anonymous modules). The same
-/// holds for the frames of its tiling paints.
+/// Whether a laid-out frame can be reused: its tags must not hold host
+/// closures (`fingerprint_identity`), which compare by identity and whose
+/// fingerprint is a key of the host's. The same holds for the frames of
+/// its tiling paints.
 fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {
@@ -884,6 +1047,8 @@ priv struct ClosureEntry {
   reads : IntrospectionRecorder?
   /// The sink side effects of the call (`None`: none).
   sink : Sink?
+  /// The compilation the entry ends with ([MemoKey::compilation]).
+  compilation : Int
   /// The result.
   output : Value
 }
@@ -1285,12 +1450,15 @@ pub fn memoized_closure(
     let state = SipHasher128::new()
     state.write_u128(base)
     write_asked_context(state, context, asked)
-    let key = state.finish128()
-    if (fingerprint_flags.val & fingerprint_lossy) == 0 &&
-      store.entries.get(key) is Some(entries) {
+    let key : MemoKey = {
+      hash: state.finish128(),
+      flags: fingerprint_flags.val,
+    }
+    if key.memoizable() && store.entries.get(key.hash) is Some(entries) {
       for entry in entries {
         let shift = depth - entry.depth
-        if (!collecting || entry.traced_files is Some(_)) &&
+        if compilation_finds(entry.compilation) &&
+          (!collecting || entry.traced_files is Some(_)) &&
           entry.matches(func, engine, context, args, shift) {
           fingerprint_flags.val = outer_flags
           closure_memo_counts[0] += 1
@@ -1315,9 +1483,11 @@ pub fn memoized_closure(
       }
     }
   }
-  let lossy = (fingerprint_flags.val & fingerprint_lossy) != 0
+  // The flags of the function and the arguments (and of the parts of the
+  // context that calls asked for so far).
+  let base_flags = fingerprint_flags.val
   fingerprint_flags.val = outer_flags
-  if lossy {
+  if !({ hash: base, flags: base_flags, } : MemoKey).memoizable() {
     return f(func, closure, engine, context, args)
   }
   closure_memo_counts[1] += 1
@@ -1389,11 +1559,18 @@ pub fn memoized_closure(
     store.asked[base] = all
   }
   let outer_flags = fingerprint_flags.val
+  fingerprint_flags.val = 0
   let state = SipHasher128::new()
   state.write_u128(base)
   write_asked_context(state, context, all)
-  let key = state.finish128()
+  // The parts of the context that the call asked for are part of its key,
+  // with their flags.
+  let key : MemoKey = {
+    hash: state.finish128(),
+    flags: base_flags | fingerprint_flags.val,
+  }
   fingerprint_flags.val = outer_flags
+  guard key.memoizable() else { return output }
   if memo_check_enabled() {
     let label = () => "call of \{func.name().unwrap_or("a closure")}"
     memo_check_reads(label, world, world_reads, () => {
@@ -1436,8 +1613,10 @@ pub fn memoized_closure(
     } else {
       Some(sink)
     },
+    compilation: key.compilation(),
     output: output.shared(),
   }
+  let key = key.hash
   match store.entries.get(key) {
     Some(entries) => {
       if entries.length() >= memo_max_entries {
