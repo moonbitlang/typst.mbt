@@ -360,6 +360,79 @@ test "module store: a failed read and a file that appears" {
 }
 
 ///|
+test "module store: the error an entry keeps is not the one an import adds its tracepoint to" {
+  with_kept_store(() => {
+    let world = store_world("#import \"bad.typ\": x", sources=[
+      ("bad.typ", "#let x = panic(\"bad\")\n"),
+    ])
+    let failed = "error: panicked with: bad at bad.typ:9..21 `panic(\"bad\")`"
+    inspect(
+      world.evaluated(),
+      content=failed +
+        " [while importing `bad.typ` at main.typ:1..20 `import \"bad.typ\": x`]: found 0, evaluated 2",
+    )
+    // The main file changes, the file that fails does not: its error is
+    // found, and every import that finds it reports it with its own
+    // tracepoint alone. (Upstream: comemo hands out a clone of what it
+    // keeps, and a tracepoint is added to the clone.)
+    world.edit("main.typ", "\n#import \"bad.typ\": x")
+    inspect(
+      world.evaluated(),
+      content=failed +
+        " [while importing `bad.typ` at main.typ:2..21 `import \"bad.typ\": x`]: found 1, evaluated 1",
+    )
+    world.edit("main.typ", "\n\n#import \"bad.typ\": x")
+    inspect(
+      world.evaluated(),
+      content=failed +
+        " [while importing `bad.typ` at main.typ:3..22 `import \"bad.typ\": x`]: found 1, evaluated 1",
+    )
+  })
+}
+
+///|
+test "module store: a caller that writes to the errors it got does not write to the entry" {
+  with_kept_store(() => {
+    let world = store_world("#import \"bad.typ\": x", sources=[
+      ("bad.typ", "#let x = panic(\"bad\")\n"),
+    ])
+    let bad = world.sources[store_id("bad.typ")]
+    // The errors of the evaluation that computes the entry, and those of
+    // two that find it: each caller adds a hint and a tracepoint to what
+    // it got and empties the array.
+    let seen = []
+    for _ in 0..<3 {
+      let before = module_memo_stats()
+      let _ = eval_source(
+        @library.TrackedWorld::new(world),
+        world.library,
+        @library.Traced::new(),
+        @library.Sink::new(),
+        @library.Route::root(),
+        bad,
+      ) catch {
+        @library.SourceError(errors) => {
+          let after = module_memo_stats()
+          seen.push(
+            "\{errors.length()} error, \{errors[0].trace.length()} tracepoints, \{errors[0].hints.length()} hints, found \{after.0 - before.0}",
+          )
+          errors[0].hint("a caller's hint")
+          errors[0].with_tracepoint(Call(None), world.main.root().span())
+          |> ignore
+          errors.clear()
+          continue
+        }
+      }
+      fail("the evaluation did not fail")
+    }
+    inspect(
+      seen.join("; "),
+      content="1 error, 0 tracepoints, 0 hints, found 0; 1 error, 0 tracepoints, 0 hints, found 1; 1 error, 0 tracepoints, 0 hints, found 1",
+    )
+  })
+}
+
+///|
 test "module store: an entry of an outer scope is found in a scope inside it if its reads hold there" {
   // No kept store here: both scopes are open. The inner world has the
   // sources of the outer one and, the second time, another data file.

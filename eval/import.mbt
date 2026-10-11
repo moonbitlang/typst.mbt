@@ -285,8 +285,34 @@ priv struct EvalMemo {
   /// `Traced::get`: only those answers must match).
   traced : @library.Traced
   traced_files : Array[@syntax.FileId]
+  /// The module, or the errors of an evaluation that failed. The errors
+  /// are the entry's own: no caller has these objects ([own_result]).
   result : Result[@library.Module, Array[@library.SourceDiagnostic]]
   sink : @library.Sink
+}
+
+///|
+/// The result of an evaluation with diagnostics of its own: what an entry
+/// keeps of the result it was computed with, and what it hands out on
+/// every hit.
+///
+/// A diagnostic is an object whose trace and hints are appended to, and
+/// every import adds a tracepoint to the errors that pass through it
+/// (`@library.trace`). Upstream never writes to what its cache holds:
+/// comemo stores a clone of the output and returns a clone on a hit
+/// (`comemo/src/memoize.rs`: `cache.insert(key, constraint,
+/// output.clone())`, `return entry.output.clone()`), and `Trace for
+/// SourceResult` adds its tracepoint through `errors.make_mut()`
+/// (`typst-library/src/diag.rs`), which copies a vector that is shared.
+/// Without the copies the error of a file that fails got one more
+/// tracepoint with every import that found it.
+fn own_result(
+  result : Result[@library.Module, Array[@library.SourceDiagnostic]],
+) -> Result[@library.Module, Array[@library.SourceDiagnostic]] {
+  match result {
+    Ok(_) => result
+    Err(errors) => Err(errors.map(error => error.clone()))
+  }
 }
 
 ///|
@@ -445,6 +471,8 @@ fn EvalMemos::of(
 ///   them, which is also what makes these files dependencies of the later
 ///   compilation).
 /// - The sink effects (warnings, ...) are replayed.
+/// - A result that is an error is kept and handed out as a copy
+///   ([own_result]).
 ///
 /// Stricter than upstream in one more point: nothing is kept for a file
 /// that changes during the scope ([@library.TrackedWorld::is_volatile]).
@@ -478,7 +506,7 @@ fn eval_source_memoized(
       memo.shifts.note_reused(depth - memo.depth)
       @library.note_traced_files(memo.traced_files)
       sink.extend_from_sink(memo.sink)
-      match memo.result {
+      match own_result(memo.result) {
         Ok(module_) => return module_
         Err(errors) => raise @library.SourceError(errors)
       }
@@ -524,7 +552,7 @@ fn eval_source_memoized(
       shifts,
       traced,
       traced_files,
-      result,
+      result: own_result(result),
       sink: own_sink,
     })
   }
@@ -613,7 +641,7 @@ fn EvalMemos::original(
   guard aside.get(key) is Some(entries) else { return None }
   for memo in entries {
     if memo.matches(library, traced, route, depth) {
-      return Some(memo.result)
+      return Some(own_result(memo.result))
     }
   }
   None

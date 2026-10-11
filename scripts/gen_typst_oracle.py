@@ -45,7 +45,11 @@ document title of the HTML export (the plain text of the title's content).
 - `memo`: documents where memoized closure calls are reused together with
   what they did besides returning a value: delayed errors, warnings at the
   spans of forwarded arguments, imports (the route queries of cached
-  modules); these record the diagnostics too (`report`).
+  modules); these record the diagnostics too (`report`). The evaluation of
+  a file is memoized as well (`typst_eval::eval`): the `traces` cases
+  record the diagnostics with their tracepoints, which an import adds to a
+  copy of the error that the cache keeps, and that a file is evaluated
+  again where the route is deeper than its depth checks allow.
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
@@ -749,6 +753,48 @@ CASES += [
         },
     ),
     (
+        "memo: a file that fails, imported twice: each error has the tracepoint of its import",
+        "traces",
+        r"""// The errors are delayed (they are raised in `context`), so both imports
+// run. The second finds the evaluation of the first, with its error: the
+// tracepoint of the first import is not on it.
+#block[A #context { import "bad.typ": x; x }]
+
+#block[B #context { import "bad.typ": x; [again] }]
+""",
+        {"bad.typ": '#let x = panic("bad")\n'},
+    ),
+    (
+        "memo: a file that fails, imported through a function and directly",
+        "traces",
+        r"""#let f() = { import "bad.typ": x; x }
+#block[A #context f()]
+
+#block[B #context { import "bad.typ": x; [again] }]
+""",
+        {"bad.typ": '#let x = panic("bad")\n'},
+    ),
+    (
+        "memo: a file is evaluated again where the route is too deep for its calls",
+        "traces",
+        r"""// `deep.typ` calls 61 functions inside each other. Imported from inside 11
+// calls that is within the maximum call depth, and from inside 21 it is
+// not: the evaluation of the first import is not taken for the second
+// (comemo tracks `Route::within`).
+#let nest(n) = if n == 0 { import "deep.typ": v; v } else { nest(n - 1) }
+#nest(10) #nest(12) #nest(20)
+""",
+        {"deep.typ": "#let down(n) = if n == 0 { 0 } else { down(n - 1) }\n#let v = down(60)\n"},
+    ),
+    (
+        "memo: a file imported at two depths that both fit",
+        "report",
+        r"""#let nest(n) = if n == 0 { import "deep.typ": v; v } else { nest(n - 1) }
+#metadata(repr((nest(10), nest(12), nest(3))))
+""",
+        {"deep.typ": "#let down(n) = if n == 0 { 0 } else { down(n - 1) }\n#let v = down(60)\n"},
+    ),
+    (
         "memo: modules of plugins without functions",
         "metadata",
         r"""// Two plugins that export their memory and nothing else: their modules
@@ -873,6 +919,33 @@ def upstream(binary, kind, source, files):
                 lines.append("--")
                 lines += [v for v in json.loads(out.stdout) if isinstance(v, str)]
             return lines
+        if kind == "traces":
+            # The default format, which prints the tracepoints of a
+            # diagnostic after it ("  while importing `a.typ` at
+            # main.typ:1:20", then the traced line).
+            out = subprocess.run(
+                [binary, "compile", "--root", ".", "main.typ", "main.pdf"],
+                capture_output=True, text=True, stdin=subprocess.DEVNULL, cwd=tmp)
+            lines = []
+            message = None
+            for line in out.stderr.split("\n"):
+                found = re.match(r"(error|warning): (.*)$", line)
+                if found:
+                    assert message is None, out.stderr
+                    message = found.groups()
+                    continue
+                found = re.match(r" +┌─ (.+:\d+:\d+)$", line)
+                if found:
+                    assert message is not None, out.stderr
+                    lines.append(f"{found.group(1)}: {message[0]}: {message[1]}")
+                    message = None
+                    continue
+                found = re.match(r"  (while .+ at .+:\d+:\d+)$", line)
+                if found:
+                    lines.append("  " + found.group(1))
+            assert message is None, out.stderr
+            assert lines, out.stderr
+            return lines
         html = os.path.join(tmp, "main.html")
         run(binary, ["compile", "--root", tmp, "--features", "html", "--format", "html", path, html])
         with open(html, encoding="utf-8") as f:
@@ -930,7 +1003,8 @@ def main():
         "// and by `eval`; the keys of located elements in measurement; the\n"
         "// reductions of what the `packages` stage found (tests/packages);\n"
         "// what a damaged PNG is reported as;\n"
-        "// closure equality, memoized calls and the sharing of values\n"
+        "// closure equality, memoized calls (of closures and of the evaluation\n"
+        "// of files) and the sharing of values\n"
         "// (`scripts/sharing_probes.py`). The helpers are in\n"
         "// `oracle_helpers_wbtest.mbt`.\n"
     ]
@@ -947,7 +1021,7 @@ def main():
                 body.append(f"    ({literal(path)}, {literal(text)}),\n")
             body.append("  ]\n")
             args = "source, files~"
-        if kind in ("metadata", "report"):
+        if kind in ("metadata", "report", "traces"):
             body.append("  let expected = [\n")
             for value in expected:
                 body.append(f"    {literal(value)},\n")

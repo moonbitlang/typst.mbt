@@ -6,7 +6,8 @@
 // and by `eval`; the keys of located elements in measurement; the
 // reductions of what the `packages` stage found (tests/packages);
 // what a damaged PNG is reported as;
-// closure equality, memoized calls and the sharing of values
+// closure equality, memoized calls (of closures and of the evaluation
+// of files) and the sharing of values
 // (`scripts/sharing_probes.py`). The helpers are in
 // `oracle_helpers_wbtest.mbt`.
 
@@ -370,6 +371,64 @@ test "oracle: memo: a cyclic import through a reused function" {
     ),
   ]
   let expected = ["lib.typ:1:24: error: cyclic import"]
+  assert_eq(oracle_report(source, files~), expected)
+}
+
+///|
+test "oracle: memo: a file that fails, imported twice: each error has the tracepoint of its import" {
+  let source = "// The errors are delayed (they are raised in `context`), so both imports\n// run. The second finds the evaluation of the first, with its error: the\n// tracepoint of the first import is not on it.\n#block[A #context { import \"bad.typ\": x; x }]\n\n#block[B #context { import \"bad.typ\": x; [again] }]\n"
+  let files = [("bad.typ", "#let x = panic(\"bad\")\n")]
+  let expected = [
+    "bad.typ:1:9: error: panicked with: bad", "  while importing `bad.typ` at main.typ:4:20",
+  ]
+  assert_eq(oracle_traces(source, files~), expected)
+}
+
+///|
+test "oracle: memo: a file that fails, imported through a function and directly" {
+  let source = "#let f() = { import \"bad.typ\": x; x }\n#block[A #context f()]\n\n#block[B #context { import \"bad.typ\": x; [again] }]\n"
+  let files = [("bad.typ", "#let x = panic(\"bad\")\n")]
+  let expected = [
+    "bad.typ:1:9: error: panicked with: bad", "  while importing `bad.typ` at main.typ:1:13",
+    "  while calling `f` at main.typ:2:18",
+  ]
+  assert_eq(oracle_traces(source, files~), expected)
+}
+
+///|
+test "oracle: memo: a file is evaluated again where the route is too deep for its calls" {
+  let source = "// `deep.typ` calls 61 functions inside each other. Imported from inside 11\n// calls that is within the maximum call depth, and from inside 21 it is\n// not: the evaluation of the first import is not taken for the second\n// (comemo tracks `Route::within`).\n#let nest(n) = if n == 0 { import \"deep.typ\": v; v } else { nest(n - 1) }\n#nest(10) #nest(12) #nest(20)\n"
+  let files = [
+    (
+      "deep.typ", "#let down(n) = if n == 0 { 0 } else { down(n - 1) }\n#let v = down(60)\n",
+    ),
+  ]
+  let expected = [
+    "deep.typ:1:38: error: maximum function call depth exceeded", "  while calling `down` at deep.typ:2:9",
+    "  while importing `deep.typ` at main.typ:5:27", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:5:60",
+    "  while calling `nest` at main.typ:5:60", "  while calling `nest` at main.typ:6:21",
+  ]
+  assert_eq(oracle_traces(source, files~), expected)
+}
+
+///|
+test "oracle: memo: a file imported at two depths that both fit" {
+  let source = "#let nest(n) = if n == 0 { import \"deep.typ\": v; v } else { nest(n - 1) }\n#metadata(repr((nest(10), nest(12), nest(3))))\n"
+  let files = [
+    (
+      "deep.typ", "#let down(n) = if n == 0 { 0 } else { down(n - 1) }\n#let v = down(60)\n",
+    ),
+  ]
+  let expected = ["--", "(0, 0, 0)"]
   assert_eq(oracle_report(source, files~), expected)
 }
 

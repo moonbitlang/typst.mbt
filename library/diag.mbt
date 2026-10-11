@@ -186,6 +186,21 @@ pub fn SourceDiagnostic::with_tracepoint(
 }
 
 ///|
+/// A copy with a trace and hints of its own (upstream `Clone`; the trace
+/// and the hints are `EcoVec`s there, which copy themselves when a shared
+/// one is written to): [trace] and [SourceDiagnostic::hint] change the
+/// arrays.
+pub fn SourceDiagnostic::clone(self : SourceDiagnostic) -> SourceDiagnostic {
+  {
+    severity: self.severity,
+    span: self.span,
+    message: self.message,
+    trace: self.trace.copy(),
+    hints: self.hints.copy(),
+  }
+}
+
+///|
 /// Convert a syntax error or warning into a source diagnostic.
 pub fn SourceDiagnostic::from_syntax(
   diag : @syntax.SyntaxDiagnostic,

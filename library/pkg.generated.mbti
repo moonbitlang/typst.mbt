@@ -10911,6 +10911,7 @@ pub(all) struct SourceDiagnostic {
   trace : Array[@moonbitlang/typst/syntax.Spanned[Tracepoint]]
   hints : Array[@moonbitlang/typst/syntax.DiagSpanned[String]]
 } derive(Eq, Hash, @debug.Debug)
+pub fn SourceDiagnostic::clone(Self) -> Self
 pub fn SourceDiagnostic::error(@moonbitlang/typst/syntax.DiagSpan, String) -> Self
 pub fn SourceDiagnostic::error_at(@moonbitlang/typst/syntax.Span, String) -> Self
 pub fn SourceDiagnostic::from_syntax(@moonbitlang/typst/syntax.SyntaxDiagnostic) -> Self
