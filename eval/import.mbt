@@ -246,32 +246,121 @@ fn import_file(
     @library.bail_at(span, "cyclic import")
   }
 
-  // Evaluate the file (memoized, see `eval_source_memoized`).
-  eval_source_memoized(engine, source)
+  // Evaluate the file.
+  eval_source(
+    engine.world,
+    engine.library,
+    engine.traced,
+    engine.sink,
+    engine.route,
+    source,
+  )
 }
 
 ///|
-/// A memoized module evaluation.
+/// A memoized module evaluation: what [eval_source_memoized] keeps for one
+/// source, one library and the answers that the evaluation got from its
+/// tracked arguments.
 priv struct EvalMemo {
   /// The scope of the evaluation ([@library.TrackedWorld::scope_token]).
+  /// It says how long the entry is kept ([EvalMemos::of]), not where it is
+  /// found.
   scope : Int
+  /// The source that was evaluated: the entry is found by its fingerprint
+  /// and only taken for the same source ([same_source]).
+  source : @syntax.Source
   library : @library.Library
-  text : String
   /// The world reads of the evaluation and their answers (comemo tracks
   /// the world of `eval`: the files that the module imported and loaded).
-  /// The source of the file itself is not among them: `import_file` reads
-  /// it before the evaluation starts, for the evaluation around this one.
+  /// The source of the file itself is not among them: it is an argument,
+  /// and the entry is found by its fingerprint.
   reads : @library.WorldReads
   /// The outer route and the file ids it was queried for (comemo tracks
   /// `Route::contains` calls, so only those answers must match).
   route : @library.Route
   queried : Array[@syntax.FileId]
+  /// The depth of the outer route and how much deeper or shallower it may
+  /// be without changing the answer of a depth check of the evaluation
+  /// (comemo tracks `Route::within`).
+  depth : Int
+  shifts : @library.RouteShifts
   /// The traced span and the files it was asked for (comemo tracks
   /// `Traced::get`: only those answers must match).
   traced : @library.Traced
   traced_files : Array[@syntax.FileId]
+  /// The module, or the errors of an evaluation that failed. The errors
+  /// are the entry's own: no caller has these objects ([own_result]).
   result : Result[@library.Module, Array[@library.SourceDiagnostic]]
   sink : @library.Sink
+}
+
+///|
+/// The result of an evaluation with diagnostics of its own: what an entry
+/// keeps of the result it was computed with, and what it hands out on
+/// every hit.
+///
+/// A diagnostic is an object whose trace and hints are appended to, and
+/// every import adds a tracepoint to the errors that pass through it
+/// (`@library.trace`). Upstream never writes to what its cache holds:
+/// comemo stores a clone of the output and returns a clone on a hit
+/// (`comemo/src/memoize.rs`: `cache.insert(key, constraint,
+/// output.clone())`, `return entry.output.clone()`), and `Trace for
+/// SourceResult` adds its tracepoint through `errors.make_mut()`
+/// (`typst-library/src/diag.rs`), which copies a vector that is shared.
+/// Without the copies the error of a file that fails got one more
+/// tracepoint with every import that found it.
+fn own_result(
+  result : Result[@library.Module, Array[@library.SourceDiagnostic]],
+) -> Result[@library.Module, Array[@library.SourceDiagnostic]] {
+  match result {
+    Ok(_) => result
+    Err(errors) => Err(errors.map(error => error.clone()))
+  }
+}
+
+///|
+/// Whether two sources are the same argument of an evaluation: one object,
+/// or two parses of one text of one file (`Source::new`: the tree and its
+/// span numbers are a function of the two). That is what the fingerprint
+/// that finds an entry says too ([@library.source_fingerprint]); like the
+/// other stores (`library/memo.mbt`, header), this one does not take a
+/// fingerprint's word for it but keeps the argument and compares it. (The
+/// fingerprint of a parsed text is kept in the source, in two words that
+/// `Source::set_memo` writes and any caller could write; and the result of
+/// an edit is identified by a number, not by a hash.) The comparison is of
+/// two objects unless two worlds parsed the same text, and then of two
+/// texts.
+fn same_source(a : @syntax.Source, b : @syntax.Source) -> Bool {
+  physical_equal(a, b) ||
+  (
+    a.is_pristine() &&
+    b.is_pristine() &&
+    a.id() == b.id() &&
+    a.text() == b.text()
+  )
+}
+
+///|
+/// Whether the entry is one for an evaluation of this source with this
+/// library, traced span and route: all conditions of a hit but the world
+/// reads, which are looked at last ([@library.TrackedWorld::validate]).
+fn EvalMemo::matches(
+  self : EvalMemo,
+  source : @syntax.Source,
+  library : @library.Library,
+  traced : @library.Traced,
+  route : @library.Route,
+  depth : Int,
+) -> Bool {
+  guard physical_equal(self.library, library) &&
+    self.shifts.allows(depth - self.depth) &&
+    same_source(self.source, source) else {
+    return false
+  }
+  for id in self.queried {
+    guard self.route.contains(id) == route.contains(id) else { return false }
+  }
+  @library.traced_answers_equal(self.traced, traced, self.traced_files)
 }
 
 ///|
@@ -279,137 +368,188 @@ priv struct EvalMemo {
 priv struct EvalMemos {
   /// The scope that asked last.
   mut last : Int
-  /// The evaluations by file id.
-  mut entries : Map[@syntax.FileId, Array[EvalMemo]]
+  /// The evaluations by the fingerprint of their source
+  /// ([@library.source_fingerprint]).
+  mut entries : Map[@library.U128, Array[EvalMemo]]
   /// Whether `@library.set_memo_check` knows the store.
   mut checked : Bool
   /// The entries that were set aside for a second run of that check.
-  mut aside : Map[@syntax.FileId, Array[EvalMemo]]?
+  mut aside : Map[@library.U128, Array[EvalMemo]]?
+  /// The numbers of evaluations that were found and that were computed
+  /// ([module_memo_stats]).
+  counts : FixedArray[Int]
 }
 
 ///|
-/// Memoized file evaluations by file id.
+/// Memoized file evaluations by the fingerprint of their source.
 let eval_memo : EvalMemos = {
   last: 0,
   entries: Map([]),
   checked: false,
   aside: None,
+  counts: [0, 0],
 }
 
 ///|
-/// The memoized evaluations of a file, for a call in the scope `scope`.
+/// For the tests of the store (`import_wbtest.mbt`): the entries outlive
+/// the scope that stored them, as they will once they have ages (step 5
+/// of slice 1 of `docs/incremental-design.md`), so that a test can ask in
+/// one scope for what another stored. Not public, and never set outside of
+/// those tests: what a kept entry needs besides what this store validates
+/// (steps 4 and 5 of that slice) is not built.
+let eval_memo_kept : Ref[Bool] = { val: false, }
+
+///|
+/// How many evaluations of source files the store has answered and how
+/// many it has computed since the process started (for tests and
+/// measurements, like `@library.closure_memo_stats`). An evaluation of a
+/// file that changes during its scope is neither.
+pub fn module_memo_stats() -> (Int, Int) {
+  (eval_memo.counts[0], eval_memo.counts[1])
+}
+
+///|
+/// The memoized evaluations of the source with the fingerprint `key`, for
+/// a call in the scope `scope`.
 ///
-/// An entry lives as long as its scope (`library/tracked_world.mbt`: a
-/// compilation, or an evaluation that is not inside one) and is found in
-/// that scope only: a world may change its files between two scopes
-/// (`typst watch`), and until an entry is found by the fingerprint of its
-/// source (it is found by the text today, and its source is read before
-/// its world reads start), the reads it keeps do not say all that it was
-/// made of. The entries of the scopes that are closed are dropped when
-/// another scope asks; a scope inside another (a host function that
-/// compiles) leaves those of the outer one alone.
+/// An entry lives as long as the scope that stored it
+/// (`library/tracked_world.mbt`: a compilation, or an evaluation that is
+/// not inside one): the entries of the scopes that are closed are dropped
+/// when another scope asks. Nothing is kept from one compilation to the
+/// next yet (`docs/incremental-design.md`, slice 1: ages are its step 5).
+/// A scope inside another (a host function that compiles) leaves the
+/// entries of the outer one alone, and finds them if they are valid for
+/// its world.
 fn EvalMemos::of(
   self : EvalMemos,
-  id : @syntax.FileId,
+  key : @library.U128,
   scope : Int,
 ) -> Array[EvalMemo] {
   if self.last != scope {
     self.last = scope
-    let empty = []
-    for id, entries in self.entries {
-      entries.retain(memo => @library.world_scope_open(memo.scope))
-      if entries.is_empty() {
-        empty.push(id)
+    if !eval_memo_kept.val {
+      let empty = []
+      for key, entries in self.entries {
+        entries.retain(memo => @library.world_scope_open(memo.scope))
+        if entries.is_empty() {
+          empty.push(key)
+        }
+      }
+      for key in empty {
+        self.entries.remove(key)
       }
     }
-    for id in empty {
-      self.entries.remove(id)
-    }
   }
-  match self.entries.get(id) {
+  match self.entries.get(key) {
     Some(entries) => entries
     None => {
       let entries = []
-      self.entries[id] = entries
+      self.entries[key] = entries
       entries
     }
   }
 }
 
 ///|
-/// Evaluate a source file like `eval_source`, but return the same module for
-/// repeated evaluations with identical inputs.
+/// [eval_source] in a scope of the world: the evaluation of a source file
+/// ([eval_source_impl]), which returns the same module for repeated
+/// evaluations with identical inputs.
 ///
 /// Upstream `typst_eval::eval` is memoized by comemo, so importing the same
-/// file twice yields the same module (modules compare by identity). This
-/// mirrors that: the result and the sink effects (warnings, ...) are cached
-/// and replayed for the same scope, library and source text, for a route
-/// and a traced span that give the answers the evaluation got (the file
-/// ids it asked the route for, the files whose code ran in it), and for a
-/// world that gives the answers it got (always, within the scope:
-/// [EvalMemos::of]); the world reads are then noted for the evaluation
-/// around this one (upstream: comemo validates the world accesses of a
-/// memoized `eval` and thereby repeats them, which is also what makes
-/// these files dependencies of the later compilation).
+/// file twice yields the same module (modules compare by identity), and a
+/// compilation whose main file is what it was finds its module:
+///
+///     #[comemo::memoize]
+///     pub fn eval(
+///         world: Tracked<dyn World + '_>,
+///         library: &LazyHash<Library>,
+///         traced: Tracked<Traced>,
+///         sink: TrackedMut<Sink>,
+///         route: Tracked<Route>,
+///         source: &Source,
+///     ) -> SourceResult<Module>
+///
+/// Its key is the hash of the library and of the source, which is the hash
+/// of the source's id, text and numbered tree (`typst-syntax/src/source.rs`,
+/// `SourceInner` under `LazyHash`); a result is taken if the world, the
+/// traced span and the route give the answers that the evaluation got, and
+/// the mutations of the sink are replayed. Here:
+///
+/// - An entry is found by the fingerprint of the source
+///   ([@library.source_fingerprint]): the id and the text of a source that
+///   `Source::new` parsed (its tree and span numbers are a function of the
+///   two), the id and the number of the object for a source that an edit
+///   made. Not by the text alone: spans are in the closures, the content
+///   and the diagnostics of a module, and a file that was edited and edited
+///   back has its old text with other span numbers where it was reparsed.
+///   The fingerprint is equal only where upstream's hash is; two sources
+///   that were edited into the same tree are two keys here and one there.
+///   An entry also keeps its source and is only taken for the same one
+///   ([same_source]; upstream keeps the hash alone).
+/// - The library is compared by identity (upstream hashes it).
+/// - The route: the file ids the evaluation asked it for must get the
+///   same answers (`Route::contains`), and its depth may only differ by as
+///   much as leaves the depth checks of the evaluation as they were
+///   (`Route::within`; [@library.RouteShifts]).
+/// - The traced span must give the same answers for the files whose code
+///   ran in the evaluation (`Traced::get`).
+/// - The world must give the answers it gave
+///   ([@library.TrackedWorld::validate], looked at last); the world reads
+///   are then noted for the evaluation around this one (upstream: comemo
+///   validates the world accesses of a memoized `eval` and thereby repeats
+///   them, which is also what makes these files dependencies of the later
+///   compilation).
+/// - The sink effects (warnings, ...) are replayed.
+/// - A result that is an error is kept and handed out as a copy
+///   ([own_result]).
+///
+/// Stricter than upstream in one more point: nothing is kept for a file
+/// that changes during the scope ([@library.TrackedWorld::is_volatile]).
 fn eval_source_memoized(
-  engine : @library.Engine,
+  world : @library.TrackedWorld,
+  library : @library.Library,
+  traced : @library.Traced,
+  sink : @library.Sink,
+  route : @library.Route,
   source : @syntax.Source,
 ) -> @library.Module raise @library.SourceError {
   let id = source.id()
-  let world = engine.world
   let scope = world.scope_token()
-  // No store outside of a scope. And none for a file that changes during
-  // the scope: its source was read before the entry's reads would start.
+  // No store outside of a scope ([eval_source] opens one). And none for a
+  // file that changes during the scope (`doc`'s snippets): every import
+  // of it evaluates what the world hands out then.
   if scope == 0 || world.is_volatile(id) {
-    return eval_source(
-      world,
-      engine.library,
-      engine.traced,
-      engine.sink,
-      engine.route,
-      source,
-    )
+    return eval_source_impl(world, library, traced, sink, route, source)
   }
-  let entries = eval_memo.of(id, scope)
+  let key = @library.source_fingerprint(source)
+  let entries = eval_memo.of(key, scope)
+  let depth = route.depth()
   for memo in entries {
-    if memo.scope == scope &&
-      physical_equal(memo.library, engine.library) &&
-      memo.text == source.text() &&
-      memo.queried
-      .iter()
-      .all(q => memo.route.contains(q) == engine.route.contains(q)) &&
-      @library.traced_answers_equal(
-        memo.traced,
-        engine.traced,
-        memo.traced_files,
-      ) &&
+    if memo.matches(source, library, traced, route, depth) &&
       // Last: this notes the world reads for the evaluation around.
       world.validate(memo.reads) {
+      eval_memo.counts[0] += 1
       // The evaluations around this one asked the same of their routes
       // and of their traced spans.
       @library.note_route_queries(memo.queried)
+      memo.shifts.note_reused(depth - memo.depth)
       @library.note_traced_files(memo.traced_files)
-      engine.sink.extend_from_sink(memo.sink)
-      match memo.result {
+      sink.extend_from_sink(memo.sink)
+      match own_result(memo.result) {
         Ok(module_) => return module_
         Err(errors) => raise @library.SourceError(errors)
       }
     }
   }
-  let sink = @library.Sink::new()
+  eval_memo.counts[1] += 1
+  let own_sink = @library.Sink::new()
   let queries = @library.route_queries_begin()
+  let outer_shifts = @library.route_shifts_begin()
   let traced_start = @library.traced_files_begin()
   let mark = world.reads_begin()
   @library.note_route_query(id)
   let result : Result[@library.Module, Array[@library.SourceDiagnostic]] = try
-    eval_source(
-      world,
-      engine.library,
-      engine.traced,
-      sink,
-      engine.route,
-      source,
-    )
+    eval_source_impl(world, library, traced, own_sink, route, source)
   catch {
     @library.SourceError(errors) => Err(errors)
   } noraise {
@@ -418,9 +558,11 @@ fn eval_source_memoized(
   // Queries and reads made here are also made by the enclosing
   // evaluations.
   let queried = @library.route_queries_end(queries)
+  let shifts = @library.route_shifts_end(outer_shifts)
   let traced_files = @library.traced_files_end(traced_start)
   let reads = world.reads_end(mark)
-  let result = match eval_memo.original(engine, source, scope) {
+  let result = match
+    eval_memo.original(key, world, source, library, traced, route, depth) {
     Some(original) => original
     None => result
   }
@@ -428,22 +570,24 @@ fn eval_source_memoized(
   // kept, also when it ended with an error.
   if !reads.is_volatile() {
     if @library.memo_check_enabled() {
-      eval_memo.check(engine, source, reads)
+      eval_memo.check(world, library, traced, route, source, reads)
     }
     entries.push({
       scope,
-      library: engine.library,
-      text: source.text(),
+      source,
+      library,
       reads,
-      route: engine.route,
+      route,
       queried,
-      traced: engine.traced,
+      depth,
+      shifts,
+      traced,
       traced_files,
-      result,
-      sink,
+      result: own_result(result),
+      sink: own_sink,
     })
   }
-  engine.sink.extend_from_sink(sink)
+  sink.extend_from_sink(own_sink)
   match result {
     Ok(module_) => module_
     Err(errors) => raise @library.SourceError(errors)
@@ -457,7 +601,10 @@ fn eval_source_memoized(
 /// world what the entry keeps.
 fn EvalMemos::check(
   self : EvalMemos,
-  engine : @library.Engine,
+  world : @library.TrackedWorld,
+  library : @library.Library,
+  traced : @library.Traced,
+  route : @library.Route,
   source : @syntax.Source,
   reads : @library.WorldReads,
 ) -> Unit {
@@ -466,29 +613,33 @@ fn EvalMemos::check(
     @library.register_memo_check_store(() => {
       let entries = self.entries
       let last = self.last
+      let found = self.counts[0]
+      let computed = self.counts[1]
       self.entries = Map([])
       self.aside = Some(entries)
       () => {
         self.entries = entries
         self.last = last
         self.aside = None
+        self.counts[0] = found
+        self.counts[1] = computed
       }
     })
   }
   @library.memo_check_reads(
     () => "module \{source.id().vpath().get_without_slash()}",
-    engine.world,
+    world,
     reads,
     () => {
       // An evaluation that failed fails again: its reads are compared
       // all the same.
       let _ : Result[@library.Module, Array[@library.SourceDiagnostic]] = try
-        eval_source(
-          engine.world,
-          engine.library,
-          engine.traced,
+        eval_source_impl(
+          world,
+          library,
+          traced,
           @library.Sink::new(),
-          engine.route,
+          route,
           source,
         )
       catch {
@@ -506,30 +657,29 @@ fn EvalMemos::check(
 /// file again, for its reads, and would make new modules; but the call it
 /// repeats holds the modules of the first run in its arguments and
 /// captures, and modules compare by identity. So an import in the run
-/// gives the module it gave in the first.
+/// gives the module it gave in the first: that of the entry that a lookup
+/// in the first run took or that the first run stored, which is the one
+/// that is valid for the world at hand (the store may hold another for the
+/// same source, of a scope around this one whose world answers
+/// differently).
 fn EvalMemos::original(
   self : EvalMemos,
-  engine : @library.Engine,
+  key : @library.U128,
+  world : @library.TrackedWorld,
   source : @syntax.Source,
-  scope : Int,
+  library : @library.Library,
+  traced : @library.Traced,
+  route : @library.Route,
+  depth : Int,
 ) -> Result[@library.Module, Array[@library.SourceDiagnostic]]? {
   guard @library.memo_check_running_now() && self.aside is Some(aside) else {
     return None
   }
-  guard aside.get(source.id()) is Some(entries) else { return None }
+  guard aside.get(key) is Some(entries) else { return None }
   for memo in entries {
-    if memo.scope == scope &&
-      physical_equal(memo.library, engine.library) &&
-      memo.text == source.text() &&
-      memo.queried
-      .iter()
-      .all(q => memo.route.contains(q) == engine.route.contains(q)) &&
-      @library.traced_answers_equal(
-        memo.traced,
-        engine.traced,
-        memo.traced_files,
-      ) {
-      return Some(memo.result)
+    if memo.matches(source, library, traced, route, depth) &&
+      world.validate(memo.reads) {
+      return Some(own_result(memo.result))
     }
   }
   None

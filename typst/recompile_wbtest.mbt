@@ -83,6 +83,27 @@ test "a file is evaluated once in a compilation" {
 }
 
 ///|
+test "the main file is evaluated through the store of module evaluations" {
+  // Upstream's `eval` is one memoized function for the main file and for
+  // imports. A `context` block is laid out with the route of the layout,
+  // which the main file is not on, so it can import the main file: that
+  // finds the module that the compilation evaluated.
+  let world = test_world(
+    "#let x = \"once\"\n#context { import \"main.typ\": x; metadata(x) }",
+  )
+  let before = @eval.module_memo_stats()
+  let warned : @library.Warned[
+    Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+  ] = compile(world)
+  let after = @eval.module_memo_stats()
+  guard warned.output is Ok(document) else { fail("the document failed") }
+  inspect(oracle_strings(document).join(" "), content="once")
+  // Evaluated once, and found by every layout of the block.
+  inspect(after.1 - before.1, content="1")
+  assert_true(after.0 - before.0 >= 1)
+}
+
+///|
 /// The text a world's main file evaluates to, without a compilation.
 fn evaluated_directly(world : TestWorld) -> String {
   try

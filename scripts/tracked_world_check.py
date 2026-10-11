@@ -9,8 +9,17 @@ engine code holds a raw `&World`. The type of `Engine.world` keeps other
 packages from it; this script holds the rest:
 
 - a raw world (`&World`, `&@library.World`) is named only where a
-  compilation or an evaluation is entered (`typst/lib.mbt`) and in the two
-  files that implement the tracked world;
+  compilation is entered (`typst/lib.mbt`) and in the two files that
+  implement the tracked world;
+- where a compilation is entered, the raw world is asked for its library
+  and for the id of its main file and for nothing else: the source of the
+  main file is read through the tracked world like every other. In
+  `typst/lib.mbt` a raw world is called `world` (a tracked one `tracked`),
+  and this script knows every use of that name: as a parameter, handed on
+  to `compile_impl` or `compile_with`, tracked (`TrackedWorld::new`), or
+  asked `main()` or `library()`. Anything else is reported, another name
+  for the world (`let raw = world`) included; a raw world under a name that
+  is not `world` is a raw world that is named (the first rule);
 - the raw world of a tracked world (its private field `raw`, which the
   compiler lets all of `library` read) is read in `tracked_world.mbt` only;
 - `World::library` and `World::main`, which are not tracked, are called
@@ -40,6 +49,24 @@ RAW_WORLD = re.compile(r"&(@library\.)?World\b")
 # The private field, as the tracked worlds of `library` are called.
 RAW_FIELD = re.compile(r"\b(world|tracked)\.raw\b")
 UNTRACKED = re.compile(r"\b(?:World::(library|main)\b|world\.(library|main)\(\))")
+# The reads that are tracked, as calls of the trait's methods.
+RAW_READ = re.compile(r"\bWorld::(source|file|book|font|today)\b")
+# Where a compilation is entered: what may be done with the raw world
+# there, which is called `world`.
+ENTRY = "typst/lib.mbt"
+RAW_NAME = re.compile(r"\bworld\b")
+RAW_USES = [
+    # A parameter.
+    re.compile(r"\bworld : &@library\.World\b"),
+    # Handed on.
+    re.compile(r"\bcompile_(impl|with)\(world,"),
+    # Tracked.
+    re.compile(r"@library\.TrackedWorld::new\(world,"),
+    # The two reads that are not tracked.
+    re.compile(r"\bworld\.(main|library)\(\)"),
+    # The field of an engine, which holds the tracked world.
+    re.compile(r"\bworld: tracked\b"),
+]
 
 
 def sources():
@@ -70,6 +97,12 @@ def main():
                     problems.append((rel, number, "the raw world of a tracked world", line))
                 if UNTRACKED.search(code) and rel not in RAW_WORLD_FILES:
                     problems.append((rel, number, "an untracked read of the world", line))
+                if rel == ENTRY:
+                    rest = code
+                    for use in RAW_USES:
+                        rest = use.sub("", rest)
+                    if RAW_READ.search(code) or RAW_NAME.search(rest):
+                        problems.append((rel, number, "a use of the raw world", line))
     for rel, number, what, line in problems:
         print(f"{rel}:{number}: {what}: {line.strip()}")
     if problems:

@@ -537,6 +537,39 @@
   compilation allocates a few dozen objects in `tracked_world.mbt` in all
   (`scripts/alloc_sites.py`), and the whole of it costs 0.1 to 0.8 % of
   the instructions of a compilation (section 5.2 of the design, "Costs").
+- Module evaluations (`eval/import.mbt`; step 3 of slice 1 of the design,
+  "Step 3 as built" in its section 8): `@eval.eval_source` is upstream's
+  memoized `eval`, one function and one store for the main file of a
+  compilation and for every import. An entry is found by
+  `@library.source_fingerprint` (the id and the text of a source that
+  `Source::new` parsed, the id and the number of the object for the
+  result of an edit: a file that is edited and edited back has its old
+  text with other span numbers and is another source, as upstream's hash
+  of the numbered tree says), keeps its source and is only taken for the
+  same one (`same_source`), and is valid if the library is the same and
+  the route (`Route::contains` for the ids it asked, and its depth within
+  the entry's `RouteShifts`, as for closure calls: upstream tracks
+  `Route::within`), the traced span and the world (its reads, validated
+  last) answer what the evaluation asked. Its scope only says when it is
+  dropped: nothing is kept from one compilation to the next before step
+  5. What an entry keeps is never handed out to be written to: an error
+  is kept as a copy and handed out as a copy (`own_result`:
+  `@library.trace` appends a tracepoint to the diagnostics that pass
+  through an import, where upstream writes to a clone; without the copies
+  a file that fails got a tracepoint per import that found it, in one
+  compilation too). A new condition of a hit goes into
+  `EvalMemo::matches`, which the lookup and the second run of the
+  recording check share. Where a compilation is entered
+  (`typst/lib.mbt`) the raw world is asked for `main()` and `library()`
+  and nothing else, and `scripts/tracked_world_check.py` reports every
+  other use of it. Tests: `eval/import_wbtest.mbt`, which keeps the store
+  over several scopes of one world with a private switch
+  (`eval_memo_kept`: never set it elsewhere, what a kept entry needs
+  besides is steps 4 and 5); the `memo: a file ..` cases of
+  `typst/oracle_wbtest.mbt` (upstream's tracepoints and depth errors: the
+  kind `traces` of `scripts/gen_typst_oracle.py` records the tracepoints
+  that the CLI prints). `@eval.module_memo_stats()` counts the
+  evaluations that were found and that were computed.
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
