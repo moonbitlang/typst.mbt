@@ -159,19 +159,22 @@ pub fn LineSegmenter::segment_str(
   self : LineSegmenter,
   input : String,
 ) -> Array[Int] {
+  let offsets = []
   let chars = []
   let mut len = 0
   for i = 0; i < input.length(); {
     let { cp: c, idx: next, } = @unicode.decode_at(input, i)
-    chars.push((len, c))
+    offsets.push(len)
+    chars.push(c)
     len += utf8_len(c)
     continue next
   }
   let iter : LineBreakIteratorV1 = {
+    offsets,
     chars,
     cursor: 0,
     len,
-    current_pos_data: None,
+    current_pos_data: -1,
     result_cache: [],
     data: self.data,
     options: self.options,
@@ -235,12 +238,17 @@ fn is_break_utf32_by_loose(
 
 ///|
 priv struct LineBreakIteratorV1 {
-  /// The `(byte offset, code point)` pairs of the input.
-  chars : Array[(Int, Int)]
+  /// The `(byte offset, code point)` pairs of the input (upstream:
+  /// `CharIndices`), as two arrays: a pair per character is an allocation
+  /// per character.
+  offsets : Array[Int]
+  chars : Array[Int]
   /// Index of the next element `iter.next()` returns.
   mut cursor : Int
   mut len : Int
-  mut current_pos_data : (Int, Int)?
+  /// The index of the current pair in `offsets` and `chars`, or -1
+  /// (upstream: `Option<(usize, char)>`).
+  mut current_pos_data : Int
   mut result_cache : Array[Int]
   data : RuleBreakData
   options : ResolvedLineBreakOptions
@@ -510,16 +518,16 @@ fn is_letter_unit(prop : Int) -> Bool {
 ///|
 fn LineBreakIteratorV1::advance_iter(self : LineBreakIteratorV1) -> Unit {
   if self.cursor < self.chars.length() {
-    self.current_pos_data = Some(self.chars[self.cursor])
+    self.current_pos_data = self.cursor
     self.cursor += 1
   } else {
-    self.current_pos_data = None
+    self.current_pos_data = -1
   }
 }
 
 ///|
 fn LineBreakIteratorV1::is_eof(self : LineBreakIteratorV1) -> Bool {
-  self.current_pos_data is None
+  self.current_pos_data < 0
 }
 
 ///|
@@ -550,9 +558,10 @@ fn LineBreakIteratorV1::check_eof(
 fn LineBreakIteratorV1::get_current_position(
   self : LineBreakIteratorV1,
 ) -> Int? {
-  match self.current_pos_data {
-    Some((pos, _)) => Some(pos)
-    None => None
+  if self.current_pos_data >= 0 {
+    Some(self.offsets[self.current_pos_data])
+  } else {
+    None
   }
 }
 
@@ -560,9 +569,10 @@ fn LineBreakIteratorV1::get_current_position(
 fn LineBreakIteratorV1::get_current_codepoint(
   self : LineBreakIteratorV1,
 ) -> Int? {
-  match self.current_pos_data {
-    Some((_, c)) => Some(c)
-    None => None
+  if self.current_pos_data >= 0 {
+    Some(self.chars[self.current_pos_data])
+  } else {
+    None
   }
 }
 

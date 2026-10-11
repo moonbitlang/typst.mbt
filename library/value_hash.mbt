@@ -626,9 +626,15 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   // Meta.
   state.write(self.label)
   state.write(self.location)
-  let lifecycle = self.lifecycle.copy()
-  lifecycle.sort()
-  state.write(lifecycle)
+  // (Upstream hashes a bit set; the order of the indices is not part of
+  // it. Fewer than two are in order as they are: no copy to sort.)
+  if self.lifecycle.length() < 2 {
+    state.write(self.lifecycle)
+  } else {
+    let lifecycle = self.lifecycle.copy()
+    lifecycle.sort()
+    state.write(lifecycle)
+  }
   // Data (hashed once and cached, like upstream).
   let cached = self.data_hash.val
   let data = match cached {

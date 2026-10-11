@@ -768,11 +768,97 @@
   succeeds is built where the error or the check happens: a message made
   by interpolation (upstream: `format_args!`), a binding guard (a struct
   and a closure here, a tuple upstream: ask `Binding::is_guarded` first, as
-  `eval_ident` does), the closure of `at`/`trace` (catch inline). Count
-  allocations per MoonBit source line with `scripts/alloc_sites.py`: it
-  rewrites the generated `cli.c` so that every call of `moonbit_malloc`/
-  `moonbit_make_*` (and of `to_owned`) counts itself (`#line` directives
-  map call sites back to `.mbt` lines) and reports or compares the counts.
+  `eval_ident` does), the closure of `at`/`trace` (catch inline). More
+  of the same kind, each found as a top site of a profile: an option of
+  an option is allocated (`FixedArray::get` on elements of type `T?`:
+  check the index and read; `LazyArray16[Offset16?]::get`); the default
+  `Hash::hash` makes a `Hasher` object for every key that a `Map` or a
+  set looks up, so a key that is a hash already has its own `hash`
+  (`U128`, `Location`; nothing may depend on a hash value, core seeds
+  them per process on native); `for k, v in map`, `x.iter()` and the
+  iterator of a `ReadOnlyArray` are three or four objects (an early
+  return for the empty map that is the default; a loop over `t[:]`); a
+  local closure that captures is an object per call of the function it
+  is in (lift it to a function of what it captures: `pair_pos_*` in
+  `shape`); a chain of `with_x(..).with_y(..)` copies the fields of the
+  content once per link (`Content::fields_copy`, `set_field`, one
+  `with_fields`: the cells of a table); an array of pairs is an object
+  per pair (two arrays and an index: `LineBreakIteratorV1`; or loop over
+  what the pairs were made from: `bidi`); a `Ref(0)` for an out-parameter
+  is an object per call (`out_cell` in `shape`, only where the value is
+  read before anything else can take the cell); an object that every
+  call makes and drops can be the one of the last call (`spare_hasher`
+  of `hash128`, `spare_shaping_buffer`). A top-level `let` that holds
+  such state gets a row in the inventory of
+  `docs/incremental-design.md`, section 5.5. Count allocations and
+  reference-count operations per MoonBit source line with
+  `scripts/alloc_sites.py`: it rewrites the generated C of a native
+  program so that every call of `moonbit_malloc`/`moonbit_make_*`, of
+  `to_owned`, of `moonbit_incref`/`moonbit_decref` and their variants
+  counts itself (`#line` directives map call sites back to `.mbt`
+  lines), names the type and the size of what is allocated, and reports
+  or compares the counts by site (`report`, `-k rc` for the counts) or
+  by type (`types`); core's sites are charged to core, and `--calls
+  <regex>` (who calls this instance of a generic function) and
+  `--in-function <regex>` find their callers. `tests/pdf_bench <file> N
+  --fresh` is the workload (a first compilation and an export per round
+  in a warm process; counts of one round are those of N rounds minus
+  those of one).
+- Reference counts (native), as the generated C shows them (moonc
+  0.10.15; core has relied on them since 2026-08): a parameter is
+  *borrowed* unless the function says `#owned(p)`. Borrowed: the callee
+  reads it for nothing, takes a reference (`moonbit_incref`) where it
+  stores or returns it, and a caller whose own reference ends with the
+  call gives it up afterwards (`moonbit_decref`): a constructor called
+  with a fresh value costs a pair. Owned: the caller hands its
+  reference over (nothing if this was its last use, an `incref` before
+  the call otherwise) and the callee stores, returns or passes it to
+  another owned parameter for nothing; a path that does not consume it
+  gives it up, and so does a call that only lends it. Results are owned:
+  a getter that is not inlined takes a reference to what it returns and
+  its caller gives it up. What is read out of a borrowed value is
+  borrowed only if nothing can replace it meanwhile: an immutable field
+  of a parameter, the payload of an enum, their immutable fields in
+  turn. Everything else is taken and given up around each call it is
+  passed to or kept across: a `mut` field, an element of an `Array`,
+  `FixedArray`, `ArrayView` or `ReadOnlyArray`, any field of an *owned*
+  parameter or of a local that owns (the result of a call, a `let
+  mut`). A `let mut` cursor over a linked
+  structure therefore takes and gives up a reference per step, and a
+  function that calls itself in tail position is compiled to that loop.
+  `#owned` on a function with an optional parameter whose default is
+  not a constant does not reach the callers that leave the parameter
+  out (they call a wrapper that borrows). `#borrow` is for `extern "C"`
+  declarations (whose parameters the C side would otherwise own); on a
+  MoonBit function it says what is the default. A `#valtype` struct is
+  passed and returned in registers and stored inline; its reference
+  fields are counted like fields. `#owned`, `#borrow` and `#valtype` do
+  not show in a `.mbti`, but `#owned` is part of how a function is
+  called. What this costs, measured (2026-10-11, aarch64 macOS;
+  `bench/longer.typ`, one compilation: 38 million allocations, 150
+  million `incref`s and as many `decref`s in 17 billion instructions):
+  the counts on objects that stay alive are about 3 to 5 % of the
+  cycles (doing every one of them three times costs 7 to 10 %; removing
+  the 30 million of the walk over the style chain changed instructions
+  by 1.4 % and the time by nothing that could be measured; `#owned` on
+  eleven constructors and `push`-like functions changed instructions by
+  0.1 %), and at most a tenth of the `incref`s are at lines that take a
+  reference to a parameter, which is all that `#owned` can remove: the
+  rest are elements of containers and results of getters. So do not
+  restructure code or annotate for the counts. The time is in what is
+  allocated and released: `mi_malloc`, `moonbit_drop_object` and their
+  helpers were 31 % of the samples, about 40 cycles per object, 46 % of
+  the releases are single objects without children and 37 % of the
+  objects hold no reference at all (boxed scalars, tuples, options,
+  iterators, closures). The lever is the number of objects, and the
+  profile of it is flat (the first ten sites are a fifth, the first
+  hundred two thirds): the changes of the paragraph above took a fifth
+  of the allocations of a text-heavy compilation and 7 to 9 % of its
+  time (`long.typ` 218 -> 199 ms, `longer.typ` 1126 -> 1049 ms, where
+  upstream takes 90 and 455 ms; on wasm-gc under moonrun about 3 %,
+  which is within what its runs differ by). Measure with `/usr/bin/time
+  -l` (instructions are exact to 0.05 %; cycles and milliseconds need a
+  quiet machine and the least of several runs).
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native
   (NEON on aarch64, SSE2 on x86, via `moonbit_simd.h`) and wasm (SIMD128),

@@ -669,11 +669,14 @@ pub fn[T : FromSlice] LazyOffsetArray16::get(
   self : LazyOffsetArray16[T],
   index : UInt16,
 ) -> T? {
-  guard self.offsets.get(index) is Some(Some(offset)) else { return None }
-  guard slice_from(self.data, offset.to_usize()) is Some(data) else {
-    return None
-  }
-  try T::parse_slice(data) catch {
+  // (`self.offsets.get(index)?` and `self.data.get(offset.to_usize()..)?`,
+  // read where they are: the option of an optional offset and the option
+  // of a slice are two allocations for every value that is looked up.)
+  guard index < self.offsets.len() else { return None }
+  let offset = be_u16(self.offsets.data(), index.to_int() * 2).to_int()
+  // Zero offsets must be ignored.
+  guard offset != 0 && offset <= self.data.length() else { return None }
+  try T::parse_slice(self.data[offset:]) catch {
     _ => None
   } noraise {
     v => Some(v)

@@ -31,8 +31,13 @@ fn explicit_compute(
   let mut valid_isolate_count = 0
   let mut current_run_level = Level::ltr()
   let mut current_run_start = 0
-  for pair in text.char_indices() {
-    let (i, c) = pair
+  // (`for (i, c) in text.char_indices()`, without the array of pairs.)
+  for at in text.start..<text.end {
+    let c = text.cps[at]
+    if c < 0 {
+      continue
+    }
+    let i = at - text.start
     let len = utf8_char_len(c)
     let last = stack.last().unwrap()
     match original_classes[i] {

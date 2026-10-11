@@ -291,8 +291,10 @@ pub fn HmtxTable::advance(self : HmtxTable, glyph_id : GlyphId) -> UInt16? {
   if glyph_id.0 >= self.number_of_metrics {
     return None
   }
-  if self.metrics.get(glyph_id.0) is Some(metrics) {
-    Some(metrics.advance)
+  // (`self.metrics.get(glyph_id.0)` and its `advance`, read where it is:
+  // the record would be allocated for every glyph that is measured.)
+  if glyph_id.0 < self.metrics.len() {
+    Some(be_u16(self.metrics.data(), glyph_id.0.to_int() * 4))
   } else {
     // 'As an optimization, the number of records can be less than the number of glyphs,
     // in which case the advance value of the last record applies

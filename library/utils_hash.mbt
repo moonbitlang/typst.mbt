@@ -11,17 +11,37 @@
 
 ///|
 /// An unsigned 128-bit integer (upstream `u128`), used for hashes.
+///
+/// A value type: every [hash128] gives one, and they are the keys of the
+/// memoization tables.
+#valtype
 pub(all) struct U128 {
   /// The upper 64 bits.
   hi : UInt64
   /// The lower 64 bits.
   lo : UInt64
-} derive(Eq, Hash, Compare, Default, Debug)
+} derive(Eq, Compare, Default, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
 pub extend U128 with Eq::{not_equal, equal}
+
+///|
+pub impl Hash for U128 with fn hash_combine(self, hasher) {
+  hasher.combine(self.hi)
+  hasher.combine(self.lo)
+}
+
+///|
+/// The hash of a key of a map (not the default, which allocates a `Hasher`
+/// for every lookup): the number is a hash already, or small, so its halves
+/// folded together will do. Nothing may depend on the value: core's hashes
+/// are seeded per process on native.
+pub impl Hash for U128 with fn hash(self) {
+  let folded = self.lo ^ self.hi
+  (folded ^ (folded >> 32)).to_int()
+}
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -102,6 +122,18 @@ pub fn SipHasher128::new() -> SipHasher128 {
     ntail: 0,
     length: 0,
   }
+}
+
+///|
+/// Make the hasher what [SipHasher128::new] gives.
+fn SipHasher128::reset(self : SipHasher128) -> Unit {
+  self.v0 = 0x736f6d6570736575UL
+  self.v1 = 0x646f72616e646f6dUL ^ 0xeeUL
+  self.v2 = 0x6c7967656e657261UL
+  self.v3 = 0x7465646279746573UL
+  self.tail = 0
+  self.ntail = 0
+  self.length = 0
 }
 
 ///|
@@ -473,10 +505,27 @@ pub fn fingerprint_lossy_in(f : () -> Unit) -> Bool {
 ///|
 /// Calculate a 128-bit SipHash of a value (upstream `typst_utils::hash128`).
 pub fn[T : Fingerprint] hash128(value : T) -> U128 {
-  let state = SipHasher128::new()
+  // (Upstream's hasher is on the stack. Here it is an object, so the one
+  // that the last call put back is taken again. While it is taken it is
+  // nobody else's: a call inside `write` makes its own, or takes what a
+  // call before it inside the same `write` put back.)
+  let state = match spare_hasher.val {
+    Some(state) => {
+      spare_hasher.val = None
+      state.reset()
+      state
+    }
+    None => SipHasher128::new()
+  }
   state.write(value)
-  state.finish128()
+  let hash = state.finish128()
+  spare_hasher.val = Some(state)
+  hash
 }
+
+///|
+/// The hasher that the last [hash128] is done with (not upstream).
+let spare_hasher : Ref[SipHasher128?] = Ref(None)
 
 ///|
 pub impl Fingerprint for Unit with fn fingerprint(_, _) {

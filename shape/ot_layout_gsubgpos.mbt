@@ -75,7 +75,7 @@ fn match_input(
   let mut total_component_count = 0
   let mut ligbase = NotChecked
   for position in 1..<count {
-    let unsafe_to = Ref(0)
+    let unsafe_to = out_cell(unsafe_cell)
     if !iter.next(Some(unsafe_to)) {
       end_position.val = unsafe_to.val
       return false
@@ -145,7 +145,7 @@ fn match_backtrack(
   iter.set_glyph_data(0)
   iter.enable_matching(match_func)
   for _ in 0..<backtrack_len {
-    let unsafe_from = Ref(0)
+    let unsafe_from = out_cell(unsafe_cell)
     if !iter.prev(Some(unsafe_from)) {
       match_start.val = unsafe_from.val
       return false
@@ -170,7 +170,7 @@ fn match_lookahead(
   iter.set_glyph_data(0)
   iter.enable_matching(match_func)
   for _ in 0..<lookahead_len {
-    let unsafe_to = Ref(0)
+    let unsafe_to = out_cell(unsafe_cell)
     if !iter.next(Some(unsafe_to)) {
       end_index.val = unsafe_to.val
       return false
@@ -178,6 +178,32 @@ fn match_lookahead(
   }
   end_index.val = iter.index() + 1
   true
+}
+
+///|
+/// Where [SkippingIterator::next] and [SkippingIterator::prev] put
+/// `unsafe_to`/`unsafe_from` for a caller that reads it before it calls
+/// anything else (upstream: a `usize` of the caller, written through `&mut`;
+/// a `Ref` of the caller here was an allocation per glyph that a lookup
+/// looks at). Taken with [out_cell].
+let unsafe_cell : Ref[Int] = Ref(0)
+
+///|
+/// The out-parameters `end_position` and `p_total_component_count` of
+/// [match_input] for [ligature_apply], which reads them when the call
+/// returns. Not `unsafe_cell`: [match_input] uses that one itself.
+let match_end_cell : Ref[Int] = Ref(0)
+
+///|
+let component_count_cell : Ref[Int] = Ref(0)
+
+///|
+/// One of the cells above as a fresh `Ref(0)`. Only for an out-parameter
+/// whose value is read before anything else can take the cell again: no
+/// call between the one that writes it and the read.
+fn out_cell(cell : Ref[Int]) -> Ref[Int] {
+  cell.val = 0
+  cell
 }
 
 ///|

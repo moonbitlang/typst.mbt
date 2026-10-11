@@ -2,13 +2,15 @@
 // costs: a document is compiled and exported several times, as `typst
 // watch` does after every edit, and each round prints its two times.
 //
-//     moon run tests/pdf_bench --target native --release -- <file.typ> [rounds] [--export-only] [--no-memo] [--out <prefix>]
+//     moon run tests/pdf_bench --target native --release -- <file.typ> [rounds] [--export-only] [--no-memo] [--fresh] [--out <prefix>]
 //
 // A round is a compilation and an export, followed by `@library.evict(10)`
 // (the loop of `cli/watch.mbt`); with `--export-only` the document is
 // compiled once and exported `rounds` times. `--no-memo` turns off what is
 // kept (`set_layout_memo_enabled(false)`): every round is then a first
-// one. `--out` writes the file of each round to `<prefix>-<round>.pdf`.
+// one. `--fresh` drops what the process keeps between rounds
+// (`@library.evict(0)`): every round is then a first compilation in a warm
+// process. `--out` writes the file of each round to `<prefix>-<round>.pdf`.
 // The last line says whether all rounds gave the same bytes.
 //
 // What is kept between exports is what `pdf/image.mbt` keeps of a raster
@@ -32,12 +34,14 @@ fn run(args : Array[String]) -> Unit raise {
   let mut rounds = 2
   let mut export_only = false
   let mut memo = true
+  let mut fresh = false
   let mut out : String? = None
   let mut i = 1
   while i < args.length() {
     match args[i] {
       "--export-only" => export_only = true
       "--no-memo" => memo = false
+      "--fresh" => fresh = true
       "--out" => {
         guard i + 1 < args.length() else { fail("--out <prefix>") }
         out = Some(args[i + 1])
@@ -54,7 +58,7 @@ fn run(args : Array[String]) -> Unit raise {
   }
   guard path is Some(path) else {
     fail(
-      "usage: pdf_bench <file.typ> [rounds] [--export-only] [--no-memo] [--out <prefix>]",
+      "usage: pdf_bench <file.typ> [rounds] [--export-only] [--no-memo] [--fresh] [--out <prefix>]",
     )
   }
   let root = match @platform.parent(path) {
@@ -79,7 +83,7 @@ fn run(args : Array[String]) -> Unit raise {
     let compiled = @platform.monotonic_nanos()
     let pdf = document.pdf().unwrap()
     let exported = @platform.monotonic_nanos()
-    @library.evict(10)
+    @library.evict(if fresh { 0 } else { 10 })
     let compile_time = if compiles { millis(compiled - start) } else { "-" }
     println(
       "round \{round}: compile \{compile_time} ms, export \{millis(exported - compiled)} ms, \{pdf.length()} bytes",
