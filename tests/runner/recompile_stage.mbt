@@ -397,6 +397,7 @@ fn run_sequence(
   stats : RecompileStats,
   options : RecompileOptions,
 ) -> String? {
+  read_check_case.val = "\{document.name} seed=\{seed} sequence=\{name}"
   let files = FileSet::new(document.base, document.files)
   let variant : Variant = { main: document.main, inputs: 0, day: 0, fonts: 0, }
   let project = Project::new(files, variant)

@@ -15,12 +15,55 @@ let golden_dir = "tests/golden"
 let trace_tests : Ref[Bool] = Ref(false)
 
 ///|
+/// `--check-reads`: every memoized result is computed a second time from
+/// scratch, and the world reads its entry keeps must be what that run
+/// asked of the world (`@library.set_memo_check`). The entries checked and
+/// the cases in which one differed.
+let read_check : Ref[Bool] = Ref(false)
+
+///|
+let read_check_entries : Ref[Int] = Ref(0)
+
+///|
+let read_check_differ : Ref[Int] = Ref(0)
+
+///|
+let read_check_cases : Ref[Int] = Ref(0)
+
+///|
+/// What the read check found since the last call, for the case `name`:
+/// prints the entries that differ (the first few) and returns their
+/// number.
+fn read_check_drain(name : String) -> Int {
+  if !read_check.val {
+    return 0
+  }
+  let (entries, failures) = @library.take_memo_check_report()
+  read_check_entries.val += entries
+  if failures.is_empty() {
+    return 0
+  }
+  read_check_differ.val += failures.length()
+  read_check_cases.val += 1
+  for i, failure in failures {
+    if i == 5 {
+      println("READS \{name}: and \{failures.length() - 5} more")
+      break
+    }
+    println("READS \{name}: \{failure}")
+  }
+  failures.length()
+}
+
+///|
 fn main {
   let args = @env.args()
   let stage = args.get(1).unwrap_or("syntax")
   let verbose = args.contains("--verbose") || args.contains("-v")
   dump_actual.val = args.contains("--dump")
   trace_tests.val = args.contains("--trace")
+  read_check.val = args.contains("--check-reads")
+  @library.set_memo_check(read_check.val)
   for a in args {
     if a.has_prefix("--upstream-pdfs=") {
       upstream_pdf_dir.val = Some(a.unsafe_substring(start=16, end=a.length()))
@@ -243,6 +286,12 @@ fn main {
       @sys.exit(2)
     }
   }
+  if read_check.val {
+    read_check_drain("after the stage") |> ignore
+    println(
+      "read check: \{read_check_entries.val} entries checked, \{read_check_differ.val} differ in \{read_check_cases.val} cases",
+    )
+  }
 }
 
 ///|
@@ -287,6 +336,7 @@ fn run_stage(
         println("TRACE \{rel} :: \{tc.name}")
       }
       let actual = report(rel, tc)
+      let unrecorded = read_check_drain("\{rel} :: \{tc.name}")
       dump.write_string("=== \{tc.name}\n\{actual}")
       let expected = golden.get(tc.name).unwrap_or(missing)
       if actual == expected {
@@ -300,7 +350,7 @@ fn run_stage(
         Some(m) => m(expected, actual)
         None => actual == expected
       }
-      if ok {
+      if ok && unrecorded == 0 {
         passed += 1
       } else {
         failed += 1
