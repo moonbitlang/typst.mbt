@@ -259,8 +259,8 @@ fn import_file(
 
 ///|
 /// A memoized module evaluation: what [eval_source_memoized] keeps for one
-/// source, one library and the answers that the evaluation got from its
-/// tracked arguments.
+/// source and one library (they are the key) and the answers that the
+/// evaluation got from its tracked arguments.
 priv struct EvalMemo {
   /// The scope of the evaluation ([@library.TrackedWorld::scope_token]).
   /// It says how long the entry is kept ([EvalMemos::of]), not where it is
@@ -269,7 +269,6 @@ priv struct EvalMemo {
   /// The source that was evaluated: the entry is found by its fingerprint
   /// and only taken for the same source ([same_source]).
   source : @syntax.Source
-  library : @library.Library
   /// The world reads of the evaluation and their answers (comemo tracks
   /// the world of `eval`: the files that the module imported and loaded).
   /// The source of the file itself is not among them: it is an argument,
@@ -342,18 +341,17 @@ fn same_source(a : @syntax.Source, b : @syntax.Source) -> Bool {
 
 ///|
 /// Whether the entry is one for an evaluation of this source with this
-/// library, traced span and route: all conditions of a hit but the world
-/// reads, which are looked at last ([@library.TrackedWorld::validate]).
+/// traced span and route: all conditions of a hit beyond the key but the
+/// world reads, which are looked at last
+/// ([@library.TrackedWorld::validate]).
 fn EvalMemo::matches(
   self : EvalMemo,
   source : @syntax.Source,
-  library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
   depth : Int,
 ) -> Bool {
-  guard physical_equal(self.library, library) &&
-    self.shifts.allows(depth - self.depth) &&
+  guard self.shifts.allows(depth - self.depth) &&
     same_source(self.source, source) else {
     return false
   }
@@ -369,7 +367,8 @@ priv struct EvalMemos {
   /// The scope that asked last.
   mut last : Int
   /// The evaluations by the fingerprint of their source
-  /// ([@library.source_fingerprint]).
+  /// ([@library.source_fingerprint]) and the number of their library
+  /// ([@library.Library::serial]).
   mut entries : Map[@library.U128, Array[EvalMemo]]
   /// Whether `@library.set_memo_check` knows the store.
   mut checked : Bool
@@ -381,7 +380,8 @@ priv struct EvalMemos {
 }
 
 ///|
-/// Memoized file evaluations by the fingerprint of their source.
+/// Memoized file evaluations by the fingerprint of their source and their
+/// library.
 let eval_memo : EvalMemos = {
   last: 0,
   entries: Map([]),
@@ -409,8 +409,8 @@ pub fn module_memo_stats() -> (Int, Int) {
 }
 
 ///|
-/// The memoized evaluations of the source with the fingerprint `key`, for
-/// a call in the scope `scope`.
+/// The memoized evaluations with the key `key` (a source and a library),
+/// for a call in the scope `scope`.
 ///
 /// An entry lives as long as the scope that stored it
 /// (`library/tracked_world.mbt`: a compilation, or an evaluation that is
@@ -486,7 +486,10 @@ fn EvalMemos::of(
 ///   that were edited into the same tree are two keys here and one there.
 ///   An entry also keeps its source and is only taken for the same one
 ///   ([same_source]; upstream keeps the hash alone).
-/// - The library is compared by identity (upstream hashes it).
+/// - The library is in the key as its number
+///   ([@library.Library::serial]; upstream hashes all it holds): a library
+///   is made by its builder alone and never changes. Two libraries that
+///   hold the same are two keys here and one there.
 /// - The route: the file ids the evaluation asked it for must get the
 ///   same answers (`Route::contains`), and its depth may only differ by as
 ///   much as leaves the depth checks of the evaluation as they were
@@ -521,11 +524,16 @@ fn eval_source_memoized(
   if scope == 0 || world.is_volatile(id) {
     return eval_source_impl(world, library, traced, sink, route, source)
   }
-  let key = @library.source_fingerprint(source)
+  // The key: the source and the library, hashed (the fingerprint of a
+  // source that an edit made is two numbers, not a hash).
+  let key = @library.memo_fingerprint(state => {
+    state.write_u128(@library.source_fingerprint(source))
+    state.write_i64(library.serial())
+  })
   let entries = eval_memo.of(key, scope)
   let depth = route.depth()
   for memo in entries {
-    if memo.matches(source, library, traced, route, depth) &&
+    if memo.matches(source, traced, route, depth) &&
       // Last: this notes the world reads for the evaluation around.
       world.validate(memo.reads) {
       eval_memo.counts[0] += 1
@@ -562,7 +570,7 @@ fn eval_source_memoized(
   let traced_files = @library.traced_files_end(traced_start)
   let reads = world.reads_end(mark)
   let result = match
-    eval_memo.original(key, world, source, library, traced, route, depth) {
+    eval_memo.original(key, world, source, traced, route, depth) {
     Some(original) => original
     None => result
   }
@@ -575,7 +583,6 @@ fn eval_source_memoized(
     entries.push({
       scope,
       source,
-      library,
       reads,
       route,
       queried,
@@ -667,7 +674,6 @@ fn EvalMemos::original(
   key : @library.U128,
   world : @library.TrackedWorld,
   source : @syntax.Source,
-  library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
   depth : Int,
@@ -677,8 +683,7 @@ fn EvalMemos::original(
   }
   guard aside.get(key) is Some(entries) else { return None }
   for memo in entries {
-    if memo.matches(source, library, traced, route, depth) &&
-      world.validate(memo.reads) {
+    if memo.matches(source, traced, route, depth) && world.validate(memo.reads) {
       return Some(own_result(memo.result))
     }
   }

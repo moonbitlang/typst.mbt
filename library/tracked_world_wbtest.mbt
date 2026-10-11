@@ -192,11 +192,18 @@ fn ReadTest::ran(self : ReadTest, tag : Int) -> Int {
 }
 
 ///|
+/// The key under which the store has the entries of the call `tag` with
+/// the library of the test as it is (`memoize` puts the library into the
+/// key it is given).
+fn ReadTest::key(self : ReadTest, tag : Int) -> U128 {
+  self.library.keyed(memo_fingerprint(state => state.write_usize(tag)))
+}
+
+///|
 /// The world reads that the entries of the call `tag` keep, without the
 /// fingerprints.
 fn ReadTest::kept(self : ReadTest, tag : Int) -> String {
-  let key = memo_fingerprint(state => state.write_usize(tag))
-  let entries = self.store.entries.get(key).unwrap_or([])
+  let entries = self.store.entries.get(self.key(tag)).unwrap_or([])
   entries
   .map(entry => entry.world.reads.map(read => read.describe()).join(", "))
   .join(" | ")
@@ -511,6 +518,98 @@ test "world reads: the library is compared (`sys.inputs`)" {
 }
 
 ///|
+test "the library is in the key as its number" {
+  let routines = Routines::new(eval_string=(_, _, _, _, _, _) => None, eval_closure=(
+    _,
+    _,
+    _,
+    _,
+    _,
+  ) => None)
+  // Two libraries from one builder are two libraries.
+  let builder = Library::builder(routines, [])
+  let a = builder.build()
+  let b = builder.build()
+  assert_true(a.serial() != b.serial())
+  assert_eq(a.serial(), a.serial())
+  let key = memo_fingerprint(state => state.write_usize(7))
+  let other = memo_fingerprint(state => state.write_usize(8))
+  assert_eq(a.keyed(key), a.keyed(key))
+  assert_true(a.keyed(key) != b.keyed(key))
+  assert_true(a.keyed(key) != a.keyed(other))
+  assert_true(a.keyed(key) != key)
+  // What the builder was given after a build is not in the library that
+  // was built: styles, formats.
+  let formats = [html_format()]
+  let builder = Library::builder(routines, formats).with_styles(styles => {
+    styles.push(TextElem::set_size(TextSize(Length::from_abs(Abs::pt(10.0)))))
+  })
+  let first = builder.build()
+  formats.push(pdf_format())
+  let second = builder.build()
+  assert_eq(first.formats.length(), 1)
+  assert_eq(second.formats.length(), 2)
+  assert_false(first.styles.is_empty())
+  assert_false(physical_equal(first.styles, second.styles))
+  // Nor what the builder's caller still holds: the inputs, the features.
+  let inputs = Dict::new()
+  inputs.insert("v", Str("1"))
+  let features = Features([])
+  let library = Library::builder(routines, [])
+    .with_inputs(inputs)
+    .with_features(features)
+    .build()
+  inputs.insert("w", Str("2"))
+  features.0.push(Html)
+  assert_false(library.features.is_enabled(Html))
+  guard library.global.scope().get("sys") is Some(sys) &&
+    sys.value is Module(sys) &&
+    sys.scope().get("inputs") is Some(binding) &&
+    binding.value is Dict(kept) else {
+    fail("no `sys.inputs`")
+  }
+  assert_eq(kept.len(), 1)
+}
+
+///|
+test "the library: closure calls with two libraries are two calls" {
+  read_test(t => {
+    let mut runs = 0
+    // What the call reads of its library stands for `sys.inputs`.
+    let body : ClosureBody = (_, _, engine, _, args) => {
+      runs += 1
+      args.finish()
+      Int(engine.library.serial())
+    }
+    let f = memo_test_func(1)
+    let call = (engine : Engine) => {
+      memo_call(f, engine, Context::none(), [], body)
+    }
+    let first = t.library
+    t.scope(engine => {
+      assert_true(call(engine) == Int(first.serial()))
+      assert_true(call(engine) == Int(first.serial()))
+    })
+    assert_eq(runs, 1)
+    let routines = Routines::new(eval_string=(_, _, _, _, _, _) => None, eval_closure=(
+      _,
+      _,
+      _,
+      _,
+      _,
+    ) => None)
+    let second = Library::builder(routines, []).build()
+    t.library = second
+    t.scope(engine => assert_true(call(engine) == Int(second.serial())))
+    assert_eq(runs, 2)
+    // Back to the first: its call is found.
+    t.library = first
+    t.scope(engine => assert_true(call(engine) == Int(first.serial())))
+    assert_eq(runs, 2)
+  })
+}
+
+///|
 test "world reads: a failed read is kept, also of a call that goes on" {
   read_test(t => {
     let body : ReadBody = engine => {
@@ -555,8 +654,8 @@ test "world reads: the reads of an entry that is taken are its caller's" {
     assert_eq((t.ran(1), t.ran(3), t.ran(2)), (2, 2, 2))
     // In a scope in which the inner entry is found again and the outer
     // ones are not there: the reads come from the entry.
-    t.store.entries.remove(memo_fingerprint(state => state.write_usize(1)))
-    t.store.entries.remove(memo_fingerprint(state => state.write_usize(3)))
+    t.store.entries.remove(t.key(1))
+    t.store.entries.remove(t.key(3))
     t.scope(engine => assert_eq(t.call(engine, 1, middle), 3))
     assert_eq((t.ran(1), t.ran(3), t.ran(2)), (3, 3, 2))
     inspect(t.kept(1), content="file(a.txt)")

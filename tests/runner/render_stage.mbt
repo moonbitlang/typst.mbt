@@ -35,11 +35,7 @@ let render_raw_dir : Ref[String?] = Ref(None)
 /// Compile a single test case, render it and compare with the reference.
 fn render_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],

@@ -7717,21 +7717,25 @@ pub impl Numeric for Length
 pub impl Reflect for Length
 pub impl ToCss for Length
 
-pub(all) struct Library {
+pub struct Library {
   routines : Routines
   global : Module
   math : Module
   styles : Styles
   rules : NativeRuleMap
   std : Binding
-  mut features : Features
+  features : Features
   formats : Array[Format]
+  // private fields
 }
 pub fn Library::builder(Routines, Array[Format]) -> LibraryBuilder
+pub fn Library::keyed(Self, U128) -> U128
+pub fn Library::serial(Self) -> Int64
 
 pub(all) struct LibraryBuilder {
   mut features : Features
   extra : Array[(Scope) -> Unit]
+  styling : Array[(Styles) -> Unit]
   routines : Routines
   mut inputs : Dict
   formats : Array[Format]
@@ -7740,6 +7744,7 @@ pub fn LibraryBuilder::build(Self) -> Library
 pub fn LibraryBuilder::with_features(Self, Features) -> Self
 pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
 pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
+pub fn LibraryBuilder::with_styles(Self, (Styles) -> Unit) -> Self
 
 pub(all) struct Limits[T] {
   min : T

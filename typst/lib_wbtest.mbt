@@ -308,7 +308,9 @@ test "compile checks the html feature" {
   )
   let world = {
     ..world,
-    library: { ..world.library, features: @library.Features::none(), },
+    library: library_builder([])
+    .with_features(@library.Features::none())
+    .build(),
   }
   let warned : @library.Warned[
     Result[HtmlLike, Array[@library.SourceDiagnostic]],

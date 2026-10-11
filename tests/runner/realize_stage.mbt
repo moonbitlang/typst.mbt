@@ -8,13 +8,8 @@
 fn realize_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let id = source.id()
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
   // The library with only the base native show rules.
-  let library = { ..library, rules: @library.NativeRuleMap::new(), }
+  let library = test_library_with(parse_features(tc.attrs), base_rules=true)
   let world : TestWorld = { main: source, library, }
   let content = @eval.eval_source(
     @library.TrackedWorld::new(world),

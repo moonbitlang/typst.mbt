@@ -310,57 +310,117 @@ fn test_files_load(id : @syntax.FileId) -> Bytes raise @library.FileError {
 }
 
 ///|
-let test_library_cell : Ref[@library.Library?] = Ref(None)
-
-///|
 /// The library with test-only definitions.
 fn test_library() -> @library.Library {
-  match test_library_cell.val {
-    Some(lib) => lib
-    None => {
-      let formats = [
-        @library.html_format(),
-        @library.pdf_format(),
-        @library.svg_format(),
-        @library.png_format(),
-        @library.bundle_format(),
-      ]
-      let lib = @typst.library_builder(formats)
-        .with_features(@library.Features::all())
-        .with_global(define_test_globals)
-        .build()
-      define_test_colors(lib)
-      define_test_styles(lib)
-      test_library_cell.val = Some(lib)
-      lib
+  test_library_with(None)
+}
+
+///|
+/// The test libraries made so far: their features, whether they have only
+/// the base show rules, and the library.
+let test_libraries : Array[(@library.Features?, Bool, @library.Library)] = []
+
+///|
+/// The library with test-only definitions and the features of a test (all
+/// features unless the test names some; `base_rules`: without the show
+/// rules of the layout engines and the formats, for the `realize` stage).
+/// A library is made by its builder and is not written to afterwards, so
+/// the tests with features of their own have another library, one per set
+/// of features.
+fn test_library_with(
+  features : @library.Features?,
+  base_rules? : Bool = false,
+) -> @library.Library {
+  for known in test_libraries {
+    if known.0 == features && known.1 == base_rules {
+      return known.2
     }
   }
+  let lib = new_test_library(features, base_rules~)
+  test_libraries.push((features, base_rules, lib))
+  lib
+}
+
+///|
+/// Builds a library with test-only definitions (see [test_library_with]).
+fn new_test_library(
+  features : @library.Features?,
+  base_rules? : Bool = false,
+  inputs? : @library.Dict,
+) -> @library.Library {
+  let formats = [
+    @library.html_format(),
+    @library.pdf_format(),
+    @library.svg_format(),
+    @library.png_format(),
+    @library.bundle_format(),
+  ]
+  // The colors are evaluated with a library of their own, before this one
+  // is built.
+  test_colors() |> ignore
+  let builder = if base_rules {
+    @library.Library::builder(
+      { ..@typst.routines, rules: @library.NativeRuleMap::new, },
+      formats.map(format => { ..format, rules: None, }),
+    )
+  } else {
+    @typst.library_builder(formats)
+  }
+  let builder = builder
+    .with_features(
+      match features {
+        Some(features) => features
+        None => @library.Features::all()
+      },
+    )
+    .with_global(define_test_globals)
+    .with_styles(define_test_styles)
+  let builder = match inputs {
+    Some(inputs) => builder.with_inputs(inputs)
+    None => builder
+  }
+  builder.build()
 }
 
 ///|
 /// Set the test styles (small pages, like upstream's test world).
-fn define_test_styles(lib : @library.Library) -> Unit {
+fn define_test_styles(styles : @library.Styles) -> Unit {
   let pt = (v : Double) => @library.Length::from_abs(@library.Abs::pt(v))
-  lib.styles.push(@library.PageElem::set_width(Custom(pt(120.0))))
-  lib.styles.push(@library.PageElem::set_height(Auto))
-  lib.styles.push(
+  styles.push(@library.PageElem::set_width(Custom(pt(120.0))))
+  styles.push(@library.PageElem::set_height(Auto))
+  styles.push(
     @library.PageElem::set_margin(
       Custom(
         @library.Margin::splat(Some(Custom(@library.Rel::from_abs(pt(10.0))))),
       ),
     ),
   )
-  lib.styles.push(@library.TextElem::set_size(@library.TextSize(pt(10.0))))
+  styles.push(@library.TextElem::set_size(@library.TextSize(pt(10.0))))
 }
 
 ///|
-/// Define the test colors (`conifer`, `forest`, `check.red`).
+/// The test colors: `conifer`, `forest` and `check.red`.
+priv struct TestColors {
+  conifer : @library.Value?
+  forest : @library.Value?
+  red : @library.Value?
+}
+
+///|
+let test_colors_cell : Ref[TestColors?] = Ref(None)
+
+///|
+/// The test colors (`conifer`, `forest`, `check.red`).
 ///
 /// The oracle constructs them natively with `Color::from_u8`; here they are
 /// evaluated from equivalent code so that the test world does not depend on
 /// the internals of the color port. Colors that cannot be evaluated yet are
 /// left undefined.
-fn define_test_colors(lib : @library.Library) -> Unit {
+fn test_colors() -> TestColors {
+  if test_colors_cell.val is Some(colors) {
+    return colors
+  }
+  let lib = @typst.library([])
   let world : TestWorld = { main: @syntax.Source::detached(""), library: lib, }
   let engine : @library.Engine = {
     world: @library.TrackedWorld::new(world),
@@ -387,18 +447,13 @@ fn define_test_colors(lib : @library.Library) -> Unit {
       None
     }
   }
-  let global = lib.global.scope()
-  if color("rgb(\"#9feb52\")") is Some(v) {
-    global.define_("conifer", v) |> ignore
+  let colors = {
+    conifer: color("rgb(\"#9feb52\")"),
+    forest: color("rgb(\"#43a127\")"),
+    red: color("red"),
   }
-  if color("rgb(\"#43a127\")") is Some(v) {
-    global.define_("forest", v) |> ignore
-  }
-  if color("red") is Some(v) &&
-    global.get("check") is Some(binding) &&
-    binding.value is Module(check) {
-    check.scope().define_("red", v) |> ignore
-  }
+  test_colors_cell.val = Some(colors)
+  colors
 }
 
 ///|
@@ -411,6 +466,10 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
   )
   |> ignore
   check.define_("gated", None).with_feature(Html) |> ignore
+  let colors = test_colors()
+  if colors.red is Some(red) {
+    check.define_("red", red) |> ignore
+  }
   scope.define_(
     "check",
     Module(@library.Module::new("check", check).canonical()),
@@ -527,6 +586,12 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
     }),
   )
   |> ignore
+  if colors.conifer is Some(conifer) {
+    scope.define_("conifer", conifer) |> ignore
+  }
+  if colors.forest is Some(forest) {
+    scope.define_("forest", forest) |> ignore
+  }
 }
 
 ///|
@@ -534,12 +599,7 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
 fn eval_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let id = source.id()
-  let library = test_library()
-  let features = parse_features(tc.attrs)
-  let library = match features {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let sink = @library.Sink::new()
   let out = StringBuilder()
@@ -657,11 +717,7 @@ fn locate(
 fn html_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let main_id = source.id()
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let warned : @library.Warned[
     Result[@html.HtmlDocument, Array[@library.SourceDiagnostic]],

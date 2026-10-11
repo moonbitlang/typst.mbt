@@ -445,9 +445,10 @@
   the file ids they ask routes for (`note_route_query`); results are
   values (containers are marked shared). In short: closure calls are
   memoized for a compilation; the key is the function (the closure's hash
-  and its span), the arguments with their spans and the traced span; a
-  hit also needs equal arguments (`args_memo_equal`), the same library
-  object and the same answers for what the call asked of its context, of
+  and its span), the arguments with their spans, the traced span and the
+  number of the library; a
+  hit also needs equal arguments (`args_memo_equal`)
+  and the same answers for what the call asked of its context, of
   the route (depth checks, `contains`), of the introspector (recorded
   reads) and of the world (the tracked world, below), and it replays the
   call's sink effects and consumes the arguments.
@@ -505,7 +506,8 @@
   of a hit that is looked at: it asks the world for what the scope has no
   answer for, in the order of the call's first reads and up to the first
   that differs, and notes the reads of an entry that is taken for the
-  calls around it), and compares the library by identity. Rules: a new
+  calls around it), and has the number of the library in its key (the
+  library, below). Rules: a new
   read of the world is a method of `TrackedWorld` with a fingerprint of
   its answer and a case in the spy of `memo_check.mbt`; a new store calls
   `reads_begin`, then `reads_end` when the call returns and `reads_abort`
@@ -545,8 +547,9 @@
   `Source::new` parsed, the id and the number of the object for the
   result of an edit: a file that is edited and edited back has its old
   text with other span numbers and is another source, as upstream's hash
-  of the numbered tree says), keeps its source and is only taken for the
-  same one (`same_source`), and is valid if the library is the same and
+  of the numbered tree says) and by the number of the library, keeps its
+  source and is only taken for the same one (`same_source`), and is valid
+  if
   the route (`Route::contains` for the ids it asked, and its depth within
   the entry's `RouteShifts`, as for closure calls: upstream tracks
   `Route::within`), the traced span and the world (its reads, validated
@@ -570,6 +573,22 @@
   kind `traces` of `scripts/gen_typst_oracle.py` records the tracepoints
   that the CLI prints). `@eval.module_memo_stats()` counts the
   evaluations that were found and that were computed.
+- The library (`LibraryBuilder` in `library/lib.mbt`; section 5.3 of the
+  design and "Step 3 as built" in its section 8): a `Library` is made by
+  `LibraryBuilder::build` and by nothing else, and nothing reachable from
+  it is written afterwards. The record cannot be built, updated or
+  assigned to outside of `library` (inside, `build` is the one place: do
+  not add another); that its scopes, styles, rule map, bindings and
+  `sys.inputs` are not written to is a contract that the types do not
+  hold. What a host or a test wants in a library goes through the
+  builder: `with_features`, `with_inputs`, `with_global` (definitions),
+  `with_styles` (default styles). A library has a number
+  (`Library::serial`) that is in the key of every memoized call where
+  upstream hashes the library: `Library::keyed(key)` for a key that is a
+  hash (`memoize`), or the number written into the hash (closure calls,
+  module evaluations). Two libraries never share results, also two from
+  one builder: keep the library where results should be found again (the
+  runner has one per set of features, `test_library_with`).
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for

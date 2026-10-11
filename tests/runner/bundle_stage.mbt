@@ -56,11 +56,7 @@ fn export_png(doc : @layout.PagedDocument) -> Bytes raise @library.SourceError {
 fn bundle_report(rel : String, tc : TestCase) -> String {
   let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
   let main_id = source.id()
-  let library = test_library()
-  let library = match parse_features(tc.attrs) {
-    Some(f) => { ..library, features: f, }
-    None => library
-  }
+  let library = test_library_with(parse_features(tc.attrs))
   let world : TestWorld = { main: source, library, }
   let warned : @library.Warned[
     Result[@bundle.Bundle, Array[@library.SourceDiagnostic]],
