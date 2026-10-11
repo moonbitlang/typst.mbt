@@ -69,6 +69,121 @@ test "memoize: a call that tracks its route is found on every route, unless it a
 }
 
 ///|
+test "memoize: an entry that tracks its route, and the depth bounds of a module evaluation" {
+  // The two things that note what is asked of routes besides closure
+  // calls: an entry of `memoize` that tracks its route (the works of a
+  // bibliography) and the evaluation of a source file, which keeps the
+  // bounds of its depth checks ([RouteShifts], `eval/import.mbt`). Both
+  // save and reset the same state and hand what they noted to whoever is
+  // around them. Each inside the other, computed and found.
+  memo_test_begin()
+  defer memo_test_end()
+  let store : MemoStore[Int, Int] = MemoStore::new()
+  let mut runs = 0
+  let call = (tag : Int, body : (Engine) -> Unit) => {
+    let engine = { ..memo_engine(), route: memo_route(3), }
+    let key = memo_fingerprint(state => state.write_usize(tag))
+    memoize(
+      store,
+      engine,
+      key,
+      tag,
+      value => value,
+      engine => {
+        runs += 1
+        body(engine)
+        tag
+      },
+      tracks_route=true,
+    )
+    |> ignore
+  }
+  // The bounds of an evaluation that checks the depth of its route (three
+  // deep, at most ten allowed: seven more are the same answer).
+  let checking = () => {
+    let outer = route_shifts_begin()
+    memo_route(3).check_within(10) |> ignore
+    route_shifts_end(outer)
+  }
+  let bounded = checking()
+  assert_true(bounded.allows(7) && !bounded.allows(8))
+  // An evaluation around an entry that asked nothing has no bounds from
+  // it, whether the entry is computed in it or found.
+  let outer = route_shifts_begin()
+  call(1, _ => ())
+  call(1, _ => ())
+  let around = route_shifts_end(outer)
+  assert_eq(runs, 1)
+  assert_true(around.allows(-1000) && around.allows(1000))
+  // Around a call that asked: the bounds are the evaluation's too.
+  let outer = route_shifts_begin()
+  call(2, engine => engine.route.check_within(10) |> ignore)
+  let around = route_shifts_end(outer)
+  assert_true(around.allows(7) && !around.allows(8))
+  // An evaluation inside the call that checked a depth: the call asked.
+  let before = runs
+  for _ in 0..<2 {
+    call(3, _ => checking() |> ignore)
+  }
+  assert_eq(runs, before + 2)
+  // An evaluation that is found inside the call notes its bounds as if it
+  // had run: with bounds the call asked, without it did not.
+  let before = runs
+  for _ in 0..<2 {
+    call(4, _ => bounded.note_reused(0))
+  }
+  assert_eq(runs, before + 2)
+  let unbounded = route_shifts_end(route_shifts_begin())
+  let before = runs
+  for _ in 0..<2 {
+    call(5, _ => unbounded.note_reused(4))
+  }
+  assert_eq(runs, before + 1)
+  // The files it asked its route for are questions too.
+  let before = runs
+  for _ in 0..<2 {
+    call(6, _ => note_route_queries([memo_file("a.typ")]))
+  }
+  assert_eq(runs, before + 2)
+  // An evaluation on a route of its own inside the call (an import in a
+  // string that is evaluated from a root route) is nobody's question.
+  let before = runs
+  for _ in 0..<2 {
+    call(7, _ => {
+      with_own_route(() => {
+        let queries = route_queries_begin()
+        note_route_query(memo_file("a.typ"))
+        checking() |> ignore
+        route_queries_end(queries) |> ignore
+      }) catch {
+        _ => ()
+      }
+    })
+  }
+  assert_eq(runs, before + 1)
+  // A closure call without bounds that is found deeper than it was
+  // computed notes "no bounds" moved by the difference: no question
+  // either.
+  let func = memo_test_func(41)
+  let quiet : ClosureBody = (_, _, _, _, _) => None
+  let closure_at = (depth : Int) => {
+    let engine = { ..memo_engine(), route: memo_route(depth), }
+    let value = memo_call(func, engine, Context::none(), [], quiet) catch {
+      _ => None
+    }
+    ignore(value)
+  }
+  closure_at(1)
+  let before = runs
+  for _ in 0..<2 {
+    call(8, _ => closure_at(6))
+  }
+  assert_eq(runs, before + 1)
+  assert_eq(route_shift_scopes.val, 0)
+  assert_eq(route_query_scopes.val, 0)
+}
+
+///|
 test "memoize: a route of its own leaves what the calls around it collected" {
   let a = memo_file("a.typ")
   let b = memo_file("b.typ")

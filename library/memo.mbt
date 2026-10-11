@@ -402,7 +402,12 @@ fn RouteMark::end(self : RouteMark) -> Bool {
   route_shift_scopes.val -= 1
   note_route_shift(lo, hi)
   let queried = route_queries_end(self.queries)
-  lo != route_shift_min || hi != route_shift_max || !queried.is_empty()
+  // "No bound" is not one number here: a closure call or a module
+  // evaluation that is found on a route `shift` deeper notes its bounds
+  // moved by `shift`, also where it has none
+  // ([RouteShifts::note_reused]), so what is far outside the depths that
+  // routes can have is no question.
+  lo > route_shift_min / 2 || hi < route_shift_max / 2 || !queried.is_empty()
 }
 
 ///|
