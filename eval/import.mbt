@@ -262,11 +262,12 @@ fn import_file(
 /// source, one library and the answers that the evaluation got from its
 /// tracked arguments.
 priv struct EvalMemo {
-  /// The scope that stored the entry or, once that is closed, the scope
-  /// that took it last ([@library.TrackedWorld::scope_token]). It does not
-  /// say where the entry is found, only that a scope that is still open
-  /// may hold the entry's module: such an entry is not dropped for the
-  /// limit of entries per source ([EvalMemos::push]).
+  /// The outermost scope that is still open and that stored or took the
+  /// entry, or else the scope that did so last
+  /// ([@library.TrackedWorld::scope_token]). It does not say where the
+  /// entry is found, only that a scope that is still open may hold the
+  /// entry's module: such an entry is not dropped for the limit of
+  /// entries per source ([EvalMemos::push]) nor by `evict`.
   mut scope : Int
   /// Whether the entry ends with the scope that stored it: an evaluation
   /// with memoization off (`@library.set_layout_memo_enabled(false)`).
@@ -437,16 +438,19 @@ let eval_memo : EvalMemos = {
 }
 
 ///|
-/// The number of entries kept per source (not upstream: comemo has no
-/// limit). An entry more is one for the same source with another library,
-/// route, traced span or, mostly, other answers of the world: a file that
-/// the module reads and that changes again and again adds one with every
-/// compilation. Under `evict(10)` a store never holds more than eleven
-/// versions of anything, so there the ages decide, as comemo's do, and
-/// this limit is for a process that does not call `evict`. An entry that a
-/// scope that is still open stored or took is not dropped for it: in one
-/// compilation a file is the same module for every import that asks the
-/// same, as upstream.
+/// The number of entries per source among those that were stored or
+/// taken since the last `@library.evict` (not upstream: comemo has no
+/// limit; `memo_max_entries` of `library/memo.mbt` is the same rule). An
+/// entry more is one for the same source with another library, route,
+/// traced span or, mostly, other answers of the world: a file that the
+/// module reads and that changes again and again adds one with every
+/// compilation. In a process that evicts, an entry of an earlier
+/// compilation is old and is not counted: it goes by its age, as comemo's
+/// does, and no document can see this limit. In a process that never
+/// evicts every entry is young, and this is what bounds it. An entry that
+/// a scope that is still open stored or took is not dropped for it: in
+/// one compilation a file is the same module for every import that asks
+/// the same, as upstream.
 let eval_memo_max_entries : Int = 12
 
 ///|
@@ -489,14 +493,21 @@ fn EvalMemos::push(
   }
   match self.entries.get(key) {
     Some(entries) => {
-      if entries.length() >= eval_memo_max_entries {
-        // The oldest that no open scope may rely on.
-        for i, other in entries {
-          if !@library.world_scope_open(other.scope) {
-            entries.remove(i) |> ignore
-            break
+      // The limit is on what was stored or taken since the last
+      // `evict` ([eval_memo_max_entries]); the oldest of those that no
+      // open scope may rely on makes room.
+      let mut young = 0
+      let mut oldest = -1
+      for i, other in entries {
+        if other.age == 0 {
+          young += 1
+          if oldest < 0 && !@library.world_scope_open(other.scope) {
+            oldest = i
           }
         }
+      }
+      if young >= eval_memo_max_entries && oldest >= 0 {
+        entries.remove(oldest) |> ignore
       }
       entries.push(memo)
     }
@@ -651,7 +662,10 @@ fn eval_source_memoized(
         eval_memo.counts[0] += 1
         // A hit makes the entry young (comemo: `lookup` stores age 0).
         memo.age = 0
-        if !@library.world_scope_open(memo.scope) {
+        // The outermost open scope that stored or took the entry keeps
+        // it (scopes nest, and an outer one has the smaller token): a
+        // scope inside it ends first.
+        if !@library.world_scope_open(memo.scope) || scope < memo.scope {
           memo.scope = scope
         }
         // The evaluations around this one asked the same of their routes

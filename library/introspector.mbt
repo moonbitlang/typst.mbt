@@ -581,9 +581,22 @@ pub fn IntrospectionRecorder::validate(
   introspector : Introspector,
 ) -> Bool {
   let introspector = introspector.untracked()
-  for _, read in self.calls {
+  let answers = read_accelerator.of(introspector.serial)
+  for key, read in self.calls {
     match read.hosts {
-      None => if (read.replay)(introspector) != read.expected { return false }
+      None => {
+        let hash = match answers.get(key) {
+          Some(hash) => hash
+          None => {
+            let hash = (read.replay)(introspector)
+            answers[key] = hash
+            hash
+          }
+        }
+        if hash != read.expected {
+          return false
+        }
+      }
       Some(expected) => {
         // Equal fingerprints and, in the same order, the same host
         // closures. Only the fingerprint of the replayed result is
@@ -606,6 +619,44 @@ pub fn IntrospectionRecorder::validate(
     }
   }
   true
+}
+
+///|
+/// The fingerprints of the results of reads on one introspector, by the
+/// key of the read (comemo's accelerator, `comemo/src/accelerate.rs`: per
+/// tracked value a map from the hash of a call to the hash of its result,
+/// "so that validation makes a call once").
+///
+/// An entry of a store is validated by replaying its reads on the
+/// introspector at hand, and many entries hold the same read: the query of
+/// a counter's updates is a read of the counter sequence at every depth of
+/// the route, of every result that an earlier iteration or compilation
+/// left under the same key, and of every layout that displays the
+/// counter. Each replay hashes the whole result. With the stores kept
+/// across compilations the candidates of earlier compilations are
+/// validated too, and are mostly rejected only after that hash. An
+/// introspector answers the same forever ([Introspector::serial]), so the
+/// fingerprint of an answer is computed once per introspector. Only the
+/// answers of the introspector that was asked last are kept.
+priv struct ReadAccelerator {
+  mut serial : Int64
+  mut answers : Map[U128, U128]
+}
+
+///|
+let read_accelerator : ReadAccelerator = { serial: -1L, answers: {}, }
+
+///|
+/// The answers known for the introspector with this number.
+fn ReadAccelerator::of(
+  self : ReadAccelerator,
+  serial : Int64,
+) -> Map[U128, U128] {
+  if self.serial != serial {
+    self.serial = serial
+    self.answers = {}
+  }
+  self.answers
 }
 
 ///|

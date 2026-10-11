@@ -408,7 +408,7 @@ test "recompile: the fixtures of upstream's watch" {
   // a step at which upstream's watch gives something else.
   let pinned = pinned_sequences()
   assert_eq(pinned.map(fixture => fixture.name), [
-    "getter", "modules", "nan", "plugin",
+    "getter", "limit", "modules", "nan", "plugin",
   ])
   for fixture in pinned {
     assert_true(fixture.steps[0].watch is None)

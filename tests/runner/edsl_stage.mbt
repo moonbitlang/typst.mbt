@@ -357,6 +357,9 @@ fn check_pair(
     let dumper : StructDumper = { elems: [], locations: None, }
     runner_slate()
     let lowered = document.lower(base)
+    // The twin is evaluated from scratch: the lowering left the
+    // evaluations of the files it imported.
+    runner_slate()
     let sink = @library.Sink::new()
     let evaluated = try
       @eval.eval_source(

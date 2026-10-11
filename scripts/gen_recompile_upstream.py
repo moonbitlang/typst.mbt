@@ -165,6 +165,34 @@ def plugin_steps():
     return steps
 
 
+LIMIT_MAIN = (
+    "#set page(width: 60pt, height: 20pt, margin: 0pt)\n"
+    '#import "a.typ" as m\n'
+    "// A function that reads a file and returns the module it captured: a\n"
+    "// result per content of the file, under one key.\n"
+    '#let get() = { let ignored = read("flag.txt"); m }\n'
+    + CELL
+    + "#cell(get() == m)#cell(m == m)\n"
+)
+
+
+def limit_steps():
+    """comemo has no limit of results per key. The flag takes five
+    contents, with a comment in `a.typ` at every step (a new module with
+    the hash of the old one); then the first content again: the call of
+    the first compilation is found, with the module of that evaluation."""
+    steps = [("the project", {"main.typ": LIMIT_MAIN, "a.typ": module_a(0), "flag.txt": "0"})]
+    for i in range(1, 6):
+        steps.append(
+            ("the flag is %d, and a comment in a.typ" % i,
+             {"flag.txt": str(i), "a.typ": module_a(i)})
+        )
+    steps.append(("the flag is 0 again, and a comment in a.typ",
+                  {"flag.txt": "0", "a.typ": module_a(6)}))
+    steps.append(("the flag is 3 again", {"flag.txt": "3"}))
+    return steps
+
+
 # name -> (what the scenario shows, [(note, {path: text or bytes})]); the
 # first step is the project, the others write the files they name.
 SCENARIOS = {
@@ -217,6 +245,14 @@ SCENARIOS = {
         "that asked for it, and then another module than the one a kept "
         "call returns.",
         plugin_steps(),
+    ),
+    "limit": (
+        "More results under one key than the port keeps of one compilation: "
+        "a function that reads a file and returns a module it captured has "
+        "one result per content of the file, and comemo keeps them all until "
+        "they are old. After six contents the first comes back, and the call "
+        "of the first compilation is found, with the module it returned then.",
+        limit_steps(),
     ),
 }
 

@@ -1,0 +1,79 @@
+{
+ "generated": "by scripts/gen_recompile_upstream.py from the upstream binary. DO NOT EDIT.",
+ "upstream": "typst 0.15.1 (e58a63af)",
+ "what": "More results under one key than the port keeps of one compilation: a function that reads a file and returns a module it captured has one result per content of the file, and comemo keeps them all until they are old. After six contents the first comes back, and the call of the first compilation is found, with the module it returned then.",
+ "steps": [
+  {
+   "edit": "the project",
+   "files": {
+    "main.typ": "#set page(width: 60pt, height: 20pt, margin: 0pt)\n#import \"a.typ\" as m\n// A function that reads a file and returns the module it captured: a\n// result per content of the file, under one key.\n#let get() = { let ignored = read(\"flag.txt\"); m }\n#let cell(on) = box(width: 10pt, height: 10pt, fill: if on { black } else { red })\n#cell(get() == m)#cell(m == m)\n",
+    "a.typ": "#let v = 1\n// comment 0\n",
+    "flag.txt": "0"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 1, and a comment in a.typ",
+   "files": {
+    "flag.txt": "1",
+    "a.typ": "#let v = 1\n// comment 1\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 2, and a comment in a.typ",
+   "files": {
+    "flag.txt": "2",
+    "a.typ": "#let v = 1\n// comment 2\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 3, and a comment in a.typ",
+   "files": {
+    "flag.txt": "3",
+    "a.typ": "#let v = 1\n// comment 3\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 4, and a comment in a.typ",
+   "files": {
+    "flag.txt": "4",
+    "a.typ": "#let v = 1\n// comment 4\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 5, and a comment in a.typ",
+   "files": {
+    "flag.txt": "5",
+    "a.typ": "#let v = 1\n// comment 5\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": null
+  },
+  {
+   "edit": "the flag is 0 again, and a comment in a.typ",
+   "files": {
+    "flag.txt": "0",
+    "a.typ": "#let v = 1\n// comment 6\n"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#ff4136\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>"
+  },
+  {
+   "edit": "the flag is 3 again",
+   "files": {
+    "flag.txt": "3"
+   },
+   "fresh": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>",
+   "watch": "<svg viewBox=\"0 0 60 20\" width=\"60pt\" height=\"20pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:h5=\"http://www.w3.org/1999/xhtml\"><path fill=\"#ffffff\" fill-rule=\"nonzero\" d=\"M 0 0v 20h 60v -20Z \"/><g><path fill=\"#ff4136\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g><g transform=\"translate(10)\"><path fill=\"#000000\" fill-rule=\"nonzero\" d=\"M 0 0v 10h 10v -10Z \"/></g></svg>"
+  }
+ ]
+}

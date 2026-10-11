@@ -228,14 +228,20 @@ fn ClosureStore::set_aside(self : ClosureStore) -> () -> Unit {
   let asked = self.asked
   let entries = self.entries
   let bound = self.bound.copy()
+  let bound_bases = self.bound_bases.copy()
   self.asked = {}
   self.entries = {}
   self.bound.clear()
+  self.bound_bases.clear()
+  self.aside = Some((asked, entries))
   () => {
     self.asked = asked
     self.entries = entries
     self.bound.clear()
     self.bound.append(bound)
+    self.bound_bases.clear()
+    self.bound_bases.append(bound_bases)
+    self.aside = None
   }
 }
 

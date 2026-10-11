@@ -675,6 +675,43 @@ test "module store: an entry of an outer scope is found in a scope inside it if 
 }
 
 ///|
+test "module store: an outer scope keeps an entry that it took from a scope inside it" {
+  with_empty_store(() => {
+    let world = store_world("#let v = 1\n")
+    let outer = @library.TrackedWorld::new(world)
+    let inner = @library.TrackedWorld::new(world)
+    let evaluate = (tracked : @library.TrackedWorld) => {
+      eval_source(
+        tracked,
+        world.library,
+        @library.Traced::new(),
+        @library.Sink::new(),
+        @library.Route::root(),
+        world.main,
+      )
+    }
+    let modules = []
+    outer.scoped(() => {
+      inner.scoped(() => {
+        // The scope inside stores the evaluation, the outer one takes it
+        // while both are open.
+        modules.push(evaluate(inner))
+        modules.push(evaluate(outer))
+      })
+      // The scope that stored it is closed. The outer one is not: the
+      // file must stay the module it is for it, whatever is evicted.
+      @library.evict(0)
+      modules.push(evaluate(outer))
+    })
+    assert_true(modules[0] == modules[1])
+    assert_true(modules[1] == modules[2])
+    assert_eq(module_memo_entries(), 1)
+    @library.evict(0)
+    assert_eq(module_memo_entries(), 0)
+  })
+}
+
+///|
 test "module store: an entry is only taken for the source it was computed for" {
   with_empty_store(() => {
     // Two sources of one file with two texts, to which a caller gave the

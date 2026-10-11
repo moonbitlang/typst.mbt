@@ -48,16 +48,18 @@ let pinned_dir : String = "tests/recompile/upstream"
 /// The number of steps at which a run of all pinned sequences must find
 /// the watch loop giving upstream's watch output instead of a fresh
 /// compilation's: the number of steps at which upstream's watch differs
-/// from a fresh compilation, which the run prints (16 with the fixtures of
-/// today: 4 of `getter`, 2 of `nan`, 7 of `modules`, 3 of `plugin`).
+/// from a fresh compilation, which the run prints (18 with the fixtures of
+/// today: 4 of `getter`, 2 of `limit`, 7 of `modules`, 2 of `nan`, 3 of
+/// `plugin`).
 /// Closure calls are kept from one compilation to the next (step 5 of
 /// slice 1 of `docs/incremental-design.md`), so the port's watch loop
 /// shows what upstream's shows, and the acceptance must be exercised at
 /// every one of these steps or the stage fails: a store that no longer
-/// finds its entries (or a plugin whose module is dropped too early or
-/// too late) gives a fresh compilation's pages at one of them. (It was
-/// zero while nothing was kept.)
-let pinned_as_upstream_expected : Int = 16
+/// finds its entries (or drops one before it is old: `limit`; or a
+/// plugin whose module is dropped too early or too late: `plugin`) gives
+/// a fresh compilation's pages at one of them. (It was zero while nothing
+/// was kept.)
+let pinned_as_upstream_expected : Int = 18
 
 ///|
 /// A step of a pinned sequence.

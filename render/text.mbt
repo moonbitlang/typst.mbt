@@ -90,6 +90,10 @@ fn load_pixglyph(font : @library.FontInstance, id : UInt16) -> @pixglyph.Glyph? 
         Some(ttf) => @pixglyph.Glyph::load(ttf, @otf.GlyphId(id))
         None => None
       }
+      // (A function of its key; a cache that is full starts again.)
+      if pixglyphs.length() >= 65536 {
+        pixglyphs.clear()
+      }
       pixglyphs[key] = glyph
       glyph
     }

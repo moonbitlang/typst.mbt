@@ -188,8 +188,21 @@ pub fn layout_memo_entries() -> Int {
 }
 
 ///|
-/// The maximum number of results kept per key (results whose introspector
-/// reads differ, e.g. from different introspection iterations).
+/// The maximum number of results per key among those that were stored or
+/// found since the last [evict] (results whose introspector reads differ,
+/// e.g. from different introspection iterations; not upstream: comemo has
+/// no limit).
+///
+/// Only among those: an entry that an earlier compilation of a watching
+/// process left goes when it is old, as comemo's does, and not because
+/// its key got a fifth result. That can be seen: a function that reads a
+/// file and returns a module it captured has one entry per content of the
+/// file, and after five contents upstream's watch still finds the first,
+/// with the module of that evaluation, which is not `==` to the module of
+/// now (`tests/recompile/upstream/limit.json`). So in a process that
+/// evicts, the ages decide, and a key holds at most this many results per
+/// eviction that is still within `max_age`; in a process that never
+/// evicts, every entry is young and this is the limit it always was.
 let memo_max_entries : Int = 4
 
 ///|
@@ -562,8 +575,19 @@ fn[T, I : Eq] memoize(
   }
   match store.entries.get(key) {
     Some(entries) => {
-      if entries.length() >= memo_max_entries {
-        entries.remove(0) |> ignore
+      // The oldest of the young ones makes room ([memo_max_entries]).
+      let mut young = 0
+      let mut oldest = -1
+      for i, other in entries {
+        if other.age == 0 {
+          young += 1
+          if oldest < 0 {
+            oldest = i
+          }
+        }
+      }
+      if young >= memo_max_entries {
+        entries.remove(oldest) |> ignore
       }
       entries.push(entry)
     }
@@ -1245,10 +1269,16 @@ priv struct ClosureStore {
   mut asked : Map[U128, Int]
   /// By that fingerprint and the parts of the context in `asked`.
   mut entries : Map[U128, Array[ClosureEntry]]
-  /// The keys of the entries that end with their compilation.
+  /// The keys of the entries that end with their compilation, and the
+  /// fingerprints of function and arguments in `asked` that hold a host
+  /// closure themselves: no later compilation asks for those either.
   bound : Array[U128]
+  bound_bases : Array[U128]
   /// Whether [evict] and the end of a compilation know the store.
   mut registered : Bool
+  /// In a second run of the recording check (`memo_check.mbt`): what was
+  /// set aside, for [ClosureStore::original].
+  mut aside : (Map[U128, Int], Map[U128, Array[ClosureEntry]])?
 }
 
 ///|
@@ -1256,7 +1286,9 @@ let closure_store : ClosureStore = {
   asked: {},
   entries: {},
   bound: [],
+  bound_bases: [],
   registered: false,
+  aside: None,
 }
 
 ///|
@@ -1306,6 +1338,53 @@ fn ClosureStore::end_compilation(self : ClosureStore) -> Unit {
     }
   }
   self.bound.clear()
+  for base in self.bound_bases {
+    self.asked.remove(base)
+  }
+  self.bound_bases.clear()
+}
+
+///|
+/// In a second run of the recording check: the result that the first run
+/// got for this call, if the store that was set aside has an entry that
+/// is valid for it (one that the first run found or stored).
+///
+/// The second run computes every call again, for its reads. But what a
+/// call returns is not always what a computation of it returns now: a
+/// call that the first run found returned the module of an earlier
+/// evaluation, and `==` tells that module from the module of now. A
+/// document that goes on to read one file or another by such a comparison
+/// would read another file in the second run, and the check would report
+/// a difference for an entry that is right. So a call of the second run
+/// is computed and then answers what the first run was answered, as an
+/// import of the second run gives the module of the first
+/// (`EvalMemos::original` in `eval/import.mbt`).
+fn ClosureStore::original(
+  self : ClosureStore,
+  base : U128,
+  func : Func,
+  engine : Engine,
+  context : Context,
+  args : Args,
+  depth : Int,
+  collecting : Bool,
+) -> Value? {
+  guard self.aside is Some((asked, entries)) else { return None }
+  guard asked.get(base) is Some(known) else { return None }
+  let flags = fingerprint_flags.val
+  let state = SipHasher128::new()
+  state.write_u128(base)
+  write_asked_context(state, context, known & ((1 << closure_asked_bits) - 1))
+  fingerprint_flags.val = flags
+  guard entries.get(state.finish128()) is Some(entries) else { return None }
+  for entry in entries {
+    if compilation_finds(entry.compilation) &&
+      (!collecting || entry.traced_files is Some(_)) &&
+      entry.matches(func, engine, context, args, depth - entry.depth) {
+      return Some(kept_value(entry.output))
+    }
+  }
+  None
 }
 
 ///|
@@ -1803,6 +1882,17 @@ pub fn memoized_closure(
   }
   let world_reads = world.reads_end(mark)
   finish()
+  // In a second run of the recording check the call answers what the
+  // first run was answered ([ClosureStore::original]).
+  let output = if memo_check_running.val {
+    match
+      store.original(base, func, engine, context, snapshot, depth, collecting) {
+      Some(original) => original
+      None => output
+    }
+  } else {
+    output
+  }
   // A call that read a file that changes during the scope is not kept.
   guard !world_reads.is_volatile() else { return output }
   // (Read again: the call may have stored entries for the same function
@@ -1881,11 +1971,25 @@ pub fn memoized_closure(
   let key = key.hash
   if entry.compilation != 0 {
     store.bound.push(key)
+    if (base_flags & fingerprint_identity) != 0 {
+      store.bound_bases.push(base)
+    }
   }
   match store.entries.get(key) {
     Some(entries) => {
-      if entries.length() >= memo_max_entries {
-        entries.remove(0) |> ignore
+      // The oldest of the young ones makes room ([memo_max_entries]).
+      let mut young = 0
+      let mut oldest = -1
+      for i, other in entries {
+        if other.age == 0 {
+          young += 1
+          if oldest < 0 {
+            oldest = i
+          }
+        }
+      }
+      if young >= memo_max_entries {
+        entries.remove(oldest) |> ignore
       }
       entries.push(entry)
     }

@@ -693,3 +693,57 @@ test "closure memo: sink effects and introspector reads are the caller's" {
   assert_eq(route_query_scopes.val, 0)
   assert_eq(route_shift_scopes.val, 0)
 }
+
+///|
+test "closure memo: the limit per key is on what no eviction has seen yet" {
+  memo_test_begin()
+  defer memo_test_end()
+  // One function and arguments, and a result per introspector: the call
+  // reads the number of labelled elements.
+  let elem = TextElem::packed("x")
+  let introspectors = Array::makei(memo_max_entries + 1, n => {
+    Introspector::new(FixedBackend(Array::make(n, elem)))
+  })
+  let mut runs = 0
+  let body : ClosureBody = (_, _, engine, _, _) => {
+    runs += 1
+    Int(engine.introspector.query_labelled().length().to_int64())
+  }
+  let f = memo_test_func(1)
+  let call = (n : Int) => {
+    let engine = memo_engine(
+      introspector=introspectors[n].track_with(IntrospectionRecorder::new()),
+    )
+    memo_call(f, engine, Context::none(), [], body)
+  }
+  // Without an eviction in between (one compilation, or a process that
+  // never evicts): the oldest result makes room for the fifth.
+  for n in 0..<=memo_max_entries {
+    assert_true(call(n) == Int(n.to_int64()))
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  assert_eq(closure_memo_entries(), memo_max_entries)
+  for n in 1..<=memo_max_entries {
+    call(n) |> ignore
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  call(0) |> ignore
+  assert_eq(runs, memo_max_entries + 2)
+  // With an eviction after each (the compilations of a watching process):
+  // a result goes when it is old, as comemo's does, not because its key
+  // got a fifth. A function that returns a module it captured shows which
+  // (`tests/recompile/upstream/limit.json`).
+  evict(0)
+  runs = 0
+  for n in 0..<=memo_max_entries {
+    call(n) |> ignore
+    evict(10)
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  assert_eq(closure_memo_entries(), memo_max_entries + 1)
+  for n in 0..<=memo_max_entries {
+    assert_true(call(n) == Int(n.to_int64()))
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  evict(0)
+}

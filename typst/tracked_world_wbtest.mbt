@@ -475,3 +475,60 @@ test "scopes: a compilation inside a host function has its own answers, and is n
   })
   inspect(texts.join(" "), content="\"outer/inner 1 outer/inner 2\"")
 }
+
+///|
+test "the recording check: a call of the second run answers what the first run was answered" {
+  // A call that is found returns the module of an earlier evaluation,
+  // which `==` tells from the module of now (upstream's rule, and its
+  // watch's). This document reads one file or the other by that
+  // comparison. The second run of the check computes every call again;
+  // if `get()` returned what a computation returns now, the run would
+  // read the other file and the check would report an entry that is right.
+  @library.evict(0)
+  defer @library.evict(0)
+  let world = reading_world(
+    "#import \"a.typ\" as m\n#let get() = m\n#metadata(read(if get() == m { \"yes.txt\" } else { \"no.txt\" }))",
+    sources=[("a.typ", "#let v = 1\n// 0\n")],
+    data=[("yes.txt", "yes"), ("no.txt", "no")],
+  )
+  let first = checked_compile(world)
+  inspect(first.text, content="\"yes\"")
+  assert_eq(first.differ, [])
+  // A comment in the imported file: another module with the hash of the
+  // first, a main file that is evaluated again, and `get()` found.
+  let id = reading_id("a.typ")
+  world.sources[id] = world.sources
+    .get(id)
+    .unwrap()
+    .replace("#let v = 1\n// 1\n").0
+  let second = checked_compile(world)
+  inspect(second.text, content="\"no\"")
+  assert_eq(second.differ, [])
+  // Without the check the compilation says the same.
+  @library.evict(0)
+  let plain = reading_world(
+    "#import \"a.typ\" as m\n#let get() = m\n#metadata(read(if get() == m { \"yes.txt\" } else { \"no.txt\" }))",
+    sources=[("a.typ", "#let v = 1\n// 0\n")],
+    data=[("yes.txt", "yes"), ("no.txt", "no")],
+  )
+  let texts = []
+  for comment in ["0", "1"] {
+    plain.sources[id] = plain.sources
+      .get(id)
+      .unwrap()
+      .replace("#let v = 1\n// \{comment}\n").0
+    let warned : @library.Warned[
+      Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+    ] = compile(plain)
+    guard warned.output is Ok(document) else { fail("the document compiles") }
+    for
+      elem in document
+      .introspector()
+      .query(Elem(@library.metadata_elem(), None)) {
+      if @library.MetadataElem::of(elem) is Some(metadata) {
+        texts.push(metadata.value().repr())
+      }
+    }
+  }
+  @debug.assert_eq(texts, ["\"yes\"", "\"no\""])
+}

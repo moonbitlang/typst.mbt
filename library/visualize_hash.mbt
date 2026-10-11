@@ -464,6 +464,11 @@ fn font_data_hash(data : Bytes) -> U128 {
   h.write_usize(data.length())
   h.write_bytes(data[:])
   let hash = h.finish128()
+  // An entry keeps its data alive, and a host can load the same font into
+  // new `Bytes` again and again: the oldest goes.
+  if font_data_hashes.length() >= 256 {
+    font_data_hashes.remove(0) |> ignore
+  }
   font_data_hashes.push((data, hash))
   hash
 }

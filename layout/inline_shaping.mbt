@@ -29,6 +29,11 @@ pub fn rusty(font : @library.FontInstance) -> @shape.Face {
         let (tag, value) = entry
         face.set_variation(@otf.Tag::from_str(tag.0), value.get())
       }
+      // (A function of its key; a cache that is full starts again: a
+      // document can make font instances without end, by variations.)
+      if rusty_faces.length() >= 1024 {
+        rusty_faces.clear()
+      }
       rusty_faces[font] = face
       face
     }
@@ -73,6 +78,11 @@ pub fn create_shape_plan(
         language,
         key.features,
       )
+      // (A function of its key, which has the features of the text: a
+      // cache that is full starts again.)
+      if shape_plans.length() >= 4096 {
+        shape_plans.clear()
+      }
       shape_plans[key] = plan
       plan
     }

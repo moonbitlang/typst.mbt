@@ -141,9 +141,12 @@ test "identity: what ends with its compilation is dropped when the outermost com
   })
   @debug.assert_eq(seen, [(2, 2), (3, 3), (3, 3)])
   // Both are gone with the outermost compilation; what any compilation
-  // may find stays.
+  // may find stays. Nothing of them is left: no key, and not what the
+  // calls of the function with the host closure asked of their contexts.
   assert_eq(closure_memo_entries(), 1)
   assert_eq(closure_store.bound.length(), 0)
+  assert_eq(closure_store.bound_bases.length(), 0)
+  assert_eq(closure_store.asked.length(), 1)
   seen.clear()
   engine.world.scoped(() => {
     with_layout_memo(() => {
@@ -228,6 +231,17 @@ test "identity: highlighted raw text under styles with a host closure ends with 
     physical_equal(plain[0].0, elem.highlight(engine, StyleChain::empty())[0].0),
   )
   assert_false(physical_equal(first[0].0, elem.highlight(engine, styles)[0].0))
+  // When the outermost compilation ends, what ended with a compilation
+  // is dropped (it holds the styles, with the host closure): the plain
+  // result stays.
+  assert_eq(raw_highlight_bound.length(), 2)
+  end_compilation_entries()
+  assert_eq(raw_highlight_bound.length(), 0)
+  assert_eq(raw_highlight_cache.length(), 1)
+  let engine = memo_engine()
+  assert_true(
+    physical_equal(plain[0].0, elem.highlight(engine, StyleChain::empty())[0].0),
+  )
 }
 
 ///|

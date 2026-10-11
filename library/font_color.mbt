@@ -78,6 +78,10 @@ pub fn glyph_frame(font : FontInstance, glyph_id : UInt16) -> GlyphFrame? {
     Some(frame) => frame
     None => {
       let frame = glyph_frame_impl(font, glyph_id)
+      // (A function of its key; a cache that is full starts again.)
+      if glyph_frame_cache.length() >= 65536 {
+        glyph_frame_cache.clear()
+      }
       glyph_frame_cache[(font, glyph_id)] = frame
       frame
     }

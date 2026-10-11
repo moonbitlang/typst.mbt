@@ -284,6 +284,14 @@ fn RawElem::highlight(
       compilation,
       lines: lines.copy(),
     }
+    if compilation != 0 {
+      // It ends with this compilation, and is dropped when that ends.
+      if !raw_highlight_ends.val {
+        raw_highlight_ends.val = true
+        compilation_enders.push(raw_highlight_end_compilation)
+      }
+      raw_highlight_bound.push(key)
+    }
     match found {
       Some(entries) => {
         if entries.length() >= memo_max_entries {
@@ -295,6 +303,30 @@ fn RawElem::highlight(
     }
   }
   lines
+}
+
+///|
+/// The keys of the highlighted texts that end with their compilation (a
+/// host closure in their styles, [MemoKey::compilation]), and whether the
+/// end of a compilation knows about them.
+let raw_highlight_bound : Array[U128] = []
+
+///|
+let raw_highlight_ends : Ref[Bool] = { val: false, }
+
+///|
+/// Drops the highlighted texts that ended with their compilation
+/// ([end_compilation_entries]): nothing finds them afterwards, and they
+/// hold the styles, with the host closures in them.
+fn raw_highlight_end_compilation() -> Unit {
+  for key in raw_highlight_bound {
+    guard raw_highlight_cache.entries.get(key) is Some(bucket) else { continue }
+    bucket.value.retain(entry => entry.compilation == 0)
+    if bucket.value.is_empty() {
+      raw_highlight_cache.entries.remove(key)
+    }
+  }
+  raw_highlight_bound.clear()
 }
 
 ///|
