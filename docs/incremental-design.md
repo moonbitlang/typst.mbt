@@ -1,7 +1,10 @@
 # Incremental compilation: design
 
-Status: slice 0 and steps 1 to 4 of slice 1 are built (5.5, "As built";
-section 8, "Step 3 as built" and "Step 4 as built"); the rest is design.
+Status: slice 0 and slice 1 are built (5.5, "As built"; section 8, "Step 3
+as built", "Step 4 as built" and "Step 5 as built"): the stores of
+memoized calls outlive their compilation, with comemo's ages, and `typst
+watch` recompiles a small edit in a fraction of a first compilation. Slices
+2 and 3 are design.
 Module equality was decided by the owner on 2026-10-11, against the
 recommendation of revisions 3 and 4: exactly as upstream (5.4, "Modules").
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
@@ -19,11 +22,13 @@ revision 5 answers it and says what was built. Upstream
 `--ignore-system-fonts`, PDF output, other agents building on the same
 machine (medians of five; the spread is given where it matters).
 
-The port recompiles from scratch in `typst watch`. Upstream keeps comemo's
-caches between compilations and recompiles a small edit in a fraction of the
-time. This document says what the port must keep, how a kept result learns
-that it is still valid, what it costs in memory, and in which order to build
-it. Section 3 has the measurements the order rests on.
+The port recompiled from scratch in `typst watch` when this was written.
+Upstream keeps comemo's caches between compilations and recompiles a small
+edit in a fraction of the time. This document says what the port must keep,
+how a kept result learns that it is still valid, what it costs in memory,
+and in which order to build it. Section 3 has the measurements the order
+rests on; "Step 5 as built" in section 8 has what the existing stores,
+kept, gave.
 
 ## 0. Summary
 
@@ -61,7 +66,10 @@ it. Section 3 has the measurements the order rests on.
   that costs: a recompilation can give what upstream's `typst watch`
   gives where that is not what a compilation from scratch gives (5.4).
 - The numbers for what is not built are a probe's, which validated less
-  than the design does: they are upper bounds of the gain.
+  than the design does: they are upper bounds of the gain. For slice 1
+  they held (section 8, "Step 5 as built": the first line of this summary
+  as measured is `long.typ` 243 ms to 96.7 ms, `longer.typ` 1260 ms to 509 ms,
+  the touying document 167 ms to 25.9 ms).
 
 ## 1. What upstream does
 
@@ -173,7 +181,8 @@ the same store.)
   patterns, `font_data_hashes`), and the CLI's page cache for PNG and SVG
   (`ExportCache`, `cli/compile.mbt`).
 - The stores are not dropped when a compilation ends but when the next one
-  starts: a watching process holds them while it waits.
+  starts: a watching process holds them while it waits. (Since step 5 of
+  slice 1 they are not dropped at all: `evict` ages them.)
 - Two caches are keyed by less than what their values depend on, which is
   harmless while nothing outlives a compilation (5.5): the syntaxes and
   themes of raw elements by their source (`raw_syntaxes_derived`,
@@ -1460,6 +1469,19 @@ then not decoded again every tenth compilation). The fingerprints of
 sources by revision and of bytes by file id are tables that hold what they
 describe; their entries age like the rest.
 
+*As built* (step 5 of slice 1; section 8, "Step 5 as built", has the
+whole of it). As above, with these differences. The fingerprint of a
+source is kept in the source (5.2) and that of bytes in `data_hashes`,
+which is swept as before, so there is no table of them to age. Module
+evaluations have a limit of twelve per source, not four, which `evict(10)`
+never reaches: there the ages decide, as comemo's (both limits count
+what is young only: deviation 4). Entries that end with
+their compilation (a host closure in the key) are dropped when the
+outermost compilation ends. `evict` may be called during a compilation
+and then spares the module evaluations of open scopes. With memoization
+off a compilation neither takes nor leaves anything. The measured peaks
+are in "Step 5 as built", "Memory".
+
 ### 6.2 What a store costs
 
 Live bytes of the allocator (mimalloc's `mi_heap_visit_blocks`, after
@@ -1523,11 +1545,11 @@ same shape.
 
 | cache | today | design |
 | --- | --- | --- |
-| capture table (`eval/captures.mbt`) | per compilation | per compilation (5.4) |
+| capture table (`eval/captures.mbt`) | per compilation | per compilation (5.4). As built: confirmed in step 5, with its cost (section 8, "Step 5 as built") |
 | world answers, log (new) | | per scope |
-| shape plans, rustybuzz faces, overhang tables, `font_data_hashes`, glyph outlines, bitmaps, colour glyph frames, and the instances a font keeps of itself (`OtfFontFace.instances`, `library/font.mbt`) | process or font object, by font, glyph, variation coordinates, shaping features; nothing ever drops them, `evict` included | registered with `evict`: dropped by `evict(0)`, otherwise kept. They grow with the fonts, glyphs, variation coordinates and feature sets a session has used, not with its edits; a document that animates a variation axis, or a host that replaces font data, frees them with `evict(0)` |
-| numbering patterns | process, by pattern string | aged |
-| raw syntaxes and themes, bibliographies, CSL styles, PDF documents, plugins and their calls | dropped as a whole every `max_age`-th `evict` | aged per entry |
+| shape plans, rustybuzz faces, overhang tables, `font_data_hashes`, glyph outlines, bitmaps, colour glyph frames, and the instances a font keeps of itself (`OtfFontFace.instances`, `library/font.mbt`) | process or font object, by font, glyph, variation coordinates, shaping features; nothing ever drops them, `evict` included | registered with `evict`: dropped by `evict(0)`, otherwise kept. They grow with the fonts, glyphs, variation coordinates and feature sets a session has used, not with its edits; a document that animates a variation axis, or a host that replaces font data, frees them with `evict(0)`. Not built in step 5: they are as they were, never dropped, also not by `evict(0)` (they are functions of a font's data, so a reference of the harness that shares them shares no result that could be stale; what is open is the memory of a host that replaces fonts) |
+| numbering patterns | process, by pattern string | aged. As built (step 5): a `ContentCache` by the hash of the string |
+| raw syntaxes and themes, bibliographies, CSL styles, PDF documents, plugins and their calls | dropped as a whole every `max_age`-th `evict` | aged per entry. As built (step 5): each a `ContentCache` |
 | decoded raster and SVG images, highlighted raw text (section 8, slice 0) | not kept | aged per entry |
 | CLI `ExportCache` | per watch session | unchanged |
 
@@ -1539,6 +1561,9 @@ of entries of each after `longer.typ` and after the `packages` stage.
 - **`typst watch`** (`cli/watch.mbt`): one process, one `SystemWorld`, one
   `Library`. Everything above applies; the loop already calls
   `world.reset()` before and `@library.evict(10)` after a recompilation.
+  (As built in step 5 of slice 1: nothing in `cli/` changed. The loop was
+  upstream's already; what changed is that the stores no longer empty
+  themselves.)
 - **A host that keeps a world** (`@typst.compile`): the contract is
   comemo's. The world may change between compilations and not during one;
   the host calls `@library.evict(n)` between compilations or memory grows
@@ -1552,7 +1577,8 @@ of entries of each after `longer.typ` and after the `packages` stage.
   the file: little that came from that file is found again. A world that
   returns the same `Bytes` object for an unchanged file saves its hashing.
   Stores are process-wide, so two worlds in one process share results where
-  they give the same answers, as with comemo.
+  they give the same answers, as with comemo. (As built: the doc comment
+  of `@typst.compile_with` is this contract.)
 - **`typst compile`, `query`, `eval`**: one compilation, nothing to reuse;
   slice 0 and the block level are what they get. The evaluation of
   `eval`'s and `query`'s strings is a scope of its own (5.2).
@@ -1566,7 +1592,11 @@ of entries of each after `longer.typ` and after the `packages` stage.
   `doc/lower.mbt`). The design does nothing for `doc` beyond not breaking
   it: no persistent cache, no stable identities for callbacks. If a
   long-lived `doc` host appears (a preview server), that is a design of its
-  own.
+  own. (As built in step 5: one thing more. A compilation or lowering of
+  `doc` ends with `@library.evict(10)`, as a recompilation of `typst
+  watch` does. Without it a process that compiles many documents would
+  hold all of them where it held one before the stores were kept, and a
+  `doc` user has no reason to know that `evict` exists.)
 
 ## 8. Slices
 
@@ -1702,7 +1732,7 @@ is made), content streams (krilla memoizes their deflation) and fonts.
 
 One slice because nothing may be kept before all of it is there. Five
 steps, each merged on its own; results cannot become stale before step 5.
-Step 1 is built.
+All five are built.
 
 1. **Scopes and recording.** Built (`library/tracked_world.mbt`,
    `library/memo_check.mbt`). Scopes (5.2) at every entry point, replacing
@@ -1769,7 +1799,8 @@ Step 1 is built.
    object in entries; the copies and views of 5.4's rule for mutable
    results; and the harness accepts upstream's own difference between a
    recompilation and a fresh compilation where it is pinned (9.1).
-5. **Ages.** `evict` as in 6.1; the stores stop clearing themselves, one
+5. **Ages.** Built ("Step 5 as built" below). `evict` as in 6.1; the
+   stores stop clearing themselves, one
    store per commit in the order modules, closure calls, layouts, counter
    sequences and works, each with the harness and its numbers. Before the
    last of them is merged: the peak of the live heap over the harness's
@@ -2307,6 +2338,718 @@ is still taken by its key (no such value is known; "For step 5" below).
   a compilation from scratch computes, and the oracle cases of the kind
   `memoized` are not compared with memoization off.
 
+#### Step 5 as built
+
+Ages. The stores of memoized calls outlive their compilation, which is
+what the four steps before this one were for, and `typst watch`
+recompiles a small edit in a fraction of a first compilation. Nothing in
+`cli/watch.mbt` changed: its loop was upstream's already (`world.reset()`,
+the compilation, `@library.evict(10)` where upstream calls
+`comemo::evict(10)`, `typst-cli/src/watch.rs:83`). What changed is that
+nothing empties a store any more.
+
+**comemo's rule, and where it is in the port.** `comemo/src/memoize.rs`:
+
+    pub fn evict(max_age: usize) {                       // :100
+        for subevict in EVICTORS.read().iter() { subevict(max_age); }
+        accelerate::evict();
+    }
+    fn evict(&mut self, max_age: usize) {                // :150, CacheData
+        self.tree.retain(|entry| {
+            let age = entry.age.get_mut();
+            *age += 1;
+            *age <= max_age
+        });
+    }
+    .inspect(|entry| entry.age.store(0, Ordering::SeqCst))   // :166, lookup
+
+An entry is inserted with age zero (`:183`), every `evict` adds one and
+keeps it while the age is at most `max_age`, a hit sets it to zero, and
+`evict(0)` drops everything. So an entry survives `max_age` evictions
+without a hit and goes with the next. Every store has exactly that:
+
+| store | entry | found by, valid by | a hit | evictor | limit per key |
+| --- | --- | --- | --- | --- | --- |
+| module evaluations (`eval/import.mbt`, `eval_memo`) | `EvalMemo.age` | the source's fingerprint; the same source, library, route answers and depth, traced answers, world reads (step 3) | `age = 0` | `EvalMemos::evict`, registered with the first entry | 12 of age zero (`eval_memo_max_entries`) |
+| closure calls (`library/memo.mbt`, `closure_store`) | `ClosureEntry.age` | function, arguments, traced span, asked parts of the context; arguments exactly, library, route, introspector reads, world reads | `age = 0` | `ClosureStore::evict` | 4 of age zero (`memo_max_entries`) |
+| what the calls of one function and arguments asked of their contexts (`ClosureStore.asked`) | the eviction count of its last use, above the three flag bits | the fingerprint of function and arguments | written when it differs from the count of now: once per fingerprint between two evictions | the same evictor | one value |
+| layouts (`layout_store`), counter sequences (`counter_sequence_store`), works (`works_store`): `memoize` | `MemoEntry.age` | the key of the call; arguments exactly, library, introspector reads, world reads (the works: route tracked) | `age = 0` | `MemoStore::evict`, one per store | 4 of age zero |
+| results by content: decoded raster images, highlighted raw text, the PDF exporter's images (slice 0) | `ContentEntry.age` | what upstream hashes | `age = 0` | `ContentCache::evict` | one per key (raw text: 4) |
+| decode caches: syntaxes and themes of `raw`, bibliographies, CSL styles, PDF documents, plugin modules, plugin calls and transitions, numbering patterns | the same (`ContentCache`, new in this step) | the hash of the bytes (plugins: of plugin, function and arguments; patterns: of the string) | `age = 0` | the same | one per key |
+
+`@library.evict(max_age)` calls every registered evictor and sweeps the
+hashes of data (`data_hashes`, as before). There is no list of caches in
+`evict` any more: the count of calls and the wholesale drop on every
+`max_age`-th call are gone.
+
+**The order.** One store per commit, each with the `recompile` stage, the
+recording check and its mutation (the numbers are in "Mutation checks"
+and "Measured" below):
+
+1. the decode caches get ages, the plugin sequence of upstream's watch is
+   recorded and pinned, the references of the stage are computed after
+   `evict(0)`;
+2. module evaluations are kept;
+3. closure calls are kept, and `pinned_as_upstream_expected` is 16;
+4. layouts are kept;
+5. the counter sequence and the works are kept, and `MemoStore` loses its
+   generation;
+6. the hosts;
+7. what the review found (below), with a fifth sequence of upstream's
+   watch (`pinned_as_upstream_expected` is 18), and the accelerator of
+   introspector reads.
+
+**What the earlier steps had left for this one.**
+
+*Plugins* (5.4, "Plugins"; "For step 5" of step 4). Upstream memoizes
+`Plugin::module(bytes)` (`typst-library/src/foundations/plugin.rs`), so
+the module of a plugin is one object for as long as comemo's entry lives,
+and `==` compares module objects. With closure calls kept, a document can
+see the age of that entry. What upstream's watch does was recorded with
+the upstream binary (`plugin.rs:261`; `scripts/gen_recompile_upstream.py`,
+scenario `plugin`; `tests/recompile/upstream/plugin.json`, 15 steps): a
+project with three plugins that export no function, one loaded by the main
+file and two by imported files, with getters `mine() = q`, `early() = p`,
+`late() = r` in the main file and the boxes `mine() == q`, `early() == p`,
+`late() == r`.
+
+| step | what changes | upstream's watch | a fresh compilation |
+| --- | --- | --- | --- |
+| 1 to 10 | the main file (a comment) | true, true, true | the same |
+| 11 | a comment in the file that loads `p`: ten evictions after `p` was loaded | true, true, true: the entry is alive, the plugin is the module it was | the same |
+| 12 | a comment in the file that loads `r`: eleven evictions after | true, true, **false**: the entry was evicted, `r` is loaded again as another module, and `late()` is found and returns the old one | true, true, true |
+| 13, 14 | the main file; the first file again | true, true, **false** | true, true, true |
+
+The plugin of the main file is asked for in every compilation and stays
+one module for the whole session. The port's plugin caches were dropped
+as a whole on every tenth `evict`, used or not: at step 10 all three
+modules would have been dropped, and steps 11 to 14 would show `false`
+where upstream shows `true`. They are `ContentCache`s now, the watch loop
+gives upstream's boxes at all 15 steps, and the stage's count of pinned
+steps fails if an entry lives one eviction longer or shorter (mutation
+checks). A fixture can hold binary
+files (hexadecimal, `binary`).
+
+*The other decode caches.* None of their results compares by identity
+(a syntax and a theme compare by the hash of their bytes, 5.5; a
+bibliography, a CSL style and a PDF document are data), so for them the
+ages are what 6.1 wanted them for: what is in use is not decoded again
+every tenth compilation. They were arrays searched by comparing bytes, or
+maps keyed by the bytes; they are found by `data_hash` now, which is
+computed once per `Bytes` object.
+
+*The module store* is registered with `evict` (above).
+
+*Limits per key.* `memo_max_entries` (4, first in, first out) was a
+limit of entries of one compilation, since a store was emptied when the
+next one started. Kept across compilations as it was, it would drop the
+first result of a key when the key got its fifth, whatever its age, and
+that can be seen (the review found it): a function that reads a file and
+returns a module it captured has one result per content of the file, and
+upstream's watch still finds the first result after six contents, with
+the module of that evaluation, which is not `==` to the module of now
+(`tests/recompile/upstream/limit.json`, recorded from the upstream
+binary: `false` at the two steps where a content comes back). comemo has
+no limit. So the limit is on the entries that were stored or found since
+the last `evict` (age zero): within a compilation it is what it was, in a
+process that never evicts every entry is young and it bounds the store as
+before, and in a process that evicts, an entry of an earlier compilation
+goes by its age, as comemo's. A key then holds at most four results per
+eviction that is still within `max_age`. Module entries had no limit;
+they have the same rule with 12 (`eval_memo_max_entries`), and an entry
+that a scope that is still open stored or took is not dropped for it, so
+within a compilation a file is one module for every import that asks the
+same, as upstream.
+
+*The references of the stage* are computed after `evict(0)`, with
+memoization on and off, and share nothing with the watch loop; the
+mutation checks below show by what. (`evict(1)`, which the stage called
+while only the decode caches outlived a compilation, does not empty what
+has an age. It happened to be enough for the loop's entries, each of
+which the loop's own `evict(10)` has made one eviction old; `evict(0)`
+does not rest on that.)
+
+*`eval_memo_kept`*, the private switch of the tests of steps 3 and 4, is
+gone. `memo_test_next_compilation` (step 4's tests) stays: it starts a
+compilation by hand without ending the one before, so that what its tests
+show is that an entry with a host closure in its key is not found, not
+that it was dropped.
+
+*The capture table* (`eval/captures.mbt`) stays per compilation. With
+persistent trees an entry would be valid forever (rule 1 of 5.5 with the
+node as the key), so this is a question of cost alone. What a kept table
+would save is the analysis and the node hash of the closure and context
+expressions that a recompilation evaluates, and those are the expressions
+of the files that changed: the module of every other file is found as a
+whole, with its closures, which hold their captured scopes and the cached
+hash of their node. Measured against a build that never drops the table
+(medians of fifteen recompilations in three watch sessions): the touying
+document after an edit of its main file 23.9 ms with the table dropped and
+23.1 ms with it kept, after an edit of a file of the package 117 ms and
+116 ms, the project `notes` 8.2 ms and 8.2 ms; the differences are inside
+the spread. What it would cost is a table that holds a node of every
+expression of every version of every file, with ages and an evictor. It
+stays as it is.
+
+**With memoization off** (`set_layout_memo_enabled(false)`), a compilation
+takes nothing from an earlier one and leaves nothing for a later one.
+`memoize` and `memoized_closure` are not asked (as before), the results
+kept by content neither, and the module store answers within the scope
+only: an entry that such an evaluation stores ends with its scope
+(`EvalMemo.scoped`), and it takes no entry of a scope that is closed
+(`EvalMemo::lives`). The store cannot simply be off, since a file is one
+module for all imports of a compilation with or without memoization.
+Found by a test that passed for the wrong reason: `typst/modules_wbtest.
+mbt` compiles one document with memoization on and then off, and the
+second compilation found the first's evaluation of the main file, with
+the answers of memoized calls in it. So `evict(0)` is a first compilation
+with memoization, and `evict(0)` with the switch off is a clean slate;
+the decode caches do not ask the switch (a plugin loaded twice in one
+compilation is one module, which a document can see), and `evict(0)`
+empties them.
+
+**`evict` at any time.** Upstream calls it between compilations. Here a
+host function can call it inside one (a compilation of `doc` inside a
+callback ends with it). Nothing holds on to an array of entries across
+the call it memoizes (the module store read its array before the
+evaluation and pushed to it after; it reads the store again), and the
+evaluations of files that an open scope stored or took are not dropped
+or aged: a file that is imported again in that compilation must be the
+module it was (deviation 17). The scope that keeps an entry is the
+outermost open one that stored or took it (scopes nest; the review found
+that an entry taken by an outer scope from a scope inside it went with
+the inner one).
+
+**Entries that end with their compilation** (a host closure in the key,
+`MemoKey::compilation`) were emptied with their store when the next
+compilation started. Now the rule of step 4 is what keeps a later
+compilation from finding them (`compilation_finds`), and they are dropped
+when the outermost compilation ends (`end_compilation_entries`; a store
+registers for it with its first such entry, so a process without host
+closures runs nothing), since nothing can find them afterwards. The same
+for what belongs to them (the review): highlighted raw text under styles
+with a host closure, and what the calls of a function with a host
+closure asked of their contexts.
+
+**The recording check** (`--check-reads`) computes every entry that is
+about to be kept a second time. With kept stores an entry that is found
+is not computed, so fewer entries are checked (the `recompile` stage:
+80 787, where step 4 had 125 391). Its second run must leave no trace in
+what has an age: the stores are set aside as before, and a
+`ContentCache` neither makes an entry young nor takes a new one while it
+runs. Without that, the stage under `--check-reads` gave upstream's watch
+output at 13 of the 16 steps that were pinned then: the second run
+evaluates the files that the first run found evaluated, so the plugins of
+the imported files were asked for in every compilation and never got old.
+And a call of the second run answers what the first run was answered
+(`ClosureStore::original`, as an import of the second run gives the
+module of the first): the first run may have found the call, with the
+module of an earlier evaluation, and a document that reads one file or
+another by comparing that module with the module of now would read the
+other file in a run that computes the call (the review; `typst/
+tracked_world_wbtest.mbt`). The check on the step as committed: `paged`
+33 509 entries, `edsl` 82 738, `recompile` 80 787, `packages` 1 307 462,
+no difference.
+
+**Hosts.**
+
+- *`typst watch`*: as above. The scenarios of `scripts/watch_check.py`
+  pass on native and on wasm (14 scenarios on native; on wasm 13, and
+  `links` skipped as before: that build cannot tell a symbolic link);
+  five of them are new, `pinned-*`, which replay the fixtures of
+  `tests/recompile/upstream`
+  with both binaries: there, and nowhere else in that script, the output
+  of a recompilation is compared with what upstream's watch wrote and
+  not with a fresh `typst compile`.
+- *`typst compile`, `query`, `eval`*: one compilation, nothing found,
+  nothing evicted. What the machinery costs them is below ("Measured").
+- *A host that keeps a world* (`@typst.compile`, `compile_with`): the
+  contract of section 7, now in the doc comment of `compile_with`. It
+  keeps its library, book, fonts and sources as objects and calls
+  `evict`.
+- *`doc`*: a compilation or a lowering ends with `@library.evict(10)`
+  (deviation 20). A script that compiles one document does not notice.
+  When a process compiles several: the layout of content that is equal
+  with its origins, the calls of Typst functions (from `Markup` and from
+  packages), the evaluations of imported files and packages (validated
+  against the new session's world, whose files answer the same) and what
+  is kept by content are found again; what involves a callback has a
+  host function in its key and ends with its compilation; what read the
+  origin listing or a snippet read a volatile file and was never kept
+  (`doc/volatile_test.mbt`, whose count of reads changed: a later
+  lowering reads a data file once to see that the kept evaluation is not
+  for it, and once to evaluate).
+- *The runner*: a stage that compares with upstream's compilation from
+  scratch calls `@library.evict(0)` before every compilation
+  (`runner_slate`), so that a case is a first compilation whatever ran
+  before it and whatever the filter is. `--keep-memo` makes that
+  `evict(10)`: the cases of a stage then share the stores like the
+  compilations of a host with many worlds. `paged --keep-memo`: 2299 of
+  2299 pass, and so they do with no eviction between the cases at all
+  (the runner of the commit before `runner_slate`; 335 MB instead of
+  235 MB).
+- *Unit tests* share a process per package and call the same functions
+  with the same arguments, so a test whose expectations count
+  computations starts with `evict(0)` (`memo_test_begin`, `read_test`,
+  `with_empty_store`, the works tests). The tests that relied on a fresh
+  store, each looked at: the closure-store and tracked-world tests of
+  `library` (8 tests found the entries of the tests before them: the
+  helpers evict); "each compilation has its own results", which is no
+  longer true and is now a test of the ages; highlighted raw text
+  outside of a compilation (its count of entries); the works tests of
+  `typst`, whose helper compiles a document and then asks for the works
+  with the document's introspector, and finds what the compilation
+  generated (the helper evicts); the depth test of the module store (a
+  second world with the same file finds the first world's evaluation);
+  `typst/modules_wbtest.mbt` (above: the store boundary was wrong, not
+  the test); `doc/volatile_test.mbt` (above). `moon test`: 6156 tests,
+  none failing.
+
+**Mutation checks.** Each put in by hand (a script per mutation, applied
+to a copy of the tree, never committed), on the default `recompile` stage
+of the final tree: 242 sequences. `tests/recompile/README.md` has the
+table in full; in short:
+
+| what was broken (number in 9.1) | failing sequences | first exposed at |
+| --- | ---: | --- |
+| module entries: world reads not validated (README 1) | 127 | `bench/showcase`, sweep, step 2; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| layouts, counter sequences, works: world reads not validated (README 2) | 69 | `bench/tiny`, sweep, step 1 |
+| closure calls: world reads not validated (README 3) | 13 | `project/book`, sweep, step 1; the watch loop gives upstream's watch output at 16 of the 18 pinned steps |
+| all three at once | 176 | `bench/tiny`, sweep, step 1; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| `import_file` reads the source around the tracked method [1] | 47 | `project/book`, sweep, step 1; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| `DataSource::load` reads the file around the tracked method [2] | 88 | `bench/showcase`, sweep, step 2; the watch loop gives upstream's watch output at 13 of the 18 pinned steps |
+| `resolve_package` reads the manifest around the tracked method [3] | 9 | `suite/scripting/import.typ/import-from-package-items`, sweep, step 1 |
+| a failed read is not recorded [4] | 9 | `suite/model/bibliography.typ/bibliography-multiple-files`, random sequence, step 5 |
+| `today` does not record [5] | 5 | `project/book`, sweep, step 1 |
+| `book` does not record [6a] | 0 | no sequence: the stage's edit of the fonts changes the book and the fonts, and the other read rejects the entry (with neither recorded: the row below). `library/tracked_world_wbtest.mbt`, 4 tests; `paged --check-reads`: 22 964 of 33 509 entries differ, in 1683 tests |
+| `font` does not record [6b] | 0 | no sequence, for the same reason. The same 4 tests; `paged --check-reads`: 22 800 entries differ, in 1657 tests |
+| neither `book` nor `font` records [6a and 6b] | 68 | `bench/tiny`, sweep, step 1 |
+| the reads of an entry that is taken are not noted for the calls around it [7] | 15 | `project/book`, sweep, step 11; the watch loop gives upstream's watch output at 17 of the 18 pinned steps |
+| a source is its id and text to the module store, also after an edit [8] | 61 | `bench/tiny`, random sequence, step 3; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| the reparser writes to the nodes it is given (`SyntaxNode::make_mut` copies nothing) [9] | 0 | no sequence: a recompilation evaluates the file that changed again, with the capture analysis and the closure hashes of its nodes as they are now, and finds nothing that was made from the nodes as they were. `syntax/persistent_test.mbt` (4 tests), `syntax/persistent_property_test.mbt`, `typst/persistent_wbtest.mbt` ("a closure of an earlier evaluation runs the body it was made from") |
+| the capture table finds an analysis by span alone [10] | 0 | no sequence (the table is per compilation). `eval/captures_wbtest.mbt`, "captures: kept per node for one compilation": the test executable aborts |
+| the introspector reads of an entry are not validated [11] | the runner aborts (exit status 134) | before the first sequence is done, as in step 4: a kept layout holds locations that the introspector at hand does not know |
+| the library is not compared, in all three stores [12] | 1 | `project/notes`, sweep, step 2 |
+| the stores take modules by identity instead of by their hashes [13] | 1 | `upstream/modules`, the pinned sequence, step 1; the watch loop gives upstream's watch output at 11 of the 18 pinned steps |
+| the sink of an entry that is found is not replayed [14] | 11 | `suite/introspection/query.typ/query-running-header`, random sequence, step 5 |
+| an entry that was validated in any scope passes in every scope [17] | 176 | `bench/tiny`, sweep, step 1; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| a module entry hands out the errors it keeps [18] | 1 | `suite/scripting/import.typ/import-cyclic-in-other-file`, sweep, step 2 |
+| no file is volatile [19] | 0 | no sequence (no document of the stage has a file that changes during a scope). `doc/volatile_test.mbt`, `library/tracked_world_wbtest.mbt` (2), `typst/tracked_world_wbtest.mbt`: 4 tests |
+| the equality of an SVG image leaves out the images it links [20b] | 0 | no sequence. `library/works_wbtest.mbt` ("svg: an image is its data, its fonts, .."), `typst/state_outside_wbtest.mbt` ("svg: a tiling of an SVG is as good as the images the SVG links") |
+| native functions are fingerprinted by their names [22] | 0 | no sequence (no two functions of the standard library share a name). `library/descriptor_identity_wbtest.mbt`, 3 tests |
+| the fingerprint of an SVG image leaves out the images it links [20a] (README 4) | 3 | `project/linked`, sweep, step 5 |
+| the works are found by their elements alone, without a read of the files [16] (README 5) | 1 | `suite/model/bibliography.typ/bibliography-multiple-files`, sweep, step 3 |
+| the plugin caches are also dropped as a whole on every tenth `evict`, as they were | 1 | `upstream/plugin`, the pinned sequence, step 8; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| a `ContentCache` drops an entry one eviction early (`age >= max_age`) | 1 | `upstream/plugin`, the pinned sequence, step 11; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| a `ContentCache` keeps an entry one eviction longer | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; no sequence fails by itself: the pinned plugin sequence gives a fresh compilation's pages where upstream's watch does not |
+| a hit does not make an entry of a store young | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; no sequence fails by itself |
+| the limit per key counts every entry, whatever its age (as it did) | 0 | the watch loop gives upstream's watch output at 17 of the 18 pinned steps; no sequence fails by itself: the pinned sequence `limit` gives a fresh compilation's pages at the step where the first content comes back. `library/memo_closure_wbtest.mbt`, "the limit per key is on what no eviction has seen yet" |
+| a hit in a second run of the recording check makes a `ContentCache` entry young (`--check-reads`) | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; the count of pinned steps, under `--check-reads` only |
+| a closure call of the second run of the recording check goes on with what it computed (`--check-reads`) | 0 | no sequence under `--check-reads` (no document of the stage reads a file by a comparison of modules). `typst/tracked_world_wbtest.mbt`, "the recording check: a call of the second run answers what the first run was answered" |
+| an entry with a host closure in its key is found by any compilation, and is not dropped when its own ends | 0 | no sequence (no host closure in the stage). `library/memo_identity_wbtest.mbt`, 4 tests |
+| what ends with its compilation is not dropped when the outermost compilation ends | 0 | no sequence. `library/memo_identity_wbtest.mbt`, 2 tests |
+| with memoization off an evaluation takes the entries of earlier scopes | 0 | no sequence (a reference of the stage starts after `evict(0)`). `eval/import_wbtest.mbt` ("with memoization off an entry ends with its scope"), `typst/modules_wbtest.mbt` |
+| an outer scope does not become the keeper of a module entry that it takes from a scope inside it | 0 | no sequence. `eval/import_wbtest.mbt`, "an outer scope keeps an entry that it took from a scope inside it" |
+| the accelerator of introspector reads has one answer per introspector, whatever the read | the runner aborts (exit status 134) | before the first sequence is done |
+| the accelerator of introspector reads answers for any introspector | the runner aborts (exit status 134) | before the first sequence is done |
+
+"No sequence" rows are mutations of things that no document of the
+stage can reach (a host closure, a volatile file, two functions with one
+name) or that another check is for; each is exposed by the tests named.
+Three rows fail no sequence by themselves and are caught by the count of
+pinned steps alone, which is why the count is part of the verdict: an
+entry that lives one eviction longer, a hit that does not make an entry
+young, and the limit per key as it was. The stage's edit of the fonts
+changes the book and the fonts together, so `book` and `font` not
+recording are each hidden by the other there (6a, 6b) and are seen
+together (68 sequences) and one by one by the recording check.
+
+That the references share nothing with the loop: with no eviction before
+a reference and everything else as it is, 0 sequences fail (a
+reference is a new world with a library object of its own, and no entry
+of the loop is one for it); with the library not compared and the
+validation of world reads off besides, 181 fail, 115 of
+those failures seen by the reference without memoization alone, since
+the reference with memoization is then answered from the loop's stores
+and is wrong with it (with `evict(0)` and the same three validations
+off: 176, 4 by that reference alone). `evict(0)` is
+what makes the reference with memoization independent when everything
+else fails, and memoization off what makes the second reference so.
+
+**Soak.** `scripts/recompile_soak.py` on the final tree: 126 documents,
+seeds 9000 to 9012, 36.9 minutes with 12 jobs (while the other gates of
+the step ran on the machine): 1638 runs, 7930 sequences, 90 237 steps, 267
+045 compilations, 4849 steps compiled again as the first compilation of a
+new process; 0 failures, 0 aborts.
+
+**Measured.** aarch64 macOS, native release, PDF output,
+`--ignore-system-fonts`, `scripts/watch_check.py --bench`: per document
+five watch sessions of every binary in turns, each a first compilation and
+five edits of every kind (every edit from the file as it was at first; the
+durations of the status lines; medians of the 25 recompilations, of the
+five first compilations). The machine was not quiet (other builds, the
+mutation checks of this step, and three groups of documents measured at
+once): the least of a row is up to 24 % below its median, and the same
+sessions on a quieter machine were 5 % faster throughout (`long.typ` after
+an edit at the end 91 ms). "Before" is `main` at `e4eb440`; the columns
+after it are the commits of this step, each with the stores named so far
+kept, and "as merged" is the step with what the review changed and the
+accelerator of introspector reads (below); upstream is the binary of
+`e58a63af` with its threads, and the ratio is of the last two columns.
+
+| document | edit | before | modules | + closure calls | + layouts | + counters, works | as merged | upstream | ratio |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `long.typ` | first compilation | 239 | 252 | 254 | 242 | 245 | 241 | 113 | 2.1 |
+| | end | 243 | 246 | 245 | 95.3 | 97.1 | 96.7 | 25.8 | 3.8 |
+| | middle | 244 | 248 | 244 | 111 | 109 | 106 | 29.6 | 3.6 |
+| | comment | 243 | 249 | 246 | 101 | 103 | 102 | 14.2 | 7.2 |
+| `longer.typ` | first compilation | 1240 | 1260 | 1240 | 1230 | 1230 | 1220 | 542 | 2.2 |
+| | end | 1260 | 1290 | 1260 | 528 | 540 | 509 | 131 | 3.9 |
+| | middle | 1260 | 1310 | 1280 | 576 | 598 | 555 | 152 | 3.6 |
+| | comment | 1270 | 1310 | 1300 | 580 | 613 | 545 | 67.9 | 8.0 |
+| `showcase.typ` | first compilation | 251 | 250 | 247 | 251 | 272 | 264 | 176 | 1.5 |
+| | end | 55.2 | 55.4 | 55.0 | 27.0 | 27.2 | 26.7 | 8.8 | 3.0 |
+| | middle | 55.0 | 55.3 | 56.3 | 26.9 | 26.1 | 25.5 | 8.7 | 2.9 |
+| | imported | 57.4 | 56.7 | 56.0 | 27.7 | 28.6 | 28.1 | 10.3 | 2.7 |
+| | comment | 56.7 | 55.1 | 56.6 | 27.3 | 26.0 | 27.3 | 7.1 | 3.9 |
+| touying | first compilation | 204 | 206 | 205 | 205 | 202 | 204 | 161 | 1.3 |
+| | end | 167 | 153 | 48.6 | 27.2 | 26.6 | 25.9 | 12.8 | 2.0 |
+| | middle | 167 | 155 | 48.3 | 26.8 | 26.9 | 26.6 | 13.5 | 2.0 |
+| | imported | 165 | 160 | 128 | 122 | 123 | 122 | 95.5 | 1.3 |
+| | comment | 168 | 156 | 44.5 | 21.5 | 21.8 | 21.7 | 3.7 | 5.8 |
+| handbook | first compilation | 168 | 173 | 173 | 166 | 172 | 170 | 118 | 1.4 |
+| | end | 80.6 | 78.1 | 76.6 | 32.0 | 31.9 | 31.6 | 11.5 | 2.8 |
+| | middle | 78.3 | 78.5 | 76.4 | 32.5 | 32.8 | 30.9 | 11.4 | 2.7 |
+| | imported | 90.7 | 89.5 | 88.3 | 81.5 | 81.8 | 81.4 | 28.8 | 2.8 |
+| | comment | 79.0 | 81.7 | 78.4 | 32.9 | 31.8 | 31.4 | 5.5 | 5.7 |
+| `book` | first compilation | 97.4 | 102 | 98.8 | 97.6 | 98.4 | 97.0 | 71.9 | 1.3 |
+| | end | 34.2 | 33.5 | 32.8 | 17.6 | 12.7 | 12.8 | 4.4 | 2.9 |
+| | middle | 33.5 | 33.8 | 33.0 | 17.6 | 12.7 | 12.9 | 5.1 | 2.5 |
+| | imported | 34.2 | 34.0 | 34.2 | 21.9 | 17.1 | 16.9 | 6.7 | 2.5 |
+| | comment | 34.1 | 34.3 | 32.8 | 17.9 | 13.2 | 12.9 | 2.8 | 4.6 |
+| `chain` | first compilation | 5.3 | 6.1 | 6.0 | 5.4 | 5.4 | 5.4 | 4.2 | 1.3 |
+| | end | 3.9 | 3.8 | 3.5 | 3.3 | 3.2 | 3.3 | 1.4 | 2.3 |
+| | middle | 3.8 | 3.7 | 3.7 | 3.1 | 3.0 | 3.0 | 1.4 | 2.2 |
+| | imported | 3.8 | 3.6 | 3.6 | 3.0 | 3.0 | 3.0 | 1.0 | 3.0 |
+| | comment | 3.8 | 3.6 | 3.6 | 2.9 | 3.0 | 2.9 | 1.0 | 2.8 |
+| `notes` | first compilation | 17.0 | 18.1 | 17.2 | 17.7 | 17.4 | 17.0 | 9.8 | 1.7 |
+| | end | 15.6 | 16.0 | 14.7 | 8.6 | 8.6 | 8.6 | 3.8 | 2.3 |
+| | middle | 15.4 | 16.4 | 14.5 | 8.9 | 8.8 | 8.7 | 3.6 | 2.4 |
+| | imported | 15.6 | 16.1 | 14.9 | 10.5 | 10.6 | 10.3 | 4.6 | 2.2 |
+| | comment | 15.9 | 16.3 | 14.6 | 8.6 | 8.9 | 8.6 | 3.0 | 2.9 |
+| `linked` | first compilation | 3.7 | 3.6 | 3.6 | 3.6 | 3.7 | 3.6 | 3.8 | 1.0 |
+| | end | 3.0 | 3.0 | 3.0 | 2.8 | 2.5 | 2.6 | 1.5 | 1.7 |
+| | middle | 2.5 | 2.6 | 2.6 | 2.6 | 2.4 | 2.3 | 1.6 | 1.5 |
+| | comment | 2.6 | 2.6 | 2.5 | 2.2 | 2.2 | 2.1 | 1.2 | 1.7 |
+| deck | first compilation | 576 | 582 | 583 | 576 | 583 | 580 | 109 | 5.3 |
+| | end | 51.6 | 51.9 | 41.2 | 18.8 | 18.4 | 18.2 | 15.9 | 1.1 |
+| | middle | 51.2 | 52.8 | 40.6 | 20.6 | 18.1 | 17.6 | 16.0 | 1.1 |
+| | comment | 50.7 | 51.6 | 40.6 | 17.9 | 17.8 | 17.3 | 14.5 | 1.2 |
+
+The edits: "end" is a character appended to the main file; "middle" an
+edit in the middle of it (in `long.typ` and `longer.typ` the body of the
+loop that makes every section: every heading changes); "imported" a
+change of a value in an imported file that reaches the pages (the size of
+a text in the theme of the touying deck and in the running header of the
+handbook, an inset in the shared module of `book` and `notes`, a word in
+`chain`'s `d.typ`, the title of an entry of `showcase.typ`'s
+bibliography); "comment" a comment appended to the main file, after
+which nothing on the pages changes. `book`, `chain`, `notes` and `linked`
+are the projects of `tests/recompile/docs`; the deck is `bench/mkdeck.
+py`'s (43 pages, 28 PNGs, no package).
+
+Against the expectations of 3.3 (the "kept" column for the documents of
+text, "+ slice 0" for those with images and code, since slice 0 is
+built), after an edit at the end:
+
+| document | expected | measured | first compilation, before and after |
+| --- | ---: | ---: | ---: |
+| `long.typ` | 96 | 96.7 | 239 and 241 |
+| `longer.typ` | 503 | 509 | 1240 and 1220 |
+| `showcase.typ` | 24 | 26.7 | 251 and 264 |
+| touying | 24 | 25.9 | 204 and 204 |
+| handbook | 30 | 31.6 | 168 and 170 |
+| deck | 332 (before slice 0c; 53 as measured with it) | 18.2 | 576 and 580 |
+
+No row misses its expectation by more than a tenth (`showcase.typ`: 11 %).
+The others of 3.3: `long.typ` after an edit of every heading 106 ms where
+the probe had 101; `longer.typ` after the same 555 ms where the probe had
+569; the touying document after an edit in the middle 26.6 ms where the
+probe had 29; after an edit of a file of its package 122 ms where the
+probe had 116; the handbook after an edit in the middle 30.9 ms where the
+probe had 31; after an edit of a file of its package 81.4 ms where the
+probe had 86. So what the probe gave for the stores that exist, kept, is
+what they give with every read recorded and validated, every argument
+compared and every kept thing copied: the optimism that section 8 warned
+of did not cost anything that these sessions can show. Against upstream
+the ratio after an edit at the end is 1.7 to 3.9 (it was up to 13, for the
+touying document), which is the ratio of the first compilations (1.0 to
+2.2) times what the block level, the page runs and the document are for
+(3.3, the later columns). It is largest after a comment, 3.9 to 8.0 for
+the bench and package documents, where upstream finds its page runs and
+its document again and the port lays out and exports as after any edit.
+The deck is at 1.1: its recompilation was the export of its images, which
+slice 0c took away, and what is left is evaluation and paragraphs. Each
+store, in the columns: the modules alone are worth a little where a
+package is evaluated (the touying document 167 ms to 153 ms), closure
+calls are the evaluation of a package document (to 49 ms), layouts are
+most of the rest everywhere, and the works of a bibliography are a third
+of what was left of `book`, whose citations are inside blocks (17.6 ms to
+12.7 ms). The counter sequence, kept, made `longer.typ` slower until its
+reads had an accelerator (540 ms and 528 ms; as merged 509 ms). A first
+compilation is what it was (the first row of every document; the
+differences have no sign in common and are within the spread).
+
+*What a first compilation and a one-shot `typst compile` pay.* Against
+the base of the step (`main` at `e4eb440`), the least of twelve runs each
+in turns, both binaries in one directory (instructions retired and cycles
+of `/usr/bin/time -l`):
+
+| workload | instructions before | after | change | cycles before | after | change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.9 M | 64.9 M | +0.04 % | 34.3 M | 33.7 M | -1.6 % |
+| `long.typ` to PDF | 3267.8 M | 3261.2 M | -0.20 % | 833.3 M | 816.7 M | -2.0 % |
+| `longer.typ` to PDF | 15980.5 M | 15823.9 M | -0.98 % | 4100.8 M | 3969.6 M | -3.2 % |
+| `query longer.typ heading` | 13551.7 M | 13385.7 M | -1.23 % | 3616.0 M | 3322.4 M | -8.1 % |
+| `showcase.typ` to PDF, embedded fonts | 3784.0 M | 3783.9 M | -0.00 % | 839.3 M | 875.3 M | +4.3 % |
+| touying `theme-metropolis.typ` to PDF | 2600.1 M | 2598.5 M | -0.06 % | 704.2 M | 695.8 M | -1.2 % |
+| ilm `bakers-handbook.typ` to PDF | 2283.3 M | 2281.4 M | -0.08 % | 602.4 M | 582.3 M | -3.3 % |
+| the book of `tests/recompile/docs` to PDF | 1381.7 M | 1381.7 M | +0.00 % | 346.5 M | 352.0 M | +1.6 % |
+
+An entry has one field more (its age), a module entry three, the lookup
+of the module store asks whether memoization is on, a compilation that
+ends asks whether a store has entries to drop (none has without host
+closures), and a store no longer compares its generation and clears. No
+evictor runs. Before the review's changes the counts were between
+-0.6 % (`tiny.typ`) and +0.06 % (`longer.typ`); what the table has
+besides is the accelerator of introspector reads, which saves 1 % of a
+compilation of `longer.typ`. The cycles are of a busy machine and within
+their spread. The budget of 5.2, 1 % of a compilation from scratch, is
+not touched; the first compilations of the watch sessions are in the
+table above.
+
+*The second budget of 5.2*: validation at most 5 % of a recompilation in
+which everything hits. Such a recompilation exists now: the main file
+written again with the bytes it has. Sampled (`/usr/bin/sample`, 1 ms, 8 s
+of a watching process that is made to recompile again and again; shares
+of the samples inside compilations, of 900 to 5200 samples per document):
+
+| document | world reads validated | of which the world answering | introspector reads validated | arguments compared | keys fingerprinted | layout of the document | export |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `long.typ` | 0.1 % | 0.0 % | 0.5 % | 2.8 % | 3.9 % | 59.6 % | 37.3 % |
+| `longer.typ` | 0.0 % | 0.0 % | 1.4 % | 3.7 % | 4.3 % | 59.8 % | 35.4 % |
+| `showcase.typ` | 3.5 % | 1.6 % | 0.5 % | 2.6 % | 1.3 % | 35.0 % | 58.7 % |
+| touying | 8.1 % | 8.1 % | 2.5 % | 1.8 % | 4.8 % | 62.2 % | 27.1 % |
+| handbook | 0.6 % | 0.5 % | 1.8 % | 3.2 % | 3.4 % | 42.1 % | 53.6 % |
+
+The validation of world reads is `TrackedWorld::validate`. For
+`long.typ`, `longer.typ` and the handbook it is a sample or two. For
+`showcase.typ` it is 3.5 %: the CLI's file store reads every dependency
+again after a reset, as upstream's does, so its image, its PDF, its SVG
+and its bibliography are read and their bytes hashed in every
+recompilation (2 MB). For the touying document it is 8.1 % (2 ms), all
+of it below `slot_of`, in the world: 32 files, the document, the package
+and its imports, 0.8 MB, each read, decoded and compared with the source
+that the slot had. comemo validates by making the same calls on
+upstream's world, which reads the same files. The bookkeeping of the
+tracked world (the stamp, the slots, the pushes) is under 0.2 %
+everywhere, so the budget holds for what it was set for; what the world
+does to answer is over it for a document with a large package, and what
+would take that away is not in this design's scope: a file store that
+does not read a file whose modification time is what it was (5.2,
+"Costs"; "not scheduled"). The other validations are the ones that
+existed before anything was kept: introspector reads replayed (0.5 to
+2.5 % with the accelerator below; 2.4 to 7.1 % without it), arguments
+compared exactly (2 to 4 %, deviation 3), keys fingerprinted (1 to 5 %).
+
+**Memory.** The resident set size of the watching process (`ps`, after
+the status line; `scripts/watch_check.py --bench-memory`), PDF output,
+after the first compilation and after 10, 50 and 200 edits, every edit a
+text that the session has not had. "Before" is the base of the step,
+which emptied its stores when a compilation started.
+
+| document | edits | binary | first | after 10 | after 50 | after 200 | peak |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| longer | at the end | before | 171 MB | 174 MB | 174 MB | 174 MB | 174 MB |
+| longer | at the end | after | 171 MB | 219 MB | 224 MB | 224 MB | 224 MB |
+| longer | at the end | upstream | 319 MB | 1974 MB | 2163 MB | 2213 MB | 2213 MB |
+| longer | every heading | before | 171 MB | 175 MB | 175 MB | 175 MB | 175 MB |
+| longer | every heading | after | 171 MB | 310 MB | 324 MB | 324 MB | 324 MB |
+| longer | every heading | upstream | 320 MB | 2174 MB | 2404 MB | 2436 MB | 2436 MB |
+| longer | every heading, a character longer each time | before | 171 MB | 175 MB | 176 MB | 199 MB | 199 MB |
+| longer | every heading, a character longer each time | after | 171 MB | 307 MB | 335 MB | 596 MB | 596 MB |
+| longer | every heading, a character longer each time | upstream | 325 MB | 2174 MB | 2554 MB | 3719 MB | 3719 MB |
+| longer | every paragraph | before | 171 MB | 175 MB | 175 MB | 175 MB | 175 MB |
+| longer | every paragraph | after | 171 MB | 947 MB | 1030 MB | 1030 MB | 1030 MB |
+| longer | every paragraph | upstream | 325 MB | 2762 MB | 3122 MB | 3190 MB | 3190 MB |
+| touying | at the end | before | 82 MB | 86 MB | 86 MB | 86 MB | 86 MB |
+| touying | at the end | after | 82 MB | 86 MB | 87 MB | 87 MB | 87 MB |
+| touying | at the end | upstream | 86 MB | 109 MB | 109 MB | 111 MB | 113 MB |
+| touying | in the middle | before | 82 MB | 85 MB | 85 MB | 85 MB | 85 MB |
+| touying | in the middle | after | 82 MB | 86 MB | 86 MB | 87 MB | 87 MB |
+| touying | in the middle | upstream | 86 MB | 105 MB | 110 MB | 107 MB | 110 MB |
+| touying | the theme of the package | before | 83 MB | 91 MB | 92 MB | 92 MB | 92 MB |
+| touying | the theme of the package | after | 82 MB | 151 MB | 159 MB | 159 MB | 159 MB |
+| touying | the theme of the package | upstream | 82 MB | 245 MB | 286 MB | 294 MB | 296 MB |
+| deck | at the end | before | 236 MB | 256 MB | 256 MB | 256 MB | 256 MB |
+| deck | at the end | after | 236 MB | 255 MB | 256 MB | 257 MB | 257 MB |
+| deck | at the end | upstream | 246 MB | 308 MB | 301 MB | 316 MB | 323 MB |
+| deck | in the middle | before | 236 MB | 256 MB | 256 MB | 256 MB | 256 MB |
+| deck | in the middle | after | 236 MB | 256 MB | 256 MB | 256 MB | 256 MB |
+| deck | in the middle | upstream | 285 MB | 350 MB | 314 MB | 316 MB | 376 MB |
+| deck | every slide | before | 234 MB | 255 MB | 255 MB | 256 MB | 256 MB |
+| deck | every slide | after | 236 MB | 259 MB | 260 MB | 260 MB | 260 MB |
+| deck | every slide | upstream | 277 MB | 349 MB | 339 MB | 362 MB | 376 MB |
+
+Every row of the port is flat from 50 edits on and within a tenth of
+that after 10 (but the rows of the edit that grows, below): the ages
+work, and what a session holds is what its last eleven compilations used.
+The plateaus of `longer.typ`: 224 MB for edits at the end (50 MB more
+than a process that keeps nothing: an edit at the end is a new module,
+the content of the whole file, 6.2), 324 MB for edits of every heading
+(6.2 measured 358 MB of live heap after ten such edits), and 1030 MB for
+edits of every paragraph, which is the bound that 6.1 gave as "about
+1.1 GB" and did not measure: eleven times the layouts of the document.
+Upstream holds 2.2 GB, 2.4 GB and 3.2 GB in the same sessions. A deck of
+images does not grow (its images are kept by content since slice 0; the
+layouts of a slide are small), and a package document grows by what its
+slides are (87 MB, and 159 MB when every edit changes the theme). The
+rows "a character longer each time" are of an edit after which the
+document itself grows over 200 edits, in all three programs: they are
+there to say that the edit of the first measurement was not one to show
+a plateau with.
+
+Bounds. Every store and every cache with an age is bounded by what the
+last `max_age` + 1 compilations used. What has no age: the caches by
+font, each with a limit of entries since the review (above); the capture
+table, of one compilation; the hashes of data by identity, swept as
+before. In a process that never evicts, a key holds at most four results
+and a source twelve evaluations, and the number of keys is what the
+process computed, as with comemo.
+
+**The accelerator of introspector reads.** Not asked for by the design,
+and found by the watch numbers: with the counter sequence kept,
+`longer.typ` recompiled 2 to 6 % slower than with the layouts alone
+(the table above; in sessions on a quieter machine 499 ms and 480 ms
+after an edit at the end, 554 ms and 531 ms in the middle). An entry is validated by replaying its introspector reads, and
+every result that an earlier iteration or compilation left under a key
+is a candidate. The read of a counter sequence is the query of all the
+counter's updates, whose fingerprint is that of every heading of the
+document, and each candidate computed it again before it was rejected.
+comemo has an accelerator for exactly this (`comemo/src/accelerate.rs`:
+per tracked value a map from the hash of a call to the hash of its
+result, "so that validation makes a call once per id"). The port has it
+now for the introspector (`ReadAccelerator` in `library/introspector.
+mbt`): the fingerprint of the answer to a read, by the key of the read,
+for the introspector that was asked last (an introspector answers the
+same forever and has a number, step 4). `longer.typ` after an edit at the
+end, in those sessions: 461 ms; a first compilation gains too (1185 ms
+to 1150 ms; 1 % of its instructions, above), since the iterations of one
+compilation validate the same reads.
+
+**Review.** One round by Codex (`gpt-6-astra`, reasoning effort xhigh)
+on the diff of the step up to the hosts, asked for an edit sequence after
+which a kept entry is found although something it depended on changed
+(anything not in its key, its recorded world reads or its recorded
+introspector reads: process state, identity, order of evaluation, a
+cache that was evicted under it), for a reference in the harness that is
+not independent of the watch loop, for differences from comemo's ages
+that a document can see, and for unbounded growth. The verdict was
+"request changes". It found no stale result (it names what it looked at:
+the stamps and shared lists of world reads, volatile reads, keys and the
+comparison of arguments, library, context, route and tracing, the
+validation of introspector reads, nested compilations, memoization off)
+and no cache that carries a result past `evict(0)`, and it checked the
+ages against comemo 0.5.1 line by line. Seven findings.
+
+Fixed:
+
+- *The limit per key against comemo's ages* (an upstream difference that
+  a document can see): above, "Limits per key". Its reproduction is the
+  fifth pinned sequence.
+- *The recording check rejects a correct entry* where a document
+  branches on the identity of a module that a found call returned:
+  above, `ClosureStore::original`.
+- *An outer scope loses a module entry that it took from a scope inside
+  it*: above, the outermost open scope keeps it.
+- *What ends with its compilation leaves things behind* (highlighted raw
+  text, the `asked` records): above.
+- *Caches by font that grow with a session's edits.* The caches by font
+  are functions of their keys and no `evict` knows them (6.3), but three
+  have more than a font in their key or hold what a host can make again
+  and again: the outlines of the SVG exporter (the scale of a glyph: a
+  watch session to SVG adds an outline per glyph and text size tried),
+  shape plans (the features of the text), the hashes of font data by the
+  identity of the `Bytes`. Each of the caches by font has a limit now and
+  is emptied when it is full (65 536 outlines, boxes, bitmaps and colour
+  glyph frames, 4096 shape plans, 1024 faces and overhang tables, 256
+  font data hashes, the oldest first for the last).
+- *The twin of the `edsl` stages was evaluated after the lowering*, whose
+  evaluations of imported files it could take: `runner_slate` before it.
+
+Not changed, with the reason:
+
+- *`eval_string` is not memoized* (upstream memoizes it,
+  `typst-eval/src/lib.rs:101`). With two plugins without functions, whose
+  modules have one hash, `for m in (a, b) { eval("m", scope: (m: m)) == m }`
+  is `(true, false)` in upstream, which finds the first evaluation again,
+  and `(true, true)` here. This is a difference in a compilation from
+  scratch, older than this step and of the kind of 5.4's table; the
+  design has `eval_string` under "not scheduled" (its world plumbing is
+  slice 1's, so nothing stands in its way any more). It is recorded in
+  section 10 and is the first thing to build after this step if the
+  quirk is to be reproduced.
+- *A host that never evicts and holds modules* still sees the limit of
+  twelve evaluations per source where comemo would keep a thirteenth.
+  That is deviation 4, which bounds a process that never evicts; comemo
+  does not bound it.
+- *`evict(0)` does not empty the caches by font* (6.3's design). A
+  reference of the harness shares them with the loop. They hold no
+  result that can be stale; with the limits above they are bounded.
+
+**For slices 2 and 3.**
+
+- A new memoized function (blocks, page runs, the document) is a
+  `MemoStore`: it has ages, an evictor, the limit of four per key and the
+  drop at the end of a compilation without doing anything. What it must
+  bring is what every entry needs (key, exact arguments, cacheable
+  results, copies) and its mutation: the validation of its world reads
+  off must fail sequences of the `recompile` stage, and
+  `pinned_as_upstream_expected` must still be 16.
+- Page runs and documents are slice 3's first kept results that hold a
+  whole document's frames: 6.2's numbers for what a store costs are per
+  layout entry and do not cover them. The memory table above is the
+  baseline to measure against.
+- After a recompilation in which everything hits, what is left is the
+  document-level realization, the flow and the export (the table of the
+  second budget: layout of the document 35 to 62 %, export 27 to 59 %),
+  which is what slices 2 and 3 are for, and then the PDF writer, which
+  no slice is for.
+- The introspector reads of a layout entry are validated by replaying
+  them (0.5 to 2.5 % of such a recompilation). Slice 3's document entry
+  would make the introspector of an unchanged document the same object
+  in the next iteration and compilation, and the shortcut by its number
+  (step 4) would then skip the replay.
+- A recompilation reads every dependency again (the CLI's file store
+  after `reset`, as upstream's). For a document with a large package that
+  is the largest part of what validation costs.
+- `evict(0)` does not drop the caches by font (6.3). A reference of the
+  harness shares them with the loop; they are functions of their keys
+  and have limits.
+- The limits per key (four results, twelve evaluations) count what is
+  young (deviation 4). A key's entries are searched in order, the oldest
+  first, and each candidate is compared with the arguments exactly before
+  it is validated: under `evict(10)` a key can hold up to 44 results, and
+  a slice whose keys collect many should measure that search.
+- The accelerator of introspector reads is for the introspector that was
+  asked last. A slice that validates against two introspectors in turns
+  (a document entry that is validated against the introspector of the
+  iteration before) would thrash it: make it a table by introspector
+  then.
+- `eval_string` is not memoized (the review; section 10). It is the one
+  place where a compilation from scratch is known to differ from
+  upstream's in what `==` says of modules.
+
 ### Slice 2: the block level
 
 `layout_single_impl` and `layout_multi_impl` through `memoized_layout`,
@@ -2710,7 +3453,15 @@ Kept or introduced, each stricter than upstream unless said:
    by identity and fingerprint by a key of the host's. (Modules were a
    second reason until step 4; they are taken by their hashes now, as
    upstream's.) 6.2 has the cost.
-4. **At most four entries per key.**
+4. **At most four entries per key** (`memo_max_entries`, first in, first
+   out) and twelve evaluations per source (`eval_memo_max_entries`),
+   **among those that no `evict` has seen yet** (step 5). comemo has no
+   limit. Within a compilation, and in a process that never evicts, the
+   limit is what it always was; in a process that evicts, an entry of an
+   earlier compilation is not counted and goes by its age, as comemo's
+   does, because the difference can be seen there
+   (`tests/recompile/upstream/limit.json`). An evaluation that an open
+   scope stored or took is not dropped for the limit.
 5. **Errors are not kept** by `memoize` and `memoized_closure` (upstream
    caches a `SourceResult`); module evaluations keep theirs, as a copy
    that is copied again for every caller.
@@ -2774,6 +3525,29 @@ Kept or introduced, each stricter than upstream unless said:
     same results are found again; the port's elements hold the sources
     only. Not stricter and not looser: another place for the same data.
 
+16. **A compilation with memoization off takes and leaves nothing**
+    (step 5; comemo has no such switch). The stores and the results kept
+    by content are neither asked nor written, and an evaluation of a file
+    ends with its scope, as every evaluation did before step 5: the module
+    store must still answer inside the scope, since a file is one module
+    in a compilation.
+17. **`evict` during a compilation spares the evaluations of files that
+    an open scope stored or took** (step 5). comemo would drop them, and
+    upstream never evicts during a compilation; here a host function can
+    (a compilation of `doc` inside a callback ends with `evict(10)`), and
+    a file that is imported again afterwards must be the module it was.
+18. **Entries whose key holds a host closure are dropped when the
+    outermost compilation ends** (step 5), not when they are old: nothing
+    can find them afterwards (deviation 6).
+19. **What the closure calls of one function and arguments asked of their
+    contexts is kept with the time of its last use**, an eviction count,
+    instead of an age per object (step 5; comemo has no such table: its
+    tree asks the context call by call). It goes when it was not asked
+    for in more than `max_age` evictions, which is never before an entry
+    under it.
+20. **`doc` evicts** (step 5): a compilation or lowering of `doc` ends
+    with `evict(10)`. Upstream has no such host.
+
 Upstream quirks the port reproduces since step 4 (the owner's decision
 on module equality, 5.4):
 
@@ -2784,9 +3558,25 @@ on module equality, 5.4):
 - A module that a kept result returns and the module of the same file
   evaluated again are different objects and compare unequal: what
   `typst watch` shows after a comment in an imported file is not what
-  `typst compile` shows (`tests/recompile/upstream/`).
+  `typst compile` shows (`tests/recompile/upstream/`). Since step 5 the
+  port's watch shows it, at the 18 steps of the five recorded sessions at
+  which upstream's does.
+- The module of a plugin is the same object for as long as comemo's
+  result of `Plugin::module` lives, and another after that: a kept call
+  that returns it agrees with the plugin loaded again up to ten evictions
+  after the plugin was last loaded and disagrees from the eleventh on
+  (`tests/recompile/upstream/plugin.json`).
 
 Upstream quirks the port does not reproduce:
+
+- `eval_string` is memoized upstream (`typst-eval/src/lib.rs:101`) and
+  not here (section 4; "not scheduled"). Two evaluated strings with
+  equal hashed arguments are one call for comemo, and two modules with
+  one hash are equal arguments: with the modules `a` and `b` of two
+  plugins without functions, `for m in (a, b) { eval("m", scope: (m: m))
+  == m }` is `(true, false)` in upstream, whose second evaluation is the
+  first one found, and `(true, true)` here (checked with both binaries
+  by the review of step 5). A difference in a compilation from scratch.
 
 - Two values with one hash are one argument for comemo where the port
   compares arguments exactly and the comparison is finer than the hash.

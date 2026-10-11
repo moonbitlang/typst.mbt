@@ -10,13 +10,19 @@ compilation from scratch of the same files gives. (With one exception
 that is upstream's own, accepted only where it is proven to be: "As
 upstream's watch".)
 
-Today nothing is kept across compilations (`library/memo.mbt`: the memoized
-calls end with their compilation; `@library.evict` drops what is kept by
-content), so the stage passes by construction, and a failure is a bug. The
-first one of this kind was found by hand: the memo of module evaluations was
-found again by world identity and the file's own text, so a module was
-reused after a file that it imports had changed (`typst/recompile_wbtest.mbt`).
-The stage finds that class mechanically (see "Mutation checks").
+The engine keeps what it memoizes across compilations (step 5 of slice 1
+of `docs/incremental-design.md`): the evaluations of files, closure calls,
+layouts, counter sequences and the works of a bibliography are stores of
+the process (`library/memo.mbt`, `eval/import.mbt`), an entry is found by
+a later compilation if it is still valid, and `@library.evict(max_age)`
+drops what was not found for more than `max_age` calls, as comemo does. So
+this stage tests the real thing: its watch loop is `cli/watch.mbt`'s, with
+every store kept, and a failure is a stale result. The first one of this
+kind was found by hand, before the stage existed: the memo of module
+evaluations was found again by world identity and the file's own text, so
+a module was reused after a file that it imports had changed
+(`typst/recompile_wbtest.mbt`). The stage finds that class mechanically
+(see "Mutation checks").
 
 ## What runs
 
@@ -47,7 +53,7 @@ second only). The phases are not interleaved: a cache
 that keeps the last compilation only would otherwise never be asked for the
 step before, and the stage would pass without testing it.
 
-**The documents** (121 by default, and the three of the sequences that are
+**The documents** (121 by default, and the five of the sequences that are
 pinned to upstream's watch, below):
 
 - 3 of `bench/` (`tiny`, `long`, `showcase`: the documents whose
@@ -151,22 +157,26 @@ A reference is a new world: a new file store (every source parsed from
 scratch) and a new library object. It shares with the worlds before it only
 what the process shares:
 
-- What `@library.evict` drops: the caches of data decoded from bytes
-  (syntaxes and themes of `raw`, bibliographies, CSL styles, PDF
-  documents, plugins and the results of their calls). The stage calls
-  `@library.evict(1)` before every reference, so a reference decodes
-  everything again.
-- The results kept by content (`library/memo_content.mbt`: decoded raster
-  images, highlighted raw text, the PDF exporter's images), which are
-  found by what upstream hashes and are not asked with memoization off.
-- The memoized calls (`layout_store`, the counter sequence, the works of
-  a bibliography, `closure_store` in `library/memo.mbt`, the capture
-  analysis of `eval/captures.mbt`) and the module evaluations of
-  `eval/import.mbt`. They end with their compilation today. The second
-  reference of every step runs with memoization off, which does not ask
-  the first five at all; the module evaluations, of the main file too,
-  end with the scope that stored them (a compilation is one,
-  `library/tracked_world.mbt`).
+- What `@library.evict(0)` drops, which the stage calls before every
+  reference: everything that has an age. That is the stores of memoized
+  calls (`layout_store`, the counter sequence, the works of a
+  bibliography, `closure_store` in `library/memo.mbt`; the module
+  evaluations of `eval/import.mbt`), the results kept by content
+  (`library/memo_content.mbt`: decoded raster images, highlighted raw
+  text, the PDF exporter's images) and the caches of data decoded from
+  bytes (syntaxes and themes of `raw`, bibliographies, CSL styles, PDF
+  documents, plugins and the results of their calls, numbering patterns).
+  So a reference computes and decodes everything again and shares none
+  of it with the loop. (It was `evict(1)` while only the decode caches
+  outlived a compilation and were dropped as a whole; an entry with an
+  age survives `evict(1)` if it was just found.)
+- With memoization off, the second reference of every step, nothing of
+  the above is asked at all, and an evaluation of a file takes no entry
+  of an earlier scope (`EvalMemo::lives`): that reference would be
+  independent of the loop without the `evict(0)` too, which is the point
+  of having both.
+- The capture analysis of `eval/captures.mbt`, which ends with its
+  compilation.
 - The fonts (`Font` objects, shared by all worlds of the runner) and what
   is computed from a font alone: shaping faces and plans
   (`layout/inline_shaping.mbt`), glyph frames, outlines and boxes
@@ -183,9 +193,11 @@ the last works of a bibliography that was found by the engine's
 introspector object.)
 
 So a reference in the same process is as good as two rules: **a cache that
-is added must be off with `set_layout_memo_enabled(false)` or be dropped by
-`evict(1)`**. A cache that follows neither could make the watch loop and
-both references wrong together. For that there are references in another
+is added must be off with `set_layout_memo_enabled(false)` and be dropped by
+`evict(0)`**. A cache that follows neither could make the watch loop and
+both references wrong together. (That the references do not share the
+stores with the loop is itself checked: "Mutation checks", the line with
+`evict(1)`.) For that there are references in another
 process: `--snapshots=DIR` writes the files of every step before it is
 compiled and a digest of what it gave, `--replay=<snapshot>` compiles one
 snapshot as the first compilation of a process, and
@@ -223,10 +235,9 @@ module with the hash of the old one; the main file is evaluated again too
 found: it returns the old module. `typst watch` of the upstream binary
 then shows `false` where `typst compile` shows `true`, until an edit
 changes what the module holds. The port's memoized calls take modules by
-their hashes too (`modules_memo_equal` in `library/memo.mbt`), so it will
-show the same as soon as closure calls are kept from one compilation to
-the next. It does not yet: nothing is kept. With every store kept (the
-experiment below) it shows exactly what upstream's watch shows.
+their hashes too (`modules_memo_equal` in `library/memo.mbt`), and closure
+calls are kept from one compilation to the next, so it shows the same:
+exactly what upstream's watch shows, at every step of the recordings.
 
 **What is accepted.** A step of a *pinned sequence* at which the watch
 loop gave what upstream's watch gave. Pinned sequences are the fixtures of
@@ -235,7 +246,10 @@ steps; `nan.json`: the same with a module that exports `float.nan`,
 whose hash has the bits of the float, three steps; `modules.json`: a
 module through a getter, as an argument inside a dictionary and through
 another file that imported it, next to a state's value and a queried
-element, which upstream's watch gets right, nine steps). `scripts/gen_recompile_upstream.py <upstream binary>` generates
+element, which upstream's watch gets right, nine steps; `plugin.json`:
+the modules of three plugins, fifteen steps, and `limit.json`: more
+results under one key than the port keeps of one compilation, eight
+steps; both below). `scripts/gen_recompile_upstream.py <upstream binary>` generates
 them: it runs `typst watch` of the upstream binary on the project, writes
 the files of every step, and records the SVG that the watching process
 wrote and the SVG of a fresh `typst compile` of the same files. The
@@ -272,14 +286,49 @@ what a fresh compilation gives, or the sequence fails. (None of those
 documents compares modules. A document that does and is edited at random
 would need a fixture per sequence; it is pinned instead.)
 
-The run prints, for example with every store kept:
+**Plugins.** `plugin.json` pins what a document can see of an age. The
+module of a plugin is memoized by the plugin's bytes (upstream
+`Plugin::module`, the port's `plugin_module_cache`) and compares by
+identity; comemo drops the result when no compilation asked for it in
+more than ten evictions. Three plugins without functions: one that the
+main file loads in every compilation, and two that imported files load,
+which are not evaluated again while they do not change. The main file
+changes ten times. Then a comment in the first imported file: ten
+evictions since its plugin was loaded, the entry is alive, the plugin is
+the module it was, and the getter that returns the kept module agrees
+(`true`, as in a fresh compilation). Then a comment in the second: eleven
+evictions, the entry is gone, the plugin is loaded again as another
+module, and the getter's module is not it (`false` in upstream's watch,
+from then on; `true` in a fresh compilation). The plugin of the main file
+is one module for all fifteen steps. The port's caches of plugins had no
+ages (they were dropped as a whole on every tenth `evict`); they have
+comemo's now, and the fixture fails if an entry lives one eviction longer
+or shorter ("Mutation checks").
 
-    recompile: 17 steps are pinned to upstream's watch
+**The limit per key.** `limit.json` pins that an entry goes when it is
+old and for no other reason. The port keeps at most four results under
+one key (`memo_max_entries`), which comemo does not. A function that
+reads a file and returns the module it captured, `get() = { read("flag.
+txt"); m }`, has one result per content of the file. The flag takes six
+contents, with a comment in the module's file at every step; then the
+first content again: upstream's watch finds the call of the first
+compilation, with the module of that evaluation, and `get() == m` is
+`false`, as it is a step later for the fourth content. A limit that
+dropped the first result when the fifth came would compute the call and
+show `true`. So the limit counts the results that no `evict` has seen yet,
+and a result of an earlier compilation goes by its age.
+
+The run prints:
+
+    recompile: 40 steps are pinned to upstream's watch
     (tests/recompile/upstream); upstream's watch gives something else than
-    a fresh compilation at 13 of them, and the watch loop gave upstream's
-    watch output instead of a fresh compilation's at 13
+    a fresh compilation at 18 of them, and the watch loop gave upstream's
+    watch output instead of a fresh compilation's at 18
 
-and with nothing kept, as the tree is, `at 0`. With `-v` every accepted
+and the stage fails if the last number is not 18
+(`pinned_as_upstream_expected`: a store that no longer finds its entries
+gives a fresh compilation's pages there, which is a regression too; it
+was 0 while nothing was kept). With `-v` every accepted
 step is a line (`NOTE upstream/getter :: step=1 (a comment in a.typ): as
 upstream's watch, not as a fresh compilation`). `scripts/recompile_soak.py`
 does not compile such a step again in a new process (the runner marks it,
@@ -316,12 +365,15 @@ every compilation of the stage (`@library.set_memo_check`: every result
 that a store keeps is computed a second time from scratch, and the world
 reads of its entry must be what that run asked of the world): a line
 `READS <document> seed=.. sequence=..: ..` per entry that differs and a
-total at the end (`read check: 125391 entries checked, 0 differ in 0
-cases`). The stage's own verdict must be the same with it.
+total at the end (`read check: 80 787 entries checked, 0 differ in 0
+cases`; fewer than before the stores were kept, since an entry that is
+found is not computed, and so not checked, again). The stage's own verdict
+must be the same with it, the count of pinned steps included: a second run
+of the check must leave no trace in what has an age.
 
-The default run is the CI run: 124 documents, 240 sequences (234, 3 with
-packages and 3 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1438
-steps and 4292 compilations with their exports, about 40 s on an M-series
+The default run is the CI run: 126 documents, 242 sequences (234, 3 with
+packages and 5 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1461
+steps and 4361 compilations with their exports, about 40 s on an M-series
 machine. `--sequences=N` and `--steps=N` size
 the random sequences of every document, `--seed=N` and `--rounds=N` choose
 the seeds, `--all` adds `bench/longer` and every document with packages,
@@ -354,100 +406,114 @@ replaced.)
 
 ## Mutation checks
 
-That the stage catches stale results was shown by putting three bugs in,
-one at a time, and running the default stage (seed 1). They are not in the
-tree; to repeat one, change the code as said, build the runner in release
-and run `recompile -v`.
+That the stage catches stale results is shown by putting bugs in, one at a
+time, and running the default stage (seed 1). They are not in the tree; to
+repeat one, change the code as said, build the runner in release and run
+`recompile -v`. All numbers are of the tree as it is, with every store
+kept (242 sequences); with the seed that a failure prints, each is
+repeated by `recompile --only=<document> --seed=1 -v` on the mutated tree.
 
-| Mutation | Failing sequences, of 237 | First at | Seen in |
+The three stores, each with the validation of its world reads off (the
+entry is taken whatever the files, the fonts and the date are now):
+
+| Mutation | Failing sequences, of 242 | First at | Seen in |
 |---|---|---|---|
-| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 122 | step 1 in 94 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 117 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 26 |
-| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo, the counter memo and the works of a bibliography outlive the compilation), and `world.validate(entry.world)` is `true` | 69 | step 1 in 61 of them (`bench/tiny`, sweep, first) | the pages in 68 of them; in one the dependencies and the diagnostics alone (works that are found do not read the bibliography file) |
-| 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared, and `engine.world.validate(self.world)` in `ClosureEntry::matches` is `true` | 12 | step 1 in 9 of them | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
+| 1. `eval/import.mbt`, `eval_source_memoized`: `world.validate(memo.reads)` is `true` | 127 | `bench/showcase`, sweep, step 2 | the dependencies in most (a module that is found again does not read its files, so they are no longer watched), the diagnostics and the pages; all five pinned sequences and their count |
+| 2. `library/memo.mbt`, `memoize` (layouts, counter sequences, works): `world.validate(entry.world)` is `true` | 69 | `bench/tiny`, sweep, step 1 | the pages in all but one; in one the dependencies and the diagnostics alone (works that are found do not read the bibliography file) |
+| 3. `library/memo.mbt`, `ClosureEntry::matches`: `engine.world.validate(self.world)` is `true` | 13 | `project/book`, sweep, step 1 | the dependencies (a function that reads a file is not called again), the pages |
+| all three at once | 176 | | |
 
-These are the three mutations of the stage's first version, on the code
-as it is since the tracked world (`library/tracked_world.mbt`; step 1 of
-slice 1 of `docs/incremental-design.md`): every entry of the three stores
-keeps what its call read of the world and is only taken if the world
-still answers the same, so "the store is not cleared" alone no longer
-makes a result stale, and each mutation also turns that validation off.
-With the validation left on, the same three give:
+(While the stores were being kept one by one, each mutation was run on the
+commit that kept its store, of 241 sequences then: 126 with the module
+store alone, 12 with the closure store, 69 with the layouts. Before step 5
+the same three mutations needed a second change, the store not being
+emptied, and gave 122, 69 and 12 of 237.)
 
-| The store outlives its compilation, world reads validated | Failing sequences | What is left |
+That the references share nothing with the loop:
+
+| Mutation | Failing sequences | What it shows |
 |---|---|---|
-| 1. module entries | 0 | (4 before step 3 of the design: three at "everything back", where a file that has an earlier text again has other span numbers and an entry was found by the text of its file, and one diagnostic with a tracepoint too many, since the error that an entry kept was the object that every import adds a tracepoint to. An entry is found by the fingerprint of its source now and keeps a copy of its errors) |
-| 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same kind of store) | 0 | |
-| 3. closure calls | 0 | |
+| no eviction before a reference, nothing else changed | 0 | a reference is a new world with a library object of its own, and no entry of the loop is one for that library |
+| no eviction, the library not compared, and the three validations of world reads off | 181, 115 of the failures seen by the reference without memoization alone | the reference with memoization is answered from the stores that the loop filled and is wrong with it; the reference without memoization asks no store and takes no evaluation of an earlier scope |
+| `evict(0)` as it is, the three validations off (the row "all three at once") | 176, 4 by that reference alone | both references see what the loop got wrong |
+| `evict(1)` instead of `evict(0)`, the three validations off | 176 | the same: `evict(1)` leaves what is young, but every entry of the loop has seen the loop's own `evict(10)` and goes with it. `evict(0)` does not rest on that |
 
-That is what the validation is for. What else a kept result depends on
-(state outside the arguments, identity, mutable results: sections 5.3 to
-5.5 of the design) is steps 2 to 4 of its slice 1, and step 4 ran the
-experiment with every store kept at once ("With every store kept",
-below). The date, the fonts, `sys.inputs` and the files that a call reads
-are no longer among the things a key does not hold: they are the reads
-and the library of the entry.
+So a reference is independent three times over: its own library, `evict(0)`,
+and for the second reference of a step memoization off.
 
-What the recording itself is worth cannot be seen by this stage while
-nothing is kept; the recording check can (`--check-reads`, below).
+The other things a kept entry is valid by, and what it keeps (the numbers
+of section 9.1 of the design in brackets):
+
+| Mutation | Failing sequences, of 242 | First at, and what else exposes it |
+|---|---|---|
+| `import_file` reads the source around the tracked method [1] | 47 | `project/book`, sweep, step 1; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| `DataSource::load` reads the file around the tracked method [2] | 88 | `bench/showcase`, sweep, step 2; the watch loop gives upstream's watch output at 13 of the 18 pinned steps |
+| `resolve_package` reads the manifest around the tracked method [3] | 9 | `suite/scripting/import.typ/import-from-package-items`, sweep, step 1 |
+| a failed read is not recorded [4] | 9 | `suite/model/bibliography.typ/bibliography-multiple-files`, random sequence, step 5 |
+| `today` does not record [5] | 5 | `project/book`, sweep, step 1 |
+| `book` does not record [6a] | 0 | no sequence: the stage's edit of the fonts changes the book and the fonts, and the other read rejects the entry (with neither recorded: the row below). `library/tracked_world_wbtest.mbt`, 4 tests; `paged --check-reads`: 22 964 of 33 509 entries differ, in 1683 tests |
+| `font` does not record [6b] | 0 | no sequence, for the same reason. The same 4 tests; `paged --check-reads`: 22 800 entries differ, in 1657 tests |
+| neither `book` nor `font` records [6a and 6b] | 68 | `bench/tiny`, sweep, step 1 |
+| the reads of an entry that is taken are not noted for the calls around it [7] | 15 | `project/book`, sweep, step 11; the watch loop gives upstream's watch output at 17 of the 18 pinned steps |
+| a source is its id and text to the module store, also after an edit [8] | 61 | `bench/tiny`, random sequence, step 3; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| the reparser writes to the nodes it is given (`SyntaxNode::make_mut` copies nothing) [9] | 0 | no sequence: a recompilation evaluates the file that changed again, with the capture analysis and the closure hashes of its nodes as they are now, and finds nothing that was made from the nodes as they were. `syntax/persistent_test.mbt` (4 tests), `syntax/persistent_property_test.mbt`, `typst/persistent_wbtest.mbt` ("a closure of an earlier evaluation runs the body it was made from") |
+| the capture table finds an analysis by span alone [10] | 0 | no sequence (the table is per compilation). `eval/captures_wbtest.mbt`, "captures: kept per node for one compilation": the test executable aborts |
+| the introspector reads of an entry are not validated [11] | the runner aborts (exit status 134) | before the first sequence is done, as in step 4: a kept layout holds locations that the introspector at hand does not know |
+| the library is not compared, in all three stores [12] | 1 | `project/notes`, sweep, step 2 |
+| the stores take modules by identity instead of by their hashes [13] | 1 | `upstream/modules`, the pinned sequence, step 1; the watch loop gives upstream's watch output at 11 of the 18 pinned steps |
+| the sink of an entry that is found is not replayed [14] | 11 | `suite/introspection/query.typ/query-running-header`, random sequence, step 5 |
+| an entry that was validated in any scope passes in every scope [17] | 176 | `bench/tiny`, sweep, step 1; the watch loop gives upstream's watch output at 1 of the 18 pinned steps |
+| a module entry hands out the errors it keeps [18] | 1 | `suite/scripting/import.typ/import-cyclic-in-other-file`, sweep, step 2 |
+| no file is volatile [19] | 0 | no sequence (no document of the stage has a file that changes during a scope). `doc/volatile_test.mbt`, `library/tracked_world_wbtest.mbt` (2), `typst/tracked_world_wbtest.mbt`: 4 tests |
+| the equality of an SVG image leaves out the images it links [20b] | 0 | no sequence. `library/works_wbtest.mbt` ("svg: an image is its data, its fonts, .."), `typst/state_outside_wbtest.mbt` ("svg: a tiling of an SVG is as good as the images the SVG links") |
+| native functions are fingerprinted by their names [22] | 0 | no sequence (no two functions of the standard library share a name). `library/descriptor_identity_wbtest.mbt`, 3 tests |
+
+Ages and lifetimes (this step's own):
+
+| Mutation | Failing sequences | What exposes it |
+|---|---|---|
+| the plugin caches are also dropped as a whole on every tenth `evict`, as they were | 1 | `upstream/plugin`, the pinned sequence, step 8; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| a `ContentCache` drops an entry one eviction early (`age >= max_age`) | 1 | `upstream/plugin`, the pinned sequence, step 11; the watch loop gives upstream's watch output at 15 of the 18 pinned steps |
+| a `ContentCache` keeps an entry one eviction longer | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; no sequence fails by itself: the pinned plugin sequence gives a fresh compilation's pages where upstream's watch does not |
+| a hit does not make an entry of a store young | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; no sequence fails by itself |
+| the limit per key counts every entry, whatever its age (as it did) | 0 | the watch loop gives upstream's watch output at 17 of the 18 pinned steps; no sequence fails by itself: the pinned sequence `limit` gives a fresh compilation's pages at the step where the first content comes back. `library/memo_closure_wbtest.mbt`, "the limit per key is on what no eviction has seen yet" |
+| a hit in a second run of the recording check makes a `ContentCache` entry young (`--check-reads`) | 0 | the watch loop gives upstream's watch output at 15 of the 18 pinned steps; the count of pinned steps, under `--check-reads` only |
+| a closure call of the second run of the recording check goes on with what it computed (`--check-reads`) | 0 | no sequence under `--check-reads` (no document of the stage reads a file by a comparison of modules). `typst/tracked_world_wbtest.mbt`, "the recording check: a call of the second run answers what the first run was answered" |
+| an entry with a host closure in its key is found by any compilation, and is not dropped when its own ends | 0 | no sequence (no host closure in the stage). `library/memo_identity_wbtest.mbt`, 4 tests |
+| what ends with its compilation is not dropped when the outermost compilation ends | 0 | no sequence. `library/memo_identity_wbtest.mbt`, 2 tests |
+| with memoization off an evaluation takes the entries of earlier scopes | 0 | no sequence (a reference of the stage starts after `evict(0)`). `eval/import_wbtest.mbt` ("with memoization off an entry ends with its scope"), `typst/modules_wbtest.mbt` |
+| an outer scope does not become the keeper of a module entry that it takes from a scope inside it | 0 | no sequence. `eval/import_wbtest.mbt`, "an outer scope keeps an entry that it took from a scope inside it" |
+| the accelerator of introspector reads has one answer per introspector, whatever the read | the runner aborts (exit status 134) | before the first sequence is done |
+| the accelerator of introspector reads answers for any introspector | the runner aborts (exit status 134) | before the first sequence is done |
 
 Two more, for the state that step 2 of the design repaired (state that a
 result depends on and that is neither an argument nor a recorded read;
-the design's section 5.5), run on the default stage of 237 sequences:
+the design's section 5.5):
 
 | Mutation | Failing sequences | First at | Seen in |
 |---|---|---|---|
-| 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats`, sweep and random sequence | the page images: the page hashes as before, so the loop keeps the image it had, and the reference has other pixels. Nothing else differs: the frames, the SVG and the PDF of the loop are those of the reference. This is what `typst watch` did with PNG pages |
-| 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process that `evict` drops with the decode caches (what the cell of the last works was for two calls that share an introspector object: a result found without its key holding the file and without a read of it) | 7 | the sweep of `project/book` (from its eighth step on), and sweeps and random sequences of the suite's bibliography and citation tests (`bibliography-basic`, `bibliography-multiple-files`, `bibliography-before-content`, `issue-3481-cite-location` twice, `issue-785-cite-locate`) | the pages in all of them, the diagnostics in six (a document that compiles from scratch fails in the loop). Also `paged`: 15 tests fail, and `paged --check-reads`: 6 entries in 3 tests |
+| 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats` | the page images in all three (the page hashes as before, so the loop keeps the image it had), and in one of them the PDF; the frames and the SVG of the loop are those of the reference |
+| 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process (a result found without its key holding the file and without a read of it) | 1 | `suite/model/bibliography.typ/bibliography-multiple-files`, sweep, step 3 | the pages; the dependencies and the diagnostics where the bibliography file is no longer read |
 
-With the seed that the failure prints, every one of them is repeated by
-`recompile --only=<document> --seed=1 -v` on the mutated tree.
+### How the stores came to be kept
 
-### With every store kept
-
-Step 4 of the design's slice 1 (identity and ownership; "Step 4 as built"
-in its section 8) ended with the experiment that says whether the stores
-can be kept: all of them at once. A local change, never committed:
-`memoize` and `memoized_closure` do not empty their stores when a
-compilation starts, the module entries outlive their scope
-(`eval_memo_kept`), `evict(1)`, which the stage calls before every
-reference, drops them all (so that references are computed from
-scratch), and `pinned_as_upstream_expected` is 13. Validation is on.
-
-| Every store kept, and | Failing sequences, of 240 | What |
-|---|---|---|
-| nothing else | 0 | the watch loop gave upstream's watch output at the 13 pinned steps at which upstream's watch differs from a fresh compilation, byte for byte, and a fresh compilation's at every other step of every sequence |
-| mutation 1 (module entries: world reads not validated) | 126 | first `bench/showcase`, sweep, step 2; the pinned sequences and their count fail with it |
-| mutation 2 (layouts, counter sequences, works) | 69 | first `bench/tiny`, sweep, step 1 |
-| mutation 3 (closure calls) | 12 | first `project/book`, sweep, step 1 |
-| an entry takes any introspector for the one it was computed with, and its introspector reads are not validated | the runner aborts (exit status 134) | `project/notes`; the `paged` stage too: a kept layout holds locations that the introspector of the iteration does not know |
-| the library is not compared, in all three stores | 1 | `project/notes`, sweep, steps 2 to 4 (`sys.inputs` changes) |
-| the sink of an entry that is found is not replayed | 9 | `query-running-header` and the four convergence tests of the suite: a warning that a fresh compilation gives is missing |
-| the stores take modules by identity instead of by their hashes | 2 | `upstream/modules`, steps 1 to 6 and 8: "the pages are not what upstream's watch gives either"; and the count of accepted steps (6, expected 13) |
-
-`scripts/recompile_soak.py --minutes 10` with that runner (every store
-kept, nothing else): 124 documents, seeds 1000 to 1004, 620 runs, 3040
-sequences, 34 594 steps, 102 372 compilations, 1835 steps compiled again
-in new processes, no failure and no abort.
-
-So with every store kept and validation on, a recompilation gives what a
-compilation from scratch gives in all of this, and what upstream's watch
-gives where the two differ. What that does not show is what the edits
-do not reach (below, "What it does not cover"), and it is not the change
-that keeps the stores: ages and eviction are step 5.
-
-All the counts of this section were measured again on the tree that has
-both step 2 and step 3 of the design (237 sequences: the project
-`linked` is two of them): 122, 69 and 12 without validation, none with
-it, 3 and 7.
-
-The first mutation fails in half of all sequences since step 3 (19 before
-it, of 235): the main file's evaluation is an entry of the same store, so a store
-that is kept without validation answers every recompilation whose main
-file is the source it was, whatever else changed.
+Step 4 of the design's slice 1 ended with an experiment: every store kept
+at once by a local change, 240 sequences, none failing, 13 pinned steps as
+upstream's watch. Step 5 made it real, one store per commit (module
+evaluations, closure calls, layouts, then the counter sequence and the
+works), each with the stage, the recording check and its mutation above,
+after the caches of plugins had got ages and their sequence was pinned; a
+review then found the limit per key, whose sequence is the fifth.
+`scripts/recompile_soak.py` on the final tree: 126 documents, seeds 9000
+to 9012, 36.9 minutes with 12 jobs (while the other gates of the step ran
+on the machine): 1638 runs, 7930 sequences, 90 237 steps, 267 045
+compilations, 4849 steps compiled again as the first compilation of a new
+process; 0 failures, 0 aborts.
 
 What the mutations showed about the stage and about the engine (as first
-run, before the tracked world: the keys of memoized calls then held none
-of what is listed at the end; the counts were 17, 67 and 13):
+run, before the tracked world and with one store kept by hand at a time:
+the keys of memoized calls then held none of what is listed at the end;
+the counts were 17, 67 and 13):
 
 - Mutation 1 is found without an edit of the right file: the files that a
   reused module would have read are missing from the dependencies after

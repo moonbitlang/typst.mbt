@@ -97,6 +97,45 @@ Typst source) are unchanged.
   `evaluation_end()` are gone (they were added since 0.1.4). What they
   were for is a scope of a tracked world (`TrackedWorld::scoped`,
   `scope_token`, `world_scope_open`).
+- `library`, `eval`, `typst`: what the engine memoizes outlives the
+  compilation that computed it (step 5 of slice 1 of
+  `docs/incremental-design.md`; upstream: comemo's caches, which is what
+  makes `typst watch` fast). Module evaluations, closure calls, layouts,
+  counter sequences and the works of a bibliography are kept by the
+  process and found by a later compilation, with the same world or
+  another, if they are still valid: for the same `Library` object, and
+  if the world answers what the result asked of it as it did (sources,
+  files, the font book and fonts as objects, the date). A process that
+  compiles again and again calls `evict(max_age)` between compilations
+  (`typst watch`: `evict(10)`), or it keeps what every compilation
+  computed (at most four results per key and twelve evaluations per
+  source); `evict(0)` drops everything; `set_layout_memo_enabled(false)`
+  compiles from scratch, taking nothing from an earlier compilation and
+  leaving nothing for a later one. Until now every compilation started
+  with empty stores. What a host sees: a second compilation is faster and
+  the process holds more memory between compilations; code that counted
+  computations across compilations (`closure_memo_stats`,
+  `module_memo_stats`) sees hits where it saw computations; and one
+  result can differ from a compilation from scratch, as it does in
+  upstream's `typst watch`: a call that is found again returns the module
+  it returned before, which `==` tells from the module of the same file
+  evaluated now (`tests/recompile/upstream`).
+- `library`: `evict(max_age)` is comemo's for everything it knows: every
+  kept result gets older by one with each call and is dropped when it was
+  not found for more than `max_age` calls, and a result that is found is
+  young again. The decode caches (syntaxes and themes of `raw`,
+  bibliographies, CSL styles, PDF documents, plugins and the results of
+  their calls) were dropped as a whole on every `max_age`-th call; they
+  have ages now, so a plugin that every compilation loads stays one
+  module for the whole session, as upstream's does. It may be called
+  during a compilation.
+- `doc`: a compilation (`Document::compile`, `compile_paged`, ..) or a
+  lowering (`Document::lower`) ends with `@library.evict(10)`, as a
+  recompilation of `typst watch` does: a process that compiles many
+  documents holds what the last ones computed, not all of it, and finds
+  again what two of them have in common (the layout of equal content,
+  evaluated packages, decoded images). What involves a callback ends with
+  its compilation, as before.
 - `library`: nothing is memoized for an engine whose world is in no scope.
   A compilation, `eval_source`, `eval_string` and `doc`'s `lower` open
   one; a host that calls memoized functions of the engine directly
@@ -405,10 +444,13 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 - `library`: `format_duration(nanoseconds)` (upstream
   `typst_utils::format_duration`: `2.85 s`, `294.82 ms`, `1 h 4 min`).
 - `library`: `evict(max_age)`, for a process that compiles again and again
-  (upstream `comemo::evict`): on every `max_age`-th call it drops the data
-  that is kept by content for the process (decoded `raw` syntaxes and
-  themes, bibliographies, CSL styles, PDF documents, plugins and the
-  results of their calls), which otherwise only grows when files change.
+  (upstream `comemo::evict`): every result that the process keeps gets
+  older by one and is dropped when it was not found for more than
+  `max_age` calls (above, "Breaking: changed").
+- `library`: `closure_memo_entries()` and `layout_memo_entries()`, `eval`:
+  `module_memo_entries()`: how many closure calls, layouts and
+  evaluations of files the stores keep (for tests and measurements);
+  `ContentCache::clear()`.
 - `library`: decoded raster images are kept by content (upstream memoizes
   `RasterImage::new_impl`): `RasterImage::new` decodes equal data with an
   equal format and ICC argument once per process and returns the same

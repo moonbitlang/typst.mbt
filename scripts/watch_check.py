@@ -1015,8 +1015,17 @@ def edit_comment(text, n):
 
 def edit_loop(text, n):
     """The body of the loop that makes every section of `bench/long.typ`
-    and `longer.typ`: every heading changes."""
+    and `longer.typ`: every heading changes. (For `--bench`, whose `n` is
+    small: for many edits, a number of the same width, so that the
+    document does not grow with them.)"""
+    if n > 9:
+        return text.replace("== Section", "== Section %04d" % n, 1)
     return text.replace("== Section", "== Section" + "x" * n, 1)
+
+
+def edit_end_steady(text, n):
+    """A word of one width at the end of the file, for many edits."""
+    return text + "x%04d\n" % n
 
 
 PACKAGES = os.path.join(ROOT, ".repos/typst-packages/preview")
@@ -1280,7 +1289,7 @@ def bench(binaries, edits, extra, sessions=5, only=None, raw=None):
         shutil.rmtree(directory, ignore_errors=True)
 
 
-def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
+def bench_memory(binaries, extra, only, counts=(10, 50, 200), which=None):
     """The resident set size of a watching process after its first
     compilation and after 10, 50 and 200 edits, and the greatest size seen
     after an edit, for three kinds of edits: at the end of the main file,
@@ -1296,10 +1305,15 @@ def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
     )
     print("| --- | --- | --- | ---: |" + " ---: |" * (len(counts) + 1))
     for document in documents:
-        kinds = [("at the end", document.edits["end"]), ("in the middle", document.edits["middle"])]
+        kinds = [
+            ("at the end", (document.main, edit_end_steady)),
+            ("in the middle", document.edits["middle"]),
+        ]
         reaching = document.everything or document.edits["imported"]
         if reaching is not None:
             kinds.append(("everything", reaching))
+        if which:
+            kinds = [kind for kind in kinds if kind[0] in which]
         for kind, (name, edit) in kinds:
             for label, command in binaries:
                 own = extra if label == "upstream" else []
@@ -1317,8 +1331,10 @@ def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
                     for i in range(max(counts)):
                         start = session.mark()
                         # (Every edit gives a text that the session has
-                        # not had: nothing of an earlier step comes back.)
-                        write(path, edit(text, i + 1))
+                        # not had, of the size of the others: nothing of
+                        # an earlier step comes back, and the document
+                        # does not grow.)
+                        write(path, edit(text, i + 10))
                         session.wait_compiled(start, timeout=600, quiet=0.3)
                         status = session.statuses(start)[-1]
                         if "with errors" in status:
@@ -1367,6 +1383,11 @@ def main():
     )
     parser.add_argument("--raw", default=None, help="append every --bench session to this file")
     parser.add_argument(
+        "--memory-edits",
+        action="append",
+        help='only these edits of --bench-memory ("at the end", "in the middle", "everything")',
+    )
+    parser.add_argument(
         "--bench-memory",
         action="store_true",
         help="the resident set size after 10, 50 and 200 edits instead",
@@ -1408,7 +1429,7 @@ def main():
         binaries.insert(last, (label, [os.path.abspath(path)]))
     jobs = ["--jobs", options.jobs] if options.jobs else []
     if options.bench_memory:
-        bench_memory(binaries, jobs, options.document)
+        bench_memory(binaries, jobs, options.document, which=options.memory_edits)
         return
     if options.bench:
         bench(binaries, options.edits, jobs, options.sessions, options.document, options.raw)

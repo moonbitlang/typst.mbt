@@ -408,8 +408,10 @@
   comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
   `layout_fragment_impl`, the counter sequence, the works of a
   bibliography (`Works::generate`) and closure calls
-  (`eval_closure`, see below) are memoized for one compilation (its
-  evaluation and its introspection iterations). A memoized call's key must
+  (`eval_closure`, see below) are memoized, within a compilation (its
+  evaluation and its introspection iterations) and from one compilation
+  of the process to the next (below: "Kept across compilations"). A
+  memoized call's key must
   fingerprint every argument except the engine (content, `StyleChain::
   memo_hash`, regions, `Locator::memo_hash`, `Route::memo_hash`), and the
   entry keeps the arguments, which must also be equal under
@@ -448,7 +450,7 @@
   note how far the route may move (`Route::check_within`), imports note
   the file ids they ask routes for (`note_route_query`); results are
   values (containers are marked shared). In short: closure calls are
-  memoized for a compilation; the key is the function (the closure's hash
+  memoized; the key is the function (the closure's hash
   and its span), the arguments with their spans and the traced span; a
   hit also needs equal arguments (`args_memo_equal`), the same library
   object and the same answers for what the call asked of its context, of
@@ -476,7 +478,9 @@
   (`eval/captures.mbt`, not upstream: the identifiers that
   `CapturesVisitor` looks up are a function of the syntax, and
   `CaptureSite::captures` replays them against the scopes; a table by span
-  and node identity, since nodes are mutable and spans are not unique).
+  and node identity, since spans are not unique. Per compilation although
+  nodes never change now: its header says what keeping it would save, a
+  millisecond of a recompilation at most, and what it would hold).
   The visitor stays the reference: it runs outside of compilations, and
   `eval/captures_wbtest.mbt` compares the two on upstream's suite and, if
   they are in `_build/typst-packages`, on touying, cetz and fletcher. A `Fingerprint` must cover
@@ -525,9 +529,10 @@
   objects it has, not make them per call); files that change during a
   scope are declared when the tracked world is made (`volatile_files`;
   `doc`'s `Registry::changes`), and what reads one, or reads through
-  another tracked world, is not stored. The stores still end with their
-  compilation, so validation decides only where an engine of another
-  world is used inside a compilation. What proves the recording is
+  another tracked world, is not stored. The stores outlive a compilation
+  (below: "Kept across compilations"), so this validation is what decides
+  whether a result of an earlier compilation is one for the files, the
+  fonts and the date of this one. What proves the recording is
   `@library.set_memo_check(true)` (the runner's `--check-reads` on the
   `paged`, `packages`, `edsl` and `recompile` stages: every result that
   is kept is computed again from scratch, under a spy below the tracked
@@ -610,9 +615,18 @@
   the route (`Route::contains` for the ids it asked, and its depth within
   the entry's `RouteShifts`, as for closure calls: upstream tracks
   `Route::within`), the traced span and the world (its reads, validated
-  last) answer what the evaluation asked. Its scope only says when it is
-  dropped: nothing is kept from one compilation to the next before step
-  5. What an entry keeps is never handed out to be written to: an error
+  last) answer what the evaluation asked. An entry is found by any later
+  scope too and has comemo's age (below: "Kept across compilations"; of
+  the entries of a source that no `evict` has seen yet at most
+  `eval_memo_max_entries`, 12, are kept, and never is one dropped, for
+  that limit or by `evict`, that a scope that is still open stored or
+  took: a file is one module in a compilation; the outermost such scope
+  keeps it). With memoization off
+  (`set_layout_memo_enabled(false)`) an evaluation ends with its scope
+  and takes nothing from an earlier one (`EvalMemo::lives`), because the
+  store must still answer within the scope: a file is one module with or
+  without memoization. What an entry keeps is never handed out to be
+  written to: an error
   is kept as a copy and handed out as a copy (`own_result`:
   `@library.trace` appends a tracepoint to the diagnostics that pass
   through an import, where upstream writes to a clone; without the copies
@@ -622,14 +636,14 @@
   recording check share. Where a compilation is entered
   (`typst/lib.mbt`) the raw world is asked for `main()` and `library()`
   and nothing else, and `scripts/tracked_world_check.py` reports every
-  other use of it. Tests: `eval/import_wbtest.mbt`, which keeps the store
-  over several scopes of one world with a private switch
-  (`eval_memo_kept`: never set it elsewhere, what a kept entry needs
-  besides is steps 4 and 5); the `memo: a file ..` cases of
+  other use of it. Tests: `eval/import_wbtest.mbt`, whose tests evaluate
+  in several scopes of one world and each start with an empty store
+  (`with_empty_store`); the `memo: a file ..` cases of
   `typst/oracle_wbtest.mbt` (upstream's tracepoints and depth errors: the
   kind `traces` of `scripts/gen_typst_oracle.py` records the tracepoints
   that the CLI prints). `@eval.module_memo_stats()` counts the
-  evaluations that were found and that were computed.
+  evaluations that were found and that were computed,
+  `@eval.module_memo_entries()` those that are kept.
 - Identity and ownership of what the stores keep (step 4 of slice 1 of
   `docs/incremental-design.md`, "Step 4 as built" in its section 8, whose
   table lists every store and cache with what it keeps, what it hands
@@ -672,9 +686,106 @@
   keeps what `new` returned (a document does). Tests:
   `library/descriptor_identity_wbtest.mbt`,
   `library/memo_identity_wbtest.mbt`, `library/memo_owned_wbtest.mbt`,
-  `layout/cached_cell_wbtest.mbt`; they keep the stores over two
-  compilations by hand (`memo_test_next_compilation`), since the stores
-  are still emptied when a compilation starts.
+  `layout/cached_cell_wbtest.mbt`; they start the next compilation by
+  hand (`memo_test_next_compilation`: the next number, without what
+  `with_layout_memo` does when a compilation ends), so that what is
+  tested is the rule that an entry is not found, not that it is gone.
+- Kept across compilations (step 5 of slice 1 of
+  `docs/incremental-design.md`, "Step 5 as built" in its section 8; this
+  is what makes `typst watch` recompile in a fraction of a first
+  compilation). The stores of memoized calls are the process's: module
+  evaluations (`eval/import.mbt`), closure calls, layouts, counter
+  sequences and the works of a bibliography (`library/memo.mbt`). None
+  empties itself when a compilation or a scope starts. A later
+  compilation, of this world or of another, finds an entry if everything
+  that a hit ever needed still holds, and the last of it, the validation
+  of the entry's world reads in the scope at hand, is what makes a result
+  of an earlier compilation valid for the files, fonts and date of this
+  one. Lifetime is comemo's (`comemo/src/memoize.rs`: `evict`,
+  `CacheData::evict`, `lookup`): `@library.evict(max_age)` makes every
+  entry older by one and drops those above `max_age`, a hit makes an
+  entry young, `evict(0)` drops everything; every store and every
+  `ContentCache` registers itself with `evict` when it first keeps
+  something (`register_evictor`). `cli/watch.mbt` calls `evict(10)` after
+  every recompilation, where upstream calls `comemo::evict(10)`; a
+  process that never calls it keeps what it computed, at most
+  `memo_max_entries` (4) results per key and `eval_memo_max_entries`
+  (12) evaluations per source. Those limits count the entries of age
+  zero only (stored or found since the last `evict`): a limit that
+  dropped a key's first result for its fifth whatever its age is
+  something a document can see where comemo, which has no limit, still
+  finds the first (`tests/recompile/upstream/limit.json`: a function
+  that reads a file and returns a module it captured). So within a
+  compilation and in a process that never evicts the limits are what
+  they were, and in a watching process the ages decide. Rules. (1) The
+  decode caches are
+  `ContentCache`s with the same ages (syntaxes and themes of `raw`,
+  bibliographies, CSL styles, PDF documents, plugins and their calls,
+  numbering patterns); they were dropped as a whole on every tenth
+  `evict`, which made a plugin's module another object under a kept call
+  that held the old one. Ages are what a document can see there: a kept
+  getter's module is `==` to the plugin loaded again exactly as long as
+  upstream's `Plugin::module` entry lives (`tests/recompile/upstream/
+  plugin.json` is the upstream binary's watch: found ten evictions after
+  the last use, another module after eleven). So an age must be comemo's
+  to the eviction: `age += 1`, keep while `age <= max_age`, zero on a hit,
+  and nothing else may make an entry young. (2) An entry whose key holds
+  a host closure ends with its compilation (`MemoKey::compilation`,
+  `compilation_finds`) and is also dropped when the outermost compilation
+  ends (`end_compilation_entries`: memory, the rule is the other one).
+  (3) `set_layout_memo_enabled(false)` compiles from scratch: no store
+  and no result kept by content is asked or written, and evaluations of
+  files end with their scope; what a compilation with memoization left
+  stays for the next one with memoization. `evict(0)` plus that switch is
+  a clean slate, and `evict(0)` alone is a first compilation with
+  memoization: tests whose expectations count computations start with
+  `evict(0)` (`memo_test_begin`, `read_test`, `with_empty_store`), since
+  the tests of a package share a process and call the same functions
+  with the same arguments, and the stages of the runner that compare
+  with upstream's compilation from scratch call it before every
+  compilation (`runner_slate`; `--keep-memo` makes it `evict(10)`, a soak
+  in which the cases of a stage share the stores). (4) `evict` may be
+  called at any time. No lookup holds on to an array across the call it
+  memoizes (re-read the store after `f` returns), and the module store
+  does not drop what an open scope stored or took. (5) A second run of
+  the recording check leaves no trace: the stores are set aside, and a
+  `ContentCache` neither makes an entry young nor takes a new one while
+  it runs (under `--check-reads` a plugin never got old); and a closure
+  call of the second run is computed, for its reads, and then answers
+  what the first run was answered (`ClosureStore::original`, like
+  `EvalMemos::original` for imports), because the first run may have
+  found the call with the module of an earlier evaluation. (6) What a
+  closure store keeps besides entries has a time of last use too
+  (`ClosureStore.asked`), and what belongs to entries that end with
+  their compilation ends with them (`bound_bases`, the highlighted raw
+  text of `raw_highlight_bound`). (7) An entry is validated by replaying
+  its introspector reads, and every result that an earlier iteration or
+  compilation left under its key is a candidate: the fingerprint of an
+  answer is computed once per introspector and read (`ReadAccelerator`
+  in `library/introspector.mbt`, comemo's accelerator; without it the
+  counter sequence, kept, made `longer.typ` recompile 5 % slower than
+  not kept, since every candidate hashed the query of all headings). (8)
+  The caches by font are not known to `evict` (functions of their keys);
+  each has a limit and is emptied when it is full, since some have more
+  than a font in their key (the scale of a glyph's outline in `svg`, the
+  features of a shape plan). A new store or cache: an age per entry, zero
+  on a hit, an evictor, a limit per key if entries of one key can differ
+  in what the world answers, nothing by identity that a kept entry could
+  hold after the cache dropped it (or pin upstream's behaviour as the
+  plugin fixture does), a row in the design's table, and the mutation
+  checks of `tests/recompile/README.md`. Hosts: `@typst.compile` and
+  `compile_with` say what a host that keeps a world must do (keep its
+  library, book, fonts and sources as objects, call `evict`); a
+  compilation or lowering of `doc` ends with `evict(10)` itself, so a
+  process that compiles many documents holds the last ones; a one-shot
+  `typst compile` pays nothing (no evictor runs, an entry is one word
+  larger). The one thing a recompilation gives that a compilation from
+  scratch does not is upstream's own, modules compared with `==` after a
+  call that is found returned one, and it is pinned to recordings of the
+  upstream binary. Tests: `library/memo_evict_wbtest.mbt`, the ages in
+  `eval/import_wbtest.mbt` and `library/memo_closure_wbtest.mbt`,
+  `library/memo_identity_wbtest.mbt`; the `recompile` stage and
+  `scripts/recompile_soak.py` are the gate.
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
@@ -718,9 +829,9 @@
   drops those above `max_age`, so an entry survives `max_age` calls
   without a hit and goes with the next; a hit makes it young; a cache of
   another
-  package reaches `evict` through `register_evictor`), where the decode
-  caches of `evict`'s own list are dropped as a whole on every
-  `max_age`-th call; a result is immutable or copied for every caller;
+  package reaches `evict` through `register_evictor`); the decode
+  caches are of the same kind since step 5 of slice 1; a result is
+  immutable or copied for every caller;
   an error is kept if upstream's function returns a `Result` (comemo
   keeps it), and copied on the way out (`HintedString::clone`: hints are a
   mutable array); and the cache obeys `set_layout_memo_enabled`, in a
@@ -1185,18 +1296,21 @@
   it so (the package smoke test checks that a consumer of `doc` links no
   async runtime). Native and wasm only; wasm-gc and js print upstream-style
   "not supported by this build". The HTTP server of HTML watch is not
-  ported (`--no-serve` is required there). Every recompilation starts from
-  scratch: nothing is cached across compilations but the export cache, so
-  whatever is kept for the process must be keyed by content
-  (`@library.evict(10)` drops those caches where upstream calls
-  `comemo::evict(10)`) or end with the compilation or with its scope
-  (`TrackedWorld::scope_token`: the memo of module evaluations in
-  `eval/import.mbt` was by world identity and file text, and went stale
-  when a file that a module imports or reads changed;
-  `typst/recompile_wbtest.mbt`). After touching `kit/watcher`,
-  `cli/watch*.mbt`, `compile_once` or a process-global cache run
-  `python3 scripts/watch_check.py` for native and wasm (9 scenarios against
-  a fresh compile and against upstream's status lines and SVG bytes; it
+  ported (`--no-serve` is required there). A recompilation finds what the
+  compilations before it computed (above: "Kept across compilations";
+  `@library.evict(10)` after each, where upstream calls
+  `comemo::evict(10)`), and what it gives must be what a fresh `typst
+  compile` gives; whatever else is kept for the process must be keyed by
+  content or validated like the stores (the memo of module evaluations
+  was once by world identity and file text, and went stale when a file
+  that a module imports or reads changed; `typst/recompile_wbtest.mbt`).
+  After touching `kit/watcher`, `cli/watch*.mbt`, `compile_once` or a
+  process-global cache run `python3 scripts/watch_check.py` for native
+  and wasm (14 scenarios against a fresh compile and against upstream's
+  status lines and SVG bytes, five of them the sequences that are pinned
+  to upstream's watch, `pinned-*`, where the output must be what
+  upstream's watch wrote and not a fresh compilation's; `--bench` and
+  `--bench-memory` measure sessions; it
   needs the upstream binary and real file events, so it is not a CI stage;
   in the scenario `linked`, PNG pages of an SVG whose linked image
   changes, only the port's files are compared, since upstream keeps the
@@ -1227,11 +1341,10 @@
   `tests/recompile/docs` and three documents with packages. A failure
   names seed, sequence and step (`--only=<document> --seed=N -v` runs it
   again; files in `_build/recompile/`; `--check-reads` runs the
-  recording check of the tracked world on every compilation). Nothing is
-  cached across
-  compilations today but those page hashes, so the rest passes by
-  construction; it is the gate for
-  anything that will be. One difference from a compilation from scratch
+  recording check of the tracked world on every compilation). The loop
+  keeps what the engine keeps across compilations, every store of
+  memoized calls, so this stage is the gate for all of it and for
+  anything that will be kept. One difference from a compilation from scratch
   is upstream's own and is accepted where it is proven to be: after an
   edit that leaves the hash of a module as it was, a call that is found
   again returns the module of the evaluation before, and `==` tells it
@@ -1246,9 +1359,14 @@
   is a bug in a key or in a validation, never something to pin.
   About the gate: the watch loop of a sequence runs with nothing
   in between (the references come after it), and a new cache must be off
-  with `set_layout_memo_enabled(false)` or dropped by `evict(1)`, or the
-  references of the stage cannot see through it. Before a cache outlives
-  a compilation, repeat the mutation checks of the README (they must
+  with `set_layout_memo_enabled(false)` and dropped by `evict(0)`, which
+  the stage calls before every reference (not `evict(1)`: what has an age
+  survives that), or the references of the stage cannot see through it.
+  The number of pinned steps at which the loop gives upstream's watch
+  output is part of the verdict (`pinned_as_upstream_expected`, 18): a
+  store that stops finding its entries fails the stage too. After
+  changing a store, a key, a validation or an age, repeat the mutation
+  checks of the README (they must
   fail) and run `python3 scripts/recompile_soak.py`, which also compares
   steps with their compilation in a new process (`--snapshots`,
   `--replay`) and sorts out the runs in which an edit makes the compiler
