@@ -379,11 +379,11 @@ With the validation left on, the same three give:
 | 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same kind of store) | 0 | |
 | 3. closure calls | 0 | |
 
-That is what the validation is for, and it is not yet a licence to keep a
-store: the design lists what else a kept result depends on (state outside
-the arguments, identity, mutable results; its sections 5.3 to 5.5), which
-these sequences do not all reach, and the soak has not run on a kept
-store. The date, the fonts, `sys.inputs` and the files that a call reads
+That is what the validation is for. What else a kept result depends on
+(state outside the arguments, identity, mutable results: sections 5.3 to
+5.5 of the design) is steps 2 to 4 of its slice 1, and step 4 ran the
+experiment with every store kept at once ("With every store kept",
+below). The date, the fonts, `sys.inputs` and the files that a call reads
 are no longer among the things a key does not hold: they are the reads
 and the library of the entry.
 
@@ -401,6 +401,39 @@ the design's section 5.5), run on the default stage of 237 sequences:
 
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
+
+### With every store kept
+
+Step 4 of the design's slice 1 (identity and ownership; "Step 4 as built"
+in its section 8) ended with the experiment that says whether the stores
+can be kept: all of them at once. A local change, never committed:
+`memoize` and `memoized_closure` do not empty their stores when a
+compilation starts, the module entries outlive their scope
+(`eval_memo_kept`), `evict(1)`, which the stage calls before every
+reference, drops them all (so that references are computed from
+scratch), and `pinned_as_upstream_expected` is 13. Validation is on.
+
+| Every store kept, and | Failing sequences, of 240 | What |
+|---|---|---|
+| nothing else | 0 | the watch loop gave upstream's watch output at the 13 pinned steps at which upstream's watch differs from a fresh compilation, byte for byte, and a fresh compilation's at every other step of every sequence |
+| mutation 1 (module entries: world reads not validated) | 126 | first `bench/showcase`, sweep, step 2; the pinned sequences and their count fail with it |
+| mutation 2 (layouts, counter sequences, works) | 69 | first `bench/tiny`, sweep, step 1 |
+| mutation 3 (closure calls) | 12 | first `project/book`, sweep, step 1 |
+| an entry takes any introspector for the one it was computed with, and its introspector reads are not validated | the runner aborts (exit status 134) | `project/notes`; the `paged` stage too: a kept layout holds locations that the introspector of the iteration does not know |
+| the library is not compared, in all three stores | 1 | `project/notes`, sweep, steps 2 to 4 (`sys.inputs` changes) |
+| the sink of an entry that is found is not replayed | 9 | `query-running-header` and the four convergence tests of the suite: a warning that a fresh compilation gives is missing |
+| the stores take modules by identity instead of by their hashes | 2 | `upstream/modules`, steps 1 to 6 and 8: "the pages are not what upstream's watch gives either"; and the count of accepted steps (6, expected 13) |
+
+`scripts/recompile_soak.py --minutes 10` with that runner (every store
+kept, nothing else): 124 documents, seeds 1000 to 1004, 620 runs, 3040
+sequences, 34 594 steps, 102 372 compilations, 1835 steps compiled again
+in new processes, no failure and no abort.
+
+So with every store kept and validation on, a recompilation gives what a
+compilation from scratch gives in all of this, and what upstream's watch
+gives where the two differ. What that does not show is what the edits
+do not reach (below, "What it does not cover"), and it is not the change
+that keeps the stores: ages and eviction are step 5.
 
 All the counts of this section were measured again on the tree that has
 both step 2 and step 3 of the design (237 sequences: the project

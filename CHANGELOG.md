@@ -228,6 +228,20 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 
 ### Fixed
 
+- Memoized calls kept objects that their callers could write to. The
+  warnings and delayed errors of a call that was found again were the
+  objects that an earlier caller had received: a hint or a tracepoint
+  added to one (`SourceDiagnostic::hint`, `trace`) was in what every
+  later caller got. The same for the styles of traced values, for a value
+  of the type `arguments` that a call returned, for the entries of a
+  rendered bibliography (`Works::bibliography`), and for the errors that
+  plugin loads, plugin calls and a flow's cached child layouts raise
+  again. Each is a copy now.
+- Two native functions, elements or types that a host makes with the same
+  name, title and documentation were one value wherever values are
+  compared by their fingerprints: a closure that captured the one was
+  equal to a closure that captured the other, and a memoized call of the
+  first answered for the second.
 - Compiling a world again after its files changed (as `typst watch` and a
   host that keeps a `World` do): a module of an imported file was found
   again by the text of that file alone, so it was reused although a file
@@ -338,9 +352,9 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 
 ### Added
 
-- `library`: `Introspector::serial`, a number that says which introspector
-  one is (the same for the recording and the untracked forms of one, zero
-  for the empty ones). `Sink::kept` and `Sink::extend_from_kept`: a copy of
+- `library`: `Introspector::serial`, a number (`Int64`) that says which
+  introspector one is (the same for the recording and the untracked forms
+  of one, zero for the empty ones). `Sink::kept` and `Sink::extend_from_kept`: a copy of
   a sink for a store that keeps the effects of a call, and its replay,
   which hands out copies of the diagnostics and of the styles of traced
   values.

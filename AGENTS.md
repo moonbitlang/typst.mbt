@@ -647,18 +647,27 @@
   holds a host closure ends with its compilation
   (`MemoKey::compilation`, `compilation_finds`), in `memoize`, in
   `memoized_closure` and for highlighted raw text; a new store or cache
-  whose key can hold values asks it. (3) What a store keeps and what it
+  whose key can hold values asks it. Host closures are compared as
+  objects wherever an entry compares its arguments, also behind a hash or
+  behind `==`: a closure or a module that holds one
+  (`closures_memo_equal`, `modules_memo_equal`), and a value that the
+  comparison leaves to `==` and that can hold a closure (a tiling's
+  frame, the paint of a stroke or a decoration: `hosts_memo_equal`; a new
+  value of that kind gets the same). (3) What a store keeps and what it
   hands out are different objects wherever the type can be written to:
   an entry keeps a copy of its sink and replays copies (`Sink::kept`,
   `Sink::extend_from_kept`: diagnostics are objects that their holder
   appends hints and tracepoints to, the styles of a traced value can be
   written to), a kept error is raised as a copy (module entries, the
-  works, `CachedCell`, the plugin caches' `raise_kept`), the works hand
+  works, `CachedCell`, the plugin caches' `raise_kept`), a value is
+  kept and handed out through `kept_value` (arrays and dictionaries
+  marked shared, `arguments`, which have no mark and are consumed by
+  reading, copied), the works hand
   out the entries of a bibliography as an array of the caller's, and an
   introspector's `query` returns a view of what it keeps
   (`ArrayView[Content]`; `.to_owned()` for an array of one's own). (4)
   An entry knows the introspector it was computed with by a number
-  (`Introspector::serial`), not by the object: every `Introspector::new`
+  (`Introspector::serial`, 64 bits like a descriptor's), not by the object: every `Introspector::new`
   is another introspector, so whoever asks one backend again and again
   keeps what `new` returned (a document does). Tests:
   `library/descriptor_identity_wbtest.mbt`,
