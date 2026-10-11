@@ -252,6 +252,34 @@ test "blocks: the same block at three places is three layouts" {
 }
 
 ///|
+/// The style chain is in the key: a block whose text did not change is
+/// another layout under another set rule before it.
+test "blocks: the same block under other styles is another layout" {
+  @library.evict(0)
+  let document = (inset : Int) => {
+    "#set page(width: 160pt, height: auto, margin: 10pt)\n" +
+    "#set block(inset: \{inset}pt)\n" +
+    "#block(rect(width: 20pt, height: 10pt))\n" +
+    "#block(breakable: true, rect(width: 30pt, height: 10pt))\n"
+  }
+  let world = reading_world(document(2))
+  let narrow = outside_page_hashes(world)
+  let edited = block_memo_edit(world, document(7))
+  let mut wide = []
+  let counts = block_memo_delta(() => wide = outside_page_hashes(edited))
+  // The two blocks; the rectangles in them are blocks under the same
+  // styles as before (the inset of a block is not inherited).
+  assert_true(counts.1 >= 2)
+  assert_true(wide != narrow)
+  assert_eq(block_memo_reference(edited), wide)
+  let back = block_memo_edit(world, document(2))
+  let counts = block_memo_delta(() => {
+    assert_eq(outside_page_hashes(back), narrow)
+  })
+  assert_eq(counts.1, 0)
+}
+
+///|
 /// The regions of a block that breaks are in the key with the heights of
 /// the regions after the first: a block that spills onto a page with less
 /// room than the page before promised (a footnote of its own) is laid out
@@ -281,9 +309,12 @@ test "blocks: a block that breaks is laid out for the regions it gets" {
 }
 
 ///|
-/// The library is not in the key: the store compares it (upstream hashes
-/// it). A block whose layout reads `sys.inputs` is another layout under
-/// another library.
+/// A block whose layout reads `sys.inputs` is another layout under another
+/// library. Upstream hashes the library into the key; here the store
+/// compares it as an object, and a block that can tell two libraries apart
+/// has another key under each besides: the closure of a `context` block
+/// captured what it uses of the standard library, `sys` with the inputs
+/// among it.
 test "blocks: a block is laid out again under another library" {
   @library.evict(0)
   let text =
