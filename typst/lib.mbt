@@ -74,14 +74,20 @@ fn[T : @library.Output] compile_impl(
   compile_with(world, traced, sink, (tracked, library) => {
     // Fetch the main source file once. (Upstream reads `main` and its
     // source through the tracked world, outside of every memoized
-    // function, where nothing records them; the port asks the world.)
+    // function, where nothing records them. Here `main` is asked of the
+    // world, since the tracked world has no such method, and the source
+    // of the tracked world: the read is the first of the scope, and what
+    // imports the main file later reads the same answer.)
     let main = world.main()
-    let main = world.source(main) catch {
+    let main = tracked.source(main) catch {
       err =>
-        raise @library.SourceError(hint_invalid_main_file(world, err, main))
+        raise @library.SourceError(hint_invalid_main_file(tracked, err, main))
     }
 
-    // First evaluate the main source file into a module.
+    // First evaluate the main source file into a module. (Memoized, as
+    // upstream's `eval` is: a compilation whose main file is the source it
+    // was, with a library, a route, a traced span and a world that answer
+    // what the evaluation asked, finds its module.)
     @eval.eval_source(
       tracked,
       library,
@@ -116,14 +122,14 @@ pub fn[T : @library.Output] compile_with(
   // The compilation is a scope of the world: the world does not change
   // during it, and what its memoized calls read of it is recorded
   // (upstream: `world.track()`).
-  let world = @library.TrackedWorld::new(world, volatile_files?)
-  world.scoped(() => compile_scoped(world, library, traced, sink, evaluate))
+  let tracked = @library.TrackedWorld::new(world, volatile_files?)
+  tracked.scoped(() => compile_scoped(tracked, library, traced, sink, evaluate))
 }
 
 ///|
 /// The rest of `compile_with`, in the scope of the tracked world.
 fn[T : @library.Output] compile_scoped(
-  world : @library.TrackedWorld,
+  tracked : @library.TrackedWorld,
   library : @library.Library,
   traced : @library.Traced,
   sink : @library.Sink,
@@ -147,7 +153,7 @@ fn[T : @library.Output] compile_scoped(
   let document = @library.with_layout_memo(() => {
     // First produce the content (the Typst path evaluates the main source
     // file into a module).
-    let content = evaluate(world, library)
+    let content = evaluate(tracked, library)
     let history : Array[T] = []
     let mut document : T? = None
 
@@ -162,7 +168,7 @@ fn[T : @library.Output] compile_scoped(
       let subsink = @library.Sink::new()
       let engine : @library.Engine = {
         library,
-        world,
+        world: tracked,
         introspector: introspector.track_with(constraint),
         traced,
         sink: subsink,
@@ -181,7 +187,7 @@ fn[T : @library.Output] compile_scoped(
         }
         introspectors.push(doc.introspector())
         let warnings = @library.analyze(
-          world,
+          tracked,
           library,
           introspectors,
           subsink.introspections(),
@@ -218,7 +224,7 @@ pub fn deduplicate(
 /// Adds useful hints when the main source file couldn't be read
 /// and returns the final diagnostic.
 fn hint_invalid_main_file(
-  world : &@library.World,
+  tracked : @library.TrackedWorld,
   file_error : @library.FileError,
   input : @syntax.FileId,
 ) -> Array[@library.SourceDiagnostic] {
@@ -246,7 +252,7 @@ fn hint_invalid_main_file(
         )
     }
     let typ = input.get().map(p => p.with_extension("typ")).intern()
-    let exists = try world.source(typ) catch {
+    let exists = try tracked.source(typ) catch {
       _ => false
     } noraise {
       _ => true

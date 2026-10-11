@@ -9,8 +9,13 @@ engine code holds a raw `&World`. The type of `Engine.world` keeps other
 packages from it; this script holds the rest:
 
 - a raw world (`&World`, `&@library.World`) is named only where a
-  compilation or an evaluation is entered (`typst/lib.mbt`) and in the two
-  files that implement the tracked world;
+  compilation is entered (`typst/lib.mbt`) and in the two files that
+  implement the tracked world;
+- where a compilation is entered, the raw world is asked for its library
+  and for the id of its main file and for nothing else: the source of the
+  main file is read through the tracked world like every other (in
+  `typst/lib.mbt` a raw world is called `world` and a tracked one
+  `tracked`, which is what this script goes by);
 - the raw world of a tracked world (its private field `raw`, which the
   compiler lets all of `library` read) is read in `tracked_world.mbt` only;
 - `World::library` and `World::main`, which are not tracked, are called
@@ -40,6 +45,10 @@ RAW_WORLD = re.compile(r"&(@library\.)?World\b")
 # The private field, as the tracked worlds of `library` are called.
 RAW_FIELD = re.compile(r"\b(world|tracked)\.raw\b")
 UNTRACKED = re.compile(r"\b(?:World::(library|main)\b|world\.(library|main)\(\))")
+# The reads that are tracked, on the raw world of `typst/lib.mbt`.
+RAW_READ = re.compile(
+    r"\b(?:World::(source|file|book|font|today)\b|world\.(source|file|book|font|today)\()"
+)
 
 
 def sources():
@@ -70,6 +79,8 @@ def main():
                     problems.append((rel, number, "the raw world of a tracked world", line))
                 if UNTRACKED.search(code) and rel not in RAW_WORLD_FILES:
                     problems.append((rel, number, "an untracked read of the world", line))
+                if rel == "typst/lib.mbt" and RAW_READ.search(code):
+                    problems.append((rel, number, "a read of the raw world", line))
     for rel, number, what, line in problems:
         print(f"{rel}:{number}: {what}: {line.strip()}")
     if problems:

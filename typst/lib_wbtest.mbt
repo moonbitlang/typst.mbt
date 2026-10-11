@@ -335,3 +335,96 @@ test "compile reports evaluation errors" {
     ),
   )
 }
+
+///|
+/// A world whose main file is not a source: reading it fails with `error`.
+/// It may have a file of the same name with the extension `.typ`.
+priv struct WrongMainWorld {
+  library : @library.Library
+  main : @syntax.FileId
+  error : @library.FileError
+  typ : @syntax.Source?
+}
+
+///|
+impl @library.World for WrongMainWorld with fn library(self) {
+  self.library
+}
+
+///|
+impl @library.World for WrongMainWorld with fn main(self) {
+  self.main
+}
+
+///|
+impl @library.World for WrongMainWorld with fn source(self, id) {
+  if id == self.main {
+    raise self.error
+  }
+  match self.typ {
+    Some(typ) if id == typ.id() => typ
+    _ => raise @library.FileError::NotFound(id.vpath().get_without_slash())
+  }
+}
+
+///|
+impl @library.World for WrongMainWorld with fn file(_, _) {
+  raise @library.FileError::AccessDenied
+}
+
+///|
+impl @library.World for WrongMainWorld with fn today(_, _) {
+  None
+}
+
+///|
+test "a main file that cannot be read is reported with hints" {
+  let id = (path : String) => {
+    let vpath = @syntax.VirtualPath::new(path) catch {
+      _ => abort("invalid path")
+    }
+    @syntax.RootedPath::new(Project, vpath).intern()
+  }
+  let report = (world : WrongMainWorld) => {
+    let warned : @library.Warned[
+      Result[Capped, Array[@library.SourceDiagnostic]],
+    ] = compile(world)
+    guard warned.output is Err(errors) else { fail("expected err") }
+    errors
+    .map(error => [error.message, ..error.hints.map(hint => hint.v)].join("; "))
+    .join(" | ")
+  }
+  let library = library([])
+  // The source of the main file and that of its `.typ` sibling are asked
+  // of the tracked world of the compilation, like every other source.
+  inspect(
+    report({
+      library,
+      main: id("paper.pdf"),
+      error: InvalidUtf8,
+      typ: Some(@syntax.Source::new(id("paper.typ"), "Hello")),
+    }),
+    content="file is not valid UTF-8; a file with the `.pdf` extension is not usually a Typst file; check if you meant to use the `.typ` extension instead",
+  )
+  inspect(
+    report({ library, main: id("paper.pdf"), error: InvalidUtf8, typ: None, }),
+    content="file is not valid UTF-8; a file with the `.pdf` extension is not usually a Typst file",
+  )
+  inspect(
+    report({ library, main: id("paper"), error: InvalidUtf8, typ: None, }),
+    content="file is not valid UTF-8; a file without an extension is not usually a Typst file",
+  )
+  inspect(
+    report({ library, main: id("paper.typ"), error: InvalidUtf8, typ: None, }),
+    content="file is not valid UTF-8",
+  )
+  inspect(
+    report({
+      library,
+      main: id("paper.typ"),
+      error: NotFound("paper.typ"),
+      typ: None,
+    }),
+    content="file not found (searched at paper.typ)",
+  )
+}
