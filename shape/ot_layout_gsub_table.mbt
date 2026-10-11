@@ -322,9 +322,9 @@ fn ligature_apply(this : @otf.Ligature, ctx : ApplyContext) -> Unit? {
       let value = this.components.get(index.to_uint16()).unwrap()
       match_glyph(glyph, value.0.to_int())
     }
-    let match_end = Ref(0)
+    let match_end = out_cell(match_end_cell)
     let match_positions = [0, 0, 0, 0]
-    let total_component_count = Ref(0)
+    let total_component_count = out_cell(component_count_cell)
     if !match_input(
         ctx,
         this.components.len().to_int(),

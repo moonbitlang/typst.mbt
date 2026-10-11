@@ -125,6 +125,18 @@ pub fn SipHasher128::new() -> SipHasher128 {
 }
 
 ///|
+/// Make the hasher what [SipHasher128::new] gives.
+fn SipHasher128::reset(self : SipHasher128) -> Unit {
+  self.v0 = 0x736f6d6570736575UL
+  self.v1 = 0x646f72616e646f6dUL ^ 0xeeUL
+  self.v2 = 0x6c7967656e657261UL
+  self.v3 = 0x7465646279746573UL
+  self.tail = 0
+  self.ntail = 0
+  self.length = 0
+}
+
+///|
 fn rotl(x : UInt64, b : Int) -> UInt64 {
   (x << b) | (x >> (64 - b))
 }
@@ -489,10 +501,27 @@ pub fn fingerprint_lossy_in(f : () -> Unit) -> Bool {
 ///|
 /// Calculate a 128-bit SipHash of a value (upstream `typst_utils::hash128`).
 pub fn[T : Fingerprint] hash128(value : T) -> U128 {
-  let state = SipHasher128::new()
+  // (Upstream's hasher is on the stack. Here it is an object, so the one
+  // that the last call put back is taken again. While it is taken it is
+  // nobody else's: a call inside `write` makes its own, or takes what a
+  // call before it inside the same `write` put back.)
+  let state = match spare_hasher.val {
+    Some(state) => {
+      spare_hasher.val = None
+      state.reset()
+      state
+    }
+    None => SipHasher128::new()
+  }
   state.write(value)
-  state.finish128()
+  let hash = state.finish128()
+  spare_hasher.val = Some(state)
+  hash
 }
+
+///|
+/// The hasher that the last [hash128] is done with (not upstream).
+let spare_hasher : Ref[SipHasher128?] = Ref(None)
 
 ///|
 pub impl Fingerprint for Unit with fn fingerprint(_, _) {

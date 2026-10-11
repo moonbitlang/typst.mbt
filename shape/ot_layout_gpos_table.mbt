@@ -441,7 +441,7 @@ fn cursive_pos_apply(
   guard this.coverage.get(this_glyph) is Some(index_this) else { return None }
   guard this.sets.entry(index_this) is Some(entry_this) else { return None }
   let iter = SkippingIterator::new(ctx, ctx.buffer.idx, false)
-  let unsafe_from = Ref(0)
+  let unsafe_from = out_cell(unsafe_cell)
   if !iter.prev(Some(unsafe_from)) {
     ctx.buffer.unsafe_to_concat_from_outbuffer(
       Some(unsafe_from.val),
@@ -794,7 +794,7 @@ fn mark_mark_pos_apply(
     ctx.lookup_props &
     (LOOKUP_FLAG_IGNORE_FLAGS.reinterpret_as_uint() ^ 0xFFFFFFFF),
   )
-  let unsafe_from = Ref(0)
+  let unsafe_from = out_cell(unsafe_cell)
   if !iter.prev(Some(unsafe_from)) {
     ctx.buffer.unsafe_to_concat_from_outbuffer(
       Some(unsafe_from.val),
