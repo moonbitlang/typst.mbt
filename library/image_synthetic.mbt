@@ -55,7 +55,16 @@ pub fn SvgImage::synthetic(
   ) catch {
     _ => abort("unreachable")
   }
-  { data, width, height, fonts: [], resolved: false, links: [], tree, }
+  {
+    data,
+    width,
+    height,
+    fonts: [],
+    resolved: false,
+    selections: [],
+    links: [],
+    tree,
+  }
 }
 
 ///|
