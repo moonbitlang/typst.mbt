@@ -27,12 +27,12 @@ pub fn Rect::new(min : Point, max : Point) -> Rect {
 
 ///|
 /// Create a new rectangle from the position and size.
-pub fn Rect::from_pos_size(pos : Point, size : Axes[Abs]) -> Rect {
+pub fn Rect::from_pos_size(pos : Point, size : Size) -> Rect {
   { min: pos, max: pos + size.to_point(), }
 }
 
 ///|
 /// Compute the size of the rectangle.
-pub fn Rect::size(self : Rect) -> Axes[Abs] {
-  Axes::new(self.max.x - self.min.x, self.max.y - self.min.y)
+pub fn Rect::size(self : Rect) -> Size {
+  Size::new(self.max.x - self.min.x, self.max.y - self.min.y)
 }

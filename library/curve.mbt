@@ -47,7 +47,7 @@ pub fn Curve::new() -> Curve {
 
 ///|
 /// Creates a curve that describes a rectangle.
-pub fn Curve::rect(size : Axes[Abs]) -> Curve {
+pub fn Curve::rect(size : Size) -> Curve {
   let z = Abs::zero()
   let point = Point::new
   let curve = Curve::new()
@@ -61,7 +61,7 @@ pub fn Curve::rect(size : Axes[Abs]) -> Curve {
 
 ///|
 /// Creates a curve that describes an axis-aligned ellipse.
-pub fn Curve::ellipse(size : Axes[Abs]) -> Curve {
+pub fn Curve::ellipse(size : Size) -> Curve {
   // https://stackoverflow.com/a/2007782
   let z = Abs::zero()
   let rx = size.x.div_by(2.0)

@@ -14,7 +14,7 @@ fn impl_measure(
   // Create a pod region with the available space.
   let styles = at(span, () => context.get_styles())
   let pod = LayoutRegion::new(
-    Axes::new(
+    Size::new(
       match width_ {
         Custom(width) => width.resolve(styles)
         Auto => Abs::inf()

@@ -118,8 +118,8 @@ pub fn Point::transform_inf(self : Point, ts : Transform) -> Point {
 
 ///|
 /// Convert to a size.
-pub fn Point::to_size(self : Point) -> Axes[Abs] {
-  Axes::new(self.x, self.y)
+pub fn Point::to_size(self : Point) -> Size {
+  Size::new(self.x, self.y)
 }
 
 ///|

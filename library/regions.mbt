@@ -10,7 +10,7 @@
 /// because `Region` is the text region of `text/lang.rs`).
 pub(all) struct LayoutRegion {
   /// The size of the region.
-  size : Axes[Abs]
+  size : Size
   /// Whether elements should expand to fill the regions instead of shrinking
   /// to fit the content.
   expand : Axes[Bool]
@@ -28,7 +28,7 @@ pub extend LayoutRegion with Hash::{hash, hash_combine}
 
 ///|
 /// Create a new region.
-pub fn LayoutRegion::new(size : Axes[Abs], expand : Axes[Bool]) -> LayoutRegion {
+pub fn LayoutRegion::new(size : Size, expand : Axes[Bool]) -> LayoutRegion {
   { size, expand, }
 }
 
@@ -41,7 +41,7 @@ pub fn LayoutRegion::new(size : Axes[Abs], expand : Axes[Bool]) -> LayoutRegion 
 /// instance, have content wrap to the side of a floating element.
 pub(all) struct Regions {
   /// The remaining size of the first region.
-  size : Axes[Abs]
+  size : Size
   /// Whether elements should expand to fill the regions instead of shrinking
   /// to fit the content.
   expand : Axes[Bool]
@@ -68,7 +68,7 @@ pub fn Regions::from_region(region : LayoutRegion) -> Regions {
 
 ///|
 /// Create a new sequence of same-size regions that repeats indefinitely.
-pub fn Regions::repeat(size : Axes[Abs], expand : Axes[Bool]) -> Regions {
+pub fn Regions::repeat(size : Size, expand : Axes[Bool]) -> Regions {
   { size, full: size.y, backlog: [][:], last: Some(size.y), expand, }
 }
 
@@ -77,8 +77,8 @@ pub fn Regions::repeat(size : Axes[Abs], expand : Axes[Bool]) -> Regions {
 /// already partially used up.
 ///
 /// This is also used for relative sizing.
-pub fn Regions::base(self : Regions) -> Axes[Abs] {
-  Axes::new(self.size.x, self.full)
+pub fn Regions::base(self : Regions) -> Size {
+  Size::new(self.size.x, self.full)
 }
 
 ///|
@@ -87,14 +87,14 @@ pub fn Regions::base(self : Regions) -> Axes[Abs] {
 /// Note that since all regions must have the same width, the width returned
 /// by `f` is ignored for the backlog and the final region. (Upstream fills
 /// a caller-provided backlog buffer; here a new array is allocated.)
-pub fn Regions::map(self : Regions, f : (Axes[Abs]) -> Axes[Abs]) -> Regions {
+pub fn Regions::map(self : Regions, f : (Size) -> Size) -> Regions {
   let x = self.size.x
-  let backlog = self.backlog.iter().map(y => f(Axes::new(x, y)).y).collect()
+  let backlog = self.backlog.iter().map(y => f(Size::new(x, y)).y).collect()
   {
     size: f(self.size),
-    full: f(Axes::new(x, self.full)).y,
+    full: f(Size::new(x, self.full)).y,
     backlog: backlog[:],
-    last: self.last.map(y => f(Axes::new(x, y)).y),
+    last: self.last.map(y => f(Size::new(x, y)).y),
     expand: self.expand,
   }
 }
@@ -137,7 +137,7 @@ pub fn Regions::next(self : Regions) -> Regions {
 /// regions, equivalently to what would be produced by calling
 /// [`next()`](Self::next) repeatedly until all regions are exhausted. This
 /// iterator may be infinite.
-pub fn Regions::iter(self : Regions) -> Iter[Axes[Abs]] {
+pub fn Regions::iter(self : Regions) -> Iter[Size] {
   let mut first = true
   let mut i = 0
   Iter::new(() => {
@@ -148,27 +148,27 @@ pub fn Regions::iter(self : Regions) -> Iter[Axes[Abs]] {
     if i < self.backlog.length() {
       let h = self.backlog[i]
       i += 1
-      return Some(Axes::new(self.size.x, h))
+      return Some(Size::new(self.size.x, h))
     }
-    self.last.map(h => Axes::new(self.size.x, h))
+    self.last.map(h => Size::new(self.size.x, h))
   })
 }
 
 ///|
 /// Upstream `Debug for Regions`.
 pub impl Show for Regions with fn output(self, logger) {
-  let size = (s : Axes[Abs]) => {
+  let size = (s : Size) => {
     "Axes(\{rust_debug_f64(s.x.to_pt())}pt, \{rust_debug_f64(s.y.to_pt())}pt)"
   }
   let entries = [size(self.size)]
   let mut prev = self.size.y
   for height in self.backlog {
-    entries.push(size(Axes::new(self.size.x, height)))
+    entries.push(size(Size::new(self.size.x, height)))
     prev = height
   }
   if self.last is Some(last) {
     if last != prev {
-      entries.push(size(Axes::new(self.size.x, last)))
+      entries.push(size(Size::new(self.size.x, last)))
     }
     entries.push("..")
   }

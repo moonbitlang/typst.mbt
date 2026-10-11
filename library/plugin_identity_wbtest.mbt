@@ -50,7 +50,7 @@ fn plugin_test_load(bytes : Bytes) -> Module raise {
 /// A frame with a tag whose element holds `value`.
 fn plugin_test_frame(value : Value) -> Frame {
   let elem = TextElem::packed("x").elem()
-  let frame = Frame::soft(Axes::new(Abs::pt(10.0), Abs::pt(10.0)))
+  let frame = Frame::soft(Size::new(Abs::pt(10.0), Abs::pt(10.0)))
   frame.push(
     Point::zero(),
     Tag(

@@ -23,7 +23,7 @@ fn positions(frame : @library.Frame) -> Array[Double] {
 
 ///|
 test "clone is copy-on-write" {
-  let a = @library.Frame::soft(@library.Axes::new(pt(10.0), pt(10.0)))
+  let a = @library.Frame::soft(@library.Size::new(pt(10.0), pt(10.0)))
   a.push(@library.Point::zero(), line_item())
   let b = a.clone()
   b.push(@library.Point::with_x(pt(2.0)), line_item())
@@ -34,9 +34,9 @@ test "clone is copy-on-write" {
 
 ///|
 test "nested groups are copied on write" {
-  let inner = @library.Frame::soft(@library.Axes::new(pt(5.0), pt(5.0)))
+  let inner = @library.Frame::soft(@library.Size::new(pt(5.0), pt(5.0)))
   inner.push(@library.Point::zero(), line_item())
-  let outer = @library.Frame::hard(@library.Axes::new(pt(10.0), pt(10.0)))
+  let outer = @library.Frame::hard(@library.Size::new(pt(10.0), pt(10.0)))
   outer.push(@library.Point::zero(), Group(@library.GroupItem::new(inner)))
   let copy = outer.clone()
   // Hiding mutates the group's frame in place, which must not leak into the
@@ -49,14 +49,14 @@ test "nested groups are copied on write" {
 
 ///|
 test "push_frame inlines small soft frames" {
-  let child = @library.Frame::soft(@library.Axes::new(pt(5.0), pt(5.0)))
+  let child = @library.Frame::soft(@library.Size::new(pt(5.0), pt(5.0)))
   child.push(@library.Point::with_x(pt(1.0)), line_item())
-  let parent = @library.Frame::soft(@library.Axes::new(pt(10.0), pt(10.0)))
+  let parent = @library.Frame::soft(@library.Size::new(pt(10.0), pt(10.0)))
   parent.push(@library.Point::zero(), line_item())
   parent.push_frame(@library.Point::with_x(pt(2.0)), child)
   @debug.debug_inspect(positions(parent), content="[0, 3]")
   // Hard frames become groups.
-  let hard = @library.Frame::hard(@library.Axes::new(pt(5.0), pt(5.0)))
+  let hard = @library.Frame::hard(@library.Size::new(pt(5.0), pt(5.0)))
   hard.push(@library.Point::zero(), line_item())
   parent.push_frame(@library.Point::zero(), hard)
   inspect(parent.items()[2].1 is Group(_), content="true")
@@ -64,7 +64,7 @@ test "push_frame inlines small soft frames" {
 
 ///|
 test "transform wraps the contents in a group" {
-  let frame = @library.Frame::soft(@library.Axes::new(pt(10.0), pt(10.0)))
+  let frame = @library.Frame::soft(@library.Size::new(pt(10.0), pt(10.0)))
   frame.set_baseline(pt(8.0))
   frame.push(@library.Point::zero(), line_item())
   frame.transform(
@@ -79,11 +79,11 @@ test "transform wraps the contents in a group" {
 
 ///|
 test "resize translates by alignment" {
-  let frame = @library.Frame::soft(@library.Axes::new(pt(10.0), pt(10.0)))
+  let frame = @library.Frame::soft(@library.Size::new(pt(10.0), pt(10.0)))
   frame.set_baseline(pt(5.0))
   frame.push(@library.Point::zero(), line_item())
   let offset = frame.resize(
-    @library.Axes::new(pt(20.0), pt(30.0)),
+    @library.Size::new(pt(20.0), pt(30.0)),
     @library.Axes::new(
       @library.FixedAlignment::Center,
       @library.FixedAlignment::End,
@@ -98,7 +98,7 @@ test "resize translates by alignment" {
 test "regions" {
   let regions : @library.Regions = {
     ..@library.Regions::repeat(
-      @library.Axes::new(pt(10.0), pt(100.0)),
+      @library.Size::new(pt(10.0), pt(100.0)),
       @library.Axes::splat(false),
     ),
     backlog: [pt(50.0), pt(60.0)][:],
@@ -114,7 +114,7 @@ test "regions" {
   inspect(
     @library.Regions::from_region(
       @library.LayoutRegion::new(
-        @library.Axes::new(pt(10.0), pt(20.0)),
+        @library.Size::new(pt(10.0), pt(20.0)),
         @library.Axes::splat(true),
       ),
     ).may_break(),

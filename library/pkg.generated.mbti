@@ -3864,36 +3864,27 @@ pub(all) struct Axes[T] {
   x : T
   y : T
 } derive(Default, Eq, Hash, @debug.Debug)
-pub fn Axes::add_size(Self[Abs], Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::all(Self[T], (T) -> Bool) -> Bool
 pub fn[T] Axes::any(Self[T], (T) -> Bool) -> Bool
-pub fn Axes::aspect_ratio(Self[Abs]) -> Ratio
 pub fn Axes::bitand(Self[Bool], Self[Bool]) -> Self[Bool]
 pub fn Axes::bitor(Self[Bool], Self[Bool]) -> Self[Bool]
-pub fn Axes::div_by(Self[Abs], Double) -> Self[Abs]
-pub fn Axes::fits(Self[Abs], Self[Abs]) -> Bool
 pub fn[T] Axes::get(Self[T], Axis) -> T
 pub fn[T : IntoValue] Axes::into_value(Self[T]) -> Value
-pub fn Axes::is_finite_size(Self[Abs]) -> Bool
-pub fn Axes::is_zero_size(Self[Abs]) -> Bool
 pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T : Compare] Axes::max(Self[T], Self[T]) -> Self[T]
 pub fn[T : Compare] Axes::max_by_side(Self[T]) -> T
 pub fn[T : Compare] Axes::min(Self[T], Self[T]) -> Self[T]
 pub fn[T : Compare] Axes::min_by_side(Self[T]) -> T
-pub fn Axes::neg_size(Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::new(T, T) -> Self[T]
-pub fn Axes::relative_to(Self[Rel[Abs]], Self[Abs]) -> Self[Abs]
+pub fn Axes::relative_to(Self[Rel[Abs]], Size) -> Size
 pub fn[T] Axes::select(Self[Bool], Self[T], Self[T]) -> Self[T]
+pub fn Axes::select_size(Self[Bool], Size, Size) -> Size
 pub fn[T] Axes::splat(T) -> Self[T]
-pub fn Axes::sub_size(Self[Abs], Self[Abs]) -> Self[Abs]
-pub fn Axes::times(Self[Abs], Double) -> Self[Abs]
-pub fn Axes::to_point(Self[Abs]) -> Point
 pub fn[T] Axes::unwrap_or_smart(Self[Smart[T]], Self[T]) -> Self[T]
 pub fn[T] Axes::with_axis_value(Self[T], Axis, T) -> Self[T]
-pub fn Axes::zero_size() -> Self[Abs]
 pub fn[T, U] Axes::zip(Self[T], Self[U]) -> Self[(T, U)]
 pub fn[T, V, U] Axes::zip_map(Self[T], Self[V], (T, V) -> U) -> Self[U]
+pub fn[T] Axes::zip_map_size(Self[T], Size, (T, Abs) -> Abs) -> Size
 pub impl[T : FromValue] FromValue for Axes[T]
 pub impl[T : IntoValue] IntoValue for Axes[T]
 pub impl[T : Reflect] Reflect for Axes[T]
@@ -5100,13 +5091,13 @@ pub(all) struct Curve(Array[CurveItem]) derive(Default, Eq, Hash)
 pub fn Curve::close(Self) -> Unit
 pub fn Curve::copy(Self) -> Self
 pub fn Curve::cubic(Self, Point, Point, Point) -> Unit
-pub fn Curve::ellipse(Axes[Abs]) -> Self
+pub fn Curve::ellipse(Size) -> Self
 pub fn Curve::is_empty(Self) -> Bool
 pub fn Curve::items(Self) -> Array[CurveItem]
 pub fn Curve::line(Self, Point) -> Unit
 pub fn Curve::move_(Self, Point) -> Unit
 pub fn Curve::new() -> Self
-pub fn Curve::rect(Axes[Abs]) -> Self
+pub fn Curve::rect(Size) -> Self
 pub fn Curve::translate(Self, Point) -> Unit
 pub impl Fingerprint for Curve
 
@@ -6649,7 +6640,7 @@ pub fn Frame::clip(Self, Curve) -> Unit
 pub fn Frame::clone(Self) -> Self
 pub fn Frame::descent(Self) -> Abs
 pub fn Frame::fill(Self, Paint) -> Unit
-pub fn Frame::hard(Axes[Abs]) -> Self
+pub fn Frame::hard(Size) -> Self
 pub fn Frame::has_baseline(Self) -> Bool
 pub fn Frame::height(Self) -> Abs
 pub fn Frame::hide(Self) -> Unit
@@ -6663,21 +6654,21 @@ pub fn Frame::mark_box(Self) -> Self
 pub fn Frame::mark_box_in_place(Self) -> Unit
 pub fn Frame::mark_line(Self, Abs) -> Unit
 pub fn Frame::mark_point(Self, Point) -> Unit
-pub fn Frame::new(Axes[Abs], FrameKind) -> Self
+pub fn Frame::new(Size, FrameKind) -> Self
 pub fn Frame::prepend(Self, Point, FrameItem) -> Unit
 pub fn Frame::prepend_frame(Self, Point, Self) -> Unit
 pub fn Frame::prepend_multiple(Self, Iter[(Point, FrameItem)]) -> Unit
 pub fn Frame::push(Self, Point, FrameItem) -> Unit
 pub fn Frame::push_frame(Self, Point, Self) -> Unit
 pub fn Frame::push_multiple(Self, Iter[(Point, FrameItem)]) -> Unit
-pub fn Frame::resize(Self, Axes[Abs], Axes[FixedAlignment]) -> Point
+pub fn Frame::resize(Self, Size, Axes[FixedAlignment]) -> Point
 pub fn Frame::retain(Self, (FrameItem) -> Bool) -> Unit
 pub fn Frame::set_baseline(Self, Abs) -> Unit
 pub fn Frame::set_kind(Self, FrameKind) -> Unit
 pub fn Frame::set_parent(Self, FrameParent) -> Unit
-pub fn Frame::set_size(Self, Axes[Abs]) -> Unit
-pub fn Frame::size(Self) -> Axes[Abs]
-pub fn Frame::soft(Axes[Abs]) -> Self
+pub fn Frame::set_size(Self, Size) -> Unit
+pub fn Frame::size(Self) -> Size
+pub fn Frame::soft(Size) -> Self
 pub fn Frame::transform(Self, Transform) -> Unit
 pub fn Frame::translate(Self, Point) -> Unit
 pub fn Frame::translate_visual(Self, Point) -> Unit
@@ -6699,8 +6690,8 @@ pub(all) enum FrameItem {
   Group(GroupItem)
   Text(TextItem)
   Shape(Shape, @moonbitlang/typst/syntax.Span)
-  Image(Image, Axes[Abs], @moonbitlang/typst/syntax.Span)
-  Link(Destination, Axes[Abs])
+  Image(Image, Size, @moonbitlang/typst/syntax.Span)
+  Link(Destination, Size)
   Tag(Tag)
 } derive(Eq)
 pub fn FrameItem::clone(Self) -> Self
@@ -6765,7 +6756,7 @@ pub(all) enum FuncInner {
 
 pub(all) enum Geometry {
   Line(Point)
-  Rect(Axes[Abs])
+  Rect(Size)
   Curve(Curve)
 } derive(Eq)
 pub fn Geometry::filled(Self, Paint) -> Shape
@@ -6790,12 +6781,12 @@ pub(all) struct GlyphFrame {
   upem : Abs
   item : GlyphFrameItem
 }
-pub fn GlyphFrame::size(Self) -> Axes[Abs]
+pub fn GlyphFrame::size(Self) -> Size
 pub fn GlyphFrame::to_frame(Self) -> Frame
 
 pub(all) enum GlyphFrameItem {
   Tofu(Point, Shape)
-  Image(Point, Image, Axes[Abs])
+  Image(Point, Image, Size)
 }
 pub fn GlyphFrameItem::pos(Self) -> Point
 
@@ -7526,11 +7517,11 @@ pub(all) enum Inherit {
 pub struct InlineCallback {
   // private fields
 }
-pub fn InlineCallback::call(Self, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError
+pub fn InlineCallback::call(Self, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError
 pub fn InlineCallback::captured(Self) -> Content
 pub fn InlineCallback::castable(Value) -> Bool
 pub fn InlineCallback::input() -> CastInfo
-pub fn[T : NativeElement] InlineCallback::new(T, (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError) -> Self
+pub fn[T : NativeElement] InlineCallback::new(T, (T, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError) -> Self
 pub fn InlineCallback::output() -> CastInfo
 pub impl Eq for InlineCallback
 pub impl FromValue for InlineCallback
@@ -7539,8 +7530,8 @@ pub impl Reflect for InlineCallback
 
 pub struct InlineElem(Content)
 pub fn InlineElem::body(Self) -> InlineCallback
-pub fn InlineElem::layout(Self, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError
-pub fn[T : NativeElement] InlineElem::layouter(T, (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError) -> Self
+pub fn InlineElem::layout(Self, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError
+pub fn[T : NativeElement] InlineElem::layouter(T, (T, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError) -> Self
 pub fn InlineElem::new(InlineCallback) -> Self
 pub fn InlineElem::of(Content) -> Self?
 pub fn InlineElem::pack(Self) -> Content
@@ -7665,10 +7656,10 @@ pub fn LayoutElem::with_func(Self, Func) -> Self
 pub impl NativeElement for LayoutElem
 
 pub(all) struct LayoutRegion {
-  size : Axes[Abs]
+  size : Size
   expand : Axes[Bool]
 } derive(Eq, Hash)
-pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
+pub fn LayoutRegion::new(Size, Axes[Bool]) -> Self
 
 pub struct LazyFingerprint {
   // private fields
@@ -9632,7 +9623,7 @@ pub fn Point::normalized(Self) -> Self
 pub fn Point::rot90ccw(Self) -> Self
 pub fn Point::splat(Abs) -> Self
 pub fn Point::times(Self, Double) -> Self
-pub fn Point::to_size(Self) -> Axes[Abs]
+pub fn Point::to_size(Self) -> Size
 pub fn Point::transform(Self, Transform) -> Self
 pub fn Point::transform_inf(Self, Transform) -> Self
 pub fn Point::with_axis(Self, Axis, Abs) -> Self
@@ -10026,9 +10017,9 @@ pub(all) struct Rect {
   min : Point
   max : Point
 } derive(Eq, Hash)
-pub fn Rect::from_pos_size(Point, Axes[Abs]) -> Self
+pub fn Rect::from_pos_size(Point, Size) -> Self
 pub fn Rect::new(Point, Point) -> Self
-pub fn Rect::size(Self) -> Axes[Abs]
+pub fn Rect::size(Self) -> Size
 
 pub struct RectElem(Content)
 pub fn RectElem::body(Self, StyleChain) -> Content?
@@ -10137,21 +10128,21 @@ pub impl IntoValue for Region
 pub impl Reflect for Region
 
 pub(all) struct Regions {
-  size : Axes[Abs]
+  size : Size
   expand : Axes[Bool]
   full : Abs
   backlog : ArrayView[Abs]
   last : Abs?
 }
-pub fn Regions::base(Self) -> Axes[Abs]
+pub fn Regions::base(Self) -> Size
 pub fn Regions::from_region(LayoutRegion) -> Self
 pub fn Regions::is_full(Self) -> Bool
-pub fn Regions::iter(Self) -> Iter[Axes[Abs]]
-pub fn Regions::map(Self, (Axes[Abs]) -> Axes[Abs]) -> Self
+pub fn Regions::iter(Self) -> Iter[Size]
+pub fn Regions::map(Self, (Size) -> Size) -> Self
 pub fn Regions::may_break(Self) -> Bool
 pub fn Regions::may_progress(Self) -> Bool
 pub fn Regions::next(Self) -> Self
-pub fn Regions::repeat(Axes[Abs], Axes[Bool]) -> Self
+pub fn Regions::repeat(Size, Axes[Bool]) -> Self
 pub impl Show for Regions
 
 pub(all) struct Rel[T] {
@@ -10652,9 +10643,10 @@ pub fn[T] Sides::iter(Self[T]) -> Iter[T]
 pub fn[T, U] Sides::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T, U] Sides::map_corners(Self[T], (T, T) -> U) -> Corners[U]
 pub fn[T] Sides::new(T, T, T, T) -> Self[T]
-pub fn Sides::relative_to(Self[Rel[Abs]], Axes[Abs]) -> Self[Abs]
+pub fn Sides::relative_to(Self[Rel[Abs]], Size) -> Self[Abs]
 pub fn[T] Sides::splat(T) -> Self[T]
 pub fn[T : Add] Sides::sum_by_axis(Self[T]) -> Axes[T]
+pub fn Sides::sum_by_axis_size(Self[Abs]) -> Size
 pub fn[T] Sides::unwrap_or(Self[T?], T) -> Self[T]
 pub fn[T] Sides::with_side(Self[T], Side, T) -> Self[T]
 pub fn[T, U] Sides::zip(Self[T], Self[U]) -> Self[(T, U)]
@@ -10718,6 +10710,43 @@ pub fn SipHasher128::write_u64(Self, UInt64) -> Unit
 pub fn SipHasher128::write_u8(Self, Byte) -> Unit
 pub fn SipHasher128::write_usize(Self, Int) -> Unit
 pub impl @moonbitlang/typst/syntax.NodeHasher for SipHasher128
+
+pub(all) struct Size {
+  x : Abs
+  y : Abs
+} derive(Default, Eq, Hash)
+pub fn Size::all(Self, (Abs) -> Bool) -> Bool
+pub fn Size::any(Self, (Abs) -> Bool) -> Bool
+pub fn Size::aspect_ratio(Self) -> Ratio
+pub fn Size::div_by(Self, Double) -> Self
+pub fn Size::fits(Self, Self) -> Bool
+pub fn Size::from_axes(Axes[Abs]) -> Self
+pub fn Size::get(Self, Axis) -> Abs
+pub fn Size::is_finite(Self) -> Bool
+pub fn Size::is_zero(Self) -> Bool
+pub fn Size::map(Self, (Abs) -> Abs) -> Self
+pub fn[U] Size::map_axes(Self, (Abs) -> U) -> Axes[U]
+pub fn Size::max(Self, Self) -> Self
+pub fn Size::max_by_side(Self) -> Abs
+pub fn Size::min(Self, Self) -> Self
+pub fn Size::min_by_side(Self) -> Abs
+pub fn Size::new(Abs, Abs) -> Self
+pub fn Size::splat(Abs) -> Self
+pub fn Size::times(Self, Double) -> Self
+pub fn Size::to_axes(Self) -> Axes[Abs]
+pub fn Size::to_point(Self) -> Point
+pub fn Size::with_axis_value(Self, Axis, Abs) -> Self
+pub fn Size::with_x(Abs) -> Self
+pub fn Size::with_y(Abs) -> Self
+pub fn Size::zero() -> Self
+pub fn[V] Size::zip_map(Self, Axes[V], (Abs, V) -> Abs) -> Self
+pub impl Add for Size
+pub impl Neg for Size
+pub impl Sub for Size
+pub impl FromValue for Size
+pub impl IntoValue for Size
+pub impl Numeric for Size
+pub impl Reflect for Size
 
 pub(all) enum Sizing {
   Auto
@@ -12000,9 +12029,9 @@ pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
   frame : Frame
-  size : Axes[Abs]
-  spacing : Axes[Abs]
-  offset : Axes[Abs]
+  size : Size
+  spacing : Size
+  offset : Size
   angle : Angle
   relative : Smart[RelativeTo]
   frame_hash : LazyFingerprint
@@ -12692,8 +12721,6 @@ pub type Pair = (Content, StyleChain)
 pub using @moonbitlang/typst/syntax {type RootedPath}
 
 pub type ShowFn[T] = (T, Engine, StyleChain) -> Content raise SourceError
-
-pub type Size = Axes[Abs]
 
 pub type SymbolVariantData = (ModifierSet, String, String?)
 

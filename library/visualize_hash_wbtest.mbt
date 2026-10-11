@@ -60,7 +60,7 @@ fn test_stroke(thickness : Double) -> Stroke {
 ///|
 /// A frame with one filled square.
 fn test_frame(fill : Paint) -> Frame {
-  let size = Axes::new(Abs::pt(10.0), Abs::pt(10.0))
+  let size = Size::new(Abs::pt(10.0), Abs::pt(10.0))
   let frame = Frame::soft(size)
   frame.push(
     Point::zero(),
@@ -74,8 +74,8 @@ fn test_tiling(frame : Frame) -> Tiling {
   {
     frame,
     size: frame.size(),
-    spacing: Axes::new(Abs::zero(), Abs::zero()),
-    offset: Axes::new(Abs::zero(), Abs::zero()),
+    spacing: Size::new(Abs::zero(), Abs::zero()),
+    offset: Size::new(Abs::zero(), Abs::zero()),
     angle: Angle::zero(),
     relative: Auto,
     frame_hash: LazyFingerprint::new(),
@@ -165,7 +165,7 @@ test "fingerprints of gradients and strokes cover their data" {
 
 ///|
 test "fingerprints of frames cover their items" {
-  let size = Axes::new(Abs::pt(10.0), Abs::pt(10.0))
+  let size = Size::new(Abs::pt(10.0), Abs::pt(10.0))
   let red = () => test_frame(Solid(color_red))
   let group = (f : (GroupItem) -> Unit) => {
     let frame = Frame::soft(size)
@@ -247,7 +247,7 @@ test "fingerprints of tilings cover their frames" {
     Value::Tiling(red),
     Tiling(blue),
     Tiling({ ..red, relative: Custom(Parent), }),
-    Tiling({ ..red, spacing: Axes::new(Abs::pt(0.00001), Abs::zero()), }),
+    Tiling({ ..red, spacing: Size::new(Abs::pt(0.00001), Abs::zero()), }),
     Tiling({ ..red, angle: Angle::deg(0.00001), }),
     Tiling(test_tiling(test_frame(Tiling(red)))),
     Tiling(test_tiling(test_frame(Tiling(blue)))),

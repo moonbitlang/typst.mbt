@@ -26,14 +26,14 @@ pub(all) struct GlyphFrame {
 
 ///|
 /// The font unit square.
-pub fn GlyphFrame::size(self : GlyphFrame) -> Axes[Abs] {
-  Axes::splat(self.upem)
+pub fn GlyphFrame::size(self : GlyphFrame) -> Size {
+  Size::splat(self.upem)
 }
 
 ///|
 /// Upstream `From<GlyphFrame> for Frame`.
 pub fn GlyphFrame::to_frame(self : GlyphFrame) -> Frame {
-  let frame = Frame::soft(Axes::splat(self.upem))
+  let frame = Frame::soft(Size::splat(self.upem))
   match self.item {
     Tofu(pos, shape) =>
       frame.push(pos, FrameItem::Shape(shape, @syntax.Span::detached()))
@@ -49,7 +49,7 @@ pub(all) enum GlyphFrameItem {
   /// A fallback rectangle.
   Tofu(Point, Shape)
   /// An image glyph.
-  Image(Point, Image, Axes[Abs])
+  Image(Point, Image, Size)
 }
 
 ///|
@@ -149,7 +149,7 @@ fn draw_fallback_tofu(
   let inset = advance.times(0.15)
   let height = upem.times(0.7)
   let pos = Point::new(inset, upem - height)
-  let size = Axes::new(advance - inset.times(2.0), height)
+  let size = Size::new(advance - inset.times(2.0), height)
   let thickness = upem.div_by(20.0)
   let stroke = { ..FixedStroke::default(), thickness, }
   let shape = Geometry::Rect(size).stroked(stroke)
@@ -183,7 +183,7 @@ fn draw_raster_glyph(
     y_offset = y_offset - upem.times(0.125)
   }
   let position = Point::new(-x_offset, -(image_height + y_offset))
-  let size = Axes::new(image_width, image_height)
+  let size = Size::new(image_width, image_height)
   Some(Image(position, image, size))
 }
 
@@ -206,7 +206,7 @@ fn draw_colr_glyph(
   let svg = SvgImage::new(data) catch { _ => return None }
   let image = Image::plain(Svg(svg))
   let position = Point::new(Abs::pt(x_min), Abs::pt(-y_max))
-  let size = Axes::new(Abs::pt(width), Abs::pt(height))
+  let size = Size::new(Abs::pt(width), Abs::pt(height))
   Some(Image(position, image, size))
 }
 

@@ -22,7 +22,7 @@ fn SipHasher128::write_ratio(self : SipHasher128, v : Ratio) -> Unit {
 }
 
 ///|
-fn SipHasher128::write_size(self : SipHasher128, v : Axes[Abs]) -> Unit {
+fn SipHasher128::write_size(self : SipHasher128, v : Size) -> Unit {
   self.write_f64(v.x.to_raw())
   self.write_f64(v.y.to_raw())
 }

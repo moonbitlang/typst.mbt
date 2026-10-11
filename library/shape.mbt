@@ -26,7 +26,7 @@ pub(all) enum Geometry {
   /// A line to a point (relative to its position).
   Line(Point)
   /// A rectangle with its origin in the topleft corner.
-  Rect(Axes[Abs])
+  Rect(Size)
   /// A curve consisting of movements, lines, and Bézier segments.
   Curve(Curve)
 } derive(Eq)

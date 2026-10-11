@@ -16,7 +16,7 @@ fn inline_elem_init(e : Element) -> Unit {
 /// Create an inline-level item with a custom layouter.
 pub fn[T : NativeElement] InlineElem::layouter(
   captured : T,
-  callback : (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError,
+  callback : (T, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError,
 ) -> InlineElem {
   InlineElem::new(InlineCallback::new(captured, callback))
 }
@@ -28,7 +28,7 @@ pub fn InlineElem::layout(
   engine : Engine,
   locator : Locator,
   styles : StyleChain,
-  region : Axes[Abs],
+  region : Size,
 ) -> Array[InlineItem] raise SourceError {
   self.body().call(engine, locator, styles, region)
 }
@@ -175,15 +175,13 @@ pub extend BlockBody with FromValue::{from_value}
 /// A layout callback of an `InlineElem`.
 pub struct InlineCallback {
   priv captured : Content
-  priv f : (Content, Engine, Locator, StyleChain, Axes[Abs]) -> Array[
-    InlineItem,
-  ] raise SourceError
+  priv f : (Content, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError
 }
 
 ///|
 pub fn[T : NativeElement] InlineCallback::new(
   captured : T,
-  f : (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError,
+  f : (T, Engine, Locator, StyleChain, Size) -> Array[InlineItem] raise SourceError,
 ) -> InlineCallback {
   {
     // Type-erase the content.
@@ -200,7 +198,7 @@ pub fn InlineCallback::call(
   engine : Engine,
   locator : Locator,
   styles : StyleChain,
-  region : Axes[Abs],
+  region : Size,
 ) -> Array[InlineItem] raise SourceError {
   (self.f)(self.captured, engine, locator, styles, region)
 }
