@@ -360,50 +360,13 @@ fn pair_pos_apply(this : @otf.PairAdjustment, ctx : ApplyContext) -> Unit? {
     return None
   }
   let iter = SkippingIterator::new(ctx, ctx.buffer.idx, false)
-  let unsafe_to = Ref(0)
+  let unsafe_to = out_cell(unsafe_cell)
   if !iter.next(Some(unsafe_to)) {
     ctx.buffer.unsafe_to_concat(Some(ctx.buffer.idx), Some(unsafe_to.val))
     return None
   }
   let second_glyph_index = iter.index()
   let second_glyph = ctx.buffer.info[second_glyph_index].as_glyph()
-  let finish = (has_record2 : Bool) => {
-    if has_record2 {
-      iter.buf_idx += 1
-      // https://github.com/harfbuzz/harfbuzz/issues/3824
-      // https://github.com/harfbuzz/harfbuzz/issues/3888#issuecomment-1326781116
-      ctx.buffer.unsafe_to_break(Some(ctx.buffer.idx), Some(iter.buf_idx + 1))
-    }
-    ctx.buffer.idx = iter.buf_idx
-    Some(())
-  }
-  let boring = (has_record2 : Bool) => {
-    ctx.buffer.unsafe_to_concat(
-      Some(ctx.buffer.idx),
-      Some(second_glyph_index + 1),
-    )
-    finish(has_record2)
-  }
-  let success = (flag1 : Bool, flag2 : Bool, has_record2 : Bool) => {
-    if flag1 || flag2 {
-      ctx.buffer.unsafe_to_break(
-        Some(ctx.buffer.idx),
-        Some(second_glyph_index + 1),
-      )
-      finish(has_record2)
-    } else {
-      boring(has_record2)
-    }
-  }
-  let bail = (records : (@otf.ValueRecord, @otf.ValueRecord)) => {
-    let has_record1 = !value_record_is_empty(records.0)
-    let has_record2 = !value_record_is_empty(records.1)
-    let flag1 = has_record1 &&
-      value_record_apply(records.0, ctx, ctx.buffer.idx)
-    let flag2 = has_record2 &&
-      value_record_apply(records.1, ctx, second_glyph_index)
-    success(flag1, flag2, has_record2)
-  }
   let records = match this {
     Format1(sets~, ..) => {
       guard sets.get(first_glyph_coverage_index) is Some(set) else {
@@ -424,10 +387,79 @@ fn pair_pos_apply(this : @otf.PairAdjustment, ctx : ApplyContext) -> Unit? {
           return None
         }
       }
-      return bail(records)
+      return pair_pos_bail(ctx, iter, second_glyph_index, records)
     }
   }
-  bail(records)
+  pair_pos_bail(ctx, iter, second_glyph_index, records)
+}
+
+///|
+/// The closures `finish`, `boring`, `success` and `bail` of upstream's
+/// `PairAdjustment::apply`, as functions of what they capture there: a
+/// closure that captures is an object, and four of them were made for
+/// every pair of glyphs that a pair adjustment looks at.
+fn pair_pos_finish(
+  ctx : ApplyContext,
+  iter : SkippingIterator,
+  has_record2 : Bool,
+) -> Unit? {
+  if has_record2 {
+    iter.buf_idx += 1
+    // https://github.com/harfbuzz/harfbuzz/issues/3824
+    // https://github.com/harfbuzz/harfbuzz/issues/3888#issuecomment-1326781116
+    ctx.buffer.unsafe_to_break(Some(ctx.buffer.idx), Some(iter.buf_idx + 1))
+  }
+  ctx.buffer.idx = iter.buf_idx
+  Some(())
+}
+
+///|
+fn pair_pos_boring(
+  ctx : ApplyContext,
+  iter : SkippingIterator,
+  second_glyph_index : Int,
+  has_record2 : Bool,
+) -> Unit? {
+  ctx.buffer.unsafe_to_concat(
+    Some(ctx.buffer.idx),
+    Some(second_glyph_index + 1),
+  )
+  pair_pos_finish(ctx, iter, has_record2)
+}
+
+///|
+fn pair_pos_success(
+  ctx : ApplyContext,
+  iter : SkippingIterator,
+  second_glyph_index : Int,
+  flag1 : Bool,
+  flag2 : Bool,
+  has_record2 : Bool,
+) -> Unit? {
+  if flag1 || flag2 {
+    ctx.buffer.unsafe_to_break(
+      Some(ctx.buffer.idx),
+      Some(second_glyph_index + 1),
+    )
+    pair_pos_finish(ctx, iter, has_record2)
+  } else {
+    pair_pos_boring(ctx, iter, second_glyph_index, has_record2)
+  }
+}
+
+///|
+fn pair_pos_bail(
+  ctx : ApplyContext,
+  iter : SkippingIterator,
+  second_glyph_index : Int,
+  records : (@otf.ValueRecord, @otf.ValueRecord),
+) -> Unit? {
+  let has_record1 = !value_record_is_empty(records.0)
+  let has_record2 = !value_record_is_empty(records.1)
+  let flag1 = has_record1 && value_record_apply(records.0, ctx, ctx.buffer.idx)
+  let flag2 = has_record2 &&
+    value_record_apply(records.1, ctx, second_glyph_index)
+  pair_pos_success(ctx, iter, second_glyph_index, flag1, flag2, has_record2)
 }
 
 // cursive_pos.rs

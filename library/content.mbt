@@ -183,6 +183,27 @@ pub fn Content::with_field(self : Content, id : Int, value : Value) -> Content {
 }
 
 ///|
+/// The fields of a copy of the content that is being made: the caller sets
+/// them ([set_field]) and makes the copy with [Content::with_fields].
+/// Upstream sets the fields of its own clone of an element in place; a
+/// chain of `with_x(..).with_y(..)` is a copy of the fields, a content and
+/// a hash cell per field.
+fn Content::fields_copy(self : Content) -> FixedArray[Value?] {
+  self.fields.copy()
+}
+
+///|
+/// Set a field of [Content::fields_copy] like the typed `with_*` of the
+/// field's type does.
+fn[T : IntoValue] set_field(
+  fields : FixedArray[Value?],
+  id : Int,
+  value : T,
+) -> Unit {
+  fields[id] = Some(IntoValue::into_value(value))
+}
+
+///|
 /// A copy with a field unset.
 pub fn Content::without_field(self : Content, id : Int) -> Content {
   let fields = self.fields.copy()
