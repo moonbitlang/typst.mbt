@@ -340,7 +340,7 @@ test "pages: what a caller writes to a document it was handed is not written to 
   @library.evict(0)
   let source = "#set document(title: [Kept], author: (\"A\", \"B\"), keywords: (\"k\",))\n" +
     three_runs("#c.step()")
-  let world = pages_world(source)
+  let world = pages_world(source, library=library(@library.default_formats()))
   let first = world.step().document()
   let pristine = document_prints(first)
   // A host that holds a document and writes to all of it.
@@ -373,13 +373,18 @@ test "pages: what a caller writes to a document it was handed is not written to 
     .options()
     .populate(
       @library.StyleChain::new(
-        @library.Styles::from_array([@library.TargetElem::set_target(Html)]),
+        @library.Styles::from_array([@library.SvgFormat::set_pretty(true)]),
       ),
       @syntax.Span::detached(),
     )
   }
   scribble(first)
-  assert_false(document_prints(first) == pristine)
+  // (Every part was written to: a page, the info, the format options.)
+  let scribbled = document_prints(first)
+  let last = pristine.length() - 1
+  assert_false(scribbled[0] == pristine[0])
+  assert_false(scribbled[last - 1] == pristine[last - 1])
+  assert_false(scribbled[last] == pristine[last])
   // The document that the entry kept is what was laid out.
   let second = world.step()
   inspect(
