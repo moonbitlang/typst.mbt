@@ -413,12 +413,21 @@ test "module store: a caller that writes to the errors it got does not write to 
       ) catch {
         @library.SourceError(errors) => {
           let after = module_memo_stats()
+          // (Without an index: where the entry hands out its own array,
+          // the second caller gets it empty.)
+          let first = match errors.get(0) {
+            Some(error) =>
+              "\{error.trace.length()} tracepoints, \{error.hints.length()} hints"
+            None => "nothing in it"
+          }
           seen.push(
-            "\{errors.length()} error, \{errors[0].trace.length()} tracepoints, \{errors[0].hints.length()} hints, found \{after.0 - before.0}",
+            "\{errors.length()} error, \{first}, found \{after.0 - before.0}",
           )
-          errors[0].hint("a caller's hint")
-          errors[0].with_tracepoint(Call(None), world.main.root().span())
-          |> ignore
+          for error in errors {
+            error.hint("a caller's hint")
+            error.with_tracepoint(Call(None), world.main.root().span())
+            |> ignore
+          }
           errors.clear()
           continue
         }
