@@ -418,7 +418,12 @@ And two things that are not bugs today:
 - Only paged documents with their SVG, their PDF and small images of
   their pages: not the HTML and bundle targets, not PNG at the resolution
   and with the options of an export, no export options but the document's
-  own.
+  own. In particular not what the CLI's cache of page hashes does when
+  only the options of the export change, which a document can set
+  (`#set format.png(ppi: 72)`): the cache holds the hash of the page and
+  not the options, as upstream's does, so `typst watch` keeps the PNG of
+  the old resolution in both programs. The page images of this stage
+  have one resolution.
 - The features and the styles of a world's library never change; fonts
   change between two sets only.
 - The traced span of the IDE functions (`@typst.trace`).
