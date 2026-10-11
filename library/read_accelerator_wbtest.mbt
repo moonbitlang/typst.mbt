@@ -90,6 +90,34 @@ test "read accelerator: answers stay for the compilation after the one that aske
 }
 
 ///|
+test "read accelerator: of an introspector that stays, the answers that are no longer asked for go" {
+  // A document that is found in every compilation is asked the reads of
+  // whatever changes around it. What a compilation did not ask is gone
+  // after the eviction that follows the next one.
+  evict(0)
+  let replays = Ref(0)
+  let many = counting_reads(6, replays)
+  let few = counting_reads(3, replays)
+  let kept = wb_introspector(sample())
+  assert_true(many.validate(kept))
+  inspect(replays.val, content="6")
+  evict(10)
+  // Known from the compilation before.
+  assert_true(few.validate(kept))
+  assert_true(many.validate(kept))
+  inspect(replays.val, content="6")
+  evict(10)
+  assert_true(few.validate(kept))
+  inspect(replays.val, content="6")
+  evict(10)
+  // The three that the last compilation did not ask are computed again.
+  assert_true(many.validate(kept))
+  inspect(replays.val, content="9")
+  inspect(read_accelerator_tables(), content="1")
+  evict(0)
+}
+
+///|
 test "read accelerator: the answers of the empty introspectors are not a table" {
   evict(0)
   let replays = Ref(0)
