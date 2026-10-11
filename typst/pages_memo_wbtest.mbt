@@ -600,15 +600,67 @@ test "pages: runs with the same children are told apart by where they are" {
     ),
   )
   let second = world.step()
-  inspect(
-    second.says(),
-    content="page 1 page 2 page 3 page 4 page 5 page 6",
-  )
+  inspect(second.says(), content="page 1 page 2 page 3 page 4 page 5 page 6")
   @library.evict(10)
   inspect(
     world.step().says(),
     content="page 1 page 2 page 3 page 4 page 5 page 6",
   )
+}
+
+///|
+test "pages: the documents of a bundle are told apart by where they are" {
+  // `layout_document_for_bundle` is given a locator (upstream tracks it,
+  // `typst-layout/src/pages/mod.rs:102`; here the key holds it resolved):
+  // two documents of a bundle with the same content and styles have
+  // elements at other locations.
+  @library.evict(0)
+  let world = pages_world(
+    "#metadata(\"m\") <m>\n#rect(width: 10pt, height: 10pt)\n",
+  )
+  let tracked = @library.TrackedWorld::new(world)
+  let (locations, counts) = tracked.scoped(() => {
+    @library.with_layout_memo(() => {
+      let sink = @library.Sink::new()
+      let content = @eval.eval_source(
+        tracked,
+        world.library,
+        @library.Traced::new(),
+        sink,
+        @library.Route::root(),
+        world.main,
+      ).content()
+      let styles = @library.StyleChain::new(world.library.styles)
+      let engine : @library.Engine = {
+        library: world.library,
+        world: tracked,
+        introspector: @library.Introspector::empty(),
+        traced: @library.Traced::new(),
+        sink,
+        route: @library.Route::root(),
+      }
+      let split = @library.Locator::root().split()
+      let first = split.next(1)
+      let second = split.next(2)
+      let before = @layout.document_memo_stats()
+      let locations = []
+      // At one place, at another, and at the first again.
+      for locator in [first.relayout(), second, first] {
+        let document = @layout.layout_document_for_bundle(
+          engine, content, locator, styles,
+        )
+        let found = document
+          .introspector()
+          .query(Elem(@library.metadata_elem(), None))
+        locations.push(found[0].location().unwrap())
+      }
+      let after = @layout.document_memo_stats()
+      (locations, "\{after.0 - before.0} found, \{after.1 - before.1} computed")
+    })
+  })
+  inspect(counts, content="1 found, 2 computed")
+  assert_false(locations[0] == locations[1])
+  assert_true(locations[0] == locations[2])
 }
 
 ///|
