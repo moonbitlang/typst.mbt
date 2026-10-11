@@ -260,6 +260,7 @@ fn fresh_world_reads(
   let flags = fingerprint_flags.val
   let reused = closure_memo_counts[0]
   let computed = closure_memo_counts[1]
+  let generated = works_generations.val
   // The log of the world: what the run pushes is taken out again.
   let log = scope.log.copy()
   let volatile_reads = scope.volatile_reads
@@ -279,6 +280,7 @@ fn fresh_world_reads(
     fingerprint_flags.val = flags
     closure_memo_counts[0] = reused
     closure_memo_counts[1] = computed
+    works_generations.val = generated
     world.reads_abort(mark)
     scope.log.clear()
     scope.log.append(log)

@@ -3358,6 +3358,8 @@ pub fn[T] with_layout_memo(() -> T raise SourceError) -> T raise SourceError
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
+pub fn works_generation_count() -> Int
+
 pub fn world_range(TrackedWorld, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
 
 pub fn world_scope_open(Int) -> Bool

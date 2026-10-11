@@ -1,5 +1,6 @@
 // Memoization (not upstream: a replacement for comemo's `#[comemo::memoize]`
-// on `layout_par_impl`, `layout_fragment_impl`, the counter sequence and
+// on `layout_par_impl`, `layout_fragment_impl`, the counter sequence, the
+// works of a bibliography (`Works::generate_impl`, `bibliography.mbt`) and
 // `eval_closure`; the closure calls are at the end of this file).
 //
 // Upstream memoizes these functions on all their arguments, tracking which
@@ -10,7 +11,8 @@
 // - Entries are found by a fingerprint of the untracked arguments (content,
 //   style chain, regions, ...) plus, for the layout functions, the fully
 //   resolved locator and the route (stricter than upstream, which only
-//   tracks what the call observes).
+//   tracks what the call observes). The works have neither: no locator,
+//   and a route that is tracked ([memoize], `tracks_route`).
 // - Fingerprints do not always distinguish what the computation can
 //   observe: host closures compare by identity but fingerprint by their key
 //   (and a `Fingerprint` that does not capture all data marks itself lossy;
@@ -161,7 +163,9 @@ let evictions : Ref[Int] = { val: 0, }
 /// Memoized calls end with their compilation here. What outlives it is
 /// data decoded from bytes, found again by its content: syntaxes and
 /// themes of `raw`, bibliographies and CSL styles, PDF documents, plugins
-/// and the results of their calls. A process that compiles a world whose
+/// and the results of their calls. (The works of a bibliography were
+/// among them, in a cell that was found by the engine's introspector
+/// object; they are an entry of [memoize] now.) A process that compiles a world whose
 /// files change would keep every version of them. They have no age, so
 /// they are dropped as a whole on every `max_age`-th call instead (decoding
 /// them again is all it costs). Must not be called during a compilation.
@@ -189,7 +193,6 @@ pub fn evict(max_age : Int) -> Unit {
   raw_theme_cache.clear()
   bibliography_cache.clear()
   csl_style_cache.clear()
-  works_cache.val = None
   pdf_document_cache.clear()
   plugin_call_cache.clear()
   plugin_transition_cache.clear()
@@ -223,6 +226,15 @@ pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> U128 {
 /// call except the engine; see the module docs) and `input` (compared for
 /// equality). `f` must use the engine it is given. `copy` produces an
 /// independent copy of a result.
+///
+/// The route: upstream tracks it (`Tracked<Route>`), so a result is found
+/// on any route that answers what the call asked as before. The key of a
+/// layout or of a counter sequence holds the whole route instead, and a
+/// result that is found is that of its depth only. With `tracks_route`
+/// the key does not hold the route and the call must not ask it anything
+/// (no depth check, no `Route::contains`, in `f` or in a memoized call
+/// inside it): that is noticed, as for a closure call, and a result that
+/// asked is not kept. Then a result is found on every route, as upstream.
 fn[T, I : Eq] memoize(
   store : MemoStore[T, I],
   engine : Engine,
@@ -234,6 +246,7 @@ fn[T, I : Eq] memoize(
   // What the recording check calls the call (a function of the input, so
   // that passing it allocates nothing).
   label? : (I) -> String = _ => "memoized call",
+  tracks_route? : Bool = false,
 ) -> T raise SourceError {
   let generation = memo_generation.val
   let world = engine.world
@@ -272,8 +285,11 @@ fn[T, I : Eq] memoize(
         }
         engine.sink.extend_from_sink(entry.sink)
         // The key holds the whole route: for a closure call around this
-        // one, the result is that of this depth only.
-        note_route_shift(0, 0)
+        // one, the result is that of this depth only. (An entry that
+        // tracks its route asked nothing of it.)
+        if !tracks_route {
+          note_route_shift(0, 0)
+        }
         return copy(entry.output)
       }
     }
@@ -291,18 +307,24 @@ fn[T, I : Eq] memoize(
     }
     engine.sink.extend_from_sink(sink)
   }
+  let route_mark = if tracks_route { Some(RouteMark::begin()) } else { None }
   let mark = world.reads_begin()
   let output = {
     errdefer {
       world.reads_abort(mark)
+      if route_mark is Some(route_mark) {
+        route_mark.end() |> ignore
+      }
       finish()
     }
     f(inner)
   }
   let world_reads = world.reads_end(mark)
+  let asked_route = route_mark is Some(route_mark) && route_mark.end()
   finish()
-  // A call that read a file that changes during the scope is not kept.
-  if world_reads.is_volatile() || !cacheable(output) {
+  // A call that read a file that changes during the scope is not kept, nor
+  // one that asked a route its key does not hold.
+  if world_reads.is_volatile() || asked_route || !cacheable(output) {
     return output
   }
   // The store may belong to another compilation by now (a nested one).
@@ -342,6 +364,45 @@ fn[T, I : Eq] memoize(
     None => store.entries[key] = [entry]
   }
   output
+}
+
+///|
+/// What a call that tracks its route ([memoize] with `tracks_route`) set
+/// aside when it started: the depth bounds of the closure call around it
+/// (`route_shift_lo` in `engine.mbt`) and where its route queries start.
+priv struct RouteMark {
+  lo : Int
+  hi : Int
+  queries : Int
+}
+
+///|
+/// Starts noticing what is asked of routes, for one call.
+fn RouteMark::begin() -> RouteMark {
+  let mark = {
+    lo: route_shift_lo.val,
+    hi: route_shift_hi.val,
+    queries: route_queries_begin(),
+  }
+  route_shift_lo.val = route_shift_min
+  route_shift_hi.val = route_shift_max
+  route_shift_scopes.val += 1
+  mark
+}
+
+///|
+/// Ends it: whether anything was asked of a route since
+/// [RouteMark::begin]. What was asked is also noted for the calls around
+/// this one.
+fn RouteMark::end(self : RouteMark) -> Bool {
+  let lo = route_shift_lo.val
+  let hi = route_shift_hi.val
+  route_shift_lo.val = self.lo
+  route_shift_hi.val = self.hi
+  route_shift_scopes.val -= 1
+  note_route_shift(lo, hi)
+  let queried = route_queries_end(self.queries)
+  lo != route_shift_min || hi != route_shift_max || !queried.is_empty()
 }
 
 // Exact comparison of memoized arguments.
