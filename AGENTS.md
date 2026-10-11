@@ -756,10 +756,16 @@
   instead of `to_string()`/`to_owned()`/`to_array()` copies; return small
   immutable results as a `#valtype` struct (`@unicode.Decoded` from
   `decode_at`, `TextEdges`, `SpanAt`) rather than a tuple; `#valtype` also
-  for small immutable non-generic data (`Point`, `Length`, `Glyph`,
+  for small immutable non-generic data (`Point`, `Size`, `Length`, `Glyph`,
   `Utf8Slice`, `LazyArray16`; generic structs whose fields are type
   parameters cannot be value types, and `physical_equal` on value types is
-  always false on native); flatten tuple fields of per-glyph structs; loop
+  always false on native; upstream's `Size`, an alias of `Axes<Abs>`, is a
+  struct of its own for this reason: port `Size` and `Axes<Abs>` as
+  `Size`, `Axes::new(w, h)` of two lengths as `Size::new(w, h)`, and read
+  the header of `library/size.mbt` for what `Size` has of `Axes[T]`, the
+  twins of the generic functions (`select_size`, `zip_map_size`,
+  `sum_by_axis_size`, `map_axes`) and what boxes a size again: an option,
+  an `Iter`, an `Array`); flatten tuple fields of per-glyph structs; loop
   instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
   `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
   default>)`; build constant style defaults once (`Value::shared`);
