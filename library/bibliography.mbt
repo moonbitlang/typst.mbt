@@ -794,11 +794,7 @@ fn clone_diagnostics(
 ) -> Array[SourceDiagnostic] {
   let copies = []
   for error in errors {
-    copies.push({
-      ..error,
-      trace: error.trace.copy(),
-      hints: error.hints.copy(),
-    })
+    copies.push(error.clone())
   }
   copies
 }
