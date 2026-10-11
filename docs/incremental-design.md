@@ -1276,8 +1276,10 @@ repairs for step 5 is the tiling of the table above.
 `layout`, `eval`, `realize`, `html`, `pdf`, `svg`, `render`, `typst`,
 `syntax` and `bundle` whose type is not a scalar or a `ReadOnlyArray`,
 and the mutable fields of what outlives a call; the other packages have
-constant tables, the counters of wasmi and usvg, and what `doc` and the
-CLI keep for themselves):
+constant tables, the counters of wasmi and usvg, the out-parameter cells
+of `shape` (`unsafe_cell`, `match_end_cell`, `component_count_cell`:
+written by a call and read before the next call, see `out_cell`), and
+what `doc` and the CLI keep for themselves):
 
 | state | what it is | verdict |
 | --- | --- | --- |
@@ -1291,8 +1293,8 @@ CLI keep for themselves):
 | in objects: `FontBook.selected` and `covering`; `OtfFontFace.instances`; `StyleChain.memo_hash`; the `LazyFingerprint` of closures, tilings, modules and capture sites; `RasterImage.hash`; the memo of a `Source`; `ElementIntrospector.queries`; the scopes and parameters of native functions, types and elements | what an object computes once of itself | rule 1 with the object as the key: a book's caches are cleared by `push`, with which its edition changes; an introspector's query cache is by the selector's hash, as upstream's, and hands out its arrays (step 4) |
 | `CachedCell` (`layout/flow_collect.mbt`) | the last layout of a child of a flow, by region, in the child that one flow layout collected (upstream's `CachedCell`) | scratch of that layout: every use is inside the call that made it. It keeps errors and raises them as kept (step 4) |
 | `accent_funcs_cell`, `lr_funcs_cell`, `codex_sym_cell`, `codex_emoji_cell`, `color_map_cell`, `sequence_elem_cell`, `styled_elem_cell`, `space_shared_cell`, `space_newline_cell`, `html_typed_funcs_cell`, `lorem_chain_cell`, `cmyk_grid_cell`, `raw_theme_cell`, the 443 cells of generated elements and functions and the 39 type descriptors, `scopes_registered`, the hooks of an element descriptor (`<elem>_init`); hayagriva's styles, locales and collation table, hypher's tries, the normalization indices | constants that are built on first use | written once |
-| `exception_map`, `shorthand_systems`, `rd_pow10_table`, `fallback_families`, `empty_style_head`, `text_base_local_styles`, the `*_default_value`s, `no_route_queries`, `no_world_reads`, `volatile_world_reads`, the grouping rules of `realize`, `routines`, the syntax sets | constants in containers | nothing writes to them (looked at every use) |
-| `route_shift_lo`, `route_shift_hi`, `route_shift_scopes`, `route_query_log`, `route_query_scopes`, `traced_file_log`, `traced_file_scopes`, `fingerprint_flags`, `fingerprint_hosts`, `fingerprint_output_hosts`, `lazy_depth`, `lazy_cut`, `spare_shaping_buffer`, `recording_worlds`, `open_world_scopes`, `compilation_depth`, `memo_generation`, the recording check's own | scratch of calls in progress | put back when the call ends |
+| `exception_map`, `shorthand_systems`, `rd_pow10_table`, `fallback_families`, `empty_style_head`, `empty_lifecycle`, `text_base_local_styles`, the `*_default_value`s, `no_route_queries`, `no_world_reads`, `volatile_world_reads`, the grouping rules of `realize`, `routines`, the syntax sets | constants in containers | nothing writes to them (looked at every use) |
+| `route_shift_lo`, `route_shift_hi`, `route_shift_scopes`, `route_query_log`, `route_query_scopes`, `traced_file_log`, `traced_file_scopes`, `fingerprint_flags`, `fingerprint_hosts`, `fingerprint_output_hosts`, `lazy_depth`, `lazy_cut`, `spare_shaping_buffer`, `spare_hasher`, `recording_worlds`, `open_world_scopes`, `compilation_depth`, `memo_generation`, the recording check's own | scratch of calls in progress | put back when the call ends |
 | `memo_enabled`, `memo_counter`, `evictions`, `evictors`, `closure_memo_counts`, `works_generations` | switches, counts and the list of evictors | no result depends on them |
 | `font_serials`, `font_book_editions`, `source_serials`, `world_scope_tokens`, the file id interner, syntect's scope repository and pattern counter, usvg's ids | identities | never reset |
 
