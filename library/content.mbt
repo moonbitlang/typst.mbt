@@ -36,10 +36,17 @@ pub fn Content::from_fields(
     span: @syntax.Span::detached(),
     label: None,
     location: None,
-    lifecycle: [],
+    lifecycle: empty_lifecycle,
     data_hash: Ref(None),
   }
 }
+
+///|
+/// The lifecycle of content that nothing has prepared or guarded. One
+/// object for all such content (not upstream, where it is a bit set in the
+/// header): a lifecycle is never written to, [Content::guarded] extends a
+/// copy.
+let empty_lifecycle : Array[Int] = []
 
 ///|
 /// Create content with the given required field values (in field order),
@@ -157,9 +164,13 @@ pub fn Content::can(self : Content, capability : String) -> Bool {
 ///|
 /// The raw stored value of a field by id (no styles).
 pub fn Content::field_raw(self : Content, id : Int) -> Value? {
-  match self.fields.get(id) {
-    Some(v) => v
-    None => None
+  // (Not `self.fields.get(id)`: its result is an option of an option, which
+  // is allocated.)
+  let fields = self.fields
+  if id >= 0 && id < fields.length() {
+    fields.unsafe_get(id)
+  } else {
+    None
   }
 }
 

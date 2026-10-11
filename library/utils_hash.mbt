@@ -11,17 +11,37 @@
 
 ///|
 /// An unsigned 128-bit integer (upstream `u128`), used for hashes.
+///
+/// A value type: every [hash128] gives one, and they are the keys of the
+/// memoization tables.
+#valtype
 pub(all) struct U128 {
   /// The upper 64 bits.
   hi : UInt64
   /// The lower 64 bits.
   lo : UInt64
-} derive(Eq, Hash, Compare, Default, Debug)
+} derive(Eq, Compare, Default, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
 pub extend U128 with Eq::{not_equal, equal}
+
+///|
+pub impl Hash for U128 with fn hash_combine(self, hasher) {
+  hasher.combine(self.hi)
+  hasher.combine(self.lo)
+}
+
+///|
+/// The hash of a key of a map (not the default, which allocates a `Hasher`
+/// for every lookup): the number is a hash already, or small, so its halves
+/// folded together will do. Nothing may depend on the value: core's hashes
+/// are seeded per process on native.
+pub impl Hash for U128 with fn hash(self) {
+  let folded = self.lo ^ self.hi
+  (folded ^ (folded >> 32)).to_int()
+}
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
