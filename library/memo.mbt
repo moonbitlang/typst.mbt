@@ -69,11 +69,20 @@
 //   for every store ([MemoKey]): nothing is kept under a lossy key, and an
 //   entry whose key holds a host closure ends with its compilation.
 //
-// Caches only live for one compilation ([with_layout_memo]: its evaluation
-// and its introspection iterations). The world reads of an entry are
-// therefore validated in the scope they were recorded in, where they
-// hold, unless an engine with another world is used inside a compilation
-// (a host function that evaluates with a world of its own).
+// Lifetime is comemo's (`comemo/src/memoize.rs`, `evict`, `CacheData::
+// evict`, `lookup`): the stores are the process's, an entry is found by
+// any later compilation for which all of the above holds, [evict] makes
+// every entry older by one and drops those above `max_age`, and a hit
+// makes an entry young. A watching compiler calls `evict(10)` after every
+// recompilation (`cli/watch.mbt`); a process that never calls it keeps
+// what it computed, at most [memo_max_entries] results per key. What
+// makes a kept result valid for the world of a later compilation is the
+// validation of its world reads in the scope of that compilation
+// (`tracked_world.mbt`). Two things end earlier: an entry whose key
+// holds a host closure, with its compilation ([MemoKey::compilation]),
+// and everything, when memoization is off ([set_layout_memo_enabled]):
+// then nothing is looked up or stored here. `evict(0)` empties every
+// store and every cache of the process that is found by content.
 
 ///|
 /// A memoized result.
@@ -104,21 +113,15 @@ priv struct MemoEntry[T, I] {
 ///|
 /// The cached results of one memoized function.
 ///
-/// With `kept`, an entry outlives its compilation: a later one finds it
-/// if its arguments, its library, its introspector reads and its world
-/// reads are what they were ([memoize]). Its lifetime is comemo's
+/// An entry outlives its compilation: a later one finds it if its
+/// arguments, its library, its introspector reads and its world reads are
+/// what they were ([memoize]). Its lifetime is comemo's
 /// (`comemo/src/memoize.rs`, `CacheData::evict` and `lookup`): every
 /// [evict] makes it older by one, being found makes it young, and it is
 /// dropped when it was not found for more than `max_age` calls. An entry
 /// whose key holds a host closure ends with its compilation
 /// ([MemoKey::compilation]).
 priv struct MemoStore[T, I] {
-  /// Whether the entries outlive their compilation. (The stores are
-  /// being kept one after the other: the layouts are, the counter
-  /// sequence and the works are still emptied when a compilation starts.)
-  kept : Bool
-  /// For a store that is not kept: the compilation the entries belong to.
-  mut generation : Int
   mut entries : Map[U128, Array[MemoEntry[T, I]]]
   /// The keys of the entries that end with their compilation.
   bound : Array[U128]
@@ -129,15 +132,8 @@ priv struct MemoStore[T, I] {
 }
 
 ///|
-fn[T, I] MemoStore::new(kept? : Bool = false) -> MemoStore[T, I] {
-  {
-    kept,
-    generation: 0,
-    entries: {},
-    bound: [],
-    registered: false,
-    checked: false,
-  }
+fn[T, I] MemoStore::new() -> MemoStore[T, I] {
+  { entries: {}, bound: [], registered: false, checked: false, }
 }
 
 ///|
@@ -211,6 +207,15 @@ let memo_enabled : Ref[Bool] = { val: true, }
 /// Turn memoization on (the default) or off for the following
 /// compilations. Memoization must not change results; tests compare
 /// compilations with and without it.
+///
+/// Off, a compilation takes nothing from an earlier one and leaves
+/// nothing for a later one: the stores of memoized calls and the results
+/// kept by content are neither asked nor written, and an evaluation of a
+/// file ends with its scope (`eval/import.mbt`). What a compilation with
+/// memoization on left stays where it is, for the next one with
+/// memoization on; `evict(0)` drops it. (The decode caches do not ask
+/// this switch: that a plugin loaded twice is one module is something a
+/// document can see.)
 pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
   memo_enabled.val = enabled
 }
@@ -220,9 +225,12 @@ pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
 let compilation_depth : Ref[Int] = { val: 0, }
 
 ///|
-/// Run `f` (a compilation) with fresh memoization caches. The caches are
-/// only used by engines whose world is in a scope
-/// ([TrackedWorld::scoped]): a compilation runs inside one.
+/// Run `f` (a compilation) with memoization: inside, the stores of
+/// memoized calls are asked and written for engines whose world is in a
+/// scope ([TrackedWorld::scoped]; a compilation runs inside one). The
+/// stores are not emptied: `f` finds what earlier compilations left, if it
+/// is valid for its world, and what ends with a compilation ends when the
+/// outermost one does ([end_compilation_entries]).
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
 ) -> T raise SourceError {
@@ -283,14 +291,25 @@ let evictions : Ref[Int] = { val: 0, }
 /// calls `comemo::evict(10)`); a process that never calls it keeps what it
 /// computed, as one using comemo does.
 ///
-/// What has an age: the results kept by content (`memo_content.mbt`:
-/// decoded raster images, highlighted raw text, the PDF exporter's images)
-/// and the decode caches (syntaxes and themes of `raw`, bibliographies and
-/// CSL styles, PDF documents, plugins and the results of their calls,
-/// parsed numbering patterns), each a [ContentCache] that registered
-/// itself ([register_evictor], comemo's `register_evictor`). The hashes of
-/// data that are kept by the identity of the `Bytes` are swept
-/// ([sweep_data_hashes]).
+/// What has an age, each registered with [register_evictor] (comemo's
+/// `register_evictor`) when it first keeps something: the stores of
+/// memoized calls (closure calls, layouts, counter sequences, the works of
+/// a bibliography here; module evaluations in `eval/import.mbt`), the
+/// results kept by content (`memo_content.mbt`: decoded raster images,
+/// highlighted raw text, the PDF exporter's images) and the decode caches
+/// (syntaxes and themes of `raw`, bibliographies and CSL styles, PDF
+/// documents, plugins and the results of their calls, parsed numbering
+/// patterns). The hashes of data that are kept by the identity of the
+/// `Bytes` are swept ([sweep_data_hashes]).
+///
+/// It may be called at any time, also inside a compilation (a host
+/// function that compiles and evicts): no lookup holds on to what it
+/// drops, and the evaluations of files that an open scope stored or took
+/// stay, since a file must be one module for the whole of a compilation.
+/// Not dropped by any call: the caches by font (shape plans, glyph
+/// outlines and bitmaps, instances), which are functions of a font's data
+/// and grow with the fonts and glyphs a process has used, not with its
+/// compilations.
 pub fn evict(max_age : Int) -> Unit {
   evictions.val += 1
   for evictor in evictors {
@@ -421,15 +440,9 @@ fn[T, I : Eq] memoize(
   label? : (I) -> String = _ => "memoized call",
   tracks_route? : Bool = false,
 ) -> T raise SourceError {
-  let generation = memo_generation.val
   let world = engine.world
-  if generation == 0 || !world.in_scope() || !key.memoizable() {
+  if memo_generation.val == 0 || !world.in_scope() || !key.memoizable() {
     return f(engine)
-  }
-  if !store.kept && store.generation != generation {
-    store.entries.clear()
-    store.bound.clear()
-    store.generation = generation
   }
   let compilation = key.compilation()
   // The traced span is not one per compilation (an evaluated string runs
@@ -508,9 +521,6 @@ fn[T, I : Eq] memoize(
   if world_reads.is_volatile() || asked_route || !cacheable(output) {
     return output
   }
-  // A store that ends with its compilation may belong to another one by
-  // now (a nested one).
-  guard store.kept || store.generation == generation else { return output }
   if memo_check_enabled() {
     if !store.checked {
       store.checked = true
@@ -1036,9 +1046,7 @@ fn chain_memo_equal(a : StyleChain, b : StyleChain) -> Bool {
 }
 
 ///|
-let layout_store : MemoStore[Array[Frame], LayoutInput] = MemoStore::new(
-  kept=true,
-)
+let layout_store : MemoStore[Array[Frame], LayoutInput] = MemoStore::new()
 
 ///|
 /// Memoize a layout function of `content` and `styles` (and `extra`

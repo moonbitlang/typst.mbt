@@ -537,10 +537,19 @@ fn EvalMemos::drop_ended(self : EvalMemos) -> Unit {
 /// comemo's `evict` for this store: every entry gets older by one, and
 /// those that were not taken for more than `max_age` calls are dropped
 /// (all of them for zero).
+///
+/// Except the entries that a scope that is still open stored or took (a
+/// host function that calls `evict` during a compilation): modules compare
+/// by identity, and a file that is imported again in that compilation
+/// must be the module it was. (comemo would drop them; upstream never
+/// evicts during a compilation.)
 fn EvalMemos::evict(self : EvalMemos, max_age : Int) -> Unit {
   let empty = []
   for key, entries in self.entries {
     entries.retain(memo => {
+      if @library.world_scope_open(memo.scope) {
+        return true
+      }
       memo.age += 1
       memo.age <= max_age
     })

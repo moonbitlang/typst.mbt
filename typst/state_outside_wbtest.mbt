@@ -50,6 +50,10 @@ fn Cited::new(text : String, files : Array[(String, Bytes)]) -> Cited raise {
     Ok(document) => document
     Err(errors) => fail(errors.map(error => error.message).join("; "))
   }
+  // The compilation generated the works of the document for this very
+  // introspector, and the store keeps them: the tests are about a call
+  // that generates them, so they start with nothing.
+  @library.evict(0)
   let tracked = @library.TrackedWorld::new(world)
   let engine : @library.Engine = {
     world: tracked,
@@ -83,6 +87,8 @@ fn Cited::step(self : Cited) -> String raise @library.SourceError {
 
 ///|
 test "works: one engine in two scopes, with a bibliography that changes in between" {
+  // (The stores are the process's: the test starts with nothing.)
+  @library.evict(0)
   // The works were kept in a cell and found by the engine's introspector
   // object and the elements, which hold the path of the file and not its
   // data: the second scope got the works of the first.
@@ -106,6 +112,8 @@ test "works: one engine in two scopes, with a bibliography that changes in betwe
 
 ///|
 test "works: an entry of the store is found by its key and taken if the files answer the same" {
+  // (The stores are the process's: the test starts with nothing.)
+  @library.evict(0)
   let cited = Cited::new("@knuth\n#bibliography(\"refs.bib\")", [
     ("refs.bib", outside_bib("Alpha")),
   ])
@@ -157,6 +165,8 @@ test "works: an entry of the store is found by its key and taken if the files an
 
 ///|
 test "works: math in an entry is evaluated on a route of its own" {
+  // (The stores are the process's: the test starts with nothing.)
+  @library.evict(0)
   // The entry of the works tracks its route and is not kept if the call
   // asked the route anything. The math of a title is evaluated from the
   // root of a new route (upstream `show_math`, `eval_string`), whose depth
@@ -181,6 +191,8 @@ test "works: math in an entry is evaluated on a route of its own" {
 
 ///|
 test "works: a CSL style that changes behind its path" {
+  // (The stores are the process's: the test starts with nothing.)
+  @library.evict(0)
   // The style is loaded from its source by the call that generates the
   // works, like the bibliography.
   let style = (delimiter : String) => {
@@ -220,6 +232,8 @@ test "works: a CSL style that changes behind its path" {
 
 ///|
 test "works: generated once for all the calls of an iteration that cite" {
+  // (The stores are the process's: the test starts with nothing.)
+  @library.evict(0)
   // Every cell of the table is laid out by a memoized call with an
   // introspector object of its own, for which the cell of the last works
   // found nothing: the works of the document were generated once per cell
@@ -243,6 +257,9 @@ test "works: generated once for all the calls of an iteration that cite" {
   inspect(@library.works_generation_count() - start, content="3")
   // Under the recording check: the entries that found the works have the
   // read of the bibliography file, as a run from scratch makes it.
+  // (From scratch again: a compilation that finds everything keeps, and
+  // so checks, nothing.)
+  @library.evict(0)
   let checked = checked_compile(world)
   assert_eq(checked.differ, [])
   assert_true(checked.entries >= 12)
