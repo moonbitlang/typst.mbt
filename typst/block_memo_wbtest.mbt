@@ -225,6 +225,145 @@ test "blocks: tables that differ in one cell, stroke, track or header flag are d
 }
 
 ///|
+/// Upstream tracks the locator of a block layout; here the resolved locator
+/// is in the key. One call gives one content with one span: what tells
+/// the three layouts apart is where they are.
+test "blocks: the same block at three places is three layouts" {
+  @library.evict(0)
+  let world = reading_world(
+    (
+      #|#set page(width: 160pt, height: auto, margin: 10pt)
+      #|#let stamp() = block(breakable: false, context {
+      #|  rect(width: here().position().y, height: 4pt)
+      #|})
+      #|#stamp()
+      #|#stamp()
+      #|#stamp()
+      #|
+    ),
+  )
+  let pages = outside_page_hashes(world)
+  assert_eq(block_memo_reference(world), pages)
+  let again = block_memo_delta(() => {
+    assert_eq(outside_page_hashes(world), pages)
+  })
+  assert_eq(again.1, 0)
+  assert_true(again.0 >= 3)
+}
+
+///|
+/// The regions of a block that breaks are in the key with the heights of
+/// the regions after the first: a block that spills onto a page with less
+/// room than the page before promised (a footnote of its own) is laid out
+/// again for the regions as they are.
+test "blocks: a block that breaks is laid out for the regions it gets" {
+  @library.evict(0)
+  let world = reading_world(
+    (
+      #|#set page(width: 160pt, height: 120pt, margin: 10pt)
+      #|#rect(width: 20pt, height: 40pt)
+      #|#block(breakable: true, {
+      #|  for i in range(12) {
+      #|    rect(width: 50pt, height: 14pt)
+      #|    if i == 5 { footnote(rect(width: 30pt, height: 30pt)) }
+      #|  }
+      #|})
+      #|
+    ),
+  )
+  let pages = outside_page_hashes(world)
+  assert_true(pages.length() >= 3)
+  assert_eq(block_memo_reference(world), pages)
+  let again = block_memo_delta(() => {
+    assert_eq(outside_page_hashes(world), pages)
+  })
+  assert_eq(again.1, 0)
+}
+
+///|
+/// The library is not in the key: the store compares it (upstream hashes
+/// it). A block whose layout reads `sys.inputs` is another layout under
+/// another library.
+test "blocks: a block is laid out again under another library" {
+  @library.evict(0)
+  let text =
+    #|#set page(width: 160pt, height: auto, margin: 10pt)
+    #|#block(inset: 2pt, context {
+    #|  let side = int(sys.inputs.at("side", default: "10")) * 1pt
+    #|  rect(width: side, height: side)
+    #|})
+    #|
+  let inputs = (side : String) => {
+    let dict = @library.Dict::new()
+    dict.insert("side", Str(side))
+    library_builder([]).with_inputs(dict).build()
+  }
+  let world = reading_world(text)
+  let other = { ..world, library: inputs("30"), }
+  let same = { ..world, library: inputs("10"), }
+  // (The hashes of pages are not compared across libraries: the elements
+  // of two libraries are two sets of descriptors.)
+  let height = (world : ReadingWorld) => {
+    let warned : @library.Warned[
+      Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+    ] = compile(world)
+    guard warned.output is Ok(document) else { fail("the document compiles") }
+    document.pages()[0].frame.height().to_pt()
+  }
+  let small = height(world)
+  let mut large = 0.0
+  let counts = block_memo_delta(() => large = height(other))
+  assert_true(counts.1 >= 1)
+  assert_eq(small, 34.0)
+  assert_eq(large, 54.0)
+  assert_eq(block_memo_reference(other), outside_page_hashes(other))
+  // A library that says the same is still another library.
+  let counts = block_memo_delta(() => assert_eq(height(same), small))
+  assert_true(counts.1 >= 1)
+  // And each finds its own again.
+  let counts = block_memo_delta(() => {
+    assert_eq(height(world), small)
+    assert_eq(height(other), large)
+    assert_eq(height(same), small)
+  })
+  assert_eq(counts.1, 0)
+}
+
+///|
+/// A warning of the layout of a block is a warning of every compilation
+/// that finds the layout.
+test "blocks: the warnings of a block that is found are reported again" {
+  @library.evict(0)
+  let world = reading_world(
+    (
+      #|#set page(width: 160pt, height: auto, margin: 10pt)
+      #|#block(par[#box(width: 5pt, height: 5pt) #parbreak() #box(width: 6pt, height: 6pt)])
+      #|#context counter(page).final().first()
+      #|
+    ),
+  )
+  let warnings = () => {
+    let warned : @library.Warned[
+      Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+    ] = compile(world)
+    guard warned.output is Ok(_) else { fail("the document compiles") }
+    warned.warnings.map(warning => warning.message)
+  }
+  let expected = [
+    "parbreak may not occur inside of a paragraph and was ignored",
+  ]
+  let mut first = []
+  let counts = block_memo_delta(() => first = warnings())
+  assert_eq(first, expected)
+  // Found in the second iteration of the first compilation already.
+  assert_true(counts.0 >= 1)
+  let mut second = []
+  let counts = block_memo_delta(() => second = warnings())
+  assert_eq(counts.1, 0)
+  assert_eq(second, expected)
+}
+
+///|
 test "blocks: a block that reads a file is laid out again when the file changes" {
   @library.evict(0)
   // The file is read while the block is laid out (a `context` expression
