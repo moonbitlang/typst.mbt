@@ -955,6 +955,11 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     BlockMultiCallback(v) => {
       state.write_discriminant(7)
       state.write(v.captured())
+      // A callback for plain content is not the callback of its element's
+      // show rule (`BlockMultiCallback.typed`).
+      if !v.typed {
+        state.write_discriminant(1)
+      }
     }
     Decoration(v) => {
       state.write_discriminant(8)

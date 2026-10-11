@@ -10,6 +10,8 @@ import {
 }
 
 // Values
+pub fn block_memo_stats() -> (Int, Int)
+
 pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
 
 pub fn create_shape_plan(@library.FontInstance, @shape.Direction, @shape.Script, @shape.Language?, ArrayView[@shape.Feature]) -> @shape.ShapePlan
