@@ -756,10 +756,16 @@
   instead of `to_string()`/`to_owned()`/`to_array()` copies; return small
   immutable results as a `#valtype` struct (`@unicode.Decoded` from
   `decode_at`, `TextEdges`, `SpanAt`) rather than a tuple; `#valtype` also
-  for small immutable non-generic data (`Point`, `Length`, `Glyph`,
+  for small immutable non-generic data (`Point`, `Size`, `Length`, `Glyph`,
   `Utf8Slice`, `LazyArray16`; generic structs whose fields are type
   parameters cannot be value types, and `physical_equal` on value types is
-  always false on native); flatten tuple fields of per-glyph structs; loop
+  always false on native; upstream's `Size`, an alias of `Axes<Abs>`, is a
+  struct of its own for this reason: port `Size` and `Axes<Abs>` as
+  `Size`, `Axes::new(w, h)` of two lengths as `Size::new(w, h)`, and read
+  the header of `library/size.mbt` for what `Size` has of `Axes[T]`, the
+  twins of the generic functions (`select_size`, `zip_map_size`,
+  `sum_by_axis_size`, `map_axes`) and what boxes a size again: an option,
+  so also what an `Iter[Size]` yields); flatten tuple fields of per-glyph structs; loop
   instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
   `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
   default>)`; build constant style defaults once (`Value::shared`);
@@ -856,8 +862,15 @@
   of the allocations of a text-heavy compilation and 7 to 9 % of its
   time (`long.typ` 218 -> 199 ms, `longer.typ` 1126 -> 1049 ms, where
   upstream takes 90 and 455 ms; on wasm-gc under moonrun about 3 %,
-  which is within what its runs differ by). Measure with `/usr/bin/time
-  -l` (instructions are exact to 0.05 %; cycles and milliseconds need a
+  which is within what its runs differ by). One type at a time is a
+  small step: sizes as a value type (`Size`, 2.1 % of the objects of
+  `longer.typ`) took 0.7 % of its instructions and of its cycles, less
+  than the milliseconds of a run differ by, and nothing on wasm-gc.
+  Measure with `/usr/bin/time
+  -l` (instructions are exact to 0.05 % in one process, and differ by up
+  to 0.3 % between processes, like the reference counts by 1 %: core
+  seeds its hashes per process, so compare the least or the median of
+  several runs of each side; cycles and milliseconds need a
   quiet machine and the least of several runs).
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native

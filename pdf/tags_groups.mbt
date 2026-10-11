@@ -453,7 +453,7 @@ fn GroupKind::is_figure(self : GroupKind) -> Bool {
 fn GroupKind::to_artifact(
   self : GroupKind,
   options : CompletePdfOptions,
-  page_size : @library.Axes[@library.Abs]?,
+  page_size : @library.Size?,
 ) -> @export.Artifact? {
   guard self is Artifact(artifact) else { return None }
   if options.version() == Pdf17 && artifact == Background {

@@ -190,7 +190,7 @@ fn SVGRenderer::render_path_glyph(
     {
       x: @library.Abs::pt(glyph_size.width().to_int().to_double()),
       y: @library.Abs::pt(glyph_size.height().to_int().to_double()),
-    } : @library.Axes[@library.Abs]).aspect_ratio()
+    } : @library.Size).aspect_ratio()
   let use_ = svg.elem("use")
   use_
   .attr("xlink:href", SvgIdRef(id))

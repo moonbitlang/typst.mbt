@@ -151,7 +151,7 @@ fn stroke_base_curve(geometry : @library.Geometry) -> @library.Curve {
 /// the click position.
 fn is_in_rect(
   pos : @library.Point,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   click : @library.Point,
 ) -> Bool {
   pos.x <= click.x &&

@@ -14,7 +14,7 @@ pub fn layout_line(
   }
   let start = resolve(resolve_axes_rel(elem.start(styles), styles))
   let delta = match elem.end(styles) {
-    Some(end) => resolve(resolve_axes_rel(end, styles)).sub_size(start)
+    Some(end) => resolve(resolve_axes_rel(end, styles)) - start
     None => {
       let length = elem.length(styles).resolve(styles)
       let angle = elem.angle(styles)
@@ -24,8 +24,8 @@ pub fn layout_line(
     }
   }
   let stroke = elem.stroke(styles).resolve(styles).unwrap_or_default()
-  let size = start.max(start.add_size(delta)).max(@library.Axes::zero_size())
-  if !size.is_finite_size() {
+  let size = start.max(start + delta).max(@library.Size::zero())
+  if !size.is_finite() {
     @library.bail_at(
       elem.pack().span(),
       "cannot create line with infinite length",
@@ -87,7 +87,7 @@ pub fn layout_curve(
   if curve.is_empty() {
     return @library.Frame::soft(size)
   }
-  if !size.is_finite_size() {
+  if !size.is_finite() {
     @library.bail_at(
       elem.pack().span(),
       "cannot create curve with infinite size",
@@ -119,7 +119,7 @@ priv struct CurveBuilder {
   /// The output curve.
   curve : @library.Curve
   /// The curve's bounds.
-  mut size : @library.Axes[@library.Abs]
+  mut size : @library.Size
   /// The region relative to which points are resolved.
   region : @library.LayoutRegion
   /// The styles for the curve.
@@ -147,7 +147,7 @@ fn CurveBuilder::new(
 ) -> CurveBuilder {
   {
     curve: @library.Curve::new(),
-    size: @library.Axes::zero_size(),
+    size: @library.Size::zero(),
     region,
     styles,
     start_point: @library.Point::zero(),
@@ -161,9 +161,7 @@ fn CurveBuilder::new(
 
 ///|
 /// Finish building, returning the curve and its bounding size.
-fn CurveBuilder::finish(
-  self : CurveBuilder,
-) -> (@library.Curve, @library.Axes[@library.Abs]) {
+fn CurveBuilder::finish(self : CurveBuilder) -> (@library.Curve, @library.Size) {
   (self.curve, self.size)
 }
 
@@ -324,7 +322,7 @@ pub fn layout_polygon(
     .iter()
     .fold(init=@library.Point::zero(), (max, c) => c.max(max))
     .to_size()
-  if !size.is_finite_size() {
+  if !size.is_finite() {
     @library.bail_at(
       elem.pack().span(),
       "cannot create polygon with infinite size",
@@ -543,7 +541,7 @@ fn layout_shape(
           .min(pod.size.min_by_side())
       }
       pod = @library.LayoutRegion::new(
-        @library.Axes::splat(length),
+        @library.Size::splat(length),
         @library.Axes::splat(true),
       )
     }
@@ -559,12 +557,12 @@ fn layout_shape(
   } else {
     // The default size that a shape takes on if it has no child and no
     // forced sizes.
-    let default = @library.Axes::new(
+    let default = @library.Size::new(
       @library.Abs::pt(45.0),
       @library.Abs::pt(30.0),
     ).min(region.size)
     let size = if kind.is_quadratic() {
-      @library.Axes::splat(
+      @library.Size::splat(
         match quadratic_size(region) {
           Some(length) => length
           None => default.min_by_side()
@@ -574,7 +572,7 @@ fn layout_shape(
       // For each dimension, pick the region size if forced, otherwise use
       // the default size (or the region size if the default is too large
       // for the region).
-      region.expand.select(region.size, default)
+      region.expand.select_size(region.size, default)
     }
     @library.Frame::soft(size)
   }
@@ -591,7 +589,7 @@ fn layout_shape(
   if fill is Some(_) || any_stroke(stroke) {
     if kind.is_round() {
       let outset = sides_rel_or_zero(outset).relative_to(frame.size())
-      let size = frame.size().add_size(outset.sum_by_axis())
+      let size = frame.size() + outset.sum_by_axis_size()
       let pos = @library.Point::new(-outset.left, -outset.top)
       let shape : @library.Shape = {
         geometry: Curve(@library.Curve::ellipse(size)),
@@ -645,13 +643,13 @@ fn option_abs_min(a : @library.Abs?, b : @library.Abs?) -> @library.Abs? {
 ///|
 /// Creates a new rectangle as a curve.
 pub fn clip_rect(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   radius : @library.Corners[@library.Rel[@library.Abs]],
   stroke : @library.Sides[@library.FixedStroke?],
   outset : @library.Sides[@library.Rel[@library.Abs]],
 ) -> @library.Curve {
   let outset = outset.relative_to(size)
-  let size = size.add_size(outset.sum_by_axis())
+  let size = size + outset.sum_by_axis_size()
   let stroke_widths = stroke.map(s => s.map(s => s.thickness.div_by(2.0)))
   let base_radius = size.x.min(size.y).div_by(2.0)
   let corner_max = stroke_widths.map_corners((a, b) => {
@@ -700,7 +698,7 @@ pub fn fill_and_stroke(
   span : @syntax.Span,
 ) -> Unit {
   let outset = outset.relative_to(frame.size())
-  let size = frame.size().add_size(outset.sum_by_axis())
+  let size = frame.size() + outset.sum_by_axis_size()
   let pos = @library.Point::new(-outset.left, -outset.top)
   frame.prepend_multiple(
     styled_rect(size, radius, fill, stroke)
@@ -715,7 +713,7 @@ pub fn fill_and_stroke(
 /// - stroke sides if possible
 /// - use fill for sides for best looks
 pub fn styled_rect(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   radius : @library.Corners[@library.Rel[@library.Abs]],
   fill : @library.Paint?,
   stroke : @library.Sides[@library.FixedStroke?],
@@ -730,7 +728,7 @@ pub fn styled_rect(
 ///|
 /// Use rect primitive for the rectangle
 fn simple_rect(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   fill : @library.Paint?,
   stroke : @library.FixedStroke?,
 ) -> Array[@library.Shape] {
@@ -746,7 +744,7 @@ fn simple_rect(
 
 ///|
 fn corners_control_points(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   radius : @library.Corners[@library.Abs],
   strokes : @library.Sides[@library.FixedStroke?],
   stroke_widths : @library.Sides[@library.Abs?],
@@ -789,7 +787,7 @@ fn corners_control_points(
 ///|
 /// Use stroke and fill for the rectangle
 fn segmented_rect(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   radius : @library.Corners[@library.Rel[@library.Abs]],
   fill : @library.Paint?,
   strokes : @library.Sides[@library.FixedStroke?],
@@ -1116,7 +1114,7 @@ priv struct ControlPoints {
   stroke_after : @library.Abs?
   stroke_before : @library.Abs?
   corner : @library.Corner
-  size : @library.Axes[@library.Abs]
+  size : @library.Size
   same : Bool
 }
 

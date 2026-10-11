@@ -9,7 +9,7 @@ fn handle_image(
   gc : GlobalContext,
   fc : FrameContext,
   image : @library.Image,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   surface : @export.Surface,
   span : @syntax.Span,
 ) -> Unit raise @library.SourceError {
@@ -284,8 +284,8 @@ fn convert_raster_impl(
 ///|
 fn exif_transform(
   image : @library.RasterImage,
-  size : @library.Axes[@library.Abs],
-) -> (@library.Transform, @library.Axes[@library.Abs]) {
+  size : @library.Size,
+) -> (@library.Transform, @library.Size) {
   // For JPEGs, we want to apply the EXIF orientation as a transformation
   // because we don't recode them. For other formats, the transform is
   // already baked into the dynamic image data.
@@ -298,7 +298,7 @@ fn exif_transform(
     hp : Bool,
     vp : Bool,
     base_ts : @library.Transform,
-    size : @library.Axes[@library.Abs],
+    size : @library.Size,
   ) => {
     let mut base_ts = base_ts
     if hp {
@@ -328,7 +328,7 @@ fn exif_transform(
       @library.Abs::zero(),
       @library.Abs::zero(),
     ).pre_concat(@library.Transform::scale(one, neg))
-    let inv_size = @library.Axes::new(size.y, size.x)
+    let inv_size = @library.Size::new(size.y, size.x)
     (base(hp, vp, base_ts, inv_size), inv_size)
   }
   match image.exif_rotation() {

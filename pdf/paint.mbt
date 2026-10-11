@@ -85,7 +85,7 @@ fn convert_paint(
     None =>
       (
         @library.Point::zero(),
-        @library.Axes::new(@library.Abs::zero(), @library.Abs::zero()),
+        @library.Size::new(@library.Abs::zero(), @library.Abs::zero()),
       )
   }
   let mut size = size
@@ -210,7 +210,7 @@ fn convert_gradient(
   gradient : @library.Gradient,
   on_text : Bool,
   state : State,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   offset : @library.Point,
 ) -> @export.Paint {
   let (size, offset) = match gradient.unwrap_relative(on_text) {

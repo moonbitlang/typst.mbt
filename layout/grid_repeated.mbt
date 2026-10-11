@@ -221,7 +221,7 @@ fn GridLayouter::layout_active_headers(
     // Advance regions without any output until we can place the
     // header and the footer.
     self.finish_region_internal(
-      @library.Frame::soft(@library.Axes::splat(@library.Abs::zero())),
+      @library.Frame::soft(@library.Size::splat(@library.Abs::zero())),
       [],
       FinishedHeaderRowInfo::default(),
     )
@@ -482,7 +482,7 @@ fn GridLayouter::prepare_footer(
     // Advance regions without any output until we can place the
     // footer.
     self.finish_region_internal(
-      @library.Frame::soft(@library.Axes::splat(@library.Abs::zero())),
+      @library.Frame::soft(@library.Size::splat(@library.Abs::zero())),
       [],
       FinishedHeaderRowInfo::default(),
     )

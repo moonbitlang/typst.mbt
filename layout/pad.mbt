@@ -28,10 +28,10 @@ pub fn layout_pad(
 ///|
 /// Shrink a region size by an inset relative to the size itself.
 pub fn shrink(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   inset : @library.Sides[@library.Rel[@library.Abs]],
-) -> @library.Axes[@library.Abs] {
-  size.sub_size(inset.sum_by_axis().relative_to(size))
+) -> @library.Size {
+  size - inset.sum_by_axis().relative_to(size)
 }
 
 ///|
@@ -39,19 +39,14 @@ pub fn shrink(
 /// to the regions themselves. Returns the shrunk `(size, full, backlog,
 /// last)`.
 pub fn shrink_multiple(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   full : @library.Abs,
   backlog : Array[@library.Abs],
   last : @library.Abs?,
   inset : @library.Sides[@library.Rel[@library.Abs]],
-) -> (
-  @library.Axes[@library.Abs],
-  @library.Abs,
-  Array[@library.Abs],
-  @library.Abs?,
-) {
+) -> (@library.Size, @library.Abs, Array[@library.Abs], @library.Abs?) {
   let summed = inset.sum_by_axis()
-  let size = size.sub_size(summed.relative_to(size))
+  let size = size - summed.relative_to(size)
   let full = full - summed.y.relative_to(full)
   let backlog = backlog.map(item => item - summed.y.relative_to(item))
   let last = last.map(v => v - summed.y.relative_to(v))

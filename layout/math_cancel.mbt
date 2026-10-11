@@ -70,7 +70,7 @@ fn draw_cancel_line(
   stroke : @library.FixedStroke,
   invert : Bool,
   angle : @library.Smart[@library.CancelAngle],
-  body_size : @library.Axes[@library.Abs],
+  body_size : @library.Size,
   styles : @library.StyleChain,
   span : @syntax.Span,
 ) -> @library.Frame raise @library.SourceError {
@@ -114,7 +114,7 @@ fn draw_cancel_line(
 
 ///|
 /// The default line angle for a body of the given size.
-fn default_angle(body : @library.Axes[@library.Abs]) -> @library.Angle {
+fn default_angle(body : @library.Size) -> @library.Angle {
   // The default cancel line is the diagonal.
   // We infer the default angle from
   // the diagonal w.r.t to the body box.

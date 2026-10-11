@@ -22,7 +22,7 @@ fn handle_link(
   fc : FrameContext,
   gc : GlobalContext,
   dest : @library.Destination,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
 ) -> Unit raise @library.SourceError {
   let target : @export.Target = match dest {
     Url(u) => Action(Link(u.0))
@@ -136,10 +136,7 @@ fn resolve_cross_link(gc : GlobalContext, loc : @library.Location) -> String? {
 
 ///|
 /// Compute the bounding box of the transformed rectangle for this frame.
-fn bounding_box(
-  fc : FrameContext,
-  size : @library.Axes[@library.Abs],
-) -> @export.Rect {
+fn bounding_box(fc : FrameContext, size : @library.Size) -> @export.Rect {
   let pos = @library.Point::zero()
   let points = [
     pos + @library.Point::with_y(size.y),

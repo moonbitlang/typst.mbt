@@ -144,7 +144,7 @@ fn handle(
       locator,
       styles.chain_one(style),
       @library.LayoutRegion::new(
-        @library.Axes::splat(@library.Abs::inf()),
+        @library.Size::splat(@library.Abs::inf()),
         @library.Axes::splat(false),
       ),
     )

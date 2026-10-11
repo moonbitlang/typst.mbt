@@ -101,7 +101,7 @@ priv struct Composer {
   work : Work
   config : Config
   mut column : Int
-  page_base : @library.Axes[@library.Abs]
+  page_base : @library.Size
   page_insertions : Insertions
   mut column_insertions : Insertions
   mut column_balancing_height : @library.Abs?
@@ -180,13 +180,13 @@ fn Composer::page_contents(
   // Subregions for column layout.
   let mut inner : @library.Regions = {
     ..regions,
-    size: @library.Axes::new(self.config.columns.width, column_height),
+    size: @library.Size::new(self.config.columns.width, column_height),
     backlog: backlog[:],
     expand: @library.Axes::new(true, regions.expand.y),
   }
 
   // The size of the merged frame hosting multiple columns.
-  let size = @library.Axes::new(
+  let size = @library.Size::new(
     regions.size.x,
     if regions.expand.y {
       regions.size.y
@@ -230,7 +230,7 @@ fn Composer::page_contents(
         self.engine,
         separator,
         self.config,
-        @library.Axes::new(self.config.columns.gutter, height),
+        @library.Size::new(self.config.columns.gutter, height),
       )
       output.prepend_frame(
         // Prepend so it's behind both adjacent columns.
@@ -743,7 +743,7 @@ fn Composer::footnote(
 fn Composer::footnote_spill(
   self : Composer,
   frames : Array[@library.Frame],
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
 ) -> Unit raise @library.SourceError {
   let area = self.column_insertions
 
@@ -781,7 +781,7 @@ fn Composer::insertion_width(self : Composer) -> @library.Abs {
 fn layout_footnote_separator(
   engine : @library.Engine,
   config : Config,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
 ) -> @library.Frame raise @library.SourceError {
   layout_frame(
     engine,
@@ -828,7 +828,7 @@ fn layout_column_separator(
   engine : @library.Engine,
   separator : @library.Content,
   config : Config,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
 ) -> @library.Frame raise @library.SourceError {
   layout_frame(
     engine,
@@ -946,9 +946,8 @@ fn Insertions::finalize(
     self.footnotes.is_empty() {
     return inner
   }
-  let size = inner
-    .size()
-    .add_size(@library.Axes::new(@library.Abs::zero(), self.height()))
+  let size = inner.size() +
+    @library.Size::new(@library.Abs::zero(), self.height())
   let output = @library.Frame::soft(size)
   let mut offset_top = @library.Abs::zero()
   for pair in self.top_floats {
@@ -1134,7 +1133,7 @@ fn layout_line_number_reset(
     locator.next(()),
     config.shared,
     @library.LayoutRegion::new(
-      @library.Axes::splat(@library.Abs::zero()),
+      @library.Size::splat(@library.Abs::zero()),
       @library.Axes::splat(false),
     ),
   )
@@ -1175,7 +1174,7 @@ fn layout_line_number(
     locator.next(()),
     config.shared,
     @library.LayoutRegion::new(
-      @library.Axes::splat(@library.Abs::inf()),
+      @library.Size::splat(@library.Abs::inf()),
       @library.Axes::splat(false),
     ),
   )

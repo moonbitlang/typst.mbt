@@ -11,7 +11,7 @@ pub fn layout_equation_inline(
   engine : @library.Engine,
   locator : @library.Locator,
   styles : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
 ) -> Array[@library.InlineItem] raise @library.SourceError {
   guard !elem.block(styles) else {
     abort("assertion failed: !elem.block.get(styles)")
@@ -32,7 +32,7 @@ pub fn layout_equation_inline(
   // An empty equation should have a height, so we still create a frame
   // (which is then resized in the loop).
   if items.is_empty() {
-    items.push(Frame(@library.Frame::soft(@library.Axes::zero_size())))
+    items.push(Frame(@library.Frame::soft(@library.Size::zero())))
   }
   for item in items {
     guard item is Frame(frame) else { continue }
@@ -112,7 +112,7 @@ pub fn layout_equation_block(
       }
       equation_builders.push({
         frames,
-        size: @library.Axes::new(width, height),
+        size: @library.Size::new(width, height),
       })
       regions = regions.next()
     }
@@ -142,7 +142,7 @@ pub fn layout_equation_block(
 
     // Ensure that there is at least one frame, even for empty equations.
     if equation_builders.is_empty() {
-      equation_builders.push({ frames: [], size: @library.Axes::zero_size(), })
+      equation_builders.push({ frames: [], size: @library.Size::zero(), })
     }
     equation_builders
   } else {
@@ -247,7 +247,7 @@ fn add_equation_number(
   }
   let y = {
     let align_baselines = (
-      line : (@library.Axes[@library.Abs], @library.Point, @library.Abs),
+      line : (@library.Size, @library.Point, @library.Abs),
       number : @library.Frame,
     ) => {
       let (_, pos, baseline) = line
@@ -275,14 +275,14 @@ fn resize_equation(
   equation_align : @library.FixedAlignment,
   width : @library.Abs,
   is_multiline : Bool,
-  first : (@library.Axes[@library.Abs], @library.Point, @library.Abs),
-  last : (@library.Axes[@library.Abs], @library.Point, @library.Abs),
+  first : (@library.Size, @library.Point, @library.Abs),
+  last : (@library.Size, @library.Point, @library.Abs),
 ) -> @library.Point {
   if number_align.y is Center && is_multiline {
     // In this case, the center lines (not baselines) of the number frame
     // and the equation frame shall be aligned.
     return equation.resize(
-      @library.Axes::new(width, equation.height().max(number.height())),
+      @library.Size::new(width, equation.height().max(number.height())),
       @library.Axes::new(equation_align, Center),
     )
   }
@@ -306,7 +306,7 @@ fn resize_equation(
   // The vertical expansion is asymmetric on the top and bottom edges, so we
   // first align at the top then translate the content downward later.
   let resizing_offset = equation.resize(
-    @library.Axes::new(width, equation.height() + excess_above + excess_below),
+    @library.Size::new(width, equation.height() + excess_above + excess_below),
     @library.Axes::new(equation_align, Start),
   )
   equation.translate(@library.Point::with_y(excess_above))
@@ -328,7 +328,7 @@ priv struct MathContext {
 /// Create a new math context.
 fn MathContext::new(
   engine : @library.Engine,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
   font : @library.FontInstance,
 ) -> MathContext {
   {

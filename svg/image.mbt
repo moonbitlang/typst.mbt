@@ -9,7 +9,7 @@ fn SVGRenderer::render_image(
   svg : SvgElem,
   state : State,
   image : @library.Image,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
 ) -> Unit {
   // TODO: Images whose web preparation isn't ported (see `WebImage::new`)
   // are written with an empty data URL.

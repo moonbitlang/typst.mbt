@@ -626,7 +626,7 @@ fn commit(
       Fractional(v, elem) => {
         let amount = v.share(fr, remaining)
         if elem is Some((elem, loc, styles)) {
-          let region = @library.Axes::new(amount, full)
+          let region = @library.Size::new(amount, full)
           let frame = layout_and_modify(styles, styles => {
             layout_box(elem, engine, loc.relayout(), styles, region)
           })
@@ -647,7 +647,7 @@ fn commit(
       }
       Frame(frame) => push(frame.clone(), idx)
       Tag(tag) => {
-        let frame = @library.Frame::soft(@library.Axes::zero_size())
+        let frame = @library.Frame::soft(@library.Size::zero())
         frame.push(@library.Point::zero(), Tag(tag))
         frames.push((offset, frame, idx))
       }
@@ -659,7 +659,7 @@ fn commit(
   if !@library.is_zero(fr) {
     remaining = @library.Abs::zero()
   }
-  let size = @library.Axes::new(width, top + bottom)
+  let size = @library.Size::new(width, top + bottom)
   let output = @library.Frame::soft(size)
   output.set_baseline(top)
   if p.config.numbering_marker is Some(marker) {

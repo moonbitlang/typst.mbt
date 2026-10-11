@@ -647,7 +647,7 @@ fn measure_prefix(
   styles : StyleChain,
   span : @syntax.Span,
 ) -> Abs raise SourceError {
-  let pod = LayoutRegion::new(Axes::splat(Abs::inf()), Axes::splat(false))
+  let pod = LayoutRegion::new(Size::splat(Abs::inf()), Axes::splat(false))
   let link = LocatorLink::measure(loc, span)
   (engine.routines().layout_frame)(
     engine,

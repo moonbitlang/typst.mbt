@@ -23,13 +23,13 @@ fn layout_math_table(
         FrameFragment::new(
           props,
           styles,
-          @library.Frame::soft(@library.Axes::zero_size()),
+          @library.Frame::soft(@library.Size::zero()),
         ),
       ),
     )
     return
   }
-  let gap = item.gap.zip_map(ctx.region.size, (rel, size) => {
+  let gap = item.gap.zip_map_size(ctx.region.size, (rel, size) => {
     rel.relative_to(size)
   })
   let half_gap = gap.times(0.5)
@@ -112,7 +112,7 @@ fn layout_math_table(
 
   // Width starts at zero because it can't be calculated until later
   let frame = @library.Frame::soft(
-    @library.Axes::new(@library.Abs::zero(), total_height),
+    @library.Size::new(@library.Abs::zero(), total_height),
   )
   let mut x = @library.Abs::zero()
   if vline.contains(0L) {

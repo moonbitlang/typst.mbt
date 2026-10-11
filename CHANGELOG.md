@@ -160,6 +160,53 @@ Typst source) are unchanged.
   `RawSyntax(RawSyntax)` and `RawTheme(RawTheme)` (the decoded syntaxes and
   the theme of a raw element, in its internal fields `syntaxes-derived`
   and `theme-derived`); a `match` over all cases must handle them.
+- `library`: `Size` is a type of its own, a struct of two `Abs` (`x`,
+  `y`) that is passed by value; it was an alias of `Axes[Abs]`, as it is
+  upstream (`pub type Size = Axes<Abs>`). A generic struct is an object
+  on the heap, and sizes are what layout computes with most. Every
+  signature that said `Axes[Abs]` says `Size`: `Frame::new`, `soft`,
+  `hard`, `size`, `set_size`, `resize`; the fields `size` of
+  `LayoutRegion` and `Regions`, `Regions::repeat`, `base`, `map`, `iter`;
+  `Rect::from_pos_size`, `size`; `Point::to_size`; `Curve::rect`,
+  `ellipse`; `Geometry::Rect`; `FrameItem::Image`, `Link`;
+  `GlyphFrameItem::Image`, `GlyphFrame::size`; the fields `size`,
+  `spacing`, `offset` of `Tiling`; `InlineElem::layouter`, `layout`,
+  `InlineCallback::new`, `call`; `Axes[Rel[Abs]]::relative_to`,
+  `Sides[Rel[Abs]]::relative_to`; in `layout`: `layout_box`,
+  `layout_equation_inline`, `layout_inline`, `layout_par`, `shrink`,
+  `shrink_multiple`, `clip_rect`, `styled_rect`. What a caller changes:
+  - `Axes::new(w, h)` and `Axes::splat(v)` for a size are `Size::new(w,
+    h)` and `Size::splat(v)`; a struct literal `{ x, y }` and the fields
+    `.x` and `.y` are as before. `size.to_axes()` and
+    `Size::from_axes(axes)` convert where an `Axes[Abs]` is at hand (the
+    first makes an object).
+  - The methods that `size.rs` adds have upstream's names:
+    `Axes::zero_size()` is `Size::zero()`, `is_zero_size()` is
+    `is_zero()`, `is_finite_size()` is `is_finite()`, and `add_size`,
+    `sub_size`, `neg_size` are `+`, `-` and unary `-`. `fits`, `to_point`,
+    `aspect_ratio`, `times` and `div_by` are methods of `Size` (they were
+    methods of `Axes` that only `Axes[Abs]` could call).
+  - Of the generic methods of `Axes[T]`, `Size` has `get`,
+    `with_axis_value`, `min`, `max`, `min_by_side`, `max_by_side`, `any`,
+    `all`, `with_x`, `with_y`, and `map` and `zip_map` where the result
+    is a size (`size.map((Abs) -> Abs)`, `size.zip_map(Axes[V], (Abs, V)
+    -> Abs)`). `size.map_axes(f)` is `map` to an `Axes[U]`
+    (`size.map_axes(Abs::is_finite)`), and `a.zip_map_size(b, f)` is
+    `zip_map` of two sizes. `zip`, and a size where another generic
+    function takes an `Axes[T]` (`unwrap_or_smart`), need `to_axes()`.
+  - Three generic functions have a twin for sizes:
+    `Axes[Bool]::select_size(Size, Size) -> Size` (`select`),
+    `Axes[T]::zip_map_size(Size, (T, Abs) -> Abs) -> Size` (`zip_map`)
+    and `Sides[Abs]::sum_by_axis_size() -> Size` (`sum_by_axis`, which
+    still returns an `Axes[T]`).
+  - `Size` implements `Eq`, `Hash`, `Default`, `Reflect`, `FromValue`
+    and `IntoValue` (an array of two lengths), as `Axes[Abs]` did, and,
+    new, `Add`, `Sub`, `Neg` and `Numeric`, as upstream. `into_value` is
+    called through its trait (`IntoValue::into_value(size)`;
+    `axes.into_value()` is a method of `Axes`). It has no identity:
+    `physical_equal` on two sizes is false on native.
+  `doc`'s `Size` (what `Ctx::measure` returns) is another type and has
+  not changed.
 
 ### Changed: `Debug` output
 

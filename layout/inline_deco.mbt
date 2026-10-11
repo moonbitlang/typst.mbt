@@ -14,7 +14,7 @@ fn decorate(
   let font_metrics = text.font.metrics()
   if deco.line is Highlight(fill~, stroke~, top_edge~, bottom_edge~, radius~) {
     let (top, bottom) = determine_edges(text, top_edge, bottom_edge)
-    let size = @library.Axes::new(width + deco.extent.times(2.0), top + bottom)
+    let size = @library.Size::new(width + deco.extent.times(2.0), top + bottom)
     let sides = styled_rect(size, radius, fill, stroke)
     let origin = @library.Point::new(pos.x - deco.extent, pos.y - top - shift)
     frame.prepend_multiple(

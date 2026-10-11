@@ -91,7 +91,7 @@ test "memo: a layout result depends on the traced span" {
       if engine.traced.0 is Some(_) {
         engine.sink.value(Int(7), None)
       }
-      Fragment([Frame::soft(Axes::new(Abs::pt(1.0), Abs::pt(1.0)))])
+      Fragment([Frame::soft(Size::new(Abs::pt(1.0), Abs::pt(1.0)))])
     })
     |> ignore
     engine.sink.values().length()

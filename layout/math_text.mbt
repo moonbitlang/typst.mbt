@@ -21,7 +21,7 @@ fn layout_math_text(
     [(elem, styles)][:],
     item.locator.relayout().split(),
     styles,
-    @library.Axes::splat(@library.Abs::inf()),
+    @library.Size::splat(@library.Abs::inf()),
     false,
   ).into_frame()
   ctx.push(Frame(FrameFragment::new(props, styles, frame).with_text_like(true)))

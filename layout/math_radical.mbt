@@ -78,7 +78,7 @@ fn layout_radical(
   let sqrt_x = sqrt_offset.max(@library.Abs::zero())
   let radicand_x = sqrt_x + sqrt.width()
   let radicand_y = ascent - radicand.ascent()
-  let size = @library.Axes::new(radicand_x + line_width, ascent + descent)
+  let size = @library.Size::new(radicand_x + line_width, ascent + descent)
 
   // The extra "- thickness" comes from the fact that the sqrt is placed
   // in `push_frame` with respect to its top, not its baseline.
@@ -104,7 +104,7 @@ fn layout_radical(
   match sqrt_stroke {
     Some(fixed_stroke) => {
       let sides = styled_rect(
-        @library.Axes::new(line_width, thickness),
+        @library.Size::new(line_width, thickness),
         @library.Corners::splat(@library.Rel::zero()),
         Some(text_fill),
         @library.Sides::new(

@@ -111,7 +111,7 @@ fn stack_rows(
   let (points, total_width) = cumulative_alignment_points(widths)
   let has_alignment = !points.is_empty()
   let frames = []
-  let mut size = @library.Axes::new(@library.Abs::zero(), start_y)
+  let mut size = @library.Size::new(@library.Abs::zero(), start_y)
   for i, row in rows {
     let sub = row_into_line_frame(
       row.cells,
@@ -173,7 +173,7 @@ fn math_run_into_par_items(
   let mut x = @library.Abs::zero()
   let mut ascent = @library.Abs::zero()
   let mut descent = @library.Abs::zero()
-  let mut frame = @library.Frame::soft(@library.Axes::zero_size())
+  let mut frame = @library.Frame::soft(@library.Size::zero())
   let mut empty = true
   let finalize_frame = (
     frame : @library.Frame,
@@ -181,7 +181,7 @@ fn math_run_into_par_items(
     ascent : @library.Abs,
     descent : @library.Abs,
   ) => {
-    frame.set_size(@library.Axes::new(x, ascent + descent))
+    frame.set_size(@library.Size::new(x, ascent + descent))
     frame.set_baseline(@library.Abs::zero())
     frame.translate(@library.Point::with_y(ascent))
   }
@@ -218,7 +218,7 @@ fn math_run_into_par_items(
     // relation so that there is a line-breaking opportunity.
     if is_line_break_opportunity(class, peek.map(f => f.class())) {
       let frame_prev = frame
-      frame = @library.Frame::soft(@library.Axes::zero_size())
+      frame = @library.Frame::soft(@library.Size::zero())
       finalize_frame(frame_prev, x, ascent, descent)
       items.push(Frame(frame_prev))
       empty = true
@@ -248,7 +248,7 @@ fn math_run_into_par_items(
 /// [`Frame`].
 priv struct MathRunFrameBuilder {
   /// The size of the resulting frame.
-  mut size : @library.Axes[@library.Abs]
+  mut size : @library.Size
   /// Each row's frame, and the position where the frame should
   /// be pushed into the resulting frame.
   frames : Array[(@library.Frame, @library.Point)]
@@ -256,7 +256,7 @@ priv struct MathRunFrameBuilder {
 
 ///|
 fn MathRunFrameBuilder::default() -> MathRunFrameBuilder {
-  { size: @library.Axes::zero_size(), frames: [], }
+  { size: @library.Size::zero(), frames: [], }
 }
 
 ///|
@@ -317,7 +317,7 @@ fn row_into_line_frame(
     None => measure_row(cells)
   }
   let frame = @library.Frame::soft(
-    @library.Axes::new(@library.Abs::zero(), ascent + descent),
+    @library.Size::new(@library.Abs::zero(), ascent + descent),
   )
   frame.set_baseline(ascent)
   let alternator = Ref(alternator)

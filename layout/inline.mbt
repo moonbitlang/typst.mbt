@@ -7,7 +7,7 @@ pub fn layout_par(
   engine : @library.Engine,
   locator : @library.Locator,
   styles : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
   expand : Bool,
   situation : ParSituation,
 ) -> @library.Fragment raise @library.SourceError {
@@ -47,7 +47,7 @@ fn layout_par_impl(
   engine : @library.Engine,
   locator : @library.Locator,
   styles : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
   expand : Bool,
   situation : ParSituation,
 ) -> @library.Fragment raise @library.SourceError {
@@ -85,7 +85,7 @@ pub fn layout_inline(
   children : ArrayView[@library.Pair],
   locator : @library.SplitLocator,
   shared : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
   expand : Bool,
 ) -> @library.Fragment raise @library.SourceError {
   layout_inline_impl(engine, children, locator, shared, region, expand, None, {
@@ -103,7 +103,7 @@ fn layout_inline_impl(
   children : ArrayView[@library.Pair],
   locator : @library.SplitLocator,
   shared : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
   expand : Bool,
   par : ParSituation?,
   base : ConfigBase,

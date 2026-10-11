@@ -28,7 +28,7 @@ pub fn layout_single_block(
   let frame = match body {
     // If we have no body, just create one frame. Its size will be adjusted
     // below.
-    None => @library.Frame::hard(@library.Axes::zero_size())
+    None => @library.Frame::hard(@library.Size::zero())
 
     // If we have content as our body, just layout it.
     Some(Content(body)) =>
@@ -44,7 +44,7 @@ pub fn layout_single_block(
     Some(MultiLayouter(callback)) => {
       let expand = pod.expand
         .bitor(region.expand)
-        .bitand(pod.size.map(@library.Abs::is_finite))
+        .bitand(pod.size.map_axes(@library.Abs::is_finite))
       let pod = { ..pod, expand, }
       callback
       .call(engine, locator, styles, @library.Regions::from_region(pod))
@@ -59,7 +59,7 @@ pub fn layout_single_block(
 
   // Enforce a correct frame size on the expanded axes. Do this before
   // applying the inset, since the pod shrunk.
-  frame.set_size(pod.expand.select(pod.size, frame.size()))
+  frame.set_size(pod.expand.select_size(pod.size, frame.size()))
 
   // Apply the inset.
   if !inset.is_zero() {
@@ -128,11 +128,11 @@ pub fn layout_multi_block(
     // below.
     None => {
       let frames = []
-      frames.push(@library.Frame::hard(@library.Axes::zero_size()))
+      frames.push(@library.Frame::hard(@library.Size::zero()))
       if pod.expand.y {
         let mut iter = pod
         while !iter.backlog.is_empty() {
-          frames.push(@library.Frame::hard(@library.Axes::zero_size()))
+          frames.push(@library.Frame::hard(@library.Size::zero()))
           iter = iter.next()
         }
       }
@@ -172,7 +172,7 @@ pub fn layout_multi_block(
         }
         let pod = {
           ..pod,
-          size: @library.Axes::new(max_width, pod.size.y),
+          size: @library.Size::new(max_width, pod.size.y),
           expand: @library.Axes::new(true, pod.expand.y),
         }
         fragment = layout_fragment(engine, body, locator, styles, pod)
@@ -196,7 +196,7 @@ pub fn layout_multi_block(
     Some(MultiLayouter(callback)) => {
       let expand = pod.expand
         .bitor(regions.expand)
-        .bitand(pod.size.map(@library.Abs::is_finite))
+        .bitand(pod.size.map_axes(@library.Abs::is_finite))
       let pod = { ..pod, expand, }
       callback.call(engine, locator, styles, pod)
     }
@@ -240,7 +240,7 @@ pub fn layout_multi_block(
 
     // Enforce a correct frame size on the expanded axes. Do this before
     // applying the inset, since the pod shrunk.
-    frame.set_size(pod.expand.select(region, frame.size()))
+    frame.set_size(pod.expand.select_size(region, frame.size()))
 
     // Apply the inset.
     if has_inset {
@@ -285,10 +285,10 @@ fn unbreakable_pod(
   height : @library.Sizing,
   inset : @library.Sides[@library.Rel[@library.Abs]],
   styles : @library.StyleChain,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
 ) -> @library.LayoutRegion {
   // Resolve the size.
-  let mut size = @library.Axes::new(
+  let mut size = @library.Size::new(
     match width {
       // - For auto, the whole region is available.
       // - Fr is handled outside and already factored into the `region`, so
@@ -353,7 +353,7 @@ fn breakable_pod(
 
   // Resolve the horizontal sizing to a concrete width and combine `width`
   // and `first` into `size`.
-  let mut size = @library.Axes::new(
+  let mut size = @library.Size::new(
     match width {
       Auto | Fr(_) => regions.size.x
       Rel(rel) => rel.resolve(styles).relative_to(base.x)

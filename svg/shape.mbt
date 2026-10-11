@@ -99,7 +99,7 @@ fn SVGRenderer::shape_fill_size(
   state : State,
   paint : @library.Paint,
   shape : @library.Shape,
-) -> @library.Axes[@library.Abs] {
+) -> @library.Size {
   // Only gradients use the aspect ratio derived from this size.
   guard paint is Gradient(gradient) else {
     return { x: @library.Abs::pt(1.0), y: @library.Abs::pt(1.0), }

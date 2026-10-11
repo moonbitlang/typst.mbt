@@ -20,7 +20,7 @@
 /// A finished layout with items at fixed positions.
 pub struct Frame {
   /// The size of the frame.
-  priv mut size : Axes[Abs]
+  priv mut size : Size
   /// The baseline of the frame measured from the top. If this is `None`, the
   /// frame's implicit baseline is at the bottom.
   priv mut baseline : Abs?
@@ -41,8 +41,8 @@ pub struct Frame {
 /// Create a new, empty frame.
 ///
 /// Panics if the size is not finite.
-pub fn Frame::new(size : Axes[Abs], kind : FrameKind) -> Frame {
-  guard size.is_finite_size() else { abort("frame size must be finite") }
+pub fn Frame::new(size : Size, kind : FrameKind) -> Frame {
+  guard size.is_finite() else { abort("frame size must be finite") }
   { size, baseline: None, items: [], shared: false, kind, }
 }
 
@@ -50,7 +50,7 @@ pub fn Frame::new(size : Axes[Abs], kind : FrameKind) -> Frame {
 /// Create a new, empty soft frame.
 ///
 /// Panics if the size is not finite.
-pub fn Frame::soft(size : Axes[Abs]) -> Frame {
+pub fn Frame::soft(size : Size) -> Frame {
   Frame::new(size, Soft)
 }
 
@@ -58,14 +58,14 @@ pub fn Frame::soft(size : Axes[Abs]) -> Frame {
 /// Create a new, empty hard frame.
 ///
 /// Panics if the size is not finite.
-pub fn Frame::hard(size : Axes[Abs]) -> Frame {
+pub fn Frame::hard(size : Size) -> Frame {
   Frame::new(size, Hard)
 }
 
 ///|
 /// An empty soft frame of zero size (upstream `Frame::default()`).
 pub impl Default for Frame with fn default() {
-  Frame::soft(Axes::zero_size())
+  Frame::soft(Size::zero())
 }
 
 ///|
@@ -114,13 +114,13 @@ pub fn Frame::is_empty(self : Frame) -> Bool {
 
 ///|
 /// The size of the frame.
-pub fn Frame::size(self : Frame) -> Axes[Abs] {
+pub fn Frame::size(self : Frame) -> Size {
   self.size
 }
 
 ///|
 /// Set the size of the frame.
-pub fn Frame::set_size(self : Frame, size : Axes[Abs]) -> Unit {
+pub fn Frame::set_size(self : Frame, size : Size) -> Unit {
   self.size = size
 }
 
@@ -368,14 +368,14 @@ pub fn Frame::clear(self : Frame) -> Unit {
 /// offset.
 pub fn Frame::resize(
   self : Frame,
-  target : Axes[Abs],
+  target : Size,
   align : Axes[FixedAlignment],
 ) -> Point {
   if self.size == target {
     return Point::zero()
   }
   let offset = align
-    .zip_map(target.sub_size(self.size), FixedAlignment::position)
+    .zip_map_size(target - self.size, FixedAlignment::position)
     .to_point()
   self.size = target
   self.translate(offset)
@@ -530,7 +530,7 @@ pub fn Frame::mark_point(self : Frame, pos : Point) -> Unit {
   self.push(
     pos - Point::splat(radius),
     Shape(
-      Geometry::Curve(Curve::ellipse(Axes::splat(radius.times(2.0)))).filled(
+      Geometry::Curve(Curve::ellipse(Size::splat(radius.times(2.0)))).filled(
         Solid(color_green),
       ),
       @syntax.Span::detached(),
@@ -632,9 +632,9 @@ pub(all) enum FrameItem {
   /// A geometric shape with optional fill and stroke.
   Shape(Shape, @syntax.Span)
   /// An image and its size.
-  Image(Image, Axes[Abs], @syntax.Span)
+  Image(Image, Size, @syntax.Span)
   /// An internal or external link to a destination.
-  Link(Destination, Axes[Abs])
+  Link(Destination, Size)
   /// An introspectable element that produced something within this frame.
   Tag(Tag)
 } derive(Eq)

@@ -28,7 +28,7 @@ fn PaintSampler::solid(c : @skia.PremultipliedColorU8) -> PaintSampler {
 fn gradient_sampler(
   gradient : @library.Gradient,
   state : State,
-  item_size : @library.Axes[@library.Abs],
+  item_size : @library.Size,
   on_text : Bool,
 ) -> PaintSampler raise RenderPanic {
   let relative = gradient.unwrap_relative(on_text)
@@ -70,7 +70,7 @@ fn tiling_sampler(
     Parent => must(state.container_transform.invert())
   }
   let pattern_transform = to_sk_transform(tiling_transform(tiling))
-  let size = tiling.size.add_size(tiling.spacing)
+  let size = tiling.size + tiling.spacing
   let size_x = to_f32(size.x.times(state.pixel_per_pt.to_double()))
   let size_y = to_f32(size.y.times(state.pixel_per_pt.to_double()))
   let transform_to_parent = fill_transform.post_concat(
@@ -205,7 +205,7 @@ fn to_sk_paint(
       }
       (bbox.size(), Some(fill_transform), gradient_map)
     }
-    None => (@library.Axes::splat(@library.Abs::zero()), None, None)
+    None => (@library.Size::splat(@library.Abs::zero()), None, None)
   }
   let sk_paint = @skia.Paint::default()
   match paint {
@@ -335,7 +335,7 @@ fn render_tiling_frame(
   state : State,
   tilings : @library.Tiling,
 ) -> @skia.Pixmap raise RenderPanic {
-  let size = tilings.size.add_size(tilings.spacing)
+  let size = tilings.size + tilings.spacing
   let canvas = must(
     @skia.Pixmap::new(
       @skia.f32_to_u32(@skia.roundf(to_f32(size.x) * state.pixel_per_pt)),

@@ -6,11 +6,11 @@ pub(all) struct Tiling {
   /// The tile's laid out body.
   frame : Frame
   /// The size of the tile.
-  size : Axes[Abs]
+  size : Size
   /// The spacing between tiles.
-  spacing : Axes[Abs]
+  spacing : Size
   /// The offset of the tiling.
-  offset : Axes[Abs]
+  offset : Size
   /// The rotation of the tiling.
   angle : Angle
   /// The relative placement of the tiling.
@@ -99,8 +99,8 @@ fn impl_tiling_construct(
   }
 
   // The size of the frame
-  let size = size_.v.map(l => l.map(a => a.abs))
-  let region = size.unwrap_or(Axes::splat(Abs::inf()))
+  let size = size_.v.map(l => Size::from_axes(l.map(a => a.abs)))
+  let region = size.unwrap_or(Size::splat(Abs::inf()))
 
   // Layout the tiling.
   let locator = Locator::root()
@@ -122,8 +122,8 @@ fn impl_tiling_construct(
     ])
   }
   let size = frame.size()
-  let spacing = Axes::new(spacing.x.abs, spacing.y.abs)
-  let offset = Axes::new(
+  let spacing = Size::new(spacing.x.abs, spacing.y.abs)
+  let offset = Size::new(
     offset.x.resolve(styles).relative_to(size.x + spacing.x),
     offset.y.resolve(styles).relative_to(size.y + spacing.y),
   )

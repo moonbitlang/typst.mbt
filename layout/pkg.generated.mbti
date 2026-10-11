@@ -10,7 +10,7 @@ import {
 }
 
 // Values
-pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
+pub fn clip_rect(@library.Size, @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
 
 pub fn create_shape_plan(@library.FontInstance, @shape.Direction, @shape.Script, @shape.Language?, ArrayView[@shape.Feature]) -> @shape.ShapePlan
 
@@ -26,7 +26,7 @@ pub fn language(@library.StyleChain) -> @shape.Language
 
 pub fn[R : FrameModify] layout_and_modify(@library.StyleChain, (@library.StyleChain) -> R raise @library.SourceError) -> R raise @library.SourceError
 
-pub fn layout_box(@library.BoxElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs]) -> @library.Frame raise @library.SourceError
+pub fn layout_box(@library.BoxElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Size) -> @library.Frame raise @library.SourceError
 
 pub fn layout_cell(@library.Cell, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions, Bool) -> @library.Fragment raise @library.SourceError
 
@@ -46,7 +46,7 @@ pub fn layout_enum(@library.EnumElem, @library.Engine, @library.Locator, @librar
 
 pub fn layout_equation_block(@library.EquationElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
 
-pub fn layout_equation_inline(@library.EquationElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs]) -> Array[@library.InlineItem] raise @library.SourceError
+pub fn layout_equation_inline(@library.EquationElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Size) -> Array[@library.InlineItem] raise @library.SourceError
 
 pub fn layout_flow(@library.Engine, ArrayView[(@library.Content, @library.StyleChain)], @library.SplitLocator, @library.StyleChain, @library.Regions, ColumnOptions, FlowMode) -> @library.Fragment raise @library.SourceError
 
@@ -58,7 +58,7 @@ pub fn layout_grid(@library.GridElem, @library.Engine, @library.Locator, @librar
 
 pub fn layout_image(@library.ImageElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
 
-pub fn layout_inline(@library.Engine, ArrayView[(@library.Content, @library.StyleChain)], @library.SplitLocator, @library.StyleChain, @library.Axes[@library.Abs], Bool) -> @library.Fragment raise @library.SourceError
+pub fn layout_inline(@library.Engine, ArrayView[(@library.Content, @library.StyleChain)], @library.SplitLocator, @library.StyleChain, @library.Size, Bool) -> @library.Fragment raise @library.SourceError
 
 pub fn layout_line(@library.LineElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
 
@@ -70,7 +70,7 @@ pub fn layout_multi_block(@library.BlockElem, @library.Engine, @library.Locator,
 
 pub fn layout_pad(@library.PadElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
 
-pub fn layout_par(@library.ParElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs], Bool, ParSituation) -> @library.Fragment raise @library.SourceError
+pub fn layout_par(@library.ParElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Size, Bool, ParSituation) -> @library.Fragment raise @library.SourceError
 
 pub fn layout_polygon(@library.PolygonElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
 
@@ -102,11 +102,11 @@ pub fn register(@library.NativeRuleMap) -> Unit
 
 pub fn rusty(@library.FontInstance) -> @shape.Face
 
-pub fn shrink(@library.Axes[@library.Abs], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Axes[@library.Abs]
+pub fn shrink(@library.Size, @library.Sides[@library.Rel[@library.Abs]]) -> @library.Size
 
-pub fn shrink_multiple(@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?, @library.Sides[@library.Rel[@library.Abs]]) -> (@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?)
+pub fn shrink_multiple(@library.Size, @library.Abs, Array[@library.Abs], @library.Abs?, @library.Sides[@library.Rel[@library.Abs]]) -> (@library.Size, @library.Abs, Array[@library.Abs], @library.Abs?)
 
-pub fn styled_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Paint?, @library.Sides[@library.FixedStroke?]) -> Array[@library.Shape]
+pub fn styled_rect(@library.Size, @library.Corners[@library.Rel[@library.Abs]], @library.Paint?, @library.Sides[@library.FixedStroke?]) -> Array[@library.Shape]
 
 // Errors
 

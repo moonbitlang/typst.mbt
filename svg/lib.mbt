@@ -144,7 +144,7 @@ pub fn svg_merged(
   let opts = opts.resolve(SvgFormatOptions::get(document.options()))
   let pages = document.pages()
   let num_gaps = if pages.length() > 0 { pages.length() - 1 } else { 0 }
-  let mut size : @library.Axes[@library.Abs] = {
+  let mut size : @library.Size = {
     x: @library.Abs::zero(),
     y: gap.times(num_gaps.to_double()),
   }
@@ -177,13 +177,13 @@ pub fn svg_merged(
 fn page_bleed(
   page : @layout.Page,
   opts : CompleteSvgOptions,
-) -> (@library.Axes[@library.Abs], @library.Transform) {
+) -> (@library.Size, @library.Transform) {
   let bleed = if opts.render_bleed {
     page.bleed
   } else {
     @library.Sides::splat(@library.Abs::zero())
   }
-  let size = page.frame.size().add_size(bleed.sum_by_axis())
+  let size = page.frame.size() + bleed.sum_by_axis_size()
   let ts = @library.Transform::translate(bleed.left, bleed.top)
   (size, ts)
 }
@@ -244,11 +244,11 @@ priv struct State {
   /// The transform of the current item.
   transform : @library.Transform
   /// The size of the first hard frame in the hierarchy.
-  size : @library.Axes[@library.Abs]
+  size : @library.Size
 }
 
 ///|
-fn State::new(size : @library.Axes[@library.Abs]) -> State {
+fn State::new(size : @library.Size) -> State {
   { size, transform: @library.Transform::identity(), }
 }
 
@@ -266,7 +266,7 @@ fn State::pre_concat(self : State, transform : @library.Transform) -> State {
 
 ///|
 /// Sets the size of the first hard frame in the hierarchy.
-fn State::with_size(self : State, size : @library.Axes[@library.Abs]) -> State {
+fn State::with_size(self : State, size : @library.Size) -> State {
   { ..self, size, }
 }
 
@@ -314,7 +314,7 @@ fn SVGRenderer::render_page(
   }
   if page.fill_or_white() is Some(fill) {
     let shape = @library.Geometry::Rect(
-      page.frame.size().add_size(page.bleed.sum_by_axis()),
+      page.frame.size() + page.bleed.sum_by_axis_size(),
     ).filled(fill)
     let state = state.pre_translate({ x: -page.bleed.left, y: -page.bleed.top, })
     self.render_shape(svg.lazy_(), state, shape)
@@ -399,7 +399,7 @@ fn SVGRenderer::render_link(
   svg : SvgElem,
   state : State,
   dest : @library.Destination,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
 ) -> Unit {
   let a = svg.elem("a")
   if !state.transform.is_identity() {
@@ -480,10 +480,7 @@ fn SVGRenderer::write_clip_path_defs(self : SVGRenderer, svg : SvgElem) -> Unit 
 ///|
 /// Write the default SVG header, including a `typst-doc` class, the
 /// `viewBox` and `width` and `height` attributes.
-fn svg_header(
-  xml : @xmlwriter.XmlWriter,
-  size : @library.Axes[@library.Abs],
-) -> SvgElem {
+fn svg_header(xml : @xmlwriter.XmlWriter, size : @library.Size) -> SvgElem {
   svg_header_with_custom_attrs(xml, size, _ => ())
 }
 
@@ -491,16 +488,13 @@ fn svg_header(
 /// Write the SVG header with additional attributes and standard attributes.
 fn svg_header_with_custom_attrs(
   xml : @xmlwriter.XmlWriter,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   write_custom_attrs : (SvgElem) -> Unit,
 ) -> SvgElem {
   // Clamp the size of SVGs to at least one pt. resvg and probably also
   // other SVG parsers don't handle SVGs with 0 sized dimensions.
   let one = @library.Abs::pt(1.0)
-  let size : @library.Axes[@library.Abs] = {
-    x: size.x.max(one),
-    y: size.y.max(one),
-  }
+  let size : @library.Size = { x: size.x.max(one), y: size.y.max(one), }
   let svg = SvgElem::new(xml, "svg")
   write_custom_attrs(svg)
   svg.attr_with("viewBox", attr => {

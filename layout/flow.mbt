@@ -202,7 +202,7 @@ pub fn layout_flow(
     engine,
     children,
     locator.next(()),
-    @library.Axes::new(config.columns.width, regions.full),
+    @library.Size::new(config.columns.width, regions.full),
     regions.expand.x,
     mode,
   )

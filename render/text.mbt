@@ -154,7 +154,7 @@ fn render_outline_glyph(
       let sampler = gradient_sampler(
         gradient,
         state,
-        @library.Axes::splat(@library.Abs::zero()),
+        @library.Size::splat(@library.Abs::zero()),
         true,
       )
       write_bitmap(canvas, bitmap, state, sampler)

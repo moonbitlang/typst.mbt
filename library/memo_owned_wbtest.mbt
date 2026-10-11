@@ -103,7 +103,7 @@ test "owned: the sink of a kept layout is not shared with the sinks it is replay
     memoized_layout(engine, key, content, styles, None, engine => {
       runs += 1
       owned_test_effects(engine)
-      Fragment([Frame::soft(Axes::new(Abs::pt(1.0), Abs::pt(1.0)))])
+      Fragment([Frame::soft(Size::new(Abs::pt(1.0), Abs::pt(1.0)))])
     })
     |> ignore
     inspect(
@@ -126,7 +126,7 @@ test "owned: a call without effects keeps no sink" {
   let key = memo_fingerprint(state => state.write_str("owned plain"))
   let engine = memo_engine()
   memoized_layout(engine, key, content, StyleChain::empty(), None, _ => {
-    Fragment([Frame::soft(Axes::new(Abs::pt(1.0), Abs::pt(1.0)))])
+    Fragment([Frame::soft(Size::new(Abs::pt(1.0), Abs::pt(1.0)))])
   })
   |> ignore
   let mut entries = 0

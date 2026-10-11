@@ -250,6 +250,9 @@ TYPEMAP = {
     "Packed<RawLine>": "RawLine",
     # layout/abs.rs
     "Abs": "Abs",
+    # layout/size.rs: upstream's alias of `Axes<Abs>` is a type of its own
+    # here (library/size.mbt); `mbt_type` maps `Axes<Abs>` to it too.
+    "Size": "Size",
     "OutlineEntry": "OutlineEntry",
     # text/lang.rs
     "Locale": "Locale",
@@ -325,5 +328,8 @@ def mbt_type(rust):
         mapped = [mbt_type(a) for a in args]
         if any(x == "Value" and a != "Value" for x, a in zip(mapped, args)):
             return "Value"
+        if m.group(1) == "Axes" and mapped == ["Abs"]:
+            # A size: nothing in the port takes an `Axes[Abs]`.
+            return "Size"
         return f"{GENERICS[m.group(1)]}[{', '.join(mapped)}]"
     return "Value"

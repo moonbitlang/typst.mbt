@@ -125,7 +125,7 @@ test "identity: a layout with a host closure in its key ends with its compilatio
     })
     memoized_layout(engine, key, content, styles, None, _ => {
       runs += 1
-      Fragment([Frame::soft(Axes::new(Abs::pt(1.0), Abs::pt(1.0)))])
+      Fragment([Frame::soft(Size::new(Abs::pt(1.0), Abs::pt(1.0)))])
     })
     |> ignore
   }
@@ -273,7 +273,7 @@ test "identity: tilings and strokes that hold two host closures with one key are
   let node = @syntax.parse_code("x")
   let elem = TextElem::packed("x").elem()
   let tiling = (host : HostFunc) => {
-    let frame = Frame::soft(Axes::new(Abs::pt(10.0), Abs::pt(10.0)))
+    let frame = Frame::soft(Size::new(Abs::pt(10.0), Abs::pt(10.0)))
     let getter = test_closure(node, Func(Func::host(host)))
     frame.push(
       Point::zero(),
@@ -299,7 +299,7 @@ test "identity: tilings and strokes that hold two host closures with one key are
   // Without a host closure nothing is walked: `==` decides.
   let plain = () => {
     Value::Tiling(
-      test_tiling(Frame::soft(Axes::new(Abs::pt(10.0), Abs::pt(10.0)))),
+      test_tiling(Frame::soft(Size::new(Abs::pt(10.0), Abs::pt(10.0)))),
     )
   }
   assert_true(values_memo_equal(plain(), plain()))

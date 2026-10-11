@@ -7,7 +7,7 @@ fn collect(
   engine : @library.Engine,
   children : ArrayView[@library.Pair],
   locator : @library.Locator,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
   expand : Bool,
   mode : FlowMode,
 ) -> Array[Child] raise @library.SourceError {
@@ -26,7 +26,7 @@ fn collect(
 /// State for collection.
 priv struct Collector {
   engine : @library.Engine
-  base : @library.Axes[@library.Abs]
+  base : @library.Size
   expand : Bool
   locator : @library.SplitLocator
   output : Array[Child]
@@ -540,7 +540,7 @@ fn MultiSpill::layout(
 
   // Build the pod with the merged regions.
   let pod : @library.Regions = {
-    size: @library.Axes::new(regions.size.x, self.first),
+    size: @library.Size::new(regions.size.x, self.first),
     expand: regions.expand,
     full: self.full,
     backlog: backlog[:],
@@ -597,7 +597,7 @@ priv struct PlacedChild {
   styles : @library.StyleChain
   locator : @library.Locator
   alignment : @library.Smart[@library.Alignment]
-  cell : CachedCell[@library.Axes[@library.Abs], @library.Frame]
+  cell : CachedCell[@library.Size, @library.Frame]
 }
 
 ///|
@@ -605,7 +605,7 @@ priv struct PlacedChild {
 fn PlacedChild::layout(
   self : PlacedChild,
   engine : @library.Engine,
-  base : @library.Axes[@library.Abs],
+  base : @library.Size,
 ) -> @library.Frame raise @library.SourceError {
   let cached = self.cell.get_or_init(base, size_eq, base => {
     // Upstream `Alignment::CENTER` is horizontal only (`H(Center)`): the
@@ -695,10 +695,7 @@ fn abs_bits_eq(a : @library.Abs, b : @library.Abs) -> Bool {
 }
 
 ///|
-fn size_eq(
-  a : @library.Axes[@library.Abs],
-  b : @library.Axes[@library.Abs],
-) -> Bool {
+fn size_eq(a : @library.Size, b : @library.Size) -> Bool {
   abs_bits_eq(a.x, b.x) && abs_bits_eq(a.y, b.y)
 }
 

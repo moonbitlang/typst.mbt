@@ -165,6 +165,23 @@ pub fn[T] Axes::select(self : Axes[Bool], t : Axes[T], f : Axes[T]) -> Axes[T] {
 }
 
 ///|
+/// `zip_map` with a size, to a size: sizes are not `Axes[Abs]` here (see
+/// `size.mbt`).
+pub fn[T] Axes::zip_map_size(
+  self : Axes[T],
+  other : Size,
+  f : (T, Abs) -> Abs,
+) -> Size {
+  { x: f(self.x, other.x), y: f(self.y, other.y), }
+}
+
+///|
+/// `select` for sizes, which are not `Axes[Abs]` here (see `size.mbt`).
+pub fn Axes::select_size(self : Axes[Bool], t : Size, f : Size) -> Size {
+  { x: if self.x { t.x } else { f.x }, y: if self.y { t.y } else { f.y }, }
+}
+
+///|
 /// Component-wise `|` (upstream `BitOr for Axes<bool>`).
 pub fn Axes::bitor(self : Axes[Bool], rhs : Axes[Bool]) -> Axes[Bool] {
   { x: self.x || rhs.x, y: self.y || rhs.y, }
@@ -178,7 +195,7 @@ pub fn Axes::bitand(self : Axes[Bool], rhs : Axes[Bool]) -> Axes[Bool] {
 
 ///|
 /// Evaluate the axes relative to the given `size`.
-pub fn Axes::relative_to(self : Axes[Rel[Abs]], size : Axes[Abs]) -> Axes[Abs] {
+pub fn Axes::relative_to(self : Axes[Rel[Abs]], size : Size) -> Size {
   { x: self.x.relative_to(size.x), y: self.y.relative_to(size.y), }
 }
 
@@ -187,6 +204,13 @@ pub fn Axes::relative_to(self : Axes[Rel[Abs]], size : Axes[Abs]) -> Axes[Abs] {
 ///|
 /// Sums up `left` and `right` into `x`, and `top` and `bottom` into `y`.
 pub fn[T : Add] Sides::sum_by_axis(self : Sides[T]) -> Axes[T] {
+  { x: self.left + self.right, y: self.top + self.bottom, }
+}
+
+///|
+/// `sum_by_axis` for sides that are lengths: the result is a size, which
+/// is not `Axes[Abs]` here (see `size.mbt`).
+pub fn Sides::sum_by_axis_size(self : Sides[Abs]) -> Size {
   { x: self.left + self.right, y: self.top + self.bottom, }
 }
 
@@ -212,10 +236,7 @@ pub fn[T] Sides::with_side(self : Sides[T], side : Side, value : T) -> Sides[T] 
 
 ///|
 /// Evaluate the sides relative to the given `size`.
-pub fn Sides::relative_to(
-  self : Sides[Rel[Abs]],
-  size : Axes[Abs],
-) -> Sides[Abs] {
+pub fn Sides::relative_to(self : Sides[Rel[Abs]], size : Size) -> Sides[Abs] {
   {
     left: self.left.relative_to(size.x),
     top: self.top.relative_to(size.y),
