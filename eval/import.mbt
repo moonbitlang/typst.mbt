@@ -262,10 +262,22 @@ fn import_file(
 /// source, one library and the answers that the evaluation got from its
 /// tracked arguments.
 priv struct EvalMemo {
-  /// The scope of the evaluation ([@library.TrackedWorld::scope_token]).
-  /// It says how long the entry is kept ([EvalMemos::of]), not where it is
-  /// found.
-  scope : Int
+  /// The scope that stored the entry or, once that is closed, the scope
+  /// that took it last ([@library.TrackedWorld::scope_token]). It does not
+  /// say where the entry is found, only that a scope that is still open
+  /// may hold the entry's module: such an entry is not dropped for the
+  /// limit of entries per source ([EvalMemos::push]).
+  mut scope : Int
+  /// Whether the entry ends with the scope that stored it: an evaluation
+  /// with memoization off (`@library.set_layout_memo_enabled(false)`).
+  /// Such a scope neither leaves anything for a later one nor takes
+  /// anything from an earlier one ([EvalMemo::lives]); the store still
+  /// answers within it, since a file is one module in a compilation with
+  /// or without memoization (modules compare by identity).
+  scoped : Bool
+  /// The number of `@library.evict` calls since the entry was stored or
+  /// taken (comemo's age).
+  mut age : Int
   /// The source that was evaluated: the entry is found by its fingerprint
   /// and only taken for the same source ([same_source]).
   source : @syntax.Source
@@ -366,13 +378,32 @@ fn EvalMemo::matches(
 }
 
 ///|
-/// The memoized file evaluations of the scopes that are open.
+/// Whether a lookup may see the entry at all: any entry of a scope that
+/// is still open, and with memoization on (`memoizing`) also every entry
+/// that an evaluation with memoization on left. So a compilation with
+/// memoization off starts from nothing, as every compilation did before
+/// entries had ages, and what it evaluated is not handed to a compilation
+/// with memoization on (the two can differ: with memoization off no
+/// closure call is found, and a call that is found is what makes two
+/// modules with one hash one argument, `library/memo.mbt`).
+fn EvalMemo::lives(self : EvalMemo, memoizing : Bool) -> Bool {
+  (memoizing && !self.scoped) || @library.world_scope_open(self.scope)
+}
+
+///|
+/// The memoized file evaluations.
 priv struct EvalMemos {
-  /// The scope that asked last.
-  mut last : Int
   /// The evaluations by the fingerprint of their source
   /// ([@library.source_fingerprint]).
   mut entries : Map[@library.U128, Array[EvalMemo]]
+  /// Whether `@library.evict` knows the store.
+  mut registered : Bool
+  /// The sources that have entries that end with their scope
+  /// (`EvalMemo.scoped`), and the scope that stored such an entry last:
+  /// when another scope stores one, those of the scopes that are closed
+  /// are dropped ([EvalMemos::drop_ended]).
+  scoped_keys : Array[@library.U128]
+  mut scoped_scope : Int
   /// Whether `@library.set_memo_check` knows the store.
   mut checked : Bool
   /// The entries that were set aside for a second run of that check.
@@ -384,22 +415,39 @@ priv struct EvalMemos {
 
 ///|
 /// Memoized file evaluations by the fingerprint of their source.
+///
+/// An entry outlives the scope that stored it (a compilation, or an
+/// evaluation that is not inside one): a later compilation finds it if its
+/// source, its library, its route, its traced span and its world reads are
+/// what they were ([eval_source_memoized]). Its lifetime is comemo's
+/// (`comemo/src/memoize.rs`, `CacheData::evict` and `lookup`): every
+/// `@library.evict(max_age)` makes it older by one, being taken makes it
+/// young, and it is dropped when it was not taken for more than `max_age`
+/// calls. A watching compiler calls `evict(10)` after every recompilation;
+/// a process that never calls it keeps what it evaluated, up to
+/// [eval_memo_max_entries] per source.
 let eval_memo : EvalMemos = {
-  last: 0,
   entries: Map([]),
+  registered: false,
+  scoped_keys: [],
+  scoped_scope: 0,
   checked: false,
   aside: None,
   counts: [0, 0],
 }
 
 ///|
-/// For the tests of the store (`import_wbtest.mbt`): the entries outlive
-/// the scope that stored them, as they will once they have ages (step 5
-/// of slice 1 of `docs/incremental-design.md`), so that a test can ask in
-/// one scope for what another stored. Not public, and never set outside of
-/// those tests: what a kept entry needs besides what this store validates
-/// (steps 4 and 5 of that slice) is not built.
-let eval_memo_kept : Ref[Bool] = { val: false, }
+/// The number of entries kept per source (not upstream: comemo has no
+/// limit). An entry more is one for the same source with another library,
+/// route, traced span or, mostly, other answers of the world: a file that
+/// the module reads and that changes again and again adds one with every
+/// compilation. Under `evict(10)` a store never holds more than eleven
+/// versions of anything, so there the ages decide, as comemo's do, and
+/// this limit is for a process that does not call `evict`. An entry that a
+/// scope that is still open stored or took is not dropped for it: in one
+/// compilation a file is the same module for every import that asks the
+/// same, as upstream.
+let eval_memo_max_entries : Int = 12
 
 ///|
 /// How many evaluations of source files the store has answered and how
@@ -411,44 +459,97 @@ pub fn module_memo_stats() -> (Int, Int) {
 }
 
 ///|
-/// The memoized evaluations of the source with the fingerprint `key`, for
-/// a call in the scope `scope`.
-///
-/// An entry lives as long as the scope that stored it
-/// (`library/tracked_world.mbt`: a compilation, or an evaluation that is
-/// not inside one): the entries of the scopes that are closed are dropped
-/// when another scope asks. Nothing is kept from one compilation to the
-/// next yet (`docs/incremental-design.md`, slice 1: ages are its step 5).
-/// A scope inside another (a host function that compiles) leaves the
-/// entries of the outer one alone, and finds them if they are valid for
-/// its world.
-fn EvalMemos::of(
+/// The number of evaluations that the store keeps (for tests and
+/// measurements).
+pub fn module_memo_entries() -> Int {
+  let mut count = 0
+  for _, entries in eval_memo.entries {
+    count += entries.length()
+  }
+  count
+}
+
+///|
+/// Keeps an evaluation of the source with the fingerprint `key`.
+fn EvalMemos::push(
   self : EvalMemos,
   key : @library.U128,
-  scope : Int,
-) -> Array[EvalMemo] {
-  if self.last != scope {
-    self.last = scope
-    if !eval_memo_kept.val {
-      let empty = []
-      for key, entries in self.entries {
-        entries.retain(memo => @library.world_scope_open(memo.scope))
-        if entries.is_empty() {
-          empty.push(key)
-        }
-      }
-      for key in empty {
-        self.entries.remove(key)
-      }
+  memo : EvalMemo,
+) -> Unit {
+  if !self.registered {
+    self.registered = true
+    @library.register_evictor(max_age => self.evict(max_age))
+  }
+  if memo.scoped {
+    if self.scoped_scope != memo.scope {
+      self.drop_ended()
+      self.scoped_scope = memo.scope
     }
+    self.scoped_keys.push(key)
   }
   match self.entries.get(key) {
-    Some(entries) => entries
-    None => {
-      let entries = []
-      self.entries[key] = entries
-      entries
+    Some(entries) => {
+      if entries.length() >= eval_memo_max_entries {
+        // The oldest that no open scope may rely on.
+        for i, other in entries {
+          if !@library.world_scope_open(other.scope) {
+            entries.remove(i) |> ignore
+            break
+          }
+        }
+      }
+      entries.push(memo)
     }
+    None => self.entries[key] = [memo]
+  }
+}
+
+///|
+/// Drops the entries that ended with their scope (`EvalMemo.scoped`, of
+/// evaluations with memoization off) and whose scope is closed. No lookup
+/// sees them; this is for the memory of a process that compiles again and
+/// again with memoization off.
+fn EvalMemos::drop_ended(self : EvalMemos) -> Unit {
+  let keys = self.scoped_keys.copy()
+  self.scoped_keys.clear()
+  for key in keys {
+    guard self.entries.get(key) is Some(entries) else { continue }
+    let mut open = false
+    entries.retain(memo => {
+      if !memo.scoped {
+        true
+      } else if @library.world_scope_open(memo.scope) {
+        open = true
+        true
+      } else {
+        false
+      }
+    })
+    if entries.is_empty() {
+      self.entries.remove(key)
+    } else if open && !self.scoped_keys.contains(key) {
+      self.scoped_keys.push(key)
+    }
+  }
+}
+
+///|
+/// comemo's `evict` for this store: every entry gets older by one, and
+/// those that were not taken for more than `max_age` calls are dropped
+/// (all of them for zero).
+fn EvalMemos::evict(self : EvalMemos, max_age : Int) -> Unit {
+  let empty = []
+  for key, entries in self.entries {
+    entries.retain(memo => {
+      memo.age += 1
+      memo.age <= max_age
+    })
+    if entries.is_empty() {
+      empty.push(key)
+    }
+  }
+  for key in empty {
+    self.entries.remove(key)
   }
 }
 
@@ -507,6 +608,12 @@ fn EvalMemos::of(
 ///
 /// Stricter than upstream in one more point: nothing is kept for a file
 /// that changes during the scope ([@library.TrackedWorld::is_volatile]).
+///
+/// An entry is found by a later scope too (the next compilation of a
+/// watching compiler) and has comemo's age ([eval_memo]). With
+/// memoization off (`@library.set_layout_memo_enabled(false)`) it ends
+/// with its scope, and nothing of an earlier scope is found
+/// ([EvalMemo::lives]).
 fn eval_source_memoized(
   world : @library.TrackedWorld,
   library : @library.Library,
@@ -524,22 +631,30 @@ fn eval_source_memoized(
     return eval_source_impl(world, library, traced, sink, route, source)
   }
   let key = @library.source_fingerprint(source)
-  let entries = eval_memo.of(key, scope)
   let depth = route.depth()
-  for memo in entries {
-    if memo.matches(source, library, traced, route, depth) &&
-      // Last: this notes the world reads for the evaluation around.
-      world.validate(memo.reads) {
-      eval_memo.counts[0] += 1
-      // The evaluations around this one asked the same of their routes
-      // and of their traced spans.
-      @library.note_route_queries(memo.queried)
-      memo.shifts.note_reused(depth - memo.depth)
-      @library.note_traced_files(memo.traced_files)
-      sink.extend_from_kept(memo.sink)
-      match own_result(memo.result) {
-        Ok(module_) => return module_
-        Err(errors) => raise @library.SourceError(errors)
+  let memoizing = @library.content_memo_enabled()
+  if eval_memo.entries.get(key) is Some(entries) {
+    for memo in entries {
+      if memo.lives(memoizing) &&
+        memo.matches(source, library, traced, route, depth) &&
+        // Last: this notes the world reads for the evaluation around.
+        world.validate(memo.reads) {
+        eval_memo.counts[0] += 1
+        // A hit makes the entry young (comemo: `lookup` stores age 0).
+        memo.age = 0
+        if !@library.world_scope_open(memo.scope) {
+          memo.scope = scope
+        }
+        // The evaluations around this one asked the same of their routes
+        // and of their traced spans.
+        @library.note_route_queries(memo.queried)
+        memo.shifts.note_reused(depth - memo.depth)
+        @library.note_traced_files(memo.traced_files)
+        sink.extend_from_kept(memo.sink)
+        match own_result(memo.result) {
+          Ok(module_) => return module_
+          Err(errors) => raise @library.SourceError(errors)
+        }
       }
     }
   }
@@ -574,8 +689,10 @@ fn eval_source_memoized(
     if @library.memo_check_enabled() {
       eval_memo.check(world, library, traced, route, source, reads)
     }
-    entries.push({
+    eval_memo.push(key, {
       scope,
+      scoped: !memoizing,
+      age: 0,
       source,
       library,
       reads,
@@ -614,14 +731,12 @@ fn EvalMemos::check(
     self.checked = true
     @library.register_memo_check_store(() => {
       let entries = self.entries
-      let last = self.last
       let found = self.counts[0]
       let computed = self.counts[1]
       self.entries = Map([])
       self.aside = Some(entries)
       () => {
         self.entries = entries
-        self.last = last
         self.aside = None
         self.counts[0] = found
         self.counts[1] = computed
@@ -678,8 +793,10 @@ fn EvalMemos::original(
     return None
   }
   guard aside.get(key) is Some(entries) else { return None }
+  let memoizing = @library.content_memo_enabled()
   for memo in entries {
-    if memo.matches(source, library, traced, route, depth) &&
+    if memo.lives(memoizing) &&
+      memo.matches(source, library, traced, route, depth) &&
       world.validate(memo.reads) {
       return Some(own_result(memo.result))
     }

@@ -98,5 +98,12 @@ test "the fragments of one lowering are one scope; two lowerings are two" {
   data = "two"
   let again = lowered()
   assert_true(again.contains("two") && !again.contains("one"))
-  assert_eq(reads, 2)
+  // (Two reads: the evaluation of `a.typ` that the first lowering left is
+  // asked whether it is one of the file as it is now, which reads the data
+  // file, and then the file is evaluated again, which reads it too.)
+  assert_eq(reads, 3)
+  // A third lowering of the same files finds that evaluation: the one
+  // read is the one that says so.
+  assert_true(lowered().contains("two"))
+  assert_eq(reads, 4)
 }
