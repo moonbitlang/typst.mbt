@@ -168,13 +168,29 @@ fn test_jpeg() -> Bytes {
 }
 
 ///|
-/// Whether two converted images hold the same data.
+/// Whether two converted images hold the same data in the same form: the
+/// samples as they were converted, or compressed as a kept image has them.
 fn same_data(a : @export.Image, b : @export.Image) -> Bool {
   match (a.data, b.data) {
     (Samples(c1, a1), Samples(c2, a2)) => c1 == c2 && a1 == a2
+    (Deflated(c1, a1), Deflated(c2, a2)) => c1 == c2 && a1 == a2
     (Jpeg(x), Jpeg(y)) => x == y
     _ => false
   }
+}
+
+///|
+/// The samples of a kept image, which holds them compressed: the colour
+/// samples and the alpha channel.
+fn test_samples_of(image : @export.Image) -> (Bytes, Bytes?) raise {
+  guard image.data is Deflated(color, alpha) else { fail("not compressed") }
+  (
+    @codecs.zlib_decompress(color),
+    match alpha {
+      Some(alpha) => Some(@codecs.zlib_decompress(alpha))
+      None => None
+    },
+  )
 }
 
 ///|
@@ -212,8 +228,18 @@ test "convert_raster: one conversion per image and interpolation" {
   assert_eq(raster_cache.length(), 1)
   assert_eq((a.width, a.height), (6, 4))
   assert_false(a.interpolate)
-  guard a.data is Samples(color, Some(alpha)) else { fail("no alpha") }
+  // What is kept is the image as it is embedded: the samples of the
+  // conversion, compressed, and not the samples as well.
+  guard test_samples_of(a) is (color, Some(alpha)) else { fail("no alpha") }
   assert_eq((color.length(), alpha.length()), (6 * 4 * 3, 6 * 4))
+  guard convert_raster_impl(raster, false) is Ok(converted) else {
+    fail("not converted")
+  }
+  guard converted.data is Samples(converted_color, Some(converted_alpha)) else {
+    fail("no samples")
+  }
+  assert_true(color == converted_color && alpha == converted_alpha)
+  assert_true(same_data(a, converted.deflated()))
   // The same bytes in another object (another path, the next compilation):
   // the same raster image, the same conversion.
   let again = @library.RasterImage::plain(test_copy(data), Exchange(Png))
@@ -308,8 +334,8 @@ test "convert_raster: images that differ in one argument" {
     false,
   )
   assert_true(synthetic.key != plain.key)
-  guard synthetic.data is Samples(_, Some(_)) else { fail("no alpha") }
-  guard plain.data is Samples(_, None) else { fail("alpha") }
+  guard synthetic.data is Deflated(_, Some(_)) else { fail("no alpha") }
+  guard plain.data is Deflated(_, None) else { fail("alpha") }
 }
 
 ///|
@@ -347,10 +373,13 @@ test "convert_raster: memoization off, and evict" {
   let a = test_converted(raster, false)
   let b = test_converted(raster, false)
   @library.set_layout_memo_enabled(true)
-  // Nothing is found or kept, and the conversions are equal.
+  // Nothing is found or kept, and the conversions are equal. They are the
+  // samples, which the exporter compresses for the document: to what the
+  // kept image holds.
   assert_false(physical_equal(a, b))
   assert_false(physical_equal(a, kept))
-  assert_true(a.key == kept.key && same_data(a, kept) && same_data(b, kept))
+  assert_true(a.data is Samples(_, Some(_)) && same_data(a, b))
+  assert_true(a.key == kept.key && same_data(a.deflated(), kept))
   assert_eq(raster_cache.length(), 1)
   // The library's `evict` reaches the cache of this package.
   @library.evict(1)
@@ -380,13 +409,15 @@ test "the PNG of a bitmap glyph is identified like a PNG inside an SVG" {
   guard glyph.data is Samples(color, Some(alpha)) else { fail("no alpha") }
   assert_eq((color.length(), alpha.length()), (6 * 4 * 3, 6 * 4))
   // The same file as an image of the document is another one (krilla's
-  // `from_custom`), as upstream.
+  // `from_custom`), as upstream. A glyph's image is made for one export
+  // and holds its samples; the document's is kept and holds them
+  // compressed.
   let direct = test_converted(
     @library.RasterImage::plain(png, Exchange(Png)),
     false,
   )
   assert_true(direct.key != glyph.key)
-  assert_true(same_data(direct, glyph))
+  assert_true(same_data(direct, glyph.deflated()))
   // A glyph's image is not an entry of the document's conversions.
   assert_eq(raster_cache.length(), 1)
 }

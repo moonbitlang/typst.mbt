@@ -105,3 +105,98 @@ test "pdf: raster images are embedded once per image, not once per data" {
   assert_true(report.pdf().unwrap() == first)
   assert_true(report.pdf().unwrap() == first)
 }
+
+///|
+test "pdf: an image kept by one export is the same bytes in the next, whatever the standard" {
+  // What an export keeps of an image is its compressed samples
+  // (`pdf/image.mbt`, `convert_raster`). The standard, the version and the
+  // errors of a document are not part of that: the exports below share the
+  // kept images.
+  let source =
+    #|#set page(width: 200pt, height: auto, margin: 5pt)
+    #|#set document(date: datetime(year: 2026, month: 10, day: 11))
+    #|#let n = 48 * 32
+    #|#let rgba = bytes(range(n * 4).map(i => calc.rem(calc.quo(i, 9) * 37 + calc.rem(i, 4) * 11, 256)))
+    #|#let luma = bytes(range(n).map(i => calc.rem(calc.quo(i, 5) * 13, 256)))
+    #|#let with-alpha = (encoding: "rgba8", width: 48, height: 32)
+    #|#image(rgba, format: with-alpha, width: 96pt)
+    #|#image(rgba, format: (encoding: "rgb8", width: 64, height: 32), width: 96pt)
+    #|#image(luma, format: (encoding: "luma8", width: 48, height: 32), width: 96pt)
+    #|#image(rgba, format: (encoding: "lumaa8", width: 96, height: 32), width: 96pt)
+    #|#pagebreak()
+    #|#image(rgba, format: with-alpha, width: 48pt)
+    #|#image(luma, format: (encoding: "luma8", width: 48, height: 32), width: 48pt)
+    #|
+  let smooth =
+    #|#pagebreak()
+    #|#image(rgba, format: with-alpha, width: 48pt, scaling: "smooth")
+    #|
+  let options = (standards : Array[@library.PdfStandard]) => @pdf.PdfOptions::{
+    ..@pdf.PdfOptions::default(),
+    format: {
+      ..@pdf.PartialPdfFormatOptions::default(),
+      standard: Some(@library.PdfStandards::new(standards)),
+    },
+  }
+  // What an export gives: the file, or its errors.
+  let exported = (text : String, standards : Array[@library.PdfStandard]) => {
+    let report = compile([@doc.Markup(text)]).pdf(options=options(standards))
+    match report.output() {
+      Some(bytes) => Ok(bytes)
+      None => Err(report.errors.map(e => e.message).join(" | "))
+    }
+  }
+  let cases : Array[(String, Array[@library.PdfStandard])] = [
+    (source, []),
+    (source, [V_1_4]),
+    (source + smooth, [V_1_7]),
+    (source, [V_2_0]),
+    (source, [A_2b]),
+    // PDF/A-1 has no transparency and PDF/A no interpolation: errors of a
+    // document, which the next one does not inherit.
+    (source, [A_1b]),
+    (source + smooth, [A_3b]),
+    (source + smooth, [V_2_0]),
+    (source, [A_4]),
+  ]
+  // The reference: every document from nothing and without memoization
+  // (the exporter is given samples and compresses them for the document).
+  @library.evict(0)
+  @library.set_layout_memo_enabled(false)
+  let reference : Array[Result[Bytes, String]] = {
+    defer @library.set_layout_memo_enabled(true)
+    cases.map(c => exported(c.0, c.1))
+  }
+  inspect(
+    reference
+    .map(r => {
+      match r {
+        Ok(_) => "ok"
+        Err(message) => message
+      }
+    })
+    .join("\n"),
+    content=(
+      #|ok
+      #|ok
+      #|ok
+      #|ok
+      #|ok
+      #|PDF/A-1b error: the image contains transparency | PDF/A-1b error: the image contains transparency
+      #|PDF/A-3b error: the image has smooth scaling
+      #|ok
+      #|ok
+    ),
+  )
+  // One after the other with what the exports before kept, in both orders,
+  // and with everything dropped after each.
+  for round in 0..<3 {
+    for i in 0..<cases.length() {
+      let i = if round == 1 { cases.length() - 1 - i } else { i }
+      assert_true(exported(cases[i].0, cases[i].1) == reference[i])
+      if round == 2 {
+        @library.evict(0)
+      }
+    }
+  }
+}
