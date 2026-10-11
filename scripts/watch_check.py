@@ -10,7 +10,9 @@ thousands of seeded edits of many documents, is checked in process by the
 which is a CI stage and tests the engine, not this program.
 
     scripts/watch_check.py [--typst CMD] [--upstream BIN | --no-upstream]
-                           [--only NAME] [--bench] [--keep] [-v]
+                           [--only NAME] [--keep] [-v]
+    scripts/watch_check.py --bench | --bench-memory [--document NAME]
+                           [--binary LABEL=PATH] [--sessions N] [--edits N]
 
 Starts `typst watch` in temporary directories, edits files, waits for the
 status line of the recompilation and checks
@@ -32,12 +34,21 @@ release build (`moon build --target native --release cli`); for wasm pass
 `--typst "moonrun _build/wasm/release/build/cli/cli.wasm --"`. `--upstream`
 defaults to `.repos/typst/target/release/typst` if that exists.
 
-`--bench` instead measures the first and the following compilations of
-`bench/long.typ` and `bench/longer.typ` in a watch session after a
-one-character edit, for both binaries (the durations are the ones the
-status lines report). Two edits are measured: a character appended to the
-document (only the last page changes), and a character added to the body
-of its loop (every section changes).
+`--bench` instead measures the first and the following compilations in
+watch sessions, for both binaries and for every other build named with
+`--binary LABEL=PATH` (the durations are the ones the status lines
+report; PDF output, `--ignore-system-fonts`). The documents are those of
+section 3 of `docs/incremental-design.md`: `bench/long.typ`, `longer.typ`
+and `showcase.typ`, a touying deck and the ilm handbook of
+`tests/packages/docs` (they need `.repos/typst-packages`), the projects of
+`tests/recompile/docs` and the image deck of `bench/mkdeck.py`. Four edits
+are measured, `--edits` times each per session, in `--sessions` sessions
+per document and binary: a character appended to the main file, an edit
+in the middle of it (in `long` and `longer` the body of the loop: every
+heading changes), a change of an imported file that reaches the pages (of
+a package's theme, a bibliography), and a comment appended to the main
+file. `--bench-memory` prints the resident set size of the watching
+process after 10, 50 and 200 edits instead.
 """
 
 import argparse
@@ -924,61 +935,313 @@ def seconds(status):
     return float(m.group(1)) * {"ns": 1e-9, "µs": 1e-6, "ms": 1e-3, "s": 1.0}[m.group(2)]
 
 
-EDITS = {
-    "at the end": lambda text, n: text + "x" * n + "\n",
-    "in the loop": lambda text, n: text.replace("== Section", "== Section" + "x" * n, 1),
-}
+def edit_replace(old, new):
+    """An edit that replaces the first `old` by `new % n`."""
+
+    def edit(text, n):
+        if old not in text:
+            raise Failure(f"`{old}` is not in the file")
+        return text.replace(old, new % n, 1)
+
+    return edit
 
 
-def bench(binaries, edits, extra):
-    """Times compilations in a watch session."""
-    rows = []
-    for document in ("long.typ", "longer.typ"):
-        for fmt in ("pdf", "svg"):
+def edit_end(text, n):
+    return text + "x" * n + "\n"
+
+
+def edit_comment(text, n):
+    return text + "// " + "x" * n + "\n"
+
+
+def edit_loop(text, n):
+    """The body of the loop that makes every section of `bench/long.typ`
+    and `longer.typ`: every heading changes."""
+    return text.replace("== Section", "== Section" + "x" * n, 1)
+
+
+PACKAGES = os.path.join(ROOT, ".repos/typst-packages/preview")
+
+
+class BenchDocument:
+    """A document of `--bench`: where its files are, its main file, and the
+    edits that are measured: `end` (a character appended to the main file),
+    `middle` (an edit in the middle of it), `imported` (a change of a file
+    it imports or reads that reaches the pages) and `comment` (a comment
+    appended to the main file: nothing on the pages changes). An edit is
+    (file, function of the file's text and a number)."""
+
+    def __init__(self, name, source, main, middle, imported=None, packages=False):
+        self.name = name
+        self.source = source
+        self.main = main
+        self.packages = packages
+        self.edits = {
+            "end": (main, edit_end),
+            "middle": (main, middle),
+            "imported": imported,
+            "comment": (main, edit_comment),
+        }
+
+    def prepare(self, directory):
+        """Copies the document into `directory`; returns the arguments of
+        `typst watch` besides the input and the output."""
+        args = ["--no-fullscreen", "--ignore-system-fonts"]
+        if callable(self.source):
+            self.source(directory)
+        elif os.path.isdir(self.source):
+            shutil.copytree(self.source, directory, dirs_exist_ok=True)
+        else:
+            # A file of a directory of documents: its siblings are its data.
+            for entry in os.listdir(os.path.dirname(self.source)):
+                path = os.path.join(os.path.dirname(self.source), entry)
+                if os.path.isfile(path) and (
+                    not entry.endswith(".typ") or path == self.source
+                ):
+                    shutil.copy(path, directory)
+        if self.packages:
+            if not os.path.isdir(PACKAGES):
+                raise Skip(f"{PACKAGES} is missing (scripts/packages.sh)")
+            shutil.copytree(PACKAGES, os.path.join(directory, "packages/preview"))
+            args += ["--package-path", "packages", "--package-cache-path", "packages"]
+        return args
+
+
+DECK = []
+
+
+def make_deck(directory):
+    """The image deck of `bench/mkdeck.py`, generated once per run."""
+    if not DECK:
+        DECK.append(tempfile.mkdtemp(prefix="watch-bench-deck-"))
+        subprocess.run(
+            [sys.executable, os.path.join(ROOT, "bench/mkdeck.py"), DECK[0]],
+            check=True,
+            stdout=subprocess.DEVNULL,
+        )
+    shutil.copytree(DECK[0], directory, dirs_exist_ok=True)
+
+
+def bench_documents():
+    docs = os.path.join(ROOT, "tests/recompile/docs")
+    packages = os.path.join(ROOT, "tests/packages/docs")
+    return [
+        BenchDocument("long", os.path.join(ROOT, "bench/long.typ"), "long.typ", edit_loop),
+        BenchDocument("longer", os.path.join(ROOT, "bench/longer.typ"), "longer.typ", edit_loop),
+        BenchDocument(
+            "showcase",
+            os.path.join(ROOT, "bench/showcase.typ"),
+            "showcase.typ",
+            edit_replace("Maxwell's law,", "Maxwell's law %d,"),
+            # A bibliography file: the title of an entry.
+            imported=(
+                "works.bib",
+                edit_replace("title={At-scale impact", "title={At-scale%d impact"),
+            ),
+        ),
+        BenchDocument(
+            "touying",
+            os.path.join(packages, "touying/theme-metropolis.typ"),
+            "theme-metropolis.typ",
+            edit_replace("Only on the second.", "Only on the second %d."),
+            # A length of the theme that every slide uses.
+            imported=(
+                "packages/preview/touying/0.8.0/themes/metropolis.typ",
+                edit_replace("set text(size: 0.8em)", "set text(size: 0.8%dem)"),
+            ),
+            packages=True,
+        ),
+        BenchDocument(
+            "handbook",
+            os.path.join(packages, "ilm/bakers-handbook.typ"),
+            "bakers-handbook.typ",
+            edit_replace("Every ingredient is expressed", "Every ingredient %d is expressed"),
+            # The size of the running header of every page.
+            imported=(
+                "packages/preview/ilm/2.1.1/lib.typ",
+                edit_replace("text(size: 0.68em", "text(size: 0.68%dem"),
+            ),
+            packages=True,
+        ),
+        BenchDocument(
+            "book",
+            os.path.join(docs, "book"),
+            "main.typ",
+            edit_replace("#outline()", "#outline()\n\nMiddle %d."),
+            imported=("lib/shared.typ", edit_replace("block(inset: 4pt", "block(inset: 4.%dpt")),
+        ),
+        BenchDocument(
+            "chain",
+            os.path.join(docs, "chain"),
+            "main.typ",
+            edit_replace("The diamond says", "The diamond %d says"),
+            imported=("d.typ", edit_replace("This is `d`, with", "This is `d` %d, with")),
+        ),
+        BenchDocument(
+            "notes",
+            os.path.join(docs, "notes"),
+            "main.typ",
+            edit_replace("As counted in @counting", "As counted %d in @counting"),
+            imported=("style.typ", edit_replace("inset: 3pt,", "inset: 3.%dpt,")),
+        ),
+        BenchDocument(
+            "linked",
+            os.path.join(docs, "linked"),
+            "main.typ",
+            edit_replace("= A tiling of it, handed", "= A tiling of it %d, handed"),
+        ),
+        BenchDocument(
+            "deck", make_deck, "deck.typ", edit_replace("step 7 of 14.", "step 7 of 14, %d.")
+        ),
+    ]
+
+
+KINDS = ("end", "middle", "imported", "comment")
+
+
+def rss_kb(pid):
+    """The resident set size of a process in kilobytes."""
+    out = subprocess.run(["ps", "-o", "rss=", "-p", str(pid)], capture_output=True, text=True)
+    return int(out.stdout.strip() or 0)
+
+
+def bench_session(document, command, edits, extra):
+    """One watch session: the first compilation, then `edits` edits of
+    every kind, each from the file as it was at first (the file is put back
+    after a kind, which is a recompilation that is not measured). Returns
+    the duration of the first compilation and the durations by kind."""
+    directory = os.path.realpath(tempfile.mkdtemp(prefix="watch-bench-"))
+    session = None
+    try:
+        args = document.prepare(directory)
+        session = Session(command, [document.main, "out.pdf"] + args + extra, directory)
+        session.wait_compiled(0, timeout=600, quiet=0.3)
+        status = session.statuses(0)[-1]
+        if "with errors" in status:
+            raise Failure(f"{document.name}: {session.text(0).decode()}")
+        first = seconds(status)
+        following = {}
+        for kind in KINDS:
+            if document.edits[kind] is None:
+                continue
+            name, edit = document.edits[kind]
+            path = os.path.join(directory, name)
+            text = open(path, encoding="utf-8").read()
+            following[kind] = []
+            for i in range(edits):
+                start = session.mark()
+                write(path, edit(text, i + 1))
+                session.wait_compiled(start, timeout=600, quiet=0.3)
+                status = session.statuses(start)[-1]
+                if "with errors" in status:
+                    raise Failure(f"{document.name}, {kind}: {session.text(start).decode()}")
+                following[kind].append(seconds(status))
+            start = session.mark()
+            write(path, text)
+            session.wait_compiled(start, timeout=600, quiet=0.3)
+        return first, following
+    finally:
+        if session is not None:
+            session.stop()
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def bench(binaries, edits, extra, sessions=5, only=None, raw=None):
+    """Times compilations in watch sessions: per document and binary the
+    median of the first compilations of `sessions` sessions, and per kind
+    of edit the median of all recompilations after it (`sessions` times
+    `edits`), with the least and the most. The sessions of the binaries
+    take turns."""
+    documents = [d for d in bench_documents() if not only or d.name in only]
+    results = {}
+    for document in documents:
+        for round_ in range(sessions):
             for label, command in binaries:
+                own = extra if label == "upstream" else []
+                try:
+                    first, following = bench_session(document, command, edits, own)
+                except Skip as e:
+                    print(f"skip {document.name}: {e}", file=sys.stderr)
+                    break
+                entry = results.setdefault((document.name, label), ([], {}))
+                entry[0].append(first)
+                for kind, times in following.items():
+                    entry[1].setdefault(kind, []).extend(times)
+                log(document.name, label, round_, first, following)
+                if raw:
+                    with open(raw, "a") as f:
+                        f.write(repr((document.name, label, round_, first, following)) + "\n")
+
+    def ms(values):
+        if not values:
+            return "–"
+        return "%.1f (%.1f–%.1f)" % (
+            statistics.median(values) * 1000,
+            min(values) * 1000,
+            max(values) * 1000,
+        )
+
+    print("| document | binary | first | " + " | ".join(KINDS) + " |")
+    print("| --- | --- | ---: |" + " ---: |" * len(KINDS))
+    for document in documents:
+        for label, _ in binaries:
+            if (document.name, label) not in results:
+                continue
+            first, following = results[(document.name, label)]
+            cells = [ms(following.get(kind, [])) for kind in KINDS]
+            print(f"| {document.name} | {label} | {ms(first)} | " + " | ".join(cells) + " |")
+    for directory in DECK:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
+    """The resident set size of a watching process after its first
+    compilation and after 10, 50 and 200 edits, for edits at the end of
+    the main file and for edits in the middle of it (in `long` and `longer`
+    that is every heading), and the greatest size seen after an edit."""
+    documents = [d for d in bench_documents() if d.name in (only or ["longer", "deck"])]
+    print(
+        "| document | binary | edits | first | "
+        + " | ".join(f"after {n}" for n in counts)
+        + " | peak |"
+    )
+    print("| --- | --- | --- | ---: |" + " ---: |" * (len(counts) + 1))
+    for document in documents:
+        for kind in ("end", "middle"):
+            for label, command in binaries:
+                own = extra if label == "upstream" else []
                 directory = os.path.realpath(tempfile.mkdtemp(prefix="watch-bench-"))
                 session = None
                 try:
-                    for entry in os.listdir(os.path.join(ROOT, "bench")):
-                        source = os.path.join(ROOT, "bench", entry)
-                        if os.path.isfile(source):
-                            shutil.copy(source, directory)
-                    main = os.path.join(directory, document)
-                    text = open(main).read()
-                    output = "out.pdf" if fmt == "pdf" else "out-{p}.svg"
-                    session = Session(
-                        command,
-                        [document, output, "--no-fullscreen", "--ignore-system-fonts"]
-                        + extra,
-                        directory,
+                    args = document.prepare(directory)
+                    session = Session(command, [document.main, "out.pdf"] + args + own, directory)
+                    session.wait_compiled(0, timeout=600, quiet=0.3)
+                    pid = session.proc.pid
+                    sizes = [rss_kb(pid)]
+                    peak = sizes[0]
+                    name, edit = document.edits[kind]
+                    path = os.path.join(directory, name)
+                    text = open(path, encoding="utf-8").read()
+                    for i in range(max(counts)):
+                        start = session.mark()
+                        write(path, edit(text, i + 1))
+                        session.wait_compiled(start, timeout=600, quiet=0.3)
+                        size = rss_kb(pid)
+                        peak = max(peak, size)
+                        if i + 1 in counts:
+                            sizes.append(size)
+                            log(document.name, kind, label, i + 1, size)
+                    cells = " | ".join(f"{size / 1024:.0f} MB" for size in sizes)
+                    print(
+                        f"| {document.name} | {label} | {kind} | {cells} | {peak / 1024:.0f} MB |",
+                        flush=True,
                     )
-                    session.wait_compiled(0, timeout=600)
-                    first = seconds(session.statuses(0)[-1])
-                    following = {}
-                    for kind, edit in EDITS.items():
-                        following[kind] = []
-                        for i in range(edits):
-                            start = session.mark()
-                            write(main, edit(text, i + 1))
-                            session.wait_compiled(start, timeout=600)
-                            following[kind].append(seconds(session.statuses(start)[-1]))
-                    rows.append((document, fmt, label, first, following))
-                    log(rows[-1])
                 finally:
                     if session is not None:
                         session.stop()
                     shutil.rmtree(directory, ignore_errors=True)
-    kinds = list(EDITS)
-    print("| document | output | binary | first | " + " | ".join(
-        f"after an edit {kind}: median (min–max)" for kind in kinds) + " |")
-    print("| --- | --- | --- | ---: |" + " ---: |" * len(kinds))
-    for document, fmt, label, first, following in rows:
-        cells = [
-            f"{statistics.median(following[kind]) * 1000:.0f} ms "
-            f"({min(following[kind]) * 1000:.0f}–{max(following[kind]) * 1000:.0f})"
-            for kind in kinds
-        ]
-        print(f"| {document} | {fmt} | {label} | {first * 1000:.0f} ms | " + " | ".join(cells) + " |")
+    for directory in DECK:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 def main():
@@ -989,7 +1252,28 @@ def main():
     parser.add_argument("--no-upstream", action="store_true")
     parser.add_argument("--only", action="append", help="run only this scenario")
     parser.add_argument("--bench", action="store_true", help="time compilations instead")
-    parser.add_argument("--edits", type=int, default=5, help="edits per --bench session")
+    parser.add_argument(
+        "--edits", type=int, default=5, help="edits of a kind per --bench session"
+    )
+    parser.add_argument(
+        "--sessions", type=int, default=5, help="sessions per document and binary"
+    )
+    parser.add_argument(
+        "--document", action="append", help="a document of --bench (default: all)"
+    )
+    parser.add_argument(
+        "--binary",
+        action="append",
+        default=[],
+        metavar="LABEL=PATH",
+        help="another build of the CLI to measure with --bench",
+    )
+    parser.add_argument("--raw", default=None, help="append every --bench session to this file")
+    parser.add_argument(
+        "--bench-memory",
+        action="store_true",
+        help="the resident set size after 10, 50 and 200 edits instead",
+    )
     parser.add_argument(
         "--jobs", default=None, help="--jobs for --bench (upstream's threads; the port has one)"
     )
@@ -1021,8 +1305,16 @@ def main():
         else:
             print("watch_check: no upstream binary, checking the port alone")
 
+    for item in options.binary:
+        label, _, path = item.partition("=")
+        last = len(binaries) - (binaries[-1][0] == "upstream")
+        binaries.insert(last, (label, [os.path.abspath(path)]))
+    jobs = ["--jobs", options.jobs] if options.jobs else []
+    if options.bench_memory:
+        bench_memory(binaries, jobs, options.document)
+        return
     if options.bench:
-        bench(binaries, options.edits, ["--jobs", options.jobs] if options.jobs else [])
+        bench(binaries, options.edits, jobs, options.sessions, options.document, options.raw)
         return
 
     failed = False
