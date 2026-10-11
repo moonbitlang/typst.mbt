@@ -50,6 +50,16 @@ document title of the HTML export (the plain text of the title's content).
   record the diagnostics with their tracepoints, which an import adds to a
   copy of the error that the cache keeps, and that a file is evaluated
   again where the route is deeper than its depth checks allow.
+- `modules`: a module compares by the identity of its inner data
+  (`PartialEq for Module`), and a memoized call takes its arguments by
+  their hashes (comemo), a module's being its name and what it holds. Two
+  modules with one hash, which a document gets from two plugins that export
+  no function, are two values to `==` and one argument of a call: the
+  second call at a call site returns what the first returned. The port
+  follows upstream in both (the owner's decision of 2026-10-11; it told
+  such modules apart in memoized calls before). What such a document says
+  is not what it says with the port's memoization turned off, where every
+  call is computed: these cases are of the kind `memoized`.
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
@@ -101,7 +111,10 @@ KEYS = r"""#set page(width: 200pt, height: auto)
 """
 
 # (group: name, kind, source[, files]). `metadata`: the values of the
-# document's metadata elements that are strings, in order. `title`: the
+# document's metadata elements that are strings, in order. `memoized`: the
+# same for a document whose answers are those of memoized calls that take
+# one argument for another (upstream has no way to turn its memoization
+# off; the port's test does not compare with it off). `title`: the
 # document title. `report`: the diagnostics as the CLI prints them with
 # `--diagnostic-format short`, then `--` and the metadata values if the
 # document compiled. `files`: other files of the project.
@@ -798,10 +811,8 @@ CASES += [
         "memo: modules of plugins without functions",
         "metadata",
         r"""// Two plugins that export their memory and nothing else: their modules
-// are equal in everything but their identity. (Not recorded here: upstream
-// takes one for the other as the argument of a memoized call,
-// `(pa, pb).map(m => m == pa)` is `(true, true)` there and `(true, false)`
-// in the port.)
+// are equal in everything but their identity. (A memoized call takes one
+// for the other, as upstream's does: the next case.)
 #let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))
 #let pa = plugin(wasm(1))
 #let pb = plugin(wasm(2))
@@ -820,6 +831,69 @@ CASES += [
 #let other() = pb
 #row(captured() == pa, other() == pa, captured == other, captured == captured)
 #context row(measure(box(width: if query(<second>).first().value.first() == pb { 10pt } else { 20pt })).width)
+""",
+    ),
+    (
+        "modules: two modules with one hash are two to `==` and one argument of a memoized call",
+        "memoized",
+        r"""// Two plugins that export their memory and nothing else. `Hash for Module`
+// is the name and what the module holds, so their modules have one hash,
+// and `==` compares the objects. A memoized call takes its arguments by
+// their hashes: at one call site (arguments with the same spans) the call
+// with the second module is answered with the result of the call with the
+// first.
+#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))
+#let a = plugin(wasm(1))
+#let b = plugin(wasm(2))
+#let row(..args) = metadata(repr(args.pos()))
+#let capture(m) = () => m
+#let id(m) = m
+#let pick(d) = d.m
+#let same(m) = m == a
+// Two call sites are two calls: each gets its own module back.
+#row(a == b, capture(a) == capture(b), (capture(a))() == a, (capture(b))() == b)
+#row(id(a) == a, id(b) == b, id(b) == a, pick((m: a)) == a, pick((m: b)) == b)
+// One call site, called by a native function.
+#row((a, b).map(m => m == a), (a, b).map(same), (b, a).map(same), (b, a).map(m => m == a))
+#row((a, b).map(id).map(m => (m == a, m == b)), (b, a).map(id).map(m => (m == a, m == b)))
+// One call site in a loop.
+#let ids = ()
+#let getters = ()
+#let picks = ()
+#let nested = ()
+#for m in (a, b) {
+  ids.push(id(m) == m)
+  getters.push((capture(m))() == m)
+  picks.push(pick((m: m)) == m)
+  nested.push(id((m, (m: m))).at(1).m == m)
+}
+#row(ids, getters, picks, nested)
+// A context expression is a closure that captured the module.
+#for m in (b, a) {
+  context row(m == a, m == b)
+}
+// Through a function with arguments applied and through content.
+#let both(m, n) = m == n
+#row((a, b).map(both.with(a)), (a, b).map(both.with(b)))
+#let held(body) = body.value == a
+#row((a, b).map(m => held(metadata(m))))
+""",
+    ),
+    (
+        "modules: closures that captured two modules with one hash are equal",
+        "metadata",
+        r"""// `capture(a) == capture(b)` is `true`: closures compare by their hash,
+// which covers what they captured as its hash.
+#let wasm(pages) = bytes((
+  0,97,115,109,1,0,0,0,5,3,1,0,pages,
+  7,10,1,6,109,101,109,111,114,121,2,0,
+))
+#let a = plugin(wasm(1))
+#let b = plugin(wasm(2))
+#let capture(m) = () => m
+#let fa = capture(a)
+#let fb = capture(b)
+#metadata(repr((a == b, fa == fb)))
 """,
     ),
 ]
@@ -895,7 +969,7 @@ def upstream(binary, kind, source, files):
         for name, text in {**files, "main.typ": source}.items():
             with open(os.path.join(tmp, name), "w", encoding="utf-8", newline="") as f:
                 f.write(text)
-        if kind == "metadata":
+        if kind in ("metadata", "memoized"):
             values = json.loads(run(binary, ["query", "--root", tmp, path, "metadata", "--field", "value"]))
             # The other metadata elements are the documents' own.
             return [v for v in values if isinstance(v, str)]
@@ -1021,7 +1095,7 @@ def main():
                 body.append(f"    ({literal(path)}, {literal(text)}),\n")
             body.append("  ]\n")
             args = "source, files~"
-        if kind in ("metadata", "report", "traces"):
+        if kind in ("metadata", "memoized", "report", "traces"):
             body.append("  let expected = [\n")
             for value in expected:
                 body.append(f"    {literal(value)},\n")

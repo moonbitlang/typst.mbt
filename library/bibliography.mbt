@@ -652,15 +652,12 @@ pub(all) struct RenderedEntry {
 /// `bibs_and_groups: &[Content]`). The key of an entry has their
 /// fingerprints; the entry keeps them for the exact comparison that every
 /// memoized call makes (`memo.mbt`).
-priv struct WorksInput(Array[Content])
+priv struct WorksInput(ArrayView[Content])
 
 ///|
 impl Eq for WorksInput with fn equal(self, other) {
   let a = self.0
   let b = other.0
-  if physical_equal(a, b) {
-    return true
-  }
   if a.length() != b.length() {
     return false
   }
@@ -737,8 +734,9 @@ pub fn Works::generate(
     engine,
     key,
     WorksInput(bibs_and_groups),
-    // Nothing writes to the works, and what they raise is a copy
-    // ([Works::citation]).
+    // Nothing writes to the works: their maps are private, what they raise
+    // is a copy ([Works::citation]), and so is the list of a
+    // bibliography's entries ([Works::bibliography]).
     works => works,
     engine => Works::generate_impl(engine, bibs_and_groups),
     label=_ => "works",
@@ -750,7 +748,7 @@ pub fn Works::generate(
 /// The internal implementation of [`Works::generate`].
 fn Works::generate_impl(
   engine : Engine,
-  bibs_and_groups : Array[Content],
+  bibs_and_groups : ArrayView[Content],
 ) -> Works {
   works_generations.val += 1
   let engine = { ..engine, route: Route::extend_(engine.route), }
@@ -807,7 +805,11 @@ pub fn Works::bibliography(
   span : @syntax.Span,
 ) -> RenderedBibliography raise SourceError {
   match self.bibliographies.get(loc) {
-    Some(Ok(bib)) => bib
+    // The works are kept and found again (`works_store`), and the array of
+    // the entries is one that anyone can write to: the caller gets its
+    // own. (Upstream hands out a reference into the works, `&'a`.)
+    Some(Ok(bib)) =>
+      { entries: bib.entries.copy(), hanging_indent: bib.hanging_indent, }
     // Upstream `.map_err(Clone::clone)`.
     Some(Err(errors)) => raise SourceError(clone_diagnostics(errors))
     None =>
@@ -879,7 +881,10 @@ priv enum GroupPart {
 ///|
 /// Prepares the document's bibliographies and citation groups for rendering
 /// with hayagriva.
-fn prepare(engine : Engine, bibs_and_groups : Array[Content]) -> Preparation {
+fn prepare(
+  engine : Engine,
+  bibs_and_groups : ArrayView[Content],
+) -> Preparation {
   // Maps from citations to bibliography indices for citations that were
   // explicitly selected via a bibliography with a `target`.
   let selected : Map[Location, Int] = Map([])
@@ -1680,7 +1685,7 @@ fn csl_locale(lang : Lang, region : Region?) -> @citationberg.LocaleCode {
 /// also not that helpful in this case.
 fn bibliography_introspection(
   span : @syntax.Span,
-) -> Introspect[Array[Content]] {
+) -> Introspect[ArrayView[Content]] {
   Introspect::new(
     (_, introspector) => {
       introspector.query(

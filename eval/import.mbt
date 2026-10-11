@@ -291,6 +291,8 @@ priv struct EvalMemo {
   /// The module, or the errors of an evaluation that failed. The errors
   /// are the entry's own: no caller has these objects ([own_result]).
   result : Result[@library.Module, Array[@library.SourceDiagnostic]]
+  /// The effects of the evaluation on its sink, as the entry's own copy
+  /// (`@library.Sink::kept`): what is replayed is a copy of it again.
   sink : @library.Sink
 }
 
@@ -534,7 +536,7 @@ fn eval_source_memoized(
       @library.note_route_queries(memo.queried)
       memo.shifts.note_reused(depth - memo.depth)
       @library.note_traced_files(memo.traced_files)
-      sink.extend_from_sink(memo.sink)
+      sink.extend_from_kept(memo.sink)
       match own_result(memo.result) {
         Ok(module_) => return module_
         Err(errors) => raise @library.SourceError(errors)
@@ -584,7 +586,7 @@ fn eval_source_memoized(
       traced,
       traced_files,
       result: own_result(result),
-      sink: own_sink,
+      sink: own_sink.kept(),
     })
   }
   sink.extend_from_sink(own_sink)

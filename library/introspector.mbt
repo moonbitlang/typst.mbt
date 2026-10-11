@@ -16,8 +16,10 @@
 /// specifics of the target. The HTML target, for instance, will return `None`
 /// for [page](Self::page) requests.
 pub(open) trait IntrospectorBackend {
-  /// Queries for all matching elements.
-  fn query(Self, Selector) -> Array[Content]
+  /// Queries for all matching elements. The result is for reading: a
+  /// backend may hand out what it keeps (upstream: an `EcoVec`, whose
+  /// holders cannot write to each other's).
+  fn query(Self, Selector) -> ArrayView[Content]
   /// Queries for the first element that matches the selector.
   fn query_first(Self, Selector) -> Content?
   /// Queries for the unique element that matches the selector.
@@ -68,7 +70,8 @@ pub(all) struct EmptyIntrospector(Unit)
 
 ///|
 pub impl IntrospectorBackend for EmptyIntrospector with fn query(_, _) {
-  []
+  let none : Array[Content] = []
+  none
 }
 
 ///|
@@ -181,19 +184,28 @@ pub extend EmptyIntrospector with IntrospectorBackend::{
 pub struct Introspector {
   priv backend : &IntrospectorBackend
   priv recorder : IntrospectionRecorder?
+  /// Which introspector this is ([Introspector::serial]).
+  priv serial : Int64
 }
 
 ///|
-/// Wrap a target-specific introspector.
+/// The number of introspectors made so far ([Introspector::new]).
+let introspector_serials : Ref[Int64] = { val: 0L, }
+
+///|
+/// Wrap a target-specific introspector. Every call makes another
+/// introspector ([Introspector::serial]): whoever asks one backend again
+/// and again keeps what this returned, as a document does.
 pub fn Introspector::new(backend : &IntrospectorBackend) -> Introspector {
-  { backend, recorder: None, }
+  introspector_serials.val += 1L
+  { backend, recorder: None, serial: introspector_serials.val, }
 }
 
 ///|
 /// An introspector that returns empty results for all inquiries (upstream
 /// `EmptyIntrospector`).
 pub fn Introspector::empty() -> Introspector {
-  Introspector::new(EmptyIntrospector(()) as &IntrospectorBackend)
+  { backend: EmptyIntrospector(()), recorder: None, serial: 0L, }
 }
 
 ///|
@@ -203,13 +215,32 @@ pub fn Introspector::track_with(
   self : Introspector,
   recorder : IntrospectionRecorder,
 ) -> Introspector {
-  { backend: self.backend, recorder: Some(recorder), }
+  { backend: self.backend, recorder: Some(recorder), serial: self.serial, }
 }
 
 ///|
 /// The same introspector, without recording.
 pub fn Introspector::untracked(self : Introspector) -> Introspector {
-  { backend: self.backend, recorder: None, }
+  { backend: self.backend, recorder: None, serial: self.serial, }
+}
+
+///|
+/// A number that says which introspector this is (not upstream): the same
+/// for what [Introspector::track_with] and [Introspector::untracked] make
+/// of one, another for every [Introspector::new], and zero for every empty
+/// one. Two introspectors with one number give the same answers, since a
+/// backend answers the same for as long as it lives (what it hands out is
+/// for reading: [Introspector::query]).
+///
+/// It is what the entry of a memoized call keeps of the introspector it
+/// was computed with, for the lookup that needs no validation of its reads
+/// (`memo.mbt`). An entry kept the backend itself for that, and with it
+/// every located element of a document for as long as the entry lived.
+/// (64 bits: a watching process makes an introspector per layout
+/// iteration, and a counter of 32 bits that comes round would give a
+/// document the number of the empty ones.)
+pub fn Introspector::serial(self : Introspector) -> Int64 {
+  self.serial
 }
 
 ///|
@@ -252,10 +283,16 @@ fn Introspector::record(
 
 ///|
 /// Queries for all matching elements.
+///
+/// The result is a view: the introspector keeps what it found (upstream
+/// caches queries too and hands out an `EcoVec`, which nobody can write to
+/// for the others), and the same answer is given to every later query, to
+/// the validation of recorded reads and to the entries that were computed
+/// with this introspector. (It was the kept array itself.)
 pub fn Introspector::query(
   self : Introspector,
   selector : Selector,
-) -> Array[Content] {
+) -> ArrayView[Content] {
   let output = self.backend.query(selector)
   self.record("query", () => hash128(selector), () => hash128(output), i => {
     hash128_output(i.backend.query(selector))
@@ -682,20 +719,24 @@ pub struct ElementIntrospector[P] {
   /// if all top-level queries are distinct, they often have shared
   /// subqueries. Example: Individual counter queries with `before` that all
   /// depend on a global counter query.
-  priv queries : Map[U128, Array[Content]]
+  ///
+  /// What is kept here is handed out as views ([ElementIntrospector::query])
+  /// and never written to again.
+  priv queries : Map[U128, ArrayView[Content]]
 }
 
 ///|
-/// Queries for all matching elements.
+/// Queries for all matching elements. The result is a view of what the
+/// introspector keeps for the selector.
 pub fn[P] ElementIntrospector::query(
   self : ElementIntrospector[P],
   selector : Selector,
-) -> Array[Content] {
+) -> ArrayView[Content] {
   let hash = hash128(selector)
   if self.queries.get(hash) is Some(output) {
     return output
   }
-  let output : Array[Content] = match selector {
+  let output : ArrayView[Content] = match selector {
     Elem(_, _) => self.all().filter(elem => selector.matches(elem, None))
     Location(location) =>
       match self.get_by_loc(location) {
@@ -733,7 +774,7 @@ pub fn[P] ElementIntrospector::query(
         let smallest = swap_remove(results, min)
         smallest.filter(candidate => {
           results.iter().all(other => self.binary_search(other, candidate).0)
-        })
+        })[:]
       }
     }
     Before(selector~, end~, inclusive~) => {
@@ -747,7 +788,7 @@ pub fn[P] ElementIntrospector::query(
             // Element itself is not contained.
             (false, i) => i
           }
-          list[:split].to_owned()
+          list[:split].to_owned()[:]
         }
         None => list
       }
@@ -763,7 +804,7 @@ pub fn[P] ElementIntrospector::query(
             // Element itself is not contained.
             (false, i) => i
           }
-          list[split:].to_owned()
+          list[split:].to_owned()[:]
         }
         None => list
       }

@@ -75,7 +75,8 @@ pub fn PluginFunc::transition(
 /// The results of memoized plugin function calls and transitions (upstream
 /// `#[comemo::memoize]`), keyed by the 128-bit hash of the function and
 /// arguments. Like comemo, only the hash of the inputs is kept (not the
-/// arguments themselves).
+/// arguments themselves). An error that is kept is raised as a copy
+/// ([raise_kept]).
 let plugin_call_cache : Map[U128, Result[Bytes, HintedError]] = Map([])
 
 ///|
@@ -117,8 +118,18 @@ fn[R] memoized(
   }
   match result {
     Ok(v) => v
-    Err(e) => raise e
+    Err(e) => raise_kept(e)
   }
+}
+
+///|
+/// Raises an error that a cache keeps, as a copy (upstream: comemo returns
+/// a clone of the `StrResult`): the hints of a `HintedString` are an array
+/// that whoever catches the error can add to, and the cache answers the
+/// next call with what it has.
+fn[T] raise_kept(error : HintedError) -> T raise HintedError {
+  let HintedError(kept) = error
+  raise HintedError(kept.clone())
 }
 
 ///|
@@ -253,7 +264,7 @@ fn Plugin::module_(bytes : Bytes) -> Module raise HintedError {
     if entry.0 == bytes {
       match entry.1 {
         Ok(v) => return v
-        Err(e) => raise e
+        Err(e) => raise_kept(e)
       }
     }
   }
@@ -267,7 +278,7 @@ fn Plugin::module_(bytes : Bytes) -> Module raise HintedError {
   entries.push((bytes, result))
   match result {
     Ok(v) => v
-    Err(e) => raise e
+    Err(e) => raise_kept(e)
   }
 }
 
@@ -393,14 +404,11 @@ fn Plugin::into_module(self : Plugin) -> Module {
       scope.bind(name, Binding::detached(Func(Func::plugin(func)))) |> ignore
     }
   }
-  // The functions' fingerprints carry the plugin; without functions two
-  // plugins give modules that only differ in their identity.
-  let module_ = Module::anonymous(scope)
-  if scope.length() > 0 {
-    module_.canonical()
-  } else {
-    module_
-  }
+  // (The hash of the module is that of its functions, which carry the
+  // plugin. Two plugins that export no function give two modules with one
+  // hash, upstream's too: `==` tells them apart and a memoized call does
+  // not, `typst/oracle_wbtest.mbt`, "modules: ..".)
+  Module::anonymous(scope)
 }
 
 ///|

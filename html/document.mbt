@@ -299,6 +299,9 @@ pub struct HtmlDocument {
   priv info : @library.DocumentInfo
   priv options : @library.DocumentFormatOptions
   priv introspector : HtmlIntrospector
+  /// The introspector as the engine asks it: one for the document
+  /// (`@library.Introspector::serial`).
+  priv tracked : @library.Introspector
 }
 
 ///|
@@ -311,7 +314,13 @@ pub fn HtmlDocument::new(
   options : @library.DocumentFormatOptions,
 ) -> HtmlDocument {
   let introspector = HtmlIntrospector::new(output.nodes())
-  { output, info, options, introspector, }
+  {
+    output,
+    info,
+    options,
+    introspector,
+    tracked: @library.Introspector::new(introspector),
+  }
 }
 
 ///|
@@ -357,7 +366,7 @@ pub fn HtmlDocument::introspector(self : HtmlDocument) -> HtmlIntrospector {
 
 ///|
 pub impl @library.Output for HtmlDocument with fn introspector(self) {
-  @library.Introspector::new(self.introspector)
+  self.tracked
 }
 
 ///|

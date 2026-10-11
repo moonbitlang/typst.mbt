@@ -27,10 +27,14 @@ pub impl Fingerprint for Label with fn fingerprint(self, state) {
 pub extend Label with Fingerprint::{fingerprint}
 
 ///|
+/// Upstream derives `Hash` for `Element(Static<ContentVtable>)`: the
+/// address of the vtable (`typst-utils/src/static.rs`). Here: the number of
+/// the descriptor object (`descriptor_serial` in `func.mbt`), which is what
+/// elements compare by. Not a text of the element: names are shared
+/// (`grid.cell` and `table.cell` are both `cell`), and two elements that a
+/// host makes can share every text.
 pub impl Fingerprint for Element with fn fingerprint(self, state) {
-  // Elements are compared by identity; their keys are unique (their names
-  // are not: `grid.cell` and `table.cell` are both `cell`).
-  state.write_str(self.0.key)
+  state.write_i64(self.0.serial)
 }
 
 ///|
@@ -333,8 +337,10 @@ pub impl Fingerprint for Args with fn fingerprint(self, state) {
 pub extend Args with Fingerprint::{fingerprint}
 
 ///|
+/// Upstream derives `Hash` for `Type(Static<NativeTypeData>)`: the address
+/// of the descriptor. Here its number (`descriptor_serial` in `func.mbt`).
 pub impl Fingerprint for Type with fn fingerprint(self, state) {
-  state.write_str(self.0.long_name)
+  state.write_i64(self.0.serial)
 }
 
 ///|
@@ -347,16 +353,10 @@ pub extend Type with Fingerprint::{fingerprint}
 /// (scope, content, file). The inner data is hashed once per module (not
 /// upstream; see [LazyFingerprint]).
 pub impl Fingerprint for Module with fn fingerprint(self, state) {
-  // Modules compare by the identity of their inner data. That is only a
-  // flag of the fingerprint (see `fingerprint_flags`) for the modules that
-  // their fingerprint does not identify (`ModuleInner.identified`:
-  // anonymous modules, but those of plugins with functions). The others
-  // are one object per evaluated source file and per plugin in a
-  // compilation: where memoization compares results by their fingerprints,
-  // an equal fingerprint is the same module.
-  if !self.inner.identified {
-    fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
-  }
+  // Modules compare by the identity of their inner data (`Eq for Module`),
+  // and that is no flag of the fingerprint: memoized calls take a module
+  // by its hash, as upstream's do. (Two modules of one hash are one
+  // argument: two plugins that export no function, a file evaluated twice.)
   state.write(self.name)
   let inner = self.inner
   if inner.hash.write_cached(state) {
@@ -571,11 +571,13 @@ fn closures_equal(a : Closure, b : Closure) -> Bool {
 ///|
 pub impl Fingerprint for Func with fn fingerprint(self, state) {
   match self.inner {
+    // Upstream: `Native(Static<NativeFuncData>)`, hashed as the address of
+    // the descriptor. Here its number (`descriptor_serial` in `func.mbt`);
+    // it was the name, the title and the documentation, which two
+    // functions can share.
     Native(data) => {
       state.write_discriminant(0)
-      state.write_str(data.name)
-      state.write_str(data.title)
-      state.write_str(data.docs)
+      state.write_i64(data.serial)
     }
     Element(elem) => {
       state.write_discriminant(1)
@@ -917,7 +919,9 @@ pub extend StateUpdate with Fingerprint::{fingerprint}
 ///|
 pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
   // Also hash the type since dynamic values with different types but equal
-  // data should be different.
+  // data should be different. (Upstream hashes the `TypeId` of the Rust
+  // type, a constant of the program and not a descriptor: the name of the
+  // port's variant stands in for it, not the number of a `Type`.)
   state.write_str(self.ty().0.long_name)
   match self {
     Counter(v) => state.write(v)

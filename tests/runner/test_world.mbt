@@ -411,11 +411,7 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
   )
   |> ignore
   check.define_("gated", None).with_feature(Html) |> ignore
-  scope.define_(
-    "check",
-    Module(@library.Module::new("check", check).canonical()),
-  )
-  |> ignore
+  scope.define_("check", Module(@library.Module::new("check", check))) |> ignore
   let test_scope = () => {
     let s = @library.Scope::new()
     s

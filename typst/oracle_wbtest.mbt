@@ -434,11 +434,30 @@ test "oracle: memo: a file imported at two depths that both fit" {
 
 ///|
 test "oracle: memo: modules of plugins without functions" {
-  let source = "// Two plugins that export their memory and nothing else: their modules\n// are equal in everything but their identity. (Not recorded here: upstream\n// takes one for the other as the argument of a memoized call,\n// `(pa, pb).map(m => m == pa)` is `(true, true)` there and `(true, false)`\n// in the port.)\n#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))\n#let pa = plugin(wasm(1))\n#let pb = plugin(wasm(2))\n#let row(..args) = metadata(repr(args.pos()))\n#row(pa == pb, pa == pa, pa == plugin(wasm(1)), pb == plugin(wasm(2)), pa, dictionary(pa))\n#row((pa, pb, pa).dedup().len(), (pa, pb).contains(pb), (pa,).contains(pb), (a: pa) == (a: pb))\n#let is-a(m) = m == pa\n#row(is-a(pa), is-a(pb))\n#let s = state(\"plugins\", pa)\n#s.update(pb)\n#context row(s.get() == pb, s.get() == pa, s.final() == pb)\n#metadata((pa,)) <first>\n#metadata((pb,)) <second>\n#context row(query(<first>).first().value.first() == pa, query(<second>).first().value.first() == pa, query(<second>).first().value.first() == pb)\n#let captured() = pa\n#let other() = pb\n#row(captured() == pa, other() == pa, captured == other, captured == captured)\n#context row(measure(box(width: if query(<second>).first().value.first() == pb { 10pt } else { 20pt })).width)\n"
+  let source = "// Two plugins that export their memory and nothing else: their modules\n// are equal in everything but their identity. (A memoized call takes one\n// for the other, as upstream's does: the next case.)\n#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))\n#let pa = plugin(wasm(1))\n#let pb = plugin(wasm(2))\n#let row(..args) = metadata(repr(args.pos()))\n#row(pa == pb, pa == pa, pa == plugin(wasm(1)), pb == plugin(wasm(2)), pa, dictionary(pa))\n#row((pa, pb, pa).dedup().len(), (pa, pb).contains(pb), (pa,).contains(pb), (a: pa) == (a: pb))\n#let is-a(m) = m == pa\n#row(is-a(pa), is-a(pb))\n#let s = state(\"plugins\", pa)\n#s.update(pb)\n#context row(s.get() == pb, s.get() == pa, s.final() == pb)\n#metadata((pa,)) <first>\n#metadata((pb,)) <second>\n#context row(query(<first>).first().value.first() == pa, query(<second>).first().value.first() == pa, query(<second>).first().value.first() == pb)\n#let captured() = pa\n#let other() = pb\n#row(captured() == pa, other() == pa, captured == other, captured == captured)\n#context row(measure(box(width: if query(<second>).first().value.first() == pb { 10pt } else { 20pt })).width)\n"
   let expected = [
     "(false, true, true, true, <module>, (:))", "(2, true, false, false)", "(true, false)",
     "(true, false, true)", "(true, false, true)", "(true, false, false, true)", "(10pt,)",
   ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: modules: two modules with one hash are two to `==` and one argument of a memoized call" {
+  let source = "// Two plugins that export their memory and nothing else. `Hash for Module`\n// is the name and what the module holds, so their modules have one hash,\n// and `==` compares the objects. A memoized call takes its arguments by\n// their hashes: at one call site (arguments with the same spans) the call\n// with the second module is answered with the result of the call with the\n// first.\n#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))\n#let a = plugin(wasm(1))\n#let b = plugin(wasm(2))\n#let row(..args) = metadata(repr(args.pos()))\n#let capture(m) = () => m\n#let id(m) = m\n#let pick(d) = d.m\n#let same(m) = m == a\n// Two call sites are two calls: each gets its own module back.\n#row(a == b, capture(a) == capture(b), (capture(a))() == a, (capture(b))() == b)\n#row(id(a) == a, id(b) == b, id(b) == a, pick((m: a)) == a, pick((m: b)) == b)\n// One call site, called by a native function.\n#row((a, b).map(m => m == a), (a, b).map(same), (b, a).map(same), (b, a).map(m => m == a))\n#row((a, b).map(id).map(m => (m == a, m == b)), (b, a).map(id).map(m => (m == a, m == b)))\n// One call site in a loop.\n#let ids = ()\n#let getters = ()\n#let picks = ()\n#let nested = ()\n#for m in (a, b) {\n  ids.push(id(m) == m)\n  getters.push((capture(m))() == m)\n  picks.push(pick((m: m)) == m)\n  nested.push(id((m, (m: m))).at(1).m == m)\n}\n#row(ids, getters, picks, nested)\n// A context expression is a closure that captured the module.\n#for m in (b, a) {\n  context row(m == a, m == b)\n}\n// Through a function with arguments applied and through content.\n#let both(m, n) = m == n\n#row((a, b).map(both.with(a)), (a, b).map(both.with(b)))\n#let held(body) = body.value == a\n#row((a, b).map(m => held(metadata(m))))\n"
+  let expected = [
+    "(false, true, true, true)", "(true, true, false, true, true)", "(\n  (true, true),\n  (true, true),\n  (true, true),\n  (false, false),\n)",
+    "(\n  ((true, false), (true, false)),\n  ((true, false), (true, false)),\n)",
+    "(\n  (true, false),\n  (true, false),\n  (true, false),\n  (true, false),\n)",
+    "(false, true)", "(false, true)", "((true, true), (false, false))", "((true, true),)",
+  ]
+  assert_eq(oracle_memoized(source), expected)
+}
+
+///|
+test "oracle: modules: closures that captured two modules with one hash are equal" {
+  let source = "// `capture(a) == capture(b)` is `true`: closures compare by their hash,\n// which covers what they captured as its hash.\n#let wasm(pages) = bytes((\n  0,97,115,109,1,0,0,0,5,3,1,0,pages,\n  7,10,1,6,109,101,109,111,114,121,2,0,\n))\n#let a = plugin(wasm(1))\n#let b = plugin(wasm(2))\n#let capture(m) = () => m\n#let fa = capture(a)\n#let fb = capture(b)\n#metadata(repr((a == b, fa == fb)))\n"
+  let expected = ["(false, true)"]
   assert_eq(oracle_metadata(source), expected)
 }
 

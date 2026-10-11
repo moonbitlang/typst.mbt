@@ -60,7 +60,7 @@ OUT = os.path.join(ROOT, "_build/recompile/soak")
 STATS = re.compile(
     r"^recompile: (\d+) documents, (\d+) sequences, (\d+) steps, (\d+) compilations"
 )
-SUMMARY = re.compile(r"^recompile(?: packages)?: (\d+) passed, (\d+) failed")
+SUMMARY = re.compile(r"^recompile(?: packages| upstream)?: (\d+) passed, (\d+) failed")
 
 
 def call(command, timeout):
@@ -169,11 +169,16 @@ def task(args, document, seed):
     else:
         # Cold references.
         # (Not the steps whose sources were reparsed into a tree that a
-        # parse does not give: a new process parses.)
+        # parse does not give: a new process parses. And not the steps of
+        # a sequence pinned to upstream's watch at which the loop gave what
+        # upstream's watch gives and a fresh compilation does not, which
+        # the stage has checked against upstream's recorded output:
+        # tests/recompile/README.md, "As upstream's watch".)
         steps = [
             d
             for d in steps_of(snap)
             if not os.path.exists(os.path.join(d, "reparsed.txt"))
+            and not os.path.exists(os.path.join(d, "as-upstream.txt"))
         ]
         rng = random.Random(f"{seed}/{document}")
         for step_dir in rng.sample(steps, min(args.cold, len(steps))):

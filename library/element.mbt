@@ -100,11 +100,17 @@ pub struct ElementHooks {
 ///|
 /// Static data describing an element (upstream `ContentVtable`).
 pub struct ElementData {
+  /// What tells this descriptor from every other (`descriptor_serial` in
+  /// `func.mbt`): its fingerprint, as the address of the vtable is
+  /// upstream's.
+  priv serial : Int64
   /// The element's normal name (e.g. `heading`).
   name : String
-  /// A name that is unique among all elements (not upstream, where an
-  /// element is identified by its vtable): names are not, e.g. `cell` is
-  /// both `grid.cell` and `table.cell`. It is the element's fingerprint.
+  /// A name that is unique among the elements of the standard library (not
+  /// upstream, where an element is identified by its vtable): names are
+  /// not, e.g. `cell` is both `grid.cell` and `table.cell`. For generated
+  /// code that needs a name per element; it identifies nothing (two
+  /// elements that a host makes may have one key).
   key : String
   /// The element's title case name (e.g. `Heading`).
   title : String
@@ -174,6 +180,7 @@ pub fn Element::new(
   fields~ : Array[FieldInfo],
 ) -> Element {
   Element({
+    serial: descriptor_serial(),
     name,
     key,
     title,

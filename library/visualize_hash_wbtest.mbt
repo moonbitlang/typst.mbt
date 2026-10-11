@@ -333,24 +333,23 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   distinct(Module(a))
   distinct(Module(b))
   distinct(Module(a.with_name("a")))
-  // Modules compare by identity. That is a flag of the fingerprint of the
-  // modules that it does not identify (anonymous ones), also from the
-  // cache, and of what holds them; not of named modules and of the
-  // modules of plugins with functions (one object each per compilation).
+  // Modules compare by identity, and their fingerprint is what they hold
+  // (upstream `Hash for Module`): two with the same contents have one
+  // fingerprint. That is no flag: memoized calls take a module by its
+  // hash, as upstream's do (`memo.mbt`, `modules_memo_equal`).
   let other = Module::anonymous(scope(Int(1), detached))
   assert_false(a == other)
   assert_eq(hash128(Value::Module(a)), hash128(Value::Module(other)))
-  for _ in 0..<2 {
-    let (_, flags) = fingerprint_and_flags(Value::Module(a))
-    assert_eq(flags, fingerprint_identity)
-    let (_, flags) = fingerprint_and_flags(
-      closure(node0, scope(Module(a), detached)),
-    )
-    assert_eq(flags, fingerprint_identity)
-  }
-  let named = Module::new("m", scope(Int(1), detached)).canonical()
-  let identified = Module::anonymous(scope(Int(1), detached)).canonical()
-  for m in [named, named.with_name("n"), identified, identified.with_name("p")] {
+  let named = Module::new("m", scope(Int(1), detached))
+  for
+    m in [
+      a,
+      a.with_name("q"),
+      named,
+      named.with_name("n"),
+      named.with_scope(scope(Int(1), detached)),
+      named.with_content(Content::empty()),
+    ] {
     for _ in 0..<2 {
       let (_, flags) = fingerprint_and_flags(Value::Module(m))
       assert_eq(flags, 0)
@@ -360,26 +359,11 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
       assert_eq(flags, 0)
     }
   }
-  // A module is canonical because its maker says so: what is made of one
-  // is not, nor is a module that is just made.
-  for
-    m in [
-      Module::new("m", scope(Int(1), detached)),
-      named.with_scope(scope(Int(1), detached)),
-      named.with_content(Content::empty()),
-      identified.with_content(Content::empty()),
-    ] {
-    let (_, flags) = fingerprint_and_flags(Value::Module(m))
-    assert_eq(flags, fingerprint_identity)
-  }
-  // Making a module canonical does not change its hash.
+  // What a module is made of is its hash: the same scope in two modules.
   assert_eq(
     hash128(Value::Module(Module::new("m", scope(Int(1), detached)))),
     hash128(Value::Module(named)),
   )
-  // The flag follows the inner data.
-  let (_, flags) = fingerprint_and_flags(Value::Module(a.with_name("q")))
-  assert_eq(flags, fingerprint_identity)
   // A module in its own scope (which evaluation cannot build) terminates.
   let cyclic = Scope::new()
   let cycle = Module::anonymous(cyclic)

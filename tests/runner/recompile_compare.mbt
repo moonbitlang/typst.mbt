@@ -60,6 +60,15 @@ priv struct Compiled {
   /// The sources of the compilation whose tree is not what a parse gives
   /// ([RecompileWorld::reparsed]).
   reparsed : Array[String]
+  /// For a pinned sequence (`recompile_pinned.mbt`): the SVG of the
+  /// document as the CLI writes it, if it compiled to one page.
+  cli_svg : String?
+  /// For a pinned sequence: what the document of this compilation gives
+  /// without anything a watching process keeps, to compare its own
+  /// outputs with: the images of all its pages (not only those whose hash
+  /// changed), and its PDF exported once more with memoization off.
+  own_images : String?
+  own_pdf : Bytes?
 }
 
 ///|
@@ -76,6 +85,10 @@ let part_frames : Int = 2
 ///|
 /// The index of the SVG in [compiled_parts].
 let part_svg : Int = 4
+
+///|
+/// The index of the page images in [compiled_parts].
+let part_images : Int = 5
 
 ///|
 /// Where a span points in the world: `file:line:column-line:column
@@ -153,7 +166,7 @@ fn recompile_introspector(
 ) -> String {
   let introspector = @library.Output::introspector(doc)
   let out = StringBuilder()
-  let dump = (kind : String, elems : Array[@library.Content]) => {
+  let dump = (kind : String, elems : ArrayView[@library.Content]) => {
     for elem in elems {
       let label = match elem.label() {
         Some(label) => label.repr()
@@ -284,6 +297,7 @@ let read_check_case : Ref[String] = Ref("")
 fn recompile_compile(
   world : RecompileWorld,
   pages? : PageFiles = PageFiles::new(),
+  pinned? : Bool = false,
 ) -> (Compiled, Array[@syntax.FileId]) {
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
@@ -301,6 +315,9 @@ fn recompile_compile(
   let mut images = ""
   let pdf_diagnostics = StringBuilder()
   let mut pdf : Bytes = b""
+  let mut cli_svg = None
+  let mut own_images = None
+  let mut own_pdf = None
   let document = match warned.output {
     Ok(doc) => {
       diagnostics.write_string("ok\n")
@@ -322,6 +339,9 @@ fn recompile_compile(
       frames = enc.out.to_string()
       introspector = recompile_introspector(dyn_world, doc)
       svg = recompile_svg(doc)
+      if pinned {
+        cli_svg = pinned_svg(doc)
+      }
       // (A compilation that fails exports nothing and leaves the files.)
       images = pages.write(doc)
       let exported = make_live(doc)
@@ -336,6 +356,16 @@ fn recompile_compile(
         }
       }
       recompile_diagnostics(pdf_diagnostics, dyn_world, exported.warnings)
+      if pinned {
+        own_images = Some(PageFiles::new().write(doc))
+        let memoized = @library.content_memo_enabled()
+        @library.set_layout_memo_enabled(false)
+        own_pdf = match make_live(doc).output {
+          Ok(bytes) => Some(bytes)
+          Err(_) => None
+        }
+        @library.set_layout_memo_enabled(memoized)
+      }
       Some(doc)
     }
     Err(errors) => {
@@ -360,6 +390,9 @@ fn recompile_compile(
     ok: document is Some(_),
     document,
     reparsed,
+    cli_svg,
+    own_images,
+    own_pdf,
   }
   (compiled, ids)
 }

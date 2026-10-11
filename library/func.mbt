@@ -28,8 +28,44 @@ pub(all) struct ParamInfo {
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
 ///|
+/// The number of descriptors made so far (see [descriptor_serial]).
+let descriptor_serials : Ref[Int64] = { val: 0L, }
+
+///|
+/// A number for a new descriptor of a native function, an element or a
+/// type: one that no other descriptor of the process has. It is the
+/// descriptor's fingerprint (`value_hash.mbt`).
+///
+/// Upstream's descriptors are statics that compare by their address
+/// (`typst-utils/src/static.rs`: `PartialEq for Static` is `ptr::eq`) and
+/// hash as that address (`Hash for Static`: `state.write_usize(self.0 as
+/// *const T as usize)`; `Type`, `Element` and `FuncInner::Native` derive
+/// `Hash` over a `Static`). The port's compare by the object and have no
+/// address to hash. Their texts are not a substitute: two native functions
+/// with one name, title and documentation are two functions, and whatever
+/// compares by fingerprint (a closure that captured one of them, by its
+/// hash) took one for the other.
+///
+/// The number says nothing but which object it is: it depends on the order
+/// in which a process makes its descriptors (the generated ones are made on
+/// first use), as upstream's addresses depend on where a process is loaded.
+/// So do the fingerprints of everything that holds a descriptor, which is
+/// all content: nothing may be derived from the value of such a fingerprint
+/// that shows in an output.
+///
+/// (64 bits: a counter of 32 comes round, and a host can make descriptors
+/// for as long as it runs.)
+fn descriptor_serial() -> Int64 {
+  descriptor_serials.val += 1L
+  descriptor_serials.val
+}
+
+///|
 /// Defines a native function.
 pub struct NativeFuncData {
+  /// What tells this descriptor from every other ([descriptor_serial]): its
+  /// fingerprint.
+  priv serial : Int64
   /// The implementation of the function.
   function : NativeFn
   /// The function's normal name (e.g. `align`), as exposed to Typst.
@@ -67,6 +103,7 @@ pub fn NativeFuncData::new(
   function : NativeFn,
 ) -> NativeFuncData {
   {
+    serial: descriptor_serial(),
     function,
     name,
     title,

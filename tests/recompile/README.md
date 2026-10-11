@@ -6,7 +6,9 @@ danger of doing so is a result that is stale and looks right. The
 `recompile` stage is the test that must be there before any cache outlives a
 compilation: it keeps one world, edits its files again and again, and after
 every edit requires what the compilation gave to be exactly what a
-compilation from scratch of the same files gives.
+compilation from scratch of the same files gives. (With one exception
+that is upstream's own, accepted only where it is proven to be: "As
+upstream's watch".)
 
 Today nothing is kept across compilations (`library/memo.mbt`: the memoized
 calls end with their compilation; `@library.evict` drops what is kept by
@@ -45,7 +47,8 @@ second only). The phases are not interleaved: a cache
 that keeps the last compilation only would otherwise never be asked for the
 step before, and the stage would pass without testing it.
 
-**The documents** (121 by default):
+**The documents** (121 by default, and the three of the sequences that are
+pinned to upstream's watch, below):
 
 - 3 of `bench/` (`tiny`, `long`, `showcase`: the documents whose
   recompilation `scripts/watch_check.py --bench` measures; `longer`, which
@@ -190,6 +193,117 @@ snapshot as the first compilation of a process, and
 That check is not in CI (a process per step); run the soak before a cache
 lands.
 
+## As upstream's watch
+
+The stage requires a recompilation to give what a compilation from scratch
+gives. There is one kind of difference that it accepts, in one place,
+because upstream has it and the port follows upstream in it (decided by the
+owner on 2026-10-11: module equality exactly as upstream).
+
+**What differs.** Upstream compares modules by the identity of their inner
+data (`PartialEq for Module`: the name and `Arc::ptr_eq`) and finds
+memoized calls by the hashes of their arguments (comemo), a module's being
+its name and what it holds. The two do not agree: a call that is found
+again returns what it returned before, and if that holds a module, it is
+the module of an earlier evaluation, which `==` tells from the module of
+the same file evaluated now. The smallest document:
+
+    // a.typ
+    #let v = 1
+    // comment 0
+
+    // main.typ
+    #import "a.typ" as m
+    #let get() = m
+    #get() == m
+
+A comment in `a.typ` changes. The file is evaluated again and gives a new
+module with the hash of the old one; the main file is evaluated again too
+(it read `a.typ`), `get` is a closure with the hash it had, and `get()` is
+found: it returns the old module. `typst watch` of the upstream binary
+then shows `false` where `typst compile` shows `true`, until an edit
+changes what the module holds. The port's memoized calls take modules by
+their hashes too (`modules_memo_equal` in `library/memo.mbt`), so it will
+show the same as soon as closure calls are kept from one compilation to
+the next. It does not yet: nothing is kept. With every store kept (the
+experiment below) it shows exactly what upstream's watch shows.
+
+**What is accepted.** A step of a *pinned sequence* at which the watch
+loop gave what upstream's watch gave. Pinned sequences are the fixtures of
+`tests/recompile/upstream/` (`getter.json`: the document above, five
+steps; `nan.json`: the same with a module that exports `float.nan`,
+whose hash has the bits of the float, three steps; `modules.json`: a
+module through a getter, as an argument inside a dictionary and through
+another file that imported it, next to a state's value and a queried
+element, which upstream's watch gets right, nine steps). `scripts/gen_recompile_upstream.py <upstream binary>` generates
+them: it runs `typst watch` of the upstream binary on the project, writes
+the files of every step, and records the SVG that the watching process
+wrote and the SVG of a fresh `typst compile` of the same files. The
+documents draw boxes and no text (a black box for `true`, a red one for
+`false`), so that their SVG is the same bytes whatever the fonts of a
+world, in upstream's CLI and here. Like `scripts/watch_check.py`, whose
+sessions it uses, the script needs the upstream binary and real file
+events and is run by hand (`--check` compares with what is committed);
+the stage reads the fixtures and needs neither.
+
+A pinned sequence runs like any other (group `recompile upstream` of the
+summary and of `scripts/ci/stages.tsv`): the watch loop with the
+fixture's edits, then the two references of every step. At every step
+(`pinned_verdict` in `tests/runner/recompile_pinned.mbt`, which is the
+only place where a recompilation that differs from a reference passes):
+
+1. The reference must give upstream's fresh SVG, byte for byte. That
+   holds in every run and with nothing kept: it says that the fixture is
+   of these files and that the port's answer from scratch is upstream's.
+2. If the watch loop gave what the reference gives, the step passes.
+3. Otherwise it passes only if upstream's watch gave something else than
+   upstream's fresh compilation at this step, the watch loop's SVG is
+   that recorded SVG, byte for byte, and the dependencies, the
+   diagnostics and the diagnostics of the PDF export are those of the
+   reference. The step is counted, and the run says how many there were.
+
+Everything else fails: a difference at a step where upstream's watch
+agrees with a fresh compilation (the port is stale where upstream is not:
+a bug in a key or in a validation), pages that are neither a fresh
+compilation's nor upstream's watch's, and upstream's pages with other
+dependencies or diagnostics. Nothing of this applies to the sweeps and
+random sequences of the other documents: there a recompilation gives
+what a fresh compilation gives, or the sequence fails. (None of those
+documents compares modules. A document that does and is edited at random
+would need a fixture per sequence; it is pinned instead.)
+
+The run prints, for example with every store kept:
+
+    recompile: 17 steps are pinned to upstream's watch
+    (tests/recompile/upstream); upstream's watch gives something else than
+    a fresh compilation at 13 of them, and the watch loop gave upstream's
+    watch output instead of a fresh compilation's at 13
+
+and with nothing kept, as the tree is, `at 0`. With `-v` every accepted
+step is a line (`NOTE upstream/getter :: step=1 (a comment in a.typ): as
+upstream's watch, not as a fresh compilation`). `scripts/recompile_soak.py`
+does not compile such a step again in a new process (the runner marks it,
+`as-upstream.txt`): a new process gives a fresh compilation.
+
+**What this gives up.** That a recompilation always gives what a
+compilation from scratch gives: where modules are compared with `==`
+after a call returned one, it gives what upstream's watch gives. And the
+references without memoization of such steps are references of a fresh
+compilation, as everywhere, not of the loop.
+
+**What it cannot hide.** The acceptance needs a byte-identical SVG that
+was recorded from the upstream binary for exactly these files and this
+step. A stale result of the port in a pinned document passes only if it
+draws the page that upstream's watch drew: the same boxes, each a
+comparison of modules or a value that depends on none, on a document of
+one page (a document with another number of pages has no SVG to compare
+and fails). A stale value in a document of the other 237 sequences is not
+looked at by this rule at all. What the rule does not look at, at a step
+it accepts: the frames, the introspector's answers, the PDF and the page
+images of the loop, which differ from the reference's there by what the
+boxes show (it requires the dependencies and the diagnostics to be the
+reference's).
+
 ## Running
 
 ```sh
@@ -202,11 +316,12 @@ every compilation of the stage (`@library.set_memo_check`: every result
 that a store keeps is computed a second time from scratch, and the world
 reads of its entry must be what that run asked of the world): a line
 `READS <document> seed=.. sequence=..: ..` per entry that differs and a
-total at the end (`read check: 120825 entries checked, 0 differ in 0
+total at the end (`read check: 125391 entries checked, 0 differ in 0
 cases`). The stage's own verdict must be the same with it.
 
-The default run is the CI run: 121 documents, 237 sequences (234 and 3 in `scripts/ci/stages.tsv`), 1421
-steps and 4241 compilations with their exports, about 40 s on an M-series
+The default run is the CI run: 124 documents, 240 sequences (234, 3 with
+packages and 3 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1438
+steps and 4292 compilations with their exports, about 40 s on an M-series
 machine. `--sequences=N` and `--steps=N` size
 the random sequences of every document, `--seed=N` and `--rounds=N` choose
 the seeds, `--all` adds `bench/longer` and every document with packages,
@@ -264,11 +379,11 @@ With the validation left on, the same three give:
 | 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same kind of store) | 0 | |
 | 3. closure calls | 0 | |
 
-That is what the validation is for, and it is not yet a licence to keep a
-store: the design lists what else a kept result depends on (state outside
-the arguments, identity, mutable results; its sections 5.3 to 5.5), which
-these sequences do not all reach, and the soak has not run on a kept
-store. The date, the fonts, `sys.inputs` and the files that a call reads
+That is what the validation is for. What else a kept result depends on
+(state outside the arguments, identity, mutable results: sections 5.3 to
+5.5 of the design) is steps 2 to 4 of its slice 1, and step 4 ran the
+experiment with every store kept at once ("With every store kept",
+below). The date, the fonts, `sys.inputs` and the files that a call reads
 are no longer among the things a key does not hold: they are the reads
 and the library of the entry.
 
@@ -286,6 +401,39 @@ the design's section 5.5), run on the default stage of 237 sequences:
 
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
+
+### With every store kept
+
+Step 4 of the design's slice 1 (identity and ownership; "Step 4 as built"
+in its section 8) ended with the experiment that says whether the stores
+can be kept: all of them at once. A local change, never committed:
+`memoize` and `memoized_closure` do not empty their stores when a
+compilation starts, the module entries outlive their scope
+(`eval_memo_kept`), `evict(1)`, which the stage calls before every
+reference, drops them all (so that references are computed from
+scratch), and `pinned_as_upstream_expected` is 13. Validation is on.
+
+| Every store kept, and | Failing sequences, of 240 | What |
+|---|---|---|
+| nothing else | 0 | the watch loop gave upstream's watch output at the 13 pinned steps at which upstream's watch differs from a fresh compilation, byte for byte, and a fresh compilation's at every other step of every sequence |
+| mutation 1 (module entries: world reads not validated) | 126 | first `bench/showcase`, sweep, step 2; the pinned sequences and their count fail with it |
+| mutation 2 (layouts, counter sequences, works) | 69 | first `bench/tiny`, sweep, step 1 |
+| mutation 3 (closure calls) | 12 | first `project/book`, sweep, step 1 |
+| an entry takes any introspector for the one it was computed with, and its introspector reads are not validated | the runner aborts (exit status 134) | `project/notes`; the `paged` stage too: a kept layout holds locations that the introspector of the iteration does not know |
+| the library is not compared, in all three stores | 1 | `project/notes`, sweep, steps 2 to 4 (`sys.inputs` changes) |
+| the sink of an entry that is found is not replayed | 9 | `query-running-header` and the four convergence tests of the suite: a warning that a fresh compilation gives is missing |
+| the stores take modules by identity instead of by their hashes | 2 | `upstream/modules`, steps 1 to 6 and 8: "the pages are not what upstream's watch gives either"; and the count of accepted steps (6, expected 13) |
+
+`scripts/recompile_soak.py --minutes 10` with that runner (every store
+kept, nothing else): 124 documents, seeds 1000 to 1004, 620 runs, 3040
+sequences, 34 594 steps, 102 372 compilations, 1835 steps compiled again
+in new processes, no failure and no abort.
+
+So with every store kept and validation on, a recompilation gives what a
+compilation from scratch gives in all of this, and what upstream's watch
+gives where the two differ. What that does not show is what the edits
+do not reach (below, "What it does not cover"), and it is not the change
+that keeps the stores: ages and eviction are step 5.
 
 All the counts of this section were measured again on the tree that has
 both step 2 and step 3 of the design (237 sequences: the project

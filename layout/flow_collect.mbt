@@ -649,7 +649,10 @@ fn PlacedChild::location(self : PlacedChild) -> @library.Location {
 ///
 /// Upstream compares the hashes of the inputs; here they are compared with
 /// a bitwise equality (so that signed zeros differ, like their hashes).
-/// Cached frames are handed out as copy-on-write clones by the callers.
+/// Cached frames are handed out as copy-on-write clones by the callers. An
+/// error is kept as a copy and raised as a copy (upstream: `output.clone()`
+/// of the `SourceResult`): whoever catches a diagnostic appends tracepoints
+/// and hints to it.
 priv struct CachedCell[I, T] {
   mut slot : (I, Result[T, Array[@library.SourceDiagnostic]])?
 }
@@ -671,19 +674,18 @@ fn[I, T] CachedCell::get_or_init(
   if self.slot is Some((prev, output)) && eq(prev, input) {
     match output {
       Ok(v) => return v
-      Err(errors) => raise @library.SourceError(errors)
+      Err(errors) =>
+        raise @library.SourceError(errors.map(error => error.clone()))
     }
   }
-  let output = try f(input) catch {
-    @library.SourceError(errors) => Err(errors)
-  } noraise {
-    v => Ok(v)
+  let output = f(input) catch {
+    @library.SourceError(errors) => {
+      self.slot = Some((input, Err(errors.map(error => error.clone()))))
+      raise @library.SourceError(errors)
+    }
   }
-  self.slot = Some((input, output))
-  match output {
-    Ok(v) => v
-    Err(errors) => raise @library.SourceError(errors)
-  }
+  self.slot = Some((input, Ok(output)))
+  output
 }
 
 ///|

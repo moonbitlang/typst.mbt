@@ -113,6 +113,38 @@ Typst source) are unchanged.
   instead of evaluating. The main file of a compilation is evaluated
   through it. An evaluation is found by the source, with its span
   numbers (`@library.source_fingerprint`), not by the text of its file.
+- `library`: what an introspector's query returns is a view.
+  `Introspector::query`, `ElementIntrospector::query` and the method
+  `query` of the trait `IntrospectorBackend` return `ArrayView[Content]`
+  (they returned `Array[Content]`, the array that the introspector keeps
+  for the selector, which a caller could write to), and
+  `query_introspection` returns `Introspect[ArrayView[Content]]`. A caller
+  that needs an array of its own writes `.to_owned()`; an implementation
+  of the trait returns its array as it did (an `Array` is taken where a
+  view is expected). `ArrayView[T]` implements `Fingerprint`, as a slice.
+- `library`: `Module::canonical` is gone (it was added since 0.1.4), with
+  the notion it was for: memoized calls take a module by its hash, as
+  upstream's do, and no longer by its identity. `==` on modules is what it
+  was, upstream's: the same name and the same object. What a document can
+  see of it: at one call site, a memoized call that is given a second
+  module with the hash of the first returns what it returned for the
+  first. Two plugins that export no function give such modules:
+  `(a, b).map(m => m == a)` is `(true, true)`, as it is for upstream (it
+  was `(true, false)`).
+- `library`: `memo_fingerprint` returns a `MemoKey` (it returned the
+  `U128`), which `memoized_layout` takes: the fingerprint with what it
+  says about its own arguments (whether they hold a host function).
+- `library`: every `Introspector::new` makes another introspector to the
+  entries of memoized calls (`Introspector::serial`): a host that asks one
+  backend again and again keeps the `Introspector` it made, as a document
+  does. It stays correct otherwise, and finds less again.
+- `library`: native functions, elements and types are fingerprinted by a
+  number of the descriptor object, not by their texts (the name, title and
+  documentation of a function, the key of an element, the long name of a
+  type): two that a host makes with the same texts were one value to
+  everything that compares by fingerprint. The fingerprints of all content
+  change, and depend on the order in which a process first uses its
+  elements; nothing that is written to an output is derived from them.
 - `doc`: `Stroke(dash=..)` takes a `Dash` (it was a `Value`): write a
   preset (`Dotted`, `Dashed`, ..), `Pattern([..], phase=..)`, or
   `RawValue(v)` for the value passed before.
@@ -196,6 +228,20 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 
 ### Fixed
 
+- Memoized calls kept objects that their callers could write to. The
+  warnings and delayed errors of a call that was found again were the
+  objects that an earlier caller had received: a hint or a tracepoint
+  added to one (`SourceDiagnostic::hint`, `trace`) was in what every
+  later caller got. The same for the styles of traced values, for a value
+  of the type `arguments` that a call returned, for the entries of a
+  rendered bibliography (`Works::bibliography`), and for the errors that
+  plugin loads, plugin calls and a flow's cached child layouts raise
+  again. Each is a copy now.
+- Two native functions, elements or types that a host makes with the same
+  name, title and documentation were one value wherever values are
+  compared by their fingerprints: a closure that captured the one was
+  equal to a closure that captured the other, and a memoized call of the
+  first answered for the second.
 - Compiling a world again after its files changed (as `typst watch` and a
   host that keeps a `World` do): a module of an imported file was found
   again by the text of that file alone, so it was reused although a file
@@ -305,6 +351,13 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   by its data).
 
 ### Added
+
+- `library`: `Introspector::serial`, a number (`Int64`) that says which
+  introspector one is (the same for the recording and the untracked forms
+  of one, zero for the empty ones). `Sink::kept` and `Sink::extend_from_kept`: a copy of
+  a sink for a store that keeps the effects of a call, and its replay,
+  which hands out copies of the diagnostics and of the styles of traced
+  values.
 
 - `library`: `TrackedWorld` (`new(world, volatile_files?)`, the reads
   `source`, `file`, `book`, `font`, `today`, and for hosts and stores
