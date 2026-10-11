@@ -624,6 +624,17 @@ fn source_answer_print(source : @syntax.Source) -> U128 {
 }
 
 ///|
+/// The fingerprint of a source as an argument of a memoized call: what an
+/// evaluation of the source is found by (`eval/import.mbt`; upstream
+/// hashes the `source: &Source` argument of `typst_eval::eval`, `Hash for
+/// Source`). It is the fingerprint of the source as an answer of the world
+/// ([TrackedWorld::source]): two sources have it in common only if they
+/// have the same id, the same text and the same span numbers.
+pub fn source_fingerprint(source : @syntax.Source) -> U128 {
+  source_answer_print(source)
+}
+
+///|
 /// The fingerprint of the bytes of a file that a world returned: the
 /// length and the bytes, as upstream's `Bytes` hashes, kept by the
 /// identity of the object ([data_hash]: a world that returns the same

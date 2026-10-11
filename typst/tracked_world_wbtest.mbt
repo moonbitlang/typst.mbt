@@ -164,8 +164,9 @@ test "recording: a module that failed is found with its reads" {
 
 ///|
 test "recording: a module that failed at the top level is checked too" {
-  // No memoized call is around the import: the entry of the module, which
-  // keeps the error, is the only one that has the read.
+  // No closure call or layout is around the import: the entry of the
+  // module, which keeps the error, and that of the main file, which failed
+  // with it, are the two that have the read.
   let world = reading_world("#import \"bad.typ\": x\n#x", sources=[
     ("bad.typ", "#let x = read(\"missing.txt\")\n"),
   ])
@@ -175,7 +176,7 @@ test "recording: a module that failed at the top level is checked too" {
     content="error: file not found (searched at missing.txt)",
   )
   inspect(checked.differ.join("\n"), content="")
-  inspect(checked.entries, content="1")
+  inspect(checked.entries, content="2")
 }
 
 ///|

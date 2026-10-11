@@ -2578,6 +2578,10 @@ pub fn route_queries_begin() -> Int
 
 pub fn route_queries_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
 
+pub fn route_shifts_begin() -> RouteShifts
+
+pub fn route_shifts_end(RouteShifts) -> RouteShifts
+
 pub fn rust_debug_f64(Double) -> String
 
 pub fn rust_display_f32(Float) -> String
@@ -2657,6 +2661,8 @@ pub let smart_quote_elem_double : Int
 pub let smart_quote_elem_enabled : Int
 
 pub let smart_quote_elem_quotes : Int
+
+pub fn source_fingerprint(@moonbitlang/typst/syntax.Source) -> U128
 
 pub fn[T] source_result(() -> T raise SourceError) -> Result[T, Array[SourceDiagnostic]]
 
@@ -10376,6 +10382,12 @@ pub fn Route::root() -> Self
 pub fn Route::unnested(Self) -> Self
 pub fn Route::with_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
 pub fn Route::within(Self, Int) -> Bool
+
+pub struct RouteShifts {
+  // private fields
+}
+pub fn RouteShifts::allows(Self, Int) -> Bool
+pub fn RouteShifts::note_reused(Self, Int) -> Unit
 
 pub(all) struct Routines {
   rules : () -> NativeRuleMap
