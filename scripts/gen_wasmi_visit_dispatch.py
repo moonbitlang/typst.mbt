@@ -57,7 +57,7 @@ def main():
     w("pub fn FuncTranslator::visit_operator(")
     w("  self : FuncTranslator,")
     w("  op : @wasmparser.Operator,")
-    w(") -> Unit raise Error {")
+    w(") -> Unit raise WasmiError {")
     w("  match op {")
     missing = []
     for name, fields in variants:
@@ -73,7 +73,7 @@ def main():
         for f, ty in fields:
             if ty == "Ieee32" or ty == "Ieee64":
                 args.append(f"{f}.bits()")
-            elif ty == "V128":
+            elif ty == "V128Value":
                 args.append(f"{f}.bytes().to_fixedarray()")
             elif ty == "Byte":
                 args.append(f"{f}.to_int()")

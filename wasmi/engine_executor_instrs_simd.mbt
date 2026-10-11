@@ -92,7 +92,7 @@ fn Executor::execute_i8x16_shuffle(
 fn Executor::execute_replace_lane_impl(
   self : Executor,
   result : @ir.Slot,
-  value : @wasmi_core.V128,
+  value : @wasmi_core.V128Value,
   delta : Int,
 ) -> Unit {
   self.set_stack_slot_as_v128(result, value)

@@ -2672,7 +2672,7 @@ pub fn WasmProposalValidator::visit_v128_store64_lane(
 ///|
 pub fn WasmProposalValidator::visit_v128_const(
   self : WasmProposalValidator,
-  value : V128,
+  value : V128Value,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.simd(), "SIMD")
   self.0.visit_v128_const(value)

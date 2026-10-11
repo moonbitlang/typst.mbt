@@ -339,7 +339,7 @@ pub(all) enum Operator {
   V128Store16Lane(memarg~ : MemArg, lane~ : Byte)
   V128Store32Lane(memarg~ : MemArg, lane~ : Byte)
   V128Store64Lane(memarg~ : MemArg, lane~ : Byte)
-  V128Const(value~ : V128)
+  V128Const(value~ : V128Value)
   I8x16Shuffle(lanes~ : FixedArray[Byte])
   I8x16ExtractLaneS(lane~ : Byte)
   I8x16ExtractLaneU(lane~ : Byte)

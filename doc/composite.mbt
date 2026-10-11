@@ -405,7 +405,7 @@ pub extend Composite with @debug.Debug::{to_repr}
 /// The kind of child of a table that a called function makes: `"cell"`,
 /// `"line"` (a horizontal or a vertical line), `"section"` (a header or a
 /// footer), or `""` for every other function.
-fn table_child_kind(func : FuncRef) -> String {
+fn table_child_kind(func : Callee) -> String {
   match func {
     FElem(elem) =>
       if elem == @library.table_cell_elem() {
@@ -441,7 +441,7 @@ fn span_of(span : Int64) -> Int {
 
 ///|
 /// `Content::table_cell_spans` of a call of `func` with `args`.
-fn call_spans(func : FuncRef, args : Array[ArgNode]) -> (Int, Int)? {
+fn call_spans(func : Callee, args : Array[ArgNode]) -> (Int, Int)? {
   match table_child_kind(func) {
     "cell" => {
       // The last argument of a name wins, as in Typst: also one that the

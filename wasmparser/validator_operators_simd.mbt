@@ -125,7 +125,7 @@ fn OperatorValidatorTemp::visit_v128_store(
 #warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_v128_const(
   self : OperatorValidatorTemp,
-  _value : V128,
+  _value : V128Value,
 ) -> Unit raise BinaryReaderError {
   self.push_operand(V128)
 }

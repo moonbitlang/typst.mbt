@@ -94,7 +94,7 @@ test "float literals match Rust" {
   ]
   for case in cases {
     let (text, bits) = case
-    let float : @ast.Float = first(text, Float)
+    let float : @ast.FloatLit = first(text, Float)
     assert_eq(float.to_untyped().leaf_text(), text)
     assert_eq(float.get().reinterpret_as_uint64(), bits)
     // The same value as the numeric part of a length (`1.pt` would be a
@@ -322,7 +322,7 @@ test "accessors on placeholders" {
   assert_true(
     @ast.IntLit::placeholder().get() is Err(PosOverflow(base=None, ..)),
   )
-  assert_eq(@ast.Float::placeholder().get(), 0.0)
+  assert_eq(@ast.FloatLit::placeholder().get(), 0.0)
   assert_eq(@ast.Numeric::placeholder().get().0, 0.0)
   assert_eq(@ast.Str::placeholder().get(), "")
   ignore(@ast.CodeBlock::placeholder().body())
