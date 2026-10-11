@@ -280,6 +280,8 @@ fn pinned_test_compiled(
     document: None,
     reparsed: [],
     cli_svg: Some(svg),
+    own_images: Some("images of \{svg}"),
+    own_pdf: Some(@utf8.encode(svg)),
   }
 }
 
@@ -353,6 +355,25 @@ test "recompile: the one difference from a fresh compilation that passes is upst
       content="fails: a fresh compilation does not give the SVG of upstream's fresh compilation",
     )
   }
+  // Upstream's pages, with a page image that the loop kept from the
+  // step before (its cache of page hashes), or with a PDF that is not
+  // what the document exports to: stale outputs behind the accepted one.
+  let stale_image : Compiled = {
+    ..pinned_test_compiled("WATCH"),
+    own_images: Some("images of FRESH"),
+  }
+  inspect(
+    pinned_test_verdict(differs, fresh, stale_image),
+    content="fails: the pages are what upstream's watch gives, but the page images of the watch loop are not those of its document",
+  )
+  let stale_pdf : Compiled = {
+    ..pinned_test_compiled("WATCH"),
+    own_pdf: Some(b"FRESH"),
+  }
+  inspect(
+    pinned_test_verdict(differs, fresh, stale_pdf),
+    content="fails: the pages are what upstream's watch gives, but the PDF of the watch loop is not what its document exports to",
+  )
   // A document that does not compile has no pages to be upstream's.
   let failed : Compiled = { ..pinned_test_compiled("WATCH"), cli_svg: None, }
   inspect(
@@ -382,7 +403,7 @@ test "recompile: the fixtures of upstream's watch" {
   // Those of the repository: each starts with a fresh compilation and has
   // a step at which upstream's watch gives something else.
   let pinned = pinned_sequences()
-  assert_eq(pinned.map(fixture => fixture.name), ["getter", "modules"])
+  assert_eq(pinned.map(fixture => fixture.name), ["getter", "modules", "nan"])
   for fixture in pinned {
     assert_true(fixture.steps[0].watch is None)
     assert_true(fixture.steps.iter().any(step => step.watch is Some(_)))

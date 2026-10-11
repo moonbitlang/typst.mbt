@@ -5,7 +5,7 @@
 pub struct NativeTypeData {
   /// What tells this descriptor from every other (`descriptor_serial` in
   /// `func.mbt`): its fingerprint.
-  priv serial : Int
+  priv serial : Int64
   /// The type's normal name (e.g. `str`), as exposed to Typst.
   name : String
   /// The type's long name (e.g. `string`), for error messages.

@@ -7600,7 +7600,7 @@ pub fn Introspector::query_first(Self, Selector) -> Content?
 pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
 pub fn Introspector::query_labelled(Self) -> Array[Content]
 pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
-pub fn Introspector::serial(Self) -> Int
+pub fn Introspector::serial(Self) -> Int64
 pub fn Introspector::track_with(Self, IntrospectionRecorder) -> Self
 pub fn Introspector::untracked(Self) -> Self
 

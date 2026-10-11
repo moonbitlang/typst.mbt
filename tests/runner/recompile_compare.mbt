@@ -63,6 +63,12 @@ priv struct Compiled {
   /// For a pinned sequence (`recompile_pinned.mbt`): the SVG of the
   /// document as the CLI writes it, if it compiled to one page.
   cli_svg : String?
+  /// For a pinned sequence: what the document of this compilation gives
+  /// without anything a watching process keeps, to compare its own
+  /// outputs with: the images of all its pages (not only those whose hash
+  /// changed), and its PDF exported once more with memoization off.
+  own_images : String?
+  own_pdf : Bytes?
 }
 
 ///|
@@ -79,6 +85,10 @@ let part_frames : Int = 2
 ///|
 /// The index of the SVG in [compiled_parts].
 let part_svg : Int = 4
+
+///|
+/// The index of the page images in [compiled_parts].
+let part_images : Int = 5
 
 ///|
 /// Where a span points in the world: `file:line:column-line:column
@@ -306,6 +316,8 @@ fn recompile_compile(
   let pdf_diagnostics = StringBuilder()
   let mut pdf : Bytes = b""
   let mut cli_svg = None
+  let mut own_images = None
+  let mut own_pdf = None
   let document = match warned.output {
     Ok(doc) => {
       diagnostics.write_string("ok\n")
@@ -344,6 +356,16 @@ fn recompile_compile(
         }
       }
       recompile_diagnostics(pdf_diagnostics, dyn_world, exported.warnings)
+      if pinned {
+        own_images = Some(PageFiles::new().write(doc))
+        let memoized = @library.content_memo_enabled()
+        @library.set_layout_memo_enabled(false)
+        own_pdf = match make_live(doc).output {
+          Ok(bytes) => Some(bytes)
+          Err(_) => None
+        }
+        @library.set_layout_memo_enabled(memoized)
+      }
       Some(doc)
     }
     Err(errors) => {
@@ -369,6 +391,8 @@ fn recompile_compile(
     document,
     reparsed,
     cli_svg,
+    own_images,
+    own_pdf,
   }
   (compiled, ids)
 }

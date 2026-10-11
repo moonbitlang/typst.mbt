@@ -140,6 +140,41 @@ test "owned: a call without effects keeps no sink" {
 }
 
 ///|
+/// A value of the type `arguments` is an object that reading consumes
+/// (`Args::eat`, `named`, `finish`: the way native code takes arguments),
+/// and it has no mark that makes a writer copy it. A store keeps a copy
+/// and hands out copies ([kept_value]).
+test "owned: arguments that a kept call returned or traced are copies" {
+  memo_test_begin()
+  defer memo_test_end()
+  let mut runs = 0
+  // `all(..args) = args`, tracing what it returns.
+  let body : ClosureBody = (func, _, engine, _, args) => {
+    runs += 1
+    let rest = Args::new(func.span, args.all())
+    args.finish()
+    engine.sink.value(Args(rest.copy()), None)
+    Args(rest)
+  }
+  let f = memo_test_func(1)
+  for _ in 0..<3 {
+    let engine = memo_engine()
+    let result = memo_call(f, engine, Context::none(), [Int(1), Str("a")], body)
+    guard result is Args(returned) else { fail("not arguments") }
+    assert_eq(returned.items.length(), 2)
+    guard engine.sink.values is [(Args(traced), _)] else {
+      fail("no traced arguments")
+    }
+    assert_eq(traced.items.length(), 2)
+    // What a native function does with arguments it is given.
+    returned.eat_spanned() |> ignore
+    traced.eat_spanned() |> ignore
+    assert_eq(returned.items.length(), 1)
+  }
+  assert_eq(runs, 1)
+}
+
+///|
 test "owned: the entries of a rendered bibliography are the caller's" {
   let listed = Location::new(hash128("bibliography"))
   let entry : RenderedEntry = {

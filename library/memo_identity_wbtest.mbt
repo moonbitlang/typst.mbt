@@ -264,6 +264,48 @@ test "identity: closures that captured two host closures with one key are two ar
 }
 
 ///|
+/// The same where the comparison of two arguments does not walk into them
+/// but asks `==`: a tiling holds a frame, whose tags hold content, and a
+/// stroke holds a paint that can be a tiling.
+test "identity: tilings and strokes that hold two host closures with one key are two arguments" {
+  let one = memo_test_host("same", 1)
+  let other = memo_test_host("same", 2)
+  let node = @syntax.parse_code("x")
+  let elem = TextElem::packed("x").elem()
+  let tiling = (host : HostFunc) => {
+    let frame = Frame::soft(Axes::new(Abs::pt(10.0), Abs::pt(10.0)))
+    let getter = test_closure(node, Func(Func::host(host)))
+    frame.push(
+      Point::zero(),
+      Tag(
+        Start(Content::from_fields(elem, [Some(getter)]), {
+          introspectable: true,
+          tagged: false,
+        }),
+      ),
+    )
+    test_tiling(frame)
+  }
+  let a = Value::Tiling(tiling(one))
+  let b = Value::Tiling(tiling(other))
+  // (Typst's `==` of two tiling values is `false`; this is the equality
+  // of what they are made of, which the comparison of arguments asks.)
+  assert_true(tiling(one) == tiling(other))
+  assert_eq(hash128(a), hash128(b))
+  for _ in 0..<2 {
+    assert_false(values_memo_equal(a, b))
+    assert_true(values_memo_equal(a, Value::Tiling(tiling(one))))
+  }
+  // Without a host closure nothing is walked: `==` decides.
+  let plain = () => {
+    Value::Tiling(
+      test_tiling(Frame::soft(Axes::new(Abs::pt(10.0), Abs::pt(10.0)))),
+    )
+  }
+  assert_true(values_memo_equal(plain(), plain()))
+}
+
+///|
 /// Two modules that hold the same (`Module::new` twice, as a host can) have
 /// one fingerprint and are one argument, also where a closure captured
 /// them: upstream's memoized calls take arguments by their hashes, and the

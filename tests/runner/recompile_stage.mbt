@@ -348,6 +348,17 @@ fn run_recompile_stage(
         println("TIME \{@env.now() - start} ms \{document.name}")
       }
     }
+    // The steps that were accepted as upstream's watch are as many as they
+    // must be ([pinned_as_upstream_expected]), if all pinned sequences ran.
+    if label == "recompile upstream" &&
+      !documents.is_empty() &&
+      documents.iter().all(document => selected(document.name)) &&
+      stats.pinned_as_upstream != pinned_as_upstream_expected {
+      failed += 1
+      failures.push(
+        "FAIL upstream :: the watch loop gave upstream's watch output instead of a fresh compilation's at \{stats.pinned_as_upstream} steps, expected \{pinned_as_upstream_expected} (\{pinned_dir}; tests/recompile/README.md, \"As upstream's watch\")",
+      )
+    }
     // A listed document that is not there fails.
     for name in missing {
       let mine = label != "recompile upstream" &&

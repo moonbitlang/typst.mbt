@@ -34,7 +34,7 @@ pub extend Label with Fingerprint::{fingerprint}
 /// (`grid.cell` and `table.cell` are both `cell`), and two elements that a
 /// host makes can share every text.
 pub impl Fingerprint for Element with fn fingerprint(self, state) {
-  state.write_usize(self.0.serial)
+  state.write_i64(self.0.serial)
 }
 
 ///|
@@ -340,7 +340,7 @@ pub extend Args with Fingerprint::{fingerprint}
 /// Upstream derives `Hash` for `Type(Static<NativeTypeData>)`: the address
 /// of the descriptor. Here its number (`descriptor_serial` in `func.mbt`).
 pub impl Fingerprint for Type with fn fingerprint(self, state) {
-  state.write_usize(self.0.serial)
+  state.write_i64(self.0.serial)
 }
 
 ///|
@@ -577,7 +577,7 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
     // functions can share.
     Native(data) => {
       state.write_discriminant(0)
-      state.write_usize(data.serial)
+      state.write_i64(data.serial)
     }
     Element(elem) => {
       state.write_discriminant(1)

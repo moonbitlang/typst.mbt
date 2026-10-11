@@ -103,7 +103,7 @@ pub struct ElementData {
   /// What tells this descriptor from every other (`descriptor_serial` in
   /// `func.mbt`): its fingerprint, as the address of the vtable is
   /// upstream's.
-  priv serial : Int
+  priv serial : Int64
   /// The element's normal name (e.g. `heading`).
   name : String
   /// A name that is unique among the elements of the standard library (not

@@ -185,19 +185,19 @@ pub struct Introspector {
   priv backend : &IntrospectorBackend
   priv recorder : IntrospectionRecorder?
   /// Which introspector this is ([Introspector::serial]).
-  priv serial : Int
+  priv serial : Int64
 }
 
 ///|
 /// The number of introspectors made so far ([Introspector::new]).
-let introspector_serials : Ref[Int] = { val: 0, }
+let introspector_serials : Ref[Int64] = { val: 0L, }
 
 ///|
 /// Wrap a target-specific introspector. Every call makes another
 /// introspector ([Introspector::serial]): whoever asks one backend again
 /// and again keeps what this returned, as a document does.
 pub fn Introspector::new(backend : &IntrospectorBackend) -> Introspector {
-  introspector_serials.val += 1
+  introspector_serials.val += 1L
   { backend, recorder: None, serial: introspector_serials.val, }
 }
 
@@ -205,7 +205,7 @@ pub fn Introspector::new(backend : &IntrospectorBackend) -> Introspector {
 /// An introspector that returns empty results for all inquiries (upstream
 /// `EmptyIntrospector`).
 pub fn Introspector::empty() -> Introspector {
-  { backend: EmptyIntrospector(()), recorder: None, serial: 0, }
+  { backend: EmptyIntrospector(()), recorder: None, serial: 0L, }
 }
 
 ///|
@@ -236,7 +236,10 @@ pub fn Introspector::untracked(self : Introspector) -> Introspector {
 /// was computed with, for the lookup that needs no validation of its reads
 /// (`memo.mbt`). An entry kept the backend itself for that, and with it
 /// every located element of a document for as long as the entry lived.
-pub fn Introspector::serial(self : Introspector) -> Int {
+/// (64 bits: a watching process makes an introspector per layout
+/// iteration, and a counter of 32 bits that comes round would give a
+/// document the number of the empty ones.)
+pub fn Introspector::serial(self : Introspector) -> Int64 {
   self.serial
 }
 

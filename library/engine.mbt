@@ -377,7 +377,8 @@ pub fn Sink::kept(self : Sink) -> Sink {
 ///|
 /// Extend from the sink that a store keeps ([Sink::kept]): like
 /// [Sink::extend_from_sink], with a copy of every diagnostic and of the
-/// styles of every traced value, whose containers are marked shared.
+/// styles of every traced value, whose containers are marked shared and
+/// whose `arguments` are copied (`kept_value` in `memo.mbt`).
 /// Introspections are immutable.
 pub fn Sink::extend_from_kept(self : Sink, kept : Sink) -> Unit {
   self.introspections.append(kept.introspections)
@@ -398,7 +399,7 @@ pub fn Sink::extend_from_kept(self : Sink, kept : Sink) -> Unit {
       Some(styles) => Some(styles.copy())
       None => None
     }
-    self.values.push((value.shared(), styles))
+    self.values.push((kept_value(value), styles))
   }
 }
 

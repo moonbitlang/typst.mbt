@@ -156,6 +156,9 @@ def record(binary, steps):
             watch_check.write(os.path.join(work, path), text.encode())
         session = watch_check.Session([binary], args, work)
         session.wait_compiled(0)
+        statuses = session.statuses(0)
+        if not statuses or not statuses[-1].startswith("compiled successfully"):
+            raise SystemExit(f"the first compilation failed: {statuses}")
         for i, (_, files) in enumerate(steps):
             if i > 0:
                 # Let the watcher see one change, not half of one.
@@ -164,8 +167,11 @@ def record(binary, steps):
                 for path, text in files.items():
                     watch_check.write(os.path.join(work, path), text.encode())
                 session.wait_compiled(mark)
-                if not session.statuses(mark):
-                    raise SystemExit(f"step {i}: no recompilation")
+                statuses = session.statuses(mark)
+                # The SVG on disk is this step's only if the watching
+                # process compiled and exported it.
+                if not statuses or not statuses[-1].startswith("compiled successfully"):
+                    raise SystemExit(f"step {i}: no successful recompilation: {statuses}")
             with open(os.path.join(work, "out.svg"), encoding="utf-8") as f:
                 watched = f.read()
             fresh_path = os.path.join(work, "fresh.svg")

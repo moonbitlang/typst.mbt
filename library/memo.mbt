@@ -86,7 +86,7 @@ priv struct MemoEntry[T, I] {
   world : WorldReads
   /// The introspector the result was computed with
   /// ([Introspector::serial]).
-  introspector : Int
+  introspector : Int64
   /// The introspector reads of the call.
   reads : IntrospectionRecorder
   /// The sink side effects of the call (`None`: none), as a copy that no
@@ -596,9 +596,29 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     (Dyn(x), Dyn(y)) => dyns_memo_equal(x, y)
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
-    (Tiling(x), Tiling(y)) => x == y
+    // A tiling holds a frame, whose tags hold content: compared by `==`,
+    // which takes a closure by its hash.
+    (Tiling(x), Tiling(y)) => x == y && hosts_memo_equal(a, b)
     _ => a == b
   }
+}
+
+///|
+/// For two values that `==` takes for one and that this comparison does
+/// not walk into (a tiling's frame, a stroke's paint): whether the host
+/// closures they hold are the same objects, in the order in which their
+/// fingerprints visit them. `==` gets to a closure in them as Typst does,
+/// by its hash, which has the key of a host closure that it captured and
+/// not the object.
+fn[T : Fingerprint] hosts_memo_equal(a : T, b : T) -> Bool {
+  let outer = fingerprint_flags.val
+  fingerprint_flags.val = 0
+  hash128(a) |> ignore
+  hash128(b) |> ignore
+  let flags = fingerprint_flags.val
+  fingerprint_flags.val = outer
+  (flags & fingerprint_host) == 0 ||
+  same_hosts(() => hash128(a) |> ignore, () => hash128(b) |> ignore)
 }
 
 ///|
@@ -638,6 +658,9 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
       }
       true
     }
+    // What holds a paint holds a tiling's frame, as above.
+    (Stroke(_), Stroke(_)) | (Decoration(_), Decoration(_)) =>
+      a == b && hosts_memo_equal(a, b)
     _ => a == b
   }
 }
@@ -942,6 +965,21 @@ pub fn memoized_layout(
 }
 
 ///|
+/// A value as a store keeps it and as it hands it out again: the same
+/// value in an object that the other side cannot write to. Arrays and
+/// dictionaries are marked shared, so that a mutation copies them
+/// ([Value::shared], the evaluator's rule for every second holder). A
+/// value of the type `arguments` has no such mark, and the way to read one
+/// from native code consumes it (`Args::eat`, `named`, `finish`): it is
+/// copied, with its items marked shared.
+fn kept_value(value : Value) -> Value {
+  match value {
+    Args(args) => Args(args.copy())
+    value => value.shared()
+  }
+}
+
+///|
 /// Whether a laid-out frame can be reused: its tags must not hold host
 /// closures (`fingerprint_identity`), which compare by identity and whose
 /// fingerprint is a key of the host's. The same holds for the frames of
@@ -1023,7 +1061,8 @@ fn paint_cacheable(paint : Paint) -> Bool {
 //   which must be the same in the scope of a later call. The library is
 //   compared by identity (upstream hashes it).
 // - Results are values: containers are marked shared, so that a mutation
-//   through one holder copies them. A result may hold closures that the
+//   through one holder copies them, and a value of the type `arguments`,
+//   which has no such mark, is copied ([kept_value]). A result may hold closures that the
 //   call created: they are equal to the ones a repeated call would create
 //   (`closures_equal`), like upstream's.
 
@@ -1057,7 +1096,7 @@ priv struct ClosureEntry {
   world : WorldReads
   /// The introspector the result was computed with
   /// ([Introspector::serial]).
-  introspector : Int
+  introspector : Int64
   /// The introspector reads of the call (`None`: none).
   reads : IntrospectionRecorder?
   /// The sink side effects of the call (`None`: none), as a copy that no
@@ -1494,7 +1533,7 @@ pub fn memoized_closure(
           // The call consumed all of its arguments (`args.finish()`), which
           // a caller that passed its own arguments on goes on to check.
           args.items.clear()
-          return entry.output
+          return kept_value(entry.output)
         }
       }
     }
@@ -1630,7 +1669,7 @@ pub fn memoized_closure(
       Some(sink.kept())
     },
     compilation: key.compilation(),
-    output: output.shared(),
+    output: kept_value(output),
   }
   let key = key.hash
   match store.entries.get(key) {
