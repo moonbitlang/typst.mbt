@@ -91,7 +91,7 @@ fn GlyphFragment::new(
 
 ///|
 fn GlyphFragment::planned(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   styles : @library.StyleChain,
   text : String,
   class : @unicode.MathClass,
@@ -128,7 +128,7 @@ fn GlyphFragment::planned(
 
 ///|
 fn GlyphFragment::base(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   styles : @library.StyleChain,
   features : Array[@shape.Feature],
   text : String,

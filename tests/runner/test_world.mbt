@@ -363,7 +363,7 @@ fn define_test_styles(lib : @library.Library) -> Unit {
 fn define_test_colors(lib : @library.Library) -> Unit {
   let world : TestWorld = { main: @syntax.Source::detached(""), library: lib, }
   let engine : @library.Engine = {
-    world,
+    world: @library.TrackedWorld::new(world),
     library: lib,
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),
@@ -545,7 +545,7 @@ fn eval_report(rel : String, tc : TestCase) -> String {
   let out = StringBuilder()
   try
     @eval.eval_source(
-      world,
+      @library.TrackedWorld::new(world),
       library,
       @library.Traced::new(),
       sink,

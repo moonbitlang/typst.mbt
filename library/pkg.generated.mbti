@@ -58,7 +58,7 @@ pub let alignment_start : Alignment
 
 pub let alignment_top : Alignment
 
-pub fn analyze(&World, Array[Introspector], ArrayView[Introspection]) -> Array[SourceDiagnostic]
+pub fn analyze(TrackedWorld, Library, Array[Introspector], ArrayView[Introspection]) -> Array[SourceDiagnostic]
 
 pub fn and_(Value, Value) -> Value raise HintedError
 
@@ -744,8 +744,6 @@ pub fn compare(Value, Value) -> Int raise HintedError
 
 pub fn compare_str(String, String) -> Int
 
-pub fn compilation_epoch() -> Int
-
 pub fn contains(BindingGuard, Value, Value) -> Bool?
 
 pub fn content_memo_enabled() -> Bool
@@ -959,10 +957,6 @@ pub let equation_elem_size : Int
 pub let equation_elem_supplement : Int
 
 pub let equation_elem_variant : Int
-
-pub fn evaluation_begin() -> Unit
-
-pub fn evaluation_end() -> Unit
 
 pub fn evict(Int) -> Unit
 
@@ -1436,7 +1430,7 @@ pub fn list_item_elem() -> Element
 
 pub let list_item_elem_body : Int
 
-pub fn load_many(@moonbitlang/typst/syntax.Spanned[Array[DataSource]], &World) -> Array[Loaded] raise SourceError
+pub fn load_many(@moonbitlang/typst/syntax.Spanned[Array[DataSource]], TrackedWorld) -> Array[Loaded] raise SourceError
 
 pub fn localized_str(String, String?, String) -> String
 
@@ -1503,6 +1497,12 @@ pub let max_iters : Int
 pub let max_layout_depth : Int
 
 pub let max_show_rule_depth : Int
+
+pub fn memo_check_enabled() -> Bool
+
+pub fn memo_check_reads(() -> String, TrackedWorld, WorldReads, () -> Unit raise SourceError) -> Unit
+
+pub fn memo_check_running_now() -> Bool
 
 pub fn memo_compilation() -> Int
 
@@ -2528,6 +2528,8 @@ pub fn regex_escape(String) -> String
 
 pub fn register_evictor((Int) -> Unit) -> Unit
 
+pub fn register_memo_check_store(() -> () -> Unit) -> Unit
+
 pub fn rem_euclid(Double, Double) -> Double
 
 pub fn repeat_elem() -> Element
@@ -2621,6 +2623,8 @@ pub fn separated_list(ArrayView[String], String) -> String
 pub fn sequence_elem() -> Element
 
 pub fn set_layout_memo_enabled(Bool) -> Unit
+
+pub fn set_memo_check(Bool) -> Unit
 
 pub fn should_outline(FontInstance, UInt16) -> Bool
 
@@ -3150,6 +3154,8 @@ pub let tag_video : HtmlTag
 
 pub let tag_wbr : HtmlTag
 
+pub fn take_memo_check_report() -> (Int, Array[String])
+
 pub fn target_elem() -> Element
 
 pub let target_elem_target : Int
@@ -3352,7 +3358,9 @@ pub fn[T] with_layout_memo(() -> T raise SourceError) -> T raise SourceError
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
-pub fn world_range(&World, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
+pub fn world_range(TrackedWorld, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
+
+pub fn world_scope_open(Int) -> Bool
 
 // Errors
 pub(all) suberror FieldAccessError {
@@ -3937,8 +3945,8 @@ pub fn Bibliography::iter(Self) -> Iter[(Label, @hayagriva.Entry)]
 pub impl Show for Bibliography
 
 pub struct BibliographyElem(Content)
-pub fn BibliographyElem::csl_style(Self, &World) -> CslStyle
-pub fn BibliographyElem::database(Self, &World) -> Bibliography
+pub fn BibliographyElem::csl_style(Self, TrackedWorld) -> CslStyle
+pub fn BibliographyElem::database(Self, TrackedWorld) -> Bibliography
 pub fn BibliographyElem::full(Self, StyleChain) -> Bool
 pub fn BibliographyElem::full_in(StyleChain) -> Bool
 pub fn BibliographyElem::full_local(Self) -> Bool?
@@ -3946,7 +3954,7 @@ pub fn BibliographyElem::group(Self, StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_in(StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_local(Self) -> Smart[String]??
 pub fn BibliographyElem::has(Engine, Label, @moonbitlang/typst/syntax.Span) -> Bool
-pub fn BibliographyElem::keys(&World, Introspector) -> Array[(Label, String?)]
+pub fn BibliographyElem::keys(TrackedWorld, Introspector) -> Array[(Label, String?)]
 pub fn BibliographyElem::lang(Self) -> Lang?
 pub fn BibliographyElem::new(OneOrMultiple[DataSource]) -> Self
 pub fn BibliographyElem::of(Content) -> Self?
@@ -5230,7 +5238,7 @@ pub fn DataSource::castable(Value) -> Bool
 pub fn DataSource::from_value(Value) -> Self raise HintedError
 pub fn DataSource::input() -> CastInfo
 pub fn DataSource::into_value(Self) -> Value
-pub fn DataSource::load(Self, @moonbitlang/typst/syntax.Span, &World) -> Loaded raise SourceError
+pub fn DataSource::load(Self, @moonbitlang/typst/syntax.Span, TrackedWorld) -> Loaded raise SourceError
 pub fn DataSource::output() -> CastInfo
 pub impl FromValue for DataSource
 pub impl IntoValue for DataSource
@@ -5825,7 +5833,7 @@ pub impl IntoValue for Endianness
 pub impl Reflect for Endianness
 
 pub(all) struct Engine {
-  world : &World
+  world : TrackedWorld
   library : Library
   introspector : Introspector
   traced : Traced
@@ -6228,6 +6236,7 @@ pub fn Font::instantiate_with(Self, FontVariations) -> FontInstance
 pub fn Font::iter(Bytes) -> Array[Self]
 pub fn Font::new(Bytes, UInt, &FontFace) -> Self
 pub fn Font::post_script_name(Self) -> String?
+pub fn Font::serial(Self) -> Int
 pub fn Font::ttf(Self) -> @otf.Face?
 pub impl Eq for Font
 pub impl Hash for Font
@@ -6245,6 +6254,7 @@ pub struct FontBook {
   // private fields
 }
 pub fn FontBook::contains_family(Self, String) -> Bool
+pub fn FontBook::edition(Self) -> Int
 pub fn FontBook::families(Self) -> Array[(String, Array[Int])]
 pub fn FontBook::from_fonts(Array[Font]) -> Self
 pub fn FontBook::from_infos(Array[FontInfo]) -> Self
@@ -11405,7 +11415,7 @@ pub fn SvgImage::new(Bytes) -> Self raise LoadErr
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
 pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double
-pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @moonbitlang/typst/syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
+pub fn SvgImage::with_fonts_images(Bytes, TrackedWorld, Array[String], @moonbitlang/typst/syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
 pub impl Eq for SvgImage
 pub impl Hash for SvgImage
 
@@ -12125,6 +12135,24 @@ pub impl FromValue for TrackSizings
 pub impl IntoValue for TrackSizings
 pub impl Reflect for TrackSizings
 
+pub struct TrackedWorld {
+  // private fields
+}
+pub fn TrackedWorld::book(Self) -> FontBook
+pub fn TrackedWorld::file(Self, @moonbitlang/typst/syntax.FileId) -> Bytes raise FileError
+pub fn TrackedWorld::font(Self, Int) -> Font?
+pub fn TrackedWorld::in_scope(Self) -> Bool
+pub fn TrackedWorld::is_volatile(Self, @moonbitlang/typst/syntax.FileId) -> Bool
+pub fn TrackedWorld::new(&World, volatile_files? : (@moonbitlang/typst/syntax.FileId) -> Bool) -> Self
+pub fn TrackedWorld::reads_abort(Self, WorldReadsMark) -> Unit
+pub fn TrackedWorld::reads_begin(Self) -> WorldReadsMark
+pub fn TrackedWorld::reads_end(Self, WorldReadsMark) -> WorldReads
+pub fn TrackedWorld::scope_token(Self) -> Int
+pub fn[T] TrackedWorld::scoped(Self, () -> T raise SourceError) -> T raise SourceError
+pub fn TrackedWorld::source(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.Source raise FileError
+pub fn TrackedWorld::today(Self, Duration?) -> Datetime?
+pub fn TrackedWorld::validate(Self, WorldReads) -> Bool
+
 pub(all) struct Transform {
   sx : Ratio
   ky : Ratio
@@ -12612,6 +12640,17 @@ pub struct Works {
 pub fn Works::bibliography(Self, Location, @moonbitlang/typst/syntax.Span) -> RenderedBibliography raise SourceError
 pub fn Works::citation(Self, Location, @moonbitlang/typst/syntax.Span) -> Content raise SourceError
 pub fn Works::generate(Engine, @moonbitlang/typst/syntax.Span) -> Self raise SourceError
+
+pub struct WorldReads {
+  // private fields
+}
+pub fn WorldReads::describe(Self) -> Array[String]
+pub fn WorldReads::is_volatile(Self) -> Bool
+pub fn WorldReads::length(Self) -> Int
+
+pub struct WorldReadsMark {
+  // private fields
+}
 
 pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn WritingScript::as_str(Self) -> String

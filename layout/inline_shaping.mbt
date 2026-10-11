@@ -1167,7 +1167,7 @@ pub fn FamilyIter::clone(self : FamilyIter) -> FamilyIter {
 ///|
 /// Holds shaping results and metadata common to all shaped segments.
 priv struct ShapingContext {
-  world : &@library.World
+  world : @library.TrackedWorld
   glyphs : Array[ShapedGlyph]
   used : Array[@library.FontInstance]
   styles : @library.StyleChain
@@ -1184,7 +1184,7 @@ priv struct ShapingContext {
 /// Shared state of text and math shaping contexts (upstream
 /// `SharedShapingContext`).
 pub(open) trait SharedShapingContext {
-  fn world(Self) -> &@library.World
+  fn world(Self) -> @library.TrackedWorld
   /// Font families that have been used with unlimited coverage.
   ///
   /// These font families are considered exhausted and will not be used

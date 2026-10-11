@@ -501,7 +501,7 @@ fn should_repeat_hyphen(
 ///|
 /// Apply the current baseline shift and italic compensation to a frame.
 fn apply_shift(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   frame : @library.Frame,
   styles : @library.StyleChain,
 ) -> Unit {

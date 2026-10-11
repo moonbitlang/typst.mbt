@@ -5,7 +5,7 @@ fn test_lower() -> Lowering {
   let session = Session::new(world)
   let session_world : SessionWorld = { session, }
   let engine : @library.Engine = {
-    world: session_world,
+    world: session.tracked(session_world),
     library: world.library,
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),

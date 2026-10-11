@@ -595,7 +595,7 @@ fn math_families(styles : @library.StyleChain) -> Array[@library.FontFamily] {
 ///|
 /// Get the current base font.
 fn get_font(
-  world : &@library.World,
+  world : @library.TrackedWorld,
   styles : @library.StyleChain,
   span : @syntax.Span,
 ) -> @library.FontInstance raise @library.SourceError {

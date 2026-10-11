@@ -23,7 +23,8 @@ let instances : Int = max_iters + 1
 /// `introspectors` must hold `max_iters + 1` introspectors: the empty one,
 /// followed by those of the documents built in each iteration.
 pub fn analyze(
-  world : &World,
+  world : TrackedWorld,
+  library : Library,
   introspectors : Array[Introspector],
   introspections : ArrayView[Introspection],
 ) -> Array[SourceDiagnostic] {
@@ -32,7 +33,7 @@ pub fn analyze(
   }
   let sink = Sink::new()
   for introspection in introspections {
-    if (introspection.diagnose)(world, introspectors) is Some(warning) {
+    if (introspection.diagnose)(world, library, introspectors) is Some(warning) {
       sink.warn(warning)
     }
   }
@@ -111,7 +112,7 @@ pub fn[T] Introspect::new(
 pub struct Introspection {
   /// Computes the history of the introspection over the given introspectors
   /// and produces a diagnostic if it did not converge.
-  priv diagnose : (&World, Array[Introspector]) -> SourceDiagnostic?
+  priv diagnose : (TrackedWorld, Library, Array[Introspector]) -> SourceDiagnostic?
 }
 
 ///|
@@ -120,8 +121,13 @@ pub fn[T : Fingerprint] Introspection::new(
   inner : Introspect[T],
 ) -> Introspection {
   {
-    diagnose: (world, introspectors) => {
-      let history = History::compute(world, introspectors, inner.introspect)
+    diagnose: (world, library, introspectors) => {
+      let history = History::compute(
+        world,
+        library,
+        introspectors,
+        inner.introspect,
+      )
       if history.converged() {
         None
       } else {
@@ -149,14 +155,15 @@ pub fn[T] History::from_entries(
 ///|
 /// Computes the value for each introspector with an ad-hoc engine.
 fn[T] History::compute(
-  world : &World,
+  world : TrackedWorld,
+  library : Library,
   introspectors : Array[Introspector],
   f : (Engine, Introspector) -> T,
 ) -> History[T] {
   {
     entries: introspectors.map(introspector => {
       let engine : Engine = {
-        library: world.library(),
+        library,
         world,
         introspector,
         traced: Traced::new(),

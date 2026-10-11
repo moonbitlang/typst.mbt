@@ -41,7 +41,7 @@ fn test_engine() -> @library.Engine {
   let library = @library.Library::builder(routines, []).build()
   let world : TestWorld = { library, }
   {
-    world,
+    world: @library.TrackedWorld::new(world),
     library,
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),
