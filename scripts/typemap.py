@@ -329,7 +329,7 @@ def mbt_type(rust):
         if any(x == "Value" and a != "Value" for x, a in zip(mapped, args)):
             return "Value"
         if m.group(1) == "Axes" and mapped == ["Abs"]:
-            # A size: the port has no values of type `Axes[Abs]`.
+            # A size: nothing in the port takes an `Axes[Abs]`.
             return "Size"
         return f"{GENERICS[m.group(1)]}[{', '.join(mapped)}]"
     return "Value"

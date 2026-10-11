@@ -330,7 +330,10 @@ fn open_group(
   id : Int,
 ) -> Unit {
   let group = groups.get(id)
+  // The kind is asked first (not upstream): the option of a page size is
+  // an object here, and most groups are not artifacts.
   if state.current_artifact is None &&
+    group.kind is Artifact(_) &&
     group.kind.to_artifact(options, fc.page_size()) is Some(ty) {
     state.current_artifact = Some((id, ty))
     surface.start_tagged(Artifact(ty)) |> ignore
@@ -363,7 +366,9 @@ fn open_multiple_groups(
   let text_attr_start = state.text_attrs.len()
   for id in rev {
     let group = tree.groups.get(id)
-    if group.kind.to_artifact(options, fc.page_size()) is Some(ty) {
+    // The kind is asked first, as in `open_group`.
+    if group.kind is Artifact(_) &&
+      group.kind.to_artifact(options, fc.page_size()) is Some(ty) {
       new_artifact = Some((id, ty))
     }
     if tree.ctx.alt(group.kind) is Some(_) {

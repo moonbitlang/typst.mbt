@@ -24,7 +24,8 @@
 //   and `zip_map` where they give a size again. They do what the generic
 //   ones do (`min`/`max` are `Ord`'s, as there, not `Abs::min`).
 //   `map_axes` is `map` to another component type
-//   (`size.map_axes(Abs::is_finite)`).
+//   (`size.map_axes(Abs::is_finite)`); `zip_map` takes an `Axes[V]`, and
+//   `zip_map_size` another size.
 // - What `size.rs` adds has upstream's names, which the alias could not
 //   have next to the generic methods: `Size::zero()`, `is_zero()`,
 //   `is_finite()`, `+`, `-`, unary `-` (they were `Axes::zero_size`,
@@ -45,11 +46,12 @@
 //
 // - No identity: `physical_equal` on value types is always false on
 //   native. Nothing compared sizes that way.
-// - It is boxed where a generic container holds it: `Size?` (the option
-//   of an object was the object; `Some(size)` is an object now:
-//   `Regions::iter`, the page size of `pdf`'s frame context),
-//   `Iter[Size]`, `Array[Size]`. In a tuple, a struct or the payload of an
-//   enum it is inline.
+// - It is boxed in an option: the option of an object was the object, and
+//   `Some(size)` is an object now. That is what an `Iter[Size]` yields
+//   (`Regions::iter`, one more object than before per iteration, for the
+//   first region) and what `pdf`'s `FrameContext::page_size` returns
+//   (which is asked for artifacts only, see `pdf/tags_tree.mbt`). In an
+//   array, a tuple, a struct or the payload of an enum it is inline.
 //
 // `Eq`, `Hash` and `Default` are derived and are what the derived impls of
 // `Axes[Abs]` were (the components in order). There is no `Fingerprint`
@@ -149,6 +151,17 @@ pub fn[V] Size::zip_map(
   self : Size,
   other : Axes[V],
   f : (Abs, V) -> Abs,
+) -> Size {
+  { x: f(self.x, other.x), y: f(self.y, other.y), }
+}
+
+///|
+/// `zip_map` of two sizes (upstream `Axes::zip_map`; the name of the twin
+/// of `Axes[T]`, `zip_map_size`).
+pub fn Size::zip_map_size(
+  self : Size,
+  other : Size,
+  f : (Abs, Abs) -> Abs,
 ) -> Size {
   { x: f(self.x, other.x), y: f(self.y, other.y), }
 }

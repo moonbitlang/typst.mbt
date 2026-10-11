@@ -10740,6 +10740,7 @@ pub fn Size::with_x(Abs) -> Self
 pub fn Size::with_y(Abs) -> Self
 pub fn Size::zero() -> Self
 pub fn[V] Size::zip_map(Self, Axes[V], (Abs, V) -> Abs) -> Self
+pub fn Size::zip_map_size(Self, Self, (Abs, Abs) -> Abs) -> Self
 pub impl Add for Size
 pub impl Neg for Size
 pub impl Sub for Size

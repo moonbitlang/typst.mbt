@@ -765,7 +765,7 @@
   the header of `library/size.mbt` for what `Size` has of `Axes[T]`, the
   twins of the generic functions (`select_size`, `zip_map_size`,
   `sum_by_axis_size`, `map_axes`) and what boxes a size again: an option,
-  an `Iter`, an `Array`); flatten tuple fields of per-glyph structs; loop
+  so also what an `Iter[Size]` yields); flatten tuple fields of per-glyph structs; loop
   instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
   `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
   default>)`; build constant style defaults once (`Value::shared`);

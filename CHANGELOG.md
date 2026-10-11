@@ -191,17 +191,20 @@ Typst source) are unchanged.
     `all`, `with_x`, `with_y`, and `map` and `zip_map` where the result
     is a size (`size.map((Abs) -> Abs)`, `size.zip_map(Axes[V], (Abs, V)
     -> Abs)`). `size.map_axes(f)` is `map` to an `Axes[U]`
-    (`size.map_axes(Abs::is_finite)`).
+    (`size.map_axes(Abs::is_finite)`), and `a.zip_map_size(b, f)` is
+    `zip_map` of two sizes. `zip`, and a size where another generic
+    function takes an `Axes[T]` (`unwrap_or_smart`), need `to_axes()`.
   - Three generic functions have a twin for sizes:
     `Axes[Bool]::select_size(Size, Size) -> Size` (`select`),
     `Axes[T]::zip_map_size(Size, (T, Abs) -> Abs) -> Size` (`zip_map`)
     and `Sides[Abs]::sum_by_axis_size() -> Size` (`sum_by_axis`, which
     still returns an `Axes[T]`).
-  - `Size` implements `Eq`, `Hash`, `Default`, `Add`, `Sub`, `Neg`,
-    `Numeric`, `Reflect`, `FromValue` and `IntoValue` (an array of two
-    lengths), which is what `Axes[Abs]` implemented, and `Numeric` as
-    upstream. It has no identity: `physical_equal` on two sizes is false
-    on native.
+  - `Size` implements `Eq`, `Hash`, `Default`, `Reflect`, `FromValue`
+    and `IntoValue` (an array of two lengths), as `Axes[Abs]` did, and,
+    new, `Add`, `Sub`, `Neg` and `Numeric`, as upstream. `into_value` is
+    called through its trait (`IntoValue::into_value(size)`;
+    `axes.into_value()` is a method of `Axes`). It has no identity:
+    `physical_equal` on two sizes is false on native.
   `doc`'s `Size` (what `Ctx::measure` returns) is another type and has
   not changed.
 
