@@ -161,8 +161,8 @@ what the process shares:
   analysis of `eval/captures.mbt`) and the module evaluations of
   `eval/import.mbt`. They end with their compilation today. The second
   reference of every step runs with memoization off, which does not ask
-  the first five at all; the module evaluations are found in the scope
-  that made them only (a compilation is one,
+  the first five at all; the module evaluations, of the main file too,
+  end with the scope that stored them (a compilation is one,
   `library/tracked_world.mbt`).
 - The fonts (`Font` objects, shared by all worlds of the runner) and what
   is computed from a font alone: shaping faces and plans
@@ -246,7 +246,7 @@ and run `recompile -v`.
 
 | Mutation | Failing sequences, of 235 | First at | Seen in |
 |---|---|---|---|
-| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_source_memoized` does not ask for `memo.scope == scope`, `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` is `true`): the bug that the watch work found | 19 | step 1 in 13 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 12 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 3, the pages in 6 |
+| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 120 | step 1 in 92 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 115 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 25 |
 | 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo and the counter memo outlive the compilation), and `world.validate(entry.world)` is `true` | 67 | step 1 in 60 of them (`bench/tiny`, sweep, first) | the pages, in all of them |
 | 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared, and `engine.world.validate(self.world)` in `ClosureEntry::matches` is `true` | 12 | step 1 in 9 of them | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
 
@@ -260,8 +260,8 @@ With the validation left on, the same three give:
 
 | The store outlives its compilation, world reads validated | Failing sequences | What is left |
 |---|---|---|
-| 1. module entries | 4 | three at "everything back" (`project/book`, `project/notes`, `suite/visualize/rect.typ`): a file that has an earlier text again has other span numbers, and an entry is found by the text of its file until it is found by the source's fingerprint (step 3 of the design); one diagnostic with a tracepoint too many (`import-cyclic-in-other-file`): the error that an entry keeps is the object that every import adds a tracepoint to (step 4) |
-| 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same store kind; run again with them, of 237 sequences) | 0 | |
+| 1. module entries | 0 | (4 before step 3 of the design: three at "everything back", where a file that has an earlier text again has other span numbers and an entry was found by the text of its file, and one diagnostic with a tracepoint too many, since the error that an entry kept was the object that every import adds a tracepoint to. An entry is found by the fingerprint of its source now and keeps a copy of its errors) |
+| 2. layouts and counter sequences, and since step 2 of the design the works of a bibliography (the same kind of store) | 0 | |
 | 3. closure calls | 0 | |
 
 That is what the validation is for, and it is not yet a licence to keep a
@@ -286,6 +286,11 @@ the design's section 5.5), run on the default stage of 237 sequences:
 
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
+
+The first mutation fails in half of all sequences since step 3 (19 before
+it): the main file's evaluation is an entry of the same store, so a store
+that is kept without validation answers every recompilation whose main
+file is the source it was, whatever else changed.
 
 What the mutations showed about the stage and about the engine (as first
 run, before the tracked world: the keys of memoized calls then held none

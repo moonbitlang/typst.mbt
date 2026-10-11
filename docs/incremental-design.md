@@ -1,7 +1,8 @@
 # Incremental compilation: design
 
-Status: slice 0 and steps 1 and 2 of slice 1 are built (and the syntax
-half of step 3); the rest is design.
+Status: slice 0, steps 1 and 2 of slice 1 (5.5, "As built") and the
+engine half of its step 3 are built (section 8, "Step 3 as built"); the
+rest is design.
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
 recording check); revision 4 elsewhere. Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
@@ -115,9 +116,12 @@ persistent edits of step 3 of slice 1, and step 1 of slice 1, which
 changed what this section and the inventory of section 4 say about the
 stores: their entries keep what the call read of the world and compare
 the library (5.2), `compilation_epoch` is gone, and a module entry
-belongs to a scope; and step 2, after which the last paragraph of this
+belongs to a scope. Step 2, after which the last paragraph of this
 section is history: the tables of raw text and the cell of the works are
-gone, and an SVG image is also the images it links (5.5, "As built").)
+gone, and an SVG image is also the images it links (5.5, "As built").
+And the engine half of step 3: a module evaluation is
+found by the fingerprint of its source, and the main file goes through
+the same store.)
 
 - `library/memo.mbt`: `memoize` (used by `memoized_layout` for
   `layout_par_impl` and `layout_fragment_impl`, and by the counter sequence
@@ -411,7 +415,7 @@ is kept but the CLI's page hashes for PNG and SVG.
 | fonts | `World::book()`, `World::font(index)` | recorded reads, fingerprints of the book and of the font |
 | the date | `World::today(offset)` | recorded read, fingerprint of the answer |
 | `sys.inputs`, features, formats, routines: the library | `World::library()`, once per compilation (`typst/lib.mbt`, `compile_with`); then `Engine.library` | the library is compared by identity in every entry (step 1 of slice 1) and becomes part of every key (5.3) |
-| the main file | `World::main()`, once per compilation (`compile_impl`), outside of every memoized function, as upstream | nothing depends on it but the source it names |
+| the main file | `World::main()`, once per compilation (`compile_impl`), outside of every memoized function, as upstream | nothing depends on it but the source it names, which is read through the tracked world and is the key of its evaluation (step 3) |
 | the traced span | `Engine.traced` | in the key (closure calls, layouts) or validated by its answers (modules); unchanged |
 
 ### 5.2 The tracked world
@@ -515,8 +519,12 @@ the stored `Introspection.diagnose` and `History::compute`
 (`library/convergence.mbt`).
 
 Not tracked, because they run outside of every memoized call, as upstream:
-`compile_impl` and `hint_invalid_main_file` (`main`, the main source) and
-`compile_with` (`library`). `@library.analyze` is not among them: it runs
+`compile_impl` (`main`) and `compile_with` (`library`). (In step 1 also
+the source of the main file and, in `hint_invalid_main_file`, that of its
+`.typ` sibling, which were asked of the raw world. Since step 3 they are
+read through the tracked world, still outside of every memoized call, and
+`scripts/tracked_world_check.py` allows no tracked read of a raw world
+where a compilation is entered.) `@library.analyze` is not among them: it runs
 inside the compilation (`typst/lib.mbt`), and the engines that
 `History::compute` builds (`library/convergence.mbt`) replay
 introspections, which enter the counter sequence's store and call the
@@ -594,7 +602,10 @@ scope is closed and another scope asks: it is found by the text of its
 file until step 3, and its own source is read before its reads start, so
 its reads do not say all that it was made of. (Before, the module store
 was also consulted outside of every compilation: an evaluated string that
-imports found the modules of the evaluation before it.)
+imports found the modules of the evaluation before it.) Since step 3 a
+module entry is found by the fingerprint of its source, in any scope that
+is open, and is valid by its reads; its scope only says when it is
+dropped, which is as before (section 8, "Step 3 as built").
 
 **A read through another world.** The log of a world holds the reads of
 that world. A memoized call that reaches another tracked world (a host
@@ -831,7 +842,9 @@ keeps the first store.
   to the kept error, again on every reuse. Traced values come with a
   `Styles` that `@typst.trace` hands to its caller and `Styles::unset` can
   change. The rule of 5.4 for mutable results applies to the sink and to
-  kept errors.
+  kept errors. (Kept errors: built in step 3, a module entry keeps a copy
+  of its errors and hands out a copy on every hit. The diagnostics and
+  traced values of sinks are step 4's.)
 - **Locator.** In the key, fully resolved (stricter than upstream's tracked
   locator; section 10).
 
@@ -925,7 +938,8 @@ from the keys: a span enters a result from an argument (content and
 closures are hashed with their spans), from a source that was read (its
 fingerprint covers the numbered tree) or from an introspector read (its
 result is fingerprinted with its spans). So a module evaluation is keyed
-by the fingerprint of its source, not by its text (today: text).
+by the fingerprint of its source, not by its text (built in step 3; it
+was the text).
 
 **Locations.** A location is a hash of the locator and the element. The
 resolved locator is in the key of every layout entry, so a reused frame
@@ -1550,7 +1564,8 @@ Step 1 is built.
    that an SVG links has changed. It costs nothing that can be measured,
    and a document with citations inside blocks compiles faster (5.5,
    "Cost").
-3. **Sources.** Persistent edits in `syntax/reparser.mbt`,
+3. **Sources.** Built, the library last ("Step 3 as built" below).
+   Persistent edits in `syntax/reparser.mbt`,
    `syntax/node.mbt` and `syntax/source.mbt` (built: "As built" in 5.4;
    the fingerprint of a source is step 1's, and with sources that never
    change it needs no revision). Module evaluations keyed by the source's
@@ -1584,6 +1599,212 @@ document 155 ms to 22 ms, the handbook 93 ms to 30 ms, the deck 501 ms
 Risk: this is the slice from which a stale result can come. What guards it
 is section 9, in particular the checks that break one validation at a time.
 Left out: every function that is not memoized today.
+
+#### Step 3 as built (the engine half)
+
+The syntax half (persistent edits) is in 5.4. This is the rest of the
+step: `eval/import.mbt`, `eval/lib.mbt`, `typst/lib.mbt`, with what they
+needed in `library` (`source_fingerprint`, `RouteShifts`,
+`SourceDiagnostic::clone`). Nothing is kept from one compilation to the
+next yet: a module entry still ends with the scope that stored it, and
+only step 5 changes that. What changed is what an entry is found by and
+what makes it valid, so that step 5 can keep it.
+
+**Upstream's key, and the port's.** Upstream:
+
+    #[comemo::memoize]
+    pub fn eval(
+        world: Tracked<dyn World + '_>,
+        library: &LazyHash<Library>,
+        traced: Tracked<Traced>,
+        sink: TrackedMut<Sink>,
+        route: Tracked<Route>,
+        source: &Source,
+    ) -> SourceResult<Module>
+
+The key is the hash of `library` and of `source`; `Hash for Source` is
+that of `SourceInner` behind a `LazyHash` (`typst-syntax/src/source.rs`):
+the id, the text with its line index, and the root, a numbered tree. The
+world, the traced span and the route are tracked: a result is taken if
+they give the answers that the evaluation got. The sink's mutations are
+replayed. The function is one for the main file (`compile_impl`) and for
+imports (`import_file`).
+
+The port, `eval_source` (public, memoized) around `eval_source_impl`:
+
+| | upstream | port |
+| --- | --- | --- |
+| the source | its hash: id, text, numbered tree | found by `@library.source_fingerprint`: the id and the text of a source that `Source::new` parsed, the id and the number of the object for the result of an edit (step 1's fingerprint of the world's answer, 5.2); and the entry keeps the source and is only taken for the same one (`same_source`: one object, or two parses of one text of one file) |
+| the library | its hash | compared by identity, as in step 1 (5.3 has what replaces it) |
+| the world | tracked | the recorded reads, validated last (`TrackedWorld::validate`, step 1) |
+| the route | tracked: `contains`, `within` | the answers of `contains` for the ids that were asked (as before), and the depth: by how much the route may be deeper or shallower without changing the answer of a depth check of the evaluation (`RouteShifts`, as closure calls have it; new) |
+| the traced span | tracked: `get` | the answers for the files whose code ran (as before) |
+| the sink | replayed | replayed |
+| the result | a clone of the stored `SourceResult` | the module; an error as a copy of the stored one (below) |
+
+Where the port's key differs: two sources that were edited into the same
+tree are two keys (upstream: one hash); the source is also compared, not
+only hashed (deviation 3 of section 10, for this store too: the
+fingerprint of a parsed text is kept in the source by a public setter,
+and before this step the comparison of the texts stood behind it); two
+libraries with equal contents are two (deviation 7); and nothing is kept
+for a file that changes during its scope (5.2).
+
+The depth is not a deviation but one that is gone. A module entry did not
+have it, so a file that was imported near the top and then from inside a
+deep recursion was found there although its own calls no longer fit the
+maximum call depth: the port compiled a document for which upstream
+reports "maximum function call depth exceeded" (it evaluates the file
+again, since `Route::within` gave another answer). In one compilation,
+before anything is kept; with a kept store the same entry would also be
+taken where a compilation from scratch fails. (`typst/oracle_wbtest.mbt`,
+"memo: a file is evaluated again where the route is too deep for its
+calls".)
+
+**A file that is edited and edited back.** With `Source::replace`, as the
+CLI's file store does it, the source after the second edit has the first
+text and other span numbers where it was reparsed. It is another source:
+its fingerprint is the number of a new object, its module is evaluated
+again, and so is every module that read it. That is a miss where the
+text is what it was, and it is upstream's miss (the hash of the reparsed
+tree is another). It costs what any edit of that file costs, since an
+edit evaluates the file again anyway; what an undo could save is the
+evaluation, not the layout, which is found by content and spans, of
+which the reparse changed few. A world that parses the text anew
+(`Source::new`: the runner's worlds, a host that reads its files into
+new sources) hands out the first tree again, number for number, and
+finds the entries of the first compilation: that is sound, the tree is a
+function of id and text. No attempt is made to recognize the old text in
+an edited source (it would need the tree of the first parse to compare
+the numbers with).
+
+**The experiment with a kept store** (as in step 1; a local change that
+is not in the tree: the module entries outlive their scope, validation
+on). The failing sequences of the `recompile` stage, of 235, in two
+variants: as step 1 ran it, where a reference is a fresh world that is
+answered from the same store; and with the store dropped by `evict(1)`,
+which the stage calls before every reference, so that references are
+computed from scratch.
+
+| the module store kept | references from the same store | references from scratch |
+| --- | ---: | ---: |
+| before this step | 4 | 4 |
+| found by the fingerprint, valid by reads and depth (the first commit) | 1 | |
+| and the kept errors copied | 0 | |
+| the step as committed (with the review's fixes) | 0 | 0 |
+
+The four: `project/book`, `project/notes` and
+`suite/visualize/rect.typ` at "everything back" (frames: the old text
+with other span numbers), and `import-cyclic-in-other-file` (a
+tracepoint too many), which is the one that the first commit leaves. As
+committed the main file is an entry too, so every compilation of the
+watch loops asks the store: of 2121 evaluations of files in them
+709 were found and 1412 computed. The second variant is the
+one to trust: a reference that is answered from the same store can be
+wrong together with the watch loop, which is how a mutation that leaves
+the library out passed at first.
+
+**Kept errors.** A module entry that failed kept the array of
+diagnostics that it raised, and `@library.trace` appends its tracepoint
+to the diagnostics that pass through an import: every import that found
+the entry added one to the kept error. Not only across compilations: a
+file that fails and is imported from two `context` blocks (the errors are
+delayed, so both imports run) was reported with two tracepoints where
+upstream reports one. Upstream never writes to what its cache holds:
+comemo inserts `output.clone()` and returns `entry.output.clone()`
+(`memoize.rs`), and `Trace for SourceResult` adds the tracepoint through
+`errors.make_mut()` (`typst-library/src/diag.rs`), which copies a vector
+that is shared, as the trace of a diagnostic is copied when it is pushed
+to. The entry keeps a copy of the errors and hands out a copy on every
+hit (`own_result`); what a caller does to the errors it got does not
+reach the entry. The modules, arrays of file ids and read lists of an
+entry are not written by anyone. Its sink still shares its diagnostics
+and traced values with the sinks it is replayed into: step 4.
+
+**The main file.** `compile_impl` calls `eval_source`, which is the
+memoized function now, so the main file's evaluation is an entry like
+any other: found again in the same compilation where something imports
+the main file (a `context` block can: its route is the layout's), and
+later, when entries are kept, by a compilation whose main file is the
+source it was. Its source is read through the tracked world, like that
+of its `.typ` sibling in `hint_invalid_main_file`; both are outside of
+every memoized call, as upstream's are, so nothing records them. What is
+left of the raw world where a compilation is entered is `main()` and
+`library()`, and `scripts/tracked_world_check.py` reports every other
+use of it there.
+
+**The mutation checks of step 3.** Each put in by hand, one at a time,
+never committed; what must fail is a unit test, the script, or the
+`recompile` stage with the module store kept (the experiment above, with
+references from scratch; as committed the stage cannot see any of them,
+its stores end with their compilation).
+
+| what was broken | what exposed it |
+| --- | --- |
+| a source is its id and text to the module store (key and comparison), not its span numbers (number 8 of the table in 9.1) | `eval/import_wbtest.mbt`, "the same text with other span numbers is another source (A, B, A)": the kept error of the first parse is reported, with a span that is not in the tree. Kept store: 55 sequences, wherever a file has an earlier text again (the main file is an entry) |
+| every source is fingerprinted by its text, also the result of an edit (the answer of the world's `source`; the module store still compares the source) | that test, and `library/tracked_world_wbtest.mbt`, "an entry is rejected if one answer differs". Kept store: 2 sequences (`project/chain`, `import-cyclic-in-other-file`: a module that is taken although a file it imported has other span numbers) |
+| the main file's source is read of the raw world | `scripts/tracked_world_check.py` and nothing else, by construction: the read is outside of every memoized call, as upstream's is, the entry of the main file is found by the source it is handed, and what imports the main file reads it through the tracked world itself. Kept store: 0 |
+| a kept error is handed out as the object it is (number 18 there) | `eval/import_wbtest.mbt`, two tests; `typst/oracle_wbtest.mbt`, the two "a file that fails, imported .." cases, in one compilation. Kept store: 1 sequence (`import-cyclic-in-other-file`) |
+| the library is not compared (number 12 there) | `library/tracked_world_wbtest.mbt`, "the library is compared (`sys.inputs`)" (step 1's); `eval/import_wbtest.mbt`, "the library is part of what an entry is for" |
+| an entry is taken for any source with its fingerprint (review) | `eval/import_wbtest.mbt`, "an entry is only taken for the source it was computed for" |
+| the recording check substitutes any entry's module (review) | `eval/import_wbtest.mbt`, "the recording check repeats an import with the module of the world at hand" |
+
+The recording check (`--check-reads`) on the step as committed: `paged`
+33 373 entries, `edsl` 82 716, `recompile` 124 041,
+`packages` 1 307 438, no difference (the main file of every
+compilation is an entry now, which is what the numbers are more than
+step 1's).
+
+**Costs.** As in 5.2: against the base of the step (`main` at `95acf25`),
+the least of twelve runs each, in turns (instructions retired and cycles
+of `/usr/bin/time -l`).
+
+| workload | instructions, before | cycles, before | instructions, after | cycles, after |
+| --- | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.5 M | 26.8 M | 64.7 M (+0.33 %) | 27.0 M (+0.7 %) |
+| `query long.typ heading` | 2964.8 M | 730.2 M | 2965.1 M (+0.01 %) | 745.3 M (+2.1 %) |
+| `long.typ` to PDF | 3526.4 M | 857.8 M | 3527.2 M (+0.02 %) | 868.4 M (+1.2 %) |
+| `query longer.typ heading` | 14877.5 M | 3756.7 M | 14882.3 M (+0.03 %) | 3725.2 M (-0.8 %) |
+| `showcase.typ` to PDF, system fonts | 4404.1 M | 1021.7 M | 4402.3 M (-0.04 %) | 1026.9 M (+0.5 %) |
+| `showcase.typ` to PDF, embedded fonts | 3807.1 M | 822.3 M | 3809.5 M (+0.06 %) | 816.4 M (-0.7 %) |
+| touying `theme-metropolis.typ` to PDF | 2663.0 M | 694.6 M | 2668.0 M (+0.19 %) | 704.8 M (+1.5 %) |
+
+First compilation and recompilation in a watch session (medians of five
+sessions with five edits each, one character appended; nothing is kept
+yet, so a recompilation is a compilation from scratch in all builds):
+
+| document | build | first compilation: median (least to most) | recompilation: median (least to most) |
+| --- | --- | ---: | ---: |
+| `long.typ` | before | 249.5 ms (247.0 to 259.5) | 252.4 ms (243.8 to 261.7) |
+|  | step 3 | 258.3 ms (251.2 to 266.1) | 267.4 ms (255.2 to 371.8) |
+| `longer.typ` | before | 1360.0 ms (1340.0 to 1370.0) | 1410.0 ms (1360.0 to 1450.0) |
+|  | step 3 | 1280.0 ms (1250.0 to 1360.0) | 1320.0 ms (1220.0 to 1440.0) |
+| `showcase.typ` | before | 252.6 ms (235.1 to 261.2) | 55.7 ms (47.8 to 95.2) |
+|  | step 3 | 250.4 ms (245.5 to 272.2) | 56.1 ms (49.8 to 78.5) |
+| touying `theme-metropolis.typ` | before | 247.6 ms (206.2 to 276.3) | 231.5 ms (169.2 to 341.4) |
+|  | step 3 | 264.0 ms (216.5 to 275.9) | 202.0 ms (178.5 to 371.4) |
+
+The sessions ran while other builds used the machine: their medians
+differ by several per cent in both directions, with no sign in common
+with the instruction counts, which are what the step is judged by: up to
++0.06 % on the bench documents, +0.2 % on the touying document and
++0.3 % (0.2 M instructions) on `tiny.typ`; the cycles are within their
+spread. The budget of 5.2 (1 % of a compilation from scratch) holds.
+
+What the step adds to a compilation: the fingerprint of the main file's
+source (a hash of its text, once per source object), an entry for the
+main file with its reads, and per import two integers for the depth.
+
+**Review.** One round by Codex on the diff, "request changes". Fixed:
+the store took a fingerprint's word for the source (the entry keeps and
+compares it now); the second run of the recording check took the module
+of any entry for an import, whatever its reads (it takes the one that is
+valid for its world); a rule of the check script that another name for
+the world got around (the script lists the uses it allows). Not
+changed: `Source::serial` and `Font::serial`, step 1's, are counters of
+32 bits, which come round after 2^32 sources or fonts of one process;
+the fingerprint of a world's answer is what could then be equal for two
+sources, and a module entry compares the source itself.
 
 ### Slice 2: the block level
 
@@ -1675,7 +1896,8 @@ main file. Sequences longer than `max_age + 2`, with `max_age` 0, 1 and
 **Scenarios that random edits will not find**, each a fixed test:
 
 - a file with an error, imported; the main file edited twice: the error
-  has one tracepoint each time (5.3);
+  has one tracepoint each time (5.3; `eval/import_wbtest.mbt`, "the error
+  an entry keeps is not the one an import adds its tracepoint to");
 - a compilation inside a host function, on another world with the same
   sources and other data files, and the same that fails with an error:
   each world gets its own answers, also afterwards (5.2);
@@ -1968,7 +2190,8 @@ Kept or introduced, each stricter than upstream unless said:
    unidentified modules compare by identity. 6.2 has the cost.
 4. **At most four entries per key.**
 5. **Errors are not kept** by `memoize` and `memoized_closure` (upstream
-   caches a `SourceResult`); module evaluations keep theirs.
+   caches a `SourceResult`); module evaluations keep theirs, as a copy
+   that is copied again for every caller.
 6. **Results that hold identity-compared values are not kept** (frames,
    introspector reads), entries keyed by them end with their compilation,
    the state sequence is not memoized.
@@ -2080,7 +2303,10 @@ Leaning towards "accepted" by the coordinator; the owner may overrule:
    parameter for volatile files and hands its callback the tracked world,
    `eval_source`, `world_range`, `analyze`, the loading functions and
    `SvgImage::with_fonts_images` take the tracked world,
-   `compilation_epoch` and `note_evaluation` are gone; `CHANGELOG.md`.)
+   `compilation_epoch` and `note_evaluation` are gone; `CHANGELOG.md`.
+   Step 3 added to the surface and changed one behaviour: `eval_source`
+   is memoized, so two calls in one scope with the same source give one
+   module.)
 
 ## Appendix A. The probe
 

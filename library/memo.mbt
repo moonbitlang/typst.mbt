@@ -977,6 +977,59 @@ pub fn note_route_queries(ids : ArrayView[@syntax.FileId]) -> Unit {
 }
 
 ///|
+/// How much shallower and deeper a route may be without changing the
+/// answer of a depth check (`route_shift_lo`, `route_shift_hi` in
+/// `engine.mbt`): what a memoized evaluation of a source file keeps of the
+/// depth checks made in it ([route_shifts_end]), and, while it runs, the
+/// bounds of the evaluation around it ([route_shifts_begin]).
+#valtype
+pub struct RouteShifts {
+  priv lower : Int
+  priv upper : Int
+}
+
+///|
+/// Starts tracking the depth checks (`Route::within`, which comemo tracks)
+/// of an evaluation of a source file, as [memoized_closure] does for a
+/// closure call. Returns the bounds of the evaluation around it, for
+/// [route_shifts_end].
+pub fn route_shifts_begin() -> RouteShifts {
+  let outer = { lower: route_shift_lo.val, upper: route_shift_hi.val, }
+  route_shift_lo.val = route_shift_min
+  route_shift_hi.val = route_shift_max
+  route_shift_scopes.val += 1
+  outer
+}
+
+///|
+/// The bounds of the evaluation that the matching [route_shifts_begin]
+/// started: by how much the depth of its route may change without changing
+/// the answer of a depth check made in it. The evaluation around it has
+/// them too.
+pub fn route_shifts_end(outer : RouteShifts) -> RouteShifts {
+  let own = { lower: route_shift_lo.val, upper: route_shift_hi.val, }
+  route_shift_lo.val = outer.lower
+  route_shift_hi.val = outer.upper
+  route_shift_scopes.val -= 1
+  note_route_shift(own.lower, own.upper)
+  own
+}
+
+///|
+/// Whether an evaluation with these bounds gives the same answers to its
+/// depth checks on a route that is `shift` deeper.
+pub fn RouteShifts::allows(self : RouteShifts, shift : Int) -> Bool {
+  self.lower <= shift && shift <= self.upper
+}
+
+///|
+/// Notes the depth checks of an evaluation that is reused on a route that
+/// is `shift` deeper for the evaluations around it, as if it had run.
+pub fn RouteShifts::note_reused(self : RouteShifts, shift : Int) -> Unit {
+  note_route_shift(self.lower - shift, self.upper - shift)
+}
+
+///|
 /// The files whose code ran in the evaluations in progress that collect
 /// them, in order: an evaluation owns what was added since it started
 /// (not upstream: comemo tracks `Traced::get`, which every `Vm` asks for

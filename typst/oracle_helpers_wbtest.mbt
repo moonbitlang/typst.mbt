@@ -67,6 +67,60 @@ fn oracle_strings(doc : @layout.PagedDocument) -> Array[String] {
 }
 
 ///|
+/// Where a span points in the world: `file:line:column`, as the CLI
+/// prints it.
+fn oracle_place(world : TestWorld, span : @syntax.DiagSpan) -> String? {
+  guard span.id() is Some(id) else { return None }
+  guard @library.world_range(@library.TrackedWorld::new(world), span)
+    is Some((start, _)) else {
+    return None
+  }
+  let source = @library.World::source(world, id) catch { _ => return None }
+  guard source.lines().byte_to_line_column(start) is Some((line, column)) else {
+    return None
+  }
+  Some("\{id.vpath().get_without_slash()}:\{line + 1}:\{column}")
+}
+
+///|
+/// The diagnostics of a document that fails or warns as the CLI prints
+/// them in its default format, without the excerpts: `file:line:column:
+/// severity: message` (the errors first), each followed by its tracepoints
+/// (`  while importing `a.typ` at file:line:column`); with memoization and
+/// without.
+fn oracle_traces(
+  source : String,
+  files? : Array[(String, String)] = [],
+) -> Array[String] raise {
+  oracle_memo_on_off(() => {
+    let (world, warned) = oracle_result(source, files)
+    let out = []
+    let errors = match warned.output {
+      Ok(_) => []
+      Err(errors) => errors
+    }
+    for diagnostic in [..errors, ..warned.warnings] {
+      let severity = match diagnostic.severity {
+        Error => "error"
+        Warning => "warning"
+      }
+      guard oracle_place(world, diagnostic.span) is Some(place) else {
+        fail("a diagnostic without a place: \{diagnostic.message}")
+      }
+      out.push("\{place}: \{severity}: \{diagnostic.message}")
+      for point in diagnostic.trace {
+        guard oracle_place(world, @syntax.DiagSpan::from_span(point.span))
+          is Some(place) else {
+          fail("a tracepoint without a place: \{point.v}")
+        }
+        out.push("  \{point.v} at \{place}")
+      }
+    }
+    out
+  })
+}
+
+///|
 /// The diagnostics of a document as the CLI prints them with
 /// `--diagnostic-format short` (`file:line:column: severity: message`
 /// without the hints, the errors first), then `--`

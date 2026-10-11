@@ -3,9 +3,14 @@
 ///|
 /// Evaluate a source file and return the resulting module.
 ///
+/// Memoized like upstream's (`#[comemo::memoize]` on `typst_eval::eval`):
+/// the main file of a compilation and every file that is imported are
+/// evaluated through the same store, `eval_source_memoized` in
+/// `import.mbt`, which says what an evaluation is found by and when it is
+/// valid.
+///
 /// (Not upstream: an evaluation that is not inside a scope of the world is
-/// one of its own, `library/tracked_world.mbt`. Inside it the modules of
-/// imported files are kept, `eval_source_memoized`.)
+/// one of its own, `library/tracked_world.mbt`.)
 pub fn eval_source(
   world : @library.TrackedWorld,
   library : @library.Library,
@@ -14,13 +19,17 @@ pub fn eval_source(
   route : @library.Route,
   source : @syntax.Source,
 ) -> @library.Module raise @library.SourceError {
+  if world.in_scope() {
+    return eval_source_memoized(world, library, traced, sink, route, source)
+  }
   world.scoped(() => {
-    eval_source_impl(world, library, traced, sink, route, source)
+    eval_source_memoized(world, library, traced, sink, route, source)
   })
 }
 
 ///|
-/// The rest of `eval_source`.
+/// The body of upstream's `eval`: the evaluation itself, which
+/// [eval_source] memoizes.
 fn eval_source_impl(
   world : @library.TrackedWorld,
   library : @library.Library,
@@ -74,7 +83,7 @@ fn eval_source_impl(
   // Assemble the module.
   let name = id.vpath().file_stem().unwrap_or("")
   // One module per evaluation of the file, which is memoized
-  // (`eval_source_memoized`; the main file is evaluated once).
+  // (`eval_source_memoized`).
   @library.Module::new(name, vm.scopes.top)
   .with_content(output)
   .with_file_id(id)
