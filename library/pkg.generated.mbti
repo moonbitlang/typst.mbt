@@ -686,6 +686,8 @@ pub let class_elem_body : Int
 
 pub let class_elem_class : Int
 
+pub fn closure_memo_entries() -> Int
+
 pub fn closure_memo_stats() -> (Int, Int)
 
 pub fn colbreak_elem() -> Element
@@ -1365,6 +1367,8 @@ pub fn layout_elem() -> Element
 pub let layout_elem_func : Int
 
 pub fn layout_memo_active() -> Bool
+
+pub fn layout_memo_entries() -> Int
 
 pub fn leq(Value, Value) -> Value raise HintedError
 
@@ -4808,6 +4812,7 @@ pub impl Reflect for Content
 pub struct ContentCache[T] {
   // private fields
 }
+pub fn[T] ContentCache::clear(Self[T]) -> Unit
 pub fn[T] ContentCache::evict(Self[T], Int) -> Unit
 pub fn[T] ContentCache::get(Self[T], U128) -> T?
 pub fn[T] ContentCache::insert(Self[T], U128, T) -> Unit

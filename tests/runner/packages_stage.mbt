@@ -217,6 +217,7 @@ fn packages_reports(group : String, name : String) -> (String, String) {
   let dyn_world = world as &@library.World
   let enc = FrameEncoder::new(span => encode_world_span(dyn_world, span))
   enc.header(upstream_revision, font_manifest_sha, name)
+  runner_slate()
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
   ] = @typst.compile(world)

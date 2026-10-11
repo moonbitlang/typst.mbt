@@ -753,6 +753,11 @@ fn font_overhang_table(font : @library.FontInstance) -> Array[(Int, Double)] {
       }
       // A stable sort keeps the table order among glyphs with equal IDs.
       stable_sort_by(table, (a, b) => a.0.compare(b.0))
+      // (A function of its key; a cache that is full starts again: a
+      // document can make font instances without end, by variations.)
+      if overhang_tables.length() >= 1024 {
+        overhang_tables.clear()
+      }
       overhang_tables[font] = table
       table
     }

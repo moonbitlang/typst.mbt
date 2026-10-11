@@ -35,10 +35,10 @@
 //   document itself).
 //
 // Anything else fails, and every accepted step is counted and printed.
-// The count is part of the verdict ([pinned_as_upstream_expected]): while
-// nothing is kept across compilations the loop gives what a fresh
-// compilation gives at every step, and one accepted step would mean that
-// something is kept.
+// The count is part of the verdict ([pinned_as_upstream_expected]): with
+// closure calls kept across compilations the loop gives upstream's watch
+// output at every step at which that is not a fresh compilation's, and
+// a step less would mean that something is no longer found.
 
 ///|
 /// Where the fixtures are.
@@ -47,21 +47,28 @@ let pinned_dir : String = "tests/recompile/upstream"
 ///|
 /// The number of steps at which a run of all pinned sequences must find
 /// the watch loop giving upstream's watch output instead of a fresh
-/// compilation's. Zero: nothing is kept from one compilation to the next,
-/// so every recompilation is a fresh compilation. The step that keeps the
-/// closure calls (step 5 of slice 1 of `docs/incremental-design.md`) sets
-/// this to the number of steps at which upstream's watch differs from a
-/// fresh compilation, which the run prints (13 with the fixtures of
-/// today): the acceptance is then exercised, or the stage fails.
-let pinned_as_upstream_expected : Int = 0
+/// compilation's: the number of steps at which upstream's watch differs
+/// from a fresh compilation, which the run prints (18 with the fixtures of
+/// today: 4 of `getter`, 2 of `limit`, 7 of `modules`, 2 of `nan`, 3 of
+/// `plugin`).
+/// Closure calls are kept from one compilation to the next (step 5 of
+/// slice 1 of `docs/incremental-design.md`), so the port's watch loop
+/// shows what upstream's shows, and the acceptance must be exercised at
+/// every one of these steps or the stage fails: a store that no longer
+/// finds its entries (or drops one before it is old: `limit`; or a
+/// plugin whose module is dropped too early or too late: `plugin`) gives
+/// a fresh compilation's pages at one of them. (It was zero while nothing
+/// was kept.)
+let pinned_as_upstream_expected : Int = 18
 
 ///|
 /// A step of a pinned sequence.
 priv struct PinnedStep {
   /// What the step does, for the trace.
   edit : String
-  /// The files it writes.
-  files : Array[(String, String)]
+  /// The files it writes: text, and files that are no text (a plugin),
+  /// which a fixture holds as hexadecimal digits.
+  files : Array[(String, Bytes)]
   /// The SVG of the first page of a fresh compilation by upstream.
   fresh : String
   /// What upstream's watching process wrote, if that is something else.
@@ -101,7 +108,18 @@ fn pinned_parse(name : String, text : String) -> Pinned {
       guard content is String(content) else {
         pinned_bad(name, "a file that is no text")
       }
-      written.push((path, content))
+      written.push((path, @utf8.encode(content)))
+    }
+    if fields.get("binary") is Some(binary) {
+      guard binary is Object(binary) else {
+        pinned_bad(name, "binary files that are no object")
+      }
+      for path, content in binary {
+        guard content is String(digits) && pinned_hex(digits) is Some(bytes) else {
+          pinned_bad(name, "a binary file that is not hexadecimal digits")
+        }
+        written.push((path, bytes))
+      }
     }
     let watch = match fields.get("watch") {
       Some(String(svg)) => Some(svg)
@@ -112,6 +130,30 @@ fn pinned_parse(name : String, text : String) -> Pinned {
   }
   guard steps.length() > 1 else { pinned_bad(name, "no edits") }
   { name, steps, }
+}
+
+///|
+/// The bytes that hexadecimal digits spell.
+fn pinned_hex(digits : String) -> Bytes? {
+  guard digits.length() % 2 == 0 else { return None }
+  let digit = (c : UInt16) => {
+    let c = c.to_int()
+    if c >= '0' && c <= '9' {
+      c - '0'
+    } else if c >= 'a' && c <= 'f' {
+      c - 'a' + 10
+    } else {
+      -1
+    }
+  }
+  let bytes : Array[Byte] = []
+  for i in 0..<(digits.length() / 2) {
+    let hi = digit(digits.unsafe_get(2 * i))
+    let lo = digit(digits.unsafe_get(2 * i + 1))
+    guard hi >= 0 && lo >= 0 else { return None }
+    bytes.push((hi * 16 + lo).to_byte())
+  }
+  Some(Bytes::from_array(bytes))
 }
 
 ///|
@@ -140,9 +182,7 @@ fn Pinned::document(self : Pinned) -> Document {
     flavor: Plain,
     main: project_file("main.typ"),
     base: id => raise @library.FileError::NotFound(file_path(id)),
-    files: self.steps[0].files.map(file => {
-      (project_file(file.0), @utf8.encode(file.1))
-    }),
+    files: self.steps[0].files.map(file => (project_file(file.0), file.1)),
   }
 }
 

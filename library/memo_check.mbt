@@ -213,11 +213,13 @@ pub fn register_memo_check_store(set_aside : () -> () -> Unit) -> Unit {
 ///|
 fn[T, I] MemoStore::set_aside(self : MemoStore[T, I]) -> () -> Unit {
   let entries = self.entries
-  let generation = self.generation
+  let bound = self.bound.copy()
   self.entries = {}
+  self.bound.clear()
   () => {
     self.entries = entries
-    self.generation = generation
+    self.bound.clear()
+    self.bound.append(bound)
   }
 }
 
@@ -225,13 +227,21 @@ fn[T, I] MemoStore::set_aside(self : MemoStore[T, I]) -> () -> Unit {
 fn ClosureStore::set_aside(self : ClosureStore) -> () -> Unit {
   let asked = self.asked
   let entries = self.entries
-  let generation = self.generation
+  let bound = self.bound.copy()
+  let bound_bases = self.bound_bases.copy()
   self.asked = {}
   self.entries = {}
+  self.bound.clear()
+  self.bound_bases.clear()
+  self.aside = Some((asked, entries))
   () => {
     self.asked = asked
     self.entries = entries
-    self.generation = generation
+    self.bound.clear()
+    self.bound.append(bound)
+    self.bound_bases.clear()
+    self.bound_bases.append(bound_bases)
+    self.aside = None
   }
 }
 

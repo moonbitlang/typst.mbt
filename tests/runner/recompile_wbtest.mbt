@@ -388,22 +388,28 @@ test "recompile: the fixtures of upstream's watch" {
     "example",
     (
       #|{"upstream": "typst", "steps": [
-      #| {"edit": "the project", "files": {"main.typ": "A\n", "a.typ": "B"}, "fresh": "<svg/>", "watch": null},
+      #| {"edit": "the project", "files": {"main.typ": "A\n", "a.typ": "B"}, "binary": {"p.wasm": "0061ff"}, "fresh": "<svg/>", "watch": null},
       #| {"edit": "an edit", "files": {"a.typ": "C"}, "fresh": "<svg/>", "watch": "<svg a/>"}
       #|]}
     ),
   )
   assert_eq(fixture.steps.length(), 2)
-  assert_eq(fixture.steps[0].files, [("main.typ", "A\n"), ("a.typ", "B")])
+  assert_eq(fixture.steps[0].files, [
+    ("main.typ", b"A\n"),
+    ("a.typ", b"B"),
+    ("p.wasm", b"\x00\x61\xff"),
+  ])
   assert_true(fixture.steps[0].watch is None)
   assert_eq(fixture.steps[1].watch, Some("<svg a/>"))
   let document = fixture.document()
   inspect(document.name, content="upstream/example")
-  assert_eq(document.files.length(), 2)
+  assert_eq(document.files.length(), 3)
   // Those of the repository: each starts with a fresh compilation and has
   // a step at which upstream's watch gives something else.
   let pinned = pinned_sequences()
-  assert_eq(pinned.map(fixture => fixture.name), ["getter", "modules", "nan"])
+  assert_eq(pinned.map(fixture => fixture.name), [
+    "getter", "limit", "modules", "nan", "plugin",
+  ])
   for fixture in pinned {
     assert_true(fixture.steps[0].watch is None)
     assert_true(fixture.steps.iter().any(step => step.watch is Some(_)))

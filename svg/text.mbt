@@ -16,6 +16,15 @@ priv enum RenderedGlyph {
 let glyph_paths : Map[@library.U128, RenderedGlyph?] = Map([])
 
 ///|
+/// The most outlines and boxes that [glyph_paths] and [glyph_bboxes] keep.
+/// Their keys have the scale of a glyph, so they grow with the text sizes
+/// that a watching process has exported, not only with its fonts and
+/// glyphs, and nothing ages them (`@library.evict` does not know the
+/// caches by font). A cache that is full is emptied and starts again:
+/// what it holds is a function of its key.
+let glyph_cache_limit : Int = 65536
+
+///|
 /// The bounding boxes of glyphs (by font and glyph).
 let glyph_bboxes : Map[@library.U128, @otf.Rect?] = Map([])
 
@@ -38,6 +47,9 @@ fn glyph_bounding_box(
       let bbox = match font.ttf() {
         Some(ttf) => ttf.glyph_bounding_box(@otf.GlyphId(glyph_id))
         None => None
+      }
+      if glyph_bboxes.length() >= glyph_cache_limit {
+        glyph_bboxes.clear()
       }
       glyph_bboxes[key] = bbox
       bbox
@@ -112,6 +124,9 @@ fn SVGRenderer::render_glyph(
           return None
         }
         Some(RenderedGlyph::Path(builder.finsish()))
+      }
+      if glyph_paths.length() >= glyph_cache_limit {
+        glyph_paths.clear()
       }
       glyph_paths[key] = path
       path

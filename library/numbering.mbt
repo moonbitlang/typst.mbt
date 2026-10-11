@@ -338,11 +338,12 @@ pub impl FromValue for NumberingPattern with fn from_value(v) {
     // Patterns are stored as strings in styles, so the same pattern is cast
     // over and over; parsed patterns are immutable and cached (performance).
     let pattern : String = v.cast()
-    if numbering_pattern_cache.get(pattern) is Some(parsed) {
+    let key = hash128(pattern)
+    if numbering_pattern_cache.get(key) is Some(parsed) {
       return parsed
     }
     let parsed = NumberingPattern::from_str(pattern)
-    numbering_pattern_cache[pattern] = parsed
+    numbering_pattern_cache.insert(key, parsed)
     return parsed
   }
   raise HintedError(NumberingPattern::input().error(v))
@@ -352,8 +353,10 @@ pub impl FromValue for NumberingPattern with fn from_value(v) {
 pub extend NumberingPattern with FromValue::{from_value}
 
 ///|
-/// Successfully parsed numbering patterns by pattern string.
-let numbering_pattern_cache : Map[String, NumberingPattern] = Map([])
+/// Successfully parsed numbering patterns by the hash of the pattern
+/// string, with comemo's ages ([ContentCache]): a pattern that no
+/// compilation asked for in `max_age` calls of [evict] goes.
+let numbering_pattern_cache : ContentCache[NumberingPattern] = ContentCache::new()
 
 // Numbering defaults of element fields.
 

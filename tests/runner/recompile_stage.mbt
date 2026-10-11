@@ -26,9 +26,12 @@
 // 2. The references: for every step, a fresh world of the snapshot is
 //    compiled, once as it is and once with memoization off
 //    (`@library.set_layout_memo_enabled(false)`), each after
-//    `@library.evict(1)` has dropped what the process keeps by content.
-//    Each must give what the watch loop gave at that step. (The documents
-//    that take long have the second reference only.)
+//    `@library.evict(0)` has dropped everything that the process keeps:
+//    a reference is computed from scratch and shares nothing with the
+//    loop. (`evict(1)`, which this was, leaves what has an age: an entry
+//    that the loop just found is young.) Each must give what the watch
+//    loop gave at that step. (The documents that take long have the
+//    second reference only.)
 //
 // Besides the sweep and the random sequences there are the sequences that
 // are pinned to what upstream's `typst watch` gives
@@ -47,7 +50,7 @@
 // compilations of several worlds of one host do.)
 //
 // A reference in the same process cannot see through a cache that neither
-// `set_layout_memo_enabled(false)` turns off nor `evict(1)` drops. For that
+// `set_layout_memo_enabled(false)` turns off nor `evict(0)` drops. For that
 // there is a reference in another process: `--snapshots=DIR` writes the
 // files of every step before it is compiled and a digest of what it gave
 // after, and `--replay=DIR/<document>/<sequence>/step<N>` compiles one such
@@ -501,7 +504,7 @@ fn run_sequence(
           match fixture.steps.get(step) {
             Some(pinned) => {
               for file in pinned.files {
-                project.set(project_file(file.0), Some(@utf8.encode(file.1)))
+                project.set(project_file(file.0), Some(file.1))
               }
               Some(pinned.edit)
             }
@@ -588,7 +591,7 @@ fn run_sequence(
     }
     let mut differing = false
     for memoized in references {
-      @library.evict(1)
+      @library.evict(0)
       @library.set_layout_memo_enabled(memoized)
       let fresh = RecompileWorld::new(
         document.flavor,

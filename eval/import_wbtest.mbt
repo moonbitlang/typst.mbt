@@ -1,12 +1,12 @@
 // The store of module evaluations (`eval_source_memoized` in `import.mbt`)
 // at the level of the store: what an entry is found by, when it is valid,
-// and that what it keeps stays what it was.
+// how long it lives, and that what it keeps stays what it was.
 //
-// Nothing is kept from one compilation to the next yet: an entry ends with
-// the scope that stored it. Most of these tests keep the store over
-// several scopes of one world (`eval_memo_kept`), which is what the later
-// steps of `docs/incremental-design.md` do for real, as the tests of
-// `library/tracked_world_wbtest.mbt` do for the stores of `memoize`.
+// An entry outlives the scope that stored it (step 5 of slice 1 of
+// `docs/incremental-design.md`): the tests evaluate in several scopes of
+// one world, as the compilations of a watching compiler do, and each
+// starts with an empty store ([with_empty_store]), since the store is the
+// process's and the tests of this file share a library.
 
 ///|
 /// A world with sources and data files that a test changes between two
@@ -204,21 +204,17 @@ fn StoreWorld::evaluated(self : StoreWorld) -> String {
 }
 
 ///|
-/// Runs a test with a store that outlives its scopes (see the file
-/// header), and leaves no entry behind.
-fn[T] with_kept_store(f : () -> T raise) -> T raise {
-  eval_memo.entries.clear()
-  eval_memo_kept.val = true
-  defer {
-    eval_memo_kept.val = false
-    eval_memo.entries.clear()
-  }
+/// Runs a test with a store that is empty when it starts, and leaves no
+/// entry behind.
+fn[T] with_empty_store(f : () -> T raise) -> T raise {
+  @library.evict(0)
+  defer @library.evict(0)
   f()
 }
 
 ///|
 test "module store: an entry is found in a later scope while its reads hold, the main file's too" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world(
       "#import \"a.typ\": x\n#import \"b.typ\": y\n#x #y",
       sources=[
@@ -250,16 +246,111 @@ test "module store: an entry is found in a later scope while its reads hold, the
 }
 
 ///|
-test "module store: without the kept store an entry ends with its scope" {
-  let world = store_world("#import \"a.typ\": x\n#x", sources=[
-    ("a.typ", "#let x = [a]\n"),
-  ])
-  inspect(world.evaluated(), content="a: found 0, evaluated 2")
-  inspect(world.evaluated(), content="a: found 0, evaluated 2")
+test "module store: an entry has comemo's age" {
+  with_empty_store(() => {
+    let world = store_world("#import \"a.typ\": x\n#import \"b.typ\": y\n#x", sources=[
+      ("a.typ", "#let x = [a]\n"),
+      ("b.typ", "#let y = [b]\n"),
+    ])
+    inspect(world.evaluated(), content="a: found 0, evaluated 3")
+    assert_eq(module_memo_entries(), 3)
+    // Not taken for `max_age` calls of `evict`: still there. (The main
+    // file's entry is found, so those of its imports are not asked for.)
+    for _ in 0..<3 {
+      @library.evict(3)
+    }
+    assert_eq(module_memo_entries(), 3)
+    inspect(world.evaluated(), content="a: found 1, evaluated 0")
+    // The hit made the main file's entry young; the two others go with
+    // the next call, the main file's three calls later.
+    @library.evict(3)
+    assert_eq(module_memo_entries(), 1)
+    @library.evict(3)
+    @library.evict(3)
+    assert_eq(module_memo_entries(), 1)
+    inspect(world.evaluated(), content="a: found 1, evaluated 0")
+    // An edit of the main file: its imports are evaluated again, their
+    // entries were dropped while the main file's answered for them.
+    world.edit("main.typ", "#import \"a.typ\": x\n#import \"b.typ\": y\n#x #y")
+    inspect(world.evaluated(), content="a b: found 0, evaluated 3")
+    // `evict(0)` drops everything.
+    @library.evict(0)
+    assert_eq(module_memo_entries(), 0)
+    inspect(world.evaluated(), content="a b: found 0, evaluated 3")
+  })
+}
+
+///|
+test "module store: a source has a limited number of entries without `evict`" {
+  with_empty_store(() => {
+    // A file that reads another, which is different in every scope: one
+    // entry per answer of the world, and `evict` is never called.
+    let world = store_world(
+      "#import \"a.typ\": x\n#x",
+      sources=[("a.typ", "#let x = read(\"d.txt\")\n")],
+      data=[("d.txt", "0")],
+    )
+    for i in 0..<(3 * eval_memo_max_entries) {
+      world.data[store_id("d.txt")] = @utf8.encode(i.to_string())
+      inspect(world.evaluated(), content="\{i}: found 0, evaluated 2")
+    }
+    // Two sources (the main file and `a.typ`), each with the entries of
+    // the last scopes.
+    assert_eq(module_memo_entries(), 2 * eval_memo_max_entries)
+    // The last answers are found, the first are gone.
+    world.data[store_id("d.txt")] = @utf8.encode(
+      (3 * eval_memo_max_entries - 2).to_string(),
+    )
+    inspect(
+      world.evaluated(),
+      content="\{3 * eval_memo_max_entries - 2}: found 1, evaluated 0",
+    )
+    world.data[store_id("d.txt")] = @utf8.encode("0")
+    inspect(world.evaluated(), content="0: found 0, evaluated 2")
+  })
+}
+
+///|
+test "module store: with memoization off an entry ends with its scope" {
+  with_empty_store(() => {
+    let world = store_world(
+      "#import \"a.typ\"\n#import \"a.typ\" as again\n#(a == again)",
+      sources=[("a.typ", "#let x = [a]\n")],
+    )
+    inspect(world.evaluated(), content="true: found 1, evaluated 2")
+    inspect(world.evaluated(), content="true: found 1, evaluated 0")
+    // Off: nothing of the scopes before is found, and a file is still one
+    // module for the two imports of one scope.
+    @library.set_layout_memo_enabled(false)
+    defer @library.set_layout_memo_enabled(true)
+    inspect(world.evaluated(), content="true: found 1, evaluated 2")
+    inspect(world.evaluated(), content="true: found 1, evaluated 2")
+    // On again: what the scopes without memoization evaluated is not
+    // found, what the scopes before them left is.
+    @library.set_layout_memo_enabled(true)
+    inspect(world.evaluated(), content="true: found 1, evaluated 0")
+    // The entries that ended with their scope are dropped by the next
+    // scope that stores one: what is left besides the entries of the
+    // evaluations with memoization is the last one's (`a.typ`).
+    world.edit(
+      "main.typ", "#import \"a.typ\"\n#import \"a.typ\" as again\n#(a != again)",
+    )
+    @library.set_layout_memo_enabled(false)
+    inspect(world.evaluated(), content="false: found 1, evaluated 2")
+    @library.set_layout_memo_enabled(true)
+    assert_eq(module_memo_entries(), 4)
+    inspect(world.evaluated(), content="false: found 2, evaluated 1")
+    assert_eq(module_memo_entries(), 5)
+    @library.evict(0)
+    assert_eq(module_memo_entries(), 0)
+  })
 }
 
 ///|
 test "module store: a file is one module in a scope, whoever imports it first" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   let world = store_world(
     "#import \"a.typ\"\n#import \"b.typ\": inner\n#import \"a.typ\" as again\n#(a == again) #(a == inner)",
     sources=[
@@ -277,7 +368,7 @@ let store_failing : String = "#let f() = panic(\"here\")\n#let later = [text]\n"
 
 ///|
 test "module store: the same text with other span numbers is another source (A, B, A)" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"a.typ\": f\n#f()", sources=[
       ("a.typ", store_failing),
     ])
@@ -326,7 +417,7 @@ test "module store: the same text with other span numbers is another source (A, 
 
 ///|
 test "module store: the library is part of what an entry is for" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"a.typ\": x\n#x", sources=[
       ("a.typ", "#let x = sys.inputs.at(\"mode\", default: \"none\")\n"),
     ])
@@ -346,7 +437,7 @@ test "module store: the library is part of what an entry is for" {
 
 ///|
 test "module store: a failed read and a file that appears" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"a.typ\": x\n#x", sources=[
       ("a.typ", "#let x = read(\"d.txt\")\n"),
     ])
@@ -361,7 +452,7 @@ test "module store: a failed read and a file that appears" {
 
 ///|
 test "module store: the error an entry keeps is not the one an import adds its tracepoint to" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"bad.typ\": x", sources=[
       ("bad.typ", "#let x = panic(\"bad\")\n"),
     ])
@@ -392,7 +483,7 @@ test "module store: the error an entry keeps is not the one an import adds its t
 
 ///|
 test "module store: a caller that writes to the errors it got does not write to the entry" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"bad.typ\": x", sources=[
       ("bad.typ", "#let x = panic(\"bad\")\n"),
     ])
@@ -443,11 +534,14 @@ test "module store: a caller that writes to the errors it got does not write to 
 
 ///|
 test "module store: the warnings an entry keeps are not those of the sinks it is replayed into" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   // A sink's diagnostics are objects that their holder can append hints
   // and tracepoints to, and an entry replays its sink into the sink of
   // every evaluation that finds it: copies, of a copy that the entry keeps
   // (`@library.Sink::kept`).
-  with_kept_store(() => {
+  with_empty_store(() => {
     let world = store_world("#import \"a.typ\": x as x\n#x", sources=[
       ("a.typ", "#let x = [a]\n"),
     ])
@@ -488,6 +582,9 @@ test "module store: the warnings an entry keeps are not those of the sinks it is
 
 ///|
 test "module store: a call that is found again returns the module of the evaluation before" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   // Upstream's rule, and the port's (the owner's decision of 2026-10-11):
   // `==` on modules compares the objects, and a memoized call is found by
   // the hashes of its arguments, a module's being its name and what it
@@ -535,6 +632,9 @@ test "module store: a call that is found again returns the module of the evaluat
 
 ///|
 test "module store: an entry of an outer scope is found in a scope inside it if its reads hold there" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   // No kept store here: both scopes are open. The inner world has the
   // sources of the outer one and, the second time, another data file.
   let outer = store_world("", sources=[("a.typ", "#read(\"d.txt\")")], data=[
@@ -575,8 +675,45 @@ test "module store: an entry of an outer scope is found in a scope inside it if 
 }
 
 ///|
+test "module store: an outer scope keeps an entry that it took from a scope inside it" {
+  with_empty_store(() => {
+    let world = store_world("#let v = 1\n")
+    let outer = @library.TrackedWorld::new(world)
+    let inner = @library.TrackedWorld::new(world)
+    let evaluate = (tracked : @library.TrackedWorld) => {
+      eval_source(
+        tracked,
+        world.library,
+        @library.Traced::new(),
+        @library.Sink::new(),
+        @library.Route::root(),
+        world.main,
+      )
+    }
+    let modules = []
+    outer.scoped(() => {
+      inner.scoped(() => {
+        // The scope inside stores the evaluation, the outer one takes it
+        // while both are open.
+        modules.push(evaluate(inner))
+        modules.push(evaluate(outer))
+      })
+      // The scope that stored it is closed. The outer one is not: the
+      // file must stay the module it is for it, whatever is evicted.
+      @library.evict(0)
+      modules.push(evaluate(outer))
+    })
+    assert_true(modules[0] == modules[1])
+    assert_true(modules[1] == modules[2])
+    assert_eq(module_memo_entries(), 1)
+    @library.evict(0)
+    assert_eq(module_memo_entries(), 0)
+  })
+}
+
+///|
 test "module store: an entry is only taken for the source it was computed for" {
-  with_kept_store(() => {
+  with_empty_store(() => {
     // Two sources of one file with two texts, to which a caller gave the
     // same two words (`Source::set_memo`, where the engine keeps the
     // fingerprint of a parsed text): the store finds the entry of the
@@ -606,6 +743,9 @@ test "module store: an entry is only taken for the source it was computed for" {
 
 ///|
 test "module store: the recording check repeats an import with the module of the world at hand" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   // Two scopes are open: one of a world whose `choose.txt` says
   // `old.txt`, and inside it one of a world with the same sources whose
   // `choose.txt` says `new.txt`. The store has the module of `a.typ` of
@@ -653,6 +793,9 @@ test "module store: the recording check repeats an import with the module of the
 
 ///|
 test "module store: the depth of the route is among what an evaluation asked" {
+  // (The store is the process's: what the tests before left is dropped.)
+  @library.evict(0)
+  defer @library.evict(0)
   // `deep.typ` calls 60 functions inside each other. Imported where the
   // route is 10 deep that is within the maximum call depth of 80, and
   // imported from inside 30 calls it is not: upstream evaluates the file
@@ -670,7 +813,9 @@ test "module store: the depth of the route is among what an evaluation asked" {
     ("deep.typ", deep),
   ])
   // Two calls deeper is still within what the first evaluation checked.
-  inspect(world.evaluated(), content="0 0: found 1, evaluated 2")
+  // (Another world with the same file: the entry of the first is found by
+  // both imports.)
+  inspect(world.evaluated(), content="0 0: found 2, evaluated 1")
   let world = store_world(nested + "#nest(10) #nest(30)", sources=[
     ("deep.typ", deep),
   ])
@@ -678,8 +823,10 @@ test "module store: the depth of the route is among what an evaluation asked" {
   assert_true(
     result.text.has_prefix("error: maximum function call depth exceeded"),
   )
+  // The first import finds the entry; the second is too deep for it and
+  // is evaluated again, and fails.
   inspect(
     "found \{result.found}, evaluated \{result.computed}",
-    content="found 0, evaluated 3",
+    content="found 1, evaluated 2",
   )
 }

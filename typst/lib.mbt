@@ -111,6 +111,27 @@ fn[T : @library.Output] compile_impl(
 /// the memoization lifetime, the relayout loop with tracked introspection,
 /// the convergence warnings and the promotion of delayed errors. Used by
 /// hosts that build content without a Typst main file (the `doc` package).
+///
+/// A host that compiles again and again (this function or `compile`):
+/// what a compilation computed is kept by the process and found by a
+/// later one, with this world or another, wherever it is still valid: for
+/// the same library object, and if the world answers what the kept result
+/// asked of it as it did (`library/tracked_world.mbt`). The contract is
+/// comemo's. The world does not change during a compilation and may
+/// change between two; the host keeps its `Library`, its font book and its
+/// fonts as objects (other objects are other answers), and gives a file
+/// that changed the source that `Source::replace` of its last source
+/// returned (a new `Source` of the new text is numbered anew: little that
+/// came from the file is found again). It calls `@library.evict(max_age)`
+/// between compilations (`typst watch`: 10 after every recompilation), or
+/// the process keeps what every compilation computed; `@library.evict(0)`
+/// drops everything. `@library.set_layout_memo_enabled(false)` compiles
+/// from scratch.
+///
+/// And one thing is not what a compilation from scratch gives, which is
+/// upstream's own: a call that is found again returns the module it
+/// returned before, and `==` tells that from the module of the same file
+/// evaluated now (`library/memo.mbt`, `tests/recompile/upstream`).
 pub fn[T : @library.Output] compile_with(
   world : &@library.World,
   traced : @library.Traced,
@@ -147,9 +168,9 @@ fn[T : @library.Output] compile_scoped(
   let styles = base.chain(target)
   let empty_introspector = @library.Introspector::empty()
 
-  // Closure calls and layout results are memoized for the compilation:
-  // during the evaluation and across the relayout iterations (upstream:
-  // comemo; see `library/memo.mbt`).
+  // Closure calls and layout results are memoized: during the evaluation,
+  // across the relayout iterations and from one compilation of the
+  // process to the next (upstream: comemo; see `library/memo.mbt`).
   let document = @library.with_layout_memo(() => {
     // First produce the content (the Typst path evaluates the main source
     // file into a module).

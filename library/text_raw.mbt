@@ -284,6 +284,14 @@ fn RawElem::highlight(
       compilation,
       lines: lines.copy(),
     }
+    if compilation != 0 {
+      // It ends with this compilation, and is dropped when that ends.
+      if !raw_highlight_ends.val {
+        raw_highlight_ends.val = true
+        compilation_enders.push(raw_highlight_end_compilation)
+      }
+      raw_highlight_bound.push(key)
+    }
     match found {
       Some(entries) => {
         if entries.length() >= memo_max_entries {
@@ -295,6 +303,30 @@ fn RawElem::highlight(
     }
   }
   lines
+}
+
+///|
+/// The keys of the highlighted texts that end with their compilation (a
+/// host closure in their styles, [MemoKey::compilation]), and whether the
+/// end of a compilation knows about them.
+let raw_highlight_bound : Array[U128] = []
+
+///|
+let raw_highlight_ends : Ref[Bool] = { val: false, }
+
+///|
+/// Drops the highlighted texts that ended with their compilation
+/// ([end_compilation_entries]): nothing finds them afterwards, and they
+/// hold the styles, with the host closures in them.
+fn raw_highlight_end_compilation() -> Unit {
+  for key in raw_highlight_bound {
+    guard raw_highlight_cache.entries.get(key) is Some(bucket) else { continue }
+    bucket.value.retain(entry => entry.compilation == 0)
+    if bucket.value.is_empty() {
+      raw_highlight_cache.entries.remove(key)
+    }
+  }
+  raw_highlight_bound.clear()
 }
 
 ///|
@@ -616,9 +648,9 @@ impl Fingerprint for RawSyntax with fn fingerprint(self, state) {
 }
 
 ///|
-/// Decoded syntaxes, keyed by their bytes (upstream memoizes
-/// `RawSyntax::decode`).
-let raw_syntax_cache : Array[(Bytes, RawSyntax)] = []
+/// Decoded syntaxes, by the hash of their bytes (upstream memoizes
+/// `RawSyntax::decode`), with comemo's ages ([ContentCache]).
+let raw_syntax_cache : ContentCache[RawSyntax] = ContentCache::new()
 
 ///|
 /// Load syntaxes from data sources (upstream returns a `Derived`: the
@@ -634,10 +666,9 @@ fn RawSyntax::load(
 
 ///|
 fn RawSyntax::decode(bytes : Bytes) -> RawSyntax raise LoadErr {
-  for entry in raw_syntax_cache {
-    if entry.0 == bytes {
-      return entry.1
-    }
+  let hash = data_hash(bytes)
+  if raw_syntax_cache.get(hash) is Some(syntax) {
+    return syntax
   }
   let str = bytes_as_str(bytes)
   let syntax = @syntect.SyntaxDefinition::load_from_str(str, false, None) catch {
@@ -645,8 +676,8 @@ fn RawSyntax::decode(bytes : Bytes) -> RawSyntax raise LoadErr {
   }
   let builder = @syntect.SyntaxSetBuilder::new()
   builder.add(syntax)
-  let syntax = { set: builder.build(), hash: data_hash(bytes), }
-  raw_syntax_cache.push((bytes, syntax))
+  let syntax = { set: builder.build(), hash, }
+  raw_syntax_cache.insert(hash, syntax)
   syntax
 }
 
@@ -828,9 +859,9 @@ impl Fingerprint for RawTheme with fn fingerprint(self, state) {
 }
 
 ///|
-/// Decoded themes, keyed by their bytes (upstream memoizes
-/// `RawTheme::decode`).
-let raw_theme_cache : Array[(Bytes, RawTheme)] = []
+/// Decoded themes, by the hash of their bytes (upstream memoizes
+/// `RawTheme::decode`), with comemo's ages ([ContentCache]).
+let raw_theme_cache : ContentCache[RawTheme] = ContentCache::new()
 
 ///|
 /// Load a theme from a data source (upstream returns a `Derived`: the
@@ -846,16 +877,15 @@ fn RawTheme::load(
 
 ///|
 fn RawTheme::decode(bytes : Bytes) -> RawTheme raise LoadErr {
-  for entry in raw_theme_cache {
-    if entry.0 == bytes {
-      return entry.1
-    }
+  let hash = data_hash(bytes)
+  if raw_theme_cache.get(hash) is Some(theme) {
+    return theme
   }
   let theme = @syntect.ThemeSet::load_from_reader(bytes) catch {
     e => raise LoadErr(format_theme_error(e))
   }
-  let theme = { theme, hash: data_hash(bytes), }
-  raw_theme_cache.push((bytes, theme))
+  let theme = { theme, hash, }
+  raw_theme_cache.insert(hash, theme)
   theme
 }
 

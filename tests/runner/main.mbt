@@ -63,6 +63,7 @@ fn main {
   dump_actual.val = args.contains("--dump")
   trace_tests.val = args.contains("--trace")
   read_check.val = args.contains("--check-reads")
+  keep_memo.val = args.contains("--keep-memo")
   @library.set_memo_check(read_check.val)
   for a in args {
     if a.has_prefix("--upstream-pdfs=") {
@@ -295,6 +296,30 @@ fn main {
 }
 
 ///|
+/// Whether the stages leave what the engine keeps where it is from one
+/// case to the next (`--keep-memo`).
+let keep_memo : Ref[Bool] = Ref(false)
+
+///|
+/// Called before every compilation of a stage that compares with what
+/// upstream gives for a compilation from scratch.
+///
+/// The engine keeps what a compilation computed for the process
+/// (`library/memo.mbt`), so a case would find what the cases before it
+/// left: `@library.evict(0)` drops everything, and every case is a first
+/// compilation, whatever ran before it and whatever the filter is. (The
+/// `recompile` stage is the one that tests what is kept, and does not
+/// call this.) With `--keep-memo` it is `@library.evict(10)` instead, what
+/// a watching compiler calls between two compilations: the cases of a
+/// stage then share the stores like the compilations of a host with many
+/// worlds, and a result that is taken for a document it is not valid for
+/// shows as a case that fails. That run depends on the order of the cases
+/// and uses more memory; it is a soak, not a gate.
+fn runner_slate() -> Unit {
+  @library.evict(if keep_memo.val { 10 } else { 0 })
+}
+
+///|
 fn run_stage(
   stage : String,
   report : (String, TestCase) -> String,
@@ -335,6 +360,7 @@ fn run_stage(
       if trace_tests.val {
         println("TRACE \{rel} :: \{tc.name}")
       }
+      runner_slate()
       let actual = report(rel, tc)
       let unrecorded = read_check_drain("\{rel} :: \{tc.name}")
       dump.write_string("=== \{tc.name}\n\{actual}")

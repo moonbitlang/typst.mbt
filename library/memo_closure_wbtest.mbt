@@ -57,8 +57,12 @@ let memo_test_world : Ref[TrackedWorld?] = { val: None, }
 
 ///|
 /// Start a compilation's memoization for the rest of a test: its stores
-/// and the scope of the world of [memo_engine].
+/// and the scope of the world of [memo_engine]. The stores are the
+/// process's and outlive a compilation, and the tests of this package call
+/// the same functions with the same arguments: a test starts with nothing
+/// (`evict(0)`).
 fn memo_test_begin() -> Unit {
+  evict(0)
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
   let world = wb_engine(Introspector::empty()).world
@@ -217,7 +221,8 @@ test "closure memo: off outside of a compilation and when disabled" {
     memo_call(f, engine, Context::none(), [], body) |> ignore
   })
   assert_eq(runs, 6)
-  // Each compilation has its own results.
+  // A compilation finds what an earlier one computed, until it is evicted.
+  evict(0)
   engine.world.scoped(() => {
     with_layout_memo(() => {
       memo_call(f, engine, Context::none(), [], body) |> ignore
@@ -225,11 +230,36 @@ test "closure memo: off outside of a compilation and when disabled" {
     })
   })
   assert_eq(runs, 7)
-  engine.world.scoped(() => {
-    with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
-  })
-  |> ignore
+  let again = () => {
+    engine.world.scoped(() => {
+      with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
+    })
+    |> ignore
+  }
+  again()
+  assert_eq(runs, 7)
+  // comemo's ages: found after `max_age` calls of `evict`, which makes it
+  // young again, and gone when it was not found for one more.
+  for _ in 0..<2 {
+    evict(2)
+  }
+  again()
+  assert_eq(runs, 7)
+  for _ in 0..<3 {
+    evict(2)
+  }
+  assert_eq(closure_memo_entries(), 0)
+  assert_eq(closure_store.asked.length(), 0)
+  again()
   assert_eq(runs, 8)
+  // With memoization off nothing is found and nothing is kept.
+  set_layout_memo_enabled(false)
+  again()
+  set_layout_memo_enabled(true)
+  assert_eq(runs, 9)
+  assert_eq(closure_memo_entries(), 1)
+  evict(0)
+  assert_eq(closure_memo_entries(), 0)
 }
 
 ///|
@@ -662,4 +692,58 @@ test "closure memo: sink effects and introspector reads are the caller's" {
   assert_eq((engine.sink.warnings().length(), recorder.len()), (1, 1))
   assert_eq(route_query_scopes.val, 0)
   assert_eq(route_shift_scopes.val, 0)
+}
+
+///|
+test "closure memo: the limit per key is on what no eviction has seen yet" {
+  memo_test_begin()
+  defer memo_test_end()
+  // One function and arguments, and a result per introspector: the call
+  // reads the number of labelled elements.
+  let elem = TextElem::packed("x")
+  let introspectors = Array::makei(memo_max_entries + 1, n => {
+    Introspector::new(FixedBackend(Array::make(n, elem)))
+  })
+  let mut runs = 0
+  let body : ClosureBody = (_, _, engine, _, _) => {
+    runs += 1
+    Int(engine.introspector.query_labelled().length().to_int64())
+  }
+  let f = memo_test_func(1)
+  let call = (n : Int) => {
+    let engine = memo_engine(
+      introspector=introspectors[n].track_with(IntrospectionRecorder::new()),
+    )
+    memo_call(f, engine, Context::none(), [], body)
+  }
+  // Without an eviction in between (one compilation, or a process that
+  // never evicts): the oldest result makes room for the fifth.
+  for n in 0..<=memo_max_entries {
+    assert_true(call(n) == Int(n.to_int64()))
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  assert_eq(closure_memo_entries(), memo_max_entries)
+  for n in 1..<=memo_max_entries {
+    call(n) |> ignore
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  call(0) |> ignore
+  assert_eq(runs, memo_max_entries + 2)
+  // With an eviction after each (the compilations of a watching process):
+  // a result goes when it is old, as comemo's does, not because its key
+  // got a fifth. A function that returns a module it captured shows which
+  // (`tests/recompile/upstream/limit.json`).
+  evict(0)
+  runs = 0
+  for n in 0..<=memo_max_entries {
+    call(n) |> ignore
+    evict(10)
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  assert_eq(closure_memo_entries(), memo_max_entries + 1)
+  for n in 0..<=memo_max_entries {
+    assert_true(call(n) == Int(n.to_int64()))
+  }
+  assert_eq(runs, memo_max_entries + 1)
+  evict(0)
 }

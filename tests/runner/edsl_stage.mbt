@@ -355,7 +355,11 @@ fn check_pair(
   // Structure.
   if structural {
     let dumper : StructDumper = { elems: [], locations: None, }
+    runner_slate()
     let lowered = document.lower(base)
+    // The twin is evaluated from scratch: the lowering left the
+    // evaluations of the files it imported.
+    runner_slate()
     let sink = @library.Sink::new()
     let evaluated = try
       @eval.eval_source(
@@ -392,7 +396,11 @@ fn check_pair(
   for memo in [true, false] {
     @library.set_layout_memo_enabled(memo)
     let mode = if memo { "" } else { " (memoization off)" }
+    // Each of the two from scratch: the twin must not be answered with
+    // what the EDSL's compilation left.
+    runner_slate()
     let edsl = document.compile_paged(base)
+    runner_slate()
     let typst : @library.Warned[
       Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
     ] = @typst.compile(world)
