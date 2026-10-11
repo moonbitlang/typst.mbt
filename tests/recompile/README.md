@@ -244,10 +244,10 @@ one at a time, and running the default stage (seed 1). They are not in the
 tree; to repeat one, change the code as said, build the runner in release
 and run `recompile -v`.
 
-| Mutation | Failing sequences, of 235 | First at | Seen in |
+| Mutation | Failing sequences, of 237 | First at | Seen in |
 |---|---|---|---|
-| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 120 | step 1 in 92 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 115 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 25 |
-| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo and the counter memo outlive the compilation), and `world.validate(entry.world)` is `true` | 67 | step 1 in 60 of them (`bench/tiny`, sweep, first) | the pages, in all of them |
+| 1. `eval/import.mbt`: the module entries outlive their scope (`eval_memo_kept` is `true`: `EvalMemos::of` does not drop the entries of closed scopes) and their world reads are not validated (`world.validate(memo.reads)` in `eval_source_memoized` is `true`): the bug that the watch work found | 122 | step 1 in 94 of them, the first compilation after the first (`project/book`, sweep) | the dependencies in 117 (a module that is found again does not read its files, so they are no longer watched), the diagnostics in 23, the pages in 26 |
+| 2. `library/memo.mbt`, `memoize`: the store is not cleared when the generation changes (the layout memo, the counter memo and the works of a bibliography outlive the compilation), and `world.validate(entry.world)` is `true` | 69 | step 1 in 61 of them (`bench/tiny`, sweep, first) | the pages in 68 of them; in one the dependencies and the diagnostics alone (works that are found do not read the bibliography file) |
 | 3. `library/memo.mbt`, `memoized_closure`: the store is not cleared, and `engine.world.validate(self.world)` in `ClosureEntry::matches` is `true` | 12 | step 1 in 9 of them | the dependencies in 6 (a function that reads a file is not called again), the pages in 7 |
 
 These are the three mutations of the stage's first version, on the code
@@ -282,13 +282,18 @@ the design's section 5.5), run on the default stage of 237 sequences:
 | Mutation | Failing sequences | First at | Seen in |
 |---|---|---|---|
 | 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats`, sweep and random sequence | the page images: the page hashes as before, so the loop keeps the image it had, and the reference has other pixels. Nothing else differs: the frames, the SVG and the PDF of the loop are those of the reference. This is what `typst watch` did with PNG pages |
-| 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process that `evict` drops with the decode caches (what the cell of the last works was for two calls that share an introspector object: a result found without its key holding the file and without a read of it) | 7 | sweeps and random sequences of the suite's bibliography and citation tests (`bibliography-multiple-files`, `bibliography-before-content`, `issue-3481-cite-location`, `issue-785-cite-locate`) | the pages in all of them, the diagnostics in most (a document that compiles from scratch fails in the loop). Also `paged`: 15 tests fail, and `paged --check-reads`: 6 entries in 3 tests |
+| 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process that `evict` drops with the decode caches (what the cell of the last works was for two calls that share an introspector object: a result found without its key holding the file and without a read of it) | 7 | the sweep of `project/book` (from its eighth step on), and sweeps and random sequences of the suite's bibliography and citation tests (`bibliography-basic`, `bibliography-multiple-files`, `bibliography-before-content`, `issue-3481-cite-location` twice, `issue-785-cite-locate`) | the pages in all of them, the diagnostics in six (a document that compiles from scratch fails in the loop). Also `paged`: 15 tests fail, and `paged --check-reads`: 6 entries in 3 tests |
 
 With the seed that the failure prints, every one of them is repeated by
 `recompile --only=<document> --seed=1 -v` on the mutated tree.
 
+All the counts of this section were measured again on the tree that has
+both step 2 and step 3 of the design (237 sequences: the project
+`linked` is two of them): 122, 69 and 12 without validation, none with
+it, 3 and 7.
+
 The first mutation fails in half of all sequences since step 3 (19 before
-it): the main file's evaluation is an entry of the same store, so a store
+it, of 235): the main file's evaluation is an entry of the same store, so a store
 that is kept without validation answers every recompilation whose main
 file is the source it was, whatever else changed.
 
