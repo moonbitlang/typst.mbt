@@ -2147,10 +2147,12 @@ else, including the four pinned steps at which upstream's watch agrees
 with one. `scripts/recompile_soak.py --minutes 10` with that runner:
 124 documents, seeds 1000 to 1004, 620 runs, 3040 sequences, 34 594
 steps, 102 372 compilations, 1835 steps compiled again in new processes,
-no failure and no abort. (Run twice: before the review of the step, and
-on the step as committed. Before the fixtures existed the stage was also
-run on the 237 sequences of the other documents alone: none failed. None
-of those documents compares modules.)
+no failure and no abort. (Run three times with the same result: before
+the review of the step, on the step as committed, and after `main` with
+the native performance work of pull request 74, which changed the
+hashers, was merged into the branch. Before the fixtures existed the
+stage was also run on the 237 sequences of the other documents alone:
+none failed. None of those documents compares modules.)
 
 What upstream's rule means, then, in the sequences of the stage: no
 sequence of the 121 documents differs from a compilation from scratch
