@@ -48,8 +48,8 @@ fn pt(v : Double) -> @library.Abs {
 }
 
 ///|
-fn size(x : Double, y : Double) -> @library.Axes[@library.Abs] {
-  @library.Axes::new(pt(x), pt(y))
+fn size(x : Double, y : Double) -> @library.Size {
+  @library.Size::new(pt(x), pt(y))
 }
 
 ///|

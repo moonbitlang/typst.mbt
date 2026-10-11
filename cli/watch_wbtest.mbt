@@ -281,7 +281,7 @@ test "time of day" {
 fn test_page(width : Double) -> @layout.Page {
   {
     frame: @library.Frame::hard(
-      @library.Axes::new(@library.Abs::pt(width), @library.Abs::pt(10.0)),
+      @library.Size::new(@library.Abs::pt(width), @library.Abs::pt(10.0)),
     ),
     bleed: @library.Sides::splat(@library.Abs::zero()),
     fill: Auto,

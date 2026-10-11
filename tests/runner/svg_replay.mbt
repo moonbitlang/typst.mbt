@@ -74,7 +74,7 @@ priv suberror Unsupported {
 ///|
 /// A decoded frame record with its items.
 priv struct FrameRec {
-  size : @library.Axes[@library.Abs]
+  size : @library.Size
   baseline : @library.Abs?
   kind : @library.FrameKind
   items : Array[(@library.Point, Array[Json])]
@@ -445,7 +445,7 @@ fn dec_point(json : Json) -> @library.Point raise Unsupported {
 }
 
 ///|
-fn dec_size(json : Json) -> @library.Axes[@library.Abs] raise Unsupported {
+fn dec_size(json : Json) -> @library.Size raise Unsupported {
   guard json is Array([x, y]) else { raise Unsupported("size") }
   { x: dec_abs(x), y: dec_abs(y), }
 }

@@ -761,7 +761,7 @@ fn point_enc(p : @library.Point) -> String {
 }
 
 ///|
-fn size_enc(s : @library.Axes[@library.Abs]) -> String {
+fn size_enc(s : @library.Size) -> String {
   array([abs_enc(s.x), abs_enc(s.y)])
 }
 
