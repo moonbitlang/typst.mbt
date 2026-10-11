@@ -168,7 +168,7 @@ fn linebreak_optimized_bounded(
       let attempt = line(engine, p, start, end, breakpoint, Some(pred.line))
 
       // Determine the cost of the line and its stretch ratio.
-      let (line_ratio, line_cost) = ratio_and_cost(
+      let { ratio: line_ratio, cost: line_cost, } = ratio_and_cost(
         p,
         metrics,
         width,
@@ -387,7 +387,7 @@ fn linebreak_optimized_approximate(
   for k = indices.length() - 1; k >= 0; k = k - 1 {
     let { end, breakpoint, unbreakable, .. } = table[indices[k]]
     let attempt = line(engine, p, start, end, breakpoint, Some(pred))
-    let (ratio, line_cost) = ratio_and_cost(
+    let { ratio, cost: line_cost, } = ratio_and_cost(
       p, metrics, width, pred, attempt, breakpoint, unbreakable,
     )
 
@@ -417,7 +417,7 @@ fn ratio_and_cost(
   attempt : Line,
   breakpoint : @linebreak.Breakpoint,
   unbreakable : Bool,
-) -> (Double, Double) {
+) -> RatioAndCost {
   let ratio = raw_ratio(
     p,
     available_width,
@@ -435,7 +435,16 @@ fn ratio_and_cost(
     pred.dash is Some(_) && attempt.dash is Some(_),
     false,
   )
-  (ratio, cost)
+  { ratio, cost, }
+}
+
+///|
+/// The stretch ratio and the cost of a line (upstream: a tuple, which is an
+/// allocation per line that the optimizer tries here).
+#valtype
+priv struct RatioAndCost {
+  ratio : Double
+  cost : Double
 }
 
 ///|

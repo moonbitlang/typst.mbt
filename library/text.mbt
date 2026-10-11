@@ -405,6 +405,20 @@ fn text_elem_size_default() -> Value {
 
 ///|
 fn text_elem_size_fold(inner : Value, outer : Value) -> Value {
+  // ([fold_with], but the inner value itself where the fold gives its
+  // length bit for bit, which it does for an absolute size, the usual case:
+  // the size is folded on every lookup, and a new value of the same length
+  // was allocated each time.)
+  if inner is Length(i) && outer is Length(o) {
+    let folded = Fold::fold(TextSize(i), TextSize(o)).0
+    if folded.em.get().reinterpret_as_int64() ==
+      i.em.get().reinterpret_as_int64() &&
+      folded.abs.to_raw().reinterpret_as_int64() ==
+      i.abs.to_raw().reinterpret_as_int64() {
+      return inner
+    }
+    return Length(folded)
+  }
   fold_with((Ty::new() : Ty[TextSize]), inner, outer)
 }
 
@@ -1179,6 +1193,11 @@ pub impl FromValue for FontFeatures with fn from_value(v) {
     }
     Dict(values) => {
       let out = []
+      // (The default, read for every run of text that is shaped: no
+      // iterator over a map without entries.)
+      if values.map.is_empty() {
+        return FontFeatures(out)
+      }
       let mut i = 0
       for k, v in values.map {
         let hint = tag_hint_helper(i, repr_str(k))

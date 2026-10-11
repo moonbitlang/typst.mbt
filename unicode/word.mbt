@@ -108,7 +108,7 @@ priv enum RegionalState {
 ///|
 /// The length (in UTF-16 code units) of the next word-bound segment of
 /// `s`, and the category to cache for the next call (`UWordBounds::next`).
-fn next_word_bound(s : StringView, cached : WordCat?) -> (Int, WordCat?) {
+fn next_word_bound(s : StringView, cached : WordCat?) -> WordBound {
   let mut self_cat = cached
   let mut take_curr = true
   let mut take_cat = true
@@ -341,7 +341,16 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> (Int, WordCat?) {
   } else {
     None
   }
-  (idx, next_cat)
+  { len: idx, next_cat, }
+}
+
+///|
+/// What [next_word_bound] gives (a value type: a tuple would be allocated
+/// for every word).
+#valtype
+priv struct WordBound {
+  len : Int
+  next_cat : WordCat?
 }
 
 ///|
@@ -353,7 +362,7 @@ pub fn split_word_bounds(s : StringView) -> Array[StringView] {
   let mut rest = s
   let mut cat = None
   while rest.length() > 0 {
-    let (len, next_cat) = next_word_bound(rest, cat)
+    let { len, next_cat, } = next_word_bound(rest, cat)
     out.push(rest.view(end_offset=len))
     rest = rest.view(start_offset=len)
     cat = next_cat

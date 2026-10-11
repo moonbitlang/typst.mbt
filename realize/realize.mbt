@@ -703,6 +703,23 @@ fn visit_styled(
 }
 
 ///|
+/// The first rule that the content triggers (upstream: `s.rules.iter()
+/// .find(|&rule| (rule.effect)(content) == GroupingEffect::Trigger)`; a
+/// loop, since the iterator and its closure are four allocations for every
+/// element that is visited).
+fn triggered_rule(
+  rules : ReadOnlyArray[GroupingRule],
+  content : Content,
+) -> GroupingRule? {
+  for rule in rules[:] {
+    if (rule.effect)(content) is Trigger {
+      return Some(rule)
+    }
+  }
+  None
+}
+
+///|
 /// Tries to group the content in an active group or start a new one if any
 /// grouping rule matches. Returns `true` if the element was grouped.
 fn visit_grouping_rules(
@@ -710,9 +727,7 @@ fn visit_grouping_rules(
   content : Content,
   styles : StyleChain,
 ) -> Bool raise SourceError {
-  let matching = s.rules
-    .iter()
-    .find_first(rule => (rule.effect)(content) is Trigger)
+  let matching = triggered_rule(s.rules, content)
 
   // Try to continue or finish an existing grouping.
   let mut i = 0

@@ -458,8 +458,15 @@ fn identify_bracket_pairs(
 ) -> Unit {
   let stack : Array[(Int, Int, Int)] = []
   for run_index, level_run in run_sequence.runs {
-    for pair in text.subrange(level_run.start, level_run.end).char_indices() {
-      let (i, ch) = pair
+    // (`for (i, ch) in text.subrange(..).char_indices()`, without the array
+    // of pairs.)
+    let run_text = text.subrange(level_run.start, level_run.end)
+    for at in run_text.start..<run_text.end {
+      let ch = run_text.cps[at]
+      if ch < 0 {
+        continue
+      }
+      let i = at - run_text.start
       let actual_index = level_run.start + i
 
       // All paren characters are ON.

@@ -1250,7 +1250,13 @@ pub fn Face::glyph_svg_image(self : Face, glyph_id : GlyphId) -> SvgDocument? {
 ///
 /// See `paint_color_glyph` for details.
 pub fn Face::is_color_glyph(self : Face, glyph_id : GlyphId) -> Bool {
-  self.tables.colr.map(colr => colr.contains(glyph_id)).unwrap_or(false)
+  // (`self.tables.colr.map(|colr| colr.contains(glyph_id)).unwrap_or(false)`;
+  // the closure captures the glyph, so it would be allocated per call, and
+  // an exporter asks this for every glyph.)
+  match self.tables.colr {
+    Some(colr) => colr.contains(glyph_id)
+    None => false
+  }
 }
 
 ///|

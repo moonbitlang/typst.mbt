@@ -36,10 +36,17 @@ pub fn Content::from_fields(
     span: @syntax.Span::detached(),
     label: None,
     location: None,
-    lifecycle: [],
+    lifecycle: empty_lifecycle,
     data_hash: Ref(None),
   }
 }
+
+///|
+/// The lifecycle of content that nothing has prepared or guarded. One
+/// object for all such content (not upstream, where it is a bit set in the
+/// header): a lifecycle is never written to, [Content::guarded] extends a
+/// copy.
+let empty_lifecycle : Array[Int] = []
 
 ///|
 /// Create content with the given required field values (in field order),
@@ -157,9 +164,13 @@ pub fn Content::can(self : Content, capability : String) -> Bool {
 ///|
 /// The raw stored value of a field by id (no styles).
 pub fn Content::field_raw(self : Content, id : Int) -> Value? {
-  match self.fields.get(id) {
-    Some(v) => v
-    None => None
+  // (Not `self.fields.get(id)`: its result is an option of an option, which
+  // is allocated.)
+  let fields = self.fields
+  if id >= 0 && id < fields.length() {
+    fields.unsafe_get(id)
+  } else {
+    None
   }
 }
 
@@ -169,6 +180,27 @@ pub fn Content::with_field(self : Content, id : Int, value : Value) -> Content {
   let fields = self.fields.copy()
   fields[id] = Some(value)
   self.with_fields(fields)
+}
+
+///|
+/// The fields of a copy of the content that is being made: the caller sets
+/// them ([set_field]) and makes the copy with [Content::with_fields].
+/// Upstream sets the fields of its own clone of an element in place; a
+/// chain of `with_x(..).with_y(..)` is a copy of the fields, a content and
+/// a hash cell per field.
+fn Content::fields_copy(self : Content) -> FixedArray[Value?] {
+  self.fields.copy()
+}
+
+///|
+/// Set a field of [Content::fields_copy] like the typed `with_*` of the
+/// field's type does.
+fn[T : IntoValue] set_field(
+  fields : FixedArray[Value?],
+  id : Int,
+  value : T,
+) -> Unit {
+  fields[id] = Some(IntoValue::into_value(value))
 }
 
 ///|

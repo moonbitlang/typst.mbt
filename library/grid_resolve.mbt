@@ -378,15 +378,38 @@ pub impl ResolvableCell for TableCell with fn resolve_cell(
   let kind = cell.kind_in_chain(styles).or_(kind)
   let cell_stroke = resolve_sides_stroke(cell.stroke(styles), styles)
   let (stroke, stroke_overridden) = fold_cell_stroke(cell_stroke, stroke)
-  let cell = cell
-    .with_x(Custom(USize(x.to_int64())))
-    .with_y(Custom(USize(y.to_int64())))
-    .with_fill(Custom(fill))
-    .with_align(cell_align_field(align, cell.align(styles)))
-    .with_inset(cell_inset_field(inset, cell.inset(styles)))
-    .with_stroke(cell_stroke_field(stroke))
-    .with_breakable(Custom(breakable))
-    .with_kind(kind)
+  // (`cell.with_x(..).with_y(..)` and so on, with one copy of the fields:
+  // upstream's `cell.x.set(..)`, `cell.y.set(..)` on its own cell.)
+  let fields = cell.0.fields_copy()
+  set_field(
+    fields,
+    table_cell_elem_x,
+    (Custom(USize(x.to_int64())) : Smart[USize]),
+  )
+  set_field(
+    fields,
+    table_cell_elem_y,
+    (Custom(USize(y.to_int64())) : Smart[USize]),
+  )
+  set_field(fields, table_cell_elem_fill, (Custom(fill) : Smart[Paint?]))
+  set_field(
+    fields,
+    table_cell_elem_align,
+    cell_align_field(align, cell.align(styles)),
+  )
+  set_field(
+    fields,
+    table_cell_elem_inset,
+    cell_inset_field(inset, cell.inset(styles)),
+  )
+  set_field(fields, table_cell_elem_stroke, cell_stroke_field(stroke))
+  set_field(
+    fields,
+    table_cell_elem_breakable,
+    (Custom(breakable) : Smart[Bool]),
+  )
+  fields[table_cell_elem_kind] = Some(kind_to_value(kind))
+  let cell = TableCell::TableCell(cell.0.with_fields(fields))
   {
     body: cell.0,
     fill,
@@ -461,14 +484,33 @@ pub impl ResolvableCell for GridCell with fn resolve_cell(
   let fill = cell.fill(styles).unwrap_or(fill)
   let cell_stroke = resolve_sides_stroke(cell.stroke(styles), styles)
   let (stroke, stroke_overridden) = fold_cell_stroke(cell_stroke, stroke)
-  let cell = cell
-    .with_x(Custom(USize(x.to_int64())))
-    .with_y(Custom(USize(y.to_int64())))
-    .with_fill(Custom(fill))
-    .with_align(cell_align_field(align, cell.align(styles)))
-    .with_inset(cell_inset_field(inset, cell.inset(styles)))
-    .with_stroke(cell_stroke_field(stroke))
-    .with_breakable(Custom(breakable))
+  // (`cell.with_x(..).with_y(..)` and so on, with one copy of the fields:
+  // upstream's `cell.x.set(..)`, `cell.y.set(..)` on its own cell.)
+  let fields = cell.0.fields_copy()
+  set_field(
+    fields,
+    grid_cell_elem_x,
+    (Custom(USize(x.to_int64())) : Smart[USize]),
+  )
+  set_field(
+    fields,
+    grid_cell_elem_y,
+    (Custom(USize(y.to_int64())) : Smart[USize]),
+  )
+  set_field(fields, grid_cell_elem_fill, (Custom(fill) : Smart[Paint?]))
+  set_field(
+    fields,
+    grid_cell_elem_align,
+    cell_align_field(align, cell.align(styles)),
+  )
+  set_field(
+    fields,
+    grid_cell_elem_inset,
+    cell_inset_field(inset, cell.inset(styles)),
+  )
+  set_field(fields, grid_cell_elem_stroke, cell_stroke_field(stroke))
+  set_field(fields, grid_cell_elem_breakable, (Custom(breakable) : Smart[Bool]))
+  let cell = GridCell(cell.0.with_fields(fields))
   {
     body: cell.0,
     fill,

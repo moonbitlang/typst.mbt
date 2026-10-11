@@ -7,12 +7,24 @@
 /// access its absolute position on the pages. You can retrieve the current
 /// location with the `here` function and the location of a queried or shown
 /// element with the `location()` method on content.
-pub(all) struct Location(U128) derive(Eq, Hash, Debug)
+pub(all) struct Location(U128) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
 #doc(hidden)
 pub extend Location with Eq::{not_equal, equal}
+
+///|
+pub impl Hash for Location with fn hash_combine(self, hasher) {
+  hasher.combine(self.0)
+}
+
+///|
+/// The hash of a key of a map or a set: that of the number (see `Hash for
+/// U128`), not the default with its `Hasher` object per lookup.
+pub impl Hash for Location with fn hash(self) {
+  Hash::hash(self.0)
+}
 
 ///|
 // `hash` is not named here: the type already has a method of this name.

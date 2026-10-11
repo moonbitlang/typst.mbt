@@ -168,8 +168,13 @@ fn compute_initial_info(
   let mut is_pure_ltr = true
   // Set to true if any bidi isolation controls are present in the paragraph.
   let mut has_isolate_controls = false
-  for pair in text.char_indices() {
-    let (i, c) = pair
+  // (`for (i, c) in text.char_indices()`, without the array of pairs.)
+  for at in text.start..<text.end {
+    let c = text.cps[at]
+    if c < 0 {
+      continue
+    }
+    let i = at - text.start
     let class = bidi_class_of(c)
     let len = utf8_char_len(c)
     for _ in 0..<len {
@@ -653,8 +658,13 @@ fn reorder_levels(
   let mut reset_from : Int? = Some(0)
   let mut reset_to : Int? = None
   let mut prev_level = para_level
-  for pair in line_text.char_indices() {
-    let (i, c) = pair
+  // (`for (i, c) in line_text.char_indices()`, without the array of pairs.)
+  for at in line_text.start..<line_text.end {
+    let c = line_text.cps[at]
+    if c < 0 {
+      continue
+    }
+    let i = at - line_text.start
     let length = utf8_char_len(c)
     match line_classes[i] {
       // Segment separator, Paragraph separator
