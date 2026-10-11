@@ -11,6 +11,15 @@
 //   introspector (the labelled elements, headings, figures and metadata:
 //   where they are, how their pages are numbered), the same SVG and the
 //   same PDF, byte for byte.
+// - The pages as images are compared as a watching compiler leaves them:
+//   it exports one file per page and writes a page again only if the hash
+//   of the page is not what it was after the compilation before
+//   (`cli/compile.mbt`, `ExportCache`; [PageFiles]). The watch loop of a
+//   sequence keeps those hashes and files from step to step, a reference
+//   starts without any, and both must have the same pixels on every page.
+//   That is the one thing here that is kept across compilations by a
+//   fingerprint, and it fails where the fingerprint of a page says less
+//   than its pixels (an SVG image whose linked image changed).
 // - Nothing is compared that a user cannot see and that differs between a
 //   file that was edited and the same text parsed from scratch:
 //   span numbers. A span is written as what it points at, in the world of
@@ -56,8 +65,8 @@ priv struct Compiled {
 ///|
 /// The parts of a compilation, in the order they are compared.
 let compiled_parts : ReadOnlyArray[String] = [
-  "dependencies", "diagnostics", "frames", "introspector", "svg", "pdf diagnostics",
-  "pdf",
+  "dependencies", "diagnostics", "frames", "introspector", "svg", "page images",
+  "pdf diagnostics", "pdf",
 ]
 
 ///|
@@ -197,14 +206,84 @@ fn recompile_svg(doc : @layout.PagedDocument) -> String {
 }
 
 ///|
+/// The image files of a watching compiler that exports one PNG per page
+/// (`typst watch main.typ page-{p}.png`): the hash of every page after the
+/// last compilation that exported (`ExportCache.cache` in
+/// `cli/compile.mbt`) and what the file of the page holds.
+priv struct PageFiles {
+  hashes : Array[@library.U128]
+  /// The size and the pixels of the image in the file of every page.
+  files : Array[String]
+}
+
+///|
+/// No files yet: a first compilation.
+fn PageFiles::new() -> PageFiles {
+  { hashes: [], files: [], }
+}
+
+///|
+/// The resolution of the page images. Low: what is compared is whether a
+/// page that changed was exported again, and every page of every reference
+/// is rendered.
+let recompile_png_ppi : Double = 36.0
+
+///|
+/// Pages above this size are not rendered (an edit can make a page of any
+/// size, and the images of a reference are all made).
+let recompile_png_limit : @library.Abs = @library.Abs::cm(200.0)
+
+///|
+/// The image of a page, as a line.
+fn recompile_png(page : @layout.Page) -> String {
+  if page.frame.width() > recompile_png_limit ||
+    page.frame.height() > recompile_png_limit {
+    return "not rendered"
+  }
+  let options : @render.CompleteRenderOptions = {
+    render_bleed: false,
+    format: { ppi: recompile_png_ppi, },
+  }
+  try {
+    let pixmap = @render.render(page, options)
+    "\{pixmap.width()}x\{pixmap.height()} \{sha256_hex(pixmap.data()[:])}"
+  } catch {
+    @render.RenderPanic(message) => "panic \{message}"
+  }
+}
+
+///|
+/// Exports the pages of a document as the CLI does in `export_image`:
+/// page `i` is written if its hash is not the one in the cache
+/// (`ExportCache::is_cached`, which also takes the new hash). Returns what
+/// the files of the document's pages hold afterwards.
+fn PageFiles::write(self : PageFiles, doc : @layout.PagedDocument) -> String {
+  let out = StringBuilder()
+  for i, page in doc.pages() {
+    let hash = @library.hash128(page)
+    if i >= self.hashes.length() {
+      self.hashes.push(hash)
+      self.files.push(recompile_png(page))
+    } else if self.hashes[i] != hash {
+      self.hashes[i] = hash
+      self.files[i] = recompile_png(page)
+    }
+    out.write_string("page \{i + 1}: \{self.files[i]}\n")
+  }
+  out.to_string()
+}
+
+///|
 /// The sequence that is running, for the lines of `--check-reads`.
 let read_check_case : Ref[String] = Ref("")
 
 ///|
 /// Compiles the world as it is and dumps what came out. Also returns the
-/// dependencies as ids.
+/// dependencies as ids. `pages` are the image files that the compiler has
+/// written so far: those of the watch loop, or none.
 fn recompile_compile(
   world : RecompileWorld,
+  pages? : PageFiles = PageFiles::new(),
 ) -> (Compiled, Array[@syntax.FileId]) {
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
@@ -219,6 +298,7 @@ fn recompile_compile(
   let mut frames = ""
   let mut introspector = ""
   let mut svg = ""
+  let mut images = ""
   let pdf_diagnostics = StringBuilder()
   let mut pdf : Bytes = b""
   let document = match warned.output {
@@ -242,6 +322,8 @@ fn recompile_compile(
       frames = enc.out.to_string()
       introspector = recompile_introspector(dyn_world, doc)
       svg = recompile_svg(doc)
+      // (A compilation that fails exports nothing and leaves the files.)
+      images = pages.write(doc)
       let exported = make_live(doc)
       match exported.output {
         Ok(bytes) => {
@@ -270,6 +352,7 @@ fn recompile_compile(
       frames,
       introspector,
       svg,
+      images,
       pdf_diagnostics.to_string(),
       "\{pdf.length()} bytes, sha256 \{sha256_hex(pdf[:])}",
     ],

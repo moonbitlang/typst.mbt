@@ -226,6 +226,7 @@ let recompile_repository : ReadOnlyArray[(String, String)] = [
   ("bench/showcase", "bench/showcase.typ"),
   ("project/book", "tests/recompile/docs/book/main.typ"),
   ("project/chain", "tests/recompile/docs/chain/main.typ"),
+  ("project/linked", "tests/recompile/docs/linked/main.typ"),
   ("project/notes", "tests/recompile/docs/notes/main.typ"),
 ]
 
