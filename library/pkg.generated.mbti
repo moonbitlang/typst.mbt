@@ -11413,6 +11413,7 @@ pub struct SvgImage {
 }
 pub fn SvgImage::data(Self) -> Bytes
 pub fn SvgImage::height(Self) -> Double
+pub fn SvgImage::links(Self) -> ArrayView[U128]
 pub fn SvgImage::new(Bytes) -> Self raise LoadErr
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
 pub fn SvgImage::tree(Self) -> @usvg.Tree

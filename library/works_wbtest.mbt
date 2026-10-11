@@ -162,3 +162,30 @@ test "works: the errors they keep are copies for whoever catches them" {
     )
   }
 }
+
+///|
+test "svg: an image is its data, its fonts and the data of the images it links" {
+  let data : Bytes = b"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>"
+  let image = (links : Array[U128]) => {
+    let svg = SvgImage::new(data) catch { _ => abort("an SVG") }
+    Image::plain(Svg({ ..svg, links, }))
+  }
+  let a = hash128("a")
+  let b = hash128("b")
+  // Upstream's identity for an image that links nothing.
+  assert_true(image([]) == image([]))
+  assert_eq(hash128(image([])), hash128(image([])))
+  assert_true(image([a]) == image([a]))
+  assert_eq(hash128(image([a])), hash128(image([a])))
+  // The linked data, its number and its order.
+  let all = [image([]), image([a]), image([b]), image([a, b]), image([b, a])]
+  for i in 0..<all.length() {
+    for j in 0..<all.length() {
+      if i != j {
+        assert_true(all[i] != all[j])
+        assert_true(hash128(all[i]) != hash128(all[j]))
+        assert_true(Hash::hash(all[i]) != Hash::hash(all[j]))
+      }
+    }
+  }
+}

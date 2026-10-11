@@ -598,8 +598,9 @@ fn SipHasher128::write_raster_format(
 /// Upstream derives `Hash` for `ImageInner` (kind, alt text, scaling) with
 /// the handwritten impls of the kinds: raster images are defined by data,
 /// format and ICC profile, SVGs by data and used fonts (and whether fonts
-/// were resolved at all), PDF pages by the document's data and the page
-/// index.
+/// were resolved at all; here also by the data of the images they link,
+/// which upstream's hash leaves out), PDF pages by the document's data and
+/// the page index.
 pub impl Fingerprint for Image with fn fingerprint(self, state) {
   match self.kind {
     Raster(raster) => {
@@ -619,6 +620,11 @@ pub impl Fingerprint for Image with fn fingerprint(self, state) {
       state.write_data(svg.data)
       state.write_bool(svg.resolved)
       state.write(svg.fonts)
+      // Not upstream: the data of the linked images ([SvgImage::links]).
+      state.write_usize(svg.links.length())
+      for link in svg.links {
+        state.write_u128(link)
+      }
     }
     Pdf(pdf) => {
       state.write_discriminant(2)

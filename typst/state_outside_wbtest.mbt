@@ -220,3 +220,123 @@ test "works: generated once for all the calls of an iteration that cite" {
   assert_eq(checked.differ, [])
   assert_true(checked.entries >= 12)
 }
+
+///|
+/// An opaque PNG of one colour.
+fn outside_png(r : Int, g : Int, b : Int) -> Bytes {
+  let pixels = Bytes::makei(4 * 4 * 3, i => {
+    match i % 3 {
+      0 => r.to_byte()
+      1 => g.to_byte()
+      _ => b.to_byte()
+    }
+  })
+  @codecs.encode_png(pixels[:], 4, 4, Rgb)
+}
+
+///|
+/// An SVG that shows the image next to it.
+let outside_svg : String =
+  #|<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  #|  <image href="photo.png" x="0" y="0" width="20" height="20"/>
+  #|</svg>
+  #|
+
+///|
+/// The hashes of the pages of the world's document, as `typst watch` keeps
+/// them to decide whether a page is exported again (`cli/compile.mbt`,
+/// `ExportCache`).
+fn outside_page_hashes(world : ReadingWorld) -> Array[@library.U128] raise {
+  let warned : @library.Warned[
+    Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+  ] = compile(world)
+  guard warned.output is Ok(document) else { fail("the document compiles") }
+  let hashes = []
+  for page in document.pages() {
+    hashes.push(@library.hash128(page))
+  }
+  hashes
+}
+
+///|
+test "svg: a linked image that changes is another page" {
+  // Two compilations of one world. The SVG file is what it was; the image
+  // it links is not. The pages hashed the same, so a watching compiler did
+  // not export the page again and its PNG kept the old photo.
+  let world = reading_world("#image(\"art.svg\")")
+  world.data[reading_id("art.svg")] = @utf8.encode(outside_svg)
+  world.data[reading_id("photo.png")] = outside_png(255, 0, 0)
+  let red = outside_page_hashes(world)
+  assert_eq(outside_page_hashes(world), red)
+  world.data[reading_id("photo.png")] = outside_png(0, 0, 255)
+  let blue = outside_page_hashes(world)
+  assert_true(blue != red)
+  // The same bytes in another object are the same image.
+  world.data[reading_id("photo.png")] = outside_png(0, 0, 255)
+  assert_eq(outside_page_hashes(world), blue)
+  world.data[reading_id("photo.png")] = outside_png(255, 0, 0)
+  assert_eq(outside_page_hashes(world), red)
+}
+
+///|
+test "svg: a tiling of an SVG is as good as the images the SVG links" {
+  // A value that holds the decoded image: the tiling lays out its body
+  // when it is made and keeps the frame. Whoever is handed the tiling (a
+  // memoized closure call, for one) reads no file, so the tiling itself
+  // must tell the two apart: its fingerprint, which is in keys, and its
+  // equality, by which arguments are compared.
+  let made = (r : Int, b : Int) => {
+    let world = reading_world(
+      "#let t = tiling(size: (20pt, 20pt), image(\"art.svg\", width: 20pt))\n#metadata(t)",
+    )
+    world.data[reading_id("art.svg")] = @utf8.encode(outside_svg)
+    world.data[reading_id("photo.png")] = outside_png(r, 0, b)
+    let warned : @library.Warned[
+      Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
+    ] = compile(world)
+    guard warned.output is Ok(document) else { fail("the document compiles") }
+    let elem = document
+      .introspector()
+      .query(Elem(@library.metadata_elem(), None))[0]
+    guard @library.MetadataElem::of(elem) is Some(metadata) else {
+      fail("metadata")
+    }
+    guard metadata.value() is Tiling(tiling) else { fail("a tiling") }
+    tiling
+  }
+  let red = made(255, 0)
+  let again = made(255, 0)
+  let blue = made(0, 255)
+  assert_true(red == again)
+  assert_eq(@library.hash128(red), @library.hash128(again))
+  assert_true(red != blue)
+  assert_true(@library.hash128(red) != @library.hash128(blue))
+}
+
+///|
+test "svg: the linked image is a read of every call that decodes the SVG" {
+  // Upstream: `SvgImage::with_fonts_images` is memoized and tracks the
+  // world, whose `file` the image resolver calls. Here the read is the
+  // tracked world's, and the recording check compares what the entries
+  // keep with what a run from scratch asks.
+  let world = reading_world(
+    "#let f() = image(\"art.svg\", width: 20pt)\n#block(f())\n#block(f())\n#box(fill: tiling(size: (20pt, 20pt), f()), width: 40pt, height: 40pt)",
+  )
+  world.data[reading_id("art.svg")] = @utf8.encode(outside_svg)
+  world.data[reading_id("photo.png")] = outside_png(255, 0, 0)
+  let checked = checked_compile(world)
+  assert_eq(checked.text, "")
+  assert_eq(checked.differ, [])
+  assert_true(checked.entries >= 2)
+  // A linked image that is not there fails the document, and comes back.
+  world.data.remove(reading_id("photo.png"))
+  let checked = checked_compile(world)
+  assert_true(
+    checked.text.contains("failed to load linked image photo.png in SVG"),
+  )
+  assert_eq(checked.differ, [])
+  world.data[reading_id("photo.png")] = outside_png(0, 0, 255)
+  let checked = checked_compile(world)
+  assert_eq(checked.text, "")
+  assert_eq(checked.differ, [])
+}
