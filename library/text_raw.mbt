@@ -607,7 +607,7 @@ let raw_syntax_cache : Array[(Bytes, RawSyntax)] = []
 /// sources are the field's value, the list goes into its companion field
 /// `syntaxes-derived`, see [raw_elem_syntaxes_parse]).
 fn RawSyntax::load(
-  world : &World,
+  world : TrackedWorld,
   sources : @syntax.Spanned[OneOrMultiple[DataSource]],
 ) -> Array[RawSyntax] raise SourceError {
   let loaded = load_many({ v: sources.v.0, span: sources.span, }, world)
@@ -819,7 +819,7 @@ let raw_theme_cache : Array[(Bytes, RawTheme)] = []
 /// source is the field's value, the theme goes into its companion field
 /// `theme-derived`, see [raw_elem_theme_parse]).
 fn RawTheme::load(
-  world : &World,
+  world : TrackedWorld,
   source : @syntax.Spanned[DataSource],
 ) -> RawTheme raise SourceError {
   let loaded = source.v.load(source.span, world)

@@ -60,7 +60,7 @@ pub fn SvgImage::new(data : Bytes) -> SvgImage raise LoadErr {
 /// Returns the image and the warnings.
 pub fn SvgImage::with_fonts_images(
   data : Bytes,
-  world : &World,
+  world : TrackedWorld,
   families : Array[String],
   svg_file : @syntax.FileId?,
 ) -> (SvgImage, Array[HintedString]) raise LoadErr {
@@ -240,7 +240,7 @@ priv struct SvgFontResolver {
   /// Typst's font book.
   book : FontBook
   /// The world we use to load fonts.
-  world : &World
+  world : TrackedWorld
   /// The active list of font families at the location of the SVG.
   families : Array[String]
   /// A mapping from Typst font indices to fontdb IDs.
@@ -254,7 +254,7 @@ priv struct SvgFontResolver {
 ///|
 /// Create a new font provider.
 fn SvgFontResolver::new(
-  world : &World,
+  world : TrackedWorld,
   book : FontBook,
   families : Array[String],
 ) -> SvgFontResolver {
@@ -412,7 +412,7 @@ fn font_stretch_from_usvg(stretch : @usvg.FontStretch) -> FontStretch {
 /// (Linked SVG images from an SVG are not supported yet.)
 priv struct SvgImageResolver {
   /// The world used to load linked images.
-  world : &World
+  world : TrackedWorld
   /// Parent folder of the SVG file, used to resolve hrefs to linked images,
   /// if any.
   svg_file : @syntax.FileId?
@@ -422,7 +422,7 @@ priv struct SvgImageResolver {
 
 ///|
 fn SvgImageResolver::new(
-  world : &World,
+  world : TrackedWorld,
   svg_file : @syntax.FileId?,
 ) -> SvgImageResolver {
   { world, svg_file, error: None, }

@@ -300,12 +300,18 @@ pub struct Source {
 pub fn Source::detached(String) -> Self
 pub fn Source::edit(Self, Int, Int, String) -> (Self, (Int, Int))
 pub fn Source::find(Self, Span) -> LinkedNode?
+pub fn Source::has_memo(Self) -> Bool
 pub fn Source::id(Self) -> FileId
+pub fn Source::is_pristine(Self) -> Bool
 pub fn Source::lines(Self) -> Lines
+pub fn Source::memo_hi(Self) -> UInt64
+pub fn Source::memo_lo(Self) -> UInt64
 pub fn Source::new(FileId, String) -> Self
 pub fn Source::range(Self, SpanNumber, SubRange?) -> (Int, Int)?
 pub fn Source::replace(Self, String) -> (Self, (Int, Int))
 pub fn Source::root(Self) -> SyntaxNode
+pub fn Source::serial(Self) -> Int
+pub fn Source::set_memo(Self, UInt64, UInt64) -> Unit
 pub fn Source::text(Self) -> String
 pub fn Source::with_root(FileId, String, SyntaxNode) -> Self
 

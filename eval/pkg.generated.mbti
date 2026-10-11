@@ -16,7 +16,7 @@ pub fn eval_expr(Vm, @ast.Expr) -> @library.Value raise @library.SourceError
 
 pub fn eval_markup(Vm, @ast.Markup) -> @library.Content raise @library.SourceError
 
-pub fn eval_source(&@library.World, @library.Library, @library.Traced, @library.Sink, @library.Route, @syntax.Source) -> @library.Module raise @library.SourceError
+pub fn eval_source(@library.TrackedWorld, @library.Library, @library.Traced, @library.Sink, @library.Route, @syntax.Source) -> @library.Module raise @library.SourceError
 
 pub fn eval_string(@library.Engine, @library.Context, String, @syntax.Span, @syntax.SyntaxMode, @library.Scope) -> @library.Value raise @library.SourceError
 

@@ -12,7 +12,7 @@ fn evaluated_module(world : TestWorld, file : String) -> @library.Module raise {
   for id, source in world.files {
     if id.vpath().get_without_slash() == file {
       return @eval.eval_source(
-        world,
+        @library.TrackedWorld::new(world),
         world.library,
         @library.Traced::new(),
         @library.Sink::new(),
@@ -34,7 +34,7 @@ fn called(
 ) -> String raise {
   let engine : @library.Engine = {
     library: world.library,
-    world,
+    world: @library.TrackedWorld::new(world),
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),
     sink: @library.Sink::new(),

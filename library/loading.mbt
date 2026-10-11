@@ -68,7 +68,7 @@ pub extend DataSource with FromValue::{from_value}
 pub fn DataSource::load(
   self : DataSource,
   span : @syntax.Span,
-  world : &World,
+  world : TrackedWorld,
 ) -> Loaded raise SourceError {
   match self {
     Path(path) => {
@@ -96,7 +96,7 @@ pub fn DataSource::load(
 /// Spanned<OneOrMultiple<DataSource>>`).
 pub fn load_many(
   sources : @syntax.Spanned[Array[DataSource]],
-  world : &World,
+  world : TrackedWorld,
 ) -> Array[Loaded] raise SourceError {
   sources.v.map(source => source.load(sources.span, world))
 }

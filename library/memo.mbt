@@ -44,15 +44,31 @@
 //   copy-on-write; values mark their containers shared).
 // - Errors are not cached (the call is simply executed again).
 //
+// - World reads of the call (sources, files, the font book, fonts, the
+//   date) are recorded with the fingerprints of their answers
+//   (`tracked_world.mbt`). A cached result is only reused if they give the
+//   same answers in the scope of the later call; they are then noted for
+//   the calls around it, as if the call had run. A call that read a file
+//   that changes during a scope is not cached. Nothing is looked up or
+//   stored for an engine whose world is not in a scope.
+// - The library is compared by identity (upstream hashes it into the key
+//   of every memoized function that builds an engine).
+//
 // Caches only live for one compilation ([with_layout_memo]: its evaluation
-// and its introspection iterations), as the world (files, fonts) is fixed
-// during it.
+// and its introspection iterations). The world reads of an entry are
+// therefore validated in the scope they were recorded in, where they
+// hold, unless an engine with another world is used inside a compilation
+// (a host function that evaluates with a world of its own).
 
 ///|
 /// A memoized result.
 priv struct MemoEntry[T, I] {
   /// The arguments that must be equal for reuse (beyond the key).
   input : I
+  /// The library the result was computed with.
+  library : Library
+  /// The world reads of the call.
+  world : WorldReads
   /// The introspector the result was computed with.
   backend : &IntrospectorBackend
   /// The introspector reads of the call.
@@ -68,12 +84,14 @@ priv struct MemoEntry[T, I] {
 priv struct MemoStore[T, I] {
   /// The compilation the entries belong to.
   mut generation : Int
-  entries : Map[U128, Array[MemoEntry[T, I]]]
+  mut entries : Map[U128, Array[MemoEntry[T, I]]]
+  /// Whether [set_memo_check] knows the store (`memo_check.mbt`).
+  mut checked : Bool
 }
 
 ///|
 fn[T, I] MemoStore::new() -> MemoStore[T, I] {
-  { generation: 0, entries: {}, }
+  { generation: 0, entries: {}, checked: false, }
 }
 
 ///|
@@ -101,15 +119,13 @@ pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
 }
 
 ///|
-/// The number of compilations that were started ([compilation_epoch]).
-let compilation_counter : Ref[Int] = { val: 0, }
-
-///|
 /// The number of compilations in progress (one inside the other).
 let compilation_depth : Ref[Int] = { val: 0, }
 
 ///|
-/// Run `f` (a compilation) with fresh memoization caches.
+/// Run `f` (a compilation) with fresh memoization caches. The caches are
+/// only used by engines whose world is in a scope
+/// ([TrackedWorld::scoped]): a compilation runs inside one.
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
 ) -> T raise SourceError {
@@ -117,7 +133,6 @@ pub fn[T] with_layout_memo(
   memo_counter.val += 1
   memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
   if compilation_depth.val == 0 {
-    compilation_counter.val += 1
     // The world may have other files now than in the compilation before.
     sweep_data_hashes()
   }
@@ -132,46 +147,6 @@ pub fn[T] with_layout_memo(
   memo_generation.val = outer
   compilation_depth.val -= 1
   result
-}
-
-///|
-/// A number that changes whenever a compilation starts (not one inside
-/// another), with memoization on or off: unlike [memo_compilation] it is
-/// never zero in a compilation, and it keeps its value after one.
-///
-/// For results that must be shared within a compilation and are only valid
-/// while the world's files are what they were: a world may change its files
-/// between two compilations (`typst watch`; comemo checks what a memoized
-/// call read from the world before it reuses a result).
-pub fn compilation_epoch() -> Int {
-  compilation_counter.val
-}
-
-///|
-/// The number of evaluations in progress that a host started outside of a
-/// compilation ([evaluation_begin]), one inside the other.
-let evaluation_depth : Ref[Int] = { val: 0, }
-
-///|
-/// Enters an evaluation: of a source file (`eval_source`) or of a string
-/// (`eval_string`), or what a host puts around several of them (`doc`'s
-/// `lower`). Outside of a compilation the outermost one starts a new
-/// [compilation_epoch], since nothing says that the world's files are what
-/// they were for the evaluation before; the evaluations inside it (the
-/// files it imports, also those a string imports, whose route is the root)
-/// share it, so that a file imported twice is one module. Every call is
-/// followed by [evaluation_end].
-pub fn evaluation_begin() -> Unit {
-  if compilation_depth.val == 0 && evaluation_depth.val == 0 {
-    compilation_counter.val += 1
-  }
-  evaluation_depth.val += 1
-}
-
-///|
-/// Leaves an evaluation ([evaluation_begin]).
-pub fn evaluation_end() -> Unit {
-  evaluation_depth.val -= 1
 }
 
 ///|
@@ -256,9 +231,13 @@ fn[T, I : Eq] memoize(
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
   cacheable? : (T) -> Bool = _ => true,
+  // What the recording check calls the call (a function of the input, so
+  // that passing it allocates nothing).
+  label? : (I) -> String = _ => "memoized call",
 ) -> T raise SourceError {
   let generation = memo_generation.val
-  if generation == 0 {
+  let world = engine.world
+  if generation == 0 || !world.in_scope() {
     return f(engine)
   }
   if store.generation != generation {
@@ -280,10 +259,14 @@ fn[T, I : Eq] memoize(
   if store.entries.get(key) is Some(entries) {
     for entry in entries {
       if entry.input == input &&
+        physical_equal(entry.library, engine.library) &&
         (
           physical_equal(entry.backend, backend) ||
           (!entry.reads.lossy && entry.reads.validate(engine.introspector))
-        ) {
+        ) &&
+        // Last: this makes the world reads that the scope has no answer
+        // for and notes them for the calls around this one.
+        world.validate(entry.world) {
         if parent is Some(parent) {
           entry.reads.merge_into(parent)
         }
@@ -308,15 +291,47 @@ fn[T, I : Eq] memoize(
     }
     engine.sink.extend_from_sink(sink)
   }
+  let mark = world.reads_begin()
   let output = {
-    errdefer finish()
+    errdefer {
+      world.reads_abort(mark)
+      finish()
+    }
     f(inner)
   }
+  let world_reads = world.reads_end(mark)
   finish()
-  if !cacheable(output) {
+  // A call that read a file that changes during the scope is not kept.
+  if world_reads.is_volatile() || !cacheable(output) {
     return output
   }
-  let entry = { input, backend, reads, sink, output: copy(output), }
+  // The store may belong to another compilation by now (a nested one).
+  guard store.generation == generation else { return output }
+  if memo_check_enabled() {
+    if !store.checked {
+      store.checked = true
+      register_memo_check_store(() => store.set_aside())
+    }
+    memo_check_reads(() => label(input), world, world_reads, () => {
+      let again = {
+        ..engine,
+        introspector: engine.introspector.track_with(
+          IntrospectionRecorder::new(),
+        ),
+        sink: Sink::new(),
+      }
+      f(again) |> ignore
+    })
+  }
+  let entry = {
+    input,
+    library: engine.library,
+    world: world_reads,
+    backend,
+    reads,
+    sink,
+    output: copy(output),
+  }
   match store.entries.get(key) {
     Some(entries) => {
       if entries.length() >= memo_max_entries {
@@ -643,6 +658,7 @@ pub fn memoized_layout(
     frames => frames.map(frame => frame.clone()),
     engine => f(engine).0,
     cacheable=frames => frames.iter().all(frame_cacheable),
+    label=input => "layout of \{input.content.elem.name()}",
   )
   Fragment(frames)
 }
@@ -724,7 +740,10 @@ fn paint_cacheable(paint : Paint) -> Bool {
 //   for ([note_route_query]), whose answers must be the same on the route
 //   of a later call.
 // - The traced span is part of the fingerprint (an evaluated string runs
-//   without one). The world and the library are fixed for a compilation.
+//   without one). The world is tracked like upstream's `Tracked<dyn World>`
+//   (`tracked_world.mbt`): the reads of a call are kept with their answers,
+//   which must be the same in the scope of a later call. The library is
+//   compared by identity (upstream hashes it).
 // - Results are values: containers are marked shared, so that a mutation
 //   through one holder copies them. A result may hold closures that the
 //   call created: they are equal to the ones a repeated call would create
@@ -754,6 +773,10 @@ priv struct ClosureEntry {
   /// evaluation of a source file that reuses the call; `None` if the call
   /// was not computed inside one, which then cannot reuse it.
   traced_files : Array[@syntax.FileId]?
+  /// The library the result was computed with.
+  library : Library
+  /// The world reads of the call.
+  world : WorldReads
   /// The introspector the result was computed with.
   backend : &IntrospectorBackend
   /// The introspector reads of the call (`None`: none).
@@ -770,9 +793,9 @@ priv struct ClosureStore {
   mut generation : Int
   /// By the fingerprint of the function and the arguments: what the calls
   /// computed so far asked of their contexts.
-  asked : Map[U128, Int]
+  mut asked : Map[U128, Int]
   /// By that fingerprint and the parts of the context in `asked`.
-  entries : Map[U128, Array[ClosureEntry]]
+  mut entries : Map[U128, Array[ClosureEntry]]
 }
 
 ///|
@@ -1023,7 +1046,8 @@ fn ClosureEntry::matches(
 ) -> Bool {
   guard self.shift_lo <= shift &&
     shift <= self.shift_hi &&
-    self.func.span == func.span else {
+    self.func.span == func.span &&
+    physical_equal(self.library, engine.library) else {
     return false
   }
   guard funcs_memo_equal(self.func, func) else { return false }
@@ -1052,11 +1076,16 @@ fn ClosureEntry::matches(
       return false
     }
   }
-  physical_equal(self.backend, engine.introspector.backend) ||
-  (match self.reads {
-    None => true
-    Some(reads) => !reads.lossy && reads.validate(engine.introspector)
-  })
+  guard physical_equal(self.backend, engine.introspector.backend) ||
+    (match self.reads {
+      None => true
+      Some(reads) => !reads.lossy && reads.validate(engine.introspector)
+    }) else {
+    return false
+  }
+  // Last: this makes the world reads that the scope has no answer for and
+  // notes them for the calls around this one.
+  engine.world.validate(self.world)
 }
 
 ///|
@@ -1071,7 +1100,8 @@ pub fn memoized_closure(
   f : (Func, Closure, Engine, Context, Args) -> Value raise SourceError,
 ) -> Value raise SourceError {
   let generation = memo_generation.val
-  if generation == 0 {
+  let world = engine.world
+  if generation == 0 || !world.in_scope() {
     return f(func, closure, engine, context, args)
   }
   let store = closure_store
@@ -1156,6 +1186,7 @@ pub fn memoized_closure(
   route_shift_scopes.val += 1
   let queries = route_queries_begin()
   let traced_start = if collecting { traced_files_begin() } else { -1 }
+  let mark = world.reads_begin()
   let mut asked = 0
   let mut shift_lo = 0
   let mut shift_hi = 0
@@ -1181,10 +1212,16 @@ pub fn memoized_closure(
     engine.sink.extend_from_sink(sink)
   }
   let output = {
-    errdefer finish()
+    errdefer {
+      world.reads_abort(mark)
+      finish()
+    }
     f(func, closure, inner, context, args)
   }
+  let world_reads = world.reads_end(mark)
   finish()
+  // A call that read a file that changes during the scope is not kept.
+  guard !world_reads.is_volatile() else { return output }
   // The store may belong to another compilation by now (a nested one).
   guard store.generation == generation else { return output }
   let known = store.asked.get(base)
@@ -1203,6 +1240,24 @@ pub fn memoized_closure(
   write_asked_context(state, context, all)
   let key = state.finish128()
   fingerprint_flags.val = outer_flags
+  if memo_check_enabled() {
+    let label = () => "call of \{func.name().unwrap_or("a closure")}"
+    memo_check_reads(label, world, world_reads, () => {
+      let again = {
+        ..engine,
+        introspector: engine.introspector.track_with(
+          IntrospectionRecorder::new(),
+        ),
+        sink: Sink::new(),
+      }
+      // What the call asks of its context is the first run's.
+      let context_reads = context.reads
+      defer {
+        context.reads = context_reads
+      }
+      f(func, closure, again, context, snapshot.copy()) |> ignore
+    })
+  }
   let entry : ClosureEntry = {
     func,
     args: snapshot,
@@ -1214,6 +1269,8 @@ pub fn memoized_closure(
     route: engine.route,
     queried,
     traced_files,
+    library: engine.library,
+    world: world_reads,
     backend: engine.introspector.backend,
     reads: if reads.calls.is_empty() && !reads.lossy {
       None

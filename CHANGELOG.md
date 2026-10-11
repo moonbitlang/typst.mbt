@@ -74,6 +74,38 @@ Typst source) are unchanged.
 - `hayro/interpret`: `GraphicsState` and `TextState`, `hayro/svg`:
   `SvgRenderer`, `otf`: `CffIndex` are no longer exported. They were
   abstract types that no public function accepted or returned.
+- `library`: the engine reads the world through a tracked world
+  (upstream's `Tracked<dyn World>`; `docs/incremental-design.md`, section
+  5.2), so that what a memoized call read of the world is known.
+  `Engine.world` is a `TrackedWorld` (it was a `&World`): code that builds
+  an `Engine` writes `world: @library.TrackedWorld::new(world)`. The
+  functions that took the world of an engine take the tracked world:
+  `world_range`, `analyze` (which also takes the `Library` now: it asked
+  the world for it), `DataSource::load`, `load_many`,
+  `SvgImage::with_fonts_images`, `BibliographyElem::keys`, `database` and
+  `csl_style`; in `layout`, the method `world` of the trait
+  `SharedShapingContext` returns it; in `eval`, `eval_source` takes it as
+  its first argument. A `World` implementation does not change.
+- `typst`: the callback of `compile_with` gets the tracked world of the
+  compilation before the library (`(TrackedWorld, Library) -> Content`,
+  it was `(Library) -> Content`); an engine it builds must hold that
+  tracked world. `compile_with` has a new optional argument,
+  `volatile_files? : (FileId) -> Bool`, for a world whose files change
+  during a compilation (`doc`'s sessions): what reads such a file is not
+  memoized.
+- `library`: `compilation_epoch()`, `evaluation_begin()` and
+  `evaluation_end()` are gone (they were added since 0.1.4). What they
+  were for is a scope of a tracked world (`TrackedWorld::scoped`,
+  `scope_token`, `world_scope_open`).
+- `library`: nothing is memoized for an engine whose world is in no scope.
+  A compilation, `eval_source`, `eval_string` and `doc`'s `lower` open
+  one; a host that calls memoized functions of the engine directly
+  (`memoized_layout`, `memoized_closure`) with `with_layout_memo` around
+  them wraps them in `world.scoped(..)` too.
+- `library`: a world must hand out the font book and the font objects it
+  has, not make them per call: the tracked world takes a book and a font
+  for the same answer only as the same object (`FontBook::edition`,
+  `Font::serial`). It stays correct otherwise, and finds less again.
 - `doc`: `Stroke(dash=..)` takes a `Dash` (it was a `Value`): write a
   preset (`Dotted`, `Dashed`, ..), `Pattern([..], phase=..)`, or
   `RawValue(v)` for the value passed before.
@@ -161,12 +193,22 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   host that keeps a `World` do): a module of an imported file was found
   again by the text of that file alone, so it was reused although a file
   that it imports or reads (`json`, `read`, ..) had changed, and those
-  files were not read again. Memoized module evaluations now end with the
-  compilation (`library`: `compilation_epoch()`), and outside of one with
-  the evaluation (`eval_source` with the root route; `library`:
-  `evaluation_begin()`/`evaluation_end()`: a string that is evaluated outside
-  of a compilation and the files it imports are one evaluation). Within one compilation nothing changes: a
-  file is still evaluated once.
+  files were not read again. Memoized module evaluations now end with
+  their scope: the compilation, or outside of one the evaluation that a
+  host started (`eval_source`, `eval_string`, `doc`'s `lower`: a string
+  that is evaluated outside of a compilation and the files it imports are
+  one scope, two evaluations in a row are two). Within one compilation
+  nothing changes: a file is still evaluated once.
+- A `doc` document whose Typst code reads the session's own virtual files
+  (the origin listing, a markup fragment) got what an earlier call had
+  read, since closure calls are memoized and the listing grows while a
+  document is compiled. Such files are declared to the engine now and
+  what reads them is not kept.
+- A function that was called with an engine of another world or another
+  library inside a compilation (a host function that evaluates with a
+  world of its own) could be answered from a call made for the
+  compilation's world. Entries of memoized calls are compared by their
+  library and by what they read of the world now.
 
 - Damaged PNG images: the decoder checked no chunk CRC and allocated the
   frame that the header claims, so a file with a damaged header either
@@ -221,6 +263,20 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
 
 ### Added
 
+- `library`: `TrackedWorld` (`new(world, volatile_files?)`, the reads
+  `source`, `file`, `book`, `font`, `today`, and for hosts and stores
+  `scoped`, `in_scope`, `scope_token`, `is_volatile`, `reads_begin`,
+  `reads_end`, `reads_abort`, `validate`), `WorldReads` (`is_volatile`,
+  `length`, `describe`), `WorldReadsMark`, `world_scope_open`.
+  `FontBook::edition`, `Font::serial`.
+- `library`: a check of what memoized calls record of the world, for
+  tests: `set_memo_check`, `memo_check_enabled`, `take_memo_check_report`,
+  `memo_check_reads`, `memo_check_running_now`,
+  `register_memo_check_store` (the runner's
+  `--check-reads`).
+- `syntax`: `Source::serial`, `is_pristine`, and a slot of two words that
+  a caller keeps with a source (`has_memo`, `memo_hi`, `memo_lo`,
+  `set_memo`).
 - The CLI has `watch` (`typst watch input.typ [output]`, native and wasm):
   the port of `typst-cli`'s, without its HTTP server for HTML export.
 - `kit/watcher`, a new package (upstream's `watcher` feature of typst-kit):

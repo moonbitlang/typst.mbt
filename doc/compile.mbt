@@ -332,7 +332,7 @@ pub fn[T] ExportReport::unwrap(self : ExportReport[T]) -> T raise DocError {
 fn Document::lower_initial(
   self : Document,
   session : Session,
-  world : SessionWorld,
+  world : @library.TrackedWorld,
   library : @library.Library,
   traced : @library.Traced,
   sink : @library.Sink,
@@ -419,11 +419,13 @@ pub fn[T : @library.Output] Document::compile(
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
-  let evaluate = library => {
-    self.lower_initial(session, session_world, library, traced, sink)
+  let evaluate = (world, library) => {
+    self.lower_initial(session, world, library, traced, sink)
   }
   let result : Result[T, Array[@library.SourceDiagnostic]] = try
-    @typst.compile_with(session_world, traced, sink, evaluate)
+    @typst.compile_with(session_world, traced, sink, evaluate, volatile_files=id => {
+      session.registry.changes(id)
+    })
   catch {
     @library.SourceError(errors) => Err(@typst.deduplicate(errors))
   } noraise {
@@ -445,19 +447,19 @@ pub fn Document::lower(
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
-  // One evaluation for the whole lowering, as a compilation is one: the
-  // fragments of Typst source in the document share the modules of the
-  // files they import.
-  @library.evaluation_begin()
-  defer @library.evaluation_end()
+  // A lowering without a compilation is a scope of its world, like a
+  // compilation (`library/tracked_world.mbt`).
+  let world = session.tracked(session_world)
   let result : Result[@library.Content, Array[@library.SourceDiagnostic]] = try
-    self.lower_initial(
-      session,
-      session_world,
-      session_world.session.base.library(),
-      traced,
-      sink,
-    )
+    world.scoped(() => {
+      self.lower_initial(
+        session,
+        world,
+        session_world.session.base.library(),
+        traced,
+        sink,
+      )
+    })
   catch {
     @library.SourceError(errors) => Err(@typst.deduplicate(errors))
   } noraise {

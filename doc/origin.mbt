@@ -522,6 +522,28 @@ fn Registry::snippet(
 }
 
 ///|
+/// Whether a file of the world changes while the session compiles (the
+/// engine's "volatile files", `library/tracked_world.mbt`): the origin
+/// listing, which grows with every origin that is registered, also while
+/// callbacks are lowered during layout, and the files of the markup
+/// snippets, which come into being then. By path, not by what the
+/// registry holds at the moment: a snippet that does not exist yet is
+/// read from the caller's world today and from the registry later in the
+/// same compilation. What reads such a file is not memoized.
+fn Registry::changes(self : Registry, id : @syntax.FileId) -> Bool {
+  if id == self.origins {
+    return true
+  }
+  guard id.root() is Project else { return false }
+  guard id.vpath().file_name() is Some(name) else { return false }
+  guard name.has_prefix("<edsl-markup-") && name.has_suffix(">") else {
+    return false
+  }
+  // The id that `snippet` makes for a file of this name.
+  virtual_file(self.dir, name) == Some(id)
+}
+
+///|
 /// The listing as a source file.
 fn Registry::listing_source(self : Registry) -> @syntax.Source {
   match self.source {
