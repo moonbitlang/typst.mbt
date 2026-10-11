@@ -72,14 +72,16 @@ test "blocks: a table and a block are found again by the next compilation" {
   // does not break, the one that does, and the ellipse, at least.
   assert_true(first.1 >= 7)
   assert_true(pages[0].length() >= 2)
-  // The next compilation of the same world computes none of them.
+  // The next compilation of the same world computes none of them, and
+  // asks for none: it finds its document (slice 3), and what is found asks
+  // for nothing beneath it.
   let second = block_memo_delta(() => pages.push(outside_page_hashes(world)))
-  assert_eq(second.1, 0)
-  assert_true(second.0 >= 6)
+  assert_eq(second, (0, 0))
   assert_eq(pages[1], pages[0])
   assert_eq(block_memo_reference(world), pages[0])
-  // After an edit at the end of the file every block before it is found:
-  // the nodes outside of the edit keep their span numbers.
+  // After an edit at the end of the file the document and its page run
+  // are laid out, and every block before the edit is found: the nodes
+  // outside of the edit keep their span numbers.
   let edited = block_memo_edit(
     world,
     block_memo_document + "#rect(width: 5pt, height: 5pt)\n",
@@ -100,7 +102,10 @@ test "blocks: a table and a block are found again by the next compilation" {
 test "blocks: found by the later iterations of one compilation" {
   @library.evict(0)
   // The page count is known in the second iteration; the table does not
-  // ask for it and is laid out once.
+  // ask for it and is laid out once: its page run is laid out again (the
+  // number beside the table is another child), and the table is found. The
+  // block of the second page is not asked for a second time: its run is
+  // found (slice 3).
   let world = reading_world(
     (
       #|#set page(width: 160pt, height: 120pt, margin: 10pt)
@@ -112,8 +117,10 @@ test "blocks: found by the later iterations of one compilation" {
     ),
   )
   let pages = []
+  let runs = @layout.page_run_memo_stats()
   let counts = block_memo_delta(() => pages.push(outside_page_hashes(world)))
-  assert_true(counts.0 >= 2)
+  assert_true(counts.0 >= 1)
+  assert_true(@layout.page_run_memo_stats().0 - runs.0 >= 1)
   assert_eq(block_memo_reference(world), pages[0])
 }
 
@@ -216,12 +223,15 @@ test "blocks: tables that differ in one cell, stroke, track or header flag are d
       fail("\{name}: laid out again for the same text")
     }
   }
-  // And back: the first document is found as it was.
+  // And back: the first document is found as it was, as a document
+  // (slice 3), so that no block is asked for.
   let back = block_memo_edit(world, document(base))
+  let documents = @layout.document_memo_stats()
   let counts = block_memo_delta(() => {
     assert_eq(outside_page_hashes(back), pages)
   })
-  assert_true(counts.0 >= 2)
+  assert_eq(counts, (0, 0))
+  assert_true(@layout.document_memo_stats().0 - documents.0 >= 1)
 }
 
 ///|
@@ -244,11 +254,17 @@ test "blocks: the same block at three places is three layouts" {
   )
   let pages = outside_page_hashes(world)
   assert_eq(block_memo_reference(world), pages)
-  let again = block_memo_delta(() => {
-    assert_eq(outside_page_hashes(world), pages)
-  })
-  assert_eq(again.1, 0)
+  // A compilation that lays the page run out again (a rectangle more at
+  // its end; the same text would find the document) finds all three.
+  let edited = block_memo_edit(
+    world,
+    world.main.text() + "#rect(width: 5pt, height: 5pt)\n",
+  )
+  let mut after = []
+  let again = block_memo_delta(() => after = outside_page_hashes(edited))
+  assert_true(again.1 <= 1)
   assert_true(again.0 >= 3)
+  assert_eq(block_memo_reference(edited), after)
 }
 
 ///|
@@ -501,7 +517,7 @@ test "blocks: the warnings of a block that is found are reported again" {
       #|
     ),
   )
-  let warnings = () => {
+  let warnings = (world : ReadingWorld) => {
     let warned : @library.Warned[
       Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
     ] = compile(world)
@@ -511,15 +527,30 @@ test "blocks: the warnings of a block that is found are reported again" {
   let expected = [
     "parbreak may not occur inside of a paragraph and was ignored",
   ]
+  // The second iteration of the first compilation finds the page run with
+  // the block in it (slice 3: the run asked the introspector nothing), and
+  // the run says what its block said.
   let mut first = []
-  let counts = block_memo_delta(() => first = warnings())
+  let runs = @layout.page_run_memo_stats()
+  block_memo_delta(() => first = warnings(world)) |> ignore
   assert_eq(first, expected)
-  // Found in the second iteration of the first compilation already.
-  assert_true(counts.0 >= 1)
+  assert_true(@layout.page_run_memo_stats().0 - runs.0 >= 1)
+  // The same text: the document is found, and says it too.
   let mut second = []
-  let counts = block_memo_delta(() => second = warnings())
-  assert_eq(counts.1, 0)
+  let counts = block_memo_delta(() => second = warnings(world))
+  assert_eq(counts, (0, 0))
   assert_eq(second, expected)
+  // A rectangle more at the end: the page run is laid out again and the
+  // block is found, by itself.
+  let edited = block_memo_edit(
+    world,
+    world.main.text() + "#rect(width: 5pt, height: 5pt)\n",
+  )
+  let mut third = []
+  let counts = block_memo_delta(() => third = warnings(edited))
+  assert_true(counts.0 >= 1)
+  assert_true(counts.1 <= 1)
+  assert_eq(third, expected)
 }
 
 ///|
@@ -599,15 +630,16 @@ test "blocks: a block whose content queries the document is laid out again when 
 /// of the groups in it: the header of `library/frame.mbt`), and the next
 /// compilation still finds the layouts as they were made.
 ///
-/// What this does not cover, for blocks as for the paragraphs and
-/// fragments that were kept before them: a frame taken out of a group of
-/// an `items()` view and written to directly. The view is read-only by the
-/// contract of `frame.mbt`, no code of the engine or of an exporter does
-/// it, and such a frame is the object that the store's copy holds too.
+/// A frame taken out of a group of an `items()` view and written to
+/// directly is not covered by a copy-on-write clone: such a frame is the
+/// object that the store's copy holds too. Since slice 3 the document that
+/// `layout_document` returns has frames and groups of its own at every
+/// depth (`Frame::deep_clone`); `typst/layers_memo_wbtest.mbt` writes to
+/// them.
 test "blocks: the frames of a kept layout are not those of the document" {
   @library.evict(0)
   let world = reading_world(block_memo_document)
-  let compile_pages = () => {
+  let compile_pages = (world : ReadingWorld) => {
     let warned : @library.Warned[
       Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
     ] = compile(world)
@@ -617,7 +649,7 @@ test "blocks: the frames of a kept layout are not those of the document" {
   let hashes = (document : @layout.PagedDocument) => {
     document.pages().map(page => @library.hash128(page))
   }
-  let first = compile_pages()
+  let first = compile_pages(world)
   let expected = hashes(first)
   // Every page of the first document: what is not a tag removed at every
   // depth (`hide` goes into the groups), the rest moved and resized.
@@ -633,14 +665,29 @@ test "blocks: the frames of a kept layout are not those of the document" {
     frame.set_baseline(@library.Abs::pt(1.0))
   }
   assert_true(hashes(first) != expected)
+  // The same text: the document is found (slice 3), as it was laid out.
   let mut second = []
-  let counts = block_memo_delta(() => second = hashes(compile_pages()))
-  assert_eq(counts.1, 0)
-  assert_true(counts.0 >= 6)
+  let counts = block_memo_delta(() => second = hashes(compile_pages(world)))
+  assert_eq(counts, (0, 0))
   assert_eq(second, expected)
+  // A rectangle more at the end: the page run is laid out again, of the
+  // blocks that are kept, which are what they were.
+  let edited = block_memo_edit(
+    world,
+    block_memo_document + "#rect(width: 5pt, height: 5pt)\n",
+  )
+  let mut third = []
+  let counts = block_memo_delta(() => third = hashes(compile_pages(edited)))
+  assert_true(counts.0 >= 6)
+  assert_true(counts.1 <= 2)
+  assert_eq(block_memo_reference(edited), third)
   // The same with the pages emptied.
-  for page in compile_pages().pages() {
+  for page in compile_pages(edited).pages() {
     page.frame.clear()
   }
-  assert_eq(hashes(compile_pages()), expected)
+  let again = block_memo_edit(
+    edited,
+    block_memo_document + "#rect(width: 5pt, height: 6pt)\n",
+  )
+  assert_eq(block_memo_reference(again), hashes(compile_pages(again)))
 }
