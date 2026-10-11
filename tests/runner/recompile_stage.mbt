@@ -30,6 +30,13 @@
 //    Each must give what the watch loop gave at that step. (The documents
 //    that take long have the second reference only.)
 //
+// Besides the sweep and the random sequences there are the sequences that
+// are pinned to what upstream's `typst watch` gives
+// (`recompile_pinned.mbt`): fixed edits of documents that compare modules,
+// where a recompilation of upstream's differs from a fresh compilation.
+// At their steps, and nowhere else, the watch loop may give what
+// upstream's watch gave instead of what a fresh compilation gives.
+//
 // The phases are not interleaved on purpose. A cache that outlives a
 // compilation may keep only the last one: with a fresh compilation between
 // two steps of the loop it would never be asked for the step before, and
@@ -128,6 +135,14 @@ priv struct RecompileStats {
   /// compilation (which is not a failure).
   mut reparsed : Int
   mut reparsed_differing : Int
+  /// The steps of the sequences that are pinned to upstream's watch
+  /// (`recompile_pinned.mbt`), those of them at which upstream's watch
+  /// gives something else than a fresh compilation, and those at which the
+  /// watch loop gave upstream's watch output and not a fresh compilation's
+  /// (which is not a failure, there and only there).
+  mut pinned : Int
+  mut pinned_upstream_differs : Int
+  mut pinned_as_upstream : Int
   /// By the kind of the edit.
   edits : Map[String, EditCount]
 }
@@ -194,6 +209,16 @@ fn run_recompile_stage(
       [..repository_documents(missing, all), ..suite_documents(missing)],
     ),
   ]
+  // The sequences that are pinned to upstream's watch: a document each,
+  // with one sequence, the fixture's.
+  let pinned = pinned_sequences()
+  let pinned_by_name : Map[String, Pinned] = Map([])
+  let pinned_documents = pinned.map(fixture => {
+    let document = fixture.document()
+    pinned_by_name[document.name] = fixture
+    document
+  })
+  groups.push(("recompile upstream", pinned_documents))
   // The documents with packages have a summary line of their own: without
   // the packages it has no cases (which `scripts/ci/stages.py` rejects, as
   // for the `packages` stage).
@@ -204,7 +229,7 @@ fn run_recompile_stage(
     groups.push(("recompile packages", []))
   }
   if string_option(args, "replay") is Some(dir) {
-    replay_snapshot(dir, [..groups[0].1, ..groups[1].1])
+    replay_snapshot(dir, [..groups[0].1, ..groups[1].1, ..groups[2].1])
     return
   }
   // `--only=<name>`: the document of that name (a filter also selects the
@@ -239,6 +264,9 @@ fn run_recompile_stage(
     rewatched: 0,
     reparsed: 0,
     reparsed_differing: 0,
+    pinned: 0,
+    pinned_upstream_differs: 0,
+    pinned_as_upstream: 0,
     edits: Map([]),
   }
   let failures = []
@@ -252,6 +280,28 @@ fn run_recompile_stage(
         continue
       }
       stats.documents += 1
+      // A pinned document has one sequence: its fixture's.
+      if pinned_by_name.get(document.name) is Some(fixture) {
+        let rng : Rng = { state: 0UL, }
+        match
+          run_sequence(
+            document,
+            options.seed,
+            "upstream",
+            rng,
+            Pinned(fixture),
+            false,
+            stats,
+            options,
+          ) {
+          None => passed += 1
+          Some(failure) => {
+            failed += 1
+            failures.push(failure)
+          }
+        }
+        continue
+      }
       let heavy = recompile_heavy[:].contains(document.name) ||
         document.flavor is Packages
       let sequences = match options.sequences {
@@ -300,7 +350,8 @@ fn run_recompile_stage(
     }
     // A listed document that is not there fails.
     for name in missing {
-      let mine = name.has_prefix("packages/") == (label == "recompile packages")
+      let mine = label != "recompile upstream" &&
+        name.has_prefix("packages/") == (label == "recompile packages")
       if mine && selected(name) {
         failed += 1
         failures.push("FAIL \{name} :: the document is missing")
@@ -320,6 +371,11 @@ fn run_recompile_stage(
   if stats.reparsed > 0 {
     println(
       "recompile: \{stats.reparsed} steps had a source whose reparsed tree is not what a parse gives; \{stats.reparsed_differing} of them gave something else than a fresh compilation and were not compared",
+    )
+  }
+  if stats.pinned > 0 {
+    println(
+      "recompile: \{stats.pinned} steps are pinned to upstream's watch (\{pinned_dir}); upstream's watch gives something else than a fresh compilation at \{stats.pinned_upstream_differs} of them, and the watch loop gave upstream's watch output instead of a fresh compilation's at \{stats.pinned_as_upstream}",
     )
   }
   if args.contains("--edits") {
@@ -365,6 +421,8 @@ priv enum Plan {
   Sweep(Sweep)
   /// That many random edits.
   Random(Int)
+  /// The edits of a fixture of upstream's watch (`recompile_pinned.mbt`).
+  Pinned(Pinned)
 }
 
 ///|
@@ -428,6 +486,16 @@ fn run_sequence(
           } else {
             None
           }
+        Pinned(fixture) =>
+          match fixture.steps.get(step) {
+            Some(pinned) => {
+              for file in pinned.files {
+                project.set(project_file(file.0), Some(@utf8.encode(file.1)))
+              }
+              Some(pinned.edit)
+            }
+            None => None
+          }
       }
       guard edit is Some(edit) else { break }
       world.set_variant(project.variant)
@@ -443,7 +511,11 @@ fn run_sequence(
       write_snapshot("\{dir}/step\{step}", document.name, snapshot)
     }
     // Recompile.
-    let (compiled, ids) = recompile_compile(world, pages~)
+    let (compiled, ids) = recompile_compile(
+      world,
+      pages~,
+      pinned=plan is Pinned(_),
+    )
     // Evict the cache.
     if step > 0 {
       @library.evict(10)
@@ -512,7 +584,7 @@ fn run_sequence(
         at.snapshot.files,
         at.snapshot.variant,
       )
-      let (expected, _) = recompile_compile(fresh)
+      let (expected, _) = recompile_compile(fresh, pinned=plan is Pinned(_))
       @library.set_layout_memo_enabled(true)
       expected.document = None
       stats.compilations += 1
@@ -520,10 +592,55 @@ fn run_sequence(
         count_step(stats, at.edit, before, expected)
         before = Some(expected)
       }
-      guard expected.difference(at.compiled) is Some((parts, detail)) else {
-        continue
+      // A step that is pinned to upstream's watch: the one place where
+      // the loop may give something else than a fresh compilation
+      // ([pinned_verdict]).
+      let mut pinned_failure = None
+      if plan is Pinned(fixture) {
+        let pinned = fixture.steps[step]
+        if !memoized {
+          stats.pinned += 1
+          if pinned.watch is Some(_) {
+            stats.pinned_upstream_differs += 1
+          }
+        }
+        match pinned_verdict(pinned, expected, at.compiled) {
+          Same => continue
+          AsUpstream => {
+            if !differing {
+              differing = true
+              stats.pinned_as_upstream += 1
+              // What a new process gives is a fresh compilation: not what
+              // this step gave (`scripts/recompile_soak.py`).
+              if snapshots is Some(dir) {
+                write_file(
+                  "\{dir}/step\{step}/as-upstream.txt",
+                  @utf8.encode("\{at.edit}\n"),
+                )
+              }
+              if options.verbose {
+                println(
+                  "NOTE \{document.name} :: step=\{step} (\{at.edit}): as upstream's watch, not as a fresh compilation",
+                )
+              }
+            }
+            continue
+          }
+          Fails(reason) => pinned_failure = Some(reason)
+        }
       }
-      if reparsed {
+      let difference = match expected.difference(at.compiled) {
+        Some(difference) => difference
+        None =>
+          match pinned_failure {
+            // Only the fixture differs: what a fresh compilation gives is
+            // not upstream's.
+            Some(_) => (["upstream's fresh SVG"], "")
+            None => continue
+          }
+      }
+      let (parts, detail) = difference
+      if reparsed && pinned_failure is None {
         if !differing {
           differing = true
           stats.reparsed_differing += 1
@@ -547,7 +664,10 @@ fn run_sequence(
         "a fresh compilation without memoization"
       }
       let out = StringBuilder()
-      out.write_string("\{parts.join(", ")} differ from \{reference}")
+      match pinned_failure {
+        Some(reason) => out.write_string("\{reason} (\{reference})")
+        None => out.write_string("\{parts.join(", ")} differ from \{reference}")
+      }
       let dir = "_build/recompile/\{document.name}/seed\{seed}-sequence-\{name}"
       if options.verbose {
         for i in 0..<=step {

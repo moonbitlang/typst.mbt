@@ -1506,11 +1506,11 @@ pub fn memo_check_running_now() -> Bool
 
 pub fn memo_compilation() -> Int
 
-pub fn memo_fingerprint((SipHasher128) -> Unit) -> U128
+pub fn memo_fingerprint((SipHasher128) -> Unit) -> MemoKey
 
 pub fn memoized_closure(Func, Closure, Engine, Context, Args, (Func, Closure, Engine, Context, Args) -> Value raise SourceError) -> Value raise SourceError
 
-pub fn memoized_layout(Engine, U128, Content, StyleChain, Content?, (Engine) -> Fragment raise SourceError) -> Fragment raise SourceError
+pub fn memoized_layout(Engine, MemoKey, Content, StyleChain, Content?, (Engine) -> Fragment raise SourceError) -> Fragment raise SourceError
 
 pub fn metadata_elem() -> Element
 
@@ -2440,7 +2440,7 @@ pub let primes_elem_count : Int
 
 pub fn query_first_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Content?]
 
-pub fn query_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Array[Content]]
+pub fn query_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[ArrayView[Content]]
 
 pub fn query_label_introspection(Label, @moonbitlang/typst/syntax.Span) -> Introspect[Result[Content, HintedString]]
 
@@ -5724,7 +5724,7 @@ pub fn[P] ElementIntrospector::len(Self[P]) -> Int
 pub fn[P] ElementIntrospector::loc_index(Self[P], Location) -> Int
 pub fn[P] ElementIntrospector::locator(Self[P], U128, Location) -> Location?
 pub fn[P] ElementIntrospector::position(Self[P], Location) -> P?
-pub fn[P] ElementIntrospector::query(Self[P], Selector) -> Array[Content]
+pub fn[P] ElementIntrospector::query(Self[P], Selector) -> ArrayView[Content]
 pub fn[P] ElementIntrospector::query_count_before(Self[P], Selector, Location) -> Int
 pub fn[P] ElementIntrospector::query_first(Self[P], Selector) -> Content?
 pub fn[P] ElementIntrospector::query_label(Self[P], Label) -> Content raise HintedError
@@ -7594,12 +7594,13 @@ pub fn Introspector::page_supplement(Self, Location) -> Content?
 pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
 pub fn Introspector::path(Self, Location) -> @moonbitlang/typst/syntax.VirtualPath?
 pub fn Introspector::position(Self, Location) -> DocumentPosition?
-pub fn Introspector::query(Self, Selector) -> Array[Content]
+pub fn Introspector::query(Self, Selector) -> ArrayView[Content]
 pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
 pub fn Introspector::query_first(Self, Selector) -> Content?
 pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
 pub fn Introspector::query_labelled(Self) -> Array[Content]
 pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
+pub fn Introspector::serial(Self) -> Int
 pub fn Introspector::track_with(Self, IntrospectionRecorder) -> Self
 pub fn Introspector::untracked(Self) -> Self
 
@@ -8479,6 +8480,10 @@ pub struct MathmlItem {
 }
 pub fn MathmlItem::create(Content, MathItem?, StyleChain) -> MathItem
 
+pub struct MemoKey {
+  // private fields
+}
+
 pub struct MetadataElem(Content)
 pub fn MetadataElem::new(Value) -> Self
 pub fn MetadataElem::of(Content) -> Self?
@@ -8510,7 +8515,6 @@ pub struct Module {
   // private fields
 }
 pub fn Module::anonymous(Scope) -> Self
-pub fn Module::canonical(Self) -> Self
 pub fn Module::content(Self) -> Content
 pub fn Module::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Module::file_id(Self) -> @moonbitlang/typst/syntax.FileId?
@@ -10681,10 +10685,12 @@ pub(all) struct Sink {
 }
 pub fn Sink::delayed_error(Self, SourceDiagnostic) -> Unit
 pub fn Sink::delayed_errors(Self, Array[SourceDiagnostic]) -> Unit
+pub fn Sink::extend_from_kept(Self, Self) -> Unit
 pub fn Sink::extend_from_sink(Self, Self) -> Unit
 pub fn Sink::introspection(Self, Introspection) -> Unit
 pub fn Sink::introspections(Self) -> ArrayView[Introspection]
 pub fn Sink::is_empty(Self) -> Bool
+pub fn Sink::kept(Self) -> Self
 pub fn Sink::new() -> Self
 pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit
@@ -12709,6 +12715,7 @@ pub impl Fingerprint for String
 pub impl[T : Fingerprint] Fingerprint for T?
 pub impl[T : Fingerprint, E : Fingerprint] Fingerprint for Result[T, E]
 pub impl[T : Fingerprint] Fingerprint for Array[T]
+pub impl[T : Fingerprint] Fingerprint for ArrayView[T]
 pub impl Fingerprint for @moonbitlang/typst/syntax.Span
 pub impl Fingerprint for @moonbitlang/typst/syntax.VirtualPath
 pub impl[A : Fingerprint, B : Fingerprint] Fingerprint for (A, B)
@@ -12771,7 +12778,7 @@ pub impl IntoValue for @unicode.MathClass
 pub impl[A : IntoValue, B : IntoValue] IntoValue for (A, B)
 
 pub(open) trait IntrospectorBackend {
-  fn query(Self, Selector) -> Array[Content]
+  fn query(Self, Selector) -> ArrayView[Content]
   fn query_first(Self, Selector) -> Content?
   fn query_unique(Self, Selector) -> Content raise HintedError
   fn query_label(Self, Label) -> Content raise HintedError

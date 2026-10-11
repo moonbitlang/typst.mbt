@@ -414,22 +414,25 @@
   memo_hash`, regions, `Locator::memo_hash`, `Route::memo_hash`), and the
   entry keeps the arguments, which must also be equal under
   `values_memo_equal` (exact where fingerprints are lossy or Typst's `==`
-  is loose; host closures and modules by identity). Closures compare by
+  is loose; host closures by identity, also where a closure or a module
+  holds them). Closures compare by
   their hash, like upstream's `Arc<LazyHash<Closure>>` (`closures_equal`:
   one closure expression evaluated twice with the same captures gives equal
-  functions), so equal fingerprints are equal closures; modules are one
-  object per evaluated file and per plugin in a compilation. Only host
-  closures flag a fingerprint as identity-bearing. Introspector reads
+  functions), so equal fingerprints are equal closures. Modules are
+  exactly upstream's (decided by the owner, 2026-10-11): `==` compares the
+  objects (`PartialEq for Module`), and a memoized call takes a module by
+  its hash (`modules_memo_equal`), as comemo does. Do not make either
+  "consistent" with the other: two modules with one hash (two plugins
+  without functions, a file evaluated twice) are two values to `==` and
+  one argument of a call, `(a, b).map(m => m == a)` is `(true, true)`,
+  and a call that is found again returns the module of an earlier
+  evaluation, which is not `==` to the module of the file evaluated now
+  (`typst/oracle_wbtest.mbt`, "modules: .."; `typst/modules_wbtest.mbt`).
+  Only host closures flag a fingerprint as identity-bearing. Introspector reads
   are recorded and replayed for validation (not across introspectors if a
   result's fingerprint was lossy or contained host closures:
   `fingerprint_flags_in`), sink effects are replayed, frames are cloned
-  (not cached if their tags hold host closures). The same flag marks the
-  modules that their fingerprint does not identify: every module but those
-  whose maker calls `Module::canonical` (the library's, the module of an
-  evaluated file, of a plugin with functions; one object each per
-  compilation). Two plugins without functions give modules that differ in
-  nothing but their identity; upstream, which compares hashes only, takes
-  one for the other as the argument of a memoized call, the port does not.
+  (not cached if their tags hold host closures).
   The traced span (IDE tracing) is not one per compilation: an evaluated
   string runs without one. The evaluation of a source file is reused if
   the span gives the answers it got (`Traced::get` for the files whose
@@ -627,6 +630,42 @@
   kind `traces` of `scripts/gen_typst_oracle.py` records the tracepoints
   that the CLI prints). `@eval.module_memo_stats()` counts the
   evaluations that were found and that were computed.
+- Identity and ownership of what the stores keep (step 4 of slice 1 of
+  `docs/incremental-design.md`, "Step 4 as built" in its section 8, whose
+  table lists every store and cache with what it keeps, what it hands
+  out and who could write to it: add a row for a new one). Rules. (1) A
+  descriptor of a native function, an element or a type is fingerprinted
+  by a number of the object (`descriptor_serial`; upstream hashes its
+  address), never by its texts: two that a host makes with the same name,
+  title and documentation are two values. The fingerprint of all content
+  therefore depends on the order in which a process first used its
+  elements: derive nothing from the value of a fingerprint that is
+  written to an output or compared across processes (SVG ids hash
+  geometry, not content). (2) What the flags of a key's fingerprint mean
+  for its entry is decided in one place, `MemoKey` (`memo_fingerprint`
+  returns it): nothing is kept under a lossy key, and an entry whose key
+  holds a host closure ends with its compilation
+  (`MemoKey::compilation`, `compilation_finds`), in `memoize`, in
+  `memoized_closure` and for highlighted raw text; a new store or cache
+  whose key can hold values asks it. (3) What a store keeps and what it
+  hands out are different objects wherever the type can be written to:
+  an entry keeps a copy of its sink and replays copies (`Sink::kept`,
+  `Sink::extend_from_kept`: diagnostics are objects that their holder
+  appends hints and tracepoints to, the styles of a traced value can be
+  written to), a kept error is raised as a copy (module entries, the
+  works, `CachedCell`, the plugin caches' `raise_kept`), the works hand
+  out the entries of a bibliography as an array of the caller's, and an
+  introspector's `query` returns a view of what it keeps
+  (`ArrayView[Content]`; `.to_owned()` for an array of one's own). (4)
+  An entry knows the introspector it was computed with by a number
+  (`Introspector::serial`), not by the object: every `Introspector::new`
+  is another introspector, so whoever asks one backend again and again
+  keeps what `new` returned (a document does). Tests:
+  `library/descriptor_identity_wbtest.mbt`,
+  `library/memo_identity_wbtest.mbt`, `library/memo_owned_wbtest.mbt`,
+  `layout/cached_cell_wbtest.mbt`; they keep the stores over two
+  compilations by hand (`memo_test_next_compilation`), since the stores
+  are still emptied when a compilation starts.
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for
@@ -1097,7 +1136,20 @@
   cached across
   compilations today but those page hashes, so the rest passes by
   construction; it is the gate for
-  anything that will be: the watch loop of a sequence runs with nothing
+  anything that will be. One difference from a compilation from scratch
+  is upstream's own and is accepted where it is proven to be: after an
+  edit that leaves the hash of a module as it was, a call that is found
+  again returns the module of the evaluation before, and `==` tells it
+  from the module of now. The sequences of `tests/recompile/upstream/`
+  are recorded from the upstream binary's `typst watch`
+  (`scripts/gen_recompile_upstream.py`; rerun it when `UPSTREAM_REV`
+  changes), and at their steps, and nowhere else, the watch loop may
+  give upstream's watch output instead of a fresh compilation's
+  (`pinned_verdict` in `tests/runner/recompile_pinned.mbt`: byte for
+  byte, with the dependencies and diagnostics of a fresh compilation;
+  counted and printed). A difference that upstream's watch does not show
+  is a bug in a key or in a validation, never something to pin.
+  About the gate: the watch loop of a sequence runs with nothing
   in between (the references come after it), and a new cache must be off
   with `set_layout_memo_enabled(false)` or dropped by `evict(1)`, or the
   references of the stage cannot see through it. Before a cache outlives

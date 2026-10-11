@@ -266,7 +266,7 @@ pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> MemoKey {
 
 ///|
 /// The fingerprint.
-pub fn MemoKey::hash(self : MemoKey) -> U128 {
+fn MemoKey::hash(self : MemoKey) -> U128 {
   self.hash
 }
 
@@ -274,7 +274,7 @@ pub fn MemoKey::hash(self : MemoKey) -> U128 {
 /// Whether a result may be looked up and kept under this key: not if its
 /// fingerprint leaves out data (`fingerprint_lossy`; no fingerprint does
 /// today). A call with such a key is computed every time.
-pub fn MemoKey::memoizable(self : MemoKey) -> Bool {
+fn MemoKey::memoizable(self : MemoKey) -> Bool {
   (self.flags & fingerprint_lossy) == 0
 }
 
@@ -290,7 +290,7 @@ pub fn MemoKey::memoizable(self : MemoKey) -> Bool {
 /// a later compilation, whatever its store keeps
 /// (`docs/incremental-design.md`, section 5.4). Outside of a compilation
 /// it is found by nobody.
-pub fn MemoKey::compilation(self : MemoKey) -> Int {
+fn MemoKey::compilation(self : MemoKey) -> Int {
   if (self.flags & fingerprint_identity) == 0 {
     0
   } else if memo_generation.val == 0 {
@@ -303,7 +303,7 @@ pub fn MemoKey::compilation(self : MemoKey) -> Int {
 ///|
 /// Whether the compilation in progress may find an entry that ends with
 /// the compilation `bound` ([MemoKey::compilation]).
-pub fn compilation_finds(bound : Int) -> Bool {
+fn compilation_finds(bound : Int) -> Bool {
   bound == 0 || bound == memo_generation.val
 }
 

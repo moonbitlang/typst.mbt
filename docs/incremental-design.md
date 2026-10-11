@@ -1,8 +1,9 @@
 # Incremental compilation: design
 
-Status: slice 0, steps 1 and 2 of slice 1 (5.5, "As built") and the
-engine half of its step 3 are built (section 8, "Step 3 as built"); the
-rest is design.
+Status: slice 0 and steps 1 to 4 of slice 1 are built (5.5, "As built";
+section 8, "Step 3 as built" and "Step 4 as built"); the rest is design.
+Module equality was decided by the owner on 2026-10-11, against the
+recommendation of revisions 3 and 4: exactly as upstream (5.4, "Modules").
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
 recording check); revision 4 elsewhere. Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
@@ -55,8 +56,10 @@ it. Section 3 has the measurements the order rests on.
 - The design mirrors comemo: results are found by a fingerprint of their
   hashed arguments, are valid if the tracked arguments answer the recorded
   questions as before, age by one with every `evict` and are dropped when
-  their age exceeds `max_age`. Where the port deviates (section 10) it is stricter, with one
-  exception that is said there (equality of modules).
+  their age exceeds `max_age`. Where the port deviates (section 10) it is
+  stricter. Modules are compared as upstream compares them, with what
+  that costs: a recompilation can give what upstream's `typst watch`
+  gives where that is not what a compilation from scratch gives (5.4).
 - The numbers for what is not built are a probe's, which validated less
   than the design does: they are upper bounds of the gain.
 
@@ -826,13 +829,12 @@ keeps the first store.
   shortcut for the introspector the entry was computed with. Across
   compilations the shortcut applies when the document is reused, since the
   next iteration then runs on the same introspector object. The shortcut
-  needs an introspector that answers the same forever. Today
-  `ElementIntrospector::query` hands out the array it keeps
+  needs an introspector that answers the same forever.
+  `ElementIntrospector::query` handed out the array it keeps
   (`library/introspector.mbt`), which a caller could change, and a host
-  may keep an introspector and use it in a later scope. `query` returns a
-  view or a copy before anything is kept (slice 1). An entry keeps the
-  introspector alive only for the shortcut; it becomes a serial number of
-  the introspector (6.2).
+  may keep an introspector and use it in a later scope. Since step 4
+  `query` returns a view, and an entry keeps the number of its
+  introspector instead of the object (`Introspector::serial`; 6.2).
 - **Route, context, traced span.** Unchanged: in the key or recorded per
   entry today, and none of it depends on the compilation.
 - **Sink.** Replayed as today. What travels in it is not all immutable.
@@ -844,7 +846,8 @@ keeps the first store.
   change. The rule of 5.4 for mutable results applies to the sink and to
   kept errors. (Kept errors: built in step 3, a module entry keeps a copy
   of its errors and hands out a copy on every hit. The diagnostics and
-  traced values of sinks are step 4's.)
+  traced values of sinks: built in step 4, `Sink::kept` and
+  `Sink::extend_from_kept`.)
 - **Locator.** In the key, fully resolved (stricter than upstream's tracked
   locator; section 10).
 
@@ -945,73 +948,152 @@ was the text).
 resolved locator is in the key of every layout entry, so a reused frame
 holds the locations a fresh layout would compute.
 
-**Modules.** Typst compares modules by identity. Today a compilation has
-one module object per evaluated file, so for these modules an equal
-fingerprint is the same object (`ModuleInner.identified`). Across
-compilations that is false: a file whose text changed in a comment is
-evaluated again and gives a module with the old fingerprint, while a kept
-closure call that returned the old module is reused, and `==` between the
-two is `false` where a from-scratch compilation has one object and says
-`true`. Upstream has this: its memoization compares hashes, its modules
-compare by pointer. The port cannot intern the modules (no weak
-references: the table would keep every version of the main file's content)
-and does not copy the quirk. Two identified modules are equal if they are
-the same object, or if their names and fingerprints are equal and, where
-the fingerprints carry `fingerprint_identity`, they visit the same host
-functions and unidentified modules, as objects, in the same order (the
-comparison that `IntrospectionRecorder::validate` makes for the results of
-reads, `fingerprint_output_hosts`). That is the relation the stores
-already use: a closure that captured one of two such modules has the hash
-of the one that captured the other (`closures_equal`), so whatever the
-fingerprint does not tell apart is one value for every kept call, and `==`
-must not tell it apart either. A relation that compares what the modules
-hold with Typst's `==` instead does not do that: a module that exports
-`float.nan` would differ from its own re-evaluation, and a function that
-returns the module it captured would then return one that is unequal to
-the current one (review 3, finding 2). The fingerprint has the float's
-bits, ends on cycles and is kept with the module.
+**Modules.** Decided by the owner on 2026-10-11: exactly as upstream,
+plugins included. Built in step 4 (section 8, "Step 4 as built"). What
+revisions 3 and 4 recommended instead, equality by fingerprint, and the
+alternative it was costed against are below as history.
 
-For this the fingerprint must tell apart what `==` tells apart inside a
-module. One thing it does not, today and within one compilation: native
-functions, elements and types compare by their descriptor object
-(`library/func.mbt`, `library/element.mbt`, `library/ty.mbt`) and
-fingerprint by name, title and documentation, by key, by long name
-(`library/value_hash.mbt`). Two native functions that a host makes with the
-same texts are one argument for every memoized call, and a closure that
-captured a module holding the one is found for the module holding the
-other (review 3, finding 3). Upstream hashes the descriptor's address
-(`typst-utils/src/static.rs:32`, `Hash for Static`). A descriptor gets a
-process-wide number when it is made, and that number is its fingerprint.
-(Tests that pin the fingerprint of a value that holds a descriptor change.)
+Upstream has two rules that do not agree.
 
-Then two objects for one evaluated file are indistinguishable. This
-changes `==` from the
-moment it is merged, in every compilation, wherever two such objects with
-equal contents meet. In a from-scratch compilation that is: a file that
-is evaluated twice (under IDE tracing a file that holds the traced span is
-evaluated again for an evaluated string, `ModuleInner`'s doc comment), and
-the modules of two libraries that a host brings into one evaluation (each
-`Library` builds its own `math`, `calc`, `sys`). Upstream says `false` in
-both, the port then `true` if what they hold is equal.
+- `==` compares the objects (`typst-library/src/foundations/module.rs`,
+  `PartialEq for Module`):
 
-The modules of plugins become identified in all cases. Today one without
-functions is not (`Plugin::into_module`, `library/plugin.mbt`): its
-fingerprint is that of an empty scope, and it compares by identity, which
-only works while the cache of loaded plugins lives exactly as long as
-everything that holds its modules. A plugin's module gets the hash of the
-plugin's bytes (and of its transitions) in its fingerprint; two loads of
-the same bytes in the same state are then equal and others are not, with
-and without functions, which is what upstream's `==` says for them in a
-from-scratch compilation.
+      self.name == other.name && Arc::ptr_eq(&self.inner, &other.inner)
 
-**Equality by content, or identity kept.** Both ways, costed.
+- A memoized call is found by the hashes of its arguments (comemo keeps
+  nothing else of them), and `Hash for Module` is derived: the name and
+  the inner data, which is the scope, the content and the file id.
 
-(a) *By content*, as above. It differs from upstream where a compilation
-from scratch holds two module objects with equal contents. No document that
-the command line compiles does: a file has one module there (a second
-evaluation needs another answer of the route or of the traced span, and
-there is no traced span), and `sys.inputs` holds strings. The two cases
-need a host. One document for the first, a line for the second:
+So two module objects that hold the same are two values to `==` and one
+argument to every memoized call, and a call that is found returns what it
+returned before, whichever module it is asked about now. The port has
+both rules as they are: `Eq for Module` is the line above
+(`library/module.mbt`), and the exact comparison that an entry makes of
+its arguments takes a module by its fingerprint (`modules_memo_equal`,
+`library/memo.mbt`). It took modules by identity before, behind a flag of
+the fingerprint (`fingerprint_identity` for the modules that
+`Module::canonical` had not marked): the port was the stricter one, and
+that is gone with `Module::canonical`. Two consequences, both upstream's.
+
+*Within one compilation.* Where a document has two modules with one
+hash, a call at one call site (the same function, arguments with the
+same spans) that is given the second returns what it returned for the
+first. A document compiled by the command line gets two such modules
+from two plugins that export no function: their modules are empty
+scopes. These answers of a compilation from scratch changed in the port,
+to upstream's (`typst query` of the upstream binary of `e58a63af`, with
+`a` and `b` the modules of two such plugins, `id(m) = m`,
+`capture(m) = () => m`, `pick(d) = d.m`):
+
+| expression | upstream | port before | port now |
+| --- | --- | --- | --- |
+| `(a, b).map(m => m == a)` | `(true, true)` | `(true, false)` | `(true, true)` |
+| `(a, b).map(same)` with `same(m) = m == a` | `(true, true)` | `(true, false)` | `(true, true)` |
+| `(b, a).map(m => m == a)` | `(false, false)` | `(false, true)` | `(false, false)` |
+| `(a, b).map(id).map(m => (m == a, m == b))` | `((true, false), (true, false))` | `((true, false), (false, true))` | as upstream |
+| in `for m in (a, b)`: `id(m) == m` | `(true, false)` | `(true, true)` | `(true, false)` |
+| the same with `pick((m: m)) == m` and with `id((m, (m: m))).at(1).m == m` | `(true, false)` | `(true, true)` | `(true, false)` |
+| the same with `(capture(m))() == m` | `(true, false)` | `(true, false)` | `(true, false)` |
+| `(a, b).map(both.with(b))` with `both(m, n) = m == n` | `(false, false)` | `(false, true)` | `(false, false)` |
+| `(a, b).map(m => held(metadata(m)))` with `held(body) = body.value == a` | `(true, true)` | `(true, false)` | `(true, true)` |
+| `a == b`, `capture(a) == capture(b)` | `false`, `true` | the same | the same |
+| at two call sites: `id(a) == a`, `id(b) == b` | `true`, `true` | the same | the same |
+
+(The getter in the loop was upstream's answer before: a closure's
+equality is its hash, upstream's and the port's, so the closure that
+captured `b` was found as the closure that captured `a`. That hole of
+the old rule, identity for arguments and hashes for what closures
+captured, is the one inconsistency the decision removes.) The rows are
+the cases "modules: .." of `typst/oracle_wbtest.mbt`, generated from the
+upstream binary. Such a document says something else with the port's
+memoization off, where every call is computed; upstream has no such
+mode, and the cases are of a kind of their own (`memoized`) that is not
+compared with it.
+
+Two other ways to two modules with one hash need a host, and the port
+answers as upstream does (`typst/modules_wbtest.mbt`): a file that is
+evaluated twice (under IDE tracing a file that holds the traced span is
+evaluated again for an evaluated string: `m == n` is `false` for the
+document of the table below), and the modules of two libraries that a
+host brings into one evaluation (`sys.inputs.m == math` is `false`, and
+`(sys.inputs.m, math).map(id)` is the first module twice).
+
+*Across compilations.* A kept call returns the module of an earlier
+evaluation, and the file is evaluated again whenever anything it read
+has changed. With
+
+    // a.typ
+    #let v = 1
+    // comment 0
+
+    // main.typ
+    #import "a.typ" as m
+    #let get() = m
+    #get() == m
+
+and a comment of `a.typ` changed, `typst watch` of the upstream binary
+shows `false` and `typst compile` shows `true`: the new module has the
+hash of the old one, `get` is a closure with the hash it had, and `get()`
+is found. It stays so for every edit that leaves the hash of the module
+as it was, and an edit that changes what the module holds gives `true`
+again. The same for the module as an argument (`pick((m: m)) == m`) and
+through another file (`held == theirs()`, with `b.typ` importing `a.typ`
+and exporting the module and a getter). A state's value and a queried
+element that hold the module compare as in a fresh compilation: their
+context expressions are found again as a whole, comparison included.
+
+The port does not show this yet, since nothing is kept from one
+compilation to the next. With every store kept (the experiment of "Step 4
+as built") it shows exactly it: the watch loop's SVG is upstream's
+watch's, byte for byte, at each of the 11 steps of the two recorded
+sessions at which upstream's watch differs from a fresh compilation, and
+a fresh compilation's at the other three.
+
+*What is given up.* The guarantee that a recompilation gives what a
+compilation from scratch gives. It holds for everything but `==` between
+a module that a found call returned and the module of the same file now
+(or between two such results). The harness requires it everywhere else
+and accepts that one difference only where it is proven to be upstream's:
+at a step of a sequence that was recorded from the upstream binary's
+`typst watch`, if the pages are byte for byte what upstream's watch
+wrote (9.1, "As upstream's watch"; `tests/recompile/README.md`).
+
+*Plugins.* Unchanged, which is upstream's: the module of a plugin is an
+anonymous module of its functions, whose hashes carry the plugin (its
+bytes and its transitions). Two plugins without functions have one hash
+and are told apart by `==` alone (`(a == b, capture(a) == capture(b))` is
+`(false, true)`, the second because closures compare by their hash). A
+plugin's module is the same argument after the cache that made it was
+dropped, with or without functions; to `==` the new module is another
+object, as upstream's is once comemo has dropped the result of
+`Plugin::module`. One thing follows for step 5: upstream drops that
+result when it was not used for `max_age` evictions, and the port drops
+its plugin caches as a whole on every `max_age`-th `evict`, used or not.
+Once closure calls are kept, a document that compares a plugin's module
+with one that a found call returned would say `false` after every tenth
+compilation where upstream's watch says `true`. The plugin caches get
+ages before that (6.1 has them among the caches that do).
+
+*Interning.* One object per fingerprint would make `==` and the hashes
+agree. A simple bounded interner cannot be used safely: one that keeps
+its modules keeps every version of the main file's content (5 MB per
+edit of `longer.typ`, 6.2), and one that forgets by age can forget a
+module that a kept closure call, or a host, still holds, after which the
+same contents are two objects again. Weak references, which the runtime
+does not have, or a lifetime that is tied to every holder would do it;
+both are machinery that neither rule needs. And interning by fingerprint
+gives the equality of the alternative (a) below, not upstream's.
+
+*History: the two alternatives that were costed* (revisions 3 and 4;
+neither is built).
+
+(a) *Equality by fingerprint.* Two modules are equal if they are the
+same object, or if their names and fingerprints are equal and, where the
+fingerprints cover host functions, those are the same objects in the same
+order. `==` then agrees with what the stores take for one value, and a
+recompilation gives what a compilation from scratch gives also where
+modules are compared. It differs from upstream wherever a compilation
+from scratch holds two module objects with equal contents:
 
     // a.typ
     #let probe(v) = v
@@ -1026,96 +1108,94 @@ need a host. One document for the first, a line for the second:
     // with a host that put another library's `math` into `sys.inputs`
     #let r = (sys.inputs.m == math)
 
-| how `r` is obtained | upstream | port today | port with (a) |
-| --- | --- | --- | --- |
-| the command line (`typst query main.typ "<r>" --field value`, with `#metadata(r) <r>` for the last line) | `true` | `true` | `true` |
-| `trace` at the last `r` of `main.typ` | `true` | `true` | `true` |
-| `trace` at the `v` of `probe`'s body: `a.typ` holds the traced span and is evaluated once with it and once, for the string, without | `false` | `false` | `true` |
-| two libraries | `false` | `false` | `true` |
+| how `r` is obtained | upstream, and the port | with (a) |
+| --- | --- | --- |
+| the command line (`typst query main.typ "<r>" --field value`, with `#metadata(r) <r>` for the last line) | `true` | `true` |
+| `trace` at the last `r` of `main.typ` | `true` | `true` |
+| `trace` at the `v` of `probe`'s body: `a.typ` holds the traced span and is evaluated once with it and once, for the string, without | `false` | `true` |
+| two libraries | `false` | `true` |
 
-Upstream's column is a throwaway program on the oracle's dependencies that
-calls `typst::trace` with a world in memory, the port's a throwaway test
-beside `typst/memo_trace_wbtest.mbt`; neither is in the repository. The
-last column is not run, (a) does not exist: it is what the rule gives (the
-two modules of `a.typ` bind `probe` to closures with one hash; the two
-`math` modules bind the same native functions and symbols, which are one
-object each in a process, `library/funcs_gen.mbt`). Review 3 looked for a
-document that the command line compiles with two such modules (a file
-under two routes, `include`, a package under two names, `eval` with a
-scope, `plugin`, `std` and `math` reached two ways, a file that fails) and
-found none (its finding 11).
+(Upstream's column was a throwaway program on the oracle's dependencies
+that calls `typst::trace` with a world in memory; the port's is
+`typst/modules_wbtest.mbt`.) It was recommended because the differences
+needed a host. A review of the two open decisions
+(`_build/codex-decisions.txt`, not in the repository) showed that this
+was too narrow: with the modules of plugins identified by their bytes,
+as (a) had them, `capture(a) == capture(b)` for two plugins without
+functions is `false` in a document that the command line compiles, where
+upstream says `true`.
 
-(b) *Identity kept.* A module entry that is valid hands out the object it
-has; a file that is evaluated again gets a new object, also when what it
-holds is equal. Upstream's `==` then holds in every compilation from
-scratch. To be sound across compilations it needs three things.
+(b) *Identity kept, and keys that carry it.* A module entry that is
+valid hands out the object it has, and the identity of a module enters
+what makes two keys interchangeable (a number per evaluation in the
+fingerprint, a second component of every key, or a comparison of
+closures by what they captured). Upstream's `==` then holds in every
+compilation from scratch and after an edit. It needs the producer of an
+identity to live as long as anything that holds it is found, and after
+an edit that leaves a file's module equal, everything that holds the
+module as a value misses once. A proxy for that, with the probe of
+section 3: text appended to `touying/0.8.0/src/utils.typ`, which changes
+the module's fingerprint and none of its bindings, recompiles the
+touying document in 137 ms with 3171 closure calls and all 19 paragraphs
+computed again, against 34 ms and 18 calls for a comment in the same
+file when closures that captured equal modules are equal, and 155 ms
+from scratch. These are a probe's numbers of a proxy, not measurements
+of two implementations.
 
-- The new object must not be taken for the old one by a key. Today it is:
-  a closure that captured the old module and one that captured the new
-  have one hash (`closures_equal`, `library/value_hash.mbt`), so a kept
-  call of the first is found for the second and returns what holds the old
-  object. The module's identity has to enter what makes two keys
-  interchangeable. That can be its fingerprint (a number per evaluation,
-  against the rule that a fingerprint covers what upstream's `Hash`
-  covers), a second component of every key beside the fingerprint, or a
-  comparison of closures by what they captured instead of by their hash
-  (a walk of the captured scopes on every lookup).
-- The producer of an identity must live as long as anything that holds
-  the identity is found: the module entry of that source in that state,
-  and for a plugin's module the entry of its load or transition. Otherwise
-  the file is evaluated again next to a kept holder of the old object,
-  which is the shape of review 1, finding 4. A hit has to renew exactly
-  those entries, and the limit of four entries per key must not push them
-  out.
-- Hits. After an edit that leaves a file's module equal (a comment, white
-  space), everything that holds the module as a value misses once. With
-  `#import "utils.typ"` and `utils.f(..)`, which is how touying's files use
-  each other, that is every closure of every importing file. A proxy for
-  it, with the probe: an edit of `touying/0.8.0/src/utils.typ` that
-  changes the module's fingerprint and none of its bindings (text appended
-  to the file, which also changes what an `include` of it would give;
-  nothing includes it). The touying document then recompiles in 137 ms,
-  with 3171 closure calls and all 19 paragraphs computed again, against
-  34 ms and 18 calls for a comment in the same file when closures that
-  captured equal modules are equal (which is today's comparison and
-  (a)'s). From scratch it is 155 ms. It is the probe's number, with what
-  the probe leaves out (section 8), and no implementation of (b).
-
-The recommendation is (a). It differs from upstream in two cases that need
-a host and in no document the command line compiles. (b) buys agreement in
-those two cases with keys that carry module identities, a rule between
-stores, and a recompilation close to from scratch after a comment in a
-shared file of a package.
+What was decided is neither: `==` is upstream's as in (b), and the
+stores take modules by their hashes as upstream's do, so nothing misses
+after a comment (the 34 ms) and nothing but upstream's own difference is
+observable.
 
 **What compares by identity.** By Typst's `==` (`library/ops.mbt`,
 `library/func.mbt`, `library/dyn.mbt`; the inventory is in review 2,
 finding 11): native functions, element functions and types, by their
-descriptor; host functions; modules that are not identified. Everything
-else compares by value (closures by their hash, plugins by their bytes and
-transitions), or is never equal (styles, gradients, tilings). Descriptors
-are objects of the process: the generated ones are made once, on first use,
-and shared by every library (`library/funcs_gen.mbt`,
-`library/types_gen.mbt`; the tables of `library/html_typed.mbt`,
-`library/accent.mbt`, `library/lr.mbt`), and a host can make more
-(`NativeFuncData::new`, the constructors of types and elements). With
-their number as their fingerprint (above) they need no flag: equal
-fingerprints are the same descriptor. What is left that compares by
-identity and that a fingerprint does not identify is what a host brings:
-host functions and modules it builds. Their fingerprints carry
-`fingerprint_identity`. Such a value can enter a kept result, which
-includes its sink (traced values) and its kept errors, in five ways, and
-each is closed:
+descriptor; host functions; modules. Everything else compares by value
+(closures by their hash, plugins by their bytes and transitions), or is
+never equal (styles, gradients, tilings).
+
+*Descriptors* are objects of the process: the generated ones are made
+once, on first use, and shared by every library
+(`library/funcs_gen.mbt`, `library/types_gen.mbt`; the tables of
+`library/html_typed.mbt`, `library/accent.mbt`, `library/lr.mbt`), and a
+host can make more (`NativeFuncData::new`, the constructors of types and
+elements). Upstream hashes a descriptor as its address
+(`typst-utils/src/static.rs:32`, `Hash for Static`: `state.write_usize(
+self.0 as *const T as usize)`; `Type(Static<NativeTypeData>)`,
+`Element(Static<ContentVtable>)` and `FuncInner::Native(Static<
+NativeFuncData>)` derive `Hash` over it). The port fingerprinted texts:
+a function's name, title and documentation, an element's key, a type's
+long name, so two descriptors that a host makes with the same texts were
+one value to everything that compares by fingerprint (review 3, finding
+3). Built in step 4: a descriptor gets a number when it is made that no
+other descriptor of the process has (`descriptor_serial`,
+`library/func.mbt`), and that number is its fingerprint. Equal
+fingerprints are the same descriptor; no flag is needed.
+
+*Modules* compare by identity for `==` and are taken by their hashes by
+the stores, as upstream's are (above): no flag either.
+
+What is left that compares by identity and that the stores must not take
+by a fingerprint is what upstream does not have: host functions. Their
+fingerprint is a key of the host's, promised to be unique within a
+compilation, and it carries `fingerprint_identity`. An entry compares the
+host functions in its arguments as objects, also where a closure or a
+module holds them (`closures_memo_equal`, `modules_memo_equal`: the same
+host functions in the order in which the fingerprint visits them). Such a
+value can enter a kept result, which includes its sink (traced values)
+and its kept errors, in five ways, and each is closed:
 
 - from an argument, a captured variable or the context of the call: the
   key carries the flag, and an entry whose key carries it ends with its
-  compilation (new: it could only be found again by the same objects, which
-  `doc` makes per compilation, `Session.hosts`);
+  compilation (built in step 4, one rule for every store: `MemoKey`,
+  `library/memo.mbt`; it could only be found again by the same objects,
+  which `doc` makes per compilation, `Session.hosts`);
 - from an introspector read: the read is marked (`reads.lossy`) and the
   entry is only valid for the introspector it was computed with (as
-  today);
+  before; by its number since step 4);
 - from the library's scope: the library is in the key;
 - from a frame's tags: such a frame is not kept (`frame_cacheable`, as
-  today);
+  before);
 - made by a host function during the call: one that is reached through a
   value is in the key, with the flag; one that the library defines must
   not make one per call (the contract of 5.2).
@@ -1126,16 +1206,19 @@ result); the checked mode of 9.1 checks it.
 
 **Mutable results.** The rule: what an entry keeps and what it hands out
 are different objects wherever the type can be written, on storing and on
-every hit. As today: frames are cloned (copy on write), values are marked
-shared. New, each a copy or a read-only view: diagnostics, in sinks and in
-kept errors, with their `trace` and `hints`; the `Styles` of traced
-values; a kept document, with its pages' frames, its `DocumentInfo` (whose
-`author` and `keywords` are arrays) and its format options (it shares only
-its introspector, whose answers are views, 5.3); `Works`, whose accessors
-return its arrays today (`library/bibliography.mbt`); the `HintedError`
-that the plugin caches keep and raise again (`library/plugin.mbt`). The
-introspections of a sink hold closures over selectors and locations, which
-nothing writes.
+every hit. As before: frames are cloned (copy on write), values are marked
+shared. Built in step 4, each a copy or a read-only view (the table of
+every store and cache is in section 8, "Step 4 as built"): diagnostics,
+in sinks and in kept errors, with their `trace` and `hints`; the `Styles`
+of traced values; the list of entries that `Works` hands out for a
+bibliography (`library/bibliography.mbt`); the `HintedError` that the
+plugin caches keep and raise again (`library/plugin.mbt`) and the errors
+of a `CachedCell`; what an introspector's `query` returns. Not built,
+because nothing keeps one yet (slice 3): a kept document, with its pages'
+frames, its `DocumentInfo` (whose `author` and `keywords` are arrays) and
+its format options (it shares only its introspector, whose answers are
+views, 5.3). The introspections of a sink hold closures over selectors
+and locations, which nothing writes.
 
 ### 5.5 State outside the arguments
 
@@ -1673,14 +1756,16 @@ Step 1 is built.
    source is then read through the tracked world; the library made only
    by its builder, immutable, with its serial number in every key in place
    of the comparison by identity (5.3).
-4. **Identity and ownership.** Descriptors fingerprinted by their number;
-   plugin modules identified by their bytes; module equality (5.4; this
-   step changes `==` where two modules with equal contents meet, in every
-   compilation); entries whose key carries
-   `fingerprint_identity` end with their compilation; the introspector's
-   `query` returns a view or a copy, and its serial number replaces the
+4. **Identity and ownership.** Built ("Step 4 as built" below), with
+   module equality as the owner decided it and not as this line had it:
+   descriptors fingerprinted by their number; modules exactly as
+   upstream's (`==` by identity, memoized calls by hash; plugins
+   unchanged); entries whose key carries `fingerprint_identity`, which is
+   host functions alone now, end with their compilation; the
+   introspector's `query` returns a view, and its number replaces the
    object in entries; the copies and views of 5.4's rule for mutable
-   results.
+   results; and the harness accepts upstream's own difference between a
+   recompilation and a fresh compilation where it is pinned (9.1).
 5. **Ages.** `evict` as in 6.1; the stores stop clearing themselves, one
    store per commit in the order modules, closure calls, layouts, counter
    sequences and works, each with the harness and its numbers. Before the
@@ -2004,7 +2089,8 @@ main file. Sequences longer than `max_age + 2`, with `max_age` 0, 1 and
   in between that an imported module reads (5.2);
 - a module that holds a plugin's module without functions, kept in use
   while the plugin's own cache entry ages out, then compared with a new
-  load (5.4);
+  load (5.4; `library/plugin_identity_wbtest.mbt`: the same argument,
+  another object to `==`, as upstream's);
 - two compilations whose libraries differ in `html_span_filled`, raw text
   in HTML (slice 0b);
 - a host that keeps a document and changes the array a query returned, the
@@ -2025,7 +2111,10 @@ main file. Sequences longer than `max_age + 2`, with `max_age` 0, 1 and
   the same document under each (5.3);
 - a file that exports `float.nan` and is imported as a module; a function
   `get() = m` in the main file and `get() == m` on the page; a comment in
-  the imported file changes (5.4);
+  the imported file changes (5.4). Since the decision on module equality
+  this is the difference that is upstream's: `false` in a watching
+  process. Pinned to the upstream binary's watch
+  (`tests/recompile/upstream/`, below);
 - a library with two native functions that have the same name, title and
   documentation; a file that exports one of them, chosen by `read`; a
   function `get() = m.x` in the main file; the choice changes (5.4);
@@ -2052,7 +2141,7 @@ make it fail, and the flag list is part of the stage:
 | 10 | the capture table finds an analysis by span alone, without the node | an edit after which another closure expression has the span of an old one, both evaluated in one compilation (as `eval/captures_wbtest.mbt` tests today) |
 | 11 | introspector reads are not validated across compilations | an edit that moves a heading to another page under an outline |
 | 12 | the library is not in the key | `sys.inputs` changes |
-| 13 | modules compare by identity | a comment-only edit of an imported file; the main file's `get() = m` returns the module it captured, and the page shows `get() == m` (a module passed as an argument proves nothing: it misses under identity) |
+| 13 | (turned round by the decision on module equality) the stores take modules by identity instead of by their hashes, as the port did | the sequences pinned to upstream's watch: where upstream's watch shows a stale module passed as an argument (`pick((m: m)) == m`), the port then computes the call again and shows what neither upstream's watch nor a fresh compilation shows |
 | 14 | the sink of a reused entry is not replayed | a warning inside a kept closure call must be reported by every recompilation |
 | 15 | raw elements keep their theme by path | changed bytes of a `.tmTheme` |
 | 16 | `Works::generate` keeps its last result by introspector | changed bytes of the `.bib` file, with two paragraphs that cite: the second one found the works of the first under the same introspector, and it must be the one that is kept and found |
@@ -2206,18 +2295,17 @@ run of the function and a comparison.
   a volatile file (such an entry is not found, 5.2).
 - Compared, by fingerprint (which has spans, locations, lifecycles and
   the bits of floats) and by the exact comparison where the fingerprint is
-  flagged (host functions and unidentified modules as objects): the
-  result, by kind: a value; frames; a module (5.4's relation: with stores
-  off its imports are new objects); pages and a document with their
+  flagged (host functions as objects): the
+  result, by kind: a value; frames; a module (by its hash, as the stores
+  take it: with stores off its imports are new objects); pages and a document with their
   frames, info and options; works with their maps and errors; a counter
   sequence. The sink: diagnostics with spans, hints and traces, traced
   values and styles. Introspections are closures and cannot be compared:
   their number is. Shared flags of arrays and dictionaries are not part
   of it.
-- The invariant of 5.4, by reachability: every host function and
-  unidentified module in the kept result is, as an object, reachable from
-  the key, from the library, or from the result of one of the entry's
-  introspector reads.
+- The invariant of 5.4, by reachability: every host function in the kept
+  result is, as an object, reachable from the key, from the library, or
+  from the result of one of the entry's introspector reads.
 
 comemo has nothing like it (its debug
 assertions catch a memoized function whose tracked calls differ between
@@ -2285,15 +2373,17 @@ Kept or introduced, each stricter than upstream unless said:
 2. **The traced span is in the keys of closure calls and layouts**
    (upstream tracks `Traced::get`). Only IDE tracing sees it.
 3. **Arguments are also compared exactly** (`values_memo_equal`), not only
-   by fingerprint, and are therefore kept. Reason: host closures and
-   unidentified modules compare by identity. 6.2 has the cost.
+   by fingerprint, and are therefore kept. Reason: host closures compare
+   by identity and fingerprint by a key of the host's. (Modules were a
+   second reason until step 4; they are taken by their hashes now, as
+   upstream's.) 6.2 has the cost.
 4. **At most four entries per key.**
 5. **Errors are not kept** by `memoize` and `memoized_closure` (upstream
    caches a `SourceResult`); module evaluations keep theirs, as a copy
    that is copied again for every caller.
-6. **Results that hold identity-compared values are not kept** (frames,
-   introspector reads), entries keyed by them end with their compilation,
-   the state sequence is not memoized.
+6. **Results that hold host closures are not kept** (frames,
+   introspector reads), entries keyed by them end with their compilation
+   (step 4), the state sequence is not memoized.
 7. **The library is identified by a serial number**, not by its hash.
 8. **The answers of the world are kept per scope**, comemo's accelerator
    per tracked reference and until `evict`. Same observable behaviour
@@ -2326,13 +2416,16 @@ Kept or introduced, each stricter than upstream unless said:
    to upstream that remains is in the signature: `edit` and `replace`
    return the source instead of changing `self`.
 10. **Descriptors of native functions, elements and types are
-    fingerprinted by a number given when they are made** (5.4); upstream
-    hashes their address. Today's port fingerprints their texts.
-11. **Looser than upstream: the modules of files, plugins and libraries
-    compare by their fingerprints** (5.4). Differs from upstream in a
-    from-scratch compilation where two such objects with equal contents
-    meet: a file evaluated twice under IDE tracing, modules of two
-    libraries in one evaluation.
+    fingerprinted by a number given when they are made** (5.4, built in
+    step 4); upstream hashes their address. The port fingerprinted their
+    texts. Not a deviation in what can be observed: both are a number per
+    object that depends on the process.
+11. **Modules: none.** (This item was "looser than upstream: the modules
+    of files, plugins and libraries compare by their fingerprints", the
+    recommendation of revisions 3 and 4. The owner decided otherwise on
+    2026-10-11: `==` and the stores treat modules exactly as upstream's
+    do, 5.4. The port's earlier deviation in the other direction, modules
+    as identity-compared arguments of memoized calls, is gone too.)
 12. **An SVG image's fingerprint and equality include the images it links**
     (5.5); upstream's cover its bytes and fonts. Built in step 2 of slice
     1, with which font was chosen for which text besides (upstream's hash
@@ -2348,14 +2441,23 @@ Kept or introduced, each stricter than upstream unless said:
     same results are found again; the port's elements hold the sources
     only. Not stricter and not looser: another place for the same data.
 
+Upstream quirks the port reproduces since step 4 (the owner's decision
+on module equality, 5.4):
+
+- Two modules with one hash are one argument for comemo, and for the
+  port's stores: two plugins without functions, a file evaluated twice,
+  the modules of two libraries (`typst/oracle_wbtest.mbt`, "modules: ..";
+  `typst/modules_wbtest.mbt`).
+- A module that a kept result returns and the module of the same file
+  evaluated again are different objects and compare unequal: what
+  `typst watch` shows after a comment in an imported file is not what
+  `typst compile` shows (`tests/recompile/upstream/`).
+
 Upstream quirks the port does not reproduce:
 
-- Two values with one hash are one argument for comemo: two plugins without
-  functions (`library/memo.mbt`, header; with 5.4 they are distinguished
-  by their bytes), and in general anything whose `Hash` is coarser than its
-  `==`.
-- A module that a kept result returns and the module of the same file
-  evaluated again are different objects and compare unequal (deviation 11).
+- Two values with one hash are one argument for comemo where the port
+  compares arguments exactly and the comparison is finer than the hash.
+  For modules it no longer is (above).
 - comemo keeps a result whose constraint is satisfied even if the nested
   results it was built from were evicted and recomputed as other objects.
   The port has the same structure; it is harmless here because nothing
@@ -2385,16 +2487,24 @@ Decided on 2026-10-07 by the coordinator of this work:
   findings are answered in this revision, and those answers are not
   reviewed.
 
+Decided on 2026-10-11 by the owner:
+
+- **Module equality: exactly as upstream**, and plugins consistent with
+  upstream. `==` compares the objects, the stores take modules by their
+  hashes. This overrules the recommendation of 5.4 in revisions 3 and 4
+  (equality by fingerprint, deviation 11 as it was) and is neither of the
+  two alternatives that were costed there, which stay in 5.4 as history.
+  What is given up is the guarantee that a recompilation always gives
+  what a compilation from scratch gives: where a document compares a
+  module that a kept call returned, the port will give what upstream's
+  `typst watch` gives. The harness requires equality with a compilation
+  from scratch everywhere else and accepts this difference only at steps
+  that are pinned to the upstream binary's recorded watch output (9.1).
+  Built in step 4.
+
 Leaning towards "accepted" by the coordinator; the owner may overrule:
 
-1. **Module equality by content** (deviation 11). 5.4 costs it against
-   keeping identity and recommends it: it differs from upstream in two
-   cases that need a host and in no document the command line compiles;
-   keeping identity costs a fingerprint that is not upstream's, a rule
-   between stores, and 137 ms instead of 34 ms after a comment in a shared
-   file of touying. If it is overruled, the harness cannot require
-   equality with a compilation from scratch for documents that compare
-   modules, or (b) of 5.4 is built.
+1. (Decided, above: module equality.)
 2. **The public surface.** `Library` stops being a record that hosts can
    build or update, and `Introspector::query` returns a view. `doc` and
    other hosts see both. In a minor version? (Step 1 made its part of the
@@ -2405,7 +2515,10 @@ Leaning towards "accepted" by the coordinator; the owner may overrule:
    `compilation_epoch` and `note_evaluation` are gone; `CHANGELOG.md`.
    Step 3 added to the surface and changed one behaviour: `eval_source`
    is memoized, so two calls in one scope with the same source give one
-   module.)
+   module. Step 4 made the introspector's part: `Introspector::query`,
+   `IntrospectorBackend::query` and `ElementIntrospector::query` return a
+   view, `memo_fingerprint` returns a `MemoKey`, `Module::canonical` is
+   gone.)
 
 ## Appendix A. The probe
 

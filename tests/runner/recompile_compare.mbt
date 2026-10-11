@@ -60,6 +60,9 @@ priv struct Compiled {
   /// The sources of the compilation whose tree is not what a parse gives
   /// ([RecompileWorld::reparsed]).
   reparsed : Array[String]
+  /// For a pinned sequence (`recompile_pinned.mbt`): the SVG of the
+  /// document as the CLI writes it, if it compiled to one page.
+  cli_svg : String?
 }
 
 ///|
@@ -284,6 +287,7 @@ let read_check_case : Ref[String] = Ref("")
 fn recompile_compile(
   world : RecompileWorld,
   pages? : PageFiles = PageFiles::new(),
+  pinned? : Bool = false,
 ) -> (Compiled, Array[@syntax.FileId]) {
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
@@ -301,6 +305,7 @@ fn recompile_compile(
   let mut images = ""
   let pdf_diagnostics = StringBuilder()
   let mut pdf : Bytes = b""
+  let mut cli_svg = None
   let document = match warned.output {
     Ok(doc) => {
       diagnostics.write_string("ok\n")
@@ -322,6 +327,9 @@ fn recompile_compile(
       frames = enc.out.to_string()
       introspector = recompile_introspector(dyn_world, doc)
       svg = recompile_svg(doc)
+      if pinned {
+        cli_svg = pinned_svg(doc)
+      }
       // (A compilation that fails exports nothing and leaves the files.)
       images = pages.write(doc)
       let exported = make_live(doc)
@@ -360,6 +368,7 @@ fn recompile_compile(
     ok: document is Some(_),
     document,
     reparsed,
+    cli_svg,
   }
   (compiled, ids)
 }

@@ -1205,9 +1205,10 @@ pub fn Func::host(f : HostFunc) -> Func
 - **Equality** (`Func ==`, memo input equality): the same `HostFunc` object.
 - **Fingerprint**: a discriminant, the `key` and the function span. It
   sets `fingerprint_identity` (the flag of values that compare by identity
-  and that their fingerprint does not identify: host functions and
-  anonymous modules; Typst closures no longer set it, they compare by
-  their hash like upstream's) and the new flag `fingerprint_host`, which
+  and that their fingerprint does not identify: host functions; Typst
+  closures do not set it, they compare by their hash like upstream's, and
+  modules do not either, since memoized calls take them by their hashes
+  as upstream's do) and the new flag `fingerprint_host`, which
   lets the recorder find results that hold host functions (11.4).
 
 ### 11.2 Identity

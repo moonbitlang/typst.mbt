@@ -487,6 +487,53 @@ test "module store: the warnings an entry keeps are not those of the sinks it is
 }
 
 ///|
+test "module store: a call that is found again returns the module of the evaluation before" {
+  // Upstream's rule, and the port's (the owner's decision of 2026-10-11):
+  // `==` on modules compares the objects, and a memoized call is found by
+  // the hashes of its arguments, a module's being its name and what it
+  // holds. `get` captured the module of `a.typ`. After a comment in
+  // `a.typ` the file is evaluated again and gives another module with the
+  // hash of the first, `get` is a closure with the hash it had, and
+  // `get()` is found: it returns the module of the first evaluation, which
+  // is not `==` to the module of the second. That is what upstream's
+  // `typst watch` shows after such an edit
+  // (`tests/recompile/upstream/getter.json`), and what the port shows
+  // once closure calls are kept from one compilation to the next. Here
+  // they are kept by running both evaluations in one compilation.
+  //
+  // The module exports `float.nan`: what it holds is compared by its hash,
+  // which has the bits of the float, never by `==`.
+  let a = (comment : Int) => {
+    "#let v = 1\n#let x = float.nan\n// comment \{comment}\n"
+  }
+  let main = "#import \"a.typ\" as m\n#let get() = m\n#repr((get() == m, m == m, get().v == m.v))"
+  let world = store_world(main, sources=[("a.typ", a(0))])
+  let seen = []
+  let mut found = 0
+  @library.with_layout_memo(() => {
+    seen.push(world.evaluated())
+    let before = @library.closure_memo_stats().0
+    world.edit("a.typ", a(1))
+    seen.push(world.evaluated())
+    // The calls were found, not computed (`get` is called in two places).
+    found = @library.closure_memo_stats().0 - before
+    // An edit that changes what the module holds: another hash, another
+    // closure, another call.
+    world.edit("a.typ", "#let v = 2\n")
+    seen.push(world.evaluated())
+  })
+  assert_eq(seen, [
+    "(true, true, true): found 0, evaluated 2", "(false, true, true): found 0, evaluated 2",
+    "(true, true, true): found 0, evaluated 2",
+  ])
+  assert_eq(found, 2)
+  // From scratch, as in every compilation of the tree as it is, the
+  // module is one.
+  let fresh = store_world(main, sources=[("a.typ", a(1))])
+  inspect(fresh.evaluated(), content="(true, true, true): found 0, evaluated 2")
+}
+
+///|
 test "module store: an entry of an outer scope is found in a scope inside it if its reads hold there" {
   // No kept store here: both scopes are open. The inner world has the
   // sources of the outer one and, the second time, another data file.

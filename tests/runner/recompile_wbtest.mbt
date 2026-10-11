@@ -255,3 +255,140 @@ test "recompile: a page image is written again only if the hash of its page chan
   assert_true(back[0] != "page 1: stale")
   inspect(back[2], content="page 3: left on disk")
 }
+
+///|
+/// What a compilation gave, as far as [pinned_verdict] looks: pages that
+/// show `svg`.
+fn pinned_test_compiled(
+  svg : String,
+  dependencies? : String = "main.typ\na.typ",
+  diagnostics? : String = "ok\n",
+) -> Compiled {
+  {
+    parts: [
+      dependencies,
+      diagnostics,
+      "frames of \{svg}",
+      "",
+      "merged \{svg}",
+      "images of \{svg}",
+      "ok\n",
+      "pdf of \{svg}",
+    ],
+    pdf: @utf8.encode(svg),
+    ok: true,
+    document: None,
+    reparsed: [],
+    cli_svg: Some(svg),
+  }
+}
+
+///|
+fn pinned_test_verdict(
+  step : PinnedStep,
+  expected : Compiled,
+  actual : Compiled,
+) -> String {
+  match pinned_verdict(step, expected, actual) {
+    Same => "same"
+    AsUpstream => "as upstream's watch"
+    Fails(reason) => "fails: \{reason}"
+  }
+}
+
+///|
+test "recompile: the one difference from a fresh compilation that passes is upstream's watch's, at its step" {
+  let fresh = pinned_test_compiled("FRESH")
+  let stale = pinned_test_compiled("WATCH")
+  let agrees : PinnedStep = {
+    edit: "an edit",
+    files: [],
+    fresh: "FRESH",
+    watch: None,
+  }
+  let differs : PinnedStep = { ..agrees, watch: Some("WATCH"), }
+  // The loop gives what a fresh compilation gives: always fine.
+  inspect(pinned_test_verdict(agrees, fresh, fresh), content="same")
+  inspect(pinned_test_verdict(differs, fresh, fresh), content="same")
+  // It gives what upstream's watch gave, where that is something else.
+  inspect(
+    pinned_test_verdict(differs, fresh, stale),
+    content="as upstream's watch",
+  )
+  // Where upstream's watch gives what a fresh compilation gives, the loop
+  // must too.
+  inspect(
+    pinned_test_verdict(agrees, fresh, stale),
+    content="fails: frames, svg, page images, pdf differ from a fresh compilation, where upstream's watch gives what a fresh compilation gives",
+  )
+  // Something else than both.
+  inspect(
+    pinned_test_verdict(differs, fresh, pinned_test_compiled("OTHER")),
+    content="fails: frames, svg, page images, pdf differ from a fresh compilation, and the pages are not what upstream's watch gives either",
+  )
+  // Upstream's pages with other dependencies or diagnostics: a stale
+  // result of another kind next to the accepted one.
+  inspect(
+    pinned_test_verdict(
+      differs,
+      fresh,
+      pinned_test_compiled("WATCH", dependencies="main.typ"),
+    ),
+    content="fails: the pages are what upstream's watch gives, but the dependencies differ from a fresh compilation",
+  )
+  inspect(
+    pinned_test_verdict(
+      differs,
+      fresh,
+      pinned_test_compiled("WATCH", diagnostics="ok\nwarning: stale\n"),
+    ),
+    content="fails: the pages are what upstream's watch gives, but the diagnostics differ from a fresh compilation",
+  )
+  // A fresh compilation that is not upstream's fresh compilation: the
+  // fixture is of other files, or the port's answer from scratch is not
+  // upstream's. Whatever the loop gave.
+  for actual in [pinned_test_compiled("OTHER"), stale] {
+    inspect(
+      pinned_test_verdict(differs, pinned_test_compiled("OTHER"), actual),
+      content="fails: a fresh compilation does not give the SVG of upstream's fresh compilation",
+    )
+  }
+  // A document that does not compile has no pages to be upstream's.
+  let failed : Compiled = { ..pinned_test_compiled("WATCH"), cli_svg: None, }
+  inspect(
+    pinned_test_verdict(differs, fresh, failed),
+    content="fails: frames, svg, page images, pdf differ from a fresh compilation, and the pages are not what upstream's watch gives either",
+  )
+}
+
+///|
+test "recompile: the fixtures of upstream's watch" {
+  let fixture = pinned_parse(
+    "example",
+    (
+      #|{"upstream": "typst", "steps": [
+      #| {"edit": "the project", "files": {"main.typ": "A\n", "a.typ": "B"}, "fresh": "<svg/>", "watch": null},
+      #| {"edit": "an edit", "files": {"a.typ": "C"}, "fresh": "<svg/>", "watch": "<svg a/>"}
+      #|]}
+    ),
+  )
+  assert_eq(fixture.steps.length(), 2)
+  assert_eq(fixture.steps[0].files, [("main.typ", "A\n"), ("a.typ", "B")])
+  assert_true(fixture.steps[0].watch is None)
+  assert_eq(fixture.steps[1].watch, Some("<svg a/>"))
+  let document = fixture.document()
+  inspect(document.name, content="upstream/example")
+  assert_eq(document.files.length(), 2)
+  // Those of the repository: each starts with a fresh compilation and has
+  // a step at which upstream's watch gives something else.
+  let pinned = pinned_sequences()
+  assert_eq(pinned.map(fixture => fixture.name), ["getter", "modules"])
+  for fixture in pinned {
+    assert_true(fixture.steps[0].watch is None)
+    assert_true(fixture.steps.iter().any(step => step.watch is Some(_)))
+    for step in fixture.steps {
+      assert_true(step.fresh.has_prefix("<svg "))
+      assert_false(step.watch == Some(step.fresh))
+    }
+  }
+}
