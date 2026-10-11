@@ -406,6 +406,30 @@ fn Document::lints(self : Document, lints : Bool) -> Array[Lint] {
 }
 
 ///|
+/// What the engine keeps of the last compilations of a process, in calls
+/// of `@library.evict` without a hit: `typst watch`'s number.
+let kept_compilations : Int = 10
+
+///|
+/// Called when a compilation or a lowering of `doc` is done, as `typst
+/// watch` calls `@library.evict(10)` after a recompilation.
+///
+/// The engine keeps what a compilation computed for the process and finds
+/// it in a later one (`library/memo.mbt`): the layout of content that is
+/// equal with its origins, the calls of Typst functions, the evaluations
+/// of files and packages, decoded images. A script that compiles one
+/// document does not notice. A process that compiles many would keep all
+/// of them, so every compilation of `doc` makes what is kept older by one,
+/// and what no compilation found for ten of them goes. What involves a
+/// callback (a host function is in its key) ends with its compilation, and
+/// what read a file that changes during a session (the origin listing, a
+/// snippet) is never kept (`doc/volatile_test.mbt`). `@library.evict(0)`
+/// drops everything at once.
+fn compilation_done() -> Unit {
+  @library.evict(kept_compilations)
+}
+
+///|
 /// Compile to any output of the engine. The EDSL's lints run by default
 /// (`CompileReport::lints`); `lints=false` turns them off. Here they are
 /// the lints of the description tree: the lints that read the pages need
@@ -431,6 +455,7 @@ pub fn[T : @library.Output] Document::compile(
   } noraise {
     output => Ok(output)
   }
+  compilation_done()
   session.report(result, sink, self.lints(lints))
 }
 
@@ -465,6 +490,7 @@ pub fn Document::lower(
   } noraise {
     output => Ok(output)
   }
+  compilation_done()
   session.report(result, sink, self.lints(lints))
 }
 

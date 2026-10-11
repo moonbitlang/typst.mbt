@@ -22,19 +22,34 @@
 // finds what the first one found (it is captured, and skipped) or fails
 // again. The same name in the other mode is another lookup and is kept.
 //
-// The cache is a table for one compilation, not a field of the syntax node:
-// nodes are mutable objects that the parser and the incremental reparser
-// change in place, so a field would need every mutator to reset it (and the
-// node hash kept next to the identifiers below also covers the spans, which
-// renumbering changes). Sources do not change during a compilation
-// (`World`'s contract, which memoization relies on anyway), so within one a
-// node object has one tree. Entries are found by the node's span and are
+// The cache is a table for one compilation, found by the node's span and
 // only used for the same node object: spans are not unique (detached
 // spans, the one span of all nodes of an evaluated string), and after an
-// edit a new node can have the span of an old one. The table is dropped
-// with the compilation's other caches ([@library.memo_compilation]); when
-// memoization is off, the visitor runs as upstream's does, which is also
-// what the tests compare the cache with.
+// edit a new node can have the span of an old one. When this was written
+// nodes were objects that the reparser changed in place, and a table that
+// outlived a compilation would have handed the analysis of a node as it
+// was to the node as it is. That is gone: syntax trees are persistent
+// (`syntax/node.mbt`), a node never changes, and an entry would be right
+// for as long as the process runs.
+//
+// It stays per compilation all the same (step 5 of slice 1 of
+// `docs/incremental-design.md`, which keeps the stores of memoized calls
+// across compilations, looked at it again). What a kept table would save
+// is the analysis and the node hash of the closure and context
+// expressions that a recompilation evaluates, which are those of the
+// files that changed: the modules of the others are found as a whole,
+// with their closures, which hold their captured scopes and the cached
+// hash of their node. Measured in watch sessions against a build that
+// never drops the table: a touying deck recompiles in 23.9 ms after an
+// edit of its main file with the table dropped and in 23.1 ms with it
+// kept, in 117 ms and 116 ms after an edit of a file of the package
+// (medians of fifteen, whose spread is larger than the difference), and
+// a small project in the same 8.2 ms. What it would cost is a table that
+// holds a node of every expression of every version of every file, with
+// ages and an evictor of its own. The table
+// is dropped when another compilation asks ([@library.memo_compilation]);
+// when memoization is off, the visitor runs as upstream's does, which is
+// also what the tests compare the cache with.
 
 ///|
 /// An identifier that the capture analysis looks up.

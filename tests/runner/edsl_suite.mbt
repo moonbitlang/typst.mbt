@@ -348,6 +348,7 @@ fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
 
   // 1. Evaluation.
   let dumper : StructDumper = { elems: [], locations: None, }
+  runner_slate()
   let lowered = document.lower(world)
   let sink = @library.Sink::new()
   let evaluated = try
@@ -388,7 +389,10 @@ fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
   for memo in [true, false] {
     @library.set_layout_memo_enabled(memo)
     let mode = if memo { "" } else { "-memo-off" }
+    // Each of the two from scratch (`edsl_stage.mbt`).
+    runner_slate()
     let edsl = document.compile_paged(world)
+    runner_slate()
     let typst : @library.Warned[
       Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
     ] = @typst.compile(world)
