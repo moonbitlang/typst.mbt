@@ -475,7 +475,7 @@ fn decode_context(
 /// Read the pairs of an array (upstream `array.iter::<(f32, f32)>()`).
 fn read_f32_pairs(a : @hayro_syntax.PdfArray) -> Array[(Float, Float)] {
   let result = []
-  let iter = (a.iter() : Iter[@hayro_syntax.Object]).iterator()
+  let iter = (a.iter() : Iter[@hayro_syntax.Object])
   while true {
     guard iter.next() is Some(o1) else { break }
     guard iter.next() is Some(o2) else { break }

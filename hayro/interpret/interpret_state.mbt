@@ -356,7 +356,7 @@ fn handle_gs_single(
       guard obj is Some(obj) else { return None }
       let function = match obj {
         Array(array) => {
-          let iter = array.iter().iterator()
+          let iter = array.iter()
           let fs = []
           for _ in 0..<4 {
             guard iter.next() is Some(o) else { return None }
@@ -406,7 +406,7 @@ fn handle_gs_single(
       guard (dict.get("Font") : @hayro_syntax.PdfArray?) is Some(arr) else {
         return None
       }
-      let iter = (arr.iter() : Iter[@hayro_syntax.Object]).iterator()
+      let iter = (arr.iter() : Iter[@hayro_syntax.Object])
       guard iter.next() is Some(o) && o.into_dict() is Some(font_dict) else {
         return None
       }
@@ -422,7 +422,7 @@ fn handle_gs_single(
       guard (dict.get(k) : @hayro_syntax.PdfArray?) is Some(arr) else {
         return None
       }
-      let iter = (arr.iter() : Iter[@hayro_syntax.Object]).iterator()
+      let iter = (arr.iter() : Iter[@hayro_syntax.Object])
       guard iter.next() is Some(o) && o.into_array() is Some(dash_array) else {
         return None
       }
