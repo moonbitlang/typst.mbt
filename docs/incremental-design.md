@@ -1328,6 +1328,105 @@ compilations: 6.2). Left out: SVG images (`SvgImage::with_fonts_images`
 reads fonts and linked files from the world: slice 1), the PDF writer's
 own speed.
 
+*As built* (0c, and the change in pdflite that was to follow it only if
+the number was worth it). The conversion cache came first
+(`convert_raster` in `pdf/image.mbt`: `raster_cache`, a `ContentCache`
+keyed by `RasterImage::hash128()` and `interpolate`). With it, what was
+left of an export of an image deck was compression in pdflite, repeated in
+every export: 365 of the 371 ms of a second export of the deck below. So
+the second half was built.
+
+What krilla does. An image is `Arc<ImageRepr>`, and its samples exist in
+it only compressed: `Image::from_custom` calls `deflate_encode` (zlib,
+level 6, no predictor) on the colour channel and on the alpha channel when
+the image is made (`SampledRepr`; on another thread with `rayon`), and
+`Image::serialize` writes those bytes with `FilterStreamBuilder::
+new_from_deflated` into whatever document is given the image. The
+dictionary is made per document: the colour space (device or ICC-based by
+`no_device_cs`), the profile (dropped if the version does not support
+it), `/Interpolate`, the reference of the mask, the validation errors,
+the check of 16-bit samples against the version. Between documents
+nothing is shared but the image itself, and typst-pdf hands the same image
+to a later export because `convert_raster` is memoized.
+
+What pdflite 0.3.9 has (`export/image.mbt`). `ImageData::Deflated(Bytes,
+Bytes?)`, the zlib streams of the colour samples and of the alpha channel,
+and `Image::deflated()`, which makes it from `Samples` with the function
+that `Document::finish` compresses samples with. The questions, as they
+were decided:
+
+- Where the cache lives: in the image value, as in krilla. pdflite has no
+  table of images, takes no cache object and needs no evictor. An
+  `@export.Image` is a struct that callers build as a literal, so a field
+  was not an option; a case of `ImageData` breaks only code that matches
+  on all its cases, of which there is none outside pdflite.
+- The key: there is none across documents. A table by `image.key` would
+  have made the caller's key, which today means "the same image in this
+  document", mean "the same samples in every document of the process";
+  as built, two images with equal fields and other samples cannot meet,
+  because nothing is looked up. Inside a document an image is embedded
+  once per `key` and `interpolate`, as before. What the kept bytes depend
+  on is the samples and nothing else: not the version, the standard, the
+  colour space, the profile or `interpolate` (two entries of
+  `raster_cache` that differ in `interpolate` hold the same streams
+  twice, as upstream's two images do).
+- Lifetime: the entry of `raster_cache`, which has comemo's ages and is
+  dropped by `@library.evict` through `register_evictor`, as before.
+- Determinism: a PDF is byte for byte what it was, from kept images or
+  not. `Samples` and `Deflated` are written by one function in pdflite,
+  and here the exporter is still given `Samples` when memoization is off,
+  so a comparison of PDFs with memoization on and off compares the two
+  forms: the `recompile` stage, `pdf/image_wbtest.mbt` and
+  `doc/pdf_images_test.mbt` (the `edsl` stage exports with memoization on
+  only).
+- Memory: what is kept is the compressed streams (about the size of the
+  images in the file) and no longer the converted samples; nothing else
+  read them. An image is compressed right after it is converted, so the
+  samples of one image are alive at a time in a first export, not those
+  of all.
+
+Measured (aarch64 macOS, native release, medians of five; the deck is
+`bench/mkdeck.py`'s: 43 pages, 28 PNGs of 1440 x 900, half with an alpha
+channel, drawn 72 times, 127 MB of samples in 42 streams, an 11 MB file;
+upstream is 0.15.1 with its threads). `tests/pdf_bench`, the export
+alone, in one process:
+
+| document | | export 1 | export 2 | peak footprint, one export | three |
+| --- | --- | ---: | ---: | ---: | ---: |
+| deck | before | 397 ms | 371 ms | 301 MB | 359 MB |
+| | after | 397 | 6.0 | 229 | 294 |
+| `showcase.typ` | before | 16.5 | 14.1 | 141 | 143 |
+| | after | 16.4 | 13.7 | 141 | 143 |
+| `longer.typ` | before | 184 | 188 | 161 | 167 |
+| | after | 183 | 189 | 161 | 167 |
+
+`typst watch` to a PDF (the durations of the status lines: a compilation
+and its export), a first compilation and five edits at the end of the main
+file:
+
+| document | | first | after an edit | RSS after the first | after the last | peak |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| deck | before | 579 ms | 420 ms | 298 MB | 335 MB | 351 MB |
+| | after | 588 | 53 | 236 | 255 | 267 |
+| | upstream | 80 | 15 | 293 | 320 | 336 |
+| | upstream, `--jobs 1` | 485 | 14 | 208 | 244 | 255 |
+| `showcase.typ` | before | 242 | 56 | 169 | 171 | 179 |
+| | after | 248 | 57 | 169 | 172 | 180 |
+| | upstream | 169 | 8 | 141 | 156 | 164 |
+| `longer.typ` | before | 1300 | 1350 | 183 | 186 | 195 |
+| | after | 1290 | 1330 | 183 | 186 | 195 |
+| | upstream | 514 | 123 | 313 | 1144 | 1200 |
+
+The 53 ms of the deck after an edit are its compilation (47 ms) and the
+6 ms of the export. `showcase.typ` (a JPEG, which is embedded as it is)
+and `longer.typ` (no image) do not change. The files are the same bytes
+before and after, in every session and round.
+
+Not kept, and so compressed in every export: images inside SVGs and
+bitmap glyphs (their images are made per export: `pdf/svg_image.mbt`,
+`pdf/color_glyph.mbt`), ICC profiles (krilla deflates a profile when it
+is made), content streams (krilla memoizes their deflation) and fonts.
+
 ### Slice 1: the tracked world, and the existing stores kept
 
 One slice because nothing may be kept before all of it is there. Five

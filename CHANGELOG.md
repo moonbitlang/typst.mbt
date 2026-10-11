@@ -348,6 +348,17 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   per process and `interpolate` flag, not once per place it is drawn at.
   `library`: `RasterImage::hash128()`, the hash of an image (its data,
   format and ICC profile; upstream `Hash for RasterImage`).
+- `pdf`: what is kept of a converted image is the image as the file
+  embeds it, its samples compressed, as krilla's images are (no change of
+  the interface; `moonbitlang/pdflite` 0.3.9, `Image::deflated`). An
+  export does not compress a raster image again that an earlier export
+  of the process embedded, for as long as `evict` keeps it (images inside
+  SVGs and bitmap glyphs are made, and compressed, for every export): the
+  second export of a deck of 28 screenshots takes 6 ms instead of 371 ms,
+  and `typst watch` recompiles it to a PDF in 53 ms instead of 420 ms.
+  The converted samples are no longer held between exports (72 MB of the
+  deck's). The bytes of a PDF are what they were. The module depends on
+  `moonbitlang/pdflite` 0.3.9 (it was 0.3.8).
 - `layout`: `Fingerprint` for `Page` (upstream derives `Hash`).
 - `doc/fonts`, a new package: `sans()`, the font files of a sans-serif
   family for the EDSL, IBM Plex Sans (SIL Open Font License 1.1) in

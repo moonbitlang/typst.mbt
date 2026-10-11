@@ -628,8 +628,10 @@
   same bytes in two objects, a broken input used twice, a file that
   changes behind its path between two compilations of one world, `evict`.
   They cost memory, not time: decoded pixels (4 bytes per pixel of an
-  RGBA image) and, for an image with an alpha channel or 16-bit samples,
-  the exporter's converted samples (as much again) stay until `max_age`
+  RGBA image) and the exporter's image, its compressed samples (about
+  the size of the image in the PDF; not the converted samples, which
+  were as much as the pixels again for an image with an alpha channel or
+  16-bit samples), stay until `max_age`
   compilations did not use them, and a process that never calls `evict`
   keeps every image it ever decoded. A watch session whose images are
   rewritten on every save holds up to `max_age` + 1 versions of them.
@@ -873,10 +875,28 @@
   with the flag of the first use; pdflite embeds it twice.) The PNG of a
   bitmap glyph is identified by its data like a PNG inside an SVG
   (krilla's `Image::from_png` for both; `decode_png_image`). The export of
-  a document with images is the compression of their samples in pdflite
-  (the deck of `memo_content.mbt`'s numbers: 515 of 550 ms, as much as
-  upstream's with `--jobs 1`), again in every export: krilla keeps the
-  compressed stream in its image, pdflite's image does not.
+  a document with images is the compression of their samples (the deck
+  of `bench/mkdeck.py`: 365 of 397 ms; upstream pays as much, on several
+  threads), and it is paid once: `convert_raster` keeps the image as
+  it is embedded, `@export.Image::deflated()` (pdflite 0.3.9:
+  `ImageData::Deflated`, the zlib streams of the colour samples and of
+  the alpha channel, which a document writes as they are), as krilla's
+  image is made of its deflated channels alone (`SampledRepr`). The second
+  export of the deck in a process takes 6 ms instead of 371 ms
+  (`tests/pdf_bench`). Rules: the kept form is the value in
+  `raster_cache`, there is no table and no key in pdflite, and what
+  belongs to a document (version, standard, colour space, the profile's
+  stream, `/Interpolate`, validation) is made per document and never
+  kept; the two forms must give the same bytes (pdflite writes both
+  through one function; with memoization off the exporter is given
+  `Samples`, so a comparison of PDFs with memoization on and off
+  compares them: the `recompile` stage, `pdf/image_wbtest.mbt` and
+  `doc/pdf_images_test.mbt`; the `edsl` stage exports with memoization
+  on only);
+  nothing may read the samples of a kept image. Not kept, so compressed
+  in every export: the images inside SVGs and of bitmap glyphs (made per
+  export), ICC profiles, content streams and fonts (krilla memoizes the
+  deflation of content streams with comemo).
 - PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
   `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts

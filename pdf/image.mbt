@@ -202,8 +202,20 @@ let raster_cache : @library.ContentCache[Result[@export.Image, String]] = @libra
 ///
 /// Kept beyond the export (`library/memo_content.mbt`): an image that is on
 /// many pages, or in the next export of `typst watch`, is converted once.
-/// The exporter still writes it once per document and compresses it for
-/// each (krilla keeps the compressed stream in its image).
+///
+/// What is kept is the image as it is embedded, its samples compressed
+/// ([@export.Image::deflated]): krilla's image is made of the compressed
+/// channels alone (`Image::from_custom` calls `deflate_encode` when the
+/// image is made, `SampledRepr`), and upstream's memoized `convert_raster`
+/// hands that image to every later export. So an export does not compress
+/// again an image that an earlier one embedded (while `evict` keeps it;
+/// the images inside SVGs and of bitmap glyphs do not come from here and
+/// are made for every export), and the converted samples (three bytes and
+/// one of alpha per pixel, where the image was not embedded as decoded)
+/// are not kept. The exporter writes the same bytes for both forms, so with
+/// memoization off, where nothing is kept and an image is converted for
+/// every place it is drawn at, the samples go to the exporter as they are
+/// and it compresses them once per document, as it embeds them once.
 fn convert_raster(
   raster : @library.RasterImage,
   interpolate : Bool,
@@ -218,7 +230,9 @@ fn convert_raster(
   match raster_cache.get(key) {
     Some(result) => result
     None => {
-      let result = convert_raster_impl(raster, interpolate)
+      let result = convert_raster_impl(raster, interpolate).map(image => {
+        image.deflated()
+      })
       raster_cache.insert(key, result)
       result
     }

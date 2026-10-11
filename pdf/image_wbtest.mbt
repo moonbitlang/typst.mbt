@@ -168,13 +168,29 @@ fn test_jpeg() -> Bytes {
 }
 
 ///|
-/// Whether two converted images hold the same data.
+/// Whether two converted images hold the same data in the same form: the
+/// samples as they were converted, or compressed as a kept image has them.
 fn same_data(a : @export.Image, b : @export.Image) -> Bool {
   match (a.data, b.data) {
     (Samples(c1, a1), Samples(c2, a2)) => c1 == c2 && a1 == a2
+    (Deflated(c1, a1), Deflated(c2, a2)) => c1 == c2 && a1 == a2
     (Jpeg(x), Jpeg(y)) => x == y
     _ => false
   }
+}
+
+///|
+/// The samples of a kept image, which holds them compressed: the colour
+/// samples and the alpha channel.
+fn test_samples_of(image : @export.Image) -> (Bytes, Bytes?) raise {
+  guard image.data is Deflated(color, alpha) else { fail("not compressed") }
+  (
+    @codecs.zlib_decompress(color),
+    match alpha {
+      Some(alpha) => Some(@codecs.zlib_decompress(alpha))
+      None => None
+    },
+  )
 }
 
 ///|
@@ -212,8 +228,18 @@ test "convert_raster: one conversion per image and interpolation" {
   assert_eq(raster_cache.length(), 1)
   assert_eq((a.width, a.height), (6, 4))
   assert_false(a.interpolate)
-  guard a.data is Samples(color, Some(alpha)) else { fail("no alpha") }
+  // What is kept is the image as it is embedded: the samples of the
+  // conversion, compressed, and not the samples as well.
+  guard test_samples_of(a) is (color, Some(alpha)) else { fail("no alpha") }
   assert_eq((color.length(), alpha.length()), (6 * 4 * 3, 6 * 4))
+  guard convert_raster_impl(raster, false) is Ok(converted) else {
+    fail("not converted")
+  }
+  guard converted.data is Samples(converted_color, Some(converted_alpha)) else {
+    fail("no samples")
+  }
+  assert_true(color == converted_color && alpha == converted_alpha)
+  assert_true(same_data(a, converted.deflated()))
   // The same bytes in another object (another path, the next compilation):
   // the same raster image, the same conversion.
   let again = @library.RasterImage::plain(test_copy(data), Exchange(Png))
@@ -308,8 +334,8 @@ test "convert_raster: images that differ in one argument" {
     false,
   )
   assert_true(synthetic.key != plain.key)
-  guard synthetic.data is Samples(_, Some(_)) else { fail("no alpha") }
-  guard plain.data is Samples(_, None) else { fail("alpha") }
+  guard synthetic.data is Deflated(_, Some(_)) else { fail("no alpha") }
+  guard plain.data is Deflated(_, None) else { fail("alpha") }
 }
 
 ///|
@@ -347,10 +373,13 @@ test "convert_raster: memoization off, and evict" {
   let a = test_converted(raster, false)
   let b = test_converted(raster, false)
   @library.set_layout_memo_enabled(true)
-  // Nothing is found or kept, and the conversions are equal.
+  // Nothing is found or kept, and the conversions are equal. They are the
+  // samples, which the exporter compresses for the document: to what the
+  // kept image holds.
   assert_false(physical_equal(a, b))
   assert_false(physical_equal(a, kept))
-  assert_true(a.key == kept.key && same_data(a, kept) && same_data(b, kept))
+  assert_true(a.data is Samples(_, Some(_)) && same_data(a, b))
+  assert_true(a.key == kept.key && same_data(a.deflated(), kept))
   assert_eq(raster_cache.length(), 1)
   // The library's `evict` reaches the cache of this package.
   @library.evict(1)
@@ -380,13 +409,195 @@ test "the PNG of a bitmap glyph is identified like a PNG inside an SVG" {
   guard glyph.data is Samples(color, Some(alpha)) else { fail("no alpha") }
   assert_eq((color.length(), alpha.length()), (6 * 4 * 3, 6 * 4))
   // The same file as an image of the document is another one (krilla's
-  // `from_custom`), as upstream.
+  // `from_custom`), as upstream. A glyph's image is made for one export
+  // and holds its samples; the document's is kept and holds them
+  // compressed.
   let direct = test_converted(
     @library.RasterImage::plain(png, Exchange(Png)),
     false,
   )
   assert_true(direct.key != glyph.key)
-  assert_true(same_data(direct, glyph))
+  assert_true(same_data(direct, glyph.deflated()))
   // A glyph's image is not an entry of the document's conversions.
   assert_eq(raster_cache.length(), 1)
+}
+
+///|
+/// A file of one page that draws the images in their order: its bytes, or
+/// why the exporter refuses it.
+fn test_file(
+  images : Array[@export.Image],
+  settings : @export.SerializeSettings,
+) -> Result[Bytes, String] {
+  let document = @export.Document::new_with(settings)
+  let page = document.start_page_with(
+    @export.PageSettings::from_wh(300.0, 300.0).unwrap(),
+  )
+  let surface = page.surface()
+  for i, image in images {
+    surface.set_location(i.to_uint64())
+    surface.draw_image(
+      image,
+      @export.Size::from_wh(10.0 + i.to_double(), 10.0).unwrap(),
+    )
+    surface.reset_location()
+  }
+  surface.finish()
+  page.finish()
+  try document.finish() catch {
+    Validation(errors) => Err("validation: \{errors.length()}")
+    ImageError(location, message) =>
+      Err("image \{location.unwrap_or(99UL)}: \{message}")
+    _ => Err("another error")
+  } noraise {
+    bytes => Ok(bytes)
+  }
+}
+
+///|
+test "a file of kept images is the file of the converted ones" {
+  test_reset()
+  let default = @export.SerializeSettings::default()
+  let settings = [
+    default,
+    {
+      ..default,
+      configuration: { version: Pdf14, validators: { a: None, ua: None, }, },
+    },
+    {
+      ..default,
+      configuration: { version: Pdf20, validators: { a: None, ua: None, }, },
+    },
+    {
+      ..default,
+      configuration: {
+        version: Pdf17,
+        validators: { a: Some(A2_B), ua: None, },
+      },
+    },
+    {
+      ..default,
+      configuration: {
+        version: Pdf14,
+        validators: { a: Some(A1_B), ua: None, },
+      },
+    },
+  ]
+  // Every colour type of a decoded image, with and without a profile,
+  // smooth and not: the conversion, and what is kept of it.
+  let colors : Array[@codecs.ColorType] = [
+    L8,
+    La8,
+    Rgb8,
+    Rgba8,
+    L16,
+    La16,
+    Rgb16,
+    Rgba16,
+  ]
+  let icc = Bytes::makei(300, i => (i * 11).to_byte())
+  let converted = []
+  for n, color in colors {
+    let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
+    let bytes_per_pixel = color.channel_count() * (if sixteen { 2 } else { 1 })
+    let buf = Bytes::makei(24 * 16 * bytes_per_pixel, i => {
+      (i / 5 * (n + 3) + i % 7).to_byte()
+    })
+    for profile in [None, Some(icc)] {
+      for interpolate in [false, true] {
+        guard convert_samples(
+            "\{n}:\{profile is Some(_)}",
+            24,
+            16,
+            color,
+            buf,
+            profile,
+            interpolate,
+          )
+          is Ok(image) else {
+          fail("not converted")
+        }
+        converted.push(image)
+      }
+    }
+  }
+  let kept = converted.map(image => image.deflated())
+  for image in kept {
+    assert_true(image.data is Deflated(_))
+  }
+  let outcomes = []
+  for options in settings {
+    let mut files = 0
+    for i, image in converted {
+      let file = test_file([image], options)
+      assert_true(test_file([kept[i]], options) == file)
+      if file is Ok(_) {
+        files += 1
+      }
+    }
+    let all = test_file(converted, options)
+    assert_true(test_file(kept, options) == all)
+    assert_true(
+      test_file(kept.rev(), options) == test_file(converted.rev(), options),
+    )
+    outcomes.push(
+      "\{files} of \{converted.length()}, all: " +
+      (match all {
+        Ok(_) => "a file"
+        Err(message) => message
+      }),
+    )
+  }
+  inspect(
+    outcomes.join("\n"),
+    content=(
+      #|32 of 32, all: a file
+      #|32 of 32, all: a file
+      #|32 of 32, all: a file
+      #|16 of 32, all: validation: 16
+      #|8 of 32, all: validation: 32
+    ),
+  )
+  // Through the cache: decoded PNGs and a JPEG, from nothing, from what
+  // the file before kept, and without memoization (the samples).
+  let rasters = [
+    @library.RasterImage::plain(test_png(12, 9, 4, 21), Exchange(Png)),
+    @library.RasterImage::plain(test_png(12, 9, 3, 22), Exchange(Png)),
+    @library.RasterImage::plain(test_png(12, 9, 2, 23), Exchange(Png)),
+    @library.RasterImage::plain(test_png(12, 9, 1, 24), Exchange(Png)),
+    @library.RasterImage::new(
+      test_png(12, 9, 4, 25),
+      Exchange(Png),
+      Custom(icc),
+    ),
+    @library.RasterImage::plain(test_jpeg(), Exchange(Jpg)),
+  ]
+  let images = (memo : Bool) => {
+    @library.set_layout_memo_enabled(memo)
+    defer @library.set_layout_memo_enabled(true)
+    let out = []
+    for raster in rasters {
+      for interpolate in [false, true] {
+        out.push(test_converted(raster, interpolate))
+      }
+    }
+    out
+  }
+  let plain = images(false)
+  assert_eq(raster_cache.length(), 0)
+  for options in settings {
+    let reference = test_file(plain, options)
+    @library.evict(0)
+    let first = images(true)
+    assert_true(first[0].data is Deflated(_, Some(_)))
+    assert_true(first[10].data is Jpeg(_))
+    assert_true(test_file(first, options) == reference)
+    let second = images(true)
+    assert_true(physical_equal(second[0], first[0]))
+    assert_true(test_file(second, options) == reference)
+    // The two forms in one file: the first drawn is the one embedded.
+    let twice = test_file([..plain, ..plain], options)
+    assert_true(test_file([..first, ..plain], options) == twice)
+    assert_true(test_file([..plain, ..first], options) == twice)
+  }
 }
