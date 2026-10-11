@@ -474,6 +474,83 @@ test "module store: an entry of an outer scope is found in a scope inside it if 
 }
 
 ///|
+test "module store: an entry is only taken for the source it was computed for" {
+  with_kept_store(() => {
+    // Two sources of one file with two texts, to which a caller gave the
+    // same two words (`Source::set_memo`, where the engine keeps the
+    // fingerprint of a parsed text): the store finds the entry of the
+    // first for the second and does not take it.
+    let world = store_world("")
+    let id = store_id("a.typ")
+    let one = @syntax.Source::new(id, "one")
+    let two = @syntax.Source::new(id, "two")
+    one.set_memo(1, 2)
+    two.set_memo(1, 2)
+    assert_true(
+      @library.source_fingerprint(one) == @library.source_fingerprint(two),
+    )
+    let first = world.evaluate_source(one)
+    let second = world.evaluate_source(two)
+    inspect(
+      "\{first.text} \{first.found}, \{second.text} \{second.found}",
+      content="one 0, two 0",
+    )
+    // The same text parsed again is the same source.
+    let again = @syntax.Source::new(id, "two")
+    again.set_memo(1, 2)
+    let third = world.evaluate_source(again)
+    inspect("\{third.text} \{third.found}", content="two 1")
+  })
+}
+
+///|
+test "module store: the recording check repeats an import with the module of the world at hand" {
+  // Two scopes are open: one of a world whose `choose.txt` says
+  // `old.txt`, and inside it one of a world with the same sources whose
+  // `choose.txt` says `new.txt`. The store has the module of `a.typ` of
+  // the outer scope when the inner one evaluates the main file under the
+  // recording check. The second run of the check imports `a.typ` again
+  // and must get the module that the first run of this world got, not the
+  // outer one's, which the store also holds for that source: with that
+  // one the run reads `old.txt`, and the check reports a difference that
+  // is not one.
+  @library.set_memo_check(true)
+  defer @library.set_memo_check(false)
+  @library.take_memo_check_report() |> ignore
+  let data = (choice : String) => {
+    [("choose.txt", choice), ("old.txt", "old"), ("new.txt", "new")]
+  }
+  let outer = store_world(
+    "#import \"a.typ\": path\n#read(path)",
+    sources=[("a.typ", "#let path = read(\"choose.txt\")\n")],
+    data=data("old.txt"),
+  )
+  let a = outer.sources[store_id("a.typ")]
+  let inner = store_world("", data=data("new.txt"))
+  inner.main = outer.main
+  inner.sources[store_id("a.typ")] = a
+  let tracked = @library.TrackedWorld::new(outer)
+  let texts = []
+  tracked.scoped(() => {
+    let _ = eval_source(
+      tracked,
+      outer.library,
+      @library.Traced::new(),
+      @library.Sink::new(),
+      @library.Route::root(),
+      a,
+    )
+    texts.push(inner.evaluate().text)
+  }) catch {
+    _ => fail("the evaluation failed")
+  }
+  inspect(texts.join(" "), content="new")
+  let (entries, differ) = @library.take_memo_check_report()
+  inspect(differ.join("\n"), content="")
+  assert_true(entries >= 3)
+}
+
+///|
 test "module store: the depth of the route is among what an evaluation asked" {
   // `deep.typ` calls 60 functions inside each other. Imported where the
   // route is 10 deep that is within the maximum call depth of 80, and

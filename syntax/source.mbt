@@ -137,6 +137,11 @@ pub fn Source::memo_lo(self : Source) -> UInt64 {
 /// Keeps two words with the source: for a hash of it, which this package
 /// cannot compute (upstream: the `LazyHash` around `SourceInner`). A
 /// source never changes, so what is kept is about it for its lifetime.
+///
+/// The words are the engine's: `@library.source_fingerprint` keeps the
+/// fingerprint of a source that [Source::new] made here, and what the
+/// engine keeps of the files that a result read is compared by it. A host
+/// does not call this.
 pub fn Source::set_memo(self : Source, hi : UInt64, lo : UInt64) -> Unit {
   self.memo = true
   self.memo_hi = hi

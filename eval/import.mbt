@@ -266,6 +266,9 @@ priv struct EvalMemo {
   /// It says how long the entry is kept ([EvalMemos::of]), not where it is
   /// found.
   scope : Int
+  /// The source that was evaluated: the entry is found by its fingerprint
+  /// and only taken for the same source ([same_source]).
+  source : @syntax.Source
   library : @library.Library
   /// The world reads of the evaluation and their answers (comemo tracks
   /// the world of `eval`: the files that the module imported and loaded).
@@ -316,18 +319,42 @@ fn own_result(
 }
 
 ///|
-/// Whether the entry is one for an evaluation with this library, traced
-/// span and route: all conditions of a hit but the world reads, which are
-/// looked at last ([@library.TrackedWorld::validate]).
+/// Whether two sources are the same argument of an evaluation: one object,
+/// or two parses of one text of one file (`Source::new`: the tree and its
+/// span numbers are a function of the two). That is what the fingerprint
+/// that finds an entry says too ([@library.source_fingerprint]); like the
+/// other stores (`library/memo.mbt`, header), this one does not take a
+/// fingerprint's word for it but keeps the argument and compares it. (The
+/// fingerprint of a parsed text is kept in the source, in two words that
+/// `Source::set_memo` writes and any caller could write; and the result of
+/// an edit is identified by a number, not by a hash.) The comparison is of
+/// two objects unless two worlds parsed the same text, and then of two
+/// texts.
+fn same_source(a : @syntax.Source, b : @syntax.Source) -> Bool {
+  physical_equal(a, b) ||
+  (
+    a.is_pristine() &&
+    b.is_pristine() &&
+    a.id() == b.id() &&
+    a.text() == b.text()
+  )
+}
+
+///|
+/// Whether the entry is one for an evaluation of this source with this
+/// library, traced span and route: all conditions of a hit but the world
+/// reads, which are looked at last ([@library.TrackedWorld::validate]).
 fn EvalMemo::matches(
   self : EvalMemo,
+  source : @syntax.Source,
   library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
   depth : Int,
 ) -> Bool {
   guard physical_equal(self.library, library) &&
-    self.shifts.allows(depth - self.depth) else {
+    self.shifts.allows(depth - self.depth) &&
+    same_source(self.source, source) else {
     return false
   }
   for id in self.queried {
@@ -457,6 +484,8 @@ fn EvalMemos::of(
 ///   back has its old text with other span numbers where it was reparsed.
 ///   The fingerprint is equal only where upstream's hash is; two sources
 ///   that were edited into the same tree are two keys here and one there.
+///   An entry also keeps its source and is only taken for the same one
+///   ([same_source]; upstream keeps the hash alone).
 /// - The library is compared by identity (upstream hashes it).
 /// - The route: the file ids the evaluation asked it for must get the
 ///   same answers (`Route::contains`), and its depth may only differ by as
@@ -496,7 +525,7 @@ fn eval_source_memoized(
   let entries = eval_memo.of(key, scope)
   let depth = route.depth()
   for memo in entries {
-    if memo.matches(library, traced, route, depth) &&
+    if memo.matches(source, library, traced, route, depth) &&
       // Last: this notes the world reads for the evaluation around.
       world.validate(memo.reads) {
       eval_memo.counts[0] += 1
@@ -532,7 +561,8 @@ fn eval_source_memoized(
   let shifts = @library.route_shifts_end(outer_shifts)
   let traced_files = @library.traced_files_end(traced_start)
   let reads = world.reads_end(mark)
-  let result = match eval_memo.original(key, library, traced, route, depth) {
+  let result = match
+    eval_memo.original(key, world, source, library, traced, route, depth) {
     Some(original) => original
     None => result
   }
@@ -544,6 +574,7 @@ fn eval_source_memoized(
     }
     entries.push({
       scope,
+      source,
       library,
       reads,
       route,
@@ -626,10 +657,16 @@ fn EvalMemos::check(
 /// file again, for its reads, and would make new modules; but the call it
 /// repeats holds the modules of the first run in its arguments and
 /// captures, and modules compare by identity. So an import in the run
-/// gives the module it gave in the first.
+/// gives the module it gave in the first: that of the entry that a lookup
+/// in the first run took or that the first run stored, which is the one
+/// that is valid for the world at hand (the store may hold another for the
+/// same source, of a scope around this one whose world answers
+/// differently).
 fn EvalMemos::original(
   self : EvalMemos,
   key : @library.U128,
+  world : @library.TrackedWorld,
+  source : @syntax.Source,
   library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
@@ -640,7 +677,8 @@ fn EvalMemos::original(
   }
   guard aside.get(key) is Some(entries) else { return None }
   for memo in entries {
-    if memo.matches(library, traced, route, depth) {
+    if memo.matches(source, library, traced, route, depth) &&
+      world.validate(memo.reads) {
       return Some(own_result(memo.result))
     }
   }
