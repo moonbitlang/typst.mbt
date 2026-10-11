@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/system",
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/kit/platform",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbitlang/core/encoding/utf8",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")
