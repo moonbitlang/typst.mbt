@@ -862,8 +862,15 @@
   of the allocations of a text-heavy compilation and 7 to 9 % of its
   time (`long.typ` 218 -> 199 ms, `longer.typ` 1126 -> 1049 ms, where
   upstream takes 90 and 455 ms; on wasm-gc under moonrun about 3 %,
-  which is within what its runs differ by). Measure with `/usr/bin/time
-  -l` (instructions are exact to 0.05 %; cycles and milliseconds need a
+  which is within what its runs differ by). One type at a time is a
+  small step: sizes as a value type (`Size`, 2.1 % of the objects of
+  `longer.typ`) took 0.7 % of its instructions and of its cycles, less
+  than the milliseconds of a run differ by, and nothing on wasm-gc.
+  Measure with `/usr/bin/time
+  -l` (instructions are exact to 0.05 % in one process, and differ by up
+  to 0.3 % between processes, like the reference counts by 1 %: core
+  seeds its hashes per process, so compare the least or the median of
+  several runs of each side; cycles and milliseconds need a
   quiet machine and the least of several runs).
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native

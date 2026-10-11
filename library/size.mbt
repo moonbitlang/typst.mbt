@@ -48,10 +48,11 @@
 //   native. Nothing compared sizes that way.
 // - It is boxed in an option: the option of an object was the object, and
 //   `Some(size)` is an object now. That is what an `Iter[Size]` yields
-//   (`Regions::iter`, one more object than before per iteration, for the
-//   first region) and what `pdf`'s `FrameContext::page_size` returns
-//   (which is asked for artifacts only, see `pdf/tags_tree.mbt`). In an
-//   array, a tuple, a struct or the payload of an enum it is inline.
+//   (`Regions::iter`: one object more than before per iterator, for the
+//   first region, 12 700 in `longer.typ`) and what `pdf`'s
+//   `FrameContext::page_size` returns (which is asked for artifacts only,
+//   see `pdf/tags_tree.mbt`). In an array, a tuple, a struct or the
+//   payload of an enum it is inline.
 //
 // `Eq`, `Hash` and `Default` are derived and are what the derived impls of
 // `Axes[Abs]` were (the components in order). There is no `Fingerprint`
