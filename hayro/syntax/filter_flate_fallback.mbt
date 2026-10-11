@@ -274,7 +274,7 @@ fn FlateStream::read_dynamic_tables(
   while i < total_codes {
     guard self.get_code(code_len_table) is Some(code) else { return None }
     match code {
-      0..=15 => {
+      0..<=15 => {
         code_lengths[i] = code
         i += 1
       }

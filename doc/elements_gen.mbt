@@ -25,7 +25,7 @@ pub fn Heading::Heading(
   outlined? : Bool,
   bookmarked? : Bool,
   hanging_indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -137,7 +137,7 @@ pub fn SetHeading::SetHeading(
   outlined? : Bool,
   bookmarked? : Bool,
   hanging_indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetHeading {
@@ -324,7 +324,7 @@ pub fn Par::Par(
   justify? : Bool,
   linebreaks? : String,
   hanging_indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -412,7 +412,7 @@ pub fn SetPar::SetPar(
   justify? : Bool,
   linebreaks? : String,
   hanging_indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPar {
@@ -557,7 +557,7 @@ pub struct Parbreak {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Parbreak::Parbreak(
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -673,7 +673,7 @@ pub struct Strong {
 pub fn Strong::Strong(
   body : &IntoContent,
   delta? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -738,7 +738,7 @@ pub struct SetStrong {
 #callsite(autofill(loc, args_loc))
 pub fn SetStrong::SetStrong(
   delta? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStrong {
@@ -854,7 +854,7 @@ pub struct Emph {
 #callsite(autofill(loc, args_loc))
 pub fn Emph::Emph(
   body : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -981,7 +981,7 @@ pub struct Link {
 pub fn Link::Link(
   dest : LinkTarget,
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1105,7 +1105,7 @@ pub fn Ref::Ref(
   target : String,
   supplement? : Supplement,
   form? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1181,7 +1181,7 @@ pub struct SetRef {
 pub fn SetRef::SetRef(
   supplement? : Supplement,
   form? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRef {
@@ -1301,7 +1301,7 @@ pub struct Footnote {
 pub fn Footnote::Footnote(
   body : &IntoContent,
   numbering? : Numbering,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1370,7 +1370,7 @@ pub struct SetFootnote {
 #callsite(autofill(loc, args_loc))
 pub fn SetFootnote::SetFootnote(
   numbering? : Numbering,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetFootnote {
@@ -1489,7 +1489,7 @@ pub fn Quote::Quote(
   block? : Bool,
   quotes? : Bool,
   attribution? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1566,7 +1566,7 @@ pub fn SetQuote::SetQuote(
   block? : Bool,
   quotes? : Bool,
   attribution? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetQuote {
@@ -1700,7 +1700,7 @@ pub fn List::List(
   body_indent? : Length,
   spacing? : Length,
   marker_align? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1798,7 +1798,7 @@ pub fn SetList::SetList(
   body_indent? : Length,
   spacing? : Length,
   marker_align? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetList {
@@ -1945,7 +1945,7 @@ pub struct ListItem {
 #callsite(autofill(loc, args_loc))
 pub fn ListItem::ListItem(
   body : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2082,7 +2082,7 @@ pub fn Enum::Enum(
   body_indent? : Length,
   spacing? : Length,
   number_align? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2197,7 +2197,7 @@ pub fn SetEnum::SetEnum(
   body_indent? : Length,
   spacing? : Length,
   number_align? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEnum {
@@ -2381,7 +2381,7 @@ pub struct EnumItem {
 pub fn EnumItem::EnumItem(
   body : &IntoContent,
   number? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2451,7 +2451,7 @@ pub struct SetEnumItem {
 #callsite(autofill(loc, args_loc))
 pub fn SetEnumItem::SetEnumItem(
   number? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEnumItem {
@@ -2574,7 +2574,7 @@ pub fn Terms::Terms(
   indent? : Length,
   hanging_indent? : Length,
   spacing? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2664,7 +2664,7 @@ pub fn SetTerms::SetTerms(
   indent? : Length,
   hanging_indent? : Length,
   spacing? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTerms {
@@ -2803,7 +2803,7 @@ pub struct TermsItem {
 pub fn TermsItem::TermsItem(
   term : &IntoContent,
   description : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2951,7 +2951,7 @@ pub fn Figure::Figure(
   numbering? : Numbering,
   gap? : Length,
   outlined? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3063,7 +3063,7 @@ pub fn SetFigure::SetFigure(
   numbering? : Numbering,
   gap? : Length,
   outlined? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetFigure {
@@ -3251,7 +3251,7 @@ pub fn Table::Table(
   align? : Cells[Alignment],
   fill? : Cells[Paint],
   stroke? : Cells[Sides[Stroke]],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3358,7 +3358,7 @@ pub fn SetTable::SetTable(
   align? : Cells[Alignment],
   fill? : Cells[Paint],
   stroke? : Cells[Sides[Stroke]],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTable {
@@ -3536,7 +3536,7 @@ pub fn TableCell::TableCell(
   fill? : Paint,
   stroke? : Sides[Stroke],
   breakable? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3641,7 +3641,7 @@ pub fn SetTableCell::SetTableCell(
   fill? : Paint,
   stroke? : Sides[Stroke],
   breakable? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableCell {
@@ -3817,7 +3817,7 @@ pub fn TableHeader::TableHeader(
   children : Array[&IntoContent],
   repeat? : Bool,
   level? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3888,7 +3888,7 @@ pub struct SetTableHeader {
 pub fn SetTableHeader::SetTableHeader(
   repeat? : Bool,
   level? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableHeader {
@@ -4006,7 +4006,7 @@ pub struct TableFooter {
 pub fn TableFooter::TableFooter(
   children : Array[&IntoContent],
   repeat? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4073,7 +4073,7 @@ pub struct SetTableFooter {
 #callsite(autofill(loc, args_loc))
 pub fn SetTableFooter::SetTableFooter(
   repeat? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableFooter {
@@ -4190,7 +4190,7 @@ pub fn TableHline::TableHline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4275,7 +4275,7 @@ pub fn SetTableHline::SetTableHline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableHline {
@@ -4423,7 +4423,7 @@ pub fn TableVline::TableVline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4508,7 +4508,7 @@ pub fn SetTableVline::SetTableVline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableVline {
@@ -4653,7 +4653,7 @@ pub fn Outline::Outline(
   title? : &IntoContent,
   depth? : Int64,
   indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4730,7 +4730,7 @@ pub fn SetOutline::SetOutline(
   title? : &IntoContent,
   depth? : Int64,
   indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetOutline {
@@ -4857,7 +4857,7 @@ pub fn SetDocument::SetDocument(
   author? : Array[String],
   description? : &IntoContent,
   keywords? : Array[String],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetDocument {
@@ -4923,7 +4923,7 @@ pub struct Title {
 #callsite(autofill(loc, args_loc))
 pub fn Title::Title(
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4992,7 +4992,7 @@ pub struct SetTitle {
 #callsite(autofill(loc, args_loc))
 pub fn SetTitle::SetTitle(
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTitle {
@@ -5136,7 +5136,7 @@ pub fn Text::Text(
   number_width? : String,
   slashed_zero? : Bool,
   fractions? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5324,7 +5324,7 @@ pub fn SetText::SetText(
   number_width? : String,
   slashed_zero? : Bool,
   fractions? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetText {
@@ -5635,7 +5635,7 @@ pub fn Raw::Raw(
   lang? : String,
   align? : Alignment,
   tab_size? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5715,7 +5715,7 @@ pub fn SetRaw::SetRaw(
   lang? : String,
   align? : Alignment,
   tab_size? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRaw {
@@ -5844,7 +5844,7 @@ pub struct Linebreak {
 #callsite(autofill(loc, args_loc))
 pub fn Linebreak::Linebreak(
   justify? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5908,7 +5908,7 @@ pub struct SetLinebreak {
 #callsite(autofill(loc, args_loc))
 pub fn SetLinebreak::SetLinebreak(
   justify? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetLinebreak {
@@ -6018,7 +6018,7 @@ pub fn Smartquote::Smartquote(
   double? : Bool,
   enabled? : Bool,
   alternative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6090,7 +6090,7 @@ pub fn SetSmartquote::SetSmartquote(
   double? : Bool,
   enabled? : Bool,
   alternative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSmartquote {
@@ -6223,7 +6223,7 @@ pub fn Underline::Underline(
   extent? : Length,
   evade? : Bool,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6308,7 +6308,7 @@ pub fn SetUnderline::SetUnderline(
   extent? : Length,
   evade? : Bool,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetUnderline {
@@ -6463,7 +6463,7 @@ pub fn Overline::Overline(
   extent? : Length,
   evade? : Bool,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6548,7 +6548,7 @@ pub fn SetOverline::SetOverline(
   extent? : Length,
   evade? : Bool,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetOverline {
@@ -6702,7 +6702,7 @@ pub fn Strike::Strike(
   offset? : Length,
   extent? : Length,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6783,7 +6783,7 @@ pub fn SetStrike::SetStrike(
   offset? : Length,
   extent? : Length,
   background? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStrike {
@@ -6931,7 +6931,7 @@ pub fn Highlight::Highlight(
   bottom_edge? : BottomEdge,
   extent? : Length,
   radius? : Corners[Length],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7023,7 +7023,7 @@ pub fn SetHighlight::SetHighlight(
   bottom_edge? : BottomEdge,
   extent? : Length,
   radius? : Corners[Length],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetHighlight {
@@ -7187,7 +7187,7 @@ pub fn Sub::Sub(
   typographic? : Bool,
   baseline? : Length,
   size? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7264,7 +7264,7 @@ pub fn SetSub::SetSub(
   typographic? : Bool,
   baseline? : Length,
   size? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSub {
@@ -7399,7 +7399,7 @@ pub fn Super::Super(
   typographic? : Bool,
   baseline? : Length,
   size? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7476,7 +7476,7 @@ pub fn SetSuper::SetSuper(
   typographic? : Bool,
   baseline? : Length,
   size? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSuper {
@@ -7609,7 +7609,7 @@ pub struct Smallcaps {
 pub fn Smallcaps::Smallcaps(
   body : &IntoContent,
   all? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7674,7 +7674,7 @@ pub struct SetSmallcaps {
 #callsite(autofill(loc, args_loc))
 pub fn SetSmallcaps::SetSmallcaps(
   all? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSmallcaps {
@@ -7823,7 +7823,7 @@ pub fn Page::Page(
   footer_descent? : Length,
   background? : &IntoContent,
   foreground? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7980,7 +7980,7 @@ pub fn SetPage::SetPage(
   footer_descent? : Length,
   background? : &IntoContent,
   foreground? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPage {
@@ -8208,7 +8208,7 @@ pub struct Pagebreak {
 pub fn Pagebreak::Pagebreak(
   weak? : Bool,
   to? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8279,7 +8279,7 @@ pub struct SetPagebreak {
 pub fn SetPagebreak::SetPagebreak(
   weak? : Bool,
   to? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPagebreak {
@@ -8398,7 +8398,7 @@ pub struct Align {
 pub fn Align::Align(
   alignment : Alignment,
   body : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8465,7 +8465,7 @@ pub struct SetAlign {
 #callsite(autofill(loc, args_loc))
 pub fn SetAlign::SetAlign(
   alignment? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetAlign {
@@ -8605,7 +8605,7 @@ pub fn Block::Block(
   below? : Spacing,
   clip? : Bool,
   sticky? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8730,7 +8730,7 @@ pub fn SetBlock::SetBlock(
   below? : Spacing,
   clip? : Bool,
   sticky? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetBlock {
@@ -8947,7 +8947,7 @@ pub fn Box::Box(
   inset? : Sides[Length],
   outset? : Sides[Length],
   clip? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9053,7 +9053,7 @@ pub fn SetBox::SetBox(
   inset? : Sides[Length],
   outset? : Sides[Length],
   clip? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetBox {
@@ -9232,7 +9232,7 @@ pub fn Pad::Pad(
   x? : Length,
   y? : Length,
   rest? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9321,7 +9321,7 @@ pub fn SetPad::SetPad(
   x? : Length,
   y? : Length,
   rest? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPad {
@@ -9489,7 +9489,7 @@ pub fn Place::Place(
   clearance? : Length,
   dx? : Length,
   dy? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9583,7 +9583,7 @@ pub fn SetPlace::SetPlace(
   clearance? : Length,
   dx? : Length,
   dy? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPlace {
@@ -9743,7 +9743,7 @@ pub fn Stack::Stack(
   children : Array[&IntoContent],
   dir? : Dir,
   spacing? : Spacing,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9817,7 +9817,7 @@ pub struct SetStack {
 pub fn SetStack::SetStack(
   dir? : Dir,
   spacing? : Spacing,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStack {
@@ -9942,7 +9942,7 @@ pub fn Grid::Grid(
   align? : Cells[Alignment],
   fill? : Cells[Paint],
   stroke? : Cells[Sides[Stroke]],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10049,7 +10049,7 @@ pub fn SetGrid::SetGrid(
   align? : Cells[Alignment],
   fill? : Cells[Paint],
   stroke? : Cells[Sides[Stroke]],
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGrid {
@@ -10225,7 +10225,7 @@ pub fn GridCell::GridCell(
   fill? : Paint,
   stroke? : Sides[Stroke],
   breakable? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10330,7 +10330,7 @@ pub fn SetGridCell::SetGridCell(
   fill? : Paint,
   stroke? : Sides[Stroke],
   breakable? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridCell {
@@ -10506,7 +10506,7 @@ pub fn GridHeader::GridHeader(
   children : Array[&IntoContent],
   repeat? : Bool,
   level? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10577,7 +10577,7 @@ pub struct SetGridHeader {
 pub fn SetGridHeader::SetGridHeader(
   repeat? : Bool,
   level? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridHeader {
@@ -10695,7 +10695,7 @@ pub struct GridFooter {
 pub fn GridFooter::GridFooter(
   children : Array[&IntoContent],
   repeat? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10762,7 +10762,7 @@ pub struct SetGridFooter {
 #callsite(autofill(loc, args_loc))
 pub fn SetGridFooter::SetGridFooter(
   repeat? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridFooter {
@@ -10879,7 +10879,7 @@ pub fn GridHline::GridHline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10964,7 +10964,7 @@ pub fn SetGridHline::SetGridHline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridHline {
@@ -11111,7 +11111,7 @@ pub fn GridVline::GridVline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -11196,7 +11196,7 @@ pub fn SetGridVline::SetGridVline(
   end_? : Int64,
   stroke? : Stroke,
   position? : Alignment,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridVline {
@@ -11344,7 +11344,7 @@ pub fn Columns::Columns(
   gutter? : Length,
   balanced? : Bool,
   separator? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -11426,7 +11426,7 @@ pub fn SetColumns::SetColumns(
   gutter? : Length,
   balanced? : Bool,
   separator? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetColumns {
@@ -11559,7 +11559,7 @@ pub struct Colbreak {
 #callsite(autofill(loc, args_loc))
 pub fn Colbreak::Colbreak(
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -11623,7 +11623,7 @@ pub struct SetColbreak {
 #callsite(autofill(loc, args_loc))
 pub fn SetColbreak::SetColbreak(
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetColbreak {
@@ -11732,7 +11732,7 @@ pub struct H {
 pub fn H::H(
   amount : Spacing,
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -11797,7 +11797,7 @@ pub struct SetH {
 #callsite(autofill(loc, args_loc))
 pub fn SetH::SetH(
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetH {
@@ -11907,7 +11907,7 @@ pub struct V {
 pub fn V::V(
   amount : Spacing,
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -11972,7 +11972,7 @@ pub struct SetV {
 #callsite(autofill(loc, args_loc))
 pub fn SetV::SetV(
   weak? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetV {
@@ -12078,7 +12078,7 @@ pub struct Hide {
 #callsite(autofill(loc, args_loc))
 pub fn Hide::Hide(
   body : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -12202,7 +12202,7 @@ pub fn Repeat::Repeat(
   body : &IntoContent,
   gap? : Length,
   justify? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -12271,7 +12271,7 @@ pub struct SetRepeat {
 pub fn SetRepeat::SetRepeat(
   gap? : Length,
   justify? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRepeat {
@@ -12395,7 +12395,7 @@ pub fn Move::Move(
   body : &IntoContent,
   dx? : Length,
   dy? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -12464,7 +12464,7 @@ pub struct SetMove {
 pub fn SetMove::SetMove(
   dx? : Length,
   dy? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetMove {
@@ -12590,7 +12590,7 @@ pub fn Rotate::Rotate(
   angle? : Angle,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -12665,7 +12665,7 @@ pub fn SetRotate::SetRotate(
   angle? : Angle,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRotate {
@@ -12812,7 +12812,7 @@ pub fn Image::Image(
   page? : Int64,
   fit? : String,
   scaling? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -12911,7 +12911,7 @@ pub fn SetImage::SetImage(
   page? : Int64,
   fit? : String,
   scaling? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetImage {
@@ -13070,7 +13070,7 @@ pub fn Line::Line(
   length? : Length,
   angle? : Angle,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -13161,7 +13161,7 @@ pub fn SetLine::SetLine(
   length? : Length,
   angle? : Angle,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetLine {
@@ -13325,7 +13325,7 @@ pub fn Rect::Rect(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -13425,7 +13425,7 @@ pub fn SetRect::SetRect(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRect {
@@ -13598,7 +13598,7 @@ pub fn Square::Square(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -13703,7 +13703,7 @@ pub fn SetSquare::SetSquare(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSquare {
@@ -13881,7 +13881,7 @@ pub fn Ellipse::Ellipse(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -13977,7 +13977,7 @@ pub fn SetEllipse::SetEllipse(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEllipse {
@@ -14143,7 +14143,7 @@ pub fn Circle::Circle(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -14243,7 +14243,7 @@ pub fn SetCircle::SetCircle(
   inset? : Sides[Length],
   outset? : Sides[Length],
   body? : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCircle {
@@ -14407,7 +14407,7 @@ pub fn Polygon::Polygon(
   fill? : Paint,
   fill_rule? : String,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -14493,7 +14493,7 @@ pub fn SetPolygon::SetPolygon(
   fill? : Paint,
   fill_rule? : String,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPolygon {
@@ -14624,7 +14624,7 @@ pub fn Curve::Curve(
   fill? : Paint,
   fill_rule? : String,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -14703,7 +14703,7 @@ pub fn SetCurve::SetCurve(
   fill? : Paint,
   fill_rule? : String,
   stroke? : Stroke,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurve {
@@ -14828,7 +14828,7 @@ pub struct CurveMove {
 pub fn CurveMove::CurveMove(
   start : (Length, Length),
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -14897,7 +14897,7 @@ pub struct SetCurveMove {
 #callsite(autofill(loc, args_loc))
 pub fn SetCurveMove::SetCurveMove(
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurveMove {
@@ -15007,7 +15007,7 @@ pub struct CurveLine {
 pub fn CurveLine::CurveLine(
   end_ : (Length, Length),
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -15076,7 +15076,7 @@ pub struct SetCurveLine {
 #callsite(autofill(loc, args_loc))
 pub fn SetCurveLine::SetCurveLine(
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurveLine {
@@ -15190,7 +15190,7 @@ pub fn CurveQuad::CurveQuad(
   control : (Length, Length),
   end_ : (Length, Length),
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -15267,7 +15267,7 @@ pub struct SetCurveQuad {
 #callsite(autofill(loc, args_loc))
 pub fn SetCurveQuad::SetCurveQuad(
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurveQuad {
@@ -15383,7 +15383,7 @@ pub fn CurveCubic::CurveCubic(
   control_end : (Length, Length),
   end_ : (Length, Length),
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -15468,7 +15468,7 @@ pub struct SetCurveCubic {
 #callsite(autofill(loc, args_loc))
 pub fn SetCurveCubic::SetCurveCubic(
   relative? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurveCubic {
@@ -15577,7 +15577,7 @@ pub struct CurveClose {
 #callsite(autofill(loc, args_loc))
 pub fn CurveClose::CurveClose(
   mode? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -15641,7 +15641,7 @@ pub struct SetCurveClose {
 #callsite(autofill(loc, args_loc))
 pub fn SetCurveClose::SetCurveClose(
   mode? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCurveClose {
@@ -15764,7 +15764,7 @@ pub fn Scale::Scale(
   y? : Length,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -15852,7 +15852,7 @@ pub fn SetScale::SetScale(
   y? : Length,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetScale {
@@ -16000,7 +16000,7 @@ pub fn Skew::Skew(
   ay? : Angle,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -16077,7 +16077,7 @@ pub fn SetSkew::SetSkew(
   ay? : Angle,
   origin? : Alignment,
   reflow? : Bool,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSkew {
@@ -16223,7 +16223,7 @@ pub fn SetEquation::SetEquation(
   number_align? : Alignment,
   supplement? : Supplement,
   alt? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEquation {
@@ -16396,7 +16396,7 @@ pub fn Bibliography::Bibliography(
   full? : Bool,
   style? : String,
   group? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -16481,7 +16481,7 @@ pub fn SetBibliography::SetBibliography(
   full? : Bool,
   style? : String,
   group? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetBibliography {
@@ -16620,7 +16620,7 @@ pub fn Cite::Cite(
   supplement? : &IntoContent,
   form? : String,
   style? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -16698,7 +16698,7 @@ pub fn SetCite::SetCite(
   supplement? : &IntoContent,
   form? : String,
   style? : String,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCite {
@@ -16814,7 +16814,7 @@ pub struct Metadata {
 #callsite(autofill(loc, args_loc))
 pub fn Metadata::Metadata(
   value : Value,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -16930,7 +16930,7 @@ pub struct Lorem {
 #callsite(autofill(loc, args_loc))
 pub fn Lorem::Lorem(
   words : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -17000,7 +17000,7 @@ pub fn PolygonRegular::PolygonRegular(
   stroke? : Stroke,
   size? : Length,
   vertices? : Int64,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -17122,7 +17122,7 @@ pub struct Upper {
 #callsite(autofill(loc, args_loc))
 pub fn Upper::Upper(
   text : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -17186,7 +17186,7 @@ pub struct Lower {
 #callsite(autofill(loc, args_loc))
 pub fn Lower::Lower(
   text : &IntoContent,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,

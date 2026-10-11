@@ -415,7 +415,7 @@ fn ShapedGlyph::is_cjk_center_aligned_punctuation(
 fn ShapedGlyph::is_letter_or_number(self : ShapedGlyph) -> Bool {
   @unicode.script(self.c) is ("Latin" | "Greek" | "Cyrillic") ||
   self.c is ('#' | '$' | '%' | '&') ||
-  self.c is ('0'..='9')
+  self.c is ('0'..<='9')
 }
 
 ///|

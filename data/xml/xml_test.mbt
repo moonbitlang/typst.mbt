@@ -126,7 +126,7 @@ fn typst_xml(text : String) -> String {
 }
 
 ///|
-fn parse_err(text : String, allow_dtd? : Bool = true) -> String {
+fn parse_err(text : String, allow_dtd~ : Bool = true) -> String {
   let opts : @xml.ParsingOptions = {
     allow_dtd,
     nodes_limit: @xml.ParsingOptions::default().nodes_limit,

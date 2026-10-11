@@ -412,7 +412,7 @@ fn implausible(rng : Rng, bytes : Bytes) -> (Bytes, String) {
         (splice(bytes, at, at, b"x"), "change-string @\{at}")
       }
     }
-    0..=5 => {
+    0..<=5 => {
       let at = char_boundary(rng, bytes)
       let breaker = rng.pick(edit_breakers[:])
       (splice(bytes, at, at, @utf8.encode(breaker)), "insert-breaker @\{at}")
@@ -662,8 +662,8 @@ fn Project::edit(self : Project, rng : Rng) -> String {
   }
   if roll < 14 {
     let day = match rng.below(10) {
-      0..=4 => self.variant.day + 1
-      5..=7 => 0
+      0..<=4 => self.variant.day + 1
+      5..<=7 => 0
       _ => rng.below(20000)
     }
     self.variant = { ..self.variant, day, }

@@ -189,7 +189,7 @@ fn stage_text(stage : Stage) -> Seq {
 
 ///|
 /// The stroke of an arrow of the diagram.
-fn arrow_stroke(paint : Paint, dashed? : Bool = false) -> Stroke {
+fn arrow_stroke(paint : Paint, dashed~ : Bool = false) -> Stroke {
   if dashed {
     Stroke(paint~, thickness=Pt(0.9), dash=Dashed)
   } else {

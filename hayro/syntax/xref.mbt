@@ -61,7 +61,7 @@ fn fallback_xref_map_inner(
     let old_r = r.clone()
 
     // First try to check if we have an object identifier.
-    if r.peek_byte() is Some(b) && b is (b'0'..=b'9') {
+    if r.peek_byte() is Some(b) && b is (b'0'..<=b'9') {
       let obj_id : ObjectIdentifier? = r.read(dummy_ctx)
       if obj_id is Some(obj_id) {
         let cloned = r.clone()
@@ -603,7 +603,7 @@ fn parse_u32_digits(data : BytesView) -> UInt? {
   for byte in data {
     accum = accum * 10
     match byte {
-      b'0'..=b'9' => accum = accum + (byte.to_int() - 48).to_uint64()
+      b'0'..<=b'9' => accum = accum + (byte.to_int() - 48).to_uint64()
       _ => return None
     }
     if accum > 0xFFFFFFFFUL {

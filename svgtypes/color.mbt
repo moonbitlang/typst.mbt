@@ -235,9 +235,9 @@ pub fn Stream::parse_color(self : Stream) -> Color raise SvgTypesError {
 ///|
 fn from_hex(c : Byte) -> Byte {
   match c {
-    b'0'..=b'9' => c - b'0'
-    b'a'..=b'f' => c - b'a' + 10
-    b'A'..=b'F' => c - b'A' + 10
+    b'0'..<=b'9' => c - b'0'
+    b'a'..<=b'f' => c - b'a' + 10
+    b'A'..<=b'F' => c - b'A' + 10
     _ => b'0'
   }
 }

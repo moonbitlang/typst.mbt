@@ -443,7 +443,7 @@ fn consume_declaration(s : Stream) -> Declaration raise CssError {
 ///|
 fn consume_term(s : Stream) -> Unit raise CssError {
   fn consume_digits(s : Stream) {
-    while s.curr_byte_ok() is Some(b'0'..=b'9') {
+    while s.curr_byte_ok() is Some(b'0'..<=b'9') {
       s.advance(1)
     }
   }
@@ -456,7 +456,7 @@ fn consume_term(s : Stream) -> Unit raise CssError {
           // Try consume as a hex color.
           while s.curr_byte_ok() is Some(c) {
             match c {
-              b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' => s.advance(1)
+              b'0'..<=b'9' | b'a'..<=b'f' | b'A'..<=b'F' => s.advance(1)
               _ => break
             }
           }
@@ -464,7 +464,7 @@ fn consume_term(s : Stream) -> Unit raise CssError {
         _ => ()
       }
     }
-    b'+' | b'-' | b'0'..=b'9' | b'.' => {
+    b'+' | b'-' | b'0'..<=b'9' | b'.' => {
       // Consume number.
       s.advance(1)
       consume_digits(s)

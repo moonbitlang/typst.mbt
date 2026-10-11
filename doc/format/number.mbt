@@ -102,7 +102,7 @@ fn write_number(
 /// the point if no decimal is left: `fixed(2.50, 2, trim=true)` is "2.5",
 /// `fixed(3.0, 2, trim=true)` is "3" (an axis label). `digits` is then the
 /// largest count of decimals.
-pub fn fixed(x : Double, digits : Int, trim? : Bool = false) -> String {
+pub fn fixed(x : Double, digits : Int, trim~ : Bool = false) -> String {
   if non_finite(x) is Some(s) {
     return s
   }
@@ -133,7 +133,7 @@ pub fn fixed(x : Double, digits : Int, trim? : Bool = false) -> String {
 /// gives `fixed(x, digits)`). Rounding, sign, clamping of `digits` and the
 /// values that are not finite ("NaN", "∞", "-∞", without separators) are
 /// those of `fixed`.
-pub fn grouped(x : Double, digits? : Int = 0, sep? : String = ",") -> String {
+pub fn grouped(x : Double, digits~ : Int = 0, sep~ : String = ",") -> String {
   if non_finite(x) is Some(s) {
     return s
   }
@@ -151,7 +151,7 @@ pub fn grouped(x : Double, digits? : Int = 0, sep? : String = ",") -> String {
 /// `grouped_int(1234567)` is "1,234,567", `grouped_int(-1000)` is "-1,000",
 /// `grouped_int(999)` is "999". Every `Int64` is accepted, the smallest
 /// included. For an `Int` write `grouped_int(n.to_int64())`.
-pub fn grouped_int(n : Int64, sep? : String = ",") -> String {
+pub fn grouped_int(n : Int64, sep~ : String = ",") -> String {
   let text = n.to_string()
   let buf = StringBuilder()
   let digits = if n < 0L {
@@ -184,7 +184,7 @@ pub fn grouped_int(n : Int64, sep? : String = ",") -> String {
 /// `fixed`.
 ///
 /// Not finite: "NaN" (no sign, no suffix), "∞%" and "-∞%".
-pub fn percent(x : Double, digits? : Int = 1) -> String {
+pub fn percent(x : Double, digits~ : Int = 1) -> String {
   if x.is_nan() {
     return "NaN"
   }
@@ -231,7 +231,7 @@ let compact_units : ReadOnlyArray[String] = ["", "k", "M", "B"]
 ///   `digits` are those of `fixed`.
 ///
 /// Not finite: "NaN", "∞" and "-∞", without a suffix.
-pub fn compact(x : Double, digits? : Int = 1) -> String {
+pub fn compact(x : Double, digits~ : Int = 1) -> String {
   if non_finite(x) is Some(s) {
     return s
   }

@@ -315,7 +315,7 @@ pub fn[T] bail_hinted(
 pub fn[T] bail_at(
   span : @syntax.Span,
   message : String,
-  hints? : ArrayView[String] = [],
+  hints~ : ArrayView[String] = [],
 ) -> T raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(span, message).with_hints(hints),

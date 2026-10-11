@@ -350,7 +350,7 @@ fn resolve_text(
       if c == '.' {
         decimal_count += 1
       }
-      if !(c is ('0'..='9') || c == '.') {
+      if !(c is ('0'..<='9') || c == '.') {
         all = false
         break
       }

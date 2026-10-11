@@ -48,7 +48,7 @@ fn collect_fonts(
           // Other spaces by their number.
           let text = match text {
             [c] if c.to_int() == 0xA0 ||
-              c.to_int() is (0x2000..=0x200A | 0x202F) =>
+              c.to_int() is (0x2000..<=0x200A | 0x202F) =>
               "U+" + c.to_int().to_string(radix=16).to_upper()
             _ => text
           }

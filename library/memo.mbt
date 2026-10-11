@@ -255,7 +255,7 @@ fn[T, I : Eq] memoize(
   input : I,
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
-  cacheable? : (T) -> Bool = _ => true,
+  cacheable~ : (T) -> Bool = _ => true,
 ) -> T raise SourceError {
   let generation = memo_generation.val
   if generation == 0 {

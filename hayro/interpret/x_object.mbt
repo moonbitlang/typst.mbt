@@ -475,7 +475,7 @@ fn decode_context(
 /// Read the pairs of an array (upstream `array.iter::<(f32, f32)>()`).
 fn read_f32_pairs(a : @hayro_syntax.PdfArray) -> Array[(Float, Float)] {
   let result = []
-  let iter = (a.iter() : Iter[@hayro_syntax.Object]).iterator()
+  let iter = (a.iter() : Iter[@hayro_syntax.Object])
   while true {
     guard iter.next() is Some(o1) else { break }
     guard iter.next() is Some(o2) else { break }
@@ -1048,7 +1048,7 @@ fn get_components(
   bits_per_component : Int,
 ) -> Array[Int]? {
   let result = match bits_per_component {
-    1..=7 | 9..=15 => {
+    1..<=7 | 9..<=15 => {
       let buf = []
       let bpc = bits_per_component
       let reader = @hayro_syntax.BitReader::new(data[:])

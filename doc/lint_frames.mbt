@@ -177,7 +177,7 @@ fn leaves(
   box : @kurbo.Rect,
   x : Bool,
   y : Bool,
-  slack? : (Double, Double) = (0.0, 0.0),
+  slack~ : (Double, Double) = (0.0, 0.0),
 ) -> (Double, Int) {
   // (Less than every amount.)
   let mut amount = -1.0e300

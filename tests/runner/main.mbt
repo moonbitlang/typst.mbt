@@ -251,12 +251,12 @@ fn run_stage(
   report : (String, TestCase) -> String,
   filter : String?,
   verbose : Bool,
-  select? : (TestCase) -> Bool = _ => true,
-  skip_file? : (String) -> Bool = _ => false,
+  select~ : (TestCase) -> Bool = _ => true,
+  skip_file~ : (String) -> Bool = _ => false,
   canonicalize? : (String) -> String,
-  dump_name? : String = stage,
+  dump_name~ : String = stage,
   matches? : (String, String) -> Bool,
-  missing? : String = "<missing golden>",
+  missing~ : String = "<missing golden>",
 ) -> Unit {
   let mut passed = 0
   // With `canonicalize`, both sides are compared after canonicalization;

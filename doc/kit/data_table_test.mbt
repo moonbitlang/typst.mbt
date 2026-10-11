@@ -793,7 +793,7 @@ fn frame_differences(
 fn surfaced(
   fill : Cells[@doc.Paint]?,
   frame_fill : @doc.Paint?,
-  count? : Int = 2,
+  count~ : Int = 2,
 ) -> @kit.DataTable {
   @kit.DataTable(
     head,

@@ -34,7 +34,7 @@ fn tiles(
 fn titled(
   title : String,
   body : &@doc.IntoContent,
-  mark? : String = "!",
+  mark~ : String = "!",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> @doc.Composite {
@@ -109,7 +109,7 @@ fn framed(
 #callsite(autofill(loc, args_loc))
 fn fit(
   body : &@doc.IntoContent,
-  fail_with? : String = "",
+  fail_with~ : String = "",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> @doc.Composite {
@@ -199,7 +199,7 @@ fn marked(
 /// An argument with a default.
 #callsite(autofill(loc, args_loc))
 fn greeting(
-  name? : String = "world",
+  name~ : String = "world",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> @doc.Composite {

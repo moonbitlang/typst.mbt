@@ -225,7 +225,7 @@ fn hang(lines : Array[String]) -> String {
 /// an array). `cases` sets its rows in text style; `display` gives the
 /// fractions of each part their size back. A row is split at its alignment
 /// points, a comma inside a row is written `comma`.
-fn braced(lines : Array[String], gap? : String = "0.9em") -> String {
+fn braced(lines : Array[String], gap~ : String = "0.9em") -> String {
   let cells = lines.map(line => {
     let parts = line
       .split("&")

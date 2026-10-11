@@ -14,7 +14,7 @@ const TEXT_W : Double = 348
 ///|
 /// A card around `body`: a rounded block that is not split. `height` is
 /// given when its row has been measured.
-fn framed(body : &IntoContent, height? : Sizing = Auto) -> Block {
+fn framed(body : &IntoContent, height~ : Sizing = Auto) -> Block {
   Block(
     body,
     width=Pct(100),
@@ -116,8 +116,8 @@ fn framed_table(
   head : Array[String],
   rows : Array[Array[&IntoContent]],
   columns~ : Array[Sizing],
-  num? : Array[Int] = [],
-  mark? : Array[Int] = [],
+  num~ : Array[Int] = [],
+  mark~ : Array[Int] = [],
 ) -> Block {
   let cells : Array[&IntoContent] = [
     TableHeader(

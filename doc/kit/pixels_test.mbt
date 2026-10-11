@@ -17,8 +17,8 @@ priv struct Pixels {
 /// through the PNG that `png_pages` exports.
 fn pixels(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page? : Int = 1,
-  ppi? : Double = 110.0,
+  page~ : Int = 1,
+  ppi~ : Double = 110.0,
 ) -> Pixels raise {
   let png = report.png_pages(ppi~).unwrap()[page - 1]
   let (info, data) = @codecs.decode_png(png)
@@ -62,8 +62,8 @@ fn outline_differences(
   a : Pixels,
   b : Pixels,
   frame : (Double, Double, Double, Double),
-  skip? : Array[(Double, Double)] = [],
-  reach? : Int = 3,
+  skip~ : Array[(Double, Double)] = [],
+  reach~ : Int = 3,
 ) -> String {
   guard a.width == b.width && a.height == b.height else {
     return "pages of \{a.width}x\{a.height} and \{b.width}x\{b.height} pixels"

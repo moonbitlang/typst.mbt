@@ -164,7 +164,7 @@ pub struct Set {
 pub fn Set::Set(
   path : String,
   named : Array[(String, Value)],
-  positional? : Array[Value] = [],
+  positional~ : Array[Value] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Set {
@@ -202,8 +202,8 @@ pub struct Call {
 #callsite(autofill(loc, args_loc))
 pub fn Call::Call(
   path : String,
-  positional? : Array[Value] = [],
-  named? : Array[(String, Value)] = [],
+  positional~ : Array[Value] = [],
+  named~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -242,7 +242,7 @@ pub struct Markup {
 #callsite(autofill(loc, args_loc))
 pub fn Markup::Markup(
   source : String,
-  scope? : Array[(String, Value)] = [],
+  scope~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Markup {
@@ -281,13 +281,13 @@ pub struct Equation {
 #callsite(autofill(loc, args_loc))
 pub fn Equation::Equation(
   source : String,
-  block? : Bool = false,
+  block~ : Bool = false,
   numbering? : Numbering,
   number_align? : Alignment,
   supplement? : Supplement,
   alt? : String,
-  scope? : Array[(String, Value)] = [],
-  extra? : Array[(String, Value)] = [],
+  scope~ : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,

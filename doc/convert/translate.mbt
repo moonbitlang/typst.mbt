@@ -11,8 +11,8 @@ pub fn translate(
   text : String,
   path : String,
   library : @library.Library,
-  baseline? : Bool = false,
-  prose? : Bool = false,
+  baseline~ : Bool = false,
+  prose~ : Bool = false,
 ) -> Translation {
   let root = @syntax.parse(text)
   let dir = match path.rev_find("/") {

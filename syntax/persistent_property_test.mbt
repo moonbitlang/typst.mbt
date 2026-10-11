@@ -151,7 +151,7 @@ fn check_document(
   text : String,
   seed : UInt64,
   edits : Int,
-  typing? : Bool = false,
+  typing~ : Bool = false,
 ) -> Int raise {
   let rng : EditRng = { state: seed, }
   let typed_at = boundary(rng, text)

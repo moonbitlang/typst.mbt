@@ -244,7 +244,7 @@ fn hash_lines(lines : StringBuilder) -> String {
 pub fn dump_otf(
   data : BytesView,
   index : Int,
-  hinted? : Bool = false,
+  hinted~ : Bool = false,
 ) -> String {
   let out = StringBuilder()
   let font = @read_fonts.FontRef::from_index(data, index) catch {

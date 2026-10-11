@@ -369,11 +369,11 @@ fn GlyphInfo::init_unicode_props(self : GlyphInfo, buffer : Buffer) -> Unit {
         // FVSes are GC=Mn, we have use a separate bit to remember them.
         // Fixes:
         // https://github.com/harfbuzz/harfbuzz/issues/234
-        0x180B..=0x180D | 0x180F => props = props | UPROPS_MASK_HIDDEN
+        0x180B..<=0x180D | 0x180F => props = props | UPROPS_MASK_HIDDEN
 
         // TAG characters need similar treatment. Fixes:
         // https://github.com/harfbuzz/harfbuzz/issues/463
-        0xE0020..=0xE007F => props = props | UPROPS_MASK_HIDDEN
+        0xE0020..<=0xE007F => props = props | UPROPS_MASK_HIDDEN
 
         // COMBINING GRAPHEME JOINER should not be skipped during GSUB either.
         // https://github.com/harfbuzz/harfbuzz/issues/554

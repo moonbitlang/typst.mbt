@@ -113,14 +113,14 @@ pub fn FontStretch::to_wdth(self : FontStretch) -> AxisValue {
 /// Round to one of the pre-defined variants.
 pub fn FontStretch::round(self : FontStretch) -> FontStretch {
   match self.0 {
-    0..=562 => FontStretch(500)
-    563..=687 => FontStretch(625)
-    688..=812 => FontStretch(750)
-    813..=937 => FontStretch(875)
-    938..=1062 => FontStretch(1000)
-    1063..=1187 => FontStretch(1125)
-    1188..=1374 => FontStretch(1250)
-    1375..=1749 => FontStretch(1500)
+    0..<=562 => FontStretch(500)
+    563..<=687 => FontStretch(625)
+    688..<=812 => FontStretch(750)
+    813..<=937 => FontStretch(875)
+    938..<=1062 => FontStretch(1000)
+    1063..<=1187 => FontStretch(1125)
+    1188..<=1374 => FontStretch(1250)
+    1375..<=1749 => FontStretch(1500)
     _ => FontStretch(2000)
   }
 }

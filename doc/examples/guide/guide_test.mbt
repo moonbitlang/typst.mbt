@@ -116,7 +116,7 @@ priv struct Pages {
 /// `world`.
 fn pages(
   children : Array[&@doc.IntoContent],
-  world? : @doc.DocWorld = @doc.DocWorld::in_memory(),
+  world~ : @doc.DocWorld = @doc.DocWorld::in_memory(),
 ) -> Pages {
   let all : Array[&@doc.IntoContent] = [
     @doc.SetPage(width=Pt(200), height=Pt(120), margin=@doc.Sides(all=Pt(10))),

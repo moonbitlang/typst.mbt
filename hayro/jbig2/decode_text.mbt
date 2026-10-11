@@ -632,7 +632,7 @@ fn decode_symbol_id_huffman_table(
   while symbol_code_lengths.length().to_uint64() < num_symbols {
     let runcode = runcode_table.decode_no_oob(reader)
     match runcode {
-      0..=31 => symbol_code_lengths.push(runcode)
+      0..<=31 => symbol_code_lengths.push(runcode)
       32 => {
         // Copy previous 3-6 times.
         let extra_bits = ok_or(reader.read_bits(2), Huffman(InvalidCode)).reinterpret_as_int()

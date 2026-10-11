@@ -905,8 +905,8 @@ pub extend Feature with @debug.Debug::{to_repr}
 pub fn Feature::new(
   tag : @otf.Tag,
   value : UInt,
-  start? : UInt = 0,
-  end? : UInt = 0xFFFFFFFF,
+  start~ : UInt = 0,
+  end~ : UInt = 0xFFFFFFFF,
 ) -> Feature {
   { tag, value, start, end, }
 }

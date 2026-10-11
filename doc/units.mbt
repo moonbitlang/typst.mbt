@@ -162,7 +162,7 @@ pub(all) enum Sizing {
 ///|
 /// `count` tracks of the same size: `columns=Sizing::repeat(5)` is Typst's
 /// `columns: 5` (five `auto` columns).
-pub fn Sizing::repeat(count : Int, size? : Sizing = Auto) -> Array[Sizing] {
+pub fn Sizing::repeat(count : Int, size~ : Sizing = Auto) -> Array[Sizing] {
   Array::make(count, size)
 }
 

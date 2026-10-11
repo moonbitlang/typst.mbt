@@ -37,7 +37,7 @@ fn data_table(
   rows : Array[Array[&IntoContent]],
   columns~ : Array[Sizing],
   align~ : Cells[@doc.Alignment],
-  mark? : Array[Int] = [],
+  mark~ : Array[Int] = [],
 ) -> Seq {
   let fill : Cells[Paint] = Cells((_, y) => {
     if y == 0 {

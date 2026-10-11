@@ -6,9 +6,9 @@
 /// An element node with the given (validated) tag and attributes.
 fn el(
   tag : String,
-  attrs? : Array[(String, String)] = [],
-  children? : Array[@html.HtmlNode] = [],
-  pre_span? : Bool = false,
+  attrs~ : Array[(String, String)] = [],
+  children~ : Array[@html.HtmlNode] = [],
+  pre_span~ : Bool = false,
 ) -> @html.HtmlNode {
   let elem = @html.HtmlElement::new(@library.HtmlTag::intern(tag)) catch {
     _ => abort("invalid tag")

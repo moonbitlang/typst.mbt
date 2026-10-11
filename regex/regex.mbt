@@ -36,11 +36,11 @@ pub fn Regex::new(pattern : String) -> Regex raise RegexError {
 /// pattern with `(?flags)` as usual.
 pub fn Regex::new_with(
   pattern : String,
-  case_insensitive? : Bool = false,
-  multi_line? : Bool = false,
-  dot_matches_new_line? : Bool = false,
-  ignore_whitespace? : Bool = false,
-  unicode? : Bool = true,
+  case_insensitive~ : Bool = false,
+  multi_line~ : Bool = false,
+  dot_matches_new_line~ : Bool = false,
+  ignore_whitespace~ : Bool = false,
+  unicode~ : Bool = true,
 ) -> Regex raise RegexError {
   let parser = Parser::new(pattern)
   parser.ignore_whitespace = ignore_whitespace

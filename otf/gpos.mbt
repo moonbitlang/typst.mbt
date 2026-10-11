@@ -112,7 +112,7 @@ fn Device::parse(data : BytesView) -> Device? {
     let second = s.read_u16()
     let format = s.read_u16()
     match format {
-      1..=3 => {
+      1..<=3 => {
         let start_size = first
         let end_size = second
         // Wrapping u16 arithmetic, like upstream in release mode.

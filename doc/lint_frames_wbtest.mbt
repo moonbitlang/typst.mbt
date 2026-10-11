@@ -93,9 +93,9 @@ fn leaving(
   y0 : Double,
   x1 : Double,
   y1 : Double,
-  x? : Bool = true,
-  y? : Bool = true,
-  slack? : (Double, Double) = (0.0, 0.0),
+  x~ : Bool = true,
+  y~ : Bool = true,
+  slack~ : (Double, Double) = (0.0, 0.0),
 ) -> String {
   let (amount, side) = leaves(
     @kurbo.Rect::new(x0, y0, x1, y1),

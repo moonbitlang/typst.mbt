@@ -103,7 +103,8 @@ fn parse_data_url_header(
   for byte in mime_type {
     match byte {
       b'\t' | b'\n' | b'\r' => continue
-      b'\x00'..=b'\x1F' | b'\x7F'..=b'\xFF' => percent_encode_byte(byte, string)
+      b'\x00'..<=b'\x1F' | b'\x7F'..<=b'\xFF' =>
+        percent_encode_byte(byte, string)
       b' ' | b'"' | b'<' | b'>' if in_query => percent_encode_byte(byte, string)
       b'?' => {
         in_query = true
@@ -179,14 +180,14 @@ fn is_http_whitespace(c : Char) -> Bool {
 fn is_http_token_code_point(c : Char) -> Bool {
   c
   is ('!'
-  | '#'..='\''
+  | '#'..<='\''
   | '*'
   | '+'
   | '-'
   | '.'
-  | '0'..='9'
-  | 'A'..='Z'
-  | '^'..='z'
+  | '0'..<='9'
+  | 'A'..<='Z'
+  | '^'..<='z'
   | '|'
   | '~')
 }
@@ -262,9 +263,9 @@ fn DataUrl::decode_to_vec(self : DataUrl) -> Bytes? {
 ///|
 fn hex_digit(b : Byte) -> Int? {
   match b {
-    b'0'..=b'9' => Some((b - b'0').to_int())
-    b'a'..=b'f' => Some((b - b'a').to_int() + 10)
-    b'A'..=b'F' => Some((b - b'A').to_int() + 10)
+    b'0'..<=b'9' => Some((b - b'0').to_int())
+    b'a'..<=b'f' => Some((b - b'a').to_int() + 10)
+    b'A'..<=b'F' => Some((b - b'A').to_int() + 10)
     _ => None
   }
 }
@@ -330,9 +331,9 @@ fn ForgivingBase64Decoder::new(out : @buffer.Buffer) -> ForgivingBase64Decoder {
 ///|
 fn base64_decode_value(byte : Byte) -> Int {
   match byte {
-    b'A'..=b'Z' => (byte - b'A').to_int()
-    b'a'..=b'z' => (byte - b'a').to_int() + 26
-    b'0'..=b'9' => (byte - b'0').to_int() + 52
+    b'A'..<=b'Z' => (byte - b'A').to_int()
+    b'a'..<=b'z' => (byte - b'a').to_int() + 26
+    b'0'..<=b'9' => (byte - b'0').to_int() + 52
     b'+' => 62
     b'/' => 63
     _ => -1

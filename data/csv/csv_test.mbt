@@ -3,8 +3,8 @@
 ///|
 fn read_all(
   data : Bytes,
-  delimiter? : Byte = b',',
-  headers? : Bool = false,
+  delimiter~ : Byte = b',',
+  headers~ : Bool = false,
 ) -> String {
   let reader = @csv.Reader::new(data, delimiter~, has_headers=headers)
   let out = StringBuilder()

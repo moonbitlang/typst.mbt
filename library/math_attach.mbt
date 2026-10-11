@@ -70,5 +70,5 @@ pub fn MathLimits::active(self : MathLimits, styles : StyleChain) -> Bool {
 ///|
 /// Determines if the character is one of a variety of integral signs.
 fn is_integral_char(c : Char) -> Bool {
-  c is ('∫'..='∳') || c is ('⨋'..='⨜')
+  c is ('∫'..<='∳') || c is ('⨋'..<='⨜')
 }

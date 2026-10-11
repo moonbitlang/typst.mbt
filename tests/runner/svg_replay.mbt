@@ -412,8 +412,8 @@ fn hex_bits(s : String, prefix : String) -> UInt64 raise Unsupported {
   let mut v : UInt64 = 0
   for c in s.view(start_offset=prefix.length()) {
     let d = match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
       _ => raise Unsupported("hex digit")
     }
     v = (v << 4) | d.to_uint64()

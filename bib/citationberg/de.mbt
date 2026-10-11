@@ -187,9 +187,9 @@ fn unescape_xml(s : String) -> String {
               for d in name[2:] {
                 v = v * 16 +
                   (match d {
-                    '0'..='9' => d.to_int() - '0'.to_int()
-                    'a'..='f' => d.to_int() - 'a'.to_int() + 10
-                    'A'..='F' => d.to_int() - 'A'.to_int() + 10
+                    '0'..<='9' => d.to_int() - '0'.to_int()
+                    'a'..<='f' => d.to_int() - 'a'.to_int() + 10
+                    'A'..<='F' => d.to_int() - 'A'.to_int() + 10
                     _ => 0
                   })
               }

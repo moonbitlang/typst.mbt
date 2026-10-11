@@ -146,7 +146,7 @@ pub impl Skippable for Object with fn skip(r, is_content_stream) {
         Some(_) => skip_string(r)
       }
     b'(' => skip_string(r)
-    b'.' | b'+' | b'-' | b'0'..=b'9' => skip_number(r)
+    b'.' | b'+' | b'-' | b'0'..<=b'9' => skip_number(r)
     b'[' => skip_array(r, is_content_stream)
     // See test case operator-in-TJ-array-0: Be lenient and skip content operators in
     // array
@@ -181,7 +181,7 @@ pub impl Readable for Object with fn read(r, ctx) {
         Some(_) => PdfString::read(r, ctx).map(s => Object::String(s))
       }
     b'(' => PdfString::read(r, ctx).map(s => Object::String(s))
-    b'.' | b'+' | b'-' | b'0'..=b'9' =>
+    b'.' | b'+' | b'-' | b'0'..<=b'9' =>
       Number::read(r, ctx).map(n => Object::Number(n))
     b'[' => PdfArray::read(r, ctx).map(a => Object::Array(a))
     // See the comment in `skip`.

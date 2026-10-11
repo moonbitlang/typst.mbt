@@ -88,8 +88,8 @@ pub fn Date::from_calendar_date(
   ensure_year_ranged(year)
   let is_leap_year = range_validated_is_leap_year(year)
   match day {
-    1..=28 => ()
-    29..=31 if day <= days_in_month_leap(month.number(), is_leap_year) => ()
+    1..<=28 => ()
+    29..<=31 if day <= days_in_month_leap(month.number(), is_leap_year) => ()
     _ => raise ComponentRange::conditional("day")
   }
   Date::from_parts(
@@ -110,7 +110,7 @@ pub fn Date::from_ordinal_date(
   ensure_year_ranged(year)
   let is_leap_year = range_validated_is_leap_year(year)
   match ordinal {
-    1..=365 => ()
+    1..<=365 => ()
     366 if is_leap_year => ()
     _ => raise ComponentRange::conditional("ordinal")
   }
@@ -126,7 +126,7 @@ pub fn Date::from_iso_week_date(
 ) -> Date raise ComponentRange {
   ensure_year_ranged(year)
   match week {
-    1..=52 => ()
+    1..<=52 => ()
     53 if week <= weeks_in_year(year) => ()
     _ => raise ComponentRange::conditional("week")
   }

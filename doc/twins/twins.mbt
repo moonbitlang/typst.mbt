@@ -91,7 +91,7 @@ fn twin(
   name : String,
   parts : Array[String],
   build : () -> Document,
-  dir? : String = "",
+  dir~ : String = "",
 ) -> Twin {
   { name, typst: parts.join(""), build, dir, }
 }

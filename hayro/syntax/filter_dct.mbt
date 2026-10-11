@@ -165,7 +165,7 @@ fn find_sof_marker(data : BytesView) -> Int? {
     match marker {
       // All SOF markers carry dimensions: SOF0–SOF15, excluding
       // 0xC4 (DHT), 0xC8 (JPG), 0xCC (DAC) which are not frame markers.
-      0xC0..=0xCF if marker != 0xC4 && marker != 0xC8 && marker != 0xCC =>
+      0xC0..<=0xCF if marker != 0xC4 && marker != 0xC8 && marker != 0xCC =>
         return Some(i)
       // Skip padding bytes (0xFF followed by 0xFF).
       0xFF => {

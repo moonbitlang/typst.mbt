@@ -91,9 +91,9 @@ test "explicit documentation" {
 
 ///|
 fn documented(
-  docs? : String = "docs",
+  docs~ : String = "docs",
   since? : Since,
-  keywords? : Array[String] = [],
+  keywords~ : Array[String] = [],
 ) -> U128 {
   hash128(
     Binding::detached(Int(1)).with_documentation({

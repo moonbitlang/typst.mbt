@@ -356,9 +356,9 @@ fn cff2_parse_char_string_impl(
       }
       30 => p.parse_vh_curve_to()
       31 => p.parse_hv_curve_to()
-      32..=246 => p.parse_int1(op)
-      247..=250 => p.parse_int2(op, s)
-      251..=254 => p.parse_int3(op, s)
+      32..<=246 => p.parse_int1(op)
+      247..<=250 => p.parse_int2(op, s)
+      251..<=254 => p.parse_int3(op, s)
       _ => // FIXED_16_16
         p.parse_fixed(s)
     }

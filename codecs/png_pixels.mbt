@@ -404,7 +404,7 @@ pub extend PngFrameError with @debug.Debug::{to_repr}
 /// order; the `png` crate's are big-endian).
 pub fn decode_png_frame(
   data : BytesView,
-  strip16? : Bool = false,
+  strip16~ : Bool = false,
 ) -> (ImageInfo, Bytes) raise PngFrameError {
   let reader = PngReader::read_info(data, PngLimits::Default.limits(), strip16) catch {
     err => raise Decoding(err.to_string())

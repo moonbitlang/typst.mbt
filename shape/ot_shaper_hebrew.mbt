@@ -135,7 +135,7 @@ fn compose_hebrew(ctx : NormalizeContext, a : Int, b : Int) -> Int? {
         0x05BC =>
           // DAGESH
           match a {
-            0x05D0..=0x05EA => {
+            0x05D0..<=0x05EA => {
               let c = s_dagesh_forms[a - 0x05D0]
               if c != 0 {
                 Some(c)

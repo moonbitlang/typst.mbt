@@ -457,7 +457,7 @@ fn Lexer::markup(self : Lexer, start : Int, c : Char) -> SyntaxKind {
     '-' if self.space_or_end() => ListMarker
     '+' if self.space_or_end() => EnumMarker
     '/' if self.space_or_end() => TermMarker
-    '0'..='9' => self.numbering(start)
+    '0'..<='9' => self.numbering(start)
     _ => self.text()
   }
 }
@@ -491,9 +491,9 @@ pub fn parse_codepoint(hex : StringView) -> Char? {
   let mut v = 0L
   for c in hex {
     let d = match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
-      'A'..='F' => c.to_int() - 'A'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
+      'A'..<='F' => c.to_int() - 'A'.to_int() + 10
       _ => return None
     }
     v = v * 16 + d.to_int64()
@@ -824,7 +824,7 @@ fn Lexer::code(self : Lexer, start : Int, c : Char) -> SyntaxKind {
   let s = self.s
   match c {
     '<' if s.at_pred(is_id_continue) => self.label()
-    '0'..='9' => self.number(start, c)
+    '0'..<='9' => self.number(start, c)
     '.' if s.at_pred(is_ascii_digit) => self.number(start, c)
     '"' => self.string()
     '=' if s.eat_if_char('=') => EqEq
@@ -1249,9 +1249,9 @@ pub fn link_prefix(text : String) -> (String, Bool) {
   let brackets : Array[Char] = []
   s.eat_while(c => {
     match c {
-      '0'..='9'
-      | 'a'..='z'
-      | 'A'..='Z'
+      '0'..<='9'
+      | 'a'..<='z'
+      | 'A'..<='Z'
       | '!'
       | '#'
       | '$'

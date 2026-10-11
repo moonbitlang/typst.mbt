@@ -19,8 +19,8 @@
 /// Compile a document function with the files below `root`.
 fn compile_document(
   build : () -> @doc.Document,
-  root? : String = "bench",
-  system_fonts? : Bool = false,
+  root~ : String = "bench",
+  system_fonts~ : Bool = false,
 ) -> @doc.CompileReport[@layout.PagedDocument] raise {
   build().compile_paged(@system.world(root~, system_fonts~, today=(2026, 1, 1)))
 }

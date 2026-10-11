@@ -317,7 +317,7 @@ fn is_base64(s : String) -> Bool {
       pad += 1
     } else if pad > 0 {
       return false
-    } else if !(c is ('A'..='Z' | 'a'..='z' | '0'..='9' | '+' | '/')) {
+    } else if !(c is ('A'..<='Z' | 'a'..<='z' | '0'..<='9' | '+' | '/')) {
       return false
     }
     n += 1
@@ -389,7 +389,7 @@ fn is_plist_integer(s : String) -> Bool {
     if hex.is_empty() || hex.length() > 16 + count_leading_zeros(hex) {
       return false
     }
-    hex.iter().all(c => c is ('0'..='9' | 'a'..='f' | 'A'..='F'))
+    hex.iter().all(c => c is ('0'..<='9' | 'a'..<='f' | 'A'..<='F'))
   } else {
     parse_rust_i64(s) is Some(_) || parse_rust_u64(s) is Some(_)
   }

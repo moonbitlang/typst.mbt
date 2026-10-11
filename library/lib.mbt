@@ -4,10 +4,10 @@
 /// Helper to define a native function quickly (hand-written natives).
 pub fn native_func(
   name : String,
-  title? : String = "",
-  params? : Array[ParamInfo] = [],
-  scope? : () -> Scope = Scope::new,
-  contextual? : Bool = false,
+  title~ : String = "",
+  params~ : Array[ParamInfo] = [],
+  scope~ : () -> Scope = Scope::new,
+  contextual~ : Bool = false,
   function : NativeFn,
 ) -> NativeFuncData {
   NativeFuncData::new(

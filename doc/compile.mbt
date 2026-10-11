@@ -16,7 +16,7 @@ pub struct Document {
 /// that directory.
 pub fn Document::Document(
   children : Array[&IntoContent],
-  dir? : String = "",
+  dir~ : String = "",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Document {
@@ -413,7 +413,7 @@ fn Document::lints(self : Document, lints : Bool) -> Array[Lint] {
 pub fn[T : @library.Output] Document::compile(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[T] {
   let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
@@ -439,7 +439,7 @@ pub fn[T : @library.Output] Document::compile(
 pub fn Document::lower(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[@library.Content] {
   let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
@@ -474,7 +474,7 @@ pub fn Document::lower(
 pub fn Document::compile_paged(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[@layout.PagedDocument] {
   let report : CompileReport[@layout.PagedDocument] = self.compile(
     world,
@@ -501,7 +501,7 @@ fn[T, U] CompileReport::failed(self : CompileReport[T]) -> ExportReport[U] {
 /// Export to PDF. Explicit options override the document's settings.
 pub fn CompileReport::pdf(
   self : CompileReport[@layout.PagedDocument],
-  options? : @pdf.PdfOptions = @pdf.PdfOptions::default(),
+  options~ : @pdf.PdfOptions = @pdf.PdfOptions::default(),
 ) -> ExportReport[Bytes] {
   guard self.output is Some(document) else { return self.failed() }
   let warned = @pdf.pdf(document, options)
@@ -524,7 +524,7 @@ pub fn CompileReport::pdf(
 /// Export every page to SVG.
 pub fn CompileReport::svg_pages(
   self : CompileReport[@layout.PagedDocument],
-  options? : @svg.SvgOptions = @svg.SvgOptions::default(),
+  options~ : @svg.SvgOptions = @svg.SvgOptions::default(),
 ) -> ExportReport[Array[String]] {
   guard self.output is Some(document) else { return self.failed() }
   let options = options.resolve(@svg.SvgFormatOptions::get(document.options()))

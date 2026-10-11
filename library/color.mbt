@@ -1601,7 +1601,7 @@ pub fn ProcessColor::from_str(hex_str : String) -> Result[ProcessColor, String] 
     hex_str
   }
   for ch in hex_str {
-    if !(ch is ('0'..='9' | 'a'..='f' | 'A'..='F')) {
+    if !(ch is ('0'..<='9' | 'a'..<='f' | 'A'..<='F')) {
       return Err("color string contains non-hexadecimal letters")
     }
   }

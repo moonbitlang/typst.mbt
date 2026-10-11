@@ -208,8 +208,8 @@ fn Interp::dispatch_inner(
 ) -> Unit raise HintErrorKind {
   let opcode = ins.opcode
   match opcode {
-    0x00..=0x05 => self.op_svtca(opcode)
-    0x06..=0x09 => self.op_svtl(opcode)
+    0x00..<=0x05 => self.op_svtca(opcode)
+    0x06..<=0x09 => self.op_svtl(opcode)
     0x0A => self.op_spvfs()
     0x0B => self.op_sfvfs()
     0x0C => self.op_gpv()
@@ -362,16 +362,16 @@ fn Interp::dispatch_inner(
     0x65 => self.value_stack.apply_unary(n => -n)
     0x66 => self.value_stack.apply_unary(n => hfloor(n))
     0x67 => self.value_stack.apply_unary(n => hceil(n))
-    0x68..=0x6B => {
+    0x68..<=0x6B => {
       let n1 = self.value_stack.pop()
       let n2 = self.graphics.round(n1)
       self.value_stack.push(n2)
     }
     // "No round" means do nothing :)
-    0x6C..=0x6F => ()
+    0x6C..<=0x6F => ()
     0x70 => self.op_wcvtf()
     0x71 | 0x72 => self.op_deltap(opcode)
-    0x73..=0x75 => self.op_deltac(opcode)
+    0x73..<=0x75 => self.op_deltac(opcode)
     0x76 => {
       let n = self.value_stack.pop()
       self.super_round(0x4000, n)

@@ -132,8 +132,8 @@ fn collect(
 ///|
 /// The page of the tests.
 fn page(
-  width? : @doc.Length = Pt(200),
-  height? : @doc.Length = Pt(120),
+  width~ : @doc.Length = Pt(200),
+  height~ : @doc.Length = Pt(120),
 ) -> Array[&IntoContent] {
   [SetPage(width~, height~, margin=Sides(all=Pt(10))), SetText(size=Pt(10))]
 }
@@ -142,7 +142,7 @@ fn page(
 /// Compile `children` after `setup` (the page of the tests by default).
 fn compile(
   children : Array[&IntoContent],
-  setup? : Array[&IntoContent] = page(),
+  setup~ : Array[&IntoContent] = page(),
 ) -> @doc.CompileReport[@layout.PagedDocument] {
   Document([..setup, ..children]).compile_paged(@doc.DocWorld::in_memory())
 }

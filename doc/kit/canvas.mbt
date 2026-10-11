@@ -399,7 +399,7 @@ fn offset(at : Double, side : Int) -> @doc.Length {
 pub fn Canvas::place(
   at : (Double, Double),
   body : &@doc.IntoContent,
-  anchor? : (AnchorX, AnchorY) = (Left, Top),
+  anchor~ : (AnchorX, AnchorY) = (Left, Top),
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> CanvasItem {
@@ -802,7 +802,7 @@ pub fn Canvas::arrow(
   start : (Double, Double),
   segments : Array[Segment],
   stroke? : @doc.Stroke,
-  head? : Double = 5.5,
+  head~ : Double = 5.5,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> CanvasItem {

@@ -53,7 +53,7 @@ fn is_ascii_ident(c : Byte) -> Bool {
 ///|
 fn char_is_name_start(c : Char) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' => true
     _ => char_is_non_ascii(c) || char_is_escape(c)
   }
 }
@@ -61,7 +61,7 @@ fn char_is_name_start(c : Char) -> Bool {
 ///|
 fn char_is_name_char(c : Char) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' | '0'..<='9' | '-' => true
     _ => char_is_non_ascii(c) || char_is_escape(c)
   }
 }

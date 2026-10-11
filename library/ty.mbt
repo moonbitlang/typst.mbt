@@ -30,7 +30,7 @@ pub fn NativeTypeData::new(
   title~ : String,
   since? : Since,
   docs~ : String,
-  keywords? : Array[String] = [],
+  keywords~ : Array[String] = [],
 ) -> NativeTypeData {
   {
     name,

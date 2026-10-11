@@ -61,7 +61,7 @@ fn Stream::parse_number_impl(self : Stream) -> Double raise SvgTypesError {
 
   // Consume integer.
   match c {
-    b'0'..=b'9' => self.skip_digits()
+    b'0'..<=b'9' => self.skip_digits()
     b'.' => ()
     _ => raise InvalidNumber(0)
   }
@@ -81,7 +81,7 @@ fn Stream::parse_number_impl(self : Stream) -> Double raise SvgTypesError {
           self.advance(1)
           self.skip_digits()
         }
-        b'0'..=b'9' => self.skip_digits()
+        b'0'..<=b'9' => self.skip_digits()
         _ => raise InvalidNumber(0)
       }
     }

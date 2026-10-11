@@ -53,9 +53,9 @@ fn create_id(id : String, relative : Int?, skip : Int) -> ParsedId? {
 ///|
 fn get_options(
   pattern : String,
-  case_insensitive? : Bool = false,
-  multi_line? : Bool = false,
-  dot_matches_new_line? : Bool = false,
+  case_insensitive~ : Bool = false,
+  multi_line~ : Bool = false,
+  dot_matches_new_line~ : Bool = false,
 ) -> RegexOptions {
   let options = RegexOptions::default()
   options.syntaxc = {

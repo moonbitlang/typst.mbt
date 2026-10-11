@@ -50,21 +50,21 @@ pub fn Routines::new(
     Scope,
   ) -> Value raise SourceError,
   eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError,
-  rules? : () -> NativeRuleMap = NativeRuleMap::new,
-  realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[
+  rules~ : () -> NativeRuleMap = NativeRuleMap::new,
+  realize~ : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[
     Pair,
   ] raise SourceError = (_, _, _, content, _) => {
     bail_at(content.span(), "realization is not available")
   },
-  layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError = (
+  layout_frame~ : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError = (
     _,
     content,
     _,
     _,
     _,
   ) => bail_at(content.span(), "layout is not available"),
-  html_mathml_body? : (Content, StyleChain) -> Content?? = (_, _) => None,
-  html_span_filled? : (Content, Color) -> Content = (content, _) => content,
+  html_mathml_body~ : (Content, StyleChain) -> Content?? = (_, _) => None,
+  html_span_filled~ : (Content, Color) -> Content = (content, _) => content,
 ) -> Routines {
   {
     rules,

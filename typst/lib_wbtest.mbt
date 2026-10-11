@@ -42,7 +42,7 @@ impl @library.World for TestWorld with fn today(_, _) {
 ///|
 fn test_world(
   text : String,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> TestWorld {
   let sources = Map([])
   for file in files {
