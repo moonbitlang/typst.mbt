@@ -34,4 +34,16 @@ What an edit of a source costs (`Source::edit`, `Source::replace`, beside
 a parse) is measured by `moon run tests/edit_bench --target native
 --release`; its header says how to count the allocations of one edit.
 
+What a PDF export costs, and the next one in the same process (what
+`typst watch` pays after every edit), is measured by `tests/pdf_bench`: it
+compiles and exports a document several times and prints the two times of
+every round. The document for it is an image deck, which is not in the
+repository but generated: `mkdeck.py` writes 28 screenshots of 1440 x 900
+pixels, half of them with an alpha channel, on 43 pages.
+
+```sh
+python3 bench/mkdeck.py _build/deck
+moon run tests/pdf_bench --target native --release -- _build/deck/deck.typ 3
+```
+
 [hyperfine]: https://github.com/sharkdp/hyperfine
