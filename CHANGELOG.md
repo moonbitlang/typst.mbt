@@ -120,6 +120,32 @@ Typst source) are unchanged.
   upstream's `typst watch`: a call that is found again returns the module
   it returned before, which `==` tells from the module of the same file
   evaluated now (`tests/recompile/upstream`).
+- `layout`: `layout_document` and `layout_document_for_bundle` are
+  memoized, and so are the page runs inside them (slice 3 of
+  `docs/incremental-design.md`; upstream: `#[comemo::memoize]` on
+  `layout_document_impl`, `layout_document_for_bundle_impl` and
+  `layout_page_run_impl`). In a compilation, and from one compilation of
+  a process to the next, a document whose content and styles are what
+  they were is not laid out again if the world and the introspector
+  answer what its layout asked as they did. What a host sees: a
+  recompilation after which nothing on the pages changed is the export
+  and little else; a document that is found has the introspector of the
+  earlier layout (`document.introspector().serial()` is the same number,
+  where every layout made another); and every document that these two
+  functions return, computed or found, has pages whose frames and groups
+  are its own at every depth, so a holder may write to them
+  (`Frame::deep_clone`; the kept layouts shared their groups with the
+  document before, and a write to a group taken out of `Frame::items`
+  reached them). The process holds more between compilations: the frames
+  of the documents and page runs of the last eleven compilations under
+  `evict(10)`.
+- `layout`: `PagedIntrospector::frame_link_targets()` returns a copy of
+  the set (it returned the set that the introspector keeps, which a kept
+  document and the documents handed out share).
+- `library`: an `ElementIntrospector` keeps the results of at most 65 536
+  queries and forgets them all when it has that many (upstream's
+  `QueryCache` has no bound; an introspector now lives as long as a kept
+  document is found).
 - `library`: `evict(max_age)` is comemo's for everything it knows: every
   kept result gets older by one with each call and is dropped when it was
   not found for more than `max_age` calls, and a result that is found is
@@ -451,6 +477,21 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   `module_memo_entries()`: how many closure calls, layouts and
   evaluations of files the stores keep (for tests and measurements);
   `ContentCache::clear()`.
+- `library`: `PageMemo[T]` (`new(label)`, `stats()`, `entries()`) and
+  `memoized_pages(memo, engine, key, content, children, styles, copy,
+  cacheable, f)`: a store of memoized layouts whose results are not
+  frames (the pages of a run, a document), with the copy of a result and
+  the test for what may be kept given by the caller. `frame_cacheable`
+  and `paint_cacheable` (they were private): whether a frame or a paint
+  may be kept by an entry (no host closure in a tag or in the frame of a
+  tiling). `Frame::deep_clone()`: a copy of a frame that shares no frame
+  and no group with it, at any depth, for a holder that the engine does
+  not know (`Frame::clone` shares the groups of the items).
+- `layout`: `page_run_memo_stats()` and `document_memo_stats()`, how many
+  page runs and documents were found and how many were laid out since
+  the process started, and `page_run_memo_entries()` and
+  `document_memo_entries()`, how many are kept (for tests and
+  measurements).
 - `library`: decoded raster images are kept by content (upstream memoizes
   `RasterImage::new_impl`): `RasterImage::new` decodes equal data with an
   equal format and ICC argument once per process and returns the same

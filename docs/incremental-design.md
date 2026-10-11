@@ -7,6 +7,9 @@ watch` recompiles a small edit in a fraction of a first compilation. Slices
 2 and 3 are design.
 Module equality was decided by the owner on 2026-10-11, against the
 recommendation of revisions 3 and 4: exactly as upstream (5.4, "Modules").
+Slice 3 is built (section 8, "Slice 3 as built"): page runs and the
+document are kept, and a recompilation after which the content is what it
+was is the export and little else.
 Revision 5 (2026-10-07) of sections 5.2, 8 (slice 1, step 1) and 9.1 (the
 recording check); revision 4 elsewhere. Revisions 1 and
 2 were reviewed by Codex (`docs/reviews/incremental-design-{1,2}.md`), both
@@ -382,8 +385,8 @@ S sink (mutable), R route, C context, L locator.
 | `typst_eval::eval` | library, source | W T S R | `eval_source_memoized`, imports only, per compilation; key: file id; valid for world and library identity, source text, route and traced answers | yes: 70 % of a touying document |
 | `eval_closure` | func, closure, library, args | W I T S R C | `memoized_closure`, per compilation; key: func, args, traced span; exact arguments; context, route, introspector tracked; world assumed fixed | yes, with `eval` |
 | `eval_string` | library, string, spans, mode, scope | W I S C (+T, R made inside) | not memoized (`eval/lib.mbt`, `eval_string`) | not measured: no document here evaluates strings in a loop |
-| `layout_document_impl`, `layout_document_for_bundle_impl` | library, content, styles | W I T S R (the bundle variant also L) | not memoized (`layout/pages.mbt`) | only when nothing changed |
-| `layout_page_run_impl` | library, children, initial styles | W I T S R L | not memoized (`layout/pages_run.mbt`) | decks (a run per slide); else only when nothing changed |
+| `layout_document_impl`, `layout_document_for_bundle_impl` | library, content, styles | W I T S R (the bundle variant also L) | not memoized (`layout/pages.mbt`). Since slice 3: `memoized_pages`, kept across compilations; key: content, styles, route (the bundle variant: the resolved locator too) | only when nothing changed |
+| `layout_page_run_impl` | library, children, initial styles | W I T S R L | not memoized (`layout/pages_run.mbt`). Since slice 3: `memoized_pages`, kept across compilations; key: children with their styles, initial styles, the resolved locator, route | decks (a run per slide); else only when nothing changed |
 | `layout_fragment_impl` | library, content, styles, regions, column | W I T S R L | `memoized_layout`, per compilation; key also has the resolved locator and the whole route | yes |
 | `layout_single_impl`, `layout_multi_impl` | library, block, styles, region(s) | W I T S R L | not memoized (`layout/flow_collect.mbt`) | yes: 40 % of what is left of `long.typ` |
 | `layout_par_impl` | library, par, styles, region, expand, situation | W I T S R L | `memoized_layout`, per compilation | yes |
@@ -1227,7 +1230,11 @@ of a `CachedCell`; what an introspector's `query` returns. Not built,
 because nothing keeps one yet (slice 3): a kept document, with its pages'
 frames, its `DocumentInfo` (whose `author` and `keywords` are arrays) and
 its format options (it shares only its introspector, whose answers are
-views, 5.3). The introspections of a sink hold closures over selectors
+views, 5.3). (Built in slice 3, section 8, "Slice 3 as built", "Copies":
+as said here, and one thing more that this rule did not see. A
+copy-on-write clone of a frame shares its groups, as objects, with the
+frame it was made of, so the document that a host is handed gets frames
+and groups of its own at every depth, `Frame::deep_clone`.) The introspections of a sink hold closures over selectors
 and locations, which nothing writes.
 
 ### 5.5 State outside the arguments
@@ -2138,6 +2145,20 @@ A kept document (pages, `DocumentInfo`, options) is slice 3's: no store
 keeps one. `Content` is immutable by the engine's rule (its `fields`
 array and `lifecycle` are objects that code of the package could write
 to and does not).
+
+(Slice 3, as built: two rows more. The store of page runs keeps the
+`LayoutedPage`s of a run as clones of what was laid out and hands out
+clones, to `finalize_page`, which moves their frames and does not write
+to them. The store of documents keeps a clone of the document with a
+copy of its info and of its format options and the introspector itself;
+`layout_document` hands out a document whose frames and groups are its
+own at every depth, with an info and options of its own and the same
+introspector, to hosts, which can write to all of it. And one row
+changes: a clone of a frame shares its groups with the frame it was
+made of, so the "clones" of the first row are safe for callers that
+write through the frame's methods, which is every caller inside the
+engine, and not for a holder of a group that it took out of
+`Frame::items`. Section 8, "Slice 3 as built", "Copies".)
 
 *The view, and what a copy would cost.* `query` could have returned a
 copy of the kept array instead. Measured, instructions of a compilation,
@@ -3087,6 +3108,667 @@ bibliography entry that is not cited: the handbook 25 ms to 16 ms; after an
 edit of a deck: 18 ms to 17 ms. Risk: low. What it does not buy: anything
 after an edit of a document that is one page run.
 
+#### Slice 3 as built
+
+Page runs and the document are kept. A recompilation in which the content
+of the document is what it was (a save without a change, a comment that
+is edited) no longer lays anything out: `longer.typ` 462 ms to 178 ms,
+the touying document 20.5 ms to 7.7 ms, and what is left of it is the
+export. Slice 2 was built at the same time on another branch and is not
+in these numbers.
+
+**Upstream's functions and the port's keys.** `H` hashed, `T` tracked,
+`M` tracked mutably (comemo records the calls and replays them).
+
+| upstream | world | library | introspector | traced | sink | route | locator | the rest |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `layout_page_run_impl` (`typst-layout/src/pages/run.rs:78`) | T | H | T | T | M | T | T | `children: &[Pair]` H, `initial: StyleChain` H |
+| `layout_document_impl` (`pages/mod.rs:55`) | T | H | T | T | M | T | none (`Locator::root()` inside) | `content` H, `styles` H |
+| `layout_document_for_bundle_impl` (`pages/mod.rs:102`) | T | H | T | T | M | T | T | `content` H, `styles` H |
+| the port, all three (`layout_page_run_impl` in `layout/pages_run.mbt`; `layout_document_impl`, `layout_document_for_bundle_impl` in `layout/pages.mbt`) | recorded reads, validated in the scope of the lookup | compared as an object | recorded reads, replayed; or the same introspector by its number | in the key | kept as a copy, replayed as copies | in the key, whole (deviation 1) | in the key, resolved (deviation 1) | in the key by fingerprint, and kept for the exact comparison (deviation 3) |
+
+The key of a page run is the name of the function, the number of
+children, each child's fingerprint and the hash of its style chain, the
+hash of the initial styles, the resolved locator and the route; that of a
+document the name, the content's fingerprint, the hash of the styles, the
+route, and for the bundle variant the resolved locator. `memoize` adds the
+traced span. The two document functions have one store and their names in
+the key (upstream: a cache per function).
+
+Both go through `memoize` (`library/memo.mbt`), so an entry has what every
+entry of a `MemoStore` has: comemo's age, the evictor, four results per
+key among those that no `evict` has seen, the end with its compilation if
+its key holds a host closure, and the recording check. What is new is in
+`library/memo_pages.mbt`: `PageMemo[T]` and `memoized_pages`, a store for
+results that are not frames (the layout package's `Array[LayoutedPage]`
+and `PagedDocument`), with the copy and the test for what may be kept
+given by the caller, the exact comparison of a run's children
+(`PagesInput`: content by `content_memo_equal`, style chains by
+`chain_memo_equal`), and counters of calls that were found and computed
+(`@layout.page_run_memo_stats`, `document_memo_stats`). An entry keeps the
+children of a run in an array of its own: the view of the call is into
+the array of the realization, which page collection writes to
+(`migrate_unterminated_tags`; it does so before any run is laid out, so
+this is a guard against a later change, not a repair).
+
+**The introspection loop.** `compile_scoped` (`typst/lib.mbt`; upstream
+`typst/src/lib.rs:151` and `:159`) lays the document out up to five
+times, each time against the introspector of the document before, and
+stops when the reads of a layout give the same answers on its own
+document. A compilation of three iterations leaves three document
+entries under one key, which differ in the introspector they were
+computed with and in their reads. How a later compilation finds them:
+
+- The first iteration asks with an empty introspector. All empty
+  introspectors have the number zero (`Introspector::serial`), and the
+  entry of an earlier first iteration was computed with one: found
+  without a replay.
+- A document that is found is handed out with the introspector it had
+  (below, "Copies"): the same object, with the same number. So the
+  second iteration asks with the introspector that the entry of the
+  earlier second iteration was computed with, and that one is found by
+  the number too. And so on: in a recompilation in which the content is
+  what it was, no read of a document entry is replayed to find it.
+- What the loop then validates is the reads of each document against
+  that document's own introspector (the convergence check), which the
+  compilation that laid the documents out validated too. That is where
+  the accelerator comes in (below).
+- After an edit the document is another key. Its page runs are asked
+  for, in the first iteration with an empty introspector (found by the
+  number) and in the later ones with the introspectors of the new
+  documents: there the entries of the compilation before are validated
+  by replaying their reads, and a run is found if what it read of the
+  document is what it was (a slide of a deck whose page number and
+  running header did not change).
+
+Five documents under one key and four results per key: a document that
+does not converge loses the entry of its first iteration to that of its
+fifth. In a watching process the next compilation lays out the first
+iteration again and finds the other four by their reads, after which all
+five are there (the limit counts what no `evict` has seen); a process
+that never evicts lays such a document out again every time
+(`typst/pages_memo_wbtest.mbt`, "a document that is found says what its
+layout said").
+
+*How many reads, and what replaying them costs.* A document entry of
+`longer.typ` records 760 distinct introspector reads in the first
+iteration (against the empty introspector) and 1736 in each of the next
+two; `long.typ` 157 and 353, the touying document 114 and 186, the
+handbook 97, 186 and 200. Replaying them is cheap, because the queries
+of an introspector are cached and the fingerprint of content is kept in
+the content: the three convergence checks of a compilation of
+`longer.typ` take 1.05 ms together when every read is replayed (a first
+compilation), 1.13 ms in a recompilation that finds all three documents
+with the accelerator as it was, and 0.25 ms with the table below. That
+is 0.7 % of such a recompilation (162 ms, of which 158 ms are the export
+and 3.5 ms everything else) and 0.2 % of one after an edit. Finding the
+three entries themselves replays nothing (the numbers above) and takes
+0.5 ms: the comparison of the arguments, which are the objects they
+were, and the validation of the world reads.
+
+**The accelerator of introspector reads** (`ReadAccelerator`,
+`library/introspector.mbt`) was the answers of the introspector that was
+asked last (step 5). Within a compilation that is enough: the lookups of
+an iteration validate against one introspector, then the convergence
+check against the next, which is the one the following iteration asks.
+What it did not serve is the next compilation: the documents that are
+found have the introspectors they had, and the answers that the
+compilation before computed for them were gone. It is a table by the
+number of the introspector now, with these bounds: an introspector that
+was not asked since the `evict` before the last is dropped with its
+answers (the introspector of a document that changed); of one that
+stays, the answers that were not asked for since then are dropped too
+(two generations: found by the review, below); at most sixteen
+introspectors in a process that never evicts; and no table for the empty
+introspectors, which all have the number zero and are asked the reads of
+every later document (their answers are kept while the empty
+introspector is the one that is asked, as before). comemo drops its
+accelerator with every `evict` (`comemo/src/memoize.rs:100`), so this
+keeps more than upstream does, of what cannot be stale: an introspector
+answers the same for as long as it lives. What it buys is the 0.9 ms
+above, a quarter of what a recompilation of `longer.typ` that finds
+everything does besides exporting.
+
+**Copies** (5.4, "Mutable results"). Share with copy-on-write where the
+engine goes on with a result, copy the structure where a host gets it.
+
+- *The pages of a run* (`copy_layouted_pages`): other `LayoutedPage`s
+  with copy-on-write clones of the five frames (`Frame::clone`: the
+  array of items is shared and both frames are marked), when the entry
+  is stored and for every caller. `finalize_page` moves the frames of
+  what it is handed into the frame of the page (`push_frame`: a group
+  that holds the frame, or its items copied in), which no longer reaches
+  the entry's. The fill, the numbering and the supplement are values.
+- *What a document entry keeps* (`PagedDocument::kept`): another
+  document with other pages, whose frames are copy-on-write clones,
+  another info (`DocumentInfo::copy`: the authors and the keywords are
+  arrays) and other format options (`DocumentFormatOptions::copy`). It
+  shares its introspector, which is made once of the pages as they were
+  laid out and whose answers are for reading
+  (`PagedIntrospector::frame_link_targets` handed out its set; it hands
+  out a copy now).
+- *What a caller of `layout_document` gets*, computed or found
+  (`PagedDocument::owned`): a document whose frames share no frame and
+  no group with anything that is kept, at any depth
+  (`Frame::deep_clone`, new). A copy-on-write clone is not enough for a
+  holder that the engine does not know. It protects writes through the
+  methods of the frame that was cloned; but the clone shares its groups,
+  as objects, with what it was cloned from, `GroupItem` has public
+  mutable fields and its frame has `Frame`'s methods, and the pages of a
+  document are clones of the frames that the entries of the document,
+  of its page runs, of paragraphs and of fragments keep. A host that
+  takes a group out of `Frame::items` and sets its transform, or empties
+  its frame, wrote to all of them (the review found it; it was true of
+  the kept paragraphs since they were first kept, for any holder of a
+  document). The deep copy makes new frames and groups and shares the
+  other items, which are values: the glyphs of a text, the curve of a
+  shape, an image, the content of a tag are not copied, here or anywhere
+  else in the engine.
+
+What the copies cost, for `longer.typ` (121 pages; timers around the
+copies in a watching process, medians of fifteen recompilations):
+
+| | per document | per recompilation (three iterations) |
+| --- | ---: | ---: |
+| the pages of the run, cloned (when stored, and when found) | 0.01 ms | 0.03 ms |
+| a document, cloned (what an entry keeps) | 0.013 ms | 0.04 ms |
+| a document with frames of its own (what a caller gets) | 0.6 ms | 1.7 to 2.0 ms |
+
+That is 1.1 to 1.2 % of a recompilation in which everything is found and
+0.15 % of a first compilation. Two thirds of it are for the documents of
+the first two iterations, of which the loop uses the introspector and
+nothing else; saving that needs a way to say that a document will not
+leave the engine (a method of `Output`), which was not worth a change of
+the trait.
+
+Tests (`typst/pages_memo_wbtest.mbt`): a host writes to the frames of
+every page (`push`, `translate`, `hide`, `set_size`), to the title, the
+authors and the keywords, to the format options, and to every group at
+every depth (transform, clip, label, the innermost frames emptied), of a
+document that was computed and of one that was found; the next
+compilation, the one after an edit of another page run, and the one
+after that give the pages that a compilation from scratch gives.
+
+**What a hit replays.** `memoize` does it for every store: the sink of
+the call (warnings, delayed errors, the introspections that `analyze`
+names in the warning of a document that does not converge, traced
+values), as copies; the introspector reads, into the recorder of the
+caller, which for a document is the constraint of the loop; the world
+reads, which are validated in the scope at hand and noted for the calls
+around (that is also what keeps the files of a found document among the
+dependencies that `typst watch` watches); and for a closure call around
+it, that the result is that of this depth of the route. For the document
+there is one thing more, which is not replayed but kept: the introspector
+of the document that is handed out, with its number, its page count and
+its locations, is the one that the later iterations were computed with.
+
+**Found on the way.**
+
+- *A comment appended to a file can change the content.* Where the
+  markup ended with a space it then ends with the space before the
+  comment and the space after it, and spaces are content. So the first
+  comment after another state of the file can lay the document out, and
+  an edit of the comment's text alone finds it. What the first one costs
+  depends on the file: in the test of this slice the page runs are found
+  (the realization drops the spaces); in `longer.typ` the run is laid out
+  too (429 ms, where the following take 176 ms and an edit at the end
+  414 ms); in the touying document nothing changes (10.3 ms and 7.4 ms).
+  Upstream's keys say the same, and its watch shows it: 97 ms for the
+  first comment in `longer.typ`, 62 ms for the following, 114 ms for an
+  edit at the end. The rows "comment" below are medians of five edits of
+  which the first is of this kind.
+- *A layout in which a function call failed read the file of the call.*
+  Upstream's `Trace::trace` asks the tracked world for the range of the
+  call (`typst-library/src/diag.rs:588`, `world.range(span)`, a read of the
+  source), and the port reads the same (`world_range`). In the first
+  iteration of many documents a `locate` or a query of something that
+  an empty document does not have fails inside a function, the error is
+  delayed and gone when a later iteration succeeds, and the entries of
+  that iteration (the document, its page run) depend on the file: they
+  are laid out again after every edit of it, also one that changes
+  nothing they hold. As upstream.
+- *What is beneath a result that is found gets old.* A document that is
+  found asks for none of its page runs, paragraphs or closure calls, and
+  what is not asked for in ten evictions is dropped. After eleven
+  recompilations in a row in which the document was found, an edit is
+  close to a first compilation: the touying document 149 ms (19 ms
+  otherwise), `longer.typ` 1220 ms (427 ms). Upstream does the same, by
+  the same rule: 111 ms (10 ms) and 522 ms (123 ms).
+- *The locator of a run seldom decides.* The children of a run are
+  realized content, which holds the locations of its elements, so two
+  runs at two places have other children. The key's locator is what
+  tells apart runs without children: empty pages one after the other,
+  whose footers and headers get their locations from it.
+
+**Memory.** The resident set size of the watching process
+(`scripts/watch_check.py --bench-memory`), PDF output, after the first
+compilation and after 10, 50 and 200 edits, every edit a text that the
+session has not had. "Before" is `main` at `565eac6` (step 5's table,
+measured again); upstream is the binary of `e58a63af`.
+
+| document | edits | binary | first | after 10 | after 50 | after 200 | peak |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| longer | at the end | before | 171 MB | 219 MB | 224 MB | 224 MB | 224 MB |
+| longer | at the end | after | 188 MB | 584 MB | 624 MB | 624 MB | 624 MB |
+| longer | at the end | upstream | 313 MB | 1961 MB | 2179 MB | 2238 MB | 2238 MB |
+| longer | every heading | before | 171 MB | 310 MB | 324 MB | 324 MB | 324 MB |
+| longer | every heading | after | 188 MB | 654 MB | 701 MB | 701 MB | 701 MB |
+| longer | every heading | upstream | 312 MB | 2163 MB | 2341 MB | 2410 MB | 2410 MB |
+| longer | every paragraph | before | 171 MB | 1024 MB | 1112 MB | 1112 MB | 1112 MB |
+| longer | every paragraph | after | 188 MB | 1339 MB | 1455 MB | 1455 MB | 1455 MB |
+| longer | every paragraph | upstream | 312 MB | 2978 MB | 3368 MB | 3424 MB | 3424 MB |
+| touying | at the end | before | 82 MB | 86 MB | 86 MB | 86 MB | 86 MB |
+| touying | at the end | after | 83 MB | 95 MB | 97 MB | 97 MB | 97 MB |
+| touying | in the middle | before | 82 MB | 86 MB | 86 MB | 86 MB | 86 MB |
+| touying | in the middle | after | 83 MB | 93 MB | 96 MB | 96 MB | 96 MB |
+| touying | the theme of the package | before | 82 MB | 151 MB | 159 MB | 159 MB | 159 MB |
+| touying | the theme of the package | after | 83 MB | 165 MB | 174 MB | 174 MB | 174 MB |
+| deck | at the end | before | 236 MB | 254 MB | 256 MB | 256 MB | 256 MB |
+| deck | at the end | after | 233 MB | 258 MB | 259 MB | 260 MB | 260 MB |
+| deck | every slide | before | 236 MB | 257 MB | 259 MB | 259 MB | 259 MB |
+| deck | every slide | after | 233 MB | 262 MB | 263 MB | 263 MB | 263 MB |
+
+A kept document holds every frame of its pages, and so does the entry of
+a page run; a compilation of three iterations leaves three of each, and
+an edit of a document that is one page run changes all six keys. With
+ages up to ten that is the frames of eleven compilations. The first
+compilation holds 17 MB more than before (188 MB for 171 MB), an edit at
+the end of `longer.typ` leaves 39.6 MB where it left 4.8 MB (a new
+module), and the plateaus are 624 MB, 701 MB and 1455 MB where step 5
+had 224 MB, 324 MB and 1112 MB: 2.8, 2.2 and 1.3 times. Upstream holds
+2238 MB, 2410 MB and 3424 MB in the same sessions; the port is at 28 %,
+29 % and 42 % of that. A deck does not show it (its runs are small, and
+most of them are found: 97 MB for 86 MB, and 260 MB for 256 MB with
+images).
+
+*Where it goes.* The same session with parts left out (fourteen edits at
+the end; megabytes per edit at the plateau):
+
+| | per edit |
+| --- | ---: |
+| before the slice | 4.8 |
+| page runs and documents kept | 39.6 |
+| the same, the entries of runs without their children | 34.5 |
+| documents kept, page runs not | 33.0 |
+| page runs kept, documents not | 33.3 |
+
+So the children that a run entry keeps for the exact comparison are 5 MB
+per edit (three realizations of the document), and the frames are 28 MB,
+which the run and the document share (a document's pages are clones of
+the run's): about 9 MB per iteration, for 121 pages. They are frames
+that no other entry holds, so not those of paragraphs, which the layout
+entries keep once and every page shares. What the flow builds anew in
+every iteration and in every compilation is what no entry keeps: the
+blocks (`longer.typ` has 180 tables and 180 equations) and the page
+frames around them. How the 28 MB divide between the two was not
+measured. The block level is slice 2: with it a page run that is laid
+out again holds clones of kept block frames, and what an edit leaves
+should come down towards the children and the page frames; that is to
+be measured when the two slices are together.
+
+*A bound, proposed and not built.* The plateau more than doubles for
+edits at the end, so here is what a smaller age for the entries of these
+two stores gives (an entry goes when it was not found in `n` evictions,
+where every other store has ten), measured with a build that has it:
+
+| `longer.typ`, plateau | at the end | every heading |
+| --- | ---: | ---: |
+| step 5 | 224 MB | 324 MB |
+| age 10 (as built) | 624 MB | 701 MB |
+| age 2 | 314 MB | 409 MB |
+| age 1 | 280 MB | 376 MB |
+
+What it costs in hits. An entry of a page run is asked for only when the
+document is not found, so every recompilation that finds the document
+(a save without a change, a comment) makes the runs older: with age 1
+one such recompilation, with age 2 two, and the next edit lays every run
+out again. Measured, an edit at the end after such recompilations: the
+touying document 22 to 24 ms where it takes 18 to 19.5 ms, the handbook
+30 ms where it takes 26 ms (the blocks and paragraphs beneath the runs
+are still found). And a document that goes back to a content it had (an
+edit and its reverse where the spans come back, a toggled value) finds
+its documents and runs for two compilations instead of ten.
+
+What it costs in principle. It would be the first age that is not
+comemo's, and section 8 of step 5 has the rule for a reason: an entry
+that goes earlier than upstream's is computed where upstream's watch
+finds it, and computing is not the same as finding where a kept call
+beneath returns the module of an earlier evaluation (5.4). A document
+that compares modules inside a layout, is found for more than `n`
+compilations while an imported file changes in a comment, and is then
+edited elsewhere, would show a comparison that upstream's watch does not
+show at that step. No document of the stage does that, and the count of
+pinned steps would not notice.
+
+So it is not built. The port holds at most 42 % of what upstream holds
+in these sessions; the frames that make the difference to step 5 are
+probably the block level's to share; and the decision is
+the owner's once that is measured. If it is taken, the place is the
+evictor that a `PageMemo` registers (`library/memo.mbt`, `memoize`:
+`register_evictor(max_age => store.evict(max_age))`), and its mutation is
+a pinned sequence that upstream's watch must be recorded for.
+
+**Mutation checks.** Each put in by hand (a script per mutation, applied to a
+copy of the tree, never committed), on the default `recompile` stage of
+the final tree (244 sequences) and on the unit tests of the slice: T is
+`typst/pages_memo_wbtest.mbt` (12 tests), L `layout/pages_run_wbtest.mbt`,
+A `library/read_accelerator_wbtest.mbt` (6 tests). The numbers in
+brackets are those of 9.1.
+
+| what was broken | failing sequences | first exposed at, and what else exposes it |
+| --- | ---: | --- |
+| page runs: the world reads of an entry are not validated [1 to 6, for this store] | 56 | `bench/tiny`, sweep, step 1 (the fonts); T, "a layout that failed inside a function read the file for its tracepoint" |
+| documents: the same | 70 | `bench/tiny`, sweep, step 1; the same test |
+| page runs: the introspector reads of an entry are not validated [11] | 35 | `project/pages`, sweep, step 1; `suite/introspection/counter.typ/counter-page` at step 0 (the first compilation differs from one without memoization: a later iteration takes the run of the first); T, all tests |
+| documents: the same [11] | 132 | `bench/long`, sweep, step 0 (the document of the first iteration is taken for the second, and the compilation ends with it); T, all tests |
+| page runs: the introspector reads of an entry that is found are not its caller's | 3 | `suite/introspection/counter.typ/counter-page`, sweep, step 2; T, 4 tests |
+| documents: the same (the constraint of the loop stays empty, and the loop stops after the first iteration that finds its document) | 67 | `project/book`, sweep, step 19; the watch loop gives upstream's watch output at 13 of the 18 pinned steps; T, 7 tests |
+| page runs and documents: the sink of an entry that is found is not replayed [14] | 15 | `suite/introspection/query.typ/query-running-header`, random sequence, step 6; `locate-missing-label`, sweep, step 1 (a delayed error is gone); T, "a document that is found says what its layout said" |
+| page runs and documents: the library is not compared [12] | 0 | no sequence: the libraries of the stage differ in `sys.inputs`, which the main file is evaluated with, to other content and another key. T, "a document and a page run are those of their library" |
+| page runs: the locator is not in the key | 2 | `project/pages`, the sweep and the random sequence, step 0 (its empty pages; none before the project had them: the children of a run hold their locations); T, "runs with the same children are told apart by where they are" |
+| the document of a bundle: the locator is not in the key | 0 | no sequence, and the `bundle` stage passes (39 of 39: no bundle of the suite has two documents with the same content). T, "the documents of a bundle are told apart by where they are" |
+| page runs: the styles of the children are neither in the key nor compared | 7 | `suite/introspection/counter.typ/counter-display-matching-numbering-full`, random sequence, step 4; `query-complex`, sweep, step 2 |
+| page runs: the initial styles are neither in the key nor compared | 2 | `suite/scripting/import.typ/import-nested-item`, random sequence, step 1; `suite/loading/json.typ/json-decode-number`, sweep, step 2 |
+| page runs: an entry hands out the pages it keeps | 0 | no sequence and no document: `finalize_page` moves the frames it is handed and does not write to them. L (a caller that writes) |
+| documents: an entry keeps the document that it hands on (`kept` is the identity) | 0 | no sequence (the stage exports a held document again; it does not write to one). T, "what a caller writes to a document it was handed is not written to the kept one" |
+| documents: what an entry keeps has the info it was made of; the format options | 0, 0 | the same test, for each |
+| documents: a caller gets the frames and groups of the kept layouts (`owned` is the identity) | 0 | no sequence. T, "what a caller writes to a group inside a page it was handed is written to no kept layout" |
+| documents: what an entry keeps has the page frames it was made of, not clones | 0 | nothing, and nothing can: since the caller gets frames of its own it never holds what the entry keeps. The clone is the cheap half of `PagedDocument::kept` being a document of its own, not what protects the entry |
+| page runs and documents: every result may be kept (`cacheable` is always true) | 0 | nothing: `edsl` 51 of 51, `library/memo_identity_wbtest.mbt` 7 of 7. An entry whose key holds a host closure ends with its compilation, and a result that got one from an introspector read is taken for that introspector only; the test is the rule of every kept layout (`frame_cacheable`), kept here as there |
+| the accelerator answers for any introspector | the runner aborts (exit status 134) | before the first sequence is done, as in step 5: a kept layout holds locations that the introspector at hand does not know. A, 5 tests; T, 7 tests |
+| the accelerator has one answer per introspector, whatever the read | the runner aborts | the same; A, all tests; T, 4 tests |
+| the accelerator: a new introspector starts with the older answers of the one asked before it | the runner aborts | the same; A, "answers stay for the compilation after the one that asked" |
+| the accelerator: the answers of an introspector that stays are never dropped | 0 | A, "of an introspector that stays, the answers that are no longer asked for go" (growth, not a wrong answer) |
+| the accelerator keeps a table for the empty introspectors too | 0 | A, "the answers of the empty introspectors are not a table" (growth, not a wrong answer) |
+
+The count of pinned steps is 18 under every mutation that lets the stage
+finish, but the one named. Of the failing sequences, two of the page
+runs' reads, five of the documents' reads and five of the documents'
+merge are among the three with packages and the five pinned ones.
+Three rows are of copies that no document can reach and that unit tests
+hold; two (`cacheable`, the clone in `kept`) are of guards that nothing
+can reach, and are said to be that.
+
+**The recording check** (`--check-reads`), with the page-level entries
+among those that are computed a second time: `paged` 39 031 entries
+(33 509 before the slice), `edsl` 83 019 (82 738), `recompile` 95 466
+(80 787), `packages` 1 309 051 (1 307 462); no difference, and the
+`recompile` stage accepts its 18 pinned steps under it.
+
+**Soak.** `scripts/recompile_soak.py --minutes 20` on the tree with the
+review's changes, cold references included: 127 documents, seeds 9100 to
+9107, 21.3 minutes with 12 jobs: 1016 runs, 4920 sequences, 55 995
+steps, 165 729 compilations, 3008 steps compiled again as the first
+compilation of a new process; 0 failures, 0 aborts.
+
+**Measured.** aarch64 macOS, native release, PDF output,
+`--ignore-system-fonts`, `scripts/watch_check.py --bench`: per document
+five watch sessions of every binary in turns, each a first compilation
+and five edits of every kind; medians of the 25 recompilations and of the
+five first compilations, in milliseconds. "Before" is `main` at
+`565eac6` (step 5 as merged), upstream the binary of `e58a63af` with its
+threads, the ratio that of the last two columns. The machine was not
+quiet (the mutation checks of this slice were building beside it): the
+least of a row is up to a tenth below its median.
+
+| document | edit | before | after | upstream | ratio |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `long.typ` | first compilation | 234 | 225 | 106 | 2.1 |
+|  | end | 89.1 | 84.6 | 23.5 | 3.6 |
+|  | middle | 97.5 | 94.9 | 27.8 | 3.4 |
+|  | comment | 91.6 | 37.6 | 13.5 | 2.8 |
+| `longer.typ` | first compilation | 1120 | 1100 | 506 | 2.2 |
+|  | end | 436 | 414 | 114 | 3.6 |
+|  | middle | 484 | 457 | 133 | 3.4 |
+|  | comment | 462 | 178 | 62.6 | 2.8 |
+| `showcase.typ` | first compilation | 232 | 227 | 156 | 1.5 |
+|  | end | 23.1 | 21.7 | 7.2 | 3.0 |
+|  | middle | 22.9 | 21.8 | 7.3 | 3.0 |
+|  | imported | 23.9 | 23.7 | 8.5 | 2.8 |
+|  | comment | 21.6 | 15.8 | 6.2 | 2.5 |
+| touying | first compilation | 193 | 191 | 141 | 1.4 |
+|  | end | 23.3 | 19.5 | 10.8 | 1.8 |
+|  | middle | 24.5 | 19.7 | 11.7 | 1.7 |
+|  | imported | 116 | 112 | 87.1 | 1.3 |
+|  | comment | 20.5 | 7.7 | 3.5 | 2.2 |
+| handbook | first compilation | 154 | 156 | 106 | 1.5 |
+|  | end | 27.4 | 25.6 | 9.4 | 2.7 |
+|  | middle | 28.1 | 26.7 | 9.7 | 2.8 |
+|  | imported | 72.5 | 72.8 | 21.9 | 3.3 |
+|  | comment | 28.0 | 17.0 | 5.1 | 3.3 |
+| `book` | first compilation | 100 | 96.3 | 71.5 | 1.3 |
+|  | end | 13.1 | 13.0 | 4.3 | 3.0 |
+|  | middle | 15.6 | 15.0 | 5.1 | 2.9 |
+|  | imported | 20.6 | 21.4 | 6.7 | 3.2 |
+|  | comment | 12.5 | 10.7 | 2.9 | 3.7 |
+| `chain` | first compilation | 5.1 | 5.2 | 3.8 | 1.4 |
+|  | end | 3.1 | 3.2 | 1.3 | 2.5 |
+|  | middle | 2.9 | 3.0 | 1.2 | 2.5 |
+|  | imported | 2.9 | 2.5 | 0.9 | 2.8 |
+|  | comment | 2.9 | 2.5 | 0.9 | 2.8 |
+| `notes` | first compilation | 16.1 | 17.1 | 8.8 | 1.9 |
+|  | end | 8.4 | 7.9 | 3.1 | 2.5 |
+|  | middle | 8.5 | 7.7 | 3.0 | 2.6 |
+|  | imported | 10.2 | 9.4 | 3.9 | 2.4 |
+|  | comment | 8.2 | 7.0 | 2.7 | 2.6 |
+| `linked` | first compilation | 3.3 | 3.3 | 3.1 | 1.1 |
+|  | end | 2.5 | 2.4 | 1.2 | 2.0 |
+|  | middle | 2.2 | 2.1 | 1.3 | 1.6 |
+|  | comment | 2.1 | 1.7 | 0.9 | 1.9 |
+| deck | first compilation | 574 | 571 | 82.8 | 6.9 |
+|  | end | 18.2 | 18.5 | 15.8 | 1.2 |
+|  | middle | 18.4 | 19.4 | 15.8 | 1.2 |
+|  | comment | 18.3 | 17.4 | 15.9 | 1.1 |
+
+The edits are those of step 5's table. "Comment" is a comment appended to
+the main file, another text each time: the first of a session's five
+follows another kind of edit and changes the content (above, "Found on
+the way"), the other four change the comment alone, and the median is of
+those.
+
+Against the expectations of 3.3 ("+ runs, document"; the rows of that
+column in which the page level decides):
+
+| document | edit | expected | measured | before |
+| --- | --- | ---: | ---: | ---: |
+| `long.typ` | nothing on the pages changes | 37 | 37.6 | 91.6 |
+| `longer.typ` | nothing on the pages changes | 171 | 178 | 462 |
+| touying | nothing on the pages changes | 7 | 7.7 | 20.5 |
+| handbook | nothing on the pages changes (3.3: a bibliography entry that is not cited, 16) | 16 | 17.0 | 28.0 |
+| touying | end | 17 | 19.5 | 23.3 |
+| touying | middle | 21 | 19.7 | 24.5 |
+
+The rows in which nothing on the pages changes are where they were
+expected, although the expectation had the block level beneath: a
+document that is found asks for nothing beneath it, so that level is not
+in these rows. The deck's rows after an edit were expected with the
+block level too (18 ms to 17 ms was the page runs' part) and are 2 ms
+above without it at the end and below in the middle: after an edit at
+the end of the touying document 55 of 63 calls for a page run are found
+and the 8 that are laid out take 0.6 ms together; the handbook finds 25
+of 29. A document that is one page run lays that run out in every
+iteration, as before (three computed, none found). Its rows are 3 to
+5 % below "before" all the same (`long.typ` 89 ms to 85 ms after an edit
+at the end, `longer.typ` 436 ms to 414 ms), and so are its first
+compilations, where the slice only adds work (below): no entry explains
+that, and it is within what the place of a binary in a round of
+sessions does. The image deck does not change: its recompilation is its
+export. `book` after a comment is 10.7 ms and not its export's 6 ms: the
+document of its first iteration read the main file for a tracepoint
+(above) and is laid out after every edit of it.
+
+Against upstream the rows in which nothing changes went from 3.9 to 8.0
+times (step 5) to 2.2 to 3.3 times for the bench and package documents,
+which is where the ratios of the other rows are: what is left there is
+the PDF writer's ratio.
+
+*What a first compilation and a one-shot `typst compile` pay.* Against
+`main` at `565eac6`, the least of twelve runs each in turns
+(instructions retired and cycles of `/usr/bin/time -l`):
+
+| workload | instructions before | after | change | cycles before | after | change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `tiny.typ` to PDF | 64.6 M | 64.6 M | -0.00 % | 23.2 M | 23.4 M | +1.0 % |
+| `long.typ` to PDF | 3261.3 M | 3272.4 M | +0.34 % | 777.3 M | 776.1 M | -0.2 % |
+| `longer.typ` to PDF | 15819.1 M | 15876.2 M | +0.36 % | 3755.4 M | 3746.0 M | -0.3 % |
+| `query longer.typ heading` | 13372.0 M | 13415.3 M | +0.32 % | 3227.7 M | 3240.2 M | +0.4 % |
+| `showcase.typ` to PDF, embedded fonts | 3779.6 M | 3779.4 M | -0.01 % | 801.3 M | 797.9 M | -0.4 % |
+| touying `theme-metropolis.typ` to PDF | 2599.5 M | 2589.4 M | -0.39 % | 688.9 M | 680.2 M | -1.3 % |
+| ilm `bakers-handbook.typ` to PDF | 2280.4 M | 2283.4 M | +0.13 % | 560.7 M | 562.4 M | +0.3 % |
+| the book of `tests/recompile/docs` to PDF | 1381.1 M | 1384.4 M | +0.24 % | 336.2 M | 339.5 M | +1.0 % |
+| the pages of `tests/recompile/docs` to PDF | 309.0 M | 309.7 M | +0.22 % | 93.9 M | 92.5 M | -1.5 % |
+
+The keys of the document and of the run are fingerprints of the content
+and of the realized children, which the keys of the paragraphs then find
+computed; besides that a compilation pays the test for what may be kept
+(a walk over the frames of every page, twice per iteration), the stores
+of three run entries and three document entries, and three deep copies
+of the document's frames. The touying document gains: 16 of its 60 calls
+for a page run are found within the compilation, in the later
+iterations (the handbook: 4 of 29). The budget of 5.2 (1 % of a
+compilation from scratch) holds with a third of it.
+
+*What is left after a recompilation in which everything is found*, by
+phase (timers of a throwaway build around the phases, in a watching
+process; medians of fifteen recompilations; milliseconds). "The same
+bytes" is the main file written again as it is; "a comment" is the text
+of a comment at its end changed.
+
+| | `longer.typ`, the same bytes | a comment | touying, the same bytes | a comment |
+| --- | ---: | ---: | ---: | ---: |
+| the recompilation (status line) | 162 | 176 | 7.5 | 7.9 |
+| evaluation: the main module found, or evaluated with every closure call found | 0.24 | 12.2 | 1.70 | 2.06 |
+| realization of the document | 0 | 0 | 0 | 0 |
+| the key of the document (a fingerprint of the content) | 0.00 | 2.03 | 0.00 | 0.00 |
+| finding the three document entries: the exact comparison of the content, the validation of world reads | 0.50 | 3.58 | 0.07 | 0.08 |
+| the convergence checks (introspector reads, from the table) | 0.25 | 0.25 | 0.03 | 0.03 |
+| copies: three documents with frames of their own | 1.95 | 1.73 | 0.21 | 0.22 |
+| the rest of the compilation (the world's reset, scopes) | 0.5 | 0.3 | 0.1 | 0.1 |
+| export (PDF) | 158 | 156 | 5.3 | 5.4 |
+
+After a save without a change, 98 % of `longer.typ` and 71 % of the
+touying document is the PDF writer; after a comment, 89 % and 68 %, and
+the rest is the evaluation of the main file (its closure calls are
+found, its content is built again) and the comparison of the content
+that it gave with the content that the entry keeps (3.1 ms: the
+fingerprints are equal, and deviation 3 compares them field by field
+when the objects are not the same). For the touying document the
+evaluation's 1.7 ms is the world: 32 files read and compared, as step 5
+found. So what comes after this slice for these recompilations is not
+memoization: it is the PDF writer (158 ms where upstream takes about 55
+for the document), and for package documents a file store that does not
+read a file whose modification time is what it was.
+
+And after an edit at the end, for comparison (the same timers):
+`longer.typ` 440 ms: evaluation 12, realization of the document 43 (three
+iterations), the key of the run 9, the flow of the run 204 (three
+iterations, the paragraphs found), storing the run 4, the introspectors of
+the new documents 4, the document's key, lookup and copies 6, the
+convergence checks 1, export 155. The touying document 19.9 ms:
+evaluation 6.2, realization 2.9, the 63 lookups of page runs 2.5 (keys
+1.2, validation and copies 1.3), the 8 runs that are laid out 0.6,
+finalization 0.6, introspectors 0.8, the document 0.5, export 5.4.
+
+**Review.** One round by Codex (`gpt-6-astra`, reasoning effort high,
+read-only) on the diff of the first five commits (page runs, the
+document, the accelerator's table, the tests, the project), asked for an
+input of the page-run or document layout that is neither in the key nor
+in the recorded reads, a kept page that a caller can write to, a hit
+that fails to replay something that later iterations or exporters depend
+on, unbounded growth, a wrong answer of the accelerator's table, and any
+change of a compilation from scratch. The verdict was "request changes",
+with three findings and no stale result. It names what it looked at and
+found sound: the inputs (children and their styles, initial styles,
+content, resolved locators, routes, traced spans, the library, the
+recorded world and introspector reads), the position of a run (the
+physical number, the parity pages, two-sided margins, pending tags and
+the manual page counter are the finalization's; floats, footnotes,
+columns and line numbers of the root flow are made per call), the replay
+(reads into the enclosing recorder, world reads validated and handed on,
+warnings, delayed errors, introspections, traced values), the copies of
+the info and the format options, the answers of the accelerator
+(numbers, the empty introspectors, nested validation and eviction), the
+lifecycle of the two stores, and the paths of a compilation from scratch
+and with memoization off.
+
+Fixed, all three:
+
+- *A document that is handed out shares groups with what is kept*
+  (above, "Copies"): `Frame::deep_clone`, `PagedDocument::owned`, and the
+  test that writes to every group at every depth.
+- *The answers of an introspector that stays are never dropped*: two
+  generations (above, the accelerator; `library/read_accelerator_wbtest.
+  mbt`, "of an introspector that stays, the answers that are no longer
+  asked for go"). Its scenario is a document whose first iteration is
+  found in every compilation while a later iteration changes (a file
+  that only a later iteration reads): the introspector of that first
+  document is asked new reads forever.
+- *The same document's introspector caches every query it is asked*
+  (`ElementIntrospector.queries`, upstream's `QueryCache`, which has no
+  bound either; it did not matter while no document lived longer than
+  its compilation or its host): the cache is emptied when it holds
+  65 536 results.
+
+Not changed, from the first finding: what the items of a frame hold
+besides frames is shared between what is kept and what is handed out
+(the glyphs of a text, the items of a curve, the stops of a gradient, the
+frame of a tiling, the pieces of a numbering pattern), and some of it is
+an array with public access. Copying it would copy every glyph of a
+document for every caller. It is the engine's contract for values, as
+for content: nothing writes to them, and nothing in the repository does
+(a search for writes to the fields of a group outside of
+`library/frame.mbt` finds the decoder of the runner's replay stage and
+tests, which build their own frames, and one for writes to the glyphs of
+a text finds the shapers, which build theirs).
+
+**HTML and the bundle** are not built (section 4; "not scheduled").
+What they would take, now that the store is generic:
+
+- `html_document_impl` and `html_document_for_bundle_impl`
+  (`typst-html/src/document.rs:46` and `:101`) have the signatures of the
+  paged functions. They are `memoized_pages` with an `HtmlDocument`:
+  the key as above; a copy of the document, which is a tree of
+  `HtmlElement`s that are written to after they are made (the anchors of
+  linked elements are assigned in `html_document`, inside the memoized
+  function upstream), so the copy is of the tree, with the frames in it
+  cloned; the introspector shared; and the test for what may be kept
+  over the frames and the content in the tree.
+- `html_block_fragment_impl` (`typst-html/src/fragment.rs:42`) is
+  `layout_fragment_impl` with other results: a `PageMemo[Array[HtmlNode]]`
+  with `whitespace` in the key.
+- `bundle_impl` (`typst-bundle/src/lib.rs:151`) returns a bundle of
+  documents and assets; its documents are those of
+  `layout_document_for_bundle` and `html_document_for_bundle`, of which
+  the first is kept since this slice. A kept bundle is a copy of each of
+  them and a shared bundle introspector. The four `export_*` functions
+  of `typst-bundle/src/export.rs` are memoized on the document and the
+  options with the link resolver tracked: results by content
+  (`library/memo_content.mbt`) once a document has a fingerprint, which
+  it has (`Fingerprint for Page`).
+- None of the measured documents is HTML or a bundle, so none of it was
+  measured.
+
+**For what comes after.**
+
+- After a recompilation in which everything is found, what is left is
+  the export: 98 % of `longer.typ` (158 of 162 ms) and 71 % of the touying
+  document (5.3 of 7.5 ms), and the table above for the rest. The PDF
+  writer takes three times upstream's time for the same pages.
+- After an edit, the document-level realization, the flow of the page
+  run around the kept paragraphs and the export are what is left;
+  slice 2 is for the flow. The document level adds, per iteration of
+  `longer.typ`, 0.7 ms for the key of the document, 3 ms for the key of
+  the run (the fingerprints of its children, which the paragraphs' keys
+  then find computed), 1.2 ms for the exact comparison and the test of
+  what may be kept, and 1.5 ms for the introspector of the new document.
+- The memory of a session is dominated by the frames of blocks that no
+  entry keeps and every iteration lays out again (above). Measure it
+  again when slice 2 is merged, before deciding on a smaller age.
+- A document entry is only as good as the content is stable: every edit
+  of the main file that changes a span changes the key. What would find
+  more is below the document (the block level) or beside it (page runs,
+  for documents that are made of many).
+
 ### Not scheduled
 
 Each needs a document that shows it, then follows the pattern of slice 2:
@@ -3592,6 +4274,29 @@ Upstream quirks the port does not reproduce:
   the binary of `e58a63af`, two SVG files of the same bytes next to a red
   and a blue `img.png` are two red squares, as images, as tilings and in
   the PDF.
+
+Slice 3 (page runs and the document), each stricter than upstream or the
+same in what can be observed:
+
+- **The locator of the bundle's document and of a page run is in the key,
+  resolved** (upstream tracks it): deviation 1, for two more functions.
+- **A document that is handed out is a deep copy of its frames and
+  groups**, and what an entry keeps is a copy-on-write clone
+  (`PagedDocument::owned`, `kept`). Upstream's `PagedDocument: Clone`
+  shares pages and frames, which nobody can write to there. Nothing to
+  observe but the time (0.6 ms per document of 121 pages).
+- **A kept document and the documents it is handed out as have one
+  introspector object**, as upstream's share an `Arc`. Its
+  `frame_link_targets` hands out a copy of the set.
+- **The answers of the read accelerator outlive an `evict`** by one
+  (comemo drops its accelerator with every `evict`): those that the
+  compilation before asked for. Not observable: an introspector answers
+  the same for as long as it lives.
+- **An `ElementIntrospector` forgets its cached queries when it has
+  65 536** (upstream's `QueryCache` has no bound). Not observable.
+- **Not built**: a smaller age for the entries of page runs and
+  documents (section 8, "Slice 3 as built", "Memory"). It would be the
+  first age that is not comemo's.
 
 ## 11. Decisions and open questions
 

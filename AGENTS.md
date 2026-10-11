@@ -786,6 +786,64 @@
   `eval/import_wbtest.mbt` and `library/memo_closure_wbtest.mbt`,
   `library/memo_identity_wbtest.mbt`; the `recompile` stage and
   `scripts/recompile_soak.py` are the gate.
+- Page runs and the document (slice 3 of `docs/incremental-design.md`,
+  "Slice 3 as built" in its section 8): `layout_page_run`
+  (`layout/pages_run.mbt`) and `layout_document`,
+  `layout_document_for_bundle` (`layout/pages.mbt`) are memoized like
+  upstream's `layout_page_run_impl`, `layout_document_impl` and
+  `layout_document_for_bundle_impl`, through `memoized_pages`
+  (`library/memo_pages.mbt`): `memoize` for results that are not frames
+  (`PageMemo[T]`), with the copy and the test for what may be kept given
+  by the caller. Keys: the children of a run with their styles and the
+  initial styles, the content and the styles of a document, and in both
+  the resolved locator and the route (what tells two empty pages apart is
+  the locator: realized children hold their locations). A recompilation
+  whose content is what it was lays nothing out. Rules. (1) A document
+  is laid out once per iteration of the introspection loop
+  (`typst/lib.mbt`), and its entries are found by the number of their
+  introspector: zero for the first iteration (every empty introspector),
+  and for the later ones the introspector of the document that the
+  iteration before found, which is why a document that is found must be
+  handed out with the introspector it had (`PagedDocument::kept`: never
+  make a new one for a copy). (2) Copies: the pages of a run and the
+  document that an entry keeps are copy-on-write clones
+  (`copy_layouted_pages`, `PagedDocument::kept`, with a copy of the info
+  and of the format options); what `layout_document` returns, computed
+  or found, has frames of its own at every depth
+  (`PagedDocument::owned`, `Frame::deep_clone`), because `Frame::clone`
+  shares the groups of the items as objects and a host can write to a
+  group it takes out of `Frame::items`. Whatever else hands frames of
+  kept layouts to a holder outside the engine does the same; inside the
+  engine a clone is right. Items other than groups are values and
+  shared. (3) The reads of a found document are validated against the
+  document's own introspector by the loop: `ReadAccelerator` keeps the
+  answers of an introspector by its number for the compilation after the
+  one that asked (two generations between `evict` calls, none for the
+  empty introspectors), and an `ElementIntrospector` forgets its cached
+  queries at 65 536, since an introspector now lives as long as its
+  document is found. (4) Ages are comemo's here too, although a session
+  that changes its one page run with every edit then holds the frames
+  of eleven compilations (`longer.typ`: 624 MB where slice 1 held
+  224 MB, upstream 2.2 GB; most of it frames that the flow builds anew
+  in every iteration, which the block level, once kept, should share): a
+  smaller age
+  for these two stores is measured in the design's note and not built,
+  because an entry that goes earlier than comemo's is recomputed where
+  upstream's watch finds it. (5) What is beneath a result that is found
+  is not asked for and gets old: after eleven recompilations in a row
+  that find the document, an edit is close to a first compilation, in
+  upstream too. (6) Things that look like misses and are upstream's: a
+  comment appended to a file can change the content (a space more), so
+  the first such edit can lay the document out, and an edit of the
+  comment's text finds it; a layout in which a
+  function call failed read the file for its tracepoint
+  (`world_range`), so the first iteration of a document that queries
+  what an empty document lacks is laid out again after every edit of
+  that file. Counters: `@layout.page_run_memo_stats()`,
+  `document_memo_stats()`. Tests: `typst/pages_memo_wbtest.mbt`,
+  `library/read_accelerator_wbtest.mbt`, the project
+  `tests/recompile/docs/pages`; mutation checks in
+  `tests/recompile/README.md`.
 - Results kept by content (`library/memo_content.mbt`; slice 0 of
   `docs/incremental-design.md`): functions that upstream memoizes without
   a tracked argument, pure in what their arguments hash to, are kept for

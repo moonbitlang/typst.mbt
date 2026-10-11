@@ -53,7 +53,7 @@ second only). The phases are not interleaved: a cache
 that keeps the last compilation only would otherwise never be asked for the
 step before, and the stage would pass without testing it.
 
-**The documents** (121 by default, and the five of the sequences that are
+**The documents** (122 by default, and the five of the sequences that are
 pinned to upstream's watch, below):
 
 - 3 of `bench/` (`tiny`, `long`, `showcase`: the documents whose
@@ -68,7 +68,7 @@ pinned to upstream's watch, below):
   PNG, JPEG, GIF, WebP, SVG with linked images, PDF, pixmaps, syntaxes and
   themes of `raw`, bibliographies, plugins). Some fail on purpose. Tests
   that upstream only evaluates are compiled to pages like the others.
-- 4 projects written for this stage (`docs/`), because the suite has no
+- 5 projects written for this stage (`docs/`), because the suite has no
   document of several files: `book` (a main file that includes chapters,
   which import a shared module, which reads a JSON file; CSV, TOML, YAML,
   text, a bibliography in an author-date style with citations inside
@@ -76,11 +76,17 @@ pinned to upstream's watch, below):
   module and as text), `chain` (imports in a chain and in a diamond over
   one data file, a function that reads the file when it is called, every
   file a document of its own), `notes` (pages computed from the
-  document, with functions that read the date and `sys.inputs`) and
+  document, with functions that read the date and `sys.inputs`),
   `linked` (an SVG that links a PNG, as an image, in a tiling that is
   handed to functions and in one that a function captured: what the pages
   show is in a file that no element names, and whose bytes are in no
-  element).
+  element) and `pages` (many page runs, for the runs and the documents
+  that a compilation keeps: page set rules in the middle, a header that
+  queries the document, a footer with the number of pages and with what
+  a function read from a file when the footer was laid out, an outline,
+  footnotes across pages, columns, runs that are the same child for
+  child and span for span, a blank page for the parity, two-sided
+  margins, a second numbering).
 - 3 documents with real packages (`tests/packages/docs`: a touying deck, an
   ilm book with a bibliography, cmarker with its plugin and a Markdown
   file), if `.repos/typst-packages` is there; all 99 with `--all`. They
@@ -161,7 +167,9 @@ what the process shares:
   reference: everything that has an age. That is the stores of memoized
   calls (`layout_store`, the counter sequence, the works of a
   bibliography, `closure_store` in `library/memo.mbt`; the module
-  evaluations of `eval/import.mbt`), the results kept by content
+  evaluations of `eval/import.mbt`; since slice 3 the page runs and
+  documents of `layout`, with the answers that the read accelerator keeps
+  for their introspectors), the results kept by content
   (`library/memo_content.mbt`: decoded raster images, highlighted raw
   text, the PDF exporter's images) and the caches of data decoded from
   bytes (syntaxes and themes of `raw`, bibliographies, CSL styles, PDF
@@ -371,9 +379,9 @@ found is not computed, and so not checked, again). The stage's own verdict
 must be the same with it, the count of pinned steps included: a second run
 of the check must leave no trace in what has an age.
 
-The default run is the CI run: 126 documents, 242 sequences (234, 3 with
-packages and 5 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1461
-steps and 4361 compilations with their exports, about 40 s on an M-series
+The default run is the CI run: 127 documents, 244 sequences (236, 3 with
+packages and 5 pinned to upstream's watch in `scripts/ci/stages.tsv`), 1474
+steps and 4400 compilations with their exports, about 40 s on an M-series
 machine. `--sequences=N` and `--steps=N` size
 the random sequences of every document, `--seed=N` and `--rounds=N` choose
 the seeds, `--all` adds `bench/longer` and every document with packages,
@@ -494,6 +502,60 @@ the design's section 5.5):
 |---|---|---|---|
 | 4. `library/visualize_hash.mbt`: the fingerprint of an SVG image leaves out the images it links (`SvgImage::links`), as it did | 3 | `project/linked`, the step of the sweep in which `art/photo.png` gets the content of `art/other.png`; `suite/visualize/image.typ` `image-svg-linked-many-formats` | the page images in all three (the page hashes as before, so the loop keeps the image it had), and in one of them the PDF; the frames and the SVG of the loop are those of the reference |
 | 5. `library/bibliography.mbt`: `Works::generate` finds the works by their elements alone in a cache of the process (a result found without its key holding the file and without a read of it) | 1 | `suite/model/bibliography.typ/bibliography-multiple-files`, sweep, step 3 | the pages; the dependencies and the diagnostics where the bibliography file is no longer read |
+
+### Page runs and documents
+
+Slice 3 of the design keeps the layout of every page run and of the
+document (`layout/pages_run.mbt`, `layout/pages.mbt`,
+`library/memo_pages.mbt`), and the answers of the read accelerator by
+introspector (`library/introspector.mbt`); the project `pages` was
+written for it. Its mutations, on the tree with them (244 sequences; the
+tables above are of the tree before, of 242). Each was put in by hand (a
+script per mutation, applied to a copy of the tree, never committed) and
+run on the default `recompile` stage and on the unit tests of the slice:
+T is `typst/pages_memo_wbtest.mbt` (12 tests), L
+`layout/pages_run_wbtest.mbt`, A `library/read_accelerator_wbtest.mbt`
+(6 tests). The numbers in brackets are those of section 9.1 of the
+design.
+
+| what was broken | failing sequences | first exposed at, and what else exposes it |
+| --- | ---: | --- |
+| page runs: the world reads of an entry are not validated [1 to 6, for this store] | 56 | `bench/tiny`, sweep, step 1 (the fonts); T, "a layout that failed inside a function read the file for its tracepoint" |
+| documents: the same | 70 | `bench/tiny`, sweep, step 1; the same test |
+| page runs: the introspector reads of an entry are not validated [11] | 35 | `project/pages`, sweep, step 1; `suite/introspection/counter.typ/counter-page` at step 0 (the first compilation differs from one without memoization: a later iteration takes the run of the first); T, all tests |
+| documents: the same [11] | 132 | `bench/long`, sweep, step 0 (the document of the first iteration is taken for the second, and the compilation ends with it); T, all tests |
+| page runs: the introspector reads of an entry that is found are not its caller's | 3 | `suite/introspection/counter.typ/counter-page`, sweep, step 2; T, 4 tests |
+| documents: the same (the constraint of the loop stays empty, and the loop stops after the first iteration that finds its document) | 67 | `project/book`, sweep, step 19; the watch loop gives upstream's watch output at 13 of the 18 pinned steps; T, 7 tests |
+| page runs and documents: the sink of an entry that is found is not replayed [14] | 15 | `suite/introspection/query.typ/query-running-header`, random sequence, step 6; `locate-missing-label`, sweep, step 1 (a delayed error is gone); T, "a document that is found says what its layout said" |
+| page runs and documents: the library is not compared [12] | 0 | no sequence: the libraries of the stage differ in `sys.inputs`, which the main file is evaluated with, to other content and another key. T, "a document and a page run are those of their library" |
+| page runs: the locator is not in the key | 2 | `project/pages`, the sweep and the random sequence, step 0 (its empty pages; none before the project had them: the children of a run hold their locations); T, "runs with the same children are told apart by where they are" |
+| the document of a bundle: the locator is not in the key | 0 | no sequence, and the `bundle` stage passes (39 of 39: no bundle of the suite has two documents with the same content). T, "the documents of a bundle are told apart by where they are" |
+| page runs: the styles of the children are neither in the key nor compared | 7 | `suite/introspection/counter.typ/counter-display-matching-numbering-full`, random sequence, step 4; `query-complex`, sweep, step 2 |
+| page runs: the initial styles are neither in the key nor compared | 2 | `suite/scripting/import.typ/import-nested-item`, random sequence, step 1; `suite/loading/json.typ/json-decode-number`, sweep, step 2 |
+| page runs: an entry hands out the pages it keeps | 0 | no sequence and no document: `finalize_page` moves the frames it is handed and does not write to them. L (a caller that writes) |
+| documents: an entry keeps the document that it hands on (`kept` is the identity) | 0 | no sequence (the stage exports a held document again; it does not write to one). T, "what a caller writes to a document it was handed is not written to the kept one" |
+| documents: what an entry keeps has the info it was made of; the format options | 0, 0 | the same test, for each |
+| documents: a caller gets the frames and groups of the kept layouts (`owned` is the identity) | 0 | no sequence. T, "what a caller writes to a group inside a page it was handed is written to no kept layout" |
+| documents: what an entry keeps has the page frames it was made of, not clones | 0 | nothing, and nothing can: since the caller gets frames of its own it never holds what the entry keeps. The clone is the cheap half of `PagedDocument::kept` being a document of its own, not what protects the entry |
+| page runs and documents: every result may be kept (`cacheable` is always true) | 0 | nothing: `edsl` 51 of 51, `library/memo_identity_wbtest.mbt` 7 of 7. An entry whose key holds a host closure ends with its compilation, and a result that got one from an introspector read is taken for that introspector only; the test is the rule of every kept layout (`frame_cacheable`), kept here as there |
+| the accelerator answers for any introspector | the runner aborts (exit status 134) | before the first sequence is done, as in step 5: a kept layout holds locations that the introspector at hand does not know. A, 5 tests; T, 7 tests |
+| the accelerator has one answer per introspector, whatever the read | the runner aborts | the same; A, all tests; T, 4 tests |
+| the accelerator: a new introspector starts with the older answers of the one asked before it | the runner aborts | the same; A, "answers stay for the compilation after the one that asked" |
+| the accelerator: the answers of an introspector that stays are never dropped | 0 | A, "of an introspector that stays, the answers that are no longer asked for go" (growth, not a wrong answer) |
+| the accelerator keeps a table for the empty introspectors too | 0 | A, "the answers of the empty introspectors are not a table" (growth, not a wrong answer) |
+
+The count of pinned steps is 18 under every mutation that lets the stage
+finish, but the one named. Of the failing sequences, two of the page
+runs' reads, five of the documents' reads and five of the documents'
+merge are among the three with packages and the five pinned ones.
+Three rows are of copies that no document can reach and that unit tests
+hold; two (`cacheable`, the clone in `kept`) are of guards that nothing
+can reach, and are said to be that.
+
+`scripts/recompile_soak.py --minutes 20` on that tree: 127 documents,
+seeds 9100 to 9107, 21.3 minutes with 12 jobs: 1016 runs, 4920
+sequences, 55 995 steps, 165 729 compilations, 3008 steps compiled again
+as the first compilation of a new process; 0 failures, 0 aborts.
 
 ### How the stores came to be kept
 
