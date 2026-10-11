@@ -1030,11 +1030,16 @@ class BenchDocument:
     appended to the main file: nothing on the pages changes). An edit is
     (file, function of the file's text and a number)."""
 
-    def __init__(self, name, source, main, middle, imported=None, packages=False):
+    def __init__(
+        self, name, source, main, middle, imported=None, packages=False, everything=None
+    ):
         self.name = name
         self.source = source
         self.main = main
         self.packages = packages
+        # For `--bench-memory`: an edit that reaches every page (file,
+        # function), if the document has one that the four above are not.
+        self.everything = everything
         self.edits = {
             "end": (main, edit_end),
             "middle": (main, middle),
@@ -1081,12 +1086,29 @@ def make_deck(directory):
     shutil.copytree(DECK[0], directory, dirs_exist_ok=True)
 
 
+# The size of the text of `bench/long.typ` and `longer.typ`: every
+# paragraph is laid out again.
+PARAGRAPHS = edit_replace("size: 10.5pt)", "size: 10.5%dpt)")
+
+
 def bench_documents():
     docs = os.path.join(ROOT, "tests/recompile/docs")
     packages = os.path.join(ROOT, "tests/packages/docs")
     return [
-        BenchDocument("long", os.path.join(ROOT, "bench/long.typ"), "long.typ", edit_loop),
-        BenchDocument("longer", os.path.join(ROOT, "bench/longer.typ"), "longer.typ", edit_loop),
+        BenchDocument(
+            "long",
+            os.path.join(ROOT, "bench/long.typ"),
+            "long.typ",
+            edit_loop,
+            everything=("long.typ", PARAGRAPHS),
+        ),
+        BenchDocument(
+            "longer",
+            os.path.join(ROOT, "bench/longer.typ"),
+            "longer.typ",
+            edit_loop,
+            everything=("longer.typ", PARAGRAPHS),
+        ),
         BenchDocument(
             "showcase",
             os.path.join(ROOT, "bench/showcase.typ"),
@@ -1150,7 +1172,12 @@ def bench_documents():
             edit_replace("= A tiling of it, handed", "= A tiling of it %d, handed"),
         ),
         BenchDocument(
-            "deck", make_deck, "deck.typ", edit_replace("step 7 of 14.", "step 7 of 14, %d.")
+            "deck",
+            make_deck,
+            "deck.typ",
+            edit_replace("step 7 of 14.", "step 7 of 14, %d."),
+            # The size of the title of every slide.
+            everything=("deck.typ", edit_replace("#text(size: 24pt,", "#text(size: 24.%dpt,")),
         ),
     ]
 
@@ -1255,18 +1282,25 @@ def bench(binaries, edits, extra, sessions=5, only=None, raw=None):
 
 def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
     """The resident set size of a watching process after its first
-    compilation and after 10, 50 and 200 edits, for edits at the end of
-    the main file and for edits in the middle of it (in `long` and `longer`
-    that is every heading), and the greatest size seen after an edit."""
+    compilation and after 10, 50 and 200 edits, and the greatest size seen
+    after an edit, for three kinds of edits: at the end of the main file,
+    in the middle of it (in `long` and `longer` every heading), and one
+    that reaches everything (every paragraph of `long` and `longer`, every
+    slide of the deck, the theme of a package: `everything`, or else the
+    edit of an imported file)."""
     documents = [d for d in bench_documents() if d.name in (only or ["longer", "deck"])]
     print(
-        "| document | binary | edits | first | "
+        "| document | edits | binary | first | "
         + " | ".join(f"after {n}" for n in counts)
         + " | peak |"
     )
     print("| --- | --- | --- | ---: |" + " ---: |" * (len(counts) + 1))
     for document in documents:
-        for kind in ("end", "middle"):
+        kinds = [("at the end", document.edits["end"]), ("in the middle", document.edits["middle"])]
+        reaching = document.everything or document.edits["imported"]
+        if reaching is not None:
+            kinds.append(("everything", reaching))
+        for kind, (name, edit) in kinds:
             for label, command in binaries:
                 own = extra if label == "upstream" else []
                 directory = os.path.realpath(tempfile.mkdtemp(prefix="watch-bench-"))
@@ -1278,13 +1312,17 @@ def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
                     pid = session.proc.pid
                     sizes = [rss_kb(pid)]
                     peak = sizes[0]
-                    name, edit = document.edits[kind]
                     path = os.path.join(directory, name)
                     text = open(path, encoding="utf-8").read()
                     for i in range(max(counts)):
                         start = session.mark()
+                        # (Every edit gives a text that the session has
+                        # not had: nothing of an earlier step comes back.)
                         write(path, edit(text, i + 1))
                         session.wait_compiled(start, timeout=600, quiet=0.3)
+                        status = session.statuses(start)[-1]
+                        if "with errors" in status:
+                            raise Failure(f"{document.name}, {kind}: {session.text(start).decode()}")
                         size = rss_kb(pid)
                         peak = max(peak, size)
                         if i + 1 in counts:
@@ -1292,7 +1330,7 @@ def bench_memory(binaries, extra, only, counts=(10, 50, 200)):
                             log(document.name, kind, label, i + 1, size)
                     cells = " | ".join(f"{size / 1024:.0f} MB" for size in sizes)
                     print(
-                        f"| {document.name} | {label} | {kind} | {cells} | {peak / 1024:.0f} MB |",
+                        f"| {document.name} | {kind} | {label} | {cells} | {peak / 1024:.0f} MB |",
                         flush=True,
                     )
                 finally:

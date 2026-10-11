@@ -23,8 +23,10 @@ cannot do in its own process:
   new process (`recompile --replay=<snapshot>`), and must give the digest
   that the watch loop gave. The references of the stage share their process
   with the loop, so a cache that neither `set_layout_memo_enabled(false)`
-  turns off nor `evict(1)` drops could make all of them wrong together; a
-  new process has no cache.
+  turns off nor `evict(0)` drops could make all of them wrong together; a
+  new process has no cache. (A step that the stage accepted as upstream's
+  watch output, which is not a fresh compilation's, is not compiled
+  again: `as-upstream.txt`.)
 - Aborts. An edit can make the compiler abort where upstream panics, and
   the runner with it. The snapshot without a digest is the one that was
   being compiled; it is compiled again in a new process. If that aborts
