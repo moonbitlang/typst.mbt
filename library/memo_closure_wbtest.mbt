@@ -57,8 +57,12 @@ let memo_test_world : Ref[TrackedWorld?] = { val: None, }
 
 ///|
 /// Start a compilation's memoization for the rest of a test: its stores
-/// and the scope of the world of [memo_engine].
+/// and the scope of the world of [memo_engine]. The stores are the
+/// process's and outlive a compilation, and the tests of this package call
+/// the same functions with the same arguments: a test starts with nothing
+/// (`evict(0)`).
 fn memo_test_begin() -> Unit {
+  evict(0)
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
   let world = wb_engine(Introspector::empty()).world
@@ -217,7 +221,8 @@ test "closure memo: off outside of a compilation and when disabled" {
     memo_call(f, engine, Context::none(), [], body) |> ignore
   })
   assert_eq(runs, 6)
-  // Each compilation has its own results.
+  // A compilation finds what an earlier one computed, until it is evicted.
+  evict(0)
   engine.world.scoped(() => {
     with_layout_memo(() => {
       memo_call(f, engine, Context::none(), [], body) |> ignore
@@ -225,11 +230,36 @@ test "closure memo: off outside of a compilation and when disabled" {
     })
   })
   assert_eq(runs, 7)
-  engine.world.scoped(() => {
-    with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
-  })
-  |> ignore
+  let again = () => {
+    engine.world.scoped(() => {
+      with_layout_memo(() => memo_call(f, engine, Context::none(), [], body))
+    })
+    |> ignore
+  }
+  again()
+  assert_eq(runs, 7)
+  // comemo's ages: found after `max_age` calls of `evict`, which makes it
+  // young again, and gone when it was not found for one more.
+  for _ in 0..<2 {
+    evict(2)
+  }
+  again()
+  assert_eq(runs, 7)
+  for _ in 0..<3 {
+    evict(2)
+  }
+  assert_eq(closure_memo_entries(), 0)
+  assert_eq(closure_store.asked.length(), 0)
+  again()
   assert_eq(runs, 8)
+  // With memoization off nothing is found and nothing is kept.
+  set_layout_memo_enabled(false)
+  again()
+  set_layout_memo_enabled(true)
+  assert_eq(runs, 9)
+  assert_eq(closure_memo_entries(), 1)
+  evict(0)
+  assert_eq(closure_memo_entries(), 0)
 }
 
 ///|

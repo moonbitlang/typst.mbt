@@ -156,17 +156,44 @@ pub fn[T] with_layout_memo(
     sweep_data_hashes()
   }
   compilation_depth.val += 1
-  let result = {
-    errdefer {
-      memo_generation.val = outer
-      compilation_depth.val -= 1
+  let finish = () => {
+    memo_generation.val = outer
+    compilation_depth.val -= 1
+    if compilation_depth.val == 0 {
+      end_compilation_entries()
     }
+  }
+  let result = {
+    errdefer finish()
     f()
   }
-  memo_generation.val = outer
-  compilation_depth.val -= 1
+  finish()
   result
 }
+
+///|
+/// What drops the entries of a store that ended with their compilation
+/// ([MemoKey::compilation]): a store registers itself when it first keeps
+/// such an entry, so a process without host closures has none.
+let compilation_enders : Array[() -> Unit] = []
+
+///|
+/// Called when the outermost compilation ends: the entries whose keys hold
+/// host closures are found by no later compilation ([compilation_finds])
+/// and by nothing outside of one, so they are dropped now and not when
+/// they are old. (A compilation inside another has a number of its own;
+/// the outer one finds its entries again afterwards, so nothing is
+/// dropped before the outermost ends.)
+fn end_compilation_entries() -> Unit {
+  for end in compilation_enders {
+    end()
+  }
+}
+
+///|
+/// The number of [evict] calls: the clock of what is kept with the time of
+/// its last use instead of an age (`ClosureStore.asked`).
+let evictions : Ref[Int] = { val: 0, }
 
 ///|
 /// Evict the caches (upstream `comemo::evict(max_age)`,
@@ -187,6 +214,7 @@ pub fn[T] with_layout_memo(
 /// data that are kept by the identity of the `Bytes` are swept
 /// ([sweep_data_hashes]).
 pub fn evict(max_age : Int) -> Unit {
+  evictions.val += 1
   for evictor in evictors {
     evictor(max_age)
   }
@@ -1085,23 +1113,110 @@ priv struct ClosureEntry {
   sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
   compilation : Int
+  /// The number of [evict] calls since the entry was stored or found
+  /// (comemo's age).
+  mut age : Int
   /// The result.
   output : Value
 }
 
 ///|
-/// The cached closure calls of the current compilation.
+/// The cached closure calls.
+///
+/// An entry outlives its compilation: a later one finds it if the
+/// function, the arguments, the library, the context, the route, the
+/// introspector reads and the world reads are what they were
+/// ([ClosureEntry::matches]). Its lifetime is comemo's
+/// (`comemo/src/memoize.rs`, `CacheData::evict` and `lookup`): every
+/// [evict] makes it older by one, being found makes it young, and it is
+/// dropped when it was not found for more than `max_age` calls. An entry
+/// whose key holds a host closure ends with its compilation
+/// ([MemoKey::compilation]).
 priv struct ClosureStore {
-  mut generation : Int
   /// By the fingerprint of the function and the arguments: what the calls
-  /// computed so far asked of their contexts.
+  /// computed so far asked of their contexts (the `context_read_*` bits),
+  /// and above those bits the number of [evict] calls ([evictions]) when
+  /// the fingerprint was last asked for. A number and not an object with
+  /// an age, so that a call allocates nothing for it; it is written once
+  /// per fingerprint between two calls of [evict]. An entry is only found
+  /// through this table, so the table's time of last use is never older
+  /// than the age of an entry under it.
   mut asked : Map[U128, Int]
   /// By that fingerprint and the parts of the context in `asked`.
   mut entries : Map[U128, Array[ClosureEntry]]
+  /// The keys of the entries that end with their compilation.
+  bound : Array[U128]
+  /// Whether [evict] and the end of a compilation know the store.
+  mut registered : Bool
 }
 
 ///|
-let closure_store : ClosureStore = { generation: 0, asked: {}, entries: {}, }
+let closure_store : ClosureStore = {
+  asked: {},
+  entries: {},
+  bound: [],
+  registered: false,
+}
+
+///|
+/// The bits of a value of `ClosureStore.asked` that are `context_read_*`.
+let closure_asked_bits : Int = 3
+
+///|
+/// comemo's `evict` for the closure calls: every entry gets older by one
+/// and those above `max_age` are dropped, and so is what calls asked of
+/// their contexts for a function and arguments that were not asked for in
+/// more than `max_age` calls.
+fn ClosureStore::evict(self : ClosureStore, max_age : Int) -> Unit {
+  let empty = []
+  for key, entries in self.entries {
+    entries.retain(entry => {
+      entry.age += 1
+      entry.age <= max_age
+    })
+    if entries.is_empty() {
+      empty.push(key)
+    }
+  }
+  for key in empty {
+    self.entries.remove(key)
+  }
+  let now = evictions.val
+  empty.clear()
+  for base, asked in self.asked {
+    if now - (asked >> closure_asked_bits) > max_age {
+      empty.push(base)
+    }
+  }
+  for base in empty {
+    self.asked.remove(base)
+  }
+}
+
+///|
+/// Drops the entries that ended with their compilation
+/// ([end_compilation_entries]).
+fn ClosureStore::end_compilation(self : ClosureStore) -> Unit {
+  for key in self.bound {
+    guard self.entries.get(key) is Some(entries) else { continue }
+    entries.retain(entry => entry.compilation == 0)
+    if entries.is_empty() {
+      self.entries.remove(key)
+    }
+  }
+  self.bound.clear()
+}
+
+///|
+/// The number of closure calls that the store keeps (for tests and
+/// measurements).
+pub fn closure_memo_entries() -> Int {
+  let mut count = 0
+  for _, entries in closure_store.entries {
+    count += entries.length()
+  }
+  count
+}
 
 ///|
 /// The numbers of closure calls that were reused and that were computed
@@ -1454,17 +1569,11 @@ pub fn memoized_closure(
   args : Args,
   f : (Func, Closure, Engine, Context, Args) -> Value raise SourceError,
 ) -> Value raise SourceError {
-  let generation = memo_generation.val
   let world = engine.world
-  if generation == 0 || !world.in_scope() {
+  if memo_generation.val == 0 || !world.in_scope() {
     return f(func, closure, engine, context, args)
   }
   let store = closure_store
-  if store.generation != generation {
-    store.asked.clear()
-    store.entries.clear()
-    store.generation = generation
-  }
   // The fingerprints. Their flags are not those of a fingerprint that may
   // be running around this call.
   let outer_flags = fingerprint_flags.val
@@ -1480,7 +1589,18 @@ pub fn memoized_closure(
   let base = state.finish128()
   let depth = engine.route.depth()
   let parent = engine.introspector.recorder
-  let known = store.asked.get(base)
+  let known = match store.asked.get(base) {
+    Some(asked) => {
+      // Asked for now: young again.
+      let now = evictions.val
+      if asked >> closure_asked_bits != now {
+        store.asked[base] = (asked & ((1 << closure_asked_bits) - 1)) |
+          (now << closure_asked_bits)
+      }
+      Some(asked & ((1 << closure_asked_bits) - 1))
+    }
+    None => None
+  }
   let collecting = traced_files_active()
   if known is Some(asked) {
     let state = SipHasher128::new()
@@ -1498,6 +1618,8 @@ pub fn memoized_closure(
           entry.matches(func, engine, context, args, shift) {
           fingerprint_flags.val = outer_flags
           closure_memo_counts[0] += 1
+          // A hit makes the entry young (comemo: `lookup` stores age 0).
+          entry.age = 0
           // What the call did to its tracked arguments.
           context.reads = context.reads | entry.asked
           note_route_shift(entry.shift_lo - shift, entry.shift_hi - shift)
@@ -1582,18 +1704,15 @@ pub fn memoized_closure(
   finish()
   // A call that read a file that changes during the scope is not kept.
   guard !world_reads.is_volatile() else { return output }
-  // The store may belong to another compilation by now (a nested one).
-  guard store.generation == generation else { return output }
-  let known = store.asked.get(base)
-  let all = match known {
-    Some(known) => known | asked
+  // (Read again: the call may have stored entries for the same function
+  // and arguments, and [evict] may have run.)
+  let all = match store.asked.get(base) {
+    Some(known) => (known & ((1 << closure_asked_bits) - 1)) | asked
     None => asked
   }
-  if known != Some(all) {
-    // Entries under what was asked before are not found again; they are
-    // few (the set only grows, three times at most).
-    store.asked[base] = all
-  }
+  // Entries under what was asked before are not found again; they are
+  // few (the set only grows, three times at most), and they get old.
+  store.asked[base] = all | (evictions.val << closure_asked_bits)
   let outer_flags = fingerprint_flags.val
   fingerprint_flags.val = 0
   let state = SipHasher128::new()
@@ -1650,9 +1769,18 @@ pub fn memoized_closure(
       Some(sink.kept())
     },
     compilation: key.compilation(),
+    age: 0,
     output: kept_value(output),
   }
+  if !store.registered {
+    store.registered = true
+    register_evictor(max_age => store.evict(max_age))
+    compilation_enders.push(() => store.end_compilation())
+  }
   let key = key.hash
+  if entry.compilation != 0 {
+    store.bound.push(key)
+  }
   match store.entries.get(key) {
     Some(entries) => {
       if entries.length() >= memo_max_entries {

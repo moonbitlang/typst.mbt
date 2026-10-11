@@ -3,19 +3,18 @@
 // host closure ends with its compilation, in every store, and a host
 // closure is compared as the object it is also where a closure captured it.
 //
-// The stores are emptied when a compilation starts, so that nothing here
-// can go wrong yet. The tests keep them: they start the next compilation
-// as `with_layout_memo` does and tell the stores that they are its own,
-// which is what a store that outlives its compilation will be (step 5 of
-// slice 1 of the design).
+// The stores outlive their compilation (step 5 of slice 1 of the design),
+// so the rule is what keeps such an entry from a later compilation. The
+// tests start the next compilation as `with_layout_memo` does, without
+// what it does when a compilation ends (dropping these entries,
+// `end_compilation_entries`, which is for memory): what is tested is that
+// an entry that is still there is not found.
 
 ///|
-/// The next compilation, with the entries of the closure store and of the
-/// layout store kept.
+/// The next compilation, with everything that the stores hold.
 fn memo_test_next_compilation() -> Unit {
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
-  closure_store.generation = memo_generation.val
   layout_store.generation = memo_generation.val
 }
 
@@ -108,6 +107,58 @@ test "identity: a closure call with a host closure in its key ends with its comp
 }
 
 ///|
+test "identity: what ends with its compilation is dropped when the outermost compilation ends" {
+  evict(0)
+  let engine = memo_engine()
+  let host = memo_test_host("h", 1)
+  let mut runs = 0
+  let body : ClosureBody = (_, _, _, _, args) => {
+    runs += 1
+    args.expect("value")
+  }
+  let f = memo_test_func(1)
+  let call = (value : Value) => {
+    memo_call(f, engine, Context::none(), [value], body) |> ignore
+  }
+  let hosted = Value::Func(Func::host(host))
+  // (The number of entries, the number of runs.)
+  let seen = []
+  let note = () => seen.push((closure_memo_entries(), runs))
+  engine.world.scoped(() => {
+    with_layout_memo(() => {
+      call(hosted)
+      call(Int(7))
+      note()
+      // A compilation inside: it does not find the outer one's entry for
+      // the host closure, and the outer one finds its own again after it.
+      with_layout_memo(() => {
+        call(hosted)
+        call(Int(7))
+      })
+      note()
+      call(hosted)
+      note()
+    })
+  })
+  @debug.assert_eq(seen, [(2, 2), (3, 3), (3, 3)])
+  // Both are gone with the outermost compilation; what any compilation
+  // may find stays.
+  assert_eq(closure_memo_entries(), 1)
+  assert_eq(closure_store.bound.length(), 0)
+  seen.clear()
+  engine.world.scoped(() => {
+    with_layout_memo(() => {
+      call(Int(7))
+      note()
+      call(hosted)
+      note()
+    })
+  })
+  @debug.assert_eq(seen, [(1, 3), (2, 4)])
+  evict(0)
+}
+
+///|
 test "identity: a layout with a host closure in its key ends with its compilation" {
   memo_test_begin()
   defer memo_test_end()
@@ -161,12 +212,14 @@ test "identity: highlighted raw text under styles with a host closure ends with 
   assert_eq(raw_highlight_cache.length(), 0)
   elem.highlight(engine, StyleChain::empty()) |> ignore
   assert_eq(raw_highlight_cache.length(), 1)
-  // In a compilation it is found by that compilation.
+  // In a compilation it is found by that compilation. (The test's
+  // compilation starts with nothing: `evict(0)`.)
   memo_test_begin()
   defer memo_test_end()
+  assert_eq(raw_highlight_cache.length(), 0)
   let engine = memo_engine()
   let first = elem.highlight(engine, styles)
-  assert_eq(raw_highlight_cache.length(), 2)
+  assert_eq(raw_highlight_cache.length(), 1)
   assert_true(physical_equal(first[0].0, elem.highlight(engine, styles)[0].0))
   // And not by the next, which finds the result that has no host closure
   // in its key (these results are kept by content, with ages).

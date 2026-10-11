@@ -217,6 +217,8 @@ fn read_test(
   f : (ReadTest) -> Unit raise,
   volatile_files? : (@syntax.FileId) -> Bool,
 ) -> Unit raise {
+  // (The stores are the process's: a test starts with nothing.)
+  evict(0)
   memo_counter.val += 1
   memo_generation.val = memo_counter.val
   defer {

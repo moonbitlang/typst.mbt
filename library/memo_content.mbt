@@ -85,10 +85,20 @@ pub fn[T] ContentCache::new() -> ContentCache[T] {
 
 ///|
 /// The result for a key, if there is one. Finding it makes it young again.
+///
+/// Not in a second run of the recording check (`memo_check.mbt`), which
+/// must leave no trace: it evaluates the files that the first run found
+/// evaluated, and a plugin that one of them loads would be asked for in
+/// every compilation and never get old, where upstream's is evicted (the
+/// pinned sequence `plugin` of the `recompile` stage shows the difference:
+/// a kept call returns the module of a plugin that upstream has loaded
+/// again as another).
 pub fn[T] ContentCache::get(self : ContentCache[T], key : U128) -> T? {
   match self.entries.get(key) {
     Some(entry) => {
-      entry.age = 0
+      if !memo_check_running.val {
+        entry.age = 0
+      }
       Some(entry.value)
     }
     None => None
@@ -96,12 +106,16 @@ pub fn[T] ContentCache::get(self : ContentCache[T], key : U128) -> T? {
 }
 
 ///|
-/// Keeps the result for a key, replacing an earlier one.
+/// Keeps the result for a key, replacing an earlier one. (Not in a second
+/// run of the recording check: see [ContentCache::get].)
 pub fn[T] ContentCache::insert(
   self : ContentCache[T],
   key : U128,
   value : T,
 ) -> Unit {
+  if memo_check_running.val {
+    return
+  }
   if !self.registered {
     self.registered = true
     register_evictor(max_age => self.evict(max_age))

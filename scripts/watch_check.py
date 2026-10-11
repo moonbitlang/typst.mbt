@@ -19,8 +19,13 @@ status line of the recompilation and checks
 
 - that the output of every recompilation is, byte for byte, what a fresh
   `typst compile` of the same files gives (a process that compiles again
-  and again must not keep anything from an earlier compilation: sources,
-  imported modules, data files, images, packages, fonts, ...),
+  and again keeps what it computed, and must not take anything for the
+  files as they are now that depends on what they were: sources, imported
+  modules, data files, images, packages, fonts, ...). The one exception is
+  upstream's own: the scenarios `pinned-*` replay the sequences of
+  `tests/recompile/upstream`, documents that compare modules, and there
+  the output must be what upstream's watch wrote, which is not a fresh
+  compilation's at the steps the fixtures say (`scenario_pinned`),
 - that the watcher sees the change at all (in-place writes, files replaced
   by a rename as editors do, removed and recreated files and directories,
   files that appear later), and does not recompile for files that are not
@@ -52,6 +57,7 @@ process after 10, 50 and 200 edits instead.
 """
 
 import argparse
+import json
 import os
 import re
 import shlex
@@ -866,6 +872,55 @@ def scenario_html(r):
     r.step("a change", lambda: write(main, "= HTML\nOther text.\n"), expect="compiled with warnings")
 
 
+PINNED = os.path.join(ROOT, "tests/recompile/upstream")
+
+
+def scenario_pinned(name):
+    """A sequence that is pinned to upstream's watch (`tests/recompile/
+    README.md`, "As upstream's watch"): documents that compare modules,
+    where a recompilation gives something else than a compilation from
+    scratch, in upstream and here (a call that is found again returns the
+    module of an earlier evaluation, and `==` tells it from the module of
+    now). These are the only steps of this script at which the output of a
+    recompilation is not compared with a fresh `typst compile`: it must be,
+    byte for byte, the SVG that the fixture recorded from upstream's
+    watching process (which is the fresh one where the two agree), and with
+    the upstream binary at hand also what that writes now."""
+
+    def scenario(r):
+        with open(os.path.join(PINNED, name + ".json"), encoding="utf-8") as f:
+            steps = json.load(f)["steps"]
+
+        def write_files(step):
+            for path, text in step["files"].items():
+                write(os.path.join(r.dir, path), text.encode())
+            for path, digits in step.get("binary", {}).items():
+                write(os.path.join(r.dir, path), bytes.fromhex(digits))
+
+        write_files(steps[0])
+        r.start(["--ignore-system-fonts"], "out.svg")
+        for i, step in enumerate(steps):
+            if i == 0:
+                r.step("initial compilation", compare=False)
+            else:
+                # Let the watcher see one change, not half of one.
+                time.sleep(0.3)
+                r.step(step["edit"], lambda step=step: write_files(step), compare=False)
+            with open(os.path.join(r.dir, "out.svg"), encoding="utf-8") as f:
+                produced = f.read()
+            if produced != (step["watch"] or step["fresh"]):
+                what = "upstream's watch" if step["watch"] else "a fresh compilation"
+                r.problems.append(
+                    f"step {i} ({step['edit']}): the page is not what {what} gives "
+                    f"({PINNED}/{name}.json)"
+                )
+            # (For the comparison of the two binaries.)
+            label, printed, _ = r.records[-1]
+            r.records[-1] = (label, printed, produced.encode())
+
+    return scenario
+
+
 SCENARIOS = [
     ("main", scenario_main),
     ("data", scenario_data),
@@ -876,6 +931,10 @@ SCENARIOS = [
     ("pages", scenario_pages),
     ("stdin", scenario_stdin),
     ("html", scenario_html),
+] + [
+    ("pinned-" + entry[:-5], scenario_pinned(entry[:-5]))
+    for entry in sorted(os.listdir(PINNED))
+    if entry.endswith(".json")
 ]
 
 

@@ -225,13 +225,15 @@ fn[T, I] MemoStore::set_aside(self : MemoStore[T, I]) -> () -> Unit {
 fn ClosureStore::set_aside(self : ClosureStore) -> () -> Unit {
   let asked = self.asked
   let entries = self.entries
-  let generation = self.generation
+  let bound = self.bound.copy()
   self.asked = {}
   self.entries = {}
+  self.bound.clear()
   () => {
     self.asked = asked
     self.entries = entries
-    self.generation = generation
+    self.bound.clear()
+    self.bound.append(bound)
   }
 }
 

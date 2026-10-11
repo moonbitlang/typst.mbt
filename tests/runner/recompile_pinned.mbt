@@ -35,10 +35,10 @@
 //   document itself).
 //
 // Anything else fails, and every accepted step is counted and printed.
-// The count is part of the verdict ([pinned_as_upstream_expected]): while
-// nothing is kept across compilations the loop gives what a fresh
-// compilation gives at every step, and one accepted step would mean that
-// something is kept.
+// The count is part of the verdict ([pinned_as_upstream_expected]): with
+// closure calls kept across compilations the loop gives upstream's watch
+// output at every step at which that is not a fresh compilation's, and
+// a step less would mean that something is no longer found.
 
 ///|
 /// Where the fixtures are.
@@ -47,13 +47,17 @@ let pinned_dir : String = "tests/recompile/upstream"
 ///|
 /// The number of steps at which a run of all pinned sequences must find
 /// the watch loop giving upstream's watch output instead of a fresh
-/// compilation's. Zero: nothing is kept from one compilation to the next,
-/// so every recompilation is a fresh compilation. The step that keeps the
-/// closure calls (step 5 of slice 1 of `docs/incremental-design.md`) sets
-/// this to the number of steps at which upstream's watch differs from a
-/// fresh compilation, which the run prints (13 with the fixtures of
-/// today): the acceptance is then exercised, or the stage fails.
-let pinned_as_upstream_expected : Int = 0
+/// compilation's: the number of steps at which upstream's watch differs
+/// from a fresh compilation, which the run prints (16 with the fixtures of
+/// today: 4 of `getter`, 2 of `nan`, 7 of `modules`, 3 of `plugin`).
+/// Closure calls are kept from one compilation to the next (step 5 of
+/// slice 1 of `docs/incremental-design.md`), so the port's watch loop
+/// shows what upstream's shows, and the acceptance must be exercised at
+/// every one of these steps or the stage fails: a store that no longer
+/// finds its entries (or a plugin whose module is dropped too early or
+/// too late) gives a fresh compilation's pages at one of them. (It was
+/// zero while nothing was kept.)
+let pinned_as_upstream_expected : Int = 16
 
 ///|
 /// A step of a pinned sequence.

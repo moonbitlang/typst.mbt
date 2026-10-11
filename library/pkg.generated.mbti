@@ -686,6 +686,8 @@ pub let class_elem_body : Int
 
 pub let class_elem_class : Int
 
+pub fn closure_memo_entries() -> Int
+
 pub fn closure_memo_stats() -> (Int, Int)
 
 pub fn colbreak_elem() -> Element
