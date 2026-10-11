@@ -250,6 +250,42 @@ fn grid_test_variants() -> Array[(String, () -> CellGrid)] {
       },
     ),
     (
+      "cell: stroke_overridden on the left",
+      () => {
+        grid_test_with_entry(
+          3,
+          Cell({
+            ..grid_test_cell("c"),
+            stroke_overridden: { ..Sides::splat(false), left: true, },
+          }),
+        )
+      },
+    ),
+    (
+      "cell: stroke_overridden on the right",
+      () => {
+        grid_test_with_entry(
+          3,
+          Cell({
+            ..grid_test_cell("c"),
+            stroke_overridden: { ..Sides::splat(false), right: true, },
+          }),
+        )
+      },
+    ),
+    (
+      "cell: stroke_overridden at the bottom",
+      () => {
+        grid_test_with_entry(
+          3,
+          Cell({
+            ..grid_test_cell("c"),
+            stroke_overridden: { ..Sides::splat(false), bottom: true, },
+          }),
+        )
+      },
+    ),
+    (
       "cell: breakable",
       () => {
         grid_test_with_entry(
@@ -290,6 +326,14 @@ fn grid_test_variants() -> Array[(String, () -> CellGrid)] {
       () => {
         let grid = grid_test_grid()
         header(grid).range = { start: 0, end: 2, }
+        grid
+      },
+    ),
+    (
+      "header: where it starts",
+      () => {
+        let grid = grid_test_grid()
+        header(grid).range = { start: 1, end: 1, }
         grid
       },
     ),

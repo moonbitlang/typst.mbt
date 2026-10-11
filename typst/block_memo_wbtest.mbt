@@ -361,6 +361,134 @@ test "blocks: a block is laid out again under another library" {
 }
 
 ///|
+/// A block of a host with a layout callback of its own (an element has one
+/// callback per kind: this one stands for a rule), laid out as the only
+/// child of a flow from a root locator, on a route of a given depth and
+/// under a given library. Returns the height of the frame in whole points,
+/// or the message of the error.
+fn block_memo_probe(
+  world : ReadingWorld,
+  library : @library.Library,
+  depth : Int,
+  block : @library.Content,
+) -> String {
+  let tracked = @library.TrackedWorld::new(world)
+  let mut route = @library.Route::root()
+  for _ in 0..<depth {
+    route = @library.Route::extend_(route)
+  }
+  let engine : @library.Engine = {
+    world: tracked,
+    library,
+    introspector: @library.Introspector::empty(),
+    traced: @library.Traced::new(),
+    sink: @library.Sink::new(),
+    route,
+  }
+  let size = @library.Axes::new(
+    @library.Abs::pt(100.0),
+    @library.Abs::pt(100.0),
+  )
+  let frame = tracked.scoped(() => {
+    @library.with_layout_memo(() => {
+      @layout.layout_frame(
+        engine,
+        block,
+        @library.Locator::root(),
+        @library.StyleChain::new(library.styles),
+        @library.LayoutRegion::new(size, @library.Axes::splat(false)),
+      )
+    })
+  }) catch {
+    @library.SourceError(errors) => return errors.map(e => e.message).join("; ")
+  }
+  frame.height().to_pt().round().to_int().to_string()
+}
+
+///|
+/// Upstream tracks the route of a block layout; here the whole route is in
+/// the key. In a document the route of a layout is as deep as the layout
+/// is nested, and what is nested differently has another locator, so this
+/// takes a host: one block, one locator, two depths, one of them a level
+/// too deep for the callback.
+test "blocks: a block is laid out for the route it is on" {
+  @library.evict(0)
+  let world = reading_world("")
+  let mut calls = 0
+  let block = @library.BlockElem::single_layouter(
+    @library.PadElem::new(@library.Content::empty()),
+    (_, engine, _, _, _) => {
+      calls += 1
+      @library.at(@syntax.Span::detached(), () => {
+        engine.route.check_layout_depth()
+      })
+      @library.Frame::soft(
+        @library.Axes::new(@library.Abs::pt(10.0), @library.Abs::pt(10.0)),
+      )
+    },
+  ).pack()
+  // The flow is one level below the route it is called on and the block
+  // one below the flow.
+  let deepest = @library.max_layout_depth - 2
+  let found = block_memo_delta(() => {
+    inspect(
+      block_memo_probe(world, world.library, deepest, block),
+      content="10",
+    )
+    inspect(
+      block_memo_probe(world, world.library, deepest, block),
+      content="10",
+    )
+  })
+  assert_eq(calls, 1)
+  assert_eq(found.1, 1)
+  // A level deeper it is another layout, which fails.
+  inspect(
+    block_memo_probe(world, world.library, deepest + 1, block),
+    content="maximum layout depth exceeded",
+  )
+  assert_eq(calls, 2)
+  inspect(block_memo_probe(world, world.library, deepest, block), content="10")
+  assert_eq(calls, 2)
+}
+
+///|
+/// Upstream hashes the library into the key of a block layout; here the
+/// store compares it as an object. A block of a document that can tell two
+/// libraries apart has another key under each (the test above this one's
+/// neighbour, with `sys.inputs`); a callback that asks the library does
+/// not.
+test "blocks: a block whose callback asks the library is laid out per library" {
+  @library.evict(0)
+  let world = reading_world("")
+  let plain = library_builder([])
+    .with_features(@library.Features::none())
+    .build()
+  let mut calls = 0
+  let block = @library.BlockElem::single_layouter(
+    @library.PadElem::new(@library.Content::empty()),
+    (_, engine, _, _, _) => {
+      calls += 1
+      let height = if engine.library.features.is_enabled(Html) {
+        30.0
+      } else {
+        10.0
+      }
+      @library.Frame::soft(
+        @library.Axes::new(@library.Abs::pt(10.0), @library.Abs::pt(height)),
+      )
+    },
+  ).pack()
+  inspect(block_memo_probe(world, world.library, 0, block), content="30")
+  inspect(block_memo_probe(world, plain, 0, block), content="10")
+  assert_eq(calls, 2)
+  // Each finds its own.
+  inspect(block_memo_probe(world, world.library, 0, block), content="30")
+  inspect(block_memo_probe(world, plain, 0, block), content="10")
+  assert_eq(calls, 2)
+}
+
+///|
 /// A warning of the layout of a block is a warning of every compilation
 /// that finds the layout.
 test "blocks: the warnings of a block that is found are reported again" {
