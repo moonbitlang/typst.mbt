@@ -119,7 +119,7 @@ fn convert_pages(
     let page_idx = gc.page_index_converter.pdf_page_index(i)
     let fc = FrameContext::new(
       page_idx,
-      typst_page.frame.size().add_size(bleed.sum_by_axis()),
+      typst_page.frame.size() + bleed.sum_by_axis_size(),
     )
     tags_page(gc, surface, () => {
       handle_frame(
@@ -158,11 +158,11 @@ priv struct State {
   /// The transform of first hard frame in the hierarchy.
   mut container_transform : @library.Transform
   /// The size of the first hard frame in the hierarchy.
-  mut container_size : @library.Axes[@library.Abs]
+  mut container_size : @library.Size
 }
 
 ///|
-fn State::new(size : @library.Axes[@library.Abs]) -> State {
+fn State::new(size : @library.Size) -> State {
   {
     transform: @library.Transform::identity(),
     container_transform: @library.Transform::identity(),
@@ -180,10 +180,7 @@ fn State::copy(self : State) -> State {
 }
 
 ///|
-fn State::register_container(
-  self : State,
-  size : @library.Axes[@library.Abs],
-) -> Unit {
+fn State::register_container(self : State, size : @library.Size) -> Unit {
   self.container_transform = self.transform
   self.container_size = size
 }
@@ -205,10 +202,7 @@ priv struct FrameContext {
 }
 
 ///|
-fn FrameContext::new(
-  page_idx : Int?,
-  size : @library.Axes[@library.Abs],
-) -> FrameContext {
+fn FrameContext::new(page_idx : Int?, size : @library.Size) -> FrameContext {
   { page_idx, states: [State::new(size)], link_annotations: [], }
 }
 
@@ -228,7 +222,7 @@ fn FrameContext::state(self : FrameContext) -> State {
 }
 
 ///|
-fn FrameContext::page_size(self : FrameContext) -> @library.Axes[@library.Abs]? {
+fn FrameContext::page_size(self : FrameContext) -> @library.Size? {
   if self.page_idx is Some(_) {
     Some(self.states[0].container_size)
   } else {
@@ -349,7 +343,7 @@ fn handle_frame(
   }
   if fill is Some(fill) {
     let shape = @library.Geometry::Rect(
-      frame.size().add_size(padding.sum_by_axis()),
+      frame.size() + padding.sum_by_axis_size(),
     ).filled(fill)
     handle_shape(
       fc,

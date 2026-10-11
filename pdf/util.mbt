@@ -31,7 +31,7 @@ fn to_export_point(p : @library.Point) -> @export.Point {
 }
 
 ///|
-fn to_export_size(size : @library.Axes[@library.Abs]) -> @export.Size? {
+fn to_export_size(size : @library.Size) -> @export.Size? {
   @export.Size::from_wh(to_f32(size.x), to_f32(size.y))
 }
 

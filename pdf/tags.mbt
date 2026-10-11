@@ -76,7 +76,7 @@ fn tags_page(
 fn tags_tiling(
   gc : GlobalContext,
   surface : @export.Surface,
-  tiling_size : @library.Axes[@library.Abs],
+  tiling_size : @library.Size,
   f : () -> Unit raise @library.SourceError,
 ) -> Unit raise @library.SourceError {
   if tags_disabled(gc) {
@@ -193,7 +193,7 @@ fn tags_image(
   fc : FrameContext,
   surface : @export.Surface,
   image : @library.Image,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
 ) -> Bool {
   if tags_disabled(gc) {
     return false

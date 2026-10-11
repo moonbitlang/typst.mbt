@@ -113,7 +113,7 @@ pub fn render(
   } else {
     @library.Sides::splat(@library.Abs::zero())
   }
-  let size = page.frame.size().add_size(bleed.sum_by_axis())
+  let size = page.frame.size() + bleed.sum_by_axis_size()
   let pixel_per_pt = Float::from_double(opts.format.ppi) / 72.0
   let pxw = @skia.f32_to_u32(
     @skia.fmax(@skia.roundf(pixel_per_pt * to_f32(size.x)), 1.0),
@@ -192,12 +192,12 @@ priv struct State {
   /// The pixel per point ratio.
   pixel_per_pt : Float
   /// The size of the first hard frame in the hierarchy.
-  size : @library.Axes[@library.Abs]
+  size : @library.Size
 }
 
 ///|
 fn State::new(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   transform : @path.Transform,
   pixel_per_pt : Float,
 ) -> State {
@@ -214,7 +214,7 @@ fn State::pre_translate(self : State, pos : @library.Point) -> State {
 }
 
 ///|
-fn State::pre_scale(self : State, scale : @library.Axes[@library.Abs]) -> State {
+fn State::pre_scale(self : State, scale : @library.Size) -> State {
   {
     ..self,
     transform: self.transform.pre_scale(to_f32(scale.x), to_f32(scale.y)),
@@ -237,7 +237,7 @@ fn State::with_mask(self : State, mask : @skia.Mask?) -> State {
 
 ///|
 /// Sets the size of the first hard frame in the hierarchy.
-fn State::with_size(self : State, size : @library.Axes[@library.Abs]) -> State {
+fn State::with_size(self : State, size : @library.Size) -> State {
   { ..self, size, }
 }
 

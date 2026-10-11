@@ -6,7 +6,7 @@ fn render_image(
   canvas : @skia.Pixmap,
   state : State,
   image : @library.Image,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
 ) -> Unit {
   let ts = state.transform
   let view_width = to_f32(size.x)

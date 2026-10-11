@@ -93,7 +93,7 @@ fn SVGRenderer::push_tiling(
   tiling : @library.Tiling,
   ts : @library.Transform,
 ) -> DedupId {
-  let tiling_size = tiling.size.add_size(tiling.spacing)
+  let tiling_size = tiling.size + tiling.spacing
   let tiling_offset = tiling.offset
   let tiling_angle = tiling.angle
   // Unfortunately due to a limitation of `xmlwriter`, we need to render the
@@ -246,7 +246,7 @@ fn SVGRenderer::write_gradients(self : SVGRenderer, svg : SvgElem) -> Unit {
             ),
           )
           builder.arc(
-            @library.Axes::splat(@library.Abs::pt(1.0)),
+            @library.Size::splat(@library.Abs::pt(1.0)),
             @library.Angle::zero(),
             0,
             1,
@@ -503,7 +503,7 @@ fn SVGRenderer::write_tilings(self : SVGRenderer, svg : SvgElem) -> Unit {
   let defs = svg.elem("defs")
   for entry in self.tilings.iter() {
     let (id, tiling) = entry
-    let size = tiling.size.add_size(tiling.spacing)
+    let size = tiling.size + tiling.spacing
     let pattern = defs
       .elem("pattern")
       .attr("id", id)

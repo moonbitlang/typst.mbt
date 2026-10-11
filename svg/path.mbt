@@ -67,10 +67,7 @@ fn SvgPathBuilder::map(
 ///|
 /// Create a rectangle path. The rectangle is created with the top-left
 /// corner at (0, 0). The width and height are the size of the rectangle.
-fn SvgPathBuilder::rect(
-  self : SvgPathBuilder,
-  size : @library.Axes[@library.Abs],
-) -> Unit {
+fn SvgPathBuilder::rect(self : SvgPathBuilder, size : @library.Size) -> Unit {
   self.move_to(@library.Point::zero())
   self.line_to(@library.Point::with_y(size.y))
   self.line_to(size.to_point())
@@ -82,7 +79,7 @@ fn SvgPathBuilder::rect(
 /// Creates an arc path.
 fn SvgPathBuilder::arc(
   self : SvgPathBuilder,
-  radius : @library.Axes[@library.Abs],
+  radius : @library.Size,
   x_axis_rot : @library.Angle,
   large_arc_flag : UInt,
   sweep_flag : UInt,

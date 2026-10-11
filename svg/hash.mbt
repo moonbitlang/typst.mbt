@@ -40,10 +40,7 @@ fn hash_point(h : @library.SipHasher128, p : @library.Point) -> Unit {
 }
 
 ///|
-fn hash_size(
-  h : @library.SipHasher128,
-  s : @library.Axes[@library.Abs],
-) -> Unit {
+fn hash_size(h : @library.SipHasher128, s : @library.Size) -> Unit {
   hash_abs(h, s.x)
   hash_abs(h, s.y)
 }
