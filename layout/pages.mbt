@@ -47,7 +47,7 @@ pub fn document_memo_entries() -> Int {
 
 ///|
 /// The internal implementation of `layout_document` (memoized like
-/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/mod.rs:53`;
+/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/mod.rs:55`;
 /// see `library/memo_pages.mbt`).
 ///
 /// Upstream hashes the library, the content and the styles, and tracks the
@@ -56,6 +56,10 @@ pub fn document_memo_entries() -> Int {
 /// (which the keys of all layouts hold in full, `library/memo.mbt`) and
 /// the traced span; the library is compared, the world and the
 /// introspector are tracked, and the sink is replayed.
+///
+/// What an entry keeps is a copy of the document, and what the caller
+/// gets, computed or found, is a document whose frames are its own all
+/// the way down (`PagedDocument::kept`, `PagedDocument::owned`).
 fn layout_document_impl(
   engine : @library.Engine,
   content : @library.Content,
@@ -87,7 +91,7 @@ fn layout_document_impl(
     engine => {
       layout_document_common(engine, content, @library.Locator::root(), styles)
     },
-  )
+  ).owned()
 }
 
 ///|
@@ -103,7 +107,7 @@ pub fn layout_document_for_bundle(
 
 ///|
 /// The internal implementation of `layout_document_for_bundle` (memoized
-/// like upstream's, `typst-layout/src/pages/mod.rs:99`).
+/// like upstream's, `typst-layout/src/pages/mod.rs:102`).
 ///
 /// As [layout_document_impl]; upstream tracks the locator besides, and
 /// the key has it resolved, as the keys of all layouts do.
@@ -147,7 +151,7 @@ fn layout_document_for_bundle_impl(
         styles,
       )
     },
-  )
+  ).owned()
 }
 
 ///|

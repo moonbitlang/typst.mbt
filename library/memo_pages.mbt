@@ -1,8 +1,8 @@
 // Memoized page runs and documents (not upstream: the stores behind
 // upstream's `#[comemo::memoize]` on `layout_page_run_impl`,
-// `typst-layout/src/pages/run.rs:75`, and on `layout_document_impl` and
-// `layout_document_for_bundle_impl`, `typst-layout/src/pages/mod.rs:53` and
-// `:99`; `docs/incremental-design.md`, section 8, slice 3).
+// `typst-layout/src/pages/run.rs:78`, and on `layout_document_impl` and
+// `layout_document_for_bundle_impl`, `typst-layout/src/pages/mod.rs:55` and
+// `:102`; `docs/incremental-design.md`, section 8, slice 3).
 //
 // Both go through [memoize], with the rules of `memo.mbt`: an entry is
 // found by the fingerprint of the hashed arguments (the children and the

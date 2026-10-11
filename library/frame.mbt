@@ -88,6 +88,56 @@ pub fn Frame::clone(self : Frame) -> Frame {
 }
 
 ///|
+/// A copy of the frame that shares no frame and no group with it, at any
+/// depth (not upstream, where this is what a clone is: a frame inside a
+/// clone can only be written to through the clone, which copies on the way
+/// down).
+///
+/// [Frame::clone] shares the array of items, and with it the groups in it
+/// and their frames, as objects: writing to the copy through its own
+/// methods copies first, but a group that is taken out of
+/// [Frame::items] is the group of both, and so is its frame. That is
+/// right for a frame that moves on inside the engine, and it is not what
+/// may be handed to a holder that the engine does not know (a host with a
+/// document, `layout/document.mbt`): after this, whatever such a holder
+/// does to the frame, to a group in it or to a frame further down is done
+/// to objects of its own. What the items hold besides frames (the glyphs
+/// of a text, the curve of a shape, an image, the content of a tag) is
+/// shared, as everywhere: items are values, and nothing writes to them.
+pub fn Frame::deep_clone(self : Frame) -> Frame {
+  let items = self.items
+  let mut groups = false
+  for i in 0..<items.length() {
+    if items[i].1 is Group(_) {
+      groups = true
+      break
+    }
+  }
+  // Without a group there is nothing below to own: a clone, whose first
+  // write copies the items.
+  if !groups {
+    return self.clone()
+  }
+  {
+    size: self.size,
+    baseline: self.baseline,
+    items: items.map(deep_clone_entry),
+    shared: false,
+    kind: self.kind,
+  }
+}
+
+///|
+/// The entry with a group of its own, if it holds one ([Frame::deep_clone]).
+fn deep_clone_entry(entry : (Point, FrameItem)) -> (Point, FrameItem) {
+  match entry.1 {
+    Group(group) =>
+      (entry.0, Group({ ..group, frame: group.frame.deep_clone(), }))
+    _ => entry
+  }
+}
+
+///|
 /// Sets the frame's hardness.
 pub fn Frame::set_kind(self : Frame, kind : FrameKind) -> Unit {
   self.kind = kind

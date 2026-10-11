@@ -64,7 +64,7 @@ pub fn page_run_memo_entries() -> Int {
 
 ///|
 /// The internal implementation of `layout_page_run` (memoized like
-/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/run.rs:75`;
+/// upstream's `#[comemo::memoize]`, `typst-layout/src/pages/run.rs:78`;
 /// see `library/memo_pages.mbt`).
 ///
 /// Upstream hashes the library, the children and the initial styles, and

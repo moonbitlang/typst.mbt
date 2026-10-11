@@ -431,6 +431,102 @@ test "pages: what a caller writes to the pages of a run it was handed is not wri
 }
 
 ///|
+/// Writes to every group of a frame and to the frames inside them, as a
+/// holder that takes the groups out of `Frame::items`: the transform, the
+/// clip and the label of each, and the innermost frames are emptied.
+/// Returns the number of groups and the greatest depth.
+fn scribble_groups(frame : @library.Frame, depth : Int) -> (Int, Int) {
+  let mut groups = 0
+  let mut deepest = depth
+  for entry in frame.items() {
+    guard entry.1 is Group(group) else { continue }
+    let (inside, below) = scribble_groups(group.frame, depth + 1)
+    groups += 1 + inside
+    if below > deepest {
+      deepest = below
+    }
+    group.transform = @library.Transform::translate(
+      @library.Abs::pt(3.0),
+      @library.Abs::pt(4.0),
+    )
+    group.clip = Some(
+      @library.Curve::rect(
+        @library.Axes::new(@library.Abs::pt(1.0), @library.Abs::pt(1.0)),
+      ),
+    )
+    group.label = @library.Label::new("scribbled")
+    if inside == 0 {
+      group.frame.clear()
+    }
+  }
+  (groups, deepest)
+}
+
+///|
+test "pages: what a caller writes to a group inside a page it was handed is written to no kept layout" {
+  // A copy-on-write clone of a frame shares its groups with what it was
+  // cloned from, and the frames of a document are clones of the frames
+  // that the entries of the document, of its page runs and of its blocks
+  // keep. The document that a caller gets has groups and frames of its own
+  // at every depth.
+  let nested = "#c.step()\n#block(clip: true, inset: 2pt, rotate(10deg, block(clip: true, inset: 2pt, rect(width: 10pt, height: 10pt))))\n"
+  let source = (first : String) => {
+    "#set page(width: 100pt, height: 100pt, margin: 10pt)\n" +
+    "#let c = counter(\"c\")\n" +
+    first +
+    "\n#rect(width: 30pt, height: 30pt)\n#pagebreak()\n" +
+    nested +
+    "#pagebreak()\n" +
+    "#block(context metadata(\"final \" + str(c.final().first())))\n"
+  }
+  @library.evict(0)
+  let world = pages_world(source("#c.step()"))
+  // The document of a computation.
+  let first = world.step().document()
+  let pristine = document_prints(first)
+  let (groups, depth) = scribble_groups(first.pages()[1].frame, 0)
+  inspect("\{groups} groups, \{depth} deep", content="3 groups, 3 deep")
+  for page in first.pages() {
+    scribble_groups(page.frame, 0) |> ignore
+  }
+  assert_false(document_prints(first)[1] == pristine[1])
+  // The document that is found is what was laid out, and writing to it
+  // changes nothing for the next one.
+  let second = world.step()
+  inspect(
+    second.counts,
+    content="documents: 2 found, 0 computed; page runs: 0 found, 0 computed",
+  )
+  let second = second.document()
+  assert_eq(document_prints(second), pristine)
+  for page in second.pages() {
+    scribble_groups(page.frame, 0) |> ignore
+  }
+  assert_eq(document_prints(world.step().document()), pristine)
+  // Another first run: the document is laid out, the run of the second
+  // page is found, with the frames it had; and the same once more for the
+  // blocks of that page (their fragments are kept layouts too), whose run
+  // is laid out again when its first child changes.
+  world.edit(source("#c.step()\n#c.step()"))
+  let third = world.step()
+  inspect(
+    third.counts,
+    content="documents: 0 found, 2 computed; page runs: 4 found, 2 computed",
+  )
+  let third = third.document()
+  assert_eq(document_prints(third)[1], pristine[1])
+  for page in third.pages() {
+    scribble_groups(page.frame, 0) |> ignore
+  }
+  world.edit(source("#c.step()\n#c.step()\n#c.step()"))
+  let fourth = world.step().document()
+  assert_eq(document_prints(fourth)[1], pristine[1])
+  // What compilations from scratch give.
+  let after = document_prints(fourth)
+  assert_eq(world.scratch(), after)
+}
+
+///|
 test "pages: a document that is found says what its layout said" {
   // A delayed error of a block's `context`, and a warning: the sink of
   // the layout, which a hit replays.

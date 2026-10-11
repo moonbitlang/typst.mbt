@@ -6658,6 +6658,7 @@ pub fn Frame::clear(Self) -> Unit
 pub fn Frame::clear_baseline(Self) -> Unit
 pub fn Frame::clip(Self, Curve) -> Unit
 pub fn Frame::clone(Self) -> Self
+pub fn Frame::deep_clone(Self) -> Self
 pub fn Frame::descent(Self) -> Abs
 pub fn Frame::fill(Self, Paint) -> Unit
 pub fn Frame::hard(Axes[Abs]) -> Self
