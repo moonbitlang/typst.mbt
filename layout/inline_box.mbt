@@ -7,7 +7,7 @@ pub fn layout_box(
   engine : @library.Engine,
   locator : @library.Locator,
   styles : @library.StyleChain,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
 ) -> @library.Frame raise @library.SourceError {
   // Fetch sizing properties.
   let width = elem.width(styles)
@@ -27,7 +27,7 @@ pub fn layout_box(
   let frame = match elem.body(styles) {
     // If we have no body, just create an empty frame. If necessary, its
     // size will be adjusted below.
-    None => @library.Frame::hard(@library.Axes::zero_size())
+    None => @library.Frame::hard(@library.Size::zero())
 
     // If we have a child, layout it into the body. Boxes are boundaries for
     // gradient relativeness, so we set the `FrameKind` to `Hard`.
@@ -37,7 +37,7 @@ pub fn layout_box(
 
   // Enforce a correct frame size on the expanded axes. Do this before
   // applying the inset, since the pod shrunk.
-  frame.set_size(pod.expand.select(pod.size, frame.size()))
+  frame.set_size(pod.expand.select_size(pod.size, frame.size()))
 
   // Apply the inset.
   if !inset.is_zero() {

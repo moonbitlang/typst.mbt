@@ -63,7 +63,7 @@ priv struct GridLayouter {
 /// on each region break.
 priv struct Current {
   /// The initial size of the current region before we started subtracting.
-  mut initial : @library.Axes[@library.Abs]
+  mut initial : @library.Size
   /// The height of the region after repeated headers were placed and footers
   /// prepared. This also includes pending repeating headers from the start,
   /// even if they were not repeated yet, since they will be repeated in the
@@ -904,7 +904,7 @@ fn GridLayouter::render_fills_strokes(self : GridLayouter) -> @library.Fragment 
               // cell's width.
               pos = { ..pos, x: self.width - (dx + width), }
             }
-            let size = @library.Axes::new(width, height)
+            let size = @library.Size::new(width, height)
             let rect = @library.Geometry::Rect(size).filled(fill)
             fills.push((pos, @library.FrameItem::Shape(rect, self.span)))
           }
@@ -1087,7 +1087,7 @@ fn GridLayouter::measure_auto_columns(
       // used above to not expand the last auto column spanned by a
       // cell if it spans all fractional columns in a finite region.
       let already_covered_width = self.cell_spanned_width(cell, parent.x)
-      let size = @library.Axes::new(available, height)
+      let size = @library.Size::new(available, height)
       let pod = @library.LayoutRegion::new(size, @library.Axes::splat(false))
       let locator = self.cell_locator(parent, 0)
       let frame = layout_cell(
@@ -1302,7 +1302,7 @@ fn GridLayouter::measure_auto_row(
     let measurement_data = self.prepare_auto_row_cell_measurement(
       parent, cell, breakable, row_group_data,
     )
-    let size = @library.Axes::new(
+    let size = @library.Size::new(
       measurement_data.width,
       measurement_data.height,
     )
@@ -1467,14 +1467,14 @@ fn GridLayouter::layout_single_row(
   if !height.is_finite() {
     @library.bail_at(self.span, "cannot create grid with infinite height")
   }
-  let output = @library.Frame::soft(@library.Axes::new(self.width, height))
+  let output = @library.Frame::soft(@library.Size::new(self.width, height))
   let mut offset = @library.Point::zero()
   for x, rcol in self.rcols {
     if self.grid.cell(x, y) is Some(cell) {
       // Rowspans have a separate layout step
       if cell.rowspan == 1 {
         let width = self.cell_spanned_width(cell, x)
-        let size = @library.Axes::new(width, height)
+        let size = @library.Size::new(width, height)
         let mut pod = @library.Regions::from_region(
           @library.LayoutRegion::new(size, @library.Axes::splat(true)),
         )
@@ -1518,11 +1518,11 @@ fn GridLayouter::layout_multi_row(
 ) -> @library.Fragment raise @library.SourceError {
   // Prepare frames.
   let outputs = heights.map(h => {
-    @library.Frame::soft(@library.Axes::new(self.width, h))
+    @library.Frame::soft(@library.Size::new(self.width, h))
   })
 
   // Prepare regions.
-  let size = @library.Axes::new(self.width, heights[0])
+  let size = @library.Size::new(self.width, heights[0])
   let mut pod = @library.Regions::from_region(
     @library.LayoutRegion::new(size, @library.Axes::splat(true)),
   )
@@ -1666,7 +1666,7 @@ fn GridLayouter::finish_region(
 
   // Determine the size of the grid in this region, expanding fully if
   // there are fr rows.
-  let mut size = @library.Axes::new(
+  let mut size = @library.Size::new(
     self.width.min(self.current.initial.x),
     used.min(self.current.initial.y),
   )

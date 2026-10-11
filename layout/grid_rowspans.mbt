@@ -124,7 +124,7 @@ fn GridLayouter::layout_rowspan(
   let dx = if self.is_rtl { self.width - (dx + width) } else { dx }
 
   // Prepare regions.
-  let size = @library.Axes::new(width, first_height)
+  let size = @library.Size::new(width, first_height)
   let mut pod = @library.Regions::from_region(
     @library.LayoutRegion::new(size, @library.Axes::splat(true)),
   )
@@ -415,7 +415,7 @@ fn GridLayouter::prepare_auto_row_cell_measurement(
       // but we will only find that out after measurement, and if
       // that happens, we discard the measurement and try again.
       let mapped_regions = self.regions.map(size => {
-        @library.Axes::new(
+        @library.Size::new(
           size.x,
           size.y -
           self.current.repeating_header_height -

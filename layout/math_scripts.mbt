@@ -78,7 +78,7 @@ fn layout_primes(
   }
   let prime = MathFragment::Glyph(prime).into_frame()
   let width = prime.width().times((item.count + 1).to_double()).div_by(2.0)
-  let frame = @library.Frame::soft(@library.Axes::new(width, prime.height()))
+  let frame = @library.Frame::soft(@library.Size::new(width, prime.height()))
   frame.set_baseline(prime.ascent())
   for i in 0..<item.count {
     frame.push_frame(
@@ -191,7 +191,7 @@ fn layout_attachments(
   let b_x = pre_width - b_pre_width
 
   // Create the final frame.
-  let frame = @library.Frame::soft(@library.Axes::new(width, height))
+  let frame = @library.Frame::soft(@library.Size::new(width, height))
   frame.set_baseline(ascent)
   frame.push_frame(@library.Point::new(base_x, base_y), base.into_frame())
   let layout = (

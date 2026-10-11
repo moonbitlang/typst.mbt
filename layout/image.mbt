@@ -28,13 +28,13 @@ pub fn layout_image(
     region.size
   } else if region.expand.x {
     // If just width is forced, take it.
-    @library.Axes::new(
+    @library.Size::new(
       region.size.x,
       region.size.y.min(region.size.x.div_by(px_ratio)),
     )
   } else if region.expand.y {
     // If just height is forced, take it.
-    @library.Axes::new(
+    @library.Size::new(
       region.size.x.min(region.size.y.times(px_ratio)),
       region.size.y,
     )
@@ -47,7 +47,7 @@ pub fn layout_image(
     let natural = @library.Axes::new(pxw, pxh).map(v => {
       @library.Abs::inches(v / dpi)
     })
-    @library.Axes::new(
+    @library.Size::new(
       natural.x.min(region.size.x).min(region.size.y.times(px_ratio)),
       natural.y.min(region.size.y).min(region.size.x.div_by(px_ratio)),
     )
@@ -58,9 +58,9 @@ pub fn layout_image(
   let fitted = match fit {
     Cover | Contain =>
       if wide == (fit == Contain) {
-        @library.Axes::new(target.x, target.x.div_by(px_ratio))
+        @library.Size::new(target.x, target.x.div_by(px_ratio))
       } else {
-        @library.Axes::new(target.y.times(px_ratio), target.y)
+        @library.Size::new(target.y.times(px_ratio), target.y)
       }
     Stretch => target
   }

@@ -46,7 +46,7 @@ fn layout_fraction(
     let line_width = num.width().max(denom.width())
     let width = line_width + item.padding.at(size).times(2.0)
     let height = num.height() + num_gap + thickness + denom_gap + denom.height()
-    let size = @library.Axes::new(width, height)
+    let size = @library.Size::new(width, height)
     let num_pos = @library.Point::with_x((width - num.width()).div_by(2.0))
     let line_pos = @library.Point::new(
       (width - line_width).div_by(2.0),
@@ -64,7 +64,7 @@ fn layout_fraction(
     let text_fill = @library.TextElem::fill_in(styles).as_decoration()
     let line = match @library.TextElem::stroke_in(styles) {
       Some(stroke) =>
-        @library.Geometry::Rect(@library.Axes::new(line_width, thickness)).filled_and_stroked(
+        @library.Geometry::Rect(@library.Size::new(line_width, thickness)).filled_and_stroked(
           text_fill,
           stroke.resolve(styles).unwrap_or_default(),
         )
@@ -95,7 +95,7 @@ fn layout_fraction(
     let width = num.width().max(denom.width()) +
       item.padding.at(size).times(2.0)
     let height = num.height() + gap.max(gap_min) + denom.height()
-    let size = @library.Axes::new(width, height)
+    let size = @library.Size::new(width, height)
     let num_pos = @library.Point::with_x((width - num.width()).div_by(2.0))
     let denom_pos = @library.Point::new(
       (width - denom.width()).div_by(2.0),
@@ -177,7 +177,7 @@ fn layout_skewed_fraction(
 
   // Build the final frame
   let fraction_frame = @library.Frame::soft(
-    @library.Axes::new(fraction_width, fraction_height),
+    @library.Size::new(fraction_width, fraction_height),
   )
 
   // Baseline (use axis height to center slash on the axis)

@@ -135,7 +135,7 @@ fn collect_inline(
   engine : @library.Engine,
   locator : @library.SplitLocator,
   config : InlineConfig,
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
 ) -> (String, Array[Segment], SpanMapper) raise @library.SourceError {
   let collector = InlineCollector::new()
   let quoter = @library.SmartQuoter::new()

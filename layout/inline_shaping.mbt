@@ -556,7 +556,7 @@ fn ShapedText::build(
   extra_justification : @library.Abs,
 ) -> @library.Frame {
   let (top, bottom) = self.measure(engine)
-  let size = @library.Axes::new(self.width(), top + bottom)
+  let size = @library.Size::new(self.width(), top + bottom)
   let mut offset = @library.Abs::zero()
   let frame = @library.Frame::soft(size)
   frame.set_baseline(top)

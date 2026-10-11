@@ -87,7 +87,7 @@ fn modify_frame(
     let mut size = frame.size()
     if link_box_outset is Some(outset) {
       pos = @library.Point::new(pos.x - outset.left, pos.y - outset.top)
-      size = size.add_size(outset.sum_by_axis())
+      size = size + outset.sum_by_axis_size()
     }
     frame.push(pos, Link(dest, size))
   }

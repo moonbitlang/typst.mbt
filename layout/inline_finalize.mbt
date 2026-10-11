@@ -6,7 +6,7 @@ fn finalize(
   engine : @library.Engine,
   p : Preparation,
   lines : Array[Line],
-  region : @library.Axes[@library.Abs],
+  region : @library.Size,
   expand : Bool,
   locator : @library.SplitLocator,
 ) -> @library.Fragment raise @library.SourceError {

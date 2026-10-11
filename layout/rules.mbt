@@ -322,7 +322,7 @@ fn heading_rule(
     let align = @library.AlignElem::alignment_in(styles).resolve(styles)
     if hanging_indent is Auto && align.x == Start {
       let pod = @library.LayoutRegion::new(
-        @library.Axes::splat(@library.Abs::inf()),
+        @library.Size::splat(@library.Abs::inf()),
         @library.Axes::splat(false),
       )
 

@@ -16,7 +16,7 @@ fn distribute(
     composer,
     regions,
     items: [],
-    used: @library.Axes::zero_size(),
+    used: @library.Size::zero(),
     target: balancing_target,
     sticky: None,
     stickable: None,
@@ -44,7 +44,7 @@ priv struct Distributor {
   /// Already laid out items, not yet aligned.
   items : Array[Item]
   /// Size used by laid out items.
-  mut used : @library.Axes[@library.Abs]
+  mut used : @library.Size
   /// The target height for column balancing.
   target : @library.Abs?
   /// A snapshot which can be restored to migrate a suffix of sticky blocks to
@@ -77,7 +77,7 @@ priv struct Distributor {
 priv struct DistributionSnapshot {
   work : Work
   items : Int
-  used : @library.Axes[@library.Abs]
+  used : @library.Size
 }
 
 ///|
@@ -102,7 +102,7 @@ fn Item::migratable(self : Item) -> Bool {
   match self {
     Tag(_) => true
     Frame(frame, _) =>
-      frame.size().is_zero_size() &&
+      frame.size().is_zero() &&
       frame.items().iter().all(entry => entry.1 is (Link(_, _) | Tag(_)))
     Placed(_, placed) => !placed.float
     _ => false
@@ -638,7 +638,7 @@ fn Distributor::finalize(
       guard item is Fr(v, _, Some(single)) else { continue }
       let length = v.share(frs, fr_space)
       let pod = @library.LayoutRegion::new(
-        @library.Axes::new(region.size.x, length),
+        @library.Size::new(region.size.x, length),
         region.expand,
       )
       let frame = single.layout(self.composer.engine, pod)
@@ -656,7 +656,7 @@ fn Distributor::finalize(
   }
 
   // Determine the region's size.
-  let size = region.expand.select(region.size, self.used.min(region.size))
+  let size = region.expand.select_size(region.size, self.used.min(region.size))
   let free = size.y - self.used.y
   let output = @library.Frame::soft(size)
   let mut ruler : @library.FixedAlignment = Start

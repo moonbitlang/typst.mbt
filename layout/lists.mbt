@@ -345,7 +345,7 @@ fn measure_markers(
       marker_locator.relayout(),
       styles,
       @library.LayoutRegion::new(
-        @library.Axes::new(available_width, @library.Abs::inf()),
+        @library.Size::new(available_width, @library.Abs::inf()),
         @library.Axes::splat(false),
       ),
     )
@@ -384,7 +384,7 @@ fn measure_bodies(
       body_locator.relayout(),
       styles,
       @library.LayoutRegion::new(
-        @library.Axes::new(available_width, @library.Abs::inf()),
+        @library.Size::new(available_width, @library.Abs::inf()),
         @library.Axes::splat(false),
       ),
     )
@@ -415,7 +415,7 @@ fn layout_item(
   )
   let mut marker = layouter.layout_marker(
     @library.LayoutRegion::new(
-      @library.Axes::new(list.marker_width, regions.base().y),
+      @library.Size::new(list.marker_width, regions.base().y),
       @library.Axes::new(true, false),
     ),
     engine,
@@ -606,7 +606,7 @@ fn ItemLayouter::vertical_align(
     None => marker.height()
   }
   let region = @library.LayoutRegion::new(
-    @library.Axes::new(self.list.marker_width, height),
+    @library.Size::new(self.list.marker_width, height),
     @library.Axes::splat(true),
   )
   self.layout_marker(region, engine)
@@ -635,7 +635,7 @@ fn ItemLayouter::finish(
       // it will be placed.
       height = height.max(marker.height() + self.marker_offset.y)
     }
-    let frame = @library.Frame::soft(@library.Axes::new(width, height))
+    let frame = @library.Frame::soft(@library.Size::new(width, height))
     let mut body_pos = self.body_offset
     if self.list.is_rtl {
       // In RTL, items expand to the left, thus the position must

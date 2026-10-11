@@ -14,8 +14,8 @@ pub fn layout_repeat(
     @library.Axes::new(false, false),
   )
   let piece = layout_frame(engine, elem.body(), locator, styles, pod)
-  let size = @library.Axes::new(region.size.x, piece.height())
-  if !size.is_finite_size() {
+  let size = @library.Size::new(region.size.x, piece.height())
+  if !size.is_finite() {
     @library.bail_at(elem.pack().span(), "repeat with no size restrictions")
   }
   let frame = @library.Frame::soft(size)

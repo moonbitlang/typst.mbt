@@ -58,9 +58,9 @@ fn layout_page_run(
     Custom(l) => l.resolve(styles)
     Auto => @library.Abs::inf()
   }
-  let mut size = @library.Axes::new(width, height)
+  let mut size = @library.Size::new(width, height)
   if @library.PageElem::flipped_in(styles) {
-    size = @library.Axes::new(size.y, size.x)
+    size = @library.Size::new(size.y, size.x)
   }
   let mut min = width.min(height)
   if !min.is_finite() {
@@ -150,13 +150,13 @@ fn layout_page_run(
   }
 
   // Layout the children.
-  let area = size.sub_size(margin.sum_by_axis())
+  let area = size - margin.sum_by_axis_size()
   let fragment = layout_flow(
     engine,
     children,
     locator,
     styles,
-    @library.Regions::repeat(area, area.map(@library.Abs::is_finite)),
+    @library.Regions::repeat(area, area.map_axes(@library.Abs::is_finite)),
     {
       count: @library.PageElem::columns_in(styles).0.to_int(),
       balanced: @library.ColumnsElem::balanced_in(styles),
@@ -169,7 +169,7 @@ fn layout_page_run(
   // Layouts a single marginal.
   let layout_marginal = (
     content : @library.Content?,
-    area : @library.Axes[@library.Abs],
+    area : @library.Size,
     align : @library.Alignment,
   ) => {
     guard content is Some(content) else { return None }
@@ -191,18 +191,17 @@ fn layout_page_run(
   let footer = footer.map(f => f.artifact(Footer))
   let background = background.map(b => b.artifact(Background))
   for inner in fragment.into_frames() {
-    let header_size = @library.Axes::new(
+    let header_size = @library.Size::new(
       inner.width(),
       margin.top - header_ascent,
     )
-    let footer_size = @library.Axes::new(
+    let footer_size = @library.Size::new(
       inner.width(),
       margin.bottom - footer_descent,
     )
-    let full_size = inner
-      .size()
-      .add_size(margin.sum_by_axis())
-      .add_size(bleed.sum_by_axis())
+    let full_size = inner.size() +
+      margin.sum_by_axis_size() +
+      bleed.sum_by_axis_size()
     let mid : @library.Alignment = Both(Center, Horizon)
     let header = layout_marginal(header, header_size, V(Bottom))
     let footer = layout_marginal(footer, footer_size, V(Top))

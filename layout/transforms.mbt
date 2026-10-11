@@ -32,11 +32,11 @@ pub fn layout_rotate(
   let align = elem.origin(styles).resolve(styles)
 
   // Compute the new region's approximate size.
-  let is_finite = region.size.is_finite_size()
+  let is_finite = region.size.is_finite()
   let size = if is_finite {
     compute_bounding_box(region.size, @library.Transform::rotate(-angle)).1
   } else {
-    @library.Axes::splat(@library.Abs::inf())
+    @library.Size::splat(@library.Abs::inf())
   }
   measure_and_layout(
     engine,
@@ -104,14 +104,11 @@ fn resolve_scale(
   elem : @library.ScaleElem,
   engine : @library.Engine,
   locator : @library.Locator,
-  container : @library.Axes[@library.Abs],
+  container : @library.Size,
   styles : @library.StyleChain,
 ) -> @library.Axes[@library.Ratio] raise @library.SourceError {
   // The size of the body, laid out lazily (once).
-  let mut size : Result[
-    @library.Axes[@library.Abs],
-    Array[@library.SourceDiagnostic],
-  ]? = None
+  let mut size : Result[@library.Size, Array[@library.SourceDiagnostic]]? = None
   let body_size = () => {
     match size {
       Some(result) => result
@@ -184,10 +181,10 @@ pub fn layout_skew(
   let align = elem.origin(styles).resolve(styles)
 
   // Compute the new region's approximate size.
-  let size = if region.size.is_finite_size() {
+  let size = if region.size.is_finite() {
     compute_bounding_box(region.size, @library.Transform::skew(ax, ay)).1
   } else {
-    @library.Axes::splat(@library.Abs::inf())
+    @library.Size::splat(@library.Abs::inf())
   }
   measure_and_layout(
     engine,
@@ -209,7 +206,7 @@ fn measure_and_layout(
   engine : @library.Engine,
   locator : @library.Locator,
   region : @library.LayoutRegion,
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   styles : @library.StyleChain,
   body : @library.Content,
   transform : @library.Transform,
@@ -228,7 +225,7 @@ fn measure_and_layout(
       @library.Axes::splat(true),
     )
     let frame = layout_frame(engine, body, locator, styles, pod)
-    let { x, y, } = align.zip_map(
+    let { x, y, } = align.zip_map_size(
       frame.size(),
       @library.FixedAlignment::position,
     )
@@ -277,7 +274,7 @@ fn measure_and_layout(
   } else {
     // Layout the body.
     let frame = layout_frame(engine, body, locator, styles, region)
-    let { x, y, } = align.zip_map(
+    let { x, y, } = align.zip_map_size(
       frame.size(),
       @library.FixedAlignment::position,
     )
@@ -296,9 +293,9 @@ fn measure_and_layout(
 ///|
 /// Computes the bounding box and offset of a transformed area.
 fn compute_bounding_box(
-  size : @library.Axes[@library.Abs],
+  size : @library.Size,
   ts : @library.Transform,
-) -> (@library.Point, @library.Axes[@library.Abs]) {
+) -> (@library.Point, @library.Size) {
   let top_left = @library.Point::zero().transform_inf(ts)
   let top_right = @library.Point::with_x(size.x).transform_inf(ts)
   let bottom_left = @library.Point::with_y(size.y).transform_inf(ts)
@@ -315,6 +312,6 @@ fn compute_bounding_box(
   let height = max_y - min_y
   (
     @library.Point::new(-min_x, -min_y),
-    @library.Axes::new(width.abs(), height.abs()),
+    @library.Size::new(width.abs(), height.abs()),
   )
 }

@@ -40,7 +40,7 @@ fn finalize_page(
   }
 
   // Create a frame for the full page.
-  let frame = @library.Frame::hard(inner.size().add_size(margin.sum_by_axis()))
+  let frame = @library.Frame::hard(inner.size() + margin.sum_by_axis_size())
 
   // Add tags.
   for tag in tags {

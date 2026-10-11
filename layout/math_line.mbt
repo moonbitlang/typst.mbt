@@ -39,7 +39,7 @@ fn layout_math_line(
   }
   let width = content.width()
   let height = content.height() + extra_height
-  let size = @library.Axes::new(width, height)
+  let size = @library.Size::new(width, height)
   let line_width = width + line_adjust
   let content_text_like = content.is_text_like()
   let content_italics_correction = content.italics_correction()
@@ -49,7 +49,7 @@ fn layout_math_line(
   let text_fill = @library.TextElem::fill_in(styles).as_decoration()
   let line = match @library.TextElem::stroke_in(styles) {
     Some(stroke) =>
-      @library.Geometry::Rect(@library.Axes::new(line_width, thickness)).filled_and_stroked(
+      @library.Geometry::Rect(@library.Size::new(line_width, thickness)).filled_and_stroked(
         text_fill,
         stroke.resolve(styles).unwrap_or_default(),
       )

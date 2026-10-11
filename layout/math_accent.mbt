@@ -61,7 +61,7 @@ fn layout_accent(
     let base_pos = @library.Point::with_x(base_x)
     (gap, accent_pos, base_pos)
   }
-  let size = @library.Axes::new(width, accent.height() + gap + base.height())
+  let size = @library.Size::new(width, accent.height() + gap + base.height())
   let baseline = base_pos.y + base.ascent()
   let base_text_like = !item.exact_frame_width && base.is_text_like()
   let base_italics_correction = base.italics_correction()

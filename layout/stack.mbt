@@ -116,7 +116,7 @@ priv struct StackLayouter {
   /// Whether the stack itself should expand to fill the region.
   expand : @library.Axes[Bool]
   /// The initial size of the current region before we started subtracting.
-  mut initial : @library.Axes[@library.Abs]
+  mut initial : @library.Size
   /// The generic size used by the frames for the current region.
   mut used : GenericSize
   /// The sum of fractions in the current region.
@@ -293,7 +293,7 @@ fn StackLayouter::finish_region(
   // Determine the size of the stack in this region depending on whether the
   // region expands.
   let mut size = self.expand
-    .select(self.initial, self.used.into_axes(self.axis))
+    .select_size(self.initial, self.used.into_axes(self.axis))
     .min(self.initial)
 
   // Expand fully if there are fr spacings.
@@ -303,7 +303,7 @@ fn StackLayouter::finish_region(
     self.used = { ..self.used, main: full, }
     size = size.with_axis_value(self.axis, full)
   }
-  if !size.is_finite_size() {
+  if !size.is_finite() {
     @library.bail_at(self.span, "stack spacing is infinite")
   }
   let output = @library.Frame::soft(size)
@@ -383,10 +383,10 @@ fn GenericSize::new(cross : @library.Abs, main : @library.Abs) -> GenericSize {
 fn GenericSize::into_axes(
   self : GenericSize,
   main : @library.Axis,
-) -> @library.Axes[@library.Abs] {
+) -> @library.Size {
   match main {
-    X => @library.Axes::new(self.main, self.cross)
-    Y => @library.Axes::new(self.cross, self.main)
+    X => @library.Size::new(self.main, self.cross)
+    Y => @library.Size::new(self.cross, self.main)
   }
 }
 

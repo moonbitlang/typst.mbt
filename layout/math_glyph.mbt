@@ -9,7 +9,7 @@ priv struct GlyphFragment {
   // Text stuff.
   mut item : @library.TextItem
   // Math stuff.
-  mut size : @library.Axes[@library.Abs]
+  mut size : @library.Size
   mut baseline : @library.Abs?
   mut italics_correction : @library.Abs
   mut accent_attach : (@library.Abs, @library.Abs)
@@ -174,7 +174,7 @@ fn GlyphFragment::from_shaped(
     extended_shape: false,
     italics_correction: @library.Abs::zero(),
     accent_attach: (@library.Abs::zero(), @library.Abs::zero()),
-    size: @library.Axes::zero_size(),
+    size: @library.Size::zero(),
     baseline: None,
     // Misc
     align: @library.Abs::zero(),
@@ -226,7 +226,7 @@ fn GlyphFragment::update_glyph(self : GlyphFragment) -> Unit {
   }
   let bottom_accent_attach = (width - italics).div_by(2.0)
   self.baseline = Some(ascent.at(self.item.size))
-  self.size = @library.Axes::new(
+  self.size = @library.Size::new(
     self.item.width(),
     ascent.at(self.item.size) + descent.at(self.item.size),
   )

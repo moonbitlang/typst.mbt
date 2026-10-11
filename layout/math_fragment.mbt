@@ -9,12 +9,12 @@ priv enum MathFragment {
 }
 
 ///|
-fn MathFragment::size(self : MathFragment) -> @library.Axes[@library.Abs] {
+fn MathFragment::size(self : MathFragment) -> @library.Size {
   match self {
     Glyph(glyph) => glyph.size
     Frame(fragment) => fragment.frame.size()
-    Space(amount) => @library.Axes::new(amount, @library.Abs::zero())
-    Tag(_) => @library.Axes::zero_size()
+    Space(amount) => @library.Size::new(amount, @library.Abs::zero())
+    Tag(_) => @library.Size::zero()
   }
 }
 
@@ -171,7 +171,7 @@ fn MathFragment::into_frame(self : MathFragment) -> @library.Frame {
     Glyph(glyph) => glyph.into_frame()
     Frame(fragment) => fragment.frame
     Tag(tag) => {
-      let frame = @library.Frame::soft(@library.Axes::zero_size())
+      let frame = @library.Frame::soft(@library.Size::zero())
       frame.push(@library.Point::zero(), Tag(tag))
       frame
     }
