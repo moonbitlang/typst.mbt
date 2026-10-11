@@ -465,7 +465,7 @@ fn Deserializer::parse_long_integer(
   let mut exponent = 0
   while true {
     match self.peek_or_null() {
-      b'0'..=b'9' => {
+      b'0'..<=b'9' => {
         self.eat_char()
         // This could overflow... if your integer is gigabytes long. Ignore
         // that possibility.
@@ -583,7 +583,7 @@ fn Deserializer::deserialize_any(
       self.eat_char()
       self.parse_integer(false)
     }
-    b'0'..=b'9' => self.parse_integer(true)
+    b'0'..<=b'9' => self.parse_integer(true)
     b'"' => {
       self.eat_char()
       Str(self.parse_str())

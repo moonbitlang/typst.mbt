@@ -34,7 +34,7 @@ fn letter_near(bytes : Bytes, from : Int) -> Int {
   let is_letter = (i : Int) => {
     i >= 0 &&
     i < bytes.length() &&
-    (bytes[i] is (b'a'..=b'z') || bytes[i] is (b'A'..=b'Z'))
+    (bytes[i] is (b'a'..<=b'z') || bytes[i] is (b'A'..<=b'Z'))
   }
   for i in from..<bytes.length() {
     if is_letter(i) && is_letter(i - 1) {

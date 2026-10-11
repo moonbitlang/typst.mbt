@@ -545,7 +545,7 @@ fn push_group(
   tree : TreeBuilder,
   elem : @library.Content,
   kind : GroupKind,
-  lang? : @library.Locale? = None,
+  lang~ : @library.Locale? = None,
 ) -> Int {
   let loc = elem.location().unwrap()
   let span = elem.span()

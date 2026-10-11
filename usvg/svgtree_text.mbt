@@ -381,12 +381,12 @@ fn rust_trim(s : String) -> String {
 /// Rust's `char::is_whitespace` (the Unicode `White_Space` property).
 fn is_rust_whitespace(c : Char) -> Bool {
   c
-  is ('\u{9}'..='\u{d}'
+  is ('\u{9}'..<='\u{d}'
   | ' '
   | '\u{85}'
   | '\u{a0}'
   | '\u{1680}'
-  | '\u{2000}'..='\u{200a}'
+  | '\u{2000}'..<='\u{200a}'
   | '\u{2028}'
   | '\u{2029}'
   | '\u{202f}'

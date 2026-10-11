@@ -126,7 +126,7 @@ pub fn ZlibEncoder::finish(self : ZlibEncoder) -> Bytes {
 /// Compresses `data` into a zlib stream with the given level (3..=6), as
 /// upstream `ZlibEncoder::new(Vec::new(), Compression::new(level))` followed
 /// by `write_all(data)` and `finish()`.
-pub fn zlib_compress(data : BytesView, level? : Int = 6) -> Bytes {
+pub fn zlib_compress(data : BytesView, level~ : Int = 6) -> Bytes {
   let encoder = ZlibEncoder::new(level)
   encoder.write_all(data)
   encoder.finish()

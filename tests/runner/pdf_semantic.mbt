@@ -132,7 +132,7 @@ fn pdf_compile(
 /// Like upstream `Pdf::make_live`.
 fn make_live(
   doc : @layout.PagedDocument,
-  untagged? : Bool = false,
+  untagged~ : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let doc_opts = @pdf.PdfFormatOptions::get(doc.options())
   let standards = doc_opts.standard.v.standards()
@@ -147,7 +147,7 @@ fn make_live(
 fn generate_pdf(
   doc : @layout.PagedDocument,
   standards : Array[@library.PdfStandard]?,
-  untagged? : Bool = false,
+  untagged~ : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let standard = match standards {
     Some(s) =>

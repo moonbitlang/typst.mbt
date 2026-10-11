@@ -89,7 +89,7 @@ pub fn UntypedIter::next(self : UntypedIter) -> Instruction? {
   while !self.reader.at_end() {
     // I believe booleans/null never appear as an operator?
     guard self.reader.peek_byte() is Some(peeked) else { return None }
-    if peeked is (b'/' | b'.' | b'+' | b'-' | b'0'..=b'9' | b'[' | b'<' | b'(') {
+    if peeked is (b'/' | b'.' | b'+' | b'-' | b'0'..<=b'9' | b'[' | b'<' | b'(') {
       // See issue 994. In all sane scenarios, if the next byte is a number
       // it has to be an operand (a number). However, it's possible that
       // the number is followed by a regular character, in which case it

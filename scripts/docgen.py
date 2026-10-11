@@ -833,7 +833,7 @@ def emit_element(spec, out, coverage):
             out.append(f"  {p.name} : {p.mty},")
         for p in optional:
             out.append(f"  {p.name}? : {p.mty},")
-        out.append("  extra? : Array[(String, Value)] = [],")
+        out.append("  extra~ : Array[(String, Value)] = [],")
         out.append("  label? : String,")
         out.append("  loc~ : SourceLoc,")
         out.append("  args_loc~ : ArgsLoc,")
@@ -896,7 +896,7 @@ def emit_element(spec, out, coverage):
         out.append(f"pub fn {sname}::{sname}(")
         for p in settable:
             out.append(f"  {p.name}? : {p.mty},")
-        out.append("  extra? : Array[(String, Value)] = [],")
+        out.append("  extra~ : Array[(String, Value)] = [],")
         out.append("  loc~ : SourceLoc,")
         out.append("  args_loc~ : ArgsLoc,")
         out.append(f") -> {sname} {{")
@@ -1094,7 +1094,7 @@ def emit_function(spec, out):
     for prm in optional:
         out.append(f"  {prm.name}? : {prm.mty},")
     if spec.owner is None:
-        out.append("  extra? : Array[(String, Value)] = [],")
+        out.append("  extra~ : Array[(String, Value)] = [],")
         out.append("  label? : String,")
         out.append("  loc~ : SourceLoc,")
         out.append("  args_loc~ : ArgsLoc,")

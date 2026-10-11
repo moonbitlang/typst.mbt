@@ -35,8 +35,7 @@ fn Type0Font::new(
   }
   let horizontal = cmap.metadata().writing_mode != Some(Vertical)
   guard (dict.get("DescendantFonts") : @hayro_syntax.PdfArray?) is Some(arr) &&
-    (arr.iter() : Iter[@hayro_syntax.Dict]).next()
-    is Some(descendant_font) else {
+    (arr.iter() : Iter[@hayro_syntax.Dict]).next() is Some(descendant_font) else {
     return None
   }
   let font_descriptor = (

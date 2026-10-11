@@ -158,8 +158,8 @@ pub fn Value::global(path : String) -> Value {
 /// `path` (`"rgb"`, `"gradient.linear"`, `"table.cell"`).
 pub fn Value::call(
   path : String,
-  positional? : Array[Value] = [],
-  named? : Array[(String, Value)] = [],
+  positional~ : Array[Value] = [],
+  named~ : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FPath(path), generic_args(positional, named)))
 }
@@ -235,7 +235,7 @@ fn generic_args(
 fn Value::native(
   func : @library.NativeFuncData,
   positional : Array[Value],
-  named? : Array[(String, Value)] = [],
+  named~ : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FNative(func), generic_args(positional, named)))
 }

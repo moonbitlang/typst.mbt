@@ -598,10 +598,10 @@ fn DictionaryParser::parse_range(self : DictionaryParser) -> (Int, Int)? {
 // Adobe Technical Note #5176, Appendix H CFF DICT Encoding.
 fn is_dict_one_byte_op(b : Byte) -> Bool {
   match b.to_int() {
-    0..=27 => true
-    28..=30 => false // numbers
+    0..<=27 => true
+    28..<=30 => false // numbers
     31 => true // Reserved
-    32..=254 => false // numbers
+    32..<=254 => false // numbers
     _ => true // Reserved
   }
 }
@@ -620,16 +620,16 @@ fn parse_dict_number(b0 : Byte, s : Stream) -> Double raise Malformed {
       Double::from_int(n)
     }
     30 => parse_dict_float(s)
-    32..=246 => {
+    32..<=246 => {
       let n = b0 - 139
       Double::from_int(n)
     }
-    247..=250 => {
+    247..<=250 => {
       let b1 = s.read_u8().to_int()
       let n = (b0 - 247) * 256 + b1 + 108
       Double::from_int(n)
     }
-    251..=254 => {
+    251..<=254 => {
       let b1 = s.read_u8().to_int()
       let n = -(b0 - 251) * 256 - b1 - 108
       Double::from_int(n)
@@ -670,7 +670,7 @@ fn parse_float_nibble(
     raise Malformed
   }
   match nibble {
-    0..=9 => data.write_char((48 + nibble).unsafe_to_char())
+    0..<=9 => data.write_char((48 + nibble).unsafe_to_char())
     10 => data.write_char('.')
     11 => data.write_char('E')
     12 => {
@@ -763,9 +763,9 @@ fn skip_number(b0 : Byte, s : Stream) -> Unit raise Malformed {
           break
         }
       }
-    32..=246 => ()
-    247..=250 => s.advance(1)
-    251..=254 => s.advance(1)
+    32..<=246 => ()
+    247..<=250 => s.advance(1)
+    251..<=254 => s.advance(1)
     _ => raise Malformed
   }
 }

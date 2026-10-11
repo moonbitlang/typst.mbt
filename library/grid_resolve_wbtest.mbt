@@ -32,7 +32,7 @@ fn nz(v : Int) -> NonZeroUSize {
 fn render_table(
   columns : Int,
   children : Array[TableChild],
-  gutter? : Bool = false,
+  gutter~ : Bool = false,
 ) -> String raise SourceError {
   let elem = TableElem::new(children)
     .with_columns(TrackSizings(Array::make(columns, Sizing::Auto)))

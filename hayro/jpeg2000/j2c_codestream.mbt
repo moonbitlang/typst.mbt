@@ -120,7 +120,7 @@ fn read_header(
         reader.read_marker() |> ignore
         skip_marker_segment(reader) |> ignore
       }
-      0x30..=0x3F =>
+      0x30..<=0x3F =>
         // "All markers with the marker code between 0xFF30 and 0xFF3F
         // have no marker segment parameters. They shall be skipped by
         // the decoder."

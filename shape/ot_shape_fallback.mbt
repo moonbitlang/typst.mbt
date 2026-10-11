@@ -372,7 +372,7 @@ fn position_around_base(
 fn conv_combining_class(n : Int) -> Int {
   match n {
     1 | 6 | 7 | 8 | 9 => n
-    10..=36 => n
+    10..<=36 => n
     84 | 91 | 103 | 107 | 118 | 122 | 129 | 130 | 132 => n
     200
     | 202

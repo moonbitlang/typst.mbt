@@ -297,7 +297,7 @@ fn scoped_callback(
 pub fn CompositeSite::invalid(
   self : CompositeSite,
   message : String,
-  arg? : Int = -1,
+  arg~ : Int = -1,
 ) -> Content {
   Content::of(NInvalid(message, self.site, self.site.param(arg)))
 }

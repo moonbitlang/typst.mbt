@@ -293,7 +293,7 @@ pub fn DataTable::DataTable(
   stroke? : @doc.Stroke,
   radius? : @doc.Corners[@doc.Length],
   frame_fill? : @doc.Paint,
-  breakable? : Bool = false,
+  breakable~ : Bool = false,
   key? : (Int) -> String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,

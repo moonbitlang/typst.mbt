@@ -24,7 +24,7 @@ pub extend InflateError with @debug.Debug::{to_repr}
 /// block is ignored.
 pub fn zlib_decompress(
   data : BytesView,
-  verify_checksum? : Bool = true,
+  verify_checksum~ : Bool = true,
 ) -> Bytes raise InflateError {
   if verify_checksum {
     @zlib.zlib_decompress(data.to_owned()) catch {

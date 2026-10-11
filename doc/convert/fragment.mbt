@@ -195,7 +195,7 @@ fn Tr::markup_fragment(
   kind : String,
   text : String,
   scope : Array[String],
-  recorded? : String = text,
+  recorded~ : String = text,
 ) -> String {
   self.record(construct, kind, recorded)
   if scope.is_empty() {

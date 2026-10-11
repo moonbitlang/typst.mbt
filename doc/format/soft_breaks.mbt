@@ -24,7 +24,7 @@ const ZERO_WIDTH_SPACE : Char = '\u{200B}'
 ///   repetitions do not matter). The default is `_ / . : -`. With an empty
 ///   set `s` is returned as it is. A zero-width space in `after` is
 ///   ignored.
-pub fn soft_breaks(s : String, after? : String = "_/.:-") -> String {
+pub fn soft_breaks(s : String, after~ : String = "_/.:-") -> String {
   if after == "" || s == "" {
     return s
   }

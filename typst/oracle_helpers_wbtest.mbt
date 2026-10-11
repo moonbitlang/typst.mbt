@@ -21,7 +21,7 @@ fn oracle_result(
 /// The paged document of a main source.
 fn oracle_compile(
   source : String,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> @layout.PagedDocument raise {
   match oracle_result(source, files).1.output {
     Ok(doc) => doc
@@ -49,7 +49,7 @@ fn[T : Eq + @debug.Debug] oracle_memo_on_off(f : () -> T raise) -> T raise {
 /// without.
 fn oracle_metadata(
   source : String,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> Array[String] raise {
   oracle_memo_on_off(() => oracle_strings(oracle_compile(source, files~)))
 }
@@ -73,7 +73,7 @@ fn oracle_strings(doc : @layout.PagedDocument) -> Array[String] {
 /// and the metadata strings if it compiled; with memoization and without.
 fn oracle_report(
   source : String,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> Array[String] raise {
   oracle_memo_on_off(() => {
     let (world, warned) = oracle_result(source, files)

@@ -1048,7 +1048,7 @@ fn get_components(
   bits_per_component : Int,
 ) -> Array[Int]? {
   let result = match bits_per_component {
-    1..=7 | 9..=15 => {
+    1..<=7 | 9..<=15 => {
       let buf = []
       let bpc = bits_per_component
       let reader = @hayro_syntax.BitReader::new(data[:])

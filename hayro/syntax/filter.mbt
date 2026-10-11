@@ -130,9 +130,9 @@ pub fn ascii_hex_decode(data : BytesView) -> Bytes? {
 ///|
 pub fn decode_hex_digit(c : Byte) -> Byte? {
   match c {
-    b'0'..=b'9' => Some(c - b'0')
-    b'A'..=b'F' => Some(c - b'A' + 10)
-    b'a'..=b'f' => Some(c - b'a' + 10)
+    b'0'..<=b'9' => Some(c - b'0')
+    b'A'..<=b'F' => Some(c - b'A' + 10)
+    b'a'..<=b'f' => Some(c - b'a' + 10)
     _ => None
   }
 }
@@ -187,7 +187,7 @@ pub fn ascii_85_decode(data : BytesView) -> Bytes? {
       return Some(decoded.to_bytes())
     }
     match b {
-      b'!'..=b'u' => {
+      b'!'..<=b'u' => {
         group.push(b)
         if group.length() == 5 {
           guard flush_group() is Some(_) else { return None }

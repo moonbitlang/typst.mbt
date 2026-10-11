@@ -147,7 +147,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
       let c = content.get_char(0).unwrap()
 
       // Step 2.
-      if c is ('\u{0320}'..='\u{03FF}') {
+      if c is ('\u{0320}'..<='\u{03FF}') {
         return category_default
       }
 
@@ -195,7 +195,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
     return category_force_default
   }
   match (c, form) {
-    ('\u{2145}'..='\u{2146}' | '\u{2202}' | '\u{221A}'..='\u{221C}', Prefix) =>
+    ('\u{2145}'..<='\u{2146}' | '\u{2202}' | '\u{221A}'..<='\u{221C}', Prefix) =>
       return category_l
     ('\u{002C}' | '\u{003A}' | '\u{003B}', Infix) => return category_m
     _ => ()
@@ -301,15 +301,15 @@ pub fn will_auto_transform(content : String) -> Bool {
   match single_char(content) {
     Some(c) =>
       c
-      is ('A'..='Z'
-      | 'a'..='z'
+      is ('A'..<='Z'
+      | 'a'..<='z'
       | 'ı'
       | 'ȷ'
-      | 'Α'..='Ρ'
+      | 'Α'..<='Ρ'
       | 'ϴ'
-      | 'Σ'..='Ω'
+      | 'Σ'..<='Ω'
       | '∇'
-      | 'α'..='ω'
+      | 'α'..<='ω'
       | '∂'
       | 'ϵ'
       | 'ϑ'

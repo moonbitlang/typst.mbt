@@ -60,9 +60,9 @@ fn ascii_hex_decode_into(data : BytesView, out : Array[Byte]) -> Unit? {
 ///|
 fn decode_hex_digit(c : Byte) -> Byte? {
   match c {
-    b'0'..=b'9' => Some(c - b'0')
-    b'A'..=b'F' => Some(c - b'A' + 10)
-    b'a'..=b'f' => Some(c - b'a' + 10)
+    b'0'..<=b'9' => Some(c - b'0')
+    b'A'..<=b'F' => Some(c - b'A' + 10)
+    b'a'..<=b'f' => Some(c - b'a' + 10)
     _ => None
   }
 }

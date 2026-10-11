@@ -468,7 +468,7 @@ pub(open) trait ToCss {
 /// Convert a value to a CSS string (upstream `ToCss::to_css`).
 pub fn[T : ToCss] to_css(
   value : T,
-  sink? : (HintedString) -> Unit = _ => (),
+  sink~ : (HintedString) -> Unit = _ => (),
 ) -> String {
   let w = CssWriter::new(sink)
   value.emit(w)

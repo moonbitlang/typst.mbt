@@ -59,7 +59,7 @@ fn flag(
   id : String,
   short? : Char,
   env? : String,
-  hidden? : Bool = false,
+  hidden~ : Bool = false,
   help~ : String,
 ) -> ArgSpec {
   {
@@ -86,11 +86,11 @@ fn opt(
   short? : Char,
   env? : String,
   delimiter? : Char,
-  possible? : Array[String] = [],
-  hidden? : Bool = false,
-  empty? : EmptyMode = Required,
+  possible~ : Array[String] = [],
+  hidden~ : Bool = false,
+  empty~ : EmptyMode = Required,
   validate? : (String) -> Unit raise CliError,
-  multiple? : Bool = false,
+  multiple~ : Bool = false,
   help~ : String,
 ) -> ArgSpec {
   {
@@ -115,9 +115,9 @@ fn opt_optional(
   id : String,
   value_name : String,
   missing : String,
-  possible? : Array[String] = [],
-  empty? : EmptyMode = Required,
-  hidden? : Bool = false,
+  possible~ : Array[String] = [],
+  empty~ : EmptyMode = Required,
+  hidden~ : Bool = false,
   help~ : String,
 ) -> ArgSpec {
   {
@@ -266,7 +266,7 @@ fn ArgSpec::display(self : ArgSpec) -> String {
 /// required (for input from stdin).
 fn CommandSpec::required_usage(
   self : CommandSpec,
-  output_required? : Bool = false,
+  output_required~ : Bool = false,
 ) -> String {
   let buf = StringBuilder()
   buf.write_string(self.path)
@@ -293,7 +293,7 @@ fn help_text(key : String, long : Bool) -> String? {
 
 ///|
 /// The help of a command: upstream's text, or a rendering of the spec.
-fn CommandSpec::help(self : CommandSpec, long? : Bool = true) -> String {
+fn CommandSpec::help(self : CommandSpec, long~ : Bool = true) -> String {
   match help_text(self.key, long) {
     Some(text) => text
     None => self.render_help()

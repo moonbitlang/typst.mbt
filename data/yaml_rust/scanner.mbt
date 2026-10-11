@@ -255,7 +255,7 @@ fn is_digit(c : Char) -> Bool {
 ///|
 fn is_alpha(c : Char) -> Bool {
   match c {
-    '0'..='9' | 'a'..='z' | 'A'..='Z' => true
+    '0'..<='9' | 'a'..<='z' | 'A'..<='Z' => true
     '_' | '-' => true
     _ => false
   }
@@ -269,9 +269,9 @@ fn is_hex(c : Char) -> Bool {
 ///|
 fn as_hex(c : Char) -> UInt {
   match c {
-    '0'..='9' => (c.to_int() - '0'.to_int()).reinterpret_as_uint()
-    'a'..='f' => (c.to_int() - 'a'.to_int() + 10).reinterpret_as_uint()
-    'A'..='F' => (c.to_int() - 'A'.to_int() + 10).reinterpret_as_uint()
+    '0'..<='9' => (c.to_int() - '0'.to_int()).reinterpret_as_uint()
+    'a'..<='f' => (c.to_int() - 'a'.to_int() + 10).reinterpret_as_uint()
+    'A'..<='F' => (c.to_int() - 'A'.to_int() + 10).reinterpret_as_uint()
     _ => panic()
   }
 }

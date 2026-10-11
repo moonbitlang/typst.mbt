@@ -139,7 +139,7 @@ priv struct Container {
 }
 
 ///|
-fn Registry::new(dir? : String = "") -> Registry {
+fn Registry::new(dir~ : String = "") -> Registry {
   // A directory that is no project path is reported when the document is
   // lowered (`Document::lower_initial`); the listing is a root file then.
   let dir = if virtual_file(dir, "<edsl-origins>") is Some(_) {

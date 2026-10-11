@@ -58,12 +58,12 @@ pub fn NativeFuncData::new(
   name~ : String,
   title~ : String,
   since? : Since,
-  docs? : String = "",
-  keywords? : Array[String] = [],
-  contextual? : Bool = false,
-  scope? : () -> Scope = Scope::new,
-  params? : Array[ParamInfo] = [],
-  returns? : () -> CastInfo = () => Any,
+  docs~ : String = "",
+  keywords~ : Array[String] = [],
+  contextual~ : Bool = false,
+  scope~ : () -> Scope = Scope::new,
+  params~ : Array[ParamInfo] = [],
+  returns~ : () -> CastInfo = () => Any,
   function : NativeFn,
 ) -> NativeFuncData {
   {

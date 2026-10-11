@@ -990,7 +990,7 @@ fn[P] read_patch_mesh(
         prev_patch_points = Some(control_points.copy())
         prev_patch_colors = Some(colors.copy())
       }
-      1..=3 => {
+      1..<=3 => {
         guard prev_patch_points is Some(prev_points) else { return None }
         guard prev_patch_colors is Some(prev_colors) else { return None }
         copy_patch_control_points(flag, prev_points, control_points)

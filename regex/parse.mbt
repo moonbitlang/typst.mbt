@@ -845,7 +845,7 @@ fn Parser::parse_escape(self : Parser) -> Primitive raise RegexError {
   }
   let c = self.char()
   match c {
-    '0'..='9' =>
+    '0'..<='9' =>
       self.error(
         { start, end: self.span_char().end, },
         UnsupportedBackreference,

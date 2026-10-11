@@ -31,7 +31,7 @@ fn position_of(text : String, needle : String) -> (Int, Int) {
 fn point_of(
   report : @doc.CompileReport[@layout.PagedDocument],
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int = 0,
 ) -> (Int, Double, Double) raise {
   let seen = [0]
   fn search(
@@ -88,7 +88,7 @@ fn point_of(
 fn spot(
   report : @doc.CompileReport[@layout.PagedDocument],
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int = 0,
 ) -> @doc.Origin raise {
   let (page, x, y) = point_of(report, needle, nth~)
   guard report.origin_at(page, x, y) is Some(origin) else {
@@ -250,7 +250,7 @@ let this_file : String = "doc/examples/review/review_wbtest.mbt"
 fn feedback_in(
   children : Array[&@doc.IntoContent],
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int = 0,
 ) -> @doc.Feedback raise {
   let text = @doc.Document(children)
     .compile_paged(@doc.DocWorld::in_memory())

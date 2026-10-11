@@ -111,7 +111,7 @@ pub fn default_formats() -> Array[Format] {
 ///|
 /// Initialize default format options from a list of formats.
 pub fn DocumentFormatOptions::new(
-  formats? : Array[Format] = default_formats(),
+  formats~ : Array[Format] = default_formats(),
 ) -> DocumentFormatOptions {
   DocumentFormatOptions(formats.map(f => FormatOptions::default_for(f.elem)))
 }

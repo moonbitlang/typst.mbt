@@ -32,8 +32,8 @@ priv struct FrameEncoder {
 ///|
 fn FrameEncoder::new(
   span_enc : (@syntax.Span) -> String,
-  zero_span_offsets? : Bool = false,
-  tag_names_only? : Bool = false,
+  zero_span_offsets~ : Bool = false,
+  tag_names_only~ : Bool = false,
   struct_tags? : StructDumper,
 ) -> FrameEncoder {
   {

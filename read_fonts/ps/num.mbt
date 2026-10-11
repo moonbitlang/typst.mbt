@@ -10,9 +10,9 @@ fn parse_int(cursor : Cursor, b0 : Int) -> Int raise PsError {
   // 3      28           -32768 to +32767         b1 << 8 | b2
   // 5      29           -(2^31) to +(2^31 - 1)   b1 << 24 | b2 << 16 | b3 << 8 | b4
   match b0 {
-    32..=246 => b0 - 139
-    247..=250 => (b0 - 247) * 256 + cursor.read_u8() + 108
-    251..=254 => -(b0 - 251) * 256 - cursor.read_u8() - 108
+    32..<=246 => b0 - 139
+    247..<=250 => (b0 - 247) * 256 + cursor.read_u8() + 108
+    251..<=254 => -(b0 - 251) * 256 - cursor.read_u8() - 108
     28 => cursor.read_i16()
     29 => cursor.read_i32()
     _ => raise InvalidNumber
@@ -104,7 +104,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
       match phase {
         0 =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               if number >= BCD_NUMBER_LIMIT {
                 exponent_add += 1
               } else if nibble != 0 || number != 0 {
@@ -125,7 +125,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
           }
         1 =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               if nibble == 0 && number == 0 {
                 exponent_add -= 1
               } else if number < BCD_NUMBER_LIMIT && fraction_len < 9 {
@@ -144,7 +144,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
           }
         _ =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               // Arbitrarily limit exponent
               if exponent > 1000 {
                 return if exponent_sign == -1 {
@@ -310,7 +310,7 @@ fn parse_fixed_dynamic(
   let b0 = cursor.read_u8()
   match b0 {
     30 => BcdComponents::parse(cursor).dynamically_scaled_value()
-    28 | 29 | 32..=254 => {
+    28 | 29 | 32..<=254 => {
       let num = parse_int(cursor, b0)
       let mut int_len = 10
       if num > BCD_INTEGER_LIMIT {

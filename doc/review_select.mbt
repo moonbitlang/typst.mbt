@@ -268,7 +268,7 @@ pub fn ReviewText::range(self : ReviewText, from : Int, to : Int) -> Selection? 
 pub fn ReviewText::find(
   self : ReviewText,
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int = 0,
 ) -> Selection? {
   // The needle with single spaces.
   let wanted : Array[Char] = []

@@ -6,7 +6,7 @@
 /// Compile with the in-memory world.
 fn compile(
   children : Array[&@doc.IntoContent],
-  files? : Map[String, Bytes] = Map([]),
+  files~ : Map[String, Bytes] = Map([]),
 ) -> @doc.CompileReport[@layout.PagedDocument] {
   @doc.Document(children).compile_paged(@doc.DocWorld::in_memory(files~))
 }

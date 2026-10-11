@@ -72,7 +72,7 @@ impl @library.World for TwinWorld with fn today(self, offset) {
 ///|
 /// The main file of a twin: a project-root file, like the EDSL's virtual
 /// files, so that paths resolve alike.
-fn twin_main(text : String, dir? : String = "") -> @syntax.Source {
+fn twin_main(text : String, dir~ : String = "") -> @syntax.Source {
   let path = if dir == "" { "twin.typ" } else { dir + "/twin.typ" }
   let id = @syntax.RootedPath::new(
     Project,
@@ -270,7 +270,7 @@ fn diagnostic_lines(diags : Array[@library.SourceDiagnostic]) -> String {
 /// The normalized frame dump of a document.
 fn normalized_frames(
   doc : @layout.PagedDocument,
-  tag_names_only? : Bool = false,
+  tag_names_only~ : Bool = false,
 ) -> String {
   let enc = FrameEncoder::new(
     _ => "null",

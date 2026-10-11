@@ -177,7 +177,7 @@ pub struct Prose {
 #callsite(autofill(loc, args_loc))
 pub fn Prose::Prose(
   text : String,
-  quotes? : Bool = true,
+  quotes~ : Bool = true,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Prose {

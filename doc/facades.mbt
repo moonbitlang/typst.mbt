@@ -186,8 +186,8 @@ pub fn Paint::darken(self : Paint, percent : Double) -> Paint {
 pub fn Paint::mix(
   self : Paint,
   other : Paint,
-  weight? : Double = 50,
-  space? : ColorSpace = Auto,
+  weight~ : Double = 50,
+  space~ : ColorSpace = Auto,
 ) -> Paint {
   let named : Array[(String, Value)] = []
   // `auto` is the default of the parameter.

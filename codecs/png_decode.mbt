@@ -56,7 +56,7 @@ pub extend PngInfo with @debug.Debug::{to_repr}
 /// `png::Decoder::new`, with which krilla reads the metadata.
 pub fn read_png_info(
   data : BytesView,
-  limits? : PngLimits = Unlimited,
+  limits~ : PngLimits = Unlimited,
 ) -> PngInfo raise ImageError {
   let reader = PngReader::read_info(data, limits.limits(), false) catch {
     err => raise image_error_from_png(err)

@@ -279,7 +279,7 @@ fn collect_painted(
 /// What page `page` (from 1) of a compiled document paints, in its order.
 fn painted(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page? : Int = 1,
+  page~ : Int = 1,
 ) -> String raise {
   let out = []
   collect_painted(report.unwrap().pages()[page - 1].frame, 0.0, 0.0, "", out)

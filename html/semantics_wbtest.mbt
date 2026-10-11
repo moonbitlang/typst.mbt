@@ -158,7 +158,7 @@ fn convert_inline(content : @library.Content) -> String raise {
 ///|
 fn encode_document(
   content : @library.Content,
-  styles? : @library.Styles = @library.Styles::new(),
+  styles~ : @library.Styles = @library.Styles::new(),
 ) -> String raise {
   let doc = html_document(
     test_engine(),

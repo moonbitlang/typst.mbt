@@ -192,13 +192,13 @@ fn is_blankz_at(s : Bytes, i : Int) -> Bool {
 fn is_printable_at(s : Bytes, i : Int) -> Bool {
   match byte_at(s, i) {
     // ASCII
-    0x0A | 0x20..=0x7E => true
+    0x0A | 0x20..<=0x7E => true
     // U+A0 ... U+BF
-    0xC2 => byte_at(s, i + 1) is (0xA0..=0xBF)
+    0xC2 => byte_at(s, i + 1) is (0xA0..<=0xBF)
     // U+C0 ... U+CFFF
-    0xC3..=0xEC => true
+    0xC3..<=0xEC => true
     // U+D000 ... U+D7FF
-    0xED => byte_at(s, i + 1) is (0x00..=0x9F)
+    0xED => byte_at(s, i + 1) is (0x00..<=0x9F)
     // U+E000 ... U+EFFF
     0xEE => true
     // U+F000 ... U+FFFD
@@ -210,7 +210,7 @@ fn is_printable_at(s : Bytes, i : Int) -> Bool {
         _ => true
       }
     // U+10000 ... U+10FFFF
-    0xF0..=0xF4 => true
+    0xF0..<=0xF4 => true
     _ => false
   }
 }

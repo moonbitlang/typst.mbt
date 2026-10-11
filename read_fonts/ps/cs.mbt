@@ -269,7 +269,7 @@ fn Evaluator::evaluate_impl(
     let b0 = cursor.read_u8()
     match b0 {
       // Push an integer to the stack
-      28 | 32..=254 => self.stack.push_i32(parse_int(cursor, b0))
+      28 | 32..<=254 => self.stack.push_i32(parse_int(cursor, b0))
       // Push a fixed point value to the stack
       255 => {
         let val = cursor.read_i32()
@@ -636,7 +636,7 @@ fn Evaluator::evaluate_operator(
         // Counter control hints.
         (12 | 13, _) => self.reset_stack()
         // Handle blends for multiple masters.
-        (14..=18, _) if weight_vector.length() > 1 =>
+        (14..<=18, _) if weight_vector.length() > 1 =>
           self.handle_mm_blend(subr_idx, num_args)
         _ =>
           // Unknown othersubr, so simply drop the arguments

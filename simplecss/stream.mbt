@@ -6,7 +6,7 @@
 ///|
 fn is_name_start(c : Int) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' => true
     _ => is_non_ascii(c) || is_escape(c)
   }
 }
@@ -14,7 +14,7 @@ fn is_name_start(c : Int) -> Bool {
 ///|
 fn is_name_char(c : Int) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' | '0'..<='9' | '-' => true
     _ => is_non_ascii(c) || is_escape(c)
   }
 }

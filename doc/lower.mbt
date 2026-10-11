@@ -778,7 +778,7 @@ fn Lowering::args(
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,
-  scopes? : Array[Pieces] = [],
+  scopes~ : Array[Pieces] = [],
   site? : Site,
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []

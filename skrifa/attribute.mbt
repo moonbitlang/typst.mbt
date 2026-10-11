@@ -111,7 +111,7 @@ fn Stretch::from_width_class(width_class : Int) -> Stretch {
   // The specified range is 1-9 and Skia simply clamps out of range
   // values. We follow.
   match width_class {
-    0..=1 => Stretch(0.5)
+    0..<=1 => Stretch(0.5)
     2 => Stretch(0.625)
     3 => Stretch(0.75)
     4 => Stretch(0.875)

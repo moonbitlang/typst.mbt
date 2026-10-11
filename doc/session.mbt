@@ -22,8 +22,8 @@ priv struct Session {
 ///|
 fn Session::new(
   base : &@library.World,
-  dir? : String = "",
-  lints? : Bool = true,
+  dir~ : String = "",
+  lints~ : Bool = true,
 ) -> Session {
   {
     base,

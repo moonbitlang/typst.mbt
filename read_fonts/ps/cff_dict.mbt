@@ -168,7 +168,7 @@ fn parse_token(cursor : Cursor) -> Token raise PsError {
     }
   } else {
     match b0 {
-      28 | 29 | 32..=254 => Operand(I32(parse_int(cursor, b0)), None)
+      28 | 29 | 32..<=254 => Operand(I32(parse_int(cursor, b0)), None)
       30 => {
         let components = BcdComponents::parse(cursor)
         Operand(Fixed(components.value(false)), Some(components))

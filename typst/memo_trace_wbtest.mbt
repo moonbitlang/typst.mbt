@@ -27,8 +27,8 @@ fn traced_at(
   source : String,
   name : String,
   index : Int,
-  files? : Array[(String, String)] = [],
-  file? : String = "",
+  files~ : Array[(String, String)] = [],
+  file~ : String = "",
 ) -> (Array[String], Array[String]) raise {
   oracle_memo_on_off(() => {
     let world = test_world(source, files~)
