@@ -30,6 +30,53 @@ pub fn PagedDocument::new(
 }
 
 ///|
+/// The document as an entry of a memoized layout keeps it and as it hands
+/// it out (not upstream, whose `PagedDocument: Clone` shares what cannot
+/// be written to: an `EcoVec` of pages, frames with shared items, an `Arc`
+/// of the introspector; `layout_document_impl` in `pages.mbt`).
+///
+/// Another document with other pages, whose frames are copy-on-write
+/// clones, another info (its authors and keywords are arrays) and other
+/// format options: whoever holds it can write to all of that
+/// (`info_mut`, `Frame::push`, `FormatOptions::populate`) and changes
+/// nothing for the entry or for another holder. The introspector is the
+/// same object: it is made once from the pages as they were laid out, it
+/// answers the same for as long as it lives, and what it hands out is for
+/// reading. That it is the same matters: it is the introspector that the
+/// next iteration of a compilation lays the document out against, and an
+/// entry computed with it is found by its number
+/// (`@library.Introspector::serial`).
+fn PagedDocument::kept(self : PagedDocument) -> PagedDocument {
+  {
+    pages: self.pages.map(Page::kept),
+    info: self.info.copy(),
+    options: self.options.copy(),
+    introspector: self.introspector,
+    paged_introspector: self.paged_introspector,
+  }
+}
+
+///|
+/// The page with a copy-on-write clone of its frame (see
+/// [PagedDocument::kept]; the other fields cannot be written to).
+fn Page::kept(self : Page) -> Page {
+  { ..self, frame: self.frame.clone(), }
+}
+
+///|
+/// Whether the document may be kept by an entry: no frame of its pages
+/// holds a host closure in its tags or in the frame of a tiling, nor does
+/// a fill (`@library.frame_cacheable`, the rule of every kept layout).
+fn PagedDocument::cacheable(self : PagedDocument) -> Bool {
+  for page in self.pages {
+    if !@library.frame_cacheable(page.frame) || !fill_cacheable(page.fill) {
+      return false
+    }
+  }
+  true
+}
+
+///|
 /// The document's finished pages.
 pub fn PagedDocument::pages(self : PagedDocument) -> ArrayView[Page] {
   self.pages[:]
