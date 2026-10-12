@@ -11,6 +11,25 @@ fn convert_fill(
   state : State,
   shape : @library.Shape?,
 ) -> @export.Fill raise @library.SourceError {
+  // (Not upstream: the fill of a solid colour is a function of the colour
+  // and the rule alone, and the text items of a paragraph, each of which
+  // is filled, have one colour object. So the last one is kept, by the
+  // identity of its colour: a dozen objects less per text item.)
+  if paint_ is Solid(color) {
+    if gc.last_solid_fill is Some(last) &&
+      physical_equal(last.color, color) &&
+      last.rule == fill_rule_ {
+      return last.fill
+    }
+    let (c, opacity) = convert_solid(color)
+    let fill : @export.Fill = {
+      paint: Color(c),
+      rule: to_export_fill_rule(fill_rule_),
+      opacity: f32(opacity.to_double() / 255.0),
+    }
+    gc.last_solid_fill = Some({ color, rule: fill_rule_, fill, })
+    return fill
+  }
   let (paint, opacity) = convert_paint(
     gc, paint_, on_text, surface, state, shape, false,
   )
@@ -19,6 +38,15 @@ fn convert_fill(
     rule: to_export_fill_rule(fill_rule_),
     opacity: f32(opacity.to_double() / 255.0),
   }
+}
+
+///|
+/// A solid colour and fill rule with the fill they were converted to
+/// ([convert_fill]).
+priv struct SolidFill {
+  color : @library.Color
+  rule : @library.FillRule
+  fill : @export.Fill
 }
 
 ///|
