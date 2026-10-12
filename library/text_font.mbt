@@ -95,7 +95,7 @@ pub extend FontStyle with FromValue::{from_value}
 
 ///|
 /// The conceptual distance between the styles, expressed as a number.
-pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int {
+pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int32 {
   if self == other {
     // Both are the same.
     0
@@ -110,7 +110,7 @@ pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int {
 
 ///|
 /// The weight of a font (100 - 900).
-pub(all) struct FontWeight(Int) derive(Eq, Hash, Compare, Debug)
+pub(all) struct FontWeight(Int32) derive(Eq, Hash, Compare, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -185,25 +185,25 @@ pub extend FontWeight with Default::{default}
 ///|
 /// Create a font weight from a number between 100 and 900, clamping it if
 /// necessary.
-pub fn FontWeight::from_number(weight : Int) -> FontWeight {
+pub fn FontWeight::from_number(weight : Int32) -> FontWeight {
   FontWeight(weight.clamp(min=100, max=900))
 }
 
 ///|
 /// The number between 100 and 900.
-pub fn FontWeight::to_number(self : FontWeight) -> Int {
+pub fn FontWeight::to_number(self : FontWeight) -> Int32 {
   self.0
 }
 
 ///|
 /// Add (or remove) weight, saturating at the boundaries of 100 and 900.
-pub fn FontWeight::thicken(self : FontWeight, delta : Int) -> FontWeight {
+pub fn FontWeight::thicken(self : FontWeight, delta : Int32) -> FontWeight {
   FontWeight((self.0 + delta).clamp(min=100, max=900))
 }
 
 ///|
 /// The absolute number distance between this and another font weight.
-pub fn FontWeight::distance(self : FontWeight, other : FontWeight) -> Int {
+pub fn FontWeight::distance(self : FontWeight, other : FontWeight) -> Int32 {
   (self.0 - other.0).abs()
 }
 
@@ -254,7 +254,7 @@ pub extend FontWeight with FromValue::{from_value}
 
 ///|
 /// The width of a font (stored in thousandths, 500 - 2000).
-pub(all) struct FontStretch(Int) derive(Eq, Hash, Compare, Debug)
+pub(all) struct FontStretch(Int32) derive(Eq, Hash, Compare, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -632,6 +632,6 @@ pub impl FromValue for FontVariations with fn from_value(v) {
 pub extend FontVariations with FromValue::{from_value}
 
 ///|
-fn tag_hint_helper(index : Int, key_repr : String) -> String {
+fn tag_hint_helper(index : Int32, key_repr : String) -> String {
   "occurred in tag at index \{index} (`\{key_repr}`)"
 }

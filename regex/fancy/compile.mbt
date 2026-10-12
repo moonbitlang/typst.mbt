@@ -6,11 +6,11 @@
 // out from Compiler.
 priv struct VMBuilder {
   prog : Array[Insn]
-  mut n_saves : Int
+  mut n_saves : Int32
 }
 
 ///|
-fn VMBuilder::new(max_group : Int) -> VMBuilder {
+fn VMBuilder::new(max_group : Int32) -> VMBuilder {
   { prog: [], n_saves: max_group * 2, }
 }
 
@@ -20,14 +20,14 @@ fn VMBuilder::build(self : VMBuilder) -> Prog {
 }
 
 ///|
-fn VMBuilder::newsave(self : VMBuilder) -> Int {
+fn VMBuilder::newsave(self : VMBuilder) -> Int32 {
   let result = self.n_saves
   self.n_saves += 1
   result
 }
 
 ///|
-fn VMBuilder::pc(self : VMBuilder) -> Int {
+fn VMBuilder::pc(self : VMBuilder) -> Int32 {
   self.prog.length()
 }
 
@@ -40,8 +40,8 @@ fn VMBuilder::add(self : VMBuilder, insn : Insn) -> Unit {
 ///|
 fn VMBuilder::set_jmp_target(
   self : VMBuilder,
-  jmp_pc : Int,
-  target : Int,
+  jmp_pc : Int32,
+  target : Int32,
 ) -> Unit {
   match self.prog[jmp_pc] {
     Jmp(_) => self.prog[jmp_pc] = Jmp(target)
@@ -52,8 +52,8 @@ fn VMBuilder::set_jmp_target(
 ///|
 fn VMBuilder::set_split_target(
   self : VMBuilder,
-  split_pc : Int,
-  target : Int,
+  split_pc : Int32,
+  target : Int32,
   second : Bool,
 ) -> Unit {
   match self.prog[split_pc] {
@@ -66,8 +66,8 @@ fn VMBuilder::set_split_target(
 ///|
 fn VMBuilder::set_repeat_target(
   self : VMBuilder,
-  repeat_pc : Int,
-  target : Int,
+  repeat_pc : Int32,
+  target : Int32,
 ) -> Unit {
   self.prog[repeat_pc] = match self.prog[repeat_pc] {
     RepeatGr(lo~, hi~, repeat~, ..) => RepeatGr(lo~, hi~, next=target, repeat~)
@@ -87,7 +87,7 @@ priv struct Compiler {
 }
 
 ///|
-fn Compiler::new(max_group : Int) -> Compiler {
+fn Compiler::new(max_group : Int32) -> Compiler {
   { b: VMBuilder::new(max_group), options: RegexOptions::default(), }
 }
 
@@ -156,8 +156,8 @@ fn Compiler::visit(
 ///|
 fn Compiler::compile_alt(
   self : Compiler,
-  count : Int,
-  handle_alternative : (Compiler, Int) -> Unit raise FancyError,
+  count : Int32,
+  handle_alternative : (Compiler, Int32) -> Unit raise FancyError,
 ) -> Unit raise FancyError {
   let jmps = []
   let mut last_pc = USIZE_MAX
@@ -190,7 +190,7 @@ fn Compiler::compile_alt(
 ///|
 fn Compiler::compile_conditional(
   self : Compiler,
-  handle_child : (Compiler, Int) -> Unit raise FancyError,
+  handle_child : (Compiler, Int32) -> Unit raise FancyError,
 ) -> Unit raise FancyError {
   // here we use atomic group functionality to be able to remove the program counter
   // relating to the split instruction's second position if the conditional succeeds
@@ -259,8 +259,8 @@ fn Compiler::compile_concat(
 fn Compiler::compile_repeat(
   self : Compiler,
   info : Info,
-  lo : Int,
-  hi : Int,
+  lo : Int32,
+  hi : Int32,
   greedy : Bool,
   hard : Bool,
 ) -> Unit raise FancyError {
@@ -489,10 +489,10 @@ pub fn compile(info : Info, anchored : Bool) -> Prog raise FancyError {
 ///|
 priv struct DelegateBuilder {
   re : StringBuilder
-  mut min_size : Int
+  mut min_size : Int32
   mut const_size : Bool
-  mut start_group : Int?
-  mut end_group : Int
+  mut start_group : Int32?
+  mut end_group : Int32
 }
 
 ///|

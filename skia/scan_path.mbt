@@ -99,7 +99,7 @@ let conservative_round_bias : Double = 0.5 + 1.5 / fdot6_one.to_double()
 /// and left edges. It has a slight bias to make the "rounded" int smaller
 /// than a normal round, to create a more conservative int-bounds (larger)
 /// from a float rect.
-fn round_down_to_int(x : Float) -> Int {
+fn round_down_to_int(x : Float) -> Int32 {
   let xx = x.to_double() - conservative_round_bias
   i32_saturate_from_f64(xx.ceil())
 }
@@ -109,14 +109,14 @@ fn round_down_to_int(x : Float) -> Int {
 /// rectangle. It has a slight bias to make the "rounded" int smaller than a
 /// normal round, to create a more conservative int-bounds (larger) from a
 /// float rect.
-fn round_up_to_int(x : Float) -> Int {
+fn round_up_to_int(x : Float) -> Int32 {
   let xx = x.to_double() + conservative_round_bias
   i32_saturate_from_f64(xx.floor())
 }
 
 ///|
 /// A stable merge sort (Rust's `slice::sort_by`).
-fn[T] stable_sort_by(arr : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] stable_sort_by(arr : Array[T], cmp : (T, T) -> Int32) -> Unit {
   let n = arr.length()
   if n < 2 {
     return
@@ -162,9 +162,9 @@ fn scan_fill_path_impl(
   path : @path.Path,
   fill_rule : FillRule,
   clip_rect : ScreenIntRect,
-  start_y : Int,
-  stop_y : Int,
-  shift_edges_up : Int,
+  start_y : Int32,
+  stop_y : Int32,
+  shift_edges_up : Int32,
   path_contained_in_clip : Bool,
   blitter : &Blitter,
 ) -> Unit {
@@ -231,9 +231,9 @@ fn scan_fill_path_impl(
 /// TODO: simplify!
 fn walk_edges(
   fill_rule : FillRule,
-  start_y : Int,
-  stop_y : Int,
-  right_clip : Int,
+  start_y : Int32,
+  stop_y : Int32,
+  right_clip : Int32,
   edges : Array[Edge],
   blitter : &Blitter,
 ) -> Unit {
@@ -320,7 +320,7 @@ fn walk_edges(
 }
 
 ///|
-fn remove_edge(curr_idx : Int, edges : Array[Edge]) -> Unit {
+fn remove_edge(curr_idx : Int32, edges : Array[Edge]) -> Unit {
   let prev = edges[curr_idx].prev
   let next = edges[curr_idx].next
   edges[prev].next = next
@@ -328,7 +328,10 @@ fn remove_edge(curr_idx : Int, edges : Array[Edge]) -> Unit {
 }
 
 ///|
-fn backward_insert_edge_based_on_x(curr_idx : Int, edges : Array[Edge]) -> Unit {
+fn backward_insert_edge_based_on_x(
+  curr_idx : Int32,
+  edges : Array[Edge],
+) -> Unit {
   let x = edges[curr_idx].x
   let mut prev_idx = edges[curr_idx].prev
   while prev_idx != 0 {
@@ -347,8 +350,8 @@ fn backward_insert_edge_based_on_x(curr_idx : Int, edges : Array[Edge]) -> Unit 
 
 ///|
 fn insert_edge_after(
-  curr_idx : Int,
-  after_idx : Int,
+  curr_idx : Int32,
+  after_idx : Int32,
   edges : Array[Edge],
 ) -> Unit {
   edges[curr_idx].prev = after_idx
@@ -364,7 +367,11 @@ fn insert_edge_after(
 /// could have started from the left of the prior insertion, and search to
 /// the right, or with some additional caching, binary search the starting
 /// point. More work could be done to determine optimal new edge insertion.
-fn backward_insert_start(prev_idx : Int, x : Int, edges : Array[Edge]) -> Int {
+fn backward_insert_start(
+  prev_idx : Int32,
+  x : Int32,
+  edges : Array[Edge],
+) -> Int32 {
   let mut prev_idx = prev_idx
   while edges[prev_idx].prev != -1 {
     prev_idx = edges[prev_idx].prev
@@ -376,7 +383,11 @@ fn backward_insert_start(prev_idx : Int, x : Int, edges : Array[Edge]) -> Int {
 }
 
 ///|
-fn insert_new_edges(new_idx : Int, curr_y : Int, edges : Array[Edge]) -> Unit {
+fn insert_new_edges(
+  new_idx : Int32,
+  curr_y : Int32,
+  edges : Array[Edge],
+) -> Unit {
   let mut new_idx = new_idx
   if edges[new_idx].first_y != curr_y {
     return

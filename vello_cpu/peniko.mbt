@@ -157,7 +157,12 @@ pub fn AlphaColor::new(components : FixedArray[Float]) -> AlphaColor {
 
 ///|
 /// `AlphaColor::from_rgba8`.
-pub fn AlphaColor::from_rgba8(r : Int, g : Int, b : Int, a : Int) -> AlphaColor {
+pub fn AlphaColor::from_rgba8(
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
+) -> AlphaColor {
   {
     components: [
       u8_to_unit_color(r),
@@ -170,7 +175,7 @@ pub fn AlphaColor::from_rgba8(r : Int, g : Int, b : Int, a : Int) -> AlphaColor 
 
 ///|
 /// `color`'s `u8` to `f32` conversion: `x as f32 * (1.0 / 255.0)`.
-fn u8_to_unit_color(x : Int) -> Float {
+fn u8_to_unit_color(x : Int32) -> Float {
   Float::from_int(x) * ((1.0 : Float) / 255.0)
 }
 
@@ -197,7 +202,7 @@ pub fn AlphaColor::premultiply(self : AlphaColor) -> FixedArray[Float] {
 ///|
 /// `AlphaColor::to_rgba8` / `PremulColor::to_rgba8` on raw components:
 /// `fast_round_to_u8(x * 255.)`.
-pub fn components_to_rgba8(c : FixedArray[Float]) -> FixedArray[Int] {
+pub fn components_to_rgba8(c : FixedArray[Float]) -> FixedArray[Int32] {
   [
     fast_round_to_u8(c[0] * 255.0),
     fast_round_to_u8(c[1] * 255.0),
@@ -208,7 +213,7 @@ pub fn components_to_rgba8(c : FixedArray[Float]) -> FixedArray[Int] {
 
 ///|
 /// Fast rounding of `f32` to integer `u8`, rounding ties up.
-fn fast_round_to_u8(a : Float) -> Int {
+fn fast_round_to_u8(a : Float) -> Int32 {
   // This does not need clamping as the behavior of a `f32` to `u8` cast in
   // Rust is to saturate.
   f32_as_u8(a + 0.5)

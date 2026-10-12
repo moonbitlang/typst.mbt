@@ -22,7 +22,7 @@ priv enum ICCColorSpace {
 }
 
 ///|
-fn ICCColorSpace::num_components(self : ICCColorSpace) -> Int {
+fn ICCColorSpace::num_components(self : ICCColorSpace) -> Int32 {
   match self {
     Xyz => 3
     Lab => 3
@@ -43,7 +43,7 @@ fn ICCColorSpace::num_components(self : ICCColorSpace) -> Int {
 }
 
 ///|
-fn ICCColorSpace::try_from(value : UInt) -> ICCColorSpace? {
+fn ICCColorSpace::try_from(value : UInt32) -> ICCColorSpace? {
   match value {
     0x58595A20 => Some(Xyz)
     0x4C616220 => Some(Lab)

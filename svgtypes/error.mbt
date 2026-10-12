@@ -12,7 +12,7 @@ pub(all) suberror SvgTypesError {
   /// Errors in a valid XML should be handled by errors below.
   UnexpectedEndOfStream
   /// An input text contains unknown data.
-  UnexpectedData(Int)
+  UnexpectedData(Int32)
   /// A provided string doesn't have a valid data.
   ///
   /// For example, if we try to parse a color form `zzz`
@@ -29,13 +29,13 @@ pub(all) suberror SvgTypesError {
   /// An invalid/unexpected character.
   ///
   /// The first byte is an actual one, others - expected.
-  InvalidChar(Array[Byte], Int)
+  InvalidChar(Array[Byte], Int32)
   /// An unexpected character instead of an XML space.
   ///
   /// The first string is an actual one, others - expected.
-  InvalidString(Array[String], Int)
+  InvalidString(Array[String], Int32)
   /// An invalid number.
-  InvalidNumber(Int)
+  InvalidNumber(Int32)
 } derive(Eq, Debug)
 
 ///|

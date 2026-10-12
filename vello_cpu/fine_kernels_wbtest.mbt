@@ -4,7 +4,7 @@
 // sentinels, masks, aliased buffers and undersized buffers (panics).
 
 ///|
-fn vbytes(n : Int, seed : Int) -> FixedArray[Byte] {
+fn vbytes(n : Int32, seed : Int32) -> FixedArray[Byte] {
   let mut x = seed.reinterpret_as_uint() * 2654435761U + 12345
   FixedArray::makei(n, _ => {
     x = x * 1103515245U + 12345U
@@ -15,7 +15,7 @@ fn vbytes(n : Int, seed : Int) -> FixedArray[Byte] {
 ///|
 /// Premultiplied RGBA pixels (color <= alpha), with opaque and transparent
 /// runs.
-fn vpixels(n_px : Int, seed : Int) -> FixedArray[Byte] {
+fn vpixels(n_px : Int32, seed : Int32) -> FixedArray[Byte] {
   let raw = vbytes(4 * n_px, seed)
   let out = FixedArray::make(4 * n_px, b'\x00')
   for p in 0..<n_px {
@@ -168,9 +168,9 @@ test "panic alpha_composite_buffer with a negative start" {
 ///|
 fn region_of(
   buf : FixedArray[Byte],
-  width : Int,
-  stride : Int,
-  offset : Int,
+  width : Int32,
+  stride : Int32,
+  offset : Int32,
 ) -> Region {
   { row_idx: 0, width, height: TILE_HEIGHT, buf, stride, offset, }
 }

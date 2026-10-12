@@ -277,7 +277,7 @@ pub fn Memory::data_mut(self : Memory) -> FixedArray[Byte] {
 /// Returns the byte length of this [`Memory`].
 ///
 /// The returned value will be a multiple of the wasm page size, 64k.
-pub fn Memory::data_size(self : Memory) -> Int {
+pub fn Memory::data_size(self : Memory) -> Int32 {
   self.bytes.len
 }
 
@@ -287,8 +287,8 @@ pub fn Memory::data_size(self : Memory) -> Int {
 fn Memory::access_span(
   self : Memory,
   start : UInt64,
-  len : Int,
-) -> Int raise MemoryError {
+  len : Int32,
+) -> Int32 raise MemoryError {
   let end = start + len.to_uint64()
   if end < start {
     raise OutOfBoundsAccess

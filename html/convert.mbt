@@ -493,7 +493,7 @@ fn make_block_level(node : HtmlNode) -> Result[Unit, Unblockable] {
 ///|
 /// Whether, apart from tags, the nodes comprise a single element or frame.
 /// Returns the index of that node.
-fn to_lone_element(nodes : Array[HtmlNode]) -> Int? {
+fn to_lone_element(nodes : Array[HtmlNode]) -> Int32? {
   let mut start = 0
   while start < nodes.length() && nodes[start] is Tag(_) {
     start += 1
@@ -546,7 +546,7 @@ priv struct TrailingWhitespace {
   /// If `true`, the trailing whitespace consists of exactly one ASCII space.
   mut single : Bool
   /// The trailing whitespace starts at `output[from..]`.
-  from : Int
+  from : Int32
 }
 
 ///|
@@ -627,7 +627,7 @@ priv enum ProtectorState {
   Collapsing
   Supportive
   /// A single space: the node at the index in the array.
-  Space(Array[HtmlNode], Int)
+  Space(Array[HtmlNode], Int32)
 }
 
 ///|
@@ -700,7 +700,7 @@ fn Protector::supportive(self : Protector) -> Unit {
 
 ///|
 /// Protects a single spaces against collapsing.
-fn protect_space(nodes : Array[HtmlNode], i : Int) -> Unit {
+fn protect_space(nodes : Array[HtmlNode], i : Int32) -> Unit {
   nodes[i] = Element(pre_wrap([nodes[i]]))
 }
 

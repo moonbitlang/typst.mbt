@@ -6,9 +6,9 @@
 fn vertical_sample_row(
   image : FixedArray[Float],
   out : FixedArray[Float],
-  row_len : Int,
-  out_base : Int,
-  left : Int,
+  row_len : Int32,
+  out_base : Int32,
+  left : Int32,
   ws : Array[Float],
 ) -> Unit {
   vertical_sample_row_scalar(image, out, row_len, out_base, left, ws)
@@ -18,8 +18,8 @@ fn vertical_sample_row(
 /// [horizontal_sample_sums_scalar].
 fn horizontal_sample_sums(
   image : FixedArray[Float],
-  start : Int,
-  channels : Int,
+  start : Int32,
+  channels : Int32,
   ws : Array[Float],
   t : FixedArray[Float],
 ) -> Unit {

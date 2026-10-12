@@ -22,7 +22,7 @@ pub(all) enum Yaml {
   /// Insertion order will match the order of insertion into the map.
   Hash(LinkedHashMap[Yaml, Yaml])
   /// Alias, not fully supported yet.
-  Alias(Int)
+  Alias(Int32)
   /// YAML null, e.g. `null` or `~`.
   Null
   /// Accessing a nonexistent node via indexing returns `BadValue`. This
@@ -71,9 +71,9 @@ pub struct YamlLoader {
   priv docs : Array[Yaml]
   // states
   // (current node, anchor_id) tuple
-  priv doc_stack : Array[(Yaml, Int)]
+  priv doc_stack : Array[(Yaml, Int32)]
   priv key_stack : Array[Yaml]
-  priv anchor_map : Map[Int, Yaml]
+  priv anchor_map : Map[Int32, Yaml]
 }
 
 ///|
@@ -158,7 +158,7 @@ pub impl MarkedEventReceiver for YamlLoader with fn on_event(self, ev, _) {
 pub extend YamlLoader with MarkedEventReceiver::{on_event}
 
 ///|
-fn YamlLoader::insert_new_node(self : YamlLoader, node : (Yaml, Int)) -> Unit {
+fn YamlLoader::insert_new_node(self : YamlLoader, node : (Yaml, Int32)) -> Unit {
   // valid anchor id starts from 1
   if node.1 > 0 {
     self.anchor_map.set(node.1, node.0)
@@ -352,7 +352,7 @@ pub impl YamlIndex for String with fn index_into(self, yaml) {
 ///|
 /// `yaml[idx]`: the element of an array, or the value of `Yaml::Integer(idx)`
 /// in a hash, else `BadValue`.
-pub impl YamlIndex for Int with fn index_into(self, yaml) {
+pub impl YamlIndex for Int32 with fn index_into(self, yaml) {
   if yaml.as_vec() is Some(v) {
     if self >= 0 && self < v.length() {
       v[self]
@@ -421,7 +421,7 @@ pub impl Show for Yaml with fn output(self, logger) {
 pub extend Yaml with Show::{to_string, output}
 
 ///|
-fn Yaml::variant_index(self : Yaml) -> Int {
+fn Yaml::variant_index(self : Yaml) -> Int32 {
   match self {
     Real(_) => 0
     Integer(_) => 1
@@ -466,7 +466,7 @@ pub extend Yaml with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Rust `str` ordering (by code point).
-fn compare_str(a : String, b : String) -> Int {
+fn compare_str(a : String, b : String) -> Int32 {
   let ia = a.iter()
   let ib = b.iter()
   while true {

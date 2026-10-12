@@ -6,7 +6,7 @@
 ///|
 /// A unique font face ID (upstream `fontdb::ID`). IDs are assigned in
 /// insertion order.
-pub type FontId = Int
+pub type FontId = Int32
 
 ///|
 /// A font style (upstream `fontdb::Style`).
@@ -29,7 +29,7 @@ pub(all) struct FaceInfo {
   /// The font data.
   source : Bytes
   /// A face index in the `source`.
-  index : UInt
+  index : UInt32
   /// A list of family names.
   ///
   /// Contains pairs of Name + Language. Where the first family is always English US,
@@ -40,7 +40,7 @@ pub(all) struct FaceInfo {
   /// A font face style.
   style : DbStyle
   /// A font face weight.
-  weight : Int
+  weight : Int32
   /// A font face stretch.
   stretch : FontStretch
   /// Indicates that the font face is monospaced.
@@ -114,7 +114,7 @@ pub fn FontDatabase::load_font_data(self : FontDatabase, data : Bytes) -> Unit {
 
 ///|
 /// Returns the number of font faces in the `Database`.
-pub fn FontDatabase::len(self : FontDatabase) -> Int {
+pub fn FontDatabase::len(self : FontDatabase) -> Int32 {
   self.faces.length()
 }
 
@@ -189,7 +189,7 @@ pub fn FontDatabase::family_name(
 /// A database query (upstream `fontdb::Query`).
 pub(all) struct FontQuery {
   families : Array[@svgtypes.FontFamily]
-  weight : Int
+  weight : Int32
   stretch : FontStretch
   style : DbStyle
 }
@@ -228,7 +228,7 @@ pub fn FontDatabase::face(self : FontDatabase, id : FontId) -> FaceInfo? {
 pub fn[T] FontDatabase::with_face_data(
   self : FontDatabase,
   id : FontId,
-  p : (Bytes, UInt) -> T,
+  p : (Bytes, UInt32) -> T,
 ) -> T? {
   guard self.face(id) is Some(face) else { return None }
   Some(p(face.source, face.index))
@@ -237,13 +237,13 @@ pub fn[T] FontDatabase::with_face_data(
 ///|
 // https://www.w3.org/TR/2018/REC-css-fonts-3-20180920/#font-style-matching
 // Based on https://github.com/servo/font-kit
-fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
+fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int32? {
   // Step 4.
   let mut matching_set = Array::makei(candidates.length(), i => i)
 
   // `min_by_key` (the first minimum).
-  let min_by_key = (set : Array[Int], key : (Int) -> Int) => {
-    let mut best : Int? = None
+  let min_by_key = (set : Array[Int32], key : (Int32) -> Int32) => {
+    let mut best : Int32? = None
     let mut best_key = 0
     for index in set {
       let k = key(index)
@@ -386,7 +386,7 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
 
 ///|
 /// Parses the face metadata (upstream `parse_face_info`).
-fn parse_face_info(data : Bytes, index : UInt) -> FaceInfo? {
+fn parse_face_info(data : Bytes, index : UInt32) -> FaceInfo? {
   guard (Some(@otf.Face::parse(data[:], index)) catch { _ => None })
     is Some(face) else {
     return None
@@ -419,7 +419,7 @@ fn parse_face_info(data : Bytes, index : UInt) -> FaceInfo? {
   let (monospaced, italic) = match
     face.raw_face().table(@otf.Tag::from_bytes(b"post")) {
     Some(post) => {
-      let zero4 = (start : Int) => {
+      let zero4 = (start : Int32) => {
         post.length() >= start + 4 &&
         post[start] == 0 &&
         post[start + 1] == 0 &&
@@ -453,7 +453,7 @@ fn parse_face_names(
   face : @otf.Face,
 ) -> (Array[(String, @otf.Language)], String)? {
   let names = face.names()
-  let collect_families = (name_id : Int) => {
+  let collect_families = (name_id : Int32) => {
     let families = []
     for name in names.iter() {
       if name.name_id.to_int() == name_id && name.is_unicode() {
@@ -538,7 +538,7 @@ fn name_to_unicode(name : @otf.Name) -> String? {
 
 ///|
 /// `String::from_utf16` (fails on unpaired surrogates).
-fn utf16_decode_strict(units : Array[Int]) -> String? {
+fn utf16_decode_strict(units : Array[Int32]) -> String? {
   let sb = StringBuilder()
   let mut i = 0
   while i < units.length() {
@@ -564,7 +564,7 @@ fn utf16_decode_strict(units : Array[Int]) -> String? {
 
 ///|
 /// Macintosh Roman to UTF-16 encoding table.
-let mac_roman : ReadOnlyArray[Int] = [
+let mac_roman : ReadOnlyArray[Int32] = [
   0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009,
   0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F, 0x0010, 0x2318, 0x21E7, 0x2325,
   0x2303, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D,

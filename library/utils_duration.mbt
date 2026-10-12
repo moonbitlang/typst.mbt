@@ -33,7 +33,7 @@ pub fn format_duration(duration : Int64) -> String {
   if days > 0L || hours > 0L {
     return buf.to_string()
   }
-  let order = (exp : Int) => {
+  let order = (exp : Int32) => {
     let mut order = 1L
     for _ in 0..<exp {
       order *= 1000L
@@ -41,7 +41,7 @@ pub fn format_duration(duration : Int64) -> String {
     order
   }
   let nanos = secs * order(3) + subsec_nanos
-  let fract = (exp : Int) => {
+  let fract = (exp : Int32) => {
     rust_display_f64(
       round_with_precision(nanos.to_double() / order(exp).to_double(), 2),
     )

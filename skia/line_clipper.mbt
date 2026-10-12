@@ -1,7 +1,7 @@
 // Port of `tiny-skia/src/line_clipper.rs`.
 
 ///|
-let line_clipper_max_points : Int = 4
+let line_clipper_max_points : Int32 = 4
 
 ///|
 /// Clip the line pts[0]...pts[1] against clip, ignoring segments that lie

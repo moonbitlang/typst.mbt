@@ -31,7 +31,7 @@ fn value_record_is_empty(this : @otf.ValueRecord) -> Bool {
 fn value_record_apply(
   this : @otf.ValueRecord,
   ctx : ApplyContext,
-  idx : Int,
+  idx : Int32,
 ) -> Bool {
   let pos = ctx.buffer.pos[idx].copy()
   let worked = value_record_apply_to_pos(this, ctx, pos)
@@ -101,7 +101,7 @@ fn value_record_apply_to_pos(
 // AnchorExt
 
 ///|
-fn anchor_get(this : @otf.Anchor, face : Face) -> (Int, Int) {
+fn anchor_get(this : @otf.Anchor, face : Face) -> (Int32, Int32) {
   let mut x = this.x.to_int()
   let mut y = this.y.to_int()
   if this.x_device is Some(_) || this.y_device is Some(_) {
@@ -124,14 +124,14 @@ fn anchor_get(this : @otf.Anchor, face : Face) -> (Int, Int) {
 // attach_type
 
 ///|
-const ATTACH_TYPE_MARK : Int = 1
+const ATTACH_TYPE_MARK : Int32 = 1
 
 ///|
-const ATTACH_TYPE_CURSIVE : Int = 2
+const ATTACH_TYPE_CURSIVE : Int32 = 2
 
 ///|
 /// `i32::try_num_from(f32)`: values in `(MIN-1, MAX+1)` truncate toward zero.
-fn try_i32_from_f32(v : Float) -> Int? {
+fn try_i32_from_f32(v : Float) -> Int32? {
   // Based on https://github.com/rust-num/num-traits/blob/master/src/cast.rs
 
   // Float as int truncates toward zero, so we want to allow values
@@ -167,7 +167,7 @@ fn f32_round(v : Float) -> Float {
 }
 
 ///|
-fn device_get_x_delta(this : @otf.Device, face : Face) -> Int? {
+fn device_get_x_delta(this : @otf.Device, face : Face) -> Int32? {
   match this {
     Hinting(hinting) =>
       hinting.x_delta(face.units_per_em.to_uint16(), ppem_u16(face))
@@ -185,7 +185,7 @@ fn device_get_x_delta(this : @otf.Device, face : Face) -> Int? {
 }
 
 ///|
-fn device_get_y_delta(this : @otf.Device, face : Face) -> Int? {
+fn device_get_y_delta(this : @otf.Device, face : Face) -> Int32? {
   match this {
     Hinting(hinting) =>
       hinting.y_delta(face.units_per_em.to_uint16(), ppem_u16(face))
@@ -227,8 +227,8 @@ fn pos_subtable_apply(
 ///|
 fn propagate_attachment_offsets(
   pos : Array[GlyphPosition],
-  len : Int,
-  i : Int,
+  len : Int32,
+  i : Int32,
   direction : Direction,
 ) -> Unit {
   // Adjusts offsets of attached glyphs (both cursive and mark) to accumulate
@@ -417,7 +417,7 @@ fn pair_pos_finish(
 fn pair_pos_boring(
   ctx : ApplyContext,
   iter : SkippingIterator,
-  second_glyph_index : Int,
+  second_glyph_index : Int32,
   has_record2 : Bool,
 ) -> Unit? {
   ctx.buffer.unsafe_to_concat(
@@ -431,7 +431,7 @@ fn pair_pos_boring(
 fn pair_pos_success(
   ctx : ApplyContext,
   iter : SkippingIterator,
-  second_glyph_index : Int,
+  second_glyph_index : Int32,
   flag1 : Bool,
   flag2 : Bool,
   has_record2 : Bool,
@@ -451,7 +451,7 @@ fn pair_pos_success(
 fn pair_pos_bail(
   ctx : ApplyContext,
   iter : SkippingIterator,
-  second_glyph_index : Int,
+  second_glyph_index : Int32,
   records : (@otf.ValueRecord, @otf.ValueRecord),
 ) -> Unit? {
   let has_record1 = !value_record_is_empty(records.0)
@@ -581,7 +581,7 @@ fn cursive_pos_apply(
 
 ///|
 /// `-x` for an `i16` (wrapping).
-fn i16_neg(x : Int) -> Int {
+fn i16_neg(x : Int32) -> Int32 {
   let v = -x & 0xFFFF
   if v >= 0x8000 {
     v - 0x10000
@@ -593,9 +593,9 @@ fn i16_neg(x : Int) -> Int {
 ///|
 fn reverse_cursive_minor_offset(
   pos : Array[GlyphPosition],
-  i : Int,
+  i : Int32,
   direction : Direction,
-  new_parent : Int,
+  new_parent : Int32,
 ) -> Unit {
   let chain = pos[i].attach_chain()
   let attach_type = pos[i].attach_type()
@@ -628,7 +628,7 @@ fn mark_array_apply(
   anchors : @otf.AnchorMatrix,
   mark_index : UInt16,
   glyph_index : UInt16,
-  glyph_pos : Int,
+  glyph_pos : Int32,
 ) -> Unit? {
   // If this subtable doesn't have an anchor for this base and this class
   // return `None` such that the subsequent subtables have a chance at it.
@@ -711,7 +711,7 @@ fn mark_base_pos_apply(
 }
 
 ///|
-fn mark_base_accept(buffer : Buffer, idx : Int) -> Bool {
+fn mark_base_accept(buffer : Buffer, idx : Int32) -> Bool {
   // We only want to attach to the first of a MultipleSubst sequence.
   // https://github.com/harfbuzz/harfbuzz/issues/740
   // Reject others...

@@ -35,7 +35,7 @@ using @doc {
 /// A drawn card (a filled shape: a rectangle, or the outline of a rounded
 /// one) or a line of text on a page (`y` is its baseline, `h` is 0).
 priv struct Mark {
-  page : Int
+  page : Int32
   text : String
   x : Double
   y : Double
@@ -49,7 +49,7 @@ fn collect(
   frame : @library.Frame,
   dx : Double,
   dy : Double,
-  page : Int,
+  page : Int32,
   out : Array[Mark],
 ) -> Unit {
   for entry in frame.items() {
@@ -132,8 +132,8 @@ fn collect(
 ///|
 /// The page of the tests.
 fn page(
-  width? : @doc.Length = Pt(200),
-  height? : @doc.Length = Pt(120),
+  width~ : @doc.Length = Pt(200),
+  height~ : @doc.Length = Pt(120),
 ) -> Array[&IntoContent] {
   [SetPage(width~, height~, margin=Sides(all=Pt(10))), SetText(size=Pt(10))]
 }
@@ -142,7 +142,7 @@ fn page(
 /// Compile `children` after `setup` (the page of the tests by default).
 fn compile(
   children : Array[&IntoContent],
-  setup? : Array[&IntoContent] = page(),
+  setup~ : Array[&IntoContent] = page(),
 ) -> @doc.CompileReport[@layout.PagedDocument] {
   Document([..setup, ..children]).compile_paged(@doc.DocWorld::in_memory())
 }
@@ -200,7 +200,7 @@ fn cards(report : @doc.CompileReport[@layout.PagedDocument]) -> String raise {
 
 ///|
 /// The number of pages.
-fn pages(report : @doc.CompileReport[@layout.PagedDocument]) -> Int raise {
+fn pages(report : @doc.CompileReport[@layout.PagedDocument]) -> Int32 raise {
   report.unwrap().pages().length()
 }
 
@@ -283,7 +283,7 @@ fn error_place(
 ///|
 /// The line of the call of this function.
 #callsite(autofill(loc))
-fn line_here(loc~ : SourceLoc) -> Int {
+fn line_here(loc~ : SourceLoc) -> Int32 {
   // `file:line:column-line:column@module`.
   let mut line = 0
   let mut colons = 0

@@ -4,10 +4,10 @@
 fn insert_dotted_circles(
   face : Face,
   buffer : Buffer,
-  broken_syllable_type : Int,
-  dottedcircle_category : Int,
-  repha_category : Int?,
-  dottedcircle_position : Int?,
+  broken_syllable_type : Int32,
+  dottedcircle_category : Int32,
+  repha_category : Int32?,
+  dottedcircle_position : Int32?,
 ) -> Bool {
   if (buffer.flags & BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE) != 0 {
     return false

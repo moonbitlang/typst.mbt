@@ -151,7 +151,7 @@ pub fn BezPath::is_empty(self : BezPath) -> Bool {
 
 ///|
 /// Shorten the path, keeping the first `len` elements.
-pub fn BezPath::truncate(self : BezPath, len : Int) -> Unit {
+pub fn BezPath::truncate(self : BezPath, len : Int32) -> Unit {
   if len < self.elements.length() {
     self.elements.truncate(len)
   }

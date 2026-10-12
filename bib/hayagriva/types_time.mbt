@@ -4,11 +4,11 @@
 /// A date that can be as coarse as a year and as fine-grained as a day.
 pub(all) struct Date {
   /// The year (1 B.C.E. is represented as 0 and so forth).
-  year : Int
+  year : Int32
   /// The optional month (0-11).
-  month : Int?
+  month : Int32?
   /// The optional day (0-30).
-  day : Int?
+  day : Int32?
   /// Whether the date is approximate.
   approximate : Bool
   /// The season. Between 1 and 4 (inclusive).
@@ -32,8 +32,8 @@ pub extend Date with @debug.Debug::{to_repr}
 
 ///|
 /// Order two dates according to the CSL specification.
-pub fn Date::csl_cmp(self : Date, other : Date) -> Int {
-  let ord_fn = (a : Int?, b : Int?) => {
+pub fn Date::csl_cmp(self : Date, other : Date) -> Int32 {
+  let ord_fn = (a : Int32?, b : Int32?) => {
     match (a, b) {
       (Some(a), Some(b)) => compare_int(a, b)
       (Some(_), None) => 1
@@ -53,7 +53,7 @@ pub fn Date::csl_cmp(self : Date, other : Date) -> Int {
 }
 
 ///|
-fn compare_bool(a : Bool, b : Bool) -> Int {
+fn compare_bool(a : Bool, b : Bool) -> Int32 {
   match (a, b) {
     (false, true) => -1
     (true, false) => 1
@@ -69,7 +69,7 @@ pub(all) enum DateError {
   /// The month is out of bounds.
   MonthOutOfBounds
   /// The day is out of bounds.
-  DayOutOfBounds(Int)
+  DayOutOfBounds(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -138,7 +138,7 @@ pub fn Date::from_str(source : String) -> Result[Date, DateError] {
 
 ///|
 /// Get a date from an integer.
-pub fn Date::from_year(year : Int) -> Date {
+pub fn Date::from_year(year : Int32) -> Date {
   { year, month: None, day: None, approximate: false, season: None, }
 }
 
@@ -206,15 +206,15 @@ pub extend Date with Show::{to_string, output}
 /// A duration.
 pub(all) struct Duration {
   /// Days (24 hours).
-  days : Int
+  days : Int32
   /// Hours (60 minutes).
-  hours : Int
+  hours : Int32
   /// Minutes (60 seconds).
-  minutes : Int
+  minutes : Int32
   /// Seconds (1000 milliseconds).
-  seconds : Int
+  seconds : Int32
   /// Milliseconds.
-  milliseconds : Int
+  milliseconds : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -401,7 +401,7 @@ fn Duration::total_milliseconds(self : Duration) -> Int64 {
 
 ///|
 /// `impl Ord for Duration`.
-pub fn Duration::cmp(self : Duration, other : Duration) -> Int {
+pub fn Duration::cmp(self : Duration, other : Duration) -> Int32 {
   self.total_milliseconds().compare(other.total_milliseconds())
 }
 
@@ -507,7 +507,7 @@ pub fn DurationRange::from_str(
 }
 
 ///|
-fn parse_int_digits(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
+fn parse_int_digits(s : @unscanny.Scanner, min : Int32, max : Int32) -> Int32? {
   s.eat_whitespace() |> ignore
   let sign = s.eat_if_fn(c => c == '+' || c == '-')
   let positive = if sign { !s.before().has_suffix("-") } else { true }
@@ -526,7 +526,11 @@ fn parse_int_digits(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
 ///|
 /// `parse_unsigned_int` with a digit count range; parses into a `u32` (or
 /// `u8` where the caller checks).
-fn parse_unsigned_int_min(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
+fn parse_unsigned_int_min(
+  s : @unscanny.Scanner,
+  min : Int32,
+  max : Int32,
+) -> Int32? {
   s.eat_whitespace() |> ignore
   let num = s.eat_while(@unscanny.is_numeric)
   let len = @unscanny.len_utf8(num)
@@ -541,7 +545,7 @@ fn parse_unsigned_int_min(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
 
 ///|
 /// Parse a string with a plus/minus and one to four digits into an integer.
-fn parse_year(s : @unscanny.Scanner) -> Result[Int, DateError] {
+fn parse_year(s : @unscanny.Scanner) -> Result[Int32, DateError] {
   match parse_int_digits(s, 4, 4) {
     Some(y) => Ok(y)
     None => Err(UnknownFormat)
@@ -549,7 +553,7 @@ fn parse_year(s : @unscanny.Scanner) -> Result[Int, DateError] {
 }
 
 ///|
-fn parse_short_year(s : @unscanny.Scanner) -> Result[Int, DateError] {
+fn parse_short_year(s : @unscanny.Scanner) -> Result[Int32, DateError] {
   match parse_int_digits(s, 2, 2) {
     Some(year) => Ok(if year < 50 { year + 2000 } else { year + 1900 })
     None => Err(UnknownFormat)
@@ -557,7 +561,7 @@ fn parse_short_year(s : @unscanny.Scanner) -> Result[Int, DateError] {
 }
 
 ///|
-fn parse_u8_digits(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
+fn parse_u8_digits(s : @unscanny.Scanner, min : Int32, max : Int32) -> Int32? {
   match parse_unsigned_int_min(s, min, max) {
     Some(v) if v <= 255 => Some(v)
     _ => None
@@ -565,7 +569,7 @@ fn parse_u8_digits(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
 }
 
 ///|
-fn parse_month(s : @unscanny.Scanner) -> Result[Int, DateError] {
+fn parse_month(s : @unscanny.Scanner) -> Result[Int32, DateError] {
   guard parse_u8_digits(s, 1, 2) is Some(month) else {
     return Err(UnknownFormat)
   }
@@ -576,7 +580,7 @@ fn parse_month(s : @unscanny.Scanner) -> Result[Int, DateError] {
 }
 
 ///|
-fn parse_day(s : @unscanny.Scanner) -> Result[Int, DateError] {
+fn parse_day(s : @unscanny.Scanner) -> Result[Int32, DateError] {
   guard parse_u8_digits(s, 1, 2) is Some(day) else { return Err(UnknownFormat) }
   if !(day >= 1 && day <= 31) {
     return Err(MonthOutOfBounds)
@@ -587,7 +591,7 @@ fn parse_day(s : @unscanny.Scanner) -> Result[Int, DateError] {
 ///|
 fn parse_month_with_year(
   s : @unscanny.Scanner,
-) -> Result[(Int, Int), DateError] {
+) -> Result[(Int32, Int32), DateError] {
   let year = match parse_year(s) {
     Ok(y) => y
     Err(e) => return Err(e)
@@ -608,7 +612,9 @@ fn parse_month_with_year(
 }
 
 ///|
-fn parse_full_date(s : @unscanny.Scanner) -> Result[(Int, Int, Int), DateError] {
+fn parse_full_date(
+  s : @unscanny.Scanner,
+) -> Result[(Int32, Int32, Int32), DateError] {
   let idx = s.cursor()
   let year = match parse_short_year(s) {
     Ok(y) => y
@@ -647,7 +653,7 @@ fn parse_full_date(s : @unscanny.Scanner) -> Result[(Int, Int, Int), DateError] 
 }
 
 ///|
-fn days_in_month(month : Int, year : Int) -> Int {
+fn days_in_month(month : Int32, year : Int32) -> Int32 {
   if month == 1 {
     if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) {
       29

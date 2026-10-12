@@ -37,7 +37,7 @@ pub fn UnOp::from_kind(token : SyntaxKind) -> UnOp? {
 
 ///|
 /// The precedence of this operator.
-pub fn UnOp::precedence(self : UnOp) -> Int {
+pub fn UnOp::precedence(self : UnOp) -> Int32 {
   match self {
     Pos | Neg => 7
     Not => 4
@@ -121,7 +121,7 @@ pub fn BinOp::from_kind(token : SyntaxKind) -> BinOp? {
 
 ///|
 /// The precedence of this operator.
-pub fn BinOp::precedence(self : BinOp) -> Int {
+pub fn BinOp::precedence(self : BinOp) -> Int32 {
   match self {
     Mul | Div => 6
     Add | Sub => 5

@@ -116,7 +116,7 @@ fn pattern_decode(
   // for all possible 32-bit alignments, which later on allows us to
   // very easily blit it into the backdrop, significantly speeding up
   // the whole process.
-  let shifted_patterns : Array[UInt] = if pattern_width <= WORD_BITS &&
+  let shifted_patterns : Array[UInt32] = if pattern_width <= WORD_BITS &&
     pattern_height <= WORD_BITS {
     let h = pattern_height.reinterpret_as_int()
     let data = Array(capacity=patterns.length() * 32 * h * 2)
@@ -145,9 +145,9 @@ fn pattern_decode(
 /// A decoded pattern dictionary.
 priv struct PatternDictionary {
   patterns : Array[Bitmap]
-  pattern_width : UInt
-  pattern_height : UInt
-  shifted_patterns : Array[UInt]
+  pattern_width : UInt32
+  pattern_height : UInt32
+  shifted_patterns : Array[UInt32]
 }
 
 ///|
@@ -156,9 +156,9 @@ priv struct PatternDictionary {
 #inline
 fn PatternDictionary::shifted_pattern(
   self : PatternDictionary,
-  pattern_idx : Int,
-  bit_offset : UInt,
-) -> Int? {
+  pattern_idx : Int32,
+  bit_offset : UInt32,
+) -> Int32? {
   let h = self.pattern_height.reinterpret_as_int()
   let len = h * 2
   let start = (pattern_idx * 32 + bit_offset.reinterpret_as_int()) * len
@@ -175,11 +175,11 @@ priv struct PatternDictionaryHeader {
   mmr : Bool
   template : Template
   /// `HDPW`
-  pattern_width : UInt
+  pattern_width : UInt32
   /// `HDPH`
-  pattern_height : UInt
+  pattern_height : UInt32
   /// `GRAYMAX`
-  num_patterns : UInt
+  num_patterns : UInt32
   data : BytesView
 }
 

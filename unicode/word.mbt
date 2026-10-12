@@ -52,18 +52,18 @@ let word_cats : ReadOnlyArray[WordCat] = word_cat_names.map(fn(name) {
 })
 
 ///|
-fn word_category(c : Int) -> WordCat {
+fn word_category(c : Int32) -> WordCat {
   word_cats[in_valued(word_cat_table, c, 0)]
 }
 
 ///|
-fn is_emoji(c : Int) -> Bool {
+fn is_emoji(c : Int32) -> Bool {
   in_valued(emoji_cat_table, c, 0) == 1
 }
 
 ///|
 /// unicode-segmentation's `util::is_alphanumeric` (`Alphabetic` or `N`).
-fn seg_is_alphanumeric(c : Int) -> Bool {
+fn seg_is_alphanumeric(c : Int32) -> Bool {
   if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
     return true
   }
@@ -120,7 +120,7 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> WordBound {
   let len = s.length()
 
   // The category of the char after the one at `idx`.
-  fn get_next_cat(s : StringView, idx : Int) -> WordCat? {
+  fn get_next_cat(s : StringView, idx : Int32) -> WordCat? {
     let { idx: nidx, .. } = decode_at(s, idx)
     if nidx < s.length() {
       let { cp: nch, .. } = decode_at(s, nidx)
@@ -349,7 +349,7 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> WordBound {
 /// for every word).
 #valtype
 priv struct WordBound {
-  len : Int
+  len : Int32
   next_cat : WordCat?
 }
 

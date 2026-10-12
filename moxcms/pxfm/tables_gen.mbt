@@ -517,7 +517,7 @@ let exp_reduce_t1 : ReadOnlyArray[UInt64] = [
 
 ///|
 /// `LOG_REDUCTION_F32: [u32; 128]` (logs/logf.rs), flattened.
-let log_reduction_f32 : ReadOnlyArray[UInt] = [
+let log_reduction_f32 : ReadOnlyArray[UInt32] = [
   0x3f800000U, 0x3f7e0000U, 0x3f7c0000U, 0x3f7a0000U, 0x3f780000U, 0x3f760000U, 0x3f740000U,
   0x3f720000U, 0x3f700000U, 0x3f6f0000U, 0x3f6d0000U, 0x3f6b0000U, 0x3f6a0000U, 0x3f680000U,
   0x3f660000U, 0x3f650000U, 0x3f630000U, 0x3f620000U, 0x3f600000U, 0x3f5f0000U, 0x3f5d0000U,
@@ -615,7 +615,7 @@ let log_range_reduction_table : ReadOnlyArray[UInt64] = [
 
 ///|
 /// `S2: [i32; 193]` (logs/log_range_reduction.rs).
-let log_s2 : ReadOnlyArray[Int] = [
+let log_s2 : ReadOnlyArray[Int32] = [
   257, 253, 249, 245, 241, 237, 233, 229, 225, 221, 217, 213, 209, 205, 201, 197,
   193, 189, 185, 180, 176, 172, 168, 164, 160, 156, 152, 148, 144, 140, 136, 132,
   128, 124, 120, 116, 112, 108, 104, 100, 96, 92, 88, 84, 80, 76, 72, 68, 64, 60,
@@ -633,7 +633,7 @@ let log_s2 : ReadOnlyArray[Int] = [
 
 ///|
 /// `S3: [i32; 161]` (logs/log_range_reduction.rs).
-let log_s3 : ReadOnlyArray[Int] = [
+let log_s3 : ReadOnlyArray[Int32] = [
   80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61,
   60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41,
   40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21,
@@ -647,7 +647,7 @@ let log_s3 : ReadOnlyArray[Int] = [
 
 ///|
 /// `S4: [i32; 130]` (logs/log_range_reduction.rs).
-let log_s4 : ReadOnlyArray[Int] = [
+let log_s4 : ReadOnlyArray[Int32] = [
   65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46,
   45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26,
   25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5,

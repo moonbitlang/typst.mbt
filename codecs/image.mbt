@@ -53,7 +53,7 @@ pub extend ColorType with @debug.Debug::{to_repr}
 
 ///|
 /// The number of channels of the color type.
-pub fn ColorType::channel_count(self : ColorType) -> Int {
+pub fn ColorType::channel_count(self : ColorType) -> Int32 {
   match self {
     L8 | L16 => 1
     La8 | La16 => 2
@@ -67,9 +67,9 @@ pub fn ColorType::channel_count(self : ColorType) -> Int {
 /// pixel data.
 pub(all) struct ImageInfo {
   /// The pixel width (upstream `ImageDecoder::dimensions().0`).
-  width : UInt
+  width : UInt32
   /// The pixel height.
-  height : UInt
+  height : UInt32
   /// The color type of the decoded image.
   color : ColorType
   /// The embedded ICC profile, if any (upstream `ImageDecoder::icc_profile`).
@@ -83,13 +83,13 @@ pub extend ImageInfo with @debug.Debug::{to_repr}
 
 ///|
 /// A big-endian 16-bit load.
-fn u16_be(data : BytesView, i : Int) -> Int {
+fn u16_be(data : BytesView, i : Int32) -> Int32 {
   (data[i].to_int() << 8) | data[i + 1].to_int()
 }
 
 ///|
 /// A big-endian 32-bit load.
-fn u32_be(data : BytesView, i : Int) -> UInt {
+fn u32_be(data : BytesView, i : Int32) -> UInt32 {
   (data[i].to_uint() << 24) |
   (data[i + 1].to_uint() << 16) |
   (data[i + 2].to_uint() << 8) |
@@ -98,13 +98,13 @@ fn u32_be(data : BytesView, i : Int) -> UInt {
 
 ///|
 /// A little-endian 16-bit load.
-fn u16_le(data : BytesView, i : Int) -> Int {
+fn u16_le(data : BytesView, i : Int32) -> Int32 {
   data[i].to_int() | (data[i + 1].to_int() << 8)
 }
 
 ///|
 /// A little-endian 24-bit load.
-fn u24_le(data : BytesView, i : Int) -> UInt {
+fn u24_le(data : BytesView, i : Int32) -> UInt32 {
   data[i].to_uint() |
   (data[i + 1].to_uint() << 8) |
   (data[i + 2].to_uint() << 16)
@@ -112,7 +112,7 @@ fn u24_le(data : BytesView, i : Int) -> UInt {
 
 ///|
 /// A little-endian 32-bit load.
-fn u32_le(data : BytesView, i : Int) -> UInt {
+fn u32_le(data : BytesView, i : Int32) -> UInt32 {
   data[i].to_uint() |
   (data[i + 1].to_uint() << 8) |
   (data[i + 2].to_uint() << 16) |

@@ -84,19 +84,19 @@ fn UntypedVal::write_lo64(self : UntypedVal, bits : UInt64) -> UntypedVal {
 
 ///|
 /// `ReadAs<i8>` (sign-extended to `Int`).
-pub fn UntypedVal::read_i8(self : UntypedVal) -> Int {
+pub fn UntypedVal::read_i8(self : UntypedVal) -> Int32 {
   self.lo64.to_int() << 24 >> 24
 }
 
 ///|
 /// `ReadAs<i16>` (sign-extended to `Int`).
-pub fn UntypedVal::read_i16(self : UntypedVal) -> Int {
+pub fn UntypedVal::read_i16(self : UntypedVal) -> Int32 {
   self.lo64.to_int() << 16 >> 16
 }
 
 ///|
 /// `ReadAs<i32>`
-pub fn UntypedVal::read_i32(self : UntypedVal) -> Int {
+pub fn UntypedVal::read_i32(self : UntypedVal) -> Int32 {
   self.lo64.to_int()
 }
 
@@ -108,19 +108,19 @@ pub fn UntypedVal::read_i64(self : UntypedVal) -> Int64 {
 
 ///|
 /// `ReadAs<u8>` (zero-extended to `Int`).
-pub fn UntypedVal::read_u8(self : UntypedVal) -> Int {
+pub fn UntypedVal::read_u8(self : UntypedVal) -> Int32 {
   self.lo64.to_int() & 0xFF
 }
 
 ///|
 /// `ReadAs<u16>` (zero-extended to `Int`).
-pub fn UntypedVal::read_u16(self : UntypedVal) -> Int {
+pub fn UntypedVal::read_u16(self : UntypedVal) -> Int32 {
   self.lo64.to_int() & 0xFFFF
 }
 
 ///|
 /// `ReadAs<u32>`
-pub fn UntypedVal::read_u32(self : UntypedVal) -> UInt {
+pub fn UntypedVal::read_u32(self : UntypedVal) -> UInt32 {
   self.lo64.to_uint()
 }
 
@@ -158,19 +158,19 @@ pub fn UntypedVal::read_v128(self : UntypedVal) -> V128Value {
 
 ///|
 /// `WriteAs<i8>` (`value as u8 as u64`).
-pub fn UntypedVal::write_i8(self : UntypedVal, value : Int) -> UntypedVal {
+pub fn UntypedVal::write_i8(self : UntypedVal, value : Int32) -> UntypedVal {
   self.write_lo64((value & 0xFF).to_uint64())
 }
 
 ///|
 /// `WriteAs<i16>` (`value as u16 as u64`).
-pub fn UntypedVal::write_i16(self : UntypedVal, value : Int) -> UntypedVal {
+pub fn UntypedVal::write_i16(self : UntypedVal, value : Int32) -> UntypedVal {
   self.write_lo64((value & 0xFFFF).to_uint64())
 }
 
 ///|
 /// `WriteAs<i32>` (`value as u32 as u64`).
-pub fn UntypedVal::write_i32(self : UntypedVal, value : Int) -> UntypedVal {
+pub fn UntypedVal::write_i32(self : UntypedVal, value : Int32) -> UntypedVal {
   self.write_lo64(value.reinterpret_as_uint().to_uint64())
 }
 
@@ -182,7 +182,7 @@ pub fn UntypedVal::write_i64(self : UntypedVal, value : Int64) -> UntypedVal {
 
 ///|
 /// `WriteAs<u32>`
-pub fn UntypedVal::write_u32(self : UntypedVal, value : UInt) -> UntypedVal {
+pub fn UntypedVal::write_u32(self : UntypedVal, value : UInt32) -> UntypedVal {
   self.write_lo64(value.to_uint64())
 }
 
@@ -223,7 +223,7 @@ pub fn UntypedVal::write_v128(
 
 ///|
 /// `From<u8>` / `From<u16>` / `From<u32>`
-pub fn UntypedVal::from_u32(value : UInt) -> UntypedVal {
+pub fn UntypedVal::from_u32(value : UInt32) -> UntypedVal {
   UntypedVal::from_bits64(value.to_uint64())
 }
 
@@ -241,19 +241,19 @@ pub fn UntypedVal::from_bool(value : Bool) -> UntypedVal {
 
 ///|
 /// `From<i8>` (`u64::from(value as u8)`).
-pub fn UntypedVal::from_i8(value : Int) -> UntypedVal {
+pub fn UntypedVal::from_i8(value : Int32) -> UntypedVal {
   UntypedVal::from_bits64((value & 0xFF).to_uint64())
 }
 
 ///|
 /// `From<i16>` (`u64::from(value as u16)`).
-pub fn UntypedVal::from_i16(value : Int) -> UntypedVal {
+pub fn UntypedVal::from_i16(value : Int32) -> UntypedVal {
   UntypedVal::from_bits64((value & 0xFFFF).to_uint64())
 }
 
 ///|
 /// `From<i32>` (`u64::from(value as u32)`).
-pub fn UntypedVal::from_i32(value : Int) -> UntypedVal {
+pub fn UntypedVal::from_i32(value : Int32) -> UntypedVal {
   UntypedVal::from_bits64(value.reinterpret_as_uint().to_uint64())
 }
 

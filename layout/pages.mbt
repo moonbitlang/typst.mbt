@@ -35,13 +35,13 @@ let document_memo : @library.PageMemo[PagedDocument] = @library.PageMemo::new(
 /// laid out since the process started (for tests and measurements, like
 /// `@library.closure_memo_stats`). A compilation lays the document out
 /// once per iteration of its introspection loop.
-pub fn document_memo_stats() -> (Int, Int) {
+pub fn document_memo_stats() -> (Int32, Int32) {
   document_memo.stats()
 }
 
 ///|
 /// The number of documents that are kept (for tests and measurements).
-pub fn document_memo_entries() -> Int {
+pub fn document_memo_entries() -> Int32 {
   document_memo.entries()
 }
 

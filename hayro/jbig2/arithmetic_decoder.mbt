@@ -18,13 +18,13 @@ priv struct ArithmeticDecoder {
   /// The underlying encoded data.
   data : BytesView
   /// The C-register (see Table C.1).
-  mut c : UInt
+  mut c : UInt32
   /// The A-register (see Table C.1).
-  mut a : UInt
+  mut a : UInt32
   /// The pointer to the current byte.
-  mut base_pointer : Int
+  mut base_pointer : Int32
   /// The bit shift counter.
-  mut shift_count : UInt
+  mut shift_count : UInt32
 }
 
 ///|
@@ -40,8 +40,8 @@ fn ArithmeticDecoder::new(data : BytesView) -> ArithmeticDecoder {
 fn ArithmeticDecoder::read_bit(
   self : ArithmeticDecoder,
   contexts : FixedArray[Byte],
-  index : Int,
-) -> UInt {
+  index : Int32,
+) -> UInt32 {
   self.decode(contexts, index)
 }
 
@@ -127,8 +127,8 @@ fn ArithmeticDecoder::renormalize(self : ArithmeticDecoder) -> Unit {
 fn ArithmeticDecoder::decode(
   self : ArithmeticDecoder,
   contexts : FixedArray[Byte],
-  index : Int,
-) -> UInt {
+  index : Int32,
+) -> UInt32 {
   let context = contexts[index].to_uint()
   // (`QE_TABLE[context.index()]`, packed into one word; see `qe_packed`.)
   let qe_entry = qe_packed[(context & 0x7F).reinterpret_as_int()]
@@ -154,14 +154,14 @@ fn ArithmeticDecoder::decode(
   // both paths with a single branchless computation.
   //
   // As can be seen above, renormalization is always performed.
-  let is_lps : UInt = if self.c >> 16 >= self.a { 1 } else { 0 }
+  let is_lps : UInt32 = if self.c >> 16 >= self.a { 1 } else { 0 }
 
   // LPS: C -= A << 16 (no-op when MPS).
   let lps_mask = 0U - is_lps // 0xFFFF_FFFF if LPS, 0 if MPS
   self.c -= (self.a << 16) & lps_mask
 
   // Same condition as in exchange_mps / exchange_lps.
-  let cond : UInt = if self.a < qe { 1 } else { 0 }
+  let cond : UInt32 = if self.a < qe { 1 } else { 0 }
 
   // LPS: a = qe (no-op when MPS, a stays as a - qe).
   self.a = (self.a & lps_mask.lnot()) | (qe & lps_mask)
@@ -213,22 +213,22 @@ fn ArithmeticDecoder::next_byte(self : ArithmeticDecoder) -> Byte {
 
 ///|
 /// A fresh context vector (`vec![ArithmeticDecoderContext::default(); n]`).
-fn new_contexts(n : Int) -> FixedArray[Byte] {
+fn new_contexts(n : Int32) -> FixedArray[Byte] {
   FixedArray::make(n, b'\x00')
 }
 
 ///|
 priv struct QeData {
-  qe : UInt
-  nmps : UInt
-  nlps : UInt
+  qe : UInt32
+  nmps : UInt32
+  nlps : UInt32
   switch_ : Bool
 }
 
 ///|
 /// `qe_table` packed as `qe | nmps << 16 | nlps << 24 | switch << 31`, so
 /// that `decode` needs a single load per bit.
-let qe_packed : FixedArray[UInt] = FixedArray::makei(qe_table.length(), i => {
+let qe_packed : FixedArray[UInt32] = FixedArray::makei(qe_table.length(), i => {
   let e = qe_table[i]
   e.qe |
   (e.nmps << 16) |

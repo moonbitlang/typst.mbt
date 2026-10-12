@@ -46,20 +46,20 @@ fn items_to_owned_format_item(items : Array[FormatItem]) -> FormatItem {
 priv struct Token {
   value : String
   /// The byte offset of the start of the token.
-  start : Int
+  start : Int32
 }
 
 ///|
 priv struct Modifier {
   key : String
   /// The byte offset of the key.
-  key_location : Int
+  key_location : Int32
   value : String
 }
 
 ///|
 /// `Modifier::value_span().start`.
-fn Modifier::value_start(self : Modifier) -> Int {
+fn Modifier::value_start(self : Modifier) -> Int32 {
   self.key_location + utf8_len(self.key) + 1
 }
 
@@ -72,7 +72,7 @@ priv struct Modifiers {
 ///|
 priv struct NestedFormatDescription {
   mut leading_whitespace : Token?
-  opening_bracket : Int
+  opening_bracket : Int32
   items : Array[FormatItem]
 }
 
@@ -89,18 +89,18 @@ priv struct Lexer {
   chars : Array[Char]
   /// `offsets[i]` is the byte offset of `chars[i]`; the last entry is the
   /// total byte length.
-  offsets : Array[Int]
+  offsets : Array[Int32]
   /// The index of the next character.
-  mut pos : Int
+  mut pos : Int32
   /// The nesting depth (a `u8` upstream).
-  mut depth : Int
+  mut depth : Int32
   /// Whether the output is owned (`parse_owned`) or borrowed
   /// (`parse_borrowed`).
   owned : Bool
 }
 
 ///|
-fn utf8_char_len(c : Char) -> Int {
+fn utf8_char_len(c : Char) -> Int32 {
   let c = c.to_int()
   if c < 0x80 {
     1
@@ -114,7 +114,7 @@ fn utf8_char_len(c : Char) -> Int {
 }
 
 ///|
-fn utf8_len(s : String) -> Int {
+fn utf8_len(s : String) -> Int32 {
   let mut len = 0
   for c in s {
     len += utf8_char_len(c)
@@ -142,17 +142,17 @@ fn Lexer::is_empty(self : Lexer) -> Bool {
 
 ///|
 /// The byte position of the lexer.
-fn Lexer::byte_pos(self : Lexer) -> Int {
+fn Lexer::byte_pos(self : Lexer) -> Int32 {
   self.offsets[self.pos]
 }
 
 ///|
-fn Lexer::peek(self : Lexer, ahead : Int) -> Char? {
+fn Lexer::peek(self : Lexer, ahead : Int32) -> Char? {
   self.chars.get(self.pos + ahead)
 }
 
 ///|
-fn Lexer::slice(self : Lexer, start : Int, end : Int) -> String {
+fn Lexer::slice(self : Lexer, start : Int32, end : Int32) -> String {
   String::from_array(self.chars[start:end])
 }
 
@@ -200,7 +200,7 @@ fn Lexer::consume_component_part(self : Lexer) -> Token? {
 }
 
 ///|
-fn Lexer::consume_closing_bracket(self : Lexer) -> Int? {
+fn Lexer::consume_closing_bracket(self : Lexer) -> Int32? {
   if self.peek(0) != Some(']') {
     return None
   }
@@ -213,7 +213,7 @@ fn Lexer::consume_closing_bracket(self : Lexer) -> Int? {
 ///|
 fn Lexer::consume_component_name(
   self : Lexer,
-  opening_bracket : Int,
+  opening_bracket : Int32,
 ) -> Token raise InvalidFormatDescription {
   let leading_whitespace = self.consume_whitespace() is Some(_)
   guard self.consume_component_part() is Some(name) else {
@@ -256,7 +256,7 @@ fn Lexer::parse_modifiers(
 ///|
 fn Lexer::consume_component(
   self : Lexer,
-  opening_bracket : Int,
+  opening_bracket : Int32,
 ) -> FormatItem raise InvalidFormatDescription {
   if self.depth + 1 > 255 {
     raise NotSupported(
@@ -335,7 +335,7 @@ fn Lexer::optional(
   self : Lexer,
   value : Array[FormatItem],
   format : Bool,
-  span_start : Int,
+  span_start : Int32,
 ) -> FormatItem raise InvalidFormatDescription {
   if !self.owned {
     raise NotSupported(
@@ -359,7 +359,7 @@ fn Lexer::optional(
 fn Lexer::first(
   self : Lexer,
   value : Array[Array[FormatItem]],
-  span_start : Int,
+  span_start : Int32,
 ) -> FormatItem raise InvalidFormatDescription {
   if !self.owned {
     raise NotSupported(
@@ -449,7 +449,7 @@ fn Lexer::consume_literal(self : Lexer) -> String {
 ///|
 fn Lexer::consume_backslash_escape_sequence(
   self : Lexer,
-  location : Int,
+  location : Int32,
 ) -> String raise InvalidFormatDescription {
   match self.peek(1) {
     Some('\\' | '[' | ']' as c) => {
@@ -503,8 +503,8 @@ fn ident_eq(provided : String, expected : String) -> Bool {
 /// The parsed value of a modifier: either the index of the matching variant
 /// or (for `[ignore count:_]`) the parsed number.
 priv enum ModifierValue {
-  Variant(Int)
-  Number(Int)
+  Variant(Int32)
+  Number(Int32)
 }
 
 ///|
@@ -537,7 +537,7 @@ fn from_modifier_value(
 
 ///|
 /// `<NonZero<u16> as FromStr>::from_str`.
-fn parse_nonzero_u16(s : String) -> Int? {
+fn parse_nonzero_u16(s : String) -> Int32? {
   let digits = if s.has_prefix("+") { s.view(start_offset=1) } else { s.view() }
   if digits.length() == 0 {
     return None
@@ -594,7 +594,7 @@ fn parse_optional_format_modifier(
 }
 
 ///|
-fn variant_or(value : ModifierValue?, default : Int) -> Int {
+fn variant_or(value : ModifierValue?, default : Int32) -> Int32 {
   match value {
     Some(Variant(i)) => i
     _ => default

@@ -5,11 +5,11 @@
 ///|
 fn alpha_composite_solid(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
-  src : FixedArray[Int],
+  start : Int32,
+  len : Int32,
+  src : FixedArray[Int32],
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   alpha_composite_solid_scalar(dest, start, len, src, alpha_buf, alphas)
 }
@@ -17,12 +17,12 @@ fn alpha_composite_solid(
 ///|
 fn alpha_composite_buffer(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
   src : FixedArray[Byte],
-  src_start : Int,
+  src_start : Int32,
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   alpha_composite_buffer_scalar(
     dest, start, len, src, src_start, alpha_buf, alphas,

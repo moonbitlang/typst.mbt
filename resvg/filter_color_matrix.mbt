@@ -6,7 +6,7 @@
 /// Input image pixels should have an **unpremultiplied alpha**.
 fn color_matrix_apply(
   matrix : @usvg.ColorMatrixKind,
-  data : FixedArray[UInt],
+  data : FixedArray[UInt32],
 ) -> Unit {
   match matrix {
     Matrix(m) =>
@@ -65,7 +65,7 @@ fn color_matrix_apply(
 }
 
 ///|
-fn apply_rgb_matrix(m : FixedArray[Float], data : FixedArray[UInt]) -> Unit {
+fn apply_rgb_matrix(m : FixedArray[Float], data : FixedArray[UInt32]) -> Unit {
   for i in 0..<data.length() {
     let p = data[i]
     let (r, g, b, _) = to_normalized_components(p)
@@ -82,7 +82,7 @@ fn apply_rgb_matrix(m : FixedArray[Float], data : FixedArray[UInt]) -> Unit {
 }
 
 ///|
-fn to_normalized_components(pixel : UInt) -> (Float, Float, Float, Float) {
+fn to_normalized_components(pixel : UInt32) -> (Float, Float, Float, Float) {
   (
     Float::from_int(px_r(pixel)) / 255.0,
     Float::from_int(px_g(pixel)) / 255.0,
@@ -92,6 +92,6 @@ fn to_normalized_components(pixel : UInt) -> (Float, Float, Float, Float) {
 }
 
 ///|
-fn from_normalized(c : Float) -> Int {
+fn from_normalized(c : Float) -> Int32 {
   f32_to_u8(f32_bound(0.0, c, 1.0) * 255.0)
 }

@@ -54,7 +54,7 @@ fn write_direct_number(n : @hayro_syntax.Number) -> @export.Obj {
 
 ///|
 /// Rust's saturating `f64 as i32`.
-fn f64_to_i32_sat(v : Double) -> Int {
+fn f64_to_i32_sat(v : Double) -> Int32 {
   if v.is_nan() {
     0
   } else if v >= 2147483647.0 {
@@ -122,7 +122,7 @@ fn write_direct(
 ///|
 fn write_indirect(
   obj : @hayro_syntax.Object,
-  id : Int,
+  id : Int32,
   ctx : ExtractionContext,
 ) -> Unit {
   match obj {

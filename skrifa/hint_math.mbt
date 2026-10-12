@@ -2,43 +2,43 @@
 // product helper from `projection.rs`.
 
 ///|
-fn hfloor(x : Int) -> Int {
+fn hfloor(x : Int32) -> Int32 {
   x & -64
 }
 
 ///|
-fn hround(x : Int) -> Int {
+fn hround(x : Int32) -> Int32 {
   hfloor(x + 32)
 }
 
 ///|
-fn hceil(x : Int) -> Int {
+fn hceil(x : Int32) -> Int32 {
   hfloor(x + 63)
 }
 
 ///|
-fn floor_pad(x : Int, n : Int) -> Int {
+fn floor_pad(x : Int32, n : Int32) -> Int32 {
   x & -n
 }
 
 ///|
-fn round_pad(x : Int, n : Int) -> Int {
+fn round_pad(x : Int32, n : Int32) -> Int32 {
   floor_pad(x + n / 2, n)
 }
 
 ///|
-fn hmul(a : Int, b : Int) -> Int {
+fn hmul(a : Int32, b : Int32) -> Int32 {
   (Fixed::from_bits(a) * Fixed::from_bits(b)).to_bits()
 }
 
 ///|
-fn hdiv(a : Int, b : Int) -> Int {
+fn hdiv(a : Int32, b : Int32) -> Int32 {
   (Fixed::from_bits(a) / Fixed::from_bits(b)).to_bits()
 }
 
 ///|
 /// Fixed point multiply and divide: a * b / c
-fn hmul_div(a : Int, b : Int, c : Int) -> Int {
+fn hmul_div(a : Int32, b : Int32, c : Int32) -> Int32 {
   Fixed::from_bits(a)
   .mul_div(Fixed::from_bits(b), Fixed::from_bits(c))
   .to_bits()
@@ -46,7 +46,7 @@ fn hmul_div(a : Int, b : Int, c : Int) -> Int {
 
 ///|
 /// Fixed point multiply and divide without rounding: a * b / c
-fn mul_div_no_round(a : Int, b : Int, c : Int) -> Int {
+fn mul_div_no_round(a : Int32, b : Int32, c : Int32) -> Int32 {
   let mut a = a
   let mut b = b
   let mut c = c
@@ -77,7 +77,7 @@ fn mul_div_no_round(a : Int, b : Int, c : Int) -> Int {
 
 ///|
 /// Multiplication for 2.14 fixed point.
-fn mul14(a : Int, b : Int) -> Int {
+fn mul14(a : Int32, b : Int32) -> Int32 {
   let mut v = a.to_int64() * b.to_int64()
   v = v + 0x2000L + (v >> 63)
   (v >> 14).to_int()
@@ -85,7 +85,7 @@ fn mul14(a : Int, b : Int) -> Int {
 
 ///|
 /// Dot product for vectors in 2.14 fixed point.
-fn dot14(ax : Int, ay : Int, bx : Int, by : Int) -> Int {
+fn dot14(ax : Int32, ay : Int32, bx : Int32, by : Int32) -> Int32 {
   let mut v1 = ax.to_int64() * bx.to_int64()
   let v2 = ay.to_int64() * by.to_int64()
   v1 = v1 + v2
@@ -95,7 +95,7 @@ fn dot14(ax : Int, ay : Int, bx : Int, by : Int) -> Int {
 
 ///|
 /// Wrapping i32 division (`Wrapping<i32> / Wrapping<i32>`).
-fn wdiv(a : Int, b : Int) -> Int {
+fn wdiv(a : Int32, b : Int32) -> Int32 {
   if b == -1 {
     -a
   } else {
@@ -107,7 +107,7 @@ fn wdiv(a : Int, b : Int) -> Int {
 /// Normalize a vector in 2.14 fixed point.
 ///
 /// Direct port of FreeType's `FT_Vector_NormLen`.
-fn normalize14(x : Int, y : Int) -> (Int, Int) {
+fn normalize14(x : Int32, y : Int32) -> (Int32, Int32) {
   let mut sx = 1
   let mut sy = 1
   let mut ux = x.reinterpret_as_uint()

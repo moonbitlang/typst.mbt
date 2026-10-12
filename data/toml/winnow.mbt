@@ -68,8 +68,8 @@ fn backtrack() -> ErrMode {
 /// `Stateful` -- is not restored by checkpoints.
 priv struct Input {
   bytes : Bytes
-  mut pos : Int
-  mut depth : Int
+  mut pos : Int32
+  mut depth : Int32
 }
 
 ///|
@@ -84,7 +84,7 @@ fn Input::at_eof(self : Input) -> Bool {
 
 ///|
 /// The byte at `pos + k`, or `-1` past the end.
-fn Input::byte_at(self : Input, k : Int) -> Int {
+fn Input::byte_at(self : Input, k : Int32) -> Int32 {
   let p = self.pos + k
   if p < self.bytes.length() {
     self.bytes[p].to_int()
@@ -95,13 +95,13 @@ fn Input::byte_at(self : Input, k : Int) -> Int {
 
 ///|
 /// Decodes the bytes `start..end` (always on char boundaries) as a string.
-fn Input::slice(self : Input, start : Int, end : Int) -> String {
+fn Input::slice(self : Input, start : Int32, end : Int32) -> String {
   @utf8.decode_lossy(self.bytes[start:end])
 }
 
 ///|
 /// `peek(any)`: the next byte without consuming it.
-fn peek_any(i : Input) -> Int raise ErrMode {
+fn peek_any(i : Input) -> Int32 raise ErrMode {
   if i.at_eof() {
     raise backtrack()
   }
@@ -110,7 +110,7 @@ fn peek_any(i : Input) -> Int raise ErrMode {
 
 ///|
 /// `any`: consumes and returns the next byte.
-fn any(i : Input) -> Int raise ErrMode {
+fn any(i : Input) -> Int32 raise ErrMode {
   if i.at_eof() {
     raise backtrack()
   }
@@ -121,7 +121,7 @@ fn any(i : Input) -> Int raise ErrMode {
 
 ///|
 /// `one_of(set)` (`any.verify(..)`): does not advance on failure.
-fn one_of(i : Input, pred : (Int) -> Bool) -> Int raise ErrMode {
+fn one_of(i : Input, pred : (Int32) -> Bool) -> Int32 raise ErrMode {
   if i.at_eof() || !pred(i.byte_at(0)) {
     raise backtrack()
   }
@@ -132,7 +132,7 @@ fn one_of(i : Input, pred : (Int) -> Bool) -> Int raise ErrMode {
 
 ///|
 /// `one_of(byte)` / a byte literal parser.
-fn byte(i : Input, b : Int) -> Unit raise ErrMode {
+fn byte(i : Input, b : Int32) -> Unit raise ErrMode {
   ignore(one_of(i, c => c == b))
 }
 
@@ -161,7 +161,7 @@ fn Input::starts_with(self : Input, s : String) -> Bool {
 
 ///|
 /// `take_while(0.., set)`: returns the start offset of the taken slice.
-fn take_while0(i : Input, pred : (Int) -> Bool) -> Int {
+fn take_while0(i : Input, pred : (Int32) -> Bool) -> Int32 {
   let start = i.pos
   while !i.at_eof() && pred(i.byte_at(0)) {
     i.pos += 1
@@ -171,7 +171,7 @@ fn take_while0(i : Input, pred : (Int) -> Bool) -> Int {
 
 ///|
 /// `take_while(1.., set)`: fails without advancing if nothing matches.
-fn take_while1(i : Input, pred : (Int) -> Bool) -> Int raise ErrMode {
+fn take_while1(i : Input, pred : (Int32) -> Bool) -> Int32 raise ErrMode {
   let start = take_while0(i, pred)
   if i.pos == start {
     raise backtrack()
@@ -183,10 +183,10 @@ fn take_while1(i : Input, pred : (Int) -> Bool) -> Int raise ErrMode {
 /// `take_while(m..=n, set)`: fails without advancing if fewer than `m` match.
 fn take_while_m_n(
   i : Input,
-  m : Int,
-  n : Int,
-  pred : (Int) -> Bool,
-) -> Int raise ErrMode {
+  m : Int32,
+  n : Int32,
+  pred : (Int32) -> Bool,
+) -> Int32 raise ErrMode {
   let start = i.pos
   let mut count = 0
   while count < n && i.pos + count < i.bytes.length() && pred(i.byte_at(count)) {
@@ -378,7 +378,7 @@ fn[T] separated_rest(
 ///|
 /// Reports a failed `try_map`/`verify`: winnow resets the input to where the
 /// mapped parser started and raises a recoverable error carrying the cause.
-fn map_failure(i : Input, start : Int, cause : String?) -> ErrMode {
+fn map_failure(i : Input, start : Int32, cause : String?) -> ErrMode {
   i.pos = start
   Backtrack({ context: [], cause, })
 }

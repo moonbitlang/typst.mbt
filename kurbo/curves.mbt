@@ -482,7 +482,7 @@ fn arclen_quadrature_core(
 }
 
 ///|
-fn arclen_rec(c : CubicBez, accuracy : Double, depth : Int) -> Double {
+fn arclen_rec(c : CubicBez, accuracy : Double, depth : Int32) -> Double {
   let d03 = c.p3.sub(c.p0)
   let d01 = c.p1.sub(c.p0)
   let d12 = c.p2.sub(c.p1)

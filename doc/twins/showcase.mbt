@@ -65,7 +65,7 @@ let maxwell : String = "nabla times bold(B) - 1/c^2 (partial bold(E)) / (partial
 
 ///|
 /// The first Fibonacci numbers (the computed table).
-fn fibonacci(count : Int) -> Array[Int] {
+fn fibonacci(count : Int32) -> Array[Int32] {
   let fibs = [0, 1]
   for i in 2..<count {
     fibs.push(fibs[i - 1] + fibs[i - 2])

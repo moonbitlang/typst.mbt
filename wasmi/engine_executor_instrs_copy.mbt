@@ -86,7 +86,7 @@ fn Executor::execute_copy_span(
   self : Executor,
   results : @ir.SlotSpan,
   values : @ir.SlotSpan,
-  len : Int,
+  len : Int32,
 ) -> Unit {
   self.execute_copy_span_impl(results, values, len)
   self.next_instr()
@@ -98,7 +98,7 @@ fn Executor::execute_copy_span_impl(
   self : Executor,
   results : @ir.SlotSpan,
   values : @ir.SlotSpan,
-  len : Int,
+  len : Int32,
 ) -> Unit {
   let results = self.sp + results.head().0
   let values = self.sp + values.head().0
@@ -143,10 +143,10 @@ fn Executor::copy_values(
 /// Internal implementation of [`Op::CopyMany`] execution.
 fn Executor::execute_copy_many_impl(
   self : Executor,
-  ip : Int,
+  ip : Int32,
   results : @ir.SlotSpan,
   values : FixedArray[@ir.Slot],
-) -> Int {
+) -> Int32 {
   let mut ip = ip
   let mut result = results.head()
   result = self.copy_values(result, values)

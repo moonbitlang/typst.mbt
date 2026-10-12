@@ -26,7 +26,7 @@ priv enum ScalarStyle {
 priv enum TokenData {
   StreamStart
   StreamEnd
-  VersionDirective(Int, Int)
+  VersionDirective(Int32, Int32)
   /// Handle and prefix.
   TagDirective(Bytes, Bytes)
   DocumentStart
@@ -62,7 +62,7 @@ priv struct Token {
 priv struct SimpleKey {
   mut possible : Bool
   mut required : Bool
-  mut token_number : Int
+  mut token_number : Int32
   mut mark : Mark
 }
 
@@ -136,33 +136,33 @@ priv struct Parser {
   // Error state.
   mut error : ErrorType
   mut problem : String
-  mut problem_offset : Int
+  mut problem_offset : Int32
   mut problem_mark : Mark
   mut context : String?
   mut context_mark : Mark
   // Reader state. The decoded buffer is `input[0..raw_pos]` (decoding
   // re-encodes valid UTF-8 unchanged), `ptr` is `buffer.pointer`.
-  mut raw_pos : Int
-  mut raw_last : Int
+  mut raw_pos : Int32
+  mut raw_last : Int32
   mut eof : Bool
-  mut unread : Int
-  mut ptr : Int
+  mut unread : Int32
+  mut ptr : Int32
   // Scanner state.
-  mut mark_index : Int
-  mut mark_line : Int
-  mut mark_column : Int
+  mut mark_index : Int32
+  mut mark_line : Int32
+  mut mark_column : Int32
   mut stream_start_produced : Bool
   mut stream_end_produced : Bool
-  mut flow_level : Int
+  mut flow_level : Int32
   tokens : Array[Token]
-  mut tokens_head : Int
-  mut tokens_parsed : Int
+  mut tokens_head : Int32
+  mut tokens_parsed : Int32
   mut token_available : Bool
-  indents : Array[Int]
-  mut indent : Int
+  indents : Array[Int32]
+  mut indent : Int32
   mut simple_key_allowed : Bool
   simple_keys : Array[SimpleKey]
-  mut not_simple_keys : Int
+  mut not_simple_keys : Int32
   // Parser state.
   mut state : ParserState
   states : Array[ParserState]

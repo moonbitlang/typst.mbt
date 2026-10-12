@@ -45,13 +45,13 @@ fn vnormalize(x : Float) -> Float {
 
 ///|
 /// `vcvtq_s32_f32`: truncating, saturating, NaN maps to 0.
-fn vtrunc_int(x : Float) -> Int {
+fn vtrunc_int(x : Float) -> Int32 {
   x.to_int()
 }
 
 ///|
 /// `vcvtnq_s32_f32`: round to nearest even, saturating, NaN maps to 0.
-fn vround_int(x : Float) -> Int {
+fn vround_int(x : Float) -> Int32 {
   rintf(x).to_int()
 }
 

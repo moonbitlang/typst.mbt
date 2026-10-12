@@ -54,7 +54,7 @@ let tall_height : Double = 34
 ///|
 /// A left brace over `rows` rows of operations, one of which is the row of
 /// Operation 19.
-fn brace(rows : Int) -> Equation {
+fn brace(rows : Int32) -> Equation {
   let size = (rows - 1).to_double() * op_height + tall_height - 5
   Equation("stretch(\\{, size: #\{size}pt)")
 }
@@ -75,7 +75,7 @@ let dots2 : String = "dots.h dots.h"
 
 ///|
 /// `n` cells of dots.
-fn dotted(n : Int) -> Array[String] {
+fn dotted(n : Int32) -> Array[String] {
   Array::make(n, dots)
 }
 
@@ -84,7 +84,7 @@ fn dotted(n : Int) -> Array[String] {
 /// that start in this row, the nature of the operation, the four
 /// descriptions and the 17 columns (missing ones at the end are empty).
 fn op(
-  number : Int,
+  number : Int32,
   group : Array[&IntoContent],
   nature : String,
   acted : String,

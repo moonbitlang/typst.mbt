@@ -167,7 +167,7 @@ fn destructure_dict(
 /// the array is mismatched.
 fn wrong_number_of_elements(
   destruct : @ast.Destructuring,
-  len : Int,
+  len : Int32,
 ) -> @library.SourceDiagnostic {
   let mut count = 0
   let mut spread = false

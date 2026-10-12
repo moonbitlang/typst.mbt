@@ -55,7 +55,7 @@ priv enum SpaceAction {
 ///
 /// This is implemented efficiently in-place by shifting elements in the buffer
 /// to the left whenever we discard or collapse a space.
-fn collapse_spaces(buf : Array[Pair], start : Int) -> Unit {
+fn collapse_spaces(buf : Array[Pair], start : Int32) -> Unit {
   let mut cursor = start
   let mut prev_space = cursor
   let mut state = SpaceState::Destructive
@@ -98,9 +98,9 @@ fn collapse_spaces(buf : Array[Pair], start : Int) -> Unit {
 /// `slice::copy_within`).
 fn copy_within(
   buf : Array[Pair],
-  src_start : Int,
-  src_end : Int,
-  dest : Int,
+  src_start : Int32,
+  src_end : Int32,
+  dest : Int32,
 ) -> Unit {
   if dest <= src_start {
     for k in 0..<(src_end - src_start) {

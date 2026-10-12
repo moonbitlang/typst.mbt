@@ -3,8 +3,8 @@
 ///|
 priv struct BReader {
   data : BytesView
-  mut byte_pos : Int
-  mut bit_pos : Int
+  mut byte_pos : Int32
+  mut bit_pos : Int32
 }
 
 ///|
@@ -13,7 +13,7 @@ fn BReader::new(data : BytesView) -> BReader {
 }
 
 ///|
-fn BReader::read_bit(self : BReader) -> Int? {
+fn BReader::read_bit(self : BReader) -> Int32? {
   guard self.byte_pos < self.data.length() else { return None }
   let byte = self.data[self.byte_pos].to_int()
   let bit = (byte >> (7 - self.bit_pos)) & 1
@@ -26,13 +26,13 @@ fn BReader::read_bit(self : BReader) -> Int? {
 }
 
 ///|
-fn BReader::read_u16(self : BReader) -> Int? {
+fn BReader::read_u16(self : BReader) -> Int32? {
   guard self.read_bytes(2) is Some(b) else { return None }
   Some((b[0].to_int() << 8) | b[1].to_int())
 }
 
 ///|
-fn BReader::read_u32(self : BReader) -> UInt? {
+fn BReader::read_u32(self : BReader) -> UInt32? {
   guard self.read_bytes(4) is Some(b) else { return None }
   Some(
     (b[0].to_uint() << 24) |
@@ -43,7 +43,7 @@ fn BReader::read_u32(self : BReader) -> UInt? {
 }
 
 ///|
-fn BReader::read_u8(self : BReader) -> Int? {
+fn BReader::read_u8(self : BReader) -> Int32? {
   guard self.byte_pos < self.data.length() else { return None }
   let val = self.data[self.byte_pos].to_int()
   self.byte_pos += 1
@@ -51,7 +51,7 @@ fn BReader::read_u8(self : BReader) -> Int? {
 }
 
 ///|
-fn BReader::read_n_bytes(self : BReader, n : Int) -> UInt? {
+fn BReader::read_n_bytes(self : BReader, n : Int32) -> UInt32? {
   match n {
     1 => self.read_u8().map(v => v.reinterpret_as_uint())
     2 => self.read_u16().map(v => v.reinterpret_as_uint())
@@ -69,7 +69,7 @@ fn BReader::read_n_bytes(self : BReader, n : Int) -> UInt? {
 }
 
 ///|
-fn BReader::read_bytes(self : BReader, n : Int) -> BytesView? {
+fn BReader::read_bytes(self : BReader, n : Int32) -> BytesView? {
   let end = self.byte_pos.to_int64() + n.to_int64()
   guard n >= 0 && end <= self.data.length().to_int64() else { return None }
   let bytes = self.data[self.byte_pos:end.to_int()]
@@ -78,7 +78,7 @@ fn BReader::read_bytes(self : BReader, n : Int) -> BytesView? {
 }
 
 ///|
-fn BReader::position(self : BReader) -> Int {
+fn BReader::position(self : BReader) -> Int32 {
   self.byte_pos
 }
 

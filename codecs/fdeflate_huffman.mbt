@@ -3,44 +3,44 @@
 // (`fdeflate_decompress.mbt`).
 
 ///|
-const LITERAL_ENTRY : UInt = 0x8000
+const LITERAL_ENTRY : UInt32 = 0x8000
 
 ///|
-const EXCEPTIONAL_ENTRY : UInt = 0x4000
+const EXCEPTIONAL_ENTRY : UInt32 = 0x4000
 
 ///|
-const SECONDARY_TABLE_ENTRY : UInt = 0x2000
+const SECONDARY_TABLE_ENTRY : UInt32 = 0x2000
 
 ///|
 /// Order of the length code length alphabet (derived from deflate spec).
-let fdeflate_clcl_order : ReadOnlyArray[Int] = [
+let fdeflate_clcl_order : ReadOnlyArray[Int32] = [
   16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15,
 ]
 
 ///|
 /// Number of extra bits for each length code (derived from deflate spec).
-let fdeflate_len_sym_to_len_extra : ReadOnlyArray[Int] = [
+let fdeflate_len_sym_to_len_extra : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5,
   5, 0,
 ]
 
 ///|
 /// The base length for each length code (derived from deflate spec).
-let fdeflate_len_sym_to_len_base : ReadOnlyArray[Int] = [
+let fdeflate_len_sym_to_len_base : ReadOnlyArray[Int32] = [
   3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83,
   99, 115, 131, 163, 195, 227, 258,
 ]
 
 ///|
 /// Number of extra bits for each distance code (derived from deflate spec.)
-let fdeflate_dist_sym_to_dist_extra : ReadOnlyArray[Int] = [
+let fdeflate_dist_sym_to_dist_extra : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11,
   12, 12, 13, 13,
 ]
 
 ///|
 /// The base distance for each distance code (derived from deflate spec).
-let fdeflate_dist_sym_to_dist_base : ReadOnlyArray[Int] = [
+let fdeflate_dist_sym_to_dist_base : ReadOnlyArray[Int32] = [
   1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769,
   1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577,
 ]
@@ -73,7 +73,7 @@ priv enum HuffmanEntries {
 ///
 ///   00000000_00000000_00000000_00000000     symbol is more than 9 bits
 ///   zzzzzzzz_zzzzzzzz_0000yyyy_0000xxxx     x = input_advance_bits, y = extra_bits, z = distance_base
-fn HuffmanEntries::get(self : HuffmanEntries, symbol : Int) -> UInt {
+fn HuffmanEntries::get(self : HuffmanEntries, symbol : Int32) -> UInt32 {
   match self {
     Plain => symbol.reinterpret_as_uint() << 16
     Litlen =>
@@ -101,7 +101,7 @@ fn HuffmanEntries::get(self : HuffmanEntries, symbol : Int) -> UInt {
 ///|
 /// Return the next code, or if the codeword is already all ones (which is the
 /// final code), return the same code again.
-fn next_codeword(codeword : Int, table_size : Int) -> Int {
+fn next_codeword(codeword : Int32, table_size : Int32) -> Int32 {
   if codeword == table_size - 1 {
     return codeword
   }
@@ -116,14 +116,14 @@ fn next_codeword(codeword : Int, table_size : Int) -> Int {
 /// lengths_start + lengths_len]`; `codes` is indexed by symbol; the primary
 /// table has `1 << primary_table_bits` entries.
 fn build_table(
-  code_lengths : FixedArray[Int],
-  lengths_start : Int,
-  lengths_len : Int,
+  code_lengths : FixedArray[Int32],
+  lengths_start : Int32,
+  lengths_len : Int32,
   entries : HuffmanEntries,
-  codes : FixedArray[Int],
-  primary_table : FixedArray[UInt],
-  primary_table_bits : Int,
-  secondary_table : Array[UInt],
+  codes : FixedArray[Int32],
+  primary_table : FixedArray[UInt32],
+  primary_table_bits : Int32,
+  secondary_table : Array[UInt32],
   is_distance_table : Bool,
   double_literal : Bool,
 ) -> Bool {

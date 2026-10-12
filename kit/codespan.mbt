@@ -44,7 +44,7 @@ pub extend LabelStyle with Eq::{not_equal, equal}
 pub extend LabelStyle with @debug.Debug::{to_repr}
 
 ///|
-fn LabelStyle::ord(self : LabelStyle) -> Int {
+fn LabelStyle::ord(self : LabelStyle) -> Int32 {
   match self {
     Primary => 0
     Secondary => 1
@@ -58,8 +58,8 @@ pub(all) struct Label {
   style : LabelStyle
   file_id : @syntax.FileId
   /// The UTF-8 byte range in the file.
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   message : String
 }
 
@@ -67,8 +67,8 @@ pub(all) struct Label {
 /// Create a new label with a style of `LabelStyle::Primary`.
 pub fn Label::primary(
   file_id : @syntax.FileId,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Label {
   { style: Primary, file_id, start, end, message: "", }
 }
@@ -77,8 +77,8 @@ pub fn Label::primary(
 /// Create a new label with a style of `LabelStyle::Secondary`.
 pub fn Label::secondary(
   file_id : @syntax.FileId,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Label {
   { style: Secondary, file_id, start, end, message: "", }
 }
@@ -120,9 +120,9 @@ pub extend DisplayStyle with @debug.Debug::{to_repr}
 /// Configures how a diagnostic is rendered (`term::Config`).
 pub(all) struct Config {
   display_style : DisplayStyle
-  tab_width : Int
-  start_context_lines : Int
-  end_context_lines : Int
+  tab_width : Int32
+  start_context_lines : Int32
+  end_context_lines : Int32
 }
 
 ///|
@@ -141,10 +141,10 @@ pub fn Config::default() -> Config {
 /// (`codespan_reporting::files::Error`).
 pub(all) suberror FilesError {
   FileMissing
-  IndexTooLarge(Int, Int)
-  LineTooLarge(Int, Int)
-  ColumnTooLarge(Int, Int)
-  InvalidCharBoundary(Int)
+  IndexTooLarge(Int32, Int32)
+  LineTooLarge(Int32, Int32)
+  ColumnTooLarge(Int32, Int32)
+  InvalidCharBoundary(Int32)
   Io(String)
 }
 
@@ -176,13 +176,13 @@ pub(open) trait Files {
   /// The lines of a file.
   fn lines(Self, @syntax.FileId) -> @syntax.Lines raise FilesError
   /// The index of the line at the given byte index.
-  fn line_index(Self, @syntax.FileId, Int) -> Int raise FilesError
+  fn line_index(Self, @syntax.FileId, Int32) -> Int32 raise FilesError
   /// The user-facing line number at the given line index.
-  fn line_number(Self, @syntax.FileId, Int) -> Int raise FilesError = _
+  fn line_number(Self, @syntax.FileId, Int32) -> Int32 raise FilesError = _
   /// The user-facing column number at the given line index and byte index.
-  fn column_number(Self, @syntax.FileId, Int, Int) -> Int raise FilesError
+  fn column_number(Self, @syntax.FileId, Int32, Int32) -> Int32 raise FilesError
   /// The byte range of line in the source of the file.
-  fn line_range(Self, @syntax.FileId, Int) -> (Int, Int) raise FilesError
+  fn line_range(Self, @syntax.FileId, Int32) -> (Int32, Int32) raise FilesError
 }
 
 ///|
@@ -193,8 +193,8 @@ impl Files with fn line_number(_self, _id, line_index) {
 ///|
 /// A user-facing location in a source file.
 priv struct Location {
-  line_number : Int
-  column_number : Int
+  line_number : Int32
+  column_number : Int32
 }
 
 ///|
@@ -203,7 +203,7 @@ priv struct Location {
 fn location(
   files : &Files,
   id : @syntax.FileId,
-  byte_index : Int,
+  byte_index : Int32,
 ) -> Location raise FilesError {
   let line_index = files.line_index(id, byte_index)
   {
@@ -232,7 +232,7 @@ pub fn emit(
 // Views (`term::views`).
 
 ///|
-fn count_digits(n : Int) -> Int {
+fn count_digits(n : Int32) -> Int32 {
   let mut n = n
   let mut count = 0
   while n != 0 {
@@ -246,34 +246,34 @@ fn count_digits(n : Int) -> Int {
 /// A single-line label: style, byte range in the line, message.
 priv struct SingleLabel {
   style : LabelStyle
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   message : String
 }
 
 ///|
 priv enum MultiLabel {
   /// Multi-line label top: the byte index of the start of the label.
-  Top(Int)
+  Top(Int32)
   /// Left vertical labels for multi-line labels.
   Left
   /// Multi-line label bottom: the byte index of the end of the label and
   /// its message.
-  Bottom(Int, String)
+  Bottom(Int32, String)
 }
 
 ///|
 priv struct MultiLabelEntry {
-  index : Int
+  index : Int32
   style : LabelStyle
   label : MultiLabel
 }
 
 ///|
 priv struct Line {
-  number : Int
-  start : Int
-  end : Int
+  number : Int32
+  start : Int32
+  end : Int32
   single_labels : Array[SingleLabel]
   multi_labels : Array[MultiLabelEntry]
   mut must_render : Bool
@@ -282,20 +282,20 @@ priv struct Line {
 ///|
 priv struct LabeledFile {
   file_id : @syntax.FileId
-  mut start : Int
+  mut start : Int32
   name : String
   mut location : Location
-  mut num_multi_labels : Int
-  lines : Map[Int, Line]
+  mut num_multi_labels : Int32
+  lines : Map[Int32, Line]
   mut max_label_style : LabelStyle
 }
 
 ///|
 fn LabeledFile::get_or_insert_line(
   self : LabeledFile,
-  line_index : Int,
-  line_range : (Int, Int),
-  line_number : Int,
+  line_index : Int32,
+  line_range : (Int32, Int32),
+  line_number : Int32,
 ) -> Line {
   match self.lines.get(line_index) {
     Some(line) => line
@@ -319,7 +319,7 @@ fn LabeledFile::get_or_insert_line(
 ///|
 /// The line indices of a labeled file in ascending order (upstream uses a
 /// `BTreeMap`).
-fn LabeledFile::sorted_lines(self : LabeledFile) -> Array[(Int, Line)] {
+fn LabeledFile::sorted_lines(self : LabeledFile) -> Array[(Int32, Line)] {
   let out = self.lines.to_array()
   out.sort_by((a, b) => a.0.compare(b.0))
   out
@@ -327,7 +327,7 @@ fn LabeledFile::sorted_lines(self : LabeledFile) -> Array[(Int, Line)] {
 
 ///|
 /// Rust's `slice::binary_search_by` (the algorithm of Rust 1.92).
-fn[T] binary_search_by(xs : Array[T], f : (T) -> Int) -> Int {
+fn[T] binary_search_by(xs : Array[T], f : (T) -> Int32) -> Int32 {
   let mut size = xs.length()
   if size == 0 {
     return 0
@@ -606,8 +606,8 @@ fn render_rich(
 fn slice_bytes(
   lines : @syntax.Lines,
   source : String,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> String {
   let a = lines.byte_to_utf16(start).unwrap_or(source.length())
   let b = lines.byte_to_utf16(end).unwrap_or(source.length())
@@ -753,7 +753,7 @@ fn Renderer::render_empty(self : Renderer) -> Unit {
 /// Top left border and locus.
 fn Renderer::render_snippet_start(
   self : Renderer,
-  outer_padding : Int,
+  outer_padding : Int32,
   name : String,
   location : Location,
 ) -> Unit {
@@ -768,7 +768,7 @@ fn Renderer::render_snippet_start(
 
 ///|
 /// The UTF-8 byte indices and characters of a string.
-fn char_indices(s : String) -> Array[(Int, Char)] {
+fn char_indices(s : String) -> Array[(Int32, Char)] {
   let out = []
   let mut byte = 0
   for c in s {
@@ -779,7 +779,7 @@ fn char_indices(s : String) -> Array[(Int, Char)] {
 }
 
 ///|
-fn utf8_char_len(c : Char) -> Int {
+fn utf8_char_len(c : Char) -> Int32 {
   let c = c.to_int()
   if c < 0x80 {
     1
@@ -795,14 +795,14 @@ fn utf8_char_len(c : Char) -> Int {
 ///|
 /// The byte index and display width of a character.
 priv struct Metrics {
-  byte_index : Int
-  unicode_width : Int
+  byte_index : Int32
+  unicode_width : Int32
 }
 
 ///|
 fn Renderer::char_metrics(
   self : Renderer,
-  chars : Array[(Int, Char)],
+  chars : Array[(Int32, Char)],
 ) -> Array[(Metrics, Char)] {
   let tab_width = self.config.tab_width
   let mut unicode_column = 0
@@ -824,14 +824,14 @@ fn Renderer::char_metrics(
 }
 
 ///|
-fn is_overlapping(s0 : Int, e0 : Int, s1 : Int, e1 : Int) -> Bool {
+fn is_overlapping(s0 : Int32, e0 : Int32, s1 : Int32, e1 : Int32) -> Bool {
   let start = @cmp.maximum(s0, s1)
   let end = @cmp.minimum(e0, e1)
   start < end
 }
 
 ///|
-fn label_priority_key(style : LabelStyle) -> Int {
+fn label_priority_key(style : LabelStyle) -> Int32 {
   match style {
     Secondary => 0
     Primary => 1
@@ -857,7 +857,7 @@ fn max_style(styles : Array[LabelStyle]) -> LabelStyle? {
 /// label.
 fn hanging_labels(
   single_labels : Array[SingleLabel],
-  trailing_label : Int?,
+  trailing_label : Int32?,
 ) -> Array[SingleLabel] {
   let out = []
   for i, label in single_labels {
@@ -870,7 +870,7 @@ fn hanging_labels(
 
 ///|
 /// The byte length of the leading whitespace of a string.
-fn leading_whitespace_len(chars : Array[(Int, Char)], len : Int) -> Int {
+fn leading_whitespace_len(chars : Array[(Int32, Char)], len : Int32) -> Int32 {
   for entry in chars {
     if !@unicode.is_whitespace(entry.1) {
       return entry.0
@@ -883,12 +883,12 @@ fn leading_whitespace_len(chars : Array[(Int, Char)], len : Int) -> Int {
 /// A line of source code.
 fn Renderer::render_snippet_source(
   self : Renderer,
-  outer_padding : Int,
-  line_number : Int,
+  outer_padding : Int32,
+  line_number : Int32,
   source : String,
   severity : Severity,
   single_labels : Array[SingleLabel],
-  num_multi_labels : Int,
+  num_multi_labels : Int32,
   multi_labels : Array[MultiLabelEntry],
 ) -> Unit {
   // Trim trailing newlines, linefeeds, and null chars from source, if they
@@ -1000,7 +1000,7 @@ fn Renderer::render_snippet_source(
     // The right-most end position, eg:
     let mut max_label_end = 0
     // A trailing message, eg:
-    let mut trailing_label : Int? = None
+    let mut trailing_label : Int32? = None
     for label_index, label in single_labels {
       if label.message != "" {
         num_messages += 1
@@ -1185,9 +1185,9 @@ fn Renderer::render_snippet_source(
 /// snippets.
 fn Renderer::render_snippet_empty(
   self : Renderer,
-  outer_padding : Int,
+  outer_padding : Int32,
   severity : Severity,
-  num_multi_labels : Int,
+  num_multi_labels : Int32,
   multi_labels : Array[MultiLabelEntry],
 ) -> Unit {
   self.outer_gutter(outer_padding)
@@ -1200,9 +1200,9 @@ fn Renderer::render_snippet_empty(
 /// A broken source line, for labeling skipped sections of source.
 fn Renderer::render_snippet_break(
   self : Renderer,
-  outer_padding : Int,
+  outer_padding : Int32,
   severity : Severity,
-  num_multi_labels : Int,
+  num_multi_labels : Int32,
   multi_labels : Array[MultiLabelEntry],
 ) -> Unit {
   self.outer_gutter(outer_padding)
@@ -1215,7 +1215,7 @@ fn Renderer::render_snippet_break(
 /// Additional notes.
 fn Renderer::render_snippet_note(
   self : Renderer,
-  outer_padding : Int,
+  outer_padding : Int32,
   message : String,
 ) -> Unit {
   for note_line_index, line in rust_lines(message) {
@@ -1270,7 +1270,7 @@ fn Renderer::snippet_locus(
 
 ///|
 /// The outer gutter of a source line.
-fn Renderer::outer_gutter(self : Renderer, outer_padding : Int) -> Unit {
+fn Renderer::outer_gutter(self : Renderer, outer_padding : Int32) -> Unit {
   self.write(" ".repeat(outer_padding))
   self.write(" ")
 }
@@ -1279,8 +1279,8 @@ fn Renderer::outer_gutter(self : Renderer, outer_padding : Int) -> Unit {
 /// The outer gutter of a source line, with line number.
 fn Renderer::outer_gutter_number(
   self : Renderer,
-  line_number : Int,
-  outer_padding : Int,
+  line_number : Int32,
+  outer_padding : Int32,
 ) -> Unit {
   self.writer.set_color(blue_style())
   let number = line_number.to_string()
@@ -1313,10 +1313,10 @@ fn Renderer::border_left_break(self : Renderer) -> Unit {
 fn Renderer::caret_pointers(
   self : Renderer,
   severity : Severity,
-  max_label_start : Int,
+  max_label_start : Int32,
   single_labels : Array[SingleLabel],
-  trailing_label : Int?,
-  chars : Array[(Int, Char)],
+  trailing_label : Int32?,
+  chars : Array[(Int32, Char)],
 ) -> Unit {
   let hanging = hanging_labels(single_labels, trailing_label)
   for entry in self.char_metrics(chars) {
@@ -1402,8 +1402,8 @@ fn Renderer::label_multi_top_caret(
   self : Renderer,
   severity : Severity,
   style : LabelStyle,
-  chars : Array[(Int, Char)],
-  start : Int,
+  chars : Array[(Int32, Char)],
+  start : Int32,
 ) -> Unit {
   self.writer.set_color(label_style(severity, style))
   for entry in self.char_metrics(chars) {
@@ -1431,8 +1431,8 @@ fn Renderer::label_multi_bottom_caret(
   self : Renderer,
   severity : Severity,
   style : LabelStyle,
-  chars : Array[(Int, Char)],
-  start : Int,
+  chars : Array[(Int32, Char)],
+  start : Int32,
   message : String,
 ) -> Unit {
   self.writer.set_color(label_style(severity, style))
@@ -1486,7 +1486,7 @@ fn Renderer::inner_gutter_space(self : Renderer) -> Unit {
 fn Renderer::inner_gutter(
   self : Renderer,
   severity : Severity,
-  num_multi_labels : Int,
+  num_multi_labels : Int32,
   multi_labels : Array[MultiLabelEntry],
 ) -> Unit {
   let mut iter = 0

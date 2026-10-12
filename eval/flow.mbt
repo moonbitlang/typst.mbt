@@ -2,7 +2,7 @@
 
 ///|
 /// The maximum number of loop iterations.
-let max_iterations : Int = 10000
+let max_iterations : Int32 = 10000
 
 ///|
 /// A control flow event that occurred during evaluation.

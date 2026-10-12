@@ -168,7 +168,7 @@ fn[T : Sample] make_lut_transform(
 
 ///|
 /// Quantizes the LUT to Q0.15 (`NeonAlignedI16x4`): `(x * q).round() as i16`.
-fn quantize_lut(depth : Depth, lut : FixedArray[Float]) -> FixedArray[Int] {
+fn quantize_lut(depth : Depth, lut : FixedArray[Float]) -> FixedArray[Int32] {
   let q = if depth.finite {
     Float::from_int((1 << depth.bit_depth) - 1)
   } else {
@@ -182,7 +182,7 @@ fn quantize_lut(depth : Depth, lut : FixedArray[Float]) -> FixedArray[Int] {
 /// `TransformLut4To3NeonQ0_15`).
 fn[T : Sample] make_transformer_4x3(
   depth : Depth,
-  grid_size : Int,
+  grid_size : Int32,
   dst_layout : Layout,
   lut : FixedArray[Float],
   options : TransformOptions,
@@ -246,7 +246,7 @@ fn[T : Sample] make_transformer_4x3(
 /// `TransformLut3x3NeonQ0_15`).
 fn[T : Sample] make_transformer_3x3(
   depth : Depth,
-  grid_size : Int,
+  grid_size : Int32,
   src_layout : Layout,
   dst_layout : Layout,
   lut : FixedArray[Float],

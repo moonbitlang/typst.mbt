@@ -38,7 +38,7 @@ pub fn Expander::python() -> Expander {
 priv enum Step {
   Char(Char)
   GroupName(String)
-  GroupNum(Int)
+  GroupNum(Int32)
   Error
 }
 
@@ -56,7 +56,7 @@ pub fn Expander::check(
   template : String,
   regex : Regex,
 ) -> Unit raise FancyError {
-  let on_group_num = (num : Int) => {
+  let on_group_num = (num : Int32) => {
     if num == 0 {
       ()
     } else if !regex.named_groups.is_empty() {
@@ -151,7 +151,7 @@ fn Expander::exec(
   let mut i = 0
   while i < bytes.length() {
     let (c, n) = decode_utf8(bytes, i)
-    let c = Int::unsafe_to_char(c)
+    let c = Int32::unsafe_to_char(c)
     i += n
     if c == self.sub_char {
       let tail = i

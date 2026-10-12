@@ -2,7 +2,7 @@
 // `*_scalar.mbt` elsewhere) against straightforward reference loops.
 
 ///|
-fn kernel_test_pixels(n : Int, seed : Int) -> FixedArray[UInt] {
+fn kernel_test_pixels(n : Int32, seed : Int32) -> FixedArray[UInt32] {
   let mut x = seed.reinterpret_as_uint() * 2654435761U + 1
   FixedArray::makei(n, i => {
     x = x * 1103515245U + 12345U
@@ -14,7 +14,7 @@ fn kernel_test_pixels(n : Int, seed : Int) -> FixedArray[UInt] {
       2 => 0U
       _ => (r >> 16) & 0xFF
     }
-    let ch = (v : UInt) => if a == 0 { 0U } else { v % (a + 1) }
+    let ch = (v : UInt32) => if a == 0 { 0U } else { v % (a + 1) }
     ch(r & 0xFF) |
     (ch((r >> 3) & 0xFF) << 8) |
     (ch((r >> 7) & 0xFF) << 16) |
@@ -78,7 +78,10 @@ test "bench demultiply 1191x1684 page (per-pixel reference)" (it : @bench.T) {
 ///|
 /// The scalar `demultiply_into` (`pixmap_scalar.mbt`), as a reference on
 /// every target.
-fn ref_demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
+fn ref_demultiply_into(
+  data : FixedArray[UInt32],
+  out : FixedArray[Byte],
+) -> Unit {
   for i in 0..<data.length() {
     demultiply_pixel(data[i], out, i * 4)
   }

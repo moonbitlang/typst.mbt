@@ -11,7 +11,7 @@ pub(all) suberror WasmiError {
   /// A message usually provided by Wasmi users of host function calls.
   Message(String)
   /// An `i32` exit status usually used by WASI applications.
-  I32ExitStatus(Int)
+  I32ExitStatus(Int32)
   /// A trap as defined by the WebAssembly specification.
   Host(@wasmi_core.HostError)
   /// A global variable error.
@@ -58,7 +58,7 @@ pub fn WasmiError::host(host_error : @wasmi_core.HostError) -> WasmiError {
 ///|
 /// Creates a new [`WasmiError`] representing an explicit program exit with a
 /// classic `i32` exit status value.
-pub fn WasmiError::i32_exit(status : Int) -> WasmiError {
+pub fn WasmiError::i32_exit(status : Int32) -> WasmiError {
   I32ExitStatus(status)
 }
 
@@ -101,7 +101,7 @@ pub fn WasmiError::as_trap_code(self : WasmiError) -> @wasmi_core.TrapCode? {
 
 ///|
 /// Returns the `i32` exit status if [`WasmiError`] is an `I32ExitStatus`.
-pub fn WasmiError::i32_exit_status(self : WasmiError) -> Int? {
+pub fn WasmiError::i32_exit_status(self : WasmiError) -> Int32? {
   match self {
     I32ExitStatus(status) => Some(status)
     _ => None

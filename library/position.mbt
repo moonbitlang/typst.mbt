@@ -182,7 +182,7 @@ pub extend PagedPosition with FromValue::{from_value}
 pub(all) struct HtmlPosition {
   /// Indices that can be used to traverse the tree from the root to the
   /// element at this position.
-  priv element : Array[Int]
+  priv element : Array[Int32]
   /// A more precise position inside of the element.
   priv inner : InnerHtmlPosition?
 } derive(Eq)
@@ -194,13 +194,16 @@ pub extend HtmlPosition with Eq::{not_equal, equal}
 
 ///|
 /// Create a position pointing to an element.
-pub fn HtmlPosition::new(element : Array[Int]) -> HtmlPosition {
+pub fn HtmlPosition::new(element : Array[Int32]) -> HtmlPosition {
   { element, inner: None, }
 }
 
 ///|
 /// Specify a character offset inside of the element.
-pub fn HtmlPosition::at_char(self : HtmlPosition, offset : Int) -> HtmlPosition {
+pub fn HtmlPosition::at_char(
+  self : HtmlPosition,
+  offset : Int32,
+) -> HtmlPosition {
   { element: self.element, inner: Some(Character(offset)), }
 }
 
@@ -221,7 +224,7 @@ pub fn HtmlPosition::details(self : HtmlPosition) -> InnerHtmlPosition? {
 
 ///|
 /// The indices to traverse the tree from the root to the element.
-pub fn HtmlPosition::element(self : HtmlPosition) -> ArrayView[Int] {
+pub fn HtmlPosition::element(self : HtmlPosition) -> ArrayView[Int32] {
   self.element
 }
 
@@ -243,7 +246,7 @@ pub(all) enum InnerHtmlPosition {
   /// frame.
   Frame(Point)
   /// If the element is a text node, this specifies the character offset.
-  Character(Int)
+  Character(Int32)
 } derive(Eq)
 
 ///|

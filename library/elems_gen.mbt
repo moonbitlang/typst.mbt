@@ -40,7 +40,7 @@ pub fn context_elem() -> Element {
 }
 
 ///|
-pub let context_elem_func : Int = 0
+pub let context_elem_func : Int32 = 0
 
 ///|
 let symbol_elem_cell : Ref[Element?] = Ref(None)
@@ -77,7 +77,7 @@ pub fn symbol_elem() -> Element {
 }
 
 ///|
-pub let symbol_elem_text : Int = 0
+pub let symbol_elem_text : Int32 = 0
 
 ///|
 let target_elem_cell : Ref[Element?] = Ref(None)
@@ -112,7 +112,7 @@ pub fn target_elem() -> Element {
 }
 
 ///|
-pub let target_elem_target : Int = 0
+pub let target_elem_target : Int32 = 0
 
 ///|
 let counter_update_elem_cell : Ref[Element?] = Ref(None)
@@ -158,10 +158,10 @@ pub fn counter_update_elem() -> Element {
 }
 
 ///|
-pub let counter_update_elem_key : Int = 0
+pub let counter_update_elem_key : Int32 = 0
 
 ///|
-pub let counter_update_elem_update : Int = 1
+pub let counter_update_elem_update : Int32 = 1
 
 ///|
 let counter_display_elem_cell : Ref[Element?] = Ref(None)
@@ -217,13 +217,13 @@ pub fn counter_display_elem() -> Element {
 }
 
 ///|
-pub let counter_display_elem_counter : Int = 0
+pub let counter_display_elem_counter : Int32 = 0
 
 ///|
-pub let counter_display_elem_numbering : Int = 1
+pub let counter_display_elem_numbering : Int32 = 1
 
 ///|
-pub let counter_display_elem_both : Int = 2
+pub let counter_display_elem_both : Int32 = 2
 
 ///|
 let metadata_elem_cell : Ref[Element?] = Ref(None)
@@ -260,7 +260,7 @@ pub fn metadata_elem() -> Element {
 }
 
 ///|
-pub let metadata_elem_value : Int = 0
+pub let metadata_elem_value : Int32 = 0
 
 ///|
 let state_update_elem_cell : Ref[Element?] = Ref(None)
@@ -306,10 +306,10 @@ pub fn state_update_elem() -> Element {
 }
 
 ///|
-pub let state_update_elem_key : Int = 0
+pub let state_update_elem_key : Int32 = 0
 
 ///|
-pub let state_update_elem_update : Int = 1
+pub let state_update_elem_update : Int32 = 1
 
 ///|
 let tag_elem_cell : Ref[Element?] = Ref(None)
@@ -347,7 +347,7 @@ pub fn tag_elem() -> Element {
 }
 
 ///|
-pub let tag_elem_tag : Int = 0
+pub let tag_elem_tag : Int32 = 0
 
 ///|
 let align_elem_cell : Ref[Element?] = Ref(None)
@@ -393,10 +393,10 @@ pub fn align_elem() -> Element {
 }
 
 ///|
-pub let align_elem_alignment : Int = 0
+pub let align_elem_alignment : Int32 = 0
 
 ///|
-pub let align_elem_body : Int = 1
+pub let align_elem_body : Int32 = 1
 
 ///|
 let columns_elem_cell : Ref[Element?] = Ref(None)
@@ -462,19 +462,19 @@ pub fn columns_elem() -> Element {
 }
 
 ///|
-pub let columns_elem_count : Int = 0
+pub let columns_elem_count : Int32 = 0
 
 ///|
-pub let columns_elem_gutter : Int = 1
+pub let columns_elem_gutter : Int32 = 1
 
 ///|
-pub let columns_elem_balanced : Int = 2
+pub let columns_elem_balanced : Int32 = 2
 
 ///|
-pub let columns_elem_separator : Int = 3
+pub let columns_elem_separator : Int32 = 3
 
 ///|
-pub let columns_elem_body : Int = 4
+pub let columns_elem_body : Int32 = 4
 
 ///|
 let colbreak_elem_cell : Ref[Element?] = Ref(None)
@@ -506,7 +506,7 @@ pub fn colbreak_elem() -> Element {
 }
 
 ///|
-pub let colbreak_elem_weak : Int = 0
+pub let colbreak_elem_weak : Int32 = 0
 
 ///|
 let box_elem_cell : Ref[Element?] = Ref(None)
@@ -602,34 +602,34 @@ pub fn box_elem() -> Element {
 }
 
 ///|
-pub let box_elem_width : Int = 0
+pub let box_elem_width : Int32 = 0
 
 ///|
-pub let box_elem_height : Int = 1
+pub let box_elem_height : Int32 = 1
 
 ///|
-pub let box_elem_baseline : Int = 2
+pub let box_elem_baseline : Int32 = 2
 
 ///|
-pub let box_elem_fill : Int = 3
+pub let box_elem_fill : Int32 = 3
 
 ///|
-pub let box_elem_stroke : Int = 4
+pub let box_elem_stroke : Int32 = 4
 
 ///|
-pub let box_elem_radius : Int = 5
+pub let box_elem_radius : Int32 = 5
 
 ///|
-pub let box_elem_inset : Int = 6
+pub let box_elem_inset : Int32 = 6
 
 ///|
-pub let box_elem_outset : Int = 7
+pub let box_elem_outset : Int32 = 7
 
 ///|
-pub let box_elem_clip : Int = 8
+pub let box_elem_clip : Int32 = 8
 
 ///|
-pub let box_elem_body : Int = 9
+pub let box_elem_body : Int32 = 9
 
 ///|
 let inline_elem_cell : Ref[Element?] = Ref(None)
@@ -667,7 +667,7 @@ pub fn inline_elem() -> Element {
 }
 
 ///|
-pub let inline_elem_body : Int = 0
+pub let inline_elem_body : Int32 = 0
 
 ///|
 let block_elem_cell : Ref[Element?] = Ref(None)
@@ -793,46 +793,46 @@ pub fn block_elem() -> Element {
 }
 
 ///|
-pub let block_elem_width : Int = 0
+pub let block_elem_width : Int32 = 0
 
 ///|
-pub let block_elem_height : Int = 1
+pub let block_elem_height : Int32 = 1
 
 ///|
-pub let block_elem_breakable : Int = 2
+pub let block_elem_breakable : Int32 = 2
 
 ///|
-pub let block_elem_fill : Int = 3
+pub let block_elem_fill : Int32 = 3
 
 ///|
-pub let block_elem_stroke : Int = 4
+pub let block_elem_stroke : Int32 = 4
 
 ///|
-pub let block_elem_radius : Int = 5
+pub let block_elem_radius : Int32 = 5
 
 ///|
-pub let block_elem_inset : Int = 6
+pub let block_elem_inset : Int32 = 6
 
 ///|
-pub let block_elem_outset : Int = 7
+pub let block_elem_outset : Int32 = 7
 
 ///|
-pub let block_elem_spacing : Int = 8
+pub let block_elem_spacing : Int32 = 8
 
 ///|
-pub let block_elem_above : Int = 9
+pub let block_elem_above : Int32 = 9
 
 ///|
-pub let block_elem_below : Int = 10
+pub let block_elem_below : Int32 = 10
 
 ///|
-pub let block_elem_clip : Int = 11
+pub let block_elem_clip : Int32 = 11
 
 ///|
-pub let block_elem_sticky : Int = 12
+pub let block_elem_sticky : Int32 = 12
 
 ///|
-pub let block_elem_body : Int = 13
+pub let block_elem_body : Int32 = 13
 
 ///|
 let grid_elem_cell : Ref[Element?] = Ref(None)
@@ -945,37 +945,37 @@ pub fn grid_elem() -> Element {
 }
 
 ///|
-pub let grid_elem_columns : Int = 0
+pub let grid_elem_columns : Int32 = 0
 
 ///|
-pub let grid_elem_rows : Int = 1
+pub let grid_elem_rows : Int32 = 1
 
 ///|
-pub let grid_elem_gutter : Int = 2
+pub let grid_elem_gutter : Int32 = 2
 
 ///|
-pub let grid_elem_column_gutter : Int = 3
+pub let grid_elem_column_gutter : Int32 = 3
 
 ///|
-pub let grid_elem_row_gutter : Int = 4
+pub let grid_elem_row_gutter : Int32 = 4
 
 ///|
-pub let grid_elem_inset : Int = 5
+pub let grid_elem_inset : Int32 = 5
 
 ///|
-pub let grid_elem_align : Int = 6
+pub let grid_elem_align : Int32 = 6
 
 ///|
-pub let grid_elem_fill : Int = 7
+pub let grid_elem_fill : Int32 = 7
 
 ///|
-pub let grid_elem_stroke : Int = 8
+pub let grid_elem_stroke : Int32 = 8
 
 ///|
-pub let grid_elem_children : Int = 9
+pub let grid_elem_children : Int32 = 9
 
 ///|
-pub let grid_elem_grid : Int = 10
+pub let grid_elem_grid : Int32 = 10
 
 ///|
 let grid_header_elem_cell : Ref[Element?] = Ref(None)
@@ -1023,13 +1023,13 @@ pub fn grid_header_elem() -> Element {
 }
 
 ///|
-pub let grid_header_elem_repeat : Int = 0
+pub let grid_header_elem_repeat : Int32 = 0
 
 ///|
-pub let grid_header_elem_level : Int = 1
+pub let grid_header_elem_level : Int32 = 1
 
 ///|
-pub let grid_header_elem_children : Int = 2
+pub let grid_header_elem_children : Int32 = 2
 
 ///|
 let grid_footer_elem_cell : Ref[Element?] = Ref(None)
@@ -1070,10 +1070,10 @@ pub fn grid_footer_elem() -> Element {
 }
 
 ///|
-pub let grid_footer_elem_repeat : Int = 0
+pub let grid_footer_elem_repeat : Int32 = 0
 
 ///|
-pub let grid_footer_elem_children : Int = 1
+pub let grid_footer_elem_children : Int32 = 1
 
 ///|
 let grid_h_line_elem_cell : Ref[Element?] = Ref(None)
@@ -1134,19 +1134,19 @@ pub fn grid_h_line_elem() -> Element {
 }
 
 ///|
-pub let grid_h_line_elem_y : Int = 0
+pub let grid_h_line_elem_y : Int32 = 0
 
 ///|
-pub let grid_h_line_elem_start : Int = 1
+pub let grid_h_line_elem_start : Int32 = 1
 
 ///|
-pub let grid_h_line_elem_end : Int = 2
+pub let grid_h_line_elem_end : Int32 = 2
 
 ///|
-pub let grid_h_line_elem_stroke : Int = 3
+pub let grid_h_line_elem_stroke : Int32 = 3
 
 ///|
-pub let grid_h_line_elem_position : Int = 4
+pub let grid_h_line_elem_position : Int32 = 4
 
 ///|
 let grid_v_line_elem_cell : Ref[Element?] = Ref(None)
@@ -1207,19 +1207,19 @@ pub fn grid_v_line_elem() -> Element {
 }
 
 ///|
-pub let grid_v_line_elem_x : Int = 0
+pub let grid_v_line_elem_x : Int32 = 0
 
 ///|
-pub let grid_v_line_elem_start : Int = 1
+pub let grid_v_line_elem_start : Int32 = 1
 
 ///|
-pub let grid_v_line_elem_end : Int = 2
+pub let grid_v_line_elem_end : Int32 = 2
 
 ///|
-pub let grid_v_line_elem_stroke : Int = 3
+pub let grid_v_line_elem_stroke : Int32 = 3
 
 ///|
-pub let grid_v_line_elem_position : Int = 4
+pub let grid_v_line_elem_position : Int32 = 4
 
 ///|
 let grid_cell_elem_cell : Ref[Element?] = Ref(None)
@@ -1329,37 +1329,37 @@ pub fn grid_cell_elem() -> Element {
 }
 
 ///|
-pub let grid_cell_elem_body : Int = 0
+pub let grid_cell_elem_body : Int32 = 0
 
 ///|
-pub let grid_cell_elem_x : Int = 1
+pub let grid_cell_elem_x : Int32 = 1
 
 ///|
-pub let grid_cell_elem_y : Int = 2
+pub let grid_cell_elem_y : Int32 = 2
 
 ///|
-pub let grid_cell_elem_colspan : Int = 3
+pub let grid_cell_elem_colspan : Int32 = 3
 
 ///|
-pub let grid_cell_elem_rowspan : Int = 4
+pub let grid_cell_elem_rowspan : Int32 = 4
 
 ///|
-pub let grid_cell_elem_inset : Int = 5
+pub let grid_cell_elem_inset : Int32 = 5
 
 ///|
-pub let grid_cell_elem_align : Int = 6
+pub let grid_cell_elem_align : Int32 = 6
 
 ///|
-pub let grid_cell_elem_fill : Int = 7
+pub let grid_cell_elem_fill : Int32 = 7
 
 ///|
-pub let grid_cell_elem_stroke : Int = 8
+pub let grid_cell_elem_stroke : Int32 = 8
 
 ///|
-pub let grid_cell_elem_breakable : Int = 9
+pub let grid_cell_elem_breakable : Int32 = 9
 
 ///|
-pub let grid_cell_elem_is_repeated : Int = 10
+pub let grid_cell_elem_is_repeated : Int32 = 10
 
 ///|
 let hide_elem_cell : Ref[Element?] = Ref(None)
@@ -1404,10 +1404,10 @@ pub fn hide_elem() -> Element {
 }
 
 ///|
-pub let hide_elem_body : Int = 0
+pub let hide_elem_body : Int32 = 0
 
 ///|
-pub let hide_elem_hidden : Int = 1
+pub let hide_elem_hidden : Int32 = 1
 
 ///|
 let layout_elem_cell : Ref[Element?] = Ref(None)
@@ -1443,7 +1443,7 @@ pub fn layout_elem() -> Element {
 }
 
 ///|
-pub let layout_elem_func : Int = 0
+pub let layout_elem_func : Int32 = 0
 
 ///|
 let pad_elem_cell : Ref[Element?] = Ref(None)
@@ -1533,28 +1533,28 @@ pub fn pad_elem() -> Element {
 }
 
 ///|
-pub let pad_elem_left : Int = 0
+pub let pad_elem_left : Int32 = 0
 
 ///|
-pub let pad_elem_top : Int = 1
+pub let pad_elem_top : Int32 = 1
 
 ///|
-pub let pad_elem_right : Int = 2
+pub let pad_elem_right : Int32 = 2
 
 ///|
-pub let pad_elem_bottom : Int = 3
+pub let pad_elem_bottom : Int32 = 3
 
 ///|
-pub let pad_elem_x : Int = 4
+pub let pad_elem_x : Int32 = 4
 
 ///|
-pub let pad_elem_y : Int = 5
+pub let pad_elem_y : Int32 = 5
 
 ///|
-pub let pad_elem_rest : Int = 6
+pub let pad_elem_rest : Int32 = 6
 
 ///|
-pub let pad_elem_body : Int = 7
+pub let pad_elem_body : Int32 = 7
 
 ///|
 let page_elem_cell : Ref[Element?] = Ref(None)
@@ -1727,61 +1727,61 @@ pub fn page_elem() -> Element {
 }
 
 ///|
-pub let page_elem_paper : Int = 0
+pub let page_elem_paper : Int32 = 0
 
 ///|
-pub let page_elem_width : Int = 1
+pub let page_elem_width : Int32 = 1
 
 ///|
-pub let page_elem_height : Int = 2
+pub let page_elem_height : Int32 = 2
 
 ///|
-pub let page_elem_flipped : Int = 3
+pub let page_elem_flipped : Int32 = 3
 
 ///|
-pub let page_elem_margin : Int = 4
+pub let page_elem_margin : Int32 = 4
 
 ///|
-pub let page_elem_bleed : Int = 5
+pub let page_elem_bleed : Int32 = 5
 
 ///|
-pub let page_elem_binding : Int = 6
+pub let page_elem_binding : Int32 = 6
 
 ///|
-pub let page_elem_columns : Int = 7
+pub let page_elem_columns : Int32 = 7
 
 ///|
-pub let page_elem_fill : Int = 8
+pub let page_elem_fill : Int32 = 8
 
 ///|
-pub let page_elem_numbering : Int = 9
+pub let page_elem_numbering : Int32 = 9
 
 ///|
-pub let page_elem_supplement : Int = 10
+pub let page_elem_supplement : Int32 = 10
 
 ///|
-pub let page_elem_number_align : Int = 11
+pub let page_elem_number_align : Int32 = 11
 
 ///|
-pub let page_elem_header : Int = 12
+pub let page_elem_header : Int32 = 12
 
 ///|
-pub let page_elem_header_ascent : Int = 13
+pub let page_elem_header_ascent : Int32 = 13
 
 ///|
-pub let page_elem_footer : Int = 14
+pub let page_elem_footer : Int32 = 14
 
 ///|
-pub let page_elem_footer_descent : Int = 15
+pub let page_elem_footer_descent : Int32 = 15
 
 ///|
-pub let page_elem_background : Int = 16
+pub let page_elem_background : Int32 = 16
 
 ///|
-pub let page_elem_foreground : Int = 17
+pub let page_elem_foreground : Int32 = 17
 
 ///|
-pub let page_elem_body : Int = 18
+pub let page_elem_body : Int32 = 18
 
 ///|
 let pagebreak_elem_cell : Ref[Element?] = Ref(None)
@@ -1825,13 +1825,13 @@ pub fn pagebreak_elem() -> Element {
 }
 
 ///|
-pub let pagebreak_elem_weak : Int = 0
+pub let pagebreak_elem_weak : Int32 = 0
 
 ///|
-pub let pagebreak_elem_to : Int = 1
+pub let pagebreak_elem_to : Int32 = 1
 
 ///|
-pub let pagebreak_elem_boundary : Int = 2
+pub let pagebreak_elem_boundary : Int32 = 2
 
 ///|
 let place_elem_cell : Ref[Element?] = Ref(None)
@@ -1907,25 +1907,25 @@ pub fn place_elem() -> Element {
 }
 
 ///|
-pub let place_elem_alignment : Int = 0
+pub let place_elem_alignment : Int32 = 0
 
 ///|
-pub let place_elem_scope : Int = 1
+pub let place_elem_scope : Int32 = 1
 
 ///|
-pub let place_elem_float : Int = 2
+pub let place_elem_float : Int32 = 2
 
 ///|
-pub let place_elem_clearance : Int = 3
+pub let place_elem_clearance : Int32 = 3
 
 ///|
-pub let place_elem_dx : Int = 4
+pub let place_elem_dx : Int32 = 4
 
 ///|
-pub let place_elem_dy : Int = 5
+pub let place_elem_dy : Int32 = 5
 
 ///|
-pub let place_elem_body : Int = 6
+pub let place_elem_body : Int32 = 6
 
 ///|
 let flush_elem_cell : Ref[Element?] = Ref(None)
@@ -1997,13 +1997,13 @@ pub fn repeat_elem() -> Element {
 }
 
 ///|
-pub let repeat_elem_body : Int = 0
+pub let repeat_elem_body : Int32 = 0
 
 ///|
-pub let repeat_elem_gap : Int = 1
+pub let repeat_elem_gap : Int32 = 1
 
 ///|
-pub let repeat_elem_justify : Int = 2
+pub let repeat_elem_justify : Int32 = 2
 
 ///|
 let h_elem_cell : Ref[Element?] = Ref(None)
@@ -2043,10 +2043,10 @@ pub fn h_elem() -> Element {
 }
 
 ///|
-pub let h_elem_amount : Int = 0
+pub let h_elem_amount : Int32 = 0
 
 ///|
-pub let h_elem_weak : Int = 1
+pub let h_elem_weak : Int32 = 1
 
 ///|
 let v_elem_cell : Ref[Element?] = Ref(None)
@@ -2095,13 +2095,13 @@ pub fn v_elem() -> Element {
 }
 
 ///|
-pub let v_elem_amount : Int = 0
+pub let v_elem_amount : Int32 = 0
 
 ///|
-pub let v_elem_weak : Int = 1
+pub let v_elem_weak : Int32 = 1
 
 ///|
-pub let v_elem_attach : Int = 2
+pub let v_elem_attach : Int32 = 2
 
 ///|
 let stack_elem_cell : Ref[Element?] = Ref(None)
@@ -2149,13 +2149,13 @@ pub fn stack_elem() -> Element {
 }
 
 ///|
-pub let stack_elem_dir : Int = 0
+pub let stack_elem_dir : Int32 = 0
 
 ///|
-pub let stack_elem_spacing : Int = 1
+pub let stack_elem_spacing : Int32 = 1
 
 ///|
-pub let stack_elem_children : Int = 2
+pub let stack_elem_children : Int32 = 2
 
 ///|
 let move_elem_cell : Ref[Element?] = Ref(None)
@@ -2206,13 +2206,13 @@ pub fn move_elem() -> Element {
 }
 
 ///|
-pub let move_elem_dx : Int = 0
+pub let move_elem_dx : Int32 = 0
 
 ///|
-pub let move_elem_dy : Int = 1
+pub let move_elem_dy : Int32 = 1
 
 ///|
-pub let move_elem_body : Int = 2
+pub let move_elem_body : Int32 = 2
 
 ///|
 let rotate_elem_cell : Ref[Element?] = Ref(None)
@@ -2274,16 +2274,16 @@ pub fn rotate_elem() -> Element {
 }
 
 ///|
-pub let rotate_elem_angle : Int = 0
+pub let rotate_elem_angle : Int32 = 0
 
 ///|
-pub let rotate_elem_origin : Int = 1
+pub let rotate_elem_origin : Int32 = 1
 
 ///|
-pub let rotate_elem_reflow : Int = 2
+pub let rotate_elem_reflow : Int32 = 2
 
 ///|
-pub let rotate_elem_body : Int = 3
+pub let rotate_elem_body : Int32 = 3
 
 ///|
 let scale_elem_cell : Ref[Element?] = Ref(None)
@@ -2361,22 +2361,22 @@ pub fn scale_elem() -> Element {
 }
 
 ///|
-pub let scale_elem_factor : Int = 0
+pub let scale_elem_factor : Int32 = 0
 
 ///|
-pub let scale_elem_x : Int = 1
+pub let scale_elem_x : Int32 = 1
 
 ///|
-pub let scale_elem_y : Int = 2
+pub let scale_elem_y : Int32 = 2
 
 ///|
-pub let scale_elem_origin : Int = 3
+pub let scale_elem_origin : Int32 = 3
 
 ///|
-pub let scale_elem_reflow : Int = 4
+pub let scale_elem_reflow : Int32 = 4
 
 ///|
-pub let scale_elem_body : Int = 5
+pub let scale_elem_body : Int32 = 5
 
 ///|
 let skew_elem_cell : Ref[Element?] = Ref(None)
@@ -2436,19 +2436,19 @@ pub fn skew_elem() -> Element {
 }
 
 ///|
-pub let skew_elem_ax : Int = 0
+pub let skew_elem_ax : Int32 = 0
 
 ///|
-pub let skew_elem_ay : Int = 1
+pub let skew_elem_ay : Int32 = 1
 
 ///|
-pub let skew_elem_origin : Int = 2
+pub let skew_elem_origin : Int32 = 2
 
 ///|
-pub let skew_elem_reflow : Int = 3
+pub let skew_elem_reflow : Int32 = 3
 
 ///|
-pub let skew_elem_body : Int = 4
+pub let skew_elem_body : Int32 = 4
 
 ///|
 let accent_elem_cell : Ref[Element?] = Ref(None)
@@ -2507,16 +2507,16 @@ pub fn accent_elem() -> Element {
 }
 
 ///|
-pub let accent_elem_base : Int = 0
+pub let accent_elem_base : Int32 = 0
 
 ///|
-pub let accent_elem_accent : Int = 1
+pub let accent_elem_accent : Int32 = 1
 
 ///|
-pub let accent_elem_size : Int = 2
+pub let accent_elem_size : Int32 = 2
 
 ///|
-pub let accent_elem_dotless : Int = 3
+pub let accent_elem_dotless : Int32 = 3
 
 ///|
 let math_attach_elem_cell : Ref[Element?] = Ref(None)
@@ -2571,25 +2571,25 @@ pub fn math_attach_elem() -> Element {
 }
 
 ///|
-pub let math_attach_elem_base : Int = 0
+pub let math_attach_elem_base : Int32 = 0
 
 ///|
-pub let math_attach_elem_t : Int = 1
+pub let math_attach_elem_t : Int32 = 1
 
 ///|
-pub let math_attach_elem_b : Int = 2
+pub let math_attach_elem_b : Int32 = 2
 
 ///|
-pub let math_attach_elem_tl : Int = 3
+pub let math_attach_elem_tl : Int32 = 3
 
 ///|
-pub let math_attach_elem_bl : Int = 4
+pub let math_attach_elem_bl : Int32 = 4
 
 ///|
-pub let math_attach_elem_tr : Int = 5
+pub let math_attach_elem_tr : Int32 = 5
 
 ///|
-pub let math_attach_elem_br : Int = 6
+pub let math_attach_elem_br : Int32 = 6
 
 ///|
 let primes_elem_cell : Ref[Element?] = Ref(None)
@@ -2626,7 +2626,7 @@ pub fn primes_elem() -> Element {
 }
 
 ///|
-pub let primes_elem_count : Int = 0
+pub let primes_elem_count : Int32 = 0
 
 ///|
 let scripts_elem_cell : Ref[Element?] = Ref(None)
@@ -2663,7 +2663,7 @@ pub fn scripts_elem() -> Element {
 }
 
 ///|
-pub let scripts_elem_body : Int = 0
+pub let scripts_elem_body : Int32 = 0
 
 ///|
 let limits_elem_cell : Ref[Element?] = Ref(None)
@@ -2703,10 +2703,10 @@ pub fn limits_elem() -> Element {
 }
 
 ///|
-pub let limits_elem_body : Int = 0
+pub let limits_elem_body : Int32 = 0
 
 ///|
-pub let limits_elem_inline : Int = 1
+pub let limits_elem_inline : Int32 = 1
 
 ///|
 let stretch_elem_cell : Ref[Element?] = Ref(None)
@@ -2750,10 +2750,10 @@ pub fn stretch_elem() -> Element {
 }
 
 ///|
-pub let stretch_elem_body : Int = 0
+pub let stretch_elem_body : Int32 = 0
 
 ///|
-pub let stretch_elem_size : Int = 1
+pub let stretch_elem_size : Int32 = 1
 
 ///|
 let cancel_elem_cell : Ref[Element?] = Ref(None)
@@ -2829,25 +2829,25 @@ pub fn cancel_elem() -> Element {
 }
 
 ///|
-pub let cancel_elem_body : Int = 0
+pub let cancel_elem_body : Int32 = 0
 
 ///|
-pub let cancel_elem_length : Int = 1
+pub let cancel_elem_length : Int32 = 1
 
 ///|
-pub let cancel_elem_inverted : Int = 2
+pub let cancel_elem_inverted : Int32 = 2
 
 ///|
-pub let cancel_elem_cross : Int = 3
+pub let cancel_elem_cross : Int32 = 3
 
 ///|
-pub let cancel_elem_angle : Int = 4
+pub let cancel_elem_angle : Int32 = 4
 
 ///|
-pub let cancel_elem_stroke : Int = 5
+pub let cancel_elem_stroke : Int32 = 5
 
 ///|
-pub let cancel_elem_background : Int = 6
+pub let cancel_elem_background : Int32 = 6
 
 ///|
 let equation_elem_cell : Ref[Element?] = Ref(None)
@@ -2978,43 +2978,43 @@ pub fn equation_elem() -> Element {
 }
 
 ///|
-pub let equation_elem_block : Int = 0
+pub let equation_elem_block : Int32 = 0
 
 ///|
-pub let equation_elem_numbering : Int = 1
+pub let equation_elem_numbering : Int32 = 1
 
 ///|
-pub let equation_elem_number_align : Int = 2
+pub let equation_elem_number_align : Int32 = 2
 
 ///|
-pub let equation_elem_supplement : Int = 3
+pub let equation_elem_supplement : Int32 = 3
 
 ///|
-pub let equation_elem_alt : Int = 4
+pub let equation_elem_alt : Int32 = 4
 
 ///|
-pub let equation_elem_body : Int = 5
+pub let equation_elem_body : Int32 = 5
 
 ///|
-pub let equation_elem_size : Int = 6
+pub let equation_elem_size : Int32 = 6
 
 ///|
-pub let equation_elem_variant : Int = 7
+pub let equation_elem_variant : Int32 = 7
 
 ///|
-pub let equation_elem_cramped : Int = 8
+pub let equation_elem_cramped : Int32 = 8
 
 ///|
-pub let equation_elem_bold : Int = 9
+pub let equation_elem_bold : Int32 = 9
 
 ///|
-pub let equation_elem_italic : Int = 10
+pub let equation_elem_italic : Int32 = 10
 
 ///|
-pub let equation_elem_script_scale : Int = 11
+pub let equation_elem_script_scale : Int32 = 11
 
 ///|
-pub let equation_elem_locale : Int = 12
+pub let equation_elem_locale : Int32 = 12
 
 ///|
 let frac_elem_cell : Ref[Element?] = Ref(None)
@@ -3084,19 +3084,19 @@ pub fn frac_elem() -> Element {
 }
 
 ///|
-pub let frac_elem_num : Int = 0
+pub let frac_elem_num : Int32 = 0
 
 ///|
-pub let frac_elem_denom : Int = 1
+pub let frac_elem_denom : Int32 = 1
 
 ///|
-pub let frac_elem_style : Int = 2
+pub let frac_elem_style : Int32 = 2
 
 ///|
-pub let frac_elem_num_deparenthesized : Int = 3
+pub let frac_elem_num_deparenthesized : Int32 = 3
 
 ///|
-pub let frac_elem_denom_deparenthesized : Int = 4
+pub let frac_elem_denom_deparenthesized : Int32 = 4
 
 ///|
 let binom_elem_cell : Ref[Element?] = Ref(None)
@@ -3143,10 +3143,10 @@ pub fn binom_elem() -> Element {
 }
 
 ///|
-pub let binom_elem_upper : Int = 0
+pub let binom_elem_upper : Int32 = 0
 
 ///|
-pub let binom_elem_lower : Int = 1
+pub let binom_elem_lower : Int32 = 1
 
 ///|
 let lr_elem_cell : Ref[Element?] = Ref(None)
@@ -3191,10 +3191,10 @@ pub fn lr_elem() -> Element {
 }
 
 ///|
-pub let lr_elem_size : Int = 0
+pub let lr_elem_size : Int32 = 0
 
 ///|
-pub let lr_elem_body : Int = 1
+pub let lr_elem_body : Int32 = 1
 
 ///|
 let mid_elem_cell : Ref[Element?] = Ref(None)
@@ -3231,7 +3231,7 @@ pub fn mid_elem() -> Element {
 }
 
 ///|
-pub let mid_elem_body : Int = 0
+pub let mid_elem_body : Int32 = 0
 
 ///|
 let vec_elem_cell : Ref[Element?] = Ref(None)
@@ -3290,16 +3290,16 @@ pub fn vec_elem() -> Element {
 }
 
 ///|
-pub let vec_elem_delim : Int = 0
+pub let vec_elem_delim : Int32 = 0
 
 ///|
-pub let vec_elem_align : Int = 1
+pub let vec_elem_align : Int32 = 1
 
 ///|
-pub let vec_elem_gap : Int = 2
+pub let vec_elem_gap : Int32 = 2
 
 ///|
-pub let vec_elem_children : Int = 3
+pub let vec_elem_children : Int32 = 3
 
 ///|
 let mat_elem_cell : Ref[Element?] = Ref(None)
@@ -3384,25 +3384,25 @@ pub fn mat_elem() -> Element {
 }
 
 ///|
-pub let mat_elem_delim : Int = 0
+pub let mat_elem_delim : Int32 = 0
 
 ///|
-pub let mat_elem_align : Int = 1
+pub let mat_elem_align : Int32 = 1
 
 ///|
-pub let mat_elem_augment : Int = 2
+pub let mat_elem_augment : Int32 = 2
 
 ///|
-pub let mat_elem_gap : Int = 3
+pub let mat_elem_gap : Int32 = 3
 
 ///|
-pub let mat_elem_row_gap : Int = 4
+pub let mat_elem_row_gap : Int32 = 4
 
 ///|
-pub let mat_elem_column_gap : Int = 5
+pub let mat_elem_column_gap : Int32 = 5
 
 ///|
-pub let mat_elem_rows : Int = 6
+pub let mat_elem_rows : Int32 = 6
 
 ///|
 let cases_elem_cell : Ref[Element?] = Ref(None)
@@ -3461,16 +3461,16 @@ pub fn cases_elem() -> Element {
 }
 
 ///|
-pub let cases_elem_delim : Int = 0
+pub let cases_elem_delim : Int32 = 0
 
 ///|
-pub let cases_elem_reverse : Int = 1
+pub let cases_elem_reverse : Int32 = 1
 
 ///|
-pub let cases_elem_gap : Int = 2
+pub let cases_elem_gap : Int32 = 2
 
 ///|
-pub let cases_elem_children : Int = 3
+pub let cases_elem_children : Int32 = 3
 
 ///|
 let align_point_elem_cell : Ref[Element?] = Ref(None)
@@ -3540,10 +3540,10 @@ pub fn class_elem() -> Element {
 }
 
 ///|
-pub let class_elem_class : Int = 0
+pub let class_elem_class : Int32 = 0
 
 ///|
-pub let class_elem_body : Int = 1
+pub let class_elem_body : Int32 = 1
 
 ///|
 let op_elem_cell : Ref[Element?] = Ref(None)
@@ -3583,10 +3583,10 @@ pub fn op_elem() -> Element {
 }
 
 ///|
-pub let op_elem_text : Int = 0
+pub let op_elem_text : Int32 = 0
 
 ///|
-pub let op_elem_limits : Int = 1
+pub let op_elem_limits : Int32 = 1
 
 ///|
 let root_elem_cell : Ref[Element?] = Ref(None)
@@ -3631,10 +3631,10 @@ pub fn root_elem() -> Element {
 }
 
 ///|
-pub let root_elem_index : Int = 0
+pub let root_elem_index : Int32 = 0
 
 ///|
-pub let root_elem_radicand : Int = 1
+pub let root_elem_radicand : Int32 = 1
 
 ///|
 let math_underline_elem_cell : Ref[Element?] = Ref(None)
@@ -3671,7 +3671,7 @@ pub fn math_underline_elem() -> Element {
 }
 
 ///|
-pub let math_underline_elem_body : Int = 0
+pub let math_underline_elem_body : Int32 = 0
 
 ///|
 let math_overline_elem_cell : Ref[Element?] = Ref(None)
@@ -3708,7 +3708,7 @@ pub fn math_overline_elem() -> Element {
 }
 
 ///|
-pub let math_overline_elem_body : Int = 0
+pub let math_overline_elem_body : Int32 = 0
 
 ///|
 let underbrace_elem_cell : Ref[Element?] = Ref(None)
@@ -3753,10 +3753,10 @@ pub fn underbrace_elem() -> Element {
 }
 
 ///|
-pub let underbrace_elem_body : Int = 0
+pub let underbrace_elem_body : Int32 = 0
 
 ///|
-pub let underbrace_elem_annotation : Int = 1
+pub let underbrace_elem_annotation : Int32 = 1
 
 ///|
 let overbrace_elem_cell : Ref[Element?] = Ref(None)
@@ -3801,10 +3801,10 @@ pub fn overbrace_elem() -> Element {
 }
 
 ///|
-pub let overbrace_elem_body : Int = 0
+pub let overbrace_elem_body : Int32 = 0
 
 ///|
-pub let overbrace_elem_annotation : Int = 1
+pub let overbrace_elem_annotation : Int32 = 1
 
 ///|
 let underbracket_elem_cell : Ref[Element?] = Ref(None)
@@ -3849,10 +3849,10 @@ pub fn underbracket_elem() -> Element {
 }
 
 ///|
-pub let underbracket_elem_body : Int = 0
+pub let underbracket_elem_body : Int32 = 0
 
 ///|
-pub let underbracket_elem_annotation : Int = 1
+pub let underbracket_elem_annotation : Int32 = 1
 
 ///|
 let overbracket_elem_cell : Ref[Element?] = Ref(None)
@@ -3897,10 +3897,10 @@ pub fn overbracket_elem() -> Element {
 }
 
 ///|
-pub let overbracket_elem_body : Int = 0
+pub let overbracket_elem_body : Int32 = 0
 
 ///|
-pub let overbracket_elem_annotation : Int = 1
+pub let overbracket_elem_annotation : Int32 = 1
 
 ///|
 let underparen_elem_cell : Ref[Element?] = Ref(None)
@@ -3945,10 +3945,10 @@ pub fn underparen_elem() -> Element {
 }
 
 ///|
-pub let underparen_elem_body : Int = 0
+pub let underparen_elem_body : Int32 = 0
 
 ///|
-pub let underparen_elem_annotation : Int = 1
+pub let underparen_elem_annotation : Int32 = 1
 
 ///|
 let overparen_elem_cell : Ref[Element?] = Ref(None)
@@ -3993,10 +3993,10 @@ pub fn overparen_elem() -> Element {
 }
 
 ///|
-pub let overparen_elem_body : Int = 0
+pub let overparen_elem_body : Int32 = 0
 
 ///|
-pub let overparen_elem_annotation : Int = 1
+pub let overparen_elem_annotation : Int32 = 1
 
 ///|
 let undershell_elem_cell : Ref[Element?] = Ref(None)
@@ -4041,10 +4041,10 @@ pub fn undershell_elem() -> Element {
 }
 
 ///|
-pub let undershell_elem_body : Int = 0
+pub let undershell_elem_body : Int32 = 0
 
 ///|
-pub let undershell_elem_annotation : Int = 1
+pub let undershell_elem_annotation : Int32 = 1
 
 ///|
 let overshell_elem_cell : Ref[Element?] = Ref(None)
@@ -4089,10 +4089,10 @@ pub fn overshell_elem() -> Element {
 }
 
 ///|
-pub let overshell_elem_body : Int = 0
+pub let overshell_elem_body : Int32 = 0
 
 ///|
-pub let overshell_elem_annotation : Int = 1
+pub let overshell_elem_annotation : Int32 = 1
 
 ///|
 let artifact_elem_cell : Ref[Element?] = Ref(None)
@@ -4136,10 +4136,10 @@ pub fn artifact_elem() -> Element {
 }
 
 ///|
-pub let artifact_elem_kind : Int = 0
+pub let artifact_elem_kind : Int32 = 0
 
 ///|
-pub let artifact_elem_body : Int = 1
+pub let artifact_elem_body : Int32 = 1
 
 ///|
 let pdf_marker_tag_elem_cell : Ref[Element?] = Ref(None)
@@ -4184,10 +4184,10 @@ pub fn pdf_marker_tag_elem() -> Element {
 }
 
 ///|
-pub let pdf_marker_tag_elem_body : Int = 0
+pub let pdf_marker_tag_elem_body : Int32 = 0
 
 ///|
-pub let pdf_marker_tag_elem_kind : Int = 1
+pub let pdf_marker_tag_elem_kind : Int32 = 1
 
 ///|
 let bibliography_elem_cell : Ref[Element?] = Ref(None)
@@ -4292,34 +4292,34 @@ pub fn bibliography_elem() -> Element {
 }
 
 ///|
-pub let bibliography_elem_sources : Int = 0
+pub let bibliography_elem_sources : Int32 = 0
 
 ///|
-pub let bibliography_elem_title : Int = 1
+pub let bibliography_elem_title : Int32 = 1
 
 ///|
-pub let bibliography_elem_full : Int = 2
+pub let bibliography_elem_full : Int32 = 2
 
 ///|
-pub let bibliography_elem_style : Int = 3
+pub let bibliography_elem_style : Int32 = 3
 
 ///|
-pub let bibliography_elem_target : Int = 4
+pub let bibliography_elem_target : Int32 = 4
 
 ///|
-pub let bibliography_elem_group : Int = 5
+pub let bibliography_elem_group : Int32 = 5
 
 ///|
-pub let bibliography_elem_lang : Int = 6
+pub let bibliography_elem_lang : Int32 = 6
 
 ///|
-pub let bibliography_elem_region : Int = 7
+pub let bibliography_elem_region : Int32 = 7
 
 ///|
-pub let bibliography_elem_sources_derived : Int = 8
+pub let bibliography_elem_sources_derived : Int32 = 8
 
 ///|
-pub let bibliography_elem_style_derived : Int = 9
+pub let bibliography_elem_style_derived : Int32 = 9
 
 ///|
 let csl_light_elem_cell : Ref[Element?] = Ref(None)
@@ -4355,7 +4355,7 @@ pub fn csl_light_elem() -> Element {
 }
 
 ///|
-pub let csl_light_elem_body : Int = 0
+pub let csl_light_elem_body : Int32 = 0
 
 ///|
 let csl_indent_elem_cell : Ref[Element?] = Ref(None)
@@ -4391,7 +4391,7 @@ pub fn csl_indent_elem() -> Element {
 }
 
 ///|
-pub let csl_indent_elem_body : Int = 0
+pub let csl_indent_elem_body : Int32 = 0
 
 ///|
 let cite_elem_cell : Ref[Element?] = Ref(None)
@@ -4473,25 +4473,25 @@ pub fn cite_elem() -> Element {
 }
 
 ///|
-pub let cite_elem_key : Int = 0
+pub let cite_elem_key : Int32 = 0
 
 ///|
-pub let cite_elem_supplement : Int = 1
+pub let cite_elem_supplement : Int32 = 1
 
 ///|
-pub let cite_elem_form : Int = 2
+pub let cite_elem_form : Int32 = 2
 
 ///|
-pub let cite_elem_style : Int = 3
+pub let cite_elem_style : Int32 = 3
 
 ///|
-pub let cite_elem_lang : Int = 4
+pub let cite_elem_lang : Int32 = 4
 
 ///|
-pub let cite_elem_region : Int = 5
+pub let cite_elem_region : Int32 = 5
 
 ///|
-pub let cite_elem_style_derived : Int = 6
+pub let cite_elem_style_derived : Int32 = 6
 
 ///|
 let cite_group_elem_cell : Ref[Element?] = Ref(None)
@@ -4527,7 +4527,7 @@ pub fn cite_group_elem() -> Element {
 }
 
 ///|
-pub let cite_group_elem_children : Int = 0
+pub let cite_group_elem_children : Int32 = 0
 
 ///|
 let divider_elem_cell : Ref[Element?] = Ref(None)
@@ -4641,28 +4641,28 @@ pub fn document_elem() -> Element {
 }
 
 ///|
-pub let document_elem_path : Int = 0
+pub let document_elem_path : Int32 = 0
 
 ///|
-pub let document_elem_format : Int = 1
+pub let document_elem_format : Int32 = 1
 
 ///|
-pub let document_elem_title : Int = 2
+pub let document_elem_title : Int32 = 2
 
 ///|
-pub let document_elem_author : Int = 3
+pub let document_elem_author : Int32 = 3
 
 ///|
-pub let document_elem_description : Int = 4
+pub let document_elem_description : Int32 = 4
 
 ///|
-pub let document_elem_keywords : Int = 5
+pub let document_elem_keywords : Int32 = 5
 
 ///|
-pub let document_elem_date : Int = 6
+pub let document_elem_date : Int32 = 6
 
 ///|
-pub let document_elem_body : Int = 7
+pub let document_elem_body : Int32 = 7
 
 ///|
 let emph_elem_cell : Ref[Element?] = Ref(None)
@@ -4699,7 +4699,7 @@ pub fn emph_elem() -> Element {
 }
 
 ///|
-pub let emph_elem_body : Int = 0
+pub let emph_elem_body : Int32 = 0
 
 ///|
 let enum_elem_cell : Ref[Element?] = Ref(None)
@@ -4801,37 +4801,37 @@ pub fn enum_elem() -> Element {
 }
 
 ///|
-pub let enum_elem_tight : Int = 0
+pub let enum_elem_tight : Int32 = 0
 
 ///|
-pub let enum_elem_numbering : Int = 1
+pub let enum_elem_numbering : Int32 = 1
 
 ///|
-pub let enum_elem_start : Int = 2
+pub let enum_elem_start : Int32 = 2
 
 ///|
-pub let enum_elem_full : Int = 3
+pub let enum_elem_full : Int32 = 3
 
 ///|
-pub let enum_elem_reversed : Int = 4
+pub let enum_elem_reversed : Int32 = 4
 
 ///|
-pub let enum_elem_indent : Int = 5
+pub let enum_elem_indent : Int32 = 5
 
 ///|
-pub let enum_elem_body_indent : Int = 6
+pub let enum_elem_body_indent : Int32 = 6
 
 ///|
-pub let enum_elem_spacing : Int = 7
+pub let enum_elem_spacing : Int32 = 7
 
 ///|
-pub let enum_elem_number_align : Int = 8
+pub let enum_elem_number_align : Int32 = 8
 
 ///|
-pub let enum_elem_children : Int = 9
+pub let enum_elem_children : Int32 = 9
 
 ///|
-pub let enum_elem_parents : Int = 10
+pub let enum_elem_parents : Int32 = 10
 
 ///|
 let enum_item_elem_cell : Ref[Element?] = Ref(None)
@@ -4876,10 +4876,10 @@ pub fn enum_item_elem() -> Element {
 }
 
 ///|
-pub let enum_item_elem_number : Int = 0
+pub let enum_item_elem_number : Int32 = 0
 
 ///|
-pub let enum_item_elem_body : Int = 1
+pub let enum_item_elem_body : Int32 = 1
 
 ///|
 let figure_elem_cell : Ref[Element?] = Ref(None)
@@ -4988,40 +4988,40 @@ pub fn figure_elem() -> Element {
 }
 
 ///|
-pub let figure_elem_body : Int = 0
+pub let figure_elem_body : Int32 = 0
 
 ///|
-pub let figure_elem_alt : Int = 1
+pub let figure_elem_alt : Int32 = 1
 
 ///|
-pub let figure_elem_placement : Int = 2
+pub let figure_elem_placement : Int32 = 2
 
 ///|
-pub let figure_elem_scope : Int = 3
+pub let figure_elem_scope : Int32 = 3
 
 ///|
-pub let figure_elem_caption : Int = 4
+pub let figure_elem_caption : Int32 = 4
 
 ///|
-pub let figure_elem_kind : Int = 5
+pub let figure_elem_kind : Int32 = 5
 
 ///|
-pub let figure_elem_supplement : Int = 6
+pub let figure_elem_supplement : Int32 = 6
 
 ///|
-pub let figure_elem_numbering : Int = 7
+pub let figure_elem_numbering : Int32 = 7
 
 ///|
-pub let figure_elem_gap : Int = 8
+pub let figure_elem_gap : Int32 = 8
 
 ///|
-pub let figure_elem_outlined : Int = 9
+pub let figure_elem_outlined : Int32 = 9
 
 ///|
-pub let figure_elem_counter : Int = 10
+pub let figure_elem_counter : Int32 = 10
 
 ///|
-pub let figure_elem_locale : Int = 11
+pub let figure_elem_locale : Int32 = 11
 
 ///|
 let figure_caption_elem_cell : Ref[Element?] = Ref(None)
@@ -5104,28 +5104,28 @@ pub fn figure_caption_elem() -> Element {
 }
 
 ///|
-pub let figure_caption_elem_position : Int = 0
+pub let figure_caption_elem_position : Int32 = 0
 
 ///|
-pub let figure_caption_elem_separator : Int = 1
+pub let figure_caption_elem_separator : Int32 = 1
 
 ///|
-pub let figure_caption_elem_body : Int = 2
+pub let figure_caption_elem_body : Int32 = 2
 
 ///|
-pub let figure_caption_elem_kind : Int = 3
+pub let figure_caption_elem_kind : Int32 = 3
 
 ///|
-pub let figure_caption_elem_supplement : Int = 4
+pub let figure_caption_elem_supplement : Int32 = 4
 
 ///|
-pub let figure_caption_elem_numbering : Int = 5
+pub let figure_caption_elem_numbering : Int32 = 5
 
 ///|
-pub let figure_caption_elem_counter : Int = 6
+pub let figure_caption_elem_counter : Int32 = 6
 
 ///|
-pub let figure_caption_elem_figure_location : Int = 7
+pub let figure_caption_elem_figure_location : Int32 = 7
 
 ///|
 let footnote_elem_cell : Ref[Element?] = Ref(None)
@@ -5172,10 +5172,10 @@ pub fn footnote_elem() -> Element {
 }
 
 ///|
-pub let footnote_elem_numbering : Int = 0
+pub let footnote_elem_numbering : Int32 = 0
 
 ///|
-pub let footnote_elem_body : Int = 1
+pub let footnote_elem_body : Int32 = 1
 
 ///|
 let footnote_entry_elem_cell : Ref[Element?] = Ref(None)
@@ -5237,19 +5237,19 @@ pub fn footnote_entry_elem() -> Element {
 }
 
 ///|
-pub let footnote_entry_elem_note : Int = 0
+pub let footnote_entry_elem_note : Int32 = 0
 
 ///|
-pub let footnote_entry_elem_separator : Int = 1
+pub let footnote_entry_elem_separator : Int32 = 1
 
 ///|
-pub let footnote_entry_elem_clearance : Int = 2
+pub let footnote_entry_elem_clearance : Int32 = 2
 
 ///|
-pub let footnote_entry_elem_gap : Int = 3
+pub let footnote_entry_elem_gap : Int32 = 3
 
 ///|
-pub let footnote_entry_elem_indent : Int = 4
+pub let footnote_entry_elem_indent : Int32 = 4
 
 ///|
 let footnote_container_elem_cell : Ref[Element?] = Ref(None)
@@ -5405,34 +5405,34 @@ pub fn heading_elem() -> Element {
 }
 
 ///|
-pub let heading_elem_level : Int = 0
+pub let heading_elem_level : Int32 = 0
 
 ///|
-pub let heading_elem_depth : Int = 1
+pub let heading_elem_depth : Int32 = 1
 
 ///|
-pub let heading_elem_offset : Int = 2
+pub let heading_elem_offset : Int32 = 2
 
 ///|
-pub let heading_elem_numbering : Int = 3
+pub let heading_elem_numbering : Int32 = 3
 
 ///|
-pub let heading_elem_supplement : Int = 4
+pub let heading_elem_supplement : Int32 = 4
 
 ///|
-pub let heading_elem_outlined : Int = 5
+pub let heading_elem_outlined : Int32 = 5
 
 ///|
-pub let heading_elem_bookmarked : Int = 6
+pub let heading_elem_bookmarked : Int32 = 6
 
 ///|
-pub let heading_elem_hanging_indent : Int = 7
+pub let heading_elem_hanging_indent : Int32 = 7
 
 ///|
-pub let heading_elem_body : Int = 8
+pub let heading_elem_body : Int32 = 8
 
 ///|
-pub let heading_elem_numbers : Int = 9
+pub let heading_elem_numbers : Int32 = 9
 
 ///|
 let link_elem_cell : Ref[Element?] = Ref(None)
@@ -5488,13 +5488,13 @@ pub fn link_elem() -> Element {
 }
 
 ///|
-pub let link_elem_dest : Int = 0
+pub let link_elem_dest : Int32 = 0
 
 ///|
-pub let link_elem_body : Int = 1
+pub let link_elem_body : Int32 = 1
 
 ///|
-pub let link_elem_current : Int = 2
+pub let link_elem_current : Int32 = 2
 
 ///|
 let direct_link_elem_cell : Ref[Element?] = Ref(None)
@@ -5549,13 +5549,13 @@ pub fn direct_link_elem() -> Element {
 }
 
 ///|
-pub let direct_link_elem_loc : Int = 0
+pub let direct_link_elem_loc : Int32 = 0
 
 ///|
-pub let direct_link_elem_body : Int = 1
+pub let direct_link_elem_body : Int32 = 1
 
 ///|
-pub let direct_link_elem_alt : Int = 2
+pub let direct_link_elem_alt : Int32 = 2
 
 ///|
 let link_marker_elem_cell : Ref[Element?] = Ref(None)
@@ -5601,10 +5601,10 @@ pub fn link_marker_elem() -> Element {
 }
 
 ///|
-pub let link_marker_elem_body : Int = 0
+pub let link_marker_elem_body : Int32 = 0
 
 ///|
-pub let link_marker_elem_alt : Int = 1
+pub let link_marker_elem_alt : Int32 = 1
 
 ///|
 let list_elem_cell : Ref[Element?] = Ref(None)
@@ -5689,28 +5689,28 @@ pub fn list_elem() -> Element {
 }
 
 ///|
-pub let list_elem_tight : Int = 0
+pub let list_elem_tight : Int32 = 0
 
 ///|
-pub let list_elem_marker : Int = 1
+pub let list_elem_marker : Int32 = 1
 
 ///|
-pub let list_elem_indent : Int = 2
+pub let list_elem_indent : Int32 = 2
 
 ///|
-pub let list_elem_body_indent : Int = 3
+pub let list_elem_body_indent : Int32 = 3
 
 ///|
-pub let list_elem_spacing : Int = 4
+pub let list_elem_spacing : Int32 = 4
 
 ///|
-pub let list_elem_marker_align : Int = 5
+pub let list_elem_marker_align : Int32 = 5
 
 ///|
-pub let list_elem_children : Int = 6
+pub let list_elem_children : Int32 = 6
 
 ///|
-pub let list_elem_depth : Int = 7
+pub let list_elem_depth : Int32 = 7
 
 ///|
 let list_item_elem_cell : Ref[Element?] = Ref(None)
@@ -5747,7 +5747,7 @@ pub fn list_item_elem() -> Element {
 }
 
 ///|
-pub let list_item_elem_body : Int = 0
+pub let list_item_elem_body : Int32 = 0
 
 ///|
 let outline_elem_cell : Ref[Element?] = Ref(None)
@@ -5808,16 +5808,16 @@ pub fn outline_elem() -> Element {
 }
 
 ///|
-pub let outline_elem_title : Int = 0
+pub let outline_elem_title : Int32 = 0
 
 ///|
-pub let outline_elem_target : Int = 1
+pub let outline_elem_target : Int32 = 1
 
 ///|
-pub let outline_elem_depth : Int = 2
+pub let outline_elem_depth : Int32 = 2
 
 ///|
-pub let outline_elem_indent : Int = 3
+pub let outline_elem_indent : Int32 = 3
 
 ///|
 let outline_entry_elem_cell : Ref[Element?] = Ref(None)
@@ -5877,16 +5877,16 @@ pub fn outline_entry_elem() -> Element {
 }
 
 ///|
-pub let outline_entry_elem_level : Int = 0
+pub let outline_entry_elem_level : Int32 = 0
 
 ///|
-pub let outline_entry_elem_element : Int = 1
+pub let outline_entry_elem_element : Int32 = 1
 
 ///|
-pub let outline_entry_elem_fill : Int = 2
+pub let outline_entry_elem_fill : Int32 = 2
 
 ///|
-pub let outline_entry_elem_parent : Int = 3
+pub let outline_entry_elem_parent : Int32 = 3
 
 ///|
 let prefix_info_elem_cell : Ref[Element?] = Ref(None)
@@ -5940,13 +5940,13 @@ pub fn prefix_info_elem() -> Element {
 }
 
 ///|
-pub let prefix_info_elem_key : Int = 0
+pub let prefix_info_elem_key : Int32 = 0
 
 ///|
-pub let prefix_info_elem_level : Int = 1
+pub let prefix_info_elem_level : Int32 = 1
 
 ///|
-pub let prefix_info_elem_inset : Int = 2
+pub let prefix_info_elem_inset : Int32 = 2
 
 ///|
 let par_elem_cell : Ref[Element?] = Ref(None)
@@ -6034,28 +6034,28 @@ pub fn par_elem() -> Element {
 }
 
 ///|
-pub let par_elem_leading : Int = 0
+pub let par_elem_leading : Int32 = 0
 
 ///|
-pub let par_elem_spacing : Int = 1
+pub let par_elem_spacing : Int32 = 1
 
 ///|
-pub let par_elem_justify : Int = 2
+pub let par_elem_justify : Int32 = 2
 
 ///|
-pub let par_elem_justification_limits : Int = 3
+pub let par_elem_justification_limits : Int32 = 3
 
 ///|
-pub let par_elem_linebreaks : Int = 4
+pub let par_elem_linebreaks : Int32 = 4
 
 ///|
-pub let par_elem_first_line_indent : Int = 5
+pub let par_elem_first_line_indent : Int32 = 5
 
 ///|
-pub let par_elem_hanging_indent : Int = 6
+pub let par_elem_hanging_indent : Int32 = 6
 
 ///|
-pub let par_elem_body : Int = 7
+pub let par_elem_body : Int32 = 7
 
 ///|
 let parbreak_elem_cell : Ref[Element?] = Ref(None)
@@ -6144,19 +6144,19 @@ pub fn par_line_elem() -> Element {
 }
 
 ///|
-pub let par_line_elem_numbering : Int = 0
+pub let par_line_elem_numbering : Int32 = 0
 
 ///|
-pub let par_line_elem_number_align : Int = 1
+pub let par_line_elem_number_align : Int32 = 1
 
 ///|
-pub let par_line_elem_number_margin : Int = 2
+pub let par_line_elem_number_margin : Int32 = 2
 
 ///|
-pub let par_line_elem_number_clearance : Int = 3
+pub let par_line_elem_number_clearance : Int32 = 3
 
 ///|
-pub let par_line_elem_numbering_scope : Int = 4
+pub let par_line_elem_numbering_scope : Int32 = 4
 
 ///|
 let par_line_marker_elem_cell : Ref[Element?] = Ref(None)
@@ -6220,16 +6220,16 @@ pub fn par_line_marker_elem() -> Element {
 }
 
 ///|
-pub let par_line_marker_elem_numbering : Int = 0
+pub let par_line_marker_elem_numbering : Int32 = 0
 
 ///|
-pub let par_line_marker_elem_number_align : Int = 1
+pub let par_line_marker_elem_number_align : Int32 = 1
 
 ///|
-pub let par_line_marker_elem_number_margin : Int = 2
+pub let par_line_marker_elem_number_margin : Int32 = 2
 
 ///|
-pub let par_line_marker_elem_number_clearance : Int = 3
+pub let par_line_marker_elem_number_clearance : Int32 = 3
 
 ///|
 let quote_elem_cell : Ref[Element?] = Ref(None)
@@ -6293,19 +6293,19 @@ pub fn quote_elem() -> Element {
 }
 
 ///|
-pub let quote_elem_block : Int = 0
+pub let quote_elem_block : Int32 = 0
 
 ///|
-pub let quote_elem_quotes : Int = 1
+pub let quote_elem_quotes : Int32 = 1
 
 ///|
-pub let quote_elem_attribution : Int = 2
+pub let quote_elem_attribution : Int32 = 2
 
 ///|
-pub let quote_elem_body : Int = 3
+pub let quote_elem_body : Int32 = 3
 
 ///|
-pub let quote_elem_depth : Int = 4
+pub let quote_elem_depth : Int32 = 4
 
 ///|
 let ref_elem_cell : Ref[Element?] = Ref(None)
@@ -6369,19 +6369,19 @@ pub fn ref_elem() -> Element {
 }
 
 ///|
-pub let ref_elem_target : Int = 0
+pub let ref_elem_target : Int32 = 0
 
 ///|
-pub let ref_elem_supplement : Int = 1
+pub let ref_elem_supplement : Int32 = 1
 
 ///|
-pub let ref_elem_form : Int = 2
+pub let ref_elem_form : Int32 = 2
 
 ///|
-pub let ref_elem_citation : Int = 3
+pub let ref_elem_citation : Int32 = 3
 
 ///|
-pub let ref_elem_element : Int = 4
+pub let ref_elem_element : Int32 = 4
 
 ///|
 let strong_elem_cell : Ref[Element?] = Ref(None)
@@ -6421,10 +6421,10 @@ pub fn strong_elem() -> Element {
 }
 
 ///|
-pub let strong_elem_delta : Int = 0
+pub let strong_elem_delta : Int32 = 0
 
 ///|
-pub let strong_elem_body : Int = 1
+pub let strong_elem_body : Int32 = 1
 
 ///|
 let table_elem_cell : Ref[Element?] = Ref(None)
@@ -6551,40 +6551,40 @@ pub fn table_elem() -> Element {
 }
 
 ///|
-pub let table_elem_columns : Int = 0
+pub let table_elem_columns : Int32 = 0
 
 ///|
-pub let table_elem_rows : Int = 1
+pub let table_elem_rows : Int32 = 1
 
 ///|
-pub let table_elem_gutter : Int = 2
+pub let table_elem_gutter : Int32 = 2
 
 ///|
-pub let table_elem_column_gutter : Int = 3
+pub let table_elem_column_gutter : Int32 = 3
 
 ///|
-pub let table_elem_row_gutter : Int = 4
+pub let table_elem_row_gutter : Int32 = 4
 
 ///|
-pub let table_elem_inset : Int = 5
+pub let table_elem_inset : Int32 = 5
 
 ///|
-pub let table_elem_align : Int = 6
+pub let table_elem_align : Int32 = 6
 
 ///|
-pub let table_elem_fill : Int = 7
+pub let table_elem_fill : Int32 = 7
 
 ///|
-pub let table_elem_stroke : Int = 8
+pub let table_elem_stroke : Int32 = 8
 
 ///|
-pub let table_elem_children : Int = 9
+pub let table_elem_children : Int32 = 9
 
 ///|
-pub let table_elem_summary : Int = 10
+pub let table_elem_summary : Int32 = 10
 
 ///|
-pub let table_elem_grid : Int = 11
+pub let table_elem_grid : Int32 = 11
 
 ///|
 let table_header_elem_cell : Ref[Element?] = Ref(None)
@@ -6632,13 +6632,13 @@ pub fn table_header_elem() -> Element {
 }
 
 ///|
-pub let table_header_elem_repeat : Int = 0
+pub let table_header_elem_repeat : Int32 = 0
 
 ///|
-pub let table_header_elem_level : Int = 1
+pub let table_header_elem_level : Int32 = 1
 
 ///|
-pub let table_header_elem_children : Int = 2
+pub let table_header_elem_children : Int32 = 2
 
 ///|
 let table_footer_elem_cell : Ref[Element?] = Ref(None)
@@ -6679,10 +6679,10 @@ pub fn table_footer_elem() -> Element {
 }
 
 ///|
-pub let table_footer_elem_repeat : Int = 0
+pub let table_footer_elem_repeat : Int32 = 0
 
 ///|
-pub let table_footer_elem_children : Int = 1
+pub let table_footer_elem_children : Int32 = 1
 
 ///|
 let table_h_line_elem_cell : Ref[Element?] = Ref(None)
@@ -6743,19 +6743,19 @@ pub fn table_h_line_elem() -> Element {
 }
 
 ///|
-pub let table_h_line_elem_y : Int = 0
+pub let table_h_line_elem_y : Int32 = 0
 
 ///|
-pub let table_h_line_elem_start : Int = 1
+pub let table_h_line_elem_start : Int32 = 1
 
 ///|
-pub let table_h_line_elem_end : Int = 2
+pub let table_h_line_elem_end : Int32 = 2
 
 ///|
-pub let table_h_line_elem_stroke : Int = 3
+pub let table_h_line_elem_stroke : Int32 = 3
 
 ///|
-pub let table_h_line_elem_position : Int = 4
+pub let table_h_line_elem_position : Int32 = 4
 
 ///|
 let table_v_line_elem_cell : Ref[Element?] = Ref(None)
@@ -6816,19 +6816,19 @@ pub fn table_v_line_elem() -> Element {
 }
 
 ///|
-pub let table_v_line_elem_x : Int = 0
+pub let table_v_line_elem_x : Int32 = 0
 
 ///|
-pub let table_v_line_elem_start : Int = 1
+pub let table_v_line_elem_start : Int32 = 1
 
 ///|
-pub let table_v_line_elem_end : Int = 2
+pub let table_v_line_elem_end : Int32 = 2
 
 ///|
-pub let table_v_line_elem_stroke : Int = 3
+pub let table_v_line_elem_stroke : Int32 = 3
 
 ///|
-pub let table_v_line_elem_position : Int = 4
+pub let table_v_line_elem_position : Int32 = 4
 
 ///|
 let table_cell_elem_cell : Ref[Element?] = Ref(None)
@@ -6947,40 +6947,40 @@ pub fn table_cell_elem() -> Element {
 }
 
 ///|
-pub let table_cell_elem_body : Int = 0
+pub let table_cell_elem_body : Int32 = 0
 
 ///|
-pub let table_cell_elem_x : Int = 1
+pub let table_cell_elem_x : Int32 = 1
 
 ///|
-pub let table_cell_elem_y : Int = 2
+pub let table_cell_elem_y : Int32 = 2
 
 ///|
-pub let table_cell_elem_colspan : Int = 3
+pub let table_cell_elem_colspan : Int32 = 3
 
 ///|
-pub let table_cell_elem_rowspan : Int = 4
+pub let table_cell_elem_rowspan : Int32 = 4
 
 ///|
-pub let table_cell_elem_inset : Int = 5
+pub let table_cell_elem_inset : Int32 = 5
 
 ///|
-pub let table_cell_elem_align : Int = 6
+pub let table_cell_elem_align : Int32 = 6
 
 ///|
-pub let table_cell_elem_fill : Int = 7
+pub let table_cell_elem_fill : Int32 = 7
 
 ///|
-pub let table_cell_elem_stroke : Int = 8
+pub let table_cell_elem_stroke : Int32 = 8
 
 ///|
-pub let table_cell_elem_breakable : Int = 9
+pub let table_cell_elem_breakable : Int32 = 9
 
 ///|
-pub let table_cell_elem_kind : Int = 10
+pub let table_cell_elem_kind : Int32 = 10
 
 ///|
-pub let table_cell_elem_is_repeated : Int = 11
+pub let table_cell_elem_is_repeated : Int32 = 11
 
 ///|
 let terms_elem_cell : Ref[Element?] = Ref(None)
@@ -7057,25 +7057,25 @@ pub fn terms_elem() -> Element {
 }
 
 ///|
-pub let terms_elem_tight : Int = 0
+pub let terms_elem_tight : Int32 = 0
 
 ///|
-pub let terms_elem_separator : Int = 1
+pub let terms_elem_separator : Int32 = 1
 
 ///|
-pub let terms_elem_indent : Int = 2
+pub let terms_elem_indent : Int32 = 2
 
 ///|
-pub let terms_elem_hanging_indent : Int = 3
+pub let terms_elem_hanging_indent : Int32 = 3
 
 ///|
-pub let terms_elem_spacing : Int = 4
+pub let terms_elem_spacing : Int32 = 4
 
 ///|
-pub let terms_elem_children : Int = 5
+pub let terms_elem_children : Int32 = 5
 
 ///|
-pub let terms_elem_within : Int = 6
+pub let terms_elem_within : Int32 = 6
 
 ///|
 let term_item_elem_cell : Ref[Element?] = Ref(None)
@@ -7120,10 +7120,10 @@ pub fn term_item_elem() -> Element {
 }
 
 ///|
-pub let term_item_elem_term : Int = 0
+pub let term_item_elem_term : Int32 = 0
 
 ///|
-pub let term_item_elem_description : Int = 1
+pub let term_item_elem_description : Int32 = 1
 
 ///|
 let title_elem_cell : Ref[Element?] = Ref(None)
@@ -7161,7 +7161,7 @@ pub fn title_elem() -> Element {
 }
 
 ///|
-pub let title_elem_body : Int = 0
+pub let title_elem_body : Int32 = 0
 
 ///|
 let underline_elem_cell : Ref[Element?] = Ref(None)
@@ -7230,22 +7230,22 @@ pub fn underline_elem() -> Element {
 }
 
 ///|
-pub let underline_elem_stroke : Int = 0
+pub let underline_elem_stroke : Int32 = 0
 
 ///|
-pub let underline_elem_offset : Int = 1
+pub let underline_elem_offset : Int32 = 1
 
 ///|
-pub let underline_elem_extent : Int = 2
+pub let underline_elem_extent : Int32 = 2
 
 ///|
-pub let underline_elem_evade : Int = 3
+pub let underline_elem_evade : Int32 = 3
 
 ///|
-pub let underline_elem_background : Int = 4
+pub let underline_elem_background : Int32 = 4
 
 ///|
-pub let underline_elem_body : Int = 5
+pub let underline_elem_body : Int32 = 5
 
 ///|
 let overline_elem_cell : Ref[Element?] = Ref(None)
@@ -7314,22 +7314,22 @@ pub fn overline_elem() -> Element {
 }
 
 ///|
-pub let overline_elem_stroke : Int = 0
+pub let overline_elem_stroke : Int32 = 0
 
 ///|
-pub let overline_elem_offset : Int = 1
+pub let overline_elem_offset : Int32 = 1
 
 ///|
-pub let overline_elem_extent : Int = 2
+pub let overline_elem_extent : Int32 = 2
 
 ///|
-pub let overline_elem_evade : Int = 3
+pub let overline_elem_evade : Int32 = 3
 
 ///|
-pub let overline_elem_background : Int = 4
+pub let overline_elem_background : Int32 = 4
 
 ///|
-pub let overline_elem_body : Int = 5
+pub let overline_elem_body : Int32 = 5
 
 ///|
 let strike_elem_cell : Ref[Element?] = Ref(None)
@@ -7395,19 +7395,19 @@ pub fn strike_elem() -> Element {
 }
 
 ///|
-pub let strike_elem_stroke : Int = 0
+pub let strike_elem_stroke : Int32 = 0
 
 ///|
-pub let strike_elem_offset : Int = 1
+pub let strike_elem_offset : Int32 = 1
 
 ///|
-pub let strike_elem_extent : Int = 2
+pub let strike_elem_extent : Int32 = 2
 
 ///|
-pub let strike_elem_background : Int = 3
+pub let strike_elem_background : Int32 = 3
 
 ///|
-pub let strike_elem_body : Int = 4
+pub let strike_elem_body : Int32 = 4
 
 ///|
 let highlight_elem_cell : Ref[Element?] = Ref(None)
@@ -7488,25 +7488,25 @@ pub fn highlight_elem() -> Element {
 }
 
 ///|
-pub let highlight_elem_fill : Int = 0
+pub let highlight_elem_fill : Int32 = 0
 
 ///|
-pub let highlight_elem_stroke : Int = 1
+pub let highlight_elem_stroke : Int32 = 1
 
 ///|
-pub let highlight_elem_top_edge : Int = 2
+pub let highlight_elem_top_edge : Int32 = 2
 
 ///|
-pub let highlight_elem_bottom_edge : Int = 3
+pub let highlight_elem_bottom_edge : Int32 = 3
 
 ///|
-pub let highlight_elem_extent : Int = 4
+pub let highlight_elem_extent : Int32 = 4
 
 ///|
-pub let highlight_elem_radius : Int = 5
+pub let highlight_elem_radius : Int32 = 5
 
 ///|
-pub let highlight_elem_body : Int = 6
+pub let highlight_elem_body : Int32 = 6
 
 ///|
 let linebreak_elem_cell : Ref[Element?] = Ref(None)
@@ -7542,7 +7542,7 @@ pub fn linebreak_elem() -> Element {
 }
 
 ///|
-pub let linebreak_elem_justify : Int = 0
+pub let linebreak_elem_justify : Int32 = 0
 
 ///|
 let text_elem_cell : Ref[Element?] = Ref(None)
@@ -7871,130 +7871,130 @@ pub fn text_elem() -> Element {
 }
 
 ///|
-pub let text_elem_font : Int = 0
+pub let text_elem_font : Int32 = 0
 
 ///|
-pub let text_elem_fallback : Int = 1
+pub let text_elem_fallback : Int32 = 1
 
 ///|
-pub let text_elem_style : Int = 2
+pub let text_elem_style : Int32 = 2
 
 ///|
-pub let text_elem_weight : Int = 3
+pub let text_elem_weight : Int32 = 3
 
 ///|
-pub let text_elem_stretch : Int = 4
+pub let text_elem_stretch : Int32 = 4
 
 ///|
-pub let text_elem_size : Int = 5
+pub let text_elem_size : Int32 = 5
 
 ///|
-pub let text_elem_fill : Int = 6
+pub let text_elem_fill : Int32 = 6
 
 ///|
-pub let text_elem_stroke : Int = 7
+pub let text_elem_stroke : Int32 = 7
 
 ///|
-pub let text_elem_tracking : Int = 8
+pub let text_elem_tracking : Int32 = 8
 
 ///|
-pub let text_elem_spacing : Int = 9
+pub let text_elem_spacing : Int32 = 9
 
 ///|
-pub let text_elem_cjk_latin_spacing : Int = 10
+pub let text_elem_cjk_latin_spacing : Int32 = 10
 
 ///|
-pub let text_elem_baseline : Int = 11
+pub let text_elem_baseline : Int32 = 11
 
 ///|
-pub let text_elem_overhang : Int = 12
+pub let text_elem_overhang : Int32 = 12
 
 ///|
-pub let text_elem_top_edge : Int = 13
+pub let text_elem_top_edge : Int32 = 13
 
 ///|
-pub let text_elem_bottom_edge : Int = 14
+pub let text_elem_bottom_edge : Int32 = 14
 
 ///|
-pub let text_elem_lang : Int = 15
+pub let text_elem_lang : Int32 = 15
 
 ///|
-pub let text_elem_region : Int = 16
+pub let text_elem_region : Int32 = 16
 
 ///|
-pub let text_elem_script : Int = 17
+pub let text_elem_script : Int32 = 17
 
 ///|
-pub let text_elem_dir : Int = 18
+pub let text_elem_dir : Int32 = 18
 
 ///|
-pub let text_elem_hyphenate : Int = 19
+pub let text_elem_hyphenate : Int32 = 19
 
 ///|
-pub let text_elem_costs : Int = 20
+pub let text_elem_costs : Int32 = 20
 
 ///|
-pub let text_elem_kerning : Int = 21
+pub let text_elem_kerning : Int32 = 21
 
 ///|
-pub let text_elem_alternates : Int = 22
+pub let text_elem_alternates : Int32 = 22
 
 ///|
-pub let text_elem_stylistic_set : Int = 23
+pub let text_elem_stylistic_set : Int32 = 23
 
 ///|
-pub let text_elem_ligatures : Int = 24
+pub let text_elem_ligatures : Int32 = 24
 
 ///|
-pub let text_elem_discretionary_ligatures : Int = 25
+pub let text_elem_discretionary_ligatures : Int32 = 25
 
 ///|
-pub let text_elem_historical_ligatures : Int = 26
+pub let text_elem_historical_ligatures : Int32 = 26
 
 ///|
-pub let text_elem_number_type : Int = 27
+pub let text_elem_number_type : Int32 = 27
 
 ///|
-pub let text_elem_number_width : Int = 28
+pub let text_elem_number_width : Int32 = 28
 
 ///|
-pub let text_elem_slashed_zero : Int = 29
+pub let text_elem_slashed_zero : Int32 = 29
 
 ///|
-pub let text_elem_fractions : Int = 30
+pub let text_elem_fractions : Int32 = 30
 
 ///|
-pub let text_elem_features : Int = 31
+pub let text_elem_features : Int32 = 31
 
 ///|
-pub let text_elem_variations : Int = 32
+pub let text_elem_variations : Int32 = 32
 
 ///|
-pub let text_elem_body : Int = 33
+pub let text_elem_body : Int32 = 33
 
 ///|
-pub let text_elem_text : Int = 34
+pub let text_elem_text : Int32 = 34
 
 ///|
-pub let text_elem_span_offset : Int = 35
+pub let text_elem_span_offset : Int32 = 35
 
 ///|
-pub let text_elem_delta : Int = 36
+pub let text_elem_delta : Int32 = 36
 
 ///|
-pub let text_elem_emph : Int = 37
+pub let text_elem_emph : Int32 = 37
 
 ///|
-pub let text_elem_deco : Int = 38
+pub let text_elem_deco : Int32 = 38
 
 ///|
-pub let text_elem_case : Int = 39
+pub let text_elem_case : Int32 = 39
 
 ///|
-pub let text_elem_smallcaps : Int = 40
+pub let text_elem_smallcaps : Int32 = 40
 
 ///|
-pub let text_elem_shift_settings : Int = 41
+pub let text_elem_shift_settings : Int32 = 41
 
 ///|
 let raw_elem_cell : Ref[Element?] = Ref(None)
@@ -8106,34 +8106,34 @@ pub fn raw_elem() -> Element {
 }
 
 ///|
-pub let raw_elem_text : Int = 0
+pub let raw_elem_text : Int32 = 0
 
 ///|
-pub let raw_elem_block : Int = 1
+pub let raw_elem_block : Int32 = 1
 
 ///|
-pub let raw_elem_lang : Int = 2
+pub let raw_elem_lang : Int32 = 2
 
 ///|
-pub let raw_elem_align : Int = 3
+pub let raw_elem_align : Int32 = 3
 
 ///|
-pub let raw_elem_syntaxes : Int = 4
+pub let raw_elem_syntaxes : Int32 = 4
 
 ///|
-pub let raw_elem_theme : Int = 5
+pub let raw_elem_theme : Int32 = 5
 
 ///|
-pub let raw_elem_tab_size : Int = 6
+pub let raw_elem_tab_size : Int32 = 6
 
 ///|
-pub let raw_elem_lines : Int = 7
+pub let raw_elem_lines : Int32 = 7
 
 ///|
-pub let raw_elem_syntaxes_derived : Int = 8
+pub let raw_elem_syntaxes_derived : Int32 = 8
 
 ///|
-pub let raw_elem_theme_derived : Int = 9
+pub let raw_elem_theme_derived : Int32 = 9
 
 ///|
 let raw_line_elem_cell : Ref[Element?] = Ref(None)
@@ -8195,16 +8195,16 @@ pub fn raw_line_elem() -> Element {
 }
 
 ///|
-pub let raw_line_elem_number : Int = 0
+pub let raw_line_elem_number : Int32 = 0
 
 ///|
-pub let raw_line_elem_count : Int = 1
+pub let raw_line_elem_count : Int32 = 1
 
 ///|
-pub let raw_line_elem_text : Int = 2
+pub let raw_line_elem_text : Int32 = 2
 
 ///|
-pub let raw_line_elem_body : Int = 3
+pub let raw_line_elem_body : Int32 = 3
 
 ///|
 let sub_elem_cell : Ref[Element?] = Ref(None)
@@ -8262,16 +8262,16 @@ pub fn sub_elem() -> Element {
 }
 
 ///|
-pub let sub_elem_typographic : Int = 0
+pub let sub_elem_typographic : Int32 = 0
 
 ///|
-pub let sub_elem_baseline : Int = 1
+pub let sub_elem_baseline : Int32 = 1
 
 ///|
-pub let sub_elem_size : Int = 2
+pub let sub_elem_size : Int32 = 2
 
 ///|
-pub let sub_elem_body : Int = 3
+pub let sub_elem_body : Int32 = 3
 
 ///|
 let super_elem_cell : Ref[Element?] = Ref(None)
@@ -8329,16 +8329,16 @@ pub fn super_elem() -> Element {
 }
 
 ///|
-pub let super_elem_typographic : Int = 0
+pub let super_elem_typographic : Int32 = 0
 
 ///|
-pub let super_elem_baseline : Int = 1
+pub let super_elem_baseline : Int32 = 1
 
 ///|
-pub let super_elem_size : Int = 2
+pub let super_elem_size : Int32 = 2
 
 ///|
-pub let super_elem_body : Int = 3
+pub let super_elem_body : Int32 = 3
 
 ///|
 let smallcaps_elem_cell : Ref[Element?] = Ref(None)
@@ -8378,10 +8378,10 @@ pub fn smallcaps_elem() -> Element {
 }
 
 ///|
-pub let smallcaps_elem_all : Int = 0
+pub let smallcaps_elem_all : Int32 = 0
 
 ///|
-pub let smallcaps_elem_body : Int = 1
+pub let smallcaps_elem_body : Int32 = 1
 
 ///|
 let smart_quote_elem_cell : Ref[Element?] = Ref(None)
@@ -8435,16 +8435,16 @@ pub fn smart_quote_elem() -> Element {
 }
 
 ///|
-pub let smart_quote_elem_double : Int = 0
+pub let smart_quote_elem_double : Int32 = 0
 
 ///|
-pub let smart_quote_elem_enabled : Int = 1
+pub let smart_quote_elem_enabled : Int32 = 1
 
 ///|
-pub let smart_quote_elem_alternative : Int = 2
+pub let smart_quote_elem_alternative : Int32 = 2
 
 ///|
-pub let smart_quote_elem_quotes : Int = 3
+pub let smart_quote_elem_quotes : Int32 = 3
 
 ///|
 let space_elem_cell : Ref[Element?] = Ref(None)
@@ -8483,7 +8483,7 @@ pub fn space_elem() -> Element {
 }
 
 ///|
-pub let space_elem_had_newline : Int = 0
+pub let space_elem_had_newline : Int32 = 0
 
 ///|
 let curve_elem_cell : Ref[Element?] = Ref(None)
@@ -8539,16 +8539,16 @@ pub fn curve_elem() -> Element {
 }
 
 ///|
-pub let curve_elem_fill : Int = 0
+pub let curve_elem_fill : Int32 = 0
 
 ///|
-pub let curve_elem_fill_rule : Int = 1
+pub let curve_elem_fill_rule : Int32 = 1
 
 ///|
-pub let curve_elem_stroke : Int = 2
+pub let curve_elem_stroke : Int32 = 2
 
 ///|
-pub let curve_elem_components : Int = 3
+pub let curve_elem_components : Int32 = 3
 
 ///|
 let curve_move_elem_cell : Ref[Element?] = Ref(None)
@@ -8592,10 +8592,10 @@ pub fn curve_move_elem() -> Element {
 }
 
 ///|
-pub let curve_move_elem_start : Int = 0
+pub let curve_move_elem_start : Int32 = 0
 
 ///|
-pub let curve_move_elem_relative : Int = 1
+pub let curve_move_elem_relative : Int32 = 1
 
 ///|
 let curve_line_elem_cell : Ref[Element?] = Ref(None)
@@ -8639,10 +8639,10 @@ pub fn curve_line_elem() -> Element {
 }
 
 ///|
-pub let curve_line_elem_end : Int = 0
+pub let curve_line_elem_end : Int32 = 0
 
 ///|
-pub let curve_line_elem_relative : Int = 1
+pub let curve_line_elem_relative : Int32 = 1
 
 ///|
 let curve_quad_elem_cell : Ref[Element?] = Ref(None)
@@ -8694,13 +8694,13 @@ pub fn curve_quad_elem() -> Element {
 }
 
 ///|
-pub let curve_quad_elem_control : Int = 0
+pub let curve_quad_elem_control : Int32 = 0
 
 ///|
-pub let curve_quad_elem_end : Int = 1
+pub let curve_quad_elem_end : Int32 = 1
 
 ///|
-pub let curve_quad_elem_relative : Int = 2
+pub let curve_quad_elem_relative : Int32 = 2
 
 ///|
 let curve_cubic_elem_cell : Ref[Element?] = Ref(None)
@@ -8760,16 +8760,16 @@ pub fn curve_cubic_elem() -> Element {
 }
 
 ///|
-pub let curve_cubic_elem_control_start : Int = 0
+pub let curve_cubic_elem_control_start : Int32 = 0
 
 ///|
-pub let curve_cubic_elem_control_end : Int = 1
+pub let curve_cubic_elem_control_end : Int32 = 1
 
 ///|
-pub let curve_cubic_elem_end : Int = 2
+pub let curve_cubic_elem_end : Int32 = 2
 
 ///|
-pub let curve_cubic_elem_relative : Int = 3
+pub let curve_cubic_elem_relative : Int32 = 3
 
 ///|
 let curve_close_elem_cell : Ref[Element?] = Ref(None)
@@ -8805,7 +8805,7 @@ pub fn curve_close_elem() -> Element {
 }
 
 ///|
-pub let curve_close_elem_mode : Int = 0
+pub let curve_close_elem_mode : Int32 = 0
 
 ///|
 let image_elem_cell : Ref[Element?] = Ref(None)
@@ -8925,40 +8925,40 @@ pub fn image_elem() -> Element {
 }
 
 ///|
-pub let image_elem_source : Int = 0
+pub let image_elem_source : Int32 = 0
 
 ///|
-pub let image_elem_format : Int = 1
+pub let image_elem_format : Int32 = 1
 
 ///|
-pub let image_elem_width : Int = 2
+pub let image_elem_width : Int32 = 2
 
 ///|
-pub let image_elem_height : Int = 3
+pub let image_elem_height : Int32 = 3
 
 ///|
-pub let image_elem_alt : Int = 4
+pub let image_elem_alt : Int32 = 4
 
 ///|
-pub let image_elem_page : Int = 5
+pub let image_elem_page : Int32 = 5
 
 ///|
-pub let image_elem_fit : Int = 6
+pub let image_elem_fit : Int32 = 6
 
 ///|
-pub let image_elem_scaling : Int = 7
+pub let image_elem_scaling : Int32 = 7
 
 ///|
-pub let image_elem_icc : Int = 8
+pub let image_elem_icc : Int32 = 8
 
 ///|
-pub let image_elem_locale : Int = 9
+pub let image_elem_locale : Int32 = 9
 
 ///|
-pub let image_elem_source_derived : Int = 10
+pub let image_elem_source_derived : Int32 = 10
 
 ///|
-pub let image_elem_icc_derived : Int = 11
+pub let image_elem_icc_derived : Int32 = 11
 
 ///|
 let line_elem_cell : Ref[Element?] = Ref(None)
@@ -9025,19 +9025,19 @@ pub fn line_elem() -> Element {
 }
 
 ///|
-pub let line_elem_start : Int = 0
+pub let line_elem_start : Int32 = 0
 
 ///|
-pub let line_elem_end : Int = 1
+pub let line_elem_end : Int32 = 1
 
 ///|
-pub let line_elem_length : Int = 2
+pub let line_elem_length : Int32 = 2
 
 ///|
-pub let line_elem_angle : Int = 3
+pub let line_elem_angle : Int32 = 3
 
 ///|
-pub let line_elem_stroke : Int = 4
+pub let line_elem_stroke : Int32 = 4
 
 ///|
 let polygon_elem_cell : Ref[Element?] = Ref(None)
@@ -9093,16 +9093,16 @@ pub fn polygon_elem() -> Element {
 }
 
 ///|
-pub let polygon_elem_fill : Int = 0
+pub let polygon_elem_fill : Int32 = 0
 
 ///|
-pub let polygon_elem_fill_rule : Int = 1
+pub let polygon_elem_fill_rule : Int32 = 1
 
 ///|
-pub let polygon_elem_stroke : Int = 2
+pub let polygon_elem_stroke : Int32 = 2
 
 ///|
-pub let polygon_elem_vertices : Int = 3
+pub let polygon_elem_vertices : Int32 = 3
 
 ///|
 let rect_elem_cell : Ref[Element?] = Ref(None)
@@ -9188,28 +9188,28 @@ pub fn rect_elem() -> Element {
 }
 
 ///|
-pub let rect_elem_width : Int = 0
+pub let rect_elem_width : Int32 = 0
 
 ///|
-pub let rect_elem_height : Int = 1
+pub let rect_elem_height : Int32 = 1
 
 ///|
-pub let rect_elem_fill : Int = 2
+pub let rect_elem_fill : Int32 = 2
 
 ///|
-pub let rect_elem_stroke : Int = 3
+pub let rect_elem_stroke : Int32 = 3
 
 ///|
-pub let rect_elem_radius : Int = 4
+pub let rect_elem_radius : Int32 = 4
 
 ///|
-pub let rect_elem_inset : Int = 5
+pub let rect_elem_inset : Int32 = 5
 
 ///|
-pub let rect_elem_outset : Int = 6
+pub let rect_elem_outset : Int32 = 6
 
 ///|
-pub let rect_elem_body : Int = 7
+pub let rect_elem_body : Int32 = 7
 
 ///|
 let square_elem_cell : Ref[Element?] = Ref(None)
@@ -9304,31 +9304,31 @@ pub fn square_elem() -> Element {
 }
 
 ///|
-pub let square_elem_size : Int = 0
+pub let square_elem_size : Int32 = 0
 
 ///|
-pub let square_elem_width : Int = 1
+pub let square_elem_width : Int32 = 1
 
 ///|
-pub let square_elem_height : Int = 2
+pub let square_elem_height : Int32 = 2
 
 ///|
-pub let square_elem_fill : Int = 3
+pub let square_elem_fill : Int32 = 3
 
 ///|
-pub let square_elem_stroke : Int = 4
+pub let square_elem_stroke : Int32 = 4
 
 ///|
-pub let square_elem_radius : Int = 5
+pub let square_elem_radius : Int32 = 5
 
 ///|
-pub let square_elem_inset : Int = 6
+pub let square_elem_inset : Int32 = 6
 
 ///|
-pub let square_elem_outset : Int = 7
+pub let square_elem_outset : Int32 = 7
 
 ///|
-pub let square_elem_body : Int = 8
+pub let square_elem_body : Int32 = 8
 
 ///|
 let ellipse_elem_cell : Ref[Element?] = Ref(None)
@@ -9406,25 +9406,25 @@ pub fn ellipse_elem() -> Element {
 }
 
 ///|
-pub let ellipse_elem_width : Int = 0
+pub let ellipse_elem_width : Int32 = 0
 
 ///|
-pub let ellipse_elem_height : Int = 1
+pub let ellipse_elem_height : Int32 = 1
 
 ///|
-pub let ellipse_elem_fill : Int = 2
+pub let ellipse_elem_fill : Int32 = 2
 
 ///|
-pub let ellipse_elem_stroke : Int = 3
+pub let ellipse_elem_stroke : Int32 = 3
 
 ///|
-pub let ellipse_elem_inset : Int = 4
+pub let ellipse_elem_inset : Int32 = 4
 
 ///|
-pub let ellipse_elem_outset : Int = 5
+pub let ellipse_elem_outset : Int32 = 5
 
 ///|
-pub let ellipse_elem_body : Int = 6
+pub let ellipse_elem_body : Int32 = 6
 
 ///|
 let circle_elem_cell : Ref[Element?] = Ref(None)
@@ -9511,28 +9511,28 @@ pub fn circle_elem() -> Element {
 }
 
 ///|
-pub let circle_elem_radius : Int = 0
+pub let circle_elem_radius : Int32 = 0
 
 ///|
-pub let circle_elem_width : Int = 1
+pub let circle_elem_width : Int32 = 1
 
 ///|
-pub let circle_elem_height : Int = 2
+pub let circle_elem_height : Int32 = 2
 
 ///|
-pub let circle_elem_fill : Int = 3
+pub let circle_elem_fill : Int32 = 3
 
 ///|
-pub let circle_elem_stroke : Int = 4
+pub let circle_elem_stroke : Int32 = 4
 
 ///|
-pub let circle_elem_inset : Int = 5
+pub let circle_elem_inset : Int32 = 5
 
 ///|
-pub let circle_elem_outset : Int = 6
+pub let circle_elem_outset : Int32 = 6
 
 ///|
-pub let circle_elem_body : Int = 7
+pub let circle_elem_body : Int32 = 7
 
 ///|
 let html_format_elem_cell : Ref[Element?] = Ref(None)
@@ -9565,7 +9565,7 @@ pub fn html_format_elem() -> Element {
 }
 
 ///|
-pub let html_format_elem_pretty : Int = 0
+pub let html_format_elem_pretty : Int32 = 0
 
 ///|
 let html_elem_cell : Ref[Element?] = Ref(None)
@@ -9642,22 +9642,22 @@ pub fn html_elem() -> Element {
 }
 
 ///|
-pub let html_elem_tag : Int = 0
+pub let html_elem_tag : Int32 = 0
 
 ///|
-pub let html_elem_attrs : Int = 1
+pub let html_elem_attrs : Int32 = 1
 
 ///|
-pub let html_elem_body : Int = 2
+pub let html_elem_body : Int32 = 2
 
 ///|
-pub let html_elem_css : Int = 3
+pub let html_elem_css : Int32 = 3
 
 ///|
-pub let html_elem_parent : Int = 4
+pub let html_elem_parent : Int32 = 4
 
 ///|
-pub let html_elem_role : Int = 5
+pub let html_elem_role : Int32 = 5
 
 ///|
 let frame_elem_cell : Ref[Element?] = Ref(None)
@@ -9694,7 +9694,7 @@ pub fn frame_elem() -> Element {
 }
 
 ///|
-pub let frame_elem_body : Int = 0
+pub let frame_elem_body : Int32 = 0
 
 ///|
 let pdf_format_elem_cell : Ref[Element?] = Ref(None)
@@ -9747,16 +9747,16 @@ pub fn pdf_format_elem() -> Element {
 }
 
 ///|
-pub let pdf_format_elem_pages : Int = 0
+pub let pdf_format_elem_pages : Int32 = 0
 
 ///|
-pub let pdf_format_elem_standard : Int = 1
+pub let pdf_format_elem_standard : Int32 = 1
 
 ///|
-pub let pdf_format_elem_tagged : Int = 2
+pub let pdf_format_elem_tagged : Int32 = 2
 
 ///|
-pub let pdf_format_elem_pretty : Int = 3
+pub let pdf_format_elem_pretty : Int32 = 3
 
 ///|
 let pdf_attach_elem_cell : Ref[Element?] = Ref(None)
@@ -9832,22 +9832,22 @@ pub fn pdf_attach_elem() -> Element {
 }
 
 ///|
-pub let pdf_attach_elem_path : Int = 0
+pub let pdf_attach_elem_path : Int32 = 0
 
 ///|
-pub let pdf_attach_elem_data : Int = 1
+pub let pdf_attach_elem_data : Int32 = 1
 
 ///|
-pub let pdf_attach_elem_relationship : Int = 2
+pub let pdf_attach_elem_relationship : Int32 = 2
 
 ///|
-pub let pdf_attach_elem_mime_type : Int = 3
+pub let pdf_attach_elem_mime_type : Int32 = 3
 
 ///|
-pub let pdf_attach_elem_description : Int = 4
+pub let pdf_attach_elem_description : Int32 = 4
 
 ///|
-pub let pdf_attach_elem_path_derived : Int = 5
+pub let pdf_attach_elem_path_derived : Int32 = 5
 
 ///|
 let svg_format_elem_cell : Ref[Element?] = Ref(None)
@@ -9879,7 +9879,7 @@ pub fn svg_format_elem() -> Element {
 }
 
 ///|
-pub let svg_format_elem_pretty : Int = 0
+pub let svg_format_elem_pretty : Int32 = 0
 
 ///|
 let png_format_elem_cell : Ref[Element?] = Ref(None)
@@ -9915,7 +9915,7 @@ pub fn png_format_elem() -> Element {
 }
 
 ///|
-pub let png_format_elem_ppi : Int = 0
+pub let png_format_elem_ppi : Int32 = 0
 
 ///|
 let bundle_format_elem_cell : Ref[Element?] = Ref(None)
@@ -9986,7 +9986,7 @@ pub fn asset_elem() -> Element {
 }
 
 ///|
-pub let asset_elem_path : Int = 0
+pub let asset_elem_path : Int32 = 0
 
 ///|
-pub let asset_elem_data : Int = 1
+pub let asset_elem_data : Int32 = 1

@@ -2173,7 +2173,7 @@ let libm_binary_expected : ReadOnlyArray[(String, ReadOnlyArray[UInt64])] = [
 
 ///|
 /// The high words the algorithms compare against.
-let libm_threshold_words : ReadOnlyArray[UInt] = [
+let libm_threshold_words : ReadOnlyArray[UInt32] = [
   0x4086232b, 0x3fd62e42, 0x3ff0a2b2, 0x3e300000, 0x408ff000, 0x40900000, 0x3c900000,
   0x4043687a, 0x40862e42, 0x40340000, 0x00100000, 0x3ff00000, 0x3fe6a09e, 0x3ff6a09e,
   0x3fda827a, 0x3fd2bec4, 0x3ca00000, 0x3e500000, 0x3fe62e42, 0x3fe193ea, 0x3fd058ae,
@@ -2214,7 +2214,7 @@ let libm_unary_thresholds : ReadOnlyArray[(String, UInt64)] = [
 /// `(function, seed, count, x range, y range, hash)`; a range is `(lo, hi, signed)`
 /// (`lo < 0`: unary).
 let libm_sweeps : ReadOnlyArray[
-  (String, UInt64, Int, (Int, Int, Bool), (Int, Int, Bool), UInt64),
+  (String, UInt64, Int32, (Int32, Int32, Bool), (Int32, Int32, Bool), UInt64),
 ] = [
   (
     "exp",

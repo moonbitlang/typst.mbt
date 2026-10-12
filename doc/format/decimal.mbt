@@ -9,8 +9,8 @@
 /// has to be multiplied by small numbers; rounding is then done on its
 /// digits, without any floating-point operation.
 priv struct Decimal {
-  digits : Array[Int]
-  point : Int
+  digits : Array[Int32]
+  point : Int32
 }
 
 ///|
@@ -79,7 +79,7 @@ fn Decimal::of(x : Double) -> Decimal {
   }
   // The top limb is not zero: `mul_small` only pushes non-zero carries, and
   // neither did the loop that split `m`.
-  let digits : Array[Int] = []
+  let digits : Array[Int32] = []
   for i = limbs.length() - 1; i >= 0; i = i - 1 {
     let limb = limbs[i].to_int()
     let mut div = 100_000_000
@@ -105,14 +105,14 @@ fn Decimal::of(x : Double) -> Decimal {
 /// its integer part, and it is at least half a unit above that integer
 /// exactly when the next digit is 5 or more, because the expansion is the
 /// whole number and not an approximation of it.
-fn Decimal::rounded(self : Decimal, scale : Int) -> Array[Int] {
+fn Decimal::rounded(self : Decimal, scale : Int32) -> Array[Int32] {
   let n = self.digits.length()
   let keep = self.point + scale
   // `keep < 0`: the value is below `10^keep <= 0.1`.
   if n == 0 || keep < 0 {
     return []
   }
-  let out : Array[Int] = []
+  let out : Array[Int32] = []
   for i in 0..<keep {
     out.push(if i < n { self.digits[i] } else { 0 })
   }

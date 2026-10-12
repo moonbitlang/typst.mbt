@@ -21,7 +21,7 @@ fn Lexer::copy(self : Lexer) -> Lexer {
 
 ///|
 /// The index at which the last token ends and the next token will start.
-fn Lexer::cursor(self : Lexer) -> Int {
+fn Lexer::cursor(self : Lexer) -> Int32 {
   self.s.cursor
 }
 
@@ -33,13 +33,13 @@ fn Lexer::set_mode(self : Lexer, mode : SyntaxMode) -> Unit {
 
 ///|
 /// Jump to the given index in the string.
-fn Lexer::jump(self : Lexer, index : Int) -> Unit {
+fn Lexer::jump(self : Lexer, index : Int32) -> Unit {
   self.s.jump(index)
 }
 
 ///|
 /// The number of characters until the most recent newline from an index.
-fn Lexer::column(self : Lexer, index : Int) -> Int {
+fn Lexer::column(self : Lexer, index : Int32) -> Int32 {
   let mut i = if index > self.s.text.length() {
     self.s.text.length()
   } else {
@@ -48,7 +48,7 @@ fn Lexer::column(self : Lexer, index : Int) -> Int {
   let mut count = 0
   while i > 0 {
     let { cp: c, idx: prev, } = @unicode.decode_before(self.s.text, i)
-    if is_newline(Int::unsafe_to_char(c)) {
+    if is_newline(Int32::unsafe_to_char(c)) {
       break
     }
     count += 1
@@ -114,7 +114,7 @@ fn Lexer::next(self : Lexer) -> (SyntaxKind, SyntaxNode) {
 
 ///|
 /// Eat whitespace characters greedily.
-fn Lexer::whitespace(self : Lexer, start : Int, c : Char) -> SyntaxKind {
+fn Lexer::whitespace(self : Lexer, start : Int32, c : Char) -> SyntaxKind {
   let mode = self.mode
   let more = self.s.eat_while(c => is_space(c, mode))
   let newlines = if c == ' ' && more.is_empty() {
@@ -203,7 +203,7 @@ fn Lexer::raw(self : Lexer) -> (SyntaxKind, SyntaxNode) {
   let delim_text = self.s.from(end - backticks)
   let nodes = [SyntaxNode::leaf(RawDelim, delim_text)]
   let mut tag : String? = None
-  let mut diff_future_tag_len : Int? = None
+  let mut diff_future_tag_len : Int32? = None
   if backticks >= 3 {
     let (t, d) = raw_lang_tag(inner)
     tag = t
@@ -226,7 +226,7 @@ fn Lexer::raw(self : Lexer) -> (SyntaxKind, SyntaxNode) {
 ///|
 /// Lex the raw language tag into an optional string and return the UTF-8
 /// length of the future language tag if it will differ in the next version.
-fn raw_lang_tag(s : Scanner) -> (String?, Int?) {
+fn raw_lang_tag(s : Scanner) -> (String?, Int32?) {
   let start = s.cursor
   let future_tag = s.eat_until(c => @unicode.is_whitespace(c) || c == '`')
   if future_tag.is_empty() {
@@ -261,7 +261,7 @@ fn blocky_raw(s : Scanner, nodes : Array[SyntaxNode]) -> Unit {
   let lines = split_newlines(s.after())
 
   // Determine dedent level.
-  let mut dedent : Int? = None
+  let mut dedent : Int32? = None
   let consider = (line : String) => {
     let n = line.iter().take_while(@unicode.is_whitespace).count()
     dedent = match dedent {
@@ -343,7 +343,7 @@ fn trim_end_unicode(s : String) -> String {
   let mut end = s.length()
   while end > 0 {
     let { cp: c, idx: prev, } = @unicode.decode_before(s, end)
-    if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
+    if !@unicode.is_whitespace(Int32::unsafe_to_char(c)) {
       break
     }
     end = prev
@@ -375,10 +375,10 @@ fn inline_raw(s : Scanner, nodes : Array[SyntaxNode]) -> Unit {
 /// Typst or if there is a language tag but the raw text is empty.
 fn add_raw_warnings(
   raw : SyntaxNode,
-  backticks : Int,
-  diff_future_tag_len : Int?,
+  backticks : Int32,
+  diff_future_tag_len : Int32?,
   tag : String?,
-  inner_len : Int,
+  inner_len : Int32,
 ) -> Unit {
   match diff_future_tag_len {
     Some(future_tag_len) => {
@@ -424,7 +424,7 @@ fn add_raw_warnings(
 }
 
 ///|
-fn Lexer::markup(self : Lexer, start : Int, c : Char) -> SyntaxKind {
+fn Lexer::markup(self : Lexer, start : Int32, c : Char) -> SyntaxKind {
   match c {
     '\\' => self.backslash()
     'h' if self.s.eat_if_str("ttp://") => self.link()
@@ -457,7 +457,7 @@ fn Lexer::markup(self : Lexer, start : Int, c : Char) -> SyntaxKind {
     '-' if self.space_or_end() => ListMarker
     '+' if self.space_or_end() => EnumMarker
     '/' if self.space_or_end() => TermMarker
-    '0'..='9' => self.numbering(start)
+    '0'..<='9' => self.numbering(start)
     _ => self.text()
   }
 }
@@ -491,9 +491,9 @@ pub fn parse_codepoint(hex : StringView) -> Char? {
   let mut v = 0L
   for c in hex {
     let d = match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
-      'A'..='F' => c.to_int() - 'A'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
+      'A'..<='F' => c.to_int() - 'A'.to_int() + 10
       _ => return None
     }
     v = v * 16 + d.to_int64()
@@ -504,7 +504,7 @@ pub fn parse_codepoint(hex : StringView) -> Char? {
   if v > 0x10FFFFL || (v >= 0xD800L && v <= 0xDFFFL) {
     None
   } else {
-    Some(Int::unsafe_to_char(v.to_int()))
+    Some(Int32::unsafe_to_char(v.to_int()))
   }
 }
 
@@ -521,7 +521,7 @@ fn Lexer::link(self : Lexer) -> SyntaxKind {
 }
 
 ///|
-fn Lexer::numbering(self : Lexer, start : Int) -> SyntaxKind {
+fn Lexer::numbering(self : Lexer, start : Int32) -> SyntaxKind {
   self.s.eat_while(is_ascii_digit) |> ignore
   let read = self.s.from(start)
   if self.s.eat_if_char('.') && self.space_or_end() && fits_u64(read) {
@@ -650,7 +650,7 @@ fn Lexer::space_or_end(self : Lexer) -> Bool {
 ///|
 fn Lexer::math(
   self : Lexer,
-  start : Int,
+  start : Int32,
   c : Char,
 ) -> (SyntaxKind, SyntaxNode?) {
   let s = self.s
@@ -734,7 +734,7 @@ fn Lexer::math(
 /// Parse a single `MathIdent` or an entire `MathFieldAccess`.
 fn Lexer::math_ident_or_field(
   self : Lexer,
-  start : Int,
+  start : Int32,
 ) -> (SyntaxKind, SyntaxNode) {
   let mut kind = MathIdent
   let mut node = SyntaxNode::leaf(kind, self.s.from(start))
@@ -766,7 +766,7 @@ fn Lexer::maybe_dot_ident(self : Lexer) -> String? {
 }
 
 ///|
-fn Lexer::math_text(self : Lexer, start : Int, c : Char) -> SyntaxKind {
+fn Lexer::math_text(self : Lexer, start : Int32, c : Char) -> SyntaxKind {
   // Keep numbers and grapheme clusters together.
   if @unicode.is_numeric(c) {
     self.s.eat_while(@unicode.is_numeric) |> ignore
@@ -783,7 +783,7 @@ fn Lexer::math_text(self : Lexer, start : Int, c : Char) -> SyntaxKind {
 
 ///|
 /// Handle named arguments in math function call.
-fn Lexer::maybe_math_named_arg(self : Lexer, start : Int) -> SyntaxNode? {
+fn Lexer::maybe_math_named_arg(self : Lexer, start : Int32) -> SyntaxNode? {
   let cursor = self.s.cursor
   self.s.jump(start)
   if self.s.eat_if_pred(is_id_start) {
@@ -806,7 +806,7 @@ fn Lexer::maybe_math_named_arg(self : Lexer, start : Int) -> SyntaxNode? {
 
 ///|
 /// Handle spread arguments in math function call.
-fn Lexer::maybe_math_spread_arg(self : Lexer, start : Int) -> SyntaxNode? {
+fn Lexer::maybe_math_spread_arg(self : Lexer, start : Int32) -> SyntaxNode? {
   let cursor = self.s.cursor
   self.s.jump(start)
   if self.s.eat_if_str("..") {
@@ -820,11 +820,11 @@ fn Lexer::maybe_math_spread_arg(self : Lexer, start : Int) -> SyntaxNode? {
 }
 
 ///|
-fn Lexer::code(self : Lexer, start : Int, c : Char) -> SyntaxKind {
+fn Lexer::code(self : Lexer, start : Int32, c : Char) -> SyntaxKind {
   let s = self.s
   match c {
     '<' if s.at_pred(is_id_continue) => self.label()
-    '0'..='9' => self.number(start, c)
+    '0'..<='9' => self.number(start, c)
     '.' if s.at_pred(is_ascii_digit) => self.number(start, c)
     '"' => self.string()
     '=' if s.eat_if_char('=') => EqEq
@@ -901,12 +901,12 @@ fn Lexer::invalid_char_in_code(self : Lexer, c : Char) -> SyntaxKind {
 }
 
 ///|
-fn Lexer::ident(self : Lexer, start : Int) -> SyntaxKind {
+fn Lexer::ident(self : Lexer, start : Int32) -> SyntaxKind {
   self.s.eat_while(is_id_continue) |> ignore
   let ident = self.s.from(start)
   // Look at the (ASCII) characters before the identifier without copying.
   let text = self.s.text
-  let unit_at = (i : Int) => {
+  let unit_at = (i : Int32) => {
     if i >= 0 {
       text.code_unit_at(i).to_int()
     } else {
@@ -947,7 +947,7 @@ pub extend NonDecimalBase with @debug.Debug::{to_repr}
 
 ///|
 /// The value of the base.
-pub fn NonDecimalBase::get(self : NonDecimalBase) -> Int {
+pub fn NonDecimalBase::get(self : NonDecimalBase) -> Int32 {
   match self {
     Hex => 16
     Octal => 8
@@ -978,7 +978,10 @@ priv enum IntParseError {
 
 ///|
 /// Parse an integer like Rust's `i64::from_str_radix`.
-fn parse_i64_radix(s : StringView, radix : Int) -> Result[Int64, IntParseError] {
+fn parse_i64_radix(
+  s : StringView,
+  radix : Int32,
+) -> Result[Int64, IntParseError] {
   if s.length() == 0 {
     return Err(Empty)
   }
@@ -1038,7 +1041,7 @@ fn parse_i64_radix(s : StringView, radix : Int) -> Result[Int64, IntParseError] 
 ///|
 /// Lex a single number, either an integer or a float, possibly with a numeric
 /// suffix.
-fn Lexer::number(self : Lexer, start : Int, first_c : Char) -> SyntaxKind {
+fn Lexer::number(self : Lexer, start : Int32, first_c : Char) -> SyntaxKind {
   let s = self.s
   // Handle alternative integer bases.
   let base : NonDecimalBase? = if first_c == '0' && s.eat_if_char('x') {
@@ -1249,9 +1252,9 @@ pub fn link_prefix(text : String) -> (String, Bool) {
   let brackets : Array[Char] = []
   s.eat_while(c => {
     match c {
-      '0'..='9'
-      | 'a'..='z'
-      | 'A'..='Z'
+      '0'..<='9'
+      | 'a'..<='z'
+      | 'A'..<='Z'
       | '!'
       | '#'
       | '$'
@@ -1315,7 +1318,7 @@ pub fn split_newlines(text : String) -> Array[String] {
 
 ///|
 /// Count the number of newlines in text.
-fn count_newlines(text : String) -> Int {
+fn count_newlines(text : String) -> Int32 {
   let s = Scanner::new(text)
   let mut newlines = 0
   while s.eat() is Some(c) {

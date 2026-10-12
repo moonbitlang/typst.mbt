@@ -60,7 +60,7 @@ impl @skrifa.OutlinePen for NullPen with fn close(_) {
 /// The adjusted advance of a glyph: unhinted if `target` is `None`.
 fn hdmx_test_advance(
   ppem : Float,
-  gid : UInt,
+  gid : UInt32,
   target : @skrifa.Target?,
 ) -> Float? raise {
   let font = @skrifa.FontRef::new(hdmx_test_font[:])

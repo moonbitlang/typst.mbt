@@ -12,7 +12,7 @@ priv enum IntErrorKind {
 
 ///|
 /// Rust's `char::to_digit` for ASCII code units.
-fn ascii_to_digit(c : Int, radix : Int) -> Int? {
+fn ascii_to_digit(c : Int32, radix : Int32) -> Int32? {
   let d = if c >= '0' && c <= '9' {
     c - '0'
   } else if c >= 'a' && c <= 'z' {
@@ -31,7 +31,7 @@ fn ascii_to_digit(c : Int, radix : Int) -> Int? {
 
 ///|
 /// Split off the sign like Rust's `from_str_radix` does.
-fn split_sign(s : String, signed : Bool) -> Result[(Bool, Int), IntErrorKind] {
+fn split_sign(s : String, signed : Bool) -> Result[(Bool, Int32), IntErrorKind] {
   if s.is_empty() {
     return Err(Empty)
   }
@@ -49,7 +49,7 @@ fn split_sign(s : String, signed : Bool) -> Result[(Bool, Int), IntErrorKind] {
 
 ///|
 /// Rust's `i64::from_str_radix`.
-fn i64_from_str_radix(s : String, radix : Int) -> Result[Int64, IntErrorKind] {
+fn i64_from_str_radix(s : String, radix : Int32) -> Result[Int64, IntErrorKind] {
   let (positive, start) = match split_sign(s, true) {
     Ok(v) => v
     Err(e) => return Err(e)
@@ -85,7 +85,10 @@ fn i64_from_str_radix(s : String, radix : Int) -> Result[Int64, IntErrorKind] {
 
 ///|
 /// Rust's `u64::from_str_radix`.
-fn u64_from_str_radix(s : String, radix : Int) -> Result[UInt64, IntErrorKind] {
+fn u64_from_str_radix(
+  s : String,
+  radix : Int32,
+) -> Result[UInt64, IntErrorKind] {
   let start = match split_sign(s, false) {
     Ok((_, start)) => start
     Err(e) => return Err(e)
@@ -133,7 +136,7 @@ fn rust_parse_f64(s : String) -> Double? {
     return Some(if negative { -nan } else { nan })
   }
   // Validate the grammar ourselves: MoonBit's parser also accepts `_`.
-  let is_digit = (j : Int) => {
+  let is_digit = (j : Int32) => {
     j < len && s.code_unit_at(j) >= '0' && s.code_unit_at(j) <= '9'
   }
   let mut digits = 0

@@ -76,9 +76,12 @@ fn capture_idents(
 /// The external scopes of variant `variant` for a tree with the identifiers
 /// `names`: which names are known, where (the top scope, an outer scope, the
 /// library in code or in math) and to what, differs per variant.
-fn capture_environment(names : Array[String], variant : Int) -> @library.Scopes {
+fn capture_environment(
+  names : Array[String],
+  variant : Int32,
+) -> @library.Scopes {
   let library = captures_library()
-  let bind = (scope : @library.Scope, name : String, i : Int) => {
+  let bind = (scope : @library.Scope, name : String, i : Int32) => {
     scope.bind(
       name,
       @library.Binding::new(Int(i.to_int64()), @syntax.Span::detached()),
@@ -137,7 +140,7 @@ fn scope_summary(scope : @library.Scope) -> (Array[String], @library.U128) {
 fn check_captures(
   root : @syntax.SyntaxNode,
   what : String,
-) -> (Int, Int, Int) raise {
+) -> (Int32, Int32, Int32) raise {
   let nodes = []
   capture_nodes(root, nodes)
   if nodes.is_empty() {
@@ -391,7 +394,7 @@ fn typ_files(dir : String, out : Array[String]) -> Unit {
 ///|
 /// Check every file below `dir` (if it is there); returns the counts of
 /// files, analyzed nodes, comparisons and captured bindings.
-fn check_corpus(dir : String) -> (Int, Int, Int, Int) raise {
+fn check_corpus(dir : String) -> (Int32, Int32, Int32, Int32) raise {
   guard captures_module_root() is Some(root) else { return (0, 0, 0, 0) }
   let files = []
   typ_files(root + dir, files)

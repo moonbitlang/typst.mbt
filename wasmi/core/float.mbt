@@ -2,17 +2,17 @@
 
 ///|
 /// A 32-bit `f32` type.
-pub struct F32(UInt)
+pub struct F32(UInt32)
 
 ///|
 /// Creates a float from its underlying bits.
-pub fn F32::from_bits(other : UInt) -> F32 {
+pub fn F32::from_bits(other : UInt32) -> F32 {
   F32(other)
 }
 
 ///|
 /// Returns the underlying bits of the float.
-pub fn F32::to_bits(self : F32) -> UInt {
+pub fn F32::to_bits(self : F32) -> UInt32 {
   self.0
 }
 
@@ -40,7 +40,7 @@ pub extend F32 with Eq::{not_equal, equal}
 
 ///|
 /// `PartialOrd::partial_cmp`: `None` if either value is NaN.
-pub fn F32::partial_cmp(self : F32, other : F32) -> Int? {
+pub fn F32::partial_cmp(self : F32, other : F32) -> Int32? {
   let a = self.to_float()
   let b = other.to_float()
   if a < b {
@@ -121,7 +121,7 @@ pub extend F64 with Eq::{not_equal, equal}
 
 ///|
 /// `PartialOrd::partial_cmp`: `None` if either value is NaN.
-pub fn F64::partial_cmp(self : F64, other : F64) -> Int? {
+pub fn F64::partial_cmp(self : F64, other : F64) -> Int32? {
   let a = self.to_float()
   let b = other.to_float()
   if a < b {

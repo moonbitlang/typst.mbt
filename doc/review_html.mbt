@@ -78,14 +78,14 @@ fn path_data(curve : @library.Curve, x : Double, y : Double) -> String {
 priv struct OriginTable {
   origins : Origins
   list : Array[Origin]
-  index : Map[String, Int]
+  index : Map[String, Int32]
   /// The number of clip paths written so far (their ids).
-  mut clips : Int
+  mut clips : Int32
   /// The words of the text, in reading order (`review_select.mbt`), the
   /// numbers of the pieces (spans), and the page that is being written.
   words : Array[Word]
-  pieces : Map[@syntax.Span, Int]
-  mut page : Int
+  pieces : Map[@syntax.Span, Int32]
+  mut page : Int32
   /// Whether the last text item was the hyphen of a line break: the next
   /// word is the rest of the word before it.
   mut hyphen : Bool
@@ -95,7 +95,7 @@ priv struct OriginTable {
 
 ///|
 /// The number of the piece with the given span.
-fn OriginTable::piece(self : OriginTable, span : @syntax.Span) -> Int {
+fn OriginTable::piece(self : OriginTable, span : @syntax.Span) -> Int32 {
   match self.pieces.get(span) {
     Some(piece) => piece
     None => {
@@ -108,14 +108,14 @@ fn OriginTable::piece(self : OriginTable, span : @syntax.Span) -> Int {
 
 ///|
 /// The number of the origin of a span, if it has one.
-fn OriginTable::id(self : OriginTable, span : @syntax.Span) -> Int? {
+fn OriginTable::id(self : OriginTable, span : @syntax.Span) -> Int32? {
   guard self.origins.resolve(span) is Some(origin) else { return Option::None }
   Some(self.number(origin))
 }
 
 ///|
 /// The number of an origin, entered on first use.
-fn OriginTable::number(self : OriginTable, origin : Origin) -> Int {
+fn OriginTable::number(self : OriginTable, origin : Origin) -> Int32 {
   let key = StringBuilder()
   key.write_string(
     "\{origin.file}\u{0}\{origin.module_name}\u{0}\{origin.kind}\u{0}\{origin.start_line}:\{origin.start_column}-\{origin.end_line}:\{origin.end_column}\u{0}\{origin.param.unwrap_or(-1)}",
@@ -318,7 +318,7 @@ fn OriginTable::layer(
         // one. The search takes the first glyph that contains the point:
         // the boxes are written in reverse order, the first on top.
         let size = text.size.to_pt()
-        let boxes : Array[(Int, Int, Double, Double)] = []
+        let boxes : Array[(Int32, Int32, Double, Double)] = []
         let mut at = x
         for g, glyph in text.glyphs {
           let width = glyph.x_advance.at(text.size).to_pt()
@@ -461,7 +461,7 @@ fn[T] CompileReport::review_layers(
 /// probes found a shape or an image, for one of those (`[origin, page,
 /// record, text]` in `objects`).
 fn ReviewText::samples(self : ReviewText) -> (Json, Json) {
-  let int = (n : Int) => Json::number(n.to_double())
+  let int = (n : Int32) => Json::number(n.to_double())
   let samples : Array[Json] = []
   let count = self.words.length()
   // Selections of 1, 2, 7 and 40 words at places spread over the text.
@@ -558,7 +558,7 @@ pub fn CompileReport::review_html(
   // (read after the probes, which can add an origin that no box has)
   // with what is known of their source, and the source lines that an
   // excerpt can show.
-  let int = (n : Int) => Json::number(n.to_double())
+  let int = (n : Int32) => Json::number(n.to_double())
   let data : Map[String, Json] = Map([])
   data["title"] = Json::string(title)
   data["probes"] = self.probes(document, table)

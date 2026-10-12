@@ -6,13 +6,13 @@
 /// **NOTE** This doesn't cover all markers, just the ones zune-jpeg supports.
 priv enum Marker {
   /// Start of frame markers (only 0..=2 are produced by `from_u8`).
-  SOF(Int)
+  SOF(Int32)
   /// Define Huffman table(s).
   DHT
   /// Define arithmetic coding conditioning(s).
   DAC
   /// Restart with modulo 8 count `m`.
-  RST(Int)
+  RST(Int32)
   /// Start of image.
   SOI
   /// End of image.
@@ -26,16 +26,16 @@ priv enum Marker {
   /// Define restart interval.
   DRI
   /// Reserved for application segments.
-  APP(Int)
+  APP(Int32)
   /// Comment.
   COM
   /// Unknown markers.
-  UNKNOWN(Int)
+  UNKNOWN(Int32)
 } derive(Eq)
 
 ///|
 /// Upstream `Marker::from_u8` (which always returns `Some`).
-fn Marker::from_u8(n : Int) -> Marker {
+fn Marker::from_u8(n : Int32) -> Marker {
   match n {
     0xFE => COM
     0xC0 => SOF(0)
@@ -43,7 +43,7 @@ fn Marker::from_u8(n : Int) -> Marker {
     0xC2 => SOF(2)
     0xC4 => DHT
     0xCC => DAC
-    0xD0..=0xD7 => RST(n - 0xD0)
+    0xD0..<=0xD7 => RST(n - 0xD0)
     0xD8 => SOI
     0xD9 => EOI
     0xDA => SOS

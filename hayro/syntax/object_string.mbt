@@ -90,7 +90,7 @@ pub extend PdfString with ObjectLike::{from_object}
 
 ///|
 fn is_ascii_hexdigit(b : Byte) -> Bool {
-  b is (b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F')
+  b is (b'0'..<=b'9' | b'a'..<=b'f' | b'A'..<=b'F')
 }
 
 ///|
@@ -136,7 +136,7 @@ fn skip_literal(r : Reader) -> Unit? {
 
 ///|
 fn is_octal_digit(byte : Byte) -> Bool {
-  byte is (b'0'..=b'7')
+  byte is (b'0'..<=b'7')
 }
 
 ///|

@@ -3,7 +3,7 @@
 // Based on https://github.com/fschutt/fastblur
 
 ///|
-let box_blur_steps : Int = 5
+let box_blur_steps : Int32 = 5
 
 ///|
 /// Applies a box blur.
@@ -36,7 +36,7 @@ fn box_blur_apply(
 }
 
 ///|
-fn create_box_gauss(sigma : Float) -> FixedArray[Int] {
+fn create_box_gauss(sigma : Float) -> FixedArray[Int32] {
   if sigma > 0.0 {
     let n_float = Float::from_int(box_blur_steps)
 
@@ -85,12 +85,12 @@ fn f32_to_usize(x : Float) -> Int64 {
 
 ///|
 fn box_blur_impl(
-  blur_radius_horz : Int,
-  blur_radius_vert : Int,
-  width : Int,
-  height : Int,
-  backbuf : FixedArray[UInt],
-  frontbuf : FixedArray[UInt],
+  blur_radius_horz : Int32,
+  blur_radius_vert : Int32,
+  width : Int32,
+  height : Int32,
+  backbuf : FixedArray[UInt32],
+  frontbuf : FixedArray[UInt32],
 ) -> Unit {
   box_blur_vert(blur_radius_vert, width, height, frontbuf, backbuf)
   box_blur_horz(blur_radius_horz, width, height, backbuf, frontbuf)
@@ -108,12 +108,12 @@ fn box_round(x : Float) -> Float {
 
 ///|
 fn box_px(
-  val_r : Int,
-  val_g : Int,
-  val_b : Int,
-  val_a : Int,
+  val_r : Int32,
+  val_g : Int32,
+  val_b : Int32,
+  val_a : Int32,
   iarr : Float,
-) -> UInt {
+) -> UInt32 {
   px_pack(
     f32_to_u8(box_round(Float::from_int(val_r) * iarr)),
     f32_to_u8(box_round(Float::from_int(val_g) * iarr)),
@@ -124,11 +124,11 @@ fn box_px(
 
 ///|
 fn box_blur_vert(
-  blur_radius : Int,
-  width : Int,
-  height : Int,
-  backbuf : FixedArray[UInt],
-  frontbuf : FixedArray[UInt],
+  blur_radius : Int32,
+  width : Int32,
+  height : Int32,
+  backbuf : FixedArray[UInt32],
+  frontbuf : FixedArray[UInt32],
 ) -> Unit {
   if blur_radius == 0 {
     copy_pixels(backbuf, frontbuf)
@@ -206,11 +206,11 @@ fn box_blur_vert(
 
 ///|
 fn box_blur_horz(
-  blur_radius : Int,
-  width : Int,
-  height : Int,
-  backbuf : FixedArray[UInt],
-  frontbuf : FixedArray[UInt],
+  blur_radius : Int32,
+  width : Int32,
+  height : Int32,
+  backbuf : FixedArray[UInt32],
+  frontbuf : FixedArray[UInt32],
 ) -> Unit {
   if blur_radius == 0 {
     copy_pixels(backbuf, frontbuf)
@@ -285,7 +285,7 @@ fn box_blur_horz(
 }
 
 ///|
-fn imin(a : Int, b : Int) -> Int {
+fn imin(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {
@@ -295,7 +295,7 @@ fn imin(a : Int, b : Int) -> Int {
 
 ///|
 /// `frontbuf.data.copy_from_slice(backbuf.data)`.
-fn copy_pixels(src : FixedArray[UInt], dst : FixedArray[UInt]) -> Unit {
+fn copy_pixels(src : FixedArray[UInt32], dst : FixedArray[UInt32]) -> Unit {
   for i in 0..<src.length() {
     dst[i] = src[i]
   }

@@ -50,7 +50,7 @@ fn linebreak_simple(
 ) -> Array[Line] {
   let lines : Array[Line] = []
   let mut start = 0
-  let mut last : (Line, Int)? = None
+  let mut last : (Line, Int32)? = None
   breakpoints(p, (end, breakpoint) => {
     // Compute the line and its size.
     let mut attempt = line(engine, p, start, end, breakpoint, lines.last())
@@ -120,10 +120,10 @@ fn linebreak_optimized(
 /// An entry in the dynamic programming table for inline layout
 /// optimization.
 priv struct BoundedEntry {
-  pred : Int
+  pred : Int32
   total : Double
   line : Line
-  end : Int
+  end : Int32
 }
 
 ///|
@@ -256,9 +256,9 @@ fn linebreak_optimized_bounded(
 ///|
 /// An entry in the approximate dynamic programming table.
 priv struct ApproxEntry {
-  pred : Int
+  pred : Int32
   total : Double
-  end : Int
+  end : Int32
   unbreakable : Bool
   breakpoint : @linebreak.Breakpoint
 }
@@ -461,7 +461,7 @@ fn raw_ratio(
   line_width : @library.Abs,
   stretchability : @library.Abs,
   shrinkability : @library.Abs,
-  justifiables : Int,
+  justifiables : Int32,
 ) -> Double {
   // Determine how much the line's spaces would need to be stretched to make
   // it the desired width.
@@ -531,7 +531,7 @@ fn f64_clamp(x : Double, min : Double, max : Double) -> Double {
 ///|
 /// Rust's `f64::powi(n)` for small positive `n` (LLVM expands constant
 /// exponents into repeated multiplication).
-fn powi(x : Double, n : Int) -> Double {
+fn powi(x : Double, n : Int32) -> Double {
   // `__powidf2`: repeated squaring.
   let mut r = 1.0
   let mut a = x
@@ -626,7 +626,7 @@ fn raw_cost(
 /// Calls `f` for all possible points in the text where lines can broken.
 fn breakpoints(
   p : Preparation,
-  f : (Int, @linebreak.Breakpoint) -> Unit,
+  f : (Int32, @linebreak.Breakpoint) -> Unit,
 ) -> Unit {
   let (ends, kinds) = match p.breakpoints {
     Some(all) => all
@@ -657,7 +657,7 @@ fn breakpoints(
 
 ///|
 /// Whether hyphenation is enabled at the given offset.
-fn hyphenate_at(p : Preparation, offset : Int) -> Bool {
+fn hyphenate_at(p : Preparation, offset : Int32) -> Bool {
   match p.config.hyphenate {
     Some(v) => v
     None => {
@@ -676,7 +676,7 @@ fn hyphenate_at(p : Preparation, offset : Int) -> Bool {
 
 ///|
 /// The text language at the given offset.
-fn lang_at(p : Preparation, offset : Int) -> @hypher.Lang? {
+fn lang_at(p : Preparation, offset : Int32) -> @hypher.Lang? {
   let lang = match p.config.lang {
     Some(lang) => lang
     None => {
@@ -795,7 +795,7 @@ priv struct CumulativeVec {
 
 ///|
 /// Create a new instance with the given capacity.
-fn CumulativeVec::with_capacity(capacity : Int) -> CumulativeVec {
+fn CumulativeVec::with_capacity(capacity : Int32) -> CumulativeVec {
   let total = @library.Abs::zero()
   let summed = Array(capacity~)
   summed.push(total)
@@ -804,7 +804,7 @@ fn CumulativeVec::with_capacity(capacity : Int) -> CumulativeVec {
 
 ///|
 /// Adjust to cover the given byte length.
-fn CumulativeVec::adjust(self : CumulativeVec, len : Int) -> Unit {
+fn CumulativeVec::adjust(self : CumulativeVec, len : Int32) -> Unit {
   if len < self.summed.length() {
     self.summed.truncate(len)
   } else {
@@ -818,7 +818,7 @@ fn CumulativeVec::adjust(self : CumulativeVec, len : Int) -> Unit {
 /// Adds a new segment with the given byte length and metric.
 fn CumulativeVec::push(
   self : CumulativeVec,
-  byte_len : Int,
+  byte_len : Int32,
   metric : @library.Abs,
 ) -> Unit {
   self.total = self.total + metric
@@ -831,15 +831,15 @@ fn CumulativeVec::push(
 /// Estimates the metrics for the line spanned by the range.
 fn CumulativeVec::estimate(
   self : CumulativeVec,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> @library.Abs {
   self.get(end) - self.get(start)
 }
 
 ///|
 /// Get the metric at the given byte position.
-fn CumulativeVec::get(self : CumulativeVec, index : Int) -> @library.Abs {
+fn CumulativeVec::get(self : CumulativeVec, index : Int32) -> @library.Abs {
   if index == 0 {
     @library.Abs::zero()
   } else {
@@ -850,19 +850,19 @@ fn CumulativeVec::get(self : CumulativeVec, index : Int) -> @library.Abs {
 ///|
 /// An accumulative array of an integer metric.
 priv struct CumulativeIntVec {
-  mut total : Int
-  summed : Array[Int]
+  mut total : Int32
+  summed : Array[Int32]
 }
 
 ///|
-fn CumulativeIntVec::with_capacity(capacity : Int) -> CumulativeIntVec {
+fn CumulativeIntVec::with_capacity(capacity : Int32) -> CumulativeIntVec {
   let summed = Array(capacity~)
   summed.push(0)
   { total: 0, summed, }
 }
 
 ///|
-fn CumulativeIntVec::adjust(self : CumulativeIntVec, len : Int) -> Unit {
+fn CumulativeIntVec::adjust(self : CumulativeIntVec, len : Int32) -> Unit {
   if len < self.summed.length() {
     self.summed.truncate(len)
   } else {
@@ -875,8 +875,8 @@ fn CumulativeIntVec::adjust(self : CumulativeIntVec, len : Int) -> Unit {
 ///|
 fn CumulativeIntVec::push(
   self : CumulativeIntVec,
-  byte_len : Int,
-  metric : Int,
+  byte_len : Int32,
+  metric : Int32,
 ) -> Unit {
   self.total = self.total + metric
   for _ in 0..<byte_len {
@@ -887,14 +887,14 @@ fn CumulativeIntVec::push(
 ///|
 fn CumulativeIntVec::estimate(
   self : CumulativeIntVec,
-  start : Int,
-  end : Int,
-) -> Int {
+  start : Int32,
+  end : Int32,
+) -> Int32 {
   self.get(end) - self.get(start)
 }
 
 ///|
-fn CumulativeIntVec::get(self : CumulativeIntVec, index : Int) -> Int {
+fn CumulativeIntVec::get(self : CumulativeIntVec, index : Int32) -> Int32 {
   if index == 0 {
     0
   } else {

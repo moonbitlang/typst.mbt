@@ -40,7 +40,7 @@ pub fn SbixStrike::get(
 fn SbixStrike::get_inner(
   self : SbixStrike,
   glyph_id : GlyphId,
-  depth : Int,
+  depth : Int32,
 ) -> RasterGlyphImage? {
   // Recursive `dupe`. Bail.
   if depth == 10 {
@@ -120,7 +120,7 @@ struct SbixStrikes {
 
 ///|
 /// Returns a strike at the index.
-pub fn SbixStrikes::get(self : SbixStrikes, index : UInt) -> SbixStrike? {
+pub fn SbixStrikes::get(self : SbixStrikes, index : UInt32) -> SbixStrike? {
   guard self.offsets.get(index) is Some(offset) else { return None }
   guard slice_from(self.data, offset.to_usize()) is Some(data) else {
     return None
@@ -134,7 +134,7 @@ pub fn SbixStrikes::get(self : SbixStrikes, index : UInt) -> SbixStrike? {
 
 ///|
 /// Returns the number of strikes.
-pub fn SbixStrikes::len(self : SbixStrikes) -> UInt {
+pub fn SbixStrikes::len(self : SbixStrikes) -> UInt32 {
   self.offsets.len()
 }
 
@@ -161,7 +161,7 @@ pub fn SbixStrikes::iter(self : SbixStrikes) -> Iter[SbixStrike] {
 /// An iterator over [`SbixStrikes`].
 struct SbixStrikesIter {
   strikes : SbixStrikes
-  mut index : UInt
+  mut index : UInt32
 }
 
 ///|
@@ -218,10 +218,10 @@ pub fn SbixTable::best_strike(
   self : SbixTable,
   pixels_per_em : UInt16,
 ) -> SbixStrike? {
-  let mut idx : UInt = 0
+  let mut idx : UInt32 = 0
   let mut max_ppem : UInt16 = 0
   let it = self.strikes.into_iter()
-  let mut i : UInt = 0
+  let mut i : UInt32 = 0
   while it.next() is Some(strike) {
     if (
         pixels_per_em <= strike.pixels_per_em && strike.pixels_per_em < max_ppem

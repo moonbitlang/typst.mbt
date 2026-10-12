@@ -3,43 +3,43 @@
 // CanonicalCombiningClass values used by the fallback positioning.
 
 ///|
-const CCC_ATTACHED_BELOW_LEFT : Int = 200
+const CCC_ATTACHED_BELOW_LEFT : Int32 = 200
 
 ///|
-const CCC_ATTACHED_BELOW : Int = 202
+const CCC_ATTACHED_BELOW : Int32 = 202
 
 ///|
-const CCC_ATTACHED_ABOVE : Int = 214
+const CCC_ATTACHED_ABOVE : Int32 = 214
 
 ///|
-const CCC_ATTACHED_ABOVE_RIGHT : Int = 216
+const CCC_ATTACHED_ABOVE_RIGHT : Int32 = 216
 
 ///|
-const CCC_BELOW_LEFT : Int = 218
+const CCC_BELOW_LEFT : Int32 = 218
 
 ///|
-const CCC_BELOW : Int = 220
+const CCC_BELOW : Int32 = 220
 
 ///|
-const CCC_BELOW_RIGHT : Int = 222
+const CCC_BELOW_RIGHT : Int32 = 222
 
 ///|
-const CCC_ABOVE_LEFT : Int = 228
+const CCC_ABOVE_LEFT : Int32 = 228
 
 ///|
-const CCC_ABOVE : Int = 230
+const CCC_ABOVE : Int32 = 230
 
 ///|
-const CCC_ABOVE_RIGHT : Int = 232
+const CCC_ABOVE_RIGHT : Int32 = 232
 
 ///|
-const CCC_DOUBLE_BELOW : Int = 233
+const CCC_DOUBLE_BELOW : Int32 = 233
 
 ///|
-const CCC_DOUBLE_ABOVE : Int = 234
+const CCC_DOUBLE_ABOVE : Int32 = 234
 
 ///|
-fn recategorize_combining_class(u : Int, class : Int) -> Int {
+fn recategorize_combining_class(u : Int32, class : Int32) -> Int32 {
   let mut class = class
   if class >= 200 {
     return class
@@ -140,8 +140,8 @@ fn _hb_ot_shape_fallback_mark_position_recategorize_marks(
 ///|
 fn zero_mark_advances(
   buffer : Buffer,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   adjust_offsets_when_zeroing : Bool,
 ) -> Unit {
   for i in start..<end {
@@ -166,7 +166,7 @@ fn position_mark(
   glyph : @otf.GlyphId,
   pos : GlyphPosition,
   base_extents : GlyphExtents,
-  combining_class : Int,
+  combining_class : Int32,
 ) -> Unit {
   let mark_extents = GlyphExtents::new()
   if !face.glyph_extents(glyph, mark_extents) {
@@ -266,8 +266,8 @@ fn position_around_base(
   plan : ShapePlan,
   face : Face,
   buffer : Buffer,
-  base : Int,
-  end : Int,
+  base : Int32,
+  end : Int32,
   adjust_offsets_when_zeroing : Bool,
 ) -> Unit {
   let mut horizontal_dir = Invalid
@@ -369,10 +369,10 @@ fn position_around_base(
 ///|
 /// `conv_combining_class`: classes without a `CanonicalCombiningClass`
 /// variant become NotReordered (0).
-fn conv_combining_class(n : Int) -> Int {
+fn conv_combining_class(n : Int32) -> Int32 {
   match n {
     1 | 6 | 7 | 8 | 9 => n
-    10..=36 => n
+    10..<=36 => n
     84 | 91 | 103 | 107 | 118 | 122 | 129 | 130 | 132 => n
     200
     | 202
@@ -398,8 +398,8 @@ fn position_cluster(
   plan : ShapePlan,
   face : Face,
   buffer : Buffer,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   adjust_offsets_when_zeroing : Bool,
 ) -> Unit {
   if end - start < 2 {

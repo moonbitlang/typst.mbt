@@ -187,19 +187,19 @@ fn unescape_xml(s : String) -> String {
               for d in name[2:] {
                 v = v * 16 +
                   (match d {
-                    '0'..='9' => d.to_int() - '0'.to_int()
-                    'a'..='f' => d.to_int() - 'a'.to_int() + 10
-                    'A'..='F' => d.to_int() - 'A'.to_int() + 10
+                    '0'..<='9' => d.to_int() - '0'.to_int()
+                    'a'..<='f' => d.to_int() - 'a'.to_int() + 10
+                    'A'..<='F' => d.to_int() - 'A'.to_int() + 10
                     _ => 0
                   })
               }
-              Some(Int::unsafe_to_char(v))
+              Some(Int32::unsafe_to_char(v))
             } else if name.has_prefix("#") {
               let mut v = 0
               for d in name[1:] {
                 v = v * 10 + (d.to_int() - '0'.to_int())
               }
-              Some(Int::unsafe_to_char(v))
+              Some(Int32::unsafe_to_char(v))
             } else {
               None
             }
@@ -359,7 +359,7 @@ fn bool_attr(n : XNode, name : String) -> Bool? {
 
 ///|
 /// `deserialize_u32_option`.
-fn u32_attr(n : XNode, name : String, path : String) -> Int? raise DeErr {
+fn u32_attr(n : XNode, name : String, path : String) -> Int32? raise DeErr {
   match n.attr(name) {
     Some(s) =>
       match @unscanny.parse_u32(@unscanny.trim(s)) {
@@ -376,7 +376,7 @@ fn u32_attr(n : XNode, name : String, path : String) -> Int? raise DeErr {
 
 ///|
 /// An `i16` attribute.
-fn i16_attr(n : XNode, name : String, path : String) -> Int? raise DeErr {
+fn i16_attr(n : XNode, name : String, path : String) -> Int32? raise DeErr {
   match n.attr(name) {
     Some(s) =>
       match @unscanny.parse_int_in(s, -32768L, 32767L) {

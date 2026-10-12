@@ -9,7 +9,7 @@
 pub fn combine_scaled(
   a : FontMatrix,
   b : FontMatrix,
-  scale : Int,
+  scale : Int32,
 ) -> FontMatrix {
   let a = a.elements()
   let b = b.elements()
@@ -91,7 +91,7 @@ pub fn Transform::identity() -> Transform {
 
 ///|
 /// Computes a scale factor for the given ppem and upem values.
-pub fn Transform::compute_scale(ppem : Float, upem : Int) -> Fixed {
+pub fn Transform::compute_scale(ppem : Float, upem : Int32) -> Fixed {
   Fixed::from_bits((ppem * 64.0).to_int()) /
   Fixed::from_bits(if upem > 1 { upem } else { 1 })
 }
@@ -122,7 +122,7 @@ pub(all) struct ScaledFontMatrix {
   /// The matrix.
   matrix : FontMatrix
   /// The dynamic scale factor used when parsing this matrix.
-  scale : Int
+  scale : Int32
 } derive(Eq, Debug)
 
 ///|

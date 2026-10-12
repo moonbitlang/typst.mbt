@@ -24,7 +24,7 @@ test "L2: no character of an embedded font is its glyph 0" {
           guard subtable.glyph_index(n) is Some(id) else { return }
           mapped += 1
           if id.0 == 0 {
-            zero[code_point(Int::unsafe_to_char(n.reinterpret_as_int()))] = ()
+            zero[code_point(Int32::unsafe_to_char(n.reinterpret_as_int()))] = ()
           }
         })
       }
@@ -50,7 +50,7 @@ test "L2: no character of an embedded font is its glyph 0" {
 ///|
 test "L2: the characters of a glyph, and how a message names them" {
   let text = ItemText::new("a\u{4e2d}\u{1F600}b")
-  let of = (from : Int, to : Int) => {
+  let of = (from : Int32, to : Int32) => {
     match text.range(from, to) {
       Some(chars) => String::from_array(chars.to_owned())
       None => "-"
@@ -93,9 +93,9 @@ fn leaving(
   y0 : Double,
   x1 : Double,
   y1 : Double,
-  x? : Bool = true,
-  y? : Bool = true,
-  slack? : (Double, Double) = (0.0, 0.0),
+  x~ : Bool = true,
+  y~ : Bool = true,
+  slack~ : (Double, Double) = (0.0, 0.0),
 ) -> String {
   let (amount, side) = leaves(
     @kurbo.Rect::new(x0, y0, x1, y1),

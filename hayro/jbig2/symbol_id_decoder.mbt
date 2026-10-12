@@ -4,11 +4,11 @@
 ///|
 priv struct SymbolIdDecoder {
   contexts : FixedArray[Byte]
-  code_len : UInt
+  code_len : UInt32
 }
 
 ///|
-fn SymbolIdDecoder::new(code_len : UInt) -> SymbolIdDecoder {
+fn SymbolIdDecoder::new(code_len : UInt32) -> SymbolIdDecoder {
   // A.3: "The number of contexts required is 2^SBSYMCODELEN, which is less
   // than twice the maximum symbol ID."
   let num_contexts = 1 << code_len.reinterpret_as_int()
@@ -19,7 +19,7 @@ fn SymbolIdDecoder::new(code_len : UInt) -> SymbolIdDecoder {
 fn SymbolIdDecoder::decode(
   self : SymbolIdDecoder,
   decoder : ArithmeticDecoder,
-) -> UInt {
+) -> UInt32 {
   let mut prev = 1U
   for _ in 0U..<self.code_len {
     let ctx_mask = (1U << (self.code_len + 1).reinterpret_as_int()) - 1

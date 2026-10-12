@@ -3,7 +3,7 @@
 ///|
 priv struct Reader {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
 
 ///|
@@ -17,13 +17,13 @@ fn Reader::clone(self : Reader) -> Reader {
 }
 
 ///|
-fn Reader::jump(self : Reader, offset : Int) -> Unit {
+fn Reader::jump(self : Reader, offset : Int32) -> Unit {
   self.offset = offset
 }
 
 ///|
 /// `data.get(start..end)`.
-fn Reader::range(self : Reader, start : Int, end : Int) -> BytesView? {
+fn Reader::range(self : Reader, start : Int32, end : Int32) -> BytesView? {
   if start >= 0 && start <= end && end <= self.data.length() {
     Some(self.data[start:end])
   } else {
@@ -32,12 +32,12 @@ fn Reader::range(self : Reader, start : Int, end : Int) -> BytesView? {
 }
 
 ///|
-fn Reader::offset(self : Reader) -> Int {
+fn Reader::offset(self : Reader) -> Int32 {
   self.offset
 }
 
 ///|
-fn Reader::read_bytes(self : Reader, len : Int) -> BytesView? {
+fn Reader::read_bytes(self : Reader, len : Int32) -> BytesView? {
   guard self.peek_bytes(len) is Some(v) else { return None }
   self.offset += len
   Some(v)
@@ -51,7 +51,7 @@ fn Reader::read_byte(self : Reader) -> Byte? {
 }
 
 ///|
-fn Reader::peek_bytes(self : Reader, len : Int) -> BytesView? {
+fn Reader::peek_bytes(self : Reader, len : Int32) -> BytesView? {
   self.range(self.offset, self.offset + len)
 }
 

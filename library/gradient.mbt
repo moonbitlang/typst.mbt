@@ -262,7 +262,7 @@ fn impl_gradient_sharp(
     colors.push(c)
   }
   let positions : Array[Double] = []
-  let index_to_progress = (i : Int) => i.to_double() * 1.0 / n.to_double()
+  let index_to_progress = (i : Int32) => i.to_double() * 1.0 / n.to_double()
   let progress = smoothness * 1.0 / (4.0 * n.to_double())
   for i in 0..<n {
     let mut j = 2 * i

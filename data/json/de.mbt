@@ -76,7 +76,7 @@ pub extend ErrorCode with Show::{to_string, output}
 /// A JSON syntax error with its 1-based line and 0-based byte column
 /// (upstream `serde_json::Error`).
 pub(all) suberror JsonError {
-  JsonError(code~ : ErrorCode, line~ : Int, column~ : Int)
+  JsonError(code~ : ErrorCode, line~ : Int32, column~ : Int32)
 } derive(Debug)
 
 ///|
@@ -86,14 +86,14 @@ pub extend JsonError with @debug.Debug::{to_repr}
 
 ///|
 /// The line at which the error occurred (1-based).
-pub fn JsonError::line(self : JsonError) -> Int {
+pub fn JsonError::line(self : JsonError) -> Int32 {
   let JsonError(line~, ..) = self
   line
 }
 
 ///|
 /// The column at which the error occurred (as reported by serde_json).
-pub fn JsonError::column(self : JsonError) -> Int {
+pub fn JsonError::column(self : JsonError) -> Int32 {
   let JsonError(column~, ..) = self
   column
 }
@@ -113,8 +113,8 @@ pub fn JsonError::message(self : JsonError) -> String {
 /// A JSON deserializer reading from a byte slice.
 priv struct Deserializer {
   slice : Bytes
-  mut index : Int
-  mut remaining_depth : Int
+  mut index : Int32
+  mut remaining_depth : Int32
 }
 
 ///|
@@ -128,7 +128,10 @@ pub fn from_slice(bytes : Bytes) -> @serde.Data raise JsonError {
 }
 
 ///|
-fn Deserializer::position_of_index(self : Deserializer, i : Int) -> (Int, Int) {
+fn Deserializer::position_of_index(
+  self : Deserializer,
+  i : Int32,
+) -> (Int32, Int32) {
   let mut start_of_line = 0
   let mut line = 1
   for j in 0..<i {
@@ -235,7 +238,7 @@ fn overflow_u64(a : UInt64, b : UInt64) -> Bool {
 }
 
 ///|
-fn overflow_i32(a : Int, b : Int) -> Bool {
+fn overflow_i32(a : Int32, b : Int32) -> Bool {
   let c = 0x7FFF_FFFF
   a >= c / 10 && (a > c / 10 || b > c % 10)
 }
@@ -313,7 +316,7 @@ fn Deserializer::parse_decimal(
   self : Deserializer,
   positive : Bool,
   significand : UInt64,
-  exponent_before_decimal_point : Int,
+  exponent_before_decimal_point : Int32,
 ) -> Double raise JsonError {
   self.eat_char()
   let mut significand = significand
@@ -350,7 +353,7 @@ fn Deserializer::parse_exponent(
   self : Deserializer,
   positive : Bool,
   significand : UInt64,
-  starting_exp : Int,
+  starting_exp : Int32,
 ) -> Double raise JsonError {
   self.eat_char()
   let positive_exp = match self.peek_or_null() {
@@ -395,7 +398,7 @@ fn Deserializer::parse_exponent(
 }
 
 ///|
-fn saturating_add_i32(a : Int, b : Int) -> Int {
+fn saturating_add_i32(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() + b.to_int64()
   if r > 0x7FFF_FFFFL {
     0x7FFF_FFFF
@@ -421,7 +424,7 @@ fn Deserializer::f64_from_parts(
   self : Deserializer,
   positive : Bool,
   significand : UInt64,
-  exponent : Int,
+  exponent : Int32,
 ) -> Double raise JsonError {
   let mut f = significand.to_double()
   let mut exponent = exponent
@@ -465,7 +468,7 @@ fn Deserializer::parse_long_integer(
   let mut exponent = 0
   while true {
     match self.peek_or_null() {
-      b'0'..=b'9' => {
+      b'0'..<=b'9' => {
         self.eat_char()
         // This could overflow... if your integer is gigabytes long. Ignore
         // that possibility.
@@ -484,7 +487,7 @@ fn Deserializer::parse_decimal_overflow(
   self : Deserializer,
   positive : Bool,
   significand : UInt64,
-  exponent : Int,
+  exponent : Int32,
 ) -> Double raise JsonError {
   // The next multiply/add would overflow, so just ignore all further digits.
   while is_digit(self.peek_or_null()) {
@@ -583,7 +586,7 @@ fn Deserializer::deserialize_any(
       self.eat_char()
       self.parse_integer(false)
     }
-    b'0'..=b'9' => self.parse_integer(true)
+    b'0'..<=b'9' => self.parse_integer(true)
     b'"' => {
       self.eat_char()
       Str(self.parse_str())
@@ -770,7 +773,7 @@ fn Deserializer::parse_escape(
 }
 
 ///|
-fn hex_val(b : Byte) -> Int? {
+fn hex_val(b : Byte) -> Int32? {
   if b >= b'0' && b <= b'9' {
     Some((b - b'0').to_int())
   } else if b >= b'A' && b <= b'F' {
@@ -783,7 +786,9 @@ fn hex_val(b : Byte) -> Int? {
 }
 
 ///|
-fn Deserializer::decode_hex_escape(self : Deserializer) -> Int raise JsonError {
+fn Deserializer::decode_hex_escape(
+  self : Deserializer,
+) -> Int32 raise JsonError {
   if self.index + 4 > self.slice.length() {
     self.index = self.slice.length()
     raise self.error(EofWhileParsingString)
@@ -847,7 +852,7 @@ fn Deserializer::parse_unicode_escape(
 
 ///|
 /// Adds a codepoint to the end of the buffer as UTF-8.
-fn push_codepoint(n : Int, scratch : Buffer) -> Unit {
+fn push_codepoint(n : Int32, scratch : Buffer) -> Unit {
   if n < 0x80 {
     scratch.write_byte(n.to_byte())
   } else if n < 0x800 {

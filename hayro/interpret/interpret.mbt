@@ -5,7 +5,7 @@
 ///
 /// The result is the raw data and the index in case the font is a TTC,
 /// otherwise it should be 0.
-pub type FontResolverFn = (FontQuery) -> (Bytes, Int)?
+pub type FontResolverFn = (FontQuery) -> (Bytes, Int32)?
 
 ///|
 /// A callback function for resolving cmap names to their files.
@@ -71,7 +71,7 @@ pub fn interpret_page(
   if context.settings.render_annotations &&
     (page.raw().get("Annots") : @hayro_syntax.PdfArray?) is Some(annot_arr) {
     for annot in (annot_arr.iter() : Iter[@hayro_syntax.Dict]) {
-      let flags = (annot.get("F") : UInt?).unwrap_or(0)
+      let flags = (annot.get("F") : UInt32?).unwrap_or(0)
 
       // Annotation should be hidden.
       if (flags & 2) != 0 {
@@ -394,7 +394,7 @@ pub fn interpret(
         // 1. A Name that references an entry in the Resources/Properties dictionary
         // 2. An inline dictionary with an OC key
         let mcid = match @hayro_syntax.dict_or_stream(props_obj) {
-          Some((props, _)) => (props.get("MCID") : Int?)
+          Some((props, _)) => (props.get("MCID") : Int32?)
           None => None
         }
         let oc = match props_obj.into_name() {

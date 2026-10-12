@@ -20,7 +20,11 @@ pub fn Document::parse_tree(
 }
 
 ///|
-fn Document::append(self : Document, parent_id : Int, kind : NodeKind) -> Int {
+fn Document::append(
+  self : Document,
+  parent_id : Int32,
+  kind : NodeKind,
+) -> Int32 {
   let new_child_id = self.nodes.length()
   self.nodes.push({
     parent: Some(parent_id),
@@ -131,10 +135,10 @@ fn parse_tag_name(node : @xml.Node) -> EId? {
 fn parse_xml_node_children(
   parent : @xml.Node,
   origin : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   style_sheet : @simplecss.StyleSheet,
   ignore_ids : Bool,
-  depth : Int,
+  depth : Int32,
   doc : Document,
   id_map : Map[String, @xml.Node],
 ) -> Unit raise @xml.XmlError {
@@ -149,10 +153,10 @@ fn parse_xml_node_children(
 fn parse_xml_node(
   node : @xml.Node,
   origin : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   style_sheet : @simplecss.StyleSheet,
   ignore_ids : Bool,
-  depth : Int,
+  depth : Int32,
   doc : Document,
   id_map : Map[String, @xml.Node],
 ) -> Unit raise @xml.XmlError {
@@ -204,12 +208,12 @@ fn parse_xml_node(
 ///|
 fn parse_svg_element(
   xml_node : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   tag_name : EId,
   style_sheet : @simplecss.StyleSheet,
   ignore_ids : Bool,
   doc : Document,
-) -> Int raise @xml.XmlError {
+) -> Int32 raise @xml.XmlError {
   let attrs_start_idx = doc.attrs.length()
 
   // Copy presentational attributes first.
@@ -363,7 +367,7 @@ fn parse_svg_element(
 
 ///|
 fn append_attribute(
-  parent_id : Int,
+  parent_id : Int32,
   tag_name : EId,
   aid : AId,
   value : String,
@@ -391,7 +395,7 @@ fn append_attribute(
 }
 
 ///|
-fn resolve_inherit(parent_id : Int, aid : AId, doc : Document) -> Bool {
+fn resolve_inherit(parent_id : Int32, aid : AId, doc : Document) -> Bool {
   if aid.is_inheritable() {
     // Inheritable attributes can inherit a value from an any ancestor.
     let node_id = doc
@@ -490,9 +494,9 @@ fn resolve_href(
 fn parse_svg_use_element(
   node : @xml.Node,
   origin : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   style_sheet : @simplecss.StyleSheet,
-  depth : Int,
+  depth : Int32,
   doc : Document,
   id_map : Map[String, @xml.Node],
 ) -> Unit raise @xml.XmlError {
@@ -639,7 +643,7 @@ fn fix_recursive_patterns(doc : Document) -> Unit {
 }
 
 ///|
-fn find_recursive_pattern(aid : AId, doc : Document) -> Int? {
+fn find_recursive_pattern(aid : AId, doc : Document) -> Int32? {
   for pattern_node in doc.root().descendants() {
     if pattern_node.tag_name() != Some(EId::Pattern) {
       continue
@@ -686,7 +690,7 @@ fn fix_recursive_links(eid : EId, aid : AId, doc : Document) -> Unit {
 }
 
 ///|
-fn find_recursive_link(eid : EId, aid : AId, doc : Document) -> Int? {
+fn find_recursive_link(eid : EId, aid : AId, doc : Document) -> Int32? {
   for node in doc.root().descendants() {
     if node.tag_name() != Some(eid) {
       continue

@@ -51,7 +51,7 @@ test "reorder_line" {
 }
 
 ///|
-fn levels(v : Array[Int]) -> Array[@bidi.Level] {
+fn levels(v : Array[Int32]) -> Array[@bidi.Level] {
   @bidi.Level::vec(v)
 }
 

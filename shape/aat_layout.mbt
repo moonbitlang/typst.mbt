@@ -7,17 +7,17 @@
 /// `hb_aat_feature_mapping_t`
 priv struct AatFeatureMapping {
   ot_feature_tag : @otf.Tag
-  aat_feature_type : Int
-  selector_to_enable : Int
-  selector_to_disable : Int
+  aat_feature_type : Int32
+  selector_to_enable : Int32
+  selector_to_disable : Int32
 }
 
 ///|
 fn AatFeatureMapping::new(
   ot_feature_tag : String,
-  aat_feature_type : Int,
-  selector_to_enable : Int,
-  selector_to_disable : Int,
+  aat_feature_type : Int32,
+  selector_to_enable : Int32,
+  selector_to_disable : Int32,
 ) -> AatFeatureMapping {
   {
     ot_feature_tag: tag(ot_feature_tag),
@@ -29,7 +29,7 @@ fn AatFeatureMapping::new(
 
 ///|
 /// `AAT::DELETED_GLYPH`
-const AAT_DELETED_GLYPH : UInt = 0xFFFF
+const AAT_DELETED_GLYPH : UInt32 = 0xFFFF
 
 ///|
 fn hb_aat_layout_substitute(

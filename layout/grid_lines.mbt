@@ -76,13 +76,13 @@ priv struct LineSegment {
 /// here, which is equivalent since `line_stroke_at_track` is pure.)
 fn generate_line_segments(
   grid : @library.CellGrid,
-  tracks : Array[(Int, @library.Abs)],
-  index : Int,
+  tracks : Array[(Int32, @library.Abs)],
+  index : Int32,
   lines : Array[@library.Line],
   line_stroke_at_track : (
     @library.CellGrid,
-    Int,
-    Int,
+    Int32,
+    Int32,
     @library.ResolvedStroke??,
   ) -> (@library.ResolvedStroke, StrokePriority)?,
 ) -> Array[LineSegment] {
@@ -229,8 +229,8 @@ fn generate_line_segments(
 /// described in the docs for `generate_line_segment`.
 fn vline_stroke_at_row(
   grid : @library.CellGrid,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   stroke : @library.ResolvedStroke??,
 ) -> (@library.ResolvedStroke, StrokePriority)? {
   // When the vline isn't at the border, we need to check if a colspan would
@@ -344,11 +344,11 @@ fn vline_stroke_at_row(
 fn hline_stroke_at_column(
   grid : @library.CellGrid,
   rows : Array[RowPiece],
-  local_top_y : Int?,
-  header_end_above : Int?,
+  local_top_y : Int32?,
+  header_end_above : Int32?,
   in_last_region : Bool,
-  y : Int,
-  x : Int,
+  y : Int32,
+  x : Int32,
   stroke : @library.ResolvedStroke??,
 ) -> (@library.ResolvedStroke, StrokePriority)? {
   // When the hline isn't at the border, we need to check if a rowspan

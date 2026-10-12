@@ -117,7 +117,7 @@ pub fn Object::into_f32(self : Object) -> Float? {
 }
 
 ///|
-pub fn Object::into_i32(self : Object) -> Int? {
+pub fn Object::into_i32(self : Object) -> Int32? {
   self.cast()
 }
 
@@ -146,7 +146,7 @@ pub impl Skippable for Object with fn skip(r, is_content_stream) {
         Some(_) => skip_string(r)
       }
     b'(' => skip_string(r)
-    b'.' | b'+' | b'-' | b'0'..=b'9' => skip_number(r)
+    b'.' | b'+' | b'-' | b'0'..<=b'9' => skip_number(r)
     b'[' => skip_array(r, is_content_stream)
     // See test case operator-in-TJ-array-0: Be lenient and skip content operators in
     // array
@@ -181,7 +181,7 @@ pub impl Readable for Object with fn read(r, ctx) {
         Some(_) => PdfString::read(r, ctx).map(s => Object::String(s))
       }
     b'(' => PdfString::read(r, ctx).map(s => Object::String(s))
-    b'.' | b'+' | b'-' | b'0'..=b'9' =>
+    b'.' | b'+' | b'-' | b'0'..<=b'9' =>
       Number::read(r, ctx).map(n => Object::Number(n))
     b'[' => PdfArray::read(r, ctx).map(a => Object::Array(a))
     // See the comment in `skip`.
@@ -198,9 +198,9 @@ pub extend Object with Readable::{read}
 /// An identifier for a PDF object.
 pub(all) struct ObjectIdentifier {
   /// The object number.
-  obj_number : Int
+  obj_number : Int32
   /// The generation number.
-  gen_number : Int
+  gen_number : Int32
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
@@ -226,19 +226,19 @@ pub extend ObjectIdentifier with @debug.Debug::{to_repr}
 ///|
 /// Create a new `ObjectIdentifier`.
 pub fn ObjectIdentifier::new(
-  obj_number : Int,
-  gen_number : Int,
+  obj_number : Int32,
+  gen_number : Int32,
 ) -> ObjectIdentifier {
   { obj_number, gen_number, }
 }
 
 ///|
 pub impl Readable for ObjectIdentifier with fn read(r, _) {
-  guard (r.read_without_context() : Int?) is Some(obj_number) else {
+  guard (r.read_without_context() : Int32?) is Some(obj_number) else {
     return None
   }
   r.skip_white_spaces_and_comments()
-  guard (r.read_without_context() : Int?) is Some(gen_number) else {
+  guard (r.read_without_context() : Int32?) is Some(gen_number) else {
     return None
   }
   r.skip_white_spaces_and_comments()

@@ -17,11 +17,11 @@ pub struct Content {
   location : Location?
   /// Manages the element during realization: bit 0 = prepared, bit n =
   /// guarded against the n-th show rule recipe.
-  lifecycle : Array[Int]
+  lifecycle : Array[Int32]
   /// The lazily computed hash of the field data (upstream: the `hash` in the
   /// content header) and its flags (see `fingerprint_flags`). Shared by all
   /// copies with the same `fields`.
-  priv data_hash : Ref[(U128, Int)?]
+  priv data_hash : Ref[(U128, Int32)?]
 }
 
 ///|
@@ -46,14 +46,14 @@ pub fn Content::from_fields(
 /// object for all such content (not upstream, where it is a bit set in the
 /// header): a lifecycle is never written to, [Content::guarded] extends a
 /// copy.
-let empty_lifecycle : Array[Int] = []
+let empty_lifecycle : Array[Int32] = []
 
 ///|
 /// Create content with the given required field values (in field order),
 /// leaving all other fields unset.
 pub fn Content::new(
   elem : Element,
-  required : ArrayView[(Int, Value)],
+  required : ArrayView[(Int32, Value)],
 ) -> Content {
   let fields = FixedArray::make(elem.fields().length(), (None : Value?))
   for pair in required {
@@ -121,13 +121,13 @@ pub fn Content::location(self : Content) -> Location? {
 
 ///|
 /// Check whether a show rule recipe is disabled.
-pub fn Content::is_guarded(self : Content, index : Int) -> Bool {
+pub fn Content::is_guarded(self : Content, index : Int32) -> Bool {
   self.lifecycle.contains(index)
 }
 
 ///|
 /// Disable a show rule recipe.
-pub fn Content::guarded(self : Content, index : Int) -> Content {
+pub fn Content::guarded(self : Content, index : Int32) -> Content {
   if self.lifecycle.contains(index) {
     self
   } else {
@@ -163,7 +163,7 @@ pub fn Content::can(self : Content, capability : String) -> Bool {
 
 ///|
 /// The raw stored value of a field by id (no styles).
-pub fn Content::field_raw(self : Content, id : Int) -> Value? {
+pub fn Content::field_raw(self : Content, id : Int32) -> Value? {
   // (Not `self.fields.get(id)`: its result is an option of an option, which
   // is allocated.)
   let fields = self.fields
@@ -176,7 +176,11 @@ pub fn Content::field_raw(self : Content, id : Int) -> Value? {
 
 ///|
 /// A copy with a field set to a value.
-pub fn Content::with_field(self : Content, id : Int, value : Value) -> Content {
+pub fn Content::with_field(
+  self : Content,
+  id : Int32,
+  value : Value,
+) -> Content {
   let fields = self.fields.copy()
   fields[id] = Some(value)
   self.with_fields(fields)
@@ -197,7 +201,7 @@ fn Content::fields_copy(self : Content) -> FixedArray[Value?] {
 /// field's type does.
 fn[T : IntoValue] set_field(
   fields : FixedArray[Value?],
-  id : Int,
+  id : Int32,
   value : T,
 ) -> Unit {
   fields[id] = Some(IntoValue::into_value(value))
@@ -205,7 +209,7 @@ fn[T : IntoValue] set_field(
 
 ///|
 /// A copy with a field unset.
-pub fn Content::without_field(self : Content, id : Int) -> Content {
+pub fn Content::without_field(self : Content, id : Int32) -> Content {
   let fields = self.fields.copy()
   fields[id] = None
   self.with_fields(fields)
@@ -261,7 +265,7 @@ pub fn FieldAccessError::message_no_default(
 /// (upstream `Content::get`).
 pub fn Content::get(
   self : Content,
-  id : Int,
+  id : Int32,
   styles? : StyleChain,
 ) -> Value raise FieldAccessError {
   if id == 255 {
@@ -311,7 +315,7 @@ pub fn Content::get_by_name(
 
 ///|
 /// Get a field by id, returning a string error.
-pub fn Content::field(self : Content, id : Int) -> Value raise HintedError {
+pub fn Content::field(self : Content, id : Int32) -> Value raise HintedError {
   self.get(id) catch {
     e =>
       raise HintedError(
@@ -522,7 +526,7 @@ pub fn Content::styled_with_map(self : Content, styles : Styles) -> Content {
 
 ///|
 /// Repeat this content `count` times.
-pub fn Content::repeat(self : Content, count : Int) -> Content {
+pub fn Content::repeat(self : Content, count : Int32) -> Content {
   Content::sequence(Array::make(count, self))
 }
 

@@ -39,7 +39,7 @@ fn Executor::execute_return(self : Executor, store : StoreInner) -> ControlFlow 
 /// `SlotSpan` of the results).
 ///
 /// The cells `dst..dst+len_results` are valid for all results.
-fn Executor::return_caller_results(self : Executor) -> Int {
+fn Executor::return_caller_results(self : Executor) -> Int32 {
   guard self.stack.calls.peek() is Some(callee) else {
     abort("the callee must exist on the call stack")
   }
@@ -208,9 +208,9 @@ fn Executor::execute_return_many(
 /// result cell (upstream's `copy_results` closure).
 fn Executor::copy_results(
   self : Executor,
-  dst : Int,
+  dst : Int32,
   values : FixedArray[@ir.Slot],
-) -> Int {
+) -> Int32 {
   let mut dst = dst
   for value in values {
     let src = self.sp + value.0
@@ -235,7 +235,7 @@ fn Executor::copy_results(
 /// - [`Op::ReturnMany`]
 fn Executor::copy_many_return_values(
   self : Executor,
-  ip : Int,
+  ip : Int32,
   values : FixedArray[@ir.Slot],
 ) -> Unit {
   let mut result = self.return_caller_results()

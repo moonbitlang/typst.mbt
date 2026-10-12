@@ -22,11 +22,11 @@ pub fn load_embedded(_name : CMapName) -> Bytes? {
 
 ///|
 /// A CID (Character Identifier).
-pub type Cid = UInt
+pub type Cid = UInt32
 
 ///|
 /// Let's limit the number of nested `usecmap` references to 16.
-const MAX_NESTING_DEPTH : Int = 16
+const MAX_NESTING_DEPTH : Int32 = 16
 
 ///|
 /// A parsed cmap.
@@ -102,7 +102,11 @@ pub fn CMap::metadata(self : CMap) -> Metadata {
 ///
 /// Returns `None` if the code does not match any range for the given byte
 /// length.
-pub fn CMap::lookup_cid_code(self : CMap, code : UInt, byte_len : Int) -> Cid? {
+pub fn CMap::lookup_cid_code(
+  self : CMap,
+  code : UInt32,
+  byte_len : Int32,
+) -> Cid? {
   // Note that, in theory, we are supposed to first check the code space range
   // whether the entry exists in the first place. However, from my experiments
   // Acrobat mostly seems to ignore this, so we do that as well.
@@ -143,14 +147,14 @@ pub fn CMap::lookup_cid_code(self : CMap, code : UInt, byte_len : Int) -> Cid? {
 /// `ToUnicode` cmap.
 ///
 /// Returns `None` if no mapping is available.
-pub fn CMap::lookup_bf_string(self : CMap, code : UInt) -> BfString? {
+pub fn CMap::lookup_bf_string(self : CMap, code : UInt32) -> BfString? {
   self.lookup_bf_string_inner(code, true)
 }
 
 ///|
 fn CMap::lookup_bf_string_inner(
   self : CMap,
-  code : UInt,
+  code : UInt32,
   recurse : Bool,
 ) -> BfString? {
   if find_in_ranges(self.bf_entries, code, e => e.range) is Some(entry) {
@@ -181,19 +185,19 @@ fn CMap::lookup_bf_string_inner(
 }
 
 ///|
-fn is_high_surrogate(u : Int) -> Bool {
+fn is_high_surrogate(u : Int32) -> Bool {
   u >= 0xD800 && u <= 0xDBFF
 }
 
 ///|
-fn is_low_surrogate(u : Int) -> Bool {
+fn is_low_surrogate(u : Int32) -> Bool {
   u >= 0xDC00 && u <= 0xDFFF
 }
 
 ///|
 /// Decode UTF-16 code units: a single character becomes `BfString::Char`,
 /// several characters `BfString::String`; ill-formed UTF-16 yields `None`.
-fn decode_utf16(units : Array[Int]) -> BfString? {
+fn decode_utf16(units : Array[Int32]) -> BfString? {
   // `core::char::decode_utf16(..).next()?.ok()?`
   guard units.length() > 0 else { return None }
   let u0 = units[0]
@@ -237,11 +241,11 @@ fn decode_utf16(units : Array[Int]) -> BfString? {
 /// found).
 fn[T] find_in_ranges(
   entries : Array[T],
-  code : UInt,
+  code : UInt32,
   range : (T) -> Range,
 ) -> T? {
   // -1: Less, 0: Equal, 1: Greater.
-  let cmp = fn(entry : T) -> Int {
+  let cmp = fn(entry : T) -> Int32 {
     let r = range(entry)
     if code < r.start {
       1
@@ -274,8 +278,8 @@ fn[T] find_in_ranges(
 ///|
 /// A range with a start and end code.
 priv struct Range {
-  start : UInt
-  end : UInt
+  start : UInt32
+  end : UInt32
 }
 
 ///|
@@ -298,7 +302,7 @@ fn PartitionedRanges::new() -> PartitionedRanges {
 ///|
 fn PartitionedRanges::push(
   self : PartitionedRanges,
-  byte_len : Int,
+  byte_len : Int32,
   range : CidRange,
 ) -> Unit {
   if byte_len >= 1 && byte_len <= 4 {
@@ -309,7 +313,7 @@ fn PartitionedRanges::push(
 ///|
 fn PartitionedRanges::get(
   self : PartitionedRanges,
-  byte_len : Int,
+  byte_len : Int32,
 ) -> Array[CidRange]? {
   if byte_len >= 1 && byte_len <= 4 {
     Some(self.buckets[byte_len - 1])
@@ -327,7 +331,7 @@ fn PartitionedRanges::sort(self : PartitionedRanges) -> Unit {
 
 ///|
 /// A stable sort by a `UInt` key (Rust's `sort_by` is stable).
-fn[T] stable_sort_by_start(arr : Array[T], key : (T) -> UInt) -> Unit {
+fn[T] stable_sort_by_start(arr : Array[T], key : (T) -> UInt32) -> Unit {
   let n = arr.length()
   if n < 2 {
     return
@@ -368,7 +372,7 @@ fn[T] stable_sort_by_start(arr : Array[T], key : (T) -> UInt) -> Unit {
 ///|
 priv struct BfRange {
   range : Range
-  dst_base : Array[Int]
+  dst_base : Array[Int32]
 }
 
 ///|
@@ -377,9 +381,9 @@ priv struct BfRange {
 // `#[allow(dead_code)]` (hayro-cmap/src/lib.rs:592).
 #warnings("-unused_field")
 priv struct CodespaceRange {
-  number_bytes : Int
-  low : UInt
-  high : UInt
+  number_bytes : Int32
+  low : UInt32
+  high : UInt32
 }
 
 ///|
@@ -523,7 +527,7 @@ pub(all) struct CharacterCollection {
   /// The registry+ordering family.
   family : CidFamily
   /// The supplement number.
-  supplement : Int
+  supplement : Int32
 } derive(Eq, Debug)
 
 ///|

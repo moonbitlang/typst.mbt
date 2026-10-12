@@ -12,7 +12,7 @@ let max_grid_index : Int64 = 0x3FFFFFFFL
 ///|
 /// Converts a user-provided `usize` into an index, saturating at
 /// [max_grid_index] (larger values will then fail the overflow checks).
-fn usize_index(v : Int64) -> Int {
+fn usize_index(v : Int64) -> Int32 {
   if v > max_grid_index {
     max_grid_index.to_int()
   } else {
@@ -21,7 +21,7 @@ fn usize_index(v : Int64) -> Int {
 }
 
 ///|
-fn max_int(a : Int, b : Int) -> Int {
+fn max_int(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a
   } else {
@@ -30,7 +30,7 @@ fn max_int(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn min_int(a : Int, b : Int) -> Int {
+fn min_int(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {
@@ -40,7 +40,7 @@ fn min_int(a : Int, b : Int) -> Int {
 
 ///|
 /// The integers in `start..end`.
-fn int_range(start : Int, end : Int) -> Array[Int] {
+fn int_range(start : Int32, end : Int32) -> Array[Int32] {
   let out = []
   for i in start..<end {
     out.push(i)
@@ -50,7 +50,7 @@ fn int_range(start : Int, end : Int) -> Array[Int] {
 
 ///|
 /// `n.next_multiple_of(m)` for non-negative `n` and positive `m`.
-fn next_multiple_of(n : Int, m : Int) -> Int {
+fn next_multiple_of(n : Int32, m : Int32) -> Int32 {
   let r = n % m
   if r == 0 {
     n
@@ -575,15 +575,15 @@ pub(all) struct Line {
   ///
   /// Must be within `0..=tracks.len()` (where `tracks` is either `grid.cols`
   /// or `grid.rows`, ignoring gutter tracks, as appropriate).
-  mut index : Int
+  mut index : Int32
   /// The index of the track at which this line starts being drawn.
   /// This is the first column a horizontal line appears in, or the first row
   /// a vertical line appears in.
-  start : Int
+  start : Int32
   /// The index after the last track through which the line is drawn.
   /// Thus, the line is drawn through tracks `start..end` (note that `end` is
   /// exclusive). `None` indicates the line should go all the way to the end.
-  end : Int?
+  end : Int32?
   /// The line's stroke. This is `None` when the line is explicitly used to
   /// override a previously specified line.
   stroke : ResolvedStroke?
@@ -599,8 +599,8 @@ pub extend Line with Eq::{not_equal, equal}
 ///|
 /// A range of rows `start..end` (upstream `Range<usize>`).
 pub(all) struct RowRange {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -620,7 +620,7 @@ pub extend RowRange with @debug.Debug::{to_repr}
 
 ///|
 /// Whether the range contains the given row.
-pub fn RowRange::contains(self : RowRange, row : Int) -> Bool {
+pub fn RowRange::contains(self : RowRange, row : Int32) -> Bool {
   self.start <= row && row < self.end
 }
 
@@ -652,13 +652,13 @@ pub extend Header with Eq::{not_equal, equal}
 /// A repeatable grid footer. Stops at the last row.
 pub(all) struct Footer {
   /// The first row included in this footer.
-  mut start : Int
+  mut start : Int32
   /// The index after the last row included in this footer.
-  mut end : Int
+  mut end : Int32
   /// The footer's level.
   ///
   /// Used similarly to header level.
-  level : Int
+  level : Int32
 } derive(Eq)
 
 ///|
@@ -709,8 +709,8 @@ pub(open) trait ResolvableCell {
   /// Returns a final Cell.
   fn resolve_cell(
     Self,
-    Int,
-    Int,
+    Int32,
+    Int32,
     Paint?,
     Smart[Alignment],
     Sides[Rel[Length]?],
@@ -720,13 +720,13 @@ pub(open) trait ResolvableCell {
     Smart[TableCellKind],
   ) -> Cell
   /// Returns this cell's column override.
-  fn cell_x(Self, StyleChain) -> Smart[Int]
+  fn cell_x(Self, StyleChain) -> Smart[Int32]
   /// Returns this cell's row override.
-  fn cell_y(Self, StyleChain) -> Smart[Int]
+  fn cell_y(Self, StyleChain) -> Smart[Int32]
   /// The amount of columns spanned by this cell.
-  fn cell_colspan(Self, StyleChain) -> Int
+  fn cell_colspan(Self, StyleChain) -> Int32
   /// The amount of rows spanned by this cell.
-  fn cell_rowspan(Self, StyleChain) -> Int
+  fn cell_rowspan(Self, StyleChain) -> Int32
   /// The cell's span, for errors.
   fn cell_span(Self) -> @syntax.Span
   /// An empty cell used to fill positions which weren't explicitly specified
@@ -740,9 +740,9 @@ pub(open) trait ResolvableCell {
 pub(all) struct ResolvableLine {
   /// The row above which the horizontal line is drawn, or the column before
   /// which the vertical line is drawn.
-  index : Smart[Int]
-  start : Int
-  end : Int?
+  index : Smart[Int32]
+  start : Int32
+  end : Int32?
   stroke : ResolvedStroke?
   /// The span of the corresponding line element.
   span : @syntax.Span
@@ -772,9 +772,9 @@ pub(all) struct Cell {
   /// The cell's fill.
   fill : Paint?
   /// The amount of columns spanned by the cell.
-  colspan : Int
+  colspan : Int32
   /// The amount of rows spanned by the cell.
-  rowspan : Int
+  rowspan : Int32
   /// The cell's stroke.
   stroke : Sides[ResolvedStroke?]
   /// Which stroke sides were explicitly overridden by the cell, over the
@@ -844,7 +844,7 @@ pub(all) enum Entry {
   Cell(Cell)
   /// An entry which is merged with another cell; holds the index of the cell
   /// this entry is merged with (`parent`).
-  Merged(Int)
+  Merged(Int32)
 } derive(Eq)
 
 ///|
@@ -947,7 +947,7 @@ pub fn CellGrid::new_internal(
   let has_gutter = gutter.any(tracks => !tracks.is_empty())
   let auto = Sizing::Auto
   let zero = Sizing::Rel(Rel::zero())
-  let get_or = (tracks : Array[Sizing], idx : Int, default : Sizing) => {
+  let get_or = (tracks : Array[Sizing], idx : Int32, default : Sizing) => {
     match tracks.get(idx) {
       Some(t) => t
       None =>
@@ -986,7 +986,7 @@ pub fn CellGrid::new_internal(
 /// Get the grid entry in column `x` and row `y`.
 ///
 /// Returns `None` if it's a gutter cell.
-pub fn CellGrid::entry(self : CellGrid, x : Int, y : Int) -> Entry? {
+pub fn CellGrid::entry(self : CellGrid, x : Int32, y : Int32) -> Entry? {
   guard x < self.cols.length() && y < self.rows.length() else {
     abort("grid position out of bounds")
   }
@@ -1008,7 +1008,7 @@ pub fn CellGrid::entry(self : CellGrid, x : Int, y : Int) -> Entry? {
 /// Get the content of the cell in column `x` and row `y`.
 ///
 /// Returns `None` if it's a gutter cell or merged position.
-pub fn CellGrid::cell(self : CellGrid, x : Int, y : Int) -> Cell? {
+pub fn CellGrid::cell(self : CellGrid, x : Int32, y : Int32) -> Cell? {
   match self.entry(x, y) {
     Some(entry) => entry.as_cell()
     None => None
@@ -1025,9 +1025,9 @@ pub fn CellGrid::cell(self : CellGrid, x : Int, y : Int) -> Cell? {
 /// - If it is a gutter cell, returns None.
 pub fn CellGrid::parent_cell_position(
   self : CellGrid,
-  x : Int,
-  y : Int,
-) -> Axes[Int]? {
+  x : Int32,
+  y : Int32,
+) -> Axes[Int32]? {
   self
   .entry(x, y)
   .map(entry => {
@@ -1061,9 +1061,9 @@ pub fn CellGrid::parent_cell_position(
 /// gutter and no cell spans it).
 pub fn CellGrid::effective_parent_cell_position(
   self : CellGrid,
-  x : Int,
-  y : Int,
-) -> Axes[Int]? {
+  x : Int32,
+  y : Int32,
+) -> Axes[Int32]? {
   if self.has_gutter {
     // If (x, y) is a gutter cell, we skip it (skip a gutter column and
     // row) to the nearest adjacent content cell, in the direction
@@ -1084,14 +1084,17 @@ pub fn CellGrid::effective_parent_cell_position(
 ///|
 /// Checks if the track with the given index is gutter.
 /// Does not check if the index is a valid track.
-pub fn CellGrid::is_gutter_track(self : CellGrid, index : Int) -> Bool {
+pub fn CellGrid::is_gutter_track(self : CellGrid, index : Int32) -> Bool {
   self.has_gutter && index % 2 == 1
 }
 
 ///|
 /// Returns the effective colspan of a cell, considering the gutters it
 /// might span if the grid has gutters.
-pub fn CellGrid::effective_colspan_of_cell(self : CellGrid, cell : Cell) -> Int {
+pub fn CellGrid::effective_colspan_of_cell(
+  self : CellGrid,
+  cell : Cell,
+) -> Int32 {
   if self.has_gutter {
     2 * cell.colspan - 1
   } else {
@@ -1102,7 +1105,10 @@ pub fn CellGrid::effective_colspan_of_cell(self : CellGrid, cell : Cell) -> Int 
 ///|
 /// Returns the effective rowspan of a cell, considering the gutters it
 /// might span if the grid has gutters.
-pub fn CellGrid::effective_rowspan_of_cell(self : CellGrid, cell : Cell) -> Int {
+pub fn CellGrid::effective_rowspan_of_cell(
+  self : CellGrid,
+  cell : Cell,
+) -> Int32 {
   if self.has_gutter {
     2 * cell.rowspan - 1
   } else {
@@ -1111,7 +1117,7 @@ pub fn CellGrid::effective_rowspan_of_cell(self : CellGrid, cell : Cell) -> Int 
 }
 
 ///|
-pub fn CellGrid::non_gutter_column_count(self : CellGrid) -> Int {
+pub fn CellGrid::non_gutter_column_count(self : CellGrid) -> Int32 {
   if self.has_gutter {
     // Calculation: With gutters, we have
     // 'cols = 2 * (non-gutter cols) - 1', since there is a gutter
@@ -1126,7 +1132,7 @@ pub fn CellGrid::non_gutter_column_count(self : CellGrid) -> Int {
 }
 
 ///|
-pub fn CellGrid::non_gutter_row_count(self : CellGrid) -> Int {
+pub fn CellGrid::non_gutter_row_count(self : CellGrid) -> Int32 {
   if self.has_gutter {
     // Same calculation as for columns.
     1 + self.rows.length() / 2
@@ -1224,7 +1230,7 @@ priv struct RowGroupData {
   /// These hlines were auto-positioned and appeared before any auto-pos
   /// cells, so they will appear at the first possible row (above the
   /// first row spanned by the row group).
-  top_hlines_start : Int
+  top_hlines_start : Int32
   /// End of the range of indices of hlines at the top of the row group.
   ///
   /// This starts as `None`, meaning that, if we stop the loop before we find
@@ -1234,7 +1240,7 @@ priv struct RowGroupData {
   /// It becomes `Some(index of last hline at the top)` when an auto-pos cell
   /// is found, as auto-pos hlines after any auto-pos cells appear below
   /// them, not at the top of the row group.
-  mut top_hlines_end : Int?
+  mut top_hlines_end : Int32?
 }
 
 ///|
@@ -1242,7 +1248,7 @@ priv struct RowGroupData {
 priv struct RowSet(Array[Bool])
 
 ///|
-fn RowSet::insert(self : RowSet, row : Int) -> Unit {
+fn RowSet::insert(self : RowSet, row : Int32) -> Unit {
   while self.0.length() <= row {
     self.0.push(false)
   }
@@ -1250,7 +1256,7 @@ fn RowSet::insert(self : RowSet, row : Int) -> Unit {
 }
 
 ///|
-fn RowSet::contains(self : RowSet, row : Int) -> Bool {
+fn RowSet::contains(self : RowSet, row : Int32) -> Bool {
   row >= 0 && row < self.0.length() && self.0[row]
 }
 
@@ -1272,10 +1278,10 @@ priv struct ResolveState {
   headers : Array[Repeatable[Header]]
   /// Stores where the footer is supposed to end, its span, and the actual
   /// footer structure.
-  mut footer : (Int, @syntax.Span, Footer)?
+  mut footer : (Int32, @syntax.Span, Footer)?
   mut repeat_footer : Bool
   /// The position of the next cell with (x: auto, y: auto).
-  auto_index : Ref[Int]
+  auto_index : Ref[Int32]
   resolved_cells : Array[Entry?]
   /// If true, there has been at least one cell besides headers and
   /// footers. When false, footers at the end are forced to not repeat.
@@ -1358,7 +1364,7 @@ fn[T : ResolvableCell] CellGridResolver::resolve(
 /// previous one, perhaps skipping existing cells along the way.
 fn[T : ResolvableCell] CellGridResolver::resolve_grid_child(
   self : CellGridResolver,
-  columns : Int,
+  columns : Int32,
   state : ResolveState,
   child : ResolvableGridChild[T],
 ) -> Unit raise SourceError {
@@ -1859,7 +1865,7 @@ fn[T : ResolvableCell] CellGridResolver::resolve_grid_child(
 fn[T : ResolvableCell] CellGridResolver::fixup_cells(
   self : CellGridResolver,
   resolved_cells : Array[Entry?],
-  columns : Int,
+  columns : Int32,
   _ty : Ty[T],
 ) -> Array[Entry] raise SourceError {
   let expected_total_cells = columns.to_int64() *
@@ -1902,8 +1908,8 @@ fn CellGridResolver::collect_lines(
   pending_hlines : Array[(@syntax.Span, Line, Bool)],
   pending_vlines : Array[(@syntax.Span, Line)],
   has_gutter : Bool,
-  columns : Int,
-  row_amount : Int,
+  columns : Int32,
+  row_amount : Int32,
 ) -> (Array[Array[Line]], Array[Array[Line]]) raise SourceError {
   let hlines : Array[Array[Line]] = []
   let vlines : Array[Array[Line]] = []
@@ -1988,9 +1994,9 @@ fn CellGridResolver::finalize_headers_and_footers(
   _self : CellGridResolver,
   has_gutter : Bool,
   headers : Array[Repeatable[Header]],
-  footer : (Int, @syntax.Span, Footer)?,
+  footer : (Int32, @syntax.Span, Footer)?,
   repeat_footer : Bool,
-  row_amount : Int,
+  row_amount : Int32,
   at_least_one_cell : Bool,
 ) -> Repeatable[Footer]? raise SourceError {
   headers.sort_by_key(h => h.inner.range.start)
@@ -2102,9 +2108,9 @@ fn CellGridResolver::finalize_headers_and_footers(
 fn[T : ResolvableCell] CellGridResolver::resolve_cell(
   self : CellGridResolver,
   cell : T,
-  x : Int,
-  y : Int,
-  rowspan : Int,
+  x : Int32,
+  y : Int32,
+  rowspan : Int32,
   kind : Smart[TableCellKind],
 ) -> Cell raise SourceError {
   // Resolve the breakability of a cell. Cells that span at least one
@@ -2112,7 +2118,7 @@ fn[T : ResolvableCell] CellGridResolver::resolve_cell(
   let breakable = {
     let auto = Sizing::Auto
     let zero = Sizing::Rel(Rel::zero())
-    let track_at = (tracks : Array[Sizing], i : Int, default : Sizing) => {
+    let track_at = (tracks : Array[Sizing], i : Int32, default : Sizing) => {
       match tracks.get(i) {
         Some(t) => t
         None =>
@@ -2172,10 +2178,10 @@ fn expand_row_group(
   resolved_cells : Array[Entry?],
   group_range : RowRange?,
   group_kind : RowGroupKind,
-  first_available_row : Int,
-  cell_y : Int,
-  rowspan : Int,
-  columns : Int,
+  first_available_row : Int32,
+  cell_y : Int32,
+  rowspan : Int32,
+  columns : Int32,
 ) -> RowRange raise HintedError {
   // Ensure each cell in a header or footer is fully contained within it by
   // expanding the header or footer towards this new cell.
@@ -2199,7 +2205,7 @@ fn expand_row_group(
       ["try moving its cells to available rows"],
     )
   }
-  let new_rows : Array[Int] = match group_range {
+  let new_rows : Array[Int32] = match group_range {
     None => int_range(new_group_start, new_group_end)
     Some(r) =>
       // NOTE: 'r.end' is one row AFTER the row group's last row, so it
@@ -2259,9 +2265,9 @@ fn expand_row_group(
 fn check_for_conflicting_cell_row(
   header_rows : RowSet,
   headers : Array[Repeatable[Header]],
-  footer : (Int, @syntax.Span, Footer)?,
-  cell_y : Int,
-  rowspan : Int,
+  footer : (Int32, @syntax.Span, Footer)?,
+  cell_y : Int32,
+  rowspan : Int32,
 ) -> Unit raise HintedError {
   if !headers.is_empty() {
     for row in cell_y..<(cell_y + rowspan) {
@@ -2295,7 +2301,7 @@ fn check_for_conflicting_cell_row(
 ///|
 /// Translates a (x, y) position to the equivalent index in the final cell
 /// vector. Errors if the position would be too large.
-fn cell_index(x : Int, y : Int, columns : Int) -> Int raise HintedError {
+fn cell_index(x : Int32, y : Int32, columns : Int32) -> Int32 raise HintedError {
   let index = y.to_int64() * columns.to_int64() + x.to_int64()
   if index > max_grid_index {
     bail("cell position too large")
@@ -2314,19 +2320,19 @@ fn cell_index(x : Int, y : Int, columns : Int) -> Int raise HintedError {
 /// not be picked by cells with `auto` row positioning, since headers and
 /// footers occupy entire rows, and may not conflict with cells outside them.
 fn resolve_cell_position(
-  cell_x : Smart[Int],
-  cell_y : Smart[Int],
-  colspan : Int,
-  rowspan : Int,
+  cell_x : Smart[Int32],
+  cell_y : Smart[Int32],
+  colspan : Int32,
+  rowspan : Int32,
   header_rows : RowSet,
   headers : Array[Repeatable[Header]],
-  footer : (Int, @syntax.Span, Footer)?,
+  footer : (Int32, @syntax.Span, Footer)?,
   resolved_cells : Array[Entry?],
-  auto_index : Ref[Int],
-  first_available_row : Int,
-  columns : Int,
+  auto_index : Ref[Int32],
+  first_available_row : Int32,
+  columns : Int32,
   in_row_group : Bool,
-) -> Int raise HintedError {
+) -> Int32 raise HintedError {
   match (cell_x, cell_y) {
     // Fully automatic cell positioning. The cell did not
     // request a coordinate.
@@ -2446,12 +2452,12 @@ fn resolve_cell_position(
 /// the column. That is used to find a position for a fixed column cell.
 fn find_next_available_position(
   header_rows : RowSet,
-  footer : (Int, @syntax.Span, Footer)?,
+  footer : (Int32, @syntax.Span, Footer)?,
   resolved_cells : Array[Entry?],
-  columns : Int,
-  initial_index : Int,
+  columns : Int32,
+  initial_index : Int32,
   skip_rows : Bool,
-) -> Int raise HintedError {
+) -> Int32 raise HintedError {
   let mut resolved_index = initial_index
   while true {
     if resolved_cells.get(resolved_index) is Some(Some(_)) {
@@ -2506,9 +2512,9 @@ fn find_next_available_position(
 /// before automatically-positioned cells, as they are placed sequentially.
 fn find_next_empty_row(
   resolved_cells : Array[Entry?],
-  auto_index : Int,
-  columns : Int,
-) -> Int {
+  auto_index : Int32,
+  columns : Int32,
+) -> Int32 {
   let mut resolved_index = next_multiple_of(auto_index, columns)
   while resolved_index + columns <= resolved_cells.length() &&
         row_any_some(resolved_cells, resolved_index, columns) {
@@ -2519,7 +2525,7 @@ fn find_next_empty_row(
 }
 
 ///|
-fn row_any_some(cells : Array[Entry?], start : Int, columns : Int) -> Bool {
+fn row_any_some(cells : Array[Entry?], start : Int32, columns : Int32) -> Bool {
   for i in start..<(start + columns) {
     if cells[i] is Some(_) {
       return true
@@ -2538,8 +2544,8 @@ fn row_any_some(cells : Array[Entry?], start : Int, columns : Int) -> Bool {
 /// rowspans and disappear (except at the presence of column gutter).
 fn skip_auto_index_through_fully_merged_rows(
   resolved_cells : Array[Entry?],
-  auto_index : Ref[Int],
-  columns : Int,
+  auto_index : Ref[Int32],
+  columns : Int32,
 ) -> Unit {
   // If the auto index isn't currently at the start of a row, that means
   // there's still at least one auto position left in the row, ignoring
@@ -2554,7 +2560,11 @@ fn skip_auto_index_through_fully_merged_rows(
 }
 
 ///|
-fn row_all_merged(cells : Array[Entry?], start : Int, columns : Int) -> Bool {
+fn row_all_merged(
+  cells : Array[Entry?],
+  start : Int32,
+  columns : Int32,
+) -> Bool {
   for i in start..<(start + columns) {
     if !(cells[i] is Some(Merged(_))) {
       return false

@@ -24,7 +24,7 @@ pub impl FromReader for Bool with fn from_reader(reader) {
 }
 
 ///|
-pub impl FromReader for UInt with fn from_reader(reader) {
+pub impl FromReader for UInt32 with fn from_reader(reader) {
   reader.read_var_u32()
 }
 
@@ -54,7 +54,7 @@ pub fn[T : FromReader] BinaryReader::read(
 /// the reader (upstream's `Clone`).
 pub struct SectionLimited[_] {
   priv reader : BinaryReader
-  priv count : UInt
+  priv count : UInt32
 }
 
 ///|
@@ -72,13 +72,13 @@ pub fn[T] SectionLimited::new(
 
 ///|
 /// Returns the count of total items within this section.
-pub fn[T] SectionLimited::count(self : SectionLimited[T]) -> UInt {
+pub fn[T] SectionLimited::count(self : SectionLimited[T]) -> UInt32 {
   self.count
 }
 
 ///|
 /// Returns whether the original byte offset of this section.
-pub fn[T] SectionLimited::original_position(self : SectionLimited[T]) -> Int {
+pub fn[T] SectionLimited::original_position(self : SectionLimited[T]) -> Int32 {
   self.reader.original_position()
 }
 
@@ -101,7 +101,7 @@ pub fn[T] SectionLimited::clone(self : SectionLimited[T]) -> SectionLimited[T] {
 /// trailing data at the end of the section as an error.
 pub struct SectionLimitedIntoIter[T] {
   priv section : SectionLimited[T]
-  priv mut remaining : UInt
+  priv mut remaining : UInt32
   priv mut end : Bool
 }
 
@@ -117,7 +117,7 @@ pub fn[T] SectionLimited::into_iter(
 /// Returns the current byte offset of the section within this iterator.
 pub fn[T] SectionLimitedIntoIter::original_position(
   self : SectionLimitedIntoIter[T],
-) -> Int {
+) -> Int32 {
   self.section.reader.original_position()
 }
 
@@ -152,7 +152,7 @@ pub fn[T : FromReader] SectionLimitedIntoIter::next(
 /// `SectionLimitedIntoIterWithOffsets::next`: the item along with its offset.
 pub fn[T : FromReader] SectionLimitedIntoIter::next_with_offset(
   self : SectionLimitedIntoIter[T],
-) -> (Int, T)? raise BinaryReaderError {
+) -> (Int32, T)? raise BinaryReaderError {
   let pos = self.section.reader.original_position()
   match self.next() {
     Some(item) => Some((pos, item))
@@ -164,7 +164,7 @@ pub fn[T : FromReader] SectionLimitedIntoIter::next_with_offset(
 /// Returns the number of items left (`size_hint`).
 pub fn[T] SectionLimitedIntoIter::remaining(
   self : SectionLimitedIntoIter[T],
-) -> UInt {
+) -> UInt32 {
   self.remaining
 }
 

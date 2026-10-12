@@ -2,65 +2,65 @@
 // as used for lossy WebP images.
 
 ///|
-let max_segments : Int = 4
+let max_segments : Int32 = 4
 
 ///|
-let num_dct_tokens : Int = 12
+let num_dct_tokens : Int32 = 12
 
 // Prediction modes (`DC_PRED` ... `B_PRED`, `B_DC_PRED` ... `B_HU_PRED`).
 
 ///|
-let dc_pred : Int = 0
+let dc_pred : Int32 = 0
 
 ///|
-let v_pred : Int = 1
+let v_pred : Int32 = 1
 
 ///|
-let h_pred : Int = 2
+let h_pred : Int32 = 2
 
 ///|
-let tm_pred : Int = 3
+let tm_pred : Int32 = 3
 
 ///|
-let b_pred : Int = 4
+let b_pred : Int32 = 4
 
 ///|
-let b_dc_pred : Int = 0
+let b_dc_pred : Int32 = 0
 
 ///|
-let b_tm_pred : Int = 1
+let b_tm_pred : Int32 = 1
 
 ///|
-let b_ve_pred : Int = 2
+let b_ve_pred : Int32 = 2
 
 ///|
-let b_he_pred : Int = 3
+let b_he_pred : Int32 = 3
 
 ///|
-let b_ld_pred : Int = 4
+let b_ld_pred : Int32 = 4
 
 ///|
-let b_rd_pred : Int = 5
+let b_rd_pred : Int32 = 5
 
 ///|
-let b_vr_pred : Int = 6
+let b_vr_pred : Int32 = 6
 
 ///|
-let b_vl_pred : Int = 7
+let b_vl_pred : Int32 = 7
 
 ///|
-let b_hd_pred : Int = 8
+let b_hd_pred : Int32 = 8
 
 ///|
-let b_hu_pred : Int = 9
+let b_hu_pred : Int32 = 9
 
 ///|
-let segment_id_tree : ReadOnlyArray[Int] = [2, 4, -0, -1, -2, -3]
+let segment_id_tree : ReadOnlyArray[Int32] = [2, 4, -0, -1, -2, -3]
 
 ///|
 /// Section 11.2: tree for determining the keyframe luma intra prediction
 /// modes.
-let keyframe_ymode_tree : ReadOnlyArray[Int] = [
+let keyframe_ymode_tree : ReadOnlyArray[Int32] = [
   -b_pred,
   2,
   4,
@@ -72,11 +72,11 @@ let keyframe_ymode_tree : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let keyframe_ymode_probs : ReadOnlyArray[Int] = [145, 156, 163, 128]
+let keyframe_ymode_probs : ReadOnlyArray[Int32] = [145, 156, 163, 128]
 
 ///|
 /// Tree for determining the keyframe B_PRED mode.
-let keyframe_bpred_mode_tree : ReadOnlyArray[Int] = [
+let keyframe_bpred_mode_tree : ReadOnlyArray[Int32] = [
   -b_dc_pred,
   2,
   -b_tm_pred,
@@ -99,7 +99,7 @@ let keyframe_bpred_mode_tree : ReadOnlyArray[Int] = [
 
 ///|
 /// Section 11.4: tree for determining macroblock the chroma mode.
-let keyframe_uv_mode_tree : ReadOnlyArray[Int] = [
+let keyframe_uv_mode_tree : ReadOnlyArray[Int32] = [
   -dc_pred,
   2,
   -v_pred,
@@ -109,41 +109,41 @@ let keyframe_uv_mode_tree : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let keyframe_uv_mode_probs : ReadOnlyArray[Int] = [142, 114, 183]
+let keyframe_uv_mode_probs : ReadOnlyArray[Int32] = [142, 114, 183]
 
 // DCT tokens.
 
 ///|
-let dct_0 : Int = 0
+let dct_0 : Int32 = 0
 
 ///|
-let dct_4 : Int = 4
+let dct_4 : Int32 = 4
 
 ///|
-let dct_cat1 : Int = 5
+let dct_cat1 : Int32 = 5
 
 ///|
-let dct_cat6 : Int = 10
+let dct_cat6 : Int32 = 10
 
 ///|
-let dct_eob : Int = 11
+let dct_eob : Int32 = 11
 
 ///|
-let dct_token_tree : ReadOnlyArray[Int] = [
+let dct_token_tree : ReadOnlyArray[Int32] = [
   -11, 2, -0, 4, -1, 6, 8, 12, -2, 10, -3, -4, 14, 16, -5, -6, 18, 20, -7, -8, -9,
   -10,
 ]
 
 ///|
-let dct_cat_base : ReadOnlyArray[Int] = [5, 7, 11, 19, 35, 67]
+let dct_cat_base : ReadOnlyArray[Int32] = [5, 7, 11, 19, 35, 67]
 
 ///|
-let coeff_bands : ReadOnlyArray[Int] = [
+let coeff_bands : ReadOnlyArray[Int32] = [
   0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7,
 ]
 
 ///|
-let zigzag : ReadOnlyArray[Int] = [
+let zigzag : ReadOnlyArray[Int32] = [
   0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15,
 ]
 
@@ -171,11 +171,11 @@ let keyframe_bpred_mode_nodes : Array[FixedArray[TreeNode]] = Array::makei(
 
 ///|
 priv struct MacroBlock {
-  bpred : FixedArray[Int]
-  complexity : FixedArray[Int]
-  mut luma_mode : Int
-  mut chroma_mode : Int
-  mut segmentid : Int
+  bpred : FixedArray[Int32]
+  complexity : FixedArray[Int32]
+  mut luma_mode : Int32
+  mut chroma_mode : Int32
+  mut segmentid : Int32
   mut coeffs_skipped : Bool
   mut non_zero_dct : Bool
 }
@@ -205,22 +205,22 @@ fn MacroBlock::copy(self : MacroBlock) -> MacroBlock {
 // upstream (image-webp 0.2.4 src/vp8.rs:788-797, written :1174-1229).
 #warnings("-unused_field")
 priv struct Vp8Frame {
-  mut width : Int
-  mut height : Int
+  mut width : Int32
+  mut height : Int32
   mut ybuf : FixedArray[Byte]
   mut ubuf : FixedArray[Byte]
   mut vbuf : FixedArray[Byte]
   mut keyframe : Bool
-  mut version : Int
+  mut version : Int32
   mut for_display : Bool
-  mut pixel_type : Int
+  mut pixel_type : Int32
   mut filter_type : Bool
-  mut filter_level : Int
-  mut sharpness_level : Int
+  mut filter_level : Int32
+  mut sharpness_level : Int32
 }
 
 ///|
-fn Vp8Frame::buffer_width(self : Vp8Frame) -> Int {
+fn Vp8Frame::buffer_width(self : Vp8Frame) -> Int32 {
   let difference = self.width % 16
   if difference > 0 {
     self.width + (16 - difference % 16)
@@ -235,7 +235,7 @@ fn Vp8Frame::buffer_width(self : Vp8Frame) -> Int {
 fn Vp8Frame::fill_rgb(
   self : Vp8Frame,
   buf : FixedArray[Byte],
-  bpp : Int,
+  bpp : Int32,
 ) -> Unit {
   fill_rgb_buffer_fancy(
     buf,
@@ -251,39 +251,39 @@ fn Vp8Frame::fill_rgb(
 
 ///|
 priv struct Segment {
-  mut ydc : Int
-  mut yac : Int
-  mut y2dc : Int
-  mut y2ac : Int
-  mut uvdc : Int
-  mut uvac : Int
+  mut ydc : Int32
+  mut yac : Int32
+  mut y2dc : Int32
+  mut y2ac : Int32
+  mut uvdc : Int32
+  mut uvac : Int32
   mut delta_values : Bool
-  mut quantizer_level : Int
-  mut loopfilter_level : Int
+  mut quantizer_level : Int32
+  mut loopfilter_level : Int32
 }
 
 ///|
 priv struct Vp8Decoder {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
   b : ArithmeticDecoder
-  mut mbwidth : Int
-  mut mbheight : Int
+  mut mbwidth : Int32
+  mut mbheight : Int32
   macroblocks : Array[MacroBlock]
   frame : Vp8Frame
   mut segments_enabled : Bool
   mut segments_update_map : Bool
   segment : FixedArray[Segment]
   mut loop_filter_adjustments_enabled : Bool
-  ref_delta : FixedArray[Int]
-  mode_delta : FixedArray[Int]
+  ref_delta : FixedArray[Int32]
+  mode_delta : FixedArray[Int32]
   partitions : FixedArray[ArithmeticDecoder]
-  mut num_partitions : Int
+  mut num_partitions : Int32
   segment_tree_nodes : FixedArray[TreeNode]
   /// `token_probs[i][j][k]` at `(i * 8 + j) * 3 + k`.
   token_probs : Array[FixedArray[TreeNode]]
-  prob_intra : Int
-  mut prob_skip_false : Int?
+  prob_intra : Int32
+  mut prob_skip_false : Int32?
   mut top : Array[MacroBlock]
   mut left : MacroBlock
   mut top_border_y : FixedArray[Byte]
@@ -355,7 +355,7 @@ fn Vp8Decoder::new(data : BytesView) -> Vp8Decoder {
 ///|
 fn Vp8Decoder::read_bytes(
   self : Vp8Decoder,
-  n : Int,
+  n : Int32,
 ) -> BytesView raise ImageError {
   if self.pos + n > self.data.length() || n < 0 {
     raise ImageError("IO Error: failed to fill whole buffer")
@@ -384,7 +384,7 @@ fn Vp8Decoder::update_token_probabilities(
 ///|
 fn Vp8Decoder::init_partitions(
   self : Vp8Decoder,
-  n : Int,
+  n : Int32,
 ) -> Unit raise ImageError {
   if n > 1 {
     let sizes = self.read_bytes(3 * n - 3)
@@ -405,8 +405,8 @@ fn Vp8Decoder::init_partitions(
 fn Vp8Decoder::read_quantization_indices(
   self : Vp8Decoder,
 ) -> Unit raise ImageError {
-  let dc_quant = (index : Int) => dc_quant_table[clamp(index, 0, 127)]
-  let ac_quant = (index : Int) => ac_quant_table[clamp(index, 0, 127)]
+  let dc_quant = (index : Int32) => dc_quant_table[clamp(index, 0, 127)]
+  let ac_quant = (index : Int32) => ac_quant_table[clamp(index, 0, 127)]
   let yac_abs = self.b.read_literal(7)
   let ydc_delta = self.b.read_optional_signed_value(4)
   let y2dc_delta = self.b.read_optional_signed_value(4)
@@ -444,7 +444,7 @@ fn Vp8Decoder::read_quantization_indices(
 }
 
 ///|
-fn clamp(v : Int, lo : Int, hi : Int) -> Int {
+fn clamp(v : Int32, lo : Int32, hi : Int32) -> Int32 {
   if v < lo {
     lo
   } else if v > hi {
@@ -456,7 +456,7 @@ fn clamp(v : Int, lo : Int, hi : Int) -> Int {
 
 ///|
 /// `x as i8` for a small integer.
-fn as_i8(x : Int) -> Int {
+fn as_i8(x : Int32) -> Int32 {
   let x = x & 0xFF
   if x >= 128 {
     x - 256
@@ -611,7 +611,7 @@ fn hex_byte(b : Byte) -> String {
 ///|
 fn Vp8Decoder::read_macroblock_header(
   self : Vp8Decoder,
-  mbx : Int,
+  mbx : Int32,
 ) -> MacroBlock raise ImageError {
   let mb = MacroBlock::default()
   if self.segments_enabled && self.segments_update_map {
@@ -677,7 +677,7 @@ fn Vp8Decoder::read_macroblock_header(
 
 ///|
 /// `LumaMode::into_intra`.
-fn luma_into_intra(mode : Int) -> Int? {
+fn luma_into_intra(mode : Int32) -> Int32? {
   if mode == dc_pred {
     Some(b_dc_pred)
   } else if mode == v_pred {
@@ -694,10 +694,10 @@ fn luma_into_intra(mode : Int) -> Int? {
 ///|
 fn Vp8Decoder::intra_predict_luma(
   self : Vp8Decoder,
-  mbx : Int,
-  mby : Int,
+  mbx : Int32,
+  mby : Int32,
   mb : MacroBlock,
-  resdata : FixedArray[Int],
+  resdata : FixedArray[Int32],
 ) -> Unit {
   let stride = 1 + 16 + 4
   let mw = self.mbwidth
@@ -747,10 +747,10 @@ fn Vp8Decoder::intra_predict_luma(
 ///|
 fn Vp8Decoder::intra_predict_chroma(
   self : Vp8Decoder,
-  mbx : Int,
-  mby : Int,
+  mbx : Int32,
+  mby : Int32,
   mb : MacroBlock,
-  resdata : FixedArray[Int],
+  resdata : FixedArray[Int32],
 ) -> Unit {
   let stride = 1 + 8
   let mw = self.mbwidth
@@ -805,13 +805,13 @@ fn Vp8Decoder::intra_predict_chroma(
 /// Reads the coefficients of one block into `block[off..off + 16]`.
 fn Vp8Decoder::read_coefficients(
   self : Vp8Decoder,
-  block : FixedArray[Int],
-  off : Int,
-  p : Int,
-  plane : Int,
-  complexity : Int,
-  dcq : Int,
-  acq : Int,
+  block : FixedArray[Int32],
+  off : Int32,
+  p : Int32,
+  plane : Int32,
+  complexity : Int32,
+  dcq : Int32,
+  acq : Int32,
 ) -> Bool raise ImageError {
   guard! complexity <= 2
   let first = if plane == 0 { 1 } else { 0 }
@@ -867,9 +867,9 @@ fn Vp8Decoder::read_coefficients(
 fn Vp8Decoder::read_residual_data(
   self : Vp8Decoder,
   mb : MacroBlock,
-  mbx : Int,
-  p : Int,
-) -> FixedArray[Int] raise ImageError {
+  mbx : Int32,
+  p : Int32,
+) -> FixedArray[Int32] raise ImageError {
   let sindex = mb.segmentid
   let blocks = FixedArray::make(384, 0)
   let mut plane = if mb.luma_mode == b_pred { 3 } else { 1 }
@@ -948,8 +948,8 @@ fn Vp8Decoder::read_residual_data(
 /// Does loop filtering on the macroblock.
 fn Vp8Decoder::loop_filter(
   self : Vp8Decoder,
-  mbx : Int,
-  mby : Int,
+  mbx : Int32,
+  mby : Int32,
   mb : MacroBlock,
 ) -> Unit {
   let luma_w = self.mbwidth * 16
@@ -1160,7 +1160,7 @@ fn Vp8Decoder::loop_filter(
 fn Vp8Decoder::calculate_filter_parameters(
   self : Vp8Decoder,
   macroblock : MacroBlock,
-) -> (Int, Int, Int) {
+) -> (Int32, Int32, Int32) {
   let segment = self.segment[macroblock.segmentid]
   let mut filter_level = self.frame.filter_level
 
@@ -1258,7 +1258,7 @@ fn vp8_decode_frame(data : BytesView) -> Vp8Frame raise ImageError {
 }
 
 ///|
-fn init_top_macroblocks(width : Int) -> Array[MacroBlock] {
+fn init_top_macroblocks(width : Int32) -> Array[MacroBlock] {
   let mb_width = (width + 15) / 16
   // Section 11.3 #3
   Array::makei(mb_width, _ => MacroBlock::default())
@@ -1266,9 +1266,9 @@ fn init_top_macroblocks(width : Int) -> Array[MacroBlock] {
 
 ///|
 fn create_border_luma(
-  mbx : Int,
-  mby : Int,
-  mbw : Int,
+  mbx : Int32,
+  mby : Int32,
+  mbw : Int32,
   top : FixedArray[Byte],
   left : FixedArray[Byte],
 ) -> FixedArray[Byte] {
@@ -1316,8 +1316,8 @@ fn create_border_luma(
 ///|
 /// Creates the left and top border for chroma prediction.
 fn create_border_chroma(
-  mbx : Int,
-  mby : Int,
+  mbx : Int32,
+  mby : Int32,
   top : FixedArray[Byte],
   left : FixedArray[Byte],
 ) -> FixedArray[Byte] {
@@ -1358,7 +1358,7 @@ fn set_chroma_border(
   left_border : FixedArray[Byte],
   top_border : FixedArray[Byte],
   chroma_block : FixedArray[Byte],
-  mbx : Int,
+  mbx : Int32,
 ) -> Unit {
   let stride = 1 + 8
   // top left is top right of previous chroma block
@@ -1387,11 +1387,11 @@ fn avg2(this : Byte, right : Byte) -> Byte {
 /// (`x0`, `y0`).
 fn add_residue(
   pblock : FixedArray[Byte],
-  rblock : FixedArray[Int],
-  roff : Int,
-  y0 : Int,
-  x0 : Int,
-  stride : Int,
+  rblock : FixedArray[Int32],
+  roff : Int32,
+  y0 : Int32,
+  x0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let mut pos = y0 * stride + x0
   for r in 0..<4 {
@@ -1406,9 +1406,9 @@ fn add_residue(
 ///|
 fn predict_4x4(
   ws : FixedArray[Byte],
-  stride : Int,
-  modes : FixedArray[Int],
-  resdata : FixedArray[Int],
+  stride : Int32,
+  modes : FixedArray[Int32],
+  resdata : FixedArray[Int32],
 ) -> Unit {
   for sby in 0..<4 {
     for sbx in 0..<4 {
@@ -1447,10 +1447,10 @@ fn predict_4x4(
 /// columns after the first, like upstream's slice zip).
 fn predict_vpred(
   a : FixedArray[Byte],
-  size : Int,
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  size : Int32,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let above_len = stride * y0 - x0
   let n = if stride - 1 < above_len { stride - 1 } else { above_len }
@@ -1466,10 +1466,10 @@ fn predict_vpred(
 /// This pass copies the first value of a row to the values right of it.
 fn predict_hpred(
   a : FixedArray[Byte],
-  size : Int,
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  size : Int32,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   for r in 0..<size {
     let row = (y0 + r) * stride
@@ -1483,8 +1483,8 @@ fn predict_hpred(
 ///|
 fn predict_dcpred(
   a : FixedArray[Byte],
-  size : Int,
-  stride : Int,
+  size : Int32,
+  stride : Int32,
   above : Bool,
   left : Bool,
 ) -> Unit {
@@ -1517,10 +1517,10 @@ fn predict_dcpred(
 ///|
 fn predict_tmpred(
   a : FixedArray[Byte],
-  size : Int,
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  size : Int32,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   // X_ij = L_i + A_j - P (RFC 6386, p. 52)
   let p = a[(y0 - 1) * stride + x0 - 1].to_int()
@@ -1541,9 +1541,9 @@ fn predict_tmpred(
 ///|
 fn predict_bdcpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let mut v = 4
   for i in 0..<4 {
@@ -1563,9 +1563,9 @@ fn predict_bdcpred(
 ///|
 fn topleft_pixel(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Byte {
   a[(y0 - 1) * stride + x0 - 1]
 }
@@ -1574,9 +1574,9 @@ fn topleft_pixel(
 /// The 8 pixels above (`top_pixels`).
 fn top_pixels(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> FixedArray[Byte] {
   let pos = (y0 - 1) * stride + x0
   FixedArray::makei(8, i => a[pos + i])
@@ -1586,9 +1586,9 @@ fn top_pixels(
 /// The 4 pixels on the left (`left_pixels`).
 fn left_pixels(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> FixedArray[Byte] {
   FixedArray::makei(4, i => a[(y0 + i) * stride + x0 - 1])
 }
@@ -1598,9 +1598,9 @@ fn left_pixels(
 /// top-left pixel and the 4 pixels above.
 fn edge_pixels(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> FixedArray[Byte] {
   let pos = (y0 - 1) * stride + x0 - 1
   [
@@ -1619,9 +1619,9 @@ fn edge_pixels(
 ///|
 fn predict_bvepred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let p = topleft_pixel(a, x0, y0, stride)
   let t = top_pixels(a, x0, y0, stride)
@@ -1643,9 +1643,9 @@ fn predict_bvepred(
 ///|
 fn predict_bhepred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let p = topleft_pixel(a, x0, y0, stride)
   let l = left_pixels(a, x0, y0, stride)
@@ -1667,9 +1667,9 @@ fn predict_bhepred(
 ///|
 fn predict_bldpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let t = top_pixels(a, x0, y0, stride)
   let avgs : ReadOnlyArray[_] = [
@@ -1693,9 +1693,9 @@ fn predict_bldpred(
 ///|
 fn predict_brdpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let e = edge_pixels(a, x0, y0, stride)
   let avgs : ReadOnlyArray[_] = [
@@ -1719,9 +1719,9 @@ fn predict_brdpred(
 ///|
 fn predict_bvrpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let e = edge_pixels(a, x0, y0, stride)
   let (e1, e2, e3, e4, e5, e6, e7, e8) = (
@@ -1755,9 +1755,9 @@ fn predict_bvrpred(
 ///|
 fn predict_bvlpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let t = top_pixels(a, x0, y0, stride)
   let (a0, a1, a2, a3, a4, a5, a6, a7) = (
@@ -1791,9 +1791,9 @@ fn predict_bvlpred(
 ///|
 fn predict_bhdpred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let e = edge_pixels(a, x0, y0, stride)
   let (e0, e1, e2, e3, e4, e5, e6, e7) = (
@@ -1827,9 +1827,9 @@ fn predict_bhdpred(
 ///|
 fn predict_bhupred(
   a : FixedArray[Byte],
-  x0 : Int,
-  y0 : Int,
-  stride : Int,
+  x0 : Int32,
+  y0 : Int32,
+  stride : Int32,
 ) -> Unit {
   let l = left_pixels(a, x0, y0, stride)
   let (l0, l1, l2, l3) = (l[0], l[1], l[2], l[3])

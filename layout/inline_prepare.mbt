@@ -18,20 +18,23 @@ priv struct Preparation {
   /// direction).
   bidi : @bidi.BidiInfo?
   /// Text runs, spacing and layouted elements, with their text ranges.
-  items : Array[(Int, Int, InlineItem)]
+  items : Array[(Int32, Int32, InlineItem)]
   /// Maps from byte indices to item indices.
-  indices : Array[Int]
+  indices : Array[Int32]
   /// The span mapper.
   spans : SpanMapper
   /// The breakpoints of `text` (computed on first use). Not upstream:
   /// upstream recomputes them for each line breaking pass; they only depend
   /// on the preparation, so they are cached here (performance).
-  mut breakpoints : (Array[Int], Array[@linebreak.Breakpoint])?
+  mut breakpoints : (Array[Int32], Array[@linebreak.Breakpoint])?
 }
 
 ///|
 /// Get the item that contains the given `text_offset`.
-fn Preparation::get(self : Preparation, offset : Int) -> (Int, Int, InlineItem) {
+fn Preparation::get(
+  self : Preparation,
+  offset : Int32,
+) -> (Int32, Int32, InlineItem) {
   let idx = self.indices.get(offset).unwrap_or(0)
   self.items[idx]
 }
@@ -41,7 +44,7 @@ fn Preparation::get(self : Preparation, offset : Int) -> (Int, Int, InlineItem) 
 /// (upstream `Preparation::slice`, which collects the intersecting items;
 /// callers iterate from here while `item.start < end || item.end <= end`
 /// instead).
-fn Preparation::slice_start(self : Preparation, start : Int) -> Int {
+fn Preparation::slice_start(self : Preparation, start : Int32) -> Int32 {
   // Usually, we don't want empty-range items at the start of the line
   // (because they will be part of the previous line), but for the first
   // line, we need to keep them.
@@ -115,7 +118,7 @@ fn prepare(
 /// Add some spacing between Han characters and western characters. See
 /// Requirements for Chinese Text Layout, Section 3.2.2 Mixed Text
 /// Composition in Horizontal Written Mode
-fn add_cjk_latin_spacing(items : Array[(Int, Int, InlineItem)]) -> Unit {
+fn add_cjk_latin_spacing(items : Array[(Int32, Int32, InlineItem)]) -> Unit {
   // The flattened `Option<(glyph, shift)>` items as two parallel arrays (no
   // boxed tuple per glyph): `None` glyphs are the non-text items.
   let flat : Array[ShapedGlyph?] = []

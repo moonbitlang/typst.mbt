@@ -18,12 +18,12 @@ priv struct TreeBuilder {
   /// will append a progression to this tree. This list of progressions is
   /// used to determine the location in the tree when doing the actual PDF
   /// generation and inserting the marked content sequences.
-  progressions : Array[Int]
+  progressions : Array[Int32]
   breaks : Array[Break]
   unfinished : Array[Unfinished]
   groups : Groups
   ctx : Ctx
-  logical_children : Map[@library.Location, Array[Int]]
+  logical_children : Map[@library.Location, Array[Int32]]
   errors : Array[@library.SourceDiagnostic]
   stack : Array[StackEntry]
   /// Currently only used for table/grid cells that are broken across multiple
@@ -76,19 +76,19 @@ fn TreeBuilder::finish(self : TreeBuilder) -> Tree {
 }
 
 ///|
-fn TreeBuilder::root_document(self : TreeBuilder) -> Int {
+fn TreeBuilder::root_document(self : TreeBuilder) -> Int32 {
   self.progressions[0]
 }
 
 ///|
 /// The last group in the progression.
-fn TreeBuilder::current(self : TreeBuilder) -> Int {
+fn TreeBuilder::current(self : TreeBuilder) -> Int32 {
   self.progressions[self.progressions.length() - 1]
 }
 
 ///|
 /// The last group on the stack or the root document.
-fn TreeBuilder::parent(self : TreeBuilder) -> Int {
+fn TreeBuilder::parent(self : TreeBuilder) -> Int32 {
   match self.stack.last() {
     Some(e) => e.id
     None => self.root_document()
@@ -105,8 +105,8 @@ priv struct StackEntry {
   /// The location of the stack entry. If this is `None` the stack entry has
   /// to be manually popped.
   loc : @library.Location?
-  id : Int
-  prog_idx : Int
+  id : Int32
+  prog_idx : Int32
 }
 
 ///|
@@ -244,7 +244,10 @@ fn visit_group_frame(
 }
 
 ///|
-fn push_logical_child(tree : TreeBuilder, parent : @library.FrameParent) -> Int {
+fn push_logical_child(
+  tree : TreeBuilder,
+  parent : @library.FrameParent,
+) -> Int32 {
   let id = tree.groups.new_virtual(
     match parent.inherit_ {
       Yes => group_id_invalid
@@ -272,7 +275,7 @@ fn push_logical_child(tree : TreeBuilder, parent : @library.FrameParent) -> Int 
 fn pop_logical_child(
   tree : TreeBuilder,
   parent : @library.FrameParent,
-  stack_idx : Int,
+  stack_idx : Int32,
 ) -> Unit {
   // Remove all stack entries after the idx.
   if stack_idx + 1 < tree.stack.length() {
@@ -306,7 +309,7 @@ fn visit_end_tag(
 }
 
 ///|
-fn progress_tree_start(tree : TreeBuilder, elem : @library.Content) -> Int {
+fn progress_tree_start(tree : TreeBuilder, elem : @library.Content) -> Int32 {
   let styles = tags_styles()
   // Artifacts
   if @library.HideElem::of(elem) is Some(_) {
@@ -508,7 +511,7 @@ fn progress_tree_start(tree : TreeBuilder, elem : @library.Content) -> Int {
 }
 
 ///|
-fn no_progress(tree : TreeBuilder) -> Int {
+fn no_progress(tree : TreeBuilder) -> Int32 {
   tree.current()
 }
 
@@ -517,7 +520,7 @@ fn push_tag(
   tree : TreeBuilder,
   elem : @library.Content,
   tag : @export.TagKind,
-) -> Int {
+) -> Int32 {
   let id = tree.groups.push_tag_storage(tag)
   push_group(tree, elem, Standard(id))
 }
@@ -527,7 +530,7 @@ fn push_text_attr(
   tree : TreeBuilder,
   elem : @library.Content,
   attr : TextAttr,
-) -> Int {
+) -> Int32 {
   push_group(tree, elem, TextAttr(attr))
 }
 
@@ -536,7 +539,7 @@ fn push_artifact(
   tree : TreeBuilder,
   elem : @library.Content,
   ty : @export.ArtifactType,
-) -> Int {
+) -> Int32 {
   push_group(tree, elem, Artifact(ty))
 }
 
@@ -545,8 +548,8 @@ fn push_group(
   tree : TreeBuilder,
   elem : @library.Content,
   kind : GroupKind,
-  lang? : @library.Locale? = None,
-) -> Int {
+  lang~ : @library.Locale? = None,
+) -> Int32 {
   let loc = elem.location().unwrap()
   let span = elem.span()
   let parent = tree.current()
@@ -560,7 +563,7 @@ fn push_located(
   tree : TreeBuilder,
   elem : @library.Content,
   kind : GroupKind,
-) -> Int {
+) -> Int32 {
   let loc = elem.location().unwrap()
   let span = elem.span()
   let parent = tree.current()
@@ -573,7 +576,7 @@ fn push_weak(
   tree : TreeBuilder,
   elem : @library.Content,
   kind : GroupKind,
-) -> Int {
+) -> Int32 {
   let loc = elem.location().unwrap()
   let span = elem.span()
   let parent = tree.current()
@@ -585,8 +588,8 @@ fn push_weak(
 fn push_stack_entry(
   tree : TreeBuilder,
   loc : @library.Location?,
-  id : Int,
-) -> Int {
+  id : Int32,
+) -> Int32 {
   let prog_idx = tree.progressions.length()
   tree.stack.push({ loc, id, prog_idx, })
   id
@@ -596,7 +599,7 @@ fn push_stack_entry(
 fn progress_tree_end(
   tree : TreeBuilder,
   loc : @library.Location,
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   if tree.stack.last() is Some(e) && e.loc == Some(loc) {
     tree.stack.pop() |> ignore
     // The tag nesting was properly closed.
@@ -707,7 +710,11 @@ fn progress_tree_end(
 /// - b:
 ///   - c:
 /// ```
-fn split_inner_groups(tree : TreeBuilder, parent : Int, stack_idx : Int) -> Int {
+fn split_inner_groups(
+  tree : TreeBuilder,
+  parent : Int32,
+  stack_idx : Int32,
+) -> Int32 {
   let mut parent = parent
   // Since the broken groups won't be visited again in any future progression,
   // they'll need to be closed when this progression is visited.
@@ -755,7 +762,11 @@ fn split_inner_groups(tree : TreeBuilder, parent : Int, stack_idx : Int) -> Int 
 ///   - c:
 ///     - a:
 /// ```
-fn split_outer_group(tree : TreeBuilder, parent : Int, stack_idx : Int) -> Int {
+fn split_outer_group(
+  tree : TreeBuilder,
+  parent : Int32,
+  stack_idx : Int32,
+) -> Int32 {
   // Remove the closed entry;
   let outer = tree.stack.remove(stack_idx)
 
@@ -796,7 +807,7 @@ fn split_outer_group(tree : TreeBuilder, parent : Int, stack_idx : Int) -> Int {
     }
 
     // Either update an existing break, or insert a new one.
-    let mut break_idx : Int? = Some(tree.breaks.length())
+    let mut break_idx : Int32? = Some(tree.breaks.length())
     for i = tree.breaks.length() - 1; i >= 0; i = i - 1 {
       let brk = tree.breaks[i]
       if brk.prog_idx == entry.prog_idx {

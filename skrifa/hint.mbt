@@ -39,16 +39,16 @@ fn Target::preserve_linear_metrics(self : Target) -> Bool {
 priv struct HintInstance {
   functions : Array[Definition]
   instructions : Array[Definition]
-  cvt : FixedArray[Int]
-  storage : FixedArray[Int]
+  cvt : FixedArray[Int32]
+  storage : FixedArray[Int32]
   mut graphics : RetainedGraphicsState
-  twilight_scaled_x : FixedArray[Int]
-  twilight_scaled_y : FixedArray[Int]
-  twilight_original_x : FixedArray[Int]
-  twilight_original_y : FixedArray[Int]
-  twilight_flags : FixedArray[Int]
-  axis_count : Int
-  max_stack : Int
+  twilight_scaled_x : FixedArray[Int32]
+  twilight_scaled_y : FixedArray[Int32]
+  twilight_original_x : FixedArray[Int32]
+  twilight_original_y : FixedArray[Int32]
+  twilight_flags : FixedArray[Int32]
+  axis_count : Int32
+  max_stack : Int32
 }
 
 ///|
@@ -56,8 +56,8 @@ priv struct HintInstance {
 /// and control value programs.
 fn HintInstance::new(
   outlines : GlyfOutlines,
-  scale : Int,
-  ppem : Int,
+  scale : Int32,
+  ppem : Int32,
   target : Target,
 ) -> HintInstance raise DrawError {
   // setup()
@@ -99,7 +99,7 @@ fn HintInstance::new(
     axis_count,
     max_stack: outlines.max_stack_elements,
   }
-  let twilight_contours : FixedArray[Int] = [n & 0xFFFF]
+  let twilight_contours : FixedArray[Int32] = [n & 0xFFFF]
   let twilight : Zone = {
     unscaled_x: IntSlice::empty(),
     unscaled_y: IntSlice::empty(),
@@ -168,14 +168,14 @@ fn HintInstance::hint(
   glyph_id : GlyphId,
   glyph : Zone,
   bytecode : BytesView,
-  phantom_x : FixedArray[Int],
-  phantom_y : FixedArray[Int],
+  phantom_x : FixedArray[Int32],
+  phantom_y : FixedArray[Int32],
   is_composite : Bool,
   is_pedantic : Bool,
 ) -> Unit raise HintError {
   // Twilight zone
   let n = self.twilight_scaled_x.length()
-  let twilight_contours : FixedArray[Int] = [n & 0xFFFF]
+  let twilight_contours : FixedArray[Int32] = [n & 0xFFFF]
   let twilight : Zone = {
     unscaled_x: IntSlice::empty(),
     unscaled_y: IntSlice::empty(),
@@ -217,7 +217,7 @@ fn HintInstance::hint(
 }
 
 ///|
-fn round26(x : Int) -> Int {
+fn round26(x : Int32) -> Int32 {
   (x + 32) & -64
 }
 
@@ -227,10 +227,10 @@ fn FreeTypeScaler::hint_simple(
   hinter : HintInstance,
   glyph_id : GlyphId,
   ins : BytesView,
-  points_start : Int,
-  point_count : Int,
-  contours_start : Int,
-  contour_count : Int,
+  points_start : Int32,
+  point_count : Int32,
+  contours_start : Int32,
+  contour_count : Int32,
 ) -> Unit raise DrawError {
   let mem = self.memory
   let other_points_end = point_count + PHANTOM_POINT_COUNT
@@ -292,8 +292,8 @@ fn FreeTypeScaler::hint_composite(
   hinter : HintInstance,
   glyph_id : GlyphId,
   ins : BytesView,
-  point_base : Int,
-  contour_base : Int,
+  point_base : Int32,
+  contour_base : Int32,
 ) -> Unit raise DrawError {
   let mem = self.memory
   // For composite glyphs, the unscaled and original points are

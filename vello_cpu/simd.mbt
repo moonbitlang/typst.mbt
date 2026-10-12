@@ -139,7 +139,7 @@ fn madd(a : Float, b : Float, c : Float) -> Float {
 
 ///|
 /// `f32 as u8` (saturating, NaN maps to 0).
-fn f32_as_u8(x : Float) -> Int {
+fn f32_as_u8(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 255.0 {
@@ -151,7 +151,7 @@ fn f32_as_u8(x : Float) -> Int {
 
 ///|
 /// `f32 as u16` (saturating, NaN maps to 0).
-fn f32_as_u16(x : Float) -> Int {
+fn f32_as_u16(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 65535.0 {
@@ -163,7 +163,7 @@ fn f32_as_u16(x : Float) -> Int {
 
 ///|
 /// `f32 as u32` / `vcvtq_u32_f32` (truncating, saturating, NaN maps to 0).
-fn f32_as_u32(x : Float) -> UInt {
+fn f32_as_u32(x : Float) -> UInt32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 4294967295.0 {
@@ -175,7 +175,7 @@ fn f32_as_u32(x : Float) -> UInt {
 
 ///|
 /// `f32 as i32` / `vcvtq_s32_f32` (truncating, saturating, NaN maps to 0).
-fn f32_as_i32(x : Float) -> Int {
+fn f32_as_i32(x : Float) -> Int32 {
   if x != x {
     0
   } else {
@@ -185,7 +185,7 @@ fn f32_as_i32(x : Float) -> Int {
 
 ///|
 /// `f32 as usize` (saturating, NaN maps to 0).
-fn f32_as_usize(x : Float) -> Int {
+fn f32_as_usize(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -197,7 +197,7 @@ fn f32_as_usize(x : Float) -> Int {
 
 ///|
 /// `f64 as u16` (saturating, NaN maps to 0).
-fn f64_as_u16(x : Double) -> Int {
+fn f64_as_u16(x : Double) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 65535.0 {
@@ -215,7 +215,7 @@ fn f32(x : Double) -> Float {
 
 ///|
 /// `u16::saturating_sub`.
-fn u16_sat_sub(a : Int, b : Int) -> Int {
+fn u16_sat_sub(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a - b
   } else {
@@ -225,7 +225,7 @@ fn u16_sat_sub(a : Int, b : Int) -> Int {
 
 ///|
 /// `u16::saturating_add`.
-fn u16_sat_add(a : Int, b : Int) -> Int {
+fn u16_sat_add(a : Int32, b : Int32) -> Int32 {
   let s = a + b
   if s > 65535 {
     65535
@@ -236,7 +236,7 @@ fn u16_sat_add(a : Int, b : Int) -> Int {
 
 ///|
 /// `u16::saturating_mul`.
-fn u16_sat_mul(a : Int, b : Int) -> Int {
+fn u16_sat_mul(a : Int32, b : Int32) -> Int32 {
   let s = a * b
   if s > 65535 {
     65535
@@ -247,36 +247,36 @@ fn u16_sat_mul(a : Int, b : Int) -> Int {
 
 ///|
 /// `x.div_ceil(d)` for non-negative integers.
-fn div_ceil(x : Int, d : Int) -> Int {
+fn div_ceil(x : Int32, d : Int32) -> Int32 {
   (x + d - 1) / d
 }
 
 ///|
 /// `Div255Ext::div_255` on a `u16` lane: `(val + 255) >> 8` (wrapping add).
-fn div_255(val : Int) -> Int {
+fn div_255(val : Int32) -> Int32 {
   ((val + 255) & 0xFFFF) >> 8
 }
 
 ///|
 /// `normalized_mul` on `u8` lanes: `div_255(a * b)` (in `u16`).
-fn norm_mul(a : Int, b : Int) -> Int {
+fn norm_mul(a : Int32, b : Int32) -> Int32 {
   div_255((a * b) & 0xFFFF)
 }
 
 ///|
 /// `u8_to_f32(x) * (1.0 / 255.0)`.
-fn u8_to_unit(x : Int) -> Float {
+fn u8_to_unit(x : Int32) -> Float {
   Float::from_int(x) * ((1.0 : Float) / 255.0)
 }
 
 ///|
 /// `NumericVec::from_f32` for `u8x16`: `f32_to_u8(val.mul_add(255.0, 0.5))`.
-fn unit_to_u8(x : Float) -> Int {
+fn unit_to_u8(x : Float) -> Int32 {
   (f32_as_u32(madd(x, 255.0, 0.5)) & 0xFF).reinterpret_as_int()
 }
 
 ///|
 /// `f32_to_u8` on a single lane (the low byte of `vcvtq_u32_f32`).
-fn f32_to_u8_lane(x : Float) -> Int {
+fn f32_to_u8_lane(x : Float) -> Int32 {
   (f32_as_u32(x) & 0xFF).reinterpret_as_int()
 }

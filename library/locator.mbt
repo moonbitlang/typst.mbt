@@ -131,7 +131,7 @@ pub struct SplitLocator {
   /// for all the layers beyond the memoization boundary on-demand.
   priv outer : LocatorLink?
   /// Simply counts up the number of times we've seen each local_hash hash.
-  priv disambiguators : Map[U128, Int]
+  priv disambiguators : Map[U128, Int32]
 }
 
 ///|

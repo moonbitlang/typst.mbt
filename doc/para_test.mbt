@@ -917,7 +917,7 @@ test "para: the review text, feedback and positions of Par(Prose(..))" {
   // emphasis inside it, and gives the narrowest of them, the emphasis;
   // the origin of a word gives the boxes of the words of the text.
   let file = "doc/para_test.mbt"
-  let boxes = (text : @doc.ReviewText, line : Int) => {
+  let boxes = (text : @doc.ReviewText, line : Int32) => {
     text.positions(file, line).map(region_text).join(" | ")
   }
   inspect(boxes(para_text, para_line), content="1: 51.3 6.2 21.8 11")

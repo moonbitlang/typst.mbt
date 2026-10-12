@@ -138,7 +138,7 @@ pub fn LineBreak::short_name(self : LineBreak) -> String {
 
 ///|
 /// The `Line_Break` property of a code point.
-pub fn line_break(c : Int) -> LineBreak {
+pub fn line_break(c : Int32) -> LineBreak {
   let table = line_break_table
   let n = table.length() / 3
   for lo = 0, hi = n; lo < hi; {

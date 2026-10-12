@@ -76,7 +76,7 @@ priv struct GroupingRule {
   kind : RuleKind
   /// When an element is visited that matches a rule with higher priority
   /// than one that is currently grouped, we start a nested group.
-  priority : Int
+  priority : Int32
   /// Whether the grouping handles tags itself. If this is set to `false`,
   /// realization will transparently take care of tags and they will not
   /// be visible to `finish`.
@@ -140,7 +140,7 @@ priv enum GroupingEffect {
 /// A started grouping of some elements.
 priv struct Grouping {
   /// The position in `s.sink` where the group starts.
-  start : Int
+  start : Int32
   /// Only applies to `PAR` grouping: Whether this paragraph group is
   /// interrupted, but not yet finished because it may be ignored due to being
   /// fully inline.
@@ -157,7 +157,7 @@ priv struct Grouped {
   /// The realization state.
   s : State
   /// The position in `s.sink` where the group starts.
-  start : Int
+  start : Int32
 }
 
 ///|
@@ -176,7 +176,7 @@ priv struct Verdict {
 /// A show rule transformation to apply to the element.
 priv enum ShowStep {
   /// A user-defined transformational show rule.
-  Recipe(Recipe, Int)
+  Recipe(Recipe, Int32)
   /// The built-in show rule.
   Builtin(@library.NativeShowRule)
 }
@@ -185,13 +185,13 @@ priv enum ShowStep {
 /// A match of a regex show rule.
 priv struct RegexMatch {
   /// The offset in the string that matched (in UTF-8 bytes).
-  offset : Int
+  offset : Int32
   /// The text that matched.
   text : String
   /// The style chain of the matching grouping.
   styles : StyleChain
   /// The index of the recipe that matched.
-  id : Int
+  id : Int32
   /// The recipe that matched.
   recipe : Recipe
 }
@@ -431,7 +431,7 @@ fn verdict(engine : Engine, elem : Content, styles : StyleChain) -> Verdict? {
   // it to determine whether a particular show rule was already applied to the
   // `elem` previously. For this purpose, show rules are indexed from the
   // top of the chain as the chain might grow to the bottom.
-  let mut depth : Int? = None
+  let mut depth : Int32? = None
   let mut r = 0
   // `for recipe in styles.recipes()`, walking the chain's links directly
   // (innermost first) instead of allocating the closure-based iterators.
@@ -944,7 +944,7 @@ fn[K : Eq] group_by_key(
 fn finish_grouping(
   s : State,
   rule : GroupingRule,
-  start : Int,
+  start : Int32,
 ) -> Unit raise SourceError {
   let mut start = start
 
@@ -1400,7 +1400,7 @@ fn finish_list_like(
 ///|
 /// Visit textual elements in `s.sink[start..]` and apply regex show rules to
 /// them.
-fn visit_textual(s : State, start : Int) -> Bool raise SourceError {
+fn visit_textual(s : State, start : Int32) -> Bool raise SourceError {
   // Try to find a regex match in the grouped textual elements.
   if find_regex_match_in_elems(s.sink[start:]) is Some(m) {
     collapse_spaces(s.sink, start)
@@ -1472,8 +1472,8 @@ fn find_regex_match_in_elems(elems : ArrayView[Pair]) -> RegexMatch? {
 fn find_regex_match_in_str(text : String, styles : StyleChain) -> RegexMatch? {
   let mut r = 0
   let revoked = @hashset.HashSet([])
-  let mut leftmost : (@regex.Match, Int, Recipe)? = None
-  let mut depth : Int? = None
+  let mut leftmost : (@regex.Match, Int32, Recipe)? = None
+  let mut depth : Int32? = None
   // `for entry in styles.entries()` without allocating the closure-based
   // iterator.
   let mut link : StyleChain? = Some(styles)
@@ -1632,7 +1632,7 @@ fn visit_regex_match(
 ///|
 /// Takes a text or symbol element and returns an appropriate sliced output
 /// element. The range is in UTF-8 bytes.
-fn slice_textual(elem : Content, start : Int, end : Int) -> Content {
+fn slice_textual(elem : Content, start : Int32, end : Int32) -> Content {
   if @library.TextElem::of(elem) is Some(text) {
     // Unfortunately, we can't apply a `TextElem::span_offset` for more
     // precise tracking here because it creates a user-visible styled

@@ -3,11 +3,11 @@
 ///|
 /// A type 0 function (sampled function).
 priv struct Type0 {
-  sizes : Array[UInt]
-  table : Map[Key, Array[UInt]]
+  sizes : Array[UInt32]
+  table : Map[Key, Array[UInt32]]
   clamper : Clamper
   range : Array[(Float, Float)]
-  bits_per_sample : Int
+  bits_per_sample : Int32
   encode : Array[(Float, Float)]
   decode : Array[(Float, Float)]
 }
@@ -33,7 +33,7 @@ fn Type0::new(stream : @hayro_syntax.Stream) -> Type0? {
   guard (dict.get("Size") : @hayro_syntax.PdfArray?) is Some(size_array) else {
     return None
   }
-  let sizes : Array[UInt] = size_array.iter().collect()
+  let sizes : Array[UInt32] = size_array.iter().collect()
   let encode = match get_tuple_vec(dict, "Encode") {
     Some(e) => e
     None => sizes.map(s => (0.0, Float::from_uint(s - 1)))
@@ -112,19 +112,19 @@ fn Type0::eval(self : Type0, input : Array[Float]) -> Array[Float]? {
 // See <https://github.com/apache/pdfbox/blob/bb778d4784f354c36ce032e91a0cee2169a4c598/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/common/function/PDFunctionType0.java#L252>
 priv struct Interpolator {
   input : Array[Float]
-  sizes : Array[UInt]
-  in_prev : Array[UInt]
-  in_next : Array[UInt]
-  out_len : Int
+  sizes : Array[UInt32]
+  in_prev : Array[UInt32]
+  in_next : Array[UInt32]
+  out_len : Int32
 }
 
 ///|
 fn Interpolator::new(
   input : Array[Float],
-  in_prev : Array[UInt],
-  in_next : Array[UInt],
-  sizes : Array[UInt],
-  out_len : Int,
+  in_prev : Array[UInt32],
+  in_next : Array[UInt32],
+  sizes : Array[UInt32],
+  out_len : Int32,
 ) -> Interpolator {
   { input, in_prev, in_next, sizes, out_len, }
 }
@@ -132,7 +132,7 @@ fn Interpolator::new(
 ///|
 fn Interpolator::interpolate(
   self : Interpolator,
-  table : Map[Key, Array[UInt]],
+  table : Map[Key, Array[UInt32]],
 ) -> Array[Float]? {
   // Upstream panics (index out of bounds) for a function without inputs.
   if self.input.length() == 0 {
@@ -144,9 +144,9 @@ fn Interpolator::interpolate(
 ///|
 fn Interpolator::interpolate_inner(
   self : Interpolator,
-  coord : Array[UInt],
-  step : Int,
-  table : Map[Key, Array[UInt]],
+  coord : Array[UInt32],
+  step : Int32,
+  table : Map[Key, Array[UInt32]],
 ) -> Array[Float]? {
   if step == self.input.length() - 1 {
     if self.in_prev[step] == self.in_next[step] {
@@ -204,10 +204,10 @@ fn Interpolator::interpolate_inner(
 
 ///|
 fn build_table(
-  data : Array[UInt],
-  sizes : Array[UInt],
-  n : Int,
-) -> Map[Key, Array[UInt]] {
+  data : Array[UInt32],
+  sizes : Array[UInt32],
+  n : Int32,
+) -> Map[Key, Array[UInt32]] {
   let key = Key::new(sizes)
   let table = Map([])
   let mut first = true
@@ -231,8 +231,8 @@ fn build_table(
 /// key in that specific dimension. (The sizes, which upstream also stores in
 /// the key, are the same for all keys of a table.)
 priv struct Key {
-  sizes : Array[UInt]
-  parts : Array[UInt]
+  sizes : Array[UInt32]
+  parts : Array[UInt32]
 }
 
 ///|
@@ -246,12 +246,12 @@ impl Hash for Key with fn hash_combine(self, hasher) {
 }
 
 ///|
-fn Key::new(sizes : Array[UInt]) -> Key {
+fn Key::new(sizes : Array[UInt32]) -> Key {
   { sizes, parts: Array::make(sizes.length(), 0U), }
 }
 
 ///|
-fn Key::from_raw(sizes : Array[UInt], parts : Array[UInt]) -> Key {
+fn Key::from_raw(sizes : Array[UInt32], parts : Array[UInt32]) -> Key {
   { sizes, parts: parts.copy(), }
 }
 
@@ -266,7 +266,7 @@ fn Key::increment(self : Key) -> Unit? {
 }
 
 ///|
-fn Key::increment_index(self : Key, index : Int) -> Unit? {
+fn Key::increment_index(self : Key, index : Int32) -> Unit? {
   guard self.sizes.get(index) is Some(size) else {
     // overflowed key in sampled function
     return None

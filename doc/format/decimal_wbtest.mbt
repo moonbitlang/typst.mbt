@@ -1,5 +1,5 @@
 ///|
-fn digits_text(digits : Array[Int]) -> String {
+fn digits_text(digits : Array[Int32]) -> String {
   let buf = StringBuilder()
   for d in digits {
     buf.write_string(d.to_string())

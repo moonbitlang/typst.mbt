@@ -5,21 +5,21 @@
 // checked when a table is read.
 
 ///|
-fn u16_at(d : FontData, p : Int) -> Int {
+fn u16_at(d : FontData, p : Int32) -> Int32 {
   d.read_u16(p) catch {
     _ => 0
   }
 }
 
 ///|
-fn i16_at(d : FontData, p : Int) -> Int {
+fn i16_at(d : FontData, p : Int32) -> Int32 {
   d.read_i16(p) catch {
     _ => 0
   }
 }
 
 ///|
-fn u32_at(d : FontData, p : Int) -> UInt {
+fn u32_at(d : FontData, p : Int32) -> UInt32 {
   d.read_u32(p) catch {
     _ => 0
   }
@@ -27,7 +27,7 @@ fn u32_at(d : FontData, p : Int) -> UInt {
 
 ///|
 /// A 16.16 version number (`Version16Dot16`).
-pub(all) struct Version16Dot16(UInt) derive(Eq, Debug)
+pub(all) struct Version16Dot16(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -41,7 +41,7 @@ pub extend Version16Dot16 with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the separate major & minor version numbers.
-pub fn Version16Dot16::to_major_minor(self : Version16Dot16) -> (Int, Int) {
+pub fn Version16Dot16::to_major_minor(self : Version16Dot16) -> (Int32, Int32) {
   let major = (self.0 >> 16).reinterpret_as_int()
   let minor = ((self.0 & 0xFFFFU) >> 12).reinterpret_as_int()
   (major, minor)
@@ -51,8 +51,8 @@ pub fn Version16Dot16::to_major_minor(self : Version16Dot16) -> (Int, Int) {
 /// 'same major version, greater than or equal minor version'
 fn Version16Dot16::compatible(
   self : Version16Dot16,
-  major : Int,
-  minor : Int,
+  major : Int32,
+  minor : Int32,
 ) -> Bool {
   let (a, b) = self.to_major_minor()
   a == major && b >= minor
@@ -77,55 +77,55 @@ pub fn FontRef::head(self : FontRef) -> Head raise ReadError {
 }
 
 ///|
-pub fn Head::flags(self : Head) -> Int {
+pub fn Head::flags(self : Head) -> Int32 {
   u16_at(self.data, 16)
 }
 
 ///|
-pub fn Head::units_per_em(self : Head) -> Int {
+pub fn Head::units_per_em(self : Head) -> Int32 {
   u16_at(self.data, 18)
 }
 
 ///|
-pub fn Head::x_min(self : Head) -> Int {
+pub fn Head::x_min(self : Head) -> Int32 {
   i16_at(self.data, 36)
 }
 
 ///|
-pub fn Head::y_min(self : Head) -> Int {
+pub fn Head::y_min(self : Head) -> Int32 {
   i16_at(self.data, 38)
 }
 
 ///|
-pub fn Head::x_max(self : Head) -> Int {
+pub fn Head::x_max(self : Head) -> Int32 {
   i16_at(self.data, 40)
 }
 
 ///|
-pub fn Head::y_max(self : Head) -> Int {
+pub fn Head::y_max(self : Head) -> Int32 {
   i16_at(self.data, 42)
 }
 
 ///|
-pub fn Head::mac_style(self : Head) -> Int {
+pub fn Head::mac_style(self : Head) -> Int32 {
   u16_at(self.data, 44)
 }
 
 ///|
-pub fn Head::index_to_loc_format(self : Head) -> Int {
+pub fn Head::index_to_loc_format(self : Head) -> Int32 {
   i16_at(self.data, 50)
 }
 
 ///|
 /// head flags bit 3: force integer ppem.
-pub const HEAD_FLAG_FORCE_INTEGER_PPEM : Int = 0x0008
+pub const HEAD_FLAG_FORCE_INTEGER_PPEM : Int32 = 0x0008
 
 ///|
 /// macStyle bits.
-pub const MAC_STYLE_BOLD : Int = 0x0001
+pub const MAC_STYLE_BOLD : Int32 = 0x0001
 
 ///|
-pub const MAC_STYLE_ITALIC : Int = 0x0002
+pub const MAC_STYLE_ITALIC : Int32 = 0x0002
 
 // ---------------------------------------------------------------------------
 // maxp
@@ -151,13 +151,13 @@ pub fn Maxp::version(self : Maxp) -> Version16Dot16 {
 }
 
 ///|
-pub fn Maxp::num_glyphs(self : Maxp) -> Int {
+pub fn Maxp::num_glyphs(self : Maxp) -> Int32 {
   u16_at(self.data, 4)
 }
 
 ///|
 /// Version 1.0 field at the given byte offset.
-fn Maxp::v1_field(self : Maxp, offset : Int) -> Int? {
+fn Maxp::v1_field(self : Maxp, offset : Int32) -> Int32? {
   if !self.version().compatible(1, 0) {
     return None
   }
@@ -169,32 +169,32 @@ fn Maxp::v1_field(self : Maxp, offset : Int) -> Int? {
 }
 
 ///|
-pub fn Maxp::max_twilight_points(self : Maxp) -> Int? {
+pub fn Maxp::max_twilight_points(self : Maxp) -> Int32? {
   self.v1_field(16)
 }
 
 ///|
-pub fn Maxp::max_storage(self : Maxp) -> Int? {
+pub fn Maxp::max_storage(self : Maxp) -> Int32? {
   self.v1_field(18)
 }
 
 ///|
-pub fn Maxp::max_function_defs(self : Maxp) -> Int? {
+pub fn Maxp::max_function_defs(self : Maxp) -> Int32? {
   self.v1_field(20)
 }
 
 ///|
-pub fn Maxp::max_instruction_defs(self : Maxp) -> Int? {
+pub fn Maxp::max_instruction_defs(self : Maxp) -> Int32? {
   self.v1_field(22)
 }
 
 ///|
-pub fn Maxp::max_stack_elements(self : Maxp) -> Int? {
+pub fn Maxp::max_stack_elements(self : Maxp) -> Int32? {
   self.v1_field(24)
 }
 
 ///|
-pub fn Maxp::max_size_of_instructions(self : Maxp) -> Int? {
+pub fn Maxp::max_size_of_instructions(self : Maxp) -> Int32? {
   self.v1_field(26)
 }
 
@@ -217,27 +217,27 @@ pub fn FontRef::hhea(self : FontRef) -> Hhea raise ReadError {
 }
 
 ///|
-pub fn Hhea::ascender(self : Hhea) -> Int {
+pub fn Hhea::ascender(self : Hhea) -> Int32 {
   i16_at(self.data, 4)
 }
 
 ///|
-pub fn Hhea::descender(self : Hhea) -> Int {
+pub fn Hhea::descender(self : Hhea) -> Int32 {
   i16_at(self.data, 6)
 }
 
 ///|
-pub fn Hhea::line_gap(self : Hhea) -> Int {
+pub fn Hhea::line_gap(self : Hhea) -> Int32 {
   i16_at(self.data, 8)
 }
 
 ///|
-pub fn Hhea::advance_width_max(self : Hhea) -> Int {
+pub fn Hhea::advance_width_max(self : Hhea) -> Int32 {
   u16_at(self.data, 10)
 }
 
 ///|
-pub fn Hhea::number_of_h_metrics(self : Hhea) -> Int {
+pub fn Hhea::number_of_h_metrics(self : Hhea) -> Int32 {
   u16_at(self.data, 34)
 }
 
@@ -269,34 +269,34 @@ pub fn FontRef::hmtx(self : FontRef) -> Hmtx raise ReadError {
 
 ///|
 /// Number of long metrics.
-pub fn Hmtx::num_h_metrics(self : Hmtx) -> Int {
+pub fn Hmtx::num_h_metrics(self : Hmtx) -> Int32 {
   self.h_metrics.len() / 4
 }
 
 ///|
-pub fn Hmtx::h_metric_advance(self : Hmtx, index : Int) -> Int {
+pub fn Hmtx::h_metric_advance(self : Hmtx, index : Int32) -> Int32 {
   u16_at(self.h_metrics, index * 4)
 }
 
 ///|
-pub fn Hmtx::h_metric_side_bearing(self : Hmtx, index : Int) -> Int {
+pub fn Hmtx::h_metric_side_bearing(self : Hmtx, index : Int32) -> Int32 {
   i16_at(self.h_metrics, index * 4 + 2)
 }
 
 ///|
-pub fn Hmtx::num_left_side_bearings(self : Hmtx) -> Int {
+pub fn Hmtx::num_left_side_bearings(self : Hmtx) -> Int32 {
   self.left_side_bearings.len() / 2
 }
 
 ///|
-pub fn Hmtx::left_side_bearing(self : Hmtx, index : Int) -> Int {
+pub fn Hmtx::left_side_bearing(self : Hmtx, index : Int32) -> Int32 {
   i16_at(self.left_side_bearings, index * 2)
 }
 
 ///|
 /// Returns the advance width for the given glyph (falling back to the last
 /// long metric).
-pub fn Hmtx::advance(self : Hmtx, glyph_id : GlyphId) -> Int? {
+pub fn Hmtx::advance(self : Hmtx, glyph_id : GlyphId) -> Int32? {
   let n = self.num_h_metrics()
   if n == 0 {
     return None
@@ -311,7 +311,7 @@ pub fn Hmtx::advance(self : Hmtx, glyph_id : GlyphId) -> Int? {
 
 ///|
 /// Returns the left side bearing for the given glyph.
-pub fn Hmtx::side_bearing(self : Hmtx, glyph_id : GlyphId) -> Int? {
+pub fn Hmtx::side_bearing(self : Hmtx, glyph_id : GlyphId) -> Int32? {
   let n = self.num_h_metrics()
   let gid = glyph_id.to_u32()
   if gid < n.reinterpret_as_uint() {
@@ -344,68 +344,68 @@ pub fn FontRef::os2(self : FontRef) -> Os2 raise ReadError {
 }
 
 ///|
-pub fn Os2::version(self : Os2) -> Int {
+pub fn Os2::version(self : Os2) -> Int32 {
   u16_at(self.data, 0)
 }
 
 ///|
-pub fn Os2::x_avg_char_width(self : Os2) -> Int {
+pub fn Os2::x_avg_char_width(self : Os2) -> Int32 {
   i16_at(self.data, 2)
 }
 
 ///|
-pub fn Os2::us_weight_class(self : Os2) -> Int {
+pub fn Os2::us_weight_class(self : Os2) -> Int32 {
   u16_at(self.data, 4)
 }
 
 ///|
-pub fn Os2::us_width_class(self : Os2) -> Int {
+pub fn Os2::us_width_class(self : Os2) -> Int32 {
   u16_at(self.data, 6)
 }
 
 ///|
-pub fn Os2::y_strikeout_size(self : Os2) -> Int {
+pub fn Os2::y_strikeout_size(self : Os2) -> Int32 {
   i16_at(self.data, 26)
 }
 
 ///|
-pub fn Os2::y_strikeout_position(self : Os2) -> Int {
+pub fn Os2::y_strikeout_position(self : Os2) -> Int32 {
   i16_at(self.data, 28)
 }
 
 ///|
-pub fn Os2::fs_selection(self : Os2) -> Int {
+pub fn Os2::fs_selection(self : Os2) -> Int32 {
   u16_at(self.data, 62)
 }
 
 ///|
-pub fn Os2::s_typo_ascender(self : Os2) -> Int {
+pub fn Os2::s_typo_ascender(self : Os2) -> Int32 {
   i16_at(self.data, 68)
 }
 
 ///|
-pub fn Os2::s_typo_descender(self : Os2) -> Int {
+pub fn Os2::s_typo_descender(self : Os2) -> Int32 {
   i16_at(self.data, 70)
 }
 
 ///|
-pub fn Os2::s_typo_line_gap(self : Os2) -> Int {
+pub fn Os2::s_typo_line_gap(self : Os2) -> Int32 {
   i16_at(self.data, 72)
 }
 
 ///|
-pub fn Os2::us_win_ascent(self : Os2) -> Int {
+pub fn Os2::us_win_ascent(self : Os2) -> Int32 {
   u16_at(self.data, 74)
 }
 
 ///|
-pub fn Os2::us_win_descent(self : Os2) -> Int {
+pub fn Os2::us_win_descent(self : Os2) -> Int32 {
   u16_at(self.data, 76)
 }
 
 ///|
 /// Version >= 2 fields.
-fn Os2::v2_i16(self : Os2, offset : Int) -> Int? {
+fn Os2::v2_i16(self : Os2, offset : Int32) -> Int32? {
   if self.version() < 2 {
     return None
   }
@@ -417,21 +417,21 @@ fn Os2::v2_i16(self : Os2, offset : Int) -> Int? {
 }
 
 ///|
-pub fn Os2::sx_height(self : Os2) -> Int? {
+pub fn Os2::sx_height(self : Os2) -> Int32? {
   self.v2_i16(86)
 }
 
 ///|
-pub fn Os2::s_cap_height(self : Os2) -> Int? {
+pub fn Os2::s_cap_height(self : Os2) -> Int32? {
   self.v2_i16(88)
 }
 
 ///|
 /// fsSelection bits.
-pub const OS2_SELECTION_ITALIC : Int = 0x0001
+pub const OS2_SELECTION_ITALIC : Int32 = 0x0001
 
 ///|
-pub const OS2_SELECTION_USE_TYPO_METRICS : Int = 0x0080
+pub const OS2_SELECTION_USE_TYPO_METRICS : Int32 = 0x0080
 
 ///|
-pub const OS2_SELECTION_OBLIQUE : Int = 0x0200
+pub const OS2_SELECTION_OBLIQUE : Int32 = 0x0200

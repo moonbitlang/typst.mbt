@@ -4,9 +4,9 @@
 ///|
 /// The analysis of an expression.
 pub struct Info {
-  start_group : Int
-  end_group : Int
-  min_size : Int
+  start_group : Int32
+  end_group : Int32
+  min_size : Int32
   const_size : Bool
   hard : Bool
   expr : Expr
@@ -37,21 +37,21 @@ fn Info::push_literal(self : Info, buf : StringBuilder) -> Unit {
 
 ///|
 priv struct SizeInfo {
-  min_size : Int
+  min_size : Int32
   const_size : Bool
 }
 
 ///|
 priv struct Analyzer {
   backrefs : BitSet
-  mut group_ix : Int
+  mut group_ix : Int32
   /// Stores the analysis info for each group by group number
-  group_info : Map[Int, SizeInfo]
+  group_info : Map[Int32, SizeInfo]
 }
 
 ///|
 /// Saturating `usize` addition.
-fn sat_add(a : Int, b : Int) -> Int {
+fn sat_add(a : Int32, b : Int32) -> Int32 {
   let s = a.to_int64() + b.to_int64()
   if s > USIZE_MAX.to_int64() {
     USIZE_MAX
@@ -62,7 +62,7 @@ fn sat_add(a : Int, b : Int) -> Int {
 
 ///|
 /// Saturating `usize` multiplication.
-fn sat_mul(a : Int, b : Int) -> Int {
+fn sat_mul(a : Int32, b : Int32) -> Int32 {
   let s = a.to_int64() * b.to_int64()
   if s > USIZE_MAX.to_int64() {
     USIZE_MAX

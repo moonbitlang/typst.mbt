@@ -11,10 +11,10 @@
 ///
 /// The unsigned upstream values are stored as `Int`s (they all fit).
 pub struct ScreenIntRect {
-  x : Int
-  y : Int
-  width : Int
-  height : Int
+  x : Int32
+  y : Int32
+  width : Int32
+  height : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -30,10 +30,10 @@ pub extend ScreenIntRect with @debug.Debug::{to_repr}
 ///|
 /// Creates a new `ScreenIntRect`.
 pub fn ScreenIntRect::from_xywh(
-  x : UInt,
-  y : UInt,
-  width : UInt,
-  height : UInt,
+  x : UInt32,
+  y : UInt32,
+  width : UInt32,
+  height : UInt32,
 ) -> ScreenIntRect? {
   let max = 0x7FFFFFFFU
   if x > max || y > max || width > max || height > max {
@@ -53,52 +53,52 @@ pub fn ScreenIntRect::from_xywh(
 
 ///|
 fn ScreenIntRect::from_xywh_safe(
-  x : Int,
-  y : Int,
-  width : Int,
-  height : Int,
+  x : Int32,
+  y : Int32,
+  width : Int32,
+  height : Int32,
 ) -> ScreenIntRect {
   { x, y, width, height, }
 }
 
 ///|
-pub fn ScreenIntRect::x(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::x(self : ScreenIntRect) -> Int32 {
   self.x
 }
 
 ///|
-pub fn ScreenIntRect::y(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::y(self : ScreenIntRect) -> Int32 {
   self.y
 }
 
 ///|
-pub fn ScreenIntRect::width(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::width(self : ScreenIntRect) -> Int32 {
   self.width
 }
 
 ///|
-pub fn ScreenIntRect::height(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::height(self : ScreenIntRect) -> Int32 {
   self.height
 }
 
 ///|
-pub fn ScreenIntRect::left(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::left(self : ScreenIntRect) -> Int32 {
   self.x
 }
 
 ///|
-pub fn ScreenIntRect::top(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::top(self : ScreenIntRect) -> Int32 {
   self.y
 }
 
 ///|
 /// Returns rect's right edge. The upstream `u32` addition cannot overflow.
-pub fn ScreenIntRect::right(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::right(self : ScreenIntRect) -> Int32 {
   self.x + self.width
 }
 
 ///|
-pub fn ScreenIntRect::bottom(self : ScreenIntRect) -> Int {
+pub fn ScreenIntRect::bottom(self : ScreenIntRect) -> Int32 {
   self.y + self.height
 }
 
@@ -146,7 +146,7 @@ pub fn ScreenIntRect::to_rect(self : ScreenIntRect) -> @path.Rect {
 
 ///|
 /// `x as f32` for a non-negative `Int` holding a `u32`.
-fn u32f(x : Int) -> Float {
+fn u32f(x : Int32) -> Float {
   Float::from_uint(x.reinterpret_as_uint())
 }
 
@@ -154,8 +154,8 @@ fn u32f(x : Int) -> Float {
 /// `IntSizeExt::to_screen_int_rect`.
 fn int_size_to_screen_int_rect(
   size : @path.IntSize,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> ScreenIntRect {
   ScreenIntRect::from_xywh(
     x.reinterpret_as_uint(),

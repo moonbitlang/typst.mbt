@@ -162,13 +162,13 @@ pub struct DataTable {
 /// What is wrong with the cells of a table that is given by rows: the row
 /// (`-1`: the head) and the message.
 priv struct Misfit {
-  row : Int
+  row : Int32
   message : String
 }
 
 ///|
 /// The name of a row in a message.
-fn row_name(row : Int) -> String {
+fn row_name(row : Int32) -> String {
   if row < 0 {
     "`head`"
   } else {
@@ -178,7 +178,7 @@ fn row_name(row : Int) -> String {
 
 ///|
 /// A number of columns in a message.
-fn columns_of(count : Int) -> String {
+fn columns_of(count : Int32) -> String {
   if count == 1 {
     "1 column"
   } else {
@@ -192,7 +192,7 @@ fn columns_of(count : Int) -> String {
 /// cell in the next column that no cell from a row above takes, over as
 /// many columns and rows as it spans.
 fn misfit(
-  columns : Int,
+  columns : Int32,
   head : Array[@doc.Content],
   rows : Array[Array[@doc.Content]],
 ) -> Misfit? {
@@ -203,7 +203,7 @@ fn misfit(
   let first = if head.is_empty() { 0 } else { -1 }
   for row in first..<rows.length() {
     let cells = if row < 0 { head } else { rows[row] }
-    let spans : Array[(Int, Int)] = []
+    let spans : Array[(Int32, Int32)] = []
     let mut own = 0
     for cell in cells {
       guard cell.table_cell_spans() is Some((colspan, rowspan)) else {
@@ -293,8 +293,8 @@ pub fn DataTable::DataTable(
   stroke? : @doc.Stroke,
   radius? : @doc.Corners[@doc.Length],
   frame_fill? : @doc.Paint,
-  breakable? : Bool = false,
-  key? : (Int) -> String,
+  breakable~ : Bool = false,
+  key? : (Int32) -> String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> DataTable {

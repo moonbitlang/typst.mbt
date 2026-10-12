@@ -40,7 +40,7 @@ fn Module::canonicalize_and_intern_rec_group(
   features : WasmFeatures,
   types : TypeList,
   rec_group : RecGroup,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if rec_group.is_explicit_rec_group() && !features.gc() {
     bail(offset, "rec group usage requires `gc` proposal to be enabled")
@@ -71,7 +71,7 @@ fn Module::check_subtype(
   id : CoreTypeId,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   let ty = types.get_core(id)
   if !features.gc() && (!ty.is_final || ty.supertype_idx is Some(_)) {
@@ -106,7 +106,7 @@ fn Module::check_composite_type(
   ty : CompositeType,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   let check = (ty : ValType, shared : Bool) => {
     if features.check_value_type(ty) is Some(e) {
@@ -200,7 +200,7 @@ fn Module::at_packed_index(
   types : TypeList,
   rec_group : RecGroupId,
   index : PackedIndex,
-  offset : Int,
+  offset : Int32,
 ) -> CoreTypeId raise BinaryReaderError {
   match index.unpack() {
     Id(id) => id
@@ -226,15 +226,18 @@ priv enum CanonicalizationMode {
 priv struct TypeCanonicalizer {
   module_ : Module
   mut features : WasmFeatures?
-  mut rec_group_start : UInt
-  mut rec_group_len : UInt
-  offset : Int
+  mut rec_group_start : UInt32
+  mut rec_group_len : UInt32
+  offset : Int32
   mode : CanonicalizationMode
   within_rec_group : (CoreTypeId, CoreTypeId)?
 }
 
 ///|
-fn TypeCanonicalizer::new(module_ : Module, offset : Int) -> TypeCanonicalizer {
+fn TypeCanonicalizer::new(
+  module_ : Module,
+  offset : Int32,
+) -> TypeCanonicalizer {
   // These defaults will work for when we are canonicalizing types from
   // outside of a rec group definition, forcing all `PackedIndex`es to be
   // canonicalized to `CoreTypeId`s.

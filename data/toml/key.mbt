@@ -2,7 +2,7 @@
 
 ///|
 /// `RecursionCheck`'s limit (feature `unbounded` is off).
-let recursion_limit : Int = 80
+let recursion_limit : Int32 = 80
 
 ///|
 /// `key = simple-key / dotted-key`,
@@ -52,7 +52,7 @@ fn unquoted_key(i : Input) -> String raise ErrMode {
 
 ///|
 /// `is_unquoted_char`: `A-Z / a-z / 0-9 / - / _`
-fn is_unquoted_char(b : Int) -> Bool {
+fn is_unquoted_char(b : Int32) -> Bool {
   (b >= 'A' && b <= 'Z') ||
   (b >= 'a' && b <= 'z') ||
   is_digit(b) ||

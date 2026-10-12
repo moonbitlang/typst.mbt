@@ -16,7 +16,7 @@ fn trace_fnv(data : Bytes) -> UInt64 {
 }
 
 ///|
-fn hex32(x : UInt) -> String {
+fn hex32(x : UInt32) -> String {
   let digits = "0123456789abcdef"
   let sb = StringBuilder()
   for i = 7; i >= 0; i = i - 1 {

@@ -67,7 +67,7 @@ fn MemoryTypeInner::maximum_byte_size(
 
 ///|
 /// Returns the size of the linear memory pages in bytes.
-fn MemoryTypeInner::page_size(self : MemoryTypeInner) -> UInt {
+fn MemoryTypeInner::page_size(self : MemoryTypeInner) -> UInt32 {
   1U << self.page_size_log2.to_int()
 }
 
@@ -287,7 +287,7 @@ pub fn MemoryType::maximum(self : MemoryType) -> UInt64? {
 
 ///|
 /// Returns the page size of the [`MemoryType`] in bytes.
-pub fn MemoryType::page_size(self : MemoryType) -> UInt {
+pub fn MemoryType::page_size(self : MemoryType) -> UInt32 {
   self.inner.page_size()
 }
 

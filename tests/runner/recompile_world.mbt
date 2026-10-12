@@ -140,7 +140,7 @@ let recompile_inputs : ReadOnlyArray[ReadOnlyArray[(String, String)]] = [
 
 ///|
 /// A new library object of a flavor with one of the [recompile_inputs].
-fn Flavor::library(self : Flavor, inputs : Int) -> @library.Library {
+fn Flavor::library(self : Flavor, inputs : Int32) -> @library.Library {
   let dict = @library.Dict::new()
   for pair in recompile_inputs[inputs][:] {
     dict.insert(pair.0, Str(pair.1))
@@ -191,7 +191,7 @@ let recompile_font_sets : Map[String, (Array[@library.Font], @library.FontBook)]
 /// fallback font, so every page changes).
 fn Flavor::font_set(
   self : Flavor,
-  set : Int,
+  set : Int32,
 ) -> (Array[@library.Font], @library.FontBook) {
   let (kind, all, book) = match self {
     Suite(_) | Plain => ("test", test_fonts(), test_font_book())
@@ -220,11 +220,11 @@ priv struct Variant {
   /// The main file.
   main : @syntax.FileId
   /// The index of `sys.inputs` in [recompile_inputs].
-  inputs : Int
+  inputs : Int32
   /// The date, in days since 1970-01-01 (upstream's test world: 0).
-  day : Int
+  day : Int32
   /// The font set ([Flavor::font_set]).
-  fonts : Int
+  fonts : Int32
 }
 
 ///|
@@ -244,7 +244,7 @@ priv struct RecompileWorld {
   mut library : @library.Library
   /// The libraries this world had, by their inputs: a host that goes back
   /// to earlier inputs may well go back to the library it built for them.
-  libraries : Map[Int, @library.Library]
+  libraries : Map[Int32, @library.Library]
   /// The files that were given out as sources since the last reset.
   sourced : Map[@syntax.FileId, Unit]
 }

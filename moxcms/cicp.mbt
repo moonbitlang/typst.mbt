@@ -29,7 +29,7 @@ pub extend CicpColorPrimaries with Eq::{not_equal, equal}
 pub extend CicpColorPrimaries with @debug.Debug::{to_repr}
 
 ///|
-fn CicpColorPrimaries::try_from(value : Int) -> CicpColorPrimaries {
+fn CicpColorPrimaries::try_from(value : Int32) -> CicpColorPrimaries {
   // Values 0, 3, 13–21, 23–255 are all reserved so all map to the same
   // variant.
   match value {
@@ -83,7 +83,7 @@ pub extend TransferCharacteristics with Eq::{not_equal, equal}
 pub extend TransferCharacteristics with @debug.Debug::{to_repr}
 
 ///|
-fn TransferCharacteristics::try_from(value : Int) -> TransferCharacteristics {
+fn TransferCharacteristics::try_from(value : Int32) -> TransferCharacteristics {
   match value {
     1 => Bt709
     2 => Unspecified
@@ -145,7 +145,7 @@ pub extend MatrixCoefficients with @debug.Debug::{to_repr}
 
 ///|
 fn MatrixCoefficients::try_from(
-  value : Int,
+  value : Int32,
 ) -> MatrixCoefficients raise CmsError {
   match value {
     0 => Identity

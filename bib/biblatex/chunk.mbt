@@ -3,8 +3,8 @@
 ///|
 /// A byte range in the source (upstream `std::ops::Range<usize>`).
 pub(all) struct Span {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -18,7 +18,7 @@ pub extend Span with Eq::{not_equal, equal}
 pub extend Span with @debug.Debug::{to_repr}
 
 ///|
-pub fn Span::new(start : Int, end : Int) -> Span {
+pub fn Span::new(start : Int32, end : Int32) -> Span {
   { start, end, }
 }
 
@@ -30,11 +30,11 @@ pub fn Span::is_empty(self : Span) -> Bool {
 
 ///|
 /// The detached marker (upstream `usize::MAX`).
-pub const DETACHED : Int = 2147483647
+pub const DETACHED : Int32 = 2147483647
 
 ///|
 /// Saturating addition of span offsets.
-fn sat_add(a : Int, b : Int) -> Int {
+fn sat_add(a : Int32, b : Int32) -> Int32 {
   if a >= DETACHED - b {
     DETACHED
   } else {
@@ -528,12 +528,12 @@ pub fn split_at_normal_char(
 
 ///|
 /// Convert a UTF-8 byte index into a UTF-16 index of `s`.
-fn byte_to_utf16(s : String, byte : Int) -> Int {
+fn byte_to_utf16(s : String, byte : Int32) -> Int32 {
   let mut b = 0
   let mut i = 0
   while i < s.length() && b < byte {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    b += @unscanny.char_len_utf8(Int::unsafe_to_char(c))
+    b += @unscanny.char_len_utf8(Int32::unsafe_to_char(c))
     i = next
   }
   i
@@ -544,8 +544,8 @@ fn byte_to_utf16(s : String, byte : Int) -> Int {
 /// the string byte index `str_idx` within that chunk.
 pub fn split_values(
   src : ArrayView[Spanned[Chunk]],
-  chunk_idx : Int,
-  str_idx : Int,
+  chunk_idx : Int32,
+  str_idx : Int32,
 ) -> (Chunks, Chunks) {
   let src = clone_chunks(src)
   let new = []
@@ -583,7 +583,7 @@ pub fn split_values(
 
 ///|
 /// Returns the number of characters in the chunks.
-pub fn count_num_char(chunks : ArrayView[Spanned[Chunk]], c : Char) -> Int {
+pub fn count_num_char(chunks : ArrayView[Spanned[Chunk]], c : Char) -> Int32 {
   let mut n = 0
   for val in chunks {
     if val.v is Normal(s) {

@@ -10,14 +10,14 @@
 
 ///|
 // Limits according to the Adobe Technical Note #5176, chapter 4 DICT Data.
-let cff1_max_operands_len : Int = 48
+let cff1_max_operands_len : Int32 = 48
 
 ///|
 // Limits according to the Adobe Technical Note #5177 Appendix B.
-let cff1_stack_limit : Int = 10
+let cff1_stack_limit : Int32 = 10
 
 ///|
-let cff1_max_arguments_stack_len : Int = 48
+let cff1_max_arguments_stack_len : Int32 = 48
 
 ///|
 priv enum FontKind {
@@ -72,14 +72,14 @@ pub extend Matrix with Default::{default}
 
 ///|
 priv struct TopDict {
-  mut charset_offset : Int?
-  mut encoding_offset : Int?
-  mut char_strings_offset : Int
-  mut private_dict_range : (Int, Int)?
+  mut charset_offset : Int32?
+  mut encoding_offset : Int32?
+  mut char_strings_offset : Int32
+  mut private_dict_range : (Int32, Int32)?
   mut matrix : Matrix
   mut has_ros : Bool
-  mut fd_array_offset : Int?
-  mut fd_select_offset : Int?
+  mut fd_array_offset : Int32?
+  mut fd_select_offset : Int32?
 }
 
 ///|
@@ -138,7 +138,7 @@ fn parse_top_dict(s : Stream) -> TopDict raise Malformed {
 
 ///|
 priv struct PrivateDict {
-  mut local_subroutines_offset : Int?
+  mut local_subroutines_offset : Int32?
   mut default_width : Float?
   mut nominal_width : Float?
 }
@@ -167,7 +167,7 @@ fn parse_private_dict(data : BytesView) -> PrivateDict {
 }
 
 ///|
-fn parse_font_dict(data : BytesView) -> (Int, Int)? {
+fn parse_font_dict(data : BytesView) -> (Int32, Int32)? {
   let dict_parser = DictionaryParser::new(data, cff1_max_operands_len)
   while dict_parser.parse_next() is Some(operator) {
     if operator == 18 {
@@ -217,7 +217,7 @@ fn parse_cid_local_subrs(
 priv struct Cff1Context {
   metadata : CffTable
   mut width : Float?
-  mut stems_len : UInt
+  mut stems_len : UInt32
   mut has_endchar : Bool
   mut has_seac : Bool
   glyph_id : GlyphId // Required to parse local subroutine in CID fonts.
@@ -277,7 +277,7 @@ fn cff1_parse_char_string(
 fn cff1_parse_char_string_impl(
   ctx : Cff1Context,
   char_string : BytesView,
-  depth : Int,
+  depth : Int32,
   p : CharStringParser,
 ) -> Unit raise CFFError {
   let s = Stream::new(char_string)
@@ -492,9 +492,9 @@ fn cff1_parse_char_string_impl(
       }
       30 => p.parse_vh_curve_to()
       31 => p.parse_hv_curve_to()
-      32..=246 => p.parse_int1(op)
-      247..=250 => p.parse_int2(op, s)
-      251..=254 => p.parse_int3(op, s)
+      32..<=246 => p.parse_int1(op)
+      247..<=250 => p.parse_int2(op, s)
+      251..<=254 => p.parse_int3(op, s)
       _ => // FIXED_16_16
         p.parse_fixed(s)
     }

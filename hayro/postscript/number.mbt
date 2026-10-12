@@ -3,7 +3,7 @@
 ///|
 /// A PostScript number object (integer or real).
 pub(all) enum Number {
-  Integer(Int)
+  Integer(Int32)
   Real(Float)
 } derive(Eq, Debug)
 
@@ -33,7 +33,7 @@ pub extend Number with Show::{to_string, output}
 ///|
 /// Return the value as an `i32`. Reals are truncated (saturating like Rust's
 /// `as`).
-pub fn Number::as_i32(self : Number) -> Int {
+pub fn Number::as_i32(self : Number) -> Int32 {
   match self {
     Integer(v) => v
     Real(v) => f32_to_i32_sat(v)
@@ -60,7 +60,7 @@ pub fn Number::as_f64(self : Number) -> Double {
 
 ///|
 /// Rust's saturating `f32 as i32`.
-fn f32_to_i32_sat(v : Float) -> Int {
+fn f32_to_i32_sat(v : Float) -> Int32 {
   let d = v.to_double()
   if d.is_nan() {
     0
@@ -179,7 +179,7 @@ fn read_number(r : Reader) -> Result[Number, PsError] {
 
 ///|
 /// `str::parse::<u32>()` on a string of ASCII digits.
-fn parse_u32_decimal(bytes : BytesView) -> UInt? {
+fn parse_u32_decimal(bytes : BytesView) -> UInt32? {
   if bytes.length() == 0 {
     return None
   }
@@ -196,7 +196,7 @@ fn parse_u32_decimal(bytes : BytesView) -> UInt? {
 
 ///|
 /// `str::parse::<i32>()`: an optional sign followed by ASCII digits.
-fn parse_i32_decimal(bytes : BytesView) -> Int? {
+fn parse_i32_decimal(bytes : BytesView) -> Int32? {
   let mut i = 0
   let mut neg = false
   if bytes.length() > 0 && (bytes[0] == b'+' || bytes[0] == b'-') {
@@ -222,7 +222,7 @@ fn parse_i32_decimal(bytes : BytesView) -> Int? {
 
 ///|
 /// `i32::from_str_radix` on a string of ASCII alphanumerics.
-fn i32_from_str_radix(bytes : BytesView, radix : Int) -> Int? {
+fn i32_from_str_radix(bytes : BytesView, radix : Int32) -> Int32? {
   if bytes.length() == 0 {
     return None
   }

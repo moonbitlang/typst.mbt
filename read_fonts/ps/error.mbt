@@ -7,16 +7,16 @@ using @font_types {type GlyphId, type Fixed, type FontMatrix}
 /// Errors that are specific to PostScript processing.
 pub(all) suberror PsError {
   InvalidFontFormat
-  InvalidIndexOffsetSize(Int)
+  InvalidIndexOffsetSize(Int32)
   ZeroOffsetInIndex
-  InvalidVariationStoreIndex(Int)
+  InvalidVariationStoreIndex(Int32)
   StackOverflow
   StackUnderflow
-  InvalidStackAccess(Int)
-  ExpectedI32StackEntry(Int)
+  InvalidStackAccess(Int32)
+  ExpectedI32StackEntry(Int32)
   InvalidNumber
-  InvalidDictOperator(Int)
-  InvalidCharstringOperator(Int)
+  InvalidDictOperator(Int32)
+  InvalidCharstringOperator(Int32)
   CharstringNestingDepthLimitExceeded
   MissingSubroutines
   MissingBlendState
@@ -24,7 +24,7 @@ pub(all) suberror PsError {
   MissingPrivateDict
   MissingCharstrings
   MissingCharset
-  InvalidSeacCode(Int)
+  InvalidSeacCode(Int32)
   Read(@read_fonts.ReadError)
 }
 

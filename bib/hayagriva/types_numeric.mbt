@@ -28,13 +28,13 @@ pub extend Numeric with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new `Numeric` from a number.
-pub fn Numeric::new(value : Int) -> Numeric {
+pub fn Numeric::new(value : Int32) -> Numeric {
   { value: Number(value), prefix: None, suffix: None, }
 }
 
 ///|
 /// Creates a new `Numeric` from a range.
-pub fn Numeric::from_range(start : Int, end : Int) -> Numeric {
+pub fn Numeric::from_range(start : Int32, end : Int32) -> Numeric {
   {
     value: Set([(start, Some(Hyphen)), (end, None)]),
     prefix: None,
@@ -110,7 +110,7 @@ pub fn[W : FmtWrite] Numeric::with_form(
   gender : @citationberg.GrammarGender?,
   ords : @citationberg.OrdinalLookup,
 ) -> Unit {
-  let format = (n : Int) => {
+  let format = (n : Int32) => {
     match form {
       Ordinal => {
         fmt_int(buf, n.to_int64())
@@ -148,8 +148,8 @@ pub fn[W : FmtWrite] Numeric::with_form(
 
 ///|
 /// `format!("{:x}", RomanNumeral)`: the lowercase Roman numeral.
-fn roman_lower(n : Int) -> String {
-  let table : Array[(Int, String)] = [
+fn roman_lower(n : Int32) -> String {
+  let table : Array[(Int32, String)] = [
     (1000, "m"),
     (900, "cm"),
     (500, "d"),
@@ -187,7 +187,7 @@ pub fn Numeric::is_plural(self : Numeric, is_number_of : Bool) -> Bool {
 
 ///|
 /// Whether the value is a single number with no prefix or suffix.
-pub fn Numeric::single_number(self : Numeric) -> Int? {
+pub fn Numeric::single_number(self : Numeric) -> Int32? {
   if self.prefix is None && self.suffix is None {
     match self.value {
       Number(n) => Some(n)
@@ -200,14 +200,14 @@ pub fn Numeric::single_number(self : Numeric) -> Int? {
 
 ///|
 /// Returns the nth number in the set.
-pub fn Numeric::nth(self : Numeric, n : Int) -> Int? {
+pub fn Numeric::nth(self : Numeric, n : Int32) -> Int32? {
   self.value.nth(n)
 }
 
 ///|
 /// Order the values according to CSL rules (lexicographic over the
 /// numbers).
-pub fn Numeric::csl_cmp(self : Numeric, other : Numeric) -> Int {
+pub fn Numeric::csl_cmp(self : Numeric, other : Numeric) -> Int32 {
   let a = self.value.numbers()
   let b = other.value.numbers()
   let n = if a.length() < b.length() { a.length() } else { b.length() }
@@ -220,7 +220,7 @@ pub fn Numeric::csl_cmp(self : Numeric, other : Numeric) -> Int {
 }
 
 ///|
-fn compare_int(a : Int, b : Int) -> Int {
+fn compare_int(a : Int32, b : Int32) -> Int32 {
   if a < b {
     -1
   } else if a > b {
@@ -349,7 +349,7 @@ pub extend NumericError with Show::{to_string, output}
 /// have already been eaten.
 ///
 /// The number can be positive, negative, or zero.
-fn number(s : @unscanny.Scanner) -> Int? {
+fn number(s : @unscanny.Scanner) -> Int32? {
   let negative = s.eat_if('-')
   let num = s.eat_while(@unscanny.is_numeric)
   if num.is_empty() {
@@ -365,9 +365,9 @@ fn number(s : @unscanny.Scanner) -> Int? {
 /// The numeric value.
 pub(all) enum NumericValue {
   /// A single number.
-  Number(Int)
+  Number(Int32)
   /// A set of numbers.
-  Set(Array[(Int, NumericDelimiter?)])
+  Set(Array[(Int32, NumericDelimiter?)])
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -387,7 +387,7 @@ pub extend NumericValue with @debug.Debug::{to_repr}
 
 ///|
 /// Return the length of the numeric value.
-pub fn NumericValue::len(self : NumericValue) -> Int {
+pub fn NumericValue::len(self : NumericValue) -> Int32 {
   match self {
     Number(_) => 1
     Set(vec) => vec.length()
@@ -396,7 +396,7 @@ pub fn NumericValue::len(self : NumericValue) -> Int {
 
 ///|
 /// Returns the nth number in the set.
-fn NumericValue::nth(self : NumericValue, n : Int) -> Int? {
+fn NumericValue::nth(self : NumericValue, n : Int32) -> Int32? {
   match self {
     Number(val) if n == 0 => Some(val)
     Number(_) => None
@@ -410,7 +410,7 @@ fn NumericValue::nth(self : NumericValue, n : Int) -> Int? {
 
 ///|
 /// The numbers of the value (upstream `NumIterator`).
-fn NumericValue::numbers(self : NumericValue) -> Array[Int] {
+fn NumericValue::numbers(self : NumericValue) -> Array[Int32] {
   match self {
     Number(v) => [v]
     Set(vec) => vec.map(item => item.0)

@@ -44,7 +44,7 @@ fn checked_mul_i64(a : Int64, b : Int64) -> Int64 raise HintedError {
 
 ///|
 /// Compare strings by code points (= UTF-8 byte order, like Rust).
-pub fn compare_str(a : String, b : String) -> Int {
+pub fn compare_str(a : String, b : String) -> Int32 {
   let mut i = 0
   let mut j = 0
   while i < a.length() && j < b.length() {
@@ -494,7 +494,7 @@ pub fn equal(lhs : Value, rhs : Value) -> Bool {
 
 ///|
 /// Compare two values: `-1`, `0` or `1`.
-pub fn compare(lhs : Value, rhs : Value) -> Int raise HintedError {
+pub fn compare(lhs : Value, rhs : Value) -> Int32 raise HintedError {
   match (lhs, rhs) {
     (Bool(a), Bool(b)) => a.compare(b)
     (Int(a), Int(b)) => a.compare(b)
@@ -532,7 +532,7 @@ pub fn compare(lhs : Value, rhs : Value) -> Int raise HintedError {
 }
 
 ///|
-fn try_cmp_floats(a : Double, b : Double) -> Int raise HintedError {
+fn try_cmp_floats(a : Double, b : Double) -> Int32 raise HintedError {
   if a.is_nan() || b.is_nan() {
     bail("cannot compare \{repr_float(a)} with \{repr_float(b)}")
   }
@@ -540,7 +540,7 @@ fn try_cmp_floats(a : Double, b : Double) -> Int raise HintedError {
 }
 
 ///|
-fn try_cmp_lengths(a : Length, b : Length) -> Int raise HintedError {
+fn try_cmp_lengths(a : Length, b : Length) -> Int32 raise HintedError {
   match a.partial_cmp(b) {
     Some(o) => o
     None => bail("cannot compare \{a.repr()} with \{b.repr()}")
@@ -549,7 +549,10 @@ fn try_cmp_lengths(a : Length, b : Length) -> Int raise HintedError {
 
 ///|
 /// Try to compare arrays of values lexicographically.
-fn try_cmp_arrays(a : Array[Value], b : Array[Value]) -> Int raise HintedError {
+fn try_cmp_arrays(
+  a : Array[Value],
+  b : Array[Value],
+) -> Int32 raise HintedError {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let o = compare(a[i], b[i])

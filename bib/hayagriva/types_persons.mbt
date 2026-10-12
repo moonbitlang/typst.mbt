@@ -504,7 +504,7 @@ pub fn Person::name_without_article(self : Person) -> String {
 
 ///|
 /// Compare optional strings like Rust's `Option<String>` ordering.
-fn compare_opt_str(a : String?, b : String?) -> Int {
+fn compare_opt_str(a : String?, b : String?) -> Int32 {
   match (a, b) {
     (None, None) => 0
     (None, Some(_)) => -1
@@ -520,7 +520,7 @@ pub fn Person::csl_cmp(
   other : Person,
   form : @citationberg.LongShortForm,
   demote_particle : Bool,
-) -> Int {
+) -> Int32 {
   let self_cjk = self.is_cjk()
   let other_cjk = other.is_cjk()
   let name_a = @unscanny.to_lowercase(self.name)
@@ -548,7 +548,7 @@ pub fn Person::csl_cmp(
   let prefix_b = other.prefix.map(s => @unscanny.to_lowercase(s))
   let suffix_a = self.suffix.map(s => @unscanny.to_lowercase(s))
   let suffix_b = other.suffix.map(s => @unscanny.to_lowercase(s))
-  let chain = (cs : Array[() -> Int]) => {
+  let chain = (cs : Array[() -> Int32]) => {
     for c in cs {
       let v = c()
       if v != 0 {

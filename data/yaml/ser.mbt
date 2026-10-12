@@ -9,7 +9,7 @@
 /// `serde_yaml::Serializer`: collects the emitter events.
 priv struct Serializer {
   events : Array[EEvent]
-  mut depth : Int
+  mut depth : Int32
 }
 
 ///|

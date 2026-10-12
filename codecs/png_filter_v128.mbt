@@ -19,8 +19,8 @@
 /// Paeth), and computes upstream's `sum_buffer` of the output, giving up
 /// (with a partially filtered row) once the cost exceeds `limit`.
 fn filter_row_cost(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],
@@ -104,7 +104,7 @@ fn filter_row_cost(
 /// `previous[0..len]`, `output[1..len + 1]` for `len = current.length()`,
 /// and `i - bpp >= 0` from `first` on.
 fn filter_ranges_ok(
-  bpp : Int,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],
@@ -149,12 +149,12 @@ fn hsum_i32x4_to_int64(v : V128) -> Int64 {
 /// Filters byte `i` into `output[i + 1]` and returns its cost (filter 0 is
 /// None; `a`/`c` are 0 before `bpp`).
 fn filter_cost_byte(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],
-  i : Int,
+  i : Int32,
 ) -> Int64 {
   let x = current[i].to_int()
   let a = if i >= bpp { current[i - bpp].to_int() } else { 0 }

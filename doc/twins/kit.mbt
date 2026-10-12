@@ -239,7 +239,7 @@ let data_table_typ : String =
 
 ///|
 /// A text of `count` words.
-fn words(count : Int) -> String {
+fn words(count : Int32) -> String {
   Array::make(count, "word").join(" ")
 }
 

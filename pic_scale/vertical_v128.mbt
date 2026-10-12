@@ -22,17 +22,17 @@
 ///|
 /// [convolve_vertical_neon_i16_precision] (the `rdm` kernel).
 fn vertical_rdm_kernel(
-  width : Int,
-  bounds_start : Int,
-  bounds_size : Int,
+  width : Int32,
+  bounds_start : Int32,
+  bounds_size : Int32,
   src : FixedArray[Byte],
-  src_offset : Int,
-  src_stride : Int,
+  src_offset : Int32,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
-  weights : FixedArray[Int],
-  weights_offset : Int,
-  acc : FixedArray[Int],
+  dst_offset : Int32,
+  weights : FixedArray[Int32],
+  weights_offset : Int32,
+  acc : FixedArray[Int32],
 ) -> Unit {
   guard width >= 16 &&
     vertical_ranges_ok(
@@ -87,17 +87,17 @@ fn vertical_rdm_kernel(
 ///|
 /// [convolve_vertical_neon_i32_precision] (the Q15 `i32` kernel).
 fn vertical_i32_kernel(
-  width : Int,
-  bounds_start : Int,
-  bounds_size : Int,
+  width : Int32,
+  bounds_start : Int32,
+  bounds_size : Int32,
   src : FixedArray[Byte],
-  src_offset : Int,
-  src_stride : Int,
+  src_offset : Int32,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
-  weights : FixedArray[Int],
-  weights_offset : Int,
-  acc : FixedArray[Int],
+  dst_offset : Int32,
+  weights : FixedArray[Int32],
+  weights_offset : Int32,
+  acc : FixedArray[Int32],
 ) -> Unit {
   guard width >= 16 &&
     vertical_ranges_ok(
@@ -153,17 +153,17 @@ fn expand8_to_14x8(p : V128) -> V128 {
 ///|
 /// Whether every access of a vertical kernel is in bounds.
 fn vertical_ranges_ok(
-  width : Int,
-  bounds_start : Int,
-  bounds_size : Int,
+  width : Int32,
+  bounds_start : Int32,
+  bounds_size : Int32,
   src : FixedArray[Byte],
-  src_offset : Int,
-  src_stride : Int,
+  src_offset : Int32,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
-  weights : FixedArray[Int],
-  weights_offset : Int,
-  acc : FixedArray[Int],
+  dst_offset : Int32,
+  weights : FixedArray[Int32],
+  weights_offset : Int32,
+  acc : FixedArray[Int32],
 ) -> Bool {
   !physical_equal(src, dst) &&
   !physical_equal(acc, weights) &&
@@ -192,6 +192,6 @@ fn vertical_ranges_ok(
 /// Whether `[off, off + len)` lies within `[0, total)`, computed without
 /// `Int` overflow (the `@v128` loads and stores are not bounds checked).
 #inline
-fn in_range(off : Int, len : Int64, total : Int) -> Bool {
+fn in_range(off : Int32, len : Int64, total : Int32) -> Bool {
   off >= 0 && len >= 0L && len <= total.to_int64() - off.to_int64()
 }

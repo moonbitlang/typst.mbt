@@ -136,12 +136,12 @@ fn collect_pages(
 /// The children are `children[base:]` upstream; `mid` is relative to `base`.
 fn migrate_unterminated_tags(
   children : Array[@library.Pair],
-  base : Int,
-  mid : Int,
-) -> Int {
+  base : Int32,
+  mid : Int32,
+) -> Int32 {
   let len = children.length() - base
-  let is_tag = (i : Int) => children[base + i].0.is_(@library.tag_elem())
-  let is_pagebreak = (i : Int) => {
+  let is_tag = (i : Int32) => children[base + i].0.is_(@library.tag_elem())
+  let is_pagebreak = (i : Int32) => {
     children[base + i].0.is_(@library.pagebreak_elem())
   }
 

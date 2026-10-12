@@ -679,7 +679,7 @@ fn compute_auto_indents(
   )
   let indents = determine_prefix_widths(elems)
   let fallback = Em::new(1.2).resolve(styles)
-  let get = (i : Int) => {
+  let get = (i : Int32) => {
     if i < indents.length() && indents[i] is Some(v) {
       v
     } else {

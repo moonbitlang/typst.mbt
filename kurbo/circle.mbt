@@ -27,7 +27,7 @@ pub fn Circle::new(center : Point, radius : Double) -> Circle {
 
 ///|
 /// The winding number of a point (`Shape::winding`).
-pub fn Circle::winding(self : Circle, pt : Point) -> Int {
+pub fn Circle::winding(self : Circle, pt : Point) -> Int32 {
   if pt.sub(self.center).hypot2() < self.radius * self.radius {
     1
   } else {

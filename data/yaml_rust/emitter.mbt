@@ -7,9 +7,9 @@
 ///|
 pub struct YamlEmitter {
   priv writer : StringBuilder
-  priv best_indent : Int
+  priv best_indent : Int32
   priv mut compact : Bool
-  priv mut level : Int
+  priv mut level : Int32
 }
 
 ///|
@@ -272,12 +272,12 @@ fn need_quotes(string : String) -> Bool {
       | '"'
       | '\''
       | '\\'
-      | '\u{0}'..='\u{6}'
+      | '\u{0}'..<='\u{6}'
       | '\t'
       | '\n'
       | '\r'
-      | '\u{e}'..='\u{1a}'
-      | '\u{1c}'..='\u{1f}' => true
+      | '\u{e}'..<='\u{1a}'
+      | '\u{1c}'..<='\u{1f}' => true
       _ => false
     }
   }) ||

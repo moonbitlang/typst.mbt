@@ -19,13 +19,13 @@ let edsl_gen_dir = "tests/edsl_gen"
 
 ///|
 /// The number of shard packages (`tests/edsl_gen/s00` ...).
-let edsl_shards : Int = 16
+let edsl_shards : Int32 = 16
 
 ///|
 /// The cases of the suite in order: number, suite file, test, and whether
 /// upstream compiles it to a paged document.
 priv struct SuiteCase {
-  number : Int
+  number : Int32
   rel : String
   tc : TestCase
   paged : Bool
@@ -140,8 +140,8 @@ fn tsv_field(field : String) -> String {
 /// `--failed=<file>`: the cases whose generated code did not type-check
 /// (lines `number<TAB>message`), which are regenerated as whole-document
 /// fragments and recorded as compile errors.
-fn read_failed(path : String) -> Map[Int, String] {
-  let failed : Map[Int, String] = Map([])
+fn read_failed(path : String) -> Map[Int32, String] {
+  let failed : Map[Int32, String] = Map([])
   for line in read(path).split("\n") {
     let line = line.to_owned()
     match line.find("\t") {
@@ -162,7 +162,7 @@ fn run_edsl_convert(
   filter : String?,
   baseline : Bool,
   prose : Bool,
-  failed : Map[Int, String],
+  failed : Map[Int32, String],
 ) -> Unit {
   let library = test_library()
   let shards : Array[StringBuilder] = Array::makei(edsl_shards, _ => {
@@ -178,7 +178,7 @@ fn run_edsl_convert(
     using_ +
     "\n"
   let header_lines = header.split("\n").count() - 1
-  let lines : Array[Int] = Array::make(edsl_shards, header_lines + 1)
+  let lines : Array[Int32] = Array::make(edsl_shards, header_lines + 1)
   let manifest = StringBuilder()
   manifest.write_string(
     tsv_line([
@@ -492,7 +492,7 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
   }
   // The manifest of the conversion: the registered builders must be those
   // of the enumerated cases (number, file and name).
-  let manifest : Map[Int, String] = Map([])
+  let manifest : Map[Int32, String] = Map([])
   for line in read("\{edsl_gen_dir}/manifest.tsv").split("\n") {
     let fields = line.split("\t").map(f => f.to_owned()).collect()
     if fields.length() >= 4 {
@@ -512,7 +512,7 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
   // In the other direction: every selected row of the manifest must be an
   // enumerated case (a corpus that disappeared since the conversion would
   // otherwise shrink the run silently).
-  let enumerated : Map[Int, String] = Map([])
+  let enumerated : Map[Int32, String] = Map([])
   for case_ in suite_cases() {
     enumerated[case_.number] = case_.rel + "\t" + case_.tc.name
   }

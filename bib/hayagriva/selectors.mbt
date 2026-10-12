@@ -170,7 +170,7 @@ fn Selector::apply_any(
       None
     }
     Multi(exprs) => {
-      let consumed : Array[Int] = []
+      let consumed : Array[Int32] = []
       let res : Map[String, Entry] = Map([])
       for spec in exprs {
         let mut item = None

@@ -80,8 +80,8 @@ pub struct PageMemo[T] {
   priv label : String
   /// The numbers of calls that were answered by an entry and that were
   /// computed, since the process started.
-  priv mut found : Int
-  priv mut computed : Int
+  priv mut found : Int32
+  priv mut computed : Int32
 }
 
 ///|
@@ -97,14 +97,14 @@ pub fn[T] PageMemo::new(label : String) -> PageMemo[T] {
 /// like [closure_memo_stats]). Calls outside of a compilation, with
 /// memoization off or in a second run of the recording check are not
 /// counted.
-pub fn[T] PageMemo::stats(self : PageMemo[T]) -> (Int, Int) {
+pub fn[T] PageMemo::stats(self : PageMemo[T]) -> (Int32, Int32) {
   (self.found, self.computed)
 }
 
 ///|
 /// The number of results that the store keeps (for tests and
 /// measurements).
-pub fn[T] PageMemo::entries(self : PageMemo[T]) -> Int {
+pub fn[T] PageMemo::entries(self : PageMemo[T]) -> Int32 {
   self.store.length()
 }
 

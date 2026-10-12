@@ -4,9 +4,9 @@
 fn check_feature(
   text : String,
   tag : String,
-  value : UInt,
-  start : UInt,
-  end : UInt,
+  value : UInt32,
+  start : UInt32,
+  end : UInt32,
 ) -> Unit raise {
   let f = @shape.Feature::from_str(text).unwrap()
   assert_eq(f.tag, @otf.Tag::from_str(tag))

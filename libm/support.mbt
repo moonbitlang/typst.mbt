@@ -45,7 +45,7 @@ priv enum Round {
 
 ///|
 /// `round as usize`.
-fn Round::to_int(self : Round) -> Int {
+fn Round::to_int(self : Round) -> Int32 {
   match self {
     Nearest => 0
     Negative => 1
@@ -60,7 +60,7 @@ fn Round::to_int(self : Round) -> Int {
 /// Never read, like the `status` it is the type of (libm
 /// `src/math/support/env.rs:17`).
 #warnings("-unused_constructor")
-priv struct Status(Int)
+priv struct Status(Int32)
 
 ///|
 /// Default status indicating no errors (`Status::OK`).
@@ -76,12 +76,12 @@ fn cold_path() -> Unit {
 
 ///|
 /// The bitwidth of the significand (`f64::SIG_BITS`).
-const F64_SIG_BITS : Int = 52
+const F64_SIG_BITS : Int32 = 52
 
 ///|
 /// The saturated (maximum bitpattern) value of the exponent, i.e. the infinite
 /// representation (`f64::EXP_SAT`).
-const F64_EXP_SAT : UInt = 0x7ff
+const F64_EXP_SAT : UInt32 = 0x7ff
 
 ///|
 /// A mask for the sign bit (`f64::SIGN_MASK`).

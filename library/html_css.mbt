@@ -63,7 +63,7 @@ pub fn CssProperties::iter(self : CssProperties) -> Iter[CssProperty] {
 
 ///|
 /// The number of properties.
-pub fn CssProperties::length(self : CssProperties) -> Int {
+pub fn CssProperties::length(self : CssProperties) -> Int32 {
   self.0.length()
 }
 
@@ -168,7 +168,7 @@ pub extend CssProperties with FromValue::{from_value}
 ///|
 /// Rust's `str` ordering (MoonBit's `String::compare` orders by length
 /// first). Property names are ASCII.
-fn css_compare_names(a : String, b : String) -> Int {
+fn css_compare_names(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let order = a.code_unit_at(i).compare(b.code_unit_at(i))
@@ -318,7 +318,7 @@ pub fn CssWriter::fail(self : CssWriter, what : String) -> Unit {
 /// drop; here [CssCallWriter::finish] must be called.
 priv struct CssCallWriter {
   w : CssWriter
-  mut count : Int
+  mut count : Int32
   separator : CssSeparator
 }
 
@@ -394,8 +394,8 @@ priv enum CssSeparator {
 priv struct CssCalcWriter {
   w : CssWriter
   /// The index in the [CssWriter::buf].
-  start_idx : Int
-  mut count : Int
+  start_idx : Int32
+  mut count : Int32
 }
 
 ///|
@@ -468,7 +468,7 @@ pub(open) trait ToCss {
 /// Convert a value to a CSS string (upstream `ToCss::to_css`).
 pub fn[T : ToCss] to_css(
   value : T,
-  sink? : (HintedString) -> Unit = _ => (),
+  sink~ : (HintedString) -> Unit = _ => (),
 ) -> String {
   let w = CssWriter::new(sink)
   value.emit(w)
@@ -494,7 +494,7 @@ impl ToCss for CssNumber with fn emit(self, w) {
 
 ///|
 /// Displays a number with N significant digits.
-priv struct CssNumberWithPrecision(Double, Int)
+priv struct CssNumberWithPrecision(Double, Int32)
 
 ///|
 impl ToCss for CssNumberWithPrecision with fn emit(self, w) {
@@ -702,7 +702,7 @@ pub extend Hsl with ToCss::{emit}
 ///|
 /// palette's `IntoStimulus<f32> for u8` (as used by `into_format`), widened
 /// to `f64` like upstream's `is_very_close`.
-fn css_u8_to_f32(x : Int) -> Double {
+fn css_u8_to_f32(x : Int32) -> Double {
   let max : Float = 255.0
   (Float::from_int(x) * ((1.0 : Float) / max)).to_double()
 }

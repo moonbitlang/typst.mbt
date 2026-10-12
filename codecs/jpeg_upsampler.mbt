@@ -11,28 +11,28 @@
 
 ///|
 priv struct Slice {
-  arr : FixedArray[Int]
-  off : Int
-  len : Int
+  arr : FixedArray[Int32]
+  off : Int32
+  len : Int32
 }
 
 ///|
-fn Slice::of(arr : FixedArray[Int]) -> Slice {
+fn Slice::of(arr : FixedArray[Int32]) -> Slice {
   { arr, off: 0, len: arr.length(), }
 }
 
 ///|
-fn Slice::at(self : Slice, i : Int) -> Int {
+fn Slice::at(self : Slice, i : Int32) -> Int32 {
   self.arr[self.off + i]
 }
 
 ///|
-fn Slice::set(self : Slice, i : Int, v : Int) -> Unit {
+fn Slice::set(self : Slice, i : Int32, v : Int32) -> Unit {
   self.arr[self.off + i] = v
 }
 
 ///|
-fn Slice::sub(self : Slice, start : Int, end : Int) -> Slice {
+fn Slice::sub(self : Slice, start : Int32, end : Int32) -> Slice {
   { arr: self.arr, off: self.off + start, len: end - start, }
 }
 
@@ -43,7 +43,7 @@ fn Slice::sub(self : Slice, start : Int, end : Int) -> Slice {
 fn upsample_horizontal_core_scalar(
   input : Slice,
   output : Slice,
-  n : Int,
+  n : Int32,
 ) -> Unit {
   for w in 0..<n {
     let sample = 3 * input.at(w + 1) + 2
@@ -60,8 +60,8 @@ fn upsample_vertical_core_scalar(
   input : Slice,
   near : Slice,
   output : Slice,
-  start : Int,
-  n : Int,
+  start : Int32,
+  n : Int32,
 ) -> Unit {
   for i in 0..<n {
     output.set(start + i, (3 * input.at(i) + 2 + near.at(i)) >> 2)
@@ -75,7 +75,7 @@ fn run_upsampler(
   input : Slice,
   in_near : Slice,
   in_far : Slice,
-  scratch : FixedArray[Int],
+  scratch : FixedArray[Int32],
   output : Slice,
 ) -> Unit raise DecodeErrors {
   match kind {
@@ -142,7 +142,7 @@ fn upsample_hv(
   input : Slice,
   in_near : Slice,
   in_far : Slice,
-  scratch_space : FixedArray[Int],
+  scratch_space : FixedArray[Int32],
   output : Slice,
 ) -> Unit raise DecodeErrors {
   if input.len * 4 != output.len || input.len * 2 > scratch_space.length() {

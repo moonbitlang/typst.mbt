@@ -14,7 +14,7 @@ struct RustDecimal {
   /// The mantissa, always in `0..2^96`.
   mantissa : @bigint.BigInt
   /// The scale (number of fractional digits), in `0..=28`.
-  scale : Int
+  scale : Int32
   /// The sign bit (may be set for zero).
   negative : Bool
 } derive(Hash)
@@ -24,7 +24,7 @@ pub extend RustDecimal with Hash::{hash, hash_combine}
 
 ///|
 /// The maximum supported scale.
-let rd_max_scale : Int = 28
+let rd_max_scale : Int32 = 28
 
 ///|
 let big_zero : @bigint.BigInt = @bigint.BigInt::from_int(0)
@@ -50,7 +50,7 @@ let rd_pow10_table : Array[@bigint.BigInt] = {
 
 ///|
 /// `10^n` as a big integer.
-fn rd_pow10(n : Int) -> @bigint.BigInt {
+fn rd_pow10(n : Int32) -> @bigint.BigInt {
   if n < rd_pow10_table.length() {
     rd_pow10_table[n]
   } else {
@@ -72,7 +72,7 @@ fn big_is_odd(n : @bigint.BigInt) -> Bool {
 fn RustDecimal::raw(
   mantissa : @bigint.BigInt,
   negative : Bool,
-  scale : Int,
+  scale : Int32,
 ) -> RustDecimal {
   { mantissa, scale, negative, }
 }
@@ -82,7 +82,7 @@ fn RustDecimal::raw(
 fn RustDecimal::from_parts(
   mantissa : @bigint.BigInt,
   negative : Bool,
-  scale : Int,
+  scale : Int32,
 ) -> RustDecimal {
   { mantissa, scale, negative: negative && !mantissa.is_zero(), }
 }
@@ -122,7 +122,7 @@ fn RustDecimal::neg(self : RustDecimal) -> RustDecimal {
 ///|
 /// rust_decimal's `cmp_impl`: compares values exactly; zeros are equal
 /// regardless of sign and scale.
-fn RustDecimal::cmp(self : RustDecimal, other : RustDecimal) -> Int {
+fn RustDecimal::cmp(self : RustDecimal, other : RustDecimal) -> Int32 {
   if other.is_zero() {
     return if self.is_zero() { 0 } else if self.negative { -1 } else { 1 }
   }
@@ -152,7 +152,7 @@ fn RustDecimal::cmp(self : RustDecimal, other : RustDecimal) -> Int {
 /// give `-1`, `0` or `1`. An ordering of this port is one of the three values
 /// of upstream's `Ordering`, and code compares them (`calc.min`/`calc.max`:
 /// `ordering == goal`).
-fn rd_cmp_internal(d1 : RustDecimal, d2 : RustDecimal) -> Int {
+fn rd_cmp_internal(d1 : RustDecimal, d2 : RustDecimal) -> Int32 {
   let scale = if d1.scale > d2.scale { d1.scale } else { d2.scale }
   let a = d1.mantissa * rd_pow10(scale - d1.scale)
   let b = d2.mantissa * rd_pow10(scale - d2.scale)
@@ -171,7 +171,10 @@ fn rd_cmp_internal(d1 : RustDecimal, d2 : RustDecimal) -> Int {
 /// like `Buf24::rescale`: drops the fewest digits needed, rounding half to
 /// even (taking all dropped digits into account). Returns `None` on
 /// overflow.
-fn rd_rescale(mantissa : @bigint.BigInt, scale : Int) -> (@bigint.BigInt, Int)? {
+fn rd_rescale(
+  mantissa : @bigint.BigInt,
+  scale : Int32,
+) -> (@bigint.BigInt, Int32)? {
   if mantissa < overflow_u96 && scale <= rd_max_scale {
     return Some((mantissa, scale))
   }
@@ -197,7 +200,7 @@ fn rd_rescale(mantissa : @bigint.BigInt, scale : Int) -> (@bigint.BigInt, Int)? 
 
 ///|
 /// `mantissa / 10^k`, rounded half to even.
-fn rd_round_half_even(mantissa : @bigint.BigInt, k : Int) -> @bigint.BigInt {
+fn rd_round_half_even(mantissa : @bigint.BigInt, k : Int32) -> @bigint.BigInt {
   if k == 0 {
     return mantissa
   }
@@ -325,7 +328,7 @@ fn RustDecimal::checked_mul(
 /// `Buf12::find_scale`: the largest power of ten (at most 9) by which the
 /// quotient can be scaled without exceeding 96 bits or the maximum scale.
 /// `None` if no scaling is possible while the scale is negative.
-fn rd_find_scale(quotient : @bigint.BigInt, scale : Int) -> Int? {
+fn rd_find_scale(quotient : @bigint.BigInt, scale : Int32) -> Int32? {
   let limit = if rd_max_scale - scale < 9 { rd_max_scale - scale } else { 9 }
   let mut x = 0
   while x < limit && quotient * rd_pow10(x + 1) < overflow_u96 {
@@ -344,9 +347,9 @@ fn rd_find_scale(quotient : @bigint.BigInt, scale : Int) -> Int? {
 /// ten, rounding half to even (or up if `sticky`).
 fn rd_unscale_from_overflow(
   quotient : @bigint.BigInt,
-  scale : Int,
+  scale : Int32,
   sticky : Bool,
-) -> (@bigint.BigInt, Int)? {
+) -> (@bigint.BigInt, Int32)? {
   let scale = scale - 1
   if scale < 0 {
     return None
@@ -364,13 +367,13 @@ fn rd_unscale_from_overflow(
 ///|
 /// The `unscale` step of division: strips trailing zeros like rust_decimal
 /// (which only strips eight zeros at once if the low 32 bits are zero).
-fn rd_unscale(q : @bigint.BigInt, scale : Int) -> (@bigint.BigInt, Int) {
+fn rd_unscale(q : @bigint.BigInt, scale : Int32) -> (@bigint.BigInt, Int32) {
   let mut q = q
   let mut scale = scale
   let low = fn(q : @bigint.BigInt, mask : Int64) -> Int64 {
     q.land(@bigint.BigInt::from_int64(mask)).to_int64()
   }
-  let try_div = fn(q : @bigint.BigInt, p : Int) -> @bigint.BigInt? {
+  let try_div = fn(q : @bigint.BigInt, p : Int32) -> @bigint.BigInt? {
     let pp = rd_pow10(p)
     let d = q / pp
     if d * pp == q {
@@ -528,7 +531,7 @@ fn RustDecimal::checked_rem(
 /// and whether a non-zero digit was discarded.
 fn RustDecimal::truncate_to(
   self : RustDecimal,
-  scale : Int,
+  scale : Int32,
 ) -> (RustDecimal, Bool) {
   if self.scale <= scale {
     return (self, false)
@@ -612,7 +615,7 @@ fn RustDecimal::normalize(self : RustDecimal) -> RustDecimal {
 /// `round_dp_with_strategy(dp, MidpointAwayFromZero)`.
 fn RustDecimal::round_dp_away_from_zero(
   self : RustDecimal,
-  dp : Int,
+  dp : Int32,
 ) -> RustDecimal {
   if self.scale <= dp {
     return self
@@ -631,7 +634,7 @@ fn RustDecimal::round_dp_away_from_zero(
 
 ///|
 /// `set_scale`: changes the scale without touching the mantissa.
-fn RustDecimal::set_scale(self : RustDecimal, scale : Int) -> RustDecimal? {
+fn RustDecimal::set_scale(self : RustDecimal, scale : Int32) -> RustDecimal? {
   if scale > rd_max_scale {
     None
   } else {
@@ -709,8 +712,8 @@ fn rd_powu_narrow(base : RustDecimal, exp : UInt64) -> RustDecimal? {
 
 ///|
 priv struct DecWide {
-  data : FixedArray[UInt]
-  scale : Int
+  data : FixedArray[UInt32]
+  scale : Int32
   negative : Bool
 }
 
@@ -725,20 +728,20 @@ fn DecWide::from_decimal(d : RustDecimal) -> DecWide {
 }
 
 ///|
-fn rd_words(m : @bigint.BigInt) -> (UInt, UInt, UInt) {
+fn rd_words(m : @bigint.BigInt) -> (UInt32, UInt32, UInt32) {
   let mask = @bigint.BigInt::from_uint64(0xFFFFFFFFUL)
   (m.land(mask).to_uint(), (m >> 32).land(mask).to_uint(), (m >> 64).to_uint())
 }
 
 ///|
-fn rd_from_words(lo : UInt, mid : UInt, hi : UInt) -> @bigint.BigInt {
+fn rd_from_words(lo : UInt32, mid : UInt32, hi : UInt32) -> @bigint.BigInt {
   (@bigint.BigInt::from_uint(hi) << 64) +
   (@bigint.BigInt::from_uint(mid) << 32) +
   @bigint.BigInt::from_uint(lo)
 }
 
 ///|
-fn upper_word_n(data : FixedArray[UInt], n : Int) -> Int {
+fn upper_word_n(data : FixedArray[UInt32], n : Int32) -> Int32 {
   let mut i = n - 1
   while i > 0 {
     if data[i] > 0U {
@@ -755,7 +758,7 @@ fn DecWide::is_zero(self : DecWide) -> Bool {
 }
 
 ///|
-fn wide_add_one(data : FixedArray[UInt]) -> Unit {
+fn wide_add_one(data : FixedArray[UInt32]) -> Unit {
   let mut carry = 1UL
   for i in 0..<data.length() {
     carry += data[i].to_uint64()
@@ -769,9 +772,9 @@ fn wide_add_one(data : FixedArray[UInt]) -> Unit {
 
 ///|
 fn div_buf_by_power(
-  data : FixedArray[UInt],
-  upper : Ref[Int],
-  power : UInt,
+  data : FixedArray[UInt32],
+  upper : Ref[Int32],
+  power : UInt32,
 ) -> Unit {
   let mut remainder = 0U
   let u = upper.val
@@ -790,16 +793,16 @@ fn div_buf_by_power(
 }
 
 ///|
-let powers_10_u32 : ReadOnlyArray[UInt] = [
+let powers_10_u32 : ReadOnlyArray[UInt32] = [
   1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 ]
 
 ///|
 fn rescale_buf(
-  data : FixedArray[UInt],
-  upper : Ref[Int],
-  scale : Ref[Int],
-  target : Int,
+  data : FixedArray[UInt32],
+  upper : Ref[Int32],
+  scale : Ref[Int32],
+  target : Int32,
 ) -> Bool {
   let n = data.length()
   if upper.val <= target && scale.val <= rd_max_scale {
@@ -1166,7 +1169,7 @@ fn big_to_f64(n : @bigint.BigInt) -> Double {
 
 ///|
 /// LLVM's `powi` (compiler-rt `__powidf2`) as used by Rust's `f64::powi`.
-fn rust_powi(a : Double, b : Int) -> Double {
+fn rust_powi(a : Double, b : Int32) -> Double {
   let recip = b < 0
   let mut a = a
   let mut b = b

@@ -516,7 +516,7 @@ fn Executor::execute_i32_store8_offset16_imm(
   self : Executor,
   ptr : @ir.Slot,
   offset : @ir.Offset16,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   // execute_store_offset16_imm16
   let ptr = self.get_stack_slot_as_u64(ptr)
@@ -538,7 +538,7 @@ fn Executor::execute_i32_store8_at_imm(
   self : Executor,
   store : StoreInner,
   address : @ir.Address32,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   // execute_store_at_imm16
   let memory = self.fetch_optional_memory(1)
@@ -718,7 +718,7 @@ fn Executor::execute_i32_store16_offset16_imm(
   self : Executor,
   ptr : @ir.Slot,
   offset : @ir.Offset16,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   // execute_store_offset16_imm16
   let ptr = self.get_stack_slot_as_u64(ptr)
@@ -740,7 +740,7 @@ fn Executor::execute_i32_store16_at_imm(
   self : Executor,
   store : StoreInner,
   address : @ir.Address32,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   // execute_store_at_imm16
   let memory = self.fetch_optional_memory(1)
@@ -920,7 +920,7 @@ fn Executor::execute_i64_store8_offset16_imm(
   self : Executor,
   ptr : @ir.Slot,
   offset : @ir.Offset16,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   let value = value.to_int64()
   // execute_store_offset16_imm16
@@ -943,7 +943,7 @@ fn Executor::execute_i64_store8_at_imm(
   self : Executor,
   store : StoreInner,
   address : @ir.Address32,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   let value = value.to_int64()
   // execute_store_at_imm16
@@ -1124,7 +1124,7 @@ fn Executor::execute_i64_store16_offset16_imm(
   self : Executor,
   ptr : @ir.Slot,
   offset : @ir.Offset16,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   let value = value.to_int64()
   // execute_store_offset16_imm16
@@ -1147,7 +1147,7 @@ fn Executor::execute_i64_store16_at_imm(
   self : Executor,
   store : StoreInner,
   address : @ir.Address32,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   let value = value.to_int64()
   // execute_store_at_imm16

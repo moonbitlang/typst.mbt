@@ -252,8 +252,8 @@ fn Parser::decrease_flow_level(self : Parser) -> Unit {
 /// the token number before which it is inserted.
 fn Parser::roll_indent(
   self : Parser,
-  column : Int,
-  number : Int,
+  column : Int32,
+  number : Int32,
   data : TokenData,
   mark : Mark,
 ) -> Unit {
@@ -277,7 +277,7 @@ fn Parser::roll_indent(
 
 ///|
 /// `yaml_parser_unroll_indent`.
-fn Parser::unroll_indent(self : Parser, column : Int) -> Unit {
+fn Parser::unroll_indent(self : Parser, column : Int32) -> Unit {
   if self.flow_level != 0 {
     return
   }
@@ -618,7 +618,7 @@ fn Parser::scan_directive_name(
 fn Parser::scan_version_directive_value(
   self : Parser,
   start_mark : Mark,
-) -> (Int, Int) raise Fail {
+) -> (Int32, Int32) raise Fail {
   self.cache(1)
   while self.is_blank_at(0) {
     self.skip()
@@ -639,14 +639,14 @@ fn Parser::scan_version_directive_value(
 
 ///|
 /// `MAX_NUMBER_LENGTH`.
-const MAX_NUMBER_LENGTH : Int = 9
+const MAX_NUMBER_LENGTH : Int32 = 9
 
 ///|
 /// `yaml_parser_scan_version_directive_number`.
 fn Parser::scan_version_directive_number(
   self : Parser,
   start_mark : Mark,
-) -> Int raise Fail {
+) -> Int32 raise Fail {
   let mut value = 0
   let mut length = 0
   self.cache(1)
@@ -1123,11 +1123,11 @@ fn Parser::scan_block_scalar(self : Parser, literal : Bool) -> Token raise Fail 
 /// and end mark.
 fn Parser::scan_block_scalar_breaks(
   self : Parser,
-  indent : Int,
+  indent : Int32,
   breaks : Array[Byte],
   start_mark : Mark,
   end_mark : Mark,
-) -> (Int, Mark) raise Fail {
+) -> (Int32, Mark) raise Fail {
   let mut indent = indent
   let mut end_mark = end_mark
   let mut max_indent = 0
@@ -1169,7 +1169,7 @@ fn Parser::scan_block_scalar_breaks(
 
 ///|
 /// Pushes the UTF-8 encoding of `value` (`value <= 0x10FFFF`).
-fn push_utf8(string : Array[Byte], value : Int) -> Unit {
+fn push_utf8(string : Array[Byte], value : Int32) -> Unit {
   if value <= 0x7F {
     string.push(value.to_byte())
   } else if value <= 0x7FF {
@@ -1194,7 +1194,7 @@ fn Parser::scan_flow_scalar(self : Parser, single : Bool) -> Token raise Fail {
   let leading_break : Array[Byte] = []
   let trailing_breaks : Array[Byte] = []
   let whitespaces : Array[Byte] = []
-  let quote : Int = if single { '\'' } else { '"' }
+  let quote : Int32 = if single { '\'' } else { '"' }
   let start_mark = self.mark()
   self.skip()
   while true {
@@ -1294,7 +1294,7 @@ fn Parser::scan_flow_scalar(self : Parser, single : Bool) -> Token raise Fail {
           self.skip()
           if code_length != 0 {
             self.cache(code_length)
-            let mut value : UInt = 0
+            let mut value : UInt32 = 0
             for k in 0..<code_length {
               if !self.is_hex_at(k) {
                 raise self.set_scanner_error(

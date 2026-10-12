@@ -139,13 +139,13 @@ pub impl Default for LineJoin with fn default() {
 pub extend LineJoin with Default::{default}
 
 ///|
-let quad_recursive_limit : Int = 3
+let quad_recursive_limit : Int32 = 3
 
 ///|
 // quads with extreme widths (e.g. (0,1) (1,6) (0,3) width=5e7) recurse to point of failure
 // largest seen for normal cubics: 5, 26
 // largest seen for normal quads: 11
-let recursive_limits : ReadOnlyArray[Int] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
+let recursive_limits : ReadOnlyArray[Int32] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
 
 ///|
 priv enum ReductionType {
@@ -209,8 +209,8 @@ pub struct PathStroker {
   priv mut first_pt : Point
   priv mut prev_pt : Point
   priv mut first_outer_pt : Point
-  priv mut first_outer_pt_index_in_contour : Int
-  priv mut segment_count : Int
+  priv mut first_outer_pt_index_in_contour : Int32
+  priv mut segment_count : Int32
   priv mut prev_is_line : Bool
   priv mut capper : LineCap
   priv mut joiner : LineJoin
@@ -219,7 +219,7 @@ pub struct PathStroker {
   priv mut outer : PathBuilder
   priv cusper : PathBuilder
   priv mut stroke_type : StrokeType
-  priv mut recursion_depth : Int // track stack depth to abort if numerics run amok
+  priv mut recursion_depth : Int32 // track stack depth to abort if numerics run amok
   priv mut found_tangents : Bool // do less work until tangents meet (cubic)
   priv mut join_completed : Bool // previous join was not degenerate
 }

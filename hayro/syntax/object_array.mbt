@@ -164,7 +164,7 @@ pub fn[T : ObjectLike] FlexArrayIter::next(self : FlexArrayIter) -> T? {
 /// Read exactly `n` items of type `T` (upstream `[T; C]: TryFrom<Array>`).
 pub fn[T : ObjectLike] PdfArray::to_fixed(
   self : PdfArray,
-  n : Int,
+  n : Int32,
 ) -> Array[T]? {
   let iter = self.flex_iter()
   let val = []
@@ -211,7 +211,7 @@ pub extend Vector with ObjectLike::{from_object}
 ///|
 /// A fixed-size array of objects (upstream `[T; C]: ObjectLike`); `n` is
 /// checked by `Dict::get_fixed`.
-fn[T : ObjectLike] fixed_from_object(o : Object, n : Int) -> Array[T]? {
+fn[T : ObjectLike] fixed_from_object(o : Object, n : Int32) -> Array[T]? {
   match o {
     Array(a) => a.to_fixed(n)
     _ => None

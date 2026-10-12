@@ -10,7 +10,7 @@
 
 ///|
 /// Execute the `i32_add` Wasm instruction.
-pub fn i32_add(lhs : Int, rhs : Int) -> Int {
+pub fn i32_add(lhs : Int32, rhs : Int32) -> Int32 {
   lhs + rhs
 }
 
@@ -22,7 +22,7 @@ pub fn i64_add(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_sub` Wasm instruction.
-pub fn i32_sub(lhs : Int, rhs : Int) -> Int {
+pub fn i32_sub(lhs : Int32, rhs : Int32) -> Int32 {
   lhs - rhs
 }
 
@@ -34,7 +34,7 @@ pub fn i64_sub(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_mul` Wasm instruction.
-pub fn i32_mul(lhs : Int, rhs : Int) -> Int {
+pub fn i32_mul(lhs : Int32, rhs : Int32) -> Int32 {
   lhs * rhs
 }
 
@@ -46,7 +46,7 @@ pub fn i64_mul(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_bitand` Wasm instruction.
-pub fn i32_bitand(lhs : Int, rhs : Int) -> Int {
+pub fn i32_bitand(lhs : Int32, rhs : Int32) -> Int32 {
   lhs & rhs
 }
 
@@ -58,7 +58,7 @@ pub fn i64_bitand(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_bitor` Wasm instruction.
-pub fn i32_bitor(lhs : Int, rhs : Int) -> Int {
+pub fn i32_bitor(lhs : Int32, rhs : Int32) -> Int32 {
   lhs | rhs
 }
 
@@ -70,7 +70,7 @@ pub fn i64_bitor(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_bitxor` Wasm instruction.
-pub fn i32_bitxor(lhs : Int, rhs : Int) -> Int {
+pub fn i32_bitxor(lhs : Int32, rhs : Int32) -> Int32 {
   lhs ^ rhs
 }
 
@@ -82,7 +82,7 @@ pub fn i64_bitxor(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_shl` Wasm instruction.
-pub fn i32_shl(lhs : Int, rhs : Int) -> Int {
+pub fn i32_shl(lhs : Int32, rhs : Int32) -> Int32 {
   lhs << (rhs & 31)
 }
 
@@ -94,7 +94,7 @@ pub fn i64_shl(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_shr_s` Wasm instruction.
-pub fn i32_shr_s(lhs : Int, rhs : Int) -> Int {
+pub fn i32_shr_s(lhs : Int32, rhs : Int32) -> Int32 {
   lhs >> (rhs & 31)
 }
 
@@ -106,7 +106,7 @@ pub fn i64_shr_s(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_shr_u` Wasm instruction.
-pub fn i32_shr_u(lhs : Int, rhs : Int) -> Int {
+pub fn i32_shr_u(lhs : Int32, rhs : Int32) -> Int32 {
   (lhs.reinterpret_as_uint() >> (rhs & 31)).reinterpret_as_int()
 }
 
@@ -118,7 +118,7 @@ pub fn i64_shr_u(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_rotl` Wasm instruction.
-pub fn i32_rotl(lhs : Int, rhs : Int) -> Int {
+pub fn i32_rotl(lhs : Int32, rhs : Int32) -> Int32 {
   let n = rhs & 31
   if n == 0 {
     return lhs
@@ -140,7 +140,7 @@ pub fn i64_rotl(lhs : Int64, rhs : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_rotr` Wasm instruction.
-pub fn i32_rotr(lhs : Int, rhs : Int) -> Int {
+pub fn i32_rotr(lhs : Int32, rhs : Int32) -> Int32 {
   let n = rhs & 31
   if n == 0 {
     return lhs
@@ -169,7 +169,7 @@ pub fn i64_rotr(lhs : Int64, rhs : Int64) -> Int64 {
 ///
 /// - [`TrapCode::IntegerDivisionByZero`]: if `rhs` is zero.
 /// - [`TrapCode::IntegerOverflow`]: if `lhs` is [`i32::MIN`] and `rhs` is `-1`.
-pub fn i32_div_s(lhs : Int, rhs : Int) -> Int raise TrapCode {
+pub fn i32_div_s(lhs : Int32, rhs : Int32) -> Int32 raise TrapCode {
   if rhs == 0 {
     raise IntegerDivisionByZero
   }
@@ -202,7 +202,7 @@ pub fn i64_div_s(lhs : Int64, rhs : Int64) -> Int64 raise TrapCode {
 /// # Errors
 ///
 /// - [`TrapCode::IntegerDivisionByZero`]: if `rhs` is zero.
-pub fn i32_div_u(lhs : UInt, rhs : UInt) -> UInt raise TrapCode {
+pub fn i32_div_u(lhs : UInt32, rhs : UInt32) -> UInt32 raise TrapCode {
   if rhs == 0 {
     raise IntegerDivisionByZero
   }
@@ -228,7 +228,7 @@ pub fn i64_div_u(lhs : UInt64, rhs : UInt64) -> UInt64 raise TrapCode {
 /// # Errors
 ///
 /// - [`TrapCode::IntegerDivisionByZero`]: if `rhs` is zero.
-pub fn i32_rem_s(lhs : Int, rhs : Int) -> Int raise TrapCode {
+pub fn i32_rem_s(lhs : Int32, rhs : Int32) -> Int32 raise TrapCode {
   if rhs == 0 {
     raise IntegerDivisionByZero
   }
@@ -262,7 +262,7 @@ pub fn i64_rem_s(lhs : Int64, rhs : Int64) -> Int64 raise TrapCode {
 /// # Errors
 ///
 /// - [`TrapCode::IntegerDivisionByZero`]: if `rhs` is zero.
-pub fn i32_rem_u(lhs : UInt, rhs : UInt) -> UInt raise TrapCode {
+pub fn i32_rem_u(lhs : UInt32, rhs : UInt32) -> UInt32 raise TrapCode {
   if rhs == 0 {
     raise IntegerDivisionByZero
   }
@@ -286,7 +286,7 @@ pub fn i64_rem_u(lhs : UInt64, rhs : UInt64) -> UInt64 raise TrapCode {
 
 ///|
 /// Execute the `i32_clz` Wasm instruction.
-pub fn i32_clz(value : Int) -> Int {
+pub fn i32_clz(value : Int32) -> Int32 {
   value.clz()
 }
 
@@ -298,7 +298,7 @@ pub fn i64_clz(value : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_ctz` Wasm instruction.
-pub fn i32_ctz(value : Int) -> Int {
+pub fn i32_ctz(value : Int32) -> Int32 {
   value.ctz()
 }
 
@@ -310,7 +310,7 @@ pub fn i64_ctz(value : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_popcnt` Wasm instruction.
-pub fn i32_popcnt(value : Int) -> Int {
+pub fn i32_popcnt(value : Int32) -> Int32 {
   value.popcnt()
 }
 
@@ -322,7 +322,7 @@ pub fn i64_popcnt(value : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_eqz` Wasm instruction.
-pub fn i32_eqz(value : Int) -> Bool {
+pub fn i32_eqz(value : Int32) -> Bool {
   value == 0
 }
 
@@ -336,7 +336,7 @@ pub fn i64_eqz(value : Int64) -> Bool {
 
 ///|
 /// Execute the `i32_eq` Wasm instruction.
-pub fn i32_eq(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_eq(lhs : Int32, rhs : Int32) -> Bool {
   lhs == rhs
 }
 
@@ -360,7 +360,7 @@ pub fn f64_eq(lhs : Double, rhs : Double) -> Bool {
 
 ///|
 /// Execute the `i32_ne` Wasm instruction.
-pub fn i32_ne(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_ne(lhs : Int32, rhs : Int32) -> Bool {
   lhs != rhs
 }
 
@@ -384,7 +384,7 @@ pub fn f64_ne(lhs : Double, rhs : Double) -> Bool {
 
 ///|
 /// Execute the `i32_lt_s` Wasm instruction.
-pub fn i32_lt_s(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_lt_s(lhs : Int32, rhs : Int32) -> Bool {
   lhs < rhs
 }
 
@@ -396,7 +396,7 @@ pub fn i64_lt_s(lhs : Int64, rhs : Int64) -> Bool {
 
 ///|
 /// Execute the `i32_lt_u` Wasm instruction.
-pub fn i32_lt_u(lhs : UInt, rhs : UInt) -> Bool {
+pub fn i32_lt_u(lhs : UInt32, rhs : UInt32) -> Bool {
   lhs < rhs
 }
 
@@ -420,7 +420,7 @@ pub fn f64_lt(lhs : Double, rhs : Double) -> Bool {
 
 ///|
 /// Execute the `i32_le_s` Wasm instruction.
-pub fn i32_le_s(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_le_s(lhs : Int32, rhs : Int32) -> Bool {
   lhs <= rhs
 }
 
@@ -432,7 +432,7 @@ pub fn i64_le_s(lhs : Int64, rhs : Int64) -> Bool {
 
 ///|
 /// Execute the `i32_le_u` Wasm instruction.
-pub fn i32_le_u(lhs : UInt, rhs : UInt) -> Bool {
+pub fn i32_le_u(lhs : UInt32, rhs : UInt32) -> Bool {
   lhs <= rhs
 }
 
@@ -456,7 +456,7 @@ pub fn f64_le(lhs : Double, rhs : Double) -> Bool {
 
 ///|
 /// Execute the `i32_gt_s` Wasm instruction.
-pub fn i32_gt_s(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_gt_s(lhs : Int32, rhs : Int32) -> Bool {
   lhs > rhs
 }
 
@@ -468,7 +468,7 @@ pub fn i64_gt_s(lhs : Int64, rhs : Int64) -> Bool {
 
 ///|
 /// Execute the `i32_gt_u` Wasm instruction.
-pub fn i32_gt_u(lhs : UInt, rhs : UInt) -> Bool {
+pub fn i32_gt_u(lhs : UInt32, rhs : UInt32) -> Bool {
   lhs > rhs
 }
 
@@ -492,7 +492,7 @@ pub fn f64_gt(lhs : Double, rhs : Double) -> Bool {
 
 ///|
 /// Execute the `i32_ge_s` Wasm instruction.
-pub fn i32_ge_s(lhs : Int, rhs : Int) -> Bool {
+pub fn i32_ge_s(lhs : Int32, rhs : Int32) -> Bool {
   lhs >= rhs
 }
 
@@ -504,7 +504,7 @@ pub fn i64_ge_s(lhs : Int64, rhs : Int64) -> Bool {
 
 ///|
 /// Execute the `i32_ge_u` Wasm instruction.
-pub fn i32_ge_u(lhs : UInt, rhs : UInt) -> Bool {
+pub fn i32_ge_u(lhs : UInt32, rhs : UInt32) -> Bool {
   lhs >= rhs
 }
 
@@ -790,19 +790,19 @@ pub fn f64_copysign(lhs : Double, rhs : Double) -> Double {
 
 ///|
 /// Execute the `i32_wrap_i64` Wasm instruction.
-pub fn i32_wrap_i64(value : Int64) -> Int {
+pub fn i32_wrap_i64(value : Int64) -> Int32 {
   value.to_int()
 }
 
 ///|
 /// Execute the `i64_extend_i32_s` Wasm instruction.
-pub fn i64_extend_i32_s(value : Int) -> Int64 {
+pub fn i64_extend_i32_s(value : Int32) -> Int64 {
   value.to_int64()
 }
 
 ///|
 /// Execute the `i64_extend_i32_u` Wasm instruction.
-pub fn i64_extend_i32_u(value : UInt) -> UInt64 {
+pub fn i64_extend_i32_u(value : UInt32) -> UInt64 {
   value.to_uint64()
 }
 
@@ -850,7 +850,7 @@ fn f64_to_u64_in_range(value : Double) -> UInt64 {
 ///
 /// - [`TrapCode::BadConversionToInteger`]: if `value` is NaN
 /// - [`TrapCode::IntegerOverflow`]: if `value` exceeds the bounds of an `i32` value
-pub fn i32_trunc_f32_s(value : Float) -> Int raise TrapCode {
+pub fn i32_trunc_f32_s(value : Float) -> Int32 raise TrapCode {
   i32_trunc_f64_s(value.to_double())
 }
 
@@ -879,7 +879,7 @@ pub fn i64_trunc_f32_s(value : Float) -> Int64 raise TrapCode {
 ///
 /// - [`TrapCode::BadConversionToInteger`]: if `value` is NaN
 /// - [`TrapCode::IntegerOverflow`]: if `value` exceeds the bounds of an `u32` value
-pub fn i32_trunc_f32_u(value : Float) -> UInt raise TrapCode {
+pub fn i32_trunc_f32_u(value : Float) -> UInt32 raise TrapCode {
   i32_trunc_f64_u(value.to_double())
 }
 
@@ -901,7 +901,7 @@ pub fn i64_trunc_f32_u(value : Float) -> UInt64 raise TrapCode {
 ///
 /// - [`TrapCode::BadConversionToInteger`]: if `value` is NaN
 /// - [`TrapCode::IntegerOverflow`]: if `value` exceeds the bounds of an `i32` value
-pub fn i32_trunc_f64_s(value : Double) -> Int raise TrapCode {
+pub fn i32_trunc_f64_s(value : Double) -> Int32 raise TrapCode {
   if value != value {
     raise BadConversionToInteger
   }
@@ -937,7 +937,7 @@ pub fn i64_trunc_f64_s(value : Double) -> Int64 raise TrapCode {
 ///
 /// - [`TrapCode::BadConversionToInteger`]: if `value` is NaN
 /// - [`TrapCode::IntegerOverflow`]: if `value` exceeds the bounds of an `u32` value
-pub fn i32_trunc_f64_u(value : Double) -> UInt raise TrapCode {
+pub fn i32_trunc_f64_u(value : Double) -> UInt32 raise TrapCode {
   if value != value {
     raise BadConversionToInteger
   }
@@ -966,13 +966,13 @@ pub fn i64_trunc_f64_u(value : Double) -> UInt64 raise TrapCode {
 
 ///|
 /// Execute the `f32_convert_i32_s` Wasm instruction.
-pub fn f32_convert_i32_s(value : Int) -> Float {
+pub fn f32_convert_i32_s(value : Int32) -> Float {
   Float::from_int(value)
 }
 
 ///|
 /// Execute the `f32_convert_i32_u` Wasm instruction.
-pub fn f32_convert_i32_u(value : UInt) -> Float {
+pub fn f32_convert_i32_u(value : UInt32) -> Float {
   Float::from_uint(value)
 }
 
@@ -990,13 +990,13 @@ pub fn f32_convert_i64_u(value : UInt64) -> Float {
 
 ///|
 /// Execute the `f64_convert_i32_s` Wasm instruction.
-pub fn f64_convert_i32_s(value : Int) -> Double {
+pub fn f64_convert_i32_s(value : Int32) -> Double {
   value.to_double()
 }
 
 ///|
 /// Execute the `f64_convert_i32_u` Wasm instruction.
-pub fn f64_convert_i32_u(value : UInt) -> Double {
+pub fn f64_convert_i32_u(value : UInt32) -> Double {
   value.to_double()
 }
 
@@ -1016,13 +1016,13 @@ pub fn f64_convert_i64_u(value : UInt64) -> Double {
 
 ///|
 /// Execute the `i32_extend8_s` Wasm instruction.
-pub fn i32_extend8_s(value : Int) -> Int {
+pub fn i32_extend8_s(value : Int32) -> Int32 {
   value << 24 >> 24
 }
 
 ///|
 /// Execute the `i32_extend16_s` Wasm instruction.
-pub fn i32_extend16_s(value : Int) -> Int {
+pub fn i32_extend16_s(value : Int32) -> Int32 {
   value << 16 >> 16
 }
 
@@ -1048,19 +1048,19 @@ pub fn i64_extend32_s(value : Int64) -> Int64 {
 
 ///|
 /// Execute the `i32_trunc_sat_f32_s` Wasm instruction.
-pub fn i32_trunc_sat_f32_s(value : Float) -> Int {
+pub fn i32_trunc_sat_f32_s(value : Float) -> Int32 {
   i32_trunc_sat_f64_s(value.to_double())
 }
 
 ///|
 /// Execute the `i32_trunc_sat_f32_u` Wasm instruction.
-pub fn i32_trunc_sat_f32_u(value : Float) -> UInt {
+pub fn i32_trunc_sat_f32_u(value : Float) -> UInt32 {
   i32_trunc_sat_f64_u(value.to_double())
 }
 
 ///|
 /// Execute the `i32_trunc_sat_f64_s` Wasm instruction.
-pub fn i32_trunc_sat_f64_s(value : Double) -> Int {
+pub fn i32_trunc_sat_f64_s(value : Double) -> Int32 {
   if value != value {
     0
   } else if value >= 2147483647.0 {
@@ -1074,7 +1074,7 @@ pub fn i32_trunc_sat_f64_s(value : Double) -> Int {
 
 ///|
 /// Execute the `i32_trunc_sat_f64_u` Wasm instruction.
-pub fn i32_trunc_sat_f64_u(value : Double) -> UInt {
+pub fn i32_trunc_sat_f64_u(value : Double) -> UInt32 {
   if value != value {
     0
   } else if value >= 4294967295.0 {
@@ -1128,7 +1128,7 @@ pub fn i64_trunc_sat_f64_u(value : Double) -> UInt64 {
 
 ///|
 /// Execute the `i32_reinterpret_f32` Wasm instruction.
-pub fn i32_reinterpret_f32(value : Float) -> Int {
+pub fn i32_reinterpret_f32(value : Float) -> Int32 {
   value.reinterpret_as_int()
 }
 
@@ -1140,7 +1140,7 @@ pub fn i64_reinterpret_f64(value : Double) -> Int64 {
 
 ///|
 /// Execute the `f32_reinterpret_i32` Wasm instruction.
-pub fn f32_reinterpret_i32(value : Int) -> Float {
+pub fn f32_reinterpret_i32(value : Int32) -> Float {
   Float::reinterpret_from_int(value)
 }
 
@@ -1161,10 +1161,10 @@ pub fn f64_reinterpret_i64(value : Int64) -> Double {
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i32_load8_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_load8_s_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -1176,9 +1176,9 @@ pub fn i32_load8_s(
 /// If `address` loads out of bounds from `memory`.
 pub fn i32_load8_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_extend8_s(load_u8_at(memory, memory_len, address).to_int())
 }
 
@@ -1191,10 +1191,10 @@ pub fn i32_load8_s_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i32_load8_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_load8_u_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -1206,9 +1206,9 @@ pub fn i32_load8_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn i32_load8_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   load_u8_at(memory, memory_len, address).to_int()
 }
 
@@ -1221,10 +1221,10 @@ pub fn i32_load8_u_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i32_load16_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_load16_s_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -1236,9 +1236,9 @@ pub fn i32_load16_s(
 /// If `address` loads out of bounds from `memory`.
 pub fn i32_load16_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_extend16_s(load_u16_at(memory, memory_len, address))
 }
 
@@ -1251,10 +1251,10 @@ pub fn i32_load16_s_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i32_load16_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   i32_load16_u_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -1266,9 +1266,9 @@ pub fn i32_load16_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn i32_load16_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   load_u16_at(memory, memory_len, address)
 }
 
@@ -1281,7 +1281,7 @@ pub fn i32_load16_u_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load8_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1296,7 +1296,7 @@ pub fn i64_load8_s(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load8_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   i32_extend8_s(load_u8_at(memory, memory_len, address).to_int()).to_int64()
@@ -1311,7 +1311,7 @@ pub fn i64_load8_s_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load8_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1326,7 +1326,7 @@ pub fn i64_load8_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load8_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   load_u8_at(memory, memory_len, address).to_int64()
@@ -1341,7 +1341,7 @@ pub fn i64_load8_u_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load16_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1356,7 +1356,7 @@ pub fn i64_load16_s(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load16_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   i32_extend16_s(load_u16_at(memory, memory_len, address)).to_int64()
@@ -1371,7 +1371,7 @@ pub fn i64_load16_s_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load16_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1386,7 +1386,7 @@ pub fn i64_load16_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load16_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   load_u16_at(memory, memory_len, address).to_int64()
@@ -1401,7 +1401,7 @@ pub fn i64_load16_u_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load32_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1416,7 +1416,7 @@ pub fn i64_load32_s(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load32_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   load_u32_at(memory, memory_len, address).reinterpret_as_int().to_int64()
@@ -1431,7 +1431,7 @@ pub fn i64_load32_s_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn i64_load32_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> Int64 raise TrapCode {
@@ -1446,7 +1446,7 @@ pub fn i64_load32_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn i64_load32_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Int64 raise TrapCode {
   load_u32_at(memory, memory_len, address).to_uint64().reinterpret_as_int64()
@@ -1461,10 +1461,10 @@ pub fn i64_load32_u_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn load32(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-) -> UInt raise TrapCode {
+) -> UInt32 raise TrapCode {
   load_u32_at(memory, memory_len, effective_address(ptr, offset))
 }
 
@@ -1476,9 +1476,9 @@ pub fn load32(
 /// If `address` loads out of bounds from `memory`.
 pub fn load32_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> UInt raise TrapCode {
+) -> UInt32 raise TrapCode {
   load_u32_at(memory, memory_len, address)
 }
 
@@ -1491,7 +1491,7 @@ pub fn load32_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn load64(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> UInt64 raise TrapCode {
@@ -1506,7 +1506,7 @@ pub fn load64(
 /// If `address` loads out of bounds from `memory`.
 pub fn load64_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> UInt64 raise TrapCode {
   load_u64_at(memory, memory_len, address)
@@ -1523,10 +1523,10 @@ pub fn load64_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn i32_store8(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-  value : Int,
+  value : Int32,
 ) -> Unit raise TrapCode {
   store_u8_at(
     memory,
@@ -1544,9 +1544,9 @@ pub fn i32_store8(
 /// If `address` stores out of bounds from `memory`.
 pub fn i32_store8_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  value : Int,
+  value : Int32,
 ) -> Unit raise TrapCode {
   store_u8_at(memory, memory_len, address, value.to_byte())
 }
@@ -1560,10 +1560,10 @@ pub fn i32_store8_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn i32_store16(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-  value : Int,
+  value : Int32,
 ) -> Unit raise TrapCode {
   store_u16_at(memory, memory_len, effective_address(ptr, offset), value)
 }
@@ -1576,9 +1576,9 @@ pub fn i32_store16(
 /// If `address` stores out of bounds from `memory`.
 pub fn i32_store16_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  value : Int,
+  value : Int32,
 ) -> Unit raise TrapCode {
   store_u16_at(memory, memory_len, address, value)
 }
@@ -1592,7 +1592,7 @@ pub fn i32_store16_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn i64_store8(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : Int64,
@@ -1613,7 +1613,7 @@ pub fn i64_store8(
 /// If `address` stores out of bounds from `memory`.
 pub fn i64_store8_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : Int64,
 ) -> Unit raise TrapCode {
@@ -1629,7 +1629,7 @@ pub fn i64_store8_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn i64_store16(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : Int64,
@@ -1650,7 +1650,7 @@ pub fn i64_store16(
 /// If `address` stores out of bounds from `memory`.
 pub fn i64_store16_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : Int64,
 ) -> Unit raise TrapCode {
@@ -1666,7 +1666,7 @@ pub fn i64_store16_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn i64_store32(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : Int64,
@@ -1687,7 +1687,7 @@ pub fn i64_store32(
 /// If `address` stores out of bounds from `memory`.
 pub fn i64_store32_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : Int64,
 ) -> Unit raise TrapCode {
@@ -1708,10 +1708,10 @@ pub fn i64_store32_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn store32(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
-  value : UInt,
+  value : UInt32,
 ) -> Unit raise TrapCode {
   store_u32_at(memory, memory_len, effective_address(ptr, offset), value)
 }
@@ -1724,9 +1724,9 @@ pub fn store32(
 /// If `address` stores out of bounds from `memory`.
 pub fn store32_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  value : UInt,
+  value : UInt32,
 ) -> Unit raise TrapCode {
   store_u32_at(memory, memory_len, address, value)
 }
@@ -1740,7 +1740,7 @@ pub fn store32_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn store64(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : UInt64,
@@ -1756,7 +1756,7 @@ pub fn store64(
 /// If `address` stores out of bounds from `memory`.
 pub fn store64_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : UInt64,
 ) -> Unit raise TrapCode {

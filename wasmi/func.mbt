@@ -21,9 +21,9 @@ pub type Trampoline = (StoreInner, Instance?, FuncInOut) -> Unit raise WasmiErro
 /// A host function reference.
 pub(all) struct HostFuncEntity {
   /// The number of parameters of the [`HostFuncEntity`].
-  len_params : Int
+  len_params : Int32
   /// The number of results of the [`HostFuncEntity`].
-  len_results : Int
+  len_results : Int32
   /// The function type of the host function.
   ty : DedupFuncType
   /// The trampoline of the host function.
@@ -285,7 +285,7 @@ pub fn[T] Memory::data(self : Memory, store : Store[T]) -> FixedArray[Byte] {
 
 ///|
 /// Returns the byte length of the linear memory.
-pub fn[T] Memory::data_size(self : Memory, store : Store[T]) -> Int {
+pub fn[T] Memory::data_size(self : Memory, store : Store[T]) -> Int32 {
   store.inner.resolve_memory(self).data_size()
 }
 

@@ -100,7 +100,7 @@ pub extend IntErrorKind with @debug.Debug::{to_repr}
 
 ///|
 /// Rust's `char::to_digit` applied to a UTF-16 code unit.
-fn radix_digit(c : Int, radix : Int) -> Int? {
+fn radix_digit(c : Int32, radix : Int32) -> Int32? {
   let d = if c >= '0'.to_int() && c <= '9'.to_int() {
     c - '0'.to_int()
   } else if c >= 'a'.to_int() && c <= 'z'.to_int() {
@@ -120,7 +120,7 @@ fn radix_digit(c : Int, radix : Int) -> Int? {
 ///|
 /// Split off Rust's optional sign for `from_str_radix`. Returns whether the
 /// number is positive and where the digits start.
-fn radix_sign(s : String, signed : Bool) -> (Bool, Int) raise IntErrorKind {
+fn radix_sign(s : String, signed : Bool) -> (Bool, Int32) raise IntErrorKind {
   if s.is_empty() {
     raise Empty
   }
@@ -141,7 +141,10 @@ fn radix_sign(s : String, signed : Bool) -> (Bool, Int) raise IntErrorKind {
 
 ///|
 /// Rust's `i64::from_str_radix` (`radix` must be in `2..=36`).
-pub fn i64_from_str_radix(s : String, radix : Int) -> Int64 raise IntErrorKind {
+pub fn i64_from_str_radix(
+  s : String,
+  radix : Int32,
+) -> Int64 raise IntErrorKind {
   let (positive, start) = radix_sign(s, true)
   let r = radix.to_int64()
   let max = @int64.MAX_VALUE
@@ -177,7 +180,10 @@ pub fn i64_from_str_radix(s : String, radix : Int) -> Int64 raise IntErrorKind {
 
 ///|
 /// Rust's `u64::from_str_radix` (`radix` must be in `2..=36`).
-pub fn u64_from_str_radix(s : String, radix : Int) -> UInt64 raise IntErrorKind {
+pub fn u64_from_str_radix(
+  s : String,
+  radix : Int32,
+) -> UInt64 raise IntErrorKind {
   let (_, start) = radix_sign(s, false)
   let r = radix.to_uint64()
   let max = 0xFFFF_FFFF_FFFF_FFFFUL

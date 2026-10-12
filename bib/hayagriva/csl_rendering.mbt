@@ -944,7 +944,7 @@ priv struct BranchConditionIter {
   cond : @citationberg.ChooseBranch
   ctx : Context
   mut pos : BranchConditionPos
-  mut idx : Int
+  mut idx : Int32
 }
 
 ///|

@@ -7,7 +7,7 @@
 // the scalar `mul_add` is `f32::mul_add` (a fused multiply-add as well).
 
 ///|
-const SIMD_WIDTH : Int = 8
+const SIMD_WIDTH : Int32 = 8
 
 // Note that these polyfills can be very imprecise, but hopefully good enough
 // for the vast majority of cases.
@@ -29,7 +29,7 @@ fn round_f32(x : Float) -> Float {
 }
 
 ///|
-fn pow2i(exp : Int) -> Float {
+fn pow2i(exp : Int32) -> Float {
   if exp >= 0 {
     Float::from_uint(shl_u32(1, exp))
   } else {
@@ -73,18 +73,18 @@ fn quiet_nan(a : Float) -> Float {
 ///|
 /// Rust's `x << n` for `u32` without overflow checks (the shift amount is
 /// masked).
-fn shl_u32(x : UInt, n : Int) -> UInt {
+fn shl_u32(x : UInt32, n : Int32) -> UInt32 {
   x << (n & 31)
 }
 
 ///|
 /// Rust's `x << n` for `i32` without overflow checks.
-fn shl_i32(x : Int, n : Int) -> Int {
+fn shl_i32(x : Int32, n : Int32) -> Int32 {
   x << (n & 31)
 }
 
 ///|
-fn div_ceil_u32(a : UInt, b : UInt) -> UInt {
+fn div_ceil_u32(a : UInt32, b : UInt32) -> UInt32 {
   let d = a / b
   if a % b != 0 {
     d + 1
@@ -104,7 +104,7 @@ fn div_ceil_u64(a : UInt64, b : UInt64) -> UInt64 {
 }
 
 ///|
-fn min_u32(a : UInt, b : UInt) -> UInt {
+fn min_u32(a : UInt32, b : UInt32) -> UInt32 {
   if a < b {
     a
   } else {
@@ -113,7 +113,7 @@ fn min_u32(a : UInt, b : UInt) -> UInt {
 }
 
 ///|
-fn max_u32(a : UInt, b : UInt) -> UInt {
+fn max_u32(a : UInt32, b : UInt32) -> UInt32 {
   if a > b {
     a
   } else {
@@ -123,7 +123,7 @@ fn max_u32(a : UInt, b : UInt) -> UInt {
 
 ///|
 /// `x as u8` for an `f32` (saturating, NaN maps to 0).
-fn f32_to_u8(x : Float) -> Int {
+fn f32_to_u8(x : Float) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 255.0 {
@@ -153,7 +153,7 @@ fn f32_to_i64(x : Float) -> Int64 {
 /// bounds checking at the end of the buffer. (`N` is always `SIMD_WIDTH`.)
 priv struct SimdBuffer {
   data : FixedArray[Float]
-  original_len : Int
+  original_len : Int32
 }
 
 ///|
@@ -171,7 +171,7 @@ fn SimdBuffer::new(data : Array[Float]) -> SimdBuffer {
 
 ///|
 /// Create a new `SimdBuffer` filled with zeros.
-fn SimdBuffer::zeros(original_len : Int) -> SimdBuffer {
+fn SimdBuffer::zeros(original_len : Int32) -> SimdBuffer {
   let padded_len = SimdBuffer::padded_len(original_len)
   { data: FixedArray::make(padded_len, (0.0 : Float)), original_len, }
 }
@@ -184,7 +184,7 @@ fn SimdBuffer::truncated(self : SimdBuffer) -> ArrayView[Float] {
 
 ///|
 /// The length of the (padded) data, like `Deref` upstream.
-fn SimdBuffer::len(self : SimdBuffer) -> Int {
+fn SimdBuffer::len(self : SimdBuffer) -> Int32 {
   self.data.length()
 }
 
@@ -195,7 +195,7 @@ fn SimdBuffer::clone(self : SimdBuffer) -> SimdBuffer {
 
 ///|
 /// Returns the length padded to a multiple of `N`
-fn SimdBuffer::padded_len(original_len : Int) -> Int {
+fn SimdBuffer::padded_len(original_len : Int32) -> Int32 {
   let remainder = original_len % SIMD_WIDTH
   let padding = SIMD_WIDTH - remainder
   original_len + padding
@@ -207,7 +207,7 @@ fn SimdBuffer::padded_len(original_len : Int) -> Int {
 /// vector grows again).
 priv struct FloatVec {
   mut data : FixedArray[Float]
-  mut len : Int
+  mut len : Int32
 }
 
 ///|
@@ -216,7 +216,7 @@ fn FloatVec::new() -> FloatVec {
 }
 
 ///|
-fn FloatVec::reserve(self : FloatVec, capacity : Int) -> Unit {
+fn FloatVec::reserve(self : FloatVec, capacity : Int32) -> Unit {
   if self.data.length() < capacity {
     let data = FixedArray::make(capacity, (0.0 : Float))
     self.data.blit_to(data, len=self.len)
@@ -226,7 +226,7 @@ fn FloatVec::reserve(self : FloatVec, capacity : Int) -> Unit {
 
 ///|
 /// `Vec::resize(new_len, 0.0)`.
-fn FloatVec::resize(self : FloatVec, new_len : Int) -> Unit {
+fn FloatVec::resize(self : FloatVec, new_len : Int32) -> Unit {
   if new_len > self.len {
     if new_len > self.data.length() {
       let cap = if self.data.length() * 2 > new_len {

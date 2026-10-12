@@ -9,7 +9,7 @@
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn v128_store(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : V128Value,
@@ -25,7 +25,7 @@ pub fn v128_store(
 /// If `address` stores out of bounds from `memory`.
 pub fn v128_store_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
 ) -> Unit raise TrapCode {
@@ -41,7 +41,7 @@ pub fn v128_store_at(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn v128_store8_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : V128Value,
@@ -65,7 +65,7 @@ pub fn v128_store8_lane(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn v128_store16_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : V128Value,
@@ -89,7 +89,7 @@ pub fn v128_store16_lane(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn v128_store32_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : V128Value,
@@ -113,7 +113,7 @@ pub fn v128_store32_lane(
 /// - If `ptr + offset` stores out of bounds from `memory`.
 pub fn v128_store64_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   value : V128Value,
@@ -136,7 +136,7 @@ pub fn v128_store64_lane(
 /// If `address` stores out of bounds from `memory`.
 pub fn v128_store8_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
   imm : ImmLaneIdx16,
@@ -157,7 +157,7 @@ pub fn v128_store8_lane_at(
 /// If `address` stores out of bounds from `memory`.
 pub fn v128_store16_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
   imm : ImmLaneIdx8,
@@ -178,7 +178,7 @@ pub fn v128_store16_lane_at(
 /// If `address` stores out of bounds from `memory`.
 pub fn v128_store32_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
   imm : ImmLaneIdx4,
@@ -199,7 +199,7 @@ pub fn v128_store32_lane_at(
 /// If `address` stores out of bounds from `memory`.
 pub fn v128_store64_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
   imm : ImmLaneIdx2,
@@ -221,7 +221,7 @@ pub fn v128_store64_lane_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -236,7 +236,7 @@ pub fn v128_load(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_u128_at(memory, memory_len, address)
@@ -251,7 +251,7 @@ pub fn v128_load_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load32_zero(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -267,7 +267,7 @@ pub fn v128_load32_zero(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load64_zero(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -282,7 +282,7 @@ pub fn v128_load64_zero(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load32_zero_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   let bits = load_u32_at(memory, memory_len, address)
@@ -297,7 +297,7 @@ pub fn v128_load32_zero_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load64_zero_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   let bits = load_u64_at(memory, memory_len, address)
@@ -313,7 +313,7 @@ pub fn v128_load64_zero_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load8_splat(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -329,7 +329,7 @@ pub fn v128_load8_splat(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load16_splat(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -345,7 +345,7 @@ pub fn v128_load16_splat(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load32_splat(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -361,7 +361,7 @@ pub fn v128_load32_splat(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load64_splat(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -376,7 +376,7 @@ pub fn v128_load64_splat(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load8_splat_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   i8x16_splat(load_u8_at(memory, memory_len, address).to_int())
@@ -390,7 +390,7 @@ pub fn v128_load8_splat_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load16_splat_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   i16x8_splat(load_u16_at(memory, memory_len, address))
@@ -404,7 +404,7 @@ pub fn v128_load16_splat_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load32_splat_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   i32x4_splat(load_u32_at(memory, memory_len, address).reinterpret_as_int())
@@ -418,7 +418,7 @@ pub fn v128_load32_splat_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load64_splat_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   let v = load_u64_at(memory, memory_len, address)
@@ -434,7 +434,7 @@ pub fn v128_load64_splat_at(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load8_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   x : V128Value,
@@ -458,7 +458,7 @@ pub fn v128_load8_lane(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load16_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   x : V128Value,
@@ -482,7 +482,7 @@ pub fn v128_load16_lane(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load32_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   x : V128Value,
@@ -506,7 +506,7 @@ pub fn v128_load32_lane(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load64_lane(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
   x : V128Value,
@@ -529,7 +529,7 @@ pub fn v128_load64_lane(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load8_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   x : V128Value,
   lane : ImmLaneIdx16,
@@ -546,7 +546,7 @@ pub fn v128_load8_lane_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load16_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   x : V128Value,
   lane : ImmLaneIdx8,
@@ -563,7 +563,7 @@ pub fn v128_load16_lane_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load32_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   x : V128Value,
   lane : ImmLaneIdx4,
@@ -580,7 +580,7 @@ pub fn v128_load32_lane_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load64_lane_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   x : V128Value,
   lane : ImmLaneIdx2,
@@ -592,10 +592,10 @@ pub fn v128_load64_lane_at(
 ///|
 /// `V128::load_nxm`: interprets `bits` as array of `bits / 2`-wide narrow
 /// items (`narrow` bits each) and distributes the (sign) extended items.
-fn load_nxm(bits : UInt64, narrow : Int, signed : Bool) -> V128Value {
+fn load_nxm(bits : UInt64, narrow : Int32, signed : Bool) -> V128Value {
   let src : V128Value = { lo: bits, hi: 0, }
   if narrow == 32 {
-    let ext = (j : Int) => {
+    let ext = (j : Int32) => {
       if signed {
         src.i32_lane(j).to_int64().reinterpret_as_uint64()
       } else {
@@ -618,7 +618,7 @@ fn load_nxm(bits : UInt64, narrow : Int, signed : Bool) -> V128Value {
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load8x8_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -634,7 +634,7 @@ pub fn v128_load8x8_s(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load8x8_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -650,7 +650,7 @@ pub fn v128_load8x8_u(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load16x4_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -666,7 +666,7 @@ pub fn v128_load16x4_s(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load16x4_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -682,7 +682,7 @@ pub fn v128_load16x4_u(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load32x2_s(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -698,7 +698,7 @@ pub fn v128_load32x2_s(
 /// - If `ptr + offset` loads out of bounds from `memory`.
 pub fn v128_load32x2_u(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   ptr : UInt64,
   offset : UInt64,
 ) -> V128Value raise TrapCode {
@@ -713,7 +713,7 @@ pub fn v128_load32x2_u(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load8x8_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 8, true)
@@ -727,7 +727,7 @@ pub fn v128_load8x8_s_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load8x8_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 8, false)
@@ -741,7 +741,7 @@ pub fn v128_load8x8_u_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load16x4_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 16, true)
@@ -755,7 +755,7 @@ pub fn v128_load16x4_s_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load16x4_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 16, false)
@@ -769,7 +769,7 @@ pub fn v128_load16x4_u_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load32x2_s_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 32, true)
@@ -783,7 +783,7 @@ pub fn v128_load32x2_s_at(
 /// If `address` loads out of bounds from `memory`.
 pub fn v128_load32x2_u_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   load_nxm(load_u64_at(memory, memory_len, address), 32, false)

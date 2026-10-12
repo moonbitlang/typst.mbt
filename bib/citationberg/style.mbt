@@ -456,7 +456,7 @@ pub fn PageRangeFormat::format(
 /// from the back.
 ///
 /// Returns as soon as two digits differ.
-fn changed_digits(x : String, y : String) -> Int {
+fn changed_digits(x : String, y : String) -> Int32 {
   let x = if x.length() < y.length() {
     String::make(y.length() - x.length(), ' ') + x
   } else {
@@ -478,7 +478,7 @@ fn changed_digits(x : String, y : String) -> Int {
 /// minimum `thresh` digits---to `buf`.
 fn minimal(
   buf : (String) -> Unit,
-  thresh : Int,
+  thresh : Int32,
   x : String,
   y : String,
 ) -> Unit {
@@ -851,7 +851,7 @@ pub(all) struct Citation {
   /// When near-note-distance is true.
   ///
   /// Default: `5`
-  near_note_distance : Int
+  near_note_distance : Int32
   /// Options for the names within.
   name_options : InheritableNameOptions
 } derive(Eq, Debug)
@@ -1000,9 +1000,9 @@ pub(all) struct Bibliography {
   second_field_align : SecondFieldAlign?
   /// The line spacing within the bibliography as a multiple of regular line
   /// spacing.
-  line_spacing : Int
+  line_spacing : Int32
   /// Extra space between entries as a multiple of line height.
-  entry_spacing : Int
+  entry_spacing : Int32
   /// When set, subsequent identical names are replaced with this.
   subsequent_author_substitute : String?
   /// How to replace subsequent identical names.
@@ -1115,8 +1115,8 @@ pub(all) enum SortKey {
   /// Sort by the output of a macro.
   MacroName(
     name~ : String,
-    names_min~ : Int?,
-    names_use_first~ : Int?,
+    names_min~ : Int32?,
+    names_use_first~ : Int32?,
     names_use_last~ : Bool?,
     sort_direction~ : SortDirection
   )
@@ -1873,13 +1873,13 @@ pub(all) struct Names {
   /// Whether to use the delimiter before the last name.
   delimiter_precedes_last : DelimiterBehavior?
   /// Minimum number of names to use et al.
-  et_al_min : Int?
+  et_al_min : Int32?
   /// Maximum number of names to use before et al.
-  et_al_use_first : Int?
+  et_al_use_first : Int32?
   /// Minimum number of names to use et al. for repeated citations.
-  et_al_subsequent_min : Int?
+  et_al_subsequent_min : Int32?
   /// Maximum number of names to use before et al. for repeated citations.
-  et_al_subsequent_use_first : Int?
+  et_al_subsequent_use_first : Int32?
   /// Whether to use the last name in the author list when there are at
   /// least `et_al_min` names.
   et_al_use_last : Bool?
@@ -2267,13 +2267,13 @@ pub(all) struct InheritableNameOptions {
   /// Whether to use the delimiter before the last name.
   delimiter_precedes_last : DelimiterBehavior?
   /// Minimum number of names to use et al.
-  et_al_min : Int?
+  et_al_min : Int32?
   /// Maximum number of names to use before et al.
-  et_al_use_first : Int?
+  et_al_use_first : Int32?
   /// Minimum number of names to use et al. for repeated citations.
-  et_al_subsequent_min : Int?
+  et_al_subsequent_min : Int32?
   /// Maximum number of names to use before et al. for repeated citations.
-  et_al_subsequent_use_first : Int?
+  et_al_subsequent_use_first : Int32?
   /// Whether to use the last name in the author list when there are at
   /// least `et_al_min` names.
   et_al_use_last : Bool?
@@ -2337,13 +2337,13 @@ pub(all) struct NameOptions {
   /// Whether to use the delimiter before the last name.
   delimiter_precedes_last : DelimiterBehavior
   /// Minimum number of names to use et al.
-  et_al_min : Int?
+  et_al_min : Int32?
   /// Maximum number of names to use before et al.
-  et_al_use_first : Int?
+  et_al_use_first : Int32?
   /// Minimum number of names to use et al. for repeated citations.
-  et_al_subsequent_min : Int?
+  et_al_subsequent_min : Int32?
   /// Maximum number of names to use before et al. for repeated citations.
-  et_al_subsequent_use_first : Int?
+  et_al_subsequent_use_first : Int32?
   /// Whether to use the last name in the author list when there are at
   /// least `et_al_min` names.
   et_al_use_last : Bool
@@ -2405,8 +2405,8 @@ pub fn InheritableNameOptions::apply(
 /// configuration.
 pub fn NameOptions::is_suppressed(
   self : NameOptions,
-  idx : Int,
-  length : Int,
+  idx : Int32,
+  length : Int32,
   is_subsequent : Bool,
 ) -> Bool {
   // This is not suppressed if we print the last element and this is it.
@@ -3146,7 +3146,7 @@ pub fn OrdinalLookup::empty() -> OrdinalLookup {
 }
 
 ///|
-fn abs_int(x : Int) -> Int {
+fn abs_int(x : Int32) -> Int32 {
   if x < 0 {
     -x
   } else {
@@ -3158,7 +3158,7 @@ fn abs_int(x : Int) -> Int {
 /// Look up a short ordinal for a number.
 pub fn OrdinalLookup::lookup(
   self : OrdinalLookup,
-  n : Int,
+  n : Int32,
   gender : GrammarGender?,
 ) -> String? {
   let mut best_match : LocalizedTerm? = None
@@ -3242,7 +3242,7 @@ pub fn OrdinalLookup::lookup(
 ///|
 /// Look up a long ordinal for a number. Does not include fallback to
 /// regular ordinals.
-pub fn OrdinalLookup::lookup_long(self : OrdinalLookup, n : Int) -> String? {
+pub fn OrdinalLookup::lookup_long(self : OrdinalLookup, n : Int32) -> String? {
   for t in self.terms {
     guard t.name is Other(LongOrdinal(o)) else { continue }
     let ok = if n > 0 && n <= 10 {

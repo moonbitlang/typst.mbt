@@ -151,7 +151,7 @@ fn resolve_marker(
       }
     }
   }
-  let draw_marker = (p : @tiny_skia_path.Point, idx : Int) => {
+  let draw_marker = (p : @tiny_skia_path.Point, idx : Int32) => {
     let mut ts = Transform::from_translate(p.x, p.y)
     let angle = match convert_orientation(marker_node) {
       AutoStartReverse if idx == 0 =>
@@ -213,7 +213,7 @@ fn stroke_scale(
 fn draw_markers(
   path : Array[Segment],
   kind : MarkerKind,
-  draw_marker : (@tiny_skia_path.Point, Int) -> Unit,
+  draw_marker : (@tiny_skia_path.Point, Int32) -> Unit,
 ) -> Unit {
   match kind {
     KindStart => if path.get(0) is Some(MoveTo(p)) { draw_marker(p, 0) }
@@ -250,7 +250,7 @@ fn draw_markers(
 }
 
 ///|
-fn calc_vertex_angle(path : Array[Segment], idx : Int) -> Float {
+fn calc_vertex_angle(path : Array[Segment], idx : Int32) -> Float {
   if idx == 0 {
     // First segment.
 
@@ -467,7 +467,7 @@ fn calc_angle(
 ///|
 fn get_subpath_start(
   segments : Array[Segment],
-  idx : Int,
+  idx : Int32,
 ) -> @tiny_skia_path.Point {
   let offset = segments.length() - idx
   // `segments.iter().rev().skip(offset)`
@@ -484,7 +484,7 @@ fn get_subpath_start(
 ///|
 fn get_prev_vertex(
   segments : Array[Segment],
-  idx : Int,
+  idx : Int32,
 ) -> @tiny_skia_path.Point {
   match segments[idx - 1] {
     MoveTo(p) => p

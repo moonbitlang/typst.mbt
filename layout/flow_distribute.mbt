@@ -76,7 +76,7 @@ priv struct Distributor {
 /// A snapshot of the distribution state.
 priv struct DistributionSnapshot {
   work : Work
-  items : Int
+  items : Int32
   used : @library.Axes[@library.Abs]
 }
 
@@ -86,9 +86,9 @@ priv enum Item {
   /// An introspection tag.
   Tag(@library.Tag)
   /// Absolute spacing and its weakness level.
-  Abs(@library.Abs, Int)
+  Abs(@library.Abs, Int32)
   /// Fractional spacing or a fractional block.
-  Fr(@library.Fr, Int, SingleChild?)
+  Fr(@library.Fr, Int32, SingleChild?)
   /// A frame for a laid out line or block.
   Frame(@library.Frame, @library.Axes[@library.FixedAlignment])
   /// A frame for an absolutely (not floatingly) placed child.
@@ -192,7 +192,7 @@ fn Distributor::use_height(self : Distributor, amount : @library.Abs) -> Unit {
 fn Distributor::rel(
   self : Distributor,
   amount : @library.Rel[@library.Abs],
-  weakness : Int,
+  weakness : Int32,
 ) -> Unit {
   let amount = amount.relative_to(self.regions.base().y)
   if weakness > 0 && !self.keep_weak_rel_spacing(amount, weakness) {
@@ -207,7 +207,7 @@ fn Distributor::rel(
 fn Distributor::fr(
   self : Distributor,
   fr : @library.Fr,
-  weakness : Int,
+  weakness : Int32,
 ) -> Unit {
   if weakness > 0 && !self.keep_weak_fr_spacing(fr, weakness) {
     return
@@ -225,7 +225,7 @@ fn Distributor::fr(
 fn Distributor::keep_weak_rel_spacing(
   self : Distributor,
   amount : @library.Abs,
-  weakness : Int,
+  weakness : Int32,
 ) -> Bool {
   for i = self.items.length() - 1; i >= 0; i = i - 1 {
     match self.items[i] {
@@ -258,7 +258,7 @@ fn Distributor::keep_weak_rel_spacing(
 fn Distributor::keep_weak_fr_spacing(
   self : Distributor,
   fr : @library.Fr,
-  weakness : Int,
+  weakness : Int32,
 ) -> Bool {
   for i = self.items.length() - 1; i >= 0; i = i - 1 {
     match self.items[i] {

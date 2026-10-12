@@ -157,18 +157,18 @@ fn decode_tile(
 ///|
 /// All decompositions for a single tile.
 priv struct TileDecompositions {
-  first_ll_sub_band : Int
-  decompositions_start : Int
-  decompositions_end : Int
+  first_ll_sub_band : Int32
+  decompositions_start : Int32
+  decompositions_end : Int32
 }
 
 ///|
 /// The sub-band indices of the given resolution (`SubBandIter`).
 fn TileDecompositions::sub_band_iter(
   self : TileDecompositions,
-  resolution : Int,
+  resolution : Int32,
   decompositions : Array[Decomposition],
-) -> FixedArray[Int] {
+) -> FixedArray[Int32] {
   if resolution == 0 {
     [self.first_ll_sub_band]
   } else {
@@ -292,8 +292,8 @@ fn decode_component_tile_bit_planes(
 
 ///|
 fn decode_sub_band_bitplanes(
-  sub_band_idx : Int,
-  resolution : Int,
+  sub_band_idx : Int32,
+  resolution : Int32,
   component_info : ComponentInfo,
   tile_ctx : TileDecodeContext,
   storage : DecompositionStorage,
@@ -532,7 +532,7 @@ fn store(
 }
 
 ///|
-fn saturating_sub_u32(a : UInt, b : UInt) -> UInt {
+fn saturating_sub_u32(a : UInt32, b : UInt32) -> UInt32 {
   if a > b {
     a - b
   } else {

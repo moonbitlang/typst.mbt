@@ -8,8 +8,8 @@
 pub fn RasterImage::synthetic(
   data : Bytes,
   format : RasterFormat,
-  width~ : UInt,
-  height~ : UInt,
+  width~ : UInt32,
+  height~ : UInt32,
   dpi? : Double,
 ) -> RasterImage {
   // Not the hash of the image that decoding the data gives: what is kept
@@ -73,7 +73,7 @@ pub fn SvgImage::synthetic(
 pub fn PdfImage::synthetic(
   data : Bytes,
   pages : Array[(Float, Float)],
-  page_index : Int,
+  page_index : Int32,
 ) -> PdfImage {
   let document = PdfDocument::synthetic(data, pages)
   PdfImage::new(document, page_index).unwrap()

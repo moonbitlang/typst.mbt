@@ -3,7 +3,7 @@
 
 ///|
 /// Rust's saturating `f32 as u8` cast (NaN becomes 0).
-fn f32_as_u8(v : Float) -> Int {
+fn f32_as_u8(v : Float) -> Int32 {
   if v.is_nan() {
     0
   } else if v <= 0.0 {
@@ -152,7 +152,7 @@ fn maybe_patch_jpeg_dimensions(
 }
 
 ///|
-fn find_sof_marker(data : BytesView) -> Int? {
+fn find_sof_marker(data : BytesView) -> Int32? {
   let mut i = 0
   while i + 1 < data.length() {
     if data[i] != 0xFF {
@@ -165,7 +165,7 @@ fn find_sof_marker(data : BytesView) -> Int? {
     match marker {
       // All SOF markers carry dimensions: SOF0–SOF15, excluding
       // 0xC4 (DHT), 0xC8 (JPG), 0xCC (DAC) which are not frame markers.
-      0xC0..=0xCF if marker != 0xC4 && marker != 0xC8 && marker != 0xCC =>
+      0xC0..<=0xCF if marker != 0xC4 && marker != 0xC8 && marker != 0xCC =>
         return Some(i)
       // Skip padding bytes (0xFF followed by 0xFF).
       0xFF => {

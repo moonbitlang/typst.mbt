@@ -1,7 +1,7 @@
 // Port of read-fonts 0.39.2 `src/ps/num.rs`.
 
 ///|
-fn parse_int(cursor : Cursor, b0 : Int) -> Int raise PsError {
+fn parse_int(cursor : Cursor, b0 : Int32) -> Int32 raise PsError {
   // Size   b0 range     Value range              Value calculation
   //--------------------------------------------------------------------------------
   // 1      32 to 246    -107 to +107             b0 - 139
@@ -10,9 +10,9 @@ fn parse_int(cursor : Cursor, b0 : Int) -> Int raise PsError {
   // 3      28           -32768 to +32767         b1 << 8 | b2
   // 5      29           -(2^31) to +(2^31 - 1)   b1 << 24 | b2 << 16 | b3 << 8 | b4
   match b0 {
-    32..=246 => b0 - 139
-    247..=250 => (b0 - 247) * 256 + cursor.read_u8() + 108
-    251..=254 => -(b0 - 251) * 256 - cursor.read_u8() - 108
+    32..<=246 => b0 - 139
+    247..<=250 => (b0 - 247) * 256 + cursor.read_u8() + 108
+    251..<=254 => -(b0 - 251) * 256 - cursor.read_u8() - 108
     28 => cursor.read_i16()
     29 => cursor.read_i32()
     _ => raise InvalidNumber
@@ -28,13 +28,13 @@ let bcd_overflow : @font_types.Fixed = @font_types.Fixed::from_bits(0x7FFFFFFF)
 let bcd_underflow : @font_types.Fixed = @font_types.Fixed::zero()
 
 ///|
-const BCD_NUMBER_LIMIT : Int = 0xCCCCCCC
+const BCD_NUMBER_LIMIT : Int32 = 0xCCCCCCC
 
 ///|
-const BCD_INTEGER_LIMIT : Int = 0x7FFF
+const BCD_INTEGER_LIMIT : Int32 = 0x7FFF
 
 ///|
-let bcd_power_tens : ReadOnlyArray[Int] = [
+let bcd_power_tens : ReadOnlyArray[Int32] = [
   1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 ]
 
@@ -45,12 +45,12 @@ pub(all) struct BcdComponents {
   /// If overflow or underflow is detected early, then this contains the
   /// resulting value and we skip further processing.
   error : @font_types.Fixed?
-  number : Int
-  sign : Int
-  exponent : Int
-  exponent_add : Int
-  integer_len : Int
-  fraction_len : Int
+  number : Int32
+  sign : Int32
+  exponent : Int32
+  exponent_add : Int32
+  integer_len : Int32
+  fraction_len : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -104,7 +104,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
       match phase {
         0 =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               if number >= BCD_NUMBER_LIMIT {
                 exponent_add += 1
               } else if nibble != 0 || number != 0 {
@@ -125,7 +125,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
           }
         1 =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               if nibble == 0 && number == 0 {
                 exponent_add -= 1
               } else if number < BCD_NUMBER_LIMIT && fraction_len < 9 {
@@ -144,7 +144,7 @@ fn BcdComponents::parse(cursor : Cursor) -> BcdComponents raise PsError {
           }
         _ =>
           match nibble {
-            0x0..=0x9 =>
+            0x0..<=0x9 =>
               // Arbitrarily limit exponent
               if exponent > 1000 {
                 return if exponent_sign == -1 {
@@ -248,7 +248,7 @@ pub fn BcdComponents::value(
 /// Use for processing FontMatrix components.
 fn BcdComponents::dynamically_scaled_value(
   self : BcdComponents,
-) -> (@font_types.Fixed, Int) {
+) -> (@font_types.Fixed, Int32) {
   if self.error is Some(error) {
     return (error, 0)
   }
@@ -306,11 +306,11 @@ fn BcdComponents::dynamically_scaled_value(
 /// Parse a fixed point value with a dynamic scaling factor.
 fn parse_fixed_dynamic(
   cursor : Cursor,
-) -> (@font_types.Fixed, Int) raise PsError {
+) -> (@font_types.Fixed, Int32) raise PsError {
   let b0 = cursor.read_u8()
   match b0 {
     30 => BcdComponents::parse(cursor).dynamically_scaled_value()
-    28 | 29 | 32..=254 => {
+    28 | 29 | 32..<=254 => {
       let num = parse_int(cursor, b0)
       let mut int_len = 10
       if num > BCD_INTEGER_LIMIT {

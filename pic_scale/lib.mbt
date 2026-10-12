@@ -14,10 +14,10 @@
 /// positive or `src` is too short.
 pub fn resize_planar_u8(
   src : Bytes,
-  src_width : Int,
-  src_height : Int,
-  dst_width : Int,
-  dst_height : Int,
+  src_width : Int32,
+  src_height : Int32,
+  dst_width : Int32,
+  dst_height : Int32,
 ) -> Bytes {
   resample_u8(src, src_width, src_height, dst_width, dst_height, 1, false)
 }
@@ -26,10 +26,10 @@ pub fn resize_planar_u8(
 /// Resamples an interleaved RGB u8 image (`plan_rgb_resampling`).
 pub fn resize_rgb_u8(
   src : Bytes,
-  src_width : Int,
-  src_height : Int,
-  dst_width : Int,
-  dst_height : Int,
+  src_width : Int32,
+  src_height : Int32,
+  dst_width : Int32,
+  dst_height : Int32,
 ) -> Bytes {
   resample_u8(src, src_width, src_height, dst_width, dst_height, 3, false)
 }
@@ -40,10 +40,10 @@ pub fn resize_rgb_u8(
 /// skipped when the alpha is constant).
 pub fn resize_rgba_u8_premultiplied(
   src : Bytes,
-  src_width : Int,
-  src_height : Int,
-  dst_width : Int,
-  dst_height : Int,
+  src_width : Int32,
+  src_height : Int32,
+  dst_width : Int32,
+  dst_height : Int32,
 ) -> Bytes {
   resample_u8(src, src_width, src_height, dst_width, dst_height, 4, true)
 }

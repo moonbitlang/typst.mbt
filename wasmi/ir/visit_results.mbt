@@ -10,5 +10,5 @@ pub(open) trait VisitResults {
   /// Visits a [`Slot`] storing the result of an [`Op`].
   fn visit_result_reg(Self, Slot) -> Slot
   /// Visits a [`SlotSpan`] storing the results of an [`Op`].
-  fn visit_result_regs(Self, SlotSpan, Int?) -> SlotSpan
+  fn visit_result_regs(Self, SlotSpan, Int32?) -> SlotSpan
 }

@@ -87,17 +87,17 @@ priv enum EnumeratedColorspace {
 // (`let rb = lab.ra.unwrap_or(200)`, hayro-jpeg2000/src/lib.rs:646).
 #warnings("-unused_field")
 priv struct CieLab {
-  rl : UInt?
-  ol : UInt?
-  ra : UInt?
-  oa : UInt?
-  rb : UInt?
-  ob : UInt?
+  rl : UInt32?
+  ol : UInt32?
+  ra : UInt32?
+  oa : UInt32?
+  rb : UInt32?
+  ob : UInt32?
 }
 
 ///|
 fn EnumeratedColorspace::from_raw(
-  value : UInt,
+  value : UInt32,
   reader : BitReader,
 ) -> EnumeratedColorspace? {
   match value {

@@ -94,12 +94,12 @@ pub fn NativeFuncData::new(
   name~ : String,
   title~ : String,
   since? : Since,
-  docs? : String = "",
-  keywords? : Array[String] = [],
-  contextual? : Bool = false,
-  scope? : () -> Scope = Scope::new,
-  params? : Array[ParamInfo] = [],
-  returns? : () -> CastInfo = () => Any,
+  docs~ : String = "",
+  keywords~ : Array[String] = [],
+  contextual~ : Bool = false,
+  scope~ : () -> Scope = Scope::new,
+  params~ : Array[ParamInfo] = [],
+  returns~ : () -> CastInfo = () => Any,
   function : NativeFn,
 ) -> NativeFuncData {
   {
@@ -151,7 +151,7 @@ pub(all) struct Closure {
   /// Captured values from outer scopes.
   captured : Scope
   /// The number of positional parameters in the closure.
-  num_pos_params : Int
+  num_pos_params : Int32
   /// The fingerprint of the fields above (upstream wraps the closure in a
   /// `LazyHash`).
   hash : LazyFingerprint

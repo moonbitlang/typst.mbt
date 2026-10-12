@@ -5,8 +5,8 @@
 
 ///|
 priv struct ClipData {
-  alpha_start : Int
-  strip_start : Int
+  alpha_start : Int32
+  strip_start : Int32
   /// A coarse bounding box of the clip path in pixel coordinates, already
   /// intersected with the viewport.
   bbox : RectU16
@@ -16,21 +16,21 @@ priv struct ClipData {
 /// Borrowed data of a stripped path.
 priv struct PathDataRef {
   strips : Array[Strip]
-  strip_start : Int
-  strip_end : Int
+  strip_start : Int32
+  strip_end : Int32
   alphas : Array[Byte]
-  alpha_start : Int
+  alpha_start : Int32
   /// A coarse bounding box of the clip path in pixel coordinates.
   bbox : RectU16
 }
 
 ///|
-fn PathDataRef::strip(self : PathDataRef, i : Int) -> Strip {
+fn PathDataRef::strip(self : PathDataRef, i : Int32) -> Strip {
   self.strips[self.strip_start + i]
 }
 
 ///|
-fn PathDataRef::strips_len(self : PathDataRef) -> Int {
+fn PathDataRef::strips_len(self : PathDataRef) -> Int32 {
   self.strip_end - self.strip_start
 }
 
@@ -83,7 +83,7 @@ fn ClipContext::push_clip(
   strip_generator : StripGenerator,
   fill_rule : Fill,
   transform : @kurbo.Affine,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
 ) -> Unit {
   self.temp_storage.clear()
   let alpha_start = self.storage.alphas.length()
@@ -300,7 +300,7 @@ fn intersect(
 }
 
 ///|
-fn first_strip_at_or_after(path : PathDataRef, strip_y : Int) -> Int {
+fn first_strip_at_or_after(path : PathDataRef, strip_y : Int32) -> Int32 {
   // Strips are guaranteed to be sorted in ascending y (and ascending x).
   let mut lo = 0
   let mut hi = path.strips_len()
@@ -328,15 +328,15 @@ priv enum OverlapRelationship {
   /// on the given side.
   Advance(Advance)
   /// There is an overlap between the regions.
-  Overlap(start~ : Int, end~ : Int, advance~ : Advance)
+  Overlap(start~ : Int32, end~ : Int32, advance~ : Advance)
 }
 
 ///|
 priv enum ClipRegion {
   /// A fill region (start in the low, width in the high 16 bits).
-  FillRegion(Int)
+  FillRegion(Int32)
   /// A strip region (start, width, alphas, alpha offset).
-  StripRegion(Int, Int, Array[Byte], Int)
+  StripRegion(Int32, Int32, Array[Byte], Int32)
 }
 
 ///|
@@ -363,7 +363,7 @@ fn ClipRegion::overlap_relationship(
 ///|
 /// The start and width of a region. Fill regions store their start in the
 /// low and their width in the high 16 bits.
-fn region_dims(r : ClipRegion) -> (Int, Int) {
+fn region_dims(r : ClipRegion) -> (Int32, Int32) {
   match r {
     FillRegion(packed) => (packed & 0xFFFF, packed >> 16)
     StripRegion(start, width, _, _) => (start, width)
@@ -376,9 +376,9 @@ priv struct RowIterator {
   /// The path in question.
   input : PathDataRef
   /// The strip row we want to iterate over.
-  strip_y : Int
+  strip_y : Int32
   /// The index of the current strip.
-  cur_idx : Ref[Int]
+  cur_idx : Ref[Int32]
   /// Whether the iterator should yield a strip next or not.
   mut on_strip : Bool
 }
@@ -386,8 +386,8 @@ priv struct RowIterator {
 ///|
 fn RowIterator::new(
   input : PathDataRef,
-  cur_idx : Ref[Int],
-  strip_y : Int,
+  cur_idx : Ref[Int32],
+  strip_y : Int32,
 ) -> RowIterator {
   // Forward the index until we have found the right strip.
   while input.strip(cur_idx.val).strip_y() < strip_y {
@@ -407,14 +407,14 @@ fn RowIterator::next_strip(self : RowIterator) -> Strip {
 }
 
 ///|
-fn RowIterator::cur_strip_width(self : RowIterator) -> Int {
+fn RowIterator::cur_strip_width(self : RowIterator) -> Int32 {
   let cur = self.cur_strip()
   let next = self.next_strip()
   ((next.alpha_idx() - cur.alpha_idx()) / TILE_HEIGHT) & 0xFFFF
 }
 
 ///|
-fn RowIterator::cur_strip_fill_area(self : RowIterator) -> Int? {
+fn RowIterator::cur_strip_fill_area(self : RowIterator) -> Int32? {
   let next = self.next_strip()
   // Note that if the next strip happens to be on the next line, it will
   // always have zero winding so we don't need to special case this.
@@ -467,8 +467,8 @@ fn RowIterator::next(self : RowIterator) -> ClipRegion? {
 ///|
 /// The data of the current strip we are building.
 priv struct StripState {
-  x : Int
-  alpha_idx : Int
+  x : Int32
+  alpha_idx : Int32
   fill_gap : Bool
 }
 
@@ -476,7 +476,7 @@ priv struct StripState {
 fn flush_strip(
   strip_state : Ref[StripState?],
   strips : Array[Strip],
-  cur_y : Int,
+  cur_y : Int32,
 ) -> Unit {
   if strip_state.val is Some(state) {
     strip_state.val = None
@@ -495,7 +495,7 @@ fn flush_strip(
 fn start_strip(
   strip_data : Ref[StripState?],
   alphas : Array[Byte],
-  x : Int,
+  x : Int32,
   fill_gap : Bool,
 ) -> Unit {
   strip_data.val = Some({ x, alpha_idx: alphas.length(), fill_gap, })
@@ -505,7 +505,7 @@ fn start_strip(
 fn should_create_new_strip(
   strip_state : Ref[StripState?],
   alphas : Array[Byte],
-  overlap_start : Int,
+  overlap_start : Int32,
 ) -> Bool {
   // Returns false in case we can append to the currently built strip.
   match strip_state.val {
@@ -545,7 +545,7 @@ fn ClipState::push_clip(
   strip_generator : StripGenerator,
   fill_rule : Fill,
   transform : @kurbo.Affine,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
 ) -> Unit {
   // `self.active_shift() * transform`, with the identity shift.
   let clip_transform = @kurbo.Affine::identity() * transform

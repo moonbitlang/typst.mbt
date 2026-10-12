@@ -7,8 +7,8 @@
 /// A decoded WebP image: `width * height` RGBA pixels when `has_alpha`,
 /// RGB pixels otherwise (upstream `read_image`'s buffer layout).
 pub(all) struct WebpImage {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   has_alpha : Bool
   data : Bytes
 }
@@ -24,8 +24,8 @@ priv struct WebpChunk {
 ///|
 priv struct WebpExtendedInfo {
   alpha : Bool
-  canvas_width : Int
-  canvas_height : Int
+  canvas_width : Int32
+  canvas_height : Int32
   exif_metadata : Bool
   xmp_metadata : Bool
   animation : Bool
@@ -37,19 +37,19 @@ priv struct WebpParser {
   data : BytesView
   mut pos : Int64
   chunks : Array[WebpChunk]
-  mut width : Int
-  mut height : Int
+  mut width : Int32
+  mut height : Int32
   mut extended : WebpExtendedInfo?
   mut is_lossy : Bool
   mut has_alpha : Bool
-  mut num_frames : Int
+  mut num_frames : Int32
 }
 
 ///|
 let webp_eof : String = "IO Error: failed to fill whole buffer"
 
 ///|
-fn WebpParser::read_u8(self : WebpParser) -> Int raise ImageError {
+fn WebpParser::read_u8(self : WebpParser) -> Int32 raise ImageError {
   if self.pos < 0L || self.pos + 1L > self.data.length().to_int64() {
     raise ImageError(webp_eof)
   }
@@ -61,7 +61,7 @@ fn WebpParser::read_u8(self : WebpParser) -> Int raise ImageError {
 ///|
 fn WebpParser::read_bytes(
   self : WebpParser,
-  n : Int,
+  n : Int32,
 ) -> BytesView raise ImageError {
   if self.pos < 0L || self.pos + n.to_int64() > self.data.length().to_int64() {
     raise ImageError(webp_eof)
@@ -72,19 +72,19 @@ fn WebpParser::read_bytes(
 }
 
 ///|
-fn WebpParser::read_u16(self : WebpParser) -> Int raise ImageError {
+fn WebpParser::read_u16(self : WebpParser) -> Int32 raise ImageError {
   let b = self.read_bytes(2)
   b[0].to_int() | (b[1].to_int() << 8)
 }
 
 ///|
-fn WebpParser::read_u24(self : WebpParser) -> Int raise ImageError {
+fn WebpParser::read_u24(self : WebpParser) -> Int32 raise ImageError {
   let b = self.read_bytes(3)
   b[0].to_int() | (b[1].to_int() << 8) | (b[2].to_int() << 16)
 }
 
 ///|
-fn WebpParser::read_u32(self : WebpParser) -> UInt raise ImageError {
+fn WebpParser::read_u32(self : WebpParser) -> UInt32 raise ImageError {
   let b = self.read_bytes(4)
   b[0].to_uint() |
   (b[1].to_uint() << 8) |
@@ -330,13 +330,13 @@ fn WebpParser::read_extended_header(
 /// The alpha filtering methods (`FilteringMethod`): none, horizontal,
 /// vertical, gradient.
 fn get_alpha_predictor(
-  x : Int,
-  y : Int,
-  width : Int,
-  filtering_method : Int,
+  x : Int32,
+  y : Int32,
+  width : Int32,
+  filtering_method : Int32,
   image_slice : FixedArray[Byte],
-) -> Int {
-  let alpha = (index : Int) => image_slice[index * 4 + 3].to_int()
+) -> Int32 {
+  let alpha = (index : Int32) => image_slice[index * 4 + 3].to_int()
   match filtering_method {
     0 => 0
     1 =>
@@ -380,9 +380,9 @@ fn get_alpha_predictor(
 /// `read_alpha_chunk`: the filtering method and the alpha values.
 fn read_alpha_chunk(
   data : BytesView,
-  width : Int,
-  height : Int,
-) -> (Int, FixedArray[Byte]) raise ImageError {
+  width : Int32,
+  height : Int32,
+) -> (Int32, FixedArray[Byte]) raise ImageError {
   if data.length() < 1 {
     raise ImageError(webp_eof)
   }
@@ -417,9 +417,9 @@ fn read_alpha_chunk(
 /// Applies the alpha values of an ALPH chunk to an RGBA buffer.
 fn apply_alpha(
   buf : FixedArray[Byte],
-  width : Int,
-  height : Int,
-  filtering : Int,
+  width : Int32,
+  height : Int32,
+  filtering : Int32,
   alpha : FixedArray[Byte],
 ) -> Unit {
   for y in 0..<height {
@@ -432,19 +432,19 @@ fn apply_alpha(
 }
 
 ///|
-fn div_by_255(v : UInt) -> UInt {
+fn div_by_255(v : UInt32) -> UInt32 {
   (((v + 0x80) >> 8) + v + 0x80) >> 8
 }
 
 ///|
 fn blend_channel_nonpremult(
-  src : UInt,
-  src_a : UInt,
-  dst : UInt,
-  dst_a : UInt,
-  scale : UInt,
-  shift : Int,
-) -> UInt {
+  src : UInt32,
+  src_a : UInt32,
+  dst : UInt32,
+  dst_a : UInt32,
+  scale : UInt32,
+  shift : Int32,
+) -> UInt32 {
   let src_channel = (src >> shift) & 0xff
   let dst_channel = (dst >> shift) & 0xff
   let blend_unscaled = src_channel * src_a + dst_channel * dst_a
@@ -453,7 +453,7 @@ fn blend_channel_nonpremult(
 
 ///|
 /// `do_alpha_blending` on little-endian packed RGBA.
-fn blend_pixel_nonpremult(src : UInt, dst : UInt) -> UInt {
+fn blend_pixel_nonpremult(src : UInt32, dst : UInt32) -> UInt32 {
   let src_a = (src >> 24) & 0xff
   if src_a == 0 {
     dst
@@ -471,7 +471,7 @@ fn blend_pixel_nonpremult(src : UInt, dst : UInt) -> UInt {
 }
 
 ///|
-fn load_rgba(b : FixedArray[Byte], i : Int) -> UInt {
+fn load_rgba(b : FixedArray[Byte], i : Int32) -> UInt32 {
   b[i].to_uint() |
   (b[i + 1].to_uint() << 8) |
   (b[i + 2].to_uint() << 16) |
@@ -482,20 +482,20 @@ fn load_rgba(b : FixedArray[Byte], i : Int) -> UInt {
 /// `extended::composite_frame`.
 fn composite_frame(
   canvas : FixedArray[Byte],
-  canvas_width : Int,
-  canvas_height : Int,
+  canvas_width : Int32,
+  canvas_height : Int32,
   clear_color : FixedArray[Byte]?,
   frame : FixedArray[Byte],
-  frame_offset_x : Int,
-  frame_offset_y : Int,
-  frame_width : Int,
-  frame_height : Int,
+  frame_offset_x : Int32,
+  frame_offset_y : Int32,
+  frame_width : Int32,
+  frame_height : Int32,
   frame_has_alpha : Bool,
   frame_use_alpha_blending : Bool,
-  previous_frame_width : Int,
-  previous_frame_height : Int,
-  previous_frame_offset_x : Int,
-  previous_frame_offset_y : Int,
+  previous_frame_width : Int32,
+  previous_frame_height : Int32,
+  previous_frame_offset_x : Int32,
+  previous_frame_offset_y : Int32,
 ) -> Unit {
   let frame_is_full_size = frame_offset_x == 0 &&
     frame_offset_y == 0 &&
@@ -565,7 +565,7 @@ fn composite_frame(
         }
     }
   }
-  let sat_sub = (a : Int, b : Int) => if a > b { a - b } else { 0 }
+  let sat_sub = (a : Int32, b : Int32) => if a > b { a - b } else { 0 }
   let width = imin3(
     frame_width,
     sat_sub(canvas_width, frame_offset_x),

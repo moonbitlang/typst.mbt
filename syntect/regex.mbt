@@ -18,7 +18,7 @@ pub struct Regex {
 ///|
 /// A region contains text positions for capture groups in a match result.
 pub struct Region {
-  priv positions : Array[(Int, Int)?]
+  priv positions : Array[(Int32, Int32)?]
 } derive(Eq)
 
 ///|
@@ -46,14 +46,14 @@ pub fn SearchText::text(self : SearchText) -> ByteIndex {
 
 ///|
 /// The UTF-8 length of the text.
-pub fn SearchText::len(self : SearchText) -> Int {
+pub fn SearchText::len(self : SearchText) -> Int32 {
   self.index.len()
 }
 
 ///|
 /// `line[start..].char_indices().nth(1)`: the offset of the char after the
 /// one at `start`, if there is one.
-pub fn SearchText::next_char_offset(self : SearchText, start : Int) -> Int? {
+pub fn SearchText::next_char_offset(self : SearchText, start : Int32) -> Int32? {
   let mut next = start + 1
   while next < self.index.len() && self.index.utf16(next) < 0 {
     next += 1
@@ -112,8 +112,8 @@ pub fn Regex::is_match(self : Regex, text : String) -> Bool {
 pub fn Regex::search(
   self : Regex,
   text : ByteIndex,
-  begin : Int,
-  end : Int,
+  begin : Int32,
+  end : Int32,
   region : Region?,
 ) -> Bool {
   self.search_text(SearchText::new(text), begin, end, region)
@@ -124,8 +124,8 @@ pub fn Regex::search(
 pub fn Regex::search_text(
   self : Regex,
   text : SearchText,
-  begin : Int,
-  end : Int,
+  begin : Int32,
+  end : Int32,
   region : Region?,
 ) -> Bool {
   // If there's an error during search, treat it as non-matching. For
@@ -192,7 +192,7 @@ fn Region::init_from_captures(
 ///
 /// If there is no match for that group or the index does not correspond to
 /// a group, `None` is returned. The index 0 returns the whole match.
-pub fn Region::pos(self : Region, i : Int) -> (Int, Int)? {
+pub fn Region::pos(self : Region, i : Int32) -> (Int32, Int32)? {
   if i < self.positions.length() {
     self.positions[i]
   } else {

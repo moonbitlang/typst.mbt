@@ -6,11 +6,17 @@
 # Packages the module like the publish workflow (`moon package`), unpacks
 # the zip and builds and runs a tiny consumer of `moonbitlang/typst/doc`
 # (and of `doc/kit`, a package of its own on top of it)
-# that depends on the unpacked package: only what is in the zip is there,
-# and moon does not run the `pre-build` steps of a dependency, so a package
-# without the generated font data (of `typst_assets/fonts` and of
-# `doc/fonts`, the EDSL's sans-serif family) fails here like 0.1.0-0.1.2
-# did for their users.
+# that depends on the unpacked package: only what is in the zip is there.
+# moon does not run the `pre-build` steps of a dependency from the registry,
+# so a package without the generated font data (of `typst_assets/fonts` and
+# of `doc/fonts`, the EDSL's sans-serif family) is broken for its users like
+# 0.1.0-0.1.2 were. Here the unpacked package can only be a member of the
+# consumer's workspace (a `moon.mod` has no dependencies by path any more),
+# and moon does run the pre-build steps of a member: so the zip must list
+# the generated files, and building the consumer must leave every file of
+# the unpacked package as it was and add none (the steps generate again
+# what the package ships, byte for byte, or the package is not what a user
+# needs).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 targets=("$@")
@@ -36,25 +42,42 @@ for f in typst_assets/fonts/fonts_gen.c typst_assets/fonts/fonts_wasm_gen.mbt \
 done
 unzip -q "$zip" -d "$work/typst"
 
-cat > "$work/consumer/moon.mod.json" <<'EOF'
-{
-  "name": "ci/consumer",
-  "version": "0.1.0",
-  "deps": {
-    "moonbitlang/typst": { "path": "../typst" }
-  }
+# Every file of the unpacked package with its checksum.
+manifest() {
+  (cd "$work/typst" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256)
+}
+manifest > "$work/package.sha256"
+
+# A `moon.mod` cannot name a dependency by its path (moon 0.1.20261012: "use
+# workspace configuration in `moon.work` instead"), so the consumer and the
+# unpacked package are the two members of a workspace, and the consumer
+# imports the package by the version it has.
+version=$(sed -n 's/^version = "\(.*\)"$/\1/p' "$work/typst/moon.mod")
+[ -n "$version" ] || { echo "package_smoke: no version in the package's moon.mod" >&2; exit 1; }
+cat > "$work/moon.work" <<'EOF'
+members = [
+  "./consumer",
+  "./typst",
+]
+EOF
+cat > "$work/consumer/moon.mod" <<EOF
+name = "ci/consumer"
+
+version = "0.1.0"
+
+import {
+  "moonbitlang/typst@$version",
 }
 EOF
-cat > "$work/consumer/cmd/moon.pkg.json" <<'EOF'
-{
-  "is-main": true,
-  "import": [
-    "moonbitlang/typst/doc",
-    "moonbitlang/typst/doc/kit",
-    "moonbitlang/typst/doc/system",
-    "moonbitlang/typst/library"
-  ]
+cat > "$work/consumer/cmd/moon.pkg" <<'EOF'
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/kit",
+  "moonbitlang/typst/doc/system",
+  "moonbitlang/typst/library",
 }
+
+pkgtype(kind: "executable")
 EOF
 cat > "$work/consumer/cmd/main.mbt" <<'EOF'
 ///|
@@ -135,6 +158,16 @@ for target in "${targets[@]}"; do
   echo "$out"
   grep -q '^consumer: ok, ' <<< "$out" || {
     echo "package_smoke: the consumer failed on $target" >&2
+    exit 1
+  }
+  # The pre-build steps ran (the package is a member of the workspace): the
+  # consumer was built from what the package ships only if they changed
+  # nothing.
+  manifest > "$work/package.after.sha256"
+  diff "$work/package.sha256" "$work/package.after.sha256" > "$work/package.diff" || {
+    head -20 "$work/package.diff"
+    echo "package_smoke: building the consumer on $target added or changed files of the package:" \
+      "it does not ship what its pre-build steps generate" >&2
     exit 1
   }
 done

@@ -31,8 +31,8 @@ pub suberror BinaryReaderError {
   BinaryReaderError(
     message~ : String,
     kind~ : BinaryReaderErrorKind,
-    offset~ : Int,
-    needed_hint~ : Int?
+    offset~ : Int32,
+    needed_hint~ : Int32?
   )
 }
 
@@ -52,7 +52,7 @@ pub extend BinaryReaderError with Show::{to_string, output}
 fn BinaryReaderError::new_kind(
   kind : BinaryReaderErrorKind,
   message : String,
-  offset : Int,
+  offset : Int32,
 ) -> BinaryReaderError {
   BinaryReaderError(message~, kind~, offset~, needed_hint=None)
 }
@@ -60,18 +60,24 @@ fn BinaryReaderError::new_kind(
 ///|
 pub fn BinaryReaderError::new(
   message : String,
-  offset : Int,
+  offset : Int32,
 ) -> BinaryReaderError {
   BinaryReaderError::new_kind(Custom, message, offset)
 }
 
 ///|
-fn BinaryReaderError::invalid(msg : String, offset : Int) -> BinaryReaderError {
+fn BinaryReaderError::invalid(
+  msg : String,
+  offset : Int32,
+) -> BinaryReaderError {
   BinaryReaderError::new_kind(Invalid, msg, offset)
 }
 
 ///|
-fn BinaryReaderError::eof(offset : Int, needed_hint : Int) -> BinaryReaderError {
+fn BinaryReaderError::eof(
+  offset : Int32,
+  needed_hint : Int32,
+) -> BinaryReaderError {
   BinaryReaderError(
     message="unexpected end-of-file",
     kind=Custom,
@@ -95,7 +101,7 @@ pub fn BinaryReaderError::message(self : BinaryReaderError) -> String {
 
 ///|
 /// Get the offset within the Wasm binary where the error occurred.
-pub fn BinaryReaderError::offset(self : BinaryReaderError) -> Int {
+pub fn BinaryReaderError::offset(self : BinaryReaderError) -> Int32 {
   let BinaryReaderError(offset~, ..) = self
   offset
 }
@@ -103,7 +109,7 @@ pub fn BinaryReaderError::offset(self : BinaryReaderError) -> Int {
 ///|
 /// The hint of how many more bytes are needed, for "unexpected end-of-file"
 /// errors.
-pub fn BinaryReaderError::needed_hint(self : BinaryReaderError) -> Int? {
+pub fn BinaryReaderError::needed_hint(self : BinaryReaderError) -> Int32? {
   let BinaryReaderError(needed_hint~, ..) = self
   needed_hint
 }
@@ -126,15 +132,15 @@ fn BinaryReaderError::clear_hint(self : BinaryReaderError) -> BinaryReaderError 
 
 ///|
 /// `bail!(offset, ...)`.
-fn[T] bail(offset : Int, message : String) -> T raise BinaryReaderError {
+fn[T] bail(offset : Int32, message : String) -> T raise BinaryReaderError {
   raise BinaryReaderError::new(message, offset)
 }
 
 ///|
 /// A half-open range of byte offsets (`core::ops::Range<usize>`).
 pub(all) struct Range {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -153,10 +159,10 @@ pub extend Range with @debug.Debug::{to_repr}
 /// The buffer is the window `data[start:start + len]`.
 pub struct BinaryReader {
   priv data : Bytes
-  priv start : Int
-  priv len : Int
-  priv mut position : Int
-  priv mut original_offset : Int
+  priv start : Int32
+  priv len : Int32
+  priv mut position : Int32
+  priv mut original_offset : Int32
   priv mut features : WasmFeatures
 }
 
@@ -173,7 +179,7 @@ pub struct BinaryReader {
 /// is enabled use the [`BinaryReader::new_features`] constructor instead.
 pub fn BinaryReader::new(
   data : BytesView,
-  original_offset : Int,
+  original_offset : Int32,
 ) -> BinaryReader {
   BinaryReader::new_features(data, original_offset, WasmFeatures::all())
 }
@@ -189,7 +195,7 @@ pub fn BinaryReader::new(
 /// slightly different.
 pub fn BinaryReader::new_features(
   data : BytesView,
-  original_offset : Int,
+  original_offset : Int32,
   features : WasmFeatures,
 ) -> BinaryReader {
   {
@@ -248,7 +254,7 @@ pub fn BinaryReader::shrink(self : BinaryReader) -> BinaryReader {
 
 ///|
 /// Gets the original position of the binary reader.
-pub fn BinaryReader::original_position(self : BinaryReader) -> Int {
+pub fn BinaryReader::original_position(self : BinaryReader) -> Int32 {
   self.original_offset + self.position
 }
 
@@ -294,7 +300,7 @@ fn BinaryReader::ensure_has_byte(
 ///|
 fn BinaryReader::ensure_has_bytes(
   self : BinaryReader,
-  len : Int,
+  len : Int32,
 ) -> Unit raise BinaryReaderError {
   // `self.position + len <= self.buffer.len()`, without overflowing.
   if len <= self.len - self.position {
@@ -308,7 +314,7 @@ fn BinaryReader::ensure_has_bytes(
 ///|
 fn BinaryReader::external_kind_from_byte(
   byte : Byte,
-  offset : Int,
+  offset : Int32,
 ) -> ExternalKind raise BinaryReaderError {
   match byte {
     0x00 => Func
@@ -326,9 +332,9 @@ fn BinaryReader::external_kind_from_byte(
 /// against a limit.
 pub fn BinaryReader::read_size(
   self : BinaryReader,
-  limit : Int,
+  limit : Int32,
   desc : String,
-) -> Int raise BinaryReaderError {
+) -> Int32 raise BinaryReaderError {
   let pos = self.original_position()
   let size = self.read_var_u32()
   if size > limit.reinterpret_as_uint() {
@@ -343,9 +349,9 @@ pub fn BinaryReader::read_size(
 /// (upstream `read_iter`).
 fn BinaryReader::read_iter(
   self : BinaryReader,
-  limit : Int,
+  limit : Int32,
   desc : String,
-) -> Int raise BinaryReaderError {
+) -> Int32 raise BinaryReaderError {
   self.read_size(limit, desc)
 }
 
@@ -414,13 +420,13 @@ pub fn BinaryReader::eof(self : BinaryReader) -> Bool {
 
 ///|
 /// Returns the `BinaryReader`'s current position.
-pub fn BinaryReader::current_position(self : BinaryReader) -> Int {
+pub fn BinaryReader::current_position(self : BinaryReader) -> Int32 {
   self.position
 }
 
 ///|
 /// Returns the number of bytes remaining in the `BinaryReader`.
-pub fn BinaryReader::bytes_remaining(self : BinaryReader) -> Int {
+pub fn BinaryReader::bytes_remaining(self : BinaryReader) -> Int32 {
   self.len - self.position
 }
 
@@ -432,7 +438,7 @@ pub fn BinaryReader::bytes_remaining(self : BinaryReader) -> Int {
 /// If `size` exceeds the remaining length in `BinaryReader`.
 pub fn BinaryReader::read_bytes(
   self : BinaryReader,
-  size : Int,
+  size : Int32,
 ) -> BytesView raise BinaryReaderError {
   self.ensure_has_bytes(size)
   let start = self.position
@@ -444,7 +450,7 @@ pub fn BinaryReader::read_bytes(
 /// Skips `size` bytes (`read_bytes` without the returned slice).
 fn BinaryReader::skip_bytes(
   self : BinaryReader,
-  size : Int,
+  size : Int32,
 ) -> Unit raise BinaryReaderError {
   self.ensure_has_bytes(size)
   self.position += size
@@ -464,7 +470,7 @@ pub fn BinaryReader::read_reader(
 /// `read_bytes(size as usize)` for a `u32` size (which may exceed `Int`).
 fn BinaryReader::skip_bytes_u32(
   self : BinaryReader,
-  size : UInt,
+  size : UInt32,
 ) -> Unit raise BinaryReaderError {
   if size > 0x7FFF_FFFFU {
     // Larger than any buffer.
@@ -480,7 +486,7 @@ fn BinaryReader::skip_bytes_u32(
 /// `read_bytes(size as usize)` for a `u32` size (which may exceed `Int`).
 fn BinaryReader::read_bytes_u32(
   self : BinaryReader,
-  size : UInt,
+  size : UInt32,
 ) -> BytesView raise BinaryReaderError {
   let start = self.position
   self.skip_bytes_u32(size)
@@ -493,7 +499,7 @@ fn BinaryReader::read_bytes_u32(
 /// If `BinaryReader` has less than four bytes remaining.
 pub fn BinaryReader::read_u32(
   self : BinaryReader,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   self.ensure_has_bytes(4)
   let p = self.start + self.position
   let word = self.data[p].to_uint() |
@@ -553,7 +559,7 @@ fn BinaryReader::eof_err(self : BinaryReader) -> BinaryReaderError {
 /// the integer is larger than 32 bits.
 pub fn BinaryReader::read_var_u32(
   self : BinaryReader,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   // Optimization for single byte i32.
   let byte = self.read_u8()
   if (byte & 0x80) == 0 {
@@ -567,7 +573,7 @@ pub fn BinaryReader::read_var_u32(
 fn BinaryReader::read_var_u32_big(
   self : BinaryReader,
   byte : Byte,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   let mut result = (byte & 0x7F).to_uint()
   let mut shift = 7
   while true {
@@ -684,7 +690,7 @@ pub fn BinaryReader::skip_string(
 /// the integer is larger than 32 bits.
 pub fn BinaryReader::read_var_i32(
   self : BinaryReader,
-) -> Int raise BinaryReaderError {
+) -> Int32 raise BinaryReaderError {
   // Optimization for single byte i32.
   let byte = self.read_u8()
   if (byte & 0x80) == 0 {
@@ -696,7 +702,7 @@ pub fn BinaryReader::read_var_i32(
 
 ///|
 /// `(byte << 1) as i8` as an `Int`.
-fn sign_and_unused(byte : Byte) -> Int {
+fn sign_and_unused(byte : Byte) -> Int32 {
   let b = (byte.to_int() << 1) & 0xFF
   if b >= 128 {
     b - 256
@@ -709,7 +715,7 @@ fn sign_and_unused(byte : Byte) -> Int {
 fn BinaryReader::read_var_i32_big(
   self : BinaryReader,
   byte : Byte,
-) -> Int raise BinaryReaderError {
+) -> Int32 raise BinaryReaderError {
   let mut result = (byte & 0x7F).to_int()
   let mut shift = 7
   while true {
@@ -843,7 +849,7 @@ pub fn BinaryReader::read_f64(
 /// (internal) Reads a fixed-size WebAssembly string from the module.
 fn BinaryReader::internal_read_string(
   self : BinaryReader,
-  len : UInt,
+  len : UInt32,
 ) -> String raise BinaryReaderError {
   self.skip_bytes_u32(len)
   let len = len.reinterpret_as_int()
@@ -895,7 +901,7 @@ pub fn BinaryReader::read_unlimited_string(
 /// Decodes `len` bytes of `data` at `start` as UTF-8 like Rust's
 /// `str::from_utf8`: `None` for any invalid sequence (overlong encodings,
 /// surrogates, code points above U+10FFFF, truncated sequences).
-fn decode_utf8(data : Bytes, start : Int, len : Int) -> String? {
+fn decode_utf8(data : Bytes, start : Int32, len : Int32) -> String? {
   let buf = StringBuilder(size_hint=len)
   let end = start + len
   let mut i = start
@@ -953,7 +959,7 @@ fn[T] BinaryReader::invalid_leading_byte(
 fn BinaryReader::invalid_leading_byte_error(
   byte : Byte,
   desc : String,
-  offset : Int,
+  offset : Int32,
 ) -> BinaryReaderError {
   BinaryReaderError::new(
     "invalid leading byte (0x\{byte.to_int().to_string(radix=16)}) for \{desc}",
@@ -1291,7 +1297,7 @@ fn binary8(x : Byte) -> String {
 ///|
 fn BinaryReader::read_0xfb_operator(
   self : BinaryReader,
-  pos : Int,
+  pos : Int32,
 ) -> Operator raise BinaryReaderError {
   let code = self.read_var_u32()
   match code {
@@ -1471,7 +1477,7 @@ fn BinaryReader::read_0xfb_operator(
 ///|
 fn BinaryReader::read_0xfc_operator(
   self : BinaryReader,
-  pos : Int,
+  pos : Int32,
 ) -> Operator raise BinaryReaderError {
   let code = self.read_var_u32()
   match code {
@@ -1542,7 +1548,7 @@ fn BinaryReader::read_0xfc_operator(
 ///|
 fn BinaryReader::read_0xfe_operator(
   self : BinaryReader,
-  pos : Int,
+  pos : Int32,
 ) -> Operator raise BinaryReaderError {
   let code = self.read_var_u32()
   match code {
@@ -1859,7 +1865,7 @@ fn pretty_hex_bytes(bytes : BytesView) -> String {
 ///|
 fn BinaryReader::read_header_version(
   self : BinaryReader,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   let magic_number = self.read_bytes(4)
   if magic_number != wasm_magic_number[:] {
     raise BinaryReaderError::new(
@@ -1885,7 +1891,7 @@ fn BinaryReader::skip_const_expr(
 ///|
 fn BinaryReader::read_memory_index_or_zero_if_not_multi_memory(
   self : BinaryReader,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   if self.features.multi_memory() {
     self.read_var_u32()
   } else {
@@ -1901,7 +1907,7 @@ fn BinaryReader::read_memory_index_or_zero_if_not_multi_memory(
 ///|
 fn BinaryReader::read_table_index_or_zero_if_not_reference_types(
   self : BinaryReader,
-) -> UInt raise BinaryReaderError {
+) -> UInt32 raise BinaryReaderError {
   if self.features.reference_types() {
     self.read_var_u32()
   } else {
@@ -1917,7 +1923,7 @@ fn BinaryReader::read_table_index_or_zero_if_not_reference_types(
 ///|
 /// Returns the number of `br_table` entries, not including the default
 /// label
-pub fn BrTable::len(self : BrTable) -> UInt {
+pub fn BrTable::len(self : BrTable) -> UInt32 {
   self.targets.length().reinterpret_as_uint()
 }
 
@@ -1929,7 +1935,7 @@ pub fn BrTable::is_empty(self : BrTable) -> Bool {
 
 ///|
 /// Returns the default target of this `br_table` instruction.
-pub fn BrTable::default(self : BrTable) -> UInt {
+pub fn BrTable::default(self : BrTable) -> UInt32 {
   self.default
 }
 
@@ -1939,6 +1945,6 @@ pub fn BrTable::default(self : BrTable) -> UInt {
 ///
 /// Upstream parses the targets lazily; they were already parsed (and their
 /// errors reported) when the `br_table` was read, so this port keeps them.
-pub fn BrTable::targets(self : BrTable) -> ArrayView[UInt] {
+pub fn BrTable::targets(self : BrTable) -> ArrayView[UInt32] {
   self.targets[:]
 }

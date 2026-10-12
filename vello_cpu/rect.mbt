@@ -91,7 +91,7 @@ fn render_rect(
 /// Compute fractional pixel coverage for 4 consecutive pixels starting at
 /// `start`.
 fn rect_coverage(
-  start : Int,
+  start : Int32,
   rect_lo : Float,
   rect_hi : Float,
 ) -> FixedArray[Float] {

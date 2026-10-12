@@ -25,7 +25,7 @@
 extern "C" fn system_cbrt(x : Double) -> Double = "cbrt"
 
 ///|
-extern "C" fn f64_cbrt_is_system_ffi() -> Int = "typst_libm_f64_cbrt_is_system"
+extern "C" fn f64_cbrt_is_system_ffi() -> Int32 = "typst_libm_f64_cbrt_is_system"
 
 ///|
 /// Whether `f64_cbrt` is the C library's `cbrt` on this platform (Windows and

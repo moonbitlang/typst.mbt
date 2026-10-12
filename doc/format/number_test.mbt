@@ -32,7 +32,7 @@ fn Rng::next(self : Rng) -> UInt64 {
 
 ///|
 /// A number in `0..n`.
-fn Rng::below(self : Rng, n : Int) -> Int {
+fn Rng::below(self : Rng, n : Int32) -> Int32 {
   (self.next() >> 33).to_int() % n
 }
 
@@ -64,8 +64,8 @@ fn Rng::double(self : Rng) -> Double {
 ///|
 /// The rows of a table that `f` does not reproduce, as text.
 fn mismatches(
-  table : ArrayView[(UInt64, Int, String)],
-  f : (Double, Int) -> String,
+  table : ArrayView[(UInt64, Int32, String)],
+  f : (Double, Int32) -> String,
 ) -> Array[String] {
   let out = []
   for row in table {
@@ -418,7 +418,7 @@ test "grouped_int" {
     @format.grouped_int(-9223372036854775807 - 1),
     "-9,223,372,036,854,775,808",
   )
-  let n : Int = 48213
+  let n : Int32 = 48213
   assert_eq(@format.grouped_int(n.to_int64()), "48,213")
   // JavaScript's `toLocaleString("en-US")`.
   let wrong = []

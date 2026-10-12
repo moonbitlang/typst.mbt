@@ -6,20 +6,20 @@
 /// pixels `bounds_start[i] .. bounds_start[i] + bounds_size[i]`.
 priv struct FilterWeights {
   weights : FixedArray[Float]
-  bounds_start : FixedArray[Int]
-  bounds_size : FixedArray[Int]
-  kernel_size : Int
-  distinct_elements : Int
+  bounds_start : FixedArray[Int32]
+  bounds_size : FixedArray[Int32]
+  kernel_size : Int32
+  distinct_elements : Int32
 }
 
 ///|
 /// `FilterWeights<i16>` after `numerical_approximation::<i16, 15>(0)`
 /// (`aligned_size == kernel_size` as the alignment is 0).
 priv struct FixedWeights {
-  weights : FixedArray[Int]
-  bounds_start : FixedArray[Int]
-  bounds_size : FixedArray[Int]
-  aligned_size : Int
+  weights : FixedArray[Int32]
+  bounds_start : FixedArray[Int32]
+  bounds_size : FixedArray[Int32]
+  aligned_size : Int32
   /// Whether every weight is an `i16` value (the contract of the v128 rdm
   /// kernels, checked once here: the weights are not modified afterwards).
   weights_fit_i16 : Bool
@@ -45,14 +45,14 @@ fn round_f64(x : Double) -> Double {
 /// are kept as `Int` (the `f64` arithmetic of upstream is exact on them).
 fn quantize_kernel(
   weights : FixedArray[Float],
-  offset : Int,
-  kernel_size : Int,
-  taps : Int,
-  precision_scale : Int,
-  lower_bound : Int,
-  upper_bound : Int,
-  scratch : FixedArray[Int],
-  order : Array[Int],
+  offset : Int32,
+  kernel_size : Int32,
+  taps : Int32,
+  precision_scale : Int32,
+  lower_bound : Int32,
+  upper_bound : Int32,
+  scratch : FixedArray[Int32],
+  order : Array[Int32],
 ) -> Unit {
   let mut sum = 0
   for i in 0..<kernel_size {
@@ -99,7 +99,7 @@ fn quantize_kernel(
 /// `FilterWeights<f32>::numerical_approximation::<i16, PRECISION>(0)`.
 fn FilterWeights::numerical_approximation_i16(
   self : FilterWeights,
-  precision : Int,
+  precision : Int32,
 ) -> FixedWeights {
   let align = self.kernel_size
   let precision_scale = 1 << precision
@@ -107,7 +107,7 @@ fn FilterWeights::numerical_approximation_i16(
   let lower_bound = -32768
   let upper_bound = 32767
   let scratch = FixedArray::make(self.kernel_size, 0)
-  let order : Array[Int] = Array(capacity=self.kernel_size)
+  let order : Array[Int32] = Array(capacity=self.kernel_size)
   // `chunks_exact(kernel_size)` zipped with the bounds.
   let chunks = if self.kernel_size == 0 {
     0
@@ -149,7 +149,7 @@ fn FilterWeights::numerical_approximation_i16(
 ///|
 /// Whether `weights[off..off + n]` are `i16` values (`numerical_approximation_
 /// i16` clamps them; the v128 kernels hold them in `i16` lanes).
-fn weights_fit_i16(weights : FixedArray[Int], off : Int, n : Int) -> Bool {
+fn weights_fit_i16(weights : FixedArray[Int32], off : Int32, n : Int32) -> Bool {
   for j in 0..<n {
     let w = weights[off + j]
     if w < -32768 || w > 32767 {

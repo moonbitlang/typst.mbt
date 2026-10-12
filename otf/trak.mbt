@@ -131,7 +131,7 @@ pub extend TrackData with Default::{default}
 
 ///|
 fn TrackData::parse(
-  offset : Int,
+  offset : Int32,
   data : BytesView,
 ) -> TrackData raise Malformed {
   let s = Stream::new_at_r(data, offset)

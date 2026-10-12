@@ -1,7 +1,7 @@
 // Helpers for Rust `str` semantics.
 
 ///|
-fn is_ws(c : Int) -> Bool {
+fn is_ws(c : Int32) -> Bool {
   @unicode.is_whitespace(c.unsafe_to_char())
 }
 
@@ -29,7 +29,7 @@ pub fn rust_trim(s : StringView) -> StringView {
 
 ///|
 /// The UTF-8 length of a string.
-pub fn utf8_len(s : StringView) -> Int {
+pub fn utf8_len(s : StringView) -> Int32 {
   let mut n = 0
   let mut i = 0
   while i < s.length() {
@@ -41,7 +41,7 @@ pub fn utf8_len(s : StringView) -> Int {
 }
 
 ///|
-fn utf8_char_len(c : Int) -> Int {
+fn utf8_char_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -58,7 +58,7 @@ fn utf8_char_len(c : Int) -> Int {
 /// not on a char boundary map to -1.
 pub struct ByteIndex {
   priv text : String
-  priv map : FixedArray[Int]
+  priv map : FixedArray[Int32]
 }
 
 ///|
@@ -84,18 +84,18 @@ pub fn ByteIndex::text(self : ByteIndex) -> String {
 
 ///|
 /// The UTF-8 length of the text.
-pub fn ByteIndex::len(self : ByteIndex) -> Int {
+pub fn ByteIndex::len(self : ByteIndex) -> Int32 {
   self.map.length() - 1
 }
 
 ///|
 /// The UTF-16 index of a UTF-8 offset.
-pub fn ByteIndex::utf16(self : ByteIndex, byte : Int) -> Int {
+pub fn ByteIndex::utf16(self : ByteIndex, byte : Int32) -> Int32 {
   self.map[byte]
 }
 
 ///|
 /// Slice the text by UTF-8 offsets (`&text[start..end]`).
-pub fn ByteIndex::slice(self : ByteIndex, start : Int, end : Int) -> String {
+pub fn ByteIndex::slice(self : ByteIndex, start : Int32, end : Int32) -> String {
   self.text.unsafe_substring(start=self.map[start], end=self.map[end])
 }

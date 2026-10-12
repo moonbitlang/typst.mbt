@@ -27,7 +27,7 @@ pub struct Source {
   priv root : SyntaxNode
   priv lines : Lines
   /// The number of the source ([Source::serial]).
-  priv serial : Int
+  priv serial : Int32
   /// Whether the tree is the one [Source::new] made of the text
   /// ([Source::is_pristine]).
   priv pristine : Bool
@@ -39,10 +39,10 @@ pub struct Source {
 
 ///|
 /// The number of sources made so far ([Source::serial]).
-let source_serials : Ref[Int] = { val: 0, }
+let source_serials : Ref[Int32] = { val: 0, }
 
 ///|
-fn next_source_serial() -> Int {
+fn next_source_serial() -> Int32 {
   source_serials.val += 1
   source_serials.val
 }
@@ -101,7 +101,7 @@ pub fn Source::with_root(
 /// source of the process has it: a source never changes, and an edit
 /// returns another source with another number. It identifies the text and
 /// the numbered tree without hashing the tree.
-pub fn Source::serial(self : Source) -> Int {
+pub fn Source::serial(self : Source) -> Int32 {
   self.serial
 }
 
@@ -187,7 +187,7 @@ pub fn Source::lines(self : Source) -> Lines {
 /// that was ultimately reparsed. `self` is unchanged (upstream edits `self`
 /// and returns the range); if the text is the same, `self` is returned with
 /// the range `(0, 0)`.
-pub fn Source::replace(self : Source, new : String) -> (Source, (Int, Int)) {
+pub fn Source::replace(self : Source, new : String) -> (Source, (Int32, Int32)) {
   guard self.lines.replacement_range(new) is Some((prefix, suffix)) else {
     return (self, (0, 0))
   }
@@ -212,10 +212,10 @@ pub fn Source::replace(self : Source, new : String) -> (Source, (Int, Int)) {
 /// Aborts if the range is out of bounds.
 pub fn Source::edit(
   self : Source,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   replacement : String,
-) -> (Source, (Int, Int)) {
+) -> (Source, (Int32, Int32)) {
   // Upstream: `let inner = &mut **Arc::make_mut(&mut self.0);`
   // (source.rs:107), a copy of the record if the source is shared. Here the
   // record is always a new one, made below.
@@ -264,7 +264,7 @@ pub fn Source::range(
   self : Source,
   num : SpanNumber,
   sub_range : SubRange?,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   guard LinkedNode::new(self.root).find_number(num) is Some(node) else {
     return None
   }

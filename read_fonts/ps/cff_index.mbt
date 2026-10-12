@@ -18,17 +18,17 @@ pub fn Index1::read(data : BytesView) -> Index1 raise PsError {
 }
 
 ///|
-pub fn Index1::count(self : Index1) -> Int {
+pub fn Index1::count(self : Index1) -> Int32 {
   (self.data[0].to_int() << 8) | self.data[1].to_int()
 }
 
 ///|
-pub fn Index1::off_size(self : Index1) -> Int {
+pub fn Index1::off_size(self : Index1) -> Int32 {
   self.data[2].to_int()
 }
 
 ///|
-fn Index1::offsets_range(self : Index1) -> (Int, Int) {
+fn Index1::offsets_range(self : Index1) -> (Int32, Int32) {
   let start = 3
   let len = (self.count() + 1) * self.off_size()
   (start, start + len)
@@ -58,7 +58,7 @@ pub fn Index1::data(self : Index1) -> BytesView {
 
 ///|
 /// Returns the total size in bytes of the index table.
-pub fn Index1::size_in_bytes(self : Index1) -> Int raise PsError {
+pub fn Index1::size_in_bytes(self : Index1) -> Int32 raise PsError {
   let count = self.count()
   match count {
     0 => 2
@@ -71,13 +71,13 @@ pub fn Index1::size_in_bytes(self : Index1) -> Int raise PsError {
 
 ///|
 /// Returns the offset of the object at the given index.
-pub fn Index1::get_offset(self : Index1, index : Int) -> Int raise PsError {
+pub fn Index1::get_offset(self : Index1, index : Int32) -> Int32 raise PsError {
   read_offset(index, self.count(), self.off_size(), self.offsets())
 }
 
 ///|
 /// Returns the data for the object at the given index.
-pub fn Index1::get(self : Index1, index : Int) -> BytesView raise PsError {
+pub fn Index1::get(self : Index1, index : Int32) -> BytesView raise PsError {
   let start = self.get_offset(index)
   let end = self.get_offset(index + 1)
   match get_range(self.data(), start, end) {
@@ -89,11 +89,11 @@ pub fn Index1::get(self : Index1, index : Int) -> BytesView raise PsError {
 ///|
 /// Reads an offset which is encoded as a variable sized integer.
 fn read_offset(
-  index : Int,
-  count : Int,
-  offset_size : Int,
+  index : Int32,
+  count : Int32,
+  offset_size : Int32,
   offset_data : BytesView,
-) -> Int raise PsError {
+) -> Int32 raise PsError {
   // There are actually count + 1 entries in the offset array.
   //
   // "Offsets in the offset array are relative to the byte that precedes
@@ -147,7 +147,7 @@ pub fn Index::new(data : BytesView, is_cff2 : Bool) -> Index raise PsError {
 
 ///|
 /// Returns the number of objects in the index.
-pub fn Index::count(self : Index) -> Int {
+pub fn Index::count(self : Index) -> Int32 {
   match self {
     Empty => 0
     Format1(ix) => ix.count()
@@ -156,7 +156,7 @@ pub fn Index::count(self : Index) -> Int {
 
 ///|
 /// Computes a bias that is added to a subroutine operator in a charstring.
-pub fn Index::subr_bias(self : Index) -> Int {
+pub fn Index::subr_bias(self : Index) -> Int32 {
   let count = self.count()
   if count < 1240 {
     107
@@ -169,7 +169,7 @@ pub fn Index::subr_bias(self : Index) -> Int {
 
 ///|
 /// Returns the total size in bytes of the index table.
-pub fn Index::size_in_bytes(self : Index) -> Int raise PsError {
+pub fn Index::size_in_bytes(self : Index) -> Int32 raise PsError {
   match self {
     Empty => 0
     Format1(ix) => ix.size_in_bytes()
@@ -178,7 +178,7 @@ pub fn Index::size_in_bytes(self : Index) -> Int raise PsError {
 
 ///|
 /// Returns the offset at the given index.
-pub fn Index::get_offset(self : Index, index : Int) -> Int raise PsError {
+pub fn Index::get_offset(self : Index, index : Int32) -> Int32 raise PsError {
   match self {
     Empty => raise oob()
     Format1(ix) => ix.get_offset(index)
@@ -187,7 +187,7 @@ pub fn Index::get_offset(self : Index, index : Int) -> Int raise PsError {
 
 ///|
 /// Returns the data for the object at the given index.
-pub fn Index::get(self : Index, index : Int) -> BytesView raise PsError {
+pub fn Index::get(self : Index, index : Int32) -> BytesView raise PsError {
   match self {
     Empty => raise oob()
     Format1(ix) => ix.get(index)
@@ -195,7 +195,7 @@ pub fn Index::get(self : Index, index : Int) -> BytesView raise PsError {
 }
 
 ///|
-pub fn Index::off_size(self : Index) -> Int {
+pub fn Index::off_size(self : Index) -> Int32 {
   match self {
     Empty => 0
     Format1(ix) => ix.off_size()

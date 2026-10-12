@@ -19,7 +19,7 @@ fn BitReader::clone(self : BitReader) -> BitReader {
 }
 
 ///|
-fn BitReader::read_bit(self : BitReader) -> UInt raise DecodeError {
+fn BitReader::read_bit(self : BitReader) -> UInt32 raise DecodeError {
   let byte_pos = self.byte_pos()
   guard byte_pos < self.data.length() else { raise UnexpectedEof }
   let byte = self.data[byte_pos].to_uint()
@@ -31,8 +31,8 @@ fn BitReader::read_bit(self : BitReader) -> UInt raise DecodeError {
 ///|
 fn BitReader::read_bits(
   self : BitReader,
-  num_bits : Int,
-) -> UInt raise DecodeError {
+  num_bits : Int32,
+) -> UInt32 raise DecodeError {
   let mut result = 0U
   for i = num_bits - 1; i >= 0; i = i - 1 {
     result = result | (self.read_bit() << i)
@@ -42,7 +42,7 @@ fn BitReader::read_bits(
 
 ///|
 /// Peek the given number of bits (upstream `peak_bits`); `None` on EOF.
-fn BitReader::peak_bits(self : BitReader, num_bits : Int) -> UInt? {
+fn BitReader::peak_bits(self : BitReader, num_bits : Int32) -> UInt32? {
   Some(self.clone().read_bits(num_bits)) catch {
     _ => None
   }
@@ -62,11 +62,11 @@ fn BitReader::at_end(self : BitReader) -> Bool {
 }
 
 ///|
-fn BitReader::byte_pos(self : BitReader) -> Int {
+fn BitReader::byte_pos(self : BitReader) -> Int32 {
   (self.bit_offset >> 3).to_int()
 }
 
 ///|
-fn BitReader::bit_pos(self : BitReader) -> Int {
+fn BitReader::bit_pos(self : BitReader) -> Int32 {
   (self.bit_offset & 7L).to_int()
 }

@@ -66,7 +66,7 @@ fn feat_fallback(
   // (flac, ssty) combinations to try.
   // Whilst there can be more ssty levels above two, only the first two are
   // used, with 0 here representing disabling the ssty feature.
-  let options : Array[(Bool, UInt)] = [
+  let options : Array[(Bool, UInt32)] = [
     (true, 2),
     (true, 1),
     (true, 0),
@@ -81,7 +81,7 @@ fn feat_fallback(
       break
     }
   }
-  let mut prev_ssty : UInt = 0
+  let mut prev_ssty : UInt32 = 0
   for f in features.rev_iter() {
     if f.tag == ssty_tag {
       prev_ssty = f.value

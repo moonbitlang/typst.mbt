@@ -33,7 +33,7 @@ fn IDWTOutput::default() -> IDWTOutput {
 fn idwt_apply(
   storage : DecompositionStorage,
   tile_ctx : TileDecodeContext,
-  component_idx : Int,
+  component_idx : Int32,
   header : Header,
   transform : WaveletTransform,
 ) -> Unit {
@@ -123,7 +123,7 @@ fn idwt_apply(
 fn filter_2d(
   // The LL sub band of the given decomposition level.
   input : FixedArray[Float],
-  input_offset : Int,
+  input_offset : Int32,
   coefficients : FloatVec,
   decomposition : Decomposition,
   transform : WaveletTransform,
@@ -142,7 +142,7 @@ fn filter_2d(
 /// The `2D_INTERLEAVE` procedure described in F.3.3.
 fn interleave_samples(
   input : FixedArray[Float],
-  input_offset : Int,
+  input_offset : Int32,
   decomposition : Decomposition,
   coefficients : FloatVec,
   storage : DecompositionStorage,
@@ -208,16 +208,16 @@ fn interleave_samples(
 ///|
 fn interleave_rows(
   first_band : FixedArray[Float],
-  first_offset : Int,
+  first_offset : Int32,
   second_band : FixedArray[Float],
-  second_offset : Int,
-  first_w : Int,
-  second_w : Int,
+  second_offset : Int32,
+  first_w : Int32,
+  second_w : Int32,
   output : FixedArray[Float],
-  width : Int,
-  height : Int,
-  start_row : Int,
-  num_rows : Int,
+  width : Int32,
+  height : Int32,
+  start_row : Int32,
+  num_rows : Int32,
 ) -> Unit {
   for v in 0..<num_rows {
     let out_row = start_row + v * 2
@@ -237,13 +237,13 @@ fn interleave_rows(
 ///|
 fn interleave_row(
   first : FixedArray[Float],
-  first_start : Int,
-  first_len : Int,
+  first_start : Int32,
+  first_len : Int32,
   second : FixedArray[Float],
-  second_start : Int,
-  second_len : Int,
+  second_start : Int32,
+  second_len : Int32,
   output : FixedArray[Float],
-  output_start : Int,
+  output_start : Int32,
 ) -> Unit {
   // (The SIMD `zip_low`/`zip_high` chunks are the same interleaving.)
   let num_pairs = if first_len < second_len { first_len } else { second_len }
@@ -290,9 +290,9 @@ fn filter_horizontal(
 /// The `1D_SR` procedure from F.3.6.
 fn filter_row(
   scanline : FixedArray[Float],
-  start : Int,
-  width : Int,
-  x0_parity : Int,
+  start : Int32,
+  width : Int32,
+  x0_parity : Int32,
   transform : WaveletTransform,
 ) -> Unit {
   if width == 1 {
@@ -311,9 +311,9 @@ fn filter_row(
 /// The 1D FILTER 5-3R procedure from F.3.8.1.
 fn reversible_filter_53r(
   scanline : FixedArray[Float],
-  start : Int,
-  width : Int,
-  x0_parity : Int,
+  start : Int32,
+  width : Int32,
+  x0_parity : Int32,
 ) -> Unit {
   let first_even = x0_parity
   let first_odd = 1 - first_even
@@ -357,9 +357,9 @@ let inv_kappa : Float = (1.0 : Float) / kappa
 /// The 1D Filter 9-7I procedure from F.3.8.2.
 fn irreversible_filter_97i(
   scanline : FixedArray[Float],
-  start : Int,
-  width : Int,
-  x0_parity : Int,
+  start : Int32,
+  width : Int32,
+  x0_parity : Int32,
 ) -> Unit {
   let first_even = x0_parity
   let first_odd = 1 - first_even
@@ -401,34 +401,34 @@ fn irreversible_filter_97i(
 
 ///|
 /// `s - floor(mul_add(left + right, 0.25, 0.5))` (scalar 5-3 predict).
-const OP_53_PREDICT : Int = 0
+const OP_53_PREDICT : Int32 = 0
 
 ///|
 /// `s + floor((left + right) * 0.5)` (5-3 update).
-const OP_53_UPDATE : Int = 1
+const OP_53_UPDATE : Int32 = 1
 
 ///|
 /// `mul_add(left + right, NEG_DELTA, s)`.
-const OP_97_DELTA : Int = 2
+const OP_97_DELTA : Int32 = 2
 
 ///|
 /// `mul_add(left + right, NEG_GAMMA, s)`.
-const OP_97_GAMMA : Int = 3
+const OP_97_GAMMA : Int32 = 3
 
 ///|
 /// `mul_add(left + right, NEG_BETA, s)`.
-const OP_97_BETA : Int = 4
+const OP_97_BETA : Int32 = 4
 
 ///|
 /// `mul_add(left + right, NEG_ALPHA, s)`.
-const OP_97_ALPHA : Int = 5
+const OP_97_ALPHA : Int32 = 5
 
 ///|
 /// `s1 - ((s2 + s3 + 2.0) * 0.25).floor()` (the `f32x8` 5-3 predict).
-const OP_53_PREDICT_SIMD : Int = 6
+const OP_53_PREDICT_SIMD : Int32 = 6
 
 ///|
-fn lift(op : Int, s : Float, left : Float, right : Float) -> Float {
+fn lift(op : Int32, s : Float, left : Float, right : Float) -> Float {
   match op {
     OP_53_PREDICT => s - floor_f32(mul_add(left + right, 0.25, 0.5))
     OP_53_UPDATE => s + floor_f32((left + right) * 0.5)
@@ -445,10 +445,10 @@ fn lift(op : Int, s : Float, left : Float, right : Float) -> Float {
 /// steps of two, with the neighbors `i - 1` and `i + 1` (the operation is
 /// dispatched once per row; the indices are checked once upfront).
 fn lift_middle(
-  op : Int,
+  op : Int32,
   scanline : FixedArray[Float],
-  from : Int,
-  end : Int,
+  from : Int32,
+  end : Int32,
 ) -> Unit {
   if from >= end {
     return
@@ -495,7 +495,7 @@ fn lift_middle(
 
 ///|
 /// Abort unless `start..end` is within `data` (like a Rust slice index).
-fn check_range(data : FixedArray[Float], start : Int, end : Int) -> Unit {
+fn check_range(data : FixedArray[Float], start : Int32, end : Int32) -> Unit {
   if start < 0 || end > data.length() {
     abort("index out of bounds")
   }
@@ -506,13 +506,13 @@ fn check_range(data : FixedArray[Float], start : Int, end : Int) -> Unit {
 /// `above` and `below` as neighbors (the operation is dispatched once; the
 /// indices are checked once upfront).
 fn lift_rows(
-  op : Int,
+  op : Int32,
   scanline : FixedArray[Float],
-  cur : Int,
-  above : Int,
-  below : Int,
-  from : Int,
-  to : Int,
+  cur : Int32,
+  above : Int32,
+  below : Int32,
+  from : Int32,
+  to : Int32,
 ) -> Unit {
   if from >= to {
     return
@@ -555,7 +555,7 @@ fn lift_rows(
 }
 
 ///|
-fn lift_coefficient(op : Int) -> Float {
+fn lift_coefficient(op : Int32) -> Float {
   match op {
     OP_97_DELTA => neg_delta
     OP_97_GAMMA => neg_gamma
@@ -567,10 +567,10 @@ fn lift_coefficient(op : Int) -> Float {
 ///|
 fn filter_step_horizontal(
   scanline : FixedArray[Float],
-  start : Int,
-  width : Int,
-  first : Int,
-  op : Int,
+  start : Int32,
+  width : Int32,
+  first : Int32,
+  op : Int32,
 ) -> Unit {
   if first == 0 {
     let left = periodic_symmetric_extension_left(0, 1)
@@ -600,12 +600,12 @@ fn filter_step_horizontal(
 ///|
 fn filter_step_vertical(
   scanline : FixedArray[Float],
-  height : Int,
-  width : Int,
-  simd_width : Int,
-  first : Int,
-  op_simd : Int,
-  op_scalar : Int,
+  height : Int32,
+  width : Int32,
+  simd_width : Int32,
+  first : Int32,
+  op_simd : Int32,
+  op_scalar : Int32,
 ) -> Unit {
   let mut row = first
   while row < height {
@@ -628,7 +628,7 @@ fn filter_step_vertical(
 /// Part of the `1D_EXTR` procedure, defined in F.3.7.
 ///
 /// Applies the period symmetric extension on the left side.
-fn periodic_symmetric_extension_left(idx : Int, offset : Int) -> Int {
+fn periodic_symmetric_extension_left(idx : Int32, offset : Int32) -> Int32 {
   if offset > idx {
     offset - idx
   } else {
@@ -641,10 +641,10 @@ fn periodic_symmetric_extension_left(idx : Int, offset : Int) -> Int {
 ///
 /// Applies the period symmetric extension on the right side.
 fn periodic_symmetric_extension_right(
-  idx : Int,
-  offset : Int,
-  length : Int,
-) -> Int {
+  idx : Int32,
+  offset : Int32,
+  length : Int32,
+) -> Int32 {
   let new_idx = idx + offset
   if new_idx >= length {
     let overshoot = new_idx - length
@@ -685,9 +685,9 @@ fn filter_vertical(
 /// The 1D FILTER 5-3R procedure from F.3.8.1.
 fn reversible_filter_53r_simd(
   scanline : FixedArray[Float],
-  height : Int,
-  width : Int,
-  y0_parity : Int,
+  height : Int32,
+  width : Int32,
+  y0_parity : Int32,
 ) -> Unit {
   let first_even = y0_parity
   let first_odd = 1 - first_even
@@ -722,9 +722,9 @@ fn reversible_filter_53r_simd(
 /// The 1D Filter 9-7I procedure from F.3.8.2.
 fn irreversible_filter_97i_simd(
   scanline : FixedArray[Float],
-  height : Int,
-  width : Int,
-  y0_parity : Int,
+  height : Int32,
+  width : Int32,
+  y0_parity : Int32,
 ) -> Unit {
   // Determine which local row indices correspond to even/odd global positions.
   let first_even = y0_parity

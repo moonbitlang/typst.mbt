@@ -110,14 +110,14 @@ pub fn Glyph::rasterize(
 pub(all) struct Bitmap {
   /// Horizontal pixel position (from the left) at which the bitmap should be
   /// placed in the larger raster.
-  left : Int
+  left : Int32
   /// Vertical pixel position (from the top) at which the bitmap should be
   /// placed in the larger raster.
-  top : Int
+  top : Int32
   /// The width of the coverage bitmap in pixels.
-  width : UInt
+  width : UInt32
   /// The height of the coverage bitmap in pixels.
-  height : UInt
+  height : UInt32
   /// How much each pixel should be covered, `0` means 0% coverage and `255`
   /// means 100% coverage.
   ///
@@ -229,7 +229,7 @@ priv struct Canvas {
 
 ///|
 /// Create a completely uncovered canvas.
-fn Canvas::new(w : UInt, h : UInt) -> Canvas {
+fn Canvas::new(w : UInt32, h : UInt32) -> Canvas {
   {
     w: w.to_uint64().reinterpret_as_int64(),
     h: h.to_uint64().reinterpret_as_int64(),
@@ -262,7 +262,7 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
 ///|
 /// `w * h` if the buffer holds that many entries, else -1. The product of
 /// the two `u32` dimensions is computed in `u64` (it can exceed `Int64`).
-fn Canvas::coverage_len(self : Canvas) -> Int {
+fn Canvas::coverage_len(self : Canvas) -> Int32 {
   let n = self.w.reinterpret_as_uint64() * self.h.reinterpret_as_uint64()
   if n <= self.a.length().to_int64().reinterpret_as_uint64() {
     n.to_int()
@@ -273,7 +273,7 @@ fn Canvas::coverage_len(self : Canvas) -> Int {
 
 ///|
 /// Truncating conversion of a float known to be in the `Int` range.
-fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
+fn f32_to_i32_unchecked(x : Float) -> Int32 = "%f32.to_i32"
 
 ///|
 /// Add to a value in the accumulation buffer.
@@ -285,7 +285,7 @@ fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
 fn Canvas::add(
   self : Canvas,
   linestart : Int64,
-  x : Int,
+  x : Int32,
   delta : Float,
 ) -> Unit {
   let a = self.a
@@ -493,7 +493,7 @@ fn clamp(v : Float, min : Float, max : Float) -> Float {
 ///|
 /// Rust's saturating `f32 as usize` cast (NaN and negatives give 0), capped
 /// at `Int::max_value`.
-fn f32_to_usize(v : Float) -> Int {
+fn f32_to_usize(v : Float) -> Int32 {
   let i = f32_to_i32(v)
   if i < 0 {
     0
@@ -506,7 +506,7 @@ fn f32_to_usize(v : Float) -> Int {
 /// Rust's saturating `f32 as i32` (NaN gives 0), like `Float::to_int`
 /// (spelled out: the core helper is not inlined; performance).
 #inline
-fn f32_to_i32(v : Float) -> Int {
+fn f32_to_i32(v : Float) -> Int32 {
   if v != v {
     0
   } else if v >= 2147483647.0 {

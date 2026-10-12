@@ -48,12 +48,12 @@ priv struct StripGenerator {
   stroke_ctx : @kurbo.StrokeCtx
   temp_storage : StripStorage
   tiles : Tiles
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
 }
 
 ///|
-fn StripGenerator::new(width : Int, height : Int) -> StripGenerator {
+fn StripGenerator::new(width : Int32, height : Int32) -> StripGenerator {
   {
     line_buf: [],
     tiles: Tiles::new(height),
@@ -72,7 +72,7 @@ fn StripGenerator::generate_filled_path(
   path : Array[@kurbo.PathEl],
   fill_rule : Fill,
   transform : @kurbo.Affine,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
   strip_storage : StripStorage,
   clip_path : PathDataRef?,
 ) -> Unit {
@@ -93,7 +93,7 @@ fn StripGenerator::generate_stroked_path(
   path : Array[@kurbo.PathEl],
   stroke : @kurbo.Stroke,
   transform : @kurbo.Affine,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
   strip_storage : StripStorage,
   clip_path : PathDataRef?,
 ) -> Unit {
@@ -114,7 +114,7 @@ fn StripGenerator::generate_stroked_path(
 ///|
 fn StripGenerator::generate_with_clip(
   self : StripGenerator,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
   strip_storage : StripStorage,
   fill_rule : Fill,
   clip_path : PathDataRef?,

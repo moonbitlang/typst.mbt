@@ -40,7 +40,7 @@ const CUSP_EPSILON : Double = 1.0e-12
 /// excessive error slip through. That said, the "arc drawing" approach is
 /// designed to be robust and not generate approximate results with narrow
 /// error peaks, even in near-cusp "J" shape curves.
-const N_LSE : Int = 8
+const N_LSE : Int32 = 8
 
 ///|
 /// The proportion of transverse error that is blended in the least-squares
@@ -60,7 +60,7 @@ const BLEND : Double = 1.0e-3
 /// will be out of tolerance.
 ///
 /// Perhaps should be configurable.
-const MAX_DEPTH : Int = 8
+const MAX_DEPTH : Int32 = 8
 
 ///|
 /// State local to a subdivision
@@ -74,7 +74,7 @@ priv struct OffsetRec {
   cusp0 : Double
   cusp1 : Double
   /// Recursion depth
-  depth : Int
+  depth : Int32
 }
 
 ///|
@@ -646,7 +646,7 @@ fn OffsetRec::new(
   utan1 : Vec2,
   cusp0 : Double,
   cusp1 : Double,
-  depth : Int,
+  depth : Int32,
 ) -> OffsetRec {
   { t0, t1, utan0, utan1, cusp0, cusp1, depth, }
 }

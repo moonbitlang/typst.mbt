@@ -6,7 +6,7 @@ pub struct Reader {
   /// The underlying data of the reader.
   data : BytesView
   /// The current byte-offset.
-  mut offset : Int
+  mut offset : Int32
 }
 
 ///|
@@ -17,7 +17,7 @@ pub fn Reader::new(data : BytesView) -> Reader {
 
 ///|
 /// Create a new reader at the given offset.
-pub fn Reader::new_with(data : BytesView, offset : Int) -> Reader {
+pub fn Reader::new_with(data : BytesView, offset : Int32) -> Reader {
   { data, offset, }
 }
 
@@ -41,7 +41,7 @@ pub fn Reader::jump_to_end(self : Reader) -> Unit {
 
 ///|
 /// Moves the reader to the specified offset.
-pub fn Reader::jump(self : Reader, offset : Int) -> Unit {
+pub fn Reader::jump(self : Reader, offset : Int32) -> Unit {
   self.offset = offset
 }
 
@@ -57,7 +57,7 @@ pub fn Reader::tail(self : Reader) -> BytesView? {
 
 ///|
 /// Returns the total length of the underlying data.
-pub fn Reader::len(self : Reader) -> Int {
+pub fn Reader::len(self : Reader) -> Int32 {
   self.data.length()
 }
 
@@ -69,7 +69,7 @@ pub fn Reader::is_empty(self : Reader) -> Bool {
 
 ///|
 /// Returns a slice of the data for the specified range.
-pub fn Reader::range(self : Reader, start : Int, end : Int) -> BytesView? {
+pub fn Reader::range(self : Reader, start : Int32, end : Int32) -> BytesView? {
   if start >= 0 && start <= end && end <= self.data.length() {
     Some(self.data[start:end])
   } else {
@@ -79,13 +79,13 @@ pub fn Reader::range(self : Reader, start : Int, end : Int) -> BytesView? {
 
 ///|
 /// Returns the current offset of the reader.
-pub fn Reader::offset(self : Reader) -> Int {
+pub fn Reader::offset(self : Reader) -> Int32 {
   self.offset
 }
 
 ///|
 /// Reads the specified number of bytes and advances the offset.
-pub fn Reader::read_bytes(self : Reader, len : Int) -> BytesView? {
+pub fn Reader::read_bytes(self : Reader, len : Int32) -> BytesView? {
   guard self.peek_bytes(len) is Some(v) else { return None }
   self.offset += len
   Some(v)
@@ -101,13 +101,13 @@ pub fn Reader::read_byte(self : Reader) -> Byte? {
 
 ///|
 /// Skips the specified number of bytes by advancing the offset.
-pub fn Reader::skip_bytes(self : Reader, len : Int) -> Unit? {
+pub fn Reader::skip_bytes(self : Reader, len : Int32) -> Unit? {
   self.read_bytes(len).map(_ => ())
 }
 
 ///|
 /// Peeks the specified number of bytes.
-pub fn Reader::peek_bytes(self : Reader, len : Int) -> BytesView? {
+pub fn Reader::peek_bytes(self : Reader, len : Int32) -> BytesView? {
   if len < 0 {
     return None
   }
@@ -203,14 +203,14 @@ pub fn Reader::peek_tag(self : Reader, tag : Bytes) -> Unit? {
 
 ///|
 /// Read a u16 integer (in big endian order).
-pub fn Reader::read_u16(self : Reader) -> Int? {
+pub fn Reader::read_u16(self : Reader) -> Int32? {
   guard self.read_bytes(2) is Some(bytes) else { return None }
   Some((bytes[0].to_int() << 8) | bytes[1].to_int())
 }
 
 ///|
 /// Read a u32 integer (in big endian order).
-pub fn Reader::read_u32(self : Reader) -> UInt? {
+pub fn Reader::read_u32(self : Reader) -> UInt32? {
   guard self.read_bytes(4) is Some(bytes) else { return None }
   Some(
     (bytes[0].to_uint() << 24) |

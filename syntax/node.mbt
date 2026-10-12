@@ -88,7 +88,7 @@ pub struct SyntaxNode {
 /// The data for nodes in the tree, plus their [SyntaxKind].
 priv enum Node {
   /// Text, kind, and UTF-8 byte length of the text.
-  Leaf(String, SyntaxKind, Int)
+  Leaf(String, SyntaxKind, Int32)
   Inner(InnerNode, SyntaxKind)
   Error(ErrorNode)
   Warning(WarningWrapper, SyntaxKind)
@@ -98,9 +98,9 @@ priv enum Node {
 /// An inner node in the untyped syntax tree.
 priv struct InnerNode {
   /// The byte length of the node in the source.
-  mut len : Int
+  mut len : Int32
   /// The number of nodes in the whole subtree, including this node.
-  mut descendants : Int
+  mut descendants : Int32
   /// Whether this node or any of its children contain a diagnostic.
   mut diagnosis : Diagnosis
   /// The upper bound of this node's numbering range.
@@ -115,7 +115,7 @@ priv struct ErrorNode {
   /// The source text of the node.
   text : String
   /// The UTF-8 byte length of `text`.
-  len : Int
+  len : Int32
   /// The error message.
   message : String
   /// Additional hints, optionally targeting a sub-range of `text`.
@@ -216,7 +216,7 @@ pub extend SyntaxDiagnostic with @debug.Debug::{to_repr}
 
 ///|
 /// The UTF-8 byte length of a string.
-pub fn utf8_len(s : StringView) -> Int {
+pub fn utf8_len(s : StringView) -> Int32 {
   let mut n = 0
   let len = s.length()
   for i = 0; i < len; {
@@ -440,8 +440,8 @@ fn SyntaxNode::warn(self : SyntaxNode, message : String) -> Unit {
 /// Add a warning around this node at a particular sub-range of its text.
 fn SyntaxNode::warn_at(
   self : SyntaxNode,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   message : String,
 ) -> Unit {
   guard end <= self.len() && SubRange::new(start, end) is Some(sub_range) else {
@@ -473,8 +473,8 @@ fn SyntaxNode::hint(self : SyntaxNode, hint : String) -> Unit {
 /// Add a hint to an existing error or warning at a sub-range of the text.
 fn SyntaxNode::hint_at(
   self : SyntaxNode,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   hint : String,
 ) -> Unit {
   guard end <= self.len() && SubRange::new(start, end) is Some(sub_range) else {
@@ -510,7 +510,7 @@ pub fn SyntaxNode::is_empty(self : SyntaxNode) -> Bool {
 
 ///|
 /// The UTF-8 byte length of the node in the source text.
-pub fn SyntaxNode::len(self : SyntaxNode) -> Int {
+pub fn SyntaxNode::len(self : SyntaxNode) -> Int32 {
   match self.data.base() {
     Leaf(_, _, len) => len
     Inner(inner, _) => inner.len
@@ -771,7 +771,7 @@ fn InnerNode::numberize(
   self : InnerNode,
   owner : SyntaxNode,
   id : FileId,
-  range : (Int, Int)?,
+  range : (Int32, Int32)?,
   start : UInt64,
   end : UInt64,
 ) -> Unit raise Unnumberable {
@@ -817,7 +817,7 @@ fn InnerNode::numberize(
 
 ///|
 /// The number of descendants, including the node itself.
-fn SyntaxNode::descendants(self : SyntaxNode) -> Int {
+fn SyntaxNode::descendants(self : SyntaxNode) -> Int32 {
   match self.data.base() {
     Inner(inner, _) => inner.descendants
     _ => 1
@@ -864,10 +864,10 @@ fn SyntaxNode::upper(self : SyntaxNode) -> UInt64 {
 /// ([SyntaxNode::make_mut]).
 fn SyntaxNode::update_parent(
   self : SyntaxNode,
-  prev_len : Int,
-  new_len : Int,
-  prev_descendants : Int,
-  new_descendants : Int,
+  prev_len : Int32,
+  new_len : Int32,
+  prev_descendants : Int32,
+  new_descendants : Int32,
 ) -> Unit {
   if self.inner_node() is Some(inner) {
     inner.len = inner.len + new_len - prev_len
@@ -888,8 +888,8 @@ fn SyntaxNode::update_parent(
 /// May have changed this node and the replacement if it raises.
 fn SyntaxNode::replace_children(
   self : SyntaxNode,
-  from : Int,
-  to : Int,
+  from : Int32,
+  to : Int32,
   replacement : Array[SyntaxNode],
 ) -> Unit raise Unnumberable {
   guard self.inner_node() is Some(inner) else { return }
@@ -993,7 +993,7 @@ fn SyntaxNode::replace_children(
 }
 
 ///|
-fn next_power_of_two(n : Int) -> Int {
+fn next_power_of_two(n : Int32) -> Int32 {
   let mut p = 1
   while p < n {
     p *= 2
@@ -1017,7 +1017,7 @@ pub fn SyntaxNode::synthesize_ranges(self : SyntaxNode, id : FileId) -> Unit {
 ///|
 fn SyntaxNode::synthesize_ranges_at(
   self : SyntaxNode,
-  offset : Int,
+  offset : Int32,
   id : FileId,
 ) -> Unit {
   let len = self.len()
@@ -1055,7 +1055,7 @@ pub fn SyntaxNode::synthesize(self : SyntaxNode, span : Span) -> Unit {
 ///|
 fn SyntaxNode::synthesize_at(
   self : SyntaxNode,
-  offset : Int,
+  offset : Int32,
   span : Span,
 ) -> Unit {
   let len = self.len()

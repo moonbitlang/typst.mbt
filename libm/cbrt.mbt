@@ -66,7 +66,7 @@ fn cbrt_round(x : Double, round : Round) -> FpResult {
   let mut mant : UInt64 = hx & F64_SIG_MASK
   let sign : UInt64 = hx >> 63
 
-  let mut e : UInt = (hx >> F64_SIG_BITS).to_uint() & F64_EXP_SAT
+  let mut e : UInt32 = (hx >> F64_SIG_BITS).to_uint() & F64_EXP_SAT
 
   if ((e + 1) & F64_EXP_SAT) < 2 {
     cold_path()
@@ -80,7 +80,7 @@ fn cbrt_round(x : Double, round : Round) -> FpResult {
       return FpResult::ok(x + x)
     }
 
-    let nz : UInt = ix.clz().reinterpret_as_uint() - 11 // subnormal
+    let nz : UInt32 = ix.clz().reinterpret_as_uint() - 11 // subnormal
     mant = mant << nz.reinterpret_as_int()
     mant = mant & F64_SIG_MASK
     e = e - (nz - 1)
@@ -90,8 +90,8 @@ fn cbrt_round(x : Double, round : Round) -> FpResult {
   let cvt1 : UInt64 = mant | (0x3ffUL << 52)
   let mut cvt5 : UInt64 = cvt1
 
-  let et : UInt = e / 3
-  let it : UInt = e % 3
+  let et : UInt32 = e / 3
+  let it : UInt32 = e % 3
 
   // 2^(3k+it) <= x < 2^(3k+it+1), with 0 <= it <= 3
   cvt5 = cvt5 + (it.to_uint64() << F64_SIG_BITS)

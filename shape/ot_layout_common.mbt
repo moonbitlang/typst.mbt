@@ -3,29 +3,29 @@
 // lookup_flags
 
 ///|
-const LOOKUP_FLAG_RIGHT_TO_LEFT : Int = 0x0001
+const LOOKUP_FLAG_RIGHT_TO_LEFT : Int32 = 0x0001
 
 ///|
 // ot_layout_common.rs:10; unused upstream too.
 #warnings("-unused_value")
-const LOOKUP_FLAG_IGNORE_BASE_GLYPHS : Int = 0x0002
+const LOOKUP_FLAG_IGNORE_BASE_GLYPHS : Int32 = 0x0002
 
 ///|
 // ot_layout_common.rs:11; unused upstream too.
 #warnings("-unused_value")
-const LOOKUP_FLAG_IGNORE_LIGATURES : Int = 0x0004
+const LOOKUP_FLAG_IGNORE_LIGATURES : Int32 = 0x0004
 
 ///|
-const LOOKUP_FLAG_IGNORE_MARKS : Int = 0x0008
+const LOOKUP_FLAG_IGNORE_MARKS : Int32 = 0x0008
 
 ///|
-const LOOKUP_FLAG_IGNORE_FLAGS : Int = 0x000E
+const LOOKUP_FLAG_IGNORE_FLAGS : Int32 = 0x000E
 
 ///|
-const LOOKUP_FLAG_USE_MARK_FILTERING_SET : Int = 0x0010
+const LOOKUP_FLAG_USE_MARK_FILTERING_SET : Int32 = 0x0010
 
 ///|
-const LOOKUP_FLAG_MARK_ATTACHMENT_TYPE_MASK : Int = 0xFF00
+const LOOKUP_FLAG_MARK_ATTACHMENT_TYPE_MASK : Int32 = 0xFF00
 
 ///|
 priv struct PositioningTable {
@@ -58,7 +58,7 @@ fn coverage_collect(this : @otf.Coverage, set_digest : SetDigest) -> Unit {
 priv struct PositioningLookup {
   subtables : Array[@otf.PositioningSubtable]
   set_digest : SetDigest
-  props : UInt
+  props : UInt32
 }
 
 ///|
@@ -90,7 +90,7 @@ priv struct SubstLookup {
   subtables : Array[@otf.SubstitutionSubtable]
   set_digest : SetDigest
   reverse : Bool
-  props : UInt
+  props : UInt32
 }
 
 ///|
@@ -111,7 +111,7 @@ fn SubstLookup::parse(lookup : @otf.Lookup) -> SubstLookup {
 /// lookup_props is a 32-bit integer where the lower 16-bit is LookupFlag and
 /// higher 16-bit is mark-filtering-set if the lookup uses one.
 /// Not to be confused with glyph_props which is very similar.
-fn lookup_props(lookup : @otf.Lookup) -> UInt {
+fn lookup_props(lookup : @otf.Lookup) -> UInt32 {
   let mut props = lookup.flags.0.to_uint()
   if lookup.mark_filtering_set is Some(set) {
     props = props | (set.to_uint() << 16)

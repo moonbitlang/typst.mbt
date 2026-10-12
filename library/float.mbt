@@ -191,7 +191,7 @@ pub fn rust_parse_f64(s : String) -> Double? {
     let nan = 0x7FF8000000000000L.reinterpret_as_double()
     return Some(if negative { -nan } else { nan })
   }
-  let is_digit = (j : Int) => {
+  let is_digit = (j : Int32) => {
     j < n && s.code_unit_at(j) >= '0' && s.code_unit_at(j) <= '9'
   }
   let int_start = i

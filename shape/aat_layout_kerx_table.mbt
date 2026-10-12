@@ -173,7 +173,7 @@ fn kerx_apply_state_machine_kerning(
   transition : (
     @otf.GenericStateEntry[@otf.KerxEntryData],
     Bool,
-    UInt,
+    UInt32,
     ShapePlan,
     Buffer,
   ) -> Unit,
@@ -240,8 +240,8 @@ fn kerx_apply_state_machine_kerning(
 
 ///|
 priv struct KerxDriver1 {
-  stack : FixedArray[Int]
-  mut depth : Int
+  stack : FixedArray[Int32]
+  mut depth : Int32
 }
 
 ///|
@@ -250,7 +250,7 @@ fn KerxDriver1::transition(
   aat : @otf.KerxSubtable1,
   entry : @otf.GenericStateEntry[@otf.KerxEntryData],
   has_cross_stream : Bool,
-  tuple_count : UInt,
+  tuple_count : UInt32,
   plan : ShapePlan,
   buffer : Buffer,
 ) -> Unit? {
@@ -343,7 +343,7 @@ fn KerxDriver1::transition(
 ///|
 priv struct KerxDriver4 {
   mut mark_set : Bool
-  mut mark : Int
+  mut mark : Int32
   ankr_table : @otf.AnkrTable?
 }
 

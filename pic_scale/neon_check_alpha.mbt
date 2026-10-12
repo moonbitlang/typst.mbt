@@ -6,9 +6,9 @@
 /// NEON code sums `alpha ^ first_alpha` per row; the sums cannot wrap).
 fn neon_has_non_constant_cap_alpha_rgba8(
   store : FixedArray[Byte],
-  width : Int,
-  height : Int,
-  stride : Int,
+  width : Int32,
+  height : Int32,
+  stride : Int32,
 ) -> Bool {
   if store.length() == 0 {
     return true

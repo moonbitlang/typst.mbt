@@ -66,7 +66,7 @@ fn list_marker_resolve(
   marker : @library.ListMarker,
   engine : @library.Engine,
   styles : @library.StyleChain,
-  depth : Int,
+  depth : Int32,
 ) -> @library.Content raise @library.SourceError {
   match marker {
     Content(list) =>
@@ -448,7 +448,7 @@ priv struct ItemLayouter {
   /// Stylechain at this item's location.
   styles : @library.StyleChain
   /// The first body's non-empty frame.
-  mut first_frame : Int
+  mut first_frame : Int32
   /// The item's regions, but adapted for the body's expected width.
   body_regions : @library.Regions
   /// Total body indent from the left of the region, as well as its offset

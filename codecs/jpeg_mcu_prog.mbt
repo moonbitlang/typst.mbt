@@ -10,7 +10,7 @@ fn JpegDecoder::decode_mcu_ycbcr_progressive(
 ) -> Unit raise DecodeErrors {
   setup_component_params(self)
   // memory location for decoded pixels for components
-  let block : FixedArray[FixedArray[Int]] = FixedArray::make(MAX_COMPONENTS, [])
+  let block : FixedArray[FixedArray[Int32]] = FixedArray::make(MAX_COMPONENTS, [])
   let mut seen_scans = 1
   if self.input_colorspace == Luma && self.is_interleaved {
     // Grayscale image with down-sampled component, resetting component
@@ -124,7 +124,7 @@ fn JpegDecoder::reset_prog_params(
 fn JpegDecoder::parse_entropy_coded_data(
   self : JpegDecoder,
   stream : BitStream,
-  buffer : FixedArray[FixedArray[Int]],
+  buffer : FixedArray[FixedArray[Int32]],
 ) -> Unit raise DecodeErrors {
   self.reset_prog_params(stream)
   if self.num_scans > self.input_colorspace.num_components() {
@@ -297,7 +297,7 @@ fn JpegDecoder::handle_rst_main(
 ///|
 fn JpegDecoder::finish_progressive_decoding(
   self : JpegDecoder,
-  block : FixedArray[FixedArray[Int]],
+  block : FixedArray[FixedArray[Int32]],
   pixels : FixedArray[Byte],
 ) -> Unit raise DecodeErrors {
   let mcu_height = if self.is_interleaved {

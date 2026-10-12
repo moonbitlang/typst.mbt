@@ -25,11 +25,11 @@
 /// `fdeflate` requires that we keep this many most recently decompressed bytes in the
 /// `out_buffer` - this allows referring back to them when handling "length and distance
 /// codes" in the deflate stream).
-const LOOKBACK_SIZE : Int = 32768
+const LOOKBACK_SIZE : Int32 = 32768
 
 ///|
 /// Upstream `UnfilteringBuffer::GROWTH_BYTES`.
-const GROWTH_BYTES : Int = 8 * 1024
+const GROWTH_BYTES : Int32 = 8 * 1024
 
 ///|
 /// Ergonomics wrapper around `miniz_oxide::inflate::stream` for zlib compressed data.
@@ -60,7 +60,7 @@ fn ZlibStream::decompress(
   self : ZlibStream,
   data : BytesView,
   image_data : UnfilteringBuffer,
-) -> Int raise DecodingError {
+) -> Int32 raise DecodingError {
   // There may be more data past the adler32 checksum at the end of the deflate stream. We
   // match libpng's default behavior and ignore any trailing data. In the future we may want
   // to add a flag to control this behavior.
@@ -197,20 +197,20 @@ priv struct UnfilteringBuffer {
   /// Vec containing the uncompressed image data currently being processed
   /// (its capacity; the length of the `Vec` is `data_len`).
   mut data_stream : FixedArray[Byte]
-  mut data_len : Int
+  mut data_len : Int32
   mut prev_row : PrevRowKind
-  mut prev_start : Int
+  mut prev_start : Int32
   mut prev_scratch : FixedArray[Byte]
   /// Index in `data_stream` where the current row starts.
   /// This points at the filter type byte of the current row (i.e. the actual pixel data starts at `current_start + 1`)
   /// The pixel data is not-yet-`unfilter`-ed.
   ///
   /// `current_start` can wrap around the length.
-  mut current_start : Int
+  mut current_start : Int32
   /// Logical length of data that must be preserved.
-  mut filled : Int
+  mut filled : Int32
   /// Length of data that can be modified.
-  mut available : Int
+  mut available : Int32
   /// The number of bytes before we shift the buffer back.
   shift_back_limit : Int64
   /// How many bytes are left to decompress into this buffer for the current frame.
@@ -291,7 +291,9 @@ fn UnfilteringBuffer::start_frame(
 /// `unfilter_curr_row_in_place`.
 ///
 /// See also `readable_len_of_curr_row`.
-fn UnfilteringBuffer::mutable_len_of_curr_row(self : UnfilteringBuffer) -> Int {
+fn UnfilteringBuffer::mutable_len_of_curr_row(
+  self : UnfilteringBuffer,
+) -> Int32 {
   @cmp.maximum(self.available - self.current_start, 0)
 }
 
@@ -301,7 +303,9 @@ fn UnfilteringBuffer::mutable_len_of_curr_row(self : UnfilteringBuffer) -> Int {
 /// using `unfilter_curr_row_using_scratch_buffer`.
 ///
 /// See also `mutable_len_of_curr_row`.
-fn UnfilteringBuffer::readable_len_of_curr_row(self : UnfilteringBuffer) -> Int {
+fn UnfilteringBuffer::readable_len_of_curr_row(
+  self : UnfilteringBuffer,
+) -> Int32 {
   self.filled - self.current_start
 }
 
@@ -375,7 +379,7 @@ fn UnfilteringBuffer::unfilled_buffer(
 /// `old_filled` is `filled` before.
 fn UnfilteringBuffer::filled_buffer(
   self : UnfilteringBuffer,
-  old_filled : Int,
+  old_filled : Int32,
 ) -> Unit {
   guard! self.filled >= old_filled
   self.remaining_bytes -= (self.filled - old_filled).to_uint64()
@@ -389,7 +393,7 @@ fn UnfilteringBuffer::filled_buffer(
 /// discarding the first `discard_size` bytes.
 fn UnfilteringBuffer::shift_buffer_left(
   self : UnfilteringBuffer,
-  discard_size : Int,
+  discard_size : Int32,
 ) -> Unit {
   // Violating this assertion will clobber the immutable "lookback"
   // window that needs to be maintained for decompressor.
@@ -419,7 +423,7 @@ fn UnfilteringBuffer::shift_buffer_left(
 /// is a `RowFilter`).
 fn UnfilteringBuffer::curr_row_filter(
   self : UnfilteringBuffer,
-) -> Int raise DecodingError {
+) -> Int32 raise DecodingError {
   let filter = self.data_stream[self.current_start].to_int()
   if filter > 4 {
     raise Format("Unknown filter method \{filter}.")
@@ -436,8 +440,8 @@ fn UnfilteringBuffer::curr_row_filter(
 /// bytes of the current row are indeed mutable.
 fn UnfilteringBuffer::unfilter_curr_row_in_place(
   self : UnfilteringBuffer,
-  rowlen : Int,
-  bpp : Int,
+  rowlen : Int32,
+  bpp : Int32,
 ) -> Unit raise DecodingError {
   let filter = self.curr_row_filter()
   // Skip the `RowFilter` byte.
@@ -491,8 +495,8 @@ fn UnfilteringBuffer::unfilter_curr_row_in_place(
 /// or not-yet-complete input streams).
 fn UnfilteringBuffer::unfilter_curr_row_using_scratch_buffer(
   self : UnfilteringBuffer,
-  rowlen : Int,
-  bpp : Int,
+  rowlen : Int32,
+  bpp : Int32,
 ) -> Unit raise DecodingError {
   let filter = self.curr_row_filter()
   let row = FixedArray::make(rowlen - 1, b'\x00')
@@ -524,7 +528,7 @@ fn UnfilteringBuffer::unfilter_curr_row_using_scratch_buffer(
 
 ///|
 /// Upstream `filter::paeth::filter_paeth` (the predictor of the decoder).
-fn png_paeth(a : Int, b : Int, c : Int) -> Int {
+fn png_paeth(a : Int32, b : Int32, c : Int32) -> Int32 {
   let pa = (b - c).abs()
   let pb = (a - c).abs()
   let pc = (a - c + (b - c)).abs()
@@ -547,10 +551,10 @@ fn png_paeth(a : Int, b : Int, c : Int) -> Int {
 /// the byte of the pixel before it. The caller has checked the range
 /// `current[cur..cur + len]`.
 fn png_unfilter_sub(
-  bpp : Int,
+  bpp : Int32,
   current : FixedArray[Byte],
-  cur : Int,
-  len : Int,
+  cur : Int32,
+  len : Int32,
 ) -> Unit {
   match bpp {
     1 => {
@@ -623,10 +627,10 @@ fn png_unfilter_sub(
 /// prev + len]`.
 fn png_unfilter_paeth4(
   previous : FixedArray[Byte],
-  prev : Int,
+  prev : Int32,
   current : FixedArray[Byte],
-  cur : Int,
-  len : Int,
+  cur : Int32,
+  len : Int32,
 ) -> Unit {
   let mut a0 = 0
   let mut a1 = 0
@@ -665,10 +669,10 @@ fn png_unfilter_paeth4(
 /// [png_unfilter_paeth4] for pixels of three bytes (`BytesPerPixel::Three`).
 fn png_unfilter_paeth3(
   previous : FixedArray[Byte],
-  prev : Int,
+  prev : Int32,
   current : FixedArray[Byte],
-  cur : Int,
-  len : Int,
+  cur : Int32,
+  len : Int32,
 ) -> Unit {
   let mut a0 = 0
   let mut a1 = 0
@@ -702,14 +706,14 @@ fn png_unfilter_paeth3(
 /// len]`, or without one if `!has_previous` (then it is treated as if it
 /// were filled with zeros). `filter` is 0 to 4.
 fn png_unfilter(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
-  prev : Int,
+  prev : Int32,
   has_previous : Bool,
   current : FixedArray[Byte],
-  cur : Int,
-  len : Int,
+  cur : Int32,
+  len : Int32,
 ) -> Unit {
   // The accesses below are in bounds: `cur + len <= current.length()` and,
   // with a previous row, `prev + len <= previous.length()`.
@@ -906,7 +910,7 @@ fn ReadDecoder::finish_decoding_image_data(
 ///|
 /// The Adam7 passes (upstream `PassConstants::PASSES`): `x_sampling`,
 /// `x_offset`, `y_sampling`, `y_offset`.
-let adam7_passes : ReadOnlyArray[(Int, Int, Int, Int)] = [
+let adam7_passes : ReadOnlyArray[(Int32, Int32, Int32, Int32)] = [
   (8, 0, 8, 0),
   (8, 4, 8, 0),
   (4, 0, 8, 4),
@@ -919,7 +923,7 @@ let adam7_passes : ReadOnlyArray[(Int, Int, Int, Int)] = [
 ///|
 /// Upstream `PassConstants::count_samples` and `count_lines`:
 /// `size.saturating_sub(offset).div_ceil(sampling)`.
-fn adam7_count(size : UInt, sampling : Int, offset : Int) -> UInt {
+fn adam7_count(size : UInt32, sampling : Int32, offset : Int32) -> UInt32 {
   let offset = offset.reinterpret_as_uint()
   let sampling = sampling.reinterpret_as_uint()
   if size <= offset {
@@ -936,23 +940,23 @@ fn adam7_count(size : UInt, sampling : Int, offset : Int) -> UInt {
 /// `SubframeInfo::current_interlace_info`).
 priv struct InterlaceInfoIter {
   interlaced : Bool
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   /// Whether there is a current row (`current_interlace_info.is_some()`).
   mut has_current : Bool
   /// The pass of the current row, 1 to 7 (`Adam7Info::pass`); 0 without
   /// interlacing (`InterlaceInfo::Null`).
-  mut pass : Int
+  mut pass : Int32
   /// The line of the current row in its pass (`line_number()`).
-  mut line : UInt
+  mut line : UInt32
   /// How many pixels the current row has (`Adam7Info::samples`; the width
   /// without interlacing).
-  mut samples : UInt
+  mut samples : UInt32
   // `Adam7Iterator`
-  mut next_line : UInt
-  mut lines : UInt
-  mut line_width : UInt
-  mut current_pass : Int
+  mut next_line : UInt32
+  mut lines : UInt32
+  mut line_width : UInt32
+  mut current_pass : Int32
 }
 
 ///|
@@ -977,8 +981,8 @@ fn InterlaceInfoIter::empty() -> InterlaceInfoIter {
 /// Upstream `InterlaceInfoIter::new` followed by `next()`, which gives the
 /// first row.
 fn InterlaceInfoIter::new(
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   interlaced : Bool,
 ) -> InterlaceInfoIter {
   let iter = {
@@ -1103,8 +1107,8 @@ fn FrameBuffer::reserve(
 /// information and reuse the global interlace options. This struct encapsulates the state of where
 /// in a particular IDAT-frame or subframe we are.
 priv struct SubframeInfo {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   rowlen : Int64
   /// `current_interlace_info` and `interlace_info_iter`
   interlace : InterlaceInfoIter
@@ -1151,10 +1155,10 @@ priv struct PngReader {
   decoder : ReadDecoder
   /// Output transformations: whether `Transformations::STRIP_16` is set.
   strip16 : Bool
-  mut bpp : Int
+  mut bpp : Int32
   mut subframe : SubframeInfo
   /// How many frames remain to be decoded.  Decremented after each `IDAT` or `fdAT` sequence.
-  mut remaining_frames : UInt
+  mut remaining_frames : UInt32
   /// Buffer with not-yet-`unfilter`-ed image rows
   unfiltering_buffer : UnfilteringBuffer
   /// Function that can transform decompressed, unfiltered rows into final output.
@@ -1267,7 +1271,7 @@ fn PngReader::info(self : PngReader) -> StreamInfo {
 /// frame (or subframe), all samples are in big endian byte order where this matters.
 fn PngReader::next_frame(
   self : PngReader,
-  input_len : Int,
+  input_len : Int32,
 ) -> FixedArray[Byte] raise DecodingError {
   if self.remaining_frames == 0 {
     // `ParameterErrorKind::PolledAfterEndOfImage`
@@ -1397,8 +1401,8 @@ fn PngReader::next_interlaced_row(self : PngReader) -> Bool raise DecodingError 
 fn PngReader::transform_row(
   self : PngReader,
   output : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
 ) -> Unit raise DecodingError {
   let buffer = self.unfiltering_buffer
   // `unfiltering_buffer.prev_row()`
@@ -1427,7 +1431,7 @@ fn PngReader::transform_row(
 /// Returns the color type and the number of bits per sample
 /// of the data returned by `next_frame`, for `Transformations::EXPAND` with
 /// or without `STRIP_16`.
-fn PngReader::output_color_type(self : PngReader) -> (PngColorType, Int) {
+fn PngReader::output_color_type(self : PngReader) -> (PngColorType, Int32) {
   let info = self.info()
   let bits = if info.bit_depth < 8 || (info.bit_depth == 16 && self.strip16) {
     8
@@ -1447,7 +1451,7 @@ fn PngReader::output_color_type(self : PngReader) -> (PngColorType, Int) {
 
 ///|
 /// The number of bytes of a pixel of the output.
-fn PngReader::output_bytes_per_pixel(self : PngReader) -> Int {
+fn PngReader::output_bytes_per_pixel(self : PngReader) -> Int32 {
   let (color, depth) = self.output_color_type()
   color.samples() * (depth / 8)
 }
@@ -1479,7 +1483,7 @@ fn PngReader::output_buffer_size(self : PngReader) -> Int64? {
 /// Returns the number of bytes required to hold a deinterlaced row.
 fn PngReader::unguarded_output_line_size(
   self : PngReader,
-  width : UInt,
+  width : UInt32,
 ) -> Int64 {
   let (color, depth) = self.output_color_type()
   raw_row_length_from_width(color, depth, width) - 1L

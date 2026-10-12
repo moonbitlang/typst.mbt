@@ -194,10 +194,10 @@ fn isolating_run_sequences(
 /// satisfying `pred`.
 fn position(
   classes : ArrayView[BidiClass],
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   pred : (BidiClass) -> Bool,
-) -> Int? {
+) -> Int32? {
   for i in start..<end {
     if pred(classes[i]) {
       return Some(i - start)
@@ -211,10 +211,10 @@ fn position(
 /// satisfying `pred`.
 fn rposition(
   classes : ArrayView[BidiClass],
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   pred : (BidiClass) -> Bool,
-) -> Int? {
+) -> Int32? {
   for i = end - 1; i >= start; i = i - 1 {
     if pred(classes[i]) {
       return Some(i - start)
@@ -229,9 +229,9 @@ fn rposition(
 /// run sequence
 fn IsolatingRunSequence::iter_forwards_from(
   self : IsolatingRunSequence,
-  pos : Int,
-  level_run_index : Int,
-) -> Iter[Int] {
+  pos : Int32,
+  level_run_index : Int32,
+) -> Iter[Int32] {
   // (pos..runs[0].end).chain(runs[1..].iter().flat_map(Clone::clone))
   let runs = self.runs
   let mut k = level_run_index
@@ -258,9 +258,9 @@ fn IsolatingRunSequence::iter_forwards_from(
 /// run sequence
 fn IsolatingRunSequence::iter_backwards_from(
   self : IsolatingRunSequence,
-  pos : Int,
-  level_run_index : Int,
-) -> Iter[Int] {
+  pos : Int32,
+  level_run_index : Int32,
+) -> Iter[Int32] {
   // (current.start..pos).rev().chain(prev_runs.iter().rev().flat_map(Clone::clone))
   //
   // Note that the previous runs are visited in reverse order, but each of them

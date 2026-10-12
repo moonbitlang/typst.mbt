@@ -145,7 +145,10 @@ priv struct WorldFiles {
 ///|
 /// Determine the byte range of a span, also remembering the source file
 /// for future line / column lookups.
-fn WorldFiles::range(self : WorldFiles, span : @syntax.DiagSpan) -> (Int, Int)? {
+fn WorldFiles::range(
+  self : WorldFiles,
+  span : @syntax.DiagSpan,
+) -> (Int32, Int32)? {
   match span.get() {
     Detached => None
     Number(id~, num~, sub_range~) => {

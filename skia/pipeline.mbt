@@ -161,9 +161,9 @@ fn Stage::has_lowp(self : Stage) -> Bool {
 
 ///|
 priv struct AAMaskCtx {
-  pixels : FixedArray[Int] // [u8; 2]
-  stride : Int // can be zero
-  shift : Int // mask offset/position in pixmap coordinates
+  pixels : FixedArray[Int32] // [u8; 2]
+  stride : Int32 // can be zero
+  shift : Int32 // mask offset/position in pixmap coordinates
 }
 
 ///|
@@ -175,10 +175,10 @@ fn AAMaskCtx::default() -> AAMaskCtx {
 /// Returns the two mask values.
 fn AAMaskCtx::copy_at_xy(
   self : AAMaskCtx,
-  dx : Int,
-  dy : Int,
-  tail : Int,
-) -> (Int, Int) {
+  dx : Int32,
+  dy : Int32,
+  tail : Int32,
+) -> (Int32, Int32) {
   let offset = self.stride * dy + dx - self.shift
   // We have only 3 variants, so unroll them.
   match (offset, tail) {
@@ -192,8 +192,8 @@ fn AAMaskCtx::copy_at_xy(
 ///|
 priv struct MaskCtx {
   data : FixedArray[Byte]
-  offset : Int
-  real_width : Int
+  offset : Int32
+  real_width : Int32
 }
 
 ///|
@@ -202,7 +202,7 @@ fn MaskCtx::default() -> MaskCtx {
 }
 
 ///|
-fn MaskCtx::offset_of(self : MaskCtx, dx : Int, dy : Int) -> Int {
+fn MaskCtx::offset_of(self : MaskCtx, dx : Int32, dy : Int32) -> Int32 {
   self.offset + self.real_width * dy + dx
 }
 
@@ -219,7 +219,7 @@ priv struct UniformColorCtx {
   mut g : Float
   mut b : Float
   mut a : Float
-  rgba : FixedArray[Int] // [0,255] in a 16-bit lane.
+  rgba : FixedArray[Int32] // [0,255] in a 16-bit lane.
 }
 
 ///|
@@ -260,7 +260,7 @@ priv struct EvenlySpaced2StopGradientCtx {
 
 ///|
 priv struct GradientCtx {
-  mut len : Int
+  mut len : Int32
   factors : Array[GradientColor]
   biases : Array[GradientColor]
   t_values : Array[Float]
@@ -283,7 +283,7 @@ fn GradientCtx::push_const_color(
 ///|
 priv struct TwoPointConicalGradientCtx {
   // This context is used only in highp, where we use Tx4.
-  mask : FixedArray[UInt] // u32x8
+  mask : FixedArray[UInt32] // u32x8
   mut p0 : Float
   mut p1 : Float
 }

@@ -25,7 +25,7 @@ pub fn CustomSectionReader::name(self : CustomSectionReader) -> String {
 ///|
 /// The offset, relative to the start of the original module or component,
 /// that the `data` payload for this custom section starts at.
-pub fn CustomSectionReader::data_offset(self : CustomSectionReader) -> Int {
+pub fn CustomSectionReader::data_offset(self : CustomSectionReader) -> Int32 {
   self.reader.original_position()
 }
 

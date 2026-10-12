@@ -11,7 +11,7 @@ fn outline_tree_repr(nodes : Array[OutlineNode[String]]) -> String {
 }
 
 ///|
-fn outline_tree_of(flat : Array[(String, Int, Bool)]) -> String {
+fn outline_tree_of(flat : Array[(String, Int32, Bool)]) -> String {
   let flat = flat.map(item => (item.0, NonZeroUSize(item.1.to_int64()), item.2))
   outline_tree_repr(OutlineNode::build_tree(flat))
 }

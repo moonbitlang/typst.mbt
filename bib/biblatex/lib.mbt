@@ -9,7 +9,7 @@ pub struct Bibliography {
   /// The bibliography entries.
   priv entries : Array[Entry]
   /// Maps from citation keys to indices in `items`.
-  priv keys : Map[String, Int]
+  priv keys : Map[String, Int32]
 }
 
 ///|
@@ -124,7 +124,7 @@ pub fn Bibliography::from_raw(
 
 ///|
 /// The number of bibliography entries.
-pub fn Bibliography::length(self : Bibliography) -> Int {
+pub fn Bibliography::length(self : Bibliography) -> Int32 {
   self.entries.length()
 }
 

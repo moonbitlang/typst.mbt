@@ -9,7 +9,7 @@
 ///|
 /// The version of upstream Typst this is a port of (upstream
 /// `typst_utils::version()`).
-pub let typst_version : (Int, Int, Int) = (0, 15, 1)
+pub let typst_version : (Int32, Int32, Int32) = (0, 15, 1)
 
 ///|
 /// A parsed package manifest.
@@ -408,7 +408,7 @@ pub extend VersionlessPackageSpec with Show::{to_string, output}
 /// A minimal string scanner (the parts of `unscanny::Scanner` used here).
 priv struct PkgScanner {
   text : String
-  mut cursor : Int
+  mut cursor : Int32
 }
 
 ///|
@@ -484,11 +484,11 @@ fn parse_version(s : PkgScanner) -> Result[PackageVersion, String] {
 /// A package's version.
 pub(all) struct PackageVersion {
   /// The package's major version.
-  major : UInt
+  major : UInt32
   /// The package's minor version.
-  minor : UInt
+  minor : UInt32
   /// The package's patch version.
-  patch : UInt
+  patch : UInt32
 } derive(Eq, Compare, Hash)
 
 ///|
@@ -597,7 +597,7 @@ pub fn PackageVersion::matches_le(
 /// Parse a version like `0.1.0`.
 pub fn PackageVersion::from_str(s : String) -> Result[PackageVersion, String] {
   let parts = s.split(".").map(p => p.to_owned())
-  fn next(kind : String) -> Result[UInt, String] {
+  fn next(kind : String) -> Result[UInt32, String] {
     match parts.next() {
       Some(part) if !part.is_empty() =>
         match parse_u32(part) {
@@ -650,11 +650,11 @@ pub extend PackageVersion with Show::{to_string, output}
 /// A version bound for compatibility specification.
 pub(all) struct VersionBound {
   /// The bounds's major version.
-  major : UInt
+  major : UInt32
   /// The bounds's minor version.
-  minor : UInt?
+  minor : UInt32?
   /// The bounds's patch version. Can only be present if minor is too.
-  patch : UInt?
+  patch : UInt32?
 } derive(Eq, Compare, Hash)
 
 ///|
@@ -676,7 +676,7 @@ pub extend VersionBound with Hash::{hash, hash_combine}
 /// Parse a version bound like `0`, `0.1` or `0.1.0`.
 pub fn VersionBound::from_str(s : String) -> Result[VersionBound, String] {
   let parts = s.split(".").map(p => p.to_owned())
-  fn next(kind : String) -> Result[UInt?, String] {
+  fn next(kind : String) -> Result[UInt32?, String] {
     match parts.next() {
       Some(part) =>
         match parse_u32(part) {
@@ -735,7 +735,7 @@ pub extend VersionBound with Show::{to_string, output}
 ///|
 /// Parse an unsigned 32-bit integer like Rust's `u32::from_str`: decimal
 /// digits with an optional leading `+`.
-fn parse_u32(s : String) -> UInt? {
+fn parse_u32(s : String) -> UInt32? {
   let mut i = 0
   if s.has_prefix("+") {
     i = 1

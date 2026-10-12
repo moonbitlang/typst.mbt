@@ -12,14 +12,14 @@
 
 ///|
 priv struct Sorter {
-  v : Array[Int]
-  is_less : (Int, Int) -> Bool
+  v : Array[Int32]
+  is_less : (Int32, Int32) -> Bool
 }
 
 ///|
 /// `slice::sort_unstable_by(|a, b| ..)` where `is_less(a, b)` is
 /// `compare(a, b) == Ordering::Less`.
-fn sort_unstable_by(v : Array[Int], is_less : (Int, Int) -> Bool) -> Unit {
+fn sort_unstable_by(v : Array[Int32], is_less : (Int32, Int32) -> Bool) -> Unit {
   let len = v.length()
   if len < 2 {
     return
@@ -34,7 +34,7 @@ fn sort_unstable_by(v : Array[Int], is_less : (Int, Int) -> Bool) -> Unit {
 }
 
 ///|
-fn Sorter::swap(self : Sorter, a : Int, b : Int) -> Unit {
+fn Sorter::swap(self : Sorter, a : Int32, b : Int32) -> Unit {
   let t = self.v[a]
   self.v[a] = self.v[b]
   self.v[b] = t
@@ -42,7 +42,7 @@ fn Sorter::swap(self : Sorter, a : Int, b : Int) -> Unit {
 
 ///|
 /// `ipnsort`.
-fn Sorter::ipnsort(self : Sorter, base : Int, len : Int) -> Unit {
+fn Sorter::ipnsort(self : Sorter, base : Int32, len : Int32) -> Unit {
   let (run_len, was_reversed) = self.find_existing_run(base, len)
   if run_len == len {
     if was_reversed {
@@ -62,7 +62,7 @@ fn Sorter::ipnsort(self : Sorter, base : Int, len : Int) -> Unit {
 }
 
 ///|
-fn ilog2(x : Int) -> Int {
+fn ilog2(x : Int32) -> Int32 {
   31 - x.clz()
 }
 
@@ -70,9 +70,9 @@ fn ilog2(x : Int) -> Int {
 /// `find_existing_run`.
 fn Sorter::find_existing_run(
   self : Sorter,
-  base : Int,
-  len : Int,
-) -> (Int, Bool) {
+  base : Int32,
+  len : Int32,
+) -> (Int32, Bool) {
   if len < 2 {
     return (len, false)
   }
@@ -98,10 +98,10 @@ fn Sorter::find_existing_run(
 /// parent partition, if this slice is its right side.
 fn Sorter::quicksort(
   self : Sorter,
-  base : Int,
-  len : Int,
-  ancestor_pivot : Int?,
-  limit : Int,
+  base : Int32,
+  len : Int32,
+  ancestor_pivot : Int32?,
+  limit : Int32,
 ) -> Unit {
   let mut base = base
   let mut len = len
@@ -141,7 +141,12 @@ fn Sorter::quicksort(
 
 ///|
 /// `partition` with `partition_lomuto_branchless_cyclic` (`usize` is small).
-fn Sorter::partition(self : Sorter, base : Int, len : Int, pivot : Int) -> Int {
+fn Sorter::partition(
+  self : Sorter,
+  base : Int32,
+  len : Int32,
+  pivot : Int32,
+) -> Int32 {
   if len == 0 {
     return 0
   }
@@ -164,10 +169,10 @@ fn Sorter::partition(self : Sorter, base : Int, len : Int, pivot : Int) -> Int {
 /// "gap" value), moving each through the cyclic permutation.
 fn Sorter::partition_lomuto_branchless_cyclic(
   self : Sorter,
-  base : Int,
-  len : Int,
-  pivot : Int,
-) -> Int {
+  base : Int32,
+  len : Int32,
+  pivot : Int32,
+) -> Int32 {
   if len == 0 {
     return 0
   }
@@ -191,7 +196,7 @@ fn Sorter::partition_lomuto_branchless_cyclic(
 
 ///|
 /// `choose_pivot`: median of 3 or recursive pseudo-median (glidesort).
-fn Sorter::choose_pivot(self : Sorter, base : Int, len : Int) -> Int {
+fn Sorter::choose_pivot(self : Sorter, base : Int32, len : Int32) -> Int32 {
   let len_div_8 = len / 8
   let a = base
   let b = base + len_div_8 * 4
@@ -207,11 +212,11 @@ fn Sorter::choose_pivot(self : Sorter, base : Int, len : Int) -> Int {
 ///|
 fn Sorter::median3_rec(
   self : Sorter,
-  a : Int,
-  b : Int,
-  c : Int,
-  n : Int,
-) -> Int {
+  a : Int32,
+  b : Int32,
+  c : Int32,
+  n : Int32,
+) -> Int32 {
   let mut a = a
   let mut b = b
   let mut c = c
@@ -225,7 +230,7 @@ fn Sorter::median3_rec(
 }
 
 ///|
-fn Sorter::median3(self : Sorter, a : Int, b : Int, c : Int) -> Int {
+fn Sorter::median3(self : Sorter, a : Int32, b : Int32, c : Int32) -> Int32 {
   let v = self.v
   let x = (self.is_less)(v[a], v[b])
   let y = (self.is_less)(v[a], v[c])
@@ -243,7 +248,7 @@ fn Sorter::median3(self : Sorter, a : Int, b : Int, c : Int) -> Int {
 
 ///|
 /// `heapsort`.
-fn Sorter::heapsort(self : Sorter, base : Int, len : Int) -> Unit {
+fn Sorter::heapsort(self : Sorter, base : Int32, len : Int32) -> Unit {
   let mut i = len + len / 2 - 1
   while i >= 0 {
     let sift_idx = if i >= len {
@@ -258,7 +263,12 @@ fn Sorter::heapsort(self : Sorter, base : Int, len : Int) -> Unit {
 }
 
 ///|
-fn Sorter::sift_down(self : Sorter, base : Int, len : Int, node : Int) -> Unit {
+fn Sorter::sift_down(
+  self : Sorter,
+  base : Int32,
+  len : Int32,
+  node : Int32,
+) -> Unit {
   let v = self.v
   let mut node = node
   while true {
@@ -282,9 +292,9 @@ fn Sorter::sift_down(self : Sorter, base : Int, len : Int, node : Int) -> Unit {
 /// first `offset` elements are sorted.
 fn Sorter::insertion_sort_shift_left(
   self : Sorter,
-  base : Int,
-  len : Int,
-  offset : Int,
+  base : Int32,
+  len : Int32,
+  offset : Int32,
 ) -> Unit {
   for tail in (base + offset)..<(base + len) {
     self.insert_tail(base, tail)
@@ -293,7 +303,7 @@ fn Sorter::insertion_sort_shift_left(
 
 ///|
 /// `insert_tail`: sorts `[begin, tail]` assuming `[begin, tail)` is sorted.
-fn Sorter::insert_tail(self : Sorter, begin : Int, tail : Int) -> Unit {
+fn Sorter::insert_tail(self : Sorter, begin : Int32, tail : Int32) -> Unit {
   let v = self.v
   let mut sift = tail - 1
   if !(self.is_less)(v[tail], v[sift]) {
@@ -317,7 +327,7 @@ fn Sorter::insert_tail(self : Sorter, begin : Int, tail : Int) -> Unit {
 
 ///|
 /// `swap_if_less`.
-fn Sorter::swap_if_less(self : Sorter, a : Int, b : Int) -> Unit {
+fn Sorter::swap_if_less(self : Sorter, a : Int32, b : Int32) -> Unit {
   if (self.is_less)(self.v[b], self.v[a]) {
     self.swap(a, b)
   }
@@ -325,7 +335,7 @@ fn Sorter::swap_if_less(self : Sorter, a : Int, b : Int) -> Unit {
 
 ///|
 /// `sort9_optimal` (optimal sorting network).
-fn Sorter::sort9_optimal(self : Sorter, b : Int) -> Unit {
+fn Sorter::sort9_optimal(self : Sorter, b : Int32) -> Unit {
   let pairs = [
     (0, 3),
     (1, 7),
@@ -360,7 +370,7 @@ fn Sorter::sort9_optimal(self : Sorter, b : Int) -> Unit {
 
 ///|
 /// `sort13_optimal` (optimal sorting network).
-fn Sorter::sort13_optimal(self : Sorter, b : Int) -> Unit {
+fn Sorter::sort13_optimal(self : Sorter, b : Int32) -> Unit {
   let pairs = [
     (0, 12),
     (1, 10),
@@ -415,7 +425,7 @@ fn Sorter::sort13_optimal(self : Sorter, b : Int) -> Unit {
 
 ///|
 /// `small_sort_network`.
-fn Sorter::small_sort_network(self : Sorter, base : Int, len : Int) -> Unit {
+fn Sorter::small_sort_network(self : Sorter, base : Int32, len : Int32) -> Unit {
   if len < 2 {
     return
   }
@@ -458,9 +468,9 @@ fn Sorter::small_sort_network(self : Sorter, base : Int, len : Int) -> Unit {
 /// `bidirectional_merge`: merges the sorted halves `v[..len / 2]` and
 /// `v[len / 2..]` into `dst` from both ends (`merge_up` / `merge_down`).
 fn bidirectional_merge(
-  v : FixedArray[Int],
-  dst : FixedArray[Int],
-  is_less : (Int, Int) -> Bool,
+  v : FixedArray[Int32],
+  dst : FixedArray[Int32],
+  is_less : (Int32, Int32) -> Bool,
 ) -> Unit {
   let len = v.length()
   let len_div_2 = len / 2

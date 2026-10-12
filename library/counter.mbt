@@ -903,7 +903,11 @@ pub fn CounterState::update(
 
 ///|
 /// Advance the number of the given level by the specified amount.
-pub fn CounterState::step(self : CounterState, level : Int, by : Int64) -> Unit {
+pub fn CounterState::step(
+  self : CounterState,
+  level : Int32,
+  by : Int64,
+) -> Unit {
   while self.0.length() < level {
     self.0.push(0L)
   }

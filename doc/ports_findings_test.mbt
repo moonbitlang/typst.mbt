@@ -12,7 +12,7 @@
 /// text run (`"text"`: `y` is its baseline, `w` its advance width, `h` is
 /// 0).
 priv struct Mark {
-  page : Int
+  page : Int32
   kind : String
   x : Double
   y : Double
@@ -21,7 +21,7 @@ priv struct Mark {
   /// The text of a run.
   text : String
   /// The glyph ids of a run.
-  glyphs : Array[Int]
+  glyphs : Array[Int32]
   /// The fill of a shape (`""`: none).
   fill : String
   /// The dash pattern of the stroke of a shape (`""`: solid or no stroke).
@@ -35,7 +35,7 @@ fn collect_marks(
   frame : @library.Frame,
   dx : Double,
   dy : Double,
-  page : Int,
+  page : Int32,
   out : Array[Mark],
 ) -> Unit {
   for entry in frame.items() {
@@ -173,7 +173,7 @@ fn lint_lines(report : @doc.CompileReport[@layout.PagedDocument]) -> String {
 ///|
 /// The line of the call of this function.
 #callsite(autofill(loc))
-fn line_here(loc~ : SourceLoc) -> Int {
+fn line_here(loc~ : SourceLoc) -> Int32 {
   // `file:line:column-line:column@module`.
   let mut line = 0
   let mut colons = 0

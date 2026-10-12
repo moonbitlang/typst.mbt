@@ -88,9 +88,9 @@ fn parse_hex64(s : String) -> UInt64 {
 /// Generates an `n`-channel image (must match `gen_image` in
 /// `oracle/src/bin/gen_pic_scale_tests.rs`).
 fn gen_image(
-  n : Int,
-  w : Int,
-  h : Int,
+  n : Int32,
+  w : Int32,
+  h : Int32,
   color : String,
   alpha : String,
   seed : UInt64,
@@ -148,7 +148,7 @@ fn gen_image(
 }
 
 ///|
-fn sort_case(len : Int, key_mod : UInt64, seed : UInt64) -> Bytes {
+fn sort_case(len : Int32, key_mod : UInt64, seed : UInt64) -> Bytes {
   let r = { state: seed, }
   let keys = FixedArray::make(len, 0.0)
   for i in 0..<len {

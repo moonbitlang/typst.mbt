@@ -11,7 +11,7 @@ pub struct Bundle {
   priv data : Bytes
   priv delta_table : HuffmanTable
   priv count_table : HuffmanTable
-  priv entries : Array[(Int, Int)]
+  priv entries : Array[(Int32, Int32)]
 }
 
 ///|

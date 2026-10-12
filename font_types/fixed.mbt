@@ -2,7 +2,7 @@
 
 ///|
 /// 32-bit signed fixed point number with 16 bits of fraction.
-pub(all) struct Fixed(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Fixed(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,7 +26,7 @@ pub extend Fixed with @debug.Debug::{to_repr}
 
 ///|
 /// 32-bit signed fixed point number with 6 bits of fraction.
-pub(all) struct F26Dot6(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct F26Dot6(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -52,7 +52,7 @@ pub extend F26Dot6 with @debug.Debug::{to_repr}
 /// 16-bit signed fixed point number with 14 bits of fraction.
 ///
 /// The raw value is stored sign-extended in an `Int`.
-pub(all) struct F2Dot14(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct F2Dot14(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -78,7 +78,7 @@ pub extend F2Dot14 with @debug.Debug::{to_repr}
 // Fixed (16.16)
 
 ///|
-pub let fixed_int_mask : Int = 0xFFFF0000
+pub let fixed_int_mask : Int32 = 0xFFFF0000
 
 ///|
 pub fn Fixed::zero() -> Fixed {
@@ -107,13 +107,13 @@ pub fn Fixed::max_value() -> Fixed {
 
 ///|
 /// Creates a new fixed point value from the underlying bit representation.
-pub fn Fixed::from_bits(bits : Int) -> Fixed {
+pub fn Fixed::from_bits(bits : Int32) -> Fixed {
   Fixed(bits)
 }
 
 ///|
 /// Returns the underlying bit representation of the value.
-pub fn Fixed::to_bits(self : Fixed) -> Int {
+pub fn Fixed::to_bits(self : Fixed) -> Int32 {
   self.0
 }
 
@@ -234,14 +234,14 @@ pub fn Fixed::mul_div(self : Fixed, a : Fixed, b : Fixed) -> Fixed {
 
 ///|
 /// Creates a 16.16 fixed point value from a 32 bit integer.
-pub fn Fixed::from_i32(i : Int) -> Fixed {
+pub fn Fixed::from_i32(i : Int32) -> Fixed {
   Fixed(i << 16)
 }
 
 ///|
 /// Converts a 16.16 fixed point value to a 32 bit integer, rounding off
 /// the fractional bits.
-pub fn Fixed::to_i32(self : Fixed) -> Int {
+pub fn Fixed::to_i32(self : Fixed) -> Int32 {
   (self.0 + 0x8000) >> 16
 }
 
@@ -293,12 +293,12 @@ pub fn F26Dot6::one() -> F26Dot6 {
 }
 
 ///|
-pub fn F26Dot6::from_bits(bits : Int) -> F26Dot6 {
+pub fn F26Dot6::from_bits(bits : Int32) -> F26Dot6 {
   F26Dot6(bits)
 }
 
 ///|
-pub fn F26Dot6::to_bits(self : F26Dot6) -> Int {
+pub fn F26Dot6::to_bits(self : F26Dot6) -> Int32 {
   self.0
 }
 
@@ -324,12 +324,12 @@ pub fn F26Dot6::fract(self : F26Dot6) -> F26Dot6 {
 }
 
 ///|
-pub fn F26Dot6::from_i32(i : Int) -> F26Dot6 {
+pub fn F26Dot6::from_i32(i : Int32) -> F26Dot6 {
   F26Dot6(i << 6)
 }
 
 ///|
-pub fn F26Dot6::to_i32(self : F26Dot6) -> Int {
+pub fn F26Dot6::to_i32(self : F26Dot6) -> Int32 {
   (self.0 + 32) >> 6
 }
 
@@ -423,12 +423,12 @@ pub fn F2Dot14::one() -> F2Dot14 {
 
 ///|
 /// Creates a value from the raw (sign-extended 16-bit) representation.
-pub fn F2Dot14::from_bits(bits : Int) -> F2Dot14 {
+pub fn F2Dot14::from_bits(bits : Int32) -> F2Dot14 {
   F2Dot14(trunc_i16(bits))
 }
 
 ///|
-pub fn F2Dot14::to_bits(self : F2Dot14) -> Int {
+pub fn F2Dot14::to_bits(self : F2Dot14) -> Int32 {
   self.0
 }
 
@@ -455,17 +455,17 @@ pub fn F2Dot14::from_f32(x : Float) -> F2Dot14 {
 // Shared helpers
 
 ///|
-fn fixed_mul_bits(a : Int, b : Int) -> Int {
+fn fixed_mul_bits(a : Int32, b : Int32) -> Int32 {
   let ab = a.to_int64() * b.to_int64()
   ((ab + 0x8000L - (if ab < 0L { 1L } else { 0L })) >> 16).to_int()
 }
 
 ///|
-fn fixed_div_bits(a : Int, b : Int) -> Int {
+fn fixed_div_bits(a : Int32, b : Int32) -> Int32 {
   let sign = (a < 0) != (b < 0)
   let au = unsigned_abs64(a)
   let bu = unsigned_abs64(b)
-  let q : UInt = if bu == 0UL {
+  let q : UInt32 = if bu == 0UL {
     0x7FFFFFFFU
   } else {
     (((au << 16) + (bu >> 1)) / bu).to_uint()
@@ -479,7 +479,7 @@ fn fixed_div_bits(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn mul_div_bits(s : Int, a : Int, b : Int) -> Int {
+fn mul_div_bits(s : Int32, a : Int32, b : Int32) -> Int32 {
   let mut sign = 1
   let mut su = s.to_uint64()
   let mut au = a.to_uint64()
@@ -506,7 +506,7 @@ fn mul_div_bits(s : Int, a : Int, b : Int) -> Int {
 }
 
 ///|
-fn unsigned_abs64(x : Int) -> UInt64 {
+fn unsigned_abs64(x : Int32) -> UInt64 {
   if x < 0 {
     (-x.to_int64()).reinterpret_as_uint64()
   } else {
@@ -516,7 +516,7 @@ fn unsigned_abs64(x : Int) -> UInt64 {
 
 ///|
 /// Saturates an `Int64` to the `i32` range.
-pub fn saturate_i32(x : Int64) -> Int {
+pub fn saturate_i32(x : Int64) -> Int32 {
   if x > 2147483647L {
     2147483647
   } else if x < -2147483648L {
@@ -527,7 +527,7 @@ pub fn saturate_i32(x : Int64) -> Int {
 }
 
 ///|
-fn saturate_i16(x : Int) -> Int {
+fn saturate_i16(x : Int32) -> Int32 {
   if x > 32767 {
     32767
   } else if x < -32768 {
@@ -539,7 +539,7 @@ fn saturate_i16(x : Int) -> Int {
 
 ///|
 /// Truncates to 16 bits and sign-extends (Rust `as i16`).
-pub fn trunc_i16(x : Int) -> Int {
+pub fn trunc_i16(x : Int32) -> Int32 {
   x << 16 >> 16
 }
 

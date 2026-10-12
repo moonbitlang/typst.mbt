@@ -39,7 +39,7 @@ fn rust_debug(e : @moxcms.CmsError) -> String {
 }
 
 ///|
-fn be32(d : Array[Byte], i : Int) -> UInt {
+fn be32(d : Array[Byte], i : Int32) -> UInt32 {
   (d[i].to_uint() << 24) |
   (d[i + 1].to_uint() << 16) |
   (d[i + 2].to_uint() << 8) |
@@ -47,13 +47,13 @@ fn be32(d : Array[Byte], i : Int) -> UInt {
 }
 
 ///|
-fn urem(a : UInt, b : Int) -> Int {
+fn urem(a : UInt32, b : Int32) -> Int32 {
   (a % b.reinterpret_as_uint()).reinterpret_as_int()
 }
 
 ///|
 /// Deterministic profile corruption (same as the oracle's `mutate`).
-fn mutate(data : Bytes, idx : UInt) -> Bytes {
+fn mutate(data : Bytes, idx : UInt32) -> Bytes {
   let rng = { state: (seed ^ (idx * 0x9E3779B9U)) | 1U, }
   let orig = data.to_array()
   let d = data.to_array()
@@ -134,7 +134,7 @@ fn fnv_bytes(bytes : ArrayView[Byte]) -> UInt64 {
 
 ///|
 /// Same as the oracle's `fuzz_case`.
-fn fuzz_case(d : Bytes, idx : UInt) -> String {
+fn fuzz_case(d : Bytes, idx : UInt32) -> String {
   let profile = @moxcms.ColorProfile::new_from_slice(d) catch {
     e => return "PARSE_ERR \{rust_debug(e)}"
   }
@@ -192,7 +192,7 @@ fn fuzz_case(d : Bytes, idx : UInt) -> String {
 }
 
 ///|
-fn fuzz_lines(data : Bytes, count : Int) -> Array[String] {
+fn fuzz_lines(data : Bytes, count : Int32) -> Array[String] {
   Array::makei(count, i => {
     let idx = i.reinterpret_as_uint()
     fuzz_case(mutate(data, idx), idx)

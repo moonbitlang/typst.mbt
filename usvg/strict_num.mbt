@@ -55,7 +55,7 @@ pub fn NormalizedF32::new_clamped(n : Float) -> NormalizedF32 {
 
 ///|
 /// Creates a `NormalizedF32` by dividing the given value by 255.
-pub fn NormalizedF32::new_u8(n : Int) -> NormalizedF32 {
+pub fn NormalizedF32::new_u8(n : Int32) -> NormalizedF32 {
   NormalizedF32(Float::from_int(n) / 255.0)
 }
 
@@ -67,7 +67,7 @@ pub fn NormalizedF32::get(self : NormalizedF32) -> Float {
 
 ///|
 /// Returns the value as a `u8`.
-pub fn NormalizedF32::to_u8(self : NormalizedF32) -> Int {
+pub fn NormalizedF32::to_u8(self : NormalizedF32) -> Int32 {
   f32_as_u8(self.0 * 255.0 + 0.5)
 }
 
@@ -145,7 +145,7 @@ fn is_finite_f32(n : Float) -> Bool {
 
 ///|
 /// `float_cmp::ApproxEqUlps` for `f32`.
-fn approx_eq_ulps(a : Float, b : Float, ulps : Int) -> Bool {
+fn approx_eq_ulps(a : Float, b : Float, ulps : Int32) -> Bool {
   // -0 and +0 are drastically far in ulps terms, so
   // we need a special case for that.
   if a == b {
@@ -161,12 +161,12 @@ fn approx_eq_ulps(a : Float, b : Float, ulps : Int) -> Bool {
 }
 
 ///|
-fn approx_ne_ulps(a : Float, b : Float, ulps : Int) -> Bool {
+fn approx_ne_ulps(a : Float, b : Float, ulps : Int32) -> Bool {
   !approx_eq_ulps(a, b, ulps)
 }
 
 ///|
-fn approx_zero_ulps(a : Float, ulps : Int) -> Bool {
+fn approx_zero_ulps(a : Float, ulps : Int32) -> Bool {
   approx_eq_ulps(a, 0.0, ulps)
 }
 
@@ -198,7 +198,7 @@ fn is_valid_length(n : Float) -> Bool {
 
 ///|
 /// Rust's saturating `f32 as u8` cast.
-fn f32_as_u8(n : Float) -> Int {
+fn f32_as_u8(n : Float) -> Int32 {
   if n.is_nan() {
     0
   } else if n <= 0.0 {
@@ -224,7 +224,7 @@ fn f32_bound(min : Float, val : Float, max : Float) -> Float {
 
 ///|
 /// Rust's `f32::powi` (LLVM's `__powisf2`).
-fn powi_f32(a : Float, b : Int) -> Float {
+fn powi_f32(a : Float, b : Int32) -> Float {
   let recip = b < 0
   let mut r : Float = 1.0
   let mut a = a

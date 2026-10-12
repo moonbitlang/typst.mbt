@@ -2,11 +2,11 @@
 
 ///|
 priv enum TagNode {
-  Group(Int)
+  Group(Int32)
   Leaf(@export.Identifier)
   /// Allows inserting a annotation into the tag tree.
   /// Currently used for `Page::add_tagged_annotation`.
-  Annotation(Int)
+  Annotation(Int32)
   /// If the attributes are non-empty this will resolve to a `Tag::Span`,
   /// otherwise the items are inserted directly.
   Text(ResolvedTextAttrs, Array[@export.Identifier])
@@ -18,7 +18,7 @@ priv struct Resolver {
   ctx : Ctx
   groups : Groups
   tags : Tags
-  mut last_heading_level : Int?
+  mut last_heading_level : Int32?
   mut flatten : Bool
   errors : Array[@library.SourceDiagnostic]
 }
@@ -81,7 +81,7 @@ fn resolve_group_node(
   parent_lang : Ref[@library.Locale?],
   parent_bbox : Ref[BBoxCtx?],
   accum : Accumulator,
-  id : Int,
+  id : Int32,
 ) -> Unit {
   let group = rs.groups.get(id)
   let tag = build_group_tag(rs, group)

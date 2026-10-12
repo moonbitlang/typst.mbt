@@ -4,66 +4,66 @@
 
 ///|
 /// Number of length codes, not counting the special END_BLOCK code.
-const LENGTH_CODES : Int = 29
+const LENGTH_CODES : Int32 = 29
 
 ///|
 /// Number of literal bytes 0..255.
-const LITERALS : Int = 256
+const LITERALS : Int32 = 256
 
 ///|
 /// Number of Literal or Length codes, including the END_BLOCK code.
-const L_CODES : Int = 286 // LITERALS + 1 + LENGTH_CODES
+const L_CODES : Int32 = 286 // LITERALS + 1 + LENGTH_CODES
 
 ///|
 /// Number of distance codes.
-const D_CODES : Int = 30
+const D_CODES : Int32 = 30
 
 ///|
 /// Number of codes used to transfer the bit lengths.
-const BL_CODES : Int = 19
+const BL_CODES : Int32 = 19
 
 ///|
 /// Maximum heap size.
-const HEAP_SIZE : Int = 573 // 2 * L_CODES + 1
+const HEAP_SIZE : Int32 = 573 // 2 * L_CODES + 1
 
 ///|
 /// All codes must not exceed MAX_BITS bits.
-const MAX_BITS : Int = 15
+const MAX_BITS : Int32 = 15
 
 ///|
 /// Bit length codes must not exceed MAX_BL_BITS bits.
-const MAX_BL_BITS : Int = 7
+const MAX_BL_BITS : Int32 = 7
 
 ///|
 /// Extra bits for each length code.
-let extra_lbits : ReadOnlyArray[Int] = [
+let extra_lbits : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5,
   5, 0,
 ]
 
 ///|
 /// Extra bits for each distance code.
-let extra_dbits : ReadOnlyArray[Int] = [
+let extra_dbits : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11,
   12, 12, 13, 13,
 ]
 
 ///|
 /// Extra bits for each bit length code.
-let extra_blbits : ReadOnlyArray[Int] = [
+let extra_blbits : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7,
 ]
 
 ///|
 /// The lengths of the bit length codes are sent in order of decreasing
 /// probability, to avoid transmitting the lengths for unused bit length codes.
-let bl_order : ReadOnlyArray[Int] = [
+let bl_order : ReadOnlyArray[Int32] = [
   16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15,
 ]
 
 ///|
 /// Reverses the first `len` bits of a code.
-fn bi_reverse(code : Int, len : Int) -> Int {
+fn bi_reverse(code : Int32, len : Int32) -> Int32 {
   let mut code = code
   let mut res = 0
   for _ in 0..<len {
@@ -75,7 +75,7 @@ fn bi_reverse(code : Int, len : Int) -> Int {
 
 ///|
 /// Length code for each normalized match length (0 == STD_MIN_MATCH).
-let length_code : FixedArray[Int] = {
+let length_code : FixedArray[Int32] = {
   let table = FixedArray::make(256, 0)
   let mut length = 0
   for code in 0..<(LENGTH_CODES - 1) {
@@ -93,7 +93,7 @@ let length_code : FixedArray[Int] = {
 
 ///|
 /// First normalized length for each code (0 = STD_MIN_MATCH).
-let base_length : FixedArray[Int] = {
+let base_length : FixedArray[Int32] = {
   let table = FixedArray::make(LENGTH_CODES, 0)
   let mut length = 0
   for code in 0..<(LENGTH_CODES - 1) {
@@ -107,7 +107,7 @@ let base_length : FixedArray[Int] = {
 /// Distance codes. The first 256 values correspond to the distances 3 ..
 /// 258, the last 256 values correspond to the top 8 bits of the 15 bit
 /// distances.
-let dist_code : FixedArray[Int] = {
+let dist_code : FixedArray[Int32] = {
   let table = FixedArray::make(512, 0)
   let mut dist = 0
   for code in 0..<16 {
@@ -128,7 +128,7 @@ let dist_code : FixedArray[Int] = {
 
 ///|
 /// First normalized distance for each code (0 = distance of 1).
-let base_dist : FixedArray[Int] = {
+let base_dist : FixedArray[Int32] = {
   let table = FixedArray::make(D_CODES, 0)
   let mut dist = 0
   for code in 0..<16 {
@@ -148,7 +148,7 @@ let base_dist : FixedArray[Int] = {
 /// imposed, there is no need for the L_CODES extra codes used during heap
 /// construction. However the codes 286 and 287 are needed to build a
 /// canonical tree.
-let static_ltree : (FixedArray[Int], FixedArray[Int]) = {
+let static_ltree : (FixedArray[Int32], FixedArray[Int32]) = {
   let codes = FixedArray::make(L_CODES + 2, 0)
   let lens = FixedArray::make(L_CODES + 2, 0)
   let bl_count = FixedArray::make(MAX_BITS + 1, 0)
@@ -172,7 +172,7 @@ let static_ltree : (FixedArray[Int], FixedArray[Int]) = {
 ///|
 /// The static distance tree. (Actually a trivial tree since all codes use 5
 /// bits.)
-let static_dtree : (FixedArray[Int], FixedArray[Int]) = (
+let static_dtree : (FixedArray[Int32], FixedArray[Int32]) = (
   FixedArray::makei(D_CODES, n => bi_reverse(n, 5)),
   FixedArray::make(D_CODES, 5),
 )

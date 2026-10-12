@@ -5,9 +5,9 @@
 priv struct GlyphSimulator {
   // We simulate that Type1 glyphs have glyph IDs so we can handle them transparently
   // to OpenType fonts.
-  glyph_to_string : Map[UInt, String]
+  glyph_to_string : Map[UInt32, String]
   string_to_glyph : Map[String, GlyphId]
-  mut glyph_counter : UInt
+  mut glyph_counter : UInt32
 }
 
 ///|
@@ -49,7 +49,7 @@ priv struct Type3 {
   widths : Array[Width]
   missing_width : Float
   encoding : Encoding
-  encodings : Map[Int, String]
+  encodings : Map[Int32, String]
   dict : @hayro_syntax.Dict
   char_procs : Map[String, @hayro_syntax.Stream]
   glyph_simulator : GlyphSimulator
@@ -129,7 +129,7 @@ fn Type3::glyph_width(self : Type3, code : Byte) -> Float {
 ///|
 fn Type3::char_code_to_unicode(
   self : Type3,
-  char_code : UInt,
+  char_code : UInt32,
 ) -> @cmap.BfString? {
   // Type3 fonts can only provide Unicode via ToUnicode CMap.
   match self.to_unicode {

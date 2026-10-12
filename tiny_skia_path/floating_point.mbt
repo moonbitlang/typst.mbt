@@ -17,7 +17,7 @@ let min_i32_fits_in_f32 : Float = -2147483520.0
 /// `i32::saturate_from(f32)`: return the closest integer for the given float.
 ///
 /// Returns MAX_I32_FITS_IN_F32 for NaN.
-pub fn i32_saturate_from(x : Float) -> Int {
+pub fn i32_saturate_from(x : Float) -> Int32 {
   let x = if x < max_i32_fits_in_f32 { x } else { max_i32_fits_in_f32 }
   let x = if x > min_i32_fits_in_f32 { x } else { min_i32_fits_in_f32 }
   f32_as_i32(x)
@@ -27,24 +27,24 @@ pub fn i32_saturate_from(x : Float) -> Int {
 /// `i32::saturate_from(f64)`: return the closest integer for the given double.
 ///
 /// Returns i32::MAX for NaN.
-pub fn i32_saturate_from_f64(x : Double) -> Int {
+pub fn i32_saturate_from_f64(x : Double) -> Int32 {
   let x = if x < 2147483647.0 { x } else { 2147483647.0 }
   let x = if x > -2147483648.0 { x } else { -2147483648.0 }
   f64_as_i32(x)
 }
 
 ///|
-pub fn i32_saturate_floor(x : Float) -> Int {
+pub fn i32_saturate_floor(x : Float) -> Int32 {
   i32_saturate_from(x.floor())
 }
 
 ///|
-pub fn i32_saturate_ceil(x : Float) -> Int {
+pub fn i32_saturate_ceil(x : Float) -> Int32 {
   i32_saturate_from(x.ceil())
 }
 
 ///|
-pub fn i32_saturate_round(x : Float) -> Int {
+pub fn i32_saturate_round(x : Float) -> Int32 {
   i32_saturate_from(x.floor() + 0.5)
 }
 
@@ -53,7 +53,7 @@ pub fn i32_saturate_round(x : Float) -> Int {
 /// to each other or against positive float-bit-constants (like 0). This does
 /// not return the int equivalent of the float, just something cheaper for
 /// compares-only.
-fn f32_as_2s_compliment(x : Float) -> Int {
+fn f32_as_2s_compliment(x : Float) -> Int32 {
   sign_bit_to_2s_compliment(x.reinterpret_as_int())
 }
 
@@ -61,7 +61,7 @@ fn f32_as_2s_compliment(x : Float) -> Int {
 /// Convert a sign-bit int (i.e. float interpreted as int) into a 2s compliement
 /// int. This also converts -0 (0x80000000) to 0. Doing this to a float allows
 /// it to be compared using normal C operators (<, <=, etc.)
-fn sign_bit_to_2s_compliment(x : Int) -> Int {
+fn sign_bit_to_2s_compliment(x : Int32) -> Int32 {
   if x < 0 {
     -(x & 0x7FFFFFFF)
   } else {

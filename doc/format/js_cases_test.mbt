@@ -5,7 +5,7 @@
 ///|
 /// `(x, digits, x.toFixed(digits))` for finite `|x| < 1e21`: JavaScript's
 /// own result.
-let fixed_js_cases : ReadOnlyArray[(UInt64, Int, String)] = [
+let fixed_js_cases : ReadOnlyArray[(UInt64, Int32, String)] = [
   (0x0000000000000000UL, 0, "0"),
   (0x0000000000000000UL, 1, "0.0"),
   (0x0000000000000000UL, 2, "0.00"),
@@ -2319,7 +2319,7 @@ let fixed_js_cases : ReadOnlyArray[(UInt64, Int, String)] = [
 /// `(x, digits, expected, x.toFixed(digits))` for `|x| >= 1e21`, where
 /// JavaScript writes an exponent: expected are the digits of the integer
 /// `BigInt(x)` and `digits` zeros.
-let fixed_large_cases : ReadOnlyArray[(UInt64, Int, String, String)] = [
+let fixed_large_cases : ReadOnlyArray[(UInt64, Int32, String, String)] = [
   (0x444b1ae4d6e2ef50UL, 0, "1000000000000000000000", "1e+21"),
   (0x444b1ae4d6e2ef50UL, 1, "1000000000000000000000.0", "1e+21"),
   (0x444b1ae4d6e2ef50UL, 2, "1000000000000000000000.00", "1e+21"),
@@ -3083,7 +3083,7 @@ let fixed_large_cases : ReadOnlyArray[(UInt64, Int, String, String)] = [
 ///|
 /// `(x, digits, text)`: `x.toFixed(digits)` with "," between groups of
 /// three digits of its integer part.
-let grouped_cases : ReadOnlyArray[(UInt64, Int, String)] = [
+let grouped_cases : ReadOnlyArray[(UInt64, Int32, String)] = [
   (0x0000000000000000UL, 0, "0"),
   (0x0000000000000000UL, 1, "0.0"),
   (0x0000000000000000UL, 2, "0.00"),
@@ -3661,7 +3661,7 @@ let grouped_int_cases : ReadOnlyArray[(UInt64, String)] = [
 ///|
 /// `(x, digits, text)` by the generator's `exactRound`: the exact value of
 /// `x` times 100, half away from zero.
-let percent_cases : ReadOnlyArray[(UInt64, Int, String)] = [
+let percent_cases : ReadOnlyArray[(UInt64, Int32, String)] = [
   (0x0000000000000000UL, 0, "0%"),
   (0x0000000000000000UL, 1, "0.0%"),
   (0x0000000000000000UL, 2, "0.00%"),
@@ -4552,7 +4552,7 @@ let percent_cases : ReadOnlyArray[(UInt64, Int, String)] = [
 ///|
 /// `(x, digits, text)` by the generator's `exactRound`: the exact value of
 /// `x` in the unit chosen after rounding.
-let compact_cases : ReadOnlyArray[(UInt64, Int, String)] = [
+let compact_cases : ReadOnlyArray[(UInt64, Int32, String)] = [
   (0x0000000000000000UL, 0, "0"),
   (0x0000000000000000UL, 1, "0.0"),
   (0x0000000000000000UL, 2, "0.00"),

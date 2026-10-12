@@ -12,7 +12,7 @@ pub fn AlignedRow::new(columns : Array[MathItem]) -> AlignedRow {
 
 ///|
 /// The number of columns in this row.
-pub fn AlignedRow::len(self : AlignedRow) -> Int {
+pub fn AlignedRow::len(self : AlignedRow) -> Int32 {
   self.0.length()
 }
 
@@ -26,7 +26,7 @@ pub fn AlignedRow::is_empty(self : AlignedRow) -> Bool {
 /// Pad the row with empty group items until its length reaches `length`.
 fn AlignedRow::pad_to(
   self : AlignedRow,
-  length : Int,
+  length : Int32,
   styles : StyleChain,
 ) -> Unit {
   while self.0.length() < length {
@@ -42,7 +42,7 @@ pub fn AlignedRow::iter(self : AlignedRow) -> Iter[MathItem] {
 
 ///|
 /// Returns the item at the given index.
-pub fn AlignedRow::get(self : AlignedRow, index : Int) -> MathItem? {
+pub fn AlignedRow::get(self : AlignedRow, index : Int32) -> MathItem? {
   self.0.get(index)
 }
 

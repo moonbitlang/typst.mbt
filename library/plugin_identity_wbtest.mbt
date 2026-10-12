@@ -7,7 +7,7 @@
 ///|
 /// A plugin that exports its memory (of `pages` pages) and no function:
 /// `(module (memory (export "memory") <pages>))`.
-fn plugin_test_memory_only(pages : Int) -> Bytes {
+fn plugin_test_memory_only(pages : Int32) -> Bytes {
   Bytes::from_array([
     b'\x00',
     b'\x61',

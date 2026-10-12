@@ -55,13 +55,13 @@ pub fn TypedVal::from_bool(value : Bool) -> TypedVal {
 
 ///|
 /// `From<i32>` (`ValType::I32`).
-pub fn TypedVal::from_i32(value : Int) -> TypedVal {
+pub fn TypedVal::from_i32(value : Int32) -> TypedVal {
   TypedVal::new(I32, UntypedVal::from_i32(value))
 }
 
 ///|
 /// `From<u32>` (`ValType::I32`).
-pub fn TypedVal::from_u32(value : UInt) -> TypedVal {
+pub fn TypedVal::from_u32(value : UInt32) -> TypedVal {
   TypedVal::new(I32, UntypedVal::from_u32(value))
 }
 
@@ -103,13 +103,13 @@ pub fn TypedVal::to_bool(self : TypedVal) -> Bool {
 
 ///|
 /// `From<TypedVal> for i32`
-pub fn TypedVal::to_i32(self : TypedVal) -> Int {
+pub fn TypedVal::to_i32(self : TypedVal) -> Int32 {
   self.value.read_i32()
 }
 
 ///|
 /// `From<TypedVal> for u32`
-pub fn TypedVal::to_u32(self : TypedVal) -> UInt {
+pub fn TypedVal::to_u32(self : TypedVal) -> UInt32 {
   self.value.read_u32()
 }
 

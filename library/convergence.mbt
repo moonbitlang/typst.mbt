@@ -6,7 +6,7 @@
 // [Introspection] stored in the sink only keeps what `analyze` needs.
 
 ///|
-pub let max_iters : Int = 5
+pub let max_iters : Int32 = 5
 
 ///|
 pub let iter_names : ReadOnlyArray[String] = [
@@ -14,7 +14,7 @@ pub let iter_names : ReadOnlyArray[String] = [
 ]
 
 ///|
-let instances : Int = max_iters + 1
+let instances : Int32 = max_iters + 1
 
 ///|
 /// Analyzes all introspections that were performed during compilation and

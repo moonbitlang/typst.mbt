@@ -55,7 +55,7 @@ pub fn Location::hash(self : Location) -> U128 {
 /// This is a synthetic location created from another one and is used, for
 /// example, in bibliography management to create individual linkable
 /// locations for reference entries from the bibliography's location.
-pub fn Location::variant(self : Location, n : Int) -> Location {
+pub fn Location::variant(self : Location, n : Int32) -> Location {
   Location(hash128((self.0, n)))
 }
 

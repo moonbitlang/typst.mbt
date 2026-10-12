@@ -7,7 +7,7 @@
 ///|
 struct ItemVariationStore {
   data : BytesView
-  data_offsets : LazyArray16[UInt]
+  data_offsets : LazyArray16[UInt32]
   regions : VariationRegionList
 }
 
@@ -222,7 +222,7 @@ pub fn DeltaSetIndexMap::new(data : BytesView) -> DeltaSetIndexMap {
 /// Maps an index to an `(outer, inner)` index pair.
 pub fn DeltaSetIndexMap::map(
   self : DeltaSetIndexMap,
-  index : UInt,
+  index : UInt32,
 ) -> (UInt16, UInt16)? {
   let s = Stream::new(self.data)
   try {
@@ -246,7 +246,7 @@ pub fn DeltaSetIndexMap::map(
       return None
     }
     s.advance(entry_size * index)
-    let mut n : UInt = 0
+    let mut n : UInt32 = 0
     let bytes = s.read_bytes(entry_size)
     for b in bytes {
       n = (n << 8) + b.to_uint()

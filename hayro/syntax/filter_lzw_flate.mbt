@@ -24,16 +24,16 @@ pub fn flate_decode(data : BytesView, params : Dict) -> Bytes? {
 }
 
 ///|
-const LZW_CLEAR_TABLE : Int = 256
+const LZW_CLEAR_TABLE : Int32 = 256
 
 ///|
-const LZW_EOD : Int = 257
+const LZW_EOD : Int32 = 257
 
 ///|
-const LZW_MAX_ENTRIES : Int = 4096
+const LZW_MAX_ENTRIES : Int32 = 4096
 
 ///|
-const LZW_INITIAL_SIZE : Int = 258
+const LZW_INITIAL_SIZE : Int32 = 258
 
 ///|
 /// Decode a LZW-encoded stream.
@@ -74,7 +74,7 @@ fn LzwTable::push(self : LzwTable, entry : Bytes) -> Bytes? {
 }
 
 ///|
-fn LzwTable::register(self : LzwTable, prev : Int, new_byte : Byte) -> Bytes? {
+fn LzwTable::register(self : LzwTable, prev : Int32, new_byte : Byte) -> Bytes? {
   guard self.get(prev) is Some(prev_entry) else { return None }
   let new_entry = Bytes::makei(prev_entry.length() + 1, i => {
     if i < prev_entry.length() {
@@ -87,7 +87,7 @@ fn LzwTable::register(self : LzwTable, prev : Int, new_byte : Byte) -> Bytes? {
 }
 
 ///|
-fn LzwTable::get(self : LzwTable, index : Int) -> Bytes? {
+fn LzwTable::get(self : LzwTable, index : Int32) -> Bytes? {
   if index >= 0 && index < self.entries.length() {
     self.entries[index]
   } else {
@@ -101,12 +101,12 @@ fn LzwTable::clear(self : LzwTable) -> Unit {
 }
 
 ///|
-fn LzwTable::size(self : LzwTable) -> Int {
+fn LzwTable::size(self : LzwTable) -> Int32 {
   self.entries.length()
 }
 
 ///|
-fn LzwTable::code_length(self : LzwTable) -> Int {
+fn LzwTable::code_length(self : LzwTable) -> Int32 {
   let adjusted = self.entries.length() + (if self.early_change { 1 } else { 0 })
   if adjusted >= 2048 {
     12
@@ -125,7 +125,7 @@ fn lzw_decode_impl(data : BytesView, early_change : Bool) -> Bytes? {
   let mut bit_size = table.code_length()
   let reader = BitReader::new(data)
   let decoded = Buffer()
-  let mut prev : Int? = None
+  let mut prev : Int32? = None
   while true {
     let next = match reader.read(bit_size) {
       Some(code) => code.reinterpret_as_int()
@@ -172,27 +172,27 @@ fn lzw_decode_impl(data : BytesView, early_change : Bool) -> Bytes? {
 
 ///|
 priv struct PredictorParams {
-  predictor : Int
-  colors : Int
-  bits_per_component : Int
-  columns : Int
+  predictor : Int32
+  colors : Int32
+  bits_per_component : Int32
+  columns : Int32
   early_change : Bool
 }
 
 ///|
-fn PredictorParams::bits_per_pixel(self : PredictorParams) -> Int {
+fn PredictorParams::bits_per_pixel(self : PredictorParams) -> Int32 {
   // u8 arithmetic in upstream (wrapping).
   (self.bits_per_component * self.colors) & 0xff
 }
 
 ///|
-fn PredictorParams::row_length_in_bytes(self : PredictorParams) -> Int {
+fn PredictorParams::row_length_in_bytes(self : PredictorParams) -> Int32 {
   (self.columns * self.bits_per_pixel() + 7) / 8
 }
 
 ///|
 fn PredictorParams::from_params(dict : Dict) -> PredictorParams {
-  let get_u8 = (key : String, default : Int) => {
+  let get_u8 = (key : String, default : Int32) => {
     match (dict.get(key) : Byte?) {
       Some(v) => v.to_int()
       None => default
@@ -254,7 +254,7 @@ fn apply_predictor(data : Bytes, params : PredictorParams) -> Bytes? {
   }
   let out = FixedArray::make(num_rows * row_len, b'\x00')
   // The previous (decoded) row, as chunks of samples.
-  let mut prev_row : Array[Array[Int]] = read_chunks(
+  let mut prev_row : Array[Array[Int32]] = read_chunks(
     FixedArray::make(row_len, b'\x00'),
     0,
     row_len,
@@ -309,11 +309,11 @@ priv enum Predictor {
 ///|
 fn Predictor::predict(
   self : Predictor,
-  cur_row : Int,
-  prev_row : Int,
-  prev_col : Int,
-  top_left : Int,
-) -> Int {
+  cur_row : Int32,
+  prev_row : Int32,
+  prev_col : Int32,
+  top_left : Int32,
+) -> Int32 {
   match self {
     Sub => (cur_row + prev_col) & 0xffff
     Up => (cur_row + prev_row) & 0xffff
@@ -343,9 +343,9 @@ fn Predictor::predict(
 /// (upstream `BitChunks`); incomplete trailing chunks are dropped.
 fn bytes_chunks(
   data : BytesView,
-  bit_size : Int,
-  chunk_len : Int,
-) -> Array[Array[Int]] {
+  bit_size : Int32,
+  chunk_len : Int32,
+) -> Array[Array[Int32]] {
   let reader = BitReader::new(data)
   let chunks = []
   while true {
@@ -364,11 +364,11 @@ fn bytes_chunks(
 ///|
 fn read_chunks(
   data : FixedArray[Byte],
-  start : Int,
-  len : Int,
-  bit_size : Int,
-  chunk_len : Int,
-) -> Array[Array[Int]] {
+  start : Int32,
+  len : Int32,
+  bit_size : Int32,
+  chunk_len : Int32,
+) -> Array[Array[Int32]] {
   let bytes = Bytes::makei(len, i => data[start + i])
   bytes_chunks(bytes[:], bit_size, chunk_len)
 }
@@ -376,11 +376,11 @@ fn read_chunks(
 ///|
 /// Upstream `apply::<T>`.
 fn predict_row(
-  prev_row : Array[Array[Int]],
-  cur_row : Array[Array[Int]],
+  prev_row : Array[Array[Int32]],
+  cur_row : Array[Array[Int32]],
   writer : BitWriter,
-  bit_size : Int,
-  chunk_len : Int,
+  bit_size : Int32,
+  chunk_len : Int32,
   predictor : Predictor,
 ) -> Unit {
   let mut prev_col = Array::make(chunk_len, 0)
@@ -409,12 +409,12 @@ fn predict_row(
 ///|
 fn apply_predictor_8bit_png(
   data : Bytes,
-  predictor : Int,
+  predictor : Int32,
   is_png_predictor : Bool,
-  row_len : Int,
-  total_row_len : Int,
-  num_rows : Int,
-  tbpp : Int,
+  row_len : Int32,
+  total_row_len : Int32,
+  num_rows : Int32,
+  tbpp : Int32,
 ) -> Bytes? {
   if row_len == 0 || total_row_len == 0 {
     return None
@@ -463,13 +463,13 @@ fn apply_predictor_8bit_png(
 /// PNG row unfiltering (`filter/png/mod.rs`, taken from the png crate):
 /// `filter` 0 = none, 1 = sub, 2 = up, 3 = avg, 4 = paeth.
 fn png_unfilter(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   buf : FixedArray[Byte],
-  prev_start : Int,
+  prev_start : Int32,
   has_prev : Bool,
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
 ) -> Unit {
   // If the previous row is empty, then treat it as if it were filled with zeros.
   let mut filter = filter
@@ -514,7 +514,7 @@ fn png_unfilter(
 }
 
 ///|
-fn filter_paeth(a : Int, b : Int, c : Int) -> Int {
+fn filter_paeth(a : Int32, b : Int32, c : Int32) -> Int32 {
   let pa = (b - c).abs()
   let pb = (a - c).abs()
   let pc = (a - c + (b - c)).abs()

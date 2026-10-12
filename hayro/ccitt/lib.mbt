@@ -52,7 +52,7 @@ pub(all) enum EncodingMode {
   /// Group 3 1D (MH).
   Group3_1D
   /// Group 3 2D (MR).
-  Group3_2D(k~ : UInt)
+  Group3_2D(k~ : UInt32)
 } derive(Eq, Debug)
 
 ///|
@@ -69,13 +69,13 @@ pub extend EncodingMode with @debug.Debug::{to_repr}
 /// Settings to apply during decoding.
 pub(all) struct DecodeSettings {
   /// How many columns the image has (i.e. its width).
-  columns : UInt
+  columns : UInt32
   /// How many rows the image has (i.e. its height).
   ///
   /// In case `end_of_block` has been set to true, decoding will run until
   /// the given number of rows have been decoded, or the `end_of_block` marker
   /// has been encountered, whichever occurs first.
-  rows : UInt
+  rows : UInt32
   /// Whether the stream _MAY_ contain an end-of-block marker
   /// (It doesn't have to. In that case this is set to `true` but there are
   /// no end-of-block markers, hayro-ccitt will still use the value of `rows`
@@ -105,7 +105,7 @@ pub(open) trait Decoder {
   ///
   /// You can assume that this method is only called if the number of already
   /// pushed pixels is a multiple of 8 (i.e. byte-aligned).
-  fn push_pixel_chunk(Self, white : Bool, chunk_count : UInt) -> Unit
+  fn push_pixel_chunk(Self, white : Bool, chunk_count : UInt32) -> Unit
   /// Called when a row has been completed.
   fn next_line(Self) -> Unit
 }
@@ -137,7 +137,7 @@ fn Color::is_white(self : Color) -> Bool {
 ///|
 /// Represents a color change at a specific index in a line.
 priv struct ColorChange {
-  idx : UInt
+  idx : UInt32
   color : Color
 }
 
@@ -155,7 +155,7 @@ pub fn[D : Decoder] decode(
   data : BytesView,
   decoder : D,
   ctx : DecoderContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   ctx.reset()
   let reader = BitReader::new(data)
   match ctx.settings.encoding {
@@ -315,19 +315,19 @@ pub struct DecoderContext {
   /// Color changes in the reference line (previous line).
   priv mut ref_changes : Array[ColorChange]
   /// The minimum index we need to start from when searching for b1.
-  priv mut ref_pos : UInt
+  priv mut ref_pos : UInt32
   /// The current index of b1.
-  priv mut b1_idx : UInt
+  priv mut b1_idx : UInt32
   /// Color changes in the coding line (current line being decoded).
   priv mut coding_changes : Array[ColorChange]
   /// Current position in the coding line (number of pixels decoded).
-  priv mut pixels_decoded : UInt
+  priv mut pixels_decoded : UInt32
   /// The width of a line in pixels (i.e. number of columns).
-  priv mut line_width : UInt
+  priv mut line_width : UInt32
   /// The color of the next run to be decoded.
   priv mut color : Color
   /// How many rows have been decoded so far.
-  priv mut decoded_rows : UInt
+  priv mut decoded_rows : UInt32
   /// The settings to apply during decoding.
   priv settings : DecodeSettings
   /// Whether to invert black and white.
@@ -367,7 +367,7 @@ fn DecoderContext::reset(self : DecoderContext) -> Unit {
 
 ///|
 /// `a0` refers to the first changing element on the current line.
-fn DecoderContext::a0(self : DecoderContext) -> UInt? {
+fn DecoderContext::a0(self : DecoderContext) -> UInt32? {
   if self.pixels_decoded == 0 {
     // If we haven't coded anything yet, a0 conceptually points at the
     // index -1. This is a bit of an edge case, and we therefore require
@@ -381,7 +381,7 @@ fn DecoderContext::a0(self : DecoderContext) -> UInt? {
 
 ///|
 /// Element `idx` of `changes` (upstream `get(idx)`).
-fn change_at(changes : Array[ColorChange], idx : UInt) -> ColorChange? {
+fn change_at(changes : Array[ColorChange], idx : UInt32) -> ColorChange? {
   if idx < changes.length().reinterpret_as_uint() {
     Some(changes[idx.reinterpret_as_int()])
   } else {
@@ -392,7 +392,7 @@ fn change_at(changes : Array[ColorChange], idx : UInt) -> ColorChange? {
 ///|
 /// "The first changing element on the reference line to the right of a0 and
 /// of opposite color to a0."
-fn DecoderContext::b1(self : DecoderContext) -> UInt {
+fn DecoderContext::b1(self : DecoderContext) -> UInt32 {
   match change_at(self.ref_changes, self.b1_idx) {
     Some(c) => c.idx
     None => self.line_width
@@ -401,7 +401,7 @@ fn DecoderContext::b1(self : DecoderContext) -> UInt {
 
 ///|
 /// "The next changing element to the right of b1, on the reference line."
-fn DecoderContext::b2(self : DecoderContext) -> UInt {
+fn DecoderContext::b2(self : DecoderContext) -> UInt32 {
   match change_at(self.ref_changes, self.b1_idx + 1) {
     Some(c) => c.idx
     None => self.line_width
@@ -440,7 +440,7 @@ fn DecoderContext::update_b(self : DecoderContext) -> Unit {
 fn[D : Decoder] DecoderContext::push_pixels(
   self : DecoderContext,
   decoder : D,
-  count : UInt,
+  count : UInt32,
 ) -> Unit {
   // Make sure we don't have too many pixels (for invalid files).
   let count = @cmp.minimum(count, self.line_width - self.pixels_decoded)

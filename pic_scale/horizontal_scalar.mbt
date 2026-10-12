@@ -5,9 +5,9 @@
 ///|
 fn rgba_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   convolve_horizontal_rgba_neon_row_i16(src, src_offset, dst, dst_offset, fw)
@@ -16,9 +16,9 @@ fn rgba_rdm_row(
 ///|
 fn rgb_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   convolve_horizontal_rgb_neon_rdm_row_one(src, src_offset, dst, dst_offset, fw)
@@ -27,9 +27,9 @@ fn rgb_rdm_row(
 ///|
 fn plane_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   convolve_horizontal_plane_neon_rdm_row(src, src_offset, dst, dst_offset, fw)
@@ -38,9 +38,9 @@ fn plane_rdm_row(
 ///|
 fn rgba_q15_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   convolve_horizontal_rgba_neon_row(src, src_offset, dst, dst_offset, fw)
@@ -49,9 +49,9 @@ fn rgba_q15_row(
 ///|
 fn rgb_q15_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   convolve_horizontal_rgb_neon_row_one(src, src_offset, dst, dst_offset, fw)

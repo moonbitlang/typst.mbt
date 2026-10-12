@@ -68,7 +68,7 @@ pub fn memo_check_running_now() -> Bool {
 
 ///|
 /// The number of entries that were checked, and what was found.
-let memo_check_count : Ref[Int] = { val: 0, }
+let memo_check_count : Ref[Int32] = { val: 0, }
 
 ///|
 let memo_check_failures : Array[String] = []
@@ -77,7 +77,7 @@ let memo_check_failures : Array[String] = []
 /// The number of entries checked since the last call, and the failures:
 /// one text per entry whose kept world reads are not the reads of a run
 /// from scratch.
-pub fn take_memo_check_report() -> (Int, Array[String]) {
+pub fn take_memo_check_report() -> (Int32, Array[String]) {
   let count = memo_check_count.val
   let failures = memo_check_failures.copy()
   memo_check_count.val = 0

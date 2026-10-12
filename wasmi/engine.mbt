@@ -8,30 +8,30 @@
 /// The configured limits of the Wasmi executor (upstream `StackConfig`).
 pub(all) struct StackConfig {
   /// The maximum recursion depth.
-  mut max_recursion_depth : Int
+  mut max_recursion_depth : Int32
   /// The minimum (or initial) value stack height.
-  mut min_stack_height : Int
+  mut min_stack_height : Int32
   /// The maximum value stack height.
-  mut max_stack_height : Int
+  mut max_stack_height : Int32
   /// The maximum number of cached stacks for reuse.
-  mut max_cached_stacks : Int
+  mut max_cached_stacks : Int32
 }
 
 ///|
 /// The default maximum recursion depth.
-let default_max_recursion_depth : Int = 1000
+let default_max_recursion_depth : Int32 = 1000
 
 ///|
 /// The default minimum (or initial) value stack height.
-let default_min_stack_height : Int = 1_000
+let default_min_stack_height : Int32 = 1_000
 
 ///|
 /// The default maximum value stack height.
-let default_max_stack_height : Int = 1_000_000
+let default_max_stack_height : Int32 = 1_000_000
 
 ///|
 /// The default maximum number of cached stacks for reuse.
-let default_max_cached_stacks : Int = 2
+let default_max_cached_stacks : Int32 = 2
 
 ///|
 pub fn StackConfig::default() -> StackConfig {
@@ -44,17 +44,17 @@ pub fn StackConfig::default() -> StackConfig {
 }
 
 ///|
-pub fn StackConfig::max_recursion_depth(self : StackConfig) -> Int {
+pub fn StackConfig::max_recursion_depth(self : StackConfig) -> Int32 {
   self.max_recursion_depth
 }
 
 ///|
-pub fn StackConfig::min_stack_height(self : StackConfig) -> Int {
+pub fn StackConfig::min_stack_height(self : StackConfig) -> Int32 {
   self.min_stack_height
 }
 
 ///|
-pub fn StackConfig::max_stack_height(self : StackConfig) -> Int {
+pub fn StackConfig::max_stack_height(self : StackConfig) -> Int32 {
   self.max_stack_height
 }
 
@@ -65,15 +65,15 @@ pub fn StackConfig::max_stack_height(self : StackConfig) -> Int {
 /// An error that can occur upon parsing or compiling a Wasm module when
 /// [`EnforcedLimits`] are set.
 pub(all) enum EnforcedLimitsError {
-  TooManyGlobals(limit~ : UInt)
-  TooManyTables(limit~ : UInt)
-  TooManyFunctions(limit~ : UInt)
-  TooManyMemories(limit~ : UInt)
-  TooManyElementSegments(limit~ : UInt)
-  TooManyDataSegments(limit~ : UInt)
-  TooManyParameters(limit~ : Int)
-  TooManyResults(limit~ : Int)
-  MinAvgBytesPerFunction(limit~ : UInt, avg~ : UInt)
+  TooManyGlobals(limit~ : UInt32)
+  TooManyTables(limit~ : UInt32)
+  TooManyFunctions(limit~ : UInt32)
+  TooManyMemories(limit~ : UInt32)
+  TooManyElementSegments(limit~ : UInt32)
+  TooManyDataSegments(limit~ : UInt32)
+  TooManyParameters(limit~ : Int32)
+  TooManyResults(limit~ : Int32)
+  MinAvgBytesPerFunction(limit~ : UInt32, avg~ : UInt32)
 }
 
 ///|
@@ -114,8 +114,8 @@ pub extend EnforcedLimitsError with Show::{to_string, output}
 ///|
 /// The required minimum average number of bytes per function.
 pub(all) struct AvgBytesPerFunctionLimit {
-  req_funcs_bytes : UInt
-  min_avg_bytes_per_function : UInt
+  req_funcs_bytes : UInt32
+  min_avg_bytes_per_function : UInt32
 }
 
 ///|
@@ -123,14 +123,14 @@ pub(all) struct AvgBytesPerFunctionLimit {
 ///
 /// By default no limits are enforced.
 pub(all) struct EnforcedLimits {
-  max_globals : UInt?
-  max_functions : UInt?
-  max_tables : UInt?
-  max_element_segments : UInt?
-  max_memories : UInt?
-  max_data_segments : UInt?
-  max_params : Int?
-  max_results : Int?
+  max_globals : UInt32?
+  max_functions : UInt32?
+  max_tables : UInt32?
+  max_element_segments : UInt32?
+  max_memories : UInt32?
+  max_data_segments : UInt32?
+  max_params : Int32?
+  max_results : Int32?
   min_avg_bytes_per_function : AvgBytesPerFunctionLimit?
 }
 
@@ -313,8 +313,8 @@ pub fn Config::wasm_features(self : Config) -> @wasmparser.WasmFeatures {
 /// of that engine (upstream `GuardedEntity<EngineIdx, DedupFuncTypeIdx>`).
 #valtype
 pub struct DedupFuncType {
-  priv guard_idx : Int
-  priv entity_idx : Int
+  priv guard_idx : Int32
+  priv entity_idx : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -335,7 +335,10 @@ pub extend DedupFuncType with @debug.Debug::{to_repr}
 ///|
 /// Returns the entity index if the guard index matches (upstream
 /// `GuardedEntity::entity_index`).
-fn DedupFuncType::entity_index(self : DedupFuncType, guard_index : Int) -> Int? {
+fn DedupFuncType::entity_index(
+  self : DedupFuncType,
+  guard_index : Int32,
+) -> Int32? {
   if self.guard_idx != guard_index {
     return None
   }
@@ -350,22 +353,22 @@ priv struct FuncTypeRegistry {
   /// # Note
   ///
   /// This is used to guard against invalid entity indices.
-  engine_idx : Int
+  engine_idx : Int32
   /// Deduplicated function types, keyed by their structure.
-  dedup : Map[String, Int]
+  dedup : Map[String, Int32]
   /// The registered function types.
   func_types : Array[@wasmi_core.FuncType]
 }
 
 ///|
 /// Creates a new [`FuncTypeRegistry`] using the given engine index.
-fn FuncTypeRegistry::new(engine_idx : Int) -> FuncTypeRegistry {
+fn FuncTypeRegistry::new(engine_idx : Int32) -> FuncTypeRegistry {
   { engine_idx, dedup: Map([]), func_types: [], }
 }
 
 ///|
 /// The panic message for an entity that another engine allocated.
-fn foreign_func_type_message(engine_idx : Int) -> String {
+fn foreign_func_type_message(engine_idx : Int32) -> String {
   "encountered foreign entity in func type registry: \{engine_idx}"
 }
 
@@ -378,7 +381,7 @@ fn foreign_func_type_message(engine_idx : Int) -> String {
 fn FuncTypeRegistry::unwrap_index(
   self : FuncTypeRegistry,
   func_type : DedupFuncType,
-) -> Int {
+) -> Int32 {
   match func_type.entity_index(self.engine_idx) {
     Some(index) => index
     None => abort(foreign_func_type_message(self.engine_idx))
@@ -491,7 +494,7 @@ pub fn BlockType::func_type(func_type : DedupFuncType) -> BlockType {
 
 ///|
 /// Returns the number of parameters of the [`BlockType`].
-pub fn BlockType::len_params(self : BlockType, engine : EngineWeak) -> Int {
+pub fn BlockType::len_params(self : BlockType, engine : EngineWeak) -> Int32 {
   match self {
     Empty | Returns(_) => 0
     FuncType(func_type) => engine.resolve_func_type(func_type).len_params()
@@ -500,7 +503,7 @@ pub fn BlockType::len_params(self : BlockType, engine : EngineWeak) -> Int {
 
 ///|
 /// Returns the number of results of the [`BlockType`].
-pub fn BlockType::len_results(self : BlockType, engine : EngineWeak) -> Int {
+pub fn BlockType::len_results(self : BlockType, engine : EngineWeak) -> Int32 {
   match self {
     Empty => 0
     Returns(_) => 1
@@ -532,7 +535,7 @@ pub fn BlockType::func_type_of(
 
 ///|
 /// A reference to a compiled function stored in the [`CodeMap`] of an [`Engine`].
-pub(all) struct EngineFunc(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct EngineFunc(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -569,8 +572,8 @@ pub fn EngineFunc::to_internal(self : EngineFunc) -> @ir.InternalFunc {
 ///|
 /// A span of contiguous [`EngineFunc`] references.
 pub(all) struct EngineFuncSpan {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -581,13 +584,13 @@ pub fn EngineFuncSpan::empty() -> EngineFuncSpan {
 
 ///|
 /// Returns the number of [`EngineFunc`] in `self`.
-pub fn EngineFuncSpan::len(self : EngineFuncSpan) -> Int {
+pub fn EngineFuncSpan::len(self : EngineFuncSpan) -> Int32 {
   self.end - self.start
 }
 
 ///|
 /// Returns the n-th [`EngineFunc`] in `self`, if any.
-pub fn EngineFuncSpan::get(self : EngineFuncSpan, n : Int) -> EngineFunc? {
+pub fn EngineFuncSpan::get(self : EngineFuncSpan, n : Int32) -> EngineFunc? {
   if n < 0 || n >= self.len() {
     return None
   }
@@ -599,7 +602,7 @@ pub fn EngineFuncSpan::get(self : EngineFuncSpan, n : Int) -> EngineFunc? {
 pub fn EngineFuncSpan::position(
   self : EngineFuncSpan,
   func : EngineFunc,
-) -> Int? {
+) -> Int32? {
   if func.0 < self.start || func.0 >= self.end {
     return None
   }
@@ -610,7 +613,7 @@ pub fn EngineFuncSpan::position(
 /// Returns the n-th [`EngineFunc`] in `self`, panicking if out of bounds.
 pub fn EngineFuncSpan::get_or_panic(
   self : EngineFuncSpan,
-  n : Int,
+  n : Int32,
 ) -> EngineFunc {
   match self.get(n) {
     Some(f) => f
@@ -660,7 +663,7 @@ pub(all) struct CompiledFuncEntity {
   ///
   /// This includes registers to store the function local constant values,
   /// function parameters, function locals and dynamically used registers.
-  len_stack_slots : Int
+  len_stack_slots : Int32
 }
 
 ///|
@@ -671,7 +674,7 @@ pub(all) struct CompiledFuncEntity {
 /// - If `instrs` is empty.
 /// - If `instrs` contains more than `i32::MAX` instructions.
 pub fn CompiledFuncEntity::new(
-  len_stack_slots : Int,
+  len_stack_slots : Int32,
   instrs : FixedArray[@ir.Op],
   consts : Array[@wasmi_core.UntypedVal],
 ) -> CompiledFuncEntity {
@@ -691,7 +694,7 @@ pub fn CompiledFuncEntity::instrs(
 
 ///|
 /// Returns the number of stack slots used by the compiled function.
-pub fn CompiledFuncEntity::len_stack_slots(self : CompiledFuncEntity) -> Int {
+pub fn CompiledFuncEntity::len_stack_slots(self : CompiledFuncEntity) -> Int32 {
   self.len_stack_slots
 }
 
@@ -721,7 +724,7 @@ fn CodeMap::new(config : Config) -> CodeMap {
 
 ///|
 /// Allocates `amount` new uninitialized [`EngineFunc`] to the [`CodeMap`].
-fn CodeMap::alloc_funcs(self : CodeMap, amount : Int) -> EngineFuncSpan {
+fn CodeMap::alloc_funcs(self : CodeMap, amount : Int32) -> EngineFuncSpan {
   let start = self.funcs.length()
   for _ in 0..<amount {
     self.funcs.push(Uninit)
@@ -862,7 +865,7 @@ fn UncompiledFuncEntity::compile(
 
 ///|
 /// The global counter of engines (upstream `EngineIdx::new`).
-let engine_counter : Ref[Int] = { val: 0, }
+let engine_counter : Ref[Int32] = { val: 0, }
 
 ///|
 /// The Wasmi interpreter.
@@ -969,7 +972,7 @@ pub fn Engine::resolve_func_type(
 
 ///|
 /// Allocates `amount` new uninitialized [`EngineFunc`] to the [`CodeMap`].
-pub fn Engine::alloc_funcs(self : Engine, amount : Int) -> EngineFuncSpan {
+pub fn Engine::alloc_funcs(self : Engine, amount : Int32) -> EngineFuncSpan {
   self.code_map.alloc_funcs(amount)
 }
 
@@ -991,7 +994,7 @@ pub fn Engine::translate_func(
   self : Engine,
   func_index : FuncIdx,
   engine_func : EngineFunc,
-  offset : Int,
+  offset : Int32,
   bytes : BytesView,
   module_ : ModuleHeader,
   func_to_validate : @wasmparser.FuncToValidate?,

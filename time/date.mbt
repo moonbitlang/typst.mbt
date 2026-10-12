@@ -9,7 +9,7 @@ pub struct Date {
   // |   1 bit    |        21 bits        |     1 bit     |  9 bits   |
   // | unassigned |         year          | is leap year? |  ordinal  |
   // The year is 15 bits when `large-dates` is not enabled.
-  priv value : Int
+  priv value : Int32
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
@@ -31,7 +31,7 @@ pub extend Date with Hash::{hash, hash_combine}
 pub extend Date with @debug.Debug::{to_repr}
 
 ///|
-let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int]] = [
+let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int32]] = [
   [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
   [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335],
 ]
@@ -39,14 +39,14 @@ let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int]] = [
 ///|
 /// Construct a `Date` from its internal representation, the validity of which
 /// must be guaranteed by the caller.
-fn Date::from_parts(year : Int, is_leap_year : Bool, ordinal : Int) -> Date {
+fn Date::from_parts(year : Int32, is_leap_year : Bool, ordinal : Int32) -> Date {
   { value: (year << 10) | ((if is_leap_year { 1 } else { 0 }) << 9) | ordinal, }
 }
 
 ///|
 /// Construct a `Date` from the year and ordinal values, the validity of which
 /// must be guaranteed by the caller.
-fn Date::from_ordinal_date_unchecked(year : Int, ordinal : Int) -> Date {
+fn Date::from_ordinal_date_unchecked(year : Int32, ordinal : Int32) -> Date {
   Date::from_parts(year, range_validated_is_leap_year(year), ordinal)
 }
 
@@ -72,7 +72,7 @@ pub fn Date::maximum() -> Date {
 }
 
 ///|
-fn ensure_year_ranged(year : Int) -> Unit raise ComponentRange {
+fn ensure_year_ranged(year : Int32) -> Unit raise ComponentRange {
   if year < MIN_YEAR || year > MAX_YEAR {
     raise ComponentRange::unconditional("year")
   }
@@ -81,15 +81,15 @@ fn ensure_year_ranged(year : Int) -> Unit raise ComponentRange {
 ///|
 /// Attempt to create a `Date` from the year, month, and day.
 pub fn Date::from_calendar_date(
-  year : Int,
+  year : Int32,
   month : Month,
-  day : Int,
+  day : Int32,
 ) -> Date raise ComponentRange {
   ensure_year_ranged(year)
   let is_leap_year = range_validated_is_leap_year(year)
   match day {
-    1..=28 => ()
-    29..=31 if day <= days_in_month_leap(month.number(), is_leap_year) => ()
+    1..<=28 => ()
+    29..<=31 if day <= days_in_month_leap(month.number(), is_leap_year) => ()
     _ => raise ComponentRange::conditional("day")
   }
   Date::from_parts(
@@ -104,13 +104,13 @@ pub fn Date::from_calendar_date(
 ///|
 /// Attempt to create a `Date` from the year and ordinal day number.
 pub fn Date::from_ordinal_date(
-  year : Int,
-  ordinal : Int,
+  year : Int32,
+  ordinal : Int32,
 ) -> Date raise ComponentRange {
   ensure_year_ranged(year)
   let is_leap_year = range_validated_is_leap_year(year)
   match ordinal {
-    1..=365 => ()
+    1..<=365 => ()
     366 if is_leap_year => ()
     _ => raise ComponentRange::conditional("ordinal")
   }
@@ -120,13 +120,13 @@ pub fn Date::from_ordinal_date(
 ///|
 /// Attempt to create a `Date` from the ISO year, week, and weekday.
 pub fn Date::from_iso_week_date(
-  year : Int,
-  week : Int,
+  year : Int32,
+  week : Int32,
   weekday : Weekday,
 ) -> Date raise ComponentRange {
   ensure_year_ranged(year)
   match week {
-    1..=52 => ()
+    1..<=52 => ()
     53 if week <= weeks_in_year(year) => ()
     _ => raise ComponentRange::conditional("week")
   }
@@ -166,7 +166,7 @@ pub fn Date::from_iso_week_date(
 
 ///|
 /// Create a `Date` from the Julian day number.
-pub fn Date::from_julian_day(julian_day : Int) -> Date raise ComponentRange {
+pub fn Date::from_julian_day(julian_day : Int32) -> Date raise ComponentRange {
   if julian_day < date_min.to_julian_day() ||
     julian_day > date_max.to_julian_day() {
     raise ComponentRange::unconditional("julian_day")
@@ -177,15 +177,15 @@ pub fn Date::from_julian_day(julian_day : Int) -> Date raise ComponentRange {
 ///|
 /// Create a `Date` from the Julian day number, the validity of which must be
 /// guaranteed by the caller.
-fn Date::from_julian_day_unchecked(julian_day : Int) -> Date {
-  let eras : UInt = 5_949
+fn Date::from_julian_day_unchecked(julian_day : Int32) -> Date {
+  let eras : UInt32 = 5_949
   // Rata Die shift:
-  let d_shift : UInt = 146097U * eras - 1_721_060U
+  let d_shift : UInt32 = 146097U * eras - 1_721_060U
   // Year shift:
-  let y_shift : UInt = 400U * eras
-  let cen_mul : UInt = ((4UL << 47) / 146_097UL).to_uint()
-  let jul_mul : UInt = ((4UL << 40) / 1_461UL + 1UL).to_uint()
-  let cen_cut : UInt = ((365UL << 32) / 36_525UL).to_uint()
+  let y_shift : UInt32 = 400U * eras
+  let cen_mul : UInt32 = ((4UL << 47) / 146_097UL).to_uint()
+  let jul_mul : UInt32 = ((4UL << 40) / 1_461UL + 1UL).to_uint()
+  let cen_cut : UInt32 = ((365UL << 32) / 36_525UL).to_uint()
   let day = julian_day.reinterpret_as_uint() + d_shift
   let c_n = (day.to_uint64() * cen_mul.to_uint64()) >> 15
   let cen = (c_n >> 32).to_uint()
@@ -210,7 +210,7 @@ fn Date::is_in_leap_year(self : Date) -> Bool {
 
 ///|
 /// Get the year of the date.
-pub fn Date::year(self : Date) -> Int {
+pub fn Date::year(self : Date) -> Int32 {
   self.value >> 10
 }
 
@@ -223,20 +223,20 @@ pub fn Date::month(self : Date) -> Month {
 ///|
 /// Get the day of the month. The returned value will always be in the range
 /// `1..=31`.
-pub fn Date::day(self : Date) -> Int {
+pub fn Date::day(self : Date) -> Int32 {
   self.to_calendar_date().2
 }
 
 ///|
 /// Get the day of the year. The returned value will always be in the range
 /// `1..=366` (`1..=365` for common years).
-pub fn Date::ordinal(self : Date) -> Int {
+pub fn Date::ordinal(self : Date) -> Int32 {
   self.value & 0x1FF
 }
 
 ///|
 /// Get the ISO 8601 year and week number.
-fn Date::iso_year_week(self : Date) -> (Int, Int) {
+fn Date::iso_year_week(self : Date) -> (Int32, Int32) {
   let (year, ordinal) = self.to_ordinal_date()
   match (ordinal + 10 - self.weekday().number_from_monday()) / 7 {
     0 => (year - 1, weeks_in_year(year - 1))
@@ -248,27 +248,27 @@ fn Date::iso_year_week(self : Date) -> (Int, Int) {
 ///|
 /// Get the ISO week number. The returned value will always be in the range
 /// `1..=53`.
-pub fn Date::iso_week(self : Date) -> Int {
+pub fn Date::iso_week(self : Date) -> Int32 {
   self.iso_year_week().1
 }
 
 ///|
 /// Get the week number where week 1 begins on the first Sunday. The returned
 /// value will always be in the range `0..=53`.
-pub fn Date::sunday_based_week(self : Date) -> Int {
+pub fn Date::sunday_based_week(self : Date) -> Int32 {
   (self.ordinal() - self.weekday().number_days_from_sunday() + 6) / 7
 }
 
 ///|
 /// Get the week number where week 1 begins on the first Monday. The returned
 /// value will always be in the range `0..=53`.
-pub fn Date::monday_based_week(self : Date) -> Int {
+pub fn Date::monday_based_week(self : Date) -> Int32 {
   (self.ordinal() - self.weekday().number_days_from_monday() + 6) / 7
 }
 
 ///|
 /// Get the year, month, and day.
-pub fn Date::to_calendar_date(self : Date) -> (Int, Month, Int) {
+pub fn Date::to_calendar_date(self : Date) -> (Int32, Month, Int32) {
   let (year, ordinal) = self.to_ordinal_date()
   let jan_feb_len = 59 + (if self.is_in_leap_year() { 1 } else { 0 })
   let (month_adj, ordinal_adj) = if ordinal <= jan_feb_len {
@@ -286,13 +286,13 @@ pub fn Date::to_calendar_date(self : Date) -> (Int, Month, Int) {
 
 ///|
 /// Get the year and ordinal day number.
-pub fn Date::to_ordinal_date(self : Date) -> (Int, Int) {
+pub fn Date::to_ordinal_date(self : Date) -> (Int32, Int32) {
   (self.year(), self.ordinal())
 }
 
 ///|
 /// Get the ISO 8601 year, week number, and weekday.
-pub fn Date::to_iso_week_date(self : Date) -> (Int, Int, Weekday) {
+pub fn Date::to_iso_week_date(self : Date) -> (Int32, Int32, Weekday) {
   let (year, week) = self.iso_year_week()
   (year, week, self.weekday())
 }
@@ -343,7 +343,7 @@ pub fn Date::previous_day(self : Date) -> Date? {
 
 ///|
 /// Get the Julian day for the date.
-pub fn Date::to_julian_day(self : Date) -> Int {
+pub fn Date::to_julian_day(self : Date) -> Int32 {
   let (year, ordinal) = self.to_ordinal_date()
   // The algorithm requires a non-negative year. Add the lowest value to make it so. This is
   // adjusted for at the end with the final subtraction.
@@ -356,12 +356,12 @@ pub fn Date::to_julian_day(self : Date) -> Int {
 }
 
 ///|
-fn Date::add_days_unchecked(self : Date, days : Int) -> Date {
+fn Date::add_days_unchecked(self : Date, days : Int32) -> Date {
   { value: self.value + days, }
 }
 
 ///|
-fn checked_add_i32(a : Int, b : Int) -> Int? {
+fn checked_add_i32(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() + b.to_int64()
   if r < -2147483648L || r > 2147483647L {
     None
@@ -429,7 +429,7 @@ pub fn Date::checked_sub(self : Date, duration : Duration) -> Date? {
 }
 
 ///|
-fn checked_sub_i32(a : Int, b : Int) -> Int? {
+fn checked_sub_i32(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() - b.to_int64()
   if r < -2147483648L || r > 2147483647L {
     None
@@ -481,9 +481,9 @@ pub fn Date::with_time(self : Date, time : Time) -> PrimitiveDateTime {
 /// provided time.
 pub fn Date::with_hms(
   self : Date,
-  hour : Int,
-  minute : Int,
-  second : Int,
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
 ) -> PrimitiveDateTime raise ComponentRange {
   PrimitiveDateTime::new(self, Time::from_hms(hour, minute, second))
 }

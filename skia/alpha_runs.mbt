@@ -9,12 +9,12 @@
 /// Sparseness allows us to independently compose several paths into the
 /// same AlphaRuns buffer.
 priv struct AlphaRuns {
-  runs : FixedArray[Int]
-  alpha : FixedArray[Int]
+  runs : FixedArray[Int32]
+  alpha : FixedArray[Int32]
 }
 
 ///|
-fn AlphaRuns::new(width : Int) -> AlphaRuns {
+fn AlphaRuns::new(width : Int32) -> AlphaRuns {
   let runs : AlphaRuns = {
     runs: FixedArray::make(width + 1, 0),
     alpha: FixedArray::make(width + 1, 0),
@@ -25,7 +25,7 @@ fn AlphaRuns::new(width : Int) -> AlphaRuns {
 
 ///|
 /// Returns 0-255 given 0-256.
-fn AlphaRuns::catch_overflow(alpha : Int) -> Int {
+fn AlphaRuns::catch_overflow(alpha : Int32) -> Int32 {
   (alpha - (alpha >> 8)) & 0xFF
 }
 
@@ -42,7 +42,7 @@ fn AlphaRuns::is_empty(self : AlphaRuns) -> Bool {
 
 ///|
 /// Reinitialize for a new scanline.
-fn AlphaRuns::reset(self : AlphaRuns, width : Int) -> Unit {
+fn AlphaRuns::reset(self : AlphaRuns, width : Int32) -> Unit {
   self.runs[0] = width & 0xFFFF
   self.runs[width] = 0
   self.alpha[0] = 0
@@ -64,13 +64,13 @@ fn AlphaRuns::reset(self : AlphaRuns, width : Int) -> Unit {
 /// offset_x should be 0 when this is called.
 fn AlphaRuns::add(
   self : AlphaRuns,
-  x : Int,
-  start_alpha : Int,
-  middle_count : Int,
-  stop_alpha : Int,
-  max_value : Int,
-  offset_x : Int,
-) -> Int {
+  x : Int32,
+  start_alpha : Int32,
+  middle_count : Int32,
+  stop_alpha : Int32,
+  max_value : Int32,
+  offset_x : Int32,
+) -> Int32 {
   let mut x = x
   let mut middle_count = middle_count
   let mut runs_offset = offset_x
@@ -135,12 +135,12 @@ fn AlphaRuns::add(
 /// Allows add() to sum another run to some of the new sub-runs.
 /// i.e. adding ..CCCCC. would produce AADDEEEB, rle as A2D2E3B1.
 fn AlphaRuns::break_run(
-  runs : FixedArray[Int],
-  runs_base : Int,
-  alpha : FixedArray[Int],
-  alpha_base : Int,
-  x : Int,
-  count : Int,
+  runs : FixedArray[Int32],
+  runs_base : Int32,
+  alpha : FixedArray[Int32],
+  alpha_base : Int32,
+  x : Int32,
+  count : Int32,
 ) -> Unit {
   let orig_x = x
   let mut x = x
@@ -185,11 +185,11 @@ fn AlphaRuns::break_run(
 /// Used by the RectClipBlitter to trim a RLE encoding to match the
 /// clipping rectangle.
 fn AlphaRuns::break_at(
-  alpha : FixedArray[Int],
-  alpha_base : Int,
-  runs : FixedArray[Int],
-  runs_base : Int,
-  x : Int,
+  alpha : FixedArray[Int32],
+  alpha_base : Int32,
+  runs : FixedArray[Int32],
+  runs_base : Int32,
+  x : Int32,
 ) -> Unit {
   let mut x = x
   let mut alpha_i = alpha_base

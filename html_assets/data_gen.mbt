@@ -1473,7 +1473,7 @@ pub fn attrs() -> Array[AttrInfo] {
 
 ///|
 /// The first `ATTRS_GLOBAL` attributes in `ATTRS` apply to all elements.
-pub let attrs_global : Int = 76
+pub let attrs_global : Int32 = 76
 
 ///|
 fn attr_strings_0(out : Array[(String, String)]) -> Unit {

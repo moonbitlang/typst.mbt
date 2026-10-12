@@ -1,7 +1,7 @@
 // Expected outputs were produced by upstream Typst (ciborium 0.2.2).
 
 ///|
-fn decode_err(bytes : Array[Int]) -> String {
+fn decode_err(bytes : Array[Int32]) -> String {
   let data = Bytes::from_array(bytes.map(b => b.to_byte()))
   try @cbor.from_slice(data) catch {
     err => err.message()
@@ -11,7 +11,7 @@ fn decode_err(bytes : Array[Int]) -> String {
 }
 
 ///|
-fn decode(bytes : Array[Int]) -> @serde.Data {
+fn decode(bytes : Array[Int32]) -> @serde.Data {
   let data = Bytes::from_array(bytes.map(b => b.to_byte()))
   @cbor.from_slice(data) catch {
     err => abort(err.message())

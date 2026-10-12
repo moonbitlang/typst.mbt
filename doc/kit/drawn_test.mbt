@@ -7,7 +7,7 @@
 ///|
 /// Something that is drawn on a page.
 priv struct Drawn {
-  page : Int
+  page : Int32
   /// `"box"`: a filled or outlined shape, by the box around its outline;
   /// `"line"`: a straight line, `w` and `h` its end from its start;
   /// `"text"`: a text run, `y` its baseline, `w` its width, `h` its size.
@@ -80,7 +80,7 @@ fn collect_drawn(
   frame : @library.Frame,
   dx : Double,
   dy : Double,
-  page : Int,
+  page : Int32,
   out : Array[Drawn],
 ) -> Unit {
   for entry in frame.items() {
@@ -279,7 +279,7 @@ fn collect_painted(
 /// What page `page` (from 1) of a compiled document paints, in its order.
 fn painted(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page? : Int = 1,
+  page~ : Int32 = 1,
 ) -> String raise {
   let out = []
   collect_painted(report.unwrap().pages()[page - 1].frame, 0.0, 0.0, "", out)

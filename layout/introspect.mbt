@@ -8,7 +8,7 @@ pub struct PagedIntrospector {
   /// Locations that are linked to via `FrameItem::Link`.
   priv frame_link_targets : @hashset.HashSet[@library.Location]
   /// The number of pages in the document.
-  priv pages : Int
+  priv pages : Int32
   /// The page numberings, indexed by page number minus 1.
   priv page_numberings : Array[@library.Numbering?]
   /// The page supplements, indexed by page number minus 1.
@@ -257,7 +257,7 @@ fn PagedIntrospectorBuilder::new() -> PagedIntrospectorBuilder {
 /// list of top-level pairs.
 fn PagedIntrospectorBuilder::finish(
   self : PagedIntrospectorBuilder,
-  pages : Int,
+  pages : Int32,
   page_numberings : Array[@library.Numbering?],
   page_supplements : Array[@library.Content],
 ) -> PagedIntrospector {

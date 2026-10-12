@@ -69,7 +69,7 @@ pub fn Pdf::new_with_password(
 
 ///|
 /// Return the number of objects present in the PDF file.
-pub fn Pdf::len(self : Pdf) -> Int {
+pub fn Pdf::len(self : Pdf) -> Int32 {
   self.xref.len()
 }
 

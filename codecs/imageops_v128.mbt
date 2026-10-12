@@ -6,7 +6,7 @@
 ///|
 /// Four consecutive `Float`s of `a` starting at `i` (in bounds) as `f32x4`.
 #inline
-fn gather_f32x4(a : FixedArray[Float], i : Int) -> V128 {
+fn gather_f32x4(a : FixedArray[Float], i : Int32) -> V128 {
   let v = @v128.f32x4_splat(a.unsafe_get(i))
   let v = @v128.f32x4_replace_lane(v, a.unsafe_get(i + 1), 1)
   let v = @v128.f32x4_replace_lane(v, a.unsafe_get(i + 2), 2)
@@ -16,7 +16,7 @@ fn gather_f32x4(a : FixedArray[Float], i : Int) -> V128 {
 ///|
 /// Stores the four lanes of `v` at `a[i..i + 4]` (in bounds).
 #inline
-fn scatter_f32x4(a : FixedArray[Float], i : Int, v : V128) -> Unit {
+fn scatter_f32x4(a : FixedArray[Float], i : Int32, v : V128) -> Unit {
   a.unsafe_set(i, @v128.f32x4_extract_lane(v, 0))
   a.unsafe_set(i + 1, @v128.f32x4_extract_lane(v, 1))
   a.unsafe_set(i + 2, @v128.f32x4_extract_lane(v, 2))
@@ -30,9 +30,9 @@ fn scatter_f32x4(a : FixedArray[Float], i : Int, v : V128) -> Unit {
 fn vertical_sample_row(
   image : FixedArray[Float],
   out : FixedArray[Float],
-  row_len : Int,
-  out_base : Int,
-  left : Int,
+  row_len : Int32,
+  out_base : Int32,
+  left : Int32,
   ws : Array[Float],
 ) -> Unit {
   let n = ws.length()
@@ -107,8 +107,8 @@ fn vertical_sample_row(
 /// (with 3, lane 3 sums the next pixel's first sample and is ignored).
 fn horizontal_sample_sums(
   image : FixedArray[Float],
-  start : Int,
-  channels : Int,
+  start : Int32,
+  channels : Int32,
   ws : Array[Float],
   t : FixedArray[Float],
 ) -> Unit {
@@ -150,10 +150,10 @@ fn horizontal_sample_sums(
 fn vertical_sample_ranges_ok(
   image : FixedArray[Float],
   out : FixedArray[Float],
-  row_len : Int,
-  out_base : Int,
-  left : Int,
-  n : Int,
+  row_len : Int32,
+  out_base : Int32,
+  left : Int32,
+  n : Int32,
 ) -> Bool {
   n > 0 &&
   row_len > 0 &&
@@ -169,9 +169,9 @@ fn vertical_sample_ranges_ok(
 /// channels.
 fn horizontal_sums_ranges_ok(
   image : FixedArray[Float],
-  start : Int,
-  channels : Int,
-  n : Int,
+  start : Int32,
+  channels : Int32,
+  n : Int32,
   t : FixedArray[Float],
 ) -> Bool {
   (channels == 3 || channels == 4) &&

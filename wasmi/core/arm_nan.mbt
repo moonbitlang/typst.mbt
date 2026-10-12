@@ -13,18 +13,18 @@
 // - the default NaN (positive, quiet, zero payload) for invalid operations.
 
 ///|
-let f32_default_nan_bits : UInt = 0x7FC0_0000
+let f32_default_nan_bits : UInt32 = 0x7FC0_0000
 
 ///|
 let f64_default_nan_bits : UInt64 = 0x7FF8_0000_0000_0000
 
 ///|
-fn f32_is_nan_bits(bits : UInt) -> Bool {
+fn f32_is_nan_bits(bits : UInt32) -> Bool {
   (bits & 0x7FFF_FFFF) > 0x7F80_0000
 }
 
 ///|
-fn f32_is_snan_bits(bits : UInt) -> Bool {
+fn f32_is_snan_bits(bits : UInt32) -> Bool {
   f32_is_nan_bits(bits) && (bits & 0x0040_0000) == 0
 }
 

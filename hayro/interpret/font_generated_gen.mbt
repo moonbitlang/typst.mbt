@@ -256,7 +256,7 @@ fn mac_roman_get(code : Byte) -> String? {
 ///|
 /// Inverse of the mac_roman table.
 /// Sorted by key in MoonBit `String` order (for binary search).
-let mac_roman_inverse_table : ReadOnlyArray[(String, Int)] = [
+let mac_roman_inverse_table : ReadOnlyArray[(String, Int32)] = [
   ("A", 65),
   ("B", 66),
   ("C", 67),
@@ -505,7 +505,7 @@ fn mac_os_roman_get(code : Byte) -> String? {
 ///|
 /// Inverse of the mac_os_roman table.
 /// Sorted by key in MoonBit `String` order (for binary search).
-let mac_os_roman_inverse_table : ReadOnlyArray[(String, Int)] = [
+let mac_os_roman_inverse_table : ReadOnlyArray[(String, Int32)] = [
   ("pi", 0),
   ("Euro", 0),
   ("Delta", 0),

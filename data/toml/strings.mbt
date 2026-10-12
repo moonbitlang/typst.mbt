@@ -21,7 +21,7 @@ fn basic_string(i : Input) -> String raise ErrMode {
 ///|
 /// `basic-unescaped = wschar / %x21 / %x23-5B / %x5D-7E / non-ascii`
 /// (also `mlb-unescaped`)
-fn is_basic_unescaped(b : Int) -> Bool {
+fn is_basic_unescaped(b : Int32) -> Bool {
   is_wschar(b) ||
   b == 0x21 ||
   (b >= 0x23 && b <= 0x5B) ||
@@ -85,12 +85,12 @@ fn escape_seq_char(i : Input) -> Char raise ErrMode {
 
 ///|
 /// `HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"` (either case)
-fn is_hexdig(b : Int) -> Bool {
+fn is_hexdig(b : Int32) -> Bool {
   is_digit(b) || (b >= 'A' && b <= 'F') || (b >= 'a' && b <= 'f')
 }
 
 ///|
-fn hex_value(b : Int) -> Int {
+fn hex_value(b : Int32) -> Int32 {
   if is_digit(b) {
     b - '0'
   } else if b >= 'a' {
@@ -102,7 +102,7 @@ fn hex_value(b : Int) -> Int {
 
 ///|
 /// `hexescape::<N>`
-fn hexescape(i : Input, n : Int) -> Char raise ErrMode {
+fn hexescape(i : Input, n : Int32) -> Char raise ErrMode {
   let start = take_while_m_n(i, 0, n, is_hexdig)
   if i.pos - start != n {
     raise map_failure(i, start, None)
@@ -163,7 +163,7 @@ fn ml_basic_body(i : Input) -> String raise ErrMode {
 
 ///|
 /// `none_of(q)`.
-fn none_of_quote(i : Input, q : Int) -> Int raise ErrMode {
+fn none_of_quote(i : Input, q : Int32) -> Int32 raise ErrMode {
   one_of(i, b => b != q)
 }
 
@@ -192,7 +192,7 @@ fn mlb_content(i : Input) -> String raise ErrMode {
 /// then one, each followed by `term`.
 fn mlb_quotes(
   i : Input,
-  q : Int,
+  q : Int32,
   term : (Input) -> Unit raise ErrMode,
 ) -> String raise ErrMode {
   let start = i.pos
@@ -225,7 +225,7 @@ fn mlb_escaped_nl(i : Input) -> Unit raise ErrMode {
 
 ///|
 /// `literal-char = %x09 / %x20-26 / %x28-7E / non-ascii` (also `mll-char`)
-fn is_literal_char(b : Int) -> Bool {
+fn is_literal_char(b : Int32) -> Bool {
   b == 0x09 ||
   (b >= 0x20 && b <= 0x26) ||
   (b >= 0x28 && b <= 0x7E) ||

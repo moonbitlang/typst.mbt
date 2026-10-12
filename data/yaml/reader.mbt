@@ -8,14 +8,14 @@
 
 ///|
 /// `INPUT_RAW_BUFFER_SIZE`.
-const INPUT_RAW_BUFFER_SIZE : Int = 16384
+const INPUT_RAW_BUFFER_SIZE : Int32 = 16384
 
 ///|
 /// `yaml_parser_set_reader_error`.
 fn Parser::set_reader_error(
   self : Parser,
   problem : String,
-  offset : Int,
+  offset : Int32,
 ) -> Fail {
   self.error = ReaderError
   self.problem = problem
@@ -44,7 +44,7 @@ fn Parser::update_raw_buffer(self : Parser) -> Unit {
 
 ///|
 /// `yaml_parser_update_buffer`.
-fn Parser::update_buffer(self : Parser, length : Int) -> Unit raise Fail {
+fn Parser::update_buffer(self : Parser, length : Int32) -> Unit raise Fail {
   if self.eof && self.raw_pos == self.raw_last {
     return
   }
@@ -140,7 +140,7 @@ fn Parser::update_buffer(self : Parser, length : Int) -> Unit raise Fail {
 
 ///|
 /// `CACHE`.
-fn Parser::cache(self : Parser, length : Int) -> Unit raise Fail {
+fn Parser::cache(self : Parser, length : Int32) -> Unit raise Fail {
   if self.unread < length {
     self.update_buffer(length)
   }
@@ -150,7 +150,7 @@ fn Parser::cache(self : Parser, length : Int) -> Unit raise Fail {
 // buffer read as NUL (the terminating NUL once the input is exhausted).
 
 ///|
-fn Parser::at(self : Parser, k : Int) -> Int {
+fn Parser::at(self : Parser, k : Int32) -> Int32 {
   let p = self.ptr + k
   if p < self.raw_pos {
     self.input[p].to_int()
@@ -161,13 +161,13 @@ fn Parser::at(self : Parser, k : Int) -> Int {
 
 ///|
 /// `CHECK_AT`.
-fn Parser::check_at(self : Parser, c : Int, k : Int) -> Bool {
+fn Parser::check_at(self : Parser, c : Int32, k : Int32) -> Bool {
   self.at(k) == c
 }
 
 ///|
 /// `CHECK`.
-fn Parser::check(self : Parser, c : Int) -> Bool {
+fn Parser::check(self : Parser, c : Int32) -> Bool {
   self.at(0) == c
 }
 
@@ -191,14 +191,14 @@ fn Parser::is_digit(self : Parser) -> Bool {
 
 ///|
 /// `IS_HEX_AT`.
-fn Parser::is_hex_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_hex_at(self : Parser, k : Int32) -> Bool {
   let c = self.at(k)
   (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')
 }
 
 ///|
 /// `AS_HEX_AT`.
-fn Parser::as_hex_at(self : Parser, k : Int) -> Int {
+fn Parser::as_hex_at(self : Parser, k : Int32) -> Int32 {
   let c = self.at(k)
   if c >= 'A' && c <= 'F' {
     c - 'A' + 10
@@ -211,7 +211,7 @@ fn Parser::as_hex_at(self : Parser, k : Int) -> Int {
 
 ///|
 /// `IS_Z_AT`.
-fn Parser::is_z_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_z_at(self : Parser, k : Int32) -> Bool {
   self.at(k) == 0
 }
 
@@ -223,25 +223,25 @@ fn Parser::is_bom(self : Parser) -> Bool {
 
 ///|
 /// `IS_SPACE_AT`.
-fn Parser::is_space_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_space_at(self : Parser, k : Int32) -> Bool {
   self.at(k) == ' '
 }
 
 ///|
 /// `IS_TAB_AT`.
-fn Parser::is_tab_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_tab_at(self : Parser, k : Int32) -> Bool {
   self.at(k) == '\t'
 }
 
 ///|
 /// `IS_BLANK_AT`.
-fn Parser::is_blank_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_blank_at(self : Parser, k : Int32) -> Bool {
   self.is_space_at(k) || self.is_tab_at(k)
 }
 
 ///|
 /// `IS_BREAK_AT`.
-fn Parser::is_break_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_break_at(self : Parser, k : Int32) -> Bool {
   let c = self.at(k)
   c == '\r' ||
   c == '\n' ||
@@ -258,19 +258,19 @@ fn Parser::is_crlf(self : Parser) -> Bool {
 
 ///|
 /// `IS_BREAKZ_AT`.
-fn Parser::is_breakz_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_breakz_at(self : Parser, k : Int32) -> Bool {
   self.is_break_at(k) || self.is_z_at(k)
 }
 
 ///|
 /// `IS_BLANKZ_AT`.
-fn Parser::is_blankz_at(self : Parser, k : Int) -> Bool {
+fn Parser::is_blankz_at(self : Parser, k : Int32) -> Bool {
   self.is_blank_at(k) || self.is_breakz_at(k)
 }
 
 ///|
 /// `WIDTH`.
-fn Parser::width(self : Parser) -> Int {
+fn Parser::width(self : Parser) -> Int32 {
   let c = self.at(0)
   if (c & 0x80) == 0x00 {
     1

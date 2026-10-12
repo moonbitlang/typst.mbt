@@ -9,25 +9,25 @@
 // Opcodes
 
 ///|
-const OP_IF : Int = 0x58
+const OP_IF : Int32 = 0x58
 
 ///|
-const OP_ELSE : Int = 0x1B
+const OP_ELSE : Int32 = 0x1B
 
 ///|
-const OP_EIF : Int = 0x59
+const OP_EIF : Int32 = 0x59
 
 ///|
-const OP_FDEF : Int = 0x2C
+const OP_FDEF : Int32 = 0x2C
 
 ///|
-const OP_IDEF : Int = 0x89
+const OP_IDEF : Int32 = 0x89
 
 ///|
-const OP_ENDF : Int = 0x2D
+const OP_ENDF : Int32 = 0x2D
 
 ///|
-fn opcode_is_push_words(op : Int) -> Bool {
+fn opcode_is_push_words(op : Int32) -> Bool {
   (op >= 0xB8 && op <= 0xBF) || op == 0x41
 }
 
@@ -38,24 +38,24 @@ fn opcode_is_push_words(op : Int) -> Bool {
 /// Errors that may occur when interpreting TrueType bytecode.
 priv suberror HintErrorKind {
   UnexpectedEndOfBytecode
-  UnhandledOpcode(Int)
+  UnhandledOpcode(Int32)
   DefinitionInGlyphProgram
   NestedDefinition
   DefinitionTooLarge
   TooManyDefinitions
-  InvalidDefinition(Int)
+  InvalidDefinition(Int32)
   ValueStackOverflow
   ValueStackUnderflow
   CallStackOverflow
   CallStackUnderflow
-  InvalidStackValue(Int)
-  InvalidPointIndex(Int)
-  InvalidPointRange(Int, Int)
-  InvalidContourIndex(Int)
-  InvalidCvtIndex(Int)
-  InvalidStorageIndex(Int)
+  InvalidStackValue(Int32)
+  InvalidPointIndex(Int32)
+  InvalidPointRange(Int32, Int32)
+  InvalidContourIndex(Int32)
+  InvalidCvtIndex(Int32)
+  InvalidStorageIndex(Int32)
   DivideByZero
-  InvalidZoneIndex(Int)
+  InvalidZoneIndex(Int32)
   NegativeLoopCounter
   InvalidJump
   ExceededExecutionBudget
@@ -63,7 +63,7 @@ priv suberror HintErrorKind {
 
 ///|
 /// `usize` display of an index stored as `Int`.
-fn usize_str(v : Int) -> String {
+fn usize_str(v : Int32) -> String {
   v.to_int64().reinterpret_as_uint64().to_string()
 }
 
@@ -117,7 +117,7 @@ priv enum Program {
 } derive(Eq)
 
 ///|
-fn Program::index(self : Program) -> Int {
+fn Program::index(self : Program) -> Int32 {
   match self {
     Font => 0
     ControlValue => 1
@@ -131,8 +131,8 @@ priv suberror HintError {
   HintError(
     program~ : Program,
     glyph_id~ : GlyphId?,
-    pc~ : Int,
-    opcode~ : Int?,
+    pc~ : Int32,
+    opcode~ : Int32?,
     kind~ : HintErrorKind
   )
 }
@@ -165,16 +165,16 @@ fn HintError::message(self : HintError) -> String {
 ///|
 /// Decoded TrueType instruction.
 priv struct Instruction {
-  opcode : Int
+  opcode : Int32
   /// Inline operand bytes (push instructions only).
   operands : BytesView
   is_words : Bool
   /// Offset into the bytecode where this instruction was decoded.
-  pc : Int
+  pc : Int32
 }
 
 ///|
-fn Instruction::operand_count(self : Instruction) -> Int {
+fn Instruction::operand_count(self : Instruction) -> Int32 {
   if self.is_words {
     self.operands.length() / 2
   } else {
@@ -183,7 +183,7 @@ fn Instruction::operand_count(self : Instruction) -> Int {
 }
 
 ///|
-fn Instruction::operand(self : Instruction, i : Int) -> Int {
+fn Instruction::operand(self : Instruction, i : Int32) -> Int32 {
   if self.is_words {
     let w = (self.operands[i * 2].to_int() << 8) |
       self.operands[i * 2 + 1].to_int()
@@ -197,7 +197,7 @@ fn Instruction::operand(self : Instruction, i : Int) -> Int {
 /// Decodes instructions from TrueType bytecode.
 priv struct Decoder {
   mut bytecode : BytesView
-  mut pc : Int
+  mut pc : Int32
 }
 
 ///|
@@ -244,18 +244,21 @@ fn Decoder::decode(self : Decoder) -> Instruction?? {
 ///|
 /// Value stack for the TrueType interpreter.
 priv struct ValueStack {
-  values : FixedArray[Int]
-  mut len : Int
+  values : FixedArray[Int32]
+  mut len : Int32
   is_pedantic : Bool
 }
 
 ///|
-fn ValueStack::new(size : Int, is_pedantic : Bool) -> ValueStack {
+fn ValueStack::new(size : Int32, is_pedantic : Bool) -> ValueStack {
   { values: FixedArray::make(size, 0), len: 0, is_pedantic, }
 }
 
 ///|
-fn ValueStack::push(self : ValueStack, value : Int) -> Unit raise HintErrorKind {
+fn ValueStack::push(
+  self : ValueStack,
+  value : Int32,
+) -> Unit raise HintErrorKind {
   if self.len >= self.values.length() {
     raise ValueStackOverflow
   }
@@ -281,7 +284,7 @@ fn ValueStack::push_inline_operands(
 }
 
 ///|
-fn ValueStack::peek(self : ValueStack) -> Int? {
+fn ValueStack::peek(self : ValueStack) -> Int32? {
   if self.len > 0 {
     Some(self.values[self.len - 1])
   } else {
@@ -290,7 +293,7 @@ fn ValueStack::peek(self : ValueStack) -> Int? {
 }
 
 ///|
-fn ValueStack::pop(self : ValueStack) -> Int raise HintErrorKind {
+fn ValueStack::pop(self : ValueStack) -> Int32 raise HintErrorKind {
   if self.peek() is Some(value) {
     self.len -= 1
     value
@@ -303,7 +306,9 @@ fn ValueStack::pop(self : ValueStack) -> Int raise HintErrorKind {
 
 ///|
 /// Convenience method for popping a value intended as a count.
-fn ValueStack::pop_count_checked(self : ValueStack) -> Int raise HintErrorKind {
+fn ValueStack::pop_count_checked(
+  self : ValueStack,
+) -> Int32 raise HintErrorKind {
   let value = self.pop()
   if value < 0 && self.is_pedantic {
     raise InvalidStackValue(value)
@@ -317,7 +322,7 @@ fn ValueStack::pop_count_checked(self : ValueStack) -> Int raise HintErrorKind {
 ///|
 fn ValueStack::apply_unary(
   self : ValueStack,
-  op : (Int) -> Int,
+  op : (Int32) -> Int32,
 ) -> Unit raise HintErrorKind {
   let a = self.pop()
   self.push(op(a))
@@ -326,7 +331,7 @@ fn ValueStack::apply_unary(
 ///|
 fn ValueStack::apply_binary(
   self : ValueStack,
-  op : (Int, Int) -> Int raise HintErrorKind,
+  op : (Int32, Int32) -> Int32 raise HintErrorKind,
 ) -> Unit raise HintErrorKind {
   let b = self.pop()
   let a = self.pop()
@@ -413,23 +418,23 @@ fn ValueStack::roll(self : ValueStack) -> Unit raise HintErrorKind {
 ///|
 /// Copy-on-write buffer for the CVT and storage area.
 priv struct CowSlice {
-  data : FixedArray[Int]
-  data_mut : FixedArray[Int]
+  data : FixedArray[Int32]
+  data_mut : FixedArray[Int32]
   mut use_mut : Bool
 }
 
 ///|
-fn CowSlice::new(data : FixedArray[Int]) -> CowSlice {
+fn CowSlice::new(data : FixedArray[Int32]) -> CowSlice {
   { data, data_mut: FixedArray::make(data.length(), 0), use_mut: false, }
 }
 
 ///|
-fn CowSlice::new_mut(data_mut : FixedArray[Int]) -> CowSlice {
+fn CowSlice::new_mut(data_mut : FixedArray[Int32]) -> CowSlice {
   { data: [], data_mut, use_mut: true, }
 }
 
 ///|
-fn CowSlice::get(self : CowSlice, index : Int) -> Int? {
+fn CowSlice::get(self : CowSlice, index : Int32) -> Int32? {
   let d = if self.use_mut { self.data_mut } else { self.data }
   if index < 0 || index >= d.length() {
     None
@@ -439,7 +444,7 @@ fn CowSlice::get(self : CowSlice, index : Int) -> Int? {
 }
 
 ///|
-fn CowSlice::set(self : CowSlice, index : Int, value : Int) -> Bool {
+fn CowSlice::set(self : CowSlice, index : Int32, value : Int32) -> Bool {
   // Copy from immutable to mutable buffer if we haven't already
   if !self.use_mut {
     for i in 0..<self.data.length() {
@@ -456,7 +461,7 @@ fn CowSlice::set(self : CowSlice, index : Int, value : Int) -> Bool {
 }
 
 ///|
-fn CowSlice::len(self : CowSlice) -> Int {
+fn CowSlice::len(self : CowSlice) -> Int32 {
   if self.use_mut {
     self.data_mut.length()
   } else {
@@ -465,7 +470,10 @@ fn CowSlice::len(self : CowSlice) -> Int {
 }
 
 ///|
-fn CowSlice::cvt_get(self : CowSlice, index : Int) -> Int raise HintErrorKind {
+fn CowSlice::cvt_get(
+  self : CowSlice,
+  index : Int32,
+) -> Int32 raise HintErrorKind {
   match self.get(index) {
     Some(v) => v
     None => raise InvalidCvtIndex(index)
@@ -475,8 +483,8 @@ fn CowSlice::cvt_get(self : CowSlice, index : Int) -> Int raise HintErrorKind {
 ///|
 fn CowSlice::cvt_set(
   self : CowSlice,
-  index : Int,
-  value : Int,
+  index : Int32,
+  value : Int32,
 ) -> Unit raise HintErrorKind {
   if !self.set(index, value) {
     raise InvalidCvtIndex(index)
@@ -492,11 +500,11 @@ fn CowSlice::cvt_set(
 // (skrifa 0.42.1 hint/program.rs:69, :92).
 #warnings("-unused_field")
 priv struct Definition {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   /// The function number for an FDEF or opcode for an IDEF.
-  key : Int
-  program : Int
+  key : Int32
+  program : Int32
   is_active : Bool
 }
 
@@ -508,9 +516,9 @@ fn Definition::default() -> Definition {
 ///|
 fn Definition::new(
   program : Program,
-  start : Int,
-  end : Int,
-  key : Int,
+  start : Int32,
+  end : Int32,
+  key : Int32,
 ) -> Definition {
   { program: program.index(), start, end, key, is_active: true, }
 }
@@ -536,8 +544,8 @@ priv struct DefinitionMap {
 /// returns its index.
 fn DefinitionMap::allocate(
   self : DefinitionMap,
-  key : Int,
-) -> Int raise HintErrorKind {
+  key : Int32,
+) -> Int32 raise HintErrorKind {
   if !self.is_mut {
     raise DefinitionInGlyphProgram
   }
@@ -551,7 +559,7 @@ fn DefinitionMap::allocate(
     // Otherwise, walk backward looking for an active entry with
     // a matching key. Keep track of the inactive entry with the
     // highest index.
-    let mut last_inactive_ix : Int? = None
+    let mut last_inactive_ix : Int32? = None
     for i = defs.length() - 1; i >= 0; i = i - 1 {
       let def = defs[i]
       if def.is_active {
@@ -576,7 +584,7 @@ fn DefinitionMap::allocate(
 /// Returns the definition with the given key.
 fn DefinitionMap::get(
   self : DefinitionMap,
-  key : Int,
+  key : Int32,
 ) -> Definition raise HintErrorKind {
   let defs = self.defs
   // Fast path, try to use key as index.
@@ -613,14 +621,14 @@ fn DefinitionMap::reset(self : DefinitionMap) -> Unit {
 /// Record of an active invocation of a function or instruction definition.
 priv struct CallRecord {
   caller_program : Program
-  return_pc : Int
-  mut current_count : Int
+  return_pc : Int32
+  mut current_count : Int32
   definition : Definition
 }
 
 ///|
 // FreeType provides a call stack with a depth of 32.
-const MAX_CALL_DEPTH : Int = 32
+const MAX_CALL_DEPTH : Int32 = 32
 
 ///|
 /// State for managing active programs and decoding instructions.
@@ -670,7 +678,7 @@ fn ProgramState::reset(self : ProgramState, program : Program) -> Unit {
 fn ProgramState::enter(
   self : ProgramState,
   definition : Definition,
-  count : Int,
+  count : Int32,
 ) -> Unit raise HintErrorKind {
   let program = definition.program()
   let pc = definition.start

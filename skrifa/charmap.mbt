@@ -81,7 +81,7 @@ pub fn Charmap::is_symbol(self : Charmap) -> Bool {
 /// Maps a character to a nominal glyph identifier.
 ///
 /// Returns `None` if a mapping does not exist.
-pub fn Charmap::map(self : Charmap, ch : UInt) -> GlyphId? {
+pub fn Charmap::map(self : Charmap, ch : UInt32) -> GlyphId? {
   guard self.codepoint_subtable is Some(subtable) else { return None }
   match map_impl(subtable, ch) {
     Some(g) => Some(g)
@@ -103,7 +103,7 @@ pub fn Charmap::map_char(self : Charmap, ch : Char) -> GlyphId? {
 }
 
 ///|
-fn map_impl(subtable : CodepointSubtable, codepoint : UInt) -> GlyphId? {
+fn map_impl(subtable : CodepointSubtable, codepoint : UInt32) -> GlyphId? {
   match subtable.subtable.map_codepoint(codepoint) {
     Some(gid) if gid != GlyphId::notdef() => Some(gid)
     _ => None

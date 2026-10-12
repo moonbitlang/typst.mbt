@@ -28,7 +28,7 @@ pub extend ScopeError with Show::{to_string, output}
 ///|
 /// Multiplier on the power of 2 for MatchPower. This is only exposed for
 /// highlighting.
-pub let atom_len_bits : Int = 3
+pub let atom_len_bits : Int32 = 3
 
 ///|
 /// A hierarchy of atoms with semi-standardized names used to accord semantic
@@ -91,7 +91,7 @@ pub extend ParseScopeError with Show::{to_string, output}
 /// numbers and their string names.
 pub struct ScopeRepository {
   priv atoms : Array[String]
-  priv atom_index_map : Map[String, Int]
+  priv atom_index_map : Map[String, Int32]
 }
 
 ///|
@@ -114,7 +114,7 @@ pub extend ScopeStack with Eq::{not_equal, equal}
 ///|
 /// How many scopes to clear.
 pub(all) enum ClearAmount {
-  TopN(Int)
+  TopN(Int32)
   All
 } derive(Eq, Debug)
 
@@ -132,7 +132,7 @@ pub extend ClearAmount with @debug.Debug::{to_repr}
 /// A change to a scope stack.
 pub(all) enum ScopeStackOp {
   Push(Scope)
-  Pop(Int)
+  Pop(Int32)
   /// Used for the `clear_scopes` feature
   Clear(ClearAmount)
   /// Restores cleared scopes
@@ -158,7 +158,7 @@ pub(all) enum BasicScopeStackOp {
 pub extend BasicScopeStackOp with Eq::{not_equal, equal}
 
 ///|
-fn pack_as_u16s(atoms : Array[Int]) -> Scope raise ParseScopeError {
+fn pack_as_u16s(atoms : Array[Int32]) -> Scope raise ParseScopeError {
   let mut a = 0UL
   let mut b = 0UL
   for i, n in atoms {
@@ -223,7 +223,10 @@ pub fn ScopeRepository::to_string(
 }
 
 ///|
-fn ScopeRepository::atom_to_index(self : ScopeRepository, atom : String) -> Int {
+fn ScopeRepository::atom_to_index(
+  self : ScopeRepository,
+  atom : String,
+) -> Int32 {
   if self.atom_index_map.get(atom) is Some(index) {
     return index
   }
@@ -237,7 +240,7 @@ fn ScopeRepository::atom_to_index(self : ScopeRepository, atom : String) -> Int 
 /// Return the string for an atom number returned by `Scope::atom_at`.
 pub fn ScopeRepository::atom_str(
   self : ScopeRepository,
-  atom_number : Int,
+  atom_number : Int32,
 ) -> String {
   self.atoms[atom_number - 1]
 }
@@ -251,7 +254,7 @@ pub fn Scope::new(s : StringView) -> Scope raise ParseScopeError {
 
 ///|
 /// Gets the atom number at a given index.
-pub fn Scope::atom_at(self : Scope, index : Int) -> Int {
+pub fn Scope::atom_at(self : Scope, index : Int32) -> Int32 {
   let shifted = if index < 4 {
     self.a >> ((3 - index) * 16)
   } else if index < 8 {
@@ -263,14 +266,14 @@ pub fn Scope::atom_at(self : Scope, index : Int) -> Int {
 }
 
 ///|
-fn Scope::missing_atoms(self : Scope) -> Int {
+fn Scope::missing_atoms(self : Scope) -> Int32 {
   let trail = if self.b == 0 { self.a.ctz() + 64 } else { self.b.ctz() }
   trail / 16
 }
 
 ///|
 /// Returns the number of atoms in the scope.
-pub fn Scope::len(self : Scope) -> Int {
+pub fn Scope::len(self : Scope) -> Int32 {
   8 - self.missing_atoms()
 }
 
@@ -426,7 +429,7 @@ pub fn ScopeStack::apply_with_hook(
 
 ///|
 /// Return the bottom n elements of the stack.
-pub fn ScopeStack::bottom_n(self : ScopeStack, n : Int) -> ArrayView[Scope] {
+pub fn ScopeStack::bottom_n(self : ScopeStack, n : Int32) -> ArrayView[Scope] {
   self.scopes[0:n]
 }
 
@@ -438,7 +441,7 @@ pub fn ScopeStack::as_slice(self : ScopeStack) -> ArrayView[Scope] {
 
 ///|
 /// Return the height/length of this stack.
-pub fn ScopeStack::len(self : ScopeStack) -> Int {
+pub fn ScopeStack::len(self : ScopeStack) -> Int32 {
   self.scopes.length()
 }
 

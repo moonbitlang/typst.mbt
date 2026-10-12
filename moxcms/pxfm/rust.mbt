@@ -163,7 +163,7 @@ pub fn f64_as_i64(x : Double) -> Int64 {
 
 ///|
 /// Rust `x as i32` for `f64` (saturating, NaN -> 0).
-pub fn f64_as_i32(x : Double) -> Int {
+pub fn f64_as_i32(x : Double) -> Int32 {
   if x.is_nan() {
     0
   } else if x >= 2147483647.0 {
@@ -177,7 +177,7 @@ pub fn f64_as_i32(x : Double) -> Int {
 
 ///|
 /// Rust `x as u16` for `f64` (saturating, NaN -> 0).
-pub fn f64_as_u16(x : Double) -> Int {
+pub fn f64_as_u16(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 65535.0 {
@@ -189,7 +189,7 @@ pub fn f64_as_u16(x : Double) -> Int {
 
 ///|
 /// Rust `x as i32` for `f32` (saturating, NaN -> 0).
-pub fn f32_as_i32(x : Float) -> Int {
+pub fn f32_as_i32(x : Float) -> Int32 {
   f64_as_i32(x.to_double())
 }
 
@@ -208,13 +208,13 @@ pub fn f32_as_u32(x : Float) -> Int64 {
 
 ///|
 /// Rust `x as u16` for `f32` (saturating, NaN -> 0).
-pub fn f32_as_u16(x : Float) -> Int {
+pub fn f32_as_u16(x : Float) -> Int32 {
   f64_as_u16(x.to_double())
 }
 
 ///|
 /// Rust `x as i16` for `f32` (saturating, NaN -> 0).
-pub fn f32_as_i16(x : Float) -> Int {
+pub fn f32_as_i16(x : Float) -> Int32 {
   let d = x.to_double()
   if d.is_nan() {
     0
@@ -229,7 +229,7 @@ pub fn f32_as_i16(x : Float) -> Int {
 
 ///|
 /// Rust `x as u8` for `f32` (saturating, NaN -> 0).
-pub fn f32_as_u8(x : Float) -> Int {
+pub fn f32_as_u8(x : Float) -> Int32 {
   let d = x.to_double()
   if d.is_nan() || d <= 0.0 {
     0

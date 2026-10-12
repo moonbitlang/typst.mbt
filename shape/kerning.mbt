@@ -48,9 +48,9 @@ fn hb_ot_layout_kern(plan : ShapePlan, face : Face, buffer : Buffer) -> Unit {
 fn machine_kern(
   face : Face,
   buffer : Buffer,
-  kern_mask : UInt,
+  kern_mask : UInt32,
   cross_stream : Bool,
-  get_kerning : (UInt, UInt) -> Int,
+  get_kerning : (UInt32, UInt32) -> Int32,
 ) -> Unit {
   buffer.unsafe_to_concat(None, None)
   let ctx = ApplyContext::new(GPOS, face, buffer)
@@ -107,7 +107,7 @@ fn machine_kern(
 fn apply_simple_kerning(
   subtable : @otf.KernSubtable,
   face : Face,
-  kern_mask : UInt,
+  kern_mask : UInt32,
   buffer : Buffer,
 ) -> Unit {
   machine_kern(face, buffer, kern_mask, subtable.has_cross_stream, (left, right) => {
@@ -123,14 +123,14 @@ fn apply_simple_kerning(
 
 ///|
 priv struct StateMachineDriver {
-  stack : FixedArray[Int]
-  mut depth : Int
+  stack : FixedArray[Int32]
+  mut depth : Int32
 }
 
 ///|
 fn apply_state_machine_kerning(
   subtable : @otf.KernSubtable,
-  kern_mask : UInt,
+  kern_mask : UInt32,
   buffer : Buffer,
 ) -> Unit {
   let state_table = match subtable.format {
@@ -201,7 +201,7 @@ fn apply_state_machine_kerning(
 fn state_machine_transition(
   entry : @otf.StateEntry,
   has_cross_stream : Bool,
-  kern_mask : UInt,
+  kern_mask : UInt32,
   state_table : @otf.AatStateTable,
   driver : StateMachineDriver,
   buffer : Buffer,

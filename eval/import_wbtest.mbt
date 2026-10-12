@@ -86,8 +86,8 @@ fn store_shared_library() -> @library.Library {
 ///|
 fn store_world(
   text : String,
-  sources? : Array[(String, String)] = [],
-  data? : Array[(String, String)] = [],
+  sources~ : Array[(String, String)] = [],
+  data~ : Array[(String, String)] = [],
 ) -> StoreWorld {
   let world : StoreWorld = {
     library: store_shared_library(),
@@ -144,8 +144,8 @@ fn StoreWorld::place(self : StoreWorld, span : @syntax.DiagSpan) -> String {
 /// store answered and how many it computed.
 priv struct Evaluated {
   text : String
-  found : Int
-  computed : Int
+  found : Int32
+  computed : Int32
 }
 
 ///|
@@ -600,7 +600,7 @@ test "module store: a call that is found again returns the module of the evaluat
   //
   // The module exports `float.nan`: what it holds is compared by its hash,
   // which has the bits of the float, never by `==`.
-  let a = (comment : Int) => {
+  let a = (comment : Int32) => {
     "#let v = 1\n#let x = float.nan\n// comment \{comment}\n"
   }
   let main = "#import \"a.typ\" as m\n#let get() = m\n#repr((get() == m, m == m, get().v == m.v))"

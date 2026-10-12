@@ -27,7 +27,7 @@ pub extend Elem with Hash::{hash, hash_combine}
 pub extend Elem with @debug.Debug::{to_repr}
 
 ///|
-fn Elem::str_len(self : Elem) -> Int {
+fn Elem::str_len(self : Elem) -> Int32 {
   let mut n = 0
   for c in self.children.0 {
     n += c.str_len()
@@ -133,9 +133,9 @@ pub(all) enum ElemMeta {
   CitationNumber
   /// The element is the output of a single name. It notes which name
   /// variable was used and the index within the variable.
-  Name(@citationberg.NameVariable, Int)
+  Name(@citationberg.NameVariable, Int32)
   /// The entry corresponds to a citation item.
-  Entry(Int)
+  Entry(Int32)
   /// The element is the output of `cs:text` with a `variable` set to
   /// `citation-label`.
   CitationLabel
@@ -313,7 +313,7 @@ pub(all) enum ElemChild {
   /// This is a link.
   Link(text~ : Formatted, url~ : String)
   /// A transparent element that must be replaced by the consumer.
-  Transparent(cite_idx~ : Int, format~ : Formatting)
+  Transparent(cite_idx~ : Int32, format~ : Formatting)
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -378,7 +378,7 @@ pub fn[W : FmtWrite] ElemChild::write_buf(
 }
 
 ///|
-fn ElemChild::str_len(self : ElemChild) -> Int {
+fn ElemChild::str_len(self : ElemChild) -> Int32 {
   match self {
     Text(t) => t.text.length()
     Elem(e) => e.str_len()
@@ -642,7 +642,7 @@ fn[T] NonEmptyStack::last_predicate(
 }
 
 ///|
-fn[T] NonEmptyStack::get(self : NonEmptyStack[T], idx : Int) -> T {
+fn[T] NonEmptyStack::get(self : NonEmptyStack[T], idx : Int32) -> T {
   if idx + 1 == self.len() {
     self.last
   } else {
@@ -651,7 +651,7 @@ fn[T] NonEmptyStack::get(self : NonEmptyStack[T], idx : Int) -> T {
 }
 
 ///|
-fn[T] NonEmptyStack::len(self : NonEmptyStack[T]) -> Int {
+fn[T] NonEmptyStack::len(self : NonEmptyStack[T]) -> Int32 {
   self.head.length() + 1
 }
 
@@ -675,7 +675,7 @@ fn[T] NonEmptyStack::pop(self : NonEmptyStack[T]) -> T? {
 
 ///|
 /// Drops all elements including and after the given index.
-fn[T] NonEmptyStack::drain(self : NonEmptyStack[T], idx : Int) -> Unit {
+fn[T] NonEmptyStack::drain(self : NonEmptyStack[T], idx : Int32) -> Unit {
   // `idx` is the length of the stack before the elements were pushed.
   self.last = self.head[idx - 1]
   self.head.truncate(idx - 1)

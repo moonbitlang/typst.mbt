@@ -47,31 +47,31 @@ fn BitReader::tail(self : BitReader) -> BytesView? {
 }
 
 ///|
-fn BitReader::offset(self : BitReader) -> Int {
+fn BitReader::offset(self : BitReader) -> Int32 {
   self.byte_pos()
 }
 
 ///|
-fn BitReader::read_bytes(self : BitReader, len : Int) -> BytesView? {
+fn BitReader::read_bytes(self : BitReader, len : Int32) -> BytesView? {
   guard self.peek_bytes(len) is Some(bytes) else { return None }
   self.cur_pos += len.to_int64() * 8L
   Some(bytes)
 }
 
 ///|
-fn BitReader::read_byte(self : BitReader) -> Int? {
+fn BitReader::read_byte(self : BitReader) -> Int32? {
   guard self.peek_byte() is Some(byte) else { return None }
   self.cur_pos += 8L
   Some(byte)
 }
 
 ///|
-fn BitReader::skip_bytes(self : BitReader, len : Int) -> Unit? {
+fn BitReader::skip_bytes(self : BitReader, len : Int32) -> Unit? {
   self.read_bytes(len).map(_ => ())
 }
 
 ///|
-fn BitReader::peek_bytes(self : BitReader, len : Int) -> BytesView? {
+fn BitReader::peek_bytes(self : BitReader, len : Int32) -> BytesView? {
   let start = self.byte_pos()
   // `start.checked_add(len)` cannot overflow for the lengths we read.
   let end = start.to_int64() + len.to_int64()
@@ -82,7 +82,7 @@ fn BitReader::peek_bytes(self : BitReader, len : Int) -> BytesView? {
 }
 
 ///|
-fn BitReader::peek_byte(self : BitReader) -> Int? {
+fn BitReader::peek_byte(self : BitReader) -> Int32? {
   let pos = self.byte_pos()
   if pos < self.data.length() {
     Some(self.data[pos].to_int())
@@ -92,13 +92,13 @@ fn BitReader::peek_byte(self : BitReader) -> Int? {
 }
 
 ///|
-fn BitReader::read_u16(self : BitReader) -> Int? {
+fn BitReader::read_u16(self : BitReader) -> Int32? {
   guard self.read_bytes(2) is Some(bytes) else { return None }
   Some((bytes[0].to_int() << 8) | bytes[1].to_int())
 }
 
 ///|
-fn BitReader::read_u32(self : BitReader) -> UInt? {
+fn BitReader::read_u32(self : BitReader) -> UInt32? {
   guard self.read_bytes(4) is Some(bytes) else { return None }
   Some(
     (bytes[0].to_uint() << 24) |
@@ -119,7 +119,7 @@ fn BitReader::read_u64(self : BitReader) -> UInt64? {
 }
 
 ///|
-fn BitReader::read_bit(self : BitReader) -> UInt? {
+fn BitReader::read_bit(self : BitReader) -> UInt32? {
   let byte_pos = self.byte_pos()
   if byte_pos >= self.data.length() {
     return None
@@ -131,12 +131,12 @@ fn BitReader::read_bit(self : BitReader) -> UInt? {
 }
 
 ///|
-fn BitReader::byte_pos(self : BitReader) -> Int {
+fn BitReader::byte_pos(self : BitReader) -> Int32 {
   (self.cur_pos / 8L).to_int()
 }
 
 ///|
-fn BitReader::bit_pos(self : BitReader) -> Int {
+fn BitReader::bit_pos(self : BitReader) -> Int32 {
   (self.cur_pos % 8L).to_int()
 }
 
@@ -145,8 +145,8 @@ fn BitReader::bit_pos(self : BitReader) -> Int {
 /// in addition.
 fn BitReader::read_bits_with_stuffing(
   self : BitReader,
-  bit_size : Int,
-) -> UInt? {
+  bit_size : Int32,
+) -> UInt32? {
   let mut bit = 0U
   for _ in 0..<bit_size {
     let needs_stuff_bit = self.needs_to_read_stuff_bit()
@@ -178,8 +178,8 @@ fn BitReader::read_stuff_bit(self : BitReader) -> Unit? {
 ///|
 fn BitReader::peak_bits_with_stuffing(
   self : BitReader,
-  bit_size : Int,
-) -> UInt? {
+  bit_size : Int32,
+) -> UInt32? {
   let pos = self.cur_pos
   let res = self.read_bits_with_stuffing(bit_size)
   self.cur_pos = pos
@@ -187,7 +187,7 @@ fn BitReader::peak_bits_with_stuffing(
 }
 
 ///|
-fn BitReader::read_marker(self : BitReader) -> Int raise DecodeError {
+fn BitReader::read_marker(self : BitReader) -> Int32 raise DecodeError {
   guard self.peek_byte() is Some(b) else { raise Marker(Invalid) }
   if b != 0xFF {
     raise Marker(Invalid)
@@ -198,7 +198,7 @@ fn BitReader::read_marker(self : BitReader) -> Int raise DecodeError {
 }
 
 ///|
-fn BitReader::peek_marker(self : BitReader) -> Int? {
+fn BitReader::peek_marker(self : BitReader) -> Int32? {
   let pos = self.cur_pos
   let res = self.read_marker() catch { _ => -1 }
   self.cur_pos = pos

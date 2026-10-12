@@ -294,7 +294,7 @@ fn drawn(
   frame : @library.Frame,
   dx : Double,
   dy : Double,
-  page : Int,
+  page : Int32,
   lines : Array[String],
   rest : Array[String],
 ) -> Unit {

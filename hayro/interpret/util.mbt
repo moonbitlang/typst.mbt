@@ -41,7 +41,7 @@ pub struct Hasher128 {
   priv mut v2 : UInt64
   priv mut v3 : UInt64
   priv mut tail : UInt64
-  priv mut ntail : Int
+  priv mut ntail : Int32
   priv mut length : UInt64
 }
 
@@ -60,7 +60,7 @@ pub fn Hasher128::new() -> Hasher128 {
 }
 
 ///|
-fn rotl(x : UInt64, b : Int) -> UInt64 {
+fn rotl(x : UInt64, b : Int32) -> UInt64 {
   (x << b) | (x >> (64 - b))
 }
 
@@ -112,7 +112,7 @@ pub fn Hasher128::write_u64(self : Hasher128, v : UInt64) -> Unit {
 
 ///|
 /// Write a 32-bit integer (little endian).
-pub fn Hasher128::write_u32(self : Hasher128, v : UInt) -> Unit {
+pub fn Hasher128::write_u32(self : Hasher128, v : UInt32) -> Unit {
   for i in 0..<4 {
     self.write_u8((v >> (8 * i)).to_byte())
   }
@@ -120,7 +120,7 @@ pub fn Hasher128::write_u32(self : Hasher128, v : UInt) -> Unit {
 
 ///|
 /// Write a `usize`.
-pub fn Hasher128::write_usize(self : Hasher128, v : Int) -> Unit {
+pub fn Hasher128::write_usize(self : Hasher128, v : Int32) -> Unit {
   self.write_u64(v.to_int64().reinterpret_as_uint64())
 }
 
@@ -319,7 +319,7 @@ pub fn f32_as_u8(x : Float) -> Byte {
 
 ///|
 /// Rust's saturating `f32 as u32` cast (as `Int`, saturating at `Int` max).
-pub fn f32_as_u32(x : Float) -> Int {
+pub fn f32_as_u32(x : Float) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -331,7 +331,7 @@ pub fn f32_as_u32(x : Float) -> Int {
 
 ///|
 /// Rust's saturating `f64 as u32` cast (as `Int`, saturating at `Int` max).
-pub fn f64_as_u32(x : Double) -> Int {
+pub fn f64_as_u32(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -378,7 +378,7 @@ pub fn powf(x : Float, y : Float) -> Float {
 
 ///|
 /// Rust's `f32::powi` (compiler-rt `__powisf2`).
-pub fn powi(a : Float, b : Int) -> Float {
+pub fn powi(a : Float, b : Int32) -> Float {
   let recip = b < 0
   let mut a = a
   let mut b = b

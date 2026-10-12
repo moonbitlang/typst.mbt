@@ -30,11 +30,11 @@ fn bench_id() -> @syntax.FileId {
 ///|
 /// The byte offset of the first ASCII letter at or after `from` that
 /// follows a letter (the middle of a word), or of the last one before it.
-fn letter_near(bytes : Bytes, from : Int) -> Int {
-  let is_letter = (i : Int) => {
+fn letter_near(bytes : Bytes, from : Int32) -> Int32 {
+  let is_letter = (i : Int32) => {
     i >= 0 &&
     i < bytes.length() &&
-    (bytes[i] is (b'a'..=b'z') || bytes[i] is (b'A'..=b'Z'))
+    (bytes[i] is (b'a'..<=b'z') || bytes[i] is (b'A'..<=b'Z'))
   }
   for i in from..<bytes.length() {
     if is_letter(i) && is_letter(i - 1) {
@@ -54,7 +54,7 @@ fn letter_near(bytes : Bytes, from : Int) -> Int {
 priv struct Doc {
   name : String
   text : String
-  places : Array[(String, Int)]
+  places : Array[(String, Int32)]
 }
 
 ///|
@@ -74,7 +74,7 @@ fn Doc::new(name : String, text : String) -> Doc {
 
 ///|
 /// One edit at `at`: a letter is inserted (even `i`) or removed again.
-fn edit_step(source : @syntax.Source, at : Int, i : Int) -> @syntax.Source {
+fn edit_step(source : @syntax.Source, at : Int32, i : Int32) -> @syntax.Source {
   if i % 2 == 0 {
     source.edit(at, at, "x").0
   } else {
@@ -84,7 +84,7 @@ fn edit_step(source : @syntax.Source, at : Int, i : Int) -> @syntax.Source {
 
 ///|
 /// The source after `edits` edits at `at`.
-fn run_edit(doc : Doc, at : Int, edits : Int) -> @syntax.Source {
+fn run_edit(doc : Doc, at : Int32, edits : Int32) -> @syntax.Source {
   let mut source = @syntax.Source::new(bench_id(), doc.text)
   for i in 0..<edits {
     source = edit_step(source, at, i)
@@ -94,7 +94,7 @@ fn run_edit(doc : Doc, at : Int, edits : Int) -> @syntax.Source {
 
 ///|
 /// The text of `doc` with a letter inserted at `at`.
-fn with_letter(doc : Doc, at : Int) -> String {
+fn with_letter(doc : Doc, at : Int32) -> String {
   @syntax.utf8_slice(doc.text, 0, at) +
   "x" +
   @syntax.utf8_slice(doc.text, at, @syntax.utf8_len(doc.text))
@@ -103,7 +103,7 @@ fn with_letter(doc : Doc, at : Int) -> String {
 ///|
 /// The same through `Source::replace`, which finds the edit by comparing
 /// the texts.
-fn run_replace(doc : Doc, at : Int, edits : Int) -> @syntax.Source {
+fn run_replace(doc : Doc, at : Int32, edits : Int32) -> @syntax.Source {
   let mut source = @syntax.Source::new(bench_id(), doc.text)
   let with_x = with_letter(doc, at)
   for i in 0..<edits {
@@ -113,7 +113,7 @@ fn run_replace(doc : Doc, at : Int, edits : Int) -> @syntax.Source {
 }
 
 ///|
-fn run_parse(doc : Doc, times : Int) -> Int {
+fn run_parse(doc : Doc, times : Int32) -> Int32 {
   let mut sum = 0
   for _ in 0..<times {
     sum += @syntax.Source::new(bench_id(), doc.text).root().len()
@@ -123,7 +123,7 @@ fn run_parse(doc : Doc, times : Int) -> Int {
 
 ///|
 /// Microseconds per call of `f`, the least of five rounds.
-fn micros(rounds : Int, f : () -> Unit) -> Double {
+fn micros(rounds : Int32, f : () -> Unit) -> Double {
   let mut best = @double.infinity
   for _ in 0..<5 {
     let start = @bench.monotonic_clock_start()

@@ -297,7 +297,7 @@ priv struct Work {
   /// Children that we haven't processed yet. The `children[pos:]` slice
   /// shrinks over time.
   children : Array[Child]
-  mut pos : Int
+  mut pos : Int32
   /// Leftovers from a breakable block.
   mut spill : MultiSpill?
   /// Queued floats that didn't fit in previous regions.
@@ -398,7 +398,7 @@ fn Work::extend_skips(self : Work, skips : Array[@library.Location]) -> Unit {
 /// Options defining the column layout.
 pub(all) struct ColumnOptions {
   /// The number of columns.
-  count : Int
+  count : Int32
   /// Whether column heights are to be equalized.
   balanced : Bool
   /// The spacing between columns.
@@ -441,7 +441,7 @@ priv struct FootnoteConfig {
 /// Configuration of columns.
 priv struct ColumnConfig {
   /// The number of columns.
-  count : Int
+  count : Int32
   /// The width of each column.
   width : @library.Abs
   /// The amount of space between columns.

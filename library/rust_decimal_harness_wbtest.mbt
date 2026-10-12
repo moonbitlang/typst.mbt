@@ -5,7 +5,7 @@
 let harness_failures : Array[String] = []
 
 ///|
-let harness_checks : Ref[Int] = Ref(0)
+let harness_checks : Ref[Int32] = Ref(0)
 
 ///|
 fn hparse(s : String) -> RustDecimal {
@@ -37,7 +37,7 @@ fn chk2(
   mul : String,
   div : String,
   rem : String,
-  cmp : Int,
+  cmp : Int32,
 ) -> Unit {
   let x = hparse(a)
   let y = hparse(b)
@@ -56,9 +56,9 @@ fn chk1(
   ceil : String,
   trunc : String,
   fract : String,
-  digits : Int,
+  digits : Int32,
   round : String,
-  exp : Int,
+  exp : Int32,
   pow : String,
   f64bits : UInt64,
   i64s : String,

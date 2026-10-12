@@ -4,13 +4,13 @@
 ///|
 /// A window into a backing array (`&mut [T]` upstream).
 priv struct IntSlice {
-  arr : FixedArray[Int]
-  off : Int
-  len : Int
+  arr : FixedArray[Int32]
+  off : Int32
+  len : Int32
 }
 
 ///|
-fn IntSlice::new(arr : FixedArray[Int], off : Int, len : Int) -> IntSlice {
+fn IntSlice::new(arr : FixedArray[Int32], off : Int32, len : Int32) -> IntSlice {
   { arr, off, len, }
 }
 
@@ -20,29 +20,29 @@ fn IntSlice::empty() -> IntSlice {
 }
 
 ///|
-fn IntSlice::get(self : IntSlice, i : Int) -> Int {
+fn IntSlice::get(self : IntSlice, i : Int32) -> Int32 {
   self.arr[self.off + i]
 }
 
 ///|
-fn IntSlice::set(self : IntSlice, i : Int, v : Int) -> Unit {
+fn IntSlice::set(self : IntSlice, i : Int32, v : Int32) -> Unit {
   self.arr[self.off + i] = v
 }
 
 ///|
-fn IntSlice::valid(self : IntSlice, i : Int) -> Bool {
+fn IntSlice::valid(self : IntSlice, i : Int32) -> Bool {
   i >= 0 && i < self.len
 }
 
 ///|
 /// Point marker bits.
-const MARKER_TOUCHED_X : Int = 0x10
+const MARKER_TOUCHED_X : Int32 = 0x10
 
 ///|
-const MARKER_TOUCHED_Y : Int = 0x20
+const MARKER_TOUCHED_Y : Int32 = 0x20
 
 ///|
-const MARKER_TOUCHED : Int = 0x30
+const MARKER_TOUCHED : Int32 = 0x30
 
 ///|
 /// Describes the axis to which a measurement or point movement operation
@@ -54,7 +54,7 @@ priv enum CoordAxis {
 } derive(Eq)
 
 ///|
-fn CoordAxis::touched_marker(self : CoordAxis) -> Int {
+fn CoordAxis::touched_marker(self : CoordAxis) -> Int32 {
   match self {
     Both => MARKER_TOUCHED
     X => MARKER_TOUCHED_X
@@ -94,12 +94,15 @@ fn Zone::default() -> Zone {
 }
 
 ///|
-fn Zone::len(self : Zone) -> Int {
+fn Zone::len(self : Zone) -> Int32 {
   self.points_x.len
 }
 
 ///|
-fn Zone::point(self : Zone, index : Int) -> (Int, Int) raise HintErrorKind {
+fn Zone::point(
+  self : Zone,
+  index : Int32,
+) -> (Int32, Int32) raise HintErrorKind {
   if !self.points_x.valid(index) {
     raise InvalidPointIndex(index)
   }
@@ -109,8 +112,8 @@ fn Zone::point(self : Zone, index : Int) -> (Int, Int) raise HintErrorKind {
 ///|
 fn Zone::set_point(
   self : Zone,
-  index : Int,
-  p : (Int, Int),
+  index : Int32,
+  p : (Int32, Int32),
 ) -> Unit raise HintErrorKind {
   if !self.points_x.valid(index) {
     raise InvalidPointIndex(index)
@@ -120,7 +123,10 @@ fn Zone::set_point(
 }
 
 ///|
-fn Zone::original(self : Zone, index : Int) -> (Int, Int) raise HintErrorKind {
+fn Zone::original(
+  self : Zone,
+  index : Int32,
+) -> (Int32, Int32) raise HintErrorKind {
   if !self.original_x.valid(index) {
     raise InvalidPointIndex(index)
   }
@@ -130,8 +136,8 @@ fn Zone::original(self : Zone, index : Int) -> (Int, Int) raise HintErrorKind {
 ///|
 fn Zone::set_original(
   self : Zone,
-  index : Int,
-  p : (Int, Int),
+  index : Int32,
+  p : (Int32, Int32),
 ) -> Unit raise HintErrorKind {
   if !self.original_x.valid(index) {
     raise InvalidPointIndex(index)
@@ -141,7 +147,7 @@ fn Zone::set_original(
 }
 
 ///|
-fn Zone::unscaled(self : Zone, index : Int) -> (Int, Int) {
+fn Zone::unscaled(self : Zone, index : Int32) -> (Int32, Int32) {
   // Unscaled points in the twilight zone are always (0, 0).
   if self.unscaled_x.valid(index) {
     (self.unscaled_x.get(index), self.unscaled_y.get(index))
@@ -151,7 +157,7 @@ fn Zone::unscaled(self : Zone, index : Int) -> (Int, Int) {
 }
 
 ///|
-fn Zone::contour(self : Zone, index : Int) -> Int raise HintErrorKind {
+fn Zone::contour(self : Zone, index : Int32) -> Int32 raise HintErrorKind {
   if !self.contours.valid(index) {
     raise InvalidContourIndex(index)
   }
@@ -161,7 +167,7 @@ fn Zone::contour(self : Zone, index : Int) -> Int raise HintErrorKind {
 ///|
 fn Zone::touch(
   self : Zone,
-  index : Int,
+  index : Int32,
   axis : CoordAxis,
 ) -> Unit raise HintErrorKind {
   if !self.flags.valid(index) {
@@ -173,7 +179,7 @@ fn Zone::touch(
 ///|
 fn Zone::untouch(
   self : Zone,
-  index : Int,
+  index : Int32,
   axis : CoordAxis,
 ) -> Unit raise HintErrorKind {
   if !self.flags.valid(index) {
@@ -185,7 +191,7 @@ fn Zone::untouch(
 ///|
 fn Zone::is_touched(
   self : Zone,
-  index : Int,
+  index : Int32,
   axis : CoordAxis,
 ) -> Bool raise HintErrorKind {
   if !self.flags.valid(index) {
@@ -195,7 +201,7 @@ fn Zone::is_touched(
 }
 
 ///|
-fn Zone::flip_on_curve(self : Zone, index : Int) -> Unit raise HintErrorKind {
+fn Zone::flip_on_curve(self : Zone, index : Int32) -> Unit raise HintErrorKind {
   if !self.flags.valid(index) {
     raise InvalidPointIndex(index)
   }
@@ -205,8 +211,8 @@ fn Zone::flip_on_curve(self : Zone, index : Int) -> Unit raise HintErrorKind {
 ///|
 fn Zone::set_on_curve(
   self : Zone,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   on : Bool,
 ) -> Unit raise HintErrorKind {
   if start < 0 || end < 0 || start > end || end > self.flags.len {
@@ -290,9 +296,9 @@ fn Zone::iup(self : Zone, axis : CoordAxis) -> Unit raise HintErrorKind {
 fn Zone::iup_shift(
   self : Zone,
   axis : CoordAxis,
-  p1 : Int,
-  p2 : Int,
-  p : Int,
+  p1 : Int32,
+  p2 : Int32,
+  p : Int32,
 ) -> Unit raise HintErrorKind {
   if p1 > p2 || p1 > p || p > p2 {
     return
@@ -321,10 +327,10 @@ fn Zone::iup_shift(
 fn Zone::iup_interpolate(
   self : Zone,
   axis : CoordAxis,
-  p1 : Int,
-  p2 : Int,
-  ref1 : Int,
-  ref2 : Int,
+  p1 : Int32,
+  p2 : Int32,
+  ref1 : Int32,
+  ref2 : Int32,
 ) -> Unit raise HintErrorKind {
   if p1 > p2 {
     return
@@ -338,7 +344,7 @@ fn Zone::iup_interpolate(
   let pts = Zone::coord(self.points_x, self.points_y, axis)
   let org = Zone::coord(self.original_x, self.original_y, axis)
   let uns = Zone::coord(self.unscaled_x, self.unscaled_y, axis)
-  let unscaled = fn(i : Int) { if uns.valid(i) { uns.get(i) } else { 0 } }
+  let unscaled = fn(i : Int32) { if uns.valid(i) { uns.get(i) } else { 0 } }
   let mut orus1 = unscaled(ref1)
   let mut orus2 = unscaled(ref2)
   if orus1 > orus2 {
@@ -422,9 +428,9 @@ priv enum RoundMode {
 /// Graphics state that controls rounding.
 priv struct RoundState {
   mut mode : RoundMode
-  mut threshold : Int
-  mut phase : Int
-  mut period : Int
+  mut threshold : Int32
+  mut phase : Int32
+  mut period : Int32
 }
 
 ///|
@@ -433,7 +439,7 @@ fn RoundState::default() -> RoundState {
 }
 
 ///|
-fn imin(a : Int, b : Int) -> Int {
+fn imin(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {
@@ -442,7 +448,7 @@ fn imin(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn RoundState::round(self : RoundState, distance : Int) -> Int {
+fn RoundState::round(self : RoundState, distance : Int32) -> Int32 {
   match self.mode {
     HalfGrid =>
       if distance >= 0 {
@@ -528,26 +534,26 @@ fn RoundState::round(self : RoundState, distance : Int) -> Int {
 #warnings("-unused_field")
 priv struct RetainedGraphicsState {
   mut auto_flip : Bool
-  mut control_value_cutin : Int
-  mut delta_base : Int
-  mut delta_shift : Int
-  mut instruct_control : Int
-  mut min_distance : Int
+  mut control_value_cutin : Int32
+  mut delta_base : Int32
+  mut delta_shift : Int32
+  mut instruct_control : Int32
+  mut min_distance : Int32
   mut scan_control : Bool
-  mut scan_type : Int
-  mut single_width_cutin : Int
-  mut single_width : Int
+  mut scan_type : Int32
+  mut single_width_cutin : Int32
+  mut single_width : Int32
   target : Target
-  scale : Int
-  ppem : Int
+  scale : Int32
+  ppem : Int32
   is_rotated : Bool
   is_stretched : Bool
 }
 
 ///|
 fn RetainedGraphicsState::new(
-  scale : Int,
-  ppem : Int,
+  scale : Int32,
+  ppem : Int32,
   target : Target,
 ) -> RetainedGraphicsState {
   {
@@ -585,7 +591,7 @@ fn RetainedGraphicsState::copy(
 
 ///|
 /// Zone pointer: 0 = twilight, 1 = glyph.
-priv struct ZonePointer(Int) derive(Eq)
+priv struct ZonePointer(Int32) derive(Eq)
 
 ///|
 fn ZonePointer::is_twilight(self : ZonePointer) -> Bool {
@@ -593,7 +599,7 @@ fn ZonePointer::is_twilight(self : ZonePointer) -> Bool {
 }
 
 ///|
-fn zone_pointer_from(value : Int) -> ZonePointer raise HintErrorKind {
+fn zone_pointer_from(value : Int32) -> ZonePointer raise HintErrorKind {
   match value {
     0 | 1 => ZonePointer(value)
     _ => raise InvalidZoneIndex(value)
@@ -604,21 +610,21 @@ fn zone_pointer_from(value : Int) -> ZonePointer raise HintErrorKind {
 /// Context in which instructions are executed.
 priv struct GraphicsState {
   mut retained : RetainedGraphicsState
-  mut proj_x : Int
-  mut proj_y : Int
+  mut proj_x : Int32
+  mut proj_y : Int32
   mut proj_axis : CoordAxis
-  mut dual_proj_x : Int
-  mut dual_proj_y : Int
+  mut dual_proj_x : Int32
+  mut dual_proj_y : Int32
   mut dual_proj_axis : CoordAxis
-  mut freedom_x : Int
-  mut freedom_y : Int
+  mut freedom_x : Int32
+  mut freedom_y : Int32
   mut freedom_axis : CoordAxis
-  mut fdotp : Int
+  mut fdotp : Int32
   mut round_state : RoundState
-  mut rp0 : Int
-  mut rp1 : Int
-  mut rp2 : Int
-  mut loop_counter : Int
+  mut rp0 : Int32
+  mut rp1 : Int32
+  mut rp2 : Int32
+  mut loop_counter : Int32
   mut zp0 : ZonePointer
   mut zp1 : ZonePointer
   mut zp2 : ZonePointer
@@ -669,7 +675,7 @@ fn GraphicsState::new(
 
 ///|
 /// Returns the factor for scaling unscaled points to pixels.
-fn GraphicsState::unscaled_to_pixels(self : GraphicsState) -> Int {
+fn GraphicsState::unscaled_to_pixels(self : GraphicsState) -> Int32 {
   if self.is_composite {
     1 << 16
   } else {
@@ -762,9 +768,9 @@ fn GraphicsState::update_projection_state(self : GraphicsState) -> Unit {
 /// projection vector.
 fn GraphicsState::project(
   self : GraphicsState,
-  v1 : (Int, Int),
-  v2 : (Int, Int),
-) -> Int {
+  v1 : (Int32, Int32),
+  v2 : (Int32, Int32),
+) -> Int32 {
   match self.proj_axis {
     X => v1.0 - v2.0
     Y => v1.1 - v2.1
@@ -781,9 +787,9 @@ fn GraphicsState::project(
 /// dual projection vector.
 fn GraphicsState::dual_project(
   self : GraphicsState,
-  v1 : (Int, Int),
-  v2 : (Int, Int),
-) -> Int {
+  v1 : (Int32, Int32),
+  v2 : (Int32, Int32),
+) -> Int32 {
   match self.dual_proj_axis {
     X => v1.0 - v2.0
     Y => v1.1 - v2.1
@@ -796,7 +802,7 @@ fn GraphicsState::dual_project(
 }
 
 ///|
-fn GraphicsState::round(self : GraphicsState, distance : Int) -> Int {
+fn GraphicsState::round(self : GraphicsState, distance : Int32) -> Int32 {
   self.round_state.round(distance)
 }
 
@@ -804,7 +810,7 @@ fn GraphicsState::round(self : GraphicsState, distance : Int) -> Int {
 /// Returns true if all (zone pointer, point index) accesses would be valid.
 fn GraphicsState::in_bounds(
   self : GraphicsState,
-  pairs : Array[(ZonePointer, Int)],
+  pairs : Array[(ZonePointer, Int32)],
 ) -> Bool {
   for pair in pairs {
     let (zp, index) = pair
@@ -840,8 +846,8 @@ fn GraphicsState::zp2z(self : GraphicsState) -> Zone {
 fn GraphicsState::move_original(
   self : GraphicsState,
   zone : ZonePointer,
-  point_ix : Int,
-  distance : Int,
+  point_ix : Int32,
+  distance : Int32,
 ) -> Unit raise HintErrorKind {
   let z = self.zone(zone)
   let (px, py) = z.original(point_ix)
@@ -867,8 +873,8 @@ fn GraphicsState::move_original(
 fn GraphicsState::move_point(
   self : GraphicsState,
   zone : ZonePointer,
-  point_ix : Int,
-  distance : Int,
+  point_ix : Int32,
+  distance : Int32,
 ) -> Unit raise HintErrorKind {
   // Note: we never adjust x in backward compatibility mode and we never
   // adjust y in backward compatibility mode after IUP has been done in
@@ -920,9 +926,9 @@ fn GraphicsState::move_point(
 /// given delta.
 fn GraphicsState::move_zp2_point(
   self : GraphicsState,
-  point_ix : Int,
-  dx : Int,
-  dy : Int,
+  point_ix : Int32,
+  dx : Int32,
+  dy : Int32,
   do_touch : Bool,
 ) -> Unit raise HintErrorKind {
   let back_compat = self.backward_compatibility
@@ -951,9 +957,9 @@ fn GraphicsState::move_zp2_point(
 ///|
 priv struct PointDisplacement {
   zone : ZonePointer
-  point_ix : Int
-  dx : Int
-  dy : Int
+  point_ix : Int32
+  dx : Int32
+  dy : Int32
 }
 
 ///|
@@ -961,7 +967,7 @@ priv struct PointDisplacement {
 /// vector.
 fn GraphicsState::point_displacement(
   self : GraphicsState,
-  opcode : Int,
+  opcode : Int32,
 ) -> PointDisplacement raise HintErrorKind {
   let (zone, point_ix) = if (opcode & 1) != 0 {
     (self.zp0, self.rp1)

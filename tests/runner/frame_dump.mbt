@@ -23,17 +23,17 @@ priv struct FrameEncoder {
   struct_tags : StructDumper?
   /// Shared with canonical content (location numbering).
   dumper : Dumper
-  fonts : Map[String, Int]
-  images : Map[String, Int]
-  contents : Map[String, Int]
-  keys : Map[@library.U128, Int]
+  fonts : Map[String, Int32]
+  images : Map[String, Int32]
+  contents : Map[String, Int32]
+  keys : Map[@library.U128, Int32]
 }
 
 ///|
 fn FrameEncoder::new(
   span_enc : (@syntax.Span) -> String,
-  zero_span_offsets? : Bool = false,
-  tag_names_only? : Bool = false,
+  zero_span_offsets~ : Bool = false,
+  tag_names_only~ : Bool = false,
   struct_tags? : StructDumper,
 ) -> FrameEncoder {
   {
@@ -165,7 +165,7 @@ fn FrameEncoder::format_options(
 fn FrameEncoder::content(
   self : FrameEncoder,
   content : @library.Content,
-) -> Int {
+) -> Int32 {
   let encoded = match self.struct_tags {
     Some(dumper) => dumper.content(content)
     None => self.dumper.content(content)
@@ -180,12 +180,15 @@ fn FrameEncoder::content(
 }
 
 ///|
-fn FrameEncoder::location(self : FrameEncoder, loc : @library.Location) -> Int {
+fn FrameEncoder::location(
+  self : FrameEncoder,
+  loc : @library.Location,
+) -> Int32 {
   self.dumper.loc_id(loc)
 }
 
 ///|
-fn FrameEncoder::key(self : FrameEncoder, key : @library.U128) -> Int {
+fn FrameEncoder::key(self : FrameEncoder, key : @library.U128) -> Int32 {
   match self.keys.get(key) {
     Some(id) => id
     None => {
@@ -264,7 +267,7 @@ fn FrameEncoder::skips(self : FrameEncoder, item : @library.FrameItem) -> Bool {
 fn FrameEncoder::item(
   self : FrameEncoder,
   r : String,
-  i : Int,
+  i : Int32,
   pos : @library.Point,
   item : @library.FrameItem,
 ) -> Unit {
@@ -430,7 +433,10 @@ fn FrameEncoder::glyphs(
 
 ///|
 /// The id of a font instance, emitting its record if it is new.
-fn FrameEncoder::font(self : FrameEncoder, font : @library.FontInstance) -> Int {
+fn FrameEncoder::font(
+  self : FrameEncoder,
+  font : @library.FontInstance,
+) -> Int32 {
   let inner = font.font()
   let variations = array(
     font.variations().0.map(v => {
@@ -460,7 +466,7 @@ fn FrameEncoder::font(self : FrameEncoder, font : @library.FontInstance) -> Int 
 
 ///|
 /// The id of an image, emitting its record if it is new.
-fn FrameEncoder::image(self : FrameEncoder, image : @library.Image) -> Int {
+fn FrameEncoder::image(self : FrameEncoder, image : @library.Image) -> Int32 {
   let (kind, sha, page_index, exif, icc) = match image.kind() {
     Raster(raster) => {
       let kind = match raster.format() {

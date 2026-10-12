@@ -116,7 +116,7 @@ pub fn[T] ModifierSet::best_match_in(
   variants : Iter[(ModifierSet, T)],
 ) -> T? {
   let mut best : T? = None
-  let mut best_score : (Int, Int)? = None
+  let mut best_score : (Int32, Int32)? = None
 
   // Find the best table entry with this name.
   for candidate in variants {

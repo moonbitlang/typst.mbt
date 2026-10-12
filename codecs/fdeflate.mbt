@@ -2,19 +2,19 @@
 // and `compute_codes` from `src/lib.rs`), used by the `png` crate's encoder.
 
 ///|
-let fdeflate_huffman_codes : FixedArray[Int] = compute_codes(
+let fdeflate_huffman_codes : FixedArray[Int32] = compute_codes(
   fdeflate_huffman_lengths,
 )
 
 ///|
-let fdeflate_bitmasks : ReadOnlyArray[UInt] = [
+let fdeflate_bitmasks : ReadOnlyArray[UInt32] = [
   0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF, 0x01FF,
   0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF,
 ]
 
 ///|
 /// Computes canonical (bit-reversed) Huffman codes from code lengths.
-fn compute_codes(lengths : ReadOnlyArray[Int]) -> FixedArray[Int] {
+fn compute_codes(lengths : ReadOnlyArray[Int32]) -> FixedArray[Int32] {
   let codes = FixedArray::make(lengths.length(), 0)
   let mut code = 0U
   for len in 1..<=16 {
@@ -32,7 +32,7 @@ fn compute_codes(lengths : ReadOnlyArray[Int]) -> FixedArray[Int] {
 
 ///|
 /// Upstream `u16::reverse_bits`.
-fn reverse_bits16(v : UInt) -> UInt {
+fn reverse_bits16(v : UInt32) -> UInt32 {
   let mut out = 0U
   for i in 0..<16 {
     if ((v >> i) & 1) != 0 {
@@ -45,8 +45,8 @@ fn reverse_bits16(v : UInt) -> UInt {
 ///|
 /// An Adler-32 checksum (upstream `simd_adler32::Adler32`).
 struct Adler32 {
-  mut a : UInt
-  mut b : UInt
+  mut a : UInt32
+  mut b : UInt32
 }
 
 ///|
@@ -62,12 +62,12 @@ fn Adler32::write(self : Adler32, data : BytesView) -> Unit {
 }
 
 ///|
-fn Adler32::finish(self : Adler32) -> UInt {
+fn Adler32::finish(self : Adler32) -> UInt32 {
   (self.b << 16) | self.a
 }
 
 ///|
-fn write_u32_be(w : Buffer, v : UInt) -> Unit {
+fn write_u32_be(w : Buffer, v : UInt32) -> Unit {
   w.write_byte((v >> 24).to_byte())
   w.write_byte((v >> 16).to_byte())
   w.write_byte((v >> 8).to_byte())
@@ -79,7 +79,7 @@ fn write_u32_be(w : Buffer, v : UInt) -> Unit {
 pub struct Compressor {
   priv checksum : Adler32
   priv mut buffer : UInt64
-  priv mut nbits : Int
+  priv mut nbits : Int32
   priv writer : Buffer
 }
 
@@ -87,7 +87,7 @@ pub struct Compressor {
 fn Compressor::write_bits(
   self : Compressor,
   bits : UInt64,
-  nbits : Int,
+  nbits : Int32,
 ) -> Unit {
   self.buffer = self.buffer | (bits << self.nbits)
   self.nbits += nbits
@@ -114,7 +114,7 @@ fn Compressor::flush(self : Compressor) -> Unit {
 }
 
 ///|
-fn Compressor::write_code(self : Compressor, sym : Int) -> Unit {
+fn Compressor::write_code(self : Compressor, sym : Int32) -> Unit {
   self.write_bits(
     fdeflate_huffman_codes[sym].to_uint64(),
     fdeflate_huffman_lengths[sym],
@@ -122,7 +122,7 @@ fn Compressor::write_code(self : Compressor, sym : Int) -> Unit {
 }
 
 ///|
-fn Compressor::write_run(self : Compressor, run : Int) -> Unit {
+fn Compressor::write_run(self : Compressor, run : Int32) -> Unit {
   let mut run = run
   self.write_code(0)
   run -= 1
@@ -158,7 +158,7 @@ pub fn Compressor::new() -> Compressor {
 }
 
 ///|
-let fdeflate_header : ReadOnlyArray[Int] = [
+let fdeflate_header : ReadOnlyArray[Int32] = [
   120, 1, 237, 192, 3, 160, 36, 89, 150, 198, 241, 255, 119, 238, 141, 200, 204,
   167, 114, 75, 99, 174, 109, 219, 182, 109, 219, 182, 109, 219, 182, 109, 105, 140,
   158, 150, 74, 175, 158, 50, 51, 34, 238, 249, 118, 183, 106, 122, 166, 135, 59,
@@ -175,7 +175,7 @@ fn Compressor::write_headers(self : Compressor) -> Unit {
 
 ///|
 /// Little-endian 64-bit load of `data[i..i + 8]`.
-fn load_u64_le(data : BytesView, i : Int) -> UInt64 {
+fn load_u64_le(data : BytesView, i : Int32) -> UInt64 {
   let mut v = 0UL
   for k in 0..<8 {
     v = v | (data[i + k].to_uint64() << (8 * k))
@@ -325,7 +325,7 @@ pub fn StoredOnlyCompressor::finish(self : StoredOnlyCompressor) -> Bytes {
 /// Return the number of bytes that will be written to the output stream for
 /// the given input size. Because this compressor only writes stored blocks,
 /// the output size is always slightly *larger* than the input size.
-pub fn StoredOnlyCompressor::compressed_size(raw_size : Int) -> Int {
+pub fn StoredOnlyCompressor::compressed_size(raw_size : Int32) -> Int32 {
   let max = 65535
   @cmp.maximum(raw_size - 1, 0) / max * (max + 5) + (raw_size % max + 5) + 6
 }

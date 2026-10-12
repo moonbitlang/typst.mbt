@@ -2,12 +2,12 @@
 // functions; the tables are generated into `ot_shaper_use_table_gen.mbt`).
 
 ///|
-fn use_b4(a : ReadOnlyArray[Int], i : Int) -> Int {
+fn use_b4(a : ReadOnlyArray[Int32], i : Int32) -> Int32 {
   (a[i >> 1] >> ((i & 1) << 2)) & 15
 }
 
 ///|
-fn use_get_category(u : UInt) -> Int {
+fn use_get_category(u : UInt32) -> Int32 {
   if u < 921600 {
     let u = u.reinterpret_as_int()
     use_u8[2953 +

@@ -42,9 +42,9 @@ fn label(
   x : Double,
   y : Double,
   text : String,
-  size? : Double = LABEL,
-  fill? : Paint = ink,
-  anchor? : Anchor = Lead,
+  size~ : Double = LABEL,
+  fill~ : Paint = ink,
+  anchor~ : Anchor = Lead,
 ) -> Place {
   let body = Text(text, size=Pt(size), fill~)
   let top = y - 0.72 * size
@@ -169,7 +169,7 @@ fn arrow(
   x2 : Double,
   y2 : Double,
   paint : Paint,
-  dashed? : Bool = false,
+  dashed~ : Bool = false,
 ) -> Seq {
   let (dx, dy) = (x2 - x1, y2 - y1)
   let len = (dx * dx + dy * dy).sqrt()

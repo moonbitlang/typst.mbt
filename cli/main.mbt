@@ -3,7 +3,7 @@
 
 ///|
 /// The CLI's exit code.
-let exit_code : Ref[Int] = { val: 0, }
+let exit_code : Ref[Int32] = { val: 0, }
 
 ///|
 /// Ensure a failure exit code.
@@ -18,7 +18,7 @@ fn main {
 
 ///|
 /// Runs the CLI and returns the exit code.
-fn run() -> Int {
+fn run() -> Int32 {
   let args = parse_args(@platform.args()) catch {
     Display(text) => {
       print_out_lossy(text)

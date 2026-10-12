@@ -72,7 +72,7 @@ pub extend DictOperator with Eq::{not_equal, equal}
 pub extend DictOperator with @debug.Debug::{to_repr}
 
 ///|
-fn DictOperator::from_opcode(opcode : Int) -> DictOperator? {
+fn DictOperator::from_opcode(opcode : Int32) -> DictOperator? {
   Some(
     match opcode {
       // Top DICT operators
@@ -108,7 +108,7 @@ fn DictOperator::from_opcode(opcode : Int) -> DictOperator? {
 }
 
 ///|
-fn DictOperator::from_extended_opcode(opcode : Int) -> DictOperator? {
+fn DictOperator::from_extended_opcode(opcode : Int32) -> DictOperator? {
   Some(
     match opcode {
       // Top DICT operators
@@ -168,7 +168,7 @@ fn parse_token(cursor : Cursor) -> Token raise PsError {
     }
   } else {
     match b0 {
-      28 | 29 | 32..=254 => Operand(I32(parse_int(cursor, b0)), None)
+      28 | 29 | 32..<=254 => Operand(I32(parse_int(cursor, b0)), None)
       30 => {
         let components = BcdComponents::parse(cursor)
         Operand(Fixed(components.value(false)), Some(components))
@@ -194,46 +194,46 @@ pub(all) enum Entry {
   FamilyName(Sid)
   Weight(Sid)
   FontBbox(FixedArray[@font_types.Fixed])
-  CharstringsOffset(Int)
+  CharstringsOffset(Int32)
   /// Private DICT byte range `start..end` (as `usize`, i.e. `UInt64`).
   PrivateDictRange(UInt64, UInt64)
-  VariationStoreOffset(Int)
+  VariationStoreOffset(Int32)
   Copyright(Sid)
   IsFixedPitch(Bool)
   ItalicAngle(@font_types.Fixed)
   UnderlinePosition(@font_types.Fixed)
   UnderlineThickness(@font_types.Fixed)
-  PaintType(Int)
-  CharstringType(Int)
+  PaintType(Int32)
+  CharstringType(Int32)
   FontMatrix(ScaledFontMatrix)
   StrokeWidth(@font_types.Fixed)
-  FdArrayOffset(Int)
-  FdSelectOffset(Int)
+  FdArrayOffset(Int32)
+  FdSelectOffset(Int32)
   BlueValues(Blues)
   OtherBlues(Blues)
   FamilyBlues(Blues)
   FamilyOtherBlues(Blues)
-  SubrsOffset(Int)
-  VariationStoreIndex(Int)
+  SubrsOffset(Int32)
+  VariationStoreIndex(Int32)
   BlueScale(@font_types.Fixed)
   BlueShift(@font_types.Fixed)
   BlueFuzz(@font_types.Fixed)
-  LanguageGroup(Int)
+  LanguageGroup(Int32)
   ExpansionFactor(@font_types.Fixed)
-  Encoding(Int)
-  Charset(Int)
-  UniqueId(Int)
+  Encoding(Int32)
+  Charset(Int32)
+  UniqueId(Int32)
   Xuid
-  SyntheticBase(Int)
+  SyntheticBase(Int32)
   PostScript(Sid)
   BaseFontName(Sid)
   BaseFontBlend
   Ros(registry~ : Sid, ordering~ : Sid, supplement~ : @font_types.Fixed)
   CidFontVersion(@font_types.Fixed)
   CidFontRevision(@font_types.Fixed)
-  CidFontType(Int)
-  CidCount(Int)
-  UidBase(Int)
+  CidFontType(Int32)
+  CidCount(Int32)
+  UidBase(Int32)
   FontName(Sid)
   StdHw(@font_types.Fixed)
   StdVw(@font_types.Fixed)
@@ -242,7 +242,7 @@ pub(all) enum Entry {
   StemSnapH(StemSnaps)
   StemSnapV(StemSnaps)
   ForceBold(Bool)
-  InitialRandomSeed(Int)
+  InitialRandomSeed(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -347,7 +347,7 @@ pub fn ok_entries(dict_data : BytesView) -> Array[Entry] {
 }
 
 ///|
-fn sid_of(v : Int) -> Sid {
+fn sid_of(v : Int32) -> Sid {
   Sid::new(v)
 }
 

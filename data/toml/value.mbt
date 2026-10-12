@@ -14,7 +14,7 @@ fn value(i : Input) -> TValue raise ErrMode {
     '[' => VArray(check_recursion(i, array))
     '{' => VInlineTable(check_recursion(i, inline_table))
     // Date/number starts
-    '+' | '-' | '0'..='9' =>
+    '+' | '-' | '0'..<='9' =>
       alt(i, [
         i => VDatetime(date_time(i)),
         i => VFloat(float(i)),

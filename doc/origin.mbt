@@ -6,15 +6,15 @@
 ///|
 /// The largest byte offset a range span can hold (`Span::from_range`
 /// saturates above it).
-let span_range_max : Int = 8388607
+let span_range_max : Int32 = 8388607
 
 ///|
 /// The maximum number of distinct markup snippets of a session.
-let snippet_slot_max : Int = 4096
+let snippet_slot_max : Int32 = 4096
 
 ///|
 /// The longest string whose glyph span offsets are exact (they are 16-bit).
-let text_offset_max : Int = 65535
+let text_offset_max : Int32 = 65535
 
 ///|
 /// The file of the origin listing: a project-root file, so that relative
@@ -52,25 +52,25 @@ priv struct Entry {
   /// The occurrence keys, outermost first.
   keys : Array[String]
   /// The byte range of the entry's line in the listing (without newline).
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   /// Per declared parameter: its location and the byte range of its token
   /// in the listing.
-  args : Array[(String, Int, Int)?]
+  args : Array[(String, Int32, Int32)?]
   /// Whether a text of more than 65,535 bytes was lowered with this origin,
   /// so that glyph offsets are not reliable.
   mut long_text : Bool
   /// The stack of containers that the entry was last noted under
   /// (`Registry::note_stack`; `-1`: none yet), so that lowering the same
   /// call again costs nothing.
-  mut noted : Int
+  mut noted : Int32
 }
 
 ///|
 /// A markup or math snippet evaluated by the front end.
 priv struct Snippet {
   /// The entry of the `Markup`/`Equation` call.
-  entry : Int
+  entry : Int32
   mode : @syntax.SyntaxMode
   text : String
   id : @syntax.FileId
@@ -81,13 +81,13 @@ priv struct Snippet {
 priv struct Registry {
   entries : Array[Entry]
   /// Deduplication: site location and key path to entry index.
-  index : Map[String, Int]
+  index : Map[String, Int32]
   /// The origin listing.
   listing : StringBuilder
   /// The length of the listing in bytes.
-  mut len : Int
+  mut len : Int32
   snippets : Array[Snippet]
-  snippet_index : Map[String, Int]
+  snippet_index : Map[String, Int32]
   /// The parsed listing (for `World::source`), invalidated by appends.
   mut source : @syntax.Source?
   /// The directory of the document's virtual files, relative to the
@@ -98,16 +98,16 @@ priv struct Registry {
   /// The blocks and boxes that were lowered with a size of their own, by
   /// the location of their call (`Container`).
   containers : Array[Container]
-  container_index : Map[String, Int]
+  container_index : Map[String, Int32]
   /// The stacks of containers that something was lowered under (the
   /// containers whose arguments were being lowered, outermost first), each
   /// once: the first is the empty one. And for the location of every call
   /// the stack that it was lowered under: if there were several, what
   /// they have in common from the innermost container outwards
   /// (`Registry::note_stack`).
-  stacks : Array[Array[Int]]
-  stack_index : Map[String, Int]
-  lowered_under : Map[String, Int]
+  stacks : Array[Array[Int32]]
+  stack_index : Map[String, Int32]
+  lowered_under : Map[String, Int32]
 }
 
 ///|
@@ -125,7 +125,7 @@ priv struct Registry {
 /// was lowered in, from the innermost outwards.
 priv struct Container {
   /// The entry of the call that was lowered first.
-  entry : Int
+  entry : Int32
   /// The call's location (`Entry::loc`).
   loc : String
   /// The sizes that the call had: its width and its height where they are
@@ -139,7 +139,7 @@ priv struct Container {
 }
 
 ///|
-fn Registry::new(dir? : String = "") -> Registry {
+fn Registry::new(dir~ : String = "") -> Registry {
   // A directory that is no project path is reported when the document is
   // lowered (`Document::lower_initial`); the listing is a root file then.
   let dir = if virtual_file(dir, "<edsl-origins>") is Some(_) {
@@ -168,7 +168,7 @@ fn Registry::new(dir? : String = "") -> Registry {
 ///|
 /// The container of the call with the entry `entry`, registered on first
 /// use.
-fn Registry::container(self : Registry, entry : Int) -> Int {
+fn Registry::container(self : Registry, entry : Int32) -> Int32 {
   let loc = self.entries[entry].loc
   match self.container_index.get(loc) {
     Some(id) => id
@@ -189,7 +189,7 @@ fn Registry::container(self : Registry, entry : Int) -> Int {
 
 ///|
 /// The number of a stack of containers (outermost first).
-fn Registry::stack(self : Registry, containers : Array[Int]) -> Int {
+fn Registry::stack(self : Registry, containers : Array[Int32]) -> Int32 {
   let key = containers.map(id => id.to_string()).join(",")
   match self.stack_index.get(key) {
     Some(stack) => stack
@@ -211,7 +211,7 @@ fn Registry::stack(self : Registry, containers : Array[Int]) -> Int {
 /// all of it) is noted like the container itself, under the stack around
 /// it: whether something with that location is in the container is asked
 /// when it is met on a page (`FrameLinter::evidence`).
-fn Registry::note_stack(self : Registry, entry : Int, stack : Int) -> Unit {
+fn Registry::note_stack(self : Registry, entry : Int32, stack : Int32) -> Unit {
   let e = self.entries[entry]
   guard e.noted != stack else { return }
   e.noted = stack
@@ -265,7 +265,7 @@ fn fixed_length(content : @library.Content, name : String) -> @library.Abs? {
 /// its call returned.
 fn Registry::note_size(
   self : Registry,
-  id : Int,
+  id : Int32,
   value : @library.Value,
 ) -> Unit {
   guard value is Content(content) else { return }
@@ -302,7 +302,7 @@ fn Registry::entry(
   self : Registry,
   site : Site,
   keys : Array[String],
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   let ArgsLoc(arg_locs) = site.args
   self.entry_of(
     site.loc.to_string(),
@@ -316,9 +316,9 @@ fn Registry::entry(
 /// The entry of the same call as `entry` under other keys.
 fn Registry::rekeyed(
   self : Registry,
-  entry : Int,
+  entry : Int32,
   keys : Array[String],
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   let e = self.entries[entry]
   self.entry_of(e.loc, e.kind, e.args.map(arg => arg.map(arg => arg.0)), keys)
 }
@@ -332,7 +332,7 @@ fn Registry::entry_of(
   kind : String,
   arg_locs : Array[String?],
   keys : Array[String],
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   // The deduplication key is unambiguous for any keys: each is prefixed
   // with its length.
   let dedup = if keys.is_empty() {
@@ -359,7 +359,7 @@ fn Registry::entry_of(
     line.write_string(@library.repr_str(key))
   }
   let start = self.len
-  let args : Array[(String, Int, Int)?] = []
+  let args : Array[(String, Int32, Int32)?] = []
   for i, arg in arg_locs {
     match arg {
       None => args.push(None)
@@ -401,7 +401,7 @@ fn Registry::entry_of(
 
 ///|
 /// The span of an entry: its line.
-fn Registry::span(self : Registry, entry : Int) -> @syntax.Span {
+fn Registry::span(self : Registry, entry : Int32) -> @syntax.Span {
   let e = self.entries[entry]
   @syntax.Span::from_range(self.origins, e.start, e.end)
 }
@@ -411,8 +411,8 @@ fn Registry::span(self : Registry, entry : Int) -> @syntax.Span {
 /// the argument has no location.
 fn Registry::arg_span(
   self : Registry,
-  entry : Int,
-  param : Int,
+  entry : Int32,
+  param : Int32,
 ) -> @syntax.Span {
   let e = self.entries[entry]
   if param >= 0 && param < e.args.length() && e.args[param] is Some((_, s, t)) {
@@ -434,7 +434,7 @@ fn Registry::mark_long_text(self : Registry, span : @syntax.Span) -> Unit {
 ///|
 /// The entry whose line contains a span of the origin listing, and the
 /// parameter whose token the span is (`-1` for the entry's own span).
-fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int, Int)? {
+fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int32, Int32)? {
   guard span.get() is Range(id~, start~, end~) && id == self.origins else {
     return None
   }
@@ -484,7 +484,7 @@ fn Registry::keyed_span(
 /// The slot of a snippet, registering it on first use.
 fn Registry::snippet(
   self : Registry,
-  entry : Int,
+  entry : Int32,
   mode : @syntax.SyntaxMode,
   text : String,
   span : @syntax.Span,
@@ -590,20 +590,20 @@ pub struct Origin {
   /// The module of the source file.
   module_name : String
   /// One-based line and column of the start and (exclusive) end.
-  start_line : Int
-  start_column : Int
-  end_line : Int
-  end_column : Int
+  start_line : Int32
+  start_column : Int32
+  end_line : Int32
+  end_column : Int32
   /// The constructor that was called.
   kind : String
   /// The occurrence keys of the enclosing `Keyed` wrappers, outermost first.
   keys : Array[String]
   /// The index of the constructor parameter the location refers to, if it
   /// is narrower than the call.
-  param : Int?
+  param : Int32?
   /// For locations inside a `Markup`/`Equation` source: the byte range in
   /// that source string.
-  text_range : (Int, Int)?
+  text_range : (Int32, Int32)?
 }
 
 ///|
@@ -635,7 +635,7 @@ pub fn Origin::describe(self : Origin) -> String {
 
 ///|
 /// Parse a decimal number.
-fn parse_int(s : StringView) -> Int {
+fn parse_int(s : StringView) -> Int32 {
   let mut n = 0
   for c in s {
     n = n * 10 + (c.to_int() - '0'.to_int())
@@ -645,7 +645,7 @@ fn parse_int(s : StringView) -> Int {
 
 ///|
 /// Parse `file:line:col-line:col@module` (the format of `SourceLoc`).
-fn parse_loc(repr : String) -> (String, String, Int, Int, Int, Int) {
+fn parse_loc(repr : String) -> (String, String, Int32, Int32, Int32, Int32) {
   // The module follows the last `@`, the range the last two `:` groups
   // around `-`.
   let (rest, module_name) = match repr.rev_find("@") {
@@ -688,8 +688,8 @@ pub struct Origins {
   /// outermost first, and the container that is at its call site (`-1`:
   /// none).
   priv containers : Array[Container]
-  priv under : Array[Array[Int]]
-  priv own : Array[Int]
+  priv under : Array[Array[Int32]]
+  priv own : Array[Int32]
 }
 
 ///|
@@ -736,7 +736,7 @@ fn Registry::freeze(self : Registry) -> Origins {
 
 ///|
 /// The number of distinct origins.
-pub fn Origins::length(self : Origins) -> Int {
+pub fn Origins::length(self : Origins) -> Int32 {
   self.entries.length()
 }
 
@@ -762,7 +762,7 @@ pub fn Origins::source_text(self : Origins, id : @syntax.FileId) -> String? {
 }
 
 ///|
-fn Origins::entry_at(self : Origins, offset : Int) -> Int? {
+fn Origins::entry_at(self : Origins, offset : Int32) -> Int32? {
   // Binary search for the last entry starting at or before `offset`.
   let mut lo = 0
   let mut hi = self.entries.length()
@@ -788,9 +788,9 @@ fn Origins::entry_at(self : Origins, offset : Int) -> Int? {
 ///|
 fn Origins::origin_of(
   self : Origins,
-  entry : Int,
-  param : Int?,
-  text_range : (Int, Int)?,
+  entry : Int32,
+  param : Int32?,
+  text_range : (Int32, Int32)?,
 ) -> Origin {
   let e = self.entries[entry]
   let loc = match param {
@@ -836,7 +836,7 @@ pub fn Origins::resolve_range(
       if id == self.file {
         guard self.entry_at(start) is Some(entry) else { return None }
         let e = self.entries[entry]
-        let mut param : Int? = Option::None
+        let mut param : Int32? = Option::None
         for i, arg in e.args {
           if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
             param = Some(i)
@@ -878,7 +878,7 @@ pub fn Origins::resolve_range(
 /// The entry that an engine span refers to and whether the span is one of
 /// its arguments, without building the origin: for the checks that look
 /// at every item of a document.
-fn Origins::entry_of(self : Origins, span : @syntax.Span) -> (Int, Bool)? {
+fn Origins::entry_of(self : Origins, span : @syntax.Span) -> (Int32, Bool)? {
   match @syntax.DiagSpan::from_span(span).get() {
     Range(id~, start~, end~) =>
       if id == self.file {
@@ -900,7 +900,10 @@ fn Origins::entry_of(self : Origins, span : @syntax.Span) -> (Int, Bool)? {
 ///|
 /// The entry of the `Markup` or `Equation` call whose source is the file
 /// `id`: what is in the source is in its source argument.
-fn Origins::snippet_entry(self : Origins, id : @syntax.FileId) -> (Int, Bool)? {
+fn Origins::snippet_entry(
+  self : Origins,
+  id : @syntax.FileId,
+) -> (Int32, Bool)? {
   for snippet in self.snippets {
     if snippet.id == id {
       return Some((snippet.entry, true))
@@ -918,7 +921,7 @@ pub struct TextOrigin {
   /// narrowing within the node's text, never claimed exact (the engine may
   /// have preprocessed the text). `None` where it is known to be
   /// unreliable: the origin lowered a text of more than 65,535 bytes.
-  engine_offset : Int?
+  engine_offset : Int32?
 }
 
 ///|
@@ -926,7 +929,7 @@ pub struct TextOrigin {
 pub fn Origins::resolve_glyph(
   self : Origins,
   span : @syntax.Span,
-  offset : Int,
+  offset : Int32,
 ) -> TextOrigin? {
   guard self.resolve(span) is Some(origin) else { return None }
   let long_text = match @syntax.DiagSpan::from_span(span).get() {

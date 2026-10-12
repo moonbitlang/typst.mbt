@@ -84,7 +84,7 @@ let category_infos : ReadOnlyArray[OperatorInfo] = [
 
 ///|
 /// Maps an operator table encoding to a category index (`from_encoding`).
-let category_encodings : ReadOnlyArray[(Int, Int)] = [
+let category_encodings : ReadOnlyArray[(Int32, Int32)] = [
   (0, 2),
   (4, 3),
   (8, 4),
@@ -100,7 +100,7 @@ let category_encodings : ReadOnlyArray[(Int, Int)] = [
 
 ///|
 /// The operator dictionary (`OPERATOR_TABLE`): (key, encoding << 4 | range length).
-let operator_table : ReadOnlyArray[(Int, Int)] = [
+let operator_table : ReadOnlyArray[(Int32, Int32)] = [
   (37, 128),
   (42, 128),
   (43, 64),
@@ -348,7 +348,7 @@ let two_ascii_chars_table : ReadOnlyArray[String] = [
 
 ///|
 /// Ranges of fence characters (`FENCE_TABLE`): (start, length).
-let fence_table : ReadOnlyArray[(Char, Int)] = [
+let fence_table : ReadOnlyArray[(Char, Int32)] = [
   ('(', 2),
   ('[', 1),
   (']', 1),
@@ -377,7 +377,7 @@ let inline_axis_non_bmp_table : ReadOnlyArray[Char] = ['\u{1EEF0}', '\u{1EEF1}']
 
 ///|
 /// BMP characters with an inline stretch axis (`INLINE_AXIS_BMP_TABLE`).
-let inline_axis_bmp_table : ReadOnlyArray[Int] = [
+let inline_axis_bmp_table : ReadOnlyArray[Int32] = [
   61, 94, 95, 126, 175, 710, 711, 713, 717, 732, 759, 770, 818, 8254, 8400, 8401,
   8406, 8407, 8417, 8592, 8594, 8596, 8600, 8601, 8602, 8603, 8604, 8605, 8606, 8608,
   8610, 8611, 8612, 8614, 8617, 8618, 8619, 8620, 8621, 8622, 8628, 8633, 8636, 8637,

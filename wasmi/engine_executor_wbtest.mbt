@@ -26,7 +26,7 @@ fn executor_test_module_bytes() -> Bytes {
 fn executor_test_decode_hex(hex : String) -> Bytes {
   let bytes = FixedArray::make(hex.length() / 2, b'\x00')
   for i in 0..<bytes.length() {
-    let digit = fn(c : Int) -> Int {
+    let digit = fn(c : Int32) -> Int32 {
       if c >= '0'.to_int() && c <= '9'.to_int() {
         c - '0'.to_int()
       } else {
@@ -163,7 +163,7 @@ test "executor: stack limits match wasmi" {
   let module_ = Module::new(engine, bytes)
   let linker : Linker[Unit] = Linker::new(engine)
   let instance = linker.instantiate_and_start(store, module_)
-  let max_ok = fn(name : String, two : Bool, hi : Int) -> String {
+  let max_ok = fn(name : String, two : Bool, hi : Int32) -> String {
     guard instance.get_func(store, name) is Some(func) else { abort(name) }
     let mut lo = 0
     let mut hi = hi

@@ -268,7 +268,7 @@ priv struct EvalMemo {
   /// entry is found, only that a scope that is still open may hold the
   /// entry's module: such an entry is not dropped for the limit of
   /// entries per source ([EvalMemos::push]) nor by `evict`.
-  mut scope : Int
+  mut scope : Int32
   /// Whether the entry ends with the scope that stored it: an evaluation
   /// with memoization off (`@library.set_layout_memo_enabled(false)`).
   /// Such a scope neither leaves anything for a later one nor takes
@@ -278,7 +278,7 @@ priv struct EvalMemo {
   scoped : Bool
   /// The number of `@library.evict` calls since the entry was stored or
   /// taken (comemo's age).
-  mut age : Int
+  mut age : Int32
   /// The source that was evaluated: the entry is found by its fingerprint
   /// and only taken for the same source ([same_source]).
   source : @syntax.Source
@@ -295,7 +295,7 @@ priv struct EvalMemo {
   /// The depth of the outer route and how much deeper or shallower it may
   /// be without changing the answer of a depth check of the evaluation
   /// (comemo tracks `Route::within`).
-  depth : Int
+  depth : Int32
   shifts : @library.RouteShifts
   /// The traced span and the files it was asked for (comemo tracks
   /// `Traced::get`: only those answers must match).
@@ -365,7 +365,7 @@ fn EvalMemo::matches(
   library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
-  depth : Int,
+  depth : Int32,
 ) -> Bool {
   guard physical_equal(self.library, library) &&
     self.shifts.allows(depth - self.depth) &&
@@ -404,14 +404,14 @@ priv struct EvalMemos {
   /// when another scope stores one, those of the scopes that are closed
   /// are dropped ([EvalMemos::drop_ended]).
   scoped_keys : Array[@library.U128]
-  mut scoped_scope : Int
+  mut scoped_scope : Int32
   /// Whether `@library.set_memo_check` knows the store.
   mut checked : Bool
   /// The entries that were set aside for a second run of that check.
   mut aside : Map[@library.U128, Array[EvalMemo]]?
   /// The numbers of evaluations that were found and that were computed
   /// ([module_memo_stats]).
-  counts : FixedArray[Int]
+  counts : FixedArray[Int32]
 }
 
 ///|
@@ -451,21 +451,21 @@ let eval_memo : EvalMemos = {
 /// a scope that is still open stored or took is not dropped for it: in
 /// one compilation a file is the same module for every import that asks
 /// the same, as upstream.
-let eval_memo_max_entries : Int = 12
+let eval_memo_max_entries : Int32 = 12
 
 ///|
 /// How many evaluations of source files the store has answered and how
 /// many it has computed since the process started (for tests and
 /// measurements, like `@library.closure_memo_stats`). An evaluation of a
 /// file that changes during its scope is neither.
-pub fn module_memo_stats() -> (Int, Int) {
+pub fn module_memo_stats() -> (Int32, Int32) {
   (eval_memo.counts[0], eval_memo.counts[1])
 }
 
 ///|
 /// The number of evaluations that the store keeps (for tests and
 /// measurements).
-pub fn module_memo_entries() -> Int {
+pub fn module_memo_entries() -> Int32 {
   let mut count = 0
   for _, entries in eval_memo.entries {
     count += entries.length()
@@ -554,7 +554,7 @@ fn EvalMemos::drop_ended(self : EvalMemos) -> Unit {
 /// by identity, and a file that is imported again in that compilation
 /// must be the module it was. (comemo would drop them; upstream never
 /// evicts during a compilation.)
-fn EvalMemos::evict(self : EvalMemos, max_age : Int) -> Unit {
+fn EvalMemos::evict(self : EvalMemos, max_age : Int32) -> Unit {
   let empty = []
   for key, entries in self.entries {
     entries.retain(memo => {
@@ -810,7 +810,7 @@ fn EvalMemos::original(
   library : @library.Library,
   traced : @library.Traced,
   route : @library.Route,
-  depth : Int,
+  depth : Int32,
 ) -> Result[@library.Module, Array[@library.SourceDiagnostic]]? {
   guard @library.memo_check_running_now() && self.aside is Some(aside) else {
     return None

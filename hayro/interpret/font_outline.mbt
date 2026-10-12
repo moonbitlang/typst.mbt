@@ -10,7 +10,7 @@ pub(all) struct OutlineFontData {
   /// PostScript name (e.g., "TimesNewRomanPS-BoldMT").
   postscript_name : String?
   /// Font weight (100-900, 400=normal, 700=bold).
-  weight : UInt?
+  weight : UInt32?
   /// Whether the font is italic/oblique.
   is_italic : Bool
   /// Whether the font is serif (vs sans-serif).
@@ -102,7 +102,7 @@ impl CacheKey for OutlineFont with fn cache_key(self) {
 fn OutlineFont::outline_glyph(
   self : OutlineFont,
   glyph : GlyphId,
-  code : UInt,
+  code : UInt32,
 ) -> @kurbo.BezPath {
   match self {
     Type1(t) => t.outline_glyph(glyph)
@@ -114,7 +114,7 @@ fn OutlineFont::outline_glyph(
 ///|
 fn OutlineFont::char_code_to_unicode(
   self : OutlineFont,
-  char_code : UInt,
+  char_code : UInt32,
 ) -> @cmap.BfString? {
   match self {
     Type1(t) => t.char_code_to_unicode(char_code)
@@ -127,7 +127,7 @@ fn OutlineFont::char_code_to_unicode(
 /// Get the advance width for a glyph by character code.
 fn OutlineFont::glyph_advance_width(
   self : OutlineFont,
-  char_code : UInt,
+  char_code : UInt32,
 ) -> Float? {
   match self {
     Type1(t) => t.glyph_width(char_code.to_byte())

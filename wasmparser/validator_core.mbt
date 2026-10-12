@@ -24,7 +24,7 @@ priv enum Order {
 } derive(Eq)
 
 ///|
-fn Order::rank(self : Order) -> Int {
+fn Order::rank(self : Order) -> Int32 {
   match self {
     Initial => 0
     Type => 1
@@ -54,16 +54,16 @@ priv struct ModuleState {
   /// Where we are, order-wise, in the wasm binary.
   mut order : Order
   /// The number of data segments in the data section (if present).
-  mut data_segment_count : UInt
+  mut data_segment_count : UInt32
   /// The number of functions we expect to be defined in the code section, or
   /// basically the length of the function section if it was found. The next
   /// index is where we are, in the code section index space, for the next
   /// entry in the code section (used to figure out what type is next for the
   /// function being validated).
-  mut expected_code_bodies : UInt?
+  mut expected_code_bodies : UInt32?
   mut const_expr_allocs : OperatorValidatorAllocations
   /// When parsing the code section, represents the current index in the section.
-  mut code_section_index : Int?
+  mut code_section_index : Int32?
 }
 
 ///|
@@ -82,7 +82,7 @@ fn ModuleState::default() -> ModuleState {
 fn ModuleState::update_order(
   self : ModuleState,
   order : Order,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if self.order.rank() >= order.rank() {
     raise BinaryReaderError::new("section out of order", offset)
@@ -93,7 +93,7 @@ fn ModuleState::update_order(
 ///|
 fn ModuleState::validate_end(
   self : ModuleState,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   // Ensure that the data count section, if any, was correct.
   if self.module_.data_count is Some(data_count) {
@@ -117,8 +117,8 @@ fn ModuleState::validate_end(
 ///|
 fn ModuleState::next_code_index_and_type(
   self : ModuleState,
-  offset : Int,
-) -> (UInt, UInt) raise BinaryReaderError {
+  offset : Int32,
+) -> (UInt32, UInt32) raise BinaryReaderError {
   let index = match self.code_section_index {
     Some(i) => i
     None => self.module_.num_imported_functions.reinterpret_as_int()
@@ -139,7 +139,7 @@ fn ModuleState::add_global(
   global : Global,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.module_.check_global_type(global.ty, features, types, offset)
   self.check_const_expr(
@@ -157,7 +157,7 @@ fn ModuleState::add_table(
   table : Table,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.module_.check_table_type(table.ty, features, types, offset)
   match table.init {
@@ -183,7 +183,7 @@ fn ModuleState::add_data_segment(
   data : Data,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   match data.kind {
     Passive => ()
@@ -200,7 +200,7 @@ fn ModuleState::add_element_segment(
   e : Element,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   // the `funcref` value type is allowed all the way back to the MVP, so
   // don't check it here
@@ -227,7 +227,7 @@ fn ModuleState::add_element_segment(
         raise BinaryReaderError::new("bulk memory must be enabled", offset)
       }
   }
-  let validate_count = (count : UInt) => {
+  let validate_count = (count : UInt32) => {
     if count > MAX_WASM_TABLE_ENTRIES.reinterpret_as_uint() {
       raise BinaryReaderError::new(
         "number of elements is out of bounds", offset,
@@ -290,7 +290,7 @@ fn ModuleState::check_const_expr(
 
 ///|
 priv struct VisitConstOperator {
-  mut offset : Int
+  mut offset : Int32
   mut uninserted_funcref : Bool
   ops : OperatorValidator
   resources : ValidatorResources
@@ -353,7 +353,7 @@ fn VisitConstOperator::validate_shared_everything_threads(
 ///|
 fn VisitConstOperator::validate_global(
   self : VisitConstOperator,
-  index : UInt,
+  index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let module_ = self.resources.module_
   let global = module_.global_at(index, self.offset)
@@ -391,7 +391,7 @@ fn VisitConstOperator::validate_global(
 // else.
 fn VisitConstOperator::insert_ref_func(
   self : VisitConstOperator,
-  index : UInt,
+  index : UInt32,
 ) -> Unit {
   if self.order == Data {
     self.uninserted_funcref = true
@@ -423,16 +423,16 @@ struct Module {
   memories : Array[MemoryType]
   globals : Array[GlobalType]
   element_types : Array[RefType]
-  mut data_count : UInt?
+  mut data_count : UInt32?
   // Stores indexes into `types`.
-  functions : Array[UInt]
+  functions : Array[UInt32]
   tags : Array[CoreTypeId]
-  function_references : @hashset.HashSet[UInt]
+  function_references : @hashset.HashSet[UInt32]
   imports : Map[(String, String), Array[EntityType]]
   exports : Map[String, EntityType]
-  mut type_size : UInt
-  mut num_imported_globals : UInt
-  mut num_imported_functions : UInt
+  mut type_size : UInt32
+  mut num_imported_globals : UInt32
+  mut num_imported_functions : UInt32
 }
 
 ///|
@@ -462,7 +462,7 @@ fn Module::add_types(
   rec_group : RecGroup,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
   check_limit : Bool,
 ) -> Unit raise BinaryReaderError {
   if check_limit {
@@ -483,7 +483,7 @@ fn Module::add_import(
   import_ : Import,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   let entity = self.check_type_ref(import_.ty, features, types, offset)
   let (len, max, desc) = match import_.ty {
@@ -534,7 +534,7 @@ fn Module::add_export(
   name : String,
   ty : EntityType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
   check_limit : Bool,
   types : TypeList,
 ) -> Unit raise BinaryReaderError {
@@ -563,9 +563,9 @@ fn Module::add_export(
 ///|
 fn Module::add_function(
   self : Module,
-  type_index : UInt,
+  type_index : UInt32,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.func_type_at(type_index, types, offset) |> ignore
   self.functions.push(type_index)
@@ -576,7 +576,7 @@ fn Module::add_memory(
   self : Module,
   ty : MemoryType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.check_memory_type(ty, features, offset)
   self.memories.push(ty)
@@ -588,7 +588,7 @@ fn Module::add_tag(
   ty : TagType,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.check_tag_type(ty, features, types, offset)
   self.tags.push(self.types[ty.func_type_idx.reinterpret_as_int()])
@@ -598,8 +598,8 @@ fn Module::add_tag(
 fn Module::sub_type_at(
   self : Module,
   types : TypeList,
-  idx : UInt,
-  offset : Int,
+  idx : UInt32,
+  offset : Int32,
 ) -> SubType raise BinaryReaderError {
   let id = self.type_id_at(idx, offset)
   types.get_core(id)
@@ -608,9 +608,9 @@ fn Module::sub_type_at(
 ///|
 fn Module::func_type_at(
   self : Module,
-  type_index : UInt,
+  type_index : UInt32,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> FuncType raise BinaryReaderError {
   match self.sub_type_at(types, type_index, offset).composite_type.inner {
     Func(f) => f
@@ -624,7 +624,7 @@ fn Module::check_type_ref(
   type_ref : TypeRef,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> EntityType raise BinaryReaderError {
   match type_ref {
     Func(type_index) => {
@@ -656,7 +656,7 @@ fn Module::check_table_type(
   ty : TableType,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   // The `funcref` value type is allowed all the way back to the MVP, so
   // don't check it here.
@@ -688,7 +688,7 @@ fn Module::check_memory_type(
   self : Module,
   ty : MemoryType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.check_limits(ty.initial, ty.maximum, offset)
   let (page_size, page_size_log2) = if ty.page_size_log2 is Some(page_size_log2) {
@@ -750,7 +750,7 @@ fn Module::check_value_type(
   self : Module,
   ty : ValType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
 ) -> ValType raise BinaryReaderError {
   // The above only checks the value type for features.
   // We must check it if it's a reference.
@@ -769,7 +769,7 @@ fn Module::check_ref_type(
   self : Module,
   ty : RefType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
 ) -> RefType raise BinaryReaderError {
   if features.check_ref_type(ty) is Some(e) {
     raise BinaryReaderError::new(e, offset)
@@ -782,7 +782,7 @@ fn Module::check_ref_type(
 fn Module::check_heap_type(
   self : Module,
   ty : HeapType,
-  offset : Int,
+  offset : Int32,
 ) -> HeapType raise BinaryReaderError {
   // Check that the heap type is valid.
   let type_index = match ty {
@@ -807,7 +807,7 @@ fn Module::check_tag_type(
   ty : TagType,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if !features.exceptions() {
     raise BinaryReaderError::new("exceptions proposal not enabled", offset)
@@ -826,7 +826,7 @@ fn Module::check_global_type(
   ty : GlobalType,
   features : WasmFeatures,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   ty.content_type = self.check_value_type(ty.content_type, features, offset)
   if ty.shared {
@@ -848,7 +848,7 @@ fn Module::check_limits(
   _self : Module,
   initial : UInt64,
   maximum : UInt64?,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if maximum is Some(max) {
     if initial > max {
@@ -860,7 +860,7 @@ fn Module::check_limits(
 }
 
 ///|
-fn Module::max_tables(_self : Module, features : WasmFeatures) -> Int {
+fn Module::max_tables(_self : Module, features : WasmFeatures) -> Int32 {
   if features.reference_types() {
     MAX_WASM_TABLES
   } else {
@@ -869,7 +869,7 @@ fn Module::max_tables(_self : Module, features : WasmFeatures) -> Int {
 }
 
 ///|
-fn Module::max_memories(_self : Module, features : WasmFeatures) -> Int {
+fn Module::max_memories(_self : Module, features : WasmFeatures) -> Int32 {
   if features.multi_memory() {
     MAX_WASM_MEMORIES
   } else {
@@ -881,9 +881,9 @@ fn Module::max_memories(_self : Module, features : WasmFeatures) -> Int {
 fn Module::export_to_entity_type(
   self : Module,
   export_ : Export,
-  offset : Int,
+  offset : Int32,
 ) -> EntityType raise BinaryReaderError {
-  let check = (ty : String, index : UInt, total : Int) => {
+  let check = (ty : String, index : UInt32, total : Int32) => {
     if index >= total.reinterpret_as_uint() {
       bail(offset, "unknown \{ty} \{index}: exported \{ty} index out of bounds")
     }
@@ -917,9 +917,9 @@ fn Module::export_to_entity_type(
 ///|
 fn Module::get_func_type(
   self : Module,
-  func_idx : UInt,
+  func_idx : UInt32,
   types : TypeList,
-  offset : Int,
+  offset : Int32,
 ) -> FuncType raise BinaryReaderError {
   if func_idx < self.functions.length().reinterpret_as_uint() {
     self.func_type_at(
@@ -935,8 +935,8 @@ fn Module::get_func_type(
 ///|
 fn Module::global_at(
   self : Module,
-  idx : UInt,
-  offset : Int,
+  idx : UInt32,
+  offset : Int32,
 ) -> GlobalType raise BinaryReaderError {
   if idx < self.globals.length().reinterpret_as_uint() {
     self.globals[idx.reinterpret_as_int()]
@@ -948,8 +948,8 @@ fn Module::global_at(
 ///|
 fn Module::table_at(
   self : Module,
-  idx : UInt,
-  offset : Int,
+  idx : UInt32,
+  offset : Int32,
 ) -> TableType raise BinaryReaderError {
   if idx < self.tables.length().reinterpret_as_uint() {
     self.tables[idx.reinterpret_as_int()]
@@ -961,8 +961,8 @@ fn Module::table_at(
 ///|
 fn Module::memory_at(
   self : Module,
-  idx : UInt,
-  offset : Int,
+  idx : UInt32,
+  offset : Int32,
 ) -> MemoryType raise BinaryReaderError {
   if idx < self.memories.length().reinterpret_as_uint() {
     self.memories[idx.reinterpret_as_int()]
@@ -981,8 +981,8 @@ fn Module::add_type_id(self : Module, id : CoreTypeId) -> Unit {
 /// `InternRecGroup::type_id_at`.
 fn Module::type_id_at(
   self : Module,
-  idx : UInt,
-  offset : Int,
+  idx : UInt32,
+  offset : Int32,
 ) -> CoreTypeId raise BinaryReaderError {
   if idx < self.types.length().reinterpret_as_uint() {
     self.types[idx.reinterpret_as_int()]
@@ -993,7 +993,7 @@ fn Module::type_id_at(
 
 ///|
 /// `InternRecGroup::types_len`.
-fn Module::types_len(self : Module) -> UInt {
+fn Module::types_len(self : Module) -> UInt32 {
   self.types.length().reinterpret_as_uint()
 }
 
@@ -1012,7 +1012,7 @@ pub struct ValidatorResources {
 /// The table element type must be canonicalized.
 pub fn ValidatorResources::table_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> TableType? {
   self.module_.tables.get(at.reinterpret_as_int())
 }
@@ -1021,7 +1021,7 @@ pub fn ValidatorResources::table_at(
 /// Returns the linear memory at given index.
 pub fn ValidatorResources::memory_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> MemoryType? {
   if at < self.module_.memories.length().reinterpret_as_uint() {
     Some(self.module_.memories[at.reinterpret_as_int()])
@@ -1036,7 +1036,7 @@ pub fn ValidatorResources::memory_at(
 /// The tag's function type must be canonicalized.
 pub fn ValidatorResources::tag_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> FuncType? {
   if at >= self.module_.tags.length().reinterpret_as_uint() {
     return None
@@ -1054,7 +1054,7 @@ pub fn ValidatorResources::tag_at(
 /// The global's value type must be canonicalized.
 pub fn ValidatorResources::global_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> GlobalType? {
   if at < self.module_.globals.length().reinterpret_as_uint() {
     Some(self.module_.globals[at.reinterpret_as_int()])
@@ -1069,7 +1069,7 @@ pub fn ValidatorResources::global_at(
 /// The sub type must be canonicalized.
 pub fn ValidatorResources::sub_type_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> SubType? {
   if at < self.module_.types.length().reinterpret_as_uint() {
     let id = self.module_.types[at.reinterpret_as_int()]
@@ -1092,7 +1092,7 @@ pub fn ValidatorResources::sub_type_at_id(
 /// Returns the type id associated with the given function index.
 pub fn ValidatorResources::type_id_of_function(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> CoreTypeId? {
   if at >= self.module_.functions.length().reinterpret_as_uint() {
     return None
@@ -1109,8 +1109,8 @@ pub fn ValidatorResources::type_id_of_function(
 /// Returns the type index associated with the given function index.
 pub fn ValidatorResources::type_index_of_function(
   self : ValidatorResources,
-  at : UInt,
-) -> UInt? {
+  at : UInt32,
+) -> UInt32? {
   if at < self.module_.functions.length().reinterpret_as_uint() {
     Some(self.module_.functions[at.reinterpret_as_int()])
   } else {
@@ -1123,7 +1123,7 @@ pub fn ValidatorResources::type_index_of_function(
 /// `type_of_function` helper).
 pub fn ValidatorResources::func_type_of_function(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> FuncType? {
   match self.type_id_of_function(at) {
     Some(id) =>
@@ -1144,7 +1144,7 @@ fn ValidatorResources::check_value_type(
   self : ValidatorResources,
   t : ValType,
   features : WasmFeatures,
-  offset : Int,
+  offset : Int32,
 ) -> ValType raise BinaryReaderError {
   if features.check_value_type(t) is Some(s) {
     raise BinaryReaderError::new(s, offset)
@@ -1160,7 +1160,7 @@ fn ValidatorResources::check_value_type(
 fn ValidatorResources::check_ref_type(
   self : ValidatorResources,
   ref_type : RefType,
-  offset : Int,
+  offset : Int32,
 ) -> RefType raise BinaryReaderError {
   let is_nullable = ref_type.is_nullable()
   let heap_ty = self.check_heap_type(ref_type.heap_type(), offset)
@@ -1175,7 +1175,7 @@ fn ValidatorResources::check_ref_type(
 fn ValidatorResources::check_heap_type(
   self : ValidatorResources,
   t : HeapType,
-  offset : Int,
+  offset : Int32,
 ) -> HeapType raise BinaryReaderError {
   self.module_.check_heap_type(t, offset)
 }
@@ -1195,7 +1195,7 @@ pub fn ValidatorResources::top_type(
 /// The `RefType` must be canonicalized.
 pub fn ValidatorResources::element_type_at(
   self : ValidatorResources,
-  at : UInt,
+  at : UInt32,
 ) -> RefType? {
   if at < self.module_.element_types.length().reinterpret_as_uint() {
     Some(self.module_.element_types[at.reinterpret_as_int()])
@@ -1229,13 +1229,13 @@ pub fn ValidatorResources::is_shared(
 
 ///|
 /// Returns the number of elements.
-pub fn ValidatorResources::element_count(self : ValidatorResources) -> UInt {
+pub fn ValidatorResources::element_count(self : ValidatorResources) -> UInt32 {
   self.module_.element_types.length().reinterpret_as_uint()
 }
 
 ///|
 /// Returns the number of bytes in the Wasm data section.
-pub fn ValidatorResources::data_count(self : ValidatorResources) -> UInt? {
+pub fn ValidatorResources::data_count(self : ValidatorResources) -> UInt32? {
   self.module_.data_count
 }
 
@@ -1244,7 +1244,7 @@ pub fn ValidatorResources::data_count(self : ValidatorResources) -> UInt? {
 /// outside of the start/function sections.
 pub fn ValidatorResources::is_function_referenced(
   self : ValidatorResources,
-  idx : UInt,
+  idx : UInt32,
 ) -> Bool {
   self.module_.function_references.contains(idx)
 }
@@ -1257,12 +1257,12 @@ pub fn ValidatorResources::types(self : ValidatorResources) -> TypeList {
 
 ///|
 /// The number of functions (imported and defined) in the module.
-pub fn ValidatorResources::function_count(self : ValidatorResources) -> UInt {
+pub fn ValidatorResources::function_count(self : ValidatorResources) -> UInt32 {
   self.module_.functions.length().reinterpret_as_uint()
 }
 
 ///|
 /// The number of types in the module's type index space.
-pub fn ValidatorResources::type_count(self : ValidatorResources) -> UInt {
+pub fn ValidatorResources::type_count(self : ValidatorResources) -> UInt32 {
   self.module_.types.length().reinterpret_as_uint()
 }

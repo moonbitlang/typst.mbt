@@ -2,7 +2,7 @@
 
 ///|
 /// Maximum size of the operand stack.
-const MAX_STACK : Int = 513
+const MAX_STACK : Int32 = 513
 
 ///|
 /// Operand stack for DICTs and charstrings.
@@ -11,15 +11,15 @@ const MAX_STACK : Int = 513
 /// values. Entries are stored in parallel arrays holding the raw 32-bit value
 /// and a flag that tracks which values are fixed point.
 pub struct Stack {
-  values : FixedArray[Int]
+  values : FixedArray[Int32]
   value_is_fixed : FixedArray[Bool]
-  mut top : Int
+  mut top : Int32
 }
 
 ///|
 /// Either a signed 32-bit integer or a 16.16 fixed point number.
 pub(all) enum Number {
-  I32(Int)
+  I32(Int32)
   Fixed(@font_types.Fixed)
 } derive(Eq, Debug)
 
@@ -48,7 +48,7 @@ pub fn Stack::is_empty(self : Stack) -> Bool {
 }
 
 ///|
-pub fn Stack::len(self : Stack) -> Int {
+pub fn Stack::len(self : Stack) -> Int32 {
   self.top
 }
 
@@ -80,7 +80,7 @@ fn Stack::exch(self : Stack) -> Unit raise PsError {
 }
 
 ///|
-pub fn Stack::push_i32(self : Stack, value : Int) -> Unit raise PsError {
+pub fn Stack::push_i32(self : Stack, value : Int32) -> Unit raise PsError {
   self.push_impl(value, false)
 }
 
@@ -104,7 +104,7 @@ pub fn Stack::push(self : Stack, number : Number) -> Unit raise PsError {
 /// Sets the element at `index` to the given fixed point value.
 fn Stack::set_fixed(
   self : Stack,
-  index : Int,
+  index : Int32,
   value : @font_types.Fixed,
 ) -> Unit raise PsError {
   if index >= self.top {
@@ -119,7 +119,7 @@ fn Stack::set_fixed(
 ///
 /// If `n` is greater than the length of the stack, this simply acts as
 /// a clear operation.
-pub fn Stack::drop(self : Stack, n : Int) -> Unit {
+pub fn Stack::drop(self : Stack, n : Int32) -> Unit {
   let t = self.top - n
   self.top = if n < 0 || t < 0 { 0 } else { t }
 }
@@ -129,7 +129,7 @@ pub fn Stack::drop(self : Stack, n : Int) -> Unit {
 ///
 /// Will return an error if the value at that index was not pushed as an
 /// integer.
-pub fn Stack::get_i32(self : Stack, index : Int) -> Int raise PsError {
+pub fn Stack::get_i32(self : Stack, index : Int32) -> Int32 raise PsError {
   // FreeType just returns 0 for OOB access
   if index < 0 || index >= MAX_STACK {
     return 0
@@ -147,7 +147,7 @@ pub fn Stack::get_i32(self : Stack, index : Int) -> Int raise PsError {
 ///
 /// If the value was pushed as an integer, it will be automatically
 /// converted to 16.16 fixed point.
-pub fn Stack::get_fixed(self : Stack, index : Int) -> @font_types.Fixed {
+pub fn Stack::get_fixed(self : Stack, index : Int32) -> @font_types.Fixed {
   // FreeType just returns 0 for OOB access
   if index < 0 || index >= MAX_STACK {
     return @font_types.Fixed::zero()
@@ -162,7 +162,7 @@ pub fn Stack::get_fixed(self : Stack, index : Int) -> @font_types.Fixed {
 
 ///|
 /// Pops a 32-bit integer from the top of stack.
-pub fn Stack::pop_i32(self : Stack) -> Int raise PsError {
+pub fn Stack::pop_i32(self : Stack) -> Int32 raise PsError {
   let i = self.pop()
   self.get_i32(i)
 }
@@ -187,8 +187,8 @@ pub fn Stack::fixed_values(self : Stack) -> Array[@font_types.Fixed] {
 /// `first_index`.
 pub fn Stack::fixed_array(
   self : Stack,
-  first_index : Int,
-  n : Int,
+  first_index : Int32,
+  n : Int32,
 ) -> FixedArray[@font_types.Fixed] {
   let result = FixedArray::make(n, @font_types.Fixed::zero())
   // FreeType doesn't have an equivalent to this function but always
@@ -249,7 +249,7 @@ fn Stack::div(self : Stack, is_type1 : Bool) -> Unit raise PsError {
 ///|
 fn Stack::push_impl(
   self : Stack,
-  value : Int,
+  value : Int32,
   is_fixed : Bool,
 ) -> Unit raise PsError {
   if self.top == MAX_STACK {
@@ -261,7 +261,7 @@ fn Stack::push_impl(
 }
 
 ///|
-fn Stack::pop(self : Stack) -> Int {
+fn Stack::pop(self : Stack) -> Int32 {
   if self.top > 0 {
     self.top -= 1
     self.top

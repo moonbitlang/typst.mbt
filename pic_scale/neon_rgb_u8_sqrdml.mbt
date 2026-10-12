@@ -15,9 +15,9 @@
 ///|
 fn convolve_horizontal_rgb_neon_rdm_row_one(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   filter_weights : FixedWeights,
 ) -> Unit {
   let rounding_const = 1 << 5

@@ -19,7 +19,7 @@ let render_ref_dir = ".repos/typst/tests/ref/render"
 /// Counters of the comparison against the reference PNGs:
 /// (refs compared, matching within tolerance, missing refs for rendered
 /// documents).
-let render_ref_stats : Ref[(Int, Int, Int)] = Ref((0, 0, 0))
+let render_ref_stats : Ref[(Int32, Int32, Int32)] = Ref((0, 0, 0))
 
 ///|
 /// Names of the tests whose rendering differs from the reference PNG.
@@ -87,7 +87,7 @@ fn compare_render_ref(tc : TestCase, pixmap : @skia.Pixmap) -> Unit {
 
 ///|
 /// The `tolerance(n)` attribute of a test (default 1).
-fn render_tolerance(attrs : String) -> Int {
+fn render_tolerance(attrs : String) -> Int32 {
   for a in attrs.split(" ") {
     if a.has_prefix("tolerance(") && a.has_suffix(")") {
       let s = a.to_owned()
@@ -100,7 +100,7 @@ fn render_tolerance(attrs : String) -> Int {
 
 ///|
 /// Whether two pixel images are approximately equal.
-fn approx_equal(a : @skia.Pixmap, b : @skia.Pixmap, tolerance : Int) -> Bool {
+fn approx_equal(a : @skia.Pixmap, b : @skia.Pixmap, tolerance : Int32) -> Bool {
   if a.width() != b.width() || a.height() != b.height() {
     return false
   }

@@ -15,7 +15,7 @@ priv enum PathDirection {
 pub struct PathBuilder {
   priv mut verbs : Array[PathVerb]
   priv mut points : Array[Point]
-  priv mut last_move_to_index : Int
+  priv mut last_move_to_index : Int32
   priv mut move_to_required : Bool
 } derive(Debug)
 
@@ -64,8 +64,8 @@ pub fn PathBuilder::new() -> PathBuilder {
 /// - Cubic - 3
 /// - Close - 0
 pub fn PathBuilder::with_capacity(
-  verbs_capacity : Int,
-  points_capacity : Int,
+  verbs_capacity : Int32,
+  points_capacity : Int32,
 ) -> PathBuilder {
   {
     verbs: Array(capacity=verbs_capacity),
@@ -121,7 +121,7 @@ pub fn PathBuilder::from_oval(oval : Rect) -> Path? {
 
 ///|
 /// Returns the current number of segments in the builder.
-pub fn PathBuilder::len(self : PathBuilder) -> Int {
+pub fn PathBuilder::len(self : PathBuilder) -> Int32 {
   self.verbs.length()
 }
 
@@ -315,7 +315,7 @@ fn PathBuilder::set_last_point(self : PathBuilder, pt : Point) -> Unit {
 ///|
 fn PathBuilder::is_zero_length_since_point(
   self : PathBuilder,
-  start_pt_index : Int,
+  start_pt_index : Int32,
 ) -> Bool {
   let count = self.points.length() - start_pt_index
   if count < 2 {

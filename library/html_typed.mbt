@@ -288,8 +288,8 @@ fn AttrType::cast(self : AttrType, value : Value) -> String? raise HintedError {
 ///
 /// `start` and `end` are used to index into `@html_assets.attr_strings()`.
 priv struct StringsType {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -566,7 +566,7 @@ fn html_datetime_time(f : StringBuilder, time : @time.Time) -> Unit {
 ///|
 /// Rust's `format!("{:0width$}", n)`: zero padding after the sign, the sign
 /// counting towards the width.
-fn rust_zero_pad(n : Int, width : Int) -> String {
+fn rust_zero_pad(n : Int32, width : Int32) -> String {
   let digits = n.abs().to_string()
   let sign = if n < 0 { "-" } else { "" }
   let pad = width - sign.length() - digits.length()

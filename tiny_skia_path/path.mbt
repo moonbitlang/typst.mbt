@@ -66,7 +66,7 @@ pub extend Path with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the number of segments in the path.
-pub fn Path::len(self : Path) -> Int {
+pub fn Path::len(self : Path) -> Int32 {
   self.verbs.length()
 }
 
@@ -185,7 +185,7 @@ fn compute_quad_extremas(
   p1 : Point,
   p2 : Point,
   extremas : Array[Point],
-) -> Int {
+) -> Int32 {
   let src : ReadOnlyArray[_] = [p0, p1, p2]
   let mut extrema_idx = 0
   if find_quad_extrema(p0.x, p1.x, p2.x) is Some(t) {
@@ -207,7 +207,7 @@ fn compute_cubic_extremas(
   p2 : Point,
   p3 : Point,
   extremas : Array[Point],
-) -> Int {
+) -> Int32 {
   let ts0 = new_t_values()
   let ts1 = new_t_values()
   let n0 = find_cubic_extrema(p0.x, p1.x, p2.x, p3.x, ts0)
@@ -251,8 +251,8 @@ pub extend PathSegment with @debug.Debug::{to_repr}
 /// A path segments iterator.
 pub struct PathSegmentsIter {
   priv path : Path
-  priv mut verb_index : Int
-  priv mut points_index : Int
+  priv mut verb_index : Int32
+  priv mut points_index : Int32
   priv mut is_auto_close : Bool
   priv mut last_move_to : Point
   priv mut last_point : Point

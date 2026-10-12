@@ -199,25 +199,25 @@ let etc : String = "\"&c.\""
 
 ///|
 /// A column of the engine, the upright bold V with its number: `V_4`.
-fn vn(sub : Int) -> String {
+fn vn(sub : Int32) -> String {
   "bold(upright(V))_(\{sub})"
 }
 
 ///|
 /// A column with the index of its value at the upper left: `^1 V_4`.
-fn v(pre : Int, sub : Int) -> String {
+fn v(pre : Int32, sub : Int32) -> String {
   "attach(bold(upright(V)), tl: \{pre}, br: \{sub})"
 }
 
 ///|
 /// `V_4` in the line.
-fn mv(sub : Int) -> Box {
+fn mv(sub : Int32) -> Box {
   m(vn(sub))
 }
 
 ///|
 /// `^1 V_4` in the line.
-fn mpv(pre : Int, sub : Int) -> Box {
+fn mpv(pre : Int32, sub : Int32) -> Box {
   m(v(pre, sub))
 }
 

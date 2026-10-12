@@ -5,7 +5,7 @@ using @kit {type Cards, type DataTable, type Chip, type Canvas}
 
 ///|
 /// Rounded cards around `bodies`, `columns` to a row.
-fn cards(bodies : Array[Seq], columns : Int) -> Cards {
+fn cards(bodies : Array[Seq], columns : Int32) -> Cards {
   Cards(
     bodies.map(body => body as &IntoContent),
     columns=Sizing::repeat(columns, size=Fr(1)),
@@ -37,7 +37,7 @@ fn data_table(
   rows : Array[Array[&IntoContent]],
   columns~ : Array[Sizing],
   align~ : Cells[@doc.Alignment],
-  mark? : Array[Int] = [],
+  mark~ : Array[Int32] = [],
 ) -> Seq {
   let fill : Cells[Paint] = Cells((_, y) => {
     if y == 0 {

@@ -22,11 +22,11 @@ pub fn validate(bytes : BytesView) -> Types raise BinaryReaderError {
 
 ///|
 fn check_max(
-  cur_len : Int,
-  amt_added : UInt,
-  max : Int,
+  cur_len : Int32,
+  amt_added : UInt32,
+  max : Int32,
   desc : String,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if cur_len > max || amt_added.to_uint64() > (max - cur_len).to_uint64() {
     if max == 1 {
@@ -38,10 +38,10 @@ fn check_max(
 
 ///|
 fn combine_type_sizes(
-  a : UInt,
-  b : UInt,
-  offset : Int,
-) -> UInt raise BinaryReaderError {
+  a : UInt32,
+  b : UInt32,
+  offset : Int32,
+) -> UInt32 raise BinaryReaderError {
   let sum = a.to_uint64() + b.to_uint64()
   if sum < MAX_WASM_TYPE_SIZE.to_uint64() {
     sum.to_uint()
@@ -60,7 +60,7 @@ fn combine_type_sizes(
 /// you get identifiers out of (e.g. [`CoreTypeId`][crate::types::CoreTypeId])
 /// and then later assert that you are pairing those identifiers with the same
 /// `Validator` instance when accessing the identifier's associated data.
-pub(all) struct ValidatorId(Int) derive(Eq, Hash, Debug)
+pub(all) struct ValidatorId(Int32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -78,7 +78,7 @@ pub extend ValidatorId with Hash::{hash, hash_combine}
 pub extend ValidatorId with @debug.Debug::{to_repr}
 
 ///|
-let validator_id_counter : Ref[Int] = { val: 0, }
+let validator_id_counter : Ref[Int32] = { val: 0, }
 
 ///|
 fn ValidatorId::default() -> ValidatorId {
@@ -143,7 +143,7 @@ priv enum ValidatorState {
 ///|
 fn ValidatorState::ensure_parsable(
   self : ValidatorState,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   match self {
     Module => ()
@@ -162,7 +162,7 @@ fn ValidatorState::ensure_parsable(
 fn ValidatorState::ensure_module(
   self : ValidatorState,
   _section : String,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.ensure_parsable(offset)
 }
@@ -367,7 +367,7 @@ pub fn Validator::validate_all(
 /// Gets the types known by the validator so far within the
 /// module/component `level` modules/components up from the
 /// module/component currently being parsed.
-pub fn Validator::types(self : Validator, level : Int) -> Types? {
+pub fn Validator::types(self : Validator, level : Int32) -> Types? {
   match self.module_ {
     Some(module_) if level == 0 =>
       Some({ id: self.id, list: self.types, module_: module_.module_, })
@@ -426,7 +426,7 @@ pub fn Validator::payload(
 /// Validates [`Payload::Version`](crate::Payload).
 pub fn Validator::version(
   self : Validator,
-  num : UInt,
+  num : UInt32,
   encoding : Encoding,
   range : Range,
 ) -> Unit raise BinaryReaderError {
@@ -534,7 +534,7 @@ pub fn Validator::import_section(
 /// This method should only be called when parsing a module.
 pub fn Validator::function_section(
   self : Validator,
-  section : SectionLimited[UInt],
+  section : SectionLimited[UInt32],
 ) -> Unit raise BinaryReaderError {
   self.process_module_section(
     Function,
@@ -713,7 +713,7 @@ pub fn Validator::export_section(
 /// This method should only be called when parsing a module.
 pub fn Validator::start_section(
   self : Validator,
-  func : UInt,
+  func : UInt32,
   range : Range,
 ) -> Unit raise BinaryReaderError {
   let offset = range.start
@@ -759,7 +759,7 @@ pub fn Validator::element_section(
 /// This method should only be called when parsing a module.
 pub fn Validator::data_count_section(
   self : Validator,
-  count : UInt,
+  count : UInt32,
   range : Range,
 ) -> Unit raise BinaryReaderError {
   let offset = range.start
@@ -780,7 +780,7 @@ pub fn Validator::data_count_section(
 /// This method should only be called when parsing a module.
 pub fn Validator::code_section_start(
   self : Validator,
-  count : UInt,
+  count : UInt32,
   range : Range,
 ) -> Unit raise BinaryReaderError {
   let offset = range.start
@@ -881,7 +881,7 @@ pub fn Validator::unknown_section(
 /// Returns the types known to the validator for the module or component.
 pub fn Validator::end(
   self : Validator,
-  offset : Int,
+  offset : Int32,
 ) -> Types raise BinaryReaderError {
   let state = self.state
   self.state = End
@@ -909,8 +909,8 @@ fn[T : FromReader] Validator::process_module_section(
   order : Order,
   section : SectionLimited[T],
   name : String,
-  validate_section : (ModuleState, WasmFeatures, TypeList, UInt, Int) -> Unit raise BinaryReaderError,
-  validate_item : (ModuleState, WasmFeatures, TypeList, T, Int) -> Unit raise BinaryReaderError,
+  validate_section : (ModuleState, WasmFeatures, TypeList, UInt32, Int32) -> Unit raise BinaryReaderError,
+  validate_item : (ModuleState, WasmFeatures, TypeList, T, Int32) -> Unit raise BinaryReaderError,
 ) -> Unit raise BinaryReaderError {
   let offset = section.range().start
   self.state.ensure_module(name, offset)

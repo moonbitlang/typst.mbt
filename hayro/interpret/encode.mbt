@@ -48,7 +48,7 @@ pub struct EncodedRadialAxialShading {
 ///
 /// The samples are keyed by `(x << 16) | y` (upstream `(u16, u16)`).
 pub struct EncodedSampledShading {
-  priv samples : Map[Int, ColorComponents]
+  priv samples : Map[Int32, ColorComponents]
   priv function : ShadingFunction?
 }
 
@@ -187,7 +187,7 @@ fn encode_axial_shading(
 
 ///|
 /// Rust's saturating `f64 as u16` cast.
-fn f64_as_u16(x : Double) -> Int {
+fn f64_as_u16(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 65535.0 {
@@ -201,8 +201,8 @@ fn f64_as_u16(x : Double) -> Int {
 fn sample_triangles(
   triangles : Array[Triangle],
   transform : @kurbo.Affine,
-) -> Map[Int, ColorComponents] {
-  let map : Map[Int, ColorComponents] = Map([])
+) -> Map[Int32, ColorComponents] {
+  let map : Map[Int32, ColorComponents] = Map([])
   for t in triangles {
     let t = {
       let p0 = transform.apply(t.p0.point)

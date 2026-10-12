@@ -2,7 +2,7 @@
 
 ///|
 /// 10 MB max, for Fogra39 etc.
-let max_profile_size : Int = 1024 * 1024 * 10
+let max_profile_size : Int32 = 1024 * 1024 * 10
 
 ///|
 pub(all) enum ProfileVersion {
@@ -35,7 +35,7 @@ pub extend ProfileVersion with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend ProfileVersion with @debug.Debug::{to_repr}
 
 ///|
-fn ProfileVersion::try_from(value : UInt) -> ProfileVersion raise CmsError {
+fn ProfileVersion::try_from(value : UInt32) -> ProfileVersion raise CmsError {
   // First try exact match for known versions
   match value {
     0x02000000U => return V2_0
@@ -166,7 +166,7 @@ fn DataColorSpace::is_three_channels(self : DataColorSpace) -> Bool {
 }
 
 ///|
-fn DataColorSpace::try_from(value : UInt) -> DataColorSpace raise CmsError {
+fn DataColorSpace::try_from(value : UInt32) -> DataColorSpace raise CmsError {
   let spaces : Array[(String, DataColorSpace)] = [
     ("XYZ ", Xyz),
     ("Lab ", Lab),
@@ -229,7 +229,7 @@ pub extend ProfileClass with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend ProfileClass with @debug.Debug::{to_repr}
 
 ///|
-fn ProfileClass::try_from(value : UInt) -> ProfileClass raise CmsError {
+fn ProfileClass::try_from(value : UInt32) -> ProfileClass raise CmsError {
   let classes : Array[(String, ProfileClass)] = [
     ("scnr", InputDevice),
     ("mntr", DisplayDevice),
@@ -250,9 +250,9 @@ fn ProfileClass::try_from(value : UInt) -> ProfileClass raise CmsError {
 ///|
 pub(all) enum LutStore {
   /// 8-bit entries.
-  Store8(FixedArray[Int])
+  Store8(FixedArray[Int32])
   /// 16-bit entries.
-  Store16(FixedArray[Int])
+  Store16(FixedArray[Int32])
 } derive(Eq, Debug)
 
 ///|
@@ -284,7 +284,7 @@ pub extend LutType with Eq::{not_equal, equal}
 pub extend LutType with @debug.Debug::{to_repr}
 
 ///|
-fn LutType::try_from(value : UInt) -> LutType raise CmsError {
+fn LutType::try_from(value : UInt32) -> LutType raise CmsError {
   if value == sig("mft1") {
     Lut8
   } else if value == sig("mft2") {
@@ -317,12 +317,12 @@ pub extend LutWarehouse with @debug.Debug::{to_repr}
 ///|
 pub(all) struct LutDataType {
   // used by lut8Type/lut16Type (mft2) only
-  num_input_channels : Int
-  num_output_channels : Int
-  num_clut_grid_points : Int
+  num_input_channels : Int32
+  num_output_channels : Int32
+  num_clut_grid_points : Int32
   matrix : Matrix3d
-  num_input_table_entries : Int
-  num_output_table_entries : Int
+  num_input_table_entries : Int32
+  num_output_table_entries : Int32
   input_table : LutStore
   clut_table : LutStore
   output_table : LutStore
@@ -341,9 +341,9 @@ pub extend LutDataType with @debug.Debug::{to_repr}
 
 ///|
 pub(all) struct LutMultidimensionalType {
-  num_input_channels : Int
-  num_output_channels : Int
-  grid_points : FixedArray[Int]
+  num_input_channels : Int32
+  num_output_channels : Int32
+  grid_points : FixedArray[Int32]
   clut : LutStore?
   a_curves : Array[ToneReprCurve]
   b_curves : Array[ToneReprCurve]
@@ -413,7 +413,7 @@ pub impl Default for RenderingIntent with fn default() {
 pub extend RenderingIntent with Default::{default}
 
 ///|
-fn RenderingIntent::try_from(value : UInt) -> RenderingIntent {
+fn RenderingIntent::try_from(value : UInt32) -> RenderingIntent {
   // Non-conforming profiles may have invalid values; default to Perceptual.
   match value {
     0U => Perceptual
@@ -426,12 +426,12 @@ fn RenderingIntent::try_from(value : UInt) -> RenderingIntent {
 
 ///|
 pub(all) struct ColorDateTime {
-  year : Int
-  month : Int
-  day_of_the_month : Int
-  hours : Int
-  minutes : Int
-  seconds : Int
+  year : Int32
+  month : Int32
+  day_of_the_month : Int32
+  hours : Int32
+  minutes : Int32
+  seconds : Int32
 } derive(Eq, Debug, Default)
 
 ///|
@@ -456,7 +456,7 @@ fn ColorDateTime::new_from_slice(
   if slice.length() != 12 {
     raise InvalidProfile
   }
-  let u16 = (i : Int) => (slice[i].to_int() << 8) | slice[i + 1].to_int()
+  let u16 = (i : Int32) => (slice[i].to_int() << 8) | slice[i + 1].to_int()
   {
     year: u16(0),
     month: u16(2),
@@ -506,9 +506,9 @@ pub extend LocalizableString with @debug.Debug::{to_repr}
 ///|
 pub(all) struct DescriptionString {
   ascii_string : String
-  unicode_language_code : UInt
+  unicode_language_code : UInt32
   unicode_string : String
-  script_code_code : Int
+  script_code_code : Int32
   mac_string : String
 } derive(Eq, Debug)
 
@@ -557,7 +557,7 @@ pub extend StandardObserver with Eq::{not_equal, equal}
 pub extend StandardObserver with @debug.Debug::{to_repr}
 
 ///|
-fn StandardObserver::from(value : UInt) -> StandardObserver {
+fn StandardObserver::from(value : UInt32) -> StandardObserver {
   if value == 1U {
     D50
   } else if value == 2U {
@@ -604,7 +604,7 @@ pub extend MeasurementGeometry with Eq::{not_equal, equal}
 pub extend MeasurementGeometry with @debug.Debug::{to_repr}
 
 ///|
-fn MeasurementGeometry::from(value : UInt) -> MeasurementGeometry {
+fn MeasurementGeometry::from(value : UInt32) -> MeasurementGeometry {
   if value == 1U {
     D45to45
   } else if value == 2U {
@@ -638,7 +638,7 @@ pub extend StandardIlluminant with Eq::{not_equal, equal}
 pub extend StandardIlluminant with @debug.Debug::{to_repr}
 
 ///|
-fn StandardIlluminant::from(value : UInt) -> StandardIlluminant {
+fn StandardIlluminant::from(value : UInt32) -> StandardIlluminant {
   match value {
     1U => D50
     2U => D65
@@ -674,7 +674,7 @@ pub extend Measurement with @debug.Debug::{to_repr}
 ///|
 /// Technology signature (`TechnologySignatures`), kept as the raw signature.
 pub(all) struct TechnologySignatures {
-  signature : UInt
+  signature : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -779,10 +779,10 @@ pub fn ColorProfile::version(self : ColorProfile) -> ProfileVersion {
 
 ///|
 /// Size of the ICC header plus the tag count (`size_of::<ProfileHeader>()`).
-let profile_header_size : Int = 132
+let profile_header_size : Int32 = 132
 
 ///|
-fn be_u32(s : BytesView, i : Int) -> UInt {
+fn be_u32(s : BytesView, i : Int32) -> UInt32 {
   (s[i].to_uint() << 24) |
   (s[i + 1].to_uint() << 16) |
   (s[i + 2].to_uint() << 8) |
@@ -790,12 +790,12 @@ fn be_u32(s : BytesView, i : Int) -> UInt {
 }
 
 ///|
-fn be_i32(s : BytesView, i : Int) -> Int {
+fn be_i32(s : BytesView, i : Int32) -> Int32 {
   be_u32(s, i).reinterpret_as_int()
 }
 
 ///|
-fn be_u16(s : BytesView, i : Int) -> Int {
+fn be_u16(s : BytesView, i : Int32) -> Int32 {
   (s[i].to_int() << 8) | s[i + 1].to_int()
 }
 

@@ -7,9 +7,9 @@
 /// Physical pixel dimensions (upstream `png::PixelDimensions`).
 pub(all) struct PixelDimensions {
   /// Pixels per unit, X axis
-  xppu : UInt
+  xppu : UInt32
   /// Pixels per unit, Y axis
-  yppu : UInt
+  yppu : UInt32
   /// Whether the unit is the meter (`png::Unit::Meter`) rather than
   /// unspecified.
   meter : Bool
@@ -28,9 +28,9 @@ pub extend PixelDimensions with @debug.Debug::{to_repr}
 ///|
 /// PNG header information (upstream `png::Info`, partially).
 pub(all) struct PngInfo {
-  width : UInt
-  height : UInt
-  bit_depth : Int
+  width : UInt32
+  height : UInt32
+  bit_depth : Int32
   color_type : PngColorType
   interlaced : Bool
   /// Whether a `tRNS` chunk is present.
@@ -56,7 +56,7 @@ pub extend PngInfo with @debug.Debug::{to_repr}
 /// `png::Decoder::new`, with which krilla reads the metadata.
 pub fn read_png_info(
   data : BytesView,
-  limits? : PngLimits = Unlimited,
+  limits~ : PngLimits = Unlimited,
 ) -> PngInfo raise ImageError {
   let reader = PngReader::read_info(data, limits.limits(), false) catch {
     err => raise image_error_from_png(err)

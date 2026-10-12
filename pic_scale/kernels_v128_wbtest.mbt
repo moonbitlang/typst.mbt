@@ -7,7 +7,7 @@
 test "vertical_ranges_ok rejects what the panic tests feed the kernels" {
   let src = kbytes(64, 1)
   let dst = FixedArray::make(32, b'\x00')
-  let w : FixedArray[Int] = [16384, 16384]
+  let w : FixedArray[Int32] = [16384, 16384]
   let acc = FixedArray::make(32, 0)
   assert_true(vertical_ranges_ok(32, 0, 2, src, 0, 32, dst, 0, w, 0, acc))
   // short accumulator, source, output

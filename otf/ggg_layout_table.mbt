@@ -63,7 +63,7 @@ pub type LookupIndex = UInt16
 
 ///|
 /// An index in [`FeatureVariations`].
-pub type VariationIndex = UInt
+pub type VariationIndex = UInt32
 
 ///|
 /// A trait to parse item in [`RecordList`].

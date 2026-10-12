@@ -7,7 +7,7 @@ fn svg_clip_path_render(
   clip_path : @usvg.ClipPath,
   surface : @export.Surface,
   process_context : SvgProcessContext,
-) -> Int {
+) -> Int32 {
   // Unfortunately, clip paths are a bit tricky to deal with, the reason being
   // that clip paths in SVGs can be much more complex than in PDF. In SVG,
   // clip paths can have transforms, as well as nested clip paths. The objects
@@ -206,7 +206,7 @@ fn svg_clip_path_render_complex(
   clip_path : @usvg.ClipPath,
   surface : @export.Surface,
   process_context : SvgProcessContext,
-) -> Int {
+) -> Int32 {
   let sub_surface = surface.stream_surface()
   let mut pop_count = 0
   if clip_path.clip_path() is Some(clip_path) {

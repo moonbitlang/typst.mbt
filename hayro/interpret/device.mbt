@@ -30,7 +30,7 @@ pub(open) trait Device {
   ///
   /// The tag is the marked content tag (e.g. b"P", b"Span"). The mcid is
   /// the marked content identifier from the properties dict, if present.
-  fn begin_marked_content(Self, Bytes, Int?) -> Unit = _
+  fn begin_marked_content(Self, Bytes, Int32?) -> Unit = _
   /// Called at the end of a marked content sequence (EMC).
   fn end_marked_content(Self) -> Unit = _
 }

@@ -25,7 +25,7 @@ fn str_names_input(names : ArrayView[String]) -> CastInfo {
 
 ///|
 /// The index of the string pattern that matches the value, if any.
-fn str_names_find(names : ArrayView[String], value : Value) -> Int? {
+fn str_names_find(names : ArrayView[String], value : Value) -> Int32? {
   match value {
     Str(s) => {
       for i, name in names {

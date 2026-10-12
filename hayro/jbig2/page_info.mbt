@@ -6,22 +6,22 @@
 priv struct PageInformation {
   /// "This is a four-byte value containing the width in pixels of the page's
   /// bitmap." (7.4.8.1)
-  width : UInt
+  width : UInt32
   /// "This is a four-byte value containing the height in pixels of the page's
   /// bitmap." (7.4.8.2)
-  height : UInt
+  height : UInt32
   /// "This is a four-byte value containing the resolution of the original page
   /// medium, measured in pixels/metre in the horizontal direction. If this
   /// value is unknown, then this field must contain 0x00000000." (7.4.8.3)
   ///
   /// `None` means unknown resolution.
-  _x_resolution : UInt?
+  _x_resolution : UInt32?
   /// "This is a four-byte value containing the resolution of the original page
   /// medium, measured in pixels/metre in the vertical direction. If this value
   /// is unknown, then this field must contain 0x00000000." (7.4.8.4)
   ///
   /// `None` means unknown resolution.
-  _y_resolution : UInt?
+  _y_resolution : UInt32?
   /// Page segment flags (7.4.8.5).
   flags : PageFlags
   /// Page striping information (7.4.8.6).
@@ -63,7 +63,7 @@ priv struct PageFlags {
   /// "Bit 2: Page default pixel value. This bit contains the initial value for
   /// every pixel in the page, before any region segments are decoded or drawn."
   /// (7.4.8.5)
-  default_pixel : Int
+  default_pixel : Int32
   /// "Bits 3-4: Page default combination operator." (7.4.8.5)
   _default_combination_operator : CombinationOperator
   /// "Bit 5: Page requires auxiliary buffers. If this bit is 0, then no region
@@ -95,7 +95,7 @@ priv struct PageStriping {
   /// segment's end row and the end row of the previous end of stripe segment,
   /// or 0 in the case of the first end of stripe segment) must be no more than
   /// the page's maximum stripe size." (7.4.8.6)
-  _max_stripe_size : UInt
+  _max_stripe_size : UInt32
 }
 
 ///|
@@ -144,7 +144,7 @@ fn parse_page_information(reader : Reader) -> PageInformation raise DecodeError 
 }
 
 ///|
-fn parse_page_flags(flags : Int) -> PageFlags {
+fn parse_page_flags(flags : Int32) -> PageFlags {
   let combo_bits = (flags >> 3) & 0x03
   let _default_combination_operator : CombinationOperator = match combo_bits {
     0 => Or

@@ -5,7 +5,7 @@
 // weights at and beyond the `i16` range, and undersized buffers (panics).
 
 ///|
-fn kbytes(n : Int, seed : Int) -> FixedArray[Byte] {
+fn kbytes(n : Int32, seed : Int32) -> FixedArray[Byte] {
   let r = SplitMix::{ state: seed.to_uint64() * 0x9E3779B97F4A7C15UL + 1, }
   FixedArray::makei(n, _ => (r.next() & 0xff).to_int().to_byte())
 }
@@ -15,11 +15,11 @@ fn kbytes(n : Int, seed : Int) -> FixedArray[Byte] {
 /// `aligned` each, within `src_pixels`) and weights summing to about 1.0 in
 /// Q15, overridden by `edge` (if non-zero) for every first tap.
 fn kweights(
-  n : Int,
-  aligned : Int,
-  src_pixels : Int,
-  seed : Int,
-  edge : Int,
+  n : Int32,
+  aligned : Int32,
+  src_pixels : Int32,
+  seed : Int32,
+  edge : Int32,
 ) -> FixedWeights {
   let r = SplitMix::{ state: seed.to_uint64() + 77, }
   let bounds_start = FixedArray::make(n, 0)
@@ -53,7 +53,7 @@ fn kweights(
 
 ///|
 /// The emulation of each horizontal kernel and its channel count.
-fn horizontal_kernels() -> Array[(RowKernel, RowKernel, Int, String)] {
+fn horizontal_kernels() -> Array[(RowKernel, RowKernel, Int32, String)] {
   [
     (rgba_rdm_row, convolve_horizontal_rgba_neon_row_i16, 4, "rgba rdm"),
     (rgb_rdm_row, convolve_horizontal_rgb_neon_rdm_row_one, 3, "rgb rdm"),
@@ -253,7 +253,7 @@ test "vertical kernels with the output aliasing the source" {
     let (kernel, emulation, name) = k
     let b1 = FixedArray::makei(34, i => if i < 17 { b'\x64' } else { b'\x00' })
     let b2 = b1.copy()
-    let weights : FixedArray[Int] = [16384, 16384]
+    let weights : FixedArray[Int32] = [16384, 16384]
     kernel(17, 0, 2, b1, 0, 17, b1, 0, weights, 0, FixedArray::make(17, 0))
     emulation(17, 0, 2, b2, 0, 17, b2, 0, weights, 0, FixedArray::make(17, 0))
     assert_same_bytes(b1, b2, name)
@@ -264,7 +264,7 @@ test "vertical kernels with the output aliasing the source" {
     for dst_offset in [1, 5, 16, 20] {
       let c1 = kbytes(70, dst_offset)
       let c2 = c1.copy()
-      let w : FixedArray[Int] = [12000, 9000, 11768]
+      let w : FixedArray[Int32] = [12000, 9000, 11768]
       kernel(20, 0, 3, c1, 0, 20, c1, dst_offset, w, 0, FixedArray::make(20, 0))
       emulation(
         20,
@@ -290,7 +290,7 @@ test "vertical kernels with weights at and beyond the i16 range" {
     let (kernel, emulation, name) = k
     for edge in [32767, -32768, 32768, -32769, 100000] {
       let src = kbytes(3 * 24, 3)
-      let weights : FixedArray[Int] = [edge, 5000, -3000]
+      let weights : FixedArray[Int32] = [edge, 5000, -3000]
       let d1 = FixedArray::make(24, b'\x00')
       let d2 = FixedArray::make(24, b'\x00')
       kernel(24, 0, 3, src, 0, 24, d1, 0, weights, 0, FixedArray::make(24, 0))

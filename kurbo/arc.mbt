@@ -125,11 +125,11 @@ pub fn Arc::subsegment(self : Arc, t0 : Double, t1 : Double) -> Arc {
 ///|
 /// The iterator returned by [`Arc::append_iter`].
 pub struct ArcAppendIter {
-  priv mut idx : Int
+  priv mut idx : Int32
   priv center : Point
   priv radii : Vec2
   priv x_rotation : Double
-  priv n : Int
+  priv n : Int32
   priv arm_len : Double
   priv angle_step : Double
   priv mut p0 : Vec2

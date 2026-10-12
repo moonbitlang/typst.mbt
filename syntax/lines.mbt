@@ -19,7 +19,7 @@ pub struct Lines {
   /// The text.
   priv text : String
   /// The UTF-8 byte length of the text.
-  priv len : Int
+  priv len : Int32
   /// The start of every line. Never written to after [Lines::new] or
   /// [Lines::edit] returned.
   priv lines : Array[Line]
@@ -33,9 +33,9 @@ pub struct Lines {
 #valtype
 priv struct Line {
   /// The UTF-8 byte offset where the line starts.
-  byte_idx : Int
+  byte_idx : Int32
   /// The UTF-16 codepoint offset where the line starts.
-  utf16_idx : Int
+  utf16_idx : Int32
 }
 
 ///|
@@ -52,26 +52,26 @@ pub fn Lines::text(self : Lines) -> String {
 
 ///|
 /// Get the length of the file in UTF-8 encoded bytes.
-pub fn Lines::len_bytes(self : Lines) -> Int {
+pub fn Lines::len_bytes(self : Lines) -> Int32 {
   self.len
 }
 
 ///|
 /// Get the length of the file in UTF-16 code units.
-pub fn Lines::len_utf16(self : Lines) -> Int {
+pub fn Lines::len_utf16(self : Lines) -> Int32 {
   // The text is stored as UTF-16, so this is simply its length.
   self.text.length()
 }
 
 ///|
 /// Get the length of the file in lines.
-pub fn Lines::len_lines(self : Lines) -> Int {
+pub fn Lines::len_lines(self : Lines) -> Int32 {
   self.lines.length()
 }
 
 ///|
 /// Return the index of the UTF-16 code unit at the byte index.
-pub fn Lines::byte_to_utf16(self : Lines, byte_idx : Int) -> Int? {
+pub fn Lines::byte_to_utf16(self : Lines, byte_idx : Int32) -> Int32? {
   guard self.byte_to_line(byte_idx) is Some(line_idx) else { return None }
   guard self.lines.get(line_idx) is Some(line) else { return None }
   self.advance_bytes(line, byte_idx)
@@ -81,7 +81,7 @@ pub fn Lines::byte_to_utf16(self : Lines, byte_idx : Int) -> Int? {
 /// Walk from the start of `line` to the UTF-8 offset `byte_idx` and return
 /// the UTF-16 index there, or `None` if `byte_idx` is not a char boundary
 /// (or lies before the line).
-fn Lines::advance_bytes(self : Lines, line : Line, byte_idx : Int) -> Int? {
+fn Lines::advance_bytes(self : Lines, line : Line, byte_idx : Int32) -> Int32? {
   let text = self.text
   let mut b = line.byte_idx
   let mut u = line.utf16_idx
@@ -99,7 +99,7 @@ fn Lines::advance_bytes(self : Lines, line : Line, byte_idx : Int) -> Int? {
 
 ///|
 /// Return the index of the line that contains the given byte index.
-pub fn Lines::byte_to_line(self : Lines, byte_idx : Int) -> Int? {
+pub fn Lines::byte_to_line(self : Lines, byte_idx : Int32) -> Int32? {
   guard byte_idx >= 0 && byte_idx <= self.len else { return None }
   match self.lines.binary_search_by(line => line.byte_idx.compare(byte_idx)) {
     Ok(i) => Some(i)
@@ -112,14 +112,14 @@ pub fn Lines::byte_to_line(self : Lines, byte_idx : Int) -> Int? {
 ///
 /// The column is defined as the number of characters in the line before the
 /// byte index.
-pub fn Lines::byte_to_column(self : Lines, byte_idx : Int) -> Int? {
+pub fn Lines::byte_to_column(self : Lines, byte_idx : Int32) -> Int32? {
   guard self.byte_to_line(byte_idx) is Some(line) else { return None }
   self.column_in(line, byte_idx)
 }
 
 ///|
 /// The number of characters in `line` before `byte_idx`.
-fn Lines::column_in(self : Lines, line_idx : Int, byte_idx : Int) -> Int? {
+fn Lines::column_in(self : Lines, line_idx : Int32, byte_idx : Int32) -> Int32? {
   guard self.lines.get(line_idx) is Some(line) else { return None }
   guard self.advance_bytes(line, byte_idx) is Some(end) else { return None }
   let mut count = 0
@@ -134,7 +134,10 @@ fn Lines::column_in(self : Lines, line_idx : Int, byte_idx : Int) -> Int? {
 
 ///|
 /// Return the index of the line and column at the byte index.
-pub fn Lines::byte_to_line_column(self : Lines, byte_idx : Int) -> (Int, Int)? {
+pub fn Lines::byte_to_line_column(
+  self : Lines,
+  byte_idx : Int32,
+) -> (Int32, Int32)? {
   guard self.byte_to_line(byte_idx) is Some(line) else { return None }
   guard self.column_in(line, byte_idx) is Some(col) else { return None }
   Some((line, col))
@@ -142,7 +145,7 @@ pub fn Lines::byte_to_line_column(self : Lines, byte_idx : Int) -> (Int, Int)? {
 
 ///|
 /// Return the byte index at the UTF-16 code unit.
-pub fn Lines::utf16_to_byte(self : Lines, utf16_idx : Int) -> Int? {
+pub fn Lines::utf16_to_byte(self : Lines, utf16_idx : Int32) -> Int32? {
   guard utf16_idx >= 0 else { return None }
   let line_idx = match
     self.lines.binary_search_by(line => line.utf16_idx.compare(utf16_idx)) {
@@ -172,14 +175,14 @@ pub fn Lines::utf16_to_byte(self : Lines, utf16_idx : Int) -> Int? {
 
 ///|
 /// Return the byte position at which the given line starts.
-pub fn Lines::line_to_byte(self : Lines, line_idx : Int) -> Int? {
+pub fn Lines::line_to_byte(self : Lines, line_idx : Int32) -> Int32? {
   guard line_idx >= 0 else { return None }
   self.lines.get(line_idx).map(line => line.byte_idx)
 }
 
 ///|
 /// Return the range which encloses the given line.
-pub fn Lines::line_to_range(self : Lines, line_idx : Int) -> (Int, Int)? {
+pub fn Lines::line_to_range(self : Lines, line_idx : Int32) -> (Int32, Int32)? {
   guard self.line_to_byte(line_idx) is Some(start) else { return None }
   let end = self.line_to_byte(line_idx + 1).unwrap_or(self.len)
   Some((start, end))
@@ -193,9 +196,9 @@ pub fn Lines::line_to_range(self : Lines, line_idx : Int) -> (Int, Int)? {
 /// the line.
 pub fn Lines::line_column_to_byte(
   self : Lines,
-  line_idx : Int,
-  column_idx : Int,
-) -> Int? {
+  line_idx : Int32,
+  column_idx : Int32,
+) -> Int32? {
   guard self.line_to_range(line_idx) is Some((start, end)) else { return None }
   guard column_idx >= 0 else { return None }
   let line = self.lines[line_idx]
@@ -233,7 +236,7 @@ pub fn Lines::replace(self : Lines, new : String) -> Lines? {
 ///|
 /// Returns the common prefix and suffix lengths.
 /// Returns [`None`] if the old and new strings are equal.
-pub fn Lines::replacement_range(self : Lines, new : String) -> (Int, Int)? {
+pub fn Lines::replacement_range(self : Lines, new : String) -> (Int32, Int32)? {
   let old = @utf8.encode(self.text)
   let new = @utf8.encode(new)
   let mut prefix = 0
@@ -272,8 +275,8 @@ pub fn Lines::replacement_range(self : Lines, new : String) -> (Int, Int)? {
 /// Aborts if the range is out of bounds or not on char boundaries.
 pub fn Lines::edit(
   self : Lines,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   replacement : String,
 ) -> Lines {
   let start_byte = start
@@ -331,8 +334,8 @@ fn compute_lines(text : String) -> Array[Line] {
 fn lines_from(
   out : Array[Line],
   text : String,
-  byte_offset : Int,
-  utf16_offset : Int,
+  byte_offset : Int32,
+  utf16_offset : Int32,
 ) -> Unit {
   let mut b = byte_offset
   let mut u = utf16_offset
@@ -340,7 +343,7 @@ fn lines_from(
     let { cp: c, idx: next, } = @unicode.decode_at(text, u)
     b += utf8_char_len(c)
     u = next
-    if is_newline(Int::unsafe_to_char(c)) {
+    if is_newline(Int32::unsafe_to_char(c)) {
       if c == '\r' && u < text.length() && text.code_unit_at(u) == '\n' {
         b += 1
         u += 1
@@ -352,7 +355,7 @@ fn lines_from(
 
 ///|
 /// The UTF-8 length of a scalar value.
-fn utf8_char_len(c : Int) -> Int {
+fn utf8_char_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -366,7 +369,7 @@ fn utf8_char_len(c : Int) -> Int {
 
 ///|
 /// Whether `i` is a char boundary of the UTF-8 encoded `bytes`.
-fn is_char_boundary(bytes : Bytes, i : Int) -> Bool {
+fn is_char_boundary(bytes : Bytes, i : Int32) -> Bool {
   i == 0 ||
   i == bytes.length() ||
   (i > 0 && i < bytes.length() && (bytes[i].to_int() & 0xC0) != 0x80)

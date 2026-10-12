@@ -28,7 +28,7 @@ fn parse_hex(s : StringView) -> UInt64 {
 }
 
 ///|
-fn hex_n(v : UInt64, digits : Int) -> String {
+fn hex_n(v : UInt64, digits : Int32) -> String {
   let chars = "0123456789abcdef"
   let buf = StringBuilder()
   for i = digits - 1; i >= 0; i = i - 1 {
@@ -38,12 +38,12 @@ fn hex_n(v : UInt64, digits : Int) -> String {
 }
 
 ///|
-fn h32(v : UInt) -> String {
+fn h32(v : UInt32) -> String {
   hex_n(v.to_uint64(), 8)
 }
 
 ///|
-fn h32i(v : Int) -> String {
+fn h32i(v : Int32) -> String {
   h32(v.reinterpret_as_uint())
 }
 
@@ -82,7 +82,7 @@ fn hb(v : Bool) -> String {
 }
 
 ///|
-fn hmem(m : FixedArray[Byte], len : Int) -> String {
+fn hmem(m : FixedArray[Byte], len : Int32) -> String {
   let buf = StringBuilder()
   for i in 0..<len {
     buf.write_string(hex_n(m[i].to_uint64(), 2))
@@ -96,12 +96,12 @@ fn trap_str(t : TrapCode) -> String {
 }
 
 ///|
-fn a_u32(s : String) -> UInt {
+fn a_u32(s : String) -> UInt32 {
   parse_hex(s).to_uint()
 }
 
 ///|
-fn a_i32(s : String) -> Int {
+fn a_i32(s : String) -> Int32 {
   parse_hex(s).to_uint().reinterpret_as_int()
 }
 
@@ -137,27 +137,27 @@ fn a_v128(s : String) -> V128Value {
 type OracleFn = (Array[String]) -> String
 
 ///|
-fn ii_i(f : (Int, Int) -> Int) -> OracleFn {
+fn ii_i(f : (Int32, Int32) -> Int32) -> OracleFn {
   a => h32i(f(a_i32(a[0]), a_i32(a[1])))
 }
 
 ///|
-fn ii_t(f : (Int, Int) -> Int raise TrapCode) -> OracleFn {
+fn ii_t(f : (Int32, Int32) -> Int32 raise TrapCode) -> OracleFn {
   a => h32i(f(a_i32(a[0]), a_i32(a[1]))) catch { t => trap_str(t) }
 }
 
 ///|
-fn uu_t(f : (UInt, UInt) -> UInt raise TrapCode) -> OracleFn {
+fn uu_t(f : (UInt32, UInt32) -> UInt32 raise TrapCode) -> OracleFn {
   a => h32(f(a_u32(a[0]), a_u32(a[1]))) catch { t => trap_str(t) }
 }
 
 ///|
-fn ii_b(f : (Int, Int) -> Bool) -> OracleFn {
+fn ii_b(f : (Int32, Int32) -> Bool) -> OracleFn {
   a => hb(f(a_i32(a[0]), a_i32(a[1])))
 }
 
 ///|
-fn uu_b(f : (UInt, UInt) -> Bool) -> OracleFn {
+fn uu_b(f : (UInt32, UInt32) -> Bool) -> OracleFn {
   a => hb(f(a_u32(a[0]), a_u32(a[1])))
 }
 
@@ -222,7 +222,7 @@ fn vvv_v(f : (V128Value, V128Value, V128Value) -> V128Value) -> OracleFn {
 }
 
 ///|
-fn vu_v(f : (V128Value, UInt) -> V128Value) -> OracleFn {
+fn vu_v(f : (V128Value, UInt32) -> V128Value) -> OracleFn {
   a => hv(f(a_v128(a[0]), a_u32(a[1])))
 }
 
@@ -233,11 +233,11 @@ fn mem_init() -> FixedArray[Byte] {
 }
 
 ///|
-let mem_len : Int = 40
+let mem_len : Int32 = 40
 
 ///|
 fn load(
-  f : (FixedArray[Byte], Int, UInt64, UInt64) -> String raise TrapCode,
+  f : (FixedArray[Byte], Int32, UInt64, UInt64) -> String raise TrapCode,
 ) -> OracleFn {
   a => {
     f(mem_init(), mem_len, a_u64(a[0]), a_u64(a[1])) catch {
@@ -248,14 +248,14 @@ fn load(
 
 ///|
 fn load_at(
-  f : (FixedArray[Byte], Int, UInt64) -> String raise TrapCode,
+  f : (FixedArray[Byte], Int32, UInt64) -> String raise TrapCode,
 ) -> OracleFn {
   a => f(mem_init(), mem_len, a_u64(a[0])) catch { t => trap_str(t) }
 }
 
 ///|
 fn store(
-  f : (FixedArray[Byte], Int, UInt64, UInt64, String) -> Unit raise TrapCode,
+  f : (FixedArray[Byte], Int32, UInt64, UInt64, String) -> Unit raise TrapCode,
 ) -> OracleFn {
   a => {
     let m = mem_init()
@@ -268,7 +268,7 @@ fn store(
 
 ///|
 fn store_at(
-  f : (FixedArray[Byte], Int, UInt64, String) -> Unit raise TrapCode,
+  f : (FixedArray[Byte], Int32, UInt64, String) -> Unit raise TrapCode,
 ) -> OracleFn {
   a => {
     let m = mem_init()
@@ -564,7 +564,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
     let f = p.1
     ops[p.0] = a => hb(f(a_v128(a[0])))
   }
-  let to_u32 : Array[(String, (V128Value) -> UInt)] = [
+  let to_u32 : Array[(String, (V128Value) -> UInt32)] = [
     ("i8x16_bitmask", i8x16_bitmask),
     ("i16x8_bitmask", i16x8_bitmask),
     ("i32x4_bitmask", i32x4_bitmask),
@@ -722,7 +722,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
   for p in ternary {
     ops[p.0] = vvv_v(p.1)
   }
-  let shifts : Array[(String, (V128Value, UInt) -> V128Value)] = [
+  let shifts : Array[(String, (V128Value, UInt32) -> V128Value)] = [
     ("i8x16_shl", i8x16_shl),
     ("i16x8_shl", i16x8_shl),
     ("i32x4_shl", i32x4_shl),
@@ -843,8 +843,8 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
   let simd_loads : Array[
     (
       String,
-      (FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode,
-      (FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode,
+      (FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode,
+      (FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode,
     ),
   ] = [
     ("v128_load", v128_load, v128_load_at),
@@ -1009,7 +1009,7 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
     v128_store_at(m, l, a, a_v128(v))
   })
   let lane_store = (
-    f : (FixedArray[Byte], Int, UInt64, UInt64, V128Value, String) -> Unit raise TrapCode,
+    f : (FixedArray[Byte], Int32, UInt64, UInt64, V128Value, String) -> Unit raise TrapCode,
   ) => {
     (a : Array[String]) => {
       let m = mem_init()
@@ -1020,7 +1020,7 @@ fn oracle_memory_ops(ops : Map[String, OracleFn]) -> Unit {
     }
   }
   let lane_store_at = (
-    f : (FixedArray[Byte], Int, UInt64, V128Value, String) -> Unit raise TrapCode,
+    f : (FixedArray[Byte], Int32, UInt64, V128Value, String) -> Unit raise TrapCode,
   ) => {
     (a : Array[String]) => {
       let m = mem_init()
@@ -1310,7 +1310,7 @@ fn run_table(a : Array[String]) -> String {
   let ops = if a[5] == "" { [] } else { a[5].split(",").collect() }
   for op in ops {
     let p = op.split(":").map(s => s.to_owned()).collect()
-    let num = (i : Int) => parse_dec(p[i])
+    let num = (i : Int32) => parse_dec(p[i])
     let res = match p[0] {
       "g" =>
         try table.grow(num(1), typed_val(p[2]), None, limiter_ref(lim)) catch {
@@ -1564,7 +1564,7 @@ test "wasmi_core oracle" {
   oracle_display_ops(ops)
   let mut total = 0
   let mut failed = 0
-  let failures : Map[String, Int] = Map([])
+  let failures : Map[String, Int32] = Map([])
   let examples : Array[String] = []
   for line in data.split("\n") {
     if line.length() == 0 || line.has_prefix("#") {

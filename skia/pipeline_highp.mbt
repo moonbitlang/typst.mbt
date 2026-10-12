@@ -7,7 +7,7 @@
 // every operation is applied per lane (see `wide.mbt`).
 
 ///|
-let highp_stage_width : Int = 8
+let highp_stage_width : Int32 = 8
 
 ///|
 priv struct HighpPipeline {
@@ -24,9 +24,9 @@ priv struct HighpPipeline {
   dg : FixedArray[Float]
   db : FixedArray[Float]
   da : FixedArray[Float]
-  mut tail : Int
-  mut dx : Int
-  mut dy : Int
+  mut tail : Int32
+  mut dx : Int32
+  mut dy : Int32
 }
 
 ///|
@@ -881,7 +881,7 @@ fn bicubic_far(t : Float) -> Float {
 /// `sampler_2x2` / `sampler_4x4`.
 fn HighpPipeline::sampler_nxn(
   p : HighpPipeline,
-  n : Int,
+  n : Int32,
   start : Float,
   cx : FixedArray[Float],
   cy : FixedArray[Float],
@@ -968,7 +968,7 @@ fn gather_ix(
   pixmap : Pixmap,
   x : FixedArray[Float],
   y : FixedArray[Float],
-) -> FixedArray[Int] {
+) -> FixedArray[Int32] {
   // Exclusive -> inclusive.
   let w = ulp_sub(Float::from_int(pixmap.width()))
   let h = ulp_sub(Float::from_int(pixmap.height()))
@@ -989,7 +989,7 @@ fn ulp_sub(v : Float) -> Float {
 ///|
 fn load_8888_gather(
   pixmap : Pixmap,
-  ix : FixedArray[Int],
+  ix : FixedArray[Int32],
   r : FixedArray[Float],
   g : FixedArray[Float],
   b : FixedArray[Float],
@@ -1027,9 +1027,9 @@ fn srgb_compress(x : Float) -> Float {
 ///|
 /// `load_8888` / `load_8888_tail`: lanes past `tail` load transparent black.
 fn load_8888_tail(
-  tail : Int,
-  data : FixedArray[UInt],
-  offset : Int,
+  tail : Int32,
+  data : FixedArray[UInt32],
+  offset : Int32,
   r : FixedArray[Float],
   g : FixedArray[Float],
   b : FixedArray[Float],
@@ -1054,9 +1054,9 @@ fn store_8888_tail(
   g : FixedArray[Float],
   b : FixedArray[Float],
   a : FixedArray[Float],
-  tail : Int,
-  data : FixedArray[UInt],
-  offset : Int,
+  tail : Int32,
+  data : FixedArray[UInt32],
+  offset : Int32,
 ) -> Unit {
   for l in 0..<tail {
     data[offset + l] = pack_rgba(
@@ -1069,7 +1069,7 @@ fn store_8888_tail(
 }
 
 ///|
-fn unnorm(v : Float) -> Int {
+fn unnorm(v : Float) -> Int32 {
   vround_int(vmin(vmax(v, 0.0), 1.0) * 255.0)
 }
 

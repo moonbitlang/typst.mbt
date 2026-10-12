@@ -28,7 +28,7 @@ pub fn TypeError::new(span : Span, kind : TypeErrorKind) -> TypeError {
 }
 
 ///|
-fn TypeError::offset(self : TypeError, amount : Int) -> TypeError {
+fn TypeError::offset(self : TypeError, amount : Int32) -> TypeError {
   {
     ..self,
     span: {
@@ -116,7 +116,7 @@ pub extend TypeErrorKind with Show::{to_string, output}
 
 ///|
 /// Parse a Roman numeral like `roman_numerals_rs::RomanNumeral::from_str`.
-pub fn parse_roman(s : String) -> Int? {
+pub fn parse_roman(s : String) -> Int32? {
   if s.is_empty() {
     return None
   }
@@ -133,11 +133,11 @@ pub fn parse_roman(s : String) -> Int? {
   let n = chars.length()
   let mut result = 0
   let mut idx = 0
-  fn at(i : Int, c : Char) -> Bool {
+  fn at(i : Int32, c : Char) -> Bool {
     i < n && chars[i] == c
   }
 
-  fn starts(i : Int, a : Char, b : Char) -> Bool {
+  fn starts(i : Int32, a : Char, b : Char) -> Bool {
     at(i, a) && at(i + 1, b)
   }
 
@@ -344,7 +344,7 @@ pub fn parse_ranges(
 ) -> Result[Array[IntRange], TypeError] {
   let range_vecs = split_token_lists(chunks, ",")
   let res = []
-  fn number(s : @unscanny.Scanner, offset : Int) -> Result[Int64, TypeError] {
+  fn number(s : @unscanny.Scanner, offset : Int32) -> Result[Int64, TypeError] {
     s.eat_whitespace() |> ignore
     let idx = s.cursor()
     let num = s.eat_while(c => c.is_ascii_digit())

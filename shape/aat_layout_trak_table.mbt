@@ -37,19 +37,19 @@ fn trak_apply(plan : ShapePlan, face : Face, buffer : Buffer) -> Unit? {
 
 ///|
 /// `TrackTableExt::hor_tracking`
-fn trak_hor_tracking(this : @otf.TrakTable, ptem : Float) -> Int? {
+fn trak_hor_tracking(this : @otf.TrakTable, ptem : Float) -> Int32? {
   track_data_tracking(this.horizontal, ptem)
 }
 
 ///|
 /// `TrackTableExt::ver_tracking`
-fn trak_ver_tracking(this : @otf.TrakTable, ptem : Float) -> Int? {
+fn trak_ver_tracking(this : @otf.TrakTable, ptem : Float) -> Int32? {
   track_data_tracking(this.vertical, ptem)
 }
 
 ///|
 /// `TrackTableDataExt::tracking`
-fn track_data_tracking(this : @otf.TrackData, ptem : Float) -> Int? {
+fn track_data_tracking(this : @otf.TrackData, ptem : Float) -> Int32? {
   // Choose track.
   guard this.tracks.iter().find_first(t => t.value == 0.0) is Some(track) else {
     return None
@@ -74,7 +74,7 @@ fn track_data_tracking(this : @otf.TrackData, ptem : Float) -> Int? {
 /// `TrackTableDataExt::interpolate_at`
 fn track_data_interpolate_at(
   this : @otf.TrackData,
-  idx : Int,
+  idx : Int32,
   target_size : Float,
   track : @otf.Track,
 ) -> Float? {

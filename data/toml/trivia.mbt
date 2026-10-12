@@ -2,19 +2,19 @@
 
 ///|
 /// `wschar = ( %x20 / %x09 )`
-fn is_wschar(b : Int) -> Bool {
+fn is_wschar(b : Int32) -> Bool {
   b == ' ' || b == '\t'
 }
 
 ///|
 /// `non-ascii = %x80-D7FF / %xE000-10FFFF` (as bytes: `0x80..=0xff`)
-fn is_non_ascii(b : Int) -> Bool {
+fn is_non_ascii(b : Int32) -> Bool {
   b >= 0x80 && b <= 0xff
 }
 
 ///|
 /// `non-eol = %x09 / %x20-7E / non-ascii`
-fn is_non_eol(b : Int) -> Bool {
+fn is_non_eol(b : Int32) -> Bool {
   b == 0x09 || (b >= 0x20 && b <= 0x7E) || is_non_ascii(b)
 }
 

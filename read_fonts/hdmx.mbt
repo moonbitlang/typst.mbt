@@ -5,13 +5,13 @@
 /// The [Horizontal Device Metrics](https://learn.microsoft.com/en-us/typography/opentype/spec/hdmx) table.
 pub struct Hdmx {
   priv data : FontData
-  priv num_glyphs : Int
+  priv num_glyphs : Int32
 }
 
 ///|
 /// `Hdmx::MIN_SIZE`: the version (u16), the number of records (u16) and the
 /// size of a record (u32).
-const HDMX_MIN_SIZE : Int = 8
+const HDMX_MIN_SIZE : Int32 = 8
 
 ///|
 /// The `hdmx` table (upstream `TableProvider::hdmx`).
@@ -26,7 +26,7 @@ pub fn FontRef::hdmx(self : FontRef) -> Hdmx raise ReadError {
 ///
 /// This type requires some external state in order to be
 /// parsed.
-pub fn Hdmx::read(data : FontData, num_glyphs : Int) -> Hdmx raise ReadError {
+pub fn Hdmx::read(data : FontData, num_glyphs : Int32) -> Hdmx raise ReadError {
   if data.len() < HDMX_MIN_SIZE {
     raise OutOfBounds
   }
@@ -35,19 +35,19 @@ pub fn Hdmx::read(data : FontData, num_glyphs : Int) -> Hdmx raise ReadError {
 
 ///|
 /// Table version number (set to 0).
-pub fn Hdmx::version(self : Hdmx) -> Int {
+pub fn Hdmx::version(self : Hdmx) -> Int32 {
   u16_at(self.data, 0)
 }
 
 ///|
 /// Number of device records.
-pub fn Hdmx::num_records(self : Hdmx) -> Int {
+pub fn Hdmx::num_records(self : Hdmx) -> Int32 {
   u16_at(self.data, 2)
 }
 
 ///|
 /// Size of device record, 32-bit aligned.
-pub fn Hdmx::size_device_record(self : Hdmx) -> UInt {
+pub fn Hdmx::size_device_record(self : Hdmx) -> UInt32 {
   u32_at(self.data, 4)
 }
 
@@ -61,7 +61,7 @@ priv struct HdmxRecords {
   item_len : Int64
   len : Int64
   data : FontData
-  num_glyphs : Int
+  num_glyphs : Int32
 }
 
 ///|
@@ -112,7 +112,7 @@ fn HdmxRecords::get(self : HdmxRecords, idx : Int64) -> DeviceRecord? {
 ///|
 /// Returns for the device record that exactly matches the given
 /// size (as ppem).
-pub fn Hdmx::record_for_size(self : Hdmx, size : Int) -> DeviceRecord? {
+pub fn Hdmx::record_for_size(self : Hdmx, size : Int32) -> DeviceRecord? {
   let records = self.records()
   // Need a custom binary search because we're working with
   // ComputedArray
@@ -135,22 +135,22 @@ pub fn Hdmx::record_for_size(self : Hdmx, size : Int) -> DeviceRecord? {
 ///|
 pub struct DeviceRecord {
   /// Pixel size for following widths (as ppem).
-  pixel_size : Int
+  pixel_size : Int32
   /// Maximum width.
-  max_width : Int
+  max_width : Int32
   /// Array of glyphs (numGlyphs is from the 'maxp' table).
   widths : BytesView
 }
 
 ///|
 /// Pixel size for following widths (as ppem).
-pub fn DeviceRecord::pixel_size(self : DeviceRecord) -> Int {
+pub fn DeviceRecord::pixel_size(self : DeviceRecord) -> Int32 {
   self.pixel_size
 }
 
 ///|
 /// Maximum width.
-pub fn DeviceRecord::max_width(self : DeviceRecord) -> Int {
+pub fn DeviceRecord::max_width(self : DeviceRecord) -> Int32 {
   self.max_width
 }
 

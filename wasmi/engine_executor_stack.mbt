@@ -53,7 +53,7 @@ fn Stack::reset(self : Stack) -> Unit {
 
 ///|
 /// Returns the capacity of the [`Stack`].
-fn Stack::capacity(self : Stack) -> Int {
+fn Stack::capacity(self : Stack) -> Int32 {
   self.values.capacity()
 }
 
@@ -125,7 +125,7 @@ priv struct CallStack {
   /// entries are live).
   frames : Array[CallFrame]
   /// The number of live call frames.
-  mut len : Int
+  mut len : Int32
   /// The [`Instance`] used at certain frame stack heights.
   instances : Array[Instance]
   /// The maximum allowed recursion depth.
@@ -133,7 +133,7 @@ priv struct CallStack {
   /// # Note
   ///
   /// A [`TrapCode::StackOverflow`] is raised if the recursion limit is exceeded.
-  recursion_limit : Int
+  recursion_limit : Int32
   /// The [`Instance`] popped by the last [`CallStack::pop`] (upstream returns
   /// it together with the popped frame).
   mut popped_instance : Instance?
@@ -141,7 +141,7 @@ priv struct CallStack {
 
 ///|
 /// Creates a new [`CallStack`] using the given recursion limit.
-fn CallStack::new(recursion_limit : Int) -> CallStack {
+fn CallStack::new(recursion_limit : Int32) -> CallStack {
   { frames: [], len: 0, instances: [], recursion_limit, popped_instance: None, }
 }
 
@@ -162,7 +162,7 @@ fn CallStack::reset(self : CallStack) -> Unit {
 
 ///|
 /// Returns the number of [`CallFrame`]s on the [`CallStack`].
-fn CallStack::len(self : CallStack) -> Int {
+fn CallStack::len(self : CallStack) -> Int32 {
   self.len
 }
 
@@ -294,11 +294,11 @@ priv struct CallFrame {
   /// The instructions of the called function.
   mut instrs : FixedArray[@ir.Op]
   /// The index of the [`Op`] that is executed next.
-  mut ip : Int
+  mut ip : Int32
   /// Offset to the first mutable cell of a [`CallFrame`].
-  mut base : Int
+  mut base : Int32
   /// Offset to the first cell of a [`CallFrame`].
-  mut frame : Int
+  mut frame : Int32
   /// Span of registers were the caller expects them in its [`CallFrame`].
   mut results : @ir.SlotSpan
   /// Is `true` if this [`CallFrame`] changed the currently used [`Instance`].
@@ -315,9 +315,9 @@ priv struct CallFrame {
 /// Creates a new [`CallFrame`].
 fn CallFrame::new(
   instrs : FixedArray[@ir.Op],
-  ip : Int,
-  offsets_base : Int,
-  offsets_frame : Int,
+  ip : Int32,
+  offsets_base : Int32,
+  offsets_frame : Int32,
   results : @ir.SlotSpan,
 ) -> CallFrame {
   {
@@ -336,9 +336,9 @@ fn CallFrame::new(
 fn CallFrame::init(
   self : CallFrame,
   instrs : FixedArray[@ir.Op],
-  ip : Int,
-  offsets_base : Int,
-  offsets_frame : Int,
+  ip : Int32,
+  offsets_base : Int32,
+  offsets_frame : Int32,
   results : @ir.SlotSpan,
 ) -> Unit {
   self.instrs = instrs
@@ -379,7 +379,7 @@ fn CallFrame::copy(self : CallFrame) -> CallFrame {
 /// # Note
 ///
 /// This is used for the implementation of tail calls.
-fn CallFrame::move_down(self : CallFrame, delta : Int) -> Unit {
+fn CallFrame::move_down(self : CallFrame, delta : Int32) -> Unit {
   // StackOffsets::move_down
   self.base = self.base - delta
   self.frame = self.frame - delta
@@ -391,19 +391,19 @@ fn CallFrame::move_down(self : CallFrame, delta : Int) -> Unit {
 /// This is required before dispatching a nested function call to update
 /// the instruction pointer of the caller so that it can continue at that
 /// position when the called function returns.
-fn CallFrame::update_instr_ptr(self : CallFrame, new_instr_ptr : Int) -> Unit {
+fn CallFrame::update_instr_ptr(self : CallFrame, new_instr_ptr : Int32) -> Unit {
   self.ip = new_instr_ptr
 }
 
 ///|
 /// Returns the frame value stack offset of the [`CallFrame`].
-fn CallFrame::frame_offset(self : CallFrame) -> Int {
+fn CallFrame::frame_offset(self : CallFrame) -> Int32 {
   self.frame
 }
 
 ///|
 /// Returns the base value stack offset of the [`CallFrame`].
-fn CallFrame::base_offset(self : CallFrame) -> Int {
+fn CallFrame::base_offset(self : CallFrame) -> Int32 {
   self.base
 }
 
@@ -429,9 +429,9 @@ priv struct ValueStack {
   /// The high 64 bits of the cells on the [`ValueStack`].
   mut hi : FixedArray[UInt64]
   /// The number of live cells.
-  mut len : Int
+  mut len : Int32
   /// Maximal possible `sp` value.
-  max_len : Int
+  max_len : Int32
 }
 
 ///|
@@ -441,7 +441,7 @@ priv struct ValueStack {
 ///
 /// - If the `initial_len` is zero.
 /// - If the `initial_len` is greater than `maximum_len`.
-fn ValueStack::new(initial_len : Int, maximum_len : Int) -> ValueStack {
+fn ValueStack::new(initial_len : Int32, maximum_len : Int32) -> ValueStack {
   if !(initial_len > 0) {
     abort("cannot initialize the value stack with zero length")
   }
@@ -484,14 +484,14 @@ fn ValueStack::reset(self : ValueStack) -> Unit {
 
 ///|
 /// Returns the capacity of the [`ValueStack`].
-fn ValueStack::capacity(self : ValueStack) -> Int {
+fn ValueStack::capacity(self : ValueStack) -> Int32 {
   self.lo.length()
 }
 
 ///|
 /// Reserves capacity for at least `additional` more cells (Rust's
 /// `Vec::reserve` amortized growth).
-fn ValueStack::reserve(self : ValueStack, additional : Int) -> Unit {
+fn ValueStack::reserve(self : ValueStack, additional : Int32) -> Unit {
   let required = self.len + additional
   let capacity = self.capacity()
   if required <= capacity {
@@ -525,8 +525,8 @@ fn ValueStack::reserve(self : ValueStack, additional : Int) -> Unit {
 /// When trying to grow the [`ValueStack`] over its maximum size limit.
 fn ValueStack::extend_by(
   self : ValueStack,
-  additional : Int,
-) -> Int raise @wasmi_core.TrapCode {
+  additional : Int32,
+) -> Int32 raise @wasmi_core.TrapCode {
   if additional >= self.max_len() - self.len() {
     raise err_stack_overflow()
   }
@@ -538,13 +538,13 @@ fn ValueStack::extend_by(
 
 ///|
 /// Returns the current length of the [`ValueStack`].
-fn ValueStack::len(self : ValueStack) -> Int {
+fn ValueStack::len(self : ValueStack) -> Int32 {
   self.len
 }
 
 ///|
 /// Returns the maximum length of the [`ValueStack`].
-fn ValueStack::max_len(self : ValueStack) -> Int {
+fn ValueStack::max_len(self : ValueStack) -> Int32 {
   self.max_len
 }
 
@@ -554,7 +554,7 @@ fn ValueStack::max_len(self : ValueStack) -> Int {
 /// # Panics (Debug)
 ///
 /// If `amount` is greater than the [`ValueStack`] height.
-fn ValueStack::drop(self : ValueStack, amount : Int) -> Unit {
+fn ValueStack::drop(self : ValueStack, amount : Int32) -> Unit {
   if !(self.len() >= amount) {
     abort("assertion failed: self.len() >= amount")
   }
@@ -569,7 +569,7 @@ fn ValueStack::drop(self : ValueStack, amount : Int) -> Unit {
 /// # Panics (Debug)
 ///
 /// If `amount` is greater than the [`ValueStack`] height.
-fn ValueStack::drop_return(self : ValueStack, amount : Int) -> Int {
+fn ValueStack::drop_return(self : ValueStack, amount : Int32) -> Int32 {
   let len = self.len()
   let dropped = len - amount
   self.drop(amount)
@@ -582,7 +582,7 @@ fn ValueStack::drop_return(self : ValueStack, amount : Int) -> Int {
 /// # Panics (Debug)
 ///
 /// If `new_len` is greater than the current [`ValueStack`] length.
-fn ValueStack::truncate(self : ValueStack, new_len : Int) -> Unit {
+fn ValueStack::truncate(self : ValueStack, new_len : Int32) -> Unit {
   if !(new_len <= self.len()) {
     abort("assertion failed: new_len <= self.len()")
   }
@@ -609,7 +609,7 @@ fn ValueStack::alloc_call_frame(
   self : ValueStack,
   func : CompiledFuncEntity,
   params : FrameParams,
-) -> Int raise @wasmi_core.TrapCode {
+) -> Int32 raise @wasmi_core.TrapCode {
   let len_stack_slots = func.len_stack_slots()
   let consts = func.consts()
   let len_consts = consts.length()
@@ -635,7 +635,7 @@ fn ValueStack::alloc_call_frame(
 ///
 /// - This invalidates all cell indices within the range `from..` and the
 ///   caller has to make sure to properly reinstantiate them.
-fn ValueStack::drain(self : ValueStack, from : Int, to : Int) -> Int {
+fn ValueStack::drain(self : ValueStack, from : Int32, to : Int32) -> Int32 {
   let len_drained = to - from
   let tail = self.len - to
   FixedArray::unsafe_blit(self.lo, from, self.lo, to, tail)
@@ -646,7 +646,7 @@ fn ValueStack::drain(self : ValueStack, from : Int, to : Int) -> Int {
 
 ///|
 /// Returns the [`UntypedVal`] of the cell at `index`.
-fn ValueStack::get(self : ValueStack, index : Int) -> @wasmi_core.UntypedVal {
+fn ValueStack::get(self : ValueStack, index : Int32) -> @wasmi_core.UntypedVal {
   @wasmi_core.UntypedVal::from_v128(
     @wasmi_core.V128Value::from_lo_hi(
       self.lo.unsafe_get(index),
@@ -659,7 +659,7 @@ fn ValueStack::get(self : ValueStack, index : Int) -> @wasmi_core.UntypedVal {
 /// Sets the cell at `index` to `value`.
 fn ValueStack::set(
   self : ValueStack,
-  index : Int,
+  index : Int32,
   value : @wasmi_core.UntypedVal,
 ) -> Unit {
   self.lo.unsafe_set(index, value.to_bits64())
@@ -672,9 +672,9 @@ priv struct FrameParams {
   /// The value stack holding the cells.
   mut values : ValueStack
   /// The next cell to initialize.
-  mut start : Int
+  mut start : Int32
   /// The end of the parameter and local cells.
-  mut end : Int
+  mut end : Int32
 }
 
 ///|
@@ -688,8 +688,8 @@ fn FrameParams::new() -> FrameParams {
 fn FrameParams::init(
   self : FrameParams,
   values : ValueStack,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Unit {
   self.values = values
   self.start = start

@@ -47,7 +47,7 @@ fn max_f32(a : Float, b : Float) -> Float {
 
 ///|
 /// `f32 as usize` (saturating; the values here are non-negative).
-fn f32_to_usize(x : Float) -> Int {
+fn f32_to_usize(x : Float) -> Int32 {
   if x <= 0.0 {
     0
   } else {
@@ -91,7 +91,7 @@ fn catmull_rom(d : Float) -> Float {
 /// `generate_weights::<f32, f64>(ResamplingFunction::CatmullRom, in_size,
 /// out_size)`. CatmullRom is a resizable kernel without window, not EWA and
 /// not area, so only that branch is ported.
-fn generate_weights(in_size : Int, out_size : Int) -> FilterWeights {
+fn generate_weights(in_size : Int32, out_size : Int32) -> FilterWeights {
   let scale : Float = Float::from_int(in_size) / Float::from_int(out_size)
   // is_resizable_kernel == true
   let filter_scale_cutoff = max_f32(scale, Float::from_int(1))

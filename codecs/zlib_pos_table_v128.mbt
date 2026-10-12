@@ -19,26 +19,26 @@ priv struct PosTable {
 }
 
 ///|
-fn PosTable::make(n : Int) -> PosTable {
+fn PosTable::make(n : Int32) -> PosTable {
   { bytes: FixedArray::make(2 * n, b'\x00'), }
 }
 
 ///|
-fn PosTable::length(self : PosTable) -> Int {
+fn PosTable::length(self : PosTable) -> Int32 {
   self.bytes.length() >> 1
 }
 
 ///|
 /// Entry `i` (`0 <= i < length`, unchecked).
 #inline
-fn PosTable::unsafe_get(self : PosTable, i : Int) -> Int {
+fn PosTable::unsafe_get(self : PosTable, i : Int32) -> Int32 {
   @v128.i16x8_extract_lane_u(@v128.v128_load16_splat(self.bytes, 2 * i), 0).reinterpret_as_int()
 }
 
 ///|
 /// Sets entry `i` (`0 <= i < length`, unchecked) to `v & 0xffff`.
 #inline
-fn PosTable::unsafe_set(self : PosTable, i : Int, v : Int) -> Unit {
+fn PosTable::unsafe_set(self : PosTable, i : Int32, v : Int32) -> Unit {
   @v128.v128_store16_lane(
     self.bytes,
     2 * i,
@@ -55,7 +55,7 @@ fn PosTable::fill_zero(self : PosTable) -> Unit {
 ///|
 /// `m.saturating_sub(wsize)` for every entry (upstream's NEON/wasm
 /// `slide_hash_chain` uses the same saturating `u16` lanes).
-fn slide_hash_chain(table : PosTable, wsize : Int) -> Unit {
+fn slide_hash_chain(table : PosTable, wsize : Int32) -> Unit {
   let bytes = table.bytes
   let w = @v128.i16x8_splat(wsize.to_uint16())
   let len = bytes.length()

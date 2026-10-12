@@ -28,7 +28,7 @@ fn eval_equation(
 ///|
 /// Converts the equation to MathML and returns the encoded `<math>` element
 /// and the warnings.
-fn mathml(src : String, block? : Bool = false) -> (String, String) raise {
+fn mathml(src : String, block~ : Bool = false) -> (String, String) raise {
   let engine = test_engine()
   let content = eval_equation(engine, src, block)
   let locator = @library.Locator::root().split()
@@ -52,7 +52,7 @@ fn mathml(src : String, block? : Bool = false) -> (String, String) raise {
 
 ///|
 /// Resolves the equation into the math IR.
-fn resolve(src : String, block? : Bool = false) -> @library.MathItem raise {
+fn resolve(src : String, block~ : Bool = false) -> @library.MathItem raise {
   let engine = test_engine()
   let content = eval_equation(engine, src, block)
   let pairs = stub_realize(

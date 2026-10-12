@@ -98,7 +98,7 @@ fn split_to_vec(re_str : String, target : String) -> Array[String] raise {
 fn splitn_to_vec(
   re_str : String,
   target : String,
-  limit : Int,
+  limit : Int32,
 ) -> Array[String] raise {
   let re = @fancy.Regex::new(re_str)
   re.splitn(target, limit).iter().map(x => x.unwrap()).collect()

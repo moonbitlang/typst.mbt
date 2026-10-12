@@ -56,7 +56,7 @@ pub fn trim_start(s : StringView) -> String {
   let n = s.length()
   while i < n {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    if !is_whitespace(Int::unsafe_to_char(c)) {
+    if !is_whitespace(Int32::unsafe_to_char(c)) {
       break
     }
     i = next
@@ -70,7 +70,7 @@ pub fn trim_end(s : StringView) -> String {
   let mut j = s.length()
   while j > 0 {
     let { cp: c, idx: prev, } = @unicode.decode_before(s, j)
-    if !is_whitespace(Int::unsafe_to_char(c)) {
+    if !is_whitespace(Int32::unsafe_to_char(c)) {
       break
     }
     j = prev
@@ -134,7 +134,7 @@ pub fn chars(s : StringView) -> Array[Char] {
 
 ///|
 /// The number of chars of a string (Rust's `s.chars().count()`).
-pub fn char_count(s : StringView) -> Int {
+pub fn char_count(s : StringView) -> Int32 {
   let mut n = 0
   for _ in s {
     n += 1
@@ -158,7 +158,7 @@ pub fn last_char(s : StringView) -> Char? {
     return None
   }
   let { cp: c, .. } = @unicode.decode_before(s, s.length())
-  Some(Int::unsafe_to_char(c))
+  Some(Int32::unsafe_to_char(c))
 }
 
 ///|
@@ -215,13 +215,13 @@ pub fn parse_int_in(s : StringView, min : Int64, max : Int64) -> Int64? {
 
 ///|
 /// Rust's `str::parse::<i32>()`.
-pub fn parse_i32(s : StringView) -> Int? {
+pub fn parse_i32(s : StringView) -> Int32? {
   parse_int_in(s, -2147483648L, 2147483647L).map(v => v.to_int())
 }
 
 ///|
 /// Rust's `str::parse::<u8>()`.
-pub fn parse_u8(s : StringView) -> Int? {
+pub fn parse_u8(s : StringView) -> Int32? {
   if s.has_prefix("-") {
     return None
   }
@@ -290,7 +290,7 @@ pub fn split_whitespace(s : StringView) -> Array[String] {
 
 ///|
 /// The byte offset of the first occurrence of `pat` (Rust's `str::find`).
-pub fn find_byte(s : StringView, pat : StringView) -> Int? {
+pub fn find_byte(s : StringView, pat : StringView) -> Int32? {
   match s.find(pat) {
     Some(i) => Some(len_utf8(s[:i]))
     None => None
@@ -299,7 +299,7 @@ pub fn find_byte(s : StringView, pat : StringView) -> Int? {
 
 ///|
 /// Rust's `str::matches(c).count()`.
-pub fn count_char(s : StringView, c : Char) -> Int {
+pub fn count_char(s : StringView, c : Char) -> Int32 {
   let mut n = 0
   for x in s {
     if x == c {
@@ -327,7 +327,7 @@ pub fn compose(a : Char, b : Char) -> Char? {
 
 ///|
 /// Compare strings by code points like Rust's `str` ordering.
-pub fn compare_str(a : StringView, b : StringView) -> Int {
+pub fn compare_str(a : StringView, b : StringView) -> Int32 {
   let ai = a.iter()
   let bi = b.iter()
   while true {

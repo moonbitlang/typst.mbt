@@ -70,7 +70,7 @@ pub fn longer() -> Document {
 ///|
 /// Chapters of three sections each: filler text, a numbered equation that
 /// mentions the chapter, and a computed table.
-fn chapters(count : Int) -> Document {
+fn chapters(count : Int32) -> Document {
   let body : Array[&@doc.IntoContent] = [
     SetPage(paper="a4", numbering=Numbering("1")),
     SetText(font=["Libertinus Serif"], size=Pt(10.5)),

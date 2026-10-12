@@ -59,7 +59,7 @@ pub fn BytesValue::to_str(self : BytesValue) -> String? {
 
 ///|
 /// The length in bytes.
-pub fn BytesValue::len(self : BytesValue) -> Int {
+pub fn BytesValue::len(self : BytesValue) -> Int32 {
   self.0.length()
 }
 
@@ -68,7 +68,7 @@ pub fn BytesValue::len(self : BytesValue) -> Int {
 fn BytesValue::locate(
   self : BytesValue,
   index : Int64,
-) -> Int raise HintedError {
+) -> Int32 raise HintedError {
   match self.locate_opt(index) {
     Some(i) => i
     None => bail(bytes_out_of_bounds(index, self.len()))
@@ -79,7 +79,7 @@ fn BytesValue::locate(
 /// Resolve an index, if it is within bounds.
 ///
 /// `index == len` is considered in bounds.
-fn BytesValue::locate_opt(self : BytesValue, index : Int64) -> Int? {
+fn BytesValue::locate_opt(self : BytesValue, index : Int64) -> Int32? {
   let len = self.0.length().to_int64()
   let wrapped = if index >= 0L { index } else { len + index }
   if wrapped >= 0L && wrapped <= len {
@@ -267,12 +267,12 @@ pub extend BytesValue with FromValue::{from_value}
 
 ///|
 /// The out of bounds access error message.
-fn bytes_out_of_bounds(index : Int64, len : Int) -> String {
+fn bytes_out_of_bounds(index : Int64, len : Int32) -> String {
   "byte index out of bounds (index: \{index}, len: \{len})"
 }
 
 ///|
 /// The out of bounds access error message when no default value was given.
-fn bytes_out_of_bounds_no_default(index : Int64, len : Int) -> String {
+fn bytes_out_of_bounds_no_default(index : Int64, len : Int32) -> String {
   "byte index out of bounds (index: \{index}, len: \{len}) and no default value was specified"
 }

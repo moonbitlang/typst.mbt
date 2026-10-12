@@ -41,7 +41,7 @@ priv struct FontInk {
   /// Per glyph id: 0 if it was not asked for yet, 1 if it has no outline
   /// (a space, and a glyph that is a bitmap or an SVG document only), 2
   /// if its box is in `boxes`.
-  known : Array[Int]
+  known : Array[Int32]
   /// Per glyph id four numbers: the left, top, right and bottom of the box
   /// of its outline in em, x to the right and y down from the pen.
   boxes : Array[Double]
@@ -50,7 +50,7 @@ priv struct FontInk {
 ///|
 /// Whether the glyph `id` has an outline: its box is then at `4 * id` of
 /// `boxes`.
-fn FontInk::has(self : FontInk, id : Int) -> Bool {
+fn FontInk::has(self : FontInk, id : Int32) -> Bool {
   while self.known.length() <= id {
     self.known.push(0)
     for _ in 0..<4 {
@@ -177,8 +177,8 @@ fn leaves(
   box : @kurbo.Rect,
   x : Bool,
   y : Bool,
-  slack? : (Double, Double) = (0.0, 0.0),
-) -> (Double, Int) {
+  slack~ : (Double, Double) = (0.0, 0.0),
+) -> (Double, Int32) {
   // (Less than every amount.)
   let mut amount = -1.0e300
   let mut side = 0
@@ -207,7 +207,7 @@ priv struct Finding {
   /// (`FrameLinter::locate`).
   indirect : Bool
   /// The page of the first.
-  page : Int
+  page : Int32
   /// `MissingGlyph`: the characters. Otherwise what left, of the farthest:
   /// `text`, `a shape`, `an image`.
   mut subject : String
@@ -218,11 +218,11 @@ priv struct Finding {
   mut container : (Origin, String)?
   /// How many there are, and the item of the last one (a run of text
   /// counts once, however many of its glyphs are found).
-  mut count : Int
-  mut last_item : Int
+  mut count : Int32
+  mut last_item : Int32
   /// How far the farthest left, and at which side.
   mut amount : Double
-  mut side : Int
+  mut side : Int32
 }
 
 ///|
@@ -296,7 +296,7 @@ fn Finding::lint(self : Finding) -> Lint {
 /// Something that leaves a frame that may be a container.
 priv struct Leaving {
   /// The number of the item of the page that it is (of) (`Finding`).
-  item : Int
+  item : Int32
   subject : String
   /// Its box in the coordinates of the frame, as far as it is drawn (not
   /// clipped away), and what does not count of it (`Extent::slack`).
@@ -307,7 +307,7 @@ priv struct Leaving {
   /// For a shape with the span of a call itself (not of an argument) that
   /// is the call of a container: that container (`-1`: none). It can be
   /// what the container draws itself (`FrameLinter::own_shape`).
-  own : Int
+  own : Int32
 }
 
 ///|
@@ -323,7 +323,7 @@ priv struct Held {
   /// The containers that had this size, and for each whether its width
   /// and its height were given, and whether the frame holds something
   /// that was lowered inside that container.
-  containers : Array[Int]
+  containers : Array[Int32]
   fixed : Array[(Bool, Bool)]
   confirmed : Array[Bool]
   leaving : Array[Leaving]
@@ -336,17 +336,17 @@ priv struct FrameLinter {
   resolver : Resolver
   findings : Array[Finding]
   /// The finding of each kind and place.
-  index : Map[String, Int]
+  index : Map[String, Int32]
   fonts : Array[FontInk]
   /// The sizes that containers were built with: by the keys of their
   /// width and of their height (`size_key`; `NO_SIDE` for a side that was
   /// not given), the containers with that width and height in points.
-  sizes : Map[Int64, Map[Int64, Array[(Int, Double?, Double?)]]]
+  sizes : Map[Int64, Map[Int64, Array[(Int32, Double?, Double?)]]]
   /// The page that is walked (from 1) and its box, with the bleed.
-  mut page : Int
+  mut page : Int32
   mut page_box : @kurbo.Rect
   /// The number of the item that is looked at, counted over the document.
-  mut item : Int
+  mut item : Int32
   /// The elements that are open (their tags), outermost first.
   elements : Array[(@library.Location, @syntax.Span)]
   /// The clips of the groups around the item: the transform from the
@@ -355,7 +355,7 @@ priv struct FrameLinter {
   /// The frames around the item that may be containers, and how many
   /// candidates of them are not confirmed.
   held : Array[Held]
-  mut unconfirmed : Int
+  mut unconfirmed : Int32
 }
 
 ///|
@@ -378,7 +378,7 @@ fn size_key(length : Double) -> Int64 {
 
 ///|
 fn FrameLinter::new(origins : Origins, resolver : Resolver) -> FrameLinter {
-  let sizes : Map[Int64, Map[Int64, Array[(Int, Double?, Double?)]]] = Map([])
+  let sizes : Map[Int64, Map[Int64, Array[(Int32, Double?, Double?)]]] = Map([])
   for id, container in origins.containers {
     for size in container.sizes {
       let w = size.0.map(width => width.to_pt())
@@ -394,7 +394,7 @@ fn FrameLinter::new(origins : Origins, resolver : Resolver) -> FrameLinter {
       let row = match sizes.get(kw) {
         Some(row) => row
         Option::None => {
-          let row : Map[Int64, Array[(Int, Double?, Double?)]] = Map([])
+          let row : Map[Int64, Array[(Int32, Double?, Double?)]] = Map([])
           sizes[kw] = row
           row
         }
@@ -467,7 +467,7 @@ fn FrameLinter::locate(
 /// A place for the table of findings: the source location without the
 /// keys, so that the rows that a function builds for some data are one
 /// place (as for L1).
-fn location_key(location : Location?, page : Int) -> String {
+fn location_key(location : Location?, page : Int32) -> String {
   match location {
     Some(Edsl(origin)) => place_key(origin)
     Some(File(file)) => {
@@ -487,9 +487,9 @@ fn location_key(location : Location?, page : Int) -> String {
 fn FrameLinter::found(
   self : FrameLinter,
   key : String,
-  item : Int,
+  item : Int32,
   amount : Double,
-  side : Int,
+  side : Int32,
   make : () -> Finding,
 ) -> Unit {
   match self.index.get(key) {
@@ -645,7 +645,7 @@ fn FrameLinter::walking(self : FrameLinter, mat : @kurbo.Affine) -> Unit {
 fn FrameLinter::own_shape(
   self : FrameLinter,
   leaving : Leaving,
-  id : Int,
+  id : Int32,
   held : Held,
 ) -> Bool {
   leaving.own == id &&
@@ -688,7 +688,7 @@ fn FrameLinter::evidence(self : FrameLinter, span : @syntax.Span) -> Unit {
   let under = self.origins.under[entry]
   guard own >= 0 || !under.is_empty() else { return }
   let mut limit = self.held.length() - 1
-  let confirm = (id : Int) => {
+  let confirm = (id : Int32) => {
     for h = limit; h >= 0; h = h - 1 {
       let held = self.held[h]
       for k, candidate in held.containers {
@@ -789,13 +789,13 @@ fn FrameLinter::drawing(
 priv struct ItemText {
   chars : Array[Char]
   /// The byte offset of each character, and the length of the text.
-  offsets : Array[Int]
+  offsets : Array[Int32]
 }
 
 ///|
 fn ItemText::new(text : String) -> ItemText {
   let chars = text.to_array()
-  let offsets : Array[Int] = Array(capacity=chars.length() + 1)
+  let offsets : Array[Int32] = Array(capacity=chars.length() + 1)
   let mut at = 0
   for c in chars {
     offsets.push(at)
@@ -818,7 +818,11 @@ fn ItemText::new(text : String) -> ItemText {
 /// The characters of the bytes `from..to`, which is what a glyph stands
 /// for. `None` where the range says nothing: the offsets of a glyph are
 /// 16-bit numbers, so beyond 65,535 bytes of an item they all end there.
-fn ItemText::range(self : ItemText, from : Int, to : Int) -> ArrayView[Char]? {
+fn ItemText::range(
+  self : ItemText,
+  from : Int32,
+  to : Int32,
+) -> ArrayView[Char]? {
   guard from < to &&
     self.offsets.binary_search(from) is Ok(first) &&
     self.offsets.binary_search(to) is Ok(end) else {
@@ -1135,8 +1139,8 @@ fn FrameLinter::sized(
   self : FrameLinter,
   width : Double,
   height : Double,
-) -> (Array[Int], Array[(Bool, Bool)]) {
-  let containers : Array[Int] = []
+) -> (Array[Int32], Array[(Bool, Bool)]) {
+  let containers : Array[Int32] = []
   let fixed : Array[(Bool, Bool)] = []
   let kw = size_key(width)
   let kh = size_key(height)
@@ -1178,7 +1182,7 @@ fn FrameLinter::sized(
 /// its frame.
 fn FrameLinter::container_name(
   self : FrameLinter,
-  id : Int,
+  id : Int32,
   held : Held,
 ) -> (Origin, String) {
   let origin = self.origins.origin_of(

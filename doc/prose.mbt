@@ -40,7 +40,7 @@ let prose_dropped_below : @ref.Ref[Int64] = { val: 0L, }
 
 ///|
 /// The number of pending interpolations that are kept.
-let prose_table_max : Int = 65536
+let prose_table_max : Int32 = 65536
 
 ///|
 /// Write the placeholder of a description: what `\{description}` in a
@@ -76,7 +76,7 @@ fn prose_placeholder(content : Content, logger : &Logger) -> Unit {
 /// the canonical spelling is a placeholder: a decimal number without
 /// leading zeros and of at most 18 digits (so it cannot overflow), then
 /// the closing character.
-fn prose_token(chars : Array[Char], start : Int) -> (Int64, Int)? {
+fn prose_token(chars : Array[Char], start : Int32) -> (Int64, Int32)? {
   let mut id = 0L
   let mut j = start
   while j < chars.length() && chars[j] >= '0' && chars[j] <= '9' {
@@ -177,7 +177,7 @@ pub struct Prose {
 #callsite(autofill(loc, args_loc))
 pub fn Prose::Prose(
   text : String,
-  quotes? : Bool = true,
+  quotes~ : Bool = true,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Prose {

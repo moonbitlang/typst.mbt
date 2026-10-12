@@ -43,9 +43,9 @@ fn execute_instrs(
 priv struct Executor {
   /// The base offset of the current frame on the value stack (upstream
   /// `FrameSlots`): `Slot(i)` is the cell `sp + i`.
-  mut sp : Int
+  mut sp : Int32
   /// The index of the currently executed instruction in `instrs`.
-  mut ip : Int
+  mut ip : Int32
   /// The instructions of the currently executed function.
   mut instrs : FixedArray[@ir.Op]
   /// The low 64 bits of the value stack cells (cached from `stack.values`).
@@ -1558,13 +1558,13 @@ fn Executor::set_stack_slot(
 
 ///|
 /// Returns the [`Slot`] value as `i32`.
-fn Executor::get_stack_slot_as_i32(self : Executor, slot : @ir.Slot) -> Int {
+fn Executor::get_stack_slot_as_i32(self : Executor, slot : @ir.Slot) -> Int32 {
   self.lo.unsafe_get(self.sp + slot.0).to_int()
 }
 
 ///|
 /// Returns the [`Slot`] value as `u32`.
-fn Executor::get_stack_slot_as_u32(self : Executor, slot : @ir.Slot) -> UInt {
+fn Executor::get_stack_slot_as_u32(self : Executor, slot : @ir.Slot) -> UInt32 {
   self.lo.unsafe_get(self.sp + slot.0).to_uint()
 }
 
@@ -1610,7 +1610,7 @@ fn Executor::get_stack_slot_as_v128(
 fn Executor::set_stack_slot_as_i32(
   self : Executor,
   slot : @ir.Slot,
-  value : Int,
+  value : Int32,
 ) -> Unit {
   self.lo.unsafe_set(self.sp + slot.0, value.reinterpret_as_uint().to_uint64())
 }
@@ -1620,7 +1620,7 @@ fn Executor::set_stack_slot_as_i32(
 fn Executor::set_stack_slot_as_u32(
   self : Executor,
   slot : @ir.Slot,
-  value : UInt,
+  value : UInt32,
 ) -> Unit {
   self.lo.unsafe_set(self.sp + slot.0, value.to_uint64())
 }
@@ -1715,7 +1715,7 @@ fn Executor::next_instr(self : Executor) -> Unit {
 ///
 /// This is used by Wasmi instructions that have a fixed
 /// encoding size of two instruction words such as [`Op::Branch`].
-fn Executor::next_instr_at(self : Executor, skip : Int) -> Unit {
+fn Executor::next_instr_at(self : Executor, skip : Int32) -> Unit {
   self.ip = self.ip + skip
 }
 
@@ -1739,7 +1739,10 @@ fn Executor::init_call_frame(self : Executor, frame : CallFrame) -> Unit {
 ///
 /// - Returns the default [`index::Memory`] if the parameter is missing.
 /// - Bumps `self.ip` if a [`Op::MemoryIndex`] parameter was found.
-fn Executor::fetch_optional_memory(self : Executor, delta : Int) -> @ir.Memory {
+fn Executor::fetch_optional_memory(
+  self : Executor,
+  delta : Int32,
+) -> @ir.Memory {
   match self.instrs.unsafe_get(self.ip + delta) {
     MemoryIndex(index~) => {
       self.ip = self.ip + 1
@@ -1817,25 +1820,25 @@ fn Executor::execute_ref_func(
 
 ///|
 /// Executes a logical `i32.and` instruction.
-fn i32_and(x : Int, y : Int) -> Bool {
+fn i32_and(x : Int32, y : Int32) -> Bool {
   @wasmi_core.i32_bitand(x, y) != 0
 }
 
 ///|
 /// Executes a logical `i32.or` instruction.
-fn i32_or(x : Int, y : Int) -> Bool {
+fn i32_or(x : Int32, y : Int32) -> Bool {
   @wasmi_core.i32_bitor(x, y) != 0
 }
 
 ///|
 /// Executes a fused `i32.and` + `i32.eqz` instruction.
-fn i32_nand(x : Int, y : Int) -> Bool {
+fn i32_nand(x : Int32, y : Int32) -> Bool {
   !i32_and(x, y)
 }
 
 ///|
 /// Executes a fused `i32.or` + `i32.eqz` instruction.
-fn i32_nor(x : Int, y : Int) -> Bool {
+fn i32_nor(x : Int32, y : Int32) -> Bool {
   !i32_or(x, y)
 }
 

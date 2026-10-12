@@ -19,17 +19,17 @@ fn lerp3(
 /// 4D CLUT helper.
 priv struct Hypercube {
   array : FixedArray[Float]
-  x_stride : Int
-  y_stride : Int
-  z_stride : Int
-  grid_size : FixedArray[Int]
+  x_stride : Int32
+  y_stride : Int32
+  z_stride : Int32
+  grid_size : FixedArray[Int32]
 }
 
 ///|
 fn Hypercube::new_hypercube(
   array : FixedArray[Float],
-  grid_size : FixedArray[Int],
-  channels : Int,
+  grid_size : FixedArray[Int32],
+  channels : Int32,
 ) -> Hypercube raise CmsError {
   if array.length() == 0 ||
     grid_size[0] == 0 ||
@@ -57,8 +57,8 @@ fn Hypercube::new_hypercube(
 ///|
 fn Hypercube::new(
   array : FixedArray[Float],
-  grid_size : Int,
-  channels : Int,
+  grid_size : Int32,
+  channels : Int32,
 ) -> Hypercube raise CmsError {
   if array.length() == 0 || grid_size == 0 {
     return {
@@ -95,10 +95,10 @@ fn Hypercube::new(
 ///|
 fn Hypercube::fetch(
   self : Hypercube,
-  x : Int,
-  y : Int,
-  z : Int,
-  w : Int,
+  x : Int32,
+  y : Int32,
+  z : Int32,
+  w : Int32,
 ) -> (Float, Float, Float) {
   let start = (x * self.x_stride + y * self.y_stride + z * self.z_stride + w) *
     3
@@ -106,12 +106,12 @@ fn Hypercube::fetch(
 }
 
 ///|
-fn floor_idx(v : Float, scale : Float) -> Int {
+fn floor_idx(v : Float, scale : Float) -> Int32 {
   @pxfm.f32_as_i32(@pxfm.min_f32(v.floor(), scale))
 }
 
 ///|
-fn ceil_idx(v : Float, scale : Float) -> Int {
+fn ceil_idx(v : Float, scale : Float) -> Int32 {
   @pxfm.f32_as_i32(@pxfm.min_f32(v.ceil(), scale))
 }
 
@@ -143,7 +143,7 @@ fn Hypercube::quadlinear_vec3(
   let y_d = lin_y * scale_y - Float::from_int(y)
   let z_d = lin_z * scale_z - Float::from_int(z)
   let w_d = lin_w * scale_w - Float::from_int(w)
-  let r = (x : Int, y : Int, z : Int, w : Int) => self.fetch(x, y, z, w)
+  let r = (x : Int32, y : Int32, z : Int32, w : Int32) => self.fetch(x, y, z, w)
   let r_x1 = lerp3(r(x, y, z, w), r(x_n, y, z, w), x_d)
   let r_x2 = lerp3(r(x, y_n, z, w), r(x_n, y_n, z, w), x_d)
   let r_y1 = lerp3(r_x1, r_x2, y_d)
@@ -165,16 +165,16 @@ fn Hypercube::quadlinear_vec3(
 /// 3D CLUT helper.
 priv struct Cube {
   array : FixedArray[Float]
-  x_stride : Int
-  y_stride : Int
-  grid_size : FixedArray[Int]
+  x_stride : Int32
+  y_stride : Int32
+  grid_size : FixedArray[Int32]
 }
 
 ///|
 fn Cube::new(
   array : FixedArray[Float],
-  grid_size : Int,
-  channels : Int,
+  grid_size : Int32,
+  channels : Int32,
 ) -> Cube raise CmsError {
   if array.length() == 0 || grid_size == 0 {
     return { array, x_stride: 0, y_stride: 0, grid_size: [0, 0, 0], }
@@ -193,8 +193,8 @@ fn Cube::new(
 ///|
 fn Cube::new_cube(
   array : FixedArray[Float],
-  grid_size : FixedArray[Int],
-  channels : Int,
+  grid_size : FixedArray[Int32],
+  channels : Int32,
 ) -> Cube raise CmsError {
   if array.length() == 0 ||
     grid_size[0] == 0 ||
@@ -217,7 +217,12 @@ fn Cube::new_cube(
 }
 
 ///|
-fn Cube::fetch(self : Cube, x : Int, y : Int, z : Int) -> (Float, Float, Float) {
+fn Cube::fetch(
+  self : Cube,
+  x : Int32,
+  y : Int32,
+  z : Int32,
+) -> (Float, Float, Float) {
   let start = (x * self.x_stride + y * self.y_stride + z) * 3
   (self.array[start], self.array[start + 1], self.array[start + 2])
 }

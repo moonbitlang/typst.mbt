@@ -8,7 +8,7 @@
 ///
 /// `filter` element in the SVG.
 pub struct Filter {
-  priv uid : Int
+  priv uid : Int32
   priv id : NonEmptyString
   priv rect : NonZeroRect
   priv primitives : Array[Primitive]
@@ -282,10 +282,10 @@ pub(all) struct FeConvolveMatrix {
 ///|
 /// A convolve matrix representation.
 pub(all) struct ConvolveMatrixData {
-  target_x : UInt
-  target_y : UInt
-  columns : UInt
-  rows : UInt
+  target_x : UInt32
+  target_y : UInt32
+  columns : UInt32
+  rows : UInt32
   data : Array[Float]
 }
 
@@ -298,10 +298,10 @@ pub(all) struct ConvolveMatrixData {
 /// - `target_x` >= `columns`
 /// - `target_y` >= `rows`
 fn ConvolveMatrixData::new(
-  target_x : UInt,
-  target_y : UInt,
-  columns : UInt,
-  rows : UInt,
+  target_x : UInt32,
+  target_y : UInt32,
+  columns : UInt32,
+  rows : UInt32,
   data : Array[Float],
 ) -> ConvolveMatrixData? {
   if (columns * rows).reinterpret_as_int() != data.length() ||
@@ -316,8 +316,8 @@ fn ConvolveMatrixData::new(
 /// Returns a matrix value at the specified position.
 pub fn ConvolveMatrixData::get(
   self : ConvolveMatrixData,
-  x : UInt,
-  y : UInt,
+  x : UInt32,
+  y : UInt32,
 ) -> Float {
   self.data[(y * self.columns + x).reinterpret_as_int()]
 }
@@ -536,8 +536,8 @@ pub(all) struct FeTile {
 pub(all) struct FeTurbulence {
   base_frequency_x : PositiveF32
   base_frequency_y : PositiveF32
-  num_octaves : UInt
-  seed : Int
+  num_octaves : UInt32
+  seed : Int32
   stitch_tiles : Bool
   kind : TurbulenceKind
 }

@@ -9,41 +9,41 @@
 ///|
 // Bt.601 Full Range inverse coefficients computed with 14 bits of precision
 // with MPFR.
-const Y_CF : Int = 16384
+const Y_CF : Int32 = 16384
 
 ///|
-const CR_CF : Int = 22970
+const CR_CF : Int32 = 22970
 
 ///|
-const CB_CF : Int = 29032
+const CB_CF : Int32 = 29032
 
 ///|
-const C_G_CR_COEF_1 : Int = -11700
+const C_G_CR_COEF_1 : Int32 = -11700
 
 ///|
-const C_G_CB_COEF_2 : Int = -5638
+const C_G_CB_COEF_2 : Int32 = -5638
 
 ///|
-const YUV_PREC : Int = 14
+const YUV_PREC : Int32 = 14
 
 ///|
 // Rounding const for YUV -> RGB conversion: floating equivalent 0.499(9).
-const YUV_RND : Int = (1 << (YUV_PREC - 1)) - 1
+const YUV_RND : Int32 = (1 << (YUV_PREC - 1)) - 1
 
 ///|
 /// Convert 16 YCbCr samples (`y[yo..yo + 16]` etc.) to RGB (`num_components
 /// == 3`) or RGBA (`4`) at `output[out_pos..]` (the scalar code; the
 /// target-selected `ycbcr_to_rgb_16` is in `jpeg_{v128,scalar}.mbt`).
 fn ycbcr_to_rgb_16_scalar(
-  y : FixedArray[Int],
-  yo : Int,
-  cb : FixedArray[Int],
-  cbo : Int,
-  cr : FixedArray[Int],
-  cro : Int,
+  y : FixedArray[Int32],
+  yo : Int32,
+  cb : FixedArray[Int32],
+  cbo : Int32,
+  cr : FixedArray[Int32],
+  cro : Int32,
   output : FixedArray[Byte],
-  out_pos : Int,
-  num_components : Int,
+  out_pos : Int32,
+  num_components : Int32,
 ) -> Unit {
   for i in 0..<16 {
     let cr = i16(cr[cro + i] - 128)

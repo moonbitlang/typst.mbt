@@ -10,7 +10,7 @@
 pub struct Duration {
   priv seconds : Int64
   // Sign must match that of `seconds` (though this is not a safety requirement).
-  priv nanoseconds : Int
+  priv nanoseconds : Int32
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
@@ -76,7 +76,7 @@ fn checked_mul_i64(a : Int64, b : Int64) -> Int64? {
 }
 
 ///|
-fn Duration::new_unchecked(seconds : Int64, nanoseconds : Int) -> Duration {
+fn Duration::new_unchecked(seconds : Int64, nanoseconds : Int32) -> Duration {
   { seconds, nanoseconds, }
 }
 
@@ -143,7 +143,7 @@ pub fn Duration::abs(self : Duration) -> Duration {
 /// nanoseconds is at least ±10^9, it will wrap to the number of seconds.
 ///
 /// Panics (aborts) if the duration overflows.
-pub fn Duration::new(seconds : Int64, nanoseconds : Int) -> Duration {
+pub fn Duration::new(seconds : Int64, nanoseconds : Int32) -> Duration {
   let mut seconds = match
     checked_add_i64(seconds, nanoseconds.to_int64() / 1_000_000_000L) {
     Some(s) => s
@@ -243,7 +243,7 @@ priv enum FloatConstructorError {
 ///|
 /// Round `x >> k` to nearest, ties to even, as done by `try_from_secs!`.
 /// Returns the rounded nanoseconds.
-fn round_shifted(x : @bigint.BigInt, k : Int) -> UInt {
+fn round_shifted(x : @bigint.BigInt, k : Int32) -> UInt32 {
   let nanos = (x >> k).to_uint()
   let rem_mask = (@bigint.BigInt::from_int(1) << k) -
     @bigint.BigInt::from_int(1)
@@ -268,7 +268,7 @@ fn Duration::try_seconds_f64(
   let bits = secs.reinterpret_as_uint64()
   let mant = (bits & mant_mask) | (mant_mask + 1UL)
   let exp = ((bits >> mant_bits) & exp_mask).to_int() + min_exp
-  let (secs_u, nanos) : (UInt64, UInt) = if exp < -31 {
+  let (secs_u, nanos) : (UInt64, UInt32) = if exp < -31 {
     // the input represents less than 1ns and can not be rounded to it
     (0UL, 0U)
   } else if exp < 0 {
@@ -390,19 +390,19 @@ pub fn Duration::as_seconds_f64(self : Duration) -> Double {
 
 ///|
 /// Get the number of milliseconds past the number of whole seconds.
-pub fn Duration::subsec_milliseconds(self : Duration) -> Int {
+pub fn Duration::subsec_milliseconds(self : Duration) -> Int32 {
   self.nanoseconds / 1_000_000
 }
 
 ///|
 /// Get the number of microseconds past the number of whole seconds.
-pub fn Duration::subsec_microseconds(self : Duration) -> Int {
+pub fn Duration::subsec_microseconds(self : Duration) -> Int32 {
   self.nanoseconds / 1_000
 }
 
 ///|
 /// Get the number of nanoseconds past the number of whole seconds.
-pub fn Duration::subsec_nanoseconds(self : Duration) -> Int {
+pub fn Duration::subsec_nanoseconds(self : Duration) -> Int32 {
   self.nanoseconds
 }
 
@@ -426,7 +426,10 @@ pub fn Duration::checked_sub(self : Duration, rhs : Duration) -> Duration? {
 
 ///|
 /// Shared overflow handling of `checked_add` and `checked_sub`.
-fn Duration::normalize_checked(seconds : Int64, nanoseconds : Int) -> Duration? {
+fn Duration::normalize_checked(
+  seconds : Int64,
+  nanoseconds : Int32,
+) -> Duration? {
   let mut seconds = seconds
   let mut nanoseconds = nanoseconds
   if nanoseconds >= 1_000_000_000 || (seconds < 0L && nanoseconds > 0) {

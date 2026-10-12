@@ -82,8 +82,8 @@ pub extend CssError with Show::{to_string, output}
 /// Position indicates a row/line and a column in the original text. Starting
 /// from 1:1.
 pub(all) struct TextPos {
-  row : UInt
-  col : UInt
+  row : UInt32
+  col : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -98,7 +98,7 @@ pub extend TextPos with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs a new `TextPos`.
-pub fn TextPos::new(row : UInt, col : UInt) -> TextPos {
+pub fn TextPos::new(row : UInt32, col : UInt32) -> TextPos {
   { row, col, }
 }
 
@@ -215,7 +215,7 @@ pub fn StyleSheet::parse_more(self : StyleSheet, text : String) -> Unit {
 }
 
 ///|
-fn compare_specificity(a : FixedArray[Byte], b : FixedArray[Byte]) -> Int {
+fn compare_specificity(a : FixedArray[Byte], b : FixedArray[Byte]) -> Int32 {
   for i in 0..<3 {
     let c = a[i].compare(b[i])
     if c != 0 {
@@ -443,7 +443,7 @@ fn consume_declaration(s : Stream) -> Declaration raise CssError {
 ///|
 fn consume_term(s : Stream) -> Unit raise CssError {
   fn consume_digits(s : Stream) {
-    while s.curr_byte_ok() is Some(b'0'..=b'9') {
+    while s.curr_byte_ok() is Some(b'0'..<=b'9') {
       s.advance(1)
     }
   }
@@ -456,7 +456,7 @@ fn consume_term(s : Stream) -> Unit raise CssError {
           // Try consume as a hex color.
           while s.curr_byte_ok() is Some(c) {
             match c {
-              b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' => s.advance(1)
+              b'0'..<=b'9' | b'a'..<=b'f' | b'A'..<=b'F' => s.advance(1)
               _ => break
             }
           }
@@ -464,7 +464,7 @@ fn consume_term(s : Stream) -> Unit raise CssError {
         _ => ()
       }
     }
-    b'+' | b'-' | b'0'..=b'9' | b'.' => {
+    b'+' | b'-' | b'0'..<=b'9' | b'.' => {
       // Consume number.
       s.advance(1)
       consume_digits(s)

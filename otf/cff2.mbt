@@ -8,20 +8,20 @@
 ///|
 // https://docs.microsoft.com/en-us/typography/opentype/spec/cff2#7-top-dict-data
 // 'Operators in DICT may be preceded by up to a maximum of 513 operands.'
-let cff2_max_operands_len : Int = 513
+let cff2_max_operands_len : Int32 = 513
 
 ///|
 // https://docs.microsoft.com/en-us/typography/opentype/spec/cff2charstr#appendix-b-cff2-charstring-implementation-limits
-let cff2_stack_limit : Int = 10
+let cff2_stack_limit : Int32 = 10
 
 ///|
-let cff2_max_arguments_stack_len : Int = 513
+let cff2_max_arguments_stack_len : Int32 = 513
 
 ///|
 priv struct TopDictData {
-  mut char_strings_offset : Int
-  mut font_dict_index_offset : Int?
-  mut variation_store_offset : Int?
+  mut char_strings_offset : Int32
+  mut font_dict_index_offset : Int32?
+  mut variation_store_offset : Int32?
 }
 
 ///|
@@ -53,7 +53,7 @@ fn cff2_parse_top_dict(data : BytesView) -> TopDictData raise Malformed {
 }
 
 ///|
-fn cff2_parse_font_dict(data : BytesView) -> (Int, Int)? {
+fn cff2_parse_font_dict(data : BytesView) -> (Int32, Int32)? {
   let mut private_dict_range = None
   let dict_parser = DictionaryParser::new(data, cff2_max_operands_len)
   while dict_parser.parse_next() is Some(operator) {
@@ -79,7 +79,7 @@ fn cff2_parse_font_dict(data : BytesView) -> (Int, Int)? {
 }
 
 ///|
-fn cff2_parse_private_dict(data : BytesView) -> Int? {
+fn cff2_parse_private_dict(data : BytesView) -> Int32? {
   let mut subroutines_offset = None
   let dict_parser = DictionaryParser::new(data, cff2_max_operands_len)
   while dict_parser.parse_next() is Some(operator) {
@@ -102,12 +102,12 @@ fn cff2_parse_private_dict(data : BytesView) -> Int? {
 ///|
 /// CFF2 allows up to 65535 scalars, but an average font will have 3-5.
 /// So 64 is more than enough.
-let scalars_max : Int = 64
+let scalars_max : Int32 = 64
 
 ///|
 priv struct Scalars {
   d : FixedArray[Float] // 256B
-  mut len : Int
+  mut len : Int32
 }
 
 ///|
@@ -116,7 +116,7 @@ fn Scalars::new() -> Scalars {
 }
 
 ///|
-fn Scalars::len(self : Scalars) -> Int {
+fn Scalars::len(self : Scalars) -> Int32 {
   self.len
 }
 
@@ -126,7 +126,7 @@ fn Scalars::clear(self : Scalars) -> Unit {
 }
 
 ///|
-fn Scalars::at(self : Scalars, i : Int) -> Float {
+fn Scalars::at(self : Scalars, i : Int32) -> Float {
   if i < self.len {
     self.d[i]
   } else {
@@ -152,7 +152,7 @@ priv struct Cff2Context {
   scalars : Scalars
   mut had_vsindex : Bool
   mut had_blend : Bool
-  mut stems_len : UInt
+  mut stems_len : UInt32
 }
 
 ///|
@@ -220,7 +220,7 @@ fn cff2_parse_char_string(
 fn cff2_parse_char_string_impl(
   ctx : Cff2Context,
   char_string : BytesView,
-  depth : Int,
+  depth : Int32,
   p : CharStringParser,
 ) -> Unit raise CFFError {
   let s = Stream::new(char_string)
@@ -356,9 +356,9 @@ fn cff2_parse_char_string_impl(
       }
       30 => p.parse_vh_curve_to()
       31 => p.parse_hv_curve_to()
-      32..=246 => p.parse_int1(op)
-      247..=250 => p.parse_int2(op, s)
-      251..=254 => p.parse_int3(op, s)
+      32..<=246 => p.parse_int1(op)
+      247..<=250 => p.parse_int2(op, s)
+      251..<=254 => p.parse_int3(op, s)
       _ => // FIXED_16_16
         p.parse_fixed(s)
     }

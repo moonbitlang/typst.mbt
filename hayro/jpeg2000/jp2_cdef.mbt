@@ -45,7 +45,7 @@ priv struct ChannelDefinitionBox {
 
 ///|
 priv struct ChannelDefinition {
-  channel_index : Int
+  channel_index : Int32
   channel_type : ChannelType
   /// `_association` upstream.
   association : ChannelAssociation
@@ -58,7 +58,7 @@ priv enum ChannelType {
 } derive(Eq)
 
 ///|
-fn ChannelType::from_raw(value : Int) -> ChannelType? {
+fn ChannelType::from_raw(value : Int32) -> ChannelType? {
   match value {
     0 => Some(Colour)
     1 => Some(Opacity)
@@ -70,11 +70,11 @@ fn ChannelType::from_raw(value : Int) -> ChannelType? {
 ///|
 priv enum ChannelAssociation {
   WholeImage
-  Colour(Int)
+  Colour(Int32)
 }
 
 ///|
-fn ChannelAssociation::from_raw(value : Int) -> ChannelAssociation? {
+fn ChannelAssociation::from_raw(value : Int32) -> ChannelAssociation? {
   match value {
     0 => Some(WholeImage)
     // Unspecified.

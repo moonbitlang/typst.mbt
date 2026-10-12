@@ -18,8 +18,8 @@ priv struct Lowering {
   /// The blocks and boxes with a size of their own whose arguments are
   /// being lowered (`Registry::container`), outermost first, and the
   /// number of that stack (`Registry::stack`).
-  containers : Array[Int]
-  stack : Int
+  containers : Array[Int32]
+  stack : Int32
 }
 
 ///|
@@ -39,7 +39,7 @@ priv struct Pieces {
   /// call (its line).
   base : @syntax.Span
   /// The number of spans that were given out. The first is `base` itself.
-  next : @ref.Ref[Int]
+  next : @ref.Ref[Int32]
   /// The spans of what is inside the argument under `Keyed` wrappers: one
   /// counter per path of keys (`Lowering::keyed`). The table belongs to the
   /// argument: the counters of its key paths share it, so that a path is
@@ -159,7 +159,7 @@ fn Lowering::take(
 fn Lowering::entry(
   self : Lowering,
   site : Site,
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   let entry = self.session.registry.entry(site, self.keys)
   if self.session.lints {
     self.session.registry.note_stack(entry, self.stack)
@@ -218,7 +218,7 @@ fn[T] Lowering::trace_call(
 fn Lowering::trace_range(
   self : Lowering,
   span : @syntax.DiagSpan,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   let range = @library.world_range(self.engine.world, span)
   let registry = self.session.registry
   guard span.get() is Range(id~, start~, end~) && id == registry.origins else {
@@ -423,7 +423,7 @@ fn Lowering::misplaced_rule(
 fn Lowering::piece_span(
   self : Lowering,
   base : @syntax.Span,
-  k : Int,
+  k : Int32,
 ) -> @syntax.Span raise @library.SourceError {
   guard k > 0 && base.get() is Range(start~, end~, ..) && end > start else {
     return base
@@ -602,8 +602,8 @@ fn value_of(content : Content) -> Value? {
 fn Lowering::param_span(
   self : Lowering,
   site : Site,
-  entry : Int,
-  param : Int,
+  entry : Int32,
+  param : Int32,
 ) -> @syntax.Span {
   self.session.registry.arg_span(entry, site.param(param))
 }
@@ -776,9 +776,9 @@ fn Lowering::func(
 fn Lowering::args(
   self : Lowering,
   args : Array[ArgNode],
-  entry : Int,
+  entry : Int32,
   span : @syntax.Span,
-  scopes? : Array[Pieces] = [],
+  scopes~ : Array[Pieces] = [],
   site? : Site,
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []
@@ -862,7 +862,7 @@ fn Lowering::call(
   self : Lowering,
   func : Callee,
   args : Array[ArgNode],
-  entry : Int,
+  entry : Int32,
   span : @syntax.Span,
   site? : Site,
 ) -> @library.Value raise @library.SourceError {

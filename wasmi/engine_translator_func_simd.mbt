@@ -28,7 +28,7 @@ pub extend LaneTy with Eq::{not_equal, equal}
 
 ///|
 /// The number of lanes of a [`LaneTy`].
-fn LaneTy::lanes(self : LaneTy) -> Int {
+fn LaneTy::lanes(self : LaneTy) -> Int32 {
   match self {
     I8 | U8 => 16
     I16 | U16 => 8
@@ -39,7 +39,7 @@ fn LaneTy::lanes(self : LaneTy) -> Int {
 
 ///|
 /// Upstream `<T::LaneIdx>::try_from(lane)`: checks the lane index.
-fn LaneTy::lane_idx(self : LaneTy, lane : Int) -> @ir.ImmLaneIdx {
+fn LaneTy::lane_idx(self : LaneTy, lane : Int32) -> @ir.ImmLaneIdx {
   if lane < 0 || lane >= self.lanes() {
     abort("encountered out of bounds lane index: \{lane}")
   }
@@ -97,10 +97,10 @@ fn FuncTranslator::translate_simd_splat(
 fn FuncTranslator::translate_extract_lane(
   self : FuncTranslator,
   lane_ty : LaneTy,
-  lane : Int,
+  lane : Int32,
   result_ty : @wasmi_core.ValType,
   make_instr : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx) -> @ir.Op,
-  const_eval : (@wasmi_core.V128Value, Int) -> @wasmi_core.TypedVal,
+  const_eval : (@wasmi_core.V128Value, Int32) -> @wasmi_core.TypedVal,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -124,7 +124,7 @@ fn FuncTranslator::translate_extract_lane(
 /// A Wasm `replace_lane` operator (upstream `SimdReplaceLane`).
 priv struct SimdReplaceLane {
   item_ty : LaneTy
-  const_eval : (@wasmi_core.V128Value, Int, @wasmi_core.TypedVal) -> @wasmi_core.V128Value
+  const_eval : (@wasmi_core.V128Value, Int32, @wasmi_core.TypedVal) -> @wasmi_core.V128Value
   replace_lane : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx) -> @ir.Op
   replace_lane_imm : (@ir.Slot, @ir.Slot, @ir.ImmLaneIdx, @wasmi_core.TypedVal) -> @ir.Op
   replace_lane_imm_param : (@wasmi_core.TypedVal) -> @ir.Op?
@@ -274,7 +274,7 @@ let f64x2_replace_lane_op : SimdReplaceLane = {
 fn FuncTranslator::translate_replace_lane(
   self : FuncTranslator,
   op : SimdReplaceLane,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -418,10 +418,10 @@ fn FuncTranslator::translate_simd_ternary(
 /// lane bit width `bits` for upstream's `IntoShiftAmount`).
 fn FuncTranslator::translate_simd_shift(
   self : FuncTranslator,
-  bits : UInt,
+  bits : UInt32,
   make_instr : (@ir.Slot, @ir.Slot, @ir.Slot) -> @ir.Op,
   make_instr_imm : (@ir.Slot, @ir.Slot, @ir.ShiftAmount) -> @ir.Op,
-  const_eval : (@wasmi_core.V128Value, UInt) -> @wasmi_core.V128Value,
+  const_eval : (@wasmi_core.V128Value, UInt32) -> @wasmi_core.V128Value,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -462,7 +462,7 @@ fn FuncTranslator::translate_v128_load_lane(
   self : FuncTranslator,
   lane_ty : LaneTy,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
   make_instr : (@ir.Slot, @ir.Offset64Lo) -> @ir.Op,
   make_instr_at : (@ir.Slot, @ir.Address32) -> @ir.Op,
 ) -> Unit raise WasmiError {
@@ -538,7 +538,7 @@ fn FuncTranslator::translate_v128_store_lane(
   self : FuncTranslator,
   lane_ty : LaneTy,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
   make_instr : (@ir.Slot, @ir.Offset64Lo) -> @ir.Op,
   make_instr_offset8 : (@ir.Slot, @ir.Slot, @ir.Offset8, @ir.ImmLaneIdx) -> @ir.Op,
   make_instr_at : (@ir.Slot, @ir.Address32) -> @ir.Op,
@@ -546,7 +546,7 @@ fn FuncTranslator::translate_v128_store_lane(
     FuncTranslator,
     @wasmparser.MemArg,
     Operand,
-    Int,
+    Int32,
     @wasmi_core.V128Value,
   ) -> Unit raise WasmiError,
 ) -> Unit raise WasmiError {
@@ -644,7 +644,7 @@ fn FuncTranslator::translate_v128_store_lane_mem0(
 fn FuncTranslator::visit_v128_load8_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_load_lane(
     I8,
@@ -659,7 +659,7 @@ fn FuncTranslator::visit_v128_load8_lane(
 fn FuncTranslator::visit_v128_load16_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_load_lane(
     I16,
@@ -674,7 +674,7 @@ fn FuncTranslator::visit_v128_load16_lane(
 fn FuncTranslator::visit_v128_load32_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_load_lane(
     I32,
@@ -689,7 +689,7 @@ fn FuncTranslator::visit_v128_load32_lane(
 fn FuncTranslator::visit_v128_load64_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_load_lane(
     I64,
@@ -704,7 +704,7 @@ fn FuncTranslator::visit_v128_load64_lane(
 fn FuncTranslator::visit_v128_store8_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_store_lane(
     I8,
@@ -730,7 +730,7 @@ fn FuncTranslator::visit_v128_store8_lane(
 fn FuncTranslator::visit_v128_store16_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_store_lane(
     I16,
@@ -756,7 +756,7 @@ fn FuncTranslator::visit_v128_store16_lane(
 fn FuncTranslator::visit_v128_store32_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_store_lane(
     I32,
@@ -782,7 +782,7 @@ fn FuncTranslator::visit_v128_store32_lane(
 fn FuncTranslator::visit_v128_store64_lane(
   self : FuncTranslator,
   memarg : @wasmparser.MemArg,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_v128_store_lane(
     I64,
@@ -858,7 +858,7 @@ fn FuncTranslator::visit_i8x16_shuffle(
 ///|
 fn FuncTranslator::visit_i8x16_extract_lane_s(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(I8, lane, I32, @ir.Op::i8x16_extract_lane_s, fn(
     v,
@@ -873,7 +873,7 @@ fn FuncTranslator::visit_i8x16_extract_lane_s(
 ///|
 fn FuncTranslator::visit_i8x16_extract_lane_u(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(U8, lane, I32, @ir.Op::i8x16_extract_lane_u, fn(
     v,
@@ -888,7 +888,7 @@ fn FuncTranslator::visit_i8x16_extract_lane_u(
 ///|
 fn FuncTranslator::visit_i16x8_extract_lane_s(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(I16, lane, I32, @ir.Op::i16x8_extract_lane_s, fn(
     v,
@@ -903,7 +903,7 @@ fn FuncTranslator::visit_i16x8_extract_lane_s(
 ///|
 fn FuncTranslator::visit_i16x8_extract_lane_u(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(U16, lane, I32, @ir.Op::i16x8_extract_lane_u, fn(
     v,
@@ -918,7 +918,7 @@ fn FuncTranslator::visit_i16x8_extract_lane_u(
 ///|
 fn FuncTranslator::visit_i32x4_extract_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(I32, lane, I32, @ir.Op::i32x4_extract_lane, fn(
     v,
@@ -933,7 +933,7 @@ fn FuncTranslator::visit_i32x4_extract_lane(
 ///|
 fn FuncTranslator::visit_i64x2_extract_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(I64, lane, I64, @ir.Op::i64x2_extract_lane, fn(
     v,
@@ -948,7 +948,7 @@ fn FuncTranslator::visit_i64x2_extract_lane(
 ///|
 fn FuncTranslator::visit_f32x4_extract_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(F32, lane, F32, @ir.Op::f32x4_extract_lane, fn(
     v,
@@ -963,7 +963,7 @@ fn FuncTranslator::visit_f32x4_extract_lane(
 ///|
 fn FuncTranslator::visit_f64x2_extract_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_extract_lane(F64, lane, F64, @ir.Op::f64x2_extract_lane, fn(
     v,
@@ -978,7 +978,7 @@ fn FuncTranslator::visit_f64x2_extract_lane(
 ///|
 fn FuncTranslator::visit_i8x16_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(i8x16_replace_lane_op, lane)
 }
@@ -986,7 +986,7 @@ fn FuncTranslator::visit_i8x16_replace_lane(
 ///|
 fn FuncTranslator::visit_i16x8_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(i16x8_replace_lane_op, lane)
 }
@@ -994,7 +994,7 @@ fn FuncTranslator::visit_i16x8_replace_lane(
 ///|
 fn FuncTranslator::visit_i32x4_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(i32x4_replace_lane_op, lane)
 }
@@ -1002,7 +1002,7 @@ fn FuncTranslator::visit_i32x4_replace_lane(
 ///|
 fn FuncTranslator::visit_i64x2_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(i64x2_replace_lane_op, lane)
 }
@@ -1010,7 +1010,7 @@ fn FuncTranslator::visit_i64x2_replace_lane(
 ///|
 fn FuncTranslator::visit_f32x4_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(f32x4_replace_lane_op, lane)
 }
@@ -1018,7 +1018,7 @@ fn FuncTranslator::visit_f32x4_replace_lane(
 ///|
 fn FuncTranslator::visit_f64x2_replace_lane(
   self : FuncTranslator,
-  lane : Int,
+  lane : Int32,
 ) -> Unit raise WasmiError {
   self.translate_replace_lane(f64x2_replace_lane_op, lane)
 }

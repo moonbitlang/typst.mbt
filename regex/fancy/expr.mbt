@@ -24,18 +24,18 @@ pub(all) enum Expr {
   LookAround(Expr, LookAround)
   /// Repeat of an expression, e.g. `a*` or `a+` or `a{1,3}` (`hi` is
   /// `USIZE_MAX` if unbounded)
-  Repeat(child~ : Expr, lo~ : Int, hi~ : Int, greedy~ : Bool)
+  Repeat(child~ : Expr, lo~ : Int32, hi~ : Int32, greedy~ : Bool)
   /// Delegate a regex to the regex crate. This is used as a simplification
   /// so that we don't have to represent all the expressions in the AST, e.g.
   /// character classes. `size`: how many characters the regex matches.
-  Delegate(inner~ : String, size~ : Int, casei~ : Bool)
+  Delegate(inner~ : String, size~ : Int32, casei~ : Bool)
   /// Back reference to a capture group, e.g. `\1` in `(abc|def)\1`
-  Backref(group~ : Int, casei~ : Bool)
+  Backref(group~ : Int32, casei~ : Bool)
   /// Back reference to a capture group at the given specified relative
   /// recursion level.
   BackrefWithRelativeRecursionLevel(
-    group~ : Int,
-    relative_level~ : Int,
+    group~ : Int32,
+    relative_level~ : Int32,
     casei~ : Bool
   )
   /// Atomic non-capturing group, e.g. `(?>ab|a)`
@@ -46,15 +46,15 @@ pub(all) enum Expr {
   ContinueFromPreviousMatchEnd
   /// Conditional expression based on whether the numbered capture group
   /// matched or not
-  BackrefExistsCondition(Int)
+  BackrefExistsCondition(Int32)
   /// If/Then/Else Condition. If there is no Then/Else, these will just be
   /// empty expressions.
   Conditional(condition~ : Expr, true_branch~ : Expr, false_branch~ : Expr)
   /// Subroutine call to the specified group number
-  SubroutineCall(Int)
+  SubroutineCall(Int32)
   /// Unresolved subroutine call to the specified group name (`ix`: the
   /// position in the original regex pattern where the call is made)
-  UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int)
+  UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -140,7 +140,7 @@ pub fn Expr::parse_tree(re : String) -> ExprTree raise FancyError {
 /// on the `FLAG_*` constants.
 pub fn Expr::parse_tree_with_flags(
   re : String,
-  flags : Int,
+  flags : Int32,
 ) -> ExprTree raise FancyError {
   Parser::parse_with_flags(re, flags)
 }
@@ -150,7 +150,11 @@ pub fn Expr::parse_tree_with_flags(
 ///
 /// Panics for expressions that are hard, i.e. can not be handled by the
 /// regex crate.
-pub fn Expr::to_str(self : Expr, buf : StringBuilder, precedence : Int) -> Unit {
+pub fn Expr::to_str(
+  self : Expr,
+  buf : StringBuilder,
+  precedence : Int32,
+) -> Unit {
   match self {
     Empty => ()
     Any(newline~) => buf.write_string(if newline { "(?s:.)" } else { "." })

@@ -9,13 +9,13 @@ let two_pow_27_plus_1 : Double = 134217729.0
 
 ///|
 /// Unbiased exponent of a finite normal double.
-fn exponent_of(x : Double) -> Int {
+fn exponent_of(x : Double) -> Int32 {
   ((x.reinterpret_as_uint64() >> 52).to_int() & 0x7ff) - 1023
 }
 
 ///|
 /// `2^k` for `-1022 <= k <= 1023`.
-fn pow2(k : Int) -> Double {
+fn pow2(k : Int32) -> Double {
   ((k + 1023).to_uint64() << 52).reinterpret_as_double()
 }
 
@@ -64,7 +64,7 @@ fn add_round_to_odd(a : Double, b : Double) -> Double {
 
 ///|
 /// Rounds `n * 2^q` (exact) to the nearest double (ties to even).
-fn round_bigint_to_double(n : @bigint.BigInt, q : Int) -> Double {
+fn round_bigint_to_double(n : @bigint.BigInt, q : Int32) -> Double {
   if n.is_zero() {
     return 0.0
   }
@@ -111,7 +111,7 @@ fn round_bigint_to_double(n : @bigint.BigInt, q : Int) -> Double {
 ///|
 /// Decomposes a finite nonzero double into `(sign_negative, m, q)` with
 /// `|x| = m * 2^q`.
-fn decompose(x : Double) -> (Bool, UInt64, Int) {
+fn decompose(x : Double) -> (Bool, UInt64, Int32) {
   let bits = x.reinterpret_as_uint64()
   let neg = bits >> 63 != 0UL
   let be = (bits >> 52).to_int() & 0x7ff

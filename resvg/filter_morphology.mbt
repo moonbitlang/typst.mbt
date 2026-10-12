@@ -73,7 +73,7 @@ fn morphology_apply(
 }
 
 ///|
-fn umin(a : UInt, b : UInt) -> UInt {
+fn umin(a : UInt32, b : UInt32) -> UInt32 {
   if a < b {
     a
   } else {
@@ -82,7 +82,7 @@ fn umin(a : UInt, b : UInt) -> UInt {
 }
 
 ///|
-fn imax(a : Int, b : Int) -> Int {
+fn imax(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a
   } else {

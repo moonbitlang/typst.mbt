@@ -6,7 +6,7 @@
 /// Input image pixels should have an **unpremultiplied alpha**.
 fn component_transfer_apply(
   fe : @usvg.FeComponentTransfer,
-  data : FixedArray[UInt],
+  data : FixedArray[UInt32],
 ) -> Unit {
   for i in 0..<data.length() {
     let p = data[i]
@@ -42,7 +42,7 @@ fn is_dummy(func : @usvg.TransferFunction) -> Bool {
 }
 
 ///|
-fn transfer(func : @usvg.TransferFunction, c : Int) -> Int {
+fn transfer(func : @usvg.TransferFunction, c : Int32) -> Int32 {
   let c = Float::from_int(c) / 255.0
   let c = match func {
     Identity => c

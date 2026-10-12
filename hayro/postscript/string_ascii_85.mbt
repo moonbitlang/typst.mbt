@@ -58,7 +58,7 @@ fn ascii_85_decode_into(data : BytesView, out : Array[Byte]) -> Unit? {
       return Some(())
     }
     match b {
-      b'!'..=b'u' => {
+      b'!'..<=b'u' => {
         group.push(b)
         if group.length() == 5 {
           guard flush_group(group, out) is Some(_) else { return None }

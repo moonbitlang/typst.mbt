@@ -87,13 +87,13 @@ fn is_parbreak_piece(content : Content) -> Bool {
 #callsite(autofill(loc, args_loc))
 pub fn Para::Para(
   text : String,
-  quotes? : Bool = true,
+  quotes~ : Bool = true,
   leading? : Length,
   spacing? : Length,
   justify? : Bool,
   linebreaks? : String,
   hanging_indent? : Length,
-  extra? : Array[(String, Value)] = [],
+  extra~ : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Para {

@@ -37,7 +37,7 @@ fn HuffmanTable::from_dynamic(nodes : Array[HuffmanNode]) -> HuffmanTable {
 fn HuffmanTable::decode(
   self : HuffmanTable,
   reader : Reader,
-) -> Int? raise DecodeError {
+) -> Int32? raise DecodeError {
   HuffmanNode::decode_from(self.nodes, 0, reader)
 }
 
@@ -47,7 +47,7 @@ fn HuffmanTable::decode(
 fn HuffmanTable::decode_no_oob(
   self : HuffmanTable,
   reader : Reader,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   ok_or(self.decode(reader), Huffman(UnexpectedOob))
 }
 
@@ -151,8 +151,8 @@ fn HuffmanTable::build(
 /// 0 to SDNUMINSYMS + NSYMSDECODED – 1, set SBSYMCODES[i] to the binary
 /// representation of i using a SBSYMCODELEN-bit string."
 fn HuffmanTable::build_uniform(
-  num_symbols : UInt,
-  code_length : UInt,
+  num_symbols : UInt32,
+  code_length : UInt32,
 ) -> HuffmanTable raise DecodeError {
   let lines = []
   for i in 0U..<num_symbols {
@@ -171,11 +171,11 @@ fn HuffmanTable::build_uniform(
 /// Insert a code into the Huffman tree.
 fn HuffmanTable::insert_code(
   nodes : Array[HuffmanNode],
-  node_index : Int,
-  code : UInt,
-  prefix_length : Int,
-  range_low : Int,
-  range_length : Int,
+  node_index : Int32,
+  code : UInt32,
+  prefix_length : Int32,
+  range_low : Int32,
+  range_length : Int32,
   is_lower : Bool,
   is_out_of_band : Bool,
 ) -> Unit raise DecodeError {
@@ -323,11 +323,11 @@ priv struct TableLine {
   /// `RANGELOW` - The base value for computing the decoded value.
   /// For normal/upper lines: value = `range_low` + offset
   /// For lower lines: value = `range_low` - offset
-  range_low : Int
+  range_low : Int32
   /// `PREFLEN` - Prefix code length.
-  prefix_length : Int
+  prefix_length : Int32
   /// `RANGELEN` - Number of additional bits.
-  range_length : Int
+  range_length : Int32
   /// True if this is a lower range line (uses subtraction).
   is_lower : Bool
   /// `OOB` - True if this is the out-of-band marker.
@@ -337,9 +337,9 @@ priv struct TableLine {
 ///|
 /// Create a normal table line.
 fn TableLine::new(
-  range_low : Int,
-  prefix_length : Int,
-  range_length : Int,
+  range_low : Int32,
+  prefix_length : Int32,
+  range_length : Int32,
 ) -> TableLine {
   {
     range_low,
@@ -353,9 +353,9 @@ fn TableLine::new(
 ///|
 /// Create a lower range line (-∞...`range_high`).
 fn TableLine::lower(
-  range_high : Int,
-  prefix_length : Int,
-  range_length : Int,
+  range_high : Int32,
+  prefix_length : Int32,
+  range_length : Int32,
 ) -> TableLine {
   {
     range_low: range_high,
@@ -369,9 +369,9 @@ fn TableLine::lower(
 ///|
 /// Create an upper range line (`range_low`...+∞).
 fn TableLine::upper(
-  range_low : Int,
-  prefix_length : Int,
-  range_length : Int,
+  range_low : Int32,
+  prefix_length : Int32,
+  range_length : Int32,
 ) -> TableLine {
   {
     range_low,
@@ -384,7 +384,7 @@ fn TableLine::upper(
 
 ///|
 /// Create an out-of-band marker line.
-fn TableLine::oob(prefix_length : Int) -> TableLine {
+fn TableLine::oob(prefix_length : Int32) -> TableLine {
   {
     range_low: 0,
     prefix_length,
@@ -400,7 +400,7 @@ fn TableLine::oob(prefix_length : Int) -> TableLine {
 /// (Child indices are upstream's `Option<NonZeroU32>`; `0` is `None`.)
 priv enum HuffmanNode {
   /// Intermediate node.
-  Intermediate(zero~ : Int, one~ : Int)
+  Intermediate(zero~ : Int32, one~ : Int32)
   /// Leaf node.
   Leaf(LeafData)
   /// Empty node (padding to fill fixed-size arrays in inline tables).
@@ -414,8 +414,8 @@ fn HuffmanNode::new_intermediate() -> HuffmanNode {
 
 ///|
 fn HuffmanNode::new_leaf(
-  range_low : Int,
-  range_length : Int,
+  range_low : Int32,
+  range_length : Int32,
   is_lower : Bool,
   is_out_of_band : Bool,
 ) -> HuffmanNode {
@@ -424,7 +424,7 @@ fn HuffmanNode::new_leaf(
 
 ///|
 /// Get the child index for a given bit (0 or 1).
-fn HuffmanNode::get_child(self : HuffmanNode, child_zero : Bool) -> Int? {
+fn HuffmanNode::get_child(self : HuffmanNode, child_zero : Bool) -> Int32? {
   match self {
     Intermediate(zero~, one~) => {
       let idx = if child_zero { zero } else { one }
@@ -445,7 +445,7 @@ fn HuffmanNode::get_child(self : HuffmanNode, child_zero : Bool) -> Int? {
 fn HuffmanNode::set_child(
   self : HuffmanNode,
   child_zero : Bool,
-  index : Int,
+  index : Int32,
 ) -> HuffmanNode raise DecodeError {
   match self {
     Intermediate(zero~, one~) =>
@@ -462,9 +462,9 @@ fn HuffmanNode::set_child(
 /// Implements B.4 "Using a Huffman table".
 fn HuffmanNode::decode_from(
   nodes : FixedArray[HuffmanNode],
-  node_index : Int,
+  node_index : Int32,
   reader : Reader,
-) -> Int? raise DecodeError {
+) -> Int32? raise DecodeError {
   let mut node_index = node_index
   // 1) "Read one bit at a time until the bit string read matches the code assigned to
   //    one of the table lines."
@@ -513,9 +513,9 @@ fn HuffmanNode::decode_from(
 /// Information stored at a leaf node of the Huffman tree.
 priv struct LeafData {
   /// `RANGELOW` - The base value for computing the decoded value.
-  range_low : Int
+  range_low : Int32
   /// `RANGELEN` - Number of additional bits to read.
-  range_length : Int
+  range_length : Int32
   /// True if this is a lower range line (uses subtraction).
   is_lower : Bool
   /// `OOB` - True if this is the out-of-band marker.
@@ -539,7 +539,7 @@ fn StandardHuffmanTables::new() -> StandardHuffmanTables {
 ///|
 fn StandardHuffmanTables::get(
   self : StandardHuffmanTables,
-  idx : Int,
+  idx : Int32,
   nodes : FixedArray[HuffmanNode],
 ) -> HuffmanTable {
   match self.tables[idx] {

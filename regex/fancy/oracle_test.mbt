@@ -45,7 +45,7 @@ fn describe_caps(caps : @fancy.Captures) -> String {
 ///|
 /// The UTF-8 byte offsets of the char boundaries (at most 16: the first 12
 /// and the last 4).
-fn boundaries(hay : String) -> Array[Int] {
+fn boundaries(hay : String) -> Array[Int32] {
   let all = []
   let mut b = 0
   for c in hay {
@@ -73,7 +73,7 @@ fn boundaries(hay : String) -> Array[Int] {
 
 ///|
 /// The largest char boundary <= half the length.
-fn mid_boundary(text : @fancy.Text) -> Int {
+fn mid_boundary(text : @fancy.Text) -> Int32 {
   let mut mid = text.len() / 2
   while text.prefix(mid).len() != mid {
     mid -= 1
@@ -82,7 +82,11 @@ fn mid_boundary(text : @fancy.Text) -> Int {
 }
 
 ///|
-fn describe_search(re : @fancy.Regex, text : @fancy.Text, pos : Int) -> String {
+fn describe_search(
+  re : @fancy.Regex,
+  text : @fancy.Text,
+  pos : Int32,
+) -> String {
   try re.captures_from_pos_text(text, pos) catch {
     e => "err:\{e}"
   } noraise {
@@ -126,7 +130,7 @@ fn describe(re : @fancy.Regex, hay : String) -> String {
 }
 
 ///|
-fn report(failures : Array[String], total : Int) -> Unit raise {
+fn report(failures : Array[String], total : Int32) -> Unit raise {
   if !failures.is_empty() {
     let shown = if failures.length() > 40 {
       failures[:40].to_owned()

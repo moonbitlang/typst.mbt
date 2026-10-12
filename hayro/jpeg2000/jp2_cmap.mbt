@@ -32,12 +32,12 @@ priv struct ComponentMappingBox {
 
 ///|
 priv struct ComponentMappingEntry {
-  component_index : Int
+  component_index : Int32
   mapping_type : ComponentMappingType
 }
 
 ///|
 priv enum ComponentMappingType {
   Direct
-  Palette(column~ : Int)
+  Palette(column~ : Int32)
 }

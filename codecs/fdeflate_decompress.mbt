@@ -91,44 +91,44 @@ priv enum FdeflateState {
 /// its `CompressedBlock` and `BlockHeader` inlined).
 priv struct Decompressor {
   // State for decoding a compressed block (`CompressedBlock`).
-  litlen_table : FixedArray[UInt]
-  secondary_table : Array[UInt]
-  dist_table : FixedArray[UInt]
-  dist_secondary_table : Array[UInt]
-  mut eof_code : UInt
-  mut eof_mask : UInt
-  mut eof_bits : Int
+  litlen_table : FixedArray[UInt32]
+  secondary_table : Array[UInt32]
+  dist_table : FixedArray[UInt32]
+  dist_secondary_table : Array[UInt32]
+  mut eof_code : UInt32
+  mut eof_mask : UInt32
+  mut eof_bits : Int32
   // State for decoding a block header (`BlockHeader`).
-  mut hlit : Int
-  mut hdist : Int
-  mut hclen : Int
-  mut num_lengths_read : Int
+  mut hlit : Int32
+  mut hdist : Int32
+  mut hclen : Int32
+  mut num_lengths_read : Int32
   /// Low 3-bits are code length code length, high 5-bits are code length code.
-  table : FixedArray[UInt]
-  code_lengths : FixedArray[Int]
+  table : FixedArray[UInt32]
+  code_lengths : FixedArray[Int32]
   // Number of bytes left for uncompressed block.
-  mut uncompressed_bytes_left : Int
+  mut uncompressed_bytes_left : Int32
   mut buffer : UInt64
-  mut nbits : Int
+  mut nbits : Int32
   /// `queued_rle: Option<(u8, usize)>`; a length of zero is `None`.
   mut queued_rle_data : Byte
-  mut queued_rle_len : Int
+  mut queued_rle_len : Int32
   /// `queued_backref: Option<(usize, usize)>`; a length of zero is `None`.
-  mut queued_backref_dist : Int
-  mut queued_backref_len : Int
+  mut queued_backref_dist : Int32
+  mut queued_backref_len : Int32
   mut last_block : Bool
   mut fixed_table : Bool
   mut state : FdeflateState
-  mut checksum : UInt
+  mut checksum : UInt32
   mut ignore_adler32 : Bool
   /// The input of the current `read` call that has not been read yet
   /// (upstream's `remaining_input`): `input[in_pos..in_end]`.
   mut input : Bytes
-  mut in_pos : Int
-  mut in_end : Int
+  mut in_pos : Int32
+  mut in_end : Int32
   /// The first element of the result of `read`: the number of bytes read
   /// from the input.
-  mut in_consumed : Int
+  mut in_consumed : Int32
 }
 
 ///|
@@ -196,12 +196,12 @@ fn Decompressor::fill_buffer(self : Decompressor) -> Unit {
 }
 
 ///|
-fn Decompressor::peak_bits(self : Decompressor, nbits : Int) -> UInt64 {
+fn Decompressor::peak_bits(self : Decompressor, nbits : Int32) -> UInt64 {
   self.buffer & ((1UL << nbits) - 1)
 }
 
 ///|
-fn Decompressor::consume_bits(self : Decompressor, nbits : Int) -> Unit {
+fn Decompressor::consume_bits(self : Decompressor, nbits : Int32) -> Unit {
   self.buffer = self.buffer >> nbits
   self.nbits -= nbits
 }
@@ -424,13 +424,13 @@ fn Decompressor::read_code_lengths(
 /// here the tables, and the result is its `eof_code` (the caller sets
 /// `eof_mask` and `eof_bits`).
 fn build_tables(
-  hlit : Int,
-  code_lengths : FixedArray[Int],
-  litlen_table : FixedArray[UInt],
-  secondary_table : Array[UInt],
-  dist_table : FixedArray[UInt],
-  dist_secondary_table : Array[UInt],
-) -> UInt raise DecompressionError {
+  hlit : Int32,
+  code_lengths : FixedArray[Int32],
+  litlen_table : FixedArray[UInt32],
+  secondary_table : Array[UInt32],
+  dist_table : FixedArray[UInt32],
+  dist_secondary_table : Array[UInt32],
+) -> UInt32 raise DecompressionError {
   // If there is no code assigned for the EOF symbol then the bitstream is invalid.
   if code_lengths[256] == 0 {
     // TODO: Return a dedicated error in this case.
@@ -487,8 +487,8 @@ fn build_tables(
 ///|
 /// The tables of a block with fixed Huffman codes.
 priv struct FixedTables {
-  litlen_table : FixedArray[UInt]
-  dist_table : FixedArray[UInt]
+  litlen_table : FixedArray[UInt32]
+  dist_table : FixedArray[UInt32]
 }
 
 ///|
@@ -543,9 +543,9 @@ fn fdeflate_fixed_tables() -> FixedTables {
 /// output.length()`).
 fn copy_backref(
   output : FixedArray[Byte],
-  output_index : Int,
-  dist : Int,
-  len : Int,
+  output_index : Int32,
+  dist : Int32,
+  len : Int32,
 ) -> Unit {
   if dist >= len {
     output.unsafe_blit(output_index, output, output_index - dist, len)
@@ -562,10 +562,10 @@ fn copy_backref(
 fn Decompressor::read_compressed(
   self : Decompressor,
   output : FixedArray[Byte],
-  out_start : Int,
-  out_end : Int,
-  output_index : Int,
-) -> Int raise DecompressionError {
+  out_start : Int32,
+  out_end : Int32,
+  output_index : Int32,
+) -> Int32 raise DecompressionError {
   let mut output_index = output_index
   let litlen_table = self.litlen_table
   let dist_table = self.dist_table
@@ -911,11 +911,11 @@ fn Decompressor::read(
   self : Decompressor,
   input : BytesView,
   output : FixedArray[Byte],
-  out_start : Int,
-  out_end : Int,
-  output_position : Int,
+  out_start : Int32,
+  out_end : Int32,
+  output_position : Int32,
   end_of_input : Bool,
-) -> Int raise DecompressionError {
+) -> Int32 raise DecompressionError {
   self.in_consumed = 0
   if self.state is Done {
     return 0
@@ -1069,7 +1069,7 @@ fn Decompressor::read(
 
 ///|
 /// Upstream `u32::swap_bytes`.
-fn swap_bytes32(v : UInt) -> UInt {
+fn swap_bytes32(v : UInt32) -> UInt32 {
   (v >> 24) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | (v << 24)
 }
 
@@ -1094,7 +1094,7 @@ priv suberror BoundedDecompressionError {
 /// `Vec` is a buffer of at least its length here.
 fn decompress_to_vec_bounded(
   input : BytesView,
-  maxlen : Int,
+  maxlen : Int32,
 ) -> Bytes raise BoundedDecompressionError {
   let decoder = Decompressor::new()
   let mut output_len = @cmp.minimum(1024, maxlen)

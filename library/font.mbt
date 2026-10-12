@@ -50,10 +50,10 @@ pub(open) trait FontInstanceFace {
   fn units_per_em(Self) -> Double
   /// The horizontal advance of a glyph in font units (upstream
   /// `glyph_hor_advance`).
-  fn glyph_hor_advance(Self, UInt16) -> Int?
+  fn glyph_hor_advance(Self, UInt16) -> Int32?
   /// The vertical advance of a glyph in font units (upstream
   /// `glyph_ver_advance`).
-  fn glyph_ver_advance(Self, UInt16) -> Int?
+  fn glyph_ver_advance(Self, UInt16) -> Int32?
   /// The bounding box of a glyph's outline in font units (upstream
   /// `glyph_bounding_box`).
   fn glyph_bounding_box(Self, UInt16) -> GlyphRect?
@@ -92,10 +92,10 @@ impl FontInstanceFace with fn ttf(_) {
 ///|
 /// A rectangle in font units (upstream `ttf_parser::Rect`).
 pub(all) struct GlyphRect {
-  x_min : Int
-  y_min : Int
-  x_max : Int
-  y_max : Int
+  x_min : Int32
+  y_min : Int32
+  x_max : Int32
+  y_max : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -122,20 +122,20 @@ pub struct Font {
   /// collection.
   priv data : Bytes
   /// The font's index in the buffer.
-  priv index : UInt
+  priv index : UInt32
   /// The parsed face.
   priv face : &FontFace
   /// The number of the object ([Font::serial]).
-  priv serial : Int
+  priv serial : Int32
 }
 
 ///|
 /// The number of fonts made so far ([Font::serial]).
-let font_serials : Ref[Int] = { val: 0, }
+let font_serials : Ref[Int32] = { val: 0, }
 
 ///|
 /// Create a font from its data, collection index and parsed face.
-pub fn Font::new(data : Bytes, index : UInt, face : &FontFace) -> Font {
+pub fn Font::new(data : Bytes, index : UInt32, face : &FontFace) -> Font {
   font_serials.val += 1
   { data, index, face, serial: font_serials.val, }
 }
@@ -150,13 +150,13 @@ pub fn Font::new(data : Bytes, index : UInt, face : &FontFace) -> Font {
 /// font object it has, as font stores do. (`Fingerprint for Font` and
 /// `==` are upstream's: where a font is part of a key or of a frame's
 /// hash, it is its data and index.)
-pub fn Font::serial(self : Font) -> Int {
+pub fn Font::serial(self : Font) -> Int32 {
   self.serial
 }
 
 ///|
 /// Parse a font from data and collection index (upstream `Font::new`).
-pub fn Font::from_data(data : Bytes, index : UInt) -> Font? {
+pub fn Font::from_data(data : Bytes, index : UInt32) -> Font? {
   let ttf = @otf.Face::parse(data[:], index) catch { _ => return None }
   guard FontInfo::from_ttf(ttf) is Some(info) else { return None }
   let face : OtfFontFace = { data, index, ttf, info, instances: {}, }
@@ -184,7 +184,7 @@ pub fn Font::data(self : Font) -> Bytes {
 
 ///|
 /// The font's index in the buffer.
-pub fn Font::index(self : Font) -> UInt {
+pub fn Font::index(self : Font) -> UInt32 {
   self.index
 }
 
@@ -423,7 +423,7 @@ fn FontInstance::edges_impl(
   bottom_edge : BottomEdge,
   font_size : Abs,
   frame : Frame?,
-  gid : Int,
+  gid : Int32,
 ) -> TextEdges {
   let mut rect : GlyphRect? = None
   let mut loaded = false
@@ -514,7 +514,7 @@ priv struct OtfFontFace {
   /// The raw font data.
   data : Bytes
   /// The font's index in the buffer.
-  index : UInt
+  index : UInt32
   /// The underlying ttf-parser face.
   ttf : @otf.Face
   /// Metadata about the font.

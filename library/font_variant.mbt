@@ -83,7 +83,7 @@ pub fn FontWeight::to_wght(self : FontWeight) -> AxisValue {
 ///|
 /// Create a font stretch from an OpenType-style number between 1 and 9,
 /// clamping it if necessary.
-pub fn FontStretch::from_number(stretch : Int) -> FontStretch {
+pub fn FontStretch::from_number(stretch : Int32) -> FontStretch {
   match stretch {
     0 | 1 => FontStretch(500)
     2 => FontStretch(625)
@@ -113,14 +113,14 @@ pub fn FontStretch::to_wdth(self : FontStretch) -> AxisValue {
 /// Round to one of the pre-defined variants.
 pub fn FontStretch::round(self : FontStretch) -> FontStretch {
   match self.0 {
-    0..=562 => FontStretch(500)
-    563..=687 => FontStretch(625)
-    688..=812 => FontStretch(750)
-    813..=937 => FontStretch(875)
-    938..=1062 => FontStretch(1000)
-    1063..=1187 => FontStretch(1125)
-    1188..=1374 => FontStretch(1250)
-    1375..=1749 => FontStretch(1500)
+    0..<=562 => FontStretch(500)
+    563..<=687 => FontStretch(625)
+    688..<=812 => FontStretch(750)
+    813..<=937 => FontStretch(875)
+    938..<=1062 => FontStretch(1000)
+    1063..<=1187 => FontStretch(1125)
+    1188..<=1374 => FontStretch(1250)
+    1375..<=1749 => FontStretch(1500)
     _ => FontStretch(2000)
   }
 }
@@ -257,7 +257,7 @@ pub fn StandardAxes::knows(tag : OpenTypeTag) -> Bool {
 
 ///|
 /// Returns a metric with which axes can be sorted for user-facing display.
-pub fn StandardAxes::order(tag : OpenTypeTag) -> Int {
+pub fn StandardAxes::order(tag : OpenTypeTag) -> Int32 {
   match standard_axes_list.search(tag.0) {
     Some(i) => i
     None => standard_axes_list.length()

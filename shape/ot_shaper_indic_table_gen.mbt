@@ -3,7 +3,7 @@
 
 ///|
 /// `(SyllabicCategory, MatraCategory)` per code point of the covered ranges.
-let indic_table : ReadOnlyArray[(Int, Int)] = [
+let indic_table : ReadOnlyArray[(Int32, Int32)] = [
 
   // Basic Latin
 
@@ -2047,55 +2047,55 @@ let indic_table : ReadOnlyArray[(Int, Int)] = [
 ]
 
 ///|
-const OFFSET_0X0028 : Int = 0
+const OFFSET_0X0028 : Int32 = 0
 
 ///|
-const OFFSET_0X00B0 : Int = 24
+const OFFSET_0X00B0 : Int32 = 24
 
 ///|
-const OFFSET_0X0900 : Int = 64
+const OFFSET_0X0900 : Int32 = 64
 
 ///|
-const OFFSET_0X1000 : Int = 1216
+const OFFSET_0X1000 : Int32 = 1216
 
 ///|
-const OFFSET_0X1780 : Int = 1376
+const OFFSET_0X1780 : Int32 = 1376
 
 ///|
-const OFFSET_0X1CD0 : Int = 1488
+const OFFSET_0X1CD0 : Int32 = 1488
 
 ///|
-const OFFSET_0X2008 : Int = 1536
+const OFFSET_0X2008 : Int32 = 1536
 
 ///|
-const OFFSET_0X2070 : Int = 1568
+const OFFSET_0X2070 : Int32 = 1568
 
 ///|
-const OFFSET_0X25F8 : Int = 1592
+const OFFSET_0X25F8 : Int32 = 1592
 
 ///|
-const OFFSET_0XA8E0 : Int = 1600
+const OFFSET_0XA8E0 : Int32 = 1600
 
 ///|
-const OFFSET_0XA9E0 : Int = 1632
+const OFFSET_0XA9E0 : Int32 = 1632
 
 ///|
-const OFFSET_0XAA60 : Int = 1664
+const OFFSET_0XAA60 : Int32 = 1664
 
 ///|
-const OFFSET_0XFE00 : Int = 1696
+const OFFSET_0XFE00 : Int32 = 1696
 
 ///|
-const OFFSET_0X11300 : Int = 1712
+const OFFSET_0X11300 : Int32 = 1712
 
 ///|
-const OFFSET_0X11338 : Int = 1720
+const OFFSET_0X11338 : Int32 = 1720
 
 ///|
-const OFFSET_0X116D0 : Int = 1728
+const OFFSET_0X116D0 : Int32 = 1728
 
 ///|
-fn get_categories(u : Int) -> (Int, Int) {
+fn get_categories(u : Int32) -> (Int32, Int32) {
   match u >> 12 {
     0x0 => {
       if u == 0x00A0 {

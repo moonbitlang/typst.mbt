@@ -13,7 +13,7 @@ priv enum IndicSyllableType {
 }
 
 ///|
-fn IndicSyllableType::to_int(self : IndicSyllableType) -> Int {
+fn IndicSyllableType::to_int(self : IndicSyllableType) -> Int32 {
   match self {
     ConsonantSyllable => 0
     VowelSyllable => 1
@@ -34,7 +34,7 @@ fn find_syllables_indic(buffer : Buffer) -> Unit {
   let pe = buffer.len
   let eof = buffer.len
   let syllable_serial = Ref(1)
-  fn found_syllable(ts : Int, te : Int, kind : IndicSyllableType) {
+  fn found_syllable(ts : Int32, te : Int32, kind : IndicSyllableType) {
     found_syllable_indic(ts, te, syllable_serial, kind.to_int(), buffer)
   }
 
@@ -237,10 +237,10 @@ fn find_syllables_indic(buffer : Buffer) -> Unit {
 
 ///|
 fn found_syllable_indic(
-  start : Int,
-  end : Int,
-  syllable_serial : Ref[Int],
-  kind : Int,
+  start : Int32,
+  end : Int32,
+  syllable_serial : Ref[Int32],
+  kind : Int32,
   buffer : Buffer,
 ) -> Unit {
   for i in start..<end {

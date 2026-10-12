@@ -9,18 +9,18 @@
 
 ///|
 priv struct ProgressionData {
-  layer_num : Int
-  resolution : Int
-  component : Int
+  layer_num : Int32
+  resolution : Int32
+  component : Int32
   precinct : UInt64
 }
 
 ///|
 priv struct IteratorInput {
-  layers : (Int, Int)
+  layers : (Int32, Int32)
   tile : Tile
-  resolutions : (Int, Int)
-  components : (Int, Int)
+  resolutions : (Int32, Int32)
+  components : (Int32, Int32)
 }
 
 ///|
@@ -37,9 +37,9 @@ fn IteratorInput::new(tile : Tile) -> IteratorInput {
 ///|
 fn IteratorInput::new_with_custom_bounds(
   tile : Tile,
-  resolutions : (Int, Int),
-  layers : (Int, Int),
-  components : (Int, Int),
+  resolutions : (Int32, Int32),
+  layers : (Int32, Int32),
+  components : (Int32, Int32),
 ) -> IteratorInput {
   let mut max_resolution = 0
   for c in tile.component_infos {
@@ -88,30 +88,30 @@ fn IteratorInput::new_with_custom_bounds(
 }
 
 ///|
-fn IteratorInput::min_layer(self : IteratorInput) -> Int {
+fn IteratorInput::min_layer(self : IteratorInput) -> Int32 {
   self.layers.0
 }
 
 ///|
-fn IteratorInput::max_layer(self : IteratorInput) -> Int {
+fn IteratorInput::max_layer(self : IteratorInput) -> Int32 {
   self.layers.1
 }
 
 ///|
-fn IteratorInput::min_resolution(self : IteratorInput) -> Int {
+fn IteratorInput::min_resolution(self : IteratorInput) -> Int32 {
   self.resolutions.0
 }
 
 ///|
-fn IteratorInput::total_max_resolution(self : IteratorInput) -> Int {
+fn IteratorInput::total_max_resolution(self : IteratorInput) -> Int32 {
   self.resolutions.1
 }
 
 ///|
 fn IteratorInput::max_resolution(
   self : IteratorInput,
-  component_idx : Int,
-) -> Int {
+  component_idx : Int32,
+) -> Int32 {
   // It's possible that the different component tiles have different resolution levels
   // (self.resolutions.1 stores the maximum across all component tiles), so
   // take the minimum of both.
@@ -125,12 +125,12 @@ fn IteratorInput::max_resolution(
 }
 
 ///|
-fn IteratorInput::min_comp(self : IteratorInput) -> Int {
+fn IteratorInput::min_comp(self : IteratorInput) -> Int32 {
   self.components.0
 }
 
 ///|
-fn IteratorInput::max_comp(self : IteratorInput) -> Int {
+fn IteratorInput::max_comp(self : IteratorInput) -> Int32 {
   self.components.1
 }
 
@@ -263,17 +263,17 @@ fn resolution_layer_component_position_progression(
 ///|
 // Note that the order of fields here is important!
 priv struct PrecinctStore {
-  resolution : Int
-  precinct_y : UInt
-  precinct_x : UInt
-  component_idx : Int
+  resolution : Int32
+  precinct_y : UInt32
+  precinct_x : UInt32
+  component_idx : Int32
   precinct_idx : UInt64
 }
 
 ///|
 fn position_progression_common(
   input : IteratorInput,
-  sort : (PrecinctStore, PrecinctStore) -> Int,
+  sort : (PrecinctStore, PrecinctStore) -> Int32,
 ) -> (() -> ProgressionData?)? {
   let elements : Array[PrecinctStore] = []
   let component_tiles = input.tile.component_tiles()

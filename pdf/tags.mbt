@@ -283,7 +283,7 @@ fn update_bbox(
 ///|
 /// The lowest link ancestor in the logical tree: its group, alt text and
 /// span.
-fn tags_parent_link(gc : GlobalContext) -> (Int, String?, @syntax.Span)? {
+fn tags_parent_link(gc : GlobalContext) -> (Int32, String?, @syntax.Span)? {
   match gc.tags.tree.parent_link() {
     Some((id, link)) => Some((id, link.alt(), link.pack().span()))
     None => None
@@ -297,15 +297,15 @@ fn tags_parent_artifact(gc : GlobalContext) -> Bool {
 }
 
 ///|
-fn tags_reserve_annotation(gc : GlobalContext) -> Int {
+fn tags_reserve_annotation(gc : GlobalContext) -> Int32 {
   gc.tags.reserve_annotation()
 }
 
 ///|
 fn tags_group_push_annotation(
   gc : GlobalContext,
-  group_id : Int,
-  annot_id : Int,
+  group_id : Int32,
+  annot_id : Int32,
 ) -> Unit {
   gc.tags.tree.groups.get(group_id).push_annotation(annot_id)
 }

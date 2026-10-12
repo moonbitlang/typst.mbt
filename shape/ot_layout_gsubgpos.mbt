@@ -4,11 +4,11 @@
 ///|
 /// A match function: glyph and the value it is matched against (a glyph id,
 /// class or coverage index, depending on the rule).
-type MatchFunc = (@otf.GlyphId, Int) -> Bool
+type MatchFunc = (@otf.GlyphId, Int32) -> Bool
 
 ///|
 /// Value represents glyph id.
-fn match_glyph(glyph : @otf.GlyphId, value : Int) -> Bool {
+fn match_glyph(glyph : @otf.GlyphId, value : Int32) -> Bool {
   glyph.0.to_int() == value
 }
 
@@ -31,11 +31,11 @@ priv enum Ligbase {
 /// arrays), as is `p_total_component_count`.
 fn match_input(
   ctx : ApplyContext,
-  input_len : Int,
+  input_len : Int32,
   match_func : MatchFunc,
-  end_position : Ref[Int],
-  match_positions : Array[Int],
-  p_total_component_count : Ref[Int]?,
+  end_position : Ref[Int32],
+  match_positions : Array[Int32],
+  p_total_component_count : Ref[Int32]?,
 ) -> Bool {
   // This is perhaps the trickiest part of OpenType...  Remarks:
   //
@@ -137,9 +137,9 @@ fn match_input(
 ///|
 fn match_backtrack(
   ctx : ApplyContext,
-  backtrack_len : Int,
+  backtrack_len : Int32,
   match_func : MatchFunc,
-  match_start : Ref[Int],
+  match_start : Ref[Int32],
 ) -> Bool {
   let iter = SkippingIterator::new(ctx, ctx.buffer.backtrack_len(), true)
   iter.set_glyph_data(0)
@@ -158,10 +158,10 @@ fn match_backtrack(
 ///|
 fn match_lookahead(
   ctx : ApplyContext,
-  lookahead_len : Int,
+  lookahead_len : Int32,
   match_func : MatchFunc,
-  start_index : Int,
-  end_index : Ref[Int],
+  start_index : Int32,
+  end_index : Ref[Int32],
 ) -> Bool {
   // Function should always be called with a non-zero starting index
   // c.f. https://github.com/harfbuzz/rustybuzz/issues/142
@@ -186,22 +186,22 @@ fn match_lookahead(
 /// anything else (upstream: a `usize` of the caller, written through `&mut`;
 /// a `Ref` of the caller here was an allocation per glyph that a lookup
 /// looks at). Taken with [out_cell].
-let unsafe_cell : Ref[Int] = Ref(0)
+let unsafe_cell : Ref[Int32] = Ref(0)
 
 ///|
 /// The out-parameters `end_position` and `p_total_component_count` of
 /// [match_input] for [ligature_apply], which reads them when the call
 /// returns. Not `unsafe_cell`: [match_input] uses that one itself.
-let match_end_cell : Ref[Int] = Ref(0)
+let match_end_cell : Ref[Int32] = Ref(0)
 
 ///|
-let component_count_cell : Ref[Int] = Ref(0)
+let component_count_cell : Ref[Int32] = Ref(0)
 
 ///|
 /// One of the cells above as a fresh `Ref(0)`. Only for an out-parameter
 /// whose value is read before anything else can take the cell again: no
 /// call between the one that writes it and the read.
-fn out_cell(cell : Ref[Int]) -> Ref[Int] {
+fn out_cell(cell : Ref[Int32]) -> Ref[Int32] {
   cell.val = 0
   cell
 }
@@ -212,16 +212,16 @@ fn out_cell(cell : Ref[Int]) -> Ref[Int] {
 /// `init`).
 priv struct SkippingIterator {
   ctx : ApplyContext
-  mut lookup_props : UInt
+  mut lookup_props : UInt32
   ignore_zwnj : Bool
   ignore_zwj : Bool
   ignore_hidden : Bool
-  mask : UInt
-  syllable : Int
+  mask : UInt32
+  syllable : Int32
   mut matching : MatchFunc?
-  buf_len : Int
-  mut glyph_data : Int
-  mut buf_idx : Int
+  buf_len : Int32
+  mut glyph_data : Int32
+  mut buf_idx : Int32
 }
 
 ///|
@@ -248,7 +248,7 @@ priv enum MaySkipT {
 ///|
 fn SkippingIterator::new(
   ctx : ApplyContext,
-  start_buf_index : Int,
+  start_buf_index : Int32,
   context_match : Bool,
 ) -> SkippingIterator {
   {
@@ -280,7 +280,7 @@ fn SkippingIterator::new(
 ///|
 fn SkippingIterator::set_glyph_data(
   self : SkippingIterator,
-  glyph_data : Int,
+  glyph_data : Int32,
 ) -> Unit {
   self.glyph_data = glyph_data
 }
@@ -293,7 +293,7 @@ fn SkippingIterator::advance_glyph_data(self : SkippingIterator) -> Unit {
 ///|
 fn SkippingIterator::set_lookup_props(
   self : SkippingIterator,
-  lookup_props : UInt,
+  lookup_props : UInt32,
 ) -> Unit {
   self.lookup_props = lookup_props
 }
@@ -307,14 +307,14 @@ fn SkippingIterator::enable_matching(
 }
 
 ///|
-fn SkippingIterator::index(self : SkippingIterator) -> Int {
+fn SkippingIterator::index(self : SkippingIterator) -> Int32 {
   self.buf_idx
 }
 
 ///|
 fn SkippingIterator::next(
   self : SkippingIterator,
-  unsafe_to : Ref[Int]?,
+  unsafe_to : Ref[Int32]?,
 ) -> Bool {
   let stop = self.buf_len - 1
   while self.buf_idx < stop {
@@ -343,7 +343,7 @@ fn SkippingIterator::next(
 ///|
 fn SkippingIterator::prev(
   self : SkippingIterator,
-  unsafe_from : Ref[Int]?,
+  unsafe_from : Ref[Int32]?,
 ) -> Bool {
   let stop = 0
   while self.buf_idx > stop {
@@ -484,7 +484,7 @@ fn context_apply(this : @otf.ContextLookup, ctx : ApplyContext) -> Unit? {
     Format3(coverage~, coverages~, lookups~) => {
       guard coverage.get(glyph) is Some(_) else { return None }
       let coverages_len = coverages.len().to_int()
-      let match_func = (glyph, index : Int) => {
+      let match_func = (glyph, index : Int32) => {
         let coverage : @otf.Coverage = coverages.get(index.to_uint16()).unwrap()
         coverage.get(glyph) is Some(_)
       }
@@ -650,19 +650,19 @@ fn chained_context_apply(
       lookups~
     ) => {
       guard coverage.get(glyph) is Some(_) else { return None }
-      let back = (glyph, index : Int) => {
+      let back = (glyph, index : Int32) => {
         let coverage : @otf.Coverage = backtrack_coverages
           .get(index.to_uint16())
           .unwrap()
         coverage.contains(glyph)
       }
-      let ahead = (glyph, index : Int) => {
+      let ahead = (glyph, index : Int32) => {
         let coverage : @otf.Coverage = lookahead_coverages
           .get(index.to_uint16())
           .unwrap()
         coverage.contains(glyph)
       }
-      let input = (glyph, index : Int) => {
+      let input = (glyph, index : Int32) => {
         let coverage : @otf.Coverage = input_coverages
           .get(index.to_uint16())
           .unwrap()
@@ -794,7 +794,7 @@ fn apply_context(
   match_func : MatchFunc,
   lookups : @otf.LazyArray16[@otf.SequenceLookupRecord],
 ) -> Unit? {
-  let match_func = (glyph, index : Int) => {
+  let match_func = (glyph, index : Int32) => {
     let value = input.get(index.to_uint16()).unwrap()
     match_func(glyph, value.to_int())
   }
@@ -832,15 +832,15 @@ fn apply_chain_context(
 ) -> Unit? {
   // NOTE: Whenever something in this method changes, we also need to
   // change it in the `apply` implementation for ChainedContextLookup.
-  let f1 = (glyph, index : Int) => {
+  let f1 = (glyph, index : Int32) => {
     let value = backtrack.get(index.to_uint16()).unwrap()
     match_funcs[0](glyph, value.to_int())
   }
-  let f2 = (glyph, index : Int) => {
+  let f2 = (glyph, index : Int32) => {
     let value = lookahead.get(index.to_uint16()).unwrap()
     match_funcs[2](glyph, value.to_int())
   }
-  let f3 = (glyph, index : Int) => {
+  let f3 = (glyph, index : Int32) => {
     let value = input.get(index.to_uint16()).unwrap()
     match_funcs[1](glyph, value.to_int())
   }
@@ -888,9 +888,9 @@ fn apply_chain_context(
 ///|
 fn apply_lookup(
   ctx : ApplyContext,
-  input_len : Int,
-  match_positions : Array[Int],
-  match_end : Int,
+  input_len : Int32,
+  match_positions : Array[Int32],
+  match_end : Int32,
   lookups : @otf.LazyArray16[@otf.SequenceLookupRecord],
 ) -> Unit {
   let mut count = input_len + 1
@@ -1025,17 +1025,17 @@ priv struct ApplyContext {
   table_index : TableIndex
   face : Face
   buffer : Buffer
-  mut lookup_mask_ : UInt
+  mut lookup_mask_ : UInt32
   mut per_syllable : Bool
-  mut lookup_index : Int
-  mut lookup_props : UInt
-  mut nesting_level_left : Int
+  mut lookup_index : Int32
+  mut lookup_props : UInt32
+  mut nesting_level_left : Int32
   mut auto_zwnj : Bool
   mut auto_zwj : Bool
   mut random : Bool
-  mut random_state : UInt
-  mut last_base : Int
-  mut last_base_until : Int
+  mut random_state : UInt32
+  mut last_base : Int32
+  mut last_base_until : Int32
   mut digest : SetDigest
 }
 
@@ -1066,26 +1066,29 @@ fn ApplyContext::new(
 }
 
 ///|
-fn ApplyContext::random_number(self : ApplyContext) -> UInt {
+fn ApplyContext::random_number(self : ApplyContext) -> UInt32 {
   // http://www.cplusplus.com/reference/random/minstd_rand/
   self.random_state = self.random_state * 48271 % 2147483647
   self.random_state
 }
 
 ///|
-fn ApplyContext::set_lookup_mask(self : ApplyContext, mask : UInt) -> Unit {
+fn ApplyContext::set_lookup_mask(self : ApplyContext, mask : UInt32) -> Unit {
   self.lookup_mask_ = mask
   self.last_base = -1
   self.last_base_until = 0
 }
 
 ///|
-fn ApplyContext::lookup_mask(self : ApplyContext) -> UInt {
+fn ApplyContext::lookup_mask(self : ApplyContext) -> UInt32 {
   self.lookup_mask_
 }
 
 ///|
-fn ApplyContext::recurse(self : ApplyContext, sub_lookup_index : Int) -> Unit? {
+fn ApplyContext::recurse(
+  self : ApplyContext,
+  sub_lookup_index : Int32,
+) -> Unit? {
   if self.nesting_level_left == 0 {
     self.buffer.shaping_failed = true
     return None
@@ -1129,7 +1132,7 @@ fn ApplyContext::recurse(self : ApplyContext, sub_lookup_index : Int) -> Unit? {
 fn ApplyContext::check_glyph_property(
   self : ApplyContext,
   info : GlyphInfo,
-  match_props : UInt,
+  match_props : UInt32,
 ) -> Bool {
   let glyph_props = info.glyph_props()
 
@@ -1171,7 +1174,7 @@ fn ApplyContext::check_glyph_property(
 fn ApplyContext::set_glyph_class(
   self : ApplyContext,
   glyph_id : @otf.GlyphId,
-  class_guess : Int,
+  class_guess : Int32,
   ligature : Bool,
   component : Bool,
 ) -> Unit {
@@ -1228,7 +1231,7 @@ fn ApplyContext::replace_glyph_inplace(
 fn ApplyContext::replace_glyph_with_ligature(
   self : ApplyContext,
   glyph_id : @otf.GlyphId,
-  class_guess : Int,
+  class_guess : Int32,
 ) -> Unit {
   self.set_glyph_class(glyph_id, class_guess, true, false)
   self.buffer.replace_glyph(glyph_id.0.to_uint())
@@ -1238,7 +1241,7 @@ fn ApplyContext::replace_glyph_with_ligature(
 fn ApplyContext::output_glyph_for_component(
   self : ApplyContext,
   glyph_id : @otf.GlyphId,
-  class_guess : Int,
+  class_guess : Int32,
 ) -> Unit {
   self.set_glyph_class(glyph_id, class_guess, false, true)
   self.buffer.output_glyph(glyph_id.0.to_uint())
@@ -1248,11 +1251,11 @@ fn ApplyContext::output_glyph_for_component(
 fn ligate_input(
   ctx : ApplyContext,
   // Including the first glyph
-  count : Int,
+  count : Int32,
   // Including the first glyph
-  match_positions : Array[Int],
-  match_end : Int,
-  total_component_count : Int,
+  match_positions : Array[Int32],
+  match_end : Int32,
+  total_component_count : Int32,
   lig_glyph : @otf.GlyphId,
 ) -> Unit {
   // - If a base and one or more marks ligate, consider that as a base, NOT

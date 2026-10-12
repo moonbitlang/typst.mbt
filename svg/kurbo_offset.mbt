@@ -196,7 +196,7 @@ fn solve_itp(
   a : Double,
   b : Double,
   epsilon : Double,
-  n0 : Int,
+  n0 : Int32,
   k1 : Double,
   ya : Double,
   yb : Double,
@@ -356,7 +356,7 @@ let cusp_epsilon : Double = 1.0e-12
 
 ///|
 /// Number of points for least-squares fit and error evaluation.
-let n_lse : Int = 8
+let n_lse : Int32 = 8
 
 ///|
 /// The proportion of transverse error that is blended in the least-squares
@@ -365,7 +365,7 @@ let blend : Double = 1.0e-3
 
 ///|
 /// Maximum recursion depth.
-let max_depth : Int = 8
+let max_depth : Int32 = 8
 
 ///|
 /// State local to a subdivision
@@ -379,7 +379,7 @@ priv struct OffsetRec {
   cusp0 : Double
   cusp1 : Double
   /// Recursion depth
-  depth : Int
+  depth : Int32
 }
 
 ///|

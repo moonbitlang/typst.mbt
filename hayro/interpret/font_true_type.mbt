@@ -12,8 +12,8 @@ fn read_widths(
   descriptor : @hayro_syntax.Dict,
 ) -> (Array[Width], Float)? {
   let widths = []
-  let first_char = (dict.get("FirstChar") : UInt?)
-  let last_char = (dict.get("LastChar") : UInt?)
+  let first_char = (dict.get("FirstChar") : UInt32?)
+  let last_char = (dict.get("LastChar") : UInt32?)
   let widths_arr = (dict.get("Widths") : @hayro_syntax.PdfArray?)
   let missing_width = (descriptor.get("MissingWidth") : Float?).unwrap_or(0.0)
   if (first_char, last_char, widths_arr) is (Some(fc), Some(lc), Some(w)) {
@@ -38,7 +38,7 @@ fn read_widths(
 }
 
 ///|
-fn glyph_num_string(s : String) -> UInt? {
+fn glyph_num_string(s : String) -> UInt32? {
   if !s.has_prefix("g") || s.length() < 2 {
     return None
   }
@@ -65,7 +65,7 @@ fn glyph_num_string(s : String) -> UInt? {
 }
 
 ///|
-fn read_encoding(dict : @hayro_syntax.Dict) -> (Encoding, Map[Int, String]) {
+fn read_encoding(dict : @hayro_syntax.Dict) -> (Encoding, Map[Int32, String]) {
   fn get_encoding_base(dict : @hayro_syntax.Dict, name : String) -> Encoding {
     match (dict.get(name) : @hayro_syntax.Name?) {
       Some(n) =>
@@ -188,7 +188,7 @@ fn TrueTypeFont::postscript_name(self : TrueTypeFont) -> String? {
 }
 
 ///|
-fn TrueTypeFont::weight(self : TrueTypeFont) -> UInt? {
+fn TrueTypeFont::weight(self : TrueTypeFont) -> UInt32? {
   match self.kind {
     Embedded(e) => {
       let weight = f32_as_u32(rust_round_f32(e.base_font.weight())).reinterpret_as_uint()
@@ -259,7 +259,7 @@ fn TrueTypeFont::glyph_width(self : TrueTypeFont, code : Byte) -> Float {
 ///|
 fn TrueTypeFont::char_code_to_unicode(
   self : TrueTypeFont,
-  code : UInt,
+  code : UInt32,
 ) -> @cmap.BfString? {
   if self.to_unicode is Some(to_unicode) &&
     to_unicode.lookup_bf_string(code) is Some(c) {
@@ -293,14 +293,14 @@ priv struct EmbeddedKind {
   base_font : OpenTypeFontBlob
   widths : Array[Width]
   missing_width : Float
-  font_flags : UInt?
+  font_flags : UInt32?
   glyph_names : Map[String, GlyphId]
   encoding : Encoding
   // Only used for PDFs that mistakenly embed a
   // CFF font.
   cff_blob : CffFontBlob?
-  differences : Map[Int, String]
-  cached_mappings : Map[Int, GlyphId]
+  differences : Map[Int32, String]
+  cached_mappings : Map[Int32, GlyphId]
   /// PostScript name from the PDF.
   postscript_name : String?
 }
@@ -310,7 +310,7 @@ fn EmbeddedKind::new(dict : @hayro_syntax.Dict) -> EmbeddedKind? {
   let descriptor = (dict.get("FontDescriptor") : @hayro_syntax.Dict?).unwrap_or(
     @hayro_syntax.Dict::empty(),
   )
-  let font_flags = match (descriptor.get("Flags") : UInt?) {
+  let font_flags = match (descriptor.get("Flags") : UInt32?) {
     Some(bits) => font_flags_from_bits(bits)
     None => None
   }

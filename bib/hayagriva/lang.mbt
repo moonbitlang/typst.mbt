@@ -17,7 +17,7 @@ pub(all) struct TitleCase {
   always_capitalize_last_word : Bool
   /// Always capitalize a word matching or exceeding a certain length, even
   /// if it is on the capitalization blacklist.
-  always_capitalize_min_len : Int?
+  always_capitalize_min_len : Int32?
   /// Treat the hyphen as a word separator, i. e. capitalize in hyphenated
   /// expressions.
   hyphen_word_separator : Bool
@@ -258,8 +258,8 @@ fn WordCase::feed(self : WordCase, is_upper : Bool, second : Bool) -> WordCase {
 
 ///|
 priv struct WordData {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   case_ : WordCase
   follows_punctuation : Bool
   start_was_upper : Bool
@@ -268,8 +268,8 @@ priv struct WordData {
 ///|
 fn WordData::new(
   c : Char,
-  buf_before : Int,
-  buf_now : Int,
+  buf_before : Int32,
+  buf_now : Int32,
   prev_class : CharClass,
   char_class : CharClass,
 ) -> WordData? {
@@ -296,8 +296,8 @@ fn WordData::feed(
   self : WordData,
   c : Char,
   buf : String,
-  buf_before : Int,
-  buf_now : Int,
+  buf_before : Int32,
+  buf_now : Int32,
   prev_class : CharClass,
   char_class : CharClass,
 ) -> WordData? {
@@ -336,7 +336,7 @@ fn WordData::feed(
 
 ///|
 /// The UTF-8 length of `buf[start:end]` (clamped).
-fn range_len_utf8(buf : String, start : Int, end : Int) -> Int {
+fn range_len_utf8(buf : String, start : Int32, end : Int32) -> Int32 {
   let n = buf.length()
   let s = if start > n { n } else { start }
   let e = if end > n { n } else { end }
@@ -378,7 +378,7 @@ pub struct CaseFolder {
   priv mut char_class : CharClass
   priv mut buf : String
   /// Index of finished at which the last configuration change happened.
-  priv mut last_reconfig : Int
+  priv mut last_reconfig : Int32
   /// Index of the last word in the buffer.
   priv mut last_word : WordData?
 }
@@ -533,7 +533,7 @@ fn CaseFolder::find_word(self : CaseFolder) -> String? {
   let mut alphabetic_end = start
   while alphabetic_end < end {
     let { cp: c, idx: next, } = @unicode.decode_at(self.buf, alphabetic_end)
-    if !@unscanny.is_alphanumeric(Int::unsafe_to_char(c)) {
+    if !@unscanny.is_alphanumeric(Int32::unsafe_to_char(c)) {
       break
     }
     alphabetic_end = next
@@ -602,7 +602,7 @@ fn CaseFolder::process_word(self : CaseFolder) -> Unit {
     Lowercase =>
       if data.start < self.buf.length() {
         let { cp: ci, idx: next, } = @unicode.decode_at(self.buf, data.start)
-        let c = Int::unsafe_to_char(ci)
+        let c = Int32::unsafe_to_char(ci)
         if @unscanny.is_uppercase(c) {
           self.buf = map_chars(self.buf, data.start, next, c => {
             Some(@unscanny.char_to_lowercase(c))
@@ -638,7 +638,7 @@ fn CaseFolder::may_trim_end(self : CaseFolder) -> Unit {
           let mut i = self.buf.length()
           while i > 0 {
             let { cp: c, idx: prev, } = @unicode.decode_before(self.buf, i)
-            if @unscanny.is_whitespace(Int::unsafe_to_char(c)) {
+            if @unscanny.is_whitespace(Int32::unsafe_to_char(c)) {
               idx = Some(i)
               break
             }
@@ -691,7 +691,7 @@ pub fn CaseFolder::is_empty(self : CaseFolder) -> Bool {
 
 ///|
 /// Return the length of the buffer.
-pub fn CaseFolder::len(self : CaseFolder) -> Int {
+pub fn CaseFolder::len(self : CaseFolder) -> Int32 {
   self.buf.length()
 }
 
@@ -749,8 +749,8 @@ pub extend CaseFolder with FmtWrite::{write_str, write_char}
 /// not be replaced.
 fn map_chars(
   buf : String,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   f : (Char) -> String?,
 ) -> String {
   let out = StringBuilder()
@@ -758,7 +758,7 @@ fn map_chars(
   let mut i = start
   while i < buf.length() && i < end {
     let { cp: ci, idx: next, } = @unicode.decode_at(buf, i)
-    let c = Int::unsafe_to_char(ci)
+    let c = Int32::unsafe_to_char(ci)
     match f(c) {
       Some(rep) => out.write_string(rep)
       None => out.write_char(c)
@@ -770,12 +770,12 @@ fn map_chars(
 }
 
 ///|
-fn capitalize_char(buf : String, start : Int) -> String {
+fn capitalize_char(buf : String, start : Int32) -> String {
   if start >= buf.length() {
     return buf
   }
   let { cp: ci, idx: next, } = @unicode.decode_at(buf, start)
-  let c = Int::unsafe_to_char(ci)
+  let c = Int32::unsafe_to_char(ci)
   if @unscanny.is_lowercase(c) {
     map_chars(buf, start, next, c => Some(@unscanny.char_to_uppercase(c)))
   } else {

@@ -30,9 +30,9 @@ pub(open) trait IntrospectorBackend {
   fn query_labelled(Self) -> Array[Content]
   /// An optimized version of `query(selector.before(end, true).len()` used by
   /// counters and state.
-  fn query_count_before(Self, Selector, Location) -> Int
+  fn query_count_before(Self, Selector, Location) -> Int32
   /// Checks how many times a label exists.
-  fn label_count(Self, Label) -> Int
+  fn label_count(Self, Label) -> Int32
   /// Tries to find a location for an element with the given `key` hash that
   /// is closest after the `base`.
   ///
@@ -373,7 +373,7 @@ pub fn Introspector::query_count_before(
   self : Introspector,
   selector : Selector,
   end : Location,
-) -> Int {
+) -> Int32 {
   let output = self.backend.query_count_before(selector, end)
   self.record(
     "query_count_before",
@@ -386,7 +386,7 @@ pub fn Introspector::query_count_before(
 
 ///|
 /// Checks how many times a label exists.
-pub fn Introspector::label_count(self : Introspector, label : Label) -> Int {
+pub fn Introspector::label_count(self : Introspector, label : Label) -> Int32 {
   let output = self.backend.label_count(label)
   self.record("label_count", () => hash128(label), () => hash128(output), i => {
     hash128_output(i.backend.label_count(label))
@@ -560,7 +560,7 @@ pub fn IntrospectionRecorder::new() -> IntrospectionRecorder {
 
 ///|
 /// The number of distinct recorded reads.
-pub fn IntrospectionRecorder::len(self : IntrospectionRecorder) -> Int {
+pub fn IntrospectionRecorder::len(self : IntrospectionRecorder) -> Int32 {
   self.calls.length()
 }
 
@@ -675,7 +675,7 @@ priv struct ReadAccelerator {
   /// The answers of the other introspectors (not of the empty ones).
   tables : Map[Int64, ReadAnswers]
   /// Counts the lookups in `tables`: the time of [ReadAnswers].
-  mut clock : Int
+  mut clock : Int32
   /// Whether [evict] knows the table.
   mut registered : Bool
 }
@@ -686,22 +686,22 @@ priv struct ReadAnswers {
   mut answers : Map[U128, U128]
   mut before : Map[U128, U128]
   /// The number of [evict] calls since the answers were asked for.
-  mut age : Int
+  mut age : Int32
   /// When they were last asked for (`ReadAccelerator.clock`).
-  mut used : Int
+  mut used : Int32
 }
 
 ///|
 /// The greatest age of the answers of an introspector: what the
 /// compilation before an `evict` asked for stays for the next one.
-let read_answers_max_age : Int = 1
+let read_answers_max_age : Int32 = 1
 
 ///|
 /// The greatest number of introspectors whose answers are kept, for a
 /// process that never calls [evict]: the one that was not asked for the
 /// longest makes room. (A compilation asks at most five and an empty
 /// one.)
-let read_answers_max_tables : Int = 16
+let read_answers_max_tables : Int32 = 16
 
 ///|
 /// No answers (never written to).
@@ -770,7 +770,7 @@ fn ReadAccelerator::ask(self : ReadAccelerator, serial : Int64) -> Unit {
 /// [evict] for the answers of introspectors: an introspector that was not
 /// asked since the call before this one is dropped, and of the others the
 /// answers that were not asked for since then; everything for zero.
-fn ReadAccelerator::evict(self : ReadAccelerator, max_age : Int) -> Unit {
+fn ReadAccelerator::evict(self : ReadAccelerator, max_age : Int32) -> Unit {
   let max_age = if max_age < read_answers_max_age {
     max_age
   } else {
@@ -876,13 +876,13 @@ fn[K : Hash + Eq, V] MultiMap::append(
 ///|
 /// A half-open range of element indices.
 priv struct IndexRange {
-  start : Int
-  mut end : Int
+  start : Int32
+  mut end : Int32
 }
 
 ///|
 /// `usize::MAX`, used for missing indices.
-let usize_max : Int = 2147483647
+let usize_max : Int32 = 2147483647
 
 ///|
 /// An underlying target-agnostic introspector used for most queries.
@@ -902,7 +902,7 @@ pub struct ElementIntrospector[P] {
   /// last element is its right-most descendants).
   priv locations : Map[Location, IndexRange]
   /// Accelerates lookup of elements by label.
-  priv labels : MultiMap[Label, Int]
+  priv labels : MultiMap[Label, Int32]
   /// Caches queries done on the introspector. This is important because even
   /// if all top-level queries are distinct, they often have shared
   /// subqueries. Example: Individual counter queries with `before` that all
@@ -1077,11 +1077,11 @@ pub fn[P] ElementIntrospector::query(
 /// when they are asked for (see [ElementIntrospector::query]). Far above
 /// what one layout of a document asks (a query per located element or
 /// so).
-let element_queries_max : Int = 65536
+let element_queries_max : Int32 = 65536
 
 ///|
 /// Rust's `Vec::swap_remove`.
-fn[T] swap_remove(vec : Array[T], i : Int) -> T {
+fn[T] swap_remove(vec : Array[T], i : Int32) -> T {
   let last = vec.length() - 1
   let item = vec[i]
   vec[i] = vec[last]
@@ -1094,9 +1094,9 @@ fn[T] swap_remove(vec : Array[T], i : Int) -> T {
 /// `(false, i)` with the insertion index. The list must be sorted by `key`.
 fn[T] binary_search_by_key(
   list : ArrayView[T],
-  target : Int,
-  key : (T) -> Int,
-) -> (Bool, Int) {
+  target : Int32,
+  key : (T) -> Int32,
+) -> (Bool, Int32) {
   let mut size = list.length()
   if size == 0 {
     return (false, 0)
@@ -1186,7 +1186,7 @@ pub fn[P] ElementIntrospector::query_count_before(
   self : ElementIntrospector[P],
   selector : Selector,
   end : Location,
-) -> Int {
+) -> Int32 {
   // See `query()` for details.
   let list = self.query(selector)
   match self.get_by_loc(end) {
@@ -1204,7 +1204,7 @@ pub fn[P] ElementIntrospector::query_count_before(
 pub fn[P] ElementIntrospector::label_count(
   self : ElementIntrospector[P],
   label : Label,
-) -> Int {
+) -> Int32 {
   self.labels.get(label).length()
 }
 
@@ -1249,7 +1249,7 @@ pub fn[P] ElementIntrospector::all(
 
 ///|
 /// The number of introspectable elements.
-pub fn[P] ElementIntrospector::len(self : ElementIntrospector[P]) -> Int {
+pub fn[P] ElementIntrospector::len(self : ElementIntrospector[P]) -> Int32 {
   self.elems.length()
 }
 
@@ -1257,7 +1257,7 @@ pub fn[P] ElementIntrospector::len(self : ElementIntrospector[P]) -> Int {
 /// Retrieves the element with the given index.
 pub fn[P] ElementIntrospector::get_by_idx(
   self : ElementIntrospector[P],
-  idx : Int,
+  idx : Int32,
 ) -> Content {
   self.elems[idx].0
 }
@@ -1266,7 +1266,7 @@ pub fn[P] ElementIntrospector::get_by_idx(
 /// Retrieves the position of the element with the given index.
 pub fn[P] ElementIntrospector::get_pos_by_idx(
   self : ElementIntrospector[P],
-  idx : Int,
+  idx : Int32,
 ) -> P {
   self.elems[idx].1
 }
@@ -1287,7 +1287,7 @@ pub fn[P] ElementIntrospector::binary_search(
   self : ElementIntrospector[P],
   list : ArrayView[Content],
   elem : Content,
-) -> (Bool, Int) {
+) -> (Bool, Int32) {
   binary_search_by_key(list, self.elem_index(elem), elem => {
     self.elem_index(elem)
   })
@@ -1298,7 +1298,7 @@ pub fn[P] ElementIntrospector::binary_search(
 pub fn[P] ElementIntrospector::elem_index(
   self : ElementIntrospector[P],
   elem : Content,
-) -> Int {
+) -> Int32 {
   self.loc_index(elem.location().unwrap())
 }
 
@@ -1307,7 +1307,7 @@ pub fn[P] ElementIntrospector::elem_index(
 pub fn[P] ElementIntrospector::loc_index(
   self : ElementIntrospector[P],
   location : Location,
-) -> Int {
+) -> Int32 {
   match self.locations.get(location) {
     Some(r) => r.start
     None => usize_max
@@ -1333,7 +1333,7 @@ fn[P] ElementIntrospector::loc_range(
 pub fn[P] ElementIntrospector::range_of(
   self : ElementIntrospector[P],
   location : Location,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   self.locations.get(location).map(r => (r.start, r.end))
 }
 
@@ -1346,7 +1346,7 @@ pub struct ElementIntrospectorBuilder[P] {
   priv insertions : MultiMap[Location, Array[BuilderItem[P]]]
   priv keys : MultiMap[U128, Location]
   priv locations : Map[Location, IndexRange]
-  priv labels : MultiMap[Label, Int]
+  priv labels : MultiMap[Label, Int32]
 }
 
 ///|
@@ -1406,7 +1406,7 @@ pub fn[P, Q] ElementIntrospectorBuilder::discover_elements(
   // the already built location ranges back to start/end events. We do this
   // by queueing end events for positions as we visit elements and dequeueing
   // them at the end of the relevant element.
-  let queued : MultiMap[Int, Location] = MultiMap::new()
+  let queued : MultiMap[Int32, Location] = MultiMap::new()
   for i, pair in elements.elems {
     let (elem, q) = pair
     let loc = elem.location().unwrap()

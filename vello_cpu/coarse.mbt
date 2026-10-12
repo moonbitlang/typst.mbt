@@ -11,14 +11,14 @@
 priv enum RecordedCmd {
   /// A path fill command.
   Fill(
-    strip_start~ : Int,
-    strip_end~ : Int,
+    strip_start~ : Int32,
+    strip_end~ : Int32,
     paint~ : Paint,
     blend_mode~ : BlendMode,
     mask~ : Mask?
   )
   /// Push a new (non-filter) layer to the layer stack.
-  PushLayer(Int)
+  PushLayer(Int32)
   /// Pop the last (non-filter) layer from the layer stack.
   PopLayer
 }
@@ -37,7 +37,7 @@ priv struct CommandRecorder {
   /// Data about recorded layers, indexed by their ID.
   layers : Array[LayerProps]
   /// Stack of currently pushed layers.
-  layer_stack : Array[Int]
+  layer_stack : Array[Int32]
 }
 
 ///|
@@ -53,8 +53,8 @@ fn CommandRecorder::has_layers(self : CommandRecorder) -> Bool {
 ///|
 fn CommandRecorder::push_fill(
   self : CommandRecorder,
-  strip_start : Int,
-  strip_end : Int,
+  strip_start : Int32,
+  strip_end : Int32,
   paint : Paint,
   blend_mode : BlendMode,
   mask : Mask?,
@@ -87,14 +87,14 @@ fn CommandRecorder::pop_layer(self : CommandRecorder) -> Unit {
 /// A horizontal span in pixel coordinates.
 priv struct Span {
   /// The horizontal start position in pixels.
-  x : Int
+  x : Int32
   /// The horizontal span width in pixels.
-  width : Int
+  width : Int32
 }
 
 ///|
 /// Returns the exclusive horizontal end position in pixels.
-fn Span::pixel_end(self : Span) -> Int {
+fn Span::pixel_end(self : Span) -> Int32 {
   u16_sat_add(self.x, self.width)
 }
 
@@ -122,14 +122,14 @@ fn Span::intersect(self : Span, other : Span) -> Span? {
 /// A bucketed render command.
 priv enum RenderCmd {
   /// Fill a span with the given paint and optionally some alpha coverage.
-  PaintFill(span~ : Span, alpha_idx~ : Int?, attrs_idx~ : Int)
+  PaintFill(span~ : Span, alpha_idx~ : Int32?, attrs_idx~ : Int32)
   /// Push a new temporary layer buffer.
   PushBuf(Span?)
   /// Pop the last temporary layer buffer.
   PopBuf
   /// Composite a span from the current temporary layer buffer into the
   /// parent buffer and optionally apply some alpha coverage.
-  LayerFill(span~ : Span, alpha_idx~ : Int?, attrs_idx~ : Int)
+  LayerFill(span~ : Span, alpha_idx~ : Int32?, attrs_idx~ : Int32)
 }
 
 ///|
@@ -150,7 +150,7 @@ priv struct LayerFillAttrs {
 priv struct RowLayerState {
   /// The index in the command stream where the `PushBuf` command of the
   /// corresponding layer lives.
-  push_cmd_idx : Int
+  push_cmd_idx : Int32
   /// The horizontal span of the layer.
   mut span : Span?
 }
@@ -160,7 +160,7 @@ priv struct RowLayerState {
 priv struct RowState {
   render_cmds : Array[RenderCmd]
   /// Current layer depth.
-  mut layer_depth : Int
+  mut layer_depth : Int32
   layer_stack : Array[RowLayerState]
 }
 
@@ -216,7 +216,7 @@ priv struct ActiveLayer {
   span : Span
   /// Which rows have been drawn into and thus contain lazily-allocated
   /// `PushBuf` instructions.
-  occupied_rows : Array[Int]
+  occupied_rows : Array[Int32]
 }
 
 ///|
@@ -234,7 +234,7 @@ priv struct CommandBucketer {
 }
 
 ///|
-fn CommandBucketer::from_wh(width : Int, height : Int) -> CommandBucketer {
+fn CommandBucketer::from_wh(width : Int32, height : Int32) -> CommandBucketer {
   // It's _very_ important that we snap to tile coordinates. Fine
   // rasterization assumes that the width is a multiple of the tile width.
   let viewport = RectU16::new(0, 0, width, height).snap_to_tile_coordinates()
@@ -255,14 +255,14 @@ fn bbox_span(bbox : RectU16) -> Span {
 }
 
 ///|
-fn CommandBucketer::width(self : CommandBucketer) -> Int {
+fn CommandBucketer::width(self : CommandBucketer) -> Int32 {
   self.clip_bboxes[0].width()
 }
 
 ///|
 fn CommandBucketer::ensure_row_layers(
   self : CommandBucketer,
-  row_idx : Int,
+  row_idx : Int32,
 ) -> Unit {
   let row = self.rows[row_idx]
   let layer_depth = row.layer_depth
@@ -343,8 +343,8 @@ fn CommandBucketer::pop_layer(self : CommandBucketer) -> Unit {
 fn CommandBucketer::generate_fill(
   self : CommandBucketer,
   strips : Array[Strip],
-  strip_start : Int,
-  strip_end : Int,
+  strip_start : Int32,
+  strip_end : Int32,
   attrs : PaintFillAttrs,
 ) -> Unit {
   if strip_start == strip_end {

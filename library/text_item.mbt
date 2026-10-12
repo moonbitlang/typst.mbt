@@ -140,7 +140,7 @@ pub extend Glyph with Hash::{hash, hash_combine}
 
 ///|
 /// The range of the glyph in its item's text (UTF-8 bytes).
-pub fn Glyph::range(self : Glyph) -> (Int, Int) {
+pub fn Glyph::range(self : Glyph) -> (Int32, Int32) {
   (self.range_start.to_int(), self.range_end.to_int())
 }
 
@@ -150,9 +150,9 @@ pub(all) struct TextItemView {
   /// The whole item this is a part of
   item : TextItem
   /// The start of the glyph range of this slice.
-  glyph_start : Int
+  glyph_start : Int32
   /// The end of the glyph range of this slice.
-  glyph_end : Int
+  glyph_end : Int32
 }
 
 ///|
@@ -165,8 +165,8 @@ pub fn TextItemView::full(text : TextItem) -> TextItemView {
 /// Build a new [TextItemView] from a [TextItem] and a range of glyphs.
 pub fn TextItemView::from_glyph_range(
   text : TextItem,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> TextItemView {
   { item: text, glyph_start: start, glyph_end: end, }
 }

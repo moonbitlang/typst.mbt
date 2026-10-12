@@ -236,7 +236,7 @@ pub(all) struct ParsingOptions {
   /// Useful when dealing with random input to limit memory usage.
   ///
   /// Default: u32::MAX (no limit)
-  nodes_limit : UInt
+  nodes_limit : UInt32
 }
 
 ///|
@@ -250,8 +250,8 @@ priv struct TempAttributeData {
   local_name : String
   value : String
   range : Range
-  qname_len : Int
-  eq_len : Int
+  qname_len : Int32
+  eq_len : Int32
 }
 
 ///|
@@ -292,8 +292,8 @@ priv struct Entity {
 priv struct TagNameSpan {
   prefix : String
   name : String
-  pos : Int
-  prefix_pos : Int
+  pos : Int32
+  prefix_pos : Int32
 }
 
 ///|
@@ -315,9 +315,9 @@ fn TagNameSpan::new_null() -> TagNameSpan {
 /// more than 255 references - this is an error (billion laughs attack).
 priv struct LoopDetector {
   /// References depth.
-  mut depth : Int
+  mut depth : Int32
   /// Number of references resolved by the root reference.
-  mut references : Int
+  mut references : Int32
 }
 
 ///|
@@ -362,13 +362,13 @@ fn LoopDetector::inc_references(
 ///|
 priv struct Context {
   opt : ParsingOptions
-  mut namespace_start_idx : Int
+  mut namespace_start_idx : Int32
   current_attributes : Array[TempAttributeData]
-  awaiting_subtree : Array[Int]
+  awaiting_subtree : Array[Int32]
   parent_prefixes : Array[String]
   entities : Array[Entity]
   after_text : Array[String]
-  mut parent_id : Int
+  mut parent_id : Int32
   mut tag_name : TagNameSpan
   loop_detector : LoopDetector
   doc : Document
@@ -379,7 +379,7 @@ fn Context::append_node(
   self : Context,
   kind : NodeKind,
   range : Range,
-) -> Int raise XmlError {
+) -> Int32 raise XmlError {
   if self.doc.nodes.length().reinterpret_as_uint() >= self.opt.nodes_limit {
     raise NodesLimitReached
   }
@@ -532,8 +532,8 @@ fn Context::token(self : Context, token : Token) -> Unit raise XmlError {
 ///|
 fn process_attribute(
   range : Range,
-  qname_len : Int,
-  eq_len : Int,
+  qname_len : Int32,
+  eq_len : Int32,
   prefix : String,
   local_name : String,
   value : StrSpan,
@@ -975,10 +975,10 @@ fn normalize_attribute_inner(
 ///|
 fn get_ns_idx_by_prefix(
   namespaces : ShortRange,
-  prefix_pos : Int,
+  prefix_pos : Int32,
   prefix : String,
   doc : Document,
-) -> Int? raise XmlError {
+) -> Int32? raise XmlError {
   // Prefix CAN be empty when the default namespace was defined.
   //
   // Example:

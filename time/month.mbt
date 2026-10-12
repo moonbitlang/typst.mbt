@@ -39,7 +39,7 @@ pub extend Month with @debug.Debug::{to_repr}
 
 ///|
 /// `Month::from_number`: create a month from its number (1-12).
-fn Month::from_number(n : Int) -> Month raise ComponentRange {
+fn Month::from_number(n : Int32) -> Month raise ComponentRange {
   match n {
     1 => January
     2 => February
@@ -59,7 +59,7 @@ fn Month::from_number(n : Int) -> Month raise ComponentRange {
 
 ///|
 /// `TryFrom<u8> for Month`.
-pub fn Month::try_from_u8(value : Int) -> Month? {
+pub fn Month::try_from_u8(value : Int32) -> Month? {
   try Month::try_from(value) catch {
     _ => None
   } noraise {
@@ -69,13 +69,13 @@ pub fn Month::try_from_u8(value : Int) -> Month? {
 
 ///|
 /// `TryFrom<u8> for Month`, keeping the error.
-pub fn Month::try_from(value : Int) -> Month raise ComponentRange {
+pub fn Month::try_from(value : Int32) -> Month raise ComponentRange {
   Month::from_number(value)
 }
 
 ///|
 /// `From<Month> for u8`: the number of the month (January is 1).
-pub fn Month::number(self : Month) -> Int {
+pub fn Month::number(self : Month) -> Int32 {
   match self {
     January => 1
     February => 2
@@ -94,7 +94,7 @@ pub fn Month::number(self : Month) -> Int {
 
 ///|
 /// Get the number of days in the month of a given year.
-pub fn Month::length(self : Month, year : Int) -> Int {
+pub fn Month::length(self : Month, year : Int32) -> Int32 {
   days_in_month(self, year)
 }
 

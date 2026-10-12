@@ -12,7 +12,7 @@ pub fn to_string(value : @serde.Data, pretty~ : Bool) -> String {
 }
 
 ///|
-fn write_indent(buf : StringBuilder, level : Int) -> Unit {
+fn write_indent(buf : StringBuilder, level : Int32) -> Unit {
   for _ in 0..<level {
     buf.write_string("  ")
   }
@@ -23,7 +23,7 @@ fn write_value(
   buf : StringBuilder,
   value : @serde.Data,
   pretty : Bool,
-  level : Int,
+  level : Int32,
 ) -> Unit {
   match value {
     None => buf.write_string("null")
@@ -80,7 +80,7 @@ fn begin_value(
   buf : StringBuilder,
   first : Bool,
   pretty : Bool,
-  level : Int,
+  level : Int32,
 ) -> Unit {
   if pretty {
     buf.write_string(if first { "\n" } else { ",\n" })
@@ -96,7 +96,7 @@ fn end_container(
   buf : StringBuilder,
   empty : Bool,
   pretty : Bool,
-  level : Int,
+  level : Int32,
   close : Char,
 ) -> Unit {
   if pretty && !empty {

@@ -33,10 +33,10 @@ pub struct HighlightState {
 /// source string (UTF-8 offsets).
 pub fn ranged_highlight(
   state : HighlightState,
-  changes : Array[(Int, ScopeStackOp)],
+  changes : Array[(Int32, ScopeStackOp)],
   text : ByteIndex,
   highlighter : Highlighter,
-) -> Array[(Style, String, (Int, Int))] {
+) -> Array[(Style, String, (Int32, Int32))] {
   let out = []
   let mut index = 0
   let mut pos = 0
@@ -98,7 +98,7 @@ pub fn ranged_highlight(
 /// collected).
 pub fn highlight_iter(
   state : HighlightState,
-  changes : Array[(Int, ScopeStackOp)],
+  changes : Array[(Int32, ScopeStackOp)],
   text : ByteIndex,
   highlighter : Highlighter,
 ) -> Array[(Style, String)] {
@@ -298,7 +298,7 @@ pub fn Highlighter::style_mod_for_stack(
 
 ///|
 /// A stable sort (Rust's `slice::sort_by`).
-pub fn[T] stable_sort_by(xs : Array[T], cmp : (T, T) -> Int) -> Array[T] {
+pub fn[T] stable_sort_by(xs : Array[T], cmp : (T, T) -> Int32) -> Array[T] {
   let indexed = xs.mapi((i, x) => (i, x))
   indexed.sort_by((a, b) => {
     let c = cmp(a.1, b.1)

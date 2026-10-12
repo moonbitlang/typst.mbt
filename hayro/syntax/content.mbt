@@ -4,7 +4,7 @@
 // 6 operands are used for example for ctm or cubic curves,
 // but anything above should be pretty rare (only for example for
 // DeviceN color spaces, or invalid PDF files). So we settle on 10.
-const OPERANDS_THRESHOLD : Int = 10
+const OPERANDS_THRESHOLD : Int32 = 10
 
 ///|
 /// Read a content stream operator (upstream `Operator`, a name without a
@@ -89,7 +89,7 @@ pub fn UntypedIter::next(self : UntypedIter) -> Instruction? {
   while !self.reader.at_end() {
     // I believe booleans/null never appear as an operator?
     guard self.reader.peek_byte() is Some(peeked) else { return None }
-    if peeked is (b'/' | b'.' | b'+' | b'-' | b'0'..=b'9' | b'[' | b'<' | b'(') {
+    if peeked is (b'/' | b'.' | b'+' | b'-' | b'0'..<=b'9' | b'[' | b'<' | b'(') {
       // See issue 994. In all sane scenarios, if the next byte is a number
       // it has to be an operand (a number). However, it's possible that
       // the number is followed by a regular character, in which case it
@@ -298,7 +298,7 @@ pub fn TypedIter::next(self : TypedIter) -> TypedInstruction? {
 }
 
 ///|
-fn saturating_sub(a : Int, b : Int) -> Int {
+fn saturating_sub(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a - b
   } else {
@@ -307,7 +307,7 @@ fn saturating_sub(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn operand_number(stack : Array[Object], index : Int) -> Number? {
+fn operand_number(stack : Array[Object], index : Int32) -> Number? {
   match stack.get(index) {
     Some(Number(n)) => Some(n)
     _ => None
@@ -315,7 +315,7 @@ fn operand_number(stack : Array[Object], index : Int) -> Number? {
 }
 
 ///|
-fn operand_name(stack : Array[Object], index : Int) -> Name? {
+fn operand_name(stack : Array[Object], index : Int32) -> Name? {
   match stack.get(index) {
     Some(Name(n)) => Some(n)
     _ => None
@@ -323,7 +323,7 @@ fn operand_name(stack : Array[Object], index : Int) -> Name? {
 }
 
 ///|
-fn operand_array(stack : Array[Object], index : Int) -> PdfArray? {
+fn operand_array(stack : Array[Object], index : Int32) -> PdfArray? {
   match stack.get(index) {
     Some(Array(a)) => Some(a)
     _ => None
@@ -331,7 +331,7 @@ fn operand_array(stack : Array[Object], index : Int) -> PdfArray? {
 }
 
 ///|
-fn operand_stream(stack : Array[Object], index : Int) -> Stream? {
+fn operand_stream(stack : Array[Object], index : Int32) -> Stream? {
   match stack.get(index) {
     Some(Stream(s)) => Some(s)
     _ => None
@@ -339,7 +339,7 @@ fn operand_stream(stack : Array[Object], index : Int) -> Stream? {
 }
 
 ///|
-fn operand_string(stack : Array[Object], index : Int) -> PdfString? {
+fn operand_string(stack : Array[Object], index : Int32) -> PdfString? {
   match stack.get(index) {
     Some(String(s)) => Some(s)
     _ => None
@@ -347,7 +347,7 @@ fn operand_string(stack : Array[Object], index : Int) -> PdfString? {
 }
 
 ///|
-fn operand_object(stack : Array[Object], index : Int) -> Object? {
+fn operand_object(stack : Array[Object], index : Int32) -> Object? {
   stack.get(index)
 }
 

@@ -26,11 +26,11 @@
 
 ///|
 priv struct BlurData {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   sigma_x : Double
   sigma_y : Double
-  steps : Int
+  steps : Int32
 }
 
 ///|
@@ -66,9 +66,9 @@ fn iir_blur_apply(
 
 ///|
 fn gaussian_channel(
-  data : FixedArray[UInt],
+  data : FixedArray[UInt32],
   d : BlurData,
-  channel : Int,
+  channel : Int32,
   buf : FixedArray[Double],
 ) -> Unit {
   let shift = channel * 8
@@ -147,7 +147,7 @@ fn gaussianiir2d(d : BlurData, buf : FixedArray[Double]) -> Unit {
 }
 
 ///|
-fn gen_coefficients(sigma : Double, steps : Int) -> (Double, Double) {
+fn gen_coefficients(sigma : Double, steps : Int32) -> (Double, Double) {
   let lambda = sigma * sigma / (2.0 * steps.to_double())
   let dnu = (1.0 + 2.0 * lambda - (1.0 + 4.0 * lambda).sqrt()) / (2.0 * lambda)
   (lambda, dnu)
@@ -155,7 +155,7 @@ fn gen_coefficients(sigma : Double, steps : Int) -> (Double, Double) {
 
 ///|
 /// `f64::powi` (LLVM's `__powidf2`: repeated squaring).
-fn powi(a : Double, b : Int) -> Double {
+fn powi(a : Double, b : Int32) -> Double {
   let recip = b < 0
   let mut a = a
   let mut b = b

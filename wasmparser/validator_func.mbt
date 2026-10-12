@@ -12,10 +12,10 @@ pub struct FuncToValidate {
   /// Reusable, heap allocated resources to drive the Wasm validation.
   resources : ValidatorResources
   /// The core Wasm function index being validated.
-  index : UInt
+  index : UInt32
   /// The core Wasm type index of the function being validated,
   /// defining the results and parameters to the function.
-  ty : UInt
+  ty : UInt32
   /// The Wasm features enabled to validate the function.
   features : WasmFeatures
 }
@@ -69,13 +69,13 @@ pub fn FuncToValidate::resources(self : FuncToValidate) -> ValidatorResources {
 
 ///|
 /// The core Wasm function index being validated.
-pub fn FuncToValidate::index(self : FuncToValidate) -> UInt {
+pub fn FuncToValidate::index(self : FuncToValidate) -> UInt32 {
   self.index
 }
 
 ///|
 /// The core Wasm type index of the function being validated.
-pub fn FuncToValidate::ty(self : FuncToValidate) -> UInt {
+pub fn FuncToValidate::ty(self : FuncToValidate) -> UInt32 {
   self.ty
 }
 
@@ -87,7 +87,7 @@ pub fn FuncToValidate::ty(self : FuncToValidate) -> UInt {
 pub struct FuncValidator {
   priv validator : OperatorValidator
   priv resources : ValidatorResources
-  priv index : UInt
+  priv index : UInt32
   // The proposal-checking visitor over `validator` (reused for every
   // operator; upstream creates a temporary one per operator).
   priv visitor : WasmProposalValidator
@@ -154,8 +154,8 @@ pub fn FuncValidator::read_locals(
 /// definitions and there's no need to re-parse the function again.
 pub fn FuncValidator::define_locals(
   self : FuncValidator,
-  offset : Int,
-  count : UInt,
+  offset : Int32,
+  count : UInt32,
   ty : ValType,
 ) -> Unit raise BinaryReaderError {
   self.validator.define_locals(offset, count, ty, self.resources)
@@ -170,7 +170,7 @@ pub fn FuncValidator::define_locals(
 /// error messages.
 pub fn FuncValidator::op(
   self : FuncValidator,
-  offset : Int,
+  offset : Int32,
   operator : Operator,
 ) -> Unit raise BinaryReaderError {
   self.visitor.0.offset = offset
@@ -183,7 +183,7 @@ pub fn FuncValidator::op(
 /// The returned visitor is intended to visit just one instruction at the `offset`.
 pub fn FuncValidator::visitor(
   self : FuncValidator,
-  offset : Int,
+  offset : Int32,
 ) -> WasmProposalValidator {
   self.visitor.0.offset = offset
   self.visitor
@@ -194,7 +194,7 @@ pub fn FuncValidator::visitor(
 /// operators too).
 pub fn FuncValidator::simd_visitor(
   self : FuncValidator,
-  offset : Int,
+  offset : Int32,
 ) -> WasmProposalValidator {
   self.visitor(offset)
 }
@@ -210,7 +210,7 @@ pub fn FuncValidator::simd_visitor(
 /// error if validation fails.
 pub fn FuncValidator::finish(
   self : FuncValidator,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   self.validator.finish(offset)
 }
@@ -230,13 +230,13 @@ pub fn FuncValidator::resources(self : FuncValidator) -> ValidatorResources {
 ///|
 /// The index of the function within the module's function index space that
 /// is being validated.
-pub fn FuncValidator::index(self : FuncValidator) -> UInt {
+pub fn FuncValidator::index(self : FuncValidator) -> UInt32 {
   self.index
 }
 
 ///|
 /// Returns the number of defined local variables in the function.
-pub fn FuncValidator::len_locals(self : FuncValidator) -> UInt {
+pub fn FuncValidator::len_locals(self : FuncValidator) -> UInt32 {
   self.validator.locals.len_locals()
 }
 
@@ -244,7 +244,7 @@ pub fn FuncValidator::len_locals(self : FuncValidator) -> UInt {
 /// Returns the type of the local variable at the given `index` if any.
 pub fn FuncValidator::get_local_type(
   self : FuncValidator,
-  index : UInt,
+  index : UInt32,
 ) -> ValType? {
   self.validator.locals.get(index)
 }
@@ -254,7 +254,7 @@ pub fn FuncValidator::get_local_type(
 ///
 /// This returns the height of the whole operand stack for this function,
 /// not just for the current control frame.
-pub fn FuncValidator::operand_stack_height(self : FuncValidator) -> UInt {
+pub fn FuncValidator::operand_stack_height(self : FuncValidator) -> UInt32 {
   self.validator.operand_stack_height().reinterpret_as_uint()
 }
 
@@ -271,14 +271,14 @@ pub fn FuncValidator::operand_stack_height(self : FuncValidator) -> UInt {
 /// A `depth` of 0 will refer to the last operand on the stack.
 pub fn FuncValidator::get_operand_type(
   self : FuncValidator,
-  depth : Int,
+  depth : Int32,
 ) -> ValType?? {
   self.validator.peek_operand_at(depth)
 }
 
 ///|
 /// Get the current height of the control frame stack.
-pub fn FuncValidator::control_stack_height(self : FuncValidator) -> UInt {
+pub fn FuncValidator::control_stack_height(self : FuncValidator) -> UInt32 {
   self.validator.control_stack_height().reinterpret_as_uint()
 }
 
@@ -287,7 +287,7 @@ pub fn FuncValidator::control_stack_height(self : FuncValidator) -> UInt {
 /// top of the control frame stack (0 is the innermost frame).
 pub fn FuncValidator::get_control_frame(
   self : FuncValidator,
-  depth : Int,
+  depth : Int32,
 ) -> Frame? {
   self.validator.get_frame(depth)
 }

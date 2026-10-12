@@ -44,7 +44,7 @@ pub fn[T] opt(f : () -> T raise Malformed) -> T? {
 /// This is a low-level, internal trait that should not be used directly.
 pub(open) trait FromData {
   /// Object's raw data size.
-  fn size() -> Int
+  fn size() -> Int32
   /// Parses an object from a raw data (`data.length() == size()`).
   fn parse(BytesView) -> Self raise Malformed
 }
@@ -96,22 +96,22 @@ pub impl FromData for Int16 with fn parse(data) {
 }
 
 ///|
-pub impl FromData for UInt with fn size() {
+pub impl FromData for UInt32 with fn size() {
   4
 }
 
 ///|
-pub impl FromData for UInt with fn parse(data) {
+pub impl FromData for UInt32 with fn parse(data) {
   be_u32(data, 0)
 }
 
 ///|
-pub impl FromData for Int with fn size() {
+pub impl FromData for Int32 with fn size() {
   4
 }
 
 ///|
-pub impl FromData for Int with fn parse(data) {
+pub impl FromData for Int32 with fn parse(data) {
   be_u32(data, 0).reinterpret_as_int()
 }
 
@@ -127,13 +127,13 @@ pub impl FromData for UInt64 with fn parse(data) {
 
 ///|
 #inline
-fn be_u16(data : BytesView, i : Int) -> UInt16 {
+fn be_u16(data : BytesView, i : Int32) -> UInt16 {
   ((data[i].to_int() << 8) | data[i + 1].to_int()).to_uint16()
 }
 
 ///|
 #inline
-fn be_u32(data : BytesView, i : Int) -> UInt {
+fn be_u32(data : BytesView, i : Int32) -> UInt32 {
   (data[i].to_uint() << 24) |
   (data[i + 1].to_uint() << 16) |
   (data[i + 2].to_uint() << 8) |
@@ -144,7 +144,7 @@ fn be_u32(data : BytesView, i : Int) -> UInt {
 /// A u24 number.
 ///
 /// Stored as u32, but encoded as 3 bytes in the font.
-pub(all) struct U24(UInt) derive(Eq, Debug)
+pub(all) struct U24(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -232,7 +232,7 @@ pub impl FromData for Fixed with fn size() {
 
 ///|
 pub impl FromData for Fixed with fn parse(data) {
-  let n : Int = FromData::parse(data)
+  let n : Int32 = FromData::parse(data)
   Fixed(Float::from_int(n) / 65536.0)
 }
 
@@ -248,7 +248,7 @@ pub fn Fixed::apply_float_delta(self : Fixed, delta : Float) -> Float {
 
 ///|
 /// Rust's `f32 as i32` cast (saturating, NaN -> 0).
-pub fn f32_as_i32(v : Float) -> Int {
+pub fn f32_as_i32(v : Float) -> Int32 {
   if v.is_nan() {
     0
   } else if v >= 2147483648.0 {
@@ -262,7 +262,7 @@ pub fn f32_as_i32(v : Float) -> Int {
 
 ///|
 /// `TryNumFrom<f32> for i32`.
-pub fn try_i32_from_f32(v : Float) -> Int? {
+pub fn try_i32_from_f32(v : Float) -> Int32? {
   // Float as int truncates toward zero, so we want to allow values
   // in the exclusive range `(MIN-1, MAX+1)`.
   let min : Float = -2147483648.0
@@ -303,7 +303,7 @@ pub fn try_u8_from_f32(v : Float) -> Byte? {
 
 ///|
 /// Rust's `data.get(start..end)`.
-pub fn slice_get(data : BytesView, start : Int, end : Int) -> BytesView? {
+pub fn slice_get(data : BytesView, start : Int32, end : Int32) -> BytesView? {
   if start >= 0 && start <= end && end <= data.length() {
     Some(data[start:end])
   } else {
@@ -313,7 +313,7 @@ pub fn slice_get(data : BytesView, start : Int, end : Int) -> BytesView? {
 
 ///|
 /// Rust's `data.get(start..)`.
-pub fn slice_from(data : BytesView, start : Int) -> BytesView? {
+pub fn slice_from(data : BytesView, start : Int32) -> BytesView? {
   if start >= 0 && start <= data.length() {
     Some(data[start:])
   } else {
@@ -325,8 +325,8 @@ pub fn slice_from(data : BytesView, start : Int) -> BytesView? {
 /// Raising version of `slice_get`.
 pub fn slice_r(
   data : BytesView,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> BytesView raise Malformed {
   if start >= 0 && start <= end && end <= data.length() {
     data[start:end]
@@ -337,7 +337,10 @@ pub fn slice_r(
 
 ///|
 /// Raising version of `slice_from`.
-pub fn slice_from_r(data : BytesView, start : Int) -> BytesView raise Malformed {
+pub fn slice_from_r(
+  data : BytesView,
+  start : Int32,
+) -> BytesView raise Malformed {
   if start >= 0 && start <= data.length() {
     data[start:]
   } else {
@@ -457,7 +460,7 @@ pub fn[T : FromData] LazyArray16::is_empty(self : LazyArray16[T]) -> Bool {
 /// Performs a binary search using specified closure.
 pub fn[T : FromData] LazyArray16::binary_search_by(
   self : LazyArray16[T],
-  f : (T) -> Int,
+  f : (T) -> Int32,
 ) -> (UInt16, T)? {
   // Based on Rust std implementation.
   let mut size = self.len()
@@ -537,7 +540,7 @@ pub fn[T] LazyArray32::new(data : BytesView) -> LazyArray32[T] {
 /// Returns a value at `index`.
 pub fn[T : FromData] LazyArray32::get(
   self : LazyArray32[T],
-  index : UInt,
+  index : UInt32,
 ) -> T? {
   if index < self.len() {
     let size = T::size()
@@ -554,7 +557,7 @@ pub fn[T : FromData] LazyArray32::get(
 
 ///|
 /// Returns array's length.
-pub fn[T : FromData] LazyArray32::len(self : LazyArray32[T]) -> UInt {
+pub fn[T : FromData] LazyArray32::len(self : LazyArray32[T]) -> UInt32 {
   let size = T::size()
   if size == 0 {
     0
@@ -573,13 +576,13 @@ pub fn[T : FromData] LazyArray32::is_empty(self : LazyArray32[T]) -> Bool {
 /// Performs a binary search using specified closure.
 pub fn[T : FromData] LazyArray32::binary_search_by(
   self : LazyArray32[T],
-  f : (T) -> Int,
-) -> (UInt, T)? {
+  f : (T) -> Int32,
+) -> (UInt32, T)? {
   let mut size = self.len()
   if size == 0 {
     return None
   }
-  let mut base : UInt = 0
+  let mut base : UInt32 = 0
   while size > 1 {
     let half = size / 2
     let mid = base + half
@@ -601,7 +604,7 @@ pub fn[T : FromData] LazyArray32::binary_search_by(
 pub fn[T : FromData + Compare] LazyArray32::binary_search(
   self : LazyArray32[T],
   key : T,
-) -> (UInt, T)? {
+) -> (UInt32, T)? {
   self.binary_search_by(p => Compare::compare(p, key))
 }
 
@@ -609,7 +612,7 @@ pub fn[T : FromData + Compare] LazyArray32::binary_search(
 /// Iterates over the array values.
 pub fn[T : FromData] LazyArray32::iter(self : LazyArray32[T]) -> Iter[T] {
   let len = self.len()
-  let mut index : UInt = 0
+  let mut index : UInt32 = 0
   Iter::new(fn() {
     if index < len {
       index += 1
@@ -717,7 +720,7 @@ pub fn[T : FromSlice] LazyOffsetArray16::iter(
 /// A streaming binary parser.
 pub struct Stream {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
 
 ///|
@@ -738,7 +741,7 @@ pub fn Stream::new(data : BytesView) -> Stream {
 /// Creates a new `Stream` parser at offset.
 ///
 /// Returns `None` when `offset` is out of bounds.
-pub fn Stream::new_at(data : BytesView, offset : Int) -> Stream? {
+pub fn Stream::new_at(data : BytesView, offset : Int32) -> Stream? {
   if offset >= 0 && offset <= data.length() {
     Some({ data, offset, })
   } else {
@@ -750,7 +753,7 @@ pub fn Stream::new_at(data : BytesView, offset : Int) -> Stream? {
 /// Raising version of `new_at`.
 pub fn Stream::new_at_r(
   data : BytesView,
-  offset : Int,
+  offset : Int32,
 ) -> Stream raise Malformed {
   if offset >= 0 && offset <= data.length() {
     { data, offset, }
@@ -787,7 +790,7 @@ pub fn Stream::jump_to_end(self : Stream) -> Unit {
 
 ///|
 /// Returns the current offset.
-pub fn Stream::offset(self : Stream) -> Int {
+pub fn Stream::offset(self : Stream) -> Int32 {
   self.offset
 }
 
@@ -809,7 +812,7 @@ pub fn Stream::tail_r(self : Stream) -> BytesView raise Malformed {
 /// Advances by the specified `len`.
 ///
 /// Doesn't check bounds.
-pub fn Stream::advance(self : Stream, len : Int) -> Unit {
+pub fn Stream::advance(self : Stream, len : Int32) -> Unit {
   self.offset += len
 }
 
@@ -817,7 +820,7 @@ pub fn Stream::advance(self : Stream, len : Int) -> Unit {
 /// Advances by the specified `len` and checks for bounds.
 pub fn Stream::advance_checked(
   self : Stream,
-  len : Int,
+  len : Int32,
 ) -> Unit raise Malformed {
   if self.offset + len <= self.data.length() {
     self.advance(len)
@@ -855,7 +858,7 @@ pub fn[T : FromData] Stream::read_opt(self : Stream) -> T? {
 /// Parses the type from the steam at offset.
 pub fn[T : FromData] Stream::read_at(
   data : BytesView,
-  offset : Int,
+  offset : Int32,
 ) -> T raise Malformed {
   let size = T::size()
   if offset < 0 || offset + size > data.length() {
@@ -894,7 +897,7 @@ pub fn Stream::read_i16(self : Stream) -> Int16 raise Malformed {
 
 ///|
 /// Reads a `u32`.
-pub fn Stream::read_u32(self : Stream) -> UInt raise Malformed {
+pub fn Stream::read_u32(self : Stream) -> UInt32 raise Malformed {
   if self.offset < 0 || self.offset + 4 > self.data.length() {
     raise Malformed
   }
@@ -905,7 +908,7 @@ pub fn Stream::read_u32(self : Stream) -> UInt raise Malformed {
 
 ///|
 /// Reads an `i32`.
-pub fn Stream::read_i32(self : Stream) -> Int raise Malformed {
+pub fn Stream::read_i32(self : Stream) -> Int32 raise Malformed {
   self.read_u32().reinterpret_as_int()
 }
 
@@ -913,7 +916,7 @@ pub fn Stream::read_i32(self : Stream) -> Int raise Malformed {
 /// Reads N bytes from the stream.
 pub fn Stream::read_bytes(
   self : Stream,
-  len : Int,
+  len : Int32,
 ) -> BytesView raise Malformed {
   let start = self.offset
   if start < 0 || len < 0 || start + len > self.data.length() {
@@ -937,7 +940,7 @@ pub fn[T : FromData] Stream::read_array16(
 /// Reads the next `count` types as a slice.
 pub fn[T : FromData] Stream::read_array32(
   self : Stream,
-  count : UInt,
+  count : UInt32,
 ) -> LazyArray32[T] raise Malformed {
   let len = count.to_uint64() * T::size().to_uint64()
   if len > 0x7fffffffUL {
@@ -960,7 +963,7 @@ pub fn Stream::read_at_offset16(
 /// A common offset methods.
 pub(open) trait Offset: FromData {
   /// Converts the offset to `usize`.
-  fn to_usize(Self) -> Int
+  fn to_usize(Self) -> Int32
   /// Whether the offset is zero.
   fn is_null(Self) -> Bool
 }
@@ -972,7 +975,7 @@ pub impl[T : Offset] FromData for T? with fn size() {
 }
 
 ///|
-fn[T : FromData] size_of(_witness : T?) -> Int {
+fn[T : FromData] size_of(_witness : T?) -> Int32 {
   T::size()
 }
 
@@ -1030,7 +1033,7 @@ pub extend Offset16 with FromData::{size, parse}
 
 ///|
 /// A type-safe u24 offset.
-pub(all) struct Offset24(UInt) derive(Eq, Debug)
+pub(all) struct Offset24(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1073,7 +1076,7 @@ pub extend Offset24 with FromData::{size, parse}
 
 ///|
 /// A type-safe u32 offset.
-pub(all) struct Offset32(UInt) derive(Eq, Debug)
+pub(all) struct Offset32(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1174,7 +1177,7 @@ pub fn u16_checked_mul(a : UInt16, b : UInt16) -> UInt16? {
 
 ///|
 /// `u32::checked_add`.
-pub fn u32_checked_add(a : UInt, b : UInt) -> UInt? {
+pub fn u32_checked_add(a : UInt32, b : UInt32) -> UInt32? {
   let r = a + b
   if r < a {
     None
@@ -1185,7 +1188,7 @@ pub fn u32_checked_add(a : UInt, b : UInt) -> UInt? {
 
 ///|
 /// `u32::checked_sub`.
-pub fn u32_checked_sub(a : UInt, b : UInt) -> UInt? {
+pub fn u32_checked_sub(a : UInt32, b : UInt32) -> UInt32? {
   if a >= b {
     Some(a - b)
   } else {
@@ -1195,7 +1198,7 @@ pub fn u32_checked_sub(a : UInt, b : UInt) -> UInt? {
 
 ///|
 /// `usize::checked_add` (on non-negative `Int`s).
-pub fn usize_checked_add(a : Int, b : Int) -> Int? {
+pub fn usize_checked_add(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() + b.to_int64()
   if r > 0x7fffffffL || r < 0L {
     None
@@ -1206,7 +1209,7 @@ pub fn usize_checked_add(a : Int, b : Int) -> Int? {
 
 ///|
 /// `usize::checked_sub` (on non-negative `Int`s).
-pub fn usize_checked_sub(a : Int, b : Int) -> Int? {
+pub fn usize_checked_sub(a : Int32, b : Int32) -> Int32? {
   if a >= b {
     Some(a - b)
   } else {
@@ -1216,7 +1219,7 @@ pub fn usize_checked_sub(a : Int, b : Int) -> Int? {
 
 ///|
 /// `u16::try_from(i32)`.
-pub fn u16_try_from_int(v : Int) -> UInt16? {
+pub fn u16_try_from_int(v : Int32) -> UInt16? {
   if v >= 0 && v <= 0xFFFF {
     Some(v.to_uint16())
   } else {
@@ -1226,7 +1229,7 @@ pub fn u16_try_from_int(v : Int) -> UInt16? {
 
 ///|
 /// `i16::try_from(i32)`.
-pub fn i16_try_from_int(v : Int) -> Int16? {
+pub fn i16_try_from_int(v : Int32) -> Int16? {
   if v >= -32768 && v <= 32767 {
     Some(Int16::from_int(v))
   } else {
@@ -1236,7 +1239,7 @@ pub fn i16_try_from_int(v : Int) -> Int16? {
 
 ///|
 /// `u16::try_from(u32)`.
-pub fn u16_try_from_u32(v : UInt) -> UInt16? {
+pub fn u16_try_from_u32(v : UInt32) -> UInt16? {
   if v <= 0xFFFF {
     Some(v.reinterpret_as_int().to_uint16())
   } else {

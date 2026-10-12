@@ -12,7 +12,7 @@ pub struct ElemInfo {
   /// A description for the element.
   docs : String
   /// Indices of the element's attributes in `attrs()`.
-  attrs : Array[Int]
+  attrs : Array[Int32]
 }
 
 ///|
@@ -24,7 +24,7 @@ pub struct ElemInfo {
 pub fn ElemInfo::new(
   name : String,
   docs : String,
-  attrs : Array[Int],
+  attrs : Array[Int32],
 ) -> ElemInfo {
   { name, docs, attrs, }
 }
@@ -54,7 +54,7 @@ pub fn ElemInfo::get_attr(self : ElemInfo, name : String) -> AttrInfo? {
 
 ///|
 /// Tries to locate the index of a specific attribute in `attrs()`.
-fn ElemInfo::get_specific_attr(self : ElemInfo, name : String) -> Int? {
+fn ElemInfo::get_specific_attr(self : ElemInfo, name : String) -> Int32? {
   let table = attrs()
   match self.attrs.binary_search_by(i => lex_compare(table[i].name, name)) {
     Ok(k) => Some(self.attrs[k])
@@ -64,7 +64,7 @@ fn ElemInfo::get_specific_attr(self : ElemInfo, name : String) -> Int? {
 
 ///|
 /// Tries to locate the index of a global attribute in `attrs()`.
-fn get_global_attr(name : String) -> Int? {
+fn get_global_attr(name : String) -> Int32? {
   let table = attrs()
   match
     table[0:attrs_global].binary_search_by(attr => lex_compare(attr.name, name)) {
@@ -145,7 +145,7 @@ pub(all) enum Type {
   SourceSize
   /// For `Strings(a, b)`, any of the strings in `attr_strings()[a:b]` →
   /// string.
-  Strings(Int, Int)
+  Strings(Int32, Int32)
   /// Any of the listed types → the respective output.
   Union(Array[Type])
   /// An array of the listed type, or, if the bool is true, the listed type
@@ -167,7 +167,7 @@ pub extend Type with @debug.Debug::{to_repr}
 ///|
 /// Lexicographic comparison of (ASCII) names, like Rust's `str` ordering
 /// (MoonBit's `String::compare` orders by length first).
-fn lex_compare(a : String, b : String) -> Int {
+fn lex_compare(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let order = a.code_unit_at(i).compare(b.code_unit_at(i))

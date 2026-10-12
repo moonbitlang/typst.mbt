@@ -23,7 +23,7 @@ pub fn HintingDevice::x_delta(
   self : HintingDevice,
   units_per_em : UInt16,
   pixels_per_em : (UInt16, UInt16)?,
-) -> Int? {
+) -> Int32? {
   guard pixels_per_em is Some((ppem, _)) else { return None }
   self.get_delta(ppem, units_per_em)
 }
@@ -34,7 +34,7 @@ pub fn HintingDevice::y_delta(
   self : HintingDevice,
   units_per_em : UInt16,
   pixels_per_em : (UInt16, UInt16)?,
-) -> Int? {
+) -> Int32? {
   guard pixels_per_em is Some((_, ppem)) else { return None }
   self.get_delta(ppem, units_per_em)
 }
@@ -44,7 +44,7 @@ fn HintingDevice::get_delta(
   self : HintingDevice,
   ppem : UInt16,
   scale : UInt16,
-) -> Int? {
+) -> Int32? {
   let f = self.delta_format.to_int()
   if ppem == 0 || ppem < self.start_size || ppem > self.end_size {
     return None
@@ -112,7 +112,7 @@ fn Device::parse(data : BytesView) -> Device? {
     let second = s.read_u16()
     let format = s.read_u16()
     match format {
-      1..=3 => {
+      1..<=3 => {
         let start_size = first
         let end_size = second
         // Wrapping u16 arithmetic, like upstream in release mode.
@@ -177,7 +177,7 @@ fn ValueFormatFlags::y_advance_device(self : ValueFormatFlags) -> Bool {
 ///|
 // The ValueRecord struct constrain either i16 values or Offset16 offsets
 // and the total size depend on how many flags are enabled.
-fn ValueFormatFlags::size(self : ValueFormatFlags) -> Int {
+fn ValueFormatFlags::size(self : ValueFormatFlags) -> Int32 {
   // The high 8 bits are not used, so make sure we ignore them using 0xFF.
   2 * self.0.to_int().popcnt()
 }
@@ -322,7 +322,7 @@ struct ValueRecordsArray {
   // Number of records.
   len : UInt16
   // Size of the single record.
-  value_len : Int
+  value_len : Int32
   // Flags, used during ValueRecord parsing.
   flags : ValueFormatFlags
 }
@@ -423,7 +423,7 @@ pub fn SingleAdjustment::coverage(self : SingleAdjustment) -> Coverage {
 struct PairSet {
   data : BytesView
   flags : (ValueFormatFlags, ValueFormatFlags)
-  record_len : Int
+  record_len : Int32
 }
 
 ///|
@@ -450,7 +450,7 @@ fn PairSet::binary_search(self : PairSet, second : GlyphId) -> BytesView? {
   if size == 0 {
     return None
   }
-  let get_record = (index : Int) => {
+  let get_record = (index : Int32) => {
     let start = index * self.record_len
     let end = start + self.record_len
     slice_get(self.data, start, end)
@@ -571,7 +571,7 @@ struct ClassMatrix {
   matrix : BytesView
   counts : (UInt16, UInt16)
   flags : (ValueFormatFlags, ValueFormatFlags)
-  record_len : Int
+  record_len : Int32
 }
 
 ///|

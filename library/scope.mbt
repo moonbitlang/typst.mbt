@@ -634,7 +634,7 @@ pub fn Scope::iter(self : Scope) -> Iter[(String, Binding)] {
 
 ///|
 /// The number of definitions.
-pub fn Scope::length(self : Scope) -> Int {
+pub fn Scope::length(self : Scope) -> Int32 {
   self.map.length()
 }
 

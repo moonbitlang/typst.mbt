@@ -6,10 +6,10 @@
 /// A smart quote substitutor with zero lookahead.
 pub struct SmartQuoter {
   /// The amount of quotes that have been opened.
-  priv mut depth : Int
+  priv mut depth : Int32
   /// Each bit indicates whether the quote at this nesting depth is a double.
   /// Maximum supported depth is thus 32.
-  priv mut kinds : UInt
+  priv mut kinds : UInt32
 }
 
 ///|

@@ -5,7 +5,7 @@
 pub struct BitReader {
   /// The underlying bytes of the bit reader.
   data : BytesView
-  priv mut cur_pos : Int
+  priv mut cur_pos : Int32
 }
 
 ///|
@@ -16,7 +16,7 @@ pub fn BitReader::new(data : BytesView) -> BitReader {
 
 ///|
 /// Create a new bit reader, and start at a specific bit offset.
-pub fn BitReader::new_with(data : BytesView, cur_pos : Int) -> BitReader {
+pub fn BitReader::new_with(data : BytesView, cur_pos : Int32) -> BitReader {
   { data, cur_pos, }
 }
 
@@ -38,7 +38,7 @@ pub fn BitReader::align(self : BitReader) -> Unit {
 /// Read the given number of bits from the byte stream.
 ///
 /// Returns `None` if `bit_size` > 32.
-pub fn BitReader::read(self : BitReader, bit_size : Int) -> UInt? {
+pub fn BitReader::read(self : BitReader, bit_size : Int32) -> UInt32? {
   if bit_size < 1 || bit_size > 32 {
     return None
   }
@@ -73,7 +73,7 @@ pub fn BitReader::read(self : BitReader, bit_size : Int) -> UInt? {
 
 ///|
 /// Peak the given number of bits.
-pub fn BitReader::peak(self : BitReader, bit_size : Int) -> UInt? {
+pub fn BitReader::peak(self : BitReader, bit_size : Int32) -> UInt32? {
   self.clone().read(bit_size)
 }
 
@@ -85,19 +85,19 @@ pub fn BitReader::at_end(self : BitReader) -> Bool {
 
 ///|
 /// Get the current byte position.
-pub fn BitReader::byte_pos(self : BitReader) -> Int {
+pub fn BitReader::byte_pos(self : BitReader) -> Int32 {
   self.cur_pos / 8
 }
 
 ///|
 /// Get the current position within the byte.
-pub fn BitReader::bit_pos(self : BitReader) -> Int {
+pub fn BitReader::bit_pos(self : BitReader) -> Int32 {
   self.cur_pos % 8
 }
 
 ///|
 /// Get the current position in bits.
-pub fn BitReader::cur_pos(self : BitReader) -> Int {
+pub fn BitReader::cur_pos(self : BitReader) -> Int32 {
   self.cur_pos
 }
 
@@ -119,7 +119,7 @@ pub fn BitReader::cur_byte(self : BitReader) -> Byte? {
 
 ///|
 /// Get the mask for the given bit size.
-pub fn bit_mask(bit_size : Int) -> UInt {
+pub fn bit_mask(bit_size : Int32) -> UInt32 {
   if bit_size <= 0 {
     0
   } else if bit_size <= 31 {
@@ -133,9 +133,9 @@ pub fn bit_mask(bit_size : Int) -> UInt {
 /// A bit writer over a buffer, starting at byte `base`.
 pub struct BitWriter {
   priv data : FixedArray[Byte]
-  priv base : Int
-  priv mut cur_pos : Int
-  priv bit_size : Int
+  priv base : Int32
+  priv mut cur_pos : Int32
+  priv bit_size : Int32
 }
 
 ///|
@@ -144,15 +144,15 @@ pub struct BitWriter {
 /// byte aligned).
 pub fn BitWriter::new(
   data : FixedArray[Byte],
-  start_bit : Int,
-  bit_size : Int,
+  start_bit : Int32,
+  bit_size : Int32,
 ) -> BitWriter {
   { data, base: start_bit / 8, cur_pos: 0, bit_size, }
 }
 
 ///|
 /// Return the number of written bits.
-pub fn BitWriter::cur_pos(self : BitWriter) -> Int {
+pub fn BitWriter::cur_pos(self : BitWriter) -> Int32 {
   self.cur_pos
 }
 
@@ -167,7 +167,7 @@ pub fn BitWriter::align(self : BitWriter) -> Unit {
 
 ///|
 /// Write the given number into the buffer.
-pub fn BitWriter::write(self : BitWriter, val : UInt) -> Unit? {
+pub fn BitWriter::write(self : BitWriter, val : UInt32) -> Unit? {
   let bit_size = self.bit_size
   let mut bits_left = bit_size
   let value = val & bit_mask(bit_size)
@@ -203,7 +203,7 @@ pub fn BitWriter::write(self : BitWriter, val : UInt) -> Unit? {
 pub fn BitWriter::fill_bytes(
   self : BitWriter,
   byte : Byte,
-  count : Int,
+  count : Int32,
 ) -> Unit? {
   // (upstream: `debug_assert_eq!(self.cur_pos % 8, 0)`)
   let start = self.base + self.cur_pos / 8

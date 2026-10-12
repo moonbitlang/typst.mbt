@@ -114,12 +114,12 @@ pub fn Time::reset(self : Time) -> Unit {
 /// A proleptic Gregorian date and time (like `chrono::NaiveDateTime`),
 /// computed from a UNIX timestamp.
 pub(all) struct UtcDateTime {
-  year : Int
-  month : Int
-  day : Int
-  hour : Int
-  minute : Int
-  second : Int
+  year : Int32
+  month : Int32
+  day : Int32
+  hour : Int32
+  minute : Int32
+  second : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -175,7 +175,7 @@ fn floor_div(a : Int64, b : Int64) -> Int64 {
 
 ///|
 /// The proleptic Gregorian date of a day count since 1970-01-01.
-fn civil_from_days(days : Int64) -> (Int, Int, Int) {
+fn civil_from_days(days : Int64) -> (Int32, Int32, Int32) {
   let z = days + 719468L
   let era = (if z >= 0L { z } else { z - 146096L }) / 146097L
   let doe = z - era * 146097L

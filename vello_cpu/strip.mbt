@@ -4,11 +4,11 @@
 /// A strip.
 struct Strip {
   /// The x coordinate of the strip, in user coordinates.
-  x : Int
+  x : Int32
   /// The y coordinate of the strip, in user coordinates.
-  y : Int
+  y : Int32
   /// Packed alpha index (bits 0..=30) and fill gap flag (bit 31).
-  packed_alpha_idx_fill_gap : UInt
+  packed_alpha_idx_fill_gap : UInt32
 } derive(Eq)
 
 ///|
@@ -18,14 +18,19 @@ pub extend Strip with Eq::{not_equal, equal}
 
 ///|
 /// The bit mask for `fill_gap` packed into `packed_alpha_idx_fill_gap`.
-const FILL_GAP_MASK : UInt = 0x80000000
+const FILL_GAP_MASK : UInt32 = 0x80000000
 
 ///|
 /// Creates a new strip.
-fn Strip::new(x : Int, y : Int, alpha_idx : Int, fill_gap : Bool) -> Strip {
+fn Strip::new(
+  x : Int32,
+  y : Int32,
+  alpha_idx : Int32,
+  fill_gap : Bool,
+) -> Strip {
   let alpha_idx = alpha_idx.reinterpret_as_uint()
   guard (alpha_idx & FILL_GAP_MASK) == 0 else { abort("`alpha_idx` too large") }
-  let fill_gap : UInt = if fill_gap { FILL_GAP_MASK } else { 0 }
+  let fill_gap : UInt32 = if fill_gap { FILL_GAP_MASK } else { 0 }
   { x, y, packed_alpha_idx_fill_gap: alpha_idx | fill_gap, }
 }
 
@@ -37,7 +42,7 @@ fn Strip::is_sentinel(self : Strip) -> Bool {
 
 ///|
 /// Return the y coordinate of the strip, in strip units.
-fn Strip::strip_y(self : Strip) -> Int {
+fn Strip::strip_y(self : Strip) -> Int32 {
   self.y / TILE_HEIGHT
 }
 
@@ -45,7 +50,7 @@ fn Strip::strip_y(self : Strip) -> Int {
 /// Returns the horizontal pixel width of this strip.
 ///
 /// This assumes that `next` is actually the next adjacent strip to `self`.
-fn Strip::width_to(self : Strip, next : Strip) -> Int {
+fn Strip::width_to(self : Strip, next : Strip) -> Int32 {
   let col = self.alpha_idx() / TILE_HEIGHT
   let next_col = next.alpha_idx() / TILE_HEIGHT
   (if next_col > col { next_col - col } else { 0 }) & 0xFFFF
@@ -53,7 +58,7 @@ fn Strip::width_to(self : Strip, next : Strip) -> Int {
 
 ///|
 /// Returns the alpha index.
-fn Strip::alpha_idx(self : Strip) -> Int {
+fn Strip::alpha_idx(self : Strip) -> Int32 {
   (self.packed_alpha_idx_fill_gap & FILL_GAP_MASK.lnot()).reinterpret_as_int()
 }
 
@@ -69,12 +74,12 @@ fn Strip::fill_gap(self : Strip) -> Bool {
 /// creates no tiles. However, if that geometry has a non-zero winding, we
 /// must output strips for those fills.
 fn emit_culled_background(
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   strips : Array[Strip],
   alphas : Array[Byte],
   windings : CulledWindings,
-  should_fill : (Int) -> Bool,
+  should_fill : (Int32) -> Bool,
 ) -> Unit {
   windings.for_active_rows_in_range(start, end, row => {
     if should_fill(windings.coarse[row]) {
@@ -95,7 +100,7 @@ fn render_strips(
   strip_buf : Array[Strip],
   alpha_buf : Array[Byte],
   fill_rule : Fill,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
   lines : Array[Line],
 ) -> Unit {
   let row_windings = tiles.windings.coarse
@@ -105,7 +110,7 @@ fn render_strips(
   if !has_culled_tiles && tiles.is_empty() {
     return
   }
-  let should_fill = (winding : Int) => {
+  let should_fill = (winding : Int32) => {
     match fill_rule {
       NonZero => winding != 0
       EvenOdd => winding % 2 != 0
@@ -113,7 +118,7 @@ fn render_strips(
   }
   // Helper to handle "captive strips".
   let emit_captive_strip = (
-    y : Int,
+    y : Int32,
     is_left_viewport : Bool,
     acc : FixedArray[Float],
   ) => {

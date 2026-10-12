@@ -204,7 +204,7 @@ fn CompositeGlyphIter::next(self : CompositeGlyphIter) -> CompositeGlyphInfo? {
 }
 
 ///|
-fn CompositeGlyphIter::count(self : CompositeGlyphIter) -> Int {
+fn CompositeGlyphIter::count(self : CompositeGlyphIter) -> Int32 {
   let mut n = 0
   while self.next() is Some(_) {
     n += 1
@@ -214,7 +214,7 @@ fn CompositeGlyphIter::count(self : CompositeGlyphIter) -> Int {
 
 ///|
 /// Reads an `i8`.
-pub fn Stream::read_i8(self : Stream) -> Int raise Malformed {
+pub fn Stream::read_i8(self : Stream) -> Int32 raise Malformed {
   let b = self.read_u8().to_int()
   if b >= 128 {
     b - 256
@@ -501,7 +501,7 @@ fn CompositeGlyphFlags::we_have_a_two_by_two(
 
 ///|
 // It's not defined in the spec, so we are using our own value.
-let glyf_max_components : Int = 32
+let glyf_max_components : Int32 = 32
 
 ///|
 /// Returns `Some(None)` for an empty glyph, raises on error.
@@ -509,7 +509,7 @@ fn glyf_outline_impl(
   loca_table : LocaTable,
   glyf_table : BytesView,
   data : BytesView,
-  depth : Int,
+  depth : Int32,
   builder : GlyfBuilder,
 ) -> Rect? raise Malformed {
   if depth >= glyf_max_components {
@@ -622,7 +622,7 @@ fn parse_simple_outline(
 fn resolve_coords_len(
   s : Stream,
   points_total : UInt16,
-) -> (Int, Int) raise Malformed {
+) -> (Int32, Int32) raise Malformed {
   let mut flags_left = points_total.to_int()
   let mut x_coords_len = 0
   let mut y_coords_len = 0

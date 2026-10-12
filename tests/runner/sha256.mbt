@@ -2,7 +2,7 @@
 // `typst-frame-v1` dump like the oracle does (`sha2::Sha256`).
 
 ///|
-let sha256_k : FixedArray[UInt] = [
+let sha256_k : FixedArray[UInt32] = [
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
   0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
   0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
@@ -16,22 +16,22 @@ let sha256_k : FixedArray[UInt] = [
 ]
 
 ///|
-fn rotr(x : UInt, n : Int) -> UInt {
+fn rotr(x : UInt32, n : Int32) -> UInt32 {
   (x >> n) | (x << (32 - n))
 }
 
 ///|
 /// The lowercase hex SHA-256 digest of some bytes.
 fn sha256_hex(data : BytesView) -> String {
-  let h : FixedArray[UInt] = [
+  let h : FixedArray[UInt32] = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
     0x5be0cd19,
   ]
   let len = data.length()
   // Message plus 0x80, padding and the 64-bit bit length.
   let total = (len + 9 + 63) / 64 * 64
-  let w : FixedArray[UInt] = FixedArray::make(64, 0)
-  fn byte_at(i : Int) -> UInt {
+  let w : FixedArray[UInt32] = FixedArray::make(64, 0)
+  fn byte_at(i : Int32) -> UInt32 {
     if i < len {
       data[i].to_uint()
     } else if i == len {
@@ -107,7 +107,7 @@ fn sha256_hex(data : BytesView) -> String {
 
 ///|
 /// `v` in lowercase hex, zero-padded to `width` digits.
-fn hex_padded(v : UInt64, width : Int) -> String {
+fn hex_padded(v : UInt64, width : Int32) -> String {
   let s = v.to_string(radix=16)
   "0".repeat(width - s.length()) + s
 }

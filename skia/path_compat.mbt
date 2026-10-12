@@ -26,7 +26,7 @@ fn ts_chop_cubic_at2(
   src : ArrayView[@path.Point],
   t : Float,
   dst : Array[@path.Point],
-  dst_offset : Int,
+  dst_offset : Int32,
 ) -> Unit {
   let tmp = Array::make(7, @path.Point::zero())
   @path.chop_cubic_at2(src, ts_t(t), tmp)
@@ -46,7 +46,7 @@ fn ts_find_unit_quad_roots(
   b : Float,
   c : Float,
   roots : Array[Float],
-) -> Int {
+) -> Int32 {
   let tmp = @path.new_t_values()
   let n = @path.find_unit_quad_roots(a, b, c, tmp)
   for i in 0..<n {
@@ -59,7 +59,7 @@ fn ts_find_unit_quad_roots(
 fn ts_find_cubic_max_curvature(
   src : ArrayView[@path.Point],
   t_values : Array[Float],
-) -> Int {
+) -> Int32 {
   let tmp = Array::make(3, @path.NormalizedF32::zero())
   let res = @path.find_cubic_max_curvature(src, tmp)
   for i in 0..<res.length() {

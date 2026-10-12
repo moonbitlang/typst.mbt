@@ -86,7 +86,7 @@ fn fnv_bytes(data : BytesView) -> UInt64 {
 
 ///|
 /// Zero-padded lowercase hex.
-fn hex_pad(n : UInt64, width : Int) -> String {
+fn hex_pad(n : UInt64, width : Int32) -> String {
   let digits = "0123456789abcdef"
   let buf = StringBuilder()
   let chars = []
@@ -249,16 +249,16 @@ fn font_raster_format(f : @otf.RasterImageFormat) -> String {
 
 ///|
 /// Whether a glyph is printed in full.
-fn is_sample(gid : Int, count : Int) -> Bool {
+fn is_sample(gid : Int32, count : Int32) -> Bool {
   gid < 40 || gid % 397 == 0 || gid + 1 == count
 }
 
 ///|
 fn font_dump_face(
   out : StringBuilder,
-  index : Int,
+  index : Int32,
   bytes : Bytes,
-  face_index : UInt,
+  face_index : UInt32,
 ) -> Unit {
   let data = bytes[:]
   out.write_string(
@@ -377,7 +377,7 @@ fn font_dump_metrics(out : StringBuilder, face : @otf.Face) -> Unit {
 }
 
 ///|
-fn cmap_format_number(format : @otf.CmapFormat) -> Int {
+fn cmap_format_number(format : @otf.CmapFormat) -> Int32 {
   match format {
     ByteEncodingTable(_) => 0
     HighByteMappingThroughTable(_) => 2
@@ -405,7 +405,7 @@ fn font_dump_cmap(out : StringBuilder, face : @otf.Face) -> Unit {
     out.write_string("cmap -\n")
     return
   }
-  let all : @hashset.HashSet[UInt] = @hashset.HashSet([])
+  let all : @hashset.HashSet[UInt32] = @hashset.HashSet([])
   let mut i = 0
   for subtable in cmap.subtables.iter() {
     let cps = []

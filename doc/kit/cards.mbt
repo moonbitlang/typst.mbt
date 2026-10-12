@@ -163,7 +163,7 @@ fn Call::grid(
 
 ///|
 /// The card of item `k` as a cell.
-fn Call::cell(self : Call, k : Int) -> @doc.Keyed {
+fn Call::cell(self : Call, k : Int32) -> @doc.Keyed {
   let site = self.site
   @doc.Keyed(
     k.to_string(),
@@ -182,7 +182,7 @@ fn Call::cell(self : Call, k : Int) -> @doc.Keyed {
 /// the same item under the same key.
 fn Call::block(
   self : Call,
-  k : Int,
+  k : Int32,
   radius : @doc.Corners[@doc.Length],
   height? : @doc.Sizing,
   breakable? : Bool,

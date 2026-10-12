@@ -29,7 +29,7 @@
 /// A discovered font face: where it lives and its metadata.
 priv struct DbFace {
   path : String
-  index : UInt
+  index : UInt32
   info : @library.FontInfo
 }
 
@@ -158,7 +158,7 @@ fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
 ///|
 /// Whether fontdb admits a face (`fontdb::parse_face_info` succeeds): the
 /// face must parse and have a family and a PostScript name.
-fn admit_face(data : Bytes, index : UInt) -> Bool {
+fn admit_face(data : Bytes, index : UInt32) -> Bool {
   let raw_face = @otf.RawFace::parse(data[:], index) catch { _ => return false }
   guard raw_face.table(@otf.Tag::from_str("name")) is Some(name_data) else {
     return false
@@ -200,12 +200,12 @@ fn is_mac_roman(name : @otf.Name) -> Bool {
 }
 
 ///|
-const TAG_CMAP : UInt = 0x636D6170U
+const TAG_CMAP : UInt32 = 0x636D6170U
 
 ///|
 /// Whether a table is one that face admission and `FontInfo::from_ttf` read
 /// (the first three are required by `Face::parse`).
-fn is_probe_table(tag : UInt) -> Bool {
+fn is_probe_table(tag : UInt32) -> Bool {
   match tag {
     // head, hhea, maxp
     0x68656164U | 0x68686561U | 0x6D617870U => true
@@ -227,7 +227,7 @@ priv struct FontFile {
   file : @platform.RangedFile?
   /// The number of faces, if this is a collection that is read in ranges
   /// (set by `fonts_in_collection`).
-  mut faces : UInt?
+  mut faces : UInt32?
   /// Of a collection that is read in ranges: the tables read so far, by
   /// their place in the file (`table_key`). The faces of a collection share
   /// tables: of the system fonts of macOS 26, 1339 faces in 502 files,
@@ -244,7 +244,7 @@ priv struct FontFile {
 
 ///|
 /// The place of a table in a file as a key: its offset and its length.
-fn table_key(offset : UInt, length : UInt) -> UInt64 {
+fn table_key(offset : UInt32, length : UInt32) -> UInt64 {
   (offset.to_uint64() << 32) | length.to_uint64()
 }
 
@@ -254,7 +254,7 @@ priv struct Probe {
   /// The whole file, or a standalone font with the face's relevant tables.
   data : Bytes
   /// The index of the face in `data`.
-  index : UInt
+  index : UInt32
   /// For a face of a collection that is read in ranges: the place of its
   /// `cmap` table in the file. The table is in `data` unless its coverage
   /// is known (`FontFile::info`).
@@ -317,7 +317,7 @@ fn FontFile::close(self : FontFile) -> Unit {
 ///|
 /// Reads exactly `len` bytes at `offset`, or `None` if the file is too
 /// short (also if it got shorter since it was opened).
-fn FontFile::read(self : FontFile, offset : Int64, len : Int) -> Bytes? {
+fn FontFile::read(self : FontFile, offset : Int64, len : Int32) -> Bytes? {
   if offset < 0L || len < 0 || len.to_int64() > self.size - offset {
     return None
   }
@@ -352,7 +352,7 @@ fn FontFile::all(self : FontFile) -> Bytes? {
 }
 
 ///|
-fn be_u32(b : Bytes, at : Int) -> UInt {
+fn be_u32(b : Bytes, at : Int32) -> UInt32 {
   (b[at].to_uint() << 24) |
   (b[at + 1].to_uint() << 16) |
   (b[at + 2].to_uint() << 8) |
@@ -360,14 +360,14 @@ fn be_u32(b : Bytes, at : Int) -> UInt {
 }
 
 ///|
-fn be_u16(b : Bytes, at : Int) -> Int {
+fn be_u16(b : Bytes, at : Int32) -> Int32 {
   (b[at].to_int() << 8) | b[at + 1].to_int()
 }
 
 ///|
 /// The number of faces if this is a font collection
 /// (`ttf_parser::fonts_in_collection`).
-fn FontFile::fonts_in_collection(self : FontFile) -> UInt? {
+fn FontFile::fonts_in_collection(self : FontFile) -> UInt32? {
   guard self.read(0L, 12) is Some(header) else { return None }
   if be_u32(header, 0) != 0x74746366U {
     return None
@@ -382,7 +382,7 @@ fn FontFile::fonts_in_collection(self : FontFile) -> UInt? {
 ///|
 /// The table at a place of a collection that is read in ranges, or `None`
 /// if it is not all in the file. Read once for all faces that have it.
-fn FontFile::table(self : FontFile, offset : UInt, length : UInt) -> Bytes? {
+fn FontFile::table(self : FontFile, offset : UInt32, length : UInt32) -> Bytes? {
   let key = table_key(offset, length)
   if self.tables.get(key) is Some(data) {
     return data
@@ -405,7 +405,7 @@ fn FontFile::table(self : FontFile, offset : UInt, length : UInt) -> Bytes? {
 /// of its faces are made to overlap (5000 faces with a table of 800 kB
 /// each, at one place with 5000 lengths, fit into 1 MB). Beyond the bound
 /// nothing is kept, and a face reads and computes what it needs for itself.
-fn FontFile::retain(self : FontFile, bytes : Int) -> Bool {
+fn FontFile::retain(self : FontFile, bytes : Int32) -> Bool {
   // (An entry is not free either.)
   let more = bytes.to_int64() + 64L
   if more > self.size - self.retained {
@@ -419,8 +419,8 @@ fn FontFile::retain(self : FontFile, bytes : Int) -> Bool {
 /// The table at a place of the file, or `None` if it is not all there.
 fn FontFile::read_table(
   self : FontFile,
-  offset : UInt,
-  length : UInt,
+  offset : UInt32,
+  length : UInt32,
 ) -> Bytes? {
   if length > 0x7FFFFFFFU {
     None
@@ -458,7 +458,7 @@ fn FontFile::info(self : FontFile, probe : Probe) -> @library.FontInfo? {
 /// ranged reads, a standalone font with the face's relevant tables (at
 /// index 0). `None` if the face cannot be parsed at all (like
 /// `ttf_parser::RawFace::parse` failing).
-fn FontFile::probe_face(self : FontFile, index : UInt) -> Probe? {
+fn FontFile::probe_face(self : FontFile, index : UInt32) -> Probe? {
   if self.data is Some(data) {
     return Some({ data, index, cmap: None, })
   }
@@ -507,7 +507,7 @@ fn FontFile::probe_face(self : FontFile, index : UInt) -> Probe? {
   // or duplicate table records (where lookups in a subset could behave
   // differently from lookups in the full table directory).
   let shared = self.faces is Some(_)
-  let tables : Array[(UInt, UInt, Bytes?)] = []
+  let tables : Array[(UInt32, UInt32, Bytes?)] = []
   let mut cmap : UInt64? = None
   let mut prev = -1L
   for i in 0..<num_tables {
@@ -546,7 +546,10 @@ fn FontFile::probe_face(self : FontFile, index : UInt) -> Probe? {
 /// Assembles a standalone font from table records (in order). Tables
 /// without data (out of the file's bounds) get an out-of-bounds record, so
 /// that they behave as missing like in the original.
-fn build_sfnt(magic : UInt, tables : Array[(UInt, UInt, Bytes?)]) -> Bytes {
+fn build_sfnt(
+  magic : UInt32,
+  tables : Array[(UInt32, UInt32, Bytes?)],
+) -> Bytes {
   let n = tables.length()
   let header_len = 12 + 16 * n
   let mut total = header_len
@@ -556,7 +559,7 @@ fn build_sfnt(magic : UInt, tables : Array[(UInt, UInt, Bytes?)]) -> Bytes {
     }
   }
   let out = FixedArray::make(total, b'\x00')
-  let put_u32 = (at : Int, v : UInt) => {
+  let put_u32 = (at : Int32, v : UInt32) => {
     out[at] = (v >> 24).to_byte()
     out[at + 1] = (v >> 16).to_byte()
     out[at + 2] = (v >> 8).to_byte()

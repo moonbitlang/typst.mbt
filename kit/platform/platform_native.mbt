@@ -1,10 +1,10 @@
 // The native backend of the platform layer (see `platform_stub.c`).
 
 ///|
-extern "C" fn ffi_last_error() -> Int = "typst_platform_last_error"
+extern "C" fn ffi_last_error() -> Int32 = "typst_platform_last_error"
 
 ///|
-extern "C" fn ffi_strerror(code : Int) -> Bytes = "typst_platform_strerror"
+extern "C" fn ffi_strerror(code : Int32) -> Bytes = "typst_platform_strerror"
 
 ///|
 #borrow(path)
@@ -12,24 +12,24 @@ extern "C" fn ffi_read_file(path : Bytes) -> Bytes = "typst_platform_read_file"
 
 ///|
 #borrow(path)
-extern "C" fn ffi_ranged_open(path : Bytes) -> Int = "typst_platform_ranged_open"
+extern "C" fn ffi_ranged_open(path : Bytes) -> Int32 = "typst_platform_ranged_open"
 
 ///|
-extern "C" fn ffi_ranged_size(fd : Int) -> Int64 = "typst_platform_ranged_size"
+extern "C" fn ffi_ranged_size(fd : Int32) -> Int64 = "typst_platform_ranged_size"
 
 ///|
-extern "C" fn ffi_ranged_read(fd : Int, offset : Int64, len : Int) -> Bytes = "typst_platform_ranged_read"
+extern "C" fn ffi_ranged_read(fd : Int32, offset : Int64, len : Int32) -> Bytes = "typst_platform_ranged_read"
 
 ///|
-extern "C" fn ffi_ranged_close(fd : Int) = "typst_platform_ranged_close"
-
-///|
-#borrow(path)
-extern "C" fn ffi_stat_kind(path : Bytes) -> Int = "typst_platform_stat_kind"
+extern "C" fn ffi_ranged_close(fd : Int32) = "typst_platform_ranged_close"
 
 ///|
 #borrow(path)
-extern "C" fn ffi_lstat_kind(path : Bytes) -> Int = "typst_platform_lstat_kind"
+extern "C" fn ffi_stat_kind(path : Bytes) -> Int32 = "typst_platform_stat_kind"
+
+///|
+#borrow(path)
+extern "C" fn ffi_lstat_kind(path : Bytes) -> Int32 = "typst_platform_lstat_kind"
 
 ///|
 #borrow(path)
@@ -41,30 +41,30 @@ extern "C" fn ffi_realpath(path : Bytes) -> Bytes = "typst_platform_realpath"
 
 ///|
 #borrow(path, data)
-extern "C" fn ffi_write_file(path : Bytes, data : Bytes) -> Int = "typst_platform_write_file"
+extern "C" fn ffi_write_file(path : Bytes, data : Bytes) -> Int32 = "typst_platform_write_file"
 
 ///|
 #borrow(path)
-extern "C" fn ffi_mkdir(path : Bytes) -> Int = "typst_platform_mkdir"
+extern "C" fn ffi_mkdir(path : Bytes) -> Int32 = "typst_platform_mkdir"
 
 ///|
 #borrow(data)
-extern "C" fn ffi_write_fd(fd : Int, data : Bytes) -> Int = "typst_platform_write_fd"
+extern "C" fn ffi_write_fd(fd : Int32, data : Bytes) -> Int32 = "typst_platform_write_fd"
 
 ///|
-extern "C" fn ffi_flush(fd : Int) -> Int = "typst_platform_flush"
+extern "C" fn ffi_flush(fd : Int32) -> Int32 = "typst_platform_flush"
 
 ///|
 extern "C" fn ffi_read_stdin() -> Bytes = "typst_platform_read_stdin"
 
 ///|
-extern "C" fn ffi_isatty(fd : Int) -> Int = "typst_platform_isatty"
+extern "C" fn ffi_isatty(fd : Int32) -> Int32 = "typst_platform_isatty"
 
 ///|
-extern "C" fn ffi_local_offset(timestamp : Int64) -> Int = "typst_platform_local_offset"
+extern "C" fn ffi_local_offset(timestamp : Int64) -> Int32 = "typst_platform_local_offset"
 
 ///|
-extern "C" fn ffi_os() -> Int = "typst_platform_os"
+extern "C" fn ffi_os() -> Int32 = "typst_platform_os"
 
 ///|
 /// A path as a NUL-terminated C string. Like Rust's file system APIs,
@@ -79,7 +79,7 @@ fn c_path(path : String) -> Bytes raise IoError {
 ///|
 /// The `io::Error` for an OS error number
 /// (`io::Error::from_raw_os_error`).
-pub fn os_error(code : Int) -> IoError {
+pub fn os_error(code : Int32) -> IoError {
   let message = @utf8.decode_lossy(ffi_strerror(code))
   IoError(kind_of_errno(code), "\{message} (os error \{code})")
 }
@@ -105,7 +105,7 @@ pub fn read_file(path : String) -> Bytes raise IoError {
 /// with `pread`, so that a piece costs one system call (`platform_stub.c`
 /// says why the file is not mapped). It must be closed.
 pub struct RangedFile {
-  priv mut fd : Int
+  priv mut fd : Int32
 }
 
 ///|
@@ -150,7 +150,7 @@ fn RangedFile::check_open(self : RangedFile) -> Unit raise IoError {
 pub fn RangedFile::read(
   self : RangedFile,
   offset : Int64,
-  len : Int,
+  len : Int32,
 ) -> Bytes raise IoError {
   self.check_open()
   let bytes = ffi_ranged_read(self.fd, offset, len)
@@ -168,7 +168,7 @@ pub fn RangedFile::close(self : RangedFile) -> Unit {
 }
 
 ///|
-fn file_kind(code : Int) -> FileKind raise IoError {
+fn file_kind(code : Int32) -> FileKind raise IoError {
   match code {
     1 => File
     2 => Dir
@@ -349,7 +349,7 @@ pub fn stderr_is_terminal() -> Bool {
 
 ///|
 /// The local UTC offset in seconds (east positive) at a UNIX timestamp.
-pub fn local_offset(timestamp : Int64) -> Int {
+pub fn local_offset(timestamp : Int64) -> Int32 {
   ffi_local_offset(timestamp)
 }
 
@@ -361,7 +361,7 @@ pub fn knows_local_time_zone() -> Bool {
 
 ///|
 #borrow(path1, path2)
-extern "C" fn ffi_same_file(path1 : Bytes, path2 : Bytes) -> Int = "typst_platform_same_file"
+extern "C" fn ffi_same_file(path1 : Bytes, path2 : Bytes) -> Int32 = "typst_platform_same_file"
 
 ///|
 /// Whether two paths refer to the same file: to the same device and inode
@@ -409,7 +409,7 @@ pub fn os() -> Os {
 }
 
 ///|
-extern "C" fn ffi_arch() -> Int = "typst_platform_arch"
+extern "C" fn ffi_arch() -> Int32 = "typst_platform_arch"
 
 ///|
 /// The CPU architecture (Rust's `std::env::consts::ARCH`).
@@ -426,7 +426,7 @@ pub fn arch() -> String {
 
 ///|
 #borrow(code)
-extern "C" fn ffi_error_kind_name(code : Int) -> Bytes = "typst_platform_error_kind_name"
+extern "C" fn ffi_error_kind_name(code : Int32) -> Bytes = "typst_platform_error_kind_name"
 
 ///|
 /// Rust's `Debug` for an `io::Error` (`Os { code: .., kind: .., message: ..

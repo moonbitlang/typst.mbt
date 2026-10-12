@@ -113,13 +113,13 @@ fn parse_hex(s : String) -> String {
       }
       v = v * 16 + d
     }
-    buf.write_char(Int::unsafe_to_char(v))
+    buf.write_char(Int32::unsafe_to_char(v))
   }
   buf.to_string()
 }
 
 ///|
-fn join_ints(v : Array[Int]) -> String {
+fn join_ints(v : Array[Int32]) -> String {
   v.map(x => x.to_string()).join(" ")
 }
 
@@ -228,7 +228,7 @@ fn bidi_summary(bidi : @bidi.BidiInfo) -> String {
 
 ///|
 fn rle(levels : ArrayView[@bidi.Level]) -> String {
-  let out : Array[(Int, Int)] = []
+  let out : Array[(Int32, Int32)] = []
   for l in levels {
     match out.last() {
       Some((v, n)) if v == l.number() => out[out.length() - 1] = (v, n + 1)

@@ -2,10 +2,10 @@
 // pipelines) for the default (`Linear`) interpolation.
 
 ///|
-let mab_lerp_depth : Int = 65536
+let mab_lerp_depth : Int32 = 65536
 
 ///|
-let mab_depth : Int = 8192
+let mab_depth : Int32 = 8192
 
 ///|
 /// `T = u16`, `BIT_DEPTH = 13` for the A/M/B curve tables.
@@ -30,7 +30,7 @@ fn build_curve_tables(
 
 ///|
 /// `(v * scale_value).round().min(scale_value) as u16`
-fn curve_index(v : Float, scale_value : Float) -> Int {
+fn curve_index(v : Float, scale_value : Float) -> Int32 {
   @pxfm.f32_as_u16(@pxfm.min_f32(@pxfm.round_f32(v * scale_value), scale_value))
 }
 
@@ -159,7 +159,7 @@ fn prepare_mab_4x3(
     if clut.length() != lut_grid {
       raise MalformedClut({ size: clut.length(), expected: lut_grid, })
     }
-    let grid_size : FixedArray[Int] = [gp[0], gp[1], gp[2], gp[3]]
+    let grid_size : FixedArray[Int32] = [gp[0], gp[1], gp[2], gp[3]]
     let n = lut.length() / 4
     if all_curves_linear(mab.a_curves) {
       // `ACurves4x3Optimized`
@@ -215,7 +215,7 @@ fn apply_a_curves3(
     if clut.length() != lut_grid {
       raise MalformedCurveLutTable({ size: clut.length(), expected: lut_grid, })
     }
-    let grid_size : FixedArray[Int] = [gp[0], gp[1], gp[2]]
+    let grid_size : FixedArray[Int32] = [gp[0], gp[1], gp[2]]
     let n = lut.length() / 3
     if all_curves_linear(mab.a_curves) {
       let cube = Cube::new_cube(clut, grid_size, 3)

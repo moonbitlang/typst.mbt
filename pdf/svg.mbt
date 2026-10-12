@@ -101,8 +101,8 @@ fn svg_render_node(
 /// `render_svg_glyph`, plugged into krilla as `render_svg_glyph_fn`).
 fn render_svg_glyph(
   data : Bytes,
-  context_color : Int,
-  glyph : Int,
+  context_color : Int32,
+  glyph : Int32,
   default_size : (Float, Float),
   surface : @export.Surface,
 ) -> Unit? {
@@ -181,7 +181,7 @@ fn render_svg_glyph(
 fn draw_svg_glyph(
   ttf : @otf.Face,
   gid : @otf.GlyphId,
-  context_color : Int,
+  context_color : Int32,
   surface : @export.Surface,
 ) -> Bool {
   guard ttf.glyph_svg_image(gid) is Some(doc) else { return false }

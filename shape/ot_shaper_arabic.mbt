@@ -1,12 +1,12 @@
 // Port of rustybuzz 0.20.1 `src/hb/ot_shaper_arabic.rs`.
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_ARABIC_HAS_STCH : UInt = HB_BUFFER_SCRATCH_FLAG_SHAPER0
+const HB_BUFFER_SCRATCH_FLAG_ARABIC_HAS_STCH : UInt32 = HB_BUFFER_SCRATCH_FLAG_SHAPER0
 
 ///|
 // See:
 // https://github.com/harfbuzz/harfbuzz/commit/6e6f82b6f3dde0fc6c3c7d991d9ec6cfff57823d#commitcomment-14248516
-fn is_word_category(gc : Int) -> Bool {
+fn is_word_category(gc : Int32) -> Bool {
   (
     rb_flag_unsafe(gc) &
     (
@@ -32,41 +32,41 @@ fn is_word_category(gc : Int) -> Bool {
 // hb_arabic_joining_type_t
 
 ///|
-const JOINING_TYPE_U : Int = 0
+const JOINING_TYPE_U : Int32 = 0
 
 ///|
 // ot_shaper_arabic.rs:42; named only by the generated table upstream.
 #warnings("-unused_value")
-const JOINING_TYPE_L : Int = 1
+const JOINING_TYPE_L : Int32 = 1
 
 ///|
-const JOINING_TYPE_R : Int = 2
+const JOINING_TYPE_R : Int32 = 2
 
 ///|
 // ot_shaper_arabic.rs:44; named only by the generated table upstream.
 #warnings("-unused_value")
-const JOINING_TYPE_D : Int = 3
+const JOINING_TYPE_D : Int32 = 3
 
 ///|
 // We don't have C, like harfbuzz, because Rust doesn't allow duplicated enum variants.
 // ot_shaper_arabic.rs:46; named only by the generated table upstream.
 #warnings("-unused_value")
-const JOINING_TYPE_GROUP_ALAPH : Int = 4
+const JOINING_TYPE_GROUP_ALAPH : Int32 = 4
 
 ///|
 // ot_shaper_arabic.rs:47; named only by the generated table upstream.
 #warnings("-unused_value")
-const JOINING_TYPE_GROUP_DALATH_RISH : Int = 5
+const JOINING_TYPE_GROUP_DALATH_RISH : Int32 = 5
 
 ///|
-const JOINING_TYPE_T : Int = 7
+const JOINING_TYPE_T : Int32 = 7
 
 ///|
 /// Means: use general-category to choose between U or T.
-const JOINING_TYPE_X : Int = 8
+const JOINING_TYPE_X : Int32 = 8
 
 ///|
-fn get_joining_type(u : Int, gc : Int) -> Int {
+fn get_joining_type(u : Int32, gc : Int32) -> Int32 {
   let j_type = joining_type(u)
   if j_type != JOINING_TYPE_X {
     return j_type
@@ -105,44 +105,44 @@ let arabic_features : ReadOnlyArray[@otf.Tag] = [
 // arabic_action_t
 
 ///|
-const ARABIC_ACTION_ISOL : Int = 0
+const ARABIC_ACTION_ISOL : Int32 = 0
 
 ///|
-const ARABIC_ACTION_FINA : Int = 1
+const ARABIC_ACTION_FINA : Int32 = 1
 
 ///|
-const ARABIC_ACTION_FIN2 : Int = 2
+const ARABIC_ACTION_FIN2 : Int32 = 2
 
 ///|
-const ARABIC_ACTION_FIN3 : Int = 3
+const ARABIC_ACTION_FIN3 : Int32 = 3
 
 ///|
-const ARABIC_ACTION_MEDI : Int = 4
+const ARABIC_ACTION_MEDI : Int32 = 4
 
 ///|
-const ARABIC_ACTION_MED2 : Int = 5
+const ARABIC_ACTION_MED2 : Int32 = 5
 
 ///|
-const ARABIC_ACTION_INIT : Int = 6
+const ARABIC_ACTION_INIT : Int32 = 6
 
 ///|
-const ARABIC_ACTION_NONE : Int = 7
+const ARABIC_ACTION_NONE : Int32 = 7
 
 ///|
 // We abuse the same byte for other things...
-const ARABIC_ACTION_STRETCHING_FIXED : Int = 8
+const ARABIC_ACTION_STRETCHING_FIXED : Int32 = 8
 
 ///|
-const ARABIC_ACTION_STRETCHING_REPEATING : Int = 9
+const ARABIC_ACTION_STRETCHING_REPEATING : Int32 = 9
 
 ///|
-fn arabic_action_is_stch(n : Int) -> Bool {
+fn arabic_action_is_stch(n : Int32) -> Bool {
   n == ARABIC_ACTION_STRETCHING_FIXED || n == ARABIC_ACTION_STRETCHING_REPEATING
 }
 
 ///|
 /// `(prev_action, curr_action, next_state)` per state and joining type.
-let arabic_state_table : ReadOnlyArray[ReadOnlyArray[(Int, Int, Int)]] = [
+let arabic_state_table : ReadOnlyArray[ReadOnlyArray[(Int32, Int32, Int32)]] = [
   // jt_U,          jt_L,          jt_R,
   // jt_D,          jg_ALAPH,      jg_DALATH_RISH
 
@@ -212,12 +212,15 @@ let arabic_state_table : ReadOnlyArray[ReadOnlyArray[(Int, Int, Int)]] = [
 ]
 
 ///|
-fn GlyphInfo::arabic_shaping_action(self : GlyphInfo) -> Int {
+fn GlyphInfo::arabic_shaping_action(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_auxiliary()
 }
 
 ///|
-fn GlyphInfo::set_arabic_shaping_action(self : GlyphInfo, action : Int) -> Unit {
+fn GlyphInfo::set_arabic_shaping_action(
+  self : GlyphInfo,
+  action : Int32,
+) -> Unit {
   self.set_ot_shaper_var_u8_auxiliary(action)
 }
 
@@ -296,7 +299,7 @@ priv struct ArabicShapePlan {
   // which is not an OpenType feature, but this simplifies the code by not
   // having to do a "if (... < NONE) ..." and just rely on the fact that
   // mask_array[NONE] == 0.
-  mask_array : FixedArray[UInt]
+  mask_array : FixedArray[UInt32]
   has_stch : Bool
 }
 
@@ -320,7 +323,7 @@ fn arabic_plan_of(plan : ShapePlan) -> ArabicShapePlan {
 
 ///|
 fn arabic_joining(buffer : Buffer) -> Unit {
-  let mut prev : Int? = None
+  let mut prev : Int32? = None
   let mut state = 0
 
   // Check pre-context.
@@ -617,7 +620,7 @@ fn postprocess_glyphs_arabic(
 
 ///|
 // http://www.unicode.org/reports/tr53/
-let modifier_combining_marks : ReadOnlyArray[UInt] = [
+let modifier_combining_marks : ReadOnlyArray[UInt32] = [
   0x0654, // ARABIC HAMZA ABOVE
    0x0655, // ARABIC HAMZA BELOW
    0x0658, // ARABIC MARK NOON GHUNNA
@@ -636,18 +639,18 @@ let modifier_combining_marks : ReadOnlyArray[UInt] = [
 
 ///|
 /// `modified_combining_class::CCC22` (meteg).
-const MODIFIED_CCC22 : Int = 25
+const MODIFIED_CCC22 : Int32 = 25
 
 ///|
 /// `modified_combining_class::CCC26` (point varika).
-const MODIFIED_CCC26 : Int = 26
+const MODIFIED_CCC26 : Int32 = 26
 
 ///|
 fn reorder_marks_arabic(
   _plan : ShapePlan,
   buffer : Buffer,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Unit {
   let mut start = start
   let mut i = start

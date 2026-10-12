@@ -158,7 +158,7 @@ pub fn LineSegmenter::new_cj(options : LineBreakOptions) -> LineSegmenter {
 pub fn LineSegmenter::segment_str(
   self : LineSegmenter,
   input : String,
-) -> Array[Int] {
+) -> Array[Int32] {
   let offsets = []
   let chars = []
   let mut len = 0
@@ -188,15 +188,15 @@ pub fn LineSegmenter::segment_str(
 }
 
 ///|
-fn is_break_utf32_by_normal(codepoint : Int, ja_zh : Bool) -> Bool {
+fn is_break_utf32_by_normal(codepoint : Int32, ja_zh : Bool) -> Bool {
   (codepoint == 0x301C || codepoint == 0x30A0) && ja_zh
 }
 
 ///|
 fn is_break_utf32_by_loose(
-  right_codepoint : Int,
-  left_prop : Int,
-  right_prop : Int,
+  right_codepoint : Int32,
+  left_prop : Int32,
+  right_prop : Int32,
   ja_zh : Bool,
 ) -> Bool? {
   Some(
@@ -241,15 +241,15 @@ priv struct LineBreakIteratorV1 {
   /// The `(byte offset, code point)` pairs of the input (upstream:
   /// `CharIndices`), as two arrays: a pair per character is an allocation
   /// per character.
-  offsets : Array[Int]
-  chars : Array[Int]
+  offsets : Array[Int32]
+  chars : Array[Int32]
   /// Index of the next element `iter.next()` returns.
-  mut cursor : Int
-  mut len : Int
+  mut cursor : Int32
+  mut len : Int32
   /// The index of the current pair in `offsets` and `chars`, or -1
   /// (upstream: `Option<(usize, char)>`).
-  mut current_pos_data : Int
-  mut result_cache : Array[Int]
+  mut current_pos_data : Int32
+  mut result_cache : Array[Int32]
   data : RuleBreakData
   options : ResolvedLineBreakOptions
   complex : ComplexPayloads
@@ -263,7 +263,7 @@ priv enum StringBoundaryPosType {
 }
 
 ///|
-fn LineBreakIteratorV1::next(self : LineBreakIteratorV1) -> Int? {
+fn LineBreakIteratorV1::next(self : LineBreakIteratorV1) -> Int32? {
   if self.options.strictness == Anywhere {
     // Upstream segments grapheme clusters here; Typst never uses this mode.
     abort("LineBreakStrictness::Anywhere is not supported")
@@ -296,7 +296,7 @@ fn LineBreakIteratorV1::next(self : LineBreakIteratorV1) -> Int? {
   }
 
   // The state prior to a sequence of CM and ZWJ affected by rule LB9.
-  let mut lb9_left : Int? = None
+  let mut lb9_left : Int32? = None
   // Whether LB9 was applied to a ZWJ, so that breaks at the current
   // position must be suppressed.
   let mut lb8a_after_lb9 = false
@@ -500,7 +500,7 @@ fn LineBreakIteratorV1::next(self : LineBreakIteratorV1) -> Int? {
 }
 
 ///|
-fn is_letter_unit(prop : Int) -> Bool {
+fn is_letter_unit(prop : Int32) -> Bool {
   prop
   is (LINE_PROPERTY_AI
   | LINE_PROPERTY_AL
@@ -557,7 +557,7 @@ fn LineBreakIteratorV1::check_eof(
 ///|
 fn LineBreakIteratorV1::get_current_position(
   self : LineBreakIteratorV1,
-) -> Int? {
+) -> Int32? {
   if self.current_pos_data >= 0 {
     Some(self.offsets[self.current_pos_data])
   } else {
@@ -568,7 +568,7 @@ fn LineBreakIteratorV1::get_current_position(
 ///|
 fn LineBreakIteratorV1::get_current_codepoint(
   self : LineBreakIteratorV1,
-) -> Int? {
+) -> Int32? {
   if self.current_pos_data >= 0 {
     Some(self.chars[self.current_pos_data])
   } else {
@@ -579,8 +579,8 @@ fn LineBreakIteratorV1::get_current_codepoint(
 ///|
 fn LineBreakIteratorV1::get_linebreak_property(
   self : LineBreakIteratorV1,
-  codepoint : Int,
-) -> Int {
+  codepoint : Int32,
+) -> Int32 {
   let prop = self.data.get32(codepoint)
   let word_option = self.options.word_option
   let strictness = self.options.strictness
@@ -603,7 +603,7 @@ fn LineBreakIteratorV1::get_linebreak_property(
 ///|
 fn LineBreakIteratorV1::get_current_linebreak_property(
   self : LineBreakIteratorV1,
-) -> Int? {
+) -> Int32? {
   match self.get_current_codepoint() {
     Some(c) => Some(self.get_linebreak_property(c))
     None => None
@@ -613,8 +613,8 @@ fn LineBreakIteratorV1::get_current_linebreak_property(
 ///|
 fn LineBreakIteratorV1::line_handle_complex_utf8(
   self : LineBreakIteratorV1,
-  left_codepoint : Int,
-) -> Int? {
+  left_codepoint : Int32,
+) -> Int32? {
   // word segmenter doesn't define break rules for some scripts such as Thai.
   let start_iter = self.cursor
   let start_point = self.current_pos_data
@@ -664,7 +664,7 @@ fn LineBreakIteratorV1::line_handle_complex_utf8(
 }
 
 ///|
-fn utf8_len(c : Int) -> Int {
+fn utf8_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {

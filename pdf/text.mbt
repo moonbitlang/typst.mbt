@@ -57,7 +57,7 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
     u16 += if cp >= 0x10000 { 2 } else { 1 }
   }
   offsets.push(u16)
-  let map = (b : Int) => {
+  let map = (b : Int32) => {
     if b >= 0 && b < offsets.length() {
       offsets[b]
     } else {

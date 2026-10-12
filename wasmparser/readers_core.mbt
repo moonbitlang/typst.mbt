@@ -7,7 +7,7 @@ pub type ImportSectionReader = SectionLimited[Import]
 
 ///|
 /// A reader for the function section of a WebAssembly module.
-pub type FunctionSectionReader = SectionLimited[UInt]
+pub type FunctionSectionReader = SectionLimited[UInt32]
 
 ///|
 /// A reader for the table section of a WebAssembly module.

@@ -171,7 +171,7 @@ fn indent() -> H {
 #callsite(autofill(loc, args_loc))
 fn sec(
   title : &IntoContent,
-  number : Int,
+  number : Int32,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Heading {
@@ -181,7 +181,7 @@ fn sec(
 ///|
 /// "§ 7", a reference to a paragraph of the paper.
 #callsite(autofill(loc, args_loc))
-fn s(number : Int, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Ref {
+fn s(number : Int32, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Ref {
   Ref("sec-\{number}", loc~, args_loc~)
 }
 

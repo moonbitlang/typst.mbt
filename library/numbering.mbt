@@ -197,7 +197,7 @@ pub fn NumberingPattern::apply_kth(
   self : NumberingPattern,
   engine : Engine,
   span : @syntax.Span,
-  k : Int,
+  k : Int32,
   number : Int64,
 ) -> String {
   let fmt = StringBuilder()
@@ -218,7 +218,7 @@ pub fn NumberingPattern::apply_kth(
 
 ///|
 /// How many counting symbols this pattern has.
-pub fn NumberingPattern::num_pieces(self : NumberingPattern) -> Int {
+pub fn NumberingPattern::num_pieces(self : NumberingPattern) -> Int32 {
   self.pieces.length()
 }
 

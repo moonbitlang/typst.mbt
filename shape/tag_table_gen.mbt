@@ -4,7 +4,7 @@
 ///|
 priv struct LangTag {
   language : String
-  tag : UInt
+  tag : UInt32
 }
 
 ///|

@@ -17,7 +17,7 @@ pub(all) enum DataKind {
   /// The data segment is passive.
   Passive
   /// The data segment is active.
-  Active(memory_index~ : UInt, offset_expr~ : ConstExpr)
+  Active(memory_index~ : UInt32, offset_expr~ : ConstExpr)
 }
 
 ///|

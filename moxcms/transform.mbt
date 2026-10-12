@@ -109,7 +109,7 @@ pub extend Layout with Eq::{not_equal, equal}
 pub extend Layout with @debug.Debug::{to_repr}
 
 ///|
-pub fn Layout::channels(self : Layout) -> Int {
+pub fn Layout::channels(self : Layout) -> Int32 {
   match self {
     Rgb => 3
     Rgba => 4
@@ -132,16 +132,16 @@ pub fn Layout::channels(self : Layout) -> Int {
 
 ///|
 /// `T::NOT_FINITE_LINEAR_TABLE_SIZE` for `f32`.
-let not_finite_linear_table_size : Int = 16384
+let not_finite_linear_table_size : Int32 = 16384
 
 ///|
 /// The `T`/`BIT_DEPTH`/`LINEAR_CAP`/`GAMMA_CAP` parameters of
 /// `create_transform_nbit`.
 priv struct Depth {
   finite : Bool
-  bit_depth : Int
-  linear_cap : Int
-  gamma_cap : Int
+  bit_depth : Int32
+  linear_cap : Int32
+  gamma_cap : Int32
 }
 
 ///|
@@ -174,15 +174,15 @@ fn Depth::as_t(self : Depth, v : Float) -> Float {
 /// Sample type abstraction (`PointeeSizeExpressible` and friends).
 priv trait Sample {
   /// `PointeeSizeExpressible::_as_usize`.
-  fn as_usize(Self) -> Int
+  fn as_usize(Self) -> Int32
   /// Converts a table entry (an `f32` holding a `T` value) to `T`.
   fn from_table(Float) -> Self
   /// `((1 << BIT_DEPTH) - 1).as_()`.
   fn max_colors() -> Self
   /// `LutBarycentricReduction<T, u8>::reduce`.
-  fn reduce_u8(Self) -> Int
+  fn reduce_u8(Self) -> Int32
   /// Output of the Q0.15 LUT executors.
-  fn from_q0_15(Int) -> Self
+  fn from_q0_15(Int32) -> Self
 }
 
 ///|
@@ -286,10 +286,10 @@ type Kernel[T] = (ArrayView[T], FixedArray[T]) -> Unit raise CmsError
 ///|
 /// Common lane checks of the executors.
 fn check_lanes(
-  src_len : Int,
-  src_channels : Int,
-  dst_len : Int,
-  dst_channels : Int,
+  src_len : Int32,
+  src_channels : Int32,
+  dst_len : Int32,
+  dst_channels : Int32,
 ) -> Unit raise CmsError {
   if src_len / src_channels != dst_len / dst_channels {
     raise LaneSizeMismatch

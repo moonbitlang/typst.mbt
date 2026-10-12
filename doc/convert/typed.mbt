@@ -555,7 +555,7 @@ fn Tr::keyed(
     return None
   }
   // A dictionary of other keys is one value (a stroke).
-  let found : Array[(Int, String, @ast.Expr)] = []
+  let found : Array[(Int32, String, @ast.Expr)] = []
   for entry in items {
     guard entry is Named(named) else { return None }
     let key = named.name().get()

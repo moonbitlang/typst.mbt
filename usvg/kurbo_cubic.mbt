@@ -125,7 +125,7 @@ fn KCubicBez::subdivide(self : KCubicBez) -> (KCubicBez, KCubicBez) {
 
 ///|
 /// Rust's `f64::powi` (LLVM's `__powidf2`).
-fn powi_f64(a : Double, b : Int) -> Double {
+fn powi_f64(a : Double, b : Int32) -> Double {
   let recip = b < 0
   let mut r = 1.0
   let mut a = a
@@ -176,7 +176,7 @@ fn arclen_quadrature_core(
 }
 
 ///|
-fn arclen_rec(c : KCubicBez, accuracy : Double, depth : Int) -> Double {
+fn arclen_rec(c : KCubicBez, accuracy : Double, depth : Int32) -> Double {
   let d03 = c.p3.sub(c.p0)
   let d01 = c.p1.sub(c.p0)
   let d12 = c.p2.sub(c.p1)
@@ -271,7 +271,7 @@ fn solve_itp(
   a : Double,
   b : Double,
   epsilon : Double,
-  n0 : Int,
+  n0 : Int32,
   k1 : Double,
   ya : Double,
   yb : Double,

@@ -68,7 +68,7 @@ impl FromData for Magic with fn size() {
 
 ///|
 impl FromData for Magic with fn parse(data) {
-  let n : UInt = FromData::parse(data)
+  let n : UInt32 = FromData::parse(data)
   match n {
     0x00010000 | 0x74727565 => TrueType
     0x4F54544F => OpenType
@@ -188,7 +188,7 @@ pub extend Variation with @debug.Debug::{to_repr}
 
 ///|
 /// A 4-byte tag.
-pub(all) struct Tag(UInt) derive(Eq, Compare, Hash, Default)
+pub(all) struct Tag(UInt32) derive(Eq, Compare, Hash, Default)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -222,7 +222,7 @@ pub fn Tag::from_bytes(bytes : Bytes) -> Tag {
 ///|
 /// Creates a `Tag` from a 4-character ASCII string.
 pub fn Tag::from_str(s : String) -> Tag {
-  let mut n : UInt = 0
+  let mut n : UInt32 = 0
   for i in 0..<4 {
     let c = if i < s.length() { s.code_unit_at(i).to_uint() & 0xFF } else { 32 }
     n = (n << 8) | c
@@ -242,7 +242,7 @@ pub fn Tag::from_bytes_lossy(bytes : BytesView) -> Tag {
   if bytes.length() == 0 {
     return Tag(0)
   }
-  let mut n : UInt = 0
+  let mut n : UInt32 = 0
   for i in 0..<4 {
     let c = if i < bytes.length() { bytes[i].to_uint() } else { 32 }
     n = (n << 8) | c
@@ -272,7 +272,7 @@ pub fn Tag::is_null(self : Tag) -> Bool {
 
 ///|
 /// Returns tag value as `u32` number.
-pub fn Tag::as_u32(self : Tag) -> UInt {
+pub fn Tag::as_u32(self : Tag) -> UInt32 {
   self.0
 }
 
@@ -773,9 +773,9 @@ pub(all) struct RasterGlyphImage {
 /// A raw table record.
 pub(all) struct TableRecord {
   tag : Tag
-  check_sum : UInt
-  offset : UInt
-  length : UInt
+  check_sum : UInt32
+  offset : UInt32
+  length : UInt32
 } derive(Debug)
 
 ///|

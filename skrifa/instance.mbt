@@ -48,7 +48,7 @@ pub fn Size::ppem(self : Size) -> Float? {
 ///|
 /// Computes a linear scale factor for this font size and the given units
 /// per em value.
-pub fn Size::linear_scale(self : Size, units_per_em : Int) -> Float {
+pub fn Size::linear_scale(self : Size, units_per_em : Int32) -> Float {
   match self.0 {
     Some(ppem) if units_per_em != 0 => ppem / Float::from_int(units_per_em)
     _ => 1.0
@@ -57,7 +57,7 @@ pub fn Size::linear_scale(self : Size, units_per_em : Int) -> Float {
 
 ///|
 /// FreeType computes a 16.16 scale factor that converts to 26.6.
-fn Size::fixed_linear_scale(self : Size, units_per_em : Int) -> Fixed {
+fn Size::fixed_linear_scale(self : Size, units_per_em : Int32) -> Fixed {
   match self.0 {
     Some(ppem) if units_per_em > 0 =>
       Fixed::from_bits((ppem * 64.0).to_int()) / Fixed::from_bits(units_per_em)
@@ -111,7 +111,7 @@ pub(all) suberror DrawError {
   /// Error occurred during hinting.
   HintingFailed(String)
   /// An anchor point had invalid indices.
-  InvalidAnchorPoint(GlyphId, Int)
+  InvalidAnchorPoint(GlyphId, Int32)
   /// Error occurred while loading a PostScript (CFF/CFF2) glyph.
   PostScript(@ps.PsError)
   /// Conversion from outline to path failed.
@@ -124,7 +124,7 @@ pub(all) suberror DrawError {
 
 ///|
 /// Maximum recursion depth for composite glyphs.
-pub const GLYF_COMPOSITE_RECURSION_LIMIT : Int = 32
+pub const GLYF_COMPOSITE_RECURSION_LIMIT : Int32 = 32
 
 ///|
 pub impl Show for DrawError with fn output(self, f) {
@@ -164,15 +164,15 @@ pub extend DrawError with Show::{to_string, output}
 /// Errors that can occur when converting an outline to a path.
 pub(all) suberror ToPathError {
   /// Contour end point at this index was less than its preceding end point.
-  ContourOrder(Int)
+  ContourOrder(Int32)
   /// Expected a quadratic off-curve point at this index.
-  ExpectedQuad(Int)
+  ExpectedQuad(Int32)
   /// Expected a quadratic off-curve or on-curve point at this index.
-  ExpectedQuadOrOnCurve(Int)
+  ExpectedQuadOrOnCurve(Int32)
   /// Expected a cubic off-curve point at this index.
-  ExpectedCubic(Int)
+  ExpectedCubic(Int32)
   /// Expected number of points to == number of flags
-  PointFlagMismatch(num_points~ : Int, num_flags~ : Int)
+  PointFlagMismatch(num_points~ : Int32, num_flags~ : Int32)
 }
 
 ///|

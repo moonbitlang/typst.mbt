@@ -11,8 +11,8 @@
 /// guard checks `current[0..len]`, `previous[0..len]` and
 /// `output[1..len + 1]`, and `i - bpp >= 0` in the loops from `first`.
 fn filter_row_cost_scalar(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],

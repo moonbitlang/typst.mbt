@@ -2,16 +2,16 @@
 // https://docs.microsoft.com/en-us/typography/opentype/spec/post) implementation.
 
 ///|
-let post_italic_angle_offset : Int = 4
+let post_italic_angle_offset : Int32 = 4
 
 ///|
-let post_underline_position_offset : Int = 8
+let post_underline_position_offset : Int32 = 8
 
 ///|
-let post_underline_thickness_offset : Int = 10
+let post_underline_thickness_offset : Int32 = 10
 
 ///|
-let post_is_fixed_pitch_offset : Int = 12
+let post_is_fixed_pitch_offset : Int32 = 12
 
 ///|
 /// An iterator over glyph names.
@@ -20,7 +20,7 @@ let post_is_fixed_pitch_offset : Int = 12
 /// so we have to simply iterate over all of them to find it out.
 pub struct PostNames {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
 
 ///|
@@ -91,7 +91,7 @@ pub fn PostTable::parse(data : BytesView) -> PostTable? {
       thickness: Stream::read_at(data, post_underline_thickness_offset),
     }
     let is_monospaced = (
-        Stream::read_at(data, post_is_fixed_pitch_offset) : UInt) !=
+        Stream::read_at(data, post_is_fixed_pitch_offset) : UInt32) !=
       0
     let mut names_data = empty_data
     let mut glyph_indexes = LazyArray16::default()

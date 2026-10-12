@@ -10,9 +10,9 @@
 /// `HorizontalFilterPass::<u8, f32, N>::horizontal_plan`.
 fn horizontal_plan(
   filter_weights : FilterWeights,
-  channels : Int,
-  src_width : Int,
-  dst_width : Int,
+  channels : Int32,
+  src_width : Int32,
+  dst_width : Int32,
 ) -> HorizontalFiltering {
   let scale_factor : Float = Float::from_int(src_width) /
     Float::from_int(dst_width)
@@ -33,8 +33,8 @@ fn horizontal_plan(
 /// `vertical_strategy_u8` (`VerticalConvolutionPass::<u8, f32, N>`).
 fn vertical_strategy_u8(
   filter_weights : FilterWeights,
-  src_height : Int,
-  dst_height : Int,
+  src_height : Int32,
+  dst_height : Int32,
 ) -> VerticalFiltering {
   let scale_factor : Float = Float::from_int(src_height) /
     Float::from_int(dst_height)

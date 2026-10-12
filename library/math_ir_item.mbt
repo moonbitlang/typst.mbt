@@ -862,12 +862,12 @@ pub let prime_char : Char = '′'
 /// Unicode codepoints up to four.
 pub struct PrimesItem {
   /// The number of primes to display. Always at least five.
-  count : Int
+  count : Int32
 }
 
 ///|
 /// Creates a new primes item.
-pub fn PrimesItem::create(count : Int, styles : StyleChain) -> MathItem {
+pub fn PrimesItem::create(count : Int32, styles : StyleChain) -> MathItem {
   let props = MathProperties::default(styles, @syntax.Span::detached())
   math_component(Primes({ count, }), props, styles)
 }
@@ -1074,12 +1074,12 @@ pub(all) enum FencedBody {
   /// Owned body.
   Owned(MathItem)
   /// Shared body stored in `SharedFenceSizing`.
-  Shared(index~ : Int, sizing~ : SharedFenceSizing)
+  Shared(index~ : Int32, sizing~ : SharedFenceSizing)
 }
 
 ///|
 pub fn FencedBody::shared(
-  index : Int,
+  index : Int32,
   sizing : SharedFenceSizing,
 ) -> FencedBody {
   Shared(index~, sizing~)

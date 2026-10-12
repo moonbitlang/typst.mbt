@@ -219,7 +219,7 @@ fn f32_max(a : Float, b : Float) -> Float {
 
 ///|
 /// Rust's saturating `f32 as i32`.
-fn f32_to_i32(v : Float) -> Int {
+fn f32_to_i32(v : Float) -> Int32 {
   let d = v.to_double()
   if d.is_nan() {
     0
@@ -234,7 +234,7 @@ fn f32_to_i32(v : Float) -> Int {
 
 ///|
 /// Rust's saturating `f32 as u32`.
-fn f32_to_u32(v : Float) -> UInt {
+fn f32_to_u32(v : Float) -> UInt32 {
   let d = v.to_double()
   if d.is_nan() || d <= 0.0 {
     0

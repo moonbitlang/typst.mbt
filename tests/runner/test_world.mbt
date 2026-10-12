@@ -97,7 +97,7 @@ fn test_today(offset : @library.Duration?) -> @library.Datetime? {
 ///|
 /// The date at 12:00:00 UTC of the `day`-th day after 1970-01-01, shifted
 /// by the offset.
-fn today_on(day : Int, offset : @library.Duration?) -> @library.Datetime? {
+fn today_on(day : Int32, offset : @library.Duration?) -> @library.Datetime? {
   let now = day.to_int64() * 86400L + 12L * 3600L
   let with_offset = match offset {
     None => now
@@ -129,7 +129,7 @@ fn today_on(day : Int, offset : @library.Duration?) -> @library.Datetime? {
 
 ///|
 /// The proleptic Gregorian date of a day count since 1970-01-01.
-fn civil_from_days(days : Int64) -> (Int, Int, Int) {
+fn civil_from_days(days : Int64) -> (Int32, Int32, Int32) {
   let z = days + 719468L
   let era = (if z >= 0L { z } else { z - 146096L }) / 146097L
   let doe = z - era * 146097L

@@ -22,8 +22,8 @@ pub fn hyphenate(word : StringView, lang : Lang) -> Array[StringView] {
 pub fn hyphenate_bounded(
   word : StringView,
   lang : Lang,
-  left_min : Int,
-  right_min : Int,
+  left_min : Int32,
+  right_min : Int32,
 ) -> Array[StringView] {
   // The UTF-8 length of the word (`word.len()`).
   let len = utf8_str_len(word)
@@ -108,7 +108,7 @@ pub fn hyphenate_bounded(
 
 ///|
 /// The UTF-8 length of a string.
-fn utf8_str_len(s : StringView) -> Int {
+fn utf8_str_len(s : StringView) -> Int32 {
   let mut n = 0
   for i = 0; i < s.length(); {
     let { cp, idx, } = @unicode.decode_at(s, i)
@@ -123,7 +123,7 @@ fn utf8_str_len(s : StringView) -> Int {
 ///
 /// The dots enable patterns that match based on whether they are at the edges
 /// of the word.
-fn lowercase_and_dot(word : StringView, len : Int) -> FixedArray[Int] {
+fn lowercase_and_dot(word : StringView, len : Int32) -> FixedArray[Int32] {
   let dotted = FixedArray::make(len + 2, 0)
   dotted[0] = '.'.to_int()
 
@@ -138,7 +138,7 @@ fn lowercase_and_dot(word : StringView, len : Int) -> FixedArray[Int] {
         c = cp + 32
       }
     } else {
-      let lower = @unicode.char_to_lowercase(Int::unsafe_to_char(cp))
+      let lower = @unicode.char_to_lowercase(Int32::unsafe_to_char(cp))
       let { cp: l, idx: lnext, } = @unicode.decode_at(lower, 0)
       if lnext == lower.length() && utf8_len(l) == utf8_len(c) {
         c = l
@@ -155,7 +155,7 @@ fn lowercase_and_dot(word : StringView, len : Int) -> FixedArray[Int] {
 /// Convert char bounds to byte bounds in the dotted word (upstream
 /// `char_to_byte_bounds`, split in two to not collect the chars): the
 /// minimum split index.
-fn char_to_byte_min(word : StringView, left_min : Int) -> Int {
+fn char_to_byte_min(word : StringView, left_min : Int32) -> Int32 {
   // It makes no sense to split outside the word.
   let left_min = if left_min > 1 { left_min } else { 1 }
 
@@ -174,7 +174,7 @@ fn char_to_byte_min(word : StringView, left_min : Int) -> Int {
 ///|
 /// The maximum split index (see [char_to_byte_min]); `len` is the UTF-8
 /// length of the word.
-fn char_to_byte_max(word : StringView, right_min : Int, len : Int) -> Int {
+fn char_to_byte_max(word : StringView, right_min : Int32, len : Int32) -> Int32 {
   let right_min = if right_min > 1 { right_min } else { 1 }
   let mut right = 0
   let mut taken = 0
@@ -195,16 +195,16 @@ fn char_to_byte_max(word : StringView, right_min : Int, len : Int) -> Int {
 #warnings("-unused_field")
 priv struct State {
   data : Bytes
-  addr : Int
-  stride : Int
+  addr : Int32
+  stride : Int32
   /// `(offset, len)` of the levels in `data`.
-  levels_at : Int
-  levels_len : Int
+  levels_at : Int32
+  levels_len : Int32
   /// `(offset, count)` of the transitions in `data`.
-  trans_at : Int
-  count : Int
+  trans_at : Int32
+  count : Int32
   /// Offset of the targets in `data`.
-  targets_at : Int
+  targets_at : Int32
 }
 
 ///|
@@ -219,7 +219,7 @@ fn State::root(data : Bytes) -> State {
 
 ///|
 /// Create a new state at the given node address.
-fn State::at(data : Bytes, addr : Int) -> State {
+fn State::at(data : Bytes, addr : Int32) -> State {
   let mut pos = addr
 
   // Decode whether the state has levels and the transition count.
@@ -261,7 +261,7 @@ fn State::at(data : Bytes, addr : Int) -> State {
 /// The address of the state reached from the state at `addr` with byte `b`,
 /// or `-1` if there is no such transition (`State::transition` on
 /// addresses).
-fn transition_addr(data : Bytes, addr : Int, b : Int) -> Int {
+fn transition_addr(data : Bytes, addr : Int32, b : Int32) -> Int32 {
   let mut pos = addr
   let head = data[pos].to_int()
   let stride = (head >> 5) & 3
@@ -286,7 +286,7 @@ fn transition_addr(data : Bytes, addr : Int, b : Int) -> Int {
 
 ///|
 /// Decode a signed number with 1, 2 or 3 bytes.
-fn from_be_bytes(buf : Bytes, at : Int, len : Int) -> Int {
+fn from_be_bytes(buf : Bytes, at : Int32, len : Int32) -> Int32 {
   match len {
     1 => {
       let v = buf[at].to_int()
@@ -317,7 +317,7 @@ fn from_be_bytes(buf : Bytes, at : Int, len : Int) -> Int {
 
 ///|
 /// Whether a byte is a character boundary.
-fn is_char_boundary(b : Int) -> Bool {
+fn is_char_boundary(b : Int32) -> Bool {
   // (b as i8) >= -0x40
   b < 0x80 || b >= 0xC0
 }
@@ -341,7 +341,7 @@ fn Lang::root(self : Lang) -> State {
 }
 
 ///|
-fn utf8_len(c : Int) -> Int {
+fn utf8_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -355,7 +355,7 @@ fn utf8_len(c : Int) -> Int {
 
 ///|
 /// Write the UTF-8 encoding of `c` at `offset`, returning the new offset.
-fn encode_char(out : FixedArray[Int], offset : Int, c : Int) -> Int {
+fn encode_char(out : FixedArray[Int32], offset : Int32, c : Int32) -> Int32 {
   if c < 0x80 {
     out[offset] = c
     offset + 1
@@ -380,7 +380,7 @@ fn encode_char(out : FixedArray[Int], offset : Int, c : Int) -> Int {
 ///|
 /// Decode base64 data, ignoring newlines.
 fn decode_base64(s : String) -> Bytes {
-  fn value(c : Int) -> Int {
+  fn value(c : Int32) -> Int32 {
     if c >= 'A' && c <= 'Z' {
       c - 'A'
     } else if c >= 'a' && c <= 'z' {

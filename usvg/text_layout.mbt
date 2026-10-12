@@ -18,11 +18,11 @@ pub struct PositionedGlyph {
   /// Returns the transform of the span that the glyph is a part of.
   priv mut span_ts : Transform
   /// The units per em of the font the glyph belongs to.
-  priv units_per_em : Int
+  priv units_per_em : Int32
   /// The font size the glyph should be scaled to.
   priv font_size : Float
   /// The ID of the glyph.
-  id : Int
+  id : Int32
   /// The text from the original string that corresponds to that glyph.
   text : String
   /// The ID of the font the glyph should be taken from. Can be used with the
@@ -197,7 +197,7 @@ pub fn LayoutSpan::stroke(self : LayoutSpan) -> Stroke? {
 
 ///|
 priv struct GlyphCluster {
-  byte_idx : Int
+  byte_idx : Int32
   codepoint : Char
   mut width : Float
   mut advance : Float
@@ -537,7 +537,7 @@ priv struct DecorationSpan {
 fn resolve_clusters_positions(
   text : Text,
   chunk : TextChunk,
-  char_offset : Int,
+  char_offset : Int32,
   writing_mode : WritingMode,
   fonts_cache : FontsCache,
   clusters : Array[GlyphCluster],
@@ -567,7 +567,7 @@ fn clusters_length(clusters : Array[GlyphCluster]) -> Float {
 fn resolve_clusters_positions_horizontal(
   text : Text,
   chunk : TextChunk,
-  offset : Int,
+  offset : Int32,
   writing_mode : WritingMode,
   clusters : Array[GlyphCluster],
 ) -> (Float, Float) {
@@ -658,7 +658,7 @@ fn resolve_baseline_shift(
 fn resolve_clusters_positions_path(
   text : Text,
   chunk : TextChunk,
-  char_offset : Int,
+  char_offset : Int32,
   path : TextPath,
   writing_mode : WritingMode,
   fonts_cache : FontsCache,
@@ -813,7 +813,7 @@ fn collect_normals(
   chunk : TextChunk,
   clusters : Array[GlyphCluster],
   path : TinyPath,
-  char_offset : Int,
+  char_offset : Int32,
   offset : Float,
 ) -> Array[PathNormal?] {
   let offsets : Array[Double] = []
@@ -946,7 +946,7 @@ fn process_chunk(
   // Glyph splitting assigns distinct glyphs to the same index in the original text, we need to
   // store previously used indices to make sure we do not re-use the same index while overwriting
   // span glyphs.
-  let positions : Set[Int] = Set([])
+  let positions : Set[Int32] = Set([])
   let mut glyphs : Array[Glyph] = []
   for span in chunk.spans {
     let font = match fonts_cache.get(span.font) {
@@ -1343,7 +1343,7 @@ fn FontDatabase::load_font(self : FontDatabase, id : FontId) -> ResolvedFont? {
 
 ///|
 /// Rust's `as i16` (wrapping) on an `i32`.
-fn i16_wrap(x : Int) -> Int {
+fn i16_wrap(x : Int32) -> Int32 {
   let v = x & 0xFFFF
   if v >= 0x8000 {
     v - 0x10000
@@ -1589,21 +1589,21 @@ fn script_supports_letter_spacing(script : String) -> Bool {
 /// Basically, a glyph ID and it's metrics.
 priv struct Glyph {
   /// The glyph ID in the font.
-  id : Int
+  id : Int32
   /// Position in bytes in the original string.
   ///
   /// We use it to match a glyph with a character in the text chunk and therefore with the style.
-  byte_idx : Int
+  byte_idx : Int32
   // The length of the cluster in bytes.
-  cluster_len : Int
+  cluster_len : Int32
   /// The text from the original string that corresponds to that glyph.
   text : String
   /// The glyph offset in font units.
-  dx : Int
+  dx : Int32
   /// The glyph offset in font units.
-  dy : Int
+  dy : Int32
   /// The glyph width / X-advance in font units.
-  width : Int
+  width : Int32
   /// Reference to the source font.
   ///
   /// Each glyph can have it's own source font.
@@ -1618,28 +1618,28 @@ fn Glyph::is_missing(self : Glyph) -> Bool {
 ///|
 priv struct ResolvedFont {
   id : FontId
-  units_per_em : Int
+  units_per_em : Int32
   // All values below are in font units.
-  ascent : Int
-  descent : Int
-  x_height : Int
-  underline_position : Int
-  underline_thickness : Int
+  ascent : Int32
+  descent : Int32
+  x_height : Int32
+  underline_position : Int32
+  underline_thickness : Int32
   // line-through thickness should be the the same as underline thickness
   // according to the TrueType spec:
   // https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ystrikeoutsize
-  line_through_position : Int
-  subscript_offset : Int
-  superscript_offset : Int
+  line_through_position : Int32
+  subscript_offset : Int32
+  superscript_offset : Int32
 }
 
 ///|
-fn chunk_span_at(chunk : TextChunk, byte_offset : Int) -> TextSpan? {
+fn chunk_span_at(chunk : TextChunk, byte_offset : Int32) -> TextSpan? {
   chunk.spans.iter().find_first(span => span_contains(span, byte_offset))
 }
 
 ///|
-fn span_contains(span : TextSpan, byte_offset : Int) -> Bool {
+fn span_contains(span : TextSpan, byte_offset : Int32) -> Bool {
   byte_offset >= span.start && byte_offset < span.end
 }
 
@@ -1774,7 +1774,7 @@ fn ResolvedFont::alignment_baseline_shift(
 
 ///|
 /// Converts byte position into a code point position (`ByteIndex::code_point_at`).
-fn code_point_at(text : String, byte_idx : Int) -> Int {
+fn code_point_at(text : String, byte_idx : Int32) -> Int32 {
   let mut i = 0
   let mut count = 0
   for c in text {
@@ -1789,7 +1789,7 @@ fn code_point_at(text : String, byte_idx : Int) -> Int {
 
 ///|
 /// Converts byte position into a character (`ByteIndex::char_from`).
-fn char_from(text : String, byte_idx : Int) -> Char {
+fn char_from(text : String, byte_idx : Int32) -> Char {
   let mut i = 0
   for c in text {
     if i == byte_idx {
@@ -1801,7 +1801,7 @@ fn char_from(text : String, byte_idx : Int) -> Char {
 }
 
 ///|
-fn utf8_char_len(c : Char) -> Int {
+fn utf8_char_len(c : Char) -> Int32 {
   let c = c.to_int()
   if c < 0x80 {
     1
@@ -1816,7 +1816,7 @@ fn utf8_char_len(c : Char) -> Int {
 
 ///|
 /// The number of chars (Unicode scalar values) of a string.
-fn String::char_count(self : String) -> Int {
+fn String::char_count(self : String) -> Int32 {
   let mut n = 0
   for _ in self {
     n += 1

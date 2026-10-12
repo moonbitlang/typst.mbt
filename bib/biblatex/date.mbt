@@ -54,11 +54,11 @@ pub(all) struct Datetime {
   /// AD years are counted starting from one and thus represented as exactly
   /// their year (e.g., 2000 AD is `2000`) whereas BC years are counted
   /// starting from zero downwards (e.g., 1000 BC is `999`)
-  year : Int
+  year : Int32
   /// The month (starting at zero).
-  month : Int?
+  month : Int32?
   /// The day (starting at zero).
-  day : Int?
+  day : Int32?
   /// The timezone-unaware time.
   time : Time?
 } derive(Eq, Debug)
@@ -77,11 +77,11 @@ pub extend Datetime with @debug.Debug::{to_repr}
 /// A potentially timezone aware time.
 pub(all) struct Time {
   /// The hour (0-23).
-  hour : Int
+  hour : Int32
   /// The minute (0-59).
-  minute : Int
+  minute : Int32
   /// The second (0-59).
-  second : Int
+  second : Int32
   /// An optional timezone offset.
   offset : TimeOffset?
 } derive(Eq, Debug)
@@ -102,7 +102,7 @@ pub(all) enum TimeOffset {
   /// Time is UTC. Do not assume an origin timezone.
   Utc
   /// Offset relative to UTC. Positiveness, hour, and minute.
-  Offset(positive~ : Bool, hours~ : Int, minutes~ : Int)
+  Offset(positive~ : Bool, hours~ : Int32, minutes~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -116,7 +116,7 @@ pub extend TimeOffset with Eq::{not_equal, equal}
 pub extend TimeOffset with @debug.Debug::{to_repr}
 
 ///|
-fn err(start : Int, end : Int, kind : TypeErrorKind) -> TypeError {
+fn err(start : Int32, end : Int32, kind : TypeErrorKind) -> TypeError {
   { span: { start, end, }, kind, }
 }
 
@@ -136,7 +136,7 @@ pub fn Date::parse(
   if is_uncertain || is_approximate {
     date_trimmed = date_trimmed[:date_trimmed.length() - 1].to_owned()
   }
-  let off = (r : Result[Datetime, TypeError], amount : Int) => {
+  let off = (r : Result[Datetime, TypeError], amount : Int32) => {
     match r {
       Ok(d) => Ok(d)
       Err(e) => Err(e.offset(amount))
@@ -356,7 +356,7 @@ fn Date::range_dates(
 }
 
 ///|
-fn get_year(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn get_year(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   s.eat_whitespace() |> ignore
   let year_idx = s.cursor()
   let has_sign = s.eat_if_any(['-', '+'])
@@ -553,7 +553,7 @@ fn Datetime::parse(src : String) -> Result[Datetime, TypeError] {
 }
 
 ///|
-fn pad_int(n : Int, width : Int) -> String {
+fn pad_int(n : Int32, width : Int32) -> String {
   // Rust's `{:0width}` for signed integers (sign counts towards the width).
   let neg = n < 0
   let digits = (if neg { -n } else { n }).to_string()
@@ -592,7 +592,11 @@ pub impl Show for Datetime with fn output(self, logger) {
 pub extend Datetime with Show::{to_string, output}
 
 ///|
-fn parse_int(s : @unscanny.Scanner, min_digits : Int, max_digits : Int) -> Int? {
+fn parse_int(
+  s : @unscanny.Scanner,
+  min_digits : Int32,
+  max_digits : Int32,
+) -> Int32? {
   s.eat_whitespace() |> ignore
   let sign = s.eat_if_fn(c => c == '+' || c == '-')
   let positive = if sign { !s.before().has_suffix("-") } else { true }
@@ -609,9 +613,9 @@ fn parse_int(s : @unscanny.Scanner, min_digits : Int, max_digits : Int) -> Int? 
 ///|
 fn parse_unsigned_int(
   s : @unscanny.Scanner,
-  min_digits : Int,
-  max_digits : Int,
-) -> Int? {
+  min_digits : Int32,
+  max_digits : Int32,
+) -> Int32? {
   s.eat_whitespace() |> ignore
   let num = s.eat_while(@unscanny.is_numeric)
   let len = @unscanny.len_utf8(num)
@@ -623,7 +627,7 @@ fn parse_unsigned_int(
 
 ///|
 /// Parse a string with a plus/minus and one to four digits into an integer.
-fn parse_year(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_year(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_int(s, 4, 4) {
     Some(y) => Ok(y)
@@ -632,7 +636,7 @@ fn parse_year(s : @unscanny.Scanner) -> Result[Int, TypeError] {
 }
 
 ///|
-fn parse_short_year(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_short_year(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_int(s, 2, 2) {
     Some(year) => Ok(if year < 50 { year + 2000 } else { year + 1900 })
@@ -642,7 +646,7 @@ fn parse_short_year(s : @unscanny.Scanner) -> Result[Int, TypeError] {
 
 ///|
 /// Parse the month in the 0-11 range.
-fn parse_month(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_month(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_unsigned_int(s, 1, 2) {
     Some(month) =>
@@ -657,7 +661,7 @@ fn parse_month(s : @unscanny.Scanner) -> Result[Int, TypeError] {
 
 ///|
 /// Parse the day in the 0-30 range.
-fn parse_day(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_day(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_unsigned_int(s, 1, 2) {
     Some(day) =>
@@ -672,7 +676,7 @@ fn parse_day(s : @unscanny.Scanner) -> Result[Int, TypeError] {
 
 ///|
 /// Parse the hour in the 0-23 range.
-fn parse_hour(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_hour(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_unsigned_int(s, 1, 2) {
     Some(hour) =>
@@ -687,7 +691,7 @@ fn parse_hour(s : @unscanny.Scanner) -> Result[Int, TypeError] {
 
 ///|
 /// Parse minutes or seconds in the 0-59 range.
-fn parse_minutes_or_seconds(s : @unscanny.Scanner) -> Result[Int, TypeError] {
+fn parse_minutes_or_seconds(s : @unscanny.Scanner) -> Result[Int32, TypeError] {
   let pos = s.cursor()
   match parse_unsigned_int(s, 1, 2) {
     Some(num) =>
@@ -754,7 +758,7 @@ pub fn parse_colon(s : @unscanny.Scanner) -> Result[Unit, TypeError] {
 }
 
 ///|
-fn days_in_month(month : Int, year : Int) -> Int {
+fn days_in_month(month : Int32, year : Int32) -> Int32 {
   if month == 1 {
     if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) {
       29
@@ -770,7 +774,7 @@ fn days_in_month(month : Int, year : Int) -> Int {
 
 ///|
 /// Used to resolve month abbreviations to their respective values.
-pub fn get_month_for_abbr(month : String) -> (String, Int)? {
+pub fn get_month_for_abbr(month : String) -> (String, Int32)? {
   match @unscanny.to_lowercase(month) {
     "jan" => Some(("January", 0))
     "feb" => Some(("February", 1))
@@ -790,7 +794,7 @@ pub fn get_month_for_abbr(month : String) -> (String, Int)? {
 
 ///|
 /// Used to resolve month names to their respective values.
-fn get_month_for_name(month : String) -> Int? {
+fn get_month_for_name(month : String) -> Int32? {
   match @unscanny.to_lowercase(month) {
     "january" => Some(0)
     "february" => Some(1)

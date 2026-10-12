@@ -142,7 +142,7 @@ pub fn NativeRuleMap::get(
 
 ///|
 /// The number of registered rules.
-pub fn NativeRuleMap::len(self : NativeRuleMap) -> Int {
+pub fn NativeRuleMap::len(self : NativeRuleMap) -> Int32 {
   self.rules.length()
 }
 

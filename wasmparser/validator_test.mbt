@@ -35,7 +35,7 @@ fn wasmi_run(bytes : Bytes) -> Unit raise @wasmparser.BinaryReaderError {
   let mut buffer = bytes[:]
   fn next(
     buffer : BytesView,
-  ) -> (Int, @wasmparser.Payload) raise @wasmparser.BinaryReaderError {
+  ) -> (Int32, @wasmparser.Payload) raise @wasmparser.BinaryReaderError {
     match parser.parse(buffer, true) {
       Parsed(consumed~, payload~) => (consumed, payload)
       NeedMoreData(_) => abort("unreachable")

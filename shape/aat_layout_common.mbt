@@ -6,7 +6,7 @@ priv struct AatApplyContext {
   face : Face
   buffer : Buffer
   mut range_flags : Array[RangeFlags]?
-  mut subtable_flags : UInt
+  mut subtable_flags : UInt32
 }
 
 ///|

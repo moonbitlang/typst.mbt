@@ -13,7 +13,7 @@ priv struct GridLayouter {
   /// The regions to layout children into.
   mut regions : @library.Regions
   /// The locators for the each cell in the cell grid.
-  cell_locators : Map[@library.Axes[Int], @library.Locator]
+  cell_locators : Map[@library.Axes[Int32], @library.Locator]
   /// The inherited styles.
   styles : @library.StyleChain
   /// Resolved column sizes.
@@ -25,7 +25,7 @@ priv struct GridLayouter {
   /// The amount of unbreakable rows remaining to be laid out in the
   /// current unbreakable row group. While this is positive, no region breaks
   /// should occur.
-  mut unbreakable_rows_left : Int
+  mut unbreakable_rows_left : Int32
   /// Rowspans not yet laid out because not all of their spanned rows were
   /// laid out yet.
   mut rowspans : Array[Rowspan]
@@ -91,7 +91,7 @@ priv struct Current {
   /// of resolved header rows at the top of the region, which is used by
   /// multi-page rowspans so they can properly skip the header rows at the
   /// top of each region during layout.
-  mut repeated_header_rows : Int
+  mut repeated_header_rows : Int32
   /// The end bound of the row range of the last repeating header at the
   /// start of the region.
   ///
@@ -101,7 +101,7 @@ priv struct Current {
   /// when to prioritize the last lines under a header.
   ///
   /// A value of zero indicates no repeated headers were placed.
-  mut last_repeated_header_end : Int
+  mut last_repeated_header_end : Int32
   /// Stores the length of `lrows` before a sequence of rows equipped with
   /// orphan prevention was laid out. In this case, if no more rows without
   /// orphan prevention are laid out after those rows before the region ends,
@@ -114,7 +114,7 @@ priv struct Current {
   /// `pending_headers` vector and so will automatically be placed again
   /// until they fit and are not orphans in at least one region (or exactly
   /// one, for non-repeated headers).
-  mut lrows_orphan_snapshot : Int?
+  mut lrows_orphan_snapshot : Int32?
   /// The height of effectively repeating headers, that is, ignoring
   /// non-repeating pending headers, in the current region.
   ///
@@ -187,10 +187,10 @@ fn RowState::default() -> RowState {
 /// Data about laid out repeated header rows for a specific finished region.
 priv struct FinishedHeaderRowInfo {
   /// The amount of repeated headers at the top of the region.
-  repeated_amount : Int
+  repeated_amount : Int32
   /// The end bound of the row range of the last repeated header at the top
   /// of the region.
-  last_repeated_header_end : Int
+  last_repeated_header_end : Int32
   /// The total height of repeated headers at the top of the region.
   repeated_height : @library.Abs
 }
@@ -210,7 +210,7 @@ priv struct RowPiece {
   /// The height of the segment.
   height : @library.Abs
   /// The index of the row.
-  y : Int
+  y : Int32
 }
 
 ///|
@@ -221,14 +221,14 @@ priv enum Row {
   /// The last parameter indicates whether or not this is the last region
   /// where this row is laid out, and it can only be false when a row uses
   /// `layout_multi_row`, which in turn is only used by breakable auto rows.
-  Frame(@library.Frame, Int, Bool)
+  Frame(@library.Frame, Int32, Bool)
   /// Fractional row with y index and disambiguator.
-  Fr(@library.Fr, Int, Int)
+  Fr(@library.Fr, Int32, Int32)
 }
 
 ///|
 /// Returns the `y` index of this row.
-fn Row::index(self : Row) -> Int {
+fn Row::index(self : Row) -> Int32 {
   match self {
     Frame(_, y, _) => y
     Fr(_, y, _) => y
@@ -244,7 +244,7 @@ fn abs_sum(iter : Iter[@library.Abs]) -> @library.Abs {
 
 ///|
 /// `usize::saturating_sub`.
-fn saturating_sub(a : Int, b : Int) -> Int {
+fn saturating_sub(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a - b
   } else {
@@ -328,8 +328,8 @@ fn GridLayouter::set_height(self : GridLayouter, y : @library.Abs) -> Unit {
 /// Create a [Locator] for use in [layout_cell].
 fn GridLayouter::cell_locator(
   self : GridLayouter,
-  pos : @library.Axes[Int],
-  disambiguator : Int,
+  pos : @library.Axes[Int32],
+  disambiguator : Int32,
 ) -> @library.Locator {
   let mut cell_locator = self.cell_locators.get(pos).unwrap().relayout()
 
@@ -420,9 +420,9 @@ fn GridLayouter::layout(
 /// Layout a row with a certain initial state, returning the final state.
 fn GridLayouter::layout_row_with_state(
   self : GridLayouter,
-  y : Int,
+  y : Int32,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   initial_state : RowState,
 ) -> RowState raise @library.SourceError {
   // Keep a copy of the previous value in the stack, as this function can
@@ -444,9 +444,9 @@ fn GridLayouter::layout_row_with_state(
 /// Layout the given row with the default row state.
 fn GridLayouter::layout_row(
   self : GridLayouter,
-  y : Int,
+  y : Int32,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> Unit raise @library.SourceError {
   self.layout_row_with_state(y, engine, disambiguator, RowState::default())
   |> ignore
@@ -456,9 +456,9 @@ fn GridLayouter::layout_row(
 /// Layout the given row using the current state.
 fn GridLayouter::layout_row_internal(
   self : GridLayouter,
-  y : Int,
+  y : Int32,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> Unit raise @library.SourceError {
   // Skip to next region if current one is full, but only for content
   // rows, not for gutter rows, and only if we aren't laying out an
@@ -504,7 +504,7 @@ fn GridLayouter::layout_row_internal(
 /// line before a gutter track.
 fn GridLayouter::expected_line_position(
   self : GridLayouter,
-  index : Int,
+  index : Int32,
   is_max_index : Bool,
 ) -> @library.LinePosition {
   if self.grid.is_gutter_track(index) && !is_max_index {
@@ -626,7 +626,7 @@ fn GridLayouter::render_fills_strokes(self : GridLayouter) -> @library.Fragment 
 
     // Converts a row to the corresponding index in the vector of
     // hlines.
-    let hline_index_of_row = (y : Int) => {
+    let hline_index_of_row = (y : Int32) => {
       if !self.grid.has_gutter {
         y
       } else if y == self.grid.rows.length() {
@@ -637,10 +637,10 @@ fn GridLayouter::render_fills_strokes(self : GridLayouter) -> @library.Fragment 
         y / 2
       }
     }
-    let get_hlines_at = (y : Int) => {
+    let get_hlines_at = (y : Int32) => {
       self.grid.hlines.get(hline_index_of_row(y)).unwrap_or([])
     }
-    let mut prev_y : Int? = None
+    let mut prev_y : Int32? = None
     for i, y in hline_indices {
       let dy = hline_offsets[i]
       // Position of lines below the row index in the previous iteration.
@@ -978,7 +978,7 @@ fn GridLayouter::measure_columns(
 fn GridLayouter::cell_spanned_width(
   self : GridLayouter,
   cell : @library.Cell,
-  x : Int,
+  x : Int32,
 ) -> @library.Abs {
   let colspan = self.grid.effective_colspan_of_cell(cell)
   abs_sum(self.rcols.iter().drop(x).take(colspan))
@@ -990,7 +990,7 @@ fn GridLayouter::measure_auto_columns(
   self : GridLayouter,
   engine : @library.Engine,
   available : @library.Abs,
-) -> (@library.Abs, Int) raise @library.SourceError {
+) -> (@library.Abs, Int32) raise @library.SourceError {
   let mut auto = @library.Abs::zero()
   let mut count = 0
   let all_frac_cols = []
@@ -1129,7 +1129,7 @@ fn GridLayouter::grow_fractional_columns(
 fn GridLayouter::shrink_auto_columns(
   self : GridLayouter,
   available : @library.Abs,
-  count : Int,
+  count : Int32,
 ) -> Unit {
   let mut last = @library.Abs::zero()
   let mut fair = -@library.Abs::inf()
@@ -1168,8 +1168,8 @@ fn GridLayouter::shrink_auto_columns(
 fn GridLayouter::layout_auto_row(
   self : GridLayouter,
   engine : @library.Engine,
-  disambiguator : Int,
-  y : Int,
+  disambiguator : Int32,
+  y : Int32,
 ) -> Unit raise @library.SourceError {
   // Determine the size for each region of the row. If the first region
   // ends up empty for some column, skip the region and remeasure.
@@ -1262,15 +1262,15 @@ fn GridLayouter::layout_auto_row(
 fn GridLayouter::measure_auto_row(
   self : GridLayouter,
   engine : @library.Engine,
-  disambiguator : Int,
-  y : Int,
+  disambiguator : Int32,
+  y : Int32,
   can_skip : Bool,
-  unbreakable_rows_left : Int,
+  unbreakable_rows_left : Int32,
   row_group_data : UnbreakableRowGroup?,
 ) -> Array[@library.Abs]? raise @library.SourceError {
   let breakable = unbreakable_rows_left == 0
   let resolved : Array[@library.Abs] = []
-  let pending_rowspans : Array[(Int, Int, Array[@library.Abs])] = []
+  let pending_rowspans : Array[(Int32, Int32, Array[@library.Abs])] = []
   for x in 0..<self.rcols.length() {
     // Get the parent cell in case this is a merged position.
     guard self.grid.parent_cell_position(x, y) is Some(parent) else {
@@ -1423,9 +1423,9 @@ fn GridLayouter::measure_auto_row(
 fn GridLayouter::layout_relative_row(
   self : GridLayouter,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   v : @library.Rel[@library.Length],
-  y : Int,
+  y : Int32,
 ) -> Unit raise @library.SourceError {
   let resolved = v.resolve(self.styles).relative_to(self.regions.base().y)
   let frame = self.layout_single_row(engine, disambiguator, resolved, y)
@@ -1457,9 +1457,9 @@ fn GridLayouter::layout_relative_row(
 fn GridLayouter::layout_single_row(
   self : GridLayouter,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   height : @library.Abs,
-  y : Int,
+  y : Int32,
 ) -> @library.Frame raise @library.SourceError {
   if !self.width.is_finite() {
     @library.bail_at(self.span, "cannot create grid with infinite width")
@@ -1512,9 +1512,9 @@ fn GridLayouter::layout_single_row(
 fn GridLayouter::layout_multi_row(
   self : GridLayouter,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   heights : Array[@library.Abs],
-  y : Int,
+  y : Int32,
 ) -> @library.Fragment raise @library.SourceError {
   // Prepare frames.
   let outputs = heights.map(h => {
@@ -1575,7 +1575,7 @@ fn GridLayouter::layout_multi_row(
 fn GridLayouter::push_row(
   self : GridLayouter,
   frame : @library.Frame,
-  y : Int,
+  y : Int32,
   is_last : Bool,
 ) -> Unit {
   if !self.row_state.in_active_repeatable {
@@ -1860,7 +1860,7 @@ fn points(extents : Iter[@library.Abs]) -> Array[@library.Abs] {
 ///|
 /// The first resolved row with an index of at least `y` (upstream
 /// `rows.iter().find(|row| row.y >= y)`).
-fn first_row_from(rows : Array[RowPiece], y : Int) -> RowPiece? {
+fn first_row_from(rows : Array[RowPiece], y : Int32) -> RowPiece? {
   for row in rows {
     if row.y >= y {
       return Some(row)

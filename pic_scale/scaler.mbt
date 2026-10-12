@@ -9,11 +9,11 @@
 /// (`plan_*_resampling` + `ResamplingPlan::resample`).
 fn resample_u8(
   src : Bytes,
-  src_width : Int,
-  src_height : Int,
-  dst_width : Int,
-  dst_height : Int,
-  channels : Int,
+  src_width : Int32,
+  src_height : Int32,
+  dst_width : Int32,
+  dst_height : Int32,
+  channels : Int32,
   premultiply_alpha : Bool,
 ) -> Bytes {
   if src_width <= 0 || src_height <= 0 || dst_width <= 0 || dst_height <= 0 {

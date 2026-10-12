@@ -27,10 +27,10 @@ fn effective_address(ptr : UInt64, offset : UInt64) -> UInt64 raise TrapCode {
 /// Returns `address` as an index into the buffer if `memory[address..][..n]`
 /// is in bounds.
 fn access_index(
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  n : Int,
-) -> Int raise TrapCode {
+  n : Int32,
+) -> Int32 raise TrapCode {
   let len = memory_len.to_uint64()
   if address > len || len - address < n.to_uint64() {
     raise MemoryOutOfBounds
@@ -41,7 +41,7 @@ fn access_index(
 ///|
 fn load_u8_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> Byte raise TrapCode {
   let i = access_index(memory_len, address, 1)
@@ -51,9 +51,9 @@ fn load_u8_at(
 ///|
 fn load_u16_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> Int raise TrapCode {
+) -> Int32 raise TrapCode {
   let i = access_index(memory_len, address, 2)
   memory[i].to_int() | (memory[i + 1].to_int() << 8)
 }
@@ -61,9 +61,9 @@ fn load_u16_at(
 ///|
 fn load_u32_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-) -> UInt raise TrapCode {
+) -> UInt32 raise TrapCode {
   let i = access_index(memory_len, address, 4)
   memory[i].to_uint() |
   (memory[i + 1].to_uint() << 8) |
@@ -72,7 +72,7 @@ fn load_u32_at(
 }
 
 ///|
-fn read_u64_le(memory : FixedArray[Byte], i : Int) -> UInt64 {
+fn read_u64_le(memory : FixedArray[Byte], i : Int32) -> UInt64 {
   memory[i].to_uint64() |
   (memory[i + 1].to_uint64() << 8) |
   (memory[i + 2].to_uint64() << 16) |
@@ -84,7 +84,7 @@ fn read_u64_le(memory : FixedArray[Byte], i : Int) -> UInt64 {
 }
 
 ///|
-fn write_u64_le(memory : FixedArray[Byte], i : Int, value : UInt64) -> Unit {
+fn write_u64_le(memory : FixedArray[Byte], i : Int32, value : UInt64) -> Unit {
   memory[i] = value.to_byte()
   memory[i + 1] = (value >> 8).to_byte()
   memory[i + 2] = (value >> 16).to_byte()
@@ -98,7 +98,7 @@ fn write_u64_le(memory : FixedArray[Byte], i : Int, value : UInt64) -> Unit {
 ///|
 fn load_u64_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> UInt64 raise TrapCode {
   let i = access_index(memory_len, address, 8)
@@ -108,7 +108,7 @@ fn load_u64_at(
 ///|
 fn load_u128_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
 ) -> V128Value raise TrapCode {
   let i = access_index(memory_len, address, 16)
@@ -118,7 +118,7 @@ fn load_u128_at(
 ///|
 fn store_u8_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : Byte,
 ) -> Unit raise TrapCode {
@@ -129,9 +129,9 @@ fn store_u8_at(
 ///|
 fn store_u16_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  value : Int,
+  value : Int32,
 ) -> Unit raise TrapCode {
   let i = access_index(memory_len, address, 2)
   memory[i] = value.to_byte()
@@ -141,9 +141,9 @@ fn store_u16_at(
 ///|
 fn store_u32_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
-  value : UInt,
+  value : UInt32,
 ) -> Unit raise TrapCode {
   let i = access_index(memory_len, address, 4)
   memory[i] = value.to_byte()
@@ -155,7 +155,7 @@ fn store_u32_at(
 ///|
 fn store_u64_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : UInt64,
 ) -> Unit raise TrapCode {
@@ -166,7 +166,7 @@ fn store_u64_at(
 ///|
 fn store_u128_at(
   memory : FixedArray[Byte],
-  memory_len : Int,
+  memory_len : Int32,
   address : UInt64,
   value : V128Value,
 ) -> Unit raise TrapCode {

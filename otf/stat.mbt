@@ -42,7 +42,7 @@ struct StatAxisValueSubtables {
   start : Offset32
   offsets : LazyArray16[Offset16]
   mut index : UInt16
-  version : UInt
+  version : UInt32
 }
 
 ///|
@@ -410,7 +410,7 @@ pub struct StatTable {
   axes : LazyArray16[StatAxisRecord]
   /// Fallback name when everything can be elided.
   fallback_name_id : UInt16?
-  version : UInt
+  version : UInt32
   data : BytesView
   value_lookup_start : Offset32
   value_offsets : LazyArray16[Offset16]

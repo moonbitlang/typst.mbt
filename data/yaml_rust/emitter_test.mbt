@@ -2,7 +2,7 @@
 // tests/test_round_trip.rs and `test_mapvec_legal` of tests/spec_test.rs.
 
 ///|
-fn dump(doc : @yaml_rust.Yaml, compact? : Bool = true) -> String {
+fn dump(doc : @yaml_rust.Yaml, compact~ : Bool = true) -> String {
   let writer = StringBuilder()
   let emitter = @yaml_rust.YamlEmitter::new(writer)
   emitter.compact(compact)

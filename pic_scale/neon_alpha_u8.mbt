@@ -6,7 +6,7 @@
 
 ///|
 /// `neon_div_by_255_n`: `vqrshrn_n_u16::<8>(vrsraq_n_u16::<8>(v, v))`.
-fn neon_div_by_255(v : Int) -> Int {
+fn neon_div_by_255(v : Int32) -> Int32 {
   let t = v + ((v + 128) >> 8)
   let r = (t + 128) >> 8
   if r > 255 {
@@ -21,10 +21,10 @@ fn neon_div_by_255(v : Int) -> Int {
 /// multiplied by alpha (`vmull_u8` + `neon_div_by_255_n`), alpha is kept.
 fn neon_premultiply_alpha_rgba(
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   src : FixedArray[Byte],
-  src_offset : Int,
-  width : Int,
+  src_offset : Int32,
+  width : Int32,
 ) -> Unit {
   for x in 0..<width {
     let s = src_offset + x * 4
@@ -39,7 +39,7 @@ fn neon_premultiply_alpha_rgba(
 
 ///|
 /// `vcvtq_s32_f32` (round toward zero, saturating) of a positive value.
-fn cvt_s32_f32(v : Float) -> Int {
+fn cvt_s32_f32(v : Float) -> Int32 {
   let d = v.to_double()
   if d >= 2147483648.0 {
     0x7fffffff
@@ -56,8 +56,8 @@ fn cvt_s32_f32(v : Float) -> Int {
 /// transparent black, alpha is kept.
 fn neon_unpremultiply_alpha_rgba(
   in_place : FixedArray[Byte],
-  offset : Int,
-  width : Int,
+  offset : Int32,
+  width : Int32,
 ) -> Unit {
   let q : Float = Float::from_int(0x7fffffff)
   for x in 0..<width {

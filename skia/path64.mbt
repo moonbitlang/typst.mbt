@@ -120,7 +120,7 @@ fn halley_cbrt3d(d : Double) -> Double {
 /// cube root approximation using bit hack for 64-bit float
 /// adapted from Kahan's cbrt
 fn cbrt_5d(d : Double) -> Double {
-  let b1 : UInt = 715094163
+  let b1 : UInt32 = 715094163
   let hi = (d.reinterpret_as_uint64() >> 32).to_uint()
   let t_hi = hi / 3 + b1
   (t_hi.to_uint64() << 32).reinterpret_as_double()
@@ -234,12 +234,12 @@ fn Cubic64::point_at_t(self : Cubic64, t : Double) -> Point64 {
 ///|
 fn Cubic64::search_roots(
   self : Cubic64,
-  extrema : Int,
+  extrema : Int32,
   axis_intercept : Double,
   x_axis : SearchAxis,
   extreme_ts : FixedArray[Double],
   valid_roots : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   let mut extrema = extrema
   extrema += self.find_inflections(extreme_ts, extrema)
   extreme_ts[extrema] = 0.0
@@ -280,8 +280,8 @@ fn Cubic64::search_roots(
 fn Cubic64::find_inflections(
   self : Cubic64,
   t_values : FixedArray[Double],
-  offset : Int,
-) -> Int {
+  offset : Int32,
+) -> Int32 {
   let ax = self.points[1].x - self.points[0].x
   let ay = self.points[1].y - self.points[0].y
   let bx = self.points[2].x - 2.0 * self.points[1].x + self.points[0].x
@@ -415,7 +415,7 @@ fn interp_cubic_coords(
 ///|
 fn cubic64_coefficients(
   src : FixedArray[Double],
-  offset : Int,
+  offset : Int32,
 ) -> (Double, Double, Double, Double) {
   let mut a = src[offset + 6] // d
   let mut b = src[offset + 4] * 3.0 // 3*c
@@ -435,7 +435,7 @@ fn cubic64_roots_valid_t(
   c : Double,
   d : Double,
   t : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   let s = FixedArray::make(3, 0.0)
   let real_roots = cubic64_roots_real(a, b, c, d, s)
   let mut found_roots = quad64_push_valid_ts(s, real_roots, t, 0)
@@ -480,7 +480,7 @@ fn cubic64_roots_real(
   c : Double,
   d : Double,
   s : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   if approximately_zero(a) &&
     approximately_zero_when_compared_to(a, b) &&
     approximately_zero_when_compared_to(a, c) &&
@@ -580,9 +580,9 @@ fn cubic64_roots_real(
 /// Solve for t, keeping only those that fit between 0 < t < 1
 fn cubic64_find_extrema(
   src : FixedArray[Double],
-  offset : Int,
+  offset : Int32,
   t_values : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   // we divide A,B,C by 3 to simplify
   let a = src[offset + 0]
   let b = src[offset + 2]
@@ -599,10 +599,10 @@ fn cubic64_find_extrema(
 ///|
 fn quad64_push_valid_ts(
   s : FixedArray[Double],
-  real_roots : Int,
+  real_roots : Int32,
   t : FixedArray[Double],
-  t_offset : Int,
-) -> Int {
+  t_offset : Int32,
+) -> Int32 {
   let mut found_roots = 0
   for index in 0..<real_roots {
     let mut t_value = s[index]
@@ -632,8 +632,8 @@ fn quad64_roots_valid_t(
   b : Double,
   c : Double,
   t : FixedArray[Double],
-  t_offset : Int,
-) -> Int {
+  t_offset : Int32,
+) -> Int32 {
   let s = FixedArray::make(3, 0.0)
   let real_roots = quad64_roots_real(a, b, c, s)
   quad64_push_valid_ts(s, real_roots, t, t_offset)
@@ -652,7 +652,7 @@ fn quad64_roots_real(
   b : Double,
   c : Double,
   s : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   if a == 0.0 {
     return quad64_handle_zero(b, c, s)
   }
@@ -678,7 +678,7 @@ fn quad64_roots_real(
 }
 
 ///|
-fn quad64_handle_zero(b : Double, c : Double, s : FixedArray[Double]) -> Int {
+fn quad64_handle_zero(b : Double, c : Double, s : FixedArray[Double]) -> Int32 {
   if approximately_zero(b) {
     s[0] = 0.0
     if c == 0.0 {
@@ -699,7 +699,7 @@ fn horizontal_intersect(
   cubic : Cubic64,
   axis_intercept : Double,
   roots : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   let (a, b, c, d) = cubic64_coefficients(cubic.as_f64_slice(), 1)
   let d = d - axis_intercept
   let mut count = cubic64_roots_valid_t(a, b, c, d, roots)
@@ -722,7 +722,7 @@ fn vertical_intersect(
   cubic : Cubic64,
   axis_intercept : Double,
   roots : FixedArray[Double],
-) -> Int {
+) -> Int32 {
   let (a, b, c, d) = cubic64_coefficients(cubic.as_f64_slice(), 0)
   let d = d - axis_intercept
   let mut count = cubic64_roots_valid_t(a, b, c, d, roots)

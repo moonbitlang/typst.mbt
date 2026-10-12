@@ -172,7 +172,7 @@ pub(all) enum Component {
   OffsetSecond(padding~ : Padding)
   /// A number of bytes to ignore when parsing. This has no effect on
   /// formatting.
-  Ignore(count~ : Int)
+  Ignore(count~ : Int32)
   /// A Unix timestamp in seconds.
   UnixTimestampSecond(sign_is_mandatory~ : Bool)
   /// A Unix timestamp in milliseconds.

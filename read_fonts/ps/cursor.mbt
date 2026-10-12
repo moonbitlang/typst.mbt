@@ -4,7 +4,7 @@
 ///|
 priv struct Cursor {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -13,20 +13,20 @@ fn Cursor::new(data : BytesView) -> Cursor {
 }
 
 ///|
-fn Cursor::advance_by(self : Cursor, n : Int) -> Unit {
+fn Cursor::advance_by(self : Cursor, n : Int32) -> Unit {
   let r = self.pos.to_int64() + n.to_int64()
   self.pos = if r > 2147483647L { 2147483647 } else { r.to_int() }
 }
 
 ///|
-fn Cursor::check(self : Cursor, p : Int, len : Int) -> Unit raise PsError {
+fn Cursor::check(self : Cursor, p : Int32, len : Int32) -> Unit raise PsError {
   if p < 0 || len > self.data.length() - p {
     raise oob()
   }
 }
 
 ///|
-fn Cursor::read_u8(self : Cursor) -> Int raise PsError {
+fn Cursor::read_u8(self : Cursor) -> Int32 raise PsError {
   let p = self.pos
   self.advance_by(1)
   self.check(p, 1)
@@ -34,7 +34,7 @@ fn Cursor::read_u8(self : Cursor) -> Int raise PsError {
 }
 
 ///|
-fn Cursor::read_i16(self : Cursor) -> Int raise PsError {
+fn Cursor::read_i16(self : Cursor) -> Int32 raise PsError {
   let p = self.pos
   self.advance_by(2)
   self.check(p, 2)
@@ -42,7 +42,7 @@ fn Cursor::read_i16(self : Cursor) -> Int raise PsError {
 }
 
 ///|
-fn Cursor::read_i32(self : Cursor) -> Int raise PsError {
+fn Cursor::read_i32(self : Cursor) -> Int32 raise PsError {
   let p = self.pos
   self.advance_by(4)
   self.check(p, 4)
@@ -56,8 +56,8 @@ fn Cursor::read_i32(self : Cursor) -> Int raise PsError {
 /// Reads `n` elements of `size` bytes and advances.
 fn Cursor::read_array(
   self : Cursor,
-  n : Int,
-  size : Int,
+  n : Int32,
+  size : Int32,
 ) -> BytesView raise PsError {
   let len = n.to_int64() * size.to_int64()
   if len > 2147483647L {
@@ -70,7 +70,7 @@ fn Cursor::read_array(
 }
 
 ///|
-fn Cursor::position(self : Cursor) -> Int raise PsError {
+fn Cursor::position(self : Cursor) -> Int32 raise PsError {
   if self.pos > self.data.length() {
     raise oob()
   }
@@ -78,7 +78,7 @@ fn Cursor::position(self : Cursor) -> Int raise PsError {
 }
 
 ///|
-fn Cursor::remaining_bytes(self : Cursor) -> Int {
+fn Cursor::remaining_bytes(self : Cursor) -> Int32 {
   let r = self.data.length() - self.pos
   if r < 0 {
     0
@@ -90,7 +90,7 @@ fn Cursor::remaining_bytes(self : Cursor) -> Int {
 // Big-endian helpers on byte views (bounds checked).
 
 ///|
-fn read_u8_at(data : BytesView, p : Int) -> Int raise PsError {
+fn read_u8_at(data : BytesView, p : Int32) -> Int32 raise PsError {
   if p < 0 || p + 1 > data.length() {
     raise oob()
   }
@@ -98,7 +98,7 @@ fn read_u8_at(data : BytesView, p : Int) -> Int raise PsError {
 }
 
 ///|
-fn read_u16_at(data : BytesView, p : Int) -> Int raise PsError {
+fn read_u16_at(data : BytesView, p : Int32) -> Int32 raise PsError {
   if p < 0 || p + 2 > data.length() {
     raise oob()
   }
@@ -106,7 +106,7 @@ fn read_u16_at(data : BytesView, p : Int) -> Int raise PsError {
 }
 
 ///|
-fn read_u24_at(data : BytesView, p : Int) -> Int raise PsError {
+fn read_u24_at(data : BytesView, p : Int32) -> Int32 raise PsError {
   if p < 0 || p + 3 > data.length() {
     raise oob()
   }
@@ -114,7 +114,7 @@ fn read_u24_at(data : BytesView, p : Int) -> Int raise PsError {
 }
 
 ///|
-fn read_u32_at(data : BytesView, p : Int) -> Int raise PsError {
+fn read_u32_at(data : BytesView, p : Int32) -> Int32 raise PsError {
   if p < 0 || p + 4 > data.length() {
     raise oob()
   }
@@ -126,7 +126,7 @@ fn read_u32_at(data : BytesView, p : Int) -> Int raise PsError {
 
 ///|
 /// `data.get(start..)` in Rust.
-fn get_from(data : BytesView, start : Int) -> BytesView? {
+fn get_from(data : BytesView, start : Int32) -> BytesView? {
   if start < 0 || start > data.length() {
     None
   } else {
@@ -136,7 +136,7 @@ fn get_from(data : BytesView, start : Int) -> BytesView? {
 
 ///|
 /// `data.get(start..end)` in Rust.
-fn get_range(data : BytesView, start : Int, end : Int) -> BytesView? {
+fn get_range(data : BytesView, start : Int32, end : Int32) -> BytesView? {
   if start < 0 || start > end || end > data.length() {
     None
   } else {

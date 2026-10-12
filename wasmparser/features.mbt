@@ -8,7 +8,7 @@
 /// upstream's `WasmFeatures::MUTABLE_GLOBAL` etc.). `WasmFeatures` is an
 /// immutable value: `set`, `union`, ... return a new set.
 pub(all) struct WasmFeatures {
-  bits : UInt
+  bits : UInt32
 } derive(Eq, Hash)
 
 ///|
@@ -23,130 +23,130 @@ pub extend WasmFeatures with Hash::{hash, hash_combine}
 
 ///|
 /// The WebAssembly `mutable-global` proposal.
-pub const MUTABLE_GLOBAL : UInt = 1
+pub const MUTABLE_GLOBAL : UInt32 = 1
 
 ///|
 /// The WebAssembly `saturating-float-to-int` proposal.
-pub const SATURATING_FLOAT_TO_INT : UInt = 0x2
+pub const SATURATING_FLOAT_TO_INT : UInt32 = 0x2
 
 ///|
 /// The WebAssembly `sign-extension-ops` proposal.
-pub const SIGN_EXTENSION : UInt = 0x4
+pub const SIGN_EXTENSION : UInt32 = 0x4
 
 ///|
 /// The WebAssembly reference types proposal.
-pub const REFERENCE_TYPES : UInt = 0x8
+pub const REFERENCE_TYPES : UInt32 = 0x8
 
 ///|
 /// The WebAssembly multi-value proposal.
-pub const MULTI_VALUE : UInt = 0x10
+pub const MULTI_VALUE : UInt32 = 0x10
 
 ///|
 /// The WebAssembly bulk memory operations proposal.
-pub const BULK_MEMORY : UInt = 0x20
+pub const BULK_MEMORY : UInt32 = 0x20
 
 ///|
 /// The WebAssembly SIMD proposal.
-pub const SIMD : UInt = 0x40
+pub const SIMD : UInt32 = 0x40
 
 ///|
 /// The WebAssembly Relaxed SIMD proposal.
-pub const RELAXED_SIMD : UInt = 0x80
+pub const RELAXED_SIMD : UInt32 = 0x80
 
 ///|
 /// The WebAssembly threads proposal.
-pub const THREADS : UInt = 0x100
+pub const THREADS : UInt32 = 0x100
 
 ///|
 /// The WebAssembly shared-everything-threads proposal; includes new
 /// component model built-ins.
-pub const SHARED_EVERYTHING_THREADS : UInt = 0x200
+pub const SHARED_EVERYTHING_THREADS : UInt32 = 0x200
 
 ///|
 /// The WebAssembly tail-call proposal.
-pub const TAIL_CALL : UInt = 0x400
+pub const TAIL_CALL : UInt32 = 0x400
 
 ///|
 /// Whether or not floating-point instructions are enabled.
-pub const FLOATS : UInt = 0x800
+pub const FLOATS : UInt32 = 0x800
 
 ///|
 /// The WebAssembly multi memory proposal.
-pub const MULTI_MEMORY : UInt = 0x1000
+pub const MULTI_MEMORY : UInt32 = 0x1000
 
 ///|
 /// The WebAssembly exception handling proposal.
-pub const EXCEPTIONS : UInt = 0x2000
+pub const EXCEPTIONS : UInt32 = 0x2000
 
 ///|
 /// The WebAssembly memory64 proposal.
-pub const MEMORY64 : UInt = 0x4000
+pub const MEMORY64 : UInt32 = 0x4000
 
 ///|
 /// The WebAssembly extended_const proposal.
-pub const EXTENDED_CONST : UInt = 0x8000
+pub const EXTENDED_CONST : UInt32 = 0x8000
 
 ///|
 /// The WebAssembly component model proposal.
-pub const COMPONENT_MODEL : UInt = 0x10000
+pub const COMPONENT_MODEL : UInt32 = 0x10000
 
 ///|
 /// The WebAssembly typed function references proposal.
-pub const FUNCTION_REFERENCES : UInt = 0x20000
+pub const FUNCTION_REFERENCES : UInt32 = 0x20000
 
 ///|
 /// The WebAssembly memory control proposal.
-pub const MEMORY_CONTROL : UInt = 0x40000
+pub const MEMORY_CONTROL : UInt32 = 0x40000
 
 ///|
 /// The WebAssembly gc proposal.
-pub const GC : UInt = 0x80000
+pub const GC : UInt32 = 0x80000
 
 ///|
 /// The WebAssembly custom-page-sizes proposal.
-pub const CUSTOM_PAGE_SIZES : UInt = 0x100000
+pub const CUSTOM_PAGE_SIZES : UInt32 = 0x100000
 
 ///|
 /// Support for the legacy exceptions proposal.
-pub const LEGACY_EXCEPTIONS : UInt = 0x800000
+pub const LEGACY_EXCEPTIONS : UInt32 = 0x800000
 
 ///|
 /// Whether or not gc types are enabled.
-pub const GC_TYPES : UInt = 0x1000000
+pub const GC_TYPES : UInt32 = 0x1000000
 
 ///|
 /// The WebAssembly stack-switching proposal.
-pub const STACK_SWITCHING : UInt = 0x2000000
+pub const STACK_SWITCHING : UInt32 = 0x2000000
 
 ///|
 /// The WebAssembly wide-arithmetic proposal.
-pub const WIDE_ARITHMETIC : UInt = 0x4000000
+pub const WIDE_ARITHMETIC : UInt32 = 0x4000000
 
 ///|
 /// Support for values in the component model.
-pub const CM_VALUES : UInt = 0x200000
+pub const CM_VALUES : UInt32 = 0x200000
 
 ///|
 /// Support for the nested namespaces and projects in component model names.
-pub const CM_NESTED_NAMES : UInt = 0x400000
+pub const CM_NESTED_NAMES : UInt32 = 0x400000
 
 ///|
 /// Support for component model async lift/lower ABI, as well as streams,
 /// futures, and errors.
-pub const CM_ASYNC : UInt = 0x8000000
+pub const CM_ASYNC : UInt32 = 0x8000000
 
 ///|
 /// Gates the "stackful ABI" in the component model async proposal.
-pub const CM_ASYNC_STACKFUL : UInt = 0x10000000
+pub const CM_ASYNC_STACKFUL : UInt32 = 0x10000000
 
 ///|
 /// Gates some intrinsics being marked with `async` in the component model
 /// async proposal.
-pub const CM_ASYNC_BUILTINS : UInt = 0x20000000
+pub const CM_ASYNC_BUILTINS : UInt32 = 0x20000000
 
 ///|
 /// All flags (`bitflags`' `all()`).
-let all_feature_bits : UInt = MUTABLE_GLOBAL |
+let all_feature_bits : UInt32 = MUTABLE_GLOBAL |
   SATURATING_FLOAT_TO_INT |
   SIGN_EXTENSION |
   REFERENCE_TYPES |
@@ -188,12 +188,12 @@ pub fn WasmFeatures::all() -> WasmFeatures {
 }
 
 ///|
-pub fn WasmFeatures::from_bits_truncate(bits : UInt) -> WasmFeatures {
+pub fn WasmFeatures::from_bits_truncate(bits : UInt32) -> WasmFeatures {
   { bits: bits & all_feature_bits, }
 }
 
 ///|
-pub fn WasmFeatures::bits(self : WasmFeatures) -> UInt {
+pub fn WasmFeatures::bits(self : WasmFeatures) -> UInt32 {
   self.bits
 }
 
@@ -238,7 +238,7 @@ pub fn WasmFeatures::default() -> WasmFeatures {
 /// Returns the set with the `flags` inserted (`enable`) or removed.
 pub fn WasmFeatures::set(
   self : WasmFeatures,
-  flags : UInt,
+  flags : UInt32,
   enable : Bool,
 ) -> WasmFeatures {
   if enable {
@@ -249,18 +249,24 @@ pub fn WasmFeatures::set(
 }
 
 ///|
-pub fn WasmFeatures::insert(self : WasmFeatures, flags : UInt) -> WasmFeatures {
+pub fn WasmFeatures::insert(
+  self : WasmFeatures,
+  flags : UInt32,
+) -> WasmFeatures {
   { bits: self.bits | flags, }
 }
 
 ///|
-pub fn WasmFeatures::remove(self : WasmFeatures, flags : UInt) -> WasmFeatures {
+pub fn WasmFeatures::remove(
+  self : WasmFeatures,
+  flags : UInt32,
+) -> WasmFeatures {
   { bits: self.bits & flags.lnot(), }
 }
 
 ///|
 /// Whether all of `flags` are set.
-pub fn WasmFeatures::contains(self : WasmFeatures, flags : UInt) -> Bool {
+pub fn WasmFeatures::contains(self : WasmFeatures, flags : UInt32) -> Bool {
   (self.bits & flags) == flags
 }
 

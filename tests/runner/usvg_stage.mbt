@@ -376,7 +376,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
 
 ///|
 /// Typst's `draw_svg_glyph` up to the bounding box (before `fixup_svg`).
-fn usvg_glyph(face : @otf.Face, gid : Int) -> (String, @tiny_skia_path.Rect)? {
+fn usvg_glyph(face : @otf.Face, gid : Int32) -> (String, @tiny_skia_path.Rect)? {
   guard face.glyph_svg_image(@otf.GlyphId(gid.to_uint16())) is Some(doc) else {
     return None
   }

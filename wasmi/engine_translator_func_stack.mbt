@@ -136,7 +136,7 @@ pub fn ImmediateOperand::ty(self : ImmediateOperand) -> @wasmi_core.ValType {
 
 ///|
 /// A [`StackOperand`] or [`Operand`] index on the operand stack.
-pub(all) struct OperandIdx(Int) derive(Eq, Debug)
+pub(all) struct OperandIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -191,9 +191,9 @@ priv struct OperandStack {
   /// Upstream `LocalsHead` (locals.rs).
   local_heads : Array[OperandIdx?]
   /// The maximum height of the [`OperandStack`].
-  mut max_height : Int
+  mut max_height : Int32
   /// The number of locals on the [`OperandStack`].
-  mut len_locals : Int
+  mut len_locals : Int32
 }
 
 ///|
@@ -215,7 +215,7 @@ fn OperandStack::reset(self : OperandStack) -> Unit {
 
 ///|
 /// Register `amount` local variables of common type `ty`.
-fn OperandStack::register_locals(self : OperandStack, amount : Int) -> Unit {
+fn OperandStack::register_locals(self : OperandStack, amount : Int32) -> Unit {
   for _ in 0..<amount {
     self.local_heads.push(None)
   }
@@ -236,12 +236,12 @@ fn OperandStack::replace_first(
 }
 
 ///|
-fn OperandStack::height(self : OperandStack) -> Int {
+fn OperandStack::height(self : OperandStack) -> Int32 {
   self.operands.length()
 }
 
 ///|
-fn OperandStack::max_height(self : OperandStack) -> Int {
+fn OperandStack::max_height(self : OperandStack) -> Int32 {
   self.max_height
 }
 
@@ -258,7 +258,10 @@ fn OperandStack::next_index(self : OperandStack) -> OperandIdx {
 }
 
 ///|
-fn OperandStack::depth_to_index(self : OperandStack, depth : Int) -> OperandIdx {
+fn OperandStack::depth_to_index(
+  self : OperandStack,
+  depth : Int32,
+) -> OperandIdx {
   OperandIdx(self.height() - depth - 1)
 }
 
@@ -316,7 +319,7 @@ fn OperandStack::push_immediate(
 
 ///|
 /// Returns the top-most `n` operands (bottom to top).
-fn OperandStack::peek(self : OperandStack, n : Int) -> Array[Operand] {
+fn OperandStack::peek(self : OperandStack, n : Int32) -> Array[Operand] {
   let len_operands = self.operands.length()
   let first_index = len_operands - n
   let out = []
@@ -340,7 +343,7 @@ fn OperandStack::pop(self : OperandStack) -> Operand {
 }
 
 ///|
-fn OperandStack::get(self : OperandStack, depth : Int) -> Operand {
+fn OperandStack::get(self : OperandStack, depth : Int32) -> Operand {
   let index = self.depth_to_index(depth)
   let operand = self.get_at(index)
   Operand::new(index, operand)
@@ -355,7 +358,7 @@ fn OperandStack::get_at(
 }
 
 ///|
-fn OperandStack::operand_to_temp(self : OperandStack, depth : Int) -> Operand {
+fn OperandStack::operand_to_temp(self : OperandStack, depth : Int32) -> Operand {
   let index = self.depth_to_index(depth)
   let operand = self.operand_to_temp_at(index)
   Operand::new(index, operand)
@@ -477,7 +480,7 @@ pub(all) struct FrameBase {
   /// The block type of the control frame.
   ty : BlockType
   /// The value stack height upon entering the control frame.
-  height : Int
+  height : Int32
   /// This is `true` if there is at least one branch to this frame.
   mut is_branched_to : Bool
   /// The frame's fuel consumption instruction, if fuel metering is enabled.
@@ -580,7 +583,7 @@ pub fn FrameBase::ty(self : FrameBase) -> BlockType {
 
 ///|
 /// Returns the height of the control frame.
-pub fn FrameBase::height(self : FrameBase) -> Int {
+pub fn FrameBase::height(self : FrameBase) -> Int32 {
   self.height
 }
 
@@ -607,7 +610,7 @@ pub fn FrameBase::branch_to(self : FrameBase) -> Unit {
 pub fn FrameBase::len_branch_params(
   self : FrameBase,
   engine : EngineWeak,
-) -> Int {
+) -> Int32 {
   if self.is_loop {
     self.ty.len_params(engine)
   } else {
@@ -658,7 +661,7 @@ pub fn ElseControlFrame::is_end_of_then_reachable(
 /// The `else` operands of `if` control frames (upstream `ElseOperands`).
 priv struct ElseOperands {
   /// The end indices of each `else` operands.
-  ends : Array[Int]
+  ends : Array[Int32]
   /// All operands of all allocated `else` control frames.
   operands : Array[Operand]
 }
@@ -702,7 +705,7 @@ fn ControlStack::reset(self : ControlStack) -> Unit {
 }
 
 ///|
-fn ControlStack::height(self : ControlStack) -> Int {
+fn ControlStack::height(self : ControlStack) -> Int32 {
   self.frames.length()
 }
 
@@ -757,7 +760,7 @@ fn ControlStack::pop_else_operands(self : ControlStack) -> Array[Operand] {
 }
 
 ///|
-fn ControlStack::get(self : ControlStack, depth : Int) -> ControlFrame {
+fn ControlStack::get(self : ControlStack, depth : Int32) -> ControlFrame {
   let height = self.height()
   if depth >= height {
     abort(
@@ -769,7 +772,7 @@ fn ControlStack::get(self : ControlStack, depth : Int) -> ControlFrame {
 
 ///|
 /// Returns `true` if `depth` refers to the function body block.
-fn ControlStack::is_root(self : ControlStack, depth : Int) -> Bool {
+fn ControlStack::is_root(self : ControlStack, depth : Int32) -> Bool {
   if self.frames.is_empty() {
     return false
   }
@@ -820,7 +823,7 @@ pub fn TranslatorStack::new(engine : EngineWeak) -> TranslatorStack {
 #warnings("-unused_error_type")
 pub fn TranslatorStack::register_locals(
   self : TranslatorStack,
-  amount : Int,
+  amount : Int32,
 ) -> Unit raise WasmiError {
   self.operands.register_locals(amount)
 }
@@ -833,19 +836,19 @@ pub fn TranslatorStack::is_control_empty(self : TranslatorStack) -> Bool {
 
 ///|
 /// Returns the current height of the [`Stack`].
-pub fn TranslatorStack::height(self : TranslatorStack) -> Int {
+pub fn TranslatorStack::height(self : TranslatorStack) -> Int32 {
   self.operands.height()
 }
 
 ///|
 /// Returns the maximum height of the [`Stack`].
-pub fn TranslatorStack::max_height(self : TranslatorStack) -> Int {
+pub fn TranslatorStack::max_height(self : TranslatorStack) -> Int32 {
   self.operands.max_height()
 }
 
 ///|
 /// Truncates `self` to the target `height`.
-pub fn TranslatorStack::trunc(self : TranslatorStack, height : Int) -> Unit {
+pub fn TranslatorStack::trunc(self : TranslatorStack, height : Int32) -> Unit {
   while self.height() > height {
     self.pop() |> ignore
   }
@@ -1041,7 +1044,7 @@ pub fn TranslatorStack::push_else_operands(
 /// Returns a shared reference to the [`ControlFrame`] at `depth`.
 pub fn TranslatorStack::peek_control(
   self : TranslatorStack,
-  depth : Int,
+  depth : Int32,
 ) -> ControlFrame {
   self.controls.get(depth)
 }
@@ -1050,7 +1053,7 @@ pub fn TranslatorStack::peek_control(
 /// Returns an exclusive reference to the [`ControlFrame`] at `depth`.
 pub fn TranslatorStack::peek_control_mut(
   self : TranslatorStack,
-  depth : Int,
+  depth : Int32,
 ) -> AcquiredTarget {
   let is_root = self.controls.is_root(depth)
   let frame = self.controls.get(depth).base()
@@ -1113,7 +1116,7 @@ pub fn TranslatorStack::push_immediate(
 
 ///|
 /// Peeks the [`Operand`] at `depth`.
-pub fn TranslatorStack::peek(self : TranslatorStack, depth : Int) -> Operand {
+pub fn TranslatorStack::peek(self : TranslatorStack, depth : Int32) -> Operand {
   self.operands.get(depth)
 }
 
@@ -1140,7 +1143,7 @@ pub fn TranslatorStack::peek3(
 /// Returns the top-most `len` operands from the stack (bottom to top).
 pub fn TranslatorStack::peek_n(
   self : TranslatorStack,
-  len : Int,
+  len : Int32,
 ) -> Array[Operand] {
   self.operands.peek(len)
 }
@@ -1174,7 +1177,7 @@ pub fn TranslatorStack::pop3(
 /// Pops `len` operands from the stack and store them into `buffer`.
 pub fn TranslatorStack::pop_n(
   self : TranslatorStack,
-  len : Int,
+  len : Int32,
   buffer : Array[Operand],
 ) -> Unit {
   buffer.clear()
@@ -1205,7 +1208,7 @@ pub fn TranslatorStack::preserve_all_locals(
 /// Converts and returns the [`Operand`] at `depth` into a [`Operand::Temp`].
 pub fn TranslatorStack::operand_to_temp(
   self : TranslatorStack,
-  depth : Int,
+  depth : Int32,
 ) -> Operand {
   self.operands.operand_to_temp(depth)
 }

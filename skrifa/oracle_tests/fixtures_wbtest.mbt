@@ -40,7 +40,7 @@ fn pdf_font_streams(path : String) -> Array[BytesView] {
 fn load_case(
   root : String,
   path : String,
-  stream_len : Int,
+  stream_len : Int32,
   stream_fnv : UInt64,
 ) -> BytesView? {
   guard target_dir() is Some(t) else { return None }
@@ -62,7 +62,7 @@ fn load_case(
 fn check_dump(
   name : String,
   out : String,
-  out_len : Int,
+  out_len : Int32,
   out_fnv : UInt64,
 ) -> String? {
   let h = fnv_str(out)

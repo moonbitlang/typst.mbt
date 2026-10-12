@@ -16,10 +16,10 @@ fn is_nl(c : Char) -> Bool {
 
 ///|
 /// Index of the first newline char at or after `i`, or the length.
-fn find_newline(text : String, i : Int) -> Int {
+fn find_newline(text : String, i : Int32) -> Int32 {
   let mut j = i
   while j < text.length() {
-    if is_nl(Int::unsafe_to_char(text.code_unit_at(j).to_int())) {
+    if is_nl(Int32::unsafe_to_char(text.code_unit_at(j).to_int())) {
       return j
     }
     j += 1
@@ -29,7 +29,7 @@ fn find_newline(text : String, i : Int) -> Int {
 
 ///|
 /// Skip one newline (`\r\n` counts as one) at `i`.
-fn eat_newline(text : String, i : Int) -> Int {
+fn eat_newline(text : String, i : Int32) -> Int32 {
   if i >= text.length() {
     return i
   }
@@ -40,7 +40,7 @@ fn eat_newline(text : String, i : Int) -> Int {
     } else {
       i + 1
     }
-  } else if is_nl(Int::unsafe_to_char(c)) {
+  } else if is_nl(Int32::unsafe_to_char(c)) {
     i + 1
   } else {
     i
@@ -48,7 +48,7 @@ fn eat_newline(text : String, i : Int) -> Int {
 }
 
 ///|
-fn starts_with_at(text : String, i : Int, prefix : String) -> Bool {
+fn starts_with_at(text : String, i : Int32, prefix : String) -> Bool {
   if i + prefix.length() > text.length() {
     return false
   }

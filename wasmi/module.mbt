@@ -5,7 +5,7 @@
 
 ///|
 /// An index to a function within a Wasm module.
-pub(all) struct FuncIdx(Int) derive(Eq, Debug)
+pub(all) struct FuncIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -19,7 +19,7 @@ pub extend FuncIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a table within a Wasm module.
-pub(all) struct TableIdx(Int) derive(Eq, Debug)
+pub(all) struct TableIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -33,7 +33,7 @@ pub extend TableIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a linear memory within a Wasm module.
-pub(all) struct MemoryIdx(Int) derive(Eq, Debug)
+pub(all) struct MemoryIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,7 +47,7 @@ pub extend MemoryIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a global variable within a Wasm module.
-pub(all) struct GlobalIdx(Int) derive(Eq, Debug)
+pub(all) struct GlobalIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -61,7 +61,7 @@ pub extend GlobalIdx with @debug.Debug::{to_repr}
 
 ///|
 /// A function type index into the Wasm module's type section.
-pub(all) struct FuncTypeIdx(Int) derive(Eq, Debug)
+pub(all) struct FuncTypeIdx(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -74,7 +74,7 @@ pub extend FuncTypeIdx with Eq::{not_equal, equal}
 pub extend FuncTypeIdx with @debug.Debug::{to_repr}
 
 ///|
-pub fn FuncIdx::into_u32(self : FuncIdx) -> UInt {
+pub fn FuncIdx::into_u32(self : FuncIdx) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 
@@ -89,7 +89,7 @@ pub(all) enum ExternIdx {
 
 ///|
 /// Creates a new [`ExternIdx`] from the given [`wasmparser::ExternalKind`] and `index`.
-fn ExternIdx::new(kind : @wasmparser.ExternalKind, index : UInt) -> ExternIdx {
+fn ExternIdx::new(kind : @wasmparser.ExternalKind, index : UInt32) -> ExternIdx {
   let index = index.reinterpret_as_int()
   match kind {
     Func => Func(FuncIdx(index))
@@ -270,9 +270,9 @@ priv enum ConstOp {
   /// A constant value.
   Const(@wasmi_core.UntypedVal)
   /// The value of a global variable.
-  Global(UInt)
+  Global(UInt32)
   /// A Wasm `ref.func index` value.
-  FuncRef(UInt)
+  FuncRef(UInt32)
   /// An arbitrary expression.
   Expr(ConstBinOp, ConstOp, ConstOp)
 }
@@ -280,8 +280,8 @@ priv enum ConstOp {
 ///|
 /// Context used to evaluate constant expressions (upstream `EvalContext`).
 pub(all) struct EvalContext {
-  get_global : (UInt) -> @wasmi_core.UntypedVal?
-  get_func : (UInt) -> @wasmi_core.UntypedVal?
+  get_global : (UInt32) -> @wasmi_core.UntypedVal?
+  get_func : (UInt32) -> @wasmi_core.UntypedVal?
 }
 
 ///|
@@ -407,7 +407,7 @@ pub fn ConstExpr::new(expr : @wasmparser.ConstExpr) -> ConstExpr {
 
 ///|
 /// Create a new `ref.func x` [`ConstExpr`].
-pub fn ConstExpr::new_funcref(function_index : UInt) -> ConstExpr {
+pub fn ConstExpr::new_funcref(function_index : UInt32) -> ConstExpr {
   { op: FuncRef(function_index), }
 }
 
@@ -435,8 +435,8 @@ pub fn ConstExpr::eval_const(self : ConstExpr) -> @wasmi_core.UntypedVal? {
 /// Evaluates the [`ConstExpr`] given the context for global variables and functions.
 pub fn ConstExpr::eval_with_context(
   self : ConstExpr,
-  global_get : (UInt) -> @wasmi_core.UntypedVal,
-  func_get : (UInt) -> @wasmi_core.UntypedVal,
+  global_get : (UInt32) -> @wasmi_core.UntypedVal,
+  func_get : (UInt32) -> @wasmi_core.UntypedVal,
 ) -> @wasmi_core.UntypedVal? {
   self.op.eval({
     get_global: fn(index) { Some(global_get(index)) },
@@ -601,18 +601,18 @@ pub(all) struct ModuleImports {
   /// All names and types of all imported items.
   items : Array[Imported]
   /// The amount of imported [`Func`].
-  len_funcs : Int
+  len_funcs : Int32
   /// The amount of imported [`Global`].
-  len_globals : Int
+  len_globals : Int32
   /// The amount of imported [`Memory`].
-  len_memories : Int
+  len_memories : Int32
   /// The amount of imported [`Table`].
-  len_tables : Int
+  len_tables : Int32
 }
 
 ///|
 /// The index of the default linear memory.
-pub let default_memory_index : Int = 0
+pub let default_memory_index : Int32 = 0
 
 ///|
 /// A parsed and validated WebAssembly module header.
@@ -853,7 +853,7 @@ fn Module::get_extern_type(self : Module, idx : ExternIdx) -> ExternType {
 
 ///|
 /// Compares strings by their UTF-8 bytes (Rust `str` ordering).
-fn compare_utf8(a : String, b : String) -> Int {
+fn compare_utf8(a : String, b : String) -> Int32 {
   let mut i = 0
   let mut j = 0
   while i < a.length() && j < b.length() {

@@ -72,7 +72,7 @@ pub fn html_in_bundle(
 /// Without a `link_resolver`, location links in frames are not resolved.
 pub fn html_encode(
   root : HtmlElement,
-  pretty? : Bool = false,
+  pretty~ : Bool = false,
   link_resolver? : @library.LateLinkResolver,
 ) -> String raise @library.SourceError {
   let w = Writer::new(link_resolver, pretty)
@@ -91,7 +91,7 @@ priv struct Writer {
   /// The output buffer.
   buf : StringBuilder
   /// The current indentation level
-  mut level : Int
+  mut level : Int32
   /// Used to resolve links between the document and contained frames as
   /// well as cross-document links in bundle export.
   link_resolver : @library.LateLinkResolver?

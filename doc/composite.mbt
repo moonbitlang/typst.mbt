@@ -45,13 +45,13 @@ priv struct Owner {
   kind : String
   /// Per declared parameter of the constructor, the parameter of the
   /// composite that it was marked as (`site.arg`), or `-1`: the call.
-  params : Array[Int]
+  params : Array[Int32]
 }
 
 ///|
 /// The parameter of the call that origins report (an index of `args`) for
 /// the parameter `param` of the constructor; `-1`: the call itself.
-fn Site::param(self : Site, param : Int) -> Int {
+fn Site::param(self : Site, param : Int32) -> Int32 {
   match self.owner {
     Option::None => param
     Some(owner) =>
@@ -78,10 +78,10 @@ fn Site::origin_kind(self : Site) -> String {
 priv struct SourceRange {
   file : String
   module_name : String
-  start_line : Int
-  start_column : Int
-  end_line : Int
-  end_column : Int
+  start_line : Int32
+  start_column : Int32
+  end_line : Int32
+  end_column : Int32
 } derive(Eq)
 
 ///|
@@ -115,7 +115,7 @@ fn SourceRange::contains(self : SourceRange, other : SourceRange) -> Bool {
 /// call is written, and the parameter (of the call that origins report).
 priv struct Mark {
   range : SourceRange
-  param : Int
+  param : Int32
 }
 
 ///|
@@ -136,16 +136,16 @@ let composite_scope : @ref.Ref[Scope?] = { val: Option::None, }
 
 ///|
 /// A parameter that two different marks claim.
-const AMBIGUOUS : Int = -2
+const AMBIGUOUS : Int32 = -2
 
 ///|
 /// A parameter that no mark claims.
-const UNMARKED : Int = -3
+const UNMARKED : Int32 = -3
 
 ///|
 /// The parameter that the marks inside `range` name, which are taken:
 /// `UNMARKED` if there is none, `AMBIGUOUS` if they name different ones.
-fn Scope::take(self : Scope, range : SourceRange) -> Int {
+fn Scope::take(self : Scope, range : SourceRange) -> Int32 {
   let mut found = UNMARKED
   let rest : Array[Mark] = []
   for mark in self.marks {
@@ -241,7 +241,7 @@ pub struct CompositeSite {
 #callsite(autofill(loc))
 pub fn[T] CompositeSite::arg(
   self : CompositeSite,
-  param : Int,
+  param : Int32,
   value : T,
   loc~ : SourceLoc,
 ) -> T {
@@ -297,7 +297,7 @@ fn scoped_callback(
 pub fn CompositeSite::invalid(
   self : CompositeSite,
   message : String,
-  arg? : Int = -1,
+  arg~ : Int32 = -1,
 ) -> Content {
   Content::of(NInvalid(message, self.site, self.site.param(arg)))
 }
@@ -429,7 +429,7 @@ fn table_child_kind(func : Callee) -> String {
 ///|
 /// A span of a cell as an `Int`: at least 1 (the engine rejects less, at
 /// the cell) and at most the largest `Int`.
-fn span_of(span : Int64) -> Int {
+fn span_of(span : Int64) -> Int32 {
   if span < 1L {
     1
   } else if span > 0x7fffffffL {
@@ -441,7 +441,7 @@ fn span_of(span : Int64) -> Int {
 
 ///|
 /// `Content::table_cell_spans` of a call of `func` with `args`.
-fn call_spans(func : Callee, args : Array[ArgNode]) -> (Int, Int)? {
+fn call_spans(func : Callee, args : Array[ArgNode]) -> (Int32, Int32)? {
   match table_child_kind(func) {
     "cell" => {
       // The last argument of a name wins, as in Typst: also one that the
@@ -479,7 +479,7 @@ fn call_spans(func : Callee, args : Array[ArgNode]) -> (Int, Int)? {
 ///|
 /// `Content::table_cell_spans` of content of the engine (a view): its
 /// element and its fields.
-fn engine_spans(content : @library.Content) -> (Int, Int)? {
+fn engine_spans(content : @library.Content) -> (Int32, Int32)? {
   let elem = content.elem()
   if elem == @library.table_h_line_elem() ||
     elem == @library.table_v_line_elem() ||
@@ -539,7 +539,7 @@ fn engine_spans(content : @library.Content) -> (Int, Int)? {
 /// For packages of elements (`doc/kit`), to which a description is opaque:
 /// an element that takes the cells of a table by rows checks with it that
 /// every row fills the columns.
-pub fn Content::table_cell_spans(self : Content) -> (Int, Int)? {
+pub fn Content::table_cell_spans(self : Content) -> (Int32, Int32)? {
   match self.node {
     NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
       body.table_cell_spans()

@@ -332,7 +332,7 @@ fn to_relative(c : Byte) -> Byte {
 ///|
 fn is_number_start(c : Byte) -> Bool {
   match c {
-    b'0'..=b'9' | b'.' | b'-' | b'+' => true
+    b'0'..<=b'9' | b'.' | b'-' | b'+' => true
     _ => false
   }
 }

@@ -6,16 +6,16 @@
 /// An NFA state.
 priv enum State {
   /// Match a char in the (non-empty) class and go to `next`.
-  Ranges(FixedArray[Int], next~ : Int)
+  Ranges(FixedArray[Int32], next~ : Int32)
   /// An assertion.
-  Look(Look, next~ : Int)
+  Look(Look, next~ : Int32)
   /// Alternatives in order of preference. If `reverse`, alternatives are
   /// patched in reverse preference order (upstream `UnionReverse`).
-  Union(Array[Int], reverse~ : Bool)
+  Union(Array[Int32], reverse~ : Bool)
   /// Record the current position in a slot.
-  Capture(Int, next~ : Int)
+  Capture(Int32, next~ : Int32)
   /// An epsilon transition.
-  Empty(next~ : Int)
+  Empty(next~ : Int32)
   /// Never matches.
   Fail
   /// A match.
@@ -26,22 +26,22 @@ priv enum State {
 /// A compiled program.
 priv struct Nfa {
   states : Array[State]
-  start : Int
+  start : Int32
   /// The number of capture groups (including the implicit group 0).
-  group_len : Int
+  group_len : Int32
   /// The reusable search state.
   cache : Ref[Cache?]
   /// If the whole regex is a single char class (`Capture(0) -> Ranges ->
   /// Capture(1) -> Match`), its ranges: searches then just scan for a char
   /// in the class.
-  single_class : FixedArray[Int]?
+  single_class : FixedArray[Int32]?
 }
 
 ///|
 /// A start and end state of a compiled sub-expression.
 priv struct ThompsonRef {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -50,24 +50,24 @@ priv struct Compiler {
 }
 
 ///|
-fn Compiler::add(self : Compiler, state : State) -> Int {
+fn Compiler::add(self : Compiler, state : State) -> Int32 {
   self.states.push(state)
   self.states.length() - 1
 }
 
 ///|
-fn Compiler::add_empty(self : Compiler) -> Int {
+fn Compiler::add_empty(self : Compiler) -> Int32 {
   self.add(Empty(next=-1))
 }
 
 ///|
-fn Compiler::add_union(self : Compiler) -> Int {
+fn Compiler::add_union(self : Compiler) -> Int32 {
   self.add(Union([], reverse=false))
 }
 
 ///|
 /// Patch the outgoing transition of `from` to point to `to`.
-fn Compiler::patch(self : Compiler, from : Int, to : Int) -> Unit {
+fn Compiler::patch(self : Compiler, from : Int32, to : Int32) -> Unit {
   match self.states[from] {
     Ranges(r, ..) => self.states[from] = Ranges(r, next=to)
     Look(l, ..) => self.states[from] = Look(l, next=to)
@@ -84,7 +84,7 @@ fn Compiler::patch(self : Compiler, from : Int, to : Int) -> Unit {
 }
 
 ///|
-fn Compiler::add_union_greedy(self : Compiler, greedy : Bool) -> Int {
+fn Compiler::add_union_greedy(self : Compiler, greedy : Bool) -> Int32 {
   self.add(Union([], reverse=!greedy))
 }
 
@@ -127,7 +127,7 @@ fn Compiler::c(self : Compiler, hir : Hir) -> ThompsonRef {
 }
 
 ///|
-fn Compiler::c_cap(self : Compiler, index : Int, sub : Hir) -> ThompsonRef {
+fn Compiler::c_cap(self : Compiler, index : Int32, sub : Hir) -> ThompsonRef {
   let start = self.add(Capture(2 * index, next=-1))
   let inner = self.c(sub)
   let end = self.add(Capture(2 * index + 1, next=-1))
@@ -168,7 +168,7 @@ fn Compiler::c_alt(self : Compiler, subs : Array[Hir]) -> ThompsonRef {
 }
 
 ///|
-fn Compiler::c_exactly(self : Compiler, sub : Hir, n : Int) -> ThompsonRef {
+fn Compiler::c_exactly(self : Compiler, sub : Hir, n : Int32) -> ThompsonRef {
   self.c_concat(Array::make(n, sub))
 }
 
@@ -192,8 +192,8 @@ fn Compiler::c_bounded(
   self : Compiler,
   sub : Hir,
   greedy : Bool,
-  min : Int,
-  max : Int,
+  min : Int32,
+  max : Int32,
 ) -> ThompsonRef {
   let prefix = self.c_exactly(sub, min)
   if min == max {
@@ -218,7 +218,7 @@ fn Compiler::c_at_least(
   self : Compiler,
   sub : Hir,
   greedy : Bool,
-  n : Int,
+  n : Int32,
 ) -> ThompsonRef {
   if n == 0 {
     // When the expression cannot match the empty string, then we can get
@@ -260,7 +260,7 @@ fn Compiler::c_at_least(
 
 ///|
 /// Compile a HIR into an NFA, wrapping it in capture group 0.
-fn compile(hir : Hir, group_len : Int) -> Nfa {
+fn compile(hir : Hir, group_len : Int32) -> Nfa {
   let c : Compiler = { states: [], }
   let inner = c.c_cap(0, hir)
   let m = c.add(Match)
@@ -295,13 +295,13 @@ fn compile(hir : Hir, group_len : Int) -> Nfa {
 /// then only the chars before `len` are visible, as if the string ended there.
 pub struct Haystack {
   priv text : String
-  priv chars : Array[Int]
+  priv chars : Array[Int32]
   /// UTF-8 byte offset of each char position (length `chars.length() + 1`).
-  priv bytes : Array[Int]
+  priv bytes : Array[Int32]
   /// UTF-16 offset of each char position (length `chars.length() + 1`).
-  priv utf16 : Array[Int]
+  priv utf16 : Array[Int32]
   /// The number of visible chars.
-  priv len : Int
+  priv len : Int32
 }
 
 ///|
@@ -333,7 +333,7 @@ pub fn Haystack::new(s : String) -> Haystack {
 
 ///|
 /// A view of the first `len` chars (as if the string ended there).
-pub fn Haystack::prefix(self : Haystack, len : Int) -> Haystack {
+pub fn Haystack::prefix(self : Haystack, len : Int32) -> Haystack {
   { ..self, len, }
 }
 
@@ -345,44 +345,48 @@ pub fn Haystack::text(self : Haystack) -> String {
 
 ///|
 /// The number of visible chars.
-pub fn Haystack::char_len(self : Haystack) -> Int {
+pub fn Haystack::char_len(self : Haystack) -> Int32 {
   self.len
 }
 
 ///|
 /// The visible length in UTF-8 bytes.
-pub fn Haystack::byte_len(self : Haystack) -> Int {
+pub fn Haystack::byte_len(self : Haystack) -> Int32 {
   self.bytes[self.len]
 }
 
 ///|
 /// The char (Unicode scalar value) at char position `i`.
-pub fn Haystack::char_at(self : Haystack, i : Int) -> Int {
+pub fn Haystack::char_at(self : Haystack, i : Int32) -> Int32 {
   self.chars[i]
 }
 
 ///|
 /// The UTF-8 byte offset of char position `i` (`0 <= i <= char_len`).
-pub fn Haystack::byte_offset(self : Haystack, i : Int) -> Int {
+pub fn Haystack::byte_offset(self : Haystack, i : Int32) -> Int32 {
   self.bytes[i]
 }
 
 ///|
 /// The UTF-16 offset (into `text`) of char position `i`.
-pub fn Haystack::utf16_offset(self : Haystack, i : Int) -> Int {
+pub fn Haystack::utf16_offset(self : Haystack, i : Int32) -> Int32 {
   self.utf16[i]
 }
 
 ///|
 /// The substring between two char positions.
-pub fn Haystack::substring(self : Haystack, start : Int, end : Int) -> String {
+pub fn Haystack::substring(
+  self : Haystack,
+  start : Int32,
+  end : Int32,
+) -> String {
   self.text.unsafe_substring(start=self.utf16[start], end=self.utf16[end])
 }
 
 ///|
 /// The char position of a UTF-8 byte offset, if it is a (visible) char
 /// boundary.
-pub fn Haystack::char_pos(self : Haystack, byte : Int) -> Int? {
+pub fn Haystack::char_pos(self : Haystack, byte : Int32) -> Int32? {
   for lo = 0, hi = self.len + 1; lo < hi; {
     let mid = lo + (hi - lo) / 2
     let k = self.bytes[mid]
@@ -399,7 +403,7 @@ pub fn Haystack::char_pos(self : Haystack, byte : Int) -> Int? {
 }
 
 ///|
-fn is_word_ascii(c : Int) -> Bool {
+fn is_word_ascii(c : Int32) -> Bool {
   (c >= 'a' && c <= 'z') ||
   (c >= 'A' && c <= 'Z') ||
   (c >= '0' && c <= '9') ||
@@ -408,10 +412,10 @@ fn is_word_ascii(c : Int) -> Bool {
 
 ///|
 /// Whether the assertion holds at char position `at`.
-fn Haystack::look_matches(self : Haystack, look : Look, at : Int) -> Bool {
+fn Haystack::look_matches(self : Haystack, look : Look, at : Int32) -> Bool {
   let len = self.len
-  let before = (f : (Int) -> Bool) => at > 0 && f(self.chars[at - 1])
-  let after = (f : (Int) -> Bool) => at < len && f(self.chars[at])
+  let before = (f : (Int32) -> Bool) => at > 0 && f(self.chars[at - 1])
+  let after = (f : (Int32) -> Bool) => at < len && f(self.chars[at])
   let uni = @unicode.is_word_character
   match look {
     Start => at == 0
@@ -442,7 +446,7 @@ fn Haystack::look_matches(self : Haystack, look : Look, at : Int) -> Bool {
 }
 
 ///|
-fn ranges_contain(ranges : FixedArray[Int], c : Int) -> Bool {
+fn ranges_contain(ranges : FixedArray[Int32], c : Int32) -> Bool {
   let n = ranges.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -462,16 +466,16 @@ fn ranges_contain(ranges : FixedArray[Int], c : Int) -> Bool {
 /// A set of active states with a slot table (upstream `ActiveStates`).
 priv struct ActiveStates {
   /// The states in insertion order.
-  dense : Array[Int]
+  dense : Array[Int32]
   /// Whether a state is in the set.
   present : FixedArray[Bool]
   /// The capture slots of each state (`nslots` per state, flattened).
-  slots : FixedArray[Int]
-  nslots : Int
+  slots : FixedArray[Int32]
+  nslots : Int32
 }
 
 ///|
-fn ActiveStates::new(nstates : Int, nslots : Int) -> ActiveStates {
+fn ActiveStates::new(nstates : Int32, nslots : Int32) -> ActiveStates {
   {
     dense: [],
     present: FixedArray::make(nstates, false),
@@ -489,7 +493,7 @@ fn ActiveStates::clear(self : ActiveStates) -> Unit {
 }
 
 ///|
-fn ActiveStates::insert(self : ActiveStates, sid : Int) -> Bool {
+fn ActiveStates::insert(self : ActiveStates, sid : Int32) -> Bool {
   if self.present[sid] {
     return false
   }
@@ -500,8 +504,8 @@ fn ActiveStates::insert(self : ActiveStates, sid : Int) -> Bool {
 
 ///|
 priv enum FollowEpsilon {
-  Explore(Int)
-  RestoreCapture(Int, Int)
+  Explore(Int32)
+  RestoreCapture(Int32, Int32)
 }
 
 ///|
@@ -510,11 +514,11 @@ priv struct Cache {
   curr : ActiveStates
   next : ActiveStates
   stack : Array[FollowEpsilon]
-  scratch : FixedArray[Int]
+  scratch : FixedArray[Int32]
 }
 
 ///|
-fn Nfa::cache(self : Nfa, nslots : Int) -> Cache {
+fn Nfa::cache(self : Nfa, nslots : Int32) -> Cache {
   match self.cache.val {
     Some(c) if c.curr.nslots == nslots => c
     _ => {
@@ -539,11 +543,11 @@ fn Nfa::epsilon_closure(
   self : Nfa,
   hay : Haystack,
   stack : Array[FollowEpsilon],
-  curr_slots : FixedArray[Int],
-  curr_base : Int,
+  curr_slots : FixedArray[Int32],
+  curr_base : Int32,
   next : ActiveStates,
-  at : Int,
-  sid : Int,
+  at : Int32,
+  sid : Int32,
 ) -> Unit {
   let nslots = next.nslots
   stack.push(Explore(sid))
@@ -602,9 +606,9 @@ fn Nfa::epsilon_closure(
 fn Nfa::search(
   self : Nfa,
   hay : Haystack,
-  start : Int,
+  start : Int32,
   anchored : Bool,
-  out : FixedArray[Int],
+  out : FixedArray[Int32],
 ) -> Bool {
   let nslots = out.length()
   if self.single_class is Some(ranges) {

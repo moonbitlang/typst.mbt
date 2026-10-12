@@ -63,7 +63,7 @@ fn fabs(x : Double) -> Double {
 ///|
 /// Rust's `f64::powi` with a constant exponent, as lowered by LLVM
 /// (binary decomposition: `powi(x, 6) = (x*x) * ((x*x)*(x*x))`).
-fn powi(x : Double, n : Int) -> Double {
+fn powi(x : Double, n : Int32) -> Double {
   let mut res : Double? = None
   let mut cur = x
   let mut n = n
@@ -120,7 +120,7 @@ fn f64_to_u64_sat(x : Double) -> UInt64 {
 ///|
 /// Rust's saturating `f64 as usize` cast, clamped to the `Int` range (used
 /// for loop counts only).
-fn f64_to_count(x : Double) -> Int {
+fn f64_to_count(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {

@@ -40,7 +40,7 @@ pub extend FuncTypeError with Show::{to_string, output}
 /// Can be cloned cheaply.
 pub struct FuncType {
   /// The number of parameters.
-  len_params : Int
+  len_params : Int32
   /// Combined parameter and result types.
   params_results : FixedArray[ValType]
 } derive(Eq, Hash)
@@ -57,11 +57,11 @@ pub extend FuncType with Hash::{hash, hash_combine}
 
 ///|
 /// The maximum number of parameter types allowed of a [`FuncType`].
-let max_len_params : Int = 1_000
+let max_len_params : Int32 = 1_000
 
 ///|
 /// The maximum number of result types allowed of a [`FuncType`].
-let max_len_results : Int = 1_000
+let max_len_results : Int32 = 1_000
 
 ///|
 /// Creates a new [`FuncType`].
@@ -105,13 +105,13 @@ pub fn FuncType::results(self : FuncType) -> ArrayView[ValType] {
 
 ///|
 /// Returns the number of parameter types of the function type.
-pub fn FuncType::len_params(self : FuncType) -> Int {
+pub fn FuncType::len_params(self : FuncType) -> Int32 {
   self.len_params
 }
 
 ///|
 /// Returns the number of result types of the function type.
-pub fn FuncType::len_results(self : FuncType) -> Int {
+pub fn FuncType::len_results(self : FuncType) -> Int32 {
   self.params_results.length() - self.len_params
 }
 

@@ -27,7 +27,7 @@ priv struct SvgDocumentRecord {
   start_glyph_id : GlyphId
   end_glyph_id : GlyphId
   svg_doc_offset : Offset32?
-  svg_doc_length : UInt
+  svg_doc_length : UInt32
 }
 
 ///|
@@ -156,7 +156,7 @@ pub fn SvgDocumentsListIter::next(self : SvgDocumentsListIter) -> SvgDocument? {
 
 ///|
 /// Returns the number of remaining documents.
-pub fn SvgDocumentsListIter::count(self : SvgDocumentsListIter) -> Int {
+pub fn SvgDocumentsListIter::count(self : SvgDocumentsListIter) -> Int32 {
   let len = self.list.len()
   if len > self.index {
     (len - self.index).to_int()

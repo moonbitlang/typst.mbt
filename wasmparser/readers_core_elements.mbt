@@ -17,7 +17,7 @@ pub(all) enum ElementKind {
   /// The element segment is passive.
   Passive
   /// The element segment is active.
-  Active(table_index~ : UInt?, offset_expr~ : ConstExpr)
+  Active(table_index~ : UInt32?, offset_expr~ : ConstExpr)
   /// The element segment is declared.
   Declared
 }
@@ -26,7 +26,7 @@ pub(all) enum ElementKind {
 /// Represents the items of an element segment.
 pub(all) enum ElementItems {
   /// This element contains function indices.
-  Functions(SectionLimited[UInt])
+  Functions(SectionLimited[UInt32])
   /// This element contains constant expressions used to initialize the table.
   Expressions(RefType, SectionLimited[ConstExpr])
 }

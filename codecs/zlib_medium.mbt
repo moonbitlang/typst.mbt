@@ -6,12 +6,12 @@
 // 0xffff here).
 
 ///|
-const EARLY_EXIT_TRIGGER_LEVEL : Int = 5
+const EARLY_EXIT_TRIGGER_LEVEL : Int32 = 5
 
 ///|
 /// The number of equal leading bytes of `window[a..a + 256]` and
 /// `window[b..b + 256]` (upstream `compare256`).
-fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
+fn compare256(window : FixedArray[Byte], a : Int32, b : Int32) -> Int32 {
   if a >= 0 &&
     b >= 0 &&
     a <= window.length() - 256 &&
@@ -31,7 +31,10 @@ fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
 /// string at offset cur_match (upstream `longest_match`). Returns the length
 /// and stores the offset in `self.match_start` (what both callers do with
 /// upstream's tuple; a MoonBit tuple would be allocated per call).
-fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
+fn DeflateStream::longest_match(
+  self : DeflateStream,
+  cur_match : Int32,
+) -> Int32 {
   let mut cur_match = cur_match
   let mut match_start = self.match_start
   let strstart = self.strstart
@@ -181,19 +184,19 @@ fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
 #inline
 fn DeflateStream::set_match_start(
   self : DeflateStream,
-  len : Int,
-  match_start : Int,
-) -> Int {
+  len : Int32,
+  match_start : Int32,
+) -> Int32 {
   self.match_start = match_start
   len
 }
 
 ///|
 priv struct Match {
-  mut match_start : Int
-  mut match_length : Int
-  mut strstart : Int
-  mut orgstart : Int
+  mut match_start : Int32
+  mut match_length : Int32
+  mut strstart : Int32
+  mut orgstart : Int32
 }
 
 ///|
@@ -208,7 +211,7 @@ fn Match::assign(self : Match, other : Match) -> Unit {
 /// Upstream `deflate_medium`.
 fn DeflateStream::deflate_medium(
   self : DeflateStream,
-  flush : Int,
+  flush : Int32,
 ) -> BlockState {
   // For levels below 5, don't check the next position for a better match
   let early_exit = self.level < 5
@@ -430,7 +433,7 @@ fn DeflateStream::insert_match(self : DeflateStream, m : Match) -> Unit {
 ///|
 fn fizzle_matches(
   window : FixedArray[Byte],
-  max_dist : Int,
+  max_dist : Int32,
   current : Match,
   next : Match,
 ) -> Unit {

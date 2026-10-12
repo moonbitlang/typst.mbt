@@ -22,7 +22,7 @@ pub enum TrapReason {
   /// # Note
   ///
   /// This is useful for some WASI functions.
-  I32Exit(Int)
+  I32Exit(Int32)
   /// An error described by a display message.
   Message(String)
   /// Traps and errors during host execution.
@@ -33,7 +33,7 @@ pub enum TrapReason {
 /// Returns the classic `i32` exit program code of a `Trap` if any.
 ///
 /// Otherwise returns `None`.
-fn TrapReason::i32_exit_status(self : TrapReason) -> Int? {
+fn TrapReason::i32_exit_status(self : TrapReason) -> Int32? {
   if self is I32Exit(status) {
     return Some(status)
   }
@@ -86,7 +86,7 @@ pub fn Trap::downcast_ref(self : Trap) -> HostError? {
 ///|
 /// Creates a new `Trap` representing an explicit program exit with a classic `i32`
 /// exit status value.
-pub fn Trap::i32_exit(status : Int) -> Trap {
+pub fn Trap::i32_exit(status : Int32) -> Trap {
   Trap::with_reason(I32Exit(status))
 }
 
@@ -94,7 +94,7 @@ pub fn Trap::i32_exit(status : Int) -> Trap {
 /// Returns the classic `i32` exit program code of a `Trap` if any.
 ///
 /// Otherwise returns `None`.
-pub fn Trap::i32_exit_status(self : Trap) -> Int? {
+pub fn Trap::i32_exit_status(self : Trap) -> Int32? {
   self.reason.i32_exit_status()
 }
 

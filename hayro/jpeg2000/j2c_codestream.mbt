@@ -2,13 +2,13 @@
 // codestream, as described in Annex A.
 
 ///|
-const MAX_LAYER_COUNT : Int = 32
+const MAX_LAYER_COUNT : Int32 = 32
 
 ///|
-const MAX_RESOLUTION_COUNT : Int = 32
+const MAX_RESOLUTION_COUNT : Int32 = 32
 
 ///|
-const MAX_PRECINCT_EXPONENT : Int = 31
+const MAX_PRECINCT_EXPONENT : Int32 = 31
 
 ///|
 priv struct Header {
@@ -16,14 +16,14 @@ priv struct Header {
   global_coding_style : CodingStyleDefault
   component_infos : Array[ComponentInfo]
   ppm_packets : Array[PpmPacket]
-  skipped_resolution_levels : Int
+  skipped_resolution_levels : Int32
   /// Whether strict mode is enabled for decoding.
   strict : Bool
 }
 
 ///|
 priv struct PpmMarkerData {
-  sequence_idx : Int
+  sequence_idx : Int32
   packets : Array[PpmPacket]
 }
 
@@ -120,7 +120,7 @@ fn read_header(
         reader.read_marker() |> ignore
         skip_marker_segment(reader) |> ignore
       }
-      0x30..=0x3F =>
+      0x30..<=0x3F =>
         // "All markers with the marker code between 0xFF30 and 0xFF3F
         // have no marker segment parameters. They shall be skipped by
         // the decoder."
@@ -207,7 +207,7 @@ fn read_header(
 
 ///|
 /// `a.checked_div(b).and_then(|v| v.checked_ilog2()).unwrap_or(0)`.
-fn checked_ilog2_div(a : UInt, b : UInt) -> Int {
+fn checked_ilog2_div(a : UInt32, b : UInt32) -> Int32 {
   if b == 0 {
     return 0
   }
@@ -221,7 +221,7 @@ fn checked_ilog2_div(a : UInt, b : UInt) -> Int {
 
 ///|
 /// A stable sort by an integer key (Rust's `sort_by` is stable).
-fn[T] stable_sort_by_key(items : Array[T], key : (T) -> Int) -> Array[T] {
+fn[T] stable_sort_by_key(items : Array[T], key : (T) -> Int32) -> Array[T] {
   let indices = Array::makei(items.length(), i => i)
   indices.sort_by((a, b) => {
     let c = key(items[a]).compare(key(items[b]))
@@ -280,8 +280,8 @@ fn ComponentInfo::clone(self : ComponentInfo) -> ComponentInfo {
 fn ComponentInfo::exponent_mantissa(
   self : ComponentInfo,
   sub_band_type : SubBandType,
-  resolution : Int,
-) -> (Int, Int) raise DecodeError {
+  resolution : Int32,
+) -> (Int32, Int32) raise DecodeError {
   let n_ll = self.coding_style.parameters.num_decomposition_levels
   let sb_index = match sub_band_type {
     // TODO: Shouldn't be reached.
@@ -328,12 +328,12 @@ fn ComponentInfo::wavelet_transform(self : ComponentInfo) -> WaveletTransform {
 }
 
 ///|
-fn ComponentInfo::num_resolution_levels(self : ComponentInfo) -> Int {
+fn ComponentInfo::num_resolution_levels(self : ComponentInfo) -> Int32 {
   self.coding_style.parameters.num_resolution_levels
 }
 
 ///|
-fn ComponentInfo::num_decomposition_levels(self : ComponentInfo) -> Int {
+fn ComponentInfo::num_decomposition_levels(self : ComponentInfo) -> Int32 {
   self.coding_style.parameters.num_decomposition_levels
 }
 
@@ -353,7 +353,7 @@ priv enum ProgressionOrder {
 }
 
 ///|
-fn ProgressionOrder::from_u8(value : Int) -> ProgressionOrder? {
+fn ProgressionOrder::from_u8(value : Int32) -> ProgressionOrder? {
   match value {
     0 => Some(LayerResolutionComponentPosition)
     1 => Some(ResolutionLayerComponentPosition)
@@ -373,7 +373,7 @@ priv enum WaveletTransform {
 } derive(Eq)
 
 ///|
-fn WaveletTransform::from_u8(value : Int) -> WaveletTransform? {
+fn WaveletTransform::from_u8(value : Int32) -> WaveletTransform? {
   match value {
     0 => Some(Irreversible97)
     1 => Some(Reversible53)
@@ -385,11 +385,11 @@ fn WaveletTransform::from_u8(value : Int) -> WaveletTransform? {
 ///|
 /// Coding style flags (Table A.13).
 priv struct CodingStyleFlags {
-  mut raw : Int
+  mut raw : Int32
 }
 
 ///|
-fn CodingStyleFlags::from_u8(value : Int) -> CodingStyleFlags {
+fn CodingStyleFlags::from_u8(value : Int32) -> CodingStyleFlags {
   { raw: value, }
 }
 
@@ -430,7 +430,7 @@ fn CodeBlockStyle::default() -> CodeBlockStyle {
 }
 
 ///|
-fn CodeBlockStyle::from_u8(value : Int) -> CodeBlockStyle {
+fn CodeBlockStyle::from_u8(value : Int32) -> CodeBlockStyle {
   {
     selective_arithmetic_coding_bypass: (value & 0x01) != 0,
     reset_context_probabilities: (value & 0x02) != 0,
@@ -451,7 +451,7 @@ priv enum QuantizationStyle {
 } derive(Eq)
 
 ///|
-fn QuantizationStyle::from_u8(value : Int) -> QuantizationStyle? {
+fn QuantizationStyle::from_u8(value : Int32) -> QuantizationStyle? {
   match value & 0x1F {
     0 => Some(NoQuantization)
     1 => Some(ScalarDerived)
@@ -463,15 +463,15 @@ fn QuantizationStyle::from_u8(value : Int) -> QuantizationStyle? {
 
 ///|
 priv struct StepSize {
-  mantissa : Int
-  exponent : Int
+  mantissa : Int32
+  exponent : Int32
 }
 
 ///|
 /// Quantization properties, from the QCD and QCC markers (A.6.4 and A.6.5).
 priv struct QuantizationInfo {
   quantization_style : QuantizationStyle
-  mut guard_bits : Int
+  mut guard_bits : Int32
   step_sizes : Array[StepSize]
 }
 
@@ -479,7 +479,7 @@ priv struct QuantizationInfo {
 /// Default values for coding style, from the COD marker (A.6.1).
 priv struct CodingStyleDefault {
   progression_order : ProgressionOrder
-  num_layers : Int
+  num_layers : Int32
   mct : Bool
   // This is the default used for all components, if not overridden by COC.
   component_parameters : CodingStyleComponent
@@ -507,54 +507,54 @@ fn CodingStyleComponent::clone(
 ///|
 /// Shared parameters between the COC and COD marker (A.6.1 and A.6.2).
 priv struct CodingStyleParameters {
-  num_decomposition_levels : Int
-  num_resolution_levels : Int
-  code_block_width : Int
-  code_block_height : Int
+  num_decomposition_levels : Int32
+  num_resolution_levels : Int32
+  code_block_width : Int32
+  code_block_height : Int32
   code_block_style : CodeBlockStyle
   transformation : WaveletTransform
-  precinct_exponents : Array[(Int, Int)]
+  precinct_exponents : Array[(Int32, Int32)]
 }
 
 ///|
 priv struct SizeData {
   /// Width of the reference grid (Xsiz).
-  reference_grid_width : UInt
+  reference_grid_width : UInt32
   /// Height of the reference grid (Ysiz).
-  reference_grid_height : UInt
+  reference_grid_height : UInt32
   /// Horizontal offset from the origin of the reference grid to the
   /// left side of the image area (`XOsiz`).
-  image_area_x_offset : UInt
+  image_area_x_offset : UInt32
   /// Vertical offset from the origin of the reference grid to the top side of the image area (`YOsiz`).
-  image_area_y_offset : UInt
+  image_area_y_offset : UInt32
   /// Width of one reference tile with respect to the reference grid (`XTSiz`).
-  tile_width : UInt
+  tile_width : UInt32
   /// Height of one reference tile with respect to the reference grid (`YTSiz`).
-  tile_height : UInt
+  tile_height : UInt32
   /// Horizontal offset from the origin of the reference grid to the left side of the first tile (`XTOSiz`).
-  tile_x_offset : UInt
+  tile_x_offset : UInt32
   /// Vertical offset from the origin of the reference grid to the top side of the first tile (`YTOSiz`).
-  tile_y_offset : UInt
+  tile_y_offset : UInt32
   /// Component information (SSiz/XRSiz/YRSiz).
   component_sizes : Array[ComponentSizeInfo]
   /// Shrink factor in the x direction. See the comment in the parsing method.
-  x_shrink_factor : UInt
+  x_shrink_factor : UInt32
   /// Shrink factor in the y direction. See the comment in the parsing method.
-  y_shrink_factor : UInt
+  y_shrink_factor : UInt32
   /// Shrink factor in the x direction due to requesting a lower resolution level.
-  mut x_resolution_shrink_factor : UInt
+  mut x_resolution_shrink_factor : UInt32
   /// Shrink factor in the y direction due to requesting a lower resolution level.
-  mut y_resolution_shrink_factor : UInt
+  mut y_resolution_shrink_factor : UInt32
 }
 
 ///|
-fn SizeData::tile_x_coord(self : SizeData, idx : UInt) -> UInt {
+fn SizeData::tile_x_coord(self : SizeData, idx : UInt32) -> UInt32 {
   // See B-6.
   idx % self.num_x_tiles()
 }
 
 ///|
-fn SizeData::tile_y_coord(self : SizeData, idx : UInt) -> UInt {
+fn SizeData::tile_y_coord(self : SizeData, idx : UInt32) -> UInt32 {
   // See B-6.
   idx / self.num_x_tiles()
 }
@@ -562,21 +562,21 @@ fn SizeData::tile_y_coord(self : SizeData, idx : UInt) -> UInt {
 ///|
 /// Component information (A.5.1 and Table A.11).
 priv struct ComponentSizeInfo {
-  precision : Int
-  horizontal_resolution : Int
-  vertical_resolution : Int
+  precision : Int32
+  horizontal_resolution : Int32
+  vertical_resolution : Int32
 }
 
 ///|
 /// The number of tiles in the x direction.
-fn SizeData::num_x_tiles(self : SizeData) -> UInt {
+fn SizeData::num_x_tiles(self : SizeData) -> UInt32 {
   // See formula B-5.
   div_ceil_u32(self.reference_grid_width - self.tile_x_offset, self.tile_width)
 }
 
 ///|
 /// The number of tiles in the y direction.
-fn SizeData::num_y_tiles(self : SizeData) -> UInt {
+fn SizeData::num_y_tiles(self : SizeData) -> UInt32 {
   // See formula B-5.
   div_ceil_u32(
     self.reference_grid_height - self.tile_y_offset,
@@ -586,13 +586,13 @@ fn SizeData::num_y_tiles(self : SizeData) -> UInt {
 
 ///|
 /// The total number of tiles.
-fn SizeData::num_tiles(self : SizeData) -> UInt {
+fn SizeData::num_tiles(self : SizeData) -> UInt32 {
   self.num_x_tiles() * self.num_y_tiles()
 }
 
 ///|
 /// Return the overall width of the image.
-fn SizeData::image_width(self : SizeData) -> UInt {
+fn SizeData::image_width(self : SizeData) -> UInt32 {
   div_ceil_u32(
     self.reference_grid_width - self.image_area_x_offset,
     self.x_shrink_factor * self.x_resolution_shrink_factor,
@@ -601,7 +601,7 @@ fn SizeData::image_width(self : SizeData) -> UInt {
 
 ///|
 /// Return the overall height of the image.
-fn SizeData::image_height(self : SizeData) -> UInt {
+fn SizeData::image_height(self : SizeData) -> UInt32 {
   div_ceil_u32(
     self.reference_grid_height - self.image_area_y_offset,
     self.y_shrink_factor * self.y_resolution_shrink_factor,
@@ -658,7 +658,7 @@ fn size_marker(reader : BitReader) -> SizeData raise DecodeError {
       raise Validation(InvalidComponentMetadata)
     }
   }
-  let max_dimensions : UInt = 60000
+  let max_dimensions : UInt32 = 60000
   if size_data.image_width() > max_dimensions ||
     size_data.image_height() > max_dimensions {
     raise Validation(ImageTooLarge)
@@ -713,8 +713,8 @@ fn size_marker_inner(reader : BitReader) -> SizeData? {
   // reduce their dimension so that we can assume a resolution of 1 for
   // all components. This makes the images much smaller.
 
-  let mut x_shrink_factor : UInt = 1
-  let mut y_shrink_factor : UInt = 1
+  let mut x_shrink_factor : UInt32 = 1
+  let mut y_shrink_factor : UInt32 = 1
   let hr = components[0].horizontal_resolution
   let vr = components[0].vertical_resolution
   let mut same_resolution = true
@@ -879,7 +879,10 @@ fn cod_marker(reader : BitReader) -> CodingStyleDefault? {
 
 ///|
 /// COC marker (A.6.2).
-fn coc_marker(reader : BitReader, csiz : Int) -> (Int, CodingStyleComponent)? {
+fn coc_marker(
+  reader : BitReader,
+  csiz : Int32,
+) -> (Int32, CodingStyleComponent)? {
   // Length.
   guard reader.read_u16() is Some(_) else { return None }
   let component_index = if csiz < 257 {
@@ -920,7 +923,7 @@ fn qcd_marker(reader : BitReader) -> QuantizationInfo? {
 
 ///|
 /// QCC marker (A.6.5).
-fn qcc_marker(reader : BitReader, csiz : Int) -> (Int, QuantizationInfo)? {
+fn qcc_marker(reader : BitReader, csiz : Int32) -> (Int32, QuantizationInfo)? {
   guard reader.read_u16() is Some(length) else { return None }
   let component_index = if csiz < 257 {
     guard reader.read_byte() is Some(v) else { return None }
@@ -949,10 +952,10 @@ fn qcc_marker(reader : BitReader, csiz : Int) -> (Int, QuantizationInfo)? {
 fn quantization_parameters(
   reader : BitReader,
   quantization_style : QuantizationStyle,
-  remaining_bytes : Int,
+  remaining_bytes : Int32,
 ) -> QuantizationInfo? {
   let step_sizes = []
-  fn irreversible(val : Int) -> StepSize {
+  fn irreversible(val : Int32) -> StepSize {
     let exponent = val >> 11
     let mantissa = val & ((1 << 11) - 1)
     { exponent, mantissa, }
@@ -988,73 +991,73 @@ fn quantization_parameters(
 
 ///|
 /// Start of codestream - 'SOC'.
-const SOC : Int = 0x4F
+const SOC : Int32 = 0x4F
 
 ///|
 /// Start of tile-part - 'SOT'.
-const SOT : Int = 0x90
+const SOT : Int32 = 0x90
 
 ///|
 /// Start of data - 'SOD'.
-const SOD : Int = 0x93
+const SOD : Int32 = 0x93
 
 ///|
 /// End of codestream - 'EOC'.
-const EOC : Int = 0xD9
+const EOC : Int32 = 0xD9
 
 ///|
 /// Image and tile size - 'SIZ'.
-const SIZ : Int = 0x51
+const SIZ : Int32 = 0x51
 
 ///|
 /// Coding style default - 'COD'.
-const COD : Int = 0x52
+const COD : Int32 = 0x52
 
 ///|
 /// Coding component - 'COC'.
-const COC : Int = 0x53
+const COC : Int32 = 0x53
 
 ///|
 /// Region-of-interest - 'RGN'.
-const RGN : Int = 0x5E
+const RGN : Int32 = 0x5E
 
 ///|
 /// Quantization default - 'QCD'.
-const QCD : Int = 0x5C
+const QCD : Int32 = 0x5C
 
 ///|
 /// Quantization component - 'QCC'.
-const QCC : Int = 0x5D
+const QCC : Int32 = 0x5D
 
 ///|
 /// Tile-part lengths - 'TLM'.
-const TLM : Int = 0x55
+const TLM : Int32 = 0x55
 
 ///|
 /// Packet length, tile-part header - 'PLT'.
-const PLT : Int = 0x58
+const PLT : Int32 = 0x58
 
 ///|
 /// Packed packet headers, main header - 'PPM'.
-const PPM : Int = 0x60
+const PPM : Int32 = 0x60
 
 ///|
 /// Packed packet headers, tile-part header - 'PPT'.
-const PPT : Int = 0x61
+const PPT : Int32 = 0x61
 
 ///|
 /// Start of packet - 'SOP'.
-const SOP : Int = 0x91
+const SOP : Int32 = 0x91
 
 ///|
 /// End of packet header - 'EPH'.
-const EPH : Int = 0x92
+const EPH : Int32 = 0x92
 
 ///|
 /// Component registration - 'CRG'.
-const CRG : Int = 0x63
+const CRG : Int32 = 0x63
 
 ///|
 /// Comment - 'COM'.
-const COM : Int = 0x64
+const COM : Int32 = 0x64
 // (POC, PLM and `markers::to_string` are unused upstream and not ported.)

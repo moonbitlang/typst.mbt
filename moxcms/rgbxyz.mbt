@@ -24,7 +24,7 @@ priv struct TransformMatrixShaperOptimized {
 
 ///|
 /// Saturating `f32 as i16`.
-fn f32_to_i16(v : Float) -> Int {
+fn f32_to_i16(v : Float) -> Int32 {
   @pxfm.f32_as_i16(v)
 }
 
@@ -128,7 +128,7 @@ fn[T : Sample] make_rgb_xyz_q2_13_opt(
 ///|
 /// NEON `SQRDMLAH` on one 32-bit lane: saturate((acc << 32) + 2 * a * b +
 /// 2^31) >> 32.
-fn qrdmlah_s32(acc : Int, a : Int, b : Int) -> Int {
+fn qrdmlah_s32(acc : Int32, a : Int32, b : Int32) -> Int32 {
   let r = acc.to_int64() + ((a.to_int64() * b.to_int64() + (1L << 30)) >> 31)
   if r > 2147483647L {
     2147483647

@@ -83,7 +83,7 @@ fn InlineItem::textual(self : InlineItem) -> String {
 
 ///|
 /// The text length of the item (in UTF-8 bytes).
-fn InlineItem::textual_len(self : InlineItem) -> Int {
+fn InlineItem::textual_len(self : InlineItem) -> Int32 {
   match self {
     Text(shaped) => shaped.text.len()
     Absolute(_, _) | Fractional(_, _) => 1
@@ -112,14 +112,14 @@ fn InlineItem::natural_width(self : InlineItem) -> @library.Abs {
 priv enum Segment {
   /// One or multiple collapsed text children. Stores how long the segment
   /// is (in bytes of the full text string).
-  Text(Int, @library.StyleChain)
+  Text(Int32, @library.StyleChain)
   /// An already prepared item.
   Item(InlineItem)
 }
 
 ///|
 /// The text length of the item.
-fn Segment::textual_len(self : Segment) -> Int {
+fn Segment::textual_len(self : Segment) -> Int32 {
   match self {
     Text(len, _) => len
     Item(item) => item.textual_len()
@@ -263,7 +263,7 @@ fn collect_inline(
 priv struct InlineCollector {
   full : StringBuilder
   /// The length of `full` in UTF-8 bytes.
-  mut len : Int
+  mut len : Int32
   /// The last char of `full` that is not default ignorable (for smart
   /// quotes).
   mut last_visible : Char?
@@ -337,7 +337,7 @@ fn InlineCollector::push_item(
 ///|
 /// Maps byte offsets back to spans.
 priv struct SpanMapper {
-  entries : Array[(Int, @syntax.Span)]
+  entries : Array[(Int32, @syntax.Span)]
 }
 
 ///|
@@ -348,7 +348,11 @@ fn SpanMapper::new() -> SpanMapper {
 
 ///|
 /// Push a span for a segment with the given length.
-fn SpanMapper::push(self : SpanMapper, len : Int, span : @syntax.Span) -> Unit {
+fn SpanMapper::push(
+  self : SpanMapper,
+  len : Int32,
+  span : @syntax.Span,
+) -> Unit {
   self.entries.push((len, span))
 }
 
@@ -356,7 +360,7 @@ fn SpanMapper::push(self : SpanMapper, len : Int, span : @syntax.Span) -> Unit {
 /// Determine the span at the given byte offset.
 ///
 /// May return a detached span.
-fn SpanMapper::span_at(self : SpanMapper, offset : Int) -> SpanAt {
+fn SpanMapper::span_at(self : SpanMapper, offset : Int32) -> SpanAt {
   let mut cursor = 0
   for entry in self.entries {
     let (len, span) = entry

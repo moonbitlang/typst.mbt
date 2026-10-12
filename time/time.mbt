@@ -9,10 +9,10 @@
 /// handle leap seconds (either positive or negative).
 pub struct Time {
   // The order of these fields matters for the derived `Compare`.
-  priv hour : Int
-  priv minute : Int
-  priv second : Int
-  priv nanosecond : Int
+  priv hour : Int32
+  priv minute : Int32
+  priv second : Int32
+  priv nanosecond : Int32
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
@@ -35,10 +35,10 @@ pub extend Time with @debug.Debug::{to_repr}
 
 ///|
 fn Time::from_hms_nanos_unchecked(
-  hour : Int,
-  minute : Int,
-  second : Int,
-  nanosecond : Int,
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
+  nanosecond : Int32,
 ) -> Time {
   { hour, minute, second, nanosecond, }
 }
@@ -64,10 +64,10 @@ pub fn Time::maximum() -> Time {
 
 ///|
 fn ensure_ranged(
-  value : Int,
-  max : Int,
+  value : Int32,
+  max : Int32,
   name : String,
-) -> Int raise ComponentRange {
+) -> Int32 raise ComponentRange {
   if value < 0 || value > max {
     raise ComponentRange::unconditional(name)
   }
@@ -77,9 +77,9 @@ fn ensure_ranged(
 ///|
 /// Attempt to create a `Time` from the hour, minute, and second.
 pub fn Time::from_hms(
-  hour : Int,
-  minute : Int,
-  second : Int,
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
 ) -> Time raise ComponentRange {
   Time::from_hms_nanos_unchecked(
     ensure_ranged(hour, 23, "hour"),
@@ -92,10 +92,10 @@ pub fn Time::from_hms(
 ///|
 /// Attempt to create a `Time` from the hour, minute, second, and nanosecond.
 pub fn Time::from_hms_nano(
-  hour : Int,
-  minute : Int,
-  second : Int,
-  nanosecond : Int,
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
+  nanosecond : Int32,
 ) -> Time raise ComponentRange {
   Time::from_hms_nanos_unchecked(
     ensure_ranged(hour, 23, "hour"),
@@ -107,53 +107,53 @@ pub fn Time::from_hms_nano(
 
 ///|
 /// Get the clock hour, minute, and second.
-pub fn Time::as_hms(self : Time) -> (Int, Int, Int) {
+pub fn Time::as_hms(self : Time) -> (Int32, Int32, Int32) {
   (self.hour, self.minute, self.second)
 }
 
 ///|
 /// Get the clock hour. The returned value will always be in the range `0..24`.
-pub fn Time::hour(self : Time) -> Int {
+pub fn Time::hour(self : Time) -> Int32 {
   self.hour
 }
 
 ///|
 /// Get the minute within the hour. The returned value will always be in the
 /// range `0..60`.
-pub fn Time::minute(self : Time) -> Int {
+pub fn Time::minute(self : Time) -> Int32 {
   self.minute
 }
 
 ///|
 /// Get the second within the minute. The returned value will always be in the
 /// range `0..60`.
-pub fn Time::second(self : Time) -> Int {
+pub fn Time::second(self : Time) -> Int32 {
   self.second
 }
 
 ///|
 /// Get the milliseconds within the second.
-pub fn Time::millisecond(self : Time) -> Int {
+pub fn Time::millisecond(self : Time) -> Int32 {
   self.nanosecond / 1_000_000
 }
 
 ///|
 /// Get the microseconds within the second.
-pub fn Time::microsecond(self : Time) -> Int {
+pub fn Time::microsecond(self : Time) -> Int32 {
   self.nanosecond / 1_000
 }
 
 ///|
 /// Get the nanoseconds within the second. The returned value will always be
 /// in the range `0..1_000_000_000`.
-pub fn Time::nanosecond(self : Time) -> Int {
+pub fn Time::nanosecond(self : Time) -> Int32 {
   self.nanosecond
 }
 
 ///|
 /// Port of the `cascade!` macro: returns the adjusted `from` and the carry to
 /// add to `to`.
-fn cascade(from : Int, min : Int, max : Int) -> (Int, Int) {
+fn cascade(from : Int32, min : Int32, max : Int32) -> (Int32, Int32) {
   if from >= max {
     (from - (max - min), 1)
   } else if from < min {
@@ -194,10 +194,10 @@ fn Time::adjusting_sub(
 ///|
 /// The shared cascading tail of `adjusting_add` and `adjusting_sub`.
 fn Time::adjust(
-  nanoseconds : Int,
-  seconds : Int,
-  minutes : Int,
-  hours : Int,
+  nanoseconds : Int32,
+  seconds : Int32,
+  minutes : Int32,
+  hours : Int32,
 ) -> (DateAdjustment, Time) {
   let (nanoseconds, carry) = cascade(nanoseconds, 0, 1_000_000_000)
   let (seconds, carry) = cascade(seconds + carry, 0, 60)

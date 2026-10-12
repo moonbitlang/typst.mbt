@@ -71,7 +71,7 @@ pub fn FuncTranslator::new(
 /// Upstream `WasmTranslator::translate_locals`.
 pub fn FuncTranslator::translate_locals(
   self : FuncTranslator,
-  amount : UInt,
+  amount : UInt32,
   value_type : @wasmparser.ValType,
 ) -> Unit raise WasmiError {
   let ty = WasmiValueType::from_wasmparser(value_type)
@@ -123,7 +123,7 @@ fn FuncTranslator::init_func_params(
 /// Registers an `amount` of local variables of common type `ty`.
 fn FuncTranslator::register_locals(
   self : FuncTranslator,
-  amount : Int,
+  amount : Int32,
   ty : @wasmi_core.ValType,
 ) -> Unit raise WasmiError {
   self.locals.register(amount, ty)
@@ -135,7 +135,7 @@ fn FuncTranslator::register_locals(
 /// Returns the frame size of the to-be-compiled function.
 ///
 /// Returns `None` if the frame size is out of bounds.
-fn FuncTranslator::frame_size(self : FuncTranslator) -> Int? {
+fn FuncTranslator::frame_size(self : FuncTranslator) -> Int32? {
   let frame_size = self.stack.max_height() +
     self.locals.len() +
     self.layout.len_consts()
@@ -185,7 +185,7 @@ fn FuncTranslator::resolve_func_type(
 /// Resolves the [`FuncType`] at the given Wasm module `type_index`.
 fn FuncTranslator::resolve_type(
   self : FuncTranslator,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> @wasmi_core.FuncType {
   let dedup_func_type = self.module_.get_func_type(
     FuncTypeIdx(type_index.reinterpret_as_int()),
@@ -197,7 +197,7 @@ fn FuncTranslator::resolve_type(
 /// Returns the [`SlotSpan`] of a call instruction before popping its parameters.
 fn FuncTranslator::call_regspan(
   self : FuncTranslator,
-  len_params : Int,
+  len_params : Int32,
 ) -> @ir.SlotSpan raise WasmiError {
   let height = self.stack.height()
   let start = height - len_params
@@ -235,7 +235,7 @@ fn FuncTranslator::push_results(
 /// as temporary operands, while encoding the necessary copy instructions.
 fn FuncTranslator::move_operands_to_temp(
   self : FuncTranslator,
-  len : Int,
+  len : Int32,
   consume_fuel : Instr?,
 ) -> Unit raise WasmiError {
   for n in 0..<len {
@@ -283,7 +283,7 @@ fn FuncTranslator::push_frame_results(
 fn FuncTranslator::encode_copies(
   self : FuncTranslator,
   results : @ir.SlotSpan,
-  len_values : Int,
+  len_values : Int32,
   consume_fuel_instr : Instr?,
 ) -> Unit raise WasmiError {
   match len_values {
@@ -556,7 +556,7 @@ fn FuncTranslator::encode_copy_span(
   self : FuncTranslator,
   results : @ir.SlotSpan,
   values : @ir.SlotSpan,
-  len : Int,
+  len : Int32,
   consume_fuel_instr : Instr?,
 ) -> Unit raise WasmiError {
   if results == values {
@@ -576,7 +576,7 @@ fn FuncTranslator::encode_copy_span(
 fn FuncTranslator::encode_copy_many(
   self : FuncTranslator,
   results : @ir.SlotSpan,
-  len : Int,
+  len : Int32,
   consume_fuel_instr : Instr?,
 ) -> Unit raise WasmiError {
   self.peek_operands_into_buffer(len)
@@ -711,7 +711,7 @@ fn FuncTranslator::frame_results_impl(
 /// Some instructions can be encoded in a more efficient way if no branch parameter copies are required.
 fn FuncTranslator::requires_branch_param_copies(
   self : FuncTranslator,
-  depth : Int,
+  depth : Int32,
 ) -> Bool {
   let frame = self.stack.peek_control(depth).base()
   let len_branch_params = frame.len_branch_params(self.engine)
@@ -911,7 +911,7 @@ fn FuncTranslator::encode_br_table_n(
   self : FuncTranslator,
   table : @wasmparser.BrTable,
   index : @ir.Slot,
-  len_values : Int,
+  len_values : Int32,
 ) -> Unit raise WasmiError {
   let consume_fuel_instr = self.stack.consume_fuel_instr()
   let values = self.try_form_regspan_or_move(len_values, consume_fuel_instr)
@@ -1013,7 +1013,7 @@ fn FuncTranslator::encode_return(
 /// Peeks `len` operands from the stack and store them into `self.operands`.
 fn FuncTranslator::peek_operands_into_buffer(
   self : FuncTranslator,
-  len : Int,
+  len : Int32,
 ) -> Unit {
   self.operands.clear()
   for operand in self.stack.peek_n(len) {
@@ -1029,7 +1029,7 @@ fn FuncTranslator::peek_operands_into_buffer(
 /// Both [`Op::ReturnSpan`] and [`Op::ReturnMany`] return 4 or more values.
 fn FuncTranslator::encode_return_many(
   self : FuncTranslator,
-  len : Int,
+  len : Int32,
   consume_fuel_instr : Instr?,
 ) -> Instr raise WasmiError {
   self.peek_operands_into_buffer(len)
@@ -1063,7 +1063,7 @@ fn FuncTranslator::encode_return_many(
 /// Returns `None` if forming a [`SlotSpan`] was not possible.
 fn FuncTranslator::try_form_regspan(
   self : FuncTranslator,
-  len : Int,
+  len : Int32,
 ) -> @ir.SlotSpan? raise WasmiError {
   FuncTranslator::try_form_regspan_of(self.stack.peek_n(len)[:], self.layout)
 }
@@ -1102,7 +1102,7 @@ fn FuncTranslator::try_form_regspan_of(
 /// Returns `None` if forming a [`SlotSpan`] was not possible.
 fn FuncTranslator::try_form_regspan_or_move(
   self : FuncTranslator,
-  len : Int,
+  len : Int32,
   consume_fuel_instr : Instr?,
 ) -> @ir.SlotSpan raise WasmiError {
   if self.try_form_regspan(len) is Some(span) {
@@ -1285,7 +1285,7 @@ fn FuncTranslator::translate_end_unreachable(
 /// Translates a Wasm `local.set` or `local.tee`.
 fn FuncTranslator::translate_local_set(
   self : FuncTranslator,
-  local_index : UInt,
+  local_index : UInt32,
   push_result : Bool,
 ) -> Unit raise WasmiError {
   if !self.reachable {

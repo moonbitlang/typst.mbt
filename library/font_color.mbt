@@ -332,9 +332,9 @@ fn draw_svg_glyph(
 /// Works on the UTF-16 string like upstream on the UTF-8 one; all scanned
 /// syntax is ASCII.
 fn fixup_svg(svg : String, view_box : Rect) -> String {
-  let mut viewbox_range : (Int, Int)? = None
-  let mut width_range : (Int, Int)? = None
-  let mut height_range : (Int, Int)? = None
+  let mut viewbox_range : (Int32, Int32)? = None
+  let mut width_range : (Int32, Int32)? = None
+  let mut height_range : (Int32, Int32)? = None
   let n = svg.length()
   let mut cursor = 0
   // `s.eat_until("<svg"); s.expect("<svg")`
@@ -343,7 +343,7 @@ fn fixup_svg(svg : String, view_box : Rect) -> String {
     None => abort("expected <svg")
   }
   let svg_attr_start = cursor
-  let is_ws = (c : Int) => c is (0x20 | 0x09 | 0x0A | 0x0D)
+  let is_ws = (c : Int32) => c is (0x20 | 0x09 | 0x0A | 0x0D)
   while true {
     // `!s.eat_if('>') && !s.done()`
     if cursor < n && svg.unsafe_get(cursor).to_int() == '>'.to_int() {
@@ -418,7 +418,7 @@ fn fixup_svg(svg : String, view_box : Rect) -> String {
   // stable sort by the range start).
   let indexed = edits.mapi((i, e) => (i, e))
   indexed.sort_by((a, b) => {
-    let key = (e : ((Int, Int)?, String)) => {
+    let key = (e : ((Int32, Int32)?, String)) => {
       match e.0 {
         Some((s, _)) => s
         None => -1
@@ -501,8 +501,8 @@ priv struct GlyphPainter {
   face : @otf.Face
   svg : @xmlwriter.XmlWriter
   path_buf : StringBuilder
-  mut gradient_index : Int
-  mut clip_path_index : Int
+  mut gradient_index : Int32
+  mut clip_path_index : Int32
   palette_index : UInt16
   mut transform : @otf.Transform
   mut outline_transform : @otf.Transform

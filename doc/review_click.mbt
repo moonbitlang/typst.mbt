@@ -297,7 +297,7 @@ fn[T] CompileReport::click_in_frame(
 /// page's top left corner; pages start at 1).
 fn CompileReport::click(
   self : CompileReport[@layout.PagedDocument],
-  page : Int,
+  page : Int32,
   x : Double,
   y : Double,
   strict : Bool,
@@ -320,7 +320,7 @@ pub(all) enum Jump {
   /// An external URL.
   Url(String)
   /// A point on a page (the target of an internal link).
-  Position(page~ : Int, x~ : Double, y~ : Double)
+  Position(page~ : Int32, x~ : Double, y~ : Double)
 }
 
 ///|
@@ -331,7 +331,7 @@ pub(all) enum Jump {
 /// compilation failed.
 pub fn CompileReport::jump_from_click(
   self : CompileReport[@layout.PagedDocument],
-  page : Int,
+  page : Int32,
   x : Double,
   y : Double,
 ) -> Jump? {
@@ -359,7 +359,7 @@ pub fn CompileReport::jump_from_click(
 /// of `review_html` shows for a click.
 pub fn CompileReport::origin_at(
   self : CompileReport[@layout.PagedDocument],
-  page : Int,
+  page : Int32,
   x : Double,
   y : Double,
 ) -> Origin? {

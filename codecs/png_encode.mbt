@@ -27,7 +27,7 @@ pub extend PngColorType with @debug.Debug::{to_repr}
 
 ///|
 /// The numeric code of the color type.
-pub fn PngColorType::code(self : PngColorType) -> Int {
+pub fn PngColorType::code(self : PngColorType) -> Int32 {
   match self {
     Grayscale => 0
     Rgb => 2
@@ -39,7 +39,7 @@ pub fn PngColorType::code(self : PngColorType) -> Int {
 
 ///|
 /// The color type with the given numeric code.
-pub fn PngColorType::from_code(n : Int) -> PngColorType? {
+pub fn PngColorType::from_code(n : Int32) -> PngColorType? {
   match n {
     0 => Some(Grayscale)
     2 => Some(Rgb)
@@ -52,7 +52,7 @@ pub fn PngColorType::from_code(n : Int) -> PngColorType? {
 
 ///|
 /// The number of samples per pixel.
-pub fn PngColorType::samples(self : PngColorType) -> Int {
+pub fn PngColorType::samples(self : PngColorType) -> Int32 {
   match self {
     Grayscale | Indexed => 1
     Rgb => 3
@@ -63,7 +63,7 @@ pub fn PngColorType::samples(self : PngColorType) -> Int {
 
 ///|
 /// The CRC-32 checksum of the given bytes (as used by PNG chunks).
-pub fn crc32(parts : Array[BytesView]) -> UInt {
+pub fn crc32(parts : Array[BytesView]) -> UInt32 {
   let mut c = 0U
   for part in parts {
     c = crc32_braid(c, part)
@@ -92,8 +92,8 @@ let png_signature : Bytes = b"\x89PNG\r\n\x1a\n"
 /// with `flate2`'s default level, see [zlib_compress]).
 pub fn encode_png(
   data : BytesView,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : PngColorType,
 ) -> Bytes {
   write_png(width, height, color, encode_image_data(data, width, height, color))
@@ -103,8 +103,8 @@ pub fn encode_png(
 /// Writes the PNG signature, the IHDR chunk, the compressed image data and
 /// the IEND chunk.
 fn write_png(
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : PngColorType,
   zlib_encoded : Bytes,
 ) -> Bytes {
@@ -127,7 +127,7 @@ fn write_png(
 
 ///|
 /// The maximum length of an IDAT chunk (upstream `MAX_IDAT_CHUNK_LEN`).
-const MAX_IDAT_CHUNK_LEN : Int = 0x7FFFFFFF
+const MAX_IDAT_CHUNK_LEN : Int32 = 0x7FFFFFFF
 
 ///|
 /// Upstream `Writer::write_zlib_encoded_idat`.
@@ -147,8 +147,8 @@ fn write_zlib_encoded_idat(w : Buffer, zlib_encoded : BytesView) -> Unit {
 /// adaptive filtering and zlib level 6 (`Compression::Balanced`).
 pub fn encode_png_balanced(
   data : BytesView,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : PngColorType,
 ) -> Bytes {
   write_png(
@@ -170,10 +170,10 @@ let png_filter_type_bytes : FixedArray[Bytes] = [
 /// `Writer::write_image_data` with `DeflateCompression::Level(level)`).
 fn encode_image_data_level(
   data : BytesView,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : PngColorType,
-  level : Int,
+  level : Int32,
 ) -> Bytes {
   let bpp = color.samples()
   let in_len = width * bpp
@@ -201,8 +201,8 @@ fn encode_image_data_level(
 /// `Writer::write_image_data` with `DeflateCompression::FdeflateUltraFast`).
 fn encode_image_data(
   data : BytesView,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : PngColorType,
 ) -> Bytes {
   let bpp = color.samples()
@@ -242,7 +242,7 @@ fn encode_image_data(
 
 ///|
 /// Upstream `filter_paeth_fpnge`.
-fn filter_paeth(a : Int, b : Int, c : Int) -> Int {
+fn filter_paeth(a : Int32, b : Int32, c : Int32) -> Int32 {
   let pa = @cmp.maximum(b, c) - @cmp.minimum(c, b)
   let pb = @cmp.maximum(a, c) - @cmp.minimum(c, a)
   let pc = if (a < c) == (c < b) {
@@ -264,12 +264,12 @@ fn filter_paeth(a : Int, b : Int, c : Int) -> Int {
 /// `adaptive_filter`). Returns the filter code; `output[1..]` holds the
 /// filtered row.
 fn adaptive_filter(
-  bpp : Int,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],
   scratch : FixedArray[Byte],
-) -> Int {
+) -> Int32 {
   let mut min_cost = 0xFFFFFFFFFFFFFFFFUL
   let mut filter_choice = 0
   // The best row so far and the buffer for the next filter: the candidates
@@ -299,4 +299,4 @@ fn adaptive_filter(
 
 ///|
 /// Up, Sub, Avg, Paeth (the order of upstream's adaptive filter).
-let adaptive_filter_order : ReadOnlyArray[Int] = [2, 1, 3, 4]
+let adaptive_filter_order : ReadOnlyArray[Int32] = [2, 1, 3, 4]

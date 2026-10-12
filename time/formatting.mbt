@@ -41,7 +41,7 @@ fn Provider::time(self : Provider) -> Time? {
 ///|
 fn format_two_digits(
   output : StringBuilder,
-  value : Int,
+  value : Int32,
   padding : Padding,
 ) -> Unit {
   output.write_string(
@@ -56,7 +56,7 @@ fn format_two_digits(
 ///|
 fn format_three_digits(
   output : StringBuilder,
-  value : Int,
+  value : Int32,
   padding : Padding,
 ) -> Unit {
   output.write_string(
@@ -71,7 +71,7 @@ fn format_three_digits(
 ///|
 fn format_four_digits(
   output : StringBuilder,
-  value : Int,
+  value : Int32,
   padding : Padding,
 ) -> Unit {
   output.write_string(
@@ -99,7 +99,7 @@ fn fmt_sign(
 ///|
 fn fmt_year_full_extended_range(
   output : StringBuilder,
-  full_year : Int,
+  full_year : Int32,
   padding : Padding,
   sign_is_mandatory : Bool,
 ) -> Unit {
@@ -117,7 +117,7 @@ fn fmt_year_full_extended_range(
 ///|
 fn fmt_year_full_standard_range(
   output : StringBuilder,
-  full_year : Int,
+  full_year : Int32,
   padding : Padding,
   sign_is_mandatory : Bool,
 ) -> Unit raise Format {
@@ -131,7 +131,7 @@ fn fmt_year_full_standard_range(
 ///|
 fn fmt_year_century_extended_range(
   output : StringBuilder,
-  year : Int,
+  year : Int32,
   padding : Padding,
   sign_is_mandatory : Bool,
 ) -> Unit {
@@ -150,7 +150,7 @@ fn fmt_year_century_extended_range(
 ///|
 fn fmt_year_century_standard_range(
   output : StringBuilder,
-  year : Int,
+  year : Int32,
   padding : Padding,
   sign_is_mandatory : Bool,
 ) -> Unit raise Format {
@@ -166,7 +166,7 @@ fn fmt_year_century_standard_range(
 ///|
 fn fmt_subsecond(
   output : StringBuilder,
-  nanos : Int,
+  nanos : Int32,
   digits : SubsecondDigits,
 ) -> Unit {
   let s = subsecond_from_nanos(nanos)

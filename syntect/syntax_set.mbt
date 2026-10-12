@@ -12,7 +12,7 @@
 pub struct SyntaxSet {
   priv syntaxes : Array[SyntaxReference]
   /// Stores the syntax index for every path that was loaded
-  priv path_syntaxes : Array[(String, Int)]
+  priv path_syntaxes : Array[(String, Int32)]
   priv mut first_line_cache : FirstLineCache?
 }
 
@@ -47,7 +47,7 @@ pub(all) struct LazyContexts {
 /// into a [`SyntaxSet`] that can be used for parsing or highlighting.
 pub struct SyntaxSetBuilder {
   priv syntaxes : Array[SyntaxDefinition]
-  priv path_syntaxes : Array[(String, Int)]
+  priv path_syntaxes : Array[(String, Int32)]
 }
 
 ///|
@@ -425,7 +425,7 @@ fn recursively_mark_no_prototype(
 ///|
 fn link_context(
   context : Context,
-  syntax_index : Int,
+  syntax_index : Int32,
   all_context_ids : Array[Map[String, ContextId]],
   syntaxes : Array[SyntaxReference],
 ) -> Unit {
@@ -444,7 +444,7 @@ fn link_context(
 ///|
 fn link_ref(
   context_ref : ContextReference,
-  syntax_index : Int,
+  syntax_index : Int32,
   all_context_ids : Array[Map[String, ContextId]],
   syntaxes : Array[SyntaxReference],
 ) -> ContextReference {
@@ -526,7 +526,7 @@ fn find_id(
 ///|
 fn link_match_pat(
   match_pat : MatchPattern,
-  syntax_index : Int,
+  syntax_index : Int32,
   all_context_ids : Array[Map[String, ContextId]],
   syntaxes : Array[SyntaxReference],
 ) -> MatchPattern {
@@ -544,7 +544,7 @@ fn link_match_pat(
 priv struct FirstLineCache {
   /// (first line regex, syntax index) pairs for all syntaxes with a first
   /// line regex
-  regexes : Array[(Regex, Int)]
+  regexes : Array[(Regex, Int32)]
 }
 
 ///|
@@ -575,7 +575,7 @@ pub fn eq_ignore_ascii_case(a : StringView, b : StringView) -> Bool {
 }
 
 ///|
-fn ascii_lower(c : Int) -> Int {
+fn ascii_lower(c : Int32) -> Int32 {
   if c >= 'A' && c <= 'Z' {
     c + 32
   } else {
@@ -585,7 +585,7 @@ fn ascii_lower(c : Int) -> Int {
 
 ///|
 /// Rust `str` ordering (by code points).
-pub fn compare_str(a : StringView, b : StringView) -> Int {
+pub fn compare_str(a : StringView, b : StringView) -> Int32 {
   let mut i = 0
   let mut j = 0
   while i < a.length() && j < b.length() {

@@ -9,14 +9,14 @@
 ///|
 /// `u64::from_le_bytes(window[i..i + 8])` without a bounds check.
 #inline
-fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt64 {
+fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int32) -> UInt64 {
   @v128.i64x2_extract_lane(@v128.v128_load64_zero(window, i), 0)
 }
 
 ///|
 /// `u32::from_le_bytes(window[i..i + 4])` without a bounds check.
 #inline
-fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
+fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int32) -> UInt32 {
   @v128.i32x4_extract_lane(@v128.v128_load32_zero(window, i), 0)
 }
 
@@ -24,7 +24,11 @@ fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
 /// [compare256] for in-bounds ranges: compares 16 bytes at a time. Only
 /// called by [compare256] after checking `0 <= a, b <= window.length() -
 /// 256`, so every load (`a + i`, `b + i` with `i <= 240`) is in bounds.
-fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
+fn compare256_unchecked(
+  window : FixedArray[Byte],
+  a : Int32,
+  b : Int32,
+) -> Int32 {
   for i = 0; i < 256; i = i + 16 {
     let x = @v128.v128_load(window, a + i)
     let y = @v128.v128_load(window, b + i)
@@ -48,11 +52,11 @@ fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
 /// lane sums are taken modulo 2^32, which is exact because the block's true
 /// `sum2` is below 2^32 (the definition of `ADLER_NMAX`).
 fn adler32_fixed(
-  start_checksum : UInt,
+  start_checksum : UInt32,
   data : FixedArray[Byte],
-  off : Int,
-  len : Int,
-) -> UInt {
+  off : Int32,
+  len : Int32,
+) -> UInt32 {
   // All loads below are within `data[off..off + len]`.
   guard in_range(off, len.to_int64(), data.length()) else {
     abort("index out of bounds")
@@ -103,7 +107,7 @@ fn adler32_fixed(
 
 ///|
 #inline
-fn hsum_u32x4(v : V128) -> UInt {
+fn hsum_u32x4(v : V128) -> UInt32 {
   @v128.i32x4_extract_lane(v, 0) +
   @v128.i32x4_extract_lane(v, 1) +
   @v128.i32x4_extract_lane(v, 2) +

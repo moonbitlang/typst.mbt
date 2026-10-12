@@ -46,7 +46,7 @@ impl @library.World for PagesWorld with fn today(_, _) {
 ///|
 fn pages_world(
   text : String,
-  library? : @library.Library = library([]),
+  library~ : @library.Library = library([]),
 ) -> PagesWorld {
   { main: @syntax.Source::detached(text), library, }
 }
@@ -443,7 +443,7 @@ test "pages: what a caller writes to the pages of a run it was handed is not wri
 /// holder that takes the groups out of `Frame::items`: the transform, the
 /// clip and the label of each, and the innermost frames are emptied.
 /// Returns the number of groups and the greatest depth.
-fn scribble_groups(frame : @library.Frame, depth : Int) -> (Int, Int) {
+fn scribble_groups(frame : @library.Frame, depth : Int32) -> (Int32, Int32) {
   let mut groups = 0
   let mut deepest = depth
   for entry in frame.items() {

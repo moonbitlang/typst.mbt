@@ -9,9 +9,9 @@ pub struct LinkedNode {
   /// The parent of this node.
   parent : LinkedNode?
   /// The index of this node in its parent's children array.
-  index : Int
+  index : Int32
   /// This node's UTF-8 byte offset in the source file.
-  offset : Int
+  offset : Int32
 }
 
 ///|
@@ -28,19 +28,19 @@ pub fn LinkedNode::get(self : LinkedNode) -> SyntaxNode {
 
 ///|
 /// The index of this node in its parent's children list.
-pub fn LinkedNode::index(self : LinkedNode) -> Int {
+pub fn LinkedNode::index(self : LinkedNode) -> Int32 {
   self.index
 }
 
 ///|
 /// The absolute byte offset of this node in the source file.
-pub fn LinkedNode::offset(self : LinkedNode) -> Int {
+pub fn LinkedNode::offset(self : LinkedNode) -> Int32 {
   self.offset
 }
 
 ///|
 /// The byte range of this node in the source file.
-pub fn LinkedNode::range(self : LinkedNode) -> (Int, Int) {
+pub fn LinkedNode::range(self : LinkedNode) -> (Int32, Int32) {
   (self.offset, self.offset + self.node.len())
 }
 
@@ -50,7 +50,7 @@ pub fn LinkedNode::kind(self : LinkedNode) -> SyntaxKind {
 }
 
 ///|
-pub fn LinkedNode::len(self : LinkedNode) -> Int {
+pub fn LinkedNode::len(self : LinkedNode) -> Int32 {
   self.node.len()
 }
 
@@ -103,8 +103,8 @@ pub fn LinkedNode::find_number(
 /// Find the descendant whose byte range matches the given range exactly.
 pub fn LinkedNode::find_range(
   self : LinkedNode,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> LinkedNode? {
   if start == self.offset && end == self.offset + self.len() {
     return Some(self)
@@ -243,7 +243,7 @@ pub fn LinkedNode::leftmost_leaf(self : LinkedNode) -> LinkedNode? {
 
 ///|
 /// Get the leaf immediately before the specified byte offset.
-fn LinkedNode::leaf_before(self : LinkedNode, cursor : Int) -> LinkedNode? {
+fn LinkedNode::leaf_before(self : LinkedNode, cursor : Int32) -> LinkedNode? {
   if self.node.children().length() == 0 && cursor <= self.offset + self.len() {
     return Some(self)
   }
@@ -262,7 +262,7 @@ fn LinkedNode::leaf_before(self : LinkedNode, cursor : Int) -> LinkedNode? {
 
 ///|
 /// Get the leaf after the specified byte offset.
-fn LinkedNode::leaf_after(self : LinkedNode, cursor : Int) -> LinkedNode? {
+fn LinkedNode::leaf_after(self : LinkedNode, cursor : Int32) -> LinkedNode? {
   if self.node.children().length() == 0 && cursor < self.offset + self.len() {
     return Some(self)
   }
@@ -281,7 +281,7 @@ fn LinkedNode::leaf_after(self : LinkedNode, cursor : Int) -> LinkedNode? {
 /// Get the leaf at the specified byte offset.
 pub fn LinkedNode::leaf_at(
   self : LinkedNode,
-  cursor : Int,
+  cursor : Int32,
   side : Side,
 ) -> LinkedNode? {
   match side {

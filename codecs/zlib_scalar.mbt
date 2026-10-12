@@ -4,7 +4,7 @@
 ///|
 /// `u64::from_le_bytes(window[i..i + 8])` without a bounds check.
 #inline
-fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt64 {
+fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int32) -> UInt64 {
   let lo = window.unsafe_get(i).to_int() |
     (window.unsafe_get(i + 1).to_int() << 8) |
     (window.unsafe_get(i + 2).to_int() << 16) |
@@ -20,7 +20,7 @@ fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt64 {
 ///|
 /// `u32::from_le_bytes(window[i..i + 4])` without a bounds check.
 #inline
-fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
+fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int32) -> UInt32 {
   // Intrinsic conversions only (core's `Byte::to_uint` is not inlined).
   (window.unsafe_get(i).to_int() |
   (window.unsafe_get(i + 1).to_int() << 8) |
@@ -30,7 +30,11 @@ fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
 
 ///|
 /// [compare256] for in-bounds ranges (checked by [compare256]).
-fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
+fn compare256_unchecked(
+  window : FixedArray[Byte],
+  a : Int32,
+  b : Int32,
+) -> Int32 {
   // Compare eight bytes at a time (like zlib-rs' `compare256_rust_u64`);
   // the result is the same as comparing byte by byte.
   for i = 0; i < 256; i = i + 8 {
@@ -46,11 +50,11 @@ fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
 ///|
 /// [adler32] of `data[off..off + len]` (the range must be in bounds).
 fn adler32_fixed(
-  start_checksum : UInt,
+  start_checksum : UInt32,
   data : FixedArray[Byte],
-  off : Int,
-  len : Int,
-) -> UInt {
+  off : Int32,
+  len : Int32,
+) -> UInt32 {
   guard in_range(off, len.to_int64(), data.length()) else {
     abort("index out of bounds")
   }

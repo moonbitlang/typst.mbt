@@ -95,7 +95,7 @@ pub fn NumTy::shift_amount(
 
 ///|
 /// The `f32` bits of a [`TypedVal`].
-fn typed_f32_bits(value : @wasmi_core.TypedVal) -> UInt {
+fn typed_f32_bits(value : @wasmi_core.TypedVal) -> UInt32 {
   value.untyped().to_bits64().to_uint()
 }
 
@@ -837,7 +837,7 @@ fn FuncTranslator::translate_select(
 fn FuncTranslator::call_indirect_params(
   self : FuncTranslator,
   index : Operand,
-  table_index : UInt,
+  table_index : UInt32,
 ) -> @ir.Op raise WasmiError {
   let table_type = self.module_.get_type_of_table(
     TableIdx(table_index.reinterpret_as_int()),
@@ -1020,7 +1020,10 @@ fn fuel_store(costs : @wasmi_core.FuelCostsProvider) -> UInt64 {
 ///|
 /// Upstream `T::Param::try_from(T::Value::from(value).wrap())`: the store
 /// immediate if the (wrapped) `value` fits the operator's immediate type.
-fn store_param_of(op : StoreWrapOperator, value : @wasmi_core.TypedVal) -> Int? {
+fn store_param_of(
+  op : StoreWrapOperator,
+  value : @wasmi_core.TypedVal,
+) -> Int32? {
   match op.kind {
     I32 => {
       let v = value.to_i32()
@@ -1055,7 +1058,7 @@ fn store_param_of(op : StoreWrapOperator, value : @wasmi_core.TypedVal) -> Int? 
 
 ///|
 /// Upstream `Into<AnyConst16>` of the store operator's `Param` type.
-fn store_param_any16(op : StoreWrapOperator, value : Int) -> @ir.AnyConst16 {
+fn store_param_any16(op : StoreWrapOperator, value : Int32) -> @ir.AnyConst16 {
   match op.kind {
     I32Wrap8 | I64Wrap8 => @ir.AnyConst16::from_i8(value)
     _ => @ir.AnyConst16::from_i16(value)

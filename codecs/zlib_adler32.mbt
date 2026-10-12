@@ -3,20 +3,20 @@
 
 ///|
 /// Largest prime smaller than 65536.
-const ADLER_BASE : UInt = 65521
+const ADLER_BASE : UInt32 = 65521
 
 ///|
 /// NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1.
-const ADLER_NMAX : Int = 5552
+const ADLER_NMAX : Int32 = 5552
 
 ///|
 /// The initial value of an Adler-32 checksum.
-const ADLER32_INITIAL_VALUE : UInt = 1
+const ADLER32_INITIAL_VALUE : UInt32 = 1
 
 ///|
 /// Updates the Adler-32 checksum `start_checksum` with `data` (upstream
 /// `adler32`).
-fn adler32(start_checksum : UInt, data : BytesView) -> UInt {
+fn adler32(start_checksum : UInt32, data : BytesView) -> UInt32 {
   // split Adler-32 into component sums
   let mut sum2 = (start_checksum >> 16) & 0xffff
   let mut adler = start_checksum & 0xffff

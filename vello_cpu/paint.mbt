@@ -4,7 +4,7 @@
 /// A premultiplied color, cached in `u8` form (the `f32` form is only used
 /// by the `f32` pipeline).
 priv struct PremulColor {
-  premul_u8 : FixedArray[Int]
+  premul_u8 : FixedArray[Int32]
 }
 
 ///|
@@ -20,7 +20,7 @@ priv enum Paint {
   /// A solid color.
   Solid(PremulColor)
   /// A paint that needs to be resolved via an index.
-  Indexed(Int)
+  Indexed(Int32)
 }
 
 ///|

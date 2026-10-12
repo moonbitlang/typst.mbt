@@ -1,6 +1,6 @@
 ///|
 /// Binary search a flat `[lo0, hi0, lo1, hi1, ...]` range table.
-fn in_ranges(table : ReadOnlyArray[Int], c : Int) -> Bool {
+fn in_ranges(table : ReadOnlyArray[Int32], c : Int32) -> Bool {
   let n = table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -19,7 +19,7 @@ fn in_ranges(table : ReadOnlyArray[Int], c : Int) -> Bool {
 ///|
 /// Binary search a flat `[lo0, hi0, v0, lo1, hi1, v1, ...]` table, returning
 /// the value of the matching range or `default`.
-fn in_valued(table : ReadOnlyArray[Int], c : Int, default : Int) -> Int {
+fn in_valued(table : ReadOnlyArray[Int32], c : Int32, default : Int32) -> Int32 {
   let n = table.length() / 3
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -224,7 +224,7 @@ pub fn discard_space_between(before : StringView, after : StringView) -> Bool {
 ///|
 /// The displayed width of a character in columns, like `unicode-width`
 /// 0.1.14's `UnicodeWidthChar::width` (`None` for control characters).
-pub fn char_width(c : Char) -> Int? {
+pub fn char_width(c : Char) -> Int32? {
   match in_valued(char_width_table, c.to_int(), 2) {
     0 => None
     v => Some(v - 1)

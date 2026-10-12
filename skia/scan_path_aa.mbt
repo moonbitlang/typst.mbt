@@ -1,16 +1,16 @@
 // Port of `tiny-skia/src/scan/path_aa.rs`.
 
 ///|
-let supersample_shift : Int = 2
+let supersample_shift : Int32 = 2
 
 ///|
-let aa_shift : Int = supersample_shift
+let aa_shift : Int32 = supersample_shift
 
 ///|
-let aa_scale : Int = 1 << aa_shift
+let aa_scale : Int32 = 1 << aa_shift
 
 ///|
-let aa_mask : Int = aa_scale - 1
+let aa_mask : Int32 = aa_scale - 1
 
 ///|
 fn scan_path_aa_fill_path(
@@ -59,7 +59,7 @@ fn scan_path_aa_fill_path(
 ///|
 /// Would any of the coordinates of this rectangle not fit in a short,
 /// when left-shifted by shift?
-fn rect_overflows_short_shift(rect : @path.IntRect, shift : Int) -> Int {
+fn rect_overflows_short_shift(rect : @path.IntRect, shift : Int32) -> Int32 {
   overflows_short_shift(rect.left(), shift) |
   overflows_short_shift(rect.top(), shift) |
   overflows_short_shift(rect.right(), shift) |
@@ -67,7 +67,7 @@ fn rect_overflows_short_shift(rect : @path.IntRect, shift : Int) -> Int {
 }
 
 ///|
-fn overflows_short_shift(value : Int, shift : Int) -> Int {
+fn overflows_short_shift(value : Int32, shift : Int32) -> Int32 {
   let s = 16 + shift
   (left_shift(value, s) >> s) - value
 }
@@ -110,15 +110,15 @@ fn scan_path_aa_fill_path_impl(
 priv struct SuperBlitter {
   // BaseSuperBlitter
   real_blitter : &Blitter
-  mut curr_iy : Int
-  width : Int
-  left : Int
-  super_left : Int
-  mut curr_y : Int
-  top : Int
+  mut curr_iy : Int32
+  width : Int32
+  left : Int32
+  super_left : Int32
+  mut curr_y : Int32
+  top : Int32
   // SuperBlitter
   runs : AlphaRuns
-  mut offset_x : Int
+  mut offset_x : Int32
 }
 
 ///|
@@ -218,6 +218,6 @@ impl Blitter for SuperBlitter with fn blit_h(self, x, y, width) {
 /// to produce a final value in [0, 255] and handles clamping 256->255
 /// itself, with the same (alpha - (alpha >> 8)) correction as
 /// coverage_to_exact_alpha().
-fn coverage_to_partial_alpha(aa : Int) -> Int {
+fn coverage_to_partial_alpha(aa : Int32) -> Int32 {
   (aa << (8 - 2 * aa_shift)) & 0xFF
 }

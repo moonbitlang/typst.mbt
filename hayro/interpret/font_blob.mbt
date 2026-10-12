@@ -145,7 +145,7 @@ fn CffFontBlob::glyph_index_by_name(
 }
 
 ///|
-fn CffFontBlob::glyph_index_by_cid(self : CffFontBlob, cid : Int) -> GlyphId? {
+fn CffFontBlob::glyph_index_by_cid(self : CffFontBlob, cid : Int32) -> GlyphId? {
   guard self.charset is Some(charset) else { return None }
   try charset.glyph_id(@ps.Sid::new(cid)) catch {
     _ => None
@@ -163,7 +163,7 @@ fn CffFontBlob::glyph_index(self : CffFontBlob, code : Byte) -> GlyphId? {
 }
 
 ///|
-fn CffFontBlob::num_glyphs(self : CffFontBlob) -> Int {
+fn CffFontBlob::num_glyphs(self : CffFontBlob) -> Int32 {
   self.font.num_glyphs()
 }
 
@@ -184,7 +184,7 @@ priv struct OpenTypeFontBlob {
 }
 
 ///|
-fn OpenTypeFontBlob::new(data : Bytes, index : Int) -> OpenTypeFontBlob? {
+fn OpenTypeFontBlob::new(data : Bytes, index : Int32) -> OpenTypeFontBlob? {
   // Check first whether the font is valid.
   let f = @read_fonts.FontRef::from_index(data[:], index) catch {
     _ => return None
@@ -332,7 +332,7 @@ fn OpenTypeFontBlob::advance_width(
 /// `font_ref().cmap().ok()?.map_codepoint(code)`.
 fn OpenTypeFontBlob::map_codepoint(
   self : OpenTypeFontBlob,
-  code : UInt,
+  code : UInt32,
 ) -> GlyphId? {
   try self.font_ref.cmap() catch {
     _ => None
@@ -344,10 +344,10 @@ fn OpenTypeFontBlob::map_codepoint(
 ///|
 /// An encoding record of the `cmap` table.
 priv struct CmapRecord {
-  platform_id : Int
-  encoding_id : Int
+  platform_id : Int32
+  encoding_id : Int32
   /// `map_codepoint` of the record's subtable (`None` if it fails to parse).
-  subtable : ((UInt) -> GlyphId?)?
+  subtable : ((UInt32) -> GlyphId?)?
 }
 
 ///|
@@ -369,7 +369,7 @@ fn OpenTypeFontBlob::cmap_records(
         Custom => 4
         Unknown => 5
       }
-      let subtable : ((UInt) -> GlyphId?)? = try
+      let subtable : ((UInt32) -> GlyphId?)? = try
         record.subtable(cmap.offset_data())
       catch {
         _ => None

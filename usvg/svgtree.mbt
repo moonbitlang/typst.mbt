@@ -9,7 +9,7 @@
 pub struct Document {
   priv nodes : Array[NodeData]
   priv attrs : Array[Attribute]
-  priv mut links : Map[String, Int]
+  priv mut links : Map[String, Int32]
 }
 
 ///|
@@ -39,22 +39,22 @@ pub fn Document::element_by_id(self : Document, id : String) -> SvgNode? {
 }
 
 ///|
-fn Document::get(self : Document, id : Int) -> SvgNode {
+fn Document::get(self : Document, id : Int32) -> SvgNode {
   { id, doc: self, }
 }
 
 ///|
 priv enum NodeKind {
   Root
-  Element(tag_name~ : EId, attributes~ : (Int, Int))
+  Element(tag_name~ : EId, attributes~ : (Int32, Int32))
   Text(String)
 }
 
 ///|
 priv struct NodeData {
-  parent : Int?
-  mut next_sibling : Int?
-  mut children : (Int, Int)?
+  parent : Int32?
+  mut next_sibling : Int32?
+  mut children : (Int32, Int32)?
   mut kind : NodeKind
 }
 
@@ -72,7 +72,7 @@ pub struct Attribute {
 ///|
 /// An SVG node.
 pub struct SvgNode {
-  priv id : Int
+  priv id : Int32
   priv doc : Document
 }
 
@@ -200,7 +200,7 @@ pub fn SvgNode::attributes(self : SvgNode) -> ArrayView[Attribute] {
 }
 
 ///|
-fn SvgNode::attribute_id(self : SvgNode, aid : AId) -> Int? {
+fn SvgNode::attribute_id(self : SvgNode, aid : AId) -> Int32? {
   match self.d().kind {
     Element(attributes=(start, _), ..) => {
       let attrs = self.attributes()

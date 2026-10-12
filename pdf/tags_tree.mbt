@@ -3,13 +3,13 @@
 ///|
 priv struct Tree {
   /// Points at the current group in the `progressions` list.
-  mut prog_cursor : Int
-  progressions : Array[Int]
+  mut prog_cursor : Int32
+  progressions : Array[Int32]
   /// Points at the next break in the `breaks` list.
-  mut break_cursor : Int
+  mut break_cursor : Int32
   breaks : Array[Break]
   /// Points at the next intem in the `unfinished` list.
-  mut unfinished_cursor : Int
+  mut unfinished_cursor : Int32
   unfinished : Array[Unfinished]
   /// A stack of traversal states, the topmost entry represents the current
   /// state in the tree. New stack entries are pushed on when entering a
@@ -17,7 +17,7 @@ priv struct Tree {
   states : Array[TraversalState]
   groups : Groups
   ctx : Ctx
-  logical_children : Map[@library.Location, Array[Int]]
+  logical_children : Map[@library.Location, Array[Int32]]
   errors : Array[@library.SourceDiagnostic]
 }
 
@@ -35,13 +35,13 @@ fn Tree::state(self : Tree) -> TraversalState {
 }
 
 ///|
-fn Tree::current(self : Tree) -> Int {
+fn Tree::current(self : Tree) -> Int32 {
   self.progressions[self.prog_cursor]
 }
 
 ///|
 /// Find the lowest link ancestor in the tree.
-fn Tree::parent_link(self : Tree) -> (Int, @library.LinkMarker)? {
+fn Tree::parent_link(self : Tree) -> (Int32, @library.LinkMarker)? {
   let mut current = self.current()
   while current != group_id_invalid {
     let group = self.groups.get(current)
@@ -73,7 +73,7 @@ fn Tree::parent_bbox(self : Tree) -> BBoxCtx? {
 
 ///|
 /// Whether an ancestor has an alternative description.
-fn Tree::parent_alt(self : Tree) -> Int? {
+fn Tree::parent_alt(self : Tree) -> Int32? {
   self.state().current_alt
 }
 
@@ -100,11 +100,11 @@ fn Tree::assert_finished_traversal(
 /// this is updated on each step.
 priv struct TraversalState {
   /// The highest artifact ancestor in the tree.
-  mut current_artifact : (Int, @export.Artifact)?
+  mut current_artifact : (Int32, @export.Artifact)?
   /// The highest ancestor that has an alternative description.
-  mut current_alt : Int?
+  mut current_alt : Int32?
   /// The stack of ancestors that have a [`GroupKind::bbox`].
-  bbox_stack : Array[Int]
+  bbox_stack : Array[Int32]
   /// The stack of text attributes.
   text_attrs : TextAttrs
 }
@@ -124,7 +124,7 @@ fn TraversalState::new() -> TraversalState {
 fn TraversalState::pop_group(
   self : TraversalState,
   surface : @export.Surface,
-  id : Int,
+  id : Int32,
   group : Group,
 ) -> Unit {
   if self.current_artifact is Some((i, _)) && i == id {
@@ -147,13 +147,13 @@ fn TraversalState::pop_group(
 priv struct Break {
   /// The index of the progression at which point the broken up groups need to
   /// be closed.
-  prog_idx : Int
+  prog_idx : Int32
   /// The number of groups which have to be closed, from the previous
   /// group upwards in the parent hierarchy.
-  mut num_closed : Int
+  mut num_closed : Int32
   /// The number of groups which have to be closed, from the next group
   /// upwards in the parent hierarchy.
-  mut num_opened : Int
+  mut num_opened : Int32
 }
 
 ///|
@@ -163,8 +163,8 @@ priv struct Break {
 priv struct Unfinished {
   /// The index of the progression at which point the broken up groups need to
   /// be closed.
-  prog_idx : Int
-  group_to_close : Int
+  prog_idx : Int32
+  group_to_close : Int32
 }
 
 ///|
@@ -259,7 +259,7 @@ fn leave_logical_child(tree : Tree, surface : @export.Surface) -> Unit {
 }
 
 ///|
-fn step(tree : Tree) -> (Int, Int)? {
+fn step(tree : Tree) -> (Int32, Int32)? {
   let prev = tree.current()
   tree.prog_cursor += 1
   let next = tree.current()
@@ -298,8 +298,8 @@ fn step_break(
   gc : GlobalContext,
   fc : FrameContext,
   surface : @export.Surface,
-  prev : Int,
-  next : Int,
+  prev : Int32,
+  next : Int32,
   brk : Break,
 ) -> Unit {
   let tree = gc.tags.tree
@@ -327,7 +327,7 @@ fn open_group(
   fc : FrameContext,
   options : CompletePdfOptions,
   surface : @export.Surface,
-  id : Int,
+  id : Int32,
 ) -> Unit {
   let group = groups.get(id)
   if state.current_artifact is None &&
@@ -355,7 +355,7 @@ fn open_multiple_groups(
   fc : FrameContext,
   options : CompletePdfOptions,
   surface : @export.Surface,
-  rev : Array[Int],
+  rev : Array[Int32],
 ) -> Unit {
   let mut new_artifact = None
   let mut new_alt = None
@@ -386,7 +386,7 @@ fn open_multiple_groups(
 }
 
 ///|
-fn close_group(tree : Tree, surface : @export.Surface, id : Int) -> Int {
+fn close_group(tree : Tree, surface : @export.Surface, id : Int32) -> Int32 {
   let group = tree.groups.get(id)
   let direct_parent = group.parent
   let semantic_parent = semantic_parent(tree, direct_parent)
@@ -549,8 +549,8 @@ fn close_group(tree : Tree, surface : @export.Surface, id : Int) -> Int {
 ///|
 fn[T] move_into(
   tree : Tree,
-  semantic_parent : Int,
-  child : Int,
+  semantic_parent : Int32,
+  child : Int32,
   f : (GroupKind) -> T?,
 ) -> T? {
   let res = f(tree.groups.get(semantic_parent).kind)
@@ -561,7 +561,7 @@ fn[T] move_into(
 }
 
 ///|
-fn semantic_parent(tree : Tree, direct_parent : Int) -> Int {
+fn semantic_parent(tree : Tree, direct_parent : Int32) -> Int32 {
   let mut parent = direct_parent
   while true {
     let group = tree.groups.get(parent)

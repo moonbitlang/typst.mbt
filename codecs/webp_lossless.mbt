@@ -8,9 +8,9 @@
 /// `BitReader` over in-memory data (`fill_buf` returns the unread rest).
 priv struct WebpBitReader {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
   mut buffer : UInt64
-  mut nbits : Int
+  mut nbits : Int32
 }
 
 ///|
@@ -42,14 +42,14 @@ fn WebpBitReader::fill(self : WebpBitReader) -> Unit {
 }
 
 ///|
-fn WebpBitReader::peek(self : WebpBitReader, num : Int) -> UInt64 {
+fn WebpBitReader::peek(self : WebpBitReader, num : Int32) -> UInt64 {
   self.buffer & ((1UL << num) - 1)
 }
 
 ///|
 fn WebpBitReader::consume(
   self : WebpBitReader,
-  num : Int,
+  num : Int32,
 ) -> Unit raise ImageError {
   if self.nbits < num {
     raise ImageError("Corrupt bitstream")
@@ -61,8 +61,8 @@ fn WebpBitReader::consume(
 ///|
 fn WebpBitReader::read_bits(
   self : WebpBitReader,
-  num : Int,
-) -> Int raise ImageError {
+  num : Int32,
+) -> Int32 raise ImageError {
   if self.nbits < num {
     self.fill()
   }
@@ -75,25 +75,25 @@ fn WebpBitReader::read_bits(
 // huffman.rs
 
 ///|
-let max_allowed_code_length : Int = 15
+let max_allowed_code_length : Int32 = 15
 
 ///|
-let max_table_bits : Int = 10
+let max_table_bits : Int32 = 10
 
 ///|
 /// `HuffmanTreeNode`: `Branch(offset)` is `offset >= 0`, `Leaf(symbol)` is
 /// `-1 - symbol` and `Empty` is `empty_node`.
-let empty_node : Int = -100000
+let empty_node : Int32 = -100000
 
 ///|
 priv enum HuffmanTree {
-  Single(Int)
-  Tree(tree~ : Array[Int], table~ : FixedArray[UInt], table_mask~ : Int)
+  Single(Int32)
+  Tree(tree~ : Array[Int32], table~ : FixedArray[UInt32], table_mask~ : Int32)
 }
 
 ///|
 fn HuffmanTree::build_implicit(
-  code_lengths : FixedArray[Int],
+  code_lengths : FixedArray[Int32],
 ) -> HuffmanTree raise ImageError {
   let mut num_symbols = 0
   let code_length_hist = FixedArray::make(max_allowed_code_length + 1, 0)
@@ -134,7 +134,7 @@ fn HuffmanTree::build_implicit(
   }
   let table_size = 1 << table_bits
   let table_mask = table_size - 1
-  let tree : Array[Int] = []
+  let tree : Array[Int32] = []
   let table = FixedArray::make(table_size, 0U)
   for symbol, length in code_lengths {
     if length == 0 {
@@ -188,7 +188,7 @@ fn HuffmanTree::build_implicit(
 }
 
 ///|
-fn webp_reverse_bits16(v : Int) -> Int {
+fn webp_reverse_bits16(v : Int32) -> Int32 {
   let mut r = 0
   for i in 0..<16 {
     if (v & (1 << i)) != 0 {
@@ -199,7 +199,7 @@ fn webp_reverse_bits16(v : Int) -> Int {
 }
 
 ///|
-fn HuffmanTree::build_two_node(zero : Int, one : Int) -> HuffmanTree {
+fn HuffmanTree::build_two_node(zero : Int32, one : Int32) -> HuffmanTree {
   Tree(
     tree=[-1 - zero, -1 - one, empty_node],
     table=[
@@ -219,7 +219,7 @@ fn HuffmanTree::is_single_node(self : HuffmanTree) -> Bool {
 fn HuffmanTree::read_symbol(
   self : HuffmanTree,
   bit_reader : WebpBitReader,
-) -> Int raise ImageError {
+) -> Int32 raise ImageError {
   match self {
     Tree(tree~, table~, table_mask~) => {
       let v = (bit_reader.buffer & 0xFFFFUL).to_int()
@@ -255,7 +255,7 @@ fn HuffmanTree::read_symbol(
 fn HuffmanTree::peek_symbol(
   self : HuffmanTree,
   bit_reader : WebpBitReader,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   match self {
     Tree(table~, table_mask~, ..) => {
       let v = (bit_reader.buffer & 0xFFFFUL).to_int()
@@ -278,13 +278,13 @@ fn HuffmanTree::peek_symbol(
 // lossless.rs
 
 ///|
-let code_length_code_order : ReadOnlyArray[Int] = [
+let code_length_code_order : ReadOnlyArray[Int32] = [
   17, 18, 0, 1, 2, 3, 4, 5, 16, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ]
 
 ///|
 /// `DISTANCE_MAP` as (xoffset, yoffset) pairs.
-let distance_map : ReadOnlyArray[Int] = [
+let distance_map : ReadOnlyArray[Int32] = [
   0, 1, 1, 0, 1, 1, -1, 1, 0, 2, 2, 0, 1, 2, -1, 2, 2, 1, -2, 1, 2, 2, -2, 2, 0,
   3, 3, 0, 1, 3, -1, 3, 3, 1, -3, 1, 2, 3, -2, 3, 3, 2, -3, 2, 0, 4, 4, 0, 1, 4,
   -1, 4, 4, 1, -4, 1, 3, 3, -3, 3, 2, 4, -2, 4, 4, 2, -4, 2, 0, 5, 3, 4, -3, 4, 4,
@@ -298,35 +298,35 @@ let distance_map : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let alphabet_size : ReadOnlyArray[Int] = [256 + 24, 256, 256, 256, 40]
+let alphabet_size : ReadOnlyArray[Int32] = [256 + 24, 256, 256, 256, 40]
 
 ///|
-fn subsample_size(size : Int, bits : Int) -> Int {
+fn subsample_size(size : Int32, bits : Int32) -> Int32 {
   (size + (1 << bits) - 1) >> bits
 }
 
 ///|
 priv enum TransformType {
-  PredictorTransform(size_bits~ : Int, predictor_data~ : FixedArray[Byte])
-  ColorTransform(size_bits~ : Int, transform_data~ : FixedArray[Byte])
+  PredictorTransform(size_bits~ : Int32, predictor_data~ : FixedArray[Byte])
+  ColorTransform(size_bits~ : Int32, transform_data~ : FixedArray[Byte])
   SubtractGreen
-  ColorIndexingTransform(table_size~ : Int, table_data~ : FixedArray[Byte])
+  ColorIndexingTransform(table_size~ : Int32, table_data~ : FixedArray[Byte])
 }
 
 ///|
 priv struct ColorCache {
-  color_cache_bits : Int
-  color_cache : FixedArray[UInt]
+  color_cache_bits : Int32
+  color_cache : FixedArray[UInt32]
 }
 
 ///|
 /// Stores the RGBA bytes `[r, g, b, a]` packed little-endian.
 fn ColorCache::insert(
   self : ColorCache,
-  r : Int,
-  g : Int,
-  b : Int,
-  a : Int,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
 ) -> Unit {
   let color_u32 = (r.reinterpret_as_uint() << 16) |
     (g.reinterpret_as_uint() << 8) |
@@ -341,16 +341,20 @@ fn ColorCache::insert(
 
 ///|
 priv struct HuffmanInfo {
-  xsize : Int
+  xsize : Int32
   color_cache : ColorCache?
-  image : Array[Int]
-  bits : Int
-  mask : Int
+  image : Array[Int32]
+  bits : Int32
+  mask : Int32
   huffman_code_groups : Array[Array[HuffmanTree]]
 }
 
 ///|
-fn HuffmanInfo::get_huff_index(self : HuffmanInfo, x : Int, y : Int) -> Int {
+fn HuffmanInfo::get_huff_index(
+  self : HuffmanInfo,
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   if self.bits == 0 {
     return 0
   }
@@ -362,9 +366,9 @@ fn HuffmanInfo::get_huff_index(self : HuffmanInfo, x : Int, y : Int) -> Int {
 priv struct LosslessDecoder {
   bit_reader : WebpBitReader
   transforms : FixedArray[TransformType?]
-  transform_order : Array[Int]
-  mut width : Int
-  mut height : Int
+  transform_order : Array[Int32]
+  mut width : Int32
+  mut height : Int32
 }
 
 ///|
@@ -383,8 +387,8 @@ fn LosslessDecoder::new(data : BytesView) -> LosslessDecoder {
 /// alpha chunk the dimensions are implicit.
 fn LosslessDecoder::decode_frame(
   self : LosslessDecoder,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   implicit_dimensions : Bool,
   buf : FixedArray[Byte],
 ) -> Unit raise ImageError {
@@ -454,11 +458,11 @@ fn LosslessDecoder::decode_frame(
 /// Reads image data from the bitstream into `data[..len]`.
 fn LosslessDecoder::decode_image_stream(
   self : LosslessDecoder,
-  xsize : Int,
-  ysize : Int,
+  xsize : Int32,
+  ysize : Int32,
   is_argb_img : Bool,
   data : FixedArray[Byte],
-  len : Int,
+  len : Int32,
 ) -> Unit raise ImageError {
   let color_cache_bits = self.read_color_cache()
   let color_cache = color_cache_bits.map(bits => {
@@ -475,7 +479,7 @@ fn LosslessDecoder::decode_image_stream(
 /// Reads transforms and their data from the bitstream.
 fn LosslessDecoder::read_transforms(
   self : LosslessDecoder,
-) -> Int raise ImageError {
+) -> Int32 raise ImageError {
   let mut xsize = self.width
   while self.bit_reader.read_bits(1) == 1 {
     let transform_type_val = self.bit_reader.read_bits(2)
@@ -547,8 +551,8 @@ fn LosslessDecoder::read_transforms(
 fn LosslessDecoder::read_huffman_codes(
   self : LosslessDecoder,
   read_meta : Bool,
-  xsize : Int,
-  ysize : Int,
+  xsize : Int32,
+  ysize : Int32,
   color_cache : ColorCache?,
 ) -> HuffmanInfo raise ImageError {
   let mut num_huff_groups = 1
@@ -603,7 +607,7 @@ fn LosslessDecoder::read_huffman_codes(
 /// Decodes and returns a single huffman tree.
 fn LosslessDecoder::read_huffman_code(
   self : LosslessDecoder,
-  alphabet_size : Int,
+  alphabet_size : Int32,
 ) -> HuffmanTree raise ImageError {
   let simple = self.bit_reader.read_bits(1) == 1
   if simple {
@@ -641,9 +645,9 @@ fn LosslessDecoder::read_huffman_code(
 /// Reads huffman code lengths.
 fn LosslessDecoder::read_huffman_code_lengths(
   self : LosslessDecoder,
-  code_length_code_lengths : FixedArray[Int],
-  num_symbols : Int,
-) -> FixedArray[Int] raise ImageError {
+  code_length_code_lengths : FixedArray[Int32],
+  num_symbols : Int32,
+) -> FixedArray[Int32] raise ImageError {
   let table = HuffmanTree::build_implicit(code_length_code_lengths)
   let mut max_symbol = if self.bit_reader.read_bits(1) == 1 {
     let length_nbits = 2 + 2 * self.bit_reader.read_bits(3)
@@ -701,11 +705,11 @@ fn LosslessDecoder::read_huffman_code_lengths(
 /// methods of decoding.
 fn LosslessDecoder::decode_image_data(
   self : LosslessDecoder,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   huffman_info : HuffmanInfo,
   data : FixedArray[Byte],
-  len : Int,
+  len : Int32,
 ) -> Unit raise ImageError {
   let num_values = width * height
   let br = self.bit_reader
@@ -713,7 +717,7 @@ fn LosslessDecoder::decode_image_data(
   let mut tree = huffman_info.huffman_code_groups[huff_index]
   let mut index = 0
   let mut next_block_start = 0
-  let set = (i : Int, v : Int) => {
+  let set = (i : Int32, v : Int32) => {
     if i >= len {
       abort("index out of bounds")
     }
@@ -858,7 +862,7 @@ fn LosslessDecoder::decode_image_data(
 /// Reads color cache data from the bitstream.
 fn LosslessDecoder::read_color_cache(
   self : LosslessDecoder,
-) -> Int? raise ImageError {
+) -> Int32? raise ImageError {
   if self.bit_reader.read_bits(1) == 1 {
     let code_bits = self.bit_reader.read_bits(4)
     if code_bits < 1 || code_bits > 11 {
@@ -874,8 +878,8 @@ fn LosslessDecoder::read_color_cache(
 /// Gets the copy distance from the prefix code and bitstream.
 fn get_copy_distance(
   bit_reader : WebpBitReader,
-  prefix_code : Int,
-) -> Int raise ImageError {
+  prefix_code : Int32,
+) -> Int32 raise ImageError {
   if prefix_code < 4 {
     return prefix_code + 1
   }
@@ -888,7 +892,7 @@ fn get_copy_distance(
 
 ///|
 /// Gets distance to pixel.
-fn plane_code_to_distance(xsize : Int, plane_code : Int) -> Int {
+fn plane_code_to_distance(xsize : Int32, plane_code : Int32) -> Int32 {
   if plane_code > 120 {
     plane_code - 120
   } else {
@@ -907,33 +911,33 @@ fn plane_code_to_distance(xsize : Int, plane_code : Int) -> Int {
 // lossless_transform.rs
 
 ///|
-fn average2(a : Int, b : Int) -> Int {
+fn average2(a : Int32, b : Int32) -> Int32 {
   (a + b) / 2
 }
 
 ///|
-fn clamp_add_subtract_full(a : Int, b : Int, c : Int) -> Int {
+fn clamp_add_subtract_full(a : Int32, b : Int32, c : Int32) -> Int32 {
   clamp(a + b - c, 0, 255)
 }
 
 ///|
-fn clamp_add_subtract_half(a : Int, b : Int) -> Int {
+fn clamp_add_subtract_half(a : Int32, b : Int32) -> Int32 {
   clamp(a + (a - b) / 2, 0, 255)
 }
 
 ///|
 fn apply_predictor_transform(
   image_data : FixedArray[Byte],
-  len : Int,
-  width : Int,
-  height : Int,
-  size_bits : Int,
+  len : Int32,
+  width : Int32,
+  height : Int32,
+  size_bits : Int32,
   predictor_data : FixedArray[Byte],
 ) -> Unit {
   let block_xsize = subsample_size(width, size_bits)
   let d = image_data
-  let get = (i : Int) => d[i].to_int()
-  let add = (i : Int, v : Int) => {
+  let get = (i : Int32) => d[i].to_int()
+  let add = (i : Int32, v : Int32) => {
     if i >= len {
       abort("index out of bounds")
     }
@@ -1062,16 +1066,16 @@ fn apply_predictor_transform(
 
 ///|
 /// Does color transform on 2 numbers.
-fn color_transform_delta(t : Int, c : Int) -> UInt {
+fn color_transform_delta(t : Int32, c : Int32) -> UInt32 {
   (as_i8(t) * as_i8(c)).reinterpret_as_uint() >> 5
 }
 
 ///|
 fn apply_color_transform(
   image_data : FixedArray[Byte],
-  len : Int,
-  width : Int,
-  size_bits : Int,
+  len : Int32,
+  width : Int32,
+  size_bits : Int32,
   transform_data : FixedArray[Byte],
 ) -> Unit {
   let block_xsize = subsample_size(width, size_bits)
@@ -1107,7 +1111,7 @@ fn apply_color_transform(
 ///|
 fn apply_subtract_green_transform(
   image_data : FixedArray[Byte],
-  len : Int,
+  len : Int32,
 ) -> Unit {
   for p = 0; p + 4 <= len; p = p + 4 {
     let g = image_data[p + 1].to_int()
@@ -1119,9 +1123,9 @@ fn apply_subtract_green_transform(
 ///|
 fn apply_color_indexing_transform(
   image_data : FixedArray[Byte],
-  width : Int,
-  height : Int,
-  table_size : Int,
+  width : Int32,
+  height : Int32,
+  table_size : Int32,
   table_data : FixedArray[Byte],
 ) -> Unit {
   guard! table_size > 0

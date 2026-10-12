@@ -15,7 +15,7 @@ pub struct SvgImage {
   /// What the font resolver answered, in the order in which it was asked
   /// (`select_font`, `select_fallback`): the place in `fonts` of the font
   /// it chose, or -1 for none (not upstream, see [SvgImage::links]).
-  priv selections : Array[Int]
+  priv selections : Array[Int32]
   /// The hashes of the data of the images that the SVG links (`<image
   /// href="photo.png"/>`), in the order in which they were loaded (not
   /// upstream, see [SvgImage::links]).
@@ -190,7 +190,7 @@ pub fn SvgImage::links(self : SvgImage) -> ArrayView[U128] {
 /// What the font resolver answered while the tree was built, in order: for
 /// every selection of a font and of a fallback the place of the chosen
 /// font in the list of used fonts, or -1 for none (see [SvgImage::links]).
-pub fn SvgImage::selections(self : SvgImage) -> ArrayView[Int] {
+pub fn SvgImage::selections(self : SvgImage) -> ArrayView[Int32] {
   self.selections[:]
 }
 
@@ -324,16 +324,16 @@ priv struct SvgFontResolver {
   /// The active list of font families at the location of the SVG.
   families : Array[String]
   /// A mapping from Typst font indices to fontdb IDs.
-  to_id : Map[Int, @usvg.FontId?]
+  to_id : Map[Int32, @usvg.FontId?]
   /// The reverse mapping.
   from_id : Map[@usvg.FontId, Font]
   /// All used fonts (upstream accumulates their hash).
   used : Array[Font]
   /// Where the font of a fontdb ID is in `used` (not upstream).
-  place : Map[@usvg.FontId, Int]
+  place : Map[@usvg.FontId, Int32]
   /// What was answered to every selection, in order: a place in `used`,
   /// or -1 (not upstream: [SvgImage::selections]).
-  selections : Array[Int]
+  selections : Array[Int32]
 }
 
 ///|
@@ -445,7 +445,7 @@ fn SvgFontResolver::select_fallback(
 /// a new ID.
 fn SvgFontResolver::get_or_load(
   self : SvgFontResolver,
-  index : Int,
+  index : Int32,
   db : @usvg.FontDatabase,
 ) -> @usvg.FontId? {
   match self.to_id.get(index) {
@@ -459,7 +459,7 @@ fn SvgFontResolver::get_or_load(
 /// database and returns its ID.
 fn SvgFontResolver::load(
   self : SvgFontResolver,
-  index : Int,
+  index : Int32,
   db : @usvg.FontDatabase,
 ) -> @usvg.FontId? {
   guard self.world.font(index) is Some(font) else { return None }

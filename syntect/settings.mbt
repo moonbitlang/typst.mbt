@@ -317,7 +317,7 @@ fn is_base64(s : String) -> Bool {
       pad += 1
     } else if pad > 0 {
       return false
-    } else if !(c is ('A'..='Z' | 'a'..='z' | '0'..='9' | '+' | '/')) {
+    } else if !(c is ('A'..<='Z' | 'a'..<='z' | '0'..<='9' | '+' | '/')) {
       return false
     }
     n += 1
@@ -328,7 +328,7 @@ fn is_base64(s : String) -> Bool {
 ///|
 fn is_rfc3339(s : String) -> Bool {
   // YYYY-MM-DDTHH:MM:SS(.frac)?(Z|+HH:MM|-HH:MM)
-  let digits = (start : Int, len : Int) => {
+  let digits = (start : Int32, len : Int32) => {
     if start + len > s.length() {
       return false
     }
@@ -340,7 +340,7 @@ fn is_rfc3339(s : String) -> Bool {
     }
     true
   }
-  let at = (i : Int, c : Char) => {
+  let at = (i : Int32, c : Char) => {
     i < s.length() && s.code_unit_at(i).to_int() == c.to_int()
   }
   if !(digits(0, 4) && at(4, '-') && digits(5, 2) && at(7, '-') && digits(8, 2)) {
@@ -389,14 +389,14 @@ fn is_plist_integer(s : String) -> Bool {
     if hex.is_empty() || hex.length() > 16 + count_leading_zeros(hex) {
       return false
     }
-    hex.iter().all(c => c is ('0'..='9' | 'a'..='f' | 'A'..='F'))
+    hex.iter().all(c => c is ('0'..<='9' | 'a'..<='f' | 'A'..<='F'))
   } else {
     parse_rust_i64(s) is Some(_) || parse_rust_u64(s) is Some(_)
   }
 }
 
 ///|
-fn count_leading_zeros(s : StringView) -> Int {
+fn count_leading_zeros(s : StringView) -> Int32 {
   let mut n = 0
   for c in s {
     if c != '0' {
@@ -450,7 +450,7 @@ fn parse_rust_f64(s : String) -> Double? {
   // Rust accepts `[+-]digits[.digits][e[+-]digits]` with optional parts.
   let mut i = 0
   let n = s.length()
-  let at = (i : Int) => if i < n { s.code_unit_at(i).to_int() } else { -1 }
+  let at = (i : Int32) => if i < n { s.code_unit_at(i).to_int() } else { -1 }
   if at(i) == '+'.to_int() || at(i) == '-'.to_int() {
     i += 1
   }

@@ -4,7 +4,7 @@
 ///|
 /// A delimiter of a group that is continued on the next line of a display,
 /// where Typst cannot size it from its contents.
-fn big(delimiter : String, percent : Int) -> String {
+fn big(delimiter : String, percent : Int32) -> String {
   "stretch(\{delimiter}, size: #\{percent}%)"
 }
 

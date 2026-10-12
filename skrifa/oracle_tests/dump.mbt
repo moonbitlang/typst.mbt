@@ -129,13 +129,13 @@ pub extend TextPen with @read_fonts.OutlinePen::{
 fn latin1(b : BytesView) -> String {
   let sb = StringBuilder()
   for c in b {
-    sb.write_char(Int::unsafe_to_char(c.to_int()))
+    sb.write_char(Int32::unsafe_to_char(c.to_int()))
   }
   sb.to_string()
 }
 
 ///|
-fn opt_i32(v : Int?) -> String {
+fn opt_i32(v : Int32?) -> String {
   match v {
     Some(v) => "Some(\{v})"
     None => "None"
@@ -243,8 +243,8 @@ fn hash_lines(lines : StringBuilder) -> String {
 /// Mirrors the oracle's `otf` command.
 pub fn dump_otf(
   data : BytesView,
-  index : Int,
-  hinted? : Bool = false,
+  index : Int32,
+  hinted~ : Bool = false,
 ) -> String {
   let out = StringBuilder()
   let font = @read_fonts.FontRef::from_index(data, index) catch {

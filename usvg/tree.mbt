@@ -13,10 +13,10 @@ using @tiny_skia_path {type Transform, type Rect, type NonZeroRect, type Size}
 type TinyPath = @tiny_skia_path.Path
 
 ///|
-let next_uid : Ref[Int] = Ref(0)
+let next_uid : Ref[Int32] = Ref(0)
 
 ///|
-fn gen_uid() -> Int {
+fn gen_uid() -> Int32 {
   next_uid.val += 1
   next_uid.val
 }
@@ -256,7 +256,7 @@ pub struct BaseGradient {
 ///
 /// `linearGradient` element in SVG.
 pub struct LinearGradient {
-  priv uid : Int
+  priv uid : Int32
   priv base : BaseGradient
   priv x1 : Float
   priv y1 : Float
@@ -317,7 +317,7 @@ pub fn LinearGradient::y2(self : LinearGradient) -> Float {
 ///
 /// `radialGradient` element in SVG.
 pub struct RadialGradient {
-  priv uid : Int
+  priv uid : Int32
   priv base : BaseGradient
   priv cx : Float
   priv cy : Float
@@ -420,7 +420,7 @@ pub fn Stop::opacity(self : Stop) -> Opacity {
 ///
 /// `pattern` element in SVG.
 pub struct Pattern {
-  priv uid : Int
+  priv uid : Int32
   priv id : NonEmptyString
   priv mut units : Units // used only during parsing
   priv mut content_units : Units // used only during parsing
@@ -710,9 +710,9 @@ pub extend Fill with Default::{default}
 ///|
 /// A 8-bit RGB color.
 pub(all) struct Color {
-  red : Int
-  green : Int
-  blue : Int
+  red : Int32
+  green : Int32
+  blue : Int32
 } derive(Eq)
 
 ///|
@@ -722,7 +722,7 @@ pub extend Color with Eq::{not_equal, equal}
 
 ///|
 /// Constructs a new `Color` from RGB values.
-pub fn Color::new_rgb(red : Int, green : Int, blue : Int) -> Color {
+pub fn Color::new_rgb(red : Int32, green : Int32, blue : Int32) -> Color {
   { red, green, blue, }
 }
 
@@ -770,7 +770,7 @@ pub extend Paint with Eq::{not_equal, equal}
 ///
 /// `clipPath` element in SVG.
 pub struct ClipPath {
-  priv uid : Int
+  priv uid : Int32
   priv id : NonEmptyString
   priv transform : Transform
   priv clip_path : ClipPath?
@@ -841,7 +841,7 @@ pub extend MaskType with Default::{default}
 ///
 /// `mask` element in SVG.
 pub struct Mask {
-  priv uid : Int
+  priv uid : Int32
   priv id : NonEmptyString
   priv rect : NonZeroRect
   priv kind : MaskType

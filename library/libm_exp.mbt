@@ -48,7 +48,7 @@ const LIBM_X1P1023 : UInt64 = 0x7fe0000000000000UL
 
 ///|
 /// `with_set_high_word`.
-fn libm_with_set_high_word(f : Double, hi : UInt) -> Double {
+fn libm_with_set_high_word(f : Double, hi : UInt32) -> Double {
   let mut tmp = f.reinterpret_as_uint64()
   tmp = tmp & 0x00000000_ffffffffUL
   tmp = tmp | (hi.to_uint64() << 32)
@@ -57,7 +57,7 @@ fn libm_with_set_high_word(f : Double, hi : UInt) -> Double {
 
 ///|
 /// `with_set_low_word`.
-fn libm_with_set_low_word(f : Double, lo : UInt) -> Double {
+fn libm_with_set_low_word(f : Double, lo : UInt32) -> Double {
   let mut tmp = f.reinterpret_as_uint64()
   tmp = tmp & 0xffffffff_00000000UL
   tmp = tmp | lo.to_uint64()
@@ -66,7 +66,7 @@ fn libm_with_set_low_word(f : Double, lo : UInt) -> Double {
 
 ///|
 /// `libm::scalbn` (`generic::scalbn` for `f64`).
-fn libm_scalbn(x : Double, n : Int) -> Double {
+fn libm_scalbn(x : Double, n : Int32) -> Double {
   let exp_max = 1023
   let exp_min = -1022
   let f_exp_max = LIBM_X1P1023.reinterpret_as_double() // 0x1p1023

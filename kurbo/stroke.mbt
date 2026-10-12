@@ -676,8 +676,8 @@ priv struct DashIterator {
   mut input_done : Bool
   mut closepath_pending : Bool
   dashes : Array[Double]
-  mut dash_ix : Int
-  init_dash_ix : Int
+  mut dash_ix : Int32
+  init_dash_ix : Int32
   init_dash_remaining : Double
   init_is_active : Bool
   mut is_active : Bool
@@ -689,7 +689,7 @@ priv struct DashIterator {
   mut start_pt : Point
   mut last_pt : Point
   stash : Array[PathEl]
-  mut stash_ix : Int
+  mut stash_ix : Int32
   stable_dash_order : Bool
   mut needs_moveto : Bool
 }

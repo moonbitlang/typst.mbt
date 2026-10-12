@@ -1,11 +1,11 @@
 ///|
-fn font_count() -> Int {
+fn font_count() -> Int32 {
   fonts_base64.length()
 }
 
 ///|
 /// Decodes a base64 multi-line string (line breaks are skipped).
-fn font_data(index : Int) -> Bytes {
+fn font_data(index : Int32) -> Bytes {
   let (chunks, len) = fonts_base64[index]
   let out = FixedArray::make(len, b'\x00')
   let mut o = 0

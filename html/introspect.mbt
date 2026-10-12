@@ -257,7 +257,7 @@ fn HtmlIntrospectorBuilder::finish(
 fn HtmlIntrospectorBuilder::discover_nodes(
   self : HtmlIntrospectorBuilder,
   nodes : ArrayView[HtmlNode],
-  current_position : Array[Int],
+  current_position : Array[Int32],
 ) -> Unit {
   for pair in iter_with_dom_indices(nodes) {
     let (node, dom_index) = pair

@@ -22,7 +22,7 @@ pub fn bytes_contain(data : BytesView, b : Byte) -> Bool {
 
 ///|
 /// Find the first occurrence of `needle` in `haystack`.
-pub fn find_needle(haystack : BytesView, needle : Bytes) -> Int? {
+pub fn find_needle(haystack : BytesView, needle : Bytes) -> Int32? {
   if needle.length() == 0 {
     return Some(0)
   }
@@ -49,7 +49,7 @@ pub fn find_needle(haystack : BytesView, needle : Bytes) -> Int? {
 
 ///|
 /// Find the last occurrence of `needle` in `haystack`.
-pub fn findr_needle(haystack : BytesView, needle : Bytes) -> Int? {
+pub fn findr_needle(haystack : BytesView, needle : Bytes) -> Int32? {
   if needle.length() == 0 {
     return Some(haystack.length())
   }
@@ -92,7 +92,7 @@ pub fn latin1_string(b : BytesView) -> String {
 
 ///|
 /// Compare two latin-1 strings by their bytes (Rust `[u8]` order).
-pub fn compare_latin1(a : String, b : String) -> Int {
+pub fn compare_latin1(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let c = a.code_unit_at(i).to_int() - b.code_unit_at(i).to_int()

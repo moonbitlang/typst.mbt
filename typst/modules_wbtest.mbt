@@ -40,7 +40,7 @@ test "modules: a file that is evaluated twice gives two modules (tracing)" {
 fn modules_test_metadata(
   source : String,
   library : @library.Library,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> Array[String] raise {
   let world : TestWorld = { ..test_world(source, files~), library, }
   match compile(world).output {

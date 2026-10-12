@@ -4,7 +4,7 @@
 
 ///|
 test "png: the chunk types are their names" {
-  let types : Array[(UInt, String)] = [
+  let types : Array[(UInt32, String)] = [
     (PNG_IHDR, "IHDR"),
     (PNG_PLTE, "PLTE"),
     (PNG_IDAT, "IDAT"),
@@ -36,7 +36,7 @@ test "png: the chunk types are their names" {
     }
     assert_eq(bytes, value)
     // An uppercase first letter is a critical chunk.
-    assert_eq(chunk_is_critical(value), name is ['A'..='Z', ..])
+    assert_eq(chunk_is_critical(value), name is ['A'..<='Z', ..])
     assert_true(
       chunk_type_debug(value).has_prefix("ChunkType { type: \{name}, "),
     )

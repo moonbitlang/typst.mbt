@@ -3,14 +3,14 @@
 // Ported from <https://github.com/mozilla/pdf.js/blob/master/src/core/calculate_md5.js>.
 
 ///|
-let md5_shift_amounts : ReadOnlyArray[Int] = [
+let md5_shift_amounts : ReadOnlyArray[Int32] = [
   7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9,
   14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
   4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
 ]
 
 ///|
-let md5_constants : ReadOnlyArray[UInt] = [
+let md5_constants : ReadOnlyArray[UInt32] = [
   0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613,
   0xfd469501, 0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193,
   0xa679438e, 0x49b40821, 0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d,
@@ -26,7 +26,7 @@ let md5_constants : ReadOnlyArray[UInt] = [
 ///|
 /// Upstream `md5::calculate`. Returns 16 bytes.
 fn md5_calculate(data : BytesView) -> Bytes {
-  let state : FixedArray[UInt] = [
+  let state : FixedArray[UInt32] = [
     0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476,
   ]
   let original_len = data.length()
@@ -39,7 +39,7 @@ fn md5_calculate(data : BytesView) -> Bytes {
     message.push(0)
   }
   write_u64_le(message, original_len.to_uint64() * 8)
-  let words : FixedArray[UInt] = FixedArray::make(16, 0)
+  let words : FixedArray[UInt32] = FixedArray::make(16, 0)
   for chunk = 0; chunk + 64 <= message.length(); chunk = chunk + 64 {
     for j in 0..<16 {
       words[j] = read_u32_le(message, chunk + j * 4)
@@ -92,22 +92,22 @@ fn md5_calculate(data : BytesView) -> Bytes {
 // MoonBit's `UInt`/`UInt64` arithmetic wraps like Rust's `wrapping_*`).
 
 ///|
-fn rotl32(x : UInt, n : Int) -> UInt {
+fn rotl32(x : UInt32, n : Int32) -> UInt32 {
   (x << n) | (x >> (32 - n))
 }
 
 ///|
-fn rotr32(x : UInt, n : Int) -> UInt {
+fn rotr32(x : UInt32, n : Int32) -> UInt32 {
   (x >> n) | (x << (32 - n))
 }
 
 ///|
-fn rotr64(x : UInt64, n : Int) -> UInt64 {
+fn rotr64(x : UInt64, n : Int32) -> UInt64 {
   (x >> n) | (x << (64 - n))
 }
 
 ///|
-fn read_u32_le(data : Array[Byte], i : Int) -> UInt {
+fn read_u32_le(data : Array[Byte], i : Int32) -> UInt32 {
   data[i].to_uint() |
   (data[i + 1].to_uint() << 8) |
   (data[i + 2].to_uint() << 16) |
@@ -115,7 +115,7 @@ fn read_u32_le(data : Array[Byte], i : Int) -> UInt {
 }
 
 ///|
-fn read_u32_be(data : FixedArray[Byte], i : Int) -> UInt {
+fn read_u32_be(data : FixedArray[Byte], i : Int32) -> UInt32 {
   (data[i].to_uint() << 24) |
   (data[i + 1].to_uint() << 16) |
   (data[i + 2].to_uint() << 8) |
@@ -123,7 +123,7 @@ fn read_u32_be(data : FixedArray[Byte], i : Int) -> UInt {
 }
 
 ///|
-fn read_u64_be(data : FixedArray[Byte], i : Int) -> UInt64 {
+fn read_u64_be(data : FixedArray[Byte], i : Int32) -> UInt64 {
   let mut v = 0UL
   for j in 0..<8 {
     v = (v << 8) | data[i + j].to_uint64()
@@ -132,7 +132,7 @@ fn read_u64_be(data : FixedArray[Byte], i : Int) -> UInt64 {
 }
 
 ///|
-fn write_u32_le(out : Array[Byte], v : UInt) -> Unit {
+fn write_u32_le(out : Array[Byte], v : UInt32) -> Unit {
   for j in 0..<4 {
     out.push((v >> (8 * j)).to_byte())
   }
@@ -146,7 +146,7 @@ fn write_u64_le(out : Array[Byte], v : UInt64) -> Unit {
 }
 
 ///|
-fn write_u32_be(out : Array[Byte], v : UInt) -> Unit {
+fn write_u32_be(out : Array[Byte], v : UInt32) -> Unit {
   for j in 0..<4 {
     out.push((v >> (8 * (3 - j))).to_byte())
   }

@@ -11,7 +11,7 @@ pub(all) enum BlockType {
   /// The block is described by a function type.
   ///
   /// The index is to a function type in the types section.
-  FuncType(UInt)
+  FuncType(UInt32)
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -99,7 +99,7 @@ pub(all) struct MemArg {
   /// Note that this points within the module's own memory index space, and
   /// is always zero unless the multi-memory proposal of WebAssembly is
   /// enabled.
-  memory : UInt
+  memory : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -117,8 +117,8 @@ pub extend MemArg with @debug.Debug::{to_repr}
 ///
 /// Upstream keeps a reader over the targets; they are already decoded here.
 pub(all) struct BrTable {
-  priv targets : Array[UInt]
-  priv default : UInt
+  priv targets : Array[UInt32]
+  priv default : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -136,7 +136,7 @@ pub extend BrTable with @debug.Debug::{to_repr}
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
-pub(all) struct Ieee32(UInt) derive(Eq, Hash, Debug)
+pub(all) struct Ieee32(UInt32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -155,7 +155,7 @@ pub extend Ieee32 with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the underlying bits of the 32-bit float.
-pub fn Ieee32::bits(self : Ieee32) -> UInt {
+pub fn Ieee32::bits(self : Ieee32) -> UInt32 {
   self.0
 }
 
@@ -266,7 +266,7 @@ pub fn OperatorsReader::eof(self : OperatorsReader) -> Bool {
 
 ///|
 /// Gets the original position of the reader.
-pub fn OperatorsReader::original_position(self : OperatorsReader) -> Int {
+pub fn OperatorsReader::original_position(self : OperatorsReader) -> Int32 {
   self.reader.original_position()
 }
 
@@ -298,7 +298,7 @@ pub fn OperatorsReader::read(
 /// Reads an operator with its offset.
 pub fn OperatorsReader::read_with_offset(
   self : OperatorsReader,
-) -> (Operator, Int) raise BinaryReaderError {
+) -> (Operator, Int32) raise BinaryReaderError {
   let pos = self.reader.original_position()
   (self.read(), pos)
 }
@@ -341,13 +341,13 @@ pub extend TryTable with @debug.Debug::{to_repr}
 /// Catch clauses that can be specified in [`TryTable`].
 pub(all) enum Catch {
   /// Equivalent of `catch`
-  One(tag~ : UInt, label~ : UInt)
+  One(tag~ : UInt32, label~ : UInt32)
   /// Equivalent of `catch_ref`
-  OneRef(tag~ : UInt, label~ : UInt)
+  OneRef(tag~ : UInt32, label~ : UInt32)
   /// Equivalent of `catch_all`
-  All(label~ : UInt)
+  All(label~ : UInt32)
   /// Equivalent of `catch_all_ref`
-  AllRef(label~ : UInt)
+  AllRef(label~ : UInt32)
 } derive(Eq, Debug)
 
 ///|
@@ -419,9 +419,9 @@ pub extend ResumeTable with @debug.Debug::{to_repr}
 /// Handle clauses that can be specified in [`ResumeTable`].
 pub(all) enum Handle {
   /// Equivalent of `(on $tag $lbl)`.
-  OnLabel(tag~ : UInt, label~ : UInt)
+  OnLabel(tag~ : UInt32, label~ : UInt32)
   /// Equivalent of `(on $tag switch)`.
-  OnSwitch(tag~ : UInt)
+  OnSwitch(tag~ : UInt32)
 } derive(Eq, Debug)
 
 ///|
@@ -436,7 +436,7 @@ pub extend Handle with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the number of entries in the table.
-pub fn ResumeTable::len(self : ResumeTable) -> Int {
+pub fn ResumeTable::len(self : ResumeTable) -> Int32 {
   self.handlers.length()
 }
 

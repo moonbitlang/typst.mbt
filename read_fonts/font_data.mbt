@@ -5,9 +5,9 @@
 pub(all) suberror ReadError {
   OutOfBounds
   InvalidFormat(Int64)
-  InvalidSfnt(UInt)
+  InvalidSfnt(UInt32)
   InvalidTtc(@font_types.Tag)
-  InvalidCollectionIndex(UInt)
+  InvalidCollectionIndex(UInt32)
   InvalidArrayLen
   ValidationError
   NullOffset
@@ -40,7 +40,7 @@ pub impl Show for ReadError with fn output(self, logger) {
 pub extend ReadError with Show::{to_string, output}
 
 ///|
-fn hex_upper8(v : UInt) -> String {
+fn hex_upper8(v : UInt32) -> String {
   let digits = "0123456789ABCDEF"
   let sb = StringBuilder()
   for i in 0..<8 {
@@ -68,7 +68,7 @@ pub fn FontData::empty() -> FontData {
 
 ///|
 /// The length of the data, in bytes.
-pub fn FontData::len(self : FontData) -> Int {
+pub fn FontData::len(self : FontData) -> Int32 {
   self.bytes.length()
 }
 
@@ -85,7 +85,7 @@ pub fn FontData::as_bytes(self : FontData) -> BytesView {
 
 ///|
 /// Returns `self[pos..]`.
-pub fn FontData::split_off(self : FontData, pos : Int) -> FontData? {
+pub fn FontData::split_off(self : FontData, pos : Int32) -> FontData? {
   if pos < 0 || pos > self.bytes.length() {
     None
   } else {
@@ -95,7 +95,11 @@ pub fn FontData::split_off(self : FontData, pos : Int) -> FontData? {
 
 ///|
 /// Returns `self[start..end]`.
-pub fn FontData::slice(self : FontData, start : Int, end : Int) -> FontData? {
+pub fn FontData::slice(
+  self : FontData,
+  start : Int32,
+  end : Int32,
+) -> FontData? {
   if start < 0 || start > end || end > self.bytes.length() {
     None
   } else {
@@ -105,7 +109,7 @@ pub fn FontData::slice(self : FontData, start : Int, end : Int) -> FontData? {
 
 ///|
 /// Returns the bytes `start..end` (Rust `bytes.get(range)`).
-pub fn FontData::get(self : FontData, start : Int, end : Int) -> BytesView? {
+pub fn FontData::get(self : FontData, start : Int32, end : Int32) -> BytesView? {
   if start < 0 || start > end || end > self.bytes.length() {
     None
   } else {
@@ -116,8 +120,8 @@ pub fn FontData::get(self : FontData, start : Int, end : Int) -> BytesView? {
 ///|
 fn FontData::check(
   self : FontData,
-  offset : Int,
-  len : Int,
+  offset : Int32,
+  len : Int32,
 ) -> Unit raise ReadError {
   if offset < 0 || len > self.bytes.length() - offset {
     raise OutOfBounds
@@ -125,31 +129,46 @@ fn FontData::check(
 }
 
 ///|
-pub fn FontData::read_u8(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_u8(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 1)
   self.bytes[offset].to_int()
 }
 
 ///|
-pub fn FontData::read_i8(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_i8(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 1)
   self.bytes[offset].to_int() << 24 >> 24
 }
 
 ///|
-pub fn FontData::read_u16(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_u16(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 2)
   (self.bytes[offset].to_int() << 8) | self.bytes[offset + 1].to_int()
 }
 
 ///|
-pub fn FontData::read_i16(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_i16(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 2)
   (self.bytes[offset].to_int() << 24 >> 16) | self.bytes[offset + 1].to_int()
 }
 
 ///|
-pub fn FontData::read_u24(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_u24(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 3)
   (self.bytes[offset].to_int() << 16) |
   (self.bytes[offset + 1].to_int() << 8) |
@@ -158,7 +177,10 @@ pub fn FontData::read_u24(self : FontData, offset : Int) -> Int raise ReadError 
 
 ///|
 /// Reads a big-endian 32-bit value (as raw bits).
-pub fn FontData::read_i32(self : FontData, offset : Int) -> Int raise ReadError {
+pub fn FontData::read_i32(
+  self : FontData,
+  offset : Int32,
+) -> Int32 raise ReadError {
   self.check(offset, 4)
   (self.bytes[offset].to_int() << 24) |
   (self.bytes[offset + 1].to_int() << 16) |
@@ -169,8 +191,8 @@ pub fn FontData::read_i32(self : FontData, offset : Int) -> Int raise ReadError 
 ///|
 pub fn FontData::read_u32(
   self : FontData,
-  offset : Int,
-) -> UInt raise ReadError {
+  offset : Int32,
+) -> UInt32 raise ReadError {
   self.read_i32(offset).reinterpret_as_uint()
 }
 
@@ -178,7 +200,7 @@ pub fn FontData::read_u32(
 /// Reads a 16.16 fixed point value.
 pub fn FontData::read_fixed(
   self : FontData,
-  offset : Int,
+  offset : Int32,
 ) -> @font_types.Fixed raise ReadError {
   @font_types.Fixed::from_bits(self.read_i32(offset))
 }
@@ -187,7 +209,7 @@ pub fn FontData::read_fixed(
 /// Reads a 2.14 fixed point value.
 pub fn FontData::read_f2dot14(
   self : FontData,
-  offset : Int,
+  offset : Int32,
 ) -> @font_types.F2Dot14 raise ReadError {
   @font_types.F2Dot14::from_bits(self.read_i16(offset))
 }
@@ -197,9 +219,9 @@ pub fn FontData::read_f2dot14(
 /// `offset` (Rust `read_array`).
 pub fn FontData::read_array(
   self : FontData,
-  offset : Int,
-  n : Int,
-  size : Int,
+  offset : Int32,
+  n : Int32,
+  size : Int32,
 ) -> FontData raise ReadError {
   let len = n.to_int64() * size.to_int64()
   if offset < 0 ||
@@ -220,11 +242,11 @@ pub fn FontData::cursor(self : FontData) -> Cursor {
 /// A cursor for sequential reads.
 pub(all) struct Cursor {
   data : FontData
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
-fn sat_add(a : Int, b : Int) -> Int {
+fn sat_add(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() + b.to_int64()
   if r > 2147483647L {
     2147483647
@@ -234,54 +256,54 @@ fn sat_add(a : Int, b : Int) -> Int {
 }
 
 ///|
-pub fn Cursor::advance_by(self : Cursor, n : Int) -> Unit {
+pub fn Cursor::advance_by(self : Cursor, n : Int32) -> Unit {
   self.pos = sat_add(self.pos, n)
 }
 
 ///|
-pub fn Cursor::read_u8(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_u8(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(1)
   self.data.read_u8(p)
 }
 
 ///|
-pub fn Cursor::read_i8(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_i8(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(1)
   self.data.read_i8(p)
 }
 
 ///|
-pub fn Cursor::read_u16(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_u16(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(2)
   self.data.read_u16(p)
 }
 
 ///|
-pub fn Cursor::read_i16(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_i16(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(2)
   self.data.read_i16(p)
 }
 
 ///|
-pub fn Cursor::read_u24(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_u24(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(3)
   self.data.read_u24(p)
 }
 
 ///|
-pub fn Cursor::read_i32(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::read_i32(self : Cursor) -> Int32 raise ReadError {
   let p = self.pos
   self.advance_by(4)
   self.data.read_i32(p)
 }
 
 ///|
-pub fn Cursor::read_u32(self : Cursor) -> UInt raise ReadError {
+pub fn Cursor::read_u32(self : Cursor) -> UInt32 raise ReadError {
   self.read_i32().reinterpret_as_uint()
 }
 
@@ -289,8 +311,8 @@ pub fn Cursor::read_u32(self : Cursor) -> UInt raise ReadError {
 /// Reads an array of `n` elements of `size` bytes and advances the cursor.
 pub fn Cursor::read_array(
   self : Cursor,
-  n : Int,
-  size : Int,
+  n : Int32,
+  size : Int32,
 ) -> FontData raise ReadError {
   let len = n.to_int64() * size.to_int64()
   if len > 2147483647L {
@@ -303,7 +325,7 @@ pub fn Cursor::read_array(
 
 ///|
 /// Returns the current position, or an error if we are out of bounds.
-pub fn Cursor::position(self : Cursor) -> Int raise ReadError {
+pub fn Cursor::position(self : Cursor) -> Int32 raise ReadError {
   if self.pos > self.data.len() {
     raise OutOfBounds
   }
@@ -311,7 +333,7 @@ pub fn Cursor::position(self : Cursor) -> Int raise ReadError {
 }
 
 ///|
-pub fn Cursor::remaining_bytes(self : Cursor) -> Int {
+pub fn Cursor::remaining_bytes(self : Cursor) -> Int32 {
   let r = self.data.len() - self.pos
   if r < 0 {
     0

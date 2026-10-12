@@ -13,7 +13,7 @@
 let rustybuzz_dir = ".repos/rustybuzz"
 
 ///|
-fn json_int(j : Json) -> Int {
+fn json_int(j : Json) -> Int32 {
   match j {
     Number(n, ..) => n.to_int()
     _ => abort("expected a number")
@@ -21,7 +21,7 @@ fn json_int(j : Json) -> Int {
 }
 
 ///|
-fn json_uint(j : Json) -> UInt {
+fn json_uint(j : Json) -> UInt32 {
   match j {
     Number(n, ..) => n.to_uint()
     _ => abort("expected a number")
@@ -137,8 +137,8 @@ fn run_shape_stage(filter : String?, verbose : Bool) -> Unit {
   files.sort_by((a, b) => compare_str(a, b))
   let mut passed = 0
   let mut failed = 0
-  let by_font : Array[(String, Int, Int)] = []
-  let by_script : Map[String, (Int, Int)] = Map([])
+  let by_font : Array[(String, Int32, Int32)] = []
+  let by_script : Map[String, (Int32, Int32)] = Map([])
   for file in files {
     let mut fp = 0
     let mut ff = 0
@@ -182,7 +182,7 @@ fn run_shape_stage(filter : String?, verbose : Bool) -> Unit {
 
 ///|
 /// Rust string ordering (code points).
-fn compare_str(a : String, b : String) -> Int {
+fn compare_str(a : String, b : String) -> Int32 {
   let a = a.to_array()
   let b = b.to_array()
   let n = if a.length() < b.length() { a.length() } else { b.length() }
@@ -197,7 +197,7 @@ fn compare_str(a : String, b : String) -> Int {
 ///|
 /// Parsed hb-shape style options of a rustybuzz test.
 priv struct HbArgs {
-  mut face_index : UInt
+  mut face_index : UInt32
   mut font_ptem : Float?
   mut variations : Array[String]
   mut direction : @shape.Direction?
@@ -205,11 +205,11 @@ priv struct HbArgs {
   mut script : @shape.Script?
   mut remove_default_ignorables : Bool
   mut unsafe_to_concat : Bool
-  mut not_found_variation_selector_glyph : UInt?
-  mut cluster_level : Int
+  mut not_found_variation_selector_glyph : UInt32?
+  mut cluster_level : Int32
   mut features : Array[String]
-  mut pre_context : Array[Int]?
-  mut post_context : Array[Int]?
+  mut pre_context : Array[Int32]?
+  mut post_context : Array[Int32]?
   mut no_glyph_names : Bool
   mut no_positions : Bool
   mut no_advances : Bool
@@ -222,7 +222,7 @@ priv struct HbArgs {
 }
 
 ///|
-fn parse_unicodes(s : String) -> Array[Int] {
+fn parse_unicodes(s : String) -> Array[Int32] {
   s
   .split(",")
   .map(p => {
@@ -357,7 +357,11 @@ fn parse_hb_args(options : String) -> HbArgs {
 
 ///|
 /// The rustybuzz test harness `shape` (tests/shaping/main.rs).
-fn hb_shape(font_path : String, text : Array[Int], options : String) -> String? {
+fn hb_shape(
+  font_path : String,
+  text : Array[Int32],
+  options : String,
+) -> String? {
   let args = parse_hb_args(options)
   let data = @fs.read_file_to_bytes(font_path) catch { _ => return None }
   let face = @shape.Face::from_slice(data[:], args.face_index).unwrap()
@@ -392,7 +396,7 @@ fn hb_shape(font_path : String, text : Array[Int], options : String) -> String? 
   if args.script is Some(script) {
     buffer.set_script(script)
   }
-  let mut flags : UInt = 0
+  let mut flags : UInt32 = 0
   if args.bot {
     flags = flags | @shape.BUFFER_FLAG_BEGINNING_OF_TEXT
   }
@@ -440,7 +444,7 @@ fn run_shape_hb_stage(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let mut skipped = 0
-  let by_prefix : Map[String, (Int, Int)] = Map([])
+  let by_prefix : Map[String, (Int32, Int32)] = Map([])
   for file in files {
     for line in read(dir + "/" + file).split("\n") {
       let line = line.to_owned()

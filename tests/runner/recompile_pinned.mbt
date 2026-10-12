@@ -59,7 +59,7 @@ let pinned_dir : String = "tests/recompile/upstream"
 /// plugin whose module is dropped too early or too late: `plugin`) gives
 /// a fresh compilation's pages at one of them. (It was zero while nothing
 /// was kept.)
-let pinned_as_upstream_expected : Int = 18
+let pinned_as_upstream_expected : Int32 = 18
 
 ///|
 /// A step of a pinned sequence.

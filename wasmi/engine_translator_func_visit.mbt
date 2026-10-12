@@ -151,7 +151,7 @@ fn FuncTranslator::visit_end(self : FuncTranslator) -> Unit raise WasmiError {
 ///|
 fn FuncTranslator::visit_br(
   self : FuncTranslator,
-  depth : UInt,
+  depth : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -181,7 +181,7 @@ fn FuncTranslator::visit_br(
 ///|
 fn FuncTranslator::visit_br_if(
   self : FuncTranslator,
-  depth : UInt,
+  depth : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -310,7 +310,7 @@ fn fuel_instance(costs : @wasmi_core.FuelCostsProvider) -> UInt64 {
 ///|
 fn FuncTranslator::visit_call(
   self : FuncTranslator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -352,8 +352,8 @@ fn FuncTranslator::visit_call(
 ///|
 fn FuncTranslator::visit_call_indirect(
   self : FuncTranslator,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -399,7 +399,7 @@ fn FuncTranslator::visit_select(self : FuncTranslator) -> Unit raise WasmiError 
 ///|
 fn FuncTranslator::visit_local_get(
   self : FuncTranslator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -412,7 +412,7 @@ fn FuncTranslator::visit_local_get(
 ///|
 fn FuncTranslator::visit_local_set(
   self : FuncTranslator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise WasmiError {
   self.translate_local_set(local_index, false)
 }
@@ -420,7 +420,7 @@ fn FuncTranslator::visit_local_set(
 ///|
 fn FuncTranslator::visit_local_tee(
   self : FuncTranslator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise WasmiError {
   self.translate_local_set(local_index, true)
 }
@@ -428,7 +428,7 @@ fn FuncTranslator::visit_local_tee(
 ///|
 fn FuncTranslator::visit_global_get(
   self : FuncTranslator,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -463,7 +463,7 @@ fn FuncTranslator::visit_global_get(
 ///|
 fn FuncTranslator::visit_global_set(
   self : FuncTranslator,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -792,7 +792,7 @@ fn FuncTranslator::visit_i64_store32(
 ///|
 fn FuncTranslator::visit_memory_size(
   self : FuncTranslator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -812,7 +812,7 @@ fn FuncTranslator::visit_memory_size(
 ///|
 fn FuncTranslator::visit_memory_grow(
   self : FuncTranslator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -855,7 +855,7 @@ fn FuncTranslator::visit_memory_grow(
 ///|
 fn FuncTranslator::visit_i32_const(
   self : FuncTranslator,
-  value : Int,
+  value : Int32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -877,7 +877,7 @@ fn FuncTranslator::visit_i64_const(
 ///|
 fn FuncTranslator::visit_f32_const(
   self : FuncTranslator,
-  bits : UInt,
+  bits : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -927,8 +927,8 @@ fn FuncTranslator::visit_i64_eqz(
 ///|
 fn FuncTranslator::visit_memory_init(
   self : FuncTranslator,
-  data_index : UInt,
-  mem : UInt,
+  data_index : UInt32,
+  mem : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -945,7 +945,7 @@ fn FuncTranslator::visit_memory_init(
 ///|
 fn FuncTranslator::visit_data_drop(
   self : FuncTranslator,
-  data_index : UInt,
+  data_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -960,8 +960,8 @@ fn FuncTranslator::visit_data_drop(
 ///|
 fn FuncTranslator::visit_memory_copy(
   self : FuncTranslator,
-  dst_mem : UInt,
-  src_mem : UInt,
+  dst_mem : UInt32,
+  src_mem : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -982,14 +982,14 @@ fn FuncTranslator::visit_memory_copy(
 ///|
 fn FuncTranslator::visit_memory_fill(
   self : FuncTranslator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
   let (dst, value, len) = self.stack.pop3()
   let dst = self.immediate_to_reg(dst)
-  let value : Input[Int] = self.make_input(value, fn(_, value) {
+  let value : Input[Int32] = self.make_input(value, fn(_, value) {
     let byte = value.to_u32().reinterpret_as_int() & 0xFF
     Immediate(byte)
   })
@@ -1005,8 +1005,8 @@ fn FuncTranslator::visit_memory_fill(
 ///|
 fn FuncTranslator::visit_table_init(
   self : FuncTranslator,
-  elem_index : UInt,
-  table : UInt,
+  elem_index : UInt32,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1023,7 +1023,7 @@ fn FuncTranslator::visit_table_init(
 ///|
 fn FuncTranslator::visit_elem_drop(
   self : FuncTranslator,
-  elem_index : UInt,
+  elem_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1038,8 +1038,8 @@ fn FuncTranslator::visit_elem_drop(
 ///|
 fn FuncTranslator::visit_table_copy(
   self : FuncTranslator,
-  dst_table : UInt,
-  src_table : UInt,
+  dst_table : UInt32,
+  src_table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1122,7 +1122,7 @@ fn FuncTranslator::visit_ref_is_null(
 ///|
 fn FuncTranslator::visit_ref_func(
   self : FuncTranslator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1138,7 +1138,7 @@ fn FuncTranslator::visit_ref_func(
 ///|
 fn FuncTranslator::visit_table_fill(
   self : FuncTranslator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1154,7 +1154,7 @@ fn FuncTranslator::visit_table_fill(
 ///|
 fn FuncTranslator::visit_table_get(
   self : FuncTranslator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1182,7 +1182,7 @@ fn FuncTranslator::visit_table_get(
 ///|
 fn FuncTranslator::visit_table_set(
   self : FuncTranslator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1205,7 +1205,7 @@ fn FuncTranslator::visit_table_set(
 ///|
 fn FuncTranslator::visit_table_grow(
   self : FuncTranslator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1249,7 +1249,7 @@ fn FuncTranslator::visit_table_grow(
 ///|
 fn FuncTranslator::visit_table_size(
   self : FuncTranslator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1269,7 +1269,7 @@ fn FuncTranslator::visit_table_size(
 ///|
 fn FuncTranslator::visit_return_call(
   self : FuncTranslator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -1304,8 +1304,8 @@ fn FuncTranslator::visit_return_call(
 ///|
 fn FuncTranslator::visit_return_call_indirect(
   self : FuncTranslator,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return

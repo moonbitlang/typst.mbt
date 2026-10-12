@@ -80,15 +80,15 @@ let compiled_parts : ReadOnlyArray[String] = [
 
 ///|
 /// The index of the frames in [compiled_parts].
-let part_frames : Int = 2
+let part_frames : Int32 = 2
 
 ///|
 /// The index of the SVG in [compiled_parts].
-let part_svg : Int = 4
+let part_svg : Int32 = 4
 
 ///|
 /// The index of the page images in [compiled_parts].
-let part_images : Int = 5
+let part_images : Int32 = 5
 
 ///|
 /// Where a span points in the world: `file:line:column-line:column
@@ -107,7 +107,7 @@ fn recompile_place(world : &@library.World, span : @syntax.DiagSpan) -> String {
     Range(start~, end~, ..) => (start, end)
   }
   let lines = source.lines()
-  let at = (byte : Int) => {
+  let at = (byte : Int32) => {
     match lines.byte_to_line_column(byte) {
       Some((line, column)) => "\{line + 1}:\{column + 1}"
       None => "?"
@@ -296,8 +296,8 @@ let read_check_case : Ref[String] = Ref("")
 /// written so far: those of the watch loop, or none.
 fn recompile_compile(
   world : RecompileWorld,
-  pages? : PageFiles = PageFiles::new(),
-  pinned? : Bool = false,
+  pages~ : PageFiles = PageFiles::new(),
+  pinned~ : Bool = false,
 ) -> (Compiled, Array[@syntax.FileId]) {
   let warned : @library.Warned[
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],

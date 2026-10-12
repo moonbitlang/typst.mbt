@@ -5,9 +5,9 @@
 /// A reference to an object.
 pub(all) struct ObjRef {
   /// The object number.
-  obj_number : Int
+  obj_number : Int32
   /// The generation number.
-  gen_number : Int
+  gen_number : Int32
 } derive(Eq, Hash, Debug, Compare)
 
 ///|
@@ -32,7 +32,7 @@ pub extend ObjRef with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Create a new object reference.
-pub fn ObjRef::new(obj_number : Int, gen_number : Int) -> ObjRef {
+pub fn ObjRef::new(obj_number : Int32, gen_number : Int32) -> ObjRef {
   { obj_number, gen_number, }
 }
 
@@ -67,9 +67,13 @@ pub extend ObjRef with Skippable::{skip}
 
 ///|
 pub impl Readable for ObjRef with fn read(r, _) {
-  guard (r.read_without_context() : Int?) is Some(obj_ref) else { return None }
+  guard (r.read_without_context() : Int32?) is Some(obj_ref) else {
+    return None
+  }
   r.skip_white_spaces()
-  guard (r.read_without_context() : Int?) is Some(gen_num) else { return None }
+  guard (r.read_without_context() : Int32?) is Some(gen_num) else {
+    return None
+  }
   r.skip_white_spaces()
   guard r.forward_tag(b"R") is Some(_) else { return None }
   Some(ObjRef::new(obj_ref, gen_num))

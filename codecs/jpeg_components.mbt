@@ -2,7 +2,7 @@
 // image components, extracted from a SOF header.
 
 ///|
-const MAX_SAMP_FACTOR : Int = 4
+const MAX_SAMP_FACTOR : Int32 = 4
 
 ///|
 /// Component IDs.
@@ -33,12 +33,12 @@ priv enum SampleRatios {
   HV
   V
   H
-  Generic(Int, Int)
+  Generic(Int32, Int32)
   NoSample
 } derive(Eq)
 
 ///|
-fn SampleRatios::sample(self : SampleRatios) -> Int {
+fn SampleRatios::sample(self : SampleRatios) -> Int32 {
   match self {
     HV => 4
     V | H => 2
@@ -65,45 +65,48 @@ priv struct Components {
   /// The type of component that has the metadata below, can be Y, Cb or Cr
   component_id : ComponentID
   /// Sub-sampling ratio of this component in the y-plane
-  mut vertical_sample : Int
+  mut vertical_sample : Int32
   /// Sub-sampling ratio of this component in the x-plane
-  mut horizontal_sample : Int
+  mut horizontal_sample : Int32
   /// DC huffman table position
-  mut dc_huff_table : Int
+  mut dc_huff_table : Int32
   /// AC huffman table position for this element.
-  mut ac_huff_table : Int
+  mut ac_huff_table : Int32
   /// Quantization table number
-  quantization_table_number : Int
+  quantization_table_number : Int32
   /// Specifies quantization table to use with this component
-  mut quantization_table : FixedArray[Int]
+  mut quantization_table : FixedArray[Int32]
   /// dc prediction for the component
-  mut dc_pred : Int
+  mut dc_pred : Int32
   /// An up-sampling function
   mut up_sampler : UpSampler
   /// How pixels do we need to go to get to the next line?
-  mut width_stride : Int
+  mut width_stride : Int32
   /// Component ID for progressive
-  id : Int
+  id : Int32
   /// Whether we need to decode this image component.
   mut needed : Bool
   /// Upsample scanline
-  mut raw_coeff : FixedArray[Int]
+  mut raw_coeff : FixedArray[Int32]
   /// Upsample destination, stores a scanline worth of sub sampled data
-  mut upsample_dest : FixedArray[Int]
+  mut upsample_dest : FixedArray[Int32]
   /// previous row, used to handle MCU boundaries
-  mut row_up : FixedArray[Int]
+  mut row_up : FixedArray[Int32]
   /// current row, used to handle MCU boundaries again
-  mut row : FixedArray[Int]
-  mut first_row_upsample_dest : FixedArray[Int]
-  mut idct_pos : Int
+  mut row : FixedArray[Int32]
+  mut first_row_upsample_dest : FixedArray[Int32]
+  mut idct_pos : Int32
   mut sample_ratio : SampleRatios
   // a very annoying bug
-  mut fix_an_annoying_bug : Int
+  mut fix_an_annoying_bug : Int32
 }
 
 ///|
 /// Create a new instance from three bytes from the start of frame.
-fn Components::from(a : BytesView, pos : Int) -> Components raise DecodeErrors {
+fn Components::from(
+  a : BytesView,
+  pos : Int32,
+) -> Components raise DecodeErrors {
   let id = match pos {
     0 => ComponentID::Y
     1 => Cb

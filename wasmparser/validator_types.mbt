@@ -10,7 +10,7 @@
 /// Represents a unique identifier for a core type type known to a
 /// [`crate::Validator`].
 pub(all) struct CoreTypeId {
-  index : UInt
+  index : UInt32
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
@@ -34,13 +34,13 @@ pub extend CoreTypeId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend CoreTypeId with @debug.Debug::{to_repr}
 
 ///|
-fn CoreTypeId::from_index(index : UInt) -> CoreTypeId {
+fn CoreTypeId::from_index(index : UInt32) -> CoreTypeId {
   { index, }
 }
 
 ///|
 /// The index of this id in the type list.
-pub fn CoreTypeId::index(self : CoreTypeId) -> Int {
+pub fn CoreTypeId::index(self : CoreTypeId) -> Int32 {
   self.index.reinterpret_as_int()
 }
 
@@ -48,7 +48,7 @@ pub fn CoreTypeId::index(self : CoreTypeId) -> Int {
 /// Represents a unique identifier for a recursion group type known to a
 /// [`crate::Validator`].
 pub(all) struct RecGroupId {
-  index : UInt
+  index : UInt32
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
@@ -72,13 +72,13 @@ pub extend RecGroupId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend RecGroupId with @debug.Debug::{to_repr}
 
 ///|
-fn RecGroupId::from_index(index : UInt) -> RecGroupId {
+fn RecGroupId::from_index(index : UInt32) -> RecGroupId {
   { index, }
 }
 
 ///|
 /// The index of this id in the type list.
-pub fn RecGroupId::index(self : RecGroupId) -> Int {
+pub fn RecGroupId::index(self : RecGroupId) -> Int32 {
   self.index.reinterpret_as_int()
 }
 
@@ -105,7 +105,7 @@ pub fn RecGroupId::index(self : RecGroupId) -> Int {
 /// information, and then one more bit is used for whether or not a borrow is
 /// used. Currently this uses the low 24 bits for the type size and the MSB for
 /// the borrow bit.
-priv struct TypeInfo(UInt)
+priv struct TypeInfo(UInt32)
 
 ///|
 /// Creates a new blank set of type information.
@@ -119,12 +119,12 @@ fn TypeInfo::new() -> TypeInfo {
 ///|
 /// Creates a new blank set of information about a leaf "core" type which
 /// has the size `size`.
-fn TypeInfo::core(size : UInt) -> TypeInfo {
+fn TypeInfo::core(size : UInt32) -> TypeInfo {
   TypeInfo::new_(size, false)
 }
 
 ///|
-fn TypeInfo::new_(size : UInt, contains_borrow : Bool) -> TypeInfo {
+fn TypeInfo::new_(size : UInt32, contains_borrow : Bool) -> TypeInfo {
   if !(size < 1U << 24) {
     abort("assertion failed: size < 1U << 24")
   }
@@ -132,7 +132,7 @@ fn TypeInfo::new_(size : UInt, contains_borrow : Bool) -> TypeInfo {
 }
 
 ///|
-fn TypeInfo::size(self : TypeInfo) -> UInt {
+fn TypeInfo::size(self : TypeInfo) -> UInt32 {
   self.0 & 0xffffff
 }
 
@@ -203,7 +203,7 @@ pub struct TypeList {
   // an uninitialized entry.
   //
   // A secondary map from `CoreTypeId` to `u8`.
-  priv core_type_to_depth : Map[CoreTypeId, Int]
+  priv core_type_to_depth : Map[CoreTypeId, Int32]
   // A primary map from `RecGroupId` to the range of the rec group's elements
   // within `core_types`.
   priv rec_group_elements : Array[(CoreTypeId, CoreTypeId)]
@@ -242,7 +242,7 @@ pub fn TypeList::get(self : TypeList, id : CoreTypeId) -> SubType? {
 
 ///|
 /// The number of core types.
-pub fn TypeList::len(self : TypeList) -> Int {
+pub fn TypeList::len(self : TypeList) -> Int32 {
   self.core_types.length()
 }
 
@@ -357,7 +357,7 @@ fn SubType::deep_copy(self : SubType) -> SubType {
 fn TypeList::intern_sub_type(
   self : TypeList,
   sub_ty : SubType,
-  offset : Int,
+  offset : Int32,
 ) -> CoreTypeId {
   let (_, group_id) = self.intern_canonical_rec_group(
     false,
@@ -371,8 +371,8 @@ fn TypeList::intern_sub_type(
 fn TypeList::rec_group_local_id(
   self : TypeList,
   rec_group : RecGroupId,
-  index : UInt,
-  offset : Int,
+  index : UInt32,
+  offset : Int32,
 ) -> CoreTypeId raise BinaryReaderError {
   let (start, end) = self.rec_group_range(rec_group)
   let len = end.index - start.index
@@ -401,7 +401,7 @@ pub fn TypeList::supertype_of(self : TypeList, id : CoreTypeId) -> CoreTypeId? {
 ///|
 /// Get the subtyping depth of the given type. A type without any supertype
 /// has depth 0.
-fn TypeList::get_subtyping_depth(self : TypeList, id : CoreTypeId) -> Int {
+fn TypeList::get_subtyping_depth(self : TypeList, id : CoreTypeId) -> Int32 {
   self.core_type_to_depth.get(id).unwrap()
 }
 
@@ -411,7 +411,7 @@ fn TypeList::get_subtyping_depth(self : TypeList, id : CoreTypeId) -> Int {
 fn TypeList::set_subtyping_depth(
   self : TypeList,
   id : CoreTypeId,
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   self.core_type_to_depth.set(id, depth)
 }
@@ -424,7 +424,7 @@ fn TypeList::at_canonicalized_unpacked_index(
   self : TypeList,
   rec_group : RecGroupId,
   index : UnpackedIndex,
-  offset : Int,
+  offset : Int32,
 ) -> CoreTypeId raise BinaryReaderError {
   match index {
     Module(_) => abort("not canonicalized")
@@ -660,84 +660,87 @@ pub fn Types::get(self : Types, id : CoreTypeId) -> SubType? {
 /// # Panics
 ///
 /// This will panic if the `index` provided is out of bounds.
-pub fn Types::core_type_at_in_module(self : Types, index : UInt) -> CoreTypeId {
+pub fn Types::core_type_at_in_module(
+  self : Types,
+  index : UInt32,
+) -> CoreTypeId {
   self.module_.types[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of core types defined so far.
-pub fn Types::core_type_count_in_module(self : Types) -> UInt {
+pub fn Types::core_type_count_in_module(self : Types) -> UInt32 {
   self.module_.types.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of a table at the given table index.
-pub fn Types::table_at(self : Types, index : UInt) -> TableType {
+pub fn Types::table_at(self : Types, index : UInt32) -> TableType {
   self.module_.tables[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of tables defined so far.
-pub fn Types::table_count(self : Types) -> UInt {
+pub fn Types::table_count(self : Types) -> UInt32 {
   self.module_.tables.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of a memory at the given memory index.
-pub fn Types::memory_at(self : Types, index : UInt) -> MemoryType {
+pub fn Types::memory_at(self : Types, index : UInt32) -> MemoryType {
   self.module_.memories[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of memories defined so far.
-pub fn Types::memory_count(self : Types) -> UInt {
+pub fn Types::memory_count(self : Types) -> UInt32 {
   self.module_.memories.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of a global at the given global index.
-pub fn Types::global_at(self : Types, index : UInt) -> GlobalType {
+pub fn Types::global_at(self : Types, index : UInt32) -> GlobalType {
   self.module_.globals[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of globals defined so far.
-pub fn Types::global_count(self : Types) -> UInt {
+pub fn Types::global_count(self : Types) -> UInt32 {
   self.module_.globals.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of a tag at the given tag index.
-pub fn Types::tag_at(self : Types, index : UInt) -> CoreTypeId {
+pub fn Types::tag_at(self : Types, index : UInt32) -> CoreTypeId {
   self.module_.tags[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of tags defined so far.
-pub fn Types::tag_count(self : Types) -> UInt {
+pub fn Types::tag_count(self : Types) -> UInt32 {
   self.module_.tags.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of a core function at the given function index.
-pub fn Types::core_function_at(self : Types, index : UInt) -> CoreTypeId {
+pub fn Types::core_function_at(self : Types, index : UInt32) -> CoreTypeId {
   self.module_.types[self.module_.functions[index.reinterpret_as_int()].reinterpret_as_int()]
 }
 
 ///|
 /// Gets the count of core functions defined so far.
-pub fn Types::function_count(self : Types) -> UInt {
+pub fn Types::function_count(self : Types) -> UInt32 {
   self.module_.functions.length().reinterpret_as_uint()
 }
 
 ///|
 /// Gets the type of an element segment at the given element segment index.
-pub fn Types::element_at(self : Types, index : UInt) -> RefType {
+pub fn Types::element_at(self : Types, index : UInt32) -> RefType {
   self.module_.element_types[index.reinterpret_as_int()]
 }
 
 ///|
 /// Returns the number of elements defined so far.
-pub fn Types::element_count(self : Types) -> UInt {
+pub fn Types::element_count(self : Types) -> UInt32 {
   self.module_.element_types.length().reinterpret_as_uint()
 }

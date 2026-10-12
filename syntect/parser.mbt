@@ -13,7 +13,7 @@ pub(all) suberror ParsingError {
   /// <https://github.com/trishume/syntect/issues/421>
   MissingContext(ContextId)
   /// A bad index to match_at
-  BadMatchIndex(Int)
+  BadMatchIndex(Int32)
   /// Tried to use a ContextReference that has not bee resolved yet
   UnresolvedContextReference(ContextReference)
 }
@@ -51,7 +51,7 @@ pub struct ParseState {
   priv mut first_line : Bool
   // See issue #101. Contains indices of frames pushed by `with_prototype`s.
   // Doesn't look at `with_prototype`s below top of stack.
-  priv proto_starts : Array[Int]
+  priv proto_starts : Array[Int32]
 }
 
 ///|
@@ -65,7 +65,7 @@ priv struct StateLevel {
 priv struct RegexMatch {
   regions : Region
   context : Context
-  pat_index : Int
+  pat_index : Int32
   from_with_prototype : Bool
   would_loop : Bool
 }
@@ -94,7 +94,7 @@ pub fn ParseState::parse_line(
   self : ParseState,
   line : String,
   syntax_set : SyntaxSet,
-) -> Array[(Int, ScopeStackOp)] raise ParsingError {
+) -> Array[(Int32, ScopeStackOp)] raise ParsingError {
   self.parse_line_indexed(ByteIndex::new(line), syntax_set)
 }
 
@@ -104,7 +104,7 @@ pub fn ParseState::parse_line_indexed(
   self : ParseState,
   line : ByteIndex,
   syntax_set : SyntaxSet,
-) -> Array[(Int, ScopeStackOp)] raise ParsingError {
+) -> Array[(Int32, ScopeStackOp)] raise ParsingError {
   if self.stack.is_empty() {
     raise MissingMainContext
   }
@@ -119,7 +119,7 @@ pub fn ParseState::parse_line_indexed(
     self.first_line = false
   }
   let regions = Region::new()
-  let search_cache : Map[Int, Region?] = Map([], capacity=128)
+  let search_cache : Map[Int32, Region?] = Map([], capacity=128)
   // Used for detecting loops with push/pop, see long comment above.
   let non_consuming_push_at = Ref((0, 0))
   let text = SearchText::new(line)
@@ -137,11 +137,11 @@ fn ParseState::parse_next_token(
   self : ParseState,
   line : SearchText,
   syntax_set : SyntaxSet,
-  start : Ref[Int],
-  search_cache : Map[Int, Region?],
+  start : Ref[Int32],
+  search_cache : Map[Int32, Region?],
   regions : Region,
-  non_consuming_push_at : Ref[(Int, Int)],
-  ops : Array[(Int, ScopeStackOp)],
+  non_consuming_push_at : Ref[(Int32, Int32)],
+  ops : Array[(Int32, ScopeStackOp)],
 ) -> Bool raise ParsingError {
   let check_pop_loop = {
     let (pos, stack_depth) = non_consuming_push_at.val
@@ -210,9 +210,9 @@ fn ParseState::parse_next_token(
 fn ParseState::find_best_match(
   self : ParseState,
   line : SearchText,
-  start : Int,
+  start : Int32,
   syntax_set : SyntaxSet,
-  search_cache : Map[Int, Region?],
+  search_cache : Map[Int32, Region?],
   regions : Region,
   check_pop_loop : Bool,
 ) -> RegexMatch? raise ParsingError {
@@ -282,10 +282,10 @@ fn ParseState::find_best_match(
 fn ParseState::search(
   self : ParseState,
   line : SearchText,
-  start : Int,
+  start : Int32,
   match_pat : MatchPattern,
   captures : (Region, ByteIndex)?,
-  search_cache : Map[Int, Region?],
+  search_cache : Map[Int32, Region?],
   regions : Region,
 ) -> Region? {
   let match_ptr = match_pat.id
@@ -339,7 +339,7 @@ fn ParseState::exec_pattern(
   reg_match : RegexMatch,
   level_context : Context,
   syntax_set : SyntaxSet,
-  ops : Array[(Int, ScopeStackOp)],
+  ops : Array[(Int32, ScopeStackOp)],
 ) -> Bool raise ParsingError {
   let (match_start, match_end) = reg_match.regions.pos(0).unwrap()
   let context = reg_match.context
@@ -360,7 +360,7 @@ fn ParseState::exec_pattern(
     // right order ex: ((bob)|(hi))* could match hibob in wrong order, and
     // outer has to push first we don't have to handle a capture matching
     // multiple times, Sublime doesn't
-    let map : Array[((Int, Int), ScopeStackOp)] = []
+    let map : Array[((Int32, Int32), ScopeStackOp)] = []
     for entry in capture_map {
       let (cap_index, scopes) = entry
       if reg_match.regions.pos(cap_index) is Some((cap_start, cap_end)) {
@@ -402,11 +402,11 @@ fn ParseState::exec_pattern(
 fn ParseState::push_meta_ops(
   _self : ParseState,
   initial : Bool,
-  index : Int,
+  index : Int32,
   cur_context : Context,
   match_op : MatchOperation,
   syntax_set : SyntaxSet,
-  ops : Array[(Int, ScopeStackOp)],
+  ops : Array[(Int32, ScopeStackOp)],
 ) -> Unit raise ParsingError {
   match match_op {
     Pop => {

@@ -13,7 +13,7 @@ pub(all) enum Color {
   Magenta
   Yellow
   White
-  Ansi256(Int)
+  Ansi256(Int32)
 } derive(Eq, Debug)
 
 ///|

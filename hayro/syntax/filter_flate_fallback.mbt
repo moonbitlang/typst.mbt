@@ -20,9 +20,9 @@ fn flate_fallback_decode(data : BytesView) -> Bytes? {
 ///|
 priv struct FlateStream {
   data : BytesView
-  mut pos : Int
-  mut code_buf : UInt
-  mut code_size : Int
+  mut pos : Int32
+  mut code_buf : UInt32
+  mut code_size : Int32
   output : Array[Byte]
   mut eof : Bool
 }
@@ -61,7 +61,7 @@ fn FlateStream::peek_byte(self : FlateStream) -> Byte? {
 }
 
 ///|
-fn FlateStream::get_bytes(self : FlateStream, n : Int) -> BytesView {
+fn FlateStream::get_bytes(self : FlateStream, n : Int32) -> BytesView {
   let end = @cmp.minimum(self.pos + n, self.data.length())
   let bytes = self.data[self.pos:end]
   self.pos = end
@@ -69,7 +69,7 @@ fn FlateStream::get_bytes(self : FlateStream, n : Int) -> BytesView {
 }
 
 ///|
-fn FlateStream::get_bits(self : FlateStream, bits : Int) -> UInt? {
+fn FlateStream::get_bits(self : FlateStream, bits : Int32) -> UInt32? {
   while self.code_size < bits {
     guard self.get_byte() is Some(b) else { return None }
     self.code_buf = self.code_buf | (b.to_uint() << self.code_size)
@@ -82,7 +82,7 @@ fn FlateStream::get_bits(self : FlateStream, bits : Int) -> UInt? {
 }
 
 ///|
-fn FlateStream::get_code(self : FlateStream, table : HuffmanTable) -> Int? {
+fn FlateStream::get_code(self : FlateStream, table : HuffmanTable) -> Int32? {
   let codes = table.codes
   let max_len = table.max_len
   while self.code_size < max_len {
@@ -274,7 +274,7 @@ fn FlateStream::read_dynamic_tables(
   while i < total_codes {
     guard self.get_code(code_len_table) is Some(code) else { return None }
     match code {
-      0..=15 => {
+      0..<=15 => {
         code_lengths[i] = code
         i += 1
       }
@@ -322,12 +322,12 @@ fn FlateStream::read_dynamic_tables(
 
 ///|
 priv struct HuffmanTable {
-  codes : FixedArray[UInt]
-  max_len : Int
+  codes : FixedArray[UInt32]
+  max_len : Int32
 }
 
 ///|
-fn generate_huffman_table(lengths : ArrayView[Int]) -> HuffmanTable {
+fn generate_huffman_table(lengths : ArrayView[Int32]) -> HuffmanTable {
   // Find max code length
   let mut max_len = 0
   for l in lengths {
@@ -395,12 +395,12 @@ let fixed_dist_table : HuffmanTable = generate_huffman_table(
 )
 
 ///|
-let code_len_code_map : ReadOnlyArray[Int] = [
+let code_len_code_map : ReadOnlyArray[Int32] = [
   16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15,
 ]
 
 ///|
-let length_decode : ReadOnlyArray[Int] = [
+let length_decode : ReadOnlyArray[Int32] = [
   0x00003, 0x00004, 0x00005, 0x00006, 0x00007, 0x00008, 0x00009, 0x0000a, 0x1000b,
   0x1000d, 0x1000f, 0x10011, 0x20013, 0x20017, 0x2001b, 0x2001f, 0x30023, 0x3002b,
   0x30033, 0x3003b, 0x40043, 0x40053, 0x40063, 0x40073, 0x50083, 0x500a3, 0x500c3,
@@ -408,7 +408,7 @@ let length_decode : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let dist_decode : ReadOnlyArray[Int] = [
+let dist_decode : ReadOnlyArray[Int32] = [
   0x00001, 0x00002, 0x00003, 0x00004, 0x10005, 0x10007, 0x20009, 0x2000d, 0x30011,
   0x30019, 0x40021, 0x40031, 0x50041, 0x50061, 0x60081, 0x600c1, 0x70101, 0x70181,
   0x80201, 0x80301, 0x90401, 0x90601, 0xa0801, 0xa0c01, 0xb1001, 0xb1801, 0xc2001,

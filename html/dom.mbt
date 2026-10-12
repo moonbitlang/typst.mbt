@@ -46,7 +46,7 @@ pub fn HtmlNode::span(self : HtmlNode) -> @syntax.Span {
 ///   the DOM level.
 pub fn iter_with_dom_indices(
   nodes : ArrayView[HtmlNode],
-) -> Array[(HtmlNode, Int)] {
+) -> Array[(HtmlNode, Int32)] {
   let out = []
   let mut cursor = 0
   let mut was_text = false

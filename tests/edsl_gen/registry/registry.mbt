@@ -10,7 +10,7 @@
 ///|
 /// A converted case: its number and the builder of its document.
 pub struct Case {
-  number : Int
+  number : Int32
   build : () -> @doc.Document
 }
 
@@ -19,14 +19,14 @@ let cases : Array[Case] = []
 
 ///|
 /// Register the builder of case `number`.
-pub fn register(number : Int, build : () -> @doc.Document) -> Unit {
+pub fn register(number : Int32, build : () -> @doc.Document) -> Unit {
   cases.push({ number, build, })
 }
 
 ///|
 /// The registered cases, by number. Aborts on a duplicate.
-pub fn all() -> Map[Int, Case] {
-  let map : Map[Int, Case] = Map([])
+pub fn all() -> Map[Int32, Case] {
+  let map : Map[Int32, Case] = Map([])
   for case_ in cases {
     if map.contains(case_.number) {
       abort("case \{case_.number} is registered twice")

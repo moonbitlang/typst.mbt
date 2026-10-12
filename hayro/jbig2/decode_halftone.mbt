@@ -116,19 +116,19 @@ priv struct HalftoneRegionFlags {
 ///|
 /// Halftone grid position and size (7.4.5.1.2).
 priv struct HalftoneGridPositionAndSize {
-  width : UInt
-  height : UInt
-  horizontal_offset : Int
-  vertical_offset : Int
+  width : UInt32
+  height : UInt32
+  horizontal_offset : Int32
+  vertical_offset : Int32
 }
 
 ///|
 /// Halftone grid vector (7.4.5.1.3).
 priv struct HalftoneGridVector {
   /// `HRX` - 256 times the horizontal coordinate of the halftone grid vector.
-  x_vector : UInt
+  x_vector : UInt32
   /// `HRY` - 256 times the vertical coordinate of the halftone grid vector.
-  y_vector : UInt
+  y_vector : UInt32
 }
 
 ///|
@@ -168,7 +168,7 @@ fn GridCoords::new(
 
 ///|
 #inline
-fn GridCoords::get(self : GridCoords) -> (Int, Int) {
+fn GridCoords::get(self : GridCoords) -> (Int32, Int32) {
   ((self.x >> 8).to_int(), (self.y >> 8).to_int())
 }
 
@@ -194,7 +194,7 @@ fn compute_skip_bitmap(
   header : HalftoneRegionHeader,
   pattern_dict : PatternDictionary,
   htreg : Bitmap,
-) -> FixedArray[UInt] raise DecodeError {
+) -> FixedArray[UInt32] raise DecodeError {
   let grid = header.grid_position_and_size
   let pattern_width = pattern_dict.pattern_width.reinterpret_as_int()
   let pattern_height = pattern_dict.pattern_height.reinterpret_as_int()
@@ -230,7 +230,7 @@ fn compute_skip_bitmap(
 /// Render patterns into the target region (6.6.5.2).
 fn render_patterns(
   region : Bitmap,
-  gi : FixedArray[UInt],
+  gi : FixedArray[UInt32],
   header : HalftoneRegionHeader,
   pattern_dict : PatternDictionary,
 ) -> Unit raise DecodeError {
@@ -324,11 +324,11 @@ fn render_patterns(
 #inline
 fn blit_op(
   op : CombinationOperator,
-  d : UInt,
-  s : UInt,
-  mask : UInt,
-  inv_mask : UInt,
-) -> UInt {
+  d : UInt32,
+  s : UInt32,
+  mask : UInt32,
+  inv_mask : UInt32,
+) -> UInt32 {
   match op {
     Or => d | s
     Xor => d ^ s

@@ -5,7 +5,7 @@ let lines_test_text = "ä\tcde\nf💛g\r\nhi\rjkl"
 
 ///|
 /// The `(byte_idx, utf16_idx)` of every line start.
-fn line_starts(lines : Lines) -> Array[(Int, Int)] {
+fn line_starts(lines : Lines) -> Array[(Int32, Int32)] {
   lines.lines.map(line => (line.byte_idx, line.utf16_idx))
 }
 
@@ -41,7 +41,7 @@ test "source file pos to column" {
 
 ///|
 test "source file utf16" {
-  fn roundtrip(lines : Lines, byte_idx : Int, utf16_idx : Int) raise {
+  fn roundtrip(lines : Lines, byte_idx : Int32, utf16_idx : Int32) raise {
     let middle = lines.byte_to_utf16(byte_idx).unwrap()
     let result = lines.utf16_to_byte(middle).unwrap()
     assert_eq(middle, utf16_idx)
@@ -61,7 +61,7 @@ test "source file utf16" {
 
 ///|
 test "source file roundtrip" {
-  fn roundtrip(lines : Lines, byte_idx : Int) raise {
+  fn roundtrip(lines : Lines, byte_idx : Int32) raise {
     let line = lines.byte_to_line(byte_idx).unwrap()
     let column = lines.byte_to_column(byte_idx).unwrap()
     let result = lines.line_column_to_byte(line, column).unwrap()
@@ -81,8 +81,8 @@ test "source file edit" {
   // tested separately.
   fn test_edit(
     prev : String,
-    start : Int,
-    end : Int,
+    start : Int32,
+    end : Int32,
     replacement : String,
     after : String,
   ) raise {

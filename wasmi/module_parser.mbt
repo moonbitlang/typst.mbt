@@ -11,7 +11,7 @@ priv struct ModuleParser {
   /// The underlying Wasm parser.
   parser : @wasmparser.Parser
   /// The number of compiled or processed functions.
-  mut engine_funcs : Int
+  mut engine_funcs : Int32
 }
 
 ///|
@@ -62,7 +62,7 @@ fn ModuleParser::validator(self : ModuleParser) -> @wasmparser.Validator {
 /// Processes the end of the Wasm binary.
 fn ModuleParser::process_end(
   self : ModuleParser,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
     // This only checks if the number of code section entries and data segments match
@@ -167,7 +167,7 @@ fn ModuleParser::process_imports(
 /// This extracts all function declarations into the [`Module`] under construction.
 fn ModuleParser::process_functions(
   self : ModuleParser,
-  section : @wasmparser.SectionLimited[UInt],
+  section : @wasmparser.SectionLimited[UInt32],
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
   if self.engine.config().get_enforced_limits().max_functions is Some(limit) {
@@ -321,7 +321,7 @@ fn ModuleParser::process_exports(
 /// This sets the start function for the [`Module`] under construction.
 fn ModuleParser::process_start(
   self : ModuleParser,
-  func : UInt,
+  func : UInt32,
   range : @wasmparser.Range,
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
@@ -373,7 +373,7 @@ fn ModuleParser::process_element(
 /// Process module data count section.
 fn ModuleParser::process_data_count(
   self : ModuleParser,
-  count : UInt,
+  count : UInt32,
   range : @wasmparser.Range,
 ) -> Unit raise WasmiError {
   if self.engine.config().get_enforced_limits().max_data_segments is Some(limit) {
@@ -421,9 +421,9 @@ fn ModuleParser::process_data(
 /// Process module code section start.
 fn ModuleParser::process_code_start(
   self : ModuleParser,
-  count : UInt,
+  count : UInt32,
   range : @wasmparser.Range,
-  size : UInt,
+  size : UInt32,
 ) -> Unit raise WasmiError {
   let enforced_limits = self.engine.config().get_enforced_limits()
   if enforced_limits.max_functions is Some(limit) {
@@ -516,7 +516,7 @@ fn ModuleParser::process_invalid_payload(
 fn ModuleParser::next_payload(
   self : ModuleParser,
   buffer : BytesView,
-) -> (Int, @wasmparser.Payload) raise WasmiError {
+) -> (Int32, @wasmparser.Payload) raise WasmiError {
   match
     wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
       self.parser.parse(buffer, true)

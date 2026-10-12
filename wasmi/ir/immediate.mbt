@@ -7,7 +7,7 @@
 
 ///|
 /// A typed 16-bit encoded constant value (the raw 16 bits).
-pub(all) struct Const16(Int) derive(Eq, Hash, Debug)
+pub(all) struct Const16(Int32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,7 +26,7 @@ pub extend Const16 with @debug.Debug::{to_repr}
 
 ///|
 /// A typed 32-bit encoded constant value (the raw 32 bits).
-pub(all) struct Const32(Int) derive(Eq, Hash, Debug)
+pub(all) struct Const32(Int32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -45,7 +45,7 @@ pub extend Const32 with @debug.Debug::{to_repr}
 
 ///|
 /// A 16-bit constant value of any type (the raw 16 bits).
-pub(all) struct AnyConst16(Int) derive(Eq, Hash, Debug)
+pub(all) struct AnyConst16(Int32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -64,7 +64,7 @@ pub extend AnyConst16 with @debug.Debug::{to_repr}
 
 ///|
 /// A 32-bit constant value of any type (the raw 32 bits).
-pub(all) struct AnyConst32(Int) derive(Eq, Hash, Debug)
+pub(all) struct AnyConst32(Int32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -86,25 +86,25 @@ pub extend AnyConst32 with @debug.Debug::{to_repr}
 
 ///|
 /// Upstream `From<i16> for AnyConst16`.
-pub fn AnyConst16::from_i16(value : Int) -> AnyConst16 {
+pub fn AnyConst16::from_i16(value : Int32) -> AnyConst16 {
   AnyConst16(value & 0xFFFF)
 }
 
 ///|
 /// Upstream `From<u16> for AnyConst16`.
-pub fn AnyConst16::from_u16(value : Int) -> AnyConst16 {
+pub fn AnyConst16::from_u16(value : Int32) -> AnyConst16 {
   AnyConst16(value & 0xFFFF)
 }
 
 ///|
 /// Upstream `From<i8> for AnyConst16`.
-pub fn AnyConst16::from_i8(value : Int) -> AnyConst16 {
+pub fn AnyConst16::from_i8(value : Int32) -> AnyConst16 {
   AnyConst16(value & 0xFF)
 }
 
 ///|
 /// Upstream `TryFrom<i32> for AnyConst16` (via `i16`).
-pub fn AnyConst16::try_from_i32(value : Int) -> AnyConst16? {
+pub fn AnyConst16::try_from_i32(value : Int32) -> AnyConst16? {
   if value >= -32768 && value <= 32767 {
     Some(AnyConst16(value & 0xFFFF))
   } else {
@@ -114,7 +114,7 @@ pub fn AnyConst16::try_from_i32(value : Int) -> AnyConst16? {
 
 ///|
 /// Upstream `TryFrom<u32> for AnyConst16` (via `u16`).
-pub fn AnyConst16::try_from_u32(value : UInt) -> AnyConst16? {
+pub fn AnyConst16::try_from_u32(value : UInt32) -> AnyConst16? {
   if value <= 0xFFFFU {
     Some(AnyConst16(value.reinterpret_as_int()))
   } else {
@@ -144,31 +144,31 @@ pub fn AnyConst16::try_from_u64(value : UInt64) -> AnyConst16? {
 
 ///|
 /// Upstream `From<AnyConst16> for i8`.
-pub fn AnyConst16::to_i8(self : AnyConst16) -> Int {
+pub fn AnyConst16::to_i8(self : AnyConst16) -> Int32 {
   (self.0 & 0xFF) << 24 >> 24
 }
 
 ///|
 /// Upstream `From<AnyConst16> for i16`.
-pub fn AnyConst16::to_i16(self : AnyConst16) -> Int {
+pub fn AnyConst16::to_i16(self : AnyConst16) -> Int32 {
   (self.0 & 0xFFFF) << 16 >> 16
 }
 
 ///|
 /// Upstream `From<AnyConst16> for u16`.
-pub fn AnyConst16::to_u16(self : AnyConst16) -> Int {
+pub fn AnyConst16::to_u16(self : AnyConst16) -> Int32 {
   self.0 & 0xFFFF
 }
 
 ///|
 /// Upstream `From<AnyConst16> for i32` (sign extension).
-pub fn AnyConst16::to_i32(self : AnyConst16) -> Int {
+pub fn AnyConst16::to_i32(self : AnyConst16) -> Int32 {
   self.to_i16()
 }
 
 ///|
 /// Upstream `From<AnyConst16> for u32` (zero extension).
-pub fn AnyConst16::to_u32(self : AnyConst16) -> UInt {
+pub fn AnyConst16::to_u32(self : AnyConst16) -> UInt32 {
   self.to_u16().reinterpret_as_uint()
 }
 
@@ -201,19 +201,19 @@ pub fn Const16::cast(self : Const16) -> Const16 {
 
 ///|
 /// Upstream `From<i16> for Const16<i32>`/`Const16<i64>`.
-pub fn Const16::from_i16(value : Int) -> Const16 {
+pub fn Const16::from_i16(value : Int32) -> Const16 {
   Const16(value & 0xFFFF)
 }
 
 ///|
 /// Upstream `From<u16> for Const16<u32>`/`Const16<u64>`.
-pub fn Const16::from_u16(value : Int) -> Const16 {
+pub fn Const16::from_u16(value : Int32) -> Const16 {
   Const16(value & 0xFFFF)
 }
 
 ///|
 /// Upstream `TryFrom<i32> for Const16<i32>` (also `NonZero<i32>`).
-pub fn Const16::try_from_i32(value : Int) -> Const16? {
+pub fn Const16::try_from_i32(value : Int32) -> Const16? {
   match AnyConst16::try_from_i32(value) {
     Some(c) => Some(Const16(c.0))
     None => None
@@ -222,7 +222,7 @@ pub fn Const16::try_from_i32(value : Int) -> Const16? {
 
 ///|
 /// Upstream `TryFrom<u32> for Const16<u32>` (also `NonZero<u32>`).
-pub fn Const16::try_from_u32(value : UInt) -> Const16? {
+pub fn Const16::try_from_u32(value : UInt32) -> Const16? {
   match AnyConst16::try_from_u32(value) {
     Some(c) => Some(Const16(c.0))
     None => None
@@ -249,13 +249,13 @@ pub fn Const16::try_from_u64(value : UInt64) -> Const16? {
 
 ///|
 /// Upstream `From<Const16<i32>> for i32`.
-pub fn Const16::to_i32(self : Const16) -> Int {
+pub fn Const16::to_i32(self : Const16) -> Int32 {
   (self.0 & 0xFFFF) << 16 >> 16
 }
 
 ///|
 /// Upstream `From<Const16<u32>> for u32`.
-pub fn Const16::to_u32(self : Const16) -> UInt {
+pub fn Const16::to_u32(self : Const16) -> UInt32 {
   (self.0 & 0xFFFF).reinterpret_as_uint()
 }
 
@@ -276,13 +276,13 @@ pub fn Const16::to_u64(self : Const16) -> UInt64 {
 
 ///|
 /// Upstream `From<i32> for AnyConst32` (also `u32`, `i16`, ... bit casts).
-pub fn AnyConst32::from_i32(value : Int) -> AnyConst32 {
+pub fn AnyConst32::from_i32(value : Int32) -> AnyConst32 {
   AnyConst32(value)
 }
 
 ///|
 /// Upstream `From<u32> for AnyConst32`.
-pub fn AnyConst32::from_u32(value : UInt) -> AnyConst32 {
+pub fn AnyConst32::from_u32(value : UInt32) -> AnyConst32 {
   AnyConst32(value.reinterpret_as_int())
 }
 
@@ -300,7 +300,7 @@ pub fn AnyConst32::from_f32(value : Float) -> AnyConst32 {
 
 ///|
 /// Upstream `From<f32> for AnyConst32` with the f32 given by its bits.
-pub fn AnyConst32::from_f32_bits(bits : UInt) -> AnyConst32 {
+pub fn AnyConst32::from_f32_bits(bits : UInt32) -> AnyConst32 {
   AnyConst32(bits.reinterpret_as_int())
 }
 
@@ -338,13 +338,13 @@ pub fn AnyConst32::try_from_f64_bits(bits : UInt64) -> AnyConst32? {
 
 ///|
 /// Upstream `From<AnyConst32> for i32`.
-pub fn AnyConst32::to_i32(self : AnyConst32) -> Int {
+pub fn AnyConst32::to_i32(self : AnyConst32) -> Int32 {
   self.0
 }
 
 ///|
 /// Upstream `From<AnyConst32> for u32`.
-pub fn AnyConst32::to_u32(self : AnyConst32) -> UInt {
+pub fn AnyConst32::to_u32(self : AnyConst32) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 
@@ -362,7 +362,7 @@ pub fn AnyConst32::to_u64(self : AnyConst32) -> UInt64 {
 
 ///|
 /// Upstream `From<AnyConst32> for f32` (as bits).
-pub fn AnyConst32::to_f32_bits(self : AnyConst32) -> UInt {
+pub fn AnyConst32::to_f32_bits(self : AnyConst32) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 
@@ -380,19 +380,19 @@ pub fn Const32::cast(self : Const32) -> Const32 {
 
 ///|
 /// Upstream `From<i32> for Const32<i32>` / `Const32<i64>`.
-pub fn Const32::from_i32(value : Int) -> Const32 {
+pub fn Const32::from_i32(value : Int32) -> Const32 {
   Const32(value)
 }
 
 ///|
 /// Upstream `From<u32> for Const32<u32>` / `Const32<u64>`.
-pub fn Const32::from_u32(value : UInt) -> Const32 {
+pub fn Const32::from_u32(value : UInt32) -> Const32 {
   Const32(value.reinterpret_as_int())
 }
 
 ///|
 /// Upstream `From<f32> for Const32<f32>` / `Const32<f64>` (given as bits).
-pub fn Const32::from_f32_bits(bits : UInt) -> Const32 {
+pub fn Const32::from_f32_bits(bits : UInt32) -> Const32 {
   Const32(bits.reinterpret_as_int())
 }
 
@@ -425,13 +425,13 @@ pub fn Const32::try_from_f64_bits(bits : UInt64) -> Const32? {
 
 ///|
 /// Upstream `From<Const32<i32>> for i32`.
-pub fn Const32::to_i32(self : Const32) -> Int {
+pub fn Const32::to_i32(self : Const32) -> Int32 {
   self.0
 }
 
 ///|
 /// Upstream `From<Const32<u32>> for u32`.
-pub fn Const32::to_u32(self : Const32) -> UInt {
+pub fn Const32::to_u32(self : Const32) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 
@@ -449,7 +449,7 @@ pub fn Const32::to_u64(self : Const32) -> UInt64 {
 
 ///|
 /// Upstream `From<Const32<f32>> for f32` (as bits).
-pub fn Const32::to_f32_bits(self : Const32) -> UInt {
+pub fn Const32::to_f32_bits(self : Const32) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 

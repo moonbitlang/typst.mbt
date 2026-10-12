@@ -9,7 +9,13 @@
 ///|
 /// A horizontal row kernel: filters the pixels of one source row starting at
 /// `src_offset` into one destination row starting at `dst_offset`.
-type RowKernel = (FixedArray[Byte], Int, FixedArray[Byte], Int, FixedWeights) -> Unit
+type RowKernel = (
+  FixedArray[Byte],
+  Int32,
+  FixedArray[Byte],
+  Int32,
+  FixedWeights,
+) -> Unit
 
 ///|
 /// A vertical row kernel (`fn(usize, &FilterBounds, &[u8], &mut [u8], usize,
@@ -17,17 +23,17 @@ type RowKernel = (FixedArray[Byte], Int, FixedArray[Byte], Int, FixedWeights) ->
 /// `bounds_start .. bounds_start + bounds_size`; the last argument is an
 /// accumulator scratch of at least `width` elements.
 type ColumnKernel = (
-  Int,
-  Int,
-  Int,
+  Int32,
+  Int32,
+  Int32,
   FixedArray[Byte],
-  Int,
-  Int,
+  Int32,
+  Int32,
   FixedArray[Byte],
-  Int,
-  FixedArray[Int],
-  Int,
-  FixedArray[Int],
+  Int32,
+  FixedArray[Int32],
+  Int32,
+  FixedArray[Int32],
 ) -> Unit
 
 ///|
@@ -43,10 +49,10 @@ priv struct HorizontalFiltering {
 fn HorizontalFiltering::filter(
   self : HorizontalFiltering,
   src : FixedArray[Byte],
-  src_stride : Int,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_stride : Int,
-  dst_height : Int,
+  dst_stride : Int32,
+  dst_height : Int32,
 ) -> Unit {
   for y in 0..<dst_height {
     self.run_on_row(src, y * src_stride, dst, y * dst_stride)
@@ -58,9 +64,9 @@ fn HorizontalFiltering::filter(
 fn HorizontalFiltering::run_on_row(
   self : HorizontalFiltering,
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
 ) -> Unit {
   (self.filter_row)(src, src_offset, dst, dst_offset, self.filter_weights)
 }
@@ -78,11 +84,11 @@ priv struct VerticalFiltering {
 fn VerticalFiltering::filter(
   self : VerticalFiltering,
   src : FixedArray[Byte],
-  src_stride : Int,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_stride : Int,
-  width : Int,
-  dst_height : Int,
+  dst_stride : Int32,
+  width : Int32,
+  dst_height : Int32,
 ) -> Unit {
   let acc = FixedArray::make(width, 0)
   for y in 0..<dst_height {
@@ -95,12 +101,12 @@ fn VerticalFiltering::filter(
 fn VerticalFiltering::run_on_row(
   self : VerticalFiltering,
   src : FixedArray[Byte],
-  src_stride : Int,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
-  width : Int,
-  y : Int,
-  acc : FixedArray[Int],
+  dst_offset : Int32,
+  width : Int32,
+  y : Int32,
+  acc : FixedArray[Int32],
 ) -> Unit {
   let fw = self.filter_weights
   (self.filter_row)(
@@ -126,10 +132,10 @@ fn trampoline_filter(
   horizontal_filter : HorizontalFiltering,
   vertical_filter : VerticalFiltering,
   src : FixedArray[Byte],
-  src_width : Int,
+  src_width : Int32,
   dst : FixedArray[Byte],
-  dst_height : Int,
-  channels : Int,
+  dst_height : Int32,
+  channels : Int32,
 ) -> Unit {
   let src_stride = src_width * channels
   let dst_stride = horizontal_filter.filter_weights.bounds_start.length() *

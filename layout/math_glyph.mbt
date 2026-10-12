@@ -2,7 +2,7 @@
 
 ///|
 /// Maximum number of times extenders can be repeated.
-const MAX_REPEATS : Int = 1024
+const MAX_REPEATS : Int32 = 1024
 
 ///|
 priv struct GlyphFragment {
@@ -779,7 +779,7 @@ fn assemble(
 /// of times.
 fn assembly_parts(
   assembly : @otf.GlyphAssembly,
-  repeat : Int,
+  repeat : Int32,
 ) -> Array[@otf.GlyphPart] {
   let out = []
   for part in assembly.parts.iter() {

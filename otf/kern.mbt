@@ -19,7 +19,7 @@ pub(all) struct KerningPair {
   ///
   /// In the kern table spec, a kerning pair is stored as two u16,
   /// but we are using one u32, so we can binary search it directly.
-  pair : UInt
+  pair : UInt32
   /// Kerning value.
   value : Int16
 } derive(Debug)
@@ -109,14 +109,14 @@ struct KernSubtables {
   /// Indicates an Apple Advanced Typography format.
   is_aat : Bool
   /// The total number of tables.
-  count : UInt
+  count : UInt32
   /// Actual data. Starts right after the `kern` header.
   data : BytesView
 }
 
 ///|
 /// Returns the number of subtables.
-pub fn KernSubtables::len(self : KernSubtables) -> UInt {
+pub fn KernSubtables::len(self : KernSubtables) -> UInt32 {
   self.count
 }
 
@@ -150,9 +150,9 @@ struct KernSubtablesIter {
   /// Indicates an Apple Advanced Typography format.
   is_aat : Bool
   /// The current table index,
-  table_index : UInt
+  table_index : UInt32
   /// The total number of tables.
-  number_of_tables : UInt
+  number_of_tables : UInt32
   /// Actual data. Starts right after `kern` header.
   stream : Stream
 }
@@ -348,7 +348,7 @@ pub fn KernSubtable2::glyphs_kerning(
 ///|
 fn get_format2_class(
   glyph_id : UInt16,
-  offset : Int,
+  offset : Int32,
   data : BytesView,
 ) -> UInt16? {
   try {

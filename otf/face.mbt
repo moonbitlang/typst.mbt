@@ -4,7 +4,7 @@
 // `FaceTables`, `Face`, `fonts_in_collection`).
 
 ///|
-let max_var_coords : Int = 64
+let max_var_coords : Int32 = 64
 
 ///|
 /// A raw font face.
@@ -30,7 +30,7 @@ pub(all) struct RawFace {
 /// While we do reuse `FaceParsingError`, `No*Table` errors will not be throws.
 pub fn RawFace::parse(
   data : BytesView,
-  index : UInt,
+  index : UInt32,
 ) -> RawFace raise FaceParsingError {
   // https://docs.microsoft.com/en-us/typography/opentype/spec/otff#organization-of-an-opentype-font
 
@@ -267,7 +267,7 @@ struct Face {
 /// If an optional table has invalid data it will be skipped.
 pub fn Face::parse(
   data : BytesView,
-  index : UInt,
+  index : UInt32,
 ) -> Face raise FaceParsingError {
   let raw_face = RawFace::parse(data, index)
   let raw_tables = Face::collect_tables(raw_face)
@@ -1337,7 +1337,7 @@ pub fn Face::set_variation(self : Face, axis : Tag, value : Float) -> Unit? {
 /// ignored, missing ones are left unchanged.
 pub fn Face::set_normalized_coordinates(
   self : Face,
-  coords : Array[Int],
+  coords : Array[Int32],
 ) -> Unit {
   for i, c in coords {
     if i < self.coordinates.length() {
@@ -1405,7 +1405,7 @@ fn Face::coords(self : Face) -> ArrayView[NormalizedCoordinate] {
 /// Returns the number of fonts stored in a TrueType font collection.
 ///
 /// Returns `None` if a provided data is not a TrueType font collection.
-pub fn fonts_in_collection(data : BytesView) -> UInt? {
+pub fn fonts_in_collection(data : BytesView) -> UInt32? {
   let s = Stream::new(data)
   let magic : Magic = s.read() catch { _ => return None }
   if magic != FontCollection {

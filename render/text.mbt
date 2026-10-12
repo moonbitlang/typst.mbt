@@ -267,7 +267,7 @@ fn write_bitmap(
 }
 
 ///|
-fn clamp(v : Int, lo : Int, hi : Int) -> Int {
+fn clamp(v : Int32, lo : Int32, hi : Int32) -> Int32 {
   if v < lo {
     lo
   } else if v > hi {
@@ -283,13 +283,13 @@ fn clamp(v : Int, lo : Int, hi : Int) -> Int {
 ///|
 /// Blends two premulitplied, packed 32-bit RGBA colors. Alpha channel must be
 /// in the 8 high bits.
-fn blend_src_over(src : UInt, dst : UInt) -> UInt {
+fn blend_src_over(src : UInt32, dst : UInt32) -> UInt32 {
   src + alpha_mul(dst, 256 - (src >> 24))
 }
 
 ///|
 /// Alpha multiply a color.
-fn alpha_mul(color : UInt, scale : UInt) -> UInt {
+fn alpha_mul(color : UInt32, scale : UInt32) -> UInt32 {
   let mask = 0xff00ffU
   let rb = ((color & mask) * scale) >> 8
   let ag = ((color >> 8) & mask) * scale

@@ -4,8 +4,8 @@
 /// A decoded 8-bit image (the subset of `image::DynamicImage` hayro-svg uses).
 priv struct DynamicImage {
   color : @codecs.PngColorType
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   data : Bytes
 }
 
@@ -82,8 +82,8 @@ fn SvgRenderer::draw_rgba_image(
 /// `ImageBuffer::from_raw(...).unwrap()`: the buffer must be large enough.
 fn image_from_raw(
   color : @codecs.PngColorType,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   data : Bytes,
 ) -> DynamicImage {
   let channels = match color {

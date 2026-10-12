@@ -5,7 +5,7 @@
 pub(all) enum InstantiationError {
   /// Caused when the number of required imports does not match
   /// the number of given externals upon module instantiation.
-  InvalidNumberOfImports(required~ : Int, given~ : Int)
+  InvalidNumberOfImports(required~ : Int32, given~ : Int32)
   /// Caused when a given external value does not match the
   /// type of the required import for module instantiation.
   ImportsExternalsMismatch(expected~ : ExternType, actual~ : Extern)
@@ -30,9 +30,9 @@ pub(all) enum InstantiationError {
     actual~ : @wasmi_core.MemoryType
   )
   /// Caused when an element segment does not fit into the specified table instance.
-  ElementSegmentDoesNotFit(table~ : Table, table_index~ : UInt64, len~ : UInt)
+  ElementSegmentDoesNotFit(table~ : Table, table_index~ : UInt64, len~ : UInt32)
   /// Caused when the `start` function was unexpectedly found in the instantiated module.
-  UnexpectedStartFn(index~ : UInt)
+  UnexpectedStartFn(index~ : UInt32)
   /// When trying to instantiate more instances than supported by Wasmi.
   TooManyInstances
   /// When trying to instantiate more tables than supported by Wasmi.

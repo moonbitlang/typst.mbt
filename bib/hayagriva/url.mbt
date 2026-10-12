@@ -76,7 +76,7 @@ pub impl Show for UrlParseError with fn output(self, logger) {
 pub extend UrlParseError with Show::{to_string, output}
 
 ///|
-fn special_default_port(scheme : String) -> Int? {
+fn special_default_port(scheme : String) -> Int32? {
   match scheme {
     "http" | "ws" => Some(80)
     "https" | "wss" => Some(443)
@@ -96,7 +96,7 @@ fn is_special_scheme(scheme : String) -> Bool {
 fn percent_encode_char(
   out : StringBuilder,
   c : Char,
-  in_set : (Int) -> Bool,
+  in_set : (Int32) -> Bool,
 ) -> Unit {
   let n = c.to_int()
   if n < 0x80 {
@@ -113,38 +113,38 @@ fn percent_encode_char(
 }
 
 ///|
-fn hex2(n : Int) -> String {
+fn hex2(n : Int32) -> String {
   let digits = "0123456789ABCDEF"
   digits[n / 16:n / 16 + 1].to_owned() + digits[n % 16:n % 16 + 1].to_owned()
 }
 
 ///|
-fn c0_control(n : Int) -> Bool {
+fn c0_control(n : Int32) -> Bool {
   n < 0x20 || n == 0x7F
 }
 
 ///|
-fn fragment_set(n : Int) -> Bool {
+fn fragment_set(n : Int32) -> Bool {
   c0_control(n) || n is (0x20 | 0x22 | 0x3C | 0x3E | 0x60)
 }
 
 ///|
-fn query_set(n : Int) -> Bool {
+fn query_set(n : Int32) -> Bool {
   c0_control(n) || n is (0x20 | 0x22 | 0x23 | 0x3C | 0x3E)
 }
 
 ///|
-fn special_query_set(n : Int) -> Bool {
+fn special_query_set(n : Int32) -> Bool {
   query_set(n) || n == 0x27
 }
 
 ///|
-fn path_set(n : Int) -> Bool {
+fn path_set(n : Int32) -> Bool {
   query_set(n) || n is (0x3F | 0x60 | 0x7B | 0x7D)
 }
 
 ///|
-fn userinfo_set(n : Int) -> Bool {
+fn userinfo_set(n : Int32) -> Bool {
   path_set(n) ||
   n is (0x2F | 0x3A | 0x3B | 0x3D | 0x40 | 0x5B | 0x5C | 0x5D | 0x5E | 0x7C)
 }
@@ -609,7 +609,7 @@ fn punycode_encode(input : String) -> String? {
   let mut b = 0
   for c in cps {
     if c < 0x80 {
-      out.write_char(Int::unsafe_to_char(c))
+      out.write_char(Int32::unsafe_to_char(c))
       b += 1
     }
   }
@@ -617,14 +617,14 @@ fn punycode_encode(input : String) -> String? {
   if b > 0 {
     out.write_char('-')
   }
-  let encode_digit = (d : Int) => {
+  let encode_digit = (d : Int32) => {
     if d < 26 {
-      Int::unsafe_to_char('a'.to_int() + d)
+      Int32::unsafe_to_char('a'.to_int() + d)
     } else {
-      Int::unsafe_to_char('0'.to_int() + d - 26)
+      Int32::unsafe_to_char('0'.to_int() + d - 26)
     }
   }
-  let adapt = (delta0 : Int, numpoints : Int, first : Bool) => {
+  let adapt = (delta0 : Int32, numpoints : Int32, first : Bool) => {
     let mut delta = if first { delta0 / damp } else { delta0 / 2 }
     delta += delta / numpoints
     let mut k = 0

@@ -219,8 +219,8 @@ fn xobject_oc(dict : @hayro_syntax.Dict, context : Context) -> Bool {
 
 ///|
 priv struct ImageXObject {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   color_space : ColorSpace?
   cache : Cache
   interpolate : Bool
@@ -277,18 +277,18 @@ fn ImageXObject::new(
     Some(b) => b
     None => (dict.get("Interpolate") : Bool?).unwrap_or(false)
   }
-  let width = match (dict.get("W") : UInt?) {
+  let width = match (dict.get("W") : UInt32?) {
     Some(w) => w
     None =>
-      match (dict.get("Width") : UInt?) {
+      match (dict.get("Width") : UInt32?) {
         Some(w) => w
         None => return None
       }
   }
-  let height = match (dict.get("H") : UInt?) {
+  let height = match (dict.get("H") : UInt32?) {
     Some(h) => h
     None =>
-      match (dict.get("Height") : UInt?) {
+      match (dict.get("Height") : UInt32?) {
         Some(h) => h
         None => return None
       }
@@ -313,7 +313,7 @@ fn ImageXObject::new(
 ///|
 fn ImageXObject::decoded_mask(
   self : ImageXObject,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> DecodedMask? {
   if !self.is_mask {
     return None
@@ -324,7 +324,7 @@ fn ImageXObject::decoded_mask(
 ///|
 fn ImageXObject::decoded_raster(
   self : ImageXObject,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> DecodedRaster? {
   if self.is_mask {
     return None
@@ -333,12 +333,12 @@ fn ImageXObject::decoded_raster(
 }
 
 ///|
-fn ImageXObject::width(self : ImageXObject) -> Int {
+fn ImageXObject::width(self : ImageXObject) -> Int32 {
   self.width
 }
 
 ///|
-fn ImageXObject::height(self : ImageXObject) -> Int {
+fn ImageXObject::height(self : ImageXObject) -> Int32 {
   self.height
 }
 
@@ -370,21 +370,21 @@ priv struct DecodedRaster {
 priv struct DecodeContext {
   mut decoded_data : Bytes
   mut decoded_alpha : Bytes?
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   scale_factors : (Float, Float)
   color_space : ColorSpace
-  bits_per_component : Int
+  bits_per_component : Int32
   decode_arr : Array[(Float, Float)]
 }
 
 ///|
 fn decode_context(
   obj : ImageXObject,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> DecodeContext? {
   let dict = obj.stream.dict()
-  let dict_bpc : Int? = match (dict.get("BPC") : Byte?) {
+  let dict_bpc : Int32? = match (dict.get("BPC") : Byte?) {
     Some(b) => Some(b.to_int())
     None =>
       match (dict.get("BitsPerComponent") : Byte?) {
@@ -475,7 +475,7 @@ fn decode_context(
 /// Read the pairs of an array (upstream `array.iter::<(f32, f32)>()`).
 fn read_f32_pairs(a : @hayro_syntax.PdfArray) -> Array[(Float, Float)] {
   let result = []
-  let iter = (a.iter() : Iter[@hayro_syntax.Object]).iterator()
+  let iter = (a.iter() : Iter[@hayro_syntax.Object])
   while true {
     guard iter.next() is Some(o1) else { break }
     guard iter.next() is Some(o2) else { break }
@@ -488,7 +488,7 @@ fn read_f32_pairs(a : @hayro_syntax.PdfArray) -> Array[(Float, Float)] {
 ///|
 fn decode_mask(
   obj : ImageXObject,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> DecodedMask? {
   guard decode_context(obj, target_dimension) is Some(ctx) else { return None }
   let height = Ref(ctx.height)
@@ -524,7 +524,7 @@ fn decode_mask(
 ///|
 fn decode_raster(
   obj : ImageXObject,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> DecodedRaster? {
   guard decode_context(obj, target_dimension) is Some(ctx) else { return None }
   let height = Ref(ctx.height)
@@ -719,10 +719,10 @@ fn pairs_eq(a : Array[(Float, Float)], b : Array[(Float, Float)]) -> Bool {
 ///|
 fn decode_mask_bytes(
   decoded_data : Bytes,
-  width : Int,
-  height : Ref[Int],
+  width : Int32,
+  height : Ref[Int32],
   color_space : ColorSpace,
-  bits_per_component : Int,
+  bits_per_component : Int32,
   decode_arr : Array[(Float, Float)],
   invert : Bool,
 ) -> Bytes? {
@@ -781,11 +781,11 @@ fn resolve_alpha(
   decoded : DecodeContext,
   image_data : ImageData?,
   color_space : ColorSpace,
-  bits_per_component : Int,
-  width : Int,
-  height : Ref[Int],
+  bits_per_component : Int32,
+  width : Int32,
+  height : Ref[Int32],
   scale_factors : (Float, Float),
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> LumaData?? {
   let dict = obj.stream.dict()
   let alpha = if (dict.get("SMaskInData") : Byte?) is Some(b'\x01') {
@@ -892,7 +892,7 @@ fn resolve_alpha(
 
 ///|
 /// Read a color key mask (upstream `dict.get::<SmallVec<[u16; 4]>>(MASK)`).
-fn read_color_key_mask(dict : @hayro_syntax.Dict) -> Array[Int]? {
+fn read_color_key_mask(dict : @hayro_syntax.Dict) -> Array[Int32]? {
   guard (dict.get("Mask") : @hayro_syntax.PdfArray?) is Some(arr) else {
     return None
   }
@@ -903,7 +903,7 @@ fn read_color_key_mask(dict : @hayro_syntax.Dict) -> Array[Int]? {
 fn resolve_matte(
   obj : ImageXObject,
   color_space : ColorSpace,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> (LumaData, FixedArray[Byte])? {
   let dict = obj.stream.dict()
   guard (dict.get("SMask") : @hayro_syntax.Stream?) is Some(s_mask) else {
@@ -984,8 +984,8 @@ fn unpremultiply(
 ///|
 fn get_rgb_data(
   decoded : Array[Float],
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   scale_factors : (Float, Float),
   cs : ColorSpace,
   interpolate : Bool,
@@ -1013,8 +1013,8 @@ impl CacheKey for ImageXObject with fn cache_key(self) {
 ///|
 fn[T] fix_image_length(
   image : Array[T],
-  width : Int,
-  height : Ref[Int],
+  width : Int32,
+  height : Ref[Int32],
   filler : T,
   cs : ColorSpace,
 ) -> Unit? {
@@ -1042,13 +1042,13 @@ fn[T] fix_image_length(
 ///|
 fn get_components(
   data : Bytes,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color_space : ColorSpace,
-  bits_per_component : Int,
-) -> Array[Int]? {
+  bits_per_component : Int32,
+) -> Array[Int32]? {
   let result = match bits_per_component {
-    1..=7 | 9..=15 => {
+    1..<=7 | 9..<=15 => {
       let buf = []
       let bpc = bits_per_component
       let reader = @hayro_syntax.BitReader::new(data[:])
@@ -1088,9 +1088,9 @@ fn get_components(
 
 ///|
 fn apply_decode_array(
-  components : Array[Int],
+  components : Array[Int32],
   color_space : ColorSpace,
-  bits_per_component : Int,
+  bits_per_component : Int32,
   decode : Array[(Float, Float)],
 ) -> Array[Float]? {
   let max = powi(2.0, bits_per_component) - 1.0

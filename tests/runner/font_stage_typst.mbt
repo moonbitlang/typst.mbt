@@ -130,7 +130,7 @@ fn dump_instance(out : StringBuilder, inst : @library.FontInstance) -> Unit {
 fn font_dump_typst(
   out : StringBuilder,
   data : Bytes,
-  face_index : UInt,
+  face_index : UInt32,
 ) -> Unit {
   guard @library.Font::from_data(data, face_index) is Some(font) else {
     out.write_string("typst -\n")
@@ -168,7 +168,7 @@ fn font_dump_typst(
     n += 1
   }
   let probe = StringBuilder()
-  let mut c : UInt = 0
+  let mut c : UInt32 = 0
   while c < 0x30000 {
     probe.write_char(if info.coverage.contains(c) { '1' } else { '0' })
     c += 7
@@ -271,7 +271,7 @@ fn font_dump_book() -> String {
     "あ", "😀", "∑", "⨀", "𝔸", "♠", "\u{1F1E9}", "ﬁ", "€", "🏳️",
     "∫", "⟨", "ℏ",
   ]
-  let likes : Array[Int?] = [
+  let likes : Array[Int32?] = [
     None,
     Some(0),
     Some(13),

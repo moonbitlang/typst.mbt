@@ -94,7 +94,7 @@ pub fn DrawSettings::hinted(
 priv enum OutlineKind {
   GlyfKind(GlyfOutlines, GlyfOutline)
   // Third field is subfont index
-  CffKind(CffOutlines, GlyphId, Int)
+  CffKind(CffOutlines, GlyphId, Int32)
 }
 
 ///|

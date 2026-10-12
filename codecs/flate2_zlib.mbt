@@ -10,7 +10,7 @@
 ///|
 /// The capacity of `zio::Writer`'s internal buffer
 /// (`Vec::with_capacity(32 * 1024)`).
-const ZIO_BUF_CAPACITY : Int = 32768
+const ZIO_BUF_CAPACITY : Int32 = 32768
 
 ///|
 /// A zlib encoder writing into an in-memory buffer (upstream
@@ -25,7 +25,7 @@ pub struct ZlibEncoder {
 /// `ZlibEncoder::new(Vec::new(), Compression::new(level))`).
 ///
 /// Only the levels handled by zlib-rs's `deflate_medium` (3..=6) are ported.
-pub fn ZlibEncoder::new(level : Int) -> ZlibEncoder {
+pub fn ZlibEncoder::new(level : Int32) -> ZlibEncoder {
   { data: DeflateStream::new(level), obj: OutBuf::new(), }
 }
 
@@ -37,9 +37,9 @@ fn ZlibEncoder::write(
   self : ZlibEncoder,
   view : BytesView,
   array : FixedArray[Byte]?,
-  off : Int,
-  len : Int,
-) -> Int {
+  off : Int32,
+  len : Int32,
+) -> Int32 {
   // miniz isn't guaranteed to actually write any of the buffer provided, it
   // may be in a flushing mode where it's just giving us data before we're
   // actually giving it any data. We don't want to spuriously return `Ok(0)`
@@ -84,8 +84,8 @@ pub fn ZlibEncoder::write_all(self : ZlibEncoder, buf : BytesView) -> Unit {
 fn ZlibEncoder::write_all_array(
   self : ZlibEncoder,
   array : FixedArray[Byte],
-  off : Int,
-  len : Int,
+  off : Int32,
+  len : Int32,
 ) -> Unit {
   let mut off = off
   let mut len = len
@@ -126,7 +126,7 @@ pub fn ZlibEncoder::finish(self : ZlibEncoder) -> Bytes {
 /// Compresses `data` into a zlib stream with the given level (3..=6), as
 /// upstream `ZlibEncoder::new(Vec::new(), Compression::new(level))` followed
 /// by `write_all(data)` and `finish()`.
-pub fn zlib_compress(data : BytesView, level? : Int = 6) -> Bytes {
+pub fn zlib_compress(data : BytesView, level~ : Int32 = 6) -> Bytes {
   let encoder = ZlibEncoder::new(level)
   encoder.write_all(data)
   encoder.finish()

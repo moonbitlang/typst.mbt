@@ -9,10 +9,10 @@ pub struct Type1Font {
   mut family_name : String?
   mut weight : String?
   mut bbox : @font_types.BoundingBox[Fixed]
-  mut italic_angle : Int
+  mut italic_angle : Int32
   mut is_fixed_pitch : Bool
-  mut underline_position : Int
-  mut underline_thickness : Int
+  mut underline_position : Int32
+  mut underline_thickness : Int32
   mut matrix : ScaledFontMatrix
   priv mut charstrings : Charstrings
   priv mut subrs : Subrs
@@ -95,7 +95,7 @@ fn bytes_eq(b : BytesView, s : String) -> Bool {
 fn Type1Font::from_dicts(base : BytesView, private : BytesView) -> Type1Font? {
   let font = Type1Font::empty()
   // Read base dict entries
-  let mut encoding_offset : Int? = None
+  let mut encoding_offset : Int32? = None
   let parser = T1Parser::new(base)
   while parser.next() is Some(token) {
     if name_is(token, "FontName") {
@@ -213,7 +213,7 @@ pub fn Type1Font::weight(self : Type1Font) -> String? {
 
 ///|
 /// Returns the italic angle.
-pub fn Type1Font::italic_angle(self : Type1Font) -> Int {
+pub fn Type1Font::italic_angle(self : Type1Font) -> Int32 {
   self.italic_angle
 }
 
@@ -225,13 +225,13 @@ pub fn Type1Font::is_fixed_pitch(self : Type1Font) -> Bool {
 
 ///|
 /// Returns the position of the top of an underline decoration.
-pub fn Type1Font::underline_position(self : Type1Font) -> Int {
+pub fn Type1Font::underline_position(self : Type1Font) -> Int32 {
   self.underline_position
 }
 
 ///|
 /// Returns the suggested size for an underline decoration.
-pub fn Type1Font::underline_thickness(self : Type1Font) -> Int {
+pub fn Type1Font::underline_thickness(self : Type1Font) -> Int32 {
   self.underline_thickness
 }
 
@@ -243,13 +243,13 @@ pub fn Type1Font::bbox(self : Type1Font) -> @font_types.BoundingBox[Fixed] {
 
 ///|
 /// Returns the number of glyphs in the Type1 font.
-pub fn Type1Font::num_glyphs(self : Type1Font) -> Int {
+pub fn Type1Font::num_glyphs(self : Type1Font) -> Int32 {
   self.charstrings.index.length()
 }
 
 ///|
 /// Returns the units per em.
-pub fn Type1Font::upem(self : Type1Font) -> Int {
+pub fn Type1Font::upem(self : Type1Font) -> Int32 {
   self.matrix.scale
 }
 
@@ -371,7 +371,7 @@ pub impl CharstringContext for Type1Font with fn seac_components(
   base_code,
   accent_code,
 ) {
-  let decode = fn(code : Int) raise PsError {
+  let decode = fn(code : Int32) raise PsError {
     if code < 0 || code > 255 {
       raise InvalidSeacCode(code)
     }
@@ -544,14 +544,14 @@ fn verify_header(data : BytesView) -> Bool {
 }
 
 ///|
-const PFB_TEXT_SEGMENT_TAG : Int = 0x8001
+const PFB_TEXT_SEGMENT_TAG : Int32 = 0x8001
 
 ///|
-const PFB_BINARY_SEGMENT_TAG : Int = 0x8002
+const PFB_BINARY_SEGMENT_TAG : Int32 = 0x8002
 
 ///|
 /// Returns the PFB tag and segment size.
-fn decode_pfb_tag(data : BytesView, start : Int) -> (Int, UInt)? {
+fn decode_pfb_tag(data : BytesView, start : Int32) -> (Int32, UInt32)? {
   if start < 0 || start + 6 > data.length() {
     return None
   }
@@ -591,7 +591,7 @@ fn decode_pfb_binary_segments(data : BytesView) -> Array[BytesView] {
 
 ///|
 /// Helper to find the position of the data following the 'eexec' token.
-fn find_eexec_data(data : BytesView) -> Int? {
+fn find_eexec_data(data : BytesView) -> Int32? {
   // Use a parser to avoid catching "eexec" in a comment or string
   // which apparently occurs in some fonts.
   let parser = T1Parser::new(data)
@@ -602,7 +602,7 @@ fn find_eexec_data(data : BytesView) -> Int? {
     let mut start = parser.pos
     // FreeType has some unfun logic for skipping whitespace
     // after the eexec token
-    let mut linefeed_pos : Int? = None
+    let mut linefeed_pos : Int32? = None
     while start < data.length() {
       let c = data[start]
       if c == b' ' || c == b'\t' {
@@ -645,7 +645,7 @@ fn find_eexec_data(data : BytesView) -> Int? {
 
 ///|
 /// Converts digits (as ASCII characters) into integer values.
-let digit_to_num : ReadOnlyArray[Int] = [
+let digit_to_num : ReadOnlyArray[Int32] = [
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1,
@@ -664,7 +664,7 @@ fn decode_hex(bytes : BytesView) -> Bytes {
   let mut pos = 0
   while true {
     // One call of the upstream iterator closure.
-    let mut produced : Int? = None
+    let mut produced : Int32? = None
     while pos < bytes.length() {
       let c = bytes[pos]
       pos += 1
@@ -704,15 +704,15 @@ fn decode_hex(bytes : BytesView) -> Bytes {
 
 ///|
 /// Decryption seed for eexec segment.
-const EEXEC_SEED : UInt = 55665
+const EEXEC_SEED : UInt32 = 55665
 
 ///|
 /// Decryption seed for charstring (and subroutine) data.
-const CHARSTRING_SEED : UInt = 4330
+const CHARSTRING_SEED : UInt32 = 4330
 
 ///|
 /// Returns the decrypted bytes, skipping the first `skip` bytes.
-fn decrypt_skip(bytes : BytesView, seed : UInt, skip : Int) -> Bytes {
+fn decrypt_skip(bytes : BytesView, seed : UInt32, skip : Int32) -> Bytes {
   let out = Buffer()
   decrypt_into(bytes, seed, skip, out)
   out.to_bytes()
@@ -721,8 +721,8 @@ fn decrypt_skip(bytes : BytesView, seed : UInt, skip : Int) -> Bytes {
 ///|
 fn decrypt_into(
   bytes : BytesView,
-  seed : UInt,
-  skip : Int,
+  seed : UInt32,
+  skip : Int32,
   out : Buffer,
 ) -> Unit {
   let mut seed = seed
@@ -805,7 +805,7 @@ priv struct Subrs {
   data : Buffer
   /// Index mapping subroutine number to range in the packed data. Sorted
   /// by subroutine number.
-  index : Array[(UInt, Int, Int)]
+  index : Array[(UInt32, Int32, Int32)]
   /// If true, subroutine number == index so we don't need to bsearch.
   mut is_dense : Bool
   mut bytes : Bytes
@@ -817,7 +817,7 @@ fn Subrs::new() -> Subrs {
 }
 
 ///|
-fn Subrs::get(self : Subrs, index : UInt) -> BytesView? {
+fn Subrs::get(self : Subrs, index : UInt32) -> BytesView? {
   let entry_idx = if self.is_dense {
     if index > 0x7FFFFFFFU {
       return None
@@ -850,10 +850,10 @@ fn Subrs::get(self : Subrs, index : UInt) -> BytesView? {
 
 ///|
 priv struct CharstringEntry {
-  name_start : Int
-  name_end : Int
-  data_start : Int
-  data_end : Int
+  name_start : Int32
+  name_end : Int32
+  data_start : Int32
+  data_end : Int32
 }
 
 ///|
@@ -867,7 +867,7 @@ priv struct Charstrings {
   index : Array[CharstringEntry]
   /// If notdef was remapped, holds the original index of the notdef
   /// charstring.
-  mut orig_notdef_index : Int?
+  mut orig_notdef_index : Int32?
   mut data_bytes : Bytes
   mut names_bytes : Bytes
 }
@@ -891,13 +891,13 @@ fn Charstrings::finish(self : Charstrings) -> Unit {
 }
 
 ///|
-fn Charstrings::get(self : Charstrings, index : Int) -> BytesView? {
+fn Charstrings::get(self : Charstrings, index : Int32) -> BytesView? {
   guard self.index.get(index) is Some(e) else { return None }
   Some(self.data_bytes[e.data_start:e.data_end])
 }
 
 ///|
-fn Charstrings::name(self : Charstrings, index : Int) -> String? {
+fn Charstrings::name(self : Charstrings, index : Int32) -> String? {
   guard self.index.get(index) is Some(e) else { return None }
   let bytes = self.names_bytes[e.name_start:e.name_end]
   try @utf8.decode(bytes, ignore_bom=false) catch {
@@ -908,7 +908,7 @@ fn Charstrings::name(self : Charstrings, index : Int) -> String? {
 }
 
 ///|
-fn Charstrings::index_for_name(self : Charstrings, name : String) -> Int? {
+fn Charstrings::index_for_name(self : Charstrings, name : String) -> Int32? {
   for idx, entry in self.index {
     let bytes = self.names_bytes[entry.name_start:entry.name_end]
     if utf8_eq(bytes, name) {
@@ -964,7 +964,7 @@ let notdef_glyph : Bytes = b"\x8B\xF7\xE1\x0D\x0E"
 ///|
 priv struct T1Parser {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -978,7 +978,7 @@ fn T1Parser::clone(self : T1Parser) -> T1Parser {
 }
 
 ///|
-fn T1Parser::get(self : T1Parser, start : Int, end : Int) -> BytesView? {
+fn T1Parser::get(self : T1Parser, start : Int32, end : Int32) -> BytesView? {
   get_range(self.data, start, end)
 }
 
@@ -1154,7 +1154,7 @@ fn T1Parser::skip_line(self : T1Parser) -> Unit {
 }
 
 ///|
-fn T1Parser::skip_until(self : T1Parser, f : (Byte) -> Bool) -> Int {
+fn T1Parser::skip_until(self : T1Parser, f : (Byte) -> Bool) -> Int32 {
   let mut count = 0
   while self.peek_byte() is Some(byte) {
     if f(byte) {
@@ -1167,7 +1167,7 @@ fn T1Parser::skip_until(self : T1Parser, f : (Byte) -> Bool) -> Int {
 }
 
 ///|
-fn T1Parser::read_proc(self : T1Parser, start : Int) -> T1Token? {
+fn T1Parser::read_proc(self : T1Parser, start : Int32) -> T1Token? {
   while true {
     guard self.next_byte() is Some(c) else { return None }
     if c == b'}' {
@@ -1190,7 +1190,7 @@ fn T1Parser::read_proc(self : T1Parser, start : Int) -> T1Token? {
 }
 
 ///|
-fn T1Parser::read_lit_string(self : T1Parser, start : Int) -> T1Token? {
+fn T1Parser::read_lit_string(self : T1Parser, start : Int32) -> T1Token? {
   let mut nest_depth = 1
   while self.next_byte() is Some(c) {
     if c == b'(' {
@@ -1219,7 +1219,7 @@ fn T1Parser::read_lit_string(self : T1Parser, start : Int) -> T1Token? {
 }
 
 ///|
-fn T1Parser::read_hex_string(self : T1Parser, start : Int) -> T1Token? {
+fn T1Parser::read_hex_string(self : T1Parser, start : Int32) -> T1Token? {
   while self.next_byte() is Some(c) {
     if !is_t1_whitespace(c) && !is_ascii_hexdigit(c) {
       break
@@ -1245,7 +1245,7 @@ fn T1Parser::read_int(self : T1Parser) -> Int64? {
 }
 
 ///|
-fn T1Parser::read_num_as_int(self : T1Parser) -> Int? {
+fn T1Parser::read_num_as_int(self : T1Parser) -> Int32? {
   match self.next() {
     Some(TInt(n)) => Some(n.to_int())
     // Note, FT calls PS_Conv_ToInt for fields that might contain
@@ -1397,7 +1397,7 @@ fn T1Parser::read_charstrings(self : T1Parser, len_iv : Int64) -> Charstrings? {
     Some(TInt(n)) => if n < 0L { return None }
     _ => return None
   }
-  let mut notdef_idx : Int? = None
+  let mut notdef_idx : Int32? = None
   while self.next() is Some(token) {
     let name = match token {
       // Stop when we find a `def` or `end` keyword.
@@ -1610,7 +1610,7 @@ fn T1Parser::read_sparse_encoding(
 
 ///|
 /// Rust `str::parse::<i64>` / `i64::from_str_radix` on ASCII bytes.
-fn parse_i64_radix(b : BytesView, radix : Int) -> Int64? {
+fn parse_i64_radix(b : BytesView, radix : Int32) -> Int64? {
   if b.length() == 0 {
     return None
   }
@@ -1699,7 +1699,7 @@ fn decode_int(bytes : BytesView) -> Int64? {
 ///|
 /// Decode an integer at the given position, returning the value and the
 /// index of the position following the decoded integer.
-fn decode_int_prefix(bytes : BytesView, start : Int) -> (Int64, Int)? {
+fn decode_int_prefix(bytes : BytesView, start : Int32) -> (Int64, Int32)? {
   guard get_from(bytes, start) is Some(tail) else { return None }
   let mut end = tail.length()
   for i in 0..<tail.length() {
@@ -1715,7 +1715,7 @@ fn decode_int_prefix(bytes : BytesView, start : Int) -> (Int64, Int)? {
 
 ///|
 /// Decode a fixed point value, scaling to a specific power of ten.
-fn decode_fixed(bytes : BytesView, power_ten : Int) -> Fixed? {
+fn decode_fixed(bytes : BytesView, power_ten : Int32) -> Fixed? {
   let limit = 0xCCCCCCC
   let mut power_ten = power_ten
   let mut idx = 0

@@ -7,7 +7,7 @@
 pub(all) suberror FancyError {
   /// An error as a result of parsing a regex pattern, with the position
   /// (UTF-8 byte offset) where the error occurred
-  ParseError(Int, ParseError)
+  ParseError(Int32, ParseError)
   /// An error as a result of compiling a regex
   CompileError(CompileError)
   /// An error as a result of running a regex
@@ -85,13 +85,13 @@ pub(all) enum CompileError {
   /// Invalid group id in escape sequence
   InvalidGroupNameBackref(String)
   /// Invalid back reference
-  InvalidBackref(Int)
+  InvalidBackref(Int32)
   /// Once named groups are used you cannot refer to groups by number
   NamedBackrefOnly
   /// Feature not supported yet
   FeatureNotYetSupported(String)
   /// Subroutine call to non-existent group
-  SubroutineCallTargetNotFound(String, Int)
+  SubroutineCallTargetNotFound(String, Int32)
 } derive(Eq, Debug)
 
 ///|

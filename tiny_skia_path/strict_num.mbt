@@ -603,7 +603,7 @@ fn fmax_f64(a : Double, b : Double) -> Double {
 ///
 /// Tests `a` and `b` to be approximately equal within `ulps` ULPs. Differing
 /// signs are always unequal, and zeroes are only equal to zeroes.
-pub fn approx_eq_ulps(a : Float, b : Float, ulps : Int) -> Bool {
+pub fn approx_eq_ulps(a : Float, b : Float, ulps : Int32) -> Bool {
   // -0 and +0 are drastically far in ulps terms, so
   // we need a special case for that.
   if a == b {
@@ -637,7 +637,7 @@ pub fn approx_eq_ulps_f64(a : Double, b : Double, ulps : Int64) -> Bool {
 pub fn FiniteF32::approx_eq_ulps(
   self : FiniteF32,
   other : FiniteF32,
-  ulps : Int,
+  ulps : Int32,
 ) -> Bool {
   approx_eq_ulps(self.0, other.0, ulps)
 }
@@ -646,7 +646,7 @@ pub fn FiniteF32::approx_eq_ulps(
 pub fn PositiveF32::approx_eq_ulps(
   self : PositiveF32,
   other : PositiveF32,
-  ulps : Int,
+  ulps : Int32,
 ) -> Bool {
   approx_eq_ulps(self.get(), other.get(), ulps)
 }
@@ -655,7 +655,7 @@ pub fn PositiveF32::approx_eq_ulps(
 pub fn NonZeroPositiveF32::approx_eq_ulps(
   self : NonZeroPositiveF32,
   other : NonZeroPositiveF32,
-  ulps : Int,
+  ulps : Int32,
 ) -> Bool {
   approx_eq_ulps(self.get(), other.get(), ulps)
 }
@@ -664,7 +664,7 @@ pub fn NonZeroPositiveF32::approx_eq_ulps(
 pub fn NormalizedF32::approx_eq_ulps(
   self : NormalizedF32,
   other : NormalizedF32,
-  ulps : Int,
+  ulps : Int32,
 ) -> Bool {
   approx_eq_ulps(self.get(), other.get(), ulps)
 }

@@ -2,10 +2,10 @@
 
 ///|
 priv struct FixedRect {
-  left : Int
-  top : Int
-  right : Int
-  bottom : Int
+  left : Int32
+  top : Int32
+  right : Int32
+  bottom : Int32
 }
 
 ///|
@@ -19,7 +19,7 @@ fn FixedRect::from_rect(src : @path.Rect) -> FixedRect {
 }
 
 ///|
-fn alpha_mul(value : Int, alpha256 : Int) -> Int {
+fn alpha_mul(value : Int32, alpha256 : Int32) -> Int32 {
   ((value * alpha256) >> 8) & 0xFF
 }
 
@@ -50,14 +50,14 @@ fn fill_fixed_rect(rect : FixedRect, blitter : &Blitter) -> Unit {
 
 ///|
 fn fill_dot8(
-  l : Int,
-  t : Int,
-  r : Int,
-  b : Int,
+  l : Int32,
+  t : Int32,
+  r : Int32,
+  b : Int32,
   fill_inner : Bool,
   blitter : &Blitter,
 ) -> Unit {
-  fn to_alpha(a : Int) -> Int {
+  fn to_alpha(a : Int32) -> Int32 {
     a & 0xFF
   }
 
@@ -115,10 +115,10 @@ fn fill_dot8(
 
 ///|
 fn do_scanline(
-  l : Int,
-  top : Int,
-  r : Int,
-  alpha : Int,
+  l : Int32,
+  top : Int32,
+  r : Int32,
+  alpha : Int32,
   blitter : &Blitter,
 ) -> Unit {
   if top < 0 {
@@ -154,10 +154,10 @@ fn do_scanline(
 
 ///|
 fn call_hline_blitter(
-  x : Int,
-  y : Int?,
-  count : Int,
-  alpha : Int,
+  x : Int32,
+  y : Int32?,
+  count : Int32,
+  alpha : Int32,
   blitter : &Blitter,
 ) -> Unit {
   let hline_stack_buffer = 100
@@ -278,10 +278,10 @@ priv enum BlitterKind {
 
 ///|
 fn do_anti_hairline(
-  x0 : Int,
-  y0 : Int,
-  x1 : Int,
-  y1 : Int,
+  x0 : Int32,
+  y0 : Int32,
+  x1 : Int32,
+  y1 : Int32,
   clip_opt : ScreenIntRect?,
   blitter : &Blitter,
 ) -> Unit {
@@ -498,12 +498,12 @@ fn do_anti_hairline(
 
 ///|
 /// returns high-bit set if x == 0x8000
-fn bad_int(x : Int) -> Int {
+fn bad_int(x : Int32) -> Int32 {
   x & -x
 }
 
 ///|
-fn any_bad_ints(a : Int, b : Int, c : Int, d : Int) -> Int {
+fn any_bad_ints(a : Int32, b : Int32, c : Int32, d : Int32) -> Int32 {
   (bad_int(a) | bad_int(b) | bad_int(c) | bad_int(d)) >> 31
 }
 
@@ -512,7 +512,7 @@ fn any_bad_ints(a : Int, b : Int, c : Int, d : Int) -> Int {
 /// return 64, not 0, so we can't just say (ordinate & 63).
 /// We basically want to compute those bits, and if they're 0, return 64.
 /// We can do that w/o a branch with an extra sub and add.
-fn contribution_64(ordinate : Int) -> Int {
+fn contribution_64(ordinate : Int32) -> Int32 {
   ((ordinate - 1) & 63) + 1
 }
 
@@ -526,7 +526,7 @@ priv struct AntiHairBlitter {
 
 ///|
 /// `u32::max(1) - 1` on an `Int` holding a `u32`.
-fn sub1_sat(x : Int) -> Int {
+fn sub1_sat(x : Int32) -> Int32 {
   if x.reinterpret_as_uint() > 1 {
     x - 1
   } else {
@@ -537,11 +537,11 @@ fn sub1_sat(x : Int) -> Int {
 ///|
 fn AntiHairBlitter::draw_cap(
   self : AntiHairBlitter,
-  x : Int,
-  fy : Int,
-  slope : Int,
-  mod64 : Int,
-) -> Int {
+  x : Int32,
+  fy : Int32,
+  slope : Int32,
+  mod64 : Int32,
+) -> Int32 {
   match self.kind {
     HLine => {
       let mut fy = fy + fdot16_one / 2
@@ -616,11 +616,11 @@ fn AntiHairBlitter::draw_cap(
 ///|
 fn AntiHairBlitter::draw_line(
   self : AntiHairBlitter,
-  x : Int,
-  stop_x : Int,
-  fy : Int,
-  slope : Int,
-) -> Int {
+  x : Int32,
+  stop_x : Int32,
+  fy : Int32,
+  slope : Int32,
+) -> Int32 {
   match self.kind {
     HLine => {
       let count = stop_x - x
@@ -711,7 +711,7 @@ fn AntiHairBlitter::draw_line(
 }
 
 ///|
-fn i32_to_alpha(a : Int) -> Int {
+fn i32_to_alpha(a : Int32) -> Int32 {
   a & 0xFF
 }
 
@@ -723,7 +723,7 @@ priv struct RectClipBlitter {
 
 ///|
 /// `u32` subtraction-and-compare `(a - b) < c` with wrapping.
-fn u32_wrapping_lt(a : Int, b : Int, c : Int) -> Bool {
+fn u32_wrapping_lt(a : Int32, b : Int32, c : Int32) -> Bool {
   (a - b).reinterpret_as_uint() < c.reinterpret_as_uint()
 }
 
@@ -808,7 +808,7 @@ impl Blitter for RectClipBlitter with fn blit_anti_v2(
 }
 
 ///|
-fn compute_anti_width(runs : FixedArray[Int], offset : Int) -> Int {
+fn compute_anti_width(runs : FixedArray[Int32], offset : Int32) -> Int32 {
   let mut i = offset
   let mut width = 0
   while runs[i] != 0 {

@@ -71,13 +71,13 @@ pub fn Op::filter_register_and_offset_hi(self : Op) -> (Slot, Offset64Hi)? {
 
 ///|
 /// Creates a new [`Op::SlotAndImm32`] from the given `slot` and `lane` index.
-pub fn Op::slot_and_lane(slot : Slot, lane : Int) -> Op {
+pub fn Op::slot_and_lane(slot : Slot, lane : Int32) -> Op {
   Op::slot_and_imm32(slot, AnyConst32::from_i32(lane))
 }
 
 ///|
 /// Returns `Some` [`Slot`] and a `lane` index if encoded properly.
-pub fn Op::filter_register_and_lane(self : Op) -> (Slot, Int)? {
+pub fn Op::filter_register_and_lane(self : Op) -> (Slot, Int32)? {
   if self is SlotAndImm32(slot~, imm~) {
     let lane_index = imm.to_i32() & 0xFF
     return Some((slot, lane_index))
@@ -105,7 +105,7 @@ pub fn Op::filter_imm16_and_offset_hi(self : Op) -> (AnyConst16, Offset64Hi)? {
 
 ///|
 /// Creates a new [`Op::Imm16AndImm32`] from the given `lane` and `memory` index.
-pub fn Op::lane_and_memory_index(value : Int, memory : Memory) -> Op {
+pub fn Op::lane_and_memory_index(value : Int32, memory : Memory) -> Op {
   Op::imm16_and_imm32(
     AnyConst16::from_u16(value),
     AnyConst32::from_i32(memory.0),
@@ -114,7 +114,7 @@ pub fn Op::lane_and_memory_index(value : Int, memory : Memory) -> Op {
 
 ///|
 /// Returns `Some` lane and [`Memory`] index if encoded properly.
-pub fn Op::filter_lane_and_memory(self : Op) -> (Int, Memory)? {
+pub fn Op::filter_lane_and_memory(self : Op) -> (Int32, Memory)? {
   if self is Imm16AndImm32(imm16~, imm32~) {
     let lane = imm16.to_u16() & 0xFF
     return Some((lane, Memory(imm32.to_i32())))

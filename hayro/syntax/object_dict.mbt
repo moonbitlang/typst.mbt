@@ -8,7 +8,7 @@
 /// offsets of the values.
 pub struct Dict {
   priv data : BytesView
-  priv offsets : Map[String, Int]?
+  priv offsets : Map[String, Int32]?
   priv ctx : ReaderContext
 }
 
@@ -48,7 +48,7 @@ pub fn Dict::data(self : Dict) -> BytesView {
 
 ///|
 /// Returns the number of entries in the dictionary.
-pub fn Dict::len(self : Dict) -> Int {
+pub fn Dict::len(self : Dict) -> Int32 {
   match self.offsets {
     Some(o) => o.length()
     None => 0
@@ -84,7 +84,7 @@ pub fn[T : ObjectLike] Dict::get(self : Dict, key : String) -> T? {
 pub fn[T : ObjectLike] Dict::get_fixed(
   self : Dict,
   key : String,
-  n : Int,
+  n : Int32,
 ) -> Array[T]? {
   guard (self.get(key) : Object?) is Some(obj) else { return None }
   fixed_from_object(obj, n)
@@ -264,7 +264,7 @@ fn parse_dict_with(
   ctx : ReaderContext,
   start_tag : Bytes?,
   end_tag : Bytes,
-  on_entry : (Name, Int, Reader) -> Unit?,
+  on_entry : (Name, Int32, Reader) -> Unit?,
 ) -> BytesView? {
   guard r.tail() is Some(dict_data) else { return None }
   let start_offset = r.offset()

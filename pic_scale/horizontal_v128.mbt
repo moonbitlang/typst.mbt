@@ -15,11 +15,11 @@
 /// within `src`, the output within `dst` and the weights within their array.
 fn horizontal_ranges_ok(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
-  channels : Int,
+  channels : Int32,
 ) -> Bool {
   let n = fw.bounds_start.length()
   if physical_equal(src, dst) ||
@@ -51,7 +51,7 @@ fn horizontal_ranges_ok(
 ///|
 /// `i16x8` with lanes 0..3 = `a` and lanes 4..7 = `b` (16-bit weights).
 #inline
-fn weights_2x4(a : Int, b : Int) -> V128 {
+fn weights_2x4(a : Int32, b : Int32) -> V128 {
   @v128.i32x4_replace_lane(
     @v128.i32x4_replace_lane(
       @v128.i32x4_splat(((a & 0xffff) | (a << 16)).reinterpret_as_uint()),
@@ -100,9 +100,9 @@ fn pack_q6(acc : V128) -> V128 {
 /// [convolve_horizontal_rgba_neon_row_i16].
 fn rgba_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   guard horizontal_ranges_ok(src, src_offset, dst, dst_offset, fw, 4) else {
@@ -144,9 +144,9 @@ fn rgba_rdm_row(
 /// [convolve_horizontal_rgb_neon_rdm_row_one].
 fn rgb_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   guard horizontal_ranges_ok(src, src_offset, dst, dst_offset, fw, 3) else {
@@ -253,9 +253,9 @@ fn rgb_rdm_row(
 /// [convolve_horizontal_plane_neon_rdm_row].
 fn plane_rdm_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   guard horizontal_ranges_ok(src, src_offset, dst, dst_offset, fw, 1) else {
@@ -321,7 +321,7 @@ fn plane_rdm_row(
 ///|
 /// Four consecutive weights as `i32x4`.
 #inline
-fn gather_weights4(w : FixedArray[Int], i : Int) -> V128 {
+fn gather_weights4(w : FixedArray[Int32], i : Int32) -> V128 {
   let v = @v128.i32x4_splat(w.unsafe_get(i).reinterpret_as_uint())
   let v = @v128.i32x4_replace_lane(
     v,
@@ -342,11 +342,11 @@ fn gather_weights4(w : FixedArray[Int], i : Int) -> V128 {
 /// `vqmovn_u16`. With 3 channels lane 3 reads the next byte and is ignored.
 fn q15_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
-  channels : Int,
+  channels : Int32,
 ) -> Unit {
   let rnd = @v128.i32x4_splat((1 << (PRECISION - 1)).reinterpret_as_uint())
   let weights = fw.weights
@@ -410,9 +410,9 @@ fn q15_row(
 /// [convolve_horizontal_rgba_neon_row].
 fn rgba_q15_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   guard horizontal_ranges_ok(src, src_offset, dst, dst_offset, fw, 4) else {
@@ -425,9 +425,9 @@ fn rgba_q15_row(
 /// [convolve_horizontal_rgb_neon_row_one].
 fn rgb_q15_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   fw : FixedWeights,
 ) -> Unit {
   guard horizontal_ranges_ok(src, src_offset, dst, dst_offset, fw, 3) else {
@@ -441,12 +441,12 @@ fn rgb_q15_row(
 /// a time (the taps are in bounds).
 fn rgb_rdm_pixel(
   src : FixedArray[Byte],
-  start : Int,
-  size : Int,
+  start : Int32,
+  size : Int32,
   dst : FixedArray[Byte],
-  d : Int,
-  weights : FixedArray[Int],
-  w_off : Int,
+  d : Int32,
+  weights : FixedArray[Int32],
+  w_off : Int32,
 ) -> Unit {
   for c in 0..<3 {
     let mut a = 1 << 5

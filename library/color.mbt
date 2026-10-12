@@ -787,13 +787,13 @@ pub fn Color::mix_iter(
 
 ///|
 /// Construct a new RGBA color from 8-bit values.
-pub fn Color::from_u8(r : Int, g : Int, b : Int, a : Int) -> Color {
+pub fn Color::from_u8(r : Int32, g : Int32, b : Int32, a : Int32) -> Color {
   Process(ProcessColor::from_u8(r, g, b, a))
 }
 
 ///|
 /// Converts a 32-bit integer to an RGBA color.
-pub fn Color::from_u32(color : UInt) -> Color {
+pub fn Color::from_u32(color : UInt32) -> Color {
   Process(ProcessColor::from_u32(color))
 }
 
@@ -838,7 +838,7 @@ pub fn Color::to_vec4(self : Color) -> FixedArray[Float] {
 
 ///|
 /// Converts the color to a vec of four `u8`s.
-pub fn Color::to_vec4_u8(self : Color) -> FixedArray[Int] {
+pub fn Color::to_vec4_u8(self : Color) -> FixedArray[Int32] {
   self.to_vec4().map(f32_to_u8_round)
 }
 
@@ -1051,7 +1051,7 @@ pub fn ProcessColor::to_hex(self : ProcessColor) -> String {
 }
 
 ///|
-fn hex2(x : Int) -> String {
+fn hex2(x : Int32) -> String {
   let digits = "0123456789abcdef"
   let s = StringBuilder()
   s.write_char(digits[x / 16].unsafe_to_char())
@@ -1062,19 +1062,19 @@ fn hex2(x : Int) -> String {
 ///|
 /// Palette's `f32` to `u8` stimulus conversion (`into_format`): scales by
 /// 255, clamps and rounds half to even.
-fn f32_to_u8_stimulus(x : Float) -> Int {
+fn f32_to_u8_stimulus(x : Float) -> Int32 {
   let max : Float = 255.0
   let scaled = f32_min(x * max, max)
   let f = scaled + Float::reinterpret_from_uint(0x4b00_0000)
   let bits = f.reinterpret_as_uint()
-  let c23 : UInt = 0x4b00_0000
+  let c23 : UInt32 = 0x4b00_0000
   let v = if bits < c23 { 0U } else { bits - c23 }
   (v & 0xff).reinterpret_as_int()
 }
 
 ///|
 /// Rust `(x * 255.0).round() as u8`.
-fn f32_to_u8_round(x : Float) -> Int {
+fn f32_to_u8_round(x : Float) -> Int32 {
   let v = rust_round((x * 255.0).to_double())
   if v.is_nan() || v <= 0.0 {
     0
@@ -1230,10 +1230,10 @@ pub fn ProcessColor::negate(
 ///|
 /// Construct a new RGBA color from 8-bit values.
 pub fn ProcessColor::from_u8(
-  r : Int,
-  g : Int,
-  b : Int,
-  a : Int,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
 ) -> ProcessColor {
   Rgb({
     red: Float::from_int(r) / 255.0,
@@ -1245,7 +1245,7 @@ pub fn ProcessColor::from_u8(
 
 ///|
 /// Converts a 32-bit integer to an RGBA color.
-pub fn ProcessColor::from_u32(color : UInt) -> ProcessColor {
+pub fn ProcessColor::from_u32(color : UInt32) -> ProcessColor {
   ProcessColor::from_u8(
     ((color >> 24) & 0xFF).reinterpret_as_int(),
     ((color >> 16) & 0xFF).reinterpret_as_int(),
@@ -1348,7 +1348,7 @@ pub fn ProcessColor::to_vec4(self : ProcessColor) -> FixedArray[Float] {
 
 ///|
 /// Converts the color to a vec of four `u8`s.
-pub fn ProcessColor::to_vec4_u8(self : ProcessColor) -> FixedArray[Int] {
+pub fn ProcessColor::to_vec4_u8(self : ProcessColor) -> FixedArray[Int32] {
   self.to_vec4().map(f32_to_u8_round)
 }
 
@@ -1601,7 +1601,7 @@ pub fn ProcessColor::from_str(hex_str : String) -> Result[ProcessColor, String] 
     hex_str
   }
   for ch in hex_str {
-    if !(ch is ('0'..='9' | 'a'..='f' | 'A'..='F')) {
+    if !(ch is ('0'..<='9' | 'a'..<='f' | 'A'..<='F')) {
       return Err("color string contains non-hexadecimal letters")
     }
   }
@@ -1612,8 +1612,8 @@ pub fn ProcessColor::from_str(hex_str : String) -> Result[ProcessColor, String] 
   if !long && !short {
     return Err("color string has wrong length")
   }
-  let values : FixedArray[Int] = [255, 255, 255, 255]
-  let digit = (i : Int) => {
+  let values : FixedArray[Int32] = [255, 255, 255, 255]
+  let digit = (i : Int32) => {
     let ch = hex_str[i].to_int()
     if ch >= '0'.to_int() && ch <= '9'.to_int() {
       ch - '0'.to_int()
@@ -1692,7 +1692,7 @@ fn Cmyk::to_rgba(self : Cmyk) -> Rgb {
 
 ///|
 /// Rust `(x * 255.0).round() as u8` for a component.
-fn f32_to_u8_round_raw(x : Float) -> Int {
+fn f32_to_u8_round_raw(x : Float) -> Int32 {
   f32_to_u8_round(x)
 }
 
@@ -1888,7 +1888,7 @@ pub fn resolve_color_space(
 ///|
 /// Returns the index of the hue component in this color space, if it has
 /// one.
-pub fn ColorSpace::hue_index(self : ColorSpace) -> Int? {
+pub fn ColorSpace::hue_index(self : ColorSpace) -> Int32? {
   match self {
     Process(s) => s.hue_index()
     Spot(_) => None
@@ -1898,7 +1898,7 @@ pub fn ColorSpace::hue_index(self : ColorSpace) -> Int? {
 ///|
 /// Returns the index of the hue component in this color space, if it has
 /// one.
-pub fn ProcessColorSpace::hue_index(self : ProcessColorSpace) -> Int? {
+pub fn ProcessColorSpace::hue_index(self : ProcessColorSpace) -> Int32? {
   match self {
     Hsl | Hsv => Some(0)
     Oklch => Some(2)
@@ -2462,7 +2462,7 @@ fn color_map() -> Module {
 
 ///|
 /// Defines a gradient preset as a series of colors expressed as u32s.
-fn color_preset(colors : ReadOnlyArray[UInt]) -> Arr {
+fn color_preset(colors : ReadOnlyArray[UInt32]) -> Arr {
   Arr::from_array(
     Array::makei(colors.length(), i => Value::Color(Color::from_u32(colors[i]))),
   )

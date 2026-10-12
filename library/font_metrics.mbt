@@ -182,8 +182,8 @@ pub(all) struct MathConstants {
   // This is not from the OpenType MATH spec.
   space_width : Em
   // These are both i16 instead of f64 as they need to go on the StyleChain.
-  script_percent_scale_down : Int
-  script_script_percent_scale_down : Int
+  script_percent_scale_down : Int32
+  script_script_percent_scale_down : Int32
   display_operator_min_height : Em
   axis_height : Em
   accent_base_height : Em

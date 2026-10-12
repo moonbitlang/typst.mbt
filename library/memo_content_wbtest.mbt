@@ -4,7 +4,7 @@
 
 ///|
 /// A PNG of `width` x `height` RGB pixels, each `(seed + i) * k` in turn.
-fn memo_test_png(width : Int, height : Int, seed : Int) -> Bytes {
+fn memo_test_png(width : Int32, height : Int32, seed : Int32) -> Bytes {
   let pixels = Bytes::makei(width * height * 3, i => ((seed + i) * 7).to_byte())
   @codecs.encode_png(pixels[:], width, height, Rgb)
 }
@@ -88,7 +88,7 @@ test "raster images: the format and the ICC profile are part of the key" {
   // The same 1200 bytes as 20x20 RGB pixels, as 40x30 and 30x40 gray
   // pixels and as 30x20 gray pixels with alpha.
   let pixels = Bytes::makei(1200, i => (i * 3).to_byte())
-  let pixel = (encoding : PixelEncoding, width : Int, height : Int) => {
+  let pixel = (encoding : PixelEncoding, width : Int32, height : Int32) => {
     RasterFormat::Pixel({
       encoding,
       width: U32(width.to_int64()),
@@ -298,7 +298,7 @@ test "data_hash: once per object, dropped when the object is not asked for" {
 ///|
 test "ContentCache: ages, replacement, evictors" {
   let cache : ContentCache[String] = ContentCache::new()
-  let key = (i : Int) => hash128(i)
+  let key = (i : Int32) => hash128(i)
   assert_true(cache.get(key(1)) is None)
   cache.insert(key(1), "one")
   cache.insert(key(2), "two")

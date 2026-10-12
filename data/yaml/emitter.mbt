@@ -56,20 +56,20 @@ priv enum EmitterState {
 priv struct Emitter {
   out : Array[Byte]
   events : Array[EEvent]
-  mut head : Int
-  best_indent : Int
-  best_width : Int
+  mut head : Int32
+  best_indent : Int32
+  best_width : Int32
   mut state : EmitterState
   states : Array[EmitterState]
-  indents : Array[Int]
-  mut indent : Int
-  mut flow_level : Int
+  indents : Array[Int32]
+  mut indent : Int32
+  mut flow_level : Int32
   mut mapping_context : Bool
   mut simple_key_context : Bool
-  mut column : Int
+  mut column : Int32
   mut whitespace : Bool
   mut indention : Bool
-  mut open_ended : Int
+  mut open_ended : Int32
   // `scalar_data`.
   mut value : Bytes
   mut multiline : Bool
@@ -138,7 +138,7 @@ fn Emitter::put_break(self : Emitter) -> Unit {
 
 ///|
 /// The byte at `i` of `s`, NUL past the end (C strings are NUL-terminated).
-fn byte_at(s : Bytes, i : Int) -> Int {
+fn byte_at(s : Bytes, i : Int32) -> Int32 {
   if i < s.length() {
     s[i].to_int()
   } else {
@@ -148,7 +148,7 @@ fn byte_at(s : Bytes, i : Int) -> Int {
 
 ///|
 /// `WIDTH_AT`.
-fn width_at(s : Bytes, i : Int) -> Int {
+fn width_at(s : Bytes, i : Int32) -> Int32 {
   let c = byte_at(s, i)
   if (c & 0x80) == 0x00 {
     1
@@ -165,7 +165,7 @@ fn width_at(s : Bytes, i : Int) -> Int {
 
 ///|
 /// `IS_BREAK_AT`.
-fn is_break_at(s : Bytes, i : Int) -> Bool {
+fn is_break_at(s : Bytes, i : Int32) -> Bool {
   let c = byte_at(s, i)
   c == '\r' ||
   c == '\n' ||
@@ -176,29 +176,29 @@ fn is_break_at(s : Bytes, i : Int) -> Bool {
 
 ///|
 /// `IS_SPACE_AT`.
-fn is_space_at(s : Bytes, i : Int) -> Bool {
+fn is_space_at(s : Bytes, i : Int32) -> Bool {
   byte_at(s, i) == ' '
 }
 
 ///|
 /// `IS_BLANKZ_AT`.
-fn is_blankz_at(s : Bytes, i : Int) -> Bool {
+fn is_blankz_at(s : Bytes, i : Int32) -> Bool {
   let c = byte_at(s, i)
   c == ' ' || c == '\t' || is_break_at(s, i) || c == 0
 }
 
 ///|
 /// `IS_PRINTABLE`.
-fn is_printable_at(s : Bytes, i : Int) -> Bool {
+fn is_printable_at(s : Bytes, i : Int32) -> Bool {
   match byte_at(s, i) {
     // ASCII
-    0x0A | 0x20..=0x7E => true
+    0x0A | 0x20..<=0x7E => true
     // U+A0 ... U+BF
-    0xC2 => byte_at(s, i + 1) is (0xA0..=0xBF)
+    0xC2 => byte_at(s, i + 1) is (0xA0..<=0xBF)
     // U+C0 ... U+CFFF
-    0xC3..=0xEC => true
+    0xC3..<=0xEC => true
     // U+D000 ... U+D7FF
-    0xED => byte_at(s, i + 1) is (0x00..=0x9F)
+    0xED => byte_at(s, i + 1) is (0x00..<=0x9F)
     // U+E000 ... U+EFFF
     0xEE => true
     // U+F000 ... U+FFFD
@@ -210,14 +210,14 @@ fn is_printable_at(s : Bytes, i : Int) -> Bool {
         _ => true
       }
     // U+10000 ... U+10FFFF
-    0xF0..=0xF4 => true
+    0xF0..<=0xF4 => true
     _ => false
   }
 }
 
 ///|
 /// `WRITE`: copies one character of `s` at `i`; returns the next index.
-fn Emitter::write(self : Emitter, s : Bytes, i : Int) -> Int {
+fn Emitter::write(self : Emitter, s : Bytes, i : Int32) -> Int32 {
   let width = width_at(s, i)
   for k in 0..<width {
     self.out.push(s[i + k])
@@ -229,7 +229,7 @@ fn Emitter::write(self : Emitter, s : Bytes, i : Int) -> Int {
 ///|
 /// `WRITE_BREAK`: copies one line break of `s` at `i`; returns the next
 /// index.
-fn Emitter::write_break(self : Emitter, s : Bytes, i : Int) -> Int {
+fn Emitter::write_break(self : Emitter, s : Bytes, i : Int32) -> Int32 {
   if byte_at(s, i) == '\n' {
     self.put_break()
     i + 1
@@ -953,7 +953,7 @@ fn Emitter::write_single_quoted_scalar(
 
 ///|
 /// An uppercase hexadecimal digit.
-fn hex_digit(d : Int) -> Byte {
+fn hex_digit(d : Int32) -> Byte {
   (if d < 10 { d + '0' } else { d - 10 + 'A' }).to_byte()
 }
 
@@ -1058,7 +1058,7 @@ fn Emitter::write_double_quoted_scalar(
 
 ///|
 /// Moves back from `i` to the start of the previous UTF-8 character.
-fn prev_char(s : Bytes, i : Int) -> Int {
+fn prev_char(s : Bytes, i : Int32) -> Int32 {
   let mut i = i - 1
   while (byte_at(s, i) & 0xC0) == 0x80 {
     i -= 1

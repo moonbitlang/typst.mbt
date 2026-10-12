@@ -318,7 +318,7 @@ fn ligature_apply(this : @otf.Ligature, ctx : ApplyContext) -> Unit? {
     ctx.replace_glyph(this.glyph)
     Some(())
   } else {
-    let f = (glyph, index : Int) => {
+    let f = (glyph, index : Int32) => {
       let value = this.components.get(index.to_uint16()).unwrap()
       match_glyph(glyph, value.0.to_int())
     }
@@ -377,13 +377,13 @@ fn reverse_chain_single_subst_apply(
     return None
   }
   guard this.substitutes.get(index) is Some(subst) else { return None }
-  let f1 = (glyph, index : Int) => {
+  let f1 = (glyph, index : Int32) => {
     let value : @otf.Coverage = this.backtrack_coverages
       .get(index.to_uint16())
       .unwrap()
     value.contains(glyph)
   }
-  let f2 = (glyph, index : Int) => {
+  let f2 = (glyph, index : Int32) => {
     let value : @otf.Coverage = this.lookahead_coverages
       .get(index.to_uint16())
       .unwrap()

@@ -75,7 +75,7 @@ fn abs_digits(n : Int64) -> String {
 ///|
 /// `write!(w, "{:0width$}", n)` for a signed integer: sign, then the padding
 /// zeros one char at a time, then the digits.
-fn[W : FmtWrite] fmt_int_zero_pad(w : W, n : Int64, width : Int) -> Unit {
+fn[W : FmtWrite] fmt_int_zero_pad(w : W, n : Int64, width : Int32) -> Unit {
   let digits = abs_digits(n)
   let len = digits.length() + (if n < 0L { 1 } else { 0 })
   if len >= width {
@@ -96,6 +96,6 @@ fn[W : FmtWrite] fmt_int_zero_pad(w : W, n : Int64, width : Int) -> Unit {
 
 ///|
 /// The string of `format!("{:0width$}", n)`.
-fn int_zero_pad(n : Int64, width : Int) -> String {
+fn int_zero_pad(n : Int64, width : Int32) -> String {
   fmt_to_string(b => fmt_int_zero_pad(b, n, width))
 }

@@ -4,7 +4,7 @@
 
 ///|
 /// Returns the [`Op::TableIndex`] parameter for an [`Op`].
-fn Executor::fetch_table_index(self : Executor, offset : Int) -> @ir.Table {
+fn Executor::fetch_table_index(self : Executor, offset : Int32) -> @ir.Table {
   match self.instrs.unsafe_get(self.ip + offset) {
     TableIndex(index~) => index
     // Safety: Wasmi translation guarantees that [`Op::TableIndex`] exists.
@@ -16,7 +16,7 @@ fn Executor::fetch_table_index(self : Executor, offset : Int) -> @ir.Table {
 /// Returns the [`Op::ElemIndex`] parameter for an [`Op`].
 fn Executor::fetch_element_segment_index(
   self : Executor,
-  offset : Int,
+  offset : Int32,
 ) -> @ir.Elem {
   match self.instrs.unsafe_get(self.ip + offset) {
     ElemIndex(index~) => index
@@ -178,8 +178,8 @@ fn Executor::execute_table_init(
   len : @ir.Slot,
 ) -> Unit raise WasmiError {
   let dst : UInt64 = self.get_stack_slot_as_u64(dst)
-  let src : UInt = self.get_stack_slot_as_u32(src)
-  let len : UInt = self.get_stack_slot_as_u32(len)
+  let src : UInt32 = self.get_stack_slot_as_u32(src)
+  let len : UInt32 = self.get_stack_slot_as_u32(len)
   let table_index = self.fetch_table_index(1)
   let element_index = self.fetch_element_segment_index(2)
   let table = store.resolve_table(self.get_table(table_index))

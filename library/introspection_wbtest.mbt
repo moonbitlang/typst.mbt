@@ -168,7 +168,7 @@ fn loc(n : UInt64) -> Location {
 
 ///|
 /// A located metadata element with the value `n`.
-fn meta(n : Int, label? : String) -> Content {
+fn meta(n : Int32, label? : String) -> Content {
   let c = MetadataElem::new(Int(n.to_int64()))
     .pack()
     .located(loc(n.to_uint64()))
@@ -615,7 +615,7 @@ test "convergence analysis" {
   let world : WbWorld = { library: wb_library(), }
   let metadata = metadata_elem().select()
   let span = @syntax.Span::detached()
-  let doc = (n : Int) => {
+  let doc = (n : Int32) => {
     let builder = ElementIntrospectorBuilder::new()
     for i in 1..<=n {
       discover(builder, meta(i), [])

@@ -198,7 +198,7 @@ pub fn[W : FmtWrite] ChunkedString::fmt_serialized(
 
 ///|
 /// Return the length of the string (in UTF-8 bytes).
-pub fn ChunkedString::len(self : ChunkedString) -> Int {
+pub fn ChunkedString::len(self : ChunkedString) -> Int32 {
   let mut n = 0
   for c in self.0 {
     n += c.len()
@@ -283,7 +283,7 @@ fn is_chunk_control(c : Char) -> Bool {
 ///
 /// Occurs when there are unbalanced braces. The field contains the position
 /// of the unmatched closing brace.
-pub(all) struct ChunkedStrParseError(Int) derive(Eq, Debug)
+pub(all) struct ChunkedStrParseError(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -415,7 +415,7 @@ pub fn StringChunk::math(value : String) -> StringChunk {
 
 ///|
 /// Return the length of the string value (in UTF-8 bytes).
-pub fn StringChunk::len(self : StringChunk) -> Int {
+pub fn StringChunk::len(self : StringChunk) -> Int32 {
   @unscanny.len_utf8(self.value)
 }
 

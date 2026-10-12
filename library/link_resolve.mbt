@@ -80,8 +80,8 @@ pub fn LinkElem::find_destinations(
 /// Creates unique IDs for elements.
 pub struct AnchorGenerator {
   priv introspector : &IntrospectorBackend
-  priv mut loc_counter : Int
-  priv label_counter : Map[Label, Int]
+  priv mut loc_counter : Int32
+  priv label_counter : Map[Label, Int32]
 }
 
 ///|
@@ -146,8 +146,8 @@ fn can_use_label_as_id(label : String) -> Bool {
 fn disambiguate(
   introspector : &IntrospectorBackend,
   text : String,
-  counter : Int,
-) -> (String, Int) {
+  counter : Int32,
+) -> (String, Int32) {
   let mut counter = counter
   while true {
     let disambiguated = "\{text}-\{counter}"

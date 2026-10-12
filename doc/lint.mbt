@@ -68,7 +68,7 @@ pub struct Lint {
   /// For the lints of the pages: the page (from 1) of the finding, the
   /// first if there are several. `None` for the lints of the description
   /// tree.
-  page : Int?
+  page : Int32?
 }
 
 ///|
@@ -104,7 +104,7 @@ pub fn Lint::render(self : Lint) -> String {
 /// (`Origins::resolve`), without a registry: the call, or its parameter
 /// `param` if the call has the location of that argument; under the keys
 /// of the enclosing `Keyed` wrappers.
-fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
+fn Site::origin(self : Site, keys : Array[String], param : Int32?) -> Origin {
   let ArgsLoc(arg_locs) = self.args
   // (Inside a composite: the parameter of the composite, `Site::param`.)
   let (loc, param) = match param.map(p => self.param(p)) {
@@ -340,7 +340,7 @@ fn is_text_item(content : Content) -> Bool {
 fn text_origin(
   content : Content,
   site : Site,
-  param : Int,
+  param : Int32,
   keys : Array[String],
 ) -> Origin {
   match content.node {
@@ -388,7 +388,7 @@ fn block_at_edge(content : Content, last : Bool) -> Bool {
 
 ///|
 /// How many characters of each text a message shows at the seam.
-const SEAM_CHARS : Int = 16
+const SEAM_CHARS : Int32 = 16
 
 ///|
 /// The text at an edge of a text item, for the message: its last (`last`)

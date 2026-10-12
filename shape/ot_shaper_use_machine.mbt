@@ -21,7 +21,7 @@ priv enum UseSyllableType {
 
 ///|
 /// `SyllableType as u8`
-fn UseSyllableType::to_int(self : UseSyllableType) -> Int {
+fn UseSyllableType::to_int(self : UseSyllableType) -> Int32 {
   match self {
     IndependentCluster => 0
     ViramaTerminatedCluster => 1
@@ -67,8 +67,8 @@ fn find_syllables_use(buffer : Buffer) -> Unit {
   }
   let mut _klen = 0
   let mut _trans = 0
-  let mut _keys : Int = 0
-  let mut _acts : Int = 0
+  let mut _keys : Int32 = 0
+  let mut _acts : Int32 = 0
   let mut _nacts = 0
   let mut __have = 0
   while !p.equal(pe) || p.equal(eof) {
@@ -94,9 +94,9 @@ fn find_syllables_use(buffer : Buffer) -> Unit {
       _klen = use_syllable_machine_single_lengths[cs]
       __have = 0
       if _klen > 0 {
-        let mut _lower : Int = _keys
-        let mut _upper : Int = _keys + _klen - 1
-        let mut _mid : Int = 0
+        let mut _lower : Int32 = _keys
+        let mut _upper : Int32 = _keys + _klen - 1
+        let mut _mid : Int32 = 0
         while true {
           if _upper < _lower {
             _keys += _klen
@@ -119,9 +119,9 @@ fn find_syllables_use(buffer : Buffer) -> Unit {
       }
       _klen = use_syllable_machine_range_lengths[cs]
       if __have == 0 && _klen > 0 {
-        let mut _lower : Int = _keys
-        let mut _upper : Int = _keys + (_klen << 1) - 2
-        let mut _mid : Int = 0
+        let mut _lower : Int32 = _keys
+        let mut _upper : Int32 = _keys + (_klen << 1) - 2
+        let mut _mid : Int32 = 0
         while true {
           if _upper < _lower {
             _trans += _klen
@@ -271,9 +271,9 @@ fn find_syllables_use(buffer : Buffer) -> Unit {
 ///|
 /// `found_syllable` of `ot_shaper_use_machine.rs`.
 fn found_syllable_use(
-  start : Int,
-  end : Int,
-  syllable_serial : Ref[Int],
+  start : Int32,
+  end : Int32,
+  syllable_serial : Ref[Int32],
   kind : UseSyllableType,
   buffer : Array[GlyphInfo],
 ) -> Unit {
@@ -293,7 +293,7 @@ fn not_ccs_default_ignorable(i : GlyphInfo) -> Bool {
 
 ///|
 /// `included` of `ot_shaper_use_machine.rs`.
-fn included_use(infos : Array[GlyphInfo], i : Int) -> Bool {
+fn included_use(infos : Array[GlyphInfo], i : Int32) -> Bool {
   let glyph = infos[i]
   if !not_ccs_default_ignorable(glyph) {
     return false

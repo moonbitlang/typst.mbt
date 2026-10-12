@@ -97,7 +97,7 @@ test "state_backtrack_cut_complex" {
 priv enum Operation {
   Push
   Pop
-  Save(Int, Int)
+  Save(Int32, Int32)
 }
 
 ///|
@@ -114,7 +114,7 @@ fn check_saves_for_operations(operations : Array[Operation]) -> Bool raise {
   }
 
   // Stack with the complete VM state (including saves)
-  let stack : Array[Array[Int]] = []
+  let stack : Array[Array[Int32]] = []
   let mut saves = Array::make(slots, USIZE_MAX)
   let state = State::new(slots, MAX_STACK)
   let expected = []

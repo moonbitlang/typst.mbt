@@ -12,27 +12,27 @@ priv suberror FilterError {
 }
 
 ///|
-fn px_r(p : UInt) -> Int {
+fn px_r(p : UInt32) -> Int32 {
   (p & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn px_g(p : UInt) -> Int {
+fn px_g(p : UInt32) -> Int32 {
   ((p >> 8) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn px_b(p : UInt) -> Int {
+fn px_b(p : UInt32) -> Int32 {
   ((p >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn px_a(p : UInt) -> Int {
+fn px_a(p : UInt32) -> Int32 {
   (p >> 24).reinterpret_as_int()
 }
 
 ///|
-fn px_pack(r : Int, g : Int, b : Int, a : Int) -> UInt {
+fn px_pack(r : Int32, g : Int32, b : Int32, a : Int32) -> UInt32 {
   (r & 0xFF).reinterpret_as_uint() |
   ((g & 0xFF).reinterpret_as_uint() << 8) |
   ((b & 0xFF).reinterpret_as_uint() << 16) |
@@ -40,7 +40,10 @@ fn px_pack(r : Int, g : Int, b : Int, a : Int) -> UInt {
 }
 
 ///|
-fn try_create(width : UInt, height : UInt) -> @skia.Pixmap raise FilterError {
+fn try_create(
+  width : UInt32,
+  height : UInt32,
+) -> @skia.Pixmap raise FilterError {
   match @skia.Pixmap::new(width, height) {
     Some(p) => p
     None => raise InvalidRegion
@@ -91,7 +94,7 @@ fn into_linear_rgb(pixmap : @skia.Pixmap) -> Unit {
 
 ///|
 /// Multiplies provided pixels alpha.
-fn multiply_alpha(data : FixedArray[UInt]) -> Unit {
+fn multiply_alpha(data : FixedArray[UInt32]) -> Unit {
   for i in 0..<data.length() {
     let p = data[i]
     let a = Float::from_int(px_a(p)) / 255.0
@@ -104,7 +107,7 @@ fn multiply_alpha(data : FixedArray[UInt]) -> Unit {
 
 ///|
 /// Demultiplies provided pixels alpha.
-fn demultiply_alpha(data : FixedArray[UInt]) -> Unit {
+fn demultiply_alpha(data : FixedArray[UInt32]) -> Unit {
   for i in 0..<data.length() {
     let p = data[i]
     let a = Float::from_int(px_a(p)) / 255.0
@@ -129,7 +132,7 @@ fn demultiply_alpha(data : FixedArray[UInt]) -> Unit {
 /// ```
 ///
 /// Thanks to librsvg for the idea.
-let srgb_to_linear_rgb_table : ReadOnlyArray[Int] = [
+let srgb_to_linear_rgb_table : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3,
   3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 8, 9, 9,
   9, 10, 10, 10, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17,
@@ -160,7 +163,7 @@ let srgb_to_linear_rgb_table : ReadOnlyArray[Int] = [
 /// ```
 ///
 /// Thanks to librsvg for the idea.
-let linear_rgb_to_srgb_table : ReadOnlyArray[Int] = [
+let linear_rgb_to_srgb_table : ReadOnlyArray[Int32] = [
   0, 13, 22, 28, 34, 38, 42, 46, 50, 53, 56, 59, 61, 64, 66, 69, 71, 73, 75, 77,
   79, 81, 83, 85, 86, 88, 90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 106, 108,
   109, 110, 112, 113, 114, 115, 117, 118, 119, 120, 121, 122, 124, 125, 126, 127,
@@ -185,7 +188,7 @@ let linear_rgb_to_srgb_table : ReadOnlyArray[Int] = [
 /// Provided pixels should have an **unpremultiplied alpha**.
 ///
 /// RGB channels order of the input image doesn't matter, but alpha channel must be the last one.
-fn to_linear_rgb(data : FixedArray[UInt]) -> Unit {
+fn to_linear_rgb(data : FixedArray[UInt32]) -> Unit {
   let t = srgb_to_linear_rgb_table
   for i in 0..<data.length() {
     let p = data[i]
@@ -199,7 +202,7 @@ fn to_linear_rgb(data : FixedArray[UInt]) -> Unit {
 /// Provided pixels should have an **unpremultiplied alpha**.
 ///
 /// RGB channels order of the input image doesn't matter, but alpha channel must be the last one.
-fn from_linear_rgb(data : FixedArray[UInt]) -> Unit {
+fn from_linear_rgb(data : FixedArray[UInt32]) -> Unit {
   let t = linear_rgb_to_srgb_table
   for i in 0..<data.length() {
     let p = data[i]
@@ -272,12 +275,12 @@ fn FImage::take(self : FImage) -> @skia.Pixmap {
 }
 
 ///|
-fn FImage::width(self : FImage) -> UInt {
+fn FImage::width(self : FImage) -> UInt32 {
   self.image.width().reinterpret_as_uint()
 }
 
 ///|
-fn FImage::height(self : FImage) -> UInt {
+fn FImage::height(self : FImage) -> UInt32 {
   self.image.height().reinterpret_as_uint()
 }
 

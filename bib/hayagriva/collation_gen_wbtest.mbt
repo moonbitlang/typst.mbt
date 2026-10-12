@@ -3,7 +3,7 @@
 
 ///|
 test "root collation matches icu_collator" {
-  let cases : Array[(String, String, Int)] = [
+  let cases : Array[(String, String, Int32)] = [
     ("", "", 0),
     ("", "o brien", -1),
     ("", "a.b", -1),

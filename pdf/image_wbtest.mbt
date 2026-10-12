@@ -6,8 +6,8 @@
 /// The conversion as it was before it was a loop per colour type: every
 /// sample through one function (the reference).
 fn reference_samples(
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : @codecs.ColorType,
   buf : Bytes,
 ) -> (Bytes, Bytes?) {
@@ -17,7 +17,7 @@ fn reference_samples(
   let color_channels = if channels >= 3 { 3 } else { 1 }
   let bpc = if sixteen { 2 } else { 1 }
   let n = width * height
-  let sample = (i : Int) => {
+  let sample = (i : Int32) => {
     if sixteen {
       u16_to_u8(buf[i].to_int() | (buf[i + 1].to_int() << 8))
     } else {
@@ -115,7 +115,12 @@ test "convert_samples: every colour type, against the reference" {
 
 ///|
 /// A PNG of `width` x `height` pixels of `channels` 8-bit samples.
-fn test_png(width : Int, height : Int, channels : Int, seed : Int) -> Bytes {
+fn test_png(
+  width : Int32,
+  height : Int32,
+  channels : Int32,
+  seed : Int32,
+) -> Bytes {
   let pixels = Bytes::makei(width * height * channels, i => {
     ((seed + i) * 7).to_byte()
   })
@@ -160,7 +165,7 @@ fn test_jpeg() -> Bytes {
     #|010002110311003f00e5bc2df0bfee7ee7f4aeff00fe157ffd31fd2bbdf0b7f0577f5e56
     #|3f3dc6fb67ef9af09f12661fd994fdf3ffd9
   ).replace_all(old="\n", new="")
-  let digit = (c : Int) => if c >= 'a' { c - 'a' + 10 } else { c - '0' }
+  let digit = (c : Int32) => if c >= 'a' { c - 'a' + 10 } else { c - '0' }
   Bytes::makei(hex.length() / 2, i => {
     (digit(hex.unsafe_get(2 * i).to_int()) * 16 +
     digit(hex.unsafe_get(2 * i + 1).to_int())).to_byte()
@@ -277,7 +282,7 @@ test "convert_raster: images that differ in one argument" {
   // The same bytes as pixels of three formats: three images, where the key
   // was the data alone and the exporter embedded the first for all.
   let pixels = Bytes::makei(1200, i => (i * 3).to_byte())
-  let pixel = (encoding : @library.PixelEncoding, width : Int, height : Int) => {
+  let pixel = (encoding : @library.PixelEncoding, width : Int32, height : Int32) => {
     @library.RasterImage::plain(
       pixels,
       Pixel({

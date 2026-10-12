@@ -13,75 +13,75 @@
 // (`Limits::bytes`) counts its growth.
 
 ///|
-const PNG_IHDR : UInt = 0x49484452
+const PNG_IHDR : UInt32 = 0x49484452
 
 ///|
-const PNG_PLTE : UInt = 0x504C5445
+const PNG_PLTE : UInt32 = 0x504C5445
 
 ///|
-const PNG_IDAT : UInt = 0x49444154
+const PNG_IDAT : UInt32 = 0x49444154
 
 ///|
-const PNG_IEND : UInt = 0x49454E44
+const PNG_IEND : UInt32 = 0x49454E44
 
 ///|
-const PNG_TRNS : UInt = 0x74524E53
+const PNG_TRNS : UInt32 = 0x74524E53
 
 ///|
-const PNG_BKGD : UInt = 0x624B4744
+const PNG_BKGD : UInt32 = 0x624B4744
 
 ///|
-const PNG_PHYS : UInt = 0x70485973
+const PNG_PHYS : UInt32 = 0x70485973
 
 ///|
-const PNG_CHRM : UInt = 0x6348524D
+const PNG_CHRM : UInt32 = 0x6348524D
 
 ///|
-const PNG_GAMA : UInt = 0x67414D41
+const PNG_GAMA : UInt32 = 0x67414D41
 
 ///|
-const PNG_SRGB : UInt = 0x73524742
+const PNG_SRGB : UInt32 = 0x73524742
 
 ///|
-const PNG_ICCP : UInt = 0x69434350
+const PNG_ICCP : UInt32 = 0x69434350
 
 ///|
-const PNG_CICP : UInt = 0x63494350
+const PNG_CICP : UInt32 = 0x63494350
 
 ///|
-const PNG_MDCV : UInt = 0x6D444356
+const PNG_MDCV : UInt32 = 0x6D444356
 
 ///|
-const PNG_CLLI : UInt = 0x634C4C49
+const PNG_CLLI : UInt32 = 0x634C4C49
 
 ///|
-const PNG_EXIF : UInt = 0x65584966
+const PNG_EXIF : UInt32 = 0x65584966
 
 ///|
-const PNG_TEXT : UInt = 0x74455874
+const PNG_TEXT : UInt32 = 0x74455874
 
 ///|
-const PNG_ZTXT : UInt = 0x7A545874
+const PNG_ZTXT : UInt32 = 0x7A545874
 
 ///|
-const PNG_ITXT : UInt = 0x69545874
+const PNG_ITXT : UInt32 = 0x69545874
 
 ///|
-const PNG_SBIT : UInt = 0x73424954
+const PNG_SBIT : UInt32 = 0x73424954
 
 ///|
-const PNG_ACTL : UInt = 0x6163544C
+const PNG_ACTL : UInt32 = 0x6163544C
 
 ///|
-const PNG_FCTL : UInt = 0x6663544C
+const PNG_FCTL : UInt32 = 0x6663544C
 
 ///|
-const PNG_FDAT : UInt = 0x66644154
+const PNG_FDAT : UInt32 = 0x66644154
 
 ///|
 /// Returns true if the chunk is critical (upstream `chunk::is_critical`; a
 /// chunk type is its four bytes as a big-endian number here).
-fn chunk_is_critical(type_ : UInt) -> Bool {
+fn chunk_is_critical(type_ : UInt32) -> Bool {
   ((type_ >> 24) & 32) == 0
 }
 
@@ -90,7 +90,7 @@ fn chunk_is_critical(type_ : UInt) -> Bool {
 /// the escapes of the control characters, of the quotes and of the
 /// backslash, and `\u{..}` for the characters of Latin-1 that are not
 /// printable (C0, DEL, C1, NBSP, SHY).
-fn escape_debug_latin1(out : StringBuilder, c : Int) -> Unit {
+fn escape_debug_latin1(out : StringBuilder, c : Int32) -> Unit {
   match c {
     0 => out.write_string("\\0")
     0x09 => out.write_string("\\t")
@@ -112,7 +112,7 @@ fn escape_debug_latin1(out : StringBuilder, c : Int) -> Unit {
 
 ///|
 /// The `Debug` output of upstream's `ChunkType`.
-fn chunk_type_debug(type_ : UInt) -> String {
+fn chunk_type_debug(type_ : UInt32) -> String {
   let out = StringBuilder()
   out.write_string("ChunkType { type: ")
   for shift in [24, 16, 8, 0] {
@@ -147,7 +147,7 @@ fn png_color_type_debug(color_type : PngColorType) -> String {
 
 ///|
 /// The `Debug` output of upstream's `BitDepth`.
-fn png_bit_depth_debug(bit_depth : Int) -> String {
+fn png_bit_depth_debug(bit_depth : Int32) -> String {
   match bit_depth {
     1 => "One"
     2 => "Two"
@@ -197,9 +197,9 @@ fn DecodingError::to_string(self : DecodingError) -> String {
 /// Raises `DecodingError::Format` with the message of
 /// `FormatErrorInner::CrcMismatch`.
 fn[T] crc_mismatch(
-  crc_val : UInt,
-  crc_sum : UInt,
-  chunk : UInt,
+  crc_val : UInt32,
+  crc_sum : UInt32,
+  chunk : UInt32,
 ) -> T raise DecodingError {
   raise Format(
     "CRC error: expected 0x\{crc_val.to_string(radix=16)} have 0x\{crc_sum.to_string(radix=16)} while decoding \{chunk_type_debug(chunk)} chunk.",
@@ -217,13 +217,13 @@ fn corrupt_flate_stream(err : DecompressionError) -> DecodingError {
 /// and blend fields are validated and not kept).
 priv struct FrameControl {
   /// Width of the following frame
-  width : UInt
+  width : UInt32
   /// Height of the following frame
-  height : UInt
+  height : UInt32
   /// X position at which to render the following frame
-  x_offset : UInt
+  x_offset : UInt32
   /// Y position at which to render the following frame
-  y_offset : UInt
+  y_offset : UInt32
 }
 
 ///|
@@ -231,9 +231,9 @@ priv struct FrameControl {
 /// (`sBIT`, `gAMA`, `cHRM`, `sRGB`, `cICP`, `mDCV`, `cLLI`, `bKGD`, `eXIf`,
 /// text) only what the decoder itself asks is kept: whether one was seen.
 priv struct StreamInfo {
-  width : UInt
-  height : UInt
-  bit_depth : Int
+  width : UInt32
+  height : UInt32
+  bit_depth : Int32
   /// How colors are stored in the image.
   color_type : PngColorType
   interlaced : Bool
@@ -252,7 +252,7 @@ priv struct StreamInfo {
   mut bkgd : Bool
   mut frame_control : FrameControl?
   /// `AnimationControl::num_frames` of the `acTL` chunk.
-  mut animation_control : UInt?
+  mut animation_control : UInt32?
   /// The rendering intent of an SRGB image.
   mut srgb : Bool
   /// The ICC profile for the image.
@@ -273,8 +273,8 @@ priv struct StreamInfo {
 /// bits).
 fn raw_row_length_from_width(
   color_type : PngColorType,
-  depth : Int,
-  width : UInt,
+  depth : Int32,
+  width : UInt32,
 ) -> Int64 {
   let samples = width.to_int64() * color_type.samples().to_int64()
   1L +
@@ -294,7 +294,7 @@ fn raw_row_length_from_width(
 /// Returns the number of bytes needed for one deinterlaced row of width `width`.
 fn StreamInfo::raw_row_length_from_width(
   self : StreamInfo,
-  width : UInt,
+  width : UInt32,
 ) -> Int64 {
   raw_row_length_from_width(self.color_type, self.bit_depth, width)
 }
@@ -302,7 +302,7 @@ fn StreamInfo::raw_row_length_from_width(
 ///|
 /// Upstream `Info::bytes_per_pixel` (and `bpp_in_prediction`): the number of
 /// bytes for a pixel used in prediction.
-fn StreamInfo::bytes_per_pixel(self : StreamInfo) -> Int {
+fn StreamInfo::bytes_per_pixel(self : StreamInfo) -> Int32 {
   self.color_type.samples() * ((self.bit_depth + 7) >> 3)
 }
 
@@ -344,10 +344,10 @@ priv enum U32ValueKind {
   Length
   /// Chunk type - see
   /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#Chunk-layout
-  Type(UInt)
+  Type(UInt32)
   /// Chunk checksum - see
   /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#Chunk-layout
-  Crc(UInt)
+  Crc(UInt32)
   /// Sequence number from an `fdAT` chunk - see
   /// https://wiki.mozilla.org/APNG_Specification#.60fdAT.60:_The_Frame_Data_Chunk
   ApngSequenceNumber
@@ -360,13 +360,13 @@ priv enum StreamState {
   /// call `parse_32` which will then move onto the next state. The fields
   /// are the kind, the accumulated bytes (big-endian, the first one in the
   /// most significant byte) and their count.
-  U32(U32ValueKind, UInt, Int)
+  U32(U32ValueKind, UInt32, Int32)
   /// In this state we are reading chunk data from external input, and appending it to
   /// `ChunkState::raw_bytes`. Then if all data has been read, we parse the chunk.
-  ReadChunkData(UInt)
+  ReadChunkData(UInt32)
   /// In this state we are reading image data from external input and feeding it directly into
   /// `StreamingDecoder::inflater`.
-  ImageData(UInt)
+  ImageData(UInt32)
 }
 
 ///|
@@ -385,15 +385,15 @@ priv enum Decoded {
   /// Nothing decoded yet
   Nothing
   /// A chunk header (length and type fields) has been read.
-  ChunkBegin(UInt, UInt)
+  ChunkBegin(UInt32, UInt32)
   /// Chunk has been read successfully.
-  ChunkComplete(UInt)
+  ChunkComplete(UInt32)
   /// An ancillary chunk has been read but it was in the wrong place, had corrupt contents, or had
   /// an invalid CRC.
-  BadAncillaryChunk(UInt)
+  BadAncillaryChunk(UInt32)
   /// Skipped an ancillary chunk because it was unrecognized or the decoder was configured to skip
   /// this type of chunk.
-  SkippedAncillaryChunk(UInt)
+  SkippedAncillaryChunk(UInt32)
   /// Decoded raw image data.
   ImageData
   /// The last of a consecutive chunk of IDAT was done.
@@ -423,11 +423,11 @@ priv struct StreamingDecoder {
   // `current_chunk: ChunkState`
   /// The type of the current chunk.
   /// Relevant for `IDAT` and `fdAT` which aggregate consecutive chunks of their own type.
-  mut type_ : UInt
+  mut type_ : UInt32
   /// Partial crc until now.
-  mut crc : UInt
+  mut crc : UInt32
   /// Remaining bytes to be read.
-  mut remaining : UInt
+  mut remaining : UInt32
   /// Non-decoded bytes in the chunk (upstream `raw_bytes: Vec<u8>`): the
   /// input at `raw_bytes_start`, of length `raw_bytes_len`, and the
   /// capacity that the `Vec` would have.
@@ -441,7 +441,7 @@ priv struct StreamingDecoder {
   /// The complete image info read from all prior chunks.
   mut info : StreamInfo?
   /// The animation chunk sequence number.
-  mut current_seq_no : UInt?
+  mut current_seq_no : UInt32?
   /// Whether we have already seen a start of an IDAT chunk.  (Used to validate chunk ordering -
   /// some chunk types can only appear before or after an IDAT chunk.)
   mut have_idat : Bool
@@ -457,7 +457,7 @@ priv struct StreamingDecoder {
   limits : Limits
   /// The first element of the result of `update` and of `next_state`: the
   /// number of bytes that have been consumed from the input buffer.
-  mut consumed : Int
+  mut consumed : Int32
 }
 
 ///|
@@ -648,10 +648,10 @@ fn StreamingDecoder::next_state(
 fn StreamingDecoder::parse_u32(
   self : StreamingDecoder,
   kind : U32ValueKind,
-  val : UInt,
+  val : UInt32,
   u32_be_bytes : BytesView,
   image_data : UnfilteringBuffer?,
-  consumed_bytes : Int,
+  consumed_bytes : Int32,
 ) -> Decoded raise DecodingError {
   self.consumed = consumed_bytes
   match kind {
@@ -799,10 +799,10 @@ fn StreamingDecoder::parse_u32(
 ///|
 fn StreamingDecoder::start_chunk(
   self : StreamingDecoder,
-  type_str : UInt,
-  length : UInt,
+  type_str : UInt32,
+  length : UInt32,
 ) -> StreamState raise DecodingError {
-  let (min, max) : (UInt, UInt) = match type_str {
+  let (min, max) : (UInt32, UInt32) = match type_str {
     PNG_IHDR => (13, 13)
     PNG_PLTE => (3, 768)
     PNG_IEND => (0, 0)
@@ -849,7 +849,7 @@ fn StreamingDecoder::start_chunk(
 ///|
 fn StreamingDecoder::parse_chunk(
   self : StreamingDecoder,
-  type_str : UInt,
+  type_str : UInt32,
 ) -> Decoded raise DecodingError {
   try {
     match type_str {
@@ -920,8 +920,8 @@ fn StreamingDecoder::parse_chunk(
 /// Upstream `buf.read_be()?` for a `u32` at `self.raw_bytes[pos..]`.
 fn StreamingDecoder::read_be_u32(
   self : StreamingDecoder,
-  pos : Int,
-) -> UInt raise DecodingError {
+  pos : Int32,
+) -> UInt32 raise DecodingError {
   if pos + 4 > self.raw_bytes.length() {
     raise IoError(UnexpectedEof)
   }
@@ -932,8 +932,8 @@ fn StreamingDecoder::read_be_u32(
 /// Upstream `buf.read_be()?` for a `u8` at `self.raw_bytes[pos..]`.
 fn StreamingDecoder::read_be_u8(
   self : StreamingDecoder,
-  pos : Int,
-) -> Int raise DecodingError {
+  pos : Int32,
+) -> Int32 raise DecodingError {
   if pos + 1 > self.raw_bytes.length() {
     raise IoError(UnexpectedEof)
   }

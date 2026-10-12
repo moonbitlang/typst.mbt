@@ -9,7 +9,7 @@ fn require_interpreter(font : FontRef) -> Bool {
 }
 
 ///|
-const MAX_HINT_RELIANT_NAME_LEN : Int = 18
+const MAX_HINT_RELIANT_NAME_LEN : Int32 = 18
 
 ///|
 fn is_hint_reliant_by_name(font : FontRef) -> Bool {
@@ -100,8 +100,8 @@ let hint_reliant_names : ReadOnlyArray[String] = [
 
 ///|
 priv struct TableId {
-  checksum : UInt
-  len : UInt
+  checksum : UInt32
+  len : UInt32
 } derive(Eq)
 
 ///|
@@ -153,7 +153,9 @@ fn matches_hint_reliant_id_list(font_id : FontId) -> Bool {
 
 ///|
 /// (cvt checksum, cvt len, fpgm checksum, fpgm len, prep checksum, prep len)
-let hint_reliant_ids : ReadOnlyArray[(UInt, UInt, UInt, UInt, UInt, UInt)] = [
+let hint_reliant_ids : ReadOnlyArray[
+  (UInt32, UInt32, UInt32, UInt32, UInt32, UInt32),
+] = [
   (0x05BCF058U, 0x000002E4U, 0x28233BF1U, 0x000087C4U, 0xA344A1EAU, 0x000001E1U),
   (0x05BCF058U, 0x000002E4U, 0x28233BF1U, 0x000087C4U, 0xA344A1EBU, 0x000001E1U),
   (0x12C3EBB2U, 0x00000350U, 0xB680EE64U, 0x000087A7U, 0xCE939563U, 0x00000758U),

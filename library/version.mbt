@@ -10,7 +10,7 @@
 /// zeros. This means that, for example, `0.8` is the same as `0.8.0`. As a
 /// special case, the empty version (that has no components at all) is the
 /// same as `0`, `0.0`, `0.0.0`, and so on.
-pub struct Version(Array[UInt]) derive(Hash)
+pub struct Version(Array[UInt32]) derive(Hash)
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -46,13 +46,13 @@ pub fn Version::component(
 
 ///|
 /// Push a component to the end of this version.
-pub fn Version::push(self : Version, component : UInt) -> Unit {
+pub fn Version::push(self : Version, component : UInt32) -> Unit {
   self.0.push(component)
 }
 
 ///|
 /// The values of the version.
-pub fn Version::values(self : Version) -> Array[UInt] {
+pub fn Version::values(self : Version) -> Array[UInt32] {
   self.0
 }
 
@@ -155,8 +155,8 @@ pub fn Version::repr(self : Version) -> String {
 ///|
 /// One or multiple version components.
 pub(all) enum VersionComponents {
-  Single(UInt)
-  Multiple(Array[UInt])
+  Single(UInt32)
+  Multiple(Array[UInt32])
 }
 
 ///|
@@ -245,7 +245,7 @@ pub(all) enum Since {
   Forever
   /// The feature was introduced in a version released after Typst 0.1.0
   /// (upstream `Version([u32; 3])`).
-  Version(UInt, UInt, UInt)
+  Version(UInt32, UInt32, UInt32)
   /// The feature is not present in any official Typst release.
   Unreleased
 } derive(Eq, Hash)

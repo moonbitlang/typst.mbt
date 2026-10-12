@@ -4,12 +4,12 @@
 
 ///|
 /// Number of phantom points generated at the end of an outline.
-pub const PHANTOM_POINT_COUNT : Int = 4
+pub const PHANTOM_POINT_COUNT : Int32 = 4
 
 ///|
 /// Maximum number of points we support in a single outline including
 /// composites.
-const MAX_POINTS : Int = 65535
+const MAX_POINTS : Int32 = 65535
 
 ///|
 /// Scaler state for TrueType outlines.
@@ -21,15 +21,15 @@ pub struct GlyfOutlines {
   priv glyf : @read_fonts.Glyf
   fpgm : BytesView
   prep : BytesView
-  cvt_len : Int
-  max_function_defs : Int
-  max_instruction_defs : Int
-  max_twilight_points : Int
-  max_stack_elements : Int
-  max_storage : Int
-  glyph_count : Int
-  units_per_em : Int
-  os2_vmetrics : (Int, Int)
+  cvt_len : Int32
+  max_function_defs : Int32
+  max_instruction_defs : Int32
+  max_twilight_points : Int32
+  max_stack_elements : Int32
+  max_storage : Int32
+  glyph_count : Int32
+  units_per_em : Int32
+  os2_vmetrics : (Int32, Int32)
   prefer_interpreter : Bool
   fractional_size_hinting : Bool
 }
@@ -115,7 +115,7 @@ pub fn GlyfOutlines::new(font : FontRef) -> GlyfOutlines? {
 }
 
 ///|
-fn sat_u16(v : Int) -> Int {
+fn sat_u16(v : Int32) -> Int32 {
   if v > 0xFFFF {
     0xFFFF
   } else {
@@ -126,7 +126,7 @@ fn sat_u16(v : Int) -> Int {
 ///|
 /// Advance width in font units (`GlyphHMetrics::advance_width` at the
 /// default location).
-fn GlyfOutlines::advance_width(self : GlyfOutlines, gid : GlyphId) -> Int {
+fn GlyfOutlines::advance_width(self : GlyfOutlines, gid : GlyphId) -> Int32 {
   self.hmtx.advance(gid).unwrap_or(0)
 }
 
@@ -137,7 +137,7 @@ fn GlyfOutlines::hdmx_width(
   self : GlyfOutlines,
   ppem : Float,
   glyph_id : GlyphId,
-) -> Int? {
+) -> Int32? {
   guard self.hdmx is Some(hdmx) else { return None }
   let ppem_u8 = f32_as_u8(ppem)
   // Make sure our ppem is integral and fits into u8
@@ -158,7 +158,7 @@ fn GlyfOutlines::hdmx_width(
 
 ///|
 /// Rust's `f32 as u8`: truncates toward zero and saturates; NaN is 0.
-fn f32_as_u8(x : Float) -> Int {
+fn f32_as_u8(x : Float) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 255.0 {
@@ -170,7 +170,7 @@ fn f32_as_u8(x : Float) -> Int {
 
 ///|
 /// Left side bearing in font units (`GlyphHMetrics::lsb`).
-fn GlyfOutlines::lsb(self : GlyfOutlines, gid : GlyphId) -> Int {
+fn GlyfOutlines::lsb(self : GlyfOutlines, gid : GlyphId) -> Int32 {
   self.hmtx.side_bearing(gid).unwrap_or(0)
 }
 
@@ -181,23 +181,23 @@ pub struct GlyfOutline {
   /// The associated top-level glyph for the outline.
   glyph : @read_fonts.Glyph?
   /// Sum of the point counts of all simple glyphs in an outline.
-  mut points : Int
+  mut points : Int32
   /// Sum of the contour counts of all simple glyphs in an outline.
-  mut contours : Int
+  mut contours : Int32
   /// Maximum number of points in a single simple glyph.
-  mut max_simple_points : Int
+  mut max_simple_points : Int32
   /// "Other" points are the unscaled or original scaled points.
-  mut max_other_points : Int
+  mut max_other_points : Int32
   /// Maximum size of the component delta stack.
-  mut max_component_delta_stack : Int
+  mut max_component_delta_stack : Int32
   /// Number of entries in the hinting value stack.
-  mut max_stack : Int
+  mut max_stack : Int32
   /// Number of CVT entries for copy-on-write support.
-  mut cvt_count : Int
+  mut cvt_count : Int32
   /// Number of storage area entries for copy-on-write support.
-  mut storage_count : Int
+  mut storage_count : Int32
   /// Maximum number of points in the twilight zone for hinting.
-  mut max_twilight_points : Int
+  mut max_twilight_points : Int32
   /// True if any component of a glyph has bytecode instructions.
   mut has_hinting : Bool
   /// True if the glyph requires variation delta processing.
@@ -242,7 +242,7 @@ pub fn GlyfOutlines::outline(
 }
 
 ///|
-fn imax(a : Int, b : Int) -> Int {
+fn imax(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a
   } else {
@@ -255,8 +255,8 @@ fn GlyfOutlines::outline_rec(
   self : GlyfOutlines,
   glyph : @read_fonts.Glyph,
   outline : GlyfOutline,
-  component_depth : Int,
-  recurse_depth : Int,
+  component_depth : Int32,
+  recurse_depth : Int32,
 ) -> Unit raise DrawError {
   if recurse_depth > GLYF_COMPOSITE_RECURSION_LIMIT {
     raise RecursionLimitExceeded(outline.glyph_id)
@@ -370,14 +370,14 @@ pub fn GlyfOutlines::compute_hinted_scale(
 ///|
 /// Buffers used during glyph scaling (structure of arrays).
 priv struct FreeTypeOutlineMemory {
-  unscaled_x : FixedArray[Int]
-  unscaled_y : FixedArray[Int]
-  scaled_x : FixedArray[Int]
-  scaled_y : FixedArray[Int]
-  original_scaled_x : FixedArray[Int]
-  original_scaled_y : FixedArray[Int]
-  contours : FixedArray[Int]
-  flags : FixedArray[Int]
+  unscaled_x : FixedArray[Int32]
+  unscaled_y : FixedArray[Int32]
+  scaled_x : FixedArray[Int32]
+  scaled_y : FixedArray[Int32]
+  original_scaled_x : FixedArray[Int32]
+  original_scaled_y : FixedArray[Int32]
+  contours : FixedArray[Int32]
+  flags : FixedArray[Int32]
 }
 
 ///|
@@ -404,16 +404,16 @@ fn FreeTypeOutlineMemory::new(
 priv struct FreeTypeScaler {
   outlines : GlyfOutlines
   memory : FreeTypeOutlineMemory
-  mut point_count : Int
-  mut contour_count : Int
+  mut point_count : Int32
+  mut contour_count : Int32
   ppem : Float
   scale : F26Dot6
   is_scaled : Bool
   is_hinted : Bool
   pedantic_hinting : Bool
   /// Phantom points (26.6 bits).
-  phantom_x : FixedArray[Int]
-  phantom_y : FixedArray[Int]
+  phantom_x : FixedArray[Int32]
+  phantom_y : FixedArray[Int32]
   hinter : HintInstance?
 }
 
@@ -474,14 +474,14 @@ fn FreeTypeScaler::hinted(
 // (skrifa 0.42.1 outline/glyf/outline.rs:142, :158, :168).
 #warnings("-unused_field")
 priv struct ScaledOutline {
-  xs : ArrayView[Int]
-  ys : ArrayView[Int]
-  flags : ArrayView[Int]
-  contours : ArrayView[Int]
-  phantom_x : FixedArray[Int]
-  phantom_y : FixedArray[Int]
+  xs : ArrayView[Int32]
+  ys : ArrayView[Int32]
+  flags : ArrayView[Int32]
+  contours : ArrayView[Int32]
+  phantom_x : FixedArray[Int32]
+  phantom_y : FixedArray[Int32]
   /// The advance width from the `hdmx` table, if it applies.
-  hdmx_width : Int?
+  hdmx_width : Int32?
 }
 
 ///|
@@ -543,7 +543,7 @@ fn FreeTypeScaler::load(
   self : FreeTypeScaler,
   glyph : @read_fonts.Glyph?,
   glyph_id : GlyphId,
-  recurse_depth : Int,
+  recurse_depth : Int32,
 ) -> Unit raise DrawError {
   if recurse_depth > GLYF_COMPOSITE_RECURSION_LIMIT {
     raise RecursionLimitExceeded(glyph_id)
@@ -573,12 +573,12 @@ fn FreeTypeScaler::load(
 /// The four "phantom" points as computed by FreeType.
 fn FreeTypeScaler::setup_phantom_points(
   self : FreeTypeScaler,
-  x_min : Int,
-  y_max : Int,
-  lsb : Int,
-  advance : Int,
-  tsb : Int,
-  vadvance : Int,
+  x_min : Int32,
+  y_max : Int32,
+  lsb : Int32,
+  advance : Int32,
+  tsb : Int32,
+  vadvance : Int32,
 ) -> Unit {
   // horizontal:
   self.phantom_x[0] = x_min - lsb
@@ -593,7 +593,7 @@ fn FreeTypeScaler::setup_phantom_points(
 }
 
 ///|
-fn mul26(a : Int, s : F26Dot6) -> Int {
+fn mul26(a : Int32, s : F26Dot6) -> Int32 {
   (F26Dot6::from_bits(a) * s).to_bits()
 }
 
@@ -708,8 +708,8 @@ fn FreeTypeScaler::load_simple(
 fn read_points_into(
   glyph : @read_fonts.SimpleGlyph,
   mem : FreeTypeOutlineMemory,
-  points_start : Int,
-  point_count : Int,
+  points_start : Int32,
+  point_count : Int32,
 ) -> Unit raise ReadError {
   // Flags are written relative to `points_start` while the unscaled points
   // start at 0, so read into temporaries first.
@@ -737,7 +737,7 @@ fn FreeTypeScaler::load_composite(
   self : FreeTypeScaler,
   glyph : @read_fonts.CompositeGlyph,
   glyph_id : GlyphId,
-  recurse_depth : Int,
+  recurse_depth : Int32,
 ) -> Unit raise DrawError {
   let mem = self.memory
   let scale = self.scale

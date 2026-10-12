@@ -157,7 +157,7 @@ pub(all) struct TilingPattern {
   priv cache : InterpreterCache
   priv settings : InterpreterSettings
   priv xref : @hayro_syntax.XRef
-  priv nesting_depth : Int
+  priv nesting_depth : Int32
 }
 
 ///|

@@ -41,14 +41,14 @@ pub enum CharsetKind {
 /// Character set for mapping from glyph to string identifiers.
 pub struct Charset {
   kind : CharsetKind
-  num_glyphs : Int
+  num_glyphs : Int32
 }
 
 ///|
 pub fn Charset::new(
   cff_data : BytesView,
-  charset_offset : Int,
-  num_glyphs : Int,
+  charset_offset : Int32,
+  num_glyphs : Int32,
 ) -> Charset raise PsError {
   let kind = match charset_offset {
     0 => IsoAdobe
@@ -70,7 +70,7 @@ pub fn Charset::kind(self : Charset) -> CharsetKind {
 }
 
 ///|
-pub fn Charset::num_glyphs(self : Charset) -> Int {
+pub fn Charset::num_glyphs(self : Charset) -> Int32 {
   self.num_glyphs
 }
 
@@ -166,7 +166,11 @@ pub fn Charset::glyph_id(
 ///|
 /// Reads range `i` (first, n_left) from a format 1 (size 3) or format 2
 /// (size 4) range array.
-fn charset_range(ranges : BytesView, size : Int, i : Int) -> (UInt, UInt) {
+fn charset_range(
+  ranges : BytesView,
+  size : Int32,
+  i : Int32,
+) -> (UInt32, UInt32) {
   let p = i * size
   let first = ((ranges[p].to_int() << 8) | ranges[p + 1].to_int()).reinterpret_as_uint()
   let n_left = if size == 3 {
@@ -180,7 +184,7 @@ fn charset_range(ranges : BytesView, size : Int, i : Int) -> (UInt, UInt) {
 ///|
 fn string_id_from_ranges(
   ranges : BytesView,
-  size : Int,
+  size : Int32,
   glyph_id : GlyphId,
 ) -> Sid raise PsError {
   let mut gid = glyph_id.to_u32()
@@ -216,7 +220,7 @@ fn string_id_from_ranges(
 ///|
 fn glyph_id_from_ranges(
   ranges : BytesView,
-  size : Int,
+  size : Int32,
   string_id : Sid,
 ) -> GlyphId raise PsError {
   let sid = string_id.to_u16().reinterpret_as_uint()
@@ -271,13 +275,13 @@ pub fn Charset::to_array(self : Charset) -> Array[(GlyphId, Sid)] {
 /// Custom iterator for range based formats.
 fn range_iter(
   ranges : BytesView,
-  size : Int,
-  num_glyphs : Int,
+  size : Int32,
+  num_glyphs : Int32,
   result : Array[(GlyphId, Sid)],
 ) -> Unit {
   let num_ranges = ranges.length() / size
   let mut next_ix = 0
-  let next_range = fn() -> (UInt, UInt)? {
+  let next_range = fn() -> (UInt32, UInt32)? {
     if next_ix < num_ranges {
       let (first, n_left) = charset_range(ranges, size, next_ix)
       next_ix += 1
@@ -342,7 +346,7 @@ fn range_iter(
 
 ///|
 /// See "Expert" charset at <https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf#page=47>
-let expert_charset : ReadOnlyArray[Int] = [
+let expert_charset : ReadOnlyArray[Int32] = [
   0, 1, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 13, 14, 15, 99, 239, 240,
   241, 242, 243, 244, 245, 246, 247, 248, 27, 28, 249, 250, 251, 252, 253, 254, 255,
   256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 109, 110, 267, 268, 269,
@@ -358,7 +362,7 @@ let expert_charset : ReadOnlyArray[Int] = [
 
 ///|
 /// See "Expert Subset" charset at <https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf#page=49>
-let expert_subset_charset : ReadOnlyArray[Int] = [
+let expert_subset_charset : ReadOnlyArray[Int32] = [
   0, 1, 231, 232, 235, 236, 237, 238, 13, 14, 15, 99, 239, 240, 241, 242, 243, 244,
   245, 246, 247, 248, 27, 28, 249, 250, 251, 253, 254, 255, 256, 257, 258, 259, 260,
   261, 262, 263, 264, 265, 266, 109, 110, 267, 268, 269, 270, 272, 300, 301, 302,

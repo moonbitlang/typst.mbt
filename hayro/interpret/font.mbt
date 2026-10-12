@@ -82,7 +82,7 @@ pub extend GlyphIdentifier with CacheKey::{cache_key}
 pub struct OutlineGlyph {
   priv id : GlyphId
   priv font : OutlineFont
-  priv char_code : UInt
+  priv char_code : UInt32
 }
 
 ///|
@@ -135,8 +135,8 @@ pub struct Type3Glyph {
   priv cache : InterpreterCache
   priv xref : @hayro_syntax.XRef
   priv settings : InterpreterSettings
-  priv nesting_depth : Int
-  priv char_code : UInt
+  priv nesting_depth : Int32
+  priv char_code : UInt32
 }
 
 ///|
@@ -232,7 +232,7 @@ fn Font::new_standard(
 }
 
 ///|
-fn Font::map_code(self : Font, code : UInt) -> GlyphId {
+fn Font::map_code(self : Font, code : UInt32) -> GlyphId {
   match self.font_type {
     Type1(f) => f.map_code(code.to_byte())
     TrueType(t) => t.map_code(code.to_byte())
@@ -245,7 +245,7 @@ fn Font::map_code(self : Font, code : UInt) -> GlyphId {
 fn Font::get_glyph(
   self : Font,
   glyph : GlyphId,
-  char_code : UInt,
+  char_code : UInt32,
   ctx : Context,
   resources : @hayro_syntax.Resources,
   origin_displacement : @kurbo.Vec2,
@@ -279,7 +279,7 @@ fn Font::get_glyph(
 }
 
 ///|
-fn Font::code_advance(self : Font, code : UInt) -> @kurbo.Vec2 {
+fn Font::code_advance(self : Font, code : UInt32) -> @kurbo.Vec2 {
   match self.font_type {
     Type1(t) =>
       @kurbo.Vec2::new(
@@ -294,7 +294,7 @@ fn Font::code_advance(self : Font, code : UInt) -> @kurbo.Vec2 {
 }
 
 ///|
-fn Font::origin_displacement(self : Font, code : UInt) -> @kurbo.Vec2 {
+fn Font::origin_displacement(self : Font, code : UInt32) -> @kurbo.Vec2 {
   match self.font_type {
     Type1(_) => @kurbo.vec2_zero
     TrueType(_) => @kurbo.vec2_zero
@@ -304,7 +304,11 @@ fn Font::origin_displacement(self : Font, code : UInt) -> @kurbo.Vec2 {
 }
 
 ///|
-fn Font::read_code(self : Font, bytes : Bytes, offset : Int) -> (UInt, Int) {
+fn Font::read_code(
+  self : Font,
+  bytes : Bytes,
+  offset : Int32,
+) -> (UInt32, Int32) {
   match self.font_type {
     Type1(_) => (bytes[offset].to_uint(), 1)
     TrueType(_) => (bytes[offset].to_uint(), 1)
@@ -417,34 +421,34 @@ fn FontStretch::from_string(s : String) -> FontStretch {
 // Bitflags describing various characteristics of fonts.
 
 ///|
-const FONT_FLAG_FIXED_PITCH : UInt = 0x1
+const FONT_FLAG_FIXED_PITCH : UInt32 = 0x1
 
 ///|
-const FONT_FLAG_SERIF : UInt = 0x2
+const FONT_FLAG_SERIF : UInt32 = 0x2
 
 ///|
-const FONT_FLAG_SYMBOLIC : UInt = 0x4
+const FONT_FLAG_SYMBOLIC : UInt32 = 0x4
 
 ///|
-const FONT_FLAG_SCRIPT : UInt = 0x8
+const FONT_FLAG_SCRIPT : UInt32 = 0x8
 
 ///|
-const FONT_FLAG_NON_SYMBOLIC : UInt = 0x20
+const FONT_FLAG_NON_SYMBOLIC : UInt32 = 0x20
 
 ///|
-const FONT_FLAG_ITALIC : UInt = 0x40
+const FONT_FLAG_ITALIC : UInt32 = 0x40
 
 ///|
-const FONT_FLAG_ALL_CAP : UInt = 0x10000
+const FONT_FLAG_ALL_CAP : UInt32 = 0x10000
 
 ///|
-const FONT_FLAG_SMALL_CAP : UInt = 0x20000
+const FONT_FLAG_SMALL_CAP : UInt32 = 0x20000
 
 ///|
-const FONT_FLAG_FORCE_BOLD : UInt = 0x40000
+const FONT_FLAG_FORCE_BOLD : UInt32 = 0x40000
 
 ///|
-const FONT_FLAGS_ALL : UInt = FONT_FLAG_FIXED_PITCH |
+const FONT_FLAGS_ALL : UInt32 = FONT_FLAG_FIXED_PITCH |
   FONT_FLAG_SERIF |
   FONT_FLAG_SYMBOLIC |
   FONT_FLAG_SCRIPT |
@@ -456,7 +460,7 @@ const FONT_FLAGS_ALL : UInt = FONT_FLAG_FIXED_PITCH |
 
 ///|
 /// `FontFlags::from_bits`: `None` if unknown bits are set.
-fn font_flags_from_bits(bits : UInt) -> UInt? {
+fn font_flags_from_bits(bits : UInt32) -> UInt32? {
   if (bits & FONT_FLAGS_ALL.lnot()) != 0 {
     None
   } else {
@@ -488,7 +492,7 @@ pub(all) struct FallbackFontQuery {
   /// The stretch of the font.
   mut font_stretch : FontStretch
   /// The weight of the font.
-  mut font_weight : UInt
+  mut font_weight : UInt32
   /// Whether the font is monospaced.
   mut is_fixed_pitch : Bool
   /// Whether the font is serif.
@@ -525,8 +529,8 @@ fn FallbackFontQuery::new(dict : @hayro_syntax.Dict) -> FallbackFontQuery {
       Some(n) => FontStretch::from_string(n.as_str())
       None => Normal
     }
-    data.font_weight = (descriptor.get("FontWeight") : UInt?).unwrap_or(400)
-    if (descriptor.get("Flags") : UInt?) is Some(bits) {
+    data.font_weight = (descriptor.get("FontWeight") : UInt32?).unwrap_or(400)
+    if (descriptor.get("Flags") : UInt32?) is Some(bits) {
       // `from_bits_truncate`
       let flags = bits & FONT_FLAGS_ALL
       data.is_serif = (flags & FONT_FLAG_SERIF) != 0
@@ -619,7 +623,7 @@ fn unicode_from_name(name : String) -> Char? {
 
 ///|
 /// Rust's `u32::from_str_radix(input, 16)`.
-fn parse_hex_u32(input : StringView) -> UInt? {
+fn parse_hex_u32(input : StringView) -> UInt32? {
   let mut s = input
   if s.has_prefix("+") {
     s = s.view(start_offset=1)
@@ -630,9 +634,9 @@ fn parse_hex_u32(input : StringView) -> UInt? {
   let mut v : UInt64 = 0
   for c in s {
     let d = match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
-      'A'..='F' => c.to_int() - 'A'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
+      'A'..<='F' => c.to_int() - 'A'.to_int() + 10
       _ => return None
     }
     v = v * 16 + d.to_uint64()
@@ -645,11 +649,11 @@ fn parse_hex_u32(input : StringView) -> UInt? {
 
 ///|
 /// Rust's `char::from_u32`.
-fn char_from_u32(v : UInt) -> Char? {
+fn char_from_u32(v : UInt32) -> Char? {
   if v > 0x10FFFF || (v >= 0xD800 && v <= 0xDFFF) {
     None
   } else {
-    Some(Int::unsafe_to_char(v.reinterpret_as_int()))
+    Some(Int32::unsafe_to_char(v.reinterpret_as_int()))
   }
 }
 

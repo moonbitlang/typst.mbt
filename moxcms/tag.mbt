@@ -1,7 +1,7 @@
 // Port of `moxcms::tag`.
 
 ///|
-let tag_size_const : Int = 12
+let tag_size_const : Int32 = 12
 
 ///|
 priv enum Tag {
@@ -39,7 +39,7 @@ priv enum Tag {
 
 ///|
 /// Big-endian four character signature.
-fn sig(s : String) -> UInt {
+fn sig(s : String) -> UInt32 {
   let mut v = 0U
   for c in s {
     v = (v << 8) | c.to_int().reinterpret_as_uint()
@@ -48,7 +48,7 @@ fn sig(s : String) -> UInt {
 }
 
 ///|
-fn Tag::try_from(value : UInt) -> Tag? {
+fn Tag::try_from(value : UInt32) -> Tag? {
   let tags : Array[(String, Tag)] = [
     ("rXYZ", RedXyz),
     ("gXYZ", GreenXyz),
@@ -115,7 +115,7 @@ priv enum TagTypeDefinition {
 } derive(Eq)
 
 ///|
-fn TagTypeDefinition::from(value : UInt) -> TagTypeDefinition {
+fn TagTypeDefinition::from(value : UInt32) -> TagTypeDefinition {
   let defs : Array[(String, TagTypeDefinition)] = [
     ("mluc", MultiLocalizedUnicode),
     ("desc", Description),

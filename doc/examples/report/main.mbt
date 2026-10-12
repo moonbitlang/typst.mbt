@@ -103,7 +103,7 @@ fn write_pdfs(dir : String) -> Unit raise {
 /// Build and compile each version `runs` times, in turns of ten: the mean
 /// time of a run in the fastest turn and over all turns, in milliseconds
 /// (the clock has milliseconds, so a turn is timed, not a run).
-fn time(runs : Int, versions : Array[(String, () -> Document)]) -> Unit raise {
+fn time(runs : Int32, versions : Array[(String, () -> Document)]) -> Unit raise {
   let world = @doc.DocWorld::in_memory()
   let turn = 10
   let turns = (runs + turn - 1) / turn
@@ -120,7 +120,7 @@ fn time(runs : Int, versions : Array[(String, () -> Document)]) -> Unit raise {
       }
     }
   }
-  let ms = (total : UInt64, count : Int) => {
+  let ms = (total : UInt64, count : Int32) => {
     let hundredths = total.to_double() * 100.0 / count.to_double()
     let rounded = hundredths.round().to_int()
     "\{rounded / 100}.\{(rounded % 100).to_string().pad_start(2, '0')}"

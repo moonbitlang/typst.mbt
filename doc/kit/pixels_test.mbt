@@ -5,8 +5,8 @@
 ///|
 /// A rendered page.
 priv struct Pixels {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   /// Pixels per point.
   scale : Double
   rgba : Bytes
@@ -17,8 +17,8 @@ priv struct Pixels {
 /// through the PNG that `png_pages` exports.
 fn pixels(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page? : Int = 1,
-  ppi? : Double = 110.0,
+  page~ : Int32 = 1,
+  ppi~ : Double = 110.0,
 ) -> Pixels raise {
   let png = report.png_pages(ppi~).unwrap()[page - 1]
   let (info, data) = @codecs.decode_png(png)
@@ -32,19 +32,19 @@ fn pixels(
 
 ///|
 /// The grey of the pixel in column `x` of row `y`.
-fn Pixels::at(self : Pixels, x : Int, y : Int) -> Int {
+fn Pixels::at(self : Pixels, x : Int32, y : Int32) -> Int32 {
   self.rgba[(y * self.width + x) * 4].to_int()
 }
 
 ///|
 /// The pixel that holds the point `at` (in points) of an axis.
-fn Pixels::pixel(self : Pixels, at : Double) -> Int {
+fn Pixels::pixel(self : Pixels, at : Double) -> Int32 {
   (at * self.scale).floor().to_int()
 }
 
 ///|
 /// The pixels of row `y` from column `from` up to `to`.
-fn Pixels::across(self : Pixels, y : Int, from : Int, to : Int) -> String {
+fn Pixels::across(self : Pixels, y : Int32, from : Int32, to : Int32) -> String {
   let out : Array[String] = []
   for x in from..<to {
     out.push(self.at(x, y).to_string())
@@ -62,8 +62,8 @@ fn outline_differences(
   a : Pixels,
   b : Pixels,
   frame : (Double, Double, Double, Double),
-  skip? : Array[(Double, Double)] = [],
-  reach? : Int = 3,
+  skip~ : Array[(Double, Double)] = [],
+  reach~ : Int32 = 3,
 ) -> String {
   guard a.width == b.width && a.height == b.height else {
     return "pages of \{a.width}x\{a.height} and \{b.width}x\{b.height} pixels"
@@ -73,7 +73,7 @@ fn outline_differences(
   let right = a.pixel(x + w)
   let top = a.pixel(y)
   let bottom = a.pixel(y + h)
-  let near = (at : Int, side : Int) => (at - side).abs() <= reach
+  let near = (at : Int32, side : Int32) => (at - side).abs() <= reach
   let out : Array[String] = []
   for py in (top - reach)..<=(bottom + reach) {
     if skip

@@ -95,7 +95,7 @@ pub fn PdfDocument::data(self : PdfDocument) -> Bytes {
 
 ///|
 /// Return the number of pages in the PDF.
-pub fn PdfDocument::num_pages(self : PdfDocument) -> Int {
+pub fn PdfDocument::num_pages(self : PdfDocument) -> Int32 {
   self.pages.length()
 }
 
@@ -110,7 +110,7 @@ pub fn PdfDocument::has_optional_content_groups(self : PdfDocument) -> Bool {
 /// A specific page of a PDF acting as an image.
 pub struct PdfImage {
   priv document : PdfDocument
-  priv page_index : Int
+  priv page_index : Int32
   priv width : Float
   priv height : Float
 }
@@ -140,7 +140,7 @@ pub extend PdfImage with Hash::{hash, hash_combine}
 /// Creates a new PDF image.
 ///
 /// Returns `None` if the page index is not valid.
-pub fn PdfImage::new(document : PdfDocument, page_index : Int) -> PdfImage? {
+pub fn PdfImage::new(document : PdfDocument, page_index : Int32) -> PdfImage? {
   guard document.pages.get(page_index) is Some((width, height)) else {
     return None
   }
@@ -173,6 +173,6 @@ pub fn PdfImage::height(self : PdfImage) -> Float {
 
 ///|
 /// Returns the page index of the image.
-pub fn PdfImage::page_index(self : PdfImage) -> Int {
+pub fn PdfImage::page_index(self : PdfImage) -> Int32 {
   self.page_index
 }

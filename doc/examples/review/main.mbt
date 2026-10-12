@@ -19,8 +19,8 @@
 /// Compile a document function with the files below `root`.
 fn compile_document(
   build : () -> @doc.Document,
-  root? : String = "bench",
-  system_fonts? : Bool = false,
+  root~ : String = "bench",
+  system_fonts~ : Bool = false,
 ) -> @doc.CompileReport[@layout.PagedDocument] raise {
   build().compile_paged(@system.world(root~, system_fonts~, today=(2026, 1, 1)))
 }
@@ -116,7 +116,7 @@ fn run(args : Array[String]) -> Unit raise {
       guard parts.length() == 2 || parts.length() == 3 else {
         fail("positions <name> <file>:<line>[:<column>]")
       }
-      let column : Int? = if parts.length() == 3 {
+      let column : Int32? = if parts.length() == 3 {
         Some(@string.parse_int(parts[2]))
       } else {
         None

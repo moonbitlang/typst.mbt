@@ -9,14 +9,14 @@
 ///|
 /// Returns `true` if `memory[index..][..len]` is in bounds for a buffer of
 /// `size` bytes (or elements).
-fn slice_in_bounds(size : Int, index : UInt64, len : UInt64) -> Bool {
+fn slice_in_bounds(size : Int32, index : UInt64, len : UInt64) -> Bool {
   let size = size.to_uint64()
   index <= size && len <= size - index
 }
 
 ///|
 /// Returns the [`Op::MemoryIndex`] parameter for an [`Op`].
-fn Executor::fetch_memory_index(self : Executor, offset : Int) -> @ir.Memory {
+fn Executor::fetch_memory_index(self : Executor, offset : Int32) -> @ir.Memory {
   match self.instrs.unsafe_get(self.ip + offset) {
     MemoryIndex(index~) => index
     // Safety: Wasmi translation guarantees that [`Op::MemoryIndex`] exists.
@@ -28,7 +28,7 @@ fn Executor::fetch_memory_index(self : Executor, offset : Int) -> @ir.Memory {
 /// Returns the [`Op::DataIndex`] parameter for an [`Op`].
 fn Executor::fetch_data_segment_index(
   self : Executor,
-  offset : Int,
+  offset : Int32,
 ) -> @ir.Data {
   match self.instrs.unsafe_get(self.ip + offset) {
     DataIndex(index~) => index
@@ -227,7 +227,7 @@ fn Executor::execute_memory_fill_imm(
   self : Executor,
   store : StoreInner,
   dst : @ir.Slot,
-  value : Int,
+  value : Int32,
   len : @ir.Slot,
 ) -> Unit raise WasmiError {
   let dst : UInt64 = self.get_stack_slot_as_u64(dst)
@@ -270,8 +270,8 @@ fn Executor::execute_memory_init(
   len : @ir.Slot,
 ) -> Unit raise WasmiError {
   let dst : UInt64 = self.get_stack_slot_as_u64(dst)
-  let src : UInt = self.get_stack_slot_as_u32(src)
-  let len : UInt = self.get_stack_slot_as_u32(len)
+  let src : UInt32 = self.get_stack_slot_as_u32(src)
+  let len : UInt32 = self.get_stack_slot_as_u32(len)
   let dst_index = dst
   let src_index = src.to_uint64()
   let len = len.to_uint64()

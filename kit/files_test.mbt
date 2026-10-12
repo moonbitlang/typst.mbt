@@ -1,8 +1,8 @@
 ///|
 /// A loader serving fixed files (like upstream's `TestLoader`).
 struct TestLoader {
-  generation : Ref[Int]
-  loads : Ref[Int]
+  generation : Ref[Int32]
+  loads : Ref[Int32]
 }
 
 ///|
@@ -135,7 +135,7 @@ test "utc date time from timestamps" {
 
 ///|
 /// A duration of the given number of hours.
-fn hours(n : Int) -> @library.Duration {
+fn hours(n : Int32) -> @library.Duration {
   let a = @library.Datetime::from_ymd_hms(2000, 1, 1, 0, 0, 0).unwrap()
   let b = @library.Datetime::from_ymd_hms(2000, 1, 1 + n / 24, n % 24, 0, 0).unwrap()
   b.sub_datetime(a) catch {

@@ -60,21 +60,21 @@ pub fn FontStore::book(self : FontStore) -> @library.FontBook {
 /// Loads the font if it's not already loaded.
 ///
 /// Can directly be used to implement `World::font`.
-pub fn FontStore::font(self : FontStore, index : Int) -> @library.Font? {
+pub fn FontStore::font(self : FontStore, index : Int32) -> @library.Font? {
   guard index >= 0 && index < self.slots.length() else { return None }
   self.slots[index].get()
 }
 
 ///|
 /// Retrieves the underlying font source for the font with this index.
-pub fn FontStore::source(self : FontStore, index : Int) -> FontSource? {
+pub fn FontStore::source(self : FontStore, index : Int32) -> FontSource? {
   guard index >= 0 && index < self.slots.length() else { return None }
   Some(self.slots[index].source)
 }
 
 ///|
 /// The number of fonts in the store.
-pub fn FontStore::len(self : FontStore) -> Int {
+pub fn FontStore::len(self : FontStore) -> Int32 {
   self.slots.length()
 }
 
@@ -120,7 +120,7 @@ pub(all) enum FontSource {
   /// which the font or font collection resides and the index in the font
   /// collection, or zero if the path points to a single font rather than a
   /// collection.
-  Path(path~ : String, index~ : UInt)
+  Path(path~ : String, index~ : UInt32)
 }
 
 ///|

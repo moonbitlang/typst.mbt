@@ -8,7 +8,7 @@
 /// `h` are its end relative to its start) or a text run (`"text"`: `y` is
 /// its baseline, `w` its advance width, `h` its font size).
 priv struct Mark {
-  page : Int
+  page : Int32
   kind : String
   x : Double
   y : Double
@@ -32,7 +32,7 @@ fn collect_marks(
   frame : @library.Frame,
   dx : Double,
   dy : Double,
-  page : Int,
+  page : Int32,
   out : Array[Mark],
 ) -> Unit {
   for entry in frame.items() {
@@ -116,7 +116,7 @@ priv struct Pages {
 /// `world`.
 fn pages(
   children : Array[&@doc.IntoContent],
-  world? : @doc.DocWorld = @doc.DocWorld::in_memory(),
+  world~ : @doc.DocWorld = @doc.DocWorld::in_memory(),
 ) -> Pages {
   let all : Array[&@doc.IntoContent] = [
     @doc.SetPage(width=Pt(200), height=Pt(120), margin=@doc.Sides(all=Pt(10))),

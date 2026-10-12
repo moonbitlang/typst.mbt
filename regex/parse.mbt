@@ -51,7 +51,7 @@ fn Primitive::into_ast(self : Primitive) -> Ast {
 priv struct Parser {
   pattern : String
   mut pos : Position
-  mut capture_index : Int
+  mut capture_index : Int32
   capture_names : Array[(String, Span)]
   mut ignore_whitespace : Bool
   stack_group : Array[GroupState]
@@ -84,12 +84,12 @@ fn[T] Parser::error(
 }
 
 ///|
-fn Parser::offset(self : Parser) -> Int {
+fn Parser::offset(self : Parser) -> Int32 {
   self.pos.offset
 }
 
 ///|
-fn Parser::char_at(self : Parser, i : Int) -> Int {
+fn Parser::char_at(self : Parser, i : Int32) -> Int32 {
   let c = self.pattern.code_unit_at(i).to_int()
   if c >= 0xD800 && c <= 0xDBFF && i + 1 < self.pattern.length() {
     let d = self.pattern.code_unit_at(i + 1).to_int()
@@ -101,7 +101,7 @@ fn Parser::char_at(self : Parser, i : Int) -> Int {
 }
 
 ///|
-fn char_len16(c : Int) -> Int {
+fn char_len16(c : Int32) -> Int32 {
   if c >= 0x10000 {
     2
   } else {
@@ -110,7 +110,7 @@ fn char_len16(c : Int) -> Int {
 }
 
 ///|
-fn Parser::char(self : Parser) -> Int {
+fn Parser::char(self : Parser) -> Int32 {
   self.char_at(self.offset())
 }
 
@@ -120,7 +120,7 @@ fn Parser::is_eof(self : Parser) -> Bool {
 }
 
 ///|
-fn Parser::next_capture_index(self : Parser) -> Int {
+fn Parser::next_capture_index(self : Parser) -> Int32 {
   self.capture_index += 1
   self.capture_index
 }
@@ -187,7 +187,7 @@ fn Parser::bump_and_bump_space(self : Parser) -> Bool {
 }
 
 ///|
-fn is_whitespace(c : Int) -> Bool {
+fn is_whitespace(c : Int32) -> Bool {
   @unicode.is_whitespace(c.unsafe_to_char())
 }
 
@@ -216,7 +216,7 @@ fn Parser::bump_space(self : Parser) -> Unit {
 }
 
 ///|
-fn Parser::peek(self : Parser) -> Int? {
+fn Parser::peek(self : Parser) -> Int32? {
   if self.is_eof() {
     return None
   }
@@ -229,7 +229,7 @@ fn Parser::peek(self : Parser) -> Int? {
 }
 
 ///|
-fn Parser::peek_space(self : Parser) -> Int? {
+fn Parser::peek_space(self : Parser) -> Int32? {
   if !self.ignore_whitespace {
     return self.peek()
   }
@@ -549,7 +549,7 @@ fn Parser::parse_counted_repetition(
   if !self.bump_and_bump_space() {
     self.error({ start, end: self.pos, }, RepetitionCountUnclosed)
   }
-  let count_start : Result[Int, (Span, AstErrorKind)] = self.parse_decimal_spec()
+  let count_start : Result[Int32, (Span, AstErrorKind)] = self.parse_decimal_spec()
   if self.is_eof() {
     self.error({ start, end: self.pos, }, RepetitionCountUnclosed)
   }
@@ -602,7 +602,7 @@ fn Parser::parse_counted_repetition(
 /// `RepetitionCountDecimalEmpty`; errors are returned, not raised.
 fn Parser::parse_decimal_spec(
   self : Parser,
-) -> Result[Int, (Span, AstErrorKind)] {
+) -> Result[Int32, (Span, AstErrorKind)] {
   while !self.is_eof() && is_whitespace(self.char()) {
     self.bump() |> ignore
   }
@@ -691,7 +691,7 @@ priv enum Either[A, B] {
 }
 
 ///|
-fn is_capture_char(c : Int, first : Bool) -> Bool {
+fn is_capture_char(c : Int32, first : Bool) -> Bool {
   if first {
     c == '_' || @unicode.is_alphabetic(c.unsafe_to_char())
   } else {
@@ -799,7 +799,7 @@ fn Parser::parse_primitive(self : Parser) -> Primitive raise RegexError {
 
 ///|
 /// Upstream `regex_syntax::is_meta_character`.
-fn is_meta_character(c : Int) -> Bool {
+fn is_meta_character(c : Int32) -> Bool {
   c
   is ('\\'
   | '.'
@@ -823,7 +823,7 @@ fn is_meta_character(c : Int) -> Bool {
 
 ///|
 /// Upstream `regex_syntax::is_escapeable_character`.
-fn is_escapeable_character(c : Int) -> Bool {
+fn is_escapeable_character(c : Int32) -> Bool {
   if is_meta_character(c) {
     return true
   }
@@ -845,7 +845,7 @@ fn Parser::parse_escape(self : Parser) -> Primitive raise RegexError {
   }
   let c = self.char()
   match c {
-    '0'..='9' =>
+    '0'..<='9' =>
       self.error(
         { start, end: self.span_char().end, },
         UnsupportedBackreference,
@@ -870,7 +870,7 @@ fn Parser::parse_escape(self : Parser) -> Primitive raise RegexError {
   if is_meta_character(c) || is_escapeable_character(c) {
     return Literal({ span, c, hex_x: false, })
   }
-  let special = (c : Int) => Primitive::Literal({ span, c, hex_x: false, })
+  let special = (c : Int32) => Primitive::Literal({ span, c, hex_x: false, })
   match c {
     'a' => special(0x07)
     'f' => special(0x0C)
@@ -905,7 +905,7 @@ fn Parser::maybe_parse_special_word_boundary(
   self : Parser,
   wb_start : Position,
 ) -> AssertionKind? raise RegexError {
-  let is_valid_char = (c : Int) => {
+  let is_valid_char = (c : Int32) => {
     (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '-'
   }
   let start = self.pos
@@ -946,12 +946,12 @@ fn Parser::maybe_parse_special_word_boundary(
 }
 
 ///|
-fn is_hex(c : Int) -> Bool {
+fn is_hex(c : Int32) -> Bool {
   (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
 }
 
 ///|
-fn hex_value(s : String) -> Int? {
+fn hex_value(s : String) -> Int32? {
   let mut n = 0L
   for c in s {
     let c = c.to_int()
@@ -996,7 +996,7 @@ fn Parser::parse_hex(self : Parser) -> Literal raise RegexError {
 ///|
 fn Parser::parse_hex_digits(
   self : Parser,
-  digits : Int,
+  digits : Int32,
   is_x : Bool,
 ) -> Literal raise RegexError {
   let scratch = StringBuilder()
@@ -1197,7 +1197,7 @@ fn Parser::parse_set_class_open(
 
 ///|
 /// The ASCII classes by name.
-fn ascii_class_ranges(name : String) -> Array[(Int, Int)]? {
+fn ascii_class_ranges(name : String) -> Array[(Int32, Int32)]? {
   match name {
     "alnum" => Some([('0', '9'), ('A', 'Z'), ('a', 'z')])
     "alpha" => Some([('A', 'Z'), ('a', 'z')])
@@ -1345,7 +1345,7 @@ fn Parser::parse_perl_class(self : Parser) -> ClassPerl {
 fn Parser::check_nest_limit(
   self : Parser,
   ast : Ast,
-  depth : Int,
+  depth : Int32,
 ) -> Unit raise RegexError {
   let enter = (span : Span) => {
     if depth + 1 > NEST_LIMIT {
@@ -1380,7 +1380,7 @@ fn Parser::check_nest_limit(
 fn Parser::check_class_set_nest(
   self : Parser,
   set : ClassSet,
-  depth : Int,
+  depth : Int32,
 ) -> Unit raise RegexError {
   match set {
     Item(item) => self.check_class_item_nest(item, depth)
@@ -1398,7 +1398,7 @@ fn Parser::check_class_set_nest(
 fn Parser::check_class_item_nest(
   self : Parser,
   item : ClassSetItem,
-  depth : Int,
+  depth : Int32,
 ) -> Unit raise RegexError {
   match item {
     Bracketed(c) => {

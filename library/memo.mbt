@@ -102,10 +102,10 @@ priv struct MemoEntry[T, I] {
   /// caller has ([Sink::kept]).
   sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
-  compilation : Int
+  compilation : Int32
   /// The number of [evict] calls since the entry was stored or found
   /// (comemo's age).
-  mut age : Int
+  mut age : Int32
   /// The result.
   output : T
 }
@@ -140,7 +140,7 @@ fn[T, I] MemoStore::new() -> MemoStore[T, I] {
 /// comemo's `evict` for one store: every entry gets older by one, and
 /// those that were not found for more than `max_age` calls are dropped
 /// (all of them for zero).
-fn[T, I] MemoStore::evict(self : MemoStore[T, I], max_age : Int) -> Unit {
+fn[T, I] MemoStore::evict(self : MemoStore[T, I], max_age : Int32) -> Unit {
   let empty = []
   for key, entries in self.entries {
     entries.retain(entry => {
@@ -172,7 +172,7 @@ fn[T, I] MemoStore::end_compilation(self : MemoStore[T, I]) -> Unit {
 
 ///|
 /// The number of results that the store keeps.
-fn[T, I] MemoStore::length(self : MemoStore[T, I]) -> Int {
+fn[T, I] MemoStore::length(self : MemoStore[T, I]) -> Int32 {
   let mut count = 0
   for _, entries in self.entries {
     count += entries.length()
@@ -183,7 +183,7 @@ fn[T, I] MemoStore::length(self : MemoStore[T, I]) -> Int {
 ///|
 /// The number of layouts (paragraphs and fragments) that the store of
 /// [memoized_layout] keeps (for tests and measurements).
-pub fn layout_memo_entries() -> Int {
+pub fn layout_memo_entries() -> Int32 {
   layout_store.length()
 }
 
@@ -203,14 +203,14 @@ pub fn layout_memo_entries() -> Int {
 /// evicts, the ages decide, and a key holds at most this many results per
 /// eviction that is still within `max_age`; in a process that never
 /// evicts, every entry is young and this is the limit it always was.
-let memo_max_entries : Int = 4
+let memo_max_entries : Int32 = 4
 
 ///|
 /// The current compilation (0: memoization is off).
-let memo_generation : Ref[Int] = { val: 0, }
+let memo_generation : Ref[Int32] = { val: 0, }
 
 ///|
-let memo_counter : Ref[Int] = { val: 0, }
+let memo_counter : Ref[Int32] = { val: 0, }
 
 ///|
 /// Whether compilations memoize (see [set_layout_memo_enabled]).
@@ -235,7 +235,7 @@ pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
 
 ///|
 /// The number of compilations in progress (one inside the other).
-let compilation_depth : Ref[Int] = { val: 0, }
+let compilation_depth : Ref[Int32] = { val: 0, }
 
 ///|
 /// Run `f` (a compilation) with memoization: inside, the stores of
@@ -292,7 +292,7 @@ fn end_compilation_entries() -> Unit {
 ///|
 /// The number of [evict] calls: the clock of what is kept with the time of
 /// its last use instead of an age (`ClosureStore.asked`).
-let evictions : Ref[Int] = { val: 0, }
+let evictions : Ref[Int32] = { val: 0, }
 
 ///|
 /// Evict the caches (upstream `comemo::evict(max_age)`,
@@ -323,7 +323,7 @@ let evictions : Ref[Int] = { val: 0, }
 /// outlines and bitmaps, instances), which are functions of a font's data
 /// and grow with the fonts and glyphs a process has used, not with its
 /// compilations.
-pub fn evict(max_age : Int) -> Unit {
+pub fn evict(max_age : Int32) -> Unit {
   evictions.val += 1
   for evictor in evictors {
     evictor(max_age)
@@ -345,7 +345,7 @@ pub fn layout_memo_active() -> Bool {
 /// The number of the current compilation, for caches that live as long as
 /// its memoized results do; zero outside of a compilation and when
 /// memoization is off.
-pub fn memo_compilation() -> Int {
+pub fn memo_compilation() -> Int32 {
   memo_generation.val
 }
 
@@ -368,7 +368,7 @@ pub fn memo_compilation() -> Int {
 #valtype
 pub struct MemoKey {
   priv hash : U128
-  priv flags : Int
+  priv flags : Int32
 }
 
 ///|
@@ -409,7 +409,7 @@ fn MemoKey::memoizable(self : MemoKey) -> Bool {
 /// a later compilation, whatever its store keeps
 /// (`docs/incremental-design.md`, section 5.4). Outside of a compilation
 /// it is found by nobody.
-fn MemoKey::compilation(self : MemoKey) -> Int {
+fn MemoKey::compilation(self : MemoKey) -> Int32 {
   if (self.flags & fingerprint_identity) == 0 {
     0
   } else if memo_generation.val == 0 {
@@ -422,7 +422,7 @@ fn MemoKey::compilation(self : MemoKey) -> Int {
 ///|
 /// Whether the compilation in progress may find an entry that ends with
 /// the compilation `bound` ([MemoKey::compilation]).
-fn compilation_finds(bound : Int) -> Bool {
+fn compilation_finds(bound : Int32) -> Bool {
   bound == 0 || bound == memo_generation.val
 }
 
@@ -447,11 +447,11 @@ fn[T, I : Eq] memoize(
   input : I,
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
-  cacheable? : (T) -> Bool = _ => true,
+  cacheable~ : (T) -> Bool = _ => true,
   // What the recording check calls the call (a function of the input, so
   // that passing it allocates nothing).
-  label? : (I) -> String = _ => "memoized call",
-  tracks_route? : Bool = false,
+  label~ : (I) -> String = _ => "memoized call",
+  tracks_route~ : Bool = false,
 ) -> T raise SourceError {
   let world = engine.world
   if memo_generation.val == 0 || !world.in_scope() || !key.memoizable() {
@@ -601,9 +601,9 @@ fn[T, I : Eq] memoize(
 /// aside when it started: the depth bounds of the closure call around it
 /// (`route_shift_lo` in `engine.mbt`) and where its route queries start.
 priv struct RouteMark {
-  lo : Int
-  hi : Int
-  queries : Int
+  lo : Int32
+  hi : Int32
+  queries : Int32
 }
 
 ///|
@@ -1210,13 +1210,13 @@ priv struct ClosureEntry {
   args : Args
   /// The context of the call and what the call asked of it (see [Context]).
   context : Context
-  asked : Int
+  asked : Int32
   /// The depth of the route of the call, and the least and greatest change
   /// of it that leaves the answers of all depth checks of the call as they
   /// were.
-  depth : Int
-  shift_lo : Int
-  shift_hi : Int
+  depth : Int32
+  shift_lo : Int32
+  shift_hi : Int32
   /// The route of the call and the file ids it was asked for during the
   /// call.
   route : Route
@@ -1238,10 +1238,10 @@ priv struct ClosureEntry {
   /// caller has ([Sink::kept]).
   sink : Sink?
   /// The compilation the entry ends with ([MemoKey::compilation]).
-  compilation : Int
+  compilation : Int32
   /// The number of [evict] calls since the entry was stored or found
   /// (comemo's age).
-  mut age : Int
+  mut age : Int32
   /// The result.
   output : Value
 }
@@ -1267,7 +1267,7 @@ priv struct ClosureStore {
   /// per fingerprint between two calls of [evict]. An entry is only found
   /// through this table, so the table's time of last use is never older
   /// than the age of an entry under it.
-  mut asked : Map[U128, Int]
+  mut asked : Map[U128, Int32]
   /// By that fingerprint and the parts of the context in `asked`.
   mut entries : Map[U128, Array[ClosureEntry]]
   /// The keys of the entries that end with their compilation, and the
@@ -1279,7 +1279,7 @@ priv struct ClosureStore {
   mut registered : Bool
   /// In a second run of the recording check (`memo_check.mbt`): what was
   /// set aside, for [ClosureStore::original].
-  mut aside : (Map[U128, Int], Map[U128, Array[ClosureEntry]])?
+  mut aside : (Map[U128, Int32], Map[U128, Array[ClosureEntry]])?
 }
 
 ///|
@@ -1294,14 +1294,14 @@ let closure_store : ClosureStore = {
 
 ///|
 /// The bits of a value of `ClosureStore.asked` that are `context_read_*`.
-let closure_asked_bits : Int = 3
+let closure_asked_bits : Int32 = 3
 
 ///|
 /// comemo's `evict` for the closure calls: every entry gets older by one
 /// and those above `max_age` are dropped, and so is what calls asked of
 /// their contexts for a function and arguments that were not asked for in
 /// more than `max_age` calls.
-fn ClosureStore::evict(self : ClosureStore, max_age : Int) -> Unit {
+fn ClosureStore::evict(self : ClosureStore, max_age : Int32) -> Unit {
   let empty = []
   for key, entries in self.entries {
     entries.retain(entry => {
@@ -1367,7 +1367,7 @@ fn ClosureStore::original(
   engine : Engine,
   context : Context,
   args : Args,
-  depth : Int,
+  depth : Int32,
   collecting : Bool,
 ) -> Value? {
   guard self.aside is Some((asked, entries)) else { return None }
@@ -1391,7 +1391,7 @@ fn ClosureStore::original(
 ///|
 /// The number of closure calls that the store keeps (for tests and
 /// measurements).
-pub fn closure_memo_entries() -> Int {
+pub fn closure_memo_entries() -> Int32 {
   let mut count = 0
   for _, entries in closure_store.entries {
     count += entries.length()
@@ -1402,12 +1402,12 @@ pub fn closure_memo_entries() -> Int {
 ///|
 /// The numbers of closure calls that were reused and that were computed
 /// since the process started.
-let closure_memo_counts : FixedArray[Int] = [0, 0]
+let closure_memo_counts : FixedArray[Int32] = [0, 0]
 
 ///|
 /// How many closure calls memoization has reused and how many it has
 /// computed since the process started (for tests and measurements).
-pub fn closure_memo_stats() -> (Int, Int) {
+pub fn closure_memo_stats() -> (Int32, Int32) {
   (closure_memo_counts[0], closure_memo_counts[1])
 }
 
@@ -1422,12 +1422,12 @@ let route_query_log : Array[@syntax.FileId] = []
 
 ///|
 /// The number of evaluations that are collecting route queries.
-let route_query_scopes : Ref[Int] = { val: 0, }
+let route_query_scopes : Ref[Int32] = { val: 0, }
 
 ///|
 /// Start collecting the route queries of an evaluation; returns the token
 /// for [route_queries_end].
-pub fn route_queries_begin() -> Int {
+pub fn route_queries_begin() -> Int32 {
   route_query_scopes.val += 1
   route_query_log.length()
 }
@@ -1437,7 +1437,7 @@ pub fn route_queries_begin() -> Int {
 /// [route_queries_begin] (without repetitions), which ends the collection
 /// for this evaluation. The evaluations around it keep them. The result
 /// must not be modified.
-pub fn route_queries_end(start : Int) -> Array[@syntax.FileId] {
+pub fn route_queries_end(start : Int32) -> Array[@syntax.FileId] {
   let queried = if route_query_log.length() == start {
     no_route_queries
   } else {
@@ -1486,8 +1486,8 @@ pub fn note_route_queries(ids : ArrayView[@syntax.FileId]) -> Unit {
 /// bounds of the evaluation around it ([route_shifts_begin]).
 #valtype
 pub struct RouteShifts {
-  priv lower : Int
-  priv upper : Int
+  priv lower : Int32
+  priv upper : Int32
 }
 
 ///|
@@ -1520,14 +1520,14 @@ pub fn route_shifts_end(outer : RouteShifts) -> RouteShifts {
 ///|
 /// Whether an evaluation with these bounds gives the same answers to its
 /// depth checks on a route that is `shift` deeper.
-pub fn RouteShifts::allows(self : RouteShifts, shift : Int) -> Bool {
+pub fn RouteShifts::allows(self : RouteShifts, shift : Int32) -> Bool {
   self.lower <= shift && shift <= self.upper
 }
 
 ///|
 /// Notes the depth checks of an evaluation that is reused on a route that
 /// is `shift` deeper for the evaluations around it, as if it had run.
-pub fn RouteShifts::note_reused(self : RouteShifts, shift : Int) -> Unit {
+pub fn RouteShifts::note_reused(self : RouteShifts, shift : Int32) -> Unit {
   note_route_shift(self.lower - shift, self.upper - shift)
 }
 
@@ -1545,7 +1545,7 @@ let traced_file_log : Ref[Array[@syntax.FileId]] = { val: [], }
 
 ///|
 /// The number of evaluations that are collecting traced files.
-let traced_file_scopes : Ref[Int] = { val: 0, }
+let traced_file_scopes : Ref[Int32] = { val: 0, }
 
 ///|
 /// Whether an evaluation is collecting traced files.
@@ -1556,7 +1556,7 @@ pub fn traced_files_active() -> Bool {
 ///|
 /// Start collecting the traced files of an evaluation; returns the token
 /// for [traced_files_end].
-pub fn traced_files_begin() -> Int {
+pub fn traced_files_begin() -> Int32 {
   traced_file_scopes.val += 1
   traced_file_log.val.length()
 }
@@ -1566,7 +1566,7 @@ pub fn traced_files_begin() -> Int {
 /// repetitions), which ends the collection for this evaluation. The
 /// evaluations around it keep them (once each: the log does not grow with
 /// the number of calls). The result must not be modified.
-pub fn traced_files_end(start : Int) -> Array[@syntax.FileId] {
+pub fn traced_files_end(start : Int32) -> Array[@syntax.FileId] {
   let log = traced_file_log.val
   let files = if log.length() == start {
     no_route_queries
@@ -1617,7 +1617,7 @@ pub fn note_traced_files(ids : ArrayView[@syntax.FileId]) -> Unit {
 /// its own set aside ([own_traced_begin]).
 pub struct OwnTraced {
   priv log : Array[@syntax.FileId]
-  priv scopes : Int
+  priv scopes : Int32
 }
 
 ///|
@@ -1663,7 +1663,7 @@ pub fn traced_answers_equal(
 fn write_asked_context(
   state : SipHasher128,
   context : Context,
-  asked : Int,
+  asked : Int32,
 ) -> Unit {
   state.write_usize(asked)
   if (asked & context_read_location) != 0 {
@@ -1693,7 +1693,7 @@ fn ClosureEntry::matches(
   engine : Engine,
   context : Context,
   args : Args,
-  shift : Int,
+  shift : Int32,
 ) -> Bool {
   guard self.shift_lo <= shift &&
     shift <= self.shift_hi &&

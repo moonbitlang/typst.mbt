@@ -59,7 +59,7 @@ pub fn PrimitiveDateTime::time(self : PrimitiveDateTime) -> Time {
 
 ///|
 /// Get the year of the date.
-pub fn PrimitiveDateTime::year(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::year(self : PrimitiveDateTime) -> Int32 {
   self.date.year()
 }
 
@@ -71,31 +71,31 @@ pub fn PrimitiveDateTime::month(self : PrimitiveDateTime) -> Month {
 
 ///|
 /// Get the day of the date.
-pub fn PrimitiveDateTime::day(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::day(self : PrimitiveDateTime) -> Int32 {
   self.date.day()
 }
 
 ///|
 /// Get the day of the year.
-pub fn PrimitiveDateTime::ordinal(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::ordinal(self : PrimitiveDateTime) -> Int32 {
   self.date.ordinal()
 }
 
 ///|
 /// Get the ISO week number.
-pub fn PrimitiveDateTime::iso_week(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::iso_week(self : PrimitiveDateTime) -> Int32 {
   self.date.iso_week()
 }
 
 ///|
 /// Get the week number where week 1 begins on the first Sunday.
-pub fn PrimitiveDateTime::sunday_based_week(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::sunday_based_week(self : PrimitiveDateTime) -> Int32 {
   self.date.sunday_based_week()
 }
 
 ///|
 /// Get the week number where week 1 begins on the first Monday.
-pub fn PrimitiveDateTime::monday_based_week(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::monday_based_week(self : PrimitiveDateTime) -> Int32 {
   self.date.monday_based_week()
 }
 
@@ -103,7 +103,7 @@ pub fn PrimitiveDateTime::monday_based_week(self : PrimitiveDateTime) -> Int {
 /// Get the year, month, and day.
 pub fn PrimitiveDateTime::to_calendar_date(
   self : PrimitiveDateTime,
-) -> (Int, Month, Int) {
+) -> (Int32, Month, Int32) {
   self.date.to_calendar_date()
 }
 
@@ -115,31 +115,31 @@ pub fn PrimitiveDateTime::weekday(self : PrimitiveDateTime) -> Weekday {
 
 ///|
 /// Get the Julian day for the date.
-pub fn PrimitiveDateTime::to_julian_day(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::to_julian_day(self : PrimitiveDateTime) -> Int32 {
   self.date.to_julian_day()
 }
 
 ///|
 /// Get the clock hour.
-pub fn PrimitiveDateTime::hour(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::hour(self : PrimitiveDateTime) -> Int32 {
   self.time.hour()
 }
 
 ///|
 /// Get the minute within the hour.
-pub fn PrimitiveDateTime::minute(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::minute(self : PrimitiveDateTime) -> Int32 {
   self.time.minute()
 }
 
 ///|
 /// Get the second within the minute.
-pub fn PrimitiveDateTime::second(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::second(self : PrimitiveDateTime) -> Int32 {
   self.time.second()
 }
 
 ///|
 /// Get the nanoseconds within the second.
-pub fn PrimitiveDateTime::nanosecond(self : PrimitiveDateTime) -> Int {
+pub fn PrimitiveDateTime::nanosecond(self : PrimitiveDateTime) -> Int32 {
   self.time.nanosecond()
 }
 

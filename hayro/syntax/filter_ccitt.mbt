@@ -5,9 +5,9 @@
 /// boundary.
 priv struct CcittBitPackDecoder {
   output : @buffer.Buffer
-  mut decoded_rows : UInt
-  mut buffer : Int
-  mut bit_count : Int
+  mut decoded_rows : UInt32
+  mut buffer : Int32
+  mut bit_count : Int32
 }
 
 ///|
@@ -62,8 +62,8 @@ impl @ccitt.Decoder for CcittBitPackDecoder with fn next_line(self) {
 /// Decodes into 8-bit luma (white = 0xFF).
 priv struct CcittLuma8Decoder {
   output : FixedArray[Byte]
-  mut idx : Int
-  mut decoded_rows : UInt
+  mut idx : Int32
+  mut decoded_rows : UInt32
 }
 
 ///|
@@ -102,12 +102,12 @@ fn ccitt_decode(
   params : Dict,
   image_params : ImageDecodeParams,
 ) -> FilterResult? {
-  let k = (params.get("K") : Int?).unwrap_or(0)
+  let k = (params.get("K") : Int32?).unwrap_or(0)
   let columns = match (params.get("Columns") : UInt64?) {
     Some(c) => c.to_uint()
     None => 1728U
   }
-  let rows = match (params.get("Rows") : UInt?) {
+  let rows = match (params.get("Rows") : UInt32?) {
     Some(r) => r
     None => image_params.height.reinterpret_as_uint()
   }

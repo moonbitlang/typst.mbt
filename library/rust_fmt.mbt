@@ -19,7 +19,7 @@ pub fn rust_round(x : Double) -> Double {
 ///|
 /// `libm::exp10` of an integer (`round_with_precision`; exact for
 /// `|n| < 16`, `libm::pow(10.0, n)` beyond).
-pub fn exp10(n : Int) -> Double {
+pub fn exp10(n : Int32) -> Double {
   libm_exp10(n.to_double())
 }
 
@@ -32,7 +32,7 @@ pub fn exp10(n : Int) -> Double {
 /// (which its Grisu fast path agrees with), including how it picks between
 /// two equally short candidates: when the remaining digits are exactly half
 /// way, it rounds up.
-fn shortest_digits(x : Double) -> (String, Int) {
+fn shortest_digits(x : Double) -> (String, Int32) {
   match shortest_digits_fast(x) {
     Some(res) => res
     None => shortest_digits_dragon(x)
@@ -49,7 +49,7 @@ fn shortest_digits(x : Double) -> (String, Int) {
 /// interval (about one ulp, at most `x * 2^-52`) to span `10^j`, so
 /// `10^(j + n) > x >= 10^j * 2^52`, i.e. `10^n > 2^52`. So results with at
 /// most 15 digits are taken as is, all others are recomputed exactly.
-fn shortest_digits_fast(x : Double) -> (String, Int)? {
+fn shortest_digits_fast(x : Double) -> (String, Int32)? {
   let s = x.abs().to_string()
   let len = s.length()
   // Split off the exponent (`1e+21`, `5e-324`).
@@ -113,7 +113,7 @@ fn shortest_digits_fast(x : Double) -> (String, Int)? {
 ///|
 /// The exact computation of [shortest_digits] (Rust's Dragon4 shortest
 /// mode).
-fn shortest_digits_dragon(x : Double) -> (String, Int) {
+fn shortest_digits_dragon(x : Double) -> (String, Int32) {
   // `flt2dec::decode`: the value is `mant * 2^exp`, its neighbors are
   // `(mant - minus) * 2^exp` and `(mant + plus) * 2^exp` (half way to the
   // adjacent floats), inclusive if the original mantissa is even.
@@ -136,7 +136,7 @@ fn shortest_digits_dragon(x : Double) -> (String, Int) {
 
 ///|
 /// The shortest round-trip digits of an `f32` (see [shortest_digits]).
-fn shortest_digits_f32(x : Float) -> (String, Int) {
+fn shortest_digits_f32(x : Float) -> (String, Int32) {
   // `flt2dec::decode` for `f32`.
   let bits = x.abs().reinterpret_as_uint()
   let biased = ((bits >> 23) & 0xFF).reinterpret_as_int()
@@ -180,11 +180,11 @@ pub fn rust_display_f32(x : Float) -> String {
 /// for the initial exponent estimate only.
 fn shortest_digits_decoded(
   raw_mant : UInt64,
-  raw_exp : Int,
+  raw_exp : Int32,
   subnormal : Bool,
   boundary : Bool,
   approx : Double,
-) -> (String, Int) {
+) -> (String, Int32) {
   let inclusive = (raw_mant & 1UL) == 0UL
   let (mant, minus, plus, exp) = if subnormal {
     (raw_mant, 1, 1, raw_exp)
@@ -217,7 +217,7 @@ fn shortest_digits_decoded(
   // powers.
   let ten = @bigint.BigInt::from_int(10)
   let upper = r + m_plus
-  let scaled_below = (k : Int) => {
+  let scaled_below = (k : Int32) => {
     if k >= 0 {
       below(s * ten.pow(@bigint.BigInt::from_int(k)), upper)
     } else {
@@ -280,7 +280,7 @@ fn shortest_digits_decoded(
   }
   let buf = StringBuilder()
   for d in digits {
-    buf.write_char(Int::unsafe_to_char(48 + d))
+    buf.write_char(Int32::unsafe_to_char(48 + d))
   }
   (buf.to_string(), k)
 }
@@ -307,7 +307,7 @@ pub fn rust_display_f64(x : Double) -> String {
 ///|
 /// Place the decimal point into `digits` (`0.digits * 10^point`), padding
 /// with zeros, and ensure at least `min_frac` fractional digits.
-fn place_point(digits : String, point : Int, min_frac : Int) -> String {
+fn place_point(digits : String, point : Int32, min_frac : Int32) -> String {
   let buf = StringBuilder()
   let n = digits.length()
   if point <= 0 {
@@ -372,7 +372,7 @@ pub fn rust_debug_f64(x : Double) -> String {
 ///|
 /// Rust's `{:.prec}` formatting of a double (round half to even on the exact
 /// binary value, like Rust's `format_exact`).
-pub fn rust_fixed_f64(x : Double, prec : Int) -> String {
+pub fn rust_fixed_f64(x : Double, prec : Int32) -> String {
   if x.is_nan() {
     return "NaN"
   }
@@ -387,7 +387,7 @@ pub fn rust_fixed_f64(x : Double, prec : Int) -> String {
 ///|
 /// Exact decimal expansion of a non-negative finite double rounded to `prec`
 /// fractional digits with round-half-to-even.
-fn exact_fixed(a : Double, prec : Int) -> String {
+fn exact_fixed(a : Double, prec : Int32) -> String {
   // Decompose a = m * 2^e exactly.
   let bits = a.reinterpret_as_uint64()
   let exp_bits = ((bits >> 52) & 0x7FF).to_int()
@@ -442,7 +442,7 @@ fn exact_fixed(a : Double, prec : Int) -> String {
 
 ///|
 /// Port of `typst_utils::round_with_precision`.
-pub fn round_with_precision(value : Double, precision : Int) -> Double {
+pub fn round_with_precision(value : Double, precision : Int32) -> Double {
   if value.is_inf() ||
     value.is_nan() ||
     (precision >= 0 && value.abs() >= 9007199254740992.0) ||

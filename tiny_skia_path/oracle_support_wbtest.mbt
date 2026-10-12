@@ -3,7 +3,7 @@
 // a mirror of the generator's RNG-driven fuzzing loop.
 
 ///|
-fn f(b : UInt) -> Float {
+fn f(b : UInt32) -> Float {
   Float::reinterpret_from_uint(b)
 }
 
@@ -38,7 +38,7 @@ fn dg(s : String) -> String {
 }
 
 ///|
-fn pad0(s : String, n : Int) -> String {
+fn pad0(s : String, n : Int32) -> String {
   let b = StringBuilder()
   for _ in s.length()..<n {
     b.write_char('0')
@@ -121,7 +121,7 @@ fn dts_opt(t : Transform?) -> String {
 ///|
 fn ts_of(s : String) -> Transform {
   let v : Array[Float] = []
-  let mut b : UInt = 0
+  let mut b : UInt32 = 0
   for c in s + "," {
     if c == ',' {
       v.push(Float::reinterpret_from_uint(b))
@@ -144,7 +144,7 @@ fn ddash(d : StrokeDash?) -> String {
 }
 
 ///|
-fn stroke_of(w : Float, ml : Float, cap : Int, join : Int) -> Stroke {
+fn stroke_of(w : Float, ml : Float, cap : Int32, join : Int32) -> Stroke {
   {
     width: w,
     miter_limit: ml,
@@ -192,7 +192,7 @@ priv struct Rng {
 }
 
 ///|
-fn Rng::next(self : Rng) -> UInt {
+fn Rng::next(self : Rng) -> UInt32 {
   self.s = self.s ^ (self.s >> 12)
   self.s = self.s ^ (self.s << 25)
   self.s = self.s ^ (self.s >> 27)
@@ -200,12 +200,12 @@ fn Rng::next(self : Rng) -> UInt {
 }
 
 ///|
-fn Rng::below(self : Rng, n : UInt) -> UInt {
+fn Rng::below(self : Rng, n : UInt32) -> UInt32 {
   self.next() % n
 }
 
 ///|
-fn Rng::below_f(self : Rng, n : UInt) -> Float {
+fn Rng::below_f(self : Rng, n : UInt32) -> Float {
   Float::from_uint(self.below(n))
 }
 
@@ -280,7 +280,7 @@ fn random_path(rng : Rng) -> Path? {
 
 ///|
 /// Mirrors `bulk_fuzz` of the generator.
-fn bulk_fuzz(seed : UInt64, n : Int) -> String {
+fn bulk_fuzz(seed : UInt64, n : Int32) -> String {
   let rng = { s: seed, }
   let out = StringBuilder()
   let dash_vals : Array[Float] = [0.0, 0.5, 1.0, 3.0, 7.5, 20.0]

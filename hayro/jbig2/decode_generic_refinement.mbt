@@ -24,7 +24,7 @@ fn generic_refinement_decode(
 
 ///|
 /// `i32::try_from(r).ok().and_then(|r| i32::try_from(h).ok().and_then(|h| r.checked_sub(h)))`.
-fn reference_offset(r : UInt, h : UInt) -> Int? {
+fn reference_offset(r : UInt32, h : UInt32) -> Int32? {
   if r > 0x7FFFFFFF || h > 0x7FFFFFFF {
     return None
   }
@@ -117,34 +117,34 @@ priv struct RefinementContextGatherer {
   template : RefinementTemplate
   at_pixels : Array[AdaptiveTemplatePixel]
   use_default_at : Bool
-  reference_dx : Int
-  reference_dy : Int
-  mut reg_y : UInt
-  mut reg_cur_x : UInt
-  mut reg_m1 : UInt
-  mut reg_cur : UInt
-  mut ref_cur_x : UInt
-  mut ref_m1 : UInt
-  mut ref_cur : UInt
-  mut ref_p1 : UInt
-  mut ctx : Int
+  reference_dx : Int32
+  reference_dy : Int32
+  mut reg_y : UInt32
+  mut reg_cur_x : UInt32
+  mut reg_m1 : UInt32
+  mut reg_cur : UInt32
+  mut ref_cur_x : UInt32
+  mut ref_m1 : UInt32
+  mut ref_cur : UInt32
+  mut ref_p1 : UInt32
+  mut ctx : Int32
 }
 
 ///|
-const REF_SHIFT_MASK_T0_DEFAULT : Int = 0b1_1001_1011_0110
+const REF_SHIFT_MASK_T0_DEFAULT : Int32 = 0b1_1001_1011_0110
 
 ///|
-const REF_SHIFT_MASK_T0_CUSTOM : Int = 0b0_1000_1011_0110
+const REF_SHIFT_MASK_T0_CUSTOM : Int32 = 0b0_1000_1011_0110
 
 ///|
-const REF_SHIFT_MASK_T1 : Int = 0b11_0001_1010
+const REF_SHIFT_MASK_T1 : Int32 = 0b11_0001_1010
 
 ///|
 fn RefinementContextGatherer::new(
   template : RefinementTemplate,
   at_pixels : Array[AdaptiveTemplatePixel],
-  reference_dx : Int,
-  reference_dy : Int,
+  reference_dx : Int32,
+  reference_dy : Int32,
 ) -> RefinementContextGatherer {
   let use_default_at = template == RTemplate0 &&
     refinement_has_default_at_pixels(at_pixels)
@@ -171,7 +171,7 @@ fn RefinementContextGatherer::start_row(
   self : RefinementContextGatherer,
   region : Bitmap,
   reference : Bitmap,
-  y : UInt,
+  y : UInt32,
 ) -> Unit {
   self.reg_y = y
   let ref_y = y.reinterpret_as_int() - self.reference_dy
@@ -235,7 +235,7 @@ fn RefinementContextGatherer::maybe_reload_buffers(
   self : RefinementContextGatherer,
   region : Bitmap,
   reference : Bitmap,
-  x : UInt,
+  x : UInt32,
 ) -> Unit {
   if x + 1 >= self.reg_cur_x + WORD_BITS {
     let new_start = if x >= 1 { x - 1 } else { 0 }
@@ -280,7 +280,7 @@ fn RefinementContextGatherer::maybe_reload_buffers(
 
 ///|
 #inline
-fn extract_3bits(buf : UInt, rbx : UInt) -> UInt {
+fn extract_3bits(buf : UInt32, rbx : UInt32) -> UInt32 {
   if rbx == 0 || rbx >= WORD_BITS - 1 {
     // Near word boundary, fall back to individual extraction.
     let b0 = get_buf_pixel(buf, rbx - 1).reinterpret_as_uint()
@@ -297,7 +297,7 @@ fn extract_3bits(buf : UInt, rbx : UInt) -> UInt {
 #inline
 fn RefinementContextGatherer::tpgr_all_same(
   self : RefinementContextGatherer,
-  x : UInt,
+  x : UInt32,
 ) -> Bool {
   let ref_x = (x.reinterpret_as_int() - self.reference_dx).reinterpret_as_uint()
   let rbx = ref_x - self.ref_cur_x
@@ -313,8 +313,8 @@ fn RefinementContextGatherer::tpgr_all_same(
 #inline
 fn RefinementContextGatherer::ref_center_pixel(
   self : RefinementContextGatherer,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let ref_x = (x.reinterpret_as_int() - self.reference_dx).reinterpret_as_uint()
   let rbx = ref_x - self.ref_cur_x
   get_buf_pixel(self.ref_cur, rbx)
@@ -324,8 +324,8 @@ fn RefinementContextGatherer::ref_center_pixel(
 #inline
 fn RefinementContextGatherer::update_current_row(
   self : RefinementContextGatherer,
-  x : UInt,
-  value : Int,
+  x : UInt32,
+  value : Int32,
 ) -> Unit {
   let bx = x - self.reg_cur_x
   let bit_pos = (WORD_SHIFT - bx).reinterpret_as_int()
@@ -338,8 +338,8 @@ fn RefinementContextGatherer::update_current_row(
 #inline
 fn RefinementContextGatherer::gather_template0_default(
   self : RefinementContextGatherer,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let bx = x - self.reg_cur_x
   let ref_x = (x.reinterpret_as_int() - self.reference_dx).reinterpret_as_uint()
   let rbx = ref_x - self.ref_cur_x
@@ -358,8 +358,8 @@ fn RefinementContextGatherer::gather_template0_custom(
   self : RefinementContextGatherer,
   region : Bitmap,
   reference : Bitmap,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let bx = x - self.reg_cur_x
   let ref_x_i = x.reinterpret_as_int() - self.reference_dx
   let rbx = ref_x_i.reinterpret_as_uint() - self.ref_cur_x
@@ -385,8 +385,8 @@ fn RefinementContextGatherer::gather_template0_custom(
 #inline
 fn RefinementContextGatherer::gather_template1(
   self : RefinementContextGatherer,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let bx = x - self.reg_cur_x
   let ref_x = (x.reinterpret_as_int() - self.reference_dx).reinterpret_as_uint()
   let rbx = ref_x - self.ref_cur_x
@@ -415,8 +415,8 @@ fn RefinementContextGatherer::gather(
   which : RefinementGather,
   region : Bitmap,
   reference : Bitmap,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   match which {
     GatherT0Default => self.gather_template0_default(x)
     GatherT0Custom => self.gather_template0_custom(region, reference, x)
@@ -431,8 +431,8 @@ fn generic_refinement_decode_bitmap(
   contexts : FixedArray[Byte],
   region : Bitmap,
   reference : Bitmap,
-  reference_dx : Int,
-  reference_dy : Int,
+  reference_dx : Int32,
+  reference_dy : Int32,
   gr_template : RefinementTemplate,
   adaptive_template_pixels : Array[AdaptiveTemplatePixel],
   tpgron : Bool,

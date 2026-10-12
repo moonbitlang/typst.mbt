@@ -1,7 +1,7 @@
 // Generated from Rust's `impl Display for f32` (see _scratch/f32fmt.rs).
 
 ///|
-let rust_display_f32_cases : Array[(UInt, String)] = [
+let rust_display_f32_cases : Array[(UInt32, String)] = [
   (0x00000000, "0"),
   (0x80000000, "-0"),
   (0x00000001, "0.000000000000000000000000000000000000000000001"),

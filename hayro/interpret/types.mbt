@@ -77,7 +77,7 @@ pub struct StencilImage {
 pub fn StencilImage::with_stencil(
   self : StencilImage,
   func : (LumaData, Paint) -> Unit,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> Unit {
   if self.image_xobject.decoded_mask(target_dimension) is Some(decoded) {
     func(decoded.luma, self.paint)
@@ -86,13 +86,13 @@ pub fn StencilImage::with_stencil(
 
 ///|
 #doc(hidden)
-pub fn StencilImage::width(self : StencilImage) -> Int {
+pub fn StencilImage::width(self : StencilImage) -> Int32 {
   self.image_xobject.width()
 }
 
 ///|
 #doc(hidden)
-pub fn StencilImage::height(self : StencilImage) -> Int {
+pub fn StencilImage::height(self : StencilImage) -> Int32 {
   self.image_xobject.height()
 }
 
@@ -121,7 +121,7 @@ pub struct RasterImage {
 pub fn RasterImage::with_rgba(
   self : RasterImage,
   func : (ImageData, LumaData?) -> Unit,
-  target_dimension : (Int, Int)?,
+  target_dimension : (Int32, Int32)?,
 ) -> Unit {
   if self.obj.decoded_raster(target_dimension) is Some(decoded) {
     func(decoded.image, decoded.alpha)
@@ -139,13 +139,13 @@ pub fn RasterImage::stream(self : RasterImage) -> @hayro_syntax.Stream {
 
 ///|
 #doc(hidden)
-pub fn RasterImage::width(self : RasterImage) -> Int {
+pub fn RasterImage::width(self : RasterImage) -> Int32 {
   self.obj.width()
 }
 
 ///|
 #doc(hidden)
-pub fn RasterImage::height(self : RasterImage) -> Int {
+pub fn RasterImage::height(self : RasterImage) -> Int32 {
   self.obj.height()
 }
 
@@ -170,7 +170,7 @@ pub enum Image {
 
 ///|
 #doc(hidden)
-pub fn Image::width(self : Image) -> Int {
+pub fn Image::width(self : Image) -> Int32 {
   match self {
     Stencil(s) => s.width()
     Raster(r) => r.width()
@@ -179,7 +179,7 @@ pub fn Image::width(self : Image) -> Int {
 
 ///|
 #doc(hidden)
-pub fn Image::height(self : Image) -> Int {
+pub fn Image::height(self : Image) -> Int32 {
   match self {
     Stencil(s) => s.height()
     Raster(r) => r.height()
@@ -205,9 +205,9 @@ pub(all) struct RgbData {
   /// The actual data. It is guaranteed to have the length width * height * 3.
   data : Bytes
   /// The width.
-  width : Int
+  width : Int32
   /// The height.
-  height : Int
+  height : Int32
   /// Whether the image should be interpolated.
   interpolate : Bool
   /// Additional scaling factors to apply to the image.
@@ -231,9 +231,9 @@ pub(all) struct LumaData {
   /// The actual data. It is guaranteed to have the length width * height.
   data : Bytes
   /// The width.
-  width : Int
+  width : Int32
   /// The height.
-  height : Int
+  height : Int32
   /// Whether the image should be interpolated.
   interpolate : Bool
   /// Additional scaling factors to apply to the image (see [RgbData]).
@@ -251,7 +251,7 @@ pub(all) enum ImageData {
 
 ///|
 /// The width of the image.
-pub fn ImageData::width(self : ImageData) -> Int {
+pub fn ImageData::width(self : ImageData) -> Int32 {
   match self {
     Rgb(d) => d.width
     Luma(d) => d.width
@@ -260,7 +260,7 @@ pub fn ImageData::width(self : ImageData) -> Int {
 
 ///|
 /// The height of the image.
-pub fn ImageData::height(self : ImageData) -> Int {
+pub fn ImageData::height(self : ImageData) -> Int32 {
   match self {
     Rgb(d) => d.height
     Luma(d) => d.height

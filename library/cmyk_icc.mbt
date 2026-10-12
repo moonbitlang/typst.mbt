@@ -12,7 +12,7 @@
 
 ///|
 /// Grid size of the precomputed 4D lookup table (`GRID_SIZE`).
-let cmyk_grid_size : Int = 17
+let cmyk_grid_size : Int32 = 17
 
 ///|
 /// Exact single-precision fused multiply-add `a * b + c` (computed in double
@@ -53,7 +53,7 @@ fn f32_round(x : Float) -> Float {
 
 ///|
 /// Rust `f32 as i32` (saturating truncation).
-fn f32_as_int(x : Float) -> Int {
+fn f32_as_int(x : Float) -> Int32 {
   if x.is_nan() {
     0
   } else {
@@ -70,7 +70,7 @@ fn f32_as_int(x : Float) -> Int {
 
 ///|
 /// `moxcms` `uint16_number_to_float_fast`.
-fn u16_to_f32(a : Int) -> Float {
+fn u16_to_f32(a : Int32) -> Float {
   Float::from_int(a) * (Float::from_int(1) / 65535.0)
 }
 
@@ -104,7 +104,7 @@ fn lerp3(
 /// `moxcms` `Hypercube::quadlinear_vec3`.
 fn quadlinear_vec3(
   clut : FixedArray[Float],
-  grid : Int,
+  grid : Int32,
   lin_x : Float,
   lin_y : Float,
   lin_z : Float,
@@ -130,7 +130,7 @@ fn quadlinear_vec3(
   let z_stride = grid
   let y_stride = grid * grid
   let x_stride = grid * grid * grid
-  let r = (x : Int, y : Int, z : Int, w : Int) => {
+  let r = (x : Int32, y : Int32, z : Int32, w : Int32) => {
     let start = (x * x_stride + y * y_stride + z * z_stride + w) * 3
     (clut[start], clut[start + 1], clut[start + 2])
   }
@@ -221,7 +221,7 @@ fn srgb_from_linear_f64(linear : Double) -> Double {
 
 ///|
 /// The 8-bit sRGB gamma table with 4096 entries (`make_gamma_table`).
-fn srgb_gamma_table() -> FixedArray[Int] {
+fn srgb_gamma_table() -> FixedArray[Int32] {
   let max_range = 1.0 / 4095.0
   FixedArray::makei(4096, v => {
     let g = srgb_from_linear_f64(v.to_double() * max_range)
@@ -231,7 +231,7 @@ fn srgb_gamma_table() -> FixedArray[Int] {
 
 ///|
 /// The precomputed 17^4 grid of 8-bit sRGB values (`[k][c][m][y]` order).
-fn cmyk_build_grid() -> FixedArray[Int] {
+fn cmyk_build_grid() -> FixedArray[Int32] {
   let grid = cmyk_icc_grid_points
   let n_in = cmyk_icc_input_entries
   let n_out = cmyk_icc_output_entries
@@ -316,10 +316,10 @@ fn cmyk_build_grid() -> FixedArray[Int] {
 }
 
 ///|
-let cmyk_grid_cell : Ref[FixedArray[Int]?] = { val: None, }
+let cmyk_grid_cell : Ref[FixedArray[Int32]?] = { val: None, }
 
 ///|
-fn cmyk_grid() -> FixedArray[Int] {
+fn cmyk_grid() -> FixedArray[Int32] {
   match cmyk_grid_cell.val {
     Some(g) => g
     None => {
@@ -333,7 +333,7 @@ fn cmyk_grid() -> FixedArray[Int] {
 ///|
 /// The barycentric weights for 8-bit inputs (`BarycentricWeight::<i16>::
 /// create_ranged_256`): `(x, x_n, w)` with `w` in Q0.15.
-fn cmyk_weight(index : Int) -> (Int, Int, Int) {
+fn cmyk_weight(index : Int32) -> (Int32, Int32, Int32) {
   let s = cmyk_grid_size
   let x = index * (s - 1) / 255
   let x_n = if x + 1 < s - 1 { x + 1 } else { s - 1 }
@@ -348,7 +348,7 @@ fn cmyk_weight(index : Int) -> (Int, Int, Int) {
 
 ///|
 /// Saturate to `i16`.
-fn sat_i16(x : Int) -> Int {
+fn sat_i16(x : Int32) -> Int32 {
   if x > 32767 {
     32767
   } else if x < -32768 {
@@ -360,21 +360,26 @@ fn sat_i16(x : Int) -> Int {
 
 ///|
 /// NEON `SQRDMLAH` on one lane: `sat((a << 16) + 2 * b * c + 2^15) >> 16`.
-fn qrdmlah(a : Int, b : Int, c : Int) -> Int {
+fn qrdmlah(a : Int32, b : Int32, c : Int32) -> Int32 {
   let acc = (a.to_int64() << 16) + 2L * b.to_int64() * c.to_int64() + 32768L
   sat_i16((acc >> 16).to_int())
 }
 
 ///|
 /// NEON `SQRDMLSH` on one lane: `sat((a << 16) - 2 * b * c + 2^15) >> 16`.
-fn qrdmlsh(a : Int, b : Int, c : Int) -> Int {
+fn qrdmlsh(a : Int32, b : Int32, c : Int32) -> Int32 {
   let acc = (a.to_int64() << 16) - 2L * b.to_int64() * c.to_int64() + 32768L
   sat_i16((acc >> 16).to_int())
 }
 
 ///|
 /// Convert 8-bit CMYK components to 8-bit sRGB.
-fn cmyk_to_srgb8(c : Int, m : Int, y : Int, k : Int) -> (Int, Int, Int) {
+fn cmyk_to_srgb8(
+  c : Int32,
+  m : Int32,
+  y : Int32,
+  k : Int32,
+) -> (Int32, Int32, Int32) {
   let lut = cmyk_grid()
   let s = cmyk_grid_size
   let grid3 = s * s * s
@@ -384,8 +389,8 @@ fn cmyk_to_srgb8(c : Int, m : Int, y : Int, k : Int) -> (Int, Int, Int) {
   let (z, z_n, db) = cmyk_weight(y)
   let result = [0, 0, 0]
   for ch in 0..<3 {
-    let lane = (table : Int) => {
-      let fetch = (x : Int, y : Int, z : Int) => {
+    let lane = (table : Int32) => {
+      let fetch = (x : Int32, y : Int32, z : Int32) => {
         lut[(table * grid3 + x * s * s + y * s + z) * 3 + ch]
       }
       let c000 = fetch(x, yy, z)

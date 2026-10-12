@@ -12,7 +12,7 @@
 ///|
 /// The block layouts that `f` found in the store and that it computed
 /// (`@layout.block_memo_stats`).
-fn block_memo_delta(f : () -> Unit raise) -> (Int, Int) raise {
+fn block_memo_delta(f : () -> Unit raise) -> (Int32, Int32) raise {
   let before = @layout.block_memo_stats()
   f()
   let after = @layout.block_memo_stats()
@@ -272,7 +272,7 @@ test "blocks: the same block at three places is three layouts" {
 /// another layout under another set rule before it.
 test "blocks: the same block under other styles is another layout" {
   @library.evict(0)
-  let document = (inset : Int) => {
+  let document = (inset : Int32) => {
     "#set page(width: 160pt, height: auto, margin: 10pt)\n" +
     "#set block(inset: \{inset}pt)\n" +
     "#block(rect(width: 20pt, height: 10pt))\n" +
@@ -385,7 +385,7 @@ test "blocks: a block is laid out again under another library" {
 fn block_memo_probe(
   world : ReadingWorld,
   library : @library.Library,
-  depth : Int,
+  depth : Int32,
   block : @library.Content,
 ) -> String {
   let tracked = @library.TrackedWorld::new(world)
@@ -594,7 +594,7 @@ test "blocks: a block that reads a file is laid out again when the file changes"
 ///|
 test "blocks: a block whose content queries the document is laid out again when the answer changes" {
   @library.evict(0)
-  let document = (headings : Int) => {
+  let document = (headings : Int32) => {
     (
       #|#set page(width: 160pt, height: auto, margin: 10pt)
       #|#block(inset: 2pt, context {

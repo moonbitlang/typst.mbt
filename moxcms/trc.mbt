@@ -3,7 +3,7 @@
 ///|
 pub(all) enum ToneReprCurve {
   /// Sampled curve (`u16` entries).
-  Lut(FixedArray[Int])
+  Lut(FixedArray[Int32])
   /// Parametric curve parameters.
   Parametric(FixedArray[Float])
 } derive(Eq, Debug)
@@ -130,7 +130,7 @@ fn ParametricCurve::invert(self : ParametricCurve) -> ParametricCurve? {
 }
 
 ///|
-fn u8_fixed_8number_to_float(x : Int) -> Float {
+fn u8_fixed_8number_to_float(x : Int32) -> Float {
   // 0x0000 = 0.
   // 0x0100 = 1.
   // 0xffff = 255  + 255/256
@@ -138,7 +138,7 @@ fn u8_fixed_8number_to_float(x : Int) -> Float {
 }
 
 ///|
-fn passthrough_table(depth : Depth, n : Int) -> FixedArray[Float] {
+fn passthrough_table(depth : Depth, n : Int32) -> FixedArray[Float] {
   let gamma_table = FixedArray::make(n, Float::from_int(0))
   let max_value = if depth.finite {
     (1 << depth.bit_depth) - 1
@@ -161,8 +161,8 @@ fn passthrough_table(depth : Depth, n : Int) -> FixedArray[Float] {
 ///|
 fn linear_forward_table(
   depth : Depth,
-  n : Int,
-  gamma : Int,
+  n : Int32,
+  gamma : Int32,
 ) -> FixedArray[Float] {
   let gamma_table = FixedArray::make(n, Float::from_int(0))
   let gamma_float = u8_fixed_8number_to_float(gamma)
@@ -198,7 +198,7 @@ fn lut_interp_linear_float(x : Float, table : ArrayView[Float]) -> Float {
 }
 
 ///|
-fn lut_interp_linear(input_value : Double, table : FixedArray[Int]) -> Float {
+fn lut_interp_linear(input_value : Double, table : FixedArray[Int32]) -> Float {
   let mut input_value = input_value
   if table.length() == 0 {
     return Float::from_double(input_value)
@@ -206,7 +206,7 @@ fn lut_interp_linear(input_value : Double, table : FixedArray[Int]) -> Float {
   input_value *= (table.length() - 1).to_double()
   let upper = @pxfm.f64_as_i32(input_value.ceil())
   let lower = @pxfm.f64_as_i32(input_value.floor())
-  let clamp_idx = (i : Int) => {
+  let clamp_idx = (i : Int32) => {
     // `(i as usize).min(len - 1)`; a negative `i` wraps to a huge `usize`.
     if i < 0 || i > table.length() - 1 {
       table.length() - 1
@@ -225,8 +225,8 @@ fn lut_interp_linear(input_value : Double, table : FixedArray[Int]) -> Float {
 ///|
 fn linear_lut_interpolate(
   depth : Depth,
-  n : Int,
-  table : FixedArray[Int],
+  n : Int32,
+  table : FixedArray[Int32],
 ) -> FixedArray[Float] {
   let gamma_table = FixedArray::make(n, Float::from_int(0))
   let max_value = if depth.finite {
@@ -262,7 +262,7 @@ fn m_clamp(a : Float, min : Float, max : Float) -> Float {
 ///|
 fn linear_curve_parametric(
   depth : Depth,
-  n : Int,
+  n : Int32,
   params : FixedArray[Float],
 ) -> FixedArray[Float]? {
   guard ParametricCurve::new(params) is Some(params) else { return None }
@@ -287,7 +287,7 @@ fn linear_curve_parametric(
 
 ///|
 fn linear_curve_parametric_s(
-  n : Int,
+  n : Int32,
   params : FixedArray[Float],
 ) -> FixedArray[Float]? {
   guard ParametricCurve::new(params) is Some(params) else { return None }
@@ -301,7 +301,7 @@ fn linear_curve_parametric_s(
 }
 
 ///|
-fn make_gamma_linear_table(depth : Depth, n : Int) -> FixedArray[Float] {
+fn make_gamma_linear_table(depth : Depth, n : Int32) -> FixedArray[Float] {
   let table = FixedArray::make(65536, Float::from_int(0))
   let max_range = if depth.finite {
     Float::from_double(
@@ -324,9 +324,9 @@ fn make_gamma_linear_table(depth : Depth, n : Int) -> FixedArray[Float] {
 /// `lut_interp_linear_gamma_impl` (integer path, finite types).
 fn lut_interp_linear_gamma_impl(
   depth : Depth,
-  n : Int,
-  input_value : Int,
-  table : FixedArray[Int],
+  n : Int32,
+  input_value : Int32,
+  table : FixedArray[Int32],
 ) -> Float {
   // Start scaling input_value to the length of the array: GAMMA_CAP*(length-1).
   // We'll divide out the GAMMA_CAP next
@@ -355,9 +355,9 @@ fn lut_interp_linear_gamma_impl(
 ///|
 /// `lut_interp_linear_gamma_impl_f32` (float types).
 fn lut_interp_linear_gamma_impl_f32(
-  n : Int,
-  input_value : Int,
-  table : FixedArray[Int],
+  n : Int32,
+  input_value : Int32,
+  table : FixedArray[Int32],
 ) -> Float {
   let guess = input_value.reinterpret_as_uint() *
     (table.length() - 1).reinterpret_as_uint()
@@ -380,8 +380,8 @@ fn lut_interp_linear_gamma_impl_f32(
 ///|
 fn make_gamma_lut(
   depth : Depth,
-  n : Int,
-  table : FixedArray[Int],
+  n : Int32,
+  table : FixedArray[Int32],
 ) -> FixedArray[Float] {
   let new_table = FixedArray::make(65536, Float::from_int(0))
   for v in 0..<n {
@@ -395,7 +395,7 @@ fn make_gamma_lut(
 }
 
 ///|
-fn lut_interp_linear16(input_value : Int, table : FixedArray[Int]) -> Int {
+fn lut_interp_linear16(input_value : Int32, table : FixedArray[Int32]) -> Int32 {
   // Start scaling input_value to the length of the array: 65535*(length-1).
   // We'll divide out the 65535 next
   let mut value = input_value.reinterpret_as_uint() *
@@ -415,7 +415,7 @@ fn lut_interp_linear16(input_value : Int, table : FixedArray[Int]) -> Int {
 ///|
 fn make_gamma_pow_table(
   depth : Depth,
-  n : Int,
+  n : Int32,
   gamma : Float,
 ) -> FixedArray[Float] {
   let table = FixedArray::make(65536, Float::from_int(0))
@@ -438,7 +438,7 @@ fn make_gamma_pow_table(
 ///|
 fn make_gamma_parametric_table(
   depth : Depth,
-  n : Int,
+  n : Int32,
   parametric_curve : ParametricCurve,
 ) -> FixedArray[Float] {
   let table = FixedArray::make(65536, Float::from_int(0))
@@ -470,7 +470,7 @@ fn compare_parametric(src : ArrayView[Float], dst : ArrayView[Float]) -> Bool {
 }
 
 ///|
-fn lut_inverse_interp16(value : Int, lut_table : FixedArray[Int]) -> Int {
+fn lut_inverse_interp16(value : Int32, lut_table : FixedArray[Int32]) -> Int32 {
   let mut l = 1 // 'int' Give spacing for negative values
   let mut r = 0x10000
   let mut x = 0
@@ -555,7 +555,10 @@ fn lut_inverse_interp16(value : Int, lut_table : FixedArray[Int]) -> Int {
 }
 
 ///|
-fn invert_lut(table : FixedArray[Int], out_length : Int) -> FixedArray[Int] {
+fn invert_lut(
+  table : FixedArray[Int32],
+  out_length : Int32,
+) -> FixedArray[Int32] {
   // For now, we invert the lut by creating a lut of size out_length and
   // attempting to look up a value for each entry using lut_inverse_interp16
   let output = FixedArray::make(out_length, 0)
@@ -572,7 +575,7 @@ fn invert_lut(table : FixedArray[Int], out_length : Int) -> FixedArray[Int] {
 fn ToneReprCurve::build_linearize_table(
   self : ToneReprCurve,
   depth : Depth,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float]? {
   match self {
     Parametric(params) => linear_curve_parametric(depth, n, params)
@@ -601,7 +604,7 @@ fn srgb_parametric() -> FixedArray[Float] {
 fn ToneReprCurve::build_gamma_table(
   self : ToneReprCurve,
   depth : Depth,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float]? {
   match self {
     Parametric(params) => {
@@ -664,7 +667,7 @@ fn ToneReprCurve::build_gamma_table(
 fn ColorProfile::build_gray_linearize_table(
   self : ColorProfile,
   depth : Depth,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float] raise CmsError {
   guard self.gray_trc is Some(trc) else { raise BuildTransferFunction }
   guard trc.build_linearize_table(depth, n) is Some(t) else {
@@ -678,7 +681,7 @@ fn ColorProfile::build_linearize_table_for(
   self : ColorProfile,
   trc : ToneReprCurve?,
   depth : Depth,
-  n : Int,
+  n : Int32,
   use_cicp : Bool,
 ) -> FixedArray[Float] raise CmsError {
   if use_cicp {
@@ -701,7 +704,7 @@ fn ColorProfile::build_linearize_table_for(
 fn ColorProfile::build_r_linearize_table(
   self : ColorProfile,
   depth : Depth,
-  n : Int,
+  n : Int32,
   use_cicp : Bool,
 ) -> FixedArray[Float] raise CmsError {
   self.build_linearize_table_for(self.red_trc, depth, n, use_cicp)
@@ -712,7 +715,7 @@ fn ColorProfile::build_r_linearize_table(
 fn ColorProfile::build_g_linearize_table(
   self : ColorProfile,
   depth : Depth,
-  n : Int,
+  n : Int32,
   use_cicp : Bool,
 ) -> FixedArray[Float] raise CmsError {
   self.build_linearize_table_for(self.green_trc, depth, n, use_cicp)
@@ -723,7 +726,7 @@ fn ColorProfile::build_g_linearize_table(
 fn ColorProfile::build_b_linearize_table(
   self : ColorProfile,
   depth : Depth,
-  n : Int,
+  n : Int32,
   use_cicp : Bool,
 ) -> FixedArray[Float] raise CmsError {
   self.build_linearize_table_for(self.blue_trc, depth, n, use_cicp)
@@ -735,7 +738,7 @@ fn ColorProfile::build_gamma_table(
   self : ColorProfile,
   trc : ToneReprCurve?,
   depth : Depth,
-  n : Int,
+  n : Int32,
   use_cicp : Bool,
 ) -> FixedArray[Float] raise CmsError {
   if use_cicp {
@@ -837,7 +840,7 @@ fn ToneReprCurve::is_linear(self : ToneReprCurve) -> Bool {
 
 ///|
 /// `matan::is_curve_linear16`.
-fn is_curve_linear16(curve : FixedArray[Int]) -> Bool {
+fn is_curve_linear16(curve : FixedArray[Int32]) -> Bool {
   let scale = Float::from_int(1) / Float::from_int(curve.length() - 1) * 65535.0
   for index, value in curve {
     let quantized = @pxfm.f32_as_u16(

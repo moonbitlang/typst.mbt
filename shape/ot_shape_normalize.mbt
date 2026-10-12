@@ -10,10 +10,10 @@ priv struct NormalizeContext {
 }
 
 ///|
-type DecomposeFn = (NormalizeContext, Int) -> (Int, Int)?
+type DecomposeFn = (NormalizeContext, Int32) -> (Int32, Int32)?
 
 ///|
-type ComposeFn = (NormalizeContext, Int, Int) -> Int?
+type ComposeFn = (NormalizeContext, Int32, Int32) -> Int32?
 
 ///|
 fn NormalizeContext::override_decompose_and_compose(
@@ -30,22 +30,22 @@ fn NormalizeContext::override_decompose_and_compose(
 }
 
 ///|
-const HB_OT_SHAPE_NORMALIZATION_MODE_NONE : Int = 0
+const HB_OT_SHAPE_NORMALIZATION_MODE_NONE : Int32 = 0
 
 ///|
-const HB_OT_SHAPE_NORMALIZATION_MODE_DECOMPOSED : Int = 1
+const HB_OT_SHAPE_NORMALIZATION_MODE_DECOMPOSED : Int32 = 1
 
 ///|
 /// Never composes base-to-base
-const HB_OT_SHAPE_NORMALIZATION_MODE_COMPOSED_DIACRITICS : Int = 2
+const HB_OT_SHAPE_NORMALIZATION_MODE_COMPOSED_DIACRITICS : Int32 = 2
 
 ///|
 /// Always fully decomposes and then recompose back
-const HB_OT_SHAPE_NORMALIZATION_MODE_COMPOSED_DIACRITICS_NO_SHORT_CIRCUIT : Int = 3
+const HB_OT_SHAPE_NORMALIZATION_MODE_COMPOSED_DIACRITICS_NO_SHORT_CIRCUIT : Int32 = 3
 
 ///|
 /// See hb-ot-shape-normalize.cc for logic.
-const HB_OT_SHAPE_NORMALIZATION_MODE_AUTO : Int = 4
+const HB_OT_SHAPE_NORMALIZATION_MODE_AUTO : Int32 = 4
 
 // HIGHLEVEL DESIGN:
 //
@@ -87,12 +87,12 @@ const HB_OT_SHAPE_NORMALIZATION_MODE_AUTO : Int = 4
 //     Indic shaper may want to disallow recomposing of two matras.
 
 ///|
-fn decompose_unicode(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
+fn decompose_unicode(_ctx : NormalizeContext, ab : Int32) -> (Int32, Int32)? {
   decompose(ab)
 }
 
 ///|
-fn compose_unicode(_ctx : NormalizeContext, a : Int, b : Int) -> Int? {
+fn compose_unicode(_ctx : NormalizeContext, a : Int32, b : Int32) -> Int32? {
   compose(a, b)
 }
 
@@ -105,7 +105,7 @@ fn set_glyph(info : GlyphInfo, font : Face) -> Unit {
 }
 
 ///|
-fn output_char(buffer : Buffer, unichar : UInt, glyph : UInt) -> Unit {
+fn output_char(buffer : Buffer, unichar : UInt32, glyph : UInt32) -> Unit {
   // This is very confusing indeed.
   buffer.cur(0).set_glyph_index(glyph)
   buffer.output_glyph(unichar)
@@ -114,7 +114,7 @@ fn output_char(buffer : Buffer, unichar : UInt, glyph : UInt) -> Unit {
 }
 
 ///|
-fn next_char(buffer : Buffer, glyph : UInt) -> Unit {
+fn next_char(buffer : Buffer, glyph : UInt32) -> Unit {
   buffer.cur(0).set_glyph_index(glyph)
   buffer.next_glyph()
 }
@@ -126,7 +126,7 @@ fn skip_char(buffer : Buffer) -> Unit {
 
 ///|
 /// Returns 0 if didn't decompose, number of resulting characters otherwise.
-fn decompose_char(ctx : NormalizeContext, shortest : Bool, ab : Int) -> Int {
+fn decompose_char(ctx : NormalizeContext, shortest : Bool, ab : Int32) -> Int32 {
   let (a, b) = match (ctx.decompose)(ctx, ab) {
     Some(decomposed) => decomposed
     _ => return 0
@@ -213,7 +213,7 @@ fn decompose_current_character(ctx : NormalizeContext, shortest : Bool) -> Unit 
 ///|
 fn handle_variation_selector_cluster(
   ctx : NormalizeContext,
-  end : Int,
+  end : Int32,
   _short_circuit : Bool,
 ) -> Unit {
   let face = ctx.face
@@ -267,7 +267,7 @@ fn handle_variation_selector_cluster(
 ///|
 fn decompose_multi_char_cluster(
   ctx : NormalizeContext,
-  end : Int,
+  end : Int32,
   short_circuit : Bool,
 ) -> Unit {
   let mut i = ctx.buffer.idx

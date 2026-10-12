@@ -123,7 +123,7 @@ fn info_line(info : @library.DocumentInfo) -> String {
 ///|
 /// Dumps content and styles, numbering locations in order of appearance.
 priv struct Dumper {
-  locations : Map[@library.Location, Int]
+  locations : Map[@library.Location, Int32]
 }
 
 ///|
@@ -138,7 +138,7 @@ fn Dumper::loc(self : Dumper, loc : @library.Location) -> String {
 
 ///|
 /// The number of a location (assigned in order of appearance).
-fn Dumper::loc_id(self : Dumper, loc : @library.Location) -> Int {
+fn Dumper::loc_id(self : Dumper, loc : @library.Location) -> Int32 {
   let n = self.locations.length()
   match self.locations.get(loc) {
     Some(id) => id

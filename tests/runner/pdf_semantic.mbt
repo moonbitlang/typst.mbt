@@ -132,7 +132,7 @@ fn pdf_compile(
 /// Like upstream `Pdf::make_live`.
 fn make_live(
   doc : @layout.PagedDocument,
-  untagged? : Bool = false,
+  untagged~ : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let doc_opts = @pdf.PdfFormatOptions::get(doc.options())
   let standards = doc_opts.standard.v.standards()
@@ -147,7 +147,7 @@ fn make_live(
 fn generate_pdf(
   doc : @layout.PagedDocument,
   standards : Array[@library.PdfStandard]?,
-  untagged? : Bool = false,
+  untagged~ : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let standard = match standards {
     Some(s) =>
@@ -315,7 +315,7 @@ fn pdf_text_string(b : Bytes) -> String {
 }
 
 ///|
-fn decode_utf16_lossy(units : Array[Int], sb : StringBuilder) -> Unit {
+fn decode_utf16_lossy(units : Array[Int32], sb : StringBuilder) -> Unit {
   let mut i = 0
   while i < units.length() {
     let u = units[i]
@@ -366,7 +366,7 @@ fn dq(s : String) -> String {
 ///|
 priv struct PdfReader {
   doc : @pdflite.PdfDocument
-  pages : Array[Int]
+  pages : Array[Int32]
   named : Array[(String, @pdfsyntax.PdfObject)]
 }
 
@@ -583,7 +583,7 @@ fn PdfReader::name_tree(
 fn PdfReader::number_tree(
   self : PdfReader,
   node : @pdfsyntax.PdfObject,
-  out : Array[(Int, @pdfsyntax.PdfObject)],
+  out : Array[(Int32, @pdfsyntax.PdfObject)],
 ) -> Unit {
   if self.get(node, "Nums") is Some(nums) {
     let items = self.array(nums)
@@ -849,7 +849,7 @@ fn parse_pdf_date(s : String) -> String? {
   } else {
     s
   }
-  let digits = (from : Int, len : Int, default : Int) => {
+  let digits = (from : Int32, len : Int32, default : Int32) => {
     if from + len > s.length() {
       return default
     }
@@ -881,8 +881,8 @@ fn parse_pdf_date(s : String) -> String? {
   } else {
     ("+", 0, 0)
   }
-  let p2 = (v : Int) => if v < 10 { "0\{v}" } else { v.to_string() }
-  let p4 = (v : Int) => {
+  let p2 = (v : Int32) => if v < 10 { "0\{v}" } else { v.to_string() }
+  let p4 = (v : Int32) => {
     let t = v.to_string()
     "0000".unsafe_substring(start=0, end=@cmp.maximum(0, 4 - t.length())) + t
   }
@@ -895,7 +895,7 @@ fn parse_pdf_date(s : String) -> String? {
 fn outline_items(
   r : PdfReader,
   item : @pdfsyntax.PdfObject,
-  depth : Int,
+  depth : Int32,
   out : StringBuilder,
 ) -> Unit {
   let mut cur = Some(item)
@@ -1033,7 +1033,7 @@ priv struct TextBlock {
 priv struct FontInfo {
   name : String
   two_byte : Bool
-  to_unicode : Map[Int, String]
+  to_unicode : Map[Int32, String]
 }
 
 ///|
@@ -1102,7 +1102,7 @@ fn Interp::run(
   content : Bytes,
   resources : @pdfsyntax.PdfObject,
   base : Matrix,
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   if depth > 16 {
     return
@@ -1245,7 +1245,7 @@ fn Interp::font_info(
   if base.has_suffix("-Identity-H") {
     base = base.unsafe_substring(start=0, end=base.length() - 11)
   }
-  let to_unicode : Map[Int, String] = Map([])
+  let to_unicode : Map[Int32, String] = Map([])
   if self.r.get(font, "ToUnicode") is Some(s) &&
     self.r.stream_data(s) is Some(data) {
     parse_to_unicode(data, to_unicode)
@@ -1334,7 +1334,7 @@ fn Interp::op(
   self : Interp,
   op : @pdfcontent.PdfContentOp,
   resources : @pdfsyntax.PdfObject,
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   let r = self.r
   match op {
@@ -1487,7 +1487,7 @@ fn Interp::draw_xobject(
   self : Interp,
   name : String,
   resources : @pdfsyntax.PdfObject,
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   let r = self.r
   guard r.get(resources, "XObject") is Some(xobjects) else { return }
@@ -1583,7 +1583,7 @@ fn Interp::draw_xobject(
 
 ///|
 /// Parse the `bfchar`/`bfrange` sections of a ToUnicode CMap.
-fn parse_to_unicode(data : Bytes, map : Map[Int, String]) -> Unit {
+fn parse_to_unicode(data : Bytes, map : Map[Int32, String]) -> Unit {
   let tokens = tokenize_cmap(latin1(data))
   let hex = (s : String) => {
     if !s.has_prefix("<") || !s.has_suffix(">") {
@@ -1610,8 +1610,8 @@ fn parse_to_unicode(data : Bytes, map : Map[Int, String]) -> Unit {
     }
     Some(out)
   }
-  let code = (b : Array[Int]) => b.fold(init=0, (acc, x) => (acc << 8) | x)
-  let utf16 = (b : Array[Int]) => {
+  let code = (b : Array[Int32]) => b.fold(init=0, (acc, x) => (acc << 8) | x)
+  let utf16 = (b : Array[Int32]) => {
     let units = []
     let mut k = 0
     while k + 1 < b.length() {

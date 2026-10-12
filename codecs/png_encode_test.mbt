@@ -2,7 +2,7 @@
 /// Expected PNG sizes and CRC-32 checksums of the output of upstream
 /// `image::codecs::png::PngEncoder` (image 0.25.10, png 0.18.1) for
 /// generated pixel data, produced with a Rust probe.
-let png_vectors : Array[(String, Int, Int, String, Int, UInt)] = [
+let png_vectors : Array[(String, Int32, Int32, String, Int32, UInt32)] = [
   ("Rgb8", 3, 3, "grad", 98, 0xD9F15588U),
   ("Rgb8", 17, 9, "grad", 536, 0xC07807B3U),
   ("Rgb8", 40, 30, "rand", 3698, 0x656317BCU),
@@ -34,7 +34,7 @@ test "encode_png matches upstream" {
   let mut seed = 12345U
   for vector in png_vectors {
     let (enc, w, h, kind, len, crc) = vector
-    let (color, ch) : (@codecs.PngColorType, Int) = match enc {
+    let (color, ch) : (@codecs.PngColorType, Int32) = match enc {
       "Rgb8" => (Rgb, 3)
       "Rgba8" => (Rgba, 4)
       "Luma8" => (Grayscale, 1)

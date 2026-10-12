@@ -204,7 +204,7 @@ priv enum MathStyle {
 priv struct CssContext {
   math_style : MathStyle
   math_shift : MathShift
-  math_depth : Int
+  math_depth : Int32
 } derive(Eq)
 
 ///|
@@ -233,7 +233,7 @@ fn CssContext::depth_auto_add(self : CssContext) -> CssContext {
 }
 
 ///|
-fn CssContext::depth_add(self : CssContext, n : Int) -> CssContext {
+fn CssContext::depth_add(self : CssContext, n : Int32) -> CssContext {
   { ..self, math_depth: self.math_depth + n, }
 }
 
@@ -265,7 +265,7 @@ priv struct MathContext {
   mut content : Array[@library.Content]
   mut embellishment : EmbellishmentContext?
   mut css : CssContext
-  mut trunk_depth : Int
+  mut trunk_depth : Int32
 }
 
 ///|
@@ -334,7 +334,7 @@ fn[T] MathContext::with_css(
 /// Run `f` with the trunk depth temporarily replaced.
 fn[T] MathContext::with_trunk_depth(
   self : MathContext,
-  trunk_depth : Int,
+  trunk_depth : Int32,
   f : () -> T raise @library.SourceError,
 ) -> T raise @library.SourceError {
   let prev = self.trunk_depth
@@ -1189,9 +1189,9 @@ fn single_char(text : String) -> Char? {
 ///|
 /// The class for an `mtd` that is one of multiple sub-columns in a table.
 fn table_mtd_class(
-  index : Int,
-  count : Int,
-  ncols : Int,
+  index : Int32,
+  count : Int32,
+  ncols : Int32,
   alternator : @library.LeftRightAlternator,
 ) -> String? {
   if count <= 1 || ncols <= 1 || !(alternator is Right) {

@@ -346,7 +346,7 @@ fn exif_transform(
 ///|
 /// The number of components of a JPEG image (from its frame header),
 /// whether it has an Adobe `APP14` marker and the frame's width and height.
-fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
+fn jpeg_components(data : Bytes) -> (Int32, Bool, (Int32, Int32)?) {
   let mut i = 2
   let mut adobe = false
   while i + 4 <= data.length() {
@@ -400,8 +400,8 @@ fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
 /// one, and the ICC profile for 8-bit images).
 fn convert_samples(
   key : String,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : @codecs.ColorType,
   buf : Bytes,
   icc : Bytes?,
@@ -494,8 +494,8 @@ fn convert_samples(
 fn convert_jpeg(
   key : String,
   data : Bytes,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   icc : Bytes?,
   interpolate : Bool,
 ) -> @export.Image {
@@ -523,6 +523,6 @@ fn convert_jpeg(
 ///|
 /// Converts a 16-bit sample to 8 bits (upstream `image`'s
 /// `FromPrimitive<u16> for u8`: `round(c * 255 / 65535)`).
-fn u16_to_u8(c : Int) -> Byte {
+fn u16_to_u8(c : Int32) -> Byte {
   ((c + 128) / 257).to_byte()
 }

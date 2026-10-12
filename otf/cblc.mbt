@@ -26,8 +26,8 @@ priv enum CblcBitmapDataFormat {
 
 ///|
 priv struct CblcMetrics {
-  mut x : Int // i8
-  mut y : Int // i8
+  mut x : Int32 // i8
+  mut y : Int32 // i8
   mut width : Byte
   mut height : Byte
 }
@@ -40,7 +40,7 @@ fn CblcMetrics::default() -> CblcMetrics {
 ///|
 priv struct CblcLocation {
   format : CblcBitmapFormat
-  offset : Int
+  offset : Int32
   metrics : CblcMetrics
   ppem : UInt16
 }
@@ -48,7 +48,7 @@ priv struct CblcLocation {
 ///|
 priv struct BitmapSizeTable {
   subtable_array_offset : Offset32
-  number_of_subtables : UInt
+  number_of_subtables : UInt32
   ppem : UInt16
   bit_depth : Byte
   // Many fields are omitted.
@@ -63,10 +63,10 @@ fn select_bitmap_size_table(
   let s = s.copy()
   let subtable_count = s.read_u32()
   let orig_s = s.copy()
-  let mut idx : Int? = None
+  let mut idx : Int32? = None
   let mut max_ppem : UInt16 = 0
   let mut bit_depth_for_max_ppem : Byte = 0
-  let mut i : UInt = 0
+  let mut i : UInt32 = 0
   while i < subtable_count {
     let cur = i
     i += 1
@@ -106,7 +106,7 @@ fn select_bitmap_size_table(
 ///|
 priv struct IndexSubtableInfo {
   start_glyph_id : GlyphId
-  offset : Int // absolute offset
+  offset : Int32 // absolute offset
 }
 
 ///|
@@ -116,7 +116,7 @@ fn select_index_subtable(
   glyph_id : GlyphId,
 ) -> IndexSubtableInfo raise Malformed {
   let s = Stream::new_at_r(data, size_table.subtable_array_offset.to_usize())
-  let mut i : UInt = 0
+  let mut i : UInt32 = 0
   while i < size_table.number_of_subtables {
     i += 1
     let start_glyph_id : GlyphId = s.read()
@@ -137,7 +137,7 @@ fn select_index_subtable(
 /// `usize` addition of two non-negative offsets. Results that do not fit
 /// into an `Int` saturate to `Int::max_value`, which is out of bounds of any
 /// data anyway (upstream uses a 64-bit `usize`).
-fn cblc_usize_add(a : Int, b : Int) -> Int {
+fn cblc_usize_add(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() + b.to_int64()
   if r > 0x7fffffffL {
     0x7fffffff
@@ -149,7 +149,7 @@ fn cblc_usize_add(a : Int, b : Int) -> Int {
 ///|
 /// `usize` multiplication of two non-negative numbers, saturating like
 /// `cblc_usize_add`.
-fn cblc_usize_mul(a : Int, b : Int) -> Int {
+fn cblc_usize_mul(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() * b.to_int64()
   if r > 0x7fffffffL {
     0x7fffffff
@@ -160,7 +160,7 @@ fn cblc_usize_mul(a : Int, b : Int) -> Int {
 
 ///|
 /// `usize::num_from(u32)`, saturating like `cblc_usize_add`.
-fn cblc_usize_from_u32(v : UInt) -> Int {
+fn cblc_usize_from_u32(v : UInt32) -> Int32 {
   let i = v.reinterpret_as_int()
   if i < 0 {
     0x7fffffff

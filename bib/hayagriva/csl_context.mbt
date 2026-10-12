@@ -4,7 +4,7 @@
 ///|
 priv enum NumberVariableResult {
   Regular(MaybeTyped[Numeric])
-  Transparent(Int)
+  Transparent(Int32)
 }
 
 ///|
@@ -17,7 +17,7 @@ priv enum NumberOrPageVariableResult {
 fn NumberVariableResult::csl_cmp(
   self : NumberVariableResult,
   other : NumberVariableResult,
-) -> Int {
+) -> Int32 {
   match (self, other) {
     (Regular(a), Regular(b)) => MaybeTyped::numeric_csl_cmp(a, b)
     (Regular(_), Transparent(_)) => -1
@@ -95,13 +95,13 @@ fn InstanceContext::resolve_standard_variable(
 fn Context::push_format(
   self : Context,
   format : @citationberg.Formatting,
-) -> Int {
+) -> Int32 {
   self.writing.push_format(format)
 }
 
 ///|
 /// Pop a format from the stack if it is not empty.
-fn Context::pop_format(self : Context, pos : Int) -> Unit {
+fn Context::pop_format(self : Context, pos : Int32) -> Unit {
   self.writing.pop_format(pos)
 }
 
@@ -365,7 +365,7 @@ fn Context::push_link(
 
 ///|
 /// Push a transparent element child into the buffer.
-fn Context::push_transparent(self : Context, idx : Int) -> Unit {
+fn Context::push_transparent(self : Context, idx : Int32) -> Unit {
   let format = self.writing.formatting()
   self.writing.save_to_block()
   self.writing.elem_stack.last.0.push(Transparent(cite_idx=idx, format~))
@@ -468,7 +468,7 @@ fn Context::stop_stripping_periods(self : Context) -> Unit {
 
 ///|
 /// Set the case of the next text.
-fn Context::push_case(self : Context, case_ : @citationberg.TextCase?) -> Int {
+fn Context::push_case(self : Context, case_ : @citationberg.TextCase?) -> Int32 {
   let independent = match case_ {
     None => true
     Some(c) => c.is_language_independent()
@@ -492,7 +492,7 @@ fn Context::push_case(self : Context, case_ : @citationberg.TextCase?) -> Int {
 
 ///|
 /// Clear the case of the next text.
-fn Context::pop_case(self : Context, idx : Int) -> Unit {
+fn Context::pop_case(self : Context, idx : Int32) -> Unit {
   self.writing.pop_case(idx)
 }
 
@@ -620,7 +620,7 @@ fn Context::resolve_name_variable(
 fn Context::apply_prefix(
   self : Context,
   affixes : @citationberg.Affixes,
-) -> (DisplayLoc, Int) {
+) -> (DisplayLoc, Int32) {
   self.writing.apply_prefix(affixes)
 }
 
@@ -630,7 +630,7 @@ fn Context::apply_prefix(
 fn Context::apply_suffix(
   self : Context,
   affixes : @citationberg.Affixes,
-  loc : (DisplayLoc, Int),
+  loc : (DisplayLoc, Int32),
 ) -> Unit {
   if !self.writing.has_content_since(loc) {
     self.discard_elem(loc.0)

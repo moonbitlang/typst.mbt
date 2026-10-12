@@ -22,7 +22,7 @@ pub struct StrokeDash {
   priv offset : Float
   priv interval_len : NonZeroPositiveF32
   priv first_len : Float // TODO: PositiveF32
-  priv first_index : Int
+  priv first_index : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -95,7 +95,7 @@ fn adjust_dash_offset(offset : Float, len : Float) -> Float {
 fn find_first_interval(
   dash_array : Array[Float],
   dash_offset : Float,
-) -> (Float, Int) {
+) -> (Float, Int32) {
   let mut dash_offset = dash_offset
   for i, gap in dash_array {
     if dash_offset > gap || (dash_offset == gap && gap != 0.0) {
@@ -138,7 +138,7 @@ fn dash_impl(src : Path, dash : StrokeDash, res_scale : Float) -> Path? {
   // We also doesn't support the `SpecialLineRec` case.
   // I have no idea what the point in it.
 
-  fn is_even(x : Int) -> Bool {
+  fn is_even(x : Int32) -> Bool {
     x % 2 == 0
   }
 
@@ -201,7 +201,7 @@ fn dash_impl(src : Path, dash : StrokeDash, res_scale : Float) -> Path? {
 }
 
 ///|
-let max_t_value : Int = 0x3FFFFFFF
+let max_t_value : Int32 = 0x3FFFFFFF
 
 ///|
 priv struct ContourMeasureIter {
@@ -334,8 +334,8 @@ priv enum SegmentType {
 ///|
 priv struct Segment {
   distance : Float // total distance up to this point
-  point_index : Int // index into the ContourMeasure::points array
-  t_value : Int
+  point_index : Int32 // index into the ContourMeasure::points array
+  t_value : Int32
   kind : SegmentType
 }
 
@@ -440,7 +440,7 @@ fn ContourMeasure::push_segment(
 fn ContourMeasure::distance_to_segment(
   self : ContourMeasure,
   distance : Float,
-) -> (Int, NormalizedF32)? {
+) -> (Int32, NormalizedF32)? {
   let mut index = find_segment(self.segments, distance)
   // don't care if we hit an exact match or not, so we xor index if it is negative
   index = index ^ (index >> 31)
@@ -468,7 +468,7 @@ fn ContourMeasure::compute_line_seg(
   p0 : Point,
   p1 : Point,
   distance : Float,
-  point_index : Int,
+  point_index : Int32,
 ) -> Float {
   let d = p0.distance(p1)
   let prev_d = distance
@@ -491,9 +491,9 @@ fn ContourMeasure::compute_quad_segs(
   p1 : Point,
   p2 : Point,
   distance : Float,
-  min_t : Int,
-  max_t : Int,
-  point_index : Int,
+  min_t : Int32,
+  max_t : Int32,
+  point_index : Int32,
   tolerance : Float,
 ) -> Float {
   let mut distance = distance
@@ -541,9 +541,9 @@ fn ContourMeasure::compute_cubic_segs(
   p2 : Point,
   p3 : Point,
   distance : Float,
-  min_t : Int,
-  max_t : Int,
-  point_index : Int,
+  min_t : Int32,
+  max_t : Int32,
+  point_index : Int32,
   tolerance : Float,
 ) -> Float {
   let mut distance = distance
@@ -586,7 +586,7 @@ fn ContourMeasure::compute_cubic_segs(
 }
 
 ///|
-fn find_segment(base : Array[Segment], key : Float) -> Int {
+fn find_segment(base : Array[Segment], key : Float) -> Int32 {
   let mut lo = 0
   let mut hi = base.length() - 1
   while lo < hi {
@@ -733,7 +733,7 @@ fn segment_to(
 }
 
 ///|
-fn t_span_big_enough(t_span : Int) -> Int {
+fn t_span_big_enough(t_span : Int32) -> Int32 {
   t_span >> 10
 }
 

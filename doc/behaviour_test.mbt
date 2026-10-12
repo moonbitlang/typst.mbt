@@ -6,7 +6,7 @@
 /// Compile with the in-memory world.
 fn compile(
   children : Array[&@doc.IntoContent],
-  files? : Map[String, Bytes] = Map([]),
+  files~ : Map[String, Bytes] = Map([]),
 ) -> @doc.CompileReport[@layout.PagedDocument] {
   @doc.Document(children).compile_paged(@doc.DocWorld::in_memory(files~))
 }
@@ -30,7 +30,7 @@ fn origin_of(diagnostic : @doc.Diagnostic) -> @doc.Origin raise {
 /// The glyphs of a frame with their text, span and span offset.
 fn collect_glyphs(
   frame : @library.Frame,
-  out : Array[(String, @syntax.Span, Int)],
+  out : Array[(String, @syntax.Span, Int32)],
 ) -> Unit {
   for entry in frame.items() {
     match entry.1 {

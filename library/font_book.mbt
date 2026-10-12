@@ -4,16 +4,16 @@
 /// Metadata about a collection of fonts.
 pub struct FontBook {
   /// Maps from lowercased family names to font indices.
-  priv families : Map[String, Array[Int]]
+  priv families : Map[String, Array[Int32]]
   /// Metadata about each font in the collection.
   priv infos : Array[FontInfo]
   /// Memoized [FontBook::select] results (not upstream; cleared by `push`).
-  priv selected : Map[(String, FontVariant), Int?]
+  priv selected : Map[(String, FontVariant), Int32?]
   /// Memoized indices of the fonts covering a char (not upstream; cleared by
   /// `push`).
-  priv covering : Map[Int, Array[Int]]
+  priv covering : Map[Int32, Array[Int32]]
   /// The state of the book ([FontBook::edition]).
-  priv mut edition : Int
+  priv mut edition : Int32
 }
 
 ///|
@@ -65,10 +65,10 @@ pub fn FontBook::push(self : FontBook, info : FontInfo) -> Unit {
 
 ///|
 /// The number of book states made so far ([FontBook::edition]).
-let font_book_editions : Ref[Int] = { val: 0, }
+let font_book_editions : Ref[Int32] = { val: 0, }
 
 ///|
-fn next_font_book_edition() -> Int {
+fn next_font_book_edition() -> Int32 {
   font_book_editions.val += 1
   font_book_editions.val
 }
@@ -83,19 +83,19 @@ fn next_font_book_edition() -> Int {
 /// on macOS 26) takes 3 ms, 1 % of a compilation that uses them, so a book
 /// is the same answer only as the same object in the same state. What a
 /// book hands out is for reading: it changes by `push` alone.
-pub fn FontBook::edition(self : FontBook) -> Int {
+pub fn FontBook::edition(self : FontBook) -> Int32 {
   self.edition
 }
 
 ///|
 /// Get the font info for the given index.
-pub fn FontBook::info(self : FontBook, index : Int) -> FontInfo? {
+pub fn FontBook::info(self : FontBook, index : Int32) -> FontInfo? {
   self.infos.get(index)
 }
 
 ///|
 /// The number of fonts in the book.
-pub fn FontBook::len(self : FontBook) -> Int {
+pub fn FontBook::len(self : FontBook) -> Int32 {
   self.infos.length()
 }
 
@@ -108,7 +108,7 @@ pub fn FontBook::contains_family(self : FontBook, family : String) -> Bool {
 ///|
 /// An ordered iterator over all font families this book knows and the
 /// font indices that belong to them.
-pub fn FontBook::families(self : FontBook) -> Array[(String, Array[Int])] {
+pub fn FontBook::families(self : FontBook) -> Array[(String, Array[Int32])] {
   // The keys are ordered like Rust's `BTreeMap<String, _>`.
   let keys = self.families.keys().to_array()
   keys.sort_by(compare_str)
@@ -129,7 +129,7 @@ pub fn FontBook::select(
   self : FontBook,
   family : String,
   variant : FontVariant,
-) -> Int? {
+) -> Int32? {
   let key = (family, variant)
   if self.selected.get(key) is Some(selected) {
     return selected
@@ -144,7 +144,10 @@ pub fn FontBook::select(
 
 ///|
 /// Iterate over all variants of a family.
-pub fn FontBook::select_family(self : FontBook, family : String) -> Array[Int] {
+pub fn FontBook::select_family(
+  self : FontBook,
+  family : String,
+) -> Array[Int32] {
   self.families.get(family).unwrap_or([])
 }
 
@@ -158,7 +161,7 @@ pub fn FontBook::select_fallback(
   like : FontInfo?,
   variant : FontVariant,
   text : StringView,
-) -> Int? {
+) -> Int32? {
   // Find the fonts that contain the text's first non-space and
   // non-ignorable char ...
   let mut c : Char? = None
@@ -190,16 +193,16 @@ pub fn FontBook::select_fallback(
 /// The score used to rank font variants (compared lexicographically).
 priv struct VariantScore {
   /// `like.map(|like| similarity(current, like))`.
-  similarity : (Bool, Bool, Int, Int)?
+  similarity : (Bool, Bool, Int32, Int32)?
   /// `Reverse(distance(current, variant))`.
-  distance : (Int, Ratio, Int)
+  distance : (Int32, Ratio, Int32)
   /// Whether the font is variable.
   variable : Bool
 }
 
 ///|
 /// Rust's tuple/`Option`/`Reverse` ordering of a [VariantScore].
-fn VariantScore::compare(self : VariantScore, other : VariantScore) -> Int {
+fn VariantScore::compare(self : VariantScore, other : VariantScore) -> Int32 {
   let c = match (self.similarity, other.similarity) {
     (None, None) => 0
     (None, Some(_)) => -1
@@ -272,9 +275,9 @@ fn FontBook::find_best_variant(
   self : FontBook,
   like : FontInfo?,
   variant : FontVariant,
-  ids : Array[Int],
-) -> Int? {
-  let mut best : Int? = None
+  ids : Array[Int32],
+) -> Int32? {
+  let mut best : Int32? = None
   let mut best_score : VariantScore? = None
   for id in ids {
     let current = self.infos[id]
@@ -298,7 +301,7 @@ fn FontBook::find_best_variant(
 ///|
 /// Determines a metric that scores higher if `other` is similar to `self`.
 /// This is used to pick a closely matching face during font fallback.
-fn similarity(left : FontInfo, right : FontInfo) -> (Bool, Bool, Int, Int) {
+fn similarity(left : FontInfo, right : FontInfo) -> (Bool, Bool, Int32, Int32) {
   (
     // Most importantly, we want a font of a similar kind (monospace,
     // serif, etc.).
@@ -324,7 +327,7 @@ fn similarity(left : FontInfo, right : FontInfo) -> (Bool, Bool, Int, Int) {
 /// - this font's closest instance (if variable)
 ///
 /// Used to pick the most suitable font in a family.
-fn distance(info : FontInfo, variant : FontVariant) -> (Int, Ratio, Int) {
+fn distance(info : FontInfo, variant : FontVariant) -> (Int32, Ratio, Int32) {
   // TODO: Potentially also consider optical size for the distance
   // computation. However, this would ideally also apply to non-variable
   // font and there are different mechanisms with which these advertise
@@ -359,7 +362,7 @@ fn distance(info : FontInfo, variant : FontVariant) -> (Int, Ratio, Int) {
 
 ///|
 /// How many words the two strings share in their prefix.
-fn shared_prefix_words(left : String, right : String) -> Int {
+fn shared_prefix_words(left : String, right : String) -> Int32 {
   let l = unicode_words(left)
   let r = unicode_words(right)
   let mut n = 0
