@@ -16,7 +16,8 @@ fn handle_text(
     None => None
   }
   let size = t.size
-  let glyphs = convert_glyphs(t)
+  let glyphs = gc.glyphs
+  convert_glyphs(t, glyphs)
   surface.push_transform(to_export_transform(fc.state().transform))
   surface.set_fill(Some(fill))
   surface.set_stroke(stroke)
@@ -40,8 +41,11 @@ fn handle_text(
 /// (Upstream hands krilla the glyphs as they are, behind its `Glyph`
 /// trait. Here every glyph of a document is converted, so what is made per
 /// glyph is the glyph alone: text that is ASCII, which most is, needs no
-/// table of offsets, and the glyphs of a word share their location.)
-fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
+/// table of offsets, the glyphs of a word share their location, and the
+/// array is the caller's, which uses the one of the text item before: the
+/// exporter reads the glyphs while it draws them and keeps none. `out` is
+/// emptied first.)
+fn convert_glyphs(t : @library.TextItem, out : Array[@export.Glyph]) -> Unit {
   let text = t.text
   let u16 = text.length()
   let mut ascii = true
@@ -55,7 +59,7 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
   // ASCII text.
   let offsets = if ascii { no_offsets } else { utf16_offsets(text) }
   let glyphs = t.glyphs
-  let out : Array[@export.Glyph] = Array(capacity=glyphs.length())
+  out.clear()
   // The location of the glyph before, to share it with the next glyph of
   // the same span.
   let mut span = 0UL
@@ -99,7 +103,6 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
       location,
     })
   }
-  out
 }
 
 ///|

@@ -36,9 +36,15 @@ fn text_test_item(
 }
 
 ///|
+/// The array that every conversion of these tests writes to, as an export
+/// has one for all its text items.
+let text_test_glyphs : Array[@export.Glyph] = []
+
+///|
 /// The converted glyphs of a text item (a copy: the caller keeps them).
 fn text_test_converted(t : @library.TextItem) -> Array[@export.Glyph] {
-  convert_glyphs(t).copy()
+  convert_glyphs(t, text_test_glyphs)
+  text_test_glyphs.copy()
 }
 
 ///|
@@ -182,5 +188,8 @@ test "convert_glyphs: every text item has its own glyphs" {
       #|9 2..3 @3
     ),
   )
+  // An item after a longer one, in the array of the longer one.
   assert_eq(text_test_summary(text_test_converted(first)), text_test_summary(a))
+  assert_eq(text_test_glyphs.length(), 2)
+  assert_eq(text_test_converted(text_test_item("abc", [])).length(), 0)
 }

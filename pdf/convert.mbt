@@ -276,6 +276,9 @@ priv struct GlobalContext {
   mut last_font : (@library.FontInstance, @export.Font)?
   /// The solid fill that was converted last (not upstream: [convert_fill]).
   mut last_solid_fill : SolidFill?
+  /// The glyphs of the text item that was converted last (not upstream:
+  /// [convert_glyphs]).
+  glyphs : Array[@export.Glyph]
   /// The fonts shared between Typst text and SVG images.
   svg_fonts : SvgFontCache
   /// The first image inside an SVG image that could not be decoded: the
@@ -315,6 +318,7 @@ fn GlobalContext::new(
     fonts_backward: [],
     last_font: None,
     last_solid_fill: None,
+    glyphs: [],
     svg_fonts: SvgFontCache::new(),
     svg_image_error: None,
     pdf_extractions: {},
