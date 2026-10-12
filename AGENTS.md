@@ -1559,10 +1559,17 @@
   `typst_assets/fonts` and of `doc/fonts`: gitignored but deliberately not
   in `.moonignore`); the publish workflow checks that they are in the zip
   (`scripts/ci/package_smoke.sh`, whose consumer also sets text in the
-  family of `doc/fonts`). Verify a release as
-  a dependency (a scratch module with `"deps": {"moonbitlang/typst": ..}`,
-  native and wasm-gc), not only by building the unpacked package as the root
-  module: 0.1.0-0.1.2 were broken as dependencies for this reason.
+  family of `doc/fonts`). Since moon 0.1.20261012 a `moon.mod` cannot name
+  a dependency by its path (and `moon.mod.json`/`moon.pkg.json` are
+  refused), so the consumer of that script and the unpacked zip are the
+  members of a workspace (`moon.work`), and moon runs the pre-build steps
+  of a member: a zip without the generated data builds there. The script
+  therefore also requires that building the consumer leaves every file of
+  the unpacked package as it was and adds none. Verify a release as
+  a dependency (a scratch module that imports `"moonbitlang/typst@x.y.z"`
+  in its `moon.mod`, native and wasm-gc), not only by building the
+  unpacked package as the root module or as a member of a workspace:
+  0.1.0-0.1.2 were broken as dependencies for this reason.
 - CI (`.github/workflows/ci.yml`, scripts in `scripts/ci/`; the check to
   require for `main` is `required`): `check` (`moon check` on native,
   wasm-gc, wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.py`: the
