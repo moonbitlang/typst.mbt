@@ -864,7 +864,7 @@ The looks that the ports gave their tables are parameters of the element
 or rules of the document (`styled_table`):
 
 ```moonbit
-pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int32) -> Seq {
   let head = ["Bed", "Crop", "Harvest (kg)"]
   let fill : Cells[Paint] = Cells((_, y) => {
     // Row 0 is the header, row `i + 1` is `rows[i]`.
