@@ -70,8 +70,3 @@ let deflate_memo_counts : FixedArray[Int32] = [0, 0]
 pub fn deflate_memo_stats() -> (Int32, Int32) {
   (deflate_memo_counts[0] - deflate_memo_counts[1], deflate_memo_counts[1])
 }
-
-///|
-/// What is kept for the exporter between the documents of this package
-/// ([convert_impl]).
-let export_memo : @export.Memo = @export.Memo(deflate=deflate_encode_memoized)

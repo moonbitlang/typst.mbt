@@ -13,6 +13,8 @@ pub fn pdf(@layout.PagedDocument, PdfOptions) -> @library.Warned[Result[Bytes, A
 
 pub fn pdf_in_bundle(@layout.PagedDocument, PdfOptions, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
 
+pub fn subset_memo_stats() -> (Int, Int)
+
 // Errors
 
 // Types and methods

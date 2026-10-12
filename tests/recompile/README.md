@@ -634,12 +634,18 @@ every document, as krilla memoizes it (`@export.Memo`; "PDF export" in
 compares its bytes with those of the references, so a stale result is a
 PDF that differs. Each mutation was put in on the final tree (246
 sequences, seed 1), one at a time, never committed; the tests are
-`pdf/deflate_wbtest.mbt` (D, 5 tests) and `doc/pdf_deflate_test.mbt` (d).
+`pdf/deflate_wbtest.mbt` (D, 5 tests), `doc/pdf_deflate_test.mbt` (d),
+`pdf/subset_wbtest.mbt` (S, 6 tests) and `doc/pdf_subset_test.mbt` (s).
 
 | Mutation | Failing sequences, of 246 | First at | Tests that fail |
 |---|---|---|---|
 | the compressed content stream is found by the length of the stream alone | 79 | `bench/long`, sweep, step 1: the PDF differs from a fresh compilation without memoization | D, "a content stream is found by its bytes" and two more; d |
 | the compressed content streams are looked up with memoization off too | not run: the bytes cannot differ, there is one compressor | | D, "the compressor is called for a stream that is not kept, and only then", "with memoization off nothing is looked up or kept ..", "a document's content streams are kept ..": d |
+| the subset of a font is found without the glyphs | 80 | `bench/tiny`, random sequence, step 1: the PDF differs from a fresh compilation | S, "a font is subset once for the glyphs it has, in their order", "a kept subset has comemo's age"; s |
+| the subset is found by the glyphs as a set (their number and their sum), not in their order | 14 | `project/blocks`, sweep, step 3 | S, "a font is subset once for the glyphs it has, in their order" |
+| the subset is found without the font | not run | | S, "the font is part of what a subset is found by"; s |
+| the subset is found without the variation coordinates | not run | | S, "the font is part of what a subset is found by" |
+| the subsets are looked up with memoization off too | not run: a subset that is found is the subset that would be made | | S, three tests; s |
 
 ### How the stores came to be kept
 

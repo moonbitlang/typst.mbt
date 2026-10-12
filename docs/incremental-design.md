@@ -1390,6 +1390,7 @@ what `doc` and the CLI keep for themselves):
 | `raw_syntax_cache`, `raw_theme_cache`, `csl_style_cache` (by bytes), `bibliography_cache` (by sources and bytes), `pdf_document_cache` (by bytes), `plugin_call_cache`, `plugin_transition_cache` (by the hash of plugin, function and arguments), `plugin_module_cache` (by hash and bytes) | the decode caches that `evict` drops as a whole | rule 1. For step 4: the plugin caches raise the errors they keep as the kept objects, and a plugin's module is one object only until its cache is dropped |
 | `raster_image_cache`, `raw_highlight_cache`, `pdf`'s `raster_cache` (`ContentCache`) | slice 0: by upstream's hash, with ages | rule 1 |
 | `pdf`'s `deflate_cache` (`ContentCache`); `deflate_memo_counts` | the compressed content streams of exports, by the hash of the bytes of the stream (krilla's memoized `deflate_encode_memoized`), with ages; the counters of `deflate_memo_stats` | rule 1: a function of the bytes. The counters are read by tests and measurements only |
+| `pdf`'s `subset_cache` (`ContentCache`); `subset_memo_counts` | the subsets of fonts, by the number of the font object, the variation coordinates and the glyph IDs in the order of the subset (krilla's memoized `subset_font`), with ages; the counters of `subset_memo_stats` | rule 1: a function of the font's data, index and coordinates and of the glyphs; the object stands for its data and index, as in the tracked world |
 | `numbering_pattern_cache` | parsed patterns by their string | rule 1 |
 | `glyph_frame_cache`, `overhang_tables`, `rusty_faces`, `shape_plans`; `svg`'s `glyph_paths`, `glyph_bboxes`; `render`'s `pixglyphs` | by font instance (data, index, variations) and glyph, the plans also by direction, script, language and features, the paths also by scale | rule 1: functions of the font's data. Never dropped (6.3) |
 | `font_data_hashes`, `data_hashes` | hashes by the identity of `Bytes` | rule 1; an entry keeps its object, so an identity is not reused |
@@ -1761,6 +1762,21 @@ result, computed now or kept. The lookups are `pdf/`'s, on
   compresses with `deflate_encode_memoized` and nothing else: binary data
   (font programs, profiles, embedded files) is compressed per document,
   as upstream.
+- Fonts (`pdf/subset.mbt`). The key is the font object of the engine
+  that the exporter's font was made of (`Font::serial`), the variation
+  coordinates of the exporter's font and the glyph IDs in the order of
+  the subset, which is all a glyph remapper holds. krilla hashes its
+  `FontInfo` instead (index, checksum, length, coordinates, metrics): not
+  the data either, and coarser. A world that makes new font objects for
+  every compilation finds nothing again, as with the tracked world. A
+  font without a font object of the engine (one that only the text of an
+  SVG image uses) is subset for every export. Errors are not kept where
+  comemo keeps them: `FontError` holds the exporter's font, an object of
+  one export, by which `finish` finds the engine's font for the message.
+  What is found again depends on the glyphs alone: an edit that brings a
+  new glyph makes the subset of its font again (and renumbers the glyphs
+  behind it, so the content streams of later pages that use them change
+  too, upstream as here).
 - Determinism: a file is the same bytes from kept streams or not, with
   memoization on and off: `doc/pdf_deflate_test.mbt` and the `recompile`
   stage. (When this was built, 5346 files, the bench documents and 2661
@@ -1771,6 +1787,29 @@ result, computed now or kept. The lookups are `pdf/`'s, on
   a page that an export saw in the last ten.
 - A first export pays for the keys: the hash of every content stream
   (`longer.typ`: 3 % of the instructions of its export).
+
+Measured (aarch64 macOS, native release, `tests/pdf_bench`, the export
+alone, in million instructions and milliseconds; on the pdflite of
+office.mbt's text-path work, which took the export of `longer.typ` from
+2471 to 1427 million instructions; upstream 0.15.1 for comparison):
+
+| document | | a first export | nothing changed | after an edit of the last page |
+| --- | --- | ---: | ---: | ---: |
+| `long.typ` | before | 318 M, 18.9 ms | 318 M, 18.9 ms | 20.5 ms |
+| | after | 260 M, 16.2 ms | 152 M, 8.8 ms | 9.8 ms |
+| | upstream | 11 ms | | |
+| `longer.typ` | before | 1427 M, 92 ms | 1427 M, 92 ms | 95 ms |
+| | after | 1136 M, 78 ms | 741 M, 47 ms | 49 ms |
+| | upstream | 54 ms | | |
+| `showcase.typ` | before | 166 M, 10 ms | 166 M, 10 ms | 10.5 ms |
+| | after | 157 M, 10.5 ms | 63 M, 3.9 ms | 4.4 ms |
+| | upstream | 6.5 ms | | |
+
+("After" is everything of this step: the two lookups, and what the
+conversion of text items, the tag tree and the file writer no longer
+allocate. A first export is one with nothing kept, `--fresh`. The
+subsets are half of what `showcase.typ`, with its thirteen font
+programs, costs once its content streams are kept.)
 
 ### Slice 1: the tracked world, and the existing stores kept
 
@@ -2173,6 +2212,7 @@ changed:
 | `raw_highlight_cache` (slice 0) | the element, the styles, the lines as a copy of the array | a copy of the array, of immutable content | callers get their own array | ends with its compilation if the key holds a host closure (the rule above) |
 | `raster_image_cache`, `pdf`'s `raster_cache` (slice 0) | a `RasterImage` (private fields) or its error; the exporter's image as compressed bytes or a message | the image; the error as a copy (`HintedString::clone`); the exporter's image | nothing writes to a decoded image or to its compressed streams | as before |
 | `pdf`'s `deflate_cache` (the exporter's lookup of compressed content streams) | `Bytes`, the zlib stream of a content stream | the same object, which the exporter writes into the file | nothing: `Bytes` are immutable, and the stream that was hashed is an object of the export that made it and is not kept | new |
+| `pdf`'s `subset_cache` (the exporter's lookup of font subsets) | an `@export.FontSubset` (private fields: the font file of the subset, the number of its glyphs, a bounding box); no errors | the same object, which the exporter reads | nothing: the fields are private to pdflite and immutable. An error would name the exporter's font of one export, so it is computed again for the next | new |
 | the decode caches (`raw_syntax_cache`, `raw_theme_cache`, `bibliography_cache`, `csl_style_cache`, `pdf_document_cache`) | decoded data; no errors (a failure is decoded again) | the data | a `Bibliography`'s entries and index are written by `decode` alone; syntaxes, themes, styles and PDF documents are read | as before |
 | `numbering_pattern_cache` | parsed patterns | the pattern | `Numbering::trimmed` makes a copy with the flag | as before |
 | `ElementIntrospector.queries` | per selector, the array of elements | the array, to every caller of `query`, to recorded reads, and as the input that the works entry keeps | nothing in the engine wrote to it (`impl_query` maps it, the others iterate); the signature let anyone | `Introspector::query`, `IntrospectorBackend::query`, `ElementIntrospector::query` and `query_introspection` hand out an `ArrayView` |

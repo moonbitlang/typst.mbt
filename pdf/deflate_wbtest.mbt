@@ -198,7 +198,7 @@ test "deflate: a document's content streams are kept, its binary streams are not
       compress_content_streams: compress,
       enable_tagging: false,
     }
-    let document = @export.Document::new_with(settings, memo=export_memo)
+    let document = @export.Document::new_with(settings, memo=export_memo([]))
     for p in 0..<3 {
       let page = document.start_page_with(
         @export.PageSettings::from_wh(300.0, 300.0).unwrap(),

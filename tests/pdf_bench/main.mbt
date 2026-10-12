@@ -17,9 +17,9 @@
 //
 // What is kept between exports is what `pdf/image.mbt` keeps of a raster
 // image, its compressed samples (the document for it is the deck of
-// `bench/mkdeck.py`), and the compressed content streams
-// (`pdf/deflate.mbt`). Peak memory is the caller's to measure
-// (`/usr/bin/time -l`).
+// `bench/mkdeck.py`), the compressed content streams (`pdf/deflate.mbt`)
+// and the subsets of the fonts (`pdf/subset.mbt`). Peak memory is the
+// caller's to measure (`/usr/bin/time -l`).
 //
 // The world is `doc/system`'s over the directory of the file, with the
 // embedded fonts and without the system's, on a fixed date.
