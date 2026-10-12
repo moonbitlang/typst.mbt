@@ -91,6 +91,13 @@ fn convert_paint(
   shape : @library.Shape?,
   include_stroke_in_bbox : Bool,
 ) -> (@export.Paint, Int32) raise @library.SourceError {
+  // (Upstream computes the offset and the size first, for every paint. A
+  // solid colour, which most paints are, needs neither, and the bounding
+  // box of a shape is not free: the lines of every table are strokes.)
+  if paint is Solid(c) {
+    let (c, a) = convert_solid(c)
+    return (Color(c), a)
+  }
   let (offset, size) = match shape {
     Some(s) => {
       let bbox = @svg.shape_bbox(s, include_stroke_in_bbox)
