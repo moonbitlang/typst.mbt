@@ -2,7 +2,7 @@
 // cargo feature: component sections are reported as `UnknownSection`).
 
 ///|
-let wasm_module_version : UInt = 0x1
+let wasm_module_version : UInt32 = 0x1
 
 ///|
 // Note that this started at `0xa` and we're incrementing up from there. When
@@ -17,13 +17,13 @@ let wasm_module_version : UInt = 0x1
 // this constant, parser.rs:407); the validator's use needs the
 // `component-model` feature (validator.rs:684).
 #warnings("-unused_value")
-let wasm_component_version : UInt = 0xd
+let wasm_component_version : UInt32 = 0xd
 
 ///|
-let kind_module : UInt = 0x00
+let kind_module : UInt32 = 0x00
 
 ///|
-let kind_component : UInt = 0x01
+let kind_component : UInt32 = 0x01
 
 ///|
 /// The supported encoding formats for the parser.
@@ -66,7 +66,7 @@ pub struct Parser {
 priv enum ParserState {
   Header
   SectionStart
-  FunctionBody(remaining~ : UInt, len~ : UInt)
+  FunctionBody(remaining~ : UInt32, len~ : UInt32)
 }
 
 ///|
@@ -82,7 +82,7 @@ pub(all) enum Chunk {
   /// bytes are needed to continue parsing.
   NeedMoreData(UInt64)
   /// A chunk was successfully parsed.
-  Parsed(consumed~ : Int, payload~ : Payload)
+  Parsed(consumed~ : Int32, payload~ : Payload)
 }
 
 ///|
@@ -107,7 +107,7 @@ pub(all) enum Chunk {
 /// if necessary.
 pub(all) enum Payload {
   /// Indicates the header of a WebAssembly module or component.
-  Version(num~ : UInt, encoding~ : Encoding, range~ : Range)
+  Version(num~ : UInt32, encoding~ : Encoding, range~ : Range)
   /// A module type section was received and the provided reader can be
   /// used to parse the contents of the type section.
   TypeSection(SectionLimited[RecGroup])
@@ -116,7 +116,7 @@ pub(all) enum Payload {
   ImportSection(SectionLimited[Import])
   /// A module function section was received and the provided reader can be
   /// used to parse the contents of the function section.
-  FunctionSection(SectionLimited[UInt])
+  FunctionSection(SectionLimited[UInt32])
   /// A module table section was received and the provided reader can be
   /// used to parse the contents of the table section.
   TableSection(SectionLimited[Table])
@@ -133,12 +133,12 @@ pub(all) enum Payload {
   /// used to parse the contents of the export section.
   ExportSection(SectionLimited[Export])
   /// A module start section was received.
-  StartSection(func~ : UInt, range~ : Range)
+  StartSection(func~ : UInt32, range~ : Range)
   /// A module element section was received and the provided reader can be
   /// used to parse the contents of the element section.
   ElementSection(SectionLimited[Element])
   /// A module data count section was received.
-  DataCountSection(count~ : UInt, range~ : Range)
+  DataCountSection(count~ : UInt32, range~ : Range)
   /// A module data section was received and the provided reader can be
   /// used to parse the contents of the data section.
   DataSection(SectionLimited[Data])
@@ -153,7 +153,7 @@ pub(all) enum Payload {
   /// contents of the code section. The code section is not required to be
   /// fully resident in memory when we parse it. Instead a [`Parser`] is
   /// capable of parsing piece-by-piece of a code section.
-  CodeSectionStart(count~ : UInt, range~ : Range, size~ : UInt)
+  CodeSectionStart(count~ : UInt32, range~ : Range, size~ : UInt32)
   /// An entry of the code section, a function, was parsed from a WebAssembly
   /// module.
   ///
@@ -176,7 +176,7 @@ pub(all) enum Payload {
   ///
   /// The value is the offset in the input byte stream where the end
   /// was reached.
-  End(Int)
+  End(Int32)
 }
 
 ///|
@@ -426,7 +426,7 @@ fn Parser::parse_reader(
         (Module, 9) => ElementSection(section(reader, len, SectionLimited::new))
         (Module, 10) => {
           let start = reader.original_position()
-          let len : Ref[UInt] = { val: len, }
+          let len : Ref[UInt32] = { val: len, }
           let count = delimited(reader, len, r => r.read_var_u32())
           let range = {
             start,
@@ -482,7 +482,7 @@ fn Parser::parse_reader(
     // `delimited`. Actual parsing of the function body is delegated to
     // the caller to iterate over the `FunctionBody` structure.
     FunctionBody(remaining~, len~) => {
-      let len : Ref[UInt] = { val: len, }
+      let len : Ref[UInt32] = { val: len, }
       let body = delimited(reader, len, r => FunctionBody::new(r.read_reader()))
       self.state = FunctionBody(remaining=remaining - 1, len=len.val)
       CodeSectionEntry(body)
@@ -551,7 +551,7 @@ pub fn Parser::skip_section(self : Parser) -> Unit {
 /// to construct the section to return.
 fn[T] section(
   reader : BinaryReader,
-  len : UInt,
+  len : UInt32,
   ctor : (BinaryReader) -> T raise BinaryReaderError,
 ) -> T raise BinaryReaderError {
   let reader = reader.skip(r => r.skip_bytes_u32(len))
@@ -567,9 +567,9 @@ fn[T] section(
 /// Reads a section that is represented by a single uleb-encoded `u32`.
 fn single_item(
   reader : BinaryReader,
-  len : UInt,
+  len : UInt32,
   desc : String,
-) -> (UInt, Range) raise BinaryReaderError {
+) -> (UInt32, Range) raise BinaryReaderError {
   let range = {
     start: reader.original_position(),
     end: reader.original_position() + len.reinterpret_as_int(),
@@ -596,7 +596,7 @@ fn single_item(
 /// what `*len` currently is.
 fn[T] delimited(
   reader : BinaryReader,
-  len : Ref[UInt],
+  len : Ref[UInt32],
   f : (BinaryReader) -> T raise BinaryReaderError,
 ) -> T raise BinaryReaderError {
   let start = reader.original_position()
@@ -649,7 +649,7 @@ pub fn Payload::as_section(self : Payload) -> (Byte, Range)? {
 
 ///|
 /// `{:#10x}`: `0x`-prefixed lowercase hex, right-aligned in `width` columns.
-fn rust_fmt_hex_width(x : UInt, width : Int) -> String {
+fn rust_fmt_hex_width(x : UInt32, width : Int32) -> String {
   let s = "0x" + x.to_string(radix=16)
   if s.length() >= width {
     s

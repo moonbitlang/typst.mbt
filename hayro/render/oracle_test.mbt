@@ -119,7 +119,7 @@ fn typst_interpreter_settings() -> @interpret.InterpreterSettings {
 }
 
 ///|
-fn test_select_standard_font(font : @interpret.StandardFont) -> (Bytes, Int)? {
+fn test_select_standard_font(font : @interpret.StandardFont) -> (Bytes, Int32)? {
   let bytes = match font {
     Helvetica => @pdf_fonts.sans()
     HelveticaBold => @pdf_fonts.sans_bold()

@@ -143,7 +143,7 @@ fn calc_oracle_call(op : StringView, a : ArrayView[StringView]) -> String raise 
 ///|
 test "calc oracle" {
   let mut failed = 0
-  let failures : Map[String, Int] = Map([])
+  let failures : Map[String, Int32] = Map([])
   let examples : Array[String] = []
   for line in calc_oracle_cases[:] {
     let fields = line.split("\t").collect()

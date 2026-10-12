@@ -3,7 +3,7 @@
 ///|
 /// End-of-facsimile-block marker (T.6 Section 2.4.1.1).
 /// Two consecutive EOL codes: 000000000001 000000000001.
-const EOFB : UInt = 0x1001
+const EOFB : UInt32 = 0x1001
 
 ///|
 /// 2D coding modes (T.4 Section 4.2.1.3.2, T.6 Section 2.2.3).
@@ -13,7 +13,7 @@ priv enum Mode {
   /// Horizontal mode (T.4 Section 4.2.1.3.2c, T.6 Section 2.2.3.3).
   Horizontal
   /// Vertical mode with offset (T.4 Section 4.2.1.3.2b, T.6 Section 2.2.3.2).
-  Vertical(Int)
+  Vertical(Int32)
 }
 
 ///|
@@ -24,8 +24,8 @@ priv enum Mode {
 fn BitReader::decode_run_inner(
   self : BitReader,
   states : FixedArray[State],
-) -> UInt raise DecodeError {
-  let mut total : UInt = 0
+) -> UInt32 raise DecodeError {
+  let mut total : UInt32 = 0
   let mut state = 0
   while true {
     let bit = self.read_bit()
@@ -59,7 +59,7 @@ fn BitReader::decode_run_inner(
 
 ///|
 /// Decode a white run length.
-fn BitReader::decode_white_run(self : BitReader) -> UInt raise DecodeError {
+fn BitReader::decode_white_run(self : BitReader) -> UInt32 raise DecodeError {
   self.decode_run_inner(white_states()) catch {
     // See 0506179.pdf. We are lenient and check whether perhaps
     // the opposite color works.
@@ -69,7 +69,7 @@ fn BitReader::decode_white_run(self : BitReader) -> UInt raise DecodeError {
 
 ///|
 /// Decode a black run length.
-fn BitReader::decode_black_run(self : BitReader) -> UInt raise DecodeError {
+fn BitReader::decode_black_run(self : BitReader) -> UInt32 raise DecodeError {
   self.decode_run_inner(black_states()) catch {
     // See 0506179.pdf. We are lenient and check whether perhaps
     // the opposite color works.
@@ -82,7 +82,7 @@ fn BitReader::decode_black_run(self : BitReader) -> UInt raise DecodeError {
 fn BitReader::decode_run(
   self : BitReader,
   color : Color,
-) -> UInt raise DecodeError {
+) -> UInt32 raise DecodeError {
   match color {
     White => self.decode_white_run()
     Black => self.decode_black_run()
@@ -113,7 +113,7 @@ fn BitReader::decode_mode(self : BitReader) -> Mode raise DecodeError {
 /// EOL is defined as `000000000001` (11 zeros followed by a 1).
 /// Fill bits (T.4 Section 4.1.3) may precede the EOL as a variable-length
 /// string of zeros.
-fn BitReader::read_eol_if_available(self : BitReader) -> Int {
+fn BitReader::read_eol_if_available(self : BitReader) -> Int32 {
   let mut count = 0
   // T.4 Section 4.1.2: EOL = 000000000001
   // T.4 Section 4.1.3: Fill = variable length string of 0s before EOL

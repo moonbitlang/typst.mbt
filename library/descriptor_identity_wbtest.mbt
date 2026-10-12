@@ -189,7 +189,7 @@ test "descriptors: the standard library's are distinct by their texts too" {
   assert_true(funcs.length() > 250)
   assert_true(elems.length() > 100)
   assert_true(types.length() > 30)
-  let texts : Map[String, Int] = Map([])
+  let texts : Map[String, Int32] = Map([])
   let twins = []
   for data in funcs {
     let text = "\{data.name}\u{0}\{data.title}\u{0}\{data.docs}"
@@ -199,7 +199,7 @@ test "descriptors: the standard library's are distinct by their texts too" {
     texts[text] = 1
   }
   assert_eq(twins.length(), 0)
-  let numbers : Map[U128, Int] = Map([])
+  let numbers : Map[U128, Int32] = Map([])
   for data in funcs {
     numbers[hash128(Value::Func(Func::native(data)))] = 1
   }

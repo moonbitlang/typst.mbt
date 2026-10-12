@@ -135,7 +135,7 @@ pub fn Select::regex(pattern : String) -> Selector[ContentView] {
 /// (`path.where(..)`).
 pub fn Select::elem(
   path : String,
-  where_? : Array[(String, Value)] = [],
+  where_~ : Array[(String, Value)] = [],
 ) -> Selector[ContentView] {
   let func = Value::global(path)
   let value = if where_.is_empty() {

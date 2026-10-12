@@ -137,10 +137,10 @@ fn read_info(family : String) -> FontInfo {
 priv struct ReadTest {
   world : ReadWorld
   tracked : TrackedWorld
-  store : MemoStore[Int, Int]
+  store : MemoStore[Int32, Int32]
   mut library : Library
   /// The number of times each call ran, by tag.
-  runs : Map[Int, Int]
+  runs : Map[Int32, Int32]
 }
 
 ///|
@@ -169,16 +169,16 @@ fn ReadTest::engine(self : ReadTest) -> Engine {
 
 ///|
 /// The body of a memoized call of a test.
-type ReadBody = (Engine) -> Int raise SourceError
+type ReadBody = (Engine) -> Int32 raise SourceError
 
 ///|
 /// The memoized call `tag` (its key and its only argument).
 fn ReadTest::call(
   self : ReadTest,
   engine : Engine,
-  tag : Int,
+  tag : Int32,
   body : ReadBody,
-) -> Int raise SourceError {
+) -> Int32 raise SourceError {
   let key = memo_fingerprint(state => state.write_usize(tag))
   memoize(self.store, engine, key, tag, value => value, engine => {
     self.runs[tag] = self.runs.get(tag).unwrap_or(0) + 1
@@ -187,14 +187,14 @@ fn ReadTest::call(
 }
 
 ///|
-fn ReadTest::ran(self : ReadTest, tag : Int) -> Int {
+fn ReadTest::ran(self : ReadTest, tag : Int32) -> Int32 {
   self.runs.get(tag).unwrap_or(0)
 }
 
 ///|
 /// The world reads that the entries of the call `tag` keep, without the
 /// fingerprints.
-fn ReadTest::kept(self : ReadTest, tag : Int) -> String {
+fn ReadTest::kept(self : ReadTest, tag : Int32) -> String {
   let key = memo_fingerprint(state => state.write_usize(tag)).hash()
   let entries = self.store.entries.get(key).unwrap_or([])
   entries
@@ -228,7 +228,7 @@ fn read_test(
 }
 
 ///|
-fn length_of(engine : Engine, path : String) -> Int raise SourceError {
+fn length_of(engine : Engine, path : String) -> Int32 raise SourceError {
   let data = engine.world.file(memo_file(path)) catch {
     error =>
       raise SourceError([
@@ -239,7 +239,7 @@ fn length_of(engine : Engine, path : String) -> Int raise SourceError {
 }
 
 ///|
-fn text_length_of(engine : Engine, path : String) -> Int {
+fn text_length_of(engine : Engine, path : String) -> Int32 {
   let source = engine.world.source(memo_file(path)) catch { _ => return -1 }
   source.text().length()
 }

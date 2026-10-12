@@ -158,8 +158,8 @@ pub fn Value::global(path : String) -> Value {
 /// `path` (`"rgb"`, `"gradient.linear"`, `"table.cell"`).
 pub fn Value::call(
   path : String,
-  positional? : Array[Value] = [],
-  named? : Array[(String, Value)] = [],
+  positional~ : Array[Value] = [],
+  named~ : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FPath(path), generic_args(positional, named)))
 }
@@ -235,7 +235,7 @@ fn generic_args(
 fn Value::native(
   func : @library.NativeFuncData,
   positional : Array[Value],
-  named? : Array[(String, Value)] = [],
+  named~ : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FNative(func), generic_args(positional, named)))
 }
@@ -274,7 +274,7 @@ pub impl ToValue for Bool with fn to_value(self) {
 }
 
 ///|
-pub impl ToValue for Int with fn to_value(self) {
+pub impl ToValue for Int32 with fn to_value(self) {
   Value::of(VInt(self.to_int64()))
 }
 
@@ -361,14 +361,14 @@ pub impl[T : ToValue] ToValue for Array[T] with fn to_value(self) {
 /// The serial number of the next callback description (process-wide). A
 /// session compares it with its starting value to reject callbacks that
 /// were constructed during the compilation.
-let callback_serial : @ref.Ref[Int] = { val: 0, }
+let callback_serial : @ref.Ref[Int32] = { val: 0, }
 
 ///|
 /// A host callback description: a MoonBit closure that the engine calls as
 /// a function. `invoke` receives the invocation's context and the engine's
 /// arguments and returns the description of the result.
 priv struct Callback {
-  serial : Int
+  serial : Int32
   origin : Site
   invoke : (Ctx, @library.Args) -> Value raise
 }

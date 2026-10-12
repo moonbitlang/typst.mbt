@@ -6,7 +6,7 @@
 /// into the input. Serialization errors (`toml::ser::Error`) use the same
 /// type with the error's `Display` output as message and no span.
 pub(all) suberror TomlError {
-  TomlError(message~ : String, span~ : (Int, Int)?)
+  TomlError(message~ : String, span~ : (Int32, Int32)?)
 } derive(Debug, Eq)
 
 ///|
@@ -108,13 +108,17 @@ fn duplicate_key_error(key : String, table : Array[String]?) -> String {
 ///|
 /// `CustomError::duplicate_key(path, i)`: the key is shown with its default
 /// representation (the parsed repr is span-based and thus unavailable).
-fn duplicate_key_at(path : Array[String], i : Int) -> String {
+fn duplicate_key_at(path : Array[String], i : Int32) -> String {
   duplicate_key_error(to_key_repr(path[i]), Some(path[:i].to_owned()))
 }
 
 ///|
 /// `CustomError::extend_wrong_type(path, i, actual)`.
-fn extend_wrong_type(path : Array[String], i : Int, actual : String) -> String {
+fn extend_wrong_type(
+  path : Array[String],
+  i : Int32,
+  actual : String,
+) -> String {
   let key = path[:i + 1].to_owned().join(".")
   "dotted key `\{key}` attempted to extend non-table type (\{actual})"
 }
@@ -129,7 +133,11 @@ let recursion_limit_exceeded : String = "recursion limit exceeded"
 /// `TomlError::new`: turns the final parser error at byte `offset` into a
 /// `TomlError` whose span covers the character at `offset` (empty at the end
 /// of input).
-fn toml_error_at(bytes : Bytes, offset : Int, err : ContextError) -> TomlError {
+fn toml_error_at(
+  bytes : Bytes,
+  offset : Int32,
+  err : ContextError,
+) -> TomlError {
   let len = bytes.length()
   // Move back to a char boundary.
   let mut offset = if offset > len { len } else { offset }

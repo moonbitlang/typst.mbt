@@ -34,7 +34,7 @@ pub extend FieldKind with @debug.Debug::{to_repr}
 /// Metadata about an element field (upstream `FieldVtable`).
 pub struct FieldInfo {
   /// The field's index.
-  id : Int
+  id : Int32
   /// The field's name (kebab case).
   name : String
   /// Documentation.
@@ -172,11 +172,11 @@ pub extend Element with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub fn Element::new(
   name~ : String,
   title~ : String,
-  key? : String = name,
+  key~ : String = name,
   since? : Since,
-  docs? : String = "",
-  keywords? : Array[String] = [],
-  capabilities? : Array[String] = [],
+  docs~ : String = "",
+  keywords~ : Array[String] = [],
+  capabilities~ : Array[String] = [],
   fields~ : Array[FieldInfo],
 ) -> Element {
   Element({
@@ -274,7 +274,7 @@ pub fn Element::is_tagged(self : Element) -> Bool {
 ///|
 /// The id of the field with the given name (`255` for `label`). Internal and
 /// external fields are not found.
-pub fn Element::field_id(self : Element, name : String) -> Int? {
+pub fn Element::field_id(self : Element, name : String) -> Int32? {
   if name == "label" {
     return Some(255)
   }
@@ -288,7 +288,7 @@ pub fn Element::field_id(self : Element, name : String) -> Int? {
 
 ///|
 /// The name of the field with the given id.
-pub fn Element::field_name(self : Element, id : Int) -> String? {
+pub fn Element::field_name(self : Element, id : Int32) -> String? {
   if id == 255 {
     return Some("label")
   }
@@ -298,7 +298,7 @@ pub fn Element::field_name(self : Element, id : Int) -> String? {
 ///|
 /// The field info with the given id (non-internal fields only, like
 /// upstream's vtable lookup).
-pub fn Element::field(self : Element, id : Int) -> FieldInfo? {
+pub fn Element::field(self : Element, id : Int32) -> FieldInfo? {
   match self.0.fields.get(id) {
     Some(f) if !f.internal => Some(f)
     _ => None
@@ -457,7 +457,7 @@ pub fn Element::select(self : Element) -> Selector {
 /// match the given argument.
 pub fn Element::where_(
   self : Element,
-  fields : Array[(Int, Value)],
+  fields : Array[(Int32, Value)],
 ) -> Selector {
   Elem(self, Some(fields))
 }
@@ -546,14 +546,14 @@ pub fn Args::named_with(
 /// Build a field info whose type is `T` (via its cast traits).
 pub fn[T : FromValue + IntoValue] field_of(
   ty : Ty[T],
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
-  docs? : String = "",
+  docs~ : String = "",
   kind~ : FieldKind,
-  positional? : Bool = false,
-  required? : Bool = false,
-  variadic? : Bool = false,
-  internal? : Bool = false,
+  positional~ : Bool = false,
+  required~ : Bool = false,
+  variadic~ : Bool = false,
+  internal~ : Bool = false,
   default? : () -> Value,
   fold? : (Value, Value) -> Value,
   parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError,

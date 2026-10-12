@@ -8,67 +8,67 @@
 
 ///|
 /// Number of elements in hash table.
-const HASH_SIZE : Int = 65536
+const HASH_SIZE : Int32 = 65536
 
 ///|
 /// The minimum match length mandated by the deflate standard.
-const STD_MIN_MATCH : Int = 3
+const STD_MIN_MATCH : Int32 = 3
 
 ///|
 /// The minimum wanted match length, affects deflate_quick, deflate_fast,
 /// deflate_medium and deflate_slow.
-const WANT_MIN_MATCH : Int = 4
+const WANT_MIN_MATCH : Int32 = 4
 
 ///|
-const MIN_LOOKAHEAD : Int = 262 // STD_MAX_MATCH (258) + STD_MIN_MATCH + 1
+const MIN_LOOKAHEAD : Int32 = 262 // STD_MAX_MATCH (258) + STD_MIN_MATCH + 1
 
 ///|
-const STRATEGY_DEFAULT : Int = 0
+const STRATEGY_DEFAULT : Int32 = 0
 
 ///|
-const STRATEGY_FIXED : Int = 4
+const STRATEGY_FIXED : Int32 = 4
 
 ///|
 /// Flush modes (upstream `DeflateFlush`).
-const FLUSH_NO : Int = 0
+const FLUSH_NO : Int32 = 0
 
 ///|
-const FLUSH_PARTIAL : Int = 1
+const FLUSH_PARTIAL : Int32 = 1
 
 ///|
-const FLUSH_SYNC : Int = 2
+const FLUSH_SYNC : Int32 = 2
 
 ///|
-const FLUSH_FULL : Int = 3
+const FLUSH_FULL : Int32 = 3
 
 ///|
-const FLUSH_FINISH : Int = 4
+const FLUSH_FINISH : Int32 = 4
 
 ///|
-const FLUSH_BLOCK : Int = 5
+const FLUSH_BLOCK : Int32 = 5
 
 ///|
 /// Return codes (upstream `ReturnCode`).
-const Z_OK : Int = 0
+const Z_OK : Int32 = 0
 
 ///|
-const Z_STREAM_END : Int = 1
+const Z_STREAM_END : Int32 = 1
 
 ///|
-const Z_STREAM_ERROR : Int = -2
+const Z_STREAM_ERROR : Int32 = -2
 
 ///|
-const Z_BUF_ERROR : Int = -5
+const Z_BUF_ERROR : Int32 = -5
 
 ///|
 /// Stream status (upstream `Status`).
-const STATUS_INIT : Int = 1
+const STATUS_INIT : Int32 = 1
 
 ///|
-const STATUS_BUSY : Int = 2
+const STATUS_BUSY : Int32 = 2
 
 ///|
-const STATUS_FINISH : Int = 3
+const STATUS_FINISH : Int32 = 3
 
 ///|
 /// Block state (upstream `BlockState`).
@@ -87,12 +87,12 @@ priv enum BlockState {
 /// Compression parameters (upstream `algorithm::Config`).
 priv struct Config {
   /// reduce lazy search above this match length
-  good_length : Int
+  good_length : Int32
   /// do not perform lazy search above this match length
-  max_lazy : Int
+  max_lazy : Int32
   /// quit search above this match length
-  nice_length : Int
-  max_chain : Int
+  nice_length : Int32
+  max_chain : Int32
 }
 
 ///|
@@ -117,35 +117,35 @@ priv struct DeflateStream {
   /// The input (`input_array[input_array_off..]` instead when that is set).
   mut input : BytesView
   mut input_array : FixedArray[Byte]?
-  mut input_array_off : Int
-  mut next_in : Int
-  mut avail_in : Int
+  mut input_array_off : Int32
+  mut next_in : Int32
+  mut avail_in : Int32
   mut output : OutBuf
-  mut avail_out : Int
+  mut avail_out : Int32
   mut total_out : Int64
-  mut data_type : Int
-  mut adler : UInt
+  mut data_type : Int32
+  mut adler : UInt32
   // -- state --
-  mut status : Int
+  mut status : Int32
   /// value of flush param for previous deflate call
-  mut last_flush : Int
+  mut last_flush : Int32
   /// bit 0 true for zlib, bit 1 true for gzip
-  mut wrap : Int
-  strategy : Int
-  mut level : Int
+  mut wrap : Int32
+  strategy : Int32
+  mut level : Int32
   /// Use a faster search when the previous match is longer than this
-  mut good_match : Int
+  mut good_match : Int32
   /// Stop searching when current match exceeds this
-  mut nice_match : Int
+  mut nice_match : Int32
   /// start of matching string
-  mut match_start : Int
+  mut match_start : Int32
   /// start of string to insert
-  mut strstart : Int
+  mut strstart : Int32
   window : FixedArray[Byte]
   /// LZ77 window size (32K by default)
-  w_size : Int
+  w_size : Int32
   /// number of valid bytes ahead in window
-  mut lookahead : Int
+  mut lookahead : Int32
   /// prev[N], where N is an offset in the current window, contains the offset
   /// in the window of the previous 4-byte sequence that hashes to the same
   /// value as the 4-byte sequence starting at N.
@@ -154,27 +154,27 @@ priv struct DeflateStream {
   /// in the current window that hashes to H.
   head : PosTable
   /// Length of the best match at previous step.
-  mut prev_length : Int
+  mut prev_length : Int32
   /// To speed up deflation, hash chains are never searched beyond this length.
-  mut max_chain_length : Int
+  mut max_chain_length : Int32
   /// Attempt to find a better match only when the current match is strictly
   /// smaller than this value (also used as max_insert_length).
-  mut max_lazy_match : Int
+  mut max_lazy_match : Int32
   /// number of string matches in current block (saturating 8-bit counter)
-  mut matches : Int
+  mut matches : Int32
   /// Window position at the beginning of the current output block. Gets
   /// negative when the window is moved backwards.
-  mut block_start : Int
+  mut block_start : Int32
   sym_buf : SymBuf
   /// Actual size of window: 2*w_size.
-  mut window_size : Int
+  mut window_size : Int32
   bit_writer : BitWriter
   /// bit length of current block with optimal trees
-  mut opt_len : Int
+  mut opt_len : Int32
   /// bit length of current block with static trees
-  mut static_len : Int
+  mut static_len : Int32
   /// bytes at end of window left to insert
-  mut insert : Int
+  mut insert : Int32
   /// literal and length tree
   l_desc : TreeDesc
   /// distance tree
@@ -186,7 +186,7 @@ priv struct DeflateStream {
 ///|
 /// Upstream `init` with a zlib wrapper, window bits 15, memLevel 8
 /// (`DEF_MEM_LEVEL`) and the default strategy, followed by `reset`.
-fn DeflateStream::new(level : Int) -> DeflateStream {
+fn DeflateStream::new(level : Int32) -> DeflateStream {
   let level = if level == -1 { 6 } else { level }
   guard level >= 3 && level <= 6 else {
     abort("only deflate_medium levels (3..=6) are ported")
@@ -285,7 +285,7 @@ fn DeflateStream::lm_init(self : DeflateStream) -> Unit {
 }
 
 ///|
-fn DeflateStream::lm_set_level(self : DeflateStream, level : Int) -> Unit {
+fn DeflateStream::lm_set_level(self : DeflateStream, level : Int32) -> Unit {
   let config = configuration_table[level]
   self.max_lazy_match = config.max_lazy
   self.good_match = config.good_length
@@ -298,27 +298,27 @@ fn DeflateStream::lm_set_level(self : DeflateStream, level : Int) -> Unit {
 
 ///|
 /// log2(w_size)
-fn DeflateStream::w_bits(self : DeflateStream) -> Int {
+fn DeflateStream::w_bits(self : DeflateStream) -> Int32 {
   self.w_size.ctz()
 }
 
 ///|
-fn DeflateStream::w_mask(self : DeflateStream) -> Int {
+fn DeflateStream::w_mask(self : DeflateStream) -> Int32 {
   self.w_size - 1
 }
 
 ///|
-fn DeflateStream::max_dist(self : DeflateStream) -> Int {
+fn DeflateStream::max_dist(self : DeflateStream) -> Int32 {
   self.w_size - MIN_LOOKAHEAD
 }
 
 ///|
-fn DeflateStream::max_insert_length(self : DeflateStream) -> Int {
+fn DeflateStream::max_insert_length(self : DeflateStream) -> Int32 {
   self.max_lazy_match
 }
 
 ///|
-fn DeflateStream::header(self : DeflateStream) -> Int {
+fn DeflateStream::header(self : DeflateStream) -> Int32 {
   // preset dictionary flag in zlib header
   let preset_dict = 0x20
   // The deflate compression method (the only one supported in this version)
@@ -334,7 +334,7 @@ fn DeflateStream::header(self : DeflateStream) -> Int {
 }
 
 ///|
-fn DeflateStream::level_flags(self : DeflateStream) -> Int {
+fn DeflateStream::level_flags(self : DeflateStream) -> Int32 {
   if self.level < 2 {
     0
   } else if self.level < 6 {
@@ -349,14 +349,14 @@ fn DeflateStream::level_flags(self : DeflateStream) -> Int {
 // -- hash_calc.rs (`StandardHashCalc`) --
 
 ///|
-fn read_u32_le(window : FixedArray[Byte], i : Int) -> UInt {
+fn read_u32_le(window : FixedArray[Byte], i : Int32) -> UInt32 {
   // One bounds check for all four bytes (performance).
   guard i >= 0 && i <= window.length() - 4 else { abort("index out of bounds") }
   load_u32_le_unchecked(window, i)
 }
 
 ///|
-fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
+fn read_u64_le(window : FixedArray[Byte], i : Int32) -> UInt64 {
   // One bounds check for all eight bytes (performance).
   guard i >= 0 && i <= window.length() - 8 else { abort("index out of bounds") }
   load_u64_le_unchecked(window, i)
@@ -364,7 +364,7 @@ fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
 
 ///|
 /// `update_hash(0, val)`: always in `0..HASH_SIZE`.
-fn hash_update(val : UInt) -> Int {
+fn hash_update(val : UInt32) -> Int32 {
   ((val * 2654435761U) >> 16).reinterpret_as_int() & (HASH_SIZE - 1)
 }
 
@@ -374,8 +374,8 @@ fn hash_update(val : UInt) -> Int {
 /// and masked indices are in bounds.
 fn DeflateStream::quick_insert_string(
   self : DeflateStream,
-  string : Int,
-) -> Int {
+  string : Int32,
+) -> Int32 {
   let val = read_u32_le(self.window, string)
   let hm = hash_update(val)
   let head = self.head.unsafe_get(hm)
@@ -391,8 +391,8 @@ fn DeflateStream::quick_insert_string(
 /// `string..string + count`, as far as four bytes of each are in the window.
 fn DeflateStream::insert_string(
   self : DeflateStream,
-  string : Int,
-  count : Int,
+  string : Int32,
+  count : Int32,
 ) -> Unit {
   let window = self.window
   // it can happen that insufficient bytes are initialized
@@ -433,9 +433,9 @@ fn DeflateStream::slide_hash(self : DeflateStream) -> Unit {
 /// total number of bytes read.
 fn DeflateStream::read_buf_window(
   self : DeflateStream,
-  offset : Int,
-  size : Int,
-) -> Int {
+  offset : Int32,
+  size : Int32,
+) -> Int32 {
   let len = @cmp.minimum(self.avail_in, size)
   if len == 0 {
     return 0
@@ -561,14 +561,14 @@ fn DeflateStream::flush_block_only(
 }
 
 ///|
-fn rank_flush(f : Int) -> Int {
+fn rank_flush(f : Int32) -> Int32 {
   // rank Z_BLOCK between Z_NO_FLUSH and Z_PARTIAL_FLUSH
   f * 2 - (if f > 4 { 9 } else { 0 })
 }
 
 ///|
 /// Upstream `algorithm::run`.
-fn DeflateStream::run(self : DeflateStream, flush : Int) -> BlockState {
+fn DeflateStream::run(self : DeflateStream, flush : Int32) -> BlockState {
   // Only the default strategy and `deflate_medium` levels are ported.
   self.deflate_medium(flush)
 }
@@ -576,7 +576,7 @@ fn DeflateStream::run(self : DeflateStream, flush : Int) -> BlockState {
 ///|
 /// Compresses as much data as possible, and stops when the input buffer
 /// becomes empty or the output buffer becomes full (upstream `deflate`).
-fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
+fn DeflateStream::deflate(self : DeflateStream, flush : Int32) -> Int32 {
   if self.status == STATUS_FINISH && flush != FLUSH_FINISH {
     return Z_STREAM_ERROR
   }
@@ -708,9 +708,9 @@ fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
 #valtype
 priv struct CompressResult {
   /// The return code.
-  ret : Int
+  ret : Int32
   /// The number of input bytes consumed.
-  consumed : Int
+  consumed : Int32
 }
 
 ///|
@@ -721,11 +721,11 @@ fn DeflateStream::compress(
   self : DeflateStream,
   view : BytesView,
   array : FixedArray[Byte]?,
-  off : Int,
-  len : Int,
+  off : Int32,
+  len : Int32,
   output : OutBuf,
-  avail_out : Int,
-  flush : Int,
+  avail_out : Int32,
+  flush : Int32,
 ) -> CompressResult {
   if array is Some(array) {
     guard off >= 0 && len >= 0 && off <= array.length() - len else {
@@ -754,7 +754,7 @@ fn DeflateStream::compress(
 /// A growable output byte buffer (upstream writes into a `Vec<u8>`).
 priv struct OutBuf {
   mut buf : FixedArray[Byte]
-  mut len : Int
+  mut len : Int32
 }
 
 ///|
@@ -767,8 +767,8 @@ fn OutBuf::new() -> OutBuf {
 fn OutBuf::append(
   self : OutBuf,
   src : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   if n > self.buf.length() - self.len {
     let cap = @cmp.maximum(

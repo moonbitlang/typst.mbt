@@ -13,7 +13,7 @@
 // - `Bytes` (font data) as the `u128` of `hash128` of the data (`LazyHash`).
 
 ///|
-fn hash_u16(h : @library.SipHasher128, v : UInt) -> Unit {
+fn hash_u16(h : @library.SipHasher128, v : UInt32) -> Unit {
   h.write_u8((v & 0xFF).to_byte())
   h.write_u8(((v >> 8) & 0xFF).to_byte())
 }

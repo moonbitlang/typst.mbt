@@ -5,7 +5,7 @@
 // `prev`/`next` (`Option<u32>`) use -1 for `None`.
 
 ///|
-let max_coeff_shift : Int = 6
+let max_coeff_shift : Int32 = 6
 
 ///|
 enum EdgeKind {
@@ -23,27 +23,27 @@ pub extend EdgeKind with Eq::{not_equal, equal}
 priv struct Edge {
   kind : EdgeKind
   // LineEdge. Imitate a linked list.
-  mut prev : Int
-  mut next : Int
-  mut x : Int // FDot16
-  mut dx : Int // FDot16
-  mut first_y : Int
-  mut last_y : Int
-  mut winding : Int // 1 or -1
+  mut prev : Int32
+  mut next : Int32
+  mut x : Int32 // FDot16
+  mut dx : Int32 // FDot16
+  mut first_y : Int32
+  mut last_y : Int32
+  mut winding : Int32 // 1 or -1
   // QuadraticEdge / CubicEdge.
-  mut curve_count : Int // i8
-  curve_shift : Int // applied to all dx/ddx/dddx
-  dshift : Int // applied to cdx and cdy (cubic only)
-  mut cx : Int
-  mut cy : Int
-  mut cdx : Int
-  mut cdy : Int
-  mut cddx : Int
-  mut cddy : Int
-  cdddx : Int // cubic only
-  cdddy : Int // cubic only
-  c_last_x : Int
-  c_last_y : Int
+  mut curve_count : Int32 // i8
+  curve_shift : Int32 // applied to all dx/ddx/dddx
+  dshift : Int32 // applied to cdx and cdy (cubic only)
+  mut cx : Int32
+  mut cy : Int32
+  mut cdx : Int32
+  mut cdy : Int32
+  mut cddx : Int32
+  mut cddy : Int32
+  cdddx : Int32 // cubic only
+  cdddy : Int32 // cubic only
+  c_last_x : Int32
+  c_last_y : Int32
 }
 
 ///|
@@ -75,7 +75,7 @@ fn Edge::line_default() -> Edge {
 
 ///|
 /// `LineEdge::new`.
-fn Edge::new_line(p0 : @path.Point, p1 : @path.Point, shift : Int) -> Edge? {
+fn Edge::new_line(p0 : @path.Point, p1 : @path.Point, shift : Int32) -> Edge? {
   let scale = Float::from_int(1 << (shift + 6))
   let mut x0 = f32_to_i32(p0.x * scale)
   let mut y0 = f32_to_i32(p0.y * scale)
@@ -118,10 +118,10 @@ fn Edge::is_vertical(self : Edge) -> Bool {
 /// `LineEdge::update`.
 fn Edge::update_line(
   self : Edge,
-  x0 : Int,
-  y0 : Int,
-  x1 : Int,
-  y1 : Int,
+  x0 : Int32,
+  y0 : Int32,
+  x1 : Int32,
+  y1 : Int32,
 ) -> Bool {
   let y0 = y0 >> 10
   let y1 = y1 >> 10
@@ -145,7 +145,7 @@ fn Edge::update_line(
 
 ///|
 /// `QuadraticEdge::new`.
-fn Edge::new_quadratic(points : ArrayView[@path.Point], shift : Int) -> Edge? {
+fn Edge::new_quadratic(points : ArrayView[@path.Point], shift : Int32) -> Edge? {
   guard Edge::new_quadratic2(points, shift) is Some(quad) else { return None }
   if quad.update_quadratic() {
     Some(quad)
@@ -155,7 +155,10 @@ fn Edge::new_quadratic(points : ArrayView[@path.Point], shift : Int) -> Edge? {
 }
 
 ///|
-fn Edge::new_quadratic2(points : ArrayView[@path.Point], shift : Int) -> Edge? {
+fn Edge::new_quadratic2(
+  points : ArrayView[@path.Point],
+  shift : Int32,
+) -> Edge? {
   let mut shift = shift
   let scale = Float::from_int(1 << (shift + 6))
   let mut x0 = f32_to_i32(points[0].x * scale)
@@ -288,7 +291,7 @@ fn Edge::update_quadratic(self : Edge) -> Bool {
 
 ///|
 /// `CubicEdge::new`.
-fn Edge::new_cubic(points : ArrayView[@path.Point], shift : Int) -> Edge? {
+fn Edge::new_cubic(points : ArrayView[@path.Point], shift : Int32) -> Edge? {
   guard Edge::new_cubic2(points, shift, true) is Some(cubic) else {
     return None
   }
@@ -302,7 +305,7 @@ fn Edge::new_cubic(points : ArrayView[@path.Point], shift : Int) -> Edge? {
 ///|
 fn Edge::new_cubic2(
   points : ArrayView[@path.Point],
-  shift : Int,
+  shift : Int32,
   sort_y : Bool,
 ) -> Edge? {
   let scale = Float::from_int(1 << (shift + 6))
@@ -447,12 +450,12 @@ fn Edge::update_cubic(self : Edge) -> Bool {
 
 ///|
 /// This correctly favors the lower-pixel when y0 is on a 1/2 pixel boundary
-fn compute_dy(top : Int, y0 : Int) -> Int {
+fn compute_dy(top : Int32, y0 : Int32) -> Int32 {
   left_shift(top, 6) + 32 - y0
 }
 
 ///|
-fn diff_to_shift(dx : Int, dy : Int, shift_aa : Int) -> Int {
+fn diff_to_shift(dx : Int32, dy : Int32, shift_aa : Int32) -> Int32 {
   // cheap calc of distance from center of p0-p2 to the center of the curve
   let mut dist = cheap_distance(dx, dy)
 
@@ -469,7 +472,7 @@ fn diff_to_shift(dx : Int, dy : Int, shift_aa : Int) -> Int {
 }
 
 ///|
-fn cheap_distance(dx : Int, dy : Int) -> Int {
+fn cheap_distance(dx : Int32, dy : Int32) -> Int32 {
   let dx = dx.abs()
   let dy = dy.abs()
   // return max + min/2
@@ -484,14 +487,14 @@ fn cheap_distance(dx : Int, dy : Int) -> Int {
 /// In LineEdge::new, QuadraticEdge::new, CubicEdge::new, the first thing we
 /// do is to convert the points into FDot6. This is modulated by the shift
 /// parameter, which will either be 0, or something like 2 for antialiasing.
-fn fdot6_to_fixed_div2(value : Int) -> Int {
+fn fdot6_to_fixed_div2(value : Int32) -> Int32 {
   // we want to return SkFDot6ToFixed(value >> 1), but we don't want to throw
   // away data in value, so just perform a modify up-shift
   left_shift(value, 16 - 6 - 1)
 }
 
 ///|
-fn fdot6_up_shift(x : Int, up_shift : Int) -> Int {
+fn fdot6_up_shift(x : Int32, up_shift : Int32) -> Int32 {
   left_shift(x, up_shift)
 }
 
@@ -503,7 +506,7 @@ fn fdot6_up_shift(x : Int, up_shift : Int) -> Int {
 /// f(2/3)-c = (a + 6b - 15c + 8d) / 27
 ///
 /// use 16/512 to approximate 1/27
-fn cubic_delta_from_line(a : Int, b : Int, c : Int, d : Int) -> Int {
+fn cubic_delta_from_line(a : Int32, b : Int32, c : Int32, d : Int32) -> Int32 {
   // since our parameters may be negative, we don't use <<
   let one_third = ((a * 8 - b * 15 + 6 * c + d) * 19) >> 9
   let two_third = ((a + 6 * b - c * 15 + d * 8) * 19) >> 9

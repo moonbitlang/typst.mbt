@@ -9,7 +9,7 @@ pub struct DocWorld {
   priv load : (@syntax.FileId) -> Bytes raise @library.FileError
   priv sources : Map[@syntax.FileId, @syntax.Source]
   priv book : @library.FontBook
-  priv font : (Int) -> @library.Font?
+  priv font : (Int32) -> @library.Font?
   priv today : (@library.Duration?) -> @library.Datetime?
 }
 
@@ -30,8 +30,8 @@ pub fn standard_library() -> @library.Library {
 pub fn DocWorld::new(
   load~ : (@syntax.FileId) -> Bytes raise @library.FileError,
   book~ : @library.FontBook,
-  font~ : (Int) -> @library.Font?,
-  today? : (@library.Duration?) -> @library.Datetime? = _ => None,
+  font~ : (Int32) -> @library.Font?,
+  today~ : (@library.Duration?) -> @library.Datetime? = _ => None,
 ) -> DocWorld {
   { library: standard_library(), load, sources: Map([]), book, font, today, }
 }
@@ -80,10 +80,10 @@ pub fn sans_fonts() -> Array[(@library.Font, @library.FontInfo)] {
 /// the Typst fonts (`typst_fonts`) and, by name only, IBM Plex Sans
 /// (`sans_fonts`); `today` is the date as `(year, month, day)`.
 pub fn DocWorld::in_memory(
-  files? : Map[String, Bytes] = {},
-  fonts? : Array[Bytes] = [],
-  embedded_fonts? : Bool = true,
-  today? : (Int, Int, Int),
+  files~ : Map[String, Bytes] = {},
+  fonts~ : Array[Bytes] = [],
+  embedded_fonts~ : Bool = true,
+  today? : (Int32, Int32, Int32),
 ) -> DocWorld {
   let all : Array[@library.Font] = []
   for data in fonts {

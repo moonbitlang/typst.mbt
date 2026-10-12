@@ -8,12 +8,12 @@ struct ShapePlan {
   shaper : OtShaper
   ot_map : OtMap
   mut data : ShaperData
-  frac_mask : UInt
-  numr_mask : UInt
-  dnom_mask : UInt
-  rtlm_mask : UInt
-  kern_mask : UInt
-  trak_mask : UInt
+  frac_mask : UInt32
+  numr_mask : UInt32
+  dnom_mask : UInt32
+  rtlm_mask : UInt32
+  kern_mask : UInt32
+  trak_mask : UInt32
   requested_kerning : Bool
   has_frac : Bool
   has_vert : Bool

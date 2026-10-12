@@ -7,18 +7,18 @@
 priv struct Blocks {
   out : StringBuilder
   prefix : String
-  count : Int
+  count : Int32
   block : StringBuilder
-  mut start : Int
+  mut start : Int32
 }
 
 ///|
-fn Blocks::new(out : StringBuilder, prefix : String, count : Int) -> Blocks {
+fn Blocks::new(out : StringBuilder, prefix : String, count : Int32) -> Blocks {
   { out, prefix, count, block: StringBuilder(), start: 0, }
 }
 
 ///|
-fn Blocks::push(self : Blocks, gid : Int, line : String) -> Unit {
+fn Blocks::push(self : Blocks, gid : Int32, line : String) -> Unit {
   if is_sample(gid, self.count) {
     self.out.write_string("\{self.prefix} \{gid} \{line}\n")
   }

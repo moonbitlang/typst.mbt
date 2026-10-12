@@ -2,7 +2,9 @@
 
 ///|
 /// (name, kind, root, path, stream_len, stream_fnv, out_len, out_fnv)
-let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = [
+let cases : Array[
+  (String, String, String, String, Int32, UInt64, Int32, UInt64),
+] = [
   (
     "FoxitDingbats.pfb.cff", "cff", "assets", "fonts/FoxitDingbats.pfb", -1, 0x0000000000000000UL,
     238321, 0x2fb7999bfbb0a660UL,

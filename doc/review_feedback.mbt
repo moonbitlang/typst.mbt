@@ -22,15 +22,15 @@ pub struct FeedbackOrigin {
   /// the source that spell the selected text (the argument is a literal,
   /// and it is the text on the page). 2: the argument as a whole. 1: the
   /// constructor call.
-  tier : Int
+  tier : Int32
   /// Why the location is not narrower (empty for tier 3).
   why : String
   source_ranges : Array[SourceSpan]
   /// Lines of the source file (number and text): those of the source
   /// characters, or else of the location; at most six. `more` lines were
   /// left out. Empty if the source file was not read.
-  excerpt : Array[(Int, String)]
-  more : Int
+  excerpt : Array[(Int32, String)]
+  more : Int32
 }
 
 ///|
@@ -42,7 +42,7 @@ pub struct Feedback {
   /// The selected text as it is rendered (empty for a shape or an image).
   selected_text : String
   /// The pages of the selection, from 1.
-  pages : Array[Int]
+  pages : Array[Int32]
   /// The origins of the selection, each once, in reading order.
   origins : Array[FeedbackOrigin]
 }
@@ -54,19 +54,19 @@ pub fn ReviewText::feedback(
   selection : Selection,
   comment : String,
 ) -> Feedback {
-  let pages : Array[Int] = []
+  let pages : Array[Int32] = []
   // Per origin, in the order of first use: the texts of its pieces, its
   // own text, and the last word that was added to it.
-  let order : Array[Int] = []
-  let found : Map[Int, (Array[StringBuilder], StringBuilder, Int)] = Map([])
+  let order : Array[Int32] = []
+  let found : Map[Int32, (Array[StringBuilder], StringBuilder, Int32)] = Map([])
   // The selected words of each origin.
-  let chosen : Map[Int, Array[Int]] = Map([])
+  let chosen : Map[Int32, Array[Int32]] = Map([])
   // Per piece: its place among the pieces of its origin, and its last
   // word.
-  let places : Map[Int, (Int, Int)] = Map([])
+  let places : Map[Int32, (Int32, Int32)] = Map([])
   // What joins a word to the text it continues: nothing if it touches the
   // word before it, a gap if other words are between.
-  let joint = (last : Int, i : Int, word : Word) => {
+  let joint = (last : Int32, i : Int32, word : Word) => {
     if last != i - 1 {
       " … "
     } else if word.space {
@@ -138,10 +138,10 @@ pub fn ReviewText::feedback(
 /// its source says for the selected words `words`.
 fn ReviewText::origin_entry(
   self : ReviewText,
-  id : Int,
+  id : Int32,
   pieces : Array[String],
   rendered : String,
-  words : Array[Int],
+  words : Array[Int32],
 ) -> FeedbackOrigin {
   let info = self.infos[id]
   let source_ranges = self.spans(id, words)
@@ -164,7 +164,7 @@ fn ReviewText::origin_entry(
 pub fn ReviewText::origin_feedback(
   self : ReviewText,
   origin : Origin,
-  page : Int,
+  page : Int32,
   comment : String,
 ) -> Feedback {
   let entry = match self.origin_number(origin) {
@@ -198,7 +198,7 @@ pub fn ReviewText::origin_feedback(
 ///|
 /// The number of an origin in the table, by what the table tells apart.
 /// `None` for an origin that is not of this document's page layers.
-fn ReviewText::origin_number(self : ReviewText, origin : Origin) -> Int? {
+fn ReviewText::origin_number(self : ReviewText, origin : Origin) -> Int32? {
   self.origins.search_by(o => {
     o.file == origin.file &&
     o.module_name == origin.module_name &&
@@ -239,7 +239,7 @@ const FEEDBACK_FORMAT : String = "typst.mbt review feedback 2"
 /// (left out for tier 3) says why it is not narrower. `excerpt_more` is
 /// left out if the excerpt is complete.
 pub fn Feedback::to_json(self : Feedback) -> Json {
-  let int = (n : Int) => Json::number(n.to_double())
+  let int = (n : Int32) => Json::number(n.to_double())
   let fields : Map[String, Json] = Map([])
   fields["format"] = Json::string(FEEDBACK_FORMAT)
   fields["document"] = Json::string(self.document)
@@ -416,9 +416,9 @@ pub fn Feedback::to_text(self : Feedback) -> String {
 /// has runs that overlap in the source.
 fn FeedbackOrigin::marks(
   self : FeedbackOrigin,
-  line : Int,
-) -> Array[(Int, Int)] {
-  let ranges : Array[(Int, Int)] = []
+  line : Int32,
+) -> Array[(Int32, Int32)] {
+  let ranges : Array[(Int32, Int32)] = []
   for span in self.source_ranges {
     if span.line == line && span.end > span.start {
       ranges.push((span.start, span.end))
@@ -432,7 +432,7 @@ fn FeedbackOrigin::marks(
     ranges.push((origin.start_column, origin.end_column))
   }
   ranges.sort_by((a, b) => a.0.compare(b.0))
-  let out : Array[(Int, Int)] = []
+  let out : Array[(Int32, Int32)] = []
   for range in ranges {
     match out.last() {
       Some(last) if range.0 <= last.1 =>

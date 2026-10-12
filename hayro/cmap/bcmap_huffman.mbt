@@ -4,9 +4,9 @@
 priv enum HuffmanNode {
   /// Intermediate node with optional children (indices of the zero- and
   /// one-child).
-  Intermediate(Int?, Int?)
+  Intermediate(Int32?, Int32?)
   /// Leaf node holding a decoded symbol value.
-  Leaf(UInt)
+  Leaf(UInt32)
 }
 
 ///|
@@ -17,7 +17,7 @@ struct HuffmanTable {
 
 ///|
 /// Decode a single symbol from the bit reader.
-fn HuffmanTable::decode(self : HuffmanTable, reader : BReader) -> UInt? {
+fn HuffmanTable::decode(self : HuffmanTable, reader : BReader) -> UInt32? {
   let mut idx = 0
   while true {
     match self.nodes[idx] {
@@ -36,10 +36,10 @@ fn HuffmanTable::decode(self : HuffmanTable, reader : BReader) -> UInt? {
 ///|
 fn insert_code(
   nodes : Array[HuffmanNode],
-  node_index : Int,
-  code : UInt,
-  length : Int,
-  symbol : UInt,
+  node_index : Int32,
+  code : UInt32,
+  length : Int32,
+  symbol : UInt32,
 ) -> Unit {
   if length == 0 {
     nodes[node_index] = Leaf(symbol)
@@ -72,8 +72,8 @@ fn insert_code(
 
 ///|
 fn HuffmanTable::build(
-  code_lengths : Array[Int],
-  symbols : Array[UInt],
+  code_lengths : Array[Int32],
+  symbols : Array[UInt32],
 ) -> HuffmanTable {
   if symbols.length() == 0 {
     return { nodes: [Intermediate(None, None)], }
@@ -123,7 +123,7 @@ fn decode_tables(data : BytesView) -> (HuffmanTable, HuffmanTable)? {
 ///|
 fn decode_single_table(
   reader : BReader,
-  read_sym : (BReader) -> UInt?,
+  read_sym : (BReader) -> UInt32?,
 ) -> HuffmanTable? {
   guard reader.read_u16() is Some(n_symbols) else { return None }
   if n_symbols == 0 {

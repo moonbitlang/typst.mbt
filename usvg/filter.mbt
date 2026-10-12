@@ -210,7 +210,7 @@ fn find_filter_with_primitives(node : SvgNode) -> SvgNode? {
 ///|
 priv struct FilterResults {
   names : Set[String]
-  mut idx : Int
+  mut idx : Int32
 }
 
 ///|
@@ -581,13 +581,13 @@ fn convert_composite(fe : SvgNode, primitives : Array[Primitive]) -> FilterKind 
 
 ///|
 /// Rust's saturating `f32 as i32` cast.
-fn f32_as_i32(x : Float) -> Int {
+fn f32_as_i32(x : Float) -> Int32 {
   x.to_int()
 }
 
 ///|
 /// Rust's saturating `f64 as i32` cast.
-fn f64_as_i32(x : Double) -> Int {
+fn f64_as_i32(x : Double) -> Int32 {
   if x.is_nan() {
     0
   } else if x >= 2147483647.0 {
@@ -601,7 +601,7 @@ fn f64_as_i32(x : Double) -> Int {
 
 ///|
 /// Rust's saturating `f32 as u32` cast.
-fn f32_as_u32(x : Float) -> UInt {
+fn f32_as_u32(x : Float) -> UInt32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 4294967295.0 {
@@ -616,7 +616,7 @@ fn convert_convolve_matrix(
   fe : SvgNode,
   primitives : Array[Primitive],
 ) -> FilterKind? {
-  fn parse_target(target : Float?, order : UInt) -> UInt? {
+  fn parse_target(target : Float?, order : UInt32) -> UInt32? {
     let default_target = f32_as_u32((Float::from_uint(order) / 2.0).floor())
     let target = f32_as_i32(target.unwrap_or(Float::from_uint(default_target)))
     if target < 0 || target >= order.reinterpret_as_int() {
@@ -626,8 +626,8 @@ fn convert_convolve_matrix(
     }
   }
 
-  let mut order_x : UInt = 3
-  let mut order_y : UInt = 3
+  let mut order_x : UInt32 = 3
+  let mut order_y : UInt32 = 3
   let value : String? = fe.attribute(AId::Order)
   if value is Some(value) {
     let s = @svgtypes.NumberListParser::from(value)

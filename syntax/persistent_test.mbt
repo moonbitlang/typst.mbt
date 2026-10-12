@@ -62,7 +62,7 @@ fn write_diagnostic(
 /// warnings with their hints; the hash of the tree.
 fn snapshot(node : @syntax.SyntaxNode) -> String {
   let buf = StringBuilder()
-  fn go(node : @syntax.SyntaxNode, depth : Int) {
+  fn go(node : @syntax.SyntaxNode, depth : Int32) {
     for _ in 0..<depth {
       buf.write_string("  ")
     }
@@ -169,7 +169,7 @@ fn hold_all(source : @syntax.Source) -> Array[Held] {
 
 ///|
 /// The UTF-8 offset of the first occurrence of `needle`.
-fn offset_of(text : String, needle : String) -> Int {
+fn offset_of(text : String, needle : String) -> Int32 {
   guard text.find(needle) is Some(i) else { abort("no \{needle} in the text") }
   @syntax.utf8_len(text.unsafe_substring(start=0, end=i))
 }

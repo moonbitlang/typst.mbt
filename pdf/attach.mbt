@@ -86,7 +86,7 @@ fn valid_mime_type(mime_type : String) -> Bool {
 }
 
 ///|
-fn has_prefix(data : Bytes, prefix : Array[Int]) -> Bool {
+fn has_prefix(data : Bytes, prefix : Array[Int32]) -> Bool {
   if data.length() < prefix.length() {
     return false
   }

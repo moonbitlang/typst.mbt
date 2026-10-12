@@ -2,27 +2,27 @@
 
 ///|
 /// W-inding bit
-const W_BIT : UInt = 0b10000
+const W_BIT : UInt32 = 0b10000
 
 ///|
 /// Shift amount corresponding to the winding bit.
-const WINDING_SHIFT : Int = 4
+const WINDING_SHIFT : Int32 = 4
 
 ///|
 /// Shift amount corresponding to the intersection bits.
-const INT_MASK_SHIFT : Int = 5
+const INT_MASK_SHIFT : Int32 = 5
 
 ///|
 /// The max number of lines per path.
-const MAX_LINES_PER_PATH : Int = 134217728
+const MAX_LINES_PER_PATH : Int32 = 134217728
 
 ///|
 /// The width of a tile in pixels.
-const TILE_WIDTH : Int = 4
+const TILE_WIDTH : Int32 = 4
 
 ///|
 /// The height of a tile in pixels.
-const TILE_HEIGHT : Int = 4
+const TILE_HEIGHT : Int32 = 4
 
 // A tile represents an aligned area on the pixmap (4x4). Tiles are stored as
 // their `u64` representation `(y << 48) | (x << 32) | packed_winding_line_idx`
@@ -34,10 +34,10 @@ const TILE_SENTINEL : UInt64 = 0xFFFFFFFF00000000
 
 ///|
 fn tile_new(
-  x : Int,
-  y : Int,
-  line_idx : Int,
-  intersection_mask : UInt,
+  x : Int32,
+  y : Int32,
+  line_idx : Int32,
+  intersection_mask : UInt32,
 ) -> UInt64 {
   (y.to_uint64() << 48) |
   (x.to_uint64() << 32) |
@@ -48,10 +48,10 @@ fn tile_new(
 /// Create a new tile, clamping `x` and `y` to the largest possible
 /// coordinate.
 fn tile_new_clamped(
-  x : Int,
-  y : Int,
-  line_idx : Int,
-  intersection_mask : UInt,
+  x : Int32,
+  y : Int32,
+  line_idx : Int32,
+  intersection_mask : UInt32,
 ) -> UInt64 {
   tile_new(
     if x < 65535 / TILE_WIDTH {
@@ -70,17 +70,17 @@ fn tile_new_clamped(
 }
 
 ///|
-fn tile_x(t : UInt64) -> Int {
+fn tile_x(t : UInt64) -> Int32 {
   ((t >> 32) & 0xFFFF).to_int()
 }
 
 ///|
-fn tile_y(t : UInt64) -> Int {
+fn tile_y(t : UInt64) -> Int32 {
   (t >> 48).to_int()
 }
 
 ///|
-fn tile_line_idx(t : UInt64) -> Int {
+fn tile_line_idx(t : UInt64) -> Int32 {
   ((t & 0xFFFFFFFF).to_uint() >> INT_MASK_SHIFT).reinterpret_as_int()
 }
 
@@ -112,15 +112,15 @@ priv struct CulledWindings {
   /// (`Tile::HEIGHT` floats per row).
   partial : FixedArray[Float]
   /// Accumulated integer winding deltas for each tile row (`i16`).
-  coarse : FixedArray[Int]
+  coarse : FixedArray[Int32]
   /// Bitmask tracking which rows contain active geometry or winding data.
-  active : FixedArray[UInt]
+  active : FixedArray[UInt32]
   /// Flag indicating if any geometry was early-culled outside the viewport.
   mut culled : Bool
 }
 
 ///|
-fn CulledWindings::new(height : Int) -> CulledWindings {
+fn CulledWindings::new(height : Int32) -> CulledWindings {
   let num_rows = div_ceil(height, TILE_HEIGHT)
   let num_bits = div_ceil(num_rows, 32)
   {
@@ -146,8 +146,8 @@ fn CulledWindings::reset(self : CulledWindings) -> Unit {
 /// `i16 += i16` (wrapping).
 fn CulledWindings::add_coarse(
   self : CulledWindings,
-  row : Int,
-  d : Int,
+  row : Int32,
+  d : Int32,
 ) -> Unit {
   let v = (self.coarse[row] + d) & 0xFFFF
   self.coarse[row] = if v >= 0x8000 { v - 0x10000 } else { v }
@@ -157,7 +157,7 @@ fn CulledWindings::add_coarse(
 /// Marks if a row was culled early for faster traversal in strip generation.
 fn CulledWindings::mark_row_active(
   self : CulledWindings,
-  row_idx : Int,
+  row_idx : Int32,
 ) -> Unit {
   self.active[row_idx >> 5] = self.active[row_idx >> 5] | (1U << (row_idx & 31))
 }
@@ -166,8 +166,8 @@ fn CulledWindings::mark_row_active(
 /// Bulk marks a range of rows as active [`start_row`, `end_row`).
 fn CulledWindings::mark_row_range_active(
   self : CulledWindings,
-  start_row : Int,
-  end_row : Int,
+  start_row : Int32,
+  end_row : Int32,
 ) -> Unit {
   if start_row >= end_row {
     return
@@ -199,16 +199,16 @@ fn CulledWindings::mark_row_range_active(
 /// Calls `f` on active rows in the range [`start`, `end`).
 fn CulledWindings::for_active_rows_in_range(
   self : CulledWindings,
-  start : Int,
-  end : Int,
-  f : (Int) -> Unit,
+  start : Int32,
+  end : Int32,
+  f : (Int32) -> Unit,
 ) -> Unit {
   if start >= end {
     return
   }
   let start_word = start >> 5
   let end_word = (end - 1) >> 5
-  let process_word = (word : UInt, word_idx : Int) => {
+  let process_word = (word : UInt32, word_idx : Int32) => {
     let mut word = word
     while word != 0 {
       let bit = word.ctz()
@@ -248,12 +248,12 @@ priv struct Tiles {
 }
 
 ///|
-fn Tiles::new(height : Int) -> Tiles {
+fn Tiles::new(height : Int32) -> Tiles {
   { tile_buf: [], sorted: false, windings: CulledWindings::new(height), }
 }
 
 ///|
-fn Tiles::len(self : Tiles) -> Int {
+fn Tiles::len(self : Tiles) -> Int32 {
   self.tile_buf.length()
 }
 
@@ -281,7 +281,7 @@ fn Tiles::sort_tiles(self : Tiles) -> Unit {
 }
 
 ///|
-fn Tiles::get(self : Tiles, index : Int) -> UInt64 {
+fn Tiles::get(self : Tiles, index : Int32) -> UInt64 {
   guard self.sorted else {
     abort("attempted to call `get` before sorting the tile container.")
   }
@@ -293,7 +293,7 @@ fn Tiles::get(self : Tiles, index : Int) -> UInt64 {
 /// (`calc_fractional_coverage!` followed by the `mul_add` into the row).
 fn CulledWindings::add_partial(
   self : CulledWindings,
-  y_idx : Int,
+  y_idx : Int32,
   segment_top_y : Float,
   segment_bottom_y : Float,
   f_dir : Float,
@@ -321,8 +321,8 @@ fn CulledWindings::add_partial(
 fn Tiles::make_tiles_analytic_aa(
   self : Tiles,
   lines : Array[Line],
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> Bool {
   self.reset()
   if width == 0 || height == 0 {
@@ -436,17 +436,17 @@ fn Tiles::make_tiles_analytic_aa(
         let dx = p1_x - p0_x
         let dy = p1_y - p0_y
         let x_slope = dx / dy
-        let dx_dir : UInt = if line_bottom_x >= line_top_x { 1 } else { 0 }
+        let dx_dir : UInt32 = if line_bottom_x >= line_top_x { 1 } else { 0 }
         let not_dx_dir = dx_dir ^ 1
         let w_start_base = dx_dir << WINDING_SHIFT
         let w_end_base = not_dx_dir << WINDING_SHIFT
         let push_row_extents = (
-          y_idx : Int,
+          y_idx : Int32,
           row_left_x : Float,
           row_right_x : Float,
-          w_start : UInt,
-          w_end : UInt,
-          w_single : UInt,
+          w_start : UInt32,
+          w_end : UInt32,
+          w_single : UInt32,
         ) => {
           let x_start = f32_as_u16(row_left_x)
           let x_end = min_int(f32_as_u16(row_right_x), tile_columns - 1)
@@ -462,12 +462,12 @@ fn Tiles::make_tiles_analytic_aa(
           }
         }
         let push_row = (
-          y_idx : Int,
+          y_idx : Int32,
           row_top_y : Float,
           row_bottom_y : Float,
-          w_start : UInt,
-          w_end : UInt,
-          w_single : UInt,
+          w_start : UInt32,
+          w_end : UInt32,
+          w_single : UInt32,
         ) => {
           let row_top_x = p0_x + (row_top_y - p0_y) * x_slope
           let row_bottom_x = p0_x + (row_bottom_y - p0_y) * x_slope
@@ -526,7 +526,7 @@ fn Tiles::make_tiles_analytic_aa(
             } else {
               p0_x + (row_bottom_y - p0_y) * x_slope
             }
-            let mask : UInt = if y >= line_top_y { W_BIT } else { 0 }
+            let mask : UInt32 = if y >= line_top_y { W_BIT } else { 0 }
             push_row_extents(
               y_top_tiles,
               fminnm(line_top_x, row_bottom_x),
@@ -566,7 +566,7 @@ fn Tiles::make_tiles_analytic_aa(
           if !is_start_culled {
             let y = Float::from_int(y_top_tiles)
             let row_bottom_y = fminnm(y + 1.0, line_bottom_y)
-            let mask : UInt = if y >= line_top_y { W_BIT } else { 0 }
+            let mask : UInt32 = if y >= line_top_y { W_BIT } else { 0 }
             push_row(
               y_top_tiles,
               line_top_y,
@@ -606,7 +606,7 @@ fn Tiles::make_tiles_analytic_aa(
 }
 
 ///|
-fn min_int(a : Int, b : Int) -> Int {
+fn min_int(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {
@@ -615,7 +615,7 @@ fn min_int(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn max_int(a : Int, b : Int) -> Int {
+fn max_int(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a
   } else {

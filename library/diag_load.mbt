@@ -192,9 +192,9 @@ fn pop_char(s : String) -> String {
 /// A position in a text document at which an error was reported.
 pub(all) enum ReportTextPos {
   /// Contains a range, and a line/column pair.
-  Full(Int, Int, LineCol)
+  Full(Int32, Int32, LineCol)
   /// Contains a range.
-  Range(Int, Int)
+  Range(Int32, Int32)
   /// Contains a line/column pair.
   LineCol(LineCol)
   /// No position (upstream `ReportTextPos::None`, renamed to avoid clashing
@@ -220,8 +220,8 @@ pub extend ReportTextPos with @debug.Debug::{to_repr}
 ///|
 /// Creates a position from a pre-existing range and line-column pair.
 pub fn ReportTextPos::full(
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   pair : LineCol,
 ) -> ReportTextPos {
   Full(start, end, pair)
@@ -232,7 +232,7 @@ pub fn ReportTextPos::full(
 fn ReportTextPos::range(
   self : ReportTextPos,
   lines : @syntax.Lines,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   match self {
     Full(start, end, _) => Some((start, end))
     Range(start, end) => Some((start, end))
@@ -279,9 +279,9 @@ fn ReportTextPos::try_line_col(self : ReportTextPos, bytes : Bytes) -> LineCol? 
 /// A line/column pair.
 pub(all) struct LineCol {
   /// The 0-based line.
-  line : Int
+  line : Int32
   /// The 0-based column.
-  col : Int
+  col : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -301,18 +301,18 @@ pub extend LineCol with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs the line/column pair from 0-based indices.
-pub fn LineCol::zero_based(line : Int, col : Int) -> LineCol {
+pub fn LineCol::zero_based(line : Int32, col : Int32) -> LineCol {
   { line, col, }
 }
 
 ///|
 /// Constructs the line/column pair from 1-based numbers.
-pub fn LineCol::one_based(line : Int, col : Int) -> LineCol {
+pub fn LineCol::one_based(line : Int32, col : Int32) -> LineCol {
   LineCol::zero_based(saturating_sub1(line), saturating_sub1(col))
 }
 
 ///|
-fn saturating_sub1(x : Int) -> Int {
+fn saturating_sub1(x : Int32) -> Int32 {
   if x > 0 {
     x - 1
   } else {
@@ -322,7 +322,7 @@ fn saturating_sub1(x : Int) -> Int {
 
 ///|
 /// Try to compute a line/column pair from possibly invalid UTF-8 data.
-pub fn LineCol::try_from_byte_pos(pos : Int, bytes : Bytes) -> LineCol? {
+pub fn LineCol::try_from_byte_pos(pos : Int32, bytes : Bytes) -> LineCol? {
   let pos = if pos > bytes.length() { bytes.length() } else { pos }
   let mut line = 0
   let mut last_newline = -1
@@ -341,13 +341,13 @@ pub fn LineCol::try_from_byte_pos(pos : Int, bytes : Bytes) -> LineCol? {
 
 ///|
 /// Returns the 0-based line/column indices.
-pub fn LineCol::indices(self : LineCol) -> (Int, Int) {
+pub fn LineCol::indices(self : LineCol) -> (Int32, Int32) {
   (self.line, self.col)
 }
 
 ///|
 /// Returns the 1-based line/column numbers.
-pub fn LineCol::numbers(self : LineCol) -> (Int, Int) {
+pub fn LineCol::numbers(self : LineCol) -> (Int32, Int32) {
   (self.line + 1, self.col + 1)
 }
 
@@ -355,10 +355,10 @@ pub fn LineCol::numbers(self : LineCol) -> (Int, Int) {
 /// A UTF-8 decoding error (upstream `std::str::Utf8Error`).
 pub(all) struct Utf8Error {
   /// The index up to which valid UTF-8 was verified.
-  valid_up_to : Int
+  valid_up_to : Int32
   /// The length of the invalid byte sequence, or `None` if the end of the
   /// input was reached unexpectedly.
-  error_len : Int?
+  error_len : Int32?
 } derive(Eq, Debug)
 
 ///|
@@ -391,7 +391,7 @@ pub fn validate_utf8(bytes : BytesView) -> Utf8Error? {
     } else {
       0
     }
-    let err = fn(len : Int?) { Some({ valid_up_to: i, error_len: len, }) }
+    let err = fn(len : Int32?) { Some({ valid_up_to: i, error_len: len, }) }
     if width == 0 {
       return err(Some(1))
     }
@@ -452,7 +452,7 @@ pub fn bytes_as_str(bytes : BytesView) -> String raise LoadErr {
 ///|
 /// Count the characters of `bytes[start..end]`, counting each maximal
 /// invalid subsequence as one item (upstream `ErrorReportingUtf8Chars`).
-fn count_utf8_chars_lossy(bytes : Bytes, start : Int, end : Int) -> Int {
+fn count_utf8_chars_lossy(bytes : Bytes, start : Int32, end : Int32) -> Int32 {
   let mut count = 0
   let mut i = start
   while i < end {

@@ -26,7 +26,11 @@ pub extend Datetime with Hash::{hash, hash_combine}
 
 ///|
 /// Create a datetime from year, month, and day.
-pub fn Datetime::from_ymd(year : Int, month : Int, day : Int) -> Datetime? {
+pub fn Datetime::from_ymd(
+  year : Int32,
+  month : Int32,
+  day : Int32,
+) -> Datetime? {
   guard @time.Month::try_from_u8(month) is Some(month) else { return None }
   let date = @time.Date::from_calendar_date(year, month, day) catch {
     _ => return None
@@ -36,7 +40,11 @@ pub fn Datetime::from_ymd(year : Int, month : Int, day : Int) -> Datetime? {
 
 ///|
 /// Create a datetime from hour, minute, and second.
-pub fn Datetime::from_hms(hour : Int, minute : Int, second : Int) -> Datetime? {
+pub fn Datetime::from_hms(
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
+) -> Datetime? {
   let time = @time.Time::from_hms(hour, minute, second) catch {
     _ => return None
   }
@@ -46,12 +54,12 @@ pub fn Datetime::from_hms(hour : Int, minute : Int, second : Int) -> Datetime? {
 ///|
 /// Create a datetime from day and time.
 pub fn Datetime::from_ymd_hms(
-  year : Int,
-  month : Int,
-  day : Int,
-  hour : Int,
-  minute : Int,
-  second : Int,
+  year : Int32,
+  month : Int32,
+  day : Int32,
+  hour : Int32,
+  minute : Int32,
+  second : Int32,
 ) -> Datetime? {
   guard @time.Month::try_from_u8(month) is Some(month) else { return None }
   let date = @time.Date::from_calendar_date(year, month, day) catch {
@@ -102,7 +110,7 @@ fn toml_parse_datetime(
   s : String,
   _with_t : Bool,
   with_z : Bool,
-) -> (Int, Int, Int, Int, Int, Int)? {
+) -> (Int32, Int32, Int32, Int32, Int32, Int32)? {
   guard toml_parse_date(s, 0) is Some(((y, mo, d), i)) else { return None }
   guard i < s.length() && s.code_unit_at(i).to_int() == 'T'.to_int() else {
     return None
@@ -130,7 +138,7 @@ fn toml_parse_datetime(
 
 ///|
 /// Parses `n` ASCII digits starting at `i`.
-fn toml_digits(s : String, i : Int, n : Int) -> Int? {
+fn toml_digits(s : String, i : Int32, n : Int32) -> Int32? {
   if i + n > s.length() {
     return None
   }
@@ -148,7 +156,10 @@ fn toml_digits(s : String, i : Int, n : Int) -> Int? {
 ///|
 /// Parses `[year]-[month]-[day]` (a four digit year with optional sign, a
 /// two digit month and day), returning the end index.
-fn toml_parse_date(s : String, start : Int) -> ((Int, Int, Int), Int)? {
+fn toml_parse_date(
+  s : String,
+  start : Int32,
+) -> ((Int32, Int32, Int32), Int32)? {
   let mut i = start
   let mut sign = 1
   if i < s.length() {
@@ -182,7 +193,10 @@ fn toml_parse_date(s : String, start : Int) -> ((Int, Int, Int), Int)? {
 ///|
 /// Parses `[hour]:[minute]:[second]` (two digits each), returning the end
 /// index.
-fn toml_parse_time(s : String, start : Int) -> ((Int, Int, Int), Int)? {
+fn toml_parse_time(
+  s : String,
+  start : Int32,
+) -> ((Int32, Int32, Int32), Int32)? {
   let mut i = start
   guard toml_digits(s, i, 2) is Some(hour) else { return None }
   i += 2
@@ -359,7 +373,7 @@ fn impl_datetime_display__pattern_default() -> SmartDisplayPattern {
 
 ///|
 /// The year if it was specified, or `{none}` for times without a date.
-pub fn Datetime::year(self : Datetime) -> Int? {
+pub fn Datetime::year(self : Datetime) -> Int32? {
   match self {
     Date(date) => Some(date.year())
     Time(_) => None
@@ -369,7 +383,7 @@ pub fn Datetime::year(self : Datetime) -> Int? {
 
 ///|
 /// The month if it was specified, or `{none}` for times without a date.
-pub fn Datetime::month(self : Datetime) -> Int? {
+pub fn Datetime::month(self : Datetime) -> Int32? {
   match self {
     Date(date) => Some(date.month().number())
     Time(_) => None
@@ -379,7 +393,7 @@ pub fn Datetime::month(self : Datetime) -> Int? {
 
 ///|
 /// The weekday (counting Monday as 1) or `{none}` for times without a date.
-pub fn Datetime::weekday(self : Datetime) -> Int? {
+pub fn Datetime::weekday(self : Datetime) -> Int32? {
   match self {
     Date(date) => Some(date.weekday().number_from_monday())
     Time(_) => None
@@ -389,7 +403,7 @@ pub fn Datetime::weekday(self : Datetime) -> Int? {
 
 ///|
 /// The day if it was specified, or `{none}` for times without a date.
-pub fn Datetime::day(self : Datetime) -> Int? {
+pub fn Datetime::day(self : Datetime) -> Int32? {
   match self {
     Date(date) => Some(date.day())
     Time(_) => None
@@ -399,7 +413,7 @@ pub fn Datetime::day(self : Datetime) -> Int? {
 
 ///|
 /// The hour if it was specified, or `{none}` for dates without a time.
-pub fn Datetime::hour(self : Datetime) -> Int? {
+pub fn Datetime::hour(self : Datetime) -> Int32? {
   match self {
     Date(_) => None
     Time(time) => Some(time.hour())
@@ -409,7 +423,7 @@ pub fn Datetime::hour(self : Datetime) -> Int? {
 
 ///|
 /// The minute if it was specified, or `{none}` for dates without a time.
-pub fn Datetime::minute(self : Datetime) -> Int? {
+pub fn Datetime::minute(self : Datetime) -> Int32? {
   match self {
     Date(_) => None
     Time(time) => Some(time.minute())
@@ -419,7 +433,7 @@ pub fn Datetime::minute(self : Datetime) -> Int? {
 
 ///|
 /// The second if it was specified, or `{none}` for dates without a time.
-pub fn Datetime::second(self : Datetime) -> Int? {
+pub fn Datetime::second(self : Datetime) -> Int32? {
   match self {
     Date(_) => None
     Time(time) => Some(time.second())
@@ -429,7 +443,7 @@ pub fn Datetime::second(self : Datetime) -> Int? {
 
 ///|
 /// The ordinal (day of the year), or `{none}` for times without a date.
-pub fn Datetime::ordinal(self : Datetime) -> Int? {
+pub fn Datetime::ordinal(self : Datetime) -> Int32? {
   match self {
     Datetime(datetime) => Some(datetime.ordinal())
     Date(date) => Some(date.ordinal())
@@ -481,7 +495,7 @@ fn impl_datetime_ordinal(self_ : Datetime) -> U16? {
 /// Upstream `Repr for Datetime`.
 pub fn Datetime::repr(self : Datetime) -> String {
   let filtered = []
-  let push = (name : String, v : Int?) => {
+  let push = (name : String, v : Int32?) => {
     if v is Some(v) {
       filtered.push("\{name}: \{repr_int(v.to_int64())}")
     }
@@ -498,7 +512,7 @@ pub fn Datetime::repr(self : Datetime) -> String {
 ///|
 /// Upstream `PartialOrd for Datetime`: only datetimes of the same kind can be
 /// compared.
-pub fn Datetime::partial_cmp(self : Datetime, other : Datetime) -> Int? {
+pub fn Datetime::partial_cmp(self : Datetime, other : Datetime) -> Int32? {
   match (self, other) {
     (Datetime(a), Datetime(b)) => Some(a.compare(b))
     (Date(a), Date(b)) => Some(a.compare(b))

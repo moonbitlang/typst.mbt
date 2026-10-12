@@ -24,7 +24,7 @@ pub extend PlatformId with Eq::{not_equal, equal}
 pub extend PlatformId with @debug.Debug::{to_repr}
 
 ///|
-pub fn PlatformId::new(raw : Int) -> PlatformId {
+pub fn PlatformId::new(raw : Int32) -> PlatformId {
   match raw {
     0 => Unicode
     1 => Macintosh
@@ -58,9 +58,9 @@ pub fn Cmap::offset_data(self : Cmap) -> FontData {
 ///|
 /// An encoding record.
 pub(all) struct EncodingRecord {
-  platform : Int
-  encoding : Int
-  subtable_offset : UInt
+  platform : Int32
+  encoding : Int32
+  subtable_offset : UInt32
 } derive(Debug)
 
 ///|
@@ -74,7 +74,7 @@ pub fn EncodingRecord::platform_id(self : EncodingRecord) -> PlatformId {
 }
 
 ///|
-pub fn EncodingRecord::encoding_id(self : EncodingRecord) -> Int {
+pub fn EncodingRecord::encoding_id(self : EncodingRecord) -> Int32 {
   self.encoding
 }
 
@@ -126,7 +126,7 @@ pub fn Cmap::encoding_records(self : Cmap) -> Array[EncodingRecord] {
 /// Map a codepoint to a nominal glyph identifier.
 ///
 /// This uses the first available subtable that provides a valid mapping.
-pub fn Cmap::map_codepoint(self : Cmap, codepoint : UInt) -> GlyphId? {
+pub fn Cmap::map_codepoint(self : Cmap, codepoint : UInt32) -> GlyphId? {
   for record in self.encoding_records() {
     let subtable = record.subtable(self.data) catch { _ => continue }
     if subtable.map_codepoint(codepoint) is Some(gid) {
@@ -138,7 +138,10 @@ pub fn Cmap::map_codepoint(self : Cmap, codepoint : UInt) -> GlyphId? {
 
 ///|
 /// Returns the subtable at the given index.
-pub fn Cmap::subtable(self : Cmap, index : Int) -> CmapSubtable raise ReadError {
+pub fn Cmap::subtable(
+  self : Cmap,
+  index : Int32,
+) -> CmapSubtable raise ReadError {
   let records = self.encoding_records()
   if index < 0 || index >= records.length() {
     raise OutOfBounds
@@ -163,7 +166,7 @@ pub enum CmapSubtable {
 ///|
 fn CmapSubtable::read(data : FontData) -> CmapSubtable raise ReadError {
   let format = data.read_u16(0)
-  let check = fn(min : Int) raise ReadError {
+  let check = fn(min : Int32) raise ReadError {
     if data.len() < min {
       raise OutOfBounds
     }
@@ -210,7 +213,7 @@ fn CmapSubtable::read(data : FontData) -> CmapSubtable raise ReadError {
 }
 
 ///|
-pub fn CmapSubtable::format(self : CmapSubtable) -> Int {
+pub fn CmapSubtable::format(self : CmapSubtable) -> Int32 {
   match self {
     Format0(d)
     | Format2(d)
@@ -229,7 +232,7 @@ pub fn CmapSubtable::format(self : CmapSubtable) -> Int {
 /// the underlying subtable.
 pub fn CmapSubtable::map_codepoint(
   self : CmapSubtable,
-  codepoint : UInt,
+  codepoint : UInt32,
 ) -> GlyphId? {
   match self {
     Format0(d) =>
@@ -290,10 +293,10 @@ pub fn CmapSubtable::map_codepoint(
 /// id_range_offsets, glyph_id_array).
 fn cmap4_arrays(
   d : FontData,
-) -> (Int, FontData, FontData, FontData, FontData, FontData) {
+) -> (Int32, FontData, FontData, FontData, FontData, FontData) {
   let seg_count_x2 = u16_at(d, 6)
   let n = seg_count_x2 / 2
-  let arr = fn(start : Int) {
+  let arr = fn(start : Int32) {
     d.read_array(start, n, 2) catch {
       _ => FontData::empty()
     }
@@ -314,7 +317,7 @@ fn cmap4_arrays(
 }
 
 ///|
-fn cmap4_map_codepoint(d : FontData, codepoint : UInt) -> GlyphId? {
+fn cmap4_map_codepoint(d : FontData, codepoint : UInt32) -> GlyphId? {
   if codepoint > 0xFFFFU {
     return None
   }
@@ -373,7 +376,7 @@ fn cmap4_map_codepoint(d : FontData, codepoint : UInt) -> GlyphId? {
 ///|
 fn cmap1213_map_codepoint(
   d : FontData,
-  codepoint : UInt,
+  codepoint : UInt32,
   is_constant : Bool,
 ) -> GlyphId? {
   let num_groups = u32_at(d, 12)

@@ -870,7 +870,7 @@ fn show_cellgrid(
 
 ///|
 /// Removes and returns the elements from `at` on (upstream `drain(at..)`).
-fn[T] drain_from(rows : Array[T], at : Int) -> Array[T] {
+fn[T] drain_from(rows : Array[T], at : Int32) -> Array[T] {
   let tail = []
   for i in at..<rows.length() {
     tail.push(rows[i])

@@ -39,7 +39,7 @@ priv enum Node {
   NShowRule(ShowNode)
   /// Content with a label attached. The integer is the index of the label
   /// parameter in the origin's `ArgsLoc`.
-  NLabelled(Content, String, Site, Int)
+  NLabelled(Content, String, Site, Int32)
   /// Content whose origins carry a runtime occurrence key.
   NKeyed(String, Content)
   /// A composite: what its `build` made (`composite.mbt`), and the site
@@ -59,7 +59,7 @@ priv enum Node {
   /// origin (a constructor found the problem; constructors do not raise).
   /// The integer is the parameter of the origin's entry that it is about
   /// (`-1`: the call).
-  NInvalid(String, Site, Int)
+  NInvalid(String, Site, Int32)
 }
 
 ///|
@@ -114,7 +114,7 @@ priv struct ArgNode {
   value : Value
   /// The index of the parameter in the constructor's `ArgsLoc` (`-1`: the
   /// call's own span).
-  param : Int
+  param : Int32
 }
 
 ///|
@@ -155,7 +155,7 @@ priv struct EvalNode {
   source : String
   scope : Array[(String, Value)]
   /// The parameter index of the source string.
-  source_param : Int
+  source_param : Int32
   /// For math: the element function's named arguments (`block`, ...).
   args : Array[ArgNode]
   origin : Site
@@ -359,8 +359,8 @@ pub extend Space with IntoContent::{into_content}
 fn push_extra(
   args : Array[ArgNode],
   extra : Array[(String, Value)],
-  param : Int,
-  positional? : Array[String] = [],
+  param : Int32,
+  positional~ : Array[String] = [],
 ) -> Unit {
   for pair in extra {
     if !positional.contains(pair.0) {
@@ -389,7 +389,7 @@ fn extra_arg(extra : Array[(String, Value)], field : String) -> Value? {
 fn labelled_call(
   call : CallNode,
   label : String?,
-  label_param : Int,
+  label_param : Int32,
 ) -> Content {
   let content = Content::of(NCall(call))
   match label {

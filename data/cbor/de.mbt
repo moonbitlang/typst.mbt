@@ -10,9 +10,9 @@ pub(all) suberror CborError {
   /// reading from a slice).
   Io(String)
   /// An error occurred while parsing bytes, at the given offset.
-  Syntax(Int)
+  Syntax(Int32)
   /// An error occurred while processing a parsed value.
-  Semantic(Int?, String)
+  Semantic(Int32?, String)
   /// The input caused serde to recurse too much.
   RecursionLimitExceeded
 } derive(Debug)
@@ -44,13 +44,13 @@ priv enum Header {
   Positive(UInt64)
   Negative(UInt64)
   Float(Double)
-  Simple(Int)
+  Simple(Int32)
   Tag(UInt64)
   Break
-  Bytes(Int?)
-  Text(Int?)
-  Array(Int?)
-  Map(Int?)
+  Bytes(Int32?)
+  Text(Int32?)
+  Array(Int32?)
+  Map(Int32?)
 }
 
 // Simple values: 20 = false, 21 = true, 22 = null, 23 = undefined.
@@ -63,16 +63,16 @@ let tag_bigneg : UInt64 = 3
 
 ///|
 /// The scratch buffer size of `ciborium::from_reader`.
-let scratch_len : Int = 4096
+let scratch_len : Int32 = 4096
 
 ///|
 /// The deserializer state (upstream `Deserializer` with its `Decoder`).
 priv struct Deserializer {
   data : Bytes
-  mut index : Int
+  mut index : Int32
   /// A header pushed back by `push` (upstream `Decoder::buffer`).
   mut buffer : Header?
-  mut recurse : Int
+  mut recurse : Int32
 }
 
 ///|
@@ -86,7 +86,7 @@ pub fn from_slice(data : Bytes) -> @serde.Data raise CborError {
 ///|
 fn Deserializer::read_exact(
   self : Deserializer,
-  len : Int,
+  len : Int32,
 ) -> BytesView raise CborError {
   if self.index + len > self.data.length() {
     self.index = self.data.length()
@@ -118,7 +118,7 @@ fn Deserializer::pull(self : Deserializer) -> Header raise CborError {
   let major = prefix >> 5
   let minor = prefix & 0b11111
   // `None` stands for `Minor::More`.
-  let (arg, width) : (UInt64?, Int) = if minor < 24 {
+  let (arg, width) : (UInt64?, Int32) = if minor < 24 {
     (Some(minor.to_uint64()), 0)
   } else if minor == 24 {
     (Some(be_uint(self.read_exact(1))), 1)
@@ -139,7 +139,7 @@ fn Deserializer::pull(self : Deserializer) -> Header raise CborError {
       None => raise Syntax(offset)
     }
   }
-  let len = fn() -> Int? raise CborError {
+  let len = fn() -> Int32? raise CborError {
     match arg {
       Some(x) =>
         if x > 0x7FFF_FFFF_FFFF_FFFFUL {
@@ -179,7 +179,7 @@ fn Deserializer::push(self : Deserializer, header : Header) -> Unit {
 
 ///|
 /// Convert the bits of an IEEE half-precision float to a double.
-fn f16_to_double(bits : Int) -> Double {
+fn f16_to_double(bits : Int32) -> Double {
   let sign = if (bits & 0x8000) != 0 { -1.0 } else { 1.0 }
   let exp = (bits >> 10) & 0x1F
   let mant = bits & 0x3FF
@@ -297,7 +297,7 @@ fn Deserializer::integer(
 /// header was already pulled (upstream `Decoder::bytes` + `Segments`).
 fn Deserializer::byte_segments(
   self : Deserializer,
-  len : Int?,
+  len : Int32?,
 ) -> Array[BytesView] raise CborError {
   self.push(Bytes(len))
   self.segments(h => {
@@ -312,7 +312,7 @@ fn Deserializer::byte_segments(
 /// Pull all segments (upstream `Segments::pull` + `Segment::pull`).
 fn Deserializer::segments(
   self : Deserializer,
-  unwrap : (Header) -> Result[Int?, Unit],
+  unwrap : (Header) -> Result[Int32?, Unit],
 ) -> Array[BytesView] raise CborError {
   let out = []
   let mut nested = 0
@@ -342,7 +342,7 @@ fn Deserializer::segments(
 /// `Decoder::text` + `Segments` with the `Text` parser).
 fn Deserializer::text_segments(
   self : Deserializer,
-  len : Int?,
+  len : Int32?,
 ) -> String raise CborError {
   let offset = self.index
   self.push(Text(len))

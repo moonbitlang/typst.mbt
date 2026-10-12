@@ -535,7 +535,7 @@ fn unit_to_line(p0 : @kurbo.Point, p1 : @kurbo.Point) -> @kurbo.Affine {
 priv struct GradientLut {
   lut_u8 : FixedArray[Byte]
   lut_f32 : FixedArray[Float]
-  len : Int
+  len : Int32
   scale : Float
 }
 
@@ -606,10 +606,10 @@ fn GradientLut::new(ranges : Array[GradientRange], as_u8 : Bool) -> GradientLut 
 
 ///|
 /// The maximum size of the gradient LUT.
-const MAX_GRADIENT_LUT_SIZE : Int = 4096
+const MAX_GRADIENT_LUT_SIZE : Int32 = 4096
 
 ///|
-fn determine_lut_size(ranges : Array[GradientRange]) -> Int {
+fn determine_lut_size(ranges : Array[GradientRange]) -> Int32 {
   // Inspired by Blend2D.
   let stop_len = match ranges.length() {
     1 => 256
@@ -635,7 +635,7 @@ fn determine_lut_size(ranges : Array[GradientRange]) -> Int {
 
 ///|
 /// `usize::next_power_of_two`.
-fn next_power_of_two(x : Int) -> Int {
+fn next_power_of_two(x : Int32) -> Int32 {
   let mut p = 1
   while p < x {
     p = p * 2

@@ -4,73 +4,73 @@
 // The limits are agreed upon with other engines for consistency.
 
 ///|
-pub const MAX_WASM_TYPES : Int = 1_000_000
+pub const MAX_WASM_TYPES : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_SUPERTYPES : Int = 1
+pub const MAX_WASM_SUPERTYPES : Int32 = 1
 
 ///|
-pub const MAX_WASM_FUNCTIONS : Int = 1_000_000
+pub const MAX_WASM_FUNCTIONS : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_IMPORTS : Int = 1_000_000
+pub const MAX_WASM_IMPORTS : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_EXPORTS : Int = 1_000_000
+pub const MAX_WASM_EXPORTS : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_GLOBALS : Int = 1_000_000
+pub const MAX_WASM_GLOBALS : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_ELEMENT_SEGMENTS : Int = 100_000
+pub const MAX_WASM_ELEMENT_SEGMENTS : Int32 = 100_000
 
 ///|
-pub const MAX_WASM_DATA_SEGMENTS : Int = 100_000
+pub const MAX_WASM_DATA_SEGMENTS : Int32 = 100_000
 
 ///|
-pub const MAX_WASM_STRING_SIZE : Int = 100_000
+pub const MAX_WASM_STRING_SIZE : Int32 = 100_000
 
 ///|
-pub const MAX_WASM_FUNCTION_SIZE : Int = 128 * 1024
+pub const MAX_WASM_FUNCTION_SIZE : Int32 = 128 * 1024
 
 ///|
-pub const MAX_WASM_FUNCTION_LOCALS : Int = 50000
+pub const MAX_WASM_FUNCTION_LOCALS : Int32 = 50000
 
 ///|
-pub const MAX_WASM_FUNCTION_PARAMS : Int = 1000
+pub const MAX_WASM_FUNCTION_PARAMS : Int32 = 1000
 
 ///|
-pub const MAX_WASM_FUNCTION_RETURNS : Int = 1000
+pub const MAX_WASM_FUNCTION_RETURNS : Int32 = 1000
 
 ///|
-pub const MAX_WASM_TABLE_ENTRIES : Int = 10_000_000
+pub const MAX_WASM_TABLE_ENTRIES : Int32 = 10_000_000
 
 ///|
-pub const MAX_WASM_TABLES : Int = 100
+pub const MAX_WASM_TABLES : Int32 = 100
 
 ///|
-pub const MAX_WASM_MEMORIES : Int = 100
+pub const MAX_WASM_MEMORIES : Int32 = 100
 
 ///|
-pub const MAX_WASM_TAGS : Int = 1_000_000
+pub const MAX_WASM_TAGS : Int32 = 1_000_000
 
 ///|
-pub const MAX_WASM_BR_TABLE_SIZE : Int = MAX_WASM_FUNCTION_SIZE
+pub const MAX_WASM_BR_TABLE_SIZE : Int32 = MAX_WASM_FUNCTION_SIZE
 
 ///|
-pub const MAX_WASM_STRUCT_FIELDS : Int = 10_000
+pub const MAX_WASM_STRUCT_FIELDS : Int32 = 10_000
 
 ///|
-pub const MAX_WASM_CATCHES : Int = 10_000
+pub const MAX_WASM_CATCHES : Int32 = 10_000
 
 ///|
-pub const MAX_WASM_SUBTYPING_DEPTH : Int = 63
+pub const MAX_WASM_SUBTYPING_DEPTH : Int32 = 63
 
 ///|
-pub const MAX_WASM_HANDLERS : Int = 10_000
+pub const MAX_WASM_HANDLERS : Int32 = 10_000
 
 ///|
-pub const MAX_WASM_TYPE_SIZE : UInt = 1_000_000
+pub const MAX_WASM_TYPE_SIZE : UInt32 = 1_000_000
 
 ///|
 pub const DEFAULT_WASM_PAGE_SIZE : UInt64 = 65536

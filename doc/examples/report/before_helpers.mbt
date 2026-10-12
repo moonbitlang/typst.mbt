@@ -14,7 +14,7 @@ const TEXT_W : Double = 348
 ///|
 /// A card around `body`: a rounded block that is not split. `height` is
 /// given when its row has been measured.
-fn framed(body : &IntoContent, height? : Sizing = Auto) -> Block {
+fn framed(body : &IntoContent, height~ : Sizing = Auto) -> Block {
   Block(
     body,
     width=Pct(100),
@@ -32,7 +32,7 @@ fn framed(body : &IntoContent, height? : Sizing = Auto) -> Block {
 /// them. A card is its key and a function from its height to its block.
 fn equal_rows(
   cards : Array[(String, (Sizing) -> Block)],
-  columns : Int,
+  columns : Int32,
 ) -> Context {
   let width = (TEXT_W - GUTTER * (columns - 1).to_double()) /
     columns.to_double()
@@ -74,7 +74,7 @@ fn tile_row(tiles : Array[Tile]) -> Context {
 
 ///|
 /// The cards of some notes, `columns` to a row.
-fn note_cards(notes : Array[Note], columns : Int) -> Context {
+fn note_cards(notes : Array[Note], columns : Int32) -> Context {
   equal_rows(
     notes.map(note => (note.id, height => framed(note_body(note), height~))),
     columns,
@@ -116,8 +116,8 @@ fn framed_table(
   head : Array[String],
   rows : Array[Array[&IntoContent]],
   columns~ : Array[Sizing],
-  num? : Array[Int] = [],
-  mark? : Array[Int] = [],
+  num~ : Array[Int32] = [],
+  mark~ : Array[Int32] = [],
 ) -> Block {
   let cells : Array[&IntoContent] = [
     TableHeader(

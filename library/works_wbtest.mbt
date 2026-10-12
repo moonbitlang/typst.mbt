@@ -9,9 +9,9 @@
 test "memoize: a call that tracks its route is found on every route, unless it asked one" {
   memo_test_begin()
   defer memo_test_end()
-  let store : MemoStore[Int, Int] = MemoStore::new()
+  let store : MemoStore[Int32, Int32] = MemoStore::new()
   let mut runs = 0
-  let call = (depth : Int, tag : Int, body : (Engine) -> Unit) => {
+  let call = (depth : Int32, tag : Int32, body : (Engine) -> Unit) => {
     let engine = { ..memo_engine(), route: memo_route(depth), }
     let key = memo_fingerprint(state => state.write_usize(tag))
     memoize(
@@ -78,9 +78,9 @@ test "memoize: an entry that tracks its route, and the depth bounds of a module 
   // around them. Each inside the other, computed and found.
   memo_test_begin()
   defer memo_test_end()
-  let store : MemoStore[Int, Int] = MemoStore::new()
+  let store : MemoStore[Int32, Int32] = MemoStore::new()
   let mut runs = 0
-  let call = (tag : Int, body : (Engine) -> Unit) => {
+  let call = (tag : Int32, body : (Engine) -> Unit) => {
     let engine = { ..memo_engine(), route: memo_route(3), }
     let key = memo_fingerprint(state => state.write_usize(tag))
     memoize(
@@ -166,7 +166,7 @@ test "memoize: an entry that tracks its route, and the depth bounds of a module 
   // either.
   let func = memo_test_func(41)
   let quiet : ClosureBody = (_, _, _, _, _) => None
-  let closure_at = (depth : Int) => {
+  let closure_at = (depth : Int32) => {
     let engine = { ..memo_engine(), route: memo_route(depth), }
     let value = memo_call(func, engine, Context::none(), [], quiet) catch {
       _ => None
@@ -208,8 +208,8 @@ test "memoize: a route of its own leaves what the calls around it collected" {
 test "memoize: what is asked of a route inside a tracking call is the caller's too" {
   memo_test_begin()
   defer memo_test_end()
-  let store : MemoStore[Int, Int] = MemoStore::new()
-  let inner = (engine : Engine, tag : Int, body : (Engine) -> Unit) => {
+  let store : MemoStore[Int32, Int32] = MemoStore::new()
+  let inner = (engine : Engine, tag : Int32, body : (Engine) -> Unit) => {
     let key = memo_fingerprint(state => state.write_usize(tag))
     memoize(
       store,
@@ -228,7 +228,7 @@ test "memoize: what is asked of a route inside a tracking call is the caller's t
   let mut runs = 0
   let outer = (
     func : Func,
-    depth : Int,
+    depth : Int32,
     body : (Engine) -> Unit raise SourceError,
   ) => {
     let engine = { ..memo_engine(), route: memo_route(depth), }
@@ -316,7 +316,7 @@ test "works: the errors they keep are copies for whoever catches them" {
 ///|
 test "svg: an image is its data, its fonts, what they were chosen for and the data of the images it links" {
   let data : Bytes = b"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>"
-  let image = (links : Array[U128], selections : Array[Int]) => {
+  let image = (links : Array[U128], selections : Array[Int32]) => {
     let svg = SvgImage::new(data) catch { _ => abort("an SVG") }
     Image::plain(Svg({ ..svg, links, selections, }))
   }

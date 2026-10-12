@@ -18,8 +18,8 @@ fn assert_captures(result : @fancy.Captures?) -> @fancy.Captures raise {
 fn assert_match_at(
   m : @fancy.Match?,
   expected_text : String,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Unit raise {
   guard m is Some(m) else { fail("Expected match, but was None") }
   assert_eq(m.as_str(), expected_text)

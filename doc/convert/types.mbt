@@ -51,7 +51,7 @@ pub struct Fallback {
   /// or document; `"callback"`: the body of a host callback.
   kind : String
   /// The UTF-8 length of the source kept as Typst.
-  bytes : Int
+  bytes : Int32
 }
 
 ///|
@@ -66,11 +66,11 @@ pub struct Translation {
   math_only : Bool
   fallbacks : Array[Fallback]
   /// The UTF-8 length of the source.
-  source_bytes : Int
+  source_bytes : Int32
   /// The UTF-8 length of the source inside fragments.
-  fallback_bytes : Int
+  fallback_bytes : Int32
   /// The number of typed constructor, rule and callback expressions.
-  typed : Int
+  typed : Int32
   /// For `T4`: why the document is not convertible.
   note : String
 }
@@ -159,12 +159,12 @@ priv struct Tr {
   mut hatch : Bool
   /// Whether a math string (`Equation`) was emitted.
   mut math : Bool
-  mut fallback_bytes : Int
+  mut fallback_bytes : Int32
   /// The number of typed expressions emitted.
-  mut typed : Int
-  mut fresh : Int
+  mut typed : Int32
+  mut fresh : Int32
   /// The MoonBit variable names in use, with their number of uses.
-  names : Map[String, Int]
+  names : Map[String, Int32]
   /// Emit `Prose(..)` for the streams it can express exactly (the readable
   /// mode, docs/edsl-convert.md, section 4.7).
   prose : Bool
@@ -173,11 +173,11 @@ priv struct Tr {
 ///|
 /// The part of the state that a failed attempt rolls back.
 priv struct Mark {
-  fallbacks : Int
+  fallbacks : Int32
   hatch : Bool
   math : Bool
-  fallback_bytes : Int
-  typed : Int
+  fallback_bytes : Int32
+  typed : Int32
 }
 
 ///|

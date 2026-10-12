@@ -10,9 +10,9 @@
 /// result is written to `src_c`.
 fn compose(
   blend_mode : BlendMode,
-  src_c : FixedArray[Int],
-  bg_c : FixedArray[Int],
-  alpha_mask : FixedArray[Int]?,
+  src_c : FixedArray[Int32],
+  bg_c : FixedArray[Int32],
+  alpha_mask : FixedArray[Int32]?,
 ) -> Unit {
   for p in 0..<8 {
     let al_s = src_c[p * 4 + 3]
@@ -54,8 +54,8 @@ fn compose(
 ///|
 /// Mix `src_c` with `bg_c` in place (`blend::mix`).
 fn mix(
-  src_c : FixedArray[Int],
-  bg_c : FixedArray[Int],
+  src_c : FixedArray[Int32],
+  bg_c : FixedArray[Int32],
   blend_mode : BlendMode,
 ) -> Unit {
   match blend_mode.mix {
@@ -93,7 +93,11 @@ fn mix(
 
 ///|
 /// The `u8` fast path for separable blend modes.
-fn u8_mix(src_c : FixedArray[Int], bg_c : FixedArray[Int], mix : Mix) -> Unit {
+fn u8_mix(
+  src_c : FixedArray[Int32],
+  bg_c : FixedArray[Int32],
+  mix : Mix,
+) -> Unit {
   let res = FixedArray::make(32, 0)
   for p in 0..<8 {
     let src_a = src_c[p * 4 + 3]
@@ -103,7 +107,7 @@ fn u8_mix(src_c : FixedArray[Int], bg_c : FixedArray[Int], mix : Mix) -> Unit {
       let s = src_c[i]
       let d = bg_c[i]
       // `narrow_saturating_u16x32`: clamp the `u16` lane to 255.
-      let narrow_sat = (v : Int) => min_int(v & 0xFFFF, 255)
+      let narrow_sat = (v : Int32) => min_int(v & 0xFFFF, 255)
       res[i] = match mix {
         // M = S * (1 - Ab) + S * D
         Multiply => {
@@ -165,13 +169,13 @@ fn u8_mix(src_c : FixedArray[Int], bg_c : FixedArray[Int], mix : Mix) -> Unit {
 
 ///|
 fn hard_light_inner(
-  s : Int,
-  d : Int,
-  src_a : Int,
-  bg_a : Int,
-  condition : Int,
-  condition_a : Int,
-) -> Int {
+  s : Int32,
+  d : Int32,
+  src_a : Int32,
+  bg_a : Int32,
+  condition : Int32,
+  condition_a : Int32,
+) -> Int32 {
   let base = (s * ((255 - bg_a) & 0xFFFF)) & 0xFFFF
   // Multiply branch: 2 * S * D.
   let multiply = (2 * s * d) & 0xFFFF

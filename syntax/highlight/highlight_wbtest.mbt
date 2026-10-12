@@ -1,6 +1,6 @@
 ///|
 fn highlight_tree(
-  tags : Array[((Int, Int), Tag)],
+  tags : Array[((Int32, Int32), Tag)],
   node : @syntax.LinkedNode,
 ) -> Unit {
   if highlight(node) is Some(tag) {

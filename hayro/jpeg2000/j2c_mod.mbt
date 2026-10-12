@@ -10,7 +10,7 @@ priv struct ParsedCodestream {
 /// Decoded data for one JPEG2000 component.
 pub struct ComponentData {
   priv container : SimdBuffer
-  priv bit_depth : Int
+  priv bit_depth : Int32
 }
 
 ///|
@@ -20,7 +20,7 @@ fn ComponentData::clone(self : ComponentData) -> ComponentData {
 
 ///|
 /// The bit depth of this component.
-pub fn ComponentData::bit_depth(self : ComponentData) -> Int {
+pub fn ComponentData::bit_depth(self : ComponentData) -> Int32 {
   self.bit_depth
 }
 

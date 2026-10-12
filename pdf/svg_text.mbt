@@ -126,7 +126,7 @@ fn svg_text_render(
 fn svg_outline_glyph(
   surface : @export.Surface,
   loaded : SvgLoadedFont,
-  glyph : Int,
+  glyph : Int32,
   font_size : Double,
 ) -> Unit {
   guard loaded.face is Some(ttf) else { return }
@@ -250,7 +250,7 @@ fn SvgFonts::resolve_variations(
 /// `KrillaError::Image`: see `svg_png_image`), until the caller that drew
 /// the SVG takes it.
 priv struct SvgFontCache {
-  entries : Array[(Bytes, Int, @export.Font?)]
+  entries : Array[(Bytes, Int32, @export.Font?)]
   mut image_error : String?
 }
 
@@ -263,7 +263,7 @@ fn SvgFontCache::new() -> SvgFontCache {
 fn SvgFontCache::find(
   self : SvgFontCache,
   data : Bytes,
-  index : Int,
+  index : Int32,
 ) -> @export.Font?? {
   for entry in self.entries {
     if physical_equal(entry.0, data) && entry.1 == index {
@@ -277,7 +277,7 @@ fn SvgFontCache::find(
 fn SvgFontCache::insert(
   self : SvgFontCache,
   data : Bytes,
-  index : Int,
+  index : Int32,
   font : @export.Font?,
 ) -> Unit {
   self.entries.push((data, index, font))
@@ -289,7 +289,7 @@ fn SvgFontCache::insert(
 fn SvgFontCache::get_or_load(
   self : SvgFontCache,
   data : Bytes,
-  index : Int,
+  index : Int32,
 ) -> @export.Font? {
   match self.find(data, index) {
     Some(font) => font

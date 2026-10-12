@@ -132,7 +132,7 @@ const TICKS_H : Double = 14
 const SCALE_TOP : Double = 12
 
 ///|
-const SCALE_TICKS : Int = 6
+const SCALE_TICKS : Int32 = 6
 
 ///|
 /// Where a value is on the scale of a chart that is `width` wide.
@@ -166,7 +166,7 @@ let back_paint : Paint = Rgb("#2a4f86")
 
 ///|
 /// The left edge of box `i` of `count` boxes across `width`.
-fn box_left(i : Int, count : Int, width : Double) -> Double {
+fn box_left(i : Int32, count : Int32, width : Double) -> Double {
   let gap = (width - BOX_W * count.to_double()) / (count - 1).to_double()
   i.to_double() * (BOX_W + gap)
 }
@@ -189,7 +189,7 @@ fn stage_text(stage : Stage) -> Seq {
 
 ///|
 /// The stroke of an arrow of the diagram.
-fn arrow_stroke(paint : Paint, dashed? : Bool = false) -> Stroke {
+fn arrow_stroke(paint : Paint, dashed~ : Bool = false) -> Stroke {
   if dashed {
     Stroke(paint~, thickness=Pt(0.9), dash=Dashed)
   } else {

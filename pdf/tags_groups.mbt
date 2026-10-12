@@ -7,10 +7,10 @@
 
 ///|
 /// The invalid group ID.
-let group_id_invalid : Int = -1
+let group_id_invalid : Int32 = -1
 
 ///|
-let group_id_root : Int = 0
+let group_id_root : Int32 = 0
 
 ///|
 priv struct Groups {
@@ -30,17 +30,17 @@ fn Groups::by_loc(self : Groups, loc : @library.Location) -> LocatedGroup? {
 }
 
 ///|
-fn Groups::get(self : Groups, id : Int) -> Group {
+fn Groups::get(self : Groups, id : Int32) -> Group {
   self.list[id]
 }
 
 ///|
-fn Groups::next_id(self : Groups) -> Int {
+fn Groups::next_id(self : Groups) -> Int32 {
   self.list.length()
 }
 
 ///|
-fn Groups::push_list(self : Groups, group : Group) -> Int {
+fn Groups::push_list(self : Groups, group : Group) -> Int32 {
   let id = self.list.length()
   self.list.push(group)
   id
@@ -50,7 +50,7 @@ fn Groups::push_list(self : Groups, group : Group) -> Int {
 /// See [`propagate_lang`].
 fn Groups::propagate_lang(
   self : Groups,
-  id : Int,
+  id : Int32,
   lang : @library.Locale,
 ) -> @library.Locale? {
   // TODO: walk up to the first parent that has a language.
@@ -70,10 +70,10 @@ fn Groups::propagate_lang(
 fn Groups::new_located(
   self : Groups,
   loc : @library.Location,
-  parent : Int,
+  parent : Int32,
   span : @syntax.Span,
   kind : GroupKind,
-) -> Int {
+) -> Int32 {
   let id = self.new_virtual(parent, span, kind)
   match self.locations.get(loc) {
     Some(located) =>
@@ -91,10 +91,10 @@ fn Groups::new_located(
 /// Create a new virtual group, not associated with any location.
 fn Groups::new_virtual(
   self : Groups,
-  parent : Int,
+  parent : Int32,
   span : @syntax.Span,
   kind : GroupKind,
-) -> Int {
+) -> Int32 {
   self.push_list(Group::new(parent, span, kind, false))
 }
 
@@ -102,10 +102,10 @@ fn Groups::new_virtual(
 /// Create a new weak group, not associated with any location.
 fn Groups::new_weak(
   self : Groups,
-  parent : Int,
+  parent : Int32,
   span : @syntax.Span,
   kind : GroupKind,
-) -> Int {
+) -> Int32 {
   self.push_list(Group::new(parent, span, kind, true))
 }
 
@@ -187,7 +187,7 @@ fn Groups::breakable(self : Groups, kind : GroupKind) -> BreakOpportunity {
 
 ///|
 /// NOTE: this needs to be kept in sync with [`Groups::breakable`].
-fn Groups::break_group(self : Groups, id : Int, new_parent : Int) -> Int {
+fn Groups::break_group(self : Groups, id : Int32, new_parent : Int32) -> Int32 {
   let group = self.get(id)
   let span = group.span
   let new_kind : GroupKind = match group.kind {
@@ -244,7 +244,11 @@ let break_priority_max : BreakPriority = Artifact
 
 ///|
 /// Create a new group with a standard tag and push it into the parent.
-fn Groups::push_tag(self : Groups, parent : Int, tag : @export.TagKind) -> Int {
+fn Groups::push_tag(
+  self : Groups,
+  parent : Int32,
+  tag : @export.TagKind,
+) -> Int32 {
   let tag_id = self.push_tag_storage(tag)
   let kind = GroupKind::Standard(tag_id)
   let id = self.push_list(
@@ -258,8 +262,8 @@ fn Groups::push_tag(self : Groups, parent : Int, tag : @export.TagKind) -> Int {
 /// Prepend multiple existing group to the start of the parent.
 fn Groups::prepend_groups(
   self : Groups,
-  parent : Int,
-  children : Array[Int],
+  parent : Int32,
+  children : Array[Int32],
 ) -> Unit {
   let nodes = self.get(parent).nodes
   for i, child in children {
@@ -269,7 +273,7 @@ fn Groups::prepend_groups(
 
 ///|
 /// Append an existing group to the end of the parent.
-fn Groups::push_group(self : Groups, parent : Int, child : Int) -> Unit {
+fn Groups::push_group(self : Groups, parent : Int32, child : Int32) -> Unit {
   self.get(parent).nodes.push(Group(child))
 }
 
@@ -277,8 +281,8 @@ fn Groups::push_group(self : Groups, parent : Int, child : Int) -> Unit {
 /// Append multiple existing groups to the end of the parent.
 fn Groups::push_groups(
   self : Groups,
-  parent : Int,
-  children : Array[Int],
+  parent : Int32,
+  children : Array[Int32],
 ) -> Unit {
   let nodes = self.get(parent).nodes
   for child in children {
@@ -289,24 +293,24 @@ fn Groups::push_groups(
 // Tag storage (upstream `TagStorage`).
 
 ///|
-fn Groups::push_tag_storage(self : Groups, tag : @export.TagKind) -> Int {
+fn Groups::push_tag_storage(self : Groups, tag : @export.TagKind) -> Int32 {
   let id = self.tags.length()
   self.tags.push(Some(tag))
   id
 }
 
 ///|
-fn Groups::set_tag(self : Groups, id : Int, tag : @export.TagKind) -> Unit {
+fn Groups::set_tag(self : Groups, id : Int32, tag : @export.TagKind) -> Unit {
   self.tags[id] = Some(tag)
 }
 
 ///|
-fn Groups::tag(self : Groups, id : Int) -> @export.TagKind {
+fn Groups::tag(self : Groups, id : Int32) -> @export.TagKind {
   self.tags[id].unwrap()
 }
 
 ///|
-fn Groups::take_tag(self : Groups, id : Int) -> @export.TagKind {
+fn Groups::take_tag(self : Groups, id : Int32) -> @export.TagKind {
   let tag = self.tags[id].unwrap()
   self.tags[id] = None
   tag
@@ -314,7 +318,7 @@ fn Groups::take_tag(self : Groups, id : Int) -> @export.TagKind {
 
 ///|
 priv struct LocatedGroup {
-  id : Int
+  id : Int32
   mut multiple_parents : Bool
 }
 
@@ -326,7 +330,7 @@ priv struct Group {
   /// parent [`GroupKind::Table`] even though the concrete tag tree will have
   /// intermediate [`TagKind::TR`] or [`TagKind::TBody`] groups in the
   /// generated `nodes`.
-  mut parent : Int
+  mut parent : Int32
   span : @syntax.Span
   kind : GroupKind
   /// The language of group kinds that have one (`GroupKind::has_lang`).
@@ -341,7 +345,7 @@ priv struct Group {
 
 ///|
 fn Group::new(
-  parent : Int,
+  parent : Int32,
   span : @syntax.Span,
   kind : GroupKind,
   weak : Bool,
@@ -355,7 +359,7 @@ fn Group::push_leaf(self : Group, id : @export.Identifier) -> Unit {
 }
 
 ///|
-fn Group::push_annotation(self : Group, annot_id : Int) -> Unit {
+fn Group::push_annotation(self : Group, annot_id : Int32) -> Unit {
   self.nodes.push(Annotation(annot_id))
 }
 
@@ -399,29 +403,29 @@ priv enum GroupKind {
   Artifact(@export.ArtifactType)
   LogicalParent(@library.Content)
   /// The logical parent is resolved after the tree has been built.
-  LogicalChild(@library.Inherit, Ref[Int])
-  Outline(Int)
+  LogicalChild(@library.Inherit, Ref[Int32])
+  Outline(Int32)
   OutlineEntry(@library.OutlineEntry)
-  Table(Int, Int)
-  TableCell(@library.TableCell, Int)
-  Grid(Int)
+  Table(Int32, Int32)
+  TableCell(@library.TableCell, Int32)
+  Grid(Int32)
   GridCell(@library.GridCell)
-  List(Int, @export.ListNumbering)
+  List(Int32, @export.ListNumbering)
   ListItemLabel
   ListItemBody
   TermsItemLabel
-  TermsItemBody(Ref[Int?])
+  TermsItemBody(Ref[Int32?])
   BibEntry
   /// An wrapper element that enclosed the figure tag and its caption.
   /// If there is no caption, this is omitted.
-  FigureWrapper(Int)
-  Figure(Int, Int)
+  FigureWrapper(Int32)
+  Figure(Int32, Int32)
   /// The figure caption has a bbox so marked content sequences won't expand
   /// the bbox of the parent figure group kind. The caption might be moved
   /// into table, or next to the figure tag.
-  FigureCaption(Int)
-  Image(@library.ImageElem, Int)
-  Formula(@library.EquationElem, Int)
+  FigureCaption(Int32)
+  Image(@library.ImageElem, Int32)
+  Formula(@library.EquationElem, Int32)
   Link(@library.LinkMarker)
   CodeBlock
   CodeBlockLine
@@ -431,7 +435,7 @@ priv enum GroupKind {
   Par
   TextAttr(TextAttr)
   Transparent
-  Standard(Int)
+  Standard(Int32)
 }
 
 ///|
@@ -492,7 +496,7 @@ fn GroupKind::as_link(self : GroupKind) -> @library.LinkMarker? {
 }
 
 ///|
-fn GroupKind::as_table(self : GroupKind) -> Int? {
+fn GroupKind::as_table(self : GroupKind) -> Int32? {
   if self is Table(id, _) {
     Some(id)
   } else {
@@ -501,7 +505,7 @@ fn GroupKind::as_table(self : GroupKind) -> Int? {
 }
 
 ///|
-fn GroupKind::as_grid(self : GroupKind) -> Int? {
+fn GroupKind::as_grid(self : GroupKind) -> Int32? {
   if self is Grid(id) {
     Some(id)
   } else {
@@ -510,7 +514,7 @@ fn GroupKind::as_grid(self : GroupKind) -> Int? {
 }
 
 ///|
-fn GroupKind::as_list(self : GroupKind) -> Int? {
+fn GroupKind::as_list(self : GroupKind) -> Int32? {
   if self is List(id, _) {
     Some(id)
   } else {
@@ -519,7 +523,7 @@ fn GroupKind::as_list(self : GroupKind) -> Int? {
 }
 
 ///|
-fn GroupKind::bbox(self : GroupKind) -> Int? {
+fn GroupKind::bbox(self : GroupKind) -> Int32? {
   match self {
     Table(_, id) => Some(id)
     Figure(_, id) => Some(id)

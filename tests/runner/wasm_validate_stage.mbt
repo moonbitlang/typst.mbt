@@ -48,7 +48,7 @@ priv struct WasmiDriver {
 ///|
 fn WasmiDriver::next_payload(
   self : WasmiDriver,
-) -> (Int, @wasmparser.Payload) raise @wasmparser.BinaryReaderError {
+) -> (Int32, @wasmparser.Payload) raise @wasmparser.BinaryReaderError {
   match self.parser.parse(self.buffer, true) {
     Parsed(consumed~, payload~) => (consumed, payload)
     NeedMoreData(_) => abort("unreachable")
@@ -56,7 +56,7 @@ fn WasmiDriver::next_payload(
 }
 
 ///|
-fn WasmiDriver::consume(self : WasmiDriver, consumed : Int) -> Unit {
+fn WasmiDriver::consume(self : WasmiDriver, consumed : Int32) -> Unit {
   self.buffer = self.buffer[consumed:]
 }
 
@@ -217,7 +217,7 @@ fn wasm_files(
 }
 
 ///|
-fn parse_decimal(s : String) -> Int {
+fn parse_decimal(s : String) -> Int32 {
   let mut n = 0
   for c in s {
     n = n * 10 + (c.to_int() - '0'.to_int())

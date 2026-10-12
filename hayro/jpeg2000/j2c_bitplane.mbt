@@ -24,7 +24,7 @@
 fn bitplane_decode(
   code_block : CodeBlock,
   sub_band_type : SubBandType,
-  total_bitplanes : Int,
+  total_bitplanes : Int32,
   style : CodeBlockStyle,
   tile_ctx : TileDecodeContext,
   storage : DecompositionStorage,
@@ -159,8 +159,8 @@ fn decode_inner(
 
 ///|
 fn[D : BitDecoder] handle_coding_passes(
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   ctx : BitPlaneDecodeContext,
   decoder : D,
 ) -> Bool {
@@ -211,22 +211,22 @@ fn[D : BitDecoder] handle_coding_passes(
 
 ///|
 // We only allow 31 bit planes because we need one bit for the sign.
-const BITPLANE_BIT_SIZE : Int = 31
+const BITPLANE_BIT_SIZE : Int32 = 31
 
 ///|
-const SIGNIFICANCE_SHIFT : Int = 7
+const SIGNIFICANCE_SHIFT : Int32 = 7
 
 ///|
-const HAS_MAGNITUDE_REFINEMENT_SHIFT : Int = 6
+const HAS_MAGNITUDE_REFINEMENT_SHIFT : Int32 = 6
 
 ///|
-const HAS_ZERO_CODING_SHIFT : Int = 5
+const HAS_ZERO_CODING_SHIFT : Int32 = 5
 
 ///|
-const CLEANUP_SKIP_MASK : Int = 0xA0 // (1 << SIGNIFICANCE_SHIFT) | (1 << HAS_ZERO_CODING_SHIFT)
+const CLEANUP_SKIP_MASK : Int32 = 0xA0 // (1 << SIGNIFICANCE_SHIFT) | (1 << HAS_ZERO_CODING_SHIFT)
 
 ///|
-const REFINEMENT_PASS_MASK : Int = 0xA0 // (1 << SIGNIFICANCE_SHIFT) | (1 << HAS_ZERO_CODING_SHIFT)
+const REFINEMENT_PASS_MASK : Int32 = 0xA0 // (1 << SIGNIFICANCE_SHIFT) | (1 << HAS_ZERO_CODING_SHIFT)
 
 // Bit-packed coefficient state (only 3 bits used):
 // - Bit 7: significance state (set when first non-zero bit is encountered)
@@ -236,14 +236,14 @@ const REFINEMENT_PASS_MASK : Int = 0xA0 // (1 << SIGNIFICANCE_SHIFT) | (1 << HAS
 // `Coefficient`: the magnitude in bits 0-30 and the sign in bit 31.
 
 ///|
-fn coefficient_get(v : UInt) -> Int {
+fn coefficient_get(v : UInt32) -> Int32 {
   let magnitude = (v & 0x7FFFFFFF).reinterpret_as_int()
   // Map sign (0 for positive, 1 for negative) to 1, -1.
   magnitude * (1 - 2 * (v >> 31).reinterpret_as_int())
 }
 
 ///|
-const COEFFICIENTS_PADDING : Int = 1
+const COEFFICIENTS_PADDING : Int32 = 1
 
 // Store the significances of each neighbor for a specific coefficient.
 // The order from MSB to LSB is as follows:
@@ -256,9 +256,9 @@ const COEFFICIENTS_PADDING : Int = 1
 ///|
 priv struct BitPlaneDecodeBuffers {
   mut combined_layers : FixedArray[Byte]
-  mut combined_len : Int
-  segment_ranges : Array[Int]
-  segment_coding_passes : Array[Int]
+  mut combined_len : Int32
+  segment_ranges : Array[Int32]
+  segment_coding_passes : Array[Int32]
 }
 
 ///|
@@ -306,38 +306,38 @@ fn BitPlaneDecodeBuffers::extend_from(
 ///|
 priv struct BitPlaneDecodeContext {
   /// A vector of bit-packed fields for each coefficient in the code-block.
-  mut coefficient_states : FixedArray[Int]
+  mut coefficient_states : FixedArray[Int32]
   /// Stripe-column state for the fast path.
-  mut stripe_flags : FixedArray[UInt]
-  mut stripe_flags_len : Int
+  mut stripe_flags : FixedArray[UInt32]
+  mut stripe_flags_len : Int32
   /// The neighbor significances for each coefficient.
-  mut neighbor_significances : FixedArray[Int]
+  mut neighbor_significances : FixedArray[Int32]
   /// The magnitude and signs of each coefficient that is successively built
   /// as we advance through the bitplanes.
-  mut coefficients : FixedArray[UInt]
+  mut coefficients : FixedArray[UInt32]
   /// The number of (padded) coefficients of the current code-block.
-  mut num_coefficients : Int
+  mut num_coefficients : Int32
   /// The width of the code-block we are processing.
-  mut width : Int
+  mut width : Int32
   /// The width of the code-block we are processing, with padding.
-  mut padded_width : Int
+  mut padded_width : Int32
   /// The height of the code-block we are processing.
-  mut height : Int
+  mut height : Int32
   /// The code-block style for the current code-block.
   mut style : CodeBlockStyle
   /// The number of bitplanes (minus implicitly missing bitplanes) to decode.
-  mut bitplanes : Int
+  mut bitplanes : Int32
   /// Whether strict mode is enabled. (Never set by `reset` upstream, so it
   /// stays `false`.)
   strict : Bool
   /// The maximum number of coding passes to process.
-  mut max_coding_passes : Int
+  mut max_coding_passes : Int32
   /// The type of sub-band the current code block belongs to.
   mut sub_band_type : SubBandType
   /// The arithmetic decoder contexts for each context label.
-  contexts : FixedArray[Int]
+  contexts : FixedArray[Int32]
   /// The bit position for the current bitplane.
-  mut current_bit_position : Int
+  mut current_bit_position : Int32
 }
 
 ///|
@@ -376,7 +376,7 @@ fn BitPlaneDecodeContext::reset(
   code_block : CodeBlock,
   sub_band_type : SubBandType,
   code_block_style : CodeBlockStyle,
-  total_bitplanes : Int,
+  total_bitplanes : Int32,
   strict : Bool,
 ) -> Unit raise DecodeError {
   let width = code_block.rect.width().reinterpret_as_int()
@@ -459,18 +459,18 @@ fn BitPlaneDecodeContext::reset_for_next_bitplane(
 ///|
 fn BitPlaneDecodeContext::index(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-) -> Int {
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   x + y * self.padded_width
 }
 
 ///|
 fn BitPlaneDecodeContext::set_sign(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-  sign : Int,
+  x : Int32,
+  y : Int32,
+  sign : Int32,
 ) -> Unit {
   let idx = self.index(x, y)
   self.coefficients[idx] = self.coefficients[idx] |
@@ -480,8 +480,8 @@ fn BitPlaneDecodeContext::set_sign(
 ///|
 fn BitPlaneDecodeContext::is_significant(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Bool {
   ((self.coefficient_states[self.index(x, y)] >> SIGNIFICANCE_SHIFT) & 1) == 1
 }
@@ -489,8 +489,8 @@ fn BitPlaneDecodeContext::is_significant(
 ///|
 fn BitPlaneDecodeContext::set_significant(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Unit {
   let pw = self.padded_width
   let idx = x + y * pw
@@ -520,8 +520,8 @@ fn BitPlaneDecodeContext::set_significant(
 ///|
 fn BitPlaneDecodeContext::set_zero_coded(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Unit {
   let idx = self.index(x, y)
   self.coefficient_states[idx] = self.coefficient_states[idx] |
@@ -531,8 +531,8 @@ fn BitPlaneDecodeContext::set_zero_coded(
 ///|
 fn BitPlaneDecodeContext::set_magnitude_refined(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Unit {
   let idx = self.index(x, y)
   self.coefficient_states[idx] = self.coefficient_states[idx] |
@@ -542,9 +542,9 @@ fn BitPlaneDecodeContext::set_magnitude_refined(
 ///|
 fn BitPlaneDecodeContext::magnitude_refinement(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-) -> Int {
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   (self.coefficient_states[self.index(x, y)] >> HAS_MAGNITUDE_REFINEMENT_SHIFT) &
   1
 }
@@ -552,8 +552,8 @@ fn BitPlaneDecodeContext::magnitude_refinement(
 ///|
 fn BitPlaneDecodeContext::should_decode_cleanup(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Bool {
   // Checks that it's not significant and not zero-coded.
   (self.coefficient_states[self.index(x, y)] & CLEANUP_SKIP_MASK) == 0
@@ -562,8 +562,8 @@ fn BitPlaneDecodeContext::should_decode_cleanup(
 ///|
 fn BitPlaneDecodeContext::should_decode_refinement(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Bool {
   // Checks that it's significant and not zero-coded.
   (self.coefficient_states[self.index(x, y)] & REFINEMENT_PASS_MASK) ==
@@ -573,9 +573,9 @@ fn BitPlaneDecodeContext::should_decode_refinement(
 ///|
 fn BitPlaneDecodeContext::push_magnitude_bit(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-  bit : Int,
+  x : Int32,
+  y : Int32,
+  bit : Int32,
 ) -> Unit {
   let idx = self.index(x, y)
   self.coefficients[idx] = self.coefficients[idx] |
@@ -585,16 +585,16 @@ fn BitPlaneDecodeContext::push_magnitude_bit(
 ///|
 fn BitPlaneDecodeContext::sign(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-) -> Int {
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   (self.coefficients[self.index(x, y)] >> 31).reinterpret_as_int()
 }
 
 ///|
 fn BitPlaneDecodeContext::neighbor_in_next_stripe(
   self : BitPlaneDecodeContext,
-  y : Int,
+  y : Int32,
 ) -> Bool {
   // `pos.bottom().real_y()` is `y` and `pos.real_y()` is `y - 1`.
   y < self.height && y >> 2 > (y - 1) >> 2
@@ -603,9 +603,9 @@ fn BitPlaneDecodeContext::neighbor_in_next_stripe(
 ///|
 fn BitPlaneDecodeContext::neighborhood_significance_states(
   self : BitPlaneDecodeContext,
-  x : Int,
-  y : Int,
-) -> Int {
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   let neighbors = self.neighbor_significances[self.index(x, y)]
   if self.style.vertically_causal_context && self.neighbor_in_next_stripe(y) {
     // Needed for vertically causal context.
@@ -794,8 +794,8 @@ fn[D : BitDecoder] magnitude_refinement_pass(
 ///|
 /// Decode a sign bit (Section D.3.2).
 fn[D : BitDecoder] decode_sign_bit(
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   ctx : BitPlaneDecodeContext,
   decoder : D,
 ) -> Bool {
@@ -814,10 +814,10 @@ fn[D : BitDecoder] decode_sign_bit(
 ///|
 /// Based on Table D.2.
 fn context_label_sign_coding(
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   ctx : BitPlaneDecodeContext,
-) -> Int {
+) -> Int32 {
   // A lot of subtleties going on here, all in the interest of achieving
   // the best performance. Fundamentally, we need to determine the
   // significances as well as signs of the four neighbors (i.e. not
@@ -862,10 +862,10 @@ fn context_label_sign_coding(
 ///|
 /// Return the context label for zero coding (Section D.3.1).
 fn context_label_zero_coding(
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   ctx : BitPlaneDecodeContext,
-) -> Int {
+) -> Int32 {
   let neighbors = ctx.neighborhood_significance_states(x, y)
 
   // Once again, the neighbors field is bit-packed, so we can just generate
@@ -881,10 +881,10 @@ fn context_label_zero_coding(
 ///|
 /// Return the context label for magnitude refinement coding (Table D.4).
 fn context_label_magnitude_refinement_coding(
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   ctx : BitPlaneDecodeContext,
-) -> Int {
+) -> Int32 {
   // If magnitude refined, then 16.
   let m1 = ctx.magnitude_refinement(x, y) * 16
   // Else: If at least one neighbor is significant then 15, else 14.
@@ -902,7 +902,7 @@ fn context_label_magnitude_refinement_coding(
 priv trait BitDecoder {
   fn bd_is_bypass(Self) -> Bool
   /// Read a bit using the given context, -1 for `None`.
-  fn bd_read_bit(Self, FixedArray[Int], Int) -> Int
+  fn bd_read_bit(Self, FixedArray[Int32], Int32) -> Int32
 }
 
 ///|
@@ -956,8 +956,8 @@ impl BitDecoder for BypassDecoder with fn bd_read_bit(self, _, _) {
 
 ///|
 fn fast_path_handle_coding_passes(
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
 ) -> Bool {
@@ -1047,13 +1047,13 @@ fn fp_cleanup_pass(
 fn fp_cleanup_from_run_length(
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
-  zero_contexts : FixedArray[Int],
-  flag_idx : Int,
-  coefficient_idx : Int,
-  stride : Int,
-  flags : UInt,
-  num_zeroes : Int,
-) -> UInt {
+  zero_contexts : FixedArray[Int32],
+  flag_idx : Int32,
+  coefficient_idx : Int32,
+  stride : Int32,
+  flags : UInt32,
+  num_zeroes : Int32,
+) -> UInt32 {
   let mut flags = flags
   match num_zeroes {
     0 => {
@@ -1111,15 +1111,15 @@ fn fp_cleanup_from_run_length(
 fn fp_cleanup_coefficient(
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
-  zero_contexts : FixedArray[Int],
-  flag_idx : Int,
-  column_coefficient_idx : Int,
-  stride : Int,
-  flags : UInt,
-  coefficient_in_stripe : Int,
+  zero_contexts : FixedArray[Int32],
+  flag_idx : Int32,
+  column_coefficient_idx : Int32,
+  stride : Int32,
+  flags : UInt32,
+  coefficient_in_stripe : Int32,
   check_flags : Bool,
   already_known_significant : Bool,
-) -> UInt {
+) -> UInt32 {
   let shift = coefficient_in_stripe * FLAGS_PER_COEFFICIENT
   if !check_flags ||
     (flags & ((FLAG_SIGNIFICANT_THIS | FLAG_ZERO_CODED_THIS) << shift)) == 0 {
@@ -1191,13 +1191,13 @@ fn fp_significance_propagation_pass(
 fn fp_significance_propagation_coefficient(
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
-  zero_contexts : FixedArray[Int],
-  flag_idx : Int,
-  column_coefficient_idx : Int,
-  stride : Int,
-  flags : UInt,
-  coefficient_in_stripe : Int,
-) -> UInt {
+  zero_contexts : FixedArray[Int32],
+  flag_idx : Int32,
+  column_coefficient_idx : Int32,
+  stride : Int32,
+  flags : UInt32,
+  coefficient_in_stripe : Int32,
+) -> UInt32 {
   let shift = coefficient_in_stripe * FLAGS_PER_COEFFICIENT
   let shifted_flags = flags >> shift
   let should_propagate = (
@@ -1268,11 +1268,11 @@ fn fp_magnitude_refinement_pass(
 fn fp_magnitude_refinement_coefficient(
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
-  column_coefficient_idx : Int,
-  stride : Int,
-  flags : UInt,
-  coefficient_in_stripe : Int,
-) -> UInt {
+  column_coefficient_idx : Int32,
+  stride : Int32,
+  flags : UInt32,
+  coefficient_in_stripe : Int32,
+) -> UInt32 {
   let shift = coefficient_in_stripe * FLAGS_PER_COEFFICIENT
   let shifted_flags = flags >> shift
   let should_decode_refinement = (
@@ -1298,10 +1298,10 @@ fn fp_magnitude_refinement_coefficient(
 fn fp_decode_sign_bit(
   ctx : BitPlaneDecodeContext,
   decoder : ArithmeticDecoder,
-  flag_idx : Int,
-  flags : UInt,
-  coefficient_in_stripe : Int,
-) -> Int {
+  flag_idx : Int32,
+  flags : UInt32,
+  coefficient_in_stripe : Int32,
+) -> Int32 {
   let shift = coefficient_in_stripe * FLAGS_PER_COEFFICIENT
   let shifted_flags = flags >> shift
   let left_flags = ctx.stripe_flags[flag_idx - 1]
@@ -1334,7 +1334,7 @@ fn fp_decode_sign_bit(
 }
 
 ///|
-fn fp_zero_context_lookup(sub_band_type : SubBandType) -> FixedArray[Int] {
+fn fp_zero_context_lookup(sub_band_type : SubBandType) -> FixedArray[Int32] {
   match sub_band_type {
     LowLow | LowHigh => zero_ctx_ll_lh_stripe_lookup
     HighLow => zero_ctx_hl_stripe_lookup
@@ -1343,7 +1343,7 @@ fn fp_zero_context_lookup(sub_band_type : SubBandType) -> FixedArray[Int] {
 }
 
 ///|
-fn fp_magnitude_refinement_context(flags : UInt) -> Int {
+fn fp_magnitude_refinement_context(flags : UInt32) -> Int32 {
   if (flags & FLAG_MAGNITUDE_REFINED_THIS) != 0 {
     16
   } else if (flags & FLAG_SIGNIFICANT_NEIGHBORS) != 0 {
@@ -1365,15 +1365,15 @@ fn fp_reset_for_next_bitplane(ctx : BitPlaneDecodeContext) -> Unit {
 ///|
 fn fp_push_magnitude_bit(
   ctx : BitPlaneDecodeContext,
-  idx : Int,
-  bit : Int,
+  idx : Int32,
+  bit : Int32,
 ) -> Unit {
   ctx.coefficients[idx] = ctx.coefficients[idx] |
     shl_u32(bit.reinterpret_as_uint(), ctx.current_bit_position)
 }
 
 ///|
-fn fp_set_sign(ctx : BitPlaneDecodeContext, idx : Int, sign : Int) -> Unit {
+fn fp_set_sign(ctx : BitPlaneDecodeContext, idx : Int32, sign : Int32) -> Unit {
   ctx.coefficients[idx] = ctx.coefficients[idx] |
     ((sign & 0xFF).reinterpret_as_uint() << 31)
 }
@@ -1381,12 +1381,12 @@ fn fp_set_sign(ctx : BitPlaneDecodeContext, idx : Int, sign : Int) -> Unit {
 ///|
 fn fp_set_significant(
   ctx : BitPlaneDecodeContext,
-  flag_idx : Int,
-  stride : Int,
-  flags : UInt,
-  coefficient_in_stripe : Int,
-  sign : Int,
-) -> UInt {
+  flag_idx : Int32,
+  stride : Int32,
+  flags : UInt32,
+  coefficient_in_stripe : Int32,
+  sign : Int32,
+) -> UInt32 {
   let shift = coefficient_in_stripe * FLAGS_PER_COEFFICIENT
   let sign = sign.reinterpret_as_uint()
   let stripe_flags = ctx.stripe_flags
@@ -1462,72 +1462,72 @@ fn fp_set_significant(
 //   31: sign below the stripe
 
 ///|
-const FLAGS_PER_COEFFICIENT : Int = 3
+const FLAGS_PER_COEFFICIENT : Int32 = 3
 
 ///|
-const LAST_COEFFICIENT_SHIFT : Int = 9 // 3 * FLAGS_PER_COEFFICIENT
+const LAST_COEFFICIENT_SHIFT : Int32 = 9 // 3 * FLAGS_PER_COEFFICIENT
 
 ///|
-const FLAG_SIGNIFICANT_TOP_LEFT : UInt = 0x1 // 1 << 0
+const FLAG_SIGNIFICANT_TOP_LEFT : UInt32 = 0x1 // 1 << 0
 
 ///|
-const FLAG_SIGNIFICANT_TOP : UInt = 0x2 // 1 << 1
+const FLAG_SIGNIFICANT_TOP : UInt32 = 0x2 // 1 << 1
 
 ///|
-const FLAG_SIGNIFICANT_TOP_RIGHT : UInt = 0x4 // 1 << 2
+const FLAG_SIGNIFICANT_TOP_RIGHT : UInt32 = 0x4 // 1 << 2
 
 ///|
-const FLAG_SIGNIFICANT_LEFT : UInt = 0x8 // 1 << 3
+const FLAG_SIGNIFICANT_LEFT : UInt32 = 0x8 // 1 << 3
 
 ///|
-const FLAG_SIGNIFICANT_THIS : UInt = 0x10 // 1 << 4
+const FLAG_SIGNIFICANT_THIS : UInt32 = 0x10 // 1 << 4
 
 ///|
-const FLAG_SIGNIFICANT_RIGHT : UInt = 0x20 // 1 << 5
+const FLAG_SIGNIFICANT_RIGHT : UInt32 = 0x20 // 1 << 5
 
 ///|
-const FLAG_SIGNIFICANT_BOTTOM_LEFT : UInt = 0x40 // 1 << 6
+const FLAG_SIGNIFICANT_BOTTOM_LEFT : UInt32 = 0x40 // 1 << 6
 
 ///|
-const FLAG_SIGNIFICANT_BOTTOM : UInt = 0x80 // 1 << 7
+const FLAG_SIGNIFICANT_BOTTOM : UInt32 = 0x80 // 1 << 7
 
 ///|
-const FLAG_SIGNIFICANT_BOTTOM_RIGHT : UInt = 0x100 // 1 << 8
+const FLAG_SIGNIFICANT_BOTTOM_RIGHT : UInt32 = 0x100 // 1 << 8
 
 ///|
 /// All neighbors (everything but `FLAG_SIGNIFICANT_THIS`).
-const FLAG_SIGNIFICANT_NEIGHBORS : UInt = 0x1EF
+const FLAG_SIGNIFICANT_NEIGHBORS : UInt32 = 0x1EF
 
 ///|
-const FLAG_SIGN_TOP_STRIPE_SHIFT : Int = 18
+const FLAG_SIGN_TOP_STRIPE_SHIFT : Int32 = 18
 
 ///|
-const FLAG_SIGN_THIS_SHIFT : Int = 19
+const FLAG_SIGN_THIS_SHIFT : Int32 = 19
 
 ///|
-const FLAG_MAGNITUDE_REFINED_THIS : UInt = 0x100000 // 1 << 20
+const FLAG_MAGNITUDE_REFINED_THIS : UInt32 = 0x100000 // 1 << 20
 
 ///|
-const FLAG_ZERO_CODED_THIS : UInt = 0x200000 // 1 << 21
+const FLAG_ZERO_CODED_THIS : UInt32 = 0x200000 // 1 << 21
 
 ///|
-const FLAG_SIGN_BOTTOM_THIS_SHIFT : Int = 22
+const FLAG_SIGN_BOTTOM_THIS_SHIFT : Int32 = 22
 
 ///|
-const FLAG_SIGN_BOTTOM_STRIPE_SHIFT : Int = 31
+const FLAG_SIGN_BOTTOM_STRIPE_SHIFT : Int32 = 31
 
 ///|
 /// (1 << 21) | (1 << 24) | (1 << 27) | (1 << 30)
-const FLAG_ZERO_CODED_ALL : UInt = 0x49200000
+const FLAG_ZERO_CODED_ALL : UInt32 = 0x49200000
 
 // Those are basically the same as the lookup tables in the default path,
 // but changed such that it works with the layout of a flag.
 
 ///|
-let sign_context_stripe_lookup : FixedArray[Int] = build_sign_context_lookup()
+let sign_context_stripe_lookup : FixedArray[Int32] = build_sign_context_lookup()
 
 ///|
-fn build_sign_context_lookup() -> FixedArray[Int] {
+fn build_sign_context_lookup() -> FixedArray[Int32] {
   let out = FixedArray::make(256, 0)
   for lookup in 0..<256 {
     let left_sign = lookup & 1
@@ -1554,22 +1554,24 @@ fn build_sign_context_lookup() -> FixedArray[Int] {
 }
 
 ///|
-let zero_ctx_ll_lh_stripe_lookup : FixedArray[Int] = build_zero_context_lookup(
+let zero_ctx_ll_lh_stripe_lookup : FixedArray[Int32] = build_zero_context_lookup(
   zero_ctx_ll_lh_lookup,
 )
 
 ///|
-let zero_ctx_hl_stripe_lookup : FixedArray[Int] = build_zero_context_lookup(
+let zero_ctx_hl_stripe_lookup : FixedArray[Int32] = build_zero_context_lookup(
   zero_ctx_hl_lookup,
 )
 
 ///|
-let zero_ctx_hh_stripe_lookup : FixedArray[Int] = build_zero_context_lookup(
+let zero_ctx_hh_stripe_lookup : FixedArray[Int32] = build_zero_context_lookup(
   zero_ctx_hh_lookup,
 )
 
 ///|
-fn build_zero_context_lookup(source : ReadOnlyArray[Int]) -> FixedArray[Int] {
+fn build_zero_context_lookup(
+  source : ReadOnlyArray[Int32],
+) -> FixedArray[Int32] {
   let out = FixedArray::make(512, 0)
   for flags in 0..<512 {
     out[flags] = source[neighbor_byte(flags)]
@@ -1578,7 +1580,7 @@ fn build_zero_context_lookup(source : ReadOnlyArray[Int]) -> FixedArray[Int] {
 }
 
 ///|
-fn neighbor_byte(flags : Int) -> Int {
+fn neighbor_byte(flags : Int32) -> Int32 {
   let f = flags.reinterpret_as_uint()
   (if (f & FLAG_SIGNIFICANT_TOP_LEFT) != 0 { 1 << 7 } else { 0 }) |
   (if (f & FLAG_SIGNIFICANT_TOP) != 0 { 1 << 6 } else { 0 }) |
@@ -1593,7 +1595,7 @@ fn neighbor_byte(flags : Int) -> Int {
 ///|
 /// `SIGN_CONTEXT_LOOKUP`: each `(label, xor_bit)` is packed as
 /// `label | xor_bit << 8`.
-let sign_context_lookup : ReadOnlyArray[Int] = [
+let sign_context_lookup : ReadOnlyArray[Int32] = [
   9, 10, 266, 0, 12, 13, 11, 0, 268, 267, 269, 0, 0, 0, 0, 0, 12, 13, 11, 0, 12,
   13, 11, 0, 9, 10, 266, 0, 0, 0, 0, 0, 268, 267, 269, 0, 9, 10, 266, 0, 268, 267,
   269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 9,
@@ -1608,7 +1610,7 @@ let sign_context_lookup : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let zero_ctx_ll_lh_lookup : ReadOnlyArray[Int] = [
+let zero_ctx_ll_lh_lookup : ReadOnlyArray[Int32] = [
   0, 3, 1, 3, 5, 7, 6, 7, 1, 3, 2, 3, 6, 7, 6, 7, 5, 7, 6, 7, 8, 8, 8, 8, 6, 7, 6,
   7, 8, 8, 8, 8, 1, 3, 2, 3, 6, 7, 6, 7, 2, 3, 2, 3, 6, 7, 6, 7, 6, 7, 6, 7, 8, 8,
   8, 8, 6, 7, 6, 7, 8, 8, 8, 8, 3, 4, 3, 4, 7, 7, 7, 7, 3, 4, 3, 4, 7, 7, 7, 7, 7,
@@ -1622,7 +1624,7 @@ let zero_ctx_ll_lh_lookup : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let zero_ctx_hl_lookup : ReadOnlyArray[Int] = [
+let zero_ctx_hl_lookup : ReadOnlyArray[Int32] = [
   0, 5, 1, 6, 3, 7, 3, 7, 1, 6, 2, 6, 3, 7, 3, 7, 3, 7, 3, 7, 4, 7, 4, 7, 3, 7, 3,
   7, 4, 7, 4, 7, 1, 6, 2, 6, 3, 7, 3, 7, 2, 6, 2, 6, 3, 7, 3, 7, 3, 7, 3, 7, 4, 7,
   4, 7, 3, 7, 3, 7, 4, 7, 4, 7, 5, 8, 6, 8, 7, 8, 7, 8, 6, 8, 6, 8, 7, 8, 7, 8, 7,
@@ -1636,7 +1638,7 @@ let zero_ctx_hl_lookup : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let zero_ctx_hh_lookup : ReadOnlyArray[Int] = [
+let zero_ctx_hh_lookup : ReadOnlyArray[Int32] = [
   0, 1, 3, 4, 1, 2, 4, 5, 3, 4, 6, 7, 4, 5, 7, 7, 1, 2, 4, 5, 2, 2, 5, 5, 4, 5, 7,
   7, 5, 5, 7, 7, 3, 4, 6, 7, 4, 5, 7, 7, 6, 7, 8, 8, 7, 7, 8, 8, 4, 5, 7, 7, 5, 5,
   7, 7, 7, 7, 8, 8, 7, 7, 8, 8, 1, 2, 4, 5, 2, 2, 5, 5, 4, 5, 7, 7, 5, 5, 7, 7, 2,

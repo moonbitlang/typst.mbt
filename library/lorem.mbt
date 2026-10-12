@@ -64,7 +64,7 @@ fn ends_with_sentence_punct(s : String) -> Bool {
 }
 
 ///|
-fn is_ascii_punctuation(c : Int) -> Bool {
+fn is_ascii_punctuation(c : Int32) -> Bool {
   (c >= 0x21 && c <= 0x2F) ||
   (c >= 0x3A && c <= 0x40) ||
   (c >= 0x5B && c <= 0x60) ||
@@ -78,7 +78,7 @@ fn ascii_capitalize(word : String) -> String {
   }
   let c = word.unsafe_get(0).to_int()
   if c >= 0x61 && c <= 0x7A {
-    Int::unsafe_to_char(c - 32).to_string() +
+    Int32::unsafe_to_char(c - 32).to_string() +
     word.unsafe_substring(start=1, end=word.length())
   } else {
     word
@@ -187,10 +187,10 @@ fn Words::next(self : Words) -> String? {
 
 ///|
 priv struct ChaCha20Rng {
-  key : FixedArray[UInt]
+  key : FixedArray[UInt32]
   mut counter : UInt64
-  buf : FixedArray[UInt]
-  mut index : Int
+  buf : FixedArray[UInt32]
+  mut index : Int32
 }
 
 ///|
@@ -241,11 +241,11 @@ fn ChaCha20Rng::refill(self : ChaCha20Rng) -> Unit {
 
 ///|
 fn chacha_quarter(
-  x : FixedArray[UInt],
-  a : Int,
-  b : Int,
-  c : Int,
-  d : Int,
+  x : FixedArray[UInt32],
+  a : Int32,
+  b : Int32,
+  c : Int32,
+  d : Int32,
 ) -> Unit {
   x[a] = x[a] + x[b]
   x[d] = rotl32(x[d] ^ x[a], 16)
@@ -258,7 +258,7 @@ fn chacha_quarter(
 }
 
 ///|
-fn ChaCha20Rng::next_u32(self : ChaCha20Rng) -> UInt {
+fn ChaCha20Rng::next_u32(self : ChaCha20Rng) -> UInt32 {
   if self.index >= 16 {
     self.refill()
   }
@@ -270,7 +270,7 @@ fn ChaCha20Rng::next_u32(self : ChaCha20Rng) -> UInt {
 ///|
 /// `rand::seq::gen_index`: `rng.gen_range(0..ubound as u32)` using
 /// `UniformInt::<u32>::sample_single_inclusive`.
-fn ChaCha20Rng::gen_index(self : ChaCha20Rng, ubound : Int) -> Int {
+fn ChaCha20Rng::gen_index(self : ChaCha20Rng, ubound : Int32) -> Int32 {
   let range = ubound.reinterpret_as_uint()
   let zone = (range << range.clz()) - 1U
   for ;; {
@@ -285,12 +285,12 @@ fn ChaCha20Rng::gen_index(self : ChaCha20Rng, ubound : Int) -> Int {
 }
 
 ///|
-fn rotl32(x : UInt, n : Int) -> UInt {
+fn rotl32(x : UInt32, n : Int32) -> UInt32 {
   (x << n) | (x >> (32 - n))
 }
 
 ///|
-fn rotr32(x : UInt, n : Int) -> UInt {
+fn rotr32(x : UInt32, n : Int32) -> UInt32 {
   if n == 0 {
     x
   } else {

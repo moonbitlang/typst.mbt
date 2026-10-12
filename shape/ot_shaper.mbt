@@ -1,40 +1,46 @@
 // Port of rustybuzz 0.20.1 `src/hb/ot_shaper.rs`.
 
 ///|
-fn GlyphInfo::ot_shaper_var_u8_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::ot_shaper_var_u8_category(self : GlyphInfo) -> Int32 {
   // var2 as [u8; 4], element 2.
   ((self.var2 >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_ot_shaper_var_u8_category(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_ot_shaper_var_u8_category(
+  self : GlyphInfo,
+  c : Int32,
+) -> Unit {
   self.var2 = (self.var2 & 0xFF00FFFF) |
     ((c.reinterpret_as_uint() & 0xFF) << 16)
 }
 
 ///|
-fn GlyphInfo::ot_shaper_var_u8_auxiliary(self : GlyphInfo) -> Int {
+fn GlyphInfo::ot_shaper_var_u8_auxiliary(self : GlyphInfo) -> Int32 {
   // var2 as [u8; 4], element 3.
   ((self.var2 >> 24) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_ot_shaper_var_u8_auxiliary(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_ot_shaper_var_u8_auxiliary(
+  self : GlyphInfo,
+  c : Int32,
+) -> Unit {
   self.var2 = (self.var2 & 0x00FFFFFF) |
     ((c.reinterpret_as_uint() & 0xFF) << 24)
 }
 
 ///|
-const MAX_COMBINING_MARKS : Int = 32
+const MAX_COMBINING_MARKS : Int32 = 32
 
 ///|
-const HB_OT_SHAPE_ZERO_WIDTH_MARKS_NONE : Int = 0
+const HB_OT_SHAPE_ZERO_WIDTH_MARKS_NONE : Int32 = 0
 
 ///|
-const HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_EARLY : Int = 1
+const HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_EARLY : Int32 = 1
 
 ///|
-const HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_LATE : Int = 2
+const HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_LATE : Int32 = 2
 
 ///|
 /// Shaper-specific plan data (rustybuzz stores a `Box<dyn Any>`).
@@ -67,7 +73,7 @@ priv struct OtShaper {
   /// Shapers can use to modify text before shaping starts.
   postprocess_glyphs : ((ShapePlan, Face, Buffer) -> Unit)?
   /// How to normalize.
-  normalization_preference : Int
+  normalization_preference : Int32
   /// Called during `shape()`'s normalization.
   decompose : DecomposeFn?
   /// Called during `shape()`'s normalization.
@@ -81,9 +87,9 @@ priv struct OtShaper {
   gpos_tag : @otf.Tag?
   /// Called during `shape()`.
   /// Shapers can use to modify ordering of combining marks.
-  reorder_marks : ((ShapePlan, Buffer, Int, Int) -> Unit)?
+  reorder_marks : ((ShapePlan, Buffer, Int32, Int32) -> Unit)?
   /// If and when to zero-width marks.
-  zero_width_marks : Int
+  zero_width_marks : Int32
   /// Whether to use fallback mark positioning.
   fallback_position : Bool
 }

@@ -6,7 +6,7 @@
 // SVG-like sRGB gradients.
 
 ///|
-const MAX_GRADIENT_SUBDIVISION_DEPTH : Int = 10
+const MAX_GRADIENT_SUBDIVISION_DEPTH : Int32 = 10
 
 ///|
 const RADIAL_EPSILON : Double = 1.0e-6
@@ -274,7 +274,7 @@ fn approximate_gradient_interval(
   start : GradientSample,
   end : GradientSample,
   tolerance : Float,
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   let offset_delta = end.offset - start.offset
   let quarter_offset = start.offset + offset_delta * 0.25

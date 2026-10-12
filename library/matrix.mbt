@@ -114,7 +114,7 @@ pub fn MathDelimiter::find_matching(self : MathDelimiter) -> MathDelimiter {
 
 ///|
 /// Upstream `char::from_u32`: `None` for surrogates and out-of-range values.
-fn char_from_u32(n : Int) -> Char? {
+fn char_from_u32(n : Int32) -> Char? {
   if n < 0 || n > 0x10FFFF || (n >= 0xD800 && n <= 0xDFFF) {
     None
   } else {

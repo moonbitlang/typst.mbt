@@ -180,7 +180,9 @@ pub fn WebImage::to_base64_url(self : WebImage) -> String {
 ///|
 /// Select the substitute for one of the 14 PDF standard fonts
 /// (`typst_assets::pdf`).
-fn select_standard_font(font : @hayro_interpret.StandardFont) -> (Bytes, Int)? {
+fn select_standard_font(
+  font : @hayro_interpret.StandardFont,
+) -> (Bytes, Int32)? {
   let bytes = match font {
     Helvetica => @pdf_fonts.sans()
     HelveticaBold => @pdf_fonts.sans_bold()

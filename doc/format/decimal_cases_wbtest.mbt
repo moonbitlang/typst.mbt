@@ -5,7 +5,7 @@
 ///|
 /// `(x, digits, point)`: `|x|` is exactly `0.digits × 10^point` (BigInt
 /// arithmetic on the mantissa and exponent of the double).
-let decimal_cases : ReadOnlyArray[(UInt64, String, Int)] = [
+let decimal_cases : ReadOnlyArray[(UInt64, String, Int32)] = [
   (
     0x3ff0000000000000UL, "10000000000000000000000000000000000000000000000000000",
     1,

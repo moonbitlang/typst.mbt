@@ -629,7 +629,7 @@ fn impl_array_sorted(
   // excessively reevaluate the key; we cache the keys explicitly.
   let items = self_.items.map(v => v.shared())
   let keys : Array[Value?] = Array::make(items.length(), None)
-  let key_of = (i : Int) => {
+  let key_of = (i : Int32) => {
     match keys[i] {
       Some(k) => k
       None => {
@@ -644,7 +644,7 @@ fn impl_array_sorted(
   }
   let order = match by_ {
     Some(by) => {
-      let are_in_order = (i : Int, j : Int) => {
+      let are_in_order = (i : Int32, j : Int32) => {
         let x = key_of(i)
         let y = key_of(j)
         match by.call_values(engine, context, [x.shared(), y.shared()]) {
@@ -706,9 +706,9 @@ fn impl_array_sorted(
 /// sort on larger ones, always comparing a later element against an
 /// earlier one first, so the first error matches upstream on small inputs.
 fn stable_sort_indices(
-  n : Int,
-  cmp : (Int, Int) -> Int raise SourceError,
-) -> Array[Int] raise SourceError {
+  n : Int32,
+  cmp : (Int32, Int32) -> Int32 raise SourceError,
+) -> Array[Int32] raise SourceError {
   let idx = Array::makei(n, i => i)
   sort_range(idx, 0, n, cmp)
   idx
@@ -716,10 +716,10 @@ fn stable_sort_indices(
 
 ///|
 fn sort_range(
-  idx : Array[Int],
-  lo : Int,
-  hi : Int,
-  cmp : (Int, Int) -> Int raise SourceError,
+  idx : Array[Int32],
+  lo : Int32,
+  hi : Int32,
+  cmp : (Int32, Int32) -> Int32 raise SourceError,
 ) -> Unit raise SourceError {
   if hi - lo <= 32 {
     // Binary insertion sort.

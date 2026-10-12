@@ -28,7 +28,7 @@
 
 ///|
 /// True `percent` times in a hundred.
-fn Rng::chance(self : Rng, percent : Int) -> Bool {
+fn Rng::chance(self : Rng, percent : Int32) -> Bool {
   self.below(100) < percent
 }
 
@@ -40,7 +40,7 @@ fn[T] Rng::pick(self : Rng, items : ArrayView[T]) -> T {
 ///|
 /// The seed of a sequence: the run's seed, the document's name and the
 /// number of the sequence (FNV-1a over them).
-fn sequence_seed(seed : Int, document : String, sequence : Int) -> UInt64 {
+fn sequence_seed(seed : Int32, document : String, sequence : Int32) -> UInt64 {
   let mut h = 0xCBF29CE484222325UL
   let mix = (v : UInt64) => h = (h ^ v) * 0x100000001B3UL
   mix(seed.to_uint64())
@@ -66,7 +66,7 @@ priv struct Project {
   /// The file that the last edit probably broke, with what it held before.
   mut broken : (@syntax.FileId, Bytes?)?
   /// Counts inserted pieces, so that they differ.
-  mut counter : Int
+  mut counter : Int32
 }
 
 ///|
@@ -131,7 +131,12 @@ fn Project::known_files(self : Project, typ : Bool) -> Array[@syntax.FileId] {
 
 ///|
 /// `bytes` with `start..end` replaced.
-fn splice(bytes : Bytes, start : Int, end : Int, replacement : Bytes) -> Bytes {
+fn splice(
+  bytes : Bytes,
+  start : Int32,
+  end : Int32,
+  replacement : Bytes,
+) -> Bytes {
   let n = replacement.length()
   Bytes::makei(bytes.length() - (end - start) + n, i => {
     if i < start {
@@ -146,7 +151,7 @@ fn splice(bytes : Bytes, start : Int, end : Int, replacement : Bytes) -> Bytes {
 
 ///|
 /// An offset in `0..=bytes.length()` that is not inside a UTF-8 sequence.
-fn char_boundary(rng : Rng, bytes : Bytes) -> Int {
+fn char_boundary(rng : Rng, bytes : Bytes) -> Int32 {
   let mut k = rng.below(bytes.length() + 1)
   while k > 0 && k < bytes.length() && (bytes[k].to_int() & 0xC0) == 0x80 {
     k -= 1
@@ -159,15 +164,15 @@ fn char_boundary(rng : Rng, bytes : Bytes) -> Int {
 /// offsets and lengths).
 priv struct Sites {
   /// The `Text` leaves.
-  text : Array[(Int, Int)]
+  text : Array[(Int32, Int32)]
   /// Where paragraphs end.
-  parbreaks : Array[Int]
+  parbreaks : Array[Int32]
   /// The number literals.
-  numbers : Array[(Int, Int)]
+  numbers : Array[(Int32, Int32)]
   /// The number literals of set rules.
-  set_numbers : Array[(Int, Int)]
+  set_numbers : Array[(Int32, Int32)]
   /// The string literals.
-  strings : Array[(Int, Int)]
+  strings : Array[(Int32, Int32)]
 }
 
 ///|
@@ -179,7 +184,7 @@ fn Sites::of(text : String) -> Sites {
     set_numbers: [],
     strings: [],
   }
-  fn walk(node : @syntax.SyntaxNode, offset : Int, in_set : Bool) {
+  fn walk(node : @syntax.SyntaxNode, offset : Int32, in_set : Bool) {
     let len = node.len()
     match node.kind() {
       Text => if len > 0 { sites.text.push((offset, len)) }
@@ -241,7 +246,7 @@ let edit_breakers : ReadOnlyArray[String] = [
 ]
 
 ///|
-fn Project::next_number(self : Project) -> Int {
+fn Project::next_number(self : Project) -> Int32 {
   self.counter += 1
   self.counter
 }
@@ -285,7 +290,7 @@ fn decoded(bytes : Bytes) -> String? {
 }
 
 ///|
-fn ascii(bytes : Bytes, start : Int, len : Int) -> String {
+fn ascii(bytes : Bytes, start : Int32, len : Int32) -> String {
   let out = StringBuilder()
   for i in start..<(start + len) {
     out.write_char(bytes[i].to_int().unsafe_to_char())
@@ -412,7 +417,7 @@ fn implausible(rng : Rng, bytes : Bytes) -> (Bytes, String) {
         (splice(bytes, at, at, b"x"), "change-string @\{at}")
       }
     }
-    0..=5 => {
+    0..<=5 => {
       let at = char_boundary(rng, bytes)
       let breaker = rng.pick(edit_breakers[:])
       (splice(bytes, at, at, @utf8.encode(breaker)), "insert-breaker @\{at}")
@@ -662,8 +667,8 @@ fn Project::edit(self : Project, rng : Rng) -> String {
   }
   if roll < 14 {
     let day = match rng.below(10) {
-      0..=4 => self.variant.day + 1
-      5..=7 => 0
+      0..<=4 => self.variant.day + 1
+      5..<=7 => 0
       _ => rng.below(20000)
     }
     self.variant = { ..self.variant, day, }
@@ -729,13 +734,13 @@ fn Project::edit(self : Project, rng : Rng) -> String {
 /// in a document that works.
 priv struct Sweep {
   /// How many of the other files are edited at most.
-  files : Int
+  files : Int32
   /// Whether the fonts change.
   fonts : Bool
-  mut stage : Int
+  mut stage : Int32
   /// The other files, once the sweep gets to them.
   mut plan : Array[@syntax.FileId]
-  mut at : Int
+  mut at : Int32
   /// What the last step changed, to undo it.
   mut last : SweepUndo?
 }
@@ -750,7 +755,7 @@ priv enum SweepUndo {
 }
 
 ///|
-fn Sweep::new(files : Int, fonts : Bool) -> Sweep {
+fn Sweep::new(files : Int32, fonts : Bool) -> Sweep {
   { files, fonts, stage: 0, plan: [], at: 0, last: None, }
 }
 

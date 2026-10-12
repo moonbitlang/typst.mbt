@@ -30,14 +30,14 @@ const S_COUNT = 11172 // L_COUNT * N_COUNT
 
 ///|
 /// The canonical combining class of a character.
-pub fn canonical_combining_class(c : Int) -> Int {
+pub fn canonical_combining_class(c : Int32) -> Int32 {
   in_valued(ccc_table, c, 0)
 }
 
 ///|
 /// Binary search a `[c, len, chars..., ...]` table sorted by `c`. The
 /// entries have variable length, so this first builds an index lazily.
-fn decomposition_index(table : ReadOnlyArray[Int]) -> Array[Int] {
+fn decomposition_index(table : ReadOnlyArray[Int32]) -> Array[Int32] {
   let index = []
   let mut i = 0
   while i < table.length() {
@@ -48,17 +48,17 @@ fn decomposition_index(table : ReadOnlyArray[Int]) -> Array[Int] {
 }
 
 ///|
-let canonical_index : Ref[Array[Int]?] = { val: None, }
+let canonical_index : Ref[Array[Int32]?] = { val: None, }
 
 ///|
-let compatible_index : Ref[Array[Int]?] = { val: None, }
+let compatible_index : Ref[Array[Int32]?] = { val: None, }
 
 ///|
 fn find_decomposition(
-  table : ReadOnlyArray[Int],
-  cache : Ref[Array[Int]?],
-  c : Int,
-) -> Int? {
+  table : ReadOnlyArray[Int32],
+  cache : Ref[Array[Int32]?],
+  c : Int32,
+) -> Int32? {
   let index = match cache.val {
     Some(index) => index
     None => {
@@ -84,7 +84,7 @@ fn find_decomposition(
 
 ///|
 /// Push the full decomposition of `c` to `out`.
-fn decompose_char(c : Int, compat : Bool, out : Array[Int]) -> Unit {
+fn decompose_char(c : Int32, compat : Bool, out : Array[Int32]) -> Unit {
   // Hangul syllables are decomposed algorithmically.
   if c >= S_BASE && c < S_BASE + S_COUNT {
     let s = c - S_BASE
@@ -122,7 +122,7 @@ fn decompose_char(c : Int, compat : Bool, out : Array[Int]) -> Unit {
 
 ///|
 /// Decompose and canonically reorder the string.
-fn decompose(s : StringView, compat : Bool) -> Array[Int] {
+fn decompose(s : StringView, compat : Bool) -> Array[Int32] {
   let out = []
   let mut i = 0
   while i < s.length() {
@@ -159,7 +159,7 @@ fn decompose(s : StringView, compat : Bool) -> Array[Int] {
 
 ///|
 /// The primary composite of `a` and `b`, if any.
-fn compose_pair(a : Int, b : Int) -> Int? {
+fn compose_pair(a : Int32, b : Int32) -> Int32? {
   // Hangul.
   if a >= L_BASE && a < L_BASE + L_COUNT && b >= V_BASE && b < V_BASE + V_COUNT {
     return Some(S_BASE + ((a - L_BASE) * V_COUNT + (b - V_BASE)) * T_COUNT)
@@ -190,7 +190,7 @@ fn compose_pair(a : Int, b : Int) -> Int? {
 
 ///|
 /// Canonical composition of a decomposed, reordered sequence.
-fn compose(chars : Array[Int]) -> Array[Int] {
+fn compose(chars : Array[Int32]) -> Array[Int32] {
   let out = []
   let mut starter = -1
   // The combining class of the last char after the starter, or -1 if the
@@ -222,7 +222,7 @@ fn compose(chars : Array[Int]) -> Array[Int] {
 }
 
 ///|
-fn chars_to_string(chars : Array[Int]) -> String {
+fn chars_to_string(chars : Array[Int32]) -> String {
   let buf = StringBuilder()
   for c in chars {
     buf.write_char(c.unsafe_to_char())

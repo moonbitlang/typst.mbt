@@ -855,7 +855,7 @@ fn text_elem_alternates_default() -> Value {
 
 ///|
 /// A set of stylistic sets to enable.
-pub(all) struct StylisticSets(Int) derive(Eq, Hash, Default)
+pub(all) struct StylisticSets(Int32) derive(Eq, Hash, Default)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -872,13 +872,13 @@ pub extend StylisticSets with Default::{default}
 
 ///|
 /// Returns whether this set contains a particular stylistic set.
-pub fn StylisticSets::has(self : StylisticSets, ss : Int) -> Bool {
+pub fn StylisticSets::has(self : StylisticSets, ss : Int32) -> Bool {
   (self.0 & (1 << ss)) != 0
 }
 
 ///|
 /// Returns all stylistic sets to enable.
-pub fn StylisticSets::sets(self : StylisticSets) -> Array[Int] {
+pub fn StylisticSets::sets(self : StylisticSets) -> Array[Int32] {
   let out = []
   for i in 1..<=20 {
     if self.has(i) {

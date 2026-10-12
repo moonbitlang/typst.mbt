@@ -31,7 +31,7 @@ pub fn format_int_with_base(n : Int64, base : Int64) -> String {
     out.write_string(minus_sign)
   }
   for i = buf.length() - 1; i >= 0; i = i - 1 {
-    out.write_char(Int::unsafe_to_char(buf[i].to_int()))
+    out.write_char(Int32::unsafe_to_char(buf[i].to_int()))
   }
   out.to_string()
 }
@@ -44,7 +44,7 @@ pub fn format_int_with_base(n : Int64, base : Int64) -> String {
 /// float literal. For example, it may return `"float.inf"`.
 pub fn format_float(
   value : Double,
-  precision? : Int,
+  precision? : Int32,
   force_separator : Bool,
   unit : String,
 ) -> String {
@@ -196,7 +196,7 @@ pub fn rust_trim_start(s : String) -> String {
   let mut i = 0
   while i < s.length() {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
+    if !@unicode.is_whitespace(Int32::unsafe_to_char(c)) {
       break
     }
     i = next
@@ -210,7 +210,7 @@ pub fn rust_trim_end(s : String) -> String {
   let mut end = s.length()
   while end > 0 {
     let { cp: c, idx: prev, } = @unicode.decode_before(s, end)
-    if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
+    if !@unicode.is_whitespace(Int32::unsafe_to_char(c)) {
       break
     }
     end = prev

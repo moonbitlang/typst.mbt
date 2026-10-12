@@ -505,13 +505,13 @@ fn setup_masks_fraction(ctx : ShapeContext) -> Unit {
 }
 
 ///|
-fn rb_flag(x : Int) -> UInt {
+fn rb_flag(x : Int32) -> UInt32 {
   1U << x
 }
 
 ///|
 /// FLAG_UNSAFE: 0 for out-of-range bits.
-fn rb_flag_unsafe(x : Int) -> UInt {
+fn rb_flag_unsafe(x : Int32) -> UInt32 {
   if x >= 0 && x < 32 {
     1U << x
   } else {
@@ -521,19 +521,19 @@ fn rb_flag_unsafe(x : Int) -> UInt {
 
 ///|
 /// FLAG_RANGE
-fn rb_flag_range(x : Int, y : Int) -> UInt {
+fn rb_flag_range(x : Int32, y : Int32) -> UInt32 {
   (if x < y { 1U } else { 0U }) + rb_flag(y + 1) - rb_flag(x)
 }
 
 ///|
 /// FLAG64
-fn rb_flag64(x : Int) -> UInt64 {
+fn rb_flag64(x : Int32) -> UInt64 {
   1UL << x
 }
 
 ///|
 /// FLAG64_UNSAFE
-fn rb_flag64_unsafe(x : Int) -> UInt64 {
+fn rb_flag64_unsafe(x : Int32) -> UInt64 {
   if x >= 0 && x < 64 {
     1UL << x
   } else {
@@ -882,7 +882,7 @@ fn propagate_flags(buffer : Buffer) -> Unit {
     0
   let clear_concat = (buffer.flags & BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT) == 0
   buffer.foreach_cluster((start, end) => {
-    let mut mask : UInt = 0
+    let mut mask : UInt32 = 0
     for i in start..<end {
       mask = mask | (buffer.info[i].mask & GLYPH_FLAG_DEFINED)
     }

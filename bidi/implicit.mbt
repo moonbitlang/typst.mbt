@@ -24,8 +24,8 @@ fn resolve_weak(
   // The previous class for the purposes of rule W1, not tracking changes from any other rules.
   let mut prev_class_before_w1 = sequence.sos
   let mut last_strong_is_al = false
-  let et_run_indices : Array[Int] = [] // for W5
-  let bn_run_indices : Array[Int] = [] // for W5 +  <https://www.unicode.org/reports/tr9/#Retaining_Explicit_Formatting_Characters>
+  let et_run_indices : Array[Int32] = [] // for W5
+  let bn_run_indices : Array[Int32] = [] // for W5 +  <https://www.unicode.org/reports/tr9/#Retaining_Explicit_Formatting_Characters>
   for run_index, level_run in sequence.runs {
     for i in level_run.start..<level_run.end {
       if processing_classes[i] == BN {
@@ -370,7 +370,7 @@ fn resolve_neutral(
 
   // N1 and N2.
   // Indices of every byte in this isolating run sequence
-  let indices : Array[Int] = []
+  let indices : Array[Int32] = []
   for run in sequence.runs {
     for i in run.start..<run.end {
       indices.push(i)
@@ -382,7 +382,7 @@ fn resolve_neutral(
     let mut i = indices[cursor]
     cursor += 1
     // Process sequences of NI characters.
-    let ni_run : Array[Int] = []
+    let ni_run : Array[Int32] = []
     // The BN is for <https://www.unicode.org/reports/tr9/#Retaining_Explicit_Formatting_Characters>
     if is_NI(processing_classes[i]) || processing_classes[i] == BN {
       // Consume a run of consecutive NI characters.
@@ -434,13 +434,13 @@ fn resolve_neutral(
 ///|
 priv struct BracketPair {
   /// The text-relative index of the opening bracket.
-  start : Int
+  start : Int32
   /// The text-relative index of the closing bracket.
-  end : Int
+  end : Int32
   /// The index of the run (in the run sequence) that the opening bracket is in.
-  start_run : Int
+  start_run : Int32
   /// The index of the run (in the run sequence) that the closing bracket is in.
-  end_run : Int
+  end_run : Int32
 }
 
 ///|
@@ -456,7 +456,7 @@ fn identify_bracket_pairs(
   original_classes : MutArrayView[BidiClass],
   bracket_pairs : Array[BracketPair],
 ) -> Unit {
-  let stack : Array[(Int, Int, Int)] = []
+  let stack : Array[(Int32, Int32, Int32)] = []
   for run_index, level_run in run_sequence.runs {
     // (`for (i, ch) in text.subrange(..).char_indices()`, without the array
     // of pairs.)

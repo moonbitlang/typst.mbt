@@ -35,7 +35,7 @@ pub fn Text::new(s : String) -> Text {
 ///|
 /// A view of the first `end` bytes (like `&text[..end]`; `end` must be a char
 /// boundary, otherwise the whole text is returned).
-pub fn Text::prefix(self : Text, end : Int) -> Text {
+pub fn Text::prefix(self : Text, end : Int32) -> Text {
   match self.hay.char_pos(end) {
     Some(n) => { hay: self.hay.prefix(n), }
     None => self
@@ -44,7 +44,7 @@ pub fn Text::prefix(self : Text, end : Int) -> Text {
 
 ///|
 /// The length in UTF-8 bytes.
-pub fn Text::len(self : Text) -> Int {
+pub fn Text::len(self : Text) -> Int32 {
   self.hay.byte_len()
 }
 
@@ -57,7 +57,7 @@ pub fn Text::as_str(self : Text) -> String {
 ///|
 /// The char position of a byte offset (`None` if not a char boundary or out
 /// of bounds).
-fn Text::char_pos(self : Text, byte : Int) -> Int? {
+fn Text::char_pos(self : Text, byte : Int32) -> Int32? {
   self.hay.char_pos(byte)
 }
 
@@ -97,12 +97,12 @@ fn SyntaxConfig::default() -> SyntaxConfig {
 priv struct RegexOptions {
   mut pattern : String
   mut syntaxc : SyntaxConfig
-  mut backtrack_limit : Int
+  mut backtrack_limit : Int32
   mut oniguruma_mode : Bool
 }
 
 ///|
-fn RegexOptions::get_flag_value(flag_value : Bool, enum_value : Int) -> Int {
+fn RegexOptions::get_flag_value(flag_value : Bool, enum_value : Int32) -> Int32 {
   if flag_value {
     enum_value
   } else {
@@ -111,7 +111,7 @@ fn RegexOptions::get_flag_value(flag_value : Bool, enum_value : Int) -> Int {
 }
 
 ///|
-fn RegexOptions::compute_flags(self : RegexOptions) -> Int {
+fn RegexOptions::compute_flags(self : RegexOptions) -> Int32 {
   let insensitive = RegexOptions::get_flag_value(
     self.syntaxc.case_insensitive,
     FLAG_CASEI,
@@ -251,7 +251,7 @@ pub fn RegexBuilder::unicode_mode(
 /// Default is `1_000_000` (1 million).
 pub fn RegexBuilder::backtrack_limit(
   self : RegexBuilder,
-  limit : Int,
+  limit : Int32,
 ) -> RegexBuilder {
   self.options.backtrack_limit = limit
   self
@@ -262,7 +262,7 @@ pub fn RegexBuilder::backtrack_limit(
 /// (accepted for compatibility; the `regex` package has no size limit).
 pub fn RegexBuilder::delegate_size_limit(
   self : RegexBuilder,
-  limit : Int,
+  limit : Int32,
 ) -> RegexBuilder {
   ignore(limit)
   self
@@ -273,7 +273,7 @@ pub fn RegexBuilder::delegate_size_limit(
 /// compatibility; unused).
 pub fn RegexBuilder::delegate_dfa_size_limit(
   self : RegexBuilder,
-  limit : Int,
+  limit : Int32,
 ) -> RegexBuilder {
   ignore(limit)
   self
@@ -296,7 +296,7 @@ pub fn RegexBuilder::oniguruma_mode(
 /// A compiled regular expression.
 pub struct Regex {
   priv inner : RegexImpl
-  priv named_groups : Map[String, Int]
+  priv named_groups : Map[String, Int32]
 }
 
 ///|
@@ -310,7 +310,7 @@ priv enum RegexImpl {
     explicit_capture_group_0~ : Bool,
     debug_pattern~ : String
   )
-  Fancy(prog~ : Prog, n_groups~ : Int, options~ : RegexOptions)
+  Fancy(prog~ : Prog, n_groups~ : Int32, options~ : RegexOptions)
 }
 
 ///|
@@ -437,7 +437,7 @@ pub fn Regex::find(self : Regex, text : String) -> Match? raise FancyError {
 pub fn Regex::find_from_pos(
   self : Regex,
   text : String,
-  pos : Int,
+  pos : Int32,
 ) -> Match? raise FancyError {
   self.find_from_pos_text(Text::new(text), pos)
 }
@@ -447,7 +447,7 @@ pub fn Regex::find_from_pos(
 pub fn Regex::find_from_pos_text(
   self : Regex,
   text : Text,
-  pos : Int,
+  pos : Int32,
 ) -> Match? raise FancyError {
   guard text.char_pos(pos) is Some(pos) else { return None }
   self.find_from_pos_with_option_flags(text, pos, 0)
@@ -458,8 +458,8 @@ pub fn Regex::find_from_pos_text(
 fn Regex::find_from_pos_with_option_flags(
   self : Regex,
   text : Text,
-  pos : Int,
-  option_flags : Int,
+  pos : Int32,
+  option_flags : Int32,
 ) -> Match? raise FancyError {
   match self.inner {
     Wrap(inner~, explicit_capture_group_0~, ..) =>
@@ -520,7 +520,7 @@ pub fn Regex::captures(
 pub fn Regex::captures_from_pos(
   self : Regex,
   text : String,
-  pos : Int,
+  pos : Int32,
 ) -> Captures? raise FancyError {
   self.captures_from_pos_text(Text::new(text), pos)
 }
@@ -530,7 +530,7 @@ pub fn Regex::captures_from_pos(
 pub fn Regex::captures_from_pos_text(
   self : Regex,
   text : Text,
-  pos : Int,
+  pos : Int32,
 ) -> Captures? raise FancyError {
   guard text.char_pos(pos) is Some(pos) else { return None }
   self.captures_from_char_pos(text, pos)
@@ -540,7 +540,7 @@ pub fn Regex::captures_from_pos_text(
 fn Regex::captures_from_char_pos(
   self : Regex,
   text : Text,
-  pos : Int,
+  pos : Int32,
 ) -> Captures? raise FancyError {
   let named_groups = self.named_groups
   match self.inner {
@@ -572,7 +572,7 @@ fn Regex::captures_from_char_pos(
 ///|
 /// Returns the number of captures, including the implicit capture of the
 /// entire expression.
-pub fn Regex::captures_len(self : Regex) -> Int {
+pub fn Regex::captures_len(self : Regex) -> Int32 {
   match self.inner {
     Wrap(inner~, explicit_capture_group_0~, ..) =>
       inner.group_len() - (if explicit_capture_group_0 { 1 } else { 0 })
@@ -635,7 +635,7 @@ pub fn Regex::replace_all(
 pub fn Regex::replacen(
   self : Regex,
   text : String,
-  limit : Int,
+  limit : Int32,
   rep : Replacer,
 ) -> String {
   self.try_replacen(text, limit, rep) catch {
@@ -652,7 +652,7 @@ pub fn Regex::replacen(
 pub fn Regex::try_replacen(
   self : Regex,
   text : String,
-  limit : Int,
+  limit : Int32,
   rep : Replacer,
 ) -> String raise FancyError {
   let t = Text::new(text)
@@ -723,7 +723,7 @@ pub fn Regex::split(self : Regex, target : String) -> Split {
 /// Splits the string by matches of the regex at most `limit` times.
 ///
 /// The `N`th substring is the remaining part of the target.
-pub fn Regex::splitn(self : Regex, target : String, limit : Int) -> SplitN {
+pub fn Regex::splitn(self : Regex, target : String, limit : Int32) -> SplitN {
   { splits: self.split(target), limit, }
 }
 
@@ -731,31 +731,31 @@ pub fn Regex::splitn(self : Regex, target : String, limit : Int) -> SplitN {
 /// A single match of a regex or group in an input text
 pub struct Match {
   priv text : Text
-  priv start_char : Int
-  priv end_char : Int
+  priv start_char : Int32
+  priv end_char : Int32
 }
 
 ///|
-fn Match::new(text : Text, start : Int, end : Int) -> Match {
+fn Match::new(text : Text, start : Int32, end : Int32) -> Match {
   { text, start_char: start, end_char: end, }
 }
 
 ///|
 /// Returns the starting byte offset of the match in the text.
-pub fn Match::start(self : Match) -> Int {
+pub fn Match::start(self : Match) -> Int32 {
   self.text.hay.byte_offset(self.start_char)
 }
 
 ///|
 /// Returns the ending byte offset of the match in the text.
-pub fn Match::end(self : Match) -> Int {
+pub fn Match::end(self : Match) -> Int32 {
   self.text.hay.byte_offset(self.end_char)
 }
 
 ///|
 /// Returns the range over the starting and ending byte offsets of the match
 /// in text.
-pub fn Match::range(self : Match) -> (Int, Int) {
+pub fn Match::range(self : Match) -> (Int32, Int32) {
   (self.start(), self.end())
 }
 
@@ -798,8 +798,8 @@ pub struct Matches {
   priv re : Regex
   priv text : Text
   /// Char positions.
-  priv mut last_end : Int
-  priv mut last_match : Int?
+  priv mut last_end : Int32
+  priv mut last_match : Int32?
 }
 
 ///|
@@ -938,8 +938,8 @@ pub fn CaptureMatches::iter(
 pub struct Captures {
   priv text : Text
   /// Char positions of the groups' starts and ends (-1 if unset).
-  priv saves : Array[Int]
-  priv named_groups : Map[String, Int]
+  priv saves : Array[Int32]
+  priv named_groups : Map[String, Int32]
 }
 
 ///|
@@ -947,7 +947,7 @@ pub struct Captures {
 ///
 /// If there is no match for that group or the index does not correspond to
 /// a group, `None` is returned. The index 0 returns the whole match.
-pub fn Captures::get(self : Captures, i : Int) -> Match? {
+pub fn Captures::get(self : Captures, i : Int32) -> Match? {
   let slot = i * 2
   if i < 0 || slot >= self.saves.length() {
     return None
@@ -1014,14 +1014,14 @@ pub fn Captures::iter(self : Captures) -> Iter[Match?] {
 ///|
 /// How many groups were captured. This is always at least 1 because group 0
 /// returns the whole match.
-pub fn Captures::len(self : Captures) -> Int {
+pub fn Captures::len(self : Captures) -> Int32 {
   self.saves.length() / 2
 }
 
 ///|
 /// Get a group's text by index. Aborts if there is no group at the given
 /// index (upstream `Index<usize>`).
-pub fn Captures::at(self : Captures, i : Int) -> String {
+pub fn Captures::at(self : Captures, i : Int32) -> String {
   match self.get(i) {
     Some(m) => m.as_str()
     None => abort("no group at index '\{i}'")
@@ -1043,7 +1043,7 @@ pub fn Captures::at_name(self : Captures, name : String) -> String {
 pub struct Split {
   priv matches : Matches
   /// Char position.
-  priv mut next_start : Int
+  priv mut next_start : Int32
   priv target : Text
 }
 
@@ -1087,7 +1087,7 @@ pub fn Split::iter(self : Split) -> Iter[Result[String, FancyError]] {
 /// An iterator over at most `N` substrings delimited by a regex.
 pub struct SplitN {
   priv splits : Split
-  priv mut limit : Int
+  priv mut limit : Int32
 }
 
 ///|

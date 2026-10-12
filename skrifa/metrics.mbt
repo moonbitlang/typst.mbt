@@ -43,9 +43,9 @@ pub extend BoundingBox with @debug.Debug::{to_repr}
 /// Metrics that apply to all glyphs in a font.
 pub(all) struct Metrics {
   /// Number of font design units per em unit.
-  mut units_per_em : Int
+  mut units_per_em : Int32
   /// Number of glyphs in the font.
-  mut glyph_count : Int
+  mut glyph_count : Int32
   /// True if the font is not proportionally spaced.
   mut is_monospace : Bool
   /// Italic angle in counter-clockwise degrees from the vertical.
@@ -83,7 +83,7 @@ pub extend Metrics with Eq::{not_equal, equal}
 pub extend Metrics with @debug.Debug::{to_repr}
 
 ///|
-fn f(v : Int) -> Float {
+fn f(v : Int32) -> Float {
   Float::from_int(v)
 }
 
@@ -191,10 +191,10 @@ pub fn Metrics::new(
 pub struct GlyphMetrics {
   font : FontRef
   size : Size
-  glyph_count : Int
+  glyph_count : Int32
   fixed_scale : Fixed
   priv hmtx : @read_fonts.Hmtx?
-  default_advance_width : Int
+  default_advance_width : Int32
   priv loca_glyf : (@read_fonts.Loca, @read_fonts.Glyf)?
 }
 
@@ -245,12 +245,12 @@ pub fn GlyphMetrics::new(
 
 ///|
 /// Returns the number of available glyphs in the font.
-pub fn GlyphMetrics::glyph_count(self : GlyphMetrics) -> Int {
+pub fn GlyphMetrics::glyph_count(self : GlyphMetrics) -> Int32 {
   self.glyph_count
 }
 
 ///|
-fn GlyphMetrics::apply(self : GlyphMetrics, value : Int) -> Float {
+fn GlyphMetrics::apply(self : GlyphMetrics, value : Int32) -> Float {
   self.fixed_scale
   .mul_div(Fixed::from_bits(value), Fixed::from_bits(64))
   .to_f32()

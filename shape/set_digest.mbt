@@ -16,13 +16,18 @@ fn SetDigest::new() -> SetDigest {
 }
 
 ///|
-fn digest_mask_for(g : Int, shift : Int) -> UInt64 {
+fn digest_mask_for(g : Int32, shift : Int32) -> UInt64 {
   1UL << ((g.to_uint64() >> shift) & 63).to_int()
 }
 
 ///|
 /// `hb_set_digest_bits_pattern_t::add_range` on one mask.
-fn digest_add_range(mask : UInt64, a : Int, b : Int, shift : Int) -> UInt64 {
+fn digest_add_range(
+  mask : UInt64,
+  a : Int32,
+  b : Int32,
+  shift : Int32,
+) -> UInt64 {
   if mask == 0xFFFFFFFFFFFFFFFFUL {
     return mask
   }
@@ -38,14 +43,14 @@ fn digest_add_range(mask : UInt64, a : Int, b : Int, shift : Int) -> UInt64 {
 }
 
 ///|
-fn SetDigest::add(self : SetDigest, g : Int) -> Unit {
+fn SetDigest::add(self : SetDigest, g : Int32) -> Unit {
   self.m4 = self.m4 | digest_mask_for(g, 4)
   self.m0 = self.m0 | digest_mask_for(g, 0)
   self.m9 = self.m9 | digest_mask_for(g, 9)
 }
 
 ///|
-fn SetDigest::add_range(self : SetDigest, a : Int, b : Int) -> Unit {
+fn SetDigest::add_range(self : SetDigest, a : Int32, b : Int32) -> Unit {
   self.m4 = digest_add_range(self.m4, a, b, 4)
   self.m0 = digest_add_range(self.m0, a, b, 0)
   self.m9 = digest_add_range(self.m9, a, b, 9)
@@ -57,7 +62,7 @@ fn SetDigest::may_have(self : SetDigest, o : SetDigest) -> Bool {
 }
 
 ///|
-fn SetDigest::may_have_glyph(self : SetDigest, g : Int) -> Bool {
+fn SetDigest::may_have_glyph(self : SetDigest, g : Int32) -> Bool {
   (self.m4 & digest_mask_for(g, 4)) != 0 &&
   (self.m0 & digest_mask_for(g, 0)) != 0 &&
   (self.m9 & digest_mask_for(g, 9)) != 0

@@ -225,7 +225,7 @@ pub(all) enum Op {
   /// # Encoding
   ///
   /// Followed `len_target` times by [`Op::Branch`].
-  BranchTable0(index~ : Slot, len_targets~ : Int)
+  BranchTable0(index~ : Slot, len_targets~ : Int32)
   /// A Wasm `br_table` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -238,7 +238,7 @@ pub(all) enum Op {
   /// 2. Followed `len_target` times by
   ///
   /// - [`Op::BranchTableTarget`]
-  BranchTableSpan(index~ : Slot, len_targets~ : Int)
+  BranchTableSpan(index~ : Slot, len_targets~ : Int32)
   /// Copies `value` to `result`.
   ///
   /// # Note
@@ -275,7 +275,7 @@ pub(all) enum Op {
   /// - Read [`Op::Copy`] for more information about this instruction.
   CopyF64Imm32(result~ : Slot, value~ : Const32)
   /// Variant of [`Op::CopySpan`] that assumes that `results` and `values` span do not overlap.
-  CopySpan(results~ : SlotSpan, values~ : SlotSpan, len~ : Int)
+  CopySpan(results~ : SlotSpan, values~ : SlotSpan, len~ : Int32)
   /// Variant of [`Op::CopyMany`] that assumes that `results` and `values` do not overlap.
   ///
   /// Must be followed by
@@ -1213,7 +1213,7 @@ pub(all) enum Op {
   ///
   /// - Variant of [`Op::I32Store8Offset16`] with immediate `value`.
   /// - Operates on the default Wasm memory instance.
-  I32Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   /// Wasm `i32.store8` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -1237,7 +1237,7 @@ pub(all) enum Op {
   /// Optionally followed by an [`Op::MemoryIndex`] encoding `memory`.
   ///
   /// - Operates on the default Wasm memory instance if missing.
-  I32Store8AtImm(value~ : Int, address~ : Address32)
+  I32Store8AtImm(value~ : Int32, address~ : Address32)
   /// Wasm `i32.store16` equivalent Wasmi instruction.
   ///
   /// # Encoding
@@ -1277,7 +1277,7 @@ pub(all) enum Op {
   ///
   /// - Variant of [`Op::I32Store16Offset16`] with immediate `value`.
   /// - Operates on the default Wasm memory instance.
-  I32Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   /// Wasm `i32.store16` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -1301,7 +1301,7 @@ pub(all) enum Op {
   /// Optionally followed by an [`Op::MemoryIndex`] encoding `memory`.
   ///
   /// - Operates on the default Wasm memory instance if missing.
-  I32Store16AtImm(value~ : Int, address~ : Address32)
+  I32Store16AtImm(value~ : Int32, address~ : Address32)
   /// Wasm `i64.store` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -1375,7 +1375,7 @@ pub(all) enum Op {
   ///
   /// - Variant of [`Op::I64Store8Offset16`] with immediate `value`.
   /// - Operates on the default Wasm memory instance.
-  I64Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   /// Wasm `i64.store8` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -1399,7 +1399,7 @@ pub(all) enum Op {
   /// Optionally followed by an [`Op::MemoryIndex`] encoding `memory`.
   ///
   /// - Operates on the default Wasm memory instance if missing.
-  I64Store8AtImm(value~ : Int, address~ : Address32)
+  I64Store8AtImm(value~ : Int32, address~ : Address32)
   /// Wasm `i64.store16` equivalent Wasmi instruction.
   ///
   /// # Encoding
@@ -1439,7 +1439,7 @@ pub(all) enum Op {
   ///
   /// - Variant of [`Op::I64Store16Offset16`] with immediate `value`.
   /// - Operates on the default Wasm memory instance.
-  I64Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   /// Wasm `i64.store16` equivalent Wasmi instruction.
   ///
   /// # Note
@@ -1463,7 +1463,7 @@ pub(all) enum Op {
   /// Optionally followed by an [`Op::MemoryIndex`] encoding `memory`.
   ///
   /// - Operates on the default Wasm memory instance if missing.
-  I64Store16AtImm(value~ : Int, address~ : Address32)
+  I64Store16AtImm(value~ : Int32, address~ : Address32)
   /// Wasm `i64.store32` equivalent Wasmi instruction.
   ///
   /// # Encoding
@@ -2272,7 +2272,7 @@ pub(all) enum Op {
   /// # Encoding
   ///
   /// Followed by [`Op::MemoryIndex`] encoding the Wasm `memory` instance.
-  MemoryFillImm(dst~ : Slot, value~ : Int, len~ : Slot)
+  MemoryFillImm(dst~ : Slot, value~ : Int32, len~ : Slot)
   /// Wasm `memory.init <data>` instruction.
   ///
   /// Initializes bytes of `memory[dst..dst+len]` from `data[src..src+len]`.
@@ -2424,7 +2424,7 @@ pub(all) enum Op {
     result~ : Slot,
     input~ : Slot,
     lane~ : ImmLaneIdx,
-    value~ : Int
+    value~ : Int32
   )
   /// Wasm `i16x8.replace_lane` instruction.
   ///
@@ -4096,13 +4096,13 @@ pub fn Op::branch_f64_not_le(
 
 ///|
 /// Creates a new [`Op::BranchTable0`].
-pub fn Op::branch_table_0(index : Slot, len_targets : Int) -> Op {
+pub fn Op::branch_table_0(index : Slot, len_targets : Int32) -> Op {
   BranchTable0(index~, len_targets~)
 }
 
 ///|
 /// Creates a new [`Op::BranchTableSpan`].
-pub fn Op::branch_table_span(index : Slot, len_targets : Int) -> Op {
+pub fn Op::branch_table_span(index : Slot, len_targets : Int32) -> Op {
   BranchTableSpan(index~, len_targets~)
 }
 
@@ -4138,7 +4138,7 @@ pub fn Op::copy_f64imm32(result : Slot, value : Const32) -> Op {
 
 ///|
 /// Creates a new [`Op::CopySpan`].
-pub fn Op::copy_span(results : SlotSpan, values : SlotSpan, len : Int) -> Op {
+pub fn Op::copy_span(results : SlotSpan, values : SlotSpan, len : Int32) -> Op {
   CopySpan(results~, values~, len~)
 }
 
@@ -4854,7 +4854,7 @@ pub fn Op::i32_store8_offset16(
 pub fn Op::i32_store8_offset16_imm(
   ptr : Slot,
   offset : Offset16,
-  value : Int,
+  value : Int32,
 ) -> Op {
   I32Store8Offset16Imm(ptr~, offset~, value~)
 }
@@ -4867,7 +4867,7 @@ pub fn Op::i32_store8_at(value : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Store8AtImm`].
-pub fn Op::i32_store8_at_imm(value : Int, address : Address32) -> Op {
+pub fn Op::i32_store8_at_imm(value : Int32, address : Address32) -> Op {
   I32Store8AtImm(value~, address~)
 }
 
@@ -4898,7 +4898,7 @@ pub fn Op::i32_store16_offset16(
 pub fn Op::i32_store16_offset16_imm(
   ptr : Slot,
   offset : Offset16,
-  value : Int,
+  value : Int32,
 ) -> Op {
   I32Store16Offset16Imm(ptr~, offset~, value~)
 }
@@ -4911,7 +4911,7 @@ pub fn Op::i32_store16_at(value : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Store16AtImm`].
-pub fn Op::i32_store16_at_imm(value : Int, address : Address32) -> Op {
+pub fn Op::i32_store16_at_imm(value : Int32, address : Address32) -> Op {
   I32Store16AtImm(value~, address~)
 }
 
@@ -4964,7 +4964,7 @@ pub fn Op::i64_store8_offset16(
 pub fn Op::i64_store8_offset16_imm(
   ptr : Slot,
   offset : Offset16,
-  value : Int,
+  value : Int32,
 ) -> Op {
   I64Store8Offset16Imm(ptr~, offset~, value~)
 }
@@ -4977,7 +4977,7 @@ pub fn Op::i64_store8_at(value : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Store8AtImm`].
-pub fn Op::i64_store8_at_imm(value : Int, address : Address32) -> Op {
+pub fn Op::i64_store8_at_imm(value : Int32, address : Address32) -> Op {
   I64Store8AtImm(value~, address~)
 }
 
@@ -5008,7 +5008,7 @@ pub fn Op::i64_store16_offset16(
 pub fn Op::i64_store16_offset16_imm(
   ptr : Slot,
   offset : Offset16,
-  value : Int,
+  value : Int32,
 ) -> Op {
   I64Store16Offset16Imm(ptr~, offset~, value~)
 }
@@ -5021,7 +5021,7 @@ pub fn Op::i64_store16_at(value : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Store16AtImm`].
-pub fn Op::i64_store16_at_imm(value : Int, address : Address32) -> Op {
+pub fn Op::i64_store16_at_imm(value : Int32, address : Address32) -> Op {
   I64Store16AtImm(value~, address~)
 }
 
@@ -6429,7 +6429,7 @@ pub fn Op::memory_fill(dst : Slot, value : Slot, len : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::MemoryFillImm`].
-pub fn Op::memory_fill_imm(dst : Slot, value : Int, len : Slot) -> Op {
+pub fn Op::memory_fill_imm(dst : Slot, value : Int32, len : Slot) -> Op {
   MemoryFillImm(dst~, value~, len~)
 }
 
@@ -6673,7 +6673,7 @@ pub fn Op::i8x16_replace_lane_imm(
   result : Slot,
   input : Slot,
   lane : ImmLaneIdx,
-  value : Int,
+  value : Int32,
 ) -> Op {
   I8x16ReplaceLaneImm(result~, input~, lane~, value~)
 }

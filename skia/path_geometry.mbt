@@ -5,7 +5,7 @@
 fn chop_quad_at_x_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
-) -> Int {
+) -> Int32 {
   let a = src[0].x
   let mut b = src[1].x
   let c = src[2].x
@@ -33,7 +33,7 @@ fn chop_quad_at_x_extrema(
 fn chop_quad_at_y_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
-) -> Int {
+) -> Int32 {
   let a = src[0].y
   let mut b = src[1].y
   let c = src[2].y
@@ -71,7 +71,7 @@ fn is_not_monotonic(a : Float, b : Float, c : Float) -> Bool {
 fn chop_cubic_at_x_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
-) -> Int {
+) -> Int32 {
   let t_values = ts_new_t_values()
   let n = find_cubic_extrema(src[0].x, src[1].x, src[2].x, src[3].x, t_values)
   chop_cubic_at(src, t_values, n, dst, 0)
@@ -91,7 +91,7 @@ fn chop_cubic_at_x_extrema(
 fn chop_cubic_at_y_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
-) -> Int {
+) -> Int32 {
   let t_values = ts_new_t_values()
   let n = find_cubic_extrema(src[0].y, src[1].y, src[2].y, src[3].y, t_values)
   chop_cubic_at(src, t_values, n, dst, 0)
@@ -119,7 +119,7 @@ fn find_cubic_extrema(
   c : Float,
   d : Float,
   t_values : Array[Float],
-) -> Int {
+) -> Int32 {
   // we divide A,B,C by 3 to simplify
   let na = d - a + (3.0 : Float) * (b - c)
   let nb = (2.0 : Float) * (a - b - b + c)
@@ -141,9 +141,9 @@ fn find_cubic_extrema(
 fn chop_cubic_at(
   src : ArrayView[@path.Point],
   t_values : Array[Float],
-  t_len : Int,
+  t_len : Int32,
   dst : Array[@path.Point],
-  dst_base : Int,
+  dst_base : Int32,
 ) -> Unit {
   if t_len == 0 {
     // nothing to chop
@@ -193,7 +193,7 @@ fn chop_cubic_at_max_curvature(
   src : ArrayView[@path.Point],
   t_values : Array[Float],
   dst : Array[@path.Point],
-) -> Int {
+) -> Int32 {
   let roots : Array[Float] = [0.0, 0.0, 0.0]
   let n = ts_find_cubic_max_curvature(src, roots)
 

@@ -17,7 +17,7 @@ fn ast_report(text : String) -> String {
 ///|
 fn ast_walk(
   node : @syntax.SyntaxNode,
-  offset : Int,
+  offset : Int32,
   buf : StringBuilder,
 ) -> Unit {
   let ctx = { node, offset, }
@@ -35,13 +35,13 @@ fn ast_walk(
 /// The subtree a summary is computed for.
 priv struct Ctx {
   node : @syntax.SyntaxNode
-  offset : Int
+  offset : Int32
 }
 
 ///|
 /// Find the absolute offset of `target` within this subtree.
-fn Ctx::locate(self : Ctx, target : @syntax.SyntaxNode) -> Int? {
-  fn go(node : @syntax.SyntaxNode, offset : Int) -> Int? {
+fn Ctx::locate(self : Ctx, target : @syntax.SyntaxNode) -> Int32? {
+  fn go(node : @syntax.SyntaxNode, offset : Int32) -> Int32? {
     if physical_equal(node, target) {
       return Some(offset)
     }
@@ -463,7 +463,7 @@ fn lines_report(text : String, buf : StringBuilder) -> Unit {
     "lines len_bytes=\{lines.len_bytes()} len_utf16=\{lines.len_utf16()} len_lines=\{lines.len_lines()}\n",
   )
   let n = lines.len_lines()
-  let o = (v : Int?) => {
+  let o = (v : Int32?) => {
     match v {
       Some(v) => v.to_string()
       None => "-"
@@ -537,13 +537,13 @@ fn rust_debug_f64(v : Double) -> String {
   // value = 0.<digits> * 10^point.
   let s = v.abs().to_string()
   let digits = StringBuilder()
-  let mut point : Int? = None
+  let mut point : Int32? = None
   let mut exp = 0
   let mut i = 0
   while i < s.length() {
     let c = s.code_unit_at(i).to_int()
     if c >= '0' && c <= '9' {
-      digits.write_char(Int::unsafe_to_char(c))
+      digits.write_char(Int32::unsafe_to_char(c))
     } else if c == '.' {
       point = Some(digits.to_string().length())
     } else if c == 'e' || c == 'E' {

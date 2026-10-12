@@ -12,7 +12,7 @@ priv struct Context {
 fn parse_inner(
   data : BytesView,
   get_cmap : (CMapName) -> Bytes?,
-  depth : Int,
+  depth : Int32,
   bundle : Bundle?,
 ) -> CMap? {
   // Prevent stack overflow for malicious cmap files or circular references.
@@ -33,7 +33,7 @@ fn parse_inner(
   let mut base = None
   let mut registry : Bytes? = None
   let mut ordering : Bytes? = None
-  let mut supplement : Int? = None
+  let mut supplement : Int32? = None
   let mut cmap_name : Bytes? = None
   let mut writing_mode : WritingMode? = None
   let mut last_name : Bytes? = None
@@ -301,7 +301,7 @@ fn parse_bf_range(
 
 ///|
 /// Convert the buffer into UTF-16 code units.
-fn decode_be(bytes : Array[Byte]) -> Array[Int]? {
+fn decode_be(bytes : Array[Byte]) -> Array[Int32]? {
   if bytes.length() == 0 {
     return None
   }
@@ -326,21 +326,24 @@ fn decode_be(bytes : Array[Byte]) -> Array[Int]? {
 fn read_u32_code(
   scanner : @hayro_postscript.Scanner,
   buf : Array[Byte],
-) -> UInt? {
+) -> UInt32? {
   guard scanner.parse_string() is Ok(s) else { return None }
   guard s.decode_into(buf) is Ok(_) else { return None }
   bytes_to_u32(buf)
 }
 
 ///|
-fn extract_u32_code(obj : @hayro_postscript.Object, buf : Array[Byte]) -> UInt? {
+fn extract_u32_code(
+  obj : @hayro_postscript.Object,
+  buf : Array[Byte],
+) -> UInt32? {
   guard obj is String(s) else { return None }
   guard s.decode_into(buf) is Ok(_) else { return None }
   bytes_to_u32(buf)
 }
 
 ///|
-fn bytes_to_u32(bytes : Array[Byte]) -> UInt? {
+fn bytes_to_u32(bytes : Array[Byte]) -> UInt32? {
   if bytes.length() == 0 || bytes.length() > 4 {
     return None
   }

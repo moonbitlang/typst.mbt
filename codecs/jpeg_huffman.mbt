@@ -3,30 +3,30 @@
 
 ///|
 /// Determines how many bits of lookahead we have for our bitstream decoder.
-const HUFF_LOOKAHEAD : Int = 9
+const HUFF_LOOKAHEAD : Int32 = 9
 
 ///|
 /// A struct which contains necessary tables for decoding a JPEG Huffman
 /// encoded bitstream.
 priv struct HuffmanTable {
   /// Largest code of length k (pre-shifted to 16 bits); element 0 unused.
-  maxcode : FixedArray[Int]
+  maxcode : FixedArray[Int32]
   /// Offset for codes of length k.
-  offset : FixedArray[Int]
+  offset : FixedArray[Int32]
   /// Lookup table for fast decoding: the bits above `HUFF_LOOKAHEAD` contain
   /// the code length, the lower 8 bits the symbol.
-  lookup : FixedArray[Int]
+  lookup : FixedArray[Int32]
   /// A table which can be used to decode small AC coefficients and do an
   /// equivalent of receive_extend (`i16` values).
-  mut ac_lookup : FixedArray[Int]?
+  mut ac_lookup : FixedArray[Int32]?
   /// Symbols in order of increasing code length.
-  values : FixedArray[Int]
+  values : FixedArray[Int32]
 }
 
 ///|
 fn HuffmanTable::new(
-  codes : FixedArray[Int],
-  values : FixedArray[Int],
+  codes : FixedArray[Int32],
+  values : FixedArray[Int32],
   is_dc : Bool,
   is_progressive : Bool,
 ) -> HuffmanTable raise DecodeErrors {
@@ -46,8 +46,8 @@ fn HuffmanTable::new(
 /// Create a new Huffman table with values that aren't fixed (used by
 /// `fill_default_mjpeg_tables`).
 fn HuffmanTable::new_unfilled(
-  codes : FixedArray[Int],
-  values : Array[Int],
+  codes : FixedArray[Int32],
+  values : Array[Int32],
   is_dc : Bool,
   is_progressive : Bool,
 ) -> HuffmanTable raise DecodeErrors {
@@ -66,12 +66,12 @@ fn HuffmanTable::make_derived_table(
   self : HuffmanTable,
   is_dc : Bool,
   _is_progressive : Bool,
-  bits : FixedArray[Int],
+  bits : FixedArray[Int32],
 ) -> Unit raise DecodeErrors {
   // build a list of code size
   let huff_size = FixedArray::make(257, 0)
   // Huffman code lengths (`u32`)
-  let huff_code : FixedArray[UInt] = FixedArray::make(257, 0)
+  let huff_code : FixedArray[UInt32] = FixedArray::make(257, 0)
   // figure C.1 make table of Huffman code length for each symbol
   let mut p = 0
   for l in 1..<=16 {
@@ -86,7 +86,7 @@ fn HuffmanTable::make_derived_table(
   let num_symbols = p
   // Generate the codes themselves
   // We also validate that the counts represent a legal Huffman code tree
-  let mut code : UInt = 0
+  let mut code : UInt32 = 0
   let mut si = huff_size[0]
   p = 0
   while huff_size[p] != 0 {
@@ -200,6 +200,6 @@ fn HuffmanTable::make_derived_table(
 
 ///|
 /// Truncate to a signed 16-bit value (Rust `as i16`).
-fn i16(x : Int) -> Int {
+fn i16(x : Int32) -> Int32 {
   x << 16 >> 16
 }

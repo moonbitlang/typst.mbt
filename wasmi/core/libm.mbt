@@ -31,12 +31,12 @@ fn libm_copysign(x : Double, y : Double) -> Double {
 }
 
 ///|
-fn f32_exp_unbiased(ix : UInt) -> Int {
+fn f32_exp_unbiased(ix : UInt32) -> Int32 {
   ((ix >> 23) & 0xFF).reinterpret_as_int() - 127
 }
 
 ///|
-fn f64_exp_unbiased(ix : UInt64) -> Int {
+fn f64_exp_unbiased(ix : UInt64) -> Int32 {
   ((ix >> 52) & 0x7FF).to_int() - 1023
 }
 
@@ -343,17 +343,17 @@ priv struct Norm {
   /// Normalized significand with one guard bit, unsigned.
   m : UInt64
   /// Exponent of the mantissa such that `m * 2^e = x`.
-  e : Int
+  e : Int32
   neg : Bool
 }
 
 ///|
 /// `EXP_UNBIAS = EXP_BIAS + SIG_BITS + 1`
-let norm_exp_unbias : Int = 1023 + 52 + 1
+let norm_exp_unbias : Int32 = 1023 + 52 + 1
 
 ///|
 /// `ZERO_INF_NAN = EXP_SAT - EXP_UNBIAS`
-let norm_zero_inf_nan : Int = 2047 - norm_exp_unbias
+let norm_zero_inf_nan : Int32 = 2047 - norm_exp_unbias
 
 ///|
 fn Norm::from_float(x : Double) -> Norm {
@@ -593,7 +593,7 @@ fn fma_round(x : Double, y : Double, z : Double) -> Double {
 
 ///|
 /// `libm::generic::scalbn` for `f64`.
-fn libm_scalbn(x : Double, n : Int) -> Double {
+fn libm_scalbn(x : Double, n : Int32) -> Double {
   let mut x = x
   let mut n = n
   let exp_max = 1023

@@ -6,7 +6,7 @@
 /// `window[..n.match_start]` and `window[..n.strstart]` on copies `c`/`n`).
 fn ref_fizzle_matches(
   window : FixedArray[Byte],
-  max_dist : Int,
+  max_dist : Int32,
   current : Match,
   next : Match,
 ) -> Unit {

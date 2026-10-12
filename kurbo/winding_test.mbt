@@ -4,10 +4,10 @@
 ///|
 /// The winding number inside a square that runs right, down, left, up
 /// (clockwise where y points down).
-const SQUARE_WINDING : Int = 1
+const SQUARE_WINDING : Int32 = 1
 
 ///|
-fn winding_of(path : Array[@kurbo.PathEl], x : Double, y : Double) -> Int {
+fn winding_of(path : Array[@kurbo.PathEl], x : Double, y : Double) -> Int32 {
   @kurbo.BezPath::from_vec(path).winding(@kurbo.Point::new(x, y))
 }
 

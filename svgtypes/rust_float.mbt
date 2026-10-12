@@ -69,7 +69,7 @@ fn f32_as_u8(x : Float) -> Byte {
 
 ///|
 /// Rust `x as usize` for `f64` (saturating, NaN -> 0), clamped to `Int`.
-fn f64_as_usize(x : Double) -> Int {
+fn f64_as_usize(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {

@@ -115,7 +115,7 @@ fn f32_abs(n : Float) -> Float {
 }
 
 ///|
-fn conv_subroutine_index(index : Float, bias : UInt16) -> UInt raise CFFError {
+fn conv_subroutine_index(index : Float, bias : UInt16) -> UInt32 raise CFFError {
   match conv_subroutine_index_impl(index, bias) {
     Some(v) => v
     None => raise InvalidSubroutineIndex
@@ -123,7 +123,7 @@ fn conv_subroutine_index(index : Float, bias : UInt16) -> UInt raise CFFError {
 }
 
 ///|
-fn conv_subroutine_index_impl(index : Float, bias : UInt16) -> UInt? {
+fn conv_subroutine_index_impl(index : Float, bias : UInt16) -> UInt32? {
   guard try_i32_from_f32(index) is Some(index) else { return None }
   let bias = bias.to_int()
   let index = index.to_int64() + bias.to_int64()
@@ -135,7 +135,7 @@ fn conv_subroutine_index_impl(index : Float, bias : UInt16) -> UInt? {
 
 ///|
 // Adobe Technical Note #5176, Chapter 16 "Local / Global Subrs INDEXes"
-fn calc_subroutine_bias(len : UInt) -> UInt16 {
+fn calc_subroutine_bias(len : UInt32) -> UInt16 {
   if len < 1240 {
     107
   } else if len < 33900 {
@@ -151,17 +151,17 @@ fn calc_subroutine_bias(len : UInt) -> UInt16 {
 ///|
 priv struct ArgumentsStack {
   data : FixedArray[Float]
-  mut len : Int
-  max_len : Int
+  mut len : Int32
+  max_len : Int32
 }
 
 ///|
-fn ArgumentsStack::new(max_len : Int) -> ArgumentsStack {
+fn ArgumentsStack::new(max_len : Int32) -> ArgumentsStack {
   { data: FixedArray::make(max_len, 0.0), len: 0, max_len, }
 }
 
 ///|
-fn ArgumentsStack::len(self : ArgumentsStack) -> Int {
+fn ArgumentsStack::len(self : ArgumentsStack) -> Int32 {
   self.len
 }
 
@@ -184,7 +184,7 @@ fn ArgumentsStack::push(
 }
 
 ///|
-fn ArgumentsStack::at(self : ArgumentsStack, index : Int) -> Float {
+fn ArgumentsStack::at(self : ArgumentsStack, index : Int32) -> Float {
   self.data[index]
 }
 
@@ -236,7 +236,7 @@ fn parse_index_u32(s : Stream) -> CffIndex raise Malformed {
 }
 
 ///|
-fn parse_index_impl(count : UInt, s : Stream) -> CffIndex raise Malformed {
+fn parse_index_impl(count : UInt32, s : Stream) -> CffIndex raise Malformed {
   if count == 0 || count == 0xFFFFFFFF {
     return CffIndex::default()
   }
@@ -263,7 +263,7 @@ fn parse_index_impl(count : UInt, s : Stream) -> CffIndex raise Malformed {
 ///|
 /// `usize::num_from(u32)`; values beyond `Int` saturate so that bounds checks
 /// fail.
-fn u32_to_usize(v : UInt) -> Int {
+fn u32_to_usize(v : UInt32) -> Int32 {
   let i = v.reinterpret_as_int()
   if i < 0 {
     0x7fffffff
@@ -279,7 +279,7 @@ fn skip_index_u16(s : Stream) -> Unit raise Malformed {
 }
 
 ///|
-fn skip_index_impl(count : UInt, s : Stream) -> Unit raise Malformed {
+fn skip_index_impl(count : UInt32, s : Stream) -> Unit raise Malformed {
   if count == 0 || count == 0xFFFFFFFF {
     return
   }
@@ -304,13 +304,13 @@ priv struct VarOffsets {
 }
 
 ///|
-fn VarOffsets::get(self : VarOffsets, index : UInt) -> UInt? {
+fn VarOffsets::get(self : VarOffsets, index : UInt32) -> UInt32? {
   if index >= self.len() {
     return None
   }
   let start = index.reinterpret_as_int() * self.offset_size.to_usize()
   guard Stream::new_at(self.data, start) is Some(s) else { return None }
-  let n : UInt = match self.offset_size {
+  let n : UInt32 = match self.offset_size {
     Size1 => (s.read_u8() catch { _ => return None }).to_uint()
     Size2 => (s.read_u16() catch { _ => return None }).to_uint()
     Size3 => (s.read() catch { _ => return None } : U24).0
@@ -323,7 +323,7 @@ fn VarOffsets::get(self : VarOffsets, index : UInt) -> UInt? {
 }
 
 ///|
-fn VarOffsets::last(self : VarOffsets) -> UInt? {
+fn VarOffsets::last(self : VarOffsets) -> UInt32? {
   if !self.is_empty() {
     self.get(self.len() - 1)
   } else {
@@ -332,7 +332,7 @@ fn VarOffsets::last(self : VarOffsets) -> UInt? {
 }
 
 ///|
-fn VarOffsets::len(self : VarOffsets) -> UInt {
+fn VarOffsets::len(self : VarOffsets) -> UInt32 {
   (self.data.length() / self.offset_size.to_usize()).reinterpret_as_uint()
 }
 
@@ -356,7 +356,7 @@ impl Default for CffIndex with fn default() {
 extend CffIndex with Default::{default}
 
 ///|
-fn CffIndex::len(self : CffIndex) -> UInt {
+fn CffIndex::len(self : CffIndex) -> UInt32 {
   // Last offset points to the byte after the `Object data`. We should skip it.
   let n = self.offsets.len()
   if n == 0 {
@@ -367,7 +367,7 @@ fn CffIndex::len(self : CffIndex) -> UInt {
 }
 
 ///|
-fn CffIndex::get(self : CffIndex, index : UInt) -> BytesView? {
+fn CffIndex::get(self : CffIndex, index : UInt32) -> BytesView? {
   guard u32_checked_add(index, 1) is Some(next_index) else { return None } // make sure we do not overflow
   guard self.offsets.get(index) is Some(start) else { return None }
   guard self.offsets.get(next_index) is Some(end) else { return None }
@@ -377,7 +377,7 @@ fn CffIndex::get(self : CffIndex, index : UInt) -> BytesView? {
 ///|
 fn CffIndex::iter(self : CffIndex) -> Iter[BytesView] {
   let len = self.len()
-  let mut offset_index : UInt = 0
+  let mut offset_index : UInt32 = 0
   Iter::new(fn() {
     if offset_index == len {
       return None
@@ -397,12 +397,12 @@ priv enum OffsetSize {
 }
 
 ///|
-fn OffsetSize::to_u32(self : OffsetSize) -> UInt {
+fn OffsetSize::to_u32(self : OffsetSize) -> UInt32 {
   self.to_usize().reinterpret_as_uint()
 }
 
 ///|
-fn OffsetSize::to_usize(self : OffsetSize) -> Int {
+fn OffsetSize::to_usize(self : OffsetSize) -> Int32 {
   match self {
     Size1 => 1
     Size2 => 2
@@ -430,18 +430,18 @@ fn OffsetSize::parse(b : Byte) -> OffsetSize raise Malformed {
 let dict_two_byte_operator_mark : Byte = 12
 
 ///|
-let dict_float_stack_len : Int = 64
+let dict_float_stack_len : Int32 = 64
 
 ///|
-let dict_end_of_float_flag : Int = 0xf
+let dict_end_of_float_flag : Int32 = 0xf
 
 ///|
 priv struct DictionaryParser {
   data : BytesView
   // The current offset.
-  mut offset : Int
+  mut offset : Int32
   // Offset to the last operands start.
-  mut operands_offset : Int
+  mut operands_offset : Int32
   // Actual operands.
   //
   // While CFF can contain only i32 and f32 values, we have to store operands as f64
@@ -450,13 +450,13 @@ priv struct DictionaryParser {
   // In both cases the type size would be 8 bytes, so it's easier to simply use f64.
   operands : FixedArray[Double]
   // An amount of operands in the `operands` array.
-  mut operands_len : Int
+  mut operands_len : Int32
 }
 
 ///|
 fn DictionaryParser::new(
   data : BytesView,
-  max_operands : Int,
+  max_operands : Int32,
 ) -> DictionaryParser {
   {
     data,
@@ -546,7 +546,7 @@ fn DictionaryParser::parse_number(self : DictionaryParser) -> Double? {
 
 ///|
 /// Rust's `f64 as i32` (saturating, NaN -> 0).
-fn f64_as_i32(v : Double) -> Int {
+fn f64_as_i32(v : Double) -> Int32 {
   if v.is_nan() {
     0
   } else if v >= 2147483647.0 {
@@ -559,7 +559,7 @@ fn f64_as_i32(v : Double) -> Int {
 }
 
 ///|
-fn DictionaryParser::parse_offset(self : DictionaryParser) -> Int? {
+fn DictionaryParser::parse_offset(self : DictionaryParser) -> Int32? {
   self.parse_operands() catch {
     _ => return None
   }
@@ -576,7 +576,7 @@ fn DictionaryParser::parse_offset(self : DictionaryParser) -> Int? {
 }
 
 ///|
-fn DictionaryParser::parse_range(self : DictionaryParser) -> (Int, Int)? {
+fn DictionaryParser::parse_range(self : DictionaryParser) -> (Int32, Int32)? {
   self.parse_operands() catch {
     _ => return None
   }
@@ -598,10 +598,10 @@ fn DictionaryParser::parse_range(self : DictionaryParser) -> (Int, Int)? {
 // Adobe Technical Note #5176, Appendix H CFF DICT Encoding.
 fn is_dict_one_byte_op(b : Byte) -> Bool {
   match b.to_int() {
-    0..=27 => true
-    28..=30 => false // numbers
+    0..<=27 => true
+    28..<=30 => false // numbers
     31 => true // Reserved
-    32..=254 => false // numbers
+    32..<=254 => false // numbers
     _ => true // Reserved
   }
 }
@@ -620,16 +620,16 @@ fn parse_dict_number(b0 : Byte, s : Stream) -> Double raise Malformed {
       Double::from_int(n)
     }
     30 => parse_dict_float(s)
-    32..=246 => {
+    32..<=246 => {
       let n = b0 - 139
       Double::from_int(n)
     }
-    247..=250 => {
+    247..<=250 => {
       let b1 = s.read_u8().to_int()
       let n = (b0 - 247) * 256 + b1 + 108
       Double::from_int(n)
     }
-    251..=254 => {
+    251..<=254 => {
       let b1 = s.read_u8().to_int()
       let n = -(b0 - 251) * 256 - b1 - 108
       Double::from_int(n)
@@ -661,16 +661,16 @@ fn parse_dict_float(s : Stream) -> Double raise Malformed {
 ///|
 // Adobe Technical Note #5176, Table 5 Nibble Definitions
 fn parse_float_nibble(
-  nibble : Int,
-  idx : Int,
+  nibble : Int32,
+  idx : Int32,
   data : StringBuilder,
-) -> Int raise Malformed {
+) -> Int32 raise Malformed {
   let mut idx = idx
   if idx == dict_float_stack_len {
     raise Malformed
   }
   match nibble {
-    0..=9 => data.write_char((48 + nibble).unsafe_to_char())
+    0..<=9 => data.write_char((48 + nibble).unsafe_to_char())
     10 => data.write_char('.')
     11 => data.write_char('E')
     12 => {
@@ -763,9 +763,9 @@ fn skip_number(b0 : Byte, s : Stream) -> Unit raise Malformed {
           break
         }
       }
-    32..=246 => ()
-    247..=250 => s.advance(1)
-    251..=254 => s.advance(1)
+    32..<=246 => ()
+    247..<=250 => s.advance(1)
+    251..<=254 => s.advance(1)
     _ => raise Malformed
   }
 }
@@ -1130,7 +1130,7 @@ priv struct CharStringParser {
 ///|
 fn CharStringParser::parse_move_to(
   self : CharStringParser,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise CFFError {
   // dx1 dy1
   if self.stack.len() != offset + 2 {
@@ -1151,7 +1151,7 @@ fn CharStringParser::parse_move_to(
 ///|
 fn CharStringParser::parse_horizontal_move_to(
   self : CharStringParser,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise CFFError {
   // dx1
   if self.stack.len() != offset + 1 {
@@ -1171,7 +1171,7 @@ fn CharStringParser::parse_horizontal_move_to(
 ///|
 fn CharStringParser::parse_vertical_move_to(
   self : CharStringParser,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise CFFError {
   // dy1
   if self.stack.len() != offset + 1 {

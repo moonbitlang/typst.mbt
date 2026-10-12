@@ -14,7 +14,7 @@ pub fn to_bytes(value : @serde.Data) -> Bytes {
 ///|
 /// Write a header with an integer argument in its shortest form (upstream
 /// `impl From<Header> for Title`).
-fn write_title(buf : Buffer, major : Int, arg : UInt64) -> Unit {
+fn write_title(buf : Buffer, major : Int32, arg : UInt64) -> Unit {
   let prefix = major << 5
   if arg <= 23UL {
     buf.write_byte((prefix | arg.to_int()).to_byte())
@@ -34,7 +34,7 @@ fn write_title(buf : Buffer, major : Int, arg : UInt64) -> Unit {
 }
 
 ///|
-fn write_be(buf : Buffer, v : UInt64, n : Int) -> Unit {
+fn write_be(buf : Buffer, v : UInt64, n : Int32) -> Unit {
   for i in 0..<n {
     let shift = (n - 1 - i) * 8
     buf.write_byte((v >> shift).to_byte())
@@ -112,7 +112,7 @@ fn write_float(buf : Buffer, v : Double) -> Unit {
 ///|
 /// The bits of `v` as an IEEE half-precision float if the conversion
 /// `f16::from_f64` round-trips bit-exactly through `f64::from`.
-fn f16_bits(v : Double) -> Int? {
+fn f16_bits(v : Double) -> Int32? {
   let bits = v.reinterpret_as_uint64()
   let sign = if bits >> 63 != 0UL { 0x8000 } else { 0 }
   let exp = ((bits >> 52) & 0x7FFUL).to_int()

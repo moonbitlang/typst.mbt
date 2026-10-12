@@ -333,7 +333,7 @@ fn TransferCharacteristics::gamma(
 fn TransferCharacteristics::make_linear_table(
   self : TransferCharacteristics,
   depth : Depth,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float] {
   let gamma_table = FixedArray::make(n, Float::from_int(0))
   let max_value = if depth.finite {
@@ -360,7 +360,7 @@ fn TransferCharacteristics::make_linear_table(
 fn TransferCharacteristics::make_gamma_table(
   self : TransferCharacteristics,
   depth : Depth,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float] {
   let table = FixedArray::make(65536, Float::from_int(0))
   let max_range = 1.0 / (n - 1).to_double()

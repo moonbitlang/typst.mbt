@@ -13,12 +13,12 @@
 // files and directories, dangling ones and cycles.)
 
 ///|
-fn be16(data : Bytes, at : Int) -> Int {
+fn be16(data : Bytes, at : Int32) -> Int32 {
   (data[at].to_int() << 8) | data[at + 1].to_int()
 }
 
 ///|
-fn be32(data : Bytes, at : Int) -> UInt {
+fn be32(data : Bytes, at : Int32) -> UInt32 {
   (data[at].to_uint() << 24) |
   (data[at + 1].to_uint() << 16) |
   (data[at + 2].to_uint() << 8) |
@@ -26,38 +26,38 @@ fn be32(data : Bytes, at : Int) -> UInt {
 }
 
 ///|
-fn u16(v : Int) -> Bytes {
+fn u16(v : Int32) -> Bytes {
   [(v >> 8).to_byte(), v.to_byte()]
 }
 
 ///|
-fn u32(v : UInt) -> Bytes {
+fn u32(v : UInt32) -> Bytes {
   [(v >> 24).to_byte(), (v >> 16).to_byte(), (v >> 8).to_byte(), v.to_byte()]
 }
 
 ///|
-fn zeros(n : Int) -> Bytes {
+fn zeros(n : Int32) -> Bytes {
   Bytes::make(n, b'\x00')
 }
 
 ///|
 /// A copy of `data` with the bytes at `at` replaced by `new`.
-fn splice(data : Bytes, at : Int, new : Bytes) -> Bytes {
+fn splice(data : Bytes, at : Int32, new : Bytes) -> Bytes {
   data[:at].to_owned() + new + data[at + new.length():].to_owned()
 }
 
 ///|
 /// A table record of a face: where the record is, and what it says.
 struct Record {
-  at : Int
+  at : Int32
   tag : String
-  offset : UInt
-  length : UInt
+  offset : UInt32
+  length : UInt32
 }
 
 ///|
 /// The table records of the face whose table directory is at `base`.
-fn records(data : Bytes, base : Int) -> Array[Record] {
+fn records(data : Bytes, base : Int32) -> Array[Record] {
   let out = []
   for i in 0..<be16(data, base + 4) {
     let at = base + 12 + 16 * i
@@ -87,13 +87,17 @@ fn record(data : Bytes, tag : String) -> Record {
 
 ///|
 /// A copy of `data` whose record at `at` has this offset and length.
-fn patch(data : Bytes, at : Int, offset : UInt, length : UInt) -> Bytes {
+fn patch(data : Bytes, at : Int32, offset : UInt32, length : UInt32) -> Bytes {
   splice(data, at + 8, u32(offset) + u32(length))
 }
 
 ///|
 /// A collection of whole fonts, one after another.
-fn ttc(fonts : Array[Bytes], count? : UInt, offsets? : Array[UInt]) -> Bytes {
+fn ttc(
+  fonts : Array[Bytes],
+  count? : UInt32,
+  offsets? : Array[UInt32],
+) -> Bytes {
   let mut pos = 12 + 4 * fonts.length()
   let starts = []
   let mut body = b""
@@ -148,7 +152,7 @@ fn test_fonts() -> (Bytes, Bytes, Bytes) {
 ///|
 /// What the whole file gives: the faces by index. Nothing for a file
 /// without one of fontdb's extensions.
-fn reference(name : String, data : Bytes) -> Array[(UInt, @library.FontInfo)] {
+fn reference(name : String, data : Bytes) -> Array[(UInt32, @library.FontInfo)] {
   let out = []
   let file_name = match name.rev_find("/") {
     Some(i) => name[i + 1:].to_owned()
@@ -196,7 +200,7 @@ fn scanned(name : String, files : Array[(String, Bytes)]) -> String raise {
     @platform.create_dir_all(@platform.parent(path).unwrap())
     @platform.write_file(path, file.1)
   }
-  let found : Map[String, Array[(UInt, @library.FontInfo)]] = Map([])
+  let found : Map[String, Array[(UInt32, @library.FontInfo)]] = Map([])
   for entry in scan(dir) {
     guard entry.0 is Path(path~, index~) else { continue }
     let file = path[dir.length() + 1:].to_owned()
@@ -441,7 +445,7 @@ test "scan: table records that point elsewhere" {
 ///|
 /// A font with `n` more table records, of empty tables whose tags come
 /// after all others.
-fn with_more_tables(data : Bytes, n : Int) -> Bytes {
+fn with_more_tables(data : Bytes, n : Int32) -> Bytes {
   let all = records(data, 0)
   let end = 12 + 16 * all.length()
   let mut out = data[:end].to_owned()
@@ -559,9 +563,9 @@ test "scan: collections" {
   // The collection with the record of a table of its face `k` changed.
   let with_record = (
     data : Bytes,
-    k : Int,
+    k : Int32,
     tag : String,
-    change : (Record) -> (UInt, UInt),
+    change : (Record) -> (UInt32, UInt32),
   ) => {
     let mut out = data
     for record in records(data, be32(data, 12 + 4 * k).reinterpret_as_int()) {
@@ -658,7 +662,7 @@ test "scan: collections" {
 ///|
 /// A collection of `n` faces that all have the tables of one font, of which
 /// it holds one copy.
-fn one_body(font : Bytes, n : Int) -> Bytes {
+fn one_body(font : Bytes, n : Int32) -> Bytes {
   let all = records(font, 0)
   let directory = 12 + 16 * all.length()
   let body = 12 + 4 * n + n * directory
@@ -915,15 +919,15 @@ test "scan: character maps" {
 ///|
 /// Upstream's `CoverageBuilder` (`info.rs`).
 priv struct ReferenceBuilder {
-  runs : Array[UInt]
-  mut next : UInt
+  runs : Array[UInt32]
+  mut next : UInt32
 }
 
 ///|
 fn ReferenceBuilder::add_codepoint_range(
   self : ReferenceBuilder,
-  start : UInt,
-  end : UInt,
+  start : UInt32,
+  end : UInt32,
 ) -> Unit {
   if end <= self.next || start >= end {
     return
@@ -939,7 +943,7 @@ fn ReferenceBuilder::add_codepoint_range(
 
 ///|
 /// Upstream's `Coverage::iter_ranges`.
-fn reference_ranges(runs : Array[UInt]) -> Array[(UInt, UInt)] {
+fn reference_ranges(runs : Array[UInt32]) -> Array[(UInt32, UInt32)] {
   let out = []
   let mut offset = 0U
   for i in 0..<(runs.length() / 2) {
@@ -953,7 +957,10 @@ fn reference_ranges(runs : Array[UInt]) -> Array[(UInt, UInt)] {
 
 ///|
 /// Upstream's `Coverage::union`.
-fn reference_union(left : Array[UInt], right : Array[UInt]) -> Array[UInt] {
+fn reference_union(
+  left : Array[UInt32],
+  right : Array[UInt32],
+) -> Array[UInt32] {
   let builder = ReferenceBuilder::{ runs: [], next: 0, }
   let left = reference_ranges(left)
   let right = reference_ranges(right)
@@ -981,8 +988,8 @@ fn reference_union(left : Array[UInt], right : Array[UInt]) -> Array[UInt] {
 /// The coverage of a face as upstream's `FontInfo::from_ttf` computes it:
 /// every codepoint of every Unicode subtable is added on its own, and the
 /// subtables are united.
-fn reference_coverage(face : @otf.Face) -> Array[UInt] {
-  let mut coverage : Array[UInt] = []
+fn reference_coverage(face : @otf.Face) -> Array[UInt32] {
+  let mut coverage : Array[UInt32] = []
   if face.tables().cmap is Some(cmap) {
     for subtable in cmap.subtables.iter() {
       if subtable.is_unicode() {

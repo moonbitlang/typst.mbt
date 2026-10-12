@@ -4,40 +4,40 @@
 
 ///|
 /// JP2 signature box - 'jP\040\040'.
-const JP2_SIGNATURE : UInt = 0x6A502020
+const JP2_SIGNATURE : UInt32 = 0x6A502020
 
 ///|
 /// File Type box - 'ftyp'.
-const FILE_TYPE : UInt = 0x66747970
+const FILE_TYPE : UInt32 = 0x66747970
 
 ///|
 /// JP2 Header box - 'jp2h'.
-const JP2_HEADER : UInt = 0x6A703268
+const JP2_HEADER : UInt32 = 0x6A703268
 
 ///|
 /// Colour Specification box - 'colr'.
-const COLOUR_SPECIFICATION : UInt = 0x636F6C72
+const COLOUR_SPECIFICATION : UInt32 = 0x636F6C72
 
 ///|
 /// Palette box - 'pclr'.
-const PALETTE : UInt = 0x70636C72
+const PALETTE : UInt32 = 0x70636C72
 
 ///|
 /// Component Mapping box - 'cmap'.
-const COMPONENT_MAPPING : UInt = 0x636D6170
+const COMPONENT_MAPPING : UInt32 = 0x636D6170
 
 ///|
 /// Channel Definition box - 'cdef'.
-const CHANNEL_DEFINITION : UInt = 0x63646566
+const CHANNEL_DEFINITION : UInt32 = 0x63646566
 
 ///|
 /// Contiguous Codestream box - 'jp2c'.
-const CONTIGUOUS_CODESTREAM : UInt = 0x6A703263
+const CONTIGUOUS_CODESTREAM : UInt32 = 0x6A703263
 
 ///|
 priv struct Jp2Box {
   data : BytesView
-  box_type : UInt
+  box_type : UInt32
 }
 
 ///|

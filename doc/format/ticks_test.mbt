@@ -1,6 +1,6 @@
 ///|
 /// The ticks as text, with up to six decimals.
-fn tick_text(lo : Double, hi : Double, count : Int) -> String {
+fn tick_text(lo : Double, hi : Double, count : Int32) -> String {
   let parts = []
   for t in @format.ticks(lo, hi, count) {
     parts.push(@format.fixed(t, 6, trim=true))

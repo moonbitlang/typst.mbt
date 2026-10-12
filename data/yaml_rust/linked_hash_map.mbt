@@ -60,7 +60,7 @@ pub fn[K : Hash + Eq, V] LinkedHashMap::remove(
 }
 
 ///|
-pub fn[K, V] LinkedHashMap::len(self : LinkedHashMap[K, V]) -> Int {
+pub fn[K, V] LinkedHashMap::len(self : LinkedHashMap[K, V]) -> Int32 {
   self.map.length()
 }
 

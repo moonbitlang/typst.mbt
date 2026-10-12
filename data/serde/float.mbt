@@ -5,7 +5,7 @@
 /// The shortest round-trip decimal digits and exponent of a finite, non-zero
 /// double: `|x| = 0.d1d2d3... * 10^point` (digits without leading or trailing
 /// zeros).
-pub fn shortest_digits(x : Double) -> (String, Int) {
+pub fn shortest_digits(x : Double) -> (String, Int32) {
   // MoonBit's `to_string` produces the shortest round-trip representation,
   // either as plain decimal or with an `e` exponent.
   let s = x.abs().to_string()
@@ -151,7 +151,7 @@ pub fn format_zmij(x : Double) -> String {
 ///|
 /// Place the decimal point into `digits` (`0.digits * 10^point`), padding
 /// with zeros, and ensure at least `min_frac` fractional digits.
-fn place_point(digits : String, point : Int, min_frac : Int) -> String {
+fn place_point(digits : String, point : Int32, min_frac : Int32) -> String {
   let buf = StringBuilder()
   let n = digits.length()
   if point <= 0 {

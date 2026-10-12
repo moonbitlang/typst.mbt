@@ -114,8 +114,8 @@ fn svg_filter_render(
 fn svg_rasterize_filter(
   group : @usvg.Group,
   initial_transform : @tiny_skia_path.Transform,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> @export.Image? {
   ignore(group)
   ignore(initial_transform)

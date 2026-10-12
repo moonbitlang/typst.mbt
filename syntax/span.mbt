@@ -97,7 +97,7 @@ pub(all) enum SpanKind {
   /// A numbered span.
   Number(id~ : FileId, num~ : SpanNumber)
   /// A raw byte range in a file.
-  Range(id~ : FileId, start~ : Int, end~ : Int)
+  Range(id~ : FileId, start~ : Int32, end~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -118,10 +118,10 @@ let span_full_start : UInt64 = 2
 let span_full_end : UInt64 = 1UL << 47
 
 ///|
-let span_number_bits : Int = 48
+let span_number_bits : Int32 = 48
 
 ///|
-let span_range_bits : Int = 46
+let span_range_bits : Int32 = 46
 
 ///|
 let span_number_mask : UInt64 = (1UL << span_number_bits) - 1
@@ -136,7 +136,7 @@ let span_external_value_max : UInt64 = (1UL << span_range_bits) - 1
 let span_range_base : UInt64 = span_external_base + (1UL << span_range_bits)
 
 ///|
-let span_range_value_bits : Int = 23
+let span_range_value_bits : Int32 = 23
 
 ///|
 let span_range_value_max : UInt64 = (1UL << span_range_value_bits) - 1
@@ -159,7 +159,7 @@ pub fn Span::from_number(id : FileId, num : SpanNumber) -> Span {
 }
 
 ///|
-fn saturate(value : Int, max : UInt64) -> UInt64 {
+fn saturate(value : Int32, max : UInt64) -> UInt64 {
   let v = value.to_uint64()
   if v > max {
     max
@@ -171,7 +171,7 @@ fn saturate(value : Int, max : UInt64) -> UInt64 {
 ///|
 /// Create a new span from a raw byte range instead of a span number. Parts
 /// exceeding `2^23-1` are saturated.
-pub fn Span::from_range(id : FileId, start : Int, end : Int) -> Span {
+pub fn Span::from_range(id : FileId, start : Int32, end : Int32) -> Span {
   let start = saturate(start, span_range_value_max)
   let end = saturate(end, span_range_value_max)
   Span::pack(id, span_range_base + ((start << span_range_value_bits) | end))
@@ -230,8 +230,8 @@ pub fn Span::or(self : Span, other : Span) -> Span {
 ///|
 /// A non-empty range targeting a smaller part of a spanned section of text.
 pub(all) struct SubRange {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -251,7 +251,7 @@ pub extend SubRange with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new sub-range. Returns `None` if the range is empty.
-pub fn SubRange::new(start : Int, end : Int) -> SubRange? {
+pub fn SubRange::new(start : Int32, end : Int32) -> SubRange? {
   if start < end {
     Some({ start, end, })
   } else {
@@ -261,13 +261,13 @@ pub fn SubRange::new(start : Int, end : Int) -> SubRange? {
 
 ///|
 /// Convert to a normal range relative to the spanned range.
-pub fn SubRange::to_relative(self : SubRange) -> (Int, Int) {
+pub fn SubRange::to_relative(self : SubRange) -> (Int32, Int32) {
   (self.start, self.end)
 }
 
 ///|
 /// Convert to a normal range at an offset.
-pub fn SubRange::to_absolute(self : SubRange, offset : Int) -> (Int, Int) {
+pub fn SubRange::to_absolute(self : SubRange, offset : Int32) -> (Int32, Int32) {
   (self.start + offset, self.end + offset)
 }
 
@@ -302,7 +302,7 @@ pub(all) enum DiagSpanKind {
   /// A numbered span with an optional sub-range.
   Number(id~ : FileId, num~ : SpanNumber, sub_range~ : SubRange?)
   /// A raw byte range in a file.
-  Range(id~ : FileId, start~ : Int, end~ : Int)
+  Range(id~ : FileId, start~ : Int32, end~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -323,7 +323,11 @@ pub fn DiagSpan::detached() -> DiagSpan {
 
 ///|
 /// Create a diagnostic span from an external file's byte range.
-pub fn DiagSpan::from_range(id : FileId, start : Int, end : Int) -> DiagSpan {
+pub fn DiagSpan::from_range(
+  id : FileId,
+  start : Int32,
+  end : Int32,
+) -> DiagSpan {
   let start = saturate(start, span_external_value_max)
   let end = saturate(end, span_external_value_max)
   { span: Span::pack(id, span_external_base + start), extra: end, }

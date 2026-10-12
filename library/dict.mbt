@@ -55,7 +55,7 @@ pub fn Dict::is_empty(self : Dict) -> Bool {
 
 ///|
 /// The number of pairs.
-pub fn Dict::len(self : Dict) -> Int {
+pub fn Dict::len(self : Dict) -> Int32 {
   self.map.length()
 }
 

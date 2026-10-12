@@ -9,21 +9,21 @@ priv struct PosTable {
 }
 
 ///|
-fn PosTable::make(n : Int) -> PosTable {
+fn PosTable::make(n : Int32) -> PosTable {
   { array: FixedArray::make(n, 0), }
 }
 
 ///|
 /// Entry `i` (`0 <= i < length`, unchecked).
 #inline
-fn PosTable::unsafe_get(self : PosTable, i : Int) -> Int {
+fn PosTable::unsafe_get(self : PosTable, i : Int32) -> Int32 {
   self.array.unsafe_get(i).to_int()
 }
 
 ///|
 /// Sets entry `i` (`0 <= i < length`, unchecked) to `v & 0xffff`.
 #inline
-fn PosTable::unsafe_set(self : PosTable, i : Int, v : Int) -> Unit {
+fn PosTable::unsafe_set(self : PosTable, i : Int32, v : Int32) -> Unit {
   self.array.unsafe_set(i, v.to_uint16())
 }
 
@@ -34,7 +34,7 @@ fn PosTable::fill_zero(self : PosTable) -> Unit {
 
 ///|
 /// `m.saturating_sub(wsize)` for every entry.
-fn slide_hash_chain(table : PosTable, wsize : Int) -> Unit {
+fn slide_hash_chain(table : PosTable, wsize : Int32) -> Unit {
   let array = table.array
   let wsize = wsize.to_uint16()
   for i in 0..<array.length() {

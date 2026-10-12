@@ -2,7 +2,7 @@
 // the xref table of a PDF file.
 
 ///|
-const XREF_ENTRY_LEN : Int = 20
+const XREF_ENTRY_LEN : Int32 = 20
 
 ///|
 priv enum XRefError {
@@ -61,7 +61,7 @@ fn fallback_xref_map_inner(
     let old_r = r.clone()
 
     // First try to check if we have an object identifier.
-    if r.peek_byte() is Some(b) && b is (b'0'..=b'9') {
+    if r.peek_byte() is Some(b) && b is (b'0'..<=b'9') {
       let obj_id : ObjectIdentifier? = r.read(dummy_ctx)
       if obj_id is Some(obj_id) {
         let cloned = r.clone()
@@ -344,7 +344,7 @@ pub fn XRef::dummy() -> XRef {
 
 ///|
 /// The number of entries in the xref table.
-pub fn XRef::len(self : XRef) -> Int {
+pub fn XRef::len(self : XRef) -> Int32 {
   match self.inner {
     None => 0
     Some(r) => r.xref_map.length()
@@ -555,14 +555,14 @@ priv enum XRefInput {
 }
 
 ///|
-fn find_last_xref_pos(data : BytesView) -> Int? {
+fn find_last_xref_pos(data : BytesView) -> Int32? {
   let needle = b"startxref"
   guard findr_needle(data, needle) is Some(pos) else { return None }
   let finder = Reader::new(data)
   finder.jump(pos)
   guard finder.forward_tag(needle) is Some(_) else { return None }
   finder.skip_white_spaces_and_comments()
-  guard (finder.read_without_context() : Int?) is Some(v) else { return None }
+  guard (finder.read_without_context() : Int32?) is Some(v) else { return None }
   if v >= 0 {
     Some(v)
   } else {
@@ -574,11 +574,11 @@ fn find_last_xref_pos(data : BytesView) -> Int? {
 /// A type of xref entry.
 priv enum EntryType {
   /// An indirect object that is at a specific offset in the original data.
-  Normal(Int)
+  Normal(Int32)
   /// An indirect object that is part of an object stream. First number indicates the object
   /// number of the _object stream_ (the generation number is always 0), the second number indicates
   /// the index in the object stream.
-  ObjStream(UInt, UInt)
+  ObjStream(UInt32, UInt32)
 }
 
 ///|
@@ -598,12 +598,12 @@ fn TrailerData::dummy() -> TrailerData {
 }
 
 ///|
-fn parse_u32_digits(data : BytesView) -> UInt? {
+fn parse_u32_digits(data : BytesView) -> UInt32? {
   let mut accum : UInt64 = 0
   for byte in data {
     accum = accum * 10
     match byte {
-      b'0'..=b'9' => accum = accum + (byte.to_int() - 48).to_uint64()
+      b'0'..<=b'9' => accum = accum + (byte.to_int() - 48).to_uint64()
       _ => return None
     }
     if accum > 0xFFFFFFFFUL {
@@ -616,7 +616,7 @@ fn parse_u32_digits(data : BytesView) -> UInt? {
 ///|
 fn populate_xref_impl(
   data : BytesView,
-  pos : Int,
+  pos : Int32,
   xref_map : Map[ObjectIdentifier, EntryType],
 ) -> BytesView? {
   let visited = @hashset.HashSet([])
@@ -625,14 +625,14 @@ fn populate_xref_impl(
 
 ///|
 /// Maximum number of allowed xref `Prev` pointers before we abort.
-const MAX_XREF_CHAIN_DEPTH : Int = 256
+const MAX_XREF_CHAIN_DEPTH : Int32 = 256
 
 ///|
 fn populate_xref_impl_inner(
   data : BytesView,
-  pos : Int,
+  pos : Int32,
   xref_map : Map[ObjectIdentifier, EntryType],
-  visited : @hashset.HashSet[Int],
+  visited : @hashset.HashSet[Int32],
 ) -> BytesView? {
   if visited.contains(pos) {
     // circular xref PREV chain detected
@@ -657,13 +657,15 @@ fn populate_xref_impl_inner(
 }
 
 ///|
-fn read_subsection_header(r : Reader) -> (UInt, UInt)? {
+fn read_subsection_header(r : Reader) -> (UInt32, UInt32)? {
   let old = r.offset()
-  let res = (fn() -> (UInt, UInt)? {
+  let res = (fn() -> (UInt32, UInt32)? {
     r.skip_white_spaces()
-    guard (r.read_without_context() : UInt?) is Some(start) else { return None }
+    guard (r.read_without_context() : UInt32?) is Some(start) else {
+      return None
+    }
     r.skip_white_spaces()
-    guard (r.read_without_context() : UInt?) is Some(num_entries) else {
+    guard (r.read_without_context() : UInt32?) is Some(num_entries) else {
       return None
     }
     r.skip_white_spaces()
@@ -681,7 +683,7 @@ fn populate_from_xref_table(
   data : BytesView,
   reader : Reader,
   insert_map : Map[ObjectIdentifier, EntryType],
-  visited : @hashset.HashSet[Int],
+  visited : @hashset.HashSet[Int32],
 ) -> BytesView? {
   guard read_xref_table_trailer(reader.clone(), ReaderContext::dummy())
     is Some(trailer) else {
@@ -690,7 +692,7 @@ fn populate_from_xref_table(
   reader.skip_white_spaces()
   guard reader.forward_tag(b"xref") is Some(_) else { return None }
   reader.skip_white_spaces()
-  let prev : Int? = trailer.get("Prev")
+  let prev : Int32? = trailer.get("Prev")
   if prev is Some(prev) {
     // First insert the entries from any previous xref tables.
     guard populate_xref_impl_inner(data, prev, insert_map, visited) is Some(_) else {
@@ -700,7 +702,7 @@ fn populate_from_xref_table(
 
   // In hybrid files, entries in `XRefStm` should have higher priority, therefore we insert them
   // after looking at `PREV`.
-  let xref_stm : Int? = trailer.get("XRefStm")
+  let xref_stm : Int32? = trailer.get("XRefStm")
   if xref_stm is Some(xref_stm) {
     guard populate_xref_impl_inner(data, xref_stm, insert_map, visited)
       is Some(_) else {
@@ -748,7 +750,7 @@ fn populate_from_xref_stream(
   data : BytesView,
   reader : Reader,
   insert_map : Map[ObjectIdentifier, EntryType],
-  visited : @hashset.HashSet[Int],
+  visited : @hashset.HashSet[Int32],
 ) -> BytesView? {
   guard (
       reader.read_with_context(ReaderContext::dummy()) : IndirectObject[Stream]?)
@@ -756,14 +758,14 @@ fn populate_from_xref_stream(
     return None
   }
   let stream = stream.get()
-  let prev : Int? = stream.dict().get("Prev")
+  let prev : Int32? = stream.dict().get("Prev")
   if prev is Some(prev) {
     // First insert the entries from any previous xref tables.
     guard populate_xref_impl_inner(data, prev, insert_map, visited) is Some(_) else {
       return None
     }
   }
-  guard (stream.dict().get("Size") : UInt?) is Some(size) else { return None }
+  guard (stream.dict().get("Size") : UInt32?) is Some(size) else { return None }
   guard (stream.dict().get_fixed("W", 3) : Array[Byte]?) is Some(w) else {
     return None
   }
@@ -780,9 +782,9 @@ fn populate_from_xref_stream(
   if index is Some(arr) {
     let iter = arr.flex_iter()
     while true {
-      let start : UInt? = iter.next()
+      let start : UInt32? = iter.next()
       guard start is Some(start) else { break }
-      let num_elements : UInt? = iter.next()
+      let num_elements : UInt32? = iter.next()
       guard num_elements is Some(num_elements) else { break }
       guard xref_stream_subsection(
           xref_reader, start, num_elements, f1_len, f2_len, f3_len, insert_map,
@@ -803,7 +805,7 @@ fn populate_from_xref_stream(
 }
 
 ///|
-fn xref_stream_num(data : BytesView) -> UInt? {
+fn xref_stream_num(data : BytesView) -> UInt32? {
   match data.length() {
     0 => None
     1 => Some(data[0].to_uint())
@@ -840,14 +842,14 @@ fn xref_stream_num(data : BytesView) -> UInt? {
 ///|
 fn xref_stream_subsection(
   xref_reader : Reader,
-  start : UInt,
-  num_elements : UInt,
-  f1_len : Int,
-  f2_len : Int,
-  f3_len : Int,
+  start : UInt32,
+  num_elements : UInt32,
+  f1_len : Int32,
+  f2_len : Int32,
+  f3_len : Int32,
   insert_map : Map[ObjectIdentifier, EntryType],
 ) -> Unit? {
-  let mut i : UInt = 0
+  let mut i : UInt32 = 0
   while i < num_elements {
     let f_type = if f1_len == 0 {
       1
@@ -953,7 +955,7 @@ fn get_decryptor(
 priv struct ObjectStream {
   data : BytesView
   ctx : ReaderContext
-  offsets : Array[(UInt, Int)]
+  offsets : Array[(UInt32, Int32)]
 }
 
 ///|
@@ -974,7 +976,7 @@ fn ObjectStream::new(
   while n < num_objects {
     r.skip_white_spaces_and_comments()
     // Skip object number
-    guard (r.read_without_context() : UInt?) is Some(obj_num) else {
+    guard (r.read_without_context() : UInt32?) is Some(obj_num) else {
       return None
     }
     r.skip_white_spaces_and_comments()
@@ -989,7 +991,7 @@ fn ObjectStream::new(
 }
 
 ///|
-fn[T : ObjectLike] ObjectStream::get(self : ObjectStream, index : UInt) -> T? {
+fn[T : ObjectLike] ObjectStream::get(self : ObjectStream, index : UInt32) -> T? {
   let index = index.reinterpret_as_int()
   if index < 0 || index >= self.offsets.length() {
     return None

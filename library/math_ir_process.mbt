@@ -101,7 +101,7 @@ priv struct Preprocessed {
   items : Array[RawMathItem]
   had_linebreaks : Bool
   has_align : Bool
-  linebreaks : Int
+  linebreaks : Int32
 }
 
 ///|
@@ -124,7 +124,7 @@ fn preprocess(
   strip_linebreaks : Bool,
 ) -> Preprocessed {
   let resolved : Array[RawMathItem] = Array(capacity=items.length())
-  let mut last : Int? = None
+  let mut last : Int32? = None
   let mut space : MathItem? = None
   let mut had_linebreaks = false
   let mut has_align = false
@@ -282,7 +282,7 @@ fn math_spacing_between(
 ///|
 /// Returns the physical index of the last non-ignorant item (upstream
 /// `MathBuffer::last_index`/`last_mut`).
-fn math_buffer_last_index(buffer : Array[RawMathItem]) -> Int? {
+fn math_buffer_last_index(buffer : Array[RawMathItem]) -> Int32? {
   for i = buffer.length() - 1; i >= 0; i = i - 1 {
     if !buffer[i].is_ignorant() {
       return Some(i)

@@ -5,15 +5,15 @@
 /// Convert 16 YCbCr samples (`y[yo..yo + 16]` etc.) to RGB (`num_components
 /// == 3`) or RGBA (`4`) at `output[out_pos..]`.
 fn ycbcr_to_rgb_16(
-  y : FixedArray[Int],
-  yo : Int,
-  cb : FixedArray[Int],
-  cbo : Int,
-  cr : FixedArray[Int],
-  cro : Int,
+  y : FixedArray[Int32],
+  yo : Int32,
+  cb : FixedArray[Int32],
+  cbo : Int32,
+  cr : FixedArray[Int32],
+  cro : Int32,
   output : FixedArray[Byte],
-  out_pos : Int,
-  num_components : Int,
+  out_pos : Int32,
+  num_components : Int32,
 ) -> Unit {
   ycbcr_to_rgb_16_scalar(
     y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
@@ -22,7 +22,7 @@ fn ycbcr_to_rgb_16(
 
 ///|
 /// [upsample_horizontal_core_scalar].
-fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
+fn upsample_horizontal_core(input : Slice, output : Slice, n : Int32) -> Unit {
   upsample_horizontal_core_scalar(input, output, n)
 }
 
@@ -32,8 +32,8 @@ fn upsample_vertical_core(
   input : Slice,
   near : Slice,
   output : Slice,
-  start : Int,
-  n : Int,
+  start : Int32,
+  n : Int32,
 ) -> Unit {
   upsample_vertical_core_scalar(input, near, output, start, n)
 }
@@ -41,10 +41,10 @@ fn upsample_vertical_core(
 ///|
 /// The integer IDCT.
 fn idct_int(
-  in_vector : FixedArray[Int],
-  out_vector : FixedArray[Int],
-  out_pos : Int,
-  stride : Int,
+  in_vector : FixedArray[Int32],
+  out_vector : FixedArray[Int32],
+  out_pos : Int32,
+  stride : Int32,
 ) -> Unit {
   idct_int_scalar(in_vector, out_vector, out_pos, stride)
 }

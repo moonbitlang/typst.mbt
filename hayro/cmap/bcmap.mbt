@@ -9,85 +9,85 @@
 let bcmap_magic : Bytes = b"bcmap"
 
 ///|
-const BCMAP_VERSION : Int = 0x01
+const BCMAP_VERSION : Int32 = 0x01
 
 ///|
-const BCMAP_FILE_HEADER_SIZE : Int = 10
+const BCMAP_FILE_HEADER_SIZE : Int32 = 10
 
 ///|
-const SEG_HEADER_SIZE : Int = 5
+const SEG_HEADER_SIZE : Int32 = 5
 
 ///|
-const SEGMENT_RANGE_1B : Int = 0x01
+const SEGMENT_RANGE_1B : Int32 = 0x01
 
 ///|
-const SEGMENT_SINGLE_1B : Int = 0x02
+const SEGMENT_SINGLE_1B : Int32 = 0x02
 
 ///|
-const SEGMENT_RANGE_2B : Int = 0x03
+const SEGMENT_RANGE_2B : Int32 = 0x03
 
 ///|
-const SEGMENT_SINGLE_2B : Int = 0x04
+const SEGMENT_SINGLE_2B : Int32 = 0x04
 
 ///|
-const SEGMENT_RANGE_3B : Int = 0x05
+const SEGMENT_RANGE_3B : Int32 = 0x05
 
 ///|
-const SEGMENT_SINGLE_3B : Int = 0x06
+const SEGMENT_SINGLE_3B : Int32 = 0x06
 
 ///|
-const SEGMENT_RANGE_4B : Int = 0x07
+const SEGMENT_RANGE_4B : Int32 = 0x07
 
 ///|
-const SEGMENT_SINGLE_4B : Int = 0x08
+const SEGMENT_SINGLE_4B : Int32 = 0x08
 
 ///|
-const SEGMENT_USECMAP : Int = 0x09
+const SEGMENT_USECMAP : Int32 = 0x09
 
 ///|
-const SEGMENT_NOTDEF : Int = 0x0A
+const SEGMENT_NOTDEF : Int32 = 0x0A
 
 ///|
-const SEGMENT_WMODE : Int = 0x0B
+const SEGMENT_WMODE : Int32 = 0x0B
 
 ///|
-const SEGMENT_CODESPACE : Int = 0x0C
+const SEGMENT_CODESPACE : Int32 = 0x0C
 
 ///|
-const SEGMENT_NAME : Int = 0x0D
+const SEGMENT_NAME : Int32 = 0x0D
 
 ///|
-const SEGMENT_CID_SYSTEM_INFO : Int = 0x0E
+const SEGMENT_CID_SYSTEM_INFO : Int32 = 0x0E
 
 ///|
-const SEGMENT_BF_RANGE_VARIABLE : Int = 0x0F
+const SEGMENT_BF_RANGE_VARIABLE : Int32 = 0x0F
 
 ///|
-const SEGMENT_BF_SINGLE_VARIABLE : Int = 0x10
+const SEGMENT_BF_SINGLE_VARIABLE : Int32 = 0x10
 
 ///|
-const SEGMENT_BF_SINGLE_1U : Int = 0x11
+const SEGMENT_BF_SINGLE_1U : Int32 = 0x11
 
 ///|
-const SEGMENT_BF_SINGLE_2U : Int = 0x12
+const SEGMENT_BF_SINGLE_2U : Int32 = 0x12
 
 ///|
-const SEGMENT_BF_SINGLE_3U : Int = 0x13
+const SEGMENT_BF_SINGLE_3U : Int32 = 0x13
 
 ///|
-const SEGMENT_BF_SINGLE_4U : Int = 0x14
+const SEGMENT_BF_SINGLE_4U : Int32 = 0x14
 
 ///|
-const SEGMENT_BF_RANGE_1U : Int = 0x15
+const SEGMENT_BF_RANGE_1U : Int32 = 0x15
 
 ///|
-const SEGMENT_BF_RANGE_2U : Int = 0x16
+const SEGMENT_BF_RANGE_2U : Int32 = 0x16
 
 ///|
 fn bcmap_parse(
   data : BytesView,
   get_cmap : (CMapName) -> Bytes?,
-  depth : Int,
+  depth : Int32,
   bundle : Bundle,
 ) -> CMap? {
   // While in theory we can assume that all binary cmaps are valid, it can
@@ -305,8 +305,8 @@ fn parse_notdef(payload : BytesView, ranges : PartitionedRanges) -> Unit? {
 fn read_huffman_column(
   r : BReader,
   table : HuffmanTable,
-  n_entries : Int,
-) -> Array[UInt]? {
+  n_entries : Int32,
+) -> Array[UInt32]? {
   guard r.read_u32() is Some(len) else { return None }
   guard r.read_bytes(len.reinterpret_as_int()) is Some(data) else {
     return None
@@ -324,7 +324,7 @@ fn read_huffman_column(
 fn parse_cid_segment(
   payload : BytesView,
   ranges : PartitionedRanges,
-  byte_width : Int,
+  byte_width : Int32,
   delta_table : HuffmanTable,
   count_table : HuffmanTable?,
 ) -> Unit? {
@@ -360,9 +360,9 @@ fn parse_cid_segment(
 
   // Read the CIDs and reconstruct the character codes that map to them.
   let is_range = count_table is Some(_)
-  let mut prev_end : UInt? = None
-  let mut prev_cid : UInt? = None
-  let mut prev_range_len : UInt = 0
+  let mut prev_end : UInt32? = None
+  let mut prev_cid : UInt32? = None
+  let mut prev_range_len : UInt32 = 0
   for i in 0..<n_entries {
     guard r.read_u16() is Some(raw_cid) else { return None }
 
@@ -401,7 +401,7 @@ fn parse_bf_segment(
   entries : Array[BfRange],
   delta_table : HuffmanTable,
   count_table : HuffmanTable?,
-  fixed_units : Int?,
+  fixed_units : Int32?,
 ) -> Unit? {
   let r = BReader::new(payload)
   guard r.read_u16() is Some(n_entries) else { return None }
@@ -416,7 +416,7 @@ fn parse_bf_segment(
     counts = c
   }
   let is_range = count_table is Some(_)
-  let mut prev_end : UInt? = None
+  let mut prev_end : UInt32? = None
   for i in 0..<n_entries {
     // Fixed-width segments encode destinations without a length prefix.
     let n_units = match fixed_units {

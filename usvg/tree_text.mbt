@@ -41,7 +41,7 @@ pub extend FontStretch with Default::{default}
 
 ///|
 /// The numeric value of a stretch (`fontdb::Stretch::to_number`).
-pub fn FontStretch::to_number(self : FontStretch) -> Int {
+pub fn FontStretch::to_number(self : FontStretch) -> Int32 {
   match self {
     UltraCondensed => 1
     ExtraCondensed => 2
@@ -134,7 +134,7 @@ pub struct Font {
   priv families : Array[@svgtypes.FontFamily]
   priv style : FontStyle
   priv stretch : FontStretch
-  priv weight : Int
+  priv weight : Int32
   priv variations : Array[FontVariation]
 } derive(Eq)
 
@@ -165,7 +165,7 @@ pub fn Font::stretch(self : Font) -> FontStretch {
 
 ///|
 /// A font weight.
-pub fn Font::weight(self : Font) -> Int {
+pub fn Font::weight(self : Font) -> Int32 {
   self.weight
 }
 
@@ -368,8 +368,8 @@ pub fn TextDecoration::line_through(
 ///
 /// Spans do not overlap inside a text chunk.
 pub struct TextSpan {
-  priv start : Int
-  priv mut end : Int
+  priv start : Int32
+  priv mut end : Int32
   priv mut fill : Fill?
   priv mut stroke : Stroke?
   priv paint_order : PaintOrder
@@ -398,13 +398,13 @@ fn TextSpan::clone(self : TextSpan) -> TextSpan {
 /// A span start in bytes.
 ///
 /// Offset is relative to the parent text chunk and not the parent text element.
-pub fn TextSpan::start(self : TextSpan) -> Int {
+pub fn TextSpan::start(self : TextSpan) -> Int32 {
   self.start
 }
 
 ///|
 /// A span end in bytes.
-pub fn TextSpan::end(self : TextSpan) -> Int {
+pub fn TextSpan::end(self : TextSpan) -> Int32 {
   self.end
 }
 

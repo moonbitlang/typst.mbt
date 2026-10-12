@@ -1,35 +1,35 @@
 // Port of `resvg/src/filter/turbulence.rs`.
 
 ///|
-let rand_m : Int = 2147483647 // 2**31 - 1
+let rand_m : Int32 = 2147483647 // 2**31 - 1
 
 ///|
-let rand_a : Int = 16807 // 7**5; primitive root of m
+let rand_a : Int32 = 16807 // 7**5; primitive root of m
 
 ///|
-let rand_q : Int = 127773 // m / a
+let rand_q : Int32 = 127773 // m / a
 
 ///|
-let rand_r : Int = 2836 // m % a
+let rand_r : Int32 = 2836 // m % a
 
 ///|
-let b_size : Int = 0x100
+let b_size : Int32 = 0x100
 
 ///|
-let b_len : Int = 0x100 + 0x100 + 2
+let b_len : Int32 = 0x100 + 0x100 + 2
 
 ///|
-let bm : Int = 0xff
+let bm : Int32 = 0xff
 
 ///|
-let perlin_n : Int = 0x1000
+let perlin_n : Int32 = 0x1000
 
 ///|
 priv struct StitchInfo {
-  mut width : Int // How much to subtract to wrap for stitching.
-  mut height : Int
-  mut wrap_x : Int // Minimum value to wrap.
-  mut wrap_y : Int
+  mut width : Int32 // How much to subtract to wrap for stitching.
+  mut height : Int32
+  mut wrap_x : Int32 // Minimum value to wrap.
+  mut wrap_y : Int32
 }
 
 ///|
@@ -46,8 +46,8 @@ fn turbulence_apply(
   sy : Double,
   base_frequency_x : Double,
   base_frequency_y : Double,
-  num_octaves : UInt,
-  seed : Int,
+  num_octaves : UInt32,
+  seed : Int32,
   stitch_tiles : Bool,
   fractal_noise : Bool,
   dest : @skia.Pixmap,
@@ -59,7 +59,7 @@ fn turbulence_apply(
   let mut x = 0
   let mut y = 0
   for i in 0..<data.length() {
-    let turb = fn(channel : Int) -> Int {
+    let turb = fn(channel : Int32) -> Int32 {
       let (tx, ty) = (
         (x.to_double() + offset_x) / sx,
         (y.to_double() + offset_y) / sy,
@@ -99,10 +99,12 @@ fn turbulence_apply(
 ///|
 /// The gradient table is stored flat: `gradient[k][i][j]` is at
 /// `(k * b_len + i) * 2 + j`.
-fn turbulence_init(seed : Int) -> (FixedArray[Int], FixedArray[Double]) {
+fn turbulence_init(seed : Int32) -> (FixedArray[Int32], FixedArray[Double]) {
   let lattice_selector = FixedArray::make(b_len, 0)
   let gradient = FixedArray::make(4 * b_len * 2, 0.0)
-  let gi = fn(k : Int, i : Int, j : Int) -> Int { (k * b_len + i) * 2 + j }
+  let gi = fn(k : Int32, i : Int32, j : Int32) -> Int32 {
+    (k * b_len + i) * 2 + j
+  }
   let mut seed = seed
   if seed <= 0 {
     seed = -seed % (rand_m - 1) + 1
@@ -144,7 +146,7 @@ fn turbulence_init(seed : Int) -> (FixedArray[Int], FixedArray[Double]) {
 
 ///|
 fn turbulence(
-  color_channel : Int,
+  color_channel : Int32,
   x : Double,
   y : Double,
   tile_x : Double,
@@ -153,10 +155,10 @@ fn turbulence(
   tile_height : Double,
   base_freq_x : Double,
   base_freq_y : Double,
-  num_octaves : UInt,
+  num_octaves : UInt32,
   fractal_sum : Bool,
   do_stitching : Bool,
-  lattice_selector : FixedArray[Int],
+  lattice_selector : FixedArray[Int32],
   gradient : FixedArray[Double],
 ) -> Double {
   let mut base_freq_x = base_freq_x
@@ -226,10 +228,10 @@ fn turbulence(
 
 ///|
 fn noise2(
-  color_channel : Int,
+  color_channel : Int32,
   x : Double,
   y : Double,
-  lattice_selector : FixedArray[Int],
+  lattice_selector : FixedArray[Int32],
   gradient : FixedArray[Double],
   stitch_info : StitchInfo?,
 ) -> Double {
@@ -286,7 +288,7 @@ fn noise2(
 }
 
 ///|
-fn random(seed : Int) -> Int {
+fn random(seed : Int32) -> Int32 {
   let mut result = rand_a * (seed % rand_q) - rand_r * (seed / rand_q)
   if result <= 0 {
     result += rand_m

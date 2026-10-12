@@ -27,16 +27,16 @@ pub struct Watcher {
 ///|
 /// How long to wait for a shortly following file system event when
 /// watching.
-const BATCH_TIMEOUT : Int = 100
+const BATCH_TIMEOUT : Int32 = 100
 
 ///|
 /// The maximum time we spend batching events before quitting `wait()`.
-const STARVE_TIMEOUT : Int = 500
+const STARVE_TIMEOUT : Int32 = 500
 
 ///|
 /// The interval in which we poll when falling back to poll watching
 /// due to missing files.
-const POLL_INTERVAL : Int = 300
+const POLL_INTERVAL : Int32 = 300
 
 ///|
 /// Create a new, blank watcher.

@@ -62,7 +62,7 @@ fn convert_paint(
   state : State,
   shape : @library.Shape?,
   include_stroke_in_bbox : Bool,
-) -> (@export.Paint, Int) raise @library.SourceError {
+) -> (@export.Paint, Int32) raise @library.SourceError {
   let (offset, size) = match shape {
     Some(s) => {
       let bbox = @svg.shape_bbox(s, include_stroke_in_bbox)
@@ -106,7 +106,7 @@ fn convert_paint(
 }
 
 ///|
-fn convert_solid(color : @library.Color) -> (@export.Color, Int) {
+fn convert_solid(color : @library.Color) -> (@export.Color, Int32) {
   match color {
     Process(color) => {
       let (c, a) = convert_process_solid(color)
@@ -119,7 +119,7 @@ fn convert_solid(color : @library.Color) -> (@export.Color, Int) {
 ///|
 fn convert_process_solid(
   color : @library.ProcessColor,
-) -> (@export.RegularColor, Int) {
+) -> (@export.RegularColor, Int32) {
   match color.space() {
     D65Gray => {
       let c = color.to_space(D65Gray).to_vec4_u8()
@@ -160,7 +160,7 @@ fn convert_pattern(
   on_text : Bool,
   surface : @export.Surface,
   state : State,
-) -> (@export.Paint, Int) raise @library.SourceError {
+) -> (@export.Paint, Int32) raise @library.SourceError {
   let transform = correct_transform(state, pattern.unwrap_relative(on_text)).pre_concat(
     tiling_transform(pattern),
   )

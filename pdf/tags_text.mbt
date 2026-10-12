@@ -5,7 +5,7 @@ priv struct TextAttrs {
   /// Store the last resolved set of text attributes. The resolution isn't
   /// that expensive, but for large bodies of text it is resolved quite often.
   mut last_resolved : (@library.FontInstance, @library.Abs, ResolvedTextAttrs)?
-  items : Array[(Int, TextAttr)]
+  items : Array[(Int32, TextAttr)]
 }
 
 ///|
@@ -14,12 +14,12 @@ fn TextAttrs::new() -> TextAttrs {
 }
 
 ///|
-fn TextAttrs::len(self : TextAttrs) -> Int {
+fn TextAttrs::len(self : TextAttrs) -> Int32 {
   self.items.length()
 }
 
 ///|
-fn TextAttrs::push(self : TextAttrs, id : Int, attr : TextAttr) -> Unit {
+fn TextAttrs::push(self : TextAttrs, id : Int32, attr : TextAttr) -> Unit {
   self.last_resolved = None
   self.items.push((id, attr))
 }
@@ -27,8 +27,8 @@ fn TextAttrs::push(self : TextAttrs, id : Int, attr : TextAttr) -> Unit {
 ///|
 fn TextAttrs::insert(
   self : TextAttrs,
-  idx : Int,
-  id : Int,
+  idx : Int32,
+  id : Int32,
   attr : TextAttr,
 ) -> Unit {
   self.last_resolved = None
@@ -37,7 +37,7 @@ fn TextAttrs::insert(
 
 ///|
 /// Returns true if a decoration was removed.
-fn TextAttrs::pop(self : TextAttrs, id : Int) -> Bool {
+fn TextAttrs::pop(self : TextAttrs, id : Int32) -> Bool {
   self.last_resolved = None
   if self.items.last() is Some((i, _)) && i == id {
     self.items.pop() |> ignore
@@ -134,7 +134,7 @@ fn resolve_text_attrs(
 ///|
 fn compute_attrs(
   options : CompletePdfOptions,
-  items : Array[(Int, TextAttr)],
+  items : Array[(Int32, TextAttr)],
   text : @library.TextItem,
 ) -> (ResolvedTextAttrs, @library.SourceDiagnostic?) {
   let styles = tags_styles()

@@ -144,22 +144,22 @@ fn info(command : InfoCommand) -> Unit raise HintedFailure {
     }
     None => {
       let out = terminal_out()
-      let key = (k : String, pad : Int?) => {
+      let key = (k : String, pad : Int32?) => {
         out.set_color(@kit.ColorSpec::new().with_fg(Cyan))
         out.write(pad_right(k, pad))
         out.reset()
       }
-      let simple = (v : String, pad : Int?) => {
+      let simple = (v : String, pad : Int32?) => {
         out.set_color(@kit.ColorSpec::new().with_fg(Green))
         out.write(pad_right(v, pad))
         out.reset()
       }
-      let special = (v : String, pad : Int?) => {
+      let special = (v : String, pad : Int32?) => {
         out.set_color(@kit.ColorSpec::new().with_fg(Blue))
         out.write(pad_right(v, pad))
         out.reset()
       }
-      let bool_value = (b : Bool, pad : Int?) => {
+      let bool_value = (b : Bool, pad : Int32?) => {
         special(if b { "on" } else { "off" }, pad)
       }
       let opt_value = (v : String?) => {
@@ -262,7 +262,7 @@ fn info(command : InfoCommand) -> Unit raise HintedFailure {
 
 ///|
 /// Pads a string with spaces to the right (`{: <pad$}`).
-fn pad_right(s : String, pad : Int?) -> String {
+fn pad_right(s : String, pad : Int32?) -> String {
   match pad {
     Some(pad) => {
       let len = s.iter().count()

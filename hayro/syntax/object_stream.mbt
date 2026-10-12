@@ -33,15 +33,15 @@ pub(all) struct ImageDecodeParams {
   /// Whether the color space of the image is an indexed color space.
   is_indexed : Bool
   /// The bits per component of the image, if that information is available.
-  bpc : Int?
+  bpc : Int32?
   /// The components per channel of the image, if that information is available.
-  num_components : Int?
+  num_components : Int32?
   /// A target resolution for the image.
-  target_dimension : (Int, Int)?
+  target_dimension : (Int32, Int32)?
   /// The width of the image as indicated by the image dictionary.
-  width : Int
+  width : Int32
   /// The height of the image as indicated by the image dictionary.
-  height : Int
+  height : Int32
 }
 
 ///|
@@ -89,7 +89,7 @@ pub(all) enum ImageColorSpace {
   /// CMYK color space.
   Cmyk
   /// An unknown color space.
-  Unknown(Int)
+  Unknown(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -110,11 +110,11 @@ pub(all) struct ImageData {
   /// The color space of the image.
   color_space : ImageColorSpace?
   /// The bits per component of the image.
-  bits_per_component : Int
+  bits_per_component : Int32
   /// The width of the image.
-  width : Int
+  width : Int32
   /// The height of the image.
-  height : Int
+  height : Int32
 }
 
 ///|
@@ -298,7 +298,7 @@ pub extend Stream with ObjectLike::{from_object}
 
 ///|
 fn parse_proper(r : Reader, dict : Dict) -> Stream? {
-  guard (dict.get("Length") : UInt?) is Some(length) else { return None }
+  guard (dict.get("Length") : UInt32?) is Some(length) else { return None }
   r.skip_white_spaces_and_comments()
   guard r.forward_tag(b"stream") is Some(_) else { return None }
   if r.forward_tag(b"\n") is None &&
@@ -343,7 +343,7 @@ fn parse_fallback(r : Reader, dict : Dict) -> Stream? {
 }
 
 ///|
-fn trim_trailing_ascii_whitespace(data : BytesView) -> Int {
+fn trim_trailing_ascii_whitespace(data : BytesView) -> Int32 {
   let mut end = data.length()
   while end > 0 && is_white_space_character(data[end - 1]) {
     end -= 1

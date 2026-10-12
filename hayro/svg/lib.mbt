@@ -496,7 +496,7 @@ fn[T] Deduplicator::is_empty(self : Deduplicator[T]) -> Bool {
 ///|
 priv struct Id {
   kind : Char
-  index : Int
+  index : Int32
 }
 
 ///|

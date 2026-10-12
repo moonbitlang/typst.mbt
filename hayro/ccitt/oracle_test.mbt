@@ -32,7 +32,7 @@ fn hex16(v : UInt64) -> String {
 /// Records the pushed pixels like the generator's `CcittRecorder`.
 struct Recorder {
   out : @buffer.Buffer
-  mut rows : Int
+  mut rows : Int32
 }
 
 ///|

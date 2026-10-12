@@ -53,7 +53,13 @@ test "segment header example 2" {
 
 ///|
 test "binary search picks the same entry as Rust's slice::binary_search_by" {
-  let entries : Array[(UInt, Int)] = [(1, 0), (3, 1), (3, 2), (3, 3), (7, 4)]
+  let entries : Array[(UInt32, Int32)] = [
+    (1, 0),
+    (3, 1),
+    (3, 2),
+    (3, 3),
+    (7, 4),
+  ]
   // Rust's implementation narrows to the last of equal keys here.
   assert_eq(binary_search_by_key(entries, 3), Some(3))
   assert_eq(binary_search_by_key(entries, 1), Some(0))

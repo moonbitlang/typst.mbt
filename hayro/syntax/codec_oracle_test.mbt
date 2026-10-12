@@ -53,15 +53,15 @@ fn codec_params(
   variant : String,
 ) -> @syntax.ImageDecodeParams {
   let dict = stream.dict()
-  let width = match (dict.get("Width") : UInt?) {
+  let width = match (dict.get("Width") : UInt32?) {
     Some(w) => w
-    None => (dict.get("W") : UInt?).unwrap_or(0)
+    None => (dict.get("W") : UInt32?).unwrap_or(0)
   }
-  let height = match (dict.get("Height") : UInt?) {
+  let height = match (dict.get("Height") : UInt32?) {
     Some(h) => h
-    None => (dict.get("H") : UInt?).unwrap_or(0)
+    None => (dict.get("H") : UInt32?).unwrap_or(0)
   }
-  let bpc : Int? = match (dict.get("BPC") : Byte?) {
+  let bpc : Int32? = match (dict.get("BPC") : Byte?) {
     Some(b) => Some(b.to_int())
     None => (dict.get("BitsPerComponent") : Byte?).map(b => b.to_int())
   }

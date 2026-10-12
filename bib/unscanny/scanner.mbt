@@ -11,14 +11,14 @@ pub struct Scanner {
   priv chars : Array[Char]
   /// `offs[i]` is the byte offset of `chars[i]`; `offs[chars.length()]` is
   /// the total byte length.
-  priv offs : Array[Int]
+  priv offs : Array[Int32]
   /// The cursor as a char index.
-  priv mut idx : Int
+  priv mut idx : Int32
 }
 
 ///|
 /// The UTF-8 length of a char.
-pub fn char_len_utf8(c : Char) -> Int {
+pub fn char_len_utf8(c : Char) -> Int32 {
   let n = c.to_int()
   if n < 0x80 {
     1
@@ -33,7 +33,7 @@ pub fn char_len_utf8(c : Char) -> Int {
 
 ///|
 /// The UTF-8 length of a string.
-pub fn len_utf8(s : StringView) -> Int {
+pub fn len_utf8(s : StringView) -> Int32 {
   let mut n = 0
   for c in s {
     n += char_len_utf8(c)
@@ -64,7 +64,7 @@ pub fn Scanner::string(self : Scanner) -> String {
 
 ///|
 /// The current cursor position (a byte offset).
-pub fn Scanner::cursor(self : Scanner) -> Int {
+pub fn Scanner::cursor(self : Scanner) -> Int32 {
   self.offs[self.idx]
 }
 
@@ -75,7 +75,7 @@ pub fn Scanner::done(self : Scanner) -> Bool {
 }
 
 ///|
-fn Scanner::slice(self : Scanner, start : Int, end : Int) -> String {
+fn Scanner::slice(self : Scanner, start : Int32, end : Int32) -> String {
   if start >= end {
     return ""
   }
@@ -97,7 +97,7 @@ pub fn Scanner::after(self : Scanner) -> String {
 ///|
 /// Snap a byte index to a char index (in bounds, on a codepoint boundary,
 /// rounding down like upstream).
-fn Scanner::snap(self : Scanner, index : Int) -> Int {
+fn Scanner::snap(self : Scanner, index : Int32) -> Int32 {
   let n = self.chars.length()
   if index >= self.offs[n] {
     return n
@@ -124,7 +124,7 @@ fn Scanner::snap(self : Scanner, index : Int) -> Int {
 ///
 /// Snaps `start` into the bounds of the string and to the next previous char
 /// boundary.
-pub fn Scanner::from(self : Scanner, start : Int) -> String {
+pub fn Scanner::from(self : Scanner, start : Int32) -> String {
   let s = self.snap(start)
   let s = if s < self.idx { s } else { self.idx }
   self.slice(s, self.idx)
@@ -132,7 +132,7 @@ pub fn Scanner::from(self : Scanner, start : Int) -> String {
 
 ///|
 /// The subslice from the cursor to `end`.
-pub fn Scanner::to(self : Scanner, end : Int) -> String {
+pub fn Scanner::to(self : Scanner, end : Int32) -> String {
   let e = self.snap(end)
   let e = if e > self.idx { e } else { self.idx }
   self.slice(self.idx, e)
@@ -140,7 +140,7 @@ pub fn Scanner::to(self : Scanner, end : Int) -> String {
 
 ///|
 /// The subslice from `start` to `end`.
-pub fn Scanner::get(self : Scanner, start : Int, end : Int) -> String {
+pub fn Scanner::get(self : Scanner, start : Int32, end : Int32) -> String {
   let s = self.snap(start)
   let e = self.snap(end)
   let e = if e > s { e } else { s }
@@ -163,7 +163,7 @@ pub fn Scanner::peek(self : Scanner) -> Char? {
 ///
 /// - `scout(-1)` is the character before the cursor.
 /// - `scout(0)` is the same as `peek()`.
-pub fn Scanner::scout(self : Scanner, n : Int) -> Char? {
+pub fn Scanner::scout(self : Scanner, n : Int32) -> Char? {
   let i = self.idx + n
   if i >= 0 && i < self.chars.length() {
     Some(self.chars[i])
@@ -174,7 +174,7 @@ pub fn Scanner::scout(self : Scanner, n : Int) -> Char? {
 
 ///|
 /// The byte index of the n-th character relative to the cursor.
-pub fn Scanner::locate(self : Scanner, n : Int) -> Int {
+pub fn Scanner::locate(self : Scanner, n : Int32) -> Int32 {
   let mut i = self.idx + n
   if i < 0 {
     i = 0
@@ -230,7 +230,7 @@ pub fn Scanner::at_fn(self : Scanner, f : (Char) -> Bool) -> Bool {
 ///|
 /// How many chars the string `s` covers if the part after the cursor starts
 /// with it.
-fn Scanner::match_str(self : Scanner, s : StringView) -> Int? {
+fn Scanner::match_str(self : Scanner, s : StringView) -> Int32? {
   let mut i = self.idx
   for c in s {
     if i >= self.chars.length() || self.chars[i] != c {
@@ -358,6 +358,6 @@ pub fn Scanner::eat_whitespace(self : Scanner) -> String {
 ///
 /// Snaps into the bounds of the string and to the next previous char
 /// boundary.
-pub fn Scanner::jump(self : Scanner, target : Int) -> Unit {
+pub fn Scanner::jump(self : Scanner, target : Int32) -> Unit {
   self.idx = self.snap(target)
 }

@@ -524,7 +524,7 @@ let cbrt_hard_expected : ReadOnlyArray[UInt64] = [
 ]
 
 ///|
-const CBRT_CUBES : Int = 208063
+const CBRT_CUBES : Int32 = 208063
 
 ///|
 const CBRT_CUBES_HASH : UInt64 = 0x846bc9bb75a31877UL
@@ -537,7 +537,7 @@ const CBRT_GRID_HASH : UInt64 = 0xe3d8e9f36da9552fUL
 
 ///|
 /// `(seed, count, lo, hi, signed, hash)`.
-let cbrt_sweeps : ReadOnlyArray[(UInt64, Int, Int, Int, Bool, UInt64)] = [
+let cbrt_sweeps : ReadOnlyArray[(UInt64, Int32, Int32, Int32, Bool, UInt64)] = [
   (0x6362727400000000UL, 100000, 0, 2047, true, 0x57c456ef45acaed0UL),
   (0x6362727400010001UL, 100000, 1023, 1025, true, 0x45629593fb0b966dUL),
   (0x6362727400020002UL, 50000, 0, 1, true, 0xe23053b08a6f61e6UL),

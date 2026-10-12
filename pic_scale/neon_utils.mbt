@@ -5,7 +5,7 @@
 
 ///|
 /// `SignedSatQ(x, 16)`.
-fn sat_i16(x : Int) -> Int {
+fn sat_i16(x : Int32) -> Int32 {
   if x > 32767 {
     32767
   } else if x < -32768 {
@@ -17,7 +17,7 @@ fn sat_i16(x : Int) -> Int {
 
 ///|
 /// Truncation of an integer to an `i16` lane (`vadd_s16`, `vaddvq_s16`).
-fn wrap_i16(x : Int) -> Int {
+fn wrap_i16(x : Int32) -> Int32 {
   ((x & 0xffff) ^ 0x8000) - 0x8000
 }
 
@@ -25,14 +25,14 @@ fn wrap_i16(x : Int) -> Int {
 /// One lane of `vqrdmlahq_s16(acc, x, w)` (SQRDMLAH, `esize = 16`):
 /// `SignedSatQ(((acc << 16) + 2 * x * w + (1 << 15)) >> 16, 16)`. As the low
 /// 16 bits of `acc << 16` are zero this equals the form below.
-fn vqrdmlah_s16(acc : Int, x : Int, w : Int) -> Int {
+fn vqrdmlah_s16(acc : Int32, x : Int32, w : Int32) -> Int32 {
   sat_i16(acc + ((2 * x * w + 32768) >> 16))
 }
 
 ///|
 /// One lane of `vqrdmulhq_s32(a, b)` (SQRDMULH, `esize = 32`):
 /// `SignedSatQ((2 * a * b + (1 << 31)) >> 32, 32)`.
-fn vqrdmulh_s32(a : Int, b : Int) -> Int {
+fn vqrdmulh_s32(a : Int32, b : Int32) -> Int32 {
   let v = (2L * a.to_int64() * b.to_int64() + 0x80000000L) >> 32
   if v > 0x7fffffffL {
     0x7fffffff
@@ -46,7 +46,7 @@ fn vqrdmulh_s32(a : Int, b : Int) -> Int {
 ///|
 /// `expand8_to_14`/`expand8_high_to_14`: `vzip(row, row)` duplicates each
 /// byte into a `u16` lane (`p * 257`), then `vshrq_n_u16::<2>` keeps 14 bits.
-fn expand8_to_14(p : Int) -> Int {
+fn expand8_to_14(p : Int32) -> Int32 {
   (p * 257) >> 2
 }
 
@@ -54,7 +54,7 @@ fn expand8_to_14(p : Int) -> Int {
 /// `vqshrun_n_s32::<15>` followed by `vqmovn_u16` (and the equivalent
 /// `max(0) >> 15` then `min(255)` of the horizontal kernels): an `i32`
 /// accumulator in Q15 to a saturated `u8`.
-fn pack_q15_u8(acc : Int) -> Int {
+fn pack_q15_u8(acc : Int32) -> Int32 {
   let v = acc >> 15
   if v < 0 {
     0
@@ -68,7 +68,7 @@ fn pack_q15_u8(acc : Int) -> Int {
 ///|
 /// `vqshrun_n_s16::<6>` (and `vshr_n_s16::<6>` + `vqmovun_s16`): an `i16`
 /// accumulator in Q6 to a saturated `u8`.
-fn pack_q6_u8(acc : Int) -> Int {
+fn pack_q6_u8(acc : Int32) -> Int32 {
   let v = acc >> 6
   if v < 0 {
     0

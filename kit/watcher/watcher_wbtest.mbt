@@ -20,7 +20,7 @@ async fn write(path : String, content : String) -> Unit {
 
 ///|
 /// Whether `wait` returns within the given time.
-async fn returns_within(watcher : Watcher, ms : Int) -> Bool {
+async fn returns_within(watcher : Watcher, ms : Int32) -> Bool {
   @async.with_timeout_opt(ms, () => watcher.wait()) is Some(_)
 }
 

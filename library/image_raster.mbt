@@ -9,8 +9,8 @@
 /// (little-endian) samples in
 /// row-major order with `color.channel_count()` channels.
 pub struct DynamicImage {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   color : @codecs.ColorType
   buf : Bytes
 } derive(Eq, Hash)
@@ -31,12 +31,12 @@ pub struct RasterImage {
   priv data : Bytes
   priv format : RasterFormat
   /// The pixel width after applying the EXIF rotation.
-  priv width : UInt
+  priv width : UInt32
   /// The pixel height after applying the EXIF rotation.
-  priv height : UInt
+  priv height : UInt32
   priv color : @codecs.ColorType
   priv dynamic : DynamicImage
-  priv exif_rotation : UInt?
+  priv exif_rotation : UInt32?
   priv icc : Bytes?
   priv dpi : Double?
   /// [RasterImage::hash128], once it was asked for.
@@ -162,7 +162,7 @@ fn RasterImage::new_impl(
       // Apply rotation from EXIF metadata.
       let mut width = info.width
       let mut height = info.height
-      let mut exif_rot : UInt? = None
+      let mut exif_rot : UInt32? = None
       if exif.bind(exif_rotation) is Some(rotation) {
         if rotation is (5 | 6 | 7 | 8) {
           // These rotations transpose the image.
@@ -250,13 +250,13 @@ pub fn RasterImage::format(self : RasterImage) -> RasterFormat {
 
 ///|
 /// The image's pixel width.
-pub fn RasterImage::width(self : RasterImage) -> UInt {
+pub fn RasterImage::width(self : RasterImage) -> UInt32 {
   self.width
 }
 
 ///|
 /// The image's pixel height.
-pub fn RasterImage::height(self : RasterImage) -> UInt {
+pub fn RasterImage::height(self : RasterImage) -> UInt32 {
   self.height
 }
 
@@ -271,7 +271,7 @@ pub fn RasterImage::color(self : RasterImage) -> @codecs.ColorType {
 ///
 /// The [`dynamic`](Self::dynamic) image already has this factored in. This
 /// value is only relevant to consumers of the raw [`data`](Self::data).
-pub fn RasterImage::exif_rotation(self : RasterImage) -> UInt? {
+pub fn RasterImage::exif_rotation(self : RasterImage) -> UInt32? {
   self.exif_rotation
 }
 
@@ -341,7 +341,7 @@ fn decode_exchange(
 
 ///|
 /// The number of bytes per pixel.
-fn DynamicImage::bytes_per_pixel(self : DynamicImage) -> Int {
+fn DynamicImage::bytes_per_pixel(self : DynamicImage) -> Int32 {
   let bytes = match self.color {
     L8 | La8 | Rgb8 | Rgba8 => 1
     L16 | La16 | Rgb16 | Rgba16 => 2
@@ -354,9 +354,9 @@ fn DynamicImage::bytes_per_pixel(self : DynamicImage) -> Int {
 /// `(x, y)` in an image of the given size.
 fn DynamicImage::remap(
   self : DynamicImage,
-  width : UInt,
-  height : UInt,
-  f : (Int, Int) -> (Int, Int),
+  width : UInt32,
+  height : UInt32,
+  f : (Int32, Int32) -> (Int32, Int32),
 ) -> DynamicImage {
   let bpp = self.bytes_per_pixel()
   let w = width.reinterpret_as_int()
@@ -378,7 +378,7 @@ fn DynamicImage::remap(
 /// (lossless for 8-bit images). The 90° rotations are exact.
 fn DynamicImage::apply_rotation(
   self : DynamicImage,
-  rotation : UInt,
+  rotation : UInt32,
 ) -> DynamicImage {
   let w = self.width.reinterpret_as_int()
   let h = self.height.reinterpret_as_int()
@@ -403,7 +403,10 @@ fn DynamicImage::apply_rotation(
 
 ///|
 /// The pixel pairs swapped by upstream `flip_horizontal_in_place`.
-fn flip_horizontal_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+fn flip_horizontal_pairs(
+  w : Int32,
+  h : Int32,
+) -> Array[((Int32, Int32), (Int32, Int32))] {
   let pairs = []
   for y in 0..<h {
     for x in 0..<(w / 2) {
@@ -415,7 +418,10 @@ fn flip_horizontal_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
 
 ///|
 /// The pixel pairs swapped by upstream `flip_vertical_in_place`.
-fn flip_vertical_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+fn flip_vertical_pairs(
+  w : Int32,
+  h : Int32,
+) -> Array[((Int32, Int32), (Int32, Int32))] {
   let pairs = []
   for y in 0..<(h / 2) {
     for x in 0..<w {
@@ -427,7 +433,10 @@ fn flip_vertical_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
 
 ///|
 /// The pixel pairs swapped by upstream `rotate180_in_place`.
-fn rotate180_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+fn rotate180_pairs(
+  w : Int32,
+  h : Int32,
+) -> Array[((Int32, Int32), (Int32, Int32))] {
   let pairs = []
   for y in 0..<(h / 2) {
     for x in 0..<w {
@@ -448,7 +457,7 @@ fn rotate180_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
 /// of `GenericImage for DynamicImage`).
 fn DynamicImage::swap_in_place(
   self : DynamicImage,
-  pairs : Array[((Int, Int), (Int, Int))],
+  pairs : Array[((Int32, Int32), (Int32, Int32))],
 ) -> DynamicImage {
   let bpp = self.bytes_per_pixel()
   let sixteen = bpp / self.color.channel_count() == 2
@@ -461,7 +470,7 @@ fn DynamicImage::swap_in_place(
     let v = (v8 << 8) | v8
     (v.to_byte(), (v >> 8).to_byte())
   }
-  let read = (x : Int, y : Int) => {
+  let read = (x : Int32, y : Int32) => {
     let start = (y * w + x) * bpp
     let pixel = FixedArray::makei(bpp, k => buf[start + k])
     if sixteen {
@@ -473,7 +482,7 @@ fn DynamicImage::swap_in_place(
     }
     pixel
   }
-  let write = (x : Int, y : Int, pixel : FixedArray[Byte]) => {
+  let write = (x : Int32, y : Int32, pixel : FixedArray[Byte]) => {
     let start = (y * w + x) * bpp
     for k in 0..<bpp {
       buf[start + k] = pixel[k]
@@ -491,7 +500,7 @@ fn DynamicImage::swap_in_place(
 
 ///|
 /// Try to get the rotation from the EXIF metadata.
-fn exif_rotation(exif : @codecs.Exif) -> UInt? {
+fn exif_rotation(exif : @codecs.Exif) -> UInt32? {
   exif
   .get_field(Tiff, @codecs.exif_tag_orientation, 0)
   .bind(value => value.get_uint(0))
@@ -523,7 +532,7 @@ fn determine_dpi(data : BytesView, exif : @codecs.Exif?) -> Double? {
 ///|
 /// Try to get the DPI from the EXIF metadata.
 fn exif_dpi(exif : @codecs.Exif) -> Double? {
-  fn axis(tag : Int) -> Double? {
+  fn axis(tag : Int32) -> Double? {
     guard exif.get_field(Tiff, tag, 0) is Some(Rational(rational)) else {
       return None
     }
@@ -545,13 +554,13 @@ fn exif_dpi(exif : @codecs.Exif) -> Double? {
 /// Tries to extract the DPI from raw JPEG data (by inspecting the JFIF APP0
 /// section).
 fn jpeg_dpi(data : BytesView) -> Double? {
-  fn validate_at(index : Int, expect : Bytes) -> Bool {
+  fn validate_at(index : Int32, expect : Bytes) -> Bool {
     index <= data.length() &&
     data.length() - index >= expect.length() &&
     data[index:index + expect.length()] == expect[:]
   }
 
-  fn u16_at(index : Int) -> Int? {
+  fn u16_at(index : Int32) -> Int32? {
     if index + 2 > data.length() {
       None
     } else {

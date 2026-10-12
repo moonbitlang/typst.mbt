@@ -32,11 +32,11 @@ pub extend ExifContext with @debug.Debug::{to_repr}
 ///|
 /// A field value (upstream `exif::Value`, numeric variants only).
 pub(all) enum ExifValue {
-  Byte(Array[UInt])
-  Short(Array[UInt])
-  Long(Array[UInt])
+  Byte(Array[UInt32])
+  Short(Array[UInt32])
+  Long(Array[UInt32])
   /// Pairs of numerator and denominator.
-  Rational(Array[(UInt, UInt)])
+  Rational(Array[(UInt32, UInt32)])
   /// Any other type.
   Other
 } derive(Debug)
@@ -48,7 +48,7 @@ pub extend ExifValue with @debug.Debug::{to_repr}
 
 ///|
 /// Returns the unsigned integer at `index` (upstream `Value::get_uint`).
-pub fn ExifValue::get_uint(self : ExifValue, index : Int) -> UInt? {
+pub fn ExifValue::get_uint(self : ExifValue, index : Int32) -> UInt32? {
   match self {
     Byte(v) | Short(v) | Long(v) if index < v.length() => Some(v[index])
     _ => None
@@ -59,8 +59,8 @@ pub fn ExifValue::get_uint(self : ExifValue, index : Int) -> UInt? {
 /// A parsed field.
 priv struct ExifField {
   ctx : ExifContext
-  tag : Int
-  ifd_num : Int
+  tag : Int32
+  ifd_num : Int32
   value : ExifValue
 }
 
@@ -77,8 +77,8 @@ pub struct Exif {
 pub fn Exif::get_field(
   self : Exif,
   ctx : ExifContext,
-  tag : Int,
-  ifd_num : Int,
+  tag : Int32,
+  ifd_num : Int32,
 ) -> ExifValue? {
   let mut found = None
   for field in self.fields {
@@ -91,15 +91,15 @@ pub fn Exif::get_field(
 
 ///|
 /// Tag number of `Orientation`.
-pub let exif_tag_orientation : Int = 0x112
+pub let exif_tag_orientation : Int32 = 0x112
 
 ///|
 /// Tag number of `XResolution`.
-pub let exif_tag_x_resolution : Int = 0x11a
+pub let exif_tag_x_resolution : Int32 = 0x11a
 
 ///|
 /// Tag number of `YResolution`.
-pub let exif_tag_y_resolution : Int = 0x11b
+pub let exif_tag_y_resolution : Int32 = 0x11b
 
 ///|
 /// An Exif reading error (upstream `exif::Error`).
@@ -261,7 +261,7 @@ priv struct TiffParser {
 }
 
 ///|
-fn TiffParser::u16(self : TiffParser, i : Int) -> Int {
+fn TiffParser::u16(self : TiffParser, i : Int32) -> Int32 {
   if self.le {
     u16_le(self.data, i)
   } else {
@@ -270,7 +270,7 @@ fn TiffParser::u16(self : TiffParser, i : Int) -> Int {
 }
 
 ///|
-fn TiffParser::u32(self : TiffParser, i : Int) -> UInt {
+fn TiffParser::u32(self : TiffParser, i : Int32) -> UInt32 {
   if self.le {
     u32_le(self.data, i)
   } else {
@@ -309,7 +309,7 @@ fn parse_tiff(data : BytesView) -> Exif raise ExifError {
 
 ///|
 /// The size of one unit of a TIFF field type.
-fn tiff_unit_len(typ : Int) -> Int {
+fn tiff_unit_len(typ : Int32) -> Int32 {
   match typ {
     1 | 2 | 6 | 7 => 1
     3 | 8 => 2
@@ -325,7 +325,7 @@ fn TiffParser::parse_ifd(
   self : TiffParser,
   offset : UInt64,
   ctx : ExifContext,
-  ifd_num : Int,
+  ifd_num : Int32,
 ) -> UInt64 raise ExifError {
   let data = self.data
   // Count (the number of the entries).
@@ -392,9 +392,9 @@ fn TiffParser::parse_ifd(
 /// only).
 fn TiffParser::parse_value(
   self : TiffParser,
-  typ : Int,
-  cnt : Int,
-  ofs : Int,
+  typ : Int32,
+  cnt : Int32,
+  ofs : Int32,
 ) -> ExifValue {
   match typ {
     1 => Byte(Array::makei(cnt, i => self.data[ofs + i].to_uint()))

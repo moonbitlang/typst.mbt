@@ -1,7 +1,7 @@
 // Port of `hayro-syntax/src/filter/jpx.rs` (on `hayro/jpeg2000`).
 
 ///|
-fn ImageColorSpace::num_components(self : ImageColorSpace) -> Int {
+fn ImageColorSpace::num_components(self : ImageColorSpace) -> Int32 {
   match self {
     Gray => 1
     Rgb => 3
@@ -102,10 +102,10 @@ fn jpx_decode(data : BytesView, params : ImageDecodeParams) -> FilterResult? {
 ///|
 fn jpx_scale(
   data : Bytes,
-  bit_per_component : Int,
-  num_components : Int,
-  width : UInt,
-  height : UInt,
+  bit_per_component : Int32,
+  num_components : Int32,
+  width : UInt32,
+  height : UInt32,
 ) -> Bytes? {
   if bit_per_component == 0 || bit_per_component > 32 {
     return None
@@ -153,7 +153,7 @@ fn jpx_round_f32(x : Float) -> Float {
 
 ///|
 /// `x as u32` for an `f32` (saturating, NaN maps to 0).
-fn jpx_f32_to_u32(x : Float) -> UInt {
+fn jpx_f32_to_u32(x : Float) -> UInt32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 4294967295.0 {

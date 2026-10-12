@@ -14,15 +14,15 @@ priv struct BitStream {
   /// operations like peek_bits and get_bits.
   mut aligned_buffer : UInt64
   /// Tell us the bits left the two buffer
-  mut bits_left : Int
+  mut bits_left : Int32
   /// Did we find a marker(RST/EOF) during decoding?
   mut marker : Marker?
   /// An i16 with the bit corresponding to successive_low set to 1, others 0.
-  mut successive_low_mask : Int
-  mut spec_start : Int
-  mut spec_end : Int
-  mut eob_run : Int
-  mut overread_by : Int
+  mut successive_low_mask : Int32
+  mut spec_start : Int32
+  mut spec_end : Int32
+  mut eob_run : Int32
+  mut overread_by : Int32
   /// True if we have seen end of image marker.
   /// Don't read anything after that.
   mut seen_eoi : Bool
@@ -48,9 +48,9 @@ fn BitStream::new() -> BitStream {
 ///|
 /// Create a new Bitstream for progressive decoding.
 fn BitStream::new_progressive(
-  al : Int,
-  spec_start : Int,
-  spec_end : Int,
+  al : Int32,
+  spec_start : Int32,
+  spec_end : Int32,
 ) -> BitStream {
   {
     buffer: 0,
@@ -68,7 +68,7 @@ fn BitStream::new_progressive(
 
 ///|
 /// `u64 << n` with Rust release semantics (the shift amount is masked).
-fn shl64(x : UInt64, n : Int) -> UInt64 {
+fn shl64(x : UInt64, n : Int32) -> UInt64 {
   x << (n & 63)
 }
 
@@ -186,20 +186,20 @@ fn BitStream::refill_byte(
 
 ///|
 /// Peek `n` bits ahead without discarding them from the buffer.
-fn BitStream::peek_bits(self : BitStream, n : Int) -> Int {
+fn BitStream::peek_bits(self : BitStream, n : Int32) -> Int32 {
   (self.aligned_buffer >> (64 - n)).to_int()
 }
 
 ///|
 /// Discard the next `n` bits without checking.
-fn BitStream::drop_bits(self : BitStream, n : Int) -> Unit {
+fn BitStream::drop_bits(self : BitStream, n : Int32) -> Unit {
   self.bits_left = @cmp.maximum(self.bits_left - n, 0)
   self.aligned_buffer = shl64(self.aligned_buffer, n)
 }
 
 ///|
 /// Read `n_bits` from the buffer and discard them.
-fn BitStream::get_bits(self : BitStream, n_bits : Int) -> Int {
+fn BitStream::get_bits(self : BitStream, n_bits : Int32) -> Int32 {
   let mask = (1UL << n_bits) - 1
   let n = n_bits & 63
   if n != 0 {
@@ -213,7 +213,7 @@ fn BitStream::get_bits(self : BitStream, n_bits : Int) -> Int {
 
 ///|
 /// Get a single bit from the bitstream.
-fn BitStream::get_bit(self : BitStream) -> Int {
+fn BitStream::get_bit(self : BitStream) -> Int32 {
   let k = (self.aligned_buffer >> 63).to_int()
   // discard a bit
   self.drop_bits(1)
@@ -225,9 +225,9 @@ fn BitStream::get_bit(self : BitStream) -> Int {
 /// table entry of the next `HUFF_LOOKAHEAD` bits.
 fn BitStream::decode_huff(
   self : BitStream,
-  symbol0 : Int,
+  symbol0 : Int32,
   table : HuffmanTable,
-) -> Int raise DecodeErrors {
+) -> Int32 raise DecodeErrors {
   let mut symbol = symbol0
   let mut code_length = symbol >> HUFF_LOOKAHEAD
   symbol = symbol & ((1 << HUFF_LOOKAHEAD) - 1)
@@ -270,8 +270,8 @@ fn BitStream::decode_dc(
   self : BitStream,
   reader : ZReader,
   dc_table : HuffmanTable,
-  dc_prediction : Int,
-) -> Int raise DecodeErrors {
+  dc_prediction : Int32,
+) -> Int32 raise DecodeErrors {
   if self.bits_left < 32 {
     let _ = self.refill(reader)
   }
@@ -315,10 +315,10 @@ fn BitStream::decode_mcu_block(
   reader : ZReader,
   dc_table : HuffmanTable,
   ac_table : HuffmanTable,
-  qt_table : FixedArray[Int],
-  block : FixedArray[Int],
+  qt_table : FixedArray[Int32],
+  block : FixedArray[Int32],
   component : Components,
-) -> Int raise DecodeErrors {
+) -> Int32 raise DecodeErrors {
   // Get fast AC table as a reference before we enter the hot path
   let ac_lookup = ac_table.ac_lookup.unwrap()
   // Decode AC coefficients
@@ -370,7 +370,7 @@ fn BitStream::discard_mcu_block(
   reader : ZReader,
   dc_table : HuffmanTable,
   ac_table : HuffmanTable,
-) -> Int raise DecodeErrors {
+) -> Int32 raise DecodeErrors {
   // Get fast AC table as a reference before we enter the hot path
   let ac_lookup = ac_table.ac_lookup.unwrap()
   // Decode AC coefficients
@@ -412,8 +412,8 @@ fn BitStream::decode_prog_dc_first(
   self : BitStream,
   reader : ZReader,
   dc_table : HuffmanTable,
-  block : FixedArray[Int],
-  idx : Int,
+  block : FixedArray[Int32],
+  idx : Int32,
   component : Components,
 ) -> Unit raise DecodeErrors {
   component.dc_pred = self.decode_dc(reader, dc_table, component.dc_pred)
@@ -425,8 +425,8 @@ fn BitStream::decode_prog_dc_first(
 fn BitStream::decode_prog_dc_refine(
   self : BitStream,
   reader : ZReader,
-  block : FixedArray[Int],
-  idx : Int,
+  block : FixedArray[Int32],
+  idx : Int32,
 ) -> Unit raise DecodeErrors {
   // refinement scan
   if self.bits_left < 1 {
@@ -448,8 +448,8 @@ fn BitStream::decode_mcu_ac_first(
   self : BitStream,
   reader : ZReader,
   ac_table : HuffmanTable,
-  block : FixedArray[Int],
-  base : Int,
+  block : FixedArray[Int32],
+  base : Int32,
 ) -> Unit raise DecodeErrors {
   let fast_ac = ac_table.ac_lookup.unwrap()
   let bit = self.successive_low_mask
@@ -501,8 +501,8 @@ fn BitStream::decode_mcu_ac_refine(
   self : BitStream,
   reader : ZReader,
   table : HuffmanTable,
-  block : FixedArray[Int],
-  base : Int,
+  block : FixedArray[Int32],
+  base : Int32,
 ) -> Unit raise DecodeErrors {
   let bit = self.successive_low_mask
   // `k` is a `u8` upstream
@@ -615,10 +615,10 @@ fn BitStream::decode_mcu_ac_refine(
 ///|
 fn BitStream::update_progressive_params(
   self : BitStream,
-  _ah : Int,
-  al : Int,
-  spec_start : Int,
-  spec_end : Int,
+  _ah : Int32,
+  al : Int32,
+  spec_start : Int32,
+  spec_end : Int32,
 ) -> Unit {
   self.successive_low_mask = i16(1 << al)
   self.spec_start = spec_start
@@ -637,18 +637,18 @@ fn BitStream::reset(self : BitStream) -> Unit {
 
 ///|
 /// Do the equivalent of JPEG HUFF_EXTEND.
-fn huff_extend(x : Int, s : Int) -> Int {
+fn huff_extend(x : Int32, s : Int32) -> Int32 {
   // if x<s return x else return x+offset[s] where offset[s] = ( (-1<<s)+1)
   x + (((x - (1 << (s - 1))) >> 31) & ((-1 << s) + 1))
 }
 
 ///|
-fn has_zero(v : UInt) -> Bool {
+fn has_zero(v : UInt32) -> Bool {
   // Retrieved from Stanford bithacks
   (((v & 0x7F7F_7F7F) + 0x7F7F_7F7F) | v | 0x7F7F_7F7F) != 0xFFFF_FFFF
 }
 
 ///|
-fn has_byte(b : UInt, val : Int) -> Bool {
+fn has_byte(b : UInt32, val : Int32) -> Bool {
   has_zero(b ^ (0x0101_0101U * val.reinterpret_as_uint()))
 }

@@ -54,8 +54,8 @@ priv struct GlyphPainter {
   face : @otf.Face
   svg : @xmlwriter.XmlWriter
   path_buf : StringBuilder
-  mut gradient_index : Int
-  mut clip_path_index : Int
+  mut gradient_index : Int32
+  mut clip_path_index : Int32
   palette_index : UInt16
   mut transform : @otf.Transform
   mut outline_transform : @otf.Transform

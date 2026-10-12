@@ -53,8 +53,8 @@ fn CbrtTestRng::next(self : CbrtTestRng) -> UInt64 {
 /// exponent in `lo..=hi`; the low mantissa bits are cleared for some samples.
 fn cbrt_test_sample(
   rng : CbrtTestRng,
-  lo : Int,
-  hi : Int,
+  lo : Int32,
+  hi : Int32,
   signed : Bool,
 ) -> Double {
   let e = lo.to_uint64() + (rng.next() >> 11) % (hi - lo + 1).to_uint64()

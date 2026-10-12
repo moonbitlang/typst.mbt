@@ -4,13 +4,13 @@
 /// All information needed to layout a single rowspan.
 priv struct Rowspan {
   /// First column of this rowspan.
-  x : Int
+  x : Int32
   /// First row of this rowspan.
-  y : Int
+  y : Int32
   /// The disambiguator for laying out the cells.
-  disambiguator : Int
+  disambiguator : Int32
   /// Amount of rows spanned by the cell at (x, y).
-  rowspan : Int
+  rowspan : Int32
   /// Whether all rows of the rowspan are part of an unbreakable row group.
   /// This is true e.g. in headers and footers, regardless of what the user
   /// specified for the parent cell's `breakable` field.
@@ -24,7 +24,7 @@ priv struct Rowspan {
   /// The vertical offset of this rowspan in the first region.
   mut dy : @library.Abs
   /// The index of the first region this rowspan appears in.
-  mut first_region : Int
+  mut first_region : Int32
   /// The full height in the first region this rowspan appears in, for
   /// relative sizing.
   mut region_full : @library.Abs
@@ -36,7 +36,7 @@ priv struct Rowspan {
   /// header, will no longer contribute height to this rowspan.
   ///
   /// This is `None` if no spanned rows were resolved in `finish_region` yet.
-  mut max_resolved_row : Int?
+  mut max_resolved_row : Int32?
   /// See [RowState::is_being_repeated].
   is_being_repeated : Bool
 }
@@ -46,7 +46,7 @@ priv struct Rowspan {
 priv struct UnbreakableRowGroup {
   /// The rows in this group of unbreakable rows.
   /// Includes their indices and their predicted heights.
-  rows : Array[(Int, @library.Abs)]
+  rows : Array[(Int32, @library.Abs)]
   /// The total height of this row group.
   mut height : @library.Abs
 }
@@ -80,7 +80,7 @@ priv struct CellMeasurementData {
   height_in_this_region : @library.Abs
   /// The amount of previous regions spanned by the cell.
   /// They are skipped for measurement purposes.
-  frames_in_previous_regions : Int
+  frames_in_previous_regions : Int32
 }
 
 ///|
@@ -192,8 +192,8 @@ fn GridLayouter::layout_rowspan(
 /// If so, adds them to the rowspans vector.
 fn GridLayouter::check_for_rowspans(
   self : GridLayouter,
-  disambiguator : Int,
-  y : Int,
+  disambiguator : Int32,
+  y : Int32,
 ) -> Unit {
   let offsets = points(self.rcols.iter())
   for x in 0..<self.rcols.length() {
@@ -230,7 +230,7 @@ fn GridLayouter::check_for_rowspans(
 /// unbreakable rowspan crossing those rows.
 fn GridLayouter::check_for_unbreakable_rows(
   self : GridLayouter,
-  current_row : Int,
+  current_row : Int32,
   engine : @library.Engine,
 ) -> Unit raise @library.SourceError {
   if self.unbreakable_rows_left == 0 {
@@ -296,11 +296,11 @@ fn GridLayouter::check_for_unbreakable_rows(
 /// group (if any) needs.
 fn GridLayouter::simulate_unbreakable_row_group(
   self : GridLayouter,
-  first_row : Int,
-  amount_unbreakable_rows : Int?,
+  first_row : Int32,
+  amount_unbreakable_rows : Int32?,
   regions : @library.Regions,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> UnbreakableRowGroup raise @library.SourceError {
   let row_group = UnbreakableRowGroup::default()
   let mut unbreakable_rows_left = amount_unbreakable_rows.unwrap_or(0)
@@ -365,8 +365,8 @@ fn GridLayouter::simulate_unbreakable_row_group(
 /// the spanned rows must, as a result, be laid out in the same region.
 fn GridLayouter::check_for_unbreakable_cells(
   self : GridLayouter,
-  y : Int,
-) -> Int {
+  y : Int32,
+) -> Int32 {
   let mut max = 0
   for x in 0..<self.grid.cols.length() {
     guard self.grid.cell(x, y) is Some(cell) else { continue }
@@ -381,7 +381,7 @@ fn GridLayouter::check_for_unbreakable_cells(
 /// Used by `measure_auto_row` to gather data needed to measure the cell.
 fn GridLayouter::prepare_auto_row_cell_measurement(
   self : GridLayouter,
-  parent : @library.Axes[Int],
+  parent : @library.Axes[Int32],
   cell : @library.Cell,
   breakable : Bool,
   row_group_data : UnbreakableRowGroup?,
@@ -493,7 +493,7 @@ fn GridLayouter::prepare_auto_row_cell_measurement(
     // If we're currently simulating an unbreakable row group, also
     // consider the height of previously spanned rows which are in
     // the row group but not yet laid out.
-    let group_rows : Array[(Int, @library.Abs)] = match row_group_data {
+    let group_rows : Array[(Int32, @library.Abs)] = match row_group_data {
       Some(row_group) => row_group.rows
       None => []
     }
@@ -606,12 +606,12 @@ fn GridLayouter::prepare_auto_row_cell_measurement(
 /// otherwise.
 fn GridLayouter::prepare_rowspan_sizes(
   self : GridLayouter,
-  auto_row_y : Int,
+  auto_row_y : Int32,
   sizes : Array[@library.Abs],
   cell : @library.Cell,
-  parent_y : Int,
-  rowspan : Int,
-  unbreakable_rows_left : Int,
+  parent_y : Int32,
+  rowspan : Int32,
+  unbreakable_rows_left : Int32,
   measurement_data : CellMeasurementData,
 ) -> Bool {
   if sizes.length() <= 1 &&
@@ -694,12 +694,12 @@ fn GridLayouter::prepare_rowspan_sizes(
 /// and vector of requested sizes).
 fn GridLayouter::simulate_and_measure_rowspans_in_auto_row(
   self : GridLayouter,
-  y : Int,
+  y : Int32,
   resolved : Array[@library.Abs],
-  pending_rowspans : Array[(Int, Int, Array[@library.Abs])],
-  unbreakable_rows_left : Int,
+  pending_rowspans : Array[(Int32, Int32, Array[@library.Abs])],
+  unbreakable_rows_left : Int32,
   row_group_data : UnbreakableRowGroup?,
-  disambiguator : Int,
+  disambiguator : Int32,
   engine : @library.Engine,
 ) -> Unit raise @library.SourceError {
   let mut disambiguator = disambiguator
@@ -877,14 +877,14 @@ fn GridLayouter::simulate_and_measure_rowspans_in_auto_row(
 /// successively larger values), aborts and returns `false`.
 fn GridLayouter::run_rowspan_simulation(
   self : GridLayouter,
-  y : Int,
-  max_spanned_row : Int,
+  y : Int32,
+  max_spanned_row : Int32,
   simulated_regions : @library.Regions,
   simulated_sizes : Array[@library.Abs],
   engine : @library.Engine,
   last_resolved_size : @library.Abs?,
-  unbreakable_rows_left : Int,
-  disambiguator : Int,
+  unbreakable_rows_left : Int32,
+  disambiguator : Int32,
 ) -> Bool raise @library.SourceError {
   let mut simulated_regions = simulated_regions
   let mut disambiguator = disambiguator
@@ -1005,7 +1005,7 @@ fn GridLayouter::run_rowspan_simulation(
 /// Auxiliary structure holding state during rowspan simulation.
 priv struct RowspanSimulator {
   /// The number of finished regions.
-  mut finished : Int
+  mut finished : Int32
   /// The state of regions during the simulation.
   mut regions : @library.Regions
   /// The total height of headers in the currently simulated region.
@@ -1030,7 +1030,7 @@ priv struct RowspanSimulator {
 /// Creates new rowspan simulation state with the given regions and initial
 /// header and footer heights. Other fields should always start as zero.
 fn RowspanSimulator::new(
-  finished : Int,
+  finished : Int32,
   regions : @library.Regions,
   current : Current,
 ) -> RowspanSimulator {
@@ -1058,11 +1058,11 @@ fn RowspanSimulator::new(
 /// more useful after that point.
 fn RowspanSimulator::simulate_rowspan_layout(
   self : RowspanSimulator,
-  y : Int,
-  max_spanned_row : Int,
+  y : Int32,
+  max_spanned_row : Int32,
   amount_to_grow : @library.Abs,
   requested_rowspan_height : @library.Abs,
-  unbreakable_rows_left : Int,
+  unbreakable_rows_left : Int32,
   layouter : GridLayouter,
   engine : @library.Engine,
 ) -> @library.Abs raise @library.SourceError {

@@ -114,7 +114,7 @@ pub fn find_unit_quad_roots(
   b : Float,
   c : Float,
   roots : Array[NormalizedF32Exclusive],
-) -> Int {
+) -> Int32 {
   if a == 0.0 {
     if valid_unit_divide(-c, b) is Some(r) {
       roots[0] = r
@@ -334,7 +334,7 @@ fn formulate_f1_dot_f2(src : Array[Float]) -> Array[Float] {
 fn solve_cubic_poly(
   coeff : Array[Float],
   t_values : Array[NormalizedF32],
-) -> Int {
+) -> Int32 {
   if is_nearly_zero(coeff[0]) {
     // we're just a quadratic
     let tmp_t = new_t_values()
@@ -400,7 +400,7 @@ fn sort_array3(array : Array[NormalizedF32]) -> Unit {
 }
 
 ///|
-fn collapse_duplicates3(array : Array[NormalizedF32]) -> Int {
+fn collapse_duplicates3(array : Array[NormalizedF32]) -> Int32 {
   let mut len = 3
   if array[1] == array[2] {
     len = 2
@@ -470,7 +470,7 @@ fn find_cubic_extrema(
   c : Float,
   d : Float,
   t_values : Array[NormalizedF32Exclusive],
-) -> Int {
+) -> Int32 {
   // we divide A,B,C by 3 to simplify
   let aa = d - a + 3.0 * (b - c)
   let bb : Float = 2.0 * (a - b - b + c)
@@ -560,8 +560,8 @@ fn find_cubic_cusp(src : ArrayView[Point]) -> NormalizedF32Exclusive? {
 // by the line segment src[lineIndex], src[lineIndex+1].
 fn on_same_side(
   src : ArrayView[Point],
-  test_index : Int,
-  line_index : Int,
+  test_index : Int32,
+  line_index : Int32,
 ) -> Bool {
   let origin = src[line_index]
   let line = src[line_index + 1] - origin
@@ -605,7 +605,7 @@ fn Conic::from_points(points : ArrayView[Point], weight : Float) -> Conic {
 }
 
 ///|
-fn Conic::compute_quad_pow2(self : Conic, tolerance : Float) -> Int? {
+fn Conic::compute_quad_pow2(self : Conic, tolerance : Float) -> Int32? {
   if tolerance < 0.0 || !is_finite(tolerance) {
     return None
   }
@@ -644,9 +644,9 @@ fn Conic::compute_quad_pow2(self : Conic, tolerance : Float) -> Int? {
 // N = 1 << pow2. The amount of storage needed is (1 + 2 * N)
 fn Conic::chop_into_quads_pow2(
   self : Conic,
-  pow2 : Int,
+  pow2 : Int32,
   points : Array[Point],
-) -> Int {
+) -> Int32 {
   points[0] = self.points[0]
   ignore(subdivide(self, points, 1, pow2))
   let quad_count = 1 << pow2
@@ -817,9 +817,9 @@ fn subdivide_weight_value(w : Float) -> Float {
 fn subdivide(
   src : Conic,
   points : Array[Point],
-  offset : Int,
-  level : Int,
-) -> Int {
+  offset : Int32,
+  level : Int32,
+) -> Int32 {
   if level == 0 {
     points[offset] = src.points[1]
     points[offset + 1] = src.points[2]
@@ -869,7 +869,7 @@ fn between(a : Float, b : Float, c : Float) -> Bool {
 ///|
 priv struct AutoConicToQuads {
   points : Array[Point] // 64
-  len : Int // the number of quads
+  len : Int32 // the number of quads
 }
 
 ///|

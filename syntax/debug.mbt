@@ -102,7 +102,7 @@ fn write_field_name(
 
 ///|
 /// Slice a string by UTF-8 byte offsets.
-pub fn utf8_slice(text : String, start : Int, end : Int) -> String {
+pub fn utf8_slice(text : String, start : Int32, end : Int32) -> String {
   let a = utf8_to_utf16(text, start)
   let b = utf8_to_utf16(text, end)
   text.unsafe_substring(start=a, end=b)
@@ -110,7 +110,7 @@ pub fn utf8_slice(text : String, start : Int, end : Int) -> String {
 
 ///|
 /// Convert a UTF-8 byte offset into a UTF-16 index (clamped to the string).
-pub fn utf8_to_utf16(text : String, offset : Int) -> Int {
+pub fn utf8_to_utf16(text : String, offset : Int32) -> Int32 {
   let mut bytes = 0
   let mut i = 0
   while i < text.length() && bytes < offset {

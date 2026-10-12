@@ -189,7 +189,7 @@ fn Collector::lines(
 
   // Store the heights of lines at the edges because we'll potentially need
   // these later when `lines` is already moved.
-  let height_at = (i : Int) => {
+  let height_at = (i : Int32) => {
     match lines.get(i) {
       Some(frame) => frame.height()
       None => @library.Abs::zero()
@@ -355,9 +355,9 @@ priv enum Child {
   /// An introspection tag.
   Tag(@library.Tag)
   /// Relative spacing with a specific weakness level.
-  Rel(@library.Rel[@library.Abs], Int)
+  Rel(@library.Rel[@library.Abs], Int32)
   /// Fractional spacing with a specific weakness level.
-  Fr(@library.Fr, Int)
+  Fr(@library.Fr, Int32)
   /// An already layouted line of a paragraph.
   Line(LineChild)
   /// An unbreakable block.
@@ -598,7 +598,7 @@ fn layout_multi_compute(
 /// The calls of [layout_single_impl] and [layout_multi_impl] in
 /// compilations with memoization, and those among them that were computed
 /// (the others were found in the store).
-let block_memo_counts : FixedArray[Int] = [0, 0]
+let block_memo_counts : FixedArray[Int32] = [0, 0]
 
 ///|
 /// The number of block layouts (`layout_single_impl`, `layout_multi_impl`)
@@ -607,7 +607,7 @@ let block_memo_counts : FixedArray[Int] = [0, 0]
 /// `@library.closure_memo_stats`). A layout that the recording check
 /// (`@library.set_memo_check`) computes a second time counts as computed
 /// twice, and one that raised as computed.
-pub fn block_memo_stats() -> (Int, Int) {
+pub fn block_memo_stats() -> (Int32, Int32) {
   (block_memo_counts[0] - block_memo_counts[1], block_memo_counts[1])
 }
 
@@ -619,7 +619,7 @@ priv struct MultiSpill {
   first : @library.Abs
   full : @library.Abs
   backlog : Array[@library.Abs]
-  min_backlog_len : Int
+  min_backlog_len : Int32
 }
 
 ///|
@@ -830,7 +830,10 @@ fn regions_eq(a : @library.Regions, b : @library.Regions) -> Bool {
 ///|
 /// Upstream `SliceExt::split_prefix_suffix`: the end of the prefix and the
 /// start of the suffix of elements matching `f`.
-fn[T] split_prefix_suffix(slice : ArrayView[T], f : (T) -> Bool) -> (Int, Int) {
+fn[T] split_prefix_suffix(
+  slice : ArrayView[T],
+  f : (T) -> Bool,
+) -> (Int32, Int32) {
   let len = slice.length()
   let mut start = len
   for i in 0..<len {

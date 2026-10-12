@@ -4,16 +4,16 @@
 
 ///|
 /// The maximum nesting depth of groups (upstream `MAX_RECURSION`).
-const MAX_RECURSION : Int = 64
+const MAX_RECURSION : Int32 = 64
 
 ///|
 /// Stand-in for Rust's `usize::MAX` (unbounded repeats, unset slots).
-pub const USIZE_MAX : Int = 0x7FFFFFFF
+pub const USIZE_MAX : Int32 = 0x7FFFFFFF
 
 ///|
 /// A set of group numbers (upstream `bit_set::BitSet`), kept sorted.
 pub struct BitSet {
-  priv items : Array[Int]
+  priv items : Array[Int32]
 } derive(Eq, Debug)
 
 ///|
@@ -32,7 +32,7 @@ pub fn BitSet::new() -> BitSet {
 }
 
 ///|
-pub fn BitSet::insert(self : BitSet, x : Int) -> Bool {
+pub fn BitSet::insert(self : BitSet, x : Int32) -> Bool {
   match self.items.binary_search(x) {
     Ok(_) => false
     Err(i) => {
@@ -43,19 +43,19 @@ pub fn BitSet::insert(self : BitSet, x : Int) -> Bool {
 }
 
 ///|
-pub fn BitSet::contains(self : BitSet, x : Int) -> Bool {
+pub fn BitSet::contains(self : BitSet, x : Int32) -> Bool {
   self.items.binary_search(x) is Ok(_)
 }
 
 ///|
 /// The members in increasing order.
-pub fn BitSet::iter(self : BitSet) -> Iter[Int] {
+pub fn BitSet::iter(self : BitSet) -> Iter[Int32] {
   self.items.iter()
 }
 
 ///|
 /// The largest member.
-pub fn BitSet::last(self : BitSet) -> Int? {
+pub fn BitSet::last(self : BitSet) -> Int32? {
   self.items.last()
 }
 
@@ -67,7 +67,7 @@ pub struct ExprTree {
   /// The groups that are referenced by backrefs.
   backrefs : BitSet
   /// The named groups.
-  named_groups : Map[String, Int]
+  named_groups : Map[String, Int32]
   contains_subroutines : Bool
   self_recursive : Bool
 } derive(Debug)
@@ -81,10 +81,10 @@ pub extend ExprTree with @debug.Debug::{to_repr}
 priv struct Parser {
   re : Bytes // source
   backrefs : BitSet
-  mut flags : Int
-  named_groups : Map[String, Int]
+  mut flags : Int32
+  named_groups : Map[String, Int32]
   mut numeric_backrefs : Bool
-  mut curr_group : Int // need to keep track of which group number we're parsing
+  mut curr_group : Int32 // need to keep track of which group number we're parsing
   mut contains_subroutines : Bool
   mut has_unresolved_subroutines : Bool
   mut self_recursive : Bool
@@ -92,21 +92,21 @@ priv struct Parser {
 
 ///|
 priv struct NamedBackrefOrSubroutine {
-  ix : Int
-  group_ix : Int?
+  ix : Int32
+  group_ix : Int32?
   group_name : String?
-  recursion_level : Int?
+  recursion_level : Int32?
 }
 
 ///|
-fn perr(ix : Int, e : ParseError) -> FancyError {
+fn perr(ix : Int32, e : ParseError) -> FancyError {
   FancyError::ParseError(ix, e)
 }
 
 ///|
 fn Parser::parse_with_flags(
   re : String,
-  flags : Int,
+  flags : Int32,
 ) -> ExprTree raise FancyError {
   let p = Parser::new(re, flags)
   let (ix, expr) = p.parse_re(0, 0)
@@ -129,7 +129,7 @@ fn Parser::parse_with_flags(
 }
 
 ///|
-fn Parser::new(re : String, flags : Int) -> Parser {
+fn Parser::new(re : String, flags : Int32) -> Parser {
   let flags = flags | FLAG_UNICODE
   {
     re: @utf8.encode(re),
@@ -145,19 +145,19 @@ fn Parser::new(re : String, flags : Int) -> Parser {
 }
 
 ///|
-fn Parser::len(self : Parser) -> Int {
+fn Parser::len(self : Parser) -> Int32 {
   self.re.length()
 }
 
 ///|
 /// The byte at `ix` (`ix` must be in bounds).
-fn Parser::byte(self : Parser, ix : Int) -> Int {
+fn Parser::byte(self : Parser, ix : Int32) -> Int32 {
   self.re[ix].to_int()
 }
 
 ///|
 /// The byte at `ix`, or -1 if out of bounds (upstream `bytes.get(ix)`).
-fn Parser::get(self : Parser, ix : Int) -> Int {
+fn Parser::get(self : Parser, ix : Int32) -> Int32 {
   if ix >= 0 && ix < self.re.length() {
     self.re[ix].to_int()
   } else {
@@ -167,18 +167,18 @@ fn Parser::get(self : Parser, ix : Int) -> Int {
 
 ///|
 /// Whether the pattern continues with the ASCII string `s` at `ix`.
-fn Parser::starts_with(self : Parser, ix : Int, s : String) -> Bool {
+fn Parser::starts_with(self : Parser, ix : Int32, s : String) -> Bool {
   bytes_starts_with(self.re, ix, s)
 }
 
 ///|
 /// The pattern slice `start..end` as a string.
-fn Parser::slice(self : Parser, start : Int, end : Int) -> String {
+fn Parser::slice(self : Parser, start : Int32, end : Int32) -> String {
   @utf8.decode_lossy(self.re[start:end])
 }
 
 ///|
-fn bytes_starts_with(re : Bytes, ix : Int, s : String) -> Bool {
+fn bytes_starts_with(re : Bytes, ix : Int32, s : String) -> Bool {
   if ix + s.length() > re.length() {
     return false
   }
@@ -193,9 +193,9 @@ fn bytes_starts_with(re : Bytes, ix : Int, s : String) -> Bool {
 ///|
 fn Parser::parse_re(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let (ix, child) = self.parse_branch(ix, depth)
   let mut ix = self.optional_whitespace(ix)
   if self.starts_with(ix, "|") {
@@ -218,9 +218,9 @@ fn Parser::parse_re(
 ///|
 fn Parser::parse_branch(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let children = []
   let mut ix = ix
   while ix < self.len() {
@@ -243,9 +243,9 @@ fn Parser::parse_branch(
 ///|
 fn Parser::parse_piece(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let (ix, child) = self.parse_atom(ix, depth)
   let mut ix = self.optional_whitespace(ix)
   if ix < self.len() {
@@ -307,8 +307,8 @@ fn Parser::is_repeatable(_self : Parser, child : Expr) -> Bool {
 /// Returns (ix, lo, hi).
 fn Parser::parse_repeat(
   self : Parser,
-  ix : Int,
-) -> (Int, Int, Int) raise FancyError {
+  ix : Int32,
+) -> (Int32, Int32, Int32) raise FancyError {
   let ix = self.optional_whitespace(ix + 1) // skip opening '{'
   if ix == self.len() {
     raise perr(ix, InvalidRepeat)
@@ -350,9 +350,9 @@ fn Parser::parse_repeat(
 ///|
 fn Parser::parse_atom(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let ix = self.optional_whitespace(ix)
   if ix == self.len() {
     return (ix, Empty)
@@ -394,11 +394,11 @@ fn Parser::parse_atom(
 ///|
 fn Parser::parse_named_backref(
   self : Parser,
-  ix : Int,
+  ix : Int32,
   open : String,
   close : String,
   allow_relative : Bool,
-) -> (Int, Expr) raise FancyError {
+) -> (Int32, Expr) raise FancyError {
   let { ix: end, group_ix, group_name, recursion_level, } = self.parse_named_backref_or_subroutine(
     ix, open, close, allow_relative,
   )
@@ -427,11 +427,11 @@ fn Parser::parse_named_backref(
 ///|
 fn Parser::parse_named_subroutine_call(
   self : Parser,
-  ix : Int,
+  ix : Int32,
   open : String,
   close : String,
   allow_relative : Bool,
-) -> (Int, Expr) raise FancyError {
+) -> (Int32, Expr) raise FancyError {
   let { ix: end, group_ix, group_name, recursion_level, } = self.parse_named_backref_or_subroutine(
     ix, open, close, allow_relative,
   )
@@ -458,7 +458,7 @@ fn Parser::parse_named_subroutine_call(
 ///|
 fn Parser::parse_named_backref_or_subroutine(
   self : Parser,
-  ix : Int,
+  ix : Int32,
   open : String,
   close : String,
   allow_relative : Bool,
@@ -511,8 +511,8 @@ fn Parser::parse_named_backref_or_subroutine(
 ///|
 fn Parser::parse_numbered_backref(
   self : Parser,
-  ix : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+) -> (Int32, Expr) raise FancyError {
   let (end, group) = self.parse_numbered_backref_or_subroutine_call(ix)
   self.numeric_backrefs = true
   self.backrefs.insert(group) |> ignore
@@ -522,8 +522,8 @@ fn Parser::parse_numbered_backref(
 ///|
 fn Parser::parse_numbered_subroutine_call(
   self : Parser,
-  ix : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+) -> (Int32, Expr) raise FancyError {
   let (end, group) = self.parse_numbered_backref_or_subroutine_call(ix)
   self.numeric_backrefs = true
   self.contains_subroutines = true
@@ -536,8 +536,8 @@ fn Parser::parse_numbered_subroutine_call(
 ///|
 fn Parser::parse_numbered_backref_or_subroutine_call(
   self : Parser,
-  ix : Int,
-) -> (Int, Int) raise FancyError {
+  ix : Int32,
+) -> (Int32, Int32) raise FancyError {
   if parse_decimal(self.re, ix) is Some((end, group)) {
     // protect BitSet against unreasonably large value
     if group < self.len() / 2 {
@@ -551,9 +551,9 @@ fn Parser::parse_numbered_backref_or_subroutine_call(
 /// `ix` points to `\` character
 fn Parser::parse_escape(
   self : Parser,
-  ix : Int,
+  ix : Int32,
   in_class : Bool,
-) -> (Int, Expr) raise FancyError {
+) -> (Int32, Expr) raise FancyError {
   let b = self.get(ix + 1)
   if b < 0 {
     raise perr(ix, TrailingBackslash)
@@ -683,9 +683,9 @@ fn Parser::parse_escape(
 /// `ix` points after `\x`, eg to `A0` or `{12345}`, or after `\u` or `\U`
 fn Parser::parse_hex(
   self : Parser,
-  ix : Int,
-  digits : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  digits : Int32,
+) -> (Int32, Expr) raise FancyError {
   if ix >= self.len() {
     // Incomplete escape sequence
     raise perr(ix, InvalidHex)
@@ -736,7 +736,10 @@ fn Parser::parse_hex(
 }
 
 ///|
-fn Parser::parse_class(self : Parser, ix : Int) -> (Int, Expr) raise FancyError {
+fn Parser::parse_class(
+  self : Parser,
+  ix : Int32,
+) -> (Int32, Expr) raise FancyError {
   let mut ix = ix + 1 // skip opening '['
   let class = StringBuilder()
   let mut nest = 1
@@ -801,9 +804,9 @@ fn Parser::parse_class(self : Parser, ix : Int) -> (Int, Expr) raise FancyError 
 ///|
 fn Parser::parse_group(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let depth = depth + 1
   if depth >= MAX_RECURSION {
     raise perr(ix, RecursionExceeded)
@@ -871,8 +874,8 @@ fn Parser::parse_group(
 ///|
 fn Parser::check_for_close_paren(
   self : Parser,
-  ix : Int,
-) -> Int raise FancyError {
+  ix : Int32,
+) -> Int32 raise FancyError {
   let ix = self.optional_whitespace(ix)
   if ix == self.len() {
     raise perr(ix, UnclosedOpenParen)
@@ -886,11 +889,11 @@ fn Parser::check_for_close_paren(
 /// `ix` points to `?` in `(?`
 fn Parser::parse_flags(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   let start = ix + 1
-  fn unknown_flag(p : Parser, start : Int, end : Int) -> FancyError {
+  fn unknown_flag(p : Parser, start : Int32, end : Int32) -> FancyError {
     let after_end = end + codepoint_len(p.byte(end))
     let s = "(?\{p.slice(start, after_end)}"
     perr(start, UnknownFlag(s))
@@ -949,9 +952,9 @@ fn Parser::parse_flags(
 /// `ix` points to after the last `(` in `(?(`
 fn Parser::parse_conditional(
   self : Parser,
-  ix : Int,
-  depth : Int,
-) -> (Int, Expr) raise FancyError {
+  ix : Int32,
+  depth : Int32,
+) -> (Int32, Expr) raise FancyError {
   if ix >= self.len() {
     raise perr(ix, UnclosedOpenParen)
   }
@@ -1018,13 +1021,13 @@ fn Parser::parse_conditional(
 }
 
 ///|
-fn Parser::flag(self : Parser, flag : Int) -> Bool {
+fn Parser::flag(self : Parser, flag : Int32) -> Bool {
   let v = self.flags & flag
   v == flag
 }
 
 ///|
-fn Parser::update_flag(self : Parser, flag : Int, neg : Bool) -> Unit {
+fn Parser::update_flag(self : Parser, flag : Int32, neg : Bool) -> Unit {
   if neg {
     self.flags = self.flags & flag.lnot()
   } else {
@@ -1033,7 +1036,10 @@ fn Parser::update_flag(self : Parser, flag : Int, neg : Bool) -> Unit {
 }
 
 ///|
-fn Parser::optional_whitespace(self : Parser, ix : Int) -> Int raise FancyError {
+fn Parser::optional_whitespace(
+  self : Parser,
+  ix : Int32,
+) -> Int32 raise FancyError {
   let mut ix = ix
   while true {
     if ix == self.len() {
@@ -1114,7 +1120,7 @@ fn Parser::resolve_named_subroutine_calls(self : Parser, expr : Expr) -> Expr {
 ///|
 /// Parse a decimal number of ASCII digits starting at `ix`, returning
 /// `(end, value)` (fails on no digits or overflow).
-pub fn parse_decimal(s : Bytes, ix : Int) -> (Int, Int)? {
+pub fn parse_decimal(s : Bytes, ix : Int32) -> (Int32, Int32)? {
   let mut end = ix
   while end < s.length() && is_ascii_digit(s[end].to_int()) {
     end += 1
@@ -1135,7 +1141,7 @@ pub fn parse_decimal(s : Bytes, ix : Int) -> (Int, Int)? {
 ///|
 /// Rust's `str::parse::<usize>` (on identifiers: an optional `+` is not
 /// possible there).
-fn parse_usize(s : String) -> Int? {
+fn parse_usize(s : String) -> Int32? {
   if s.is_empty() {
     return None
   }
@@ -1157,8 +1163,8 @@ fn parse_usize(s : String) -> Int? {
 /// The result of `parse_id`.
 pub struct ParsedId {
   id : String
-  relative : Int?
-  skip : Int
+  relative : Int32?
+  skip : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -1178,7 +1184,7 @@ pub extend ParsedId with @debug.Debug::{to_repr}
 /// how many bytes of the string were used.
 pub fn parse_id(
   s : Bytes,
-  start : Int,
+  start : Int32,
   open : String,
   close : String,
   allow_relative : Bool,
@@ -1189,7 +1195,7 @@ pub fn parse_id(
   }
   let id_start = start + open.length()
   let mut i = id_start
-  let mut after_id : Int? = None
+  let mut after_id : Int32? = None
   while i < s.length() {
     let (c, n) = decode_utf8(s, i)
     if !is_id_char(c) {
@@ -1237,17 +1243,17 @@ pub fn parse_id(
 }
 
 ///|
-fn is_id_char(c : Int) -> Bool {
-  c == '_' || @unicode.is_alphanumeric(Int::unsafe_to_char(c))
+fn is_id_char(c : Int32) -> Bool {
+  c == '_' || @unicode.is_alphanumeric(Int32::unsafe_to_char(c))
 }
 
 ///|
-fn is_hex_digit(b : Int) -> Bool {
+fn is_hex_digit(b : Int32) -> Bool {
   is_ascii_digit(b) || ((b | 32) >= 'a' && (b | 32) <= 'f')
 }
 
 ///|
-fn hex_value(b : Int) -> Int {
+fn hex_value(b : Int32) -> Int32 {
   if is_ascii_digit(b) {
     b - '0'
   } else {
@@ -1256,18 +1262,18 @@ fn hex_value(b : Int) -> Int {
 }
 
 ///|
-fn is_ascii_digit(b : Int) -> Bool {
+fn is_ascii_digit(b : Int32) -> Bool {
   b >= '0' && b <= '9'
 }
 
 ///|
-fn is_ascii_alphabetic(b : Int) -> Bool {
+fn is_ascii_alphabetic(b : Int32) -> Bool {
   (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
 }
 
 ///|
 /// The length of the UTF-8 sequence starting with byte `b`.
-fn codepoint_len(b : Int) -> Int {
+fn codepoint_len(b : Int32) -> Int32 {
   if b < 0x80 {
     1
   } else if b < 0xe0 {
@@ -1281,7 +1287,7 @@ fn codepoint_len(b : Int) -> Int {
 
 ///|
 /// Decode the (valid) UTF-8 sequence at `i`: (char, length).
-fn decode_utf8(s : Bytes, i : Int) -> (Int, Int) {
+fn decode_utf8(s : Bytes, i : Int32) -> (Int32, Int32) {
   let b = s[i].to_int()
   let n = codepoint_len(b)
   let mut c = match n {
@@ -1299,8 +1305,8 @@ fn decode_utf8(s : Bytes, i : Int) -> (Int, Int) {
 }
 
 ///|
-fn char_to_string(c : Int) -> String {
-  Int::unsafe_to_char(c).to_string()
+fn char_to_string(c : Int32) -> String {
+  Int32::unsafe_to_char(c).to_string()
 }
 
 ///|

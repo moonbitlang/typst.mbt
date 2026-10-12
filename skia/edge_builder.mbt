@@ -15,11 +15,11 @@ pub extend Combine with Eq::{not_equal, equal}
 ///|
 priv struct ShiftedIntRect {
   shifted : ScreenIntRect
-  shift : Int
+  shift : Int32
 }
 
 ///|
-fn ShiftedIntRect::new(rect : ScreenIntRect, shift : Int) -> ShiftedIntRect? {
+fn ShiftedIntRect::new(rect : ScreenIntRect, shift : Int32) -> ShiftedIntRect? {
   guard ScreenIntRect::from_xywh(
       rect.x().reinterpret_as_uint() << shift,
       rect.y().reinterpret_as_uint() << shift,
@@ -45,11 +45,11 @@ fn ShiftedIntRect::recover(self : ShiftedIntRect) -> ScreenIntRect {
 ///|
 priv struct BasicEdgeBuilder {
   edges : Array[Edge]
-  clip_shift : Int
+  clip_shift : Int32
 }
 
 ///|
-fn BasicEdgeBuilder::new(clip_shift : Int) -> BasicEdgeBuilder {
+fn BasicEdgeBuilder::new(clip_shift : Int32) -> BasicEdgeBuilder {
   { edges: Array(capacity=64), clip_shift, }
 }
 
@@ -59,7 +59,7 @@ fn BasicEdgeBuilder::new(clip_shift : Int) -> BasicEdgeBuilder {
 fn BasicEdgeBuilder::build_edges(
   path : @path.Path,
   clip : ShiftedIntRect?,
-  clip_shift : Int,
+  clip_shift : Int32,
 ) -> Array[Edge]? {
   // If we're convex, then we need both edges, even if the right edge is past
   // the clip.
@@ -253,8 +253,8 @@ priv enum PathEdge {
 /// contour.
 priv struct PathEdgeIter {
   path : @path.Path
-  mut verb_index : Int
-  mut points_index : Int
+  mut verb_index : Int32
+  mut points_index : Int32
   mut move_to : @path.Point
   mut needs_close_line : Bool
 }

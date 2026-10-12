@@ -4,12 +4,12 @@
 // strongly typed wrappers. FDot6, FDot8 and FDot16 are all `Int`.
 
 ///|
-fn left_shift(value : Int, shift : Int) -> Int {
+fn left_shift(value : Int32, shift : Int32) -> Int32 {
   (value.reinterpret_as_uint() << shift).reinterpret_as_int()
 }
 
 ///|
-fn left_shift64(value : Int64, shift : Int) -> Int64 {
+fn left_shift64(value : Int64, shift : Int32) -> Int64 {
   (value.reinterpret_as_uint64() << shift).reinterpret_as_int64()
 }
 
@@ -49,40 +49,40 @@ fn approx_powf(x : Float, y : Float) -> Float {
 // fdot6
 
 ///|
-let fdot6_one : Int = 64
+let fdot6_one : Int32 = 64
 
 ///|
-fn fdot6_from_i32(n : Int) -> Int {
+fn fdot6_from_i32(n : Int32) -> Int32 {
   n << 6
 }
 
 ///|
-fn fdot6_from_f32(n : Float) -> Int {
+fn fdot6_from_f32(n : Float) -> Int32 {
   f32_to_i32(n * 64.0)
 }
 
 ///|
-fn fdot6_floor(n : Int) -> Int {
+fn fdot6_floor(n : Int32) -> Int32 {
   n >> 6
 }
 
 ///|
-fn fdot6_ceil(n : Int) -> Int {
+fn fdot6_ceil(n : Int32) -> Int32 {
   (n + 63) >> 6
 }
 
 ///|
-fn fdot6_round(n : Int) -> Int {
+fn fdot6_round(n : Int32) -> Int32 {
   (n + 32) >> 6
 }
 
 ///|
-fn fdot6_to_fdot16(n : Int) -> Int {
+fn fdot6_to_fdot16(n : Int32) -> Int32 {
   left_shift(n, 10)
 }
 
 ///|
-fn fdot6_div(a : Int, b : Int) -> Int {
+fn fdot6_div(a : Int32, b : Int32) -> Int32 {
   if a >= -32768 && a <= 32767 {
     left_shift(a, 16) / b
   } else {
@@ -94,62 +94,62 @@ fn fdot6_div(a : Int, b : Int) -> Int {
 // Only used by `debug_assert!`s upstream (scan/hairline.rs:67,
 // scan/hairline_aa.rs:337).
 #warnings("-unused_value")
-fn fdot6_can_convert_to_fdot16(n : Int) -> Bool {
+fn fdot6_can_convert_to_fdot16(n : Int32) -> Bool {
   let max_dot6 = 0x7FFFFFFF >> (16 - 6)
   n.abs() <= max_dot6
 }
 
 ///|
-fn fdot6_small_scale(value : Int, dot6 : Int) -> Int {
+fn fdot6_small_scale(value : Int32, dot6 : Int32) -> Int32 {
   ((value * dot6) >> 6) & 0xFF
 }
 
 // fdot8 (extracted from SkScan_Antihair.cpp)
 
 ///|
-fn fdot8_from_fdot16(x : Int) -> Int {
+fn fdot8_from_fdot16(x : Int32) -> Int32 {
   (x + 0x80) >> 8
 }
 
 // fdot16
 
 ///|
-let fdot16_half : Int = (1 << 16) / 2
+let fdot16_half : Int32 = (1 << 16) / 2
 
 ///|
-let fdot16_one : Int = 1 << 16
+let fdot16_one : Int32 = 1 << 16
 
 ///|
 /// `from_f32` seems to lack a rounding step. For all fixed-point values, this
 /// version is as accurate as possible for (fixed -> float -> fixed).
-fn fdot16_from_f32(x : Float) -> Int {
+fn fdot16_from_f32(x : Float) -> Int32 {
   i32_saturate_from(x * Float::from_int(fdot16_one))
 }
 
 ///|
-fn fdot16_floor_to_i32(x : Int) -> Int {
+fn fdot16_floor_to_i32(x : Int32) -> Int32 {
   x >> 16
 }
 
 ///|
-fn fdot16_ceil_to_i32(x : Int) -> Int {
+fn fdot16_ceil_to_i32(x : Int32) -> Int32 {
   (x + fdot16_one - 1) >> 16
 }
 
 ///|
-fn fdot16_round_to_i32(x : Int) -> Int {
+fn fdot16_round_to_i32(x : Int32) -> Int32 {
   (x + fdot16_half) >> 16
 }
 
 ///|
 /// The divide may exceed 32 bits. Clamp to a signed 32 bit result.
-fn fdot16_mul(a : Int, b : Int) -> Int {
+fn fdot16_mul(a : Int32, b : Int32) -> Int32 {
   ((a.to_int64() * b.to_int64()) >> 16).to_int()
 }
 
 ///|
 /// The divide may exceed 32 bits. Clamp to a signed 32 bit result.
-fn fdot16_div(numer : Int, denom : Int) -> Int {
+fn fdot16_div(numer : Int32, denom : Int32) -> Int32 {
   let v = left_shift64(numer.to_int64(), 16) / denom.to_int64()
   let n = if v > 2147483647L {
     2147483647L
@@ -162,6 +162,6 @@ fn fdot16_div(numer : Int, denom : Int) -> Int {
 }
 
 ///|
-fn fdot16_fast_div(a : Int, b : Int) -> Int {
+fn fdot16_fast_div(a : Int32, b : Int32) -> Int32 {
   left_shift(a, 16) / b
 }

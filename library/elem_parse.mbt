@@ -7,14 +7,14 @@ fn named_as(
   args : Args,
   name : String,
   elem : Element,
-  id : Int,
+  id : Int32,
 ) -> Value? raise SourceError {
   args.named_with(name, elem.field(id).unwrap().cast)
 }
 
 ///|
 /// [Args::find] casting to the type of an element field.
-fn find_as(args : Args, elem : Element, id : Int) -> Value? raise SourceError {
+fn find_as(args : Args, elem : Element, id : Int32) -> Value? raise SourceError {
   let field = elem.field(id).unwrap()
   args.find_with(field.castable, field.cast)
 }
@@ -26,7 +26,7 @@ fn find_castable_as(
   args : Args,
   castable : (Value) -> Bool,
   elem : Element,
-  id : Int,
+  id : Int32,
 ) -> Value? raise SourceError {
   args.find_with(castable, elem.field(id).unwrap().cast)
 }

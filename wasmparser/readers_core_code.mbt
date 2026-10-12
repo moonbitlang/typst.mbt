@@ -79,18 +79,18 @@ pub extend FunctionBody with FromReader::{from_reader}
 /// A reader for a function body's locals.
 pub struct LocalsReader {
   priv reader : BinaryReader
-  priv count : UInt
+  priv count : UInt32
 }
 
 ///|
 /// Gets the count of locals in the function body.
-pub fn LocalsReader::get_count(self : LocalsReader) -> UInt {
+pub fn LocalsReader::get_count(self : LocalsReader) -> UInt32 {
   self.count
 }
 
 ///|
 /// Gets the original position of the reader.
-pub fn LocalsReader::original_position(self : LocalsReader) -> Int {
+pub fn LocalsReader::original_position(self : LocalsReader) -> Int32 {
   self.reader.original_position()
 }
 
@@ -98,7 +98,7 @@ pub fn LocalsReader::original_position(self : LocalsReader) -> Int {
 /// Reads an item from the reader.
 pub fn LocalsReader::read(
   self : LocalsReader,
-) -> (UInt, ValType) raise BinaryReaderError {
+) -> (UInt32, ValType) raise BinaryReaderError {
   let count = self.reader.read_var_u32()
   let value_type = ValType::from_reader(self.reader)
   (count, value_type)

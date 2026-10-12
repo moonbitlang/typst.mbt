@@ -46,7 +46,7 @@ pub extend Form with @debug.Debug::{to_repr}
 
 ///|
 /// Set of properties an operator can have.
-pub(all) struct Properties(Int) derive(Eq, Debug)
+pub(all) struct Properties(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -79,19 +79,19 @@ pub fn Properties::contains(self : Properties, other : Properties) -> Bool {
 ///|
 /// The categories of the operator dictionary, as indices into
 /// `category_infos` (upstream `data::Category`).
-let category_default : Int = 0
+let category_default : Int32 = 0
 
 ///|
-let category_force_default : Int = 1
+let category_force_default : Int32 = 1
 
 ///|
-let category_i : Int = 10
+let category_i : Int32 = 10
 
 ///|
-let category_l : Int = 13
+let category_l : Int32 = 13
 
 ///|
-let category_m : Int = 14
+let category_m : Int32 = 14
 
 ///|
 /// Gets the `OperatorInfo` corresponding to the given (content, form) pair.
@@ -112,7 +112,7 @@ pub fn OperatorInfo::of(
 ///|
 /// Performs Step 4 of the algorithm for determining the properties of an
 /// embellished operator, from the MathML Core specification.
-fn get_implicit_operator_category(content : String) -> Int {
+fn get_implicit_operator_category(content : String) -> Int32 {
   for form in [Infix, Postfix, Prefix] {
     let category = get_operator_category(content, form)
     if category != category_default {
@@ -139,7 +139,7 @@ fn single_char(s : String) -> Char? {
 ///|
 /// Implementation of the algorithm to determine the category of an
 /// operator, as described in the MathML Core specification.
-fn get_operator_category(content : String, form : Form) -> Int {
+fn get_operator_category(content : String, form : Form) -> Int32 {
   // The string is stored as UTF-16, so its length is the UTF-16 count.
   let c : Char = match content.length() {
     1 => {
@@ -147,7 +147,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
       let c = content.get_char(0).unwrap()
 
       // Step 2.
-      if c is ('\u{0320}'..='\u{03FF}') {
+      if c is ('\u{0320}'..<='\u{03FF}') {
         return category_default
       }
 
@@ -195,7 +195,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
     return category_force_default
   }
   match (c, form) {
-    ('\u{2145}'..='\u{2146}' | '\u{2202}' | '\u{221A}'..='\u{221C}', Prefix) =>
+    ('\u{2145}'..<='\u{2146}' | '\u{2202}' | '\u{221A}'..<='\u{221C}', Prefix) =>
       return category_l
     ('\u{002C}' | '\u{003A}' | '\u{003B}', Infix) => return category_m
     _ => ()
@@ -239,7 +239,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
 
 ///|
 /// Maps an operator table encoding to its category.
-fn from_encoding(encoding : Int) -> Int {
+fn from_encoding(encoding : Int32) -> Int32 {
   for entry in category_encodings[:] {
     if entry.0 == encoding {
       return entry.1
@@ -301,15 +301,15 @@ pub fn will_auto_transform(content : String) -> Bool {
   match single_char(content) {
     Some(c) =>
       c
-      is ('A'..='Z'
-      | 'a'..='z'
+      is ('A'..<='Z'
+      | 'a'..<='z'
       | 'ı'
       | 'ȷ'
-      | 'Α'..='Ρ'
+      | 'Α'..<='Ρ'
       | 'ϴ'
-      | 'Σ'..='Ω'
+      | 'Σ'..<='Ω'
       | '∇'
-      | 'α'..='ω'
+      | 'α'..<='ω'
       | '∂'
       | 'ϵ'
       | 'ϑ'

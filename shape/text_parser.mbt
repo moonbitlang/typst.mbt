@@ -4,7 +4,7 @@
 
 ///|
 priv struct TextParser {
-  mut pos : Int
+  mut pos : Int32
   text : Bytes
 }
 
@@ -19,7 +19,7 @@ fn TextParser::at_end(self : TextParser) -> Bool {
 }
 
 ///|
-fn TextParser::curr_byte(self : TextParser) -> Int? {
+fn TextParser::curr_byte(self : TextParser) -> Int32? {
   if !self.at_end() {
     Some(self.curr_byte_unchecked())
   } else {
@@ -28,17 +28,17 @@ fn TextParser::curr_byte(self : TextParser) -> Int? {
 }
 
 ///|
-fn TextParser::curr_byte_unchecked(self : TextParser) -> Int {
+fn TextParser::curr_byte_unchecked(self : TextParser) -> Int32 {
   self.text[self.pos].to_int()
 }
 
 ///|
-fn TextParser::advance(self : TextParser, n : Int) -> Unit {
+fn TextParser::advance(self : TextParser, n : Int32) -> Unit {
   self.pos += n
 }
 
 ///|
-fn TextParser::consume_byte(self : TextParser, c : Int) -> Unit? {
+fn TextParser::consume_byte(self : TextParser, c : Int32) -> Unit? {
   guard self.curr_byte() is Some(curr) else { return None }
   if curr != c {
     return None
@@ -48,7 +48,7 @@ fn TextParser::consume_byte(self : TextParser, c : Int) -> Unit? {
 }
 
 ///|
-fn is_ascii_whitespace(c : Int) -> Bool {
+fn is_ascii_whitespace(c : Int32) -> Bool {
   // Unlike harfbuzz::ISSPACE, is_ascii_whitespace doesn't includes `\v`, but whatever.
   c == ' ' || c == '\t' || c == '\n' || c == 0x0C || c == '\r'
 }
@@ -61,7 +61,7 @@ fn TextParser::skip_spaces(self : TextParser) -> Unit {
 }
 
 ///|
-fn TextParser::consume_quote(self : TextParser) -> Int? {
+fn TextParser::consume_quote(self : TextParser) -> Int32? {
   guard self.curr_byte() is Some(c) else { return None }
   if c == '\'' || c == '"' {
     self.advance(1)
@@ -72,26 +72,29 @@ fn TextParser::consume_quote(self : TextParser) -> Int? {
 }
 
 ///|
-fn TextParser::consume_bytes(self : TextParser, f : (Int) -> Bool) -> BytesView {
+fn TextParser::consume_bytes(
+  self : TextParser,
+  f : (Int32) -> Bool,
+) -> BytesView {
   let start = self.pos
   self.skip_bytes(f)
   self.text[start:self.pos]
 }
 
 ///|
-fn TextParser::skip_bytes(self : TextParser, f : (Int) -> Bool) -> Unit {
+fn TextParser::skip_bytes(self : TextParser, f : (Int32) -> Bool) -> Unit {
   while !self.at_end() && f(self.curr_byte_unchecked()) {
     self.advance(1)
   }
 }
 
 ///|
-fn is_ascii_digit(c : Int) -> Bool {
+fn is_ascii_digit(c : Int32) -> Bool {
   c >= '0' && c <= '9'
 }
 
 ///|
-fn is_ascii_alphabetic(c : Int) -> Bool {
+fn is_ascii_alphabetic(c : Int32) -> Bool {
   (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
 
@@ -109,7 +112,7 @@ fn TextParser::consume_tag(self : TextParser) -> @otf.Tag? {
 ///|
 /// Rust's `str::parse::<i32>`: an optional sign followed by at least one
 /// digit, in range.
-fn parse_i32(s : BytesView) -> Int? {
+fn parse_i32(s : BytesView) -> Int32? {
   let mut i = 0
   let mut neg = false
   if s.length() > 0 && (s[0] == b'-' || s[0] == b'+') {
@@ -141,7 +144,7 @@ fn parse_i32(s : BytesView) -> Int? {
 }
 
 ///|
-fn TextParser::consume_i32(self : TextParser) -> Int? {
+fn TextParser::consume_i32(self : TextParser) -> Int32? {
   let start = self.pos
   if self.curr_byte() is Some('-' | '+') {
     self.advance(1)

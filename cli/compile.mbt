@@ -705,11 +705,11 @@ fn has_indexable_template(output : String) -> Bool {
 ///|
 fn format_template(
   output : String,
-  this_page : Int,
-  total_pages : Int,
+  this_page : Int32,
+  total_pages : Int32,
 ) -> String {
   // Find the base 10 width of number `i`
-  let width = (i : Int) => {
+  let width = (i : Int32) => {
     let mut digits = 1
     let mut n = i
     while n >= 10 {
@@ -820,7 +820,7 @@ fn ExportCache::new() -> ExportCache {
 /// cache (for the next compilation).
 fn ExportCache::is_cached(
   self : ExportCache,
-  i : Int,
+  i : Int32,
   page : @layout.Page,
 ) -> Bool {
   let hash = @library.hash128(page)

@@ -36,11 +36,11 @@ pub fn Regex::new(pattern : String) -> Regex raise RegexError {
 /// pattern with `(?flags)` as usual.
 pub fn Regex::new_with(
   pattern : String,
-  case_insensitive? : Bool = false,
-  multi_line? : Bool = false,
-  dot_matches_new_line? : Bool = false,
-  ignore_whitespace? : Bool = false,
-  unicode? : Bool = true,
+  case_insensitive~ : Bool = false,
+  multi_line~ : Bool = false,
+  dot_matches_new_line~ : Bool = false,
+  ignore_whitespace~ : Bool = false,
+  unicode~ : Bool = true,
 ) -> Regex raise RegexError {
   let parser = Parser::new(pattern)
   parser.ignore_whitespace = ignore_whitespace
@@ -83,7 +83,7 @@ pub fn Regex::new_with(
 
 ///|
 /// The number of capture groups, including the implicit group 0.
-pub fn Regex::group_len(self : Regex) -> Int {
+pub fn Regex::group_len(self : Regex) -> Int32 {
   self.nfa.group_len
 }
 
@@ -97,9 +97,9 @@ pub fn Regex::group_len(self : Regex) -> Int {
 pub fn Regex::search_slots(
   self : Regex,
   hay : Haystack,
-  start : Int,
+  start : Int32,
   anchored~ : Bool,
-  slots : FixedArray[Int],
+  slots : FixedArray[Int32],
 ) -> Bool {
   self.nfa.search(hay, start, anchored, slots)
 }
@@ -151,8 +151,8 @@ pub extend Regex with Show::{to_string, output}
 ///|
 /// A match: UTF-8 byte offsets into the haystack and the matched text.
 pub(all) struct Match {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   text : String
 } derive(Eq, Debug)
 
@@ -174,13 +174,13 @@ pub struct Captures {
 
 ///|
 /// The match of a capture group, if it participated.
-pub fn Captures::get(self : Captures, i : Int) -> Match? {
+pub fn Captures::get(self : Captures, i : Int32) -> Match? {
   self.groups.get(i).unwrap_or(None)
 }
 
 ///|
 /// The number of capture groups (including group 0).
-pub fn Captures::len(self : Captures) -> Int {
+pub fn Captures::len(self : Captures) -> Int32 {
   self.groups.length()
 }
 
@@ -191,7 +191,7 @@ pub fn Captures::iter(self : Captures) -> Iter[Match?] {
 }
 
 ///|
-fn make_match(s : String, hay : Haystack, start : Int, end : Int) -> Match {
+fn make_match(s : String, hay : Haystack, start : Int32, end : Int32) -> Match {
   {
     start: hay.bytes[start],
     end: hay.bytes[end],
@@ -203,7 +203,7 @@ fn make_match(s : String, hay : Haystack, start : Int, end : Int) -> Match {
 fn make_captures(
   s : String,
   hay : Haystack,
-  slots : FixedArray[Int],
+  slots : FixedArray[Int32],
 ) -> Captures {
   let groups = []
   for i = 0; i + 1 < slots.length(); i = i + 2 {
@@ -218,7 +218,11 @@ fn make_captures(
 
 ///|
 /// Search starting at the char position `at`.
-fn Regex::search(self : Regex, hay : Haystack, at : Int) -> FixedArray[Int]? {
+fn Regex::search(
+  self : Regex,
+  hay : Haystack,
+  at : Int32,
+) -> FixedArray[Int32]? {
   let slots = FixedArray::make(2 * self.nfa.group_len, -1)
   if self.nfa.search(hay, at, false, slots) {
     Some(slots)
@@ -242,7 +246,7 @@ pub fn Regex::find(self : Regex, s : String) -> Match? {
 ///|
 /// The leftmost-first match starting the search at the UTF-8 byte offset
 /// `start` (with the surrounding context taken into account).
-pub fn Regex::find_at(self : Regex, s : String, start : Int) -> Match? {
+pub fn Regex::find_at(self : Regex, s : String, start : Int32) -> Match? {
   let hay = Haystack::new(s)
   guard hay.char_pos(start) is Some(at) else { return None }
   match self.search(hay, at) {
@@ -264,11 +268,11 @@ pub fn Regex::captures(self : Regex, s : String) -> Captures? {
 ///|
 /// All successive non-overlapping matches as capture slots (upstream
 /// `Searcher::advance`, including its handling of empty matches).
-fn Regex::all_slots(self : Regex, hay : Haystack) -> Array[FixedArray[Int]] {
+fn Regex::all_slots(self : Regex, hay : Haystack) -> Array[FixedArray[Int32]] {
   let out = []
   let len = hay.len
   let mut start = 0
-  let mut last_match_end : Int? = None
+  let mut last_match_end : Int32? = None
   while start <= len {
     let mut slots = match self.search(hay, start) {
       Some(slots) => slots

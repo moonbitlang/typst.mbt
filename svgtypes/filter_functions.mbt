@@ -49,15 +49,15 @@ pub extend FilterValue with @debug.Debug::{to_repr}
 /// A list of possible [`FilterValueListParser`] errors.
 pub(all) suberror FilterValueListParserError {
   /// Lengths with percentage values are not allowed.
-  PercentageValue(Int)
+  PercentageValue(Int32)
   /// Some values cannot be negative.
-  NegativeValue(Int)
+  NegativeValue(Int32)
   /// An invalid angle value.
-  InvalidAngle(Int)
+  InvalidAngle(Int32)
   /// Drop shadow offset values must be set.
-  MissingDropShadowOffset(Int)
+  MissingDropShadowOffset(Int32)
   /// Usually indicates an empty url.
-  InvalidUrl(Int)
+  InvalidUrl(Int32)
   /// Other errors.
   StreamErrors(SvgTypesError)
 } derive(Eq, Debug)

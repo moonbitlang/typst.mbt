@@ -10,7 +10,7 @@ pub fn Equation::body(self : Equation) -> Math {
 /// Whether the equation should be displayed as a separate block.
 pub fn Equation::block(self : Equation) -> Bool {
   let children = self.node.children()
-  let is_space = (i : Int) => {
+  let is_space = (i : Int32) => {
     i >= 0 &&
     i < children.length() &&
     children[i].kind() is (SpaceNoNewline | SpaceWithNewline)
@@ -323,7 +323,7 @@ pub fn MathAttach::primes(self : MathAttach) -> MathPrimes? {
 
 ///|
 /// The number of grouped primes.
-pub fn MathPrimes::count(self : MathPrimes) -> Int {
+pub fn MathPrimes::count(self : MathPrimes) -> Int32 {
   // We can use byte length since single quotes are one byte.
   @syntax.utf8_len(self.node.leaf_text())
 }

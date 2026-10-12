@@ -99,7 +99,7 @@ test "the origin registry is append-only and deduplicates by call site and keys"
 
 ///|
 /// The keys of an entry as a report resolves them.
-fn frozen_keys(registry : Registry, entry : Int) -> Array[String] raise {
+fn frozen_keys(registry : Registry, entry : Int32) -> Array[String] raise {
   guard registry.freeze().resolve(registry.span(entry)) is Some(origin) else {
     fail("no origin")
   }

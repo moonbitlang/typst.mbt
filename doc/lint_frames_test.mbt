@@ -186,7 +186,7 @@ test "lint L2: what is not a missing glyph" {
 test "lint L2: one lint per call site and character, with a count" {
   // A table of 100 rows that a function builds, each with the same
   // missing character, under keys.
-  let row = (i : Int) => {
+  let row = (i : Int32) => {
     @doc.Keyed("row \{i}", @doc.Text("\u{1F600} done \{i} \u{1F600}"))
   }
   let cells : Array[&@doc.IntoContent] = []
@@ -573,7 +573,7 @@ test "lint L3: what the engine draws without a location is at its element" {
 /// The groups and tags of a frame, one line each, indented by their
 /// depth: a group with the kind and the size of its frame, a tag with its
 /// element (`/` for the end of one).
-fn skeleton(frame : @library.Frame, depth : Int, out : Array[String]) -> Unit {
+fn skeleton(frame : @library.Frame, depth : Int32, out : Array[String]) -> Unit {
   let pad = " ".repeat(depth * 2)
   for entry in frame.items() {
     match entry.1 {

@@ -184,7 +184,7 @@ fn tag_set_border_color(
 }
 
 ///|
-fn tag_set_bbox(tag : @export.TagKind, bbox : (Int, @export.Rect)?) -> Unit {
+fn tag_set_bbox(tag : @export.TagKind, bbox : (Int32, @export.Rect)?) -> Unit {
   tag_set_opt(
     tag,
     bbox.map(b => @export.Attr::BBox(b.0, b.1)),

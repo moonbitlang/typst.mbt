@@ -19,26 +19,26 @@ let hebrew_shaper : OtShaper = {
 
 ///|
 /// `modified_combining_class::CCC10` (sheva).
-const MODIFIED_CCC10 : Int = 22
+const MODIFIED_CCC10 : Int32 = 22
 
 ///|
 /// `modified_combining_class::CCC14` (hiriq).
-const MODIFIED_CCC14 : Int = 23
+const MODIFIED_CCC14 : Int32 = 23
 
 ///|
 /// `modified_combining_class::CCC17` (patah).
-const MODIFIED_CCC17 : Int = 20
+const MODIFIED_CCC17 : Int32 = 20
 
 ///|
 /// `modified_combining_class::CCC18` (qamats & qamats qatan).
-const MODIFIED_CCC18 : Int = 21
+const MODIFIED_CCC18 : Int32 = 21
 
 ///|
 fn reorder_marks_hebrew(
   _plan : ShapePlan,
   buffer : Buffer,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Unit {
   for i in (start + 2)..<end {
     let c0 = buffer.info[i - 2]
@@ -65,7 +65,7 @@ fn reorder_marks_hebrew(
 }
 
 ///|
-let s_dagesh_forms : ReadOnlyArray[Int] = [
+let s_dagesh_forms : ReadOnlyArray[Int32] = [
   0xFB30, // ALEF
    0xFB31, // BET
    0xFB32, // GIMEL
@@ -96,7 +96,7 @@ let s_dagesh_forms : ReadOnlyArray[Int] = [
 ]
 
 ///|
-fn compose_hebrew(ctx : NormalizeContext, a : Int, b : Int) -> Int? {
+fn compose_hebrew(ctx : NormalizeContext, a : Int32, b : Int32) -> Int32? {
   // Hebrew presentation-form shaping.
   // https://bugzilla.mozilla.org/show_bug.cgi?id=728866
   // Hebrew presentation forms with dagesh, for characters U+05D0..05EA;
@@ -135,7 +135,7 @@ fn compose_hebrew(ctx : NormalizeContext, a : Int, b : Int) -> Int? {
         0x05BC =>
           // DAGESH
           match a {
-            0x05D0..=0x05EA => {
+            0x05D0..<=0x05EA => {
               let c = s_dagesh_forms[a - 0x05D0]
               if c != 0 {
                 Some(c)

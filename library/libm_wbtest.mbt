@@ -90,7 +90,7 @@ fn LibmTestRng::next(self : LibmTestRng) -> UInt64 {
 ///|
 /// `sample` in the generator: a double with a uniformly distributed biased
 /// exponent in `lo..=hi`; the low mantissa bits are cleared for some samples.
-fn libm_test_sample(rng : LibmTestRng, range : (Int, Int, Bool)) -> Double {
+fn libm_test_sample(rng : LibmTestRng, range : (Int32, Int32, Bool)) -> Double {
   let (lo, hi, signed) = range
   let e = lo.to_uint64() + (rng.next() >> 11) % (hi - lo + 1).to_uint64()
   let mut mant = rng.next() & 0x000fffffffffffffUL

@@ -6,7 +6,7 @@
 
 ///|
 /// The fingerprint of a value and the flags of its computation.
-fn[T : Fingerprint] fingerprint_and_flags(value : T) -> (U128, Int) {
+fn[T : Fingerprint] fingerprint_and_flags(value : T) -> (U128, Int32) {
   let mut hash = u128_zero
   let flags = fingerprint_flags_in(() => hash = hash128(value))
   (hash, flags)

@@ -22,10 +22,10 @@ priv enum CffFontKind {
 pub struct CffFontRef {
   data : BytesView
   is_cff2 : Bool
-  upem : Int
+  upem : Int32
   global_subrs : Index
   priv top_dict : TopDict
-  top_dict_index : Int
+  top_dict_index : Int32
 }
 
 ///|
@@ -38,8 +38,8 @@ pub struct CffFontRef {
 /// from the `head` table. Otherwise, 1000 will be assumed.
 pub fn CffFontRef::new(
   data : BytesView,
-  top_dict_index : Int,
-  upem : Int?,
+  top_dict_index : Int32,
+  upem : Int32?,
 ) -> CffFontRef raise PsError {
   let version = read_u8_at(data, 0)
   match version {
@@ -53,8 +53,8 @@ pub fn CffFontRef::new(
 /// Creates a new font for the given CFF data.
 pub fn CffFontRef::new_cff(
   data : BytesView,
-  top_dict_index : Int,
-  upem : Int?,
+  top_dict_index : Int32,
+  upem : Int32?,
 ) -> CffFontRef raise PsError {
   let cff = Cff::read(data)
   let top_dict_data = cff.top_dicts().get(top_dict_index)
@@ -89,7 +89,7 @@ pub fn CffFontRef::data(self : CffFontRef) -> BytesView {
 
 ///|
 /// Returns the CFF version (either 1 or 2).
-pub fn CffFontRef::version(self : CffFontRef) -> Int {
+pub fn CffFontRef::version(self : CffFontRef) -> Int32 {
   if self.is_cff2 {
     2
   } else {
@@ -111,7 +111,7 @@ pub fn CffFontRef::global_subrs(self : CffFontRef) -> Index {
 
 ///|
 /// Returns the number of glyphs in the CFF font.
-pub fn CffFontRef::num_glyphs(self : CffFontRef) -> Int {
+pub fn CffFontRef::num_glyphs(self : CffFontRef) -> Int32 {
   self.top_dict.charstrings.count()
 }
 
@@ -177,13 +177,13 @@ pub fn CffFontRef::matrix(self : CffFontRef) -> ScaledFontMatrix? {
 
 ///|
 /// Returns the units per em.
-pub fn CffFontRef::upem(self : CffFontRef) -> Int {
+pub fn CffFontRef::upem(self : CffFontRef) -> Int32 {
   self.upem
 }
 
 ///|
 /// Returns the number of available subfonts.
-pub fn CffFontRef::num_subfonts(self : CffFontRef) -> Int {
+pub fn CffFontRef::num_subfonts(self : CffFontRef) -> Int32 {
   match self.top_dict.kind {
     Sid(..) => 1
     Cid(fd_array~, ..) => fd_array.count() & 0xFFFF
@@ -192,7 +192,7 @@ pub fn CffFontRef::num_subfonts(self : CffFontRef) -> Int {
 
 ///|
 /// Returns the subfont index for the given glyph.
-pub fn CffFontRef::subfont_index(self : CffFontRef, gid : GlyphId) -> Int? {
+pub fn CffFontRef::subfont_index(self : CffFontRef, gid : GlyphId) -> Int32? {
   match self.top_dict.kind {
     Sid(..) => Some(0)
     Cid(fd_select~, ..) =>
@@ -208,7 +208,7 @@ pub fn CffFontRef::subfont_index(self : CffFontRef, gid : GlyphId) -> Int? {
 /// coordinates (which are ignored by this port).
 pub fn CffFontRef::subfont(
   self : CffFontRef,
-  index : Int,
+  index : Int32,
   _coords : Array[@font_types.F2Dot14],
 ) -> Subfont raise PsError {
   match self.top_dict.kind {
@@ -236,7 +236,7 @@ pub fn CffFontRef::subfont(
 /// Returns the subfont and hinting parameters for the given index.
 pub fn CffFontRef::subfont_hinted(
   self : CffFontRef,
-  index : Int,
+  index : Int32,
   _coords : Array[@font_types.F2Dot14],
 ) -> (Subfont, HintingParams) raise PsError {
   match self.top_dict.kind {
@@ -431,11 +431,11 @@ pub fn Encoding::map(self : Encoding, code : Byte) -> GlyphId? {
 /// Private DICT structures. These determine the set of subroutines, metrics
 /// and hinting parameters for some group of glyphs.
 pub struct Subfont {
-  mut subrs_offset : UInt
+  mut subrs_offset : UInt32
   mut default_width : Fixed?
   mut nominal_width : Fixed
   matrix : ScaledFontMatrix?
-  mut vs_index : Int
+  mut vs_index : Int32
 }
 
 ///|
@@ -505,7 +505,7 @@ fn Subfont::new_hinted(
 
 ///|
 /// `range.start.checked_add(offset as usize).ok_or(OutOfBounds)? as u32`
-fn subrs_offset(start : UInt64, offset : Int) -> UInt raise PsError {
+fn subrs_offset(start : UInt64, offset : Int32) -> UInt32 raise PsError {
   let off = offset.to_uint64()
   let sum = start + off
   if sum < start {
@@ -530,7 +530,7 @@ fn get_range_u64(
 ///|
 /// Returns the offset to the local subroutine index from the start of the
 /// CFF blob.
-pub fn Subfont::subrs_offset(self : Subfont) -> UInt {
+pub fn Subfont::subrs_offset(self : Subfont) -> UInt32 {
   self.subrs_offset
 }
 
@@ -554,7 +554,7 @@ pub fn Subfont::matrix(self : Subfont) -> ScaledFontMatrix? {
 
 ///|
 /// Returns the default variation store index.
-pub fn Subfont::vs_index(self : Subfont) -> Int {
+pub fn Subfont::vs_index(self : Subfont) -> Int32 {
   self.vs_index
 }
 
@@ -562,15 +562,15 @@ pub fn Subfont::vs_index(self : Subfont) -> Int {
 priv struct TopDict {
   charstrings : Index
   /// `None` represents the in-band "missing" offset (`u32::MAX`).
-  charset_offset : Int?
-  encoding_offset : Int?
+  charset_offset : Int32?
+  encoding_offset : Int32?
   matrix : ScaledFontMatrix?
   kind : CffFontKind
 }
 
 ///|
 /// `MaybeOffset(offset as u32)`
-fn maybe_offset(offset : Int) -> Int? {
+fn maybe_offset(offset : Int32) -> Int32? {
   if offset == -1 {
     None
   } else {
@@ -589,8 +589,8 @@ fn TopDict::new(
   let mut charstrings : Index? = None
   // CFF fonts have a default charset and encoding offset of 0
   // which selects the standard Adobe encoding
-  let mut charset_offset : Int? = if is_cff2 { None } else { Some(0) }
-  let mut encoding_offset : Int? = if is_cff2 { None } else { Some(0) }
+  let mut charset_offset : Int32? = if is_cff2 { None } else { Some(0) }
+  let mut encoding_offset : Int32? = if is_cff2 { None } else { Some(0) }
   let mut fd_array : Index? = None
   let mut fd_select : FdSelect? = None
   let mut private_dict_start = 0UL

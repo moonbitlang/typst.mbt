@@ -77,7 +77,7 @@ fn lanczos(x : Float, t : Float) -> Float {
 /// Rust's `f32::powi` for the small positive exponents used here (LLVM
 /// expands it into the same multiplication tree as compiler-rt's
 /// `__powisf2`).
-fn powi(x : Float, n : Int) -> Float {
+fn powi(x : Float, n : Int32) -> Float {
   let mut r : Float = 1.0
   let mut a = x
   let mut b = n
@@ -167,7 +167,7 @@ fn box_kernel(_x : Float) -> Float {
 fn samples_to_f32(
   color : ColorType,
   buf : Bytes,
-  len : Int,
+  len : Int32,
 ) -> FixedArray[Float] {
   let buf = buf[:]
   let out = FixedArray::make(len, (0.0 : Float))
@@ -193,7 +193,7 @@ fn is_wide(color : ColorType) -> Bool {
 
 ///|
 /// The number of bytes per sample.
-fn sample_size(color : ColorType) -> Int {
+fn sample_size(color : ColorType) -> Int32 {
   if is_wide(color) {
     2
   } else {
@@ -224,14 +224,14 @@ fn f32_to_i64(v : Float) -> Int64 {
 /// `vertical_sample` and `horizontal_sample`). Returns `left` and the weights
 /// of the input positions `left..right`.
 fn sample_weights(
-  outx : UInt,
-  size : UInt,
+  outx : UInt32,
+  size : UInt32,
   ratio : Float,
   sratio : Float,
   src_support : Float,
   filter : Filter,
   ws : Array[Float],
-) -> Int {
+) -> Int32 {
   // Find the point in the input image corresponding to the centre
   // of the current pixel in the output image.
   let inputx = (Float::from_uint(outx) + 0.5) * ratio
@@ -275,10 +275,10 @@ fn sample_weights(
 // an `Rgba32FImage`, padding absent channels, which are discarded later).
 fn vertical_sample(
   image : FixedArray[Float],
-  width : UInt,
-  height : UInt,
-  channels : Int,
-  new_height : UInt,
+  width : UInt32,
+  height : UInt32,
+  channels : Int32,
+  new_height : UInt32,
   filter : Filter,
 ) -> FixedArray[Float] {
   let w = width.reinterpret_as_int()
@@ -314,10 +314,10 @@ fn vertical_sample(
 // `filter` is the filter to use for sampling.
 fn horizontal_sample(
   image : FixedArray[Float],
-  width : UInt,
-  height : UInt,
-  channels : Int,
-  new_width : UInt,
+  width : UInt32,
+  height : UInt32,
+  channels : Int32,
+  new_width : UInt32,
   filter : Filter,
   color : ColorType,
 ) -> Bytes {
@@ -398,12 +398,12 @@ fn round_half_away(x : Float) -> Float {
 /// This method assumes alpha pre-multiplication for images that contain
 /// non-constant alpha (i.e. it does not premultiply itself).
 pub fn resize_exact(
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   color : ColorType,
   buf : Bytes,
-  nwidth : UInt,
-  nheight : UInt,
+  nwidth : UInt32,
+  nheight : UInt32,
   filter : FilterType,
 ) -> Bytes {
   let channels = color.channel_count()
@@ -445,8 +445,8 @@ pub fn resize_exact(
 /// (`p.get_pixel(x, y).to_rgba().into_color()`): luma is replicated, absent
 /// alpha is opaque and 16-bit samples map to 8 bits by `(c + 128) / 257`.
 pub fn to_rgba8(
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   color : ColorType,
   buf : Bytes,
 ) -> Bytes {
@@ -455,7 +455,7 @@ pub fn to_rgba8(
   let channels = color.channel_count()
   let wide = is_wide(color)
   let buf = buf[:]
-  let sample = (i : Int) => {
+  let sample = (i : Int32) => {
     if wide {
       ((u16_le(buf, 2 * i) + 128) / 257).to_byte()
     } else {

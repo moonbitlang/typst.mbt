@@ -1545,7 +1545,7 @@ test "canvas: provenance" {
   assert_eq(origin.start_line, line)
   // Items that one line makes are told apart by their keys: by the index,
   // or by the key of the caller.
-  let bars = (key : ((Int) -> String)?) => {
+  let bars = (key : ((Int32) -> String)?) => {
     let items : Array[&IntoContent] = []
     for i in 0..<3 {
       items.push(

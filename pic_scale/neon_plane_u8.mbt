@@ -7,14 +7,14 @@
 
 ///|
 /// `PRECISION` of `support.rs`.
-const PRECISION : Int = 15
+const PRECISION : Int32 = 15
 
 ///|
 fn convolve_horizontal_plane_neon_row(
   src : FixedArray[Byte],
-  src_offset : Int,
+  src_offset : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
+  dst_offset : Int32,
   filter_weights : FixedWeights,
 ) -> Unit {
   let rnd_const = 1 << (PRECISION - 1)

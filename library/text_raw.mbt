@@ -210,7 +210,7 @@ priv struct RawHighlight {
   routines : Routines
   /// The compilation the entry ends with ([MemoKey::compilation]): its
   /// own, if the element or the styles hold a host closure.
-  compilation : Int
+  compilation : Int32
   lines : Array[RawLine]
 }
 
@@ -479,7 +479,7 @@ fn raw_styled(
   foreground : @syntect.Color,
   style : @syntect.Style,
   span : @syntax.Span,
-  span_offset : Int,
+  span_offset : Int32,
 ) -> Content {
   let mut body = TextElem::packed(piece).spanned(span)
   if span_offset > 0 {
@@ -985,10 +985,10 @@ priv struct ThemedHighlighter {
   highlighter : @syntect.Highlighter
   mut scopes : Array[@syntect.Scope]
   current_line : Array[Content]
-  mut range : (Int, Int)
-  mut line : Int
-  style_fn : (Int, @syntax.LinkedNode, (Int, Int), @syntect.Style) -> Content
-  line_fn : (Int, (Int, Int), Array[Content]) -> Unit
+  mut range : (Int32, Int32)
+  mut line : Int32
+  style_fn : (Int32, @syntax.LinkedNode, (Int32, Int32), @syntect.Style) -> Content
+  line_fn : (Int32, (Int32, Int32), Array[Content]) -> Unit
 }
 
 ///|
@@ -996,8 +996,8 @@ fn ThemedHighlighter::new(
   code : @syntect.ByteIndex,
   top : @syntax.LinkedNode,
   highlighter : @syntect.Highlighter,
-  style_fn : (Int, @syntax.LinkedNode, (Int, Int), @syntect.Style) -> Content,
-  line_fn : (Int, (Int, Int), Array[Content]) -> Unit,
+  style_fn : (Int32, @syntax.LinkedNode, (Int32, Int32), @syntect.Style) -> Content,
+  line_fn : (Int32, (Int32, Int32), Array[Content]) -> Unit,
 ) -> ThemedHighlighter {
   {
     code,
@@ -1092,7 +1092,7 @@ fn raw_preprocess(
 
 ///|
 /// Replace tabs with spaces to align with multiples of `tab_size`.
-fn align_tabs(text : String, tab_size : Int) -> String {
+fn align_tabs(text : String, tab_size : Int32) -> String {
   let replacement = " ".repeat(tab_size)
   let divisor = if tab_size > 1 { tab_size } else { 1 }
   let res = StringBuilder()

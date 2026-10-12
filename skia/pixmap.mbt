@@ -5,14 +5,14 @@
 
 ///|
 /// Number of bytes per pixel.
-pub let bytes_per_pixel : Int = 4
+pub let bytes_per_pixel : Int32 = 4
 
 ///|
 /// A container that owns premultiplied RGBA pixels.
 ///
 /// The data is not aligned, therefore width == stride.
 pub struct Pixmap {
-  data : FixedArray[UInt]
+  data : FixedArray[UInt32]
   size : @path.IntSize
 }
 
@@ -24,7 +24,7 @@ pub struct Pixmap {
 /// Zero size in an error.
 ///
 /// Pixmap's width is limited by i32::MAX/4.
-pub fn Pixmap::new(width : UInt, height : UInt) -> Pixmap? {
+pub fn Pixmap::new(width : UInt32, height : UInt32) -> Pixmap? {
   guard @path.IntSize::from_wh(width, height) is Some(size) else { return None }
   guard data_len_for_size(size) is Some(len) else { return None }
   Some({ data: FixedArray::make(len, 0), size, })
@@ -34,7 +34,7 @@ pub fn Pixmap::new(width : UInt, height : UInt) -> Pixmap? {
 /// Creates a new pixmap by taking ownership over an image buffer
 /// (premultiplied RGBA pixels).
 pub fn Pixmap::from_vec(
-  data : FixedArray[UInt],
+  data : FixedArray[UInt32],
   size : @path.IntSize,
 ) -> Pixmap? {
   guard data_len_for_size(size) is Some(len) else { return None }
@@ -48,8 +48,8 @@ pub fn Pixmap::from_vec(
 /// Creates a new pixmap from premultiplied RGBA bytes.
 pub fn Pixmap::from_bytes(
   data : BytesView,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
 ) -> Pixmap? {
   guard @path.IntSize::from_wh(width, height) is Some(size) else { return None }
   guard data_len_for_size(size) is Some(len) else { return None }
@@ -68,13 +68,13 @@ pub fn Pixmap::from_bytes(
 
 ///|
 /// Returns pixmap's width.
-pub fn Pixmap::width(self : Pixmap) -> Int {
+pub fn Pixmap::width(self : Pixmap) -> Int32 {
   self.size.width().reinterpret_as_int()
 }
 
 ///|
 /// Returns pixmap's height.
-pub fn Pixmap::height(self : Pixmap) -> Int {
+pub fn Pixmap::height(self : Pixmap) -> Int32 {
   self.size.height().reinterpret_as_int()
 }
 
@@ -92,7 +92,7 @@ pub fn Pixmap::fill(self : Pixmap, color : Color) -> Unit {
 
 ///|
 /// Returns the internal pixels (packed premultiplied RGBA).
-pub fn Pixmap::pixels(self : Pixmap) -> FixedArray[UInt] {
+pub fn Pixmap::pixels(self : Pixmap) -> FixedArray[UInt32] {
   self.data
 }
 
@@ -107,8 +107,8 @@ pub fn Pixmap::data(self : Pixmap) -> Bytes {
 /// Returns a pixel color. Returns `None` when position is out of bounds.
 pub fn Pixmap::pixel(
   self : Pixmap,
-  x : UInt,
-  y : UInt,
+  x : UInt32,
+  y : UInt32,
 ) -> PremultipliedColorU8? {
   let idx = self.size.width().to_uint64() * y.to_uint64() + x.to_uint64()
   if idx > 0xFFFFFFFFUL || idx >= self.data.length().to_uint64() {
@@ -140,7 +140,7 @@ pub fn Pixmap::take_demultiplied(self : Pixmap) -> Bytes {
 /// Writes the demultiplied bytes of the packed pixel `p` to `out[pos..pos +
 /// 4]` (the caller checks the bounds).
 #inline
-fn demultiply_pixel(p : UInt, out : FixedArray[Byte], pos : Int) -> Unit {
+fn demultiply_pixel(p : UInt32, out : FixedArray[Byte], pos : Int32) -> Unit {
   let c = if p >> 24 == 0xFF {
     p
   } else {
@@ -213,7 +213,7 @@ pub fn Pixmap::decode_png(data : BytesView) -> Pixmap raise @codecs.ImageError {
   }
   let pixels = FixedArray::make(len, 0U)
   let channels = info.color.channel_count()
-  fn sample(i : Int) -> Int {
+  fn sample(i : Int32) -> Int32 {
     buf[i].to_int()
   }
 
@@ -243,7 +243,7 @@ pub fn Pixmap::decode_png(data : BytesView) -> Pixmap raise @codecs.ImageError {
 }
 
 ///|
-fn data_len_for_size(size : @path.IntSize) -> Int? {
+fn data_len_for_size(size : @path.IntSize) -> Int32? {
   let w = size.width().to_uint64()
   let h = size.height().to_uint64()
   // `min_row_bytes`: the row must fit into an `i32` in bytes.
@@ -264,21 +264,25 @@ fn data_len_for_size(size : @path.IntSize) -> Int? {
 /// `offset` is the index of the region's top-left pixel in `pixels` (RGBA
 /// pixmaps) or `bytes` (masks); `real_width` is the row stride.
 priv struct SubPixmapMut {
-  pixels : FixedArray[UInt]
+  pixels : FixedArray[UInt32]
   bytes : FixedArray[Byte]
-  offset : Int
+  offset : Int32
   size : @path.IntSize
-  real_width : Int
+  real_width : Int32
 }
 
 ///|
-let empty_pixels : FixedArray[UInt] = []
+let empty_pixels : FixedArray[UInt32] = []
 
 ///|
 let empty_bytes : FixedArray[Byte] = []
 
 ///|
-fn SubPixmapMut::offset_of(self : SubPixmapMut, dx : Int, dy : Int) -> Int {
+fn SubPixmapMut::offset_of(
+  self : SubPixmapMut,
+  dx : Int32,
+  dy : Int32,
+) -> Int32 {
   self.offset + self.real_width * dy + dx
 }
 

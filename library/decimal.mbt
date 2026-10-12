@@ -107,7 +107,7 @@ pub fn Decimal::fract(self : Decimal) -> Decimal {
 ///
 /// Note that this can return `None` when using negative digits where the
 /// rounded number would overflow the available range for decimals.
-pub fn Decimal::round(self : Decimal, digits : Int) -> Decimal? {
+pub fn Decimal::round(self : Decimal, digits : Int32) -> Decimal? {
   // Positive digits can be handled by just rounding with rust_decimal.
   if digits >= 0 {
     return Some(Decimal::Decimal(self.0.round_dp_away_from_zero(digits)))

@@ -36,12 +36,16 @@ pub extend TableType with @debug.Debug::{to_repr}
 /// # Panics
 ///
 /// If `min` is greater than `max`.
-pub fn TableType::new(element : ValType, min : UInt, max : UInt?) -> TableType {
+pub fn TableType::new(
+  element : ValType,
+  min : UInt32,
+  max : UInt32?,
+) -> TableType {
   TableType::new_impl(
     element,
     IndexType::I32,
     min.to_uint64(),
-    max.map(UInt::to_uint64),
+    max.map(UInt32::to_uint64),
   )
 }
 

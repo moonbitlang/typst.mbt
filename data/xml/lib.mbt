@@ -23,8 +23,8 @@ const XMLNS : String = "xmlns"
 /// Position indicates a row/line and a column in the original text. Starting
 /// from 1:1. The column is counted in chars.
 pub(all) struct TextPos {
-  row : Int
-  col : Int
+  row : Int32
+  col : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -39,7 +39,7 @@ pub extend TextPos with @debug.Debug::{to_repr}
 
 ///|
 /// Constructs a new `TextPos`.
-pub fn TextPos::new(row : Int, col : Int) -> TextPos {
+pub fn TextPos::new(row : Int32, col : Int32) -> TextPos {
   { row, col, }
 }
 
@@ -72,7 +72,7 @@ pub fn Document::root(self : Document) -> Node {
 
 ///|
 /// Returns the node of the tree with the given id (0 is the root node).
-pub fn Document::get_node(self : Document, id : Int) -> Node? {
+pub fn Document::get_node(self : Document, id : Int32) -> Node? {
   if id >= 0 && id < self.nodes.length() {
     Some({ doc: self, id, })
   } else {
@@ -99,7 +99,7 @@ pub fn Document::descendants(self : Document) -> Array[Node] {
 
 ///|
 /// Calculates `TextPos` in the original document from position in bytes.
-pub fn Document::text_pos_at(self : Document, pos : Int) -> TextPos {
+pub fn Document::text_pos_at(self : Document, pos : Int32) -> TextPos {
   Stream::new(self.text).gen_text_pos_from(pos)
 }
 
@@ -156,8 +156,8 @@ pub extend PI with @debug.Debug::{to_repr}
 ///|
 /// A short range (indices into a document-internal array).
 priv struct ShortRange {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -175,23 +175,23 @@ priv enum NodeKind {
 
 ///|
 priv struct NodeData {
-  parent : Int?
-  mut prev_sibling : Int?
-  mut next_subtree : Int?
-  mut last_child : Int?
+  parent : Int32?
+  mut prev_sibling : Int32?
+  mut next_subtree : Int32?
+  mut last_child : Int32?
   mut kind : NodeKind
-  range_start : Int
-  mut range_end : Int
+  range_start : Int32
+  mut range_end : Int32
 }
 
 ///|
 priv struct AttributeData {
   name : ExpandedNameIndexed
   value : String
-  range_start : Int
-  range_end : Int
-  qname_len : Int
-  eq_len : Int // includes any surrounding spaces
+  range_start : Int32
+  range_end : Int32
+  qname_len : Int32
+  eq_len : Int32 // includes any surrounding spaces
 }
 
 ///|
@@ -226,20 +226,20 @@ pub fn Attribute::value(self : Attribute) -> String {
 /// <e n:attr='value'/>
 ///    ^^^^^^^^^^^^^^
 /// ```
-pub fn Attribute::range(self : Attribute) -> (Int, Int) {
+pub fn Attribute::range(self : Attribute) -> (Int32, Int32) {
   (self.data.range_start, self.data.range_end)
 }
 
 ///|
 /// Returns attribute's qname's range in bytes in the original document.
-pub fn Attribute::range_qname(self : Attribute) -> (Int, Int) {
+pub fn Attribute::range_qname(self : Attribute) -> (Int32, Int32) {
   (self.data.range_start, self.data.range_start + self.data.qname_len)
 }
 
 ///|
 /// Returns attribute's value's range in bytes in the original document,
 /// excluding the surrounding quotes.
-pub fn Attribute::range_value(self : Attribute) -> (Int, Int) {
+pub fn Attribute::range_value(self : Attribute) -> (Int32, Int32) {
   // +1 on start and -1 on end are to exclude the quotes around the value
   // (all valid quotes are 1 byte)
   let start = self.data.range_start + self.data.qname_len + self.data.eq_len + 1
@@ -282,9 +282,9 @@ priv struct Namespaces {
   // Deduplicated namespace values used throughout the document
   values : Array[Namespace]
   // Indices into the above in tree order as the document is parsed
-  tree_order : Array[Int]
+  tree_order : Array[Int32]
   // Used for deduplication (upstream: indices sorted by value).
-  dedup : Map[(String?, String), Int]
+  dedup : Map[(String?, String), Int32]
 }
 
 ///|
@@ -314,13 +314,17 @@ fn Namespaces::push_ns(
 }
 
 ///|
-fn Namespaces::push_ref(self : Namespaces, tree_idx : Int) -> Unit {
+fn Namespaces::push_ref(self : Namespaces, tree_idx : Int32) -> Unit {
   let idx = self.tree_order[tree_idx]
   self.tree_order.push(idx)
 }
 
 ///|
-fn Namespaces::exists(self : Namespaces, start : Int, prefix : String?) -> Bool {
+fn Namespaces::exists(
+  self : Namespaces,
+  start : Int32,
+  prefix : String?,
+) -> Bool {
   for i in start..<self.tree_order.length() {
     if self.values[self.tree_order[i]].name == prefix {
       return true
@@ -330,13 +334,13 @@ fn Namespaces::exists(self : Namespaces, start : Int, prefix : String?) -> Bool 
 }
 
 ///|
-fn Namespaces::get(self : Namespaces, idx : Int) -> Namespace {
+fn Namespaces::get(self : Namespaces, idx : Int32) -> Namespace {
   self.values[idx]
 }
 
 ///|
 priv struct ExpandedNameIndexed {
-  namespace_idx : Int?
+  namespace_idx : Int32?
   local_name : String
 }
 
@@ -402,7 +406,7 @@ pub struct Node {
   /// The tree containing the node.
   priv doc : Document
   /// Node's ID.
-  priv id : Int
+  priv id : Int32
 }
 
 ///|
@@ -470,7 +474,7 @@ pub fn Node::document(self : Node) -> Document {
 
 ///|
 /// Returns node's ID (an index into the document's nodes; 0 is the root).
-pub fn Node::id(self : Node) -> Int {
+pub fn Node::id(self : Node) -> Int32 {
   self.id
 }
 
@@ -788,7 +792,7 @@ pub fn Node::descendants(self : Node) -> Array[Node] {
 
 ///|
 /// Returns node's range in bytes in the original document.
-pub fn Node::range(self : Node) -> (Int, Int) {
+pub fn Node::range(self : Node) -> (Int32, Int32) {
   let d = self.d()
   (d.range_start, d.range_end)
 }

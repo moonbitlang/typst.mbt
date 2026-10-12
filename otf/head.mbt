@@ -325,7 +325,7 @@ pub(all) enum LocaTable {
   /// Short offsets.
   Short(LazyArray16[UInt16])
   /// Long offsets.
-  Long(LazyArray16[UInt])
+  Long(LazyArray16[UInt32])
 }
 
 ///|
@@ -395,7 +395,7 @@ pub fn LocaTable::is_empty(self : LocaTable) -> Bool {
 pub fn LocaTable::glyph_range(
   self : LocaTable,
   glyph_id : GlyphId,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   let glyph_id = glyph_id.0
   if glyph_id == 0xFFFF {
     return None

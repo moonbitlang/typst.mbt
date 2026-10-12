@@ -3,11 +3,11 @@
 
 ///|
 priv struct Rng {
-  mut state : UInt
+  mut state : UInt32
 }
 
 ///|
-fn Rng::next(self : Rng) -> UInt {
+fn Rng::next(self : Rng) -> UInt32 {
   let mut x = self.state
   x = x ^ (x << 13)
   x = x ^ (x >> 17)
@@ -32,7 +32,7 @@ fn Fnv::byte(self : Fnv, b : UInt64) -> Unit {
 }
 
 ///|
-fn Fnv::u32(self : Fnv, v : UInt) -> Unit {
+fn Fnv::u32(self : Fnv, v : UInt32) -> Unit {
   let v = v.to_uint64()
   for i in 0..<4 {
     self.byte((v >> (8 * i)) & 0xffUL)
@@ -47,7 +47,7 @@ fn Fnv::u64(self : Fnv, v : UInt64) -> Unit {
 }
 
 ///|
-fn powf_hash(n : Int) -> UInt64 {
+fn powf_hash(n : Int32) -> UInt64 {
   let rng = { state: 2463534242U, }
   let h = Fnv::new()
   for _ in 0..<n {
@@ -60,7 +60,7 @@ fn powf_hash(n : Int) -> UInt64 {
 }
 
 ///|
-fn pow_hash(n : Int) -> UInt64 {
+fn pow_hash(n : Int32) -> UInt64 {
   let rng = { state: 2463534242U, }
   let h = Fnv::new()
   for _ in 0..<n {
@@ -103,7 +103,7 @@ test "table sizes" {
 ///|
 test "fma matches exact big integer evaluation" {
   let rng = { state: 88172645U, }
-  let rnd = (lo_e : UInt, range : UInt) => {
+  let rnd = (lo_e : UInt32, range : UInt32) => {
     let hi = rng.next().to_uint64()
     let lo = rng.next().to_uint64()
     let e = (rng.next() % range + lo_e).to_uint64()

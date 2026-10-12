@@ -2,7 +2,7 @@
 // segments, as specified in Annex B.
 
 ///|
-const MAX_BITPLANE_COUNT : Int = 32
+const MAX_BITPLANE_COUNT : Int32 = 32
 
 ///|
 fn parse_segments(
@@ -107,7 +107,7 @@ fn parse_inner(
 
 ///|
 fn resolve_segments(
-  sub_band_dx : Int,
+  sub_band_dx : Int32,
   progression_data : ProgressionData,
   reader : BitReader,
   storage : DecompositionStorage,
@@ -242,7 +242,7 @@ fn resolve_segments(
       return None
     }
     let style = component_info.code_block_style()
-    fn get_segment_idx(pass_idx : Int) -> Int {
+    fn get_segment_idx(pass_idx : Int32) -> Int32 {
       if style.termination_on_each_pass {
         // If we terminate on each pass, the segment is just the index
         // of the pass.
@@ -258,7 +258,10 @@ fn resolve_segments(
     }
 
     let start = storage.segments.length()
-    fn push_segment(segment : Int, coding_passes_for_segment : Int) -> Unit? {
+    fn push_segment(
+      segment : Int32,
+      coding_passes_for_segment : Int32,
+    ) -> Unit? {
       if !(coding_passes_for_segment > 0) {
         abort("assertion failed: coding_passes_for_segment > 0")
       }
@@ -326,7 +329,7 @@ fn resolve_segments(
 ///|
 /// Calculate the segment index for the given pass in arithmetic decoder
 /// bypass (see section D.6, Table D.9).
-fn segment_idx_for_bypass(pass_idx : Int) -> Int {
+fn segment_idx_for_bypass(pass_idx : Int32) -> Int32 {
   if pass_idx < 10 {
     0
   } else {

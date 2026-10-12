@@ -5,7 +5,7 @@
 ///|
 /// `Chain::compile_flags` in harfbuzz
 fn compile_flags(face : Face, builder : AatMapBuilder, map : AatMap) -> Unit? {
-  let has_feature = (kind : Int, setting : Int) => {
+  let has_feature = (kind : Int32, setting : Int32) => {
     // `binary_search_by(...).is_ok()`
     let features = builder.current_features
     let mut lo = 0
@@ -76,7 +76,7 @@ fn compile_flags(face : Face, builder : AatMapBuilder, map : AatMap) -> Unit? {
 /// `map.chain_flags.resize(chain_len, vec![])`
 fn resize_chain_flags(
   chain_flags : Array[Array[RangeFlags]],
-  len : Int,
+  len : Int32,
 ) -> Unit {
   if chain_flags.length() > len {
     chain_flags.truncate(len)
@@ -183,7 +183,7 @@ fn[T : @otf.FromData] drive(
     ac.buffer.clear_output()
   }
   let mut state = MORX_START_OF_TEXT
-  let mut last_range : Int? = match ac.range_flags {
+  let mut last_range : Int32? = match ac.range_flags {
     Some(rf) =>
       if rf.length() > 1 {
         Some(0)
@@ -354,7 +354,7 @@ fn apply_subtable(kind : @otf.MorxSubtableKind, ac : AatApplyContext) -> Unit {
         Some(gdef) if gdef.has_glyph_classes() => Some(ac.face)
         _ => None
       }
-      let mut last_range : Int? = match ac.range_flags {
+      let mut last_range : Int32? = match ac.range_flags {
         Some(rf) =>
           if rf.length() > 1 {
             Some(0)
@@ -403,8 +403,8 @@ fn apply_subtable(kind : @otf.MorxSubtableKind, ac : AatApplyContext) -> Unit {
 
 ///|
 priv struct RearrangementCtx {
-  mut start : Int
-  mut end : Int
+  mut start : Int32
+  mut end : Int32
 }
 
 ///|
@@ -424,7 +424,7 @@ const REARRANGEMENT_VERB : UInt16 = 0x000F
 /// and end-side. Values of 0,1,2 mean move that many
 /// to the other side. Value of 3 means move 2 and
 /// flip them.
-let rearrangement_map : ReadOnlyArray[Int] = [
+let rearrangement_map : ReadOnlyArray[Int32] = [
   0x00, // 0  no change
    0x10, // 1  Ax => xA
    0x01, // 2  xD => Dx
@@ -520,7 +520,7 @@ fn RearrangementCtx::transition(
 priv struct ContextualCtx {
   mut mark_set : Bool
   face_if_has_glyph_classes : Face?
-  mut mark : Int
+  mut mark : Int32
   table : @otf.MorxContextualSubtable
 }
 
@@ -602,7 +602,7 @@ fn ContextualCtx::transition(
 
 ///|
 priv struct InsertionCtx {
-  mut mark : Int
+  mut mark : Int32
   glyphs : @otf.LazyArray32[@otf.GlyphId]
 }
 
@@ -736,13 +736,13 @@ fn InsertionCtx::transition(
 }
 
 ///|
-const LIGATURE_MAX_MATCHES : Int = 64
+const LIGATURE_MAX_MATCHES : Int32 = 64
 
 ///|
 priv struct LigatureCtx {
   table : @otf.MorxLigatureSubtable
-  mut match_length : Int
-  match_positions : FixedArray[Int]
+  mut match_length : Int32
+  match_positions : FixedArray[Int32]
 }
 
 ///|
@@ -755,13 +755,13 @@ const LIGATURE_DONT_ADVANCE : UInt16 = 0x4000
 const LIGATURE_PERFORM_ACTION : UInt16 = 0x2000
 
 ///|
-const LIG_ACTION_LAST : UInt = 0x80000000
+const LIG_ACTION_LAST : UInt32 = 0x80000000
 
 ///|
-const LIG_ACTION_STORE : UInt = 0x40000000
+const LIG_ACTION_STORE : UInt32 = 0x40000000
 
 ///|
-const LIG_ACTION_OFFSET : UInt = 0x3FFFFFFF
+const LIG_ACTION_OFFSET : UInt32 = 0x3FFFFFFF
 
 ///|
 fn LigatureCtx::driver(self : LigatureCtx) -> DriverContext[UInt16] {

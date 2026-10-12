@@ -5,23 +5,23 @@
 // which defines the same values.
 
 ///|
-const LJMO : Int = 1
+const LJMO : Int32 = 1
 
 ///|
-const VJMO : Int = 2
+const VJMO : Int32 = 2
 
 ///|
-const TJMO : Int = 3
+const TJMO : Int32 = 3
 
 ///|
-fn GlyphInfo::hangul_shaping_feature(self : GlyphInfo) -> Int {
+fn GlyphInfo::hangul_shaping_feature(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_auxiliary()
 }
 
 ///|
 fn GlyphInfo::set_hangul_shaping_feature(
   self : GlyphInfo,
-  feature : Int,
+  feature : Int32,
 ) -> Unit {
   self.set_ot_shaper_var_u8_auxiliary(feature)
 }
@@ -44,7 +44,7 @@ fn override_features_hangul(planner : ShapePlanner) -> Unit {
 ///|
 /// `hangul_shape_plan_t`.
 priv struct HangulShapePlan {
-  mask_array : FixedArray[UInt]
+  mask_array : FixedArray[UInt32]
 }
 
 ///|
@@ -60,47 +60,47 @@ fn data_create_hangul(map : OtMap) -> HangulShapePlan {
 }
 
 ///|
-fn is_combining_l(u : Int) -> Bool {
+fn is_combining_l(u : Int32) -> Bool {
   u >= L_BASE && u <= L_BASE + L_COUNT - 1
 }
 
 ///|
-fn is_combining_v(u : Int) -> Bool {
+fn is_combining_v(u : Int32) -> Bool {
   u >= V_BASE && u <= V_BASE + V_COUNT - 1
 }
 
 ///|
-fn is_combining_t(u : Int) -> Bool {
+fn is_combining_t(u : Int32) -> Bool {
   u >= T_BASE + 1 && u <= T_BASE + T_COUNT - 1
 }
 
 ///|
-fn is_combined_s(u : Int) -> Bool {
+fn is_combined_s(u : Int32) -> Bool {
   u >= S_BASE && u <= S_BASE + S_COUNT - 1
 }
 
 ///|
-fn is_l(u : Int) -> Bool {
+fn is_l(u : Int32) -> Bool {
   (u >= 0x1100 && u <= 0x115F) || (u >= 0xA960 && u <= 0xA97C)
 }
 
 ///|
-fn is_v(u : Int) -> Bool {
+fn is_v(u : Int32) -> Bool {
   (u >= 0x1160 && u <= 0x11A7) || (u >= 0xD7B0 && u <= 0xD7C6)
 }
 
 ///|
-fn is_t(u : Int) -> Bool {
+fn is_t(u : Int32) -> Bool {
   (u >= 0x11A8 && u <= 0x11FF) || (u >= 0xD7CB && u <= 0xD7FB)
 }
 
 ///|
-fn is_hangul_tone(u : Int) -> Bool {
+fn is_hangul_tone(u : Int32) -> Bool {
   u >= 0x302E && u <= 0x302F
 }
 
 ///|
-fn is_zero_width_char(face : Face, c : Int) -> Bool {
+fn is_zero_width_char(face : Face, c : Int32) -> Bool {
   if face.get_nominal_glyph(c) is Some(glyph) {
     face.glyph_h_advance(glyph) == 0
   } else {
@@ -189,7 +189,7 @@ fn preprocess_text_hangul(
       } else if (buffer.flags & BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE) == 0 &&
         face.has_glyph(0x25CC) {
         // No valid syllable as base for tone mark; try to insert dotted circle.
-        let chars : Array[UInt] = [0, 0]
+        let chars : Array[UInt32] = [0, 0]
         if !is_zero_width_char(face, c) {
           chars[0] = u.reinterpret_as_uint()
           chars[1] = 0x25CC

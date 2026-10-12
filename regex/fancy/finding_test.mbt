@@ -7,7 +7,7 @@ fn find_match(re : String, text : String) -> @fancy.Match? raise {
 }
 
 ///|
-fn find(re : String, text : String) -> (Int, Int)? raise {
+fn find(re : String, text : String) -> (Int32, Int32)? raise {
   find_match(re, text).map(m => (m.start(), m.end()))
 }
 
@@ -22,7 +22,7 @@ fn is_err(re : String) -> Bool {
 
 ///|
 /// The (start, end) of all matches of `find_iter`.
-fn find_all(re : String, text : String) -> Array[(Int, Int)] raise {
+fn find_all(re : String, text : String) -> Array[(Int32, Int32)] raise {
   let out = []
   for m in @fancy.Regex::new(re).find_iter(text).iter() {
     let m = m.unwrap_or_error()

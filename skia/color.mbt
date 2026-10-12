@@ -5,14 +5,14 @@
 // of the upstream `[u8; 4]`.
 
 ///|
-pub let alpha_u8_transparent : Int = 0x00
+pub let alpha_u8_transparent : Int32 = 0x00
 
 ///|
-pub let alpha_u8_opaque : Int = 0xFF
+pub let alpha_u8_opaque : Int32 = 0xFF
 
 ///|
 /// An 8-bit RGBA color value (`r | g << 8 | b << 16 | a << 24`).
-pub(all) struct ColorU8(UInt) derive(Eq, Debug)
+pub(all) struct ColorU8(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,27 +26,32 @@ pub extend ColorU8 with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new color.
-pub fn ColorU8::from_rgba(r : Int, g : Int, b : Int, a : Int) -> ColorU8 {
+pub fn ColorU8::from_rgba(
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
+) -> ColorU8 {
   ColorU8(pack_rgba(r, g, b, a))
 }
 
 ///|
-pub fn ColorU8::red(self : ColorU8) -> Int {
+pub fn ColorU8::red(self : ColorU8) -> Int32 {
   (self.0 & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn ColorU8::green(self : ColorU8) -> Int {
+pub fn ColorU8::green(self : ColorU8) -> Int32 {
   ((self.0 >> 8) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn ColorU8::blue(self : ColorU8) -> Int {
+pub fn ColorU8::blue(self : ColorU8) -> Int32 {
   ((self.0 >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn ColorU8::alpha(self : ColorU8) -> Int {
+pub fn ColorU8::alpha(self : ColorU8) -> Int32 {
   (self.0 >> 24).reinterpret_as_int()
 }
 
@@ -74,7 +79,7 @@ pub fn ColorU8::premultiply(self : ColorU8) -> PremultipliedColorU8 {
 
 ///|
 /// An 8-bit, premultiplied RGBA color value.
-pub(all) struct PremultipliedColorU8(UInt) derive(Eq, Debug)
+pub(all) struct PremultipliedColorU8(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -92,7 +97,7 @@ pub let premultiplied_color_u8_transparent : PremultipliedColorU8 = Premultiplie
 )
 
 ///|
-fn pack_rgba(r : Int, g : Int, b : Int, a : Int) -> UInt {
+fn pack_rgba(r : Int32, g : Int32, b : Int32, a : Int32) -> UInt32 {
   (r & 0xFF).reinterpret_as_uint() |
   ((g & 0xFF).reinterpret_as_uint() << 8) |
   ((b & 0xFF).reinterpret_as_uint() << 16) |
@@ -102,10 +107,10 @@ fn pack_rgba(r : Int, g : Int, b : Int, a : Int) -> UInt {
 ///|
 /// Creates a new premultiplied color. RGB components must be <= alpha.
 pub fn PremultipliedColorU8::from_rgba(
-  r : Int,
-  g : Int,
-  b : Int,
-  a : Int,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
 ) -> PremultipliedColorU8? {
   if r <= a && g <= a && b <= a {
     Some(PremultipliedColorU8(pack_rgba(r, g, b, a)))
@@ -116,31 +121,31 @@ pub fn PremultipliedColorU8::from_rgba(
 
 ///|
 pub fn PremultipliedColorU8::from_rgba_unchecked(
-  r : Int,
-  g : Int,
-  b : Int,
-  a : Int,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
 ) -> PremultipliedColorU8 {
   PremultipliedColorU8(pack_rgba(r, g, b, a))
 }
 
 ///|
-pub fn PremultipliedColorU8::red(self : PremultipliedColorU8) -> Int {
+pub fn PremultipliedColorU8::red(self : PremultipliedColorU8) -> Int32 {
   (self.0 & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn PremultipliedColorU8::green(self : PremultipliedColorU8) -> Int {
+pub fn PremultipliedColorU8::green(self : PremultipliedColorU8) -> Int32 {
   ((self.0 >> 8) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn PremultipliedColorU8::blue(self : PremultipliedColorU8) -> Int {
+pub fn PremultipliedColorU8::blue(self : PremultipliedColorU8) -> Int32 {
   ((self.0 >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-pub fn PremultipliedColorU8::alpha(self : PremultipliedColorU8) -> Int {
+pub fn PremultipliedColorU8::alpha(self : PremultipliedColorU8) -> Int32 {
   (self.0 >> 24).reinterpret_as_int()
 }
 
@@ -169,7 +174,7 @@ pub fn PremultipliedColorU8::demultiply(self : PremultipliedColorU8) -> ColorU8 
 
 ///|
 /// `x as u8` for an `f64` (saturating, NaN maps to 0).
-fn f64_to_u8(x : Double) -> Int {
+fn f64_to_u8(x : Double) -> Int32 {
   if x != x {
     0
   } else if x >= 255.0 {
@@ -183,7 +188,7 @@ fn f64_to_u8(x : Double) -> Int {
 
 ///|
 /// `x as u8` for an `f32` (saturating, NaN maps to 0).
-pub fn f32_to_u8(x : Float) -> Int {
+pub fn f32_to_u8(x : Float) -> Int32 {
   if x != x {
     0
   } else if x >= 255.0 {
@@ -197,7 +202,7 @@ pub fn f32_to_u8(x : Float) -> Int {
 
 ///|
 /// `x as u16` for an `f32` (saturating, NaN maps to 0).
-pub fn f32_to_u16(x : Float) -> Int {
+pub fn f32_to_u16(x : Float) -> Int32 {
   if x != x {
     0
   } else if x >= 65535.0 {
@@ -267,13 +272,13 @@ pub fn Color::from_rgba_unchecked(
 
 ///|
 /// `NormalizedF32::new_u8`.
-fn normalized_u8(n : Int) -> Float {
+fn normalized_u8(n : Int32) -> Float {
   Float::from_int(n) / 255.0
 }
 
 ///|
 /// Creates a new color from 4 components (u8 values).
-pub fn Color::from_rgba8(r : Int, g : Int, b : Int, a : Int) -> Color {
+pub fn Color::from_rgba8(r : Int32, g : Int32, b : Int32, a : Int32) -> Color {
   {
     r: normalized_u8(r),
     g: normalized_u8(g),
@@ -406,13 +411,13 @@ pub fn PremultipliedColor::to_color_u8(
 
 ///|
 /// Return a*b/255, rounding any fractional bits.
-pub fn premultiply_u8(c : Int, a : Int) -> Int {
+pub fn premultiply_u8(c : Int32, a : Int32) -> Int32 {
   let prod = c * a + 128
   ((prod + (prod >> 8)) >> 8) & 0xFF
 }
 
 ///|
-fn color_f32_to_u8(r : Float, g : Float, b : Float, a : Float) -> UInt {
+fn color_f32_to_u8(r : Float, g : Float, b : Float, a : Float) -> UInt32 {
   pack_rgba(
     f32_to_u8(r * 255.0 + 0.5),
     f32_to_u8(g * 255.0 + 0.5),

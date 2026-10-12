@@ -3,7 +3,7 @@
 
 ///|
 /// Binary search a `[c, mapped, ...]` table.
-fn lookup_single(table : ReadOnlyArray[Int], c : Int) -> Int? {
+fn lookup_single(table : ReadOnlyArray[Int32], c : Int32) -> Int32? {
   let n = table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -23,7 +23,7 @@ fn lookup_single(table : ReadOnlyArray[Int], c : Int) -> Int? {
 ///|
 /// Look up a `[c, len, chars..., ...]` table (linear; the tables are small).
 /// Returns the start and length of the mapping.
-fn lookup_multi(table : ReadOnlyArray[Int], c : Int) -> (Int, Int)? {
+fn lookup_multi(table : ReadOnlyArray[Int32], c : Int32) -> (Int32, Int32)? {
   let mut i = 0
   while i < table.length() {
     let len = table[i + 1]
@@ -38,9 +38,9 @@ fn lookup_multi(table : ReadOnlyArray[Int], c : Int) -> (Int, Int)? {
 ///|
 fn write_mapped(
   buf : StringBuilder,
-  c : Int,
-  single : ReadOnlyArray[Int],
-  multi : ReadOnlyArray[Int],
+  c : Int32,
+  single : ReadOnlyArray[Int32],
+  multi : ReadOnlyArray[Int32],
 ) -> Unit {
   match lookup_single(single, c) {
     Some(m) => buf.write_char(m.unsafe_to_char())
@@ -57,13 +57,13 @@ fn write_mapped(
 
 ///|
 /// Unicode `Cased`.
-fn is_cased(c : Int) -> Bool {
+fn is_cased(c : Int32) -> Bool {
   in_ranges(cased_table, c)
 }
 
 ///|
 /// Unicode `Case_Ignorable`.
-fn is_case_ignorable(c : Int) -> Bool {
+fn is_case_ignorable(c : Int32) -> Bool {
   in_ranges(case_ignorable_table, c)
 }
 
@@ -87,7 +87,7 @@ pub fn char_to_uppercase(c : Char) -> String {
 /// Rust's `str::to_lowercase` (including the contextual mapping of `Σ` to
 /// `ς` at the end of a word).
 pub fn to_lowercase(s : StringView) -> String {
-  let chars : Array[Int] = []
+  let chars : Array[Int32] = []
   let mut i = 0
   while i < s.length() {
     let { cp: c, idx: next, } = decode_at(s, i)
@@ -113,9 +113,9 @@ pub fn to_lowercase(s : StringView) -> String {
 /// Whether, skipping case-ignorable chars from `start` in direction `step`,
 /// the first other char is cased.
 fn case_ignorable_then_cased(
-  chars : Array[Int],
-  start : Int,
-  step : Int,
+  chars : Array[Int32],
+  start : Int32,
+  step : Int32,
 ) -> Bool {
   for i = start; i >= 0 && i < chars.length(); i = i + step {
     if !is_case_ignorable(chars[i]) {

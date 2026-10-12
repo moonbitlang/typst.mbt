@@ -125,7 +125,11 @@ fn reorder_myanmar(_plan : ShapePlan, face : Face, buffer : Buffer) -> Bool {
 }
 
 ///|
-fn reorder_syllable_myanmar(start : Int, end : Int, buffer : Buffer) -> Unit {
+fn reorder_syllable_myanmar(
+  start : Int32,
+  end : Int32,
+  buffer : Buffer,
+) -> Unit {
   let syllable_type : MyanmarSyllableType = match
     buffer.info[start].syllable() & 0x0F {
     0 => ConsonantSyllable
@@ -146,8 +150,8 @@ fn reorder_syllable_myanmar(start : Int, end : Int, buffer : Buffer) -> Unit {
 /// Rules from:
 /// https://docs.microsoft.com/en-us/typography/script-development/myanmar
 fn initial_reordering_consonant_syllable_myanmar(
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   let mut base = end

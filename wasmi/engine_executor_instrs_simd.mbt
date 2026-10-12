@@ -2,25 +2,25 @@
 
 ///|
 /// Converts an IR lane index into a `@wasmi_core.ImmLaneIdx2`.
-fn lane_idx2(lane : Int) -> @wasmi_core.ImmLaneIdx2 {
+fn lane_idx2(lane : Int32) -> @wasmi_core.ImmLaneIdx2 {
   @wasmi_core.ImmLaneIdx2(lane.to_byte())
 }
 
 ///|
 /// Converts an IR lane index into a `@wasmi_core.ImmLaneIdx4`.
-fn lane_idx4(lane : Int) -> @wasmi_core.ImmLaneIdx4 {
+fn lane_idx4(lane : Int32) -> @wasmi_core.ImmLaneIdx4 {
   @wasmi_core.ImmLaneIdx4(lane.to_byte())
 }
 
 ///|
 /// Converts an IR lane index into a `@wasmi_core.ImmLaneIdx8`.
-fn lane_idx8(lane : Int) -> @wasmi_core.ImmLaneIdx8 {
+fn lane_idx8(lane : Int32) -> @wasmi_core.ImmLaneIdx8 {
   @wasmi_core.ImmLaneIdx8(lane.to_byte())
 }
 
 ///|
 /// Converts an IR lane index into a `@wasmi_core.ImmLaneIdx16`.
-fn lane_idx16(lane : Int) -> @wasmi_core.ImmLaneIdx16 {
+fn lane_idx16(lane : Int32) -> @wasmi_core.ImmLaneIdx16 {
   @wasmi_core.ImmLaneIdx16(lane.to_byte())
 }
 
@@ -93,7 +93,7 @@ fn Executor::execute_replace_lane_impl(
   self : Executor,
   result : @ir.Slot,
   value : @wasmi_core.V128Value,
-  delta : Int,
+  delta : Int32,
 ) -> Unit {
   self.set_stack_slot_as_v128(result, value)
   self.next_instr_at(delta)
@@ -106,7 +106,7 @@ fn Executor::execute_i8x16_replace_lane_imm(
   result : @ir.Slot,
   input : @ir.Slot,
   lane : @ir.ImmLaneIdx,
-  value : Int,
+  value : Int32,
 ) -> Unit {
   let input = self.get_stack_slot_as_v128(input)
   let value = @wasmi_core.i8x16_replace_lane(input, lane_idx16(lane.0), value)

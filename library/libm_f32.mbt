@@ -45,7 +45,7 @@ fn f32_hypot(x : Float, y : Float) -> Float {
 }
 
 ///|
-fn f32_bits(x : UInt) -> Float {
+fn f32_bits(x : UInt32) -> Float {
   Float::reinterpret_from_uint(x)
 }
 
@@ -257,7 +257,7 @@ fn libm_k_cosf(x : Double) -> Float {
 
 ///|
 /// `libm` `rem_pio2f`: `x` reduced by multiples of pi/2.
-fn libm_rem_pio2f(x : Float) -> (Int, Double) {
+fn libm_rem_pio2f(x : Float) -> (Int32, Double) {
   let toint = 1.5 / 2.220446049250313e-16
   let inv_pio2 = 6.36619772367581382433e-01
   let pio2_1 = 1.57079631090164184570e+00

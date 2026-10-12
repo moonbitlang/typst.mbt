@@ -7,10 +7,10 @@
 
 ///|
 /// `vp8_idct4x4` on `block[off..off + 16]`.
-fn vp8_idct4x4(block : FixedArray[Int], off : Int) -> Unit {
+fn vp8_idct4x4(block : FixedArray[Int32], off : Int32) -> Unit {
   let const1 = 20091L
   let const2 = 35468L
-  let fetch = (idx : Int) => block[off + idx].to_int64()
+  let fetch = (idx : Int32) => block[off + idx].to_int64()
   for i in 0..<4 {
     let a1 = fetch(i) + fetch(8 + i)
     let b1 = fetch(i) - fetch(8 + i)
@@ -43,7 +43,7 @@ fn vp8_idct4x4(block : FixedArray[Int], off : Int) -> Unit {
 
 ///|
 /// `vp8_iwht4x4` (section 14.3).
-fn vp8_iwht4x4(block : FixedArray[Int]) -> Unit {
+fn vp8_iwht4x4(block : FixedArray[Int32]) -> Unit {
   for i in 0..<4 {
     let a1 = block[i] + block[12 + i]
     let b1 = block[4 + i] + block[8 + i]
@@ -79,7 +79,7 @@ fn vp8_iwht4x4(block : FixedArray[Int]) -> Unit {
 // column through `point` with the given stride.
 
 ///|
-fn lf_c(val : Int) -> Int {
+fn lf_c(val : Int32) -> Int32 {
   if val < -128 {
     -128
   } else if val > 127 {
@@ -90,17 +90,17 @@ fn lf_c(val : Int) -> Int {
 }
 
 ///|
-fn lf_u2s(val : Byte) -> Int {
+fn lf_u2s(val : Byte) -> Int32 {
   val.to_int() - 128
 }
 
 ///|
-fn lf_s2u(val : Int) -> Byte {
+fn lf_s2u(val : Int32) -> Byte {
   (lf_c(val) + 128).to_byte()
 }
 
 ///|
-fn lf_diff(a : Byte, b : Byte) -> Int {
+fn lf_diff(a : Byte, b : Byte) -> Int32 {
   let d = a.to_int() - b.to_int()
   if d < 0 {
     -d
@@ -113,9 +113,9 @@ fn lf_diff(a : Byte, b : Byte) -> Int {
 fn common_adjust_vertical(
   use_outer_taps : Bool,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
-) -> Int {
+  point : Int32,
+  stride : Int32,
+) -> Int32 {
   let p1 = lf_u2s(pixels[point - 2 * stride])
   let p0 = lf_u2s(pixels[point - stride])
   let q0 = lf_u2s(pixels[point])
@@ -133,8 +133,8 @@ fn common_adjust_vertical(
 fn common_adjust_horizontal(
   use_outer_taps : Bool,
   pixels : FixedArray[Byte],
-  at : Int,
-) -> Int {
+  at : Int32,
+) -> Int32 {
   let p1 = lf_u2s(pixels[at + 2])
   let p0 = lf_u2s(pixels[at + 3])
   let q0 = lf_u2s(pixels[at + 4])
@@ -150,10 +150,10 @@ fn common_adjust_horizontal(
 
 ///|
 fn simple_threshold_vertical(
-  filter_limit : Int,
+  filter_limit : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Bool {
   lf_diff(pixels[point - stride], pixels[point]) * 2 +
   lf_diff(pixels[point - 2 * stride], pixels[point + stride]) / 2 <=
@@ -162,9 +162,9 @@ fn simple_threshold_vertical(
 
 ///|
 fn simple_threshold_horizontal(
-  filter_limit : Int,
+  filter_limit : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Bool {
   lf_diff(pixels[at + 3], pixels[at + 4]) * 2 +
   lf_diff(pixels[at + 2], pixels[at + 5]) / 2 <=
@@ -173,11 +173,11 @@ fn simple_threshold_horizontal(
 
 ///|
 fn should_filter_vertical(
-  interior_limit : Int,
-  edge_limit : Int,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Bool {
   simple_threshold_vertical(edge_limit, pixels, point, stride) &&
   lf_diff(pixels[point - 4 * stride], pixels[point - 3 * stride]) <=
@@ -193,10 +193,10 @@ fn should_filter_vertical(
 
 ///|
 fn should_filter_horizontal(
-  interior_limit : Int,
-  edge_limit : Int,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Bool {
   simple_threshold_horizontal(edge_limit, pixels, at) &&
   lf_diff(pixels[at], pixels[at + 1]) <= interior_limit &&
@@ -209,10 +209,10 @@ fn should_filter_horizontal(
 
 ///|
 fn high_edge_variance_vertical(
-  threshold : Int,
+  threshold : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Bool {
   lf_diff(pixels[point - 2 * stride], pixels[point - stride]) > threshold ||
   lf_diff(pixels[point + stride], pixels[point]) > threshold
@@ -220,9 +220,9 @@ fn high_edge_variance_vertical(
 
 ///|
 fn high_edge_variance_horizontal(
-  threshold : Int,
+  threshold : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Bool {
   lf_diff(pixels[at + 2], pixels[at + 3]) > threshold ||
   lf_diff(pixels[at + 5], pixels[at + 4]) > threshold
@@ -230,10 +230,10 @@ fn high_edge_variance_horizontal(
 
 ///|
 fn simple_segment_vertical(
-  edge_limit : Int,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Unit {
   if simple_threshold_vertical(edge_limit, pixels, point, stride) {
     common_adjust_vertical(true, pixels, point, stride) |> ignore
@@ -242,9 +242,9 @@ fn simple_segment_vertical(
 
 ///|
 fn simple_segment_horizontal(
-  edge_limit : Int,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Unit {
   if simple_threshold_horizontal(edge_limit, pixels, at) {
     common_adjust_horizontal(true, pixels, at) |> ignore
@@ -253,12 +253,12 @@ fn simple_segment_horizontal(
 
 ///|
 fn subblock_filter_vertical(
-  hev_threshold : Int,
-  interior_limit : Int,
-  edge_limit : Int,
+  hev_threshold : Int32,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Unit {
   if should_filter_vertical(interior_limit, edge_limit, pixels, point, stride) {
     let hv = high_edge_variance_vertical(hev_threshold, pixels, point, stride)
@@ -274,11 +274,11 @@ fn subblock_filter_vertical(
 
 ///|
 fn subblock_filter_horizontal(
-  hev_threshold : Int,
-  interior_limit : Int,
-  edge_limit : Int,
+  hev_threshold : Int32,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Unit {
   if should_filter_horizontal(interior_limit, edge_limit, pixels, at) {
     let hv = high_edge_variance_horizontal(hev_threshold, pixels, at)
@@ -292,12 +292,12 @@ fn subblock_filter_horizontal(
 
 ///|
 fn macroblock_filter_vertical(
-  hev_threshold : Int,
-  interior_limit : Int,
-  edge_limit : Int,
+  hev_threshold : Int32,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  point : Int,
-  stride : Int,
+  point : Int32,
+  stride : Int32,
 ) -> Unit {
   if should_filter_vertical(interior_limit, edge_limit, pixels, point, stride) {
     if !high_edge_variance_vertical(hev_threshold, pixels, point, stride) {
@@ -325,11 +325,11 @@ fn macroblock_filter_vertical(
 
 ///|
 fn macroblock_filter_horizontal(
-  hev_threshold : Int,
-  interior_limit : Int,
-  edge_limit : Int,
+  hev_threshold : Int32,
+  interior_limit : Int32,
+  edge_limit : Int32,
   pixels : FixedArray[Byte],
-  at : Int,
+  at : Int32,
 ) -> Unit {
   if should_filter_horizontal(interior_limit, edge_limit, pixels, at) {
     if !high_edge_variance_horizontal(hev_threshold, pixels, at) {
@@ -360,12 +360,12 @@ fn macroblock_filter_horizontal(
 
 ///|
 /// `_mm_mulhi_epu16` emulation.
-fn yuv_mulhi(v : Int, coeff : Int) -> Int {
+fn yuv_mulhi(v : Int32, coeff : Int32) -> Int32 {
   (v * coeff) >> 8
 }
 
 ///|
-fn yuv_clip(v : Int) -> Int {
+fn yuv_clip(v : Int32) -> Int32 {
   let v = v >> 6
   if v < 0 {
     0
@@ -379,10 +379,10 @@ fn yuv_clip(v : Int) -> Int {
 ///|
 fn yuv_set_pixel(
   rgb : FixedArray[Byte],
-  at : Int,
-  y : Int,
-  u : Int,
-  v : Int,
+  at : Int32,
+  y : Int32,
+  u : Int32,
+  v : Int32,
 ) -> Unit {
   rgb[at] = yuv_clip(yuv_mulhi(y, 19077) + yuv_mulhi(v, 26149) - 14234).to_byte()
   rgb[at + 1] = yuv_clip(
@@ -393,11 +393,11 @@ fn yuv_set_pixel(
 
 ///|
 fn get_fancy_chroma_value(
-  main : Int,
-  secondary1 : Int,
-  secondary2 : Int,
-  tertiary : Int,
-) -> Int {
+  main : Int32,
+  secondary1 : Int32,
+  secondary2 : Int32,
+  tertiary : Int32,
+) -> Int32 {
   (9 * main + 3 * secondary1 + 3 * secondary2 + tertiary + 8) / 16
 }
 
@@ -405,13 +405,13 @@ fn get_fancy_chroma_value(
 /// `fill_rgb_buffer_fancy::<bpp>`.
 fn fill_rgb_buffer_fancy(
   buffer : FixedArray[Byte],
-  bpp : Int,
+  bpp : Int32,
   y_buffer : FixedArray[Byte],
   u_buffer : FixedArray[Byte],
   v_buffer : FixedArray[Byte],
-  width : Int,
-  height : Int,
-  buffer_width : Int,
+  width : Int32,
+  height : Int32,
+  buffer_width : Int32,
 ) -> Unit {
   // buffer width is always even so don't need to do div_ceil
   let chroma_buffer_width = buffer_width / 2
@@ -472,7 +472,7 @@ fn fill_rgb_buffer_fancy(
 }
 
 ///|
-fn imin3(a : Int, b : Int, c : Int) -> Int {
+fn imin3(a : Int32, b : Int32, c : Int32) -> Int32 {
   let m = if a < b { a } else { b }
   if m < c {
     m
@@ -485,20 +485,20 @@ fn imin3(a : Int, b : Int, c : Int) -> Int {
 /// Fills a row with the fancy interpolation as detailed.
 fn fill_row_fancy_with_2_uv_rows(
   buf : FixedArray[Byte],
-  row : Int,
-  bpp : Int,
-  width : Int,
+  row : Int32,
+  bpp : Int32,
+  width : Int32,
   y : FixedArray[Byte],
-  yo : Int,
+  yo : Int32,
   u : FixedArray[Byte],
-  u1 : Int,
-  u2 : Int,
+  u1 : Int32,
+  u2 : Int32,
   v : FixedArray[Byte],
-  v1 : Int,
-  v2 : Int,
-  chroma_width : Int,
+  v1 : Int32,
+  v2 : Int32,
+  chroma_width : Int32,
 ) -> Unit {
-  let g = (b : FixedArray[Byte], i : Int) => b[i].to_int()
+  let g = (b : FixedArray[Byte], i : Int32) => b[i].to_int()
   // need to do left pixel separately since it will only have one u/v value
   {
     let u_value = get_fancy_chroma_value(g(u, u1), g(u, u1), g(u, u2), g(u, u2))
@@ -555,18 +555,18 @@ fn fill_row_fancy_with_2_uv_rows(
 ///|
 fn fill_row_fancy_with_1_uv_row(
   buf : FixedArray[Byte],
-  row : Int,
-  bpp : Int,
-  width : Int,
+  row : Int32,
+  bpp : Int32,
+  width : Int32,
   y : FixedArray[Byte],
-  yo : Int,
+  yo : Int32,
   u : FixedArray[Byte],
-  uo : Int,
+  uo : Int32,
   v : FixedArray[Byte],
-  vo : Int,
-  chroma_width : Int,
+  vo : Int32,
+  chroma_width : Int32,
 ) -> Unit {
-  let g = (b : FixedArray[Byte], i : Int) => b[i].to_int()
+  let g = (b : FixedArray[Byte], i : Int32) => b[i].to_int()
   // doing left pixel first
   yuv_set_pixel(buf, row, g(y, yo), g(u, uo), g(v, vo))
   // two pixels at a time since they share the same u/v value

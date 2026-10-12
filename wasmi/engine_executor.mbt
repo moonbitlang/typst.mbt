@@ -210,7 +210,7 @@ priv struct CachedInstance {
   /// The cached bytes of the default linear memory.
   mut memory_data : FixedArray[Byte]
   /// The cached length of the default linear memory.
-  mut memory_len : Int
+  mut memory_len : Int32
   /// The cached global variable at index 0.
   mut global : @wasmi_core.Global
 }

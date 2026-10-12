@@ -20,7 +20,7 @@ fn module_root() -> String? {
 }
 
 ///|
-fn hex(v : UInt) -> String {
+fn hex(v : UInt32) -> String {
   if v == 0 {
     return "0"
   }
@@ -72,8 +72,8 @@ fn bits(v : Array[Float]) -> String {
 }
 
 ///|
-fn grid(domain : Array[Float], n_in : Int) -> Array[Array[Float]] {
-  let dom = fn(i : Int) -> (Float, Float) {
+fn grid(domain : Array[Float], n_in : Int32) -> Array[Array[Float]] {
+  let dom = fn(i : Int32) -> (Float, Float) {
     (domain.get(2 * i).unwrap_or(0.0), domain.get(2 * i + 1).unwrap_or(1.0))
   }
   if n_in == 1 {
@@ -114,7 +114,7 @@ fn dump_function(
   dict : @hayro_syntax.Dict,
 ) -> String {
   let out = StringBuilder()
-  let ft = match (dict.get("FunctionType") : Int?) {
+  let ft = match (dict.get("FunctionType") : Int32?) {
     Some(v) => "Some(\{v})"
     None => "None"
   }
@@ -142,7 +142,7 @@ fn dump_function(
 }
 
 ///|
-fn summary_line(label : String, i : Int, dump : String) -> String {
+fn summary_line(label : String, i : Int32, dump : String) -> String {
   let lines = dump.split("\n").collect()
   let n = lines.length() - 1
   let first = lines[0].to_owned()

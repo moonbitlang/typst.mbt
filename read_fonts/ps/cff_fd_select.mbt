@@ -43,7 +43,7 @@ pub fn FdSelect::read(data : BytesView) -> FdSelect raise PsError {
 
 ///|
 /// Returns the associated font DICT index for the given glyph identifier.
-pub fn FdSelect::font_index(self : FdSelect, glyph_id : GlyphId) -> Int? {
+pub fn FdSelect::font_index(self : FdSelect, glyph_id : GlyphId) -> Int32? {
   let gid = glyph_id.to_u32()
   match self {
     Format0(fds) =>
@@ -54,7 +54,7 @@ pub fn FdSelect::font_index(self : FdSelect, glyph_id : GlyphId) -> Int? {
       }
     Format3(ranges) => {
       let n = ranges.length() / 3
-      let first = fn(i : Int) {
+      let first = fn(i : Int32) {
         ((ranges[i * 3].to_int() << 8) | ranges[i * 3 + 1].to_int()).reinterpret_as_uint()
       }
       let ix = binary_search_ix(n, first, gid)
@@ -66,7 +66,7 @@ pub fn FdSelect::font_index(self : FdSelect, glyph_id : GlyphId) -> Int? {
     }
     Format4(ranges) => {
       let n = ranges.length() / 6
-      let first = fn(i : Int) {
+      let first = fn(i : Int32) {
         let p = i * 6
         ((ranges[p].to_int() << 24) |
         (ranges[p + 1].to_int() << 16) |
@@ -86,7 +86,11 @@ pub fn FdSelect::font_index(self : FdSelect, glyph_id : GlyphId) -> Int? {
 ///|
 /// Rust `slice::binary_search_by(|range| range.first().cmp(&gid))` followed
 /// by `Ok(ix) => ix, Err(ix) => ix.saturating_sub(1)`.
-fn binary_search_ix(n : Int, first : (Int) -> UInt, gid : UInt) -> Int {
+fn binary_search_ix(
+  n : Int32,
+  first : (Int32) -> UInt32,
+  gid : UInt32,
+) -> Int32 {
   // Mirrors the std implementation (which may return any matching index
   // when there are duplicates).
   let mut size = n

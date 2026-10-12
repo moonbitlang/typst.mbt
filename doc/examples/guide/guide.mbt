@@ -346,7 +346,7 @@ pub fn short_row() -> DataTable {
 /// Section 7.2: the looks. A frame with its surface, a size for the text,
 /// a header in small grey capitals, a font for the numbers, and a tint for
 /// the row `marked`.
-pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int) -> Seq {
+pub fn styled_table(rows : Array[Array[&IntoContent]], marked : Int32) -> Seq {
   let head = ["Bed", "Crop", "Harvest (kg)"]
   let fill : Cells[Paint] = Cells((_, y) => {
     // Row 0 is the header, row `i + 1` is `rows[i]`.

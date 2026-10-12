@@ -3,7 +3,7 @@
 
 ///|
 /// Convert a flat `[lo0, hi0, lo1, hi1, ...]` table into ranges.
-fn table_ranges(table : ReadOnlyArray[Int]) -> Array[(Int, Int)] {
+fn table_ranges(table : ReadOnlyArray[Int32]) -> Array[(Int32, Int32)] {
   let out = []
   for i = 0; i + 1 < table.length(); i = i + 2 {
     out.push((table[i], table[i + 1]))
@@ -13,26 +13,26 @@ fn table_ranges(table : ReadOnlyArray[Int]) -> Array[(Int, Int)] {
 
 ///|
 /// The ranges of `\w` (regex-syntax `perl_word`).
-pub fn perl_word_ranges() -> Array[(Int, Int)] {
+pub fn perl_word_ranges() -> Array[(Int32, Int32)] {
   table_ranges(perl_word_table)
 }
 
 ///|
 /// The ranges of `\d` (regex-syntax `perl_digit`, general category Nd).
-pub fn perl_digit_ranges() -> Array[(Int, Int)] {
+pub fn perl_digit_ranges() -> Array[(Int32, Int32)] {
   table_ranges(perl_digit_table)
 }
 
 ///|
 /// The ranges of `\s` (regex-syntax `perl_space`, `White_Space`).
-pub fn perl_space_ranges() -> Array[(Int, Int)] {
+pub fn perl_space_ranges() -> Array[(Int32, Int32)] {
   table_ranges(perl_space_table)
 }
 
 ///|
 /// Whether `c` is a word character as defined by regex-syntax's
 /// `is_word_character` (used for `\b`).
-pub fn is_word_character(c : Int) -> Bool {
+pub fn is_word_character(c : Int32) -> Bool {
   if c < 0x80 {
     (c >= 'a' && c <= 'z') ||
     (c >= 'A' && c <= 'Z') ||
@@ -45,7 +45,7 @@ pub fn is_word_character(c : Int) -> Bool {
 
 ///|
 /// Lexicographic comparison of ASCII strings (Rust `str` ordering).
-fn lex_compare(a : String, b : String) -> Int {
+fn lex_compare(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let o = a.code_unit_at(i).compare(b.code_unit_at(i))
@@ -98,8 +98,8 @@ pub fn canonical_script(normalized : String) -> String? {
 
 ///|
 /// Merge sorted ranges that touch.
-fn merge_ranges(ranges : Array[(Int, Int)]) -> Array[(Int, Int)] {
-  let out : Array[(Int, Int)] = []
+fn merge_ranges(ranges : Array[(Int32, Int32)]) -> Array[(Int32, Int32)] {
+  let out : Array[(Int32, Int32)] = []
   for r in ranges {
     match out.last() {
       Some((a, b)) if b + 1 >= r.0 =>
@@ -114,10 +114,10 @@ fn merge_ranges(ranges : Array[(Int, Int)]) -> Array[(Int, Int)] {
 /// The ranges of a valued table whose value satisfies `pred`; chars missing
 /// from the table have value `default`.
 fn valued_ranges(
-  table : ReadOnlyArray[Int],
-  default : Int,
-  pred : (Int) -> Bool,
-) -> Array[(Int, Int)] {
+  table : ReadOnlyArray[Int32],
+  default : Int32,
+  pred : (Int32) -> Bool,
+) -> Array[(Int32, Int32)] {
   let out = []
   let mut next = 0
   for i = 0; i + 2 < table.length(); i = i + 3 {
@@ -139,8 +139,8 @@ fn valued_ranges(
 ///|
 /// The ranges of a canonical general category (leaf or group), excluding the
 /// special `Any`, `Assigned` and `ASCII`. `None` if there is no data for it.
-pub fn general_category_ranges(canonical : String) -> Array[(Int, Int)]? {
-  let leaves : Array[Int] = []
+pub fn general_category_ranges(canonical : String) -> Array[(Int32, Int32)]? {
+  let leaves : Array[Int32] = []
   for i, name in gc_names[:] {
     if name == canonical {
       leaves.push(i)
@@ -172,7 +172,7 @@ pub fn general_category_ranges(canonical : String) -> Array[(Int, Int)]? {
 
 ///|
 /// The ranges of a canonical script. `None` if there is no data for it.
-pub fn script_ranges(canonical : String) -> Array[(Int, Int)]? {
+pub fn script_ranges(canonical : String) -> Array[(Int32, Int32)]? {
   for i, name in regex_script_names[:] {
     if name == canonical {
       return Some(valued_ranges(regex_script_table, -1, v => v == i))
@@ -184,7 +184,7 @@ pub fn script_ranges(canonical : String) -> Array[(Int, Int)]? {
 ///|
 /// The `Script_Extensions` ranges of a canonical script. `None` if there is
 /// no data for it.
-pub fn script_extension_ranges(canonical : String) -> Array[(Int, Int)]? {
+pub fn script_extension_ranges(canonical : String) -> Array[(Int32, Int32)]? {
   for i, name in regex_script_names[:] {
     if name == canonical {
       let out = []
@@ -202,7 +202,7 @@ pub fn script_extension_ranges(canonical : String) -> Array[(Int, Int)]? {
 ///|
 /// The ranges of a canonical binary property. `None` if there is no data
 /// for it.
-pub fn bool_property_ranges(canonical : String) -> Array[(Int, Int)]? {
+pub fn bool_property_ranges(canonical : String) -> Array[(Int32, Int32)]? {
   for i, name in bool_prop_names[:] {
     if name == canonical {
       let out = []
@@ -218,7 +218,7 @@ pub fn bool_property_ranges(canonical : String) -> Array[(Int, Int)]? {
 ///|
 /// The next character in the simple case folding orbit of `c` (regex-syntax
 /// `SimpleCaseFolder`), or `None` if `c` has no case variants.
-pub fn simple_fold_next(c : Int) -> Int? {
+pub fn simple_fold_next(c : Int32) -> Int32? {
   let n = case_fold_table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -237,7 +237,7 @@ pub fn simple_fold_next(c : Int) -> Int? {
 
 ///|
 /// All characters in `lo..=hi` that have case variants.
-pub fn chars_with_case_variants(lo : Int, hi : Int) -> Array[Int] {
+pub fn chars_with_case_variants(lo : Int32, hi : Int32) -> Array[Int32] {
   let n = case_fold_table.length() / 2
   // First entry >= lo.
   let start = for l = 0, h = n; l < h; {

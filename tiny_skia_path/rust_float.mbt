@@ -67,7 +67,7 @@ fn round_f32(x : Float) -> Float {
 
 ///|
 /// Rust `f32 as u32` (saturating, NaN -> 0).
-fn f32_as_u32(x : Float) -> UInt {
+fn f32_as_u32(x : Float) -> UInt32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 4294967296.0 {
@@ -79,13 +79,13 @@ fn f32_as_u32(x : Float) -> UInt {
 
 ///|
 /// Rust `f32 as i32` (saturating, NaN -> 0).
-fn f32_as_i32(x : Float) -> Int {
+fn f32_as_i32(x : Float) -> Int32 {
   x.to_int()
 }
 
 ///|
 /// Rust `f64 as i32` (saturating, NaN -> 0).
-fn f64_as_i32(x : Double) -> Int {
+fn f64_as_i32(x : Double) -> Int32 {
   if x != x {
     0
   } else if x >= 2147483647.0 {
@@ -99,19 +99,19 @@ fn f64_as_i32(x : Double) -> Int {
 
 ///|
 /// Rust `u32 as f32`.
-fn u32_as_f32(x : UInt) -> Float {
+fn u32_as_f32(x : UInt32) -> Float {
   Float::from_uint(x)
 }
 
 ///|
 /// Rust `i32 as f32`.
-fn i32_as_f32(x : Int) -> Float {
+fn i32_as_f32(x : Int32) -> Float {
   Float::from_int(x)
 }
 
 ///|
 /// Rust `i32::saturating_sub`.
-fn i32_saturating_sub(a : Int, b : Int) -> Int {
+fn i32_saturating_sub(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() - b.to_int64()
   if r > 2147483647L {
     2147483647
@@ -124,7 +124,7 @@ fn i32_saturating_sub(a : Int, b : Int) -> Int {
 
 ///|
 /// Rust `i32::saturating_add`.
-fn i32_saturating_add(a : Int, b : Int) -> Int {
+fn i32_saturating_add(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() + b.to_int64()
   if r > 2147483647L {
     2147483647
@@ -137,7 +137,7 @@ fn i32_saturating_add(a : Int, b : Int) -> Int {
 
 ///|
 /// Rust `i32::checked_add`.
-fn i32_checked_add(a : Int, b : Int) -> Int? {
+fn i32_checked_add(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() + b.to_int64()
   if r > 2147483647L || r < -2147483648L {
     None
@@ -148,7 +148,7 @@ fn i32_checked_add(a : Int, b : Int) -> Int? {
 
 ///|
 /// Rust `i32::checked_sub`.
-fn i32_checked_sub(a : Int, b : Int) -> Int? {
+fn i32_checked_sub(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() - b.to_int64()
   if r > 2147483647L || r < -2147483648L {
     None

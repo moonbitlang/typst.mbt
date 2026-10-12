@@ -129,8 +129,8 @@ fn text_convert(
 
 ///|
 priv struct IterState {
-  mut chars_count : Int
-  mut chunk_bytes_count : Int
+  mut chars_count : Int32
+  mut chunk_bytes_count : Int32
   mut split_chunk : Bool
   mut text_flow : TextFlow
   chunks : Array[TextChunk]
@@ -659,8 +659,8 @@ fn conv_font_stretch(node : SvgNode) -> FontStretch {
 }
 
 ///|
-fn resolve_font_weight(node : SvgNode) -> Int {
-  fn bound(min : Int, val : Int, max : Int) -> Int {
+fn resolve_font_weight(node : SvgNode) -> Int32 {
+  fn bound(min : Int32, val : Int32, max : Int32) -> Int32 {
     if val < min {
       min
     } else if val > max {
@@ -915,7 +915,7 @@ fn convert_baseline_shift(
 }
 
 ///|
-fn count_chars(node : SvgNode) -> Int {
+fn count_chars(node : SvgNode) -> Int32 {
   let mut w = 0
   for n in node.descendants() {
     if n.is_text() {

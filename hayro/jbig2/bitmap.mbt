@@ -9,18 +9,18 @@
 ///|
 // To guard better against malicious files, we limit bitmap dimensions
 // to `u16::MAX`, which should be more than enough.
-const MAX_DIMENSION : UInt = 0xFFFF
+const MAX_DIMENSION : UInt32 = 0xFFFF
 
 // The underlying word type for packed pixel storage is `u32` (`UInt`).
 
 ///|
-const WORD_BITS : UInt = 32
+const WORD_BITS : UInt32 = 32
 
 ///|
-const WORD_BYTES : UInt = 4
+const WORD_BYTES : UInt32 = 4
 
 ///|
-const WORD_SHIFT : UInt = 31
+const WORD_SHIFT : UInt32 = 31
 
 ///|
 /// A decoded bitmap with position information.
@@ -33,20 +33,20 @@ const WORD_SHIFT : UInt = 31
 /// never mutated after it has been stored in a dictionary or region list.)
 priv struct Bitmap {
   /// Width in pixels.
-  mut width : UInt
+  mut width : UInt32
   /// Height in pixels.
-  mut height : UInt
+  mut height : UInt32
   /// Number of words per row.
-  mut stride : UInt
+  mut stride : UInt32
   /// Packed pixel data, one bit per pixel, row-major order.
   /// Each row is padded to a word boundary.
-  mut data : FixedArray[UInt]
+  mut data : FixedArray[UInt32]
   /// "This four-byte field gives the horizontal offset in pixels of the bitmap
   /// encoded in this segment relative to the page bitmap." (7.4.1.3)
-  mut x_location : UInt
+  mut x_location : UInt32
   /// "This four-byte field gives the vertical offset in pixels of the bitmap
   /// encoded in this segment relative to the page bitmap." (7.4.1.4)
-  mut y_location : UInt
+  mut y_location : UInt32
 }
 
 ///|
@@ -58,30 +58,30 @@ fn Bitmap::default() -> Bitmap {
 /// Create a new bitmap filled with white pixels (false).
 ///
 /// The bitmap is positioned at (0, 0).
-fn Bitmap::new(width : UInt, height : UInt) -> Bitmap raise DecodeError {
+fn Bitmap::new(width : UInt32, height : UInt32) -> Bitmap raise DecodeError {
   Bitmap::new_with(width, height, 0, 0, false)
 }
 
 ///|
 /// `width.div_ceil(WORD_BITS)`.
-fn stride_of(width : UInt) -> UInt {
+fn stride_of(width : UInt32) -> UInt32 {
   (width >> 5) + (if (width & 31) != 0 { 1 } else { 0 })
 }
 
 ///|
 /// Create a new bitmap with full configuration.
 fn Bitmap::new_with(
-  width : UInt,
-  height : UInt,
-  x_location : UInt,
-  y_location : UInt,
+  width : UInt32,
+  height : UInt32,
+  x_location : UInt32,
+  y_location : UInt32,
   default_pixel : Bool,
 ) -> Bitmap raise DecodeError {
   if width > MAX_DIMENSION || height > MAX_DIMENSION {
     raise Overflow(BitmapDimension)
   }
   let stride = stride_of(width)
-  let default_word : UInt = if default_pixel { 0xFFFFFFFF } else { 0 }
+  let default_word : UInt32 = if default_pixel { 0xFFFFFFFF } else { 0 }
   let data = FixedArray::make(
     stride.reinterpret_as_int() * height.reinterpret_as_int(),
     default_word,
@@ -92,15 +92,15 @@ fn Bitmap::new_with(
 ///|
 fn Bitmap::reinitialize(
   self : Bitmap,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   default_pixel : Bool,
 ) -> Unit raise DecodeError {
   if width > MAX_DIMENSION || height > MAX_DIMENSION {
     raise Overflow(BitmapDimension)
   }
   let stride = stride_of(width)
-  let default_word : UInt = if default_pixel { 0xFFFFFFFF } else { 0 }
+  let default_word : UInt32 = if default_pixel { 0xFFFFFFFF } else { 0 }
   self.width = width
   self.height = height
   self.stride = stride
@@ -117,7 +117,7 @@ fn Bitmap::reinitialize(
 ///|
 /// Get a pixel value at (x, y).
 #inline
-fn Bitmap::get_pixel(self : Bitmap, x : UInt, y : UInt) -> Int {
+fn Bitmap::get_pixel(self : Bitmap, x : UInt32, y : UInt32) -> Int32 {
   if x >= self.width || y >= self.height {
     return 0
   }
@@ -129,7 +129,12 @@ fn Bitmap::get_pixel(self : Bitmap, x : UInt, y : UInt) -> Int {
 ///|
 /// Set a pixel value at (x, y).
 #inline
-fn Bitmap::set_pixel(self : Bitmap, x : UInt, y : UInt, value : Int) -> Unit {
+fn Bitmap::set_pixel(
+  self : Bitmap,
+  x : UInt32,
+  y : UInt32,
+  value : Int32,
+) -> Unit {
   if x >= self.width || y >= self.height {
     return
   }
@@ -149,8 +154,8 @@ fn Bitmap::set_pixel(self : Bitmap, x : UInt, y : UInt, value : Int) -> Unit {
 fn Bitmap::combine(
   self : Bitmap,
   other : Bitmap,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   operator : CombinationOperator,
 ) -> Unit {
   // TODO: Figure out how we can optimize this, especially since this is a
@@ -190,7 +195,7 @@ fn Bitmap::combine(
       let px_end = if dest_x_end < word_end_x { dest_x_end } else { word_end_x }
       let bit_start = (px_start - word_start_x).reinterpret_as_int()
       let bit_end = px_end - word_start_x
-      let mask : UInt = if bit_end == WORD_BITS {
+      let mask : UInt32 = if bit_end == WORD_BITS {
         0xFFFFFFFFU >> bit_start
       } else {
         (0xFFFFFFFFU >> bit_start) &
@@ -224,7 +229,7 @@ fn Bitmap::combine(
 
 ///|
 #inline
-fn Bitmap::get_word(self : Bitmap, row : UInt, word_idx : UInt) -> UInt {
+fn Bitmap::get_word(self : Bitmap, row : UInt32, word_idx : UInt32) -> UInt32 {
   if row >= self.height || word_idx >= self.stride {
     return 0
   }

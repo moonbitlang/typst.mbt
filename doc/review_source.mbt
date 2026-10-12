@@ -10,8 +10,8 @@
 /// count code points.
 priv struct Cell {
   c : Char
-  line : Int
-  col : Int
+  line : Int32
+  col : Int32
 }
 
 ///|
@@ -20,15 +20,15 @@ priv struct Cell {
 /// escape is several columns wide).
 priv struct LitChar {
   c : Char
-  line : Int
-  col : Int
-  end : Int
+  line : Int32
+  col : Int32
+  end : Int32
   /// A number that grows by one from character to character, white space
   /// between them not counted, and by more where the literal's text does
   /// not simply go on: at a new line of the source, an interpolation, or
   /// the next element of an array. Characters with consecutive numbers are
   /// on one line with at most white space between them.
-  at : Int
+  at : Int32
 }
 
 ///|
@@ -83,20 +83,20 @@ fn source_cells(lines : Array[Array[Char]], origin : Origin) -> Array[Cell]? {
 priv struct LitReader {
   cells : Array[Cell]
   chars : Array[LitChar]
-  mut at : Int
+  mut at : Int32
   mut holes : Bool
   /// How deep the group that is being skipped is nested.
-  mut depth : Int
+  mut depth : Int32
 }
 
 ///|
 /// The deepest nesting of brackets that the reader follows (an argument
 /// that is nested deeper is not read as a literal).
-const GROUP_DEPTH : Int = 64
+const GROUP_DEPTH : Int32 = 64
 
 ///|
 /// The index behind the end of the line that `i` is in.
-fn LitReader::line_end(self : LitReader, i : Int, end : Int) -> Int {
+fn LitReader::line_end(self : LitReader, i : Int32, end : Int32) -> Int32 {
   let mut j = i
   while j < end && self.cells[j].c != '\n' {
     j += 1
@@ -106,7 +106,7 @@ fn LitReader::line_end(self : LitReader, i : Int, end : Int) -> Int {
 
 ///|
 /// The index behind white space and comments from `i`.
-fn LitReader::skip_trivia(self : LitReader, i : Int, end : Int) -> Int {
+fn LitReader::skip_trivia(self : LitReader, i : Int32, end : Int32) -> Int32 {
   let cells = self.cells
   let mut i = i
   while i < end {
@@ -123,7 +123,7 @@ fn LitReader::skip_trivia(self : LitReader, i : Int, end : Int) -> Int {
 
 ///|
 /// Whether a line of a multi-line string (`#|` or `$|`) starts at `i`.
-fn LitReader::multiline_at(self : LitReader, i : Int, end : Int) -> Bool {
+fn LitReader::multiline_at(self : LitReader, i : Int32, end : Int32) -> Bool {
   i + 1 < end &&
   (self.cells[i].c == '#' || self.cells[i].c == '$') &&
   self.cells[i + 1].c == '|'
@@ -133,7 +133,7 @@ fn LitReader::multiline_at(self : LitReader, i : Int, end : Int) -> Bool {
 /// The index behind the bracketed group that starts at `i`, with strings,
 /// character literals, comments and nested groups skipped. `None` if it
 /// does not end before `end`, or is nested too deep.
-fn LitReader::skip_group(self : LitReader, i : Int, end : Int) -> Int? {
+fn LitReader::skip_group(self : LitReader, i : Int32, end : Int32) -> Int32? {
   guard self.depth < GROUP_DEPTH else { return Option::None }
   self.depth += 1
   let after = self.skip_group_at(i, end)
@@ -142,7 +142,7 @@ fn LitReader::skip_group(self : LitReader, i : Int, end : Int) -> Int? {
 }
 
 ///|
-fn LitReader::skip_group_at(self : LitReader, i : Int, end : Int) -> Int? {
+fn LitReader::skip_group_at(self : LitReader, i : Int32, end : Int32) -> Int32? {
   let cells = self.cells
   let close = match cells[i].c {
     '(' => ')'
@@ -186,7 +186,7 @@ fn LitReader::skip_group_at(self : LitReader, i : Int, end : Int) -> Int? {
 
 ///|
 /// The value of a hexadecimal digit.
-fn hex_digit(c : Char) -> Int? {
+fn hex_digit(c : Char) -> Int32? {
   if c >= '0' && c <= '9' {
     Some(c.to_int() - '0'.to_int())
   } else if c >= 'a' && c <= 'f' {
@@ -201,7 +201,11 @@ fn hex_digit(c : Char) -> Int? {
 ///|
 /// Read the escape whose backslash is at `i`: its character and the index
 /// behind it. `None` for an escape that this reader does not know.
-fn LitReader::escape(self : LitReader, i : Int, end : Int) -> (Char, Int)? {
+fn LitReader::escape(
+  self : LitReader,
+  i : Int32,
+  end : Int32,
+) -> (Char, Int32)? {
   let cells = self.cells
   guard i + 1 < end else { return Option::None }
   match cells[i + 1].c {
@@ -239,7 +243,7 @@ fn LitReader::escape(self : LitReader, i : Int, end : Int) -> (Char, Int)? {
         !(code >= 0xD800 && code <= 0xDFFF) else {
         return Option::None
       }
-      Some((Int::unsafe_to_char(code), j))
+      Some((Int32::unsafe_to_char(code), j))
     }
     _ => Option::None
   }
@@ -248,7 +252,7 @@ fn LitReader::escape(self : LitReader, i : Int, end : Int) -> (Char, Int)? {
 ///|
 /// Add a character of the literal's value that the source spells in the
 /// cells `i..j`.
-fn LitReader::push(self : LitReader, c : Char, i : Int, j : Int) -> Unit {
+fn LitReader::push(self : LitReader, c : Char, i : Int32, j : Int32) -> Unit {
   guard !is_blank(c) else { return }
   let cell = self.cells[i]
   self.chars.push({
@@ -275,7 +279,12 @@ fn LitReader::gap(self : LitReader, hole : Bool) -> Unit {
 /// The index behind the string literal whose opening quote is at `i`;
 /// with `keep`, its characters are added. `None` if it does not end, or
 /// has an escape that this reader does not know.
-fn LitReader::string(self : LitReader, i : Int, end : Int, keep : Bool) -> Int? {
+fn LitReader::string(
+  self : LitReader,
+  i : Int32,
+  end : Int32,
+  keep : Bool,
+) -> Int32? {
   let cells = self.cells
   let mut j = i + 1
   while j < end {
@@ -321,7 +330,7 @@ fn LitReader::string(self : LitReader, i : Int, end : Int, keep : Bool) -> Int? 
 /// added. `None` for a `$|` line with a backslash that starts no
 /// interpolation (an escape there is deprecated, and its meaning is not
 /// assumed).
-fn LitReader::multiline(self : LitReader, i : Int, end : Int) -> Int? {
+fn LitReader::multiline(self : LitReader, i : Int32, end : Int32) -> Int32? {
   let cells = self.cells
   let mut i = i
   while self.multiline_at(i, end) {
@@ -355,7 +364,7 @@ fn LitReader::multiline(self : LitReader, i : Int, end : Int) -> Int? {
 /// Read one literal that fills `start..end`, but for white space and
 /// comments behind it: a string or a multi-line string. `false` if the
 /// range is something else (a string with a method call, say).
-fn LitReader::literal(self : LitReader, start : Int, end : Int) -> Bool {
+fn LitReader::literal(self : LitReader, start : Int32, end : Int32) -> Bool {
   let before = self.chars.length()
   let holes = self.holes
   let read = if start < end && self.cells[start].c == '"' {
@@ -380,7 +389,11 @@ fn LitReader::literal(self : LitReader, start : Int, end : Int) -> Bool {
 ///|
 /// The range without the white space and comments around it and without
 /// parentheses that enclose all of it.
-fn LitReader::strip(self : LitReader, start : Int, end : Int) -> (Int, Int) {
+fn LitReader::strip(
+  self : LitReader,
+  start : Int32,
+  end : Int32,
+) -> (Int32, Int32) {
   let cells = self.cells
   let mut start = self.skip_trivia(start, end)
   let mut end = end
@@ -413,7 +426,7 @@ fn arg_shape(cells : Array[Cell]) -> ArgShape {
     // The elements, between the commas of the array itself.
     let mut from = start + 1
     let mut j = start + 1
-    let element = (from : Int, to : Int) => {
+    let element = (from : Int32, to : Int32) => {
       let (a, b) = reader.strip(from, to)
       if a < b && !reader.literal(a, b) {
         reader.holes = true

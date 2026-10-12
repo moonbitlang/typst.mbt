@@ -267,7 +267,7 @@ test "works: generated once for all the calls of an iteration that cite" {
 
 ///|
 /// An opaque PNG of one colour.
-fn outside_png(r : Int, g : Int, b : Int) -> Bytes {
+fn outside_png(r : Int32, g : Int32, b : Int32) -> Bytes {
   let pixels = Bytes::makei(4 * 4 * 3, i => {
     match i % 3 {
       0 => r.to_byte()
@@ -329,7 +329,7 @@ test "svg: a tiling of an SVG is as good as the images the SVG links" {
   // memoized closure call, for one) reads no file, so the tiling itself
   // must tell the two apart: its fingerprint, which is in keys, and its
   // equality, by which arguments are compared.
-  let made = (r : Int, b : Int) => {
+  let made = (r : Int32, b : Int32) => {
     let world = reading_world(
       "#let t = tiling(size: (20pt, 20pt), image(\"art.svg\", width: 20pt))\n#metadata(t)",
     )

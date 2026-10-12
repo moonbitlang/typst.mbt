@@ -20,7 +20,7 @@ fn module_root() -> String? {
 }
 
 ///|
-fn hex(v : UInt) -> String {
+fn hex(v : UInt32) -> String {
   if v == 0 {
     return "0"
   }
@@ -81,7 +81,7 @@ struct Lcg {
 }
 
 ///|
-fn Lcg::next(self : Lcg) -> UInt {
+fn Lcg::next(self : Lcg) -> UInt32 {
   self.state = self.state * 6364136223846793005UL + 1442695040888963407UL
   (self.state >> 32).to_uint()
 }
@@ -172,7 +172,7 @@ fn dump_cmap(data : BytesView) -> String {
 }
 
 ///|
-fn summary_line(label : String, i : Int, dump : String) -> String {
+fn summary_line(label : String, i : Int32, dump : String) -> String {
   let lines = dump.split("\n").collect()
   let n = lines.length() - 1
   let first = lines[0].to_owned()

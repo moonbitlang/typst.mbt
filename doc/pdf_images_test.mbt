@@ -17,7 +17,7 @@ fn pdf_images(pdf : Bytes) -> Array[String] {
     guard dict.find(key) is Some(at) else { return "?" }
     let digits = StringBuilder()
     for c in dict[at + key.length():] {
-      guard c is ('0'..='9') else { break }
+      guard c is ('0'..<='9') else { break }
       digits.write_char(c)
     }
     digits.to_string()

@@ -2,30 +2,40 @@
 
 ///|
 priv struct IntRect {
-  x0 : UInt
-  y0 : UInt
-  x1 : UInt
-  y1 : UInt
+  x0 : UInt32
+  y0 : UInt32
+  x1 : UInt32
+  y1 : UInt32
 }
 
 ///|
-fn IntRect::from_ltrb(x0 : UInt, y0 : UInt, x1 : UInt, y1 : UInt) -> IntRect {
+fn IntRect::from_ltrb(
+  x0 : UInt32,
+  y0 : UInt32,
+  x1 : UInt32,
+  y1 : UInt32,
+) -> IntRect {
   { x0, y0, x1, y1, }
 }
 
 ///|
-fn IntRect::from_xywh(x : UInt, y : UInt, w : UInt, h : UInt) -> IntRect {
+fn IntRect::from_xywh(
+  x : UInt32,
+  y : UInt32,
+  w : UInt32,
+  h : UInt32,
+) -> IntRect {
   { x0: x, y0: y, x1: x + w, y1: y + h, }
 }
 
 ///|
-fn IntRect::width(self : IntRect) -> UInt {
+fn IntRect::width(self : IntRect) -> UInt32 {
   // See B-11.
   self.x1 - self.x0
 }
 
 ///|
-fn IntRect::height(self : IntRect) -> UInt {
+fn IntRect::height(self : IntRect) -> UInt32 {
   // See B-11.
   self.y1 - self.y0
 }

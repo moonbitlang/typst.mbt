@@ -567,7 +567,7 @@ fn impl_calc_round(
 ///|
 /// Port of `typst_utils::round_int_with_precision`: rounds an integer to the
 /// given number of (negative) digits. Returns `None` on overflow.
-pub fn round_int_with_precision(value : Int64, precision : Int) -> Int64? {
+pub fn round_int_with_precision(value : Int64, precision : Int32) -> Int64? {
   if precision >= 0 {
     return Some(value)
   }
@@ -682,7 +682,7 @@ fn impl_calc_max(
 fn minmax(
   span : @syntax.Span,
   values : Array[@syntax.Spanned[Value]],
-  goal : Int,
+  goal : Int32,
 ) -> Value raise SourceError {
   if values.is_empty() {
     bail_at(span, "expected at least one value")
@@ -1163,7 +1163,7 @@ fn is_normal(f : Double) -> Bool {
 
 ///|
 /// Rust's `i64::saturating_as::<i16>()`.
-fn saturate_i16(i : Int64) -> Int {
+fn saturate_i16(i : Int64) -> Int32 {
   if i > 32767L {
     32767
   } else if i < -32768L {

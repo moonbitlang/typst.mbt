@@ -24,7 +24,7 @@ fn fit_to_rect(r : @path.IntRect, bounds : @path.IntRect) -> @path.IntRect? {
 
 ///|
 /// `i32::checked_sub`.
-fn checked_sub_i32(a : Int, b : Int) -> Int? {
+fn checked_sub_i32(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() - b.to_int64()
   if r < -2147483648L || r > 2147483647L {
     None
@@ -35,7 +35,7 @@ fn checked_sub_i32(a : Int, b : Int) -> Int? {
 
 ///|
 /// `u32::checked_add`.
-fn checked_add_u32(a : UInt, b : UInt) -> UInt? {
+fn checked_add_u32(a : UInt32, b : UInt32) -> UInt32? {
   let r = a.to_uint64() + b.to_uint64()
   if r > 0xFFFFFFFFUL {
     None
@@ -46,13 +46,13 @@ fn checked_add_u32(a : UInt, b : UInt) -> UInt? {
 
 ///|
 /// `x as u8` for an `f32` (saturating, NaN maps to 0).
-fn f32_to_u8(x : Float) -> Int {
+fn f32_to_u8(x : Float) -> Int32 {
   @skia.f32_to_u8(x)
 }
 
 ///|
 /// `x as u8` for an `f64` (saturating, NaN maps to 0).
-fn f64_to_u8(x : Double) -> Int {
+fn f64_to_u8(x : Double) -> Int32 {
   if x != x {
     0
   } else if x >= 255.0 {
@@ -66,7 +66,7 @@ fn f64_to_u8(x : Double) -> Int {
 
 ///|
 /// `x as i32` for an `f64` (saturating, NaN maps to 0).
-fn f64_to_i32(x : Double) -> Int {
+fn f64_to_i32(x : Double) -> Int32 {
   if x != x {
     0
   } else if x >= 2147483647.0 {
@@ -94,22 +94,22 @@ fn f64_to_i64(x : Double) -> Int64 {
 
 ///|
 /// `x as i32` for an `f32` (saturating, NaN maps to 0).
-fn f32_to_i32(x : Float) -> Int {
+fn f32_to_i32(x : Float) -> Int32 {
   f64_to_i32(x.to_double())
 }
 
 ///|
 /// `x as u32` for an `f32` (saturating, NaN maps to 0).
-fn f32_to_u32(x : Float) -> UInt {
+fn f32_to_u32(x : Float) -> UInt32 {
   @skia.f32_to_u32(x)
 }
 
 ///|
-fn i32_to_f32(x : Int) -> Float {
+fn i32_to_f32(x : Int32) -> Float {
   Float::from_int(x)
 }
 
 ///|
-fn u32_to_f32(x : UInt) -> Float {
+fn u32_to_f32(x : UInt32) -> Float {
   @skia.u32_to_f32(x)
 }

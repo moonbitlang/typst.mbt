@@ -106,7 +106,7 @@ pub fn Escape::get(self : Escape) -> Char {
 }
 
 ///|
-fn is_ascii_hexdigit(c : Int) -> Bool {
+fn is_ascii_hexdigit(c : Int32) -> Bool {
   (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
 }
 
@@ -236,7 +236,7 @@ pub fn Heading::body(self : Heading) -> Markup {
 
 ///|
 /// The section depth (number of equals signs).
-pub fn Heading::depth(self : Heading) -> Int {
+pub fn Heading::depth(self : Heading) -> Int32 {
   for node in self.node.children() {
     if node.kind() is HeadingMarker {
       return if node.len() > 0 { node.len() } else { 1 }

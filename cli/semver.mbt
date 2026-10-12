@@ -10,7 +10,7 @@ fn parse_semver(v : String) -> Unit raise CliError {
 
 ///|
 /// The semver crate's `Position` display names.
-fn semver_position(pos : Int) -> String {
+fn semver_position(pos : Int32) -> String {
   match pos {
     0 => "major version number"
     1 => "minor version number"
@@ -42,7 +42,7 @@ fn parse_semver_version(text : String) -> Unit raise @kit.StrError {
   }
   let chars = text.to_array()
   let mut i = 0
-  let numeric = (pos : Int) => {
+  let numeric = (pos : Int32) => {
     let start = i
     let mut value = 0UL
     while i < chars.length() && chars[i] >= '0' && chars[i] <= '9' {
@@ -67,7 +67,7 @@ fn parse_semver_version(text : String) -> Unit raise @kit.StrError {
       )
     }
   }
-  let dot = (pos : Int) => {
+  let dot = (pos : Int32) => {
     if i < chars.length() && chars[i] == '.' {
       i += 1
     } else if i < chars.length() {
@@ -81,7 +81,7 @@ fn parse_semver_version(text : String) -> Unit raise @kit.StrError {
     }
   }
   // `identifier`: returns whether it is empty.
-  let identifier = (pos : Int) => {
+  let identifier = (pos : Int32) => {
     let begin = i
     let mut segment_start = i
     let mut has_nondigit = false

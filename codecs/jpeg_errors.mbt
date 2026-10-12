@@ -8,7 +8,7 @@
 /// ZByteIoError`).
 pub(all) enum ZByteIoError {
   /// Not enough bytes to satisfy a read: (read, requested).
-  NotEnoughBytes(Int, Int)
+  NotEnoughBytes(Int32, Int32)
   /// A standard library error.
   StdIoError(String)
   /// An error that may occur randomly.
@@ -35,7 +35,7 @@ pub suberror DecodeErrors {
   /// the heap.
   FormatStatic(String)
   /// Illegal magic bytes.
-  IllegalMagicBytes(Int)
+  IllegalMagicBytes(Int32)
   /// Problems with the Huffman tables in a JPEG file.
   HuffmanDecode(String)
   /// Image has zero width.
@@ -49,7 +49,7 @@ pub suberror DecodeErrors {
   /// Exhausted data.
   ExhaustedData
   /// Too small output for size.
-  TooSmallOutput(Int, Int)
+  TooSmallOutput(Int32, Int32)
   IoErrors(ZByteIoError)
   /// Not upstream: a condition where upstream panics (e.g. an out of bounds
   /// slice index on corrupt input).
@@ -106,7 +106,7 @@ fn rust_debug_str(s : String) -> String {
 /// `skip`; reads past the end then return no bytes.
 priv struct ZReader {
   data : BytesView
-  mut position : Int
+  mut position : Int32
 }
 
 ///|
@@ -116,7 +116,7 @@ fn ZReader::new(data : BytesView) -> ZReader {
 
 ///|
 /// The number of bytes a read of `n` bytes can return.
-fn ZReader::available(self : ZReader, n : Int) -> Int {
+fn ZReader::available(self : ZReader, n : Int32) -> Int32 {
   let rem = self.data.length() - self.position
   if rem <= 0 {
     0
@@ -129,7 +129,7 @@ fn ZReader::available(self : ZReader, n : Int) -> Int {
 
 ///|
 /// Read a single byte, returning 0 if there is none.
-fn ZReader::read_u8(self : ZReader) -> Int {
+fn ZReader::read_u8(self : ZReader) -> Int32 {
   if self.position >= 0 && self.position < self.data.length() {
     let b = self.data[self.position].to_int()
     self.position += 1
@@ -144,7 +144,7 @@ fn ZReader::read_u8(self : ZReader) -> Int {
 /// position is unchanged.
 fn ZReader::read_exact_bytes(
   self : ZReader,
-  n : Int,
+  n : Int32,
 ) -> BytesView raise DecodeErrors {
   let got = self.available(n)
   if got < n {
@@ -157,14 +157,14 @@ fn ZReader::read_exact_bytes(
 
 ///|
 /// Read a single byte returning an error if the read cannot be satisfied.
-fn ZReader::read_u8_err(self : ZReader) -> Int raise DecodeErrors {
+fn ZReader::read_u8_err(self : ZReader) -> Int32 raise DecodeErrors {
   self.read_exact_bytes(1)[0].to_int()
 }
 
 ///|
 /// Read a big endian `u16`, returning an error if there are not enough
 /// bytes.
-fn ZReader::get_u16_be_err(self : ZReader) -> Int raise DecodeErrors {
+fn ZReader::get_u16_be_err(self : ZReader) -> Int32 raise DecodeErrors {
   let v = self.read_exact_bytes(2)
   (v[0].to_int() << 8) | v[1].to_int()
 }
@@ -172,7 +172,7 @@ fn ZReader::get_u16_be_err(self : ZReader) -> Int raise DecodeErrors {
 ///|
 /// Read a big endian `u16`; missing bytes read as zero (upstream
 /// `get_u16_be`, which reads as many bytes as are available).
-fn ZReader::get_u16_be(self : ZReader) -> Int {
+fn ZReader::get_u16_be(self : ZReader) -> Int32 {
   let got = self.available(2)
   let mut v = 0
   for i in 0..<2 {
@@ -187,13 +187,13 @@ fn ZReader::get_u16_be(self : ZReader) -> Int {
 
 ///|
 /// Skip ahead `num` bytes. This never fails.
-fn ZReader::skip(self : ZReader, num : Int) -> Unit {
+fn ZReader::skip(self : ZReader, num : Int32) -> Unit {
   self.position += num
 }
 
 ///|
 /// Move back `num` bytes.
-fn ZReader::rewind(self : ZReader, num : Int) -> Unit raise DecodeErrors {
+fn ZReader::rewind(self : ZReader, num : Int32) -> Unit raise DecodeErrors {
   if self.position - num < 0 {
     raise IoErrors(StdIoError("Negative seek"))
   }
@@ -205,8 +205,8 @@ fn ZReader::rewind(self : ZReader, num : Int) -> Unit raise DecodeErrors {
 /// advancing.
 fn ZReader::peek_at(
   self : ZReader,
-  position : Int,
-  num_bytes : Int,
+  position : Int32,
+  num_bytes : Int32,
 ) -> BytesView raise DecodeErrors {
   if position != 0 {
     self.skip(position)

@@ -8,7 +8,7 @@
 ///|
 fn OperatorValidatorTemp::visit_struct_new(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
+  _struct_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_new")
 }
@@ -16,7 +16,7 @@ fn OperatorValidatorTemp::visit_struct_new(
 ///|
 fn OperatorValidatorTemp::visit_struct_new_default(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
+  _struct_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_new_default")
 }
@@ -24,8 +24,8 @@ fn OperatorValidatorTemp::visit_struct_new_default(
 ///|
 fn OperatorValidatorTemp::visit_struct_get(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_get")
 }
@@ -33,8 +33,8 @@ fn OperatorValidatorTemp::visit_struct_get(
 ///|
 fn OperatorValidatorTemp::visit_struct_get_s(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_get_s")
 }
@@ -42,8 +42,8 @@ fn OperatorValidatorTemp::visit_struct_get_s(
 ///|
 fn OperatorValidatorTemp::visit_struct_get_u(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_get_u")
 }
@@ -51,8 +51,8 @@ fn OperatorValidatorTemp::visit_struct_get_u(
 ///|
 fn OperatorValidatorTemp::visit_struct_set(
   self : OperatorValidatorTemp,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_set")
 }
@@ -60,7 +60,7 @@ fn OperatorValidatorTemp::visit_struct_set(
 ///|
 fn OperatorValidatorTemp::visit_array_new(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_new")
 }
@@ -68,7 +68,7 @@ fn OperatorValidatorTemp::visit_array_new(
 ///|
 fn OperatorValidatorTemp::visit_array_new_default(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_new_default")
 }
@@ -76,8 +76,8 @@ fn OperatorValidatorTemp::visit_array_new_default(
 ///|
 fn OperatorValidatorTemp::visit_array_new_fixed(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
-  _array_size : UInt,
+  _array_type_index : UInt32,
+  _array_size : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_new_fixed")
 }
@@ -85,8 +85,8 @@ fn OperatorValidatorTemp::visit_array_new_fixed(
 ///|
 fn OperatorValidatorTemp::visit_array_new_data(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
-  _array_data_index : UInt,
+  _array_type_index : UInt32,
+  _array_data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_new_data")
 }
@@ -94,8 +94,8 @@ fn OperatorValidatorTemp::visit_array_new_data(
 ///|
 fn OperatorValidatorTemp::visit_array_new_elem(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
-  _array_elem_index : UInt,
+  _array_type_index : UInt32,
+  _array_elem_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_new_elem")
 }
@@ -103,7 +103,7 @@ fn OperatorValidatorTemp::visit_array_new_elem(
 ///|
 fn OperatorValidatorTemp::visit_array_get(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_get")
 }
@@ -111,7 +111,7 @@ fn OperatorValidatorTemp::visit_array_get(
 ///|
 fn OperatorValidatorTemp::visit_array_get_s(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_get_s")
 }
@@ -119,7 +119,7 @@ fn OperatorValidatorTemp::visit_array_get_s(
 ///|
 fn OperatorValidatorTemp::visit_array_get_u(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_get_u")
 }
@@ -127,7 +127,7 @@ fn OperatorValidatorTemp::visit_array_get_u(
 ///|
 fn OperatorValidatorTemp::visit_array_set(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_set")
 }
@@ -142,7 +142,7 @@ fn OperatorValidatorTemp::visit_array_len(
 ///|
 fn OperatorValidatorTemp::visit_array_fill(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_fill")
 }
@@ -150,8 +150,8 @@ fn OperatorValidatorTemp::visit_array_fill(
 ///|
 fn OperatorValidatorTemp::visit_array_copy(
   self : OperatorValidatorTemp,
-  _array_type_index_dst : UInt,
-  _array_type_index_src : UInt,
+  _array_type_index_dst : UInt32,
+  _array_type_index_src : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_copy")
 }
@@ -159,8 +159,8 @@ fn OperatorValidatorTemp::visit_array_copy(
 ///|
 fn OperatorValidatorTemp::visit_array_init_data(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
-  _array_data_index : UInt,
+  _array_type_index : UInt32,
+  _array_data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_init_data")
 }
@@ -168,8 +168,8 @@ fn OperatorValidatorTemp::visit_array_init_data(
 ///|
 fn OperatorValidatorTemp::visit_array_init_elem(
   self : OperatorValidatorTemp,
-  _array_type_index : UInt,
-  _array_elem_index : UInt,
+  _array_type_index : UInt32,
+  _array_elem_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_init_elem")
 }
@@ -209,7 +209,7 @@ fn OperatorValidatorTemp::visit_ref_cast_nullable(
 ///|
 fn OperatorValidatorTemp::visit_br_on_cast(
   self : OperatorValidatorTemp,
-  _relative_depth : UInt,
+  _relative_depth : UInt32,
   _from_ref_type : RefType,
   _to_ref_type : RefType,
 ) -> Unit raise BinaryReaderError {
@@ -219,7 +219,7 @@ fn OperatorValidatorTemp::visit_br_on_cast(
 ///|
 fn OperatorValidatorTemp::visit_br_on_cast_fail(
   self : OperatorValidatorTemp,
-  _relative_depth : UInt,
+  _relative_depth : UInt32,
   _from_ref_type : RefType,
   _to_ref_type : RefType,
 ) -> Unit raise BinaryReaderError {
@@ -272,7 +272,7 @@ fn OperatorValidatorTemp::visit_try(
 ///|
 fn OperatorValidatorTemp::visit_catch(
   self : OperatorValidatorTemp,
-  _tag_index : UInt,
+  _tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_catch")
 }
@@ -280,7 +280,7 @@ fn OperatorValidatorTemp::visit_catch(
 ///|
 fn OperatorValidatorTemp::visit_rethrow(
   self : OperatorValidatorTemp,
-  _relative_depth : UInt,
+  _relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_rethrow")
 }
@@ -288,7 +288,7 @@ fn OperatorValidatorTemp::visit_rethrow(
 ///|
 fn OperatorValidatorTemp::visit_delegate(
   self : OperatorValidatorTemp,
-  _relative_depth : UInt,
+  _relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_delegate")
 }
@@ -304,7 +304,7 @@ fn OperatorValidatorTemp::visit_catch_all(
 fn OperatorValidatorTemp::visit_global_atomic_get(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_get")
 }
@@ -313,7 +313,7 @@ fn OperatorValidatorTemp::visit_global_atomic_get(
 fn OperatorValidatorTemp::visit_global_atomic_set(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_set")
 }
@@ -322,7 +322,7 @@ fn OperatorValidatorTemp::visit_global_atomic_set(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_add(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_add")
 }
@@ -331,7 +331,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_add(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_sub(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_sub")
 }
@@ -340,7 +340,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_sub(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_and(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_and")
 }
@@ -349,7 +349,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_and(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_or(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_or")
 }
@@ -358,7 +358,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_or(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_xor(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_xor")
 }
@@ -367,7 +367,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_xor(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_xchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_xchg")
 }
@@ -376,7 +376,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_xchg(
 fn OperatorValidatorTemp::visit_global_atomic_rmw_cmpxchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _global_index : UInt,
+  _global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_global_atomic_rmw_cmpxchg")
 }
@@ -385,7 +385,7 @@ fn OperatorValidatorTemp::visit_global_atomic_rmw_cmpxchg(
 fn OperatorValidatorTemp::visit_table_atomic_get(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _table_index : UInt,
+  _table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_table_atomic_get")
 }
@@ -394,7 +394,7 @@ fn OperatorValidatorTemp::visit_table_atomic_get(
 fn OperatorValidatorTemp::visit_table_atomic_set(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _table_index : UInt,
+  _table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_table_atomic_set")
 }
@@ -403,7 +403,7 @@ fn OperatorValidatorTemp::visit_table_atomic_set(
 fn OperatorValidatorTemp::visit_table_atomic_rmw_xchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _table_index : UInt,
+  _table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_table_atomic_rmw_xchg")
 }
@@ -412,7 +412,7 @@ fn OperatorValidatorTemp::visit_table_atomic_rmw_xchg(
 fn OperatorValidatorTemp::visit_table_atomic_rmw_cmpxchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _table_index : UInt,
+  _table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_table_atomic_rmw_cmpxchg")
 }
@@ -421,8 +421,8 @@ fn OperatorValidatorTemp::visit_table_atomic_rmw_cmpxchg(
 fn OperatorValidatorTemp::visit_struct_atomic_get(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_get")
 }
@@ -431,8 +431,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_get(
 fn OperatorValidatorTemp::visit_struct_atomic_get_s(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_get_s")
 }
@@ -441,8 +441,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_get_s(
 fn OperatorValidatorTemp::visit_struct_atomic_get_u(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_get_u")
 }
@@ -451,8 +451,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_get_u(
 fn OperatorValidatorTemp::visit_struct_atomic_set(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_set")
 }
@@ -461,8 +461,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_set(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_add(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_add")
 }
@@ -471,8 +471,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_add(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_sub(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_sub")
 }
@@ -481,8 +481,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_sub(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_and(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_and")
 }
@@ -491,8 +491,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_and(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_or(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_or")
 }
@@ -501,8 +501,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_or(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_xor(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_xor")
 }
@@ -511,8 +511,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_xor(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_xchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_xchg")
 }
@@ -521,8 +521,8 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_xchg(
 fn OperatorValidatorTemp::visit_struct_atomic_rmw_cmpxchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _struct_type_index : UInt,
-  _field_index : UInt,
+  _struct_type_index : UInt32,
+  _field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_struct_atomic_rmw_cmpxchg")
 }
@@ -531,7 +531,7 @@ fn OperatorValidatorTemp::visit_struct_atomic_rmw_cmpxchg(
 fn OperatorValidatorTemp::visit_array_atomic_get(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_get")
 }
@@ -540,7 +540,7 @@ fn OperatorValidatorTemp::visit_array_atomic_get(
 fn OperatorValidatorTemp::visit_array_atomic_get_s(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_get_s")
 }
@@ -549,7 +549,7 @@ fn OperatorValidatorTemp::visit_array_atomic_get_s(
 fn OperatorValidatorTemp::visit_array_atomic_get_u(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_get_u")
 }
@@ -558,7 +558,7 @@ fn OperatorValidatorTemp::visit_array_atomic_get_u(
 fn OperatorValidatorTemp::visit_array_atomic_set(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_set")
 }
@@ -567,7 +567,7 @@ fn OperatorValidatorTemp::visit_array_atomic_set(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_add(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_add")
 }
@@ -576,7 +576,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_add(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_sub(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_sub")
 }
@@ -585,7 +585,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_sub(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_and(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_and")
 }
@@ -594,7 +594,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_and(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_or(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_or")
 }
@@ -603,7 +603,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_or(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_xor(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_xor")
 }
@@ -612,7 +612,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_xor(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_xchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_xchg")
 }
@@ -621,7 +621,7 @@ fn OperatorValidatorTemp::visit_array_atomic_rmw_xchg(
 fn OperatorValidatorTemp::visit_array_atomic_rmw_cmpxchg(
   self : OperatorValidatorTemp,
   _ordering : Ordering,
-  _array_type_index : UInt,
+  _array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_array_atomic_rmw_cmpxchg")
 }
@@ -636,7 +636,7 @@ fn OperatorValidatorTemp::visit_ref_i31_shared(
 ///|
 fn OperatorValidatorTemp::visit_cont_new(
   self : OperatorValidatorTemp,
-  _cont_type_index : UInt,
+  _cont_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_cont_new")
 }
@@ -644,8 +644,8 @@ fn OperatorValidatorTemp::visit_cont_new(
 ///|
 fn OperatorValidatorTemp::visit_cont_bind(
   self : OperatorValidatorTemp,
-  _argument_index : UInt,
-  _result_index : UInt,
+  _argument_index : UInt32,
+  _result_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_cont_bind")
 }
@@ -653,7 +653,7 @@ fn OperatorValidatorTemp::visit_cont_bind(
 ///|
 fn OperatorValidatorTemp::visit_suspend(
   self : OperatorValidatorTemp,
-  _tag_index : UInt,
+  _tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_suspend")
 }
@@ -661,7 +661,7 @@ fn OperatorValidatorTemp::visit_suspend(
 ///|
 fn OperatorValidatorTemp::visit_resume(
   self : OperatorValidatorTemp,
-  _cont_type_index : UInt,
+  _cont_type_index : UInt32,
   _resume_table : ResumeTable,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_resume")
@@ -670,8 +670,8 @@ fn OperatorValidatorTemp::visit_resume(
 ///|
 fn OperatorValidatorTemp::visit_resume_throw(
   self : OperatorValidatorTemp,
-  _cont_type_index : UInt,
-  _tag_index : UInt,
+  _cont_type_index : UInt32,
+  _tag_index : UInt32,
   _resume_table : ResumeTable,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_resume_throw")
@@ -680,8 +680,8 @@ fn OperatorValidatorTemp::visit_resume_throw(
 ///|
 fn OperatorValidatorTemp::visit_switch(
   self : OperatorValidatorTemp,
-  _cont_type_index : UInt,
-  _tag_index : UInt,
+  _cont_type_index : UInt32,
+  _tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   raise self.not_ported("visit_switch")
 }

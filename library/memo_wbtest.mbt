@@ -13,7 +13,7 @@ fn test_gradient(stop : Double) -> Value {
 
 ///|
 /// A value whose fingerprint does not capture its data (only its parity).
-priv struct LossyValue(Int)
+priv struct LossyValue(Int32)
 
 ///|
 impl Fingerprint for LossyValue with fn fingerprint(self, state) {

@@ -154,12 +154,12 @@ pub fn Matrix3f::identity() -> Matrix3f {
 }
 
 ///|
-fn Matrix3d::at(self : Matrix3d, row : Int, col : Int) -> Double {
+fn Matrix3d::at(self : Matrix3d, row : Int32, col : Int32) -> Double {
   self.v[3 * row + col]
 }
 
 ///|
-fn Matrix3f::at(self : Matrix3f, row : Int, col : Int) -> Float {
+fn Matrix3f::at(self : Matrix3f, row : Int32, col : Int32) -> Float {
   self.v[3 * row + col]
 }
 
@@ -187,7 +187,7 @@ fn Matrix3f::test_equality(self : Matrix3f, other : Matrix3f) -> Bool {
 
 ///|
 fn Matrix3d::determinant(self : Matrix3d) -> Double? {
-  let v = (r : Int, c : Int) => self.at(r, c)
+  let v = (r : Int32, c : Int32) => self.at(r, c)
   let a0 = v(0, 0) * v(1, 1) * v(2, 2)
   let a1 = v(0, 1) * v(1, 2) * v(2, 0)
   let a2 = v(0, 2) * v(1, 0) * v(2, 1)

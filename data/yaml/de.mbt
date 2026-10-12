@@ -6,7 +6,7 @@
 ///|
 /// `serde_yaml::de::Event`.
 priv enum DeEvent {
-  DAlias(Int)
+  DAlias(Int32)
   DScalar(tag~ : Bytes?, value~ : Bytes, style~ : ScalarStyle)
   DSequenceStart(Bytes?)
   DSequenceEnd
@@ -21,14 +21,14 @@ priv struct Document {
   events : Array[(DeEvent, Mark)]
   mut error : ErrorImpl?
   /// Map from alias id to index in events.
-  aliases : Map[Int, Int]
+  aliases : Map[Int32, Int32]
 }
 
 ///|
 /// `serde_yaml::loader::Loader`.
 priv struct Loader {
   mut parser : Parser?
-  mut document_count : Int
+  mut document_count : Int32
 }
 
 ///|
@@ -37,7 +37,7 @@ fn Loader::next_document(self : Loader) -> Document? {
   guard self.parser is Some(parser) else { return None }
   let first = self.document_count == 0
   self.document_count += 1
-  let anchors : Map[Bytes, Int] = Map([])
+  let anchors : Map[Bytes, Int32] = Map([])
   let document : Document = { events: [], error: None, aliases: {}, }
   let register = (anchor : Bytes?) => {
     if anchor is Some(anchor) {
@@ -102,7 +102,7 @@ fn Loader::next_document(self : Loader) -> Document? {
 /// `serde_yaml::path::Path`.
 priv enum Path {
   Root
-  Seq(Path, Int)
+  Seq(Path, Int32)
   MapKey(Path, String)
   Alias(Path)
   Unknown(Path)
@@ -134,10 +134,10 @@ fn Path::to_string(self : Path) -> String {
 /// for Typst, whose visitor rejects enums).
 priv struct De {
   document : Document
-  pos : Ref[Int]
-  jumpcount : Ref[Int]
+  pos : Ref[Int32]
+  jumpcount : Ref[Int32]
   path : Path
-  mut remaining_depth : Int
+  mut remaining_depth : Int32
 }
 
 ///|
@@ -163,7 +163,7 @@ fn De::next_event_mark(self : De) -> (DeEvent, Mark) raise YError {
 
 ///|
 /// `DeserializerFromEvents::jump`.
-fn De::jump(self : De, id : Int) -> De raise YError {
+fn De::jump(self : De, id : Int32) -> De raise YError {
   self.jumpcount.val += 1
   if self.jumpcount.val > self.document.events.length() * 100 {
     raise YError(RepetitionLimitExceeded)
@@ -299,7 +299,7 @@ fn De::deserialize_str_event(self : De, next : DeEvent) -> String raise YError {
 
 ///|
 /// `DeserializerFromEvents::recursion_check` (entry part).
-fn De::enter(self : De, mark : Mark) -> Int raise YError {
+fn De::enter(self : De, mark : Mark) -> Int32 raise YError {
   let previous_depth = self.remaining_depth
   if previous_depth == 0 {
     raise YError(RecursionLimitExceeded(mark))
@@ -452,7 +452,7 @@ fn starts_with_sign(s : String) -> Bool {
 /// `serde_yaml::de::parse_unsigned_int`, generic over the radix parser.
 fn[T] parse_unsigned_int(
   scalar : String,
-  from_str_radix : (String, Int) -> T?,
+  from_str_radix : (String, Int32) -> T?,
 ) -> T? {
   let unpositive = strip_prefix(scalar, "+").unwrap_or(scalar)
   for prefix_radix in [("0x", 16), ("0o", 8), ("0b", 2)] {
@@ -479,7 +479,7 @@ fn[T] parse_unsigned_int(
 /// `serde_yaml::de::parse_negative_int`, generic over the radix parser.
 fn[T] parse_negative_int(
   scalar : String,
-  from_str_radix : (String, Int) -> T?,
+  from_str_radix : (String, Int32) -> T?,
 ) -> T? {
   for prefix_radix in [("-0x", 16), ("-0o", 8), ("-0b", 2)] {
     let (prefix, radix) = prefix_radix

@@ -230,7 +230,7 @@ pub extend RowType with FromValue::{from_value}
 
 ///|
 /// Format the user-facing CSV error message.
-fn format_csv_error(err : @csv.CsvError, line : Int) -> LoadError {
+fn format_csv_error(err : @csv.CsvError, line : Int32) -> LoadError {
   let msg = "failed to parse CSV"
   let @csv.CsvError(kind) = err
   let pos = match kind.position() {

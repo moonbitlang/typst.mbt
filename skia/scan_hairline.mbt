@@ -1,10 +1,10 @@
 // Port of `tiny-skia/src/scan/hairline.rs`.
 
 ///|
-let max_cubic_subdivide_level : Int = 9
+let max_cubic_subdivide_level : Int32 = 9
 
 ///|
-let max_quad_subdivide_level : Int = 5
+let max_quad_subdivide_level : Int32 = 5
 
 ///|
 fn hairline_stroke_path(
@@ -327,7 +327,7 @@ fn hair_quad(
   clip : ScreenIntRect?,
   inset_clip : @path.IntRect?,
   outset_clip : @path.IntRect?,
-  level : Int,
+  level : Int32,
   line_proc : (ArrayView[@path.Point], ScreenIntRect?, &Blitter) -> Unit,
   blitter : &Blitter,
 ) -> Unit {
@@ -379,7 +379,7 @@ fn geometric_contains(outer : @path.Rect, inner : @path.Rect) -> Bool {
 fn hair_quad2(
   points : Array[@path.Point],
   clip : ScreenIntRect?,
-  level : Int,
+  level : Int32,
   line_proc : (ArrayView[@path.Point], ScreenIntRect?, &Blitter) -> Unit,
   blitter : &Blitter,
 ) -> Unit {
@@ -399,7 +399,7 @@ fn hair_quad2(
 }
 
 ///|
-fn compute_quad_level(points : Array[@path.Point]) -> Int {
+fn compute_quad_level(points : Array[@path.Point]) -> Int32 {
   let d = compute_int_quad_dist(points)
   // Quadratics approach the line connecting their start and end points
   // 4x closer with each subdivision, so we compute the number of
@@ -414,7 +414,7 @@ fn compute_quad_level(points : Array[@path.Point]) -> Int {
 }
 
 ///|
-fn compute_int_quad_dist(points : Array[@path.Point]) -> UInt {
+fn compute_int_quad_dist(points : Array[@path.Point]) -> UInt32 {
   // compute the vector between the control point ([1]) and the middle of the
   // line connecting the start and end ([0] and [2])
   let dx = fabs(half(points[0].x + points[2].x) - points[1].x)
@@ -530,7 +530,7 @@ fn hair_cubic2(
 }
 
 ///|
-fn compute_cubic_segments(points : Array[@path.Point]) -> Int {
+fn compute_cubic_segments(points : Array[@path.Point]) -> Int32 {
   let p0 = points[0].to_f32x2()
   let p1 = points[1].to_f32x2()
   let p2 = points[2].to_f32x2()

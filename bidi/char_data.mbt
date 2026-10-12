@@ -84,7 +84,7 @@ pub fn bidi_class(c : Char) -> BidiClass {
 
 ///|
 /// `bsearch_range_value_table` over `bidi_class_table`.
-fn bidi_class_of(c : Int) -> BidiClass {
+fn bidi_class_of(c : Int32) -> BidiClass {
   let table = bidi_class_table
   let n = table.length() / 3
   for lo = 0, hi = n; lo < hi; {
@@ -109,7 +109,7 @@ pub(all) struct BidiMatchedOpeningBracket {
   ///
   /// In case of opening brackets, this will be the bracket itself, except for when the bracket
   /// is not normalized, in which case it will be the normalized form.
-  opening : Int
+  opening : Int32
   /// Whether or not the requested bracket was an opening bracket. True for opening
   is_open : Bool
 } derive(Eq, Debug)
@@ -128,7 +128,7 @@ pub extend BidiMatchedOpeningBracket with @debug.Debug::{to_repr}
 /// If this character is a bracket according to BidiBrackets.txt,
 /// return the corresponding *normalized* *opening bracket* of the pair,
 /// and whether or not it itself is an opening bracket.
-pub fn bidi_matched_opening_bracket(c : Int) -> BidiMatchedOpeningBracket? {
+pub fn bidi_matched_opening_bracket(c : Int32) -> BidiMatchedOpeningBracket? {
   let table = bidi_pairs_table
   for k = 0; k < table.length(); k = k + 3 {
     if table[k] == c || table[k + 1] == c {
@@ -146,37 +146,37 @@ pub fn is_rtl(bidi_class : BidiClass) -> Bool {
 
 ///|
 /// Directional formatting characters (`format_chars.rs`).
-pub let char_alm : Int = 0x061C
+pub let char_alm : Int32 = 0x061C
 
 ///|
-pub let char_lrm : Int = 0x200E
+pub let char_lrm : Int32 = 0x200E
 
 ///|
-pub let char_rlm : Int = 0x200F
+pub let char_rlm : Int32 = 0x200F
 
 ///|
-pub let char_lri : Int = 0x2066
+pub let char_lri : Int32 = 0x2066
 
 ///|
-pub let char_rli : Int = 0x2067
+pub let char_rli : Int32 = 0x2067
 
 ///|
-pub let char_fsi : Int = 0x2068
+pub let char_fsi : Int32 = 0x2068
 
 ///|
-pub let char_pdi : Int = 0x2069
+pub let char_pdi : Int32 = 0x2069
 
 ///|
-pub let char_lre : Int = 0x202A
+pub let char_lre : Int32 = 0x202A
 
 ///|
-pub let char_rle : Int = 0x202B
+pub let char_rle : Int32 = 0x202B
 
 ///|
-pub let char_pdf : Int = 0x202C
+pub let char_pdf : Int32 = 0x202C
 
 ///|
-pub let char_lro : Int = 0x202D
+pub let char_lro : Int32 = 0x202D
 
 ///|
-pub let char_rlo : Int = 0x202E
+pub let char_rlo : Int32 = 0x202E

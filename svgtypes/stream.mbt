@@ -53,7 +53,7 @@ fn is_ascii_ident(c : Byte) -> Bool {
 ///|
 fn char_is_name_start(c : Char) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' => true
     _ => char_is_non_ascii(c) || char_is_escape(c)
   }
 }
@@ -61,7 +61,7 @@ fn char_is_name_start(c : Char) -> Bool {
 ///|
 fn char_is_name_char(c : Char) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' | '0'..<='9' | '-' => true
     _ => char_is_non_ascii(c) || char_is_escape(c)
   }
 }
@@ -85,7 +85,7 @@ pub struct Stream {
   priv bytes : Bytes
   /// Whether `text` is pure ASCII (byte offsets == UTF-16 offsets).
   priv ascii : Bool
-  priv mut pos : Int
+  priv mut pos : Int32
 }
 
 ///|
@@ -109,7 +109,7 @@ pub fn Stream::text(self : Stream) -> String {
 ///|
 /// Decodes the UTF-8 char starting at byte `pos` (`pos` < len).
 /// Returns the char and its UTF-8 length.
-fn Stream::decode_char_at(self : Stream, pos : Int) -> (Char, Int) {
+fn Stream::decode_char_at(self : Stream, pos : Int32) -> (Char, Int32) {
   let b = self.bytes
   let b0 = b[pos].to_int()
   if b0 < 0x80 {
@@ -136,7 +136,7 @@ fn Stream::decode_char_at(self : Stream, pos : Int) -> (Char, Int) {
 
 ///|
 /// Returns the text between the byte offsets `start` and `end`.
-fn Stream::slice(self : Stream, start : Int, end : Int) -> String {
+fn Stream::slice(self : Stream, start : Int32, end : Int32) -> String {
   if self.ascii {
     self.text.unsafe_substring(start~, end~)
   } else {
@@ -164,19 +164,19 @@ fn Stream::curr_char(self : Stream) -> Char? {
 
 ///|
 /// Returns the current position in bytes.
-pub fn Stream::pos(self : Stream) -> Int {
+pub fn Stream::pos(self : Stream) -> Int32 {
   self.pos
 }
 
 ///|
 /// Calculates the current position in chars.
-pub fn Stream::calc_char_pos(self : Stream) -> Int {
+pub fn Stream::calc_char_pos(self : Stream) -> Int32 {
   self.calc_char_pos_at(self.pos)
 }
 
 ///|
 /// Calculates the current position in chars.
-pub fn Stream::calc_char_pos_at(self : Stream, byte_pos : Int) -> Int {
+pub fn Stream::calc_char_pos_at(self : Stream, byte_pos : Int32) -> Int32 {
   let mut pos = 1
   let len = self.bytes.length()
   for idx in 0..<len {
@@ -268,7 +268,7 @@ pub fn Stream::next_byte(self : Stream) -> Byte raise SvgTypesError {
 
 ///|
 /// Advances by `n` bytes.
-pub fn Stream::advance(self : Stream, n : Int) -> Unit {
+pub fn Stream::advance(self : Stream, n : Int32) -> Unit {
   self.pos += n
 }
 
@@ -454,7 +454,7 @@ pub fn Stream::skip_bytes(self : Stream, f : (Stream, Byte) -> Bool) -> Unit {
 
 ///|
 /// Slices data from `pos` to the current position.
-pub fn Stream::slice_back(self : Stream, pos : Int) -> String {
+pub fn Stream::slice_back(self : Stream, pos : Int32) -> String {
   self.slice(pos, self.pos)
 }
 

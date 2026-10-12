@@ -26,11 +26,11 @@ priv struct Cache {
   /// This fontdb is initialized from [`Options::fontdb`] and then populated
   /// over the course of conversion.
   fontdb : FontDatabase
-  cache_outline : Map[(Int, Int), TinyPath?]
-  cache_colr : Map[(Int, Int), Tree?]
-  cache_svg : Map[(Int, Int), Node?]
-  cache_raster : Map[(Int, Int), BitmapImage?]
-  cache_has_opsz : Map[Int, Bool]
+  cache_outline : Map[(Int32, Int32), TinyPath?]
+  cache_colr : Map[(Int32, Int32), Tree?]
+  cache_svg : Map[(Int32, Int32), Node?]
+  cache_raster : Map[(Int32, Int32), BitmapImage?]
+  cache_has_opsz : Map[Int32, Bool]
   clip_paths : Map[String, ClipPath]
   masks : Map[String, Mask]
   filters : Map[String, Filter]
@@ -38,13 +38,13 @@ priv struct Cache {
 
   // used for ID generation
   all_ids : Set[String]
-  mut linear_gradient_index : Int
-  mut radial_gradient_index : Int
-  mut pattern_index : Int
-  mut clip_path_index : Int
-  mut mask_index : Int
-  mut filter_index : Int
-  mut image_index : Int
+  mut linear_gradient_index : Int32
+  mut radial_gradient_index : Int32
+  mut pattern_index : Int32
+  mut clip_path_index : Int32
+  mut mask_index : Int32
+  mut filter_index : Int32
+  mut image_index : Int32
   /// Whether the tree conversion is done (and paint servers are being
   /// updated); see `is_unique` in `paint_server.mbt`.
   mut ref_roots : Array[Group]?

@@ -27,7 +27,7 @@ priv enum Consonant {
 }
 
 ///|
-fn Consonant::to_int(self : Consonant) -> Int {
+fn Consonant::to_int(self : Consonant) -> Int32 {
   match self {
     NC => 0
     AC => 1
@@ -38,12 +38,12 @@ fn Consonant::to_int(self : Consonant) -> Int {
 }
 
 ///|
-fn get_consonant_type(u : UInt) -> Consonant {
+fn get_consonant_type(u : UInt32) -> Consonant {
   match u {
     0x0E1B | 0x0E1D | 0x0E1F => AC
     0x0E0D | 0x0E10 => RC
     0x0E0E | 0x0E0F => DC
-    0x0E01..=0x0E2E => NC
+    0x0E01..<=0x0E2E => NC
     _ => NotConsonant
   }
 }
@@ -57,7 +57,7 @@ priv enum Mark {
 } derive(Eq)
 
 ///|
-fn Mark::to_int(self : Mark) -> Int {
+fn Mark::to_int(self : Mark) -> Int32 {
   match self {
     AV => 0
     BV => 1
@@ -67,11 +67,11 @@ fn Mark::to_int(self : Mark) -> Int {
 }
 
 ///|
-fn get_mark_type(u : UInt) -> Mark {
+fn get_mark_type(u : UInt32) -> Mark {
   match u {
-    0x0E31 | 0x0E34..=0x0E37 | 0x0E47 | 0x0E4D..=0x0E4E => AV
-    0x0E38..=0x0E3A => BV
-    0x0E48..=0x0E4C => T
+    0x0E31 | 0x0E34..<=0x0E37 | 0x0E47 | 0x0E4D..<=0x0E4E => AV
+    0x0E38..<=0x0E3A => BV
+    0x0E48..<=0x0E4C => T
     _ => NotMark
   }
 }
@@ -91,9 +91,9 @@ priv enum Action {
 
 ///|
 priv struct PuaMapping {
-  u : UInt
-  win_pua : UInt
-  mac_pua : UInt
+  u : UInt32
+  win_pua : UInt32
+  mac_pua : UInt32
 }
 
 ///|
@@ -144,7 +144,7 @@ let rd_mappings : ReadOnlyArray[PuaMapping] = [
 ]
 
 ///|
-fn pua_shape(u : UInt, action : Action, face : Face) -> UInt {
+fn pua_shape(u : UInt32, action : Action, face : Face) -> UInt32 {
   let mappings = match action {
     NOP => return u
     SD => sd_mappings
@@ -176,7 +176,7 @@ priv enum AboveState {
 }
 
 ///|
-fn AboveState::to_int(self : AboveState) -> Int {
+fn AboveState::to_int(self : AboveState) -> Int32 {
   match self {
     T0 => 0
     T1 => 1
@@ -248,7 +248,7 @@ priv enum BelowState {
 }
 
 ///|
-fn BelowState::to_int(self : BelowState) -> Int {
+fn BelowState::to_int(self : BelowState) -> Int32 {
   match self {
     B0 => 0
     B1 => 1
@@ -343,25 +343,25 @@ fn do_pua_shaping(face : Face, buffer : Buffer) -> Unit {
 ///|
 // We only get one script at a time, so a script-agnostic implementation
 // is adequate here.
-fn is_sara_am(u : UInt) -> Bool {
+fn is_sara_am(u : UInt32) -> Bool {
   (u & (0x0080U ^ 0xFFFFFFFF)) == 0x0E33
 }
 
 ///|
-fn nikhahit_from_sara_am(u : UInt) -> UInt {
+fn nikhahit_from_sara_am(u : UInt32) -> UInt32 {
   u - 0x0E33 + 0x0E4D
 }
 
 ///|
-fn sara_aa_from_sara_am(u : UInt) -> UInt {
+fn sara_aa_from_sara_am(u : UInt32) -> UInt32 {
   u - 1
 }
 
 ///|
-fn is_above_base_mark(u : UInt) -> Bool {
+fn is_above_base_mark(u : UInt32) -> Bool {
   let u = u & (0x0080U ^ 0xFFFFFFFF)
   match u {
-    0x0E34..=0x0E37 | 0x0E47..=0x0E4E | 0x0E31..=0x0E31 | 0x0E3B..=0x0E3B =>
+    0x0E34..<=0x0E37 | 0x0E47..<=0x0E4E | 0x0E31..<=0x0E31 | 0x0E3B..<=0x0E3B =>
       true
     _ => false
   }

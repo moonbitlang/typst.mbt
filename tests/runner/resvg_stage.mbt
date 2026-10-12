@@ -14,7 +14,7 @@ let resvg_raw_dir : Ref[String?] = Ref(None)
 
 ///|
 /// Rust's `str` ordering (by code points).
-fn resvg_str_lt(a : String, b : String) -> Int {
+fn resvg_str_lt(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let c = a.code_unit_at(i).to_int() - b.code_unit_at(i).to_int()

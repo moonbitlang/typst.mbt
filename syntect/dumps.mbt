@@ -8,23 +8,23 @@
 ///|
 priv struct Decoder {
   s : String
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
-fn Decoder::peek(self : Decoder) -> Int {
+fn Decoder::peek(self : Decoder) -> Int32 {
   self.s.code_unit_at(self.pos).to_int()
 }
 
 ///|
-fn Decoder::tag(self : Decoder) -> Int {
+fn Decoder::tag(self : Decoder) -> Int32 {
   let c = self.peek()
   self.pos += 1
   c
 }
 
 ///|
-fn Decoder::int(self : Decoder) -> Int {
+fn Decoder::int(self : Decoder) -> Int32 {
   let mut n = 0
   while true {
     let c = self.tag()
@@ -184,7 +184,7 @@ fn Decoder::context(self : Decoder, table : Array[Scope]) -> Context {
 /// `contexts` returns by syntax index when they are first needed.
 pub fn SyntaxSet::from_compact(
   header : String,
-  contexts : (Int) -> String,
+  contexts : (Int32) -> String,
 ) -> SyntaxSet {
   let d : Decoder = { s: header, pos: 0, }
   let nscopes = d.int()

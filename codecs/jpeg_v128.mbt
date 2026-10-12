@@ -11,7 +11,7 @@
 ///|
 /// Four consecutive `Int`s of `a` starting at `i` (in bounds) as `i32x4`.
 #inline
-fn gather_i32x4(a : FixedArray[Int], i : Int) -> V128 {
+fn gather_i32x4(a : FixedArray[Int32], i : Int32) -> V128 {
   let v = @v128.i32x4_splat(a.unsafe_get(i).reinterpret_as_uint())
   let v = @v128.i32x4_replace_lane(
     v,
@@ -37,15 +37,15 @@ fn i16_lanes(v : V128) -> V128 {
 /// Convert 16 YCbCr samples (`y[yo..yo + 16]` etc.) to RGB (`num_components
 /// == 3`) or RGBA (`4`) at `output[out_pos..]`.
 fn ycbcr_to_rgb_16(
-  y : FixedArray[Int],
-  yo : Int,
-  cb : FixedArray[Int],
-  cbo : Int,
-  cr : FixedArray[Int],
-  cro : Int,
+  y : FixedArray[Int32],
+  yo : Int32,
+  cb : FixedArray[Int32],
+  cbo : Int32,
+  cr : FixedArray[Int32],
+  cro : Int32,
   output : FixedArray[Byte],
-  out_pos : Int,
-  num_components : Int,
+  out_pos : Int32,
+  num_components : Int32,
 ) -> Unit {
   guard ycbcr_ranges_ok(
     y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
@@ -163,15 +163,15 @@ fn ycbcr_to_rgb_16(
 /// Whether the 16 samples of each component and the `16 * num_components`
 /// output bytes of [ycbcr_to_rgb_16] are in bounds.
 fn ycbcr_ranges_ok(
-  y : FixedArray[Int],
-  yo : Int,
-  cb : FixedArray[Int],
-  cbo : Int,
-  cr : FixedArray[Int],
-  cro : Int,
+  y : FixedArray[Int32],
+  yo : Int32,
+  cb : FixedArray[Int32],
+  cbo : Int32,
+  cr : FixedArray[Int32],
+  cro : Int32,
   output : FixedArray[Byte],
-  out_pos : Int,
-  num_components : Int,
+  out_pos : Int32,
+  num_components : Int32,
 ) -> Bool {
   (num_components == 3 || num_components == 4) &&
   in_range(yo, 16, y.length()) &&
@@ -238,7 +238,7 @@ fn ycc_blue(y : V128, cb : V128) -> V128 {
 ///|
 /// Stores the four lanes of `v` at `a[i..i + 4]` (in bounds).
 #inline
-fn scatter_i32x4(a : FixedArray[Int], i : Int, v : V128) -> Unit {
+fn scatter_i32x4(a : FixedArray[Int32], i : Int32, v : V128) -> Unit {
   a.unsafe_set(i, @v128.i32x4_extract_lane(v, 0).reinterpret_as_int())
   a.unsafe_set(i + 1, @v128.i32x4_extract_lane(v, 1).reinterpret_as_int())
   a.unsafe_set(i + 2, @v128.i32x4_extract_lane(v, 2).reinterpret_as_int())
@@ -248,7 +248,7 @@ fn scatter_i32x4(a : FixedArray[Int], i : Int, v : V128) -> Unit {
 ///|
 /// Whether `s[start..start + len]` is within its array.
 #inline
-fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
+fn slice_range_ok(s : Slice, start : Int32, len : Int64) -> Bool {
   start >= 0 &&
   len >= 0L &&
   s.off >= 0 &&
@@ -258,7 +258,7 @@ fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
 ///|
 /// The main loop of [upsample_horizontal]: `output[2..2 + 2 * n]` from
 /// `input[0..n + 2]`, four input samples at a time.
-fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
+fn upsample_horizontal_core(input : Slice, output : Slice, n : Int32) -> Unit {
   // Output aliasing the input: the scalar code (the blocks read ahead of
   // their writes).
   if physical_equal(input.arr, output.arr) {
@@ -320,8 +320,8 @@ fn upsample_vertical_core(
   input : Slice,
   near : Slice,
   output : Slice,
-  start : Int,
-  n : Int,
+  start : Int32,
+  n : Int32,
 ) -> Unit {
   // Output aliasing an input: the scalar code (the blocks read ahead of
   // their writes).
@@ -364,9 +364,9 @@ fn upsample_vertical_core(
 /// the scalar passes, with the given rounding `bias` and final shift.
 fn idct_pass(
   m : FixedArray[V128],
-  base : Int,
+  base : Int32,
   bias : V128,
-  shift : Int,
+  shift : Int32,
 ) -> Unit {
   let p2 = m[base + 2]
   let p3 = m[base + 6]
@@ -414,7 +414,7 @@ fn idct_pass(
 
 ///|
 /// Transposes the 4x4 `i32` matrix `m[i..i + 4]` (rows) in place.
-fn transpose4(m : FixedArray[V128], i : Int) -> Unit {
+fn transpose4(m : FixedArray[V128], i : Int32) -> Unit {
   let a = m[i]
   let b = m[i + 1]
   let c = m[i + 2]
@@ -450,10 +450,10 @@ fn transpose4(m : FixedArray[V128], i : Int) -> Unit {
 /// The integer IDCT (upstream `idct_neon` on aarch64): both passes on four
 /// columns (then four rows) at a time, with 4x4 transposes in between.
 fn idct_int(
-  in_vector : FixedArray[Int],
-  out_vector : FixedArray[Int],
-  out_pos : Int,
-  stride : Int,
+  in_vector : FixedArray[Int32],
+  out_vector : FixedArray[Int32],
+  out_pos : Int32,
+  stride : Int32,
 ) -> Unit {
   guard in_vector.length() >= 64 else {
     idct_int_scalar(in_vector, out_vector, out_pos, stride)
@@ -522,6 +522,6 @@ fn idct_int(
 ///|
 /// `i32x4.splat(c)`.
 #inline
-fn ks(c : Int) -> V128 {
+fn ks(c : Int32) -> V128 {
   @v128.i32x4_splat(c.reinterpret_as_uint())
 }

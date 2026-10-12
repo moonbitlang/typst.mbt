@@ -3,7 +3,7 @@
 
 ///|
 /// Fast 0..255 * 0..255 => 0..255 rounded multiplication (borrowed from stb).
-fn blinn_8x8(in_val : Int, y : Int) -> Int {
+fn blinn_8x8(in_val : Int32, y : Int32) -> Int32 {
   let t = in_val * y + 128
   ((t + (t >> 8)) >> 8) & 0xFF
 }
@@ -11,7 +11,7 @@ fn blinn_8x8(in_val : Int, y : Int) -> Int {
 ///|
 /// A row-chunk iterator count: the number of `chunks_exact(size)` of a
 /// slice of length `len`.
-fn chunks(len : Int, size : Int) -> Int {
+fn chunks(len : Int32, size : Int32) -> Int32 {
   if size <= 0 {
     0
   } else {
@@ -27,10 +27,10 @@ fn color_convert(
   input_colorspace : ColorSpace,
   output_colorspace : ColorSpace,
   output : FixedArray[Byte],
-  out_pos : Int,
-  out_len : Int,
-  width : Int,
-  padded_width : Int,
+  out_pos : Int32,
+  out_len : Int32,
+  width : Int32,
+  padded_width : Int32,
 ) -> Unit raise DecodeErrors {
   let out = { bytes: output, off: out_pos, len: out_len, }
   if input_colorspace.num_components() == 3 &&
@@ -77,17 +77,17 @@ fn color_convert(
 /// Output view.
 priv struct OutSlice {
   bytes : FixedArray[Byte]
-  off : Int
-  len : Int
+  off : Int32
+  len : Int32
 }
 
 ///|
 fn convert_luma_to_rgb(
   mcu_block : FixedArray[Slice],
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output : OutSlice,
-  n : Int,
+  n : Int32,
 ) -> Unit {
   let rows = @cmp.minimum(
     chunks(output.len, width * n),
@@ -115,10 +115,10 @@ fn convert_luma_to_rgb(
 /// `copy_removing_padding_generic`).
 fn copy_removing_padding(
   mcu_block : FixedArray[Slice],
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output : OutSlice,
-  channels : Int,
+  channels : Int32,
 ) -> Unit {
   let mut rows = chunks(output.len, width * channels)
   for c in 0..<channels {
@@ -141,11 +141,11 @@ fn copy_removing_padding(
 /// Convert YCCK image to rgb.
 fn color_convert_ycck_to_rgb(
   mcu_block : FixedArray[Slice],
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output_colorspace : ColorSpace,
   output : OutSlice,
-  num_components : Int,
+  num_components : Int32,
 ) -> Unit {
   color_convert_ycbcr(mcu_block, width, padded_width, output_colorspace, output)
   let rows = @cmp.minimum(
@@ -168,10 +168,10 @@ fn color_convert_ycck_to_rgb(
 ///|
 fn color_convert_cymk_to_rgb(
   mcu_block : FixedArray[Slice],
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output : OutSlice,
-  num_components : Int,
+  num_components : Int32,
 ) -> Unit {
   let mut rows = chunks(output.len, width * num_components)
   for c in 0..<4 {
@@ -198,8 +198,8 @@ fn color_convert_cymk_to_rgb(
 /// Do color-conversion for interleaved MCU.
 fn color_convert_ycbcr(
   mcu_block : FixedArray[Slice],
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output_colorspace : ColorSpace,
   output : OutSlice,
 ) -> Unit {
@@ -281,8 +281,8 @@ fn color_convert_ycbcr(
 ///|
 fn ycbcr_to_grayscale(
   y : Slice,
-  width : Int,
-  padded_width : Int,
+  width : Int32,
+  padded_width : Int32,
   output : OutSlice,
 ) -> Unit {
   let rows = @cmp.minimum(
@@ -302,11 +302,11 @@ fn ycbcr_to_grayscale(
 ///|
 /// Copy `src[s..s + n]` to `dst[d..d + n]`.
 fn copy_ints(
-  dst : FixedArray[Int],
-  d : Int,
-  src : FixedArray[Int],
-  s : Int,
-  n : Int,
+  dst : FixedArray[Int32],
+  d : Int32,
+  src : FixedArray[Int32],
+  s : Int32,
+  n : Int32,
 ) -> Unit {
   for i in 0..<n {
     dst[d + i] = src[s + i]
@@ -316,9 +316,9 @@ fn copy_ints(
 ///|
 fn upsample(
   component : Components,
-  mcu_height : Int,
-  i : Int,
-  upsampler_scratch_space : FixedArray[Int],
+  mcu_height : Int32,
+  i : Int32,
+  upsampler_scratch_space : FixedArray[Int32],
   has_vertical_sample : Bool,
 ) -> Unit raise DecodeErrors {
   match component.sample_ratio {

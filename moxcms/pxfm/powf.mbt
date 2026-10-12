@@ -20,7 +20,7 @@ fn larger_exponent(a : Double, b : Double) -> Bool {
 ///|
 /// Calculates 2^(y * log2(x)) in double-double precision.
 fn powf_dd(
-  idx_x : Int,
+  idx_x : Int32,
   dx : Double,
   y6 : Double,
   lo6_hi : Double,
@@ -44,7 +44,7 @@ fn powf_dd(
     0x3c7ce04b5140d867UL, 0x3fdec709dc3a03fdUL, 0x3c7137b47e635be5UL, 0xbfd71547652b82fbUL,
     0xbc5b5a30b3bdb318UL, 0x3fd2776c516a92a2UL, 0x3c62d2fbd081e657UL, 0xbfcec70af1929ca6UL,
   ]
-  let c = (i : Int) => {
+  let c = (i : Int32) => {
     DoubleDouble::from_bit_pair(coeffs[2 * i], coeffs[2 * i + 1])
   }
   let dx_dd = DoubleDouble::new(0.0, dx2)
@@ -274,7 +274,7 @@ pub fn f_powf(x : Float, y : Float) -> Float {
     0x3ff71547652b82feUL, 0xbfe71547652b7a07UL, 0x3fdec709dc458db1UL, 0xbfd715479c2266c9UL,
     0x3fd2776ae1ddf8f0UL, 0xbfce7b2178870157UL,
   ]
-  let k = (i : Int) => coeffs[i].reinterpret_as_double()
+  let k = (i : Int32) => coeffs[i].reinterpret_as_double()
   let dx2 = dx * dx // Exact
   let c0 = fma(dx, k(1), k(0))
   let c1 = fma(dx, k(3), k(2))
@@ -323,7 +323,7 @@ pub fn f_powf(x : Float, y : Float) -> Float {
     0x3ff0000000000000UL, 0x3f862e42fefa39efUL, 0x3f0ebfbdff82a23aUL, 0x3e8c6b08d7076268UL,
     0x3e03b2ad33f8b48bUL, 0x3d75d870c4d84445UL,
   ]
-  let e = (i : Int) => exp2_coeffs[i].reinterpret_as_double()
+  let e = (i : Int32) => exp2_coeffs[i].reinterpret_as_double()
   let lo6_sqr = lo6 * lo6
   let d0 = fma(lo6, e(1), e(0))
   let d1 = fma(lo6, e(3), e(2))

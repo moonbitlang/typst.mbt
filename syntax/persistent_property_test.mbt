@@ -51,7 +51,7 @@ fn EditRng::next(self : EditRng) -> UInt64 {
 
 ///|
 /// A number in `0..n` (`n > 0`).
-fn EditRng::below(self : EditRng, n : Int) -> Int {
+fn EditRng::below(self : EditRng, n : Int32) -> Int32 {
   (self.next() % n.to_uint64()).to_int()
 }
 
@@ -68,7 +68,7 @@ let property_snippets : Array[String] = [
 
 ///|
 /// A place between two characters of `text`, as an index into the string.
-fn boundary(rng : EditRng, text : String) -> Int {
+fn boundary(rng : EditRng, text : String) -> Int32 {
   let mut i = rng.below(text.length() + 1)
   // Not between the halves of a surrogate pair.
   if i > 0 && i < text.length() {
@@ -150,9 +150,9 @@ fn check_document(
   path : String,
   text : String,
   seed : UInt64,
-  edits : Int,
-  typing? : Bool = false,
-) -> Int raise {
+  edits : Int32,
+  typing~ : Bool = false,
+) -> Int32 raise {
   let rng : EditRng = { state: seed, }
   let typed_at = boundary(rng, text)
   let mut source = @syntax.Source::detached(text)

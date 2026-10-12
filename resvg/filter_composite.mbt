@@ -20,7 +20,7 @@ fn composite_arithmetic(
 ) -> Unit {
   guard! src1.width() == src2.width() && src1.width() == dest.width()
   guard! src1.height() == src2.height() && src1.height() == dest.height()
-  let calc = fn(i1 : Int, i2 : Int, max : Float) -> Float {
+  let calc = fn(i1 : Int32, i2 : Int32, max : Float) -> Float {
     let i1 = Float::from_int(i1) / 255.0
     let i2 = Float::from_int(i2) / 255.0
     let result = k1 * i1 * i2 + k2 * i1 + k3 * i2 + k4

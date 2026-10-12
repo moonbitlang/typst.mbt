@@ -84,8 +84,8 @@ fn SvgPathBuilder::arc(
   self : SvgPathBuilder,
   radius : @library.Axes[@library.Abs],
   x_axis_rot : @library.Angle,
-  large_arc_flag : UInt,
-  sweep_flag : UInt,
+  large_arc_flag : UInt32,
+  sweep_flag : UInt32,
   pos : @library.Point,
 ) -> Unit {
   let radius = self.map(radius.to_point())

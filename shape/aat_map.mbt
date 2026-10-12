@@ -14,8 +14,8 @@ fn AatMap::default() -> AatMap {
 ///|
 /// `feature_info_t`
 priv struct AatFeatureInfo {
-  kind : Int
-  setting : Int
+  kind : Int32
+  setting : Int32
   is_exclusive : Bool
 } derive(Eq)
 
@@ -26,7 +26,7 @@ fn AatFeatureInfo::default() -> AatFeatureInfo {
 
 ///|
 /// `impl PartialOrd for feature_info_t`
-fn AatFeatureInfo::cmp(self : AatFeatureInfo, other : AatFeatureInfo) -> Int {
+fn AatFeatureInfo::cmp(self : AatFeatureInfo, other : AatFeatureInfo) -> Int32 {
   if self.kind != other.kind {
     self.kind.compare(other.kind)
   } else if !self.is_exclusive &&
@@ -41,21 +41,24 @@ fn AatFeatureInfo::cmp(self : AatFeatureInfo, other : AatFeatureInfo) -> Int {
 /// `feature_range_t`
 priv struct AatFeatureRange {
   info : AatFeatureInfo
-  start : UInt
-  end : UInt
+  start : UInt32
+  end : UInt32
 }
 
 ///|
 /// `feature_event_t`
 priv struct AatFeatureEvent {
-  index : UInt
+  index : UInt32
   start : Bool
   feature : AatFeatureInfo
 }
 
 ///|
 /// `impl PartialOrd for feature_event_t`
-fn AatFeatureEvent::cmp(self : AatFeatureEvent, other : AatFeatureEvent) -> Int {
+fn AatFeatureEvent::cmp(
+  self : AatFeatureEvent,
+  other : AatFeatureEvent,
+) -> Int32 {
   if self.index != other.index {
     self.index.compare(other.index)
   } else if self.start != other.start {
@@ -68,9 +71,9 @@ fn AatFeatureEvent::cmp(self : AatFeatureEvent, other : AatFeatureEvent) -> Int 
 ///|
 /// `range_flags_t`
 priv struct RangeFlags {
-  flags : UInt
-  cluster_first : UInt
-  mut cluster_last : UInt // end - 1
+  flags : UInt32
+  cluster_first : UInt32
+  mut cluster_last : UInt32 // end - 1
 }
 
 ///|
@@ -78,8 +81,8 @@ priv struct RangeFlags {
 priv struct AatMapBuilder {
   mut current_features : Array[AatFeatureInfo]
   features : Array[AatFeatureRange]
-  mut range_first : UInt
-  mut range_last : UInt
+  mut range_first : UInt32
+  mut range_last : UInt32
 }
 
 ///|
@@ -95,7 +98,7 @@ fn AatMapBuilder::default() -> AatMapBuilder {
 ///|
 /// Rust's stable `slice::sort_by` (insertion sort, as used for short
 /// slices): `is_less(a, b)` is `cmp(a, b) == Less`.
-fn[T] aat_insertion_sort(v : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] aat_insertion_sort(v : Array[T], cmp : (T, T) -> Int32) -> Unit {
   for i in 1..<v.length() {
     let x = v[i]
     let mut j = i
@@ -226,7 +229,7 @@ fn AatMapBuilder::compile(
 
   // Scan events and save features for each range.
   let active_features : Array[AatFeatureInfo] = []
-  let mut last_index : UInt = 0
+  let mut last_index : UInt32 = 0
   for event in feature_events {
     if event.index != last_index {
       // Save a snapshot of active features and the range.

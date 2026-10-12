@@ -7,102 +7,102 @@
 // hb_gc
 
 ///|
-pub const GC_CONTROL : Int = 0
+pub const GC_CONTROL : Int32 = 0
 
 ///|
-pub const GC_FORMAT : Int = 1
+pub const GC_FORMAT : Int32 = 1
 
 ///|
-pub const GC_UNASSIGNED : Int = 2
+pub const GC_UNASSIGNED : Int32 = 2
 
 ///|
-pub const GC_PRIVATE_USE : Int = 3
+pub const GC_PRIVATE_USE : Int32 = 3
 
 ///|
-pub const GC_SURROGATE : Int = 4
+pub const GC_SURROGATE : Int32 = 4
 
 ///|
-pub const GC_LOWERCASE_LETTER : Int = 5
+pub const GC_LOWERCASE_LETTER : Int32 = 5
 
 ///|
-pub const GC_MODIFIER_LETTER : Int = 6
+pub const GC_MODIFIER_LETTER : Int32 = 6
 
 ///|
-pub const GC_OTHER_LETTER : Int = 7
+pub const GC_OTHER_LETTER : Int32 = 7
 
 ///|
-pub const GC_TITLECASE_LETTER : Int = 8
+pub const GC_TITLECASE_LETTER : Int32 = 8
 
 ///|
-pub const GC_UPPERCASE_LETTER : Int = 9
+pub const GC_UPPERCASE_LETTER : Int32 = 9
 
 ///|
-pub const GC_SPACING_MARK : Int = 10
+pub const GC_SPACING_MARK : Int32 = 10
 
 ///|
-pub const GC_ENCLOSING_MARK : Int = 11
+pub const GC_ENCLOSING_MARK : Int32 = 11
 
 ///|
-pub const GC_NON_SPACING_MARK : Int = 12
+pub const GC_NON_SPACING_MARK : Int32 = 12
 
 ///|
-pub const GC_DECIMAL_NUMBER : Int = 13
+pub const GC_DECIMAL_NUMBER : Int32 = 13
 
 ///|
-pub const GC_LETTER_NUMBER : Int = 14
+pub const GC_LETTER_NUMBER : Int32 = 14
 
 ///|
-pub const GC_OTHER_NUMBER : Int = 15
+pub const GC_OTHER_NUMBER : Int32 = 15
 
 ///|
-pub const GC_CONNECT_PUNCTUATION : Int = 16
+pub const GC_CONNECT_PUNCTUATION : Int32 = 16
 
 ///|
-pub const GC_DASH_PUNCTUATION : Int = 17
+pub const GC_DASH_PUNCTUATION : Int32 = 17
 
 ///|
-pub const GC_CLOSE_PUNCTUATION : Int = 18
+pub const GC_CLOSE_PUNCTUATION : Int32 = 18
 
 ///|
-pub const GC_FINAL_PUNCTUATION : Int = 19
+pub const GC_FINAL_PUNCTUATION : Int32 = 19
 
 ///|
-pub const GC_INITIAL_PUNCTUATION : Int = 20
+pub const GC_INITIAL_PUNCTUATION : Int32 = 20
 
 ///|
-pub const GC_OTHER_PUNCTUATION : Int = 21
+pub const GC_OTHER_PUNCTUATION : Int32 = 21
 
 ///|
-pub const GC_OPEN_PUNCTUATION : Int = 22
+pub const GC_OPEN_PUNCTUATION : Int32 = 22
 
 ///|
-pub const GC_CURRENCY_SYMBOL : Int = 23
+pub const GC_CURRENCY_SYMBOL : Int32 = 23
 
 ///|
-pub const GC_MODIFIER_SYMBOL : Int = 24
+pub const GC_MODIFIER_SYMBOL : Int32 = 24
 
 ///|
-pub const GC_MATH_SYMBOL : Int = 25
+pub const GC_MATH_SYMBOL : Int32 = 25
 
 ///|
-pub const GC_OTHER_SYMBOL : Int = 26
+pub const GC_OTHER_SYMBOL : Int32 = 26
 
 ///|
-pub const GC_LINE_SEPARATOR : Int = 27
+pub const GC_LINE_SEPARATOR : Int32 = 27
 
 ///|
-pub const GC_PARAGRAPH_SEPARATOR : Int = 28
+pub const GC_PARAGRAPH_SEPARATOR : Int32 = 28
 
 ///|
-pub const GC_SPACE_SEPARATOR : Int = 29
+pub const GC_SPACE_SEPARATOR : Int32 = 29
 
 ///|
-fn gc_is_mark(gc : Int) -> Bool {
+fn gc_is_mark(gc : Int32) -> Bool {
   gc == GC_SPACING_MARK || gc == GC_ENCLOSING_MARK || gc == GC_NON_SPACING_MARK
 }
 
 ///|
-fn gc_is_letter(gc : Int) -> Bool {
+fn gc_is_letter(gc : Int32) -> Bool {
   gc == GC_LOWERCASE_LETTER ||
   gc == GC_MODIFIER_LETTER ||
   gc == GC_OTHER_LETTER ||
@@ -116,50 +116,50 @@ fn gc_is_letter(gc : Int) -> Bool {
 // (hb_unicode_funcs_t::space_t)
 
 ///|
-const NOT_SPACE : Int = 0
+const NOT_SPACE : Int32 = 0
 
 ///|
-const SPACE_EM : Int = 1
+const SPACE_EM : Int32 = 1
 
 ///|
-const SPACE_EM_2 : Int = 2
+const SPACE_EM_2 : Int32 = 2
 
 ///|
-const SPACE_EM_3 : Int = 3
+const SPACE_EM_3 : Int32 = 3
 
 ///|
-const SPACE_EM_4 : Int = 4
+const SPACE_EM_4 : Int32 = 4
 
 ///|
-const SPACE_EM_5 : Int = 5
+const SPACE_EM_5 : Int32 = 5
 
 ///|
-const SPACE_EM_6 : Int = 6
+const SPACE_EM_6 : Int32 = 6
 
 ///|
-const SPACE_EM_16 : Int = 16
+const SPACE_EM_16 : Int32 = 16
 
 ///|
 /// 4/18th of an EM!
-const SPACE_4_EM_18 : Int = 17
+const SPACE_4_EM_18 : Int32 = 17
 
 ///|
-const SPACE : Int = 18
+const SPACE : Int32 = 18
 
 ///|
-const SPACE_FIGURE : Int = 19
+const SPACE_FIGURE : Int32 = 19
 
 ///|
-const SPACE_PUNCTUATION : Int = 20
+const SPACE_PUNCTUATION : Int32 = 20
 
 ///|
-const SPACE_NARROW : Int = 21
+const SPACE_NARROW : Int32 = 21
 
 ///|
 /// Modified combining classes (`MODIFIED_COMBINING_CLASS`): the identity,
 /// except for the Hebrew, Arabic, Telugu, Thai, Lao and Tibetan permutations
 /// documented in rustybuzz's `modified_combining_class` module.
-let modified_combining_class_table : FixedArray[Int] = {
+let modified_combining_class_table : FixedArray[Int32] = {
   let t = FixedArray::makei(256, i => i)
   // Hebrew
   //
@@ -242,17 +242,17 @@ let modified_combining_class_table : FixedArray[Int] = {
 
 ///|
 /// The rustybuzz script of a codepoint (`CharExt::script`).
-fn char_script(u : Int) -> Script {
+fn char_script(u : Int32) -> Script {
   Script(@otf.Tag::from_str(@unicode.rb_script_tag(u)))
 }
 
 ///|
-fn char_general_category(u : Int) -> Int {
+fn char_general_category(u : Int32) -> Int32 {
   @unicode.rb_general_category(u)
 }
 
 ///|
-fn char_space_fallback(u : Int) -> Int {
+fn char_space_fallback(u : Int32) -> Int32 {
   // All GC=Zs chars that can use a fallback.
   match u {
     0x0020 => SPACE // SPACE
@@ -276,7 +276,7 @@ fn char_space_fallback(u : Int) -> Int {
 }
 
 ///|
-fn char_modified_combining_class(u : Int) -> Int {
+fn char_modified_combining_class(u : Int32) -> Int32 {
   // Reorder SAKOT to ensure it comes after any tone marks.
   if u == 0x1A60 {
     return 254
@@ -295,12 +295,12 @@ fn char_modified_combining_class(u : Int) -> Int {
 }
 
 ///|
-fn char_mirrored(u : Int) -> Int? {
+fn char_mirrored(u : Int32) -> Int32? {
   @unicode.rb_mirrored(u)
 }
 
 ///|
-fn char_is_emoji_extended_pictographic(u : Int) -> Bool {
+fn char_is_emoji_extended_pictographic(u : Int32) -> Bool {
   // Generated by scripts/gen-unicode-is-emoji-ext-pict.py
   let table = emoji_extended_pictographic_table
   let n = table.length() / 2
@@ -326,7 +326,7 @@ fn char_is_emoji_extended_pictographic(u : Int) -> Bool {
 /// is with regular spacing glyphs, and that's the way fonts are made to work.
 /// As such, we make exceptions for those four.
 /// Also ignoring U+1BCA0..1BCA3. https://github.com/harfbuzz/harfbuzz/issues/503
-fn char_is_default_ignorable(ch : Int) -> Bool {
+fn char_is_default_ignorable(ch : Int32) -> Bool {
   let plane = ch >> 16
   if plane == 0 {
     // BMP
@@ -356,7 +356,7 @@ fn char_is_default_ignorable(ch : Int) -> Bool {
 }
 
 ///|
-fn char_is_variation_selector(ch : Int) -> Bool {
+fn char_is_variation_selector(ch : Int32) -> Bool {
   // U+180B..180D, U+180F MONGOLIAN FREE VARIATION SELECTORs are handled in the
   // Arabic shaper. No need to match them here.
   (ch >= 0x0FE00 && ch <= 0x0FE0F) || // VARIATION SELECTOR - 1..16
@@ -364,7 +364,7 @@ fn char_is_variation_selector(ch : Int) -> Bool {
 }
 
 ///|
-fn char_vertical(u : Int) -> Int? {
+fn char_vertical(u : Int32) -> Int32? {
   match u >> 8 {
     0x20 =>
       match u {
@@ -420,34 +420,34 @@ fn char_vertical(u : Int) -> Int? {
 }
 
 ///|
-const S_BASE : Int = 0xAC00
+const S_BASE : Int32 = 0xAC00
 
 ///|
-const L_BASE : Int = 0x1100
+const L_BASE : Int32 = 0x1100
 
 ///|
-const V_BASE : Int = 0x1161
+const V_BASE : Int32 = 0x1161
 
 ///|
-const T_BASE : Int = 0x11A7
+const T_BASE : Int32 = 0x11A7
 
 ///|
-const L_COUNT : Int = 19
+const L_COUNT : Int32 = 19
 
 ///|
-const V_COUNT : Int = 21
+const V_COUNT : Int32 = 21
 
 ///|
-const T_COUNT : Int = 28
+const T_COUNT : Int32 = 28
 
 ///|
-const N_COUNT : Int = 588 // V_COUNT * T_COUNT
+const N_COUNT : Int32 = 588 // V_COUNT * T_COUNT
 
 ///|
-const S_COUNT : Int = 11172 // L_COUNT * N_COUNT
+const S_COUNT : Int32 = 11172 // L_COUNT * N_COUNT
 
 ///|
-fn compose(a : Int, b : Int) -> Int? {
+fn compose(a : Int32, b : Int32) -> Int32? {
   if compose_hangul(a, b) is Some(ab) {
     return Some(ab)
   }
@@ -470,7 +470,7 @@ fn compose(a : Int, b : Int) -> Int? {
 }
 
 ///|
-fn compose_hangul(a : Int, b : Int) -> Int? {
+fn compose_hangul(a : Int32, b : Int32) -> Int32? {
   let l = a
   let v = b
   if L_BASE <= l && l < L_BASE + L_COUNT && V_BASE <= v && v < V_BASE + V_COUNT {
@@ -490,7 +490,7 @@ fn compose_hangul(a : Int, b : Int) -> Int? {
 
 ///|
 /// Decomposes `ab` into `(a, b)` (`b` is 0 for singleton decompositions).
-fn decompose(ab : Int) -> (Int, Int)? {
+fn decompose(ab : Int32) -> (Int32, Int32)? {
   if decompose_hangul(ab) is Some(ab) {
     return Some(ab)
   }
@@ -512,7 +512,7 @@ fn decompose(ab : Int) -> (Int, Int)? {
 }
 
 ///|
-fn decompose_hangul(ab : Int) -> (Int, Int)? {
+fn decompose_hangul(ab : Int32) -> (Int32, Int32)? {
   let si = ab - S_BASE
   if si < 0 || si >= S_COUNT {
     return None

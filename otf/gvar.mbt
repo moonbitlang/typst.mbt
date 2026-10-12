@@ -293,10 +293,10 @@ fn parse_tuple_variation_header(
 // https://docs.microsoft.com/en-us/typography/opentype/spec/otvarcommonformats#packed-point-numbers
 
 ///|
-let points_are_words_flag : Int = 0x80
+let points_are_words_flag : Int32 = 0x80
 
 ///|
-let point_run_count_mask : Int = 0x7F
+let point_run_count_mask : Int32 = 0x7F
 
 ///|
 priv enum PackedPointsState {
@@ -412,7 +412,7 @@ fn PackedPointsIter::next(self : PackedPointsIter) -> UInt16? {
 }
 
 ///|
-fn PackedPointsIter::count(self : PackedPointsIter) -> Int {
+fn PackedPointsIter::count(self : PackedPointsIter) -> Int32 {
   let mut n = 0
   while self.next() is Some(_) {
     n += 1
@@ -478,13 +478,13 @@ fn SetPointsIter::next(self : SetPointsIter) -> Bool {
 // https://docs.microsoft.com/en-us/typography/opentype/spec/otvarcommonformats#packed-deltas
 
 ///|
-let deltas_are_zero_flag : Int = 0x80
+let deltas_are_zero_flag : Int32 = 0x80
 
 ///|
-let deltas_are_words_flag : Int = 0x40
+let deltas_are_words_flag : Int32 = 0x40
 
 ///|
-let delta_run_count_mask : Int = 0x3F
+let delta_run_count_mask : Int32 = 0x3F
 
 ///|
 priv enum PackedDeltasState {
@@ -951,7 +951,7 @@ fn outline_var_impl(
   glyph_id : GlyphId,
   data : BytesView,
   coordinates : ArrayView[NormalizedCoordinate],
-  depth : Int,
+  depth : Int32,
   builder : GlyfBuilder,
 ) -> Unit raise Malformed {
   if depth >= glyf_max_components {

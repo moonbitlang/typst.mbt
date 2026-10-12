@@ -83,8 +83,8 @@ priv struct FrameRec {
 ///|
 priv struct FrameDecoder {
   frames : Map[String, FrameRec]
-  fonts : Map[Int, @library.FontInstance]
-  images : Map[Int, Array[Json]]
+  fonts : Map[Int32, @library.FontInstance]
+  images : Map[Int32, Array[Json]]
 }
 
 ///|
@@ -399,7 +399,7 @@ fn FrameDecoder::paint(
 // Decoders of plain values.
 
 ///|
-fn dec_int(json : Json) -> Int raise Unsupported {
+fn dec_int(json : Json) -> Int32 raise Unsupported {
   match json {
     Number(n, ..) => n.to_int()
     _ => raise Unsupported("integer")
@@ -412,8 +412,8 @@ fn hex_bits(s : String, prefix : String) -> UInt64 raise Unsupported {
   let mut v : UInt64 = 0
   for c in s.view(start_offset=prefix.length()) {
     let d = match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
       _ => raise Unsupported("hex digit")
     }
     v = (v << 4) | d.to_uint64()
@@ -513,7 +513,7 @@ fn dec_process_color(json : Json) -> @library.ProcessColor raise Unsupported {
   guard json is Array(c) && c[0] is String(kind) else {
     raise Unsupported("color")
   }
-  let v = (i : Int) => dec_f32(c[i])
+  let v = (i : Int32) => dec_f32(c[i])
   match kind {
     "Luma" => Luma({ luma: v(1), alpha: v(2), })
     "Oklab" => Oklab({ l: v(1), a: v(2), b: v(3), alpha: v(4), })

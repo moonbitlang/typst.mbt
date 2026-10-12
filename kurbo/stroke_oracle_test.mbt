@@ -62,7 +62,7 @@ fn parse_hex(s : StringView) -> Double {
 }
 
 ///|
-fn clamp_len(len : Int, n : Int) -> Int {
+fn clamp_len(len : Int32, n : Int32) -> Int32 {
   if len < n {
     len
   } else {
@@ -177,7 +177,7 @@ fn parse_path(s : String) -> Array[@kurbo.PathEl] {
   let toks = tokens(s)
   let els : Array[@kurbo.PathEl] = []
   let mut i = 0
-  let pt = (j : Int) => {
+  let pt = (j : Int32) => {
     @kurbo.Point::new(parse_hex(toks[j]), parse_hex(toks[j + 1]))
   }
   while i < toks.length() {
@@ -211,7 +211,7 @@ fn parse_path(s : String) -> Array[@kurbo.PathEl] {
 ///|
 fn parse_seg(s : String) -> @kurbo.PathSeg {
   let toks = tokens(s)
-  let pt = (j : Int) => {
+  let pt = (j : Int32) => {
     @kurbo.Point::new(parse_hex(toks[j]), parse_hex(toks[j + 1]))
   }
   match toks[0] {
@@ -341,7 +341,7 @@ test "kurbo stroke oracle" {
   let ctx = @kurbo.StrokeCtx::new()
   let mut total = 0
   let mut passed = 0
-  let failed_ops : Map[String, Int] = Map([])
+  let failed_ops : Map[String, Int32] = Map([])
   for line in data.split("\n") {
     if line.is_empty() {
       continue

@@ -6,27 +6,27 @@
 
 ///|
 /// Produces the nearest float to `a` with a maximum error of 1/1024.
-fn s15_fixed16_number_to_float(a : Int) -> Float {
+fn s15_fixed16_number_to_float(a : Int32) -> Float {
   Float::from_int(a) / 65536.0
 }
 
 ///|
-fn s15_fixed16_number_to_double(a : Int) -> Double {
+fn s15_fixed16_number_to_double(a : Int32) -> Double {
   a.to_double() / 65536.0
 }
 
 ///|
-fn uint16_number_to_float(a : UInt) -> Float {
+fn uint16_number_to_float(a : UInt32) -> Float {
   Float::from_uint(a) / 65535.0
 }
 
 ///|
-fn uint16_number_to_float_fast(a : Int) -> Float {
+fn uint16_number_to_float_fast(a : Int32) -> Float {
   Float::from_int(a) * (Float::from_int(1) / 65535.0)
 }
 
 ///|
-fn uint8_number_to_float_fast(a : Int) -> Float {
+fn uint8_number_to_float_fast(a : Int32) -> Float {
   Float::from_int(a) * (Float::from_int(1) / 255.0)
 }
 
@@ -92,7 +92,7 @@ fn len64(slice : BytesView) -> UInt64 {
 fn read_desc_unicode(
   tag : BytesView,
   unicode_offset : UInt64,
-) -> (UInt, String)? {
+) -> (UInt32, String)? {
   if len64(tag) < unicode_offset + 8UL {
     return None
   }
@@ -297,7 +297,7 @@ fn read_lut_table_f32(table : BytesView, lut_type : LutType) -> LutStore {
 fn read_nested_tone_curves(
   slice : BytesView,
   offset : UInt64,
-  length : Int,
+  length : Int32,
 ) -> Array[ToneReprCurve] raise CmsError {
   let mut curve_offset = offset
   let curves = []

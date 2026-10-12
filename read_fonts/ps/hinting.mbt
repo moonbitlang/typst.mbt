@@ -2,7 +2,7 @@
 
 ///|
 /// Maximum number of values in a set of blue alignment zones.
-pub const MAX_BLUE_VALUES : Int = 7
+pub const MAX_BLUE_VALUES : Int32 = 7
 
 ///|
 /// Operand for the `BlueValues`, `OtherBlues`, `FamilyBlues` and
@@ -46,7 +46,7 @@ pub fn Blues::default() -> Blues {
 
 ///|
 /// Maximum number of stem snap parameters.
-pub const MAX_STEM_SNAPS : Int = 12
+pub const MAX_STEM_SNAPS : Int32 = 12
 
 ///|
 /// Operand for the `StemSnapH` and `StemSnapV` operators.
@@ -88,7 +88,7 @@ pub(all) struct HintingParams {
   mut blue_scale : @font_types.Fixed
   mut blue_shift : @font_types.Fixed
   mut blue_fuzz : @font_types.Fixed
-  mut language_group : Int
+  mut language_group : Int32
 } derive(Eq, Debug)
 
 ///|

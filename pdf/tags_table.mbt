@@ -2,8 +2,8 @@
 
 ///|
 priv struct TableCtx {
-  group_id : Int
-  table_id : Int
+  group_id : Int32
+  table_id : Int32
   elem : @library.TableElem
   row_kinds : Array[@library.TableCellKind]
   cells : GridCells[TableCellData]
@@ -13,7 +13,7 @@ priv struct TableCtx {
 
 ///|
 priv struct TableCellData {
-  tag : Int
+  tag : Int32
   kind : @library.TableCellKind
   headers : Array[Bytes]
   stroke : SidesMut
@@ -49,8 +49,8 @@ priv enum StrokePriority {
 
 ///|
 fn TableCtx::new(
-  group_id : Int,
-  table_id : Int,
+  group_id : Int32,
+  table_id : Int32,
   table : @library.TableElem,
 ) -> TableCtx {
   let grid = table.grid().unwrap()
@@ -95,8 +95,8 @@ fn TableCtx::new(
 fn TableCtx::insert(
   self : TableCtx,
   cell : @library.TableCell,
-  tag : Int,
-  id : Int,
+  tag : Int32,
+  id : Int32,
 ) -> Unit {
   let styles = tags_styles()
   guard cell.x(styles) is Custom(x) && cell.y(styles) is Custom(y) else {
@@ -159,7 +159,7 @@ fn TableCtx::build_tag(self : TableCtx) -> @export.TagKind {
 }
 
 ///|
-fn build_table(tree : Tree, table_id : Int) -> Unit {
+fn build_table(tree : Tree, table_id : Int32) -> Unit {
   let table_ctx = tree.ctx.tables[table_id]
 
   // Table layouting ensures that there are no overlapping cells, and that
@@ -405,20 +405,20 @@ priv struct HeaderCells {
   /// If this header is inside a table header regions defined by a
   /// `table.header()` call, this is the range of that region.
   /// Currently this is only supported for multi row headers.
-  region_range : (Int, Int)?
+  region_range : (Int32, Int32)?
   level : Int64
   cell_ids : Array[Bytes]
 }
 
 ///|
 fn resolve_cell_headers(
-  table_id : Int,
+  table_id : Int32,
   cells : GridCells[TableCellData],
   header_stack : Array[HeaderCells],
-  region_range : (Int, Int)?,
+  region_range : (Int32, Int32)?,
   refers_to_dir : (@library.TableHeaderScope) -> Bool,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Unit {
   guard cells.cell(x, y) is Some(cell) else { return }
   let cell_ids = resolve_cell_header_ids(
@@ -435,9 +435,9 @@ fn resolve_cell_headers(
 
 ///|
 fn resolve_cell_header_ids(
-  table_id : Int,
+  table_id : Int32,
   header_stack : Array[HeaderCells],
-  region_range : (Int, Int)?,
+  region_range : (Int32, Int32)?,
   refers_to_dir : (@library.TableHeaderScope) -> Bool,
   cell : CtxCell[TableCellData],
 ) -> HeaderCells? {
@@ -482,7 +482,7 @@ fn resolve_cell_header_ids(
 }
 
 ///|
-fn table_cell_id(table_id : Int, x : Int, y : Int) -> Bytes {
+fn table_cell_id(table_id : Int32, x : Int32, y : Int32) -> Bytes {
   // 32 bytes is the maximum length the ID string can have.
   let s = "\{table_id + 1}x\{x}y\{y}"
   // krilla's `TagId::from` disambiguates ids provided by the user from ids
@@ -500,12 +500,12 @@ fn table_cell_id(table_id : Int, x : Int, y : Int) -> Bytes {
 fn place_explicit_lines(
   cells : GridCells[TableCellData],
   lines : Array[Array[@library.Line]],
-  block_end : Int,
-  inline_end : Int,
+  block_end : Int32,
+  inline_end : Int32,
   set_side : (
     GridCells[TableCellData],
-    Int,
-    Int,
+    Int32,
+    Int32,
     @library.LinePosition,
     PrioritzedStroke,
   ) -> Unit,
@@ -546,8 +546,8 @@ fn place_explicit_lines(
 /// `BorderThickness`, and `BorderColor` instead of an array for each.
 fn prioritize_strokes(
   cells : GridCells[TableCellData],
-  a : (Int, Int),
-  b : (Int, Int),
+  a : (Int32, Int32),
+  b : (Int32, Int32),
   get_a : (TableCellData) -> PrioritzedStroke,
   get_b : (TableCellData) -> PrioritzedStroke,
   set_a : (TableCellData, PrioritzedStroke) -> Unit,
@@ -585,7 +585,7 @@ fn try_resolve_table_stroke(
   cells : GridCells[TableCellData],
 ) -> (Double?, @export.NaiveRgbColor?) {
   // Omitted strokes are counted too for reasons explained above.
-  let strokes : Array[(@library.ResolvedStroke?, Int)] = []
+  let strokes : Array[(@library.ResolvedStroke?, Int32)] = []
   for entry in cells.entries {
     guard entry is Cell(cell) else { continue }
     for side in cell.data.stroke.to_array() {
@@ -607,7 +607,7 @@ fn try_resolve_table_stroke(
   // Find the most used stroke and convert it to a fixed stroke.
   // NOTE: upstream iterates a hash map here, so ties are broken in an
   // unspecified order; the last most used stroke is taken here.
-  let mut best : (@library.ResolvedStroke?, Int)? = None
+  let mut best : (@library.ResolvedStroke?, Int32)? = None
   for e in strokes {
     match best {
       Some(b) if b.1 > e.1 => ()
@@ -632,8 +632,8 @@ fn resolve_cell_border_and_background(
   grid : @library.CellGrid,
   parent_border_thickness : Double?,
   parent_border_color : @export.NaiveRgbColor?,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   stroke : SidesMut,
   tag : @export.TagKind,
 ) -> Unit {

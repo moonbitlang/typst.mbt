@@ -85,7 +85,7 @@ fn log_poly_1(z : Double) -> DoubleDouble {
     0x3fd5555555555558UL, 0xbfd0000000000003UL, 0x3fc999999981f535UL, 0xbfc55555553d1eb4UL,
     0x3fc2494526fd4a06UL, 0xbfc0001f0c80e8ceUL,
   ]
-  let p = (i : Int) => p_1[i].reinterpret_as_double()
+  let p = (i : Int32) => p_1[i].reinterpret_as_double()
   let w = DoubleDouble::from_exact_mult(z, z)
   let t = fma(p(5), z, p(4))
   let mut u = fma(p(3), z, p(2))
@@ -150,7 +150,7 @@ fn exp_poly_1(z : Double) -> DoubleDouble {
     0x3ff0000000000000UL, 0x3ff0000000000000UL, 0x3fe0000000000000UL, 0x3fc5555555997996UL,
     0x3fa5555555849d8dUL,
   ]
-  let q = (i : Int) => q_1[i].reinterpret_as_double()
+  let q = (i : Int32) => q_1[i].reinterpret_as_double()
   let mut qq = fma(q(4), z, q(3))
   qq = fma(qq, z, q(2))
   let h0 = fma(qq, z, q(1))

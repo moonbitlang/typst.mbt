@@ -47,7 +47,7 @@ pub fn FontRef::loca(self : FontRef, is_long : Bool?) -> Loca raise ReadError {
 }
 
 ///|
-pub fn Loca::len(self : Loca) -> Int {
+pub fn Loca::len(self : Loca) -> Int32 {
   let n = match self {
     Short(d) => d.len() / 2
     Long(d) => d.len() / 4
@@ -60,7 +60,7 @@ pub fn Loca::len(self : Loca) -> Int {
 }
 
 ///|
-pub fn Loca::get_raw(self : Loca, idx : Int) -> UInt? {
+pub fn Loca::get_raw(self : Loca, idx : Int32) -> UInt32? {
   if idx < 0 {
     return None
   }
@@ -129,27 +129,27 @@ fn Glyph::data(self : Glyph) -> FontData {
 }
 
 ///|
-pub fn Glyph::number_of_contours(self : Glyph) -> Int {
+pub fn Glyph::number_of_contours(self : Glyph) -> Int32 {
   i16_at(self.data(), 0)
 }
 
 ///|
-pub fn Glyph::x_min(self : Glyph) -> Int {
+pub fn Glyph::x_min(self : Glyph) -> Int32 {
   i16_at(self.data(), 2)
 }
 
 ///|
-pub fn Glyph::y_min(self : Glyph) -> Int {
+pub fn Glyph::y_min(self : Glyph) -> Int32 {
   i16_at(self.data(), 4)
 }
 
 ///|
-pub fn Glyph::x_max(self : Glyph) -> Int {
+pub fn Glyph::x_max(self : Glyph) -> Int32 {
   i16_at(self.data(), 6)
 }
 
 ///|
-pub fn Glyph::y_max(self : Glyph) -> Int {
+pub fn Glyph::y_max(self : Glyph) -> Int32 {
   i16_at(self.data(), 8)
 }
 
@@ -160,13 +160,13 @@ pub struct SimpleGlyph {
 }
 
 ///|
-pub fn SimpleGlyph::number_of_contours(self : SimpleGlyph) -> Int {
+pub fn SimpleGlyph::number_of_contours(self : SimpleGlyph) -> Int32 {
   i16_at(self.data, 0)
 }
 
 ///|
 /// The contour end points (empty if out of bounds).
-pub fn SimpleGlyph::end_pts_of_contours(self : SimpleGlyph) -> Array[Int] {
+pub fn SimpleGlyph::end_pts_of_contours(self : SimpleGlyph) -> Array[Int32] {
   let n = self.number_of_contours()
   let arr = self.data.read_array(10, n, 2) catch { _ => return [] }
   [
@@ -175,12 +175,12 @@ pub fn SimpleGlyph::end_pts_of_contours(self : SimpleGlyph) -> Array[Int] {
 }
 
 ///|
-fn SimpleGlyph::instruction_length_offset(self : SimpleGlyph) -> Int {
+fn SimpleGlyph::instruction_length_offset(self : SimpleGlyph) -> Int32 {
   10 + self.number_of_contours() * 2
 }
 
 ///|
-pub fn SimpleGlyph::instruction_length(self : SimpleGlyph) -> Int {
+pub fn SimpleGlyph::instruction_length(self : SimpleGlyph) -> Int32 {
   u16_at(self.data, self.instruction_length_offset())
 }
 
@@ -204,7 +204,7 @@ pub fn SimpleGlyph::glyph_data(self : SimpleGlyph) -> BytesView {
 
 ///|
 /// Returns the total number of points.
-pub fn SimpleGlyph::num_points(self : SimpleGlyph) -> Int {
+pub fn SimpleGlyph::num_points(self : SimpleGlyph) -> Int32 {
   let pts = self.end_pts_of_contours()
   match pts.last() {
     Some(last) => last + 1
@@ -224,10 +224,10 @@ pub fn SimpleGlyph::has_overlapping_contours(self : SimpleGlyph) -> Bool {
 /// exactly `num_points` entries). Flags are reduced to the on-curve bit.
 pub fn SimpleGlyph::read_points_fast(
   self : SimpleGlyph,
-  xs : FixedArray[Int],
-  ys : FixedArray[Int],
-  flags : FixedArray[Int],
-  base : Int,
+  xs : FixedArray[Int32],
+  ys : FixedArray[Int32],
+  flags : FixedArray[Int32],
+  base : Int32,
 ) -> Unit raise ReadError {
   let n_points = self.num_points()
   let data = FontData::new(self.glyph_data())
@@ -315,46 +315,46 @@ pub fn CompositeGlyph::component_data(self : CompositeGlyph) -> FontData {
 
 ///|
 /// Composite glyph flags.
-pub const ARG_1_AND_2_ARE_WORDS : Int = 0x0001
+pub const ARG_1_AND_2_ARE_WORDS : Int32 = 0x0001
 
 ///|
-pub const ARGS_ARE_XY_VALUES : Int = 0x0002
+pub const ARGS_ARE_XY_VALUES : Int32 = 0x0002
 
 ///|
-pub const ROUND_XY_TO_GRID : Int = 0x0004
+pub const ROUND_XY_TO_GRID : Int32 = 0x0004
 
 ///|
-pub const WE_HAVE_A_SCALE : Int = 0x0008
+pub const WE_HAVE_A_SCALE : Int32 = 0x0008
 
 ///|
-pub const MORE_COMPONENTS : Int = 0x0020
+pub const MORE_COMPONENTS : Int32 = 0x0020
 
 ///|
-pub const WE_HAVE_AN_X_AND_Y_SCALE : Int = 0x0040
+pub const WE_HAVE_AN_X_AND_Y_SCALE : Int32 = 0x0040
 
 ///|
-pub const WE_HAVE_A_TWO_BY_TWO : Int = 0x0080
+pub const WE_HAVE_A_TWO_BY_TWO : Int32 = 0x0080
 
 ///|
-pub const WE_HAVE_INSTRUCTIONS : Int = 0x0100
+pub const WE_HAVE_INSTRUCTIONS : Int32 = 0x0100
 
 ///|
-pub const USE_MY_METRICS : Int = 0x0200
+pub const USE_MY_METRICS : Int32 = 0x0200
 
 ///|
-pub const OVERLAP_COMPOUND : Int = 0x0400
+pub const OVERLAP_COMPOUND : Int32 = 0x0400
 
 ///|
-pub const SCALED_COMPONENT_OFFSET : Int = 0x0800
+pub const SCALED_COMPONENT_OFFSET : Int32 = 0x0800
 
 ///|
-pub const UNSCALED_COMPONENT_OFFSET : Int = 0x1000
+pub const UNSCALED_COMPONENT_OFFSET : Int32 = 0x1000
 
 ///|
 /// Anchor position for a composite component.
 pub(all) enum Anchor {
-  Offset(x~ : Int, y~ : Int)
-  Point(base~ : Int, component~ : Int)
+  Offset(x~ : Int32, y~ : Int32)
+  Point(base~ : Int32, component~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -389,8 +389,8 @@ pub extend ComponentTransform with @debug.Debug::{to_repr}
 ///|
 /// A reference to another glyph. Part of [CompositeGlyph].
 pub(all) struct Component {
-  flags : Int
-  glyph : Int
+  flags : Int32
+  glyph : Int32
   anchor : Anchor
   transform : ComponentTransform
 } derive(Eq, Debug)
@@ -474,7 +474,7 @@ pub fn CompositeGlyph::components(self : CompositeGlyph) -> Array[Component] {
 /// `count_and_instructions`).
 pub fn CompositeGlyph::component_glyphs_and_flags(
   self : CompositeGlyph,
-) -> (Array[(Int, Int)], BytesView?) {
+) -> (Array[(Int32, Int32)], BytesView?) {
   let result = []
   let cursor = self.component_data().cursor()
   let mut cur_flags = 0
@@ -524,7 +524,7 @@ pub fn CompositeGlyph::instructions(self : CompositeGlyph) -> BytesView? {
 
 ///|
 /// Computes a table checksum.
-pub fn compute_checksum(table : BytesView) -> UInt {
+pub fn compute_checksum(table : BytesView) -> UInt32 {
   let mut sum = 0U
   let n = table.length() / 4
   for i in 0..<n {
@@ -584,7 +584,7 @@ pub fn FontRef::cff(self : FontRef) -> CffTable raise ReadError {
 
 ///|
 /// Reads a CFF INDEX header and returns its total size in bytes.
-fn cff_index_size(d : FontData) -> Int raise ReadError {
+fn cff_index_size(d : FontData) -> Int32 raise ReadError {
   if d.len() < 3 {
     raise OutOfBounds
   }

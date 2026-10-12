@@ -131,7 +131,7 @@ pub(open) trait World {
   /// Metadata about all known fonts.
   fn book(Self) -> FontBook = _
   /// Try to access the font with the given index in the font book.
-  fn font(Self, Int) -> Font? = _
+  fn font(Self, Int32) -> Font? = _
   /// Get the current date.
   ///
   /// If no offset is specified, the local date should be chosen. Otherwise,
@@ -158,7 +158,7 @@ impl World with fn font(_, _) {
 pub fn world_range(
   world : TrackedWorld,
   span : @syntax.DiagSpan,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   match span.get() {
     Detached => None
     Number(id~, num~, sub_range~) =>
@@ -303,7 +303,7 @@ pub(all) struct Sink {
 
 ///|
 /// The maximum number of traced values.
-pub let sink_max_values : Int = 10
+pub let sink_max_values : Int32 = 10
 
 ///|
 pub fn Sink::new() -> Sink {
@@ -481,7 +481,7 @@ pub struct Route {
   priv id : @syntax.FileId?
   /// This is set whenever we enter a function, nested layout, or are applying
   /// a show rule.
-  priv mut len : Int
+  priv mut len : Int32
 }
 
 ///|
@@ -548,7 +548,7 @@ pub fn Route::memo_hash(self : Route) -> U128 {
 /// The depth of the route: the sum of the lengths of its segments (not
 /// upstream; see `route_shift_lo`). Lengths are not negative, so
 /// `self.within(depth)` is `self.depth() <= depth`.
-pub fn Route::depth(self : Route) -> Int {
+pub fn Route::depth(self : Route) -> Int32 {
   let mut route = self
   let mut depth = 0
   while true {
@@ -573,7 +573,7 @@ pub fn Route::contains(self : Route, id : @syntax.FileId) -> Bool {
 
 ///|
 /// Whether the route's depth is less than or equal to the given depth.
-pub fn Route::within(self : Route, depth : Int) -> Bool {
+pub fn Route::within(self : Route, depth : Int32) -> Bool {
   if depth < self.len {
     return false
   }
@@ -592,26 +592,26 @@ pub fn Route::within(self : Route, depth : Int) -> Bool {
 /// `memo.mbt`). The answer of `within(depth)` on a route of depth `d` is
 /// `d <= depth`: it stays true while the route is at most `depth - d`
 /// deeper, and false while it is more than that (a negative number) deeper.
-let route_shift_lo : Ref[Int] = { val: route_shift_min, }
+let route_shift_lo : Ref[Int32] = { val: route_shift_min, }
 
 ///|
-let route_shift_hi : Ref[Int] = { val: route_shift_max, }
+let route_shift_hi : Ref[Int32] = { val: route_shift_max, }
 
 ///|
 /// The number of memoized closure calls in progress.
-let route_shift_scopes : Ref[Int] = { val: 0, }
+let route_shift_scopes : Ref[Int32] = { val: 0, }
 
 ///|
 /// No bound (far outside the depths that routes can have).
-let route_shift_min : Int = -1000000
+let route_shift_min : Int32 = -1000000
 
 ///|
-let route_shift_max : Int = 1000000
+let route_shift_max : Int32 = 1000000
 
 ///|
 /// Narrow the bounds of the call in progress: something in it is only what
 /// it was for a change of the depth in `lo..=hi`.
-fn note_route_shift(lo : Int, hi : Int) -> Unit {
+fn note_route_shift(lo : Int32, hi : Int32) -> Unit {
   if route_shift_scopes.val > 0 {
     if lo > route_shift_lo.val {
       route_shift_lo.val = lo
@@ -624,7 +624,7 @@ fn note_route_shift(lo : Int, hi : Int) -> Unit {
 
 ///|
 /// [Route::within] for the checks below, noted for memoization.
-fn Route::check_within(self : Route, depth : Int) -> Bool {
+fn Route::check_within(self : Route, depth : Int32) -> Bool {
   let within = self.within(depth)
   if route_shift_scopes.val > 0 {
     let slack = depth - self.depth()
@@ -638,16 +638,16 @@ fn Route::check_within(self : Route, depth : Int) -> Bool {
 }
 
 ///|
-pub let max_show_rule_depth : Int = 64
+pub let max_show_rule_depth : Int32 = 64
 
 ///|
-pub let max_layout_depth : Int = 72
+pub let max_layout_depth : Int32 = 72
 
 ///|
-pub let max_html_depth : Int = 72
+pub let max_html_depth : Int32 = 72
 
 ///|
-pub let max_call_depth : Int = 80
+pub let max_call_depth : Int32 = 80
 
 ///|
 /// Ensures that we are within the maximum show rule depth.
@@ -703,21 +703,21 @@ pub struct Context {
   /// What was asked of the context since a memoized closure call last
   /// cleared it: [context_read_location], [context_read_styles],
   /// [context_read_introspect].
-  priv mut reads : Int
+  priv mut reads : Int32
 }
 
 ///|
 /// See [Context]: the location was read.
-let context_read_location : Int = 1
+let context_read_location : Int32 = 1
 
 ///|
 /// See [Context]: the styles were read.
-let context_read_styles : Int = 2
+let context_read_styles : Int32 = 2
 
 ///|
 /// See [Context]: [Context::introspect] was called (which only depends on
 /// whether there is any context).
-let context_read_introspect : Int = 4
+let context_read_introspect : Int32 = 4
 
 ///|
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Context {

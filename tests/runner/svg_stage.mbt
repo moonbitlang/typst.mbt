@@ -60,7 +60,7 @@ fn is_dedup_kind(c : Char) -> Bool {
 ///|
 /// The length of a deduplicated ID (kind + hex digits) starting at `i`, if
 /// any.
-fn dedup_id_len(s : String, i : Int) -> Int? {
+fn dedup_id_len(s : String, i : Int32) -> Int32? {
   if i >= s.length() || !is_dedup_kind(s.unsafe_get(i).unsafe_to_char()) {
     return None
   }
@@ -94,7 +94,7 @@ fn canonicalize_svg_ids(svg : String) -> String {
   }
   // Rename definitions and references in order of first occurrence.
   let names : Map[String, String] = Map([])
-  let counters : Map[Char, Int] = Map([])
+  let counters : Map[Char, Int32] = Map([])
   let out = StringBuilder()
   let mut last = 0
   let mut i = 0

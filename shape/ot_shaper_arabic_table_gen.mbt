@@ -3,7 +3,7 @@
 
 ///|
 /// Joining types (`hb_arabic_joining_type_t` values) of the covered ranges.
-let joining_table : ReadOnlyArray[Int] = [
+let joining_table : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 8, 8, 0, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
   8, 8, 8, 8, 8, 3, 0, 2, 2, 2, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 8, 8, 8, 8, 8, 8,
@@ -61,40 +61,40 @@ let joining_table : ReadOnlyArray[Int] = [
 ]
 
 ///|
-const JOINING_OFFSET_0X0600 : Int = 0
+const JOINING_OFFSET_0X0600 : Int32 = 0
 
 ///|
-const JOINING_OFFSET_0X1806 : Int = 739
+const JOINING_OFFSET_0X1806 : Int32 = 739
 
 ///|
-const JOINING_OFFSET_0X200C : Int = 904
+const JOINING_OFFSET_0X200C : Int32 = 904
 
 ///|
-const JOINING_OFFSET_0XA840 : Int = 998
+const JOINING_OFFSET_0XA840 : Int32 = 998
 
 ///|
-const JOINING_OFFSET_0X10AC0 : Int = 1050
+const JOINING_OFFSET_0X10AC0 : Int32 = 1050
 
 ///|
-const JOINING_OFFSET_0X10B80 : Int = 1098
+const JOINING_OFFSET_0X10B80 : Int32 = 1098
 
 ///|
-const JOINING_OFFSET_0X10D00 : Int = 1146
+const JOINING_OFFSET_0X10D00 : Int32 = 1146
 
 ///|
-const JOINING_OFFSET_0X10EC2 : Int = 1182
+const JOINING_OFFSET_0X10EC2 : Int32 = 1182
 
 ///|
-const JOINING_OFFSET_0X10F30 : Int = 1185
+const JOINING_OFFSET_0X10F30 : Int32 = 1185
 
 ///|
-const JOINING_OFFSET_0X110BD : Int = 1341
+const JOINING_OFFSET_0X110BD : Int32 = 1341
 
 ///|
-const JOINING_OFFSET_0X1E900 : Int = 1358
+const JOINING_OFFSET_0X1E900 : Int32 = 1358
 
 ///|
-fn joining_type(u : Int) -> Int {
+fn joining_type(u : Int32) -> Int32 {
   match u >> 12 {
     0x0 =>
       if u >= 0x0600 && u <= 0x08E2 {

@@ -32,7 +32,7 @@ pub fn ShadingFunction::eval(
 
 ///|
 /// The key of Rust's `f32::total_cmp`.
-fn f32_total_cmp_key(x : Float) -> Int {
+fn f32_total_cmp_key(x : Float) -> Int32 {
   let bits = x.reinterpret_as_int()
   bits ^ ((bits >> 31).reinterpret_as_uint() >> 1).reinterpret_as_int()
 }
@@ -243,7 +243,7 @@ fn Shading::new(
       }
       let function = read_function(dict, color_space)
       guard read_decode() is Some(decode) else { return None }
-      guard (dict.get("VerticesPerRow") : UInt?) is Some(vertices_per_row) else {
+      guard (dict.get("VerticesPerRow") : UInt32?) is Some(vertices_per_row) else {
         return None
       }
       guard read_lattice_triangles(
@@ -427,7 +427,7 @@ fn Triangle::barycentric_coords(
 ///|
 /// A triangle vertex.
 pub struct TriangleVertex {
-  priv flag : UInt
+  priv flag : UInt32
   /// The position of the vertex.
   point : @kurbo.Point
   /// The color component of the vertex.
@@ -517,7 +517,7 @@ fn bilinear_colors(
 
 ///|
 /// Evaluate Bernstein polynomial `B_i(t)` for tensor-product patches.
-fn TensorProductPatch::bernstein(i : Int, t : Double) -> Double {
+fn TensorProductPatch::bernstein(i : Int32, t : Double) -> Double {
   // `powi` with a constant exponent is expanded into multiplications.
   match i {
     0 => {
@@ -543,7 +543,7 @@ pub fn TensorProductPatch::map_coordinate(
   let (u, v) = (p.x, p.y)
   let mut x = 0.0
   let mut y = 0.0
-  fn idx(i : Int, j : Int) -> Int {
+  fn idx(i : Int32, j : Int32) -> Int32 {
     match (i, j) {
       (0, 0) => 0
       (0, 1) => 1
@@ -657,8 +657,8 @@ fn read_free_form_triangles(
 ///|
 /// Common interpolation functions used across different shading types.
 priv struct InterpolationHelpers {
-  bp_coord : Int
-  bp_comp : Int
+  bp_coord : Int32
+  bp_comp : Int32
   coord_max : Float
   comp_max : Float
   x_min : Float
@@ -692,14 +692,14 @@ fn InterpolationHelpers::new(
 
 ///|
 /// Rust's `u32 as f32`.
-fn u32_as_f32(n : UInt) -> Float {
+fn u32_as_f32(n : UInt32) -> Float {
   Float::from_double(n.to_uint64().to_double())
 }
 
 ///|
 fn InterpolationHelpers::interpolate_coord(
   self : InterpolationHelpers,
-  n : UInt,
+  n : UInt32,
   d_min : Float,
   d_max : Float,
 ) -> Float {
@@ -709,7 +709,7 @@ fn InterpolationHelpers::interpolate_coord(
 ///|
 fn InterpolationHelpers::interpolate_comp(
   self : InterpolationHelpers,
-  n : UInt,
+  n : UInt32,
   d_min : Float,
   d_max : Float,
 ) -> Float {
@@ -866,7 +866,7 @@ fn read_lattice_triangles(
   bp_cord : Byte,
   bp_comp : Byte,
   has_function : Bool,
-  vertices_per_row : UInt,
+  vertices_per_row : UInt32,
   decode : Array[Float],
 ) -> Array[Triangle]? {
   let lattices : Array[Array[TriangleVertex]] = []
@@ -955,7 +955,7 @@ fn[P] read_patch_mesh(
   bp_comp : Byte,
   has_function : Bool,
   decode : Array[Float],
-  control_points_count : Int,
+  control_points_count : Int32,
   create_patch : (FixedArray[@kurbo.Point], FixedArray[ColorComponents]) -> P,
 ) -> Array[P]? {
   guard split_decode(decode) is Some((coords, decode)) else { return None }
@@ -990,7 +990,7 @@ fn[P] read_patch_mesh(
         prev_patch_points = Some(control_points.copy())
         prev_patch_colors = Some(colors.copy())
       }
-      1..=3 => {
+      1..<=3 => {
         guard prev_patch_points is Some(prev_points) else { return None }
         guard prev_patch_colors is Some(prev_colors) else { return None }
         copy_patch_control_points(flag, prev_points, control_points)
@@ -1029,7 +1029,7 @@ fn[P] read_patch_mesh(
 
 ///|
 fn copy_patch_control_points(
-  flag : UInt,
+  flag : UInt32,
   prev_control_points : FixedArray[@kurbo.Point],
   control_points : FixedArray[@kurbo.Point],
 ) -> Unit {

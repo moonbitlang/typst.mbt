@@ -4,7 +4,7 @@
 
 ///|
 /// Rust's `char::to_digit` for a UTF-16 code unit.
-fn ascii_to_digit(c : Int, radix : Int) -> Int? {
+fn ascii_to_digit(c : Int32, radix : Int32) -> Int32? {
   let d = if c >= '0' && c <= '9' {
     c - '0'
   } else if c >= 'a' && c <= 'z' {
@@ -24,7 +24,7 @@ fn ascii_to_digit(c : Int, radix : Int) -> Int? {
 ///|
 /// Rust's `i64::from_str_radix` (also `str::parse::<i64>()` with radix 10):
 /// an optional `+`/`-` followed by at least one digit, no overflow.
-fn i64_from_str_radix(s : String, radix : Int) -> Int64? {
+fn i64_from_str_radix(s : String, radix : Int32) -> Int64? {
   let len = s.length()
   if len == 0 {
     return None
@@ -107,7 +107,7 @@ fn rust_parse_f64(s : String) -> Double? {
     return Some(if negative { -nan } else { nan })
   }
   // Validate the grammar ourselves: MoonBit's parser also accepts `_`.
-  let is_digit = (j : Int) => {
+  let is_digit = (j : Int32) => {
     j < len && s.code_unit_at(j) >= '0' && s.code_unit_at(j) <= '9'
   }
   let mut digits = 0

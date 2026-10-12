@@ -22,9 +22,9 @@ pub(all) struct MorxFeature {
   /// The feature's setting (aka selector).
   setting : UInt16
   /// Flags for the settings that this feature and setting enables.
-  enable_flags : UInt
+  enable_flags : UInt32
   /// Complement of flags for the settings that this feature and setting disable.
-  disable_flags : UInt
+  disable_flags : UInt32
 } derive(Debug)
 
 ///|
@@ -116,7 +116,7 @@ fn MorxContextualSubtable::parse(
 /// Returns a [Lookup](AatLookup) at index.
 pub fn MorxContextualSubtable::lookup(
   self : MorxContextualSubtable,
-  index : UInt,
+  index : UInt32,
 ) -> AatLookup? {
   guard self.offsets.get(index) is Some(offset) else { return None }
   guard slice_from(self.offsets_data, offset.to_usize()) is Some(lookup_data) else {
@@ -131,7 +131,7 @@ pub struct MorxLigatureSubtable {
   /// A state table.
   state : ExtendedStateTable[UInt16]
   /// Ligature actions.
-  ligature_actions : LazyArray32[UInt]
+  ligature_actions : LazyArray32[UInt32]
   /// Ligature components.
   components : LazyArray32[UInt16]
   /// Ligatures.
@@ -267,7 +267,7 @@ pub(all) struct MorxSubtable {
   /// A subtable coverage.
   coverage : MorxCoverage
   /// Subtable feature flags.
-  feature_flags : UInt
+  feature_flags : UInt32
 }
 
 ///|
@@ -276,7 +276,7 @@ pub(all) struct MorxSubtable {
 /// The internal data layout is not designed for random access,
 /// therefore we're not providing the `get()` method and only an iterator.
 struct MorxSubtables {
-  count : UInt
+  count : UInt32
   data : BytesView
   number_of_glyphs : UInt16
 }
@@ -302,8 +302,8 @@ pub fn MorxSubtables::iter(self : MorxSubtables) -> Iter[MorxSubtable] {
 ///|
 /// An iterator over a metamorphosis chain subtables.
 struct MorxSubtablesIter {
-  index : UInt
-  count : UInt
+  index : UInt32
+  count : UInt32
   stream : Stream
   number_of_glyphs : UInt16
 }
@@ -379,7 +379,7 @@ pub fn MorxSubtablesIter::next(self : MorxSubtablesIter) -> MorxSubtable? {
 /// A metamorphosis chain.
 pub(all) struct MorxChain {
   /// Default chain features.
-  default_flags : UInt
+  default_flags : UInt32
   /// A list of chain features.
   features : LazyArray32[MorxFeature]
   /// A list of chain subtables.
@@ -393,7 +393,7 @@ pub(all) struct MorxChain {
 /// therefore we're not providing the `get()` method and only an iterator.
 struct MorxChains {
   data : BytesView
-  count : UInt
+  count : UInt32
   number_of_glyphs : UInt16
 }
 
@@ -430,8 +430,8 @@ pub fn MorxChains::iter(self : MorxChains) -> Iter[MorxChain] {
 ///|
 /// An iterator over metamorphosis chains.
 struct MorxChainsIter {
-  index : UInt
-  count : UInt
+  index : UInt32
+  count : UInt32
   stream : Stream
   number_of_glyphs : UInt16
 }

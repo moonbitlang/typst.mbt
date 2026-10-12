@@ -13,7 +13,7 @@ pub(all) enum Paint {
   /// `rgb("#rrggbb")` (any string `rgb` accepts).
   Rgb(String)
   /// `luma(n)` with `n` in `0..=255`.
-  Luma(Int)
+  Luma(Int32)
   Black
   Gray
   Silver
@@ -186,8 +186,8 @@ pub fn Paint::darken(self : Paint, percent : Double) -> Paint {
 pub fn Paint::mix(
   self : Paint,
   other : Paint,
-  weight? : Double = 50,
-  space? : ColorSpace = Auto,
+  weight~ : Double = 50,
+  space~ : ColorSpace = Auto,
 ) -> Paint {
   let named : Array[(String, Value)] = []
   // `auto` is the default of the parameter.
@@ -819,7 +819,7 @@ pub struct Cells[T] {
 pub fn[T : ToValue] Cells::Cells(
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
-  f : (Int, Int) -> T raise,
+  f : (Int32, Int32) -> T raise,
 ) -> Cells[T] {
   let site = Site::new("Cells", loc, args_loc)
   let callback = Callback::new(site, (_, args) => {
@@ -947,7 +947,7 @@ pub(all) enum FontWeight {
   Bold
   ExtraBold
   Black
-  Weight(Int)
+  Weight(Int32)
 }
 
 ///|

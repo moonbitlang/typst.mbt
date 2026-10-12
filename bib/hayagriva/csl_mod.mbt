@@ -6,7 +6,7 @@ pub struct BibliographyDriver {
   /// The citations we have seen so far.
   priv citations : Array[CitationRequest]
   /// Offset to apply to the citation number (for numeric styles).
-  priv mut citation_number_offset : Int
+  priv mut citation_number_offset : Int32
 }
 
 ///|
@@ -19,7 +19,7 @@ pub fn BibliographyDriver::new() -> BibliographyDriver {
 /// Adds a citation number offset to the driver.
 pub fn BibliographyDriver::with_citation_number_offset(
   self : BibliographyDriver,
-  offset : Int,
+  offset : Int32,
 ) -> BibliographyDriver {
   self.citation_number_offset = offset
   self
@@ -45,7 +45,7 @@ priv struct SpeculativeItemRender {
   checked_disambiguate : Bool
   first_name : NameDisambiguationProperties?
   mut delim_override : String?
-  mut group_idx : Int?
+  mut group_idx : Int32?
   locator : SpecificLocator?
   mut hidden : Bool
   locale : @citationberg.LocaleCode?
@@ -264,7 +264,7 @@ pub fn BibliographyDriver::finish(
   // 3. Group adjacent citations.
   for cite in res {
     // This map contains the last index of each entry with this names elem.
-    let map : Map[String, Int] = Map([])
+    let map : Map[String, Int32] = Map([])
     let mut group_idx = 0
     for i in 0..<cite.items.length() {
       let citation = cite.request.style.citation
@@ -343,7 +343,7 @@ pub fn BibliographyDriver::finish(
     None => None
   }
   if bib_sort is None {
-    let seen_nums : Array[(Entry, Int)] = []
+    let seen_nums : Array[(Entry, Int32)] = []
     let mut start = self.citation_number_offset
     for cite in res {
       for item in cite.items {
@@ -610,7 +610,7 @@ fn date_replacement(
 ///|
 /// Write a year with the AD/BC terms.
 pub fn[W : FmtWrite] write_year(
-  year : Int,
+  year : Int32,
   short : Bool,
   w : W,
   ad : String,
@@ -683,9 +683,9 @@ fn get_names(children : ElemChildren) -> Array[Person] {
 /// A state used for disambiguation.
 priv struct DisambData {
   /// The citation index of the item.
-  cite_id : Int
+  cite_id : Int32
   /// The item index.
-  item_id : Int
+  item_id : Int32
   /// Names occurring in this citation item.
   names : Array[Person]
   /// The related speculative render
@@ -701,7 +701,7 @@ fn DisambData::same(self : DisambData, other : DisambData) -> Bool {
 /// Returns true iff the item `x` is fully disambiguated w.r.t. `xs` where
 /// the first `et_al_min` are added and the `rule` is applied.
 fn is_disambiguated(
-  et_al_min : Int,
+  et_al_min : Int32,
   xs : Array[DisambData],
   x : DisambData,
   rule : @citationberg.DisambiguationRule?,
@@ -790,7 +790,7 @@ fn disamb_cite_add_given_name(
 /// Progressively transform names to disambiguate them.
 fn disambiguate_names(
   renders : Array[SpeculativeCiteRender],
-  group : Array[(Int, Int)],
+  group : Array[(Int32, Int32)],
   mark : (Entry, DisambiguateState) -> Unit,
 ) -> Unit {
   let group = group.map(pair => {
@@ -814,8 +814,8 @@ fn disambiguate_names(
   }
 
   // Tracks changes to the disambiguation state
-  let changed_states : Array[((Int, Int), DisambiguateState)] = []
-  let get_changed = (key : (Int, Int)) => {
+  let changed_states : Array[((Int32, Int32), DisambiguateState)] = []
+  let get_changed = (key : (Int32, Int32)) => {
     for pair in changed_states {
       if pair.0 == key {
         return Some(pair.1)
@@ -823,7 +823,7 @@ fn disambiguate_names(
     }
     None
   }
-  let set_changed = (key : (Int, Int), state : DisambiguateState) => {
+  let set_changed = (key : (Int32, Int32), state : DisambiguateState) => {
     for i, pair in changed_states {
       if pair.0 == key {
         changed_states[i] = (key, state)
@@ -833,8 +833,8 @@ fn disambiguate_names(
     changed_states.push((key, state))
   }
   // Tracks already disambiguated items
-  let disambiguated : Array[(Int, Int)] = []
-  let insert_disambiguated = (key : (Int, Int)) => {
+  let disambiguated : Array[(Int32, Int32)] = []
+  let insert_disambiguated = (key : (Int32, Int32)) => {
     if !disambiguated.contains(key) {
       disambiguated.push(key)
     }
@@ -927,7 +927,7 @@ fn disambiguate_names(
 /// Mark qualifying entries for disambiguation with `cs:choose`.
 fn disambiguate_with_choose(
   renders : Array[SpeculativeCiteRender],
-  group : Array[(Int, Int)],
+  group : Array[(Int32, Int32)],
   mark : (Entry, DisambiguateState) -> Unit,
 ) -> Unit {
   if group
@@ -956,7 +956,7 @@ fn disambiguate_with_choose(
 /// Mark qualifying entries for disambiguation with year suffixes.
 fn disambiguate_year_suffix(
   renders : Array[SpeculativeCiteRender],
-  group : Array[(Int, Int)],
+  group : Array[(Int32, Int32)],
   mark : (Entry, DisambiguateState) -> Unit,
 ) -> Unit {
   let any_date = renders
@@ -1008,11 +1008,11 @@ fn disambiguate_year_suffix(
 /// with cite and item index.
 fn find_ambiguous_sets(
   cites : Array[SpeculativeCiteRender],
-) -> Array[Array[(Int, Int)]] {
+) -> Array[Array[(Int32, Int32)]] {
   // `Ok(pos)`: a single item produced this string; `Err(idx)`: there were
   // multiple matches (the index in the result vector).
-  let map : Map[String, Result[(Int, Int), Int]] = Map([])
-  let res : Array[Array[(Int, Int)]] = []
+  let map : Map[String, Result[(Int32, Int32), Int32]] = Map([])
+  let res : Array[Array[(Int32, Int32)]] = []
   for i, cite in cites {
     for j, item in cite.items {
       if !item.cite_props.speculative.disambiguation.may_disambiguate_with_year_suffix() {
@@ -1054,7 +1054,7 @@ fn collapse_items(cite : SpeculativeCiteRender) -> Unit {
   match style.citation.collapse {
     Some(CitationNumber) => {
       // Option with the start and end of the range.
-      let mut range_start : (Int, Int)? = None
+      let mut range_start : (Int32, Int32)? = None
       let mut just_collapsed = false
       let items = cite.items
       let end_range = () => {
@@ -1106,7 +1106,7 @@ fn collapse_items(cite : SpeculativeCiteRender) -> Unit {
     Some(Year as c) | Some(YearSuffix as c) | Some(YearSuffixRanged as c) => {
       // Index of where the current group started and the group we are
       // currently in.
-      let mut group_idx : (Int, Int)? = None
+      let mut group_idx : (Int32, Int32)? = None
       for i in 0..<cite.items.length() {
         let item = cite.items[i]
         match group_idx {
@@ -1249,7 +1249,7 @@ fn substitute_subsequent_authors(
     }
   }
 
-  fn replace_first_n(num : Int, names : Elem, subs : Formatted) -> Unit {
+  fn replace_first_n(num : Int32, names : Elem, subs : Formatted) -> Unit {
     let mut num = num
     let old_children = names.children
     names.children = ElemChildren([copy_subs(subs)])
@@ -1270,7 +1270,7 @@ fn substitute_subsequent_authors(
     }
   }
 
-  fn num_of_matches(ns1 : Array[Elem], ns2 : Array[Elem]) -> Int {
+  fn num_of_matches(ns1 : Array[Elem], ns2 : Array[Elem]) -> Int32 {
     let mut n = 0
     while n < ns1.length() && n < ns2.length() && ns1[n] == ns2[n] {
       n += 1
@@ -1361,9 +1361,9 @@ pub(all) struct RenderedBibliography {
   second_field_align : @citationberg.SecondFieldAlign?
   /// The line spacing within the bibliography as a multiple of regular line
   /// spacing.
-  line_spacing : Int
+  line_spacing : Int32
   /// Extra space between entries as a multiple of line height.
-  entry_spacing : Int
+  entry_spacing : Int32
   /// The bibliography items. The first item may be some if
   /// `second_field_align` is set. Then, it is the first field that must be
   /// treated specially.
@@ -1396,7 +1396,7 @@ pub extend BibliographyItem with @debug.Debug::{to_repr}
 /// A fully rendered citation.
 pub(all) struct RenderedCitation {
   /// The footnote number for this citation.
-  note_number : Int?
+  note_number : Int32?
   /// The citation.
   citation : ElemChildren
 } derive(Debug)
@@ -1456,7 +1456,7 @@ fn InstanceContext::new(
 ///|
 fn InstanceContext::variable_sort_instance(
   item : CitationItem,
-  idx : Int,
+  idx : Int32,
 ) -> InstanceContext {
   InstanceContext::new(
     item.entry,
@@ -1517,7 +1517,7 @@ fn StyleContext::ctx(
 fn StyleContext::macro_sorting_ctx(
   self : StyleContext,
   item : CitationItem,
-  idx : Int,
+  idx : Int32,
   locale : @citationberg.LocaleCode?,
   term_locale : @citationberg.LocaleCode?,
   bibliography : Bool,
@@ -1762,7 +1762,7 @@ pub struct CitationRequest {
   /// not define all necessary items.
   locale_files : Array[@citationberg.Locale]
   /// The number to use for `first-reference-note-number`.
-  priv note_number : Int?
+  priv note_number : Int32?
 }
 
 ///|
@@ -1772,7 +1772,7 @@ pub fn CitationRequest::new(
   style : @citationberg.IndependentStyle,
   locale : @citationberg.LocaleCode?,
   locale_files : Array[@citationberg.Locale],
-  note_number : Int?,
+  note_number : Int32?,
 ) -> CitationRequest {
   {
     items,
@@ -1861,7 +1861,7 @@ pub struct CitationItem {
   /// Format the item in a special way.
   purpose : CitePurpose?
   /// The initial index of this item in the list of items.
-  priv mut initial_idx : Int
+  priv mut initial_idx : Int32
 }
 
 ///|
@@ -2048,7 +2048,7 @@ fn WritingContext::formatting(self : WritingContext) -> Formatting {
 fn WritingContext::push_format(
   self : WritingContext,
   format : @citationberg.Formatting,
-) -> Int {
+) -> Int32 {
   if format.is_empty() {
     return self.format_stack.len()
   }
@@ -2060,7 +2060,7 @@ fn WritingContext::push_format(
 
 ///|
 /// Pop a format from the stack if it is not empty.
-fn WritingContext::pop_format(self : WritingContext, pos : Int) -> Unit {
+fn WritingContext::pop_format(self : WritingContext, pos : Int32) -> Unit {
   if pos == self.format_stack.len() {
     return
   }
@@ -2097,8 +2097,8 @@ fn WritingContext::save_to_block(self : WritingContext) -> Unit {
 ///|
 /// A location in the element stack (upstream `DisplayLoc`).
 priv struct DisplayLoc {
-  pos : Int
-  format_idx : Int
+  pos : Int32
+  format_idx : Int32
 }
 
 ///|
@@ -2130,7 +2130,7 @@ fn WritingContext::discard_elem(
 ///|
 fn WritingContext::has_content_since(
   self : WritingContext,
-  loc : (DisplayLoc, Int),
+  loc : (DisplayLoc, Int32),
 ) -> Bool {
   self.save_to_block()
   let children = self.elem_stack.last
@@ -2151,7 +2151,7 @@ fn WritingContext::has_content_since(
 fn WritingContext::apply_prefix(
   self : WritingContext,
   affixes : @citationberg.Affixes,
-) -> (DisplayLoc, Int) {
+) -> (DisplayLoc, Int32) {
   let pos = self.push_elem(@citationberg.Formatting::default())
   if affixes.prefix is Some(prefix) {
     self.buf.push_str(prefix)
@@ -2256,7 +2256,7 @@ fn WritingContext::stop_suppressing_queried_variables(
 fn WritingContext::push_case(
   self : WritingContext,
   case_ : @citationberg.TextCase?,
-) -> Int {
+) -> Int32 {
   let idx = self.cases.len()
   self.cases.push(case_)
   idx
@@ -2264,7 +2264,7 @@ fn WritingContext::push_case(
 
 ///|
 /// Clear the case of the next text.
-fn WritingContext::pop_case(self : WritingContext, idx : Int) -> Unit {
+fn WritingContext::pop_case(self : WritingContext, idx : Int32) -> Unit {
   if idx == self.cases.len() {
     return
   }
@@ -2287,7 +2287,7 @@ fn WritingContext::reconfigure(self : WritingContext) -> Unit {
 fn WritingContext::push_delimiter(
   self : WritingContext,
   delimiter : String?,
-) -> Int {
+) -> Int32 {
   let idx = self.delimiters.len()
   self.delimiters.push(delimiter)
   idx
@@ -2295,7 +2295,7 @@ fn WritingContext::push_delimiter(
 
 ///|
 /// Clear the delimiter after a group or layout.
-fn WritingContext::pop_delimiter(self : WritingContext, idx : Int) -> Unit {
+fn WritingContext::pop_delimiter(self : WritingContext, idx : Int32) -> Unit {
   if idx == self.delimiters.len() {
     return
   }
@@ -2328,7 +2328,7 @@ fn WritingContext::prepare_variable_query(
 ///|
 /// Return the sum of the lengths of strings in the finished elements. This
 /// may not monotonically increase.
-fn WritingContext::len(self : WritingContext) -> Int {
+fn WritingContext::len(self : WritingContext) -> Int32 {
   let mut n = self.buf.len()
   for e in self.elem_stack.items() {
     for c in e.0 {
@@ -2376,7 +2376,7 @@ fn CiteProperties::copy(self : CiteProperties) -> CiteProperties {
 ///|
 fn CiteProperties::for_sorting(
   locator : SpecificLocator?,
-  citation_number : Int,
+  citation_number : Int32,
 ) -> CiteProperties {
   {
     certain: CertainCiteProperties::new(),
@@ -2393,16 +2393,16 @@ fn CiteProperties::for_sorting(
 /// citation or bibliography entry.
 priv struct CertainCiteProperties {
   /// The number of the footnote this citation appears in.
-  note_number : Int?
+  note_number : Int32?
   /// The number of the first footnote this citation appears in.
-  first_note_number : Int?
+  first_note_number : Int32?
   /// Whether the item is within `near-note-distance` to the previous
   /// citation of the same item.
   is_near_note : Bool
   /// Whether this citation is the first citation of the entry.
   is_first : Bool
   /// The index of the item in the original citation request.
-  initial_idx : Int
+  initial_idx : Int32
 }
 
 ///|
@@ -2423,7 +2423,7 @@ priv struct SpeculativeCiteProperties {
   /// Locator with its type.
   mut locator : SpecificLocator?
   /// The position the item appears at in the bibliography.
-  mut citation_number : Int
+  mut citation_number : Int32
   /// Whether this citation is exactly the same as the previous citation.
   mut ibid : IbidState
   /// Whether this citation is a disambiguation.
@@ -2450,7 +2450,7 @@ fn SpeculativeCiteProperties::copy(
 /// this item nor its predecessors will be subject to cite grouping.
 fn SpeculativeCiteProperties::speculate(
   locator : SpecificLocator?,
-  citation_number : Int,
+  citation_number : Int32,
   ibid : IbidState,
 ) -> SpeculativeCiteProperties {
   {
@@ -2513,7 +2513,7 @@ priv enum DisambiguateState {
   None_
   NameDisambiguation(NameDisambiguationProperties)
   Choose
-  YearSuffix(Int)
+  YearSuffix(Int32)
 } derive(Eq)
 
 ///|

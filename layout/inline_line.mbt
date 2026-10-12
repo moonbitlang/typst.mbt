@@ -39,7 +39,7 @@ fn Line::empty() -> Line {
 ///|
 /// How many glyphs are in the text where we can insert additional space
 /// when encountering underfull lines.
-fn Line::justifiables(self : Line) -> Int {
+fn Line::justifiables(self : Line) -> Int32 {
   let mut count = 0
   for entry in self.items.0 {
     if entry.1.item is Text(shaped) {
@@ -124,8 +124,8 @@ priv enum Dash {
 fn line(
   engine : @library.Engine,
   p : Preparation,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   breakpoint : @linebreak.Breakpoint,
   pred : Line?,
 ) -> Line {
@@ -206,11 +206,11 @@ fn collect_items(
   items : Items,
   engine : @library.Engine,
   p : Preparation,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   trim : @linebreak.Trim,
 ) -> Unit {
-  let fallback : Ref[(Int, ItemEntry)?] = Ref(None)
+  let fallback : Ref[(Int32, ItemEntry)?] = Ref(None)
 
   // Collect the items for each consecutively ordered run.
   if p.bidi is None || start == end {
@@ -271,9 +271,9 @@ fn trim_weak_spacing(items : Items) -> Unit {
 /// Calls `f` for the BiDi-reordered ranges of a line.
 fn reorder(
   p : Preparation,
-  start : Int,
-  end : Int,
-  f : (Int, Int, Bool) -> Unit,
+  start : Int32,
+  end : Int32,
+  f : (Int32, Int32, Bool) -> Unit,
 ) -> Unit {
   // If there is nothing bidirectional going on, skip reordering.
   guard p.bidi is Some(bidi) else { f(start, end, p.config.dir == RTL) }
@@ -306,11 +306,11 @@ fn reorder(
 fn collect_range(
   engine : @library.Engine,
   p : Preparation,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   trim : @linebreak.Trim,
   items : Items,
-  fallback : Ref[(Int, ItemEntry)?],
+  fallback : Ref[(Int32, ItemEntry)?],
 ) -> Unit {
   // `p.slice(start, end)` without collecting the indices (performance).
   let first = p.slice_start(start)
@@ -372,8 +372,8 @@ fn collect_range(
 /// The `range` should only contain regular texts, with linebreaks trimmed.
 fn adjust_cj_at_line_boundaries(
   p : Preparation,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   items : Items,
 ) -> Unit {
   let text = p.text.slice(start, end)
@@ -611,8 +611,8 @@ fn commit(
   let mut bottom = @library.Abs::zero()
 
   // Build the frames and determine the height and baseline.
-  let frames : Array[(@library.Abs, @library.Frame, Int)] = []
-  let push = (frame : @library.Frame, idx : Int) => {
+  let frames : Array[(@library.Abs, @library.Frame, Int32)] = []
+  let push = (frame : @library.Frame, idx : Int32) => {
     let width = frame.width()
     top = top.max(frame.baseline())
     bottom = bottom.max(frame.size().y - frame.baseline())
@@ -733,12 +733,12 @@ fn overhang(glyph : ShapedGlyph) -> @library.Abs {
 }
 
 ///|
-let overhang_tables : Map[@library.FontInstance, Array[(Int, Double)]] = Map([])
+let overhang_tables : Map[@library.FontInstance, Array[(Int32, Double)]] = Map([])
 
 ///|
 /// Generates a sorted table with overhang ratios indexed by glyph ID for a
 /// particular font.
-fn font_overhang_table(font : @library.FontInstance) -> Array[(Int, Double)] {
+fn font_overhang_table(font : @library.FontInstance) -> Array[(Int32, Double)] {
   match overhang_tables.get(font) {
     Some(table) => table
     None => {
@@ -788,7 +788,7 @@ let default_overhang_table : ReadOnlyArray[(Char, Double)] = [
 ///|
 /// A collection of owned or borrowed inline items, with the logical
 /// indices that define their logical order.
-priv struct Items(Array[(Int, ItemEntry)])
+priv struct Items(Array[(Int32, ItemEntry)])
 
 ///|
 /// Create empty items.
@@ -798,19 +798,19 @@ fn Items::new() -> Items {
 
 ///|
 /// Push a new item.
-fn Items::push(self : Items, entry : ItemEntry, idx : Int) -> Unit {
+fn Items::push(self : Items, entry : ItemEntry, idx : Int32) -> Unit {
   self.0.push((idx, entry))
 }
 
 ///|
 /// Insert a new item at the start of the line.
-fn Items::prepend(self : Items, entry : ItemEntry, idx : Int) -> Unit {
+fn Items::prepend(self : Items, entry : ItemEntry, idx : Int32) -> Unit {
   self.0.insert(0, (idx, entry))
 }
 
 ///|
 /// The position of the first unskippable item.
-fn Items::leading_pos(self : Items) -> Int? {
+fn Items::leading_pos(self : Items) -> Int32? {
   for i, entry in self.0 {
     if !entry.1.item.is_skippable() {
       return Some(i)
@@ -821,7 +821,7 @@ fn Items::leading_pos(self : Items) -> Int? {
 
 ///|
 /// The position of the last unskippable item.
-fn Items::trailing_pos(self : Items) -> Int? {
+fn Items::trailing_pos(self : Items) -> Int32? {
   for i = self.0.length() - 1; i >= 0; i = i - 1 {
     if !self.0[i].1.item.is_skippable() {
       return Some(i)
@@ -839,7 +839,7 @@ fn Items::leading_text(self : Items) -> ShapedText? {
 
 ///|
 /// Access the first unskippable item alongside its index, if it is text.
-fn Items::leading_text_indexed(self : Items) -> (Int, ShapedText)? {
+fn Items::leading_text_indexed(self : Items) -> (Int32, ShapedText)? {
   guard self.leading_pos() is Some(i) else { return None }
   let (idx, entry) = self.0[i]
   guard entry.item.text() is Some(text) else { return None }
@@ -862,7 +862,7 @@ fn Items::trailing_text(self : Items) -> ShapedText? {
 
 ///|
 /// Access the last unskippable item alongside its index, if it is text.
-fn Items::trailing_text_indexed(self : Items) -> (Int, ShapedText)? {
+fn Items::trailing_text_indexed(self : Items) -> (Int32, ShapedText)? {
   guard self.trailing_pos() is Some(i) else { return None }
   let (idx, entry) = self.0[i]
   guard entry.item.text() is Some(text) else { return None }
@@ -878,7 +878,7 @@ fn Items::trailing_text_mut(self : Items) -> ShapedText? {
 
 ///|
 /// Reorder the items starting at the given index to RTL.
-fn Items::reorder(self : Items, from : Int) -> Unit {
+fn Items::reorder(self : Items, from : Int32) -> Unit {
   let mut i = from
   let mut j = self.0.length() - 1
   while i < j {
@@ -897,7 +897,7 @@ fn Items::reorder(self : Items, from : Int) -> Unit {
 /// Normal items have their position in `p.items` times two plus one, so
 /// that there is always a space before the first, between two and after
 /// the last one (for hyphens, `idx - 1` and `idx + 1`).
-fn logical_index_from_item_index(i : Int) -> Int {
+fn logical_index_from_item_index(i : Int32) -> Int32 {
   2 * i + 1
 }
 

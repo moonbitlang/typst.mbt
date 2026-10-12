@@ -52,7 +52,7 @@ pub fn Arr::is_empty(self : Arr) -> Bool {
 
 ///|
 /// The length of the array.
-pub fn Arr::len(self : Arr) -> Int {
+pub fn Arr::len(self : Arr) -> Int32 {
   self.items.length()
 }
 
@@ -68,7 +68,7 @@ pub fn Arr::locate(
   self : Arr,
   index : Int64,
   end_ok : Bool,
-) -> Int raise HintedError {
+) -> Int32 raise HintedError {
   match self.locate_opt(index, end_ok) {
     Some(i) => i
     None => bail(out_of_bounds(index, self.len()))
@@ -78,7 +78,7 @@ pub fn Arr::locate(
 ///|
 /// Resolve an index, if it is within bounds. `index == len` is considered in
 /// bounds if and only if `end_ok` is true.
-pub fn Arr::locate_opt(self : Arr, index : Int64, end_ok : Bool) -> Int? {
+pub fn Arr::locate_opt(self : Arr, index : Int64, end_ok : Bool) -> Int32? {
   let len = self.len().to_int64()
   let wrapped = if index >= 0L { index } else { len + index }
   let limit = len + (if end_ok { 1L } else { 0L })
@@ -151,13 +151,13 @@ pub fn array_is_empty() -> String {
 
 ///|
 /// The out of bounds access error message.
-pub fn out_of_bounds(index : Int64, len : Int) -> String {
+pub fn out_of_bounds(index : Int64, len : Int32) -> String {
   "array index out of bounds (index: \{index}, len: \{len})"
 }
 
 ///|
 /// The out of bounds access error message when no default value was given.
-pub fn out_of_bounds_no_default(index : Int64, len : Int) -> String {
+pub fn out_of_bounds_no_default(index : Int64, len : Int32) -> String {
   "array index out of bounds (index: \{index}, len: \{len}) and no default value was specified"
 }
 

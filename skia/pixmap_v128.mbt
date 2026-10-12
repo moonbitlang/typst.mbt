@@ -6,7 +6,7 @@
 /// bytes). Four pixels at a time: when all four are opaque their packed
 /// little-endian words already are the output bytes; otherwise each pixel
 /// goes through [PremultipliedColorU8::demultiply].
-fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
+fn demultiply_into(data : FixedArray[UInt32], out : FixedArray[Byte]) -> Unit {
   let len = data.length()
   // Unchecked: `data[i..i + 4]` for `i <= len - 4` and the stores to
   // `out[4 * i..4 * i + 16]` within the checked length. (`data` and `out`
@@ -37,7 +37,7 @@ fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
 ///|
 /// Whether `out` holds the `4 * data.length()` bytes.
 fn demultiply_ranges_ok(
-  data : FixedArray[UInt],
+  data : FixedArray[UInt32],
   out : FixedArray[Byte],
 ) -> Bool {
   out.length().to_int64() >= data.length().to_int64() * 4

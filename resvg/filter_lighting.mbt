@@ -70,8 +70,8 @@ priv struct Normal {
 fn Normal::new(
   factor_x : Float,
   factor_y : Float,
-  nx : Int,
-  ny : Int,
+  nx : Int32,
+  ny : Int32,
 ) -> Normal {
   {
     factor: { x: factor_x, y: factor_y, },
@@ -178,7 +178,12 @@ fn specular_lighting(
 
 ///|
 /// `alpha_at` of upstream's `ImageRef`.
-fn alpha_at(data : FixedArray[UInt], width : Int, x : Int, y : Int) -> Int {
+fn alpha_at(
+  data : FixedArray[UInt32],
+  width : Int32,
+  x : Int32,
+  y : Int32,
+) -> Int32 {
   px_a(data[width * y + x])
 }
 
@@ -189,7 +194,7 @@ fn lighting_apply(
   surface_scale : Float,
   lighting_color : @usvg.Color,
   light_factor : (Normal, Vector3) -> Float,
-  calc_alpha : (Int, Int, Int) -> Int,
+  calc_alpha : (Int32, Int32, Int32) -> Int32,
   src : @skia.Pixmap,
   dest : @skia.Pixmap,
 ) -> Unit {
@@ -214,7 +219,7 @@ fn lighting_apply(
     }
     _ => { x: 1.0, y: 1.0, z: 1.0, }
   }
-  let calc = fn(nx : Int, ny : Int, normal : Normal) {
+  let calc = fn(nx : Int32, ny : Int32, normal : Normal) {
     match light_source {
       DistantLight(_) => ()
       PointLight(light) => {
@@ -244,7 +249,7 @@ fn lighting_apply(
     }
     let light_color = light_color(light_source, lighting_color, light_vector)
     let factor = light_factor(normal, light_vector)
-    let compute = fn(x : Int) -> Int {
+    let compute = fn(x : Int32) -> Int32 {
       f32_to_u8(f32_bound(0.0, Float::from_int(x) * factor, 255.0) + 0.5)
     }
     let r = compute(light_color.red)
@@ -300,7 +305,7 @@ fn light_color(
         }
       }
       let factor = @skia.powf(minus_l_dot_s, light.specular_exponent.get())
-      let compute = fn(x : Int) -> Int {
+      let compute = fn(x : Int32) -> Int32 {
         f32_to_u8(f32_bound(0.0, Float::from_int(x) * factor, 255.0) + 0.5)
       }
       @usvg.Color::new_rgb(
@@ -313,7 +318,7 @@ fn light_color(
 }
 
 ///|
-fn top_left_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
+fn top_left_normal(img : (FixedArray[UInt32], Int32, Int32)) -> Normal {
   let (d, w, _) = img
   let center = alpha_at(d, w, 0, 0)
   let right = alpha_at(d, w, 1, 0)
@@ -328,7 +333,7 @@ fn top_left_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
 }
 
 ///|
-fn top_right_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
+fn top_right_normal(img : (FixedArray[UInt32], Int32, Int32)) -> Normal {
   let (d, w, _) = img
   let left = alpha_at(d, w, w - 2, 0)
   let center = alpha_at(d, w, w - 1, 0)
@@ -343,7 +348,7 @@ fn top_right_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
 }
 
 ///|
-fn bottom_left_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
+fn bottom_left_normal(img : (FixedArray[UInt32], Int32, Int32)) -> Normal {
   let (d, w, h) = img
   let top = alpha_at(d, w, 0, h - 2)
   let top_right = alpha_at(d, w, 1, h - 2)
@@ -358,7 +363,7 @@ fn bottom_left_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
 }
 
 ///|
-fn bottom_right_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
+fn bottom_right_normal(img : (FixedArray[UInt32], Int32, Int32)) -> Normal {
   let (d, w, h) = img
   let top_left = alpha_at(d, w, w - 2, h - 2)
   let top = alpha_at(d, w, w - 1, h - 2)
@@ -373,7 +378,10 @@ fn bottom_right_normal(img : (FixedArray[UInt], Int, Int)) -> Normal {
 }
 
 ///|
-fn top_row_normal(img : (FixedArray[UInt], Int, Int), x : Int) -> Normal {
+fn top_row_normal(
+  img : (FixedArray[UInt32], Int32, Int32),
+  x : Int32,
+) -> Normal {
   let (d, w, _) = img
   let left = alpha_at(d, w, x - 1, 0)
   let center = alpha_at(d, w, x, 0)
@@ -390,7 +398,10 @@ fn top_row_normal(img : (FixedArray[UInt], Int, Int), x : Int) -> Normal {
 }
 
 ///|
-fn bottom_row_normal(img : (FixedArray[UInt], Int, Int), x : Int) -> Normal {
+fn bottom_row_normal(
+  img : (FixedArray[UInt32], Int32, Int32),
+  x : Int32,
+) -> Normal {
   let (d, w, h) = img
   let top_left = alpha_at(d, w, x - 1, h - 2)
   let top = alpha_at(d, w, x, h - 2)
@@ -407,7 +418,10 @@ fn bottom_row_normal(img : (FixedArray[UInt], Int, Int), x : Int) -> Normal {
 }
 
 ///|
-fn left_column_normal(img : (FixedArray[UInt], Int, Int), y : Int) -> Normal {
+fn left_column_normal(
+  img : (FixedArray[UInt32], Int32, Int32),
+  y : Int32,
+) -> Normal {
   let (d, w, _) = img
   let top = alpha_at(d, w, 0, y - 1)
   let top_right = alpha_at(d, w, 1, y - 1)
@@ -424,7 +438,10 @@ fn left_column_normal(img : (FixedArray[UInt], Int, Int), y : Int) -> Normal {
 }
 
 ///|
-fn right_column_normal(img : (FixedArray[UInt], Int, Int), y : Int) -> Normal {
+fn right_column_normal(
+  img : (FixedArray[UInt32], Int32, Int32),
+  y : Int32,
+) -> Normal {
   let (d, w, _) = img
   let top_left = alpha_at(d, w, w - 2, y - 1)
   let top = alpha_at(d, w, w - 1, y - 1)
@@ -442,9 +459,9 @@ fn right_column_normal(img : (FixedArray[UInt], Int, Int), y : Int) -> Normal {
 
 ///|
 fn interior_normal(
-  img : (FixedArray[UInt], Int, Int),
-  x : Int,
-  y : Int,
+  img : (FixedArray[UInt32], Int32, Int32),
+  x : Int32,
+  y : Int32,
 ) -> Normal {
   let (d, w, _) = img
   let top_left = alpha_at(d, w, x - 1, y - 1)
@@ -464,11 +481,11 @@ fn interior_normal(
 }
 
 ///|
-fn calc_diffuse_alpha(_r : Int, _g : Int, _b : Int) -> Int {
+fn calc_diffuse_alpha(_r : Int32, _g : Int32, _b : Int32) -> Int32 {
   255
 }
 
 ///|
-fn calc_specular_alpha(r : Int, g : Int, b : Int) -> Int {
+fn calc_specular_alpha(r : Int32, g : Int32, b : Int32) -> Int32 {
   imax(imax(r, g), b)
 }

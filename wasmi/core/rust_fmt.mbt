@@ -10,7 +10,7 @@
 /// (which its Grisu fast path agrees with), including how it picks between
 /// two equally short candidates: when the remaining digits are exactly half
 /// way, it rounds up.
-fn shortest_digits(x : Double) -> (String, Int) {
+fn shortest_digits(x : Double) -> (String, Int32) {
   // `flt2dec::decode`: the value is `mant * 2^exp`, its neighbors are
   // `(mant - minus) * 2^exp` and `(mant + plus) * 2^exp` (half way to the
   // adjacent floats), inclusive if the original mantissa is even.
@@ -33,7 +33,7 @@ fn shortest_digits(x : Double) -> (String, Int) {
 
 ///|
 /// The shortest round-trip digits of an `f32` (see [shortest_digits]).
-fn shortest_digits_f32(x : Float) -> (String, Int) {
+fn shortest_digits_f32(x : Float) -> (String, Int32) {
   // `flt2dec::decode` for `f32`.
   let bits = x.abs().reinterpret_as_uint()
   let biased = ((bits >> 23) & 0xFF).reinterpret_as_int()
@@ -77,11 +77,11 @@ fn rust_display_f32(x : Float) -> String {
 /// for the initial exponent estimate only.
 fn shortest_digits_decoded(
   raw_mant : UInt64,
-  raw_exp : Int,
+  raw_exp : Int32,
   subnormal : Bool,
   boundary : Bool,
   approx : Double,
-) -> (String, Int) {
+) -> (String, Int32) {
   let inclusive = (raw_mant & 1UL) == 0UL
   let (mant, minus, plus, exp) = if subnormal {
     (raw_mant, 1, 1, raw_exp)
@@ -114,7 +114,7 @@ fn shortest_digits_decoded(
   // powers.
   let ten = @bigint.BigInt::from_int(10)
   let upper = r + m_plus
-  let scaled_below = (k : Int) => {
+  let scaled_below = (k : Int32) => {
     if k >= 0 {
       below(s * ten.pow(@bigint.BigInt::from_int(k)), upper)
     } else {
@@ -177,7 +177,7 @@ fn shortest_digits_decoded(
   }
   let buf = StringBuilder()
   for d in digits {
-    buf.write_char(Int::unsafe_to_char(48 + d))
+    buf.write_char(Int32::unsafe_to_char(48 + d))
   }
   (buf.to_string(), k)
 }
@@ -204,7 +204,7 @@ fn rust_display_f64(x : Double) -> String {
 ///|
 /// Place the decimal point into `digits` (`0.digits * 10^point`), padding
 /// with zeros, and ensure at least `min_frac` fractional digits.
-fn place_point(digits : String, point : Int, min_frac : Int) -> String {
+fn place_point(digits : String, point : Int32, min_frac : Int32) -> String {
   let buf = StringBuilder()
   let n = digits.length()
   if point <= 0 {

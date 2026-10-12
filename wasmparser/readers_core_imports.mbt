@@ -6,7 +6,7 @@ pub(all) enum TypeRef {
   /// The type is a function.
   ///
   /// The value is an index into the type section.
-  Func(UInt)
+  Func(UInt32)
   /// The type is a table.
   Table(TableType)
   /// The type is a memory.

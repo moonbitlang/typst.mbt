@@ -18,7 +18,7 @@ let khmer_shaper : OtShaper = {
 }
 
 ///|
-let khmer_features : ReadOnlyArray[(@otf.Tag, Int)] = [
+let khmer_features : ReadOnlyArray[(@otf.Tag, Int32)] = [
   // Basic features.
   // These features are applied all at once, before reordering, constrained
   // to the syllable.
@@ -38,19 +38,19 @@ let khmer_features : ReadOnlyArray[(@otf.Tag, Int)] = [
 // `khmer_feature`: must be in the same order as the KHMER_FEATURES array.
 
 ///|
-const KHMER_PREF : Int = 0
+const KHMER_PREF : Int32 = 0
 
 ///|
-const KHMER_BLWF : Int = 1
+const KHMER_BLWF : Int32 = 1
 
 ///|
-const KHMER_ABVF : Int = 2
+const KHMER_ABVF : Int32 = 2
 
 ///|
-const KHMER_PSTF : Int = 3
+const KHMER_PSTF : Int32 = 3
 
 ///|
-const KHMER_CFAR : Int = 4
+const KHMER_CFAR : Int32 = 4
 
 ///|
 fn GlyphInfo::set_khmer_properties(self : GlyphInfo) -> Unit {
@@ -61,7 +61,7 @@ fn GlyphInfo::set_khmer_properties(self : GlyphInfo) -> Unit {
 
 ///|
 priv struct KhmerShapePlan {
-  mask_array : FixedArray[UInt]
+  mask_array : FixedArray[UInt32]
 }
 
 ///|
@@ -154,8 +154,8 @@ fn reorder_khmer(plan : ShapePlan, face : Face, buffer : Buffer) -> Bool {
 ///|
 fn reorder_syllable_khmer(
   khmer_plan : KhmerShapePlan,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   let syllable_type : KhmerSyllableType = match
@@ -177,8 +177,8 @@ fn reorder_syllable_khmer(
 /// https://docs.microsoft.com/en-us/typography/script-development/devanagari
 fn reorder_consonant_syllable_khmer(
   plan : KhmerShapePlan,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   // Setup masks.
@@ -258,7 +258,7 @@ fn override_features_khmer(planner : ShapePlanner) -> Unit {
 }
 
 ///|
-fn decompose_khmer(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
+fn decompose_khmer(_ctx : NormalizeContext, ab : Int32) -> (Int32, Int32)? {
   // Decompose split matras that don't have Unicode decompositions.
   match ab {
     0x17BE | 0x17BF | 0x17C0 | 0x17C4 | 0x17C5 => Some((0x17C1, ab))
@@ -267,7 +267,7 @@ fn decompose_khmer(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
 }
 
 ///|
-fn compose_khmer(_ctx : NormalizeContext, a : Int, b : Int) -> Int? {
+fn compose_khmer(_ctx : NormalizeContext, a : Int32, b : Int32) -> Int32? {
   // Avoid recomposing split matras.
   if gc_is_mark(char_general_category(a)) {
     return None

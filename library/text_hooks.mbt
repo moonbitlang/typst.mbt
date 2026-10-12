@@ -2,7 +2,7 @@
 // (upstream `text/mod.rs`, `foundations/symbol.rs`, `text/space.rs`).
 
 ///|
-fn text_like(c : Content, id : Int) -> String {
+fn text_like(c : Content, id : Int32) -> String {
   match c.field_raw(id) {
     Some(Str(s)) => s
     _ => ""

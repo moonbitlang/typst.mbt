@@ -102,7 +102,7 @@ fn Type1Font::glyph_width(self : Type1Font, code : Byte) -> Float? {
 ///|
 fn Type1Font::char_code_to_unicode(
   self : Type1Font,
-  char_code : UInt,
+  char_code : UInt32,
 ) -> @cmap.BfString? {
   if self.to_unicode is Some(to_unicode) &&
     to_unicode.lookup_bf_string(char_code) is Some(c) {
@@ -160,7 +160,7 @@ priv struct Type1BlobKind {
   encoding : Encoding
   widths : Array[Width]
   missing_width : Float
-  encodings : Map[Int, String]
+  encodings : Map[Int32, String]
   name_to_gid : Map[String, GlyphId]
   standard_font : StandardFont?
 }
@@ -279,7 +279,7 @@ priv struct CffKind {
   encoding : Encoding
   widths : Array[Width]
   missing_width : Float
-  encodings : Map[Int, String]
+  encodings : Map[Int32, String]
   name_to_gid : Map[String, GlyphId]
   gid_to_name : Array[String?]
   standard_font : StandardFont?

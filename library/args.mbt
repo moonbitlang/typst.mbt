@@ -50,7 +50,7 @@ pub fn Args::spanned(self : Args, span : @syntax.Span) -> Args {
 
 ///|
 /// Returns the number of remaining positional arguments.
-pub fn Args::remaining(self : Args) -> Int {
+pub fn Args::remaining(self : Args) -> Int32 {
   self.items.iter().filter(a => a.name is None).count()
 }
 
@@ -58,7 +58,7 @@ pub fn Args::remaining(self : Args) -> Int {
 /// Insert a positional argument at a specific index.
 pub fn Args::insert(
   self : Args,
-  index : Int,
+  index : Int32,
   span : @syntax.Span,
   value : Value,
 ) -> Unit {
@@ -100,7 +100,7 @@ pub fn Args::eat_spanned(self : Args) -> @syntax.Spanned[Value]? {
 
 ///|
 /// Consume n positional arguments if possible.
-pub fn Args::consume(self : Args, n : Int) -> Array[Arg] raise SourceError {
+pub fn Args::consume(self : Args, n : Int32) -> Array[Arg] raise SourceError {
   let list = []
   let mut i = 0
   while i < self.items.length() && list.length() < n {

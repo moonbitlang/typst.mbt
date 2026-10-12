@@ -20,19 +20,19 @@ priv type ByteArrayReadHandle
 fn ffi_read_bytes_from_stdin() -> ExternByteArray = "__moonbit_io_unstable" "read_bytes_from_stdin"
 
 ///|
-fn ffi_write_char(fd : Int, c : Int) = "__moonbit_io_unstable" "write_char"
+fn ffi_write_char(fd : Int32, c : Int32) = "__moonbit_io_unstable" "write_char"
 
 ///|
-fn ffi_flush(fd : Int) = "__moonbit_io_unstable" "flush"
+fn ffi_flush(fd : Int32) = "__moonbit_io_unstable" "flush"
 
 ///|
-fn ffi_is_windows() -> Int = "__moonbit_sys_unstable" "is_windows"
+fn ffi_is_windows() -> Int32 = "__moonbit_sys_unstable" "is_windows"
 
 ///|
 fn ffi_begin_read_byte_array(s : ExternByteArray) -> ByteArrayReadHandle = "__moonbit_fs_unstable" "begin_read_byte_array"
 
 ///|
-fn ffi_byte_array_read_byte(handle : ByteArrayReadHandle) -> Int = "__moonbit_fs_unstable" "byte_array_read_byte"
+fn ffi_byte_array_read_byte(handle : ByteArrayReadHandle) -> Int32 = "__moonbit_fs_unstable" "byte_array_read_byte"
 
 ///|
 fn ffi_finish_read_byte_array(handle : ByteArrayReadHandle) = "__moonbit_fs_unstable" "finish_read_byte_array"
@@ -136,7 +136,7 @@ pub fn RangedFile::size(self : RangedFile) -> Int64 raise IoError {
 pub fn RangedFile::read(
   self : RangedFile,
   offset : Int64,
-  len : Int,
+  len : Int32,
 ) -> Bytes raise IoError {
   let data = self.bytes()
   if offset < 0L || len < 0 {
@@ -274,7 +274,7 @@ pub fn supports_binary_stdout() -> Bool {
 }
 
 ///|
-fn write_text(fd : Int, text : String) -> Unit {
+fn write_text(fd : Int32, text : String) -> Unit {
   for c in text {
     ffi_write_char(fd, c.to_int())
   }
@@ -334,7 +334,7 @@ pub fn stderr_is_terminal() -> Bool {
 ///|
 /// The local UTC offset in seconds at a UNIX timestamp (unknown here, so
 /// UTC).
-pub fn local_offset(_timestamp : Int64) -> Int {
+pub fn local_offset(_timestamp : Int64) -> Int32 {
   0
 }
 
@@ -357,7 +357,7 @@ pub fn is_same_file(path1 : String, path2 : String) -> Bool raise IoError {
 /// The `io::Error` for an OS error number of the host
 /// (`io::Error::from_raw_os_error`). There is no `strerror` here: the
 /// numbers that Linux and macOS share have their text, the others none.
-pub fn os_error(code : Int) -> IoError {
+pub fn os_error(code : Int32) -> IoError {
   let message = match code {
     1 => "Operation not permitted"
     2 => "No such file or directory"

@@ -52,13 +52,13 @@ let page_run_memo : @library.PageMemo[Array[LayoutedPage]] = @library.PageMemo::
 /// How many page runs were answered by a kept layout and how many were
 /// laid out since the process started (for tests and measurements, like
 /// `@library.closure_memo_stats`).
-pub fn page_run_memo_stats() -> (Int, Int) {
+pub fn page_run_memo_stats() -> (Int32, Int32) {
   page_run_memo.stats()
 }
 
 ///|
 /// The number of page runs that are kept (for tests and measurements).
-pub fn page_run_memo_entries() -> Int {
+pub fn page_run_memo_entries() -> Int32 {
   page_run_memo.entries()
 }
 

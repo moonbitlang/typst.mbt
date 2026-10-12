@@ -179,7 +179,7 @@ pub fn Length::repr(self : Length) -> String {
 
 ///|
 /// Upstream `PartialOrd for Length`.
-pub fn Length::partial_cmp(self : Length, other : Length) -> Int? {
+pub fn Length::partial_cmp(self : Length, other : Length) -> Int32? {
   if self.em.is_zero() && other.em.is_zero() {
     Some(self.abs.compare(other.abs))
   } else if self.abs.is_zero() && other.abs.is_zero() {

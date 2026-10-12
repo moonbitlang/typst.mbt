@@ -13,7 +13,9 @@ priv enum VerticalOrientation {
 
 ///|
 /// The ranges of `unicode_vo::char_orientation` (start, end, orientation).
-let vertical_orientation_ranges : ReadOnlyArray[(Int, Int, VerticalOrientation)] = [
+let vertical_orientation_ranges : ReadOnlyArray[
+  (Int32, Int32, VerticalOrientation),
+] = [
   (0x00A7, 0x00A7, Upright),
   (0x00A9, 0x00A9, Upright),
   (0x00AE, 0x00AE, Upright),

@@ -12,7 +12,7 @@
 // `split`/`join`.
 
 ///|
-let lowp_stage_width : Int = 16
+let lowp_stage_width : Int32 = 16
 
 ///|
 priv struct LowpPipeline {
@@ -20,21 +20,21 @@ priv struct LowpPipeline {
   mask_ctx : MaskCtx
   aa_mask_ctx : AAMaskCtx
   ctx : Context
-  r : FixedArray[Int]
-  g : FixedArray[Int]
-  b : FixedArray[Int]
-  a : FixedArray[Int]
-  dr : FixedArray[Int]
-  dg : FixedArray[Int]
-  db : FixedArray[Int]
-  da : FixedArray[Int]
-  mut tail : Int
-  mut dx : Int
-  mut dy : Int
+  r : FixedArray[Int32]
+  g : FixedArray[Int32]
+  b : FixedArray[Int32]
+  a : FixedArray[Int32]
+  dr : FixedArray[Int32]
+  dg : FixedArray[Int32]
+  db : FixedArray[Int32]
+  da : FixedArray[Int32]
+  mut tail : Int32
+  mut dx : Int32
+  mut dy : Int32
 }
 
 ///|
-fn lanes16() -> FixedArray[Int] {
+fn lanes16() -> FixedArray[Int32] {
   FixedArray::make(16, 0)
 }
 
@@ -93,12 +93,12 @@ fn LowpPipeline::run(self : LowpPipeline, stages : Array[Stage]) -> Unit {
 }
 
 ///|
-fn u16(v : Int) -> Int {
+fn u16(v : Int32) -> Int32 {
   v & 0xFFFF
 }
 
 ///|
-fn div255(v : Int) -> Int {
+fn div255(v : Int32) -> Int32 {
   // Skia uses `vrshrq_n_u16(vrsraq_n_u16(v, v, 8), 8)` here when NEON is
   // available, but it doesn't affect performance much and breaks
   // reproducible result. Ignore it.
@@ -106,28 +106,32 @@ fn div255(v : Int) -> Int {
 }
 
 ///|
-fn inv16(v : Int) -> Int {
+fn inv16(v : Int32) -> Int32 {
   u16(255 - v)
 }
 
 ///|
-fn mul16(a : Int, b : Int) -> Int {
+fn mul16(a : Int32, b : Int32) -> Int32 {
   u16(a * b)
 }
 
 ///|
-fn from_float(f : Float) -> Int {
+fn from_float(f : Float) -> Int32 {
   f32_to_u16(f * 255.0 + 0.5)
 }
 
 ///|
-fn lerp16(from : Int, to : Int, t : Int) -> Int {
+fn lerp16(from : Int32, to : Int32, t : Int32) -> Int32 {
   div255(u16(mul16(from, inv16(t)) + mul16(to, t)))
 }
 
 ///|
 /// `join(lo, hi)[i]`: the f32 lane `i` (0..16) of the two registers.
-fn join_lane(lo : FixedArray[Int], hi : FixedArray[Int], i : Int) -> Float {
+fn join_lane(
+  lo : FixedArray[Int32],
+  hi : FixedArray[Int32],
+  i : Int32,
+) -> Float {
   let (reg, j) = if i < 8 { (lo, i) } else { (hi, i - 8) }
   Float::reinterpret_from_uint(
     reg[2 * j].reinterpret_as_uint() |
@@ -136,15 +140,15 @@ fn join_lane(lo : FixedArray[Int], hi : FixedArray[Int], i : Int) -> Float {
 }
 
 ///|
-fn join(lo : FixedArray[Int], hi : FixedArray[Int]) -> FixedArray[Float] {
+fn join(lo : FixedArray[Int32], hi : FixedArray[Int32]) -> FixedArray[Float] {
   FixedArray::makei(16, i => join_lane(lo, hi, i))
 }
 
 ///|
 fn split(
   v : FixedArray[Float],
-  lo : FixedArray[Int],
-  hi : FixedArray[Int],
+  lo : FixedArray[Int32],
+  hi : FixedArray[Int32],
 ) -> Unit {
   for i in 0..<16 {
     let bits = v[i].reinterpret_as_uint()
@@ -493,7 +497,7 @@ fn LowpPipeline::stage(p : LowpPipeline, stage : Stage) -> Bool {
 /// `blend_fn!`.
 fn LowpPipeline::blend(
   p : LowpPipeline,
-  f : (Int, Int, Int, Int) -> Int,
+  f : (Int32, Int32, Int32, Int32) -> Int32,
 ) -> Unit {
   for i in 0..<16 {
     let a = p.a[i]
@@ -509,7 +513,7 @@ fn LowpPipeline::blend(
 /// `blend_fn2!`: the same logic applied to color, and source_over for alpha.
 fn LowpPipeline::blend2(
   p : LowpPipeline,
-  f : (Int, Int, Int, Int) -> Int,
+  f : (Int32, Int32, Int32, Int32) -> Int32,
 ) -> Unit {
   for i in 0..<16 {
     let a = p.a[i]
@@ -527,10 +531,10 @@ fn round_f32_to_u16(
   gf : FixedArray[Float],
   bf : FixedArray[Float],
   af : FixedArray[Float],
-  r : FixedArray[Int],
-  g : FixedArray[Int],
-  b : FixedArray[Int],
-  a : FixedArray[Int],
+  r : FixedArray[Int32],
+  g : FixedArray[Int32],
+  b : FixedArray[Int32],
+  a : FixedArray[Int32],
 ) -> Unit {
   // TODO: may produce a slightly different result to Skia
   //       affects the two_stops_linear_mirror test

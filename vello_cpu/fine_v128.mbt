@@ -22,7 +22,7 @@ fn div_255x8(v : V128) -> V128 {
 /// The masks of pixels `i..i + 4` (`alpha_buf[i..]`), each replicated over
 /// its pixel's four bytes.
 #inline
-fn masks_4px(alpha_buf : Array[Byte], i : Int) -> V128 {
+fn masks_4px(alpha_buf : Array[Byte], i : Int32) -> V128 {
   let m = @v128.i32x4_splat(
     alpha_buf.unsafe_get(i).to_int().reinterpret_as_uint(),
   )
@@ -110,11 +110,11 @@ fn alphas_4px(src : V128) -> V128 {
 /// Composites a solid color onto a buffer using alpha blending.
 fn alpha_composite_solid(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
-  src : FixedArray[Int],
+  start : Int32,
+  len : Int32,
+  src : FixedArray[Int32],
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   // Whole chunks only, like the emulation (8 pixels with masks, 16 without).
   let chunk = if alphas is Some(_) { 32 } else { 64 }
@@ -158,12 +158,12 @@ fn alpha_composite_solid(
 /// blending.
 fn alpha_composite_buffer(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
   src : FixedArray[Byte],
-  src_start : Int,
+  src_start : Int32,
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   let n = len / 32 * 32
   guard !physical_equal(dest, src) &&
@@ -229,7 +229,7 @@ fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
 ///|
 /// Whether the masks of `n` bytes of pixels (`alpha_buf[off..off + n / 4]`,
 /// if any) are in bounds.
-fn masks_ok(alpha_buf : Array[Byte], alphas : Int?, n : Int) -> Bool {
+fn masks_ok(alpha_buf : Array[Byte], alphas : Int32?, n : Int32) -> Bool {
   match alphas {
     Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
     None => true
@@ -259,6 +259,6 @@ fn pack_ranges_ok(scratch : FixedArray[Byte], region : Region) -> Bool {
 /// Whether `[off, off + len)` lies within `[0, total)`, computed without
 /// `Int` overflow (the `@v128` loads and stores are not bounds checked).
 #inline
-fn in_range(off : Int, len : Int64, total : Int) -> Bool {
+fn in_range(off : Int32, len : Int64, total : Int32) -> Bool {
   off >= 0 && len >= 0L && len <= total.to_int64() - off.to_int64()
 }

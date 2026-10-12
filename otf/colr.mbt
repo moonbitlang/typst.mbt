@@ -85,7 +85,7 @@ impl Default for ClipList with fn default() {
 ///|
 fn ClipList::get(
   self : ClipList,
-  index : UInt,
+  index : UInt32,
   variation_data : ColrVariationData,
   coords : ArrayView[NormalizedCoordinate],
 ) -> ClipBox? {
@@ -123,7 +123,7 @@ fn ClipList::find(
   coords : ArrayView[NormalizedCoordinate],
 ) -> ClipBox? {
   let len = self.records.len()
-  let mut index : UInt = 0
+  let mut index : UInt32 = 0
   while index < len {
     guard self.records.get(index) is Some(v) else { return None }
     if v.glyphs_range_contains(glyph_id) {
@@ -252,7 +252,7 @@ priv struct VarColorStopRaw {
   stop_offset : F2DOT14
   palette_index : UInt16
   alpha : F2DOT14
-  var_index_base : UInt
+  var_index_base : UInt32
 }
 
 ///|
@@ -914,7 +914,7 @@ fn ColrTable::paint_v1(
 ///|
 fn ColrTable::parse_paint(
   self : ColrTable,
-  offset : Int,
+  offset : Int32,
   palette : UInt16,
   painter : &ColrPainter,
   recursion_stack : RecursionStack,
@@ -941,7 +941,7 @@ fn ColrTable::parse_paint(
 ///|
 fn ColrTable::parse_paint_impl(
   self : ColrTable,
-  offset : Int,
+  offset : Int32,
   palette : UInt16,
   painter : &ColrPainter,
   recursion_stack : RecursionStack,
@@ -952,7 +952,7 @@ fn ColrTable::parse_paint_impl(
 ) -> Unit? {
   // Paints a sub-paint at the given offset (the result is ignored, like
   // upstream).
-  fn sub(paint_offset : Int) {
+  fn sub(paint_offset : Int32) {
     self.parse_paint(
       paint_offset, palette, painter, recursion_stack, coords, foreground_color,
     )
@@ -1525,7 +1525,7 @@ fn ColrTable::parse_paint_impl(
 ///|
 fn ColrTable::parse_color_line(
   self : ColrTable,
-  offset : Int,
+  offset : Int32,
   foreground_color : RgbaColor,
 ) -> NonVarColorLine? {
   try {
@@ -1542,7 +1542,7 @@ fn ColrTable::parse_color_line(
 ///|
 fn ColrTable::parse_var_color_line(
   self : ColrTable,
-  offset : Int,
+  offset : Int32,
   foreground_color : RgbaColor,
 ) -> VarColorLine? {
   try {
@@ -1559,8 +1559,8 @@ fn ColrTable::parse_var_color_line(
 ///|
 priv struct RecursionStack {
   // The limit of 64 is chosen arbitrarily and not from the spec. But we have to stop somewhere...
-  stack : FixedArray[Int]
-  mut len : Int
+  stack : FixedArray[Int32]
+  mut len : Int32
 }
 
 ///|
@@ -1577,7 +1577,7 @@ fn RecursionStack::is_empty(self : RecursionStack) -> Bool {
 
 ///|
 /// Returns `false` when the stack is full (upstream's `Err(())`).
-fn RecursionStack::push(self : RecursionStack, offset : Int) -> Bool {
+fn RecursionStack::push(self : RecursionStack, offset : Int32) -> Bool {
   if self.len == self.stack.length() {
     false
   } else {
@@ -1588,7 +1588,7 @@ fn RecursionStack::push(self : RecursionStack, offset : Int) -> Bool {
 }
 
 ///|
-fn RecursionStack::contains(self : RecursionStack, offset : Int) -> Bool {
+fn RecursionStack::contains(self : RecursionStack, offset : Int32) -> Bool {
   for i in 0..<self.len {
     if self.stack[i] == offset {
       return true
@@ -1614,11 +1614,11 @@ struct ColrVariationData {
 // Inspired from `fontations`.
 fn ColrVariationData::read_deltas(
   self : ColrVariationData,
-  n : Int,
-  var_index_base : UInt,
+  n : Int32,
+  var_index_base : UInt32,
   coordinates : ArrayView[NormalizedCoordinate],
 ) -> FixedArray[Float] {
-  let no_variation_deltas : UInt = 0xFFFFFFFF
+  let no_variation_deltas : UInt32 = 0xFFFFFFFF
   let deltas : FixedArray[Float] = FixedArray::make(n, 0.0)
   guard self.variation_store is Some(variation_store) &&
     !coordinates.is_empty() &&

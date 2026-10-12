@@ -12,16 +12,16 @@ priv struct GrayScaleParams {
   /// `GSMMR` - Specifies whether MMR is used.
   use_mmr : Bool
   /// `GSBPP` - The number of bits per gray-scale value.
-  bits_per_pixel : UInt
+  bits_per_pixel : UInt32
   /// `GSW` - The width of the gray-scale image.
-  width : UInt
+  width : UInt32
   /// `GSH` - The height of the gray-scale image.
-  height : UInt
+  height : UInt32
   /// `GSTEMPLATE` - The template used to code the gray-scale bitplanes.
   template : Template
   /// `GSKIP` - A mask indicating which values should be skipped.
   /// None if `GSUSESKIP` = 0.
-  skip_mask : FixedArray[UInt]?
+  skip_mask : FixedArray[UInt32]?
 }
 
 ///|
@@ -32,7 +32,7 @@ fn decode_gray_scale_image(
   data : BytesView,
   params : GrayScaleParams,
   ctx : ScratchBuffers,
-) -> FixedArray[UInt] raise DecodeError {
+) -> FixedArray[UInt32] raise DecodeError {
   // Table C.1: "GSMMR specifies whether MMR is used."
   if params.use_mmr {
     gray_decode_mmr(data, params)
@@ -48,7 +48,7 @@ fn decode_gray_scale_image(
 fn gray_decode_mmr(
   data : BytesView,
   params : GrayScaleParams,
-) -> FixedArray[UInt] raise DecodeError {
+) -> FixedArray[UInt32] raise DecodeError {
   // `GSW` - The width of the gray-scale image.
   let width = params.width
   // `GSH` - The height of the gray-scale image.
@@ -78,7 +78,7 @@ fn gray_decode_arithmetic(
   data : BytesView,
   params : GrayScaleParams,
   ctx : ScratchBuffers,
-) -> FixedArray[UInt] raise DecodeError {
+) -> FixedArray[UInt32] raise DecodeError {
   // `GSW` - The width of the gray-scale image.
   let width = params.width
   // `GSH` - The height of the gray-scale image.
@@ -158,12 +158,12 @@ fn gray_decode_arithmetic(
 /// The closure `decode_next` is called for each bitplane, receiving the bitplane
 /// index (`GSBPP`-1 down to 0) and a zeroed bitmap to decode into.
 fn decode_bitplanes(
-  width : UInt,
-  height : UInt,
-  stride : UInt,
-  bits_per_pixel : UInt,
-  decode_next : (UInt, Bitmap) -> Unit raise DecodeError,
-) -> FixedArray[UInt] raise DecodeError {
+  width : UInt32,
+  height : UInt32,
+  stride : UInt32,
+  bits_per_pixel : UInt32,
+  decode_next : (UInt32, Bitmap) -> Unit raise DecodeError,
+) -> FixedArray[UInt32] raise DecodeError {
   let size = width.to_int64() * height.to_int64()
   // (Upstream allocates up to 65535 × 65535 values here; such sizes exceed
   // MoonBit's array limit.)
@@ -197,7 +197,7 @@ fn decode_bitplanes(
 }
 
 ///|
-fn xor_planes(plane : FixedArray[UInt], prev : FixedArray[UInt]) -> Unit {
+fn xor_planes(plane : FixedArray[UInt32], prev : FixedArray[UInt32]) -> Unit {
   // (The `u32x8` chunks and the scalar tail compute the same lane-wise xor.)
   for i in 0..<plane.length() {
     plane[i] = plane[i] ^ prev[i]
@@ -206,12 +206,12 @@ fn xor_planes(plane : FixedArray[UInt], prev : FixedArray[UInt]) -> Unit {
 
 ///|
 fn extract_bits(
-  data : FixedArray[UInt],
-  values : FixedArray[UInt],
-  width : UInt,
-  height : UInt,
-  stride : UInt,
-  j : UInt,
+  data : FixedArray[UInt32],
+  values : FixedArray[UInt32],
+  width : UInt32,
+  height : UInt32,
+  stride : UInt32,
+  j : UInt32,
 ) -> Unit {
   // (The `u32x8` path tests `(word & BIT_MASKS[bit_offset + lane]) > 0` per
   // lane and ors in `1 << j`, which is exactly the scalar tail's test.)

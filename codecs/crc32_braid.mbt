@@ -7,28 +7,28 @@
 
 ///|
 /// The number of braids (upstream's `N`).
-const CRC_BRAID_N : Int = 5
+const CRC_BRAID_N : Int32 = 5
 
 ///|
 /// The word size in bytes (upstream's `W`).
-const CRC_WORD : Int = 8
+const CRC_WORD : Int32 = 8
 
 ///|
 /// Offsets of the tables in [crc32_tables]: `CRC32_BYTE_TABLE`, then
 /// `CRC32_WORD_TABLE[0..W]`, then `Crc32BraidTable::<5>::TABLE[0..W]`, 256
 /// entries each.
-const CRC_WORD_TABLE : Int = 256
+const CRC_WORD_TABLE : Int32 = 256
 
 ///|
-const CRC_BRAID_TABLE : Int = 256 + 8 * 256
+const CRC_BRAID_TABLE : Int32 = 256 + 8 * 256
 
 ///|
-let crc32_tables_cell : Ref[FixedArray[UInt]?] = { val: None, }
+let crc32_tables_cell : Ref[FixedArray[UInt32]?] = { val: None, }
 
 ///|
 /// The CRC-32 tables, built on first use (upstream evaluates
 /// `build_crc32_table` at compile time).
-fn crc32_tables() -> FixedArray[UInt] {
+fn crc32_tables() -> FixedArray[UInt32] {
   match crc32_tables_cell.val {
     Some(tables) => tables
     None => {
@@ -44,7 +44,7 @@ fn crc32_tables() -> FixedArray[UInt] {
 /// through the polynomial `8 * (W * N - i)` times. Shifting by eight bits maps
 /// `c` to `(c >> 8) ^ CRC32_BYTE_TABLE[c & 0xff]`, so the tables follow from
 /// `shifted[m][j]` (`j` shifted `8 * m` times) for `m <= W * N`.
-fn build_crc32_tables() -> FixedArray[UInt] {
+fn build_crc32_tables() -> FixedArray[UInt32] {
   let max_shift = CRC_WORD * CRC_BRAID_N
   let shifted = FixedArray::make((max_shift + 1) * 256, 0U)
   for j in 0..<256 {
@@ -83,7 +83,7 @@ fn build_crc32_tables() -> FixedArray[UInt] {
 
 ///|
 /// Upstream `crc32_braid::<5>(start, data)`.
-fn crc32_braid(start : UInt, data : BytesView) -> UInt {
+fn crc32_braid(start : UInt32, data : BytesView) -> UInt32 {
   // Unchecked accesses: the table indices are `offset + byte` within the
   // checked table length; the word reads `bytes[base + 8 * w..+ 8]` for `w <
   // words` and the byte reads stay within the view (`base + len <=

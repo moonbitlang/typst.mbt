@@ -129,7 +129,7 @@ pub fn Lang::from_iso(code : String) -> Lang? {
 ///|
 /// The default number of chars to each side between which no hyphenation
 /// should happen.
-pub fn Lang::bounds(self : Lang) -> (Int, Int) {
+pub fn Lang::bounds(self : Lang) -> (Int32, Int32) {
   match self {
     Afrikaans => (1, 2)
     Albanian => (2, 2)
@@ -204,7 +204,7 @@ pub fn Lang::hyphenation_character(self : Lang) -> Char? {
 
 ///|
 /// Index of the language's trie in `tries`.
-fn Lang::index(self : Lang) -> Int {
+fn Lang::index(self : Lang) -> Int32 {
   match self {
     Afrikaans => 0
     Albanian => 1

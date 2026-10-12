@@ -31,9 +31,9 @@ fn Executor::execute_branch(self : Executor, offset : @ir.BranchOffset) -> Unit 
 fn Executor::fetch_branch_table_offset(
   self : Executor,
   index : @ir.Slot,
-  len_targets : Int,
-) -> Int {
-  let index : UInt = self.get_stack_slot_as_u32(index)
+  len_targets : Int32,
+) -> Int32 {
+  let index : UInt32 = self.get_stack_slot_as_u32(index)
   // The index of the default target which is the last target of the slice.
   let max_index = len_targets.reinterpret_as_uint() - 1
   // A normalized index will always yield a target without panicking.
@@ -46,7 +46,7 @@ fn Executor::fetch_branch_table_offset(
 fn Executor::execute_branch_table_0(
   self : Executor,
   index : @ir.Slot,
-  len_targets : Int,
+  len_targets : Int32,
 ) -> Unit {
   let offset = self.fetch_branch_table_offset(index, len_targets)
   self.ip = self.ip + offset
@@ -57,7 +57,7 @@ fn Executor::execute_branch_table_0(
 fn Executor::execute_branch_table_span(
   self : Executor,
   index : @ir.Slot,
-  len_targets : Int,
+  len_targets : Int32,
 ) -> Unit {
   let offset = self.fetch_branch_table_offset(index, len_targets)
   self.ip = self.ip + 1
@@ -85,32 +85,32 @@ fn Executor::execute_branch_table_span(
 // `@wasmi_core` comparisons).
 
 ///|
-fn cmp_eq_i32(a : Int, b : Int) -> Bool {
+fn cmp_eq_i32(a : Int32, b : Int32) -> Bool {
   a == b
 }
 
 ///|
-fn cmp_ne_i32(a : Int, b : Int) -> Bool {
+fn cmp_ne_i32(a : Int32, b : Int32) -> Bool {
   a != b
 }
 
 ///|
-fn cmp_lt_i32(a : Int, b : Int) -> Bool {
+fn cmp_lt_i32(a : Int32, b : Int32) -> Bool {
   a < b
 }
 
 ///|
-fn cmp_le_i32(a : Int, b : Int) -> Bool {
+fn cmp_le_i32(a : Int32, b : Int32) -> Bool {
   a <= b
 }
 
 ///|
-fn cmp_lt_u32(a : UInt, b : UInt) -> Bool {
+fn cmp_lt_u32(a : UInt32, b : UInt32) -> Bool {
   a < b
 }
 
 ///|
-fn cmp_le_u32(a : UInt, b : UInt) -> Bool {
+fn cmp_le_u32(a : UInt32, b : UInt32) -> Bool {
   a <= b
 }
 

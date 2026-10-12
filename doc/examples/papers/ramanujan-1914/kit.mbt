@@ -57,7 +57,7 @@ const NUMBER_ROOM : Double = 25
 /// and the displays that are wider than the place they are set in.
 priv struct Audit {
   mut check : Bool
-  mut numbered : Int
+  mut numbered : Int32
   formulas : Array[(String, String)]
   overfull : Map[String, String]
 }
@@ -151,7 +151,7 @@ fn ueq(src : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Item {
 /// numbers come from the engine's counter, the label `eq<n>` is what the
 /// text refers to.
 #callsite(autofill(loc, args_loc))
-fn eq(src : String, n~ : Int, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Item {
+fn eq(src : String, n~ : Int32, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Item {
   audit.numbered += 1
   guard audit.numbered == n else {
     abort("equation (\{n}) is the \{audit.numbered}th numbered display")
@@ -225,7 +225,7 @@ fn hang(lines : Array[String]) -> String {
 /// an array). `cases` sets its rows in text style; `display` gives the
 /// fractions of each part their size back. A row is split at its alignment
 /// points, a comma inside a row is written `comma`.
-fn braced(lines : Array[String], gap? : String = "0.9em") -> String {
+fn braced(lines : Array[String], gap~ : String = "0.9em") -> String {
   let cells = lines.map(line => {
     let parts = line
       .split("&")
@@ -247,7 +247,7 @@ fn braced(lines : Array[String], gap? : String = "0.9em") -> String {
 
 ///|
 /// A reference to a numbered display as the paper prints it: "(12)".
-fn r(n : Int) -> Seq {
+fn r(n : Int32) -> Seq {
   Seq(["(", Ref("eq\{n}", supplement=Supplement::none()), ")"])
 }
 

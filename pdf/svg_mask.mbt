@@ -6,7 +6,7 @@ fn svg_mask_render(
   mask : @usvg.Mask,
   surface : @export.Surface,
   process_context : SvgProcessContext,
-) -> Int {
+) -> Int32 {
   let sub_surface = surface.stream_surface()
   let mut pop_count = 0
   if mask.mask() is Some(sub_mask) {

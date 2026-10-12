@@ -67,7 +67,7 @@ pub fn CmapSubtable::is_unicode(self : CmapSubtable) -> Bool {
 /// - when format is `UnicodeVariationSequences`. Use `glyph_variation_index` instead.
 pub fn CmapSubtable::glyph_index(
   self : CmapSubtable,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   match self.format {
     ByteEncodingTable(subtable) => subtable.glyph_index(code_point)
@@ -91,8 +91,8 @@ pub fn CmapSubtable::glyph_index(
 /// - when format is not `UnicodeVariationSequences`.
 pub fn CmapSubtable::glyph_variation_index(
   self : CmapSubtable,
-  code_point : UInt,
-  variation : UInt,
+  code_point : UInt32,
+  variation : UInt32,
 ) -> GlyphVariationResult? {
   match self.format {
     UnicodeVariationSequences(subtable) =>
@@ -117,7 +117,7 @@ pub fn CmapSubtable::glyph_variation_index(
 /// - when format is `UnicodeVariationSequences`, since it's not supported.
 pub fn CmapSubtable::codepoints(
   self : CmapSubtable,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   match self.format {
     ByteEncodingTable(subtable) => subtable.codepoints(f)
@@ -144,7 +144,7 @@ pub fn CmapSubtable::codepoints(
 /// time.
 pub fn CmapSubtable::codepoint_ranges(
   self : CmapSubtable,
-  f : (UInt, UInt) -> Unit,
+  f : (UInt32, UInt32) -> Unit,
 ) -> Unit {
   match self.format {
     SegmentMappingToDeltaValues(subtable) => {
@@ -180,7 +180,7 @@ pub fn CmapSubtable::codepoint_ranges(
 /// 13 subtable (`start..=end`: nothing if the start is after the end).
 fn group_ranges(
   groups : LazyArray32[SequentialMapGroup],
-  f : (UInt, UInt) -> Unit,
+  f : (UInt32, UInt32) -> Unit,
 ) -> Unit {
   let data = groups.data
   // Whole groups only, like `LazyArray32::len`.
@@ -200,7 +200,7 @@ fn group_ranges(
 /// `be_u32` without bounds checks: the caller has `0 <= i` and
 /// `i + 3 < data.length()`.
 #inline
-fn be_u32_unchecked(data : BytesView, i : Int) -> UInt {
+fn be_u32_unchecked(data : BytesView, i : Int32) -> UInt32 {
   ((data.unsafe_get(i).to_int() << 24) |
   (data.unsafe_get(i + 1).to_int() << 16) |
   (data.unsafe_get(i + 2).to_int() << 8) |
@@ -280,7 +280,7 @@ pub fn CmapSubtables::get(
 /// The offset in the table of the subtable at an index (not in ttf-parser:
 /// several encoding records of a table usually point to one subtable, and
 /// whoever walks all subtables, like the coverage of a font, can tell).
-pub fn CmapSubtables::offset(self : CmapSubtables, index : UInt16) -> UInt? {
+pub fn CmapSubtables::offset(self : CmapSubtables, index : UInt16) -> UInt32? {
   guard self.records.get(index) is Some(record) else { return None }
   Some(record.offset.0)
 }
@@ -361,7 +361,7 @@ pub fn CmapSubtable0::parse(data : BytesView) -> CmapSubtable0? {
 /// Returns a glyph index for a code point.
 pub fn CmapSubtable0::glyph_index(
   self : CmapSubtable0,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   if code_point >= self.glyph_ids.length().reinterpret_as_uint() {
     return None
@@ -380,7 +380,7 @@ pub fn CmapSubtable0::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable0::codepoints(
   self : CmapSubtable0,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   for i in 0..<self.glyph_ids.length() {
     // In contrast to every other format, here we take a look at the glyph
@@ -436,7 +436,7 @@ pub extend SubHeaderRecord with FromData::{size, parse}
 /// subtable.
 pub struct CmapSubtable2 {
   sub_header_keys : LazyArray16[UInt16]
-  sub_headers_offset : Int
+  sub_headers_offset : Int32
   sub_headers : LazyArray16[SubHeaderRecord]
   // The whole subtable data.
   data : BytesView
@@ -477,7 +477,7 @@ pub fn CmapSubtable2::parse(data : BytesView) -> CmapSubtable2? {
 /// Returns `None` when `code_point` is larger than `u16`.
 pub fn CmapSubtable2::glyph_index(
   self : CmapSubtable2,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   // This subtable supports code points only in a u16 range.
   guard u16_try_from_u32(code_point) is Some(code_point) else { return None }
@@ -535,7 +535,7 @@ pub fn CmapSubtable2::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable2::codepoints(
   self : CmapSubtable2,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   self.codepoints_inner(f) catch {
     _ => ()
@@ -545,7 +545,7 @@ pub fn CmapSubtable2::codepoints(
 ///|
 fn CmapSubtable2::codepoints_inner(
   self : CmapSubtable2,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit raise Malformed {
   for first_byte_i in 0..<256 {
     let first_byte = first_byte_i.to_uint16()
@@ -580,7 +580,7 @@ pub struct CmapSubtable4 {
   end_codes : LazyArray16[UInt16]
   id_deltas : LazyArray16[Int16]
   id_range_offsets : LazyArray16[UInt16]
-  id_range_offset_pos : Int
+  id_range_offset_pos : Int32
   // The whole subtable data.
   data : BytesView
 }
@@ -622,7 +622,7 @@ pub fn CmapSubtable4::parse(data : BytesView) -> CmapSubtable4? {
 /// Returns `None` when `code_point` is larger than `u16`.
 pub fn CmapSubtable4::glyph_index(
   self : CmapSubtable4,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   // This subtable supports code points only in a u16 range.
   guard u16_try_from_u32(code_point) is Some(code_point) else { return None }
@@ -684,7 +684,7 @@ pub fn CmapSubtable4::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable4::codepoints(
   self : CmapSubtable4,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   let n = if self.start_codes.len() < self.end_codes.len() {
     self.start_codes.len()
@@ -742,7 +742,7 @@ pub fn CmapSubtable6::parse(data : BytesView) -> CmapSubtable6? {
 /// Returns `None` when `code_point` is larger than `u16`.
 pub fn CmapSubtable6::glyph_index(
   self : CmapSubtable6,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   // This subtable supports code points only in a u16 range.
   guard u16_try_from_u32(code_point) is Some(code_point) else { return None }
@@ -756,7 +756,7 @@ pub fn CmapSubtable6::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable6::codepoints(
   self : CmapSubtable6,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   for i in 0..<self.glyphs.len().to_int() {
     if u16_checked_add(self.first_code_point, i.to_uint16()) is Some(code_point) {
@@ -773,7 +773,7 @@ pub fn CmapSubtable6::codepoints(
 /// subtable.
 pub struct CmapSubtable10 {
   /// First character code covered.
-  first_code_point : UInt
+  first_code_point : UInt32
   /// Array of glyph indices for the character codes covered.
   glyphs : LazyArray32[GlyphId]
 }
@@ -800,7 +800,7 @@ pub fn CmapSubtable10::parse(data : BytesView) -> CmapSubtable10? {
 /// Returns a glyph index for a code point.
 pub fn CmapSubtable10::glyph_index(
   self : CmapSubtable10,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   guard u32_checked_sub(code_point, self.first_code_point) is Some(idx) else {
     return None
@@ -812,9 +812,9 @@ pub fn CmapSubtable10::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable10::codepoints(
   self : CmapSubtable10,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
-  let mut i : UInt = 0
+  let mut i : UInt32 = 0
   while i < self.glyphs.len() {
     if u32_checked_add(self.first_code_point, i) is Some(code_point) {
       f(code_point)
@@ -828,9 +828,9 @@ pub fn CmapSubtable10::codepoints(
 
 ///|
 pub struct SequentialMapGroup {
-  start_char_code : UInt
-  end_char_code : UInt
-  start_glyph_id : UInt
+  start_char_code : UInt32
+  end_char_code : UInt32
+  start_glyph_id : UInt32
 }
 
 ///|
@@ -857,7 +857,7 @@ pub extend SequentialMapGroup with FromData::{size, parse}
 /// Calls `f` for each code point of a group (`start..=end`).
 fn SequentialMapGroup::each_codepoint(
   self : SequentialMapGroup,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   if self.start_char_code > self.end_char_code {
     return
@@ -900,7 +900,7 @@ pub fn CmapSubtable12::parse(data : BytesView) -> CmapSubtable12? {
 /// Returns a glyph index for a code point.
 pub fn CmapSubtable12::glyph_index(
   self : CmapSubtable12,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   // `binary_search_by` specialized to compare the raw big-endian fields
   // instead of parsing a group for every probe (same probe sequence).
@@ -909,7 +909,7 @@ pub fn CmapSubtable12::glyph_index(
   if size == 0 {
     return None
   }
-  let mut base : UInt = 0
+  let mut base : UInt32 = 0
   while size > 1 {
     let half = size / 2
     let mid = base + half
@@ -944,7 +944,7 @@ pub fn CmapSubtable12::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable12::codepoints(
   self : CmapSubtable12,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   for group in self.groups.iter() {
     group.each_codepoint(f)
@@ -984,7 +984,7 @@ pub fn CmapSubtable13::parse(data : BytesView) -> CmapSubtable13? {
 /// Returns a glyph index for a code point.
 pub fn CmapSubtable13::glyph_index(
   self : CmapSubtable13,
-  code_point : UInt,
+  code_point : UInt32,
 ) -> GlyphId? {
   for group in self.groups.iter() {
     let start_char_code = group.start_char_code
@@ -1002,7 +1002,7 @@ pub fn CmapSubtable13::glyph_index(
 /// Calls `f` for each codepoint defined in this table.
 pub fn CmapSubtable13::codepoints(
   self : CmapSubtable13,
-  f : (UInt) -> Unit,
+  f : (UInt32) -> Unit,
 ) -> Unit {
   for group in self.groups.iter() {
     group.each_codepoint(f)
@@ -1014,7 +1014,7 @@ pub fn CmapSubtable13::codepoints(
 
 ///|
 pub struct VariationSelectorRecord {
-  var_selector : UInt
+  var_selector : UInt32
   default_uvs_offset : Offset32?
   non_default_uvs_offset : Offset32?
 }
@@ -1041,7 +1041,7 @@ pub extend VariationSelectorRecord with FromData::{size, parse}
 
 ///|
 pub struct UVSMappingRecord {
-  unicode_value : UInt
+  unicode_value : UInt32
   glyph_id : GlyphId
 }
 
@@ -1063,12 +1063,12 @@ pub extend UVSMappingRecord with FromData::{size, parse}
 
 ///|
 pub struct UnicodeRangeRecord {
-  start_unicode_value : UInt
+  start_unicode_value : UInt32
   additional_count : Byte
 }
 
 ///|
-fn UnicodeRangeRecord::contains(self : UnicodeRangeRecord, c : UInt) -> Bool {
+fn UnicodeRangeRecord::contains(self : UnicodeRangeRecord, c : UInt32) -> Bool {
   // Never overflows, since `start_unicode_value` is actually u24.
   let end = self.start_unicode_value + self.additional_count.to_uint()
   c >= self.start_unicode_value && c <= end
@@ -1140,8 +1140,8 @@ pub fn CmapSubtable14::parse(data : BytesView) -> CmapSubtable14? {
 /// Returns a glyph index for a code point.
 pub fn CmapSubtable14::glyph_index(
   self : CmapSubtable14,
-  code_point : UInt,
-  variation : UInt,
+  code_point : UInt32,
+  variation : UInt32,
 ) -> GlyphVariationResult? {
   guard self.records.binary_search_by(v => v.var_selector.compare(variation))
     is Some((_, record)) else {

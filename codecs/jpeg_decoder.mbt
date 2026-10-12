@@ -5,7 +5,7 @@
 
 ///|
 /// Maximum components.
-const MAX_COMPONENTS : Int = 4
+const MAX_COMPONENTS : Int32 = 4
 
 ///|
 /// The image color spaces the decoder deals with (upstream
@@ -19,7 +19,7 @@ pub(all) enum ColorSpace {
   Luma
   YCCK
   CMYK
-  MultiBand(Int)
+  MultiBand(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -34,7 +34,7 @@ pub extend ColorSpace with @debug.Debug::{to_repr}
 
 ///|
 /// Number of color channels present for a certain colorspace.
-fn ColorSpace::num_components(self : ColorSpace) -> Int {
+fn ColorSpace::num_components(self : ColorSpace) -> Int32 {
   match self {
     RGB | YCbCr => 3
     YCCK | CMYK => 4
@@ -58,33 +58,33 @@ fn ColorSpace::debug(self : ColorSpace) -> String {
 ///|
 /// An encapsulation of an ICC chunk.
 priv struct ICCChunk {
-  seq_no : Int
-  num_markers : Int
+  seq_no : Int32
+  num_markers : Int32
   data : BytesView
 }
 
 ///|
 /// An extended XMP segment.
 priv struct ExtendedXmpSegment {
-  offset : UInt
-  total_size : UInt
+  offset : UInt32
+  total_size : UInt32
   guid : Bytes
-  data_len : Int
+  data_len : Int32
 }
 
 ///|
 /// A JPEG decoder instance.
 pub struct JpegDecoder {
   /// Image width (from the SOF).
-  priv mut width : Int
+  priv mut width : Int32
   /// Image height (from the SOF).
-  priv mut height : Int
+  priv mut height : Int32
   /// Number of components (from the SOF).
-  priv mut info_components : Int
+  priv mut info_components : Int32
   /// Image sub-sampling ratio.
   priv mut sample_ratio : SampleRatios
   /// Quantization tables.
-  priv qt_tables : FixedArray[FixedArray[Int]?]
+  priv qt_tables : FixedArray[FixedArray[Int32]?]
   /// DC Huffman tables with a maximum of 4 tables for each component
   priv dc_huffman_tables : FixedArray[HuffmanTable?]
   /// AC Huffman tables with a maximum of 4 tables for each component
@@ -92,17 +92,17 @@ pub struct JpegDecoder {
   /// Image components
   priv mut components : Array[Components]
   /// maximum horizontal component of all channels in the image
-  priv mut h_max : Int
+  priv mut h_max : Int32
   /// maximum vertical component of all channels in the image
-  priv mut v_max : Int
+  priv mut v_max : Int32
   /// mcu's width (interleaved scans)
-  priv mut mcu_width : Int
+  priv mut mcu_width : Int32
   /// MCU height (interleaved scans)
-  priv mut mcu_height : Int
+  priv mut mcu_height : Int32
   /// Number of MCU's in the x plane
-  priv mut mcu_x : Int
+  priv mut mcu_x : Int32
   /// Number of MCU's in the y plane
-  priv mut mcu_y : Int
+  priv mut mcu_y : Int32
   /// Is the image interleaved?
   priv mut is_interleaved : Bool
   /// Image input colorspace
@@ -110,28 +110,28 @@ pub struct JpegDecoder {
   /// Is the image progressive?
   priv mut is_progressive : Bool
   /// Start of spectral scan
-  priv mut spec_start : Int
+  priv mut spec_start : Int32
   /// End of spectral scan
-  priv mut spec_end : Int
+  priv mut spec_end : Int32
   /// Successive approximation bit position high
-  priv mut succ_high : Int
+  priv mut succ_high : Int32
   /// Successive approximation bit position low
-  priv mut succ_low : Int
+  priv mut succ_low : Int32
   /// Number of components in the scan.
-  priv mut num_scans : Int
+  priv mut num_scans : Int32
   /// For a scan, check if any component has vertical/horizontal sampling.
   priv mut scan_subsampled : Bool
-  priv z_order : FixedArray[Int]
+  priv z_order : FixedArray[Int32]
   /// restart markers
-  priv mut restart_interval : Int
+  priv mut restart_interval : Int32
   /// MCUs until the next restart marker (`usize`, wrapping).
-  priv mut todo : Int
+  priv mut todo : Int32
   /// The output colorspace (upstream `DecoderOptions::jpeg_get_out_colorspace`).
   priv mut out_colorspace : ColorSpace
   /// Maximum image width (upstream `DecoderOptions::max_width`).
-  priv mut max_width : Int
+  priv mut max_width : Int32
   /// Maximum image height (upstream `DecoderOptions::max_height`).
-  priv mut max_height : Int
+  priv mut max_height : Int32
   /// byte-stream
   priv stream : ZReader
   /// Indicate whether headers have been decoded
@@ -139,7 +139,7 @@ pub struct JpegDecoder {
   priv mut seen_sof : Bool
   priv icc_data : Array[ICCChunk]
   priv mut is_mjpeg : Bool
-  priv mut coeff : Int
+  priv mut coeff : Int32
   /// Extended XMP segments
   priv mut extended_xmp_segments : Array[ExtendedXmpSegment]
 }
@@ -147,7 +147,7 @@ pub struct JpegDecoder {
 ///|
 /// Maximum progressive scans (upstream `DecoderOptions::jpeg_get_max_scans`
 /// default).
-const MAX_SCANS : Int = 100
+const MAX_SCANS : Int32 = 100
 
 ///|
 /// The decoder options the port supports (upstream
@@ -157,8 +157,8 @@ const MAX_SCANS : Int = 100
 /// them at their defaults.
 pub(all) struct DecoderOptions {
   out_colorspace : ColorSpace
-  max_width : Int
-  max_height : Int
+  max_width : Int32
+  max_height : Int32
 }
 
 ///|
@@ -243,7 +243,7 @@ fn JpegDecoder::new(
 
 ///|
 /// Return the number of bytes required to hold a decoded image frame.
-fn JpegDecoder::output_buffer_size(self : JpegDecoder) -> Int {
+fn JpegDecoder::output_buffer_size(self : JpegDecoder) -> Int32 {
   self.width * self.height * self.out_colorspace.num_components()
 }
 
@@ -272,7 +272,7 @@ fn JpegDecoder::reassemble_extended_xmp(self : JpegDecoder) -> Unit {
       return
     }
   }
-  let mut rolling_offset : UInt = 0
+  let mut rolling_offset : UInt32 = 0
   let mut complete = true
   for segment in self.extended_xmp_segments {
     if segment.offset != rolling_offset {
@@ -477,7 +477,7 @@ pub fn JpegDecoder::input_colorspace(self : JpegDecoder) -> ColorSpace? {
 ///|
 /// The number of components of the image (upstream `info().components`),
 /// or `None` if the headers weren't decoded.
-pub fn JpegDecoder::info_components(self : JpegDecoder) -> Int? {
+pub fn JpegDecoder::info_components(self : JpegDecoder) -> Int32? {
   if self.headers_decoded {
     Some(self.info_components)
   } else {
@@ -488,7 +488,7 @@ pub fn JpegDecoder::info_components(self : JpegDecoder) -> Int? {
 ///|
 /// Image dimensions as a tuple of width and height, or `None` if the headers
 /// weren't decoded (upstream `JpegDecoder::dimensions`).
-pub fn JpegDecoder::dimensions(self : JpegDecoder) -> (Int, Int)? {
+pub fn JpegDecoder::dimensions(self : JpegDecoder) -> (Int32, Int32)? {
   if self.headers_decoded {
     Some((self.width, self.height))
   } else {

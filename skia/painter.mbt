@@ -75,10 +75,10 @@ pub fn Paint::set_color(self : Paint, color : Color) -> Unit {
 /// Sets a paint source to a solid color.
 pub fn Paint::set_color_rgba8(
   self : Paint,
-  r : Int,
-  g : Int,
-  b : Int,
-  a : Int,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+  a : Int32,
 ) -> Unit {
   self.set_color(Color::from_rgba8(r, g, b, a))
 }
@@ -386,8 +386,8 @@ fn stroke_hairline(
 /// The same as filling a rectangle with a `pixmap` pattern.
 fn Pixmap::draw_pixmap_impl(
   self : Pixmap,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   pixmap : Pixmap,
   paint : PixmapPaint,
   transform : @path.Transform,
@@ -504,26 +504,26 @@ fn is_too_big_for_math(path : @path.Path) -> Bool {
 
 ///|
 priv struct DrawTiler {
-  image_width : Int
-  image_height : Int
-  mut x_offset : Int
-  mut y_offset : Int
+  image_width : Int32
+  image_height : Int32
+  mut x_offset : Int32
+  mut y_offset : Int32
   finished : Bool
 }
 
 ///|
 /// 8K is 1 too big, since 8K << supersample == 32768 which is too big for
 /// Fixed.
-let draw_tiler_max_dimensions : Int = 8192 - 1
+let draw_tiler_max_dimensions : Int32 = 8192 - 1
 
 ///|
-fn DrawTiler::required(image_width : Int, image_height : Int) -> Bool {
+fn DrawTiler::required(image_width : Int32, image_height : Int32) -> Bool {
   image_width > draw_tiler_max_dimensions ||
   image_height > draw_tiler_max_dimensions
 }
 
 ///|
-fn DrawTiler::new(image_width : Int, image_height : Int) -> DrawTiler? {
+fn DrawTiler::new(image_width : Int32, image_height : Int32) -> DrawTiler? {
   if DrawTiler::required(image_width, image_height) {
     Some({
       image_width,
@@ -673,8 +673,8 @@ pub fn Pixmap::stroke_path(
 /// The same as filling a rectangle with a `pixmap` pattern.
 pub fn Pixmap::draw_pixmap(
   self : Pixmap,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   pixmap : Pixmap,
   paint : PixmapPaint,
   transform : @path.Transform,

@@ -13,19 +13,19 @@ pub(all) enum Operator {
   If(blockty~ : BlockType)
   Else
   End
-  Br(relative_depth~ : UInt)
-  BrIf(relative_depth~ : UInt)
+  Br(relative_depth~ : UInt32)
+  BrIf(relative_depth~ : UInt32)
   BrTable(targets~ : BrTable)
   Return
-  Call(function_index~ : UInt)
-  CallIndirect(type_index~ : UInt, table_index~ : UInt)
+  Call(function_index~ : UInt32)
+  CallIndirect(type_index~ : UInt32, table_index~ : UInt32)
   Drop
   Select
-  LocalGet(local_index~ : UInt)
-  LocalSet(local_index~ : UInt)
-  LocalTee(local_index~ : UInt)
-  GlobalGet(global_index~ : UInt)
-  GlobalSet(global_index~ : UInt)
+  LocalGet(local_index~ : UInt32)
+  LocalSet(local_index~ : UInt32)
+  LocalTee(local_index~ : UInt32)
+  GlobalGet(global_index~ : UInt32)
+  GlobalSet(global_index~ : UInt32)
   I32Load(memarg~ : MemArg)
   I64Load(memarg~ : MemArg)
   F32Load(memarg~ : MemArg)
@@ -49,9 +49,9 @@ pub(all) enum Operator {
   I64Store8(memarg~ : MemArg)
   I64Store16(memarg~ : MemArg)
   I64Store32(memarg~ : MemArg)
-  MemorySize(mem~ : UInt)
-  MemoryGrow(mem~ : UInt)
-  I32Const(value~ : Int)
+  MemorySize(mem~ : UInt32)
+  MemoryGrow(mem~ : UInt32)
+  I32Const(value~ : Int32)
   I64Const(value~ : Int64)
   F32Const(value~ : Ieee32)
   F64Const(value~ : Ieee64)
@@ -184,37 +184,37 @@ pub(all) enum Operator {
   I64Extend16S
   I64Extend32S
   RefEq
-  StructNew(struct_type_index~ : UInt)
-  StructNewDefault(struct_type_index~ : UInt)
-  StructGet(struct_type_index~ : UInt, field_index~ : UInt)
-  StructGetS(struct_type_index~ : UInt, field_index~ : UInt)
-  StructGetU(struct_type_index~ : UInt, field_index~ : UInt)
-  StructSet(struct_type_index~ : UInt, field_index~ : UInt)
-  ArrayNew(array_type_index~ : UInt)
-  ArrayNewDefault(array_type_index~ : UInt)
-  ArrayNewFixed(array_type_index~ : UInt, array_size~ : UInt)
-  ArrayNewData(array_type_index~ : UInt, array_data_index~ : UInt)
-  ArrayNewElem(array_type_index~ : UInt, array_elem_index~ : UInt)
-  ArrayGet(array_type_index~ : UInt)
-  ArrayGetS(array_type_index~ : UInt)
-  ArrayGetU(array_type_index~ : UInt)
-  ArraySet(array_type_index~ : UInt)
+  StructNew(struct_type_index~ : UInt32)
+  StructNewDefault(struct_type_index~ : UInt32)
+  StructGet(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructGetS(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructGetU(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructSet(struct_type_index~ : UInt32, field_index~ : UInt32)
+  ArrayNew(array_type_index~ : UInt32)
+  ArrayNewDefault(array_type_index~ : UInt32)
+  ArrayNewFixed(array_type_index~ : UInt32, array_size~ : UInt32)
+  ArrayNewData(array_type_index~ : UInt32, array_data_index~ : UInt32)
+  ArrayNewElem(array_type_index~ : UInt32, array_elem_index~ : UInt32)
+  ArrayGet(array_type_index~ : UInt32)
+  ArrayGetS(array_type_index~ : UInt32)
+  ArrayGetU(array_type_index~ : UInt32)
+  ArraySet(array_type_index~ : UInt32)
   ArrayLen
-  ArrayFill(array_type_index~ : UInt)
-  ArrayCopy(array_type_index_dst~ : UInt, array_type_index_src~ : UInt)
-  ArrayInitData(array_type_index~ : UInt, array_data_index~ : UInt)
-  ArrayInitElem(array_type_index~ : UInt, array_elem_index~ : UInt)
+  ArrayFill(array_type_index~ : UInt32)
+  ArrayCopy(array_type_index_dst~ : UInt32, array_type_index_src~ : UInt32)
+  ArrayInitData(array_type_index~ : UInt32, array_data_index~ : UInt32)
+  ArrayInitElem(array_type_index~ : UInt32, array_elem_index~ : UInt32)
   RefTestNonNull(hty~ : HeapType)
   RefTestNullable(hty~ : HeapType)
   RefCastNonNull(hty~ : HeapType)
   RefCastNullable(hty~ : HeapType)
   BrOnCast(
-    relative_depth~ : UInt,
+    relative_depth~ : UInt32,
     from_ref_type~ : RefType,
     to_ref_type~ : RefType
   )
   BrOnCastFail(
-    relative_depth~ : UInt,
+    relative_depth~ : UInt32,
     from_ref_type~ : RefType,
     to_ref_type~ : RefType
   )
@@ -231,25 +231,25 @@ pub(all) enum Operator {
   I64TruncSatF32U
   I64TruncSatF64S
   I64TruncSatF64U
-  MemoryInit(data_index~ : UInt, mem~ : UInt)
-  DataDrop(data_index~ : UInt)
-  MemoryCopy(dst_mem~ : UInt, src_mem~ : UInt)
-  MemoryFill(mem~ : UInt)
-  TableInit(elem_index~ : UInt, table~ : UInt)
-  ElemDrop(elem_index~ : UInt)
-  TableCopy(dst_table~ : UInt, src_table~ : UInt)
+  MemoryInit(data_index~ : UInt32, mem~ : UInt32)
+  DataDrop(data_index~ : UInt32)
+  MemoryCopy(dst_mem~ : UInt32, src_mem~ : UInt32)
+  MemoryFill(mem~ : UInt32)
+  TableInit(elem_index~ : UInt32, table~ : UInt32)
+  ElemDrop(elem_index~ : UInt32)
+  TableCopy(dst_table~ : UInt32, src_table~ : UInt32)
   TypedSelect(ty~ : ValType)
   RefNull(hty~ : HeapType)
   RefIsNull
-  RefFunc(function_index~ : UInt)
-  TableFill(table~ : UInt)
-  TableGet(table~ : UInt)
-  TableSet(table~ : UInt)
-  TableGrow(table~ : UInt)
-  TableSize(table~ : UInt)
-  ReturnCall(function_index~ : UInt)
-  ReturnCallIndirect(type_index~ : UInt, table_index~ : UInt)
-  MemoryDiscard(mem~ : UInt)
+  RefFunc(function_index~ : UInt32)
+  TableFill(table~ : UInt32)
+  TableGet(table~ : UInt32)
+  TableSet(table~ : UInt32)
+  TableGrow(table~ : UInt32)
+  TableSize(table~ : UInt32)
+  ReturnCall(function_index~ : UInt32)
+  ReturnCallIndirect(type_index~ : UInt32, table_index~ : UInt32)
+  MemoryDiscard(mem~ : UInt32)
   MemoryAtomicNotify(memarg~ : MemArg)
   MemoryAtomicWait32(memarg~ : MemArg)
   MemoryAtomicWait64(memarg~ : MemArg)
@@ -574,108 +574,108 @@ pub(all) enum Operator {
   I16x8RelaxedDotI8x16I7x16S
   I32x4RelaxedDotI8x16I7x16AddS
   TryTable(try_table~ : TryTable)
-  Throw(tag_index~ : UInt)
+  Throw(tag_index~ : UInt32)
   ThrowRef
   Try(blockty~ : BlockType)
-  Catch(tag_index~ : UInt)
-  Rethrow(relative_depth~ : UInt)
-  Delegate(relative_depth~ : UInt)
+  Catch(tag_index~ : UInt32)
+  Rethrow(relative_depth~ : UInt32)
+  Delegate(relative_depth~ : UInt32)
   CatchAll
-  GlobalAtomicGet(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicSet(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwAdd(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwSub(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwAnd(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwOr(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwXor(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwXchg(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwCmpxchg(ordering~ : Ordering, global_index~ : UInt)
-  TableAtomicGet(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicSet(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicRmwXchg(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicRmwCmpxchg(ordering~ : Ordering, table_index~ : UInt)
+  GlobalAtomicGet(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicSet(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwAdd(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwSub(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwAnd(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwOr(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwXor(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwXchg(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwCmpxchg(ordering~ : Ordering, global_index~ : UInt32)
+  TableAtomicGet(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicSet(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicRmwXchg(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicRmwCmpxchg(ordering~ : Ordering, table_index~ : UInt32)
   StructAtomicGet(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicGetS(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicGetU(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicSet(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwAdd(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwSub(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwAnd(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwOr(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwXor(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwXchg(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
   StructAtomicRmwCmpxchg(
     ordering~ : Ordering,
-    struct_type_index~ : UInt,
-    field_index~ : UInt
+    struct_type_index~ : UInt32,
+    field_index~ : UInt32
   )
-  ArrayAtomicGet(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicGetS(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicGetU(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicSet(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwAdd(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwSub(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwAnd(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwOr(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwXor(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwXchg(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwCmpxchg(ordering~ : Ordering, array_type_index~ : UInt)
+  ArrayAtomicGet(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicGetS(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicGetU(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicSet(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwAdd(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwSub(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwAnd(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwOr(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwXor(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwXchg(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwCmpxchg(ordering~ : Ordering, array_type_index~ : UInt32)
   RefI31Shared
-  CallRef(type_index~ : UInt)
-  ReturnCallRef(type_index~ : UInt)
+  CallRef(type_index~ : UInt32)
+  ReturnCallRef(type_index~ : UInt32)
   RefAsNonNull
-  BrOnNull(relative_depth~ : UInt)
-  BrOnNonNull(relative_depth~ : UInt)
-  ContNew(cont_type_index~ : UInt)
-  ContBind(argument_index~ : UInt, result_index~ : UInt)
-  Suspend(tag_index~ : UInt)
-  Resume(cont_type_index~ : UInt, resume_table~ : ResumeTable)
+  BrOnNull(relative_depth~ : UInt32)
+  BrOnNonNull(relative_depth~ : UInt32)
+  ContNew(cont_type_index~ : UInt32)
+  ContBind(argument_index~ : UInt32, result_index~ : UInt32)
+  Suspend(tag_index~ : UInt32)
+  Resume(cont_type_index~ : UInt32, resume_table~ : ResumeTable)
   ResumeThrow(
-    cont_type_index~ : UInt,
-    tag_index~ : UInt,
+    cont_type_index~ : UInt32,
+    tag_index~ : UInt32,
     resume_table~ : ResumeTable
   )
-  Switch(cont_type_index~ : UInt, tag_index~ : UInt)
+  Switch(cont_type_index~ : UInt32, tag_index~ : UInt32)
   I64Add128
   I64Sub128
   I64MulWideS

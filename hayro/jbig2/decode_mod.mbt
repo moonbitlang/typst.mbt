@@ -28,7 +28,7 @@ priv enum CombinationOperator {
 
 ///|
 fn CombinationOperator::from_value(
-  value : Int,
+  value : Int32,
 ) -> CombinationOperator raise DecodeError {
   match value & 0x07 {
     0 => Or
@@ -68,7 +68,7 @@ priv enum Template {
 }
 
 ///|
-fn Template::from_byte(value : Int) -> Template {
+fn Template::from_byte(value : Int32) -> Template {
   match value & 0x03 {
     0 => Template0
     1 => Template1
@@ -79,7 +79,7 @@ fn Template::from_byte(value : Int) -> Template {
 
 ///|
 /// Number of context bits for this template (6.2.5.3).
-fn Template::context_bits(self : Template) -> Int {
+fn Template::context_bits(self : Template) -> Int32 {
   match self {
     Template0 => 16
     Template1 => 13
@@ -89,7 +89,7 @@ fn Template::context_bits(self : Template) -> Int {
 
 ///|
 /// Number of adaptive template pixels (6.2.5.3).
-fn Template::adaptive_template_pixels(self : Template) -> Int {
+fn Template::adaptive_template_pixels(self : Template) -> Int32 {
   match self {
     Template0 => 4
     Template1 | Template2 | Template3 => 1
@@ -109,16 +109,16 @@ fn Template::adaptive_template_pixels(self : Template) -> Int {
 priv struct RegionSegmentInfo {
   /// "This four-byte field gives the width in pixels of the bitmap encoded
   /// in this segment." (7.4.1.1)
-  width : UInt
+  width : UInt32
   /// "This four-byte field gives the height in pixels of the bitmap encoded
   /// in this segment." (7.4.1.2)
-  mut height : UInt
+  mut height : UInt32
   /// "This four-byte field gives the horizontal offset in pixels of the bitmap
   /// encoded in this segment relative to the page bitmap." (7.4.1.3)
-  x_location : UInt
+  x_location : UInt32
   /// "This four-byte field gives the vertical offset in pixels of the bitmap
   /// encoded in this segment relative to the page bitmap." (7.4.1.4)
-  y_location : UInt
+  y_location : UInt32
   /// "Bits 0-2: External combination operator." (7.4.1.5)
   combination_operator : CombinationOperator
   /// "Bit 3: Colour extension flag (COLEXTFLAG). This field specifies whether
@@ -168,8 +168,8 @@ fn parse_region_segment_info(
 ///
 /// (`x`/`y` are upstream's `i8`s.)
 priv struct AdaptiveTemplatePixel {
-  x : Int
-  y : Int
+  x : Int32
+  y : Int32
 }
 
 ///|
@@ -179,7 +179,7 @@ fn AdaptiveTemplatePixel::default() -> AdaptiveTemplatePixel {
 
 ///|
 /// `byte as i8`.
-fn i8_of(byte : Byte) -> Int {
+fn i8_of(byte : Byte) -> Int32 {
   let v = byte.to_int()
   if v >= 128 {
     v - 256
@@ -219,7 +219,7 @@ priv enum RefinementTemplate {
 } derive(Eq)
 
 ///|
-fn RefinementTemplate::from_byte(value : Int) -> RefinementTemplate {
+fn RefinementTemplate::from_byte(value : Int32) -> RefinementTemplate {
   if (value & 0x01) == 0 {
     RTemplate0
   } else {
@@ -229,7 +229,7 @@ fn RefinementTemplate::from_byte(value : Int) -> RefinementTemplate {
 
 ///|
 /// Number of context bits for this template (6.3.5.3).
-fn RefinementTemplate::context_bits(self : RefinementTemplate) -> Int {
+fn RefinementTemplate::context_bits(self : RefinementTemplate) -> Int32 {
   match self {
     RTemplate0 => 13
     RTemplate1 => 10

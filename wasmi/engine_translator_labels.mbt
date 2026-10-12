@@ -3,7 +3,7 @@
 
 ///|
 /// A reference to an encoded [`Op`] (its index in the instruction sequence).
-pub(all) struct Instr(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Instr(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -27,25 +27,25 @@ pub extend Instr with @debug.Debug::{to_repr}
 
 ///|
 /// Creates an [`Instr`] from the given `usize` value.
-pub fn Instr::from_usize(value : Int) -> Instr {
+pub fn Instr::from_usize(value : Int32) -> Instr {
   Instr(value)
 }
 
 ///|
 /// Returns an `usize` representation of the instruction index.
-pub fn Instr::into_usize(self : Instr) -> Int {
+pub fn Instr::into_usize(self : Instr) -> Int32 {
   self.0
 }
 
 ///|
 /// Returns the `u32` representation of the instruction index.
-pub fn Instr::to_u32(self : Instr) -> UInt {
+pub fn Instr::to_u32(self : Instr) -> UInt32 {
   self.0.reinterpret_as_uint()
 }
 
 ///|
 /// Returns the absolute distance between `self` and `other`.
-pub fn Instr::distance(self : Instr, other : Instr) -> Int {
+pub fn Instr::distance(self : Instr, other : Instr) -> Int32 {
   (self.0 - other.0).abs()
 }
 
@@ -60,7 +60,7 @@ priv enum Label {
 
 ///|
 /// A reference to an [`Label`].
-pub(all) struct LabelRef(Int) derive(Eq, Debug)
+pub(all) struct LabelRef(Int32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

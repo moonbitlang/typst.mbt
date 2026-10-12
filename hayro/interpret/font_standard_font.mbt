@@ -192,7 +192,9 @@ fn select_standard_font(
   // Now, we bruteforce, trying to determine a suitable font based on the
   // keywords that appear in the name.
   let lower = ascii_lowercase(name)
-  let is_bold = ((descriptor.get("FontWeight") : UInt?) is Some(w) && w >= 700) ||
+  let is_bold = (
+      (descriptor.get("FontWeight") : UInt32?) is Some(w) && w >= 700
+    ) ||
     lower.contains("bold") ||
     lower.contains("demi")
   let is_italic = (
@@ -243,7 +245,7 @@ fn ascii_lowercase(s : String) -> String {
   let buf = StringBuilder()
   for c in s {
     if c >= 'A' && c <= 'Z' {
-      buf.write_char(Int::unsafe_to_char(c.to_int() + 32))
+      buf.write_char(Int32::unsafe_to_char(c.to_int() + 32))
     } else {
       buf.write_char(c)
     }
@@ -258,7 +260,10 @@ priv enum StandardFontBlob {
 }
 
 ///|
-fn StandardFontBlob::from_data(data : Bytes, index : Int) -> StandardFontBlob? {
+fn StandardFontBlob::from_data(
+  data : Bytes,
+  index : Int32,
+) -> StandardFontBlob? {
   if CffFontBlob::new(data) is Some(blob) {
     Some(StandardFontBlob::new_cff(blob))
   } else {
@@ -294,7 +299,7 @@ fn StandardFontBlob::name_to_glyph(
 ///|
 fn StandardFontBlob::unicode_to_glyph(
   self : StandardFontBlob,
-  code : UInt,
+  code : UInt32,
 ) -> GlyphId? {
   match self {
     Cff(_) => None
@@ -337,8 +342,8 @@ priv struct StandardKind {
   widths : Array[Width]
   missing_width : Float
   fallback : Bool
-  glyph_to_code : Map[UInt, Byte]
-  encodings : Map[Int, String]
+  glyph_to_code : Map[UInt32, Byte]
+  encodings : Map[Int32, String]
 }
 
 ///|

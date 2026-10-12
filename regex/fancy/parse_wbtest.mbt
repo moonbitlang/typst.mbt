@@ -46,16 +46,16 @@ fn parse_id_str(
 }
 
 ///|
-fn create_id(id : String, relative : Int?, skip : Int) -> ParsedId? {
+fn create_id(id : String, relative : Int32?, skip : Int32) -> ParsedId? {
   Some({ id, relative, skip, })
 }
 
 ///|
 fn get_options(
   pattern : String,
-  case_insensitive? : Bool = false,
-  multi_line? : Bool = false,
-  dot_matches_new_line? : Bool = false,
+  case_insensitive~ : Bool = false,
+  multi_line~ : Bool = false,
+  dot_matches_new_line~ : Bool = false,
 ) -> RegexOptions {
   let options = RegexOptions::default()
   options.syntaxc = {

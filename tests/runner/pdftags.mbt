@@ -93,9 +93,9 @@ priv struct TagsFormatter {
   r : PdfReader
   /// The marked content sequences of each page, by page object number:
   /// the page index and the properties of each MCID.
-  pages : Map[Int, (Int, Map[Int64, @pdfsyntax.PdfObject])]
+  pages : Map[Int32, (Int32, Map[Int64, @pdfsyntax.PdfObject])]
   buf : StringBuilder
-  mut indent : Int
+  mut indent : Int32
   /// Whether the last character written was a newline and an indent should
   /// be applied to the next line. This isn't done directly because the
   /// indent might be changed before writing any other content.
@@ -169,7 +169,7 @@ fn TagsFormatter::get_ref(
   self : TagsFormatter,
   obj : @pdfsyntax.PdfObject,
   key : String,
-) -> Int? {
+) -> Int32? {
   match self.r.get_raw(obj, key) {
     Some(PdfIndirect(n)) => Some(n)
     _ => None
@@ -334,7 +334,7 @@ fn format_tag_children(
 /// Format a marked content sequence.
 fn format_marked_content(
   f : TagsFormatter,
-  page_ref : Int,
+  page_ref : Int32,
   mcid : Int64,
 ) -> Unit raise {
   guard f.pages.get(page_ref) is Some((page_idx, marked_content)) else {
@@ -364,7 +364,7 @@ fn format_marked_content(
 /// Format a link annotation.
 fn format_annotation(
   f : TagsFormatter,
-  page_ref : Int,
+  page_ref : Int32,
   annot : @pdfsyntax.PdfObject,
 ) -> Unit raise {
   assert_type(f, annot, "Annot")
@@ -489,7 +489,7 @@ let tags_attributes : Array[
 ]
 
 ///|
-fn tags_attribute_index(name : String) -> Int? {
+fn tags_attribute_index(name : String) -> Int32? {
   for i, a in tags_attributes {
     if a.0 == name {
       return Some(i)

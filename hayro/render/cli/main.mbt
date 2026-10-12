@@ -6,7 +6,7 @@
 // Usage: hayro-render-cli <out.rgba> <file.pdf> <page> <scale>
 
 ///|
-fn select_standard_font(font : @interpret.StandardFont) -> (Bytes, Int)? {
+fn select_standard_font(font : @interpret.StandardFont) -> (Bytes, Int32)? {
   let bytes = match font {
     Helvetica => @pdf_fonts.sans()
     HelveticaBold => @pdf_fonts.sans_bold()

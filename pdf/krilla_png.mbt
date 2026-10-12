@@ -6,7 +6,7 @@
 priv struct PngData {
   /// The concatenated `IDAT` chunks.
   idat : Bytes
-  bit_depth : Int
+  bit_depth : Int32
   color_type : @codecs.PngColorType
   /// The `PLTE` chunk of an indexed image.
   palette : Bytes?
@@ -17,7 +17,7 @@ priv struct PngData {
 priv struct PngChunk {
   kind : BytesView
   data : BytesView
-  crc : UInt
+  crc : UInt32
   is_critical : Bool
 }
 
@@ -31,7 +31,7 @@ fn PngChunk::has_valid_crc(self : PngChunk) -> Bool {
 /// for a truncated chunk (after which there are no more chunks).
 priv struct PngChunks {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
   mut failed : Bool
 }
 
@@ -45,7 +45,7 @@ fn PngChunks::new(data : BytesView) -> PngChunks? {
 }
 
 ///|
-fn PngChunks::read_u32(self : PngChunks) -> UInt? {
+fn PngChunks::read_u32(self : PngChunks) -> UInt32? {
   if self.data.length() - self.pos < 4 {
     return None
   }
@@ -164,11 +164,11 @@ fn PngData::new(data : BytesView) -> PngData? {
 ///|
 /// Parses an `IHDR` chunk (krilla's `Header::new`): the bit depth, the color
 /// type and whether the image is interlaced.
-fn png_header(data : BytesView) -> (Int, @codecs.PngColorType, Bool)? {
+fn png_header(data : BytesView) -> (Int32, @codecs.PngColorType, Bool)? {
   if data.length() != 13 {
     return None
   }
-  let u32_at = (i : Int) => {
+  let u32_at = (i : Int32) => {
     (data[i].to_uint() << 24) |
     (data[i + 1].to_uint() << 16) |
     (data[i + 2].to_uint() << 8) |

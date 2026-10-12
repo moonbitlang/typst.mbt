@@ -16,7 +16,7 @@ pub struct Document {
 /// that directory.
 pub fn Document::Document(
   children : Array[&IntoContent],
-  dir? : String = "",
+  dir~ : String = "",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Document {
@@ -59,10 +59,10 @@ pub struct FileLocation {
   /// The package (`@namespace/name:version`), for package files.
   package_spec : String?
   /// The byte range in the file, if it could be resolved.
-  range : (Int, Int)?
+  range : (Int32, Int32)?
   /// One-based line and column of the start (0 if unknown).
-  line : Int
-  column : Int
+  line : Int32
+  column : Int32
 }
 
 ///|
@@ -181,7 +181,7 @@ fn Resolver::locate(self : Resolver, span : @syntax.DiagSpan) -> Location? {
   let path = id.vpath().get_without_slash()
   // The byte range: numbered spans through the parsed source, raw ranges
   // (data files) directly.
-  let mut range : (Int, Int)? = None
+  let mut range : (Int32, Int32)? = None
   let mut lines : @syntax.Lines? = None
   match span.get() {
     Number(num~, sub_range~, ..) =>
@@ -408,7 +408,7 @@ fn Document::lints(self : Document, lints : Bool) -> Array[Lint] {
 ///|
 /// What the engine keeps of the last compilations of a process, in calls
 /// of `@library.evict` without a hit: `typst watch`'s number.
-let kept_compilations : Int = 10
+let kept_compilations : Int32 = 10
 
 ///|
 /// Called when a compilation or a lowering of `doc` is done, as `typst
@@ -437,7 +437,7 @@ fn compilation_done() -> Unit {
 pub fn[T : @library.Output] Document::compile(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[T] {
   let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
@@ -466,7 +466,7 @@ pub fn[T : @library.Output] Document::compile(
 pub fn Document::lower(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[@library.Content] {
   let session = Session::new(world, dir=self.dir, lints~)
   let session_world : SessionWorld = { session, }
@@ -502,7 +502,7 @@ pub fn Document::lower(
 pub fn Document::compile_paged(
   self : Document,
   world : &@library.World,
-  lints? : Bool = true,
+  lints~ : Bool = true,
 ) -> CompileReport[@layout.PagedDocument] {
   let report : CompileReport[@layout.PagedDocument] = self.compile(
     world,
@@ -529,7 +529,7 @@ fn[T, U] CompileReport::failed(self : CompileReport[T]) -> ExportReport[U] {
 /// Export to PDF. Explicit options override the document's settings.
 pub fn CompileReport::pdf(
   self : CompileReport[@layout.PagedDocument],
-  options? : @pdf.PdfOptions = @pdf.PdfOptions::default(),
+  options~ : @pdf.PdfOptions = @pdf.PdfOptions::default(),
 ) -> ExportReport[Bytes] {
   guard self.output is Some(document) else { return self.failed() }
   let warned = @pdf.pdf(document, options)
@@ -552,7 +552,7 @@ pub fn CompileReport::pdf(
 /// Export every page to SVG.
 pub fn CompileReport::svg_pages(
   self : CompileReport[@layout.PagedDocument],
-  options? : @svg.SvgOptions = @svg.SvgOptions::default(),
+  options~ : @svg.SvgOptions = @svg.SvgOptions::default(),
 ) -> ExportReport[Array[String]] {
   guard self.output is Some(document) else { return self.failed() }
   let options = options.resolve(@svg.SvgFormatOptions::get(document.options()))

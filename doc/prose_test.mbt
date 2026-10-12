@@ -318,7 +318,7 @@ fn pieces(content : @library.Content) -> Array[(String, @syntax.Span)] {
 
 ///|
 /// The number of distinct spans.
-fn distinct_spans(spans : Array[@syntax.Span]) -> Int {
+fn distinct_spans(spans : Array[@syntax.Span]) -> Int32 {
   let seen : Map[String, Unit] = Map([])
   for span in spans {
     let key = match span.get() {
@@ -347,7 +347,7 @@ fn tag_keys(frame : @library.Frame, out : Array[@library.U128]) -> Unit {
 /// among them.
 fn count_keys(
   report : @doc.CompileReport[@layout.PagedDocument],
-) -> (Int, Int) raise {
+) -> (Int32, Int32) raise {
   let keys = []
   for page in report.unwrap().pages() {
     tag_keys(page.frame, keys)
@@ -584,7 +584,7 @@ test "pieces: an error at an argument is inside the call in every block" {
   // the origin listing than the call. For trace points they count as the
   // spans inside the call that they stand for, so an error at the last of
   // many arguments has the same trace as an error at the second.
-  let failing = (cells : Int) => {
+  let failing = (cells : Int32) => {
     let args : Array[@doc.Value] = []
     for _ in 0..<cells {
       args.push(@doc.Value::content("x"))
@@ -603,7 +603,7 @@ test "pieces: an error at an argument is inside the call in every block" {
     few.errors[0].trace.map(point => point.description),
   )
   // A call value among the pieces of a sequence, in a later block.
-  let failing = (before : Int, cells : Int) => {
+  let failing = (before : Int32, cells : Int32) => {
     let children : Array[&@doc.IntoContent] = []
     for _ in 0..<before {
       children.push("x")
@@ -639,7 +639,7 @@ test "pieces: an error in a later block is outside unrelated calls" {
   // seem to contain it and lose their trace points. A numbering callback
   // returns a call that fails at its last argument: the trace of the
   // surrounding `numbering` call stays, whatever the number of arguments.
-  let failing = (cells : Int) => {
+  let failing = (cells : Int32) => {
     let numbering = @doc.Numbering::func() <| ((_, _) => {
       let args : Array[@doc.Value] = []
       for _ in 0..<cells {

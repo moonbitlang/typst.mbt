@@ -62,26 +62,26 @@ pub extend ComponentRange with Show::{to_string, output}
 /// The format description provided was not valid.
 pub(all) suberror InvalidFormatDescription {
   /// There was a bracket pair that was opened but not closed.
-  UnclosedOpeningBracket(index~ : Int)
+  UnclosedOpeningBracket(index~ : Int32)
   /// A component name is not valid.
-  InvalidComponentName(name~ : String, index~ : Int)
+  InvalidComponentName(name~ : String, index~ : Int32)
   /// A modifier is not valid.
-  InvalidModifier(value~ : String, index~ : Int)
+  InvalidModifier(value~ : String, index~ : Int32)
   /// A component name is missing.
-  MissingComponentName(index~ : Int)
+  MissingComponentName(index~ : Int32)
   /// A required modifier is missing.
-  MissingRequiredModifier(name~ : String, index~ : Int)
+  MissingRequiredModifier(name~ : String, index~ : Int32)
   /// Something was expected, but not found.
-  Expected(what~ : String, index~ : Int)
+  Expected(what~ : String, index~ : Int32)
   /// Certain behavior is not supported in the given context.
-  NotSupported(what~ : String, context~ : String, index~ : Int)
+  NotSupported(what~ : String, context~ : String, index~ : Int32)
   /// A modifier is duplicated.
-  DuplicateModifier(name~ : String, index~ : Int)
+  DuplicateModifier(name~ : String, index~ : Int32)
   /// A modifier is not valid for the given component.
   InvalidModifierCombination(
     modifier~ : String,
     context~ : String,
-    index~ : Int
+    index~ : Int32
   )
 } derive(Eq, Debug)
 

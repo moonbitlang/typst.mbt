@@ -11,7 +11,7 @@ pub struct BundleIntrospector {
   /// The underlying target-agnostic introspector used for most queries.
   /// The positions are indices into `children` (upstream: off-by-one
   /// `NonZeroUsize` indices).
-  priv elements : @library.ElementIntrospector[Int?]
+  priv elements : @library.ElementIntrospector[Int32?]
   /// Maps from element locations to assigned link anchors. This is used to
   /// support intra-doc links. Link anchors are local to the relevant
   /// document.
@@ -305,7 +305,7 @@ priv struct BundleIntrospectorBuilder {
   subdocuments : Array[
     (@syntax.VirtualPath, ChildIntrospector, @library.Location),
   ]
-  elements : @library.ElementIntrospectorBuilder[Int?]
+  elements : @library.ElementIntrospectorBuilder[Int32?]
 }
 
 ///|

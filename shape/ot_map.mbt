@@ -4,7 +4,7 @@
 priv struct OtMap {
   found_script : FixedArray[Bool]
   chosen_script : FixedArray[@otf.Tag?]
-  global_mask : UInt
+  global_mask : UInt32
   features : Array[FeatureMap]
   lookups : FixedArray[Array[LookupMap]]
   stages : FixedArray[Array[StageMap]]
@@ -14,12 +14,12 @@ priv struct OtMap {
 priv struct FeatureMap {
   tag : @otf.Tag
   // GSUB/GPOS
-  index : FixedArray[Int?]
-  stage : FixedArray[Int]
-  shift : Int
-  mask : UInt
+  index : FixedArray[Int32?]
+  stage : FixedArray[Int32]
+  shift : Int32
+  mask : UInt32
   // mask for value=1, for quick access
-  one_mask : UInt
+  one_mask : UInt32
   auto_zwnj : Bool
   auto_zwj : Bool
   random : Bool
@@ -28,12 +28,12 @@ priv struct FeatureMap {
 
 ///|
 priv struct LookupMap {
-  index : Int
+  index : Int32
   // TODO: to bitflags
   mut auto_zwnj : Bool
   mut auto_zwj : Bool
   random : Bool
-  mut mask : UInt
+  mut mask : UInt32
   per_syllable : Bool
 }
 
@@ -45,7 +45,7 @@ fn LookupMap::copy(self : LookupMap) -> LookupMap {
 ///|
 /// The derived `Ord` of `lookup_map_t` (field order: index, auto_zwnj,
 /// auto_zwj, random, mask, per_syllable).
-fn LookupMap::cmp(self : LookupMap, o : LookupMap) -> Int {
+fn LookupMap::cmp(self : LookupMap, o : LookupMap) -> Int32 {
   let c = self.index.compare(o.index)
   if c != 0 {
     return c
@@ -77,15 +77,15 @@ type PauseFunc = (ShapePlan, Face, Buffer) -> Bool
 ///|
 priv struct StageMap {
   // Cumulative
-  last_lookup : Int
+  last_lookup : Int32
   pause_func : PauseFunc?
 }
 
 ///|
-const MAX_BITS : Int = 8
+const MAX_BITS : Int32 = 8
 
 ///|
-const MAX_VALUE : UInt = 255 // (1 << MAX_BITS) - 1
+const MAX_VALUE : UInt32 = 255 // (1 << MAX_BITS) - 1
 
 ///|
 fn OtMap::found_script(self : OtMap, table_index : TableIndex) -> Bool {
@@ -98,13 +98,13 @@ fn OtMap::chosen_script(self : OtMap, table_index : TableIndex) -> @otf.Tag? {
 }
 
 ///|
-fn OtMap::get_global_mask(self : OtMap) -> UInt {
+fn OtMap::get_global_mask(self : OtMap) -> UInt32 {
   self.global_mask
 }
 
 ///|
 /// `binary_search_by_key(&feature_tag, |f| f.tag)` (any matching index).
-fn OtMap::find_feature(self : OtMap, feature_tag : @otf.Tag) -> Int? {
+fn OtMap::find_feature(self : OtMap, feature_tag : @otf.Tag) -> Int32? {
   let features = self.features
   let mut size = features.length()
   if size == 0 {
@@ -128,7 +128,7 @@ fn OtMap::find_feature(self : OtMap, feature_tag : @otf.Tag) -> Int? {
 }
 
 ///|
-fn OtMap::get_mask(self : OtMap, feature_tag : @otf.Tag) -> (UInt, Int) {
+fn OtMap::get_mask(self : OtMap, feature_tag : @otf.Tag) -> (UInt32, Int32) {
   match self.find_feature(feature_tag) {
     Some(idx) => (self.features[idx].mask, self.features[idx].shift)
     None => (0, 0)
@@ -136,7 +136,7 @@ fn OtMap::get_mask(self : OtMap, feature_tag : @otf.Tag) -> (UInt, Int) {
 }
 
 ///|
-fn OtMap::get_1_mask(self : OtMap, feature_tag : @otf.Tag) -> UInt {
+fn OtMap::get_1_mask(self : OtMap, feature_tag : @otf.Tag) -> UInt32 {
   match self.find_feature(feature_tag) {
     Some(idx) => self.features[idx].one_mask
     None => 0
@@ -148,7 +148,7 @@ fn OtMap::get_feature_index(
   self : OtMap,
   table_index : TableIndex,
   feature_tag : @otf.Tag,
-) -> Int? {
+) -> Int32? {
   match self.find_feature(feature_tag) {
     Some(idx) => self.features[idx].index[table_index.to_int()]
     None => None
@@ -160,7 +160,7 @@ fn OtMap::get_feature_stage(
   self : OtMap,
   table_index : TableIndex,
   feature_tag : @otf.Tag,
-) -> Int? {
+) -> Int32? {
   match self.find_feature(feature_tag) {
     Some(idx) => Some(self.features[idx].stage[table_index.to_int()])
     None => None
@@ -176,7 +176,7 @@ fn OtMap::stages(self : OtMap, table_index : TableIndex) -> Array[StageMap] {
 fn OtMap::lookup(
   self : OtMap,
   table_index : TableIndex,
-  index : Int,
+  index : Int32,
 ) -> LookupMap {
   self.lookups[table_index.to_int()][index]
 }
@@ -185,7 +185,7 @@ fn OtMap::lookup(
 fn OtMap::stage_lookups(
   self : OtMap,
   table_index : TableIndex,
-  stage : Int,
+  stage : Int32,
 ) -> ArrayView[LookupMap] {
   let (start, end) = self.stage_lookup_range(table_index, stage)
   self.lookups[table_index.to_int()][start:end]
@@ -195,8 +195,8 @@ fn OtMap::stage_lookups(
 fn OtMap::stage_lookup_range(
   self : OtMap,
   table_index : TableIndex,
-  stage : Int,
-) -> (Int, Int) {
+  stage : Int32,
+) -> (Int32, Int32) {
   let stages = self.stages[table_index.to_int()]
   let lookups = self.lookups[table_index.to_int()]
   let start = if stage >= 1 { stages[stage - 1].last_lookup } else { 0 }
@@ -211,54 +211,54 @@ fn OtMap::stage_lookup_range(
 // hb_ot_map_feature_flags_t
 
 ///|
-const F_NONE : Int = 0x0000
+const F_NONE : Int32 = 0x0000
 
 ///|
 /// Feature applies to all characters; results in no mask allocated for it.
-const F_GLOBAL : Int = 0x0001
+const F_GLOBAL : Int32 = 0x0001
 
 ///|
 /// Has fallback implementation, so include mask bit even if feature not found.
-const F_HAS_FALLBACK : Int = 0x0002
+const F_HAS_FALLBACK : Int32 = 0x0002
 
 ///|
 /// Don't skip over ZWNJ when matching **context**.
-const F_MANUAL_ZWNJ : Int = 0x0004
+const F_MANUAL_ZWNJ : Int32 = 0x0004
 
 ///|
 /// Don't skip over ZWJ when matching **input**.
-const F_MANUAL_ZWJ : Int = 0x0008
+const F_MANUAL_ZWJ : Int32 = 0x0008
 
 ///|
-const F_MANUAL_JOINERS : Int = 0x000C
+const F_MANUAL_JOINERS : Int32 = 0x000C
 
 ///|
-const F_GLOBAL_MANUAL_JOINERS : Int = 0x000D
+const F_GLOBAL_MANUAL_JOINERS : Int32 = 0x000D
 
 ///|
-const F_GLOBAL_HAS_FALLBACK : Int = 0x0003
+const F_GLOBAL_HAS_FALLBACK : Int32 = 0x0003
 
 ///|
 /// If feature not found in LangSys, look for it in global feature list and
 /// pick one.
-const F_GLOBAL_SEARCH : Int = 0x0010
+const F_GLOBAL_SEARCH : Int32 = 0x0010
 
 ///|
 /// Randomly select a glyph from an AlternateSubstFormat1 subtable.
-const F_RANDOM : Int = 0x0020
+const F_RANDOM : Int32 = 0x0020
 
 ///|
 /// Contain lookup application to within syllable.
-const F_PER_SYLLABLE : Int = 0x0040
+const F_PER_SYLLABLE : Int32 = 0x0040
 
 ///|
 priv struct OtMapBuilder {
   face : Face
   found_script : FixedArray[Bool]
-  script_index : FixedArray[Int?]
+  script_index : FixedArray[Int32?]
   chosen_script : FixedArray[@otf.Tag?]
-  lang_index : FixedArray[Int?]
-  current_stage : FixedArray[Int]
+  lang_index : FixedArray[Int32?]
+  current_stage : FixedArray[Int32]
   feature_infos : Array[FeatureInfo]
   stages : FixedArray[Array[StageInfo]]
   mut is_simple : Bool
@@ -268,13 +268,13 @@ priv struct OtMapBuilder {
 priv struct FeatureInfo {
   tag : @otf.Tag
   // sequence number, used for stable sorting only
-  seq : Int
-  mut max_value : UInt
-  mut flags : Int
+  seq : Int32
+  mut max_value : UInt32
+  mut flags : Int32
   // for non-global features, what should the unset glyphs take
-  mut default_value : UInt
+  mut default_value : UInt32
   // GSUB/GPOS
-  stage : FixedArray[Int]
+  stage : FixedArray[Int32]
 }
 
 ///|
@@ -284,15 +284,15 @@ fn FeatureInfo::copy(self : FeatureInfo) -> FeatureInfo {
 
 ///|
 priv struct StageInfo {
-  index : Int
+  index : Int32
   pause_func : PauseFunc?
 }
 
 ///|
-const GLOBAL_BIT_SHIFT : Int = 31 // 8 * u32::SIZE - 1
+const GLOBAL_BIT_SHIFT : Int32 = 31 // 8 * u32::SIZE - 1
 
 ///|
-const GLOBAL_BIT_MASK : UInt = 0x80000000 // 1 << GLOBAL_BIT_SHIFT
+const GLOBAL_BIT_MASK : UInt32 = 0x80000000 // 1 << GLOBAL_BIT_SHIFT
 
 ///|
 fn OtMapBuilder::new(
@@ -304,9 +304,9 @@ fn OtMapBuilder::new(
   // features not available in either table and not waste precious bits for them.
   let (script_tags, lang_tags) = tags_from_script_and_language(script, language)
   let found_script : FixedArray[Bool] = [false, false]
-  let script_index : FixedArray[Int?] = [None, None]
+  let script_index : FixedArray[Int32?] = [None, None]
   let chosen_script : FixedArray[@otf.Tag?] = [None, None]
-  let lang_index : FixedArray[Int?] = [None, None]
+  let lang_index : FixedArray[Int32?] = [None, None]
   for entry in face.layout_tables() {
     let (table_index, table) = entry
     let ti = table_index.to_int()
@@ -363,8 +363,8 @@ fn OtMapBuilder::has_feature(self : OtMapBuilder, tag : @otf.Tag) -> Bool {
 fn OtMapBuilder::add_feature(
   self : OtMapBuilder,
   tag : @otf.Tag,
-  flags : Int,
-  value : UInt,
+  flags : Int32,
+  value : UInt32,
 ) -> Unit {
   if !tag.is_null() {
     let seq = self.feature_infos.length()
@@ -387,8 +387,8 @@ fn OtMapBuilder::add_feature(
 fn OtMapBuilder::enable_feature(
   self : OtMapBuilder,
   tag : @otf.Tag,
-  flags : Int,
-  value : UInt,
+  flags : Int32,
+  value : UInt32,
 ) -> Unit {
   self.add_feature(tag, flags | F_GLOBAL, value)
 }
@@ -430,7 +430,7 @@ fn OtMapBuilder::compile(self : OtMapBuilder) -> OtMap {
   // We default to applying required feature in stage 0.  If the required
   // feature has a tag that is known to the shaper, we apply required feature
   // in the stage for that tag.
-  let required_index : FixedArray[Int?] = [None, None]
+  let required_index : FixedArray[Int32?] = [None, None]
   let required_tag : FixedArray[@otf.Tag?] = [None, None]
   for entry in self.face.layout_tables() {
     let (table_index, table) = entry
@@ -463,7 +463,7 @@ fn OtMapBuilder::compile(self : OtMapBuilder) -> OtMap {
 }
 
 ///|
-fn leading_zeros_u32(v : UInt) -> Int {
+fn leading_zeros_u32(v : UInt32) -> Int32 {
   v.clz()
 }
 
@@ -471,9 +471,9 @@ fn leading_zeros_u32(v : UInt) -> Int {
 fn OtMapBuilder::collect_feature_maps(
   self : OtMapBuilder,
   required_tag : FixedArray[@otf.Tag?],
-) -> (Array[FeatureMap], FixedArray[Int], UInt) {
+) -> (Array[FeatureMap], FixedArray[Int32], UInt32) {
   let map_features : Array[FeatureMap] = []
-  let required_stage : FixedArray[Int] = [0, 0]
+  let required_stage : FixedArray[Int32] = [0, 0]
   let mut global_mask = GLOBAL_BIT_MASK
   let mut next_bit = GLYPH_FLAG_DEFINED.popcnt() + 1
 
@@ -494,7 +494,7 @@ fn OtMapBuilder::collect_feature_maps(
       continue
     }
     let mut found = false
-    let feature_index : FixedArray[Int?] = [None, None]
+    let feature_index : FixedArray[Int32?] = [None, None]
     for entry in self.face.layout_tables() {
       let (table_index, table) = entry
       let ti = table_index.to_int()
@@ -559,9 +559,9 @@ fn OtMapBuilder::collect_feature_maps(
 /// A stable sort of `v[start:end]` (Rust's `slice::sort_by`).
 fn[T] stable_sort_by(
   v : Array[T],
-  start : Int,
-  end : Int,
-  cmp : (T, T) -> Int,
+  start : Int32,
+  end : Int32,
+  cmp : (T, T) -> Int32,
 ) -> Unit {
   for i in (start + 1)..<end {
     let x = v[i]
@@ -627,8 +627,8 @@ fn OtMapBuilder::dedup_feature_infos(self : OtMapBuilder) -> Unit {
 fn OtMapBuilder::collect_lookup_stages(
   self : OtMapBuilder,
   map_features : Array[FeatureMap],
-  required_feature_index : FixedArray[Int?],
-  required_feature_stage : FixedArray[Int],
+  required_feature_index : FixedArray[Int32?],
+  required_feature_stage : FixedArray[Int32],
 ) -> (FixedArray[Array[LookupMap]], FixedArray[Array[StageMap]]) {
   let map_lookups : FixedArray[Array[LookupMap]] = [[], []]
   let map_stages : FixedArray[Array[StageMap]] = [[], []]
@@ -718,9 +718,9 @@ fn OtMapBuilder::add_lookups(
   self : OtMapBuilder,
   lookups : Array[LookupMap],
   table_index : TableIndex,
-  feature_index : Int,
-  variation_index : UInt?,
-  mask : UInt,
+  feature_index : Int32,
+  variation_index : UInt32?,
+  mask : UInt32,
   auto_zwnj : Bool,
   auto_zwj : Bool,
   random : Bool,

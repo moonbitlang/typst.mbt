@@ -30,7 +30,7 @@ priv struct FileHeader {
   /// The file organization type.
   organization : FileOrganization
   /// The number of pages in the file, if known.
-  _number_of_pages : UInt?
+  _number_of_pages : UInt32?
   /// "If this bit is 0, no generic region segments uses the templates with
   /// 12 AT pixels. If the file contains one or more generic region segments
   /// using such templates, this bit must be 1." (D.4.2, Bit 2)

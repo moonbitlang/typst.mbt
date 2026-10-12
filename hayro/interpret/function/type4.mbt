@@ -57,16 +57,16 @@ fn Argument::as_f32(self : Argument) -> Float {
 /// A stack with a fixed capacity.
 priv struct ArgumentsStack[T] {
   stack : Array[T]
-  capacity : Int
+  capacity : Int32
 }
 
 ///|
-fn[T] ArgumentsStack::new(capacity : Int) -> ArgumentsStack[T] {
+fn[T] ArgumentsStack::new(capacity : Int32) -> ArgumentsStack[T] {
   { stack: [], capacity, }
 }
 
 ///|
-fn[T] ArgumentsStack::len(self : ArgumentsStack[T]) -> Int {
+fn[T] ArgumentsStack::len(self : ArgumentsStack[T]) -> Int32 {
   self.stack.length()
 }
 
@@ -82,7 +82,7 @@ fn[T] ArgumentsStack::push(self : ArgumentsStack[T], n : T) -> Unit? {
 }
 
 ///|
-fn[T] ArgumentsStack::at(self : ArgumentsStack[T], index : Int) -> T? {
+fn[T] ArgumentsStack::at(self : ArgumentsStack[T], index : Int32) -> T? {
   self.stack.get(index)
 }
 

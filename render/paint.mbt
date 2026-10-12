@@ -4,14 +4,14 @@
 ///|
 /// Sampling of a paint (solid colors, gradients and tilings) for glyph
 /// bitmaps: returns the packed premultiplied color at the pixel position.
-priv struct PaintSampler((UInt, UInt) -> UInt raise RenderPanic)
+priv struct PaintSampler((UInt32, UInt32) -> UInt32 raise RenderPanic)
 
 ///|
 fn PaintSampler::sample(
   self : PaintSampler,
-  x : UInt,
-  y : UInt,
-) -> UInt raise RenderPanic {
+  x : UInt32,
+  y : UInt32,
+) -> UInt32 raise RenderPanic {
   (self.0)(x, y)
 }
 
@@ -107,8 +107,8 @@ fn tiling_transform(tiling : @library.Tiling) -> @library.Transform {
 /// `comemo::memoize`).
 fn gradient_pixmap(
   gradient : @library.Gradient,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   gradient_map : (@library.Point, @library.Axes[@library.Ratio])?,
 ) -> @skia.Pixmap raise RenderPanic {
   let (offset, scale) = match gradient_map {
@@ -320,12 +320,12 @@ fn to_sk_color_u8(color : @library.ProcessColor) -> @skia.ColorU8 {
 ///|
 /// Palette's `f32` to `u8` stimulus conversion (`into_format`): scales by
 /// 255, clamps and rounds half to even.
-fn f32_to_u8_stimulus(x : Float) -> Int {
+fn f32_to_u8_stimulus(x : Float) -> Int32 {
   let max : Float = 255.0
   let scaled = @skia.fmin(x * max, max)
   let f = scaled + Float::reinterpret_from_uint(0x4b00_0000)
   let bits = f.reinterpret_as_uint()
-  let c23 : UInt = 0x4b00_0000
+  let c23 : UInt32 = 0x4b00_0000
   let v = if bits < c23 { 0U } else { bits - c23 }
   (v & 0xff).reinterpret_as_int()
 }

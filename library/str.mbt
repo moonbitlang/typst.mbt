@@ -7,14 +7,14 @@
 
 ///|
 /// The UTF-8 length of a string (upstream `Str::len`).
-fn str_len(s : String) -> Int {
+fn str_len(s : String) -> Int32 {
   @syntax.utf8_len(s)
 }
 
 ///|
 /// The UTF-16 index of a UTF-8 byte offset, if it is a char boundary within
 /// the string (upstream `str::is_char_boundary`).
-fn str_byte_to_utf16(s : String, byte : Int) -> Int? {
+fn str_byte_to_utf16(s : String, byte : Int32) -> Int32? {
   let mut bytes = 0
   let mut i = 0
   while bytes < byte {
@@ -42,14 +42,14 @@ fn str_byte_to_utf16(s : String, byte : Int) -> Int? {
 
 ///|
 /// The UTF-8 byte offset of a UTF-16 index.
-fn str_utf16_to_byte(s : String, i : Int) -> Int {
+fn str_utf16_to_byte(s : String, i : Int32) -> Int32 {
   @syntax.utf8_len(s.view(end_offset=i))
 }
 
 ///|
 /// Resolve an index or throw an out of bounds error. Returns the byte offset
 /// and the UTF-16 index.
-fn str_locate(s : String, index : Int64) -> (Int, Int) raise HintedError {
+fn str_locate(s : String, index : Int64) -> (Int32, Int32) raise HintedError {
   match str_locate_opt(s, index) {
     Some(r) => r
     None => bail(str_out_of_bounds(index, str_len(s)))
@@ -60,7 +60,10 @@ fn str_locate(s : String, index : Int64) -> (Int, Int) raise HintedError {
 /// Resolve an index, if it is within bounds and on a valid char boundary.
 ///
 /// `index == len` is considered in bounds.
-fn str_locate_opt(s : String, index : Int64) -> (Int, Int)? raise HintedError {
+fn str_locate_opt(
+  s : String,
+  index : Int64,
+) -> (Int32, Int32)? raise HintedError {
   let len = str_len(s).to_int64()
   let wrapped = if index >= 0L { index } else { len + index }
   if wrapped < 0L || wrapped > len {
@@ -321,7 +324,7 @@ fn impl_str_ends_with(self_ : String, pattern_ : StrPattern) -> Bool {
 
 ///|
 /// The UTF-8 length of a code point.
-fn utf8_char_len(c : Int) -> Int {
+fn utf8_char_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -358,7 +361,7 @@ fn impl_str_position(self_ : String, pattern_ : StrPattern) -> USize? {
 /// Rust's `str::match_indices` for a string pattern: the byte offsets and
 /// UTF-16 ranges of all non-overlapping matches. An empty pattern matches at
 /// every char boundary.
-fn str_match_indices(s : String, pat : String) -> Array[(Int, Int, Int)] {
+fn str_match_indices(s : String, pat : String) -> Array[(Int32, Int32, Int32)] {
   let out = []
   if pat.is_empty() {
     let mut i = 0
@@ -432,7 +435,7 @@ fn impl_str_replace(
   let output = StringBuilder()
   // The UTF-16 end of the last match.
   let mut last_match = 0
-  let handle_match = (start : Int, end : Int, dict : Dict) => {
+  let handle_match = (start : Int32, end : Int32, dict : Dict) => {
     // Push everything until the match.
     output.write_string(self_.unsafe_substring(start=last_match, end=start))
     last_match = end
@@ -533,7 +536,7 @@ fn impl_str_trim(
     }
     Some(Regex(re)) => {
       let s = self_
-      let mut last : Int? = None
+      let mut last : Int32? = None
       let mut range_start = 0
       let mut range_end = str_len(s)
       for m in re.inner.find_iter(s) {
@@ -836,7 +839,7 @@ pub extend UnicodeNormalForm with FromValue::{from_value}
 
 ///|
 /// Converts a match of a string pattern into a dictionary.
-fn match_to_dict(start : Int, text : String) -> Dict {
+fn match_to_dict(start : Int32, text : String) -> Dict {
   Dict::from_pairs([
     ("start", Int(start.to_int64())),
     ("end", Int((start + str_len(text)).to_int64())),
@@ -867,12 +870,12 @@ fn captures_to_dict(cap : @regex.Captures) -> Dict {
 }
 
 ///|
-fn str_out_of_bounds(index : Int64, len : Int) -> String {
+fn str_out_of_bounds(index : Int64, len : Int32) -> String {
   "string index out of bounds (index: \{index}, len: \{len})"
 }
 
 ///|
-fn str_no_default_and_out_of_bounds(index : Int64, len : Int) -> String {
+fn str_no_default_and_out_of_bounds(index : Int64, len : Int32) -> String {
   "no default value was specified and string index out of bounds (index: \{index}, len: \{len})"
 }
 

@@ -2618,7 +2618,7 @@ let oracle_formats : Array[(String, Array[String])] = [
 ]
 
 ///|
-let oracle_dates : Array[(Int, String)] = [
+let oracle_dates : Array[(Int32, String)] = [
   (
     -1930999, "-9999|1|1|1|1|1|0|1|-1930999|-9999-01-01|-9999|52|Some(-9999-01-02)|None|Some(-9999-01-02)|None|None|Some(-9999-01-02)|Some(-9998-02-05)|None|None|Some(-9989-12-15)|Some(-9999-01-02)|None|Some(-9999-01-01)|Some(-9999-01-01)|None|None",
   ),
@@ -3348,7 +3348,7 @@ let oracle_dates : Array[(Int, String)] = [
 ]
 
 ///|
-let oracle_calendar : Array[(Int, Int, Int, String)] = [
+let oracle_calendar : Array[(Int32, Int32, Int32, String)] = [
   (-10000, 1, 0, "err:year was not in range|false"),
   (-10000, 1, 1, "err:year was not in range|false"),
   (-10000, 1, 28, "err:year was not in range|false"),
@@ -4513,7 +4513,7 @@ let oracle_f64 : Array[(UInt64, String)] = [
 ]
 
 ///|
-let oracle_arith : Array[(Int, Int, Int64, Int, String)] = [
+let oracle_arith : Array[(Int32, Int32, Int64, Int32, String)] = [
   (
     0, 0, 0L, 0, "14:26:50.0|14:26:50.0|Some(2023-04-29 14:26:50.0)|Some(2023-04-29 14:26:50.0)",
   ),
@@ -5965,7 +5965,7 @@ let oracle_arith : Array[(Int, Int, Int64, Int, String)] = [
 ]
 
 ///|
-let oracle_diff : Array[(Int, Int, String)] = [
+let oracle_diff : Array[(Int32, Int32, String)] = [
   (0, 0, "0s|0s|0s|0|0s"),
   (0, 1, "-306d|14h26m50s|-305d9h33m10s|-43|9h33m10s"),
   (0, 2, "848d|2h26m45s|848d2h26m45s|121|21h33m15s"),
@@ -6276,7 +6276,7 @@ let oracle_diff : Array[(Int, Int, String)] = [
 ]
 
 ///|
-let oracle_duration_ops : Array[(Int64, Int, Double, String)] = [
+let oracle_duration_ops : Array[(Int64, Int32, Double, String)] = [
   (0L, 0, 1.0, "0s|0|0|0|0|0|0|0|0s|0s|0|0s|0s"),
   (0L, 0, 2.5, "0s|0|0|0|0|0|0|0|0s|0s|0|0s|0s"),
   (0L, 0, -0.5, "0s|0|0|0|0|0|0|0|0s|0s|0|0s|0s"),

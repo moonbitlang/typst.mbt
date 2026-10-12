@@ -4,7 +4,7 @@
 /// The layout of the stack frame of a function.
 pub(all) struct StackLayout {
   /// The number of locals registered to the function.
-  priv mut len_locals : Int
+  priv mut len_locals : Int32
   /// All function local constants.
   priv consts : ConstRegistry
 }
@@ -27,7 +27,7 @@ pub fn StackLayout::reset(self : StackLayout) -> Unit {
 #warnings("-unused_error_type")
 pub fn StackLayout::register_locals(
   self : StackLayout,
-  amount : Int,
+  amount : Int32,
 ) -> Unit raise WasmiError {
   self.len_locals += amount
 }
@@ -104,7 +104,7 @@ pub fn StackLayout::consts(self : StackLayout) -> Array[@wasmi_core.UntypedVal] 
 
 ///|
 /// Returns the number of function local constants.
-pub fn StackLayout::len_consts(self : StackLayout) -> Int {
+pub fn StackLayout::len_consts(self : StackLayout) -> Int32 {
   self.consts.idx2const.length()
 }
 
@@ -154,7 +154,7 @@ priv struct ConstRegistry {
   /// Mapping from [`Slot`] indices to constant [`UntypedVal`] values.
   idx2const : Array[@wasmi_core.UntypedVal]
   /// The [`Slot`] index for the next allocated function local constant value.
-  mut next_idx : Int
+  mut next_idx : Int32
 }
 
 ///|
@@ -176,7 +176,7 @@ fn ConstRegistry::reset(self : ConstRegistry) -> Unit {
 ///
 /// The maximum index is also the one to be assigned to the first allocated
 /// function local constant value as indices are assigned in reverse order.
-fn ConstRegistry::first_index() -> Int {
+fn ConstRegistry::first_index() -> Int32 {
   -1
 }
 
@@ -187,7 +187,7 @@ fn ConstRegistry::first_index() -> Int {
 ///
 /// This index is not assignable to a function local constant value and acts
 /// as a sentinel value to indicate that all available indices have been assigned.
-fn ConstRegistry::last_index() -> Int {
+fn ConstRegistry::last_index() -> Int32 {
   -32768
 }
 

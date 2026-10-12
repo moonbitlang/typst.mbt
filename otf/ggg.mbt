@@ -46,7 +46,10 @@ pub fn LazyArray16::range(
 /// The byte offset of the [`RangeRecord`] containing `glyph` (see
 /// [LazyArray16::range]), or `-1`. (Lets hot callers read the record's
 /// fields without allocating it.)
-fn range_record_at(records : LazyArray16[RangeRecord], glyph : GlyphId) -> Int {
+fn range_record_at(
+  records : LazyArray16[RangeRecord],
+  glyph : GlyphId,
+) -> Int32 {
   // `binary_search_by` specialized to compare the raw big-endian fields
   // instead of parsing a record for every probe (same probe sequence).
   let data = records.data

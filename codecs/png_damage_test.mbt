@@ -6,11 +6,11 @@
 ///|
 /// xorshift32
 priv struct PngDamageRng {
-  mut state : UInt
+  mut state : UInt32
 }
 
 ///|
-fn PngDamageRng::next(self : PngDamageRng) -> UInt {
+fn PngDamageRng::next(self : PngDamageRng) -> UInt32 {
   let mut x = self.state
   x = x ^ (x << 13)
   x = x ^ (x >> 17)
@@ -34,7 +34,7 @@ priv struct PngDamageCase {
 }
 
 ///|
-fn png_damage_u32(data : Bytes, pos : Int) -> UInt {
+fn png_damage_u32(data : Bytes, pos : Int32) -> UInt32 {
   (data[pos].to_uint() << 24) |
   (data[pos + 1].to_uint() << 16) |
   (data[pos + 2].to_uint() << 8) |
@@ -42,7 +42,7 @@ fn png_damage_u32(data : Bytes, pos : Int) -> UInt {
 }
 
 ///|
-fn png_damage_write_u32(out : Buffer, v : UInt) -> Unit {
+fn png_damage_write_u32(out : Buffer, v : UInt32) -> Unit {
   out.write_byte((v >> 24).to_byte())
   out.write_byte((v >> 16).to_byte())
   out.write_byte((v >> 8).to_byte())
@@ -86,7 +86,7 @@ fn png_damage_build(chunks : ArrayView[PngDamageChunk]) -> Bytes {
 
 ///|
 /// `data` with bit `b` of byte `i` flipped.
-fn png_damage_flip(data : Bytes, i : Int, b : Int) -> Bytes {
+fn png_damage_flip(data : Bytes, i : Int32, b : Int32) -> Bytes {
   Bytes::makei(data.length(), j => {
     if j == i {
       data[j] ^ (1 << b).to_byte()
@@ -100,7 +100,7 @@ fn png_damage_flip(data : Bytes, i : Int, b : Int) -> Bytes {
 /// `chunks` with chunk `k` replaced.
 fn png_damage_with(
   chunks : Array[PngDamageChunk],
-  k : Int,
+  k : Int32,
   data : Bytes,
 ) -> Array[PngDamageChunk] {
   let chunks = chunks.copy()
@@ -110,7 +110,7 @@ fn png_damage_with(
 
 ///|
 /// The damaged files of a seed, in the order of the expectations.
-fn png_damage(seed : Bytes, seed_index : Int) -> Array[PngDamageCase] {
+fn png_damage(seed : Bytes, seed_index : Int32) -> Array[PngDamageCase] {
   let cases : Array[PngDamageCase] = []
   fn add(desc : String, data : Bytes) {
     cases.push({ desc, data, direct: false, })
@@ -152,7 +152,7 @@ fn png_damage(seed : Bytes, seed_index : Int) -> Array[PngDamageCase] {
   for k, c in chunks {
     let m = c.data.length()
     let name = @utf8.decode_lossy(c.ty)
-    let positions : Array[Int] = []
+    let positions : Array[Int32] = []
     if m <= 40 {
       for p in 0..<m {
         positions.push(p)
@@ -172,7 +172,7 @@ fn png_damage(seed : Bytes, seed_index : Int) -> Array[PngDamageCase] {
       }
     }
     for p in positions {
-      let bits : Array[Int] = if m <= 13 {
+      let bits : Array[Int32] = if m <= 13 {
         [0, 1, 2, 3, 4, 5, 6, 7]
       } else {
         let b = (rng.next() % 8).reinterpret_as_int()
@@ -357,7 +357,7 @@ fn png_damage(seed : Bytes, seed_index : Int) -> Array[PngDamageCase] {
   let width = png_damage_u32(ihdr, 0)
   let height = png_damage_u32(ihdr, 4)
   let interlaced = ihdr[12] != 0
-  let dims : Array[(UInt, UInt)] = [
+  let dims : Array[(UInt32, UInt32)] = [
     (0, height),
     (width, 0),
     (1, 1),
@@ -464,10 +464,10 @@ let png_damage_instead_of_abort : String = "error: Format error decoding Png: ID
 /// Checks the damaged copies of a seed against the oracle: `expected` holds
 /// four characters per case of [png_damage].
 fn png_damage_seed(
-  seed_index : Int,
+  seed_index : Int32,
   b64 : String,
   valid : String,
-  count : Int,
+  count : Int32,
   expected : String,
 ) -> Unit raise {
   let seed = @base64.decode(b64)
@@ -500,9 +500,9 @@ fn png_damage_seed(
 ///|
 /// Checks one case with its whole outcome.
 fn png_damage_outcome(
-  seed_index : Int,
+  seed_index : Int32,
   b64 : String,
-  index : Int,
+  index : Int32,
   desc : String,
   outcome : String,
 ) -> Unit raise {

@@ -4,25 +4,25 @@
 ///|
 /// `toml_datetime::Date`.
 priv struct Date {
-  year : Int
-  month : Int
-  day : Int
+  year : Int32
+  month : Int32
+  day : Int32
 }
 
 ///|
 /// `toml_datetime::Time`.
 priv struct Time {
-  hour : Int
-  minute : Int
-  second : Int
-  nanosecond : Int
+  hour : Int32
+  minute : Int32
+  second : Int32
+  nanosecond : Int32
 }
 
 ///|
 /// `toml_datetime::Offset`.
 priv enum Offset {
   Z
-  Custom(minutes~ : Int)
+  Custom(minutes~ : Int32)
 }
 
 ///|
@@ -35,7 +35,7 @@ priv struct Datetime {
 
 ///|
 /// Formats `n` with at least `width` digits (zero-padded).
-fn pad(n : Int, width : Int) -> String {
+fn pad(n : Int32, width : Int32) -> String {
   let s = n.to_string()
   if s.length() >= width {
     s
@@ -87,13 +87,13 @@ fn Datetime::to_display(self : Datetime) -> String {
 }
 
 ///|
-fn is_digit(b : Int) -> Bool {
+fn is_digit(b : Int32) -> Bool {
   b >= '0' && b <= '9'
 }
 
 ///|
 /// Parses a run of ASCII digits.
-fn digits_value(i : Input, start : Int, end : Int) -> Int {
+fn digits_value(i : Input, start : Int32, end : Int32) -> Int32 {
   let mut v = 0
   for k in start..<end {
     v = v * 10 + (i.bytes[k].to_int() - '0')
@@ -209,7 +209,7 @@ fn time_offset(i : Input) -> Offset raise ErrMode {
 
 ///|
 /// `date_fullyear`: `date-fullyear = 4DIGIT`
-fn date_fullyear(i : Input) -> Int raise ErrMode {
+fn date_fullyear(i : Input) -> Int32 raise ErrMode {
   let start = unsigned_digits(i, 4, 4)
   digits_value(i, start, i.pos)
 }
@@ -217,7 +217,7 @@ fn date_fullyear(i : Input) -> Int raise ErrMode {
 ///|
 /// A two-digit field with a range check (`date_month`, `date_mday`,
 /// `time_hour`, `time_minute`, `time_second`).
-fn ranged_2digit(i : Input, min : Int, max : Int) -> Int raise ErrMode {
+fn ranged_2digit(i : Input, min : Int32, max : Int32) -> Int32 raise ErrMode {
   let start = unsigned_digits(i, 2, 2)
   let d = digits_value(i, start, i.pos)
   if d < min || d > max {
@@ -228,43 +228,43 @@ fn ranged_2digit(i : Input, min : Int, max : Int) -> Int raise ErrMode {
 
 ///|
 /// `date-month = 2DIGIT ; 01-12`
-fn date_month(i : Input) -> Int raise ErrMode {
+fn date_month(i : Input) -> Int32 raise ErrMode {
   ranged_2digit(i, 1, 12)
 }
 
 ///|
 /// `date-mday = 2DIGIT ; 01-28, 01-29, 01-30, 01-31 based on month/year`
-fn date_mday(i : Input) -> Int raise ErrMode {
+fn date_mday(i : Input) -> Int32 raise ErrMode {
   ranged_2digit(i, 1, 31)
 }
 
 ///|
 /// `time-delim = "T" / %x20 ; T, t, or space`
-fn time_delim(i : Input) -> Int raise ErrMode {
+fn time_delim(i : Input) -> Int32 raise ErrMode {
   one_of(i, b => b == 'T' || b == 't' || b == ' ')
 }
 
 ///|
 /// `time-hour = 2DIGIT ; 00-23`
-fn time_hour(i : Input) -> Int raise ErrMode {
+fn time_hour(i : Input) -> Int32 raise ErrMode {
   ranged_2digit(i, 0, 23)
 }
 
 ///|
 /// `time-minute = 2DIGIT ; 00-59`
-fn time_minute(i : Input) -> Int raise ErrMode {
+fn time_minute(i : Input) -> Int32 raise ErrMode {
   ranged_2digit(i, 0, 59)
 }
 
 ///|
 /// `time-second = 2DIGIT ; 00-58, 00-59, 00-60 based on leap second rules`
-fn time_second(i : Input) -> Int raise ErrMode {
+fn time_second(i : Input) -> Int32 raise ErrMode {
   ranged_2digit(i, 0, 60)
 }
 
 ///|
 /// `time-secfrac = "." 1*DIGIT`; truncated to nanosecond precision.
-fn time_secfrac(i : Input) -> Int raise ErrMode {
+fn time_secfrac(i : Input) -> Int32 raise ErrMode {
   byte(i, '.')
   let start = unsigned_digits(i, 1, 0x7FFF_FFFF)
   let max_digits = 9
@@ -280,6 +280,6 @@ fn time_secfrac(i : Input) -> Int raise ErrMode {
 
 ///|
 /// `unsigned_digits::<MIN, MAX>`: returns the start of the digits.
-fn unsigned_digits(i : Input, min : Int, max : Int) -> Int raise ErrMode {
+fn unsigned_digits(i : Input, min : Int32, max : Int32) -> Int32 raise ErrMode {
   take_while_m_n(i, min, max, is_digit)
 }

@@ -9,7 +9,7 @@ let exact_pow10 : ReadOnlyArray[Double] = [
 ///|
 /// `10^e` for `e >= 0`: exact up to `10^22`, a product of exact powers (and
 /// so only near the power, or infinite) above.
-fn pow10(e : Int) -> Double {
+fn pow10(e : Int32) -> Double {
   let mut e = e
   let mut r = 1.0
   while e > 22 {
@@ -25,7 +25,7 @@ fn pow10(e : Int) -> Double {
 /// division of exact doubles, hence the double nearest to the decimal
 /// number: `scale10(3.0, -1)` is the double `0.3`, which `0.1 + 0.1 + 0.1`
 /// and `3.0 * 0.1` are not.
-fn scale10(n : Double, e : Int) -> Double {
+fn scale10(n : Double, e : Int32) -> Double {
   if e >= 0 {
     n * pow10(e)
   } else if e >= -308 {
@@ -59,7 +59,7 @@ fn positive_zero(x : Double) -> Double {
 
 ///|
 /// The largest count of intervals `ticks` aims for.
-const MAX_TICK_COUNT : Int = 1000
+const MAX_TICK_COUNT : Int32 = 1000
 
 ///|
 /// Round values for the axis of a chart: the multiples of a step that lie
@@ -104,7 +104,7 @@ const MAX_TICK_COUNT : Int = 1000
 ///   difference is not a finite double (`-1e308` and `1e308`) or whose
 ///   step would not be one. The step is never below about `1e-300`, so a
 ///   narrower range has at most one tick.
-pub fn ticks(lo : Double, hi : Double, count : Int) -> Array[Double] {
+pub fn ticks(lo : Double, hi : Double, count : Int32) -> Array[Double] {
   if lo.is_nan() || lo.is_inf() || hi.is_nan() || hi.is_inf() {
     return []
   }

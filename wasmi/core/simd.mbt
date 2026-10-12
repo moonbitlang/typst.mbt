@@ -13,20 +13,20 @@ pub fn i64x2_splat(value : Int64) -> V128Value {
 
 ///|
 /// Executes a Wasm `i32x4_splat` instruction.
-pub fn i32x4_splat(value : Int) -> V128Value {
+pub fn i32x4_splat(value : Int32) -> V128Value {
   i32x4_from(value, value, value, value)
 }
 
 ///|
 /// Executes a Wasm `i16x8_splat` instruction.
-pub fn i16x8_splat(value : Int) -> V128Value {
+pub fn i16x8_splat(value : Int32) -> V128Value {
   let v = (value & 0xFFFF).to_uint64() * 0x0001_0001_0001_0001UL
   { lo: v, hi: v, }
 }
 
 ///|
 /// Executes a Wasm `i8x16_splat` instruction.
-pub fn i8x16_splat(value : Int) -> V128Value {
+pub fn i8x16_splat(value : Int32) -> V128Value {
   let v = (value & 0xFF).to_uint64() * 0x0101_0101_0101_0101UL
   { lo: v, hi: v, }
 }
@@ -52,7 +52,7 @@ pub fn i64x2_extract_lane(v128 : V128Value, lane : ImmLaneIdx2) -> Int64 {
 
 ///|
 /// Executes a Wasm `i32x4_extract_lane` instruction.
-pub fn i32x4_extract_lane(v128 : V128Value, lane : ImmLaneIdx4) -> Int {
+pub fn i32x4_extract_lane(v128 : V128Value, lane : ImmLaneIdx4) -> Int32 {
   v128.i32_lane(lane.to_u8().to_int())
 }
 
@@ -70,25 +70,25 @@ pub fn f32x4_extract_lane(v128 : V128Value, lane : ImmLaneIdx4) -> Float {
 
 ///|
 /// Executes a Wasm `i8x16_extract_lane_s` instruction.
-pub fn i8x16_extract_lane_s(v128 : V128Value, lane : ImmLaneIdx16) -> Int {
+pub fn i8x16_extract_lane_s(v128 : V128Value, lane : ImmLaneIdx16) -> Int32 {
   ext_small(v128.lane_bits(8, lane.to_u8().to_int()), 8, true)
 }
 
 ///|
 /// Executes a Wasm `i8x16_extract_lane_u` instruction.
-pub fn i8x16_extract_lane_u(v128 : V128Value, lane : ImmLaneIdx16) -> UInt {
+pub fn i8x16_extract_lane_u(v128 : V128Value, lane : ImmLaneIdx16) -> UInt32 {
   v128.lane_bits(8, lane.to_u8().to_int()).to_uint()
 }
 
 ///|
 /// Executes a Wasm `i16x8_extract_lane_s` instruction.
-pub fn i16x8_extract_lane_s(v128 : V128Value, lane : ImmLaneIdx8) -> Int {
+pub fn i16x8_extract_lane_s(v128 : V128Value, lane : ImmLaneIdx8) -> Int32 {
   ext_small(v128.lane_bits(16, lane.to_u8().to_int()), 16, true)
 }
 
 ///|
 /// Executes a Wasm `i16x8_extract_lane_u` instruction.
-pub fn i16x8_extract_lane_u(v128 : V128Value, lane : ImmLaneIdx8) -> UInt {
+pub fn i16x8_extract_lane_u(v128 : V128Value, lane : ImmLaneIdx8) -> UInt32 {
   v128.lane_bits(16, lane.to_u8().to_int()).to_uint()
 }
 
@@ -107,7 +107,7 @@ pub fn i64x2_replace_lane(
 pub fn i32x4_replace_lane(
   v128 : V128Value,
   lane : ImmLaneIdx4,
-  item : Int,
+  item : Int32,
 ) -> V128Value {
   v128.with_lane_bits(
     32,
@@ -121,7 +121,7 @@ pub fn i32x4_replace_lane(
 pub fn i16x8_replace_lane(
   v128 : V128Value,
   lane : ImmLaneIdx8,
-  item : Int,
+  item : Int32,
 ) -> V128Value {
   v128.with_lane_bits(16, lane.to_u8().to_int(), (item & 0xFFFF).to_uint64())
 }
@@ -131,7 +131,7 @@ pub fn i16x8_replace_lane(
 pub fn i8x16_replace_lane(
   v128 : V128Value,
   lane : ImmLaneIdx16,
-  item : Int,
+  item : Int32,
 ) -> V128Value {
   v128.with_lane_bits(8, lane.to_u8().to_int(), (item & 0xFF).to_uint64())
 }
@@ -194,24 +194,24 @@ pub fn i8x16_swizzle(a : V128Value, s : V128Value) -> V128Value {
 
 ///|
 /// Lanewise operation for the Wasm `q15mulr_sat` SIMD operation.
-fn q15mulr_sat(x : Int, y : Int) -> Int {
+fn q15mulr_sat(x : Int32, y : Int32) -> Int32 {
   let q15mulr = (x * y + (1 << 14)) >> 15
   sat(q15mulr, -32768, 32767)
 }
 
 ///|
 /// `avgr!(u8 as u16)` / `avgr!(u16 as u32)`: `a.wrapping_add(b).div_ceil(2)`.
-fn avgr(a : Int, b : Int) -> Int {
+fn avgr(a : Int32, b : Int32) -> Int32 {
   (a + b + 1) >> 1
 }
 
 ///|
-fn wrapping_neg_small(x : Int) -> Int {
+fn wrapping_neg_small(x : Int32) -> Int32 {
   -x
 }
 
 ///|
-fn wrapping_abs_small(x : Int) -> Int {
+fn wrapping_abs_small(x : Int32) -> Int32 {
   if x < 0 {
     -x
   } else {
@@ -221,7 +221,7 @@ fn wrapping_abs_small(x : Int) -> Int {
 
 ///|
 /// Saturates `x` to the range `min..=max`.
-fn sat(x : Int, min : Int, max : Int) -> Int {
+fn sat(x : Int32, min : Int32, max : Int32) -> Int32 {
   if x < min {
     min
   } else if x > max {
@@ -360,31 +360,31 @@ pub fn i16x8_q15mulr_sat_s(lhs : V128Value, rhs : V128Value) -> V128Value {
 ///|
 /// Executes a Wasm `i8x16_min_s` instruction.
 pub fn i8x16_min_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 8, true, Int::min)
+  lanewise_binary_small(lhs, rhs, 8, true, Int32::min)
 }
 
 ///|
 /// Executes a Wasm `i8x16_min_u` instruction.
 pub fn i8x16_min_u(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 8, false, Int::min)
+  lanewise_binary_small(lhs, rhs, 8, false, Int32::min)
 }
 
 ///|
 /// Executes a Wasm `i16x8_min_s` instruction.
 pub fn i16x8_min_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 16, true, Int::min)
+  lanewise_binary_small(lhs, rhs, 16, true, Int32::min)
 }
 
 ///|
 /// Executes a Wasm `i16x8_min_u` instruction.
 pub fn i16x8_min_u(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 16, false, Int::min)
+  lanewise_binary_small(lhs, rhs, 16, false, Int32::min)
 }
 
 ///|
 /// Executes a Wasm `i32x4_min_s` instruction.
 pub fn i32x4_min_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_i32(lhs, rhs, Int::min)
+  lanewise_binary_i32(lhs, rhs, Int32::min)
 }
 
 ///|
@@ -402,31 +402,31 @@ pub fn i32x4_min_u(lhs : V128Value, rhs : V128Value) -> V128Value {
 ///|
 /// Executes a Wasm `i8x16_max_s` instruction.
 pub fn i8x16_max_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 8, true, Int::max)
+  lanewise_binary_small(lhs, rhs, 8, true, Int32::max)
 }
 
 ///|
 /// Executes a Wasm `i8x16_max_u` instruction.
 pub fn i8x16_max_u(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 8, false, Int::max)
+  lanewise_binary_small(lhs, rhs, 8, false, Int32::max)
 }
 
 ///|
 /// Executes a Wasm `i16x8_max_s` instruction.
 pub fn i16x8_max_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 16, true, Int::max)
+  lanewise_binary_small(lhs, rhs, 16, true, Int32::max)
 }
 
 ///|
 /// Executes a Wasm `i16x8_max_u` instruction.
 pub fn i16x8_max_u(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_small(lhs, rhs, 16, false, Int::max)
+  lanewise_binary_small(lhs, rhs, 16, false, Int32::max)
 }
 
 ///|
 /// Executes a Wasm `i32x4_max_s` instruction.
 pub fn i32x4_max_s(lhs : V128Value, rhs : V128Value) -> V128Value {
-  lanewise_binary_i32(lhs, rhs, Int::max)
+  lanewise_binary_i32(lhs, rhs, Int32::max)
 }
 
 ///|
@@ -670,7 +670,7 @@ pub fn v128_not(v128 : V128Value) -> V128Value {
 ///|
 /// Executes a Wasm `i8x16_popcnt` instruction.
 pub fn i8x16_popcnt(v128 : V128Value) -> V128Value {
-  lanewise_unary_small(v128, 8, false, Int::popcnt)
+  lanewise_unary_small(v128, 8, false, Int32::popcnt)
 }
 
 ///|
@@ -1076,7 +1076,7 @@ pub fn f64x2_ge(lhs : V128Value, rhs : V128Value) -> V128Value {
 }
 
 ///|
-fn identity_int(x : Int) -> Int {
+fn identity_int(x : Int32) -> Int32 {
   x
 }
 
@@ -1186,7 +1186,7 @@ pub fn i64x2_extend_high_i32x4_u(v128 : V128Value) -> V128Value {
 }
 
 ///|
-fn mul_int(a : Int, b : Int) -> Int {
+fn mul_int(a : Int32, b : Int32) -> Int32 {
   a * b
 }
 
@@ -1220,10 +1220,10 @@ pub fn i32x4_extmul_low_i16x8_u(lhs : V128Value, rhs : V128Value) -> V128Value {
 fn extmul_32(
   lhs : V128Value,
   rhs : V128Value,
-  i : Int,
+  i : Int32,
   signed : Bool,
 ) -> V128Value {
-  let wide = (v : V128Value, j : Int) => {
+  let wide = (v : V128Value, j : Int32) => {
     if signed {
       v.i32_lane(j).to_int64().reinterpret_as_uint64()
     } else {
@@ -1282,7 +1282,7 @@ pub fn i64x2_extmul_high_i32x4_u(lhs : V128Value, rhs : V128Value) -> V128Value 
 }
 
 ///|
-fn add_int(a : Int, b : Int) -> Int {
+fn add_int(a : Int32, b : Int32) -> Int32 {
   a + b
 }
 
@@ -1312,70 +1312,70 @@ pub fn i32x4_extadd_pairwise_i16x8_u(v128 : V128Value) -> V128Value {
 
 ///|
 /// Executes a Wasm `i8x16_shl` instruction.
-pub fn i8x16_shl(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i8x16_shl(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 7
   lanewise_unary_small(v128, 8, false, v => v << n)
 }
 
 ///|
 /// Executes a Wasm `i16x8_shl` instruction.
-pub fn i16x8_shl(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i16x8_shl(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 15
   lanewise_unary_small(v128, 16, false, v => v << n)
 }
 
 ///|
 /// Executes a Wasm `i32x4_shl` instruction.
-pub fn i32x4_shl(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i32x4_shl(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 31
   lanewise_unary_i32(v128, v => v << n)
 }
 
 ///|
 /// Executes a Wasm `i64x2_shl` instruction.
-pub fn i64x2_shl(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i64x2_shl(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 63
   { lo: v128.lo << n, hi: v128.hi << n, }
 }
 
 ///|
 /// Executes a Wasm `i8x16_shr_s` instruction.
-pub fn i8x16_shr_s(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i8x16_shr_s(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 7
   lanewise_unary_small(v128, 8, true, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i8x16_shr_u` instruction.
-pub fn i8x16_shr_u(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i8x16_shr_u(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 7
   lanewise_unary_small(v128, 8, false, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i16x8_shr_s` instruction.
-pub fn i16x8_shr_s(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i16x8_shr_s(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 15
   lanewise_unary_small(v128, 16, true, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i16x8_shr_u` instruction.
-pub fn i16x8_shr_u(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i16x8_shr_u(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 15
   lanewise_unary_small(v128, 16, false, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i32x4_shr_s` instruction.
-pub fn i32x4_shr_s(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i32x4_shr_s(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 31
   lanewise_unary_i32(v128, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i32x4_shr_u` instruction.
-pub fn i32x4_shr_u(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i32x4_shr_u(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 31
   lanewise_unary_i32(v128, v => {
     (v.reinterpret_as_uint() >> n).reinterpret_as_int()
@@ -1384,39 +1384,39 @@ pub fn i32x4_shr_u(v128 : V128Value, rhs : UInt) -> V128Value {
 
 ///|
 /// Executes a Wasm `i64x2_shr_s` instruction.
-pub fn i64x2_shr_s(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i64x2_shr_s(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 63
   lanewise_unary_i64(v128, v => v >> n)
 }
 
 ///|
 /// Executes a Wasm `i64x2_shr_u` instruction.
-pub fn i64x2_shr_u(v128 : V128Value, rhs : UInt) -> V128Value {
+pub fn i64x2_shr_u(v128 : V128Value, rhs : UInt32) -> V128Value {
   let n = rhs.reinterpret_as_int() & 63
   { lo: v128.lo >> n, hi: v128.hi >> n, }
 }
 
 ///|
 /// Narrows `value` from type `i16` to type `i8`.
-fn narrow_i16_to_i8(value : Int) -> Int {
+fn narrow_i16_to_i8(value : Int32) -> Int32 {
   sat(value, -128, 127)
 }
 
 ///|
 /// Narrows `value` from type `u16` (as `i16`) to type `u8`.
-fn narrow_u16_to_u8(value : Int) -> Int {
+fn narrow_u16_to_u8(value : Int32) -> Int32 {
   sat(value, 0, 255)
 }
 
 ///|
 /// Narrows `value` from type `i32` to type `i16`.
-fn narrow_i32_to_i16(value : Int) -> Int {
+fn narrow_i32_to_i16(value : Int32) -> Int32 {
   sat(value, -32768, 32767)
 }
 
 ///|
 /// Narrows `value` from type `u32` (as `i32`) to type `u16`.
-fn narrow_u32_to_u16(value : Int) -> Int {
+fn narrow_u32_to_u16(value : Int32) -> Int32 {
   sat(value, 0, 65535)
 }
 
@@ -1479,7 +1479,7 @@ pub fn f32x4_demote_f64x2_zero(low : V128Value) -> V128Value {
 
 ///|
 /// `all_true!` for `bits`-wide lanes.
-fn all_true(v128 : V128Value, bits : Int) -> Bool {
+fn all_true(v128 : V128Value, bits : Int32) -> Bool {
   for i in 0..<(128 / bits) {
     if v128.lane_bits(bits, i) == 0 {
       return false
@@ -1514,7 +1514,7 @@ pub fn i64x2_all_true(v128 : V128Value) -> Bool {
 
 ///|
 /// `bitmask!` for `bits`-wide lanes: bit `n` is set if lane `n` is negative.
-fn bitmask(v128 : V128Value, bits : Int) -> UInt {
+fn bitmask(v128 : V128Value, bits : Int32) -> UInt32 {
   let mut acc = 0U
   for n in 0..<(128 / bits) {
     if v128.lane_bits(bits, n) >> (bits - 1) != 0 {
@@ -1526,25 +1526,25 @@ fn bitmask(v128 : V128Value, bits : Int) -> UInt {
 
 ///|
 /// Executes a Wasm `i8x16_bitmask` instruction.
-pub fn i8x16_bitmask(v128 : V128Value) -> UInt {
+pub fn i8x16_bitmask(v128 : V128Value) -> UInt32 {
   bitmask(v128, 8)
 }
 
 ///|
 /// Executes a Wasm `i16x8_bitmask` instruction.
-pub fn i16x8_bitmask(v128 : V128Value) -> UInt {
+pub fn i16x8_bitmask(v128 : V128Value) -> UInt32 {
   bitmask(v128, 16)
 }
 
 ///|
 /// Executes a Wasm `i32x4_bitmask` instruction.
-pub fn i32x4_bitmask(v128 : V128Value) -> UInt {
+pub fn i32x4_bitmask(v128 : V128Value) -> UInt32 {
   bitmask(v128, 32)
 }
 
 ///|
 /// Executes a Wasm `i64x2_bitmask` instruction.
-pub fn i64x2_bitmask(v128 : V128Value) -> UInt {
+pub fn i64x2_bitmask(v128 : V128Value) -> UInt32 {
   bitmask(v128, 64)
 }
 

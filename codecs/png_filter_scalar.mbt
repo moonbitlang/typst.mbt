@@ -4,8 +4,8 @@
 ///|
 /// [filter_row_cost_scalar].
 fn filter_row_cost(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],

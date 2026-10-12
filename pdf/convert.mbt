@@ -198,15 +198,15 @@ fn State::pre_concat(self : State, transform : @library.Transform) -> Unit {
 priv struct FrameContext {
   /// The logical page index. This might be `None` if the page isn't
   /// exported, or if the context has been built to convert a pattern.
-  page_idx : Int?
+  page_idx : Int32?
   states : Array[State]
   /// The link annotations belonging to a Link tag (in insertion order).
-  link_annotations : Array[(Int, Array[LinkAnnotation])]
+  link_annotations : Array[(Int32, Array[LinkAnnotation])]
 }
 
 ///|
 fn FrameContext::new(
-  page_idx : Int?,
+  page_idx : Int32?,
   size : @library.Axes[@library.Abs],
 ) -> FrameContext {
   { page_idx, states: [State::new(size)], link_annotations: [], }
@@ -239,7 +239,7 @@ fn FrameContext::page_size(self : FrameContext) -> @library.Axes[@library.Abs]? 
 ///|
 fn FrameContext::get_link_annotation(
   self : FrameContext,
-  id : Int,
+  id : Int32,
 ) -> LinkAnnotation? {
   for entry in self.link_annotations {
     if entry.0 == id {
@@ -252,7 +252,7 @@ fn FrameContext::get_link_annotation(
 ///|
 fn FrameContext::push_link_annotation(
   self : FrameContext,
-  id : Int,
+  id : Int32,
   annotation : LinkAnnotation,
 ) -> Unit {
   for entry in self.link_annotations {
@@ -828,8 +828,8 @@ fn collect_named_destinations(
 
 ///|
 priv struct PageIndexConverter {
-  page_indices : Map[Int, Int]
-  skipped_pages : Int
+  page_indices : Map[Int32, Int32]
+  skipped_pages : Int32
 }
 
 ///|
@@ -837,7 +837,7 @@ fn PageIndexConverter::new(
   document : @layout.PagedDocument,
   options : CompletePdfOptions,
 ) -> PageIndexConverter {
-  let page_indices : Map[Int, Int] = Map([])
+  let page_indices : Map[Int32, Int32] = Map([])
   let mut skipped_pages = 0
   for i in 0..<document.pages().length() {
     match options.format.pages.v {
@@ -857,7 +857,7 @@ fn PageIndexConverter::has_skipped_pages(self : PageIndexConverter) -> Bool {
 /// Get the PDF page index of a page index, if it's not excluded.
 fn PageIndexConverter::pdf_page_index(
   self : PageIndexConverter,
-  page_index : Int,
-) -> Int? {
+  page_index : Int32,
+) -> Int32? {
   self.page_indices.get(page_index)
 }

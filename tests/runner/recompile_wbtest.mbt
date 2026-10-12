@@ -27,7 +27,7 @@ fn recompile_test_show(files : FileSet, path : String) -> String {
 
 ///|
 test "recompile: splice replaces a range of bytes" {
-  let spliced = (start : Int, end : Int, replacement : Bytes) => {
+  let spliced = (start : Int32, end : Int32, replacement : Bytes) => {
     decoded(splice(b"abcdef", start, end, replacement)).unwrap_or("?")
   }
   inspect(spliced(2, 4, b"XYZ"), content="abXYZef")
@@ -93,7 +93,7 @@ test "recompile: the places of harmless edits are byte offsets" {
   let text = "#set text(size: 11pt)\n= Ünïcode\n\nWörter und 3 Zahlen.\n\n#let x = 0.5\n"
   let sites = Sites::of(text)
   let bytes = @utf8.encode(text)
-  let at = (site : (Int, Int)) => ascii(bytes, site.0, site.1)
+  let at = (site : (Int32, Int32)) => ascii(bytes, site.0, site.1)
   inspect(sites.set_numbers.map(at).join(" "), content="11pt")
   inspect(sites.numbers.map(at).join(" "), content="11pt 0.5")
   inspect(sites.parbreaks.length(), content="2")
@@ -261,8 +261,8 @@ test "recompile: a page image is written again only if the hash of its page chan
 /// show `svg`.
 fn pinned_test_compiled(
   svg : String,
-  dependencies? : String = "main.typ\na.typ",
-  diagnostics? : String = "ok\n",
+  dependencies~ : String = "main.typ\na.typ",
+  diagnostics~ : String = "ok\n",
 ) -> Compiled {
   {
     parts: [

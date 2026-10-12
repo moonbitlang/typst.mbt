@@ -155,14 +155,14 @@ fn has_default_at_pixels(
 /// A decoder sink that writes decoded pixels into a `Bitmap`.
 priv struct BitmapDecoder {
   bitmap : Bitmap
-  mut x : UInt
-  mut y : UInt
+  mut x : UInt32
+  mut y : UInt32
   /// Precomputed start index into `bitmap.data` for the current row.
-  mut row_start : Int
+  mut row_start : Int32
   /// Accumulator for pixels emitted by `push_pixel`.
-  mut buf : UInt
+  mut buf : UInt32
   /// Number of bits accumulated in `buf`.
-  mut buf_len : UInt
+  mut buf_len : UInt32
 }
 
 ///|
@@ -201,7 +201,7 @@ impl @ccitt.Decoder for BitmapDecoder with fn push_pixel(self, white) {
 
 ///|
 /// `byte_masks[i] = 0xFF << ((WORD_BYTES - 1 - i) * 8)`.
-let byte_masks : ReadOnlyArray[UInt] = [
+let byte_masks : ReadOnlyArray[UInt32] = [
   0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
 ]
 
@@ -221,7 +221,7 @@ impl @ccitt.Decoder for BitmapDecoder with fn push_pixel_chunk(
       self.bitmap.width
     }
   }
-  let white_mask : UInt = if white { 0xFFFFFFFF } else { 0 }
+  let white_mask : UInt32 = if white { 0xFFFFFFFF } else { 0 }
   let start = (self.x / 8).reinterpret_as_int()
   let end = (end_x / 8).reinterpret_as_int()
   let first_full = (start + word_bytes - 1) / word_bytes
@@ -265,7 +265,7 @@ impl @ccitt.Decoder for BitmapDecoder with fn next_line(self) {
 fn decode_bitmap_mmr(
   bitmap : Bitmap,
   data : BytesView,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   let width = bitmap.width
   let height = bitmap.height
   let decoder = BitmapDecoder::new(bitmap)
@@ -305,7 +305,11 @@ fn decode_bitmap_mmr(
 
 ///|
 #inline
-fn Bitmap::get_row_byte(self : Bitmap, row : UInt, byte_idx : Int) -> UInt {
+fn Bitmap::get_row_byte(
+  self : Bitmap,
+  row : UInt32,
+  byte_idx : Int32,
+) -> UInt32 {
   let word_idx = byte_idx / 4
   let shift = (3 - byte_idx % 4) * 8
   (
@@ -320,9 +324,9 @@ fn Bitmap::get_row_byte(self : Bitmap, row : UInt, byte_idx : Int) -> UInt {
 #inline
 fn Bitmap::set_row_byte(
   self : Bitmap,
-  row : UInt,
-  byte_idx : Int,
-  value : UInt,
+  row : UInt32,
+  byte_idx : Int32,
+  value : UInt32,
 ) -> Unit {
   let word_idx = byte_idx / 4
   let shift = (3 - byte_idx % 4) * 8
@@ -335,7 +339,7 @@ fn Bitmap::set_row_byte(
 ///|
 /// `copy_within(src..src + stride, y * stride)` for the TPGDON row copy.
 #inline
-fn Bitmap::copy_row_from_above(self : Bitmap, y : UInt) -> Unit {
+fn Bitmap::copy_row_from_above(self : Bitmap, y : UInt32) -> Unit {
   let stride = self.stride.reinterpret_as_int()
   let src = (y.reinterpret_as_int() - 1) * stride
   self.data.blit_to(
@@ -355,7 +359,7 @@ fn decode_loop(
   contexts : FixedArray[Byte],
   ctx_gatherer : ContextGatherer,
   tpgdon : Bool,
-  sltp_context : Int,
+  sltp_context : Int32,
 ) -> Unit {
   let width = bitmap.width
   let height = bitmap.height
@@ -405,7 +409,7 @@ fn decode_default_template_fast_loop(
   decoder : ArithmeticDecoder,
   contexts : FixedArray[Byte],
   tpgdon : Bool,
-  sltp_context : Int,
+  sltp_context : Int32,
   params : DefaultTemplateFastParams,
 ) -> Unit {
   let prev2_initial_shift = params.prev2_initial_shift
@@ -525,16 +529,16 @@ priv struct ContextGatherer {
   use_default_at : Bool
   /// Used in `maybe_reload_buffers` to determine how far to the right
   /// we might access pixels.
-  max_right : UInt
+  max_right : UInt32
   /// Current position.
-  mut cur_y : UInt
-  mut cur_x : UInt
+  mut cur_y : UInt32
+  mut cur_x : UInt32
   /// Pre-fetched pixel buffers for rows y-2, y-1, y.
-  mut buf_m2 : UInt
-  mut buf_m1 : UInt
-  mut buf_cur : UInt
+  mut buf_m2 : UInt32
+  mut buf_m1 : UInt32
+  mut buf_cur : UInt32
   /// The current context for all 3 rows.
-  mut ctx : Int
+  mut ctx : Int32
 }
 
 ///|
@@ -543,7 +547,7 @@ fn ContextGatherer::new(
   at_pixels : FixedArray[AdaptiveTemplatePixel],
 ) -> ContextGatherer {
   let use_default_at = has_default_at_pixels(template, at_pixels)
-  let max_right : UInt = match template {
+  let max_right : UInt32 = match template {
     Template0 | Template1 => if use_default_at { 3 } else { 2 }
     Template2 | Template3 => if use_default_at { 2 } else { 1 }
   }
@@ -562,34 +566,34 @@ fn ContextGatherer::new(
 }
 
 ///|
-const SHIFT_MASK_T0 : Int = 0b0110_0011_1100_1110
+const SHIFT_MASK_T0 : Int32 = 0b0110_0011_1100_1110
 
 ///|
-const SHIFT_MASK_T1 : Int = 0b0001_1101_1110_0110
+const SHIFT_MASK_T1 : Int32 = 0b0001_1101_1110_0110
 
 ///|
-const SHIFT_MASK_T2 : Int = 0b0000_0011_0111_0010
+const SHIFT_MASK_T2 : Int32 = 0b0000_0011_0111_0010
 
 ///|
-const SHIFT_MASK_T3 : Int = 0b0000_0011_1100_1110
+const SHIFT_MASK_T3 : Int32 = 0b0000_0011_1100_1110
 
 ///|
-const SHIFT_MASK_T0_DEFAULT : Int = 0b1111_0111_1110_1110
+const SHIFT_MASK_T0_DEFAULT : Int32 = 0b1111_0111_1110_1110
 
 ///|
-const SHIFT_MASK_T1_DEFAULT : Int = 0b0001_1101_1111_0110
+const SHIFT_MASK_T1_DEFAULT : Int32 = 0b0001_1101_1111_0110
 
 ///|
-const SHIFT_MASK_T2_DEFAULT : Int = 0b0000_0011_0111_1010
+const SHIFT_MASK_T2_DEFAULT : Int32 = 0b0000_0011_0111_1010
 
 ///|
-const SHIFT_MASK_T3_DEFAULT : Int = 0b0000_0011_1110_1110
+const SHIFT_MASK_T3_DEFAULT : Int32 = 0b0000_0011_1110_1110
 
 ///|
 fn ContextGatherer::start_row(
   self : ContextGatherer,
   bitmap : Bitmap,
-  y : UInt,
+  y : UInt32,
 ) -> Unit {
   self.cur_y = y
   self.cur_x = 0
@@ -608,7 +612,7 @@ fn ContextGatherer::start_row(
 }
 
 ///|
-fn ContextGatherer::init_context_custom(self : ContextGatherer) -> Int {
+fn ContextGatherer::init_context_custom(self : ContextGatherer) -> Int32 {
   match self.template {
     Template0 => {
       let m2 = get_buf_pixel(self.buf_m2, 0)
@@ -636,7 +640,7 @@ fn ContextGatherer::init_context_custom(self : ContextGatherer) -> Int {
 }
 
 ///|
-fn ContextGatherer::init_context_default(self : ContextGatherer) -> Int {
+fn ContextGatherer::init_context_default(self : ContextGatherer) -> Int32 {
   match self.template {
     Template0 =>
       (get_buf_pixel(self.buf_m2, 0) << 12) |
@@ -663,7 +667,7 @@ fn ContextGatherer::init_context_default(self : ContextGatherer) -> Int {
 ///|
 /// `ContextGatherer::load_word`.
 #inline
-fn load_word(bitmap : Bitmap, row_y : UInt, start_x : UInt) -> UInt {
+fn load_word(bitmap : Bitmap, row_y : UInt32, start_x : UInt32) -> UInt32 {
   let word_idx = start_x / WORD_BITS
   if start_x % WORD_BITS == 0 {
     bitmap.get_word(row_y, word_idx)
@@ -678,7 +682,7 @@ fn load_word(bitmap : Bitmap, row_y : UInt, start_x : UInt) -> UInt {
 ///|
 /// `ContextGatherer::get_buf_pixel`.
 #inline
-fn get_buf_pixel(buf : UInt, pos : UInt) -> Int {
+fn get_buf_pixel(buf : UInt32, pos : UInt32) -> Int32 {
   if pos < WORD_BITS {
     ((buf >> (WORD_SHIFT - pos).reinterpret_as_int()) & 1).reinterpret_as_int()
   } else {
@@ -691,7 +695,7 @@ fn get_buf_pixel(buf : UInt, pos : UInt) -> Int {
 fn ContextGatherer::maybe_reload_buffers(
   self : ContextGatherer,
   bitmap : Bitmap,
-  x : UInt,
+  x : UInt32,
 ) -> Unit {
   if x + self.max_right >= self.cur_x + WORD_BITS {
     let new_start = if x >= 4 { x - 4 } else { 0 }
@@ -713,7 +717,7 @@ fn ContextGatherer::maybe_reload_buffers(
 ///|
 /// `(xi + d) as u32` for an AT pixel offset.
 #inline
-fn at_coord(v : Int, d : Int) -> UInt {
+fn at_coord(v : Int32, d : Int32) -> UInt32 {
   (v + d).reinterpret_as_uint()
 }
 
@@ -724,8 +728,8 @@ fn at_coord(v : Int, d : Int) -> UInt {
 fn ContextGatherer::gather_custom(
   self : ContextGatherer,
   bitmap : Bitmap,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let bx = x - self.cur_x
   let xi = x.reinterpret_as_int()
   let yi = self.cur_y.reinterpret_as_int()
@@ -776,8 +780,8 @@ fn ContextGatherer::gather_custom(
 fn ContextGatherer::gather_default(
   self : ContextGatherer,
   _bitmap : Bitmap,
-  x : UInt,
-) -> Int {
+  x : UInt32,
+) -> Int32 {
   let bx = x - self.cur_x
   match self.template {
     Template0 => {
@@ -813,8 +817,8 @@ fn ContextGatherer::gather_default(
 #inline
 fn ContextGatherer::update_current_row(
   self : ContextGatherer,
-  x : UInt,
-  value : Int,
+  x : UInt32,
+  value : Int32,
 ) -> Unit {
   let bit_pos = (WORD_SHIFT - (x - self.cur_x)).reinterpret_as_int()
   let mask = 1U << bit_pos
@@ -824,13 +828,13 @@ fn ContextGatherer::update_current_row(
 
 ///|
 priv struct DefaultTemplateFastParams {
-  prev2_initial_shift : Int
-  prev2_initial_mask : UInt
-  prev1_shift : Int
-  prev1_initial_mask : UInt
-  shift_mask : UInt
-  prev2_next_mask : UInt
-  prev1_next_mask : UInt
+  prev2_initial_shift : Int32
+  prev2_initial_mask : UInt32
+  prev1_shift : Int32
+  prev1_initial_mask : UInt32
+  shift_mask : UInt32
+  prev2_next_mask : UInt32
+  prev1_next_mask : UInt32
 }
 
 ///|

@@ -10,7 +10,7 @@ priv enum KhmerSyllableType {
 }
 
 ///|
-fn KhmerSyllableType::to_int(self : KhmerSyllableType) -> Int {
+fn KhmerSyllableType::to_int(self : KhmerSyllableType) -> Int32 {
   match self {
     ConsonantSyllable => 0
     BrokenCluster => 1
@@ -28,7 +28,7 @@ fn find_syllables_khmer(buffer : Buffer) -> Unit {
   let pe = buffer.len
   let eof = buffer.len
   let syllable_serial = Ref(1)
-  fn found_syllable(ts : Int, te : Int, kind : KhmerSyllableType) {
+  fn found_syllable(ts : Int32, te : Int32, kind : KhmerSyllableType) {
     found_syllable_khmer(ts, te, syllable_serial, kind.to_int(), buffer)
   }
 
@@ -199,10 +199,10 @@ fn find_syllables_khmer(buffer : Buffer) -> Unit {
 
 ///|
 fn found_syllable_khmer(
-  start : Int,
-  end : Int,
-  syllable_serial : Ref[Int],
-  kind : Int,
+  start : Int32,
+  end : Int32,
+  syllable_serial : Ref[Int32],
+  kind : Int32,
   buffer : Buffer,
 ) -> Unit {
   for i in start..<end {

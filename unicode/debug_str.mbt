@@ -16,7 +16,7 @@ pub fn rust_debug_str(s : StringView) -> String {
 }
 
 ///|
-fn write_rust_escaped(buf : StringBuilder, c : Int, first : Bool) -> Unit {
+fn write_rust_escaped(buf : StringBuilder, c : Int32, first : Bool) -> Unit {
   match c {
     0 => buf.write_string("\\0")
     '\t' => buf.write_string("\\t")
@@ -35,7 +35,7 @@ fn write_rust_escaped(buf : StringBuilder, c : Int, first : Bool) -> Unit {
         buf.write_string(c.to_string(radix=16))
         buf.write_char('}')
       } else {
-        buf.write_char(Int::unsafe_to_char(c))
+        buf.write_char(Int32::unsafe_to_char(c))
       }
     }
   }

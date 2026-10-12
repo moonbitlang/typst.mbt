@@ -27,11 +27,11 @@ pub(all) struct RenderSettings {
   /// The width of the viewport. If this is set to `None`, the width will be
   /// chosen automatically based on the scale factor and the dimensions of
   /// the PDF.
-  width : Int?
+  width : Int32?
   /// The height of the viewport. If this is set to `None`, the height will
   /// be chosen automatically based on the scale factor and the dimensions of
   /// the PDF.
-  height : Int?
+  height : Int32?
   /// The background color. Determines the color of the base rectangle
   /// during rendering to a pixmap.
   bg_color : @vello_cpu.AlphaColor
@@ -55,7 +55,7 @@ pub extend RenderSettings with Default::{default}
 
 ///|
 /// `f64 as u16` (saturating, NaN maps to 0).
-fn f64_as_u16(x : Double) -> Int {
+fn f64_as_u16(x : Double) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 65535.0 {

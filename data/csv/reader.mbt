@@ -9,11 +9,11 @@
 /// A position in CSV data (upstream `csv::Position`).
 pub(all) struct Position {
   /// The byte offset.
-  byte : Int
+  byte : Int32
   /// The line number (starting at 1).
-  line : Int
+  line : Int32
   /// The record index (starting at 0).
-  record : Int
+  record : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -32,9 +32,9 @@ pub extend Position with @debug.Debug::{to_repr}
 pub(all) enum ErrorKind {
   /// A UTF-8 decoding error that occurred while trying to convert a byte
   /// record to a string record.
-  Utf8(pos~ : Position?, field~ : Int, valid_up_to~ : Int)
+  Utf8(pos~ : Position?, field~ : Int32, valid_up_to~ : Int32)
   /// A record with a different number of fields than the first record.
-  UnequalLengths(pos~ : Position?, expected_len~ : Int, len~ : Int)
+  UnequalLengths(pos~ : Position?, expected_len~ : Int32, len~ : Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -107,13 +107,13 @@ pub struct Reader {
   priv delimiter : Byte
   priv has_headers : Bool
   /// The current input index.
-  priv mut index : Int
+  priv mut index : Int32
   /// The current NFA state.
   priv mut nfa_state : NfaState
   /// Whether the BOM check was done (upstream `has_read`).
   priv mut has_read : Bool
   /// The current line (as counted by the occurrences of `\n`).
-  priv mut line : Int
+  priv mut line : Int32
   /// The current position.
   priv mut cur_pos : Position
   /// Whether EOF was reached.
@@ -125,7 +125,7 @@ pub struct Reader {
   /// Whether the first record was yielded.
   priv mut first : Bool
   /// The number of fields of the first record.
-  priv mut first_field_count : Int?
+  priv mut first_field_count : Int32?
 }
 
 ///|
@@ -411,7 +411,7 @@ pub fn Reader::headers(self : Reader) -> Array[String] raise CsvError {
 ///|
 /// The index up to which `bytes` is valid UTF-8, or `None` if it is all
 /// valid (like Rust's `Utf8Error::valid_up_to`).
-fn utf8_valid_up_to(bytes : Bytes) -> Int? {
+fn utf8_valid_up_to(bytes : Bytes) -> Int32? {
   let n = bytes.length()
   let mut i = 0
   while i < n {

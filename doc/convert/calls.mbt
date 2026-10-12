@@ -104,7 +104,7 @@ fn Sig::param(
 
 ///|
 /// The position of a field in the lowering order.
-fn Sig::lowered_at(self : Sig, field : String) -> Int raise Bail {
+fn Sig::lowered_at(self : Sig, field : String) -> Int32 raise Bail {
   for i, name in self.order {
     if name == field {
       return i
@@ -117,8 +117,8 @@ fn Sig::lowered_at(self : Sig, field : String) -> Int raise Bail {
 /// Where a translated argument stands in the source and in the lowering
 /// order, and whether lowering it is total.
 priv struct Slot {
-  major : Int
-  minor : Int
+  major : Int32
+  minor : Int32
   total : Bool
 }
 
@@ -371,7 +371,7 @@ fn is_label_field(path : String, field : String) -> Bool {
 /// One argument matched to a field.
 priv struct Assigned {
   field : String
-  source : Int
+  source : Int32
   expr : @ast.Expr
   positional : Bool
 }
@@ -388,7 +388,7 @@ fn Tr::sig_call(
   args : @ast.Args,
   env : Env,
 ) -> Code raise Bail {
-  let positional : Array[(Int, @ast.Expr)] = []
+  let positional : Array[(Int32, @ast.Expr)] = []
   let assigned : Array[Assigned] = []
   let names : Array[String] = []
   let mut index = 0
@@ -560,7 +560,7 @@ fn Tr::sig_call(
 /// is also given by name).
 fn Tr::text_positional(
   self : Tr,
-  positional : Array[(Int, @ast.Expr)],
+  positional : Array[(Int32, @ast.Expr)],
   names : Array[String],
   env : Env,
 ) -> Array[String] raise Bail {

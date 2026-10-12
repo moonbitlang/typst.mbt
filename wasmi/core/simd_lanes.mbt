@@ -204,7 +204,7 @@ pub fn ImmLaneIdx32::to_u8(self : ImmLaneIdx32) -> Byte {
 
 ///|
 /// Returns the raw bits of the `bits`-wide lane `i` (zero-extended).
-fn V128Value::lane_bits(self : V128Value, bits : Int, i : Int) -> UInt64 {
+fn V128Value::lane_bits(self : V128Value, bits : Int32, i : Int32) -> UInt64 {
   let per_word = 64 / bits
   let w = if i < per_word { self.lo } else { self.hi }
   let s = i % per_word * bits
@@ -219,8 +219,8 @@ fn V128Value::lane_bits(self : V128Value, bits : Int, i : Int) -> UInt64 {
 /// Returns `self` with the `bits`-wide lane `i` replaced by the low bits of `value`.
 fn V128Value::with_lane_bits(
   self : V128Value,
-  bits : Int,
-  i : Int,
+  bits : Int32,
+  i : Int32,
   value : UInt64,
 ) -> V128Value {
   let per_word = 64 / bits
@@ -240,7 +240,7 @@ fn V128Value::with_lane_bits(
 
 ///|
 /// Extends the raw lane bits `raw` of a `bits`-wide lane to `Int`.
-fn ext_small(raw : UInt64, bits : Int, signed : Bool) -> Int {
+fn ext_small(raw : UInt64, bits : Int32, signed : Bool) -> Int32 {
   let x = raw.to_int()
   if signed {
     x << (32 - bits) >> (32 - bits)
@@ -251,7 +251,7 @@ fn ext_small(raw : UInt64, bits : Int, signed : Bool) -> Int {
 
 ///|
 /// Builds a [`V128Value`] of `bits`-wide lanes from `f(i)`, truncating each value.
-fn small_from_fn(bits : Int, f : (Int) -> Int) -> V128Value {
+fn small_from_fn(bits : Int32, f : (Int32) -> Int32) -> V128Value {
   let per_word = 64 / bits
   let mask = (1UL << bits) - 1
   let mut lo = 0UL
@@ -269,9 +269,9 @@ fn small_from_fn(bits : Int, f : (Int) -> Int) -> V128Value {
 ///|
 fn lanewise_unary_small(
   v : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
-  f : (Int) -> Int,
+  f : (Int32) -> Int32,
 ) -> V128Value {
   small_from_fn(bits, i => f(ext_small(v.lane_bits(bits, i), bits, signed)))
 }
@@ -280,9 +280,9 @@ fn lanewise_unary_small(
 fn lanewise_binary_small(
   lhs : V128Value,
   rhs : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
-  f : (Int, Int) -> Int,
+  f : (Int32, Int32) -> Int32,
 ) -> V128Value {
   small_from_fn(bits, i => {
     f(
@@ -296,9 +296,9 @@ fn lanewise_binary_small(
 fn lanewise_comparison_small(
   lhs : V128Value,
   rhs : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
-  f : (Int, Int) -> Bool,
+  f : (Int32, Int32) -> Bool,
 ) -> V128Value {
   small_from_fn(bits, i => {
     if f(
@@ -315,13 +315,13 @@ fn lanewise_comparison_small(
 // 32-bit lanes (as `Int`; unsigned operations reinterpret).
 
 ///|
-fn V128Value::i32_lane(self : V128Value, i : Int) -> Int {
+fn V128Value::i32_lane(self : V128Value, i : Int32) -> Int32 {
   let w = if i < 2 { self.lo } else { self.hi }
   (w >> ((i & 1) * 32)).to_int()
 }
 
 ///|
-fn i32x4_from(a : Int, b : Int, c : Int, d : Int) -> V128Value {
+fn i32x4_from(a : Int32, b : Int32, c : Int32, d : Int32) -> V128Value {
   {
     lo: a.reinterpret_as_uint().to_uint64() |
     (b.reinterpret_as_uint().to_uint64() << 32),
@@ -331,7 +331,7 @@ fn i32x4_from(a : Int, b : Int, c : Int, d : Int) -> V128Value {
 }
 
 ///|
-fn lanewise_unary_i32(v : V128Value, f : (Int) -> Int) -> V128Value {
+fn lanewise_unary_i32(v : V128Value, f : (Int32) -> Int32) -> V128Value {
   i32x4_from(
     f(v.i32_lane(0)),
     f(v.i32_lane(1)),
@@ -344,7 +344,7 @@ fn lanewise_unary_i32(v : V128Value, f : (Int) -> Int) -> V128Value {
 fn lanewise_binary_i32(
   lhs : V128Value,
   rhs : V128Value,
-  f : (Int, Int) -> Int,
+  f : (Int32, Int32) -> Int32,
 ) -> V128Value {
   i32x4_from(
     f(lhs.i32_lane(0), rhs.i32_lane(0)),
@@ -355,7 +355,7 @@ fn lanewise_binary_i32(
 }
 
 ///|
-fn bool_mask32(b : Bool) -> Int {
+fn bool_mask32(b : Bool) -> Int32 {
   if b {
     -1
   } else {
@@ -367,7 +367,7 @@ fn bool_mask32(b : Bool) -> Int {
 fn lanewise_comparison_i32(
   lhs : V128Value,
   rhs : V128Value,
-  f : (Int, Int) -> Bool,
+  f : (Int32, Int32) -> Bool,
 ) -> V128Value {
   lanewise_binary_i32(lhs, rhs, (a, b) => bool_mask32(f(a, b)))
 }
@@ -376,7 +376,7 @@ fn lanewise_comparison_i32(
 fn lanewise_comparison_u32(
   lhs : V128Value,
   rhs : V128Value,
-  f : (UInt, UInt) -> Bool,
+  f : (UInt32, UInt32) -> Bool,
 ) -> V128Value {
   lanewise_binary_i32(lhs, rhs, (a, b) => {
     bool_mask32(f(a.reinterpret_as_uint(), b.reinterpret_as_uint()))
@@ -433,7 +433,7 @@ fn lanewise_comparison_i64(
 // `f32` lanes.
 
 ///|
-fn V128Value::f32_lane(self : V128Value, i : Int) -> Float {
+fn V128Value::f32_lane(self : V128Value, i : Int32) -> Float {
   Float::reinterpret_from_int(self.i32_lane(i))
 }
 
@@ -548,10 +548,10 @@ fn lanewise_comparison_f64(
 /// number of wide lanes (high).
 fn widen_unary_small(
   v : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
   high : Bool,
-  f : (Int) -> Int,
+  f : (Int32) -> Int32,
 ) -> V128Value {
   let wide_bits = bits * 2
   let base = if high { 128 / wide_bits } else { 0 }
@@ -565,10 +565,10 @@ fn widen_unary_small(
 fn widen_binary_small(
   lhs : V128Value,
   rhs : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
   high : Bool,
-  f : (Int, Int) -> Int,
+  f : (Int32, Int32) -> Int32,
 ) -> V128Value {
   let wide_bits = bits * 2
   let base = if high { 128 / wide_bits } else { 0 }
@@ -585,9 +585,9 @@ fn widen_binary_small(
 /// is `f(narrow[2 * i], narrow[2 * i + 1])`.
 fn pairwise_unary_small(
   v : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
-  f : (Int, Int) -> Int,
+  f : (Int32, Int32) -> Int32,
 ) -> V128Value {
   small_from_fn(bits * 2, i => {
     f(
@@ -602,9 +602,9 @@ fn pairwise_unary_small(
 fn pairwise_binary_small(
   lhs : V128Value,
   rhs : V128Value,
-  bits : Int,
+  bits : Int32,
   signed : Bool,
-  f : (Int, Int, Int, Int) -> Int,
+  f : (Int32, Int32, Int32, Int32) -> Int32,
 ) -> V128Value {
   small_from_fn(bits * 2, i => {
     f(
@@ -624,8 +624,8 @@ fn pairwise_binary_small(
 fn narrow_low_high(
   low : V128Value,
   high : V128Value,
-  bits : Int,
-  f : (Int) -> Int,
+  bits : Int32,
+  f : (Int32) -> Int32,
 ) -> V128Value {
   let n = 128 / bits
   small_from_fn(bits / 2, i => {

@@ -3,55 +3,55 @@
 // https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#windows-platform-platform-id--3
 
 ///|
-const WINDOWS_SYMBOL_ENCODING : Int = 0
+const WINDOWS_SYMBOL_ENCODING : Int32 = 0
 
 ///|
-const WINDOWS_UNICODE_BMP_ENCODING : Int = 1
+const WINDOWS_UNICODE_BMP_ENCODING : Int32 = 1
 
 ///|
-const WINDOWS_UNICODE_FULL_ENCODING : Int = 10
+const WINDOWS_UNICODE_FULL_ENCODING : Int32 = 10
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/name#platform-specific-encoding-and-language-ids-unicode-platform-platform-id--0
 
 ///|
-const UNICODE_1_0_ENCODING : Int = 0
+const UNICODE_1_0_ENCODING : Int32 = 0
 
 ///|
-const UNICODE_1_1_ENCODING : Int = 1
+const UNICODE_1_1_ENCODING : Int32 = 1
 
 ///|
-const UNICODE_ISO_ENCODING : Int = 2
+const UNICODE_ISO_ENCODING : Int32 = 2
 
 ///|
-const UNICODE_2_0_BMP_ENCODING : Int = 3
+const UNICODE_2_0_BMP_ENCODING : Int32 = 3
 
 ///|
-const UNICODE_2_0_FULL_ENCODING : Int = 4
+const UNICODE_2_0_FULL_ENCODING : Int32 = 4
 
 ///|
-const UNICODE_FULL_ENCODING : Int = 6
+const UNICODE_FULL_ENCODING : Int32 = 6
 
 ///|
 /// A font face handle (`hb_font_t`).
 struct Face {
   ttfp_face : @otf.Face
-  units_per_em : Int
-  mut pixels_per_em : (Int, Int)?
+  units_per_em : Int32
+  mut pixels_per_em : (Int32, Int32)?
   mut points_per_em : Float?
-  prefered_cmap_encoding_subtable : Int?
+  prefered_cmap_encoding_subtable : Int32?
   gsub : SubstitutionTable?
   gpos : PositioningTable?
   /// Not upstream: memoized `get_nominal_glyph` results (glyph id, or -1
   /// for none) by code point, and `glyph_props` by glyph id (-1: not yet
   /// computed). Both only depend on the font's tables (performance).
-  nominal_glyphs : Map[Int, Int]
-  mut glyph_props_cache : FixedArray[Int]
+  nominal_glyphs : Map[Int32, Int32]
+  mut glyph_props_cache : FixedArray[Int32]
 }
 
 ///|
 /// Creates a new `Face` from data (`face_index` selects a face of a
 /// collection).
-pub fn Face::from_slice(data : BytesView, face_index : UInt) -> Face? {
+pub fn Face::from_slice(data : BytesView, face_index : UInt32) -> Face? {
   let face = @otf.Face::parse(data, face_index) catch { _ => return None }
   Some(Face::from_face(face))
 }
@@ -81,14 +81,14 @@ pub fn Face::ttf(self : Face) -> @otf.Face {
 
 ///|
 /// Returns face’s units per EM.
-pub fn Face::units_per_em(self : Face) -> Int {
+pub fn Face::units_per_em(self : Face) -> Int32 {
   self.units_per_em
 }
 
 ///|
 /// Sets pixels per EM. Used during raster glyphs processing and hinting.
 /// `None` by default.
-pub fn Face::set_pixels_per_em(self : Face, ppem : (Int, Int)?) -> Unit {
+pub fn Face::set_pixels_per_em(self : Face, ppem : (Int32, Int32)?) -> Unit {
   self.pixels_per_em = ppem
 }
 
@@ -126,12 +126,12 @@ fn Face::variation_coordinates(
 }
 
 ///|
-fn Face::has_glyph(self : Face, c : Int) -> Bool {
+fn Face::has_glyph(self : Face, c : Int32) -> Bool {
   self.get_nominal_glyph(c) is Some(_)
 }
 
 ///|
-fn Face::get_nominal_glyph(self : Face, c : Int) -> @otf.GlyphId? {
+fn Face::get_nominal_glyph(self : Face, c : Int32) -> @otf.GlyphId? {
   match self.nominal_glyphs.get(c) {
     Some(-1) => None
     Some(gid) => Some(@otf.GlyphId(gid.to_uint16()))
@@ -147,7 +147,7 @@ fn Face::get_nominal_glyph(self : Face, c : Int) -> @otf.GlyphId? {
 }
 
 ///|
-fn Face::get_nominal_glyph_uncached(self : Face, c : Int) -> @otf.GlyphId? {
+fn Face::get_nominal_glyph_uncached(self : Face, c : Int32) -> @otf.GlyphId? {
   let mut c = c
   guard self.prefered_cmap_encoding_subtable is Some(subtable_idx) else {
     return None
@@ -181,12 +181,12 @@ fn Face::get_nominal_glyph_uncached(self : Face, c : Int) -> @otf.GlyphId? {
 }
 
 ///|
-fn Face::glyph_h_advance(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_h_advance(self : Face, glyph : @otf.GlyphId) -> Int32 {
   self.glyph_advance(glyph, false).reinterpret_as_int()
 }
 
 ///|
-fn Face::glyph_v_advance(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_v_advance(self : Face, glyph : @otf.GlyphId) -> Int32 {
   -self.glyph_advance(glyph, true).reinterpret_as_int()
 }
 
@@ -195,7 +195,7 @@ fn Face::glyph_advance(
   self : Face,
   glyph : @otf.GlyphId,
   is_vertical : Bool,
-) -> UInt {
+) -> UInt32 {
   let face = self.ttfp_face
   if face.is_variable() &&
     face.has_non_default_variation_coordinates() &&
@@ -236,12 +236,12 @@ fn Face::glyph_advance(
 }
 
 ///|
-fn Face::glyph_h_origin(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_h_origin(self : Face, glyph : @otf.GlyphId) -> Int32 {
   self.glyph_h_advance(glyph) / 2
 }
 
 ///|
-fn Face::glyph_v_origin(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_v_origin(self : Face, glyph : @otf.GlyphId) -> Int32 {
   match self.ttfp_face.glyph_y_origin(glyph) {
     Some(y) => y.to_int()
     None => {
@@ -267,7 +267,7 @@ fn Face::glyph_side_bearing(
   self : Face,
   glyph : @otf.GlyphId,
   is_vertical : Bool,
-) -> Int {
+) -> Int32 {
   let face = self.ttfp_face
   if face.is_variable() &&
     face.tables().hvar is None &&
@@ -291,7 +291,7 @@ fn Face::glyph_side_bearing(
 
 ///|
 /// Rust's `f32::round` (half away from zero) then `as i32` (saturating).
-fn round_f32_to_i32(v : Float) -> Int {
+fn round_f32_to_i32(v : Float) -> Int32 {
   let d = v.to_double()
   if d.is_nan() {
     return 0
@@ -310,7 +310,7 @@ fn round_f32_to_i32(v : Float) -> Int {
 
 ///|
 /// Rust's `f32 as i32` (truncating, saturating).
-fn f32_as_i32(v : Float) -> Int {
+fn f32_as_i32(v : Float) -> Int32 {
   let d = v.to_double()
   if d.is_nan() {
     0
@@ -416,7 +416,7 @@ fn Face::glyph_name(self : Face, glyph : @otf.GlyphId) -> String? {
 }
 
 ///|
-fn Face::glyph_props(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_props(self : Face, glyph : @otf.GlyphId) -> Int32 {
   let g = glyph.0.to_int()
   if g < self.glyph_props_cache.length() {
     let cached = self.glyph_props_cache[g]
@@ -433,7 +433,7 @@ fn Face::glyph_props(self : Face, glyph : @otf.GlyphId) -> Int {
 }
 
 ///|
-fn Face::glyph_props_uncached(self : Face, glyph : @otf.GlyphId) -> Int {
+fn Face::glyph_props_uncached(self : Face, glyph : @otf.GlyphId) -> Int32 {
   guard self.tables().gdef is Some(table) else { return 0 }
   match table.glyph_class(glyph) {
     Some(Base) => GLYPH_PROPS_BASE_GLYPH
@@ -471,10 +471,10 @@ fn Face::layout_tables(self : Face) -> Array[(TableIndex, @otf.LayoutTable)] {
 
 ///|
 priv struct GlyphExtents {
-  mut x_bearing : Int
-  mut y_bearing : Int
-  mut width : Int
-  mut height : Int
+  mut x_bearing : Int32
+  mut y_bearing : Int32
+  mut width : Int32
+  mut height : Int32
 }
 
 ///|
@@ -483,7 +483,7 @@ fn GlyphExtents::new() -> GlyphExtents {
 }
 
 ///|
-fn find_best_cmap_subtable(face : @otf.Face) -> Int? {
+fn find_best_cmap_subtable(face : @otf.Face) -> Int32? {
   // Symbol subtable.
   // Prefer symbol if available.
   // https://github.com/harfbuzz/harfbuzz/issues/1918
@@ -514,8 +514,8 @@ fn find_best_cmap_subtable(face : @otf.Face) -> Int? {
 fn find_cmap_subtable(
   face : @otf.Face,
   platform_id : @otf.PlatformId,
-  encoding_id : Int,
-) -> Int? {
+  encoding_id : Int32,
+) -> Int32? {
   guard face.tables().cmap is Some(cmap) else { return None }
   for i, subtable in cmap.subtables.iter().to_array() {
     if subtable.platform_id == platform_id &&
@@ -527,7 +527,7 @@ fn find_cmap_subtable(
 }
 
 ///|
-let unicode_to_macroman_table : ReadOnlyArray[Int] = [
+let unicode_to_macroman_table : ReadOnlyArray[Int32] = [
   0x00C4, 0x00C5, 0x00C7, 0x00C9, 0x00D1, 0x00D6, 0x00DC, 0x00E1, 0x00E0, 0x00E2,
   0x00E4, 0x00E3, 0x00E5, 0x00E7, 0x00E9, 0x00E8, 0x00EA, 0x00EB, 0x00ED, 0x00EC,
   0x00EE, 0x00EF, 0x00F1, 0x00F3, 0x00F2, 0x00F4, 0x00F6, 0x00F5, 0x00FA, 0x00F9,
@@ -544,7 +544,7 @@ let unicode_to_macroman_table : ReadOnlyArray[Int] = [
 ]
 
 ///|
-fn unicode_to_macroman(c : Int) -> Int {
+fn unicode_to_macroman(c : Int32) -> Int32 {
   let u = c & 0xFFFF
   for i, m in unicode_to_macroman_table[:] {
     if m == u {

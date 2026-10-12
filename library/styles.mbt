@@ -40,7 +40,7 @@ pub fn Styles::iter(self : Styles) -> Iter[Style] {
 pub fn Styles::set(
   self : Styles,
   elem : Element,
-  id : Int,
+  id : Int32,
   value : Value,
 ) -> Unit {
   self.items.push(Property(Property::new(elem, id, value)))
@@ -115,7 +115,7 @@ pub fn Styles::liftable(self : Styles) -> Styles {
 
 ///|
 /// Whether there is a style for the given field of the given element.
-pub fn Styles::has(self : Styles, elem : Element, id : Int) -> Bool {
+pub fn Styles::has(self : Styles, elem : Element, id : Int32) -> Bool {
   self.items.iter().any(s => s is Property(p) && p.is_(elem, id))
 }
 
@@ -138,7 +138,7 @@ pub(all) enum Style {
   /// A show rule recipe.
   Recipe(Recipe)
   /// Disables a specific show rule recipe.
-  Revocation(Int)
+  Revocation(Int32)
 } derive(Eq)
 
 ///|
@@ -215,7 +215,7 @@ pub struct Property {
   /// The element the property belongs to.
   elem : Element
   /// The property's ID.
-  id : Int
+  id : Int32
   /// The property's value.
   value : Value
   /// The span of the set rule the property stems from.
@@ -228,7 +228,7 @@ pub struct Property {
 
 ///|
 /// Create a new property from a key-value pair.
-pub fn Property::new(elem : Element, id : Int, value : Value) -> Property {
+pub fn Property::new(elem : Element, id : Int32, value : Value) -> Property {
   {
     elem,
     id,
@@ -241,7 +241,7 @@ pub fn Property::new(elem : Element, id : Int, value : Value) -> Property {
 
 ///|
 /// Whether this property is the given one.
-pub fn Property::is_(self : Property, elem : Element, id : Int) -> Bool {
+pub fn Property::is_(self : Property, elem : Element, id : Int32) -> Bool {
   self.elem == elem && self.id == id
 }
 
@@ -394,7 +394,7 @@ pub struct StyleChain {
   tail : StyleChain?
   /// The cached fingerprint of [StyleChain::memo_hash] and its flags (see
   /// `fingerprint_flags`; not upstream).
-  priv mut memo_hash : (U128, Int)?
+  priv mut memo_hash : (U128, Int32)?
 }
 
 ///|
@@ -486,7 +486,7 @@ pub fn StyleChain::entries(self : StyleChain) -> Iter[Style] {
 
 ///|
 /// `self.recipes().count()` without allocating the iterators.
-pub fn StyleChain::recipe_count(self : StyleChain) -> Int {
+pub fn StyleChain::recipe_count(self : StyleChain) -> Int32 {
   let mut n = 0
   let mut link : StyleChain? = Some(self)
   while link is Some(l) {
@@ -521,7 +521,7 @@ pub fn StyleChain::links(self : StyleChain) -> Array[Array[Style]] {
 ///|
 /// Build owned styles from the suffix (all but the outermost `len` links) of
 /// the chain.
-pub fn StyleChain::suffix(self : StyleChain, len : Int) -> Styles {
+pub fn StyleChain::suffix(self : StyleChain, len : Int32) -> Styles {
   let links = self.links()
   let take = if links.length() > len { links.length() - len } else { 0 }
   let items = []
@@ -539,7 +539,7 @@ pub fn StyleChain::suffix(self : StyleChain, len : Int) -> Styles {
 fn StyleChain::first_property(
   self : StyleChain,
   elem : Element,
-  id : Int,
+  id : Int32,
 ) -> Value? {
   let mut link = self
   while true {
@@ -561,7 +561,7 @@ fn StyleChain::first_property(
 
 ///|
 /// Whether the chain has a property for the given field.
-pub fn StyleChain::has(self : StyleChain, elem : Element, id : Int) -> Bool {
+pub fn StyleChain::has(self : StyleChain, elem : Element, id : Int32) -> Bool {
   self.first_property(elem, id) is Some(_)
 }
 
@@ -632,7 +632,7 @@ pub fn StyleChain::get_value_with_local(
 pub fn StyleChain::get_field(
   self : StyleChain,
   elem : Element,
-  id : Int,
+  id : Int32,
 ) -> Value {
   self.get_value_with_local(elem, elem.fields()[id], None)
 }
@@ -656,7 +656,7 @@ pub fn StyleChain::pop(self : StyleChain) -> StyleChain {
 
 ///|
 /// Iterate over the links of the chain (innermost first) and count them.
-pub fn StyleChain::depth(self : StyleChain) -> Int {
+pub fn StyleChain::depth(self : StyleChain) -> Int32 {
   let mut n = 0
   let mut link : StyleChain? = Some(self)
   while link is Some(l) {
@@ -676,7 +676,7 @@ pub fn StyleChain::fresh(self : StyleChain) -> StyleChain {
 
 ///|
 /// The number of styles in the first link of the chain.
-pub fn StyleChain::head_len(self : StyleChain) -> Int {
+pub fn StyleChain::head_len(self : StyleChain) -> Int32 {
   self.head.length()
 }
 

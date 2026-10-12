@@ -122,11 +122,11 @@ fn create_rgba_palette(
 fn PngTransform::apply(
   self : PngTransform,
   row : FixedArray[Byte],
-  row_start : Int,
-  row_len : Int,
+  row_start : Int32,
+  row_len : Int32,
   output : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
   info : StreamInfo,
 ) -> Unit {
   // The accesses below are within these ranges.
@@ -259,11 +259,11 @@ fn PngTransform::apply(
 /// bytes of the output (for which the input has samples, which upstream
 /// asserts).
 fn unpack_bits_pixels(
-  input_len : Int,
-  output_len : Int,
-  channels : Int,
-  bit_depth : Int,
-) -> Int {
+  input_len : Int32,
+  output_len : Int32,
+  channels : Int32,
+  bit_depth : Int32,
+) -> Int32 {
   let per_byte = 8 / bit_depth
   let pixels = output_len / channels
   // (Not `input_len * per_byte`, which does not fit an `Int` for a row of
@@ -283,10 +283,10 @@ fn unpack_bits_pixels(
 /// in bounds for the pixels of `unpack_bits_pixels`.
 fn unpack_bits_sample(
   input : FixedArray[Byte],
-  start : Int,
-  i : Int,
-  bit_depth : Int,
-) -> Int {
+  start : Int32,
+  i : Int32,
+  bit_depth : Int32,
+) -> Int32 {
   if bit_depth == 8 {
     return input.unsafe_get(start + i).to_int()
   }
@@ -404,7 +404,7 @@ pub extend PngFrameError with @debug.Debug::{to_repr}
 /// order; the `png` crate's are big-endian).
 pub fn decode_png_frame(
   data : BytesView,
-  strip16? : Bool = false,
+  strip16~ : Bool = false,
 ) -> (ImageInfo, Bytes) raise PngFrameError {
   let reader = PngReader::read_info(data, PngLimits::Default.limits(), strip16) catch {
     err => raise Decoding(err.to_string())
@@ -421,7 +421,7 @@ pub fn decode_png_frame(
 /// Reads the frame of a reader whose frame has a size.
 fn read_png_frame(
   reader : PngReader,
-  input_len : Int,
+  input_len : Int32,
 ) -> (ImageInfo, Bytes) raise DecodingError {
   let info = reader.info()
   let (color_type, bits) = reader.output_color_type()

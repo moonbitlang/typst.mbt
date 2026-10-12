@@ -103,7 +103,10 @@ pub extend Rel with Fold::{fold}
 
 ///|
 /// Upstream `PartialOrd for Rel<Length>`.
-pub fn Rel::partial_cmp_length(self : Rel[Length], other : Rel[Length]) -> Int? {
+pub fn Rel::partial_cmp_length(
+  self : Rel[Length],
+  other : Rel[Length],
+) -> Int32? {
   if self.rel.is_zero() && other.rel.is_zero() {
     self.abs.partial_cmp(other.abs)
   } else if self.abs.is_zero() && other.abs.is_zero() {

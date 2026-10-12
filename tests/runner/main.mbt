@@ -22,19 +22,19 @@ let trace_tests : Ref[Bool] = Ref(false)
 let read_check : Ref[Bool] = Ref(false)
 
 ///|
-let read_check_entries : Ref[Int] = Ref(0)
+let read_check_entries : Ref[Int32] = Ref(0)
 
 ///|
-let read_check_differ : Ref[Int] = Ref(0)
+let read_check_differ : Ref[Int32] = Ref(0)
 
 ///|
-let read_check_cases : Ref[Int] = Ref(0)
+let read_check_cases : Ref[Int32] = Ref(0)
 
 ///|
 /// What the read check found since the last call, for the case `name`:
 /// prints the entries that differ (the first few) and returns their
 /// number.
-fn read_check_drain(name : String) -> Int {
+fn read_check_drain(name : String) -> Int32 {
   if !read_check.val {
     return 0
   }
@@ -268,7 +268,7 @@ fn main {
     // The upstream suite converted to the EDSL (docs/edsl-convert.md):
     // generate the conversions, and compare them with the Typst path.
     "edsl-convert" => {
-      let mut failed : Map[Int, String] = Map([])
+      let mut failed : Map[Int32, String] = Map([])
       for a in args {
         if a.has_prefix("--failed=") {
           failed = read_failed(a.unsafe_substring(start=9, end=a.length()))
@@ -325,12 +325,12 @@ fn run_stage(
   report : (String, TestCase) -> String,
   filter : String?,
   verbose : Bool,
-  select? : (TestCase) -> Bool = _ => true,
-  skip_file? : (String) -> Bool = _ => false,
+  select~ : (TestCase) -> Bool = _ => true,
+  skip_file~ : (String) -> Bool = _ => false,
   canonicalize? : (String) -> String,
-  dump_name? : String = stage,
+  dump_name~ : String = stage,
   matches? : (String, String) -> Bool,
-  missing? : String = "<missing golden>",
+  missing~ : String = "<missing golden>",
 ) -> Unit {
   let mut passed = 0
   // With `canonicalize`, both sides are compared after canonicalization;

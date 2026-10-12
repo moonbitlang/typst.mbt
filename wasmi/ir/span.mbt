@@ -44,13 +44,13 @@ pub fn SlotSpan::new(head : Slot) -> SlotSpan {
 
 ///|
 /// Returns a [`SlotSpanIter`] yielding `len` [`Slot`]s.
-pub fn SlotSpan::iter_sized(self : SlotSpan, len : Int) -> SlotSpanIter {
+pub fn SlotSpan::iter_sized(self : SlotSpan, len : Int32) -> SlotSpanIter {
   SlotSpanIter::new(self.0, len)
 }
 
 ///|
 /// Returns a [`SlotSpanIter`] yielding `len` [`Slot`]s.
-pub fn SlotSpan::iter(self : SlotSpan, len : Int) -> SlotSpanIter {
+pub fn SlotSpan::iter(self : SlotSpan, len : Int32) -> SlotSpanIter {
   SlotSpanIter::new_u16(self.0, len)
 }
 
@@ -66,7 +66,7 @@ pub fn SlotSpan::head(self : SlotSpan) -> Slot {
 pub fn SlotSpan::has_overlapping_copies(
   results : SlotSpan,
   values : SlotSpan,
-  len : Int,
+  len : Int32,
 ) -> Bool {
   SlotSpanIter::has_overlapping_copies(results.iter(len), values.iter(len))
 }
@@ -112,7 +112,7 @@ pub fn FixedSlotSpan::to_array(self : FixedSlotSpan) -> (Slot, Slot) {
 /// If `span` cannot hold `n` slots (overflowing slot indices).
 pub fn FixedSlotSpan::new(
   span : SlotSpan,
-  n : Int,
+  n : Int32,
 ) -> FixedSlotSpan raise IrError {
   let head = span.head()
   if head.0 >= head.next_n(n).0 {
@@ -155,7 +155,7 @@ pub fn FixedSlotSpan::contains(self : FixedSlotSpan, slot : Slot) -> Bool {
 
 ///|
 /// Returns the number of [`Slot`]s in `self`.
-pub fn FixedSlotSpan::len(_self : FixedSlotSpan) -> Int {
+pub fn FixedSlotSpan::len(_self : FixedSlotSpan) -> Int32 {
   2
 }
 
@@ -165,7 +165,7 @@ pub(all) struct BoundedSlotSpan {
   /// The first [`Slot`] in `self`.
   span : SlotSpan
   /// The number of [`Slot`] in `self` (upstream `u16`).
-  len : Int
+  len : Int32
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
@@ -190,7 +190,7 @@ pub extend BoundedSlotSpan with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new [`BoundedSlotSpan`] from the given `span` and `len`.
-pub fn BoundedSlotSpan::new(span : SlotSpan, len : Int) -> BoundedSlotSpan {
+pub fn BoundedSlotSpan::new(span : SlotSpan, len : Int32) -> BoundedSlotSpan {
   { span, len, }
 }
 
@@ -219,7 +219,7 @@ pub fn BoundedSlotSpan::contains(self : BoundedSlotSpan, reg : Slot) -> Bool {
 
 ///|
 /// Returns the number of [`Slot`] in `self`.
-pub fn BoundedSlotSpan::len(self : BoundedSlotSpan) -> Int {
+pub fn BoundedSlotSpan::len(self : BoundedSlotSpan) -> Int32 {
   self.len
 }
 
@@ -233,9 +233,9 @@ pub fn BoundedSlotSpan::is_empty(self : BoundedSlotSpan) -> Bool {
 /// A [`SlotSpanIter`] iterator yielding contiguous [`Slot`].
 pub(all) struct SlotSpanIter {
   /// The next [`Slot`] in the [`SlotSpanIter`].
-  mut next : Int
+  mut next : Int32
   /// The last [`Slot`] in the [`SlotSpanIter`].
-  mut last : Int
+  mut last : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -260,7 +260,7 @@ pub fn SlotSpanIter::from_raw_parts(start : Slot, end : Slot) -> SlotSpanIter {
 /// # Panics
 ///
 /// If the `start..end` [`Slot`] span indices are out of bounds.
-fn SlotSpanIter::new(start : Slot, len : Int) -> SlotSpanIter {
+fn SlotSpanIter::new(start : Slot, len : Int32) -> SlotSpanIter {
   if len < 0 || len > 0xFFFF {
     abort("out of bounds length for register span: \{len}")
   }
@@ -273,7 +273,7 @@ fn SlotSpanIter::new(start : Slot, len : Int) -> SlotSpanIter {
 /// # Panics
 ///
 /// If the `start..end` [`Slot`] span indices are out of bounds.
-fn SlotSpanIter::new_u16(start : Slot, len : Int) -> SlotSpanIter {
+fn SlotSpanIter::new_u16(start : Slot, len : Int32) -> SlotSpanIter {
   let last = start.0 + len
   if last > 32767 {
     abort("overflowing register index for register span")
@@ -289,13 +289,13 @@ pub fn SlotSpanIter::span(self : SlotSpanIter) -> SlotSpan {
 
 ///|
 /// Returns the remaining number of [`Slot`]s yielded by the [`SlotSpanIter`].
-pub fn SlotSpanIter::len_as_u16(self : SlotSpanIter) -> Int {
+pub fn SlotSpanIter::len_as_u16(self : SlotSpanIter) -> Int32 {
   (self.last - self.next).abs()
 }
 
 ///|
 /// Returns the remaining number of [`Slot`]s yielded by the [`SlotSpanIter`].
-pub fn SlotSpanIter::len(self : SlotSpanIter) -> Int {
+pub fn SlotSpanIter::len(self : SlotSpanIter) -> Int32 {
   self.len_as_u16()
 }
 

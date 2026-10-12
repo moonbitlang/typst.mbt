@@ -14,13 +14,13 @@ pub(all) struct WriteOptions {
   /// Smaller precision can lead to a malformed output in some cases.
   ///
   /// Default: 8
-  coordinates_precision : Int
+  coordinates_precision : Int32
   /// Set the transform values numeric precision.
   ///
   /// Smaller precision can lead to a malformed output in some cases.
   ///
   /// Default: 8
-  transforms_precision : Int
+  transforms_precision : Int32
   /// Use single quote marks instead of double quote.
   ///
   /// Default: disabled
@@ -1301,7 +1301,7 @@ let pow_vec : ReadOnlyArray[Float] = [
 ]
 
 ///|
-fn write_num(num : Float, buf : StringBuilder, precision : Int) -> Unit {
+fn write_num(num : Float, buf : StringBuilder, precision : Int32) -> Unit {
   // If number is an integer, it's faster to write it as i32.
   if approx_zero_ulps(num - num.trunc(), 4) {
     buf.write_string(f32_as_i32(num).to_string())
@@ -1458,7 +1458,7 @@ fn write_span(
 
 ///|
 /// Slices a string by UTF-8 byte offsets.
-fn utf8_slice(s : String, start : Int, end : Int) -> String {
+fn utf8_slice(s : String, start : Int32, end : Int32) -> String {
   let bytes = @utf8.encode(s)
   @utf8.decode_lossy(bytes[start:end])
 }

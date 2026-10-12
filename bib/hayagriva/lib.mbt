@@ -56,7 +56,7 @@ pub fn Library::keys(self : Library) -> Array[String] {
 
 ///|
 /// Get the length of the library.
-pub fn Library::length(self : Library) -> Int {
+pub fn Library::length(self : Library) -> Int32 {
   self.entries.length()
 }
 
@@ -68,7 +68,7 @@ pub fn Library::is_empty(self : Library) -> Bool {
 
 ///|
 /// Get the nth entry in the library.
-pub fn Library::nth(self : Library, n : Int) -> Entry? {
+pub fn Library::nth(self : Library, n : Int32) -> Entry? {
   self.entries.get(n)
 }
 
@@ -529,8 +529,8 @@ pub fn[T] Entry::map(self : Entry, f : (Entry) -> T?) -> T? {
 /// Get the unconverted value of a certain field from the parents only by
 /// BFS.
 pub fn[T] Entry::map_parents(self : Entry, f : (Entry) -> T?) -> T? {
-  let path : Array[Int] = [0]
-  fn up(path : Array[Int]) -> Unit {
+  let path : Array[Int32] = [0]
+  fn up(path : Array[Int32]) -> Unit {
     path.pop() |> ignore
     if path.length() > 0 {
       path[path.length() - 1] += 1

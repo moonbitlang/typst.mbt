@@ -30,10 +30,10 @@
 fn reparse(
   root : SyntaxNode,
   text : Lines,
-  replaced_start : Int,
-  replaced_end : Int,
-  replacement_len : Int,
-) -> (SyntaxNode, (Int, Int)) {
+  replaced_start : Int32,
+  replaced_end : Int32,
+  replacement_len : Int32,
+) -> (SyntaxNode, (Int32, Int32)) {
   // Upstream writes to the root's record through `node.children_mut()`
   // (reparser.rs:64), which copies it if it is shared.
   let node = root.make_mut()
@@ -63,7 +63,7 @@ fn reparse(
 
 ///|
 /// Convert a UTF-8 byte index of the new text into the parser's UTF-16 index.
-fn reparse_utf16(text : Lines, byte_idx : Int) -> Int {
+fn reparse_utf16(text : Lines, byte_idx : Int32) -> Int32 {
   guard text.byte_to_utf16(byte_idx) is Some(i) else {
     abort("reparse range out of bounds")
   }
@@ -101,13 +101,13 @@ fn reparse_utf16(text : Lines, byte_idx : Int) -> Int {
 /// edit until they are replaced here.
 fn try_reparse(
   text : Lines,
-  replaced_start : Int,
-  replaced_end : Int,
-  replacement_len : Int,
+  replaced_start : Int32,
+  replaced_end : Int32,
+  replacement_len : Int32,
   parent_kind : SyntaxKind?,
   node : SyntaxNode,
-  offset : Int,
-) -> (Int, Int)? {
+  offset : Int32,
+) -> (Int32, Int32)? {
   guard overlapping_children(node, replaced_start, replaced_end, offset)
     is Some((overlap_start, overlap_end, start_offset)) else {
     return None
@@ -201,15 +201,15 @@ fn try_reparse(
 /// each iteration.
 fn expand_and_reparse_markup(
   text : Lines,
-  replaced_start : Int,
-  replaced_end : Int,
-  replacement_len : Int,
+  replaced_start : Int32,
+  replaced_end : Int32,
+  replacement_len : Int32,
   node : SyntaxNode,
-  overlap_start : Int,
-  overlap_end : Int,
-  offset : Int,
+  overlap_start : Int32,
+  overlap_end : Int32,
+  offset : Int32,
   top_level : Bool,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   let children = node.children()
 
   // Reparse a segment. Retries until it works, taking exponentially more
@@ -247,7 +247,7 @@ fn expand_and_reparse_markup(
     // Synthesize what `at_start` and `nesting` would be at the start of the
     // reparse.
     let mut prefix_len = 0
-    let nesting : Ref[Int] = { val: 0, }
+    let nesting : Ref[Int32] = { val: 0, }
     let at_start : Ref[Bool] = { val: true, }
     for child in children[:start] {
       prefix_len += child.len()
@@ -258,7 +258,7 @@ fn expand_and_reparse_markup(
     // Determine what `at_start` will have to be at the end of the reparse.
     let mut prev_len = 0
     let prev_at_start_after : Ref[Bool] = { val: at_start.val, }
-    let prev_nesting_after : Ref[Int] = { val: nesting.val, }
+    let prev_nesting_after : Ref[Int32] = { val: nesting.val, }
     for child in children[start:end] {
       prev_len += child.len()
       next_at_start(child, prev_at_start_after)
@@ -317,10 +317,10 @@ fn expand_and_reparse_markup(
 /// parent, but the returned offset is a byte offset in the source text.
 fn overlapping_children(
   node : SyntaxNode,
-  range_start : Int,
-  range_end : Int,
-  offset : Int,
-) -> (Int, Int, Int)? {
+  range_start : Int32,
+  range_end : Int32,
+  offset : Int32,
+) -> (Int32, Int32, Int32)? {
   if !node.is_inner() || offset > range_start || range_end > offset + node.len() {
     // No set of children will fully cover the range, no need to search.
     return None
@@ -368,7 +368,7 @@ fn next_at_start(node : SyntaxNode, at_start : Ref[Bool]) -> Unit {
 
 ///|
 /// Update `nesting` based on the node.
-fn next_nesting(node : SyntaxNode, nesting : Ref[Int]) -> Unit {
+fn next_nesting(node : SyntaxNode, nesting : Ref[Int32]) -> Unit {
   if node.kind() == Text {
     match node.leaf_text() {
       "[" => nesting.val += 1

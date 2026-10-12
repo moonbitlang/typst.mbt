@@ -8,7 +8,7 @@
 #warnings("-unused_field")
 priv struct Tile {
   /// The index of the tile, in row-major order.
-  idx : UInt
+  idx : UInt32
   /// The concatenated tile parts that contain all the information for all
   /// constituent codeblocks.
   tile_parts : Array[TilePart]
@@ -20,7 +20,7 @@ priv struct Tile {
   /// exclusive.
   rect : IntRect
   mut progression_order : ProgressionOrder
-  mut num_layers : Int
+  mut num_layers : Int32
   mut mct : Bool
 }
 
@@ -28,7 +28,7 @@ priv struct Tile {
 /// A tile part where packet headers and packet data are separated.
 priv struct SeparatedTilePart {
   headers : Array[BitReader]
-  mut active_header_reader : Int
+  mut active_header_reader : Int32
   body : BitReader
 }
 
@@ -75,7 +75,7 @@ fn TilePart::body(self : TilePart) -> BitReader {
 }
 
 ///|
-fn Tile::new(idx : UInt, header : Header) -> Tile {
+fn Tile::new(idx : UInt32, header : Header) -> Tile {
   let rect = {
     let size_data = header.size_data
     let x_coord = size_data.tile_x_coord(idx)
@@ -151,7 +151,7 @@ fn parse_tile_part(
   reader : BitReader,
   main_header : Header,
   tiles : Array[Tile],
-  tile_part_idx : Int,
+  tile_part_idx : Int32,
 ) -> Unit raise DecodeError {
   if reader.read_marker() != SOT {
     raise Marker(Expected("SOT"))
@@ -264,7 +264,7 @@ fn parse_tile_part(
           raise Marker(ParseFailure("COM"))
         }
       }
-      0x30..=0x3F =>
+      0x30..<=0x3F =>
         // "All markers with the marker code between 0xFF30 and 0xFF3F
         // have no marker segment parameters. They shall be skipped by
         // the decoder."
@@ -341,9 +341,9 @@ fn ComponentTile::resolution_tiles(
 /// A tile instantiated to a specific resolution of a component tile.
 priv struct ResolutionTile {
   /// The resolution of the tile.
-  resolution : Int
+  resolution : Int32
   /// The decomposition level of the tile.
-  decomposition_level : Int
+  decomposition_level : Int32
   /// The underlying component tile.
   component_tile : ComponentTile
   /// The rectangle of the resolution tile.
@@ -353,7 +353,7 @@ priv struct ResolutionTile {
 ///|
 fn ResolutionTile::new(
   component_tile : ComponentTile,
-  resolution : Int,
+  resolution : Int32,
 ) -> ResolutionTile {
   if !(component_tile.component_info.coding_style.parameters.num_resolution_levels >
     resolution) {
@@ -433,7 +433,7 @@ fn ResolutionTile::sub_band_rect(
 
 ///|
 /// `2_u64.pow(n)` (wrapping, as in a release build).
-fn pow2_u64(n : Int) -> UInt64 {
+fn pow2_u64(n : Int32) -> UInt64 {
   if n >= 64 {
     0
   } else {
@@ -443,7 +443,7 @@ fn pow2_u64(n : Int) -> UInt64 {
 
 ///|
 /// `2_u32.pow(n)` (wrapping, as in a release build).
-fn pow2_u32(n : Int) -> UInt {
+fn pow2_u32(n : Int32) -> UInt32 {
   if n >= 32 {
     0
   } else {
@@ -464,7 +464,7 @@ fn saturating_sub_u64(a : UInt64, b : UInt64) -> UInt64 {
 /// The exponent for determining the horizontal size of a precinct.
 ///
 /// `PPx` in the specification.
-fn ResolutionTile::precinct_exponent_x(self : ResolutionTile) -> Int {
+fn ResolutionTile::precinct_exponent_x(self : ResolutionTile) -> Int32 {
   self.component_tile.component_info.coding_style.parameters.precinct_exponents[self.resolution].0
 }
 
@@ -472,12 +472,12 @@ fn ResolutionTile::precinct_exponent_x(self : ResolutionTile) -> Int {
 /// The exponent for determining the vertical size of a precinct.
 ///
 /// `PPx` in the specification.
-fn ResolutionTile::precinct_exponent_y(self : ResolutionTile) -> Int {
+fn ResolutionTile::precinct_exponent_y(self : ResolutionTile) -> Int32 {
   self.component_tile.component_info.coding_style.parameters.precinct_exponents[self.resolution].1
 }
 
 ///|
-fn ResolutionTile::num_precincts_x(self : ResolutionTile) -> UInt {
+fn ResolutionTile::num_precincts_x(self : ResolutionTile) -> UInt32 {
   // See B-16.
   let { x0, x1, .. } = self.rect
   if x0 == x1 {
@@ -489,7 +489,7 @@ fn ResolutionTile::num_precincts_x(self : ResolutionTile) -> UInt {
 }
 
 ///|
-fn ResolutionTile::num_precincts_y(self : ResolutionTile) -> UInt {
+fn ResolutionTile::num_precincts_y(self : ResolutionTile) -> UInt32 {
   // See B-16.
   let { y0, y1, .. } = self.rect
   if y0 == y1 {
@@ -507,7 +507,7 @@ fn ResolutionTile::num_precincts(self : ResolutionTile) -> UInt64 {
 
 ///|
 /// `u32::checked_next_multiple_of`.
-fn checked_next_multiple_of_u32(v : UInt, rhs : UInt) -> UInt? {
+fn checked_next_multiple_of_u32(v : UInt32, rhs : UInt32) -> UInt32? {
   if rhs == 0 {
     return None
   }
@@ -526,7 +526,7 @@ fn checked_next_multiple_of_u32(v : UInt, rhs : UInt) -> UInt? {
 
 ///|
 /// `u32::next_multiple_of` (wrapping, as in a release build).
-fn next_multiple_of_u32(v : UInt, rhs : UInt) -> UInt {
+fn next_multiple_of_u32(v : UInt32, rhs : UInt32) -> UInt32 {
   let r = v % rhs
   if r == 0 {
     v
@@ -537,7 +537,7 @@ fn next_multiple_of_u32(v : UInt, rhs : UInt) -> UInt {
 
 ///|
 /// `u32::is_multiple_of`.
-fn is_multiple_of_u32(v : UInt, rhs : UInt) -> Bool {
+fn is_multiple_of_u32(v : UInt32, rhs : UInt32) -> Bool {
   if rhs == 0 {
     v == 0
   } else {
@@ -651,7 +651,7 @@ fn ResolutionTile::precincts(self : ResolutionTile) -> Array[PrecinctData]? {
 }
 
 ///|
-fn ResolutionTile::code_block_width(self : ResolutionTile) -> UInt {
+fn ResolutionTile::code_block_width(self : ResolutionTile) -> UInt32 {
   // See B-17.
   let xcb = self.component_tile.component_info.coding_style.parameters.code_block_width
   let limit = if self.resolution > 0 {
@@ -663,7 +663,7 @@ fn ResolutionTile::code_block_width(self : ResolutionTile) -> UInt {
 }
 
 ///|
-fn ResolutionTile::code_block_height(self : ResolutionTile) -> UInt {
+fn ResolutionTile::code_block_height(self : ResolutionTile) -> UInt32 {
   // See B-18.
   let ycb = self.component_tile.component_info.coding_style.parameters.code_block_height
   let limit = if self.resolution > 0 {
@@ -676,14 +676,14 @@ fn ResolutionTile::code_block_height(self : ResolutionTile) -> UInt {
 
 ///|
 priv struct TilePartHeader {
-  tile_index : Int
-  tile_part_length : UInt
+  tile_index : Int32
+  tile_part_length : UInt32
 }
 
 ///|
 priv struct PptMarkerData {
   data : BytesView
-  sequence_idx : Int
+  sequence_idx : Int32
 }
 
 ///|

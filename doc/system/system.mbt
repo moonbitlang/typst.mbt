@@ -29,11 +29,11 @@ pub extend SystemError with Show::{to_string, output}
 /// (`@doc.sans_fonts`). `today` fixes the date as `(year, month, day)`;
 /// otherwise the system date is used.
 pub fn world(
-  root? : String = ".",
-  embedded_fonts? : Bool = true,
-  system_fonts? : Bool = true,
-  font_paths? : Array[String] = [],
-  today? : (Int, Int, Int),
+  root~ : String = ".",
+  embedded_fonts~ : Bool = true,
+  system_fonts~ : Bool = true,
+  font_paths~ : Array[String] = [],
+  today? : (Int32, Int32, Int32),
 ) -> @doc.DocWorld raise SystemError {
   let root = @platform.canonicalize(root) catch {
     err => raise SystemError("root directory not found (\{root}): \{err}")
@@ -113,7 +113,7 @@ pub fn read(path : String) -> Bytes raise SystemError {
 /// drive, a `..`, a backslash). The names are the source locations that
 /// the compiler recorded for the program; links inside the root are
 /// followed like any other file.
-pub fn sources(root? : String = ".") -> (String, String) -> String? {
+pub fn sources(root~ : String = ".") -> (String, String) -> String? {
   (file, _) => {
     guard !file.has_prefix("/") &&
       !file.contains("..") &&

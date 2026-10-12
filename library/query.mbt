@@ -129,7 +129,7 @@ fn format_query_unique_convergence_warning(
 /// The warning when a query did not converge.
 fn format_query_convergence_warning(
   span : @syntax.Span,
-  lengths : History[Int],
+  lengths : History[Int32],
   what : String,
 ) -> SourceDiagnostic {
   let diag = SourceDiagnostic::warning_at(span, "\{what} did not stabilize")

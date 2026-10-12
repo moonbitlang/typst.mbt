@@ -6,7 +6,7 @@ fn str_collation_cmp(
   a : String,
   b : String,
   locale : @citationberg.LocaleCode,
-) -> Int {
+) -> Int32 {
   if icu_locale_parses(locale.0) {
     root_collation_compare(a, b)
   } else {
@@ -20,7 +20,7 @@ fn opt_collation_cmp(
   a : String?,
   b : String?,
   locale : @citationberg.LocaleCode,
-) -> Int {
+) -> Int32 {
   match (a, b) {
     (Some(a), Some(b)) => str_collation_cmp(a, b, locale)
     (Some(_), None) => 1
@@ -59,12 +59,12 @@ fn icu_locale_parses(s : String) -> Bool {
 fn StyleContext::cmp_entries(
   self : StyleContext,
   a : CitationItem,
-  a_idx : Int,
+  a_idx : Int32,
   b : CitationItem,
-  b_idx : Int,
+  b_idx : Int32,
   key : @citationberg.SortKey,
   term_locale : @citationberg.LocaleCode?,
-) -> Int {
+) -> Int32 {
   let (ordering, empty_value) = match key {
     Variable(variable=Standard(s), ..) => {
       let a = InstanceContext::variable_sort_instance(a, a_idx)
@@ -130,7 +130,7 @@ fn StyleContext::cmp_entries(
       }
     }
     MacroName(name~, names_min~, names_use_first~, names_use_last~, ..) => {
-      let render = (entry : CitationItem, idx : Int) => {
+      let render = (entry : CitationItem, idx : Int32) => {
         let ctx = self.macro_sorting_ctx(
           entry,
           idx,
@@ -185,7 +185,7 @@ fn StyleContext::sort(
   cites : Array[CitationItem],
   sort : @citationberg.Sort?,
   term_locale : @citationberg.LocaleCode?,
-  citation_number : (Entry) -> Int,
+  citation_number : (Entry) -> Int32,
 ) -> Unit {
   guard sort is Some(sort) else { return }
   stable_sort_by(cites, (a, b) => {
@@ -209,7 +209,7 @@ fn StyleContext::sort(
 
 ///|
 /// A stable merge sort (Rust's `slice::sort_by` is stable).
-fn[T] stable_sort_by(xs : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] stable_sort_by(xs : Array[T], cmp : (T, T) -> Int32) -> Unit {
   let n = xs.length()
   if n < 2 {
     return

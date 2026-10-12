@@ -11,25 +11,25 @@ priv struct Pending {
   /// start of the allocation
   buf : FixedArray[Byte]
   /// next pending byte to output to the stream
-  mut out : Int
+  mut out : Int32
   /// number of bytes in the pending buffer
-  mut pending : Int
+  mut pending : Int32
 }
 
 ///|
-fn Pending::new(len : Int) -> Pending {
+fn Pending::new(len : Int32) -> Pending {
   { buf: FixedArray::make(len, b'\x00'), out: 0, pending: 0, }
 }
 
 ///|
 /// Number of bytes that can be added to the pending buffer until it is full.
-fn Pending::remaining(self : Pending) -> Int {
+fn Pending::remaining(self : Pending) -> Int32 {
   self.buf.length() - (self.out + self.pending)
 }
 
 ///|
 /// Mark a number of pending bytes as no longer pending.
-fn Pending::advance(self : Pending, number_of_bytes : Int) -> Unit {
+fn Pending::advance(self : Pending, number_of_bytes : Int32) -> Unit {
   self.out += number_of_bytes
   self.pending -= number_of_bytes
   if self.pending == 0 {
@@ -50,8 +50,8 @@ fn Pending::push(self : Pending, byte : Byte) -> Unit {
 fn Pending::extend_window(
   self : Pending,
   src : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
 ) -> Unit {
   guard self.remaining() >= len else {
     abort("buf.len() must fit in remaining()")
@@ -69,11 +69,11 @@ fn Pending::extend_window(
 /// The literal/length/distance symbol buffer (upstream `SymBuf`).
 priv struct SymBuf {
   buf : FixedArray[Byte]
-  mut filled : Int
+  mut filled : Int32
 }
 
 ///|
-fn SymBuf::new(lit_bufsize : Int) -> SymBuf {
+fn SymBuf::new(lit_bufsize : Int32) -> SymBuf {
   { buf: FixedArray::make(lit_bufsize * 3, b'\x00'), filled: 0, }
 }
 
@@ -95,14 +95,14 @@ fn SymBuf::clear(self : SymBuf) -> Unit {
 }
 
 ///|
-fn SymBuf::push_lit(self : SymBuf, byte : Int) -> Unit {
+fn SymBuf::push_lit(self : SymBuf, byte : Int32) -> Unit {
   // NOTE: we rely on the buffer being zeroed here!
   self.buf[self.filled + 2] = byte.to_byte()
   self.filled += 3
 }
 
 ///|
-fn SymBuf::push_dist(self : SymBuf, dist : Int, len : Int) -> Unit {
+fn SymBuf::push_dist(self : SymBuf, dist : Int32, len : Int32) -> Unit {
   self.buf[self.filled] = (dist & 0xff).to_byte()
   self.buf[self.filled + 1] = ((dist >> 8) & 0xff).to_byte()
   self.buf[self.filled + 2] = (len & 0xff).to_byte()
@@ -118,15 +118,15 @@ priv struct BitWriter {
   mut bit_buffer : UInt64
   /// Number of valid bits in bit_buffer. All bits above the last valid bit
   /// are always zero.
-  mut bits_valid : Int
+  mut bits_valid : Int32
   // (`bits_used` is only read by `deflatePending`, not ported)
 }
 
 ///|
-const BIT_BUF_SIZE : Int = 64
+const BIT_BUF_SIZE : Int32 = 64
 
 ///|
-fn BitWriter::push_le_bytes(self : BitWriter, v : UInt64, n : Int) -> Unit {
+fn BitWriter::push_le_bytes(self : BitWriter, v : UInt64, n : Int32) -> Unit {
   let pending = self.pending
   guard n >= 0 && n <= 8 && pending.remaining() >= n else {
     abort("buf.len() must fit in remaining()")
@@ -159,7 +159,7 @@ fn BitWriter::emit_align(self : BitWriter) -> Unit {
 }
 
 ///|
-fn BitWriter::send_bits(self : BitWriter, val : UInt64, len : Int) -> Unit {
+fn BitWriter::send_bits(self : BitWriter, val : UInt64, len : Int32) -> Unit {
   let total_bits = len + self.bits_valid
   if total_bits < BIT_BUF_SIZE {
     self.bit_buffer = self.bit_buffer | (val << self.bits_valid)
@@ -173,7 +173,7 @@ fn BitWriter::send_bits(self : BitWriter, val : UInt64, len : Int) -> Unit {
 fn BitWriter::send_bits_overflow(
   self : BitWriter,
   val : UInt64,
-  total_bits : Int,
+  total_bits : Int32,
 ) -> Unit {
   if self.bits_valid == BIT_BUF_SIZE {
     self.push_le_bytes(self.bit_buffer, 8)
@@ -190,9 +190,9 @@ fn BitWriter::send_bits_overflow(
 ///|
 fn BitWriter::send_code(
   self : BitWriter,
-  code : Int,
-  codes : FixedArray[Int],
-  lens : FixedArray[Int],
+  code : Int32,
+  codes : FixedArray[Int32],
+  lens : FixedArray[Int32],
 ) -> Unit {
   self.send_bits(codes[code].to_uint64(), lens[code])
 }
@@ -207,18 +207,18 @@ fn BitWriter::align(self : BitWriter) -> Unit {
 }
 
 ///|
-const BLOCK_STORED : Int = 0
+const BLOCK_STORED : Int32 = 0
 
 ///|
-const BLOCK_STATIC_TREES : Int = 1
+const BLOCK_STATIC_TREES : Int32 = 1
 
 ///|
-const BLOCK_DYNAMIC_TREES : Int = 2
+const BLOCK_DYNAMIC_TREES : Int32 = 2
 
 ///|
 fn BitWriter::emit_tree(
   self : BitWriter,
-  block_type : Int,
+  block_type : Int32,
   is_last_block : Bool,
 ) -> Unit {
   let header_bits = (block_type << 1) | (if is_last_block { 1 } else { 0 })
@@ -226,13 +226,13 @@ fn BitWriter::emit_tree(
 }
 
 ///|
-const END_BLOCK : Int = 256
+const END_BLOCK : Int32 = 256
 
 ///|
 fn BitWriter::emit_end_block(
   self : BitWriter,
-  lcodes : FixedArray[Int],
-  llens : FixedArray[Int],
+  lcodes : FixedArray[Int32],
+  llens : FixedArray[Int32],
 ) -> Unit {
   self.send_code(END_BLOCK, lcodes, llens)
 }
@@ -243,7 +243,7 @@ fn BitWriter::emit_end_block(
 #valtype
 priv struct EncodedBits {
   bits : UInt64
-  len : Int
+  len : Int32
 }
 
 ///|
@@ -252,9 +252,9 @@ priv struct EncodedBits {
 /// [DeflateStream::compress_block_help]).
 #inline
 fn encode_len(
-  lcodes : FixedArray[Int],
-  llens : FixedArray[Int],
-  lc : Int,
+  lcodes : FixedArray[Int32],
+  llens : FixedArray[Int32],
+  lc : Int32,
 ) -> EncodedBits {
   let mut lc = lc
   // Send the length code, len is the match length - STD_MIN_MATCH
@@ -276,9 +276,9 @@ fn encode_len(
 /// table sizes, see [DeflateStream::compress_block_help]).
 #inline
 fn encode_dist(
-  dcodes : FixedArray[Int],
-  dlens : FixedArray[Int],
-  dist : Int,
+  dcodes : FixedArray[Int32],
+  dlens : FixedArray[Int32],
+  dist : Int32,
 ) -> EncodedBits {
   let mut dist = dist - 1 // dist is now the match distance - 1
   let code = dist_code.unsafe_get(
@@ -303,34 +303,34 @@ fn encode_dist(
 ///|
 /// `x as u64` for a non-negative `x` (intrinsic conversions only).
 #inline
-fn u64_of_int(x : Int) -> UInt64 {
+fn u64_of_int(x : Int32) -> UInt64 {
   UInt64::extend_uint(x.reinterpret_as_uint())
 }
 
 ///|
-fn d_code(dist : Int) -> Int {
+fn d_code(dist : Int32) -> Int32 {
   let index = if dist < 256 { dist } else { 256 + (dist >> 7) }
   dist_code[index]
 }
 
 ///|
 /// Repeat previous bit length 3-6 times (2 bits of repeat count).
-const REP_3_6 : Int = 16
+const REP_3_6 : Int32 = 16
 
 ///|
 /// Repeat a zero length 3-10 times (3 bits of repeat count).
-const REPZ_3_10 : Int = 17
+const REPZ_3_10 : Int32 = 17
 
 ///|
 /// Repeat a zero length 11-138 times (7 bits of repeat count).
-const REPZ_11_138 : Int = 18
+const REPZ_11_138 : Int32 = 18
 
 ///|
 fn BitWriter::send_tree(
   self : BitWriter,
   tree : TreeDesc,
   bl_tree : TreeDesc,
-  max_code : Int,
+  max_code : Int32,
 ) -> Unit {
   let mut prevlen = -1 // last emitted length
   let mut nextlen = tree.b[0] // length of next code
@@ -388,15 +388,15 @@ fn BitWriter::send_tree(
 /// Static parameters of a tree (upstream `StaticTreeDesc`).
 priv struct StaticTreeDesc {
   /// static tree (lengths) or None
-  static_lens : FixedArray[Int]?
+  static_lens : FixedArray[Int32]?
   /// extra bits for each code
-  extra_bits : ReadOnlyArray[Int]
+  extra_bits : ReadOnlyArray[Int32]
   /// base index for extra_bits
-  extra_base : Int
+  extra_base : Int32
   /// max number of elements in the tree
-  elems : Int
+  elems : Int32
   /// max bit length for the codes
-  max_length : Int
+  max_length : Int32
 }
 
 ///|
@@ -430,14 +430,14 @@ let static_bl_desc : StaticTreeDesc = {
 /// A dynamic tree (upstream `TreeDesc`). Upstream's `Value` holds two `u16`s:
 /// `a` is the frequency or the code, `b` the dad or the length.
 priv struct TreeDesc {
-  a : FixedArray[Int]
-  b : FixedArray[Int]
-  mut max_code : Int
+  a : FixedArray[Int32]
+  b : FixedArray[Int32]
+  mut max_code : Int32
   stat_desc : StaticTreeDesc
 }
 
 ///|
-fn TreeDesc::new(n : Int, stat_desc : StaticTreeDesc) -> TreeDesc {
+fn TreeDesc::new(n : Int32, stat_desc : StaticTreeDesc) -> TreeDesc {
   {
     a: FixedArray::make(n, 0),
     b: FixedArray::make(n, 0),
@@ -450,12 +450,12 @@ fn TreeDesc::new(n : Int, stat_desc : StaticTreeDesc) -> TreeDesc {
 /// The heap used to build the Huffman trees. The sons of heap[n] are
 /// heap[2*n] and heap[2*n+1]. heap[0] is not used.
 priv struct Heap {
-  heap : FixedArray[Int]
+  heap : FixedArray[Int32]
   /// number of elements in the heap
-  mut heap_len : Int
+  mut heap_len : Int32
   /// element of the largest frequency
-  mut heap_max : Int
-  depth : FixedArray[Int]
+  mut heap_max : Int32
+  depth : FixedArray[Int32]
 }
 
 ///|
@@ -471,7 +471,7 @@ fn Heap::new() -> Heap {
 ///|
 /// Construct the initial heap, with least frequent element in
 /// heap[SMALLEST].
-fn Heap::initialize(self : Heap, tree : TreeDesc, elements : Int) -> Int {
+fn Heap::initialize(self : Heap, tree : TreeDesc, elements : Int32) -> Int32 {
   let mut max_code = -1
   self.heap_len = 0
   self.heap_max = HEAP_SIZE
@@ -490,10 +490,10 @@ fn Heap::initialize(self : Heap, tree : TreeDesc, elements : Int) -> Int {
 
 ///|
 /// Index within the heap array of least frequent node in the Huffman tree.
-const SMALLEST : Int = 1
+const SMALLEST : Int32 = 1
 
 ///|
-fn Heap::pqdownheap(self : Heap, tree : TreeDesc, k : Int) -> Unit {
+fn Heap::pqdownheap(self : Heap, tree : TreeDesc, k : Int32) -> Unit {
   let mut k = k
   let v = self.heap[k]
   let v_val = freq_and_depth(tree, self.depth, v)
@@ -525,14 +525,18 @@ fn Heap::pqdownheap(self : Heap, tree : TreeDesc, k : Int) -> Unit {
 /// Pack the node's frequency and depth into a single integer (a closure in
 /// upstream's `pqdownheap`).
 #inline
-fn freq_and_depth(tree : TreeDesc, depth : FixedArray[Int], i : Int) -> Int {
+fn freq_and_depth(
+  tree : TreeDesc,
+  depth : FixedArray[Int32],
+  i : Int32,
+) -> Int32 {
   (tree.a[i] << 8) | depth[i]
 }
 
 ///|
 /// Remove the smallest element from the heap and recreate the heap with one
 /// less element.
-fn Heap::pqremove(self : Heap, tree : TreeDesc) -> Int {
+fn Heap::pqremove(self : Heap, tree : TreeDesc) -> Int32 {
   let top = self.heap[SMALLEST]
   self.heap[SMALLEST] = self.heap[self.heap_len]
   self.heap_len -= 1
@@ -546,7 +550,7 @@ fn Heap::pqremove(self : Heap, tree : TreeDesc) -> Int {
 fn Heap::construct_huffman_tree(
   self : Heap,
   tree : TreeDesc,
-  node : Int,
+  node : Int32,
 ) -> Unit {
   let mut node = node
   while true {
@@ -626,7 +630,7 @@ fn DeflateStream::gen_bitlen(
   self : DeflateStream,
   heap : Heap,
   desc : TreeDesc,
-) -> FixedArray[Int] {
+) -> FixedArray[Int32] {
   let tree = desc
   let max_code = desc.max_code
   let stree = desc.stat_desc.static_lens
@@ -714,10 +718,10 @@ fn DeflateStream::gen_bitlen(
 /// Generate the codes for a given tree and bit counts (which need not be
 /// optimal).
 fn gen_codes(
-  codes : FixedArray[Int],
-  lens : FixedArray[Int],
-  max_code : Int,
-  bl_count : FixedArray[Int],
+  codes : FixedArray[Int32],
+  lens : FixedArray[Int32],
+  max_code : Int32,
+  bl_count : FixedArray[Int32],
 ) -> Unit {
   let next_code = FixedArray::make(MAX_BITS + 1, 0) // next code value for each bit length
   let mut code = 0 // running code value
@@ -742,7 +746,7 @@ fn gen_codes(
 ///|
 /// Scan a literal or distance tree to determine the frequencies of the codes
 /// in the bit length tree.
-fn scan_tree(bl_desc : TreeDesc, tree : TreeDesc, max_code : Int) -> Unit {
+fn scan_tree(bl_desc : TreeDesc, tree : TreeDesc, max_code : Int32) -> Unit {
   let mut prevlen = -1 // last emitted length
   let mut nextlen = tree.b[0] // length of next code
   let mut count = 0 // repeat count of the current code
@@ -792,9 +796,9 @@ fn scan_tree(bl_desc : TreeDesc, tree : TreeDesc, max_code : Int) -> Unit {
 /// lengths of the bit length codes, the literal tree and the distance tree.
 fn DeflateStream::send_all_trees(
   self : DeflateStream,
-  lcodes : Int,
-  dcodes : Int,
-  blcodes : Int,
+  lcodes : Int32,
+  dcodes : Int32,
+  blcodes : Int32,
 ) -> Unit {
   let bw = self.bit_writer
   bw.send_bits((lcodes - 257).to_uint64(), 5) // not +255 as stated in appnote.txt
@@ -812,7 +816,7 @@ fn DeflateStream::send_all_trees(
 ///|
 /// Construct the Huffman tree for the bit lengths and return the index in
 /// bl_order of the last bit length code to send.
-fn DeflateStream::build_bl_tree(self : DeflateStream) -> Int {
+fn DeflateStream::build_bl_tree(self : DeflateStream) -> Int32 {
   // Determine the bit length frequencies for literal and distance trees
   scan_tree(self.bl_desc, self.l_desc, self.l_desc.max_code)
   scan_tree(self.bl_desc, self.d_desc, self.d_desc.max_code)
@@ -868,10 +872,10 @@ fn DeflateStream::compress_block_dynamic_trees(self : DeflateStream) -> Unit {
 /// kept in locals (performance).
 fn DeflateStream::compress_block_help(
   self : DeflateStream,
-  lcodes : FixedArray[Int],
-  llens : FixedArray[Int],
-  dcodes : FixedArray[Int],
-  dlens : FixedArray[Int],
+  lcodes : FixedArray[Int32],
+  llens : FixedArray[Int32],
+  dcodes : FixedArray[Int32],
+  dlens : FixedArray[Int32],
 ) -> Unit {
   let sym = self.sym_buf.buf
   let filled = self.sym_buf.filled
@@ -935,7 +939,7 @@ fn DeflateStream::compress_block_help(
 
 ///|
 /// Upstream `detect_data_type`: Check if the data type is TEXT or BINARY.
-fn detect_data_type(dyn_tree : TreeDesc) -> Int {
+fn detect_data_type(dyn_tree : TreeDesc) -> Int32 {
   // set bits 0..6, 14..25, and 28..31
   // 0xf3ffc07f = binary 11110011111111111100000001111111
   let mut mask = 0xf3ffc07fU
@@ -961,20 +965,20 @@ fn detect_data_type(dyn_tree : TreeDesc) -> Int {
 }
 
 ///|
-const Z_BINARY : Int = 0
+const Z_BINARY : Int32 = 0
 
 ///|
-const Z_TEXT : Int = 1
+const Z_TEXT : Int32 = 1
 
 ///|
-const Z_UNKNOWN : Int = 2
+const Z_UNKNOWN : Int32 = 2
 
 ///|
 /// Send a stored block.
 fn DeflateStream::zng_tr_stored_block(
   self : DeflateStream,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   is_last : Bool,
 ) -> Unit {
   let bw = self.bit_writer
@@ -998,8 +1002,8 @@ fn DeflateStream::zng_tr_stored_block(
 /// trees or store, and write out the encoded block.
 fn DeflateStream::zng_tr_flush_block(
   self : DeflateStream,
-  window_offset : Int?,
-  stored_len : Int,
+  window_offset : Int32?,
+  stored_len : Int32,
   last : Bool,
 ) -> Unit {
   // window_offset: offset of the input block into the window
@@ -1076,7 +1080,7 @@ fn DeflateStream::init_block(self : DeflateStream) -> Unit {
 }
 
 ///|
-fn DeflateStream::tally_lit(self : DeflateStream, unmatched : Int) -> Bool {
+fn DeflateStream::tally_lit(self : DeflateStream, unmatched : Int32) -> Bool {
   self.sym_buf.push_lit(unmatched)
   self.l_desc.a[unmatched] += 1
   // signal that the current block should be flushed
@@ -1086,8 +1090,8 @@ fn DeflateStream::tally_lit(self : DeflateStream, unmatched : Int) -> Bool {
 ///|
 fn DeflateStream::tally_dist(
   self : DeflateStream,
-  dist : Int,
-  len : Int,
+  dist : Int32,
+  len : Int32,
 ) -> Bool {
   self.sym_buf.push_dist(dist, len)
   self.matches = @cmp.minimum(self.matches + 1, 255)

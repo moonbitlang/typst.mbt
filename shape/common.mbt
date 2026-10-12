@@ -2,10 +2,10 @@
 // languages, features and variations).
 
 ///|
-pub const HB_FEATURE_GLOBAL_START : UInt = 0
+pub const HB_FEATURE_GLOBAL_START : UInt32 = 0
 
 ///|
-pub const HB_FEATURE_GLOBAL_END : UInt = 0xFFFFFFFF
+pub const HB_FEATURE_GLOBAL_END : UInt32 = 0xFFFFFFFF
 
 ///|
 /// Defines the direction in which text is to be read.
@@ -879,9 +879,9 @@ pub let script_myanmar_zawgyi : Script = Script::from_bytes(b"Qaag")
 /// `shape`s input it should be applied.
 pub(all) struct Feature {
   tag : @otf.Tag
-  value : UInt
-  start : UInt
-  end : UInt
+  value : UInt32
+  start : UInt32
+  end : UInt32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -904,9 +904,9 @@ pub extend Feature with @debug.Debug::{to_repr}
 /// `start..=end` (rustybuzz's `Feature::new` with resolved range bounds).
 pub fn Feature::new(
   tag : @otf.Tag,
-  value : UInt,
-  start? : UInt = 0,
-  end? : UInt = 0xFFFFFFFF,
+  value : UInt32,
+  start~ : UInt32 = 0,
+  end~ : UInt32 = 0xFFFFFFFF,
 ) -> Feature {
   { tag, value, start, end, }
 }
@@ -941,7 +941,7 @@ pub fn Feature::from_str(s : String) -> Feature? {
   let p = TextParser::new(s)
 
   // Parse prefix.
-  let mut value : UInt = 1
+  let mut value : UInt32 = 1
   guard p.curr_byte() is Some(first) else { return None }
   match first {
     '-' => {

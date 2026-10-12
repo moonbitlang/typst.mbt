@@ -15,12 +15,12 @@
 /// palette).
 pub(all) struct GifFrame {
   /// The logical screen size.
-  screen_width : Int
-  screen_height : Int
-  left : Int
-  top : Int
-  width : Int
-  height : Int
+  screen_width : Int32
+  screen_height : Int32
+  left : Int32
+  top : Int32
+  width : Int32
+  height : Int32
   /// `width * height * 4` bytes.
   rgba : Bytes
 }
@@ -28,11 +28,11 @@ pub(all) struct GifFrame {
 ///|
 priv struct GifReader {
   data : BytesView
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
-fn GifReader::byte(self : GifReader) -> Int raise ImageError {
+fn GifReader::byte(self : GifReader) -> Int32 raise ImageError {
   if self.pos >= self.data.length() {
     decoding_error("Gif", "Unexpected End of File")
   }
@@ -42,7 +42,7 @@ fn GifReader::byte(self : GifReader) -> Int raise ImageError {
 }
 
 ///|
-fn GifReader::bytes(self : GifReader, n : Int) -> BytesView raise ImageError {
+fn GifReader::bytes(self : GifReader, n : Int32) -> BytesView raise ImageError {
   if self.pos + n > self.data.length() {
     decoding_error("Gif", "Unexpected End of File")
   }
@@ -62,8 +62,8 @@ pub fn decode_gif_first_frame(data : BytesView) -> GifFrame? raise ImageError {
 /// The logical screen, the ICC profile read by `read_info` and the first
 /// frame of a GIF.
 priv struct GifFirst {
-  screen_width : Int
-  screen_height : Int
+  screen_width : Int32
+  screen_height : Int32
   icc : Bytes?
   frame : GifFrame?
 }
@@ -99,7 +99,7 @@ fn gif_decode_first(
 
   // The frame being described (created by a control extension or an image
   // descriptor).
-  let mut transparent : Int? = None
+  let mut transparent : Int32? = None
   let mut has_frame = false
   let mut icc : Buffer? = None
   let first = (frame : GifFrame?) => {
@@ -283,11 +283,11 @@ pub fn decode_gif_image(
 priv struct GifLzwInput {
   r : GifReader
   /// Bytes left in the current sub-block; `-1` after the terminator.
-  mut left : Int
+  mut left : Int32
 }
 
 ///|
-fn GifLzwInput::next_byte(self : GifLzwInput) -> Int? raise ImageError {
+fn GifLzwInput::next_byte(self : GifLzwInput) -> Int32? raise ImageError {
   while self.left == 0 {
     let len = self.r.byte()
     if len == 0 {
@@ -308,12 +308,12 @@ fn GifLzwInput::next_byte(self : GifLzwInput) -> Int? raise ImageError {
 /// rows like `PixelConverter::read_into_buffer`.
 fn gif_decode_pixels(
   r : GifReader,
-  min_code_size : Int,
-  width : Int,
-  height : Int,
+  min_code_size : Int32,
+  width : Int32,
+  height : Int32,
   interlaced : Bool,
   palette : BytesView,
-  transparent : Int?,
+  transparent : Int32?,
 ) -> Bytes raise ImageError {
   let n = width * height
   let indices = FixedArray::make(n, b'\x00')
@@ -346,7 +346,7 @@ fn gif_decode_pixels(
 
 ///|
 /// The row order of an interlaced frame (`InterlaceIterator`).
-fn gif_interlaced_rows(len : Int) -> Array[Int] {
+fn gif_interlaced_rows(len : Int32) -> Array[Int32] {
   let rows = []
   if len == 0 {
     return rows
@@ -376,9 +376,9 @@ fn gif_interlaced_rows(len : Int) -> Array[Int] {
 /// written. Invalid codes raise `weezl`'s `InvalidCode` error.
 fn lzw_decode_into(
   input : GifLzwInput,
-  min_code_size : Int,
+  min_code_size : Int32,
   out : FixedArray[Byte],
-) -> Int raise ImageError {
+) -> Int32 raise ImageError {
   let clear = 1 << min_code_size
   let end = clear + 1
   // Each entry: (prefix code, last byte, length).
@@ -467,10 +467,10 @@ fn lzw_decode_into(
 
 ///|
 fn first_byte(
-  prefix : FixedArray[Int],
+  prefix : FixedArray[Int32],
   suffix : FixedArray[Byte],
-  code : Int,
-) -> Int {
+  code : Int32,
+) -> Int32 {
   let mut c = code
   while prefix[c] >= 0 {
     c = prefix[c]

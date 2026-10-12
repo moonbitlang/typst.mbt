@@ -1,7 +1,7 @@
 // Benchmarks of the resamplers as hayro uses them (`moon bench`).
 
 ///|
-fn bench_image(w : Int, h : Int, channels : Int) -> Bytes {
+fn bench_image(w : Int32, h : Int32, channels : Int32) -> Bytes {
   let mut x = 0x9E3779B9U
   Bytes::makei(w * h * channels, i => {
     x = x * 1103515245U + 12345U

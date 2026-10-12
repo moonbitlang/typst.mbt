@@ -3,10 +3,10 @@
 
 ///|
 /// Maximum number of instructions we will execute in `Interp::run()`.
-const MAX_RUN_INSTRUCTIONS : Int = 1_000_000
+const MAX_RUN_INSTRUCTIONS : Int32 = 1_000_000
 
 ///|
-const MAX_DEFINITION_SIZE : Int = 65535
+const MAX_DEFINITION_SIZE : Int32 = 65535
 
 ///|
 /// Tracks budgets for loops to limit execution time.
@@ -17,7 +17,7 @@ priv struct LoopBudget {
 }
 
 ///|
-fn LoopBudget::new(cvt_len : Int, point_count : Int?) -> LoopBudget {
+fn LoopBudget::new(cvt_len : Int32, point_count : Int32?) -> LoopBudget {
   // Compute limits for loop calls and backward jumps.
   let limit = match point_count {
     Some(point_count) =>
@@ -46,7 +46,7 @@ fn LoopBudget::doing_backward_jump(
 ///|
 fn LoopBudget::doing_loop_call(
   self : LoopBudget,
-  count : Int,
+  count : Int32,
 ) -> Unit raise HintErrorKind {
   self.loop_calls += count.to_int64()
   if self.loop_calls > self.limit {
@@ -65,13 +65,13 @@ priv struct Interp {
   storage : CowSlice
   value_stack : ValueStack
   loop_budget : LoopBudget
-  axis_count : Int
+  axis_count : Int32
   coords : Array[F2Dot14]
 }
 
 ///|
 fn Interp::new(
-  cvt_len : Int,
+  cvt_len : Int32,
   program : ProgramState,
   graphics : RetainedGraphicsState,
   functions : DefinitionMap,
@@ -81,7 +81,7 @@ fn Interp::new(
   value_stack : ValueStack,
   twilight : Zone,
   glyph : Zone,
-  axis_count : Int,
+  axis_count : Int32,
   coords : Array[F2Dot14],
   is_composite : Bool,
 ) -> Interp {
@@ -208,8 +208,8 @@ fn Interp::dispatch_inner(
 ) -> Unit raise HintErrorKind {
   let opcode = ins.opcode
   match opcode {
-    0x00..=0x05 => self.op_svtca(opcode)
-    0x06..=0x09 => self.op_svtl(opcode)
+    0x00..<=0x05 => self.op_svtca(opcode)
+    0x06..<=0x09 => self.op_svtl(opcode)
     0x0A => self.op_spvfs()
     0x0B => self.op_sfvfs()
     0x0C => self.op_gpv()
@@ -362,16 +362,16 @@ fn Interp::dispatch_inner(
     0x65 => self.value_stack.apply_unary(n => -n)
     0x66 => self.value_stack.apply_unary(n => hfloor(n))
     0x67 => self.value_stack.apply_unary(n => hceil(n))
-    0x68..=0x6B => {
+    0x68..<=0x6B => {
       let n1 = self.value_stack.pop()
       let n2 = self.graphics.round(n1)
       self.value_stack.push(n2)
     }
     // "No round" means do nothing :)
-    0x6C..=0x6F => ()
+    0x6C..<=0x6F => ()
     0x70 => self.op_wcvtf()
     0x71 | 0x72 => self.op_deltap(opcode)
-    0x73..=0x75 => self.op_deltac(opcode)
+    0x73..<=0x75 => self.op_deltac(opcode)
     0x76 => {
       let n = self.value_stack.pop()
       self.super_round(0x4000, n)
@@ -502,7 +502,7 @@ fn Interp::do_jump(self : Interp, cond : Bool) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::decode_next_opcode(self : Interp) -> Int raise HintErrorKind {
+fn Interp::decode_next_opcode(self : Interp) -> Int32 raise HintErrorKind {
   match self.program.decoder.decode() {
     Some(Some(ins)) => ins.opcode
     _ => raise UnexpectedEndOfBytecode
@@ -526,7 +526,7 @@ fn Interp::op_loopcall(self : Interp) -> Unit raise HintErrorKind {
 fn Interp::do_def(
   self : Interp,
   is_function : Bool,
-  key : Int,
+  key : Int32,
 ) -> Unit raise HintErrorKind {
   if self.program.initial == Glyph {
     raise DefinitionInGlyphProgram
@@ -555,8 +555,8 @@ fn Interp::do_def(
 fn Interp::do_call(
   self : Interp,
   is_function : Bool,
-  count : Int,
-  key : Int,
+  count : Int32,
+  key : Int32,
 ) -> Unit raise HintErrorKind {
   if count == 0 {
     return
@@ -578,10 +578,10 @@ fn Interp::do_call(
 
 ///|
 fn line_vector(
-  p1 : (Int, Int),
-  p2 : (Int, Int),
+  p1 : (Int32, Int32),
+  p2 : (Int32, Int32),
   is_parallel : Bool,
-) -> (Int, Int) {
+) -> (Int32, Int32) {
   let mut a = p1.0 - p2.0
   let mut b = p1.1 - p2.1
   if a == 0 && b == 0 {
@@ -601,7 +601,7 @@ fn line_vector(
 // Cannot fail; every opcode handler returns `OpResult`
 // (skrifa 0.42.1 src/outline/glyf/hint/engine/graphics.rs:40).
 #warnings("-unused_error_type")
-fn Interp::op_svtca(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_svtca(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   // The low bit of the opcode determines the axis to set (1 = x, 0 = y).
   let x = (opcode & 1) << 14
   let y = x ^ 0x4000
@@ -622,7 +622,7 @@ fn Interp::op_svtca(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_svtl(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_svtl(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let index1 = self.value_stack.pop()
   let index2 = self.value_stack.pop()
   let is_parallel = (opcode & 1) == 0
@@ -654,7 +654,7 @@ fn Interp::op_sfvtpv(self : Interp) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_sdpvtl(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_sdpvtl(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let index1 = self.value_stack.pop()
   let index2 = self.value_stack.pop()
   let is_parallel = (opcode & 1) == 0
@@ -721,8 +721,8 @@ fn Interp::op_gfv(self : Interp) -> Unit raise HintErrorKind {
 ///|
 fn Interp::super_round(
   self : Interp,
-  grid_period : Int,
-  selector : Int,
+  grid_period : Int32,
+  selector : Int32,
 ) -> Unit {
   let round_state = self.graphics.round_state
   let period = match selector & 0xC0 {
@@ -891,7 +891,7 @@ fn Interp::op_ws(self : Interp) -> Unit raise HintErrorKind {
 // Data
 
 ///|
-fn Interp::op_gc(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_gc(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let p = self.value_stack.pop()
   let gs = self.graphics
   if !gs.is_pedantic && !gs.in_bounds([(gs.zp2, p)]) {
@@ -921,7 +921,7 @@ fn Interp::op_scfs(self : Interp) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_md(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_md(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let p1 = self.value_stack.pop()
   let p2 = self.value_stack.pop()
   let gs = self.graphics
@@ -949,7 +949,7 @@ fn Interp::op_md(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 // Delta exceptions
 
 ///|
-fn Interp::op_deltap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_deltap(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let ppem = gs.retained.ppem.reinterpret_as_uint()
   let point_count = gs.zp0z().len()
@@ -997,7 +997,7 @@ fn Interp::op_deltap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_deltac(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_deltac(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let ppem = gs.retained.ppem.reinterpret_as_uint()
   let n = self.value_stack.pop_count_checked()
@@ -1122,7 +1122,7 @@ fn Interp::set_on_curve_for_range(
 }
 
 ///|
-fn Interp::op_shp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_shp(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let disp = gs.point_displacement(opcode)
   let count = gs.loop_counter
@@ -1134,7 +1134,7 @@ fn Interp::op_shp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_shc(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_shc(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let contour_ix = self.value_stack.pop()
   if !gs.is_pedantic && (contour_ix < 0 || contour_ix >= gs.zp2z().contours.len) {
@@ -1159,7 +1159,7 @@ fn Interp::op_shc(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_shz(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_shz(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   ignore(zone_pointer_from(self.value_stack.pop()))
   let gs = self.graphics
   let point_disp = gs.point_displacement(opcode)
@@ -1207,7 +1207,7 @@ fn Interp::op_shpix(self : Interp) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_msirp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_msirp(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let distance = self.value_stack.pop()
   let point_ix = self.value_stack.pop()
@@ -1231,7 +1231,7 @@ fn Interp::op_msirp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_mdap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_mdap(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let p = self.value_stack.pop()
   if !gs.is_pedantic && !gs.in_bounds([(gs.zp0, p)]) {
@@ -1251,7 +1251,7 @@ fn Interp::op_mdap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn abs32(x : Int) -> Int {
+fn abs32(x : Int32) -> Int32 {
   if x < 0 {
     -x
   } else {
@@ -1260,7 +1260,7 @@ fn abs32(x : Int) -> Int {
 }
 
 ///|
-fn Interp::op_miap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_miap(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let cvt_entry = self.value_stack.pop()
   let point_ix = self.value_stack.pop()
@@ -1286,7 +1286,7 @@ fn Interp::op_miap(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_mdrp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_mdrp(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let p = self.value_stack.pop()
   if !gs.is_pedantic && !gs.in_bounds([(gs.zp1, p), (gs.zp0, gs.rp0)]) {
@@ -1337,7 +1337,7 @@ fn Interp::op_mdrp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_mirp(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_mirp(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let n = self.value_stack.pop() + 1
   let p = self.value_stack.pop()
@@ -1513,7 +1513,7 @@ fn Interp::op_ip(self : Interp) -> Unit raise HintErrorKind {
 }
 
 ///|
-fn Interp::op_iup(self : Interp, opcode : Int) -> Unit raise HintErrorKind {
+fn Interp::op_iup(self : Interp, opcode : Int32) -> Unit raise HintErrorKind {
   let gs = self.graphics
   let axis = if (opcode & 1) != 0 { X } else { Y }
   let mut run = true

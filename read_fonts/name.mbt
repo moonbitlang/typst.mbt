@@ -17,29 +17,29 @@ pub fn FontRef::name(self : FontRef) -> Name raise ReadError {
 }
 
 ///|
-pub fn Name::version(self : Name) -> Int {
+pub fn Name::version(self : Name) -> Int32 {
   u16_at(self.data, 0)
 }
 
 ///|
-pub fn Name::count(self : Name) -> Int {
+pub fn Name::count(self : Name) -> Int32 {
   u16_at(self.data, 2)
 }
 
 ///|
-pub fn Name::storage_offset(self : Name) -> Int {
+pub fn Name::storage_offset(self : Name) -> Int32 {
   u16_at(self.data, 4)
 }
 
 ///|
 /// A name record.
 pub(all) struct NameRecord {
-  platform_id : Int
-  encoding_id : Int
-  language_id : Int
-  name_id : Int
-  length : Int
-  string_offset : Int
+  platform_id : Int32
+  encoding_id : Int32
+  language_id : Int32
+  name_id : Int32
+  length : Int32
+  string_offset : Int32
 } derive(Debug)
 
 ///|
@@ -68,7 +68,7 @@ pub fn Name::name_record(self : Name) -> Array[NameRecord] {
 
 ///|
 /// Language tag records (length, offset) of version 1 tables.
-pub fn Name::lang_tag_record(self : Name) -> Array[(Int, Int)]? {
+pub fn Name::lang_tag_record(self : Name) -> Array[(Int32, Int32)]? {
   if self.version() < 1 {
     return None
   }
@@ -113,7 +113,10 @@ pub extend NameEncoding with Eq::{not_equal, equal}
 pub extend NameEncoding with @debug.Debug::{to_repr}
 
 ///|
-pub fn NameEncoding::new(platform_id : Int, encoding_id : Int) -> NameEncoding {
+pub fn NameEncoding::new(
+  platform_id : Int32,
+  encoding_id : Int32,
+) -> NameEncoding {
   match (platform_id, encoding_id) {
     (0, _) => Utf16Be
     (1, 0) => MacRoman
@@ -147,8 +150,8 @@ pub fn NameRecord::string(
 
 ///|
 fn lang_tag_string(
-  length : Int,
-  offset : Int,
+  length : Int32,
+  offset : Int32,
   data : FontData,
 ) -> NameString raise ReadError {
   guard data.get(offset, offset + length) is Some(bytes) else {
@@ -198,11 +201,11 @@ pub fn NameString::chars(self : NameString) -> Array[Char] {
 }
 
 ///|
-fn char_from_u32(v : Int) -> Char? {
+fn char_from_u32(v : Int32) -> Char? {
   if v < 0 || v > 0x10FFFF || (v >= 0xD800 && v <= 0xDFFF) {
     None
   } else {
-    Some(Int::unsafe_to_char(v))
+    Some(Int32::unsafe_to_char(v))
   }
 }
 
@@ -212,7 +215,7 @@ pub fn NameString::to_string(self : NameString) -> String {
 }
 
 ///|
-let mac_roman_decode : ReadOnlyArray[Int] = [
+let mac_roman_decode : ReadOnlyArray[Int32] = [
   196, 197, 199, 201, 209, 214, 220, 225, 224, 226, 228, 227, 229, 231, 233, 232,
   234, 235, 237, 236, 238, 239, 241, 243, 242, 244, 246, 245, 250, 249, 251, 252,
   8224, 176, 162, 163, 167, 8226, 182, 223, 174, 169, 8482, 180, 168, 8800, 198,
@@ -282,7 +285,7 @@ fn name_language(name : Name, record : NameRecord) -> String? {
 }
 
 ///|
-fn language_id_to_bcp47(language_id : Int) -> String? {
+fn language_id_to_bcp47(language_id : Int32) -> String? {
   let table = language_id_to_bcp47_table
   let mut lo = 0
   let mut hi = table.length()
@@ -304,7 +307,7 @@ fn language_id_to_bcp47(language_id : Int) -> String? {
 /// Returns the localized strings for the given name id.
 pub fn FontRef::localized_strings(
   self : FontRef,
-  id : Int,
+  id : Int32,
 ) -> Array[LocalizedString] {
   let name = self.name() catch { _ => return [] }
   let result = []
@@ -340,11 +343,11 @@ pub fn english_or_first(strings : Array[LocalizedString]) -> LocalizedString? {
 
 ///|
 /// Well-known name id: family name.
-pub const NAME_ID_FAMILY_NAME : Int = 1
+pub const NAME_ID_FAMILY_NAME : Int32 = 1
 
 ///|
 /// Mapping from Mac/Windows language ids to BCP 47 tags (sorted by id).
-let language_id_to_bcp47_table : ReadOnlyArray[(Int, String)] = [
+let language_id_to_bcp47_table : ReadOnlyArray[(Int32, String)] = [
   (0, "en"),
   (1, "fr"),
   (2, "de"),

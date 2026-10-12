@@ -81,7 +81,7 @@ priv struct CaptureSite {
 ///|
 /// The sites of the current compilation by the span of their nodes.
 priv struct CaptureSites {
-  mut generation : Int
+  mut generation : Int32
   sites : Map[@syntax.Span, Array[CaptureSite]]
 }
 
@@ -91,7 +91,7 @@ let capture_sites : CaptureSites = { generation: 0, sites: {}, }
 ///|
 /// The most nodes with one span that are kept (the nodes of an evaluated
 /// string all have the span of the string).
-let capture_sites_per_span : Int = 4
+let capture_sites_per_span : Int32 = 4
 
 ///|
 /// The analysis of `node` for the current compilation, or `None` outside of

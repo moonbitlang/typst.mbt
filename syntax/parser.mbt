@@ -2,7 +2,7 @@
 
 ///|
 /// Picked by gut feeling.
-let max_depth : Int = 256
+let max_depth : Int32 = 256
 
 ///|
 /// Parses a source file as top-level markup.
@@ -63,10 +63,10 @@ fn markup_exprs(p : Parser, at_start : Bool, stop_set : SyntaxSet) -> Unit {
 /// Reparses a subsection of markup incrementally.
 fn reparse_markup(
   text : String,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   at_start : Ref[Bool],
-  nesting : Ref[Int],
+  nesting : Ref[Int32],
   top_level : Bool,
 ) -> Array[SyntaxNode]? {
   let p = Parser::new(text, start, Markup)
@@ -88,7 +88,7 @@ fn reparse_markup(
 
 ///|
 /// Parses a single markup expression.
-fn markup_expr(p : Parser, at_start : Bool, nesting : Ref[Int]) -> Unit {
+fn markup_expr(p : Parser, at_start : Bool, nesting : Ref[Int32]) -> Unit {
   p.with_depth(() => {
     match p.current() {
       LeftBracket => {
@@ -241,7 +241,7 @@ fn math(p : Parser, stop_set : SyntaxSet) -> Unit {
 ///|
 /// Parses a sequence of math expressions. Returns the number of expressions
 /// parsed (including errors).
-fn math_exprs(p : Parser, stop_set : SyntaxSet) -> Int {
+fn math_exprs(p : Parser, stop_set : SyntaxSet) -> Int32 {
   if !p.check_depth_until(stop_set) {
     return 1
   }
@@ -264,14 +264,14 @@ fn math_expr(p : Parser) -> Unit {
 }
 
 ///|
-let math_func_prec : Int = 2
+let math_func_prec : Int32 = 2
 
 ///|
-let math_root_prec : Int = 2
+let math_root_prec : Int32 = 2
 
 ///|
 /// Parses a math expression with at least the given precedence.
-fn math_expr_prec(p : Parser, min_prec : Int, stop_set : SyntaxSet) -> Unit {
+fn math_expr_prec(p : Parser, min_prec : Int32, stop_set : SyntaxSet) -> Unit {
   p.with_depth(() => {
     let m = p.marker()
     let mut continuable = false
@@ -378,7 +378,10 @@ fn math_expr_prec(p : Parser, min_prec : Int, stop_set : SyntaxSet) -> Unit {
 
 ///|
 /// Precedence and wrapper kinds for infix and postfix math operators.
-fn math_op(kind : SyntaxKind, had_trivia : Bool) -> (SyntaxKind, Assoc?, Int)? {
+fn math_op(
+  kind : SyntaxKind,
+  had_trivia : Bool,
+) -> (SyntaxKind, Assoc?, Int32)? {
   match kind {
     Slash => Some((MathFrac, Some(Left), 1))
     Underscore => Some((MathAttach, Some(Right), 2))
@@ -430,7 +433,7 @@ fn math_delimited(p : Parser) -> Unit {
 ///|
 /// Remove one set of parentheses (if any) from a previously parsed expression
 /// by converting to non-expression kinds.
-fn math_unparen(p : Parser, m : Int) -> Unit {
+fn math_unparen(p : Parser, m : Int32) -> Unit {
   guard m < p.nodes.length() else { return }
   let node = p.nodes[m]
   if node.kind() != MathDelimited {
@@ -573,7 +576,7 @@ fn code_expr(p : Parser) -> Unit {
 
 ///|
 /// Parses a code expression with at least the given precedence.
-fn code_expr_prec(p : Parser, atomic_ : Bool, min_prec : Int) -> Unit {
+fn code_expr_prec(p : Parser, atomic_ : Bool, min_prec : Int32) -> Unit {
   p.with_depth(() => {
     let m = p.marker()
     if p.at_set(unary_op_set) {
@@ -693,7 +696,7 @@ fn code_primary(p : Parser, atomic_ : Bool) -> Unit {
 
 ///|
 /// Reparses a full content or code block.
-fn reparse_block(text : String, start : Int, end : Int) -> SyntaxNode? {
+fn reparse_block(text : String, start : Int32, end : Int32) -> SyntaxNode? {
   let p = Parser::new(text, start, Code)
   guard p.at(LeftBracket) || p.at(LeftBrace) else {
     abort("reparse_block must start at a block")
@@ -995,7 +998,7 @@ fn expr_with_paren(p : Parser, atomic_ : Bool) -> Unit {
 ///|
 /// State for array/dictionary parsing.
 priv struct GroupState {
-  mut count : Int
+  mut count : Int32
   /// Whether this is just a single expression in parens: `(a)`.
   mut maybe_just_parens : Bool
   /// The kind to wrap as (if we've figured it out yet).
@@ -1353,7 +1356,7 @@ priv struct Parser {
   /// Parser checkpoints for a given text index.
   memo : MemoArena
   /// The current expression nesting depth.
-  mut depth : Int
+  mut depth : Int32
 }
 
 ///|
@@ -1365,13 +1368,13 @@ priv struct Token {
   /// The node of the current token, ready to be eaten.
   mut node : SyntaxNode
   /// The number of preceding trivia before this token.
-  mut n_trivia : Int
+  mut n_trivia : Int32
   /// Whether this token's preceding trivia contained a newline.
   newline : Newline?
   /// The index into `text` of the start of our current token.
-  start : Int
+  start : Int32
   /// The index into `text` of the end of the previous token.
-  mut prev_end : Int
+  mut prev_end : Int32
 }
 
 ///|
@@ -1390,7 +1393,7 @@ fn Token::copy(self : Token) -> Token {
 /// Information about newlines in a group of trivia.
 priv struct Newline {
   /// The column of the start of the next token in its line.
-  column : Int?
+  column : Int32?
   /// Whether any of our newlines were paragraph breaks.
   parbreak : Bool
 }
@@ -1407,7 +1410,7 @@ priv enum AtNewline {
   /// Stop only at a parbreak, not normal newlines (Markup only).
   StopParBreak
   /// Require that the token's column be greater or equal to a column.
-  RequireColumn(Int)
+  RequireColumn(Int32)
 } derive(Eq)
 
 ///|
@@ -1436,7 +1439,7 @@ fn AtNewline::stop_at(
 
 ///|
 /// Create a new parser starting from the given text offset and syntax mode.
-fn Parser::new(text : String, offset : Int, mode : SyntaxMode) -> Parser {
+fn Parser::new(text : String, offset : Int32, mode : SyntaxMode) -> Parser {
   let lexer = Lexer::new(text, mode)
   lexer.jump(offset)
   let nl_mode = AtNewline::Continue
@@ -1500,7 +1503,7 @@ fn Parser::had_newline(self : Parser) -> Bool {
 ///|
 /// The number of characters until the most recent newline from the start of
 /// the current token.
-fn Parser::current_column(self : Parser) -> Int {
+fn Parser::current_column(self : Parser) -> Int32 {
   match self.token.newline {
     Some({ column: Some(column), .. }) => column
     _ => self.lexer.column(self.token.start)
@@ -1514,29 +1517,29 @@ fn Parser::current_text(self : Parser) -> String {
 }
 
 ///|
-fn Parser::current_start(self : Parser) -> Int {
+fn Parser::current_start(self : Parser) -> Int32 {
   self.token.start
 }
 
 ///|
-fn Parser::current_end(self : Parser) -> Int {
+fn Parser::current_end(self : Parser) -> Int32 {
   self.lexer.cursor()
 }
 
 ///|
-fn Parser::prev_end(self : Parser) -> Int {
+fn Parser::prev_end(self : Parser) -> Int32 {
   self.token.prev_end
 }
 
 ///|
 /// A marker that will point to the current token once it's been eaten.
-fn Parser::marker(self : Parser) -> Int {
+fn Parser::marker(self : Parser) -> Int32 {
   self.nodes.length()
 }
 
 ///|
 /// A marker that will point to first trivia before this token.
-fn Parser::before_trivia(self : Parser) -> Int {
+fn Parser::before_trivia(self : Parser) -> Int32 {
   self.nodes.length() - self.token.n_trivia
 }
 
@@ -1592,7 +1595,7 @@ fn Parser::flush_trivia(self : Parser) -> Unit {
 ///|
 /// Wrap the nodes from a marker up to (but excluding) the current token in a
 /// new inner node of the given kind.
-fn Parser::wrap(self : Parser, from : Int, kind : SyntaxKind) -> Unit {
+fn Parser::wrap(self : Parser, from : Int32, kind : SyntaxKind) -> Unit {
   let to = self.before_trivia()
   let from = if from < to { from } else { to }
   let children = self.nodes[from:to].to_owned()
@@ -1617,7 +1620,7 @@ fn Parser::wrap(self : Parser, from : Int, kind : SyntaxKind) -> Unit {
 
 ///|
 /// Wrap the nodes from a marker up to the current token in a new error node.
-fn Parser::wrap_error(self : Parser, from : Int, message : String) -> Unit {
+fn Parser::wrap_error(self : Parser, from : Int32, message : String) -> Unit {
   let to = self.before_trivia()
   let from = if from < to { from } else { to }
   let buf = StringBuilder()
@@ -1722,20 +1725,20 @@ priv struct MemoArena {
   arena : Array[SyntaxNode]
   /// A map from the parser's position to a range of previously parsed nodes
   /// in the arena and a checkpoint of the parser's state.
-  memo_map : Map[Int, (Int, Int, PartialState)]
+  memo_map : Map[Int32, (Int32, Int32, PartialState)]
 }
 
 ///|
 /// A checkpoint of the parser which can fully restore it to a previous state.
 priv struct Checkpoint {
-  node_len : Int
+  node_len : Int32
   state : PartialState
 }
 
 ///|
 /// State needed to restore the parser's current token and the lexer.
 priv struct PartialState {
-  cursor : Int
+  cursor : Int32
   lex_mode : SyntaxMode
   token : Token
 }
@@ -1744,8 +1747,8 @@ priv struct PartialState {
 /// Store the already parsed nodes and the parser state into the memo map.
 fn Parser::memoize_parsed_nodes(
   self : Parser,
-  key : Int,
-  prev_len : Int,
+  key : Int32,
+  prev_len : Int32,
 ) -> Unit {
   let { state, node_len, } = self.checkpoint()
   let memo_start = self.memo.arena.length()
@@ -1758,7 +1761,7 @@ fn Parser::memoize_parsed_nodes(
 ///|
 /// Try to load a memoized result, return `None` if we did or `Some` (with a
 /// checkpoint and a key for the memo map) if we didn't.
-fn Parser::restore_memo_or_checkpoint(self : Parser) -> (Int, Checkpoint)? {
+fn Parser::restore_memo_or_checkpoint(self : Parser) -> (Int32, Checkpoint)? {
   let key = self.current_start()
   match self.memo.memo_map.get(key) {
     Some((start, end, state)) => {
@@ -1821,7 +1824,7 @@ fn Parser::expect(self : Parser, kind : SyntaxKind) -> Bool {
 /// opening delimiter at `open`.
 fn Parser::expect_closing_delimiter(
   self : Parser,
-  open : Int,
+  open : Int32,
   kind : SyntaxKind,
 ) -> Bool {
   let at = self.eat_if(kind)
@@ -1853,7 +1856,7 @@ fn Parser::after_error(self : Parser) -> Bool {
 ///|
 /// Produce an error that the given `thing` was expected at the position of
 /// the marker `m`.
-fn Parser::expected_at(self : Parser, m : Int, thing : String) -> Unit {
+fn Parser::expected_at(self : Parser, m : Int32, thing : String) -> Unit {
   let error = SyntaxNode::error("expected \{thing}", "")
   self.nodes.insert(m, error)
 }

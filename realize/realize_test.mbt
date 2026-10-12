@@ -55,7 +55,7 @@ fn test_engine() -> @library.Engine {
 /// number of style links).
 fn run(
   content : @library.Content,
-  kind? : @library.RealizationKind = Fragment(kind=Ref(Block)),
+  kind~ : @library.RealizationKind = Fragment(kind=Ref(Block)),
 ) -> String raise @library.SourceError {
   let styles = @library.StyleChain::new(@library.Styles::new())
   let pairs = @realize.realize(

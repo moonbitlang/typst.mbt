@@ -7,7 +7,7 @@
 
 ///|
 /// The size of a DC block for a MCU.
-const DCT_BLOCK : Int = 64
+const DCT_BLOCK : Int32 = 64
 
 ///|
 priv enum McuContinuation {
@@ -42,7 +42,7 @@ fn JpegDecoder::check_tables(self : JpegDecoder) -> Unit raise DecodeErrors {
 
 ///|
 /// Fill `pixels[from..]` with 128.
-fn fill_128(pixels : FixedArray[Byte], from : Int) -> Unit {
+fn fill_128(pixels : FixedArray[Byte], from : Int32) -> Unit {
   for i in from..<pixels.length() {
     pixels[i] = b'\x80'
   }
@@ -115,7 +115,7 @@ fn JpegDecoder::decode_mcu_ycbcr_baseline(
   // convenience we use each row of MCUS. Otherwise, we must first wait until
   // following SOS provide the remaining components.
   let all_components_in_first_scan = self.num_scans == self.components.length()
-  let progressive_mcus : FixedArray[FixedArray[Int]] = FixedArray::make(4, [])
+  let progressive_mcus : FixedArray[FixedArray[Int32]] = FixedArray::make(4, [])
   if !all_components_in_first_scan {
     for k, component in self.components {
       if k >= 4 {
@@ -202,8 +202,8 @@ fn JpegDecoder::decode_mcu_ycbcr_baseline(
 /// component-after-component.
 fn JpegDecoder::finish_baseline_decoding(
   self : JpegDecoder,
-  block : FixedArray[FixedArray[Int]],
-  _mcu_width : Int,
+  block : FixedArray[FixedArray[Int32]],
+  _mcu_width : Int32,
   pixels : FixedArray[Byte],
 ) -> Unit raise DecodeErrors {
   let mcu_height = self.mcu_y
@@ -247,11 +247,11 @@ fn JpegDecoder::finish_baseline_decoding(
 fn JpegDecoder::decode_mcu_width(
   self : JpegDecoder,
   progressive_buf : Bool,
-  mcu_width : Int,
-  mcu_height : Int,
-  tmp : FixedArray[Int],
+  mcu_width : Int32,
+  mcu_height : Int32,
+  tmp : FixedArray[Int32],
   stream : BitStream,
-  progressive : FixedArray[FixedArray[Int]],
+  progressive : FixedArray[FixedArray[Int32]],
 ) -> McuContinuation raise DecodeErrors {
   let sampled = self.scan_subsampled
   let num_scans = self.num_scans
@@ -492,12 +492,12 @@ fn JpegDecoder::handle_rst(self : JpegDecoder, stream : BitStream) -> Unit {
 fn JpegDecoder::post_process(
   self : JpegDecoder,
   pixels : FixedArray[Byte],
-  i : Int,
-  mcu_height : Int,
-  width : Int,
-  padded_width : Int,
-  pixels_written : Ref[Int],
-  upsampler_scratch_space : FixedArray[Int],
+  i : Int32,
+  mcu_height : Int32,
+  width : Int32,
+  padded_width : Int32,
+  pixels_written : Ref[Int32],
+  upsampler_scratch_space : FixedArray[Int32],
 ) -> Unit raise DecodeErrors {
   let out_colorspace_components = self.out_colorspace.num_components()
   let mut px = pixels_written.val
@@ -512,7 +512,7 @@ fn JpegDecoder::post_process(
     comp_len = out_colorspace_components
   }
   let empty : Slice = { arr: [], off: 0, len: 0, }
-  let color_conv_function = (num_iters : Int, samples : FixedArray[Slice]) => {
+  let color_conv_function = (num_iters : Int32, samples : FixedArray[Slice]) => {
     let row_len = width * out_colorspace_components
     let avail = if row_len == 0 { 0 } else { (pixels.length() - px) / row_len }
     let n = @cmp.minimum(avail, num_iters)

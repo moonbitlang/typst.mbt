@@ -21,7 +21,7 @@ pub fn Scalar::get(self : Scalar) -> Double {
 
 ///|
 /// Raises a number to an integer power.
-pub fn Scalar::powi(self : Scalar, b : Int) -> Scalar {
+pub fn Scalar::powi(self : Scalar, b : Int32) -> Scalar {
   // Ported from https://github.com/llvm/llvm-project/blob/0ee439b/compiler-rt/lib/builtins/powidf2.c
   // Copyright: The LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
   let mut a = self.get()

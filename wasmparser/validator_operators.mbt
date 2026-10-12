@@ -32,7 +32,7 @@ struct OperatorValidator {
   operands : Array[MaybeType]
   /// Offset of the `end` instruction which emptied the `control` stack, which
   /// must be the end of the function.
-  mut end_which_emptied_control : Int?
+  mut end_which_emptied_control : Int32?
   /// Whether validation is happening in a shared context.
   mut shared : Bool
 }
@@ -44,14 +44,14 @@ priv struct LocalInits {
   local_inits : Array[Bool]
   /// When `local_inits` is modified, the relevant `index` is recorded
   /// here to be undone when control pops.
-  inits : Array[UInt]
+  inits : Array[UInt32]
   /// The index of the first non-defaultable local.
   ///
   /// # Note
   ///
   /// This is an optimization so that we only have to perform expensive
   /// look-ups for locals that have a local index equal to or higher than this.
-  mut first_non_default_local : UInt
+  mut first_non_default_local : UInt32
 }
 
 ///|
@@ -61,7 +61,7 @@ fn LocalInits::new() -> LocalInits {
 
 ///|
 /// Defines new function local parameters.
-fn LocalInits::define_params(self : LocalInits, count : Int) -> Unit {
+fn LocalInits::define_params(self : LocalInits, count : Int32) -> Unit {
   for _ in 0..<count {
     self.local_inits.push(true)
   }
@@ -71,7 +71,7 @@ fn LocalInits::define_params(self : LocalInits, count : Int) -> Unit {
 /// Defines `count` function locals of type `ty`.
 fn LocalInits::define_locals(
   self : LocalInits,
-  count : UInt,
+  count : UInt32,
   ty : ValType,
 ) -> Unit {
   let len = self.local_inits.length()
@@ -88,7 +88,7 @@ fn LocalInits::define_locals(
 
 ///|
 /// Returns `true` if the local at `local_index` has already been initialized.
-fn LocalInits::is_uninit(self : LocalInits, local_index : UInt) -> Bool {
+fn LocalInits::is_uninit(self : LocalInits, local_index : UInt32) -> Bool {
   if local_index < self.first_non_default_local {
     return false
   }
@@ -97,7 +97,7 @@ fn LocalInits::is_uninit(self : LocalInits, local_index : UInt) -> Bool {
 
 ///|
 /// Marks the local at `local_index` as initialized.
-fn LocalInits::set_init(self : LocalInits, local_index : UInt) -> Unit {
+fn LocalInits::set_init(self : LocalInits, local_index : UInt32) -> Unit {
   if self.is_uninit(local_index) {
     self.local_inits[local_index.reinterpret_as_int()] = true
     self.inits.push(local_index)
@@ -106,7 +106,7 @@ fn LocalInits::set_init(self : LocalInits, local_index : UInt) -> Unit {
 
 ///|
 /// Registers a new control frame and returns its `height`.
-fn LocalInits::push_ctrl(self : LocalInits) -> Int {
+fn LocalInits::push_ctrl(self : LocalInits) -> Int32 {
   self.inits.length()
 }
 
@@ -114,7 +114,7 @@ fn LocalInits::push_ctrl(self : LocalInits) -> Int {
 /// Pops a control frame via its `height`.
 ///
 /// This uninitializes all locals that have been initialized within it.
-fn LocalInits::pop_ctrl(self : LocalInits, height : Int) -> Unit {
+fn LocalInits::pop_ctrl(self : LocalInits, height : Int32) -> Unit {
   for i in height..<self.inits.length() {
     self.local_inits[self.inits[i].reinterpret_as_int()] = false
   }
@@ -134,12 +134,12 @@ fn LocalInits::clear(self : LocalInits) -> Unit {
 ///|
 // No science was performed in the creation of this number, feel free to change
 // it if you so like.
-let max_locals_to_track : Int = 50
+let max_locals_to_track : Int32 = 50
 
 ///|
 struct Locals {
   // Total number of locals in the function.
-  mut num_locals : UInt
+  mut num_locals : UInt32
 
   // The first MAX_LOCALS_TO_TRACK locals in a function. This is used to
   // optimize the theoretically common case where most functions don't have
@@ -157,7 +157,7 @@ struct Locals {
   // `local.{get,set,tee}`. We do a binary search for the index desired, and
   // it either lies in a "hole" where the maximum index is specified later,
   // or it's at the end of the list meaning it's out of bounds.
-  all : Array[(UInt, ValType)]
+  all : Array[(UInt32, ValType)]
 }
 
 ///|
@@ -174,11 +174,11 @@ pub(all) struct Frame {
   /// or a type index pointing into the module's types.
   block_type : BlockType
   /// The index, below which, this frame cannot modify the operand stack.
-  height : Int
+  height : Int32
   /// Whether this frame is unreachable so far.
   mut unreachable_ : Bool
   /// The number of initializations in the stack at the time of its creation
-  init_height : Int
+  init_height : Int32
 }
 
 ///|
@@ -203,7 +203,7 @@ pub extend Frame with @debug.Debug::{to_repr}
 /// `OperatorValidatorTemp`: the operator validator together with the
 /// resources and the offset of the current operator.
 pub struct OperatorValidatorTemp {
-  priv mut offset : Int
+  priv mut offset : Int32
   priv inner : OperatorValidator
   priv resources : ValidatorResources
 }
@@ -216,7 +216,7 @@ pub struct OperatorValidatorAllocations {
   priv operands : Array[MaybeType]
   priv local_inits : LocalInits
   priv locals_first : Array[ValType]
-  priv locals_all : Array[(UInt, ValType)]
+  priv locals_all : Array[(UInt32, ValType)]
 }
 
 ///|
@@ -243,7 +243,7 @@ pub fn OperatorValidatorAllocations::default() -> OperatorValidatorAllocations {
 /// - `Bottom`: -1
 /// - `UnknownRef(None)`: -2, `UnknownRef(Some(t))`: -3 - index of `t`
 /// - `Known(ty)`: `ty` encoded by `encode_val_type` (non-negative)
-priv struct MaybeType(Int)
+priv struct MaybeType(Int32)
 
 ///|
 /// The unpacked form of a [`MaybeType`].
@@ -296,7 +296,7 @@ let abstract_heap_types : ReadOnlyArray[AbstractHeapType] = [
 ]
 
 ///|
-fn abstract_heap_type_index(t : AbstractHeapType) -> Int {
+fn abstract_heap_type_index(t : AbstractHeapType) -> Int32 {
   match t {
     Func => 0
     Extern => 1
@@ -316,7 +316,7 @@ fn abstract_heap_type_index(t : AbstractHeapType) -> Int {
 }
 
 ///|
-fn encode_val_type(ty : ValType) -> Int {
+fn encode_val_type(ty : ValType) -> Int32 {
   match ty {
     I32 => 0
     I64 => 1
@@ -424,8 +424,8 @@ fn OperatorValidator::new(
 /// The `resources` are used to learn about the function type underlying
 /// `ty`.
 fn OperatorValidator::new_func(
-  ty : UInt,
-  offset : Int,
+  ty : UInt32,
+  offset : Int32,
   features : WasmFeatures,
   resources : ValidatorResources,
   allocs : OperatorValidatorAllocations,
@@ -484,8 +484,8 @@ fn OperatorValidator::new_const_expr(
 ///|
 fn OperatorValidator::define_locals(
   self : OperatorValidator,
-  offset : Int,
-  count : UInt,
+  offset : Int32,
+  count : UInt32,
   ty : ValType,
   resources : ValidatorResources,
 ) -> Unit raise BinaryReaderError {
@@ -503,7 +503,9 @@ fn OperatorValidator::define_locals(
 
 ///|
 /// Returns the current operands stack height.
-pub fn OperatorValidator::operand_stack_height(self : OperatorValidator) -> Int {
+pub fn OperatorValidator::operand_stack_height(
+  self : OperatorValidator,
+) -> Int32 {
   self.operands.length()
 }
 
@@ -520,7 +522,7 @@ pub fn OperatorValidator::operand_stack_height(self : OperatorValidator) -> Int 
 /// A `depth` of 0 will refer to the last operand on the stack.
 pub fn OperatorValidator::peek_operand_at(
   self : OperatorValidator,
-  depth : Int,
+  depth : Int32,
 ) -> ValType?? {
   let n = self.operands.length()
   if depth < 0 || depth >= n {
@@ -534,14 +536,16 @@ pub fn OperatorValidator::peek_operand_at(
 
 ///|
 /// Returns the number of frames on the control flow stack.
-pub fn OperatorValidator::control_stack_height(self : OperatorValidator) -> Int {
+pub fn OperatorValidator::control_stack_height(
+  self : OperatorValidator,
+) -> Int32 {
   self.control.length()
 }
 
 ///|
 pub fn OperatorValidator::get_frame(
   self : OperatorValidator,
-  depth : Int,
+  depth : Int32,
 ) -> Frame? {
   let n = self.control.length()
   if depth < 0 || depth >= n {
@@ -556,7 +560,7 @@ pub fn OperatorValidator::get_frame(
 fn OperatorValidator::with_resources(
   self : OperatorValidator,
   resources : ValidatorResources,
-  offset : Int,
+  offset : Int32,
 ) -> WasmProposalValidator {
   WasmProposalValidator({ offset, inner: self, resources, })
 }
@@ -564,7 +568,7 @@ fn OperatorValidator::with_resources(
 ///|
 pub fn OperatorValidator::finish(
   self : OperatorValidator,
-  offset : Int,
+  offset : Int32,
 ) -> Unit raise BinaryReaderError {
   if self.control.length() > 0 {
     bail(
@@ -584,7 +588,7 @@ pub fn OperatorValidator::finish(
 ///|
 fn OperatorValidator::err_beyond_end(
   _self : OperatorValidator,
-  offset : Int,
+  offset : Int32,
 ) -> BinaryReaderError {
   BinaryReaderError::new("operators remaining after end of function", offset)
 }
@@ -638,7 +642,7 @@ fn OperatorValidatorTemp::push_maybe_operand(
 fn OperatorValidatorTemp::push_concrete_ref(
   self : OperatorValidatorTemp,
   nullable : Bool,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let heap_ty = HeapType::Concrete(Module(type_index))
 
@@ -659,7 +663,7 @@ fn OperatorValidatorTemp::push_concrete_ref(
 fn OperatorValidatorTemp::pop_concrete_ref(
   self : OperatorValidatorTemp,
   nullable : Bool,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> MaybeType raise BinaryReaderError {
   let heap_ty = HeapType::Concrete(Module(type_index))
 
@@ -907,7 +911,7 @@ fn OperatorValidatorTemp::pop_maybe_shared_ref(
 /// of bounds.
 fn OperatorValidatorTemp::local_(
   self : OperatorValidatorTemp,
-  idx : UInt,
+  idx : UInt32,
 ) -> ValType raise BinaryReaderError {
   match self.inner.locals.get(idx) {
     Some(ty) => ty
@@ -1008,7 +1012,7 @@ fn OperatorValidatorTemp::pop_ctrl(
 /// as the kind of block if the jump is valid. Otherwise returns an error.
 fn OperatorValidatorTemp::jump(
   self : OperatorValidatorTemp,
-  depth : UInt,
+  depth : UInt32,
 ) -> (BlockType, FrameKind) raise BinaryReaderError {
   let control = self.inner.control
   if control.length() == 0 {
@@ -1028,7 +1032,7 @@ fn OperatorValidatorTemp::jump(
 /// type of address used to index the memory specified.
 fn OperatorValidatorTemp::check_memory_index(
   self : OperatorValidatorTemp,
-  memory_index : UInt,
+  memory_index : UInt32,
 ) -> ValType raise BinaryReaderError {
   match self.resources.memory_at(memory_index) {
     Some(mem) => mem.index_type()
@@ -1107,7 +1111,7 @@ fn OperatorValidatorTemp::check_block_type(
 /// `function_index`.
 fn OperatorValidatorTemp::type_of_function(
   self : OperatorValidatorTemp,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> FuncType raise BinaryReaderError {
   if self.resources.type_index_of_function(function_index) is Some(type_index) {
     self.func_type_at(type_index)
@@ -1167,7 +1171,7 @@ fn OperatorValidatorTemp::check_return_call_ty(
 /// `check_return_call_ty`).
 fn OperatorValidatorTemp::check_call_ref_ty(
   self : OperatorValidatorTemp,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> FuncType raise BinaryReaderError {
   let unpacked_index = UnpackedIndex::Module(type_index)
   let hty = HeapType::Concrete(unpacked_index)
@@ -1189,8 +1193,8 @@ fn OperatorValidatorTemp::check_call_ref_ty(
 /// `type_index` which must then be passed to `check_{call,return_call}_ty`.
 fn OperatorValidatorTemp::check_call_indirect_ty(
   self : OperatorValidatorTemp,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> FuncType raise BinaryReaderError {
   let tab = self.table_type_at(table_index)
   if !self.resources.is_subtype(Ref(tab.element_type), valtype_funcref) {
@@ -1388,7 +1392,7 @@ fn OperatorValidatorTemp::check_atomic_binary_memory_cmpxchg(
 ///|
 fn OperatorValidatorTemp::element_type_at(
   self : OperatorValidatorTemp,
-  elem_index : UInt,
+  elem_index : UInt32,
 ) -> RefType raise BinaryReaderError {
   match self.resources.element_type_at(elem_index) {
     Some(ty) => ty
@@ -1403,7 +1407,7 @@ fn OperatorValidatorTemp::element_type_at(
 ///|
 fn OperatorValidatorTemp::sub_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> SubType raise BinaryReaderError {
   match self.resources.sub_type_at(at) {
     Some(t) => t
@@ -1414,7 +1418,7 @@ fn OperatorValidatorTemp::sub_type_at(
 ///|
 fn OperatorValidatorTemp::struct_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> StructType raise BinaryReaderError {
   let sub_ty = self.sub_type_at(at)
   if sub_ty.composite_type.inner is Struct(struct_ty) {
@@ -1430,8 +1434,8 @@ fn OperatorValidatorTemp::struct_type_at(
 ///|
 fn OperatorValidatorTemp::struct_field_at(
   self : OperatorValidatorTemp,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> FieldType raise BinaryReaderError {
   let fields = self.struct_type_at(struct_type_index).fields
   if field_index < fields.length().reinterpret_as_uint() {
@@ -1451,8 +1455,8 @@ fn OperatorValidatorTemp::struct_field_at(
 #warnings("-unused_value")
 fn OperatorValidatorTemp::mutable_struct_field_at(
   self : OperatorValidatorTemp,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> FieldType raise BinaryReaderError {
   let field = self.struct_field_at(struct_type_index, field_index)
   if !field.mutable {
@@ -1464,7 +1468,7 @@ fn OperatorValidatorTemp::mutable_struct_field_at(
 ///|
 fn OperatorValidatorTemp::array_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> FieldType raise BinaryReaderError {
   let sub_ty = self.sub_type_at(at)
   if sub_ty.composite_type.inner is Array(array_ty) {
@@ -1484,7 +1488,7 @@ fn OperatorValidatorTemp::array_type_at(
 #warnings("-unused_value")
 fn OperatorValidatorTemp::mutable_array_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> FieldType raise BinaryReaderError {
   let field = self.array_type_at(at)
   if !field.mutable {
@@ -1496,7 +1500,7 @@ fn OperatorValidatorTemp::mutable_array_type_at(
 ///|
 fn OperatorValidatorTemp::func_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> FuncType raise BinaryReaderError {
   let sub_ty = self.sub_type_at(at)
   if sub_ty.composite_type.inner is Func(func_ty) {
@@ -1512,7 +1516,7 @@ fn OperatorValidatorTemp::func_type_at(
 ///|
 fn OperatorValidatorTemp::tag_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> FuncType raise BinaryReaderError {
   match self.resources.tag_at(at) {
     Some(t) => t
@@ -1526,7 +1530,7 @@ fn OperatorValidatorTemp::tag_at(
 // feature as it allows non-empty result types on tags.
 fn OperatorValidatorTemp::exception_tag_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> FuncType raise BinaryReaderError {
   let func_ty = self.tag_at(at)
   if func_ty.results().length() != 0 {
@@ -1538,7 +1542,7 @@ fn OperatorValidatorTemp::exception_tag_at(
 ///|
 fn OperatorValidatorTemp::global_type_at(
   self : OperatorValidatorTemp,
-  at : UInt,
+  at : UInt32,
 ) -> GlobalType raise BinaryReaderError {
   if self.resources.global_at(at) is Some(ty) {
     if self.inner.shared && !ty.shared {
@@ -1554,7 +1558,7 @@ fn OperatorValidatorTemp::global_type_at(
 /// Validates that the `table` is valid and returns the type it points to.
 fn OperatorValidatorTemp::table_type_at(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> TableType raise BinaryReaderError {
   match self.resources.table_at(table) {
     Some(ty) => {
@@ -1609,7 +1613,7 @@ fn OperatorValidatorTemp::label_types(
 ///|
 fn OperatorValidatorTemp::check_data_segment(
   self : OperatorValidatorTemp,
-  data_index : UInt,
+  data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   match self.resources.data_count() {
     None => bail(self.offset, "data count section required")
@@ -1691,7 +1695,7 @@ fn WasmProposalValidator::check_enabled(
 /// Sets the offset of the operator being validated (for error messages).
 pub fn WasmProposalValidator::set_offset(
   self : WasmProposalValidator,
-  offset : Int,
+  offset : Int32,
 ) -> Unit {
   self.0.offset = offset
 }
@@ -1849,7 +1853,7 @@ fn OperatorValidatorTemp::visit_try_table(
 ///|
 fn OperatorValidatorTemp::visit_throw(
   self : OperatorValidatorTemp,
-  index : UInt,
+  index : UInt32,
 ) -> Unit raise BinaryReaderError {
   // Check values associated with the exception.
   let ty = self.exception_tag_at(index)
@@ -1897,7 +1901,7 @@ fn OperatorValidatorTemp::visit_end(
 ///|
 fn OperatorValidatorTemp::visit_br(
   self : OperatorValidatorTemp,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   let (ty, kind) = self.jump(relative_depth)
   let types = self.label_types(ty, kind)
@@ -1910,7 +1914,7 @@ fn OperatorValidatorTemp::visit_br(
 ///|
 fn OperatorValidatorTemp::visit_br_if(
   self : OperatorValidatorTemp,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.pop_operand(Some(I32)) |> ignore
   let (ty, kind) = self.jump(relative_depth)
@@ -1953,7 +1957,7 @@ fn OperatorValidatorTemp::visit_return(
 ///|
 fn OperatorValidatorTemp::visit_call(
   self : OperatorValidatorTemp,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.type_of_function(function_index)
   self.check_call_ty(ty)
@@ -1962,7 +1966,7 @@ fn OperatorValidatorTemp::visit_call(
 ///|
 fn OperatorValidatorTemp::visit_return_call(
   self : OperatorValidatorTemp,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.type_of_function(function_index)
   self.check_return_call_ty(ty)
@@ -1971,7 +1975,7 @@ fn OperatorValidatorTemp::visit_return_call(
 ///|
 fn OperatorValidatorTemp::visit_call_ref(
   self : OperatorValidatorTemp,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_call_ref_ty(type_index)
   self.check_call_ty(ty)
@@ -1980,7 +1984,7 @@ fn OperatorValidatorTemp::visit_call_ref(
 ///|
 fn OperatorValidatorTemp::visit_return_call_ref(
   self : OperatorValidatorTemp,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_call_ref_ty(type_index)
   self.check_return_call_ty(ty)
@@ -1989,8 +1993,8 @@ fn OperatorValidatorTemp::visit_return_call_ref(
 ///|
 fn OperatorValidatorTemp::visit_call_indirect(
   self : OperatorValidatorTemp,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_call_indirect_ty(type_index, table_index)
   self.check_call_ty(ty)
@@ -1999,8 +2003,8 @@ fn OperatorValidatorTemp::visit_call_indirect(
 ///|
 fn OperatorValidatorTemp::visit_return_call_indirect(
   self : OperatorValidatorTemp,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_call_indirect_ty(type_index, table_index)
   self.check_return_call_ty(ty)
@@ -2061,7 +2065,7 @@ fn OperatorValidatorTemp::visit_typed_select(
 ///|
 fn OperatorValidatorTemp::visit_local_get(
   self : OperatorValidatorTemp,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.local_(local_index)
   if self.inner.local_inits.is_uninit(local_index) {
@@ -2073,7 +2077,7 @@ fn OperatorValidatorTemp::visit_local_get(
 ///|
 fn OperatorValidatorTemp::visit_local_set(
   self : OperatorValidatorTemp,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.local_(local_index)
   self.pop_operand(Some(ty)) |> ignore
@@ -2083,7 +2087,7 @@ fn OperatorValidatorTemp::visit_local_set(
 ///|
 fn OperatorValidatorTemp::visit_local_tee(
   self : OperatorValidatorTemp,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let expected_ty = self.local_(local_index)
   self.pop_operand(Some(expected_ty)) |> ignore
@@ -2094,7 +2098,7 @@ fn OperatorValidatorTemp::visit_local_tee(
 ///|
 fn OperatorValidatorTemp::visit_global_get(
   self : OperatorValidatorTemp,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.global_type_at(global_index).content_type
   self.push_operand(ty)
@@ -2103,7 +2107,7 @@ fn OperatorValidatorTemp::visit_global_get(
 ///|
 fn OperatorValidatorTemp::visit_global_set(
   self : OperatorValidatorTemp,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.global_type_at(global_index)
   if !ty.mutable {
@@ -2339,7 +2343,7 @@ fn OperatorValidatorTemp::visit_i64_store32(
 ///|
 fn OperatorValidatorTemp::visit_memory_size(
   self : OperatorValidatorTemp,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   let index_ty = self.check_memory_index(mem)
   self.push_operand(index_ty)
@@ -2348,7 +2352,7 @@ fn OperatorValidatorTemp::visit_memory_size(
 ///|
 fn OperatorValidatorTemp::visit_memory_grow(
   self : OperatorValidatorTemp,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   let index_ty = self.check_memory_index(mem)
   self.pop_operand(Some(index_ty)) |> ignore
@@ -2361,7 +2365,7 @@ fn OperatorValidatorTemp::visit_memory_grow(
 #warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_i32_const(
   self : OperatorValidatorTemp,
-  _value : Int,
+  _value : Int32,
 ) -> Unit raise BinaryReaderError {
   self.push_operand(I32)
 }
@@ -3922,7 +3926,7 @@ fn OperatorValidatorTemp::visit_ref_as_non_null(
 ///|
 fn OperatorValidatorTemp::visit_br_on_null(
   self : OperatorValidatorTemp,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ref_ty = self.pop_ref(None).as_non_null()
   let (ft, kind) = self.jump(relative_depth)
@@ -3934,7 +3938,7 @@ fn OperatorValidatorTemp::visit_br_on_null(
 ///|
 fn OperatorValidatorTemp::visit_br_on_non_null(
   self : OperatorValidatorTemp,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   let (ft, kind) = self.jump(relative_depth)
   let label_types = self.label_types(ft, kind)
@@ -3966,7 +3970,7 @@ fn OperatorValidatorTemp::visit_ref_is_null(
 ///|
 fn OperatorValidatorTemp::visit_ref_func(
   self : OperatorValidatorTemp,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   let type_id = match self.resources.type_id_of_function(function_index) {
     Some(id) => id
@@ -4017,8 +4021,8 @@ fn OperatorValidatorTemp::visit_ref_eq(
 ///|
 fn OperatorValidatorTemp::visit_memory_init(
   self : OperatorValidatorTemp,
-  segment : UInt,
-  mem : UInt,
+  segment : UInt32,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_memory_index(mem)
   self.check_data_segment(segment)
@@ -4030,7 +4034,7 @@ fn OperatorValidatorTemp::visit_memory_init(
 ///|
 fn OperatorValidatorTemp::visit_data_drop(
   self : OperatorValidatorTemp,
-  segment : UInt,
+  segment : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_data_segment(segment)
 }
@@ -4038,8 +4042,8 @@ fn OperatorValidatorTemp::visit_data_drop(
 ///|
 fn OperatorValidatorTemp::visit_memory_copy(
   self : OperatorValidatorTemp,
-  dst : UInt,
-  src : UInt,
+  dst : UInt32,
+  src : UInt32,
 ) -> Unit raise BinaryReaderError {
   let dst_ty = self.check_memory_index(dst)
   let src_ty = self.check_memory_index(src)
@@ -4065,7 +4069,7 @@ fn OperatorValidatorTemp::visit_memory_copy(
 ///|
 fn OperatorValidatorTemp::visit_memory_fill(
   self : OperatorValidatorTemp,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_memory_index(mem)
   self.pop_operand(Some(ty)) |> ignore
@@ -4076,7 +4080,7 @@ fn OperatorValidatorTemp::visit_memory_fill(
 ///|
 fn OperatorValidatorTemp::visit_memory_discard(
   self : OperatorValidatorTemp,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_memory_index(mem)
   self.pop_operand(Some(ty)) |> ignore
@@ -4086,8 +4090,8 @@ fn OperatorValidatorTemp::visit_memory_discard(
 ///|
 fn OperatorValidatorTemp::visit_table_init(
   self : OperatorValidatorTemp,
-  segment : UInt,
-  table : UInt,
+  segment : UInt32,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   let segment_ty = self.element_type_at(segment)
@@ -4102,7 +4106,7 @@ fn OperatorValidatorTemp::visit_table_init(
 ///|
 fn OperatorValidatorTemp::visit_elem_drop(
   self : OperatorValidatorTemp,
-  segment : UInt,
+  segment : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.element_type_at(segment) |> ignore
 }
@@ -4110,8 +4114,8 @@ fn OperatorValidatorTemp::visit_elem_drop(
 ///|
 fn OperatorValidatorTemp::visit_table_copy(
   self : OperatorValidatorTemp,
-  dst_table : UInt,
-  src_table : UInt,
+  dst_table : UInt32,
+  src_table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let src = self.table_type_at(src_table)
   let dst = self.table_type_at(dst_table)
@@ -4140,7 +4144,7 @@ fn OperatorValidatorTemp::visit_table_copy(
 ///|
 fn OperatorValidatorTemp::visit_table_get(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   self.pop_operand(Some(table.index_type())) |> ignore
@@ -4150,7 +4154,7 @@ fn OperatorValidatorTemp::visit_table_get(
 ///|
 fn OperatorValidatorTemp::visit_table_set(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   self.pop_operand(Some(Ref(table.element_type))) |> ignore
@@ -4160,7 +4164,7 @@ fn OperatorValidatorTemp::visit_table_set(
 ///|
 fn OperatorValidatorTemp::visit_table_grow(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   self.pop_operand(Some(table.index_type())) |> ignore
@@ -4171,7 +4175,7 @@ fn OperatorValidatorTemp::visit_table_grow(
 ///|
 fn OperatorValidatorTemp::visit_table_size(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   self.push_operand(table.index_type())
@@ -4180,7 +4184,7 @@ fn OperatorValidatorTemp::visit_table_size(
 ///|
 fn OperatorValidatorTemp::visit_table_fill(
   self : OperatorValidatorTemp,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   let table = self.table_type_at(table)
   self.pop_operand(Some(table.index_type())) |> ignore
@@ -4222,7 +4226,7 @@ fn OperatorValidatorTemp::visit_i64_mul_wide_u(
 /// Returns `true` if the definition was successful. Local variable
 /// definition is unsuccessful in case the amount of total variables
 /// after definition exceeds the allowed maximum number.
-fn Locals::define_(self : Locals, count : UInt, ty : ValType) -> Bool {
+fn Locals::define_(self : Locals, count : UInt32, ty : ValType) -> Bool {
   let n = self.num_locals.to_uint64() + count.to_uint64()
   if n > 0xFFFF_FFFFUL {
     return false
@@ -4243,13 +4247,13 @@ fn Locals::define_(self : Locals, count : UInt, ty : ValType) -> Bool {
 
 ///|
 /// Returns the number of defined local variables.
-pub fn Locals::len_locals(self : Locals) -> UInt {
+pub fn Locals::len_locals(self : Locals) -> UInt32 {
   self.num_locals
 }
 
 ///|
 /// Returns the type of the local variable at the given index if any.
-pub fn Locals::get(self : Locals, idx : UInt) -> ValType? {
+pub fn Locals::get(self : Locals, idx : UInt32) -> ValType? {
   if idx < self.first.length().reinterpret_as_uint() {
     Some(self.first[idx.reinterpret_as_int()])
   } else {
@@ -4258,7 +4262,7 @@ pub fn Locals::get(self : Locals, idx : UInt) -> ValType? {
 }
 
 ///|
-fn Locals::get_bsearch(self : Locals, idx : UInt) -> ValType? {
+fn Locals::get_bsearch(self : Locals, idx : UInt32) -> ValType? {
   // `binary_search_by_key(&idx, |(idx, _)| *idx)`: the first entry whose
   // maximum index is `>= idx`. If this index would be inserted at the end
   // of the list, then the index is out of bounds.

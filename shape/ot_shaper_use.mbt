@@ -21,11 +21,11 @@ let universal_shaper : OtShaper = {
 
 ///|
 /// OTHER
-const USE_O : Int = 0
+const USE_O : Int32 = 0
 
 ///|
 /// BASE
-const USE_B : Int = 1
+const USE_B : Int32 = 1
 
 // pub const IND: u8     = 3;    // BASE_IND
 
@@ -33,16 +33,16 @@ const USE_B : Int = 1
 /// BASE_NUM
 // ot_shaper_use.rs:40; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_N : Int = 4
+const USE_N : Int32 = 4
 
 ///|
 /// BASE_OTHER
 // ot_shaper_use.rs:41; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_GB : Int = 5
+const USE_GB : Int32 = 5
 
 ///|
-const USE_CGJ : Int = 6
+const USE_CGJ : Int32 = 6
 
 // pub const CGJ: u8     = 6;    // CGJ
 // pub const F: u8       = 7;    // CONS_FINAL
@@ -54,21 +54,21 @@ const USE_CGJ : Int = 6
 /// CONS_SUB
 // ot_shaper_use.rs:50; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_SUB : Int = 11
+const USE_SUB : Int32 = 11
 
 ///|
 /// HALANT
-const USE_H : Int = 12
+const USE_H : Int32 = 12
 
 ///|
 /// HALANT_NUM
 // ot_shaper_use.rs:53; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_HN : Int = 13
+const USE_HN : Int32 = 13
 
 ///|
 /// Zero width non-joiner
-const USE_ZWNJ : Int = 14
+const USE_ZWNJ : Int32 = 14
 
 // pub const ZWJ: u8     = 15;   // Zero width joiner
 
@@ -76,23 +76,23 @@ const USE_ZWNJ : Int = 14
 /// Word joiner
 // ot_shaper_use.rs:57; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_WJ : Int = 16
+const USE_WJ : Int32 = 16
 
 ///|
 /// Reserved characters
 // ot_shaper_use.rs:59; unused upstream too.
 #warnings("-unused_value")
-const USE_RSV : Int = 17
+const USE_RSV : Int32 = 17
 
 ///|
 /// REPHA
-const USE_R : Int = 18
+const USE_R : Int32 = 18
 
 ///|
 /// SYM
 // ot_shaper_use.rs:61; unused upstream too.
 #warnings("-unused_value")
-const USE_S : Int = 19
+const USE_S : Int32 = 19
 
 // pub const SM: u8      = 20;   // SYM_MOD
 // pub const VS: u8      = 21;   // VARIATION_SELECTOR
@@ -103,155 +103,155 @@ const USE_S : Int = 19
 /// CONS_WITH_STACKER
 // ot_shaper_use.rs:68; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_CS : Int = 43
+const USE_CS : Int32 = 43
 
 ///|
 /// HALANT_OR_VOWEL_MODIFIER
 ///
 /// https://github.com/harfbuzz/harfbuzz/issues/1102
-const USE_IS : Int = 44
+const USE_IS : Int32 = 44
 
 ///|
 /// SAKOT
 // ot_shaper_use.rs:73; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_Sk : Int = 48
+const USE_Sk : Int32 = 48
 
 ///|
 /// CONS_FINAL_ABOVE
-const USE_FAbv : Int = 24
+const USE_FAbv : Int32 = 24
 
 ///|
 /// CONS_FINAL_BELOW
-const USE_FBlw : Int = 25
+const USE_FBlw : Int32 = 25
 
 ///|
 /// CONS_FINAL_POST
-const USE_FPst : Int = 26
+const USE_FPst : Int32 = 26
 
 ///|
 /// CONS_MED_ABOVE
-const USE_MAbv : Int = 27
+const USE_MAbv : Int32 = 27
 
 ///|
 /// CONS_MED_BELOW
-const USE_MBlw : Int = 28
+const USE_MBlw : Int32 = 28
 
 ///|
 /// CONS_MED_POST
-const USE_MPst : Int = 29
+const USE_MPst : Int32 = 29
 
 ///|
 /// CONS_MED_PRE
-const USE_MPre : Int = 30
+const USE_MPre : Int32 = 30
 
 ///|
 /// CONS_MOD_ABOVE
 // ot_shaper_use.rs:82; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_CMAbv : Int = 31
+const USE_CMAbv : Int32 = 31
 
 ///|
 /// CONS_MOD_BELOW
 // ot_shaper_use.rs:83; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_CMBlw : Int = 32
+const USE_CMBlw : Int32 = 32
 
 ///|
 /// VOWEL_ABOVE / VOWEL_ABOVE_BELOW / VOWEL_ABOVE_BELOW_POST / VOWEL_ABOVE_POST
-const USE_VAbv : Int = 33
+const USE_VAbv : Int32 = 33
 
 ///|
 /// VOWEL_BELOW / VOWEL_BELOW_POST
-const USE_VBlw : Int = 34
+const USE_VBlw : Int32 = 34
 
 ///|
 /// VOWEL_POST UIPC = Right
-const USE_VPst : Int = 35
+const USE_VPst : Int32 = 35
 
 ///|
 /// VOWEL_PRE / VOWEL_PRE_ABOVE / VOWEL_PRE_ABOVE_POST / VOWEL_PRE_POST
-const USE_VPre : Int = 22
+const USE_VPre : Int32 = 22
 
 ///|
 /// VOWEL_MOD_ABOVE
-const USE_VMAbv : Int = 37
+const USE_VMAbv : Int32 = 37
 
 ///|
 /// VOWEL_MOD_BELOW
-const USE_VMBlw : Int = 38
+const USE_VMBlw : Int32 = 38
 
 ///|
 /// VOWEL_MOD_POST
-const USE_VMPst : Int = 39
+const USE_VMPst : Int32 = 39
 
 ///|
 /// VOWEL_MOD_PRE
-const USE_VMPre : Int = 23
+const USE_VMPre : Int32 = 23
 
 ///|
 /// SYM_MOD_ABOVE
 // ot_shaper_use.rs:92; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_SMAbv : Int = 41
+const USE_SMAbv : Int32 = 41
 
 ///|
 /// SYM_MOD_BELOW
 // ot_shaper_use.rs:93; named only by the Ragel grammar upstream.
 #warnings("-unused_value")
-const USE_SMBlw : Int = 42
+const USE_SMBlw : Int32 = 42
 
 ///|
 /// CONS_FINAL_MOD UIPC = Top
-const USE_FMAbv : Int = 45
+const USE_FMAbv : Int32 = 45
 
 ///|
 /// CONS_FINAL_MOD UIPC = Bottom
-const USE_FMBlw : Int = 46
+const USE_FMBlw : Int32 = 46
 
 ///|
 /// CONS_FINAL_MOD UIPC = Not_Applicable
-const USE_FMPst : Int = 47
+const USE_FMPst : Int32 = 47
 
 ///|
 /// HIEROGLYPH
 // ot_shaper_use.rs:97; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_G : Int = 49
+const USE_G : Int32 = 49
 
 ///|
 /// HIEROGLYPH_JOINER
 // ot_shaper_use.rs:98; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_J : Int = 50
+const USE_J : Int32 = 50
 
 ///|
 /// HIEROGLYPH_SEGMENT_BEGIN
 // ot_shaper_use.rs:99; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_SB : Int = 51
+const USE_SB : Int32 = 51
 
 ///|
 /// HIEROGLYPH_SEGMENT_END
 // ot_shaper_use.rs:100; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_SE : Int = 52
+const USE_SE : Int32 = 52
 
 ///|
 /// HIEROGLYPH_SEGMENT_END
-const USE_HVM : Int = 53
+const USE_HVM : Int32 = 53
 
 ///|
 /// HIEROGLYPH_MOD
 // ot_shaper_use.rs:102; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_HM : Int = 54
+const USE_HM : Int32 = 54
 
 ///|
 /// HIEROGLYPH_MIRROR
 // ot_shaper_use.rs:103; named only by the generated table upstream.
 #warnings("-unused_value")
-const USE_HR : Int = 55
+const USE_HR : Int32 = 55
 
 ///|
 /// These features are applied all at once, before reordering,
@@ -284,7 +284,7 @@ priv enum JoiningForm {
 } derive(Eq)
 
 ///|
-fn JoiningForm::to_int(self : JoiningForm) -> Int {
+fn JoiningForm::to_int(self : JoiningForm) -> Int32 {
   match self {
     Isolated => 0
     Initial => 1
@@ -304,12 +304,12 @@ let use_other_features : ReadOnlyArray[@otf.Tag] = [
 ]
 
 ///|
-fn GlyphInfo::use_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::use_category(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_category()
 }
 
 ///|
-fn GlyphInfo::set_use_category(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_use_category(self : GlyphInfo, c : Int32) -> Unit {
   self.set_ot_shaper_var_u8_category(c)
 }
 
@@ -320,7 +320,7 @@ fn GlyphInfo::is_halant_use(self : GlyphInfo) -> Bool {
 
 ///|
 priv struct UniversalShapePlan {
-  rphf_mask : UInt
+  rphf_mask : UInt32
   arabic_plan : ArabicShapePlan?
 }
 
@@ -420,7 +420,7 @@ fn setup_topographical_masks(plan : ShapePlan, buffer : Buffer) -> Unit {
   if universal_plan(plan).arabic_plan is Some(_) {
     return
   }
-  let masks : FixedArray[UInt] = [0, 0, 0, 0]
+  let masks : FixedArray[UInt32] = [0, 0, 0, 0]
   let mut all_masks = 0U
   for i in 0..<4 {
     masks[i] = plan.ot_map.get_1_mask(use_topographical_features[i])
@@ -517,12 +517,12 @@ fn reorder_use(_plan : ShapePlan, face : Face, buffer : Buffer) -> Bool {
 }
 
 ///|
-fn category_flag(c : Int) -> UInt {
+fn category_flag(c : Int32) -> UInt32 {
   rb_flag(c)
 }
 
 ///|
-fn category_flag64(c : Int) -> UInt64 {
+fn category_flag64(c : Int32) -> UInt64 {
   rb_flag64(c)
 }
 
@@ -547,7 +547,7 @@ let use_post_base_flags : UInt64 = category_flag64(USE_FAbv) |
   category_flag64(USE_VMPre)
 
 ///|
-fn reorder_syllable_use(start : Int, end : Int, buffer : Buffer) -> Unit {
+fn reorder_syllable_use(start : Int32, end : Int32, buffer : Buffer) -> Unit {
   let syllable_type = buffer.info[start].syllable() & 0x0F
   // Only a few syllable types need reordering.
   if (
@@ -660,7 +660,7 @@ fn preprocess_text_use(
 }
 
 ///|
-fn compose_use(_ctx : NormalizeContext, a : Int, b : Int) -> Int? {
+fn compose_use(_ctx : NormalizeContext, a : Int32, b : Int32) -> Int32? {
   // Avoid recomposing split matras.
   if gc_is_mark(char_general_category(a)) {
     return None

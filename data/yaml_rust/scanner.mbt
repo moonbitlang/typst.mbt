@@ -39,9 +39,9 @@ pub extend TScalarStyle with @debug.Debug::{to_repr}
 /// A position in the input. `index` counts chars (code points), `line` starts
 /// from 1 and `col` from 0.
 pub struct Marker {
-  priv index : Int
-  priv line : Int
-  priv col : Int
+  priv index : Int32
+  priv line : Int32
+  priv col : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -55,22 +55,22 @@ pub extend Marker with Eq::{not_equal, equal}
 pub extend Marker with @debug.Debug::{to_repr}
 
 ///|
-fn Marker::new(index : Int, line : Int, col : Int) -> Marker {
+fn Marker::new(index : Int32, line : Int32, col : Int32) -> Marker {
   { index, line, col, }
 }
 
 ///|
-pub fn Marker::index(self : Marker) -> Int {
+pub fn Marker::index(self : Marker) -> Int32 {
   self.index
 }
 
 ///|
-pub fn Marker::line(self : Marker) -> Int {
+pub fn Marker::line(self : Marker) -> Int32 {
   self.line
 }
 
 ///|
-pub fn Marker::col(self : Marker) -> Int {
+pub fn Marker::col(self : Marker) -> Int32 {
   self.col
 }
 
@@ -125,7 +125,7 @@ pub(all) enum TokenType {
   StreamStart(TEncoding)
   StreamEnd
   /// major, minor
-  VersionDirective(UInt, UInt)
+  VersionDirective(UInt32, UInt32)
   /// handle, prefix
   TagDirective(String, String)
   DocumentStart
@@ -175,7 +175,7 @@ pub extend Token with @debug.Debug::{to_repr}
 priv struct SimpleKey {
   mut possible : Bool
   mut required : Bool
-  mut token_number : Int
+  mut token_number : Int32
   mark : Marker
 }
 
@@ -190,20 +190,20 @@ fn SimpleKey::new(mark : Marker) -> SimpleKey {
 pub struct Scanner {
   priv rdr : Array[Char]
   /// Position in `rdr` of `buffer[0]`; chars past the end read as `'\0'`.
-  priv mut pos : Int
+  priv mut pos : Int32
   priv mut mark : Marker
   priv tokens : Array[Token]
-  priv mut tokens_head : Int
+  priv mut tokens_head : Int32
   priv mut error : ScanError?
   priv mut stream_start_produced : Bool
   priv mut stream_end_produced : Bool
-  priv mut adjacent_value_allowed_at : Int
+  priv mut adjacent_value_allowed_at : Int32
   priv mut simple_key_allowed : Bool
   priv simple_keys : Array[SimpleKey]
-  priv mut indent : Int
-  priv indents : Array[Int]
-  priv mut flow_level : Int
-  priv mut tokens_parsed : Int
+  priv mut indent : Int32
+  priv indents : Array[Int32]
+  priv mut flow_level : Int32
+  priv mut tokens_parsed : Int32
   priv mut token_available : Bool
 }
 
@@ -255,7 +255,7 @@ fn is_digit(c : Char) -> Bool {
 ///|
 fn is_alpha(c : Char) -> Bool {
   match c {
-    '0'..='9' | 'a'..='z' | 'A'..='Z' => true
+    '0'..<='9' | 'a'..<='z' | 'A'..<='Z' => true
     '_' | '-' => true
     _ => false
   }
@@ -267,11 +267,11 @@ fn is_hex(c : Char) -> Bool {
 }
 
 ///|
-fn as_hex(c : Char) -> UInt {
+fn as_hex(c : Char) -> UInt32 {
   match c {
-    '0'..='9' => (c.to_int() - '0'.to_int()).reinterpret_as_uint()
-    'a'..='f' => (c.to_int() - 'a'.to_int() + 10).reinterpret_as_uint()
-    'A'..='F' => (c.to_int() - 'A'.to_int() + 10).reinterpret_as_uint()
+    '0'..<='9' => (c.to_int() - '0'.to_int()).reinterpret_as_uint()
+    'a'..<='f' => (c.to_int() - 'a'.to_int() + 10).reinterpret_as_uint()
+    'A'..<='F' => (c.to_int() - 'A'.to_int() + 10).reinterpret_as_uint()
     _ => panic()
   }
 }
@@ -286,7 +286,7 @@ fn is_flow(c : Char) -> Bool {
 
 ///|
 /// `char::from_u32`.
-fn char_from_u32(code : UInt) -> Char? {
+fn char_from_u32(code : UInt32) -> Char? {
   if code > 0x10FFFFU || (code >= 0xD800U && code <= 0xDFFFU) {
     None
   } else {
@@ -330,14 +330,14 @@ pub fn Scanner::get_error(self : Scanner) -> ScanError? {
 /// Upstream fills `buffer` from the reader; here the whole input is decoded up
 /// front, so this is a no-op kept for structural fidelity.
 #inline
-fn Scanner::lookahead(_self : Scanner, _count : Int) -> Unit {
+fn Scanner::lookahead(_self : Scanner, _count : Int32) -> Unit {
 
 }
 
 ///|
 /// `self.buffer[i]`.
 #inline
-fn Scanner::buf(self : Scanner, i : Int) -> Char {
+fn Scanner::buf(self : Scanner, i : Int32) -> Char {
   let p = self.pos + i
   if p < self.rdr.length() {
     self.rdr[p]
@@ -410,7 +410,7 @@ fn Scanner::read_break(self : Scanner, s : StringBuilder) -> Unit {
 }
 
 ///|
-fn Scanner::tokens_len(self : Scanner) -> Int {
+fn Scanner::tokens_len(self : Scanner) -> Int32 {
   self.tokens.length() - self.tokens_head
 }
 
@@ -420,7 +420,7 @@ fn Scanner::push_token(self : Scanner, tok : Token) -> Unit {
 }
 
 ///|
-fn Scanner::insert_token(self : Scanner, pos : Int, tok : Token) -> Unit {
+fn Scanner::insert_token(self : Scanner, pos : Int32, tok : Token) -> Unit {
   let old_len = self.tokens_len()
   guard! pos <= old_len
   self.tokens.insert(self.tokens_head + pos, tok)
@@ -722,7 +722,7 @@ fn Scanner::scan_directive_name(self : Scanner) -> String raise ScanError {
 fn Scanner::scan_version_directive_number(
   self : Scanner,
   mark : Marker,
-) -> UInt raise ScanError {
+) -> UInt32 raise ScanError {
   let mut val = 0U
   let mut length = 0
   self.lookahead(1)
@@ -1263,7 +1263,7 @@ fn Scanner::scan_block_scalar(
 ///|
 fn Scanner::block_scalar_breaks(
   self : Scanner,
-  indent : Ref[Int],
+  indent : Ref[Int32],
   breaks : StringBuilder,
 ) -> Unit raise ScanError {
   let mut max_indent = 0
@@ -1681,8 +1681,8 @@ fn Scanner::fetch_value(self : Scanner) -> Unit raise ScanError {
 ///|
 fn Scanner::roll_indent(
   self : Scanner,
-  col : Int,
-  number : Int?,
+  col : Int32,
+  number : Int32?,
   tok : TokenType,
   mark : Marker,
 ) -> Unit {
@@ -1701,7 +1701,7 @@ fn Scanner::roll_indent(
 }
 
 ///|
-fn Scanner::unroll_indent(self : Scanner, col : Int) -> Unit {
+fn Scanner::unroll_indent(self : Scanner, col : Int32) -> Unit {
   if self.flow_level > 0 {
     return
   }

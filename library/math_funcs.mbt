@@ -6,7 +6,7 @@
 pub fn Content::set(
   self : Content,
   elem : Element,
-  id : Int,
+  id : Int32,
   value : Value,
 ) -> Content {
   self.styled(Property(Property::new(elem, id, value)))

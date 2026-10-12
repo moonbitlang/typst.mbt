@@ -58,9 +58,9 @@ fn reading_id(path : String) -> @syntax.FileId {
 ///|
 fn reading_world(
   text : String,
-  sources? : Array[(String, String)] = [],
-  data? : Array[(String, String)] = [],
-  library? : @library.Library = library([]),
+  sources~ : Array[(String, String)] = [],
+  data~ : Array[(String, String)] = [],
+  library~ : @library.Library = library([]),
 ) -> ReadingWorld {
   let world : ReadingWorld = {
     main: @syntax.Source::detached(text),
@@ -86,7 +86,7 @@ fn reading_world(
 priv struct Checked {
   text : String
   warnings : Array[String]
-  entries : Int
+  entries : Int32
   differ : Array[String]
 }
 

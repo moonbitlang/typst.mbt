@@ -8,7 +8,7 @@
 /// kept, so a second layout with the same region reported what the first
 /// caller had made of them.
 test "cached cell: an error that it keeps is raised as a copy" {
-  let cell : CachedCell[Int, Int] = CachedCell::new()
+  let cell : CachedCell[Int32, Int32] = CachedCell::new()
   let span = @syntax.Span::detached()
   let mut runs = 0
   let caught = () => {
@@ -41,9 +41,9 @@ test "cached cell: an error that it keeps is raised as a copy" {
   }
   assert_eq(runs, 1)
   // A value is handed out as it is kept, and another input computes anew.
-  let values : CachedCell[Int, Int] = CachedCell::new()
+  let values : CachedCell[Int32, Int32] = CachedCell::new()
   let mut computed = 0
-  let get = (input : Int) => {
+  let get = (input : Int32) => {
     values.get_or_init(input, (a, b) => a == b, input => {
       computed += 1
       input * 2

@@ -2,7 +2,7 @@
 
 ///|
 /// Baked `SegmenterBreakLineV1`: `property_table` as ranges. Missing = 0.
-let line_property_table : ReadOnlyArray[Int] = [
+let line_property_table : ReadOnlyArray[Int32] = [
   0x0, 0x8, 14, 0x9, 0x9, 8, 0xA, 0xA, 32, 0xB, 0xC, 10, 0xD, 0xD, 16, 0xE, 0x1F,
   14, 0x20, 0x20, 47, 0x21, 0x21, 19, 0x22, 0x22, 42, 0x23, 0x23, 3, 0x24, 0x24,
   40, 0x25, 0x25, 38, 0x26, 0x26, 3, 0x27, 0x27, 42, 0x28, 0x28, 37, 0x29, 0x29,
@@ -875,7 +875,7 @@ let line_property_table : ReadOnlyArray[Int] = [
 
 ///|
 /// Baked `SegmenterBreakLineV1`: `break_state_table` (ULE bytes).
-let line_break_state_table : ReadOnlyArray[Int] = [
+let line_break_state_table : ReadOnlyArray[Int32] = [
   253, 253, 253, 253, 253, 253, 253, 253, 255, 253, 255, 253, 255, 255, 253, 255,
   255, 253, 253, 255, 255, 253, 253, 253, 255, 253, 253, 255, 255, 253, 253, 253,
   255, 255, 255, 253, 253, 253, 253, 253, 253, 253, 255, 255, 255, 253, 253, 255,
@@ -1168,11 +1168,11 @@ let line_break_state_table : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let line_params : (Int, Int, Int, Int, Int) = (68, 54, 66, 67, 46)
+let line_params : (Int32, Int32, Int32, Int32, Int32) = (68, 54, 66, 67, 46)
 
 ///|
 /// `SegmenterBreakLineV1` from `typst_assets::icu::ICU_CJ_SEGMENT`: `property_table` as ranges. Missing = 0.
-let cj_line_property_table : ReadOnlyArray[Int] = [
+let cj_line_property_table : ReadOnlyArray[Int32] = [
   0x0, 0x8, 14, 0x9, 0x9, 8, 0xA, 0xA, 32, 0xB, 0xC, 10, 0xD, 0xD, 16, 0xE, 0x1F,
   14, 0x20, 0x20, 47, 0x21, 0x21, 19, 0x22, 0x22, 42, 0x23, 0x23, 3, 0x24, 0x24,
   40, 0x25, 0x25, 38, 0x26, 0x26, 3, 0x27, 0x27, 42, 0x28, 0x28, 37, 0x29, 0x29,
@@ -2046,7 +2046,7 @@ let cj_line_property_table : ReadOnlyArray[Int] = [
 
 ///|
 /// `SegmenterBreakLineV1` from `typst_assets::icu::ICU_CJ_SEGMENT`: `break_state_table` (ULE bytes).
-let cj_line_break_state_table : ReadOnlyArray[Int] = [
+let cj_line_break_state_table : ReadOnlyArray[Int32] = [
   253, 253, 253, 253, 253, 253, 253, 253, 255, 253, 255, 253, 255, 255, 253, 255,
   255, 253, 253, 255, 255, 253, 253, 253, 255, 253, 253, 255, 255, 253, 253, 253,
   255, 255, 255, 253, 253, 253, 253, 253, 253, 253, 255, 255, 255, 253, 253, 255,
@@ -2339,11 +2339,11 @@ let cj_line_break_state_table : ReadOnlyArray[Int] = [
 ]
 
 ///|
-let cj_line_params : (Int, Int, Int, Int, Int) = (68, 54, 66, 67, 46)
+let cj_line_params : (Int32, Int32, Int32, Int32, Int32) = (68, 54, 66, 67, 46)
 
 ///|
 /// `Line_Break` (icu_properties 2.3); values are ICU4C `ULineBreak` values. Missing = XX (0).
-let line_break_table : ReadOnlyArray[Int] = [
+let line_break_table : ReadOnlyArray[Int32] = [
   0x0, 0x8, 9, 0x9, 0x9, 4, 0xA, 0xA, 17, 0xB, 0xC, 6, 0xD, 0xD, 10, 0xE, 0x1F, 9,
   0x20, 0x20, 26, 0x21, 0x21, 11, 0x22, 0x22, 23, 0x23, 0x23, 2, 0x24, 0x24, 22,
   0x25, 0x25, 21, 0x26, 0x26, 2, 0x27, 0x27, 23, 0x28, 0x28, 20, 0x29, 0x29, 36,

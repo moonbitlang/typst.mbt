@@ -4,7 +4,7 @@
 ///|
 /// Writes the demultiplied RGBA bytes of `data` to `out` (`4 * data.length()`
 /// bytes).
-fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
+fn demultiply_into(data : FixedArray[UInt32], out : FixedArray[Byte]) -> Unit {
   let len = data.length()
   // `out[4 * i..4 * i + 4]` for `i < len` is within the checked length.
   guard out.length().to_int64() >= len.to_int64() * 4 else {

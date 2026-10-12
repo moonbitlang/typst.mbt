@@ -179,8 +179,8 @@ priv struct CallData {
 /// If there was an error reading/writing memory, keep the offset + length to
 /// display an error message.
 priv struct MemoryError {
-  offset : UInt
-  length : UInt
+  offset : UInt32
+  length : UInt32
   write : Bool
 }
 
@@ -306,7 +306,7 @@ fn plugin_func_type(
 /// Create a new plugin from raw WebAssembly bytes.
 fn Plugin::new(
   bytes : Bytes,
-  bytes_hash? : U128 = plugin_bytes_hash(bytes),
+  bytes_hash~ : U128 = plugin_bytes_hash(bytes),
 ) -> Plugin raise HintedError {
   let config = @wasmi.Config::default()
   // Disable relaxed SIMD as it can introduce non-determinism.

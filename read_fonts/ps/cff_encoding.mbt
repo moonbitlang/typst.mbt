@@ -14,7 +14,7 @@ pub enum RawEncoding {
 /// expert encodings, respectively.
 pub fn RawEncoding::new(
   data : BytesView,
-  offset : Int,
+  offset : Int32,
 ) -> RawEncoding raise PsError {
   match offset {
     0 => Predefined(Standard)
@@ -32,7 +32,7 @@ pub fn RawEncoding::new(
 pub fn RawEncoding::map(
   self : RawEncoding,
   charset : Charset,
-  code : Int,
+  code : Int32,
 ) -> GlyphId? {
   match self {
     Predefined(predefined) => {
@@ -95,7 +95,7 @@ pub fn CustomEncoding::new(data : BytesView) -> CustomEncoding raise PsError {
 pub fn CustomEncoding::map(
   self : CustomEncoding,
   charset : Charset,
-  code : Int,
+  code : Int32,
 ) -> GlyphId? {
   let read_sup = fn(sup : BytesView) -> GlyphId? {
     for i in 0..<(sup.length() / 3) {

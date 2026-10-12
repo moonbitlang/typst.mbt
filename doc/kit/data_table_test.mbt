@@ -28,7 +28,7 @@ let rule : Stroke = Stroke(thickness=Pt(0.5), paint=Luma(120))
 let head : Array[&IntoContent] = ["A", "B"]
 
 ///|
-fn two_columns(count : Int) -> Array[Array[&IntoContent]] {
+fn two_columns(count : Int32) -> Array[Array[&IntoContent]] {
   Array::makei(count, i => ["a\{i}", "b\{i}"])
 }
 
@@ -727,7 +727,7 @@ fn tinted_page() -> Array[&IntoContent] {
 /// The frame of the table on page `page`: the box that has a stroke.
 fn frame_on(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page : Int,
+  page : Int32,
 ) -> Drawn raise {
   of_kind(drawn(report), "box").filter(d => d.stroke != "" && d.page == page)[0]
 }
@@ -771,7 +771,7 @@ fn box_alone(frame : Drawn) -> Pixels raise {
 /// comparison, and is a failure.)
 fn frame_differences(
   report : @doc.CompileReport[@layout.PagedDocument],
-  page : Int,
+  page : Int32,
 ) -> String raise {
   let frame = frame_on(report, page)
   let lines = of_kind(drawn(report), "line").filter(d => d.page == page)
@@ -793,7 +793,7 @@ fn frame_differences(
 fn surfaced(
   fill : Cells[@doc.Paint]?,
   frame_fill : @doc.Paint?,
-  count? : Int = 2,
+  count~ : Int32 = 2,
 ) -> @kit.DataTable {
   @kit.DataTable(
     head,

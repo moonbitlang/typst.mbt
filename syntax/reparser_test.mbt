@@ -6,9 +6,9 @@ priv enum Edit {
   /// Insert at the end.
   End
   /// Insert at an index.
-  At(Int)
+  At(Int32)
   /// Replace the given range.
-  Range(Int, Int)
+  Range(Int32, Int32)
   /// Replace the first match in the original.
   Match(String)
   /// Replace at the index after the first match of this string.
@@ -17,7 +17,7 @@ priv enum Edit {
 
 ///|
 /// The byte index of the first match of `pat` in `text`.
-fn find_bytes(text : String, pat : String) -> Int {
+fn find_bytes(text : String, pat : String) -> Int32 {
   match text.find(pat) {
     Some(i) => @syntax.utf8_len(text.unsafe_substring(start=0, end=i))
     None => abort("pattern must exist in original")
@@ -25,7 +25,7 @@ fn find_bytes(text : String, pat : String) -> Int {
 }
 
 ///|
-fn Edit::into_range(self : Edit, text : String) -> (Int, Int) {
+fn Edit::into_range(self : Edit, text : String) -> (Int32, Int32) {
   let len = @syntax.utf8_len(text)
   match self {
     End => (len, len)

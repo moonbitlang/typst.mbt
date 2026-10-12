@@ -29,7 +29,7 @@ fn build_decompositions(
     fn build_sub_band(
       sub_band_type : SubBandType,
       resolution_tile : ResolutionTile,
-    ) -> Int raise DecodeError {
+    ) -> Int32 raise DecodeError {
       let sub_band_rect = resolution_tile.sub_band_rect(sub_band_type)
       let (precincts_start, precincts_end) = build_precincts(
         resolution_tile, sub_band_rect, tile, storage,
@@ -81,7 +81,7 @@ fn build_precincts(
   sub_band_rect : IntRect,
   tile : Tile,
   storage : DecompositionStorage,
-) -> (Int, Int) raise DecodeError {
+) -> (Int32, Int32) raise DecodeError {
   let start = storage.precincts.length()
   guard resolution_tile.precincts() is Some(precincts) else {
     raise Decoding(InvalidPrecinct)
@@ -114,12 +114,12 @@ fn build_precincts(
     // If the sub-band is empty, there are no code-blocks, but due to our
     // flooring/ceiling above, we would get 1 code-block in each direction.
     // Because of this, we need to special-case this.
-    let code_blocks_x : UInt = if sub_band_rect.width() == 0 {
+    let code_blocks_x : UInt32 = if sub_band_rect.width() == 0 {
       0
     } else {
       code_block_area.width() / cb_width
     }
-    let code_blocks_y : UInt = if sub_band_rect.height() == 0 {
+    let code_blocks_y : UInt32 = if sub_band_rect.height() == 0 {
       0
     } else {
       code_block_area.height() / cb_height
@@ -154,11 +154,11 @@ fn build_code_blocks(
   code_block_area : IntRect,
   sub_band_rect : IntRect,
   tile_instance : ResolutionTile,
-  code_blocks_x : UInt,
-  code_blocks_y : UInt,
+  code_blocks_x : UInt32,
+  code_blocks_y : UInt32,
   tile : Tile,
   storage : DecompositionStorage,
-) -> (Int, Int) {
+) -> (Int32, Int32) {
   let mut y = code_block_area.y0
   let code_block_width = tile_instance.code_block_width()
   let code_block_height = tile_instance.code_block_height()
@@ -207,7 +207,7 @@ fn build_code_blocks(
 ///|
 priv struct Decomposition {
   /// In the order low-high, high-low and high-high.
-  sub_bands : FixedArray[Int]
+  sub_bands : FixedArray[Int32]
   /// The rectangle of the decomposition.
   rect : IntRect
 }
@@ -216,10 +216,10 @@ priv struct Decomposition {
 priv struct SubBand {
   sub_band_type : SubBandType
   rect : IntRect
-  precincts_start : Int
-  precincts_end : Int
-  coefficients_start : Int
-  coefficients_end : Int
+  precincts_start : Int32
+  precincts_end : Int32
+  coefficients_start : Int32
+  coefficients_end : Int32
 }
 
 ///|
@@ -232,8 +232,8 @@ priv enum SubBandType {
 
 ///|
 priv struct Precinct {
-  code_blocks_start : Int
-  code_blocks_end : Int
+  code_blocks_start : Int32
+  code_blocks_end : Int32
   code_inclusion_tree : TagTree
   zero_bitplane_tree : TagTree
 }
@@ -241,9 +241,9 @@ priv struct Precinct {
 ///|
 priv struct PrecinctData {
   /// The x coordinate mapped back to the reference grid.
-  r_x : UInt
+  r_x : UInt32
   /// The y coordinate mapped back to the reference grid.
-  r_y : UInt
+  r_y : UInt32
   /// The actual rectangle of the precinct (in the sub-band coordinate
   /// system).
   rect : IntRect
@@ -254,26 +254,26 @@ priv struct PrecinctData {
 ///|
 priv struct CodeBlock {
   rect : IntRect
-  x_idx : UInt
-  y_idx : UInt
-  layers_start : Int
-  layers_end : Int
+  x_idx : UInt32
+  y_idx : UInt32
+  layers_start : Int32
+  layers_end : Int32
   mut has_been_included : Bool
-  mut missing_bit_planes : Int
-  mut number_of_coding_passes : Int
-  mut l_block : UInt
-  mut non_empty_layer_count : Int
+  mut missing_bit_planes : Int32
+  mut number_of_coding_passes : Int32
+  mut l_block : UInt32
+  mut non_empty_layer_count : Int32
 }
 
 ///|
 priv struct Segment {
-  idx : Int
-  coding_pases : Int
-  data_length : UInt
+  idx : Int32
+  coding_pases : Int32
+  data_length : UInt32
   mut data : BytesView
 }
 
 ///|
 priv struct Layer {
-  mut segments : (Int, Int)?
+  mut segments : (Int32, Int32)?
 }

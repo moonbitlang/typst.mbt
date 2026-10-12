@@ -10,10 +10,10 @@ priv struct Session {
   registry : Registry
   /// The host function of each callback description (by serial): one per
   /// description and compilation.
-  hosts : Map[Int, @library.HostFunc]
+  hosts : Map[Int32, @library.HostFunc]
   /// The serial of the first callback description that did not exist when
   /// the compilation started.
-  start_serial : Int
+  start_serial : Int32
   /// Whether the lints run: lowering then notes what the lint of
   /// containers needs (`Container` in `origin.mbt`).
   lints : Bool
@@ -22,8 +22,8 @@ priv struct Session {
 ///|
 fn Session::new(
   base : &@library.World,
-  dir? : String = "",
-  lints? : Bool = true,
+  dir~ : String = "",
+  lints~ : Bool = true,
 ) -> Session {
   {
     base,

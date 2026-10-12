@@ -50,23 +50,23 @@ fn imagesize_image_type(data : Bytes) -> ImageSizeType? {
 /// `imagesize::blob_size`: the `(width, height)` of an image. (A PNG's
 /// are the eight bytes after the type of its first chunk, whatever the
 /// chunk is and whether its CRC is right: `imagesize` checks neither.)
-fn imagesize_blob_size(data : Bytes) -> (UInt, UInt)? {
+fn imagesize_blob_size(data : Bytes) -> (UInt32, UInt32)? {
   let n = data.length()
-  let u16_be = (pos : Int) => {
+  let u16_be = (pos : Int32) => {
     if pos + 2 <= n {
       Some((data[pos].to_int() << 8) | data[pos + 1].to_int())
     } else {
       None
     }
   }
-  let u16_le = (pos : Int) => {
+  let u16_le = (pos : Int32) => {
     if pos + 2 <= n {
       Some((data[pos + 1].to_int() << 8) | data[pos].to_int())
     } else {
       None
     }
   }
-  let u24_le = (pos : Int) => {
+  let u24_le = (pos : Int32) => {
     if pos + 3 <= n {
       Some(
         (data[pos + 2].to_int() << 16) |
@@ -77,7 +77,7 @@ fn imagesize_blob_size(data : Bytes) -> (UInt, UInt)? {
       None
     }
   }
-  let u32_be = (pos : Int) => {
+  let u32_be = (pos : Int32) => {
     if pos + 4 <= n {
       Some(
         (data[pos].to_uint() << 24) |
@@ -89,7 +89,7 @@ fn imagesize_blob_size(data : Bytes) -> (UInt, UInt)? {
       None
     }
   }
-  let u32_le = (pos : Int) => {
+  let u32_le = (pos : Int32) => {
     if pos + 4 <= n {
       Some(
         (data[pos + 3].to_uint() << 24) |

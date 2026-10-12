@@ -8,7 +8,7 @@
 /// LaTeX's `alphabetical` style.
 pub(all) struct Alphanumerical {
   /// Defines how many letters are allowed to describe an entry.
-  letters : Int
+  letters : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -34,7 +34,7 @@ pub fn Alphanumerical::new() -> Alphanumerical {
 
 ///|
 /// The first `n` graphemes of a string.
-fn take_graphemes(s : String, n : Int) -> String {
+fn take_graphemes(s : String, n : Int32) -> String {
   let out = StringBuilder()
   for i, g in @unicode.graphemes(s) {
     if i >= n {

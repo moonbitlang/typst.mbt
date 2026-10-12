@@ -13,7 +13,7 @@ fn hex(data : Bytes) -> String {
 }
 
 ///|
-fn u16s(values : Array[Int]) -> Bytes {
+fn u16s(values : Array[Int32]) -> Bytes {
   Bytes::from_array(
     values.map(v => [v.to_byte(), (v >> 8).to_byte()]).flatten(),
   )

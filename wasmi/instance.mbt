@@ -195,14 +195,17 @@ pub fn InstanceEntity::is_initialized(self : InstanceEntity) -> Bool {
 /// Returns the linear memory at the `index` if any.
 pub fn InstanceEntity::get_memory(
   self : InstanceEntity,
-  index : Int,
+  index : Int32,
 ) -> Memory? {
   self.memories.get(index)
 }
 
 ///|
 /// Returns the table at the `index` if any.
-pub fn InstanceEntity::get_table(self : InstanceEntity, index : Int) -> Table? {
+pub fn InstanceEntity::get_table(
+  self : InstanceEntity,
+  index : Int32,
+) -> Table? {
   self.tables.get(index)
 }
 
@@ -210,14 +213,14 @@ pub fn InstanceEntity::get_table(self : InstanceEntity, index : Int) -> Table? {
 /// Returns the global variable at the `index` if any.
 pub fn InstanceEntity::get_global(
   self : InstanceEntity,
-  index : Int,
+  index : Int32,
 ) -> Global? {
   self.globals.get(index)
 }
 
 ///|
 /// Returns the function at the `index` if any.
-pub fn InstanceEntity::get_func(self : InstanceEntity, index : Int) -> Func? {
+pub fn InstanceEntity::get_func(self : InstanceEntity, index : Int32) -> Func? {
   self.funcs.get(index)
 }
 
@@ -225,7 +228,7 @@ pub fn InstanceEntity::get_func(self : InstanceEntity, index : Int) -> Func? {
 /// Returns the signature at the `index` if any.
 pub fn InstanceEntity::get_signature(
   self : InstanceEntity,
-  index : Int,
+  index : Int32,
 ) -> DedupFuncType? {
   self.func_types.get(index)
 }
@@ -234,7 +237,7 @@ pub fn InstanceEntity::get_signature(
 /// Returns the [`DataSegment`] at the `index` if any.
 pub fn InstanceEntity::get_data_segment(
   self : InstanceEntity,
-  index : Int,
+  index : Int32,
 ) -> DataSegment? {
   self.data_segments.get(index)
 }
@@ -243,7 +246,7 @@ pub fn InstanceEntity::get_data_segment(
 /// Returns the [`ElementSegment`] at the `index` if any.
 pub fn InstanceEntity::get_element_segment(
   self : InstanceEntity,
-  index : Int,
+  index : Int32,
 ) -> ElementSegment? {
   self.elem_segments.get(index)
 }
@@ -272,7 +275,7 @@ pub fn[T] Instance::get_export(
 pub fn[T] Instance::get_func_by_index(
   self : Instance,
   store : Store[T],
-  index : Int,
+  index : Int32,
 ) -> Func? {
   store.inner.resolve_instance(self).get_func(index)
 }
@@ -392,7 +395,7 @@ fn InstanceEntityBuilder::get_start(self : InstanceEntityBuilder) -> FuncIdx? {
 ///|
 fn InstanceEntityBuilder::get_memory(
   self : InstanceEntityBuilder,
-  index : Int,
+  index : Int32,
 ) -> Memory {
   match self.memories.get(index) {
     Some(m) => m
@@ -403,7 +406,7 @@ fn InstanceEntityBuilder::get_memory(
 ///|
 fn InstanceEntityBuilder::get_table(
   self : InstanceEntityBuilder,
-  index : Int,
+  index : Int32,
 ) -> Table {
   match self.tables.get(index) {
     Some(t) => t
@@ -414,7 +417,7 @@ fn InstanceEntityBuilder::get_table(
 ///|
 fn InstanceEntityBuilder::get_global(
   self : InstanceEntityBuilder,
-  index : Int,
+  index : Int32,
 ) -> Global {
   match self.globals.get(index) {
     Some(g) => g
@@ -425,7 +428,7 @@ fn InstanceEntityBuilder::get_global(
 ///|
 fn InstanceEntityBuilder::get_func(
   self : InstanceEntityBuilder,
-  index : Int,
+  index : Int32,
 ) -> Func {
   match self.funcs.get(index) {
     Some(f) => f

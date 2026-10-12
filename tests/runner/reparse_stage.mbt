@@ -15,7 +15,7 @@
 
 ///|
 /// Number of edits applied to every test body.
-let reparse_edits : Int = 8
+let reparse_edits : Int32 = 8
 
 ///|
 /// Text that is inserted or replaces a range.
@@ -44,7 +44,7 @@ fn Rng::next(self : Rng) -> UInt64 {
 
 ///|
 /// A number in `0..n` (`n > 0`).
-fn Rng::below(self : Rng, n : Int) -> Int {
+fn Rng::below(self : Rng, n : Int32) -> Int32 {
   (self.next() % n.to_uint64()).to_int()
 }
 
@@ -114,7 +114,7 @@ fn source_state(source : @syntax.Source, lines : @syntax.Lines) -> UInt64 {
 ///|
 /// The closest position at or before `i` that is a char boundary of the
 /// UTF-8 `text` and not between `\r` and `\n`.
-fn floor_boundary(text : Bytes, i : Int) -> Int {
+fn floor_boundary(text : Bytes, i : Int32) -> Int32 {
   let mut i = i
   while (i < text.length() && (text[i].to_int() & 0xC0) == 0x80) ||
         (i > 0 && i < text.length() && text[i - 1] == b'\r' && text[i] == b'\n') {
@@ -127,8 +127,8 @@ fn floor_boundary(text : Bytes, i : Int) -> Int {
 /// An edit: replace `start..end` with `with_`, through `Source::replace` if
 /// `whole` and through `Source::edit` otherwise.
 priv struct ReparseEdit {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   with_ : String
   whole : Bool
 }

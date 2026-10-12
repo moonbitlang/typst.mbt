@@ -7,8 +7,8 @@
 ///
 /// - Width and height are positive and non-zero.
 pub struct IntSize {
-  priv width : UInt
-  priv height : UInt
+  priv width : UInt32
+  priv height : UInt32
 } derive(Eq, Debug, Hash)
 
 ///|
@@ -28,7 +28,7 @@ pub extend IntSize with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new `IntSize` from width and height.
-pub fn IntSize::from_wh(width : UInt, height : UInt) -> IntSize? {
+pub fn IntSize::from_wh(width : UInt32, height : UInt32) -> IntSize? {
   if width == 0 || height == 0 {
     return None
   }
@@ -36,25 +36,25 @@ pub fn IntSize::from_wh(width : UInt, height : UInt) -> IntSize? {
 }
 
 ///|
-fn IntSize::from_wh_safe(width : UInt, height : UInt) -> IntSize {
+fn IntSize::from_wh_safe(width : UInt32, height : UInt32) -> IntSize {
   { width, height, }
 }
 
 ///|
 /// Returns width.
-pub fn IntSize::width(self : IntSize) -> UInt {
+pub fn IntSize::width(self : IntSize) -> UInt32 {
   self.width
 }
 
 ///|
 /// Returns height.
-pub fn IntSize::height(self : IntSize) -> UInt {
+pub fn IntSize::height(self : IntSize) -> UInt32 {
   self.height
 }
 
 ///|
 /// Returns width and height as a tuple.
-pub fn IntSize::dimensions(self : IntSize) -> (UInt, UInt) {
+pub fn IntSize::dimensions(self : IntSize) -> (UInt32, UInt32) {
   (self.width(), self.height())
 }
 
@@ -75,7 +75,7 @@ pub fn IntSize::scale_to(self : IntSize, to : IntSize) -> IntSize {
 
 ///|
 /// Scales current size to the specified width.
-pub fn IntSize::scale_to_width(self : IntSize, new_width : UInt) -> IntSize? {
+pub fn IntSize::scale_to_width(self : IntSize, new_width : UInt32) -> IntSize? {
   let new_height = (u32_as_f32(new_width) *
   u32_as_f32(self.height()) /
   u32_as_f32(self.width())).ceil()
@@ -84,7 +84,10 @@ pub fn IntSize::scale_to_width(self : IntSize, new_width : UInt) -> IntSize? {
 
 ///|
 /// Scales current size to the specified height.
-pub fn IntSize::scale_to_height(self : IntSize, new_height : UInt) -> IntSize? {
+pub fn IntSize::scale_to_height(
+  self : IntSize,
+  new_height : UInt32,
+) -> IntSize? {
   let new_width = (u32_as_f32(new_height) *
   u32_as_f32(self.width()) /
   u32_as_f32(self.height())).ceil()
@@ -99,7 +102,7 @@ pub fn IntSize::to_size(self : IntSize) -> Size {
 
 ///|
 /// Converts into [`IntRect`] at the provided position.
-pub fn IntSize::to_int_rect(self : IntSize, x : Int, y : Int) -> IntRect {
+pub fn IntSize::to_int_rect(self : IntSize, x : Int32, y : Int32) -> IntRect {
   IntRect::from_xywh(x, y, self.width(), self.height()).unwrap()
 }
 

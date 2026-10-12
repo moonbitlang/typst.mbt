@@ -3,7 +3,7 @@
 
 ///|
 /// A local variable index.
-pub(all) struct LocalIdx(UInt) derive(Eq, Debug)
+pub(all) struct LocalIdx(UInt32) derive(Eq, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -32,14 +32,14 @@ pub(all) struct LocalsRegistry {
   /// The types of the remaining defined local variables.
   priv tys_remaining : Array[LocalGroup]
   /// The total number of registered locals.
-  priv mut len_locals : Int
+  priv mut len_locals : Int32
 }
 
 ///|
 /// A local group of one or more locals sharing a common type.
 priv struct LocalGroup {
   /// The local index of the first local in the group.
-  max_index : UInt
+  max_index : UInt32
   /// The shared type of the locals in the local group.
   ty : @wasmi_core.ValType
 }
@@ -59,17 +59,17 @@ pub fn LocalsRegistry::reset(self : LocalsRegistry) -> Unit {
 
 ///|
 /// Returns the number of registered local variables in `self`.
-pub fn LocalsRegistry::len(self : LocalsRegistry) -> Int {
+pub fn LocalsRegistry::len(self : LocalsRegistry) -> Int32 {
   self.len_locals
 }
 
 ///|
 /// The maximum number of local variables per function.
-let local_variables_max : Int = 30_000
+let local_variables_max : Int32 = 30_000
 
 ///|
 /// The maximum number of local variables in the fast `tys_first` vector.
-let first_tys_max : Int = 100
+let first_tys_max : Int32 = 100
 
 ///|
 /// Registers `amount` of locals of type `ty` for `self`.
@@ -79,7 +79,7 @@ let first_tys_max : Int = 100
 /// If too many local variables have been registered.
 pub fn LocalsRegistry::register(
   self : LocalsRegistry,
-  amount : Int,
+  amount : Int32,
   ty : @wasmi_core.ValType,
 ) -> Unit raise WasmiError {
   if amount == 0 {

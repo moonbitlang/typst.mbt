@@ -36,7 +36,7 @@ pub struct Mask {
 /// Creates a new mask by taking ownership over a mask buffer.
 ///
 /// The size needs to match the data provided.
-pub fn Mask::new(width : UInt, height : UInt) -> Mask? {
+pub fn Mask::new(width : UInt32, height : UInt32) -> Mask? {
   guard @path.IntSize::from_wh(width, height) is Some(size) else { return None }
   let len = width.reinterpret_as_int() * height.reinterpret_as_int()
   Some({ data: FixedArray::make(len, b'\x00'), size, })
@@ -96,13 +96,13 @@ pub fn Mask::from_vec(data : FixedArray[Byte], size : @path.IntSize) -> Mask? {
 
 ///|
 /// Returns mask's width.
-pub fn Mask::width(self : Mask) -> Int {
+pub fn Mask::width(self : Mask) -> Int32 {
   self.size.width().reinterpret_as_int()
 }
 
 ///|
 /// Returns mask's height.
-pub fn Mask::height(self : Mask) -> Int {
+pub fn Mask::height(self : Mask) -> Int32 {
   self.size.height().reinterpret_as_int()
 }
 
@@ -311,9 +311,9 @@ pub fn Mask::clear(self : Mask) -> Unit {
 /// A view into a mask region.
 priv struct SubMaskRef {
   data : FixedArray[Byte]
-  offset : Int
+  offset : Int32
   size : @path.IntSize
-  real_width : Int
+  real_width : Int32
 }
 
 ///|

@@ -9,7 +9,7 @@
 // and I have no idea how to generate them.
 
 ///|
-let kerx_header_size : Int = 12
+let kerx_header_size : Int32 = 12
 
 ///|
 /// A format 0 subtable.
@@ -328,7 +328,7 @@ pub fn KerxSubtable6::glyphs_kerning(
         .unwrap_or(0)
         .to_int()
       let array_offset = (l + r) * 4
-      let vector_offset : UInt = Stream::read_at(
+      let vector_offset : UInt32 = Stream::read_at(
         kerning_array_data, array_offset,
       )
       Some(
@@ -380,7 +380,7 @@ pub(all) struct KerxSubtable {
   /// The tuple count.
   ///
   /// This value is only used with variation fonts and should be 0 for all other fonts.
-  tuple_count : UInt
+  tuple_count : UInt32
   /// Subtable format.
   format : KerxFormat
 }
@@ -431,7 +431,7 @@ struct KerxSubtables {
   /// The number of glyphs from the `maxp` table.
   number_of_glyphs : UInt16
   /// The total number of tables.
-  number_of_tables : UInt
+  number_of_tables : UInt32
   /// Actual data. Starts right after the `kerx` header.
   data : BytesView
 }
@@ -460,9 +460,9 @@ struct KerxSubtablesIter {
   /// The number of glyphs from the `maxp` table.
   number_of_glyphs : UInt16
   /// The current table index.
-  mut table_index : UInt
+  mut table_index : UInt32
   /// The total number of tables.
-  number_of_tables : UInt
+  number_of_tables : UInt32
   /// Actual data. Starts right after the `kerx` header.
   stream : Stream
 }

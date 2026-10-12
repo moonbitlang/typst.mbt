@@ -32,14 +32,14 @@ pub struct FormatOptions {
   /// The format element whose settable fields these are.
   elem : Element
   /// The values of the settable fields, by field index.
-  priv fields : Map[Int, SpannedValue[Value]]
+  priv fields : Map[Int32, SpannedValue[Value]]
 }
 
 ///|
 /// The default options of a format element: the defaults of its settable
 /// fields (upstream `E::Options::default()`).
 pub fn FormatOptions::default_for(elem : Element) -> FormatOptions {
-  let fields : Map[Int, SpannedValue[Value]] = Map([])
+  let fields : Map[Int32, SpannedValue[Value]] = Map([])
   for field in elem.fields() {
     if field.kind is (Settable | Ghost) {
       fields[field.id] = SpannedValue::detached(
@@ -69,7 +69,7 @@ pub fn FormatOptions::populate(
 /// The value of the settable field with the given index.
 pub fn FormatOptions::get(
   self : FormatOptions,
-  id : Int,
+  id : Int32,
 ) -> SpannedValue[Value] {
   match self.fields.get(id) {
     Some(v) => v
@@ -111,7 +111,7 @@ pub fn default_formats() -> Array[Format] {
 ///|
 /// Initialize default format options from a list of formats.
 pub fn DocumentFormatOptions::new(
-  formats? : Array[Format] = default_formats(),
+  formats~ : Array[Format] = default_formats(),
 ) -> DocumentFormatOptions {
   DocumentFormatOptions(formats.map(f => FormatOptions::default_for(f.elem)))
 }

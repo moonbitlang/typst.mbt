@@ -64,7 +64,7 @@ priv enum CallKind {
 /// # Note
 ///
 /// The `offset` denotes how many [`Op`] words make up the call instruction.
-fn Executor::update_instr_ptr_at(self : Executor, offset : Int) -> Unit {
+fn Executor::update_instr_ptr_at(self : Executor, offset : Int32) -> Unit {
   // Note: we explicitly do not mutate `self.ip` since that would make
   // other parts of the code more fragile with respect to instruction ordering.
   self.ip = self.ip + offset

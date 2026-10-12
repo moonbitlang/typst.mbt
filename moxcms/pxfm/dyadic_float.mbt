@@ -21,7 +21,7 @@ fn U128::is_zero(self : U128) -> Bool {
 
 ///|
 /// `self.wrapping_shr(n)`.
-fn U128::shr(self : U128, n : Int) -> U128 {
+fn U128::shr(self : U128, n : Int32) -> U128 {
   let n = n & 127
   if n == 0 {
     self
@@ -34,7 +34,7 @@ fn U128::shr(self : U128, n : Int) -> U128 {
 
 ///|
 /// `self.wrapping_shl(n)`.
-fn U128::shl(self : U128, n : Int) -> U128 {
+fn U128::shl(self : U128, n : Int32) -> U128 {
   let n = n & 127
   if n == 0 {
     self
@@ -74,7 +74,7 @@ fn U128::ge(a : U128, b : U128) -> Bool {
 }
 
 ///|
-fn U128::leading_zeros(self : U128) -> Int {
+fn U128::leading_zeros(self : U128) -> Int32 {
   if self.hi != 0UL {
     self.hi.clz()
   } else {
@@ -120,14 +120,14 @@ fn mulhi_u128(a : U128, b : U128) -> U128 {
 ///|
 priv struct DyadicFloat128 {
   mut neg : Bool
-  mut exponent : Int
+  mut exponent : Int32
   mut mantissa : U128
 }
 
 ///|
 fn dyadic(
   neg : Bool,
-  exponent : Int,
+  exponent : Int32,
   hi : UInt64,
   lo : UInt64,
 ) -> DyadicFloat128 {
@@ -173,7 +173,7 @@ fn DyadicFloat128::new_from_f64(x : Double) -> DyadicFloat128 {
 }
 
 ///|
-fn DyadicFloat128::shift_right(self : DyadicFloat128, amount : Int) -> Unit {
+fn DyadicFloat128::shift_right(self : DyadicFloat128, amount : Int32) -> Unit {
   if amount < 128 {
     self.exponent += amount
     self.mantissa = self.mantissa.shr(amount)
@@ -184,7 +184,7 @@ fn DyadicFloat128::shift_right(self : DyadicFloat128, amount : Int) -> Unit {
 }
 
 ///|
-fn DyadicFloat128::shift_left(self : DyadicFloat128, amount : Int) -> Unit {
+fn DyadicFloat128::shift_left(self : DyadicFloat128, amount : Int32) -> Unit {
   if amount < 128 {
     self.exponent -= amount
     self.mantissa = self.mantissa.shl(amount)
@@ -400,7 +400,7 @@ fn DyadicFloat128::fast_as_f64(self : DyadicFloat128) -> Double {
 
 ///|
 /// Arithmetic (flooring) right shift of a big integer, like Rust's `i128 >>`.
-fn floor_shr(x : @bigint.BigInt, n : Int) -> @bigint.BigInt {
+fn floor_shr(x : @bigint.BigInt, n : Int32) -> @bigint.BigInt {
   if x < 0N {
     -((-x + ((1N << n) - 1N)) >> n)
   } else {
@@ -451,7 +451,7 @@ fn log_range_reduction(
 }
 
 ///|
-fn log_accurate(e_x : Int, index : Int, m_x : Double) -> DyadicFloat128 {
+fn log_accurate(e_x : Int32, index : Int32, m_x : Double) -> DyadicFloat128 {
   let big_coeffs : FixedArray[DyadicFloat128] = [
     dyadic(true, -129, 0x800000000006a710UL, 0xb59c58e5554d581cUL),
     dyadic(false, -129, 0xaaaaaaaaaaaaaabdUL, 0xde05c7c94ae9cbaeUL),

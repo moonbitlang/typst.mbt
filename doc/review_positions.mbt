@@ -43,7 +43,7 @@ fn Mat::group(
 /// A rectangle on a page, in points from the page's top left corner.
 pub struct Region {
   /// The page, from 1.
-  page : Int
+  page : Int32
   x : Double
   y : Double
   width : Double
@@ -54,8 +54,8 @@ pub struct Region {
 /// A box of the layer on its page: of a word (`word`), of a gap between
 /// words or of a shape or an image (`word` is `-1`), with its origin.
 priv struct PageBox {
-  origin : Int
-  word : Int
+  origin : Int32
+  word : Int32
   region : Region
 }
 
@@ -82,8 +82,8 @@ fn bounds(points : Array[(Double, Double)]) -> (Double, Double, Double, Double) 
 fn OriginTable::note_box(
   self : OriginTable,
   mat : Mat,
-  origin : Int,
-  word : Int,
+  origin : Int32,
+  word : Int32,
   x0 : Double,
   y0 : Double,
   x1 : Double,
@@ -172,9 +172,9 @@ fn shape_box(
 fn ReviewText::line_hits(
   self : ReviewText,
   file : String,
-  line : Int,
-  column : Int?,
-) -> (Array[Int], Array[Int]) {
+  line : Int32,
+  column : Int32?,
+) -> (Array[Int32], Array[Int32]) {
   let has = (o : Origin) => {
     o.file == file &&
     o.start_line <= line &&
@@ -198,7 +198,7 @@ fn ReviewText::line_hits(
       b.end_column == a.end_column
     starts && ends && !same
   }
-  let candidates : Array[Int] = []
+  let candidates : Array[Int32] = []
   for id, origin in self.origins {
     if has(origin) {
       candidates.push(id)
@@ -219,8 +219,8 @@ fn ReviewText::line_hits(
       narrowest[key] = ()
     }
   }
-  let exact : Map[Int, Unit] = Map([])
-  let whole : Array[Int] = []
+  let exact : Map[Int32, Unit] = Map([])
+  let whole : Array[Int32] = []
   for id in candidates {
     if self.infos[id].tier == 3 {
       exact[id] = ()
@@ -228,7 +228,7 @@ fn ReviewText::line_hits(
       whole.push(id)
     }
   }
-  let words : Array[Int] = []
+  let words : Array[Int32] = []
   if !exact.is_empty() {
     for number, word in self.words {
       guard exact.contains(word.origin) else { continue }
@@ -258,11 +258,11 @@ fn ReviewText::line_hits(
 pub fn ReviewText::positions(
   self : ReviewText,
   file : String,
-  line : Int,
-  column? : Int,
+  line : Int32,
+  column? : Int32,
 ) -> Array[Region] {
   let (words, whole) = self.line_hits(file, line, column)
-  let wanted : Map[Int, Unit] = Map([])
+  let wanted : Map[Int32, Unit] = Map([])
   for id in whole {
     wanted[id] = ()
   }

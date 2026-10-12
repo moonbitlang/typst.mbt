@@ -117,7 +117,7 @@ fn ColorSpaceType::new_inner(
           return None
         }
         let dict = icc_stream.dict()
-        guard (dict.get("N") : Int?) is Some(num_components) else {
+        guard (dict.get("N") : Int32?) is Some(num_components) else {
           return None
         }
         return cache.get_or_insert_color_space_type(
@@ -358,7 +358,7 @@ fn ColorSpace::is_device_rgb(self : ColorSpace) -> Bool {
 
 ///|
 /// Get the number of components of the color space.
-fn ColorSpace::num_components(self : ColorSpace) -> Int {
+fn ColorSpace::num_components(self : ColorSpace) -> Int32 {
   match self.inner {
     DeviceCmyk => 4
     DeviceGray => 1
@@ -383,7 +383,13 @@ pub fn ColorSpace::to_rgba(
   manual_scale : Bool,
 ) -> AlphaColor {
   let alpha = f32_to_u8(opacity)
-  let get = (i : Int) => if i < c.length() { f32_to_u8(c[i]) } else { b'\x00' }
+  let get = (i : Int32) => {
+    if i < c.length() {
+      f32_to_u8(c[i])
+    } else {
+      b'\x00'
+    }
+  }
   match self.inner {
     DeviceGray => {
       let gray = get(0)
@@ -808,7 +814,7 @@ impl ToRgb for Lab with fn convert_f32(self, input, output, manual_scale) {
 ///|
 priv struct Indexed {
   values : Array[Array[Float]]
-  hival : Int
+  hival : Int32
   base : ColorSpace
 }
 
@@ -823,7 +829,7 @@ fn Indexed::new(array : @hayro_syntax.PdfArray, cache : Cache) -> Indexed? {
   guard ColorSpace::new(base_obj, cache) is Some(base_color_space) else {
     return None
   }
-  guard (iter.next() : UInt?) is Some(hival) else { return None }
+  guard (iter.next() : UInt32?) is Some(hival) else { return None }
   let hival = if hival > 255 { 255 } else { hival.reinterpret_as_int() }
   let data : BytesView = match (iter.next() : @hayro_syntax.Stream?) {
     Some(s) =>
@@ -927,7 +933,7 @@ impl ToRgb for Separation with fn is_none(self) {
 ///|
 priv struct DeviceN {
   alternate_space : ColorSpace
-  num_components : Int
+  num_components : Int32
   tint_transform : @function.Function
   is_none : Bool
 }
@@ -982,7 +988,7 @@ impl ToRgb for DeviceN with fn is_none(self) {
 priv struct ICCProfile {
   src_profile : @moxcms.ColorProfile
   src_layout : @moxcms.Layout
-  number_components : Int
+  number_components : Int32
   is_srgb : Bool
   is_lab : Bool
   transform_u8 : @moxcms.Transform8BitExecutor
@@ -990,7 +996,10 @@ priv struct ICCProfile {
 }
 
 ///|
-fn ICCProfile::new(profile : BytesView, number_components : Int) -> ICCProfile? {
+fn ICCProfile::new(
+  profile : BytesView,
+  number_components : Int32,
+) -> ICCProfile? {
   let src_profile = @moxcms.ColorProfile::new_from_slice(profile) catch {
     _ => return None
   }
@@ -1010,7 +1019,7 @@ fn ICCProfile::new_from_src_profile(
   src_profile : @moxcms.ColorProfile,
   is_srgb : Bool,
   is_lab : Bool,
-  number_components : Int,
+  number_components : Int32,
 ) -> ICCProfile? {
   let src_layout : @moxcms.Layout = match number_components {
     1 => Gray
@@ -1246,7 +1255,7 @@ fn[T : ToRgb] to_alpha_color(
 fn get_f32_array(
   dict : @hayro_syntax.Dict,
   key : String,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Float]? {
   guard (dict.get_fixed(key, n) : Array[Float]?) is Some(a) else { return None }
   Some(FixedArray::from_array(a))

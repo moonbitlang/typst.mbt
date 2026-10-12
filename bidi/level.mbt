@@ -15,7 +15,7 @@
 /// larger than 125 results in an `Error`.
 ///
 /// <http://www.unicode.org/reports/tr9/#BD2>
-pub(all) struct Level(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Level(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -44,15 +44,15 @@ pub let ltr_level : Level = Level(0)
 pub let rtl_level : Level = Level(1)
 
 ///|
-let max_depth : Int = 125
+let max_depth : Int32 = 125
 
 ///|
 /// During explicit level resolution, embedding level can go as high as `max_depth`.
-pub let max_explicit_depth : Int = max_depth
+pub let max_explicit_depth : Int32 = max_depth
 
 ///|
 /// During implicit level resolution, embedding level can go as high as `max_depth + 1`.
-pub let max_implicit_depth : Int = max_depth + 1
+pub let max_implicit_depth : Int32 = max_depth + 1
 
 ///|
 /// Errors that can occur on Level creation or mutation
@@ -85,19 +85,19 @@ pub fn Level::rtl() -> Level {
 
 ///|
 /// Maximum depth of the directional status stack during implicit resolutions.
-pub fn Level::max_implicit_depth() -> Int {
+pub fn Level::max_implicit_depth() -> Int32 {
   max_implicit_depth
 }
 
 ///|
 /// Maximum depth of the directional status stack during explicit resolutions.
-pub fn Level::max_explicit_depth() -> Int {
+pub fn Level::max_explicit_depth() -> Int32 {
   max_explicit_depth
 }
 
 ///|
 /// Create new level, fail if number is larger than `max_depth + 1`.
-pub fn Level::new(number : Int) -> Result[Level, LevelError] {
+pub fn Level::new(number : Int32) -> Result[Level, LevelError] {
   if number >= 0 && number <= max_implicit_depth {
     Ok(Level(number))
   } else {
@@ -107,7 +107,7 @@ pub fn Level::new(number : Int) -> Result[Level, LevelError] {
 
 ///|
 /// Create new level, fail if number is larger than `max_depth`.
-pub fn Level::new_explicit(number : Int) -> Result[Level, LevelError] {
+pub fn Level::new_explicit(number : Int32) -> Result[Level, LevelError] {
   if number >= 0 && number <= max_explicit_depth {
     Ok(Level(number))
   } else {
@@ -117,7 +117,7 @@ pub fn Level::new_explicit(number : Int) -> Result[Level, LevelError] {
 
 ///|
 /// The level number.
-pub fn Level::number(self : Level) -> Int {
+pub fn Level::number(self : Level) -> Int32 {
   self.0
 }
 
@@ -137,7 +137,7 @@ pub fn Level::is_rtl(self : Level) -> Bool {
 /// Raise level by `amount`, fail if number is larger than `max_depth + 1`.
 pub fn Level::raise_level(
   self : Level,
-  amount : Int,
+  amount : Int32,
 ) -> Result[Level, LevelError] {
   let number = self.0 + amount
   if number <= 255 && number <= max_implicit_depth {
@@ -151,7 +151,7 @@ pub fn Level::raise_level(
 /// Raise level by `amount`, fail if number is larger than `max_depth`.
 pub fn Level::raise_level_explicit(
   self : Level,
-  amount : Int,
+  amount : Int32,
 ) -> Result[Level, LevelError] {
   let number = self.0 + amount
   if number <= 255 && number <= max_explicit_depth {
@@ -163,7 +163,7 @@ pub fn Level::raise_level_explicit(
 
 ///|
 /// Lower level by `amount`, fail if number goes below zero.
-pub fn Level::lower(self : Level, amount : Int) -> Result[Level, LevelError] {
+pub fn Level::lower(self : Level, amount : Int32) -> Result[Level, LevelError] {
   let number = self.0 - amount
   if number >= 0 {
     Ok(Level(number))
@@ -203,7 +203,7 @@ pub fn Level::bidi_class(self : Level) -> BidiClass {
 
 ///|
 /// Create a vector of levels from numbers (panics on invalid numbers).
-pub fn Level::vec(v : Array[Int]) -> Array[Level] {
+pub fn Level::vec(v : Array[Int32]) -> Array[Level] {
   v.map(x => Level::new(x).unwrap())
 }
 

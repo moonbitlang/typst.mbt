@@ -28,9 +28,9 @@ fn GridLayouter::may_progress_with_repeats(self : GridLayouter) -> Bool {
 /// consecutive header count (upstream: a `&mut usize` parameter).
 fn GridLayouter::place_new_headers(
   self : GridLayouter,
-  consecutive_header_count : Int,
+  consecutive_header_count : Int32,
   engine : @library.Engine,
-) -> Int raise @library.SourceError {
+) -> Int32 raise @library.SourceError {
   let consecutive_header_count = consecutive_header_count + 1
   let consecutive_headers = self.upcoming_headers[:consecutive_header_count]
   let new_upcoming_headers = self.upcoming_headers[consecutive_header_count:]
@@ -129,7 +129,7 @@ fn GridLayouter::layout_header_rows(
   self : GridLayouter,
   header : @library.Header,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   as_short_lived : Bool,
   is_being_repeated : Bool,
 ) -> @library.Abs raise @library.SourceError {
@@ -428,7 +428,7 @@ fn GridLayouter::simulate_header_height(
   headers : Array[@library.Header],
   regions : @library.Regions,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> @library.Abs raise @library.SourceError {
   let mut height = @library.Abs::zero()
   for header in headers {
@@ -445,7 +445,7 @@ fn GridLayouter::simulate_header(
   header : @library.Header,
   regions : @library.Regions,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> UnbreakableRowGroup raise @library.SourceError {
   // Note that we assume the invariant that any rowspan in a header is
   // fully contained within that header. Therefore, there won't be any
@@ -467,7 +467,7 @@ fn GridLayouter::prepare_footer(
   self : GridLayouter,
   footer : @library.Footer,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> Unit raise @library.SourceError {
   let footer_height = self.simulate_footer(
       footer,
@@ -512,7 +512,7 @@ fn GridLayouter::layout_footer(
   self : GridLayouter,
   footer : @library.Footer,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
   is_being_repeated : Bool,
 ) -> Unit raise @library.SourceError {
   // Ensure footer rows have their own height available.
@@ -539,7 +539,7 @@ fn GridLayouter::simulate_footer(
   footer : @library.Footer,
   regions : @library.Regions,
   engine : @library.Engine,
-  disambiguator : Int,
+  disambiguator : Int32,
 ) -> UnbreakableRowGroup raise @library.SourceError {
   // Note that we assume the invariant that any rowspan in a footer is
   // fully contained within that footer. Therefore, there won't be any
@@ -557,6 +557,6 @@ fn GridLayouter::simulate_footer(
 
 ///|
 /// The total amount of rows in the given list of headers.
-fn total_header_row_count(headers : Iter[@library.Header]) -> Int {
+fn total_header_row_count(headers : Iter[@library.Header]) -> Int32 {
   headers.fold(init=0, (acc, h) => acc + (h.range.end - h.range.start))
 }

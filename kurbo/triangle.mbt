@@ -65,7 +65,7 @@ fn f64_signum(x : Double) -> Double {
 
 ///|
 /// The winding number of a point (`Shape::winding`).
-pub fn Triangle::winding(self : Triangle, pt : Point) -> Int {
+pub fn Triangle::winding(self : Triangle, pt : Point) -> Int32 {
   let s0 = f64_signum(self.b.sub(self.a).cross(pt.sub(self.a)))
   let s1 = f64_signum(self.c.sub(self.b).cross(pt.sub(self.b)))
   let s2 = f64_signum(self.a.sub(self.c).cross(pt.sub(self.c)))

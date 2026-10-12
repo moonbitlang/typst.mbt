@@ -102,7 +102,7 @@ pub struct SipHasher128 {
   priv mut v3 : UInt64
   /// Unprocessed bytes (little endian, `ntail` of them).
   priv mut tail : UInt64
-  priv mut ntail : Int
+  priv mut ntail : Int32
   /// Total number of bytes written.
   priv mut length : UInt64
 }
@@ -137,7 +137,7 @@ fn SipHasher128::reset(self : SipHasher128) -> Unit {
 }
 
 ///|
-fn rotl(x : UInt64, b : Int) -> UInt64 {
+fn rotl(x : UInt64, b : Int32) -> UInt64 {
   (x << b) | (x >> (64 - b))
 }
 
@@ -176,7 +176,11 @@ pub fn SipHasher128::write_u8(self : SipHasher128, b : Byte) -> Unit {
 ///|
 /// Write the `n` low bytes of `v` (little endian; `1 <= n <= 7` and the
 /// other bytes of `v` are zero): what `n` calls of `write_u8` do.
-fn SipHasher128::write_short(self : SipHasher128, v : UInt64, n : Int) -> Unit {
+fn SipHasher128::write_short(
+  self : SipHasher128,
+  v : UInt64,
+  n : Int32,
+) -> Unit {
   let ntail = self.ntail
   self.length += UInt64::extend_uint(n.reinterpret_as_uint())
   let word = self.tail | (v << (8 * ntail))
@@ -257,13 +261,13 @@ pub fn SipHasher128::write_bytes(
 
 ///|
 /// Write a 32-bit integer.
-pub fn SipHasher128::write_u32(self : SipHasher128, v : UInt) -> Unit {
+pub fn SipHasher128::write_u32(self : SipHasher128, v : UInt32) -> Unit {
   self.write_short(UInt64::extend_uint(v), 4)
 }
 
 ///|
 /// Write a `usize` (hashed as `u64`, like upstream on 64-bit platforms).
-pub fn SipHasher128::write_usize(self : SipHasher128, v : Int) -> Unit {
+pub fn SipHasher128::write_usize(self : SipHasher128, v : Int32) -> Unit {
   self.write_u64(v.to_int64().reinterpret_as_uint64())
 }
 
@@ -288,7 +292,7 @@ pub fn SipHasher128::write_bool(self : SipHasher128, v : Bool) -> Unit {
 
 ///|
 /// Write an enum discriminant (Rust hashes `isize` discriminants).
-pub fn SipHasher128::write_discriminant(self : SipHasher128, d : Int) -> Unit {
+pub fn SipHasher128::write_discriminant(self : SipHasher128, d : Int32) -> Unit {
   self.write_usize(d)
 }
 
@@ -412,20 +416,20 @@ pub fn[T : Fingerprint] SipHasher128::write(
 /// interchangeable values, and a lossy fingerprint gives elements a
 /// location key that upstream would not give them. What the flags of a key
 /// mean for its entry is said in one place, [MemoKey] (`memo.mbt`).
-let fingerprint_flags : Ref[Int] = { val: 0, }
+let fingerprint_flags : Ref[Int32] = { val: 0, }
 
 ///|
 /// See [fingerprint_flags].
-pub let fingerprint_lossy : Int = 1
+pub let fingerprint_lossy : Int32 = 1
 
 ///|
 /// See [fingerprint_flags].
-pub let fingerprint_identity : Int = 2
+pub let fingerprint_identity : Int32 = 2
 
 ///|
 /// See [fingerprint_flags]: the fingerprint contains a host closure (a
 /// [HostFunc]; it also sets [fingerprint_identity]).
-pub let fingerprint_host : Int = 4
+pub let fingerprint_host : Int32 = 4
 
 ///|
 /// The collector of the host closures visited by fingerprint computations
@@ -480,14 +484,14 @@ pub fn mark_fingerprint_lossy() -> Unit {
 
 ///|
 /// Record flags for the value being fingerprinted (e.g. from a cache).
-pub fn mark_fingerprint_flags(flags : Int) -> Unit {
+pub fn mark_fingerprint_flags(flags : Int32) -> Unit {
   fingerprint_flags.val = fingerprint_flags.val | flags
 }
 
 ///|
 /// Runs `f` and returns the flags of what it fingerprinted (the flags of an
 /// enclosing fingerprint computation are kept).
-pub fn fingerprint_flags_in(f : () -> Unit) -> Int {
+pub fn fingerprint_flags_in(f : () -> Unit) -> Int32 {
   let outer = fingerprint_flags.val
   fingerprint_flags.val = 0
   f()
@@ -538,7 +542,7 @@ pub impl Fingerprint for Bool with fn fingerprint(self, state) {
 }
 
 ///|
-pub impl Fingerprint for Int with fn fingerprint(self, state) {
+pub impl Fingerprint for Int32 with fn fingerprint(self, state) {
   state.write_usize(self)
 }
 
@@ -553,7 +557,7 @@ pub impl Fingerprint for UInt64 with fn fingerprint(self, state) {
 }
 
 ///|
-pub impl Fingerprint for UInt with fn fingerprint(self, state) {
+pub impl Fingerprint for UInt32 with fn fingerprint(self, state) {
   state.write_u32(self)
 }
 
@@ -696,22 +700,22 @@ pub struct LazyFingerprint {
   priv mut cached : Bool
   /// The depth of the computation of this fingerprint among the running
   /// ones ([lazy_depth]), or zero if it is not being computed.
-  priv mut busy : Int
+  priv mut busy : Int32
   priv mut hash : U128
-  priv mut flags : Int
+  priv mut flags : Int32
 }
 
 ///|
 /// The number of [LazyFingerprint] computations that are running (nested).
-let lazy_depth : Ref[Int] = { val: 0, }
+let lazy_depth : Ref[Int32] = { val: 0, }
 
 ///|
 /// The smallest depth of a running computation that was reached again
 /// (see [LazyFingerprint]): every computation deeper than it was cut short.
-let lazy_cut : Ref[Int] = { val: lazy_no_cut, }
+let lazy_cut : Ref[Int32] = { val: lazy_no_cut, }
 
 ///|
-let lazy_no_cut : Int = 0x7fffffff
+let lazy_no_cut : Int32 = 0x7fffffff
 
 ///|
 /// Whether the fingerprint computation that just ended inside a running
@@ -797,7 +801,7 @@ fn LazyFingerprint::compute(
   self : LazyFingerprint,
   state : SipHasher128,
   f : (SipHasher128) -> Unit,
-) -> Int {
+) -> Int32 {
   if self.busy != 0 {
     // A cycle: everything between the owner and here is cut short.
     if self.busy < lazy_cut.val {
@@ -840,7 +844,7 @@ fn LazyFingerprint::compute(
 pub fn LazyFingerprint::flags(
   self : LazyFingerprint,
   f : (SipHasher128) -> Unit,
-) -> Int {
+) -> Int32 {
   if self.cached {
     self.flags
   } else {

@@ -49,7 +49,7 @@ pub(all) struct DecodeSettings {
   /// specific reason not to.
   strict : Bool
   /// A hint for the target resolution that the image should be decoded at.
-  target_resolution : (UInt, UInt)?
+  target_resolution : (UInt32, UInt32)?
 } derive(Debug)
 
 ///|
@@ -127,20 +127,20 @@ pub fn Image::color_space(self : Image) -> ColorSpace {
 
 ///|
 /// The width of the image.
-pub fn Image::width(self : Image) -> UInt {
+pub fn Image::width(self : Image) -> UInt32 {
   self.header.size_data.image_width()
 }
 
 ///|
 /// The height of the image.
-pub fn Image::height(self : Image) -> UInt {
+pub fn Image::height(self : Image) -> UInt32 {
   self.header.size_data.image_height()
 }
 
 ///|
 /// The original bit depth of the image. You usually don't need to do anything
 /// with this parameter, it just exists for informational purposes.
-pub fn Image::original_bit_depth(self : Image) -> Int {
+pub fn Image::original_bit_depth(self : Image) -> Int32 {
   // Note that this only works if all components have the same precision.
   self.header.component_infos[0].size_info.precision
 }
@@ -261,13 +261,13 @@ pub(all) enum ColorSpace {
   CMYK
   /// An unknown color space.
   /// The number of channels of the color space.
-  Unknown(num_channels~ : Int)
+  Unknown(num_channels~ : Int32)
   /// An image based on an ICC profile.
   /// The raw data of the ICC profile.
   Icc(
     profile~ : Bytes,
     /// The number of channels used by the ICC profile.
-    num_channels~ : Int
+    num_channels~ : Int32
   )
 } derive(Debug, Eq)
 
@@ -283,7 +283,7 @@ pub extend ColorSpace with Eq::{not_equal, equal}
 
 ///|
 /// Return the number of expected channels for the color space.
-pub fn ColorSpace::num_channels(self : ColorSpace) -> Int {
+pub fn ColorSpace::num_channels(self : ColorSpace) -> Int32 {
   match self {
     Gray => 1
     RGB => 3
@@ -408,7 +408,7 @@ fn interleave_and_convert(image : DecodedImage, buf : FixedArray[Byte]) -> Unit 
 ///|
 fn convert_color_space(
   image : DecodedImage,
-  bit_depth : Int,
+  bit_depth : Int32,
 ) -> Unit raise DecodeError {
   if image.boxes.color_specification is Some({ color_space: Enumerated(e), }) {
     match e {
@@ -423,7 +423,7 @@ fn convert_color_space(
 ///|
 fn get_color_space(
   boxes : ImageBoxes,
-  num_components : Int,
+  num_components : Int32,
 ) -> ColorSpace raise DecodeError {
   let colr = match boxes.color_specification {
     Some(c) => c.color_space
@@ -513,7 +513,7 @@ fn resolve_palette_indices(
 ///|
 fn cielab_to_rgb(
   components : Array[ComponentData],
-  bit_depth : Int,
+  bit_depth : Int32,
   lab : CieLab,
 ) -> Unit raise DecodeError {
   if components.length() < 3 {
@@ -587,7 +587,7 @@ fn min_chunked_len(
   a : FixedArray[Float],
   b : FixedArray[Float],
   c : FixedArray[Float],
-) -> Int {
+) -> Int32 {
   let mut n = a.length() / SIMD_WIDTH
   if b.length() / SIMD_WIDTH < n {
     n = b.length() / SIMD_WIDTH
@@ -601,7 +601,7 @@ fn min_chunked_len(
 ///|
 fn sycc_to_rgb(
   components : Array[ComponentData],
-  bit_depth : Int,
+  bit_depth : Int32,
 ) -> Unit raise DecodeError {
   let offset = Float::from_uint(shl_u32(1, bit_depth - 1))
   let max_value = Float::from_uint(shl_u32(1, bit_depth) - 1)

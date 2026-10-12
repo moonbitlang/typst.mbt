@@ -6,9 +6,9 @@
 ///|
 /// Mask is used to describe alpha bitmaps.
 priv struct BlitMask {
-  image : FixedArray[Int] // [u8; 2]
+  image : FixedArray[Int32] // [u8; 2]
   bounds : ScreenIntRect
-  row_bytes : Int
+  row_bytes : Int32
 }
 
 ///|
@@ -20,7 +20,7 @@ priv struct BlitMask {
 /// the destination.
 priv trait Blitter {
   /// Blits a horizontal run of one or more pixels.
-  fn blit_h(Self, x : Int, y : Int, width : Int) -> Unit = _
+  fn blit_h(Self, x : Int32, y : Int32, width : Int32) -> Unit = _
   /// Blits a horizontal run of antialiased pixels.
   ///
   /// runs[] is a *sparse* zero-terminated run-length encoding of spans of
@@ -34,17 +34,17 @@ priv trait Blitter {
   /// is terminated with 0 (`None`).
   fn blit_anti_h(
     Self,
-    x : Int,
-    y : Int,
-    antialias : FixedArray[Int],
-    aa_offset : Int,
-    runs : FixedArray[Int],
-    runs_offset : Int,
+    x : Int32,
+    y : Int32,
+    antialias : FixedArray[Int32],
+    aa_offset : Int32,
+    runs : FixedArray[Int32],
+    runs_offset : Int32,
   ) -> Unit = _
   /// Blits a vertical run of pixels with a constant alpha value.
-  fn blit_v(Self, x : Int, y : Int, height : Int, alpha : Int) -> Unit = _
-  fn blit_anti_h2(Self, x : Int, y : Int, alpha0 : Int, alpha1 : Int) -> Unit = _
-  fn blit_anti_v2(Self, x : Int, y : Int, alpha0 : Int, alpha1 : Int) -> Unit = _
+  fn blit_v(Self, x : Int32, y : Int32, height : Int32, alpha : Int32) -> Unit = _
+  fn blit_anti_h2(Self, x : Int32, y : Int32, alpha0 : Int32, alpha1 : Int32) -> Unit = _
+  fn blit_anti_v2(Self, x : Int32, y : Int32, alpha0 : Int32, alpha1 : Int32) -> Unit = _
   /// Blits a solid rectangle one or more pixels wide.
   fn blit_rect(Self, rect : ScreenIntRect) -> Unit = _
   /// Blits a pattern of pixels defined by a rectangle-clipped mask.

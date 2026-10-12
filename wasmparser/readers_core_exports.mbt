@@ -35,7 +35,7 @@ pub(all) struct Export {
   /// The kind of the export.
   kind : ExternalKind
   /// The index of the exported item.
-  index : UInt
+  index : UInt32
 } derive(Eq, Debug)
 
 ///|

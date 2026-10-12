@@ -7,15 +7,15 @@ priv struct Type0Font {
   cache_key : U128
   dw : Float
   dw2 : (Float, Float)
-  widths : Map[UInt, Float]
+  widths : Map[UInt32, Float]
   encoding : @cmap.CMap
   to_unicode : @cmap.CMap?
-  widths2 : Map[UInt, FixedArray[Float]]
+  widths2 : Map[UInt32, FixedArray[Float]]
   cid_to_gid_map : CidToGIdMap
   /// PostScript name from the PDF.
   postscript_name : String?
   /// Font flags from the font descriptor.
-  font_flags : UInt?
+  font_flags : UInt32?
   /// Whether this font is using a fallback (non-embedded) font.
   fallback : Bool
   /// Whether the `to_unicode` map is a UCS2 `CMap` (CID-indexed) rather than
@@ -106,7 +106,7 @@ fn Type0Font::new(
   }
 
   // Extract font flags from descriptor
-  let font_flags = match (font_descriptor.get("Flags") : UInt?) {
+  let font_flags = match (font_descriptor.get("Flags") : UInt32?) {
     Some(bits) => font_flags_from_bits(bits)
     None => None
   }
@@ -129,7 +129,7 @@ fn Type0Font::new(
 }
 
 ///|
-fn Type0Font::map_code(self : Type0Font, code : UInt) -> GlyphId {
+fn Type0Font::map_code(self : Type0Font, code : UInt32) -> GlyphId {
   guard self.code_to_cid(code) is Some(cid) else { return glyph_id_notdef }
 
   // UCS2 maps are indexed by CIDs, while embededd `ToUnicode` maps are
@@ -173,7 +173,7 @@ fn Type0Font::map_code(self : Type0Font, code : UInt) -> GlyphId {
 /// Map a character code (or CID) to a glyph ID
 /// by first getting its Unicode and then looking up the codepoint in the
 /// font's cmap.
-fn Type0Font::map_via_unicode(self : Type0Font, key : UInt) -> GlyphId? {
+fn Type0Font::map_via_unicode(self : Type0Font, key : UInt32) -> GlyphId? {
   guard self.to_unicode is Some(to_unicode) else { return None }
   let bf = match to_unicode.lookup_bf_string(key) {
     Some(bf) => Some(bf)
@@ -209,7 +209,7 @@ fn Type0Font::map_via_unicode(self : Type0Font, key : UInt) -> GlyphId? {
 }
 
 ///|
-fn Type0Font::code_to_cid(self : Type0Font, code : UInt) -> UInt? {
+fn Type0Font::code_to_cid(self : Type0Font, code : UInt32) -> UInt32? {
   for byte_len in 1..<=4 {
     if self.encoding.lookup_cid_code(code, byte_len) is Some(cid) {
       return Some(cid)
@@ -222,7 +222,7 @@ fn Type0Font::code_to_cid(self : Type0Font, code : UInt) -> UInt? {
 fn Type0Font::outline_glyph(
   self : Type0Font,
   glyph : GlyphId,
-  code : UInt,
+  code : UInt32,
 ) -> @kurbo.BezPath {
   let path = match self.font_type {
     OpenType(t) => t.outline_glyph(glyph)
@@ -260,7 +260,7 @@ fn Type0Font::postscript_name(self : Type0Font) -> String? {
 /// Get the font weight (100-900, 400=normal, 700=bold).
 ///
 /// Returns `None` if weight cannot be determined (CFF fonts or invalid weight).
-fn Type0Font::weight(self : Type0Font) -> UInt? {
+fn Type0Font::weight(self : Type0Font) -> UInt32? {
   match self.font_type {
     OpenType(t) => {
       let weight = f32_as_u32(rust_round_f32(t.weight())).reinterpret_as_uint()
@@ -305,7 +305,7 @@ fn Type0Font::is_monospace(self : Type0Font) -> Bool {
 }
 
 ///|
-fn Type0Font::code_advance(self : Type0Font, code : UInt) -> @kurbo.Vec2 {
+fn Type0Font::code_advance(self : Type0Font, code : UInt32) -> @kurbo.Vec2 {
   let cid = self.code_to_cid(code).unwrap_or(0)
   if self.horizontal {
     @kurbo.Vec2::new(self.horizontal_width(cid).to_double(), 0.0)
@@ -317,7 +317,7 @@ fn Type0Font::code_advance(self : Type0Font, code : UInt) -> @kurbo.Vec2 {
 }
 
 ///|
-fn Type0Font::horizontal_width(self : Type0Font, cid : UInt) -> Float {
+fn Type0Font::horizontal_width(self : Type0Font, cid : UInt32) -> Float {
   self.widths.get(cid).unwrap_or(self.dw)
 }
 
@@ -330,8 +330,8 @@ fn Type0Font::is_horizontal(self : Type0Font) -> Bool {
 fn Type0Font::read_code(
   self : Type0Font,
   bytes : Bytes,
-  offset : Int,
-) -> (UInt, Int) {
+  offset : Int32,
+) -> (UInt32, Int32) {
   let mut code = 0U
   let remaining = bytes.length() - offset
   for n in 0..<@cmp.minimum(4, remaining) {
@@ -344,7 +344,10 @@ fn Type0Font::read_code(
 }
 
 ///|
-fn Type0Font::origin_displacement(self : Type0Font, code : UInt) -> @kurbo.Vec2 {
+fn Type0Font::origin_displacement(
+  self : Type0Font,
+  code : UInt32,
+) -> @kurbo.Vec2 {
   let cid = self.code_to_cid(code).unwrap_or(0)
   if self.is_horizontal() {
     @kurbo.vec2_zero
@@ -361,7 +364,7 @@ fn Type0Font::origin_displacement(self : Type0Font, code : UInt) -> @kurbo.Vec2 
 ///|
 fn Type0Font::char_code_to_unicode(
   self : Type0Font,
-  code : UInt,
+  code : UInt32,
 ) -> @cmap.BfString? {
   if self.to_unicode is Some(to_unicode) {
     let key = if self.to_unicode_is_cid_indexed {
@@ -429,7 +432,7 @@ fn CidFontType::new(descriptor : @hayro_syntax.Dict) -> CidFontType? {
 ///|
 priv enum CidToGIdMap {
   Identity
-  Mapped(forward~ : Map[Int, GlyphId], inverse~ : Map[UInt, Int])
+  Mapped(forward~ : Map[Int32, GlyphId], inverse~ : Map[UInt32, Int32])
 }
 
 ///|
@@ -458,7 +461,7 @@ fn CidToGIdMap::new(dict : @hayro_syntax.Dict) -> CidToGIdMap? {
 }
 
 ///|
-fn CidToGIdMap::map(self : CidToGIdMap, code : Int) -> GlyphId {
+fn CidToGIdMap::map(self : CidToGIdMap, code : Int32) -> GlyphId {
   match self {
     Identity => GlyphId::new(code.reinterpret_as_uint())
     Mapped(forward~, ..) => forward.get(code).unwrap_or(glyph_id_notdef)
@@ -466,7 +469,7 @@ fn CidToGIdMap::map(self : CidToGIdMap, code : Int) -> GlyphId {
 }
 
 ///|
-fn CidToGIdMap::inverse_map(self : CidToGIdMap, gid : GlyphId) -> Int {
+fn CidToGIdMap::inverse_map(self : CidToGIdMap, gid : GlyphId) -> Int32 {
   match self {
     Identity => gid.to_u32().reinterpret_as_int() & 0xFFFF
     Mapped(inverse~, ..) =>
@@ -479,14 +482,14 @@ fn CidToGIdMap::inverse_map(self : CidToGIdMap, gid : GlyphId) -> Int {
 ///|
 /// Read a `(T, U)` tuple at the current position of a flex iterator,
 /// restoring nothing on failure (upstream `FlexArrayIter::next::<(T, U)>`).
-fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt, Float]? {
+fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt32, Float]? {
   let map = Map([])
   let items : Array[@hayro_syntax.Object] = arr.iter().collect()
   let mut i = 0
   while true {
     // `(u32, Array)`
     if i + 1 < items.length() &&
-      (items[i].cast() : UInt?) is Some(first) &&
+      (items[i].cast() : UInt32?) is Some(first) &&
       items[i + 1] is Array(range) {
       let mut first = first
       for width in (range.iter() : Iter[Float]) {
@@ -496,8 +499,8 @@ fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt, Float]? {
       }
       i += 2
     } else if i + 2 < items.length() &&
-      (items[i].cast() : UInt?) is Some(first) &&
-      (items[i + 1].cast() : UInt?) is Some(second) &&
+      (items[i].cast() : UInt32?) is Some(first) &&
+      (items[i + 1].cast() : UInt32?) is Some(second) &&
       (items[i + 2].cast() : Float?) is Some(width) {
       // `(u32, u32, f32)`
       let mut c = first
@@ -519,13 +522,13 @@ fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt, Float]? {
 ///|
 fn read_cid_widths2(
   arr : @hayro_syntax.PdfArray,
-) -> Map[UInt, FixedArray[Float]]? {
+) -> Map[UInt32, FixedArray[Float]]? {
   let map = Map([])
   let items : Array[@hayro_syntax.Object] = arr.iter().collect()
   let mut i = 0
   while true {
     if i + 1 < items.length() &&
-      (items[i].cast() : UInt?) is Some(first) &&
+      (items[i].cast() : UInt32?) is Some(first) &&
       items[i + 1] is Array(range) {
       let mut first = first
       let vals : Array[Float] = range.iter().collect()
@@ -542,8 +545,8 @@ fn read_cid_widths2(
       }
       i += 2
     } else if i + 4 < items.length() &&
-      (items[i].cast() : UInt?) is Some(first) &&
-      (items[i + 1].cast() : UInt?) is Some(second) &&
+      (items[i].cast() : UInt32?) is Some(first) &&
+      (items[i + 1].cast() : UInt32?) is Some(second) &&
       (items[i + 2].cast() : Float?) is Some(w) &&
       (items[i + 3].cast() : Float?) is Some(v1) &&
       (items[i + 4].cast() : Float?) is Some(v2) {
@@ -577,7 +580,7 @@ fn read_cid_system_info(
   guard (info.get("Ordering") : @hayro_syntax.PdfString?) is Some(ordering) else {
     return None
   }
-  let supplement = (info.get("Supplement") : Int?).unwrap_or(0)
+  let supplement = (info.get("Supplement") : Int32?).unwrap_or(0)
   let family = @cmap.CidFamily::from_registry_ordering(
     registry.as_bytes()[:],
     ordering.as_bytes()[:],

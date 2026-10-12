@@ -10,9 +10,9 @@
 /// drawing commands to the underlying rasterization engine.
 pub struct RenderContext {
   /// Width of the render target in pixels.
-  priv width : Int
+  priv width : Int32
   /// Height of the render target in pixels.
-  priv height : Int
+  priv height : Int32
   // The current rendering state (`RenderState`).
   priv mut paint : PaintType
   priv mut paint_transform : @kurbo.Affine
@@ -23,7 +23,7 @@ pub struct RenderContext {
   /// The current mask in place.
   priv mut mask : Mask?
   /// Optional threshold for aliasing.
-  priv mut aliasing_threshold : Int?
+  priv mut aliasing_threshold : Int32?
   priv encoded_paints : Array[EncodedPaint]
   // The dispatcher (`SingleThreadedDispatcher`).
   priv clip_state : ClipState
@@ -34,7 +34,7 @@ pub struct RenderContext {
 
 ///|
 /// Create a new render context with the given width and height in pixels.
-pub fn RenderContext::new(width : Int, height : Int) -> RenderContext {
+pub fn RenderContext::new(width : Int32, height : Int32) -> RenderContext {
   {
     width,
     height,
@@ -91,7 +91,7 @@ fn RenderContext::effective_paint_transform(
 ///|
 fn RenderContext::record_fill(
   self : RenderContext,
-  strip_start : Int,
+  strip_start : Int32,
   paint : Paint,
 ) -> Unit {
   let strip_end = self.strip_storage.strips.length()
@@ -232,7 +232,7 @@ pub fn RenderContext::push_mask_layer(
 /// anti-aliasing will be applied.
 pub fn RenderContext::set_aliasing_threshold(
   self : RenderContext,
-  aliasing_threshold : Int?,
+  aliasing_threshold : Int32?,
 ) -> Unit {
   self.aliasing_threshold = aliasing_threshold
 }
@@ -365,13 +365,13 @@ pub fn RenderContext::flush(_self : RenderContext) -> Unit {
 
 ///|
 /// Return the width of the scene.
-pub fn RenderContext::width(self : RenderContext) -> Int {
+pub fn RenderContext::width(self : RenderContext) -> Int32 {
   self.width
 }
 
 ///|
 /// Return the height of the scene.
-pub fn RenderContext::height(self : RenderContext) -> Int {
+pub fn RenderContext::height(self : RenderContext) -> Int32 {
   self.height
 }
 

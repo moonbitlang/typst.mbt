@@ -48,7 +48,7 @@ let test_rules : @library.NativeRuleMap = {
 }
 
 ///|
-let location_counter : Ref[Int] = Ref(1000)
+let location_counter : Ref[Int32] = Ref(1000)
 
 ///|
 /// A minimal realization: flattens sequences and styled content and applies
@@ -158,7 +158,7 @@ fn convert_inline(content : @library.Content) -> String raise {
 ///|
 fn encode_document(
   content : @library.Content,
-  styles? : @library.Styles = @library.Styles::new(),
+  styles~ : @library.Styles = @library.Styles::new(),
 ) -> String raise {
   let doc = html_document(
     test_engine(),
@@ -433,7 +433,7 @@ test "document: pretty option from the document" {
 }
 
 ///|
-fn located(c : @library.Content, n : Int) -> @library.Content {
+fn located(c : @library.Content, n : Int32) -> @library.Content {
   c.located(@library.Location::new(@library.hash128(n)))
 }
 

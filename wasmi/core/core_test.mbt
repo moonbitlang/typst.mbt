@@ -53,10 +53,10 @@ test "trap_code_conversion" {
 }
 
 ///|
-fn memory_type(minimum : UInt, maximum : UInt?) -> @core.MemoryType {
+fn memory_type(minimum : UInt32, maximum : UInt32?) -> @core.MemoryType {
   let b = @core.MemoryType::builder()
   b.min(minimum.to_uint64()) |> ignore
-  b.max(maximum.map(UInt::to_uint64)) |> ignore
+  b.max(maximum.map(UInt32::to_uint64)) |> ignore
   b.build() catch {
     _ => abort("invalid memory type")
   }

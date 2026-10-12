@@ -16,12 +16,12 @@ fn titem(text : String) -> TableItem {
 }
 
 ///|
-fn usize(v : Int) -> Smart[USize] {
+fn usize(v : Int32) -> Smart[USize] {
   Custom(USize(v.to_int64()))
 }
 
 ///|
-fn nz(v : Int) -> NonZeroUSize {
+fn nz(v : Int32) -> NonZeroUSize {
   NonZeroUSize(v.to_int64())
 }
 
@@ -30,9 +30,9 @@ fn nz(v : Int) -> NonZeroUSize {
 /// cells (`-` for empty ones, with `/CxR` for spans) and `^parent` for
 /// merged positions.
 fn render_table(
-  columns : Int,
+  columns : Int32,
   children : Array[TableChild],
-  gutter? : Bool = false,
+  gutter~ : Bool = false,
 ) -> String raise SourceError {
   let elem = TableElem::new(children)
     .with_columns(TrackSizings(Array::make(columns, Sizing::Auto)))

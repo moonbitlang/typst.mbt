@@ -14,7 +14,10 @@ fn make_hdmx() -> Bytes {
 }
 
 ///|
-fn hdmx_record(hdmx : @read_fonts.Hdmx, size : Int) -> (Int, Int, Array[Int])? {
+fn hdmx_record(
+  hdmx : @read_fonts.Hdmx,
+  size : Int32,
+) -> (Int32, Int32, Array[Int32])? {
   match hdmx.record_for_size(size) {
     Some(record) =>
       Some(

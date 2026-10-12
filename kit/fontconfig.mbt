@@ -226,7 +226,7 @@ fn calculate_path(
 /// Arranges a vector into a max-heap in place like Rust's
 /// `BinaryHeap::from(vec)` (`rebuild`), so that iterating it yields the
 /// same order as iterating the `BinaryHeap`.
-fn[T] heapify(data : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] heapify(data : Array[T], cmp : (T, T) -> Int32) -> Unit {
   let len = data.length()
   let mut n = len / 2
   while n > 0 {
@@ -239,9 +239,9 @@ fn[T] heapify(data : Array[T], cmp : (T, T) -> Int) -> Unit {
 /// Rust's `BinaryHeap::sift_down_range`.
 fn[T] sift_down_range(
   data : Array[T],
-  pos : Int,
-  end : Int,
-  cmp : (T, T) -> Int,
+  pos : Int32,
+  end : Int32,
+  cmp : (T, T) -> Int32,
 ) -> Unit {
   let elem = data[pos]
   let mut hole = pos

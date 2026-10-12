@@ -116,7 +116,7 @@ fn Reader::peek_byte(self : Reader) -> Byte? {
 /// Read an u16 number.
 ///
 /// Assumes that the reader is currently byte-aligned.
-fn Reader::read_u16(self : Reader) -> UInt? {
+fn Reader::read_u16(self : Reader) -> UInt32? {
   guard self.read_bytes(2) is Some(b) else { return None }
   Some((b[0].to_uint() << 8) | b[1].to_uint())
 }
@@ -125,7 +125,7 @@ fn Reader::read_u16(self : Reader) -> UInt? {
 /// Read an u32 number.
 ///
 /// Assumes that the reader is currently byte-aligned.
-fn Reader::read_u32(self : Reader) -> UInt? {
+fn Reader::read_u32(self : Reader) -> UInt32? {
   guard self.read_bytes(4) is Some(b) else { return None }
   Some(
     (b[0].to_uint() << 24) |
@@ -139,12 +139,12 @@ fn Reader::read_u32(self : Reader) -> UInt? {
 /// Read an i32 number.
 ///
 /// Assumes that the reader is currently byte-aligned.
-fn Reader::read_i32(self : Reader) -> Int? {
+fn Reader::read_i32(self : Reader) -> Int32? {
   self.read_u32().map(v => v.reinterpret_as_int())
 }
 
 ///|
-fn Reader::read_bit(self : Reader) -> Int? {
+fn Reader::read_bit(self : Reader) -> Int32? {
   guard self.cur_byte() is Some(byte) else { return None }
   let shift = 7 - self.bit_pos()
   self.cur_pos += 1L
@@ -152,7 +152,7 @@ fn Reader::read_bit(self : Reader) -> Int? {
 }
 
 ///|
-fn Reader::read_bits(self : Reader, count : Int) -> UInt? {
+fn Reader::read_bits(self : Reader, count : Int32) -> UInt32? {
   let mut value = 0U
   let mut remaining = count
   while remaining > 0 {
@@ -173,7 +173,7 @@ fn Reader::read_bits(self : Reader, count : Int) -> UInt? {
 }
 
 ///|
-fn Reader::byte_pos(self : Reader) -> Int {
+fn Reader::byte_pos(self : Reader) -> Int32 {
   (self.cur_pos >> 3).to_int()
 }
 
@@ -183,6 +183,6 @@ fn Reader::cur_byte(self : Reader) -> Byte? {
 }
 
 ///|
-fn Reader::bit_pos(self : Reader) -> Int {
+fn Reader::bit_pos(self : Reader) -> Int32 {
   (self.cur_pos & 7L).to_int()
 }

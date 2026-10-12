@@ -106,13 +106,13 @@ let f32_epsilon : Float = Float::reinterpret_from_uint(0x34000000)
 
 ///|
 /// The key of `f32::total_cmp`.
-fn total_cmp_key(x : Float) -> Int {
+fn total_cmp_key(x : Float) -> Int32 {
   let left = x.reinterpret_as_int()
   left ^ ((left >> 31).reinterpret_as_uint() >> 1).reinterpret_as_int()
 }
 
 ///|
-fn find_interval(bounds : Array[Float], x : Float) -> Int? {
+fn find_interval(bounds : Array[Float], x : Float) -> Int32? {
   guard bounds.get(0) is Some(first) else { return None }
   guard bounds.last() is Some(last) else { return None }
   if x < first || x >= last {

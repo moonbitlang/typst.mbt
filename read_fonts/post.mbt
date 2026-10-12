@@ -28,22 +28,22 @@ pub fn Post::italic_angle(self : Post) -> Fixed {
 }
 
 ///|
-pub fn Post::underline_position(self : Post) -> Int {
+pub fn Post::underline_position(self : Post) -> Int32 {
   i16_at(self.data, 8)
 }
 
 ///|
-pub fn Post::underline_thickness(self : Post) -> Int {
+pub fn Post::underline_thickness(self : Post) -> Int32 {
   i16_at(self.data, 10)
 }
 
 ///|
-pub fn Post::is_fixed_pitch(self : Post) -> UInt {
+pub fn Post::is_fixed_pitch(self : Post) -> UInt32 {
   u32_at(self.data, 12)
 }
 
 ///|
-pub fn Post::num_glyphs(self : Post) -> Int? {
+pub fn Post::num_glyphs(self : Post) -> Int32? {
   if !self.version().compatible(2, 0) {
     return None
   }
@@ -56,7 +56,7 @@ pub fn Post::num_glyphs(self : Post) -> Int? {
 
 ///|
 /// The glyph name indices (version 2.0 only).
-pub fn Post::glyph_name_index(self : Post) -> Array[Int]? {
+pub fn Post::glyph_name_index(self : Post) -> Array[Int32]? {
   if !self.version().compatible(2, 0) {
     return None
   }
@@ -66,7 +66,7 @@ pub fn Post::glyph_name_index(self : Post) -> Array[Int]? {
 }
 
 ///|
-fn Post::string_data_start(self : Post) -> Int {
+fn Post::string_data_start(self : Post) -> Int32 {
   let num_glyphs = self.num_glyphs().unwrap_or(0)
   34 + num_glyphs * 2
 }
@@ -104,7 +104,7 @@ pub fn Post::string_data(self : Post) -> Array[Result[String, ReadError]]? {
     if ascii {
       let sb = StringBuilder()
       for b in item {
-        sb.write_char(Int::unsafe_to_char(b.to_int()))
+        sb.write_char(Int32::unsafe_to_char(b.to_int()))
       }
       result.push(Ok(sb.to_string()))
     } else {

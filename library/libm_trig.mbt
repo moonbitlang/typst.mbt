@@ -40,13 +40,13 @@ const LIBM_PIO2_3T : Double = 8.47842766036889956997e-32 // 0x397B839A, 0x252049
 
 ///|
 /// The high word of a double's bits (sign cleared by callers as needed).
-fn libm_high_word(x : Double) -> UInt {
+fn libm_high_word(x : Double) -> UInt32 {
   (x.reinterpret_as_uint64() >> 32).to_uint()
 }
 
 ///|
 /// `rem_pio2::medium`.
-fn libm_rem_pio2_medium(x : Double, ix : UInt) -> (Int, Double, Double) {
+fn libm_rem_pio2_medium(x : Double, ix : UInt32) -> (Int32, Double, Double) {
   // rint(x/(pi/2)), Assume round-to-nearest.
   let tmp = x * LIBM_INV_PIO2 + LIBM_TO_INT
   let f_n = tmp - LIBM_TO_INT
@@ -79,7 +79,7 @@ fn libm_rem_pio2_medium(x : Double, ix : UInt) -> (Int, Double, Double) {
 
 ///|
 /// Return the remainder of x rem pi/2 in y0+y1 (`libm::rem_pio2`).
-fn libm_rem_pio2(x : Double) -> (Int, Double, Double) {
+fn libm_rem_pio2(x : Double) -> (Int32, Double, Double) {
   let sign = (x.reinterpret_as_uint64() >> 63).to_int()
   let ix = libm_high_word(x) & 0x7fffffff
   let small = (k : Double) => {
@@ -168,7 +168,7 @@ fn libm_rem_pio2(x : Double) -> (Int, Double, Double) {
 
 ///|
 /// `libm::k_sin`.
-fn libm_k_sin(x : Double, y : Double, iy : Int) -> Double {
+fn libm_k_sin(x : Double, y : Double, iy : Int32) -> Double {
   let s1 = -1.66666666666666324348e-01 // 0xBFC55555, 0x55555549
   let s2 = 8.33333333332248946124e-03 // 0x3F811111, 0x1110F8A6
   let s3 = -1.98412698298579493134e-04 // 0xBF2A01A0, 0x19C161D5
@@ -304,7 +304,7 @@ let libm_tan_t : ReadOnlyArray[Double] = [
 ///      4. For x in [0.67434,pi/4],  let y = pi/4 - x, then
 ///              tan(x) = tan(pi/4-y) = (1-tan(y))/(1+tan(y))
 ///                     = 1 - 2*(tan(y) - (tan(y)^2)/(1+tan(y)))
-fn libm_k_tan(x : Double, y : Double, odd : Int) -> Double {
+fn libm_k_tan(x : Double, y : Double, odd : Int32) -> Double {
   let pio4 = 7.85398163397448278999e-01 // 3FE921FB, 54442D18
   let pio4_lo = 3.06161699786838301793e-17 // 3C81A626, 33145C07
   let t = libm_tan_t
@@ -371,7 +371,7 @@ fn libm_tan(x : Double) -> Double {
 }
 
 ///|
-let libm_two_over_pi : ReadOnlyArray[Int] = [
+let libm_two_over_pi : ReadOnlyArray[Int32] = [
   0xA2F983, 0x6E4E44, 0x1529FC, 0x2757D1, 0xF534DD, 0xC0DB62, 0x95993C, 0x439041,
   0xFE5163, 0xABDEBB, 0xC561B7, 0x246E3A, 0x424DD2, 0xE00649, 0x2EEA09, 0xD1921C,
   0xFE1DEB, 0x1CB129, 0xA73EE8, 0x8235F5, 0x2EBB44, 0x84E99C, 0x7026B4, 0x5F7E41,
@@ -399,31 +399,31 @@ let libm_pi_over_2 : ReadOnlyArray[Double] = [
 fn libm_kernel_rem_pio2(
   x : Array[Double],
   y : Array[Double],
-  e0 : Int,
-  nx : Int,
-  prec : Int,
-) -> Int {
+  e0 : Int32,
+  nx : Int32,
+  prec : Int32,
+) -> Int32 {
   // initial value for jk (musl's table; fdlibm's is [2, 3, 4, 6], which
   // `@math` indexes with `prec = 2`)
-  let init_jk : ReadOnlyArray[Int] = [3, 4, 4, 6]
+  let init_jk : ReadOnlyArray[Int32] = [3, 4, 4, 6]
   let two24 : Double = 16777216.0 // 0x41700000, 0x00000000
   let twon24 : Double = 5.96046447753906250000e-08 // 0x3E700000, 0x00000000
 
   // Declare variables at the beginning, as in the original C code
-  let mut jz : Int = 0
-  let mut jx : Int = 0
-  let mut jv : Int = 0
-  let mut jp : Int = 0
-  let mut jk : Int = 0
-  let mut carry : Int = 0
-  let mut n : Int = 0
-  let iq : Array[Int] = Array::make(20, 0)
-  let mut i : Int = 0
-  let mut j : Int = 0
-  let mut k : Int = 0
-  let mut m : Int = 0
-  let mut q0 : Int = 0
-  let mut ih : Int = 0
+  let mut jz : Int32 = 0
+  let mut jx : Int32 = 0
+  let mut jv : Int32 = 0
+  let mut jp : Int32 = 0
+  let mut jk : Int32 = 0
+  let mut carry : Int32 = 0
+  let mut n : Int32 = 0
+  let iq : Array[Int32] = Array::make(20, 0)
+  let mut i : Int32 = 0
+  let mut j : Int32 = 0
+  let mut k : Int32 = 0
+  let mut m : Int32 = 0
+  let mut q0 : Int32 = 0
+  let mut ih : Int32 = 0
   let mut z : Double = 0
   let mut fw : Double = 0
   let f : Array[Double] = Array::make(20, 0.0)

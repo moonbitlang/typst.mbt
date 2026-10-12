@@ -317,7 +317,7 @@ fn BiblatexParser::number(self : BiblatexParser) -> String raise PErr {
   while self.s.peek() is Some(c) {
     let start = self.s.cursor()
     match c {
-      '0'..='9' => self.s.eat() |> ignore
+      '0'..<='9' => self.s.eat() |> ignore
       '.' =>
         if !has_dot {
           self.s.eat() |> ignore
@@ -535,7 +535,7 @@ fn BiblatexParser::preamble(self : BiblatexParser) -> Unit raise PErr {
 fn BiblatexParser::body(
   self : BiblatexParser,
   kind : Spanned[String],
-  start : Int,
+  start : Int32,
 ) -> Unit raise PErr {
   let key = self.key()
   self.s.eat_whitespace() |> ignore

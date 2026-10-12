@@ -49,7 +49,7 @@ fn integer(i : Input) -> Int64 raise ErrMode {
 fn radix_int(
   i : Input,
   p : (Input) -> String raise ErrMode,
-  radix : Int,
+  radix : Int32,
 ) -> Int64 raise ErrMode {
   let start = i.pos
   let s = p(i)
@@ -63,7 +63,7 @@ fn radix_int(
 /// `i64::from_str_radix(&s.replace('_', ""), radix)` for the digit strings
 /// the grammar admits (optional sign, digits and underscores); the error is
 /// the `Display` of `ParseIntError`.
-fn parse_i64(s : String, radix : Int) -> Result[Int64, String] {
+fn parse_i64(s : String, radix : Int32) -> Result[Int64, String] {
   let mut negative = false
   let mut k = 0
   if s.length() > 0 && (s[0] == '+' || s[0] == '-') {
@@ -104,7 +104,7 @@ fn parse_i64(s : String, radix : Int) -> Result[Int64, String] {
 /// cut_err(digit).context(Expected("digit"))))))` for the given digit set.
 fn digits_with_underscores(
   i : Input,
-  pred : (Int) -> Bool,
+  pred : (Int32) -> Bool,
 ) -> Unit raise ErrMode {
   repeat0(i, i => {
     alt(i, [
@@ -146,7 +146,7 @@ fn dec_int(i : Input) -> String raise ErrMode {
 fn prefixed_int(
   i : Input,
   prefix : String,
-  pred : (Int) -> Bool,
+  pred : (Int32) -> Bool,
   label : String,
 ) -> String raise ErrMode {
   context(

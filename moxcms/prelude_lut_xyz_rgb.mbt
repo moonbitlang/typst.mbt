@@ -55,7 +55,7 @@ fn xyz_to_rgb_stage(
 ///|
 fn create_rgb_lin_lut(
   depth : Depth,
-  samples : Int,
+  samples : Int32,
   source : ColorProfile,
   opts : TransformOptions,
 ) -> FixedArray[Float] raise CmsError {
@@ -91,7 +91,7 @@ fn create_rgb_lin_lut(
     3 * samples * samples * samples,
     Float::from_int(0),
   )
-  let lookup = (table : FixedArray[Float], v : Int) => {
+  let lookup = (table : FixedArray[Float], v : Int32) => {
     // `src.as_() as f32`: the integer sample converted to `T` and back.
     let t = if depth.finite {
       Float::from_int(v & 0xff)

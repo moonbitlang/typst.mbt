@@ -198,7 +198,7 @@ pub fn[E : Element] Selector::matches(self : Selector, element : E) -> Bool {
 ///|
 fn[E : Element] Selector::matches_impl(
   self : Selector,
-  idx : Int,
+  idx : Int32,
   element : E,
 ) -> Bool {
   let component = self.components[idx]
@@ -278,7 +278,7 @@ fn add_sub(
 ///|
 /// Upstream `selector::parse`: the parsed selector (if any) and the number of
 /// consumed bytes.
-fn parse_selector(text : BytesView) -> (Selector?, Int) {
+fn parse_selector(text : BytesView) -> (Selector?, Int32) {
   let components : Array[Component] = []
   let combinator : Ref[Combinator] = { val: Combinator::None, }
   let tokenizer = SelectorTokenizer::from_bytes(text)

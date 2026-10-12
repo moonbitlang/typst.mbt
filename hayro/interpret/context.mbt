@@ -2,7 +2,7 @@
 
 ///|
 /// Maximum nesting depth for interpreting `XObject`'s/patterns/streams.
-let max_nested_interpretation_depth : Int = 50
+let max_nested_interpretation_depth : Int32 = 50
 
 ///|
 /// A cache used by the interpreter.
@@ -45,7 +45,7 @@ pub struct Context {
   priv interpreter_cache : InterpreterCache
   priv xref : @hayro_syntax.XRef
   priv ocg_state : OcgState
-  priv mut nesting_depth : Int
+  priv mut nesting_depth : Int32
 }
 
 ///|
@@ -69,7 +69,7 @@ fn Context::new_with(
   xref : @hayro_syntax.XRef,
   settings : InterpreterSettings,
   state : State,
-  nesting_depth : Int,
+  nesting_depth : Int32,
 ) -> Context {
   let ocg_state = {
     let root_ref = xref.root_id()
@@ -264,12 +264,12 @@ fn Context::stroke_props(self : Context) -> StrokeProps {
 }
 
 ///|
-fn Context::num_states(self : Context) -> Int {
+fn Context::num_states(self : Context) -> Int32 {
   self.states.length()
 }
 
 ///|
-fn Context::nesting_depth(self : Context) -> Int {
+fn Context::nesting_depth(self : Context) -> Int32 {
   self.nesting_depth
 }
 

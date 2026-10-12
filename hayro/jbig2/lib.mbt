@@ -38,7 +38,7 @@ priv struct ScratchBuffers {
 /// `contexts.clear(); contexts.resize(n, ArithmeticDecoderContext::default())`.
 fn ScratchBuffers::reset_contexts(
   self : ScratchBuffers,
-  n : Int,
+  n : Int32,
 ) -> FixedArray[Byte] {
   if self.contexts.length() == n {
     self.contexts.fill(b'\x00')
@@ -61,7 +61,7 @@ pub(open) trait Decoder {
   ///
   /// You can assume that this method is only called if the number of already
   /// pushed pixels is a multiple of 8 (i.e. byte-aligned).
-  fn push_pixel_chunk(Self, black : Bool, chunk_count : UInt) -> Unit
+  fn push_pixel_chunk(Self, black : Bool, chunk_count : UInt32) -> Unit
   /// Called when a row has been completed.
   fn next_line(Self) -> Unit
 }
@@ -72,11 +72,11 @@ pub struct Image {
   /// The parsed segments.
   priv segments : Array[Segment]
   /// The width of the image in pixels.
-  priv width : UInt
+  priv width : UInt32
   /// The height of the image in pixels.
-  priv height : UInt
+  priv height : UInt32
   /// The height determined from `EndOfStripe` segments, if applicable.
-  priv height_from_stripes : UInt?
+  priv height_from_stripes : UInt32?
 }
 
 ///|
@@ -112,7 +112,7 @@ pub fn Image::new_embedded(
 ///|
 fn Image::from_segments(segments : Array[Segment]) -> Image raise DecodeError {
   // Pre-scan for stripe height from EndOfStripe segments.
-  let mut height_from_stripes : UInt? = None
+  let mut height_from_stripes : UInt32? = None
   for seg in segments {
     if seg.header.segment_type is EndOfStripe && seg.data.length() == 4 {
       let d = seg.data
@@ -157,13 +157,13 @@ fn Image::from_segments(segments : Array[Segment]) -> Image raise DecodeError {
 
 ///|
 /// The width of the image in pixels.
-pub fn Image::width(self : Image) -> UInt {
+pub fn Image::width(self : Image) -> UInt32 {
   self.width
 }
 
 ///|
 /// The height of the image in pixels.
-pub fn Image::height(self : Image) -> UInt {
+pub fn Image::height(self : Image) -> UInt32 {
   self.height
 }
 
@@ -251,7 +251,7 @@ fn[D : Decoder] emit_bitmap(bitmap : Bitmap, decoder : D) -> Unit {
 /// Collect the exported symbols of the referred symbol dictionaries.
 fn PageState::referred_symbols(
   self : PageState,
-  referred_to_segments : Array[UInt],
+  referred_to_segments : Array[UInt32],
 ) -> Array[Bitmap] {
   let symbols = []
   for num in referred_to_segments {
@@ -266,7 +266,7 @@ fn PageState::referred_symbols(
 /// Collect Huffman tables from referred table segments.
 fn PageState::referred_tables(
   self : PageState,
-  referred_to_segments : Array[UInt],
+  referred_to_segments : Array[UInt32],
 ) -> Array[HuffmanTable] {
   let tables = []
   for num in referred_to_segments {
@@ -280,7 +280,7 @@ fn PageState::referred_tables(
 ///|
 fn decode_segments(
   segments : Array[Segment],
-  height_from_stripes : UInt?,
+  height_from_stripes : UInt32?,
   decoder_ctx : DecoderContext,
 ) -> Unit raise DecodeError {
   // Find and parse page information segment first.
@@ -548,14 +548,14 @@ priv struct PageState {
   /// Whether the page bitmap is still in its initial state (not yet painted to).
   mut page_pristine : Bool
   /// Decoded intermediate regions, stored as (`segment_number`, region) pairs.
-  referred_segments : Array[(UInt, Bitmap)]
+  referred_segments : Array[(UInt32, Bitmap)]
   /// Decoded pattern dictionaries, stored as (`segment_number`, dictionary) pairs.
-  pattern_dictionaries : Array[(UInt, PatternDictionary)]
+  pattern_dictionaries : Array[(UInt32, PatternDictionary)]
   /// Decoded symbol dictionaries, stored as (`segment_number`, dictionary) pairs.
-  symbol_dictionaries : Array[(UInt, SymbolDictionary)]
+  symbol_dictionaries : Array[(UInt32, SymbolDictionary)]
   /// Decoded Huffman tables from table segments, stored as (`segment_number`, table) pairs.
   /// "Tables – see 7.4.13." (type 53)
-  huffman_tables : Array[(UInt, HuffmanTable)]
+  huffman_tables : Array[(UInt32, HuffmanTable)]
   /// Standard Huffman tables (`TABLE_A` through `TABLE_O`).
   standard_tables : StandardHuffmanTables
 }
@@ -618,7 +618,7 @@ fn PageState::can_decode_directly(
 /// `binary_search_by_key(&segment_number, |(num, _)| *num)` as Rust's
 /// `slice::binary_search_by` implements it (the index it finds among equal
 /// keys is part of the behavior).
-fn[T] binary_search_by_key(entries : Array[(UInt, T)], key : UInt) -> T? {
+fn[T] binary_search_by_key(entries : Array[(UInt32, T)], key : UInt32) -> T? {
   let mut size = entries.length()
   if size == 0 {
     return None
@@ -644,7 +644,7 @@ fn[T] binary_search_by_key(entries : Array[(UInt, T)], key : UInt) -> T? {
 /// Store a decoded region for later reference.
 fn PageState::store_region(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
   region : Bitmap,
 ) -> Unit {
   self.referred_segments.push((segment_number, region))
@@ -654,7 +654,7 @@ fn PageState::store_region(
 /// Look up a referred segment by number.
 fn PageState::get_referred_segment(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
 ) -> Bitmap? {
   binary_search_by_key(self.referred_segments, segment_number)
 }
@@ -663,7 +663,7 @@ fn PageState::get_referred_segment(
 /// Store a decoded pattern dictionary for later reference.
 fn PageState::store_pattern_dictionary(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
   dictionary : PatternDictionary,
 ) -> Unit {
   self.pattern_dictionaries.push((segment_number, dictionary))
@@ -673,7 +673,7 @@ fn PageState::store_pattern_dictionary(
 /// Look up a pattern dictionary by segment number.
 fn PageState::get_pattern_dictionary(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
 ) -> PatternDictionary? {
   binary_search_by_key(self.pattern_dictionaries, segment_number)
 }
@@ -682,7 +682,7 @@ fn PageState::get_pattern_dictionary(
 /// Store a decoded symbol dictionary for later reference.
 fn PageState::store_symbol_dictionary(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
   dictionary : SymbolDictionary,
 ) -> Unit {
   self.symbol_dictionaries.push((segment_number, dictionary))
@@ -692,7 +692,7 @@ fn PageState::store_symbol_dictionary(
 /// Look up a symbol dictionary by segment number.
 fn PageState::get_symbol_dictionary(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
 ) -> SymbolDictionary? {
   binary_search_by_key(self.symbol_dictionaries, segment_number)
 }
@@ -701,7 +701,7 @@ fn PageState::get_symbol_dictionary(
 /// Store a decoded Huffman table for later reference.
 fn PageState::store_huffman_table(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
   table : HuffmanTable,
 ) -> Unit {
   self.huffman_tables.push((segment_number, table))
@@ -711,7 +711,7 @@ fn PageState::store_huffman_table(
 /// Look up a Huffman table by segment number.
 fn PageState::get_huffman_table(
   self : PageState,
-  segment_number : UInt,
+  segment_number : UInt32,
 ) -> HuffmanTable? {
   binary_search_by_key(self.huffman_tables, segment_number)
 }
@@ -720,7 +720,7 @@ fn PageState::get_huffman_table(
 /// Parse page information and initialize the page bitmap.
 fn init_page(
   reader : Reader,
-  height_from_stripes : UInt?,
+  height_from_stripes : UInt32?,
   page : PageState,
   bitmap : Bitmap,
 ) -> Unit raise DecodeError {

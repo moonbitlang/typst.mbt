@@ -475,7 +475,7 @@ let all_kinds : ReadOnlyArray[SyntaxKind] = [
 
 ///|
 /// The numeric index of the kind (its declaration order).
-pub fn SyntaxKind::index(self : SyntaxKind) -> Int {
+pub fn SyntaxKind::index(self : SyntaxKind) -> Int32 {
   match self {
     End => 0
     Error => 1
@@ -620,7 +620,7 @@ pub fn SyntaxKind::index(self : SyntaxKind) -> Int {
 
 ///|
 /// The kind with the given index.
-pub fn SyntaxKind::from_index(i : Int) -> SyntaxKind {
+pub fn SyntaxKind::from_index(i : Int32) -> SyntaxKind {
   all_kinds[i]
 }
 

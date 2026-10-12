@@ -9,8 +9,8 @@
 ///|
 /// A half-open range of byte indices (`Range<usize>`).
 pub(all) struct Range {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
@@ -34,7 +34,7 @@ pub extend Range with Hash::{hash, hash_combine}
 pub extend Range with @debug.Debug::{to_repr}
 
 ///|
-pub fn Range::len(self : Range) -> Int {
+pub fn Range::len(self : Range) -> Int32 {
   self.end - self.start
 }
 
@@ -44,7 +44,7 @@ pub fn Range::is_empty(self : Range) -> Bool {
 }
 
 ///|
-pub fn Range::contains(self : Range, i : Int) -> Bool {
+pub fn Range::contains(self : Range, i : Int32) -> Bool {
   self.start <= i && i < self.end
 }
 
@@ -93,7 +93,7 @@ pub extend ParagraphInfo with @debug.Debug::{to_repr}
 
 ///|
 /// Gets the length of the paragraph in the source text.
-pub fn ParagraphInfo::len(self : ParagraphInfo) -> Int {
+pub fn ParagraphInfo::len(self : ParagraphInfo) -> Int32 {
   self.range.end - self.range.start
 }
 
@@ -159,7 +159,7 @@ fn compute_initial_info(
   let original_classes : Array[BidiClass] = Array(capacity=text.len())
 
   // The stack contains the starting code unit index for each nested isolate we're inside.
-  let isolate_stack : Array[Int] = []
+  let isolate_stack : Array[Int32] = []
   let mut para_start = 0
   let mut para_level = default_para_level
 
@@ -368,7 +368,7 @@ pub fn BidiInfo::reorder_line(
 ///
 /// This only runs [Rule L2](http://www.unicode.org/reports/tr9/#L2) as it does not have
 /// information about the actual text.
-pub fn BidiInfo::reorder_visual(levels : ArrayView[Level]) -> Array[Int] {
+pub fn BidiInfo::reorder_visual(levels : ArrayView[Level]) -> Array[Int32] {
   reorder_visual(levels)
 }
 
@@ -426,7 +426,7 @@ fn reorder_line(
     if levels[run.start].is_rtl() {
       let chars = text.view().subrange(run.start, run.end).chars()
       for k = chars.length() - 1; k >= 0; k = k - 1 {
-        result.write_char(Int::unsafe_to_char(chars[k]))
+        result.write_char(Int32::unsafe_to_char(chars[k]))
       }
     } else {
       result.write_string(text.slice(run.start, run.end))
@@ -500,7 +500,7 @@ fn visual_runs_for_line(
 }
 
 ///|
-fn[T] reverse_range(arr : Array[T], start : Int, end : Int) -> Unit {
+fn[T] reverse_range(arr : Array[T], start : Int32, end : Int32) -> Unit {
   let mut a = start
   let mut b = end - 1
   while a < b {
@@ -514,10 +514,10 @@ fn[T] reverse_range(arr : Array[T], start : Int, end : Int) -> Unit {
 
 ///|
 /// Reorders pre-calculated levels of a sequence of characters.
-fn reorder_visual(levels : ArrayView[Level]) -> Array[Int] {
+fn reorder_visual(levels : ArrayView[Level]) -> Array[Int32] {
   // Gets the next range of characters after start_index with a level greater
   // than or equal to `max`
-  fn next_range(levels : ArrayView[Level], start_index : Int, max : Level) {
+  fn next_range(levels : ArrayView[Level], start_index : Int32, max : Level) {
     if levels.is_empty() || start_index >= levels.length() {
       return (start_index, start_index)
     }
@@ -655,8 +655,8 @@ fn reorder_levels(
 ) -> Unit {
   // Reset some whitespace chars to paragraph level.
   // <http://www.unicode.org/reports/tr9/#L1>
-  let mut reset_from : Int? = Some(0)
-  let mut reset_to : Int? = None
+  let mut reset_from : Int32? = Some(0)
+  let mut reset_to : Int32? = None
   let mut prev_level = para_level
   // (`for (i, c) in line_text.char_indices()`, without the array of pairs.)
   for at in line_text.start..<line_text.end {
@@ -733,7 +733,7 @@ pub fn Paragraph::direction(self : Paragraph) -> Direction {
 
 ///|
 /// Returns the `Level` of a certain character in the paragraph.
-pub fn Paragraph::level_at(self : Paragraph, pos : Int) -> Level {
+pub fn Paragraph::level_at(self : Paragraph, pos : Int32) -> Level {
   let actual_position = self.para.range.start + pos
   self.info.levels[actual_position]
 }

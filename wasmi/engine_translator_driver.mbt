@@ -12,7 +12,7 @@ pub(all) struct FuncTranslationDriver {
 ///|
 /// Creates a new Wasm to Wasmi bytecode function translator.
 pub fn FuncTranslationDriver::new(
-  offset : Int,
+  offset : Int32,
   bytes : BytesView,
   config : Config,
 ) -> FuncTranslationDriver {
@@ -59,7 +59,7 @@ pub fn FuncTranslationDriver::translate(
 /// driven by the `FuncTranslationDriver`.
 pub fn validate_func_body(
   func_to_validate : @wasmparser.FuncToValidate,
-  offset : Int,
+  offset : Int32,
   bytes : BytesView,
   config : Config,
 ) -> Unit raise WasmiError {

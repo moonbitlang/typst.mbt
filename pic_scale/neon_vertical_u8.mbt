@@ -12,17 +12,17 @@
 /// <false, 15>`): `vmlal_s16` into `i32` lanes starting at `1 << 14`, then
 /// `vqshrun_n_s32::<15>` + `vqmovn_u16`.
 fn convolve_vertical_neon_i32_precision(
-  width : Int,
-  bounds_start : Int,
-  bounds_size : Int,
+  width : Int32,
+  bounds_start : Int32,
+  bounds_size : Int32,
   src : FixedArray[Byte],
-  src_offset : Int,
-  src_stride : Int,
+  src_offset : Int32,
+  src_stride : Int32,
   dst : FixedArray[Byte],
-  dst_offset : Int,
-  weights : FixedArray[Int],
-  weights_offset : Int,
-  acc : FixedArray[Int],
+  dst_offset : Int32,
+  weights : FixedArray[Int32],
+  weights_offset : Int32,
+  acc : FixedArray[Int32],
 ) -> Unit {
   let rnd_const = 1 << (PRECISION - 1)
   for x in 0..<width {

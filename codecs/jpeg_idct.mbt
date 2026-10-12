@@ -11,14 +11,14 @@
 // Output is written to `out[out_pos..]` with the given row `stride`.
 
 ///|
-const SCALE_BITS : Int = 512 + 65536 + (128 << 17)
+const SCALE_BITS : Int32 = 512 + 65536 + (128 << 17)
 
 ///|
 fn idct_int_1x1(
-  in_vector : FixedArray[Int],
-  out_vector : FixedArray[Int],
-  out_pos : Int,
-  stride : Int,
+  in_vector : FixedArray[Int32],
+  out_vector : FixedArray[Int32],
+  out_pos : Int32,
+  stride : Int32,
 ) -> Unit raise DecodeErrors {
   let coeff = clamp255((in_vector[0] + 4 + 1024) >> 3)
   // upstream panics when the output is too short
@@ -38,7 +38,7 @@ fn idct_int_1x1(
 
 ///|
 /// Clamp values between 0 and 255.
-fn clamp255(a : Int) -> Int {
+fn clamp255(a : Int32) -> Int32 {
   if a < 0 {
     0
   } else if a > 255 {
@@ -52,16 +52,16 @@ fn clamp255(a : Int) -> Int {
 /// Store 8 values at `out[pos..pos + 8]` if they fit (upstream writes to a
 /// temporary buffer otherwise, "to prevent some bad images from crashing").
 fn store8(
-  out : FixedArray[Int],
-  pos : Int,
-  v0 : Int,
-  v1 : Int,
-  v2 : Int,
-  v3 : Int,
-  v4 : Int,
-  v5 : Int,
-  v6 : Int,
-  v7 : Int,
+  out : FixedArray[Int32],
+  pos : Int32,
+  v0 : Int32,
+  v1 : Int32,
+  v2 : Int32,
+  v3 : Int32,
+  v4 : Int32,
+  v5 : Int32,
+  v6 : Int32,
+  v7 : Int32,
 ) -> Unit {
   if in_range(pos, 8, out.length()) {
     out[pos] = v0
@@ -77,10 +77,10 @@ fn store8(
 
 ///|
 fn idct_int_scalar(
-  in_vector : FixedArray[Int],
-  out_vector : FixedArray[Int],
-  out_pos : Int,
-  stride : Int,
+  in_vector : FixedArray[Int32],
+  out_vector : FixedArray[Int32],
+  out_pos : Int32,
+  stride : Int32,
 ) -> Unit {
   let mut all_zero = true
   for i in 1..<64 {
@@ -206,10 +206,10 @@ fn idct_int_scalar(
 ///|
 /// IDCT assuming only the upper 4x4 is filled.
 fn idct4x4(
-  in_vector : FixedArray[Int],
-  out_vector : FixedArray[Int],
-  out_pos : Int,
-  stride : Int,
+  in_vector : FixedArray[Int32],
+  out_vector : FixedArray[Int32],
+  out_pos : Int32,
+  stride : Int32,
 ) -> Unit {
   let mut pos = out_pos
   // vertical pass

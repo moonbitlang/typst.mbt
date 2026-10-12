@@ -199,7 +199,7 @@ fn KArc::to_cubic_beziers(
 
 ///|
 /// Rust's saturating `f64 as usize` cast.
-fn f64_as_usize(x : Double) -> Int {
+fn f64_as_usize(x : Double) -> Int32 {
   if x.is_nan() || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {

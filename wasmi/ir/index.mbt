@@ -4,7 +4,7 @@
 /// A Wasmi stack slot (register) index (upstream `i16`).
 ///
 /// Negative indices refer to function local constant values.
-pub(all) struct Slot(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Slot(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,7 +28,7 @@ pub extend Slot with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm function index (upstream `u32`).
-pub(all) struct Func(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Func(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -52,7 +52,7 @@ pub extend Func with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm function type index (upstream `u32`).
-pub(all) struct FuncType(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct FuncType(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -76,7 +76,7 @@ pub extend FuncType with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasmi internal function index (upstream `u32`).
-pub(all) struct InternalFunc(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct InternalFunc(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -100,7 +100,7 @@ pub extend InternalFunc with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm global variable index (upstream `u32`).
-pub(all) struct Global(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Global(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -124,7 +124,7 @@ pub extend Global with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm linear memory index (upstream `u32`).
-pub(all) struct Memory(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Memory(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -148,7 +148,7 @@ pub extend Memory with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm table index (upstream `u32`).
-pub(all) struct Table(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Table(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -172,7 +172,7 @@ pub extend Table with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm data segment index (upstream `u32`).
-pub(all) struct Data(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Data(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -196,7 +196,7 @@ pub extend Data with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm element segment index (upstream `u32`).
-pub(all) struct Elem(Int) derive(Eq, Compare, Hash, Debug)
+pub(all) struct Elem(Int32) derive(Eq, Compare, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -227,7 +227,7 @@ pub fn Memory::is_default(self : Memory) -> Bool {
 
 ///|
 /// Upstream `TryFrom<u32> for Slot`.
-pub fn Slot::try_from_u32(local_index : UInt) -> Slot raise IrError {
+pub fn Slot::try_from_u32(local_index : UInt32) -> Slot raise IrError {
   if local_index > 0x7FFFU {
     raise IrError::StackSlotOutOfBounds
   }
@@ -236,7 +236,7 @@ pub fn Slot::try_from_u32(local_index : UInt) -> Slot raise IrError {
 
 ///|
 /// Wrapping `i16` addition (upstream `i16::wrapping_add_unsigned`).
-fn wrap_i16(value : Int) -> Int {
+fn wrap_i16(value : Int32) -> Int32 {
   (value & 0xFFFF) << 16 >> 16
 }
 
@@ -247,7 +247,7 @@ fn wrap_i16(value : Int) -> Int {
 ///
 /// - Calling this with `n == 0` just returns `self`.
 /// - This has wrapping semantics with respect to the underlying index.
-pub fn Slot::next_n(self : Slot, n : Int) -> Slot {
+pub fn Slot::next_n(self : Slot, n : Int32) -> Slot {
   Slot(wrap_i16(self.0 + n))
 }
 
@@ -258,7 +258,7 @@ pub fn Slot::next_n(self : Slot, n : Int) -> Slot {
 ///
 /// - Calling this with `n == 0` just returns `self`.
 /// - This has wrapping semantics with respect to the underlying index.
-pub fn Slot::prev_n(self : Slot, n : Int) -> Slot {
+pub fn Slot::prev_n(self : Slot, n : Int32) -> Slot {
   Slot(wrap_i16(self.0 - n))
 }
 

@@ -34,7 +34,7 @@ fn lang_matches(language : StringView, spec : StringView) -> Bool {
 }
 
 ///|
-fn strncmp(s1 : StringView, s2 : StringView, n : Int) -> Bool {
+fn strncmp(s1 : StringView, s2 : StringView, n : Int32) -> Bool {
   let n1 = n.min(s1.length())
   let n2 = n.min(s2.length())
   s1[:n1] == s2[:n2]

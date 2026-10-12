@@ -53,12 +53,12 @@ pub fn content_memo_enabled() -> Bool {
 ///|
 /// What [evict] calls besides dropping its own caches (comemo's
 /// `register_evictor`).
-let evictors : Array[(Int) -> Unit] = []
+let evictors : Array[(Int32) -> Unit] = []
 
 ///|
 /// Registers a function that [evict] calls with its `max_age` (comemo's
 /// `register_evictor`): for caches of packages that `library` does not know.
-pub fn register_evictor(f : (Int) -> Unit) -> Unit {
+pub fn register_evictor(f : (Int32) -> Unit) -> Unit {
   evictors.push(f)
 }
 
@@ -66,7 +66,7 @@ pub fn register_evictor(f : (Int) -> Unit) -> Unit {
 priv struct ContentEntry[T] {
   value : T
   /// The number of [evict] calls since the entry was made or found.
-  mut age : Int
+  mut age : Int32
 }
 
 ///|
@@ -126,7 +126,7 @@ pub fn[T] ContentCache::insert(
 ///|
 /// comemo's `evict`: every entry gets older by one, and those that were not
 /// found for more than `max_age` calls are dropped (all of them for zero).
-pub fn[T] ContentCache::evict(self : ContentCache[T], max_age : Int) -> Unit {
+pub fn[T] ContentCache::evict(self : ContentCache[T], max_age : Int32) -> Unit {
   let dropped = []
   for key, entry in self.entries {
     entry.age += 1
@@ -141,7 +141,7 @@ pub fn[T] ContentCache::evict(self : ContentCache[T], max_age : Int) -> Unit {
 
 ///|
 /// The number of results.
-pub fn[T] ContentCache::length(self : ContentCache[T]) -> Int {
+pub fn[T] ContentCache::length(self : ContentCache[T]) -> Int32 {
   self.entries.length()
 }
 
@@ -158,7 +158,7 @@ priv struct DataHashEntry {
   data : Bytes
   hash : U128
   /// The number of [sweep_data_hashes] calls since the hash was asked for.
-  mut age : Int
+  mut age : Int32
 }
 
 ///|
@@ -176,17 +176,17 @@ priv struct DataHashEntry {
 /// session, whose sweeps are the start of a compilation and the `evict`
 /// after it, that is a compilation later, and the objects of a host that
 /// hands out the same `Bytes` again are hashed once. `evict(0)` drops all.
-let data_hashes : Map[Int, Array[DataHashEntry]] = Map([])
+let data_hashes : Map[Int32, Array[DataHashEntry]] = Map([])
 
 ///|
 /// Data below this length is hashed on every call: that costs less than
 /// finding it.
-let data_hash_min_length : Int = 256
+let data_hash_min_length : Int32 = 256
 
 ///|
 /// Where an object is filed in [data_hashes]: its length and a few of its
 /// bytes (at least [data_hash_min_length] of them exist).
-fn data_probe(data : Bytes) -> Int {
+fn data_probe(data : Bytes) -> Int32 {
   let n = data.length()
   let mut h = n
   let step = n / 16
@@ -238,7 +238,7 @@ fn data_hash_uncached(data : Bytes) -> U128 {
 
 ///|
 /// The sweeps an entry of [data_hashes] stays for after it was asked for.
-let data_hash_max_age : Int = 2
+let data_hash_max_age : Int32 = 2
 
 ///|
 /// Makes the hashes of [data_hashes] older by one and drops those of the

@@ -22,7 +22,7 @@ let glyph_paths : Map[@library.U128, RenderedGlyph?] = Map([])
 /// glyphs, and nothing ages them (`@library.evict` does not know the
 /// caches by font). A cache that is full is emptied and starts again:
 /// what it holds is a function of its key.
-let glyph_cache_limit : Int = 65536
+let glyph_cache_limit : Int32 = 65536
 
 ///|
 /// The bounding boxes of glyphs (by font and glyph).

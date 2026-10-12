@@ -2,8 +2,8 @@
 
 ///|
 pub(all) struct MalformedSize {
-  size : Int
-  expected : Int
+  size : Int32
+  expected : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -27,14 +27,14 @@ pub(all) suberror CmsError {
   ParametricCurveZeroDivision
   InvalidRenderingIntent
   DivisionByZero
-  UnsupportedColorPrimaries(Int)
-  UnsupportedTrc(Int)
+  UnsupportedColorPrimaries(Int32)
+  UnsupportedTrc(Int32)
   InvalidLayout
   UnsupportedProfileConnection
   BuildTransferFunction
   UnsupportedChannelConfiguration
-  UnknownTag(UInt)
-  UnknownTagTypeDefinition(UInt)
+  UnknownTag(UInt32)
+  UnknownTagTypeDefinition(UInt32)
   UnsupportedLutRenderingIntent(RenderingIntent)
   InvalidAtoBLut
   OverflowingError
@@ -43,7 +43,7 @@ pub(all) suberror CmsError {
   MalformedCurveLutTable(MalformedSize)
   InvalidInksCountForProfile
   MalformedTrcCurve(String)
-  OutOfMemory(Int)
+  OutOfMemory(Int32)
   IncorrectlyFormedLut(String)
 } derive(Eq, Debug)
 

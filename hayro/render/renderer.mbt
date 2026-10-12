@@ -20,8 +20,8 @@ priv enum ImagePixelFormat {
 ///|
 priv struct SolidColorImage {
   color : FixedArray[Byte]
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   interpolate : Bool
 }
 
@@ -43,7 +43,7 @@ fn RenderImageData::from_image_data(
 }
 
 ///|
-fn RenderImageData::width(self : RenderImageData) -> Int {
+fn RenderImageData::width(self : RenderImageData) -> Int32 {
   match self {
     Rgb(d) => d.width
     Luma(d) => d.width
@@ -52,7 +52,7 @@ fn RenderImageData::width(self : RenderImageData) -> Int {
 }
 
 ///|
-fn RenderImageData::height(self : RenderImageData) -> Int {
+fn RenderImageData::height(self : RenderImageData) -> Int32 {
   match self {
     Rgb(d) => d.height
     Luma(d) => d.height
@@ -71,8 +71,8 @@ fn RenderImageData::interpolate(self : RenderImageData) -> Bool {
 
 ///|
 fn Renderer::new(
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   outline_cache : Map[@interpret.U128, @kurbo.BezPath],
 ) -> Renderer {
   {
@@ -199,10 +199,10 @@ fn Renderer::draw_image_with_alpha_mask(
 ///|
 fn resize_image_data(
   data : Bytes,
-  src_width : Int,
-  src_height : Int,
-  new_width : Int,
-  new_height : Int,
+  src_width : Int32,
+  src_height : Int32,
+  new_width : Int32,
+  new_height : Int32,
   pixel_format : ImagePixelFormat,
 ) -> Bytes {
   match pixel_format {
@@ -554,7 +554,7 @@ fn Renderer::draw_image_impl(
 
 ///|
 /// `f32 as u32` (saturating).
-fn f32_as_u32(x : Float) -> Int {
+fn f32_as_u32(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -840,7 +840,7 @@ fn Renderer::set_paint(
 
 ///|
 /// `f32 as u16` (saturating).
-fn f32_as_u16(x : Float) -> Int {
+fn f32_as_u16(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 65535.0 {
@@ -1077,7 +1077,7 @@ impl @interpret.Device for Renderer with fn draw_image(self, image, props) {
 
 ///|
 /// `f64 as u32` (saturating, as `Int`).
-fn f64_as_u32(x : Double) -> Int {
+fn f64_as_u32(x : Double) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -1196,7 +1196,7 @@ impl @interpret.Device for Renderer with fn draw_glyph(
 fn render_shading_texture(
   path_bbox : @kurbo.Rect,
   shading_pattern : @interpret.EncodedShadingPattern,
-) -> (FixedArray[Byte], Int, Int, @kurbo.Affine, Bool) {
+) -> (FixedArray[Byte], Int32, Int32, @kurbo.Affine, Bool) {
   let base_width = fmaxnm(Float::from_double(path_bbox.width()), 1.0)
   let base_height = fmaxnm(Float::from_double(path_bbox.height()), 1.0)
   let width = f32_as_u32(base_width.ceil())
@@ -1237,8 +1237,8 @@ fn render_shading_texture(
 ///|
 fn draw_soft_mask(
   mask : @interpret.SoftMask,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> @vello_cpu.Mask {
   let renderer = Renderer::new(width, height, {})
   let bg_color = mask.background_color().to_rgba()
@@ -1291,7 +1291,7 @@ fn draw_soft_mask(
 
 ///|
 /// `f32 as u8` (saturating).
-fn f32_as_u8(x : Float) -> Int {
+fn f32_as_u8(x : Float) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 255.0 {

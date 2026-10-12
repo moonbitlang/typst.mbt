@@ -5,14 +5,14 @@
 
 ///|
 /// The number of introspectors whose answers the accelerator keeps.
-fn read_accelerator_tables() -> Int {
+fn read_accelerator_tables() -> Int32 {
   read_accelerator.tables.length()
 }
 
 ///|
 /// A recorder of `n` reads whose replays count themselves in `replays`
 /// and answer what was expected of them.
-fn counting_reads(n : Int, replays : Ref[Int]) -> IntrospectionRecorder {
+fn counting_reads(n : Int32, replays : Ref[Int32]) -> IntrospectionRecorder {
   let recorder = IntrospectionRecorder::new()
   for i in 0..<n {
     let key = hash128(("read", i))

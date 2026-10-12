@@ -24,7 +24,7 @@ pub fn Fragment::is_empty(self : Fragment) -> Bool {
 
 ///|
 /// The number of frames in the fragment.
-pub fn Fragment::len(self : Fragment) -> Int {
+pub fn Fragment::len(self : Fragment) -> Int32 {
   self.0.length()
 }
 

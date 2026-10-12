@@ -189,8 +189,8 @@ fn TextState::apply_adjustment(self : TextState, adjustment : Float) -> Unit {
 ///|
 fn TextState::apply_code_advance(
   self : TextState,
-  char_code : UInt,
-  code_len : Int,
+  char_code : UInt32,
+  code_len : Int32,
 ) -> Unit {
   let glyph_advance = match self.font {
     Some(f) => f.font().code_advance(char_code)

@@ -184,7 +184,7 @@ test "encode basics" {
 
 ///|
 /// `n` repetitions of the ASCII byte `b`.
-fn rep(b : Byte, n : Int) -> Bytes {
+fn rep(b : Byte, n : Int32) -> Bytes {
   Bytes::make(n, b)
 }
 

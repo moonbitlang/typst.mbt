@@ -6,7 +6,7 @@
 
 ///|
 /// `PosExt::splat_pos` for one lane: the position of row `row` in a column.
-fn splat_pos_lane(pos : Float, y_advance : Float, row : Int) -> Float {
+fn splat_pos_lane(pos : Float, y_advance : Float, row : Int32) -> Float {
   madd(Float::from_int(row), y_advance, pos)
 }
 
@@ -15,7 +15,7 @@ fn splat_pos_lane(pos : Float, y_advance : Float, row : Int) -> Float {
 fn calculate_t_vals(
   gradient : EncodedGradient,
   buf : FixedArray[Float],
-  len : Int,
+  len : Int32,
   start_x : Double,
   start_y : Double,
 ) -> Unit {
@@ -125,8 +125,8 @@ fn paint_gradient_u8(
   gradient : EncodedGradient,
   t_vals : FixedArray[Float],
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let lut = gradient.u8_lut()
   let scale_factor = lut.scale
@@ -155,8 +155,8 @@ fn paint_gradient_f32_lut(
   gradient : EncodedGradient,
   t_vals : FixedArray[Float],
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let lut = gradient.f32_lut()
   let scale_factor = lut.scale
@@ -204,7 +204,7 @@ priv struct ImagePainterData {
   height_inv : Float
   width : Float
   width_inv : Float
-  width_u32 : UInt
+  width_u32 : UInt32
 }
 
 ///|
@@ -236,7 +236,7 @@ fn ImagePainterData::sample(
   self : ImagePainterData,
   x : Float,
   y : Float,
-) -> UInt {
+) -> UInt32 {
   let idx = f32_as_u32(x) + f32_as_u32(y) * self.width_u32
   self.pixmap.sample_idx(idx)
 }
@@ -271,7 +271,7 @@ fn image_extend(
 
 ///|
 /// Store a packed pixel at a byte offset.
-fn store_pixel(buf : FixedArray[Byte], o : Int, px : UInt) -> Unit {
+fn store_pixel(buf : FixedArray[Byte], o : Int32, px : UInt32) -> Unit {
   buf[o] = (px & 0xFF).to_byte()
   buf[o + 1] = ((px >> 8) & 0xFF).to_byte()
   buf[o + 2] = ((px >> 16) & 0xFF).to_byte()
@@ -286,8 +286,8 @@ fn paint_plain_nn(
   start_x : Double,
   start_y : Double,
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let data = ImagePainterData::new(image, pixmap, start_x, start_y)
   let y_positions = FixedArray::make(4, (0.0 : Float))
@@ -328,8 +328,8 @@ fn paint_nn(
   start_x : Double,
   start_y : Double,
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let data = ImagePainterData::new(image, pixmap, start_x, start_y)
   for col in 0..<(n / 16) {
@@ -364,14 +364,14 @@ fn fract_floor(val : Float) -> Float {
 /// Bilinear interpolation of 4 packed pixels with `u8` weights
 /// (`lowp::image`).
 fn bilinear_u8(
-  p00 : UInt,
-  p10 : UInt,
-  p01 : UInt,
-  p11 : UInt,
-  fx : Int,
-  fy : Int,
+  p00 : UInt32,
+  p10 : UInt32,
+  p01 : UInt32,
+  p11 : UInt32,
+  fx : Int32,
+  fy : Int32,
   buf : FixedArray[Byte],
-  o : Int,
+  o : Int32,
 ) -> Unit {
   let fx_inv = (255 - fx) & 0xFFFF
   let fy_inv = (255 - fy) & 0xFFFF
@@ -395,8 +395,8 @@ fn paint_bilinear(
   start_x : Double,
   start_y : Double,
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let data = ImagePainterData::new(image, pixmap, start_x, start_y)
   for col in 0..<(n / 16) {
@@ -455,8 +455,8 @@ fn paint_plain_bilinear(
   start_x : Double,
   start_y : Double,
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let data = ImagePainterData::new(image, pixmap, start_x, start_y)
   let y_pos1 = FixedArray::make(4, (0.0 : Float))
@@ -566,8 +566,8 @@ fn paint_bicubic(
   start_x : Double,
   start_y : Double,
   buf : FixedArray[Byte],
-  off : Int,
-  n : Int,
+  off : Int32,
+  n : Int32,
 ) -> Unit {
   let data = ImagePainterData::new(image, pixmap, start_x, start_y)
   let offsets : FixedArray[Float] = [-1.5, -0.5, 0.5, 1.5]

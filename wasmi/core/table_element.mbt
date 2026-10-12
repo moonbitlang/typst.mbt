@@ -43,7 +43,7 @@ pub fn ElementSegment::items(self : ElementSegment) -> ArrayView[UntypedVal] {
 
 ///|
 /// Returns the number of items in the [`ElementSegment`].
-pub fn ElementSegment::size(self : ElementSegment) -> UInt {
+pub fn ElementSegment::size(self : ElementSegment) -> UInt32 {
   self.as_ref().size()
 }
 
@@ -78,6 +78,6 @@ pub fn ElementSegmentRef::items(
 
 ///|
 /// Returns the number of items in the [`ElementSegment`].
-pub fn ElementSegmentRef::size(self : ElementSegmentRef) -> UInt {
+pub fn ElementSegmentRef::size(self : ElementSegmentRef) -> UInt32 {
   self.items.length().reinterpret_as_uint()
 }

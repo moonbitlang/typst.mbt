@@ -74,19 +74,19 @@
 
 ///|
 /// The random sequences of a document.
-let default_sequences : Int = 1
+let default_sequences : Int32 = 1
 
 ///|
 /// The edits of a random sequence.
-let default_steps : Int = 6
+let default_steps : Int32 = 6
 
 ///|
 /// The most files, besides the main file, that a sweep edits.
-let sweep_files : Int = 16
+let sweep_files : Int32 = 16
 
 ///|
 /// The same for a document that takes long.
-let heavy_sweep_files : Int = 1
+let heavy_sweep_files : Int32 = 1
 
 ///|
 /// The documents whose compilation takes long, besides those with
@@ -98,11 +98,11 @@ let recompile_heavy : ReadOnlyArray[String] = [
 ///|
 /// The size of a run.
 priv struct RecompileOptions {
-  seed : Int
-  rounds : Int
+  seed : Int32
+  rounds : Int32
   /// `None`: the default of the document.
-  sequences : Int?
-  steps : Int
+  sequences : Int32?
+  steps : Int32
   verbose : Bool
   times : Bool
   /// Where the snapshots of the steps are written, if anywhere.
@@ -113,9 +113,9 @@ priv struct RecompileOptions {
 /// What is counted per kind of edit: the steps, those that did not compile
 /// and those that gave other pages than the step before.
 priv struct EditCount {
-  mut steps : Int
-  mut errors : Int
-  mut changed : Int
+  mut steps : Int32
+  mut errors : Int32
+  mut changed : Int32
 }
 
 ///|
@@ -123,29 +123,29 @@ priv struct EditCount {
 /// without memoization, not on the watch loop: with a stale result the
 /// loop would say that nothing changed.
 priv struct RecompileStats {
-  mut documents : Int
-  mut sequences : Int
-  mut steps : Int
-  mut compilations : Int
+  mut documents : Int32
+  mut sequences : Int32
+  mut steps : Int32
+  mut compilations : Int32
   /// Steps whose document did not compile.
-  mut errors : Int
+  mut errors : Int32
   /// Steps that gave other pages than the step before.
-  mut changed : Int
+  mut changed : Int32
   /// Steps that gave other files to watch than the step before.
-  mut rewatched : Int
+  mut rewatched : Int32
   /// Steps of the watch loop with a source whose tree is not what a parse
   /// gives, and those of them that gave something else than a fresh
   /// compilation (which is not a failure).
-  mut reparsed : Int
-  mut reparsed_differing : Int
+  mut reparsed : Int32
+  mut reparsed_differing : Int32
   /// The steps of the sequences that are pinned to upstream's watch
   /// (`recompile_pinned.mbt`), those of them at which upstream's watch
   /// gives something else than a fresh compilation, and those at which the
   /// watch loop gave upstream's watch output and not a fresh compilation's
   /// (which is not a failure, there and only there).
-  mut pinned : Int
-  mut pinned_upstream_differs : Int
-  mut pinned_as_upstream : Int
+  mut pinned : Int32
+  mut pinned_upstream_differs : Int32
+  mut pinned_as_upstream : Int32
   /// By the kind of the edit.
   edits : Map[String, EditCount]
 }
@@ -161,7 +161,7 @@ priv struct RecompileStep {
 
 ///|
 /// The value of `--name=N` (not negative).
-fn int_option(args : Array[String], name : String) -> Int? {
+fn int_option(args : Array[String], name : String) -> Int32? {
   let prefix = "--\{name}="
   for arg in args {
     if arg.has_prefix(prefix) {
@@ -434,7 +434,7 @@ priv enum Plan {
   /// The sweep.
   Sweep(Sweep)
   /// That many random edits.
-  Random(Int)
+  Random(Int32)
   /// The edits of a fixture of upstream's watch (`recompile_pinned.mbt`).
   Pinned(Pinned)
 }
@@ -463,7 +463,7 @@ fn edit_kind(edit : String) -> String {
 /// compilation, or changed the document of the step before.
 fn run_sequence(
   document : Document,
-  seed : Int,
+  seed : Int32,
   name : String,
   rng : Rng,
   plan : Plan,
@@ -486,7 +486,7 @@ fn run_sequence(
   let pages = PageFiles::new()
   let done : Array[RecompileStep] = []
   // The steps during whose compilation the document before them changed.
-  let disturbed : Array[Int] = []
+  let disturbed : Array[Int32] = []
   for step = 0; ; step = step + 1 {
     let edit = if step == 0 {
       "the first compilation"
@@ -579,8 +579,8 @@ fn run_sequence(
   // memoization only (the one that no memo of the process reaches).
   let steps = done.length() - 1
   let references = if heavy { [false] } else { [true, false] }
-  let mut failure : (Int, String)? = None
-  let also : Array[Int] = []
+  let mut failure : (Int32, String)? = None
+  let also : Array[Int32] = []
   let mut before : Compiled? = None
   for step, at in done {
     // A tree that a parse does not give (upstream's reparser) is no stale
@@ -770,7 +770,7 @@ fn write_file(path : String, content : Bytes) -> Unit {
 fn dump_failure(
   dir : String,
   done : Array[RecompileStep],
-  step : Int,
+  step : Int32,
   part : String,
   expected : Compiled,
   actual : Compiled,
@@ -866,7 +866,7 @@ fn replay_snapshot(dir : String, documents : Array[Document]) -> Unit {
   let meta = read("\{dir}/meta.txt")
   let mut name = ""
   let mut main = ""
-  let numbers : Map[String, Int] = Map([])
+  let numbers : Map[String, Int32] = Map([])
   let overlay : Array[(@syntax.FileId, Bytes?)] = []
   for line in meta.split("\n") {
     let line = line.to_owned()

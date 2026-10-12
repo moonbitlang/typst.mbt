@@ -4,7 +4,7 @@
 ///|
 fn parse_svg_text_element(
   parent : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   style_sheet : @simplecss.StyleSheet,
   doc : Document,
 ) -> Unit raise @xml.XmlError {
@@ -26,7 +26,7 @@ fn parse_svg_text_element(
 ///|
 fn parse_svg_text_element_impl(
   parent : @xml.Node,
-  parent_id : Int,
+  parent_id : Int32,
   style_sheet : @simplecss.StyleSheet,
   space : XmlSpace,
   doc : Document,
@@ -125,7 +125,11 @@ priv enum XmlSpace {
 } derive(Eq)
 
 ///|
-fn get_xmlspace(doc : Document, node_id : Int, default : XmlSpace) -> XmlSpace {
+fn get_xmlspace(
+  doc : Document,
+  node_id : Int32,
+  default : XmlSpace,
+) -> XmlSpace {
   let value : String? = doc.get(node_id).attribute(AId::Space)
   match value {
     Some("preserve") => XmlSpacePreserve
@@ -135,7 +139,7 @@ fn get_xmlspace(doc : Document, node_id : Int, default : XmlSpace) -> XmlSpace {
 }
 
 ///|
-fn Document::text_of(self : Document, node_id : Int) -> String {
+fn Document::text_of(self : Document, node_id : Int32) -> String {
   match self.nodes[node_id].kind {
     Text(text) => text
     _ => self.get(node_id).text()
@@ -143,7 +147,7 @@ fn Document::text_of(self : Document, node_id : Int) -> String {
 }
 
 ///|
-fn Document::remove_first_space(self : Document, node_id : Int) -> Unit {
+fn Document::remove_first_space(self : Document, node_id : Int32) -> Unit {
   if self.nodes[node_id].kind is Text(text) {
     self.nodes[node_id].kind = Text(
       text.unsafe_substring(start=1, end=text.length()),
@@ -152,7 +156,7 @@ fn Document::remove_first_space(self : Document, node_id : Int) -> Unit {
 }
 
 ///|
-fn Document::remove_last_space(self : Document, node_id : Int) -> Unit {
+fn Document::remove_last_space(self : Document, node_id : Int32) -> Unit {
   if self.nodes[node_id].kind is Text(text) {
     self.nodes[node_id].kind = Text(
       text.unsafe_substring(start=0, end=text.length() - 1),
@@ -168,7 +172,7 @@ fn Document::remove_last_space(self : Document, node_id : Int) -> Unit {
 /// - tabs and newlines removing/replacing
 /// - spaces trimming
 fn trim_text_nodes(
-  text_elem_id : Int,
+  text_elem_id : Int32,
   xmlspace : XmlSpace,
   doc : Document,
 ) -> Unit {
@@ -218,7 +222,7 @@ fn trim_text_nodes(
 
     let mut i = 0
     let len = nodes.length() - 1
-    let mut last_non_empty : Int? = None
+    let mut last_non_empty : Int32? = None
     while i < len {
       // Process pairs.
       let (node1_id_, depth1) = nodes[i]
@@ -325,8 +329,8 @@ fn trim_text_nodes(
 ///|
 fn collect_text_nodes(
   parent : SvgNode,
-  depth : Int,
-  nodes : Array[(Int, Int)],
+  depth : Int32,
+  nodes : Array[(Int32, Int32)],
 ) -> Unit {
   for child in parent.children() {
     if child.is_text() {
@@ -381,12 +385,12 @@ fn rust_trim(s : String) -> String {
 /// Rust's `char::is_whitespace` (the Unicode `White_Space` property).
 fn is_rust_whitespace(c : Char) -> Bool {
   c
-  is ('\u{9}'..='\u{d}'
+  is ('\u{9}'..<='\u{d}'
   | ' '
   | '\u{85}'
   | '\u{a0}'
   | '\u{1680}'
-  | '\u{2000}'..='\u{200a}'
+  | '\u{2000}'..<='\u{200a}'
   | '\u{2028}'
   | '\u{2029}'
   | '\u{202f}'

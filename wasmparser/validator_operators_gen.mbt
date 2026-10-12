@@ -56,7 +56,7 @@ pub fn WasmProposalValidator::visit_end(
 ///|
 pub fn WasmProposalValidator::visit_br(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_br(relative_depth)
 }
@@ -64,7 +64,7 @@ pub fn WasmProposalValidator::visit_br(
 ///|
 pub fn WasmProposalValidator::visit_br_if(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_br_if(relative_depth)
 }
@@ -87,7 +87,7 @@ pub fn WasmProposalValidator::visit_return(
 ///|
 pub fn WasmProposalValidator::visit_call(
   self : WasmProposalValidator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_call(function_index)
 }
@@ -95,8 +95,8 @@ pub fn WasmProposalValidator::visit_call(
 ///|
 pub fn WasmProposalValidator::visit_call_indirect(
   self : WasmProposalValidator,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_call_indirect(type_index, table_index)
 }
@@ -118,7 +118,7 @@ pub fn WasmProposalValidator::visit_select(
 ///|
 pub fn WasmProposalValidator::visit_local_get(
   self : WasmProposalValidator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_local_get(local_index)
 }
@@ -126,7 +126,7 @@ pub fn WasmProposalValidator::visit_local_get(
 ///|
 pub fn WasmProposalValidator::visit_local_set(
   self : WasmProposalValidator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_local_set(local_index)
 }
@@ -134,7 +134,7 @@ pub fn WasmProposalValidator::visit_local_set(
 ///|
 pub fn WasmProposalValidator::visit_local_tee(
   self : WasmProposalValidator,
-  local_index : UInt,
+  local_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_local_tee(local_index)
 }
@@ -142,7 +142,7 @@ pub fn WasmProposalValidator::visit_local_tee(
 ///|
 pub fn WasmProposalValidator::visit_global_get(
   self : WasmProposalValidator,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_global_get(global_index)
 }
@@ -150,7 +150,7 @@ pub fn WasmProposalValidator::visit_global_get(
 ///|
 pub fn WasmProposalValidator::visit_global_set(
   self : WasmProposalValidator,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_global_set(global_index)
 }
@@ -342,7 +342,7 @@ pub fn WasmProposalValidator::visit_i64_store32(
 ///|
 pub fn WasmProposalValidator::visit_memory_size(
   self : WasmProposalValidator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_memory_size(mem)
 }
@@ -350,7 +350,7 @@ pub fn WasmProposalValidator::visit_memory_size(
 ///|
 pub fn WasmProposalValidator::visit_memory_grow(
   self : WasmProposalValidator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_memory_grow(mem)
 }
@@ -358,7 +358,7 @@ pub fn WasmProposalValidator::visit_memory_grow(
 ///|
 pub fn WasmProposalValidator::visit_i32_const(
   self : WasmProposalValidator,
-  value : Int,
+  value : Int32,
 ) -> Unit raise BinaryReaderError {
   self.0.visit_i32_const(value)
 }
@@ -1314,7 +1314,7 @@ pub fn WasmProposalValidator::visit_ref_eq(
 ///|
 pub fn WasmProposalValidator::visit_struct_new(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
+  struct_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_new(struct_type_index)
@@ -1323,7 +1323,7 @@ pub fn WasmProposalValidator::visit_struct_new(
 ///|
 pub fn WasmProposalValidator::visit_struct_new_default(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
+  struct_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_new_default(struct_type_index)
@@ -1332,8 +1332,8 @@ pub fn WasmProposalValidator::visit_struct_new_default(
 ///|
 pub fn WasmProposalValidator::visit_struct_get(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_get(struct_type_index, field_index)
@@ -1342,8 +1342,8 @@ pub fn WasmProposalValidator::visit_struct_get(
 ///|
 pub fn WasmProposalValidator::visit_struct_get_s(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_get_s(struct_type_index, field_index)
@@ -1352,8 +1352,8 @@ pub fn WasmProposalValidator::visit_struct_get_s(
 ///|
 pub fn WasmProposalValidator::visit_struct_get_u(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_get_u(struct_type_index, field_index)
@@ -1362,8 +1362,8 @@ pub fn WasmProposalValidator::visit_struct_get_u(
 ///|
 pub fn WasmProposalValidator::visit_struct_set(
   self : WasmProposalValidator,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_struct_set(struct_type_index, field_index)
@@ -1372,7 +1372,7 @@ pub fn WasmProposalValidator::visit_struct_set(
 ///|
 pub fn WasmProposalValidator::visit_array_new(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_new(array_type_index)
@@ -1381,7 +1381,7 @@ pub fn WasmProposalValidator::visit_array_new(
 ///|
 pub fn WasmProposalValidator::visit_array_new_default(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_new_default(array_type_index)
@@ -1390,8 +1390,8 @@ pub fn WasmProposalValidator::visit_array_new_default(
 ///|
 pub fn WasmProposalValidator::visit_array_new_fixed(
   self : WasmProposalValidator,
-  array_type_index : UInt,
-  array_size : UInt,
+  array_type_index : UInt32,
+  array_size : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_new_fixed(array_type_index, array_size)
@@ -1400,8 +1400,8 @@ pub fn WasmProposalValidator::visit_array_new_fixed(
 ///|
 pub fn WasmProposalValidator::visit_array_new_data(
   self : WasmProposalValidator,
-  array_type_index : UInt,
-  array_data_index : UInt,
+  array_type_index : UInt32,
+  array_data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_new_data(array_type_index, array_data_index)
@@ -1410,8 +1410,8 @@ pub fn WasmProposalValidator::visit_array_new_data(
 ///|
 pub fn WasmProposalValidator::visit_array_new_elem(
   self : WasmProposalValidator,
-  array_type_index : UInt,
-  array_elem_index : UInt,
+  array_type_index : UInt32,
+  array_elem_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_new_elem(array_type_index, array_elem_index)
@@ -1420,7 +1420,7 @@ pub fn WasmProposalValidator::visit_array_new_elem(
 ///|
 pub fn WasmProposalValidator::visit_array_get(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_get(array_type_index)
@@ -1429,7 +1429,7 @@ pub fn WasmProposalValidator::visit_array_get(
 ///|
 pub fn WasmProposalValidator::visit_array_get_s(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_get_s(array_type_index)
@@ -1438,7 +1438,7 @@ pub fn WasmProposalValidator::visit_array_get_s(
 ///|
 pub fn WasmProposalValidator::visit_array_get_u(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_get_u(array_type_index)
@@ -1447,7 +1447,7 @@ pub fn WasmProposalValidator::visit_array_get_u(
 ///|
 pub fn WasmProposalValidator::visit_array_set(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_set(array_type_index)
@@ -1464,7 +1464,7 @@ pub fn WasmProposalValidator::visit_array_len(
 ///|
 pub fn WasmProposalValidator::visit_array_fill(
   self : WasmProposalValidator,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_fill(array_type_index)
@@ -1473,8 +1473,8 @@ pub fn WasmProposalValidator::visit_array_fill(
 ///|
 pub fn WasmProposalValidator::visit_array_copy(
   self : WasmProposalValidator,
-  array_type_index_dst : UInt,
-  array_type_index_src : UInt,
+  array_type_index_dst : UInt32,
+  array_type_index_src : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_copy(array_type_index_dst, array_type_index_src)
@@ -1483,8 +1483,8 @@ pub fn WasmProposalValidator::visit_array_copy(
 ///|
 pub fn WasmProposalValidator::visit_array_init_data(
   self : WasmProposalValidator,
-  array_type_index : UInt,
-  array_data_index : UInt,
+  array_type_index : UInt32,
+  array_data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_init_data(array_type_index, array_data_index)
@@ -1493,8 +1493,8 @@ pub fn WasmProposalValidator::visit_array_init_data(
 ///|
 pub fn WasmProposalValidator::visit_array_init_elem(
   self : WasmProposalValidator,
-  array_type_index : UInt,
-  array_elem_index : UInt,
+  array_type_index : UInt32,
+  array_elem_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.gc(), "gc")
   self.0.visit_array_init_elem(array_type_index, array_elem_index)
@@ -1539,7 +1539,7 @@ pub fn WasmProposalValidator::visit_ref_cast_nullable(
 ///|
 pub fn WasmProposalValidator::visit_br_on_cast(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
   from_ref_type : RefType,
   to_ref_type : RefType,
 ) -> Unit raise BinaryReaderError {
@@ -1550,7 +1550,7 @@ pub fn WasmProposalValidator::visit_br_on_cast(
 ///|
 pub fn WasmProposalValidator::visit_br_on_cast_fail(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
   from_ref_type : RefType,
   to_ref_type : RefType,
 ) -> Unit raise BinaryReaderError {
@@ -1689,8 +1689,8 @@ pub fn WasmProposalValidator::visit_i64_trunc_sat_f64_u(
 ///|
 pub fn WasmProposalValidator::visit_memory_init(
   self : WasmProposalValidator,
-  data_index : UInt,
-  mem : UInt,
+  data_index : UInt32,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_memory_init(data_index, mem)
@@ -1699,7 +1699,7 @@ pub fn WasmProposalValidator::visit_memory_init(
 ///|
 pub fn WasmProposalValidator::visit_data_drop(
   self : WasmProposalValidator,
-  data_index : UInt,
+  data_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_data_drop(data_index)
@@ -1708,8 +1708,8 @@ pub fn WasmProposalValidator::visit_data_drop(
 ///|
 pub fn WasmProposalValidator::visit_memory_copy(
   self : WasmProposalValidator,
-  dst_mem : UInt,
-  src_mem : UInt,
+  dst_mem : UInt32,
+  src_mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_memory_copy(dst_mem, src_mem)
@@ -1718,7 +1718,7 @@ pub fn WasmProposalValidator::visit_memory_copy(
 ///|
 pub fn WasmProposalValidator::visit_memory_fill(
   self : WasmProposalValidator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_memory_fill(mem)
@@ -1727,8 +1727,8 @@ pub fn WasmProposalValidator::visit_memory_fill(
 ///|
 pub fn WasmProposalValidator::visit_table_init(
   self : WasmProposalValidator,
-  elem_index : UInt,
-  table : UInt,
+  elem_index : UInt32,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_table_init(elem_index, table)
@@ -1737,7 +1737,7 @@ pub fn WasmProposalValidator::visit_table_init(
 ///|
 pub fn WasmProposalValidator::visit_elem_drop(
   self : WasmProposalValidator,
-  elem_index : UInt,
+  elem_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_elem_drop(elem_index)
@@ -1746,8 +1746,8 @@ pub fn WasmProposalValidator::visit_elem_drop(
 ///|
 pub fn WasmProposalValidator::visit_table_copy(
   self : WasmProposalValidator,
-  dst_table : UInt,
-  src_table : UInt,
+  dst_table : UInt32,
+  src_table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.bulk_memory(), "bulk memory")
   self.0.visit_table_copy(dst_table, src_table)
@@ -1782,7 +1782,7 @@ pub fn WasmProposalValidator::visit_ref_is_null(
 ///|
 pub fn WasmProposalValidator::visit_ref_func(
   self : WasmProposalValidator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_ref_func(function_index)
@@ -1791,7 +1791,7 @@ pub fn WasmProposalValidator::visit_ref_func(
 ///|
 pub fn WasmProposalValidator::visit_table_fill(
   self : WasmProposalValidator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_table_fill(table)
@@ -1800,7 +1800,7 @@ pub fn WasmProposalValidator::visit_table_fill(
 ///|
 pub fn WasmProposalValidator::visit_table_get(
   self : WasmProposalValidator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_table_get(table)
@@ -1809,7 +1809,7 @@ pub fn WasmProposalValidator::visit_table_get(
 ///|
 pub fn WasmProposalValidator::visit_table_set(
   self : WasmProposalValidator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_table_set(table)
@@ -1818,7 +1818,7 @@ pub fn WasmProposalValidator::visit_table_set(
 ///|
 pub fn WasmProposalValidator::visit_table_grow(
   self : WasmProposalValidator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_table_grow(table)
@@ -1827,7 +1827,7 @@ pub fn WasmProposalValidator::visit_table_grow(
 ///|
 pub fn WasmProposalValidator::visit_table_size(
   self : WasmProposalValidator,
-  table : UInt,
+  table : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.reference_types(), "reference types")
   self.0.visit_table_size(table)
@@ -1836,7 +1836,7 @@ pub fn WasmProposalValidator::visit_table_size(
 ///|
 pub fn WasmProposalValidator::visit_return_call(
   self : WasmProposalValidator,
-  function_index : UInt,
+  function_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.tail_call(), "tail calls")
   self.0.visit_return_call(function_index)
@@ -1845,8 +1845,8 @@ pub fn WasmProposalValidator::visit_return_call(
 ///|
 pub fn WasmProposalValidator::visit_return_call_indirect(
   self : WasmProposalValidator,
-  type_index : UInt,
-  table_index : UInt,
+  type_index : UInt32,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.tail_call(), "tail calls")
   self.0.visit_return_call_indirect(type_index, table_index)
@@ -1855,7 +1855,7 @@ pub fn WasmProposalValidator::visit_return_call_indirect(
 ///|
 pub fn WasmProposalValidator::visit_memory_discard(
   self : WasmProposalValidator,
-  mem : UInt,
+  mem : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.memory_control(), "memory control")
   self.0.visit_memory_discard(mem)
@@ -4569,7 +4569,7 @@ pub fn WasmProposalValidator::visit_try_table(
 ///|
 pub fn WasmProposalValidator::visit_throw(
   self : WasmProposalValidator,
-  tag_index : UInt,
+  tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.exceptions(), "exceptions")
   self.0.visit_throw(tag_index)
@@ -4598,7 +4598,7 @@ pub fn WasmProposalValidator::visit_try(
 ///|
 pub fn WasmProposalValidator::visit_catch(
   self : WasmProposalValidator,
-  tag_index : UInt,
+  tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.legacy_exceptions(),
@@ -4610,7 +4610,7 @@ pub fn WasmProposalValidator::visit_catch(
 ///|
 pub fn WasmProposalValidator::visit_rethrow(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.legacy_exceptions(),
@@ -4622,7 +4622,7 @@ pub fn WasmProposalValidator::visit_rethrow(
 ///|
 pub fn WasmProposalValidator::visit_delegate(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.legacy_exceptions(),
@@ -4646,7 +4646,7 @@ pub fn WasmProposalValidator::visit_catch_all(
 pub fn WasmProposalValidator::visit_global_atomic_get(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4659,7 +4659,7 @@ pub fn WasmProposalValidator::visit_global_atomic_get(
 pub fn WasmProposalValidator::visit_global_atomic_set(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4672,7 +4672,7 @@ pub fn WasmProposalValidator::visit_global_atomic_set(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_add(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4685,7 +4685,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_add(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_sub(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4698,7 +4698,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_sub(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_and(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4711,7 +4711,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_and(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_or(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4724,7 +4724,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_or(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_xor(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4737,7 +4737,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_xor(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_xchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4750,7 +4750,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_xchg(
 pub fn WasmProposalValidator::visit_global_atomic_rmw_cmpxchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  global_index : UInt,
+  global_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4763,7 +4763,7 @@ pub fn WasmProposalValidator::visit_global_atomic_rmw_cmpxchg(
 pub fn WasmProposalValidator::visit_table_atomic_get(
   self : WasmProposalValidator,
   ordering : Ordering,
-  table_index : UInt,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4776,7 +4776,7 @@ pub fn WasmProposalValidator::visit_table_atomic_get(
 pub fn WasmProposalValidator::visit_table_atomic_set(
   self : WasmProposalValidator,
   ordering : Ordering,
-  table_index : UInt,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4789,7 +4789,7 @@ pub fn WasmProposalValidator::visit_table_atomic_set(
 pub fn WasmProposalValidator::visit_table_atomic_rmw_xchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  table_index : UInt,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4802,7 +4802,7 @@ pub fn WasmProposalValidator::visit_table_atomic_rmw_xchg(
 pub fn WasmProposalValidator::visit_table_atomic_rmw_cmpxchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  table_index : UInt,
+  table_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4815,8 +4815,8 @@ pub fn WasmProposalValidator::visit_table_atomic_rmw_cmpxchg(
 pub fn WasmProposalValidator::visit_struct_atomic_get(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4829,8 +4829,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_get(
 pub fn WasmProposalValidator::visit_struct_atomic_get_s(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4843,8 +4843,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_get_s(
 pub fn WasmProposalValidator::visit_struct_atomic_get_u(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4857,8 +4857,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_get_u(
 pub fn WasmProposalValidator::visit_struct_atomic_set(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4871,8 +4871,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_set(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_add(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4885,8 +4885,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_add(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_sub(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4899,8 +4899,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_sub(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_and(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4913,8 +4913,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_and(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_or(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4927,8 +4927,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_or(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_xor(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4941,8 +4941,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_xor(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_xchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4955,8 +4955,8 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_xchg(
 pub fn WasmProposalValidator::visit_struct_atomic_rmw_cmpxchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  struct_type_index : UInt,
-  field_index : UInt,
+  struct_type_index : UInt32,
+  field_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4971,7 +4971,7 @@ pub fn WasmProposalValidator::visit_struct_atomic_rmw_cmpxchg(
 pub fn WasmProposalValidator::visit_array_atomic_get(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4984,7 +4984,7 @@ pub fn WasmProposalValidator::visit_array_atomic_get(
 pub fn WasmProposalValidator::visit_array_atomic_get_s(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -4997,7 +4997,7 @@ pub fn WasmProposalValidator::visit_array_atomic_get_s(
 pub fn WasmProposalValidator::visit_array_atomic_get_u(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5010,7 +5010,7 @@ pub fn WasmProposalValidator::visit_array_atomic_get_u(
 pub fn WasmProposalValidator::visit_array_atomic_set(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5023,7 +5023,7 @@ pub fn WasmProposalValidator::visit_array_atomic_set(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_add(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5036,7 +5036,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_add(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_sub(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5049,7 +5049,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_sub(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_and(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5062,7 +5062,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_and(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_or(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5075,7 +5075,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_or(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_xor(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5088,7 +5088,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_xor(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_xchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5101,7 +5101,7 @@ pub fn WasmProposalValidator::visit_array_atomic_rmw_xchg(
 pub fn WasmProposalValidator::visit_array_atomic_rmw_cmpxchg(
   self : WasmProposalValidator,
   ordering : Ordering,
-  array_type_index : UInt,
+  array_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.shared_everything_threads(),
@@ -5124,7 +5124,7 @@ pub fn WasmProposalValidator::visit_ref_i31_shared(
 ///|
 pub fn WasmProposalValidator::visit_call_ref(
   self : WasmProposalValidator,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.function_references(),
@@ -5136,7 +5136,7 @@ pub fn WasmProposalValidator::visit_call_ref(
 ///|
 pub fn WasmProposalValidator::visit_return_call_ref(
   self : WasmProposalValidator,
-  type_index : UInt,
+  type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.function_references(),
@@ -5159,7 +5159,7 @@ pub fn WasmProposalValidator::visit_ref_as_non_null(
 ///|
 pub fn WasmProposalValidator::visit_br_on_null(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.function_references(),
@@ -5171,7 +5171,7 @@ pub fn WasmProposalValidator::visit_br_on_null(
 ///|
 pub fn WasmProposalValidator::visit_br_on_non_null(
   self : WasmProposalValidator,
-  relative_depth : UInt,
+  relative_depth : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(
     self.0.inner.features.function_references(),
@@ -5183,7 +5183,7 @@ pub fn WasmProposalValidator::visit_br_on_non_null(
 ///|
 pub fn WasmProposalValidator::visit_cont_new(
   self : WasmProposalValidator,
-  cont_type_index : UInt,
+  cont_type_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
   self.0.visit_cont_new(cont_type_index)
@@ -5192,8 +5192,8 @@ pub fn WasmProposalValidator::visit_cont_new(
 ///|
 pub fn WasmProposalValidator::visit_cont_bind(
   self : WasmProposalValidator,
-  argument_index : UInt,
-  result_index : UInt,
+  argument_index : UInt32,
+  result_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
   self.0.visit_cont_bind(argument_index, result_index)
@@ -5202,7 +5202,7 @@ pub fn WasmProposalValidator::visit_cont_bind(
 ///|
 pub fn WasmProposalValidator::visit_suspend(
   self : WasmProposalValidator,
-  tag_index : UInt,
+  tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
   self.0.visit_suspend(tag_index)
@@ -5211,7 +5211,7 @@ pub fn WasmProposalValidator::visit_suspend(
 ///|
 pub fn WasmProposalValidator::visit_resume(
   self : WasmProposalValidator,
-  cont_type_index : UInt,
+  cont_type_index : UInt32,
   resume_table : ResumeTable,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
@@ -5221,8 +5221,8 @@ pub fn WasmProposalValidator::visit_resume(
 ///|
 pub fn WasmProposalValidator::visit_resume_throw(
   self : WasmProposalValidator,
-  cont_type_index : UInt,
-  tag_index : UInt,
+  cont_type_index : UInt32,
+  tag_index : UInt32,
   resume_table : ResumeTable,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
@@ -5232,8 +5232,8 @@ pub fn WasmProposalValidator::visit_resume_throw(
 ///|
 pub fn WasmProposalValidator::visit_switch(
   self : WasmProposalValidator,
-  cont_type_index : UInt,
-  tag_index : UInt,
+  cont_type_index : UInt32,
+  tag_index : UInt32,
 ) -> Unit raise BinaryReaderError {
   self.check_enabled(self.0.inner.features.stack_switching(), "stack switching")
   self.0.visit_switch(cont_type_index, tag_index)

@@ -46,7 +46,7 @@ fn TomlValue::unexpected(self : TomlValue) -> String {
 ///|
 priv struct TomlParser {
   text : String
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -163,7 +163,7 @@ fn TomlParser::done(self : TomlParser) -> Bool {
 }
 
 ///|
-fn TomlParser::peek(self : TomlParser) -> Int {
+fn TomlParser::peek(self : TomlParser) -> Int32 {
   if self.done() {
     -1
   } else {
@@ -238,7 +238,7 @@ fn TomlParser::line_end(self : TomlParser) -> Unit raise TomlError {
 }
 
 ///|
-fn is_bare_key_char(c : Int) -> Bool {
+fn is_bare_key_char(c : Int32) -> Bool {
   (c >= 'a' && c <= 'z') ||
   (c >= 'A' && c <= 'Z') ||
   (c >= '0' && c <= '9') ||
@@ -465,7 +465,7 @@ fn TomlParser::basic_string(self : TomlParser) -> String raise TomlError {
         let code = @string.parse_int(hex, base=16) catch {
           _ => raise TomlError("invalid TOML: invalid escape sequence")
         }
-        out.write_char(Int::unsafe_to_char(code))
+        out.write_char(Int32::unsafe_to_char(code))
       }
       '\n' | ' ' | '\t' | '\r' if multi =>
         // Line ending backslash: trim all whitespace up to the next

@@ -105,7 +105,7 @@ pub extend Os with @debug.Debug::{to_repr}
 
 ///|
 /// The error kind of an OS error number (POSIX numbering).
-fn kind_of_errno(code : Int) -> ErrorKind {
+fn kind_of_errno(code : Int32) -> ErrorKind {
   match code {
     2 => NotFound
     1 | 13 => PermissionDenied
@@ -216,12 +216,12 @@ pub fn separator() -> String {
 }
 
 ///|
-fn is_separator(c : Int) -> Bool {
+fn is_separator(c : Int32) -> Bool {
   c == '/'.to_int() || (c == '\\'.to_int() && os() == Windows)
 }
 
 ///|
-fn last_separator(path : String) -> Int? {
+fn last_separator(path : String) -> Int32? {
   for i = path.length() - 1; i >= 0; i = i - 1 {
     if is_separator(path.code_unit_at(i).to_int()) {
       return Some(i)
@@ -306,7 +306,7 @@ pub fn now_ms() -> Int64 {
 
 ///|
 /// Exits the process with the given code (flushing the standard streams).
-pub fn exit(code : Int) -> Unit {
+pub fn exit(code : Int32) -> Unit {
   flush_stdout()
   flush_stderr()
   @sys.exit(code)

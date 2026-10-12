@@ -30,11 +30,11 @@ priv enum Look {
 /// A set of Unicode scalar values as sorted, non-overlapping, non-adjacent
 /// inclusive ranges.
 priv struct Class {
-  ranges : Array[(Int, Int)]
+  ranges : Array[(Int32, Int32)]
 }
 
 ///|
-fn Class::new(ranges : Array[(Int, Int)]) -> Class {
+fn Class::new(ranges : Array[(Int32, Int32)]) -> Class {
   let c = { ranges: ranges.copy(), }
   c.canonicalize()
   c
@@ -49,7 +49,7 @@ fn Class::canonicalize(self : Class) -> Unit {
       a.1.compare(b.1)
     }
   })
-  let out : Array[(Int, Int)] = []
+  let out : Array[(Int32, Int32)] = []
   for r in self.ranges {
     match out.last() {
       Some((a, b)) if r.0 <= b + 1 =>
@@ -167,11 +167,11 @@ fn Class::is_ascii(self : Class) -> Bool {
 /// The high-level intermediate representation of a regular expression.
 priv enum Hir {
   Empty
-  Literal(Array[Int])
+  Literal(Array[Int32])
   Class(Class)
   Look(Look)
-  Repetition(min~ : Int, max~ : Int?, greedy~ : Bool, sub~ : Hir)
-  Capture(index~ : Int, sub~ : Hir)
+  Repetition(min~ : Int32, max~ : Int32?, greedy~ : Bool, sub~ : Hir)
+  Capture(index~ : Int32, sub~ : Hir)
   Concat(Array[Hir])
   Alternation(Array[Hir])
 }
@@ -179,7 +179,7 @@ priv enum Hir {
 ///|
 /// The minimum length (in chars) of a match, or `None` if the expression
 /// can never match.
-fn Hir::minimum_len(self : Hir) -> Int? {
+fn Hir::minimum_len(self : Hir) -> Int32? {
   match self {
     Empty | Look(_) => Some(0)
     Literal(cs) => Some(cs.length())
@@ -202,7 +202,7 @@ fn Hir::minimum_len(self : Hir) -> Int? {
       Some(total)
     }
     Alternation(subs) => {
-      let mut best : Int? = None
+      let mut best : Int32? = None
       for s in subs {
         if s.minimum_len() is Some(n) {
           best = Some(
@@ -414,7 +414,7 @@ fn Translator::translate(self : Translator, ast : Ast) -> Hir raise RegexError {
 fn Translator::literal_to_scalar(
   self : Translator,
   lit : Literal,
-) -> Int raise RegexError {
+) -> Int32 raise RegexError {
   if self.unicode() || !lit.hex_x || lit.c <= 0x7F {
     return lit.c
   }
@@ -423,7 +423,7 @@ fn Translator::literal_to_scalar(
 }
 
 ///|
-fn Translator::case_fold_char(self : Translator, c : Int) -> Hir? {
+fn Translator::case_fold_char(self : Translator, c : Int32) -> Hir? {
   if !self.case_insensitive() {
     return None
   }
@@ -676,7 +676,7 @@ fn Translator::class_set_item(
 fn Translator::class_literal(
   self : Translator,
   lit : Literal,
-) -> Int raise RegexError {
+) -> Int32 raise RegexError {
   let c = self.literal_to_scalar(lit)
   if !self.unicode() && c > 0x7F {
     // Byte classes don't support Unicode.

@@ -2,45 +2,45 @@
 // 26.6 fixed point coordinates).
 
 ///|
-const POINT_FLAG_ON_CURVE : Int = 0x01
+const POINT_FLAG_ON_CURVE : Int32 = 0x01
 
 ///|
-const POINT_FLAG_OFF_CURVE_CUBIC : Int = 0x80
+const POINT_FLAG_OFF_CURVE_CUBIC : Int32 = 0x80
 
 ///|
-const POINT_FLAG_CURVE_MASK : Int = 0x81
+const POINT_FLAG_CURVE_MASK : Int32 = 0x81
 
 ///|
-fn is_on_curve(flags : Int) -> Bool {
+fn is_on_curve(flags : Int32) -> Bool {
   (flags & POINT_FLAG_ON_CURVE) != 0
 }
 
 ///|
-fn is_off_curve_quad(flags : Int) -> Bool {
+fn is_off_curve_quad(flags : Int32) -> Bool {
   (flags & POINT_FLAG_CURVE_MASK) == 0
 }
 
 ///|
-fn is_off_curve_cubic(flags : Int) -> Bool {
+fn is_off_curve_cubic(flags : Int32) -> Bool {
   (flags & POINT_FLAG_OFF_CURVE_CUBIC) != 0
 }
 
 ///|
 /// Combination of point coordinates (26.6 bits) and flags.
 priv struct ContourPoint {
-  x : Int
-  y : Int
-  flags : Int
+  x : Int32
+  y : Int32
+  flags : Int32
 }
 
 ///|
-fn f26dot6_to_f32(v : Int) -> Float {
+fn f26dot6_to_f32(v : Int32) -> Float {
   F26Dot6::from_bits(v).to_f32()
 }
 
 ///|
 /// FreeType uses integer division on 26.6 to compute midpoints.
-fn midpoint_i32(a : Int, b : Int) -> Int {
+fn midpoint_i32(a : Int32, b : Int32) -> Int32 {
   (a + b) / 2
 }
 
@@ -63,10 +63,10 @@ fn ContourPoint::midpoint(
 ///
 /// Coordinates are 26.6 fixed point bit patterns.
 fn to_path(
-  xs : ArrayView[Int],
-  ys : ArrayView[Int],
-  flags : ArrayView[Int],
-  contours : ArrayView[Int],
+  xs : ArrayView[Int32],
+  ys : ArrayView[Int32],
+  flags : ArrayView[Int32],
+  contours : ArrayView[Int32],
   pen : &OutlinePen,
 ) -> Unit raise ToPathError {
   let num_points = xs.length()
@@ -80,7 +80,7 @@ fn to_path(
     if end_ix >= flags.length() {
       raise PointFlagMismatch(num_points=n, num_flags=flags.length())
     }
-    let point = fn(i : Int) -> ContourPoint {
+    let point = fn(i : Int32) -> ContourPoint {
       { x: xs[start_ix + i], y: ys[start_ix + i], flags: flags[start_ix + i], }
     }
     contour_to_path_freetype(n, point, pen) catch {
@@ -94,8 +94,8 @@ fn to_path(
 
 ///|
 fn contour_to_path_freetype(
-  n : Int,
-  point : (Int) -> ContourPoint,
+  n : Int32,
+  point : (Int32) -> ContourPoint,
   pen : &OutlinePen,
 ) -> Unit raise ToPathError {
   let first_point = point(0)
@@ -145,7 +145,7 @@ fn contour_to_path_freetype(
 /// Pending state: kind 0 = empty, 1 = pending quad (p0), 2 = pending cubic
 /// (p0), 3 = two pending cubics (p0, p1).
 priv struct PendingState {
-  mut kind : Int
+  mut kind : Int32
   mut p0 : ContourPoint
   mut p1 : ContourPoint
 }
@@ -153,7 +153,7 @@ priv struct PendingState {
 ///|
 fn PendingState::emit(
   self : PendingState,
-  ix : Int,
+  ix : Int32,
   point : ContourPoint,
   pen : &OutlinePen,
 ) -> Unit raise ToPathError {
@@ -235,7 +235,7 @@ fn PendingState::emit(
 ///|
 fn PendingState::finish(
   self : PendingState,
-  start_ix : Int,
+  start_ix : Int32,
   start_point : ContourPoint,
   pen : &OutlinePen,
 ) -> Unit raise ToPathError {

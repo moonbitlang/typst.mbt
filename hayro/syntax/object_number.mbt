@@ -72,13 +72,13 @@ pub fn Number::from_f32(num : Float) -> Number {
 
 ///|
 /// Create a new `Number` from an i32 number.
-pub fn Number::from_i32(num : Int) -> Number {
+pub fn Number::from_i32(num : Int32) -> Number {
   Integer(num.to_int64())
 }
 
 ///|
 fn is_digit(byte : Byte) -> Bool {
-  byte is (b'0'..=b'9')
+  byte is (b'0'..<=b'9')
 }
 
 ///|
@@ -97,7 +97,7 @@ fn skip_number(r : Reader) -> Unit? {
       // See PDFJS-9252 - treat a single . as 0.
       r.forward_while(is_digit_or_minus)
     }
-    b'0'..=b'9' | b'-' => {
+    b'0'..<=b'9' | b'-' => {
       guard r.forward_while_1(is_digit_or_minus) is Some(_) else { return None }
       if r.forward_tag(b".") is Some(_) {
         r.forward_while(is_digit_or_minus)
@@ -161,7 +161,7 @@ fn read_number_inner(r : Reader) -> Number? {
   let mut has_digits = false
   while true {
     match r.peek_byte() {
-      Some(b'0'..=b'9') => {
+      Some(b'0'..<=b'9') => {
         let d = r.read_byte().unwrap()
         mantissa = mantissa * 10UL + (d.to_int() - 48).to_uint64()
         has_digits = true
@@ -218,7 +218,7 @@ fn read_number_inner(r : Reader) -> Number? {
 }
 
 ///|
-fn powi_f64(x : Double, n : Int) -> Double {
+fn powi_f64(x : Double, n : Int32) -> Double {
   let mut result = 1.0
   let mut base = x
   let mut exp = n
@@ -291,17 +291,17 @@ fn int_from_object(o : Object, min : Int64, max : Int64) -> Int64? {
 // `i32`.
 
 ///|
-pub impl Readable for Int with fn read(r, _) {
+pub impl Readable for Int32 with fn read(r, _) {
   read_int_in_range(r, -2147483648L, 2147483647L).map(v => v.to_int())
 }
 
 ///|
-pub impl Skippable for Int with fn skip(r, _) {
+pub impl Skippable for Int32 with fn skip(r, _) {
   skip_int(r)
 }
 
 ///|
-pub impl ObjectLike for Int with fn from_object(o) {
+pub impl ObjectLike for Int32 with fn from_object(o) {
   int_from_object(o, -2147483648L, 2147483647L).map(v => v.to_int())
 }
 
@@ -324,14 +324,14 @@ pub impl ObjectLike for Int64 with fn from_object(o) {
 // `u32`.
 
 ///|
-pub impl Readable for UInt with fn read(r, _) {
+pub impl Readable for UInt32 with fn read(r, _) {
   read_int_in_range(r, 0L, 4294967295L).map(v => {
     v.reinterpret_as_uint64().to_uint()
   })
 }
 
 ///|
-pub impl ObjectLike for UInt with fn from_object(o) {
+pub impl ObjectLike for UInt32 with fn from_object(o) {
   int_from_object(o, 0L, 4294967295L).map(v => {
     v.reinterpret_as_uint64().to_uint()
   })

@@ -12,13 +12,13 @@ priv struct Utf8Str {
   s : String
   /// `u16[i]` is the UTF-16 index of byte offset `i` if it is a char
   /// boundary, otherwise `-1`. Has length `len + 1`.
-  u16 : FixedArray[Int]
+  u16 : FixedArray[Int32]
   /// `cps[i]` is the code point starting at byte `i`, or `-1`.
-  cps : FixedArray[Int]
+  cps : FixedArray[Int32]
 }
 
 ///|
-fn utf8_char_len(c : Int) -> Int {
+fn utf8_char_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -32,7 +32,7 @@ fn utf8_char_len(c : Int) -> Int {
 
 ///|
 /// The UTF-8 length of a string.
-fn utf8_str_len(s : StringView) -> Int {
+fn utf8_str_len(s : StringView) -> Int32 {
   let mut n = 0
   for i = 0; i < s.length(); {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
@@ -60,7 +60,7 @@ fn Utf8Str::new(s : String) -> Utf8Str {
 }
 
 ///|
-fn Utf8Str::len(self : Utf8Str) -> Int {
+fn Utf8Str::len(self : Utf8Str) -> Int32 {
   self.cps.length()
 }
 
@@ -76,8 +76,8 @@ fn Utf8Str::full(self : Utf8Str) -> Utf8Slice {
 #valtype
 priv struct Utf8Slice {
   src : Utf8Str
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -91,7 +91,7 @@ let empty_slice : Utf8Slice = Utf8Slice::from_string("")
 
 ///|
 /// The length in UTF-8 bytes.
-fn Utf8Slice::len(self : Utf8Slice) -> Int {
+fn Utf8Slice::len(self : Utf8Slice) -> Int32 {
   self.end - self.start
 }
 
@@ -123,13 +123,13 @@ fn Utf8Slice::view(self : Utf8Slice) -> StringView {
 
 ///|
 /// Slice by relative byte offsets (must be char boundaries).
-fn Utf8Slice::slice(self : Utf8Slice, a : Int, b : Int) -> Utf8Slice {
+fn Utf8Slice::slice(self : Utf8Slice, a : Int32, b : Int32) -> Utf8Slice {
   { src: self.src, start: self.start + a, end: self.start + b, }
 }
 
 ///|
 /// The code point starting at relative offset `i`, or `-1`.
-fn Utf8Slice::char_at(self : Utf8Slice, i : Int) -> Int {
+fn Utf8Slice::char_at(self : Utf8Slice, i : Int32) -> Int32 {
   if i >= 0 && i < self.len() {
     self.src.cps[self.start + i]
   } else {
@@ -139,7 +139,7 @@ fn Utf8Slice::char_at(self : Utf8Slice, i : Int) -> Int {
 
 ///|
 /// The first char, if any.
-fn Utf8Slice::first_char(self : Utf8Slice) -> Int? {
+fn Utf8Slice::first_char(self : Utf8Slice) -> Int32? {
   if self.is_empty() {
     None
   } else {
@@ -149,7 +149,7 @@ fn Utf8Slice::first_char(self : Utf8Slice) -> Int? {
 
 ///|
 /// The relative start offset of the char ending at relative offset `i`.
-fn Utf8Slice::char_start_before(self : Utf8Slice, i : Int) -> Int {
+fn Utf8Slice::char_start_before(self : Utf8Slice, i : Int32) -> Int32 {
   let mut j = i - 1
   while j > 0 && self.src.cps[self.start + j] < 0 {
     j -= 1
@@ -159,7 +159,7 @@ fn Utf8Slice::char_start_before(self : Utf8Slice, i : Int) -> Int {
 
 ///|
 /// The last char, if any.
-fn Utf8Slice::last_char(self : Utf8Slice) -> Int? {
+fn Utf8Slice::last_char(self : Utf8Slice) -> Int32? {
   if self.is_empty() {
     None
   } else {
@@ -175,7 +175,7 @@ fn Utf8Slice::ends_with_char(self : Utf8Slice, c : Char) -> Bool {
 
 ///|
 /// The relative length after trimming trailing chars matching `pred`.
-fn Utf8Slice::trim_end_len(self : Utf8Slice, pred : (Int) -> Bool) -> Int {
+fn Utf8Slice::trim_end_len(self : Utf8Slice, pred : (Int32) -> Bool) -> Int32 {
   let mut end = self.len()
   while end > 0 {
     let start = self.char_start_before(end)
@@ -192,9 +192,9 @@ fn Utf8Slice::trim_end_len(self : Utf8Slice, pred : (Int) -> Bool) -> Int {
 /// allocating the slice and the closure (performance).
 fn Utf8Slice::trim_end_whitespace_len(
   self : Utf8Slice,
-  start : Int,
-  end : Int,
-) -> Int {
+  start : Int32,
+  end : Int32,
+) -> Int32 {
   let base = self.start + start
   let mut len = end - start
   while len > 0 {
@@ -212,6 +212,6 @@ fn Utf8Slice::trim_end_whitespace_len(
 }
 
 ///|
-fn char_of(c : Int) -> Char {
-  Int::unsafe_to_char(c)
+fn char_of(c : Int32) -> Char {
+  Int32::unsafe_to_char(c)
 }

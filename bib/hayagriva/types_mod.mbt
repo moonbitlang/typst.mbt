@@ -278,7 +278,7 @@ pub fn MaybeTyped::duration_range_from_str(
 pub fn MaybeTyped::numeric_csl_cmp(
   self : MaybeTyped[Numeric],
   other : MaybeTyped[Numeric],
-) -> Int {
+) -> Int32 {
   match (self, other) {
     (Typed(a), Typed(b)) => a.csl_cmp(b)
     _ => @unscanny.compare_str(self.to_str(), other.to_str())
@@ -291,7 +291,7 @@ pub fn MaybeTyped::numeric_csl_cmp(
 pub fn MaybeTyped::page_ranges_csl_cmp(
   self : MaybeTyped[PageRanges],
   other : MaybeTyped[PageRanges],
-) -> Int {
+) -> Int32 {
   match (self, other) {
     (Typed(a), Typed(b)) => a.csl_cmp(b)
     _ => @unscanny.compare_str(self.to_str(), other.to_str())

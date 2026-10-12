@@ -109,7 +109,7 @@ fn is_xml_str(value : StrSpan, s : Stream) -> Unit raise XmlError {
 ///
 /// Returns the char and its encoded length. `text` is always valid UTF-8 and
 /// `pos` always on a char boundary.
-fn decode_char(text : Bytes, pos : Int) -> (Char, Int) {
+fn decode_char(text : Bytes, pos : Int32) -> (Char, Int32) {
   let b0 = text[pos].to_int()
   if b0 < 0x80 {
     (b0.unsafe_to_char(), 1)
@@ -132,7 +132,7 @@ fn decode_char(text : Bytes, pos : Int) -> (Char, Int) {
 
 ///|
 /// Decodes the byte range `start..end` of `text` (always valid UTF-8).
-fn slice_str(text : Bytes, start : Int, end : Int) -> String {
+fn slice_str(text : Bytes, start : Int32, end : Int32) -> String {
   @utf8.decode_lossy(text[start:end])
 }
 
@@ -145,8 +145,8 @@ fn slice_str(text : Bytes, start : Int, end : Int) -> String {
 /// it was parsed. Since external entity resolution is not supported, every
 /// span refers to the document text.
 priv struct StrSpan {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 // --- Tokens -----------------------------------------------------------------
@@ -154,8 +154,8 @@ priv struct StrSpan {
 ///|
 /// A byte range `start..end` (upstream `Range<usize>`).
 priv struct Range {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 }
 
 ///|
@@ -168,9 +168,9 @@ priv enum Token {
   // <!ENTITY ns_extend "http://test.com">
   EntityDeclaration(String, StrSpan)
   // <ns:elem
-  ElementStart(String, String, Int)
+  ElementStart(String, String, Int32)
   // ns:attr="value"
-  Attribute(Range, Int, Int, String, String, StrSpan)
+  Attribute(Range, Int32, Int32, String, String, StrSpan)
   ElementEnd(ElementEnd, Range)
   // Contains text between elements including whitespaces.
   // Basically everything between `>` and `<`.
@@ -694,8 +694,8 @@ priv enum Reference {
 /// Upstream `tokenizer::Stream`: a byte cursor over (a fragment of) the
 /// UTF-8 encoded input.
 priv struct Stream {
-  mut pos : Int
-  end : Int
+  mut pos : Int32
+  end : Int32
   text : Bytes
 }
 
@@ -728,7 +728,7 @@ fn Stream::curr_byte_unchecked(self : Stream) -> Byte {
 }
 
 ///|
-fn Stream::advance(self : Stream, n : Int) -> Unit {
+fn Stream::advance(self : Stream, n : Int32) -> Unit {
   self.pos += n
 }
 
@@ -837,17 +837,17 @@ fn Stream::advance_until2(
 }
 
 ///|
-fn Stream::slice_back(self : Stream, pos : Int) -> String {
+fn Stream::slice_back(self : Stream, pos : Int32) -> String {
   slice_str(self.text, pos, self.pos)
 }
 
 ///|
-fn Stream::slice_back_span(self : Stream, pos : Int) -> StrSpan {
+fn Stream::slice_back_span(self : Stream, pos : Int32) -> StrSpan {
   { start: pos, end: self.pos, }
 }
 
 ///|
-fn Stream::range_from(self : Stream, start : Int) -> Range {
+fn Stream::range_from(self : Stream, start : Int32) -> Range {
   { start, end: self.pos, }
 }
 
@@ -933,9 +933,9 @@ fn is_ascii_hexdigit(c : Byte) -> Bool {
 /// contains valid digits of `radix`).
 fn u32_from_str_radix(
   text : Bytes,
-  start : Int,
-  end : Int,
-  radix : Int,
+  start : Int32,
+  end : Int32,
+  radix : Int32,
 ) -> UInt64? {
   if start >= end {
     return None
@@ -1008,7 +1008,7 @@ fn Stream::skip_name(self : Stream) -> Unit raise XmlError {
 /// Consumes according to: <https://www.w3.org/TR/xml-names/#ns-qualnames>
 fn Stream::consume_qname(self : Stream) -> (String, String) raise XmlError {
   let start = self.pos
-  let mut splitter : Int? = None
+  let mut splitter : Int32? = None
   while !self.at_end() {
     // Check for ASCII first for performance reasons.
     let b = self.curr_byte_unchecked()
@@ -1095,7 +1095,7 @@ fn Stream::gen_text_pos(self : Stream) -> TextPos {
 /// Calculates an absolute position at `pos`.
 ///
 /// This operation is very expensive. Use only for errors.
-fn Stream::gen_text_pos_from(self : Stream, pos : Int) -> TextPos {
+fn Stream::gen_text_pos_from(self : Stream, pos : Int32) -> TextPos {
   let s : Stream = {
     pos: min_int(pos, self.text.length()),
     end: self.end,
@@ -1105,7 +1105,7 @@ fn Stream::gen_text_pos_from(self : Stream, pos : Int) -> TextPos {
 }
 
 ///|
-fn Stream::calc_curr_row(text : Bytes, end : Int) -> Int {
+fn Stream::calc_curr_row(text : Bytes, end : Int32) -> Int32 {
   let mut row = 1
   for i in 0..<end {
     if text[i] == b'\n' {
@@ -1117,7 +1117,7 @@ fn Stream::calc_curr_row(text : Bytes, end : Int) -> Int {
 
 ///|
 /// Counts the chars (not bytes) since the last `\n`.
-fn Stream::calc_curr_col(text : Bytes, end : Int) -> Int {
+fn Stream::calc_curr_col(text : Bytes, end : Int32) -> Int32 {
   let mut col = 1
   let mut i = end - 1
   while i >= 0 {
@@ -1134,7 +1134,7 @@ fn Stream::calc_curr_col(text : Bytes, end : Int) -> Int {
 }
 
 ///|
-fn min_int(a : Int, b : Int) -> Int {
+fn min_int(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {

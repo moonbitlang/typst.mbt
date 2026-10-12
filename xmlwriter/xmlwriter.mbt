@@ -12,7 +12,7 @@ pub(all) enum Indent {
   /// Disable indention and new lines.
   None
   /// Indent with spaces. Preferred range is 0..4.
-  Spaces(Int)
+  Spaces(Int32)
   /// Indent with tabs.
   Tabs
 } derive(Eq, Debug)
@@ -324,7 +324,7 @@ fn XmlWriter::write_node_indent(self : XmlWriter) -> Unit {
 ///|
 fn XmlWriter::write_indent(
   self : XmlWriter,
-  depth : Int,
+  depth : Int32,
   indent : Indent,
 ) -> Unit {
   if indent == None || self.preserve_whitespaces {

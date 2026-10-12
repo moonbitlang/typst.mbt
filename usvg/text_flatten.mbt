@@ -198,9 +198,9 @@ impl @otf.OutlineBuilder for GlyphPathBuilder with fn close(self) {
 /// A raster glyph image.
 priv struct BitmapImage {
   image : Image
-  x : Int
-  y : Int
-  pixels_per_em : Int
+  x : Int32
+  y : Int32
+  pixels_per_em : Int32
   glyph_bbox : @otf.Rect?
   is_sbix : Bool
 }
@@ -224,7 +224,7 @@ fn FontDatabase::fresh_face(self : FontDatabase, id : FontId) -> @otf.Face? {
 fn FontDatabase::outline(
   self : FontDatabase,
   id : FontId,
-  glyph_id : Int,
+  glyph_id : Int32,
 ) -> TinyPath? {
   guard self.fresh_face(id) is Some(font) else { return None }
 
@@ -248,7 +248,7 @@ fn FontDatabase::outline(
 fn FontDatabase::outline_with_variations(
   self : FontDatabase,
   id : FontId,
-  glyph_id : Int,
+  glyph_id : Int32,
   variations : Array[FontVariation],
   font_size : Float,
   font_optical_sizing : FontOpticalSizing,
@@ -308,7 +308,7 @@ fn FontDatabase::has_opsz_axis(self : FontDatabase, id : FontId) -> Bool {
 fn FontDatabase::raster(
   self : FontDatabase,
   id : FontId,
-  glyph_id : Int,
+  glyph_id : Int32,
 ) -> BitmapImage? {
   guard self.parse_face(id) is Some(font) else { return None }
   let gid = @otf.GlyphId(glyph_id.to_uint16())
@@ -353,7 +353,11 @@ fn FontDatabase::raster(
 }
 
 ///|
-fn FontDatabase::svg(self : FontDatabase, id : FontId, glyph_id : Int) -> Node? {
+fn FontDatabase::svg(
+  self : FontDatabase,
+  id : FontId,
+  glyph_id : Int32,
+) -> Node? {
   // TODO: Technically not 100% accurate because the SVG format in a OTF font
   // is actually a subset/superset of a normal SVG, but it seems to work fine
   // for Twitter Color Emoji, so might as well use what we already have.
@@ -386,7 +390,7 @@ fn FontDatabase::svg(self : FontDatabase, id : FontId, glyph_id : Int) -> Node? 
 fn FontDatabase::colr(
   self : FontDatabase,
   id : FontId,
-  glyph_id : Int,
+  glyph_id : Int32,
 ) -> Tree? {
   guard self.parse_face(id) is Some(face) else { return None }
   let svg = @xmlwriter.XmlWriter::new(@xmlwriter.Options::default())
@@ -424,7 +428,11 @@ fn FontDatabase::colr(
 }
 
 ///|
-fn Cache::fontdb_outline(self : Cache, font : FontId, glyph : Int) -> TinyPath? {
+fn Cache::fontdb_outline(
+  self : Cache,
+  font : FontId,
+  glyph : Int32,
+) -> TinyPath? {
   match self.cache_outline.get((font, glyph)) {
     Some(hit) => hit
     None => {
@@ -436,7 +444,7 @@ fn Cache::fontdb_outline(self : Cache, font : FontId, glyph : Int) -> TinyPath? 
 }
 
 ///|
-fn Cache::fontdb_colr(self : Cache, font : FontId, glyph : Int) -> Tree? {
+fn Cache::fontdb_colr(self : Cache, font : FontId, glyph : Int32) -> Tree? {
   match self.cache_colr.get((font, glyph)) {
     Some(hit) => hit.map(Tree::clone)
     None => {
@@ -448,7 +456,7 @@ fn Cache::fontdb_colr(self : Cache, font : FontId, glyph : Int) -> Tree? {
 }
 
 ///|
-fn Cache::fontdb_svg(self : Cache, font : FontId, glyph : Int) -> Node? {
+fn Cache::fontdb_svg(self : Cache, font : FontId, glyph : Int32) -> Node? {
   match self.cache_svg.get((font, glyph)) {
     Some(hit) => hit.map(Node::clone)
     None => {
@@ -463,7 +471,7 @@ fn Cache::fontdb_svg(self : Cache, font : FontId, glyph : Int) -> Node? {
 fn Cache::fontdb_raster(
   self : Cache,
   font : FontId,
-  glyph : Int,
+  glyph : Int32,
 ) -> BitmapImage? {
   match self.cache_raster.get((font, glyph)) {
     Some(hit) => hit.map(BitmapImage::clone)

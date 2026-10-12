@@ -298,7 +298,7 @@ pub extend PageBinding with @debug.Debug::{to_repr}
 
 ///|
 /// Whether to swap left and right margin for the page with this number.
-pub fn PageBinding::swap(self : PageBinding, number : Int) -> Bool {
+pub fn PageBinding::swap(self : PageBinding, number : Int32) -> Bool {
   match self {
     // Left-bound must swap on even pages
     // (because it is correct on the first page).
@@ -423,7 +423,7 @@ pub extend PageRanges with FromValue::{from_value}
 ///|
 /// Check if a page, given its number, should be included when exporting
 /// the document while restricting the exported pages to these page ranges.
-pub fn PageRanges::includes_page(self : PageRanges, page : Int) -> Bool {
+pub fn PageRanges::includes_page(self : PageRanges, page : Int32) -> Bool {
   self.0
   .iter()
   .any(range => {
@@ -442,8 +442,8 @@ pub fn PageRanges::includes_page(self : PageRanges, page : Int) -> Bool {
 /// The range is one-indexed. For example, `1..=3` indicates the first,
 /// second and third pages should be exported.
 pub(all) struct PageRange {
-  start : Int?
-  end : Int?
+  start : Int32?
+  end : Int32?
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -481,7 +481,7 @@ pub extend PageRange with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for PageRange with fn into_value(self) {
-  let nr = (n : Int?) => {
+  let nr = (n : Int32?) => {
     match n {
       Some(n) => Value::Int(n.to_int64())
       None => Value::None
@@ -502,7 +502,7 @@ pub impl FromValue for PageRange with fn from_value(v) {
     }
     Dict(dict) => {
       let dict = dict.copy()
-      let parse_nr : (String) -> Int? raise HintedError = key => {
+      let parse_nr : (String) -> Int32? raise HintedError = key => {
         if dict.contains(key) {
           let nr : Int64 = FromValue::from_value(dict.take(key))
           Some(parse_page_number(nr))
@@ -529,7 +529,7 @@ pub impl FromValue for PageRange with fn from_value(v) {
 pub extend PageRange with FromValue::{from_value}
 
 ///|
-fn parse_page_number(nr : Int64) -> Int raise HintedError {
+fn parse_page_number(nr : Int64) -> Int32 raise HintedError {
   if nr < 1L {
     bail("page numbers start at one")
   }
@@ -615,7 +615,7 @@ pub extend Parity with FromValue::{from_value}
 
 ///|
 /// Whether the given number matches the parity.
-pub fn Parity::matches(self : Parity, number : Int) -> Bool {
+pub fn Parity::matches(self : Parity, number : Int32) -> Bool {
   match self {
     Even => number % 2 == 0
     Odd => number % 2 == 1

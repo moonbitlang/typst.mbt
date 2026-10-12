@@ -12,7 +12,7 @@ priv struct LinkAnnotation {
 ///|
 priv enum LinkAnnotationKind {
   /// A link annotation that is tagged within a `Link` structure element.
-  Tagged(Int)
+  Tagged(Int32)
   /// A link annotation within an artifact.
   Artifact
 }

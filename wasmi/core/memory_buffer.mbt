@@ -25,7 +25,7 @@ priv struct ByteBuffer {
   ///
   /// - **Vec:** `vec.len()`
   /// - **Static:** The accessible subslice of the entire underlying static byte buffer.
-  mut len : Int
+  mut len : Int32
   /// Whether the [`ByteBuffer`] was initialized from a `&'static [u8]` or a `Vec<u8>`.
   is_static : Bool
 }

@@ -90,7 +90,7 @@ fn read_object(r : Reader) -> Result[Object, PsError] {
       r.forward()
       Err(UnsupportedType)
     }
-    b'.' | b'+' | b'-' | b'0'..=b'9' =>
+    b'.' | b'+' | b'-' | b'0'..<=b'9' =>
       match read_number(r) {
         Ok(n) => Ok(Number(n))
         Err(e) => Err(e)

@@ -152,7 +152,7 @@ priv struct ServerArgs {
   /// The port where HTML is served.
   ///
   /// Defaults to the first free port in the range 3000-3005.
-  port : Int?
+  port : Int32?
 }
 
 ///|
@@ -192,7 +192,7 @@ priv struct WorldArgs {
 // (typst-cli/src/world.rs:48); this port is single-threaded.
 #warnings("-unused_field")
 priv struct ProcessArgs {
-  jobs : Int?
+  jobs : Int32?
   features : Array[@library.Feature]
   diagnostic_format : @kit.DiagnosticFormat
 }
@@ -374,7 +374,7 @@ fn parse_page_number(
 ///|
 /// A page number or job count as an `Int` (values beyond `Int` saturate;
 /// no document has that many pages).
-fn saturate(n : UInt64) -> Int {
+fn saturate(n : UInt64) -> Int32 {
   if n > 2147483647UL {
     2147483647
   } else {
@@ -1253,7 +1253,7 @@ fn process_args(m : Matches) -> ProcessArgs raise CliError {
 
 ///|
 /// The value parser of `--jobs` (`usize`).
-fn parse_jobs(v : String) -> Int raise CliError {
+fn parse_jobs(v : String) -> Int32 raise CliError {
   match parse_usize(v) {
     Some(n) => saturate(n)
     None =>
@@ -1266,7 +1266,7 @@ fn parse_jobs(v : String) -> Int raise CliError {
 ///|
 /// The value parser of `--port` (`u16`: clap parses an `i64` and checks the
 /// range).
-fn parse_port(v : String) -> Int raise CliError {
+fn parse_port(v : String) -> Int32 raise CliError {
   let n = parse_i64(v) catch {
     @kit.StrError(msg) =>
       raise Invalid("invalid value '\{v}' for '--port <PORT>': \{msg}")

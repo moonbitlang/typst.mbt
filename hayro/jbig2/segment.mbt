@@ -56,7 +56,7 @@ priv enum SegmentType {
 
 ///|
 /// "All other segment types are reserved and must not be used." (7.3)
-fn SegmentType::from_type_value(value : Int) -> SegmentType raise DecodeError {
+fn SegmentType::from_type_value(value : Int32) -> SegmentType raise DecodeError {
   match value {
     0 => SymbolDictionary
     4 => IntermediateTextRegion
@@ -90,7 +90,7 @@ priv struct SegmentHeader {
   /// "This four-byte field contains the segment's segment number. The valid
   /// range of segment numbers is 0 through 4294967295 (0xFFFFFFFF) inclusive."
   /// (7.2.2)
-  segment_number : UInt
+  segment_number : UInt32
   /// "Bits 0-5: Segment type. See 7.3." (7.2.3)
   segment_type : SegmentType
   /// "Bit 7: Deferred non-retain. If this bit is 1, this segment is flagged
@@ -100,16 +100,16 @@ priv struct SegmentHeader {
   /// The first page must be numbered '1'. This field may contain a value of
   /// zero; this value indicates that this segment is not associated with any
   /// page." (7.2.6)
-  _page_association : UInt
+  _page_association : UInt32
   /// "This field contains the segment numbers of the segments that this segment
   /// refers to, if any." (7.2.5)
-  referred_to_segments : Array[UInt]
+  referred_to_segments : Array[UInt32]
   /// "This 4-byte field contains the length of the segment's segment data part,
   /// in bytes." (7.2.7)
   ///
   /// `None` means the length was unknown (0xFFFFFFFF), which is only valid for
   /// immediate generic region segments in sequential organization.
-  data_length : UInt?
+  data_length : UInt32?
 }
 
 ///|
@@ -160,7 +160,7 @@ fn parse_segment_header(reader : Reader) -> SegmentHeader raise DecodeError {
   if short_count == 5 || short_count == 6 {
     raise Segment(InvalidReferredCount)
   }
-  let referred_to_count : UInt = if short_count < 7 {
+  let referred_to_count : UInt32 = if short_count < 7 {
     // Short form: "Bits 5-7: Count of referred-to segments. This field may
     // take on values between zero and four."
     short_count.reinterpret_as_uint()
@@ -289,7 +289,7 @@ fn parse_segment_data(
 /// occur anywhere after that eighteenth byte." (7.2.7)
 fn scan_for_immediate_generic_region_size(
   reader : Reader,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   let scan = reader.clone()
   let start_offset = scan.byte_pos()
   ok_or(scan.skip_bytes(17), eof)

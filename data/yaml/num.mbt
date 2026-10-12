@@ -4,7 +4,7 @@
 
 ///|
 /// Rust's `char::to_digit` for ASCII code units.
-fn ascii_to_digit(c : Int, radix : Int) -> Int? {
+fn ascii_to_digit(c : Int32, radix : Int32) -> Int32? {
   let d = if c >= '0' && c <= '9' {
     c - '0'
   } else if c >= 'a' && c <= 'z' {
@@ -34,7 +34,7 @@ priv struct Wide {
 /// split off like upstream (`-` only for signed types), every remaining
 /// character must be a digit of `radix`, and the magnitude must fit into 128
 /// bits. Range checks for the concrete type happen in the callers.
-fn parse_wide(s : String, radix : Int, signed : Bool) -> Wide? {
+fn parse_wide(s : String, radix : Int32, signed : Bool) -> Wide? {
   if s.is_empty() {
     return None
   }
@@ -81,7 +81,7 @@ fn parse_wide(s : String, radix : Int, signed : Bool) -> Wide? {
 
 ///|
 /// Rust's `u64::from_str_radix`.
-fn u64_from_str_radix(s : String, radix : Int) -> UInt64? {
+fn u64_from_str_radix(s : String, radix : Int32) -> UInt64? {
   match parse_wide(s, radix, false) {
     Some({ hi: 0, lo, .. }) => Some(lo)
     _ => None
@@ -90,7 +90,7 @@ fn u64_from_str_radix(s : String, radix : Int) -> UInt64? {
 
 ///|
 /// Rust's `i64::from_str_radix`.
-fn i64_from_str_radix(s : String, radix : Int) -> Int64? {
+fn i64_from_str_radix(s : String, radix : Int32) -> Int64? {
   match parse_wide(s, radix, true) {
     Some({ negative: false, hi: 0, lo, }) if lo <= 0x7FFF_FFFF_FFFF_FFFFUL =>
       Some(lo.reinterpret_as_int64())
@@ -102,13 +102,13 @@ fn i64_from_str_radix(s : String, radix : Int) -> Int64? {
 
 ///|
 /// Rust's `u128::from_str_radix`.
-fn u128_from_str_radix(s : String, radix : Int) -> Wide? {
+fn u128_from_str_radix(s : String, radix : Int32) -> Wide? {
   parse_wide(s, radix, false)
 }
 
 ///|
 /// Rust's `i128::from_str_radix`.
-fn i128_from_str_radix(s : String, radix : Int) -> Wide? {
+fn i128_from_str_radix(s : String, radix : Int32) -> Wide? {
   match parse_wide(s, radix, true) {
     Some({ negative: false, hi, .. } as w) if hi <= 0x7FFF_FFFF_FFFF_FFFFUL =>
       Some(w)
@@ -180,7 +180,7 @@ fn rust_parse_f64(s : String) -> Double? {
     return Some(if negative { -nan } else { nan })
   }
   // Validate the grammar ourselves: MoonBit's parser also accepts `_`.
-  let is_digit = (j : Int) => {
+  let is_digit = (j : Int32) => {
     j < len && s.code_unit_at(j) >= '0' && s.code_unit_at(j) <= '9'
   }
   let mut digits = 0

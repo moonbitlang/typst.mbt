@@ -12,15 +12,15 @@
 
 ///|
 priv struct CollEntry {
-  first : Int?
+  first : Int32?
   rest : Bytes
-  end : Int?
+  end : Int32?
   sec : Bytes
   ter : Bytes
 }
 
 ///|
-fn coll_digit(c : Char) -> Int {
+fn coll_digit(c : Char) -> Int32 {
   let c = c.to_int()
   if c >= '0'.to_int() && c <= '9'.to_int() {
     c - '0'.to_int()
@@ -42,7 +42,7 @@ fn coll_hex(s : String) -> Bytes {
 }
 
 ///|
-fn coll_hex_opt(s : String) -> Int? {
+fn coll_hex_opt(s : String) -> Int32? {
   if s == "-" {
     None
   } else {
@@ -51,10 +51,10 @@ fn coll_hex_opt(s : String) -> Int? {
 }
 
 ///|
-let collation_table : Ref[Map[Int, CollEntry]?] = { val: None, }
+let collation_table : Ref[Map[Int32, CollEntry]?] = { val: None, }
 
 ///|
-fn collation_table_get() -> Map[Int, CollEntry] {
+fn collation_table_get() -> Map[Int32, CollEntry] {
   match collation_table.val {
     Some(t) => t
     None => {
@@ -83,7 +83,7 @@ fn collation_table_get() -> Map[Int, CollEntry] {
 }
 
 ///|
-fn coll_is_han(cp : Int) -> Bool {
+fn coll_is_han(cp : Int32) -> Bool {
   (cp >= 0x4E00 && cp <= 0x9FFF) ||
   (cp >= 0x3400 && cp <= 0x4DBF) ||
   (cp >= 0xF900 && cp <= 0xFAFF) ||
@@ -92,7 +92,7 @@ fn coll_is_han(cp : Int) -> Bool {
 
 ///|
 /// Implicit weights for code points outside the table.
-fn coll_fallback(cp : Int) -> CollEntry {
+fn coll_fallback(cp : Int32) -> CollEntry {
   {
     first: Some(if coll_is_han(cp) { 0xFA } else { 0xF0 }),
     rest: Bytes::from_array([
@@ -112,7 +112,7 @@ fn coll_key(s : String) -> (Bytes, Bytes, Bytes) {
   let p = Buffer()
   let sec = Buffer()
   let ter = Buffer()
-  let mut prev : Int? = None
+  let mut prev : Int32? = None
   let decomposed = []
   for ch in s {
     let cp = ch.to_int()
@@ -158,7 +158,7 @@ fn coll_key(s : String) -> (Bytes, Bytes, Bytes) {
 }
 
 ///|
-fn coll_cmp_bytes(a : Bytes, b : Bytes) -> Int {
+fn coll_cmp_bytes(a : Bytes, b : Bytes) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     if a[i] != b[i] {
@@ -170,7 +170,7 @@ fn coll_cmp_bytes(a : Bytes, b : Bytes) -> Int {
 
 ///|
 /// Compare two strings with the ICU root collation (tertiary strength).
-fn root_collation_compare(a : String, b : String) -> Int {
+fn root_collation_compare(a : String, b : String) -> Int32 {
   let (pa, sa, ta) = coll_key(a)
   let (pb, sb, tb) = coll_key(b)
   let c = coll_cmp_bytes(pa, pb)

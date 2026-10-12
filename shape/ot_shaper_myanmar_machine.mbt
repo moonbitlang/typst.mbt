@@ -11,7 +11,7 @@ priv enum MyanmarSyllableType {
 }
 
 ///|
-fn MyanmarSyllableType::to_int(self : MyanmarSyllableType) -> Int {
+fn MyanmarSyllableType::to_int(self : MyanmarSyllableType) -> Int32 {
   match self {
     ConsonantSyllable => 0
     PunctuationCluster => 1
@@ -29,7 +29,7 @@ fn find_syllables_myanmar(buffer : Buffer) -> Unit {
   let pe = buffer.len
   let eof = buffer.len
   let syllable_serial = Ref(1)
-  fn found_syllable(ts : Int, te : Int, kind : MyanmarSyllableType) {
+  fn found_syllable(ts : Int32, te : Int32, kind : MyanmarSyllableType) {
     found_syllable_myanmar(ts, te, syllable_serial, kind.to_int(), buffer)
   }
 
@@ -186,10 +186,10 @@ fn find_syllables_myanmar(buffer : Buffer) -> Unit {
 
 ///|
 fn found_syllable_myanmar(
-  start : Int,
-  end : Int,
-  syllable_serial : Ref[Int],
-  kind : Int,
+  start : Int32,
+  end : Int32,
+  syllable_serial : Ref[Int32],
+  kind : Int32,
   buffer : Buffer,
 ) -> Unit {
   for i in start..<end {

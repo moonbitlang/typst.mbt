@@ -247,7 +247,7 @@ pub fn AatStateTable::new_state(self : AatStateTable, state : UInt16) -> UInt16 
 ///
 /// Currently used by `kerx` and `morx` tables.
 struct ExtendedStateTable[_] {
-  number_of_classes : UInt
+  number_of_classes : UInt32
   lookup : AatLookup
   state_array : BytesView
   entry_table : BytesView
@@ -451,7 +451,7 @@ fn LookupInner::value(self : LookupInner, glyph_id : GlyphId) -> UInt16? {
           2 => (s.read_array16(glyph_count) : LazyArray16[UInt16]).get(idx)
           // TODO: we should return u32 here, but this is not supported yet
           4 =>
-            (s.read_array16(glyph_count) : LazyArray16[UInt])
+            (s.read_array16(glyph_count) : LazyArray16[UInt32])
             .get(idx)
             .map(n => n.reinterpret_as_int().to_uint16())
           _ => None // 8 is also supported
@@ -528,7 +528,7 @@ fn[T : BinarySearchValue] BinarySearchTable::get(
 ///|
 priv trait BinarySearchValue: FromData {
   fn is_termination(Self) -> Bool
-  fn contains(Self, GlyphId) -> Int
+  fn contains(Self, GlyphId) -> Int32
 }
 
 ///|

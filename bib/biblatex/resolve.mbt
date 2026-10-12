@@ -33,15 +33,15 @@ priv struct ContentParser {
   verb_field : Bool
   mut current_chunk : Chunk
   result : Chunks
-  mut start : Int
-  offset : Int
+  mut start : Int32
+  offset : Int32
 }
 
 ///|
 fn ContentParser::new(
   key : String,
   field : String,
-  offset : Int,
+  offset : Int32,
 ) -> ContentParser {
   {
     s: @unscanny.Scanner::new(field),
@@ -154,7 +154,7 @@ fn ContentParser::parse_impl(
 }
 
 ///|
-fn ContentParser::turnaround(self : ContentParser, depth : Int) -> Unit {
+fn ContentParser::turnaround(self : ContentParser, depth : Int32) -> Unit {
   let chunk = self.current_chunk
   self.current_chunk = default_chunk(depth)
   self.result.push(
@@ -264,7 +264,7 @@ fn ContentParser::here(self : ContentParser) -> Span {
 }
 
 ///|
-fn default_chunk(depth : Int) -> Chunk {
+fn default_chunk(depth : Int32) -> Chunk {
   if depth > 0 {
     Verbatim("")
   } else {

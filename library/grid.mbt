@@ -511,8 +511,8 @@ pub fn[T : FromValue] Celled::resolve(
   self : Celled[T],
   engine : Engine,
   styles : StyleChain,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
   default : T,
 ) -> T raise SourceError {
   match self {
@@ -567,8 +567,8 @@ pub fn ResolvedCelled::resolve(
   self : ResolvedCelled,
   engine : Engine,
   styles : StyleChain,
-  x : Int,
-  y : Int,
+  x : Int32,
+  y : Int32,
 ) -> Sides[ResolvedStroke??] raise SourceError {
   match self.0 {
     CelledValue(value) => value

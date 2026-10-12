@@ -2,11 +2,11 @@
 // parsing and decoding (7.4.2, 6.5).
 
 ///|
-const MAX_SYMBOLS : UInt = 0xFFFF
+const MAX_SYMBOLS : UInt32 = 0xFFFF
 
 ///|
 /// `u32::checked_add_signed`.
-fn checked_add_signed_u32(a : UInt, b : Int) -> UInt? {
+fn checked_add_signed_u32(a : UInt32, b : Int32) -> UInt32? {
   let r = a.to_int64() + b.to_int64()
   if r < 0L || r > 0xFFFFFFFFL {
     None
@@ -17,7 +17,7 @@ fn checked_add_signed_u32(a : UInt, b : Int) -> UInt? {
 
 ///|
 /// `u32::checked_add`.
-fn checked_add_u32(a : UInt, b : UInt) -> UInt? {
+fn checked_add_u32(a : UInt32, b : UInt32) -> UInt32? {
   let r = a + b
   if r < a {
     None
@@ -55,7 +55,7 @@ fn symbol_decode(
   }
   fn read_height_class_delta(
     ctx : SymbolDecodeContext,
-  ) -> Int? raise DecodeError {
+  ) -> Int32? raise DecodeError {
     if ctx.header.flags.use_huffman {
       ctx.h_ctx.height_class_delta_table.decode(ctx.h_ctx.reader)
     } else {
@@ -65,7 +65,7 @@ fn symbol_decode(
 
   fn read_symbol_width_delta(
     ctx : SymbolDecodeContext,
-  ) -> Int? raise DecodeError {
+  ) -> Int32? raise DecodeError {
     if ctx.header.flags.use_huffman {
       ctx.h_ctx.symbol_width_delta_table.decode(ctx.h_ctx.reader)
     } else {
@@ -82,7 +82,7 @@ fn symbol_decode(
       checked_add_signed_u32(ctx.height_class_height, height_class_delta),
       Overflow(BitmapDimension),
     )
-    let mut symbol_width : UInt = 0
+    let mut symbol_width : UInt32 = 0
     ctx.total_width = 0
     ctx.height_class_first_symbol = ctx.symbols_decoded_count
 
@@ -163,7 +163,7 @@ priv struct SymbolDictionary {
 
 ///|
 /// `32 - (n - 1).leading_zeros()` (with `u32` wrapping).
-fn symbol_code_length_of(n : UInt) -> UInt {
+fn symbol_code_length_of(n : UInt32) -> UInt32 {
   32U - (n - 1).clz().reinterpret_as_uint()
 }
 
@@ -171,7 +171,7 @@ fn symbol_code_length_of(n : UInt) -> UInt {
 /// Decode a symbol bitmap using refinement/aggregate coding (6.5.8.2).
 fn decode_refinement_aggregation_bitmap(
   ctx : SymbolDecodeContext,
-  symbol_width : UInt,
+  symbol_width : UInt32,
 ) -> Bitmap raise DecodeError {
   // 6.5.8.2.1 Number of symbol instances in the aggregation.
   let aggregation_instance_count = ok_or(
@@ -199,7 +199,7 @@ fn decode_refinement_aggregation_bitmap(
 /// Decode a refinement bitmap symbol with a single aggregate (6.5.8.2).
 fn decode_refinement_bitmap(
   ctx : SymbolDecodeContext,
-  symbol_width : UInt,
+  symbol_width : UInt32,
 ) -> Bitmap raise DecodeError {
   let use_huffman = ctx.header.flags.use_huffman
   let mut symbol_code_length = symbol_code_length_of(ctx.total_symbols())
@@ -281,8 +281,8 @@ fn decode_refinement_bitmap(
 /// Decode an aggregation bitmap with more than one aggregate (6.5.8.2).
 fn decode_aggregation_bitmap(
   ctx : SymbolDecodeContext,
-  symbol_width : UInt,
-  aggregation_instance_count : UInt,
+  symbol_width : UInt32,
+  aggregation_instance_count : UInt32,
 ) -> Bitmap raise DecodeError {
   let use_huffman = ctx.header.flags.use_huffman
 
@@ -378,13 +378,13 @@ fn Symbols::new(input : Array[Bitmap]) -> Symbols {
 }
 
 ///|
-fn Symbols::input_count(self : Symbols) -> UInt {
+fn Symbols::input_count(self : Symbols) -> UInt32 {
   self.input.length().reinterpret_as_uint()
 }
 
 ///|
 /// (A negative `index` stands for an out-of-range `usize`.)
-fn Symbols::get(self : Symbols, index : Int) -> Bitmap? {
+fn Symbols::get(self : Symbols, index : Int32) -> Bitmap? {
   if index < 0 {
     None
   } else if index < self.input.length() {
@@ -406,15 +406,15 @@ priv struct SymbolDecodeContext {
   h_ctx : HuffmanContext
   symbols : Symbols
   standard_tables : StandardHuffmanTables
-  symbol_widths : Array[UInt]
-  mut height_class_first_symbol : UInt
-  mut symbols_decoded_count : UInt
-  mut total_width : UInt
-  mut height_class_height : UInt
+  symbol_widths : Array[UInt32]
+  mut height_class_first_symbol : UInt32
+  mut symbols_decoded_count : UInt32
+  mut total_width : UInt32
+  mut height_class_height : UInt32
 }
 
 ///|
-fn SymbolDecodeContext::total_symbols(self : SymbolDecodeContext) -> UInt {
+fn SymbolDecodeContext::total_symbols(self : SymbolDecodeContext) -> UInt32 {
   self.symbols.input_count() + self.header.num_new_symbols
 }
 
@@ -438,7 +438,7 @@ priv struct ArithmeticContext {
 /// `self.text_region_contexts.get_or_insert_with(|| TextRegionContexts::new(code_len))`.
 fn ArithmeticContext::text_region_contexts(
   self : ArithmeticContext,
-  symbol_code_length : UInt,
+  symbol_code_length : UInt32,
 ) -> TextRegionContexts {
   match self.text_region_contexts_ {
     Some(c) => c
@@ -603,7 +603,7 @@ fn decode_height_class_collective_bitmap(
 
   // Finally, we simply chop up the collective bitmap into its constituent
   // symbols.
-  let mut x_offset : UInt = 0
+  let mut x_offset : UInt32 = 0
   for symbol_idx in ctx.height_class_first_symbol..<ctx.symbols_decoded_count {
     let symbol_width = ctx.symbol_widths[symbol_idx.reinterpret_as_int()]
     let symbol = Bitmap::new(symbol_width, ctx.height_class_height)
@@ -641,7 +641,7 @@ fn decode_height_class_collective_bitmap(
 /// Exported symbols (6.5.10).
 fn export_symbols(ctx : SymbolDecodeContext) -> Array[Bitmap] raise DecodeError {
   let total_symbols = ctx.total_symbols()
-  fn read_run_length() -> UInt raise DecodeError {
+  fn read_run_length() -> UInt32 raise DecodeError {
     let value = ok_or(
       if ctx.header.flags.use_huffman {
         ctx.h_ctx.export_run_length_table.decode(ctx.h_ctx.reader)
@@ -657,7 +657,7 @@ fn export_symbols(ctx : SymbolDecodeContext) -> Array[Bitmap] raise DecodeError 
   }
 
   let exported = []
-  let mut index : UInt = 0
+  let mut index : UInt32 = 0
   let mut should_export = false
   while index < total_symbols {
     let run_length = read_run_length()
@@ -714,8 +714,8 @@ priv struct SymbolDictionaryHeader {
   flags : SymbolDictionaryFlags
   adaptive_template_pixels : FixedArray[AdaptiveTemplatePixel]
   refinement_at_pixels : Array[AdaptiveTemplatePixel]
-  num_exported_symbols : UInt
-  num_new_symbols : UInt
+  num_exported_symbols : UInt32
+  num_new_symbols : UInt32
   data : BytesView
 }
 

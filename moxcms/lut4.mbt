@@ -11,7 +11,11 @@ fn LutStore::to_clut_f32(self : LutStore) -> FixedArray[Float] {
 
 ///|
 /// `(grid as usize).safe_powi(n)?.safe_mul(m)?` on a 64-bit `usize`.
-fn clut_length(grid : Int, n_in : Int, n_out : Int) -> Int raise CmsError {
+fn clut_length(
+  grid : Int32,
+  n_in : Int32,
+  n_out : Int32,
+) -> Int32 raise CmsError {
   let mut v = 1UL
   for _ in 0..<n_in {
     v = v * grid.to_uint64()
@@ -31,13 +35,13 @@ fn clut_length(grid : Int, n_in : Int, n_out : Int) -> Int raise CmsError {
 priv struct LutCurves {
   linearization : Array[ArrayView[Float]]
   clut : FixedArray[Float]
-  grid_size : Int
+  grid_size : Int32
   output : Array[ArrayView[Float]]
 }
 
 ///|
 /// `make_lut_4x3` / `make_lut_3x3`.
-fn make_lut_nx3(lut : LutDataType, n : Int) -> LutCurves raise CmsError {
+fn make_lut_nx3(lut : LutDataType, n : Int32) -> LutCurves raise CmsError {
   let clut_len = clut_length(
     lut.num_clut_grid_points,
     lut.num_input_channels,
@@ -90,7 +94,7 @@ fn make_lut_nx3(lut : LutDataType, n : Int) -> LutCurves raise CmsError {
 }
 
 ///|
-fn create_lut4_norm_samples(samples : Int) -> FixedArray[Float] {
+fn create_lut4_norm_samples(samples : Int32) -> FixedArray[Float] {
   let src = FixedArray::make(
     4 * samples * samples * samples * samples,
     Float::from_int(0),
@@ -115,7 +119,7 @@ fn create_lut4_norm_samples(samples : Int) -> FixedArray[Float] {
 
 ///|
 fn create_lut4(
-  samples : Int,
+  samples : Int32,
   lut : LutDataType,
   pcs : DataColorSpace,
 ) -> FixedArray[Float] raise CmsError {
@@ -145,7 +149,7 @@ fn create_lut4(
 }
 
 ///|
-fn create_lut3_samples_norm(samples : Int) -> FixedArray[Float] {
+fn create_lut3_samples_norm(samples : Int32) -> FixedArray[Float] {
   let src = FixedArray::make(
     3 * samples * samples * samples,
     Float::from_int(0),

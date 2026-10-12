@@ -170,7 +170,7 @@ pub fn BibliographyElem::realize_title(
 /// A loaded bibliography.
 pub struct Bibliography {
   priv entries : Array[(Label, @hayagriva.Entry)]
-  priv index : Map[Label, Int]
+  priv index : Map[Label, Int32]
 }
 
 ///|
@@ -679,12 +679,12 @@ let works_store : MemoStore[Works, WorksInput] = MemoStore::new()
 
 ///|
 /// How often [Works::generate_impl] ran since the process started.
-let works_generations : Ref[Int] = { val: 0, }
+let works_generations : Ref[Int32] = { val: 0, }
 
 ///|
 /// How often the works of a document were generated (not found) since the
 /// process started, for tests and measurements.
-pub fn works_generation_count() -> Int {
+pub fn works_generation_count() -> Int32 {
   works_generations.val
 }
 
@@ -762,7 +762,7 @@ fn Works::generate_impl(
   let p = prepare(engine, bibs_and_groups)
 
   // Render the bibliography and citations with hayagriva.
-  let offsets : Map[String, Int] = Map([])
+  let offsets : Map[String, Int32] = Map([])
   let rendered = p.bibs.map(bib => render(bib, offsets))
   {
     bibliographies: show_bibliographies(engine, p, rendered),
@@ -879,7 +879,7 @@ priv enum GroupPart {
   Content(Content)
   /// Points to a subgroup in one of the bibliographies in the document and
   /// should be substituted by the content produced for the citation.
-  Subgroup(Int, Int)
+  Subgroup(Int32, Int32)
 }
 
 ///|
@@ -891,7 +891,7 @@ fn prepare(
 ) -> Preparation {
   // Maps from citations to bibliography indices for citations that were
   // explicitly selected via a bibliography with a `target`.
-  let selected : Map[Location, Int] = Map([])
+  let selected : Map[Location, Int32] = Map([])
 
   // First, we process bibliographies.
   let bibs : Array[PreparedBibliography] = []
@@ -947,9 +947,9 @@ fn prepare(
 fn prepare_cite_group(
   engine : Engine,
   bibs : Array[PreparedBibliography],
-  bib_cursor : Int,
+  bib_cursor : Int32,
   group : CiteGroup,
-  selected : Map[Location, Int],
+  selected : Map[Location, Int32],
 ) -> PreparedCiteGroup raise SourceError {
   // Holds the collected segments of the citation group.
   let parts = []
@@ -957,7 +957,7 @@ fn prepare_cite_group(
   let mut subgroup = []
   // The bibliography index for the current subgroup. If `Some(_)`, then
   // `subgroup` is not empty.
-  let mut subgroup_bib : Int? = None
+  let mut subgroup_bib : Int32? = None
   // The elements in `group.children[tail..i]` are interior spaces.
   let mut tail = 0
   // Holds errors for any uncovered citation. We collect them instead of
@@ -1024,7 +1024,7 @@ fn prepare_cite_group(
 fn save_subgroup(
   engine : Engine,
   bibs : Array[PreparedBibliography],
-  bib_idx : Int,
+  bib_idx : Int32,
   elem : CiteGroup,
   citations : Array[CiteElem],
 ) -> GroupPart {
@@ -1060,9 +1060,9 @@ fn save_subgroup(
 fn select_auto_bib(
   citation : CiteElem,
   bibs : Array[PreparedBibliography],
-  bib_cursor : Int,
-) -> Int? {
-  let ok = (idx : Int) => {
+  bib_cursor : Int32,
+) -> Int32? {
+  let ok = (idx : Int32) => {
     let bib = bibs[idx]
     bib.elem.target(StyleChain::empty()) is Auto &&
     bib.database.has(citation.key())
@@ -1099,7 +1099,7 @@ fn group_key(group : Smart[String]) -> String {
 /// Renders the bibliography and citation groups with hayagriva.
 fn render(
   bib : PreparedBibliography,
-  offsets : Map[String, Int],
+  offsets : Map[String, Int32],
 ) -> @hayagriva.Rendered {
   let locales = @hayagriva.locales()
   let database = bib.database
@@ -1326,7 +1326,7 @@ fn show_cite_group(
   group : PreparedCiteGroup,
   prepared : Array[PreparedBibliography],
   rendered : Array[@hayagriva.Rendered],
-  to_entry : (Int, String) -> Location?,
+  to_entry : (Int32, String) -> Location?,
 ) -> Content raise SourceError {
   let seq = []
   for part in group.0 {
@@ -1367,13 +1367,13 @@ fn show_subgroup(
     return Content::empty()
   }
   let span = span_find(group.citations.map(elem => elem.0.span()))
-  let supplement = (i : Int) => {
+  let supplement = (i : Int32) => {
     match group.citations.get(i) {
       Some(c) => c.supplement(StyleChain::empty())
       None => None
     }
   }
-  let link = (i : Int) => {
+  let link = (i : Int32) => {
     match group.citations.get(i) {
       Some(c) => to_entry(c.key().resolve())
       None => None
@@ -1421,7 +1421,7 @@ fn links_to_citations(groups : Array[Subgroup]) -> Map[String, Location] {
 fn links_to_entries(
   p : Preparation,
   rendered : Array[@hayagriva.Rendered],
-) -> Map[(Int, String), Location] {
+) -> Map[(Int32, String), Location] {
   let links = Map([])
   for i, bib in p.bibs {
     guard rendered[i].bibliography is Some(r) else { continue }
@@ -1437,7 +1437,7 @@ fn links_to_entries(
 /// derived from the bibliography's location. This way, citations can link to
 /// them without having to query for them (which would incur an extra layout
 /// iteration).
-fn entry_location(bib : PreparedBibliography, k : Int) -> Location {
+fn entry_location(bib : PreparedBibliography, k : Int32) -> Location {
   bib.elem.0.location().unwrap().variant(k + 1)
 }
 
@@ -1450,9 +1450,9 @@ priv struct ShowCtx {
   /// The span that is attached to all of the resulting content.
   span : @syntax.Span
   /// Resolves the supplement of i-th citation in the request.
-  supplement : (Int) -> Content?
+  supplement : (Int32) -> Content?
   /// Resolves where the i-th citation in the request should link to.
-  link : (Int) -> Location?
+  link : (Int32) -> Location?
 }
 
 ///|
@@ -1591,7 +1591,7 @@ fn show_link(
 /// Displays transparent pass-through content.
 fn show_transparent(
   ctx : ShowCtx,
-  i : Int,
+  i : Int32,
   format : @hayagriva.Formatting,
 ) -> Content {
   let content = (ctx.supplement)(i).unwrap_or(Content::empty())

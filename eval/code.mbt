@@ -498,7 +498,7 @@ fn int_literal_error(
 fn find_bad_digits(
   base : @syntax.NonDecimalBase,
   digits : String,
-) -> (Int, Int, Array[Char]) {
+) -> (Int32, Int32, Array[Char]) {
   let ranges : Array[(Char, Char)] = match base {
     Hex => [('g', 'z'), ('G', 'Z')]
     Octal => [('8', '9')]
@@ -510,7 +510,7 @@ fn find_bad_digits(
   for range in ranges {
     let mut c = range.0.to_int()
     while c <= range.1.to_int() {
-      let ch = Int::unsafe_to_char(c)
+      let ch = Int32::unsafe_to_char(c)
       match digits.find(ch.to_string()) {
         Some(index) => {
           if index < start {

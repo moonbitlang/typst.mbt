@@ -98,7 +98,7 @@ fn ot_tag(s : String) -> @otf.Tag {
 /// Collect the OpenType features to apply.
 pub fn features(styles : @library.StyleChain) -> Array[@shape.Feature] {
   let tags = []
-  let feat = (tag : String, value : UInt) => {
+  let feat = (tag : String, value : UInt32) => {
     tags.push(@shape.Feature::new(ot_tag(tag), value))
   }
 
@@ -188,7 +188,7 @@ pub fn language(styles : @library.StyleChain) -> @shape.Language {
 /// frame.
 priv struct ShapedText {
   /// The start of the text in the full text.
-  base : Int
+  base : Int32
   /// The text that was shaped.
   text : Utf8Slice
   /// The text direction.
@@ -227,8 +227,8 @@ priv struct Glyphs {
   /// Whether `inner` is owned (may be mutated in place).
   mut owned : Bool
   /// The range of untrimmed glyphs.
-  mut kept_start : Int
-  mut kept_end : Int
+  mut kept_start : Int32
+  mut kept_end : Int32
 }
 
 ///|
@@ -303,7 +303,7 @@ priv struct ShapedGlyph {
   /// The font the glyph is contained in.
   font : @library.FontInstance
   /// The glyph's index in the font.
-  glyph_id : Int
+  glyph_id : Int32
   /// The advance width of the glyph.
   mut x_advance : @library.Em
   /// The horizontal offset of the glyph.
@@ -317,8 +317,8 @@ priv struct ShapedGlyph {
   /// The byte range of this glyph's cluster in the full inline layout. A
   /// cluster is a sequence of one or multiple glyphs that cannot be
   /// separated and must always be treated as a union.
-  range_start : Int
-  range_end : Int
+  range_start : Int32
+  range_end : Int32
   /// Whether splitting the shaping result before this glyph would yield the
   /// same results as shaping the parts to both sides of `text_index`
   /// separately.
@@ -425,7 +425,7 @@ fn ShapedGlyph::is_cjk_center_aligned_punctuation(
 fn ShapedGlyph::is_letter_or_number(self : ShapedGlyph) -> Bool {
   @unicode.script(self.c) is ("Latin" | "Greek" | "Cyrillic") ||
   self.c is ('#' | '$' | '%' | '&') ||
-  self.c is ('0'..='9')
+  self.c is ('0'..<='9')
 }
 
 ///|
@@ -768,7 +768,7 @@ fn ShapedText::measure(
 ///|
 /// How many glyphs are in the text where we can insert additional space
 /// when encountering underfull lines.
-fn ShapedText::justifiables(self : ShapedText) -> Int {
+fn ShapedText::justifiables(self : ShapedText) -> Int32 {
   let mut count = 0
   for g in self.glyphs.kept() {
     if g.is_justifiable() {
@@ -819,8 +819,8 @@ fn ShapedText::shrinkability(self : ShapedText) -> @library.Abs {
 fn ShapedText::reshape(
   self : ShapedText,
   engine : @library.Engine,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> ShapedText {
   let text = self.text.slice(start - self.base, end - self.base)
   match self.slice_safe_to_break(start, end) {
@@ -861,7 +861,7 @@ fn ShapedText::hyphen(
   engine : @library.Engine,
   fallback : Bool,
   base : ShapedText,
-  pos : Int,
+  pos : Int32,
   soft : Bool,
 ) -> ShapedText? {
   let world = engine.world
@@ -941,8 +941,8 @@ fn ShapedText::hyphen(
 /// sides are safe to break.
 fn ShapedText::slice_safe_to_break(
   self : ShapedText,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> ArrayView[ShapedGlyph]? {
   let (start, end) = if !self.dir.is_positive() {
     (end, start)
@@ -957,7 +957,10 @@ fn ShapedText::slice_safe_to_break(
 ///|
 /// Find the glyph offset matching the text index that is most towards the
 /// start of the text and safe-to-break.
-fn ShapedText::find_safe_to_break(self : ShapedText, text_index : Int) -> Int? {
+fn ShapedText::find_safe_to_break(
+  self : ShapedText,
+  text_index : Int32,
+) -> Int32? {
   let ltr = self.dir.is_positive()
   let glyphs = self.glyphs.kept()
 
@@ -1043,18 +1046,18 @@ fn ShapedText::find_safe_to_break(self : ShapedText, text_index : Int) -> Int? {
 /// Group a range of text by BiDi level and script, shape the runs and
 /// generate items for them.
 fn shape_range(
-  items : Array[(Int, Int, InlineItem)],
+  items : Array[(Int32, Int32, InlineItem)],
   engine : @library.Engine,
   text : Utf8Slice,
   bidi : @bidi.BidiInfo,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   styles : @library.StyleChain,
 ) -> Unit {
   let script = @library.TextElem::script_in(styles)
   let lang = @library.TextElem::lang_in(styles)
   let region = @library.TextElem::region_in(styles)
-  let process = (a : Int, b : Int, level : @bidi.Level) => {
+  let process = (a : Int32, b : Int32, level : @bidi.Level) => {
     let dir : @library.Dir = if level.is_ltr() { LTR } else { RTL }
     let shaped = shape(engine, a, text.slice(a, b), styles, dir, lang, region)
     items.push((a, b, Text(shaped)))
@@ -1106,7 +1109,7 @@ fn is_compatible(a : String, b : String) -> Bool {
 /// Shape text into [`ShapedText`].
 fn shape(
   engine : @library.Engine,
-  base : Int,
+  base : Int32,
   text : Utf8Slice,
   styles : @library.StyleChain,
   dir : @library.Dir,
@@ -1150,7 +1153,7 @@ fn shape(
 /// reference (upstream `impl Iterator<Item = &FontFamily> + Clone`).
 pub struct FamilyIter {
   priv list : Array[@library.FontFamily]
-  priv mut pos : Int
+  priv mut pos : Int32
 }
 
 ///|
@@ -1355,7 +1358,7 @@ fn recycle_shaping_buffer(buffer : @shape.GlyphBuffer) -> Unit {
 /// Shape text with font fallback using the `families` iterator.
 fn shape_segment(
   ctx : ShapingContext,
-  base : Int,
+  base : Int32,
   text : Utf8Slice,
   families : FamilyIter,
 ) -> Unit {
@@ -1436,7 +1439,7 @@ fn shape_segment(
   let ltr = ctx.dir.is_positive()
 
   // Whether the character at the given offset is covered by the coverage.
-  let is_covered = (offset : Int) => {
+  let is_covered = (offset : Int32) => {
     match covers {
       None => true
       Some(cov) => {
@@ -1654,12 +1657,12 @@ fn typographic_shift_supported(
 /// Shape the text with tofus from the given font.
 fn shape_tofus(
   ctx : ShapingContext,
-  base : Int,
+  base : Int32,
   text : Utf8Slice,
   font : @library.FontInstance,
 ) -> Unit {
   let x_advance = font.x_advance(0).unwrap_or(@library.Em::zero())
-  let add_glyph = (cluster : Int, c : Int) => {
+  let add_glyph = (cluster : Int32, c : Int32) => {
     let start = base + cluster
     let end = start + utf8_char_len(c)
     let c = char_of(c)

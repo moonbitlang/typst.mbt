@@ -30,7 +30,7 @@
 
 ///|
 /// Enable tracing of VM execution. Only for debugging/investigating.
-const OPTION_TRACE : Int = 1
+const OPTION_TRACE : Int32 = 1
 
 ///|
 /// When iterating over all matches within a text (e.g. with `find_iter`),
@@ -41,11 +41,11 @@ const OPTION_TRACE : Int = 1
 /// the VM about the fact that we skipped because of an empty match, it would
 /// still treat `\G` as matching. So this option is for communicating that to
 /// the VM. Phew.
-const OPTION_SKIPPED_EMPTY_MATCH : Int = 2
+const OPTION_SKIPPED_EMPTY_MATCH : Int32 = 2
 
 ///|
 // TODO: make configurable
-const MAX_STACK : Int = 1_000_000
+const MAX_STACK : Int32 = 1_000_000
 
 ///|
 /// Delegate matching to the regex crate
@@ -55,11 +55,11 @@ pub struct Delegate {
   /// The regex pattern as a string
   pattern : String
   /// The first group number that this regex captures (if it contains groups)
-  start_group : Int
+  start_group : Int32
   /// The last group number
-  end_group : Int
+  end_group : Int32
   /// Reusable slot buffer for searches.
-  priv slots : FixedArray[Int]
+  priv slots : FixedArray[Int32]
 }
 
 ///|
@@ -78,30 +78,30 @@ pub(all) enum Insn {
   /// Split execution into two threads. The two fields are positions of
   /// instructions. Execution first tries the first thread. If that fails, the
   /// second position is tried.
-  Split(Int, Int)
+  Split(Int32, Int32)
   /// Jump to instruction at position
-  Jmp(Int)
+  Jmp(Int32)
   /// Save the current string index into the specified slot
-  Save(Int)
+  Save(Int32)
   /// Save `0` into the specified slot
-  Save0(Int)
+  Save0(Int32)
   /// Set the string index to the value that was saved in the specified slot
-  Restore(Int)
+  Restore(Int32)
   /// Repeat greedily (match as much as possible)
-  RepeatGr(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
+  RepeatGr(lo~ : Int32, hi~ : Int32, next~ : Int32, repeat~ : Int32)
   /// Repeat non-greedily (prefer matching as little as possible)
-  RepeatNg(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
+  RepeatNg(lo~ : Int32, hi~ : Int32, next~ : Int32, repeat~ : Int32)
   /// Repeat greedily and prevent infinite loops from empty matches
-  RepeatEpsilonGr(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
+  RepeatEpsilonGr(lo~ : Int32, next~ : Int32, repeat~ : Int32, check~ : Int32)
   /// Repeat non-greedily and prevent infinite loops from empty matches
-  RepeatEpsilonNg(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
+  RepeatEpsilonNg(lo~ : Int32, next~ : Int32, repeat~ : Int32, check~ : Int32)
   /// Negative look-around failed
   FailNegativeLookAround
   /// Set IX back by the specified number of characters
-  GoBack(Int)
+  GoBack(Int32)
   /// Back reference to a group number to check (`slot`: the save slot
   /// representing the start of the capture group)
-  Backref(slot~ : Int, casei~ : Bool)
+  Backref(slot~ : Int32, casei~ : Bool)
   /// Begin of atomic group
   BeginAtomic
   /// End of atomic group
@@ -112,7 +112,7 @@ pub(all) enum Insn {
   ContinueFromPreviousMatchEnd
   /// Continue only if the specified capture group has already been populated
   /// as part of the match
-  BackrefExistsCondition(Int)
+  BackrefExistsCondition(Int32)
 }
 
 ///|
@@ -171,15 +171,15 @@ pub extend Insn with Show::{to_string, output}
 pub struct Prog {
   /// Instructions of the program
   body : Array[Insn]
-  priv n_saves : Int
+  priv n_saves : Int32
   /// The chars of each `Lit` instruction (indexed by pc).
-  priv lits : Array[FixedArray[Int]]
+  priv lits : Array[FixedArray[Int32]]
   /// The reusable VM state.
   priv state : Ref[State?]
 }
 
 ///|
-fn Prog::new(body : Array[Insn], n_saves : Int) -> Prog {
+fn Prog::new(body : Array[Insn], n_saves : Int32) -> Prog {
   let lits = body.map(insn => {
     match insn {
       Lit(s) => {
@@ -209,24 +209,24 @@ pub fn Prog::debug_print(self : Prog, writer : StringBuilder) -> Unit {
 priv struct State {
   /// Saved values indexed by slot. Mostly indices to s, but can be repeat
   /// values etc. Always contains the saves of the current state.
-  saves : Array[Int]
+  saves : Array[Int32]
   /// Stack of backtrack branches (pc, ix, nsave).
-  stack_pc : Array[Int]
-  stack_ix : Array[Int]
-  stack_nsave : Array[Int]
+  stack_pc : Array[Int32]
+  stack_ix : Array[Int32]
+  stack_nsave : Array[Int32]
   /// Old saves (slot, value)
-  oldsave_slot : Array[Int]
-  oldsave_value : Array[Int]
+  oldsave_slot : Array[Int32]
+  oldsave_value : Array[Int32]
   /// Number of saves at the end of `oldsave` that need to be restored to
   /// `saves` on pop
-  mut nsave : Int
-  explicit_sp : Int
+  mut nsave : Int32
+  explicit_sp : Int32
   /// Maximum size of the stack. If the size would be exceeded during
   /// execution, a `StackOverflow` error is raised.
-  max_stack : Int
+  max_stack : Int32
   /// Scratch for `backtrack_cut`: the stamp at which a slot was last seen.
-  seen : Array[Int]
-  mut stamp : Int
+  seen : Array[Int32]
+  mut stamp : Int32
 }
 
 // Each element in the stack conceptually represents the entire state
@@ -238,7 +238,7 @@ priv struct State {
 // current machine state to the top of stack.
 
 ///|
-fn State::new(n_saves : Int, max_stack : Int) -> State {
+fn State::new(n_saves : Int32, max_stack : Int32) -> State {
   {
     saves: Array::make(n_saves, USIZE_MAX),
     stack_pc: [],
@@ -269,7 +269,7 @@ fn State::reset(self : State) -> Unit {
 
 ///|
 /// push a backtrack branch
-fn State::push(self : State, pc : Int, ix : Int) -> Unit raise FancyError {
+fn State::push(self : State, pc : Int32, ix : Int32) -> Unit raise FancyError {
   if self.stack_pc.length() < self.max_stack {
     self.stack_pc.push(pc)
     self.stack_ix.push(ix)
@@ -282,7 +282,7 @@ fn State::push(self : State, pc : Int, ix : Int) -> Unit raise FancyError {
 
 ///|
 /// pop a backtrack branch
-fn State::pop(self : State) -> (Int, Int) {
+fn State::pop(self : State) -> (Int32, Int32) {
   for _ in 0..<self.nsave {
     let slot = self.oldsave_slot.unsafe_pop()
     let value = self.oldsave_value.unsafe_pop()
@@ -295,7 +295,7 @@ fn State::pop(self : State) -> (Int, Int) {
 }
 
 ///|
-fn State::save(self : State, slot : Int, val : Int) -> Unit {
+fn State::save(self : State, slot : Int32, val : Int32) -> Unit {
   let len = self.oldsave_slot.length()
   for i in 0..<self.nsave {
     // could avoid this iteration with some overhead; worth it?
@@ -312,14 +312,14 @@ fn State::save(self : State, slot : Int, val : Int) -> Unit {
 }
 
 ///|
-fn State::get(self : State, slot : Int) -> Int {
+fn State::get(self : State, slot : Int32) -> Int32 {
   self.saves[slot]
 }
 
 ///|
 /// push a value onto the explicit stack; note: the entire contents of
 /// the explicit stack is saved and restored on backtrack.
-fn State::stack_push(self : State, val : Int) -> Unit {
+fn State::stack_push(self : State, val : Int32) -> Unit {
   if self.saves.length() == self.explicit_sp {
     self.saves.push(self.explicit_sp + 1)
   }
@@ -335,7 +335,7 @@ fn State::stack_push(self : State, val : Int) -> Unit {
 
 ///|
 /// pop a value from the explicit stack
-fn State::stack_pop(self : State) -> Int {
+fn State::stack_pop(self : State) -> Int32 {
   let explicit_sp = self.explicit_sp
   let sp = self.get(explicit_sp) - 1
   let result = self.get(sp)
@@ -345,7 +345,7 @@ fn State::stack_pop(self : State) -> Int {
 
 ///|
 /// Get the current number of backtrack branches
-fn State::backtrack_count(self : State) -> Int {
+fn State::backtrack_count(self : State) -> Int32 {
   self.stack_pc.length()
 }
 
@@ -358,7 +358,7 @@ fn State::backtrack_count(self : State) -> Int {
 /// * Only keep `count` backtrack branches on `stack`, discard the rest
 /// * Keep the first `oldsave` for each slot, discard the rest (multiple
 ///   pushes might have happened with saves to the same slot)
-fn State::backtrack_cut(self : State, count : Int) -> Unit {
+fn State::backtrack_cut(self : State, count : Int32) -> Unit {
   if self.stack_pc.length() == count {
     // no backtrack branches to discard, all good
     return
@@ -403,8 +403,8 @@ fn State::backtrack_cut(self : State, count : Int) -> Unit {
 /// Whether the chars of `literal` occur in `s` at `ix`.
 fn matches_literal(
   s : @regex.Haystack,
-  ix : Int,
-  literal : FixedArray[Int],
+  ix : Int32,
+  literal : FixedArray[Int32],
 ) -> Bool {
   let n = literal.length()
   if ix + n > s.char_len() {
@@ -420,7 +420,12 @@ fn matches_literal(
 
 ///|
 /// Whether the text of the chars `lo..hi` of `s` occurs at `ix`.
-fn matches_backref(s : @regex.Haystack, ix : Int, lo : Int, hi : Int) -> Bool {
+fn matches_backref(
+  s : @regex.Haystack,
+  ix : Int32,
+  lo : Int32,
+  hi : Int32,
+) -> Bool {
   let n = hi - lo
   if ix + n > s.char_len() {
     return false
@@ -439,10 +444,10 @@ fn matches_backref(s : @regex.Haystack, ix : Int, lo : Int, hi : Int) -> Bool {
 /// the char position of `end` on success.
 fn matches_literal_casei(
   s : @regex.Haystack,
-  ix : Int,
-  lo : Int,
-  hi : Int,
-) -> Int? {
+  ix : Int32,
+  lo : Int32,
+  hi : Int32,
+) -> Int32? {
   let literal_bytes = s.byte_offset(hi) - s.byte_offset(lo)
   let end_byte = s.byte_offset(ix) + literal_bytes
   if end_byte > s.byte_len() {
@@ -487,7 +492,7 @@ fn matches_literal_casei(
 }
 
 ///|
-fn ascii_lower(c : Int) -> Int {
+fn ascii_lower(c : Int32) -> Int32 {
   if c >= 'A' && c <= 'Z' {
     c + 32
   } else {
@@ -496,7 +501,7 @@ fn ascii_lower(c : Int) -> Int {
 }
 
 ///|
-fn is_word_char_at(s : @regex.Haystack, i : Int) -> Bool {
+fn is_word_char_at(s : @regex.Haystack, i : Int32) -> Bool {
   i >= 0 && i < s.char_len() && @unicode.is_word_character(s.char_at(i))
 }
 
@@ -506,7 +511,7 @@ fn is_word_char_at(s : @regex.Haystack, i : Int) -> Bool {
 fn assertion_matches(
   s : @regex.Haystack,
   assertion : Assertion,
-  ix : Int,
+  ix : Int32,
 ) -> Bool {
   let len = s.char_len()
   match assertion {
@@ -535,10 +540,10 @@ fn assertion_matches(
 fn run(
   prog : Prog,
   s : @regex.Haystack,
-  pos : Int,
-  option_flags : Int,
+  pos : Int32,
+  option_flags : Int32,
   options : RegexOptions,
-) -> Array[Int]? raise FancyError {
+) -> Array[Int32]? raise FancyError {
   let state = match prog.state.val {
     Some(state) => {
       state.reset()
@@ -783,8 +788,8 @@ fn run(
 pub fn run_trace(
   prog : Prog,
   s : @regex.Haystack,
-  pos : Int,
-) -> Array[Int]? raise FancyError {
+  pos : Int32,
+) -> Array[Int32]? raise FancyError {
   run(prog, s, pos, OPTION_TRACE, RegexOptions::default())
 }
 
@@ -793,7 +798,7 @@ pub fn run_trace(
 pub fn run_default(
   prog : Prog,
   s : @regex.Haystack,
-  pos : Int,
-) -> Array[Int]? raise FancyError {
+  pos : Int32,
+) -> Array[Int32]? raise FancyError {
   run(prog, s, pos, 0, RegexOptions::default())
 }

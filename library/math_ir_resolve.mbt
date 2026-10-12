@@ -53,7 +53,7 @@ fn MathResolver::push_raw(self : MathResolver, item : RawMathItem) -> Unit {
 /// Removes and returns the items from `start` on (upstream `drain(start..)`).
 fn MathResolver::drain_from(
   self : MathResolver,
-  start : Int,
+  start : Int32,
 ) -> Array[RawMathItem] {
   let drained = self.items[start:].iter().collect()
   self.items.truncate(start)
@@ -67,7 +67,7 @@ fn MathResolver::resolve_into_items(
   self : MathResolver,
   elem : Content,
   styles : StyleChain,
-) -> Int raise SourceError {
+) -> Int32 raise SourceError {
   let start = self.items.length()
   self.resolve_into_self(elem, styles)
   start
@@ -350,7 +350,7 @@ fn resolve_text(
       if c == '.' {
         decimal_count += 1
       }
-      if !(c is ('0'..='9') || c == '.') {
+      if !(c is ('0'..<='9') || c == '.') {
         all = false
         break
       }
@@ -1055,7 +1055,10 @@ fn resolve_lr(
 ///|
 /// Returns the indices at which the inner portion and the suffix start
 /// (upstream `SliceExt::split_prefix_suffix`).
-fn[T] split_prefix_suffix(slice : ArrayView[T], f : (T) -> Bool) -> (Int, Int) {
+fn[T] split_prefix_suffix(
+  slice : ArrayView[T],
+  f : (T) -> Bool,
+) -> (Int32, Int32) {
   let mut start = slice.length()
   for i, v in slice {
     if !f(v) {

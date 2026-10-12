@@ -100,7 +100,7 @@ priv struct Composer {
   engine : @library.Engine
   work : Work
   config : Config
-  mut column : Int
+  mut column : Int32
   page_base : @library.Axes[@library.Abs]
   page_insertions : Insertions
   mut column_insertions : Insertions
@@ -1020,7 +1020,7 @@ fn layout_line_numbers(
   config : Config,
   line_config : LineNumberConfig,
   locator : @library.Locator,
-  column : Int,
+  column : Int32,
   output : @library.Frame,
 ) -> Unit raise @library.SourceError {
   let locator = locator.split()
@@ -1237,7 +1237,7 @@ fn[T] find_in_frame_impl(
 
 ///|
 /// A stable sort (upstream `slice::sort_by`), implemented as a merge sort.
-fn[T] stable_sort_by(array : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] stable_sort_by(array : Array[T], cmp : (T, T) -> Int32) -> Unit {
   let n = array.length()
   if n < 2 {
     return

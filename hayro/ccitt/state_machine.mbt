@@ -16,20 +16,20 @@
 
 ///|
 /// The flag indicating whether the state is terminal.
-const TERMINAL : Int = 0x8000
+const TERMINAL : Int32 = 0x8000
 
 ///|
 /// The mask used to get the actual value from a terminal state.
-const VALUE_MASK : Int = 0x1FFF
+const VALUE_MASK : Int32 = 0x1FFF
 
 ///|
 /// An invalid state.
-const INVALID : Int = 0xFFFF
+const INVALID : Int32 = 0xFFFF
 
 ///|
 priv struct State {
-  mut on_0 : Int
-  mut on_1 : Int
+  mut on_0 : Int32
+  mut on_1 : Int32
 }
 
 ///|
@@ -42,11 +42,11 @@ fn State::new() -> State {
 /// Returns the new number of states.
 fn insert_code(
   states : FixedArray[State],
-  num_states : Int,
-  run_length : Int,
-  code_length : Int,
-  code : Int,
-) -> Int {
+  num_states : Int32,
+  run_length : Int32,
+  code_length : Int32,
+  code : Int32,
+) -> Int32 {
   let mut num_states = num_states
   let mut current_state = 0
   for i in 0..<code_length {
@@ -85,9 +85,9 @@ fn insert_code(
 ///|
 fn insert_codes(
   states : FixedArray[State],
-  num_states : Int,
-  codes : ReadOnlyArray[(Int, Int, Int)],
-) -> Int {
+  num_states : Int32,
+  codes : ReadOnlyArray[(Int32, Int32, Int32)],
+) -> Int32 {
   let mut num_states = num_states
   for c in codes[:] {
     let (run_length, code_length, code) = c
@@ -98,9 +98,9 @@ fn insert_codes(
 
 ///|
 fn build_run_states(
-  n : Int,
-  terminating : ReadOnlyArray[(Int, Int, Int)],
-  makeup : ReadOnlyArray[(Int, Int, Int)],
+  n : Int32,
+  terminating : ReadOnlyArray[(Int32, Int32, Int32)],
+  makeup : ReadOnlyArray[(Int32, Int32, Int32)],
 ) -> FixedArray[State] {
   let states = FixedArray::makei(n, _ => State::new())
   let mut num_states = 1
@@ -161,7 +161,7 @@ fn mode_states() -> FixedArray[State] {
 
 ///|
 /// White terminating codes (T.4 Table 2/T.4, T.6 Table 2/T.6).
-let white_terminating : ReadOnlyArray[(Int, Int, Int)] = [
+let white_terminating : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (0, 8, 0b00110101),
   (1, 6, 0b000111),
   (2, 4, 0b0111),
@@ -230,7 +230,7 @@ let white_terminating : ReadOnlyArray[(Int, Int, Int)] = [
 
 ///|
 /// White make-up codes (T.4 Table 3a/T.4, T.6 Table 3/T.6).
-let white_makeup : ReadOnlyArray[(Int, Int, Int)] = [
+let white_makeup : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (64, 5, 0b11011),
   (128, 5, 0b10010),
   (192, 6, 0b010111),
@@ -262,7 +262,7 @@ let white_makeup : ReadOnlyArray[(Int, Int, Int)] = [
 
 ///|
 /// Black terminating codes (T.4 Table 2/T.4, T.6 Table 2/T.6).
-let black_terminating : ReadOnlyArray[(Int, Int, Int)] = [
+let black_terminating : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (0, 10, 0b0000110111),
   (1, 3, 0b010),
   (2, 2, 0b11),
@@ -331,7 +331,7 @@ let black_terminating : ReadOnlyArray[(Int, Int, Int)] = [
 
 ///|
 /// Black make-up codes (T.4 Table 3a/T.4, T.6 Table 3/T.6).
-let black_makeup : ReadOnlyArray[(Int, Int, Int)] = [
+let black_makeup : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (64, 10, 0b0000001111),
   (128, 12, 0b000011001000),
   (192, 12, 0b000011001001),
@@ -363,7 +363,7 @@ let black_makeup : ReadOnlyArray[(Int, Int, Int)] = [
 
 ///|
 /// Extended make-up codes for run lengths > 1728 (T.4 Table 3b/T.4, T.6 Table 3/T.6).
-let common_makeup : ReadOnlyArray[(Int, Int, Int)] = [
+let common_makeup : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (1792, 11, 0b00000001000),
   (1856, 11, 0b00000001100),
   (1920, 11, 0b00000001101),
@@ -381,7 +381,7 @@ let common_makeup : ReadOnlyArray[(Int, Int, Int)] = [
 
 ///|
 /// Mode codes for 2D encoding (T.4 Table 4/T.4, T.6 Table 1/T.6).
-let mode_codes : ReadOnlyArray[(Int, Int, Int)] = [
+let mode_codes : ReadOnlyArray[(Int32, Int32, Int32)] = [
   (0, 4, 0b0001),
   (1, 3, 0b001),
   (2, 1, 0b1),

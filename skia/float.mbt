@@ -151,25 +151,25 @@ pub fn signum(x : Float) -> Float {
 
 ///|
 /// `x as i32` (saturating, NaN maps to 0).
-pub fn f32_to_i32(x : Float) -> Int {
+pub fn f32_to_i32(x : Float) -> Int32 {
   x.to_int()
 }
 
 ///|
 /// `x as u32` (saturating, NaN maps to 0).
-pub fn f32_to_u32(x : Float) -> UInt {
+pub fn f32_to_u32(x : Float) -> UInt32 {
   x.to_double().to_uint()
 }
 
 ///|
 /// `x as f32` for an `i32`.
-pub fn i32_to_f32(x : Int) -> Float {
+pub fn i32_to_f32(x : Int32) -> Float {
   Float::from_int(x)
 }
 
 ///|
 /// `x as f32` for a `u32`.
-pub fn u32_to_f32(x : UInt) -> Float {
+pub fn u32_to_f32(x : UInt32) -> Float {
   Float::from_uint(x)
 }
 
@@ -265,7 +265,7 @@ let min_i32_fits_in_f32 : Float = -2147483520.0
 ///|
 /// `i32::saturate_from(f32)`: returns the closest integer for the given
 /// float. Returns MAX_I32_FITS_IN_F32 for NaN.
-pub fn i32_saturate_from(x : Float) -> Int {
+pub fn i32_saturate_from(x : Float) -> Int32 {
   let x = if x < max_i32_fits_in_f32 { x } else { max_i32_fits_in_f32 }
   let x = if x > min_i32_fits_in_f32 { x } else { min_i32_fits_in_f32 }
   f32_to_i32(x)
@@ -273,36 +273,36 @@ pub fn i32_saturate_from(x : Float) -> Int {
 
 ///|
 /// `i32::saturate_from(f64)`. Returns i32::MAX for NaN.
-pub fn i32_saturate_from_f64(x : Double) -> Int {
+pub fn i32_saturate_from_f64(x : Double) -> Int32 {
   let x = if x < 2147483647.0 { x } else { 2147483647.0 }
   let x = if x > -2147483648.0 { x } else { -2147483648.0 }
   x.to_int()
 }
 
 ///|
-pub fn i32_saturate_floor(x : Float) -> Int {
+pub fn i32_saturate_floor(x : Float) -> Int32 {
   i32_saturate_from(floorf(x))
 }
 
 ///|
-pub fn i32_saturate_ceil(x : Float) -> Int {
+pub fn i32_saturate_ceil(x : Float) -> Int32 {
   i32_saturate_from(ceilf(x))
 }
 
 ///|
-pub fn i32_saturate_round(x : Float) -> Int {
+pub fn i32_saturate_round(x : Float) -> Int32 {
   i32_saturate_from(floorf(x) + 0.5)
 }
 
 ///|
 /// Return the float as a 2s compliment int. Just to be used to compare floats
 /// to each other or against positive float-bit-constants (like 0).
-pub fn f32_as_2s_compliment(x : Float) -> Int {
+pub fn f32_as_2s_compliment(x : Float) -> Int32 {
   sign_bit_to_2s_compliment(x.reinterpret_as_int())
 }
 
 ///|
-fn sign_bit_to_2s_compliment(x : Int) -> Int {
+fn sign_bit_to_2s_compliment(x : Int32) -> Int32 {
   if x < 0 {
     -(x & 0x7FFFFFFF)
   } else {
@@ -312,7 +312,7 @@ fn sign_bit_to_2s_compliment(x : Int) -> Int {
 
 ///|
 /// `i32::saturating_add`.
-pub fn i32_saturating_add(a : Int, b : Int) -> Int {
+pub fn i32_saturating_add(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() + b.to_int64()
   if r > 2147483647L {
     2147483647
@@ -325,7 +325,7 @@ pub fn i32_saturating_add(a : Int, b : Int) -> Int {
 
 ///|
 /// `i32::saturating_sub`.
-pub fn i32_saturating_sub(a : Int, b : Int) -> Int {
+pub fn i32_saturating_sub(a : Int32, b : Int32) -> Int32 {
   let r = a.to_int64() - b.to_int64()
   if r > 2147483647L {
     2147483647

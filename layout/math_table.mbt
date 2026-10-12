@@ -208,7 +208,7 @@ fn layout_math_cell(
 ///|
 /// Compute max sub-column widths across a table column.
 fn compute_sub_column_widths(col : Array[CellLayout]) -> Array[@library.Abs] {
-  let mut len : Int? = None
+  let mut len : Int32? = None
   for cell in col {
     let l = cell.sub_columns.length()
     len = match len {

@@ -14,16 +14,16 @@ priv struct TagNode {
   /// For leaf nodes, this value is always 1. In some cases, the width might
   /// be 0, in which case the leaf node doesn't actually "exist" and is just
   /// a dummy node.
-  width : UInt
+  width : UInt32
   /// The height of the area covered by the node.
   ///
   /// For leaf nodes, this value is always 1. In some cases, the height might
   /// be 0, in which case the leaf node doesn't actually "exist" and is just
   /// a dummy node.
-  height : UInt
+  height : UInt32
   /// The actual value stored in the node. Only valid once `initialized`
   /// is set to `true`.
-  mut value : UInt
+  mut value : UInt32
   /// Whether the node has been fully initialized. The tag tree is not
   /// stored in its complete form in the JP2 file, but is instead built
   /// up incrementally, each packet contributing the information of the
@@ -33,14 +33,14 @@ priv struct TagNode {
   /// The level inside the tree. Zero indicates that the given node is
   /// a leaf node, otherwise the level is > 0. The root node has the highest
   /// level.
-  level : Int
+  level : Int32
   /// The indices of the children of the node, some of which might be dummy
   /// nodes (indicated by the fact that the index is `usize::MAX`, here -1).
-  children : FixedArray[Int]
+  children : FixedArray[Int32]
 }
 
 ///|
-fn TagNode::new(width : UInt, height : UInt, level : Int) -> TagNode {
+fn TagNode::new(width : UInt32, height : UInt32, level : Int32) -> TagNode {
   {
     width,
     height,
@@ -53,21 +53,21 @@ fn TagNode::new(width : UInt, height : UInt, level : Int) -> TagNode {
 
 ///|
 /// The width of the top-left child.
-fn TagNode::top_left_width(self : TagNode) -> UInt {
+fn TagNode::top_left_width(self : TagNode) -> UInt32 {
   min_u32(shl_u32(1, self.level - 1), self.width)
 }
 
 ///|
 /// The height of the top-left child.
-fn TagNode::top_left_height(self : TagNode) -> UInt {
+fn TagNode::top_left_height(self : TagNode) -> UInt32 {
   min_u32(shl_u32(1, self.level - 1), self.height)
 }
 
 ///|
 fn TagNode::build(
-  width : UInt,
-  height : UInt,
-  level : Int,
+  width : UInt32,
+  height : UInt32,
+  level : Int32,
   nodes : Array[TagNode],
 ) -> TagNode {
   let tag = TagNode::new(width, height, level)
@@ -83,7 +83,7 @@ fn TagNode::build(
   // on this, we can infer the dimensions of all other child nodes.
   let top_left_width = tag.top_left_width()
   let top_left_height = tag.top_left_height()
-  fn push(node : TagNode, child_idx : Int) {
+  fn push(node : TagNode, child_idx : Int32) {
     // If this is not the case, the child doesn't actually exist.
     if node.width > 0 && node.height > 0 {
       let node_idx = nodes.length()
@@ -124,14 +124,14 @@ fn TagNode::build(
 
 ///|
 fn read_tag_node(
-  node_idx : Int,
-  x : UInt,
-  y : UInt,
+  node_idx : Int32,
+  x : UInt32,
+  y : UInt32,
   reader : BitReader,
-  parent_val : UInt,
-  max_val : UInt,
+  parent_val : UInt32,
+  max_val : UInt32,
   nodes : Array[TagNode],
-) -> UInt? {
+) -> UInt32? {
   let node = nodes[node_idx]
   if !node.initialized {
     let mut val = max_u32(parent_val, node.value)
@@ -208,13 +208,17 @@ fn read_tag_node(
 // which is not ported (release builds do not check it).
 #warnings("-unused_field")
 priv struct TagTree {
-  root : Int
-  width : UInt
-  height : UInt
+  root : Int32
+  width : UInt32
+  height : UInt32
 }
 
 ///|
-fn TagTree::new(width : UInt, height : UInt, nodes : Array[TagNode]) -> TagTree {
+fn TagTree::new(
+  width : UInt32,
+  height : UInt32,
+  nodes : Array[TagNode],
+) -> TagTree {
   // Calculate how many levels the tree has in total.
   let wl = ilog2_u32(next_power_of_two_u32(width))
   let hl = ilog2_u32(next_power_of_two_u32(height))
@@ -228,18 +232,18 @@ fn TagTree::new(width : UInt, height : UInt, nodes : Array[TagNode]) -> TagTree 
 ///|
 fn TagTree::read(
   self : TagTree,
-  x : UInt,
-  y : UInt,
+  x : UInt32,
+  y : UInt32,
   reader : BitReader,
-  max_val : UInt,
+  max_val : UInt32,
   nodes : Array[TagNode],
-) -> UInt? {
+) -> UInt32? {
   read_tag_node(self.root, x, y, reader, 0, max_val, nodes)
 }
 
 ///|
 /// `u32::next_power_of_two` (0 maps to 1; overflow wraps to 0 in release).
-fn next_power_of_two_u32(v : UInt) -> UInt {
+fn next_power_of_two_u32(v : UInt32) -> UInt32 {
   if v <= 1 {
     1
   } else {
@@ -254,6 +258,6 @@ fn next_power_of_two_u32(v : UInt) -> UInt {
 
 ///|
 /// `u32::ilog2` (`v` must not be zero).
-fn ilog2_u32(v : UInt) -> Int {
+fn ilog2_u32(v : UInt32) -> Int32 {
   31 - v.clz()
 }

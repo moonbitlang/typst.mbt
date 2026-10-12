@@ -49,7 +49,7 @@ priv struct SoftMaskRepr {
   settings : InterpreterSettings
   background : Color
   xref : @hayro_syntax.XRef
-  nesting_depth : Int
+  nesting_depth : Int32
 }
 
 ///|

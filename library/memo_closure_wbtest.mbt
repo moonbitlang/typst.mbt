@@ -9,7 +9,7 @@ type ClosureBody = (Func, Closure, Engine, Context, Args) -> Value raise SourceE
 
 ///|
 /// A closure whose hash depends on `tag`.
-fn memo_test_func(tag : Int) -> Func {
+fn memo_test_func(tag : Int32) -> Func {
   guard test_closure(@syntax.parse_code("x"), Int(tag.to_int64())) is Func(func) else {
     abort("not a function")
   }
@@ -32,7 +32,7 @@ fn memo_call(
 
 ///|
 /// A route that is `depth` deep.
-fn memo_route(depth : Int) -> Route {
+fn memo_route(depth : Int32) -> Route {
   let mut route = Route::root()
   for _ in 0..<depth {
     route = Route::extend_(route)
@@ -81,7 +81,7 @@ fn memo_test_end() -> Unit {
 
 ///|
 fn memo_engine(
-  introspector? : Introspector = Introspector::new(FixedBackend([])),
+  introspector~ : Introspector = Introspector::new(FixedBackend([])),
 ) -> Engine {
   let engine = wb_engine(introspector)
   match memo_test_world.val {
@@ -316,7 +316,7 @@ test "closure memo: a result depends on what the call asked of its context" {
   let mut runs = 0
   // The number of calls that are computed when `body` is called in every
   // context twice.
-  let computed = (tag : Int, body : ClosureBody) => {
+  let computed = (tag : Int32, body : ClosureBody) => {
     let f = memo_test_func(tag)
     let before = runs
     for _ in 0..<2 {
@@ -470,7 +470,7 @@ test "closure memo: a result depends on the answers of the depth checks" {
   defer memo_test_end()
   let mut runs = 0
   // Enters `levels` nested calls and checks the call depth in the last.
-  let nest = (engine : Engine, levels : Int) => {
+  let nest = (engine : Engine, levels : Int32) => {
     let mut route = engine.route
     for _ in 0..<levels {
       route = Route::extend_(route)
@@ -486,8 +486,8 @@ test "closure memo: a result depends on the answers of the depth checks" {
     let levels : Int64 = args.expect("levels")
     Bool(nest(engine, levels.to_int()))
   }
-  let at = (depth : Int) => { ..memo_engine(), route: memo_route(depth), }
-  let call = (f : Func, depth : Int, levels : Int) => {
+  let at = (depth : Int32) => { ..memo_engine(), route: memo_route(depth), }
+  let call = (f : Func, depth : Int32, levels : Int32) => {
     memo_call(f, at(depth), Context::none(), [Int(levels.to_int64())], body)
   }
   let f = memo_test_func(1)
@@ -537,7 +537,7 @@ test "closure memo: a result depends on the answers of the depth checks" {
     let engine = { ..engine, route: Route::extend_(engine.route), }
     memo_call(inner, engine, context, [Int(10)], body)
   }
-  let outer = (tag : Int, depth : Int) => {
+  let outer = (tag : Int32, depth : Int32) => {
     memo_call(memo_test_func(tag), at(depth), Context::none(), [], outer_body)
   }
   // The inner call is computed at depth 1.
@@ -710,7 +710,7 @@ test "closure memo: the limit per key is on what no eviction has seen yet" {
     Int(engine.introspector.query_labelled().length().to_int64())
   }
   let f = memo_test_func(1)
-  let call = (n : Int) => {
+  let call = (n : Int32) => {
     let engine = memo_engine(
       introspector=introspectors[n].track_with(IntrospectionRecorder::new()),
     )

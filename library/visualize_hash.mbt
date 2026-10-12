@@ -227,7 +227,7 @@ pub extend Tiling with Fingerprint::{fingerprint}
 
 ///|
 /// The [fingerprint_flags] of the tiling's frame.
-pub fn Tiling::frame_fingerprint_flags(self : Tiling) -> Int {
+pub fn Tiling::frame_fingerprint_flags(self : Tiling) -> Int32 {
   self.frame_hash.flags(state => state.write(self.frame))
 }
 

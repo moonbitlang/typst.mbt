@@ -228,8 +228,8 @@ fn note_g() -> Array[&IntoContent] {
   let general = disp(
     "z_n = f(n) dot x + f_1(n) + f_2(n) dot x^(-1) + f_3(n) dot x^(-3) + dots.c",
   )
-  let bold_b = (index : Int) => m("bold(upright(B))_(\{index})")
-  let bold_a = (index : Int) => m("bold(upright(A))_(\{index})")
+  let bold_b = (index : Int32) => m("bold(upright(B))_(\{index})")
+  let bold_a = (index : Int32) => m("bold(upright(A))_(\{index})")
   [
     (
       $|It is desirable to guard against the possibility of exaggerated ideas that

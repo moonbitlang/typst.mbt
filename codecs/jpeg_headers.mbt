@@ -457,7 +457,7 @@ fn parse_app2(decoder : JpegDecoder) -> Unit raise DecodeErrors {
 
 ///|
 /// Un-zig-zag a quantization table.
-fn un_zig_zag(a : (Int) -> Int) -> FixedArray[Int] {
+fn un_zig_zag(a : (Int32) -> Int32) -> FixedArray[Int32] {
   let output = FixedArray::make(64, 0)
   for i in 0..<64 {
     output[un_zigzag[i]] = a(i)

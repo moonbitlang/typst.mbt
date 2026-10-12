@@ -24,7 +24,7 @@ fn PagesWorld::layers(self : PagesWorld) -> PagesStep {
 ///|
 /// Two page runs. The first has a block that reads the final value of a
 /// counter, which the second steps, and a rectangle after it.
-fn layered(tail : Int, steps : String) -> String {
+fn layered(tail : Int32, steps : String) -> String {
   "#set page(width: 100pt, height: 100pt, margin: 10pt)\n" +
   "#let c = counter(\"c\")\n" +
   "#block(context [#rect(width: 10pt, height: c.final().first() * 10pt)#metadata(\"final \" + str(c.final().first()))])\n" +
@@ -83,7 +83,7 @@ test "layers: the reads of a block that is found are those of the run and of the
 test "layers: a block found inside a run found inside a document found says what a compilation from scratch says" {
   // A block whose layout warns, a block that reads the document, and a
   // second run. Whichever level is found, the warning is reported once.
-  let source = (tail : Int, other : Int) => {
+  let source = (tail : Int32, other : Int32) => {
     "#set page(width: 100pt, height: 100pt, margin: 10pt)\n" +
     "#block(par[#box(width: 5pt, height: 5pt) #parbreak() #box(width: 6pt, height: 6pt)])\n" +
     "#block(context metadata(\"pages \" + str(counter(page).final().first())))\n" +
@@ -158,7 +158,7 @@ test "layers: what a caller writes to the groups of a document is written to no 
   // blocks keep, as clones, which share their groups. The document that a
   // caller gets has groups of its own at every depth, so a run that is
   // laid out again from the kept blocks gets them as they were laid out.
-  let source = (tail : Int) => {
+  let source = (tail : Int32) => {
     "#set page(width: 100pt, height: 100pt, margin: 10pt)\n" +
     "#block(clip: true, inset: 2pt, rotate(10deg, block(clip: true, inset: 2pt, rect(width: 10pt, height: 10pt))))\n" +
     "#block(fill: red, inset: 3pt, block(stroke: 1pt, inset: 2pt, rect(width: 12pt, height: 6pt)))\n" +

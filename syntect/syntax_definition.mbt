@@ -3,15 +3,15 @@
 // Data structures for representing syntax definitions
 
 ///|
-pub type CaptureMapping = Array[(Int, Array[Scope])]
+pub type CaptureMapping = Array[(Int32, Array[Scope])]
 
 ///|
 /// An opaque ID for a [`Context`].
 pub(all) struct ContextId {
   /// Index into [`SyntaxSet::syntaxes`]
-  syntax_index : Int
+  syntax_index : Int32
   /// Index into the contexts of the [`Self::syntax_index`] syntax
-  context_index : Int
+  context_index : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -84,7 +84,7 @@ pub(all) enum Pattern {
 pub struct MatchPattern {
   /// A unique id, standing in for upstream's use of the pattern's address as
   /// the key of the parser's search cache.
-  priv id : Int
+  priv id : Int32
   has_captures : Bool
   regex : Regex
   scope : Array[Scope]
@@ -165,11 +165,11 @@ pub(all) enum MatchOperation {
 pub struct MatchIter {
   priv syntax_set : SyntaxSet
   priv ctx_stack : Array[Context]
-  priv index_stack : Array[Int]
+  priv index_stack : Array[Int32]
 }
 
 ///|
-pub fn MatchIter::next(self : MatchIter) -> (Context, Int)? {
+pub fn MatchIter::next(self : MatchIter) -> (Context, Int32)? {
   while true {
     if self.ctx_stack.is_empty() {
       return None
@@ -214,7 +214,7 @@ pub fn context_iter(syntax_set : SyntaxSet, context : Context) -> MatchIter {
 /// Returns the match pattern at an index
 pub fn Context::match_at(
   self : Context,
-  index : Int,
+  index : Int32,
 ) -> MatchPattern raise ParsingError {
   match self.patterns[index] {
     Match(match_pat) => match_pat
@@ -248,7 +248,7 @@ pub fn ContextReference::id(
 ///|
 pub fn substitute_backrefs_in_regex(
   regex_str : String,
-  substituter : (Int) -> String?,
+  substituter : (Int32) -> String?,
 ) -> String {
   let reg_str = StringBuilder()
   let mut last_was_escape = false
@@ -273,7 +273,7 @@ pub fn substitute_backrefs_in_regex(
 }
 
 ///|
-let match_pattern_counter : Ref[Int] = Ref(0)
+let match_pattern_counter : Ref[Int32] = Ref(0)
 
 ///|
 pub fn MatchPattern::new(

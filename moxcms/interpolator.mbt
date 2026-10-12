@@ -4,18 +4,18 @@
 
 ///|
 /// `LUT_SAMPLING`
-let lut_sampling : Int = 255
+let lut_sampling : Int32 = 255
 
 ///|
 priv struct BarycentricWeight {
-  x : Int
-  x_n : Int
-  w : Int
+  x : Int32
+  x_n : Int32
+  w : Int32
 }
 
 ///|
 /// `BarycentricWeight::<i16>::create_ranged_256::<GRID_SIZE>()`.
-fn create_ranged_256_q0_15(grid_size : Int) -> FixedArray[BarycentricWeight] {
+fn create_ranged_256_q0_15(grid_size : Int32) -> FixedArray[BarycentricWeight] {
   FixedArray::makei(256, index => {
     let scale_c = Float::from_int(1) / Float::from_int(lut_sampling)
     let x = index * (grid_size - 1) / lut_sampling
@@ -39,7 +39,7 @@ fn create_ranged_256_q0_15(grid_size : Int) -> FixedArray[BarycentricWeight] {
 
 ///|
 /// Saturate to `i16`.
-fn sat_i16(x : Int64) -> Int {
+fn sat_i16(x : Int64) -> Int32 {
   if x > 32767L {
     32767
   } else if x < -32768L {
@@ -51,7 +51,7 @@ fn sat_i16(x : Int64) -> Int {
 
 ///|
 /// NEON `SQRDMLAH` on one 16-bit lane: `sat((a << 16) + 2 * b * c + 2^15) >> 16`.
-fn qrdmlah_s16(a : Int, b : Int, c : Int) -> Int {
+fn qrdmlah_s16(a : Int32, b : Int32, c : Int32) -> Int32 {
   sat_i16(
     ((a.to_int64() << 16) + 2L * b.to_int64() * c.to_int64() + 32768L) >> 16,
   )
@@ -59,7 +59,7 @@ fn qrdmlah_s16(a : Int, b : Int, c : Int) -> Int {
 
 ///|
 /// NEON `SQRDMLSH` on one 16-bit lane: `sat((a << 16) - 2 * b * c + 2^15) >> 16`.
-fn qrdmlsh_s16(a : Int, b : Int, c : Int) -> Int {
+fn qrdmlsh_s16(a : Int32, b : Int32, c : Int32) -> Int32 {
   sat_i16(
     ((a.to_int64() << 16) - 2L * b.to_int64() * c.to_int64() + 32768L) >> 16,
   )
@@ -69,15 +69,15 @@ fn qrdmlsh_s16(a : Int, b : Int, c : Int) -> Int {
 /// `TrilinearNeonQ0_15::interpolate` (one channel lane) on the cube starting
 /// at `table` (in grid points).
 fn trilinear_q0_15(
-  lut : FixedArray[Int],
-  table : Int,
-  grid_size : Int,
+  lut : FixedArray[Int32],
+  table : Int32,
+  grid_size : Int32,
   weights : FixedArray[BarycentricWeight],
-  in_r : Int,
-  in_g : Int,
-  in_b : Int,
-  ch : Int,
-) -> Int {
+  in_r : Int32,
+  in_g : Int32,
+  in_b : Int32,
+  ch : Int32,
+) -> Int32 {
   let lut_r = weights[in_r]
   let lut_g = weights[in_g]
   let lut_b = weights[in_b]
@@ -90,7 +90,7 @@ fn trilinear_q0_15(
   let dr = lut_r.w
   let dg = lut_g.w
   let db = lut_b.w
-  let fetch = (x : Int, y : Int, z : Int) => {
+  let fetch = (x : Int32, y : Int32, z : Int32) => {
     lut[(table + x * grid_size * grid_size + y * grid_size + z) * 3 + ch]
   }
   let c000 = fetch(x, y, z)

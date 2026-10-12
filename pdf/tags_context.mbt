@@ -28,7 +28,7 @@ fn Tags::push_text(
 }
 
 ///|
-fn Tags::reserve_annotation(self : Tags) -> Int {
+fn Tags::reserve_annotation(self : Tags) -> Int32 {
   let id = self.annotations.length()
   self.annotations.push(None)
   id
@@ -37,14 +37,14 @@ fn Tags::reserve_annotation(self : Tags) -> Int {
 ///|
 fn Tags::init_annotation(
   self : Tags,
-  id : Int,
+  id : Int32,
   annot : @export.Identifier,
 ) -> Unit {
   self.annotations[id] = Some(annot)
 }
 
 ///|
-fn Tags::take_annotation(self : Tags, id : Int) -> @export.Node {
+fn Tags::take_annotation(self : Tags, id : Int32) -> @export.Node {
   let annot = self.annotations[id].unwrap()
   self.annotations[id] = None
   Leaf(annot)
@@ -66,7 +66,7 @@ fn Ctx::new() -> Ctx {
 }
 
 ///|
-fn Ctx::new_bbox(self : Ctx) -> Int {
+fn Ctx::new_bbox(self : Ctx) -> Int32 {
   let id = self.bboxes.length()
   self.bboxes.push(BBoxCtx::new())
   id
@@ -94,7 +94,7 @@ fn Ctx::alt(self : Ctx, kind : GroupKind) -> String? {
 ///|
 priv struct BBoxCtx {
   /// The page index and the rectangle (min x, min y, max x, max y).
-  mut rect : (Int, @library.Point, @library.Point)?
+  mut rect : (Int32, @library.Point, @library.Point)?
   mut multi_page : Bool
 }
 
@@ -180,7 +180,7 @@ fn BBoxCtx::expand_page(self : BBoxCtx, inner : BBoxCtx) -> Unit {
 }
 
 ///|
-fn BBoxCtx::to_export(self : BBoxCtx) -> (Int, @export.Rect)? {
+fn BBoxCtx::to_export(self : BBoxCtx) -> (Int32, @export.Rect)? {
   guard self.rect is Some((page_idx, min, max)) else { return None }
   let rect = @export.Rect::from_ltrb(
     to_f32(min.x),
@@ -209,7 +209,7 @@ fn tags_context_finish(tree : Tree) -> Unit {
 ///|
 priv struct ListCtx {
   /// The id of the `LI` tag of the last item.
-  mut last_item : Int?
+  mut last_item : Int32?
 }
 
 ///|
@@ -221,8 +221,8 @@ fn ListCtx::new() -> ListCtx {
 fn ListCtx::push_label(
   self : ListCtx,
   groups : Groups,
-  list : Int,
-  label : Int,
+  list : Int32,
+  label : Int32,
 ) -> Unit {
   if self.last_item is Some(item) {
     self.last_item = None
@@ -237,8 +237,8 @@ fn ListCtx::push_label(
 fn ListCtx::ensure_within_item(
   self : ListCtx,
   groups : Groups,
-  list : Int,
-) -> Int {
+  list : Int32,
+) -> Int32 {
   if self.last_item is Some(item) {
     self.last_item = None
     item
@@ -253,8 +253,8 @@ fn ListCtx::ensure_within_item(
 fn ListCtx::push_body(
   self : ListCtx,
   groups : Groups,
-  list : Int,
-  body : Int,
+  list : Int32,
+  body : Int32,
 ) -> Unit {
   let item = self.ensure_within_item(groups, list)
   groups.push_group(item, body)
@@ -304,8 +304,8 @@ fn ListCtx::push_body(
 fn ListCtx::push_bib_entry(
   self : ListCtx,
   groups : Groups,
-  list : Int,
-  bib_entry : Int,
+  list : Int32,
+  bib_entry : Int32,
 ) -> Unit {
   // Bibliography lists are always flat, so there is no need to check for
   // an inner list. If they do contain a list it is semantically unrelated
@@ -320,7 +320,7 @@ fn ListCtx::push_bib_entry(
 ///|
 priv struct OutlineCtx {
   /// The stack of nested `TOC` entries.
-  stack : Array[Int]
+  stack : Array[Int32]
 }
 
 ///|
@@ -332,9 +332,9 @@ fn OutlineCtx::new() -> OutlineCtx {
 fn OutlineCtx::insert(
   self : OutlineCtx,
   groups : Groups,
-  outline_id : Int,
+  outline_id : Int32,
   entry : @library.OutlineEntry,
-  entry_id : Int,
+  entry_id : Int32,
 ) -> Unit {
   let expected_len = entry.level().0.to_int() - 1
   let mut parent = self.stack.last().unwrap_or(outline_id)
@@ -374,14 +374,14 @@ priv enum FigureTagKind {
 
 ///|
 priv struct FigureCtx {
-  group_id : Int
+  group_id : Int32
   elem : @library.FigureElem
-  mut captions : Array[Int]
+  mut captions : Array[Int32]
   mut tag_kind : FigureTagKind
 }
 
 ///|
-fn FigureCtx::new(group_id : Int, elem : @library.FigureElem) -> FigureCtx {
+fn FigureCtx::new(group_id : Int32, elem : @library.FigureElem) -> FigureCtx {
   { group_id, elem, captions: [], tag_kind: Div, }
 }
 
@@ -416,7 +416,7 @@ fn FigureCtx::build_wrapper_tag(self : FigureCtx) -> @export.TagKind? {
 }
 
 ///|
-fn build_figure(tree : Tree, figure_id : Int) -> Unit {
+fn build_figure(tree : Tree, figure_id : Int32) -> Unit {
   let figure_ctx = tree.ctx.figures[figure_id]
   let group = tree.groups.get(figure_ctx.group_id)
   let wrapper = group.parent
@@ -454,7 +454,7 @@ fn build_figure(tree : Tree, figure_id : Int) -> Unit {
 }
 
 ///|
-fn single_semantic_child(groups : Groups, group : Group) -> Int? {
+fn single_semantic_child(groups : Groups, group : Group) -> Int32? {
   let mut group = group
   while group.nodes is [Group(id)] {
     group = groups.get(id)
@@ -471,17 +471,17 @@ fn single_semantic_child(groups : Groups, group : Group) -> Int? {
 /// A cell of a `GridCells` grid.
 priv struct CtxCell[D] {
   data : D
-  x : Int
-  y : Int
-  rowspan : Int
-  colspan : Int
-  id : Int
+  x : Int32
+  y : Int32
+  rowspan : Int32
+  colspan : Int32
+  id : Int32
 }
 
 ///|
 priv enum GridEntry[D] {
   Cell(CtxCell[D])
-  Spanned(Int)
+  Spanned(Int32)
   Missing
 }
 
@@ -501,12 +501,12 @@ fn[D] GridEntry::is_missing(self : GridEntry[D]) -> Bool {
 
 ///|
 priv struct GridCells[T] {
-  width : Int
+  width : Int32
   entries : Array[GridEntry[T]]
 }
 
 ///|
-fn[T] GridCells::new(width : Int, height : Int) -> GridCells[T] {
+fn[T] GridCells::new(width : Int32, height : Int32) -> GridCells[T] {
   { width, entries: Array::make(width * height, Missing), }
 }
 
@@ -516,22 +516,22 @@ fn[T] GridCells::is_empty(self : GridCells[T]) -> Bool {
 }
 
 ///|
-fn[T] GridCells::width(self : GridCells[T]) -> Int {
+fn[T] GridCells::width(self : GridCells[T]) -> Int32 {
   self.width
 }
 
 ///|
-fn[T] GridCells::height(self : GridCells[T]) -> Int {
+fn[T] GridCells::height(self : GridCells[T]) -> Int32 {
   self.entries.length() / self.width
 }
 
 ///|
-fn[T] GridCells::row(self : GridCells[T], y : Int) -> ArrayView[GridEntry[T]] {
+fn[T] GridCells::row(self : GridCells[T], y : Int32) -> ArrayView[GridEntry[T]] {
   self.entries[y * self.width:(y + 1) * self.width]
 }
 
 ///|
-fn[T] GridCells::cell(self : GridCells[T], x : Int, y : Int) -> CtxCell[T]? {
+fn[T] GridCells::cell(self : GridCells[T], x : Int32, y : Int32) -> CtxCell[T]? {
   let idx = self.cell_idx(x, y)
   match self.entries[idx] {
     Cell(c) => Some(c)
@@ -543,7 +543,7 @@ fn[T] GridCells::cell(self : GridCells[T], x : Int, y : Int) -> CtxCell[T]? {
 ///|
 /// The index of the parent cell entry at a position. The position must not
 /// point to a `Missing` entry.
-fn[T] GridCells::parent_idx(self : GridCells[T], x : Int, y : Int) -> Int {
+fn[T] GridCells::parent_idx(self : GridCells[T], x : Int32, y : Int32) -> Int32 {
   let idx = self.cell_idx(x, y)
   match self.entries[idx] {
     Cell(_) => idx
@@ -584,7 +584,7 @@ fn[T] GridCells::insert(self : GridCells[T], cell : CtxCell[T]) -> Unit {
 }
 
 ///|
-fn[T] GridCells::cell_idx(self : GridCells[T], x : Int, y : Int) -> Int {
+fn[T] GridCells::cell_idx(self : GridCells[T], x : Int32, y : Int32) -> Int32 {
   y * self.width + x
 }
 
@@ -592,7 +592,7 @@ fn[T] GridCells::cell_idx(self : GridCells[T], x : Int, y : Int) -> Int {
 /// Convert from "effective" positions inside the cell grid, which may
 /// include gutter tracks in addition to the cells, to conventional
 /// positions.
-fn grid_from_effective(grid : @library.CellGrid, i : Int) -> Int {
+fn grid_from_effective(grid : @library.CellGrid, i : Int32) -> Int32 {
   if grid.has_gutter {
     i / 2
   } else {
@@ -603,7 +603,7 @@ fn grid_from_effective(grid : @library.CellGrid, i : Int) -> Int {
 ///|
 /// Convert from conventional positions to "effective" positions inside the
 /// cell grid, which may include gutter tracks in addition to the cells.
-fn grid_to_effective(grid : @library.CellGrid, i : Int) -> Int {
+fn grid_to_effective(grid : @library.CellGrid, i : Int32) -> Int32 {
   if grid.has_gutter {
     2 * i
   } else {
@@ -613,12 +613,12 @@ fn grid_to_effective(grid : @library.CellGrid, i : Int) -> Int {
 
 ///|
 priv struct GridCtx {
-  group_id : Int
+  group_id : Int32
   cells : GridCells[Unit]
 }
 
 ///|
-fn GridCtx::new(group_id : Int, grid : @library.GridElem) -> GridCtx {
+fn GridCtx::new(group_id : Int32, grid : @library.GridElem) -> GridCtx {
   let grid = grid.grid().unwrap()
   let width = grid.non_gutter_column_count()
   let height = grid.non_gutter_row_count()
@@ -626,7 +626,11 @@ fn GridCtx::new(group_id : Int, grid : @library.GridElem) -> GridCtx {
 }
 
 ///|
-fn GridCtx::insert(self : GridCtx, cell : @library.GridCell, id : Int) -> Unit {
+fn GridCtx::insert(
+  self : GridCtx,
+  cell : @library.GridCell,
+  id : Int32,
+) -> Unit {
   let styles = tags_styles()
   guard cell.x(styles) is Custom(x) && cell.y(styles) is Custom(y) else {
     abort("unreachable")
@@ -642,7 +646,7 @@ fn GridCtx::insert(self : GridCtx, cell : @library.GridCell, id : Int) -> Unit {
 }
 
 ///|
-fn saturating_u32(v : Int64) -> Int {
+fn saturating_u32(v : Int64) -> Int32 {
   if v > 0x7FFFFFFFL {
     0x7FFFFFFF
   } else {
@@ -651,7 +655,7 @@ fn saturating_u32(v : Int64) -> Int {
 }
 
 ///|
-fn build_grid(tree : Tree, grid_id : Int) -> Unit {
+fn build_grid(tree : Tree, grid_id : Int32) -> Unit {
   let grid_ctx = tree.ctx.grids[grid_id]
   for entry in grid_ctx.cells.entries {
     if entry is Cell(cell) {

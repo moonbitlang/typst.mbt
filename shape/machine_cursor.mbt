@@ -7,14 +7,14 @@
 /// Cursors are values: `add`/`sub` return moved copies.
 priv struct MachineCursor[T] {
   data : Array[T]
-  pred : (Array[T], Int) -> Bool
-  pos : Int
+  pred : (Array[T], Int32) -> Bool
+  pos : Int32
 }
 
 ///|
 fn[T] MachineCursor::new(
   data : Array[T],
-  pred : (Array[T], Int) -> Bool,
+  pred : (Array[T], Int32) -> Bool,
 ) -> MachineCursor[T] {
   let mut pos = data.length()
   for i in 0..<data.length() {
@@ -51,7 +51,7 @@ fn[T] MachineCursor::recede1(self : MachineCursor[T]) -> MachineCursor[T] {
 }
 
 ///|
-fn[T] MachineCursor::index(self : MachineCursor[T]) -> Int {
+fn[T] MachineCursor::index(self : MachineCursor[T]) -> Int32 {
   self.pos
 }
 
@@ -64,7 +64,7 @@ fn[T] MachineCursor::end(self : MachineCursor[T]) -> MachineCursor[T] {
 /// `cursor + rhs`
 fn[T] MachineCursor::add(
   self : MachineCursor[T],
-  rhs : Int,
+  rhs : Int32,
 ) -> MachineCursor[T] {
   let mut c = self
   for _ in 0..<rhs {
@@ -77,7 +77,7 @@ fn[T] MachineCursor::add(
 /// `cursor - rhs`
 fn[T] MachineCursor::sub(
   self : MachineCursor[T],
-  rhs : Int,
+  rhs : Int32,
 ) -> MachineCursor[T] {
   let mut c = self
   for _ in 0..<rhs {

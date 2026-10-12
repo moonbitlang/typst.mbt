@@ -29,7 +29,7 @@ pub extend ExtractionQueryType with @debug.Debug::{to_repr}
 /// An extraction query.
 pub(all) struct ExtractionQuery {
   query_type : ExtractionQueryType
-  page_index : Int
+  page_index : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -44,13 +44,13 @@ pub extend ExtractionQuery with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new page extraction query with the given page index.
-pub fn ExtractionQuery::new_page(page_index : Int) -> ExtractionQuery {
+pub fn ExtractionQuery::new_page(page_index : Int32) -> ExtractionQuery {
   { query_type: Page, page_index, }
 }
 
 ///|
 /// Create a new `XObject` extraction query with the given page index.
-pub fn ExtractionQuery::new_xobject(page_index : Int) -> ExtractionQuery {
+pub fn ExtractionQuery::new_xobject(page_index : Int32) -> ExtractionQuery {
   { query_type: XObject, page_index, }
 }
 
@@ -58,7 +58,7 @@ pub fn ExtractionQuery::new_xobject(page_index : Int) -> ExtractionQuery {
 /// An error that occurred during page extraction.
 pub(all) enum ExtractionError {
   /// An invalid page index was given.
-  InvalidPageIndex(Int)
+  InvalidPageIndex(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -75,9 +75,9 @@ pub extend ExtractionError with @debug.Debug::{to_repr}
 /// The result of an extraction.
 pub(all) struct ExtractionResult {
   /// The root references of the pages/XObject, one for each extraction query.
-  root_refs : Array[Result[Int, ExtractionError]]
+  root_refs : Array[Result[Int32, ExtractionError]]
   /// The reference to the page tree parent that was generated.
-  page_tree_parent_ref : Int
+  page_tree_parent_ref : Int32
 }
 
 ///|
@@ -86,15 +86,15 @@ pub(all) struct ExtractionResult {
 /// (sharing the already written objects).
 pub struct ExtractionContext {
   priv pdf : @hayro_syntax.Pdf
-  priv new_ref_fn : () -> Int
-  priv put_fn : (Int, @export.Indirect) -> Unit
+  priv new_ref_fn : () -> Int32
+  priv put_fn : (Int32, @export.Indirect) -> Unit
   priv visited_objects : Map[@hayro_syntax.ObjRef, Unit]
   priv to_visit_refs : Array[@hayro_syntax.ObjRef]
   priv valid_ref_cache : Map[@hayro_syntax.ObjRef, Bool]
-  priv ref_map : Map[@hayro_syntax.ObjRef, Int]
-  priv cached_content_streams : Map[Int, Int]
+  priv ref_map : Map[@hayro_syntax.ObjRef, Int32]
+  priv cached_content_streams : Map[Int32, Int32]
   /// The reference of the page tree parent of extracted pages.
-  page_tree_parent_ref : Int
+  page_tree_parent_ref : Int32
 }
 
 ///|
@@ -103,9 +103,9 @@ pub struct ExtractionContext {
 /// pages (upstream allocates one, which krilla remaps to its page tree).
 pub fn ExtractionContext::new(
   pdf : @hayro_syntax.Pdf,
-  new_ref : () -> Int,
-  put : (Int, @export.Indirect) -> Unit,
-  page_tree_parent_ref? : Int,
+  new_ref : () -> Int32,
+  put : (Int32, @export.Indirect) -> Unit,
+  page_tree_parent_ref? : Int32,
 ) -> ExtractionContext {
   let page_tree_parent_ref = match page_tree_parent_ref {
     Some(r) => r
@@ -128,7 +128,7 @@ pub fn ExtractionContext::new(
 fn ExtractionContext::map_ref(
   self : ExtractionContext,
   ref_ : @hayro_syntax.ObjRef,
-) -> Int {
+) -> Int32 {
   match self.ref_map.get(ref_) {
     Some(r) => r
     None => {
@@ -140,7 +140,7 @@ fn ExtractionContext::map_ref(
 }
 
 ///|
-fn ExtractionContext::new_ref(self : ExtractionContext) -> Int {
+fn ExtractionContext::new_ref(self : ExtractionContext) -> Int32 {
   (self.new_ref_fn)()
 }
 
@@ -148,8 +148,8 @@ fn ExtractionContext::new_ref(self : ExtractionContext) -> Int {
 /// Apply the extraction queries to the given PDF and return the results.
 pub fn extract(
   pdf : @hayro_syntax.Pdf,
-  new_ref : () -> Int,
-  put : (Int, @export.Indirect) -> Unit,
+  new_ref : () -> Int32,
+  put : (Int32, @export.Indirect) -> Unit,
   queries : Array[ExtractionQuery],
 ) -> Result[ExtractionResult, ExtractionError] {
   let ctx = ExtractionContext::new(pdf, new_ref, put)
@@ -173,7 +173,7 @@ pub fn extract(
 pub fn ExtractionContext::extract_query(
   self : ExtractionContext,
   query : ExtractionQuery,
-) -> Result[Int, ExtractionError] {
+) -> Result[Int32, ExtractionError] {
   let pages = self.pdf.pages()
   guard pages.get(query.page_index) is Some(_) else {
     return Err(InvalidPageIndex(query.page_index))
@@ -189,7 +189,7 @@ pub fn ExtractionContext::extract_query(
 pub fn ExtractionContext::extract_query_into(
   self : ExtractionContext,
   query : ExtractionQuery,
-  root_ref : Int,
+  root_ref : Int32,
 ) -> Result[Unit, ExtractionError] {
   let pages = self.pdf.pages()
   guard pages.get(query.page_index) is Some(page) else {
@@ -225,8 +225,8 @@ pub fn ExtractionContext::write_dependencies(self : ExtractionContext) -> Unit {
 ///|
 fn write_page(
   page : @hayro_syntax.Page,
-  page_ref : Int,
-  page_idx : Int,
+  page_ref : Int32,
+  page_idx : Int32,
   ctx : ExtractionContext,
 ) -> Unit {
   // Note: We can cache content stream references, but _not_ the page references themselves.
@@ -279,7 +279,7 @@ fn write_page(
 ///|
 fn write_xobject(
   page : @hayro_syntax.Page,
-  xobj_ref : Int,
+  xobj_ref : Int32,
   ctx : ExtractionContext,
 ) -> Unit {
   let data = match page.page_stream() {

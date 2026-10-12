@@ -181,8 +181,8 @@ fn svg_webp_image(data : Bytes) -> @export.Image? {
 /// Deviation: 16-bit samples are reduced to 8 bits.
 fn krilla_sampled(
   key : String,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   color : @codecs.ColorType,
   buf : Bytes,
   icc : Bytes?,
@@ -192,7 +192,7 @@ fn krilla_sampled(
   let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
   let color_channels = if channels >= 3 { 3 } else { 1 }
   let bpc = if sixteen { 2 } else { 1 }
-  let sample = (i : Int) => {
+  let sample = (i : Int32) => {
     if sixteen {
       u16_to_u8(buf[i].to_int() | (buf[i + 1].to_int() << 8))
     } else {

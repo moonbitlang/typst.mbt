@@ -7,11 +7,11 @@
 
 ///|
 priv struct Rng {
-  mut state : UInt
+  mut state : UInt32
 }
 
 ///|
-fn Rng::next(self : Rng) -> UInt {
+fn Rng::next(self : Rng) -> UInt32 {
   let mut x = self.state
   x = x ^ (x << 13)
   x = x ^ (x >> 17)
@@ -32,7 +32,7 @@ fn Rng::float(self : Rng) -> Float {
 }
 
 ///|
-let seed : UInt = 2463534242U
+let seed : UInt32 = 2463534242U
 
 ///|
 fn special_floats() -> Array[Float] {
@@ -60,7 +60,7 @@ fn special_floats() -> Array[Float] {
 }
 
 ///|
-fn inputs_u8(n : Int) -> Array[Byte] {
+fn inputs_u8(n : Int32) -> Array[Byte] {
   let out : Array[Byte] = []
   let rng = { state: seed, }
   match n {
@@ -109,7 +109,7 @@ fn inputs_u8(n : Int) -> Array[Byte] {
 }
 
 ///|
-fn inputs_f32(n : Int) -> Array[Float] {
+fn inputs_f32(n : Int32) -> Array[Float] {
   let out : Array[Float] = []
   let rng = { state: seed, }
   let sf = special_floats()
@@ -218,7 +218,7 @@ fn error_name(e : @moxcms.CmsError) -> String {
 }
 
 ///|
-fn layout_for(n : Int) -> @moxcms.Layout {
+fn layout_for(n : Int32) -> @moxcms.Layout {
   match n {
     1 => Gray
     3 => Rgb
@@ -234,7 +234,12 @@ fn hex(v : UInt64) -> String {
 
 ///|
 /// Runs one oracle case; `raw` receives the output bytes.
-fn run_case(data : Bytes, n : Int, mode : String, raw : Array[Byte]) -> String {
+fn run_case(
+  data : Bytes,
+  n : Int32,
+  mode : String,
+  raw : Array[Byte],
+) -> String {
   let profile = @moxcms.ColorProfile::new_from_slice(data) catch {
     e => return "PARSE_ERR \{error_name(e)}"
   }
@@ -290,7 +295,7 @@ fn read_fixture(name : String) -> Bytes? {
 
 ///|
 /// Expected oracle results: (fixture, components, mode, result).
-let expected : Array[(String, Int, String, String)] = [
+let expected : Array[(String, Int32, String, String)] = [
   ("srgb_v2_curv.icc", 1, "u8", "CREATE_ERR InvalidLayout"),
   ("srgb_v2_curv.icc", 1, "f32", "CREATE_ERR InvalidLayout"),
   ("srgb_v2_curv.icc", 3, "u8", "OK count=190608 hash=0x8ec34341eecdd704"),

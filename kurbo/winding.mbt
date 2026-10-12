@@ -81,7 +81,7 @@ fn CubicBez::solve_monotonic_for_y(self : CubicBez, y : Double) -> Double {
 /// Assumes that this segment is monotonic in `y`. We consider `self` to
 /// contain the endpoint with smaller y, and not contain the endpoint with
 /// larger y, so that consecutive segments are handled correctly.
-fn PathSeg::winding_inner(self : PathSeg, p : Point) -> Int {
+fn PathSeg::winding_inner(self : PathSeg, p : Point) -> Int32 {
   let start = self.start()
   let end = self.end()
   let sign = if end.y > start.y {
@@ -155,7 +155,7 @@ fn PathSeg::winding_inner(self : PathSeg, p : Point) -> Int {
 /// Compute the winding number contribution of a single segment.
 ///
 /// Cast a ray to the left and count intersections.
-pub fn PathSeg::winding(self : PathSeg, p : Point) -> Int {
+pub fn PathSeg::winding(self : PathSeg, p : Point) -> Int32 {
   // `ParamCurveExtrema::extrema_ranges`: parameter ranges, each of which
   // is monotonic within the range.
   let mut sum = 0
@@ -169,7 +169,7 @@ pub fn PathSeg::winding(self : PathSeg, p : Point) -> Int {
 
 ///|
 /// Winding number of point (`Shape::winding`).
-pub fn BezPath::winding(self : BezPath, pt : Point) -> Int {
+pub fn BezPath::winding(self : BezPath, pt : Point) -> Int32 {
   let mut sum = 0
   for seg in self.segments() {
     sum += seg.winding(pt)

@@ -114,7 +114,7 @@ fn check_selector(text : String, expected : String) -> Unit raise {
 ///|
 /// A node of the element tree in `tree_spec`.
 struct Node {
-  idx : Int
+  idx : Int32
 }
 
 ///|

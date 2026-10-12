@@ -11,7 +11,7 @@
 
 ///|
 /// `SmallVecExt::left`.
-fn three_tags_left(tags : Array[@otf.Tag]) -> Int {
+fn three_tags_left(tags : Array[@otf.Tag]) -> Int32 {
   3 - tags.length()
 }
 
@@ -49,7 +49,7 @@ fn is_ascii_alphanumeric(c : Char) -> Bool {
 
 ///|
 /// `bytes.get(i)` of a byte string.
-fn byte_at(s : StringView, i : Int) -> Char? {
+fn byte_at(s : StringView, i : Int32) -> Char? {
   if i >= 0 && i < s.length() {
     Some(s[i].to_int().unsafe_to_char())
   } else {
@@ -169,14 +169,14 @@ fn parse_private_use_subtag(
 
   // Some bits magic from HarfBuzz...
   if (tag.as_u32() & 0xDFDFDFDF) == default_script_tag().as_u32() {
-    tag = @otf.Tag(tag.as_u32() ^ (0xDFDFDFDF : UInt).lnot())
+    tag = @otf.Tag(tag.as_u32() ^ (0xDFDFDFDF : UInt32).lnot())
   }
   tags.push(tag)
   true
 }
 
 ///|
-fn lang_cmp(s1 : StringView, s2 : StringView) -> Int {
+fn lang_cmp(s1 : StringView, s2 : StringView) -> Int32 {
   let da = s1.find("-").unwrap_or(s1.length())
   let db = s2.find("-").unwrap_or(s2.length())
   let n = da.max(db)

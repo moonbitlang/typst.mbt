@@ -34,7 +34,7 @@ pub fn Cff::read(data : BytesView) -> Cff raise PsError {
 }
 
 ///|
-fn split_off(d : BytesView, n : Int) -> BytesView raise PsError {
+fn split_off(d : BytesView, n : Int32) -> BytesView raise PsError {
   match get_from(d, n) {
     Some(v) => v
     None => raise oob()
@@ -55,7 +55,7 @@ pub fn Cff::names(self : Cff) -> Index1 {
 ///|
 /// Returns the PostScript name for the font in the font set at the
 /// given index.
-pub fn Cff::name(self : Cff, index : Int) -> BytesView? {
+pub fn Cff::name(self : Cff, index : Int32) -> BytesView? {
   try self.names.get(index) catch {
     _ => None
   } noraise {
@@ -107,11 +107,14 @@ pub fn Cff::global_subrs(self : Cff) -> Index1 {
 ///|
 /// Returns the character set associated with the top dict at the given
 /// index.
-pub fn Cff::charset(self : Cff, top_dict_index : Int) -> Charset? raise PsError {
+pub fn Cff::charset(
+  self : Cff,
+  top_dict_index : Int32,
+) -> Charset? raise PsError {
   let top_dict = self.top_dicts.get(top_dict_index)
   let offset_data = self.data
-  let mut charset_offset : Int? = None
-  let mut num_glyphs : Int? = None
+  let mut charset_offset : Int32? = None
+  let mut num_glyphs : Int32? = None
   for entry in entries(top_dict) {
     match entry {
       Ok(Charset(offset)) => charset_offset = Some(offset)

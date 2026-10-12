@@ -4,7 +4,7 @@
 
 ///|
 /// The number of UTF-8 bytes of a code point.
-pub fn utf8_char_len(c : Int) -> Int {
+pub fn utf8_char_len(c : Int32) -> Int32 {
   if c < 0x80 {
     1
   } else if c < 0x800 {
@@ -23,7 +23,7 @@ pub struct Utf8Text {
   text : String
   /// `cps[i]` is the code point starting at byte `i`, or `-1` if byte `i` is
   /// not a char boundary.
-  cps : FixedArray[Int]
+  cps : FixedArray[Int32]
 }
 
 ///|
@@ -48,20 +48,20 @@ pub fn Utf8Text::new(text : String) -> Utf8Text {
 
 ///|
 /// The length of the text in UTF-8 bytes.
-pub fn Utf8Text::len(self : Utf8Text) -> Int {
+pub fn Utf8Text::len(self : Utf8Text) -> Int32 {
   self.cps.length()
 }
 
 ///|
 /// Whether byte `i` is a char boundary (`i == len` counts as one).
-pub fn Utf8Text::is_char_boundary(self : Utf8Text, i : Int) -> Bool {
+pub fn Utf8Text::is_char_boundary(self : Utf8Text, i : Int32) -> Bool {
   i == self.cps.length() ||
   (i >= 0 && i < self.cps.length() && self.cps[i] >= 0)
 }
 
 ///|
 /// The code point starting at byte `i`, if `i` is a char boundary.
-pub fn Utf8Text::char_at(self : Utf8Text, i : Int) -> Int? {
+pub fn Utf8Text::char_at(self : Utf8Text, i : Int32) -> Int32? {
   if i >= 0 && i < self.cps.length() && self.cps[i] >= 0 {
     Some(self.cps[i])
   } else {
@@ -71,18 +71,18 @@ pub fn Utf8Text::char_at(self : Utf8Text, i : Int) -> Int? {
 
 ///|
 /// The `(byte index, code point)` pairs of the text.
-pub fn Utf8Text::char_indices(self : Utf8Text) -> Array[(Int, Int)] {
+pub fn Utf8Text::char_indices(self : Utf8Text) -> Array[(Int32, Int32)] {
   self.view().char_indices()
 }
 
 ///|
 /// Slice the text by UTF-8 byte offsets.
-pub fn Utf8Text::slice(self : Utf8Text, start : Int, end : Int) -> String {
+pub fn Utf8Text::slice(self : Utf8Text, start : Int32, end : Int32) -> String {
   let buf = StringBuilder()
   for i in start..<end {
     let c = self.cps[i]
     if c >= 0 {
-      buf.write_char(Int::unsafe_to_char(c))
+      buf.write_char(Int32::unsafe_to_char(c))
     }
   }
   buf.to_string()
@@ -96,13 +96,13 @@ fn Utf8Text::view(self : Utf8Text) -> TextSlice {
 ///|
 /// A subrange of a `Utf8Text`, indexed relative to its start.
 priv struct TextSlice {
-  cps : FixedArray[Int]
-  start : Int
-  end : Int
+  cps : FixedArray[Int32]
+  start : Int32
+  end : Int32
 }
 
 ///|
-fn TextSlice::len(self : TextSlice) -> Int {
+fn TextSlice::len(self : TextSlice) -> Int32 {
   self.end - self.start
 }
 
@@ -110,7 +110,7 @@ fn TextSlice::len(self : TextSlice) -> Int {
 /// Get the character at a given code unit index, along with its length in
 /// code units. Returns None if index is out of range, or points inside a
 /// multi-code-unit character.
-fn TextSlice::char_at(self : TextSlice, index : Int) -> (Int, Int)? {
+fn TextSlice::char_at(self : TextSlice, index : Int32) -> (Int32, Int32)? {
   if index >= 0 && index < self.len() {
     let c = self.cps[self.start + index]
     if c >= 0 {
@@ -121,7 +121,11 @@ fn TextSlice::char_at(self : TextSlice, index : Int) -> (Int, Int)? {
 }
 
 ///|
-fn TextSlice::subrange(self : TextSlice, start : Int, end : Int) -> TextSlice {
+fn TextSlice::subrange(
+  self : TextSlice,
+  start : Int32,
+  end : Int32,
+) -> TextSlice {
   guard start >= 0 && start <= end && end <= self.len() else {
     abort("byte index out of range")
   }
@@ -129,7 +133,7 @@ fn TextSlice::subrange(self : TextSlice, start : Int, end : Int) -> TextSlice {
 }
 
 ///|
-fn TextSlice::char_indices(self : TextSlice) -> Array[(Int, Int)] {
+fn TextSlice::char_indices(self : TextSlice) -> Array[(Int32, Int32)] {
   let out = []
   for i in self.start..<self.end {
     let c = self.cps[i]
@@ -141,7 +145,7 @@ fn TextSlice::char_indices(self : TextSlice) -> Array[(Int, Int)] {
 }
 
 ///|
-fn TextSlice::chars(self : TextSlice) -> Array[Int] {
+fn TextSlice::chars(self : TextSlice) -> Array[Int32] {
   let out = []
   for i in self.start..<self.end {
     let c = self.cps[i]
@@ -154,7 +158,7 @@ fn TextSlice::chars(self : TextSlice) -> Array[Int] {
 
 ///|
 /// The first char of the slice.
-fn TextSlice::first_char(self : TextSlice) -> Int? {
+fn TextSlice::first_char(self : TextSlice) -> Int32? {
   for i in self.start..<self.end {
     let c = self.cps[i]
     if c >= 0 {

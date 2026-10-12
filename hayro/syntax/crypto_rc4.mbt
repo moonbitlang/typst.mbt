@@ -4,14 +4,14 @@
 
 ///|
 priv struct Rc4 {
-  mut a : Int
-  mut b : Int
-  s : FixedArray[Int]
+  mut a : Int32
+  mut b : Int32
+  s : FixedArray[Int32]
 }
 
 ///|
 fn Rc4::new(key : BytesView) -> Rc4 {
-  let s : FixedArray[Int] = FixedArray::make(256, 0)
+  let s : FixedArray[Int32] = FixedArray::make(256, 0)
   let key_length = key.length()
   for i in 0..<256 {
     s[i] = i

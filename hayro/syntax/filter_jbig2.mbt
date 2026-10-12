@@ -31,7 +31,7 @@ impl @jbig2.Decoder for Jbig2BitWriterDecoder with fn next_line(self) {
 /// Expands the pixels to 8-bit luma (upstream's `Luma8Decoder`).
 priv struct Jbig2Luma8Decoder {
   output : FixedArray[Byte]
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|

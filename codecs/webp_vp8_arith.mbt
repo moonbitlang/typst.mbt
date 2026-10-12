@@ -11,14 +11,14 @@
 /// A node of a decoding tree (`TreeNode`): `left`/`right` are node indices,
 /// or leaf values with the `0x80` bit set.
 priv struct TreeNode {
-  left : Int
-  right : Int
-  mut prob : Int
-  index : Int
+  left : Int32
+  right : Int32
+  mut prob : Int32
+  index : Int32
 }
 
 ///|
-fn TreeNode::prepare_branch(t : Int) -> Int {
+fn TreeNode::prepare_branch(t : Int32) -> Int32 {
   if t > 0 {
     t / 2
   } else {
@@ -27,15 +27,15 @@ fn TreeNode::prepare_branch(t : Int) -> Int {
 }
 
 ///|
-fn TreeNode::value_from_branch(t : Int) -> Int {
+fn TreeNode::value_from_branch(t : Int32) -> Int32 {
   t & 0x7F
 }
 
 ///|
 /// `tree_nodes_from`.
 fn tree_nodes_from(
-  tree : ReadOnlyArray[Int],
-  probs : ArrayView[Int],
+  tree : ReadOnlyArray[Int32],
+  probs : ArrayView[Int32],
 ) -> FixedArray[TreeNode] {
   FixedArray::makei(probs.length(), i => {
     left: TreeNode::prepare_branch(tree[2 * i]),
@@ -48,17 +48,17 @@ fn tree_nodes_from(
 ///|
 priv struct ArithmeticDecoder {
   /// The data as big-endian 32-bit chunks.
-  mut chunks : FixedArray[UInt]
-  mut chunk_index : Int
+  mut chunks : FixedArray[UInt32]
+  mut chunk_index : Int32
   mut value : UInt64
-  mut range : UInt
-  mut bit_count : Int
-  final_bytes : FixedArray[Int]
-  mut final_bytes_remaining : Int
+  mut range : UInt32
+  mut bit_count : Int32
+  final_bytes : FixedArray[Int32]
+  mut final_bytes_remaining : Int32
 }
 
 ///|
-let final_bytes_remaining_eof : Int = -0xE
+let final_bytes_remaining_eof : Int32 = -0xE
 
 ///|
 fn ArithmeticDecoder::new() -> ArithmeticDecoder {
@@ -154,7 +154,7 @@ fn ArithmeticDecoder::load_from_final_bytes(self : ArithmeticDecoder) -> Unit {
 /// `cold_read_bit`.
 fn ArithmeticDecoder::read_bit(
   self : ArithmeticDecoder,
-  probability : Int,
+  probability : Int32,
 ) -> Bool {
   if self.bit_count < 0 {
     if self.chunk_index < self.chunks.length() {
@@ -190,7 +190,7 @@ fn ArithmeticDecoder::read_bit(
 ///|
 fn ArithmeticDecoder::read_bool(
   self : ArithmeticDecoder,
-  probability : Int,
+  probability : Int32,
 ) -> Bool {
   self.read_bit(probability)
 }
@@ -201,7 +201,10 @@ fn ArithmeticDecoder::read_flag(self : ArithmeticDecoder) -> Bool {
 }
 
 ///|
-fn ArithmeticDecoder::read_literal(self : ArithmeticDecoder, n : Int) -> Int {
+fn ArithmeticDecoder::read_literal(
+  self : ArithmeticDecoder,
+  n : Int32,
+) -> Int32 {
   let mut v = 0
   for _ in 0..<n {
     let b = self.read_flag()
@@ -213,8 +216,8 @@ fn ArithmeticDecoder::read_literal(self : ArithmeticDecoder, n : Int) -> Int {
 ///|
 fn ArithmeticDecoder::read_optional_signed_value(
   self : ArithmeticDecoder,
-  n : Int,
-) -> Int {
+  n : Int32,
+) -> Int32 {
   let flag = self.read_flag()
   if !flag {
     return 0
@@ -232,7 +235,7 @@ fn ArithmeticDecoder::read_optional_signed_value(
 fn ArithmeticDecoder::read_with_tree(
   self : ArithmeticDecoder,
   tree : FixedArray[TreeNode],
-) -> Int {
+) -> Int32 {
   self.read_with_tree_with_first_node(tree, tree[0])
 }
 
@@ -241,7 +244,7 @@ fn ArithmeticDecoder::read_with_tree_with_first_node(
   self : ArithmeticDecoder,
   tree : FixedArray[TreeNode],
   first_node : TreeNode,
-) -> Int {
+) -> Int32 {
   let mut index = first_node.index
   while true {
     let node = tree[index]

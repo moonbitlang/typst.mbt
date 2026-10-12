@@ -43,7 +43,7 @@ test "display" {
 
 ///|
 test "to_str_repeat" {
-  fn repeat(lo : Int, hi : Int, greedy : Bool) -> Expr {
+  fn repeat(lo : Int32, hi : Int32, greedy : Bool) -> Expr {
     Repeat(child=make_literal("a"), lo~, hi~, greedy~)
   }
 

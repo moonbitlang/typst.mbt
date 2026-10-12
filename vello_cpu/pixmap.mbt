@@ -4,9 +4,9 @@
 /// A pixmap of premultiplied RGBA8 values backed by a byte buffer.
 pub struct Pixmap {
   /// Width of the pixmap in pixels.
-  width : Int
+  width : Int32
   /// Height of the pixmap in pixels.
-  height : Int
+  height : Int32
   /// Buffer of the pixmap in RGBA8 format.
   buf : FixedArray[Byte]
   /// Whether the pixmap may have alpha values that are not 255.
@@ -17,7 +17,7 @@ pub struct Pixmap {
 /// Create a new pixmap with the given width and height in pixels.
 ///
 /// All pixels are initialized to transparent black.
-pub fn Pixmap::new(width : Int, height : Int) -> Pixmap {
+pub fn Pixmap::new(width : Int32, height : Int32) -> Pixmap {
   {
     width,
     height,
@@ -31,8 +31,8 @@ pub fn Pixmap::new(width : Int, height : Int) -> Pixmap {
 /// whether it may have transparent pixels.
 pub fn Pixmap::from_parts_with_opacity(
   data : FixedArray[Byte],
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   may_have_transparency : Bool,
 ) -> Pixmap {
   guard data.length() == width * height * 4 else {
@@ -45,19 +45,19 @@ pub fn Pixmap::from_parts_with_opacity(
 /// Create a new pixmap with the given premultiplied RGBA8 data.
 pub fn Pixmap::from_parts(
   data : FixedArray[Byte],
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> Pixmap {
   Pixmap::from_parts_with_opacity(data, width, height, true)
 }
 
 ///|
-pub fn Pixmap::width(self : Pixmap) -> Int {
+pub fn Pixmap::width(self : Pixmap) -> Int32 {
   self.width
 }
 
 ///|
-pub fn Pixmap::height(self : Pixmap) -> Int {
+pub fn Pixmap::height(self : Pixmap) -> Int32 {
   self.height
 }
 
@@ -75,7 +75,7 @@ pub fn Pixmap::may_have_transparency(self : Pixmap) -> Bool {
 
 ///|
 /// The packed pixel (`PremulRgba8::to_u32`, little endian) at an index.
-fn Pixmap::sample_idx(self : Pixmap, idx : UInt) -> UInt {
+fn Pixmap::sample_idx(self : Pixmap, idx : UInt32) -> UInt32 {
   let i = idx.reinterpret_as_int() * 4
   let b = self.buf
   b[i].to_uint() |
@@ -88,8 +88,8 @@ fn Pixmap::sample_idx(self : Pixmap, idx : UInt) -> UInt {
 /// A mask (alpha or luminance) with one byte per pixel.
 pub struct Mask {
   priv data : FixedArray[Byte]
-  priv width : Int
-  priv height : Int
+  priv width : Int32
+  priv height : Int32
 }
 
 ///|
@@ -108,8 +108,8 @@ pub fn Mask::new_luminance(pixmap : Pixmap) -> Mask {
 /// Create a new mask from the given alpha data.
 pub fn Mask::from_parts(
   data : FixedArray[Byte],
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> Mask {
   guard data.length() == width * height else {
     abort("`data` should have `width * height` length")
@@ -140,18 +140,18 @@ fn Mask::new_with(pixmap : Pixmap, alpha_mask : Bool) -> Mask {
 
 ///|
 /// Return the width of the mask.
-pub fn Mask::width(self : Mask) -> Int {
+pub fn Mask::width(self : Mask) -> Int32 {
   self.width
 }
 
 ///|
 /// Return the height of the mask.
-pub fn Mask::height(self : Mask) -> Int {
+pub fn Mask::height(self : Mask) -> Int32 {
   self.height
 }
 
 ///|
 /// Sample the value at a specific location.
-pub fn Mask::sample(self : Mask, x : Int, y : Int) -> Int {
+pub fn Mask::sample(self : Mask, x : Int32, y : Int32) -> Int32 {
   self.data[y * self.width + x].to_int()
 }

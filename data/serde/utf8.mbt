@@ -4,7 +4,7 @@
 /// The index up to which `bytes` is valid UTF-8 and the length of the
 /// invalid sequence (`None` if the input ends unexpectedly), or `None` if
 /// all bytes are valid (Rust's `Utf8Error::valid_up_to` / `error_len`).
-pub fn utf8_error(bytes : BytesView) -> (Int, Int?)? {
+pub fn utf8_error(bytes : BytesView) -> (Int32, Int32?)? {
   let n = bytes.length()
   let mut i = 0
   while i < n {

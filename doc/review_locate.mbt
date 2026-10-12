@@ -10,11 +10,11 @@
 /// the first equal to `from` of the second are on one line with only
 /// white space between them.
 priv struct Seg {
-  line : Int
-  start : Int
-  end : Int
-  from : Int
-  to : Int
+  line : Int32
+  start : Int32
+  end : Int32
+  from : Int32
+  to : Int32
 }
 
 ///|
@@ -22,25 +22,25 @@ priv struct Seg {
 priv struct SourceInfo {
   /// 3: the argument is a literal that is the text on the page, so words
   /// have source characters. 2: the argument, as a whole. 1: the call.
-  tier : Int
+  tier : Int32
   /// Why the location is not narrower (empty for tier 3).
   why : String
   /// The file's number among the files that were read (`-1`: none).
-  file : Int
+  file : Int32
 }
 
 ///|
 /// The lines of the source files that were read, by file.
 priv struct SourceFiles {
   provider : ((String, String) -> String?)?
-  index : Map[String, Int]
+  index : Map[String, Int32]
   lines : Array[Array[Array[Char]]]
 }
 
 ///|
 /// The number of an origin's file, read on first use (`-1`: there is no
 /// provider, or it does not have the file).
-fn SourceFiles::file(self : SourceFiles, origin : Origin) -> Int {
+fn SourceFiles::file(self : SourceFiles, origin : Origin) -> Int32 {
   guard self.provider is Some(provider) else { return -1 }
   let key = "\{origin.file}\u{0}\{origin.module_name}"
   if self.index.get(key) is Some(number) {
@@ -102,7 +102,7 @@ fn counts(c : Char) -> Bool {
 /// character on the page is its position in the literal.
 fn ReviewText::match_literal(
   self : ReviewText,
-  words : Array[Int],
+  words : Array[Int32],
   literal : Array[LitChar],
 ) -> Array[Array[Seg]]? {
   let literal = literal.filter(c => counts(c.c))
@@ -152,14 +152,14 @@ fn ReviewText::locate(
 ) -> Unit {
   let files : SourceFiles = { provider, index: Map([]), lines: self.lines, }
   // The words of each origin, in reading order.
-  let words : Array[Array[Int]] = self.origins.map(_ => [])
+  let words : Array[Array[Int32]] = self.origins.map(_ => [])
   for number, word in self.words {
     words[word.origin].push(number)
     self.segs.push([])
   }
   for id, origin in self.origins {
     let file = files.file(origin)
-    let info = (tier : Int, why : String) => { tier, why, file, }
+    let info = (tier : Int32, why : String) => { tier, why, file, }
     guard origin.param is Some(_) else {
       self.infos.push(
         info(
@@ -224,10 +224,10 @@ fn ReviewText::locate(
 /// A run of source characters of a feedback record.
 pub struct SourceSpan {
   /// The line, from 1.
-  line : Int
+  line : Int32
   /// The columns, from 1, in code points; `end` is exclusive.
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   /// The source text of the run (as written: with its escapes).
   text : String
 }
@@ -238,8 +238,8 @@ pub struct SourceSpan {
 /// the one before it ended.
 fn ReviewText::spans(
   self : ReviewText,
-  origin : Int,
-  words : Array[Int],
+  origin : Int32,
+  words : Array[Int32],
 ) -> Array[SourceSpan] {
   let file = self.infos[origin].file
   guard file >= 0 else { return [] }
@@ -266,7 +266,7 @@ fn ReviewText::spans(
 
 ///|
 /// The most lines that an excerpt shows.
-const EXCERPT_LINES : Int = 6
+const EXCERPT_LINES : Int32 = 6
 
 ///|
 /// The excerpt of an origin's source for a feedback record: the lines of
@@ -274,15 +274,15 @@ const EXCERPT_LINES : Int = 6
 /// most `EXCERPT_LINES` of them; and how many lines were left out.
 fn ReviewText::excerpt(
   self : ReviewText,
-  origin : Int,
+  origin : Int32,
   spans : Array[SourceSpan],
-) -> (Array[(Int, String)], Int) {
+) -> (Array[(Int32, String)], Int32) {
   let file = self.infos[origin].file
   guard file >= 0 else { return ([], 0) }
   // The lines, each once, in the order of first use, as far as the file
   // has them.
   let count = self.lines[file].length()
-  let lines : Array[Int] = []
+  let lines : Array[Int32] = []
   if spans.is_empty() {
     let o = self.origins[origin]
     for line in o.start_line..<(o.end_line + 1) {
@@ -291,7 +291,7 @@ fn ReviewText::excerpt(
       }
     }
   } else {
-    let seen : Map[Int, Unit] = Map([])
+    let seen : Map[Int32, Unit] = Map([])
     for span in spans {
       if !seen.contains(span.line) {
         seen[span.line] = ()
@@ -299,7 +299,7 @@ fn ReviewText::excerpt(
       }
     }
   }
-  let shown : Array[(Int, String)] = []
+  let shown : Array[(Int32, String)] = []
   for line in lines {
     guard shown.length() < EXCERPT_LINES else { break }
     shown.push((line, String::from_array(self.lines[file][line - 1])))

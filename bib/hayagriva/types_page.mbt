@@ -30,7 +30,7 @@ pub fn PageRanges::new(ranges : Array[PageRangesPart]) -> PageRanges {
 
 ///|
 /// `impl From<i32> for PageRanges`.
-pub fn PageRanges::from_int(value : Int) -> PageRanges {
+pub fn PageRanges::from_int(value : Int32) -> PageRanges {
   { ranges: [SinglePage(Numeric::new(value))], }
 }
 
@@ -47,7 +47,7 @@ pub fn PageRanges::first(self : PageRanges) -> Numeric? {
 
 ///|
 /// Order the values according to CSL rules.
-pub fn PageRanges::csl_cmp(self : PageRanges, other : PageRanges) -> Int {
+pub fn PageRanges::csl_cmp(self : PageRanges, other : PageRanges) -> Int32 {
   let n = if self.ranges.length() < other.ranges.length() {
     self.ranges.length()
   } else {
@@ -174,7 +174,7 @@ pub fn PageRangesPart::end(self : PageRangesPart) -> Numeric? {
 pub fn PageRangesPart::csl_cmp(
   self : PageRangesPart,
   other : PageRangesPart,
-) -> Int {
+) -> Int32 {
   match (self, other) {
     (Ampersand, Ampersand) => 0
     (Ampersand, _) => -1

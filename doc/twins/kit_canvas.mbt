@@ -367,7 +367,7 @@ fn kit_canvas() -> Array[Twin] {
          "#canvas(216, 40, canvas-arrow((20, 20), ((\"line\", (36, 20)),)), canvas-arrow((20, 20), ((\"line\", (32, 32)),)), canvas-arrow((20, 20), ((\"line\", (20, 36)),)), canvas-arrow((20, 20), ((\"line\", (8, 32)),)), canvas-arrow((20, 20), ((\"line\", (4, 20)),)), canvas-arrow((20, 20), ((\"line\", (8, 8)),)), canvas-arrow((20, 20), ((\"line\", (20, 4)),)), canvas-arrow((20, 20), ((\"line\", (32, 8)),)), canvas-arrow((60, 5), ((\"line\", (97, 31.5)),), stroke: luma(100)), canvas-arrow((130, 36), ((\"line\", (101.3, 2.9)),), stroke: 1.7pt + green, head: 9.3), canvas-arrow((140, 10), ((\"line\", (140, 30)), (\"line\", (142.5, 31))), head: 6), canvas-arrow((150, 30), ((\"cubic\", (160, 0), (183.7, 12.1), (183.7, 12.1)),), stroke: 0.7pt + purple), canvas-arrow((190, 5), ((\"line\", (210, 35)),), head: 0))",
       ],
       () => {
-        let box = (x : Double, shade : Int) => {
+        let box = (x : Double, shade : Int32) => {
           @kit.Canvas::rect(
             (x, 10.0),
             40.0,

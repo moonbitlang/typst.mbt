@@ -7,7 +7,7 @@
 // v128 range predicates reject those parameters).
 
 ///|
-const SENTINEL : Int = 0x5A
+const SENTINEL : Int32 = 0x5A
 
 ///|
 fn assert_bytes_eq(a : FixedArray[Byte], b : FixedArray[Byte]) -> Unit raise {
@@ -20,7 +20,7 @@ fn assert_bytes_eq(a : FixedArray[Byte], b : FixedArray[Byte]) -> Unit raise {
 }
 
 ///|
-fn assert_ints_eq(a : FixedArray[Int], b : FixedArray[Int]) -> Unit raise {
+fn assert_ints_eq(a : FixedArray[Int32], b : FixedArray[Int32]) -> Unit raise {
   assert_eq(a.length(), b.length())
   for i in 0..<a.length() {
     if a[i] != b[i] {
@@ -118,10 +118,10 @@ test "panic filter_row_cost with the output aliasing the current row" {
 /// filter in full, the least `sum_buffer` cost (ties to the later one),
 /// stopping at a zero cost.
 fn ref_adaptive_filter(
-  bpp : Int,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
-) -> (Int, FixedArray[Byte]) {
+) -> (Int32, FixedArray[Byte]) {
   let mut min_cost = 0xFFFFFFFFFFFFFFFFUL
   let mut choice = 0
   let mut best = FixedArray::make(current.length() + 1, b'\x00')

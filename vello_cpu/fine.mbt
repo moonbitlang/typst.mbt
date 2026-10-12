@@ -7,7 +7,7 @@
 
 ///|
 /// Number of color components in a single column of a tile.
-const TILE_HEIGHT_COMPONENTS : Int = 16
+const TILE_HEIGHT_COMPONENTS : Int32 = 16
 
 ///|
 /// Fine rasterizer for processing strip rows at the pixel level.
@@ -24,11 +24,11 @@ priv struct Fine {
   /// Buffer for storing gradient interpolation parameters (t values).
   mut f32_buf : FixedArray[Float]
   /// The current strip row y-coordinate.
-  mut row_y : Int
+  mut row_y : Int32
 }
 
 ///|
-fn Fine::new(buffer_width : Int) -> Fine {
+fn Fine::new(buffer_width : Int32) -> Fine {
   let scratch_len = buffer_width * TILE_HEIGHT_COMPONENTS
   {
     buffer_span: { x: 0, width: buffer_width, },
@@ -48,14 +48,14 @@ fn Fine::top(self : Fine) -> FixedArray[Byte] {
 ///|
 /// A view into a part of a single strip row of a pixmap.
 priv struct Region {
-  row_idx : Int
-  width : Int
-  height : Int
+  row_idx : Int32
+  width : Int32
+  height : Int32
   /// The target buffer, its stride in bytes and the byte offset of the
   /// region's first row.
   buf : FixedArray[Byte]
-  stride : Int
-  offset : Int
+  stride : Int32
+  offset : Int32
 }
 
 ///|
@@ -115,7 +115,7 @@ fn Fine::run_cmd(
   self : Fine,
   cmd : RenderCmd,
   bucketer : CommandBucketer,
-  row_y : Int,
+  row_y : Int32,
   resources : FineResources,
 ) -> Unit {
   match cmd {
@@ -172,7 +172,7 @@ fn Fine::opacity(self : Fine, span : Span, opacity : Float) -> Unit {
 }
 
 ///|
-fn Fine::mask(self : Fine, row_y : Int, span : Span, mask : Mask) -> Unit {
+fn Fine::mask(self : Fine, row_y : Int32, span : Span, mask : Mask) -> Unit {
   let x = span.x
   let width = span.width
   let target = self.top()
@@ -201,11 +201,11 @@ fn Fine::mask(self : Fine, row_y : Int, span : Span, mask : Mask) -> Unit {
 ///|
 fn Fine::layer_fill(
   self : Fine,
-  row_y : Int,
+  row_y : Int32,
   span : Span,
   attrs : LayerFillAttrs,
   resources : FineResources,
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   if attrs.opacity != 1.0 {
     self.opacity(span, attrs.opacity)
@@ -253,7 +253,7 @@ fn Fine::paint_fill(
   span : Span,
   attrs : PaintFillAttrs,
   resources : FineResources,
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   match attrs.paint {
     Solid(color) => self.solid_fill(span, color, attrs, resources, alphas)
@@ -268,7 +268,7 @@ fn Fine::solid_fill(
   color : PremulColor,
   attrs : PaintFillAttrs,
   resources : FineResources,
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   let start = span.x * TILE_HEIGHT_COMPONENTS
   let len = span.width * TILE_HEIGHT_COMPONENTS
@@ -311,10 +311,10 @@ const PIXEL_CENTER_OFFSET : Double = 0.5
 fn Fine::indexed_fill(
   self : Fine,
   span : Span,
-  paint_index : Int,
+  paint_index : Int32,
   attrs : PaintFillAttrs,
   resources : FineResources,
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   let x = span.x
   let y = self.row_y
@@ -336,7 +336,7 @@ fn Fine::indexed_fill(
   let default_blend = attrs.blend_mode.is_default()
   let fill_complex_paint = (
     may_have_transparency : Bool,
-    painter : (FixedArray[Byte], Int, Int) -> Unit,
+    painter : (FixedArray[Byte], Int32, Int32) -> Unit,
   ) => {
     if may_have_transparency ||
       alphas is Some(_) ||
@@ -394,7 +394,7 @@ fn Fine::indexed_fill(
       let pixmap = match image.source {
         Pixmap(pixmap) => pixmap
       }
-      let painter : (FixedArray[Byte], Int, Int) -> Unit = match
+      let painter : (FixedArray[Byte], Int32, Int32) -> Unit = match
         (image.has_skew(), image.nearest_neighbor()) {
         (false, false) =>
           // Axis-aligned with filtering - use optimized plain painters
@@ -442,11 +442,11 @@ fn Fine::indexed_fill(
 /// per-pixel alphas.
 fn fill_solid(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
   color : PremulColor,
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   let color = color.premul_u8
   if color[3] == 255 && alphas is None {
@@ -470,11 +470,11 @@ fn fill_solid(
 /// `fine_{v128,scalar}.mbt`).
 fn alpha_composite_solid_scalar(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
-  src : FixedArray[Int],
+  start : Int32,
+  len : Int32,
+  src : FixedArray[Int32],
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   match alphas {
     Some(alpha_off) => {
@@ -519,12 +519,12 @@ fn alpha_composite_solid_scalar(
 /// `alpha_composite_buffer` is in `fine_{v128,scalar}.mbt`).
 fn alpha_composite_buffer_scalar(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
+  start : Int32,
+  len : Int32,
   src : FixedArray[Byte],
-  src_start : Int,
+  src_start : Int32,
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
 ) -> Unit {
   let chunks = len / 32
   match alphas {
@@ -572,16 +572,16 @@ fn alpha_composite_buffer_scalar(
 /// chunk (`src_repeat = true`).
 fn blend(
   dest : FixedArray[Byte],
-  start : Int,
-  len : Int,
-  start_x : Int,
-  start_y : Int,
+  start : Int32,
+  len : Int32,
+  start_x : Int32,
+  start_y : Int32,
   src : FixedArray[Byte],
-  src_start : Int,
+  src_start : Int32,
   src_repeat : Bool,
   blend_mode : BlendMode,
   alpha_buf : Array[Byte],
-  alphas : Int?,
+  alphas : Int32?,
   mask : Mask?,
 ) -> Unit {
   let chunks = len / 32
@@ -602,7 +602,7 @@ fn blend(
       // The mask samples of the two columns of this chunk.
       let mask_samples = FixedArray::make(8, 255)
       if mask is Some(m) {
-        let sample = (x : Int, y : Int) => {
+        let sample = (x : Int32, y : Int32) => {
           if x < m.width() && y < m.height() {
             m.sample(x, y)
           } else {

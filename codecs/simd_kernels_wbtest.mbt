@@ -2,7 +2,7 @@
 // `*_scalar.mbt` elsewhere) against straightforward reference loops.
 
 ///|
-fn kernel_test_bytes(n : Int, seed : Int) -> FixedArray[Byte] {
+fn kernel_test_bytes(n : Int32, seed : Int32) -> FixedArray[Byte] {
   let mut x = seed.reinterpret_as_uint() * 2654435761U + 1
   FixedArray::makei(n, _ => {
     x = x * 1103515245U + 12345U
@@ -96,8 +96,8 @@ test "adler32_fixed matches adler32" {
 /// Reference PNG filter: the whole row, byte by byte (upstream
 /// `filter_internal` + `sum_buffer`).
 fn ref_filter_row(
-  filter : Int,
-  bpp : Int,
+  filter : Int32,
+  bpp : Int32,
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
 ) -> (FixedArray[Byte], UInt64) {
@@ -124,7 +124,7 @@ fn ref_filter_row(
 }
 
 ///|
-fn png_test_row(len : Int, seed : Int, kind : Int) -> FixedArray[Byte] {
+fn png_test_row(len : Int32, seed : Int32, kind : Int32) -> FixedArray[Byte] {
   let noise = kernel_test_bytes(len, seed)
   match kind {
     // random
@@ -237,7 +237,12 @@ test "paeth16 matches filter_paeth on all byte triples" {
 }
 
 ///|
-fn kernel_test_ints(n : Int, seed : Int, lo : Int, hi : Int) -> FixedArray[Int] {
+fn kernel_test_ints(
+  n : Int32,
+  seed : Int32,
+  lo : Int32,
+  hi : Int32,
+) -> FixedArray[Int32] {
   let bytes = kernel_test_bytes(4 * n, seed)
   // 32 random bits per value, reduced into `lo..=hi` in `Int64`.
   let range = hi.to_int64() - lo.to_int64() + 1L
@@ -290,7 +295,7 @@ test "upsamplers match the reference filters" {
       let out_arr = FixedArray::make(2 * len + 9, -1)
       let output : Slice = { arr: out_arr, off: 3, len: 2 * len, }
       upsample_horizontal(input, output)
-      let inp = (i : Int) => src[off + i]
+      let inp = (i : Int32) => src[off + i]
       assert_eq(out_arr[3], inp(0))
       assert_eq(out_arr[4], (inp(0) * 3 + inp(1) + 2) >> 2)
       for w in 0..<(len - 2) {
@@ -356,7 +361,11 @@ test "bench upsample_vertical 1024 samples x16" (it : @bench.T) {
 }
 
 ///|
-fn kernel_test_floats(n : Int, seed : Int, scale : Float) -> FixedArray[Float] {
+fn kernel_test_floats(
+  n : Int32,
+  seed : Int32,
+  scale : Float,
+) -> FixedArray[Float] {
   let ints = kernel_test_ints(n, seed, -100000, 100000)
   FixedArray::makei(n, i => Float::from_int(ints[i]) / 100000.0 * scale)
 }
@@ -649,7 +658,7 @@ test "bench slide_hash_chain head and prev x10" (it : @bench.T) {
 
 ///|
 /// The bitwise CRC-32 (reflected polynomial 0xEDB88320).
-fn ref_crc32(start : UInt, data : BytesView) -> UInt {
+fn ref_crc32(start : UInt32, data : BytesView) -> UInt32 {
   let mut c = start.lnot()
   for b in data {
     c = c ^ b.to_uint()

@@ -3,11 +3,11 @@
 
 ///|
 struct Rng {
-  mut s : UInt
+  mut s : UInt32
 }
 
 ///|
-fn Rng::next(self : Rng) -> UInt {
+fn Rng::next(self : Rng) -> UInt32 {
   let mut x = self.s
   x = x ^ (x << 13)
   x = x ^ (x >> 17)
@@ -17,12 +17,12 @@ fn Rng::next(self : Rng) -> UInt {
 }
 
 ///|
-fn Rng::below(self : Rng, n : UInt) -> UInt {
+fn Rng::below(self : Rng, n : UInt32) -> UInt32 {
   self.next() % n
 }
 
 ///|
-fn Rng::belowi(self : Rng, n : Int) -> Int {
+fn Rng::belowi(self : Rng, n : Int32) -> Int32 {
   (self.next() % n.reinterpret_as_uint()).reinterpret_as_int()
 }
 
@@ -302,7 +302,7 @@ fn rand_paint(
 }
 
 ///|
-fn rand_mask(r : Rng, w : UInt, h : UInt) -> @skia.Mask? {
+fn rand_mask(r : Rng, w : UInt32, h : UInt32) -> @skia.Mask? {
   if r.belowi(3) != 0 {
     return None
   }
@@ -332,7 +332,7 @@ fn fnv(data : Bytes) -> UInt64 {
 }
 
 ///|
-fn scene(seed : UInt, stroke_widths : Bool, hair : Bool) -> @skia.Pixmap {
+fn scene(seed : UInt32, stroke_widths : Bool, hair : Bool) -> @skia.Pixmap {
   let r : Rng = { s: (seed * 2654435761U + 12345U) | 1U, }
   for _ in 0..<4 {
     r.next() |> ignore

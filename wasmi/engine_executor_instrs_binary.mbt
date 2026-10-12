@@ -7,7 +7,7 @@
 
 ///|
 /// Optimized variant of Wasm `i32.div_s` for immutable non-zero `rhs` values.
-fn i32_div_s_nonzero(lhs : Int, rhs : Int) -> Int raise WasmiError {
+fn i32_div_s_nonzero(lhs : Int32, rhs : Int32) -> Int32 raise WasmiError {
   // `checked_div` with a non-zero `rhs` only fails on overflow.
   if lhs == -2147483647 - 1 && rhs == -1 {
     raise WasmiError::TrapCode(IntegerOverflow)
@@ -17,13 +17,13 @@ fn i32_div_s_nonzero(lhs : Int, rhs : Int) -> Int raise WasmiError {
 
 ///|
 /// Optimized variant of Wasm `i32.div_u` for immutable non-zero `rhs` values.
-fn i32_div_u_nonzero(lhs : Int, rhs : UInt) -> Int {
+fn i32_div_u_nonzero(lhs : Int32, rhs : UInt32) -> Int32 {
   (lhs.reinterpret_as_uint() / rhs).reinterpret_as_int()
 }
 
 ///|
 /// Optimized variant of Wasm `i32.rem_s` for immutable non-zero `rhs` values.
-fn i32_rem_s_nonzero(lhs : Int, rhs : Int) -> Int raise WasmiError {
+fn i32_rem_s_nonzero(lhs : Int32, rhs : Int32) -> Int32 raise WasmiError {
   @wasmi_core.i32_rem_s(lhs, rhs) catch {
     e => raise WasmiError::TrapCode(e)
   }
@@ -31,7 +31,7 @@ fn i32_rem_s_nonzero(lhs : Int, rhs : Int) -> Int raise WasmiError {
 
 ///|
 /// Optimized variant of Wasm `i32.rem_u` for immutable non-zero `rhs` values.
-fn i32_rem_u_nonzero(lhs : Int, rhs : UInt) -> Int {
+fn i32_rem_u_nonzero(lhs : Int32, rhs : UInt32) -> Int32 {
   (lhs.reinterpret_as_uint() % rhs).reinterpret_as_int()
 }
 

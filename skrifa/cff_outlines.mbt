@@ -8,7 +8,7 @@ pub struct CffOutlines {
   offset_data : BytesView
   global_subrs : @ps.Index
   priv top_dict : CffTopDict
-  units_per_em : Int
+  units_per_em : Int32
 }
 
 ///|
@@ -67,7 +67,7 @@ fn CffTopDict::new(
 }
 
 ///|
-fn get_from_or_empty(data : BytesView, offset : Int) -> BytesView {
+fn get_from_or_empty(data : BytesView, offset : Int32) -> BytesView {
   if offset < 0 || offset > data.length() {
     b""[:]
   } else {
@@ -85,7 +85,7 @@ pub fn CffOutlines::new(font : FontRef) -> CffOutlines? {
 ///|
 pub fn CffOutlines::from_cff(
   font : FontRef,
-  units_per_em : Int,
+  units_per_em : Int32,
 ) -> CffOutlines? {
   guard ok(() => font.cff()) is Some(cff1) else { return None }
   // GlyphHMetrics::new: hmtx is required
@@ -113,7 +113,7 @@ pub fn CffOutlines::from_cff(
 
 ///|
 /// Returns the number of available glyphs.
-pub fn CffOutlines::glyph_count(self : CffOutlines) -> Int {
+pub fn CffOutlines::glyph_count(self : CffOutlines) -> Int32 {
   self.top_dict.charstrings.count()
 }
 
@@ -123,7 +123,7 @@ pub fn CffOutlines::glyph_count(self : CffOutlines) -> Int {
 pub fn CffOutlines::subfont_index(
   self : CffOutlines,
   glyph_id : GlyphId,
-) -> Int {
+) -> Int32 {
   match self.top_dict.fd_select {
     Some(select) => select.font_index(glyph_id).unwrap_or(0)
     None => 0
@@ -142,7 +142,7 @@ priv struct CffSubfont {
 /// Creates a new subfont for the given index and size.
 fn CffOutlines::subfont(
   self : CffOutlines,
-  index : Int,
+  index : Int32,
   size : Float?,
 ) -> CffSubfont raise @ps.PsError {
   let (pd_start, pd_end, sub_matrix) = self.parse_font_dict(index)
@@ -246,7 +246,7 @@ fn CffOutlines::subfont(
 ///|
 fn CffOutlines::parse_font_dict(
   self : CffOutlines,
-  subfont_index : Int,
+  subfont_index : Int32,
 ) -> (UInt64, UInt64, @ps.ScaledFontMatrix?) raise @ps.PsError {
   if self.top_dict.font_dicts.count() != 0 {
     // If we have a font dict array, extract the private dict range

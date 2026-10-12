@@ -9,18 +9,18 @@
 /// piece and have no white space between them.
 priv struct Word {
   /// The page, from 1.
-  page : Int
+  page : Int32
   text : String
   /// Whether the word is apart from the word before it: white space, a
   /// new line or another place on the page is between them. Words that
   /// touch are parts of one written word (the piece changes inside it).
   space : Bool
   /// The number of the origin in the table.
-  origin : Int
+  origin : Int32
   /// The number of the piece: text with the same span. All runs of one
   /// `Prose` and all strings of one array have the same origin, the
   /// argument; each is a piece of its own (docs/edsl-design.md, 12.2).
-  piece : Int
+  piece : Int32
 }
 
 ///|
@@ -39,12 +39,12 @@ fn OriginTable::item_words(
   self : OriginTable,
   text : @library.TextItem,
   apart : Bool,
-) -> Array[Int] {
+) -> Array[Int32] {
   let glyphs = text.glyphs
   let word_of = Array::make(glyphs.length(), -1)
   // The byte offset of every character, to cut the text at glyph ranges.
   let chars = text.text.to_array()
-  let offsets : Array[Int] = [0]
+  let offsets : Array[Int32] = [0]
   for c in chars {
     let n = c.to_int()
     let width = if n < 0x80 {
@@ -58,14 +58,14 @@ fn OriginTable::item_words(
     }
     offsets.push(offsets[offsets.length() - 1] + width)
   }
-  let char_at = (byte : Int) => {
+  let char_at = (byte : Int32) => {
     match offsets.binary_search(byte) {
       Ok(index) => Some(index)
       Err(_) => Option::None
     }
   }
   // Parts of words: (first and end character, origin, piece, glyphs).
-  let parts : Array[(Int, Int, Int, Int, Array[Int])] = []
+  let parts : Array[(Int32, Int32, Int32, Int32, Array[Int32])] = []
   let mut open = false
   for g, glyph in glyphs {
     let (from, to) = glyph.range()
@@ -183,8 +183,8 @@ pub struct ReviewText {
 /// A selection of text: the words from one word to another, in reading
 /// order.
 pub struct Selection {
-  priv from : Int
-  priv to : Int
+  priv from : Int32
+  priv to : Int32
 }
 
 ///|
@@ -227,14 +227,14 @@ fn ReviewText::new(
 
 ///|
 /// The number of words.
-pub fn ReviewText::length(self : ReviewText) -> Int {
+pub fn ReviewText::length(self : ReviewText) -> Int32 {
   self.words.length()
 }
 
 ///|
 /// The words `from..=to` as text: words that are apart are joined with a
 /// space.
-fn ReviewText::join(self : ReviewText, from : Int, to : Int) -> String {
+fn ReviewText::join(self : ReviewText, from : Int32, to : Int32) -> String {
   let out = StringBuilder()
   let to = if to < self.words.length() { to } else { self.words.length() - 1 }
   for i in from..<(to + 1) {
@@ -255,7 +255,11 @@ pub fn ReviewText::text(self : ReviewText) -> String {
 ///|
 /// The words `from..=to` (numbers of words in reading order, from 0), in
 /// either order; `None` if there is no such word.
-pub fn ReviewText::range(self : ReviewText, from : Int, to : Int) -> Selection? {
+pub fn ReviewText::range(
+  self : ReviewText,
+  from : Int32,
+  to : Int32,
+) -> Selection? {
   let (from, to) = if from <= to { (from, to) } else { (to, from) }
   guard from >= 0 && to < self.words.length() else { return None }
   Some({ from, to, })
@@ -268,7 +272,7 @@ pub fn ReviewText::range(self : ReviewText, from : Int, to : Int) -> Selection? 
 pub fn ReviewText::find(
   self : ReviewText,
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int32 = 0,
 ) -> Selection? {
   // The needle with single spaces.
   let wanted : Array[Char] = []
@@ -285,7 +289,7 @@ pub fn ReviewText::find(
   guard wanted.length() > 0 && nth >= 0 else { return None }
   // The text, and the word of each of its characters (`-1`: a space).
   let stream : Array[Char] = []
-  let word_at : Array[Int] = []
+  let word_at : Array[Int32] = []
   for i, word in self.words {
     if i > 0 && word.space {
       stream.push(' ')

@@ -330,7 +330,7 @@ pub fn[T] bail_hinted(
 pub fn[T] bail_at(
   span : @syntax.Span,
   message : String,
-  hints? : ArrayView[String] = [],
+  hints~ : ArrayView[String] = [],
 ) -> T raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(span, message).with_hints(hints),
@@ -359,7 +359,7 @@ pub fn[T] at(
 /// `.trace(world, make_point, span)`). `range` maps spans to byte ranges
 /// (upstream `world.range`).
 pub fn[T] trace(
-  range : (@syntax.DiagSpan) -> (Int, Int)?,
+  range : (@syntax.DiagSpan) -> (Int32, Int32)?,
   make_point : () -> Tracepoint,
   span : @syntax.Span,
   f : () -> T raise SourceError,

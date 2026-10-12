@@ -948,9 +948,9 @@ pub(all) enum OtherTerm {
   // Ordinals
   Ordinal
   /// Between 0 and 99.
-  OrdinalN(Int)
+  OrdinalN(Int32)
   /// Between 0 and 10.
-  LongOrdinal(Int)
+  LongOrdinal(Int32)
   // Punctuation
   OpenQuote
   CloseQuote
@@ -1075,7 +1075,7 @@ pub fn OtherTerm::is_ordinal(self : OtherTerm) -> Bool {
 
 ///|
 /// Get the month for a number between 0 and 11.
-pub fn OtherTerm::month(i : Int) -> OtherTerm? {
+pub fn OtherTerm::month(i : Int32) -> OtherTerm? {
   match i {
     0 => Some(Month01)
     1 => Some(Month02)
@@ -1143,7 +1143,7 @@ pub extend TermConversionError with Show::{to_string, output}
 
 ///|
 /// Rust's `str::parse::<u8>` with its error kinds.
-fn parse_u8_term(s : String) -> Result[Int, TermConversionError] {
+fn parse_u8_term(s : String) -> Result[Int32, TermConversionError] {
   match @unscanny.parse_i64(s) {
     Some(v) =>
       if v >= 0L && v <= 255L {
@@ -1315,7 +1315,7 @@ pub fn OtherTerm::from_str(
 }
 
 ///|
-fn pad2(i : Int) -> String {
+fn pad2(i : Int32) -> String {
   if i < 10 {
     "0\{i}"
   } else {
@@ -1470,7 +1470,7 @@ pub extend Season with @debug.Debug::{to_repr}
 ///|
 /// Converts a season number in the range 1-4 (as defined by the CSL spec)
 /// to a Season instance.
-pub fn Season::try_from_csl_number(i : Int) -> Season? {
+pub fn Season::try_from_csl_number(i : Int32) -> Season? {
   match i {
     1 => Some(Spring)
     2 => Some(Summer)
@@ -1482,7 +1482,7 @@ pub fn Season::try_from_csl_number(i : Int) -> Season? {
 
 ///|
 /// Converts a season to its number as defined by the CSL spec.
-pub fn Season::to_csl_number(self : Season) -> Int {
+pub fn Season::to_csl_number(self : Season) -> Int32 {
   match self {
     Spring => 1
     Summer => 2

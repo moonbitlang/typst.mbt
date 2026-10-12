@@ -130,7 +130,7 @@ pub extend MathConstants with @debug.Debug::{to_repr}
 
 ///|
 /// Read an `i16` at an offset into the table.
-fn MathConstants::read_i16(self : MathConstants, offset : Int) -> Int16 {
+fn MathConstants::read_i16(self : MathConstants, offset : Int32) -> Int16 {
   (Stream::read_at(self.data, offset) : Int16) catch {
     _ => 0
   }
@@ -138,7 +138,7 @@ fn MathConstants::read_i16(self : MathConstants, offset : Int) -> Int16 {
 
 ///|
 /// Read an `u16` at an offset into the table.
-fn MathConstants::read_u16(self : MathConstants, offset : Int) -> UInt16 {
+fn MathConstants::read_u16(self : MathConstants, offset : Int32) -> UInt16 {
   (Stream::read_at(self.data, offset) : UInt16) catch {
     _ => 0
   }
@@ -146,7 +146,10 @@ fn MathConstants::read_u16(self : MathConstants, offset : Int) -> UInt16 {
 
 ///|
 /// Read a `MathValueRecord` at an offset into the table.
-fn MathConstants::read_record(self : MathConstants, offset : Int) -> MathValue {
+fn MathConstants::read_record(
+  self : MathConstants,
+  offset : Int32,
+) -> MathValue {
   let v = match slice_from(self.data, offset) {
     Some(data) => MathValue::parse(data, self.data)
     None => None
@@ -155,172 +158,172 @@ fn MathConstants::read_record(self : MathConstants, offset : Int) -> MathValue {
 }
 
 ///|
-const SCRIPT_PERCENT_SCALE_DOWN_OFFSET : Int = 0
+const SCRIPT_PERCENT_SCALE_DOWN_OFFSET : Int32 = 0
 
 ///|
-const SCRIPT_SCRIPT_PERCENT_SCALE_DOWN_OFFSET : Int = 2
+const SCRIPT_SCRIPT_PERCENT_SCALE_DOWN_OFFSET : Int32 = 2
 
 ///|
-const DELIMITED_SUB_FORMULA_MIN_HEIGHT_OFFSET : Int = 4
+const DELIMITED_SUB_FORMULA_MIN_HEIGHT_OFFSET : Int32 = 4
 
 ///|
-const DISPLAY_OPERATOR_MIN_HEIGHT_OFFSET : Int = 6
+const DISPLAY_OPERATOR_MIN_HEIGHT_OFFSET : Int32 = 6
 
 ///|
-const MATH_LEADING_OFFSET : Int = 8
+const MATH_LEADING_OFFSET : Int32 = 8
 
 ///|
-const AXIS_HEIGHT_OFFSET : Int = 12
+const AXIS_HEIGHT_OFFSET : Int32 = 12
 
 ///|
-const ACCENT_BASE_HEIGHT_OFFSET : Int = 16
+const ACCENT_BASE_HEIGHT_OFFSET : Int32 = 16
 
 ///|
-const FLATTENED_ACCENT_BASE_HEIGHT_OFFSET : Int = 20
+const FLATTENED_ACCENT_BASE_HEIGHT_OFFSET : Int32 = 20
 
 ///|
-const SUBSCRIPT_SHIFT_DOWN_OFFSET : Int = 24
+const SUBSCRIPT_SHIFT_DOWN_OFFSET : Int32 = 24
 
 ///|
-const SUBSCRIPT_TOP_MAX_OFFSET : Int = 28
+const SUBSCRIPT_TOP_MAX_OFFSET : Int32 = 28
 
 ///|
-const SUBSCRIPT_BASELINE_DROP_MIN_OFFSET : Int = 32
+const SUBSCRIPT_BASELINE_DROP_MIN_OFFSET : Int32 = 32
 
 ///|
-const SUPERSCRIPT_SHIFT_UP_OFFSET : Int = 36
+const SUPERSCRIPT_SHIFT_UP_OFFSET : Int32 = 36
 
 ///|
-const SUPERSCRIPT_SHIFT_UP_CRAMPED_OFFSET : Int = 40
+const SUPERSCRIPT_SHIFT_UP_CRAMPED_OFFSET : Int32 = 40
 
 ///|
-const SUPERSCRIPT_BOTTOM_MIN_OFFSET : Int = 44
+const SUPERSCRIPT_BOTTOM_MIN_OFFSET : Int32 = 44
 
 ///|
-const SUPERSCRIPT_BASELINE_DROP_MAX_OFFSET : Int = 48
+const SUPERSCRIPT_BASELINE_DROP_MAX_OFFSET : Int32 = 48
 
 ///|
-const SUB_SUPERSCRIPT_GAP_MIN_OFFSET : Int = 52
+const SUB_SUPERSCRIPT_GAP_MIN_OFFSET : Int32 = 52
 
 ///|
-const SUPERSCRIPT_BOTTOM_MAX_WITH_SUBSCRIPT_OFFSET : Int = 56
+const SUPERSCRIPT_BOTTOM_MAX_WITH_SUBSCRIPT_OFFSET : Int32 = 56
 
 ///|
-const SPACE_AFTER_SCRIPT_OFFSET : Int = 60
+const SPACE_AFTER_SCRIPT_OFFSET : Int32 = 60
 
 ///|
-const UPPER_LIMIT_GAP_MIN_OFFSET : Int = 64
+const UPPER_LIMIT_GAP_MIN_OFFSET : Int32 = 64
 
 ///|
-const UPPER_LIMIT_BASELINE_RISE_MIN_OFFSET : Int = 68
+const UPPER_LIMIT_BASELINE_RISE_MIN_OFFSET : Int32 = 68
 
 ///|
-const LOWER_LIMIT_GAP_MIN_OFFSET : Int = 72
+const LOWER_LIMIT_GAP_MIN_OFFSET : Int32 = 72
 
 ///|
-const LOWER_LIMIT_BASELINE_DROP_MIN_OFFSET : Int = 76
+const LOWER_LIMIT_BASELINE_DROP_MIN_OFFSET : Int32 = 76
 
 ///|
-const STACK_TOP_SHIFT_UP_OFFSET : Int = 80
+const STACK_TOP_SHIFT_UP_OFFSET : Int32 = 80
 
 ///|
-const STACK_TOP_DISPLAY_STYLE_SHIFT_UP_OFFSET : Int = 84
+const STACK_TOP_DISPLAY_STYLE_SHIFT_UP_OFFSET : Int32 = 84
 
 ///|
-const STACK_BOTTOM_SHIFT_DOWN_OFFSET : Int = 88
+const STACK_BOTTOM_SHIFT_DOWN_OFFSET : Int32 = 88
 
 ///|
-const STACK_BOTTOM_DISPLAY_STYLE_SHIFT_DOWN_OFFSET : Int = 92
+const STACK_BOTTOM_DISPLAY_STYLE_SHIFT_DOWN_OFFSET : Int32 = 92
 
 ///|
-const STACK_GAP_MIN_OFFSET : Int = 96
+const STACK_GAP_MIN_OFFSET : Int32 = 96
 
 ///|
-const STACK_DISPLAY_STYLE_GAP_MIN_OFFSET : Int = 100
+const STACK_DISPLAY_STYLE_GAP_MIN_OFFSET : Int32 = 100
 
 ///|
-const STRETCH_STACK_TOP_SHIFT_UP_OFFSET : Int = 104
+const STRETCH_STACK_TOP_SHIFT_UP_OFFSET : Int32 = 104
 
 ///|
-const STRETCH_STACK_BOTTOM_SHIFT_DOWN_OFFSET : Int = 108
+const STRETCH_STACK_BOTTOM_SHIFT_DOWN_OFFSET : Int32 = 108
 
 ///|
-const STRETCH_STACK_GAP_ABOVE_MIN_OFFSET : Int = 112
+const STRETCH_STACK_GAP_ABOVE_MIN_OFFSET : Int32 = 112
 
 ///|
-const STRETCH_STACK_GAP_BELOW_MIN_OFFSET : Int = 116
+const STRETCH_STACK_GAP_BELOW_MIN_OFFSET : Int32 = 116
 
 ///|
-const FRACTION_NUMERATOR_SHIFT_UP_OFFSET : Int = 120
+const FRACTION_NUMERATOR_SHIFT_UP_OFFSET : Int32 = 120
 
 ///|
-const FRACTION_NUMERATOR_DISPLAY_STYLE_SHIFT_UP_OFFSET : Int = 124
+const FRACTION_NUMERATOR_DISPLAY_STYLE_SHIFT_UP_OFFSET : Int32 = 124
 
 ///|
-const FRACTION_DENOMINATOR_SHIFT_DOWN_OFFSET : Int = 128
+const FRACTION_DENOMINATOR_SHIFT_DOWN_OFFSET : Int32 = 128
 
 ///|
-const FRACTION_DENOMINATOR_DISPLAY_STYLE_SHIFT_DOWN_OFFSET : Int = 132
+const FRACTION_DENOMINATOR_DISPLAY_STYLE_SHIFT_DOWN_OFFSET : Int32 = 132
 
 ///|
-const FRACTION_NUMERATOR_GAP_MIN_OFFSET : Int = 136
+const FRACTION_NUMERATOR_GAP_MIN_OFFSET : Int32 = 136
 
 ///|
-const FRACTION_NUM_DISPLAY_STYLE_GAP_MIN_OFFSET : Int = 140
+const FRACTION_NUM_DISPLAY_STYLE_GAP_MIN_OFFSET : Int32 = 140
 
 ///|
-const FRACTION_RULE_THICKNESS_OFFSET : Int = 144
+const FRACTION_RULE_THICKNESS_OFFSET : Int32 = 144
 
 ///|
-const FRACTION_DENOMINATOR_GAP_MIN_OFFSET : Int = 148
+const FRACTION_DENOMINATOR_GAP_MIN_OFFSET : Int32 = 148
 
 ///|
-const FRACTION_DENOM_DISPLAY_STYLE_GAP_MIN_OFFSET : Int = 152
+const FRACTION_DENOM_DISPLAY_STYLE_GAP_MIN_OFFSET : Int32 = 152
 
 ///|
-const SKEWED_FRACTION_HORIZONTAL_GAP_OFFSET : Int = 156
+const SKEWED_FRACTION_HORIZONTAL_GAP_OFFSET : Int32 = 156
 
 ///|
-const SKEWED_FRACTION_VERTICAL_GAP_OFFSET : Int = 160
+const SKEWED_FRACTION_VERTICAL_GAP_OFFSET : Int32 = 160
 
 ///|
-const OVERBAR_VERTICAL_GAP_OFFSET : Int = 164
+const OVERBAR_VERTICAL_GAP_OFFSET : Int32 = 164
 
 ///|
-const OVERBAR_RULE_THICKNESS_OFFSET : Int = 168
+const OVERBAR_RULE_THICKNESS_OFFSET : Int32 = 168
 
 ///|
-const OVERBAR_EXTRA_ASCENDER_OFFSET : Int = 172
+const OVERBAR_EXTRA_ASCENDER_OFFSET : Int32 = 172
 
 ///|
-const UNDERBAR_VERTICAL_GAP_OFFSET : Int = 176
+const UNDERBAR_VERTICAL_GAP_OFFSET : Int32 = 176
 
 ///|
-const UNDERBAR_RULE_THICKNESS_OFFSET : Int = 180
+const UNDERBAR_RULE_THICKNESS_OFFSET : Int32 = 180
 
 ///|
-const UNDERBAR_EXTRA_DESCENDER_OFFSET : Int = 184
+const UNDERBAR_EXTRA_DESCENDER_OFFSET : Int32 = 184
 
 ///|
-const RADICAL_VERTICAL_GAP_OFFSET : Int = 188
+const RADICAL_VERTICAL_GAP_OFFSET : Int32 = 188
 
 ///|
-const RADICAL_DISPLAY_STYLE_VERTICAL_GAP_OFFSET : Int = 192
+const RADICAL_DISPLAY_STYLE_VERTICAL_GAP_OFFSET : Int32 = 192
 
 ///|
-const RADICAL_RULE_THICKNESS_OFFSET : Int = 196
+const RADICAL_RULE_THICKNESS_OFFSET : Int32 = 196
 
 ///|
-const RADICAL_EXTRA_ASCENDER_OFFSET : Int = 200
+const RADICAL_EXTRA_ASCENDER_OFFSET : Int32 = 200
 
 ///|
-const RADICAL_KERN_BEFORE_DEGREE_OFFSET : Int = 204
+const RADICAL_KERN_BEFORE_DEGREE_OFFSET : Int32 = 204
 
 ///|
-const RADICAL_KERN_AFTER_DEGREE_OFFSET : Int = 208
+const RADICAL_KERN_AFTER_DEGREE_OFFSET : Int32 = 208
 
 ///|
-const RADICAL_DEGREE_BOTTOM_RAISE_PERCENT_OFFSET : Int = 212
+const RADICAL_DEGREE_BOTTOM_RAISE_PERCENT_OFFSET : Int32 = 212
 
 ///|
 /// Percentage of scaling down for level 1 superscripts and subscripts.

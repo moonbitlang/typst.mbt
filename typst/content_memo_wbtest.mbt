@@ -12,7 +12,7 @@ priv struct FilesWorld {
   sources : Map[@syntax.FileId, @syntax.Source]
   files : Map[@syntax.FileId, Bytes]
   /// The number of files handed out (reads of the world).
-  mut reads : Int
+  mut reads : Int32
 }
 
 ///|
@@ -354,7 +354,7 @@ test "raw: blocks that differ in one argument of highlighting" {
 
 ///|
 test "images: a file that changes behind its path, and a broken one" {
-  let png = (seed : Int) => {
+  let png = (seed : Int32) => {
     let pixels = Bytes::makei(4 * 3 * 3, i => ((seed + i) * 7).to_byte())
     @codecs.encode_png(pixels[:], 4, 3, Rgb)
   }

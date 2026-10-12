@@ -6,26 +6,26 @@
 ///
 /// The rectangle is considered to be empty when `x0 >= x1` or `y0 >= y1`.
 priv struct RectU16 {
-  x0 : Int
-  y0 : Int
-  mut x1 : Int
-  mut y1 : Int
+  x0 : Int32
+  y0 : Int32
+  mut x1 : Int32
+  mut y1 : Int32
 }
 
 ///|
-fn RectU16::new(x0 : Int, y0 : Int, x1 : Int, y1 : Int) -> RectU16 {
+fn RectU16::new(x0 : Int32, y0 : Int32, x1 : Int32, y1 : Int32) -> RectU16 {
   { x0, y0, x1, y1, }
 }
 
 ///|
 /// The width of the rectangle (`x1 - x0`), saturating at zero.
-fn RectU16::width(self : RectU16) -> Int {
+fn RectU16::width(self : RectU16) -> Int32 {
   u16_sat_sub(self.x1, self.x0)
 }
 
 ///|
 /// The height of the rectangle (`y1 - y0`), saturating at zero.
-fn RectU16::height(self : RectU16) -> Int {
+fn RectU16::height(self : RectU16) -> Int32 {
   u16_sat_sub(self.y1, self.y0)
 }
 
@@ -69,7 +69,7 @@ fn RectU16::snap_to_tile_coordinates(self : RectU16) -> RectU16 {
 
 ///|
 /// `u16::checked_next_multiple_of(..).unwrap_or(u16::MAX)`.
-fn checked_next_multiple(x : Int, m : Int) -> Int {
+fn checked_next_multiple(x : Int32, m : Int32) -> Int32 {
   let r = (x + m - 1) / m * m
   if r > 65535 {
     65535

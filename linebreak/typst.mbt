@@ -41,7 +41,7 @@ pub(all) enum Breakpoint {
   Mandatory
   /// An opportunity for hyphenating and how many chars are before/after it
   /// in the word.
-  Hyphen(Int, Int)
+  Hyphen(Int32, Int32)
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -67,10 +67,10 @@ pub(all) struct Trim {
   /// The text in the range `layout..shaping` should be shaped but should not
   /// affect layout. This ensures that we trim spaces for layout purposes, but
   /// still render zero-advance space glyphs for copy paste.
-  layout : Int
+  layout : Int32
   /// The text should only be shaped up until the given text offset. Newlines
   /// are already trimmed here.
-  shaping : Int
+  shaping : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -85,13 +85,17 @@ pub extend Trim with @debug.Debug::{to_repr}
 
 ///|
 /// Create an instance with equal layout and shaping trim.
-fn Trim::uniform(trim : Int) -> Trim {
+fn Trim::uniform(trim : Int32) -> Trim {
   { layout: trim, shaping: trim, }
 }
 
 ///|
 /// Trim a line before this breakpoint.
-pub fn Breakpoint::trim(self : Breakpoint, start : Int, line : String) -> Trim {
+pub fn Breakpoint::trim(
+  self : Breakpoint,
+  start : Int32,
+  line : String,
+) -> Trim {
   match self {
     // Trailing whitespace should be shaped, but the glyphs should have
     // their advance width zeroed. This way, they are available for copy
@@ -111,7 +115,7 @@ pub fn Breakpoint::trim(self : Breakpoint, start : Int, line : String) -> Trim {
     // - `\u{2069}` POP isolate
     Normal => {
       let trimmed = trim_end_len(line, c => {
-        let ch = Int::unsafe_to_char(c)
+        let ch = Int32::unsafe_to_char(c)
         @unicode.is_whitespace(ch) || @unicode.is_default_ignorable(ch)
       })
       { layout: start + trimmed, shaping: start + utf8_str_len(line), }
@@ -136,9 +140,9 @@ pub fn Breakpoint::trim(self : Breakpoint, start : Int, line : String) -> Trim {
 /// `trimmed_len` (the same result without building the line's string).
 pub fn Breakpoint::trim_by(
   self : Breakpoint,
-  start : Int,
-  end : Int,
-  trimmed_len : ((Int) -> Bool) -> Int,
+  start : Int32,
+  end : Int32,
+  trimmed_len : ((Int32) -> Bool) -> Int32,
 ) -> Trim {
   match self {
     Normal => { layout: start + trimmed_len(c => self.trims(c)), shaping: end, }
@@ -150,10 +154,10 @@ pub fn Breakpoint::trim_by(
 ///|
 /// Whether a trailing char is trimmed from lines ending at this breakpoint
 /// (see [Breakpoint::trim]).
-pub fn Breakpoint::trims(self : Breakpoint, c : Int) -> Bool {
+pub fn Breakpoint::trims(self : Breakpoint, c : Int32) -> Bool {
   match self {
     Normal => {
-      let ch = Int::unsafe_to_char(c)
+      let ch = Int32::unsafe_to_char(c)
       @unicode.is_whitespace(ch) || @unicode.is_default_ignorable(ch)
     }
     Mandatory =>
@@ -170,7 +174,7 @@ pub fn Breakpoint::is_hyphen(self : Breakpoint) -> Bool {
 
 ///|
 /// The UTF-8 length of `s` after trimming trailing chars matching `pred`.
-fn trim_end_len(s : String, pred : (Int) -> Bool) -> Int {
+fn trim_end_len(s : String, pred : (Int32) -> Bool) -> Int32 {
   let mut end = s.length()
   while end > 0 {
     let { cp: c, idx: start, } = @unicode.decode_before(s, end)
@@ -183,7 +187,7 @@ fn trim_end_len(s : String, pred : (Int) -> Bool) -> Int {
 }
 
 ///|
-fn utf8_str_len(s : StringView) -> Int {
+fn utf8_str_len(s : StringView) -> Int32 {
   let mut n = 0
   for i = 0; i < s.length(); {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
@@ -199,9 +203,9 @@ priv struct Utf8Str {
   text : String
   /// `to_utf16[i]` is the UTF-16 index of byte offset `i`, or `-1` if `i`
   /// is not a char boundary. Has length `len + 1`.
-  to_utf16 : FixedArray[Int]
+  to_utf16 : FixedArray[Int32]
   /// `cps[i]` is the code point starting at byte `i`, or `-1`.
-  cps : FixedArray[Int]
+  cps : FixedArray[Int32]
 }
 
 ///|
@@ -222,12 +226,12 @@ fn Utf8Str::new(text : String) -> Utf8Str {
 }
 
 ///|
-fn Utf8Str::len(self : Utf8Str) -> Int {
+fn Utf8Str::len(self : Utf8Str) -> Int32 {
   self.cps.length()
 }
 
 ///|
-fn Utf8Str::slice(self : Utf8Str, start : Int, end : Int) -> StringView {
+fn Utf8Str::slice(self : Utf8Str, start : Int32, end : Int32) -> StringView {
   self.text.view(
     start_offset=self.to_utf16[start],
     end_offset=self.to_utf16[end],
@@ -236,7 +240,7 @@ fn Utf8Str::slice(self : Utf8Str, start : Int, end : Int) -> StringView {
 
 ///|
 /// The last char before byte offset `i`.
-fn Utf8Str::char_before(self : Utf8Str, i : Int) -> Int? {
+fn Utf8Str::char_before(self : Utf8Str, i : Int32) -> Int32? {
   if i <= 0 {
     return None
   }
@@ -260,9 +264,9 @@ pub fn breakpoints(
   text : String,
   cj~ : Bool,
   hyphenate~ : Bool,
-  lang_at~ : (Int) -> @hypher.Lang?,
-  hyphenate_at~ : (Int) -> Bool,
-  f : (Int, Breakpoint) -> Unit,
+  lang_at~ : (Int32) -> @hypher.Lang?,
+  hyphenate_at~ : (Int32) -> Bool,
+  f : (Int32, Breakpoint) -> Unit,
 ) -> Unit {
   // Single breakpoint at the end for empty text.
   if text.is_empty() {
@@ -358,7 +362,7 @@ pub fn breakpoints(
 fn all_alphabetic(s : StringView) -> Bool {
   for i = 0; i < s.length(); {
     let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    if !@unicode.is_alphabetic(Int::unsafe_to_char(c)) {
+    if !@unicode.is_alphabetic(Int32::unsafe_to_char(c)) {
       return false
     }
     continue next
@@ -371,7 +375,7 @@ fn all_alphabetic(s : StringView) -> Bool {
 ///
 /// Anything matching this grammar rule that is also followed by '://', is
 /// treated as a potential URL scheme.
-fn find_url_scheme(t : Utf8Str, base : Int) -> (Int, Int)? {
+fn find_url_scheme(t : Utf8Str, base : Int32) -> (Int32, Int32)? {
   let text = t.slice(base, t.len())
   guard text.find("://") is Some(end16) else { return None }
   let prefix = text.view(end_offset=end16)
@@ -390,7 +394,7 @@ fn find_url_scheme(t : Utf8Str, base : Int) -> (Int, Int)? {
 ///
 /// This method uses the scheme grammar from
 /// <https://www.rfc-editor.org/info/rfc3986/#section-3.1>.
-fn is_valid_in_url_scheme(c : Int) -> Bool {
+fn is_valid_in_url_scheme(c : Int32) -> Bool {
   // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
   c == '+' ||
   c == '-' ||
@@ -403,11 +407,11 @@ fn is_valid_in_url_scheme(c : Int) -> Bool {
 ///|
 /// Generate breakpoints for hyphenations within a word.
 fn hyphenations(
-  lang_at : (Int) -> @hypher.Lang?,
-  hyphenate_at : (Int) -> Bool,
-  offset : Int,
+  lang_at : (Int32) -> @hypher.Lang?,
+  hyphenate_at : (Int32) -> Bool,
+  offset : Int32,
   word : StringView,
-  f : (Int, Breakpoint) -> Unit,
+  f : (Int32, Breakpoint) -> Unit,
 ) -> Unit {
   guard lang_at(offset) is Some(lang) else { return }
   let mut offset = offset
@@ -447,7 +451,7 @@ fn hyphenations(
 }
 
 ///|
-fn char_count(s : StringView) -> Int {
+fn char_count(s : StringView) -> Int32 {
   let mut n = 0
   for i = 0; i < s.length(); {
     let { idx: next, .. } = @unicode.decode_at(s, i)
@@ -466,8 +470,8 @@ priv enum LinkClass {
 } derive(Eq)
 
 ///|
-fn LinkClass::of(c : Int) -> LinkClass {
-  let ch = Int::unsafe_to_char(c)
+fn LinkClass::of(c : Int32) -> LinkClass {
+  let ch = Int32::unsafe_to_char(c)
   if @unicode.is_alphabetic(ch) {
     Alphabetic
   } else if @unicode.is_numeric(ch) {
@@ -481,7 +485,7 @@ fn LinkClass::of(c : Int) -> LinkClass {
 
 ///|
 /// Produce linebreak opportunities for a link.
-fn linebreak_link(link : String, f : (Int) -> Unit) -> Unit {
+fn linebreak_link(link : String, f : (Int32) -> Unit) -> Unit {
   let t = Utf8Str::new(link)
   let mut offset = 0
   let mut prev = Other

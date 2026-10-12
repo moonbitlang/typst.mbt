@@ -4,10 +4,10 @@
 // the prefix (e.g. `_hb_glyph_info_is_mark` is `GlyphInfo::is_mark`).
 
 ///|
-const MAX_NESTING_LEVEL : Int = 64
+const MAX_NESTING_LEVEL : Int32 = 64
 
 ///|
-const MAX_CONTEXT_LENGTH : Int = 64
+const MAX_CONTEXT_LENGTH : Int32 = 64
 
 ///|
 fn hb_ot_layout_has_kerning(face : Face) -> Bool {
@@ -60,7 +60,7 @@ priv enum TableIndex {
 } derive(Eq)
 
 ///|
-fn TableIndex::to_int(self : TableIndex) -> Int {
+fn TableIndex::to_int(self : TableIndex) -> Int32 {
   match self {
     GSUB => 0
     GPOS => 1
@@ -71,7 +71,7 @@ fn TableIndex::to_int(self : TableIndex) -> Int {
 /// A lookup in a layout table (`LayoutLookup`).
 priv trait LayoutLookup {
   /// The lookup's lookup_props.
-  fn props(Self) -> UInt
+  fn props(Self) -> UInt32
   /// Whether the lookup has to be applied backwards.
   fn is_reverse(Self) -> Bool
   /// The digest of the lookup.
@@ -91,7 +91,7 @@ priv trait LayoutLookup {
 fn layout_select_script(
   this : @otf.LayoutTable,
   script_tags : Array[@otf.Tag],
-) -> (Bool, Int, @otf.Tag)? {
+) -> (Bool, Int32, @otf.Tag)? {
   for tag in script_tags {
     if this.scripts.index(tag) is Some(index) {
       return Some((true, index.to_int(), tag))
@@ -121,9 +121,9 @@ fn layout_select_script(
 /// GPOS table, underneath the specified script index.
 fn layout_select_script_language(
   this : @otf.LayoutTable,
-  script_index : Int,
+  script_index : Int32,
   lang_tags : Array[@otf.Tag],
-) -> Int? {
+) -> Int32? {
   guard (this.scripts.get(script_index.to_uint16()) : @otf.Script?)
     is Some(script) else {
     return None
@@ -144,8 +144,8 @@ fn layout_select_script_language(
 ///|
 fn layout_lang_sys(
   this : @otf.LayoutTable,
-  script_index : Int,
-  lang_index : Int?,
+  script_index : Int32,
+  lang_index : Int32?,
 ) -> @otf.LanguageSystem? {
   guard (this.scripts.get(script_index.to_uint16()) : @otf.Script?)
     is Some(script) else {
@@ -164,9 +164,9 @@ fn layout_lang_sys(
 /// GPOS table, underneath the specified script and language.
 fn layout_get_required_language_feature(
   this : @otf.LayoutTable,
-  script_index : Int,
-  lang_index : Int?,
-) -> (Int, @otf.Tag)? {
+  script_index : Int32,
+  lang_index : Int32?,
+) -> (Int32, @otf.Tag)? {
   guard layout_lang_sys(this, script_index, lang_index) is Some(sys) else {
     return None
   }
@@ -184,10 +184,10 @@ fn layout_get_required_language_feature(
 /// underneath the specified script and language.
 fn layout_find_language_feature(
   this : @otf.LayoutTable,
-  script_index : Int,
-  lang_index : Int?,
+  script_index : Int32,
+  lang_index : Int32?,
   feature_tag : @otf.Tag,
-) -> Int? {
+) -> Int32? {
   guard layout_lang_sys(this, script_index, lang_index) is Some(sys) else {
     return None
   }
@@ -330,14 +330,14 @@ fn[L : LayoutLookup] apply_backward(ctx : ApplyContext, lookup : L) -> Bool {
 // remember them.
 
 ///|
-fn GlyphInfo::set_general_category(self : GlyphInfo, gen_cat : Int) -> Unit {
+fn GlyphInfo::set_general_category(self : GlyphInfo, gen_cat : Int32) -> Unit {
   // Clears top-byte.
   let n = gen_cat | (self.unicode_props() & (0xFF & UPROPS_MASK_GEN_CAT.lnot()))
   self.set_unicode_props(n)
 }
 
 ///|
-fn GlyphInfo::get_general_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_general_category(self : GlyphInfo) -> Int32 {
   self.unicode_props() & UPROPS_MASK_GEN_CAT
 }
 
@@ -349,7 +349,7 @@ fn GlyphInfo::is_unicode_mark(self : GlyphInfo) -> Bool {
 ///|
 fn GlyphInfo::set_modified_combining_class(
   self : GlyphInfo,
-  modified_class : Int,
+  modified_class : Int32,
 ) -> Unit {
   if !self.is_unicode_mark() {
     return
@@ -359,7 +359,7 @@ fn GlyphInfo::set_modified_combining_class(
 }
 
 ///|
-fn GlyphInfo::get_modified_combining_class(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_modified_combining_class(self : GlyphInfo) -> Int32 {
   if self.is_unicode_mark() {
     (self.unicode_props() >> 8) & 0xFF
   } else {
@@ -375,7 +375,7 @@ fn GlyphInfo::is_unicode_space(self : GlyphInfo) -> Bool {
 ///|
 fn GlyphInfo::set_unicode_space_fallback_type(
   self : GlyphInfo,
-  s : Int,
+  s : Int32,
 ) -> Unit {
   if !self.is_unicode_space() {
     return
@@ -385,7 +385,7 @@ fn GlyphInfo::set_unicode_space_fallback_type(
 }
 
 ///|
-fn GlyphInfo::get_unicode_space_fallback_type(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_unicode_space_fallback_type(self : GlyphInfo) -> Int32 {
   if self.is_unicode_space() {
     (self.unicode_props() >> 8) & 0xFF
   } else {
@@ -501,13 +501,13 @@ fn GlyphInfo::is_zwj(self : GlyphInfo) -> Bool {
 // to marks that belong to the same component of the same ligature.
 
 ///|
-const IS_LIG_BASE : Int = 0x10
+const IS_LIG_BASE : Int32 = 0x10
 
 ///|
 fn GlyphInfo::set_lig_props_for_ligature(
   self : GlyphInfo,
-  lig_id : Int,
-  lig_num_comps : Int,
+  lig_id : Int32,
+  lig_num_comps : Int32,
 ) -> Unit {
   self.set_lig_props(
     ((lig_id << 5) & 0xFF) | IS_LIG_BASE | (lig_num_comps & 0x0F),
@@ -517,19 +517,22 @@ fn GlyphInfo::set_lig_props_for_ligature(
 ///|
 fn GlyphInfo::set_lig_props_for_mark(
   self : GlyphInfo,
-  lig_id : Int,
-  lig_comp : Int,
+  lig_id : Int32,
+  lig_comp : Int32,
 ) -> Unit {
   self.set_lig_props(((lig_id << 5) & 0xFF) | (lig_comp & 0x0F))
 }
 
 ///|
-fn GlyphInfo::set_lig_props_for_component(self : GlyphInfo, comp : Int) -> Unit {
+fn GlyphInfo::set_lig_props_for_component(
+  self : GlyphInfo,
+  comp : Int32,
+) -> Unit {
   self.set_lig_props_for_mark(0, comp)
 }
 
 ///|
-fn GlyphInfo::get_lig_id(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_lig_id(self : GlyphInfo) -> Int32 {
   self.lig_props() >> 5
 }
 
@@ -539,7 +542,7 @@ fn GlyphInfo::ligated_internal(self : GlyphInfo) -> Bool {
 }
 
 ///|
-fn GlyphInfo::get_lig_comp(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_lig_comp(self : GlyphInfo) -> Int32 {
   if self.ligated_internal() {
     0
   } else {
@@ -548,7 +551,7 @@ fn GlyphInfo::get_lig_comp(self : GlyphInfo) -> Int {
 }
 
 ///|
-fn GlyphInfo::get_lig_num_comps(self : GlyphInfo) -> Int {
+fn GlyphInfo::get_lig_num_comps(self : GlyphInfo) -> Int32 {
   if (self.glyph_props() & GLYPH_PROPS_LIGATURE) != 0 && self.ligated_internal() {
     self.lig_props() & 0x0F
   } else {

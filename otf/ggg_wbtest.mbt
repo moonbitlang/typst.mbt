@@ -1,5 +1,5 @@
 ///|
-fn ggg_test_bytes(words : Array[Int]) -> BytesView {
+fn ggg_test_bytes(words : Array[Int32]) -> BytesView {
   let bytes : Array[Byte] = []
   for w in words {
     bytes.push((w >> 8).to_byte())

@@ -425,8 +425,8 @@ fn eval_math_args(
 ) -> @library.Args raise @library.SourceError {
   let named : Array[@library.Arg] = []
   let pos : Array[@library.Arg] = []
-  let mut two_dim_start : Int? = None
-  let drain_into_array = (start : Int, span : @syntax.Span) => {
+  let mut two_dim_start : Int32? = None
+  let drain_into_array = (start : Int32, span : @syntax.Span) => {
     let array = pos[start:].iter().map(arg => arg.value.v).collect()
     pos.truncate(start)
     pos.push({
@@ -710,7 +710,7 @@ pub struct CapturesVisitor {
   /// identifiers that `capture` would look up instead of capturing them,
   /// with the modes each name was recorded in (1: code, 2: math).
   priv recording : Array[CaptureAttempt]?
-  priv recorded_modes : Map[String, Int]
+  priv recorded_modes : Map[String, Int32]
 }
 
 ///|

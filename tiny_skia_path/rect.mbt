@@ -8,10 +8,10 @@
 /// - Width and height are in 1..=i32::MAX range.
 /// - x+width and y+height does not overflow.
 pub struct IntRect {
-  priv x : Int
-  priv y : Int
-  priv width : UInt
-  priv height : UInt
+  priv x : Int32
+  priv y : Int32
+  priv width : UInt32
+  priv height : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -27,10 +27,10 @@ pub extend IntRect with @debug.Debug::{to_repr}
 ///|
 /// Creates a new `IntRect`.
 pub fn IntRect::from_xywh(
-  x : Int,
-  y : Int,
-  width : UInt,
-  height : UInt,
+  x : Int32,
+  y : Int32,
+  width : UInt32,
+  height : UInt32,
 ) -> IntRect? {
   if width > 0x7FFFFFFFU || height > 0x7FFFFFFFU {
     return None
@@ -50,10 +50,10 @@ pub fn IntRect::from_xywh(
 ///|
 /// Creates a new `IntRect`.
 pub fn IntRect::from_ltrb(
-  left : Int,
-  top : Int,
-  right : Int,
-  bottom : Int,
+  left : Int32,
+  top : Int32,
+  right : Int32,
+  bottom : Int32,
 ) -> IntRect? {
   guard i32_checked_sub(right, left) is Some(width) && width >= 0 else {
     return None
@@ -71,50 +71,50 @@ pub fn IntRect::from_ltrb(
 
 ///|
 /// Returns rect's X position.
-pub fn IntRect::x(self : IntRect) -> Int {
+pub fn IntRect::x(self : IntRect) -> Int32 {
   self.x
 }
 
 ///|
 /// Returns rect's Y position.
-pub fn IntRect::y(self : IntRect) -> Int {
+pub fn IntRect::y(self : IntRect) -> Int32 {
   self.y
 }
 
 ///|
 /// Returns rect's width.
-pub fn IntRect::width(self : IntRect) -> UInt {
+pub fn IntRect::width(self : IntRect) -> UInt32 {
   self.width
 }
 
 ///|
 /// Returns rect's height.
-pub fn IntRect::height(self : IntRect) -> UInt {
+pub fn IntRect::height(self : IntRect) -> UInt32 {
   self.height
 }
 
 ///|
 /// Returns rect's left edge.
-pub fn IntRect::left(self : IntRect) -> Int {
+pub fn IntRect::left(self : IntRect) -> Int32 {
   self.x
 }
 
 ///|
 /// Returns rect's top edge.
-pub fn IntRect::top(self : IntRect) -> Int {
+pub fn IntRect::top(self : IntRect) -> Int32 {
   self.y
 }
 
 ///|
 /// Returns rect's right edge.
-pub fn IntRect::right(self : IntRect) -> Int {
+pub fn IntRect::right(self : IntRect) -> Int32 {
   // No overflow is guaranteed by constructors.
   self.x + self.width.reinterpret_as_int()
 }
 
 ///|
 /// Returns rect's bottom edge.
-pub fn IntRect::bottom(self : IntRect) -> Int {
+pub fn IntRect::bottom(self : IntRect) -> Int32 {
   // No overflow is guaranteed by constructors.
   self.y + self.height.reinterpret_as_int()
 }
@@ -163,7 +163,7 @@ pub fn IntRect::intersect(self : IntRect, other : IntRect) -> IntRect? {
 
 ///|
 /// Insets the rectangle.
-pub fn IntRect::inset(self : IntRect, dx : Int, dy : Int) -> IntRect? {
+pub fn IntRect::inset(self : IntRect, dx : Int32, dy : Int32) -> IntRect? {
   IntRect::from_ltrb(
     self.left() + dx,
     self.top() + dy,
@@ -174,7 +174,7 @@ pub fn IntRect::inset(self : IntRect, dx : Int, dy : Int) -> IntRect? {
 
 ///|
 /// Outsets the rectangle.
-pub fn IntRect::make_outset(self : IntRect, dx : Int, dy : Int) -> IntRect? {
+pub fn IntRect::make_outset(self : IntRect, dx : Int32, dy : Int32) -> IntRect? {
   IntRect::from_ltrb(
     i32_saturating_sub(self.left(), dx),
     i32_saturating_sub(self.top(), dy),
@@ -185,13 +185,13 @@ pub fn IntRect::make_outset(self : IntRect, dx : Int, dy : Int) -> IntRect? {
 
 ///|
 /// Translates the rect by the specified offset.
-pub fn IntRect::translate(self : IntRect, tx : Int, ty : Int) -> IntRect? {
+pub fn IntRect::translate(self : IntRect, tx : Int32, ty : Int32) -> IntRect? {
   IntRect::from_xywh(self.x() + tx, self.y() + ty, self.width(), self.height())
 }
 
 ///|
 /// Translates the rect to the specified position.
-pub fn IntRect::translate_to(self : IntRect, x : Int, y : Int) -> IntRect? {
+pub fn IntRect::translate_to(self : IntRect, x : Int32, y : Int32) -> IntRect? {
   IntRect::from_xywh(x, y, self.width(), self.height())
 }
 

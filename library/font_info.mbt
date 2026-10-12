@@ -40,7 +40,7 @@ pub extend FontInfo with Hash::{hash, hash_combine}
 
 ///|
 /// Bitflags describing characteristics of a font.
-pub(all) struct FontFlags(UInt) derive(Eq, Hash, Debug)
+pub(all) struct FontFlags(UInt32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -126,7 +126,7 @@ pub extend FontFlags with Show::{to_string, output}
 
 ///|
 /// Compute metadata for font at the `index` of the given data.
-pub fn FontInfo::new(data : Bytes, index : UInt) -> FontInfo? {
+pub fn FontInfo::new(data : Bytes, index : UInt32) -> FontInfo? {
   let ttf = @otf.Face::parse(data[:], index) catch { _ => return None }
   FontInfo::from_ttf(ttf)
 }
@@ -442,7 +442,7 @@ fn rust_str_trim(s : String) -> StringView {
 /// - 2 codepoints inside (18, 19)
 ///
 /// So the resulting encoding is `[2, 3, 4, 3, 3, 1, 2, 2]`.
-pub(all) struct Coverage(Array[UInt]) derive(Eq, Hash)
+pub(all) struct Coverage(Array[UInt32]) derive(Eq, Hash)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -469,7 +469,7 @@ pub fn Coverage::from_ttf(ttf : @otf.Face) -> Coverage {
   let mut coverage = Coverage([])
   if ttf.tables().cmap is Some(cmap) {
     // The offsets of the subtables that are in `coverage`.
-    let seen : Array[UInt] = []
+    let seen : Array[UInt32] = []
     let mut index : UInt16 = 0
     for subtable in cmap.subtables.iter() {
       let offset = cmap.subtables.offset(index)
@@ -516,7 +516,7 @@ pub fn Coverage::from_ttf(ttf : @otf.Face) -> Coverage {
 
 ///|
 /// Encode a vector of codepoints.
-pub fn Coverage::from_vec(codepoints : Array[UInt]) -> Coverage {
+pub fn Coverage::from_vec(codepoints : Array[UInt32]) -> Coverage {
   let codepoints = codepoints.copy()
   codepoints.sort()
   codepoints.dedup()
@@ -529,9 +529,9 @@ pub fn Coverage::from_vec(codepoints : Array[UInt]) -> Coverage {
 
 ///|
 /// Whether the codepoint is covered.
-pub fn Coverage::contains(self : Coverage, c : UInt) -> Bool {
+pub fn Coverage::contains(self : Coverage, c : UInt32) -> Bool {
   let mut inside = false
-  let mut cursor : UInt = 0
+  let mut cursor : UInt32 = 0
   for run in self.0 {
     if c >= cursor && c < cursor + run {
       return inside
@@ -544,7 +544,7 @@ pub fn Coverage::contains(self : Coverage, c : UInt) -> Bool {
 
 ///|
 /// Iterate over all covered codepoints.
-pub fn Coverage::iter(self : Coverage) -> Iter[UInt] {
+pub fn Coverage::iter(self : Coverage) -> Iter[UInt32] {
   self
   .iter_ranges()
   .flat_map(r => {
@@ -561,9 +561,9 @@ pub fn Coverage::iter(self : Coverage) -> Iter[UInt] {
 
 ///|
 /// Iterate over all continuous ranges of covered codepoints.
-fn Coverage::iter_ranges(self : Coverage) -> Iter[(UInt, UInt)] {
+fn Coverage::iter_ranges(self : Coverage) -> Iter[(UInt32, UInt32)] {
   let ranges = []
-  let mut offset : UInt = 0
+  let mut offset : UInt32 = 0
   let mut i = 0
   while i + 1 < self.0.length() {
     let gap = self.0[i]
@@ -595,9 +595,9 @@ fn Coverage::union(self : Coverage, other : Coverage) -> Coverage {
   let builder = CoverageBuilder::with_capacity(capacity)
   // The index of the next range's gap and the end of the range before it.
   let mut i = 0
-  let mut left_offset : UInt = 0
+  let mut left_offset : UInt32 = 0
   let mut j = 0
-  let mut right_offset : UInt = 0
+  let mut right_offset : UInt32 = 0
   while i + 1 < left.length() && j + 1 < right.length() {
     let left_start = left_offset + left[i]
     let right_start = right_offset + right[j]
@@ -640,13 +640,13 @@ pub extend Coverage with Show::{to_string, output}
 /// Incrementally builds a [`Coverage`] set from a non-decreasing series of
 /// codepoints, or ranges thereof.
 priv struct CoverageBuilder {
-  runs : Array[UInt]
-  mut next : UInt
+  runs : Array[UInt32]
+  mut next : UInt32
 }
 
 ///|
 /// Create a new coverage builder with at least the given capacity.
-fn CoverageBuilder::with_capacity(capacity : Int) -> CoverageBuilder {
+fn CoverageBuilder::with_capacity(capacity : Int32) -> CoverageBuilder {
   { runs: Array(capacity~), next: 0, }
 }
 
@@ -661,7 +661,7 @@ fn CoverageBuilder::build(self : CoverageBuilder) -> Coverage {
 /// in a strictly increasing order.
 fn CoverageBuilder::add_codepoint(
   self : CoverageBuilder,
-  codepoint : UInt,
+  codepoint : UInt32,
 ) -> Unit {
   let end = if codepoint == 0xFFFFFFFFU { codepoint } else { codepoint + 1 }
   self.add_codepoint_range(codepoint, end)
@@ -675,8 +675,8 @@ fn CoverageBuilder::add_codepoint(
 /// (Upstream's `Range<u32>` as its two ends: a tuple is an allocation.)
 fn CoverageBuilder::add_codepoint_range(
   self : CoverageBuilder,
-  start : UInt,
-  end : UInt,
+  start : UInt32,
+  end : UInt32,
 ) -> Unit {
   if end <= self.next || start >= end {
     return

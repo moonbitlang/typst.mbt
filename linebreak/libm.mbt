@@ -4,12 +4,12 @@
 // because the LSTM's break decisions are argmax comparisons.
 
 ///|
-fn f32(bits : UInt) -> Float {
+fn f32(bits : UInt32) -> Float {
   Float::reinterpret_from_uint(bits)
 }
 
 ///|
-fn bits(x : Float) -> UInt {
+fn bits(x : Float) -> UInt32 {
   x.reinterpret_as_uint()
 }
 
@@ -65,7 +65,7 @@ fn expf(x : Float) -> Float {
   }
 
   // argument reduction
-  let mut k : Int = 0
+  let mut k : Int32 = 0
   let mut hi : Float = 0.0
   let mut lo : Float = 0.0
   if hx > 0x3eb17218 {
@@ -104,7 +104,7 @@ fn expf(x : Float) -> Float {
 
 ///|
 /// `scalbn` for f32 (libm's generic implementation).
-fn scalbnf(x : Float, n : Int) -> Float {
+fn scalbnf(x : Float, n : Int32) -> Float {
   let mut x = x
   let mut n = n
   let exp_max = 127
@@ -189,7 +189,7 @@ fn expm1f(x : Float) -> Float {
       return x
     }
   }
-  let mut k : Int = 0
+  let mut k : Int32 = 0
   let mut hi : Float = 0.0
   let mut lo : Float = 0.0
   let mut c : Float = 0.0

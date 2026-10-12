@@ -5,7 +5,7 @@
 /// The number of segments in a conic gradient. This is a heuristic value
 /// that seems to work well. Smaller values could be interesting for
 /// optimization.
-let num_conic_segments : Int = 360
+let num_conic_segments : Int32 = 360
 
 ///|
 /// Render a frame to a string.
@@ -676,7 +676,7 @@ fn into_degrees(x : Float) -> Float {
 
 ///|
 /// Upstream `round::<DIGITS>`.
-fn round_f32(num : Float, digits : Int) -> Double {
+fn round_f32(num : Float, digits : Int32) -> Double {
   let factor = @library.exp10(digits)
   @library.rust_round(num.to_double() * factor) / factor
 }

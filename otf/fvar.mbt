@@ -213,7 +213,7 @@ pub fn AvarTable::parse(data : BytesView) -> AvarTable? {
 pub fn AvarTable::map_coordinate(
   self : AvarTable,
   coordinates : Array[NormalizedCoordinate],
-  coordinate_index : Int,
+  coordinate_index : Int32,
 ) -> Unit? {
   if self.segment_maps.count.to_int() != coordinates.length() {
     return None

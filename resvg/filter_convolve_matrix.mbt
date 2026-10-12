@@ -12,7 +12,7 @@ fn convolve_matrix_apply(
   matrix : @usvg.FeConvolveMatrix,
   src : @skia.Pixmap,
 ) -> Unit {
-  fn bound(min : Int, val : Int, max : Int) -> Int {
+  fn bound(min : Int32, val : Int32, max : Int32) -> Int32 {
     let v = if max < val { max } else { val }
     if min > v {
       min
@@ -85,7 +85,7 @@ fn convolve_matrix_apply(
       new_a = new_a / divisor + bias
     }
     let bounded_new_a = f32_bound(0.0, new_a, 1.0)
-    let calc = fn(x : Float) -> Int {
+    let calc = fn(x : Float) -> Int32 {
       let x = x / divisor + bias * new_a
       let x = if matrix.preserve_alpha {
         f32_bound(0.0, x, 1.0) * bounded_new_a

@@ -101,7 +101,7 @@ fn spec_escape(s : String) -> String {
 }
 
 ///|
-fn spec_hex(value : UInt64, digits : Int) -> String {
+fn spec_hex(value : UInt64, digits : Int32) -> String {
   let s = value.to_string(radix=16)
   "0".repeat(digits - s.length()) + s
 }
@@ -251,7 +251,7 @@ fn run_wasm_spec_file(
   tsv : String,
   verbose : Bool,
   label : String,
-) -> (Int, Int, Int) {
+) -> (Int32, Int32, Int32) {
   let ctx = SpecCtx::new() catch {
     e => {
       println("\{label}: failed to set up spectest: \{e}")
@@ -424,7 +424,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
 
 ///|
 /// Compares strings by code points (Rust `str`/path order).
-fn spec_compare(a : String, b : String) -> Int {
+fn spec_compare(a : String, b : String) -> Int32 {
   let n = if a.length() < b.length() { a.length() } else { b.length() }
   for i in 0..<n {
     let c = a.code_unit_at(i).compare(b.code_unit_at(i))
@@ -436,7 +436,7 @@ fn spec_compare(a : String, b : String) -> Int {
 }
 
 ///|
-fn spec_parse_dec(s : String) -> UInt {
+fn spec_parse_dec(s : String) -> UInt32 {
   let mut v = 0U
   for c in s {
     v = v * 10 + (c.to_int() - '0'.to_int()).reinterpret_as_uint()

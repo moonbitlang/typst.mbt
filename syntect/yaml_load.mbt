@@ -592,7 +592,7 @@ fn add_initial_contexts(
 ///|
 priv struct ContextNamer {
   name : String
-  mut anonymous_index : Int?
+  mut anonymous_index : Int32?
 }
 
 ///|
@@ -738,9 +738,9 @@ fn regex_for_no_newlines(regex : String) -> String {
 /// group inside a lookaround, (i.e. "captures:\n x: scope.stack goes.here",
 /// where "x" is the number of a capture group in a lookahead/behind), those
 /// those scopes are not applied, so no need to even parse them.
-fn get_consuming_capture_indexes(regex : String) -> Array[Int] {
+fn get_consuming_capture_indexes(regex : String) -> Array[Int32] {
   let parser = RegexScanner::new(regex)
-  let result : Array[Int] = []
+  let result : Array[Int32] = []
   let stack = []
   let mut cap_num = 0
   let mut in_lookaround = false
@@ -815,7 +815,7 @@ fn get_consuming_capture_indexes(regex : String) -> Array[Int] {
 /// A byte scanner over a regex (upstream `Parser`).
 priv struct RegexScanner {
   bytes : Bytes
-  mut index : Int
+  mut index : Int32
 }
 
 ///|

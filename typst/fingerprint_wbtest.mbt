@@ -12,7 +12,7 @@ fn collect_funcs(
   scope : @library.Scope,
   funcs : Array[@library.Func],
   modules : Array[@library.Module],
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   if depth > 6 {
     return
@@ -82,7 +82,7 @@ fn collect_types(
   scope : @library.Scope,
   types : Array[@library.Type],
   modules : Array[@library.Module],
-  depth : Int,
+  depth : Int32,
 ) -> Unit {
   if depth > 6 {
     return

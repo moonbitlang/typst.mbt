@@ -5,7 +5,7 @@
 priv struct PagesContext {
   media_box : Rect?
   crop_box : Rect?
-  rotate : Int?
+  rotate : Int32?
 }
 
 ///|
@@ -177,7 +177,7 @@ fn Page::new(
     Some(c) => c
     None => ctx.crop_box.unwrap_or(media_box)
   }
-  let rotate = match (dict.get("Rotate") : Int?) {
+  let rotate = match (dict.get("Rotate") : Int32?) {
     Some(r) => r
     None => ctx.rotate.unwrap_or(0)
   }
@@ -529,13 +529,13 @@ pub fn Pages::xref(self : Pages) -> XRef {
 
 ///|
 /// The number of pages.
-pub fn Pages::length(self : Pages) -> Int {
+pub fn Pages::length(self : Pages) -> Int32 {
   self.pages.length()
 }
 
 ///|
 /// The page at `index`.
-pub fn Pages::get(self : Pages, index : Int) -> Page? {
+pub fn Pages::get(self : Pages, index : Int32) -> Page? {
   self.pages.get(index)
 }
 
@@ -546,7 +546,7 @@ pub fn Pages::iter(self : Pages) -> Iter[Page] {
 
 ///|
 #alias("_[_]")
-pub fn Pages::at(self : Pages, index : Int) -> Page {
+pub fn Pages::at(self : Pages, index : Int32) -> Page {
   self.pages[index]
 }
 
@@ -564,7 +564,7 @@ fn resolve_pages(
   if (pages_dict.get("CropBox") : Rect?) is Some(crop_box) {
     ctx = { ..ctx, crop_box: Some(crop_box), }
   }
-  if (pages_dict.get("Rotate") : Int?) is Some(rotate) {
+  if (pages_dict.get("Rotate") : Int32?) is Some(rotate) {
     ctx = { ..ctx, rotate: Some(rotate), }
   }
   let resources = Resources::from_parent(

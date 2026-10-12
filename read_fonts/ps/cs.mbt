@@ -3,7 +3,7 @@
 
 ///|
 /// Maximum nesting depth for subroutine calls.
-pub const NESTING_DEPTH_LIMIT : Int = 10
+pub const NESTING_DEPTH_LIMIT : Int32 = 10
 
 ///|
 /// The type of a PostScript charstring.
@@ -31,13 +31,13 @@ pub(open) trait CharstringContext {
   fn kind(Self) -> CharstringKind
   /// Returns the base and accent charstrings for the `seac` (standard
   /// encoded accented character) operator.
-  fn seac_components(Self, Int, Int) -> (BytesView, BytesView) raise PsError
+  fn seac_components(Self, Int32, Int32) -> (BytesView, BytesView) raise PsError
   /// Returns the charstring for the global subroutine at the given index as
   /// encoded in the calling charstring.
-  fn global_subr(Self, Int) -> BytesView raise PsError
+  fn global_subr(Self, Int32) -> BytesView raise PsError
   /// Returns the charstring for the local subroutine at the given index as
   /// encoded in the calling charstring.
-  fn subr(Self, Int) -> BytesView raise PsError
+  fn subr(Self, Int32) -> BytesView raise PsError
   /// Returns the current active weight vector for a multiple master font.
   fn weight_vector(Self) -> Array[Fixed]
 }
@@ -81,7 +81,7 @@ pub impl CharstringContext for CffContext with fn seac_components(
         _ => raise MissingCharset
       }
   }
-  let seac_to_gid = fn(code : Int) -> GlyphId? {
+  let seac_to_gid = fn(code : Int32) -> GlyphId? {
     if code < 0 || code > 255 {
       return None
     }
@@ -202,7 +202,7 @@ priv struct Evaluator {
   mut seen_width_command : Bool
   /// True if we've actually read a width
   mut have_read_width : Bool
-  mut stem_count : Int
+  mut stem_count : Int32
   mut x : Fixed
   mut y : Fixed
   /// X side-bearing
@@ -210,7 +210,7 @@ priv struct Evaluator {
   /// X width
   mut wx : Fixed
   stack : Stack
-  mut stack_ix : Int
+  mut stack_ix : Int32
   mut in_seac : Bool
 }
 
@@ -258,7 +258,7 @@ fn Evaluator::evaluate(
 fn Evaluator::evaluate_impl(
   self : Evaluator,
   charstring_data : BytesView,
-  nesting_depth : Int,
+  nesting_depth : Int32,
 ) -> Bool raise PsError {
   if nesting_depth > NESTING_DEPTH_LIMIT {
     raise CharstringNestingDepthLimitExceeded
@@ -269,7 +269,7 @@ fn Evaluator::evaluate_impl(
     let b0 = cursor.read_u8()
     match b0 {
       // Push an integer to the stack
-      28 | 32..=254 => self.stack.push_i32(parse_int(cursor, b0))
+      28 | 32..<=254 => self.stack.push_i32(parse_int(cursor, b0))
       // Push a fixed point value to the stack
       255 => {
         let val = cursor.read_i32()
@@ -310,7 +310,7 @@ fn Evaluator::evaluate_operator(
   self : Evaluator,
   operator : CsOperator,
   cursor : Cursor,
-  nesting_depth : Int,
+  nesting_depth : Int32,
 ) -> Bool raise PsError {
   match operator {
     // The following "flex" operators are intended to emit
@@ -636,7 +636,7 @@ fn Evaluator::evaluate_operator(
         // Counter control hints.
         (12 | 13, _) => self.reset_stack()
         // Handle blends for multiple masters.
-        (14..=18, _) if weight_vector.length() > 1 =>
+        (14..<=18, _) if weight_vector.length() > 1 =>
           self.handle_mm_blend(subr_idx, num_args)
         _ =>
           // Unknown othersubr, so simply drop the arguments
@@ -682,7 +682,7 @@ priv struct SeacComponent {
 fn Evaluator::handle_seac(
   self : Evaluator,
   mode : SeacMode,
-  nesting_depth : Int,
+  nesting_depth : Int32,
 ) -> Unit raise PsError {
   // handle seac operator
   if self.in_seac {
@@ -815,8 +815,8 @@ fn Evaluator::handle_flex(self : Evaluator) -> Unit raise PsError {
 /// Handle point blending for multiple master fonts.
 fn Evaluator::handle_mm_blend(
   self : Evaluator,
-  subr_idx : Int,
-  num_args : Int,
+  subr_idx : Int32,
+  num_args : Int32,
 ) -> Unit raise PsError {
   let weight_vector = self.context.weight_vector()
   let num_points = subr_idx - 13 + (if subr_idx == 18 { 1 } else { 0 })
@@ -852,7 +852,7 @@ fn Evaluator::handle_mm_blend(
 }
 
 ///|
-fn Evaluator::coords_remaining(self : Evaluator) -> Int {
+fn Evaluator::coords_remaining(self : Evaluator) -> Int32 {
   // This is overly defensive to avoid overflow but in the case of
   // broken fonts, just return 0 when stack_ix > stack_len to prevent
   // potential runaway while loops in the evaluator if this wraps
@@ -1016,7 +1016,7 @@ priv enum CsOperator {
 } derive(Eq)
 
 ///|
-fn CsOperator::read(cursor : Cursor, b0 : Int) -> CsOperator raise PsError {
+fn CsOperator::read(cursor : Cursor, b0 : Int32) -> CsOperator raise PsError {
   // Escape opcode for accessing two byte operators
   let (opcode, operator) = if b0 == 12 {
     let b1 = cursor.read_u8()
@@ -1032,7 +1032,7 @@ fn CsOperator::read(cursor : Cursor, b0 : Int) -> CsOperator raise PsError {
 
 ///|
 /// Creates an operator from the given opcode.
-fn CsOperator::from_opcode(opcode : Int) -> CsOperator? {
+fn CsOperator::from_opcode(opcode : Int32) -> CsOperator? {
   Some(
     match opcode {
       1 => HStem
@@ -1070,7 +1070,7 @@ fn CsOperator::from_opcode(opcode : Int) -> CsOperator? {
 /// Creates an operator from the given extended opcode.
 ///
 /// These are preceded by a byte containing the escape value of 12.
-fn CsOperator::from_two_byte_opcode(opcode : Int) -> CsOperator? {
+fn CsOperator::from_two_byte_opcode(opcode : Int32) -> CsOperator? {
   Some(
     match opcode {
       0 => DotSection

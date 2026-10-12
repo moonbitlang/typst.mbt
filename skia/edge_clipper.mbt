@@ -1,7 +1,7 @@
 // Port of `tiny-skia/src/edge_clipper.rs`.
 
 ///|
-let max_verbs : Int = 18
+let max_verbs : Int32 = 18
 
 ///|
 priv struct EdgeClipper {

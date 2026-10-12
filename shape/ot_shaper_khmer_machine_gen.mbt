@@ -3,14 +3,14 @@
 
 ///|
 /// `_khmer_syllable_machine_actions: [i8; 29]`
-let khmer_syllable_machine_actions : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_actions : ReadOnlyArray[Int32] = [
   0, 1, 0, 1, 1, 1, 2, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 2, 2, 3, 2, 2,
   4, 0, 0,
 ]
 
 ///|
 /// `_khmer_syllable_machine_key_offsets: [i16; 45]`
-let khmer_syllable_machine_key_offsets : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_key_offsets : ReadOnlyArray[Int32] = [
   0, 5, 8, 11, 15, 18, 21, 25, 28, 32, 35, 40, 45, 48, 51, 55, 58, 61, 65, 68, 72,
   75, 90, 100, 103, 113, 122, 123, 129, 134, 141, 149, 158, 168, 171, 181, 190, 191,
   197, 202, 209, 217, 226, 0, 0,
@@ -18,7 +18,7 @@ let khmer_syllable_machine_key_offsets : ReadOnlyArray[Int] = [
 
 ///|
 /// `_khmer_syllable_machine_trans_keys: [u8; 232]`
-let khmer_syllable_machine_trans_keys : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_trans_keys : ReadOnlyArray[Int32] = [
   20, 25, 26, 5, 6, 26, 5, 6, 15, 1, 2, 20, 26, 5, 6, 26, 5, 6, 26, 5, 6, 20, 26,
   5, 6, 26, 5, 6, 20, 26, 5, 6, 26, 5, 6, 20, 25, 26, 5, 6, 20, 25, 26, 5, 6, 26,
   5, 6, 15, 1, 2, 20, 26, 5, 6, 26, 5, 6, 26, 5, 6, 20, 26, 5, 6, 26, 5, 6, 20, 26,
@@ -34,21 +34,21 @@ let khmer_syllable_machine_trans_keys : ReadOnlyArray[Int] = [
 
 ///|
 /// `_khmer_syllable_machine_single_lengths: [i8; 45]`
-let khmer_syllable_machine_single_lengths : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_single_lengths : ReadOnlyArray[Int32] = [
   3, 1, 1, 2, 1, 1, 2, 1, 2, 1, 3, 3, 1, 1, 2, 1, 1, 2, 1, 2, 1, 9, 8, 1, 8, 7, 1,
   4, 3, 5, 6, 7, 8, 1, 8, 7, 1, 4, 3, 5, 6, 7, 2, 0, 0,
 ]
 
 ///|
 /// `_khmer_syllable_machine_range_lengths: [i8; 45]`
-let khmer_syllable_machine_range_lengths : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_range_lengths : ReadOnlyArray[Int32] = [
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 0,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0,
 ]
 
 ///|
 /// `_khmer_syllable_machine_index_offsets: [i16; 45]`
-let khmer_syllable_machine_index_offsets : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_index_offsets : ReadOnlyArray[Int32] = [
   0, 5, 8, 11, 15, 18, 21, 25, 28, 32, 35, 40, 45, 48, 51, 55, 58, 61, 65, 68, 72,
   75, 88, 98, 101, 111, 120, 122, 128, 133, 140, 148, 157, 167, 170, 180, 189, 191,
   197, 202, 209, 217, 226, 0, 0,
@@ -56,7 +56,7 @@ let khmer_syllable_machine_index_offsets : ReadOnlyArray[Int] = [
 
 ///|
 /// `_khmer_syllable_machine_cond_targs: [i8; 275]`
-let khmer_syllable_machine_cond_targs : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_cond_targs : ReadOnlyArray[Int32] = [
   27, 31, 25, 1, 21, 25, 1, 21, 26, 26, 21, 27, 25, 1, 21, 27, 4, 21, 28, 5, 21,
   27, 29, 7, 21, 29, 7, 21, 27, 30, 9, 21, 30, 9, 21, 27, 32, 25, 1, 21, 37, 41,
   35, 12, 21, 35, 12, 21, 36, 36, 21, 37, 35, 12, 21, 37, 15, 21, 38, 16, 21, 37,
@@ -75,7 +75,7 @@ let khmer_syllable_machine_cond_targs : ReadOnlyArray[Int] = [
 
 ///|
 /// `_khmer_syllable_machine_cond_actions: [i8; 275]`
-let khmer_syllable_machine_cond_actions : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_cond_actions : ReadOnlyArray[Int32] = [
   5, 5, 5, 0, 15, 5, 0, 15, 0, 0, 15, 5, 5, 0, 15, 5, 0, 15, 5, 0, 15, 5, 5, 0, 15,
   5, 0, 15, 5, 5, 0, 15, 5, 0, 15, 5, 5, 5, 0, 15, 5, 21, 21, 0, 17, 21, 0, 19, 0,
   0, 17, 5, 21, 0, 17, 5, 0, 17, 5, 0, 17, 5, 5, 0, 17, 5, 0, 17, 5, 5, 0, 17, 5,
@@ -92,40 +92,40 @@ let khmer_syllable_machine_cond_actions : ReadOnlyArray[Int] = [
 
 ///|
 /// `_khmer_syllable_machine_to_state_actions: [i8; 45]`
-let khmer_syllable_machine_to_state_actions : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_to_state_actions : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
 ///|
 /// `_khmer_syllable_machine_from_state_actions: [i8; 45]`
-let khmer_syllable_machine_from_state_actions : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_from_state_actions : ReadOnlyArray[Int32] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
 ///|
 /// `_khmer_syllable_machine_eof_trans: [i16; 45]`
-let khmer_syllable_machine_eof_trans : ReadOnlyArray[Int] = [
+let khmer_syllable_machine_eof_trans : ReadOnlyArray[Int32] = [
   231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246,
   247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262,
   263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 0, 0,
 ]
 
 ///|
-let khmer_syllable_machine_start : Int = 21
+let khmer_syllable_machine_start : Int32 = 21
 
 ///|
-let khmer_syllable_machine_first_final : Int = 21
-
-///|
-// Emitted by Ragel and unused by the driver, as upstream
-// (`#![allow(dead_code)]`).
-#warnings("-unused_value")
-let khmer_syllable_machine_error : Int = -1
+let khmer_syllable_machine_first_final : Int32 = 21
 
 ///|
 // Emitted by Ragel and unused by the driver, as upstream
 // (`#![allow(dead_code)]`).
 #warnings("-unused_value")
-let khmer_syllable_machine_en_main : Int = 21
+let khmer_syllable_machine_error : Int32 = -1
+
+///|
+// Emitted by Ragel and unused by the driver, as upstream
+// (`#![allow(dead_code)]`).
+#warnings("-unused_value")
+let khmer_syllable_machine_en_main : Int32 = 21

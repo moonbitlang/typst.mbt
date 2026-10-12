@@ -260,7 +260,7 @@ fn clone_entry(entry : (Point, FrameItem)) -> (Point, FrameItem) {
 ///|
 /// The layer the next item will be added on. This corresponds to the number
 /// of items in the frame.
-pub fn Frame::layer(self : Frame) -> Int {
+pub fn Frame::layer(self : Frame) -> Int32 {
   self.items.length()
 }
 
@@ -304,7 +304,7 @@ pub fn Frame::push_frame(self : Frame, pos : Point, frame : Frame) -> Unit {
 /// This panics if the layer is greater than the number of layers present.
 pub fn Frame::insert(
   self : Frame,
-  layer : Int,
+  layer : Int32,
   pos : Point,
   item : FrameItem,
 ) -> Unit {
@@ -358,7 +358,12 @@ fn Frame::should_inline(self : Frame, frame : Frame) -> Bool {
 
 ///|
 /// Inline a frame at the given layer.
-fn Frame::inline(self : Frame, layer : Int, pos : Point, frame : Frame) -> Unit {
+fn Frame::inline(
+  self : Frame,
+  layer : Int32,
+  pos : Point,
+  frame : Frame,
+) -> Unit {
   // Skip work if there's nothing to do.
   if frame.items.is_empty() {
     return

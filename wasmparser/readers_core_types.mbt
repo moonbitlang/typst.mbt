@@ -30,7 +30,7 @@
 // * `01`: The `index` is an index into the containing type's recursion group.
 //
 // * `10`: The `index` is a `CoreTypeId`.
-pub(all) struct PackedIndex(UInt) derive(Eq, Hash, Compare, Debug)
+pub(all) struct PackedIndex(UInt32) derive(Eq, Hash, Compare, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -53,48 +53,48 @@ pub extend PackedIndex with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend PackedIndex with @debug.Debug::{to_repr}
 
 ///|
-let packed_index_kind_mask : UInt = 0b11U << 20
+let packed_index_kind_mask : UInt32 = 0b11U << 20
 
 ///|
-let packed_index_index_mask : UInt = (1U << 20) - 1
+let packed_index_index_mask : UInt32 = (1U << 20) - 1
 
 ///|
-let packed_index_module_kind : UInt = 0b00U << 20
+let packed_index_module_kind : UInt32 = 0b00U << 20
 
 ///|
-let packed_index_rec_group_kind : UInt = 0b01U << 20
+let packed_index_rec_group_kind : UInt32 = 0b01U << 20
 
 ///|
-let packed_index_id_kind : UInt = 0b10U << 20
+let packed_index_id_kind : UInt32 = 0b10U << 20
 
 ///|
-fn PackedIndex::unchecked_from_u32(x : UInt) -> PackedIndex {
+fn PackedIndex::unchecked_from_u32(x : UInt32) -> PackedIndex {
   PackedIndex(x)
 }
 
 ///|
-fn PackedIndex::to_u32(id : PackedIndex) -> UInt {
+fn PackedIndex::to_u32(id : PackedIndex) -> UInt32 {
   id.0
 }
 
 ///|
-fn PackedIndex::can_represent_index(index : UInt) -> Bool {
+fn PackedIndex::can_represent_index(index : UInt32) -> Bool {
   (index & packed_index_index_mask) == index
 }
 
 ///|
-fn PackedIndex::kind(self : PackedIndex) -> UInt {
+fn PackedIndex::kind(self : PackedIndex) -> UInt32 {
   self.0 & packed_index_kind_mask
 }
 
 ///|
-fn PackedIndex::index(self : PackedIndex) -> UInt {
+fn PackedIndex::index(self : PackedIndex) -> UInt32 {
   self.0 & packed_index_index_mask
 }
 
 ///|
 /// Construct a `PackedIndex` from an index into a module's types space.
-pub fn PackedIndex::from_module_index(index : UInt) -> PackedIndex? {
+pub fn PackedIndex::from_module_index(index : UInt32) -> PackedIndex? {
   if PackedIndex::can_represent_index(index) {
     Some(PackedIndex(packed_index_module_kind | index))
   } else {
@@ -105,7 +105,7 @@ pub fn PackedIndex::from_module_index(index : UInt) -> PackedIndex? {
 ///|
 /// Construct a `PackedIndex` from an index into the index's containing
 /// recursion group.
-pub fn PackedIndex::from_rec_group_index(index : UInt) -> PackedIndex? {
+pub fn PackedIndex::from_rec_group_index(index : UInt32) -> PackedIndex? {
   if PackedIndex::can_represent_index(index) {
     Some(PackedIndex(packed_index_rec_group_kind | index))
   } else {
@@ -155,7 +155,7 @@ pub fn PackedIndex::unpack(self : PackedIndex) -> UnpackedIndex {
 
 ///|
 /// Get the underlying index into a module's types space, if any.
-pub fn PackedIndex::as_module_index(self : PackedIndex) -> UInt? {
+pub fn PackedIndex::as_module_index(self : PackedIndex) -> UInt32? {
   if self.kind() == packed_index_module_kind {
     Some(self.index())
   } else {
@@ -165,7 +165,7 @@ pub fn PackedIndex::as_module_index(self : PackedIndex) -> UInt? {
 
 ///|
 /// Get the underlying index into the containing recursion group, if any.
-pub fn PackedIndex::as_rec_group_index(self : PackedIndex) -> UInt? {
+pub fn PackedIndex::as_rec_group_index(self : PackedIndex) -> UInt32? {
   if self.kind() == packed_index_rec_group_kind {
     Some(self.index())
   } else {
@@ -199,9 +199,9 @@ pub extend PackedIndex with Show::{to_string, output}
 /// Can be used for `match` statements.
 pub(all) enum UnpackedIndex {
   /// An index into a Wasm module's types space.
-  Module(UInt)
+  Module(UInt32)
   /// An index into the containing type's recursion group.
-  RecGroup(UInt)
+  RecGroup(UInt32)
   /// A type identifier.
   Id(CoreTypeId)
 } derive(Eq, Hash, Debug)
@@ -241,7 +241,7 @@ pub fn UnpackedIndex::is_canonical(self : UnpackedIndex) -> Bool {
 
 ///|
 /// Get the underlying index into a module's types space, if any.
-pub fn UnpackedIndex::as_module_index(self : UnpackedIndex) -> UInt? {
+pub fn UnpackedIndex::as_module_index(self : UnpackedIndex) -> UInt32? {
   if self is Module(i) {
     Some(i)
   } else {
@@ -251,7 +251,7 @@ pub fn UnpackedIndex::as_module_index(self : UnpackedIndex) -> UInt? {
 
 ///|
 /// Get the underlying index into the containing recursion group, if any.
-pub fn UnpackedIndex::as_rec_group_index(self : UnpackedIndex) -> UInt? {
+pub fn UnpackedIndex::as_rec_group_index(self : UnpackedIndex) -> UInt32? {
   if self is RecGroup(i) {
     Some(i)
   } else {
@@ -294,17 +294,17 @@ pub extend RecGroup with @debug.Debug::{to_repr}
 
 ///|
 priv enum RecGroupInner {
-  Implicit(Int, SubType)
-  Explicit(Array[(Int, SubType)])
+  Implicit(Int32, SubType)
+  Explicit(Array[(Int32, SubType)])
 } derive(Debug)
 
 ///|
-fn RecGroup::explicit(types : Array[(Int, SubType)]) -> RecGroup {
+fn RecGroup::explicit(types : Array[(Int32, SubType)]) -> RecGroup {
   { inner: Explicit(types), }
 }
 
 ///|
-fn RecGroup::implicit(offset : Int, ty : SubType) -> RecGroup {
+fn RecGroup::implicit(offset : Int32, ty : SubType) -> RecGroup {
   { inner: Implicit(offset, ty), }
 }
 
@@ -325,7 +325,7 @@ pub fn RecGroup::types(self : RecGroup) -> Array[SubType] {
 
 ///|
 /// The number of types in the group.
-pub fn RecGroup::len(self : RecGroup) -> Int {
+pub fn RecGroup::len(self : RecGroup) -> Int32 {
   match self.inner {
     Implicit(_, _) => 1
     Explicit(types) => types.length()
@@ -334,7 +334,7 @@ pub fn RecGroup::len(self : RecGroup) -> Int {
 
 ///|
 /// The `i`-th type of the group.
-pub fn RecGroup::get(self : RecGroup, i : Int) -> SubType {
+pub fn RecGroup::get(self : RecGroup, i : Int32) -> SubType {
   match self.inner {
     Implicit(_, ty) => {
       if !(i == 0) {
@@ -357,7 +357,7 @@ pub fn RecGroup::into_types(self : RecGroup) -> Array[SubType] {
 /// Return an iterator over the types in this rec group (with their offsets).
 pub fn RecGroup::into_types_and_offsets(
   self : RecGroup,
-) -> Array[(Int, SubType)] {
+) -> Array[(Int32, SubType)] {
   match self.inner {
     Implicit(offset, ty) => [(offset, ty)]
     Explicit(types) => types
@@ -617,7 +617,7 @@ pub struct FuncType {
   /// The combined parameters and result types.
   priv params_results : Array[ValType]
   /// The number of parameter types.
-  priv len_params : Int
+  priv len_params : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -674,7 +674,7 @@ pub fn FuncType::new(
 ///|
 fn FuncType::from_raw_parts(
   params_results : Array[ValType],
-  len_params : Int,
+  len_params : Int32,
 ) -> FuncType {
   if !(len_params <= params_results.length()) {
     abort("assertion failed: len_params <= params_results.length()")
@@ -1024,7 +1024,7 @@ fn ValType::remap_indices(
 //
 //   0000 = none
 //   ```
-pub(all) struct RefType(UInt) derive(Eq, Hash, Debug)
+pub(all) struct RefType(UInt32) derive(Eq, Hash, Debug)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1075,64 +1075,64 @@ pub extend RefType with Show::{to_string, output}
 // These bits are valid for all `RefType`s.
 
 ///|
-let reftype_nullable_bit : UInt = 1U << 23
+let reftype_nullable_bit : UInt32 = 1U << 23
 
 ///|
-let reftype_concrete_bit : UInt = 1U << 22
+let reftype_concrete_bit : UInt32 = 1U << 22
 
 // The `abstype` field is valid only when `concrete == 0`.
 
 ///|
-let reftype_shared_bit : UInt = 1U << 21
+let reftype_shared_bit : UInt32 = 1U << 21
 
 ///|
-let reftype_abstype_mask : UInt = 0b1111U << 17
+let reftype_abstype_mask : UInt32 = 0b1111U << 17
 
 ///|
-let reftype_any_abstype : UInt = 0b1111U << 17
+let reftype_any_abstype : UInt32 = 0b1111U << 17
 
 ///|
-let reftype_eq_abstype : UInt = 0b1101U << 17
+let reftype_eq_abstype : UInt32 = 0b1101U << 17
 
 ///|
-let reftype_i31_abstype : UInt = 0b1000U << 17
+let reftype_i31_abstype : UInt32 = 0b1000U << 17
 
 ///|
-let reftype_struct_abstype : UInt = 0b1001U << 17
+let reftype_struct_abstype : UInt32 = 0b1001U << 17
 
 ///|
-let reftype_array_abstype : UInt = 0b1100U << 17
+let reftype_array_abstype : UInt32 = 0b1100U << 17
 
 ///|
-let reftype_func_abstype : UInt = 0b0101U << 17
+let reftype_func_abstype : UInt32 = 0b0101U << 17
 
 ///|
-let reftype_nofunc_abstype : UInt = 0b0100U << 17
+let reftype_nofunc_abstype : UInt32 = 0b0100U << 17
 
 ///|
-let reftype_extern_abstype : UInt = 0b0011U << 17
+let reftype_extern_abstype : UInt32 = 0b0011U << 17
 
 ///|
-let reftype_noextern_abstype : UInt = 0b0010U << 17
+let reftype_noextern_abstype : UInt32 = 0b0010U << 17
 
 ///|
-let reftype_exn_abstype : UInt = 0b0001U << 17
+let reftype_exn_abstype : UInt32 = 0b0001U << 17
 
 ///|
-let reftype_noexn_abstype : UInt = 0b1110U << 17
+let reftype_noexn_abstype : UInt32 = 0b1110U << 17
 
 ///|
-let reftype_none_abstype : UInt = 0b0000U << 17
+let reftype_none_abstype : UInt32 = 0b0000U << 17
 
 ///|
-let reftype_cont_abstype : UInt = 0b0111U << 17
+let reftype_cont_abstype : UInt32 = 0b0111U << 17
 
 ///|
-let reftype_nocont_abstype : UInt = 0b0110U << 17
+let reftype_nocont_abstype : UInt32 = 0b0110U << 17
 
 ///|
 // The `index` is valid only when `concrete == 1`.
-let reftype_index_mask : UInt = (1U << 22) - 1
+let reftype_index_mask : UInt32 = (1U << 22) - 1
 
 ///|
 /// A nullable untyped function reference aka `(ref null func)` aka
@@ -1286,17 +1286,17 @@ pub let reftype_nocont : RefType = RefType(reftype_nocont_abstype)
 ///|
 // Only used by a `debug_assert!` upstream (readers/core/types.rs:1204).
 #warnings("-unused_value")
-fn RefType::can_represent_type_index(index : UInt) -> Bool {
+fn RefType::can_represent_type_index(index : UInt32) -> Bool {
   (index & reftype_index_mask) == index
 }
 
 ///|
-fn RefType::as_u32(self : RefType) -> UInt {
+fn RefType::as_u32(self : RefType) -> UInt32 {
   self.0
 }
 
 ///|
-fn RefType::from_u32(x : UInt) -> RefType {
+fn RefType::from_u32(x : UInt32) -> RefType {
   RefType(x)
 }
 
@@ -1307,7 +1307,7 @@ fn RefType::from_u32(x : UInt) -> RefType {
 /// Returns `None` when the type index is beyond this crate's
 /// implementation limits and therefore is not representable.
 pub fn RefType::concrete(nullable : Bool, index : PackedIndex) -> RefType {
-  let index : UInt = PackedIndex::to_u32(index)
+  let index : UInt32 = PackedIndex::to_u32(index)
   let nullable32 = if nullable { reftype_nullable_bit } else { 0 }
   RefType::from_u32(nullable32 | reftype_concrete_bit | index)
 }
@@ -1382,7 +1382,7 @@ pub fn RefType::type_index(self : RefType) -> PackedIndex? {
 }
 
 ///|
-fn RefType::abstype(self : RefType) -> UInt {
+fn RefType::abstype(self : RefType) -> UInt32 {
   self.as_u32() & reftype_abstype_mask
 }
 
@@ -2019,7 +2019,7 @@ pub(all) struct MemoryType {
   /// [The custom-page-sizes proposal] allows changing it to other values.
   ///
   /// [The custom-page-sizes proposal]: https://github.com/WebAssembly/custom-page-sizes
-  page_size_log2 : UInt?
+  page_size_log2 : UInt32?
 } derive(Eq, Debug)
 
 ///|
@@ -2086,7 +2086,7 @@ pub(all) struct TagType {
   /// The kind of tag
   kind : TagKind
   /// The function type this tag uses.
-  func_type_idx : UInt
+  func_type_idx : UInt32
 } derive(Eq, Debug)
 
 ///|

@@ -83,7 +83,7 @@ fn NameDisambiguationProperties::copy(
 /// Adds the first `num` names (i.e., makes their name forms visible).
 fn NameDisambiguationProperties::add_name(
   self : NameDisambiguationProperties,
-  num : Int,
+  num : Int32,
 ) -> Bool {
   for lst in self.name_forms {
     if lst.length() >= num {
@@ -150,7 +150,7 @@ fn NameDisambiguationProperties::max(
 /// exist (upstream `get_form_mut`, split into a getter and a setter).
 fn NameDisambiguationProperties::get_form(
   self : NameDisambiguationProperties,
-  idx : Int,
+  idx : Int32,
 ) -> DisambiguatedNameForm? {
   match self.locate_form(idx) {
     Some((i, j)) => self.name_forms[i][j]
@@ -161,8 +161,8 @@ fn NameDisambiguationProperties::get_form(
 ///|
 fn NameDisambiguationProperties::locate_form(
   self : NameDisambiguationProperties,
-  idx : Int,
-) -> (Int, Int)? {
+  idx : Int32,
+) -> (Int32, Int32)? {
   let mut k = 0
   for i, l in self.name_forms {
     for j, f in l {
@@ -178,7 +178,7 @@ fn NameDisambiguationProperties::locate_form(
 ///|
 fn NameDisambiguationProperties::set_form(
   self : NameDisambiguationProperties,
-  idx : Int,
+  idx : Int32,
   form : DisambiguatedNameForm,
 ) -> Unit {
   match self.locate_form(idx) {
@@ -620,7 +620,7 @@ fn write_name(
   cs_name : @citationberg.Name,
   name_opts : @citationberg.NameOptions,
   variable : @citationberg.NameVariable,
-  name_idx : Int,
+  name_idx : Int32,
 ) -> Unit {
   let hyphen_init = ctx.style.csl.settings.initialize_with_hyphen
   let sort_sep = name_opts.sort_separator

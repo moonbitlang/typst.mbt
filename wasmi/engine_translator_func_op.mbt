@@ -35,9 +35,9 @@ pub(all) struct StoreWrapOperator {
   store : (@ir.Slot, @ir.Offset64Lo) -> @ir.Op
   store_imm : (@ir.Slot, @ir.Offset64Lo) -> @ir.Op
   store_offset16 : (@ir.Slot, @ir.Offset16, @ir.Slot) -> @ir.Op
-  store_offset16_imm : (@ir.Slot, @ir.Offset16, Int) -> @ir.Op
+  store_offset16_imm : (@ir.Slot, @ir.Offset16, Int32) -> @ir.Op
   store_at : (@ir.Slot, @ir.Address32) -> @ir.Op
-  store_at_imm : (Int, @ir.Address32) -> @ir.Op
+  store_at_imm : (Int32, @ir.Address32) -> @ir.Op
 }
 
 ///|

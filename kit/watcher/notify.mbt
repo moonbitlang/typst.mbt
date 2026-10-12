@@ -271,7 +271,7 @@ priv struct Receiver(@aqueue.Queue[Result[Event, NotifyError]])
 /// `Duration::MAX`).
 async fn Receiver::recv_timeout(
   self : Receiver,
-  timeout : Int?,
+  timeout : Int32?,
 ) -> Result[Event, NotifyError]? noraise {
   // An error is a channel without a sender, which upstream treats like a
   // timeout (`Result::into_iter`, `.ok()`).
@@ -331,7 +331,7 @@ priv struct RecommendedWatcher {
 /// happened to its files before the `commit` (events the operating system
 /// queued while a compilation was running, which a new watcher never
 /// sees).
-const LINGER : Int = 1000
+const LINGER : Int32 = 1000
 
 ///|
 /// Creates the watcher and the channel it sends its events to

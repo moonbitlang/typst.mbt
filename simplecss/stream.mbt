@@ -4,28 +4,28 @@
 // offsets and the reported `TextPos`es are identical to upstream's.
 
 ///|
-fn is_name_start(c : Int) -> Bool {
+fn is_name_start(c : Int32) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' => true
     _ => is_non_ascii(c) || is_escape(c)
   }
 }
 
 ///|
-fn is_name_char(c : Int) -> Bool {
+fn is_name_char(c : Int32) -> Bool {
   match c {
-    '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' => true
+    '_' | 'a'..<='z' | 'A'..<='Z' | '0'..<='9' | '-' => true
     _ => is_non_ascii(c) || is_escape(c)
   }
 }
 
 ///|
-fn is_non_ascii(c : Int) -> Bool {
+fn is_non_ascii(c : Int32) -> Bool {
   c > 237
 }
 
 ///|
-fn is_escape(_c : Int) -> Bool {
+fn is_escape(_c : Int32) -> Bool {
   // TODO: this
   false
 }
@@ -33,8 +33,8 @@ fn is_escape(_c : Int) -> Bool {
 ///|
 priv struct Stream {
   text : BytesView
-  mut pos : Int
-  end : Int
+  mut pos : Int32
+  end : Int32
 }
 
 ///|
@@ -48,7 +48,7 @@ fn Stream::from_string(text : String) -> Stream {
 }
 
 ///|
-fn Stream::pos(self : Stream) -> Int {
+fn Stream::pos(self : Stream) -> Int32 {
   self.pos
 }
 
@@ -96,7 +96,7 @@ fn Stream::next_byte_ok(self : Stream) -> Byte? {
 }
 
 ///|
-fn Stream::advance(self : Stream, n : Int) -> Unit {
+fn Stream::advance(self : Stream, n : Int32) -> Unit {
   self.pos += n
 }
 
@@ -135,7 +135,7 @@ fn Stream::skip_bytes(self : Stream, f : (Byte) -> Bool) -> Unit {
 
 ///|
 /// Decodes the UTF-8 char starting at byte `pos`: `(code point, len_utf8)`.
-fn Stream::char_at(self : Stream, pos : Int) -> (Int, Int) {
+fn Stream::char_at(self : Stream, pos : Int32) -> (Int32, Int32) {
   let b0 = self.text[pos].to_int()
   if b0 < 0x80 {
     (b0, 1)
@@ -160,12 +160,12 @@ fn Stream::char_at(self : Stream, pos : Int) -> (Int, Int) {
 }
 
 ///|
-fn Stream::slice_range(self : Stream, start : Int, end : Int) -> String {
+fn Stream::slice_range(self : Stream, start : Int32, end : Int32) -> String {
   @utf8.decode_lossy(self.text[start:end])
 }
 
 ///|
-fn Stream::slice_back(self : Stream, pos : Int) -> String {
+fn Stream::slice_back(self : Stream, pos : Int32) -> String {
   self.slice_range(pos, self.pos)
 }
 
@@ -283,13 +283,13 @@ fn Stream::gen_text_pos(self : Stream) -> TextPos {
 }
 
 ///|
-fn Stream::gen_text_pos_from(self : Stream, pos : Int) -> TextPos {
+fn Stream::gen_text_pos_from(self : Stream, pos : Int32) -> TextPos {
   let pos = if pos < self.text.length() { pos } else { self.text.length() }
   TextPos::new(calc_curr_row(self.text, pos), calc_curr_col(self.text, pos))
 }
 
 ///|
-fn calc_curr_row(text : BytesView, end : Int) -> UInt {
+fn calc_curr_row(text : BytesView, end : Int32) -> UInt32 {
   let mut row = 1U
   for i in 0..<end {
     if text[i] == b'\n' {
@@ -300,7 +300,7 @@ fn calc_curr_row(text : BytesView, end : Int) -> UInt {
 }
 
 ///|
-fn calc_curr_col(text : BytesView, end : Int) -> UInt {
+fn calc_curr_col(text : BytesView, end : Int32) -> UInt32 {
   // Counts the chars (non-continuation bytes) back to the previous newline.
   let mut col = 1U
   for i = end - 1; i >= 0; i = i - 1 {

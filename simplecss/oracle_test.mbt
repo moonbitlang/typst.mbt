@@ -2,7 +2,7 @@
 // `simplecss` 0.2.2 crate. Do not edit.
 
 ///|
-let tree_spec : Array[(Int, String, Array[(String, String)])] = [
+let tree_spec : Array[(Int32, String, Array[(String, String)])] = [
   (-1, "svg", [("id", "root")]),
   (0, "g", [("id", "g1"), ("class", "a b")]),
   (1, "rect", [("id", "r1"), ("class", "a"), ("lang", "en")]),

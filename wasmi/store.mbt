@@ -8,13 +8,13 @@
 
 ///|
 /// The global counter of stores (upstream `StoreIdx::new`).
-let store_counter : Ref[Int] = { val: 0, }
+let store_counter : Ref[Int32] = { val: 0, }
 
 ///|
 /// The inner store that owns all data not associated to the host state.
 pub struct StoreInner {
   /// The unique store index.
-  priv store_idx : Int
+  priv store_idx : Int32
   /// Stored Wasm or host functions.
   priv funcs : Array[FuncEntity]
   /// Stored linear memories.
@@ -111,8 +111,8 @@ pub fn[T] Store::set_data(self : Store[T], data : T) -> Unit {
 ///|
 /// A Wasm or host function reference.
 pub(all) struct Func {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -140,8 +140,8 @@ pub extend Func with Show::{to_string, output}
 ///|
 /// A Wasm linear memory reference.
 pub(all) struct Memory {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -169,8 +169,8 @@ pub extend Memory with Show::{to_string, output}
 ///|
 /// A Wasm table reference.
 pub(all) struct Table {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -198,8 +198,8 @@ pub extend Table with Show::{to_string, output}
 ///|
 /// A Wasm global variable reference.
 pub(all) struct Global {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -227,8 +227,8 @@ pub extend Global with Show::{to_string, output}
 ///|
 /// An instantiated WebAssembly [`Module`].
 pub(all) struct Instance {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -256,8 +256,8 @@ pub extend Instance with Show::{to_string, output}
 ///|
 /// A reference to a data segment.
 pub(all) struct DataSegment {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -273,8 +273,8 @@ pub extend DataSegment with Hash::{hash, hash_combine}
 ///|
 /// A reference to an element segment.
 pub(all) struct ElementSegment {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -290,8 +290,8 @@ pub extend ElementSegment with Hash::{hash, hash_combine}
 ///|
 /// Represents an opaque reference to any data within WebAssembly.
 pub(all) struct ExternRef {
-  priv store : Int
-  priv idx : Int
+  priv store : Int32
+  priv idx : Int32
 } derive(Eq, Hash)
 
 ///|
@@ -325,7 +325,7 @@ pub(all) struct ExternRefEntity {
 ///|
 /// An opaque value of any type (a stand-in for Rust's `dyn Any`).
 pub(all) enum Any {
-  U32(UInt)
+  U32(UInt32)
   Str(String)
   Other
 } derive(Eq)
@@ -463,7 +463,7 @@ pub fn StoreInner::alloc_func(self : StoreInner, func : FuncEntity) -> Func {
 
 ///|
 /// Checks that the entity belongs to this store.
-fn StoreInner::check_store(self : StoreInner, store : Int) -> Unit {
+fn StoreInner::check_store(self : StoreInner, store : Int32) -> Unit {
   if store != self.store_idx {
     abort("failed to resolve stored entity: encountered foreign entity")
   }
@@ -618,11 +618,11 @@ pub fn StoreInner::externref_from_untyped(
 /// Runtime representation of a Wasm value.
 pub(all) enum Val {
   /// Value of 32-bit signed or unsigned integer.
-  I32(Int)
+  I32(Int32)
   /// Value of 64-bit signed or unsigned integer.
   I64(Int64)
   /// Value of 32-bit IEEE 754-2008 floating point number (as bits).
-  F32(UInt)
+  F32(UInt32)
   /// Value of 64-bit IEEE 754-2008 floating point number (as bits).
   F64(UInt64)
   /// 128-bit Wasm `simd` proposal vector.

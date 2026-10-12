@@ -22,7 +22,7 @@ fn IntegerDecoder::new() -> IntegerDecoder {
 fn IntegerDecoder::decode(
   self : IntegerDecoder,
   decoder : ArithmeticDecoder,
-) -> Int? {
+) -> Int32? {
   // A.2 step 1: "Set: PREV = 1"
   // `PREV` - Context prefix, contains bits decoded so far plus a leading 1.
   let prev = Ref(1U)
@@ -79,8 +79,8 @@ fn IntegerDecoder::decode(
 fn IntegerDecoder::decode_bit(
   self : IntegerDecoder,
   decoder : ArithmeticDecoder,
-  prev : Ref[UInt],
-) -> UInt {
+  prev : Ref[UInt32],
+) -> UInt32 {
   let ctx_idx = (prev.val & 0x1FF).reinterpret_as_int()
   // `D` - The just-decoded bit.
   let d = decoder.read_bit(self.contexts, ctx_idx)
@@ -103,9 +103,9 @@ fn IntegerDecoder::decode_bit(
 fn IntegerDecoder::decode_n_bits(
   self : IntegerDecoder,
   decoder : ArithmeticDecoder,
-  prev : Ref[UInt],
-  n : Int,
-) -> UInt {
+  prev : Ref[UInt32],
+  n : Int32,
+) -> UInt32 {
   let mut value = 0U
   for _ in 0..<n {
     let bit = self.decode_bit(decoder, prev)

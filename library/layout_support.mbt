@@ -296,7 +296,7 @@ pub fn Counter::update(
 /// and the logical page counter (upstream `ManualPageCounter`,
 /// `introspection/counter.rs`).
 pub struct ManualPageCounter {
-  priv mut physical : Int
+  priv mut physical : Int32
   priv mut logical : Int64
 }
 
@@ -308,7 +308,7 @@ pub fn ManualPageCounter::new() -> ManualPageCounter {
 
 ///|
 /// Get the current physical page counter state.
-pub fn ManualPageCounter::physical(self : ManualPageCounter) -> Int {
+pub fn ManualPageCounter::physical(self : ManualPageCounter) -> Int32 {
   self.physical
 }
 

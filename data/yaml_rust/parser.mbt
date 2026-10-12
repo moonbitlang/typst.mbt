@@ -39,14 +39,14 @@ pub(all) enum Event {
   DocumentStart
   DocumentEnd
   /// Refer to an anchor ID
-  Alias(Int)
+  Alias(Int32)
   /// Value, style, anchor_id, tag
-  Scalar(String, TScalarStyle, Int, TokenType?)
+  Scalar(String, TScalarStyle, Int32, TokenType?)
   /// Anchor ID
-  SequenceStart(Int)
+  SequenceStart(Int32)
   SequenceEnd
   /// Anchor ID
-  MappingStart(Int)
+  MappingStart(Int32)
   MappingEnd
 } derive(Eq, Debug)
 
@@ -67,7 +67,7 @@ fn Event::empty_scalar() -> Event {
 }
 
 ///|
-fn Event::empty_scalar_with_anchor(anchor : Int, tag : TokenType?) -> Event {
+fn Event::empty_scalar_with_anchor(anchor : Int32, tag : TokenType?) -> Event {
   Event::Scalar("", Plain, anchor, tag)
 }
 
@@ -78,8 +78,8 @@ pub struct Parser {
   priv mut state : State
   priv mut token : Token?
   priv mut current : (Event, Marker)?
-  priv anchors : Map[String, Int]
-  priv mut anchor_id : Int
+  priv anchors : Map[String, Int32]
+  priv mut anchor_id : Int32
 }
 
 ///|
@@ -445,7 +445,11 @@ fn Parser::document_end(self : Parser) -> (Event, Marker) raise ScanError {
 }
 
 ///|
-fn Parser::register_anchor(self : Parser, name : String, _mark : Marker) -> Int {
+fn Parser::register_anchor(
+  self : Parser,
+  name : String,
+  _mark : Marker,
+) -> Int32 {
   // anchors can be overridden/reused
   // if self.anchors.contains_key(name) {
   //     return Err(ScanError::new(*mark,

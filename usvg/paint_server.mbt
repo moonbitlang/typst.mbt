@@ -1142,7 +1142,7 @@ fn Paint::content_units(self : Paint) -> Units {
 ///|
 /// Whether the object with the given `uid` would be uniquely referenced
 /// (`Arc::get_mut` succeeds); see the file header.
-fn Cache::is_unique(self : Cache, uid : Int) -> Bool {
+fn Cache::is_unique(self : Cache, uid : Int32) -> Bool {
   match self.ref_roots {
     None => false
     Some(roots) => {
@@ -1159,7 +1159,7 @@ fn Cache::is_unique(self : Cache, uid : Int) -> Bool {
 ///|
 /// Counts the references to shared objects (upstream's `Arc` strong counts).
 priv struct RefCounter {
-  counts : Map[Int, Int]
+  counts : Map[Int32, Int32]
 }
 
 ///|
@@ -1170,7 +1170,7 @@ fn RefCounter::new() -> RefCounter {
 ///|
 /// Counts a reference; returns whether the object is seen for the first
 /// time (and its content must be visited).
-fn RefCounter::hit(self : RefCounter, uid : Int) -> Bool {
+fn RefCounter::hit(self : RefCounter, uid : Int32) -> Bool {
   let n = self.counts.get(uid).unwrap_or(0)
   self.counts[uid] = n + 1
   n == 0

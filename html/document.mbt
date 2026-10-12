@@ -122,7 +122,7 @@ fn html_document_common(
 /// The introspectible output of HTML compilation.
 pub struct HtmlOutput {
   priv nodes : Array[HtmlNode]
-  priv root_index : Int
+  priv root_index : Int32
 }
 
 ///|

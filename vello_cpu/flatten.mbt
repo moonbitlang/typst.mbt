@@ -231,7 +231,7 @@ fn flatten_impl(
 
 ///|
 /// `f64 as usize` (saturating).
-fn f64_as_usize(x : Double) -> Int {
+fn f64_as_usize(x : Double) -> Int32 {
   if x != x || x <= 0.0 {
     0
   } else if x >= 2147483647.0 {
@@ -339,7 +339,7 @@ fn quad_determine_subdiv_t(params : FlattenParams, x : Double) -> Double {
 
 ///|
 /// This limit was chosen based on the pre-existing GitHub gist.
-const MAX_QUADS : Int = 16
+const MAX_QUADS : Int32 = 16
 
 ///|
 /// The context needed for flattening curves. Points are stored as
@@ -352,7 +352,7 @@ priv struct FlattenCtx {
   u0 : FixedArray[Float]
   uscale : FixedArray[Float]
   val : FixedArray[Float]
-  mut n_quads : Int
+  mut n_quads : Int32
   /// Reusable buffer for flattened cubic points.
   mut flattened_cubics : FixedArray[Float]
 }
@@ -374,7 +374,7 @@ fn FlattenCtx::new() -> FlattenCtx {
 
 ///|
 /// Make sure `flattened_cubics` holds at least `points` points.
-fn FlattenCtx::ensure_cubics(self : FlattenCtx, points : Int) -> Unit {
+fn FlattenCtx::ensure_cubics(self : FlattenCtx, points : Int32) -> Unit {
   if points * 2 > self.flattened_cubics.length() {
     let mut cap = self.flattened_cubics.length()
     while cap < points * 2 {
@@ -416,7 +416,7 @@ fn eval_cubics_simd(
   p1 : @kurbo.Point,
   p2 : @kurbo.Point,
   p3 : @kurbo.Point,
-  n : Int,
+  n : Int32,
   result : FlattenCtx,
 ) -> Unit {
   result.n_quads = n
@@ -469,7 +469,7 @@ fn eval_cubics_simd(
 ///|
 /// Lane `l` of an `f32x8` loaded from `arr` at float offset `off` (lanes
 /// past the end read as zero, like the default-initialized arrays upstream).
-fn lane_at(arr : FixedArray[Float], off : Int) -> Float {
+fn lane_at(arr : FixedArray[Float], off : Int32) -> Float {
   if off < arr.length() {
     arr[off]
   } else {
@@ -552,11 +552,11 @@ fn estimate_subdiv_simd(sqrt_tol : Float, ctx : FlattenCtx) -> Unit {
 ///|
 fn output_lines_simd(
   ctx : FlattenCtx,
-  i : Int,
+  i : Int32,
   x0 : Float,
   dx : Float,
-  n : Int,
-  start_idx : Int,
+  n : Int32,
+  start_idx : Int32,
 ) -> Unit {
   let p0x = ctx.even_pts[i * 2]
   let p0y = ctx.even_pts[i * 2 + 1]
@@ -601,7 +601,7 @@ fn flatten_cubic_simd(
   p2 : @kurbo.Point,
   p3 : @kurbo.Point,
   ctx : FlattenCtx,
-) -> Int {
+) -> Int32 {
   let n_quads = estimate_num_quads(p0, p1, p2, p3, f32(TOL))
   eval_cubics_simd(p0, p1, p2, p3, n_quads, ctx)
   let tol = f32(TOL) * ((1.0 : Float) - to_quad_tol)
@@ -654,7 +654,7 @@ fn estimate_num_quads(
   p2 : @kurbo.Point,
   p3 : @kurbo.Point,
   accuracy : Float,
-) -> Int {
+) -> Int32 {
   let q_accuracy = (accuracy * to_quad_tol).to_double()
   let max_hypot2 = 432.0 * q_accuracy * q_accuracy
   let p1x2x = p1.x * 3.0 - p0.x
@@ -675,7 +675,7 @@ let estimate_lut : ReadOnlyArray[Double] = [
 ]
 
 ///|
-fn estimate(err_div : Double) -> Int {
+fn estimate(err_div : Double) -> Int32 {
   // Equivalent to `(err_div.powf(1. / 6.0).ceil() as usize).max(1)` clamped
   // to `MAX_QUADS`, using a lookup table.
   for i in 0..<MAX_QUADS {

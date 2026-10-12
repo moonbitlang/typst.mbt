@@ -3,7 +3,7 @@
 
 ///|
 /// `i32::checked_add`.
-fn checked_add_i32(a : Int, b : Int) -> Int? {
+fn checked_add_i32(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() + b.to_int64()
   if r < -0x80000000L || r > 0x7FFFFFFFL {
     None
@@ -14,7 +14,7 @@ fn checked_add_i32(a : Int, b : Int) -> Int? {
 
 ///|
 /// `i32::checked_mul`.
-fn checked_mul_i32(a : Int, b : Int) -> Int? {
+fn checked_mul_i32(a : Int32, b : Int32) -> Int32? {
   let r = a.to_int64() * b.to_int64()
   if r < -0x80000000L || r > 0x7FFFFFFFL {
     None
@@ -96,7 +96,7 @@ fn text_decode_with(
     raise Overflow(PlacementCoordinate)
   }
   let mut strip_t = -first_delta_t
-  let mut first_s : Int = 0
+  let mut first_s : Int32 = 0
   let mut instance_count = 0U
   while instance_count < header.num_instances {
     let delta_t = ctx.read_strip_delta_t(strip_size)
@@ -197,7 +197,7 @@ fn text_decode_with(
 ///|
 /// `symbols.get(idx)`, where a negative `idx` stands for a `usize` that is
 /// out of range anyway.
-fn get_symbol(symbols : Array[Bitmap], idx : Int) -> Bitmap? {
+fn get_symbol(symbols : Array[Bitmap], idx : Int32) -> Bitmap? {
   if idx >= 0 && idx < symbols.length() {
     Some(symbols[idx])
   } else {
@@ -232,7 +232,7 @@ priv struct TextRegionContexts {
 
 ///|
 /// Create new text region contexts with the given symbol code length.
-fn TextRegionContexts::new(symbol_code_length : UInt) -> TextRegionContexts {
+fn TextRegionContexts::new(symbol_code_length : UInt32) -> TextRegionContexts {
   {
     iadt: IntegerDecoder::new(),
     iafs: IntegerDecoder::new(),
@@ -290,8 +290,8 @@ fn DecodeContext::new_arithmetic(
 ///|
 fn DecodeContext::read_strip_delta_t(
   self : DecodeContext,
-  strip_size : UInt,
-) -> Int raise DecodeError {
+  strip_size : UInt32,
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) => {
       let value = tables.delta_t.decode_no_oob(reader)
@@ -312,7 +312,7 @@ fn DecodeContext::read_strip_delta_t(
 
 ///|
 /// Decode first symbol instance S coordinate (6.4.7).
-fn DecodeContext::read_first_s(self : DecodeContext) -> Int raise DecodeError {
+fn DecodeContext::read_first_s(self : DecodeContext) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) => tables.first_s.decode_no_oob(reader)
     ArithmeticCoding(decoder~, contexts~, ..) =>
@@ -322,7 +322,9 @@ fn DecodeContext::read_first_s(self : DecodeContext) -> Int raise DecodeError {
 
 ///|
 /// Decode subsequent symbol instance S coordinate (6.4.8).
-fn DecodeContext::read_delta_s(self : DecodeContext) -> Int? raise DecodeError {
+fn DecodeContext::read_delta_s(
+  self : DecodeContext,
+) -> Int32? raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) => tables.delta_s.decode(reader)
     ArithmeticCoding(decoder~, contexts~, ..) => contexts.iads.decode(decoder)
@@ -333,9 +335,9 @@ fn DecodeContext::read_delta_s(self : DecodeContext) -> Int? raise DecodeError {
 /// Decode symbol instance T coordinate (6.4.9).
 fn DecodeContext::read_symbol_t(
   self : DecodeContext,
-  strip_size : UInt,
-  log_strip_size : Int,
-) -> Int raise DecodeError {
+  strip_size : UInt32,
+  log_strip_size : Int32,
+) -> Int32 raise DecodeError {
   if strip_size == 1 {
     return 0
   }
@@ -351,7 +353,9 @@ fn DecodeContext::read_symbol_t(
 /// Decode symbol instance symbol ID (6.4.10).
 ///
 /// (Upstream's `usize`; a negative result stands for an out-of-range one.)
-fn DecodeContext::read_symbol_id(self : DecodeContext) -> Int raise DecodeError {
+fn DecodeContext::read_symbol_id(
+  self : DecodeContext,
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, symbol_codes~, ..) =>
       symbol_codes.decode_no_oob(reader)
@@ -363,7 +367,7 @@ fn DecodeContext::read_symbol_id(self : DecodeContext) -> Int raise DecodeError 
 ///|
 fn DecodeContext::read_refinement_flag(
   self : DecodeContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, ..) => ok_or(reader.read_bit(), eof)
     ArithmeticCoding(decoder~, contexts~, ..) =>
@@ -375,7 +379,7 @@ fn DecodeContext::read_refinement_flag(
 /// Decode symbol instance refinement delta width (6.4.11.1).
 fn DecodeContext::read_refinement_delta_width(
   self : DecodeContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) =>
       tables.refinement_width.decode_no_oob(reader)
@@ -388,7 +392,7 @@ fn DecodeContext::read_refinement_delta_width(
 /// Decode symbol instance refinement delta height (6.4.11.2).
 fn DecodeContext::read_refinement_delta_height(
   self : DecodeContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) =>
       tables.refinement_height.decode_no_oob(reader)
@@ -401,7 +405,7 @@ fn DecodeContext::read_refinement_delta_height(
 /// Decode symbol instance refinement x offset (6.4.11.3).
 fn DecodeContext::read_refinement_x_offset(
   self : DecodeContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) =>
       tables.refinement_x.decode_no_oob(reader)
@@ -414,7 +418,7 @@ fn DecodeContext::read_refinement_x_offset(
 /// Decode symbol instance refinement y offset (6.4.11.4).
 fn DecodeContext::read_refinement_y_offset(
   self : DecodeContext,
-) -> Int raise DecodeError {
+) -> Int32 raise DecodeError {
   match self {
     HuffmanCoding(reader~, tables~, ..) =>
       tables.refinement_y.decode_no_oob(reader)
@@ -429,8 +433,8 @@ fn DecodeContext::decode_refinement_bitmap(
   self : DecodeContext,
   refined : Bitmap,
   reference_bitmap : Bitmap,
-  reference_x_offset : Int,
-  reference_y_offset : Int,
+  reference_x_offset : Int32,
+  reference_y_offset : Int32,
   refinement_template : RefinementTemplate,
   refinement_at_pixels : Array[AdaptiveTemplatePixel],
 ) -> Unit raise DecodeError {
@@ -464,7 +468,7 @@ fn DecodeContext::decode_refinement_bitmap(
 /// Result of determining a symbol instance bitmap.
 priv enum SymbolBitmap {
   /// Use the symbol at this index directly (`R_I` = 0).
-  Reference(Int)
+  Reference(Int32)
   /// Use this refined bitmap (`R_I` = 1).
   Owned(Bitmap)
 }
@@ -475,7 +479,7 @@ fn decode_symbol_instance_bitmap(
   ctx : DecodeContext,
   symbols : Array[Bitmap],
   header : TextRegionHeader,
-  symbol_id : Int,
+  symbol_id : Int32,
 ) -> SymbolBitmap raise DecodeError {
   if !header.flags.use_refinement || ctx.read_refinement_flag() == 0 {
     return Reference(symbol_id)
@@ -619,7 +623,7 @@ fn select_huffman_tables(
 /// Decode the symbol ID Huffman table (7.4.3.1.7).
 fn decode_symbol_id_huffman_table(
   reader : Reader,
-  num_symbols : UInt,
+  num_symbols : UInt32,
 ) -> HuffmanTable raise DecodeError {
   let runcode_lines = []
   for runcode_idx in 0..<35 {
@@ -628,11 +632,11 @@ fn decode_symbol_id_huffman_table(
   }
   let runcode_table = HuffmanTable::build(runcode_lines)
   let num_symbols = num_symbols.to_uint64()
-  let symbol_code_lengths : Array[Int] = []
+  let symbol_code_lengths : Array[Int32] = []
   while symbol_code_lengths.length().to_uint64() < num_symbols {
     let runcode = runcode_table.decode_no_oob(reader)
     match runcode {
-      0..=31 => symbol_code_lengths.push(runcode)
+      0..<=31 => symbol_code_lengths.push(runcode)
       32 => {
         // Copy previous 3-6 times.
         let extra_bits = ok_or(reader.read_bits(2), Huffman(InvalidCode)).reinterpret_as_int()
@@ -696,7 +700,7 @@ priv enum ReferenceCorner {
 } derive(Eq)
 
 ///|
-fn ReferenceCorner::from_byte(value : Int) -> ReferenceCorner {
+fn ReferenceCorner::from_byte(value : Int32) -> ReferenceCorner {
   match value {
     0 => BottomLeft
     1 => TopLeft
@@ -710,27 +714,27 @@ fn ReferenceCorner::from_byte(value : Int) -> ReferenceCorner {
 priv struct TextRegionFlags {
   use_huffman : Bool
   use_refinement : Bool
-  log_strip_size : Int
+  log_strip_size : Int32
   reference_corner : ReferenceCorner
   transposed : Bool
   combination_operator : CombinationOperator
   default_pixel : Bool
   /// (Upstream's `i8`.)
-  delta_s_offset : Int
+  delta_s_offset : Int32
   refinement_template : RefinementTemplate
 }
 
 ///|
 /// Text region segment Huffman flags (7.4.3.1.2).
 priv struct TextRegionHuffmanFlags {
-  first_s_table : Int
-  delta_s_table : Int
-  delta_t_table : Int
-  refinement_width_table : Int
-  refinement_height_table : Int
-  refinement_y_table : Int
-  refinement_x_table : Int
-  refinement_size_table : Int
+  first_s_table : Int32
+  delta_s_table : Int32
+  delta_t_table : Int32
+  refinement_width_table : Int32
+  refinement_height_table : Int32
+  refinement_y_table : Int32
+  refinement_x_table : Int32
+  refinement_size_table : Int32
 }
 
 ///|
@@ -740,14 +744,14 @@ priv struct TextRegionHeader {
   flags : TextRegionFlags
   huffman_flags : TextRegionHuffmanFlags?
   refinement_at_pixels : Array[AdaptiveTemplatePixel]
-  num_instances : UInt
+  num_instances : UInt32
   symbol_id_table : HuffmanTable?
-  segment_data_len : Int
+  segment_data_len : Int32
   data : BytesView
 }
 
 ///|
-fn TextRegionHeader::strip_size(self : TextRegionHeader) -> UInt {
+fn TextRegionHeader::strip_size(self : TextRegionHeader) -> UInt32 {
   1U << self.flags.log_strip_size
 }
 
@@ -816,7 +820,7 @@ fn parse_text_region_huffman_flags(
 /// Parse a text region segment header (7.4.3.1).
 fn text_parse(
   reader : Reader,
-  num_symbols : UInt,
+  num_symbols : UInt32,
 ) -> TextRegionHeader raise DecodeError {
   let segment_data_len = ok_or(reader.tail(), eof).length()
   let region_info = parse_region_segment_info(reader)

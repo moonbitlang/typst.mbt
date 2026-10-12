@@ -15,7 +15,7 @@ fn hex_of(data : Bytes) -> String {
 
 ///|
 /// LCG-based test data: literals mixed with repetitive runs.
-fn gen_data(n : Int) -> Bytes {
+fn gen_data(n : Int32) -> Bytes {
   let mut x = 1U
   Bytes::makei(n, i => {
     x = x * 1103515245U + 12345U
@@ -28,7 +28,7 @@ fn gen_data(n : Int) -> Bytes {
 }
 
 ///|
-fn zlib_chunked(data : Bytes, level : Int, chunk : Int) -> Bytes {
+fn zlib_chunked(data : Bytes, level : Int32, chunk : Int32) -> Bytes {
   let enc = @codecs.ZlibEncoder::new(level)
   let mut off = 0
   while off < data.length() {

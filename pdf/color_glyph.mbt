@@ -313,7 +313,7 @@ impl @otf.ColrPainter for ColrSurfacePainter with fn pop_transform(self) {
 fn draw_colr_glyph(
   ttf : @otf.Face,
   gid : @otf.GlyphId,
-  context_color : Int,
+  context_color : Int32,
   surface : @export.Surface,
 ) -> Bool {
   if !ttf.is_color_glyph(gid) {

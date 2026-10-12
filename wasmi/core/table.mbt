@@ -240,7 +240,7 @@ pub fn Table::set_untyped(
 
 ///|
 /// Returns the start of `items[index..][..len]` if it is in bounds.
-fn sub_range_start(items_len : Int, index : UInt64, len : UInt64) -> Int? {
+fn sub_range_start(items_len : Int32, index : UInt64, len : UInt64) -> Int32? {
   let n = items_len.to_uint64()
   if index > n || n - index < len {
     return None
@@ -263,8 +263,8 @@ pub fn Table::init(
   self : Table,
   element : ElementSegmentRef,
   dst_index : UInt64,
-  src_index : UInt,
-  len : UInt,
+  src_index : UInt32,
+  len : UInt32,
   fuel : Fuel?,
 ) -> Unit raise TableError {
   let table_type = self.ty()
@@ -347,10 +347,10 @@ pub fn Table::copy(
 /// `copy_within` / `copy_from_slice` (handles overlapping ranges).
 fn Table::move_elements(
   dst : Array[UntypedVal],
-  dst_start : Int,
+  dst_start : Int32,
   src : Array[UntypedVal],
-  src_start : Int,
-  len : Int,
+  src_start : Int32,
+  len : Int32,
 ) -> Unit {
   if physical_equal(dst, src) && dst_start > src_start {
     for i = len - 1; i >= 0; i = i - 1 {

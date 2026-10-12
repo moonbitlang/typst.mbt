@@ -304,7 +304,7 @@ priv struct DecryptorData {
 ///|
 fn DecryptorData::from_dict(
   dict : Dict,
-  default_length : Int,
+  default_length : Int32,
 ) -> DecryptorData? {
   let mappings : Map[String, CryptDictionary] = Map([])
   if (dict.get("CF") : Dict?) is Some(dict) {
@@ -329,13 +329,13 @@ fn DecryptorData::from_dict(
 ///|
 priv struct CryptDictionary {
   cfm : DecryptorTag
-  _length : Int
+  _length : Int32
 }
 
 ///|
 fn CryptDictionary::from_dict(
   dict : Dict,
-  default_length : Int,
+  default_length : Int32,
 ) -> CryptDictionary? {
   guard (dict.get("CFM") : Name?) is Some(cfm_name) else { return None }
   guard DecryptorTag::from_name(cfm_name) is Some(cfm) else { return None }
@@ -358,7 +358,7 @@ fn CryptDictionary::from_dict(
 }
 
 ///|
-fn CryptDictionary::identity(default_length : Int) -> CryptDictionary {
+fn CryptDictionary::identity(default_length : Int32) -> CryptDictionary {
   { cfm: NoneTag, _length: default_length, }
 }
 
@@ -368,7 +368,7 @@ fn compute_hash_rev56(
   password : BytesView,
   validation_salt : BytesView,
   user_string : BytesView?,
-  revision : Int,
+  revision : Int32,
 ) -> Result[Bytes, DecryptionError] {
   // Take the SHA-256 hash of the original input to the algorithm and name the resulting
   // 32 bytes, K.
@@ -470,10 +470,10 @@ fn compute_hash_rev56(
 fn decryption_key_rev1234(
   password : Bytes,
   encrypt_metadata : Bool,
-  revision : Int,
-  byte_length : Int,
+  revision : Int32,
+  byte_length : Int32,
   owner_string : PdfString,
-  permissions : UInt,
+  permissions : UInt32,
   id : Bytes,
 ) -> Result[Bytes, DecryptionError] {
   let md5_input = Buffer()
@@ -530,7 +530,7 @@ fn decryption_key_rev1234(
 ///|
 /// Algorithm 6: Authenticating the user password
 fn authenticate_user_password_rev234(
-  revision : Int,
+  revision : Int32,
   decryption_key : Bytes,
   id : Bytes,
   user_string : PdfString,
@@ -607,7 +607,7 @@ fn user_password_rev34(decryption_key : Bytes, id : Bytes) -> Bytes {
 /// Algorithm 2.A: Retrieving the file encryption key from an encrypted document in order to decrypt it (revision 6 and later)
 fn decryption_key_rev56(
   dict : Dict,
-  revision : Int,
+  revision : Int32,
   password : Bytes,
   owner_string : PdfString,
   user_string : PdfString,
@@ -715,6 +715,6 @@ fn decryption_key_rev56(
 
 ///|
 /// `Vec::resize(n, 0)`.
-fn resize_bytes(data : Bytes, n : Int) -> Bytes {
+fn resize_bytes(data : Bytes, n : Int32) -> Bytes {
   Bytes::makei(n, i => if i < data.length() { data[i] } else { 0 })
 }

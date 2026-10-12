@@ -5,9 +5,9 @@
 /// A position as reported by `serde_yaml::Location`: the byte index of the
 /// error (libyaml's `mark.index`) and its 1-based line and column.
 pub(all) struct Location {
-  index : Int
-  line : Int
-  column : Int
+  index : Int32
+  line : Int32
+  column : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -40,9 +40,9 @@ pub extend YamlError with @debug.Debug::{to_repr}
 ///|
 /// A libyaml `yaml_mark_t`: 0-based byte index, line and column.
 priv struct Mark {
-  index : Int
-  line : Int
-  column : Int
+  index : Int32
+  line : Int32
+  column : Int32
 }
 
 ///|
@@ -68,7 +68,7 @@ fn Mark::to_location(self : Mark) -> Location {
 /// `serde_yaml::libyaml::error::Error` (only what `Display` and `mark` need).
 priv struct LibyamlError {
   problem : String
-  problem_offset : Int
+  problem_offset : Int32
   problem_mark : Mark
   context : String?
   context_mark : Mark

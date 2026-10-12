@@ -5,9 +5,9 @@
 /// A position in the pattern. `offset` is a UTF-16 index (upstream: byte
 /// offset); `line` and `column` are 1-based, columns count chars.
 priv struct Position {
-  offset : Int
-  line : Int
-  column : Int
+  offset : Int32
+  line : Int32
+  column : Int32
 } derive(Eq, Compare)
 
 ///|
@@ -56,7 +56,7 @@ priv enum AstErrorKind {
   GroupNameUnexpectedEof
   GroupUnclosed
   GroupUnopened
-  NestLimitExceeded(Int)
+  NestLimitExceeded(Int32)
   RepetitionCountInvalid
   RepetitionCountDecimalEmpty
   RepetitionCountUnclosed
@@ -303,7 +303,7 @@ fn format_error(
 /// A single character literal.
 priv struct Literal {
   span : Span
-  c : Int
+  c : Int32
   /// Whether this is a fixed `\xNN` escape (upstream `Literal::byte`).
   hex_x : Bool
 }
@@ -449,9 +449,9 @@ priv enum RepetitionKind {
   ZeroOrOne
   ZeroOrMore
   OneOrMore
-  Exactly(Int)
-  AtLeast(Int)
-  Bounded(Int, Int)
+  Exactly(Int32)
+  AtLeast(Int32)
+  Bounded(Int32, Int32)
 }
 
 ///|
@@ -474,7 +474,7 @@ priv struct Flags {
 
 ///|
 /// Add an item; returns the index of an equal existing item instead.
-fn Flags::add_item(self : Flags, item : FlagsItem) -> Int? {
+fn Flags::add_item(self : Flags, item : FlagsItem) -> Int32? {
   for i, x in self.items {
     if x.kind == item.kind {
       return Some(i)
@@ -500,8 +500,8 @@ fn Flags::flag_state(self : Flags, flag : Char) -> Bool? {
 
 ///|
 priv enum GroupKind {
-  CaptureIndex(Int)
-  CaptureName(String, Int)
+  CaptureIndex(Int32)
+  CaptureName(String, Int32)
   NonCapturing(Flags)
 }
 

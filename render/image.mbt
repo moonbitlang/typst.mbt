@@ -53,7 +53,11 @@ fn render_image(
 
 ///|
 /// Prepare a texture for an image at a scaled size.
-fn build_texture(image : @library.Image, w : UInt, h : UInt) -> @skia.Pixmap? {
+fn build_texture(
+  image : @library.Image,
+  w : UInt32,
+  h : UInt32,
+) -> @skia.Pixmap? {
   match image.kind() {
     Raster(raster) => {
       guard @skia.Pixmap::new(w, h) is Some(texture) else { return None }
@@ -113,7 +117,9 @@ fn build_texture(image : @library.Image, w : UInt, h : UInt) -> @skia.Pixmap? {
 ///|
 /// Select the substitute for one of the 14 PDF standard fonts
 /// (`typst_assets::pdf`).
-fn select_standard_font(font : @hayro_interpret.StandardFont) -> (Bytes, Int)? {
+fn select_standard_font(
+  font : @hayro_interpret.StandardFont,
+) -> (Bytes, Int32)? {
   let bytes = match font {
     Helvetica => @pdf_fonts.sans()
     HelveticaBold => @pdf_fonts.sans_bold()
@@ -137,8 +143,8 @@ fn select_standard_font(font : @hayro_interpret.StandardFont) -> (Bytes, Int)? {
 // Keep this in sync with `typst-svg`!
 fn build_pdf_texture(
   pdf : @library.PdfImage,
-  w : UInt,
-  h : UInt,
+  w : UInt32,
+  h : UInt32,
 ) -> @skia.Pixmap? {
   let interpreter_settings : @hayro_interpret.InterpreterSettings = {
     font_resolver: query => {

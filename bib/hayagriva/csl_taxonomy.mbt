@@ -602,12 +602,12 @@ fn csl_language(lang_id : LanguageIdentifier) -> String {
 
 ///|
 /// The year suffix letter for a disambiguation index.
-fn letter(val : Int) -> String {
+fn letter(val : Int32) -> String {
   let mut result = ""
   let mut current = val
   while true {
     let remainder = current % 26
-    let c = Int::unsafe_to_char(remainder + 'a'.to_int())
+    let c = Int32::unsafe_to_char(remainder + 'a'.to_int())
     result = c.to_string() + result
     if current < 26 {
       break

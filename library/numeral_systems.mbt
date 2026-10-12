@@ -738,7 +738,7 @@ pub fn NumeralSystem::represent(
 
 ///|
 /// Rust's `u64::ilog`.
-fn ilog_u64(n : UInt64, base : UInt64) -> UInt {
+fn ilog_u64(n : UInt64, base : UInt64) -> UInt32 {
   let mut n = n
   let mut log = 0U
   while n >= base {
@@ -750,7 +750,7 @@ fn ilog_u64(n : UInt64, base : UInt64) -> UInt {
 
 ///|
 /// Rust's `u64::pow` (wrapping).
-fn pow_u64(base : UInt64, exp : UInt) -> UInt64 {
+fn pow_u64(base : UInt64, exp : UInt32) -> UInt64 {
   let mut out = 1UL
   for _ in 0U..<exp {
     out = out * base
@@ -764,7 +764,7 @@ fn write_positional(
   f : StringBuilder,
   digits : ReadOnlyArray[String],
   n : UInt64,
-  size : UInt,
+  size : UInt32,
 ) -> Unit {
   let radix = digits.length().to_uint64()
   let mut n = n
@@ -921,17 +921,17 @@ fn chinese_number_str(
 
 ///|
 /// `ChineseExponent` ordinals: 分 角 個 十 百 千 萬 億 兆 京 垓 秭 穰 溝 澗 正 載 極.
-let chinese_exponent_shi : Int = 3
+let chinese_exponent_shi : Int32 = 3
 
 ///|
-let chinese_exponent_bai : Int = 4
+let chinese_exponent_bai : Int32 = 4
 
 ///|
-let chinese_exponent_wan : Int = 6
+let chinese_exponent_wan : Int32 = 6
 
 ///|
 fn chinese_exponent_str(
-  ordinal : Int,
+  ordinal : Int32,
   variant : ChineseVariant,
   case_ : ChineseCase,
 ) -> String {

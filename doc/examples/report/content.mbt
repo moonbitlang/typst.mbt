@@ -188,7 +188,7 @@ fn[T : IntoContent] bed_rows(
 
 ///|
 /// The bed that gave the most: its row is marked.
-fn best_bed() -> Int {
+fn best_bed() -> Int32 {
   let mut best = 0
   for i, bed in beds {
     if bed.kilograms > beds[best].kilograms {

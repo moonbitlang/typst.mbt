@@ -6,19 +6,19 @@ using @font_types {type GlyphId, type Tag, type Fixed, type F2Dot14}
 
 ///|
 /// The sfnt version of TrueType fonts (0x00010000).
-pub const TT_SFNT_VERSION : UInt = 0x00010000
+pub const TT_SFNT_VERSION : UInt32 = 0x00010000
 
 ///|
 /// The sfnt version of CFF fonts ('OTTO').
-pub const CFF_SFNT_VERSION : UInt = 0x4F54544F
+pub const CFF_SFNT_VERSION : UInt32 = 0x4F54544F
 
 ///|
 /// The sfnt version of Apple TrueType fonts ('true').
-pub const TRUE_SFNT_VERSION : UInt = 0x74727565
+pub const TRUE_SFNT_VERSION : UInt32 = 0x74727565
 
 ///|
 /// The TTC header tag ('ttcf').
-pub const TTC_HEADER_TAG : UInt = 0x74746366
+pub const TTC_HEADER_TAG : UInt32 = 0x74746366
 
 ///|
 /// The OpenType table directory.
@@ -35,14 +35,14 @@ fn TableDirectory::read(data : FontData) -> TableDirectory raise ReadError {
 }
 
 ///|
-pub fn TableDirectory::sfnt_version(self : TableDirectory) -> UInt {
+pub fn TableDirectory::sfnt_version(self : TableDirectory) -> UInt32 {
   self.data.read_u32(0) catch {
     _ => 0
   }
 }
 
 ///|
-pub fn TableDirectory::num_tables(self : TableDirectory) -> Int {
+pub fn TableDirectory::num_tables(self : TableDirectory) -> Int32 {
   self.data.read_u16(4) catch {
     _ => 0
   }
@@ -60,9 +60,9 @@ fn TableDirectory::records(self : TableDirectory) -> FontData {
 /// A table record: (tag, checksum, offset, length).
 pub(all) struct TableRecord {
   tag : Tag
-  checksum : UInt
-  offset : UInt
-  length : UInt
+  checksum : UInt32
+  offset : UInt32
+  length : UInt32
 } derive(Debug)
 
 ///|
@@ -109,7 +109,7 @@ pub struct FontRef {
   table_directory : TableDirectory
   priv records : Array[TableRecord]
   /// The index of this font in a TrueType collection
-  ttc_index : Int
+  ttc_index : Int32
   /// Whether this font is a member of a TrueType collection.
   in_ttc : Bool
   priv table_directory_sorted : Bool
@@ -132,7 +132,7 @@ pub fn FontRef::new(data : BytesView) -> FontRef raise ReadError {
 /// files. If a single font file is provided, the index parameter must be 0.
 pub fn FontRef::from_index(
   data : BytesView,
-  index : Int,
+  index : Int32,
 ) -> FontRef raise ReadError {
   // FileRef::new
   match collection_new(data) {
@@ -165,7 +165,7 @@ fn collection_new(data : BytesView) -> FontData? {
 }
 
 ///|
-fn collection_get(data : FontData, index : Int) -> FontRef raise ReadError {
+fn collection_get(data : FontData, index : Int32) -> FontRef raise ReadError {
   let num_fonts = data.read_u32(8)
   let offsets = data.read_array(12, num_fonts.reinterpret_as_int(), 4) catch {
     _ => FontData::empty()
@@ -190,7 +190,7 @@ fn collection_get(data : FontData, index : Int) -> FontRef raise ReadError {
 fn FontRef::with_table_directory(
   data : FontData,
   table_directory : TableDirectory,
-  ttc_index : Int?,
+  ttc_index : Int32?,
 ) -> FontRef raise ReadError {
   let v = table_directory.sfnt_version()
   if v == TT_SFNT_VERSION || v == CFF_SFNT_VERSION || v == TRUE_SFNT_VERSION {
@@ -216,7 +216,7 @@ pub fn FontRef::data(self : FontRef) -> FontData {
 ///|
 /// If the font is in a TrueType collection (ttc) file, returns the index
 /// of the font in that collection.
-pub fn FontRef::ttc_index(self : FontRef) -> Int? {
+pub fn FontRef::ttc_index(self : FontRef) -> Int32? {
   if self.in_ttc {
     Some(self.ttc_index)
   } else {
@@ -238,7 +238,7 @@ pub fn FontRef::table_data(self : FontRef, tag : Tag) -> FontData? {
     // binary search
     let mut lo = 0
     let mut hi = recs.length()
-    let mut found : Int? = None
+    let mut found : Int32? = None
     while lo < hi {
       let mid = lo + (hi - lo) / 2
       let t = recs[mid].tag.to_u32()
@@ -253,7 +253,7 @@ pub fn FontRef::table_data(self : FontRef, tag : Tag) -> FontData? {
     }
     found
   } else {
-    let mut found : Int? = None
+    let mut found : Int32? = None
     for i, rec in recs {
       if rec.tag.to_u32() == tag {
         found = Some(i)

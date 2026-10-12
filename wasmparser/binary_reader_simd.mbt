@@ -3,7 +3,7 @@
 ///|
 fn BinaryReader::read_0xfd_operator(
   self : BinaryReader,
-  pos : Int,
+  pos : Int32,
 ) -> Operator raise BinaryReaderError {
   let code = self.read_var_u32()
   match code {

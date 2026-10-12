@@ -60,7 +60,7 @@ pub fn Timestamp::new_utc(datetime : @library.Datetime) -> Timestamp {
 /// offset.
 pub fn Timestamp::new_local(
   datetime : @library.Datetime,
-  whole_minute_offset : Int,
+  whole_minute_offset : Int32,
 ) -> Timestamp? {
   let hour_offset = whole_minute_offset / 60
   // Note: the `%` operator is the remainder operator, which can be
@@ -80,7 +80,7 @@ pub(all) enum Timezone {
   UTC
   /// The local timezone offset from UTC (hours and minutes; the minute
   /// offset has the same sign as the hour offset).
-  Local(Int, Int)
+  Local(Int32, Int32)
 } derive(Eq)
 
 ///|

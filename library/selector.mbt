@@ -10,7 +10,7 @@ pub(all) enum Selector {
   ///
   /// If there is a dictionary, only elements with the fields from the
   /// dictionary match.
-  Elem(Element, Array[(Int, Value)]?)
+  Elem(Element, Array[(Int32, Value)]?)
   /// Matches the element at the specified location.
   Location(Location)
   /// Matches elements with a specific label.
@@ -95,7 +95,7 @@ pub fn Selector::matches(
 /// Whether the field of the target has the given value.
 fn field_matches(
   target : Content,
-  id : Int,
+  id : Int32,
   value : Value,
   styles : StyleChain?,
 ) -> Bool {

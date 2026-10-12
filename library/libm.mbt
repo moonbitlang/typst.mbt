@@ -196,7 +196,7 @@ fn erfc1(x : Double) -> Double {
 }
 
 ///|
-fn erfc2(ix : UInt, x : Double) -> Double {
+fn erfc2(ix : UInt32, x : Double) -> Double {
   if ix < 0x3ff40000U {
     // |x| < 1.25
     return erfc1(x)

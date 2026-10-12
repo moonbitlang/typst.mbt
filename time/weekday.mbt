@@ -60,19 +60,19 @@ pub fn Weekday::next(self : Weekday) -> Weekday {
 
 ///|
 /// Get the one-indexed number of days from Monday.
-pub fn Weekday::number_from_monday(self : Weekday) -> Int {
+pub fn Weekday::number_from_monday(self : Weekday) -> Int32 {
   self.number_days_from_monday() + 1
 }
 
 ///|
 /// Get the one-indexed number of days from Sunday.
-pub fn Weekday::number_from_sunday(self : Weekday) -> Int {
+pub fn Weekday::number_from_sunday(self : Weekday) -> Int32 {
   self.number_days_from_sunday() + 1
 }
 
 ///|
 /// Get the zero-indexed number of days from Monday.
-pub fn Weekday::number_days_from_monday(self : Weekday) -> Int {
+pub fn Weekday::number_days_from_monday(self : Weekday) -> Int32 {
   match self {
     Monday => 0
     Tuesday => 1
@@ -86,7 +86,7 @@ pub fn Weekday::number_days_from_monday(self : Weekday) -> Int {
 
 ///|
 /// Get the zero-indexed number of days from Sunday.
-pub fn Weekday::number_days_from_sunday(self : Weekday) -> Int {
+pub fn Weekday::number_days_from_sunday(self : Weekday) -> Int32 {
   match self {
     Monday => 1
     Tuesday => 2

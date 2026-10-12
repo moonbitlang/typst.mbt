@@ -25,7 +25,7 @@ let grapheme_cats : ReadOnlyArray[GraphemeCat] = grapheme_cat_names.map(
 )
 
 ///|
-fn grapheme_cat(c : Int) -> GraphemeCat {
+fn grapheme_cat(c : Int32) -> GraphemeCat {
   if c < 0x7F && c >= 0x20 {
     return Any
   }
@@ -55,7 +55,7 @@ fn cat_of_name(name : String) -> GraphemeCat {
 }
 
 ///|
-fn is_incb_linker(c : Int) -> Bool {
+fn is_incb_linker(c : Int32) -> Bool {
   c == 0x94D ||
   c == 0x9CD ||
   c == 0xACD ||
@@ -100,14 +100,14 @@ fn check_pair(before : GraphemeCat, after : GraphemeCat) -> PairResult {
 /// with `let { cp, idx } = decode_at(s, i)`.
 #valtype
 pub struct Decoded {
-  cp : Int
-  idx : Int
+  cp : Int32
+  idx : Int32
 }
 
 ///|
 /// Decode the scalar value starting at UTF-16 index `i`. Returns the code
 /// point and the index after it. Lone surrogates decode as themselves.
-pub fn decode_at(s : StringView, i : Int) -> Decoded {
+pub fn decode_at(s : StringView, i : Int32) -> Decoded {
   let c = s.code_unit_at(i).to_int()
   if c >= 0xD800 && c <= 0xDBFF && i + 1 < s.length() {
     let d = s.code_unit_at(i + 1).to_int()
@@ -121,7 +121,7 @@ pub fn decode_at(s : StringView, i : Int) -> Decoded {
 ///|
 /// Decode the scalar value ending right before UTF-16 index `i`. Returns the
 /// code point and the index where it starts.
-pub fn decode_before(s : StringView, i : Int) -> Decoded {
+pub fn decode_before(s : StringView, i : Int32) -> Decoded {
   let d = s.code_unit_at(i - 1).to_int()
   if d >= 0xDC00 && d <= 0xDFFF && i >= 2 {
     let c = s.code_unit_at(i - 2).to_int()
@@ -134,7 +134,7 @@ pub fn decode_before(s : StringView, i : Int) -> Decoded {
 
 ///|
 /// Decide a break that depends on context before position `pos`.
-fn lookback(s : StringView, pos : Int, kind : PairResult) -> Bool {
+fn lookback(s : StringView, pos : Int32, kind : PairResult) -> Bool {
   match kind {
     InCbConsonant => {
       let mut linkers = 0
@@ -185,7 +185,7 @@ fn lookback(s : StringView, pos : Int, kind : PairResult) -> Bool {
 ///|
 /// The UTF-16 index of the end of the extended grapheme cluster starting at
 /// `start`. Returns `start` if `start` is at the end of the string.
-pub fn grapheme_end(s : StringView, start : Int) -> Int {
+pub fn grapheme_end(s : StringView, start : Int32) -> Int32 {
   let len = s.length()
   if start >= len {
     return start
@@ -213,7 +213,7 @@ pub fn grapheme_end(s : StringView, start : Int) -> Int {
 ///|
 /// The UTF-16 index of the start of the extended grapheme cluster ending at
 /// `end`. Returns `end` if `end` is `0`.
-pub fn grapheme_start(s : StringView, end : Int) -> Int {
+pub fn grapheme_start(s : StringView, end : Int32) -> Int32 {
   if end <= 0 {
     return 0
   }

@@ -32,27 +32,27 @@ let aes_mul13 : Bytes = b"\x00\x0d\x1a\x17\x34\x39\x2e\x23\x68\x65\x72\x7f\x5c\x
 let aes_mul14 : Bytes = b"\x00\x0e\x1c\x12\x38\x36\x24\x2a\x70\x7e\x6c\x62\x48\x46\x54\x5a\xe0\xee\xfc\xf2\xd8\xd6\xc4\xca\x90\x9e\x8c\x82\xa8\xa6\xb4\xba\xdb\xd5\xc7\xc9\xe3\xed\xff\xf1\xab\xa5\xb7\xb9\x93\x9d\x8f\x81\x3b\x35\x27\x29\x03\x0d\x1f\x11\x4b\x45\x57\x59\x73\x7d\x6f\x61\xad\xa3\xb1\xbf\x95\x9b\x89\x87\xdd\xd3\xc1\xcf\xe5\xeb\xf9\xf7\x4d\x43\x51\x5f\x75\x7b\x69\x67\x3d\x33\x21\x2f\x05\x0b\x19\x17\x76\x78\x6a\x64\x4e\x40\x52\x5c\x06\x08\x1a\x14\x3e\x30\x22\x2c\x96\x98\x8a\x84\xae\xa0\xb2\xbc\xe6\xe8\xfa\xf4\xde\xd0\xc2\xcc\x41\x4f\x5d\x53\x79\x77\x65\x6b\x31\x3f\x2d\x23\x09\x07\x15\x1b\xa1\xaf\xbd\xb3\x99\x97\x85\x8b\xd1\xdf\xcd\xc3\xe9\xe7\xf5\xfb\x9a\x94\x86\x88\xa2\xac\xbe\xb0\xea\xe4\xf6\xf8\xd2\xdc\xce\xc0\x7a\x74\x66\x68\x42\x4c\x5e\x50\x0a\x04\x16\x18\x32\x3c\x2e\x20\xec\xe2\xf0\xfe\xd4\xda\xc8\xc6\x9c\x92\x80\x8e\xa4\xaa\xb8\xb6\x0c\x02\x10\x1e\x34\x3a\x28\x26\x7c\x72\x60\x6e\x44\x4a\x58\x56\x37\x39\x2b\x25\x0f\x01\x13\x1d\x47\x49\x5b\x55\x7f\x71\x63\x6d\xd7\xd9\xcb\xc5\xef\xe1\xf3\xfd\xa7\xa9\xbb\xb5\x9f\x91\x83\x8d"
 
 ///|
-let aes_inv_mix_0 : FixedArray[UInt] = build_inv_mix_table(0)
+let aes_inv_mix_0 : FixedArray[UInt32] = build_inv_mix_table(0)
 
 ///|
-let aes_inv_mix_1 : FixedArray[UInt] = build_inv_mix_table(1)
+let aes_inv_mix_1 : FixedArray[UInt32] = build_inv_mix_table(1)
 
 ///|
-let aes_inv_mix_2 : FixedArray[UInt] = build_inv_mix_table(2)
+let aes_inv_mix_2 : FixedArray[UInt32] = build_inv_mix_table(2)
 
 ///|
-let aes_inv_mix_3 : FixedArray[UInt] = build_inv_mix_table(3)
+let aes_inv_mix_3 : FixedArray[UInt32] = build_inv_mix_table(3)
 
 ///|
-fn build_inv_mix_table(table : Int) -> FixedArray[UInt] {
-  fn from_le_bytes(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte) -> UInt {
+fn build_inv_mix_table(table : Int32) -> FixedArray[UInt32] {
+  fn from_le_bytes(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte) -> UInt32 {
     b0.to_uint() |
     (b1.to_uint() << 8) |
     (b2.to_uint() << 16) |
     (b3.to_uint() << 24)
   }
 
-  let result : FixedArray[UInt] = FixedArray::make(256, 0)
+  let result : FixedArray[UInt32] = FixedArray::make(256, 0)
   for i in 0..<256 {
     result[i] = match table {
       0 => from_le_bytes(aes_mul14[i], aes_mul9[i], aes_mul13[i], aes_mul11[i])
@@ -171,7 +171,7 @@ fn aes_add_round_key(
 /// (`AESCipher<32, 15>`) become the constructors `AESCipher::new_aes128` and
 /// `AESCipher::new_aes256`.
 priv struct AESCipher {
-  rounds : Int
+  rounds : Int32
   round_keys : FixedArray[FixedArray[Byte]]
 }
 
@@ -188,7 +188,11 @@ fn AESCipher::new_aes256(key : BytesView) -> AESCipher? {
 }
 
 ///|
-fn AESCipher::new(key : BytesView, key_size : Int, rounds : Int) -> AESCipher? {
+fn AESCipher::new(
+  key : BytesView,
+  key_size : Int32,
+  rounds : Int32,
+) -> AESCipher? {
   if key.length() != key_size {
     return None
   }
@@ -206,7 +210,7 @@ fn AESCipher::new(key : BytesView, key_size : Int, rounds : Int) -> AESCipher? {
 ///|
 fn AESCipher::expand_key_128(
   round_keys : FixedArray[FixedArray[Byte]],
-  rounds : Int,
+  rounds : Int32,
   key : BytesView,
 ) -> Unit {
   for i in 0..<16 {
@@ -238,7 +242,7 @@ fn AESCipher::expand_key_128(
 ///|
 fn AESCipher::expand_key_256(
   round_keys : FixedArray[FixedArray[Byte]],
-  rounds : Int,
+  rounds : Int32,
   key : BytesView,
 ) -> Unit {
   for i in 0..<16 {

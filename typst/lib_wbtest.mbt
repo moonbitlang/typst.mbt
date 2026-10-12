@@ -42,7 +42,7 @@ impl @library.World for TestWorld with fn today(_, _) {
 ///|
 fn test_world(
   text : String,
-  files? : Array[(String, String)] = [],
+  files~ : Array[(String, String)] = [],
 ) -> TestWorld {
   let sources = Map([])
   for file in files {
@@ -61,7 +61,7 @@ fn test_world(
 
 ///|
 /// An introspector backend that knows `n` labelled elements.
-priv struct CountBackend(Int)
+priv struct CountBackend(Int32)
 
 ///|
 impl @library.IntrospectorBackend for CountBackend with fn query(_, _) {
@@ -149,18 +149,18 @@ impl @library.IntrospectorBackend for CountBackend with fn path(_, _) {
 
 ///|
 /// How many times a test output was created.
-let creations : Ref[Int] = { val: 0, }
+let creations : Ref[Int32] = { val: 0, }
 
 ///|
 /// Observes the number of labelled elements `seen` and produces a document
 /// with `min(seen + 1, cap)` of them, so it converges after `cap + 1`
 /// creations (or never, if that exceeds the iteration limit).
 priv struct CountDoc {
-  n : Int
+  n : Int32
 }
 
 ///|
-fn count_doc_create(engine : @library.Engine, cap : Int) -> CountDoc {
+fn count_doc_create(engine : @library.Engine, cap : Int32) -> CountDoc {
   creations.val += 1
   let seen = engine.introspector.query_labelled().length()
   { n: if seen + 1 < cap { seen + 1 } else { cap }, }

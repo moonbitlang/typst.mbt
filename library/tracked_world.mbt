@@ -72,7 +72,7 @@ priv enum WorldRead {
   Source(@syntax.FileId)
   File(@syntax.FileId)
   Book
-  Font(Int)
+  Font(Int32)
   Today(Duration?)
 }
 
@@ -111,8 +111,8 @@ pub struct WorldReads {
   /// The token of the scope in which the reads were last found to give
   /// these answers (at first the scope of the call), and where its answers
   /// for them are.
-  priv mut stamp : Int
-  priv mut slots : Array[Int]
+  priv mut stamp : Int32
+  priv mut slots : Array[Int32]
   /// Whether the call read a volatile file: it must not be stored.
   priv unstorable : Bool
 }
@@ -146,7 +146,7 @@ pub fn WorldReads::is_volatile(self : WorldReads) -> Bool {
 
 ///|
 /// The number of reads.
-pub fn WorldReads::length(self : WorldReads) -> Int {
+pub fn WorldReads::length(self : WorldReads) -> Int32 {
   self.reads.length()
 }
 
@@ -171,36 +171,36 @@ fn u128_hex(v : U128) -> String {
 ///|
 /// The state of a scope: the answers and the log (see the file header).
 priv struct WorldScope {
-  token : Int
+  token : Int32
   /// The answers, by slot: a scope numbers the reads it has seen.
   reads : Array[WorldRead]
   prints : Array[U128]
   /// By slot: where in the log the slot was pushed last.
-  seen : Array[Int]
+  seen : Array[Int32]
   /// By slot: the deduplication that saw the slot last (`dedups`).
-  marks : Array[Int]
+  marks : Array[Int32]
   /// The slots of the reads, plus one (zero: the scope has no answer):
   /// sources and files by file id, fonts by index.
-  sources : Array[Int]
-  files : Array[Int]
-  fonts : Array[Int]
-  mut book : Int
+  sources : Array[Int32]
+  files : Array[Int32]
+  fonts : Array[Int32]
+  mut book : Int32
   /// The slots of `today`, by offset.
   today_offsets : Array[Duration?]
-  today_slots : Array[Int]
+  today_slots : Array[Int32]
   /// The fonts with an index that `fonts` does not hold.
-  other_fonts : Map[Int, Int]
+  other_fonts : Map[Int32, Int32]
   /// The read lists made last ([WorldScope::kept_reads]).
   lists : Array[WorldReads]
   /// The reads of the memoized calls in progress, as slots.
-  log : Array[Int]
+  log : Array[Int32]
   /// Where the part of the innermost call in progress starts.
-  mut call_start : Int
+  mut call_start : Int32
   /// The number of calls in progress. Without one nothing is logged.
-  mut calls : Int
+  mut calls : Int32
   /// The number of reads of volatile files.
-  mut volatile_reads : Int
-  mut dedups : Int
+  mut volatile_reads : Int32
+  mut dedups : Int32
 }
 
 ///|
@@ -229,11 +229,11 @@ fn TrackedWorld::note_read(self : TrackedWorld) -> Unit {
 
 ///|
 /// The number of scopes that were opened.
-let world_scope_tokens : Ref[Int] = { val: 0, }
+let world_scope_tokens : Ref[Int32] = { val: 0, }
 
 ///|
 /// The tokens of the scopes that are open.
-let open_world_scopes : Array[Int] = []
+let open_world_scopes : Array[Int32] = []
 
 ///|
 fn WorldScope::new() -> WorldScope {
@@ -262,7 +262,7 @@ fn WorldScope::new() -> WorldScope {
 
 ///|
 /// Gives a read its slot.
-fn WorldScope::add(self : WorldScope, read : WorldRead, print : U128) -> Int {
+fn WorldScope::add(self : WorldScope, read : WorldRead, print : U128) -> Int32 {
   let slot = self.reads.length()
   self.reads.push(read)
   self.prints.push(print)
@@ -276,7 +276,7 @@ fn WorldScope::add(self : WorldScope, read : WorldRead, print : U128) -> Int {
 /// read is in the part of the innermost one already. Must not allocate
 /// (but for the growth of the log): shaping asks for the book and a font
 /// per text run.
-fn WorldScope::push(self : WorldScope, slot : Int) -> Unit {
+fn WorldScope::push(self : WorldScope, slot : Int32) -> Unit {
   if self.calls == 0 {
     return
   }
@@ -292,7 +292,7 @@ fn WorldScope::push(self : WorldScope, slot : Int) -> Unit {
 
 ///|
 /// The slot of the indexed table entry `i` (zero: none).
-fn slot_at(table : Array[Int], i : Int) -> Int {
+fn slot_at(table : Array[Int32], i : Int32) -> Int32 {
   if i < table.length() {
     table[i]
   } else {
@@ -301,7 +301,7 @@ fn slot_at(table : Array[Int], i : Int) -> Int {
 }
 
 ///|
-fn set_slot_at(table : Array[Int], i : Int, slot : Int) -> Unit {
+fn set_slot_at(table : Array[Int32], i : Int32, slot : Int32) -> Unit {
   while table.length() <= i {
     table.push(0)
   }
@@ -310,7 +310,7 @@ fn set_slot_at(table : Array[Int], i : Int, slot : Int) -> Unit {
 
 ///|
 /// Font indices up to which a scope keeps slots in an array.
-let world_font_table_max : Int = 65536
+let world_font_table_max : Int32 = 65536
 
 ///|
 /// The environment in which typesetting occurs, as the engine sees it
@@ -405,7 +405,7 @@ pub fn TrackedWorld::in_scope(self : TrackedWorld) -> Bool {
 ///|
 /// The token of the scope the world is in (zero: none). No two scopes of a
 /// process have the same.
-pub fn TrackedWorld::scope_token(self : TrackedWorld) -> Int {
+pub fn TrackedWorld::scope_token(self : TrackedWorld) -> Int32 {
   match self.scope {
     Some(scope) => scope.token
     None => 0
@@ -414,7 +414,7 @@ pub fn TrackedWorld::scope_token(self : TrackedWorld) -> Int {
 
 ///|
 /// Whether the scope with this token is still open.
-pub fn world_scope_open(token : Int) -> Bool {
+pub fn world_scope_open(token : Int32) -> Bool {
   for open in open_world_scopes {
     if open == token {
       return true
@@ -523,7 +523,7 @@ pub fn TrackedWorld::book(self : TrackedWorld) -> FontBook {
 
 ///|
 /// Try to access the font with the given index in the font book.
-pub fn TrackedWorld::font(self : TrackedWorld, index : Int) -> Font? {
+pub fn TrackedWorld::font(self : TrackedWorld, index : Int32) -> Font? {
   self.note_read()
   let font = self.raw.font(index)
   guard self.scope is Some(scope) else { return font }
@@ -574,7 +574,7 @@ pub fn TrackedWorld::today(
 
 ///|
 /// The slot of `today(offset)`, or -1.
-fn WorldScope::today_slot(self : WorldScope, offset : Duration?) -> Int {
+fn WorldScope::today_slot(self : WorldScope, offset : Duration?) -> Int32 {
   for i, known in self.today_offsets {
     let same = match (known, offset) {
       (None, None) => true
@@ -766,9 +766,9 @@ fn today_answer_print(today : Datetime?) -> U128 {
 #valtype
 pub struct WorldReadsMark {
   /// Where the part of the call around this one starts (-1: no scope).
-  priv outer : Int
+  priv outer : Int32
   /// The number of volatile reads so far.
-  priv volatile_reads : Int
+  priv volatile_reads : Int32
 }
 
 ///|
@@ -841,7 +841,7 @@ pub fn TrackedWorld::reads_end(
 
 ///|
 /// The number of read lists a scope remembers ([WorldScope::kept_reads]).
-let world_kept_reads_max : Int = 8
+let world_kept_reads_max : Int32 = 8
 
 ///|
 /// The reads from `start` to the end of the log, which are deduplicated,
@@ -852,7 +852,7 @@ let world_kept_reads_max : Int = 8
 /// for all of them when they are validated in another scope.
 fn WorldScope::kept_reads(
   self : WorldScope,
-  start : Int,
+  start : Int32,
   unstorable : Bool,
 ) -> WorldReads {
   let log = self.log
@@ -980,7 +980,7 @@ fn TrackedWorld::slot_of(
   self : TrackedWorld,
   scope : WorldScope,
   read : WorldRead,
-) -> Int {
+) -> Int32 {
   match read {
     Source(id) => {
       let i = id.into_raw().to_int()

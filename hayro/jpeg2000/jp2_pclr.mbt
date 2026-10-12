@@ -57,7 +57,7 @@ priv struct PaletteBox {
 }
 
 ///|
-fn PaletteBox::map(self : PaletteBox, entry : Int64, column : Int) -> UInt64? {
+fn PaletteBox::map(self : PaletteBox, entry : Int64, column : Int32) -> UInt64? {
   if entry < 0 || entry >= self.entries.length().to_int64() {
     return None
   }
@@ -70,5 +70,5 @@ fn PaletteBox::map(self : PaletteBox, entry : Int64, column : Int) -> UInt64? {
 
 ///|
 priv struct PaletteColumn {
-  bit_depth : Int
+  bit_depth : Int32
 }

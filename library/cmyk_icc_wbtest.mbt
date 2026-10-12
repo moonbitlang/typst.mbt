@@ -1,7 +1,7 @@
 ///|
 test "cmyk icc transform matches moxcms" {
   // Reference outputs of moxcms 0.8.1 (aarch64, CMYK-to-XYZ.icc to sRGB).
-  let samples : Array[((Int, Int, Int, Int), (Int, Int, Int))] = [
+  let samples : Array[((Int32, Int32, Int32, Int32), (Int32, Int32, Int32))] = [
     ((241, 87, 13, 28), (0, 121, 176)),
     ((110, 74, 240, 67), (124, 125, 48)),
     ((5, 65, 184, 226), (61, 43, 11)),

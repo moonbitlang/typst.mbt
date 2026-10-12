@@ -11,7 +11,7 @@ let bench_file : String = "doc/twins/bench.mbt"
 ///|
 /// The one-based line and column (in code points) of the first occurrence
 /// of `needle` in `text`.
-fn position_of(text : String, needle : String) -> (Int, Int) {
+fn position_of(text : String, needle : String) -> (Int32, Int32) {
   let wanted = needle.to_array()
   for i, line in text.split("\n").map(l => l.to_owned()).collect() {
     let chars = line.to_array()
@@ -31,8 +31,8 @@ fn position_of(text : String, needle : String) -> (Int, Int) {
 fn point_of(
   report : @doc.CompileReport[@layout.PagedDocument],
   needle : String,
-  nth? : Int = 0,
-) -> (Int, Double, Double) raise {
+  nth~ : Int32 = 0,
+) -> (Int32, Double, Double) raise {
   let seen = [0]
   fn search(
     frame : @library.Frame,
@@ -88,7 +88,7 @@ fn point_of(
 fn spot(
   report : @doc.CompileReport[@layout.PagedDocument],
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int32 = 0,
 ) -> @doc.Origin raise {
   let (page, x, y) = point_of(report, needle, nth~)
   guard report.origin_at(page, x, y) is Some(origin) else {
@@ -147,7 +147,7 @@ test "clicks on the showcase lead to the constructor calls of its source" {
 
   // The images (a JPEG, an SVG and a PDF): a coarse grid of clicks over
   // the pages finds each at the line and column of its `Image(..)` call.
-  let images : Array[(Int, Int)] = []
+  let images : Array[(Int32, Int32)] = []
   for i, page in report.unwrap().pages() {
     let size = page.frame.size()
     for row in 1..<40 {
@@ -250,7 +250,7 @@ let this_file : String = "doc/examples/review/review_wbtest.mbt"
 fn feedback_in(
   children : Array[&@doc.IntoContent],
   needle : String,
-  nth? : Int = 0,
+  nth~ : Int32 = 0,
 ) -> @doc.Feedback raise {
   let text = @doc.Document(children)
     .compile_paged(@doc.DocWorld::in_memory())
@@ -573,13 +573,13 @@ test "source characters: the text of a Para resolves like the text of a Prose" {
   // A source line of the text leads to the boxes of its words on the
   // page: the same boxes for both forms. (The lines with this text: the
   // search below, then the two literals.)
-  let lines : Array[Int] = []
+  let lines : Array[Int32] = []
   for i, line in @utf8.decode(@system.read(this_file)).split("\n").collect() {
     if line.contains("$|Boxes of the first") {
       lines.push(i + 1)
     }
   }
-  let boxes = (children : Array[&@doc.IntoContent], line : Int) => {
+  let boxes = (children : Array[&@doc.IntoContent], line : Int32) => {
     let text = @doc.Document(children)
       .compile_paged(@doc.DocWorld::in_memory())
       .review_text(sources=@system.sources())

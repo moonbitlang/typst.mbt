@@ -194,7 +194,7 @@ pub fn FsPackages::latest_version(
 fn compare_versions(
   a : @syntax.PackageVersion,
   b : @syntax.PackageVersion,
-) -> Int {
+) -> Int32 {
   if a.major != b.major {
     a.major.compare(b.major)
   } else if a.minor != b.minor {

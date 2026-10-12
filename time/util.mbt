@@ -2,16 +2,16 @@
 
 ///|
 /// The minimum valid year (without the `large-dates` feature).
-pub const MIN_YEAR : Int = -9999
+pub const MIN_YEAR : Int32 = -9999
 
 ///|
 /// The maximum valid year (without the `large-dates` feature).
-pub const MAX_YEAR : Int = 9999
+pub const MAX_YEAR : Int32 = 9999
 
 ///|
 /// Returns if the provided year is a leap year in the proleptic Gregorian
 /// calendar. Uses [astronomical year numbering](https://en.wikipedia.org/wiki/Astronomical_year_numbering).
-pub fn is_leap_year(year : Int) -> Bool {
+pub fn is_leap_year(year : Int32) -> Bool {
   // https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
   let abs = year.to_int64().abs().reinterpret_as_uint64()
   ((abs * 0x4000_0000_28F5_C28FUL) & 0xC000_000F_8000_000FUL) <= 0xF_8000_0000UL
@@ -19,7 +19,7 @@ pub fn is_leap_year(year : Int) -> Bool {
 
 ///|
 /// Get the number of calendar days in a given year.
-pub fn days_in_year(year : Int) -> Int {
+pub fn days_in_year(year : Int32) -> Int32 {
   if is_leap_year(year) {
     366
   } else {
@@ -29,7 +29,7 @@ pub fn days_in_year(year : Int) -> Int {
 
 ///|
 /// Get the number of weeks in the ISO year.
-pub fn weeks_in_year(year : Int) -> Int {
+pub fn weeks_in_year(year : Int32) -> Int32 {
   match year % 400 {
     -396
     | -391
@@ -179,14 +179,14 @@ pub fn weeks_in_year(year : Int) -> Int {
 
 ///|
 /// Get the number of days in the month of a given year.
-pub fn days_in_month(month : Month, year : Int) -> Int {
+pub fn days_in_month(month : Month, year : Int32) -> Int32 {
   days_in_month_leap(month.number(), is_leap_year(year))
 }
 
 ///|
 /// Get the number of days in the month (1-12) given whether the year is a
 /// leap year.
-fn days_in_month_leap(month : Int, is_leap_year : Bool) -> Int {
+fn days_in_month_leap(month : Int32, is_leap_year : Bool) -> Int32 {
   if month == 2 {
     if is_leap_year {
       29
@@ -201,13 +201,13 @@ fn days_in_month_leap(month : Int, is_leap_year : Bool) -> Int {
 ///|
 /// `time_core::util::range_validated::is_leap_year`: only valid for years in
 /// `MIN_YEAR..=MAX_YEAR`.
-fn range_validated_is_leap_year(year : Int) -> Bool {
+fn range_validated_is_leap_year(year : Int32) -> Bool {
   let abs = year.abs().reinterpret_as_uint()
   ((abs * 0x20003D7U) & 0x6007C0FU) <= 0x7C00U
 }
 
 ///|
-fn range_validated_days_in_year(year : Int) -> Int {
+fn range_validated_days_in_year(year : Int32) -> Int32 {
   if range_validated_is_leap_year(year) {
     366
   } else {
@@ -217,7 +217,7 @@ fn range_validated_days_in_year(year : Int) -> Int {
 
 ///|
 /// Port of the `div_floor!` macro.
-fn div_floor(this : Int, rhs : Int) -> Int {
+fn div_floor(this : Int32, rhs : Int32) -> Int32 {
   let d = this / rhs
   let r = this % rhs
   let correction = (this ^ rhs) >> 31

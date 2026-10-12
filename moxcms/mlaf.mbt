@@ -33,6 +33,6 @@ fn fmla_d(a : Double, b : Double, acc : Double) -> Double {
 
 ///|
 /// `mlaf` on `u32` (wrapping).
-fn mlaf_u32(acc : UInt, a : UInt, b : UInt) -> UInt {
+fn mlaf_u32(acc : UInt32, a : UInt32, b : UInt32) -> UInt32 {
   a * b + acc
 }

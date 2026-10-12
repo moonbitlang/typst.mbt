@@ -31,7 +31,7 @@ fn grid_test_cell(text : String) -> Cell {
 }
 
 ///|
-fn grid_test_line(index : Int) -> Line {
+fn grid_test_line(index : Int32) -> Line {
   {
     index,
     start: 0,
@@ -75,7 +75,7 @@ fn grid_test_grid() -> CellGrid {
 
 ///|
 /// The grid with one entry replaced.
-fn grid_test_with_entry(i : Int, entry : Entry) -> CellGrid {
+fn grid_test_with_entry(i : Int32, entry : Entry) -> CellGrid {
   let grid = grid_test_grid()
   grid.entries[i] = entry
   grid

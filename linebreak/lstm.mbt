@@ -7,11 +7,11 @@
 /// A matrix of f32 values (`MatrixZero` / `MatrixOwned`), row-major.
 priv struct Matrix {
   data : FixedArray[Float]
-  dims : ReadOnlyArray[Int]
+  dims : ReadOnlyArray[Int32]
 }
 
 ///|
-fn Matrix::from_base64(b64 : String, dims : ReadOnlyArray[Int]) -> Matrix {
+fn Matrix::from_base64(b64 : String, dims : ReadOnlyArray[Int32]) -> Matrix {
   let bytes = decode_base64(b64)
   let n = bytes.length() / 4
   let data = FixedArray::make(n, (0.0 : Float))
@@ -28,7 +28,7 @@ fn Matrix::from_base64(b64 : String, dims : ReadOnlyArray[Int]) -> Matrix {
 
 ///|
 /// The size of a submatrix (product of all but the first dimension).
-fn Matrix::stride(self : Matrix) -> Int {
+fn Matrix::stride(self : Matrix) -> Int32 {
   let mut n = 1
   for k in 1..<self.dims.length() {
     n *= self.dims[k]
@@ -38,7 +38,7 @@ fn Matrix::stride(self : Matrix) -> Int {
 
 ///|
 /// Submatrix `index` of a matrix (sharing the data).
-fn Matrix::submatrix(self : Matrix, index : Int) -> Matrix {
+fn Matrix::submatrix(self : Matrix, index : Int32) -> Matrix {
   let n = self.stride()
   let data = FixedArray::make(n, (0.0 : Float))
   for i in 0..<n {
@@ -54,8 +54,8 @@ fn Matrix::submatrix(self : Matrix, index : Int) -> Matrix {
 /// A word break segmenter using an LSTM model. Input strings have to be of
 /// the same complex script.
 priv struct LstmSegmenter {
-  dic : Map[String, Int]
-  dic_len : Int
+  dic : Map[String, Int32]
+  dic_len : Int32
   grapheme_clusters : Bool
   embedding : Matrix
   fw_w : Matrix
@@ -72,11 +72,11 @@ priv struct LstmSegmenter {
 ///|
 fn LstmSegmenter::new(
   model_type : String,
-  dic : ReadOnlyArray[(String, Int)],
-  matrices : ReadOnlyArray[(String, ReadOnlyArray[Int])],
+  dic : ReadOnlyArray[(String, Int32)],
+  matrices : ReadOnlyArray[(String, ReadOnlyArray[Int32])],
 ) -> LstmSegmenter {
   let m = matrices.map(p => Matrix::from_base64(p.0, p.1))
-  let map : Map[String, Int] = Map([])
+  let map : Map[String, Int32] = Map([])
   for entry in dic[:] {
     map[entry.0] = entry.1
   }
@@ -103,14 +103,14 @@ fn LstmSegmenter::new(
 /// the UTF-8 byte offsets of the breaks.
 fn LstmSegmenter::segment_str(
   self : LstmSegmenter,
-  input : ArrayView[Int],
-) -> Array[Int] {
+  input : ArrayView[Int32],
+) -> Array[Int32] {
   if self.grapheme_clusters {
     // None of the baked models uses grapheme clusters.
     abort("grapheme cluster LSTM models are not supported")
   }
   let input_seq = input.map(c => {
-    let s = Int::unsafe_to_char(c).to_string()
+    let s = Int32::unsafe_to_char(c).to_string()
     match self.dic.get(s) {
       Some(id) => id
       None => self.dic_len
@@ -143,12 +143,12 @@ fn LstmSegmenter::segment_str(
 ///|
 priv struct BiesIterator {
   model : LstmSegmenter
-  input_seq : Array[Int]
-  mut pos : Int
+  input_seq : Array[Int32]
+  mut pos : Int32
   h_bw : FixedArray[Float]
   curr_fw : FixedArray[Float]
   c_fw : FixedArray[Float]
-  hunits : Int
+  hunits : Int32
 }
 
 ///|
@@ -156,7 +156,7 @@ priv struct BiesIterator {
 // in the embedding layer of the model.
 fn BiesIterator::new(
   model : LstmSegmenter,
-  input_seq : Array[Int],
+  input_seq : Array[Int32],
 ) -> BiesIterator {
   let hunits = model.fw_u.dims[1]
   let n = input_seq.length()
@@ -195,7 +195,7 @@ fn BiesIterator::new(
 }
 
 ///|
-fn BiesIterator::remaining(self : BiesIterator) -> Int {
+fn BiesIterator::remaining(self : BiesIterator) -> Int32 {
   self.input_seq.length() - self.pos
 }
 
@@ -248,9 +248,9 @@ fn BiesIterator::next(self : BiesIterator) -> Bool? {
 /// row of `h` starting at `h_at`.
 fn compute_hc(
   embedding : Matrix,
-  g_id : Int,
+  g_id : Int32,
   h : FixedArray[Float],
-  h_at : Int,
+  h_at : Int32,
   c_tm1 : FixedArray[Float],
   w : Matrix,
   u : Matrix,
@@ -300,10 +300,10 @@ fn sigmoid(x : Float) -> Float {
 /// `xs[xa:xa+len]` and `ys[ya:ya+len]`.
 fn unrolled_dot(
   xs : FixedArray[Float],
-  xa : Int,
+  xa : Int32,
   ys : FixedArray[Float],
-  ya : Int,
-  len : Int,
+  ya : Int32,
+  len : Int32,
 ) -> Float {
   let chunks = len / 8
   let rem = chunks * 8
@@ -429,7 +429,7 @@ let lstm_thai : LazyModel = {
 ///|
 /// Decode base64 data, ignoring newlines.
 fn decode_base64(s : String) -> Bytes {
-  fn value(c : Int) -> Int {
+  fn value(c : Int32) -> Int32 {
     if c >= 'A' && c <= 'Z' {
       c - 'A'
     } else if c >= 'a' && c <= 'z' {

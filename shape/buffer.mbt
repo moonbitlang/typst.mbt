@@ -11,7 +11,7 @@
 // `ensure_native_direction`) iterate over the whole vector.
 
 ///|
-const CONTEXT_LENGTH : Int = 5
+const CONTEXT_LENGTH : Int32 = 5
 
 // glyph_flag
 
@@ -19,166 +19,166 @@ const CONTEXT_LENGTH : Int = 5
 /// Indicates that if input text is broken at the beginning of the cluster
 /// this glyph is part of, then both sides need to be re-shaped, as the
 /// result might be different.
-pub const UNSAFE_TO_BREAK : UInt = 0x00000001
+pub const UNSAFE_TO_BREAK : UInt32 = 0x00000001
 
 ///|
 /// Indicates that if input text is changed on one side of the beginning of
 /// the cluster this glyph is part of, then the shaping results for the other
 /// side might change. The UNSAFE_TO_BREAK flag will always imply this flag.
-pub const UNSAFE_TO_CONCAT : UInt = 0x00000002
+pub const UNSAFE_TO_CONCAT : UInt32 = 0x00000002
 
 ///|
 /// In scripts that use elongation (Arabic, Mongolian, Syriac, etc.), this
 /// flag signifies that it is safe to insert a U+0640 TATWEEL character
 /// *before* this cluster for elongation.
-pub const SAFE_TO_INSERT_TATWEEL : UInt = 0x00000004
+pub const SAFE_TO_INSERT_TATWEEL : UInt32 = 0x00000004
 
 ///|
 /// All the currently defined flags.
-pub const GLYPH_FLAG_DEFINED : UInt = 0x00000007
+pub const GLYPH_FLAG_DEFINED : UInt32 = 0x00000007
 
 // BufferFlags
 
 ///|
 /// Indicates that special handling of the beginning of text paragraph can be
 /// applied to this buffer.
-pub const BUFFER_FLAG_BEGINNING_OF_TEXT : UInt = 0x00000001
+pub const BUFFER_FLAG_BEGINNING_OF_TEXT : UInt32 = 0x00000001
 
 ///|
 /// Indicates that special handling of the end of text paragraph can be
 /// applied to this buffer.
-pub const BUFFER_FLAG_END_OF_TEXT : UInt = 0x00000002
+pub const BUFFER_FLAG_END_OF_TEXT : UInt32 = 0x00000002
 
 ///|
 /// Use the glyphs of `Default_Ignorable` characters instead of hiding them.
-pub const BUFFER_FLAG_PRESERVE_DEFAULT_IGNORABLES : UInt = 0x00000004
+pub const BUFFER_FLAG_PRESERVE_DEFAULT_IGNORABLES : UInt32 = 0x00000004
 
 ///|
 /// Remove `Default_Ignorable` characters instead of hiding them.
-pub const BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES : UInt = 0x00000008
+pub const BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES : UInt32 = 0x00000008
 
 ///|
 /// Do not insert a dotted circle for incorrect character sequences.
-pub const BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE : UInt = 0x00000010
+pub const BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE : UInt32 = 0x00000010
 
 ///|
 /// Verify the shaping results (unused).
-pub const BUFFER_FLAG_VERIFY : UInt = 0x00000020
+pub const BUFFER_FLAG_VERIFY : UInt32 = 0x00000020
 
 ///|
 /// Produce the `UNSAFE_TO_CONCAT` glyph flag.
-pub const BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT : UInt = 0x00000040
+pub const BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT : UInt32 = 0x00000040
 
 ///|
 /// Produce the `SAFE_TO_INSERT_TATWEEL` glyph flag (same bit as
 /// `PRODUCE_UNSAFE_TO_CONCAT` in rustybuzz 0.20.1).
-pub const BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL : UInt = 0x00000040
+pub const BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL : UInt32 = 0x00000040
 
 ///|
 /// All currently defined flags.
-pub const BUFFER_FLAG_DEFINED : UInt = 0x000000FF
+pub const BUFFER_FLAG_DEFINED : UInt32 = 0x000000FF
 
 // Cluster levels.
 
 ///|
-pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES : Int = 0
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES : Int32 = 0
 
 ///|
-pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS : Int = 1
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS : Int32 = 1
 
 ///|
-pub const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS : Int = 2
+pub const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS : Int32 = 2
 
 ///|
-pub const HB_BUFFER_CLUSTER_LEVEL_DEFAULT : Int = 0
+pub const HB_BUFFER_CLUSTER_LEVEL_DEFAULT : Int32 = 0
 
 // UnicodeProps
 
 ///|
-const UPROPS_MASK_GEN_CAT : Int = 0x001F
+const UPROPS_MASK_GEN_CAT : Int32 = 0x001F
 
 ///|
-const UPROPS_MASK_IGNORABLE : Int = 0x0020
+const UPROPS_MASK_IGNORABLE : Int32 = 0x0020
 
 ///|
 /// MONGOLIAN FREE VARIATION SELECTOR 1..4, or TAG characters, or CGJ sometimes
-const UPROPS_MASK_HIDDEN : Int = 0x0040
+const UPROPS_MASK_HIDDEN : Int32 = 0x0040
 
 ///|
-const UPROPS_MASK_CONTINUATION : Int = 0x0080
+const UPROPS_MASK_CONTINUATION : Int32 = 0x0080
 
 ///|
 /// If GEN_CAT=FORMAT, top byte masks:
-const UPROPS_MASK_CF_ZWJ : Int = 0x0100
+const UPROPS_MASK_CF_ZWJ : Int32 = 0x0100
 
 ///|
-const UPROPS_MASK_CF_ZWNJ : Int = 0x0200
+const UPROPS_MASK_CF_ZWNJ : Int32 = 0x0200
 
 ///|
-const UPROPS_MASK_CF_VS : Int = 0x0400
+const UPROPS_MASK_CF_VS : Int32 = 0x0400
 
 // GlyphPropsFlags
 
 ///|
 /// The following three match LookupFlags::Ignore* numbers.
-const GLYPH_PROPS_BASE_GLYPH : Int = 0x02
+const GLYPH_PROPS_BASE_GLYPH : Int32 = 0x02
 
 ///|
-const GLYPH_PROPS_LIGATURE : Int = 0x04
+const GLYPH_PROPS_LIGATURE : Int32 = 0x04
 
 ///|
-const GLYPH_PROPS_MARK : Int = 0x08
+const GLYPH_PROPS_MARK : Int32 = 0x08
 
 ///|
 // buffer.rs:1537; unused upstream too.
 #warnings("-unused_value")
-const GLYPH_PROPS_CLASS_MASK : Int = 0x0E
+const GLYPH_PROPS_CLASS_MASK : Int32 = 0x0E
 
 ///|
 /// The following are used internally; not derived from GDEF.
-const GLYPH_PROPS_SUBSTITUTED : Int = 0x10
+const GLYPH_PROPS_SUBSTITUTED : Int32 = 0x10
 
 ///|
-const GLYPH_PROPS_LIGATED : Int = 0x20
+const GLYPH_PROPS_LIGATED : Int32 = 0x20
 
 ///|
-const GLYPH_PROPS_MULTIPLIED : Int = 0x40
+const GLYPH_PROPS_MULTIPLIED : Int32 = 0x40
 
 ///|
-const GLYPH_PROPS_PRESERVE : Int = 0x70
+const GLYPH_PROPS_PRESERVE : Int32 = 0x70
 
 // Scratch flags.
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_DEFAULT : UInt = 0x00000000
+const HB_BUFFER_SCRATCH_FLAG_DEFAULT : UInt32 = 0x00000000
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_NON_ASCII : UInt = 0x00000001
+const HB_BUFFER_SCRATCH_FLAG_HAS_NON_ASCII : UInt32 = 0x00000001
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_DEFAULT_IGNORABLES : UInt = 0x00000002
+const HB_BUFFER_SCRATCH_FLAG_HAS_DEFAULT_IGNORABLES : UInt32 = 0x00000002
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_SPACE_FALLBACK : UInt = 0x00000004
+const HB_BUFFER_SCRATCH_FLAG_HAS_SPACE_FALLBACK : UInt32 = 0x00000004
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_GPOS_ATTACHMENT : UInt = 0x00000008
+const HB_BUFFER_SCRATCH_FLAG_HAS_GPOS_ATTACHMENT : UInt32 = 0x00000008
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_CGJ : UInt = 0x00000010
+const HB_BUFFER_SCRATCH_FLAG_HAS_CGJ : UInt32 = 0x00000010
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_GLYPH_FLAGS : UInt = 0x00000020
+const HB_BUFFER_SCRATCH_FLAG_HAS_GLYPH_FLAGS : UInt32 = 0x00000020
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_BROKEN_SYLLABLE : UInt = 0x00000040
+const HB_BUFFER_SCRATCH_FLAG_HAS_BROKEN_SYLLABLE : UInt32 = 0x00000040
 
 ///|
-const HB_BUFFER_SCRATCH_FLAG_HAS_VARIATION_SELECTOR_FALLBACK : UInt = 0x00000080
+const HB_BUFFER_SCRATCH_FLAG_HAS_VARIATION_SELECTOR_FALLBACK : UInt32 = 0x00000080
 
 ///|
 /// Reserved for shapers' internal use.
-const HB_BUFFER_SCRATCH_FLAG_SHAPER0 : UInt = 0x01000000
+const HB_BUFFER_SCRATCH_FLAG_SHAPER0 : UInt32 = 0x01000000
 
 ///|
 /// Holds the positions of the glyph in both horizontal and vertical
@@ -186,17 +186,17 @@ const HB_BUFFER_SCRATCH_FLAG_SHAPER0 : UInt = 0x01000000
 pub(all) struct GlyphPosition {
   /// How much the line advances after drawing this glyph when setting text
   /// in horizontal direction.
-  mut x_advance : Int
+  mut x_advance : Int32
   /// How much the line advances after drawing this glyph when setting text
   /// in vertical direction.
-  mut y_advance : Int
+  mut y_advance : Int32
   /// How much the glyph moves on the X-axis before drawing it, this should
   /// not affect how much the line advances.
-  mut x_offset : Int
+  mut x_offset : Int32
   /// How much the glyph moves on the Y-axis before drawing it, this should
   /// not affect how much the line advances.
-  mut y_offset : Int
-  mut var_ : UInt
+  mut y_offset : Int32
+  mut var_ : UInt32
 } derive(Debug)
 
 ///|
@@ -236,7 +236,7 @@ fn GlyphPosition::assign(self : GlyphPosition, o : GlyphPosition) -> Unit {
 ///|
 /// Glyph to which this attaches to, relative to current glyphs; negative
 /// for going back, positive for forward.
-fn GlyphPosition::attach_chain(self : GlyphPosition) -> Int {
+fn GlyphPosition::attach_chain(self : GlyphPosition) -> Int32 {
   // var as [i16; 2], element 0.
   let v = (self.var_ & 0xFFFF).reinterpret_as_int()
   if v >= 0x8000 {
@@ -247,20 +247,20 @@ fn GlyphPosition::attach_chain(self : GlyphPosition) -> Int {
 }
 
 ///|
-fn GlyphPosition::set_attach_chain(self : GlyphPosition, n : Int) -> Unit {
+fn GlyphPosition::set_attach_chain(self : GlyphPosition, n : Int32) -> Unit {
   self.var_ = (self.var_ & 0xFFFF0000) | (n.reinterpret_as_uint() & 0xFFFF)
 }
 
 ///|
 /// Attachment type. Note! if attach_chain() is zero, the value of
 /// attach_type() is irrelevant.
-fn GlyphPosition::attach_type(self : GlyphPosition) -> Int {
+fn GlyphPosition::attach_type(self : GlyphPosition) -> Int32 {
   // var as [u8; 4], element 2.
   ((self.var_ >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphPosition::set_attach_type(self : GlyphPosition, n : Int) -> Unit {
+fn GlyphPosition::set_attach_type(self : GlyphPosition, n : Int32) -> Unit {
   self.var_ = (self.var_ & 0xFF00FFFF) |
     ((n.reinterpret_as_uint() & 0xFF) << 16)
 }
@@ -272,12 +272,12 @@ fn GlyphPosition::set_attach_type(self : GlyphPosition, n : Int) -> Unit {
 /// after. Just like harfbuzz, the same variable is used for two purposes.
 pub(all) struct GlyphInfo {
   /// A selected glyph (guaranteed to be <= `u16::MAX` after shaping).
-  mut glyph_id : UInt
-  mut mask : UInt
+  mut glyph_id : UInt32
+  mut mask : UInt32
   /// An index to the start of the grapheme cluster in the original string.
-  mut cluster : UInt
-  mut var1 : UInt
-  mut var2 : UInt
+  mut cluster : UInt32
+  mut var1 : UInt32
+  mut var2 : UInt32
 } derive(Debug)
 
 ///|
@@ -324,7 +324,7 @@ pub fn GlyphInfo::unsafe_to_break(self : GlyphInfo) -> Bool {
 
 ///|
 /// The codepoint (before shaping).
-fn GlyphInfo::as_char(self : GlyphInfo) -> Int {
+fn GlyphInfo::as_char(self : GlyphInfo) -> Int32 {
   self.glyph_id.reinterpret_as_int()
 }
 
@@ -337,12 +337,12 @@ fn GlyphInfo::as_glyph(self : GlyphInfo) -> @otf.GlyphId {
 // Used during the entire shaping process to store unicode properties
 
 ///|
-fn GlyphInfo::unicode_props(self : GlyphInfo) -> Int {
+fn GlyphInfo::unicode_props(self : GlyphInfo) -> Int32 {
   (self.var2 & 0xFFFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_unicode_props(self : GlyphInfo, n : Int) -> Unit {
+fn GlyphInfo::set_unicode_props(self : GlyphInfo, n : Int32) -> Unit {
   self.var2 = (self.var2 & 0xFFFF0000) | (n.reinterpret_as_uint() & 0xFFFF)
 }
 
@@ -369,11 +369,11 @@ fn GlyphInfo::init_unicode_props(self : GlyphInfo, buffer : Buffer) -> Unit {
         // FVSes are GC=Mn, we have use a separate bit to remember them.
         // Fixes:
         // https://github.com/harfbuzz/harfbuzz/issues/234
-        0x180B..=0x180D | 0x180F => props = props | UPROPS_MASK_HIDDEN
+        0x180B..<=0x180D | 0x180F => props = props | UPROPS_MASK_HIDDEN
 
         // TAG characters need similar treatment. Fixes:
         // https://github.com/harfbuzz/harfbuzz/issues/463
-        0xE0020..=0xE007F => props = props | UPROPS_MASK_HIDDEN
+        0xE0020..<=0xE007F => props = props | UPROPS_MASK_HIDDEN
 
         // COMBINING GRAPHEME JOINER should not be skipped during GSUB either.
         // https://github.com/harfbuzz/harfbuzz/issues/554
@@ -400,36 +400,36 @@ fn GlyphInfo::unhide(self : GlyphInfo) -> Unit {
 }
 
 ///|
-fn GlyphInfo::lig_props(self : GlyphInfo) -> Int {
+fn GlyphInfo::lig_props(self : GlyphInfo) -> Int32 {
   // var1 as [u8; 4], element 2.
   ((self.var1 >> 16) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_lig_props(self : GlyphInfo, n : Int) -> Unit {
+fn GlyphInfo::set_lig_props(self : GlyphInfo, n : Int32) -> Unit {
   self.var1 = (self.var1 & 0xFF00FFFF) |
     ((n.reinterpret_as_uint() & 0xFF) << 16)
 }
 
 ///|
-fn GlyphInfo::glyph_props(self : GlyphInfo) -> Int {
+fn GlyphInfo::glyph_props(self : GlyphInfo) -> Int32 {
   // var1 as [u16; 2], element 0.
   (self.var1 & 0xFFFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_glyph_props(self : GlyphInfo, n : Int) -> Unit {
+fn GlyphInfo::set_glyph_props(self : GlyphInfo, n : Int32) -> Unit {
   self.var1 = (self.var1 & 0xFFFF0000) | (n.reinterpret_as_uint() & 0xFFFF)
 }
 
 ///|
-fn GlyphInfo::syllable(self : GlyphInfo) -> Int {
+fn GlyphInfo::syllable(self : GlyphInfo) -> Int32 {
   // var1 as [u8; 4], element 3.
   ((self.var1 >> 24) & 0xFF).reinterpret_as_int()
 }
 
 ///|
-fn GlyphInfo::set_syllable(self : GlyphInfo, n : Int) -> Unit {
+fn GlyphInfo::set_syllable(self : GlyphInfo, n : Int32) -> Unit {
   self.var1 = (self.var1 & 0x00FFFFFF) |
     ((n.reinterpret_as_uint() & 0xFF) << 24)
 }
@@ -438,12 +438,12 @@ fn GlyphInfo::set_syllable(self : GlyphInfo, n : Int) -> Unit {
 // Used during the normalization process to store glyph indices
 
 ///|
-fn GlyphInfo::glyph_index(self : GlyphInfo) -> UInt {
+fn GlyphInfo::glyph_index(self : GlyphInfo) -> UInt32 {
   self.var1
 }
 
 ///|
-fn GlyphInfo::set_glyph_index(self : GlyphInfo, n : UInt) -> Unit {
+fn GlyphInfo::set_glyph_index(self : GlyphInfo, n : UInt32) -> Unit {
   self.var1 = n
 }
 
@@ -455,7 +455,7 @@ fn GlyphInfo::set_glyph_index(self : GlyphInfo, n : UInt) -> Unit {
 /// truncates to `len + 1` and grows by one, like upstream's `ensure`).
 fn resize_infos(
   v : Array[GlyphInfo],
-  size : Int,
+  size : Int32,
   spare : Array[GlyphInfo],
 ) -> Unit {
   if size < v.length() {
@@ -483,7 +483,7 @@ fn resize_infos(
 /// [resize_infos] for positions.
 fn resize_positions(
   v : Array[GlyphPosition],
-  size : Int,
+  size : Int32,
   spare : Array[GlyphPosition],
 ) -> Unit {
   if size < v.length() {
@@ -511,10 +511,10 @@ fn resize_positions(
 /// The shaping buffer (`hb_buffer_t`).
 struct Buffer {
   // Information about how the text in the buffer should be treated.
-  mut flags : UInt
-  mut cluster_level : Int
+  mut flags : UInt32
+  mut cluster_level : Int32
   mut invisible : @otf.GlyphId?
-  mut not_found_variation_selector : UInt?
+  mut not_found_variation_selector : UInt32?
 
   // Buffer contents.
   mut direction : Direction
@@ -529,9 +529,9 @@ struct Buffer {
   mut have_separate_output : Bool
   /// Whether we have positions
   mut have_positions : Bool
-  mut idx : Int
-  mut len : Int
-  mut out_len : Int
+  mut idx : Int32
+  mut len : Int32
+  mut out_len : Int32
   mut info : Array[GlyphInfo]
   mut pos : Array[GlyphPosition]
   /// The separate output buffer (lives in `pos` in Rust).
@@ -543,37 +543,37 @@ struct Buffer {
   // Text before / after the main buffer contents.
   // Always in Unicode, and ordered outward.
   // Index 0 is for "pre-context", 1 for "post-context".
-  context : Array[Array[Int]]
-  context_len : Array[Int]
+  context : Array[Array[Int32]]
+  context_len : Array[Int32]
 
   // Managed by enter / leave
-  mut serial : Int
-  mut scratch_flags : UInt
+  mut serial : Int32
+  mut scratch_flags : UInt32
   /// Maximum allowed len.
-  mut max_len : Int
+  mut max_len : Int32
   /// Maximum allowed operations.
-  mut max_ops : Int
+  mut max_ops : Int32
 }
 
 ///|
-const MAX_LEN_FACTOR : Int = 64
+const MAX_LEN_FACTOR : Int32 = 64
 
 ///|
-const MAX_LEN_MIN : Int = 16384
+const MAX_LEN_MIN : Int32 = 16384
 
 ///|
 /// Shaping more than a billion chars? Let us know!
-const MAX_LEN_DEFAULT : Int = 0x3FFFFFFF
+const MAX_LEN_DEFAULT : Int32 = 0x3FFFFFFF
 
 ///|
-const MAX_OPS_FACTOR : Int = 1024
+const MAX_OPS_FACTOR : Int32 = 1024
 
 ///|
-const MAX_OPS_MIN : Int = 16384
+const MAX_OPS_MIN : Int32 = 16384
 
 ///|
 /// Shaping more than a billion operations? Let us know!
-const MAX_OPS_DEFAULT : Int = 0x1FFFFFFF
+const MAX_OPS_DEFAULT : Int32 = 0x1FFFFFFF
 
 ///|
 /// Creates a new `Buffer`.
@@ -659,12 +659,12 @@ fn Buffer::out_info(self : Buffer) -> Array[GlyphInfo] {
 }
 
 ///|
-fn Buffer::set_out_info(self : Buffer, i : Int, info : GlyphInfo) -> Unit {
+fn Buffer::set_out_info(self : Buffer, i : Int32, info : GlyphInfo) -> Unit {
   self.out_info()[i].assign(info)
 }
 
 ///|
-fn Buffer::cur(self : Buffer, i : Int) -> GlyphInfo {
+fn Buffer::cur(self : Buffer, i : Int32) -> GlyphInfo {
   self.info[self.idx + i]
 }
 
@@ -716,7 +716,7 @@ fn Buffer::clear(self : Buffer) -> Unit {
 }
 
 ///|
-fn Buffer::backtrack_len(self : Buffer) -> Int {
+fn Buffer::backtrack_len(self : Buffer) -> Int32 {
   if self.have_output {
     self.out_len
   } else {
@@ -725,12 +725,12 @@ fn Buffer::backtrack_len(self : Buffer) -> Int {
 }
 
 ///|
-fn Buffer::lookahead_len(self : Buffer) -> Int {
+fn Buffer::lookahead_len(self : Buffer) -> Int32 {
   self.len - self.idx
 }
 
 ///|
-fn Buffer::next_serial(self : Buffer) -> Int {
+fn Buffer::next_serial(self : Buffer) -> Int32 {
   // A `serial` overflow/wrap-around here is perfectly fine.
   self.serial = (self.serial + 1) & 0xFF
   if self.serial == 0 {
@@ -740,7 +740,7 @@ fn Buffer::next_serial(self : Buffer) -> Int {
 }
 
 ///|
-fn Buffer::add(self : Buffer, codepoint : UInt, cluster : UInt) -> Unit {
+fn Buffer::add(self : Buffer, codepoint : UInt32, cluster : UInt32) -> Unit {
   if !self.ensure(self.len + 1) {
     return
   }
@@ -764,7 +764,7 @@ fn Buffer::reverse(self : Buffer) -> Unit {
 }
 
 ///|
-fn Buffer::reverse_range(self : Buffer, start : Int, end : Int) -> Unit {
+fn Buffer::reverse_range(self : Buffer, start : Int32, end : Int32) -> Unit {
   if end - start < 2 {
     return
   }
@@ -775,7 +775,7 @@ fn Buffer::reverse_range(self : Buffer, start : Int, end : Int) -> Unit {
 }
 
 ///|
-fn[T] reverse_slice(v : Array[T], start : Int, end : Int) -> Unit {
+fn[T] reverse_slice(v : Array[T], start : Int32, end : Int32) -> Unit {
   let mut i = start
   let mut j = end - 1
   while i < j {
@@ -816,9 +816,9 @@ fn Buffer::reverse_groups(
 ///|
 fn Buffer::group_end(
   self : Buffer,
-  start : Int,
+  start : Int32,
   group : (GlyphInfo, GlyphInfo) -> Bool,
-) -> Int {
+) -> Int32 {
   let mut start = start + 1
   while start < self.len && group(self.info[start - 1], self.info[start]) {
     start += 1
@@ -905,9 +905,9 @@ fn Buffer::clear_positions(self : Buffer) -> Unit {
 ///|
 fn Buffer::replace_glyphs(
   self : Buffer,
-  num_in : Int,
-  num_out : Int,
-  glyph_data : Array[UInt],
+  num_in : Int32,
+  num_out : Int32,
+  glyph_data : Array[UInt32],
 ) -> Unit {
   if !self.make_room_for(num_in, num_out) {
     return
@@ -925,7 +925,7 @@ fn Buffer::replace_glyphs(
 }
 
 ///|
-fn Buffer::replace_glyph(self : Buffer, glyph_index : UInt) -> Unit {
+fn Buffer::replace_glyph(self : Buffer, glyph_index : UInt32) -> Unit {
   if self.have_separate_output || self.out_len != self.idx {
     if !self.make_room_for(1, 1) {
       return
@@ -939,7 +939,7 @@ fn Buffer::replace_glyph(self : Buffer, glyph_index : UInt) -> Unit {
 }
 
 ///|
-fn Buffer::output_glyph(self : Buffer, glyph_index : UInt) -> Unit {
+fn Buffer::output_glyph(self : Buffer, glyph_index : UInt32) -> Unit {
   if !self.make_room_for(0, 1) {
     return
   }
@@ -997,7 +997,7 @@ fn Buffer::next_glyph(self : Buffer) -> Unit {
 /// Copies n glyphs at idx to output and advance idx.
 ///
 /// If there's no output, just advance idx.
-fn Buffer::next_glyphs(self : Buffer, n : Int) -> Unit {
+fn Buffer::next_glyphs(self : Buffer, n : Int32) -> Unit {
   if self.have_output {
     if self.have_separate_output || self.out_len != self.idx {
       if !self.make_room_for(n, n) {
@@ -1019,7 +1019,7 @@ fn Buffer::skip_glyph(self : Buffer) -> Unit {
 }
 
 ///|
-fn Buffer::reset_masks(self : Buffer, mask : UInt) -> Unit {
+fn Buffer::reset_masks(self : Buffer, mask : UInt32) -> Unit {
   for i in 0..<self.len {
     self.info[i].mask = mask
   }
@@ -1028,10 +1028,10 @@ fn Buffer::reset_masks(self : Buffer, mask : UInt) -> Unit {
 ///|
 fn Buffer::set_masks(
   self : Buffer,
-  value : UInt,
-  mask : UInt,
-  cluster_start : UInt,
-  cluster_end : UInt,
+  value : UInt32,
+  mask : UInt32,
+  cluster_start : UInt32,
+  cluster_end : UInt32,
 ) -> Unit {
   if mask == 0 {
     return
@@ -1054,7 +1054,7 @@ fn Buffer::set_masks(
 }
 
 ///|
-fn Buffer::merge_clusters(self : Buffer, start : Int, end : Int) -> Unit {
+fn Buffer::merge_clusters(self : Buffer, start : Int32, end : Int32) -> Unit {
   if end - start < 2 {
     return
   }
@@ -1062,7 +1062,7 @@ fn Buffer::merge_clusters(self : Buffer, start : Int, end : Int) -> Unit {
 }
 
 ///|
-fn imin(a : Int, b : Int) -> Int {
+fn imin(a : Int32, b : Int32) -> Int32 {
   if a < b {
     a
   } else {
@@ -1071,7 +1071,7 @@ fn imin(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn imax(a : Int, b : Int) -> Int {
+fn imax(a : Int32, b : Int32) -> Int32 {
   if a > b {
     a
   } else {
@@ -1080,7 +1080,7 @@ fn imax(a : Int, b : Int) -> Int {
 }
 
 ///|
-fn umin(a : UInt, b : UInt) -> UInt {
+fn umin(a : UInt32, b : UInt32) -> UInt32 {
   if a < b {
     a
   } else {
@@ -1089,7 +1089,11 @@ fn umin(a : UInt, b : UInt) -> UInt {
 }
 
 ///|
-fn Buffer::merge_clusters_impl(self : Buffer, start : Int, end : Int) -> Unit {
+fn Buffer::merge_clusters_impl(
+  self : Buffer,
+  start : Int32,
+  end : Int32,
+) -> Unit {
   let mut start = start
   let mut end = end
   if self.cluster_level == HB_BUFFER_CLUSTER_LEVEL_CHARACTERS {
@@ -1130,7 +1134,11 @@ fn Buffer::merge_clusters_impl(self : Buffer, start : Int, end : Int) -> Unit {
 }
 
 ///|
-fn Buffer::merge_out_clusters(self : Buffer, start : Int, end : Int) -> Unit {
+fn Buffer::merge_out_clusters(
+  self : Buffer,
+  start : Int32,
+  end : Int32,
+) -> Unit {
   let mut start = start
   let mut end = end
   if self.cluster_level == HB_BUFFER_CLUSTER_LEVEL_CHARACTERS {
@@ -1246,7 +1254,7 @@ fn Buffer::delete_glyphs_inplace(
 }
 
 ///|
-fn Buffer::unsafe_to_break(self : Buffer, start : Int?, end : Int?) -> Unit {
+fn Buffer::unsafe_to_break(self : Buffer, start : Int32?, end : Int32?) -> Unit {
   self._set_glyph_flags(
     UNSAFE_TO_BREAK | UNSAFE_TO_CONCAT,
     start,
@@ -1259,8 +1267,8 @@ fn Buffer::unsafe_to_break(self : Buffer, start : Int?, end : Int?) -> Unit {
 ///|
 fn Buffer::safe_to_insert_tatweel(
   self : Buffer,
-  start : Int?,
-  end : Int?,
+  start : Int32?,
+  end : Int32?,
 ) -> Unit {
   if (self.flags & BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL) == 0 {
     self.unsafe_to_break(start, end)
@@ -1275,9 +1283,9 @@ fn Buffer::safe_to_insert_tatweel(
 /// If interior is true, then the cluster having the minimum value is skipped.
 fn Buffer::_set_glyph_flags(
   self : Buffer,
-  mask : UInt,
-  start : Int?,
-  end : Int?,
+  mask : UInt32,
+  start : Int32?,
+  end : Int32?,
   interior : Bool?,
   from_out_buffer : Bool?,
 ) -> Unit {
@@ -1331,7 +1339,11 @@ fn Buffer::_set_glyph_flags(
 }
 
 ///|
-fn Buffer::unsafe_to_concat(self : Buffer, start : Int?, end : Int?) -> Unit {
+fn Buffer::unsafe_to_concat(
+  self : Buffer,
+  start : Int32?,
+  end : Int32?,
+) -> Unit {
   if (self.flags & BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT) == 0 {
     return
   }
@@ -1341,8 +1353,8 @@ fn Buffer::unsafe_to_concat(self : Buffer, start : Int?, end : Int?) -> Unit {
 ///|
 fn Buffer::unsafe_to_break_from_outbuffer(
   self : Buffer,
-  start : Int?,
-  end : Int?,
+  start : Int32?,
+  end : Int32?,
 ) -> Unit {
   self._set_glyph_flags(
     UNSAFE_TO_BREAK | UNSAFE_TO_CONCAT,
@@ -1356,8 +1368,8 @@ fn Buffer::unsafe_to_break_from_outbuffer(
 ///|
 fn Buffer::unsafe_to_concat_from_outbuffer(
   self : Buffer,
-  start : Int?,
-  end : Int?,
+  start : Int32?,
+  end : Int32?,
 ) -> Unit {
   if (self.flags & BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT) == 0 {
     return
@@ -1366,7 +1378,7 @@ fn Buffer::unsafe_to_concat_from_outbuffer(
 }
 
 ///|
-fn Buffer::move_to(self : Buffer, i : Int) -> Bool {
+fn Buffer::move_to(self : Buffer, i : Int32) -> Bool {
   if !self.have_output {
     guard! i <= self.len
     self.idx = i
@@ -1411,7 +1423,7 @@ fn Buffer::move_to(self : Buffer, i : Int) -> Bool {
 }
 
 ///|
-fn Buffer::ensure(self : Buffer, size : Int) -> Bool {
+fn Buffer::ensure(self : Buffer, size : Int32) -> Bool {
   if size < self.len {
     return true
   }
@@ -1426,7 +1438,11 @@ fn Buffer::ensure(self : Buffer, size : Int) -> Bool {
 }
 
 ///|
-fn Buffer::make_room_for(self : Buffer, num_in : Int, num_out : Int) -> Bool {
+fn Buffer::make_room_for(
+  self : Buffer,
+  num_in : Int32,
+  num_out : Int32,
+) -> Bool {
   if !self.ensure(self.out_len + num_out) {
     return false
   }
@@ -1441,7 +1457,7 @@ fn Buffer::make_room_for(self : Buffer, num_in : Int, num_out : Int) -> Bool {
 }
 
 ///|
-fn Buffer::shift_forward(self : Buffer, count : Int) -> Unit {
+fn Buffer::shift_forward(self : Buffer, count : Int32) -> Unit {
   guard! self.have_output
   if !self.ensure(self.len + count) {
     return
@@ -1459,15 +1475,15 @@ fn Buffer::shift_forward(self : Buffer, count : Int) -> Unit {
 }
 
 ///|
-fn Buffer::clear_context(self : Buffer, side : Int) -> Unit {
+fn Buffer::clear_context(self : Buffer, side : Int32) -> Unit {
   self.context_len[side] = 0
 }
 
 ///|
 fn Buffer::sort(
   self : Buffer,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   cmp : (GlyphInfo, GlyphInfo) -> Bool,
 ) -> Unit {
   guard! !self.have_positions
@@ -1491,7 +1507,7 @@ fn Buffer::sort(
 }
 
 ///|
-fn set_cluster(info : GlyphInfo, cluster : UInt, mask : UInt) -> Unit {
+fn set_cluster(info : GlyphInfo, cluster : UInt32, mask : UInt32) -> Unit {
   if info.cluster != cluster {
     info.mask = (info.mask & (GLYPH_FLAG_DEFINED ^ 0xFFFFFFFF)) |
       (mask & GLYPH_FLAG_DEFINED)
@@ -1534,10 +1550,10 @@ fn Buffer::leave(self : Buffer) -> Unit {
 fn Buffer::_infos_find_min_cluster(
   self : Buffer,
   info : Array[GlyphInfo],
-  start : Int,
-  end : Int,
-  cluster : UInt?,
-) -> UInt {
+  start : Int32,
+  end : Int32,
+  cluster : UInt32?,
+) -> UInt32 {
   let mut cluster = cluster.unwrap_or(0xFFFFFFFF)
   if start == end {
     return cluster
@@ -1554,10 +1570,10 @@ fn Buffer::_infos_find_min_cluster(
 fn Buffer::_infos_set_glyph_flags(
   self : Buffer,
   out_info : Bool,
-  start : Int,
-  end : Int,
-  cluster : UInt,
-  mask : UInt,
+  start : Int32,
+  end : Int32,
+  cluster : UInt32,
+  mask : UInt32,
 ) -> Unit {
   let mut apply_scratch_flags = false
   if start == end {
@@ -1631,7 +1647,7 @@ fn Buffer::push_str(self : Buffer, text : StringView) -> Unit {
 }
 
 ///|
-fn utf8_len(c : Char) -> Int {
+fn utf8_len(c : Char) -> Int32 {
   let c = c.to_int()
   if c < 0x80 {
     1
@@ -1645,7 +1661,7 @@ fn utf8_len(c : Char) -> Int {
 }
 
 ///|
-fn Buffer::set_pre_context(self : Buffer, text : Array[Int]) -> Unit {
+fn Buffer::set_pre_context(self : Buffer, text : Array[Int32]) -> Unit {
   self.clear_context(0)
   let mut i = 0
   for j = text.length() - 1; j >= 0 && i < CONTEXT_LENGTH; j = j - 1 {
@@ -1656,7 +1672,7 @@ fn Buffer::set_pre_context(self : Buffer, text : Array[Int]) -> Unit {
 }
 
 ///|
-fn Buffer::set_post_context(self : Buffer, text : Array[Int]) -> Unit {
+fn Buffer::set_post_context(self : Buffer, text : Array[Int32]) -> Unit {
   self.clear_context(1)
   for i, c in text {
     if i >= CONTEXT_LENGTH {
@@ -1668,7 +1684,7 @@ fn Buffer::set_post_context(self : Buffer, text : Array[Int]) -> Unit {
 }
 
 ///|
-fn Buffer::next_syllable(self : Buffer, start : Int) -> Int {
+fn Buffer::next_syllable(self : Buffer, start : Int32) -> Int32 {
   let mut start = start
   if start >= self.len {
     return start
@@ -1682,7 +1698,7 @@ fn Buffer::next_syllable(self : Buffer, start : Int) -> Int {
 }
 
 ///|
-fn Buffer::allocate_lig_id(self : Buffer) -> Int {
+fn Buffer::allocate_lig_id(self : Buffer) -> Int32 {
   let mut lig_id = self.next_serial() & 0x07
   if lig_id == 0 {
     lig_id = self.allocate_lig_id()
@@ -1700,7 +1716,7 @@ fn cluster_group_func(a : GlyphInfo, b : GlyphInfo) -> Bool {
 fn Buffer::foreach_group(
   self : Buffer,
   group_func : (GlyphInfo, GlyphInfo) -> Bool,
-  body : (Int, Int) -> Unit,
+  body : (Int32, Int32) -> Unit,
 ) -> Unit {
   let count = self.len
   let mut start = 0
@@ -1714,13 +1730,19 @@ fn Buffer::foreach_group(
 
 ///|
 /// The `foreach_cluster!` macro.
-fn Buffer::foreach_cluster(self : Buffer, body : (Int, Int) -> Unit) -> Unit {
+fn Buffer::foreach_cluster(
+  self : Buffer,
+  body : (Int32, Int32) -> Unit,
+) -> Unit {
   self.foreach_group(cluster_group_func, body)
 }
 
 ///|
 /// The `foreach_syllable!` macro.
-fn Buffer::foreach_syllable(self : Buffer, body : (Int, Int) -> Unit) -> Unit {
+fn Buffer::foreach_syllable(
+  self : Buffer,
+  body : (Int32, Int32) -> Unit,
+) -> Unit {
   let mut start = 0
   let mut end = self.next_syllable(0)
   while start < self.len {
@@ -1732,7 +1754,10 @@ fn Buffer::foreach_syllable(self : Buffer, body : (Int, Int) -> Unit) -> Unit {
 
 ///|
 /// The `foreach_grapheme!` macro.
-fn Buffer::foreach_grapheme(self : Buffer, body : (Int, Int) -> Unit) -> Unit {
+fn Buffer::foreach_grapheme(
+  self : Buffer,
+  body : (Int32, Int32) -> Unit,
+) -> Unit {
   self.foreach_group(grapheme_group_func, body)
 }
 
@@ -1748,7 +1773,7 @@ pub fn UnicodeBuffer::new() -> UnicodeBuffer {
 
 ///|
 /// The number of unicode codepoints contained in the buffer.
-pub fn UnicodeBuffer::len(self : UnicodeBuffer) -> Int {
+pub fn UnicodeBuffer::len(self : UnicodeBuffer) -> Int32 {
   self.0.len
 }
 
@@ -1768,7 +1793,7 @@ pub fn UnicodeBuffer::push_str(self : UnicodeBuffer, str : StringView) -> Unit {
 /// Sets the pre-context for this buffer.
 pub fn UnicodeBuffer::set_pre_context(
   self : UnicodeBuffer,
-  chars : Array[Int],
+  chars : Array[Int32],
 ) -> Unit {
   self.0.set_pre_context(chars)
 }
@@ -1777,7 +1802,7 @@ pub fn UnicodeBuffer::set_pre_context(
 /// Sets the post-context for this buffer.
 pub fn UnicodeBuffer::set_post_context(
   self : UnicodeBuffer,
-  chars : Array[Int],
+  chars : Array[Int32],
 ) -> Unit {
   self.0.set_post_context(chars)
 }
@@ -1786,8 +1811,8 @@ pub fn UnicodeBuffer::set_post_context(
 /// Appends a character to a buffer with the given cluster value.
 pub fn UnicodeBuffer::add(
   self : UnicodeBuffer,
-  codepoint : Int,
-  cluster : UInt,
+  codepoint : Int32,
+  cluster : UInt32,
 ) -> Unit {
   self.0.add(codepoint.reinterpret_as_uint(), cluster)
   self.0.context_len[1] = 0
@@ -1834,7 +1859,7 @@ pub fn UnicodeBuffer::set_language(
 /// with.
 pub fn UnicodeBuffer::set_not_found_variation_selector_glyph(
   self : UnicodeBuffer,
-  glyph : UInt,
+  glyph : UInt32,
 ) -> Unit {
   self.0.not_found_variation_selector = Some(glyph)
 }
@@ -1854,13 +1879,13 @@ pub fn UnicodeBuffer::guess_segment_properties(self : UnicodeBuffer) -> Unit {
 
 ///|
 /// Set the flags for this buffer (`BUFFER_FLAG_*`).
-pub fn UnicodeBuffer::set_flags(self : UnicodeBuffer, flags : UInt) -> Unit {
+pub fn UnicodeBuffer::set_flags(self : UnicodeBuffer, flags : UInt32) -> Unit {
   self.0.flags = flags
 }
 
 ///|
 /// Get the flags for this buffer.
-pub fn UnicodeBuffer::flags(self : UnicodeBuffer) -> UInt {
+pub fn UnicodeBuffer::flags(self : UnicodeBuffer) -> UInt32 {
   self.0.flags
 }
 
@@ -1868,14 +1893,14 @@ pub fn UnicodeBuffer::flags(self : UnicodeBuffer) -> UInt {
 /// Set the cluster level of the buffer (`HB_BUFFER_CLUSTER_LEVEL_*`).
 pub fn UnicodeBuffer::set_cluster_level(
   self : UnicodeBuffer,
-  cluster_level : Int,
+  cluster_level : Int32,
 ) -> Unit {
   self.0.cluster_level = cluster_level
 }
 
 ///|
 /// Retrieve the cluster level of the buffer.
-pub fn UnicodeBuffer::cluster_level(self : UnicodeBuffer) -> Int {
+pub fn UnicodeBuffer::cluster_level(self : UnicodeBuffer) -> Int32 {
   match self.0.cluster_level {
     HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS
     | HB_BUFFER_CLUSTER_LEVEL_CHARACTERS => self.0.cluster_level
@@ -1901,7 +1926,7 @@ pub struct GlyphBuffer(Buffer)
 
 ///|
 /// The number of glyphs stored.
-pub fn GlyphBuffer::len(self : GlyphBuffer) -> Int {
+pub fn GlyphBuffer::len(self : GlyphBuffer) -> Int32 {
   self.0.len
 }
 
@@ -1948,35 +1973,35 @@ pub fn GlyphBuffer::recycle(self : GlyphBuffer) -> UnicodeBuffer {
 
 ///|
 /// Do not serialize glyph cluster.
-pub const SERIALIZE_NO_CLUSTERS : Int = 0b00000001
+pub const SERIALIZE_NO_CLUSTERS : Int32 = 0b00000001
 
 ///|
 /// Do not serialize glyph position information.
-pub const SERIALIZE_NO_POSITIONS : Int = 0b00000010
+pub const SERIALIZE_NO_POSITIONS : Int32 = 0b00000010
 
 ///|
 /// Do no serialize glyph name.
-pub const SERIALIZE_NO_GLYPH_NAMES : Int = 0b00000100
+pub const SERIALIZE_NO_GLYPH_NAMES : Int32 = 0b00000100
 
 ///|
 /// Serialize glyph extents.
-pub const SERIALIZE_GLYPH_EXTENTS : Int = 0b00001000
+pub const SERIALIZE_GLYPH_EXTENTS : Int32 = 0b00001000
 
 ///|
 /// Serialize glyph flags.
-pub const SERIALIZE_GLYPH_FLAGS : Int = 0b00010000
+pub const SERIALIZE_GLYPH_FLAGS : Int32 = 0b00010000
 
 ///|
 /// Do not serialize glyph advances, glyph offsets will reflect absolute
 /// glyph positions.
-pub const SERIALIZE_NO_ADVANCES : Int = 0b00100000
+pub const SERIALIZE_NO_ADVANCES : Int32 = 0b00100000
 
 ///|
 /// Converts the glyph buffer content into a string (hb-shape format).
 pub fn GlyphBuffer::serialize(
   self : GlyphBuffer,
   face : Face,
-  flags : Int,
+  flags : Int32,
 ) -> String {
   let s = StringBuilder()
   let infos = self.glyph_infos()
@@ -2035,7 +2060,7 @@ pub fn GlyphBuffer::serialize(
 }
 
 ///|
-fn hex_upper(n : UInt) -> String {
+fn hex_upper(n : UInt32) -> String {
   let digits = "0123456789ABCDEF"
   if n == 0 {
     return "0"

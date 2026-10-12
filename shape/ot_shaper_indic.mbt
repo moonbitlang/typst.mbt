@@ -27,191 +27,191 @@ let indic_shaper : OtShaper = {
 // values in the machines, we also need to update them here.
 
 ///|
-const OT_X : Int = 0
+const OT_X : Int32 = 0
 
 ///|
-const OT_C : Int = 1
+const OT_C : Int32 = 1
 
 ///|
-const OT_V : Int = 2
+const OT_V : Int32 = 2
 
 ///|
-const OT_N : Int = 3
+const OT_N : Int32 = 3
 
 ///|
-const OT_H : Int = 4
+const OT_H : Int32 = 4
 
 ///|
-const OT_ZWNJ : Int = 5
+const OT_ZWNJ : Int32 = 5
 
 ///|
-const OT_ZWJ : Int = 6
+const OT_ZWJ : Int32 = 6
 
 ///|
-const OT_M : Int = 7
+const OT_M : Int32 = 7
 
 ///|
-const OT_SM : Int = 8
+const OT_SM : Int32 = 8
 
 ///|
-const OT_A : Int = 9
+const OT_A : Int32 = 9
 
 ///|
 // ot_shaper_indic.rs:53; unused upstream too.
 #warnings("-unused_value")
-const OT_VD : Int = OT_A
+const OT_VD : Int32 = OT_A
 
 ///|
-const OT_PLACEHOLDER : Int = 10
+const OT_PLACEHOLDER : Int32 = 10
 
 ///|
-const OT_GB : Int = OT_PLACEHOLDER
+const OT_GB : Int32 = OT_PLACEHOLDER
 
 ///|
-const OT_DOTTEDCIRCLE : Int = 11
+const OT_DOTTEDCIRCLE : Int32 = 11
 
 ///|
 /// Register Shifter, used in Khmer OT spec.
-const OT_RS : Int = 12
+const OT_RS : Int32 = 12
 
 ///|
-const OT_MPst : Int = 13
+const OT_MPst : Int32 = 13
 
 ///|
 /// Atomically-encoded logical or visual repha.
-const OT_Repha : Int = 14
+const OT_Repha : Int32 = 14
 
 ///|
-const OT_Ra : Int = 15
+const OT_Ra : Int32 = 15
 
 ///|
 /// Consonant-Medial.
-const OT_CM : Int = 16
+const OT_CM : Int32 = 16
 
 ///|
 /// Avagraha, etc that take marks (SM,A,VD).
-const OT_Symbol : Int = 17
+const OT_Symbol : Int32 = 17
 
 ///|
-const OT_CS : Int = 18
+const OT_CS : Int32 = 18
 
 // Khmer & Myanmar shapers.
 
 ///|
-const OT_VAbv : Int = 20
+const OT_VAbv : Int32 = 20
 
 ///|
-const OT_VBlw : Int = 21
+const OT_VBlw : Int32 = 21
 
 ///|
-const OT_VPre : Int = 22
+const OT_VPre : Int32 = 22
 
 ///|
-const OT_VPst : Int = 23
+const OT_VPst : Int32 = 23
 
 // Khmer.
 
 ///|
-const OT_Robatic : Int = 25
+const OT_Robatic : Int32 = 25
 
 ///|
-const OT_Xgroup : Int = 26
+const OT_Xgroup : Int32 = 26
 
 ///|
-const OT_Ygroup : Int = 27
+const OT_Ygroup : Int32 = 27
 
 // Myanmar
 
 ///|
 /// Asat
-const OT_As : Int = 32
+const OT_As : Int32 = 32
 
 ///|
 /// Medial
-const OT_MH : Int = 35
+const OT_MH : Int32 = 35
 
 ///|
 /// Medial
-const OT_MR : Int = 36
+const OT_MR : Int32 = 36
 
 ///|
 /// Medial
-const OT_MW : Int = 37
+const OT_MW : Int32 = 37
 
 ///|
 /// Medial
-const OT_MY : Int = 38
+const OT_MY : Int32 = 38
 
 ///|
 /// Pwo and other tones
-const OT_PT : Int = 39
+const OT_PT : Int32 = 39
 
 ///|
 /// Variation selectors
-const OT_VS : Int = 40
+const OT_VS : Int32 = 40
 
 ///|
 /// Consonant medials
-const OT_ML : Int = 41
+const OT_ML : Int32 = 41
 
 ///|
 /// This one doesn't exist in ot_category_t in harfbuzz, only in
 /// the Myanmar machine. However, in Rust we unfortunately can't export
 /// inside the Ragel file, so we have to define it here as well. Needs to
 /// be kept in sync with the value in the machine.
-const OT_IV : Int = 2
+const OT_IV : Int32 = 2
 
 // `ot_position_t`
 
 ///|
-const POS_START : Int = 0
+const POS_START : Int32 = 0
 
 ///|
-const POS_RA_TO_BECOME_REPH : Int = 1
+const POS_RA_TO_BECOME_REPH : Int32 = 1
 
 ///|
-const POS_PRE_M : Int = 2
+const POS_PRE_M : Int32 = 2
 
 ///|
-const POS_PRE_C : Int = 3
+const POS_PRE_C : Int32 = 3
 
 ///|
-const POS_BASE_C : Int = 4
+const POS_BASE_C : Int32 = 4
 
 ///|
-const POS_AFTER_MAIN : Int = 5
+const POS_AFTER_MAIN : Int32 = 5
 
 ///|
-const POS_ABOVE_C : Int = 6
+const POS_ABOVE_C : Int32 = 6
 
 ///|
-const POS_BEFORE_SUB : Int = 7
+const POS_BEFORE_SUB : Int32 = 7
 
 ///|
-const POS_BELOW_C : Int = 8
+const POS_BELOW_C : Int32 = 8
 
 ///|
-const POS_AFTER_SUB : Int = 9
+const POS_AFTER_SUB : Int32 = 9
 
 ///|
 // ot_shaper_indic.rs:110; only the value of `RephPosition::BeforePost` upstream, :253.
 #warnings("-unused_value")
-const POS_BEFORE_POST : Int = 10
+const POS_BEFORE_POST : Int32 = 10
 
 ///|
-const POS_POST_C : Int = 11
+const POS_POST_C : Int32 = 11
 
 ///|
-const POS_AFTER_POST : Int = 12
+const POS_AFTER_POST : Int32 = 12
 
 ///|
-const POS_SMVD : Int = 13
+const POS_SMVD : Int32 = 13
 
 ///|
-const POS_END : Int = 14
+const POS_END : Int32 = 14
 
 ///|
-let indic_features : ReadOnlyArray[(@otf.Tag, Int)] = [
+let indic_features : ReadOnlyArray[(@otf.Tag, Int32)] = [
   // Basic features.
   // These features are applied in order, one at a time, after initial_reordering,
   // constrained to the syllable.
@@ -244,76 +244,76 @@ let indic_features : ReadOnlyArray[(@otf.Tag, Int)] = [
 ///|
 // ot_shaper_indic.rs:201; unused upstream too.
 #warnings("-unused_value")
-const INDIC_NUKT : Int = 0
+const INDIC_NUKT : Int32 = 0
 
 ///|
 // ot_shaper_indic.rs:202; unused upstream too.
 #warnings("-unused_value")
-const INDIC_AKHN : Int = 1
+const INDIC_AKHN : Int32 = 1
 
 ///|
-const INDIC_RPHF : Int = 2
+const INDIC_RPHF : Int32 = 2
 
 ///|
 // ot_shaper_indic.rs:204; unused upstream too.
 #warnings("-unused_value")
-const INDIC_RKRF : Int = 3
+const INDIC_RKRF : Int32 = 3
 
 ///|
-const INDIC_PREF : Int = 4
+const INDIC_PREF : Int32 = 4
 
 ///|
-const INDIC_BLWF : Int = 5
+const INDIC_BLWF : Int32 = 5
 
 ///|
-const INDIC_ABVF : Int = 6
+const INDIC_ABVF : Int32 = 6
 
 ///|
-const INDIC_HALF : Int = 7
+const INDIC_HALF : Int32 = 7
 
 ///|
-const INDIC_PSTF : Int = 8
+const INDIC_PSTF : Int32 = 8
 
 ///|
 // ot_shaper_indic.rs:210; unused upstream too.
 #warnings("-unused_value")
-const INDIC_VATU : Int = 9
+const INDIC_VATU : Int32 = 9
 
 ///|
 // ot_shaper_indic.rs:211; unused upstream too.
 #warnings("-unused_value")
-const INDIC_CJCT : Int = 10
+const INDIC_CJCT : Int32 = 10
 
 ///|
-const INDIC_INIT : Int = 11
+const INDIC_INIT : Int32 = 11
 
 ///|
 // ot_shaper_indic.rs:213; unused upstream too.
 #warnings("-unused_value")
-const INDIC_PRES : Int = 12
+const INDIC_PRES : Int32 = 12
 
 ///|
 // ot_shaper_indic.rs:214; unused upstream too.
 #warnings("-unused_value")
-const INDIC_ABVS : Int = 13
+const INDIC_ABVS : Int32 = 13
 
 ///|
 // ot_shaper_indic.rs:215; unused upstream too.
 #warnings("-unused_value")
-const INDIC_BLWS : Int = 14
+const INDIC_BLWS : Int32 = 14
 
 ///|
 // ot_shaper_indic.rs:216; unused upstream too.
 #warnings("-unused_value")
-const INDIC_PSTS : Int = 15
+const INDIC_PSTS : Int32 = 15
 
 ///|
 // ot_shaper_indic.rs:217; unused upstream too.
 #warnings("-unused_value")
-const INDIC_HALN : Int = 16
+const INDIC_HALN : Int32 = 16
 
 ///|
-fn indic_category_flag(c : Int) -> UInt {
+fn indic_category_flag(c : Int32) -> UInt32 {
   rb_flag(c)
 }
 
@@ -323,7 +323,7 @@ fn indic_category_flag(c : Int) -> UInt {
 /// We treat Vowels and placeholders as if they were consonants.  This is safe because Vowels
 /// cannot happen in a consonant syllable.  The plus side however is, we can call the
 /// consonant syllable logic from the vowel syllable function and get it all right!
-let consonant_flags_indic : UInt = indic_category_flag(OT_C) |
+let consonant_flags_indic : UInt32 = indic_category_flag(OT_C) |
   indic_category_flag(OT_CS) |
   indic_category_flag(OT_Ra) |
   indic_category_flag(OT_CM) |
@@ -332,7 +332,7 @@ let consonant_flags_indic : UInt = indic_category_flag(OT_C) |
   indic_category_flag(OT_DOTTEDCIRCLE)
 
 ///|
-let consonant_flags_myanmar : UInt = indic_category_flag(OT_C) |
+let consonant_flags_myanmar : UInt32 = indic_category_flag(OT_C) |
   indic_category_flag(OT_CS) |
   indic_category_flag(OT_Ra) |
   // | category_flag(ot_category_t::OT_CM)
@@ -341,7 +341,7 @@ let consonant_flags_myanmar : UInt = indic_category_flag(OT_C) |
   indic_category_flag(OT_DOTTEDCIRCLE)
 
 ///|
-let joiner_flags : UInt = indic_category_flag(OT_ZWJ) |
+let joiner_flags : UInt32 = indic_category_flag(OT_ZWJ) |
   indic_category_flag(OT_ZWNJ)
 
 ///|
@@ -375,7 +375,7 @@ priv enum BlwfMode {
 priv struct IndicConfig {
   script : Script?
   has_old_spec : Bool
-  virama : Int
+  virama : Int32
   reph_pos : RephPosition
   reph_mode : RephMode
   blwf_mode : BlwfMode
@@ -385,7 +385,7 @@ priv struct IndicConfig {
 fn IndicConfig::new(
   script : Script?,
   has_old_spec : Bool,
-  virama : Int,
+  virama : Int32,
   reph_pos : RephPosition,
   reph_mode : RephMode,
   blwf_mode : BlwfMode,
@@ -481,7 +481,7 @@ let indic_configs : ReadOnlyArray[IndicConfig] = [
 ///|
 priv struct IndicWouldSubstituteFeature {
   /// `Range<usize>` as `(start, end)`.
-  lookups : (Int, Int)
+  lookups : (Int32, Int32)
   zero_context : Bool
 }
 
@@ -530,7 +530,7 @@ priv struct IndicShapePlan {
   blwf : IndicWouldSubstituteFeature
   pstf : IndicWouldSubstituteFeature
   vatu : IndicWouldSubstituteFeature
-  mask_array : FixedArray[UInt]
+  mask_array : FixedArray[UInt32]
 }
 
 ///|
@@ -618,52 +618,52 @@ fn indic_shape_plan(plan : ShapePlan) -> IndicShapePlan {
 }
 
 ///|
-fn GlyphInfo::indic_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::indic_category(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_category()
 }
 
 ///|
-fn GlyphInfo::myanmar_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::myanmar_category(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_category()
 }
 
 ///|
-fn GlyphInfo::khmer_category(self : GlyphInfo) -> Int {
+fn GlyphInfo::khmer_category(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_category()
 }
 
 ///|
-fn GlyphInfo::set_indic_category(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_indic_category(self : GlyphInfo, c : Int32) -> Unit {
   self.set_ot_shaper_var_u8_category(c)
 }
 
 ///|
-fn GlyphInfo::set_myanmar_category(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_myanmar_category(self : GlyphInfo, c : Int32) -> Unit {
   self.set_ot_shaper_var_u8_category(c)
 }
 
 ///|
-fn GlyphInfo::indic_position(self : GlyphInfo) -> Int {
+fn GlyphInfo::indic_position(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_auxiliary()
 }
 
 ///|
-fn GlyphInfo::myanmar_position(self : GlyphInfo) -> Int {
+fn GlyphInfo::myanmar_position(self : GlyphInfo) -> Int32 {
   self.ot_shaper_var_u8_auxiliary()
 }
 
 ///|
-fn GlyphInfo::set_indic_position(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_indic_position(self : GlyphInfo, c : Int32) -> Unit {
   self.set_ot_shaper_var_u8_auxiliary(c)
 }
 
 ///|
-fn GlyphInfo::set_myanmar_position(self : GlyphInfo, c : Int) -> Unit {
+fn GlyphInfo::set_myanmar_position(self : GlyphInfo, c : Int32) -> Unit {
   self.set_ot_shaper_var_u8_auxiliary(c)
 }
 
 ///|
-fn GlyphInfo::is_one_of(self : GlyphInfo, flags : UInt) -> Bool {
+fn GlyphInfo::is_one_of(self : GlyphInfo, flags : UInt32) -> Bool {
   // If it ligated, all bets are off.
   if self.ligated() {
     return false
@@ -736,7 +736,7 @@ fn preprocess_text_indic(
 }
 
 ///|
-fn decompose_indic(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
+fn decompose_indic(_ctx : NormalizeContext, ab : Int32) -> (Int32, Int32)? {
   // Don't decompose these.
   //   U+0931 DEVANAGARI LETTER RRA
   //   https://github.com/harfbuzz/harfbuzz/issues/779
@@ -751,7 +751,7 @@ fn decompose_indic(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
 }
 
 ///|
-fn compose_indic(_ctx : NormalizeContext, a : Int, b : Int) -> Int? {
+fn compose_indic(_ctx : NormalizeContext, a : Int32, b : Int32) -> Int32? {
   // Avoid recomposing split matras.
   if gc_is_mark(char_general_category(a)) {
     return None
@@ -854,7 +854,7 @@ fn consonant_position_from_face(
   face : Face,
   consonant : @otf.GlyphId,
   virama : @otf.GlyphId,
-) -> Int {
+) -> Int32 {
   // For old-spec, the order of glyphs is Consonant,Virama,
   // whereas for new-spec, it's Virama,Consonant.  However,
   // some broken fonts (like Free Sans) simply copied lookups
@@ -891,8 +891,8 @@ fn initial_reordering_syllable_indic(
   plan : ShapePlan,
   indic_plan : IndicShapePlan,
   face : Face,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   let syllable_type : IndicSyllableType = match
@@ -927,8 +927,8 @@ fn initial_reordering_consonant_syllable_indic(
   plan : ShapePlan,
   indic_plan : IndicShapePlan,
   face : Face,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   // https://github.com/harfbuzz/harfbuzz/issues/435#issuecomment-335560167
@@ -1439,8 +1439,8 @@ fn initial_reordering_standalone_cluster_indic(
   plan : ShapePlan,
   indic_plan : IndicShapePlan,
   face : Face,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   // We treat placeholder/dotted-circle as if they are consonants, so we
@@ -1469,8 +1469,8 @@ fn final_reordering_indic(
 fn final_reordering_impl_indic(
   plan : ShapePlan,
   face : Face,
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
   buffer : Buffer,
 ) -> Unit {
   let indic_plan = indic_shape_plan(plan)
@@ -1798,11 +1798,11 @@ fn final_reordering_impl_indic(
 /// the reph.
 fn find_new_reph_pos_indic(
   indic_plan : IndicShapePlan,
-  start : Int,
-  end : Int,
-  base : Int,
+  start : Int32,
+  end : Int32,
+  base : Int32,
   buffer : Buffer,
-) -> Int {
+) -> Int32 {
   let mut new_reph_pos = 0
   let reph_pos = indic_plan.config.reph_pos
 
