@@ -36,11 +36,83 @@ fn handle_text(
 ///|
 /// Convert the glyphs of a text item; text ranges are converted from UTF-8
 /// byte offsets to UTF-16 offsets into the text.
+///
+/// (Upstream hands krilla the glyphs as they are, behind its `Glyph`
+/// trait. Here every glyph of a document is converted, so what is made per
+/// glyph is the glyph alone: text that is ASCII, which most is, needs no
+/// table of offsets, and the glyphs of a word share their location.)
 fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
-  // Map UTF-8 byte offsets to UTF-16 offsets.
+  let text = t.text
+  let u16 = text.length()
+  let mut ascii = true
+  for i in 0..<u16 {
+    if text.unsafe_get(i).to_int() >= 0x80 {
+      ascii = false
+      break
+    }
+  }
+  // Map UTF-8 byte offsets to UTF-16 offsets: the two are the same in
+  // ASCII text.
+  let offsets = if ascii { no_offsets } else { utf16_offsets(text) }
+  let glyphs = t.glyphs
+  let out : Array[@export.Glyph] = Array(capacity=glyphs.length())
+  // The location of the glyph before, to share it with the next glyph of
+  // the same span.
+  let mut span = 0UL
+  let mut location : UInt64? = None
+  for g in glyphs {
+    // (`let (start, end) = g.range()`, without the tuple.)
+    let start = g.range_start.to_int()
+    let end = g.range_end.to_int()
+    if location is None || g.span.0 != span {
+      span = g.span.0
+      location = Some(span)
+    }
+    out.push({
+      glyph_id: g.id.to_int(),
+      text_start: if ascii {
+        if start <= u16 {
+          start
+        } else {
+          u16
+        }
+      } else if start < offsets.length() {
+        offsets[start]
+      } else {
+        u16
+      },
+      text_end: if ascii {
+        if end <= u16 {
+          end
+        } else {
+          u16
+        }
+      } else if end < offsets.length() {
+        offsets[end]
+      } else {
+        u16
+      },
+      x_advance: g.x_advance.get(),
+      x_offset: g.x_offset.get(),
+      y_advance: g.y_advance.get(),
+      y_offset: g.y_offset.get(),
+      location,
+    })
+  }
+  out
+}
+
+///|
+/// The table of offsets that ASCII text does not need (never written to).
+let no_offsets : Array[Int32] = []
+
+///|
+/// The UTF-16 offset of every UTF-8 byte offset into the text, and of its
+/// end.
+fn utf16_offsets(text : String) -> Array[Int32] {
   let offsets = []
   let mut u16 = 0
-  for c in t.text {
+  for c in text {
     let cp = c.to_int()
     let n = if cp < 0x80 {
       1
@@ -57,32 +129,26 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
     u16 += if cp >= 0x10000 { 2 } else { 1 }
   }
   offsets.push(u16)
-  let map = (b : Int32) => {
-    if b >= 0 && b < offsets.length() {
-      offsets[b]
-    } else {
-      u16
-    }
-  }
-  t.glyphs.map(g => {
-    // (`let (start, end) = g.range()`, without the tuple.)
-    let start = g.range_start.to_int()
-    let end = g.range_end.to_int()
-    {
-      glyph_id: g.id.to_int(),
-      text_start: map(start),
-      text_end: map(end),
-      x_advance: g.x_advance.get(),
-      x_offset: g.x_offset.get(),
-      y_advance: g.y_advance.get(),
-      y_offset: g.y_offset.get(),
-      location: Some(g.span.0),
-    }
-  })
+  offsets
 }
 
 ///|
 fn convert_font(
+  gc : GlobalContext,
+  typst_font : @library.FontInstance,
+) -> @export.Font raise @library.SourceError {
+  // (Not upstream: the font of the text item before, by its identity.)
+  if gc.last_font is Some((last, font)) && physical_equal(last, typst_font) {
+    return font
+  }
+  let font = convert_font_lookup(gc, typst_font)
+  gc.last_font = Some((typst_font, font))
+  font
+}
+
+///|
+/// [convert_font] without what it keeps of the call before.
+fn convert_font_lookup(
   gc : GlobalContext,
   typst_font : @library.FontInstance,
 ) -> @export.Font raise @library.SourceError {

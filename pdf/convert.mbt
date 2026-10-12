@@ -270,6 +270,12 @@ priv struct GlobalContext {
   /// Cache the conversion between export and Typst fonts.
   fonts_forward : Map[@library.FontInstance, @export.Font]
   fonts_backward : Array[(@export.Font, @library.FontInstance)]
+  /// The font that was converted last, with its instance: the text items
+  /// of a paragraph have one font, and looking a font up hashes it (not
+  /// upstream: [convert_font]).
+  mut last_font : (@library.FontInstance, @export.Font)?
+  /// The solid fill that was converted last (not upstream: [convert_fill]).
+  mut last_solid_fill : SolidFill?
   /// The fonts shared between Typst text and SVG images.
   svg_fonts : SvgFontCache
   /// The first image inside an SVG image that could not be decoded: the
@@ -307,6 +313,8 @@ fn GlobalContext::new(
   {
     fonts_forward: {},
     fonts_backward: [],
+    last_font: None,
+    last_solid_fill: None,
     svg_fonts: SvgFontCache::new(),
     svg_image_error: None,
     pdf_extractions: {},
