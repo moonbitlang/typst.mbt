@@ -8,6 +8,10 @@ the module (`library` is `moonbitlang/typst/library`).
 
 ## Unreleased
 
+Since 0.1.5. Nothing yet.
+
+## 0.1.5
+
 Since 0.1.4 (commit 7d2ee18).
 
 ### Breaking: renamed

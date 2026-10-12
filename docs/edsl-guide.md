@@ -130,8 +130,8 @@ declaration:
 
 ```
 import {
-  "moonbitlang/typst@0.1.4/doc",
-  "moonbitlang/typst@0.1.4/doc/system",
+  "moonbitlang/typst@0.1.5/doc",
+  "moonbitlang/typst@0.1.5/doc/system",
 }
 
 using @doc {
