@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn deflate_memo_stats() -> (Int, Int)
+
 pub fn pdf(@layout.PagedDocument, PdfOptions) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
 
 pub fn pdf_in_bundle(@layout.PagedDocument, PdfOptions, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]

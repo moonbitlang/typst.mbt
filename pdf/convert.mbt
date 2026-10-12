@@ -38,7 +38,7 @@ fn convert_impl(
     },
     enable_tagging: options.tagged(),
   }
-  let document = @export.Document::new_with(settings)
+  let document = @export.Document::new_with(settings, memo=export_memo)
   let page_index_converter = PageIndexConverter::new(typst_document, options)
   let named_destinations = collect_named_destinations(
     document, typst_document, anchors, page_index_converter,
