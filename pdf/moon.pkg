@@ -15,3 +15,7 @@ import {
   "moonbitlang/core/math",
   "moonbitlang/core/cmp",
 }
+
+import {
+  "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
+} for "wbtest"
