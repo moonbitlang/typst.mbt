@@ -171,21 +171,36 @@ fn tags_text(
   if gc.tags.tree.parent_artifact() is Some(_) {
     return false
   }
-  update_bbox(gc, fc, () => text.bbox())
+  // (`update_bbox(gc, fc, || text.bbox())`, with the closure made where
+  // it is called: for the text of a figure, not for every text item.)
+  if gc.tags.tree.parent_bbox() is Some(_) {
+    update_bbox(gc, fc, () => text.bbox())
+  }
   let attrs = resolve_text_attrs(gc.tags.tree, gc.options, text)
   let lang = {
     let locale = @library.Locale::new(text.lang, text.region)
     gc.tags.tree.groups.propagate_lang(gc.tags.tree.current(), locale)
   }
-  let lang_str = lang.map(l => l.rfc_3066())
-  let content = @export.ContentTag::Span({
-    ..@export.SpanTag::empty(),
-    lang: lang_str,
-  })
+  let content = match lang {
+    Some(lang) =>
+      @export.ContentTag::Span({
+        lang: Some(lang.rfc_3066()),
+        alt_text: None,
+        expanded: None,
+        actual_text: None,
+      })
+    // (`SpanTag::empty()`, the same for every text item without a language
+    // of its own.)
+    None => empty_span_tag
+  }
   let id = surface.start_tagged(content)
   gc.tags.push_text(attrs, id)
   true
 }
+
+///|
+/// The marked content tag of text without a language of its own.
+let empty_span_tag : @export.ContentTag = Span(@export.SpanTag::empty())
 
 ///|
 fn tags_image(
