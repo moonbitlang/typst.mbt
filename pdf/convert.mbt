@@ -200,6 +200,10 @@ priv struct FrameContext {
   /// exported, or if the context has been built to convert a pattern.
   page_idx : Int32?
   states : Array[State]
+  /// The states that were popped, for [FrameContext::push] to use again
+  /// (not upstream: every item of a frame pushes a state and pops it, and
+  /// nothing holds on to a state that was popped).
+  spare : Array[State]
   /// The link annotations belonging to a Link tag (in insertion order).
   link_annotations : Array[(Int32, Array[LinkAnnotation])]
 }
@@ -209,17 +213,28 @@ fn FrameContext::new(
   page_idx : Int32?,
   size : @library.Axes[@library.Abs],
 ) -> FrameContext {
-  { page_idx, states: [State::new(size)], link_annotations: [], }
+  { page_idx, states: [State::new(size)], spare: [], link_annotations: [], }
 }
 
 ///|
 fn FrameContext::push(self : FrameContext) -> Unit {
-  self.states.push(self.states[self.states.length() - 1].copy())
+  let top = self.states[self.states.length() - 1]
+  match self.spare.pop() {
+    Some(state) => {
+      state.transform = top.transform
+      state.container_transform = top.container_transform
+      state.container_size = top.container_size
+      self.states.push(state)
+    }
+    None => self.states.push(top.copy())
+  }
 }
 
 ///|
 fn FrameContext::pop(self : FrameContext) -> Unit {
-  self.states.pop() |> ignore
+  if self.states.pop() is Some(state) {
+    self.spare.push(state)
+  }
 }
 
 ///|
