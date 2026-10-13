@@ -8,7 +8,23 @@ the module (`library` is `moonbitlang/typst/library`).
 
 ## Unreleased
 
-Since 0.1.6. Nothing yet.
+Since 0.1.7. Nothing yet.
+
+## 0.1.7
+
+Since 0.1.6 (commit a81bbc4). No change to the public API.
+
+### Changed
+
+- The module depends on `moonbit-community/flate` 0.9.0 and
+  `moonbitlang/pdflite` 0.4.0 (they were 0.8.5 and 0.3.11). flate 0.9.0
+  renames API, and a build has one version of a module: a program that
+  uses this module and flate itself, or another module that still asks
+  for flate 0.8, has to move to 0.9.0 with it (in `moonbitlang/office.mbt`
+  that is mbtexcel 0.3.0, docx2html 0.7.0, pagelayout 0.8.0, office-lib
+  0.7.0). What comes with it: level-6 compression in fewer instructions
+  with the same bytes, one-shot zlib and gzip decoding about twice as
+  fast. Every exported document is byte for byte what it was.
 
 ## 0.1.6
 
