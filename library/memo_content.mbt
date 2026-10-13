@@ -228,6 +228,15 @@ pub fn data_hash(data : Bytes) -> U128 {
 }
 
 ///|
+/// [data_hash] of data that is made for one call and asked for once (the
+/// content stream of a page in an export): the same hash, computed and not
+/// filed under the object, which nobody will ask for again and which the
+/// table would keep alive until its third sweep.
+pub fn transient_data_hash(data : Bytes) -> U128 {
+  data_hash_uncached(data)
+}
+
+///|
 fn data_hash_uncached(data : Bytes) -> U128 {
   let h = SipHasher128::new()
   // `[u8]`: a length prefix, then the bytes.

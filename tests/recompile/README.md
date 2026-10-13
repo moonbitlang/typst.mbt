@@ -626,6 +626,21 @@ references: 128 documents, seeds 9300 to 9311, 21.9 minutes with 8 jobs
 steps, 250 752 compilations, 4548 steps compiled again as the first
 compilation of a new process; 0 failures, 0 aborts.
 
+### The PDF exporter's lookups
+
+What the exporter (pdflite) asks `pdf/` for instead of computing it for
+every document, as krilla memoizes it (`@export.Memo`; "PDF export" in
+`AGENTS.md`). The watch loop of the stage exports a PDF at every step and
+compares its bytes with those of the references, so a stale result is a
+PDF that differs. Each mutation was put in on the final tree (246
+sequences, seed 1), one at a time, never committed; the tests are
+`pdf/deflate_wbtest.mbt` (D, 5 tests) and `doc/pdf_deflate_test.mbt` (d).
+
+| Mutation | Failing sequences, of 246 | First at | Tests that fail |
+|---|---|---|---|
+| the compressed content stream is found by the length of the stream alone | 79 | `bench/long`, sweep, step 1: the PDF differs from a fresh compilation without memoization | D, "a content stream is found by its bytes" and two more; d |
+| the compressed content streams are looked up with memoization off too | not run: the bytes cannot differ, there is one compressor | | D, "the compressor is called for a stream that is not kept, and only then", "with memoization off nothing is looked up or kept ..", "a document's content streams are kept ..": d |
+
 ### How the stores came to be kept
 
 Step 4 of the design's slice 1 ended with an experiment: every store kept

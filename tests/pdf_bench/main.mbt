@@ -16,8 +16,9 @@
 // The last line says whether all rounds gave the same bytes.
 //
 // What is kept between exports is what `pdf/image.mbt` keeps of a raster
-// image, its compressed samples; the document for it is the deck of
-// `bench/mkdeck.py`. Peak memory is the caller's to measure
+// image, its compressed samples (the document for it is the deck of
+// `bench/mkdeck.py`), and the compressed content streams
+// (`pdf/deflate.mbt`). Peak memory is the caller's to measure
 // (`/usr/bin/time -l`).
 //
 // The world is `doc/system`'s over the directory of the file, with the

@@ -3302,6 +3302,8 @@ pub fn traced_files_begin() -> Int
 
 pub fn traced_files_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
 
+pub fn transient_data_hash(Bytes) -> U128
+
 pub let typst_version : (Int, Int, Int)
 
 pub let u128_zero : U128

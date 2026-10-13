@@ -18,4 +18,5 @@ import {
 
 import {
   "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
+  "moonbitlang/pdflite/flate",
 } for "wbtest"

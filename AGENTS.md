@@ -938,7 +938,11 @@
   for the two). The third is the PDF exporter's image
   conversion (`pdf/image.mbt` `convert_raster`: the image, as
   `RasterImage::hash128()`, upstream's `Hash for RasterImage`, and
-  `interpolate`). Rules for such a cache: the
+  `interpolate`). The fourth is the compressed content streams of an
+  export (`pdf/deflate.mbt`, krilla's `deflate_encode_memoized`: the
+  bytes of the stream, hashed with `transient_data_hash`, the hash of
+  `data_hash` without the table by object, since a stream is an object of
+  one export). Rules for such a cache: the
   key is exactly what upstream hashes (read the Rust signature and the
   `Hash` impls: `RasterImage::new` hashes the data, the format and the
   ICC profile that was passed, not the one found in the file), and the
@@ -1320,10 +1324,31 @@
   compares them: the `recompile` stage, `pdf/image_wbtest.mbt` and
   `doc/pdf_images_test.mbt`; the `edsl` stage exports with memoization
   on only);
-  nothing may read the samples of a kept image. Not kept, so compressed
-  in every export: the images inside SVGs and of bitmap glyphs (made per
-  export), ICC profiles, content streams and fonts (krilla memoizes the
-  deflation of content streams with comemo).
+  nothing may read the samples of a kept image. What krilla memoizes
+  with comemo the exporter asks its host for (`@export.Memo`, given to
+  `Document::new_with`; pdflite after 0.3.9): pdflite keeps nothing
+  between documents, so the lookup is a function of `pdf/`. The
+  compressed content streams (`pdf/deflate.mbt`, krilla's
+  `deflate_encode_memoized`: the content streams of pages, form XObjects,
+  tiling patterns and Type 3 glyphs, ToUnicode CMaps, the PostScript
+  functions of gradients; not with `pretty`) are kept by the hash of the
+  bytes of the stream, and a stream that is not found is compressed by
+  the function pdflite hands to the lookup, its own: there is one
+  compressor in the PDF path, pdflite's, and a file is byte for byte what
+  pdflite alone writes, with memoization on and off (plain `cmp` is the
+  gate). An export compresses the content streams that are not the bytes
+  they were in an export before: none if no page changed, the stream of a
+  page that was edited, and those of the pages behind it if the edit
+  brought a glyph that renumbers theirs. Rules: a
+  lookup returns what its computation returns for these arguments, now or
+  earlier, and nothing else is in its key because nothing else is an
+  argument (the compressor is the same function in every call); what
+  belongs to a document is never kept. Not kept, so compressed in every
+  export: the images inside SVGs and of bitmap glyphs (made per export),
+  ICC profiles and font programs (binary data, krilla's `deflate_encode`,
+  which upstream does not memoize either). `@pdf.deflate_memo_stats()`
+  counts the streams that were found and that were compressed; tests:
+  `pdf/deflate_wbtest.mbt`, `doc/pdf_deflate_test.mbt`.
 - PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
   `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
