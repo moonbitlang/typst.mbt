@@ -27,7 +27,7 @@ pub fn zlib_decompress(
   verify_checksum~ : Bool = true,
 ) -> Bytes raise InflateError {
   if verify_checksum {
-    @zlib.zlib_decompress(data.to_owned()) catch {
+    @zlib.decompress(data.to_owned()) catch {
       @zlib.ZlibError(_, msg) => raise InflateError(msg)
     }
   } else {
@@ -102,7 +102,7 @@ pub fn inflate_read_to_end(
 ///|
 /// Decompresses a gzip stream, validating the CRC-32 and the size.
 pub fn gzip_decompress(data : BytesView) -> Bytes raise InflateError {
-  @gzip.gunzip(data.to_owned()) catch {
+  @gzip.decompress(data.to_owned()) catch {
     @gzip.GzipError(_, msg) => raise InflateError(msg)
   }
 }
