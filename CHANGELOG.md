@@ -8,7 +8,32 @@ the module (`library` is `moonbitlang/typst/library`).
 
 ## Unreleased
 
-Since 0.1.5. Nothing yet.
+Since 0.1.6. Nothing yet.
+
+## 0.1.6
+
+Since 0.1.5 (commit 62135b7). Nothing is renamed or removed.
+
+### Changed
+
+- `pdf`: an export keeps the compressed content streams and the subsets of
+  fonts that it made, and a later export in the process finds them (what
+  krilla memoizes with comemo: `deflate_encode_memoized`, `subset_font`).
+  They have the ages of the other results kept by content
+  (`@library.evict`), and `set_layout_memo_enabled(false)` turns them off.
+  The bytes of a document are the same either way. A repeated export of a
+  117-page text document takes 50 ms where the first takes 70 ms; of a
+  document with thirteen fonts, 4 ms where the first takes 9 ms. Needs
+  pdflite 0.3.11 (`Memo`).
+
+### Added
+
+- `library`: `transient_data_hash(Bytes)`, the hash that `data_hash` gives,
+  computed and not kept under the object: for data that is made for one
+  call and asked for once (the content stream of a page).
+- `pdf`: `deflate_memo_stats()` and `subset_memo_stats()`, the numbers of
+  content streams and of font subsets that exports found and that they
+  made (for tests and measurements, like `@layout.block_memo_stats`).
 
 ## 0.1.5
 
