@@ -37,6 +37,7 @@ fn deflate_test_file(
   last : String,
   standards~ : Array[@library.PdfStandard] = [],
   pretty~ : Bool = false,
+  world~ : @doc.DocWorld = @doc.DocWorld::in_memory(),
 ) -> Bytes raise {
   let options = @pdf.PdfOptions::{
     ..@pdf.PdfOptions::default(),
@@ -46,7 +47,10 @@ fn deflate_test_file(
       pretty: Some(pretty),
     },
   }
-  compile([@doc.Markup(deflate_test_source(last))]).pdf(options~).unwrap()
+  @doc.Document([@doc.Markup(deflate_test_source(last))])
+  .compile_paged(world)
+  .pdf(options~)
+  .unwrap()
 }
 
 ///|

@@ -38,14 +38,20 @@ fn convert_impl(
     },
     enable_tagging: options.tagged(),
   }
-  let document = @export.Document::new_with(settings, memo=export_memo)
+  // (Upstream makes this table with the `GlobalContext`. The lookup of
+  // font subsets reads it, and the document is made first.)
+  let fonts_backward = []
+  let document = @export.Document::new_with(
+    settings,
+    memo=export_memo(fonts_backward),
+  )
   let page_index_converter = PageIndexConverter::new(typst_document, options)
   let named_destinations = collect_named_destinations(
     document, typst_document, anchors, page_index_converter,
   )
   let gc = GlobalContext::new(
     typst_document, options, link_resolver, named_destinations, page_index_converter,
-    tags,
+    tags, fonts_backward,
   )
   convert_pages(gc, document)
   attach_files(gc, document)
@@ -327,10 +333,11 @@ fn GlobalContext::new(
   loc_to_names : Map[@library.Location, @export.NamedDestination],
   page_index_converter : PageIndexConverter,
   tags : Tags,
+  fonts_backward : Array[(@export.Font, @library.FontInstance)],
 ) -> GlobalContext {
   {
     fonts_forward: {},
-    fonts_backward: [],
+    fonts_backward,
     last_font: None,
     last_solid_fill: None,
     glyphs: [],

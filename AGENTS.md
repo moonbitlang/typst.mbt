@@ -942,7 +942,10 @@
   export (`pdf/deflate.mbt`, krilla's `deflate_encode_memoized`: the
   bytes of the stream, hashed with `transient_data_hash`, the hash of
   `data_hash` without the table by object, since a stream is an object of
-  one export). Rules for such a cache: the
+  one export), and the fifth the subsets of its fonts (`pdf/subset.mbt`,
+  krilla's `subset_font`: by the font object, the variation coordinates
+  and the glyph IDs, finer than krilla's `FontInfo`; no error is kept).
+  Rules for such a cache: the
   key is exactly what upstream hashes (read the Rust signature and the
   `Hash` impls: `RasterImage::new` hashes the data, the format and the
   ICC profile that was passed, not the one found in the file), and the
@@ -1343,12 +1346,29 @@
   lookup returns what its computation returns for these arguments, now or
   earlier, and nothing else is in its key because nothing else is an
   argument (the compressor is the same function in every call); what
-  belongs to a document is never kept. Not kept, so compressed in every
-  export: the images inside SVGs and of bitmap glyphs (made per export),
-  ICC profiles and font programs (binary data, krilla's `deflate_encode`,
-  which upstream does not memoize either). `@pdf.deflate_memo_stats()`
-  counts the streams that were found and that were compressed; tests:
-  `pdf/deflate_wbtest.mbt`, `doc/pdf_deflate_test.mbt`.
+  belongs to a document is never kept. The subsets of fonts
+  (`pdf/subset.mbt`, krilla's memoized `subset_font`: the subset's font
+  file and the bounding box of its glyphs, half of an export of a
+  document with several fonts) are kept by the font object of the engine
+  (`Font::serial`, never the hash of the data: a system font collection
+  takes 24 ms to hash), the variation coordinates and the glyph IDs that
+  the document uses, in the order of the subset (a glyph remapper; the
+  subsetter adds the components of composite glyphs); a font that only
+  the text of an SVG image
+  uses has no font object of the engine and is subset for every export,
+  and an error is not kept, since it names the exporter's font of its
+  export. So a world must hand out the font objects it has for subsets
+  to be found again (`DocWorld::in_memory` makes new ones per world).
+  Exports of `bench/longer.typ`, `long.typ` and `showcase.typ` whose
+  pages are what they were: 47, 8.8 and 3.9 ms (before: 92, 18.9 and 10
+  ms; upstream's first export: 54, 11 and 6.5 ms); a first export pays
+  about 3 % for the keys. Not kept, so compressed in every export: the
+  images inside SVGs and of bitmap glyphs (made per export), ICC profiles
+  and font programs (binary data, krilla's `deflate_encode`, which
+  upstream does not memoize either). `@pdf.deflate_memo_stats()` and
+  `@pdf.subset_memo_stats()` count what was found and what was made;
+  tests: `pdf/deflate_wbtest.mbt`, `pdf/subset_wbtest.mbt`,
+  `doc/pdf_deflate_test.mbt`, `doc/pdf_subset_test.mbt`.
 - PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
   `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
