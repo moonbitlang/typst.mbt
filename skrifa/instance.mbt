@@ -212,6 +212,9 @@ fn[T] ok(f : () -> T raise) -> T? {
 
 ///|
 /// Runs `f`, capturing the result.
+// Preserve the result as data for repeated inspection, as in upstream
+// skrifa/src/metrics.rs:109-116 (the head table and its fallback).
+#warnings("-result_error_return")
 fn[T] res(f : () -> T raise ReadError) -> Result[T, ReadError] {
   try f() catch {
     e => Err(e)

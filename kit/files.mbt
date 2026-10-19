@@ -153,6 +153,9 @@ fn FileSlot::reset(self : FileSlot) -> FileSlot {
 
 ///|
 /// Loads the bytes of a file, catching the error.
+// The result is cached as data in FileSlot::Loaded, including failures
+// (upstream typst-kit/src/files.rs:180-181).
+#warnings("-result_error_return")
 fn[L : FileLoader] load_result(
   loader : L,
   id : @syntax.FileId,

@@ -234,7 +234,7 @@ type CblcTable
 pub fn CblcTable::parse(BytesView) -> Self?
 
 type Cff2Table
-pub fn Cff2Table::outline(Self, ArrayView[NormalizedCoordinate], GlyphId, &OutlineBuilder) -> Result[Rect, CFFError]
+pub fn Cff2Table::outline(Self, ArrayView[NormalizedCoordinate], GlyphId, &OutlineBuilder) -> Rect raise CFFError
 pub fn Cff2Table::parse(BytesView) -> Self?
 
 type CffTable
@@ -245,7 +245,7 @@ pub fn CffTable::glyph_name(Self, GlyphId) -> String?
 pub fn CffTable::glyph_width(Self, GlyphId) -> UInt16?
 pub fn CffTable::matrix(Self) -> Matrix
 pub fn CffTable::number_of_glyphs(Self) -> UInt16
-pub fn CffTable::outline(Self, GlyphId, &OutlineBuilder) -> Result[Rect, CFFError]
+pub fn CffTable::outline(Self, GlyphId, &OutlineBuilder) -> Rect raise CFFError
 pub fn CffTable::parse(BytesView) -> Self?
 
 pub(all) enum ChainedContextLookup {

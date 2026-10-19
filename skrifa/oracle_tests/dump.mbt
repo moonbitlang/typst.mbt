@@ -418,6 +418,9 @@ fn debug_platform(p : @read_fonts.PlatformId) -> String {
 
 ///|
 /// Runs `f`, capturing the result.
+// The oracle dump inspects both variants and writes errors into its output;
+// this helper captures a result as data rather than propagating a failure.
+#warnings("-result_error_return")
 fn[T] res(
   f : () -> T raise @read_fonts.ReadError,
 ) -> Result[T, @read_fonts.ReadError] {
