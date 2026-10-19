@@ -22,13 +22,13 @@ import {
 // Values
 pub fn accent_elem() -> Element
 
-pub let accent_elem_accent : Int
+pub let accent_elem_accent : Int32
 
-pub let accent_elem_base : Int
+pub let accent_elem_base : Int32
 
-pub let accent_elem_dotless : Int
+pub let accent_elem_dotless : Int32
 
-pub let accent_elem_size : Int
+pub let accent_elem_size : Int32
 
 pub let accent_short_fall : Em
 
@@ -36,9 +36,9 @@ pub fn add(Value, Value) -> Value raise HintedError
 
 pub fn align_elem() -> Element
 
-pub let align_elem_alignment : Int
+pub let align_elem_alignment : Int32
 
-pub let align_elem_body : Int
+pub let align_elem_body : Int32
 
 pub fn align_point_elem() -> Element
 
@@ -66,15 +66,15 @@ pub fn array_is_empty() -> String
 
 pub fn artifact_elem() -> Element
 
-pub let artifact_elem_body : Int
+pub let artifact_elem_body : Int32
 
-pub let artifact_elem_kind : Int
+pub let artifact_elem_kind : Int32
 
 pub fn asset_elem() -> Element
 
-pub let asset_elem_data : Int
+pub let asset_elem_data : Int32
 
-pub let asset_elem_path : Int
+pub let asset_elem_path : Int32
 
 pub fn asset_unsupported_rule(AssetElem, Engine, StyleChain) -> Content raise SourceError
 
@@ -510,83 +510,83 @@ pub fn[T] bail_hinted(String, ArrayView[String]) -> T raise HintedError
 
 pub fn bibliography_elem() -> Element
 
-pub let bibliography_elem_full : Int
+pub let bibliography_elem_full : Int32
 
-pub let bibliography_elem_group : Int
+pub let bibliography_elem_group : Int32
 
-pub let bibliography_elem_lang : Int
+pub let bibliography_elem_lang : Int32
 
-pub let bibliography_elem_region : Int
+pub let bibliography_elem_region : Int32
 
-pub let bibliography_elem_sources : Int
+pub let bibliography_elem_sources : Int32
 
-pub let bibliography_elem_sources_derived : Int
+pub let bibliography_elem_sources_derived : Int32
 
-pub let bibliography_elem_style : Int
+pub let bibliography_elem_style : Int32
 
-pub let bibliography_elem_style_derived : Int
+pub let bibliography_elem_style_derived : Int32
 
-pub let bibliography_elem_target : Int
+pub let bibliography_elem_target : Int32
 
-pub let bibliography_elem_title : Int
+pub let bibliography_elem_title : Int32
 
 pub fn binom_elem() -> Element
 
-pub let binom_elem_lower : Int
+pub let binom_elem_lower : Int32
 
-pub let binom_elem_upper : Int
+pub let binom_elem_upper : Int32
 
 pub fn block_elem() -> Element
 
-pub let block_elem_above : Int
+pub let block_elem_above : Int32
 
-pub let block_elem_below : Int
+pub let block_elem_below : Int32
 
-pub let block_elem_body : Int
+pub let block_elem_body : Int32
 
-pub let block_elem_breakable : Int
+pub let block_elem_breakable : Int32
 
-pub let block_elem_clip : Int
+pub let block_elem_clip : Int32
 
-pub let block_elem_fill : Int
+pub let block_elem_fill : Int32
 
-pub let block_elem_height : Int
+pub let block_elem_height : Int32
 
-pub let block_elem_inset : Int
+pub let block_elem_inset : Int32
 
-pub let block_elem_outset : Int
+pub let block_elem_outset : Int32
 
-pub let block_elem_radius : Int
+pub let block_elem_radius : Int32
 
-pub let block_elem_spacing : Int
+pub let block_elem_spacing : Int32
 
-pub let block_elem_sticky : Int
+pub let block_elem_sticky : Int32
 
-pub let block_elem_stroke : Int
+pub let block_elem_stroke : Int32
 
-pub let block_elem_width : Int
+pub let block_elem_width : Int32
 
 pub fn box_elem() -> Element
 
-pub let box_elem_baseline : Int
+pub let box_elem_baseline : Int32
 
-pub let box_elem_body : Int
+pub let box_elem_body : Int32
 
-pub let box_elem_clip : Int
+pub let box_elem_clip : Int32
 
-pub let box_elem_fill : Int
+pub let box_elem_fill : Int32
 
-pub let box_elem_height : Int
+pub let box_elem_height : Int32
 
-pub let box_elem_inset : Int
+pub let box_elem_inset : Int32
 
-pub let box_elem_outset : Int
+pub let box_elem_outset : Int32
 
-pub let box_elem_radius : Int
+pub let box_elem_radius : Int32
 
-pub let box_elem_stroke : Int
+pub let box_elem_stroke : Int32
 
-pub let box_elem_width : Int
+pub let box_elem_width : Int32
 
 pub fn bundle_document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content raise SourceError
 
@@ -602,29 +602,29 @@ pub fn bytes_to_str(BytesView) -> String?
 
 pub fn cancel_elem() -> Element
 
-pub let cancel_elem_angle : Int
+pub let cancel_elem_angle : Int32
 
-pub let cancel_elem_background : Int
+pub let cancel_elem_background : Int32
 
-pub let cancel_elem_body : Int
+pub let cancel_elem_body : Int32
 
-pub let cancel_elem_cross : Int
+pub let cancel_elem_cross : Int32
 
-pub let cancel_elem_inverted : Int
+pub let cancel_elem_inverted : Int32
 
-pub let cancel_elem_length : Int
+pub let cancel_elem_length : Int32
 
-pub let cancel_elem_stroke : Int
+pub let cancel_elem_stroke : Int32
 
 pub fn cases_elem() -> Element
 
-pub let cases_elem_children : Int
+pub let cases_elem_children : Int32
 
-pub let cases_elem_delim : Int
+pub let cases_elem_delim : Int32
 
-pub let cases_elem_gap : Int
+pub let cases_elem_gap : Int32
 
-pub let cases_elem_reverse : Int
+pub let cases_elem_reverse : Int32
 
 pub fn[T : Reflect] cast_error(Ty[T], Value) -> HintedString
 
@@ -644,55 +644,55 @@ pub fn charsets_is_w3c_text_char(Char) -> Bool
 
 pub fn circle_elem() -> Element
 
-pub let circle_elem_body : Int
+pub let circle_elem_body : Int32
 
-pub let circle_elem_fill : Int
+pub let circle_elem_fill : Int32
 
-pub let circle_elem_height : Int
+pub let circle_elem_height : Int32
 
-pub let circle_elem_inset : Int
+pub let circle_elem_inset : Int32
 
-pub let circle_elem_outset : Int
+pub let circle_elem_outset : Int32
 
-pub let circle_elem_radius : Int
+pub let circle_elem_radius : Int32
 
-pub let circle_elem_stroke : Int
+pub let circle_elem_stroke : Int32
 
-pub let circle_elem_width : Int
+pub let circle_elem_width : Int32
 
 pub fn cite_elem() -> Element
 
-pub let cite_elem_form : Int
+pub let cite_elem_form : Int32
 
-pub let cite_elem_key : Int
+pub let cite_elem_key : Int32
 
-pub let cite_elem_lang : Int
+pub let cite_elem_lang : Int32
 
-pub let cite_elem_region : Int
+pub let cite_elem_region : Int32
 
-pub let cite_elem_style : Int
+pub let cite_elem_style : Int32
 
-pub let cite_elem_style_derived : Int
+pub let cite_elem_style_derived : Int32
 
-pub let cite_elem_supplement : Int
+pub let cite_elem_supplement : Int32
 
 pub fn cite_group_elem() -> Element
 
-pub let cite_group_elem_children : Int
+pub let cite_group_elem_children : Int32
 
 pub fn class_elem() -> Element
 
-pub let class_elem_body : Int
+pub let class_elem_body : Int32
 
-pub let class_elem_class : Int
+pub let class_elem_class : Int32
 
-pub fn closure_memo_entries() -> Int
+pub fn closure_memo_entries() -> Int32
 
-pub fn closure_memo_stats() -> (Int, Int)
+pub fn closure_memo_stats() -> (Int32, Int32)
 
 pub fn colbreak_elem() -> Element
 
-pub let colbreak_elem_weak : Int
+pub let colbreak_elem_weak : Int32
 
 pub let color_aqua : Color
 
@@ -732,19 +732,19 @@ pub let color_yellow : Color
 
 pub fn columns_elem() -> Element
 
-pub let columns_elem_balanced : Int
+pub let columns_elem_balanced : Int32
 
-pub let columns_elem_body : Int
+pub let columns_elem_body : Int32
 
-pub let columns_elem_count : Int
+pub let columns_elem_count : Int32
 
-pub let columns_elem_gutter : Int
+pub let columns_elem_gutter : Int32
 
-pub let columns_elem_separator : Int
+pub let columns_elem_separator : Int32
 
-pub fn compare(Value, Value) -> Int raise HintedError
+pub fn compare(Value, Value) -> Int32 raise HintedError
 
-pub fn compare_str(String, String) -> Int
+pub fn compare_str(String, String) -> Int32
 
 pub fn contains(BindingGuard, Value, Value) -> Bool?
 
@@ -752,7 +752,7 @@ pub fn content_memo_enabled() -> Bool
 
 pub fn context_elem() -> Element
 
-pub let context_elem_func : Int
+pub let context_elem_func : Int32
 
 pub fn context_rule(ContextElem, Engine, StyleChain) -> Content raise SourceError
 
@@ -760,71 +760,71 @@ pub fn convert_float_to_int(Double) -> Int64 raise HintedError
 
 pub fn counter_display_elem() -> Element
 
-pub let counter_display_elem_both : Int
+pub let counter_display_elem_both : Int32
 
-pub let counter_display_elem_counter : Int
+pub let counter_display_elem_counter : Int32
 
-pub let counter_display_elem_numbering : Int
+pub let counter_display_elem_numbering : Int32
 
 pub fn counter_display_rule(CounterDisplayElem, Engine, StyleChain) -> Content raise SourceError
 
 pub fn counter_update_elem() -> Element
 
-pub let counter_update_elem_key : Int
+pub let counter_update_elem_key : Int32
 
-pub let counter_update_elem_update : Int
+pub let counter_update_elem_update : Int32
 
 pub fn csl_indent_elem() -> Element
 
-pub let csl_indent_elem_body : Int
+pub let csl_indent_elem_body : Int32
 
 pub fn csl_light_elem() -> Element
 
-pub let csl_light_elem_body : Int
+pub let csl_light_elem_body : Int32
 
 pub fn curve_close_elem() -> Element
 
-pub let curve_close_elem_mode : Int
+pub let curve_close_elem_mode : Int32
 
 pub fn curve_cubic_elem() -> Element
 
-pub let curve_cubic_elem_control_end : Int
+pub let curve_cubic_elem_control_end : Int32
 
-pub let curve_cubic_elem_control_start : Int
+pub let curve_cubic_elem_control_start : Int32
 
-pub let curve_cubic_elem_end : Int
+pub let curve_cubic_elem_end : Int32
 
-pub let curve_cubic_elem_relative : Int
+pub let curve_cubic_elem_relative : Int32
 
 pub fn curve_elem() -> Element
 
-pub let curve_elem_components : Int
+pub let curve_elem_components : Int32
 
-pub let curve_elem_fill : Int
+pub let curve_elem_fill : Int32
 
-pub let curve_elem_fill_rule : Int
+pub let curve_elem_fill_rule : Int32
 
-pub let curve_elem_stroke : Int
+pub let curve_elem_stroke : Int32
 
 pub fn curve_line_elem() -> Element
 
-pub let curve_line_elem_end : Int
+pub let curve_line_elem_end : Int32
 
-pub let curve_line_elem_relative : Int
+pub let curve_line_elem_relative : Int32
 
 pub fn curve_move_elem() -> Element
 
-pub let curve_move_elem_relative : Int
+pub let curve_move_elem_relative : Int32
 
-pub let curve_move_elem_start : Int
+pub let curve_move_elem_start : Int32
 
 pub fn curve_quad_elem() -> Element
 
-pub let curve_quad_elem_control : Int
+pub let curve_quad_elem_control : Int32
 
-pub let curve_quad_elem_end : Int
+pub let curve_quad_elem_end : Int32
 
-pub let curve_quad_elem_relative : Int
+pub let curve_quad_elem_relative : Int32
 
 pub fn data_hash(Bytes) -> U128
 
@@ -844,11 +844,11 @@ pub fn determine_format_from_path(@moonbitlang/typst/syntax.VirtualPath) -> Imag
 
 pub fn direct_link_elem() -> Element
 
-pub let direct_link_elem_alt : Int
+pub let direct_link_elem_alt : Int32
 
-pub let direct_link_elem_body : Int
+pub let direct_link_elem_body : Int32
 
-pub let direct_link_elem_loc : Int
+pub let direct_link_elem_loc : Int32
 
 pub fn display_float(Double) -> String
 
@@ -858,21 +858,21 @@ pub fn divider_elem() -> Element
 
 pub fn document_elem() -> Element
 
-pub let document_elem_author : Int
+pub let document_elem_author : Int32
 
-pub let document_elem_body : Int
+pub let document_elem_body : Int32
 
-pub let document_elem_date : Int
+pub let document_elem_date : Int32
 
-pub let document_elem_description : Int
+pub let document_elem_description : Int32
 
-pub let document_elem_format : Int
+pub let document_elem_format : Int32
 
-pub let document_elem_keywords : Int
+pub let document_elem_keywords : Int32
 
-pub let document_elem_path : Int
+pub let document_elem_path : Int32
 
-pub let document_elem_title : Int
+pub let document_elem_title : Int32
 
 pub fn document_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[Location?]
 
@@ -880,53 +880,53 @@ pub fn document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content ra
 
 pub fn ellipse_elem() -> Element
 
-pub let ellipse_elem_body : Int
+pub let ellipse_elem_body : Int32
 
-pub let ellipse_elem_fill : Int
+pub let ellipse_elem_fill : Int32
 
-pub let ellipse_elem_height : Int
+pub let ellipse_elem_height : Int32
 
-pub let ellipse_elem_inset : Int
+pub let ellipse_elem_inset : Int32
 
-pub let ellipse_elem_outset : Int
+pub let ellipse_elem_outset : Int32
 
-pub let ellipse_elem_stroke : Int
+pub let ellipse_elem_stroke : Int32
 
-pub let ellipse_elem_width : Int
+pub let ellipse_elem_width : Int32
 
 pub fn emph_elem() -> Element
 
-pub let emph_elem_body : Int
+pub let emph_elem_body : Int32
 
 pub fn enum_elem() -> Element
 
-pub let enum_elem_body_indent : Int
+pub let enum_elem_body_indent : Int32
 
-pub let enum_elem_children : Int
+pub let enum_elem_children : Int32
 
-pub let enum_elem_full : Int
+pub let enum_elem_full : Int32
 
-pub let enum_elem_indent : Int
+pub let enum_elem_indent : Int32
 
-pub let enum_elem_number_align : Int
+pub let enum_elem_number_align : Int32
 
-pub let enum_elem_numbering : Int
+pub let enum_elem_numbering : Int32
 
-pub let enum_elem_parents : Int
+pub let enum_elem_parents : Int32
 
-pub let enum_elem_reversed : Int
+pub let enum_elem_reversed : Int32
 
-pub let enum_elem_spacing : Int
+pub let enum_elem_spacing : Int32
 
-pub let enum_elem_start : Int
+pub let enum_elem_start : Int32
 
-pub let enum_elem_tight : Int
+pub let enum_elem_tight : Int32
 
 pub fn enum_item_elem() -> Element
 
-pub let enum_item_elem_body : Int
+pub let enum_item_elem_body : Int32
 
-pub let enum_item_elem_number : Int
+pub let enum_item_elem_number : Int32
 
 pub fn eq_(Value, Value) -> Value raise HintedError
 
@@ -934,39 +934,39 @@ pub fn equal(Value, Value) -> Bool
 
 pub fn equation_elem() -> Element
 
-pub let equation_elem_alt : Int
+pub let equation_elem_alt : Int32
 
-pub let equation_elem_block : Int
+pub let equation_elem_block : Int32
 
-pub let equation_elem_body : Int
+pub let equation_elem_body : Int32
 
-pub let equation_elem_bold : Int
+pub let equation_elem_bold : Int32
 
-pub let equation_elem_cramped : Int
+pub let equation_elem_cramped : Int32
 
-pub let equation_elem_italic : Int
+pub let equation_elem_italic : Int32
 
-pub let equation_elem_locale : Int
+pub let equation_elem_locale : Int32
 
-pub let equation_elem_number_align : Int
+pub let equation_elem_number_align : Int32
 
-pub let equation_elem_numbering : Int
+pub let equation_elem_numbering : Int32
 
-pub let equation_elem_script_scale : Int
+pub let equation_elem_script_scale : Int32
 
-pub let equation_elem_size : Int
+pub let equation_elem_size : Int32
 
-pub let equation_elem_supplement : Int
+pub let equation_elem_supplement : Int32
 
-pub let equation_elem_variant : Int
+pub let equation_elem_variant : Int32
 
-pub fn evict(Int) -> Unit
+pub fn evict(Int32) -> Unit
 
-pub fn exp10(Int) -> Double
+pub fn exp10(Int32) -> Double
 
 pub fn families(StyleChain) -> Array[FontFamily]
 
-pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value, eq? : (Value, Value) -> Bool) -> FieldInfo
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int32, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value, eq? : (Value, Value) -> Bool) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
@@ -974,59 +974,59 @@ pub fn fields_on(Type) -> Array[String]
 
 pub fn figure_caption_elem() -> Element
 
-pub let figure_caption_elem_body : Int
+pub let figure_caption_elem_body : Int32
 
-pub let figure_caption_elem_counter : Int
+pub let figure_caption_elem_counter : Int32
 
-pub let figure_caption_elem_figure_location : Int
+pub let figure_caption_elem_figure_location : Int32
 
-pub let figure_caption_elem_kind : Int
+pub let figure_caption_elem_kind : Int32
 
-pub let figure_caption_elem_numbering : Int
+pub let figure_caption_elem_numbering : Int32
 
-pub let figure_caption_elem_position : Int
+pub let figure_caption_elem_position : Int32
 
-pub let figure_caption_elem_separator : Int
+pub let figure_caption_elem_separator : Int32
 
-pub let figure_caption_elem_supplement : Int
+pub let figure_caption_elem_supplement : Int32
 
 pub fn figure_elem() -> Element
 
-pub let figure_elem_alt : Int
+pub let figure_elem_alt : Int32
 
-pub let figure_elem_body : Int
+pub let figure_elem_body : Int32
 
-pub let figure_elem_caption : Int
+pub let figure_elem_caption : Int32
 
-pub let figure_elem_counter : Int
+pub let figure_elem_counter : Int32
 
-pub let figure_elem_gap : Int
+pub let figure_elem_gap : Int32
 
-pub let figure_elem_kind : Int
+pub let figure_elem_kind : Int32
 
-pub let figure_elem_locale : Int
+pub let figure_elem_locale : Int32
 
-pub let figure_elem_numbering : Int
+pub let figure_elem_numbering : Int32
 
-pub let figure_elem_outlined : Int
+pub let figure_elem_outlined : Int32
 
-pub let figure_elem_placement : Int
+pub let figure_elem_placement : Int32
 
-pub let figure_elem_scope : Int
+pub let figure_elem_scope : Int32
 
-pub let figure_elem_supplement : Int
+pub let figure_elem_supplement : Int32
 
 pub fn find_name(@otf.Face, UInt16) -> String?
 
-pub fn fingerprint_flags_in(() -> Unit) -> Int
+pub fn fingerprint_flags_in(() -> Unit) -> Int32
 
-pub let fingerprint_host : Int
+pub let fingerprint_host : Int32
 
 pub fn fingerprint_hosts_in(() -> Unit) -> Array[HostFunc]
 
-pub let fingerprint_identity : Int
+pub let fingerprint_identity : Int32
 
-pub let fingerprint_lossy : Int
+pub let fingerprint_lossy : Int32
 
 pub fn fingerprint_lossy_in(() -> Unit) -> Bool
 
@@ -1068,27 +1068,27 @@ pub fn footnote_container_elem() -> Element
 
 pub fn footnote_elem() -> Element
 
-pub let footnote_elem_body : Int
+pub let footnote_elem_body : Int32
 
-pub let footnote_elem_numbering : Int
+pub let footnote_elem_numbering : Int32
 
 pub fn footnote_entry_elem() -> Element
 
-pub let footnote_entry_elem_clearance : Int
+pub let footnote_entry_elem_clearance : Int32
 
-pub let footnote_entry_elem_gap : Int
+pub let footnote_entry_elem_gap : Int32
 
-pub let footnote_entry_elem_indent : Int
+pub let footnote_entry_elem_indent : Int32
 
-pub let footnote_entry_elem_note : Int
+pub let footnote_entry_elem_note : Int32
 
-pub let footnote_entry_elem_separator : Int
+pub let footnote_entry_elem_separator : Int32
 
 pub fn footnote_marker_elem() -> Element
 
 pub fn format_duration(Int64) -> String
 
-pub fn format_float(Double, precision? : Int, Bool, String) -> String
+pub fn format_float(Double, precision? : Int32, Bool, String) -> String
 
 pub fn format_float_component(Double) -> String
 
@@ -1106,15 +1106,15 @@ pub fn format_yaml_error(@yaml.YamlError) -> LoadError
 
 pub fn frac_elem() -> Element
 
-pub let frac_elem_denom : Int
+pub let frac_elem_denom : Int32
 
-pub let frac_elem_denom_deparenthesized : Int
+pub let frac_elem_denom_deparenthesized : Int32
 
-pub let frac_elem_num : Int
+pub let frac_elem_num : Int32
 
-pub let frac_elem_num_deparenthesized : Int
+pub let frac_elem_num_deparenthesized : Int32
 
-pub let frac_elem_style : Int
+pub let frac_elem_style : Int32
 
 pub let frac_padding : Em
 
@@ -1122,7 +1122,7 @@ pub fn frame_cacheable(Frame) -> Bool
 
 pub fn frame_elem() -> Element
 
-pub let frame_elem_body : Int
+pub let frame_elem_body : Int32
 
 pub fn geq(Value, Value) -> Value raise HintedError
 
@@ -1134,195 +1134,195 @@ pub fn glyph_frame(FontInstance, UInt16) -> GlyphFrame?
 
 pub fn grid_cell_elem() -> Element
 
-pub let grid_cell_elem_align : Int
+pub let grid_cell_elem_align : Int32
 
-pub let grid_cell_elem_body : Int
+pub let grid_cell_elem_body : Int32
 
-pub let grid_cell_elem_breakable : Int
+pub let grid_cell_elem_breakable : Int32
 
-pub let grid_cell_elem_colspan : Int
+pub let grid_cell_elem_colspan : Int32
 
-pub let grid_cell_elem_fill : Int
+pub let grid_cell_elem_fill : Int32
 
-pub let grid_cell_elem_inset : Int
+pub let grid_cell_elem_inset : Int32
 
-pub let grid_cell_elem_is_repeated : Int
+pub let grid_cell_elem_is_repeated : Int32
 
-pub let grid_cell_elem_rowspan : Int
+pub let grid_cell_elem_rowspan : Int32
 
-pub let grid_cell_elem_stroke : Int
+pub let grid_cell_elem_stroke : Int32
 
-pub let grid_cell_elem_x : Int
+pub let grid_cell_elem_x : Int32
 
-pub let grid_cell_elem_y : Int
+pub let grid_cell_elem_y : Int32
 
 pub fn grid_elem() -> Element
 
-pub let grid_elem_align : Int
+pub let grid_elem_align : Int32
 
-pub let grid_elem_children : Int
+pub let grid_elem_children : Int32
 
-pub let grid_elem_column_gutter : Int
+pub let grid_elem_column_gutter : Int32
 
-pub let grid_elem_columns : Int
+pub let grid_elem_columns : Int32
 
-pub let grid_elem_fill : Int
+pub let grid_elem_fill : Int32
 
-pub let grid_elem_grid : Int
+pub let grid_elem_grid : Int32
 
-pub let grid_elem_gutter : Int
+pub let grid_elem_gutter : Int32
 
-pub let grid_elem_inset : Int
+pub let grid_elem_inset : Int32
 
-pub let grid_elem_row_gutter : Int
+pub let grid_elem_row_gutter : Int32
 
-pub let grid_elem_rows : Int
+pub let grid_elem_rows : Int32
 
-pub let grid_elem_stroke : Int
+pub let grid_elem_stroke : Int32
 
 pub fn grid_footer_elem() -> Element
 
-pub let grid_footer_elem_children : Int
+pub let grid_footer_elem_children : Int32
 
-pub let grid_footer_elem_repeat : Int
+pub let grid_footer_elem_repeat : Int32
 
 pub fn grid_h_line_elem() -> Element
 
-pub let grid_h_line_elem_end : Int
+pub let grid_h_line_elem_end : Int32
 
-pub let grid_h_line_elem_position : Int
+pub let grid_h_line_elem_position : Int32
 
-pub let grid_h_line_elem_start : Int
+pub let grid_h_line_elem_start : Int32
 
-pub let grid_h_line_elem_stroke : Int
+pub let grid_h_line_elem_stroke : Int32
 
-pub let grid_h_line_elem_y : Int
+pub let grid_h_line_elem_y : Int32
 
 pub fn grid_header_elem() -> Element
 
-pub let grid_header_elem_children : Int
+pub let grid_header_elem_children : Int32
 
-pub let grid_header_elem_level : Int
+pub let grid_header_elem_level : Int32
 
-pub let grid_header_elem_repeat : Int
+pub let grid_header_elem_repeat : Int32
 
 pub fn grid_to_cellgrid(GridElem, Engine, StyleChain) -> CellGrid raise SourceError
 
 pub fn grid_v_line_elem() -> Element
 
-pub let grid_v_line_elem_end : Int
+pub let grid_v_line_elem_end : Int32
 
-pub let grid_v_line_elem_position : Int
+pub let grid_v_line_elem_position : Int32
 
-pub let grid_v_line_elem_start : Int
+pub let grid_v_line_elem_start : Int32
 
-pub let grid_v_line_elem_stroke : Int
+pub let grid_v_line_elem_stroke : Int32
 
-pub let grid_v_line_elem_x : Int
+pub let grid_v_line_elem_x : Int32
 
 pub fn gt(Value, Value) -> Value raise HintedError
 
 pub fn h_elem() -> Element
 
-pub let h_elem_amount : Int
+pub let h_elem_amount : Int32
 
-pub let h_elem_weak : Int
+pub let h_elem_weak : Int32
 
 pub fn[T : Fingerprint] hash128(T) -> U128
 
 pub fn heading_elem() -> Element
 
-pub let heading_elem_body : Int
+pub let heading_elem_body : Int32
 
-pub let heading_elem_bookmarked : Int
+pub let heading_elem_bookmarked : Int32
 
-pub let heading_elem_depth : Int
+pub let heading_elem_depth : Int32
 
-pub let heading_elem_hanging_indent : Int
+pub let heading_elem_hanging_indent : Int32
 
-pub let heading_elem_level : Int
+pub let heading_elem_level : Int32
 
-pub let heading_elem_numbering : Int
+pub let heading_elem_numbering : Int32
 
-pub let heading_elem_numbers : Int
+pub let heading_elem_numbers : Int32
 
-pub let heading_elem_offset : Int
+pub let heading_elem_offset : Int32
 
-pub let heading_elem_outlined : Int
+pub let heading_elem_outlined : Int32
 
-pub let heading_elem_supplement : Int
+pub let heading_elem_supplement : Int32
 
 pub fn hide_elem() -> Element
 
-pub let hide_elem_body : Int
+pub let hide_elem_body : Int32
 
-pub let hide_elem_hidden : Int
+pub let hide_elem_hidden : Int32
 
 pub fn highlight_elem() -> Element
 
-pub let highlight_elem_body : Int
+pub let highlight_elem_body : Int32
 
-pub let highlight_elem_bottom_edge : Int
+pub let highlight_elem_bottom_edge : Int32
 
-pub let highlight_elem_extent : Int
+pub let highlight_elem_extent : Int32
 
-pub let highlight_elem_fill : Int
+pub let highlight_elem_fill : Int32
 
-pub let highlight_elem_radius : Int
+pub let highlight_elem_radius : Int32
 
-pub let highlight_elem_stroke : Int
+pub let highlight_elem_stroke : Int32
 
-pub let highlight_elem_top_edge : Int
+pub let highlight_elem_top_edge : Int32
 
 pub fn html_elem() -> Element
 
-pub let html_elem_attrs : Int
+pub let html_elem_attrs : Int32
 
-pub let html_elem_body : Int
+pub let html_elem_body : Int32
 
-pub let html_elem_css : Int
+pub let html_elem_css : Int32
 
-pub let html_elem_parent : Int
+pub let html_elem_parent : Int32
 
-pub let html_elem_role : Int
+pub let html_elem_role : Int32
 
-pub let html_elem_tag : Int
+pub let html_elem_tag : Int32
 
 pub fn html_format() -> Format
 
 pub fn html_format_elem() -> Element
 
-pub let html_format_elem_pretty : Int
+pub let html_format_elem_pretty : Int32
 
-pub fn i64_from_str_radix(String, Int) -> Int64 raise IntErrorKind
+pub fn i64_from_str_radix(String, Int32) -> Int64 raise IntErrorKind
 
 pub let image_default_dpi : Double
 
 pub fn image_elem() -> Element
 
-pub let image_elem_alt : Int
+pub let image_elem_alt : Int32
 
-pub let image_elem_fit : Int
+pub let image_elem_fit : Int32
 
-pub let image_elem_format : Int
+pub let image_elem_format : Int32
 
-pub let image_elem_height : Int
+pub let image_elem_height : Int32
 
-pub let image_elem_icc : Int
+pub let image_elem_icc : Int32
 
-pub let image_elem_icc_derived : Int
+pub let image_elem_icc_derived : Int32
 
-pub let image_elem_locale : Int
+pub let image_elem_locale : Int32
 
-pub let image_elem_page : Int
+pub let image_elem_page : Int32
 
-pub let image_elem_scaling : Int
+pub let image_elem_scaling : Int32
 
-pub let image_elem_source : Int
+pub let image_elem_source : Int32
 
-pub let image_elem_source_derived : Int
+pub let image_elem_source_derived : Int32
 
-pub let image_elem_width : Int
+pub let image_elem_width : Int32
 
 pub let image_usvg_default_dpi : Double
 
@@ -1330,7 +1330,7 @@ pub fn in_(BindingGuard, Value, Value) -> Value raise HintedError
 
 pub fn inline_elem() -> Element
 
-pub let inline_elem_body : Int
+pub let inline_elem_body : Int32
 
 pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
 
@@ -1366,11 +1366,11 @@ pub let lang_yiddish : Lang
 
 pub fn layout_elem() -> Element
 
-pub let layout_elem_func : Int
+pub let layout_elem_func : Int32
 
 pub fn layout_memo_active() -> Bool
 
-pub fn layout_memo_entries() -> Int
+pub fn layout_memo_entries() -> Int32
 
 pub fn leq(Value, Value) -> Value raise HintedError
 
@@ -1378,63 +1378,63 @@ pub fn libm_erf(Double) -> Double
 
 pub fn limits_elem() -> Element
 
-pub let limits_elem_body : Int
+pub let limits_elem_body : Int32
 
-pub let limits_elem_inline : Int
+pub let limits_elem_inline : Int32
 
 pub fn line_elem() -> Element
 
-pub let line_elem_angle : Int
+pub let line_elem_angle : Int32
 
-pub let line_elem_end : Int
+pub let line_elem_end : Int32
 
-pub let line_elem_length : Int
+pub let line_elem_length : Int32
 
-pub let line_elem_start : Int
+pub let line_elem_start : Int32
 
-pub let line_elem_stroke : Int
+pub let line_elem_stroke : Int32
 
 pub fn linebreak_elem() -> Element
 
-pub let linebreak_elem_justify : Int
+pub let linebreak_elem_justify : Int32
 
 pub fn link_anchor_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[String?]
 
 pub fn link_elem() -> Element
 
-pub let link_elem_body : Int
+pub let link_elem_body : Int32
 
-pub let link_elem_current : Int
+pub let link_elem_current : Int32
 
-pub let link_elem_dest : Int
+pub let link_elem_dest : Int32
 
 pub fn link_marker_elem() -> Element
 
-pub let link_marker_elem_alt : Int
+pub let link_marker_elem_alt : Int32
 
-pub let link_marker_elem_body : Int
+pub let link_marker_elem_body : Int32
 
 pub fn list_elem() -> Element
 
-pub let list_elem_body_indent : Int
+pub let list_elem_body_indent : Int32
 
-pub let list_elem_children : Int
+pub let list_elem_children : Int32
 
-pub let list_elem_depth : Int
+pub let list_elem_depth : Int32
 
-pub let list_elem_indent : Int
+pub let list_elem_indent : Int32
 
-pub let list_elem_marker : Int
+pub let list_elem_marker : Int32
 
-pub let list_elem_marker_align : Int
+pub let list_elem_marker_align : Int32
 
-pub let list_elem_spacing : Int
+pub let list_elem_spacing : Int32
 
-pub let list_elem_tight : Int
+pub let list_elem_tight : Int32
 
 pub fn list_item_elem() -> Element
 
-pub let list_item_elem_body : Int
+pub let list_item_elem_body : Int32
 
 pub fn load_many(@moonbitlang/typst/syntax.Spanned[Array[DataSource]], TrackedWorld) -> Array[Loaded] raise SourceError
 
@@ -1442,67 +1442,67 @@ pub fn localized_str(String, String?, String) -> String
 
 pub fn lr_elem() -> Element
 
-pub let lr_elem_body : Int
+pub let lr_elem_body : Int32
 
-pub let lr_elem_size : Int
+pub let lr_elem_size : Int32
 
 pub fn lt(Value, Value) -> Value raise HintedError
 
-pub fn mark_fingerprint_flags(Int) -> Unit
+pub fn mark_fingerprint_flags(Int32) -> Unit
 
 pub fn mark_fingerprint_lossy() -> Unit
 
 pub fn mat_elem() -> Element
 
-pub let mat_elem_align : Int
+pub let mat_elem_align : Int32
 
-pub let mat_elem_augment : Int
+pub let mat_elem_augment : Int32
 
-pub let mat_elem_column_gap : Int
+pub let mat_elem_column_gap : Int32
 
-pub let mat_elem_delim : Int
+pub let mat_elem_delim : Int32
 
-pub let mat_elem_gap : Int
+pub let mat_elem_gap : Int32
 
-pub let mat_elem_row_gap : Int
+pub let mat_elem_row_gap : Int32
 
-pub let mat_elem_rows : Int
+pub let mat_elem_rows : Int32
 
 pub fn math_attach_elem() -> Element
 
-pub let math_attach_elem_b : Int
+pub let math_attach_elem_b : Int32
 
-pub let math_attach_elem_base : Int
+pub let math_attach_elem_base : Int32
 
-pub let math_attach_elem_bl : Int
+pub let math_attach_elem_bl : Int32
 
-pub let math_attach_elem_br : Int
+pub let math_attach_elem_br : Int32
 
-pub let math_attach_elem_t : Int
+pub let math_attach_elem_t : Int32
 
-pub let math_attach_elem_tl : Int
+pub let math_attach_elem_tl : Int32
 
-pub let math_attach_elem_tr : Int
+pub let math_attach_elem_tr : Int32
 
 pub fn math_module() -> Module
 
 pub fn math_overline_elem() -> Element
 
-pub let math_overline_elem_body : Int
+pub let math_overline_elem_body : Int32
 
 pub fn math_underline_elem() -> Element
 
-pub let math_underline_elem_body : Int
+pub let math_underline_elem_body : Int32
 
-pub let max_call_depth : Int
+pub let max_call_depth : Int32
 
-pub let max_html_depth : Int
+pub let max_html_depth : Int32
 
-pub let max_iters : Int
+pub let max_iters : Int32
 
-pub let max_layout_depth : Int
+pub let max_layout_depth : Int32
 
-pub let max_show_rule_depth : Int
+pub let max_show_rule_depth : Int32
 
 pub fn memo_check_enabled() -> Bool
 
@@ -1510,7 +1510,7 @@ pub fn memo_check_reads(() -> String, TrackedWorld, WorldReads, () -> Unit raise
 
 pub fn memo_check_running_now() -> Bool
 
-pub fn memo_compilation() -> Int
+pub fn memo_compilation() -> Int32
 
 pub fn memo_fingerprint((SipHasher128) -> Unit) -> MemoKey
 
@@ -1522,11 +1522,11 @@ pub fn[T] memoized_pages(PageMemo[T], Engine, MemoKey, Content?, ArrayView[(Cont
 
 pub fn metadata_elem() -> Element
 
-pub let metadata_elem_value : Int
+pub let metadata_elem_value : Int32
 
 pub fn mid_elem() -> Element
 
-pub let mid_elem_body : Int
+pub let mid_elem_body : Int32
 
 pub let minus_sign : String
 
@@ -1536,11 +1536,11 @@ pub fn missing_key_no_default(String) -> String
 
 pub fn move_elem() -> Element
 
-pub let move_elem_body : Int
+pub let move_elem_body : Int32
 
-pub let move_elem_dx : Int
+pub let move_elem_dx : Int32
 
-pub let move_elem_dy : Int
+pub let move_elem_dy : Int32
 
 pub fn mul(Value, Value) -> Value raise HintedError
 
@@ -2166,77 +2166,77 @@ pub fn note_traced_files(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
 
 pub fn op_elem() -> Element
 
-pub let op_elem_limits : Int
+pub let op_elem_limits : Int32
 
-pub let op_elem_text : Int
+pub let op_elem_text : Int32
 
 pub fn or_(Value, Value) -> Value raise HintedError
 
 pub fn[T] or_raise(Result[T, Array[SourceDiagnostic]]) -> T raise SourceError
 
-pub fn out_of_bounds(Int64, Int) -> String
+pub fn out_of_bounds(Int64, Int32) -> String
 
-pub fn out_of_bounds_no_default(Int64, Int) -> String
+pub fn out_of_bounds_no_default(Int64, Int32) -> String
 
 pub fn outline_elem() -> Element
 
-pub let outline_elem_depth : Int
+pub let outline_elem_depth : Int32
 
-pub let outline_elem_indent : Int
+pub let outline_elem_indent : Int32
 
-pub let outline_elem_target : Int
+pub let outline_elem_target : Int32
 
-pub let outline_elem_title : Int
+pub let outline_elem_title : Int32
 
 pub fn outline_entry_elem() -> Element
 
-pub let outline_entry_elem_element : Int
+pub let outline_entry_elem_element : Int32
 
-pub let outline_entry_elem_fill : Int
+pub let outline_entry_elem_fill : Int32
 
-pub let outline_entry_elem_level : Int
+pub let outline_entry_elem_level : Int32
 
-pub let outline_entry_elem_parent : Int
+pub let outline_entry_elem_parent : Int32
 
 pub fn[T : Reflect] output_of(Ty[T]) -> CastInfo
 
 pub fn overbrace_elem() -> Element
 
-pub let overbrace_elem_annotation : Int
+pub let overbrace_elem_annotation : Int32
 
-pub let overbrace_elem_body : Int
+pub let overbrace_elem_body : Int32
 
 pub fn overbracket_elem() -> Element
 
-pub let overbracket_elem_annotation : Int
+pub let overbracket_elem_annotation : Int32
 
-pub let overbracket_elem_body : Int
+pub let overbracket_elem_body : Int32
 
 pub fn overline_elem() -> Element
 
-pub let overline_elem_background : Int
+pub let overline_elem_background : Int32
 
-pub let overline_elem_body : Int
+pub let overline_elem_body : Int32
 
-pub let overline_elem_evade : Int
+pub let overline_elem_evade : Int32
 
-pub let overline_elem_extent : Int
+pub let overline_elem_extent : Int32
 
-pub let overline_elem_offset : Int
+pub let overline_elem_offset : Int32
 
-pub let overline_elem_stroke : Int
+pub let overline_elem_stroke : Int32
 
 pub fn overparen_elem() -> Element
 
-pub let overparen_elem_annotation : Int
+pub let overparen_elem_annotation : Int32
 
-pub let overparen_elem_body : Int
+pub let overparen_elem_body : Int32
 
 pub fn overshell_elem() -> Element
 
-pub let overshell_elem_annotation : Int
+pub let overshell_elem_annotation : Int32
 
-pub let overshell_elem_body : Int
+pub let overshell_elem_body : Int32
 
 pub fn own_traced_begin() -> OwnTraced
 
@@ -2244,61 +2244,61 @@ pub fn own_traced_end(OwnTraced) -> Unit
 
 pub fn pad_elem() -> Element
 
-pub let pad_elem_body : Int
+pub let pad_elem_body : Int32
 
-pub let pad_elem_bottom : Int
+pub let pad_elem_bottom : Int32
 
-pub let pad_elem_left : Int
+pub let pad_elem_left : Int32
 
-pub let pad_elem_rest : Int
+pub let pad_elem_rest : Int32
 
-pub let pad_elem_right : Int
+pub let pad_elem_right : Int32
 
-pub let pad_elem_top : Int
+pub let pad_elem_top : Int32
 
-pub let pad_elem_x : Int
+pub let pad_elem_x : Int32
 
-pub let pad_elem_y : Int
+pub let pad_elem_y : Int32
 
 pub fn page_elem() -> Element
 
-pub let page_elem_background : Int
+pub let page_elem_background : Int32
 
-pub let page_elem_binding : Int
+pub let page_elem_binding : Int32
 
-pub let page_elem_bleed : Int
+pub let page_elem_bleed : Int32
 
-pub let page_elem_body : Int
+pub let page_elem_body : Int32
 
-pub let page_elem_columns : Int
+pub let page_elem_columns : Int32
 
-pub let page_elem_fill : Int
+pub let page_elem_fill : Int32
 
-pub let page_elem_flipped : Int
+pub let page_elem_flipped : Int32
 
-pub let page_elem_footer : Int
+pub let page_elem_footer : Int32
 
-pub let page_elem_footer_descent : Int
+pub let page_elem_footer_descent : Int32
 
-pub let page_elem_foreground : Int
+pub let page_elem_foreground : Int32
 
-pub let page_elem_header : Int
+pub let page_elem_header : Int32
 
-pub let page_elem_header_ascent : Int
+pub let page_elem_header_ascent : Int32
 
-pub let page_elem_height : Int
+pub let page_elem_height : Int32
 
-pub let page_elem_margin : Int
+pub let page_elem_margin : Int32
 
-pub let page_elem_number_align : Int
+pub let page_elem_number_align : Int32
 
-pub let page_elem_numbering : Int
+pub let page_elem_numbering : Int32
 
-pub let page_elem_paper : Int
+pub let page_elem_paper : Int32
 
-pub let page_elem_supplement : Int
+pub let page_elem_supplement : Int32
 
-pub let page_elem_width : Int
+pub let page_elem_width : Int32
 
 pub fn page_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[NonZeroUSize?]
 
@@ -2308,53 +2308,53 @@ pub fn page_supplement_introspection(Location, @moonbitlang/typst/syntax.Span) -
 
 pub fn pagebreak_elem() -> Element
 
-pub let pagebreak_elem_boundary : Int
+pub let pagebreak_elem_boundary : Int32
 
-pub let pagebreak_elem_to : Int
+pub let pagebreak_elem_to : Int32
 
-pub let pagebreak_elem_weak : Int
+pub let pagebreak_elem_weak : Int32
 
 pub fn paint_cacheable(Paint) -> Bool
 
 pub fn par_elem() -> Element
 
-pub let par_elem_body : Int
+pub let par_elem_body : Int32
 
-pub let par_elem_first_line_indent : Int
+pub let par_elem_first_line_indent : Int32
 
-pub let par_elem_hanging_indent : Int
+pub let par_elem_hanging_indent : Int32
 
-pub let par_elem_justification_limits : Int
+pub let par_elem_justification_limits : Int32
 
-pub let par_elem_justify : Int
+pub let par_elem_justify : Int32
 
-pub let par_elem_leading : Int
+pub let par_elem_leading : Int32
 
-pub let par_elem_linebreaks : Int
+pub let par_elem_linebreaks : Int32
 
-pub let par_elem_spacing : Int
+pub let par_elem_spacing : Int32
 
 pub fn par_line_elem() -> Element
 
-pub let par_line_elem_number_align : Int
+pub let par_line_elem_number_align : Int32
 
-pub let par_line_elem_number_clearance : Int
+pub let par_line_elem_number_clearance : Int32
 
-pub let par_line_elem_number_margin : Int
+pub let par_line_elem_number_margin : Int32
 
-pub let par_line_elem_numbering : Int
+pub let par_line_elem_numbering : Int32
 
-pub let par_line_elem_numbering_scope : Int
+pub let par_line_elem_numbering_scope : Int32
 
 pub fn par_line_marker_elem() -> Element
 
-pub let par_line_marker_elem_number_align : Int
+pub let par_line_marker_elem_number_align : Int32
 
-pub let par_line_marker_elem_number_clearance : Int
+pub let par_line_marker_elem_number_clearance : Int32
 
-pub let par_line_marker_elem_number_margin : Int
+pub let par_line_marker_elem_number_margin : Int32
 
-pub let par_line_marker_elem_numbering : Int
+pub let par_line_marker_elem_numbering : Int32
 
 pub fn parbreak_elem() -> Element
 
@@ -2362,69 +2362,69 @@ pub fn path_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspec
 
 pub fn pdf_attach_elem() -> Element
 
-pub let pdf_attach_elem_data : Int
+pub let pdf_attach_elem_data : Int32
 
-pub let pdf_attach_elem_description : Int
+pub let pdf_attach_elem_description : Int32
 
-pub let pdf_attach_elem_mime_type : Int
+pub let pdf_attach_elem_mime_type : Int32
 
-pub let pdf_attach_elem_path : Int
+pub let pdf_attach_elem_path : Int32
 
-pub let pdf_attach_elem_path_derived : Int
+pub let pdf_attach_elem_path_derived : Int32
 
-pub let pdf_attach_elem_relationship : Int
+pub let pdf_attach_elem_relationship : Int32
 
 pub fn pdf_format() -> Format
 
 pub fn pdf_format_elem() -> Element
 
-pub let pdf_format_elem_pages : Int
+pub let pdf_format_elem_pages : Int32
 
-pub let pdf_format_elem_pretty : Int
+pub let pdf_format_elem_pretty : Int32
 
-pub let pdf_format_elem_standard : Int
+pub let pdf_format_elem_standard : Int32
 
-pub let pdf_format_elem_tagged : Int
+pub let pdf_format_elem_tagged : Int32
 
 pub fn pdf_marker_tag(PdfMarkerTagKind, Content) -> Content
 
 pub fn pdf_marker_tag_elem() -> Element
 
-pub let pdf_marker_tag_elem_body : Int
+pub let pdf_marker_tag_elem_body : Int32
 
-pub let pdf_marker_tag_elem_kind : Int
+pub let pdf_marker_tag_elem_kind : Int32
 
 pub fn place_elem() -> Element
 
-pub let place_elem_alignment : Int
+pub let place_elem_alignment : Int32
 
-pub let place_elem_body : Int
+pub let place_elem_body : Int32
 
-pub let place_elem_clearance : Int
+pub let place_elem_clearance : Int32
 
-pub let place_elem_dx : Int
+pub let place_elem_dx : Int32
 
-pub let place_elem_dy : Int
+pub let place_elem_dy : Int32
 
-pub let place_elem_float : Int
+pub let place_elem_float : Int32
 
-pub let place_elem_scope : Int
+pub let place_elem_scope : Int32
 
 pub fn png_format() -> Format
 
 pub fn png_format_elem() -> Element
 
-pub let png_format_elem_ppi : Int
+pub let png_format_elem_ppi : Int32
 
 pub fn polygon_elem() -> Element
 
-pub let polygon_elem_fill : Int
+pub let polygon_elem_fill : Int32
 
-pub let polygon_elem_fill_rule : Int
+pub let polygon_elem_fill_rule : Int32
 
-pub let polygon_elem_stroke : Int
+pub let polygon_elem_stroke : Int32
 
-pub let polygon_elem_vertices : Int
+pub let polygon_elem_vertices : Int32
 
 pub fn pos(Value) -> Value raise HintedError
 
@@ -2432,11 +2432,11 @@ pub fn position_introspection(Location, @moonbitlang/typst/syntax.Span) -> Intro
 
 pub fn prefix_info_elem() -> Element
 
-pub let prefix_info_elem_inset : Int
+pub let prefix_info_elem_inset : Int32
 
-pub let prefix_info_elem_key : Int
+pub let prefix_info_elem_key : Int32
 
-pub let prefix_info_elem_level : Int
+pub let prefix_info_elem_level : Int32
 
 pub fn pretty_array_like(ArrayView[String], Bool) -> String
 
@@ -2446,7 +2446,7 @@ pub let prime_char : Char
 
 pub fn primes_elem() -> Element
 
-pub let primes_elem_count : Int
+pub let primes_elem_count : Int32
 
 pub fn query_first_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Content?]
 
@@ -2458,47 +2458,47 @@ pub fn query_unique_introspection(Selector, @moonbitlang/typst/syntax.Span) -> I
 
 pub fn quote_elem() -> Element
 
-pub let quote_elem_attribution : Int
+pub let quote_elem_attribution : Int32
 
-pub let quote_elem_block : Int
+pub let quote_elem_block : Int32
 
-pub let quote_elem_body : Int
+pub let quote_elem_body : Int32
 
-pub let quote_elem_depth : Int
+pub let quote_elem_depth : Int32
 
-pub let quote_elem_quotes : Int
+pub let quote_elem_quotes : Int32
 
 pub fn raw_elem() -> Element
 
-pub let raw_elem_align : Int
+pub let raw_elem_align : Int32
 
-pub let raw_elem_block : Int
+pub let raw_elem_block : Int32
 
-pub let raw_elem_lang : Int
+pub let raw_elem_lang : Int32
 
-pub let raw_elem_lines : Int
+pub let raw_elem_lines : Int32
 
-pub let raw_elem_syntaxes : Int
+pub let raw_elem_syntaxes : Int32
 
-pub let raw_elem_syntaxes_derived : Int
+pub let raw_elem_syntaxes_derived : Int32
 
-pub let raw_elem_tab_size : Int
+pub let raw_elem_tab_size : Int32
 
-pub let raw_elem_text : Int
+pub let raw_elem_text : Int32
 
-pub let raw_elem_theme : Int
+pub let raw_elem_theme : Int32
 
-pub let raw_elem_theme_derived : Int
+pub let raw_elem_theme_derived : Int32
 
 pub fn raw_line_elem() -> Element
 
-pub let raw_line_elem_body : Int
+pub let raw_line_elem_body : Int32
 
-pub let raw_line_elem_count : Int
+pub let raw_line_elem_count : Int32
 
-pub let raw_line_elem_number : Int
+pub let raw_line_elem_number : Int32
 
-pub let raw_line_elem_text : Int
+pub let raw_line_elem_text : Int32
 
 pub fn raw_syntaxes() -> @syntect.SyntaxSet
 
@@ -2506,37 +2506,37 @@ pub fn raw_theme() -> @syntect.Theme
 
 pub fn rect_elem() -> Element
 
-pub let rect_elem_body : Int
+pub let rect_elem_body : Int32
 
-pub let rect_elem_fill : Int
+pub let rect_elem_fill : Int32
 
-pub let rect_elem_height : Int
+pub let rect_elem_height : Int32
 
-pub let rect_elem_inset : Int
+pub let rect_elem_inset : Int32
 
-pub let rect_elem_outset : Int
+pub let rect_elem_outset : Int32
 
-pub let rect_elem_radius : Int
+pub let rect_elem_radius : Int32
 
-pub let rect_elem_stroke : Int
+pub let rect_elem_stroke : Int32
 
-pub let rect_elem_width : Int
+pub let rect_elem_width : Int32
 
 pub fn ref_elem() -> Element
 
-pub let ref_elem_citation : Int
+pub let ref_elem_citation : Int32
 
-pub let ref_elem_element : Int
+pub let ref_elem_element : Int32
 
-pub let ref_elem_form : Int
+pub let ref_elem_form : Int32
 
-pub let ref_elem_supplement : Int
+pub let ref_elem_supplement : Int32
 
-pub let ref_elem_target : Int
+pub let ref_elem_target : Int32
 
 pub fn regex_escape(String) -> String
 
-pub fn register_evictor((Int) -> Unit) -> Unit
+pub fn register_evictor((Int32) -> Unit) -> Unit
 
 pub fn register_memo_check_store(() -> () -> Unit) -> Unit
 
@@ -2544,11 +2544,11 @@ pub fn rem_euclid(Double, Double) -> Double
 
 pub fn repeat_elem() -> Element
 
-pub let repeat_elem_body : Int
+pub let repeat_elem_body : Int32
 
-pub let repeat_elem_gap : Int
+pub let repeat_elem_gap : Int32
 
-pub let repeat_elem_justify : Int
+pub let repeat_elem_justify : Int32
 
 pub fn repr_float(Double) -> String
 
@@ -2566,27 +2566,27 @@ pub fn resolve_equation(EquationElem, Engine, Locator, StyleChain) -> MathItem r
 
 pub fn root_elem() -> Element
 
-pub let root_elem_index : Int
+pub let root_elem_index : Int32
 
-pub let root_elem_radicand : Int
+pub let root_elem_radicand : Int32
 
 pub fn rotate_elem() -> Element
 
-pub let rotate_elem_angle : Int
+pub let rotate_elem_angle : Int32
 
-pub let rotate_elem_body : Int
+pub let rotate_elem_body : Int32
 
-pub let rotate_elem_origin : Int
+pub let rotate_elem_origin : Int32
 
-pub let rotate_elem_reflow : Int
+pub let rotate_elem_reflow : Int32
 
-pub fn round_int_with_precision(Int64, Int) -> Int64?
+pub fn round_int_with_precision(Int64, Int32) -> Int64?
 
-pub fn round_with_precision(Double, Int) -> Double
+pub fn round_with_precision(Double, Int32) -> Double
 
-pub fn route_queries_begin() -> Int
+pub fn route_queries_begin() -> Int32
 
-pub fn route_queries_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
+pub fn route_queries_end(Int32) -> Array[@moonbitlang/typst/syntax.FileId]
 
 pub fn route_shifts_begin() -> RouteShifts
 
@@ -2598,7 +2598,7 @@ pub fn rust_display_f32(Float) -> String
 
 pub fn rust_display_f64(Double) -> String
 
-pub fn rust_fixed_f64(Double, Int) -> String
+pub fn rust_fixed_f64(Double, Int32) -> String
 
 pub fn rust_lines(String) -> Array[String]
 
@@ -2616,21 +2616,21 @@ pub fn rust_trim_start(String) -> String
 
 pub fn scale_elem() -> Element
 
-pub let scale_elem_body : Int
+pub let scale_elem_body : Int32
 
-pub let scale_elem_factor : Int
+pub let scale_elem_factor : Int32
 
-pub let scale_elem_origin : Int
+pub let scale_elem_origin : Int32
 
-pub let scale_elem_reflow : Int
+pub let scale_elem_reflow : Int32
 
-pub let scale_elem_x : Int
+pub let scale_elem_x : Int32
 
-pub let scale_elem_y : Int
+pub let scale_elem_y : Int32
 
 pub fn scripts_elem() -> Element
 
-pub let scripts_elem_body : Int
+pub let scripts_elem_body : Int32
 
 pub fn separated_list(ArrayView[String], String) -> String
 
@@ -2642,35 +2642,35 @@ pub fn set_memo_check(Bool) -> Unit
 
 pub fn should_outline(FontInstance, UInt16) -> Bool
 
-pub let sink_max_values : Int
+pub let sink_max_values : Int32
 
 pub fn skew_elem() -> Element
 
-pub let skew_elem_ax : Int
+pub let skew_elem_ax : Int32
 
-pub let skew_elem_ay : Int
+pub let skew_elem_ay : Int32
 
-pub let skew_elem_body : Int
+pub let skew_elem_body : Int32
 
-pub let skew_elem_origin : Int
+pub let skew_elem_origin : Int32
 
-pub let skew_elem_reflow : Int
+pub let skew_elem_reflow : Int32
 
 pub fn smallcaps_elem() -> Element
 
-pub let smallcaps_elem_all : Int
+pub let smallcaps_elem_all : Int32
 
-pub let smallcaps_elem_body : Int
+pub let smallcaps_elem_body : Int32
 
 pub fn smart_quote_elem() -> Element
 
-pub let smart_quote_elem_alternative : Int
+pub let smart_quote_elem_alternative : Int32
 
-pub let smart_quote_elem_double : Int
+pub let smart_quote_elem_double : Int32
 
-pub let smart_quote_elem_enabled : Int
+pub let smart_quote_elem_enabled : Int32
 
-pub let smart_quote_elem_quotes : Int
+pub let smart_quote_elem_quotes : Int32
 
 pub fn source_fingerprint(@moonbitlang/typst/syntax.Source) -> U128
 
@@ -2678,69 +2678,69 @@ pub fn[T] source_result(() -> T raise SourceError) -> Result[T, Array[SourceDiag
 
 pub fn space_elem() -> Element
 
-pub let space_elem_had_newline : Int
+pub let space_elem_had_newline : Int32
 
 pub fn square_elem() -> Element
 
-pub let square_elem_body : Int
+pub let square_elem_body : Int32
 
-pub let square_elem_fill : Int
+pub let square_elem_fill : Int32
 
-pub let square_elem_height : Int
+pub let square_elem_height : Int32
 
-pub let square_elem_inset : Int
+pub let square_elem_inset : Int32
 
-pub let square_elem_outset : Int
+pub let square_elem_outset : Int32
 
-pub let square_elem_radius : Int
+pub let square_elem_radius : Int32
 
-pub let square_elem_size : Int
+pub let square_elem_size : Int32
 
-pub let square_elem_stroke : Int
+pub let square_elem_stroke : Int32
 
-pub let square_elem_width : Int
+pub let square_elem_width : Int32
 
 pub fn stack_elem() -> Element
 
-pub let stack_elem_children : Int
+pub let stack_elem_children : Int32
 
-pub let stack_elem_dir : Int
+pub let stack_elem_dir : Int32
 
-pub let stack_elem_spacing : Int
+pub let stack_elem_spacing : Int32
 
 pub fn state_update_elem() -> Element
 
-pub let state_update_elem_key : Int
+pub let state_update_elem_key : Int32
 
-pub let state_update_elem_update : Int
+pub let state_update_elem_update : Int32
 
 pub fn str_repeat(String, Int64) -> String raise HintedError
 
 pub fn stretch_elem() -> Element
 
-pub let stretch_elem_body : Int
+pub let stretch_elem_body : Int32
 
-pub let stretch_elem_size : Int
+pub let stretch_elem_size : Int32
 
 pub fn strike_elem() -> Element
 
-pub let strike_elem_background : Int
+pub let strike_elem_background : Int32
 
-pub let strike_elem_body : Int
+pub let strike_elem_body : Int32
 
-pub let strike_elem_extent : Int
+pub let strike_elem_extent : Int32
 
-pub let strike_elem_offset : Int
+pub let strike_elem_offset : Int32
 
-pub let strike_elem_stroke : Int
+pub let strike_elem_stroke : Int32
 
 pub fn stroke_from_pair(Value, Value) -> Value raise HintedError
 
 pub fn strong_elem() -> Element
 
-pub let strong_elem_body : Int
+pub let strong_elem_body : Int32
 
-pub let strong_elem_delta : Int
+pub let strong_elem_delta : Int32
 
 pub fn style_cramped() -> Style
 
@@ -2762,125 +2762,125 @@ pub fn sub(Value, Value) -> Value raise HintedError
 
 pub fn sub_elem() -> Element
 
-pub let sub_elem_baseline : Int
+pub let sub_elem_baseline : Int32
 
-pub let sub_elem_body : Int
+pub let sub_elem_body : Int32
 
-pub let sub_elem_size : Int
+pub let sub_elem_size : Int32
 
-pub let sub_elem_typographic : Int
+pub let sub_elem_typographic : Int32
 
 pub fn super_elem() -> Element
 
-pub let super_elem_baseline : Int
+pub let super_elem_baseline : Int32
 
-pub let super_elem_body : Int
+pub let super_elem_body : Int32
 
-pub let super_elem_size : Int
+pub let super_elem_size : Int32
 
-pub let super_elem_typographic : Int
+pub let super_elem_typographic : Int32
 
 pub fn svg_format() -> Format
 
 pub fn svg_format_elem() -> Element
 
-pub let svg_format_elem_pretty : Int
+pub let svg_format_elem_pretty : Int32
 
 pub fn symbol_elem() -> Element
 
-pub let symbol_elem_text : Int
+pub let symbol_elem_text : Int32
 
 pub fn table_cell_elem() -> Element
 
-pub let table_cell_elem_align : Int
+pub let table_cell_elem_align : Int32
 
-pub let table_cell_elem_body : Int
+pub let table_cell_elem_body : Int32
 
-pub let table_cell_elem_breakable : Int
+pub let table_cell_elem_breakable : Int32
 
-pub let table_cell_elem_colspan : Int
+pub let table_cell_elem_colspan : Int32
 
-pub let table_cell_elem_fill : Int
+pub let table_cell_elem_fill : Int32
 
-pub let table_cell_elem_inset : Int
+pub let table_cell_elem_inset : Int32
 
-pub let table_cell_elem_is_repeated : Int
+pub let table_cell_elem_is_repeated : Int32
 
-pub let table_cell_elem_kind : Int
+pub let table_cell_elem_kind : Int32
 
-pub let table_cell_elem_rowspan : Int
+pub let table_cell_elem_rowspan : Int32
 
-pub let table_cell_elem_stroke : Int
+pub let table_cell_elem_stroke : Int32
 
-pub let table_cell_elem_x : Int
+pub let table_cell_elem_x : Int32
 
-pub let table_cell_elem_y : Int
+pub let table_cell_elem_y : Int32
 
 pub fn table_elem() -> Element
 
-pub let table_elem_align : Int
+pub let table_elem_align : Int32
 
-pub let table_elem_children : Int
+pub let table_elem_children : Int32
 
-pub let table_elem_column_gutter : Int
+pub let table_elem_column_gutter : Int32
 
-pub let table_elem_columns : Int
+pub let table_elem_columns : Int32
 
-pub let table_elem_fill : Int
+pub let table_elem_fill : Int32
 
-pub let table_elem_grid : Int
+pub let table_elem_grid : Int32
 
-pub let table_elem_gutter : Int
+pub let table_elem_gutter : Int32
 
-pub let table_elem_inset : Int
+pub let table_elem_inset : Int32
 
-pub let table_elem_row_gutter : Int
+pub let table_elem_row_gutter : Int32
 
-pub let table_elem_rows : Int
+pub let table_elem_rows : Int32
 
-pub let table_elem_stroke : Int
+pub let table_elem_stroke : Int32
 
-pub let table_elem_summary : Int
+pub let table_elem_summary : Int32
 
 pub fn table_footer_elem() -> Element
 
-pub let table_footer_elem_children : Int
+pub let table_footer_elem_children : Int32
 
-pub let table_footer_elem_repeat : Int
+pub let table_footer_elem_repeat : Int32
 
 pub fn table_h_line_elem() -> Element
 
-pub let table_h_line_elem_end : Int
+pub let table_h_line_elem_end : Int32
 
-pub let table_h_line_elem_position : Int
+pub let table_h_line_elem_position : Int32
 
-pub let table_h_line_elem_start : Int
+pub let table_h_line_elem_start : Int32
 
-pub let table_h_line_elem_stroke : Int
+pub let table_h_line_elem_stroke : Int32
 
-pub let table_h_line_elem_y : Int
+pub let table_h_line_elem_y : Int32
 
 pub fn table_header_elem() -> Element
 
-pub let table_header_elem_children : Int
+pub let table_header_elem_children : Int32
 
-pub let table_header_elem_level : Int
+pub let table_header_elem_level : Int32
 
-pub let table_header_elem_repeat : Int
+pub let table_header_elem_repeat : Int32
 
 pub fn table_to_cellgrid(TableElem, Engine, StyleChain) -> CellGrid raise SourceError
 
 pub fn table_v_line_elem() -> Element
 
-pub let table_v_line_elem_end : Int
+pub let table_v_line_elem_end : Int32
 
-pub let table_v_line_elem_position : Int
+pub let table_v_line_elem_position : Int32
 
-pub let table_v_line_elem_start : Int
+pub let table_v_line_elem_start : Int32
 
-pub let table_v_line_elem_stroke : Int
+pub let table_v_line_elem_stroke : Int32
 
-pub let table_v_line_elem_x : Int
+pub let table_v_line_elem_x : Int32
 
 pub let tag_a : HtmlTag
 
@@ -2946,7 +2946,7 @@ pub let tag_dt : HtmlTag
 
 pub fn tag_elem() -> Element
 
-pub let tag_elem_tag : Int
+pub let tag_elem_tag : Int32
 
 pub let tag_em : HtmlTag
 
@@ -3170,193 +3170,193 @@ pub let tag_video : HtmlTag
 
 pub let tag_wbr : HtmlTag
 
-pub fn take_memo_check_report() -> (Int, Array[String])
+pub fn take_memo_check_report() -> (Int32, Array[String])
 
 pub fn target_elem() -> Element
 
-pub let target_elem_target : Int
+pub let target_elem_target : Int32
 
 pub fn term_item_elem() -> Element
 
-pub let term_item_elem_description : Int
+pub let term_item_elem_description : Int32
 
-pub let term_item_elem_term : Int
+pub let term_item_elem_term : Int32
 
 pub fn terms_elem() -> Element
 
-pub let terms_elem_children : Int
+pub let terms_elem_children : Int32
 
-pub let terms_elem_hanging_indent : Int
+pub let terms_elem_hanging_indent : Int32
 
-pub let terms_elem_indent : Int
+pub let terms_elem_indent : Int32
 
-pub let terms_elem_separator : Int
+pub let terms_elem_separator : Int32
 
-pub let terms_elem_spacing : Int
+pub let terms_elem_spacing : Int32
 
-pub let terms_elem_tight : Int
+pub let terms_elem_tight : Int32
 
-pub let terms_elem_within : Int
+pub let terms_elem_within : Int32
 
 pub fn text_elem() -> Element
 
-pub let text_elem_alternates : Int
+pub let text_elem_alternates : Int32
 
-pub let text_elem_baseline : Int
+pub let text_elem_baseline : Int32
 
-pub let text_elem_body : Int
+pub let text_elem_body : Int32
 
-pub let text_elem_bottom_edge : Int
+pub let text_elem_bottom_edge : Int32
 
-pub let text_elem_case : Int
+pub let text_elem_case : Int32
 
-pub let text_elem_cjk_latin_spacing : Int
+pub let text_elem_cjk_latin_spacing : Int32
 
-pub let text_elem_costs : Int
+pub let text_elem_costs : Int32
 
-pub let text_elem_deco : Int
+pub let text_elem_deco : Int32
 
-pub let text_elem_delta : Int
+pub let text_elem_delta : Int32
 
-pub let text_elem_dir : Int
+pub let text_elem_dir : Int32
 
-pub let text_elem_discretionary_ligatures : Int
+pub let text_elem_discretionary_ligatures : Int32
 
-pub let text_elem_emph : Int
+pub let text_elem_emph : Int32
 
-pub let text_elem_fallback : Int
+pub let text_elem_fallback : Int32
 
-pub let text_elem_features : Int
+pub let text_elem_features : Int32
 
-pub let text_elem_fill : Int
+pub let text_elem_fill : Int32
 
-pub let text_elem_font : Int
+pub let text_elem_font : Int32
 
-pub let text_elem_fractions : Int
+pub let text_elem_fractions : Int32
 
-pub let text_elem_historical_ligatures : Int
+pub let text_elem_historical_ligatures : Int32
 
-pub let text_elem_hyphenate : Int
+pub let text_elem_hyphenate : Int32
 
-pub let text_elem_kerning : Int
+pub let text_elem_kerning : Int32
 
-pub let text_elem_lang : Int
+pub let text_elem_lang : Int32
 
-pub let text_elem_ligatures : Int
+pub let text_elem_ligatures : Int32
 
-pub let text_elem_number_type : Int
+pub let text_elem_number_type : Int32
 
-pub let text_elem_number_width : Int
+pub let text_elem_number_width : Int32
 
-pub let text_elem_overhang : Int
+pub let text_elem_overhang : Int32
 
-pub let text_elem_region : Int
+pub let text_elem_region : Int32
 
-pub let text_elem_script : Int
+pub let text_elem_script : Int32
 
-pub let text_elem_shift_settings : Int
+pub let text_elem_shift_settings : Int32
 
-pub let text_elem_size : Int
+pub let text_elem_size : Int32
 
-pub let text_elem_slashed_zero : Int
+pub let text_elem_slashed_zero : Int32
 
-pub let text_elem_smallcaps : Int
+pub let text_elem_smallcaps : Int32
 
-pub let text_elem_spacing : Int
+pub let text_elem_spacing : Int32
 
-pub let text_elem_span_offset : Int
+pub let text_elem_span_offset : Int32
 
-pub let text_elem_stretch : Int
+pub let text_elem_stretch : Int32
 
-pub let text_elem_stroke : Int
+pub let text_elem_stroke : Int32
 
-pub let text_elem_style : Int
+pub let text_elem_style : Int32
 
-pub let text_elem_stylistic_set : Int
+pub let text_elem_stylistic_set : Int32
 
-pub let text_elem_text : Int
+pub let text_elem_text : Int32
 
-pub let text_elem_top_edge : Int
+pub let text_elem_top_edge : Int32
 
-pub let text_elem_tracking : Int
+pub let text_elem_tracking : Int32
 
-pub let text_elem_variations : Int
+pub let text_elem_variations : Int32
 
-pub let text_elem_weight : Int
+pub let text_elem_weight : Int32
 
 pub fn title_elem() -> Element
 
-pub let title_elem_body : Int
+pub let title_elem_body : Int32
 
 pub fn[T : ToCss] to_css(T, sink? : (HintedString) -> Unit) -> String
 
 pub fn to_style(Char, MathStyle) -> String
 
-pub fn[T] trace((@moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @moonbitlang/typst/syntax.Span, () -> T raise SourceError) -> T raise SourceError
+pub fn[T] trace((@moonbitlang/typst/syntax.DiagSpan) -> (Int32, Int32)?, () -> Tracepoint, @moonbitlang/typst/syntax.Span, () -> T raise SourceError) -> T raise SourceError
 
 pub fn traced_answers_equal(Traced, Traced, ArrayView[@moonbitlang/typst/syntax.FileId]) -> Bool
 
 pub fn traced_files_active() -> Bool
 
-pub fn traced_files_begin() -> Int
+pub fn traced_files_begin() -> Int32
 
-pub fn traced_files_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
+pub fn traced_files_end(Int32) -> Array[@moonbitlang/typst/syntax.FileId]
 
 pub fn transient_data_hash(Bytes) -> U128
 
-pub let typst_version : (Int, Int, Int)
+pub let typst_version : (Int32, Int32, Int32)
 
 pub let u128_zero : U128
 
-pub fn u64_from_str_radix(String, Int) -> UInt64 raise IntErrorKind
+pub fn u64_from_str_radix(String, Int32) -> UInt64 raise IntErrorKind
 
 pub fn underbrace_elem() -> Element
 
-pub let underbrace_elem_annotation : Int
+pub let underbrace_elem_annotation : Int32
 
-pub let underbrace_elem_body : Int
+pub let underbrace_elem_body : Int32
 
 pub fn underbracket_elem() -> Element
 
-pub let underbracket_elem_annotation : Int
+pub let underbracket_elem_annotation : Int32
 
-pub let underbracket_elem_body : Int
+pub let underbracket_elem_body : Int32
 
 pub fn underline_elem() -> Element
 
-pub let underline_elem_background : Int
+pub let underline_elem_background : Int32
 
-pub let underline_elem_body : Int
+pub let underline_elem_body : Int32
 
-pub let underline_elem_evade : Int
+pub let underline_elem_evade : Int32
 
-pub let underline_elem_extent : Int
+pub let underline_elem_extent : Int32
 
-pub let underline_elem_offset : Int
+pub let underline_elem_offset : Int32
 
-pub let underline_elem_stroke : Int
+pub let underline_elem_stroke : Int32
 
 pub fn underparen_elem() -> Element
 
-pub let underparen_elem_annotation : Int
+pub let underparen_elem_annotation : Int32
 
-pub let underparen_elem_body : Int
+pub let underparen_elem_body : Int32
 
 pub fn undershell_elem() -> Element
 
-pub let undershell_elem_annotation : Int
+pub let undershell_elem_annotation : Int32
 
-pub let undershell_elem_body : Int
+pub let undershell_elem_body : Int32
 
 pub let unused_binding_guard : BindingGuard
 
 pub fn v_elem() -> Element
 
-pub let v_elem_amount : Int
+pub let v_elem_amount : Int32
 
-pub let v_elem_attach : Int
+pub let v_elem_attach : Int32
 
-pub let v_elem_weak : Int
+pub let v_elem_weak : Int32
 
 pub fn validate_utf8(BytesView) -> Utf8Error?
 
@@ -3364,23 +3364,23 @@ pub fn variant(StyleChain) -> FontVariant
 
 pub fn vec_elem() -> Element
 
-pub let vec_elem_align : Int
+pub let vec_elem_align : Int32
 
-pub let vec_elem_children : Int
+pub let vec_elem_children : Int32
 
-pub let vec_elem_delim : Int
+pub let vec_elem_delim : Int32
 
-pub let vec_elem_gap : Int
+pub let vec_elem_gap : Int32
 
 pub fn[T] with_layout_memo(() -> T raise SourceError) -> T raise SourceError
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
-pub fn works_generation_count() -> Int
+pub fn works_generation_count() -> Int32
 
-pub fn world_range(TrackedWorld, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
+pub fn world_range(TrackedWorld, @moonbitlang/typst/syntax.DiagSpan) -> (Int32, Int32)?
 
-pub fn world_scope_open(Int) -> Bool
+pub fn world_scope_open(Int32) -> Bool
 
 // Errors
 pub(all) suberror FieldAccessError {
@@ -3447,7 +3447,7 @@ pub fn Abs::approx_empty(Self) -> Bool
 pub fn Abs::approx_eq(Self, Self) -> Bool
 pub fn Abs::clamp(Self, Self, Self) -> Self
 pub fn Abs::cm(Double) -> Self
-pub fn Abs::compare(Self, Self) -> Int
+pub fn Abs::compare(Self, Self) -> Int32
 pub fn Abs::div_by(Self, Double) -> Self
 pub fn Abs::fits(Self, Self) -> Bool
 pub fn Abs::inches(Double) -> Self
@@ -3562,11 +3562,11 @@ pub fn AlignPointElem::pack(Self) -> Content
 pub impl NativeElement for AlignPointElem
 
 pub struct AlignedRow(Array[MathItem])
-pub fn AlignedRow::get(Self, Int) -> MathItem?
+pub fn AlignedRow::get(Self, Int32) -> MathItem?
 pub fn AlignedRow::is_empty(Self) -> Bool
 pub fn AlignedRow::items(Self) -> Array[MathItem]
 pub fn AlignedRow::iter(Self) -> Iter[MathItem]
-pub fn AlignedRow::len(Self) -> Int
+pub fn AlignedRow::len(Self) -> Int32
 pub fn AlignedRow::new(Array[MathItem]) -> Self
 
 pub(all) enum Alignment {
@@ -3615,7 +3615,7 @@ pub fn Angle::acos(Double) -> Self
 pub fn Angle::asin(Double) -> Self
 pub fn Angle::atan(Double) -> Self
 pub fn Angle::atan2(Double, Double) -> Self
-pub fn Angle::compare(Self, Self) -> Int
+pub fn Angle::compare(Self, Self) -> Int32
 pub fn Angle::cos(Self) -> Double
 pub fn Angle::deg(Double) -> Self
 pub fn Angle::div_by(Self, Double) -> Self
@@ -3695,7 +3695,7 @@ pub(all) struct Args {
 pub fn[T : FromValue] Args::all(Self) -> Array[T] raise SourceError
 pub fn[T : FromValue] Args::all_spanned(Self) -> Array[@moonbitlang/typst/syntax.Spanned[T]] raise SourceError
 pub fn Args::all_with(Self, (Value) -> Value raise HintedError) -> Array[Value] raise SourceError
-pub fn Args::consume(Self, Int) -> Array[Arg] raise SourceError
+pub fn Args::consume(Self, Int32) -> Array[Arg] raise SourceError
 pub fn Args::copy(Self) -> Self
 pub fn[T : FromValue] Args::eat(Self) -> T? raise SourceError
 pub fn Args::eat_spanned(Self) -> @moonbitlang/typst/syntax.Spanned[Value]?
@@ -3708,7 +3708,7 @@ pub fn[T : FromValue] Args::find(Self) -> T? raise SourceError
 pub fn[T : FromValue] Args::find_spanned(Self) -> @moonbitlang/typst/syntax.Spanned[T]? raise SourceError
 pub fn Args::find_with(Self, (Value) -> Bool, (Value) -> Value raise HintedError) -> Value? raise SourceError
 pub fn Args::finish(Self) -> Unit raise SourceError
-pub fn Args::insert(Self, Int, @moonbitlang/typst/syntax.Span, Value) -> Unit
+pub fn Args::insert(Self, Int32, @moonbitlang/typst/syntax.Span, Value) -> Unit
 pub fn Args::is_empty(Self) -> Bool
 pub fn Args::merge(Self, Self) -> Self
 pub fn[T : FromValue] Args::named(Self, String) -> T? raise SourceError
@@ -3717,7 +3717,7 @@ pub fn[T : FromValue] Args::named_spanned(Self, String) -> @moonbitlang/typst/sy
 pub fn Args::named_with(Self, String, (Value) -> Value raise HintedError) -> Value? raise SourceError
 pub fn Args::new(@moonbitlang/typst/syntax.Span, ArrayView[Value]) -> Self
 pub fn Args::push(Self, @moonbitlang/typst/syntax.Span, Value) -> Unit
-pub fn Args::remaining(Self) -> Int
+pub fn Args::remaining(Self) -> Int32
 pub fn Args::repr(Self) -> String
 pub fn Args::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Args::take(Self) -> Self
@@ -3753,9 +3753,9 @@ pub fn Arr::input() -> CastInfo
 pub fn Arr::insert(Self, Int64, Value) -> Unit raise HintedError
 pub fn Arr::is_empty(Self) -> Bool
 pub fn Arr::iter(Self) -> Iter[Value]
-pub fn Arr::len(Self) -> Int
-pub fn Arr::locate(Self, Int64, Bool) -> Int raise HintedError
-pub fn Arr::locate_opt(Self, Int64, Bool) -> Int?
+pub fn Arr::len(Self) -> Int32
+pub fn Arr::locate(Self, Int64, Bool) -> Int32 raise HintedError
+pub fn Arr::locate_opt(Self, Int64, Bool) -> Int32?
 pub fn Arr::make_mut(Self) -> Self
 pub fn Arr::new() -> Self
 pub fn Arr::output() -> CastInfo
@@ -4279,7 +4279,7 @@ pub fn BytesValue::concat(Self, Self) -> Self
 pub fn BytesValue::from_string(String) -> Self
 pub fn BytesValue::input() -> CastInfo
 pub fn BytesValue::is_empty(Self) -> Bool
-pub fn BytesValue::len(Self) -> Int
+pub fn BytesValue::len(Self) -> Int32
 pub fn BytesValue::new(Bytes) -> Self
 pub fn BytesValue::output() -> CastInfo
 pub fn BytesValue::repr(Self) -> String
@@ -4432,8 +4432,8 @@ pub impl Fingerprint for Category
 pub(all) struct Cell {
   body : Content
   fill : Paint?
-  colspan : Int
-  rowspan : Int
+  colspan : Int32
+  rowspan : Int32
   stroke : Sides[ResolvedStroke?]
   stroke_overridden : Sides[Bool]
   breakable : Bool
@@ -4451,20 +4451,20 @@ pub(all) struct CellGrid {
   has_gutter : Bool
 } derive(Eq)
 pub fn CellGrid::castable(Value) -> Bool
-pub fn CellGrid::cell(Self, Int, Int) -> Cell?
-pub fn CellGrid::effective_colspan_of_cell(Self, Cell) -> Int
-pub fn CellGrid::effective_parent_cell_position(Self, Int, Int) -> Axes[Int]?
-pub fn CellGrid::effective_rowspan_of_cell(Self, Cell) -> Int
-pub fn CellGrid::entry(Self, Int, Int) -> Entry?
+pub fn CellGrid::cell(Self, Int32, Int32) -> Cell?
+pub fn CellGrid::effective_colspan_of_cell(Self, Cell) -> Int32
+pub fn CellGrid::effective_parent_cell_position(Self, Int32, Int32) -> Axes[Int32]?
+pub fn CellGrid::effective_rowspan_of_cell(Self, Cell) -> Int32
+pub fn CellGrid::entry(Self, Int32, Int32) -> Entry?
 pub fn CellGrid::has_repeated_headers(Self) -> Bool
 pub fn CellGrid::input() -> CastInfo
-pub fn CellGrid::is_gutter_track(Self, Int) -> Bool
+pub fn CellGrid::is_gutter_track(Self, Int32) -> Bool
 pub fn CellGrid::new(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[Cell]) -> Self
 pub fn CellGrid::new_internal(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[Array[Line]], Array[Array[Line]], Array[Repeatable[Header]], Repeatable[Footer]?, Array[Entry]) -> Self
-pub fn CellGrid::non_gutter_column_count(Self) -> Int
-pub fn CellGrid::non_gutter_row_count(Self) -> Int
+pub fn CellGrid::non_gutter_column_count(Self) -> Int32
+pub fn CellGrid::non_gutter_row_count(Self) -> Int32
 pub fn CellGrid::output() -> CastInfo
-pub fn CellGrid::parent_cell_position(Self, Int, Int) -> Axes[Int]?
+pub fn CellGrid::parent_cell_position(Self, Int32, Int32) -> Axes[Int32]?
 pub impl Fingerprint for CellGrid
 pub impl FromValue for CellGrid
 pub impl IntoValue for CellGrid
@@ -4476,7 +4476,7 @@ pub(all) enum Celled[T] {
   CelledArray(Array[T])
 } derive(Eq)
 pub fn[T : IntoValue] Celled::into_value(Self[T]) -> Value
-pub fn[T : FromValue] Celled::resolve(Self[T], Engine, StyleChain, Int, Int, T) -> T raise SourceError
+pub fn[T : FromValue] Celled::resolve(Self[T], Engine, StyleChain, Int32, Int32, T) -> T raise SourceError
 pub impl[T : Default] Default for Celled[T]
 pub impl[T : Fold] Fold for Celled[T]
 pub impl[T : FromValue] FromValue for Celled[T]
@@ -4622,7 +4622,7 @@ pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
   captured : Scope
-  num_pos_params : Int
+  num_pos_params : Int32
   hash : LazyFingerprint
   node_hash : LazyFingerprint
 }
@@ -4658,8 +4658,8 @@ pub(all) enum Color {
 pub fn Color::alpha(Self) -> Float?
 pub fn Color::castable(Value) -> Bool
 pub fn Color::from_str(String) -> Result[Self, String]
-pub fn Color::from_u32(UInt) -> Self
-pub fn Color::from_u8(Int, Int, Int, Int) -> Self
+pub fn Color::from_u32(UInt32) -> Self
+pub fn Color::from_u8(Int32, Int32, Int32, Int32) -> Self
 pub fn Color::from_value(Value) -> Self raise HintedError
 pub fn Color::input() -> CastInfo
 pub fn Color::mix_iter(Array[WeightedColor], Smart[ColorSpace]) -> Self raise HintedError
@@ -4678,7 +4678,7 @@ pub fn Color::to_process_space(Self, ProcessColorSpace) -> Self
 pub fn Color::to_rgb(Self) -> Rgb
 pub fn Color::to_space(Self, ColorSpace) -> Self raise HintedError
 pub fn Color::to_vec4(Self) -> FixedArray[Float]
-pub fn Color::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn Color::to_vec4_u8(Self) -> FixedArray[Int32]
 pub fn Color::with_alpha(Self, Float) -> Self
 pub impl Eq for Color
 pub impl Hash for Color
@@ -4693,7 +4693,7 @@ pub(all) enum ColorSpace {
   Spot(SpotColorant)
 } derive(Eq)
 pub fn ColorSpace::castable(Value) -> Bool
-pub fn ColorSpace::hue_index(Self) -> Int?
+pub fn ColorSpace::hue_index(Self) -> Int32?
 pub fn ColorSpace::input() -> CastInfo
 pub fn ColorSpace::into_value(Self) -> Value
 pub fn ColorSpace::output() -> CastInfo
@@ -4754,7 +4754,7 @@ pub struct Content {
   span : @moonbitlang/typst/syntax.Span
   label : Label?
   location : Location?
-  lifecycle : Array[Int]
+  lifecycle : Array[Int32]
   // private fields
 }
 pub fn Content::add(Self, Self) -> Self
@@ -4765,22 +4765,22 @@ pub fn Content::castable(Value) -> Bool
 pub fn Content::elem(Self) -> Element
 pub fn Content::emph(Self) -> Self
 pub fn Content::empty() -> Self
-pub fn Content::field(Self, Int) -> Value raise HintedError
+pub fn Content::field(Self, Int32) -> Value raise HintedError
 pub fn Content::field_by_name(Self, String) -> Value raise HintedError
-pub fn Content::field_raw(Self, Int) -> Value?
+pub fn Content::field_raw(Self, Int32) -> Value?
 pub fn Content::fields(Self) -> Dict
 pub fn Content::from_fields(Element, FixedArray[Value?]) -> Self
 pub fn Content::from_value(Value) -> Self raise HintedError
 pub fn Content::func(Self) -> Element
-pub fn Content::get(Self, Int, styles? : StyleChain) -> Value raise FieldAccessError
+pub fn Content::get(Self, Int32, styles? : StyleChain) -> Value raise FieldAccessError
 pub fn Content::get_by_name(Self, String) -> Value raise FieldAccessError
-pub fn Content::guarded(Self, Int) -> Self
+pub fn Content::guarded(Self, Int32) -> Self
 pub fn Content::has(Self, String) -> Bool
 pub fn Content::input() -> CastInfo
 pub fn Content::into_value(Self) -> Value
 pub fn Content::is_(Self, Element) -> Bool
 pub fn Content::is_empty(Self) -> Bool
-pub fn Content::is_guarded(Self, Int) -> Bool
+pub fn Content::is_guarded(Self, Int32) -> Bool
 pub fn Content::is_prepared(Self) -> Bool
 pub fn Content::label(Self) -> Label?
 pub fn Content::labelled(Self, Label) -> Self
@@ -4790,16 +4790,16 @@ pub fn Content::location(Self) -> Location?
 pub fn Content::mark_prepared(Self) -> Self
 pub fn Content::materialize(Self, StyleChain) -> Self
 pub fn Content::moved(Self, Axes[Rel[Length]]) -> Self
-pub fn Content::new(Element, ArrayView[(Int, Value)]) -> Self
+pub fn Content::new(Element, ArrayView[(Int32, Value)]) -> Self
 pub fn Content::output() -> CastInfo
 pub fn Content::padded(Self, Sides[Rel[Length]]) -> Self
 pub fn Content::plain_text(Self) -> String
 pub fn Content::query_first_naive(Self, Selector) -> Self?
-pub fn Content::repeat(Self, Int) -> Self
+pub fn Content::repeat(Self, Int32) -> Self
 pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
 pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
-pub fn Content::set(Self, Element, Int, Value) -> Self
+pub fn Content::set(Self, Element, Int32, Value) -> Self
 pub fn Content::span(Self) -> @moonbitlang/typst/syntax.Span
 pub fn Content::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Content::strong(Self) -> Self
@@ -4809,8 +4809,8 @@ pub fn[T : NativeElement] Content::to_packed(Self) -> T?
 pub fn Content::to_sequence(Self) -> Array[Self]?
 pub fn Content::traverse(Self, (Self) -> Bool) -> Bool
 pub fn Content::underlined(Self) -> Self
-pub fn Content::with_field(Self, Int, Value) -> Self
-pub fn Content::without_field(Self, Int) -> Self
+pub fn Content::with_field(Self, Int32, Value) -> Self
+pub fn Content::without_field(Self, Int32) -> Self
 pub impl Eq for Content
 pub impl Fingerprint for Content
 pub impl FromValue for Content
@@ -4821,10 +4821,10 @@ pub struct ContentCache[T] {
   // private fields
 }
 pub fn[T] ContentCache::clear(Self[T]) -> Unit
-pub fn[T] ContentCache::evict(Self[T], Int) -> Unit
+pub fn[T] ContentCache::evict(Self[T], Int32) -> Unit
 pub fn[T] ContentCache::get(Self[T], U128) -> T?
 pub fn[T] ContentCache::insert(Self[T], U128, T) -> Unit
-pub fn[T] ContentCache::length(Self[T]) -> Int
+pub fn[T] ContentCache::length(Self[T]) -> Int32
 pub fn[T] ContentCache::new() -> Self[T]
 
 pub struct Context {
@@ -4951,7 +4951,7 @@ pub fn CounterState::from_value(Value) -> Self raise HintedError
 pub fn CounterState::init(Bool) -> Self
 pub fn CounterState::input() -> CastInfo
 pub fn CounterState::output() -> CastInfo
-pub fn CounterState::step(Self, Int, Int64) -> Unit
+pub fn CounterState::step(Self, Int32, Int64) -> Unit
 pub fn CounterState::update(Self, Engine, CounterUpdate) -> Unit raise SourceError
 pub impl Fingerprint for CounterState
 pub impl FromValue for CounterState
@@ -4982,12 +4982,12 @@ pub fn CounterUpdateElem::with_key(Self, CounterKey) -> Self
 pub fn CounterUpdateElem::with_update(Self, CounterUpdate) -> Self
 pub impl NativeElement for CounterUpdateElem
 
-pub(all) struct Coverage(Array[UInt]) derive(Eq, Hash)
-pub fn Coverage::contains(Self, UInt) -> Bool
+pub(all) struct Coverage(Array[UInt32]) derive(Eq, Hash)
+pub fn Coverage::contains(Self, UInt32) -> Bool
 pub fn Coverage::default() -> Self
 pub fn Coverage::from_ttf(@otf.Face) -> Self
-pub fn Coverage::from_vec(Array[UInt]) -> Self
-pub fn Coverage::iter(Self) -> Iter[UInt]
+pub fn Coverage::from_vec(Array[UInt32]) -> Self
+pub fn Coverage::iter(Self) -> Iter[UInt32]
 pub impl Default for Coverage
 pub impl Show for Coverage
 
@@ -5078,7 +5078,7 @@ pub fn CssProperties::copy(Self) -> Self
 pub fn CssProperties::into_value(Self) -> Value
 pub fn CssProperties::is_empty(Self) -> Bool
 pub fn CssProperties::iter(Self) -> Iter[CssProperty]
-pub fn CssProperties::length(Self) -> Int
+pub fn CssProperties::length(Self) -> Int32
 pub fn CssProperties::new() -> Self
 pub fn CssProperties::push(Self, String, String) -> Unit
 pub fn CssProperties::remove(Self, String) -> Unit
@@ -5272,25 +5272,25 @@ pub(all) enum Datetime {
 } derive(Eq, Hash)
 pub fn Datetime::add_duration(Self, Duration) -> Self
 pub fn Datetime::castable(Value) -> Bool
-pub fn Datetime::day(Self) -> Int?
-pub fn Datetime::from_hms(Int, Int, Int) -> Self?
+pub fn Datetime::day(Self) -> Int32?
+pub fn Datetime::from_hms(Int32, Int32, Int32) -> Self?
 pub fn Datetime::from_toml_dict(Dict) -> Self?
-pub fn Datetime::from_ymd(Int, Int, Int) -> Self?
-pub fn Datetime::from_ymd_hms(Int, Int, Int, Int, Int, Int) -> Self?
-pub fn Datetime::hour(Self) -> Int?
+pub fn Datetime::from_ymd(Int32, Int32, Int32) -> Self?
+pub fn Datetime::from_ymd_hms(Int32, Int32, Int32, Int32, Int32, Int32) -> Self?
+pub fn Datetime::hour(Self) -> Int32?
 pub fn Datetime::input() -> CastInfo
 pub fn Datetime::kind(Self) -> String
-pub fn Datetime::minute(Self) -> Int?
-pub fn Datetime::month(Self) -> Int?
-pub fn Datetime::ordinal(Self) -> Int?
+pub fn Datetime::minute(Self) -> Int32?
+pub fn Datetime::month(Self) -> Int32?
+pub fn Datetime::ordinal(Self) -> Int32?
 pub fn Datetime::output() -> CastInfo
-pub fn Datetime::partial_cmp(Self, Self) -> Int?
+pub fn Datetime::partial_cmp(Self, Self) -> Int32?
 pub fn Datetime::repr(Self) -> String
-pub fn Datetime::second(Self) -> Int?
+pub fn Datetime::second(Self) -> Int32?
 pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
 pub fn Datetime::sub_duration(Self, Duration) -> Self
-pub fn Datetime::weekday(Self) -> Int?
-pub fn Datetime::year(Self) -> Int?
+pub fn Datetime::weekday(Self) -> Int32?
+pub fn Datetime::year(Self) -> Int32?
 pub impl Fingerprint for Datetime
 pub impl FromValue for Datetime
 pub impl IntoValue for Datetime
@@ -5321,7 +5321,7 @@ pub fn Decimal::checked_rem(Self, Self) -> Self?
 pub fn Decimal::checked_rem_euclid(Self, Self) -> Self?
 pub fn Decimal::checked_sub(Self, Self) -> Self?
 pub fn Decimal::clamp(Self, Self, Self) -> Self
-pub fn Decimal::compare(Self, Self) -> Int
+pub fn Decimal::compare(Self, Self) -> Int32
 pub fn Decimal::floor(Self) -> Self
 pub fn Decimal::fract(Self) -> Self
 pub fn Decimal::from_int(Int64) -> Self
@@ -5337,7 +5337,7 @@ pub fn Decimal::op_le(Self, Self) -> Bool
 pub fn Decimal::op_lt(Self, Self) -> Bool
 pub fn Decimal::output() -> CastInfo
 pub fn Decimal::repr(Self) -> String
-pub fn Decimal::round(Self, Int) -> Self?
+pub fn Decimal::round(Self, Int32) -> Self?
 pub fn Decimal::to_f64(Self) -> Double?
 pub fn Decimal::to_i64(Self) -> Int64?
 pub fn Decimal::to_string(Self) -> String
@@ -5440,7 +5440,7 @@ pub fn Dict::insert(Self, String, Value) -> Unit
 pub fn Dict::is_empty(Self) -> Bool
 pub fn Dict::iter(Self) -> Iter2[String, Value]
 pub fn Dict::keys_within(Self, ArrayView[String]) -> Bool
-pub fn Dict::len(Self) -> Int
+pub fn Dict::len(Self) -> Int32
 pub fn Dict::make_mut(Self) -> Self
 pub fn Dict::merge(Self, Self) -> Self
 pub fn Dict::new() -> Self
@@ -5588,7 +5588,7 @@ pub impl Fingerprint for DocumentPosition
 pub struct Duration(@time.Duration) derive(Compare, Eq, Hash)
 pub fn Duration::add(Self, Self) -> Self
 pub fn Duration::castable(Value) -> Bool
-pub fn Duration::compare(Self, Self) -> Int
+pub fn Duration::compare(Self, Self) -> Int32
 pub fn Duration::days(Self) -> Double
 pub fn Duration::decompose(Self) -> FixedArray[Int64]
 pub fn Duration::div(Self, Double) -> Self
@@ -5646,8 +5646,8 @@ pub fn DynValue::ty(Self) -> Type
 pub impl Fingerprint for DynValue
 
 pub struct DynamicImage {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   color : @codecs.ColorType
   buf : Bytes
 } derive(Eq, Hash)
@@ -5663,9 +5663,9 @@ pub fn Element::can(Self, String) -> Bool
 pub fn Element::castable(Value) -> Bool
 pub fn Element::construct(Self, Engine, Args) -> Content raise SourceError
 pub fn Element::docs(Self) -> String
-pub fn Element::field(Self, Int) -> FieldInfo?
-pub fn Element::field_id(Self, String) -> Int?
-pub fn Element::field_name(Self, Int) -> String?
+pub fn Element::field(Self, Int32) -> FieldInfo?
+pub fn Element::field_id(Self, String) -> Int32?
+pub fn Element::field_name(Self, Int32) -> String?
 pub fn Element::fields(Self) -> Array[FieldInfo]
 pub fn Element::from_value(Value) -> Self raise HintedError
 pub fn Element::hooks(Self) -> ElementHooks
@@ -5689,7 +5689,7 @@ pub fn Element::set_fields(Self, Engine, Args) -> Styles raise SourceError
 pub fn Element::settable_field_accessor(Self, String) -> ((StyleChain) -> Value)?
 pub fn Element::since(Self) -> Since?
 pub fn Element::title(Self) -> String
-pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
+pub fn Element::where_(Self, Array[(Int32, Value)]) -> Selector
 pub impl Compare for Element
 pub impl Eq for Element
 pub impl Hash for Element
@@ -5727,23 +5727,23 @@ pub struct ElementIntrospector[P] {
   // private fields
 }
 pub fn[P] ElementIntrospector::all(Self[P]) -> Array[Content]
-pub fn[P] ElementIntrospector::binary_search(Self[P], ArrayView[Content], Content) -> (Bool, Int)
-pub fn[P] ElementIntrospector::elem_index(Self[P], Content) -> Int
-pub fn[P] ElementIntrospector::get_by_idx(Self[P], Int) -> Content
+pub fn[P] ElementIntrospector::binary_search(Self[P], ArrayView[Content], Content) -> (Bool, Int32)
+pub fn[P] ElementIntrospector::elem_index(Self[P], Content) -> Int32
+pub fn[P] ElementIntrospector::get_by_idx(Self[P], Int32) -> Content
 pub fn[P] ElementIntrospector::get_by_loc(Self[P], Location) -> Content?
-pub fn[P] ElementIntrospector::get_pos_by_idx(Self[P], Int) -> P
-pub fn[P] ElementIntrospector::label_count(Self[P], Label) -> Int
-pub fn[P] ElementIntrospector::len(Self[P]) -> Int
-pub fn[P] ElementIntrospector::loc_index(Self[P], Location) -> Int
+pub fn[P] ElementIntrospector::get_pos_by_idx(Self[P], Int32) -> P
+pub fn[P] ElementIntrospector::label_count(Self[P], Label) -> Int32
+pub fn[P] ElementIntrospector::len(Self[P]) -> Int32
+pub fn[P] ElementIntrospector::loc_index(Self[P], Location) -> Int32
 pub fn[P] ElementIntrospector::locator(Self[P], U128, Location) -> Location?
 pub fn[P] ElementIntrospector::position(Self[P], Location) -> P?
 pub fn[P] ElementIntrospector::query(Self[P], Selector) -> ArrayView[Content]
-pub fn[P] ElementIntrospector::query_count_before(Self[P], Selector, Location) -> Int
+pub fn[P] ElementIntrospector::query_count_before(Self[P], Selector, Location) -> Int32
 pub fn[P] ElementIntrospector::query_first(Self[P], Selector) -> Content?
 pub fn[P] ElementIntrospector::query_label(Self[P], Label) -> Content raise HintedError
 pub fn[P] ElementIntrospector::query_labelled(Self[P]) -> Array[Content]
 pub fn[P] ElementIntrospector::query_unique(Self[P], Selector) -> Content raise HintedError
-pub fn[P] ElementIntrospector::range_of(Self[P], Location) -> (Int, Int)?
+pub fn[P] ElementIntrospector::range_of(Self[P], Location) -> (Int32, Int32)?
 
 pub struct ElementIntrospectorBuilder[P] {
   // private fields
@@ -5799,7 +5799,7 @@ pub impl NativeElement for EllipseElem
 pub(all) struct Em(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Em::abs(Self) -> Self
 pub fn Em::at(Self, Abs) -> Abs
-pub fn Em::compare(Self, Self) -> Int
+pub fn Em::compare(Self, Self) -> Int32
 pub fn Em::div_by(Self, Double) -> Self
 pub fn Em::from_abs(Abs, Abs) -> Self
 pub fn Em::from_length(Length, Abs) -> Self
@@ -5869,7 +5869,7 @@ pub fn Engine::with_route(Self, Route) -> Self
 
 pub(all) enum Entry {
   Cell(Cell)
-  Merged(Int)
+  Merged(Int32)
 } derive(Eq)
 pub fn Entry::as_cell(Self) -> Cell?
 
@@ -6029,10 +6029,10 @@ pub fn Features::none() -> Self
 
 pub(all) enum FencedBody {
   Owned(MathItem)
-  Shared(index~ : Int, sizing~ : SharedFenceSizing)
+  Shared(index~ : Int32, sizing~ : SharedFenceSizing)
 }
 pub fn FencedBody::item(Self) -> MathItem
-pub fn FencedBody::shared(Int, SharedFenceSizing) -> Self
+pub fn FencedBody::shared(Int32, SharedFenceSizing) -> Self
 pub fn FencedBody::sizing(Self) -> SharedFenceSizing?
 
 pub struct FencedItem {
@@ -6044,7 +6044,7 @@ pub struct FencedItem {
 pub fn FencedItem::create(MathItem?, MathItem?, FencedBody, Bool, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub struct FieldInfo {
-  id : Int
+  id : Int32
   name : String
   docs : String
   kind : FieldKind
@@ -6210,7 +6210,7 @@ pub(all) enum FixedAlignment {
   Center
   End
 } derive(Compare, Eq, Hash, @debug.Debug)
-pub fn FixedAlignment::compare(Self, Self) -> Int
+pub fn FixedAlignment::compare(Self, Self) -> Int32
 pub fn FixedAlignment::from_side(Side) -> Self
 pub fn FixedAlignment::inv(Self) -> Self
 pub fn FixedAlignment::op_ge(Self, Self) -> Bool
@@ -6249,15 +6249,15 @@ pub struct Font {
 pub fn Font::data(Self) -> Bytes
 pub fn Font::face(Self) -> &FontFace
 pub fn Font::family(Self) -> String
-pub fn Font::from_data(Bytes, UInt) -> Self?
-pub fn Font::index(Self) -> UInt
+pub fn Font::from_data(Bytes, UInt32) -> Self?
+pub fn Font::index(Self) -> UInt32
 pub fn Font::info(Self) -> FontInfo
 pub fn Font::instantiate(Self, FontVariant, Abs, FontVariations) -> FontInstance
 pub fn Font::instantiate_with(Self, FontVariations) -> FontInstance
 pub fn Font::iter(Bytes) -> Array[Self]
-pub fn Font::new(Bytes, UInt, &FontFace) -> Self
+pub fn Font::new(Bytes, UInt32, &FontFace) -> Self
 pub fn Font::post_script_name(Self) -> String?
-pub fn Font::serial(Self) -> Int
+pub fn Font::serial(Self) -> Int32
 pub fn Font::ttf(Self) -> @otf.Face?
 pub impl Eq for Font
 pub impl Hash for Font
@@ -6275,17 +6275,17 @@ pub struct FontBook {
   // private fields
 }
 pub fn FontBook::contains_family(Self, String) -> Bool
-pub fn FontBook::edition(Self) -> Int
-pub fn FontBook::families(Self) -> Array[(String, Array[Int])]
+pub fn FontBook::edition(Self) -> Int32
+pub fn FontBook::families(Self) -> Array[(String, Array[Int32])]
 pub fn FontBook::from_fonts(Array[Font]) -> Self
 pub fn FontBook::from_infos(Array[FontInfo]) -> Self
-pub fn FontBook::info(Self, Int) -> FontInfo?
-pub fn FontBook::len(Self) -> Int
+pub fn FontBook::info(Self, Int32) -> FontInfo?
+pub fn FontBook::len(Self) -> Int32
 pub fn FontBook::new() -> Self
 pub fn FontBook::push(Self, FontInfo) -> Unit
-pub fn FontBook::select(Self, String, FontVariant) -> Int?
-pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, StringView) -> Int?
-pub fn FontBook::select_family(Self, String) -> Array[Int]
+pub fn FontBook::select(Self, String, FontVariant) -> Int32?
+pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, StringView) -> Int32?
+pub fn FontBook::select_family(Self, String) -> Array[Int32]
 pub impl Default for FontBook
 
 pub(all) struct FontFamily {
@@ -6316,7 +6316,7 @@ pub impl FromValue for FontFeatures
 pub impl IntoValue for FontFeatures
 pub impl Reflect for FontFeatures
 
-pub(all) struct FontFlags(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct FontFlags(UInt32) derive(Eq, Hash, @debug.Debug)
 pub fn FontFlags::contains(Self, Self) -> Bool
 pub fn FontFlags::empty() -> Self
 pub fn FontFlags::set(Self, Self, Bool) -> Self
@@ -6333,7 +6333,7 @@ pub fn FontInfo::from_ttf(@otf.Face) -> Self?
 pub fn FontInfo::from_ttf_with_coverage(@otf.Face, Coverage?) -> Self?
 pub fn FontInfo::is_last_resort(Self) -> Bool
 pub fn FontInfo::iter(Bytes) -> Array[Self]
-pub fn FontInfo::new(Bytes, UInt) -> Self?
+pub fn FontInfo::new(Bytes, UInt32) -> Self?
 pub impl Show for FontInfo
 
 pub struct FontInstance {
@@ -6383,11 +6383,11 @@ pub(all) struct FontMetrics {
 pub fn FontMetrics::from_ttf(@otf.Face) -> Self
 pub fn FontMetrics::vertical(Self, VerticalFontMetric) -> Em
 
-pub(all) struct FontStretch(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct FontStretch(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FontStretch::castable(Value) -> Bool
 pub fn FontStretch::default() -> Self
 pub fn FontStretch::distance(Self, Self) -> Ratio
-pub fn FontStretch::from_number(Int) -> Self
+pub fn FontStretch::from_number(Int32) -> Self
 pub fn FontStretch::from_ratio(Ratio) -> Self
 pub fn FontStretch::from_wdth(AxisValue) -> Self
 pub fn FontStretch::input() -> CastInfo
@@ -6409,7 +6409,7 @@ pub(all) enum FontStyle {
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FontStyle::castable(Value) -> Bool
 pub fn FontStyle::default() -> Self
-pub fn FontStyle::distance(Self, Self) -> Int
+pub fn FontStyle::distance(Self, Self) -> Int32
 pub fn FontStyle::input() -> CastInfo
 pub fn FontStyle::into_value(Self) -> Value
 pub fn FontStyle::output() -> CastInfo
@@ -6443,18 +6443,18 @@ pub impl FromValue for FontVariations
 pub impl IntoValue for FontVariations
 pub impl Reflect for FontVariations
 
-pub(all) struct FontWeight(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct FontWeight(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FontWeight::castable(Value) -> Bool
 pub fn FontWeight::default() -> Self
-pub fn FontWeight::distance(Self, Self) -> Int
-pub fn FontWeight::from_number(Int) -> Self
+pub fn FontWeight::distance(Self, Self) -> Int32
+pub fn FontWeight::from_number(Int32) -> Self
 pub fn FontWeight::from_value(Value) -> Self raise HintedError
 pub fn FontWeight::from_wght(AxisValue) -> Self
 pub fn FontWeight::input() -> CastInfo
 pub fn FontWeight::into_value(Self) -> Value
 pub fn FontWeight::output() -> CastInfo
-pub fn FontWeight::thicken(Self, Int) -> Self
-pub fn FontWeight::to_number(Self) -> Int
+pub fn FontWeight::thicken(Self, Int32) -> Self
+pub fn FontWeight::to_number(Self) -> Int32
 pub fn FontWeight::to_wght(Self) -> AxisValue
 pub impl Default for FontWeight
 pub impl FromValue for FontWeight
@@ -6462,9 +6462,9 @@ pub impl IntoValue for FontWeight
 pub impl Reflect for FontWeight
 
 pub(all) struct Footer {
-  mut start : Int
-  mut end : Int
-  level : Int
+  mut start : Int32
+  mut end : Int32
+  level : Int32
 } derive(Eq)
 pub fn Footer::range(Self) -> RowRange
 
@@ -6561,13 +6561,13 @@ pub struct FormatOptions {
 }
 pub fn FormatOptions::copy(Self) -> Self
 pub fn FormatOptions::default_for(Element) -> Self
-pub fn FormatOptions::get(Self, Int) -> SpannedValue[Value]
+pub fn FormatOptions::get(Self, Int32) -> SpannedValue[Value]
 pub fn FormatOptions::populate(Self, StyleChain, @moonbitlang/typst/syntax.Span) -> Unit
 pub impl Fingerprint for FormatOptions
 
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
-pub fn Fr::compare(Self, Self) -> Int
+pub fn Fr::compare(Self, Self) -> Int32
 pub fn Fr::div_by(Self, Double) -> Self
 pub fn Fr::get(Self) -> Double
 pub fn Fr::new(Double) -> Self
@@ -6644,7 +6644,7 @@ pub fn Fragment::into_frame(Self) -> Frame
 pub fn Fragment::into_frames(Self) -> Array[Frame]
 pub fn Fragment::is_empty(Self) -> Bool
 pub fn Fragment::iter(Self) -> Iter[Frame]
-pub fn Fragment::len(Self) -> Int
+pub fn Fragment::len(Self) -> Int32
 
 pub(all) enum FragmentKind {
   Inline
@@ -6667,12 +6667,12 @@ pub fn Frame::hard(Axes[Abs]) -> Self
 pub fn Frame::has_baseline(Self) -> Bool
 pub fn Frame::height(Self) -> Abs
 pub fn Frame::hide(Self) -> Unit
-pub fn Frame::insert(Self, Int, Point, FrameItem) -> Unit
+pub fn Frame::insert(Self, Int32, Point, FrameItem) -> Unit
 pub fn Frame::is_empty(Self) -> Bool
 pub fn Frame::items(Self) -> ArrayView[(Point, FrameItem)]
 pub fn Frame::kind(Self) -> FrameKind
 pub fn Frame::label(Self, Label) -> Unit
-pub fn Frame::layer(Self) -> Int
+pub fn Frame::layer(Self) -> Int32
 pub fn Frame::mark_box(Self) -> Self
 pub fn Frame::mark_box_in_place(Self) -> Unit
 pub fn Frame::mark_line(Self, Abs) -> Unit
@@ -6797,7 +6797,7 @@ pub(all) struct Glyph {
   span : @moonbitlang/typst/syntax.Span
   span_offset : UInt16
 } derive(Eq, Hash)
-pub fn Glyph::range(Self) -> (Int, Int)
+pub fn Glyph::range(Self) -> (Int32, Int32)
 pub impl Fingerprint for Glyph
 
 pub(all) struct GlyphFrame {
@@ -6823,10 +6823,10 @@ pub struct GlyphItem {
 pub fn GlyphItem::create(String, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) struct GlyphRect {
-  x_min : Int
-  y_min : Int
-  x_max : Int
-  y_max : Int
+  x_min : Int32
+  y_min : Int32
+  x_max : Int32
+  y_max : Int32
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) enum Gradient {
@@ -7372,11 +7372,11 @@ pub fn HtmlFormatOptions::get(DocumentFormatOptions) -> Self
 pub(all) struct HtmlPosition {
   // private fields
 } derive(Eq)
-pub fn HtmlPosition::at_char(Self, Int) -> Self
+pub fn HtmlPosition::at_char(Self, Int32) -> Self
 pub fn HtmlPosition::details(Self) -> InnerHtmlPosition?
-pub fn HtmlPosition::element(Self) -> ArrayView[Int]
+pub fn HtmlPosition::element(Self) -> ArrayView[Int32]
 pub fn HtmlPosition::in_frame(Self, Point) -> Self
-pub fn HtmlPosition::new(Array[Int]) -> Self
+pub fn HtmlPosition::new(Array[Int32]) -> Self
 pub impl Fingerprint for HtmlPosition
 
 pub struct HtmlTag(String) derive(Eq, Hash)
@@ -7568,7 +7568,7 @@ pub(all) enum InlineItem {
 
 pub(all) enum InnerHtmlPosition {
   Frame(Point)
-  Character(Int)
+  Character(Int32)
 } derive(Eq)
 pub impl Fingerprint for InnerHtmlPosition
 
@@ -7586,7 +7586,7 @@ pub fn[T : Fingerprint] Introspection::new(Introspect[T]) -> Self
 pub struct IntrospectionRecorder {
   // private fields
 }
-pub fn IntrospectionRecorder::len(Self) -> Int
+pub fn IntrospectionRecorder::len(Self) -> Int32
 pub fn IntrospectionRecorder::merge_into(Self, Self) -> Unit
 pub fn IntrospectionRecorder::methods(Self) -> Array[String]
 pub fn IntrospectionRecorder::new() -> Self
@@ -7599,7 +7599,7 @@ pub fn Introspector::anchor(Self, Location) -> String?
 pub fn Introspector::backend(Self) -> &IntrospectorBackend
 pub fn Introspector::document(Self, Location) -> Location?
 pub fn Introspector::empty() -> Self
-pub fn Introspector::label_count(Self, Label) -> Int
+pub fn Introspector::label_count(Self, Label) -> Int32
 pub fn Introspector::locator(Self, U128, Location) -> Location?
 pub fn Introspector::new(&IntrospectorBackend) -> Self
 pub fn Introspector::page(Self, Location) -> NonZeroUSize?
@@ -7609,7 +7609,7 @@ pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
 pub fn Introspector::path(Self, Location) -> @moonbitlang/typst/syntax.VirtualPath?
 pub fn Introspector::position(Self, Location) -> DocumentPosition?
 pub fn Introspector::query(Self, Selector) -> ArrayView[Content]
-pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
+pub fn Introspector::query_count_before(Self, Selector, Location) -> Int32
 pub fn Introspector::query_first(Self, Selector) -> Content?
 pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
 pub fn Introspector::query_labelled(Self) -> Array[Content]
@@ -7687,7 +7687,7 @@ pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
 pub struct LazyFingerprint {
   // private fields
 }
-pub fn LazyFingerprint::flags(Self, (SipHasher128) -> Unit) -> Int
+pub fn LazyFingerprint::flags(Self, (SipHasher128) -> Unit) -> Int32
 pub fn LazyFingerprint::new() -> Self
 pub fn LazyFingerprint::reset(Self) -> Unit
 pub fn LazyFingerprint::write(Self, SipHasher128, (SipHasher128) -> Unit) -> Unit
@@ -7716,7 +7716,7 @@ pub fn Length::from_value(Value) -> Self raise HintedError
 pub fn Length::input() -> CastInfo
 pub fn Length::is_zero(Self) -> Bool
 pub fn Length::output() -> CastInfo
-pub fn Length::partial_cmp(Self, Self) -> Int?
+pub fn Length::partial_cmp(Self, Self) -> Int32?
 pub fn Length::repr(Self) -> String
 pub fn Length::resolve(Self, StyleChain) -> Abs
 pub fn Length::times(Self, Double) -> Self
@@ -7780,9 +7780,9 @@ pub fn LimitsElem::with_inline(Self, Bool) -> Self
 pub impl NativeElement for LimitsElem
 
 pub(all) struct Line {
-  mut index : Int
-  start : Int
-  end : Int?
+  mut index : Int32
+  start : Int32
+  end : Int32?
   stroke : ResolvedStroke?
   position : LinePosition
 } derive(Eq)
@@ -7801,14 +7801,14 @@ pub impl IntoValue for LineCap
 pub impl Reflect for LineCap
 
 pub(all) struct LineCol {
-  line : Int
-  col : Int
+  line : Int32
+  col : Int32
 } derive(Eq, Hash, @debug.Debug)
-pub fn LineCol::indices(Self) -> (Int, Int)
-pub fn LineCol::numbers(Self) -> (Int, Int)
-pub fn LineCol::one_based(Int, Int) -> Self
-pub fn LineCol::try_from_byte_pos(Int, Bytes) -> Self?
-pub fn LineCol::zero_based(Int, Int) -> Self
+pub fn LineCol::indices(Self) -> (Int32, Int32)
+pub fn LineCol::numbers(Self) -> (Int32, Int32)
+pub fn LineCol::one_based(Int32, Int32) -> Self
+pub fn LineCol::try_from_byte_pos(Int32, Bytes) -> Self?
+pub fn LineCol::zero_based(Int32, Int32) -> Self
 
 pub struct LineElem(Content)
 pub fn LineElem::angle(Self, StyleChain) -> Angle
@@ -8084,7 +8084,7 @@ pub fn Location::new(U128) -> Self
 pub fn Location::output() -> CastInfo
 pub fn Location::page_numbering(Self, Engine, @moonbitlang/typst/syntax.Span) -> Numbering?
 pub fn Location::repr(Self) -> String
-pub fn Location::variant(Self, Int) -> Self
+pub fn Location::variant(Self, Int32) -> Self
 pub impl Hash for Location
 pub impl Show for Location
 pub impl Fingerprint for Location
@@ -8143,7 +8143,7 @@ pub struct ManualPageCounter {
 }
 pub fn ManualPageCounter::logical(Self) -> Int64
 pub fn ManualPageCounter::new() -> Self
-pub fn ManualPageCounter::physical(Self) -> Int
+pub fn ManualPageCounter::physical(Self) -> Int32
 pub fn ManualPageCounter::step(Self) -> Unit
 pub fn ManualPageCounter::visit(Self, Engine, Frame) -> Unit raise SourceError
 
@@ -8238,8 +8238,8 @@ pub struct MathComponent {
 
 pub(all) struct MathConstants {
   space_width : Em
-  script_percent_scale_down : Int
-  script_script_percent_scale_down : Int
+  script_percent_scale_down : Int32
+  script_script_percent_scale_down : Int32
   display_operator_min_height : Em
   axis_height : Em
   accent_base_height : Em
@@ -8626,7 +8626,7 @@ pub struct NativeRuleMap {
   // private fields
 }
 pub fn NativeRuleMap::get(Self, Target, Content) -> NativeShowRule?
-pub fn NativeRuleMap::len(Self) -> Int
+pub fn NativeRuleMap::len(Self) -> Int32
 pub fn NativeRuleMap::new() -> Self
 pub fn[T : NativeElement] NativeRuleMap::register(Self, Target, (T, Engine, StyleChain) -> Content raise SourceError) -> Unit
 pub fn[T : NativeElement] NativeRuleMap::replace(Self, Target, (T, Engine, StyleChain) -> Content raise SourceError) -> Unit
@@ -8751,13 +8751,13 @@ pub(all) struct NumberingPattern {
   // private fields
 } derive(Eq)
 pub fn NumberingPattern::apply(Self, (Engine, @moonbitlang/typst/syntax.Span)?, ArrayView[Int64]) -> String raise HintedError
-pub fn NumberingPattern::apply_kth(Self, Engine, @moonbitlang/typst/syntax.Span, Int, Int64) -> String
+pub fn NumberingPattern::apply_kth(Self, Engine, @moonbitlang/typst/syntax.Span, Int32, Int64) -> String
 pub fn NumberingPattern::castable(Value) -> Bool
 pub fn NumberingPattern::from_str(String) -> Self raise HintedError
 pub fn NumberingPattern::from_value(Value) -> Self raise HintedError
 pub fn NumberingPattern::input() -> CastInfo
 pub fn NumberingPattern::into_value(Self) -> Value
-pub fn NumberingPattern::num_pieces(Self) -> Int
+pub fn NumberingPattern::num_pieces(Self) -> Int32
 pub fn NumberingPattern::output() -> CastInfo
 pub fn NumberingPattern::to_string(Self) -> String
 pub impl FromValue for NumberingPattern
@@ -9084,7 +9084,7 @@ pub(all) enum PageBinding {
 pub fn PageBinding::castable(Value) -> Bool
 pub fn PageBinding::input() -> CastInfo
 pub fn PageBinding::output() -> CastInfo
-pub fn PageBinding::swap(Self, Int) -> Bool
+pub fn PageBinding::swap(Self, Int32) -> Bool
 pub impl FromValue for PageBinding
 pub impl IntoValue for PageBinding
 pub impl Reflect for PageBinding
@@ -9132,13 +9132,13 @@ pub impl NativeElement for PageElem
 pub struct PageMemo[T] {
   // private fields
 }
-pub fn[T] PageMemo::entries(Self[T]) -> Int
+pub fn[T] PageMemo::entries(Self[T]) -> Int32
 pub fn[T] PageMemo::new(String) -> Self[T]
-pub fn[T] PageMemo::stats(Self[T]) -> (Int, Int)
+pub fn[T] PageMemo::stats(Self[T]) -> (Int32, Int32)
 
 pub(all) struct PageRange {
-  start : Int?
-  end : Int?
+  start : Int32?
+  end : Int32?
 } derive(Eq, Hash, @debug.Debug)
 pub fn PageRange::castable(Value) -> Bool
 pub fn PageRange::from_value(Value) -> Self raise HintedError
@@ -9151,7 +9151,7 @@ pub impl Reflect for PageRange
 
 pub(all) struct PageRanges(Array[PageRange]) derive(Eq, Hash, @debug.Debug)
 pub fn PageRanges::castable(Value) -> Bool
-pub fn PageRanges::includes_page(Self, Int) -> Bool
+pub fn PageRanges::includes_page(Self, Int32) -> Bool
 pub fn PageRanges::input() -> CastInfo
 pub fn PageRanges::output() -> CastInfo
 pub impl FromValue for PageRanges
@@ -9345,7 +9345,7 @@ pub(all) enum Parity {
 } derive(Eq, Hash, @debug.Debug)
 pub fn Parity::castable(Value) -> Bool
 pub fn Parity::input() -> CastInfo
-pub fn Parity::matches(Self, Int) -> Bool
+pub fn Parity::matches(Self, Int32) -> Bool
 pub fn Parity::output() -> CastInfo
 pub impl FromValue for Parity
 pub impl IntoValue for Parity
@@ -9408,7 +9408,7 @@ pub struct PdfDocument {
 pub fn PdfDocument::data(Self) -> Bytes
 pub fn PdfDocument::has_optional_content_groups(Self) -> Bool
 pub fn PdfDocument::new(Bytes) -> Self raise LoadPdfError
-pub fn PdfDocument::num_pages(Self) -> Int
+pub fn PdfDocument::num_pages(Self) -> Int32
 pub fn PdfDocument::pdf(Self) -> @moonbitlang/typst/hayro/syntax.Pdf
 pub fn PdfDocument::synthetic(Bytes, Array[(Float, Float)]) -> Self
 pub impl Eq for PdfDocument
@@ -9419,10 +9419,10 @@ pub struct PdfImage {
 }
 pub fn PdfImage::document(Self) -> PdfDocument
 pub fn PdfImage::height(Self) -> Float
-pub fn PdfImage::new(PdfDocument, Int) -> Self?
+pub fn PdfImage::new(PdfDocument, Int32) -> Self?
 pub fn PdfImage::page(Self) -> @moonbitlang/typst/hayro/syntax.Page
-pub fn PdfImage::page_index(Self) -> Int
-pub fn PdfImage::synthetic(Bytes, Array[(Float, Float)], Int) -> Self
+pub fn PdfImage::page_index(Self) -> Int32
+pub fn PdfImage::synthetic(Bytes, Array[(Float, Float)], Int32) -> Self
 pub fn PdfImage::width(Self) -> Float
 pub impl Eq for PdfImage
 pub impl Hash for PdfImage
@@ -9717,9 +9717,9 @@ pub fn PrimesElem::with_count(Self, USize) -> Self
 pub impl NativeElement for PrimesElem
 
 pub struct PrimesItem {
-  count : Int
+  count : Int32
 }
-pub fn PrimesItem::create(Int, StyleChain) -> MathItem
+pub fn PrimesItem::create(Int32, StyleChain) -> MathItem
 
 pub(all) enum ProcessColor {
   Luma(Luma)
@@ -9737,9 +9737,9 @@ pub fn ProcessColor::components(Self, Bool) -> Arr
 pub fn ProcessColor::darken(Self, Ratio) -> Self
 pub fn ProcessColor::desaturate(Self, @moonbitlang/typst/syntax.Span, Ratio) -> Self raise SourceError
 pub fn ProcessColor::from_str(String) -> Result[Self, String]
-pub fn ProcessColor::from_u32(UInt) -> Self
-pub fn ProcessColor::from_u8(Int, Int, Int, Int) -> Self
-pub fn ProcessColor::hash(Self) -> Int
+pub fn ProcessColor::from_u32(UInt32) -> Self
+pub fn ProcessColor::from_u8(Int32, Int32, Int32, Int32) -> Self
+pub fn ProcessColor::hash(Self) -> Int32
 pub fn ProcessColor::hash_combine(Self, Hasher) -> Unit
 pub fn ProcessColor::input() -> CastInfo
 pub fn ProcessColor::lighten(Self, Ratio) -> Self
@@ -9759,7 +9759,7 @@ pub fn ProcessColor::to_oklch(Self) -> Oklch
 pub fn ProcessColor::to_rgb(Self) -> Rgb
 pub fn ProcessColor::to_space(Self, ProcessColorSpace) -> Self
 pub fn ProcessColor::to_vec4(Self) -> FixedArray[Float]
-pub fn ProcessColor::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn ProcessColor::to_vec4_u8(Self) -> FixedArray[Int32]
 pub fn ProcessColor::with_alpha(Self, Float) -> Self
 pub impl Eq for ProcessColor
 pub impl Hash for ProcessColor
@@ -9778,22 +9778,22 @@ pub(all) enum ProcessColorSpace {
   Hsv
   Cmyk
 } derive(Eq, @debug.Debug)
-pub fn ProcessColorSpace::hue_index(Self) -> Int?
+pub fn ProcessColorSpace::hue_index(Self) -> Int32?
 pub impl FromValue for ProcessColorSpace
 pub impl IntoValue for ProcessColorSpace
 pub impl Reflect for ProcessColorSpace
 
 pub struct Property {
   elem : Element
-  id : Int
+  id : Int32
   value : Value
   span : @moonbitlang/typst/syntax.Span
   liftable : Bool
   outside : Bool
 }
-pub fn Property::is_(Self, Element, Int) -> Bool
+pub fn Property::is_(Self, Element, Int32) -> Bool
 pub fn Property::is_of(Self, Element) -> Bool
-pub fn Property::new(Element, Int, Value) -> Self
+pub fn Property::new(Element, Int32, Value) -> Self
 pub impl Eq for Property
 
 pub(all) enum Quadrant {
@@ -9868,21 +9868,21 @@ pub fn RasterImage::color(Self) -> @codecs.ColorType
 pub fn RasterImage::data(Self) -> Bytes
 pub fn RasterImage::dpi(Self) -> Double?
 pub fn RasterImage::dynamic(Self) -> DynamicImage
-pub fn RasterImage::exif_rotation(Self) -> UInt?
+pub fn RasterImage::exif_rotation(Self) -> UInt32?
 pub fn RasterImage::format(Self) -> RasterFormat
 pub fn RasterImage::hash128(Self) -> U128
-pub fn RasterImage::height(Self) -> UInt
+pub fn RasterImage::height(Self) -> UInt32
 pub fn RasterImage::icc(Self) -> Bytes?
 pub fn RasterImage::new(Bytes, RasterFormat, Smart[Bytes]) -> Self raise HintedError
 pub fn RasterImage::plain(Bytes, RasterFormat) -> Self raise HintedError
-pub fn RasterImage::synthetic(Bytes, RasterFormat, width~ : UInt, height~ : UInt, dpi? : Double) -> Self
-pub fn RasterImage::width(Self) -> UInt
+pub fn RasterImage::synthetic(Bytes, RasterFormat, width~ : UInt32, height~ : UInt32, dpi? : Double) -> Self
+pub fn RasterImage::width(Self) -> UInt32
 pub impl Eq for RasterImage
 pub impl Hash for RasterImage
 
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
-pub fn Ratio::compare(Self, Self) -> Int
+pub fn Ratio::compare(Self, Self) -> Int32
 pub fn Ratio::div_by(Self, Double) -> Self
 pub fn Ratio::from_value(Value) -> Self raise HintedError
 pub fn Ratio::get(Self) -> Double
@@ -10189,7 +10189,7 @@ pub fn[T : Numeric] Rel::is_zero(Self[T]) -> Bool
 pub fn[T, U] Rel::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T] Rel::new(Ratio, T) -> Self[T]
 pub fn[T : Numeric] Rel::one() -> Self[T]
-pub fn Rel::partial_cmp_length(Self[Length], Self[Length]) -> Int?
+pub fn Rel::partial_cmp_length(Self[Length], Self[Length]) -> Int32?
 pub fn[T : Numeric] Rel::relative_to(Self[T], T) -> T
 pub fn Rel::repr_length(Self[Length]) -> String
 pub fn Rel::resolve(Self[Length], StyleChain) -> Self[Abs]
@@ -10264,12 +10264,12 @@ pub impl IntoValue for Replacement
 pub impl Reflect for Replacement
 
 pub(all) enum ReportTextPos {
-  Full(Int, Int, LineCol)
-  Range(Int, Int)
+  Full(Int32, Int32, LineCol)
+  Range(Int32, Int32)
   LineCol(LineCol)
   NoPos
 } derive(Eq, Hash, @debug.Debug)
-pub fn ReportTextPos::full(Int, Int, LineCol) -> Self
+pub fn ReportTextPos::full(Int32, Int32, LineCol) -> Self
 
 pub(all) enum RepresentationError {
   Zero
@@ -10289,9 +10289,9 @@ pub(all) enum ResolvableGridItem[T] {
 }
 
 pub(all) struct ResolvableLine {
-  index : Smart[Int]
-  start : Int
-  end : Int?
+  index : Smart[Int32]
+  start : Int32
+  end : Int32?
   stroke : ResolvedStroke?
   span : @moonbitlang/typst/syntax.Span
   position : LinePosition
@@ -10304,7 +10304,7 @@ pub(all) struct ResolvedAugment {
 } derive(Eq)
 
 pub struct ResolvedCelled(Celled[Sides[ResolvedStroke??]])
-pub fn ResolvedCelled::resolve(Self, Engine, StyleChain, Int, Int) -> Sides[ResolvedStroke??] raise SourceError
+pub fn ResolvedCelled::resolve(Self, Engine, StyleChain, Int32, Int32) -> Sides[ResolvedStroke??] raise SourceError
 pub fn ResolvedCelled::resolve_from(Celled[Sides[Stroke??]], StyleChain) -> Self
 
 pub(all) enum ResolvedDashLength {
@@ -10402,20 +10402,20 @@ pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
 pub fn Route::check_show_depth(Self) -> Unit raise HintedError
 pub fn Route::contains(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn Route::decrease(Self) -> Unit
-pub fn Route::depth(Self) -> Int
+pub fn Route::depth(Self) -> Int32
 pub fn Route::extend_(Self) -> Self
 pub fn Route::increase(Self) -> Unit
 pub fn Route::memo_hash(Self) -> U128
 pub fn Route::root() -> Self
 pub fn Route::unnested(Self) -> Self
 pub fn Route::with_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
-pub fn Route::within(Self, Int) -> Bool
+pub fn Route::within(Self, Int32) -> Bool
 
 pub struct RouteShifts {
   // private fields
 }
-pub fn RouteShifts::allows(Self, Int) -> Bool
-pub fn RouteShifts::note_reused(Self, Int) -> Unit
+pub fn RouteShifts::allows(Self, Int32) -> Bool
+pub fn RouteShifts::note_reused(Self, Int32) -> Unit
 
 pub(all) struct Routines {
   rules : () -> NativeRuleMap
@@ -10429,10 +10429,10 @@ pub(all) struct Routines {
 pub fn Routines::new(eval_string~ : (Engine, Context, String, @moonbitlang/typst/syntax.Span, @moonbitlang/typst/syntax.SyntaxMode, Scope) -> Value raise SourceError, eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError, rules? : () -> NativeRuleMap, realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError, layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError, html_mathml_body? : (Content, StyleChain) -> Content??, html_span_filled? : (Content, Color) -> Content) -> Self
 
 pub(all) struct RowRange {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Hash, @debug.Debug)
-pub fn RowRange::contains(Self, Int) -> Bool
+pub fn RowRange::contains(Self, Int32) -> Bool
 
 pub(all) enum RowType {
   RowArray
@@ -10443,14 +10443,14 @@ pub impl IntoValue for RowType
 pub impl Reflect for RowType
 
 type RustDecimal derive(Hash)
-pub fn RustDecimal::hash(Self) -> Int
+pub fn RustDecimal::hash(Self) -> Int32
 pub fn RustDecimal::hash_combine(Self, Hasher) -> Unit
 
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
 pub fn Scalar::into_value(Self) -> Value
 pub fn Scalar::new(Double) -> Self
-pub fn Scalar::powi(Self, Int) -> Self
+pub fn Scalar::powi(Self, Int32) -> Self
 pub impl Add for Scalar
 pub impl Compare for Scalar
 pub impl Div for Scalar
@@ -10514,7 +10514,7 @@ pub fn Scope::define_func(Self, NativeFuncData) -> Binding
 pub fn Scope::define_type(Self, Type) -> Binding
 pub fn Scope::get(Self, String) -> Binding?
 pub fn Scope::iter(Self) -> Iter[(String, Binding)]
-pub fn Scope::length(Self) -> Int
+pub fn Scope::length(Self) -> Int32
 pub fn Scope::new() -> Self
 pub fn Scope::prelude_path(Self, Array[String]) -> Binding?
 pub fn Scope::reset_category(Self) -> Unit
@@ -10571,7 +10571,7 @@ pub struct ScriptsItem {
 pub fn ScriptsItem::create(MathItem, MathItem?, MathItem?, MathItem?, MathItem?, MathItem?, MathItem?, StyleChain) -> MathItem
 
 pub(all) enum Selector {
-  Elem(Element, Array[(Int, Value)]?)
+  Elem(Element, Array[(Int32, Value)]?)
   Location(Location)
   Label(Label)
   Regex(Regex)
@@ -10686,7 +10686,7 @@ pub impl[T : Reflect] Reflect for Sides[T?]
 
 pub(all) enum Since {
   Forever
-  Version(UInt, UInt, UInt)
+  Version(UInt32, UInt32, UInt32)
   Unreleased
 } derive(Eq, Hash)
 pub fn Since::castable(Value) -> Bool
@@ -10728,16 +10728,16 @@ pub fn SipHasher128::new() -> Self
 pub fn[T : Fingerprint] SipHasher128::write(Self, T) -> Unit
 pub fn SipHasher128::write_bool(Self, Bool) -> Unit
 pub fn SipHasher128::write_bytes(Self, BytesView) -> Unit
-pub fn SipHasher128::write_discriminant(Self, Int) -> Unit
+pub fn SipHasher128::write_discriminant(Self, Int32) -> Unit
 pub fn SipHasher128::write_f64(Self, Double) -> Unit
 pub fn SipHasher128::write_i64(Self, Int64) -> Unit
 pub fn[T : Hash] SipHasher128::write_leaf(Self, String, T) -> Unit
 pub fn SipHasher128::write_str(Self, StringView) -> Unit
 pub fn SipHasher128::write_u128(Self, U128) -> Unit
-pub fn SipHasher128::write_u32(Self, UInt) -> Unit
+pub fn SipHasher128::write_u32(Self, UInt32) -> Unit
 pub fn SipHasher128::write_u64(Self, UInt64) -> Unit
 pub fn SipHasher128::write_u8(Self, Byte) -> Unit
-pub fn SipHasher128::write_usize(Self, Int) -> Unit
+pub fn SipHasher128::write_usize(Self, Int32) -> Unit
 pub impl @moonbitlang/typst/syntax.NodeHasher for SipHasher128
 
 pub(all) enum Sizing {
@@ -11020,7 +11020,7 @@ pub(all) struct SpotColorant {
 } derive(Eq)
 pub fn SpotColorant::castable(Value) -> Bool
 pub fn SpotColorant::from_value(Value) -> Self raise HintedError
-pub fn SpotColorant::hash(Self) -> Int
+pub fn SpotColorant::hash(Self) -> Int32
 pub fn SpotColorant::hash_combine(Self, Hasher) -> Unit
 pub fn SpotColorant::input() -> CastInfo
 pub fn SpotColorant::into_value(Self) -> Value
@@ -11127,7 +11127,7 @@ pub(all) struct StandardAxes {
   mut opsz : FontAxis?
 }
 pub fn StandardAxes::knows(OpenTypeTag) -> Bool
-pub fn StandardAxes::order(OpenTypeTag) -> Int
+pub fn StandardAxes::order(OpenTypeTag) -> Int32
 pub fn StandardAxes::parse(Array[FontAxis]) -> Self
 
 pub(all) struct State {
@@ -11302,7 +11302,7 @@ pub impl NativeElement for StrongElem
 pub(all) enum Style {
   Property(Property)
   Recipe(Recipe)
-  Revocation(Int)
+  Revocation(Int32)
 } derive(Eq)
 pub fn Style::element(Self) -> Element?
 pub fn Style::liftable(Self) -> Bool
@@ -11319,21 +11319,21 @@ pub struct StyleChain {
 }
 pub fn StyleChain::chain(Self, Styles) -> Self
 pub fn StyleChain::chain_one(Self, Style) -> Self
-pub fn StyleChain::depth(Self) -> Int
+pub fn StyleChain::depth(Self) -> Int32
 pub fn StyleChain::empty() -> Self
 pub fn StyleChain::entries(Self) -> Iter[Style]
 pub fn StyleChain::fresh(Self) -> Self
-pub fn StyleChain::get_field(Self, Element, Int) -> Value
+pub fn StyleChain::get_field(Self, Element, Int32) -> Value
 pub fn StyleChain::get_value_with_local(Self, Element, FieldInfo, Value?) -> Value
-pub fn StyleChain::has(Self, Element, Int) -> Bool
-pub fn StyleChain::head_len(Self) -> Int
+pub fn StyleChain::has(Self, Element, Int32) -> Bool
+pub fn StyleChain::head_len(Self) -> Int32
 pub fn StyleChain::links(Self) -> Array[Array[Style]]
 pub fn StyleChain::memo_hash(Self) -> U128
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
-pub fn StyleChain::recipe_count(Self) -> Int
+pub fn StyleChain::recipe_count(Self) -> Int32
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]
-pub fn StyleChain::suffix(Self, Int) -> Styles
+pub fn StyleChain::suffix(Self, Int32) -> Styles
 pub fn StyleChain::to_map(Self) -> Styles
 pub fn StyleChain::trunk(Iter[Self]) -> Self?
 pub fn StyleChain::trunk_from_pairs(ArrayView[(Content, Self)]) -> Self?
@@ -11351,7 +11351,7 @@ pub fn Styles::apply(Self, Self) -> Unit
 pub fn Styles::apply_one(Self, Style) -> Unit
 pub fn Styles::copy(Self) -> Self
 pub fn Styles::from_array(Array[Style]) -> Self
-pub fn Styles::has(Self, Element, Int) -> Bool
+pub fn Styles::has(Self, Element, Int32) -> Bool
 pub fn Styles::is_empty(Self) -> Bool
 pub fn Styles::iter(Self) -> Iter[Style]
 pub fn Styles::liftable(Self) -> Self
@@ -11359,7 +11359,7 @@ pub fn Styles::new() -> Self
 pub fn Styles::outside(Self) -> Self
 pub fn Styles::push(Self, Style) -> Unit
 pub fn Styles::root(ArrayView[(Content, StyleChain)], StyleChain) -> Self
-pub fn Styles::set(Self, Element, Int, Value) -> Unit
+pub fn Styles::set(Self, Element, Int32, Value) -> Unit
 pub fn Styles::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Styles::unset(Self) -> Unit
 pub impl Eq for Styles
@@ -11368,14 +11368,14 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
-pub(all) struct StylisticSets(Int) derive(Default, Eq, Hash)
+pub(all) struct StylisticSets(Int32) derive(Default, Eq, Hash)
 pub fn StylisticSets::castable(Value) -> Bool
 pub fn StylisticSets::default() -> Self
-pub fn StylisticSets::has(Self, Int) -> Bool
+pub fn StylisticSets::has(Self, Int32) -> Bool
 pub fn StylisticSets::input() -> CastInfo
 pub fn StylisticSets::into_value(Self) -> Value
 pub fn StylisticSets::output() -> CastInfo
-pub fn StylisticSets::sets(Self) -> Array[Int]
+pub fn StylisticSets::sets(Self) -> Array[Int32]
 pub impl FromValue for StylisticSets
 pub impl IntoValue for StylisticSets
 pub impl Reflect for StylisticSets
@@ -11456,7 +11456,7 @@ pub fn SvgImage::data(Self) -> Bytes
 pub fn SvgImage::height(Self) -> Double
 pub fn SvgImage::links(Self) -> ArrayView[U128]
 pub fn SvgImage::new(Bytes) -> Self raise LoadErr
-pub fn SvgImage::selections(Self) -> ArrayView[Int]
+pub fn SvgImage::selections(Self) -> ArrayView[Int32]
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
 pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double
@@ -12000,10 +12000,10 @@ pub impl Fingerprint for TextItem
 
 pub(all) struct TextItemView {
   item : TextItem
-  glyph_start : Int
-  glyph_end : Int
+  glyph_start : Int32
+  glyph_end : Int32
 }
-pub fn TextItemView::from_glyph_range(TextItem, Int, Int) -> Self
+pub fn TextItemView::from_glyph_range(TextItem, Int32, Int32) -> Self
 pub fn TextItemView::full(TextItem) -> Self
 pub fn TextItemView::glyph_text(Self, Glyph) -> String
 pub fn TextItemView::glyphs(Self) -> ArrayView[Glyph]
@@ -12029,7 +12029,7 @@ pub(all) struct Tiling {
   frame_hash : LazyFingerprint
 } derive(Eq)
 pub fn Tiling::castable(Value) -> Bool
-pub fn Tiling::frame_fingerprint_flags(Self) -> Int
+pub fn Tiling::frame_fingerprint_flags(Self) -> Int32
 pub fn Tiling::input() -> CastInfo
 pub fn Tiling::output() -> CastInfo
 pub fn Tiling::relative(Self) -> Smart[RelativeTo]
@@ -12185,14 +12185,14 @@ pub struct TrackedWorld {
 }
 pub fn TrackedWorld::book(Self) -> FontBook
 pub fn TrackedWorld::file(Self, @moonbitlang/typst/syntax.FileId) -> Bytes raise FileError
-pub fn TrackedWorld::font(Self, Int) -> Font?
+pub fn TrackedWorld::font(Self, Int32) -> Font?
 pub fn TrackedWorld::in_scope(Self) -> Bool
 pub fn TrackedWorld::is_volatile(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn TrackedWorld::new(&World, volatile_files? : (@moonbitlang/typst/syntax.FileId) -> Bool) -> Self
 pub fn TrackedWorld::reads_abort(Self, WorldReadsMark) -> Unit
 pub fn TrackedWorld::reads_begin(Self) -> WorldReadsMark
 pub fn TrackedWorld::reads_end(Self, WorldReadsMark) -> WorldReads
-pub fn TrackedWorld::scope_token(Self) -> Int
+pub fn TrackedWorld::scope_token(Self) -> Int32
 pub fn[T] TrackedWorld::scoped(Self, () -> T raise SourceError) -> T raise SourceError
 pub fn TrackedWorld::source(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.Source raise FileError
 pub fn TrackedWorld::today(Self, Duration?) -> Datetime?
@@ -12466,8 +12466,8 @@ pub(all) enum UrlContactScheme {
 pub fn UrlContactScheme::as_str(Self) -> String
 
 pub(all) struct Utf8Error {
-  valid_up_to : Int
-  error_len : Int?
+  valid_up_to : Int32
+  error_len : Int32?
 } derive(Eq, @debug.Debug)
 
 pub(all) enum VAlignment {
@@ -12615,9 +12615,9 @@ pub impl FromValue for VectorFormat
 pub impl IntoValue for VectorFormat
 pub impl Reflect for VectorFormat
 
-pub struct Version(Array[UInt]) derive(Hash)
+pub struct Version(Array[UInt32]) derive(Hash)
 pub fn Version::castable(Value) -> Bool
-pub fn Version::compare(Self, Self) -> Int
+pub fn Version::compare(Self, Self) -> Int32
 pub fn Version::component(Self, String) -> Int64 raise HintedError
 pub fn Version::input() -> CastInfo
 pub fn Version::new() -> Self
@@ -12626,10 +12626,10 @@ pub fn Version::op_gt(Self, Self) -> Bool
 pub fn Version::op_le(Self, Self) -> Bool
 pub fn Version::op_lt(Self, Self) -> Bool
 pub fn Version::output() -> CastInfo
-pub fn Version::push(Self, UInt) -> Unit
+pub fn Version::push(Self, UInt32) -> Unit
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String
-pub fn Version::values(Self) -> Array[UInt]
+pub fn Version::values(Self) -> Array[UInt32]
 pub impl Compare for Version
 pub impl Eq for Version
 pub impl Show for Version
@@ -12638,8 +12638,8 @@ pub impl IntoValue for Version
 pub impl Reflect for Version
 
 pub(all) enum VersionComponents {
-  Single(UInt)
-  Multiple(Array[UInt])
+  Single(UInt32)
+  Multiple(Array[UInt32])
 }
 pub fn VersionComponents::castable(Value) -> Bool
 pub fn VersionComponents::input() -> CastInfo
@@ -12692,7 +12692,7 @@ pub struct WorldReads {
 }
 pub fn WorldReads::describe(Self) -> Array[String]
 pub fn WorldReads::is_volatile(Self) -> Bool
-pub fn WorldReads::length(Self) -> Int
+pub fn WorldReads::length(Self) -> Int32
 
 pub struct WorldReadsMark {
   // private fields
@@ -12729,9 +12729,9 @@ pub(open) trait Fingerprint {
 }
 pub impl Fingerprint for Unit
 pub impl Fingerprint for Bool
-pub impl Fingerprint for Int
+pub impl Fingerprint for Int32
 pub impl Fingerprint for Int64
-pub impl Fingerprint for UInt
+pub impl Fingerprint for UInt32
 pub impl Fingerprint for UInt64
 pub impl Fingerprint for Double
 pub impl Fingerprint for String
@@ -12761,8 +12761,8 @@ pub(open) trait FontFace {
 
 pub(open) trait FontInstanceFace {
   fn units_per_em(Self) -> Double
-  fn glyph_hor_advance(Self, UInt16) -> Int?
-  fn glyph_ver_advance(Self, UInt16) -> Int?
+  fn glyph_hor_advance(Self, UInt16) -> Int32?
+  fn glyph_ver_advance(Self, UInt16) -> Int32?
   fn glyph_bounding_box(Self, UInt16) -> GlyphRect?
   fn metrics(Self) -> FontMetrics = _
   fn ttf(Self) -> @otf.Face? = _
@@ -12806,8 +12806,8 @@ pub(open) trait IntrospectorBackend {
   fn query_unique(Self, Selector) -> Content raise HintedError
   fn query_label(Self, Label) -> Content raise HintedError
   fn query_labelled(Self) -> Array[Content]
-  fn query_count_before(Self, Selector, Location) -> Int
-  fn label_count(Self, Label) -> Int
+  fn query_count_before(Self, Selector, Location) -> Int32
+  fn label_count(Self, Label) -> Int32
   fn locator(Self, U128, Location) -> Location?
   fn pages(Self, Location) -> NonZeroUSize?
   fn page(Self, Location) -> NonZeroUSize?
@@ -12857,11 +12857,11 @@ pub impl Reflect for @unicode.MathClass
 pub impl[A : Reflect, B : Reflect] Reflect for (A, B)
 
 pub(open) trait ResolvableCell {
-  fn resolve_cell(Self, Int, Int, Paint?, Smart[Alignment], Sides[Rel[Length]?], Sides[ResolvedStroke??], Bool, StyleChain, Smart[TableCellKind]) -> Cell
-  fn cell_x(Self, StyleChain) -> Smart[Int]
-  fn cell_y(Self, StyleChain) -> Smart[Int]
-  fn cell_colspan(Self, StyleChain) -> Int
-  fn cell_rowspan(Self, StyleChain) -> Int
+  fn resolve_cell(Self, Int32, Int32, Paint?, Smart[Alignment], Sides[Rel[Length]?], Sides[ResolvedStroke??], Bool, StyleChain, Smart[TableCellKind]) -> Cell
+  fn cell_x(Self, StyleChain) -> Smart[Int32]
+  fn cell_y(Self, StyleChain) -> Smart[Int32]
+  fn cell_colspan(Self, StyleChain) -> Int32
+  fn cell_rowspan(Self, StyleChain) -> Int32
   fn cell_span(Self) -> @moonbitlang/typst/syntax.Span
   fn default_cell() -> Self
 }
@@ -12877,6 +12877,6 @@ pub(open) trait World {
   fn source(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.Source raise FileError
   fn file(Self, @moonbitlang/typst/syntax.FileId) -> Bytes raise FileError
   fn book(Self) -> FontBook = _
-  fn font(Self, Int) -> Font? = _
+  fn font(Self, Int32) -> Font? = _
   fn today(Self, Duration?) -> Datetime?
 }

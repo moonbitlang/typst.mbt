@@ -54,23 +54,23 @@ pub struct Attribute {
 }
 pub fn Attribute::name(Self) -> String
 pub fn Attribute::namespace_(Self) -> String?
-pub fn Attribute::range(Self) -> (Int, Int)
-pub fn Attribute::range_qname(Self) -> (Int, Int)
-pub fn Attribute::range_value(Self) -> (Int, Int)
+pub fn Attribute::range(Self) -> (Int32, Int32)
+pub fn Attribute::range_qname(Self) -> (Int32, Int32)
+pub fn Attribute::range_value(Self) -> (Int32, Int32)
 pub fn Attribute::value(Self) -> String
 
 pub struct Document {
   // private fields
 }
 pub fn Document::descendants(Self) -> Array[Node]
-pub fn Document::get_node(Self, Int) -> Node?
+pub fn Document::get_node(Self, Int32) -> Node?
 pub fn Document::input_text(Self) -> String
 pub fn Document::parse(String) -> Self raise XmlError
 pub fn Document::parse_utf8_with_options(Bytes, ParsingOptions) -> Self raise XmlError
 pub fn Document::parse_with_options(String, ParsingOptions) -> Self raise XmlError
 pub fn Document::root(Self) -> Node
 pub fn Document::root_element(Self) -> Node
-pub fn Document::text_pos_at(Self, Int) -> TextPos
+pub fn Document::text_pos_at(Self, Int32) -> TextPos
 
 pub(all) struct ExpandedName {
   uri : String?
@@ -102,7 +102,7 @@ pub fn Node::has_attribute(Self, String, ns? : String) -> Bool
 pub fn Node::has_children(Self) -> Bool
 pub fn Node::has_siblings(Self) -> Bool
 pub fn Node::has_tag_name(Self, String, ns? : String) -> Bool
-pub fn Node::id(Self) -> Int
+pub fn Node::id(Self) -> Int32
 pub fn Node::is_comment(Self) -> Bool
 pub fn Node::is_element(Self) -> Bool
 pub fn Node::is_pi(Self) -> Bool
@@ -121,7 +121,7 @@ pub fn Node::parent_element(Self) -> Self?
 pub fn Node::pi(Self) -> PI?
 pub fn Node::prev_sibling(Self) -> Self?
 pub fn Node::prev_sibling_element(Self) -> Self?
-pub fn Node::range(Self) -> (Int, Int)
+pub fn Node::range(Self) -> (Int32, Int32)
 pub fn Node::tag_name(Self) -> ExpandedName
 pub fn Node::tail(Self) -> String?
 pub fn Node::text(Self) -> String?
@@ -144,15 +144,15 @@ pub(all) struct PI {
 
 pub(all) struct ParsingOptions {
   allow_dtd : Bool
-  nodes_limit : UInt
+  nodes_limit : UInt32
 }
 pub fn ParsingOptions::default() -> Self
 
 pub(all) struct TextPos {
-  row : Int
-  col : Int
+  row : Int32
+  col : Int32
 } derive(Eq, @debug.Debug)
-pub fn TextPos::new(Int, Int) -> Self
+pub fn TextPos::new(Int32, Int32) -> Self
 pub impl Show for TextPos
 
 // Type aliases

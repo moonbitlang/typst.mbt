@@ -6,113 +6,113 @@ import {
 }
 
 // Values
-pub const BULK_MEMORY : UInt = 0x20
+pub const BULK_MEMORY : UInt32 = 0x20
 
-pub const CM_ASYNC : UInt = 0x8000000
+pub const CM_ASYNC : UInt32 = 0x8000000
 
-pub const CM_ASYNC_BUILTINS : UInt = 0x20000000
+pub const CM_ASYNC_BUILTINS : UInt32 = 0x20000000
 
-pub const CM_ASYNC_STACKFUL : UInt = 0x10000000
+pub const CM_ASYNC_STACKFUL : UInt32 = 0x10000000
 
-pub const CM_NESTED_NAMES : UInt = 0x400000
+pub const CM_NESTED_NAMES : UInt32 = 0x400000
 
-pub const CM_VALUES : UInt = 0x200000
+pub const CM_VALUES : UInt32 = 0x200000
 
-pub const COMPONENT_MODEL : UInt = 0x10000
+pub const COMPONENT_MODEL : UInt32 = 0x10000
 
-pub const CUSTOM_PAGE_SIZES : UInt = 0x100000
+pub const CUSTOM_PAGE_SIZES : UInt32 = 0x100000
 
 pub const DEFAULT_WASM_PAGE_SIZE : UInt64 = 65536
 
-pub const EXCEPTIONS : UInt = 0x2000
+pub const EXCEPTIONS : UInt32 = 0x2000
 
-pub const EXTENDED_CONST : UInt = 0x8000
+pub const EXTENDED_CONST : UInt32 = 0x8000
 
-pub const FLOATS : UInt = 0x800
+pub const FLOATS : UInt32 = 0x800
 
-pub const FUNCTION_REFERENCES : UInt = 0x20000
+pub const FUNCTION_REFERENCES : UInt32 = 0x20000
 
-pub const GC : UInt = 0x80000
+pub const GC : UInt32 = 0x80000
 
-pub const GC_TYPES : UInt = 0x1000000
+pub const GC_TYPES : UInt32 = 0x1000000
 
-pub const LEGACY_EXCEPTIONS : UInt = 0x800000
+pub const LEGACY_EXCEPTIONS : UInt32 = 0x800000
 
-pub const MAX_WASM_BR_TABLE_SIZE : Int = 131072
+pub const MAX_WASM_BR_TABLE_SIZE : Int32 = 131072
 
-pub const MAX_WASM_CATCHES : Int = 10_000
+pub const MAX_WASM_CATCHES : Int32 = 10_000
 
-pub const MAX_WASM_DATA_SEGMENTS : Int = 100_000
+pub const MAX_WASM_DATA_SEGMENTS : Int32 = 100_000
 
-pub const MAX_WASM_ELEMENT_SEGMENTS : Int = 100_000
+pub const MAX_WASM_ELEMENT_SEGMENTS : Int32 = 100_000
 
-pub const MAX_WASM_EXPORTS : Int = 1_000_000
+pub const MAX_WASM_EXPORTS : Int32 = 1_000_000
 
-pub const MAX_WASM_FUNCTIONS : Int = 1_000_000
+pub const MAX_WASM_FUNCTIONS : Int32 = 1_000_000
 
-pub const MAX_WASM_FUNCTION_LOCALS : Int = 50000
+pub const MAX_WASM_FUNCTION_LOCALS : Int32 = 50000
 
-pub const MAX_WASM_FUNCTION_PARAMS : Int = 1000
+pub const MAX_WASM_FUNCTION_PARAMS : Int32 = 1000
 
-pub const MAX_WASM_FUNCTION_RETURNS : Int = 1000
+pub const MAX_WASM_FUNCTION_RETURNS : Int32 = 1000
 
-pub const MAX_WASM_FUNCTION_SIZE : Int = 131072
+pub const MAX_WASM_FUNCTION_SIZE : Int32 = 131072
 
-pub const MAX_WASM_GLOBALS : Int = 1_000_000
+pub const MAX_WASM_GLOBALS : Int32 = 1_000_000
 
-pub const MAX_WASM_HANDLERS : Int = 10_000
+pub const MAX_WASM_HANDLERS : Int32 = 10_000
 
-pub const MAX_WASM_IMPORTS : Int = 1_000_000
+pub const MAX_WASM_IMPORTS : Int32 = 1_000_000
 
-pub const MAX_WASM_MEMORIES : Int = 100
+pub const MAX_WASM_MEMORIES : Int32 = 100
 
-pub const MAX_WASM_STRING_SIZE : Int = 100_000
+pub const MAX_WASM_STRING_SIZE : Int32 = 100_000
 
-pub const MAX_WASM_STRUCT_FIELDS : Int = 10_000
+pub const MAX_WASM_STRUCT_FIELDS : Int32 = 10_000
 
-pub const MAX_WASM_SUBTYPING_DEPTH : Int = 63
+pub const MAX_WASM_SUBTYPING_DEPTH : Int32 = 63
 
-pub const MAX_WASM_SUPERTYPES : Int = 1
+pub const MAX_WASM_SUPERTYPES : Int32 = 1
 
-pub const MAX_WASM_TABLES : Int = 100
+pub const MAX_WASM_TABLES : Int32 = 100
 
-pub const MAX_WASM_TABLE_ENTRIES : Int = 10_000_000
+pub const MAX_WASM_TABLE_ENTRIES : Int32 = 10_000_000
 
-pub const MAX_WASM_TAGS : Int = 1_000_000
+pub const MAX_WASM_TAGS : Int32 = 1_000_000
 
-pub const MAX_WASM_TYPES : Int = 1_000_000
+pub const MAX_WASM_TYPES : Int32 = 1_000_000
 
-pub const MAX_WASM_TYPE_SIZE : UInt = 1_000_000
+pub const MAX_WASM_TYPE_SIZE : UInt32 = 1_000_000
 
-pub const MEMORY64 : UInt = 0x4000
+pub const MEMORY64 : UInt32 = 0x4000
 
-pub const MEMORY_CONTROL : UInt = 0x40000
+pub const MEMORY_CONTROL : UInt32 = 0x40000
 
-pub const MULTI_MEMORY : UInt = 0x1000
+pub const MULTI_MEMORY : UInt32 = 0x1000
 
-pub const MULTI_VALUE : UInt = 0x10
+pub const MULTI_VALUE : UInt32 = 0x10
 
-pub const MUTABLE_GLOBAL : UInt = 1
+pub const MUTABLE_GLOBAL : UInt32 = 1
 
-pub const REFERENCE_TYPES : UInt = 0x8
+pub const REFERENCE_TYPES : UInt32 = 0x8
 
-pub const RELAXED_SIMD : UInt = 0x80
+pub const RELAXED_SIMD : UInt32 = 0x80
 
-pub const SATURATING_FLOAT_TO_INT : UInt = 0x2
+pub const SATURATING_FLOAT_TO_INT : UInt32 = 0x2
 
-pub const SHARED_EVERYTHING_THREADS : UInt = 0x200
+pub const SHARED_EVERYTHING_THREADS : UInt32 = 0x200
 
-pub const SIGN_EXTENSION : UInt = 0x4
+pub const SIGN_EXTENSION : UInt32 = 0x4
 
-pub const SIMD : UInt = 0x40
+pub const SIMD : UInt32 = 0x40
 
-pub const STACK_SWITCHING : UInt = 0x2000000
+pub const STACK_SWITCHING : UInt32 = 0x2000000
 
-pub const TAIL_CALL : UInt = 0x400
+pub const TAIL_CALL : UInt32 = 0x400
 
-pub const THREADS : UInt = 0x100
+pub const THREADS : UInt32 = 0x100
 
-pub const WIDE_ARITHMETIC : UInt = 0x4000000
+pub const WIDE_ARITHMETIC : UInt32 = 0x4000000
 
 pub let heaptype_extern : HeapType
 
@@ -200,12 +200,12 @@ pub let wasm_features_wasm3 : WasmFeatures
 
 // Errors
 pub suberror BinaryReaderError {
-  BinaryReaderError(message~ : String, kind~ : BinaryReaderErrorKind, offset~ : Int, needed_hint~ : Int?)
+  BinaryReaderError(message~ : String, kind~ : BinaryReaderErrorKind, offset~ : Int32, needed_hint~ : Int32?)
 }
 pub fn BinaryReaderError::message(Self) -> String
-pub fn BinaryReaderError::needed_hint(Self) -> Int?
-pub fn BinaryReaderError::new(String, Int) -> Self
-pub fn BinaryReaderError::offset(Self) -> Int
+pub fn BinaryReaderError::needed_hint(Self) -> Int32?
+pub fn BinaryReaderError::new(String, Int32) -> Self
+pub fn BinaryReaderError::offset(Self) -> Int32
 pub fn BinaryReaderError::output(Self, &Logger) -> Unit
 pub fn BinaryReaderError::to_string(Self) -> String
 pub impl Show for BinaryReaderError
@@ -237,32 +237,32 @@ pub impl FromReader for ArrayType
 pub struct BinaryReader {
   // private fields
 }
-pub fn BinaryReader::bytes_remaining(Self) -> Int
+pub fn BinaryReader::bytes_remaining(Self) -> Int32
 pub fn BinaryReader::clone(Self) -> Self
-pub fn BinaryReader::current_position(Self) -> Int
+pub fn BinaryReader::current_position(Self) -> Int32
 pub fn BinaryReader::eof(Self) -> Bool
 pub fn BinaryReader::features(Self) -> WasmFeatures
 pub fn BinaryReader::is_end_then_eof(Self) -> Bool
-pub fn BinaryReader::new(BytesView, Int) -> Self
-pub fn BinaryReader::new_features(BytesView, Int, WasmFeatures) -> Self
-pub fn BinaryReader::original_position(Self) -> Int
+pub fn BinaryReader::new(BytesView, Int32) -> Self
+pub fn BinaryReader::new_features(BytesView, Int32, WasmFeatures) -> Self
+pub fn BinaryReader::original_position(Self) -> Int32
 pub fn BinaryReader::range(Self) -> Range
 pub fn[T : FromReader] BinaryReader::read(Self) -> T raise BinaryReaderError
-pub fn BinaryReader::read_bytes(Self, Int) -> BytesView raise BinaryReaderError
+pub fn BinaryReader::read_bytes(Self, Int32) -> BytesView raise BinaryReaderError
 pub fn BinaryReader::read_f32(Self) -> Ieee32 raise BinaryReaderError
 pub fn BinaryReader::read_f64(Self) -> Ieee64 raise BinaryReaderError
 pub fn BinaryReader::read_operator(Self) -> Operator raise BinaryReaderError
 pub fn BinaryReader::read_reader(Self) -> Self raise BinaryReaderError
-pub fn BinaryReader::read_size(Self, Int, String) -> Int raise BinaryReaderError
+pub fn BinaryReader::read_size(Self, Int32, String) -> Int32 raise BinaryReaderError
 pub fn BinaryReader::read_string(Self) -> String raise BinaryReaderError
-pub fn BinaryReader::read_u32(Self) -> UInt raise BinaryReaderError
+pub fn BinaryReader::read_u32(Self) -> UInt32 raise BinaryReaderError
 pub fn BinaryReader::read_u64(Self) -> UInt64 raise BinaryReaderError
 pub fn BinaryReader::read_u8(Self) -> Byte raise BinaryReaderError
 pub fn BinaryReader::read_unlimited_string(Self) -> String raise BinaryReaderError
-pub fn BinaryReader::read_var_i32(Self) -> Int raise BinaryReaderError
+pub fn BinaryReader::read_var_i32(Self) -> Int32 raise BinaryReaderError
 pub fn BinaryReader::read_var_i64(Self) -> Int64 raise BinaryReaderError
 pub fn BinaryReader::read_var_s33(Self) -> Int64 raise BinaryReaderError
-pub fn BinaryReader::read_var_u32(Self) -> UInt raise BinaryReaderError
+pub fn BinaryReader::read_var_u32(Self) -> UInt32 raise BinaryReaderError
 pub fn BinaryReader::read_var_u64(Self) -> UInt64 raise BinaryReaderError
 pub fn BinaryReader::remaining_buffer(Self) -> BytesView
 pub fn BinaryReader::set_features(Self, WasmFeatures) -> Unit
@@ -278,29 +278,29 @@ pub(all) enum BinaryReaderErrorKind {
 pub(all) enum BlockType {
   Empty
   Type(ValType)
-  FuncType(UInt)
+  FuncType(UInt32)
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct BrTable {
   // private fields
 } derive(Eq, @debug.Debug)
-pub fn BrTable::default(Self) -> UInt
+pub fn BrTable::default(Self) -> UInt32
 pub fn BrTable::is_empty(Self) -> Bool
-pub fn BrTable::len(Self) -> UInt
-pub fn BrTable::targets(Self) -> ArrayView[UInt]
+pub fn BrTable::len(Self) -> UInt32
+pub fn BrTable::targets(Self) -> ArrayView[UInt32]
 
 pub(all) enum Catch {
-  One(tag~ : UInt, label~ : UInt)
-  OneRef(tag~ : UInt, label~ : UInt)
-  All(label~ : UInt)
-  AllRef(label~ : UInt)
+  One(tag~ : UInt32, label~ : UInt32)
+  OneRef(tag~ : UInt32, label~ : UInt32)
+  All(label~ : UInt32)
+  AllRef(label~ : UInt32)
 } derive(Eq, @debug.Debug)
 pub fn Catch::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for Catch
 
 pub(all) enum Chunk {
   NeedMoreData(UInt64)
-  Parsed(consumed~ : Int, payload~ : Payload)
+  Parsed(consumed~ : Int32, payload~ : Payload)
 }
 
 pub(all) enum CompositeInnerType {
@@ -340,15 +340,15 @@ pub fn ContType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for ContType
 
 pub(all) struct CoreTypeId {
-  index : UInt
+  index : UInt32
 } derive(Compare, Eq, Hash, @debug.Debug)
-pub fn CoreTypeId::index(Self) -> Int
+pub fn CoreTypeId::index(Self) -> Int32
 
 pub struct CustomSectionReader {
   // private fields
 }
 pub fn CustomSectionReader::data(Self) -> BytesView
-pub fn CustomSectionReader::data_offset(Self) -> Int
+pub fn CustomSectionReader::data_offset(Self) -> Int32
 pub fn CustomSectionReader::name(Self) -> String
 pub fn CustomSectionReader::new(BinaryReader) -> Self raise BinaryReaderError
 pub fn CustomSectionReader::range(Self) -> Range
@@ -362,7 +362,7 @@ pub impl FromReader for Data
 
 pub(all) enum DataKind {
   Passive
-  Active(memory_index~ : UInt, offset_expr~ : ConstExpr)
+  Active(memory_index~ : UInt32, offset_expr~ : ConstExpr)
 }
 
 pub(all) struct Element {
@@ -373,13 +373,13 @@ pub(all) struct Element {
 pub impl FromReader for Element
 
 pub(all) enum ElementItems {
-  Functions(SectionLimited[UInt])
+  Functions(SectionLimited[UInt32])
   Expressions(RefType, SectionLimited[ConstExpr])
 }
 
 pub(all) enum ElementKind {
   Passive
-  Active(table_index~ : UInt?, offset_expr~ : ConstExpr)
+  Active(table_index~ : UInt32?, offset_expr~ : ConstExpr)
   Declared
 }
 
@@ -399,7 +399,7 @@ pub(all) enum EntityType {
 pub(all) struct Export {
   name : String
   kind : ExternalKind
-  index : UInt
+  index : UInt32
 } derive(Eq, @debug.Debug)
 pub impl FromReader for Export
 
@@ -423,9 +423,9 @@ pub impl FromReader for FieldType
 pub(all) struct Frame {
   kind : FrameKind
   block_type : BlockType
-  height : Int
+  height : Int32
   mut unreachable_ : Bool
-  init_height : Int
+  init_height : Int32
 }
 pub impl @debug.Debug for Frame
 
@@ -442,15 +442,15 @@ pub(all) enum FrameKind {
 
 pub struct FuncToValidate {
   resources : ValidatorResources
-  index : UInt
-  ty : UInt
+  index : UInt32
+  ty : UInt32
   features : WasmFeatures
 }
 pub fn FuncToValidate::features(Self) -> WasmFeatures
-pub fn FuncToValidate::index(Self) -> UInt
+pub fn FuncToValidate::index(Self) -> UInt32
 pub fn FuncToValidate::into_validator(Self, FuncValidatorAllocations) -> FuncValidator
 pub fn FuncToValidate::resources(Self) -> ValidatorResources
-pub fn FuncToValidate::ty(Self) -> UInt
+pub fn FuncToValidate::ty(Self) -> UInt32
 
 pub struct FuncType {
   // private fields
@@ -465,23 +465,23 @@ pub impl FromReader for FuncType
 pub struct FuncValidator {
   // private fields
 }
-pub fn FuncValidator::control_stack_height(Self) -> UInt
-pub fn FuncValidator::define_locals(Self, Int, UInt, ValType) -> Unit raise BinaryReaderError
+pub fn FuncValidator::control_stack_height(Self) -> UInt32
+pub fn FuncValidator::define_locals(Self, Int32, UInt32, ValType) -> Unit raise BinaryReaderError
 pub fn FuncValidator::features(Self) -> WasmFeatures
-pub fn FuncValidator::finish(Self, Int) -> Unit raise BinaryReaderError
-pub fn FuncValidator::get_control_frame(Self, Int) -> Frame?
-pub fn FuncValidator::get_local_type(Self, UInt) -> ValType?
-pub fn FuncValidator::get_operand_type(Self, Int) -> ValType??
-pub fn FuncValidator::index(Self) -> UInt
+pub fn FuncValidator::finish(Self, Int32) -> Unit raise BinaryReaderError
+pub fn FuncValidator::get_control_frame(Self, Int32) -> Frame?
+pub fn FuncValidator::get_local_type(Self, UInt32) -> ValType?
+pub fn FuncValidator::get_operand_type(Self, Int32) -> ValType??
+pub fn FuncValidator::index(Self) -> UInt32
 pub fn FuncValidator::into_allocations(Self) -> FuncValidatorAllocations
-pub fn FuncValidator::len_locals(Self) -> UInt
-pub fn FuncValidator::op(Self, Int, Operator) -> Unit raise BinaryReaderError
-pub fn FuncValidator::operand_stack_height(Self) -> UInt
+pub fn FuncValidator::len_locals(Self) -> UInt32
+pub fn FuncValidator::op(Self, Int32, Operator) -> Unit raise BinaryReaderError
+pub fn FuncValidator::operand_stack_height(Self) -> UInt32
 pub fn FuncValidator::read_locals(Self, BinaryReader) -> Unit raise BinaryReaderError
 pub fn FuncValidator::resources(Self) -> ValidatorResources
-pub fn FuncValidator::simd_visitor(Self, Int) -> WasmProposalValidator
+pub fn FuncValidator::simd_visitor(Self, Int32) -> WasmProposalValidator
 pub fn FuncValidator::validate(Self, FunctionBody) -> Unit raise BinaryReaderError
-pub fn FuncValidator::visitor(Self, Int) -> WasmProposalValidator
+pub fn FuncValidator::visitor(Self, Int32) -> WasmProposalValidator
 
 pub struct FuncValidatorAllocations(OperatorValidatorAllocations)
 pub fn FuncValidatorAllocations::default() -> Self
@@ -512,8 +512,8 @@ pub fn GlobalType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for GlobalType
 
 pub(all) enum Handle {
-  OnLabel(tag~ : UInt, label~ : UInt)
-  OnSwitch(tag~ : UInt)
+  OnLabel(tag~ : UInt32, label~ : UInt32)
+  OnSwitch(tag~ : UInt32)
 } derive(Eq, @debug.Debug)
 pub fn Handle::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for Handle
@@ -525,8 +525,8 @@ pub(all) enum HeapType {
 pub fn HeapType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for HeapType
 
-pub(all) struct Ieee32(UInt) derive(Eq, Hash, @debug.Debug)
-pub fn Ieee32::bits(Self) -> UInt
+pub(all) struct Ieee32(UInt32) derive(Eq, Hash, @debug.Debug)
+pub fn Ieee32::bits(Self) -> UInt32
 
 pub(all) struct Ieee64(UInt64) derive(Eq, Hash, @debug.Debug)
 pub fn Ieee64::bits(Self) -> UInt64
@@ -539,21 +539,21 @@ pub(all) struct Import {
 pub impl FromReader for Import
 
 type Locals
-pub fn Locals::get(Self, UInt) -> ValType?
-pub fn Locals::len_locals(Self) -> UInt
+pub fn Locals::get(Self, UInt32) -> ValType?
+pub fn Locals::len_locals(Self) -> UInt32
 
 pub struct LocalsReader {
   // private fields
 }
-pub fn LocalsReader::get_count(Self) -> UInt
-pub fn LocalsReader::original_position(Self) -> Int
-pub fn LocalsReader::read(Self) -> (UInt, ValType) raise BinaryReaderError
+pub fn LocalsReader::get_count(Self) -> UInt32
+pub fn LocalsReader::original_position(Self) -> Int32
+pub fn LocalsReader::read(Self) -> (UInt32, ValType) raise BinaryReaderError
 
 pub(all) struct MemArg {
   align : Byte
   max_align : Byte
   offset : UInt64
-  memory : UInt
+  memory : UInt32
 } derive(Eq, @debug.Debug)
 
 pub(all) struct MemoryType {
@@ -561,7 +561,7 @@ pub(all) struct MemoryType {
   shared : Bool
   initial : UInt64
   maximum : UInt64?
-  page_size_log2 : UInt?
+  page_size_log2 : UInt32?
 } derive(Eq, @debug.Debug)
 pub fn MemoryType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn MemoryType::index_type(Self) -> ValType
@@ -577,19 +577,19 @@ pub(all) enum Operator {
   If(blockty~ : BlockType)
   Else
   End
-  Br(relative_depth~ : UInt)
-  BrIf(relative_depth~ : UInt)
+  Br(relative_depth~ : UInt32)
+  BrIf(relative_depth~ : UInt32)
   BrTable(targets~ : BrTable)
   Return
-  Call(function_index~ : UInt)
-  CallIndirect(type_index~ : UInt, table_index~ : UInt)
+  Call(function_index~ : UInt32)
+  CallIndirect(type_index~ : UInt32, table_index~ : UInt32)
   Drop
   Select
-  LocalGet(local_index~ : UInt)
-  LocalSet(local_index~ : UInt)
-  LocalTee(local_index~ : UInt)
-  GlobalGet(global_index~ : UInt)
-  GlobalSet(global_index~ : UInt)
+  LocalGet(local_index~ : UInt32)
+  LocalSet(local_index~ : UInt32)
+  LocalTee(local_index~ : UInt32)
+  GlobalGet(global_index~ : UInt32)
+  GlobalSet(global_index~ : UInt32)
   I32Load(memarg~ : MemArg)
   I64Load(memarg~ : MemArg)
   F32Load(memarg~ : MemArg)
@@ -613,9 +613,9 @@ pub(all) enum Operator {
   I64Store8(memarg~ : MemArg)
   I64Store16(memarg~ : MemArg)
   I64Store32(memarg~ : MemArg)
-  MemorySize(mem~ : UInt)
-  MemoryGrow(mem~ : UInt)
-  I32Const(value~ : Int)
+  MemorySize(mem~ : UInt32)
+  MemoryGrow(mem~ : UInt32)
+  I32Const(value~ : Int32)
   I64Const(value~ : Int64)
   F32Const(value~ : Ieee32)
   F64Const(value~ : Ieee64)
@@ -748,32 +748,32 @@ pub(all) enum Operator {
   I64Extend16S
   I64Extend32S
   RefEq
-  StructNew(struct_type_index~ : UInt)
-  StructNewDefault(struct_type_index~ : UInt)
-  StructGet(struct_type_index~ : UInt, field_index~ : UInt)
-  StructGetS(struct_type_index~ : UInt, field_index~ : UInt)
-  StructGetU(struct_type_index~ : UInt, field_index~ : UInt)
-  StructSet(struct_type_index~ : UInt, field_index~ : UInt)
-  ArrayNew(array_type_index~ : UInt)
-  ArrayNewDefault(array_type_index~ : UInt)
-  ArrayNewFixed(array_type_index~ : UInt, array_size~ : UInt)
-  ArrayNewData(array_type_index~ : UInt, array_data_index~ : UInt)
-  ArrayNewElem(array_type_index~ : UInt, array_elem_index~ : UInt)
-  ArrayGet(array_type_index~ : UInt)
-  ArrayGetS(array_type_index~ : UInt)
-  ArrayGetU(array_type_index~ : UInt)
-  ArraySet(array_type_index~ : UInt)
+  StructNew(struct_type_index~ : UInt32)
+  StructNewDefault(struct_type_index~ : UInt32)
+  StructGet(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructGetS(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructGetU(struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructSet(struct_type_index~ : UInt32, field_index~ : UInt32)
+  ArrayNew(array_type_index~ : UInt32)
+  ArrayNewDefault(array_type_index~ : UInt32)
+  ArrayNewFixed(array_type_index~ : UInt32, array_size~ : UInt32)
+  ArrayNewData(array_type_index~ : UInt32, array_data_index~ : UInt32)
+  ArrayNewElem(array_type_index~ : UInt32, array_elem_index~ : UInt32)
+  ArrayGet(array_type_index~ : UInt32)
+  ArrayGetS(array_type_index~ : UInt32)
+  ArrayGetU(array_type_index~ : UInt32)
+  ArraySet(array_type_index~ : UInt32)
   ArrayLen
-  ArrayFill(array_type_index~ : UInt)
-  ArrayCopy(array_type_index_dst~ : UInt, array_type_index_src~ : UInt)
-  ArrayInitData(array_type_index~ : UInt, array_data_index~ : UInt)
-  ArrayInitElem(array_type_index~ : UInt, array_elem_index~ : UInt)
+  ArrayFill(array_type_index~ : UInt32)
+  ArrayCopy(array_type_index_dst~ : UInt32, array_type_index_src~ : UInt32)
+  ArrayInitData(array_type_index~ : UInt32, array_data_index~ : UInt32)
+  ArrayInitElem(array_type_index~ : UInt32, array_elem_index~ : UInt32)
   RefTestNonNull(hty~ : HeapType)
   RefTestNullable(hty~ : HeapType)
   RefCastNonNull(hty~ : HeapType)
   RefCastNullable(hty~ : HeapType)
-  BrOnCast(relative_depth~ : UInt, from_ref_type~ : RefType, to_ref_type~ : RefType)
-  BrOnCastFail(relative_depth~ : UInt, from_ref_type~ : RefType, to_ref_type~ : RefType)
+  BrOnCast(relative_depth~ : UInt32, from_ref_type~ : RefType, to_ref_type~ : RefType)
+  BrOnCastFail(relative_depth~ : UInt32, from_ref_type~ : RefType, to_ref_type~ : RefType)
   AnyConvertExtern
   ExternConvertAny
   RefI31
@@ -787,25 +787,25 @@ pub(all) enum Operator {
   I64TruncSatF32U
   I64TruncSatF64S
   I64TruncSatF64U
-  MemoryInit(data_index~ : UInt, mem~ : UInt)
-  DataDrop(data_index~ : UInt)
-  MemoryCopy(dst_mem~ : UInt, src_mem~ : UInt)
-  MemoryFill(mem~ : UInt)
-  TableInit(elem_index~ : UInt, table~ : UInt)
-  ElemDrop(elem_index~ : UInt)
-  TableCopy(dst_table~ : UInt, src_table~ : UInt)
+  MemoryInit(data_index~ : UInt32, mem~ : UInt32)
+  DataDrop(data_index~ : UInt32)
+  MemoryCopy(dst_mem~ : UInt32, src_mem~ : UInt32)
+  MemoryFill(mem~ : UInt32)
+  TableInit(elem_index~ : UInt32, table~ : UInt32)
+  ElemDrop(elem_index~ : UInt32)
+  TableCopy(dst_table~ : UInt32, src_table~ : UInt32)
   TypedSelect(ty~ : ValType)
   RefNull(hty~ : HeapType)
   RefIsNull
-  RefFunc(function_index~ : UInt)
-  TableFill(table~ : UInt)
-  TableGet(table~ : UInt)
-  TableSet(table~ : UInt)
-  TableGrow(table~ : UInt)
-  TableSize(table~ : UInt)
-  ReturnCall(function_index~ : UInt)
-  ReturnCallIndirect(type_index~ : UInt, table_index~ : UInt)
-  MemoryDiscard(mem~ : UInt)
+  RefFunc(function_index~ : UInt32)
+  TableFill(table~ : UInt32)
+  TableGet(table~ : UInt32)
+  TableSet(table~ : UInt32)
+  TableGrow(table~ : UInt32)
+  TableSize(table~ : UInt32)
+  ReturnCall(function_index~ : UInt32)
+  ReturnCallIndirect(type_index~ : UInt32, table_index~ : UInt32)
+  MemoryDiscard(mem~ : UInt32)
   MemoryAtomicNotify(memarg~ : MemArg)
   MemoryAtomicWait32(memarg~ : MemArg)
   MemoryAtomicWait64(memarg~ : MemArg)
@@ -1130,60 +1130,60 @@ pub(all) enum Operator {
   I16x8RelaxedDotI8x16I7x16S
   I32x4RelaxedDotI8x16I7x16AddS
   TryTable(try_table~ : TryTable)
-  Throw(tag_index~ : UInt)
+  Throw(tag_index~ : UInt32)
   ThrowRef
   Try(blockty~ : BlockType)
-  Catch(tag_index~ : UInt)
-  Rethrow(relative_depth~ : UInt)
-  Delegate(relative_depth~ : UInt)
+  Catch(tag_index~ : UInt32)
+  Rethrow(relative_depth~ : UInt32)
+  Delegate(relative_depth~ : UInt32)
   CatchAll
-  GlobalAtomicGet(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicSet(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwAdd(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwSub(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwAnd(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwOr(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwXor(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwXchg(ordering~ : Ordering, global_index~ : UInt)
-  GlobalAtomicRmwCmpxchg(ordering~ : Ordering, global_index~ : UInt)
-  TableAtomicGet(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicSet(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicRmwXchg(ordering~ : Ordering, table_index~ : UInt)
-  TableAtomicRmwCmpxchg(ordering~ : Ordering, table_index~ : UInt)
-  StructAtomicGet(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicGetS(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicGetU(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicSet(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwAdd(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwSub(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwAnd(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwOr(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwXor(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwXchg(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  StructAtomicRmwCmpxchg(ordering~ : Ordering, struct_type_index~ : UInt, field_index~ : UInt)
-  ArrayAtomicGet(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicGetS(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicGetU(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicSet(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwAdd(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwSub(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwAnd(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwOr(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwXor(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwXchg(ordering~ : Ordering, array_type_index~ : UInt)
-  ArrayAtomicRmwCmpxchg(ordering~ : Ordering, array_type_index~ : UInt)
+  GlobalAtomicGet(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicSet(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwAdd(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwSub(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwAnd(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwOr(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwXor(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwXchg(ordering~ : Ordering, global_index~ : UInt32)
+  GlobalAtomicRmwCmpxchg(ordering~ : Ordering, global_index~ : UInt32)
+  TableAtomicGet(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicSet(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicRmwXchg(ordering~ : Ordering, table_index~ : UInt32)
+  TableAtomicRmwCmpxchg(ordering~ : Ordering, table_index~ : UInt32)
+  StructAtomicGet(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicGetS(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicGetU(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicSet(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwAdd(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwSub(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwAnd(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwOr(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwXor(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwXchg(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  StructAtomicRmwCmpxchg(ordering~ : Ordering, struct_type_index~ : UInt32, field_index~ : UInt32)
+  ArrayAtomicGet(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicGetS(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicGetU(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicSet(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwAdd(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwSub(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwAnd(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwOr(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwXor(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwXchg(ordering~ : Ordering, array_type_index~ : UInt32)
+  ArrayAtomicRmwCmpxchg(ordering~ : Ordering, array_type_index~ : UInt32)
   RefI31Shared
-  CallRef(type_index~ : UInt)
-  ReturnCallRef(type_index~ : UInt)
+  CallRef(type_index~ : UInt32)
+  ReturnCallRef(type_index~ : UInt32)
   RefAsNonNull
-  BrOnNull(relative_depth~ : UInt)
-  BrOnNonNull(relative_depth~ : UInt)
-  ContNew(cont_type_index~ : UInt)
-  ContBind(argument_index~ : UInt, result_index~ : UInt)
-  Suspend(tag_index~ : UInt)
-  Resume(cont_type_index~ : UInt, resume_table~ : ResumeTable)
-  ResumeThrow(cont_type_index~ : UInt, tag_index~ : UInt, resume_table~ : ResumeTable)
-  Switch(cont_type_index~ : UInt, tag_index~ : UInt)
+  BrOnNull(relative_depth~ : UInt32)
+  BrOnNonNull(relative_depth~ : UInt32)
+  ContNew(cont_type_index~ : UInt32)
+  ContBind(argument_index~ : UInt32, result_index~ : UInt32)
+  Suspend(tag_index~ : UInt32)
+  Resume(cont_type_index~ : UInt32, resume_table~ : ResumeTable)
+  ResumeThrow(cont_type_index~ : UInt32, tag_index~ : UInt32, resume_table~ : ResumeTable)
+  Switch(cont_type_index~ : UInt32, tag_index~ : UInt32)
   I64Add128
   I64Sub128
   I64MulWideS
@@ -1193,11 +1193,11 @@ pub fn Operator::proposal(Self) -> String
 pub fn Operator::visit_name(Self) -> String
 
 type OperatorValidator
-pub fn OperatorValidator::control_stack_height(Self) -> Int
-pub fn OperatorValidator::finish(Self, Int) -> Unit raise BinaryReaderError
-pub fn OperatorValidator::get_frame(Self, Int) -> Frame?
-pub fn OperatorValidator::operand_stack_height(Self) -> Int
-pub fn OperatorValidator::peek_operand_at(Self, Int) -> ValType??
+pub fn OperatorValidator::control_stack_height(Self) -> Int32
+pub fn OperatorValidator::finish(Self, Int32) -> Unit raise BinaryReaderError
+pub fn OperatorValidator::get_frame(Self, Int32) -> Frame?
+pub fn OperatorValidator::operand_stack_height(Self) -> Int32
+pub fn OperatorValidator::peek_operand_at(Self, Int32) -> ValType??
 
 pub struct OperatorValidatorAllocations {
   // private fields
@@ -1215,22 +1215,22 @@ pub fn OperatorsReader::ensure_end(Self) -> Unit raise BinaryReaderError
 pub fn OperatorsReader::eof(Self) -> Bool
 pub fn OperatorsReader::get_binary_reader(Self) -> BinaryReader
 pub fn OperatorsReader::is_end_then_eof(Self) -> Bool
-pub fn OperatorsReader::original_position(Self) -> Int
+pub fn OperatorsReader::original_position(Self) -> Int32
 pub fn OperatorsReader::read(Self) -> Operator raise BinaryReaderError
-pub fn OperatorsReader::read_with_offset(Self) -> (Operator, Int) raise BinaryReaderError
+pub fn OperatorsReader::read_with_offset(Self) -> (Operator, Int32) raise BinaryReaderError
 
 pub(all) enum Ordering {
   AcqRel
   SeqCst
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct PackedIndex(UInt) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct PackedIndex(UInt32) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn PackedIndex::as_core_type_id(Self) -> CoreTypeId?
-pub fn PackedIndex::as_module_index(Self) -> UInt?
-pub fn PackedIndex::as_rec_group_index(Self) -> UInt?
+pub fn PackedIndex::as_module_index(Self) -> UInt32?
+pub fn PackedIndex::as_rec_group_index(Self) -> UInt32?
 pub fn PackedIndex::from_id(CoreTypeId) -> Self?
-pub fn PackedIndex::from_module_index(UInt) -> Self?
-pub fn PackedIndex::from_rec_group_index(UInt) -> Self?
+pub fn PackedIndex::from_module_index(UInt32) -> Self?
+pub fn PackedIndex::from_rec_group_index(UInt32) -> Self?
 pub fn PackedIndex::is_canonical(Self) -> Bool
 pub fn PackedIndex::unpack(Self) -> UnpackedIndex
 pub impl Show for PackedIndex
@@ -1249,51 +1249,51 @@ pub fn Parser::set_features(Self, WasmFeatures) -> Unit
 pub fn Parser::skip_section(Self) -> Unit
 
 pub(all) enum Payload {
-  Version(num~ : UInt, encoding~ : Encoding, range~ : Range)
+  Version(num~ : UInt32, encoding~ : Encoding, range~ : Range)
   TypeSection(SectionLimited[RecGroup])
   ImportSection(SectionLimited[Import])
-  FunctionSection(SectionLimited[UInt])
+  FunctionSection(SectionLimited[UInt32])
   TableSection(SectionLimited[Table])
   MemorySection(SectionLimited[MemoryType])
   TagSection(SectionLimited[TagType])
   GlobalSection(SectionLimited[Global])
   ExportSection(SectionLimited[Export])
-  StartSection(func~ : UInt, range~ : Range)
+  StartSection(func~ : UInt32, range~ : Range)
   ElementSection(SectionLimited[Element])
-  DataCountSection(count~ : UInt, range~ : Range)
+  DataCountSection(count~ : UInt32, range~ : Range)
   DataSection(SectionLimited[Data])
-  CodeSectionStart(count~ : UInt, range~ : Range, size~ : UInt)
+  CodeSectionStart(count~ : UInt32, range~ : Range, size~ : UInt32)
   CodeSectionEntry(FunctionBody)
   CustomSection(CustomSectionReader)
   UnknownSection(id~ : Byte, contents~ : BytesView, range~ : Range)
-  End(Int)
+  End(Int32)
 }
 pub fn Payload::as_section(Self) -> (Byte, Range)?
 
 pub(all) struct Range {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, @debug.Debug)
 
 pub struct RecGroup {
   // private fields
 } derive(@debug.Debug)
-pub fn RecGroup::get(Self, Int) -> SubType
+pub fn RecGroup::get(Self, Int32) -> SubType
 pub fn RecGroup::into_types(Self) -> Array[SubType]
-pub fn RecGroup::into_types_and_offsets(Self) -> Array[(Int, SubType)]
+pub fn RecGroup::into_types_and_offsets(Self) -> Array[(Int32, SubType)]
 pub fn RecGroup::is_explicit_rec_group(Self) -> Bool
-pub fn RecGroup::len(Self) -> Int
+pub fn RecGroup::len(Self) -> Int32
 pub fn RecGroup::types(Self) -> Array[SubType]
 pub impl Eq for RecGroup
 pub impl Hash for RecGroup
 pub impl FromReader for RecGroup
 
 pub(all) struct RecGroupId {
-  index : UInt
+  index : UInt32
 } derive(Compare, Eq, Hash, @debug.Debug)
-pub fn RecGroupId::index(Self) -> Int
+pub fn RecGroupId::index(Self) -> Int32
 
-pub(all) struct RefType(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct RefType(UInt32) derive(Eq, Hash, @debug.Debug)
 pub fn RefType::as_non_null(Self) -> Self
 pub fn RefType::concrete(Bool, PackedIndex) -> Self
 pub fn RefType::difference(Self, Self) -> Self
@@ -1319,7 +1319,7 @@ pub(all) struct ResumeTable {
   handlers : Array[Handle]
 } derive(Eq, @debug.Debug)
 pub fn ResumeTable::from_reader(BinaryReader) -> Self raise BinaryReaderError
-pub fn ResumeTable::len(Self) -> Int
+pub fn ResumeTable::len(Self) -> Int32
 pub impl FromReader for ResumeTable
 
 pub struct SectionLimited[_] {
@@ -1327,20 +1327,20 @@ pub struct SectionLimited[_] {
 }
 pub fn[T] SectionLimited::clone(Self[T]) -> Self[T]
 pub fn[T : FromReader] SectionLimited::collect(Self[T]) -> Array[T] raise BinaryReaderError
-pub fn[T] SectionLimited::count(Self[T]) -> UInt
+pub fn[T] SectionLimited::count(Self[T]) -> UInt32
 pub fn[T] SectionLimited::into_iter(Self[T]) -> SectionLimitedIntoIter[T]
 pub fn SectionLimited::into_iter_err_on_gc_types(Self[RecGroup]) -> Array[FuncType] raise BinaryReaderError
 pub fn[T] SectionLimited::new(BinaryReader) -> Self[T] raise BinaryReaderError
-pub fn[T] SectionLimited::original_position(Self[T]) -> Int
+pub fn[T] SectionLimited::original_position(Self[T]) -> Int32
 pub fn[T] SectionLimited::range(Self[T]) -> Range
 
 pub struct SectionLimitedIntoIter[T] {
   // private fields
 }
 pub fn[T : FromReader] SectionLimitedIntoIter::next(Self[T]) -> T? raise BinaryReaderError
-pub fn[T : FromReader] SectionLimitedIntoIter::next_with_offset(Self[T]) -> (Int, T)? raise BinaryReaderError
-pub fn[T] SectionLimitedIntoIter::original_position(Self[T]) -> Int
-pub fn[T] SectionLimitedIntoIter::remaining(Self[T]) -> UInt
+pub fn[T : FromReader] SectionLimitedIntoIter::next_with_offset(Self[T]) -> (Int32, T)? raise BinaryReaderError
+pub fn[T] SectionLimitedIntoIter::original_position(Self[T]) -> Int32
+pub fn[T] SectionLimitedIntoIter::remaining(Self[T]) -> UInt32
 
 pub(all) enum StorageType {
   I8
@@ -1401,7 +1401,7 @@ pub(all) enum TagKind {
 
 pub(all) struct TagType {
   kind : TagKind
-  func_type_idx : UInt
+  func_type_idx : UInt32
 } derive(Eq, @debug.Debug)
 pub fn TagType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for TagType
@@ -1418,7 +1418,7 @@ pub struct TypeList {
 }
 pub fn TypeList::get(Self, CoreTypeId) -> SubType?
 pub fn TypeList::get_core(Self, CoreTypeId) -> SubType
-pub fn TypeList::len(Self) -> Int
+pub fn TypeList::len(Self) -> Int32
 pub fn TypeList::rec_group_id_of(Self, CoreTypeId) -> RecGroupId
 pub fn TypeList::reftype_is_shared(Self, RefType) -> Bool
 pub fn TypeList::reftype_is_subtype(Self, RefType, RefType) -> Bool
@@ -1428,7 +1428,7 @@ pub fn TypeList::valtype_is_shared(Self, ValType) -> Bool
 pub fn TypeList::valtype_is_subtype(Self, ValType, ValType) -> Bool
 
 pub(all) enum TypeRef {
-  Func(UInt)
+  Func(UInt32)
   Table(TableType)
   Memory(MemoryType)
   Global(GlobalType)
@@ -1440,31 +1440,31 @@ pub impl FromReader for TypeRef
 pub struct Types {
   // private fields
 }
-pub fn Types::core_function_at(Self, UInt) -> CoreTypeId
-pub fn Types::core_type_at_in_module(Self, UInt) -> CoreTypeId
-pub fn Types::core_type_count_in_module(Self) -> UInt
-pub fn Types::element_at(Self, UInt) -> RefType
-pub fn Types::element_count(Self) -> UInt
-pub fn Types::function_count(Self) -> UInt
+pub fn Types::core_function_at(Self, UInt32) -> CoreTypeId
+pub fn Types::core_type_at_in_module(Self, UInt32) -> CoreTypeId
+pub fn Types::core_type_count_in_module(Self) -> UInt32
+pub fn Types::element_at(Self, UInt32) -> RefType
+pub fn Types::element_count(Self) -> UInt32
+pub fn Types::function_count(Self) -> UInt32
 pub fn Types::get(Self, CoreTypeId) -> SubType?
-pub fn Types::global_at(Self, UInt) -> GlobalType
-pub fn Types::global_count(Self) -> UInt
+pub fn Types::global_at(Self, UInt32) -> GlobalType
+pub fn Types::global_count(Self) -> UInt32
 pub fn Types::id(Self) -> ValidatorId
-pub fn Types::memory_at(Self, UInt) -> MemoryType
-pub fn Types::memory_count(Self) -> UInt
-pub fn Types::table_at(Self, UInt) -> TableType
-pub fn Types::table_count(Self) -> UInt
-pub fn Types::tag_at(Self, UInt) -> CoreTypeId
-pub fn Types::tag_count(Self) -> UInt
+pub fn Types::memory_at(Self, UInt32) -> MemoryType
+pub fn Types::memory_count(Self) -> UInt32
+pub fn Types::table_at(Self, UInt32) -> TableType
+pub fn Types::table_count(Self) -> UInt32
+pub fn Types::tag_at(Self, UInt32) -> CoreTypeId
+pub fn Types::tag_count(Self) -> UInt32
 
 pub(all) enum UnpackedIndex {
-  Module(UInt)
-  RecGroup(UInt)
+  Module(UInt32)
+  RecGroup(UInt32)
   Id(CoreTypeId)
 } derive(Eq, Hash, @debug.Debug)
 pub fn UnpackedIndex::as_core_type_id(Self) -> CoreTypeId?
-pub fn UnpackedIndex::as_module_index(Self) -> UInt?
-pub fn UnpackedIndex::as_rec_group_index(Self) -> UInt?
+pub fn UnpackedIndex::as_module_index(Self) -> UInt32?
+pub fn UnpackedIndex::as_rec_group_index(Self) -> UInt32?
 pub fn UnpackedIndex::is_canonical(Self) -> Bool
 pub fn UnpackedIndex::output(Self, &Logger) -> Unit
 pub fn UnpackedIndex::pack(Self) -> PackedIndex?
@@ -1501,14 +1501,14 @@ pub struct Validator {
   // private fields
 }
 pub fn Validator::code_section_entry(Self, FunctionBody) -> FuncToValidate raise BinaryReaderError
-pub fn Validator::code_section_start(Self, UInt, Range) -> Unit raise BinaryReaderError
-pub fn Validator::data_count_section(Self, UInt, Range) -> Unit raise BinaryReaderError
+pub fn Validator::code_section_start(Self, UInt32, Range) -> Unit raise BinaryReaderError
+pub fn Validator::data_count_section(Self, UInt32, Range) -> Unit raise BinaryReaderError
 pub fn Validator::data_section(Self, SectionLimited[Data]) -> Unit raise BinaryReaderError
 pub fn Validator::element_section(Self, SectionLimited[Element]) -> Unit raise BinaryReaderError
-pub fn Validator::end(Self, Int) -> Types raise BinaryReaderError
+pub fn Validator::end(Self, Int32) -> Types raise BinaryReaderError
 pub fn Validator::export_section(Self, SectionLimited[Export]) -> Unit raise BinaryReaderError
 pub fn Validator::features(Self) -> WasmFeatures
-pub fn Validator::function_section(Self, SectionLimited[UInt]) -> Unit raise BinaryReaderError
+pub fn Validator::function_section(Self, SectionLimited[UInt32]) -> Unit raise BinaryReaderError
 pub fn Validator::global_section(Self, SectionLimited[Global]) -> Unit raise BinaryReaderError
 pub fn Validator::id(Self) -> ValidatorId
 pub fn Validator::import_section(Self, SectionLimited[Import]) -> Unit raise BinaryReaderError
@@ -1516,45 +1516,45 @@ pub fn Validator::memory_section(Self, SectionLimited[MemoryType]) -> Unit raise
 pub fn Validator::new() -> Self
 pub fn Validator::new_with_features(WasmFeatures) -> Self
 pub fn Validator::payload(Self, Payload) -> ValidPayload raise BinaryReaderError
-pub fn Validator::start_section(Self, UInt, Range) -> Unit raise BinaryReaderError
+pub fn Validator::start_section(Self, UInt32, Range) -> Unit raise BinaryReaderError
 pub fn Validator::table_section(Self, SectionLimited[Table]) -> Unit raise BinaryReaderError
 pub fn Validator::tag_section(Self, SectionLimited[TagType]) -> Unit raise BinaryReaderError
 pub fn Validator::type_section(Self, SectionLimited[RecGroup]) -> Unit raise BinaryReaderError
-pub fn Validator::types(Self, Int) -> Types?
+pub fn Validator::types(Self, Int32) -> Types?
 pub fn Validator::unknown_section(Self, Byte, Range) -> Unit raise BinaryReaderError
 pub fn Validator::validate_all(Self, BytesView) -> Types raise BinaryReaderError
-pub fn Validator::version(Self, UInt, Encoding, Range) -> Unit raise BinaryReaderError
+pub fn Validator::version(Self, UInt32, Encoding, Range) -> Unit raise BinaryReaderError
 
-pub(all) struct ValidatorId(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct ValidatorId(Int32) derive(Eq, Hash, @debug.Debug)
 
 pub struct ValidatorResources {
   // private fields
 }
-pub fn ValidatorResources::data_count(Self) -> UInt?
-pub fn ValidatorResources::element_count(Self) -> UInt
-pub fn ValidatorResources::element_type_at(Self, UInt) -> RefType?
-pub fn ValidatorResources::func_type_of_function(Self, UInt) -> FuncType?
-pub fn ValidatorResources::function_count(Self) -> UInt
-pub fn ValidatorResources::global_at(Self, UInt) -> GlobalType?
-pub fn ValidatorResources::is_function_referenced(Self, UInt) -> Bool
+pub fn ValidatorResources::data_count(Self) -> UInt32?
+pub fn ValidatorResources::element_count(Self) -> UInt32
+pub fn ValidatorResources::element_type_at(Self, UInt32) -> RefType?
+pub fn ValidatorResources::func_type_of_function(Self, UInt32) -> FuncType?
+pub fn ValidatorResources::function_count(Self) -> UInt32
+pub fn ValidatorResources::global_at(Self, UInt32) -> GlobalType?
+pub fn ValidatorResources::is_function_referenced(Self, UInt32) -> Bool
 pub fn ValidatorResources::is_shared(Self, RefType) -> Bool
 pub fn ValidatorResources::is_subtype(Self, ValType, ValType) -> Bool
-pub fn ValidatorResources::memory_at(Self, UInt) -> MemoryType?
-pub fn ValidatorResources::sub_type_at(Self, UInt) -> SubType?
+pub fn ValidatorResources::memory_at(Self, UInt32) -> MemoryType?
+pub fn ValidatorResources::sub_type_at(Self, UInt32) -> SubType?
 pub fn ValidatorResources::sub_type_at_id(Self, CoreTypeId) -> SubType
-pub fn ValidatorResources::table_at(Self, UInt) -> TableType?
-pub fn ValidatorResources::tag_at(Self, UInt) -> FuncType?
+pub fn ValidatorResources::table_at(Self, UInt32) -> TableType?
+pub fn ValidatorResources::tag_at(Self, UInt32) -> FuncType?
 pub fn ValidatorResources::top_type(Self, HeapType) -> HeapType
-pub fn ValidatorResources::type_count(Self) -> UInt
-pub fn ValidatorResources::type_id_of_function(Self, UInt) -> CoreTypeId?
-pub fn ValidatorResources::type_index_of_function(Self, UInt) -> UInt?
+pub fn ValidatorResources::type_count(Self) -> UInt32
+pub fn ValidatorResources::type_id_of_function(Self, UInt32) -> CoreTypeId?
+pub fn ValidatorResources::type_index_of_function(Self, UInt32) -> UInt32?
 pub fn ValidatorResources::types(Self) -> TypeList
 
 pub(all) struct WasmFeatures {
-  bits : UInt
+  bits : UInt32
 } derive(Eq, Hash)
 pub fn WasmFeatures::all() -> Self
-pub fn WasmFeatures::bits(Self) -> UInt
+pub fn WasmFeatures::bits(Self) -> UInt32
 pub fn WasmFeatures::bulk_memory(Self) -> Bool
 pub fn WasmFeatures::check_ref_type(Self, RefType) -> String?
 pub fn WasmFeatures::check_value_type(Self, ValType) -> String?
@@ -1564,18 +1564,18 @@ pub fn WasmFeatures::cm_async_stackful(Self) -> Bool
 pub fn WasmFeatures::cm_nested_names(Self) -> Bool
 pub fn WasmFeatures::cm_values(Self) -> Bool
 pub fn WasmFeatures::component_model(Self) -> Bool
-pub fn WasmFeatures::contains(Self, UInt) -> Bool
+pub fn WasmFeatures::contains(Self, UInt32) -> Bool
 pub fn WasmFeatures::custom_page_sizes(Self) -> Bool
 pub fn WasmFeatures::default() -> Self
 pub fn WasmFeatures::empty() -> Self
 pub fn WasmFeatures::exceptions(Self) -> Bool
 pub fn WasmFeatures::extended_const(Self) -> Bool
 pub fn WasmFeatures::floats(Self) -> Bool
-pub fn WasmFeatures::from_bits_truncate(UInt) -> Self
+pub fn WasmFeatures::from_bits_truncate(UInt32) -> Self
 pub fn WasmFeatures::function_references(Self) -> Bool
 pub fn WasmFeatures::gc(Self) -> Bool
 pub fn WasmFeatures::gc_types(Self) -> Bool
-pub fn WasmFeatures::insert(Self, UInt) -> Self
+pub fn WasmFeatures::insert(Self, UInt32) -> Self
 pub fn WasmFeatures::legacy_exceptions(Self) -> Bool
 pub fn WasmFeatures::memory64(Self) -> Bool
 pub fn WasmFeatures::memory_control(Self) -> Bool
@@ -1584,9 +1584,9 @@ pub fn WasmFeatures::multi_value(Self) -> Bool
 pub fn WasmFeatures::mutable_global(Self) -> Bool
 pub fn WasmFeatures::reference_types(Self) -> Bool
 pub fn WasmFeatures::relaxed_simd(Self) -> Bool
-pub fn WasmFeatures::remove(Self, UInt) -> Self
+pub fn WasmFeatures::remove(Self, UInt32) -> Self
 pub fn WasmFeatures::saturating_float_to_int(Self) -> Bool
-pub fn WasmFeatures::set(Self, UInt, Bool) -> Self
+pub fn WasmFeatures::set(Self, UInt32, Bool) -> Self
 pub fn WasmFeatures::shared_everything_threads(Self) -> Bool
 pub fn WasmFeatures::sign_extension(Self) -> Bool
 pub fn WasmFeatures::simd(Self) -> Bool
@@ -1597,53 +1597,53 @@ pub fn WasmFeatures::union(Self, Self) -> Self
 pub fn WasmFeatures::wide_arithmetic(Self) -> Bool
 
 pub struct WasmProposalValidator(OperatorValidatorTemp)
-pub fn WasmProposalValidator::set_offset(Self, Int) -> Unit
+pub fn WasmProposalValidator::set_offset(Self, Int32) -> Unit
 pub fn WasmProposalValidator::visit_any_convert_extern(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_get(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_get_s(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_get_u(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_add(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_and(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_cmpxchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_or(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_sub(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_xchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_rmw_xor(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_atomic_set(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_copy(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_fill(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_get(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_get_s(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_get_u(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_init_data(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_init_elem(Self, UInt, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_get(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_get_s(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_get_u(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_add(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_and(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_cmpxchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_or(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_sub(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_xchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_rmw_xor(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_atomic_set(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_copy(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_fill(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_get(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_get_s(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_get_u(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_init_data(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_init_elem(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_array_len(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_new(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_new_data(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_new_default(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_new_elem(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_new_fixed(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_array_set(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_new(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_new_data(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_new_default(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_new_elem(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_new_fixed(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_array_set(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_atomic_fence(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_block(Self, BlockType) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br_if(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br_on_cast(Self, UInt, RefType, RefType) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br_on_cast_fail(Self, UInt, RefType, RefType) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br_on_non_null(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_br_on_null(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br_if(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br_on_cast(Self, UInt32, RefType, RefType) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br_on_cast_fail(Self, UInt32, RefType, RefType) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br_on_non_null(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_br_on_null(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_br_table(Self, BrTable) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_call(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_call_indirect(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_call_ref(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_catch(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_call(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_call_indirect(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_call_ref(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_catch(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_catch_all(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_cont_bind(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_cont_new(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_data_drop(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_delegate(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_cont_bind(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_cont_new(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_data_drop(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_delegate(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_drop(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_elem_drop(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_elem_drop(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_else(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_end(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_extern_convert_any(Self) -> Unit raise BinaryReaderError
@@ -1767,17 +1767,17 @@ pub fn WasmProposalValidator::visit_f64x2_splat(Self) -> Unit raise BinaryReader
 pub fn WasmProposalValidator::visit_f64x2_sqrt(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_f64x2_sub(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_f64x2_trunc(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_get(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_add(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_and(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_cmpxchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_or(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_sub(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_xchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_rmw_xor(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_atomic_set(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_get(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_global_set(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_get(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_add(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_and(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_cmpxchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_or(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_sub(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_xchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_rmw_xor(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_atomic_set(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_get(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_global_set(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i16x8_abs(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i16x8_add(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i16x8_add_sat_s(Self) -> Unit raise BinaryReaderError
@@ -1859,7 +1859,7 @@ pub fn WasmProposalValidator::visit_i32_atomic_store(Self, MemArg) -> Unit raise
 pub fn WasmProposalValidator::visit_i32_atomic_store16(Self, MemArg) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i32_atomic_store8(Self, MemArg) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i32_clz(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_i32_const(Self, Int) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_i32_const(Self, Int32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i32_ctz(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i32_div_s(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i32_div_u(Self) -> Unit raise BinaryReaderError
@@ -2117,71 +2117,71 @@ pub fn WasmProposalValidator::visit_i8x16_sub_sat_s(Self) -> Unit raise BinaryRe
 pub fn WasmProposalValidator::visit_i8x16_sub_sat_u(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_i8x16_swizzle(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_if(Self, BlockType) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_local_get(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_local_set(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_local_tee(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_local_get(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_local_set(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_local_tee(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_loop(Self, BlockType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_memory_atomic_notify(Self, MemArg) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_memory_atomic_wait32(Self, MemArg) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_memory_atomic_wait64(Self, MemArg) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_copy(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_discard(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_fill(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_grow(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_init(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_memory_size(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_copy(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_discard(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_fill(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_grow(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_init(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_memory_size(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_nop(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_operator(Self, Operator) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_as_non_null(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_cast_non_null(Self, HeapType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_cast_nullable(Self, HeapType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_eq(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_ref_func(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_ref_func(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_i31(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_i31_shared(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_is_null(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_null(Self, HeapType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_test_non_null(Self, HeapType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_ref_test_nullable(Self, HeapType) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_resume(Self, UInt, ResumeTable) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_resume_throw(Self, UInt, UInt, ResumeTable) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_rethrow(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_resume(Self, UInt32, ResumeTable) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_resume_throw(Self, UInt32, UInt32, ResumeTable) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_rethrow(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_return(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_return_call(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_return_call_indirect(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_return_call_ref(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_return_call(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_return_call_indirect(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_return_call_ref(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_select(Self) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_get(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_get_s(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_get_u(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_add(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_and(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_cmpxchg(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_or(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_sub(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_xchg(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_rmw_xor(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_atomic_set(Self, Ordering, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_get(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_get_s(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_get_u(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_new(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_new_default(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_struct_set(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_suspend(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_switch(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_atomic_get(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_atomic_rmw_cmpxchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_atomic_rmw_xchg(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_atomic_set(Self, Ordering, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_copy(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_fill(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_get(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_grow(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_init(Self, UInt, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_set(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_table_size(Self, UInt) -> Unit raise BinaryReaderError
-pub fn WasmProposalValidator::visit_throw(Self, UInt) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_get(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_get_s(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_get_u(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_add(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_and(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_cmpxchg(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_or(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_sub(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_xchg(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_rmw_xor(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_atomic_set(Self, Ordering, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_get(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_get_s(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_get_u(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_new(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_new_default(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_struct_set(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_suspend(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_switch(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_atomic_get(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_atomic_rmw_cmpxchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_atomic_rmw_xchg(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_atomic_set(Self, Ordering, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_copy(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_fill(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_get(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_grow(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_init(Self, UInt32, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_set(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_table_size(Self, UInt32) -> Unit raise BinaryReaderError
+pub fn WasmProposalValidator::visit_throw(Self, UInt32) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_throw_ref(Self) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_try(Self, BlockType) -> Unit raise BinaryReaderError
 pub fn WasmProposalValidator::visit_try_table(Self, TryTable) -> Unit raise BinaryReaderError
@@ -2227,7 +2227,7 @@ pub type ElementSectionReader = SectionLimited[Element]
 
 pub type ExportSectionReader = SectionLimited[Export]
 
-pub type FunctionSectionReader = SectionLimited[UInt]
+pub type FunctionSectionReader = SectionLimited[UInt32]
 
 pub type GlobalSectionReader = SectionLimited[Global]
 
@@ -2246,5 +2246,5 @@ pub(open) trait FromReader {
   fn from_reader(BinaryReader) -> Self raise BinaryReaderError
 }
 pub impl FromReader for Bool
-pub impl FromReader for UInt
+pub impl FromReader for UInt32
 pub impl FromReader for String

@@ -18,14 +18,14 @@ pub(all) suberror CmsError {
   ParametricCurveZeroDivision
   InvalidRenderingIntent
   DivisionByZero
-  UnsupportedColorPrimaries(Int)
-  UnsupportedTrc(Int)
+  UnsupportedColorPrimaries(Int32)
+  UnsupportedTrc(Int32)
   InvalidLayout
   UnsupportedProfileConnection
   BuildTransferFunction
   UnsupportedChannelConfiguration
-  UnknownTag(UInt)
-  UnknownTagTypeDefinition(UInt)
+  UnknownTag(UInt32)
+  UnknownTagTypeDefinition(UInt32)
   UnsupportedLutRenderingIntent(RenderingIntent)
   InvalidAtoBLut
   OverflowingError
@@ -34,7 +34,7 @@ pub(all) suberror CmsError {
   MalformedCurveLutTable(MalformedSize)
   InvalidInksCountForProfile
   MalformedTrcCurve(String)
-  OutOfMemory(Int)
+  OutOfMemory(Int32)
   IncorrectlyFormedLut(String)
 } derive(Eq, @debug.Debug)
 pub impl Show for CmsError
@@ -68,12 +68,12 @@ pub(all) struct CicpProfile {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct ColorDateTime {
-  year : Int
-  month : Int
-  day_of_the_month : Int
-  hours : Int
-  minutes : Int
-  seconds : Int
+  year : Int32
+  month : Int32
+  day_of_the_month : Int32
+  hours : Int32
+  minutes : Int32
+  seconds : Int32
 } derive(Default, Eq, @debug.Debug)
 
 pub(all) struct ColorProfile {
@@ -155,9 +155,9 @@ pub fn DataColorSpace::check_layout(Self, Layout) -> Unit raise CmsError
 
 pub(all) struct DescriptionString {
   ascii_string : String
-  unicode_language_code : UInt
+  unicode_language_code : UInt32
   unicode_string : String
-  script_code_code : Int
+  script_code_code : Int32
   mac_string : String
 } derive(Eq, @debug.Debug)
 
@@ -183,7 +183,7 @@ pub(all) enum Layout {
   Inks14
   Inks15
 } derive(Eq, @debug.Debug)
-pub fn Layout::channels(Self) -> Int
+pub fn Layout::channels(Self) -> Int32
 
 pub(all) struct LocalizableString {
   language : String
@@ -192,12 +192,12 @@ pub(all) struct LocalizableString {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct LutDataType {
-  num_input_channels : Int
-  num_output_channels : Int
-  num_clut_grid_points : Int
+  num_input_channels : Int32
+  num_output_channels : Int32
+  num_clut_grid_points : Int32
   matrix : Matrix3d
-  num_input_table_entries : Int
-  num_output_table_entries : Int
+  num_input_table_entries : Int32
+  num_output_table_entries : Int32
   input_table : LutStore
   clut_table : LutStore
   output_table : LutStore
@@ -205,9 +205,9 @@ pub(all) struct LutDataType {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct LutMultidimensionalType {
-  num_input_channels : Int
-  num_output_channels : Int
-  grid_points : FixedArray[Int]
+  num_input_channels : Int32
+  num_output_channels : Int32
+  grid_points : FixedArray[Int32]
   clut : LutStore?
   a_curves : Array[ToneReprCurve]
   b_curves : Array[ToneReprCurve]
@@ -217,8 +217,8 @@ pub(all) struct LutMultidimensionalType {
 } derive(Eq, @debug.Debug)
 
 pub(all) enum LutStore {
-  Store8(FixedArray[Int])
-  Store16(FixedArray[Int])
+  Store8(FixedArray[Int32])
+  Store16(FixedArray[Int32])
 } derive(Eq, @debug.Debug)
 
 pub(all) enum LutType {
@@ -234,8 +234,8 @@ pub(all) enum LutWarehouse {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct MalformedSize {
-  size : Int
-  expected : Int
+  size : Int32
+  expected : Int32
 } derive(Eq, @debug.Debug)
 
 pub(all) struct Matrix3d {
@@ -338,11 +338,11 @@ pub(all) enum StandardObserver {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct TechnologySignatures {
-  signature : UInt
+  signature : UInt32
 } derive(Eq, @debug.Debug)
 
 pub(all) enum ToneReprCurve {
-  Lut(FixedArray[Int])
+  Lut(FixedArray[Int32])
   Parametric(FixedArray[Float])
 } derive(Eq, @debug.Debug)
 

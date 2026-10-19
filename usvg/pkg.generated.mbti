@@ -311,12 +311,12 @@ pub fn ClipPath::root(Self) -> Group
 pub fn ClipPath::transform(Self) -> @tiny_skia_path.Transform
 
 pub(all) struct Color {
-  red : Int
-  green : Int
-  blue : Int
+  red : Int32
+  green : Int32
+  blue : Int32
 } derive(Eq)
 pub fn Color::black() -> Self
-pub fn Color::new_rgb(Int, Int, Int) -> Self
+pub fn Color::new_rgb(Int32, Int32, Int32) -> Self
 pub fn Color::white() -> Self
 
 pub(all) enum ColorChannel {
@@ -352,13 +352,13 @@ pub(all) enum CompositeOperator {
 } derive(Eq)
 
 pub(all) struct ConvolveMatrixData {
-  target_x : UInt
-  target_y : UInt
-  columns : UInt
-  rows : UInt
+  target_x : UInt32
+  target_y : UInt32
+  columns : UInt32
+  rows : UInt32
   data : Array[Float]
 }
-pub fn ConvolveMatrixData::get(Self, UInt, UInt) -> Float
+pub fn ConvolveMatrixData::get(Self, UInt32, UInt32) -> Float
 
 pub(all) enum DbStyle {
   Normal
@@ -466,13 +466,13 @@ pub(all) enum EdgeMode {
 } derive(Eq)
 
 pub(all) struct FaceInfo {
-  mut id : Int
+  mut id : Int32
   source : Bytes
-  index : UInt
+  index : UInt32
   families : Array[(String, @otf.Language)]
   post_script_name : String
   style : DbStyle
-  weight : Int
+  weight : Int32
   stretch : FontStretch
   monospaced : Bool
 }
@@ -586,8 +586,8 @@ pub(all) struct FeTile {
 pub(all) struct FeTurbulence {
   base_frequency_x : PositiveF32
   base_frequency_y : PositiveF32
-  num_octaves : UInt
-  seed : Int
+  num_octaves : UInt32
+  seed : Int32
   stitch_tiles : Bool
   kind : TurbulenceKind
 }
@@ -649,27 +649,27 @@ pub fn Font::families(Self) -> Array[@svgtypes.FontFamily]
 pub fn Font::stretch(Self) -> FontStretch
 pub fn Font::style(Self) -> FontStyle
 pub fn Font::variations(Self) -> Array[FontVariation]
-pub fn Font::weight(Self) -> Int
+pub fn Font::weight(Self) -> Int32
 
 pub struct FontDatabase {
   // private fields
 }
 pub fn FontDatabase::clone(Self) -> Self
-pub fn FontDatabase::face(Self, Int) -> FaceInfo?
+pub fn FontDatabase::face(Self, Int32) -> FaceInfo?
 pub fn FontDatabase::faces(Self) -> Array[FaceInfo]
 pub fn FontDatabase::family_name(Self, @svgtypes.FontFamily) -> String
 pub fn FontDatabase::is_empty(Self) -> Bool
-pub fn FontDatabase::len(Self) -> Int
+pub fn FontDatabase::len(Self) -> Int32
 pub fn FontDatabase::load_font_data(Self, Bytes) -> Unit
 pub fn FontDatabase::new() -> Self
-pub fn FontDatabase::push_face_info(Self, FaceInfo) -> Int
-pub fn FontDatabase::query(Self, FontQuery) -> Int?
+pub fn FontDatabase::push_face_info(Self, FaceInfo) -> Int32
+pub fn FontDatabase::query(Self, FontQuery) -> Int32?
 pub fn FontDatabase::set_cursive_family(Self, String) -> Unit
 pub fn FontDatabase::set_fantasy_family(Self, String) -> Unit
 pub fn FontDatabase::set_monospace_family(Self, String) -> Unit
 pub fn FontDatabase::set_sans_serif_family(Self, String) -> Unit
 pub fn FontDatabase::set_serif_family(Self, String) -> Unit
-pub fn[T] FontDatabase::with_face_data(Self, Int, (Bytes, UInt) -> T) -> T?
+pub fn[T] FontDatabase::with_face_data(Self, Int32, (Bytes, UInt32) -> T) -> T?
 
 pub(all) enum FontOpticalSizing {
   OpticalAuto
@@ -679,18 +679,18 @@ pub impl Default for FontOpticalSizing
 
 pub(all) struct FontQuery {
   families : Array[@svgtypes.FontFamily]
-  weight : Int
+  weight : Int32
   stretch : FontStretch
   style : DbStyle
 }
 
 pub(all) struct FontResolver {
-  select_font : (Font, FontDatabase) -> Int?
-  select_fallback : (Char, Array[Int], FontDatabase) -> Int?
+  select_font : (Font, FontDatabase) -> Int32?
+  select_fallback : (Char, Array[Int32], FontDatabase) -> Int32?
 }
 pub fn FontResolver::default() -> Self
-pub fn FontResolver::default_fallback_selector() -> (Char, Array[Int], FontDatabase) -> Int?
-pub fn FontResolver::default_font_selector() -> (Font, FontDatabase) -> Int?
+pub fn FontResolver::default_fallback_selector() -> (Char, Array[Int32], FontDatabase) -> Int32?
+pub fn FontResolver::default_font_selector() -> (Font, FontDatabase) -> Int32?
 pub impl Default for FontResolver
 
 pub(all) enum FontStretch {
@@ -704,7 +704,7 @@ pub(all) enum FontStretch {
   ExtraExpanded
   UltraExpanded
 } derive(Compare, Eq, Hash)
-pub fn FontStretch::to_number(Self) -> Int
+pub fn FontStretch::to_number(Self) -> Int32
 pub impl Default for FontStretch
 
 pub(all) enum FontStyle {
@@ -894,9 +894,9 @@ pub struct NormalizedF32(Float) derive(Eq)
 pub fn NormalizedF32::get(Self) -> Float
 pub fn NormalizedF32::new(Float) -> Self?
 pub fn NormalizedF32::new_clamped(Float) -> Self
-pub fn NormalizedF32::new_u8(Int) -> Self
+pub fn NormalizedF32::new_u8(Int32) -> Self
 pub fn NormalizedF32::one() -> Self
-pub fn NormalizedF32::to_u8(Self) -> Int
+pub fn NormalizedF32::to_u8(Self) -> Int32
 pub fn NormalizedF32::zero() -> Self
 pub impl Mul for NormalizedF32
 pub impl FromValue for NormalizedF32
@@ -965,9 +965,9 @@ pub(all) struct PointLight {
 }
 
 pub struct PositionedGlyph {
-  id : Int
+  id : Int32
   text : String
-  font : Int
+  font : Int32
   // private fields
 }
 pub fn PositionedGlyph::cbdt_transform(Self, Float, Float, Float, Float) -> @tiny_skia_path.Transform
@@ -1168,7 +1168,7 @@ pub fn TextSpan::apply_kerning(Self) -> Bool
 pub fn TextSpan::baseline_shift(Self) -> Array[BaselineShift]
 pub fn TextSpan::decoration(Self) -> TextDecoration
 pub fn TextSpan::dominant_baseline(Self) -> DominantBaseline
-pub fn TextSpan::end(Self) -> Int
+pub fn TextSpan::end(Self) -> Int32
 pub fn TextSpan::fill(Self) -> Fill?
 pub fn TextSpan::font(Self) -> Font
 pub fn TextSpan::font_optical_sizing(Self) -> FontOpticalSizing
@@ -1178,7 +1178,7 @@ pub fn TextSpan::length_adjust(Self) -> LengthAdjust
 pub fn TextSpan::letter_spacing(Self) -> Float
 pub fn TextSpan::paint_order(Self) -> PaintOrder
 pub fn TextSpan::small_caps(Self) -> Bool
-pub fn TextSpan::start(Self) -> Int
+pub fn TextSpan::start(Self) -> Int32
 pub fn TextSpan::stroke(Self) -> Stroke?
 pub fn TextSpan::text_length(Self) -> Float?
 pub fn TextSpan::word_spacing(Self) -> Float
@@ -1235,8 +1235,8 @@ pub impl FromValue for Visibility
 pub(all) struct WriteOptions {
   id_prefix : String?
   preserve_text : Bool
-  coordinates_precision : Int
-  transforms_precision : Int
+  coordinates_precision : Int32
+  transforms_precision : Int32
   use_single_quote : Bool
   indent : @xmlwriter.Indent
   attributes_indent : @xmlwriter.Indent
@@ -1250,7 +1250,7 @@ pub(all) enum WritingMode {
 } derive(Eq)
 
 // Type aliases
-pub type FontId = Int
+pub type FontId = Int32
 
 // Traits
 pub(open) trait FromValue {

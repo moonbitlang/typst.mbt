@@ -6,15 +6,15 @@ import {
 }
 
 // Values
-pub fn all() -> Map[Int, Case]
+pub fn all() -> Map[Int32, Case]
 
-pub fn register(Int, () -> @doc.Document) -> Unit
+pub fn register(Int32, () -> @doc.Document) -> Unit
 
 // Errors
 
 // Types and methods
 pub struct Case {
-  number : Int
+  number : Int32
   build : () -> @doc.Document
 }
 

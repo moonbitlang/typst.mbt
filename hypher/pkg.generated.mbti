@@ -8,7 +8,7 @@ import {
 // Values
 pub fn hyphenate(StringView, Lang) -> Array[StringView]
 
-pub fn hyphenate_bounded(StringView, Lang, Int, Int) -> Array[StringView]
+pub fn hyphenate_bounded(StringView, Lang, Int32, Int32) -> Array[StringView]
 
 // Errors
 
@@ -63,7 +63,7 @@ pub(all) enum Lang {
   Turkmen
   Ukrainian
 } derive(Eq, Hash, @debug.Debug)
-pub fn Lang::bounds(Self) -> (Int, Int)
+pub fn Lang::bounds(Self) -> (Int32, Int32)
 pub fn Lang::from_iso(String) -> Self?
 pub fn Lang::hyphenation_character(Self) -> Char?
 

@@ -7,13 +7,13 @@ import {
 }
 
 // Values
-pub fn deflate_memo_stats() -> (Int, Int)
+pub fn deflate_memo_stats() -> (Int32, Int32)
 
 pub fn pdf(@layout.PagedDocument, PdfOptions) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
 
 pub fn pdf_in_bundle(@layout.PagedDocument, PdfOptions, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
 
-pub fn subset_memo_stats() -> (Int, Int)
+pub fn subset_memo_stats() -> (Int32, Int32)
 
 // Errors
 
@@ -55,12 +55,12 @@ pub(all) struct Timestamp {
   datetime : @library.Datetime
   timezone : Timezone
 }
-pub fn Timestamp::new_local(@library.Datetime, Int) -> Self?
+pub fn Timestamp::new_local(@library.Datetime, Int32) -> Self?
 pub fn Timestamp::new_utc(@library.Datetime) -> Self
 
 pub(all) enum Timezone {
   UTC
-  Local(Int, Int)
+  Local(Int32, Int32)
 } derive(Eq)
 
 // Type aliases

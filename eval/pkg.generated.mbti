@@ -26,9 +26,9 @@ pub fn hint_if_shadowed_std(Vm, @ast.Expr, @library.HintedString) -> @library.Hi
 
 pub fn import_(@library.Engine, String, @syntax.Span) -> @library.Module raise @library.SourceError
 
-pub fn module_memo_entries() -> Int
+pub fn module_memo_entries() -> Int32
 
-pub fn module_memo_stats() -> (Int, Int)
+pub fn module_memo_stats() -> (Int32, Int32)
 
 pub fn routines_eval_closure() -> (@library.Func, @library.Closure, @library.Engine, @library.Context, @library.Args) -> @library.Value raise @library.SourceError
 

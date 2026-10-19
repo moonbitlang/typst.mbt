@@ -10,23 +10,23 @@ pub fn parse_font_families(String) -> Array[FontFamily] raise SvgTypesError
 
 // Errors
 pub(all) suberror FilterValueListParserError {
-  PercentageValue(Int)
-  NegativeValue(Int)
-  InvalidAngle(Int)
-  MissingDropShadowOffset(Int)
-  InvalidUrl(Int)
+  PercentageValue(Int32)
+  NegativeValue(Int32)
+  InvalidAngle(Int32)
+  MissingDropShadowOffset(Int32)
+  InvalidUrl(Int32)
   StreamErrors(SvgTypesError)
 } derive(Eq, @debug.Debug)
 pub impl Show for FilterValueListParserError
 
 pub(all) suberror SvgTypesError {
   UnexpectedEndOfStream
-  UnexpectedData(Int)
+  UnexpectedData(Int32)
   InvalidValue
   InvalidIdent
-  InvalidChar(Array[Byte], Int)
-  InvalidString(Array[String], Int)
-  InvalidNumber(Int)
+  InvalidChar(Array[Byte], Int32)
+  InvalidString(Array[String], Int32)
+  InvalidNumber(Int32)
 } derive(Eq, @debug.Debug)
 pub fn SvgTypesError::output(Self, &Logger) -> Unit
 pub fn SvgTypesError::to_string(Self) -> String
@@ -284,10 +284,10 @@ pub fn SimplifyingPathParser::next(Self) -> Result[SimplePathSegment, SvgTypesEr
 pub struct Stream {
   // private fields
 }
-pub fn Stream::advance(Self, Int) -> Unit
+pub fn Stream::advance(Self, Int32) -> Unit
 pub fn Stream::at_end(Self) -> Bool
-pub fn Stream::calc_char_pos(Self) -> Int
-pub fn Stream::calc_char_pos_at(Self, Int) -> Int
+pub fn Stream::calc_char_pos(Self) -> Int32
+pub fn Stream::calc_char_pos_at(Self, Int32) -> Int32
 pub fn Stream::clone(Self) -> Self
 pub fn Stream::consume_ascii_ident(Self) -> String
 pub fn Stream::consume_byte(Self, Byte) -> Unit raise SvgTypesError
@@ -313,11 +313,11 @@ pub fn Stream::parse_list_number_or_percent(Self) -> Double raise SvgTypesError
 pub fn Stream::parse_number(Self) -> Double raise SvgTypesError
 pub fn Stream::parse_number_or_percent(Self) -> Double raise SvgTypesError
 pub fn Stream::parse_quoted_string(Self) -> String raise SvgTypesError
-pub fn Stream::pos(Self) -> Int
+pub fn Stream::pos(Self) -> Int32
 pub fn Stream::skip_bytes(Self, (Self, Byte) -> Bool) -> Unit
 pub fn Stream::skip_digits(Self) -> Unit
 pub fn Stream::skip_spaces(Self) -> Unit
-pub fn Stream::slice_back(Self, Int) -> String
+pub fn Stream::slice_back(Self, Int32) -> String
 pub fn Stream::slice_tail(Self) -> String
 pub fn Stream::starts_with(Self, Bytes) -> Bool
 pub fn Stream::text(Self) -> String

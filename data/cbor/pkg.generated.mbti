@@ -14,8 +14,8 @@ pub fn to_bytes(@serde.Data) -> Bytes
 // Errors
 pub(all) suberror CborError {
   Io(String)
-  Syntax(Int)
-  Semantic(Int?, String)
+  Syntax(Int32)
+  Semantic(Int32?, String)
   RecursionLimitExceeded
 } derive(@debug.Debug)
 pub fn CborError::message(Self) -> String

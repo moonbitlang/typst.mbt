@@ -7,13 +7,13 @@ import {
 }
 
 // Values
-pub fn breakpoints(String, cj~ : Bool, hyphenate~ : Bool, lang_at~ : (Int) -> @hypher.Lang?, hyphenate_at~ : (Int) -> Bool, (Int, Breakpoint) -> Unit) -> Unit
+pub fn breakpoints(String, cj~ : Bool, hyphenate~ : Bool, lang_at~ : (Int32) -> @hypher.Lang?, hyphenate_at~ : (Int32) -> Bool, (Int32, Breakpoint) -> Unit) -> Unit
 
 pub fn cj_segmenter() -> LineSegmenter
 
 pub fn default_segmenter() -> LineSegmenter
 
-pub fn line_break(Int) -> LineBreak
+pub fn line_break(Int32) -> LineBreak
 
 // Errors
 
@@ -21,12 +21,12 @@ pub fn line_break(Int) -> LineBreak
 pub(all) enum Breakpoint {
   Normal
   Mandatory
-  Hyphen(Int, Int)
+  Hyphen(Int32, Int32)
 } derive(Eq, Hash, @debug.Debug)
 pub fn Breakpoint::is_hyphen(Self) -> Bool
-pub fn Breakpoint::trim(Self, Int, String) -> Trim
-pub fn Breakpoint::trim_by(Self, Int, Int, ((Int) -> Bool) -> Int) -> Trim
-pub fn Breakpoint::trims(Self, Int) -> Bool
+pub fn Breakpoint::trim(Self, Int32, String) -> Trim
+pub fn Breakpoint::trim_by(Self, Int32, Int32, ((Int32) -> Bool) -> Int32) -> Trim
+pub fn Breakpoint::trims(Self, Int32) -> Bool
 
 pub(all) enum LineBreak {
   Unknown
@@ -107,11 +107,11 @@ pub struct LineSegmenter {
 pub fn LineSegmenter::new_cj(LineBreakOptions) -> Self
 pub fn LineSegmenter::new_for_non_complex_scripts(LineBreakOptions) -> Self
 pub fn LineSegmenter::new_lstm(LineBreakOptions) -> Self
-pub fn LineSegmenter::segment_str(Self, String) -> Array[Int]
+pub fn LineSegmenter::segment_str(Self, String) -> Array[Int32]
 
 pub(all) struct Trim {
-  layout : Int
-  shaping : Int
+  layout : Int32
+  shaping : Int32
 } derive(Eq, @debug.Debug)
 
 // Type aliases

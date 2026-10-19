@@ -2,19 +2,19 @@
 package "moonbitlang/typst/doc/format"
 
 // Values
-pub fn compact(Double, digits? : Int) -> String
+pub fn compact(Double, digits? : Int32) -> String
 
-pub fn fixed(Double, Int, trim? : Bool) -> String
+pub fn fixed(Double, Int32, trim? : Bool) -> String
 
-pub fn grouped(Double, digits? : Int, sep? : String) -> String
+pub fn grouped(Double, digits? : Int32, sep? : String) -> String
 
 pub fn grouped_int(Int64, sep? : String) -> String
 
-pub fn percent(Double, digits? : Int) -> String
+pub fn percent(Double, digits? : Int32) -> String
 
 pub fn soft_breaks(String, after? : String) -> String
 
-pub fn ticks(Double, Double, Int) -> Array[Double]
+pub fn ticks(Double, Double, Int32) -> Array[Double]
 
 // Errors
 

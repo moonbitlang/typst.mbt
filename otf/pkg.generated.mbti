@@ -18,7 +18,7 @@ pub let empty_data : BytesView
 
 pub fn f32_as_i16(Float) -> Int16
 
-pub fn f32_as_i32(Float) -> Int
+pub fn f32_as_i32(Float) -> Int32
 
 pub fn f32_as_u16(Float) -> UInt16
 
@@ -30,7 +30,7 @@ pub fn f32_max_of(Float, Float) -> Float
 
 pub fn f32_min_of(Float, Float) -> Float
 
-pub fn fonts_in_collection(BytesView) -> UInt?
+pub fn fonts_in_collection(BytesView) -> UInt32?
 
 pub fn i16_as_u16(Int16) -> UInt16
 
@@ -38,7 +38,7 @@ pub fn i16_bound(Int16, Int16, Int16) -> Int16
 
 pub fn i16_saturating_add(Int16, Int16) -> Int16
 
-pub fn i16_try_from_int(Int) -> Int16?
+pub fn i16_try_from_int(Int32) -> Int16?
 
 pub let name_id_compatible_full : UInt16
 
@@ -94,17 +94,17 @@ pub fn[T] opt(() -> T raise Malformed) -> T?
 
 pub fn[T] req(T?) -> T raise Malformed
 
-pub fn slice_from(BytesView, Int) -> BytesView?
+pub fn slice_from(BytesView, Int32) -> BytesView?
 
-pub fn slice_from_r(BytesView, Int) -> BytesView raise Malformed
+pub fn slice_from_r(BytesView, Int32) -> BytesView raise Malformed
 
-pub fn slice_get(BytesView, Int, Int) -> BytesView?
+pub fn slice_get(BytesView, Int32, Int32) -> BytesView?
 
-pub fn slice_r(BytesView, Int, Int) -> BytesView raise Malformed
+pub fn slice_r(BytesView, Int32, Int32) -> BytesView raise Malformed
 
 pub fn try_i16_from_f32(Float) -> Int16?
 
-pub fn try_i32_from_f32(Float) -> Int?
+pub fn try_i32_from_f32(Float) -> Int32?
 
 pub fn try_u16_from_f32(Float) -> UInt16?
 
@@ -120,17 +120,17 @@ pub fn u16_checked_sub(UInt16, UInt16) -> UInt16?
 
 pub fn u16_from_u8(Byte) -> UInt16
 
-pub fn u16_try_from_int(Int) -> UInt16?
+pub fn u16_try_from_int(Int32) -> UInt16?
 
-pub fn u16_try_from_u32(UInt) -> UInt16?
+pub fn u16_try_from_u32(UInt32) -> UInt16?
 
-pub fn u32_checked_add(UInt, UInt) -> UInt?
+pub fn u32_checked_add(UInt32, UInt32) -> UInt32?
 
-pub fn u32_checked_sub(UInt, UInt) -> UInt?
+pub fn u32_checked_sub(UInt32, UInt32) -> UInt32?
 
-pub fn usize_checked_add(Int, Int) -> Int?
+pub fn usize_checked_add(Int32, Int32) -> Int32?
 
-pub fn usize_checked_sub(Int, Int) -> Int?
+pub fn usize_checked_sub(Int32, Int32) -> Int32?
 
 pub fn utf8_to_string(BytesView) -> String?
 
@@ -217,7 +217,7 @@ pub fn AnkrTable::points(Self, GlyphId) -> LazyArray32[AnkrPoint]?
 pub(all) struct AvarTable {
   segment_maps : SegmentMaps
 }
-pub fn AvarTable::map_coordinate(Self, Array[NormalizedCoordinate], Int) -> Unit?
+pub fn AvarTable::map_coordinate(Self, Array[NormalizedCoordinate], Int32) -> Unit?
 pub fn AvarTable::parse(BytesView) -> Self?
 
 pub(all) struct AxisValueMap {
@@ -292,56 +292,56 @@ pub(all) struct CmapSubtable {
   encoding_id : UInt16
   format : CmapFormat
 }
-pub fn CmapSubtable::codepoint_ranges(Self, (UInt, UInt) -> Unit) -> Unit
-pub fn CmapSubtable::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable::glyph_index(Self, UInt) -> GlyphId?
-pub fn CmapSubtable::glyph_variation_index(Self, UInt, UInt) -> GlyphVariationResult?
+pub fn CmapSubtable::codepoint_ranges(Self, (UInt32, UInt32) -> Unit) -> Unit
+pub fn CmapSubtable::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable::glyph_index(Self, UInt32) -> GlyphId?
+pub fn CmapSubtable::glyph_variation_index(Self, UInt32, UInt32) -> GlyphVariationResult?
 pub fn CmapSubtable::is_unicode(Self) -> Bool
 
 pub struct CmapSubtable0 {
   glyph_ids : BytesView
 }
-pub fn CmapSubtable0::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable0::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable0::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable0::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable0::parse(BytesView) -> Self?
 
 pub struct CmapSubtable10 {
-  first_code_point : UInt
+  first_code_point : UInt32
   glyphs : LazyArray32[GlyphId]
 }
-pub fn CmapSubtable10::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable10::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable10::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable10::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable10::parse(BytesView) -> Self?
 
 pub struct CmapSubtable12 {
   groups : LazyArray32[SequentialMapGroup]
 }
-pub fn CmapSubtable12::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable12::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable12::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable12::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable12::parse(BytesView) -> Self?
 
 pub struct CmapSubtable13 {
   groups : LazyArray32[SequentialMapGroup]
 }
-pub fn CmapSubtable13::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable13::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable13::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable13::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable13::parse(BytesView) -> Self?
 
 pub struct CmapSubtable14 {
   records : LazyArray32[VariationSelectorRecord]
   data : BytesView
 }
-pub fn CmapSubtable14::glyph_index(Self, UInt, UInt) -> GlyphVariationResult?
+pub fn CmapSubtable14::glyph_index(Self, UInt32, UInt32) -> GlyphVariationResult?
 pub fn CmapSubtable14::parse(BytesView) -> Self?
 
 pub struct CmapSubtable2 {
   sub_header_keys : LazyArray16[UInt16]
-  sub_headers_offset : Int
+  sub_headers_offset : Int32
   sub_headers : LazyArray16[SubHeaderRecord]
   data : BytesView
 }
-pub fn CmapSubtable2::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable2::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable2::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable2::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable2::parse(BytesView) -> Self?
 
 pub struct CmapSubtable4 {
@@ -349,19 +349,19 @@ pub struct CmapSubtable4 {
   end_codes : LazyArray16[UInt16]
   id_deltas : LazyArray16[Int16]
   id_range_offsets : LazyArray16[UInt16]
-  id_range_offset_pos : Int
+  id_range_offset_pos : Int32
   data : BytesView
 }
-pub fn CmapSubtable4::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable4::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable4::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable4::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable4::parse(BytesView) -> Self?
 
 pub struct CmapSubtable6 {
   first_code_point : UInt16
   glyphs : LazyArray16[GlyphId]
 }
-pub fn CmapSubtable6::codepoints(Self, (UInt) -> Unit) -> Unit
-pub fn CmapSubtable6::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable6::codepoints(Self, (UInt32) -> Unit) -> Unit
+pub fn CmapSubtable6::glyph_index(Self, UInt32) -> GlyphId?
 pub fn CmapSubtable6::parse(BytesView) -> Self?
 
 type CmapSubtables
@@ -369,7 +369,7 @@ pub fn CmapSubtables::get(Self, UInt16) -> CmapSubtable?
 pub fn CmapSubtables::is_empty(Self) -> Bool
 pub fn CmapSubtables::iter(Self) -> Iter[CmapSubtable]
 pub fn CmapSubtables::len(Self) -> UInt16
-pub fn CmapSubtables::offset(Self, UInt16) -> UInt?
+pub fn CmapSubtables::offset(Self, UInt16) -> UInt32?
 pub impl Default for CmapSubtables
 
 pub struct CmapTable {
@@ -460,7 +460,7 @@ pub fn CursiveAnchorSet::len(Self) -> UInt16
 pub impl @debug.Debug for CursiveAnchorSet
 
 type DeltaSetIndexMap
-pub fn DeltaSetIndexMap::map(Self, UInt) -> (UInt16, UInt16)?
+pub fn DeltaSetIndexMap::map(Self, UInt32) -> (UInt16, UInt16)?
 pub fn DeltaSetIndexMap::new(BytesView) -> Self
 
 pub(all) enum Device {
@@ -516,10 +516,10 @@ pub fn Face::names(Self) -> Names
 pub fn Face::number_of_glyphs(Self) -> UInt16
 pub fn Face::outline_glyph(Self, GlyphId, &OutlineBuilder) -> Rect?
 pub fn Face::paint_color_glyph(Self, GlyphId, UInt16, RgbaColor, &ColrPainter) -> Unit?
-pub fn Face::parse(BytesView, UInt) -> Self raise FaceParsingError
+pub fn Face::parse(BytesView, UInt32) -> Self raise FaceParsingError
 pub fn Face::permissions(Self) -> Permissions?
 pub fn Face::raw_face(Self) -> RawFace
-pub fn Face::set_normalized_coordinates(Self, Array[Int]) -> Unit
+pub fn Face::set_normalized_coordinates(Self, Array[Int32]) -> Unit
 pub fn Face::set_variation(Self, Tag, Float) -> Unit?
 pub fn Face::strikeout_metrics(Self) -> LineMetrics?
 pub fn Face::style(Self) -> Style
@@ -613,8 +613,8 @@ type FeatureNamesIter
 pub fn FeatureNamesIter::next(Self) -> FeatureName?
 
 type FeatureVariations
-pub fn FeatureVariations::find_index(Self, ArrayView[NormalizedCoordinate]) -> UInt?
-pub fn FeatureVariations::find_substitute(Self, UInt16, UInt) -> Feature?
+pub fn FeatureVariations::find_index(Self, ArrayView[NormalizedCoordinate]) -> UInt32?
+pub fn FeatureVariations::find_substitute(Self, UInt16, UInt32) -> Feature?
 
 pub(all) struct Fixed(Float) derive(Eq, @debug.Debug)
 pub fn Fixed::apply_float_delta(Self, Float) -> Float
@@ -735,8 +735,8 @@ pub(all) struct HheaTable {
 pub fn HheaTable::parse(BytesView) -> Self?
 
 type HintingDevice
-pub fn HintingDevice::x_delta(Self, UInt16, (UInt16, UInt16)?) -> Int?
-pub fn HintingDevice::y_delta(Self, UInt16, (UInt16, UInt16)?) -> Int?
+pub fn HintingDevice::x_delta(Self, UInt16, (UInt16, UInt16)?) -> Int32?
+pub fn HintingDevice::y_delta(Self, UInt16, (UInt16, UInt16)?) -> Int32?
 pub impl @debug.Debug for HintingDevice
 
 pub(all) struct HmtxMetrics {
@@ -806,7 +806,7 @@ type KernSubtables
 pub fn KernSubtables::into_iter(Self) -> KernSubtablesIter
 pub fn KernSubtables::is_empty(Self) -> Bool
 pub fn KernSubtables::iter(Self) -> Iter[KernSubtable]
-pub fn KernSubtables::len(Self) -> UInt
+pub fn KernSubtables::len(Self) -> UInt32
 
 type KernSubtablesIter
 pub fn KernSubtablesIter::next(Self) -> KernSubtable?
@@ -817,7 +817,7 @@ pub(all) struct KernTable {
 pub fn KernTable::parse(BytesView) -> Self?
 
 pub(all) struct KerningPair {
-  pair : UInt
+  pair : UInt32
   value : Int16
 } derive(@debug.Debug)
 pub fn KerningPair::left(Self) -> GlyphId
@@ -845,7 +845,7 @@ pub(all) struct KerxSubtable {
   variable : Bool
   has_cross_stream : Bool
   has_state_machine : Bool
-  tuple_count : UInt
+  tuple_count : UInt32
   format : KerxFormat
 }
 pub fn KerxSubtable::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
@@ -1122,7 +1122,7 @@ pub struct LazyArray16[_] {
   data : BytesView
 }
 pub fn[T : FromData + Compare] LazyArray16::binary_search(Self[T], T) -> (UInt16, T)?
-pub fn[T : FromData] LazyArray16::binary_search_by(Self[T], (T) -> Int) -> (UInt16, T)?
+pub fn[T : FromData] LazyArray16::binary_search_by(Self[T], (T) -> Int32) -> (UInt16, T)?
 pub fn[T] LazyArray16::data(Self[T]) -> BytesView
 pub fn[T] LazyArray16::default() -> Self[T]
 pub fn[T : FromData] LazyArray16::get(Self[T], UInt16) -> T?
@@ -1139,13 +1139,13 @@ pub impl[T] Default for LazyArray16[T]
 pub struct LazyArray32[_] {
   data : BytesView
 }
-pub fn[T : FromData + Compare] LazyArray32::binary_search(Self[T], T) -> (UInt, T)?
-pub fn[T : FromData] LazyArray32::binary_search_by(Self[T], (T) -> Int) -> (UInt, T)?
+pub fn[T : FromData + Compare] LazyArray32::binary_search(Self[T], T) -> (UInt32, T)?
+pub fn[T : FromData] LazyArray32::binary_search_by(Self[T], (T) -> Int32) -> (UInt32, T)?
 pub fn[T] LazyArray32::default() -> Self[T]
-pub fn[T : FromData] LazyArray32::get(Self[T], UInt) -> T?
+pub fn[T : FromData] LazyArray32::get(Self[T], UInt32) -> T?
 pub fn[T : FromData] LazyArray32::is_empty(Self[T]) -> Bool
 pub fn[T : FromData] LazyArray32::iter(Self[T]) -> Iter[T]
-pub fn[T : FromData] LazyArray32::len(Self[T]) -> UInt
+pub fn[T : FromData] LazyArray32::len(Self[T]) -> UInt32
 pub fn[T] LazyArray32::new(BytesView) -> Self[T]
 pub impl[T] Default for LazyArray32[T]
 
@@ -1199,9 +1199,9 @@ pub fn LinearGradient::stops(Self, UInt16, ArrayView[NormalizedCoordinate]) -> G
 
 pub(all) enum LocaTable {
   Short(LazyArray16[UInt16])
-  Long(LazyArray16[UInt])
+  Long(LazyArray16[UInt32])
 }
-pub fn LocaTable::glyph_range(Self, GlyphId) -> (Int, Int)?
+pub fn LocaTable::glyph_range(Self, GlyphId) -> (Int32, Int32)?
 pub fn LocaTable::is_empty(Self) -> Bool
 pub fn LocaTable::len(Self) -> UInt16
 pub fn LocaTable::parse(UInt16, IndexToLocationFormat, BytesView) -> Self?
@@ -1389,7 +1389,7 @@ pub(all) struct MaxpTable {
 pub fn MaxpTable::parse(BytesView) -> Self?
 
 pub(all) struct MorxChain {
-  default_flags : UInt
+  default_flags : UInt32
   features : LazyArray32[MorxFeature]
   subtables : MorxSubtables
 }
@@ -1414,7 +1414,7 @@ pub struct MorxContextualSubtable {
   offsets : LazyArray32[Offset32]
   number_of_glyphs : UInt16
 }
-pub fn MorxContextualSubtable::lookup(Self, UInt) -> AatLookup?
+pub fn MorxContextualSubtable::lookup(Self, UInt32) -> AatLookup?
 
 pub(all) struct MorxCoverage(Byte) derive(@debug.Debug)
 pub fn MorxCoverage::is_all_directions(Self) -> Bool
@@ -1425,8 +1425,8 @@ pub fn MorxCoverage::is_vertical(Self) -> Bool
 pub(all) struct MorxFeature {
   kind : UInt16
   setting : UInt16
-  enable_flags : UInt
-  disable_flags : UInt
+  enable_flags : UInt32
+  disable_flags : UInt32
 } derive(@debug.Debug)
 pub impl FromData for MorxFeature
 
@@ -1443,7 +1443,7 @@ pub struct MorxInsertionSubtable {
 
 pub struct MorxLigatureSubtable {
   state : ExtendedStateTable[UInt16]
-  ligature_actions : LazyArray32[UInt]
+  ligature_actions : LazyArray32[UInt32]
   components : LazyArray32[UInt16]
   ligatures : LazyArray32[GlyphId]
 }
@@ -1451,7 +1451,7 @@ pub struct MorxLigatureSubtable {
 pub(all) struct MorxSubtable {
   kind : MorxSubtableKind
   coverage : MorxCoverage
-  feature_flags : UInt
+  feature_flags : UInt32
 }
 
 pub(all) enum MorxSubtableKind {
@@ -1517,19 +1517,19 @@ pub fn NormalizedCoordinate::get(Self) -> Int16
 
 pub(all) struct Offset16(UInt16) derive(Eq, @debug.Debug)
 pub fn Offset16::is_null(Self) -> Bool
-pub fn Offset16::to_usize(Self) -> Int
+pub fn Offset16::to_usize(Self) -> Int32
 pub impl FromData for Offset16
 pub impl Offset for Offset16
 
-pub(all) struct Offset24(UInt) derive(Eq, @debug.Debug)
+pub(all) struct Offset24(UInt32) derive(Eq, @debug.Debug)
 pub fn Offset24::is_null(Self) -> Bool
-pub fn Offset24::to_usize(Self) -> Int
+pub fn Offset24::to_usize(Self) -> Int32
 pub impl FromData for Offset24
 pub impl Offset for Offset24
 
-pub(all) struct Offset32(UInt) derive(Eq, @debug.Debug)
+pub(all) struct Offset32(UInt32) derive(Eq, @debug.Debug)
 pub fn Offset32::is_null(Self) -> Bool
-pub fn Offset32::to_usize(Self) -> Int
+pub fn Offset32::to_usize(Self) -> Int32
 pub impl FromData for Offset32
 pub impl Offset for Offset32
 
@@ -1628,7 +1628,7 @@ pub impl LookupSubtable for PositioningSubtable
 
 pub struct PostNames {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
 pub fn PostNames::next(Self) -> String?
 
@@ -1690,7 +1690,7 @@ pub(all) struct RawFace {
   data : BytesView
   table_records : LazyArray16[TableRecord]
 }
-pub fn RawFace::parse(BytesView, UInt) -> Self raise FaceParsingError
+pub fn RawFace::parse(BytesView, UInt32) -> Self raise FaceParsingError
 pub fn RawFace::table(Self, Tag) -> BytesView?
 
 pub(all) struct RawFaceTables {
@@ -1795,11 +1795,11 @@ pub fn SbixStrike::is_empty(Self) -> Bool
 pub fn SbixStrike::len(Self) -> UInt16
 
 type SbixStrikes
-pub fn SbixStrikes::get(Self, UInt) -> SbixStrike?
+pub fn SbixStrikes::get(Self, UInt32) -> SbixStrike?
 pub fn SbixStrikes::into_iter(Self) -> SbixStrikesIter
 pub fn SbixStrikes::is_empty(Self) -> Bool
 pub fn SbixStrikes::iter(Self) -> Iter[SbixStrike]
-pub fn SbixStrikes::len(Self) -> UInt
+pub fn SbixStrikes::len(Self) -> UInt32
 
 type SbixStrikesIter
 pub fn SbixStrikesIter::next(Self) -> SbixStrike?
@@ -1847,9 +1847,9 @@ pub(all) struct SequenceRule {
 pub impl FromSlice for SequenceRule
 
 pub struct SequentialMapGroup {
-  start_char_code : UInt
-  end_char_code : UInt
-  start_glyph_id : UInt
+  start_char_code : UInt32
+  end_char_code : UInt32
+  start_glyph_id : UInt32
 }
 pub impl FromData for SequentialMapGroup
 
@@ -1942,7 +1942,7 @@ pub fn StatAxisValueSubtables::next(Self) -> StatAxisValueSubtable?
 pub struct StatTable {
   axes : LazyArray16[StatAxisRecord]
   fallback_name_id : UInt16?
-  version : UInt
+  version : UInt32
   data : BytesView
   value_lookup_start : Offset32
   value_offsets : LazyArray16[Offset16]
@@ -1953,32 +1953,32 @@ pub fn StatTable::subtables(Self) -> StatAxisValueSubtables
 
 pub struct Stream {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
-pub fn Stream::advance(Self, Int) -> Unit
-pub fn Stream::advance_checked(Self, Int) -> Unit raise Malformed
+pub fn Stream::advance(Self, Int32) -> Unit
+pub fn Stream::advance_checked(Self, Int32) -> Unit raise Malformed
 pub fn Stream::at_end(Self) -> Bool
 pub fn Stream::copy(Self) -> Self
 pub fn Stream::data(Self) -> BytesView
 pub fn Stream::default() -> Self
 pub fn Stream::jump_to_end(Self) -> Unit
 pub fn Stream::new(BytesView) -> Self
-pub fn Stream::new_at(BytesView, Int) -> Self?
-pub fn Stream::new_at_r(BytesView, Int) -> Self raise Malformed
-pub fn Stream::offset(Self) -> Int
+pub fn Stream::new_at(BytesView, Int32) -> Self?
+pub fn Stream::new_at_r(BytesView, Int32) -> Self raise Malformed
+pub fn Stream::offset(Self) -> Int32
 pub fn[T : FromData] Stream::read(Self) -> T raise Malformed
 pub fn[T : FromData] Stream::read_array16(Self, UInt16) -> LazyArray16[T] raise Malformed
-pub fn[T : FromData] Stream::read_array32(Self, UInt) -> LazyArray32[T] raise Malformed
-pub fn[T : FromData] Stream::read_at(BytesView, Int) -> T raise Malformed
+pub fn[T : FromData] Stream::read_array32(Self, UInt32) -> LazyArray32[T] raise Malformed
+pub fn[T : FromData] Stream::read_at(BytesView, Int32) -> T raise Malformed
 pub fn Stream::read_at_offset16(Self, BytesView) -> BytesView raise Malformed
-pub fn Stream::read_bytes(Self, Int) -> BytesView raise Malformed
+pub fn Stream::read_bytes(Self, Int32) -> BytesView raise Malformed
 pub fn Stream::read_f2dot14(Self) -> F2DOT14 raise Malformed
 pub fn Stream::read_i16(Self) -> Int16 raise Malformed
-pub fn Stream::read_i32(Self) -> Int raise Malformed
-pub fn Stream::read_i8(Self) -> Int raise Malformed
+pub fn Stream::read_i32(Self) -> Int32 raise Malformed
+pub fn Stream::read_i8(Self) -> Int32 raise Malformed
 pub fn[T : FromData] Stream::read_opt(Self) -> T?
 pub fn Stream::read_u16(Self) -> UInt16 raise Malformed
-pub fn Stream::read_u32(Self) -> UInt raise Malformed
+pub fn Stream::read_u32(Self) -> UInt32 raise Malformed
 pub fn Stream::read_u8(Self) -> Byte raise Malformed
 pub fn Stream::tail(Self) -> BytesView?
 pub fn Stream::tail_r(Self) -> BytesView raise Malformed
@@ -2032,7 +2032,7 @@ pub fn SvgDocumentsList::len(Self) -> UInt16
 
 type SvgDocumentsListIter
 pub fn SvgDocumentsListIter::copy(Self) -> Self
-pub fn SvgDocumentsListIter::count(Self) -> Int
+pub fn SvgDocumentsListIter::count(Self) -> Int32
 pub fn SvgDocumentsListIter::next(Self) -> SvgDocument?
 
 pub(all) struct SvgTable {
@@ -2053,15 +2053,15 @@ pub fn SweepGradient::stops(Self, UInt16, ArrayView[NormalizedCoordinate]) -> Gr
 
 pub(all) struct TableRecord {
   tag : Tag
-  check_sum : UInt
-  offset : UInt
-  length : UInt
+  check_sum : UInt32
+  offset : UInt32
+  length : UInt32
 } derive(@debug.Debug)
 pub impl FromData for TableRecord
 
-pub(all) struct Tag(UInt) derive(Compare, Default, Eq, Hash)
-pub fn Tag::as_u32(Self) -> UInt
-pub fn Tag::compare(Self, Self) -> Int
+pub(all) struct Tag(UInt32) derive(Compare, Default, Eq, Hash)
+pub fn Tag::as_u32(Self) -> UInt32
+pub fn Tag::compare(Self, Self) -> Int32
 pub fn Tag::from_bytes(Bytes) -> Self
 pub fn Tag::from_bytes_lossy(BytesView) -> Self
 pub fn Tag::from_str(String) -> Self
@@ -2126,17 +2126,17 @@ pub fn Transform::new_translate(Float, Float) -> Self
 pub impl Default for Transform
 pub impl @debug.Debug for Transform
 
-pub(all) struct U24(UInt) derive(Eq, @debug.Debug)
+pub(all) struct U24(UInt32) derive(Eq, @debug.Debug)
 pub impl FromData for U24
 
 pub struct UVSMappingRecord {
-  unicode_value : UInt
+  unicode_value : UInt32
   glyph_id : GlyphId
 }
 pub impl FromData for UVSMappingRecord
 
 pub struct UnicodeRangeRecord {
-  start_unicode_value : UInt
+  start_unicode_value : UInt32
   additional_count : Byte
 }
 pub impl FromData for UnicodeRangeRecord
@@ -2194,7 +2194,7 @@ type VariationRegionList
 pub fn VariationRegionList::evaluate_region(Self, UInt16, ArrayView[NormalizedCoordinate]) -> Float
 
 pub struct VariationSelectorRecord {
-  var_selector : UInt
+  var_selector : UInt32
   default_uvs_offset : Offset32?
   non_default_uvs_offset : Offset32?
 }
@@ -2295,7 +2295,7 @@ pub type SequenceRuleSets = LazyOffsetArray16[LazyOffsetArray16[SequenceRule]]
 
 pub type StateEntry = GenericStateEntry[Unit]
 
-pub type VariationIndex = UInt
+pub type VariationIndex = UInt32
 
 // Traits
 pub(open) trait ColrPainter {
@@ -2311,14 +2311,14 @@ pub(open) trait ColrPainter {
 }
 
 pub(open) trait FromData {
-  fn size() -> Int
+  fn size() -> Int32
   fn parse(BytesView) -> Self raise Malformed
 }
 pub impl FromData for Unit
 pub impl FromData for Byte
-pub impl FromData for Int
+pub impl FromData for Int32
 pub impl FromData for Int16
-pub impl FromData for UInt
+pub impl FromData for UInt32
 pub impl FromData for UInt16
 pub impl FromData for UInt64
 pub impl[T : Offset] FromData for T?
@@ -2332,7 +2332,7 @@ pub(open) trait LookupSubtable {
 }
 
 pub(open) trait Offset : FromData {
-  fn to_usize(Self) -> Int
+  fn to_usize(Self) -> Int32
   fn is_null(Self) -> Bool
 }
 

@@ -10,15 +10,15 @@ import {
 }
 
 // Values
-pub fn block_memo_stats() -> (Int, Int)
+pub fn block_memo_stats() -> (Int32, Int32)
 
 pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
 
 pub fn create_shape_plan(@library.FontInstance, @shape.Direction, @shape.Script, @shape.Language?, ArrayView[@shape.Feature]) -> @shape.ShapePlan
 
-pub fn document_memo_entries() -> Int
+pub fn document_memo_entries() -> Int32
 
-pub fn document_memo_stats() -> (Int, Int)
+pub fn document_memo_stats() -> (Int32, Int32)
 
 pub fn features(@library.StyleChain) -> Array[@shape.Feature]
 
@@ -104,9 +104,9 @@ pub fn[T : FrameModify] modified(T, FrameModifiers) -> T
 
 pub fn modify_text(@library.Frame, @library.StyleChain) -> Unit
 
-pub fn page_run_memo_entries() -> Int
+pub fn page_run_memo_entries() -> Int32
 
-pub fn page_run_memo_stats() -> (Int, Int)
+pub fn page_run_memo_stats() -> (Int32, Int32)
 
 pub fn register(@library.NativeRuleMap) -> Unit
 
@@ -122,7 +122,7 @@ pub fn styled_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@l
 
 // Types and methods
 pub(all) struct ColumnOptions {
-  count : Int
+  count : Int32
   balanced : Bool
   gutter : @library.Rel[@library.Abs]
   separator : @library.Content?

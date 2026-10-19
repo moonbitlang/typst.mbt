@@ -24,7 +24,7 @@ pub fn env_var(String) -> String?
 
 pub fn exists(String) -> Bool
 
-pub fn exit(Int) -> Unit
+pub fn exit(Int32) -> Unit
 
 pub fn file_name(String) -> String?
 
@@ -42,7 +42,7 @@ pub fn join(String, String) -> String
 
 pub fn knows_local_time_zone() -> Bool
 
-pub fn local_offset(Int64) -> Int
+pub fn local_offset(Int64) -> Int32
 
 pub fn lstat_kind(String) -> FileKind raise IoError
 
@@ -52,7 +52,7 @@ pub fn now_ms() -> Int64
 
 pub fn os() -> Os
 
-pub fn os_error(Int) -> IoError
+pub fn os_error(Int32) -> IoError
 
 pub fn parent(String) -> String?
 
@@ -131,7 +131,7 @@ pub struct RangedFile {
 }
 pub fn RangedFile::close(Self) -> Unit
 pub fn RangedFile::open(String) -> Self raise IoError
-pub fn RangedFile::read(Self, Int64, Int) -> Bytes raise IoError
+pub fn RangedFile::read(Self, Int64, Int32) -> Bytes raise IoError
 pub fn RangedFile::size(Self) -> Int64 raise IoError
 
 // Type aliases

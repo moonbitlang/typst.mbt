@@ -33,21 +33,21 @@ pub(all) enum ColorSpace {
   Gray
   RGB
   CMYK
-  Unknown(num_channels~ : Int)
-  Icc(profile~ : Bytes, num_channels~ : Int)
+  Unknown(num_channels~ : Int32)
+  Icc(profile~ : Bytes, num_channels~ : Int32)
 } derive(Eq, @debug.Debug)
-pub fn ColorSpace::num_channels(Self) -> Int
+pub fn ColorSpace::num_channels(Self) -> Int32
 
 pub struct ComponentData {
   // private fields
 }
-pub fn ComponentData::bit_depth(Self) -> Int
+pub fn ComponentData::bit_depth(Self) -> Int32
 pub fn ComponentData::samples(Self) -> ArrayView[Float]
 
 pub(all) struct DecodeSettings {
   resolve_palette_indices : Bool
   strict : Bool
-  target_resolution : (UInt, UInt)?
+  target_resolution : (UInt32, UInt32)?
 } derive(@debug.Debug)
 pub impl Default for DecodeSettings
 
@@ -95,10 +95,10 @@ pub struct Image {
 pub fn Image::color_space(Self) -> ColorSpace
 pub fn Image::decode(Self, DecoderContext) -> DecodedImage raise DecodeError
 pub fn Image::has_alpha(Self) -> Bool
-pub fn Image::height(Self) -> UInt
+pub fn Image::height(Self) -> UInt32
 pub fn Image::new(BytesView, DecodeSettings) -> Self raise DecodeError
-pub fn Image::original_bit_depth(Self) -> Int
-pub fn Image::width(Self) -> UInt
+pub fn Image::original_bit_depth(Self) -> Int32
+pub fn Image::width(Self) -> UInt32
 
 pub(all) enum MarkerError {
   Invalid

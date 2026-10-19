@@ -29,13 +29,13 @@ pub fn simplify_children(ElemChildren) -> ElemChildren
 
 pub fn standalone_citation(CitationRequest) -> ElemChildren
 
-pub fn[W : FmtWrite] write_year(Int, Bool, W, String, String) -> Unit
+pub fn[W : FmtWrite] write_year(Int32, Bool, W, String, String) -> Unit
 
 // Errors
 
 // Types and methods
 pub(all) struct Alphanumerical {
-  letters : Int
+  letters : Int32
 } derive(Eq, Hash, @debug.Debug)
 pub fn Alphanumerical::citation(Self, Entry) -> String
 pub fn Alphanumerical::new() -> Self
@@ -142,7 +142,7 @@ pub struct BibliographyDriver {
 pub fn BibliographyDriver::citation(Self, CitationRequest) -> Unit
 pub fn BibliographyDriver::finish(Self, BibliographyRequest) -> Rendered
 pub fn BibliographyDriver::new() -> Self
-pub fn BibliographyDriver::with_citation_number_offset(Self, Int) -> Self
+pub fn BibliographyDriver::with_citation_number_offset(Self, Int32) -> Self
 
 pub(all) struct BibliographyItem {
   key : String
@@ -192,7 +192,7 @@ pub fn CaseFolder::ends_with(Self, Char) -> Bool
 pub fn CaseFolder::finish(Self) -> String
 pub fn CaseFolder::has_content(Self) -> Bool
 pub fn CaseFolder::is_empty(Self) -> Bool
-pub fn CaseFolder::len(Self) -> Int
+pub fn CaseFolder::len(Self) -> Int32
 pub fn CaseFolder::mark_changed(Self) -> Unit
 pub fn CaseFolder::new() -> Self
 pub fn CaseFolder::prevent_trimming(Self) -> Unit
@@ -210,7 +210,7 @@ pub(all) enum ChunkKind {
   Math
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct ChunkedStrParseError(Int) derive(Eq, @debug.Debug)
+pub(all) struct ChunkedStrParseError(Int32) derive(Eq, @debug.Debug)
 pub fn ChunkedStrParseError::output(Self, &Logger) -> Unit
 pub fn ChunkedStrParseError::to_string(Self) -> String
 pub impl Show for ChunkedStrParseError
@@ -226,7 +226,7 @@ pub fn ChunkedString::from_chunk(StringChunk) -> Self
 pub fn ChunkedString::from_str(String) -> Result[Self, ChunkedStrParseError]
 pub fn ChunkedString::from_string(String) -> Self
 pub fn ChunkedString::is_empty(Self) -> Bool
-pub fn ChunkedString::len(Self) -> Int
+pub fn ChunkedString::len(Self) -> Int32
 pub fn ChunkedString::new() -> Self
 pub fn ChunkedString::output(Self, &Logger) -> Unit
 pub fn ChunkedString::push_char(Self, Char, ChunkKind) -> Unit
@@ -258,7 +258,7 @@ pub struct CitationRequest {
   // private fields
 }
 pub fn CitationRequest::from_items(Array[CitationItem], @citationberg.IndependentStyle, Array[@citationberg.Locale]) -> Self
-pub fn CitationRequest::new(Array[CitationItem], @citationberg.IndependentStyle, @citationberg.LocaleCode?, Array[@citationberg.Locale], Int?) -> Self
+pub fn CitationRequest::new(Array[CitationItem], @citationberg.IndependentStyle, @citationberg.LocaleCode?, Array[@citationberg.Locale], Int32?) -> Self
 
 pub(all) enum CitePurpose {
   Author
@@ -268,36 +268,36 @@ pub(all) enum CitePurpose {
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct Date {
-  year : Int
-  month : Int?
-  day : Int?
+  year : Int32
+  month : Int32?
+  day : Int32?
   approximate : Bool
   season : @citationberg.Season?
 } derive(Eq, Hash, @debug.Debug)
-pub fn Date::csl_cmp(Self, Self) -> Int
+pub fn Date::csl_cmp(Self, Self) -> Int32
 pub fn Date::display_year(Self) -> String
 pub fn Date::display_year_opt(Self, Bool, Bool, Bool, Bool) -> String
 pub fn Date::from_str(String) -> Result[Self, DateError]
-pub fn Date::from_year(Int) -> Self
+pub fn Date::from_year(Int32) -> Self
 pub impl Show for Date
 
 pub(all) enum DateError {
   UnknownFormat
   MonthOutOfBounds
-  DayOutOfBounds(Int)
+  DayOutOfBounds(Int32)
 } derive(Eq, @debug.Debug)
 pub fn DateError::output(Self, &Logger) -> Unit
 pub fn DateError::to_string(Self) -> String
 pub impl Show for DateError
 
 pub(all) struct Duration {
-  days : Int
-  hours : Int
-  minutes : Int
-  seconds : Int
-  milliseconds : Int
+  days : Int32
+  hours : Int32
+  minutes : Int32
+  seconds : Int32
+  milliseconds : Int32
 } derive(Eq, Hash, @debug.Debug)
-pub fn Duration::cmp(Self, Self) -> Int
+pub fn Duration::cmp(Self, Self) -> Int32
 pub fn Duration::from_str(String) -> Result[Self, DurationError]
 pub fn Duration::output(Self, &Logger) -> Unit
 pub fn Duration::to_string(Self) -> String
@@ -332,7 +332,7 @@ pub(all) enum ElemChild {
   Elem(Elem)
   Markup(String)
   Link(text~ : Formatted, url~ : String)
-  Transparent(cite_idx~ : Int, format~ : Formatting)
+  Transparent(cite_idx~ : Int32, format~ : Formatting)
 } derive(Eq, Hash, @debug.Debug)
 pub fn ElemChild::copy(Self) -> Self
 pub fn[W : FmtWrite] ElemChild::write_buf(Self, W, BufWriteFormat) -> Unit
@@ -362,8 +362,8 @@ pub(all) enum ElemMeta {
   Number
   Label
   CitationNumber
-  Name(@citationberg.NameVariable, Int)
-  Entry(Int)
+  Name(@citationberg.NameVariable, Int32)
+  Entry(Int32)
   CitationLabel
 } derive(Eq, Hash, @debug.Debug)
 
@@ -544,9 +544,9 @@ pub fn Library::get(Self, String) -> Entry?
 pub fn Library::is_empty(Self) -> Bool
 pub fn Library::iter(Self) -> Iter[Entry]
 pub fn Library::keys(Self) -> Array[String]
-pub fn Library::length(Self) -> Int
+pub fn Library::length(Self) -> Int32
 pub fn Library::new() -> Self
-pub fn Library::nth(Self, Int) -> Entry?
+pub fn Library::nth(Self, Int32) -> Entry?
 pub fn Library::push(Self, Entry) -> Unit
 
 pub(all) enum LocatorPayload {
@@ -561,9 +561,9 @@ pub(all) enum MaybeTyped[T] {
 pub fn[T] MaybeTyped::as_typed(Self[T]) -> T?
 pub fn MaybeTyped::duration_from_str(String) -> Self[Duration]
 pub fn MaybeTyped::duration_range_from_str(String) -> Self[DurationRange]
-pub fn MaybeTyped::numeric_csl_cmp(Self[Numeric], Self[Numeric]) -> Int
+pub fn MaybeTyped::numeric_csl_cmp(Self[Numeric], Self[Numeric]) -> Int32
 pub fn MaybeTyped::numeric_from_str(String) -> Self[Numeric]
-pub fn MaybeTyped::page_ranges_csl_cmp(Self[PageRanges], Self[PageRanges]) -> Int
+pub fn MaybeTyped::page_ranges_csl_cmp(Self[PageRanges], Self[PageRanges]) -> Int32
 pub fn MaybeTyped::page_ranges_from_str(String) -> Self[PageRanges]
 pub fn[T : Show] MaybeTyped::to_str(Self[T]) -> String
 pub impl[T : Show] Show for MaybeTyped[T]
@@ -573,16 +573,16 @@ pub(all) struct Numeric {
   prefix : String?
   suffix : String?
 } derive(Eq, Hash, @debug.Debug)
-pub fn Numeric::csl_cmp(Self, Self) -> Int
+pub fn Numeric::csl_cmp(Self, Self) -> Int32
 pub fn[W : FmtWrite] Numeric::fmt(Self, W) -> Unit
 pub fn[W : FmtWrite] Numeric::fmt_value(Self, W, Bool) -> Unit
-pub fn Numeric::from_range(Int, Int) -> Self
+pub fn Numeric::from_range(Int32, Int32) -> Self
 pub fn Numeric::from_str(String) -> Result[Self, NumericError]
 pub fn Numeric::is_plural(Self, Bool) -> Bool
-pub fn Numeric::new(Int) -> Self
-pub fn Numeric::nth(Self, Int) -> Int?
+pub fn Numeric::new(Int32) -> Self
+pub fn Numeric::nth(Self, Int32) -> Int32?
 pub fn Numeric::output(Self, &Logger) -> Unit
-pub fn Numeric::single_number(Self) -> Int?
+pub fn Numeric::single_number(Self) -> Int32?
 pub fn Numeric::to_string(Self) -> String
 pub fn Numeric::will_transform(Self) -> Bool
 pub fn[W : FmtWrite] Numeric::with_form(Self, W, @citationberg.NumberForm, @citationberg.GrammarGender?, @citationberg.OrdinalLookup) -> Unit
@@ -610,18 +610,18 @@ pub fn NumericError::to_string(Self) -> String
 pub impl Show for NumericError
 
 pub(all) enum NumericValue {
-  Number(Int)
-  Set(Array[(Int, NumericDelimiter?)])
+  Number(Int32)
+  Set(Array[(Int32, NumericDelimiter?)])
 } derive(Eq, Hash, @debug.Debug)
-pub fn NumericValue::len(Self) -> Int
+pub fn NumericValue::len(Self) -> Int32
 
 pub(all) struct PageRanges {
   ranges : Array[PageRangesPart]
 } derive(Eq, Hash, @debug.Debug)
-pub fn PageRanges::csl_cmp(Self, Self) -> Int
+pub fn PageRanges::csl_cmp(Self, Self) -> Int32
 pub fn PageRanges::first(Self) -> Numeric?
 pub fn[W : FmtWrite] PageRanges::fmt(Self, W) -> Unit
-pub fn PageRanges::from_int(Int) -> Self
+pub fn PageRanges::from_int(Int32) -> Self
 pub fn PageRanges::from_str(String) -> Result[Self, PageRangesPartErr]
 pub fn PageRanges::is_plural(Self) -> Bool
 pub fn PageRanges::new(Array[PageRangesPart]) -> Self
@@ -634,7 +634,7 @@ pub(all) enum PageRangesPart {
   SinglePage(Numeric)
   Range(Numeric, Numeric)
 } derive(Eq, Hash, @debug.Debug)
-pub fn PageRangesPart::csl_cmp(Self, Self) -> Int
+pub fn PageRangesPart::csl_cmp(Self, Self) -> Int32
 pub fn PageRangesPart::end(Self) -> Numeric?
 pub fn[W : FmtWrite] PageRangesPart::fmt(Self, W) -> Unit
 pub fn PageRangesPart::from_str(String) -> Result[Self, PageRangesPartErr]
@@ -658,7 +658,7 @@ pub(all) struct Person {
   comma_suffix : Bool
   alias_ : String?
 } derive(Eq, Hash, @debug.Debug)
-pub fn Person::csl_cmp(Self, Self, @citationberg.LongShortForm, Bool) -> Int
+pub fn Person::csl_cmp(Self, Self, @citationberg.LongShortForm, Bool) -> Int32
 pub fn[W : FmtWrite] Person::first_name_with_delimiter(Self, W, String?) -> Unit
 pub fn Person::from_str(String) -> Result[Self, PersonError]
 pub fn Person::from_strings(Array[String]) -> Result[Self, PersonError]
@@ -737,13 +737,13 @@ pub(all) struct Rendered {
 pub(all) struct RenderedBibliography {
   hanging_indent : Bool
   second_field_align : @citationberg.SecondFieldAlign?
-  line_spacing : Int
-  entry_spacing : Int
+  line_spacing : Int32
+  entry_spacing : Int32
   items : Array[BibliographyItem]
 } derive(@debug.Debug)
 
 pub(all) struct RenderedCitation {
-  note_number : Int?
+  note_number : Int32?
   citation : ElemChildren
 } derive(@debug.Debug)
 
@@ -793,7 +793,7 @@ pub(all) struct StringChunk {
   kind : ChunkKind
 } derive(Eq, Hash, @debug.Debug)
 pub fn StringChunk::is_empty(Self) -> Bool
-pub fn StringChunk::len(Self) -> Int
+pub fn StringChunk::len(Self) -> Int32
 pub fn StringChunk::math(String) -> Self
 pub fn StringChunk::new(String, ChunkKind) -> Self
 pub fn StringChunk::normal(String) -> Self
@@ -805,7 +805,7 @@ pub impl Show for StringChunk
 pub(all) struct TitleCase {
   always_capitalize_after_punctuation : Bool
   always_capitalize_last_word : Bool
-  always_capitalize_min_len : Int?
+  always_capitalize_min_len : Int32?
   hyphen_word_separator : Bool
   keep_all_uppercase_words : Bool
   use_exception_dictionary : Bool

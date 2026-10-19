@@ -6,7 +6,7 @@ import {
 }
 
 // Values
-pub fn crc32(Array[BytesView]) -> UInt
+pub fn crc32(Array[BytesView]) -> UInt32
 
 pub fn decode_gif_first_frame(BytesView) -> GifFrame? raise ImageError
 
@@ -22,15 +22,15 @@ pub fn decode_webp(BytesView) -> WebpImage raise ImageError
 
 pub fn decode_webp_image(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
-pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
+pub fn encode_png(BytesView, Int32, Int32, PngColorType) -> Bytes
 
-pub fn encode_png_balanced(BytesView, Int, Int, PngColorType) -> Bytes
+pub fn encode_png_balanced(BytesView, Int32, Int32, PngColorType) -> Bytes
 
-pub let exif_tag_orientation : Int
+pub let exif_tag_orientation : Int32
 
-pub let exif_tag_x_resolution : Int
+pub let exif_tag_x_resolution : Int32
 
-pub let exif_tag_y_resolution : Int
+pub let exif_tag_y_resolution : Int32
 
 pub fn gif_image_info(BytesView) -> ImageInfo raise ImageError
 
@@ -48,13 +48,13 @@ pub fn read_exif_from_container(BytesView) -> Exif raise ExifError
 
 pub fn read_png_info(BytesView, limits? : PngLimits) -> PngInfo raise ImageError
 
-pub fn resize_exact(UInt, UInt, ColorType, Bytes, UInt, UInt, FilterType) -> Bytes
+pub fn resize_exact(UInt32, UInt32, ColorType, Bytes, UInt32, UInt32, FilterType) -> Bytes
 
-pub fn to_rgba8(UInt, UInt, ColorType, Bytes) -> Bytes
+pub fn to_rgba8(UInt32, UInt32, ColorType, Bytes) -> Bytes
 
 pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
 
-pub fn zlib_compress(BytesView, level? : Int) -> Bytes
+pub fn zlib_compress(BytesView, level? : Int32) -> Bytes
 
 pub fn zlib_decompress(BytesView, verify_checksum? : Bool) -> Bytes raise InflateError
 
@@ -62,14 +62,14 @@ pub fn zlib_decompress(BytesView, verify_checksum? : Bool) -> Bytes raise Inflat
 pub suberror DecodeErrors {
   Format(String)
   FormatStatic(String)
-  IllegalMagicBytes(Int)
+  IllegalMagicBytes(Int32)
   HuffmanDecode(String)
   ZeroError
   DqtError(String)
   SosError(String)
   SofError(String)
   ExhaustedData
-  TooSmallOutput(Int, Int)
+  TooSmallOutput(Int32, Int32)
   IoErrors(ZByteIoError)
   Panic(String)
 }
@@ -101,7 +101,7 @@ pub(all) enum ColorSpace {
   Luma
   YCCK
   CMYK
-  MultiBand(Int)
+  MultiBand(Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) enum ColorType {
@@ -114,7 +114,7 @@ pub(all) enum ColorType {
   Rgb16
   Rgba16
 } derive(Eq, Hash, @debug.Debug)
-pub fn ColorType::channel_count(Self) -> Int
+pub fn ColorType::channel_count(Self) -> Int32
 
 pub struct Compressor {
   // private fields
@@ -125,15 +125,15 @@ pub fn Compressor::write_data(Self, BytesView) -> Unit
 
 pub(all) struct DecoderOptions {
   out_colorspace : ColorSpace
-  max_width : Int
-  max_height : Int
+  max_width : Int32
+  max_height : Int32
 }
 pub fn DecoderOptions::default() -> Self
 
 pub struct Exif {
   // private fields
 }
-pub fn Exif::get_field(Self, ExifContext, Int, Int) -> ExifValue?
+pub fn Exif::get_field(Self, ExifContext, Int32, Int32) -> ExifValue?
 
 pub(all) enum ExifContext {
   Tiff
@@ -143,13 +143,13 @@ pub(all) enum ExifContext {
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) enum ExifValue {
-  Byte(Array[UInt])
-  Short(Array[UInt])
-  Long(Array[UInt])
-  Rational(Array[(UInt, UInt)])
+  Byte(Array[UInt32])
+  Short(Array[UInt32])
+  Long(Array[UInt32])
+  Rational(Array[(UInt32, UInt32)])
   Other
 } derive(@debug.Debug)
-pub fn ExifValue::get_uint(Self, Int) -> UInt?
+pub fn ExifValue::get_uint(Self, Int32) -> UInt32?
 
 pub(all) enum FilterType {
   Nearest
@@ -160,18 +160,18 @@ pub(all) enum FilterType {
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct GifFrame {
-  screen_width : Int
-  screen_height : Int
-  left : Int
-  top : Int
-  width : Int
-  height : Int
+  screen_width : Int32
+  screen_height : Int32
+  left : Int32
+  top : Int32
+  width : Int32
+  height : Int32
   rgba : Bytes
 }
 
 pub(all) struct ImageInfo {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   color : ColorType
   icc : Bytes?
 } derive(@debug.Debug)
@@ -181,15 +181,15 @@ pub struct JpegDecoder {
 }
 pub fn JpegDecoder::decode(Self) -> Bytes raise DecodeErrors
 pub fn JpegDecoder::decode_headers(Self) -> Unit raise DecodeErrors
-pub fn JpegDecoder::dimensions(Self) -> (Int, Int)?
-pub fn JpegDecoder::info_components(Self) -> Int?
+pub fn JpegDecoder::dimensions(Self) -> (Int32, Int32)?
+pub fn JpegDecoder::info_components(Self) -> Int32?
 pub fn JpegDecoder::input_colorspace(Self) -> ColorSpace?
 pub fn JpegDecoder::new_with_options(BytesView, DecoderOptions) -> Self
 pub fn JpegDecoder::set_options(Self, DecoderOptions) -> Unit
 
 pub(all) struct PixelDimensions {
-  xppu : UInt
-  yppu : UInt
+  xppu : UInt32
+  yppu : UInt32
   meter : Bool
 } derive(Eq, @debug.Debug)
 
@@ -200,14 +200,14 @@ pub(all) enum PngColorType {
   GrayscaleAlpha
   Rgba
 } derive(Eq, @debug.Debug)
-pub fn PngColorType::code(Self) -> Int
-pub fn PngColorType::from_code(Int) -> Self?
-pub fn PngColorType::samples(Self) -> Int
+pub fn PngColorType::code(Self) -> Int32
+pub fn PngColorType::from_code(Int32) -> Self?
+pub fn PngColorType::samples(Self) -> Int32
 
 pub(all) struct PngInfo {
-  width : UInt
-  height : UInt
-  bit_depth : Int
+  width : UInt32
+  height : UInt32
+  bit_depth : Int32
   color_type : PngColorType
   interlaced : Bool
   trns : Bool
@@ -224,20 +224,20 @@ pub(all) enum PngLimits {
 pub struct StoredOnlyCompressor {
   // private fields
 }
-pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
+pub fn StoredOnlyCompressor::compressed_size(Int32) -> Int32
 pub fn StoredOnlyCompressor::finish(Self) -> Bytes
 pub fn StoredOnlyCompressor::new() -> Self
 pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
 
 pub(all) struct WebpImage {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   has_alpha : Bool
   data : Bytes
 }
 
 pub(all) enum ZByteIoError {
-  NotEnoughBytes(Int, Int)
+  NotEnoughBytes(Int32, Int32)
   StdIoError(String)
   Generic(String)
 }
@@ -246,7 +246,7 @@ pub struct ZlibEncoder {
   // private fields
 }
 pub fn ZlibEncoder::finish(Self) -> Bytes
-pub fn ZlibEncoder::new(Int) -> Self
+pub fn ZlibEncoder::new(Int32) -> Self
 pub fn ZlibEncoder::write_all(Self, BytesView) -> Unit
 
 // Type aliases

@@ -28,8 +28,8 @@ pub struct CMap {
 }
 pub fn CMap::identity_h() -> Self
 pub fn CMap::identity_v() -> Self
-pub fn CMap::lookup_bf_string(Self, UInt) -> BfString?
-pub fn CMap::lookup_cid_code(Self, UInt, Int) -> UInt?
+pub fn CMap::lookup_bf_string(Self, UInt32) -> BfString?
+pub fn CMap::lookup_cid_code(Self, UInt32, Int32) -> UInt32?
 pub fn CMap::metadata(Self) -> Metadata
 pub fn CMap::parse(BytesView, (CMapName) -> Bytes?) -> Self?
 pub fn CMap::parse_with_bundle(BytesView, (CMapName) -> Bytes?, Bundle) -> Self?
@@ -107,7 +107,7 @@ pub fn CMapName::to_bytes(Self) -> BytesView
 
 pub(all) struct CharacterCollection {
   family : CidFamily
-  supplement : Int
+  supplement : Int32
 } derive(Eq, @debug.Debug)
 pub impl Show for CharacterCollection
 
@@ -140,6 +140,6 @@ pub impl Default for WritingMode
 pub impl Show for WritingMode
 
 // Type aliases
-pub type Cid = UInt
+pub type Cid = UInt32
 
 // Traits

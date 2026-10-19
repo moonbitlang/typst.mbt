@@ -36,10 +36,10 @@ pub let universe_namespace : String
 // Errors
 pub(all) suberror FilesError {
   FileMissing
-  IndexTooLarge(Int, Int)
-  LineTooLarge(Int, Int)
-  ColumnTooLarge(Int, Int)
-  InvalidCharBoundary(Int)
+  IndexTooLarge(Int32, Int32)
+  LineTooLarge(Int32, Int32)
+  ColumnTooLarge(Int32, Int32)
+  InvalidCharBoundary(Int32)
   Io(String)
 }
 pub fn FilesError::output(Self, &Logger) -> Unit
@@ -63,7 +63,7 @@ pub(all) enum Color {
   Magenta
   Yellow
   White
-  Ansi256(Int)
+  Ansi256(Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct ColorSpec {
@@ -96,9 +96,9 @@ pub fn ColorWriter::writeln(Self, String) -> Unit
 
 pub(all) struct Config {
   display_style : DisplayStyle
-  tab_width : Int
-  start_context_lines : Int
-  end_context_lines : Int
+  tab_width : Int32
+  start_context_lines : Int32
+  end_context_lines : Int32
 }
 pub fn Config::default() -> Self
 
@@ -131,7 +131,7 @@ pub fn[L : FileLoader] FileStore::source(Self[L], @syntax.FileId) -> @syntax.Sou
 
 pub(all) enum FontSource {
   Loaded(@library.Font)
-  Path(path~ : String, index~ : UInt)
+  Path(path~ : String, index~ : UInt32)
 }
 pub fn FontSource::load(Self) -> @library.Font?
 
@@ -140,11 +140,11 @@ pub struct FontStore {
 }
 pub fn FontStore::book(Self) -> @library.FontBook
 pub fn FontStore::extend_all(Self, Array[(FontSource, @library.FontInfo)]) -> Unit
-pub fn FontStore::font(Self, Int) -> @library.Font?
-pub fn FontStore::len(Self) -> Int
+pub fn FontStore::font(Self, Int32) -> @library.Font?
+pub fn FontStore::len(Self) -> Int32
 pub fn FontStore::new() -> Self
 pub fn FontStore::push(Self, (FontSource, @library.FontInfo)) -> Unit
-pub fn FontStore::source(Self, Int) -> FontSource?
+pub fn FontStore::source(Self, Int32) -> FontSource?
 
 pub(all) struct FsPackages(String) derive(Eq, @debug.Debug)
 pub fn FsPackages::latest_version(Self, @syntax.VersionlessPackageSpec) -> @syntax.PackageVersion?
@@ -163,12 +163,12 @@ pub fn FsRoot::resolve(Self, @syntax.VirtualPath) -> String raise @library.FileE
 pub(all) struct Label {
   style : LabelStyle
   file_id : @syntax.FileId
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   message : String
 }
-pub fn Label::primary(@syntax.FileId, Int, Int) -> Self
-pub fn Label::secondary(@syntax.FileId, Int, Int) -> Self
+pub fn Label::primary(@syntax.FileId, Int32, Int32) -> Self
+pub fn Label::secondary(@syntax.FileId, Int32, Int32) -> Self
 pub fn Label::with_message(Self, String) -> Self
 
 pub(all) enum LabelStyle {
@@ -203,12 +203,12 @@ pub fn Time::system() -> Self
 pub fn Time::today(Self, @library.Duration?) -> @library.Datetime?
 
 pub(all) struct UtcDateTime {
-  year : Int
-  month : Int
-  day : Int
-  hour : Int
-  minute : Int
-  second : Int
+  year : Int32
+  month : Int32
+  day : Int32
+  hour : Int32
+  minute : Int32
+  second : Int32
 } derive(Eq, @debug.Debug)
 pub fn UtcDateTime::from_timestamp(Int64) -> Self?
 pub fn UtcDateTime::now() -> Self
@@ -227,8 +227,8 @@ pub(open) trait FileLoader {
 pub(open) trait Files {
   fn name(Self, @syntax.FileId) -> String raise FilesError
   fn lines(Self, @syntax.FileId) -> @syntax.Lines raise FilesError
-  fn line_index(Self, @syntax.FileId, Int) -> Int raise FilesError
-  fn line_number(Self, @syntax.FileId, Int) -> Int raise FilesError = _
-  fn column_number(Self, @syntax.FileId, Int, Int) -> Int raise FilesError
-  fn line_range(Self, @syntax.FileId, Int) -> (Int, Int) raise FilesError
+  fn line_index(Self, @syntax.FileId, Int32) -> Int32 raise FilesError
+  fn line_number(Self, @syntax.FileId, Int32) -> Int32 raise FilesError = _
+  fn column_number(Self, @syntax.FileId, Int32, Int32) -> Int32 raise FilesError
+  fn line_range(Self, @syntax.FileId, Int32) -> (Int32, Int32) raise FilesError
 }

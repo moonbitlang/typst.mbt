@@ -394,7 +394,7 @@ pub struct Heading {
   node : @syntax.SyntaxNode
 }
 pub fn Heading::body(Self) -> Markup
-pub fn Heading::depth(Self) -> Int
+pub fn Heading::depth(Self) -> Int32
 pub fn Heading::from_untyped(@syntax.SyntaxNode) -> Self?
 pub fn Heading::placeholder() -> Self
 pub fn Heading::span(Self) -> @syntax.Span
@@ -693,7 +693,7 @@ pub impl AstNode for MathIdent
 pub struct MathPrimes {
   node : @syntax.SyntaxNode
 }
-pub fn MathPrimes::count(Self) -> Int
+pub fn MathPrimes::count(Self) -> Int32
 pub fn MathPrimes::from_untyped(@syntax.SyntaxNode) -> Self?
 pub fn MathPrimes::placeholder() -> Self
 pub fn MathPrimes::span(Self) -> @syntax.Span

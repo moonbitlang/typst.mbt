@@ -50,17 +50,17 @@ pub fn split_newlines(String) -> Array[String]
 
 pub let stmt_set : SyntaxSet
 
-pub let typst_version : (Int, Int, Int)
+pub let typst_version : (Int32, Int32, Int32)
 
 pub let unary_op_set : SyntaxSet
 
 pub fn unescape_str_literal(String) -> String
 
-pub fn utf8_len(StringView) -> Int
+pub fn utf8_len(StringView) -> Int32
 
-pub fn utf8_slice(String, Int, Int) -> String
+pub fn utf8_slice(String, Int32, Int32) -> String
 
-pub fn utf8_to_utf16(String, Int) -> Int
+pub fn utf8_to_utf16(String, Int32) -> Int32
 
 // Errors
 pub(all) suberror PathError {
@@ -115,14 +115,14 @@ pub(all) enum BinOp {
 pub fn BinOp::as_str(Self) -> String
 pub fn BinOp::assoc(Self) -> Assoc
 pub fn BinOp::from_kind(SyntaxKind) -> Self?
-pub fn BinOp::precedence(Self) -> Int
+pub fn BinOp::precedence(Self) -> Int32
 
 pub(all) struct DiagSpan {
   span : Span
   extra : UInt64
 } derive(Eq, Hash, @debug.Debug)
 pub fn DiagSpan::detached() -> Self
-pub fn DiagSpan::from_range(FileId, Int, Int) -> Self
+pub fn DiagSpan::from_range(FileId, Int32, Int32) -> Self
 pub fn DiagSpan::from_span(Span, sub_range? : SubRange) -> Self
 pub fn DiagSpan::get(Self) -> DiagSpanKind
 pub fn DiagSpan::id(Self) -> FileId?
@@ -132,7 +132,7 @@ pub fn DiagSpan::or(Self, Self) -> Self
 pub(all) enum DiagSpanKind {
   Detached
   Number(id~ : FileId, num~ : SpanNumber, sub_range~ : SubRange?)
-  Range(id~ : FileId, start~ : Int, end~ : Int)
+  Range(id~ : FileId, start~ : Int32, end~ : Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct DiagSpanned[T] {
@@ -162,47 +162,47 @@ pub impl @debug.Debug for FileId
 pub struct Lines {
   // private fields
 }
-pub fn Lines::byte_to_column(Self, Int) -> Int?
-pub fn Lines::byte_to_line(Self, Int) -> Int?
-pub fn Lines::byte_to_line_column(Self, Int) -> (Int, Int)?
-pub fn Lines::byte_to_utf16(Self, Int) -> Int?
-pub fn Lines::edit(Self, Int, Int, String) -> Self
-pub fn Lines::len_bytes(Self) -> Int
-pub fn Lines::len_lines(Self) -> Int
-pub fn Lines::len_utf16(Self) -> Int
-pub fn Lines::line_column_to_byte(Self, Int, Int) -> Int?
-pub fn Lines::line_to_byte(Self, Int) -> Int?
-pub fn Lines::line_to_range(Self, Int) -> (Int, Int)?
+pub fn Lines::byte_to_column(Self, Int32) -> Int32?
+pub fn Lines::byte_to_line(Self, Int32) -> Int32?
+pub fn Lines::byte_to_line_column(Self, Int32) -> (Int32, Int32)?
+pub fn Lines::byte_to_utf16(Self, Int32) -> Int32?
+pub fn Lines::edit(Self, Int32, Int32, String) -> Self
+pub fn Lines::len_bytes(Self) -> Int32
+pub fn Lines::len_lines(Self) -> Int32
+pub fn Lines::len_utf16(Self) -> Int32
+pub fn Lines::line_column_to_byte(Self, Int32, Int32) -> Int32?
+pub fn Lines::line_to_byte(Self, Int32) -> Int32?
+pub fn Lines::line_to_range(Self, Int32) -> (Int32, Int32)?
 pub fn Lines::new(String) -> Self
 pub fn Lines::replace(Self, String) -> Self?
-pub fn Lines::replacement_range(Self, String) -> (Int, Int)?
+pub fn Lines::replacement_range(Self, String) -> (Int32, Int32)?
 pub fn Lines::text(Self) -> String
-pub fn Lines::utf16_to_byte(Self, Int) -> Int?
+pub fn Lines::utf16_to_byte(Self, Int32) -> Int32?
 pub impl Hash for Lines
 
 pub struct LinkedNode {
   node : SyntaxNode
   parent : LinkedNode?
-  index : Int
-  offset : Int
+  index : Int32
+  offset : Int32
 }
 pub fn LinkedNode::children(Self) -> Array[Self]
 pub fn LinkedNode::find(Self, Span) -> Self?
 pub fn LinkedNode::find_number(Self, SpanNumber) -> Self?
-pub fn LinkedNode::find_range(Self, Int, Int) -> Self?
+pub fn LinkedNode::find_range(Self, Int32, Int32) -> Self?
 pub fn LinkedNode::get(Self) -> SyntaxNode
-pub fn LinkedNode::index(Self) -> Int
+pub fn LinkedNode::index(Self) -> Int32
 pub fn LinkedNode::kind(Self) -> SyntaxKind
-pub fn LinkedNode::leaf_at(Self, Int, Side) -> Self?
+pub fn LinkedNode::leaf_at(Self, Int32, Side) -> Self?
 pub fn LinkedNode::leftmost_leaf(Self) -> Self?
-pub fn LinkedNode::len(Self) -> Int
+pub fn LinkedNode::len(Self) -> Int32
 pub fn LinkedNode::mode_after(Self) -> SyntaxMode?
 pub fn LinkedNode::new(SyntaxNode) -> Self
 pub fn LinkedNode::next_leaf(Self) -> Self?
 pub fn LinkedNode::next_sibling(Self) -> Self?
 pub fn LinkedNode::next_sibling_kind(Self) -> SyntaxKind?
 pub fn LinkedNode::next_sibling_with_trivia(Self) -> Self?
-pub fn LinkedNode::offset(Self) -> Int
+pub fn LinkedNode::offset(Self) -> Int32
 pub fn LinkedNode::parent(Self) -> Self?
 pub fn LinkedNode::parent_kind(Self) -> SyntaxKind?
 pub fn LinkedNode::parent_mode(Self) -> SyntaxMode?
@@ -210,7 +210,7 @@ pub fn LinkedNode::prev_leaf(Self) -> Self?
 pub fn LinkedNode::prev_sibling(Self) -> Self?
 pub fn LinkedNode::prev_sibling_kind(Self) -> SyntaxKind?
 pub fn LinkedNode::prev_sibling_with_trivia(Self) -> Self?
-pub fn LinkedNode::range(Self) -> (Int, Int)
+pub fn LinkedNode::range(Self) -> (Int32, Int32)
 pub fn LinkedNode::rightmost_leaf(Self) -> Self?
 
 pub(all) enum NonDecimalBase {
@@ -218,7 +218,7 @@ pub(all) enum NonDecimalBase {
   Octal
   Binary
 } derive(Eq, @debug.Debug)
-pub fn NonDecimalBase::get(Self) -> Int
+pub fn NonDecimalBase::get(Self) -> Int32
 pub fn NonDecimalBase::name(Self) -> String
 
 pub(all) struct PackageInfo {
@@ -260,9 +260,9 @@ pub impl Show for PackageSpec
 pub impl @debug.Debug for PackageSpec
 
 pub(all) struct PackageVersion {
-  major : UInt
-  minor : UInt
-  patch : UInt
+  major : UInt32
+  minor : UInt32
+  patch : UInt32
 } derive(Compare, Eq, Hash)
 pub fn PackageVersion::compiler() -> Self
 pub fn PackageVersion::from_str(String) -> Result[Self, String]
@@ -298,7 +298,7 @@ pub struct Source {
   // private fields
 }
 pub fn Source::detached(String) -> Self
-pub fn Source::edit(Self, Int, Int, String) -> (Self, (Int, Int))
+pub fn Source::edit(Self, Int32, Int32, String) -> (Self, (Int32, Int32))
 pub fn Source::find(Self, Span) -> LinkedNode?
 pub fn Source::has_memo(Self) -> Bool
 pub fn Source::id(Self) -> FileId
@@ -307,10 +307,10 @@ pub fn Source::lines(Self) -> Lines
 pub fn Source::memo_hi(Self) -> UInt64
 pub fn Source::memo_lo(Self) -> UInt64
 pub fn Source::new(FileId, String) -> Self
-pub fn Source::range(Self, SpanNumber, SubRange?) -> (Int, Int)?
-pub fn Source::replace(Self, String) -> (Self, (Int, Int))
+pub fn Source::range(Self, SpanNumber, SubRange?) -> (Int32, Int32)?
+pub fn Source::replace(Self, String) -> (Self, (Int32, Int32))
 pub fn Source::root(Self) -> SyntaxNode
-pub fn Source::serial(Self) -> Int
+pub fn Source::serial(Self) -> Int32
 pub fn Source::set_memo(Self, UInt64, UInt64) -> Unit
 pub fn Source::text(Self) -> String
 pub fn Source::with_root(FileId, String, SyntaxNode) -> Self
@@ -318,7 +318,7 @@ pub fn Source::with_root(FileId, String, SyntaxNode) -> Self
 pub(all) struct Span(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Span::detached() -> Self
 pub fn Span::from_number(FileId, SpanNumber) -> Self
-pub fn Span::from_range(FileId, Int, Int) -> Self
+pub fn Span::from_range(FileId, Int32, Int32) -> Self
 pub fn Span::get(Self) -> SpanKind
 pub fn Span::id(Self) -> FileId?
 pub fn Span::is_detached(Self) -> Bool
@@ -328,7 +328,7 @@ pub fn Span::or(Self, Self) -> Self
 pub(all) enum SpanKind {
   Detached
   Number(id~ : FileId, num~ : SpanNumber)
-  Range(id~ : FileId, start~ : Int, end~ : Int)
+  Range(id~ : FileId, start~ : Int32, end~ : Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct SpanNumber(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
@@ -339,12 +339,12 @@ pub(all) struct Spanned[T] {
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct SubRange {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, Hash, @debug.Debug)
-pub fn SubRange::new(Int, Int) -> Self?
-pub fn SubRange::to_absolute(Self, Int) -> (Int, Int)
-pub fn SubRange::to_relative(Self) -> (Int, Int)
+pub fn SubRange::new(Int32, Int32) -> Self?
+pub fn SubRange::to_absolute(Self, Int32) -> (Int32, Int32)
+pub fn SubRange::to_relative(Self) -> (Int32, Int32)
 
 pub(all) struct SyntaxDiagnostic {
   is_error : Bool
@@ -494,8 +494,8 @@ pub(all) enum SyntaxKind {
   DestructAssignment
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn SyntaxKind::debug_name(Self) -> String
-pub fn SyntaxKind::from_index(Int) -> Self
-pub fn SyntaxKind::index(Self) -> Int
+pub fn SyntaxKind::from_index(Int32) -> Self
+pub fn SyntaxKind::index(Self) -> Int32
 pub fn SyntaxKind::is_block(Self) -> Bool
 pub fn SyntaxKind::is_error(Self) -> Bool
 pub fn SyntaxKind::is_grouping(Self) -> Bool
@@ -530,7 +530,7 @@ pub fn SyntaxNode::is_leaf(Self) -> Bool
 pub fn SyntaxNode::kind(Self) -> SyntaxKind
 pub fn SyntaxNode::leaf(SyntaxKind, StringView) -> Self
 pub fn SyntaxNode::leaf_text(Self) -> String
-pub fn SyntaxNode::len(Self) -> Int
+pub fn SyntaxNode::len(Self) -> Int32
 pub fn SyntaxNode::placeholder(SyntaxKind) -> Self
 pub fn SyntaxNode::span(Self) -> Span
 pub fn SyntaxNode::spanless_eq(Self, Self) -> Bool
@@ -567,12 +567,12 @@ pub(all) enum UnOp {
 } derive(Eq, Hash, @debug.Debug)
 pub fn UnOp::as_str(Self) -> String
 pub fn UnOp::from_kind(SyntaxKind) -> Self?
-pub fn UnOp::precedence(Self) -> Int
+pub fn UnOp::precedence(Self) -> Int32
 
 pub(all) struct VersionBound {
-  major : UInt
-  minor : UInt?
-  patch : UInt?
+  major : UInt32
+  minor : UInt32?
+  patch : UInt32?
 } derive(Compare, Eq, Hash)
 pub fn VersionBound::from_str(String) -> Result[Self, String]
 pub fn VersionBound::output(Self, &Logger) -> Unit

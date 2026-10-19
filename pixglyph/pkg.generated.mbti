@@ -11,10 +11,10 @@ import {
 
 // Types and methods
 pub(all) struct Bitmap {
-  left : Int
-  top : Int
-  width : UInt
-  height : UInt
+  left : Int32
+  top : Int32
+  width : UInt32
+  height : UInt32
   coverage : Bytes
 }
 pub impl Show for Bitmap

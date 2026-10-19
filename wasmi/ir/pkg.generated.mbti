@@ -27,73 +27,73 @@ pub(all) struct Address(UInt64) derive(Eq, Hash, @debug.Debug)
 pub fn Address::to_u64(Self) -> UInt64
 pub fn Address::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Address32(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Address32(UInt32) derive(Eq, Hash, @debug.Debug)
 pub fn Address32::to_u64(Self) -> UInt64
 pub fn Address32::try_from_address(Address) -> Self?
 
-pub(all) struct AnyConst16(Int) derive(Eq, Hash, @debug.Debug)
-pub fn AnyConst16::from_i16(Int) -> Self
-pub fn AnyConst16::from_i8(Int) -> Self
-pub fn AnyConst16::from_u16(Int) -> Self
-pub fn AnyConst16::to_i16(Self) -> Int
-pub fn AnyConst16::to_i32(Self) -> Int
+pub(all) struct AnyConst16(Int32) derive(Eq, Hash, @debug.Debug)
+pub fn AnyConst16::from_i16(Int32) -> Self
+pub fn AnyConst16::from_i8(Int32) -> Self
+pub fn AnyConst16::from_u16(Int32) -> Self
+pub fn AnyConst16::to_i16(Self) -> Int32
+pub fn AnyConst16::to_i32(Self) -> Int32
 pub fn AnyConst16::to_i64(Self) -> Int64
-pub fn AnyConst16::to_i8(Self) -> Int
-pub fn AnyConst16::to_u16(Self) -> Int
-pub fn AnyConst16::to_u32(Self) -> UInt
+pub fn AnyConst16::to_i8(Self) -> Int32
+pub fn AnyConst16::to_u16(Self) -> Int32
+pub fn AnyConst16::to_u32(Self) -> UInt32
 pub fn AnyConst16::to_u64(Self) -> UInt64
-pub fn AnyConst16::try_from_i32(Int) -> Self?
+pub fn AnyConst16::try_from_i32(Int32) -> Self?
 pub fn AnyConst16::try_from_i64(Int64) -> Self?
-pub fn AnyConst16::try_from_u32(UInt) -> Self?
+pub fn AnyConst16::try_from_u32(UInt32) -> Self?
 pub fn AnyConst16::try_from_u64(UInt64) -> Self?
 
-pub(all) struct AnyConst32(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct AnyConst32(Int32) derive(Eq, Hash, @debug.Debug)
 pub fn AnyConst32::from_bool(Bool) -> Self
 pub fn AnyConst32::from_f32(Float) -> Self
-pub fn AnyConst32::from_f32_bits(UInt) -> Self
-pub fn AnyConst32::from_i32(Int) -> Self
-pub fn AnyConst32::from_u32(UInt) -> Self
-pub fn AnyConst32::to_f32_bits(Self) -> UInt
+pub fn AnyConst32::from_f32_bits(UInt32) -> Self
+pub fn AnyConst32::from_i32(Int32) -> Self
+pub fn AnyConst32::from_u32(UInt32) -> Self
+pub fn AnyConst32::to_f32_bits(Self) -> UInt32
 pub fn AnyConst32::to_f64_bits(Self) -> UInt64
-pub fn AnyConst32::to_i32(Self) -> Int
+pub fn AnyConst32::to_i32(Self) -> Int32
 pub fn AnyConst32::to_i64(Self) -> Int64
-pub fn AnyConst32::to_u32(Self) -> UInt
+pub fn AnyConst32::to_u32(Self) -> UInt32
 pub fn AnyConst32::to_u64(Self) -> UInt64
 pub fn AnyConst32::try_from_f64_bits(UInt64) -> Self?
 pub fn AnyConst32::try_from_i64(Int64) -> Self?
 pub fn AnyConst32::try_from_u64(UInt64) -> Self?
 
-pub(all) struct BlockFuel(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct BlockFuel(UInt32) derive(Eq, Hash, @debug.Debug)
 pub fn BlockFuel::bump_by(Self, UInt64) -> Self raise IrError
-pub fn BlockFuel::from_u32(UInt) -> Self
+pub fn BlockFuel::from_u32(UInt32) -> Self
 pub fn BlockFuel::to_u64(Self) -> UInt64
 pub fn BlockFuel::try_from_u64(UInt64) -> Self raise IrError
 
 pub(all) struct BoundedSlotSpan {
   span : SlotSpan
-  len : Int
+  len : Int32
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn BoundedSlotSpan::contains(Self, Slot) -> Bool
 pub fn BoundedSlotSpan::is_empty(Self) -> Bool
 pub fn BoundedSlotSpan::iter(Self) -> SlotSpanIter
-pub fn BoundedSlotSpan::len(Self) -> Int
-pub fn BoundedSlotSpan::new(SlotSpan, Int) -> Self
+pub fn BoundedSlotSpan::len(Self) -> Int32
+pub fn BoundedSlotSpan::new(SlotSpan, Int32) -> Self
 pub fn BoundedSlotSpan::span(Self) -> SlotSpan
 
-pub(all) struct BranchOffset(Int) derive(Eq, Hash, @debug.Debug)
-pub fn BranchOffset::from_i32(Int) -> Self
-pub fn BranchOffset::from_src_to_dst(UInt, UInt) -> Self raise IrError
+pub(all) struct BranchOffset(Int32) derive(Eq, Hash, @debug.Debug)
+pub fn BranchOffset::from_i32(Int32) -> Self
+pub fn BranchOffset::from_src_to_dst(UInt32, UInt32) -> Self raise IrError
 pub fn BranchOffset::init(Self, Self) -> Self
 pub fn BranchOffset::is_init(Self) -> Bool
-pub fn BranchOffset::to_i32(Self) -> Int
+pub fn BranchOffset::to_i32(Self) -> Int32
 pub fn BranchOffset::uninit() -> Self
 
-pub(all) struct BranchOffset16(Int) derive(Eq, Hash, @debug.Debug)
-pub fn BranchOffset16::from_i16(Int) -> Self
+pub(all) struct BranchOffset16(Int32) derive(Eq, Hash, @debug.Debug)
+pub fn BranchOffset16::from_i16(Int32) -> Self
 pub fn BranchOffset16::init(Self, BranchOffset) -> Self raise IrError
 pub fn BranchOffset16::is_init(Self) -> Bool
 pub fn BranchOffset16::to_branch_offset(Self) -> BranchOffset
-pub fn BranchOffset16::to_i16(Self) -> Int
+pub fn BranchOffset16::to_i16(Self) -> Int32
 pub fn BranchOffset16::try_from(BranchOffset) -> Self raise IrError
 
 pub(all) enum Comparator {
@@ -130,8 +130,8 @@ pub(all) enum Comparator {
   F64NotLt
   F64NotLe
 } derive(Eq, Hash, @debug.Debug)
-pub fn Comparator::to_u32(Self) -> UInt
-pub fn Comparator::try_from_u32(UInt) -> Self raise IrError
+pub fn Comparator::to_u32(Self) -> UInt32
+pub fn Comparator::try_from_u32(UInt32) -> Self raise IrError
 
 pub(all) struct ComparatorAndOffset {
   cmp : Comparator
@@ -141,63 +141,63 @@ pub fn ComparatorAndOffset::as_u64(Self) -> UInt64
 pub fn ComparatorAndOffset::from_u64(UInt64) -> Self?
 pub fn ComparatorAndOffset::new(Comparator, BranchOffset) -> Self
 
-pub(all) struct Const16(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Const16(Int32) derive(Eq, Hash, @debug.Debug)
 pub fn Const16::cast(Self) -> Self
-pub fn Const16::from_i16(Int) -> Self
-pub fn Const16::from_u16(Int) -> Self
+pub fn Const16::from_i16(Int32) -> Self
+pub fn Const16::from_u16(Int32) -> Self
 pub fn Const16::is_zero(Self) -> Bool
-pub fn Const16::to_i32(Self) -> Int
+pub fn Const16::to_i32(Self) -> Int32
 pub fn Const16::to_i64(Self) -> Int64
-pub fn Const16::to_u32(Self) -> UInt
+pub fn Const16::to_u32(Self) -> UInt32
 pub fn Const16::to_u64(Self) -> UInt64
-pub fn Const16::try_from_i32(Int) -> Self?
+pub fn Const16::try_from_i32(Int32) -> Self?
 pub fn Const16::try_from_i64(Int64) -> Self?
-pub fn Const16::try_from_u32(UInt) -> Self?
+pub fn Const16::try_from_u32(UInt32) -> Self?
 pub fn Const16::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Const32(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Const32(Int32) derive(Eq, Hash, @debug.Debug)
 pub fn Const32::cast(Self) -> Self
-pub fn Const32::from_f32_bits(UInt) -> Self
-pub fn Const32::from_i32(Int) -> Self
-pub fn Const32::from_u32(UInt) -> Self
-pub fn Const32::to_f32_bits(Self) -> UInt
+pub fn Const32::from_f32_bits(UInt32) -> Self
+pub fn Const32::from_i32(Int32) -> Self
+pub fn Const32::from_u32(UInt32) -> Self
+pub fn Const32::to_f32_bits(Self) -> UInt32
 pub fn Const32::to_f64_bits(Self) -> UInt64
-pub fn Const32::to_i32(Self) -> Int
+pub fn Const32::to_i32(Self) -> Int32
 pub fn Const32::to_i64(Self) -> Int64
-pub fn Const32::to_u32(Self) -> UInt
+pub fn Const32::to_u32(Self) -> UInt32
 pub fn Const32::to_u64(Self) -> UInt64
 pub fn Const32::try_from_f64_bits(UInt64) -> Self?
 pub fn Const32::try_from_i64(Int64) -> Self?
 pub fn Const32::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Data(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Data(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
-pub(all) struct Elem(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Elem(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
 pub(all) struct FixedSlotSpan(SlotSpan) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FixedSlotSpan::bounded(Self) -> BoundedSlotSpan
 pub fn FixedSlotSpan::contains(Self, Slot) -> Bool
 pub fn FixedSlotSpan::from_span_unchecked(SlotSpan) -> Self
 pub fn FixedSlotSpan::iter(Self) -> SlotSpanIter
-pub fn FixedSlotSpan::len(Self) -> Int
-pub fn FixedSlotSpan::new(SlotSpan, Int) -> Self raise IrError
+pub fn FixedSlotSpan::len(Self) -> Int32
+pub fn FixedSlotSpan::new(SlotSpan, Int32) -> Self raise IrError
 pub fn FixedSlotSpan::span(Self) -> SlotSpan
 pub fn FixedSlotSpan::to_array(Self) -> (Slot, Slot)
 
-pub(all) struct Func(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Func(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
-pub(all) struct FuncType(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct FuncType(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
-pub(all) struct Global(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Global(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
-pub(all) struct ImmLaneIdx(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct ImmLaneIdx(Int32) derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct InternalFunc(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct InternalFunc(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
-pub(all) struct Memory(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Memory(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Memory::is_default(Self) -> Bool
 
-pub(all) struct Offset16(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset16(Int32) derive(Eq, Hash, @debug.Debug)
 pub fn Offset16::to_u64(Self) -> UInt64
 pub fn Offset16::try_from_u64(UInt64) -> Self?
 
@@ -206,11 +206,11 @@ pub fn Offset64::combine(Offset64Hi, Offset64Lo) -> Self
 pub fn Offset64::split(UInt64) -> (Offset64Hi, Offset64Lo)
 pub fn Offset64::to_u64(Self) -> UInt64
 
-pub(all) struct Offset64Hi(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset64Hi(UInt32) derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct Offset64Lo(UInt) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset64Lo(UInt32) derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct Offset8(Int) derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset8(Int32) derive(Eq, Hash, @debug.Debug)
 pub fn Offset8::to_u64(Self) -> UInt64
 pub fn Offset8::try_from_u64(UInt64) -> Self?
 
@@ -288,14 +288,14 @@ pub(all) enum Op {
   BranchF64Le(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
   BranchF64NotLt(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
   BranchF64NotLe(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
-  BranchTable0(index~ : Slot, len_targets~ : Int)
-  BranchTableSpan(index~ : Slot, len_targets~ : Int)
+  BranchTable0(index~ : Slot, len_targets~ : Int32)
+  BranchTableSpan(index~ : Slot, len_targets~ : Int32)
   Copy(result~ : Slot, value~ : Slot)
   Copy2(results~ : FixedSlotSpan, values~ : FixedArray[Slot])
   CopyImm32(result~ : Slot, value~ : AnyConst32)
   CopyI64Imm32(result~ : Slot, value~ : Const32)
   CopyF64Imm32(result~ : Slot, value~ : Const32)
-  CopySpan(results~ : SlotSpan, values~ : SlotSpan, len~ : Int)
+  CopySpan(results~ : SlotSpan, values~ : SlotSpan, len~ : Int32)
   CopyMany(results~ : SlotSpan, values~ : FixedArray[Slot])
   ReturnCallInternal0(func~ : InternalFunc)
   ReturnCallInternal(func~ : InternalFunc)
@@ -400,30 +400,30 @@ pub(all) enum Op {
   I32Store8(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I32Store8Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I32Store8Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
-  I32Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   I32Store8At(value~ : Slot, address~ : Address32)
-  I32Store8AtImm(value~ : Int, address~ : Address32)
+  I32Store8AtImm(value~ : Int32, address~ : Address32)
   I32Store16(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I32Store16Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I32Store16Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
-  I32Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   I32Store16At(value~ : Slot, address~ : Address32)
-  I32Store16AtImm(value~ : Int, address~ : Address32)
+  I32Store16AtImm(value~ : Int32, address~ : Address32)
   I64StoreImm16(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64StoreOffset16Imm16(ptr~ : Slot, offset~ : Offset16, value~ : Const16)
   I64StoreAtImm16(value~ : Const16, address~ : Address32)
   I64Store8(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store8Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store8Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
-  I64Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   I64Store8At(value~ : Slot, address~ : Address32)
-  I64Store8AtImm(value~ : Int, address~ : Address32)
+  I64Store8AtImm(value~ : Int32, address~ : Address32)
   I64Store16(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store16Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store16Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
-  I64Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int32)
   I64Store16At(value~ : Slot, address~ : Address32)
-  I64Store16AtImm(value~ : Int, address~ : Address32)
+  I64Store16AtImm(value~ : Int32, address~ : Address32)
   I64Store32(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store32Imm16(ptr~ : Slot, offset_lo~ : Offset64Lo)
   I64Store32Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
@@ -655,7 +655,7 @@ pub(all) enum Op {
   MemoryGrow(result~ : Slot, delta~ : Slot)
   MemoryCopy(dst~ : Slot, src~ : Slot, len~ : Slot)
   MemoryFill(dst~ : Slot, value~ : Slot, len~ : Slot)
-  MemoryFillImm(dst~ : Slot, value~ : Int, len~ : Slot)
+  MemoryFillImm(dst~ : Slot, value~ : Int32, len~ : Slot)
   MemoryInit(dst~ : Slot, src~ : Slot, len~ : Slot)
   TableIndex(index~ : Table)
   MemoryIndex(index~ : Memory)
@@ -689,7 +689,7 @@ pub(all) enum Op {
   F32x4ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
   F64x2ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
   I8x16ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
-  I8x16ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx, value~ : Int)
+  I8x16ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx, value~ : Int32)
   I16x8ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
   I16x8ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
   I32x4ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
@@ -1020,8 +1020,8 @@ pub fn Op::branch_i64_or(Slot, Slot, BranchOffset16) -> Self
 pub fn Op::branch_i64_or_imm16(Slot, Const16, BranchOffset16) -> Self
 pub fn Op::branch_offset(Self) -> BranchOffset?
 pub fn Op::branch_offset16(Self) -> BranchOffset16?
-pub fn Op::branch_table_0(Slot, Int) -> Self
-pub fn Op::branch_table_span(Slot, Int) -> Self
+pub fn Op::branch_table_0(Slot, Int32) -> Self
+pub fn Op::branch_table_span(Slot, Int32) -> Self
 pub fn Op::branch_table_target(SlotSpan, BranchOffset) -> Self
 pub fn Op::call_imported(SlotSpan, Func) -> Self
 pub fn Op::call_imported_0(SlotSpan, Func) -> Self
@@ -1043,7 +1043,7 @@ pub fn Op::copy_i64imm32(Slot, Const32) -> Self
 pub fn Op::copy_imm32(Slot, AnyConst32) -> Self
 pub fn Op::copy_many(SlotSpan, FixedArray[Slot]) -> Self
 pub fn Op::copy_many_ext(SlotSpan, Slot, Slot) -> Self
-pub fn Op::copy_span(SlotSpan, SlotSpan, Int) -> Self
+pub fn Op::copy_span(SlotSpan, SlotSpan, Int32) -> Self
 pub fn Op::data_drop(Data) -> Self
 pub fn Op::data_index(Data) -> Self
 pub fn Op::elem_drop(Elem) -> Self
@@ -1158,8 +1158,8 @@ pub fn Op::f64x2_sqrt(Slot, Slot) -> Self
 pub fn Op::f64x2_sub(Slot, Slot, Slot) -> Self
 pub fn Op::f64x2_trunc(Slot, Slot) -> Self
 pub fn Op::filter_imm16_and_offset_hi(Self) -> (AnyConst16, Offset64Hi)?
-pub fn Op::filter_lane_and_memory(Self) -> (Int, Memory)?
-pub fn Op::filter_register_and_lane(Self) -> (Slot, Int)?
+pub fn Op::filter_lane_and_memory(Self) -> (Int32, Memory)?
+pub fn Op::filter_register_and_lane(Self) -> (Slot, Int32)?
 pub fn Op::filter_register_and_offset_hi(Self) -> (Slot, Offset64Hi)?
 pub fn Op::global_get(Slot, Global) -> Self
 pub fn Op::global_set(Slot, Global) -> Self
@@ -1292,16 +1292,16 @@ pub fn Op::i32_shr_u_by(Slot, Slot, ShiftAmount) -> Self
 pub fn Op::i32_shr_u_imm16(Slot, Const16, Slot) -> Self
 pub fn Op::i32_store16(Slot, Offset64Lo) -> Self
 pub fn Op::i32_store16_at(Slot, Address32) -> Self
-pub fn Op::i32_store16_at_imm(Int, Address32) -> Self
+pub fn Op::i32_store16_at_imm(Int32, Address32) -> Self
 pub fn Op::i32_store16_imm(Slot, Offset64Lo) -> Self
 pub fn Op::i32_store16_offset16(Slot, Offset16, Slot) -> Self
-pub fn Op::i32_store16_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i32_store16_offset16_imm(Slot, Offset16, Int32) -> Self
 pub fn Op::i32_store8(Slot, Offset64Lo) -> Self
 pub fn Op::i32_store8_at(Slot, Address32) -> Self
-pub fn Op::i32_store8_at_imm(Int, Address32) -> Self
+pub fn Op::i32_store8_at_imm(Int32, Address32) -> Self
 pub fn Op::i32_store8_imm(Slot, Offset64Lo) -> Self
 pub fn Op::i32_store8_offset16(Slot, Offset16, Slot) -> Self
-pub fn Op::i32_store8_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i32_store8_offset16_imm(Slot, Offset16, Int32) -> Self
 pub fn Op::i32_store_at_imm16(Const16, Address32) -> Self
 pub fn Op::i32_store_imm16(Slot, Offset64Lo) -> Self
 pub fn Op::i32_store_offset16_imm16(Slot, Offset16, Const16) -> Self
@@ -1449,10 +1449,10 @@ pub fn Op::i64_shr_u_by(Slot, Slot, ShiftAmount) -> Self
 pub fn Op::i64_shr_u_imm16(Slot, Const16, Slot) -> Self
 pub fn Op::i64_store16(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store16_at(Slot, Address32) -> Self
-pub fn Op::i64_store16_at_imm(Int, Address32) -> Self
+pub fn Op::i64_store16_at_imm(Int32, Address32) -> Self
 pub fn Op::i64_store16_imm(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store16_offset16(Slot, Offset16, Slot) -> Self
-pub fn Op::i64_store16_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i64_store16_offset16_imm(Slot, Offset16, Int32) -> Self
 pub fn Op::i64_store32(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store32_at(Slot, Address32) -> Self
 pub fn Op::i64_store32_at_imm16(Const16, Address32) -> Self
@@ -1461,10 +1461,10 @@ pub fn Op::i64_store32_offset16(Slot, Offset16, Slot) -> Self
 pub fn Op::i64_store32_offset16_imm16(Slot, Offset16, Const16) -> Self
 pub fn Op::i64_store8(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store8_at(Slot, Address32) -> Self
-pub fn Op::i64_store8_at_imm(Int, Address32) -> Self
+pub fn Op::i64_store8_at_imm(Int32, Address32) -> Self
 pub fn Op::i64_store8_imm(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store8_offset16(Slot, Offset16, Slot) -> Self
-pub fn Op::i64_store8_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i64_store8_offset16_imm(Slot, Offset16, Int32) -> Self
 pub fn Op::i64_store_at_imm16(Const16, Address32) -> Self
 pub fn Op::i64_store_imm16(Slot, Offset64Lo) -> Self
 pub fn Op::i64_store_offset16_imm16(Slot, Offset16, Const16) -> Self
@@ -1533,7 +1533,7 @@ pub fn Op::i8x16_ne(Slot, Slot, Slot) -> Self
 pub fn Op::i8x16_neg(Slot, Slot) -> Self
 pub fn Op::i8x16_popcnt(Slot, Slot) -> Self
 pub fn Op::i8x16_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
-pub fn Op::i8x16_replace_lane_imm(Slot, Slot, ImmLaneIdx, Int) -> Self
+pub fn Op::i8x16_replace_lane_imm(Slot, Slot, ImmLaneIdx, Int32) -> Self
 pub fn Op::i8x16_shl(Slot, Slot, Slot) -> Self
 pub fn Op::i8x16_shl_by(Slot, Slot, ShiftAmount) -> Self
 pub fn Op::i8x16_shr_s(Slot, Slot, Slot) -> Self
@@ -1548,7 +1548,7 @@ pub fn Op::i8x16_sub_sat_u(Slot, Slot, Slot) -> Self
 pub fn Op::i8x16_swizzle(Slot, Slot, Slot) -> Self
 pub fn Op::imm16_and_imm32(AnyConst16, AnyConst32) -> Self
 pub fn Op::imm16_and_offset_hi(AnyConst16, Offset64Hi) -> Self
-pub fn Op::lane_and_memory_index(Int, Memory) -> Self
+pub fn Op::lane_and_memory_index(Int32, Memory) -> Self
 pub fn Op::load32(Slot, Offset64Lo) -> Self
 pub fn Op::load32_at(Slot, Address32) -> Self
 pub fn Op::load32_offset16(Slot, Slot, Offset16) -> Self
@@ -1557,7 +1557,7 @@ pub fn Op::load64_at(Slot, Address32) -> Self
 pub fn Op::load64_offset16(Slot, Slot, Offset16) -> Self
 pub fn Op::memory_copy(Slot, Slot, Slot) -> Self
 pub fn Op::memory_fill(Slot, Slot, Slot) -> Self
-pub fn Op::memory_fill_imm(Slot, Int, Slot) -> Self
+pub fn Op::memory_fill_imm(Slot, Int32, Slot) -> Self
 pub fn Op::memory_grow(Slot, Slot) -> Self
 pub fn Op::memory_index(Memory) -> Self
 pub fn Op::memory_init(Slot, Slot, Slot) -> Self
@@ -1630,7 +1630,7 @@ pub fn Op::slot2_ext(Slot, Slot) -> Self
 pub fn Op::slot3(FixedArray[Slot]) -> Self
 pub fn Op::slot3_ext(Slot, Slot, Slot) -> Self
 pub fn Op::slot_and_imm32(Slot, AnyConst32) -> Self
-pub fn Op::slot_and_lane(Slot, Int) -> Self
+pub fn Op::slot_and_lane(Slot, Int32) -> Self
 pub fn Op::slot_and_offset_hi(Slot, Offset64Hi) -> Self
 pub fn Op::slot_list(FixedArray[Slot]) -> Self
 pub fn Op::slot_list_ext(Slot, Slot, Slot) -> Self
@@ -1724,56 +1724,56 @@ pub fn Op::v128_xor(Slot, Slot, Slot) -> Self
 pub fn[V : VisitResults] Op::visit_results(Self, V) -> Self
 
 pub(all) struct ShiftAmount(Const16) derive(Eq, Hash, @debug.Debug)
-pub fn ShiftAmount::of_i32(Int) -> Self?
+pub fn ShiftAmount::of_i32(Int32) -> Self?
 pub fn ShiftAmount::of_i64(Int64) -> Self?
-pub fn ShiftAmount::of_u32(UInt, UInt) -> Self?
-pub fn ShiftAmount::to_i32(Self) -> Int
+pub fn ShiftAmount::of_u32(UInt32, UInt32) -> Self?
+pub fn ShiftAmount::to_i32(Self) -> Int32
 pub fn ShiftAmount::to_i64(Self) -> Int64
-pub fn ShiftAmount::to_u32(Self) -> UInt
+pub fn ShiftAmount::to_u32(Self) -> UInt32
 
 pub(all) struct Sign(Bool) derive(Eq, Hash, @debug.Debug)
-pub fn Sign::from_f32_bits(UInt) -> Self
+pub fn Sign::from_f32_bits(UInt32) -> Self
 pub fn Sign::from_f64_bits(UInt64) -> Self
 pub fn Sign::neg() -> Self
 pub fn Sign::pos() -> Self
 pub fn Sign::to_f32(Self) -> Float
 pub fn Sign::to_f64(Self) -> Double
 
-pub(all) struct Slot(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Slot(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Slot::is_const(Self) -> Bool
 pub fn Slot::next(Self) -> Self
-pub fn Slot::next_n(Self, Int) -> Self
+pub fn Slot::next_n(Self, Int32) -> Self
 pub fn Slot::prev(Self) -> Self
-pub fn Slot::prev_n(Self, Int) -> Self
-pub fn Slot::try_from_u32(UInt) -> Self raise IrError
+pub fn Slot::prev_n(Self, Int32) -> Self
+pub fn Slot::try_from_u32(UInt32) -> Self raise IrError
 
 pub(all) struct SlotSpan(Slot) derive(Compare, Eq, Hash, @debug.Debug)
-pub fn SlotSpan::has_overlapping_copies(Self, Self, Int) -> Bool
+pub fn SlotSpan::has_overlapping_copies(Self, Self, Int32) -> Bool
 pub fn SlotSpan::head(Self) -> Slot
-pub fn SlotSpan::iter(Self, Int) -> SlotSpanIter
-pub fn SlotSpan::iter_sized(Self, Int) -> SlotSpanIter
+pub fn SlotSpan::iter(Self, Int32) -> SlotSpanIter
+pub fn SlotSpan::iter_sized(Self, Int32) -> SlotSpanIter
 pub fn SlotSpan::new(Slot) -> Self
 
 pub(all) struct SlotSpanIter {
-  mut next : Int
-  mut last : Int
+  mut next : Int32
+  mut last : Int32
 } derive(Eq, @debug.Debug)
 pub fn SlotSpanIter::copy(Self) -> Self
 pub fn SlotSpanIter::from_raw_parts(Slot, Slot) -> Self
 pub fn SlotSpanIter::has_overlapping_copies(Self, Self) -> Bool
 pub fn SlotSpanIter::is_empty(Self) -> Bool
-pub fn SlotSpanIter::len(Self) -> Int
-pub fn SlotSpanIter::len_as_u16(Self) -> Int
+pub fn SlotSpanIter::len(Self) -> Int32
+pub fn SlotSpanIter::len_as_u16(Self) -> Int32
 pub fn SlotSpanIter::next(Self) -> Slot?
 pub fn SlotSpanIter::next_back(Self) -> Slot?
 pub fn SlotSpanIter::span(Self) -> SlotSpan
 
-pub(all) struct Table(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Table(Int32) derive(Compare, Eq, Hash, @debug.Debug)
 
 // Type aliases
 
 // Traits
 pub(open) trait VisitResults {
   fn visit_result_reg(Self, Slot) -> Slot
-  fn visit_result_regs(Self, SlotSpan, Int?) -> SlotSpan
+  fn visit_result_regs(Self, SlotSpan, Int32?) -> SlotSpan
 }

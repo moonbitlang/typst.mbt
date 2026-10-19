@@ -20,9 +20,9 @@ pub(all) suberror YamlError {
 
 // Types and methods
 pub(all) struct Location {
-  index : Int
-  line : Int
-  column : Int
+  index : Int32
+  line : Int32
+  column : Int32
 } derive(Eq, @debug.Debug)
 
 pub(all) struct YamlNode {

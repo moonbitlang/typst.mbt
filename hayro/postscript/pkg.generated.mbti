@@ -21,12 +21,12 @@ pub fn Name::is_literal(Self) -> Bool
 pub impl Show for Name
 
 pub(all) enum Number {
-  Integer(Int)
+  Integer(Int32)
   Real(Float)
 } derive(Eq, @debug.Debug)
 pub fn Number::as_f32(Self) -> Float
 pub fn Number::as_f64(Self) -> Double
-pub fn Number::as_i32(Self) -> Int
+pub fn Number::as_i32(Self) -> Int32
 pub impl Show for Number
 
 pub(all) enum Object {

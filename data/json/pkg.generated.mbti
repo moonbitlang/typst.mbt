@@ -15,10 +15,10 @@ pub fn valid_utf8(BytesView) -> Bool
 
 // Errors
 pub(all) suberror JsonError {
-  JsonError(code~ : ErrorCode, line~ : Int, column~ : Int)
+  JsonError(code~ : ErrorCode, line~ : Int32, column~ : Int32)
 } derive(@debug.Debug)
-pub fn JsonError::column(Self) -> Int
-pub fn JsonError::line(Self) -> Int
+pub fn JsonError::column(Self) -> Int32
+pub fn JsonError::line(Self) -> Int32
 pub fn JsonError::message(Self) -> String
 
 // Types and methods

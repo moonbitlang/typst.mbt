@@ -35,7 +35,7 @@ pub fn html_mathml_body(@library.Content, @library.StyleChain) -> @library.Conte
 
 pub fn html_span_filled(@library.Content, @library.Color) -> @library.Content
 
-pub fn iter_with_dom_indices(ArrayView[HtmlNode]) -> Array[(HtmlNode, Int)]
+pub fn iter_with_dom_indices(ArrayView[HtmlNode]) -> Array[(HtmlNode, Int32)]
 
 pub fn register(@library.NativeRuleMap) -> Unit
 

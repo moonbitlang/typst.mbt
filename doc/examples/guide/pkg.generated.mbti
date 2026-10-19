@@ -77,7 +77,7 @@ pub fn stripes_captured() -> @doc.Seq
 
 pub fn stripes_in_show() -> @doc.Seq
 
-pub fn styled_table(Array[Array[&@doc.IntoContent]], Int) -> @doc.Seq
+pub fn styled_table(Array[Array[&@doc.IntoContent]], Int32) -> @doc.Seq
 
 pub fn typed_fields() -> @doc.Seq
 

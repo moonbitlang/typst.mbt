@@ -146,7 +146,7 @@ pub struct Cells[T] {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn[T : ToValue] Cells::Cells(loc~ : SourceLoc, args_loc~ : ArgsLoc, (Int, Int) -> T raise) -> Self[T]
+pub fn[T : ToValue] Cells::Cells(loc~ : SourceLoc, args_loc~ : ArgsLoc, (Int32, Int32) -> T raise) -> Self[T]
 pub fn[T : ToValue] Cells::all(T) -> Self[T]
 pub fn[T : ToValue] Cells::columns(Array[T]) -> Self[T]
 pub impl[T] ToValue for Cells[T]
@@ -240,8 +240,8 @@ pub struct CompileReport[T] {
   origins : Origins
   // private fields
 }
-pub fn CompileReport::jump_from_click(Self[@layout.PagedDocument], Int, Double, Double) -> Jump?
-pub fn CompileReport::origin_at(Self[@layout.PagedDocument], Int, Double, Double) -> Origin?
+pub fn CompileReport::jump_from_click(Self[@layout.PagedDocument], Int32, Double, Double) -> Jump?
+pub fn CompileReport::origin_at(Self[@layout.PagedDocument], Int32, Double, Double) -> Origin?
 pub fn[T] CompileReport::output(Self[T]) -> T?
 pub fn CompileReport::pdf(Self[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]
 pub fn CompileReport::png_pages(Self[@layout.PagedDocument], ppi? : Double) -> ExportReport[Array[Bytes]]
@@ -262,14 +262,14 @@ pub struct CompositeSite {
   // private fields
 }
 #callsite(autofill(loc))
-pub fn[T] CompositeSite::arg(Self, Int, T, loc~ : SourceLoc) -> T
-pub fn CompositeSite::invalid(Self, String, arg? : Int) -> Content
+pub fn[T] CompositeSite::arg(Self, Int32, T, loc~ : SourceLoc) -> T
+pub fn CompositeSite::invalid(Self, String, arg? : Int32) -> Content
 
 pub struct Content {
   // private fields
 }
 pub fn Content::Content(&IntoContent) -> Self
-pub fn Content::table_cell_spans(Self) -> (Int, Int)?
+pub fn Content::table_cell_spans(Self) -> (Int32, Int32)?
 pub impl @builtin.Show for Content
 pub impl @debug.Debug for Content
 pub impl IntoContent for Content
@@ -503,8 +503,8 @@ pub impl ToValue for Dir
 pub struct DocWorld {
   // private fields
 }
-pub fn DocWorld::in_memory(files? : Map[String, Bytes], fonts? : Array[Bytes], embedded_fonts? : Bool, today? : (Int, Int, Int)) -> Self
-pub fn DocWorld::new(load~ : (@syntax.FileId) -> Bytes raise @library.FileError, book~ : @library.FontBook, font~ : (Int) -> @library.Font?, today? : (@library.Duration?) -> @library.Datetime?) -> Self
+pub fn DocWorld::in_memory(files? : Map[String, Bytes], fonts? : Array[Bytes], embedded_fonts? : Bool, today? : (Int32, Int32, Int32)) -> Self
+pub fn DocWorld::new(load~ : (@syntax.FileId) -> Bytes raise @library.FileError, book~ : @library.FontBook, font~ : (Int32) -> @library.Font?, today? : (@library.Duration?) -> @library.Datetime?) -> Self
 pub impl @library.World for DocWorld
 
 pub struct Document {
@@ -619,7 +619,7 @@ pub struct Feedback {
   document : String
   comment : String
   selected_text : String
-  pages : Array[Int]
+  pages : Array[Int32]
   origins : Array[FeedbackOrigin]
 }
 pub fn Feedback::to_json(Self) -> Json
@@ -629,11 +629,11 @@ pub struct FeedbackOrigin {
   origin : Origin
   pieces : Array[String]
   rendered : String
-  tier : Int
+  tier : Int32
   why : String
   source_ranges : Array[SourceSpan]
-  excerpt : Array[(Int, String)]
-  more : Int
+  excerpt : Array[(Int32, String)]
+  more : Int32
 }
 
 pub struct Figure {
@@ -657,9 +657,9 @@ pub impl IntoContent for FigureView
 pub struct FileLocation {
   path : String
   package_spec : String?
-  range : (Int, Int)?
-  line : Int
-  column : Int
+  range : (Int32, Int32)?
+  line : Int32
+  column : Int32
 }
 
 pub(all) enum FontWeight {
@@ -672,7 +672,7 @@ pub(all) enum FontWeight {
   Bold
   ExtraBold
   Black
-  Weight(Int)
+  Weight(Int32)
 }
 pub impl ToValue for FontWeight
 
@@ -892,7 +892,7 @@ pub impl IntoContent for ImageView
 pub(all) enum Jump {
   Source(Origin)
   Url(String)
-  Position(page~ : Int, x~ : Double, y~ : Double)
+  Position(page~ : Int32, x~ : Double, y~ : Double)
 }
 
 pub struct Keyed {
@@ -1011,7 +1011,7 @@ pub struct Lint {
   message : String
   hints : Array[Hint]
   location : Location?
-  page : Int?
+  page : Int32?
 }
 pub fn Lint::render(Self) -> String
 
@@ -1154,14 +1154,14 @@ pub impl ToValue for Numbering
 pub struct Origin {
   file : String
   module_name : String
-  start_line : Int
-  start_column : Int
-  end_line : Int
-  end_column : Int
+  start_line : Int32
+  start_column : Int32
+  end_line : Int32
+  end_column : Int32
   kind : String
   keys : Array[String]
-  param : Int?
-  text_range : (Int, Int)?
+  param : Int32?
+  text_range : (Int32, Int32)?
 }
 pub fn Origin::describe(Self) -> String
 pub fn Origin::position(Self) -> String
@@ -1169,10 +1169,10 @@ pub fn Origin::position(Self) -> String
 pub struct Origins {
   // private fields
 }
-pub fn Origins::length(Self) -> Int
+pub fn Origins::length(Self) -> Int32
 pub fn Origins::listing(Self) -> String
 pub fn Origins::resolve(Self, @syntax.Span) -> Origin?
-pub fn Origins::resolve_glyph(Self, @syntax.Span, Int) -> TextOrigin?
+pub fn Origins::resolve_glyph(Self, @syntax.Span, Int32) -> TextOrigin?
 pub fn Origins::resolve_range(Self, @syntax.DiagSpan) -> Origin?
 pub fn Origins::source_text(Self, @syntax.FileId) -> String?
 
@@ -1268,7 +1268,7 @@ pub(all) enum Paint {
   Auto
   None
   Rgb(String)
-  Luma(Int)
+  Luma(Int32)
   Black
   Gray
   Silver
@@ -1477,7 +1477,7 @@ pub impl @debug.Debug for RefView
 pub impl IntoContent for RefView
 
 pub struct Region {
-  page : Int
+  page : Int32
   x : Double
   y : Double
   width : Double
@@ -1506,12 +1506,12 @@ pub struct ReviewText {
   // private fields
 }
 pub fn ReviewText::feedback(Self, Selection, String) -> Feedback
-pub fn ReviewText::find(Self, String, nth? : Int) -> Selection?
-pub fn ReviewText::length(Self) -> Int
-pub fn ReviewText::origin_feedback(Self, Origin, Int, String) -> Feedback
+pub fn ReviewText::find(Self, String, nth? : Int32) -> Selection?
+pub fn ReviewText::length(Self) -> Int32
+pub fn ReviewText::origin_feedback(Self, Origin, Int32, String) -> Feedback
 pub fn ReviewText::origin_positions(Self, Origin) -> Array[Region]
-pub fn ReviewText::positions(Self, String, Int, column? : Int) -> Array[Region]
-pub fn ReviewText::range(Self, Int, Int) -> Selection?
+pub fn ReviewText::positions(Self, String, Int32, column? : Int32) -> Array[Region]
+pub fn ReviewText::range(Self, Int32, Int32) -> Selection?
 pub fn ReviewText::selected_text(Self, Selection) -> String
 pub fn ReviewText::text(Self) -> String
 
@@ -2354,7 +2354,7 @@ pub(all) enum Sizing {
   Pct(Double)
   Rel(Length)
 }
-pub fn Sizing::repeat(Int, size? : Self) -> Array[Self]
+pub fn Sizing::repeat(Int32, size? : Self) -> Array[Self]
 pub impl ToValue for Sizing
 
 pub struct Skew {
@@ -2419,9 +2419,9 @@ pub impl IntoSource for Source
 pub impl ToValue for Source
 
 pub struct SourceSpan {
-  line : Int
-  start : Int
-  end : Int
+  line : Int32
+  start : Int32
+  end : Int32
   text : String
 }
 
@@ -2732,7 +2732,7 @@ pub impl IntoContent for Text
 
 pub struct TextOrigin {
   origin : Origin
-  engine_offset : Int?
+  engine_offset : Int32?
 }
 
 pub struct TextView {
@@ -2874,7 +2874,7 @@ pub trait ToValue {
   fn to_value(Self) -> Value
 }
 pub impl ToValue for Bool
-pub impl ToValue for Int
+pub impl ToValue for Int32
 pub impl ToValue for Int64
 pub impl ToValue for Double
 pub impl ToValue for String
