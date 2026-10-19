@@ -10,7 +10,7 @@ pub fn attr_strings() -> Array[(String, String)]
 
 pub fn attrs() -> Array[AttrInfo]
 
-pub let attrs_global : Int
+pub let attrs_global : Int32
 
 pub fn elems() -> Array[ElemInfo]
 
@@ -43,11 +43,11 @@ pub fn AttrInfo::new(String, String, Type) -> Self
 pub struct ElemInfo {
   name : String
   docs : String
-  attrs : Array[Int]
+  attrs : Array[Int32]
 }
 pub fn ElemInfo::attributes(Self) -> Array[AttrInfo]
 pub fn ElemInfo::get_attr(Self, String) -> AttrInfo?
-pub fn ElemInfo::new(String, String, Array[Int]) -> Self
+pub fn ElemInfo::new(String, String, Array[Int32]) -> Self
 
 pub(all) enum Form {
   Infix
@@ -63,7 +63,7 @@ pub(all) struct OperatorInfo {
 } derive(Eq, @debug.Debug)
 pub fn OperatorInfo::of(String, Form, Bool) -> Self
 
-pub(all) struct Properties(Int) derive(Eq, @debug.Debug)
+pub(all) struct Properties(Int32) derive(Eq, @debug.Debug)
 pub fn Properties::contains(Self, Self) -> Bool
 
 pub(all) enum Type {
@@ -89,7 +89,7 @@ pub(all) enum Type {
   IconSize
   ImageCandidate
   SourceSize
-  Strings(Int, Int)
+  Strings(Int32, Int32)
   Union(Array[Type])
   List(Type, Char, Bool)
 } derive(Eq, @debug.Debug)

@@ -24,7 +24,7 @@ pub fn segments(Array[PathEl]) -> Array[PathSeg]
 
 pub fn solve_cubic(Double, Double, Double, Double) -> Array[Double]
 
-pub fn solve_itp((Double) -> Double, Double, Double, Double, Int, Double, Double, Double) -> Double
+pub fn solve_itp((Double) -> Double, Double, Double, Double, Int32, Double, Double, Double) -> Double
 
 pub fn solve_quadratic(Double, Double, Double) -> Array[Double]
 
@@ -99,8 +99,8 @@ pub fn BezPath::push(Self, PathEl) -> Unit
 pub fn BezPath::quad_to(Self, Point, Point) -> Unit
 pub fn BezPath::segments(Self) -> Array[PathSeg]
 pub fn BezPath::transform(Self, Affine) -> Self
-pub fn BezPath::truncate(Self, Int) -> Unit
-pub fn BezPath::winding(Self, Point) -> Int
+pub fn BezPath::truncate(Self, Int32) -> Unit
+pub fn BezPath::winding(Self, Point) -> Int32
 
 pub(all) enum Cap {
   Butt
@@ -114,7 +114,7 @@ pub(all) struct Circle {
 } derive(Eq, @debug.Debug)
 pub fn Circle::contains(Self, Point) -> Bool
 pub fn Circle::new(Point, Double) -> Self
-pub fn Circle::winding(Self, Point) -> Int
+pub fn Circle::winding(Self, Point) -> Int32
 
 pub(all) struct CubicBez {
   p0 : Point
@@ -187,7 +187,7 @@ pub fn PathSeg::extrema(Self) -> Array[Double]
 pub fn PathSeg::inv_arclen(Self, Double, Double) -> Double
 pub fn PathSeg::start(Self) -> Point
 pub fn PathSeg::subsegment(Self, Double, Double) -> Self
-pub fn PathSeg::winding(Self, Point) -> Int
+pub fn PathSeg::winding(Self, Point) -> Int32
 
 pub(all) struct Point {
   x : Double
@@ -297,7 +297,7 @@ pub fn Triangle::centroid(Self) -> Point
 pub fn Triangle::contains(Self, Point) -> Bool
 pub fn Triangle::from_coords((Double, Double), (Double, Double), (Double, Double)) -> Self
 pub fn Triangle::new(Point, Point, Point) -> Self
-pub fn Triangle::winding(Self, Point) -> Int
+pub fn Triangle::winding(Self, Point) -> Int32
 
 pub(all) struct Vec2 {
   x : Double

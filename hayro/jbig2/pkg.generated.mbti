@@ -51,10 +51,10 @@ pub struct Image {
 }
 pub fn[D : Decoder] Image::decode(Self, D) -> Unit raise DecodeError
 pub fn[D : Decoder] Image::decode_with(Self, D, DecoderContext) -> Unit raise DecodeError
-pub fn Image::height(Self) -> UInt
+pub fn Image::height(Self) -> UInt32
 pub fn Image::new(BytesView) -> Self raise DecodeError
 pub fn Image::new_embedded(BytesView, BytesView?) -> Self raise DecodeError
-pub fn Image::width(Self) -> UInt
+pub fn Image::width(Self) -> UInt32
 
 pub(all) enum OverflowError {
   BitmapDimension
@@ -122,6 +122,6 @@ pub impl Show for TemplateError
 // Traits
 pub(open) trait Decoder {
   fn push_pixel(Self, Bool) -> Unit
-  fn push_pixel_chunk(Self, Bool, UInt) -> Unit
+  fn push_pixel_chunk(Self, Bool, UInt32) -> Unit
   fn next_line(Self) -> Unit
 }

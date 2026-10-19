@@ -16,9 +16,9 @@ pub fn f32_add(Float, Float) -> Float
 
 pub fn f32_ceil(Float) -> Float
 
-pub fn f32_convert_i32_s(Int) -> Float
+pub fn f32_convert_i32_s(Int32) -> Float
 
-pub fn f32_convert_i32_u(UInt) -> Float
+pub fn f32_convert_i32_u(UInt32) -> Float
 
 pub fn f32_convert_i64_s(Int64) -> Float
 
@@ -54,7 +54,7 @@ pub fn f32_nearest(Float) -> Float
 
 pub fn f32_neg(Float) -> Float
 
-pub fn f32_reinterpret_i32(Int) -> Float
+pub fn f32_reinterpret_i32(Int32) -> Float
 
 pub fn f32_sqrt(Float) -> Float
 
@@ -130,9 +130,9 @@ pub fn f64_add(Double, Double) -> Double
 
 pub fn f64_ceil(Double) -> Double
 
-pub fn f64_convert_i32_s(Int) -> Double
+pub fn f64_convert_i32_s(Int32) -> Double
 
-pub fn f64_convert_i32_u(UInt) -> Double
+pub fn f64_convert_i32_u(UInt32) -> Double
 
 pub fn f64_convert_i64_s(Int64) -> Double
 
@@ -250,7 +250,7 @@ pub fn i16x8_all_true(V128Value) -> Bool
 
 pub fn i16x8_avgr_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_bitmask(V128Value) -> UInt
+pub fn i16x8_bitmask(V128Value) -> UInt32
 
 pub fn i16x8_eq(V128Value, V128Value) -> V128Value
 
@@ -274,9 +274,9 @@ pub fn i16x8_extmul_low_i8x16_s(V128Value, V128Value) -> V128Value
 
 pub fn i16x8_extmul_low_i8x16_u(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_extract_lane_s(V128Value, ImmLaneIdx8) -> Int
+pub fn i16x8_extract_lane_s(V128Value, ImmLaneIdx8) -> Int32
 
-pub fn i16x8_extract_lane_u(V128Value, ImmLaneIdx8) -> UInt
+pub fn i16x8_extract_lane_u(V128Value, ImmLaneIdx8) -> UInt32
 
 pub fn i16x8_ge_s(V128Value, V128Value) -> V128Value
 
@@ -320,15 +320,15 @@ pub fn i16x8_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
 pub fn i16x8_relaxed_q15mulr_s(V128Value, V128Value) -> V128Value
 
-pub fn i16x8_replace_lane(V128Value, ImmLaneIdx8, Int) -> V128Value
+pub fn i16x8_replace_lane(V128Value, ImmLaneIdx8, Int32) -> V128Value
 
-pub fn i16x8_shl(V128Value, UInt) -> V128Value
+pub fn i16x8_shl(V128Value, UInt32) -> V128Value
 
-pub fn i16x8_shr_s(V128Value, UInt) -> V128Value
+pub fn i16x8_shr_s(V128Value, UInt32) -> V128Value
 
-pub fn i16x8_shr_u(V128Value, UInt) -> V128Value
+pub fn i16x8_shr_u(V128Value, UInt32) -> V128Value
 
-pub fn i16x8_splat(Int) -> V128Value
+pub fn i16x8_splat(Int32) -> V128Value
 
 pub fn i16x8_sub(V128Value, V128Value) -> V128Value
 
@@ -336,111 +336,111 @@ pub fn i16x8_sub_sat_s(V128Value, V128Value) -> V128Value
 
 pub fn i16x8_sub_sat_u(V128Value, V128Value) -> V128Value
 
-pub fn i32_add(Int, Int) -> Int
+pub fn i32_add(Int32, Int32) -> Int32
 
-pub fn i32_bitand(Int, Int) -> Int
+pub fn i32_bitand(Int32, Int32) -> Int32
 
-pub fn i32_bitor(Int, Int) -> Int
+pub fn i32_bitor(Int32, Int32) -> Int32
 
-pub fn i32_bitxor(Int, Int) -> Int
+pub fn i32_bitxor(Int32, Int32) -> Int32
 
-pub fn i32_clz(Int) -> Int
+pub fn i32_clz(Int32) -> Int32
 
-pub fn i32_ctz(Int) -> Int
+pub fn i32_ctz(Int32) -> Int32
 
-pub fn i32_div_s(Int, Int) -> Int raise TrapCode
+pub fn i32_div_s(Int32, Int32) -> Int32 raise TrapCode
 
-pub fn i32_div_u(UInt, UInt) -> UInt raise TrapCode
+pub fn i32_div_u(UInt32, UInt32) -> UInt32 raise TrapCode
 
-pub fn i32_eq(Int, Int) -> Bool
+pub fn i32_eq(Int32, Int32) -> Bool
 
-pub fn i32_eqz(Int) -> Bool
+pub fn i32_eqz(Int32) -> Bool
 
-pub fn i32_extend16_s(Int) -> Int
+pub fn i32_extend16_s(Int32) -> Int32
 
-pub fn i32_extend8_s(Int) -> Int
+pub fn i32_extend8_s(Int32) -> Int32
 
-pub fn i32_ge_s(Int, Int) -> Bool
+pub fn i32_ge_s(Int32, Int32) -> Bool
 
-pub fn i32_ge_u(UInt, UInt) -> Bool
+pub fn i32_ge_u(UInt32, UInt32) -> Bool
 
-pub fn i32_gt_s(Int, Int) -> Bool
+pub fn i32_gt_s(Int32, Int32) -> Bool
 
-pub fn i32_gt_u(UInt, UInt) -> Bool
+pub fn i32_gt_u(UInt32, UInt32) -> Bool
 
-pub fn i32_le_s(Int, Int) -> Bool
+pub fn i32_le_s(Int32, Int32) -> Bool
 
-pub fn i32_le_u(UInt, UInt) -> Bool
+pub fn i32_le_u(UInt32, UInt32) -> Bool
 
-pub fn i32_load16_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+pub fn i32_load16_s(FixedArray[Byte], Int32, UInt64, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load16_s_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+pub fn i32_load16_s_at(FixedArray[Byte], Int32, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load16_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+pub fn i32_load16_u(FixedArray[Byte], Int32, UInt64, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load16_u_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+pub fn i32_load16_u_at(FixedArray[Byte], Int32, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load8_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+pub fn i32_load8_s(FixedArray[Byte], Int32, UInt64, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load8_s_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+pub fn i32_load8_s_at(FixedArray[Byte], Int32, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load8_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+pub fn i32_load8_u(FixedArray[Byte], Int32, UInt64, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_load8_u_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+pub fn i32_load8_u_at(FixedArray[Byte], Int32, UInt64) -> Int32 raise TrapCode
 
-pub fn i32_lt_s(Int, Int) -> Bool
+pub fn i32_lt_s(Int32, Int32) -> Bool
 
-pub fn i32_lt_u(UInt, UInt) -> Bool
+pub fn i32_lt_u(UInt32, UInt32) -> Bool
 
-pub fn i32_mul(Int, Int) -> Int
+pub fn i32_mul(Int32, Int32) -> Int32
 
-pub fn i32_ne(Int, Int) -> Bool
+pub fn i32_ne(Int32, Int32) -> Bool
 
-pub fn i32_popcnt(Int) -> Int
+pub fn i32_popcnt(Int32) -> Int32
 
-pub fn i32_reinterpret_f32(Float) -> Int
+pub fn i32_reinterpret_f32(Float) -> Int32
 
-pub fn i32_rem_s(Int, Int) -> Int raise TrapCode
+pub fn i32_rem_s(Int32, Int32) -> Int32 raise TrapCode
 
-pub fn i32_rem_u(UInt, UInt) -> UInt raise TrapCode
+pub fn i32_rem_u(UInt32, UInt32) -> UInt32 raise TrapCode
 
-pub fn i32_rotl(Int, Int) -> Int
+pub fn i32_rotl(Int32, Int32) -> Int32
 
-pub fn i32_rotr(Int, Int) -> Int
+pub fn i32_rotr(Int32, Int32) -> Int32
 
-pub fn i32_shl(Int, Int) -> Int
+pub fn i32_shl(Int32, Int32) -> Int32
 
-pub fn i32_shr_s(Int, Int) -> Int
+pub fn i32_shr_s(Int32, Int32) -> Int32
 
-pub fn i32_shr_u(Int, Int) -> Int
+pub fn i32_shr_u(Int32, Int32) -> Int32
 
-pub fn i32_store16(FixedArray[Byte], Int, UInt64, UInt64, Int) -> Unit raise TrapCode
+pub fn i32_store16(FixedArray[Byte], Int32, UInt64, UInt64, Int32) -> Unit raise TrapCode
 
-pub fn i32_store16_at(FixedArray[Byte], Int, UInt64, Int) -> Unit raise TrapCode
+pub fn i32_store16_at(FixedArray[Byte], Int32, UInt64, Int32) -> Unit raise TrapCode
 
-pub fn i32_store8(FixedArray[Byte], Int, UInt64, UInt64, Int) -> Unit raise TrapCode
+pub fn i32_store8(FixedArray[Byte], Int32, UInt64, UInt64, Int32) -> Unit raise TrapCode
 
-pub fn i32_store8_at(FixedArray[Byte], Int, UInt64, Int) -> Unit raise TrapCode
+pub fn i32_store8_at(FixedArray[Byte], Int32, UInt64, Int32) -> Unit raise TrapCode
 
-pub fn i32_sub(Int, Int) -> Int
+pub fn i32_sub(Int32, Int32) -> Int32
 
-pub fn i32_trunc_f32_s(Float) -> Int raise TrapCode
+pub fn i32_trunc_f32_s(Float) -> Int32 raise TrapCode
 
-pub fn i32_trunc_f32_u(Float) -> UInt raise TrapCode
+pub fn i32_trunc_f32_u(Float) -> UInt32 raise TrapCode
 
-pub fn i32_trunc_f64_s(Double) -> Int raise TrapCode
+pub fn i32_trunc_f64_s(Double) -> Int32 raise TrapCode
 
-pub fn i32_trunc_f64_u(Double) -> UInt raise TrapCode
+pub fn i32_trunc_f64_u(Double) -> UInt32 raise TrapCode
 
-pub fn i32_trunc_sat_f32_s(Float) -> Int
+pub fn i32_trunc_sat_f32_s(Float) -> Int32
 
-pub fn i32_trunc_sat_f32_u(Float) -> UInt
+pub fn i32_trunc_sat_f32_u(Float) -> UInt32
 
-pub fn i32_trunc_sat_f64_s(Double) -> Int
+pub fn i32_trunc_sat_f64_s(Double) -> Int32
 
-pub fn i32_trunc_sat_f64_u(Double) -> UInt
+pub fn i32_trunc_sat_f64_u(Double) -> UInt32
 
-pub fn i32_wrap_i64(Int64) -> Int
+pub fn i32_wrap_i64(Int64) -> Int32
 
 pub fn i32x4_abs(V128Value) -> V128Value
 
@@ -448,7 +448,7 @@ pub fn i32x4_add(V128Value, V128Value) -> V128Value
 
 pub fn i32x4_all_true(V128Value) -> Bool
 
-pub fn i32x4_bitmask(V128Value) -> UInt
+pub fn i32x4_bitmask(V128Value) -> UInt32
 
 pub fn i32x4_dot_i16x8_s(V128Value, V128Value) -> V128Value
 
@@ -474,7 +474,7 @@ pub fn i32x4_extmul_low_i16x8_s(V128Value, V128Value) -> V128Value
 
 pub fn i32x4_extmul_low_i16x8_u(V128Value, V128Value) -> V128Value
 
-pub fn i32x4_extract_lane(V128Value, ImmLaneIdx4) -> Int
+pub fn i32x4_extract_lane(V128Value, ImmLaneIdx4) -> Int32
 
 pub fn i32x4_ge_s(V128Value, V128Value) -> V128Value
 
@@ -518,15 +518,15 @@ pub fn i32x4_relaxed_trunc_f64x2_s_zero(V128Value) -> V128Value
 
 pub fn i32x4_relaxed_trunc_f64x2_u_zero(V128Value) -> V128Value
 
-pub fn i32x4_replace_lane(V128Value, ImmLaneIdx4, Int) -> V128Value
+pub fn i32x4_replace_lane(V128Value, ImmLaneIdx4, Int32) -> V128Value
 
-pub fn i32x4_shl(V128Value, UInt) -> V128Value
+pub fn i32x4_shl(V128Value, UInt32) -> V128Value
 
-pub fn i32x4_shr_s(V128Value, UInt) -> V128Value
+pub fn i32x4_shr_s(V128Value, UInt32) -> V128Value
 
-pub fn i32x4_shr_u(V128Value, UInt) -> V128Value
+pub fn i32x4_shr_u(V128Value, UInt32) -> V128Value
 
-pub fn i32x4_splat(Int) -> V128Value
+pub fn i32x4_splat(Int32) -> V128Value
 
 pub fn i32x4_sub(V128Value, V128Value) -> V128Value
 
@@ -566,9 +566,9 @@ pub fn i64_extend32_s(Int64) -> Int64
 
 pub fn i64_extend8_s(Int64) -> Int64
 
-pub fn i64_extend_i32_s(Int) -> Int64
+pub fn i64_extend_i32_s(Int32) -> Int64
 
-pub fn i64_extend_i32_u(UInt) -> UInt64
+pub fn i64_extend_i32_u(UInt32) -> UInt64
 
 pub fn i64_ge_s(Int64, Int64) -> Bool
 
@@ -582,29 +582,29 @@ pub fn i64_le_s(Int64, Int64) -> Bool
 
 pub fn i64_le_u(UInt64, UInt64) -> Bool
 
-pub fn i64_load16_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load16_s(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load16_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load16_s_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load16_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load16_u(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load16_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load16_u_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load32_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load32_s(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load32_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load32_s_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load32_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load32_u(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load32_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load32_u_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load8_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load8_s(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load8_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load8_s_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load8_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+pub fn i64_load8_u(FixedArray[Byte], Int32, UInt64, UInt64) -> Int64 raise TrapCode
 
-pub fn i64_load8_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+pub fn i64_load8_u_at(FixedArray[Byte], Int32, UInt64) -> Int64 raise TrapCode
 
 pub fn i64_lt_s(Int64, Int64) -> Bool
 
@@ -636,17 +636,17 @@ pub fn i64_shr_s(Int64, Int64) -> Int64
 
 pub fn i64_shr_u(Int64, Int64) -> Int64
 
-pub fn i64_store16(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store16(FixedArray[Byte], Int32, UInt64, UInt64, Int64) -> Unit raise TrapCode
 
-pub fn i64_store16_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store16_at(FixedArray[Byte], Int32, UInt64, Int64) -> Unit raise TrapCode
 
-pub fn i64_store32(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store32(FixedArray[Byte], Int32, UInt64, UInt64, Int64) -> Unit raise TrapCode
 
-pub fn i64_store32_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store32_at(FixedArray[Byte], Int32, UInt64, Int64) -> Unit raise TrapCode
 
-pub fn i64_store8(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store8(FixedArray[Byte], Int32, UInt64, UInt64, Int64) -> Unit raise TrapCode
 
-pub fn i64_store8_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+pub fn i64_store8_at(FixedArray[Byte], Int32, UInt64, Int64) -> Unit raise TrapCode
 
 pub fn i64_sub(Int64, Int64) -> Int64
 
@@ -674,7 +674,7 @@ pub fn i64x2_add(V128Value, V128Value) -> V128Value
 
 pub fn i64x2_all_true(V128Value) -> Bool
 
-pub fn i64x2_bitmask(V128Value) -> UInt
+pub fn i64x2_bitmask(V128Value) -> UInt32
 
 pub fn i64x2_eq(V128Value, V128Value) -> V128Value
 
@@ -714,11 +714,11 @@ pub fn i64x2_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
 pub fn i64x2_replace_lane(V128Value, ImmLaneIdx2, Int64) -> V128Value
 
-pub fn i64x2_shl(V128Value, UInt) -> V128Value
+pub fn i64x2_shl(V128Value, UInt32) -> V128Value
 
-pub fn i64x2_shr_s(V128Value, UInt) -> V128Value
+pub fn i64x2_shr_s(V128Value, UInt32) -> V128Value
 
-pub fn i64x2_shr_u(V128Value, UInt) -> V128Value
+pub fn i64x2_shr_u(V128Value, UInt32) -> V128Value
 
 pub fn i64x2_splat(Int64) -> V128Value
 
@@ -736,13 +736,13 @@ pub fn i8x16_all_true(V128Value) -> Bool
 
 pub fn i8x16_avgr_u(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_bitmask(V128Value) -> UInt
+pub fn i8x16_bitmask(V128Value) -> UInt32
 
 pub fn i8x16_eq(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_extract_lane_s(V128Value, ImmLaneIdx16) -> Int
+pub fn i8x16_extract_lane_s(V128Value, ImmLaneIdx16) -> Int32
 
-pub fn i8x16_extract_lane_u(V128Value, ImmLaneIdx16) -> UInt
+pub fn i8x16_extract_lane_u(V128Value, ImmLaneIdx16) -> UInt32
 
 pub fn i8x16_ge_s(V128Value, V128Value) -> V128Value
 
@@ -784,17 +784,17 @@ pub fn i8x16_relaxed_laneselect(V128Value, V128Value, V128Value) -> V128Value
 
 pub fn i8x16_relaxed_swizzle(V128Value, V128Value) -> V128Value
 
-pub fn i8x16_replace_lane(V128Value, ImmLaneIdx16, Int) -> V128Value
+pub fn i8x16_replace_lane(V128Value, ImmLaneIdx16, Int32) -> V128Value
 
-pub fn i8x16_shl(V128Value, UInt) -> V128Value
+pub fn i8x16_shl(V128Value, UInt32) -> V128Value
 
-pub fn i8x16_shr_s(V128Value, UInt) -> V128Value
+pub fn i8x16_shr_s(V128Value, UInt32) -> V128Value
 
-pub fn i8x16_shr_u(V128Value, UInt) -> V128Value
+pub fn i8x16_shr_u(V128Value, UInt32) -> V128Value
 
 pub fn i8x16_shuffle(V128Value, V128Value, FixedArray[ImmLaneIdx32]) -> V128Value
 
-pub fn i8x16_splat(Int) -> V128Value
+pub fn i8x16_splat(Int32) -> V128Value
 
 pub fn i8x16_sub(V128Value, V128Value) -> V128Value
 
@@ -806,21 +806,21 @@ pub fn i8x16_swizzle(V128Value, V128Value) -> V128Value
 
 pub fn likely(Bool) -> Bool
 
-pub fn load32(FixedArray[Byte], Int, UInt64, UInt64) -> UInt raise TrapCode
+pub fn load32(FixedArray[Byte], Int32, UInt64, UInt64) -> UInt32 raise TrapCode
 
-pub fn load32_at(FixedArray[Byte], Int, UInt64) -> UInt raise TrapCode
+pub fn load32_at(FixedArray[Byte], Int32, UInt64) -> UInt32 raise TrapCode
 
-pub fn load64(FixedArray[Byte], Int, UInt64, UInt64) -> UInt64 raise TrapCode
+pub fn load64(FixedArray[Byte], Int32, UInt64, UInt64) -> UInt64 raise TrapCode
 
-pub fn load64_at(FixedArray[Byte], Int, UInt64) -> UInt64 raise TrapCode
+pub fn load64_at(FixedArray[Byte], Int32, UInt64) -> UInt64 raise TrapCode
 
-pub fn store32(FixedArray[Byte], Int, UInt64, UInt64, UInt) -> Unit raise TrapCode
+pub fn store32(FixedArray[Byte], Int32, UInt64, UInt64, UInt32) -> Unit raise TrapCode
 
-pub fn store32_at(FixedArray[Byte], Int, UInt64, UInt) -> Unit raise TrapCode
+pub fn store32_at(FixedArray[Byte], Int32, UInt64, UInt32) -> Unit raise TrapCode
 
-pub fn store64(FixedArray[Byte], Int, UInt64, UInt64, UInt64) -> Unit raise TrapCode
+pub fn store64(FixedArray[Byte], Int32, UInt64, UInt64, UInt64) -> Unit raise TrapCode
 
-pub fn store64_at(FixedArray[Byte], Int, UInt64, UInt64) -> Unit raise TrapCode
+pub fn store64_at(FixedArray[Byte], Int32, UInt64, UInt64) -> Unit raise TrapCode
 
 pub fn unlikely(Bool) -> Bool
 
@@ -832,97 +832,97 @@ pub fn v128_any_true(V128Value) -> Bool
 
 pub fn v128_bitselect(V128Value, V128Value, V128Value) -> V128Value
 
-pub fn v128_load(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
+pub fn v128_load16_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
 
-pub fn v128_load16_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
+pub fn v128_load16_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx8) -> V128Value raise TrapCode
 
-pub fn v128_load16_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16_splat(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16_splat_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16x4_s(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16x4_s_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16x4_u(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load16x4_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load16x4_u_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
+pub fn v128_load32_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
 
-pub fn v128_load32_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
+pub fn v128_load32_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx4) -> V128Value raise TrapCode
 
-pub fn v128_load32_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32_splat(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32_splat_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32_zero(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32_zero_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32_zero_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32x2_s(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32x2_s_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32x2_u(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load32x2_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load32x2_u_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
+pub fn v128_load64_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
 
-pub fn v128_load64_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
+pub fn v128_load64_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx2) -> V128Value raise TrapCode
 
-pub fn v128_load64_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load64_splat(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load64_splat_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load64_zero(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load64_zero_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load64_zero_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
+pub fn v128_load8_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
 
-pub fn v128_load8_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
+pub fn v128_load8_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx16) -> V128Value raise TrapCode
 
-pub fn v128_load8_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8_splat(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8_splat_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8_splat_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8x8_s(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_s_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8x8_s_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8x8_u(FixedArray[Byte], Int32, UInt64, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load8x8_u_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load8x8_u_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
-pub fn v128_load_at(FixedArray[Byte], Int, UInt64) -> V128Value raise TrapCode
+pub fn v128_load_at(FixedArray[Byte], Int32, UInt64) -> V128Value raise TrapCode
 
 pub fn v128_not(V128Value) -> V128Value
 
 pub fn v128_or(V128Value, V128Value) -> V128Value
 
-pub fn v128_store(FixedArray[Byte], Int, UInt64, UInt64, V128Value) -> Unit raise TrapCode
+pub fn v128_store(FixedArray[Byte], Int32, UInt64, UInt64, V128Value) -> Unit raise TrapCode
 
-pub fn v128_store16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
+pub fn v128_store16_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
 
-pub fn v128_store16_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
+pub fn v128_store16_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx8) -> Unit raise TrapCode
 
-pub fn v128_store32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
+pub fn v128_store32_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
 
-pub fn v128_store32_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
+pub fn v128_store32_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx4) -> Unit raise TrapCode
 
-pub fn v128_store64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
+pub fn v128_store64_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
 
-pub fn v128_store64_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
+pub fn v128_store64_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx2) -> Unit raise TrapCode
 
-pub fn v128_store8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
+pub fn v128_store8_lane(FixedArray[Byte], Int32, UInt64, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
 
-pub fn v128_store8_lane_at(FixedArray[Byte], Int, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
+pub fn v128_store8_lane_at(FixedArray[Byte], Int32, UInt64, V128Value, ImmLaneIdx16) -> Unit raise TrapCode
 
-pub fn v128_store_at(FixedArray[Byte], Int, UInt64, V128Value) -> Unit raise TrapCode
+pub fn v128_store_at(FixedArray[Byte], Int32, UInt64, V128Value) -> Unit raise TrapCode
 
 pub fn v128_xor(V128Value, V128Value) -> V128Value
 
@@ -1040,22 +1040,22 @@ pub fn ElementSegment::as_ref(Self) -> ElementSegmentRef
 pub fn ElementSegment::drop_items(Self) -> Unit
 pub fn ElementSegment::items(Self) -> ArrayView[UntypedVal]
 pub fn ElementSegment::new(ValType, ArrayView[UntypedVal]) -> Self
-pub fn ElementSegment::size(Self) -> UInt
+pub fn ElementSegment::size(Self) -> UInt32
 pub fn ElementSegment::ty(Self) -> ValType
 
 pub struct ElementSegmentRef {
   // private fields
 }
 pub fn ElementSegmentRef::items(Self) -> ArrayView[UntypedVal]
-pub fn ElementSegmentRef::size(Self) -> UInt
+pub fn ElementSegmentRef::size(Self) -> UInt32
 pub fn ElementSegmentRef::ty(Self) -> ValType
 
-pub struct F32(UInt)
-pub fn F32::from_bits(UInt) -> Self
+pub struct F32(UInt32)
+pub fn F32::from_bits(UInt32) -> Self
 pub fn F32::from_float(Float) -> Self
 pub fn F32::output(Self, &Logger) -> Unit
-pub fn F32::partial_cmp(Self, Self) -> Int?
-pub fn F32::to_bits(Self) -> UInt
+pub fn F32::partial_cmp(Self, Self) -> Int32?
+pub fn F32::to_bits(Self) -> UInt32
 pub fn F32::to_float(Self) -> Float
 pub fn F32::to_string(Self) -> String
 pub impl Eq for F32
@@ -1066,7 +1066,7 @@ pub struct F64(UInt64)
 pub fn F64::from_bits(UInt64) -> Self
 pub fn F64::from_float(Double) -> Self
 pub fn F64::output(Self, &Logger) -> Unit
-pub fn F64::partial_cmp(Self, Self) -> Int?
+pub fn F64::partial_cmp(Self, Self) -> Int32?
 pub fn F64::to_bits(Self) -> UInt64
 pub fn F64::to_float(Self) -> Double
 pub fn F64::to_string(Self) -> String
@@ -1103,11 +1103,11 @@ pub impl Default for FuelCostsProvider
 pub impl Show for FuelCostsProvider
 
 pub struct FuncType {
-  len_params : Int
+  len_params : Int32
   params_results : FixedArray[ValType]
 } derive(Eq, Hash)
-pub fn FuncType::len_params(Self) -> Int
-pub fn FuncType::len_results(Self) -> Int
+pub fn FuncType::len_params(Self) -> Int32
+pub fn FuncType::len_results(Self) -> Int32
 pub fn FuncType::new(ArrayView[ValType], ArrayView[ValType]) -> Self raise FuncTypeError
 pub fn FuncType::output(Self, &Logger) -> Unit
 pub fn FuncType::params(Self) -> ArrayView[ValType]
@@ -1169,7 +1169,7 @@ pub struct Memory {
 }
 pub fn Memory::data(Self) -> FixedArray[Byte]
 pub fn Memory::data_mut(Self) -> FixedArray[Byte]
-pub fn Memory::data_size(Self) -> Int
+pub fn Memory::data_size(Self) -> Int32
 pub fn Memory::dynamic_ty(Self) -> MemoryType
 pub fn Memory::grow(Self, UInt64, Fuel?, ResourceLimiterRef) -> UInt64 raise MemoryError
 pub fn Memory::new(MemoryType, ResourceLimiterRef) -> Self raise MemoryError
@@ -1188,7 +1188,7 @@ pub fn MemoryType::is_64(Self) -> Bool
 pub fn MemoryType::is_subtype_of(Self, Self) -> Bool
 pub fn MemoryType::maximum(Self) -> UInt64?
 pub fn MemoryType::minimum(Self) -> UInt64
-pub fn MemoryType::page_size(Self) -> UInt
+pub fn MemoryType::page_size(Self) -> UInt32
 pub fn MemoryType::page_size_log2(Self) -> Byte
 
 pub struct MemoryTypeBuilder {
@@ -1228,7 +1228,7 @@ pub fn Table::get(Self, UInt64) -> TypedVal?
 pub fn Table::get_untyped(Self, UInt64) -> UntypedVal?
 pub fn Table::grow(Self, UInt64, TypedVal, Fuel?, ResourceLimiterRef) -> UInt64 raise TableError
 pub fn Table::grow_untyped(Self, UInt64, UntypedVal, Fuel?, ResourceLimiterRef) -> UInt64 raise TableError
-pub fn Table::init(Self, ElementSegmentRef, UInt64, UInt, UInt, Fuel?) -> Unit raise TableError
+pub fn Table::init(Self, ElementSegmentRef, UInt64, UInt32, UInt32, Fuel?) -> Unit raise TableError
 pub fn Table::new(TableType, TypedVal, ResourceLimiterRef) -> Self raise TableError
 pub fn Table::set(Self, UInt64, TypedVal) -> Unit raise TableError
 pub fn Table::set_untyped(Self, UInt64, UntypedVal) -> Unit raise TableError
@@ -1244,7 +1244,7 @@ pub fn TableType::is_64(Self) -> Bool
 pub fn TableType::is_subtype_of(Self, Self) -> Bool
 pub fn TableType::maximum(Self) -> UInt64?
 pub fn TableType::minimum(Self) -> UInt64
-pub fn TableType::new(ValType, UInt, UInt?) -> Self
+pub fn TableType::new(ValType, UInt32, UInt32?) -> Self
 pub fn TableType::new64(ValType, UInt64, UInt64?) -> Self
 
 pub struct Trap {
@@ -1253,8 +1253,8 @@ pub struct Trap {
 pub fn Trap::downcast_ref(Self) -> Error?
 pub fn Trap::from_host_error(Error) -> Self
 pub fn Trap::from_trap_code(TrapCode) -> Self
-pub fn Trap::i32_exit(Int) -> Self
-pub fn Trap::i32_exit_status(Self) -> Int?
+pub fn Trap::i32_exit(Int32) -> Self
+pub fn Trap::i32_exit_status(Self) -> Int32?
 pub fn Trap::new(String) -> Self
 pub fn Trap::output(Self, &Logger) -> Unit
 pub fn Trap::to_string(Self) -> String
@@ -1263,7 +1263,7 @@ pub impl Show for Trap
 
 pub enum TrapReason {
   InstructionTrap(TrapCode)
-  I32Exit(Int)
+  I32Exit(Int32)
   Message(String)
   Host(Error)
 }
@@ -1275,18 +1275,18 @@ pub struct TypedVal {
 pub fn TypedVal::from_bool(Bool) -> Self
 pub fn TypedVal::from_f32(Float) -> Self
 pub fn TypedVal::from_f64(Double) -> Self
-pub fn TypedVal::from_i32(Int) -> Self
+pub fn TypedVal::from_i32(Int32) -> Self
 pub fn TypedVal::from_i64(Int64) -> Self
-pub fn TypedVal::from_u32(UInt) -> Self
+pub fn TypedVal::from_u32(UInt32) -> Self
 pub fn TypedVal::from_u64(UInt64) -> Self
 pub fn TypedVal::from_v128(V128Value) -> Self
 pub fn TypedVal::new(ValType, UntypedVal) -> Self
 pub fn TypedVal::to_bool(Self) -> Bool
 pub fn TypedVal::to_f32(Self) -> Float
 pub fn TypedVal::to_f64(Self) -> Double
-pub fn TypedVal::to_i32(Self) -> Int
+pub fn TypedVal::to_i32(Self) -> Int32
 pub fn TypedVal::to_i64(Self) -> Int64
-pub fn TypedVal::to_u32(Self) -> UInt
+pub fn TypedVal::to_u32(Self) -> UInt32
 pub fn TypedVal::to_u64(Self) -> UInt64
 pub fn TypedVal::to_v128(Self) -> V128Value
 pub fn TypedVal::ty(Self) -> ValType
@@ -1301,35 +1301,35 @@ pub fn UntypedVal::from_bits64(UInt64) -> Self
 pub fn UntypedVal::from_bool(Bool) -> Self
 pub fn UntypedVal::from_f32(Float) -> Self
 pub fn UntypedVal::from_f64(Double) -> Self
-pub fn UntypedVal::from_i16(Int) -> Self
-pub fn UntypedVal::from_i32(Int) -> Self
+pub fn UntypedVal::from_i16(Int32) -> Self
+pub fn UntypedVal::from_i32(Int32) -> Self
 pub fn UntypedVal::from_i64(Int64) -> Self
-pub fn UntypedVal::from_i8(Int) -> Self
-pub fn UntypedVal::from_u32(UInt) -> Self
+pub fn UntypedVal::from_i8(Int32) -> Self
+pub fn UntypedVal::from_u32(UInt32) -> Self
 pub fn UntypedVal::from_u64(UInt64) -> Self
 pub fn UntypedVal::from_v128(V128Value) -> Self
 pub fn UntypedVal::hi64(Self) -> UInt64
 pub fn UntypedVal::read_bool(Self) -> Bool
 pub fn UntypedVal::read_f32(Self) -> Float
 pub fn UntypedVal::read_f64(Self) -> Double
-pub fn UntypedVal::read_i16(Self) -> Int
-pub fn UntypedVal::read_i32(Self) -> Int
+pub fn UntypedVal::read_i16(Self) -> Int32
+pub fn UntypedVal::read_i32(Self) -> Int32
 pub fn UntypedVal::read_i64(Self) -> Int64
-pub fn UntypedVal::read_i8(Self) -> Int
-pub fn UntypedVal::read_u16(Self) -> Int
-pub fn UntypedVal::read_u32(Self) -> UInt
+pub fn UntypedVal::read_i8(Self) -> Int32
+pub fn UntypedVal::read_u16(Self) -> Int32
+pub fn UntypedVal::read_u32(Self) -> UInt32
 pub fn UntypedVal::read_u64(Self) -> UInt64
-pub fn UntypedVal::read_u8(Self) -> Int
+pub fn UntypedVal::read_u8(Self) -> Int32
 pub fn UntypedVal::read_v128(Self) -> V128Value
 pub fn UntypedVal::to_bits64(Self) -> UInt64
 pub fn UntypedVal::write_bool(Self, Bool) -> Self
 pub fn UntypedVal::write_f32(Self, Float) -> Self
 pub fn UntypedVal::write_f64(Self, Double) -> Self
-pub fn UntypedVal::write_i16(Self, Int) -> Self
-pub fn UntypedVal::write_i32(Self, Int) -> Self
+pub fn UntypedVal::write_i16(Self, Int32) -> Self
+pub fn UntypedVal::write_i32(Self, Int32) -> Self
 pub fn UntypedVal::write_i64(Self, Int64) -> Self
-pub fn UntypedVal::write_i8(Self, Int) -> Self
-pub fn UntypedVal::write_u32(Self, UInt) -> Self
+pub fn UntypedVal::write_i8(Self, Int32) -> Self
+pub fn UntypedVal::write_u32(Self, UInt32) -> Self
 pub fn UntypedVal::write_u64(Self, UInt64) -> Self
 pub fn UntypedVal::write_v128(Self, V128Value) -> Self
 pub impl Default for UntypedVal

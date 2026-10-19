@@ -17,7 +17,7 @@ pub let alpha_color_transparent : AlphaColor
 
 pub let alpha_color_white : AlphaColor
 
-pub fn f32_as_u32(Float) -> Int
+pub fn f32_as_u32(Float) -> Int32
 
 pub fn f32_as_u8(Float) -> Byte
 
@@ -35,7 +35,7 @@ pub fn f32_max(Float, Float) -> Float
 
 pub fn f32_min(Float, Float) -> Float
 
-pub fn f64_as_u32(Double) -> Int
+pub fn f64_as_u32(Double) -> Int32
 
 pub fn f64_is_nearly_equal(Double, Double) -> Bool
 
@@ -59,7 +59,7 @@ pub fn[T : CacheKey, U : CacheKey] pair_cache_key(T, U) -> U128
 
 pub fn powf(Float, Float) -> Float
 
-pub fn powi(Float, Int) -> Float
+pub fn powi(Float, Int32) -> Float
 
 pub fn rect_to_kurbo(@syntax.Rect) -> @kurbo.Rect
 
@@ -193,7 +193,7 @@ pub(all) struct FallbackFontQuery {
   mut font_name : String?
   mut font_family : String?
   mut font_stretch : FontStretch
-  mut font_weight : UInt
+  mut font_weight : UInt32
   mut is_fixed_pitch : Bool
   mut is_serif : Bool
   mut is_italic : Bool
@@ -246,10 +246,10 @@ pub fn Hasher128::write_f32(Self, Float) -> Unit
 pub fn Hasher128::write_f64(Self, Double) -> Unit
 pub fn Hasher128::write_str(Self, StringView) -> Unit
 pub fn Hasher128::write_u128(Self, U128) -> Unit
-pub fn Hasher128::write_u32(Self, UInt) -> Unit
+pub fn Hasher128::write_u32(Self, UInt32) -> Unit
 pub fn Hasher128::write_u64(Self, UInt64) -> Unit
 pub fn Hasher128::write_u8(Self, Byte) -> Unit
-pub fn Hasher128::write_usize(Self, Int) -> Unit
+pub fn Hasher128::write_usize(Self, Int32) -> Unit
 
 pub enum Image {
   Stencil(StencilImage)
@@ -261,10 +261,10 @@ pub(all) enum ImageData {
   Rgb(RgbData)
   Luma(LumaData)
 }
-pub fn ImageData::height(Self) -> Int
+pub fn ImageData::height(Self) -> Int32
 pub fn ImageData::interpolate(Self) -> Bool
 pub fn ImageData::scale_factors(Self) -> (Float, Float)
-pub fn ImageData::width(Self) -> Int
+pub fn ImageData::width(Self) -> Int32
 
 pub(all) struct ImageDrawProps {
   transform : @kurbo.Affine
@@ -279,7 +279,7 @@ pub fn InterpreterCache::new() -> Self
 pub impl Default for InterpreterCache
 
 pub(all) struct InterpreterSettings {
-  font_resolver : (FontQuery) -> (Bytes, Int)?
+  font_resolver : (FontQuery) -> (Bytes, Int32)?
   cmap_resolver : (@cmap.CMapName) -> Bytes?
   warning_sink : (InterpreterWarning) -> Unit
   render_annotations : Bool
@@ -292,8 +292,8 @@ pub(all) enum InterpreterWarning {
 
 pub(all) struct LumaData {
   data : Bytes
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   interpolate : Bool
   scale_factors : (Float, Float)
 }
@@ -307,7 +307,7 @@ pub(all) struct OutlineFontData {
   data : Bytes
   cache_key : U128
   postscript_name : String?
-  weight : UInt?
+  weight : UInt32?
   is_italic : Bool
   is_serif : Bool
   is_monospace : Bool
@@ -340,13 +340,13 @@ pub struct RasterImage {
   // private fields
 }
 pub fn RasterImage::stream(Self) -> @syntax.Stream
-pub fn RasterImage::with_rgba(Self, (ImageData, LumaData?) -> Unit, (Int, Int)?) -> Unit
+pub fn RasterImage::with_rgba(Self, (ImageData, LumaData?) -> Unit, (Int32, Int32)?) -> Unit
 pub impl CacheKey for RasterImage
 
 pub(all) struct RgbData {
   data : Bytes
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   interpolate : Bool
   scale_factors : (Float, Float)
 }
@@ -419,7 +419,7 @@ type State
 pub struct StencilImage {
   // private fields
 }
-pub fn StencilImage::with_stencil(Self, (LumaData, Paint) -> Unit, (Int, Int)?) -> Unit
+pub fn StencilImage::with_stencil(Self, (LumaData, Paint) -> Unit, (Int32, Int32)?) -> Unit
 pub impl CacheKey for StencilImage
 
 pub(all) struct StrokeProps {
@@ -506,7 +506,7 @@ pub type CMapResolverFn = (@cmap.CMapName) -> Bytes?
 
 pub type ColorComponents = Array[Float]
 
-pub type FontResolverFn = (FontQuery) -> (Bytes, Int)?
+pub type FontResolverFn = (FontQuery) -> (Bytes, Int32)?
 
 pub using @font_types {type GlyphId}
 
@@ -539,6 +539,6 @@ pub(open) trait Device {
   fn pop_clip(Self) -> Unit
   fn pop_transparency_group(Self) -> Unit
   fn draw_rect(Self, @kurbo.Rect, DrawProps, DrawMode) -> Unit = _
-  fn begin_marked_content(Self, Bytes, Int?) -> Unit = _
+  fn begin_marked_content(Self, Bytes, Int32?) -> Unit = _
   fn end_marked_content(Self) -> Unit = _
 }

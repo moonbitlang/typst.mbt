@@ -7,53 +7,53 @@ import {
 }
 
 // Values
-pub const ARGS_ARE_XY_VALUES : Int = 0x0002
+pub const ARGS_ARE_XY_VALUES : Int32 = 0x0002
 
-pub const ARG_1_AND_2_ARE_WORDS : Int = 0x0001
+pub const ARG_1_AND_2_ARE_WORDS : Int32 = 0x0001
 
-pub const CFF_SFNT_VERSION : UInt = 0x4F54544F
+pub const CFF_SFNT_VERSION : UInt32 = 0x4F54544F
 
-pub const HEAD_FLAG_FORCE_INTEGER_PPEM : Int = 0x0008
+pub const HEAD_FLAG_FORCE_INTEGER_PPEM : Int32 = 0x0008
 
-pub const MAC_STYLE_BOLD : Int = 0x0001
+pub const MAC_STYLE_BOLD : Int32 = 0x0001
 
-pub const MAC_STYLE_ITALIC : Int = 0x0002
+pub const MAC_STYLE_ITALIC : Int32 = 0x0002
 
-pub const MORE_COMPONENTS : Int = 0x0020
+pub const MORE_COMPONENTS : Int32 = 0x0020
 
-pub const NAME_ID_FAMILY_NAME : Int = 1
+pub const NAME_ID_FAMILY_NAME : Int32 = 1
 
-pub const OS2_SELECTION_ITALIC : Int = 0x0001
+pub const OS2_SELECTION_ITALIC : Int32 = 0x0001
 
-pub const OS2_SELECTION_OBLIQUE : Int = 0x0200
+pub const OS2_SELECTION_OBLIQUE : Int32 = 0x0200
 
-pub const OS2_SELECTION_USE_TYPO_METRICS : Int = 0x0080
+pub const OS2_SELECTION_USE_TYPO_METRICS : Int32 = 0x0080
 
-pub const OVERLAP_COMPOUND : Int = 0x0400
+pub const OVERLAP_COMPOUND : Int32 = 0x0400
 
-pub const ROUND_XY_TO_GRID : Int = 0x0004
+pub const ROUND_XY_TO_GRID : Int32 = 0x0004
 
-pub const SCALED_COMPONENT_OFFSET : Int = 0x0800
+pub const SCALED_COMPONENT_OFFSET : Int32 = 0x0800
 
-pub const TRUE_SFNT_VERSION : UInt = 0x74727565
+pub const TRUE_SFNT_VERSION : UInt32 = 0x74727565
 
-pub const TTC_HEADER_TAG : UInt = 0x74746366
+pub const TTC_HEADER_TAG : UInt32 = 0x74746366
 
-pub const TT_SFNT_VERSION : UInt = 0x00010000
+pub const TT_SFNT_VERSION : UInt32 = 0x00010000
 
-pub const UNSCALED_COMPONENT_OFFSET : Int = 0x1000
+pub const UNSCALED_COMPONENT_OFFSET : Int32 = 0x1000
 
-pub const USE_MY_METRICS : Int = 0x0200
+pub const USE_MY_METRICS : Int32 = 0x0200
 
-pub const WE_HAVE_AN_X_AND_Y_SCALE : Int = 0x0040
+pub const WE_HAVE_AN_X_AND_Y_SCALE : Int32 = 0x0040
 
-pub const WE_HAVE_A_SCALE : Int = 0x0008
+pub const WE_HAVE_A_SCALE : Int32 = 0x0008
 
-pub const WE_HAVE_A_TWO_BY_TWO : Int = 0x0080
+pub const WE_HAVE_A_TWO_BY_TWO : Int32 = 0x0080
 
-pub const WE_HAVE_INSTRUCTIONS : Int = 0x0100
+pub const WE_HAVE_INSTRUCTIONS : Int32 = 0x0100
 
-pub fn compute_checksum(BytesView) -> UInt
+pub fn compute_checksum(BytesView) -> UInt32
 
 pub let default_glyph_names : ReadOnlyArray[String]
 
@@ -63,9 +63,9 @@ pub fn english_or_first(Array[LocalizedString]) -> LocalizedString?
 pub(all) suberror ReadError {
   OutOfBounds
   InvalidFormat(Int64)
-  InvalidSfnt(UInt)
+  InvalidSfnt(UInt32)
   InvalidTtc(@font_types.Tag)
-  InvalidCollectionIndex(UInt)
+  InvalidCollectionIndex(UInt32)
   InvalidArrayLen
   ValidationError
   NullOffset
@@ -79,8 +79,8 @@ pub impl Show for ReadError
 
 // Types and methods
 pub(all) enum Anchor {
-  Offset(x~ : Int, y~ : Int)
-  Point(base~ : Int, component~ : Int)
+  Offset(x~ : Int32, y~ : Int32)
+  Point(base~ : Int32, component~ : Int32)
 } derive(Eq, @debug.Debug)
 
 pub struct CffTable {
@@ -92,9 +92,9 @@ pub struct Cmap {
   data : FontData
 }
 pub fn Cmap::encoding_records(Self) -> Array[EncodingRecord]
-pub fn Cmap::map_codepoint(Self, UInt) -> @font_types.GlyphId?
+pub fn Cmap::map_codepoint(Self, UInt32) -> @font_types.GlyphId?
 pub fn Cmap::offset_data(Self) -> FontData
-pub fn Cmap::subtable(Self, Int) -> CmapSubtable raise ReadError
+pub fn Cmap::subtable(Self, Int32) -> CmapSubtable raise ReadError
 
 pub enum CmapSubtable {
   Format0(FontData)
@@ -107,12 +107,12 @@ pub enum CmapSubtable {
   Format13(FontData)
   Format14(FontData)
 }
-pub fn CmapSubtable::format(Self) -> Int
-pub fn CmapSubtable::map_codepoint(Self, UInt) -> @font_types.GlyphId?
+pub fn CmapSubtable::format(Self) -> Int32
+pub fn CmapSubtable::map_codepoint(Self, UInt32) -> @font_types.GlyphId?
 
 pub(all) struct Component {
-  flags : Int
-  glyph : Int
+  flags : Int32
+  glyph : Int32
   anchor : Anchor
   transform : ComponentTransform
 } derive(Eq, @debug.Debug)
@@ -128,43 +128,43 @@ pub struct CompositeGlyph {
   data : FontData
 }
 pub fn CompositeGlyph::component_data(Self) -> FontData
-pub fn CompositeGlyph::component_glyphs_and_flags(Self) -> (Array[(Int, Int)], BytesView?)
+pub fn CompositeGlyph::component_glyphs_and_flags(Self) -> (Array[(Int32, Int32)], BytesView?)
 pub fn CompositeGlyph::components(Self) -> Array[Component]
 pub fn CompositeGlyph::instructions(Self) -> BytesView?
 
 pub(all) struct Cursor {
   data : FontData
-  mut pos : Int
+  mut pos : Int32
 }
-pub fn Cursor::advance_by(Self, Int) -> Unit
+pub fn Cursor::advance_by(Self, Int32) -> Unit
 pub fn Cursor::is_empty(Self) -> Bool
-pub fn Cursor::position(Self) -> Int raise ReadError
-pub fn Cursor::read_array(Self, Int, Int) -> FontData raise ReadError
-pub fn Cursor::read_i16(Self) -> Int raise ReadError
-pub fn Cursor::read_i32(Self) -> Int raise ReadError
-pub fn Cursor::read_i8(Self) -> Int raise ReadError
-pub fn Cursor::read_u16(Self) -> Int raise ReadError
-pub fn Cursor::read_u24(Self) -> Int raise ReadError
-pub fn Cursor::read_u32(Self) -> UInt raise ReadError
-pub fn Cursor::read_u8(Self) -> Int raise ReadError
+pub fn Cursor::position(Self) -> Int32 raise ReadError
+pub fn Cursor::read_array(Self, Int32, Int32) -> FontData raise ReadError
+pub fn Cursor::read_i16(Self) -> Int32 raise ReadError
+pub fn Cursor::read_i32(Self) -> Int32 raise ReadError
+pub fn Cursor::read_i8(Self) -> Int32 raise ReadError
+pub fn Cursor::read_u16(Self) -> Int32 raise ReadError
+pub fn Cursor::read_u24(Self) -> Int32 raise ReadError
+pub fn Cursor::read_u32(Self) -> UInt32 raise ReadError
+pub fn Cursor::read_u8(Self) -> Int32 raise ReadError
 pub fn Cursor::remaining(Self) -> FontData?
-pub fn Cursor::remaining_bytes(Self) -> Int
+pub fn Cursor::remaining_bytes(Self) -> Int32
 
 pub struct DeviceRecord {
-  pixel_size : Int
-  max_width : Int
+  pixel_size : Int32
+  max_width : Int32
   widths : BytesView
 }
-pub fn DeviceRecord::max_width(Self) -> Int
-pub fn DeviceRecord::pixel_size(Self) -> Int
+pub fn DeviceRecord::max_width(Self) -> Int32
+pub fn DeviceRecord::pixel_size(Self) -> Int32
 pub fn DeviceRecord::widths(Self) -> BytesView
 
 pub(all) struct EncodingRecord {
-  platform : Int
-  encoding : Int
-  subtable_offset : UInt
+  platform : Int32
+  encoding : Int32
+  subtable_offset : UInt32
 } derive(@debug.Debug)
-pub fn EncodingRecord::encoding_id(Self) -> Int
+pub fn EncodingRecord::encoding_id(Self) -> Int32
 pub fn EncodingRecord::is_mac_roman(Self) -> Bool
 pub fn EncodingRecord::is_symbol(Self) -> Bool
 pub fn EncodingRecord::platform_id(Self) -> PlatformId
@@ -176,27 +176,27 @@ pub(all) struct FontData {
 pub fn FontData::as_bytes(Self) -> BytesView
 pub fn FontData::cursor(Self) -> Cursor
 pub fn FontData::empty() -> Self
-pub fn FontData::get(Self, Int, Int) -> BytesView?
+pub fn FontData::get(Self, Int32, Int32) -> BytesView?
 pub fn FontData::is_empty(Self) -> Bool
-pub fn FontData::len(Self) -> Int
+pub fn FontData::len(Self) -> Int32
 pub fn FontData::new(BytesView) -> Self
-pub fn FontData::read_array(Self, Int, Int, Int) -> Self raise ReadError
-pub fn FontData::read_f2dot14(Self, Int) -> @font_types.F2Dot14 raise ReadError
-pub fn FontData::read_fixed(Self, Int) -> @font_types.Fixed raise ReadError
-pub fn FontData::read_i16(Self, Int) -> Int raise ReadError
-pub fn FontData::read_i32(Self, Int) -> Int raise ReadError
-pub fn FontData::read_i8(Self, Int) -> Int raise ReadError
-pub fn FontData::read_u16(Self, Int) -> Int raise ReadError
-pub fn FontData::read_u24(Self, Int) -> Int raise ReadError
-pub fn FontData::read_u32(Self, Int) -> UInt raise ReadError
-pub fn FontData::read_u8(Self, Int) -> Int raise ReadError
-pub fn FontData::slice(Self, Int, Int) -> Self?
-pub fn FontData::split_off(Self, Int) -> Self?
+pub fn FontData::read_array(Self, Int32, Int32, Int32) -> Self raise ReadError
+pub fn FontData::read_f2dot14(Self, Int32) -> @font_types.F2Dot14 raise ReadError
+pub fn FontData::read_fixed(Self, Int32) -> @font_types.Fixed raise ReadError
+pub fn FontData::read_i16(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::read_i32(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::read_i8(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::read_u16(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::read_u24(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::read_u32(Self, Int32) -> UInt32 raise ReadError
+pub fn FontData::read_u8(Self, Int32) -> Int32 raise ReadError
+pub fn FontData::slice(Self, Int32, Int32) -> Self?
+pub fn FontData::split_off(Self, Int32) -> Self?
 
 pub struct FontRef {
   data : FontData
   table_directory : TableDirectory
-  ttc_index : Int
+  ttc_index : Int32
   in_ttc : Bool
   // private fields
 }
@@ -204,14 +204,14 @@ pub fn FontRef::cff(Self) -> CffTable raise ReadError
 pub fn FontRef::cmap(Self) -> Cmap raise ReadError
 pub fn FontRef::data(Self) -> FontData
 pub fn FontRef::data_for_tag(Self, String) -> FontData?
-pub fn FontRef::from_index(BytesView, Int) -> Self raise ReadError
+pub fn FontRef::from_index(BytesView, Int32) -> Self raise ReadError
 pub fn FontRef::glyf(Self) -> Glyf raise ReadError
 pub fn FontRef::hdmx(Self) -> Hdmx raise ReadError
 pub fn FontRef::head(Self) -> Head raise ReadError
 pub fn FontRef::hhea(Self) -> Hhea raise ReadError
 pub fn FontRef::hmtx(Self) -> Hmtx raise ReadError
 pub fn FontRef::loca(Self, Bool?) -> Loca raise ReadError
-pub fn FontRef::localized_strings(Self, Int) -> Array[LocalizedString]
+pub fn FontRef::localized_strings(Self, Int32) -> Array[LocalizedString]
 pub fn FontRef::maxp(Self) -> Maxp raise ReadError
 pub fn FontRef::name(Self) -> Name raise ReadError
 pub fn FontRef::new(BytesView) -> Self raise ReadError
@@ -219,7 +219,7 @@ pub fn FontRef::os2(Self) -> Os2 raise ReadError
 pub fn FontRef::post(Self) -> Post raise ReadError
 pub fn FontRef::table_data(Self, @font_types.Tag) -> FontData?
 pub fn FontRef::table_directory(Self) -> TableDirectory
-pub fn FontRef::ttc_index(Self) -> Int?
+pub fn FontRef::ttc_index(Self) -> Int32?
 
 pub struct Glyf {
   data : FontData
@@ -230,62 +230,62 @@ pub enum Glyph {
   Simple(SimpleGlyph)
   Composite(CompositeGlyph)
 }
-pub fn Glyph::number_of_contours(Self) -> Int
+pub fn Glyph::number_of_contours(Self) -> Int32
 pub fn Glyph::read(FontData) -> Self raise ReadError
-pub fn Glyph::x_max(Self) -> Int
-pub fn Glyph::x_min(Self) -> Int
-pub fn Glyph::y_max(Self) -> Int
-pub fn Glyph::y_min(Self) -> Int
+pub fn Glyph::x_max(Self) -> Int32
+pub fn Glyph::x_min(Self) -> Int32
+pub fn Glyph::y_max(Self) -> Int32
+pub fn Glyph::y_min(Self) -> Int32
 
 pub struct Hdmx {
   // private fields
 }
-pub fn Hdmx::num_records(Self) -> Int
-pub fn Hdmx::read(FontData, Int) -> Self raise ReadError
-pub fn Hdmx::record_for_size(Self, Int) -> DeviceRecord?
-pub fn Hdmx::size_device_record(Self) -> UInt
-pub fn Hdmx::version(Self) -> Int
+pub fn Hdmx::num_records(Self) -> Int32
+pub fn Hdmx::read(FontData, Int32) -> Self raise ReadError
+pub fn Hdmx::record_for_size(Self, Int32) -> DeviceRecord?
+pub fn Hdmx::size_device_record(Self) -> UInt32
+pub fn Hdmx::version(Self) -> Int32
 
 pub struct Head {
   data : FontData
 }
-pub fn Head::flags(Self) -> Int
-pub fn Head::index_to_loc_format(Self) -> Int
-pub fn Head::mac_style(Self) -> Int
-pub fn Head::units_per_em(Self) -> Int
-pub fn Head::x_max(Self) -> Int
-pub fn Head::x_min(Self) -> Int
-pub fn Head::y_max(Self) -> Int
-pub fn Head::y_min(Self) -> Int
+pub fn Head::flags(Self) -> Int32
+pub fn Head::index_to_loc_format(Self) -> Int32
+pub fn Head::mac_style(Self) -> Int32
+pub fn Head::units_per_em(Self) -> Int32
+pub fn Head::x_max(Self) -> Int32
+pub fn Head::x_min(Self) -> Int32
+pub fn Head::y_max(Self) -> Int32
+pub fn Head::y_min(Self) -> Int32
 
 pub struct Hhea {
   data : FontData
 }
-pub fn Hhea::advance_width_max(Self) -> Int
-pub fn Hhea::ascender(Self) -> Int
-pub fn Hhea::descender(Self) -> Int
-pub fn Hhea::line_gap(Self) -> Int
-pub fn Hhea::number_of_h_metrics(Self) -> Int
+pub fn Hhea::advance_width_max(Self) -> Int32
+pub fn Hhea::ascender(Self) -> Int32
+pub fn Hhea::descender(Self) -> Int32
+pub fn Hhea::line_gap(Self) -> Int32
+pub fn Hhea::number_of_h_metrics(Self) -> Int32
 
 pub struct Hmtx {
   h_metrics : FontData
   left_side_bearings : FontData
 }
-pub fn Hmtx::advance(Self, @font_types.GlyphId) -> Int?
-pub fn Hmtx::h_metric_advance(Self, Int) -> Int
-pub fn Hmtx::h_metric_side_bearing(Self, Int) -> Int
-pub fn Hmtx::left_side_bearing(Self, Int) -> Int
-pub fn Hmtx::num_h_metrics(Self) -> Int
-pub fn Hmtx::num_left_side_bearings(Self) -> Int
-pub fn Hmtx::side_bearing(Self, @font_types.GlyphId) -> Int?
+pub fn Hmtx::advance(Self, @font_types.GlyphId) -> Int32?
+pub fn Hmtx::h_metric_advance(Self, Int32) -> Int32
+pub fn Hmtx::h_metric_side_bearing(Self, Int32) -> Int32
+pub fn Hmtx::left_side_bearing(Self, Int32) -> Int32
+pub fn Hmtx::num_h_metrics(Self) -> Int32
+pub fn Hmtx::num_left_side_bearings(Self) -> Int32
+pub fn Hmtx::side_bearing(Self, @font_types.GlyphId) -> Int32?
 
 pub enum Loca {
   Short(FontData)
   Long(FontData)
 }
 pub fn Loca::get_glyf(Self, @font_types.GlyphId, Glyf) -> Glyph? raise ReadError
-pub fn Loca::get_raw(Self, Int) -> UInt?
-pub fn Loca::len(Self) -> Int
+pub fn Loca::get_raw(Self, Int32) -> UInt32?
+pub fn Loca::len(Self) -> Int32
 
 pub struct LocalizedString {
   language : String?
@@ -297,39 +297,39 @@ pub fn LocalizedString::language(Self) -> String?
 pub struct Maxp {
   data : FontData
 }
-pub fn Maxp::max_function_defs(Self) -> Int?
-pub fn Maxp::max_instruction_defs(Self) -> Int?
-pub fn Maxp::max_size_of_instructions(Self) -> Int?
-pub fn Maxp::max_stack_elements(Self) -> Int?
-pub fn Maxp::max_storage(Self) -> Int?
-pub fn Maxp::max_twilight_points(Self) -> Int?
-pub fn Maxp::num_glyphs(Self) -> Int
+pub fn Maxp::max_function_defs(Self) -> Int32?
+pub fn Maxp::max_instruction_defs(Self) -> Int32?
+pub fn Maxp::max_size_of_instructions(Self) -> Int32?
+pub fn Maxp::max_stack_elements(Self) -> Int32?
+pub fn Maxp::max_storage(Self) -> Int32?
+pub fn Maxp::max_twilight_points(Self) -> Int32?
+pub fn Maxp::num_glyphs(Self) -> Int32
 pub fn Maxp::version(Self) -> Version16Dot16
 
 pub struct Name {
   data : FontData
 }
-pub fn Name::count(Self) -> Int
-pub fn Name::lang_tag_record(Self) -> Array[(Int, Int)]?
+pub fn Name::count(Self) -> Int32
+pub fn Name::lang_tag_record(Self) -> Array[(Int32, Int32)]?
 pub fn Name::name_record(Self) -> Array[NameRecord]
-pub fn Name::storage_offset(Self) -> Int
+pub fn Name::storage_offset(Self) -> Int32
 pub fn Name::string_data(Self) -> FontData
-pub fn Name::version(Self) -> Int
+pub fn Name::version(Self) -> Int32
 
 pub(all) enum NameEncoding {
   Utf16Be
   MacRoman
   Unknown
 } derive(Eq, @debug.Debug)
-pub fn NameEncoding::new(Int, Int) -> Self
+pub fn NameEncoding::new(Int32, Int32) -> Self
 
 pub(all) struct NameRecord {
-  platform_id : Int
-  encoding_id : Int
-  language_id : Int
-  name_id : Int
-  length : Int
-  string_offset : Int
+  platform_id : Int32
+  encoding_id : Int32
+  language_id : Int32
+  name_id : Int32
+  length : Int32
+  string_offset : Int32
 } derive(@debug.Debug)
 pub fn NameRecord::string(Self, FontData) -> NameString raise ReadError
 
@@ -347,20 +347,20 @@ pub impl OutlinePen for NullPen
 pub struct Os2 {
   data : FontData
 }
-pub fn Os2::fs_selection(Self) -> Int
-pub fn Os2::s_cap_height(Self) -> Int?
-pub fn Os2::s_typo_ascender(Self) -> Int
-pub fn Os2::s_typo_descender(Self) -> Int
-pub fn Os2::s_typo_line_gap(Self) -> Int
-pub fn Os2::sx_height(Self) -> Int?
-pub fn Os2::us_weight_class(Self) -> Int
-pub fn Os2::us_width_class(Self) -> Int
-pub fn Os2::us_win_ascent(Self) -> Int
-pub fn Os2::us_win_descent(Self) -> Int
-pub fn Os2::version(Self) -> Int
-pub fn Os2::x_avg_char_width(Self) -> Int
-pub fn Os2::y_strikeout_position(Self) -> Int
-pub fn Os2::y_strikeout_size(Self) -> Int
+pub fn Os2::fs_selection(Self) -> Int32
+pub fn Os2::s_cap_height(Self) -> Int32?
+pub fn Os2::s_typo_ascender(Self) -> Int32
+pub fn Os2::s_typo_descender(Self) -> Int32
+pub fn Os2::s_typo_line_gap(Self) -> Int32
+pub fn Os2::sx_height(Self) -> Int32?
+pub fn Os2::us_weight_class(Self) -> Int32
+pub fn Os2::us_width_class(Self) -> Int32
+pub fn Os2::us_win_ascent(Self) -> Int32
+pub fn Os2::us_win_descent(Self) -> Int32
+pub fn Os2::version(Self) -> Int32
+pub fn Os2::x_avg_char_width(Self) -> Int32
+pub fn Os2::y_strikeout_position(Self) -> Int32
+pub fn Os2::y_strikeout_size(Self) -> Int32
 
 pub(all) enum PathElement {
   MoveTo(x~ : Float, y~ : Float)
@@ -378,18 +378,18 @@ pub(all) enum PlatformId {
   Custom
   Unknown
 } derive(Eq, @debug.Debug)
-pub fn PlatformId::new(Int) -> Self
+pub fn PlatformId::new(Int32) -> Self
 
 pub struct Post {
   data : FontData
 }
-pub fn Post::glyph_name_index(Self) -> Array[Int]?
-pub fn Post::is_fixed_pitch(Self) -> UInt
+pub fn Post::glyph_name_index(Self) -> Array[Int32]?
+pub fn Post::is_fixed_pitch(Self) -> UInt32
 pub fn Post::italic_angle(Self) -> @font_types.Fixed
-pub fn Post::num_glyphs(Self) -> Int?
+pub fn Post::num_glyphs(Self) -> Int32?
 pub fn Post::string_data(Self) -> Array[Result[String, ReadError]]?
-pub fn Post::underline_position(Self) -> Int
-pub fn Post::underline_thickness(Self) -> Int
+pub fn Post::underline_position(Self) -> Int32
+pub fn Post::underline_thickness(Self) -> Int32
 pub fn Post::version(Self) -> Version16Dot16
 
 pub(all) struct RecordingPen {
@@ -401,31 +401,31 @@ pub impl OutlinePen for RecordingPen
 pub struct SimpleGlyph {
   data : FontData
 }
-pub fn SimpleGlyph::end_pts_of_contours(Self) -> Array[Int]
+pub fn SimpleGlyph::end_pts_of_contours(Self) -> Array[Int32]
 pub fn SimpleGlyph::glyph_data(Self) -> BytesView
 pub fn SimpleGlyph::has_overlapping_contours(Self) -> Bool
-pub fn SimpleGlyph::instruction_length(Self) -> Int
+pub fn SimpleGlyph::instruction_length(Self) -> Int32
 pub fn SimpleGlyph::instructions(Self) -> BytesView
-pub fn SimpleGlyph::num_points(Self) -> Int
-pub fn SimpleGlyph::number_of_contours(Self) -> Int
-pub fn SimpleGlyph::read_points_fast(Self, FixedArray[Int], FixedArray[Int], FixedArray[Int], Int) -> Unit raise ReadError
+pub fn SimpleGlyph::num_points(Self) -> Int32
+pub fn SimpleGlyph::number_of_contours(Self) -> Int32
+pub fn SimpleGlyph::read_points_fast(Self, FixedArray[Int32], FixedArray[Int32], FixedArray[Int32], Int32) -> Unit raise ReadError
 
 pub struct TableDirectory {
   data : FontData
 }
-pub fn TableDirectory::num_tables(Self) -> Int
-pub fn TableDirectory::sfnt_version(Self) -> UInt
+pub fn TableDirectory::num_tables(Self) -> Int32
+pub fn TableDirectory::sfnt_version(Self) -> UInt32
 pub fn TableDirectory::table_records(Self) -> Array[TableRecord]
 
 pub(all) struct TableRecord {
   tag : @font_types.Tag
-  checksum : UInt
-  offset : UInt
-  length : UInt
+  checksum : UInt32
+  offset : UInt32
+  length : UInt32
 } derive(@debug.Debug)
 
-pub(all) struct Version16Dot16(UInt) derive(Eq, @debug.Debug)
-pub fn Version16Dot16::to_major_minor(Self) -> (Int, Int)
+pub(all) struct Version16Dot16(UInt32) derive(Eq, @debug.Debug)
+pub fn Version16Dot16::to_major_minor(Self) -> (Int32, Int32)
 
 // Type aliases
 

@@ -7,115 +7,115 @@ import {
 }
 
 // Values
-pub const BUFFER_FLAG_BEGINNING_OF_TEXT : UInt = 0x00000001
+pub const BUFFER_FLAG_BEGINNING_OF_TEXT : UInt32 = 0x00000001
 
-pub const BUFFER_FLAG_DEFINED : UInt = 0x000000FF
+pub const BUFFER_FLAG_DEFINED : UInt32 = 0x000000FF
 
-pub const BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE : UInt = 0x00000010
+pub const BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE : UInt32 = 0x00000010
 
-pub const BUFFER_FLAG_END_OF_TEXT : UInt = 0x00000002
+pub const BUFFER_FLAG_END_OF_TEXT : UInt32 = 0x00000002
 
-pub const BUFFER_FLAG_PRESERVE_DEFAULT_IGNORABLES : UInt = 0x00000004
+pub const BUFFER_FLAG_PRESERVE_DEFAULT_IGNORABLES : UInt32 = 0x00000004
 
-pub const BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL : UInt = 0x00000040
+pub const BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL : UInt32 = 0x00000040
 
-pub const BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT : UInt = 0x00000040
+pub const BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT : UInt32 = 0x00000040
 
-pub const BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES : UInt = 0x00000008
+pub const BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES : UInt32 = 0x00000008
 
-pub const BUFFER_FLAG_VERIFY : UInt = 0x00000020
+pub const BUFFER_FLAG_VERIFY : UInt32 = 0x00000020
 
-pub const GC_CLOSE_PUNCTUATION : Int = 18
+pub const GC_CLOSE_PUNCTUATION : Int32 = 18
 
-pub const GC_CONNECT_PUNCTUATION : Int = 16
+pub const GC_CONNECT_PUNCTUATION : Int32 = 16
 
-pub const GC_CONTROL : Int = 0
+pub const GC_CONTROL : Int32 = 0
 
-pub const GC_CURRENCY_SYMBOL : Int = 23
+pub const GC_CURRENCY_SYMBOL : Int32 = 23
 
-pub const GC_DASH_PUNCTUATION : Int = 17
+pub const GC_DASH_PUNCTUATION : Int32 = 17
 
-pub const GC_DECIMAL_NUMBER : Int = 13
+pub const GC_DECIMAL_NUMBER : Int32 = 13
 
-pub const GC_ENCLOSING_MARK : Int = 11
+pub const GC_ENCLOSING_MARK : Int32 = 11
 
-pub const GC_FINAL_PUNCTUATION : Int = 19
+pub const GC_FINAL_PUNCTUATION : Int32 = 19
 
-pub const GC_FORMAT : Int = 1
+pub const GC_FORMAT : Int32 = 1
 
-pub const GC_INITIAL_PUNCTUATION : Int = 20
+pub const GC_INITIAL_PUNCTUATION : Int32 = 20
 
-pub const GC_LETTER_NUMBER : Int = 14
+pub const GC_LETTER_NUMBER : Int32 = 14
 
-pub const GC_LINE_SEPARATOR : Int = 27
+pub const GC_LINE_SEPARATOR : Int32 = 27
 
-pub const GC_LOWERCASE_LETTER : Int = 5
+pub const GC_LOWERCASE_LETTER : Int32 = 5
 
-pub const GC_MATH_SYMBOL : Int = 25
+pub const GC_MATH_SYMBOL : Int32 = 25
 
-pub const GC_MODIFIER_LETTER : Int = 6
+pub const GC_MODIFIER_LETTER : Int32 = 6
 
-pub const GC_MODIFIER_SYMBOL : Int = 24
+pub const GC_MODIFIER_SYMBOL : Int32 = 24
 
-pub const GC_NON_SPACING_MARK : Int = 12
+pub const GC_NON_SPACING_MARK : Int32 = 12
 
-pub const GC_OPEN_PUNCTUATION : Int = 22
+pub const GC_OPEN_PUNCTUATION : Int32 = 22
 
-pub const GC_OTHER_LETTER : Int = 7
+pub const GC_OTHER_LETTER : Int32 = 7
 
-pub const GC_OTHER_NUMBER : Int = 15
+pub const GC_OTHER_NUMBER : Int32 = 15
 
-pub const GC_OTHER_PUNCTUATION : Int = 21
+pub const GC_OTHER_PUNCTUATION : Int32 = 21
 
-pub const GC_OTHER_SYMBOL : Int = 26
+pub const GC_OTHER_SYMBOL : Int32 = 26
 
-pub const GC_PARAGRAPH_SEPARATOR : Int = 28
+pub const GC_PARAGRAPH_SEPARATOR : Int32 = 28
 
-pub const GC_PRIVATE_USE : Int = 3
+pub const GC_PRIVATE_USE : Int32 = 3
 
-pub const GC_SPACE_SEPARATOR : Int = 29
+pub const GC_SPACE_SEPARATOR : Int32 = 29
 
-pub const GC_SPACING_MARK : Int = 10
+pub const GC_SPACING_MARK : Int32 = 10
 
-pub const GC_SURROGATE : Int = 4
+pub const GC_SURROGATE : Int32 = 4
 
-pub const GC_TITLECASE_LETTER : Int = 8
+pub const GC_TITLECASE_LETTER : Int32 = 8
 
-pub const GC_UNASSIGNED : Int = 2
+pub const GC_UNASSIGNED : Int32 = 2
 
-pub const GC_UPPERCASE_LETTER : Int = 9
+pub const GC_UPPERCASE_LETTER : Int32 = 9
 
-pub const GLYPH_FLAG_DEFINED : UInt = 0x00000007
+pub const GLYPH_FLAG_DEFINED : UInt32 = 0x00000007
 
-pub const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS : Int = 2
+pub const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS : Int32 = 2
 
-pub const HB_BUFFER_CLUSTER_LEVEL_DEFAULT : Int = 0
+pub const HB_BUFFER_CLUSTER_LEVEL_DEFAULT : Int32 = 0
 
-pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS : Int = 1
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS : Int32 = 1
 
-pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES : Int = 0
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES : Int32 = 0
 
-pub const HB_FEATURE_GLOBAL_END : UInt = 0xFFFFFFFF
+pub const HB_FEATURE_GLOBAL_END : UInt32 = 0xFFFFFFFF
 
-pub const HB_FEATURE_GLOBAL_START : UInt = 0
+pub const HB_FEATURE_GLOBAL_START : UInt32 = 0
 
-pub const SAFE_TO_INSERT_TATWEEL : UInt = 0x00000004
+pub const SAFE_TO_INSERT_TATWEEL : UInt32 = 0x00000004
 
-pub const SERIALIZE_GLYPH_EXTENTS : Int = 0b00001000
+pub const SERIALIZE_GLYPH_EXTENTS : Int32 = 0b00001000
 
-pub const SERIALIZE_GLYPH_FLAGS : Int = 0b00010000
+pub const SERIALIZE_GLYPH_FLAGS : Int32 = 0b00010000
 
-pub const SERIALIZE_NO_ADVANCES : Int = 0b00100000
+pub const SERIALIZE_NO_ADVANCES : Int32 = 0b00100000
 
-pub const SERIALIZE_NO_CLUSTERS : Int = 0b00000001
+pub const SERIALIZE_NO_CLUSTERS : Int32 = 0b00000001
 
-pub const SERIALIZE_NO_GLYPH_NAMES : Int = 0b00000100
+pub const SERIALIZE_NO_GLYPH_NAMES : Int32 = 0b00000100
 
-pub const SERIALIZE_NO_POSITIONS : Int = 0b00000010
+pub const SERIALIZE_NO_POSITIONS : Int32 = 0b00000010
 
-pub const UNSAFE_TO_BREAK : UInt = 0x00000001
+pub const UNSAFE_TO_BREAK : UInt32 = 0x00000001
 
-pub const UNSAFE_TO_CONCAT : UInt = 0x00000002
+pub const UNSAFE_TO_CONCAT : UInt32 = 0x00000002
 
 pub let script_adlam : Script
 
@@ -490,48 +490,48 @@ pub impl Default for Direction
 
 type Face
 pub fn Face::from_face(@otf.Face) -> Self
-pub fn Face::from_slice(BytesView, UInt) -> Self?
-pub fn Face::set_pixels_per_em(Self, (Int, Int)?) -> Unit
+pub fn Face::from_slice(BytesView, UInt32) -> Self?
+pub fn Face::set_pixels_per_em(Self, (Int32, Int32)?) -> Unit
 pub fn Face::set_points_per_em(Self, Float?) -> Unit
 pub fn Face::set_variation(Self, @otf.Tag, Float) -> Unit
 pub fn Face::set_variations(Self, Array[Variation]) -> Unit
 pub fn Face::ttf(Self) -> @otf.Face
-pub fn Face::units_per_em(Self) -> Int
+pub fn Face::units_per_em(Self) -> Int32
 
 pub(all) struct Feature {
   tag : @otf.Tag
-  value : UInt
-  start : UInt
-  end : UInt
+  value : UInt32
+  start : UInt32
+  end : UInt32
 } derive(Eq, Hash, @debug.Debug)
 pub fn Feature::from_str(String) -> Self?
 pub fn Feature::is_global(Self) -> Bool
-pub fn Feature::new(@otf.Tag, UInt, start? : UInt, end? : UInt) -> Self
+pub fn Feature::new(@otf.Tag, UInt32, start? : UInt32, end? : UInt32) -> Self
 
 pub struct GlyphBuffer(Buffer)
 pub fn GlyphBuffer::clear(Self) -> UnicodeBuffer
 pub fn GlyphBuffer::glyph_infos(Self) -> ArrayView[GlyphInfo]
 pub fn GlyphBuffer::glyph_positions(Self) -> ArrayView[GlyphPosition]
 pub fn GlyphBuffer::is_empty(Self) -> Bool
-pub fn GlyphBuffer::len(Self) -> Int
+pub fn GlyphBuffer::len(Self) -> Int32
 pub fn GlyphBuffer::recycle(Self) -> UnicodeBuffer
-pub fn GlyphBuffer::serialize(Self, Face, Int) -> String
+pub fn GlyphBuffer::serialize(Self, Face, Int32) -> String
 
 pub(all) struct GlyphInfo {
-  mut glyph_id : UInt
-  mut mask : UInt
-  mut cluster : UInt
-  mut var1 : UInt
-  mut var2 : UInt
+  mut glyph_id : UInt32
+  mut mask : UInt32
+  mut cluster : UInt32
+  mut var1 : UInt32
+  mut var2 : UInt32
 } derive(@debug.Debug)
 pub fn GlyphInfo::unsafe_to_break(Self) -> Bool
 
 pub(all) struct GlyphPosition {
-  mut x_advance : Int
-  mut y_advance : Int
-  mut x_offset : Int
-  mut y_offset : Int
-  mut var_ : UInt
+  mut x_advance : Int32
+  mut y_advance : Int32
+  mut x_offset : Int32
+  mut y_offset : Int32
+  mut var_ : UInt32
 } derive(@debug.Debug)
 
 pub(all) struct Language(String) derive(Eq, Hash, @debug.Debug)
@@ -550,26 +550,26 @@ pub fn ShapePlan::new(Face, Direction, Script?, Language?, Array[Feature]) -> Se
 pub fn ShapePlan::script(Self) -> Script?
 
 pub struct UnicodeBuffer(Buffer)
-pub fn UnicodeBuffer::add(Self, Int, UInt) -> Unit
+pub fn UnicodeBuffer::add(Self, Int32, UInt32) -> Unit
 pub fn UnicodeBuffer::clear(Self) -> Unit
-pub fn UnicodeBuffer::cluster_level(Self) -> Int
+pub fn UnicodeBuffer::cluster_level(Self) -> Int32
 pub fn UnicodeBuffer::direction(Self) -> Direction
-pub fn UnicodeBuffer::flags(Self) -> UInt
+pub fn UnicodeBuffer::flags(Self) -> UInt32
 pub fn UnicodeBuffer::guess_segment_properties(Self) -> Unit
 pub fn UnicodeBuffer::is_empty(Self) -> Bool
 pub fn UnicodeBuffer::language(Self) -> Language?
-pub fn UnicodeBuffer::len(Self) -> Int
+pub fn UnicodeBuffer::len(Self) -> Int32
 pub fn UnicodeBuffer::new() -> Self
 pub fn UnicodeBuffer::push_str(Self, StringView) -> Unit
 pub fn UnicodeBuffer::reset_clusters(Self) -> Unit
 pub fn UnicodeBuffer::script(Self) -> Script
-pub fn UnicodeBuffer::set_cluster_level(Self, Int) -> Unit
+pub fn UnicodeBuffer::set_cluster_level(Self, Int32) -> Unit
 pub fn UnicodeBuffer::set_direction(Self, Direction) -> Unit
-pub fn UnicodeBuffer::set_flags(Self, UInt) -> Unit
+pub fn UnicodeBuffer::set_flags(Self, UInt32) -> Unit
 pub fn UnicodeBuffer::set_language(Self, Language) -> Unit
-pub fn UnicodeBuffer::set_not_found_variation_selector_glyph(Self, UInt) -> Unit
-pub fn UnicodeBuffer::set_post_context(Self, Array[Int]) -> Unit
-pub fn UnicodeBuffer::set_pre_context(Self, Array[Int]) -> Unit
+pub fn UnicodeBuffer::set_not_found_variation_selector_glyph(Self, UInt32) -> Unit
+pub fn UnicodeBuffer::set_post_context(Self, Array[Int32]) -> Unit
+pub fn UnicodeBuffer::set_pre_context(Self, Array[Int32]) -> Unit
 pub fn UnicodeBuffer::set_script(Self, Script) -> Unit
 
 pub(all) struct Variation {

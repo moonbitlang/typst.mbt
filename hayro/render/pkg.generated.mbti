@@ -21,8 +21,8 @@ pub fn RenderCache::new() -> Self
 pub(all) struct RenderSettings {
   x_scale : Float
   y_scale : Float
-  width : Int?
-  height : Int?
+  width : Int32?
+  height : Int32?
   bg_color : @vello_cpu.AlphaColor
 }
 pub impl Default for RenderSettings

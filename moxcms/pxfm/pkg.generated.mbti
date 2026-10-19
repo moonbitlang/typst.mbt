@@ -2,21 +2,21 @@
 package "moonbitlang/typst/moxcms/pxfm"
 
 // Values
-pub fn f32_as_i16(Float) -> Int
+pub fn f32_as_i16(Float) -> Int32
 
-pub fn f32_as_i32(Float) -> Int
+pub fn f32_as_i32(Float) -> Int32
 
-pub fn f32_as_u16(Float) -> Int
+pub fn f32_as_u16(Float) -> Int32
 
 pub fn f32_as_u32(Float) -> Int64
 
-pub fn f32_as_u8(Float) -> Int
+pub fn f32_as_u8(Float) -> Int32
 
-pub fn f64_as_i32(Double) -> Int
+pub fn f64_as_i32(Double) -> Int32
 
 pub fn f64_as_i64(Double) -> Int64
 
-pub fn f64_as_u16(Double) -> Int
+pub fn f64_as_u16(Double) -> Int32
 
 pub fn f_pow(Double, Double) -> Double
 

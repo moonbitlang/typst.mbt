@@ -14,15 +14,15 @@ pub(all) suberror CsvError {
 
 // Types and methods
 pub(all) enum ErrorKind {
-  Utf8(pos~ : Position?, field~ : Int, valid_up_to~ : Int)
-  UnequalLengths(pos~ : Position?, expected_len~ : Int, len~ : Int)
+  Utf8(pos~ : Position?, field~ : Int32, valid_up_to~ : Int32)
+  UnequalLengths(pos~ : Position?, expected_len~ : Int32, len~ : Int32)
 } derive(Eq, @debug.Debug)
 pub fn ErrorKind::position(Self) -> Position?
 
 pub(all) struct Position {
-  byte : Int
-  line : Int
-  record : Int
+  byte : Int32
+  line : Int32
+  record : Int32
 } derive(Eq, @debug.Debug)
 
 pub struct Reader {

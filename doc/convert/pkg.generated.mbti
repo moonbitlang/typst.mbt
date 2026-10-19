@@ -16,7 +16,7 @@ pub fn translate(String, String, @library.Library, baseline? : Bool, prose? : Bo
 pub struct Fallback {
   construct : String
   kind : String
-  bytes : Int
+  bytes : Int32
 }
 
 pub(all) enum Tier {
@@ -34,9 +34,9 @@ pub struct Translation {
   tier : Tier
   math_only : Bool
   fallbacks : Array[Fallback]
-  source_bytes : Int
-  fallback_bytes : Int
-  typed : Int
+  source_bytes : Int32
+  fallback_bytes : Int32
+  typed : Int32
   note : String
 }
 

@@ -7,13 +7,13 @@ import {
 }
 
 // Values
-pub let atom_len_bits : Int
+pub let atom_len_bits : Int32
 
 pub let color_black : Color
 
 pub let color_white : Color
 
-pub fn compare_str(StringView, StringView) -> Int
+pub fn compare_str(StringView, StringView) -> Int32
 
 pub fn context_iter(SyntaxSet, Context) -> MatchIter
 
@@ -25,9 +25,9 @@ pub let font_style_italic : FontStyle
 
 pub let font_style_underline : FontStyle
 
-pub fn highlight_iter(HighlightState, Array[(Int, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String)]
+pub fn highlight_iter(HighlightState, Array[(Int32, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String)]
 
-pub fn ranged_highlight(HighlightState, Array[(Int, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String, (Int, Int))]
+pub fn ranged_highlight(HighlightState, Array[(Int32, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String, (Int32, Int32))]
 
 pub fn read_plist(Bytes) -> Settings raise SettingsError
 
@@ -41,11 +41,11 @@ pub fn rust_trim(StringView) -> StringView
 
 pub fn split_whitespace(StringView) -> Array[StringView]
 
-pub fn[T] stable_sort_by(Array[T], (T, T) -> Int) -> Array[T]
+pub fn[T] stable_sort_by(Array[T], (T, T) -> Int32) -> Array[T]
 
-pub fn substitute_backrefs_in_regex(String, (Int) -> String?) -> String
+pub fn substitute_backrefs_in_regex(String, (Int32) -> String?) -> String
 
-pub fn utf8_len(StringView) -> Int
+pub fn utf8_len(StringView) -> Int32
 
 // Errors
 pub(all) suberror LoadingError {
@@ -96,7 +96,7 @@ pub impl Show for ParseThemeError
 pub(all) suberror ParsingError {
   MissingMainContext
   MissingContext(ContextId)
-  BadMatchIndex(Int)
+  BadMatchIndex(Int32)
   UnresolvedContextReference(ContextReference)
 }
 pub impl Show for ParsingError
@@ -127,14 +127,14 @@ pub(all) enum BasicScopeStackOp {
 pub struct ByteIndex {
   // private fields
 }
-pub fn ByteIndex::len(Self) -> Int
+pub fn ByteIndex::len(Self) -> Int32
 pub fn ByteIndex::new(String) -> Self
-pub fn ByteIndex::slice(Self, Int, Int) -> String
+pub fn ByteIndex::slice(Self, Int32, Int32) -> String
 pub fn ByteIndex::text(Self) -> String
-pub fn ByteIndex::utf16(Self, Int) -> Int
+pub fn ByteIndex::utf16(Self, Int32) -> Int32
 
 pub(all) enum ClearAmount {
-  TopN(Int)
+  TopN(Int32)
   All
 } derive(Eq, @debug.Debug)
 
@@ -156,12 +156,12 @@ pub(all) struct Context {
   mut uses_backrefs : Bool
   patterns : Array[Pattern]
 }
-pub fn Context::match_at(Self, Int) -> MatchPattern raise ParsingError
+pub fn Context::match_at(Self, Int32) -> MatchPattern raise ParsingError
 pub fn Context::new(Bool) -> Self
 
 pub(all) struct ContextId {
-  syntax_index : Int
-  context_index : Int
+  syntax_index : Int32
+  context_index : Int32
 } derive(Eq, Hash, @debug.Debug)
 
 pub(all) enum ContextReference {
@@ -216,7 +216,7 @@ pub(all) struct LazyContexts {
 pub struct MatchIter {
   // private fields
 }
-pub fn MatchIter::next(Self) -> (Context, Int)?
+pub fn MatchIter::next(Self) -> (Context, Int32)?
 
 pub(all) enum MatchOperation {
   Push(Array[ContextReference])
@@ -229,17 +229,17 @@ pub struct MatchPattern {
   has_captures : Bool
   regex : Regex
   scope : Array[Scope]
-  captures : Array[(Int, Array[Scope])]?
+  captures : Array[(Int32, Array[Scope])]?
   operation : MatchOperation
   with_prototype : ContextReference?
   // private fields
 }
-pub fn MatchPattern::new(Bool, String, Array[Scope], Array[(Int, Array[Scope])]?, MatchOperation, ContextReference?) -> Self
+pub fn MatchPattern::new(Bool, String, Array[Scope], Array[(Int32, Array[Scope])]?, MatchOperation, ContextReference?) -> Self
 pub fn MatchPattern::regex(Self) -> Regex
 pub fn MatchPattern::regex_with_refs(Self, Region, ByteIndex) -> Regex
 
 pub(all) struct MatchPower(Double) derive(Compare, Eq, @debug.Debug)
-pub fn MatchPower::compare(Self, Self) -> Int
+pub fn MatchPower::compare(Self, Self) -> Int32
 pub fn MatchPower::op_ge(Self, Self) -> Bool
 pub fn MatchPower::op_gt(Self, Self) -> Bool
 pub fn MatchPower::op_le(Self, Self) -> Bool
@@ -249,8 +249,8 @@ pub struct ParseState {
   // private fields
 }
 pub fn ParseState::new(SyntaxReference) -> Self
-pub fn ParseState::parse_line(Self, String, SyntaxSet) -> Array[(Int, ScopeStackOp)] raise ParsingError
-pub fn ParseState::parse_line_indexed(Self, ByteIndex, SyntaxSet) -> Array[(Int, ScopeStackOp)] raise ParsingError
+pub fn ParseState::parse_line(Self, String, SyntaxSet) -> Array[(Int32, ScopeStackOp)] raise ParsingError
+pub fn ParseState::parse_line_indexed(Self, ByteIndex, SyntaxSet) -> Array[(Int32, ScopeStackOp)] raise ParsingError
 
 pub(all) enum Pattern {
   Match(MatchPattern)
@@ -263,8 +263,8 @@ pub struct Regex {
 pub fn Regex::is_match(Self, String) -> Bool
 pub fn Regex::new(String) -> Self
 pub fn Regex::regex_str(Self) -> String
-pub fn Regex::search(Self, ByteIndex, Int, Int, Region?) -> Bool
-pub fn Regex::search_text(Self, SearchText, Int, Int, Region?) -> Bool
+pub fn Regex::search(Self, ByteIndex, Int32, Int32, Region?) -> Bool
+pub fn Regex::search_text(Self, SearchText, Int32, Int32, Region?) -> Bool
 pub fn Regex::try_compile(String) -> String?
 
 pub struct Region {
@@ -272,25 +272,25 @@ pub struct Region {
 } derive(Eq)
 pub fn Region::clone(Self) -> Self
 pub fn Region::new() -> Self
-pub fn Region::pos(Self, Int) -> (Int, Int)?
+pub fn Region::pos(Self, Int32) -> (Int32, Int32)?
 
 pub(all) struct Scope {
   a : UInt64
   b : UInt64
 } derive(Compare, Default, Eq, Hash)
-pub fn Scope::atom_at(Self, Int) -> Int
+pub fn Scope::atom_at(Self, Int32) -> Int32
 pub fn Scope::build_string(Self) -> String
 pub fn Scope::debug(Self) -> String
 pub fn Scope::is_empty(Self) -> Bool
 pub fn Scope::is_prefix_of(Self, Self) -> Bool
-pub fn Scope::len(Self) -> Int
+pub fn Scope::len(Self) -> Int32
 pub fn Scope::new(StringView) -> Self raise ParseScopeError
 pub impl Show for Scope
 
 pub struct ScopeRepository {
   // private fields
 }
-pub fn ScopeRepository::atom_str(Self, Int) -> String
+pub fn ScopeRepository::atom_str(Self, Int32) -> String
 pub fn ScopeRepository::build(Self, StringView) -> Scope raise ParseScopeError
 pub fn ScopeRepository::to_string(Self, Scope) -> String
 
@@ -316,12 +316,12 @@ pub(all) struct ScopeStack {
 pub fn ScopeStack::apply(Self, ScopeStackOp) -> Unit raise ScopeError
 pub fn ScopeStack::apply_with_hook(Self, ScopeStackOp, (BasicScopeStackOp, ArrayView[Scope]) -> Unit) -> Unit raise ScopeError
 pub fn ScopeStack::as_slice(Self) -> ArrayView[Scope]
-pub fn ScopeStack::bottom_n(Self, Int) -> ArrayView[Scope]
+pub fn ScopeStack::bottom_n(Self, Int32) -> ArrayView[Scope]
 pub fn ScopeStack::does_match(Self, ArrayView[Scope]) -> MatchPower?
 pub fn ScopeStack::from_str(StringView) -> Self raise ParseScopeError
 pub fn ScopeStack::from_vec(Array[Scope]) -> Self
 pub fn ScopeStack::is_empty(Self) -> Bool
-pub fn ScopeStack::len(Self) -> Int
+pub fn ScopeStack::len(Self) -> Int32
 pub fn ScopeStack::new() -> Self
 pub fn ScopeStack::pop(Self) -> Unit
 pub fn ScopeStack::push(Self, Scope) -> Unit
@@ -329,7 +329,7 @@ pub impl Show for ScopeStack
 
 pub(all) enum ScopeStackOp {
   Push(Scope)
-  Pop(Int)
+  Pop(Int32)
   Clear(ClearAmount)
   Restore
   Noop
@@ -344,9 +344,9 @@ pub(all) struct ScoredStyle {
 pub struct SearchText {
   // private fields
 }
-pub fn SearchText::len(Self) -> Int
+pub fn SearchText::len(Self) -> Int32
 pub fn SearchText::new(ByteIndex) -> Self
-pub fn SearchText::next_char_offset(Self, Int) -> Int?
+pub fn SearchText::next_char_offset(Self, Int32) -> Int32?
 pub fn SearchText::text(Self) -> ByteIndex
 
 pub(all) enum Settings {
@@ -409,7 +409,7 @@ pub fn SyntaxSet::find_syntax_by_name(Self, String) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_by_scope(Self, Scope) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_by_token(Self, String) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_plain_text(Self) -> SyntaxReference
-pub fn SyntaxSet::from_compact(String, (Int) -> String) -> Self
+pub fn SyntaxSet::from_compact(String, (Int32) -> String) -> Self
 pub fn SyntaxSet::from_lazy_syntaxes(Array[SyntaxReference]) -> Self
 pub fn SyntaxSet::get_context(Self, ContextId) -> Context raise ParsingError
 pub fn SyntaxSet::new() -> Self
@@ -484,6 +484,6 @@ pub(all) enum UnderlineOption {
 pub fn UnderlineOption::from_str(String) -> Self raise ParseThemeError
 
 // Type aliases
-pub type CaptureMapping = Array[(Int, Array[Scope])]
+pub type CaptureMapping = Array[(Int32, Array[Scope])]
 
 // Traits

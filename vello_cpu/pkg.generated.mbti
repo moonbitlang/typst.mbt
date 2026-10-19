@@ -8,7 +8,7 @@ import {
 // Values
 pub let black : AlphaColor
 
-pub fn components_to_rgba8(FixedArray[Float]) -> FixedArray[Int]
+pub fn components_to_rgba8(FixedArray[Float]) -> FixedArray[Int32]
 
 pub let transparent : AlphaColor
 
@@ -20,7 +20,7 @@ pub let white : AlphaColor
 pub(all) struct AlphaColor {
   components : FixedArray[Float]
 }
-pub fn AlphaColor::from_rgba8(Int, Int, Int, Int) -> Self
+pub fn AlphaColor::from_rgba8(Int32, Int32, Int32, Int32) -> Self
 pub fn AlphaColor::new(FixedArray[Float]) -> Self
 pub fn AlphaColor::premultiply(Self) -> FixedArray[Float]
 
@@ -106,12 +106,12 @@ pub(all) enum ImageSource {
 pub struct Mask {
   // private fields
 }
-pub fn Mask::from_parts(FixedArray[Byte], Int, Int) -> Self
-pub fn Mask::height(Self) -> Int
+pub fn Mask::from_parts(FixedArray[Byte], Int32, Int32) -> Self
+pub fn Mask::height(Self) -> Int32
 pub fn Mask::new_alpha(Pixmap) -> Self
 pub fn Mask::new_luminance(Pixmap) -> Self
-pub fn Mask::sample(Self, Int, Int) -> Int
-pub fn Mask::width(Self) -> Int
+pub fn Mask::sample(Self, Int32, Int32) -> Int32
+pub fn Mask::width(Self) -> Int32
 
 pub(all) enum Mix {
   Normal
@@ -139,18 +139,18 @@ pub(all) enum PaintType {
 }
 
 pub struct Pixmap {
-  width : Int
-  height : Int
+  width : Int32
+  height : Int32
   buf : FixedArray[Byte]
   may_have_transparency : Bool
 }
 pub fn Pixmap::data(Self) -> FixedArray[Byte]
-pub fn Pixmap::from_parts(FixedArray[Byte], Int, Int) -> Self
-pub fn Pixmap::from_parts_with_opacity(FixedArray[Byte], Int, Int, Bool) -> Self
-pub fn Pixmap::height(Self) -> Int
+pub fn Pixmap::from_parts(FixedArray[Byte], Int32, Int32) -> Self
+pub fn Pixmap::from_parts_with_opacity(FixedArray[Byte], Int32, Int32, Bool) -> Self
+pub fn Pixmap::height(Self) -> Int32
 pub fn Pixmap::may_have_transparency(Self) -> Bool
-pub fn Pixmap::new(Int, Int) -> Self
-pub fn Pixmap::width(Self) -> Int
+pub fn Pixmap::new(Int32, Int32) -> Self
+pub fn Pixmap::width(Self) -> Int32
 
 pub struct RenderContext {
   // private fields
@@ -160,8 +160,8 @@ pub fn RenderContext::fill_path(Self, @kurbo.BezPath) -> Unit
 pub fn RenderContext::fill_rect(Self, @kurbo.Rect) -> Unit
 pub fn RenderContext::fill_rule(Self) -> Fill
 pub fn RenderContext::flush(Self) -> Unit
-pub fn RenderContext::height(Self) -> Int
-pub fn RenderContext::new(Int, Int) -> Self
+pub fn RenderContext::height(Self) -> Int32
+pub fn RenderContext::new(Int32, Int32) -> Self
 pub fn RenderContext::pop_clip_path(Self) -> Unit
 pub fn RenderContext::pop_layer(Self) -> Unit
 pub fn RenderContext::push_clip_path(Self, @kurbo.BezPath) -> Unit
@@ -169,7 +169,7 @@ pub fn RenderContext::push_layer(Self, BlendMode?, Float?, Mask?) -> Unit
 pub fn RenderContext::push_mask_layer(Self, Mask) -> Unit
 pub fn RenderContext::render(Self, Pixmap) -> Unit
 pub fn RenderContext::reset_mask(Self) -> Unit
-pub fn RenderContext::set_aliasing_threshold(Self, Int?) -> Unit
+pub fn RenderContext::set_aliasing_threshold(Self, Int32?) -> Unit
 pub fn RenderContext::set_blend_mode(Self, BlendMode) -> Unit
 pub fn RenderContext::set_fill_rule(Self, Fill) -> Unit
 pub fn RenderContext::set_mask(Self, Mask) -> Unit
@@ -180,7 +180,7 @@ pub fn RenderContext::set_transform(Self, @kurbo.Affine) -> Unit
 pub fn RenderContext::stroke(Self) -> @kurbo.Stroke
 pub fn RenderContext::stroke_path(Self, @kurbo.BezPath) -> Unit
 pub fn RenderContext::transform(Self) -> @kurbo.Affine
-pub fn RenderContext::width(Self) -> Int
+pub fn RenderContext::width(Self) -> Int32
 
 type Strip derive(Eq)
 

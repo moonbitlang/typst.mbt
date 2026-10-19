@@ -454,11 +454,9 @@ pub fn Cff2Table::outline(
   coordinates : ArrayView[NormalizedCoordinate],
   glyph_id : GlyphId,
   builder : &OutlineBuilder,
-) -> Result[Rect, CFFError] {
+) -> Rect raise CFFError {
   guard self.char_strings.get(glyph_id.0.to_uint()) is Some(data) else {
-    return Err(NoGlyph)
+    raise NoGlyph
   }
-  Ok(cff2_parse_char_string(data, self, coordinates, builder)) catch {
-    e => Err(e)
-  }
+  cff2_parse_char_string(data, self, coordinates, builder)
 }

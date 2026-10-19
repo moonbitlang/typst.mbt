@@ -759,16 +759,12 @@ pub fn CffTable::outline(
   self : CffTable,
   glyph_id : GlyphId,
   builder : &OutlineBuilder,
-) -> Result[Rect, CFFError] {
+) -> Rect raise CFFError {
   guard self.char_strings.get(glyph_id.0.to_uint()) is Some(data) else {
-    return Err(NoGlyph)
+    raise NoGlyph
   }
-  try {
-    let (rect, _) = cff1_parse_char_string(data, self, glyph_id, false, builder)
-    Ok(rect)
-  } catch {
-    e => Err(e)
-  }
+  let (rect, _) = cff1_parse_char_string(data, self, glyph_id, false, builder)
+  rect
 }
 
 ///|

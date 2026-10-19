@@ -32,8 +32,8 @@ pub(all) struct Bibliography {
   layout : Layout
   hanging_indent : Bool
   second_field_align : SecondFieldAlign?
-  line_spacing : Int
-  entry_spacing : Int
+  line_spacing : Int32
+  entry_spacing : Int32
   subsequent_author_substitute : String?
   subsequent_author_substitute_rule : SubsequentAuthorSubstituteRule
   name_options : InheritableNameOptions
@@ -89,7 +89,7 @@ pub(all) struct Citation {
   collapse : Collapse?
   year_suffix_delimiter : String?
   after_collapse_delimiter : String?
-  near_note_distance : Int
+  near_note_distance : Int32
   name_options : InheritableNameOptions
 } derive(Eq, @debug.Debug)
 pub fn Citation::get_after_collapse_delimiter(Self) -> String
@@ -378,10 +378,10 @@ pub(all) struct InheritableNameOptions {
   names_delimiter : String?
   delimiter_precedes_et_al : DelimiterBehavior?
   delimiter_precedes_last : DelimiterBehavior?
-  et_al_min : Int?
-  et_al_use_first : Int?
-  et_al_subsequent_min : Int?
-  et_al_subsequent_use_first : Int?
+  et_al_min : Int32?
+  et_al_use_first : Int32?
+  et_al_subsequent_min : Int32?
+  et_al_subsequent_use_first : Int32?
   et_al_use_last : Bool?
   name_form : NameForm?
   initialize : Bool?
@@ -625,10 +625,10 @@ pub(all) struct NameOptions {
   delimiter : String
   delimiter_precedes_et_al : DelimiterBehavior
   delimiter_precedes_last : DelimiterBehavior
-  et_al_min : Int?
-  et_al_use_first : Int?
-  et_al_subsequent_min : Int?
-  et_al_subsequent_use_first : Int?
+  et_al_min : Int32?
+  et_al_use_first : Int32?
+  et_al_subsequent_min : Int32?
+  et_al_subsequent_use_first : Int32?
   et_al_use_last : Bool
   form : NameForm
   initialize : Bool
@@ -636,7 +636,7 @@ pub(all) struct NameOptions {
   name_as_sort_order : NameAsSortOrder?
   sort_separator : String
 }
-pub fn NameOptions::is_suppressed(Self, Int, Int, Bool) -> Bool
+pub fn NameOptions::is_suppressed(Self, Int32, Int32, Bool) -> Bool
 
 pub(all) struct NamePart {
   name : NamePartName
@@ -691,10 +691,10 @@ pub(all) struct Names {
   and_ : NameAnd?
   delimiter_precedes_et_al : DelimiterBehavior?
   delimiter_precedes_last : DelimiterBehavior?
-  et_al_min : Int?
-  et_al_use_first : Int?
-  et_al_subsequent_min : Int?
-  et_al_subsequent_use_first : Int?
+  et_al_min : Int32?
+  et_al_use_first : Int32?
+  et_al_subsequent_min : Int32?
+  et_al_subsequent_use_first : Int32?
   et_al_use_last : Bool?
   name_form : NameForm?
   initialize : Bool?
@@ -781,8 +781,8 @@ pub struct OrdinalLookup {
   // private fields
 }
 pub fn OrdinalLookup::empty() -> Self
-pub fn OrdinalLookup::lookup(Self, Int, GrammarGender?) -> String?
-pub fn OrdinalLookup::lookup_long(Self, Int) -> String?
+pub fn OrdinalLookup::lookup(Self, Int32, GrammarGender?) -> String?
+pub fn OrdinalLookup::lookup_long(Self, Int32) -> String?
 
 pub(all) enum OrdinalMatch {
   LastDigit
@@ -804,8 +804,8 @@ pub(all) enum OtherTerm {
   Month11
   Month12
   Ordinal
-  OrdinalN(Int)
-  LongOrdinal(Int)
+  OrdinalN(Int32)
+  LongOrdinal(Int32)
   OpenQuote
   CloseQuote
   OpenInnerQuote
@@ -899,7 +899,7 @@ pub(all) enum OtherTerm {
 pub fn OtherTerm::from_str(String) -> Result[Self, TermConversionError]
 pub fn OtherTerm::is_n_ordinal(Self) -> Bool
 pub fn OtherTerm::is_ordinal(Self) -> Bool
-pub fn OtherTerm::month(Int) -> Self?
+pub fn OtherTerm::month(Int32) -> Self?
 pub fn OtherTerm::season(Season) -> Self
 pub impl Show for OtherTerm
 
@@ -933,8 +933,8 @@ pub(all) enum Season {
   Autumn
   Winter
 } derive(Eq, Hash, @debug.Debug)
-pub fn Season::to_csl_number(Self) -> Int
-pub fn Season::try_from_csl_number(Int) -> Self?
+pub fn Season::to_csl_number(Self) -> Int32
+pub fn Season::try_from_csl_number(Int32) -> Self?
 
 pub(all) enum SecondFieldAlign {
   Margin
@@ -952,7 +952,7 @@ pub(all) enum SortDirection {
 
 pub(all) enum SortKey {
   Variable(variable~ : Variable, sort_direction~ : SortDirection)
-  MacroName(name~ : String, names_min~ : Int?, names_use_first~ : Int?, names_use_last~ : Bool?, sort_direction~ : SortDirection)
+  MacroName(name~ : String, names_min~ : Int32?, names_use_first~ : Int32?, names_use_last~ : Bool?, sort_direction~ : SortDirection)
 } derive(Eq, @debug.Debug)
 pub fn SortKey::sort_direction(Self) -> SortDirection
 

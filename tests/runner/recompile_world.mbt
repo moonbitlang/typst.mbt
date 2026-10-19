@@ -66,6 +66,9 @@ fn FileSet::copy(self : FileSet) -> FileSet {
 
 ///|
 /// The bytes of a file on disk.
+// Cache failures as well as bytes, like FileSlot::Loaded in upstream
+// typst-kit/src/files.rs:180-181.
+#warnings("-result_error_return")
 fn FileSet::on_disk(
   self : FileSet,
   id : @syntax.FileId,
@@ -86,6 +89,9 @@ fn FileSet::on_disk(
 
 ///|
 /// The bytes of a file as they are now.
+// Return the cached result as data, including a removed file's error,
+// like FileSlot::Loaded in upstream typst-kit/src/files.rs:180-181.
+#warnings("-result_error_return")
 fn FileSet::get(
   self : FileSet,
   id : @syntax.FileId,

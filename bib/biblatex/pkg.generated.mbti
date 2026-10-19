@@ -7,7 +7,7 @@ import {
 }
 
 // Values
-pub const DETACHED : Int = 2147483647
+pub const DETACHED : Int32 = 2147483647
 
 pub fn chunk_chars(ArrayView[Spanned[Chunk]]) -> Array[(Char, Bool)]
 
@@ -19,7 +19,7 @@ pub fn chunks_to_biblatex_string(ArrayView[Spanned[Chunk]], Bool) -> String
 
 pub fn clone_chunks(ArrayView[Spanned[Chunk]]) -> Array[Spanned[Chunk]]
 
-pub fn count_num_char(ArrayView[Spanned[Chunk]], Char) -> Int
+pub fn count_num_char(ArrayView[Spanned[Chunk]], Char) -> Int32
 
 pub fn date_to_chunks(Date) -> Array[Spanned[Chunk]]
 
@@ -27,7 +27,7 @@ pub fn format_sentence(ArrayView[Spanned[Chunk]]) -> String
 
 pub fn format_verbatim(ArrayView[Spanned[Chunk]]) -> String
 
-pub fn get_month_for_abbr(String) -> (String, Int)?
+pub fn get_month_for_abbr(String) -> (String, Int32)?
 
 pub fn i64_to_chunks(Int64) -> Array[Spanned[Chunk]]
 
@@ -73,7 +73,7 @@ pub fn parse_range(ArrayView[Spanned[Chunk]]) -> Result[IntRange, TypeError]
 
 pub fn parse_ranges(ArrayView[Spanned[Chunk]]) -> Result[Array[IntRange], TypeError]
 
-pub fn parse_roman(String) -> Int?
+pub fn parse_roman(String) -> Int32?
 
 pub fn parse_string(ArrayView[Spanned[Chunk]]) -> Result[String, TypeError]
 
@@ -89,7 +89,7 @@ pub fn split_token_lists(ArrayView[Spanned[Chunk]], String) -> Array[Array[Spann
 
 pub fn split_token_lists_with_kw(ArrayView[Spanned[Chunk]], String) -> Array[Array[Spanned[Chunk]]]
 
-pub fn split_values(ArrayView[Spanned[Chunk]], Int, Int) -> (Array[Spanned[Chunk]], Array[Spanned[Chunk]])
+pub fn split_values(ArrayView[Spanned[Chunk]], Int32, Int32) -> (Array[Spanned[Chunk]], Array[Spanned[Chunk]])
 
 pub fn string_list_to_chunks(Array[String]) -> Array[Spanned[Chunk]]
 
@@ -108,7 +108,7 @@ pub fn Bibliography::insert(Self, Entry) -> Entry?
 pub fn Bibliography::is_empty(Self) -> Bool
 pub fn Bibliography::iter(Self) -> Iter[Entry]
 pub fn Bibliography::keys(Self) -> Array[String]
-pub fn Bibliography::length(Self) -> Int
+pub fn Bibliography::length(Self) -> Int32
 pub fn Bibliography::new() -> Self
 pub fn Bibliography::parse(String) -> Result[Self, ParseError]
 
@@ -136,9 +136,9 @@ pub(all) enum DateValue {
 } derive(Eq, @debug.Debug)
 
 pub(all) struct Datetime {
-  year : Int
-  month : Int?
-  day : Int?
+  year : Int32
+  month : Int32?
+  day : Int32?
   time : Time?
 } derive(Eq, @debug.Debug)
 pub impl Show for Datetime
@@ -453,11 +453,11 @@ pub(all) enum RetrievalError {
 pub impl Show for RetrievalError
 
 pub(all) struct Span {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, @debug.Debug)
 pub fn Span::is_empty(Self) -> Bool
-pub fn Span::new(Int, Int) -> Self
+pub fn Span::new(Int32, Int32) -> Self
 
 pub(all) struct Spanned[T] {
   mut v : T
@@ -469,15 +469,15 @@ pub fn[T] Spanned::new(T, Span) -> Self[T]
 pub fn[T] Spanned::zero(T) -> Self[T]
 
 pub(all) struct Time {
-  hour : Int
-  minute : Int
-  second : Int
+  hour : Int32
+  minute : Int32
+  second : Int32
   offset : TimeOffset?
 } derive(Eq, @debug.Debug)
 
 pub(all) enum TimeOffset {
   Utc
-  Offset(positive~ : Bool, hours~ : Int, minutes~ : Int)
+  Offset(positive~ : Bool, hours~ : Int32, minutes~ : Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) enum Token {

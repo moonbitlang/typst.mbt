@@ -19,27 +19,27 @@ pub impl Show for RegexError
 pub struct Captures {
   // private fields
 }
-pub fn Captures::get(Self, Int) -> Match?
+pub fn Captures::get(Self, Int32) -> Match?
 pub fn Captures::iter(Self) -> Iter[Match?]
-pub fn Captures::len(Self) -> Int
+pub fn Captures::len(Self) -> Int32
 
 pub struct Haystack {
   // private fields
 }
-pub fn Haystack::byte_len(Self) -> Int
-pub fn Haystack::byte_offset(Self, Int) -> Int
-pub fn Haystack::char_at(Self, Int) -> Int
-pub fn Haystack::char_len(Self) -> Int
-pub fn Haystack::char_pos(Self, Int) -> Int?
+pub fn Haystack::byte_len(Self) -> Int32
+pub fn Haystack::byte_offset(Self, Int32) -> Int32
+pub fn Haystack::char_at(Self, Int32) -> Int32
+pub fn Haystack::char_len(Self) -> Int32
+pub fn Haystack::char_pos(Self, Int32) -> Int32?
 pub fn Haystack::new(String) -> Self
-pub fn Haystack::prefix(Self, Int) -> Self
-pub fn Haystack::substring(Self, Int, Int) -> String
+pub fn Haystack::prefix(Self, Int32) -> Self
+pub fn Haystack::substring(Self, Int32, Int32) -> String
 pub fn Haystack::text(Self) -> String
-pub fn Haystack::utf16_offset(Self, Int) -> Int
+pub fn Haystack::utf16_offset(Self, Int32) -> Int32
 
 pub(all) struct Match {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   text : String
 } derive(Eq, @debug.Debug)
 
@@ -51,13 +51,13 @@ pub fn Regex::capture_names(Self) -> Array[String?]
 pub fn Regex::captures(Self, String) -> Captures?
 pub fn Regex::captures_iter(Self, String) -> Array[Captures]
 pub fn Regex::find(Self, String) -> Match?
-pub fn Regex::find_at(Self, String, Int) -> Match?
+pub fn Regex::find_at(Self, String, Int32) -> Match?
 pub fn Regex::find_iter(Self, String) -> Array[Match]
-pub fn Regex::group_len(Self) -> Int
+pub fn Regex::group_len(Self) -> Int32
 pub fn Regex::is_match(Self, String) -> Bool
 pub fn Regex::new(String) -> Self raise RegexError
 pub fn Regex::new_with(String, case_insensitive? : Bool, multi_line? : Bool, dot_matches_new_line? : Bool, ignore_whitespace? : Bool, unicode? : Bool) -> Self raise RegexError
-pub fn Regex::search_slots(Self, Haystack, Int, anchored~ : Bool, FixedArray[Int]) -> Bool
+pub fn Regex::search_slots(Self, Haystack, Int32, anchored~ : Bool, FixedArray[Int32]) -> Bool
 pub fn Regex::split(Self, String) -> Array[String]
 pub impl Eq for Regex
 pub impl Hash for Regex

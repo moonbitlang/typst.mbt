@@ -33,7 +33,7 @@ fn describe(name : String) -> String {
           Some(s) => s.length()
           None => -1
         }
-        sb.write_string("\n  \{w}x\{h} stream=\{len}")
+        sb.write_string("\n  \{w.to_double()}x\{h.to_double()} stream=\{len}")
         let mut n = 0
         let iter = page.typed_operations()
         while iter.next() is Some(_) {

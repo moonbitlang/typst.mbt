@@ -7,21 +7,21 @@ import {
 }
 
 // Values
-pub const FLAG_CASEI : Int = 1
+pub const FLAG_CASEI : Int32 = 1
 
-pub const FLAG_DOTNL : Int = 4
+pub const FLAG_DOTNL : Int32 = 4
 
-pub const FLAG_IGNORE_SPACE : Int = 16
+pub const FLAG_IGNORE_SPACE : Int32 = 16
 
-pub const FLAG_MULTI : Int = 2
+pub const FLAG_MULTI : Int32 = 2
 
-pub const FLAG_ONIGURUMA_MODE : Int = 64
+pub const FLAG_ONIGURUMA_MODE : Int32 = 64
 
-pub const FLAG_SWAP_GREED : Int = 8
+pub const FLAG_SWAP_GREED : Int32 = 8
 
-pub const FLAG_UNICODE : Int = 32
+pub const FLAG_UNICODE : Int32 = 32
 
-pub const USIZE_MAX : Int = 0x7FFFFFFF
+pub const USIZE_MAX : Int32 = 0x7FFFFFFF
 
 pub fn analyze(ExprTree, Bool) -> Info raise FancyError
 
@@ -37,17 +37,17 @@ pub fn make_literal_case_insensitive(String, Bool) -> Expr
 
 pub fn optimize(ExprTree) -> Bool
 
-pub fn parse_decimal(Bytes, Int) -> (Int, Int)?
+pub fn parse_decimal(Bytes, Int32) -> (Int32, Int32)?
 
-pub fn parse_id(Bytes, Int, String, String, Bool) -> ParsedId?
+pub fn parse_id(Bytes, Int32, String, String, Bool) -> ParsedId?
 
-pub fn run_default(Prog, @regex.Haystack, Int) -> Array[Int]? raise FancyError
+pub fn run_default(Prog, @regex.Haystack, Int32) -> Array[Int32]? raise FancyError
 
-pub fn run_trace(Prog, @regex.Haystack, Int) -> Array[Int]? raise FancyError
+pub fn run_trace(Prog, @regex.Haystack, Int32) -> Array[Int32]? raise FancyError
 
 // Errors
 pub(all) suberror FancyError {
-  ParseError(Int, ParseError)
+  ParseError(Int32, ParseError)
   CompileError(CompileError)
   RuntimeError(RuntimeError)
 } derive(Eq, @debug.Debug)
@@ -69,10 +69,10 @@ pub(all) enum Assertion {
 pub struct BitSet {
   // private fields
 } derive(Eq, @debug.Debug)
-pub fn BitSet::contains(Self, Int) -> Bool
-pub fn BitSet::insert(Self, Int) -> Bool
-pub fn BitSet::iter(Self) -> Iter[Int]
-pub fn BitSet::last(Self) -> Int?
+pub fn BitSet::contains(Self, Int32) -> Bool
+pub fn BitSet::insert(Self, Int32) -> Bool
+pub fn BitSet::iter(Self) -> Iter[Int32]
+pub fn BitSet::last(Self) -> Int32?
 pub fn BitSet::new() -> Self
 
 pub struct CaptureMatches {
@@ -86,12 +86,12 @@ pub fn CaptureMatches::text(Self) -> String
 pub struct Captures {
   // private fields
 }
-pub fn Captures::at(Self, Int) -> String
+pub fn Captures::at(Self, Int32) -> String
 pub fn Captures::at_name(Self, String) -> String
 pub fn Captures::expand(Self, String, StringBuilder) -> Unit
-pub fn Captures::get(Self, Int) -> Match?
+pub fn Captures::get(Self, Int32) -> Match?
 pub fn Captures::iter(Self) -> Iter[Match?]
-pub fn Captures::len(Self) -> Int
+pub fn Captures::len(Self) -> Int32
 pub fn Captures::name(Self, String) -> Match?
 
 pub(all) enum CompileError {
@@ -99,18 +99,18 @@ pub(all) enum CompileError {
   LookBehindNotConst
   InvalidGroupName
   InvalidGroupNameBackref(String)
-  InvalidBackref(Int)
+  InvalidBackref(Int32)
   NamedBackrefOnly
   FeatureNotYetSupported(String)
-  SubroutineCallTargetNotFound(String, Int)
+  SubroutineCallTargetNotFound(String, Int32)
 } derive(Eq, @debug.Debug)
 pub impl Show for CompileError
 
 pub struct Delegate {
   inner : @regex.Regex
   pattern : String
-  start_group : Int
-  end_group : Int
+  start_group : Int32
+  end_group : Int32
   // private fields
 }
 
@@ -136,34 +136,34 @@ pub(all) enum Expr {
   Alt(Array[Expr])
   Group(Expr)
   LookAround(Expr, LookAround)
-  Repeat(child~ : Expr, lo~ : Int, hi~ : Int, greedy~ : Bool)
-  Delegate(inner~ : String, size~ : Int, casei~ : Bool)
-  Backref(group~ : Int, casei~ : Bool)
-  BackrefWithRelativeRecursionLevel(group~ : Int, relative_level~ : Int, casei~ : Bool)
+  Repeat(child~ : Expr, lo~ : Int32, hi~ : Int32, greedy~ : Bool)
+  Delegate(inner~ : String, size~ : Int32, casei~ : Bool)
+  Backref(group~ : Int32, casei~ : Bool)
+  BackrefWithRelativeRecursionLevel(group~ : Int32, relative_level~ : Int32, casei~ : Bool)
   AtomicGroup(Expr)
   KeepOut
   ContinueFromPreviousMatchEnd
-  BackrefExistsCondition(Int)
+  BackrefExistsCondition(Int32)
   Conditional(condition~ : Expr, true_branch~ : Expr, false_branch~ : Expr)
-  SubroutineCall(Int)
-  UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int)
+  SubroutineCall(Int32)
+  UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int32)
 } derive(Eq, @debug.Debug)
 pub fn Expr::parse_tree(String) -> ExprTree raise FancyError
-pub fn Expr::parse_tree_with_flags(String, Int) -> ExprTree raise FancyError
-pub fn Expr::to_str(Self, StringBuilder, Int) -> Unit
+pub fn Expr::parse_tree_with_flags(String, Int32) -> ExprTree raise FancyError
+pub fn Expr::to_str(Self, StringBuilder, Int32) -> Unit
 
 pub struct ExprTree {
   mut expr : Expr
   backrefs : BitSet
-  named_groups : Map[String, Int]
+  named_groups : Map[String, Int32]
   contains_subroutines : Bool
   self_recursive : Bool
 } derive(@debug.Debug)
 
 pub struct Info {
-  start_group : Int
-  end_group : Int
-  min_size : Int
+  start_group : Int32
+  end_group : Int32
+  min_size : Int32
   const_size : Bool
   hard : Bool
   expr : Expr
@@ -176,23 +176,23 @@ pub(all) enum Insn {
   AnyNoNL
   Assertion(Assertion)
   Lit(String)
-  Split(Int, Int)
-  Jmp(Int)
-  Save(Int)
-  Save0(Int)
-  Restore(Int)
-  RepeatGr(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
-  RepeatNg(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
-  RepeatEpsilonGr(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
-  RepeatEpsilonNg(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
+  Split(Int32, Int32)
+  Jmp(Int32)
+  Save(Int32)
+  Save0(Int32)
+  Restore(Int32)
+  RepeatGr(lo~ : Int32, hi~ : Int32, next~ : Int32, repeat~ : Int32)
+  RepeatNg(lo~ : Int32, hi~ : Int32, next~ : Int32, repeat~ : Int32)
+  RepeatEpsilonGr(lo~ : Int32, next~ : Int32, repeat~ : Int32, check~ : Int32)
+  RepeatEpsilonNg(lo~ : Int32, next~ : Int32, repeat~ : Int32, check~ : Int32)
   FailNegativeLookAround
-  GoBack(Int)
-  Backref(slot~ : Int, casei~ : Bool)
+  GoBack(Int32)
+  Backref(slot~ : Int32, casei~ : Bool)
   BeginAtomic
   EndAtomic
   Delegate(Delegate)
   ContinueFromPreviousMatchEnd
-  BackrefExistsCondition(Int)
+  BackrefExistsCondition(Int32)
 }
 pub impl Show for Insn
 
@@ -207,9 +207,9 @@ pub struct Match {
   // private fields
 }
 pub fn Match::as_str(Self) -> String
-pub fn Match::end(Self) -> Int
-pub fn Match::range(Self) -> (Int, Int)
-pub fn Match::start(Self) -> Int
+pub fn Match::end(Self) -> Int32
+pub fn Match::range(Self) -> (Int32, Int32)
+pub fn Match::start(Self) -> Int32
 pub impl Eq for Match
 pub impl Show for Match
 
@@ -243,8 +243,8 @@ pub impl Show for ParseError
 
 pub struct ParsedId {
   id : String
-  relative : Int?
-  skip : Int
+  relative : Int32?
+  skip : Int32
 } derive(Eq, @debug.Debug)
 
 pub struct Prog {
@@ -259,15 +259,15 @@ pub struct Regex {
 pub fn Regex::as_str(Self) -> String
 pub fn Regex::capture_names(Self) -> Array[String?]
 pub fn Regex::captures(Self, String) -> Captures? raise FancyError
-pub fn Regex::captures_from_pos(Self, String, Int) -> Captures? raise FancyError
-pub fn Regex::captures_from_pos_text(Self, Text, Int) -> Captures? raise FancyError
+pub fn Regex::captures_from_pos(Self, String, Int32) -> Captures? raise FancyError
+pub fn Regex::captures_from_pos_text(Self, Text, Int32) -> Captures? raise FancyError
 pub fn Regex::captures_iter(Self, String) -> CaptureMatches
 pub fn Regex::captures_iter_text(Self, Text) -> CaptureMatches
-pub fn Regex::captures_len(Self) -> Int
+pub fn Regex::captures_len(Self) -> Int32
 pub fn Regex::debug_print(Self) -> String
 pub fn Regex::find(Self, String) -> Match? raise FancyError
-pub fn Regex::find_from_pos(Self, String, Int) -> Match? raise FancyError
-pub fn Regex::find_from_pos_text(Self, Text, Int) -> Match? raise FancyError
+pub fn Regex::find_from_pos(Self, String, Int32) -> Match? raise FancyError
+pub fn Regex::find_from_pos_text(Self, Text, Int32) -> Match? raise FancyError
 pub fn Regex::find_iter(Self, String) -> Matches
 pub fn Regex::find_iter_text(Self, Text) -> Matches
 pub fn Regex::is_fancy(Self) -> Bool
@@ -276,21 +276,21 @@ pub fn Regex::is_match_text(Self, Text) -> Bool raise FancyError
 pub fn Regex::new(String) -> Self raise FancyError
 pub fn Regex::replace(Self, String, Replacer) -> String
 pub fn Regex::replace_all(Self, String, Replacer) -> String
-pub fn Regex::replacen(Self, String, Int, Replacer) -> String
+pub fn Regex::replacen(Self, String, Int32, Replacer) -> String
 pub fn Regex::split(Self, String) -> Split
-pub fn Regex::splitn(Self, String, Int) -> SplitN
+pub fn Regex::splitn(Self, String, Int32) -> SplitN
 pub fn Regex::to_string(Self) -> String
-pub fn Regex::try_replacen(Self, String, Int, Replacer) -> String raise FancyError
+pub fn Regex::try_replacen(Self, String, Int32, Replacer) -> String raise FancyError
 pub impl Show for Regex
 
 pub struct RegexBuilder {
   // private fields
 }
-pub fn RegexBuilder::backtrack_limit(Self, Int) -> Self
+pub fn RegexBuilder::backtrack_limit(Self, Int32) -> Self
 pub fn RegexBuilder::build(Self) -> Regex raise FancyError
 pub fn RegexBuilder::case_insensitive(Self, Bool) -> Self
-pub fn RegexBuilder::delegate_dfa_size_limit(Self, Int) -> Self
-pub fn RegexBuilder::delegate_size_limit(Self, Int) -> Self
+pub fn RegexBuilder::delegate_dfa_size_limit(Self, Int32) -> Self
+pub fn RegexBuilder::delegate_size_limit(Self, Int32) -> Self
 pub fn RegexBuilder::dot_matches_new_line(Self, Bool) -> Self
 pub fn RegexBuilder::ignore_whitespace(Self, Bool) -> Self
 pub fn RegexBuilder::multi_line(Self, Bool) -> Self
@@ -337,9 +337,9 @@ pub struct Text {
   // private fields
 }
 pub fn Text::as_str(Self) -> String
-pub fn Text::len(Self) -> Int
+pub fn Text::len(Self) -> Int32
 pub fn Text::new(String) -> Self
-pub fn Text::prefix(Self, Int) -> Self
+pub fn Text::prefix(Self, Int32) -> Self
 
 // Type aliases
 

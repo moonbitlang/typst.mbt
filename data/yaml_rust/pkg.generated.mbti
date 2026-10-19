@@ -24,11 +24,11 @@ pub(all) enum Event {
   StreamEnd
   DocumentStart
   DocumentEnd
-  Alias(Int)
-  Scalar(String, TScalarStyle, Int, TokenType?)
-  SequenceStart(Int)
+  Alias(Int32)
+  Scalar(String, TScalarStyle, Int32, TokenType?)
+  SequenceStart(Int32)
   SequenceEnd
-  MappingStart(Int)
+  MappingStart(Int32)
   MappingEnd
 } derive(Eq, @debug.Debug)
 
@@ -43,7 +43,7 @@ pub fn[K, V] LinkedHashMap::is_empty(Self[K, V]) -> Bool
 pub fn[K, V] LinkedHashMap::iter(Self[K, V]) -> Iter[(K, V)]
 pub fn[K, V] LinkedHashMap::iter2(Self[K, V]) -> Iter2[K, V]
 pub fn[K, V] LinkedHashMap::keys(Self[K, V]) -> Iter[K]
-pub fn[K, V] LinkedHashMap::len(Self[K, V]) -> Int
+pub fn[K, V] LinkedHashMap::len(Self[K, V]) -> Int32
 pub fn[K : Hash + Eq, V] LinkedHashMap::new() -> Self[K, V]
 pub fn[K : Hash + Eq, V] LinkedHashMap::remove(Self[K, V], K) -> V?
 pub fn[K, V] LinkedHashMap::to_array(Self[K, V]) -> Array[(K, V)]
@@ -57,9 +57,9 @@ pub impl[K : @debug.Debug, V : @debug.Debug] @debug.Debug for LinkedHashMap[K, V
 pub struct Marker {
   // private fields
 } derive(Eq, @debug.Debug)
-pub fn Marker::col(Self) -> Int
-pub fn Marker::index(Self) -> Int
-pub fn Marker::line(Self) -> Int
+pub fn Marker::col(Self) -> Int32
+pub fn Marker::index(Self) -> Int32
+pub fn Marker::line(Self) -> Int32
 
 pub struct Parser {
   // private fields
@@ -101,7 +101,7 @@ pub(all) enum TokenType {
   NoToken
   StreamStart(TEncoding)
   StreamEnd
-  VersionDirective(UInt, UInt)
+  VersionDirective(UInt32, UInt32)
   TagDirective(String, String)
   DocumentStart
   DocumentEnd
@@ -129,7 +129,7 @@ pub(all) enum Yaml {
   Boolean(Bool)
   Array(Array[Yaml])
   Hash(LinkedHashMap[Yaml, Yaml])
-  Alias(Int)
+  Alias(Int32)
   Null
   BadValue
 } derive(Eq, Hash, @debug.Debug)
@@ -181,5 +181,5 @@ pub(open) trait MarkedEventReceiver {
 pub(open) trait YamlIndex {
   fn index_into(Self, Yaml) -> Yaml
 }
-pub impl YamlIndex for Int
+pub impl YamlIndex for Int32
 pub impl YamlIndex for String

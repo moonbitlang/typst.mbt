@@ -20,11 +20,11 @@ pub fn format_zmij(Double) -> String
 
 pub fn invalid_type(String, String) -> String
 
-pub fn shortest_digits(Double) -> (String, Int)
+pub fn shortest_digits(Double) -> (String, Int32)
 
 pub let toml_datetime_field : String
 
-pub fn utf8_error(BytesView) -> (Int, Int?)?
+pub fn utf8_error(BytesView) -> (Int32, Int32?)?
 
 pub fn valid_utf8(BytesView) -> Bool
 

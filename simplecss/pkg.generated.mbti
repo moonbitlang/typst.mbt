@@ -98,10 +98,10 @@ pub fn StyleSheet::parse_more(Self, String) -> Unit
 pub impl Show for StyleSheet
 
 pub(all) struct TextPos {
-  row : UInt
-  col : UInt
+  row : UInt32
+  col : UInt32
 } derive(Eq, @debug.Debug)
-pub fn TextPos::new(UInt, UInt) -> Self
+pub fn TextPos::new(UInt32, UInt32) -> Self
 pub impl Show for TextPos
 
 // Type aliases

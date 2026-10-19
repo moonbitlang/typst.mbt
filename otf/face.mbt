@@ -1151,10 +1151,12 @@ pub fn Face::outline_glyph(
     return table.outline(glyph_id, builder)
   }
   if self.tables.cff is Some(cff) {
-    return cff.outline(glyph_id, builder).to_option()
+    return Some(cff.outline(glyph_id, builder)) catch { _ => None }
   }
   if self.tables.cff2 is Some(cff2) {
-    return cff2.outline(self.coords(), glyph_id, builder).to_option()
+    return Some(cff2.outline(self.coords(), glyph_id, builder)) catch {
+      _ => None
+    }
   }
   None
 }

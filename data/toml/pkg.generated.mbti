@@ -13,7 +13,7 @@ pub fn to_string(@serde.Data, pretty~ : Bool) -> String raise TomlError
 
 // Errors
 pub(all) suberror TomlError {
-  TomlError(message~ : String, span~ : (Int, Int)?)
+  TomlError(message~ : String, span~ : (Int32, Int32)?)
 } derive(Eq, @debug.Debug)
 
 // Types and methods

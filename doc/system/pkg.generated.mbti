@@ -10,7 +10,7 @@ pub fn read(String) -> Bytes raise SystemError
 
 pub fn sources(root? : String) -> (String, String) -> String?
 
-pub fn world(root? : String, embedded_fonts? : Bool, system_fonts? : Bool, font_paths? : Array[String], today? : (Int, Int, Int)) -> @doc.DocWorld raise SystemError
+pub fn world(root? : String, embedded_fonts? : Bool, system_fonts? : Bool, font_paths? : Array[String], today? : (Int32, Int32, Int32)) -> @doc.DocWorld raise SystemError
 
 pub fn write(String, Bytes) -> Unit raise SystemError
 

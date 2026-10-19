@@ -12,19 +12,19 @@ pub fn ascii_85_decode(BytesView) -> Bytes?
 
 pub fn ascii_hex_decode(BytesView) -> Bytes?
 
-pub fn bit_mask(Int) -> UInt
+pub fn bit_mask(Int32) -> UInt32
 
 pub fn bytes_contain(BytesView, Byte) -> Bool
 
-pub fn compare_latin1(String, String) -> Int
+pub fn compare_latin1(String, String) -> Int32
 
 pub fn decode_hex_digit(Byte) -> Byte?
 
 pub fn dict_or_stream(Object) -> (Dict, Stream?)?
 
-pub fn find_needle(BytesView, Bytes) -> Int?
+pub fn find_needle(BytesView, Bytes) -> Int32?
 
-pub fn findr_needle(BytesView, Bytes) -> Int?
+pub fn findr_needle(BytesView, Bytes) -> Int32?
 
 pub fn flate_decode(BytesView, Dict) -> Bytes?
 
@@ -57,25 +57,25 @@ pub struct BitReader {
 }
 pub fn BitReader::align(Self) -> Unit
 pub fn BitReader::at_end(Self) -> Bool
-pub fn BitReader::bit_pos(Self) -> Int
-pub fn BitReader::byte_pos(Self) -> Int
+pub fn BitReader::bit_pos(Self) -> Int32
+pub fn BitReader::byte_pos(Self) -> Int32
 pub fn BitReader::clone(Self) -> Self
 pub fn BitReader::cur_byte(Self) -> Byte?
-pub fn BitReader::cur_pos(Self) -> Int
+pub fn BitReader::cur_pos(Self) -> Int32
 pub fn BitReader::new(BytesView) -> Self
-pub fn BitReader::new_with(BytesView, Int) -> Self
-pub fn BitReader::peak(Self, Int) -> UInt?
-pub fn BitReader::read(Self, Int) -> UInt?
+pub fn BitReader::new_with(BytesView, Int32) -> Self
+pub fn BitReader::peak(Self, Int32) -> UInt32?
+pub fn BitReader::read(Self, Int32) -> UInt32?
 pub fn BitReader::tail(Self) -> BytesView
 
 pub struct BitWriter {
   // private fields
 }
 pub fn BitWriter::align(Self) -> Unit
-pub fn BitWriter::cur_pos(Self) -> Int
-pub fn BitWriter::fill_bytes(Self, Byte, Int) -> Unit?
-pub fn BitWriter::new(FixedArray[Byte], Int, Int) -> Self
-pub fn BitWriter::write(Self, UInt) -> Unit?
+pub fn BitWriter::cur_pos(Self) -> Int32
+pub fn BitWriter::fill_bytes(Self, Byte, Int32) -> Unit?
+pub fn BitWriter::new(FixedArray[Byte], Int32, Int32) -> Self
+pub fn BitWriter::write(Self, UInt32) -> Unit?
 
 pub(all) enum DecodeFailure {
   ImageDecode
@@ -105,12 +105,12 @@ pub fn Dict::data(Self) -> BytesView
 pub fn Dict::empty() -> Self
 pub fn Dict::entries(Self) -> Array[(Name, MaybeRef[Object])]
 pub fn[T : ObjectLike] Dict::get(Self, String) -> T?
-pub fn[T : ObjectLike] Dict::get_fixed(Self, String, Int) -> Array[T]?
+pub fn[T : ObjectLike] Dict::get_fixed(Self, String, Int32) -> Array[T]?
 pub fn[T : Readable] Dict::get_raw(Self, String) -> MaybeRef[T]?
 pub fn Dict::get_ref(Self, String) -> ObjRef?
 pub fn Dict::is_empty(Self) -> Bool
 pub fn Dict::keys(Self) -> Array[Name]
-pub fn Dict::len(Self) -> Int
+pub fn Dict::len(Self) -> Int32
 pub fn Dict::obj_id(Self) -> ObjectIdentifier?
 pub fn Dict::read(Reader, ReaderContext) -> Self?
 pub impl Default for Dict
@@ -150,24 +150,24 @@ pub(all) enum ImageColorSpace {
   Gray
   Rgb
   Cmyk
-  Unknown(Int)
+  Unknown(Int32)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct ImageData {
   alpha : Bytes?
   color_space : ImageColorSpace?
-  bits_per_component : Int
-  width : Int
-  height : Int
+  bits_per_component : Int32
+  width : Int32
+  height : Int32
 }
 
 pub(all) struct ImageDecodeParams {
   is_indexed : Bool
-  bpc : Int?
-  num_components : Int?
-  target_dimension : (Int, Int)?
-  width : Int
-  height : Int
+  bpc : Int32?
+  num_components : Int32?
+  target_dimension : (Int32, Int32)?
+  width : Int32
+  height : Int32
 }
 pub fn ImageDecodeParams::default() -> Self
 
@@ -226,17 +226,17 @@ pub fn Number::as_f32(Self) -> Float
 pub fn Number::as_f64(Self) -> Double
 pub fn Number::as_i64(Self) -> Int64
 pub fn Number::from_f32(Float) -> Self
-pub fn Number::from_i32(Int) -> Self
+pub fn Number::from_i32(Int32) -> Self
 pub fn Number::read(Reader, ReaderContext) -> Self?
 pub impl ObjectLike for Number
 pub impl Readable for Number
 pub impl Skippable for Number
 
 pub(all) struct ObjRef {
-  obj_number : Int
-  gen_number : Int
+  obj_number : Int32
+  gen_number : Int32
 } derive(Compare, Eq, Hash, @debug.Debug)
-pub fn ObjRef::new(Int, Int) -> Self
+pub fn ObjRef::new(Int32, Int32) -> Self
 pub fn ObjRef::to_id(Self) -> ObjectIdentifier
 pub impl Readable for ObjRef
 pub impl Skippable for ObjRef
@@ -256,7 +256,7 @@ pub fn Object::into_array(Self) -> PdfArray?
 pub fn Object::into_bool(Self) -> Bool?
 pub fn Object::into_dict(Self) -> Dict?
 pub fn Object::into_f32(Self) -> Float?
-pub fn Object::into_i32(Self) -> Int?
+pub fn Object::into_i32(Self) -> Int32?
 pub fn Object::into_name(Self) -> Name?
 pub fn Object::into_number(Self) -> Number?
 pub fn Object::into_stream(Self) -> Stream?
@@ -268,10 +268,10 @@ pub impl Readable for Object
 pub impl Skippable for Object
 
 pub(all) struct ObjectIdentifier {
-  obj_number : Int
-  gen_number : Int
+  obj_number : Int32
+  gen_number : Int32
 } derive(Compare, Eq, Hash, @debug.Debug)
-pub fn ObjectIdentifier::new(Int, Int) -> Self
+pub fn ObjectIdentifier::new(Int32, Int32) -> Self
 pub fn ObjectIdentifier::skip(Reader, Bool) -> Unit?
 pub fn ObjectIdentifier::to_ref(Self) -> ObjRef
 pub impl Readable for ObjectIdentifier
@@ -298,17 +298,17 @@ pub struct Pages {
   // private fields
 }
 #alias("_[_]")
-pub fn Pages::at(Self, Int) -> Page
-pub fn Pages::get(Self, Int) -> Page?
+pub fn Pages::at(Self, Int32) -> Page
+pub fn Pages::get(Self, Int32) -> Page?
 pub fn Pages::iter(Self) -> Iter[Page]
-pub fn Pages::length(Self) -> Int
+pub fn Pages::length(Self) -> Int32
 pub fn Pages::xref(Self) -> XRef
 
 pub struct Pdf {
   // private fields
 }
 pub fn Pdf::data(Self) -> Bytes
-pub fn Pdf::len(Self) -> Int
+pub fn Pdf::len(Self) -> Int32
 pub fn Pdf::new(Bytes) -> Result[Self, LoadPdfError]
 pub fn Pdf::new_with_password(Bytes, String) -> Result[Self, LoadPdfError]
 pub fn Pdf::objects(Self) -> Array[Object]
@@ -325,7 +325,7 @@ pub fn PdfArray::flex_iter(Self) -> FlexArrayIter
 pub fn[T : ObjectLike] PdfArray::iter(Self) -> Iter[T]
 pub fn PdfArray::raw_iter(Self) -> Iter[MaybeRef[Object]]
 pub fn PdfArray::read(Reader, ReaderContext) -> Self?
-pub fn[T : ObjectLike] PdfArray::to_fixed(Self, Int) -> Array[T]?
+pub fn[T : ObjectLike] PdfArray::to_fixed(Self, Int32) -> Array[T]?
 pub fn[T : ObjectLike] PdfArray::to_vec(Self) -> Array[T]
 pub impl Eq for PdfArray
 pub impl Show for PdfArray
@@ -357,7 +357,7 @@ pub fn PdfVersion::from_bytes(BytesView) -> Self?
 
 pub struct Reader {
   data : BytesView
-  mut offset : Int
+  mut offset : Int32
 }
 pub fn Reader::at_end(Self) -> Bool
 pub fn Reader::clone(Self) -> Self
@@ -368,26 +368,26 @@ pub fn Reader::forward_tag(Self, Bytes) -> Unit?
 pub fn Reader::forward_while(Self, (Byte) -> Bool) -> Unit
 pub fn Reader::forward_while_1(Self, (Byte) -> Bool) -> Unit?
 pub fn Reader::is_empty(Self) -> Bool
-pub fn Reader::jump(Self, Int) -> Unit
+pub fn Reader::jump(Self, Int32) -> Unit
 pub fn Reader::jump_to_end(Self) -> Unit
-pub fn Reader::len(Self) -> Int
+pub fn Reader::len(Self) -> Int32
 pub fn Reader::new(BytesView) -> Self
-pub fn Reader::new_with(BytesView, Int) -> Self
-pub fn Reader::offset(Self) -> Int
+pub fn Reader::new_with(BytesView, Int32) -> Self
+pub fn Reader::offset(Self) -> Int32
 pub fn Reader::peek_byte(Self) -> Byte?
-pub fn Reader::peek_bytes(Self, Int) -> BytesView?
+pub fn Reader::peek_bytes(Self, Int32) -> BytesView?
 pub fn Reader::peek_tag(Self, Bytes) -> Unit?
-pub fn Reader::range(Self, Int, Int) -> BytesView?
+pub fn Reader::range(Self, Int32, Int32) -> BytesView?
 pub fn[T : Readable] Reader::read(Self, ReaderContext) -> T?
 pub fn Reader::read_byte(Self) -> Byte?
-pub fn Reader::read_bytes(Self, Int) -> BytesView?
-pub fn Reader::read_u16(Self) -> Int?
-pub fn Reader::read_u32(Self) -> UInt?
+pub fn Reader::read_bytes(Self, Int32) -> BytesView?
+pub fn Reader::read_u16(Self) -> Int32?
+pub fn Reader::read_u32(Self) -> UInt32?
 pub fn Reader::read_white_space(Self) -> Unit?
 pub fn[T : Readable] Reader::read_with_context(Self, ReaderContext) -> T?
 pub fn[T : Readable] Reader::read_without_context(Self) -> T?
 pub fn Reader::skip(Self, (Self, Bool) -> Unit?, Bool) -> BytesView?
-pub fn Reader::skip_bytes(Self, Int) -> Unit?
+pub fn Reader::skip_bytes(Self, Int32) -> Unit?
 pub fn Reader::skip_eol_characters(Self) -> Unit
 pub fn Reader::skip_white_spaces(Self) -> Unit
 pub fn Reader::skip_white_spaces_and_comments(Self) -> Unit
@@ -581,7 +581,7 @@ pub fn XRef::dummy() -> Self
 pub fn[T : ObjectLike] XRef::get(Self, ObjectIdentifier) -> T?
 pub fn[T : ObjectLike] XRef::get_with(Self, ObjectIdentifier, ReaderContext) -> T?
 pub fn XRef::has_optional_content_groups(Self) -> Bool
-pub fn XRef::len(Self) -> Int
+pub fn XRef::len(Self) -> Int32
 pub fn XRef::needs_decryption(Self, ReaderContext) -> Bool
 pub fn XRef::objects(Self) -> Array[Object]
 pub fn XRef::root_id(Self) -> ObjectIdentifier
@@ -594,9 +594,9 @@ pub(open) trait ObjectLike : Readable {
 }
 pub impl ObjectLike for Bool
 pub impl ObjectLike for Byte
-pub impl ObjectLike for Int
+pub impl ObjectLike for Int32
 pub impl ObjectLike for Int64
-pub impl ObjectLike for UInt
+pub impl ObjectLike for UInt32
 pub impl ObjectLike for UInt16
 pub impl ObjectLike for UInt64
 pub impl ObjectLike for Float
@@ -607,9 +607,9 @@ pub(open) trait Readable {
 }
 pub impl Readable for Bool
 pub impl Readable for Byte
-pub impl Readable for Int
+pub impl Readable for Int32
 pub impl Readable for Int64
-pub impl Readable for UInt
+pub impl Readable for UInt32
 pub impl Readable for UInt16
 pub impl Readable for UInt64
 pub impl Readable for Float
@@ -619,5 +619,5 @@ pub(open) trait Skippable {
   fn skip(Reader, Bool) -> Unit?
 }
 pub impl Skippable for Bool
-pub impl Skippable for Int
+pub impl Skippable for Int32
 pub impl Skippable for Float
