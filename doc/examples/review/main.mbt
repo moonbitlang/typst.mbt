@@ -17,17 +17,17 @@
 
 ///|
 /// Compile a document function with the files below `root`.
-fn compile_document(
+async fn compile_document(
   build : () -> @doc.Document,
   root~ : String = "bench",
   system_fonts~ : Bool = false,
-) -> @doc.CompileReport[@layout.PagedDocument] raise {
+) -> @doc.CompileReport[@layout.PagedDocument] {
   build().compile_paged(@system.world(root~, system_fonts~, today=(2026, 1, 1)))
 }
 
 ///|
 /// The document with the given name, compiled.
-fn compiled(name : String) -> @doc.CompileReport[@layout.PagedDocument] raise {
+async fn compiled(name : String) -> @doc.CompileReport[@layout.PagedDocument] {
   for original in @twins.originals() {
     if original.name == name {
       return compile_document(
@@ -40,7 +40,7 @@ fn compiled(name : String) -> @doc.CompileReport[@layout.PagedDocument] raise {
 }
 
 ///|
-fn run(args : Array[String]) -> Unit raise {
+async fn run(args : Array[String]) -> Unit {
   match args.get(1).unwrap_or("preview") {
     "preview" => {
       let mut name = "showcase"
@@ -140,7 +140,7 @@ fn run(args : Array[String]) -> Unit raise {
 }
 
 ///|
-fn main {
+async fn main {
   run(@env.args()) catch {
     @doc.DocError(errors) =>
       for error in errors {

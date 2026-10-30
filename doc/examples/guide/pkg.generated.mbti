@@ -22,7 +22,7 @@ pub fn first_document() -> @doc.Document
 
 pub fn font_families() -> @doc.SetText
 
-pub fn fonts_of(String) -> @doc.DocWorld raise @system.SystemError
+pub async fn fonts_of(String) -> @doc.DocWorld raise @system.SystemError
 
 pub fn guide() -> @doc.Document
 

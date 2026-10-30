@@ -8,15 +8,13 @@
 // read. Here, large font files are probed by reading just the face's table
 // directory and the tables that face admission and `FontInfo::from_ttf`
 // look at (`probe_tables`), which are reassembled into a small standalone
-// font. Small files, unusual fonts (unsorted or duplicate table records)
-// and platforms without cheap ranged reads (wasm) read the whole file.
+// font. Small files and unusual fonts (unsorted or duplicate table records)
+// are read whole. Native and wasm both use async/fs offset reads.
 //
-// A file is opened once (`@platform.RangedFile`) and its pieces are read
-// from that descriptor. It is not mapped: reading the pieces costs what
-// touching them in a mapping costs (10 ms for the 1339 faces in 502 files
-// of a macOS 26 installation, either way), and a file that is truncated
-// while it is read gives short reads, which are faces that do not parse,
-// where a mapping gives SIGBUS (fontdb has that exposure).
+// A file is opened once (`@fs.File`) and its pieces are read from that
+// descriptor. It is not mapped: a file that is truncated while it is read
+// gives short reads, which are faces that do not parse, where a mapping
+// gives SIGBUS (fontdb has that exposure).
 //
 // fontdb and `FontInfo::new` look at every face on its own. Here the faces
 // of a collection that is read in ranges share what they have in common: a
@@ -63,14 +61,14 @@ fn extension(name : String) -> String? {
 ///|
 /// Loads font files from the selected directory into the database,
 /// recursively (`Database::load_fonts_dir`).
-fn FontDb::load_fonts_dir(self : FontDb, dir : String) -> Unit {
+async fn FontDb::load_fonts_dir(self : FontDb, dir : String) -> Unit {
   self.load_fonts_dir_impl(dir, @hashset.HashSet([]))
 }
 
 ///|
 /// Resolves a directory entry to the path to load and its file type,
 /// deduplicating symlinked entries (`Database::canonicalize`).
-fn canonicalize_entry(
+async fn canonicalize_entry(
   path : String,
   kind : @platform.FileKind?,
   seen : @hashset.HashSet[String],
@@ -79,7 +77,10 @@ fn canonicalize_entry(
   // says.
   let file_type = match kind {
     Some(kind) => kind
-    None => @platform.lstat_kind(path) catch { _ => return None }
+    None =>
+      font_stat_kind(path, follow_symlink=false) catch {
+        _ => return None
+      }
   }
   if file_type != Symlink {
     if seen.length() > 0 {
@@ -93,8 +94,8 @@ fn canonicalize_entry(
   // (Upstream also seeds `seen` with the paths of all loaded faces here
   // when a symlink entry is a directory, but the file type of a symlink
   // entry is never a directory, so that branch never runs.)
-  let stat = @platform.stat_kind(path) catch { _ => return None }
-  let canon = @platform.canonicalize(path) catch { _ => return None }
+  let stat = font_stat_kind(path) catch { _ => return None }
+  let canon = @fs.realpath(path) catch { _ => return None }
   if seen.contains(canon) {
     return None
   }
@@ -103,12 +104,12 @@ fn canonicalize_entry(
 }
 
 ///|
-fn FontDb::load_fonts_dir_impl(
+async fn FontDb::load_fonts_dir_impl(
   self : FontDb,
   dir : String,
   seen : @hashset.HashSet[String],
 ) -> Unit {
-  let entries = @platform.read_dir_entries(dir) catch { _ => return }
+  let entries = font_read_dir_entries(dir) catch { _ => return }
   for entry in entries {
     let kind = entry.kind
     let entry = @platform.join(dir, entry.name)
@@ -129,7 +130,7 @@ fn FontDb::load_fonts_dir_impl(
 ///|
 /// Loads all faces of a font file (`Database::load_font_file`), keeping
 /// those that fontdb admits and for which typst can compute metadata.
-fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
+async fn FontDb::load_font_file(self : FontDb, path : String) -> Unit {
   let file = FontFile::open(path) catch { _ => return }
   defer file.close()
   let n = match file.fonts_in_collection() {
@@ -224,7 +225,7 @@ priv struct FontFile {
   /// The whole file, if it was read completely.
   mut data : Bytes?
   /// The open file, if it is read in ranges.
-  file : @platform.RangedFile?
+  file : @fs.File?
   /// The number of faces, if this is a collection that is read in ranges
   /// (set by `fonts_in_collection`).
   mut faces : UInt32?
@@ -268,11 +269,8 @@ priv struct Probe {
 const WHOLE_FILE_LIMIT : Int64 = 262144L
 
 ///|
-fn FontFile::open(path : String) -> FontFile raise @platform.IoError {
-  if !@platform.supports_ranged_reads() {
-    return FontFile::whole(@platform.read_file(path))
-  }
-  let file = @platform.RangedFile::open(path)
+async fn FontFile::open(path : String) -> FontFile {
+  let file = @fs.open(path, mode=ReadOnly)
   errdefer file.close()
   let size = file.size()
   if size > WHOLE_FILE_LIMIT {
@@ -287,7 +285,7 @@ fn FontFile::open(path : String) -> FontFile raise @platform.IoError {
     }
   }
   // Small files are cheaper to read whole.
-  let data = file.read(0L, size.to_int())
+  let data = font_read_range(file, 0L, size.to_int())
   file.close()
   FontFile::whole(data)
 }
@@ -317,7 +315,7 @@ fn FontFile::close(self : FontFile) -> Unit {
 ///|
 /// Reads exactly `len` bytes at `offset`, or `None` if the file is too
 /// short (also if it got shorter since it was opened).
-fn FontFile::read(self : FontFile, offset : Int64, len : Int32) -> Bytes? {
+async fn FontFile::read(self : FontFile, offset : Int64, len : Int32) -> Bytes? {
   if offset < 0L || len < 0 || len.to_int64() > self.size - offset {
     return None
   }
@@ -326,7 +324,7 @@ fn FontFile::read(self : FontFile, offset : Int64, len : Int32) -> Bytes? {
     return Some(data[start:start + len].to_owned())
   }
   guard self.file is Some(file) else { return None }
-  let bytes = file.read(offset, len) catch { _ => return None }
+  let bytes = font_read_range(file, offset, len) catch { _ => return None }
   if bytes.length() == len {
     Some(bytes)
   } else {
@@ -336,7 +334,7 @@ fn FontFile::read(self : FontFile, offset : Int64, len : Int32) -> Bytes? {
 
 ///|
 /// The whole file. It is kept, so the remaining faces are parsed in place.
-fn FontFile::all(self : FontFile) -> Bytes? {
+async fn FontFile::all(self : FontFile) -> Bytes? {
   if self.data is Some(data) {
     return Some(data)
   }
@@ -344,7 +342,7 @@ fn FontFile::all(self : FontFile) -> Bytes? {
   // (`fs::read` of a larger file fails as well.)
   guard self.size <= 0x7FFFFFFFL else { return None }
   let size = self.size.to_int()
-  let data = file.read(0L, size) catch { _ => return None }
+  let data = font_read_range(file, 0L, size) catch { _ => return None }
   // The file got shorter since it was opened.
   guard data.length() == size else { return None }
   self.data = Some(data)
@@ -367,7 +365,7 @@ fn be_u16(b : Bytes, at : Int32) -> Int32 {
 ///|
 /// The number of faces if this is a font collection
 /// (`ttf_parser::fonts_in_collection`).
-fn FontFile::fonts_in_collection(self : FontFile) -> UInt32? {
+async fn FontFile::fonts_in_collection(self : FontFile) -> UInt32? {
   guard self.read(0L, 12) is Some(header) else { return None }
   if be_u32(header, 0) != 0x74746366U {
     return None
@@ -382,7 +380,11 @@ fn FontFile::fonts_in_collection(self : FontFile) -> UInt32? {
 ///|
 /// The table at a place of a collection that is read in ranges, or `None`
 /// if it is not all in the file. Read once for all faces that have it.
-fn FontFile::table(self : FontFile, offset : UInt32, length : UInt32) -> Bytes? {
+async fn FontFile::table(
+  self : FontFile,
+  offset : UInt32,
+  length : UInt32,
+) -> Bytes? {
   let key = table_key(offset, length)
   if self.tables.get(key) is Some(data) {
     return data
@@ -417,7 +419,7 @@ fn FontFile::retain(self : FontFile, bytes : Int32) -> Bool {
 
 ///|
 /// The table at a place of the file, or `None` if it is not all there.
-fn FontFile::read_table(
+async fn FontFile::read_table(
   self : FontFile,
   offset : UInt32,
   length : UInt32,
@@ -458,7 +460,7 @@ fn FontFile::info(self : FontFile, probe : Probe) -> @library.FontInfo? {
 /// ranged reads, a standalone font with the face's relevant tables (at
 /// index 0). `None` if the face cannot be parsed at all (like
 /// `ttf_parser::RawFace::parse` failing).
-fn FontFile::probe_face(self : FontFile, index : UInt32) -> Probe? {
+async fn FontFile::probe_face(self : FontFile, index : UInt32) -> Probe? {
   if self.data is Some(data) {
     return Some({ data, index, cmap: None, })
   }

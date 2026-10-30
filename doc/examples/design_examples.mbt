@@ -334,7 +334,7 @@ pub fn export_pdf(world : @doc.DocWorld) -> Bytes raise @doc.DocError {
 
 ///|
 /// Section 14.3: the system world and file output.
-pub fn write_report(path : String) -> Unit raise {
+pub async fn write_report(path : String) -> Unit {
   let world = @system.world(root=".", system_fonts=false)
   @system.write(path, export_pdf(world))
 }

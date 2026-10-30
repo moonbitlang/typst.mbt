@@ -1,5 +1,5 @@
 ///|
-test "the paper compiles: no error, warning or lint, 38 pages" {
+async test "the paper compiles: no error, warning or lint, 38 pages" {
   let world = @system.world(
     root="doc/examples/papers/einstein-1916",
     system_fonts=false,

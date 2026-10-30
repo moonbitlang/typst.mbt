@@ -28,7 +28,7 @@ pub extend SystemError with Show::{to_string, output}
 /// Typst fonts and, by name only and after all others, IBM Plex Sans
 /// (`@doc.sans_fonts`). `today` fixes the date as `(year, month, day)`;
 /// otherwise the system date is used.
-pub fn world(
+pub async fn world(
   root~ : String = ".",
   embedded_fonts~ : Bool = true,
   system_fonts~ : Bool = true,
@@ -42,13 +42,21 @@ pub fn world(
   let packages = @kit.SystemPackages::new()
   let fonts = @kit.FontStore::new()
   if system_fonts {
-    fonts.extend_all(@kit.system())
+    fonts.extend_all(
+      @kit.system() catch {
+        err => raise SystemError(err.to_string())
+      },
+    )
   }
   if embedded_fonts {
     fonts.extend_all(@kit.embedded())
   }
   for path in font_paths {
-    fonts.extend_all(@kit.scan(path))
+    fonts.extend_all(
+      @kit.scan(path) catch {
+        err => raise SystemError(err.to_string())
+      },
+    )
   }
   if embedded_fonts {
     for entry in @doc.sans_fonts() {

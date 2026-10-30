@@ -643,7 +643,7 @@ fn Pages::faces(self : Pages) -> String raise {
 }
 
 ///|
-test "section 5: the embedded sans-serif family" {
+async test "section 5: the embedded sans-serif family" {
   // By its name, with its own bold and italic.
   let report = pages([@guide.sans_report()])
   inspect(report.errors(), content="")
@@ -694,7 +694,7 @@ test "section 5: the embedded sans-serif family" {
 }
 
 ///|
-test "section 5: fonts come from the world" {
+async test "section 5: fonts come from the world" {
   let text : Array[&@doc.IntoContent] = [@guide.font_families(), "mono"]
   // The directory of the embedded fonts, read as a directory of the
   // project.

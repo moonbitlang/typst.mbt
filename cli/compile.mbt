@@ -15,7 +15,7 @@ fn bail(message : String) -> HintedFailure {
 
 ///|
 /// Execute a compilation command.
-fn compile(args : CompileArgs) -> Unit raise HintedFailure {
+async fn compile(args : CompileArgs) -> Unit raise HintedFailure {
   let config = CompileConfig::new(args)
   let world = SystemWorld::new(Some(args.input), args.world, args.process) catch {
     err => raise bail("\{err}")

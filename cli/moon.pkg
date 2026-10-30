@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/async",
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/library",
   "moonbitlang/typst/eval",
