@@ -67,10 +67,12 @@ version = "0.1.0"
 
 import {
   "moonbitlang/typst@$version",
+  "moonbitlang/async@0.22.5",
 }
 EOF
 cat > "$work/consumer/cmd/moon.pkg" <<'EOF'
 import {
+  "moonbitlang/async",
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/kit",
   "moonbitlang/typst/doc/system",
@@ -113,7 +115,7 @@ fn has_text(frame : @library.Frame, text : String, family : String) -> Bool {
 }
 
 ///|
-fn build() -> Bytes raise {
+async fn build() -> Bytes raise {
   let world = @system.world(root=".", system_fonts=false, today=(2026, 10, 5))
   let compiled = report().compile_paged(world)
   // The family of `doc/fonts` was found (an unknown family is a warning)
@@ -130,7 +132,7 @@ fn build() -> Bytes raise {
 }
 
 ///|
-fn main {
+async fn main {
   let pdf = build() catch {
     e => {
       println("consumer: failed: \{e}")

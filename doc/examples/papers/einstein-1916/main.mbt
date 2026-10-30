@@ -410,7 +410,7 @@ fn document() -> Document {
 }
 
 ///|
-fn run() -> Unit raise {
+async fn run() -> Unit {
   let world = @system.world(
     root="doc/examples/papers/einstein-1916",
     system_fonts=false,
@@ -433,7 +433,7 @@ fn run() -> Unit raise {
 }
 
 ///|
-fn main {
+async fn main {
   run() catch {
     @doc.DocError(errors) =>
       for error in errors {

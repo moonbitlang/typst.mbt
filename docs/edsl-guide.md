@@ -559,7 +559,7 @@ have 51 characters more, of which a report may have the hyphens U+2010 and
 U+2011 (non-breaking): in upright text these two come from Libertinus
 Serif.
 
-`@system.world(..)` builds the world from three sources, each of which can
+`@system.world(..)` asynchronously builds the world from three sources, each of which can
 be turned off: the embedded fonts (`embedded_fonts`, default true), the
 fonts of the system (`system_fonts`, default true) and the font files below
 the directories of `font_paths` (searched recursively). With the system's
@@ -570,7 +570,7 @@ project and name that directory (`fonts_of`); files of IBM Plex Sans that
 a document brings this way are used instead of the embedded ones:
 
 ```moonbit
-pub fn fonts_of(dir : String) -> DocWorld raise @system.SystemError {
+pub async fn fonts_of(dir : String) -> DocWorld raise @system.SystemError {
   @system.world(embedded_fonts=false, system_fonts=false, font_paths=[dir])
 }
 ```

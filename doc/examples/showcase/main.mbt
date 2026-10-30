@@ -5,7 +5,7 @@
 //   moon run doc/examples/showcase --target native -- out.pdf [png-prefix]
 
 ///|
-fn run(pdf_path : String, png_prefix : String?) -> Unit raise {
+async fn run(pdf_path : String, png_prefix : String?) -> Unit {
   let world = @system.world(
     root="bench",
     system_fonts=false,
@@ -31,7 +31,7 @@ fn run(pdf_path : String, png_prefix : String?) -> Unit raise {
 }
 
 ///|
-fn main {
+async fn main {
   let args = @env.args()
   let pdf_path = args.get(1).unwrap_or("showcase-edsl.pdf")
   run(pdf_path, args.get(2)) catch {

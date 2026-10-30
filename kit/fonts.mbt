@@ -155,7 +155,7 @@ pub fn embedded() -> Array[(FontSource, @library.FontInfo)] {
 /// Discovers system fonts.
 ///
 /// This searches in operating-system dependent standard font locations.
-pub fn system() -> Array[(FontSource, @library.FontInfo)] {
+pub async fn system() -> Array[(FontSource, @library.FontInfo)] {
   with_db(db => {
     db.load_system_fonts()
 
@@ -170,13 +170,15 @@ pub fn system() -> Array[(FontSource, @library.FontInfo)] {
 /// Scans for fonts in a directory.
 ///
 /// The directory is searched recursively.
-pub fn scan(path : String) -> Array[(FontSource, @library.FontInfo)] {
+pub async fn scan(path : String) -> Array[(FontSource, @library.FontInfo)] {
   with_db(db => db.load_fonts_dir(path))
 }
 
 ///|
 /// Discovers fonts via the font database.
-fn with_db(f : (FontDb) -> Unit) -> Array[(FontSource, @library.FontInfo)] {
+async fn with_db(
+  f : async (FontDb) -> Unit,
+) -> Array[(FontSource, @library.FontInfo)] {
   let db = FontDb::new()
   f(db)
   db.faces.map(face => {
@@ -192,7 +194,7 @@ fn with_db(f : (FontDb) -> Unit) -> Array[(FontSource, @library.FontInfo)] {
 /// [Adobe Fonts Service Product Specific Terms][terms].
 ///
 /// [terms]: https://wwwimages2.adobe.com/content/dam/cc/en/legal/servicetou/Adobe-Fonts-Product-Specific-Terms-en_US-20241007.pdf
-fn load_adobe_fonts(db : FontDb) -> Unit {
+async fn load_adobe_fonts(db : FontDb) -> Unit {
   guard data_dir() is Some(data) else { return }
   let base = @platform.join(data, "Adobe")
   let prefix = if @platform.os() == MacOs { "." } else { "" }
@@ -202,11 +204,11 @@ fn load_adobe_fonts(db : FontDb) -> Unit {
   ]
   for subdir in subdirs {
     let dir = @platform.join(base, subdir)
-    let entries = @platform.read_dir(dir) catch { _ => return }
+    let entries = @fs.readdir(dir, sort=false) catch { _ => return }
     for name in entries {
       let path = @platform.join(dir, name)
       // Adobe fonts are stored as files (directories are skipped).
-      if (@platform.stat_kind(path) catch { _ => Other }) == File {
+      if (font_stat_kind(path) catch { _ => Other }) == File {
         db.load_font_file(path)
       }
     }
@@ -217,7 +219,7 @@ fn load_adobe_fonts(db : FontDb) -> Unit {
 /// Attempts to load system fonts (`Database::load_system_fonts`).
 ///
 /// This scans some predefined, operating-system dependent directories.
-fn FontDb::load_system_fonts(self : FontDb) -> Unit {
+async fn FontDb::load_system_fonts(self : FontDb) -> Unit {
   match @platform.os() {
     Windows => {
       let seen = @hashset.HashSet([])
@@ -242,7 +244,7 @@ fn FontDb::load_system_fonts(self : FontDb) -> Unit {
       self.load_fonts_dir_impl("/Library/Fonts", seen)
       self.load_fonts_dir_impl("/System/Library/Fonts", seen)
       // Downloadable fonts, location varies on major macOS releases
-      let assets = @platform.read_dir("/System/Library/AssetsV2") catch {
+      let assets = @fs.readdir("/System/Library/AssetsV2", sort=false) catch {
         _ => []
       }
       for name in assets {
@@ -265,7 +267,7 @@ fn FontDb::load_system_fonts(self : FontDb) -> Unit {
 ///|
 /// Loads fonts from the known font directories of Linux
 /// (`Database::load_no_fontconfig`).
-fn FontDb::load_no_fontconfig(self : FontDb) -> Unit {
+async fn FontDb::load_no_fontconfig(self : FontDb) -> Unit {
   let seen = @hashset.HashSet([])
   self.load_fonts_dir_impl("/usr/share/fonts/", seen)
   self.load_fonts_dir_impl("/usr/local/share/fonts/", seen)
