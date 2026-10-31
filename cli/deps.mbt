@@ -158,13 +158,6 @@ fn relative_dependencies(world : SystemWorld) -> Array[String] {
 fn strip_path_prefix(path : String, prefix : String) -> String? {
   let a = components(path)
   let b = components(prefix)
-  if b.length() > a.length() {
-    return None
-  }
-  for i, c in b {
-    if a[i] != c {
-      return None
-    }
-  }
-  Some(a[b.length():].to_owned().join(@platform.separator()))
+  guard a.strip_prefix(b[:]) is Some(rest) else { return None }
+  Some(rest.to_owned().join(@platform.separator()))
 }

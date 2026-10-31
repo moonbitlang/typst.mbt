@@ -428,7 +428,7 @@ fn CommandSpec::parse(
     if only_positional || arg == "-" || !arg.has_prefix("-") {
       if self.subcommands.length() > 0 && !only_positional {
         let known = arg == "help" ||
-          self.subcommands.iter().any(s => s.0 == arg || s.1.contains(arg))
+          self.subcommands.any(s => s.0 == arg || s.1.contains(arg))
         if !known {
           raise Usage("unrecognized subcommand '\{arg}'", self.usage())
         }
@@ -775,7 +775,7 @@ fn ParseState::apply_env(self : ParseState) -> Unit raise CliError {
         }
       _ =>
         if !self.values.contains(spec.id) &&
-          !self.pending.iter().any(p => p.0.id == spec.id) {
+          !self.pending.any(p => p.0.id == spec.id) {
           self.push_values(spec, value)
         }
     }

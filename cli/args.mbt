@@ -1341,7 +1341,7 @@ fn usize_error(v : String) -> String {
   let digits = if v.has_prefix("+") { v[1:].to_owned() } else { v }
   if v == "" {
     "cannot parse integer from empty string"
-  } else if digits != "" && digits.iter().all(c => c >= '0' && c <= '9') {
+  } else if digits != "" && digits.all(c => c >= '0' && c <= '9') {
     "number too large to fit in target type"
   } else {
     "invalid digit found in string"
