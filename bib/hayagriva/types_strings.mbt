@@ -209,7 +209,7 @@ pub fn ChunkedString::len(self : ChunkedString) -> Int32 {
 ///|
 /// Returns whether the string is empty.
 pub fn ChunkedString::is_empty(self : ChunkedString) -> Bool {
-  self.0.iter().all(c => c.is_empty())
+  self.0.all(c => c.is_empty())
 }
 
 ///|

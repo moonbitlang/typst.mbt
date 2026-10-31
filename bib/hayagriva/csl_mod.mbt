@@ -65,7 +65,7 @@ priv struct SpeculativeCiteRender {
 fn dedup_entries(entries : Array[Entry]) -> Array[Entry] {
   let out = []
   for e in entries {
-    if !out.iter().any(x => x == e) {
+    if !out.any(x => x == e) {
       out.push(e)
     }
   }
@@ -135,7 +135,7 @@ pub fn BibliographyDriver::finish(
           while k >= 0 && taken < style.csl.citation.near_note_distance {
             let cite = res[k]
             if cite.request.note_number is Some(_) &&
-              cite.items.iter().any(item => item.entry == entry) {
+              cite.items.any(item => item.entry == entry) {
               found = true
               break
             }
@@ -150,14 +150,14 @@ pub fn BibliographyDriver::finish(
         let mut out = None
         for cite in res {
           if cite.request.note_number is Some(nn) &&
-            cite.items.iter().any(item => item.entry == entry) {
+            cite.items.any(item => item.entry == entry) {
             out = Some(nn)
             break
           }
         }
         out.unwrap_or(n)
       })
-      let is_first = !seen.iter().any(e => physical_equal(e, entry))
+      let is_first = !seen.any(e => physical_equal(e, entry))
       if is_first {
         seen.push(entry)
       }
@@ -369,7 +369,7 @@ pub fn BibliographyDriver::finish(
   for cite in res {
     let style_ctx = cite.request.style_context()
     // 5. Collapse grouped citations.
-    if cite.request.items.iter().all(c => c.purpose is None) {
+    if cite.request.items.all(c => c.purpose is None) {
       collapse_items(cite)
     }
     for item in cite.items {
@@ -382,7 +382,7 @@ pub fn BibliographyDriver::finish(
     )
     final_citations.push({
       note_number: cite.request.note_number,
-      citation: if cite.items.iter().all(i => i.hidden) {
+      citation: if cite.items.all(i => i.hidden) {
         ElemChildren::new()
       } else {
         let elem_children : Array[ElemChild] = []
@@ -743,7 +743,7 @@ fn is_disambiguated(
     name_parts(taken, rule)
   }
   let disamb_x = disamb_name(x)
-  xs.iter().all(y => x.same(y) || disamb_name(y) != disamb_x)
+  xs.all(y => x.same(y) || disamb_name(y) != disamb_x)
 }
 
 ///|
@@ -991,7 +991,7 @@ fn disambiguate_year_suffix(
     for pair in group {
       let item = renders[pair.0].items[pair.1]
       if item.cite_props.speculative.disambiguation.may_disambiguate_with_year_suffix() &&
-        !entries.iter().any(e => e == item.entry) {
+        !entries.any(e => e == item.entry) {
         entries.push(item.entry)
       }
     }
@@ -1035,7 +1035,7 @@ fn find_ambiguous_sets(
   res.filter(e => {
     guard e.get(0) is Some((c0, i0)) else { return false }
     let first_entry = cites[c0].items[i0].entry
-    e.iter().any(pair => cites[pair.0].items[pair.1].entry != first_entry)
+    e.any(pair => cites[pair.0].items[pair.1].entry != first_entry)
   })
 }
 
@@ -1804,7 +1804,7 @@ fn CitationRequest::style_context(self : CitationRequest) -> StyleContext {
 
 ///|
 fn CitationRequest::shall_affix(self : CitationRequest) -> Bool {
-  self.items.iter().all(p => p.purpose is None)
+  self.items.all(p => p.purpose is None)
 }
 
 ///|

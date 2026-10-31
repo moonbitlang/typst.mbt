@@ -76,7 +76,7 @@ pub fn Selector::apply(self : Selector, entry : Entry) -> Map[String, Entry]? {
     Attr(expr, attributes) =>
       match expr.apply(entry) {
         Some(bound) =>
-          if attributes.iter().all(arg => entry.has(arg)) {
+          if attributes.all(arg => entry.has(arg)) {
             Some(bound)
           } else {
             None
@@ -150,7 +150,7 @@ fn Selector::apply_any(
       match expr.apply_any(entries) {
         Some((bound, es)) =>
           if !es.is_empty() {
-            if es.iter().any(e => attributes.iter().all(arg => e.has(arg))) {
+            if es.any(e => attributes.all(arg => e.has(arg))) {
               Some((bound, es))
             } else {
               None
