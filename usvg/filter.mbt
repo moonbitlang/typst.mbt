@@ -377,7 +377,7 @@ fn resolve_input(
       // If `in` references an unknown `result` than fallback
       // to previous result or `SourceGraphic`.
       if input is Reference(name) {
-        if !primitives.iter().any(p => p.result == name) {
+        if !primitives.any(p => p.result == name) {
           return if primitives.last() is Some(prev) {
             Reference(prev.result)
           } else {

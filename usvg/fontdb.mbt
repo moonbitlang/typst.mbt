@@ -200,7 +200,7 @@ pub fn FontDatabase::query(self : FontDatabase, query : FontQuery) -> FontId? {
   for family in query.families {
     let name = self.family_name(family)
     let candidates = self.faces.filter(face => {
-      face.families.iter().any(f => f.0 == name)
+      face.families.any(f => f.0 == name)
     })
     if !candidates.is_empty() {
       if find_best_match(candidates, query) is Some(index) {
@@ -257,9 +257,9 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int32? {
 
   // Step 4a (`font-stretch`).
   let q = query.stretch.to_number()
-  let matches = matching_set
-    .iter()
-    .any(index => candidates[index].stretch == query.stretch)
+  let matches = matching_set.any(index => {
+    candidates[index].stretch == query.stretch
+  })
   let matching_stretch = if matches {
     // Exact match.
     query.stretch
@@ -313,7 +313,7 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int32? {
   guard style_preference
     .iter()
     .find_first(query_style => {
-      matching_set.iter().any(index => candidates[index].style == query_style)
+      matching_set.any(index => candidates[index].style == query_style)
     })
     is Some(matching_style) else {
     return None
@@ -333,12 +333,12 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int32? {
     weight
   } else if weight >= 400 &&
     weight < 450 &&
-    matching_set.iter().any(index => candidates[index].weight == 500) {
+    matching_set.any(index => candidates[index].weight == 500) {
     // Check 500 first.
     500
   } else if weight >= 450 &&
     weight <= 500 &&
-    matching_set.iter().any(index => candidates[index].weight == 400) {
+    matching_set.any(index => candidates[index].weight == 400) {
     // Check 400 first.
     400
   } else if weight <= 500 {
@@ -455,7 +455,7 @@ fn parse_face_names(
   let names = face.names()
   let collect_families = (name_id : Int32) => {
     let families = []
-    for name in names.iter() {
+    for name in names {
       if name.name_id.to_int() == name_id && name.is_unicode() {
         if name_to_unicode(name) is Some(family) {
           families.push((family, name.language()))
@@ -464,8 +464,8 @@ fn parse_face_names(
     }
 
     // If no Unicode English US family name was found then look for English MacRoman as well.
-    if !families.iter().any(f => f.1 == English_UnitedStates) {
-      for name in names.iter() {
+    if !families.any(f => f.1 == English_UnitedStates) {
+      for name in names {
         if name.name_id.to_int() == name_id && name_is_mac_roman(name) {
           if name_to_unicode(name) is Some(family) {
             families.push((family, name.language()))
@@ -498,7 +498,7 @@ fn parse_face_names(
     return None
   }
   let mut post_script_name = None
-  for name in names.iter() {
+  for name in names {
     if name.name_id.to_int() == 6 &&
       (name.is_unicode() || name_is_mac_roman(name)) {
       post_script_name = name_to_unicode(name)

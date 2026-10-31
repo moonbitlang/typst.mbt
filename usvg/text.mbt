@@ -375,9 +375,9 @@ fn convert_font(node : SvgNode, state : State) -> Font {
   // This allows variable fonts to work with regular font-weight/font-stretch properties.
   let has_tag = (tag : String) => {
     let t = @utf8.encode(tag)
-    variations
-    .iter()
-    .any(v => v.tag.length() == 4 && Bytes::makei(4, i => v.tag[i]) == t)
+    variations.any(v => {
+      v.tag.length() == 4 && Bytes::makei(4, i => v.tag[i]) == t
+    })
   }
   let has_wght = has_tag("wght")
   let has_wdth = has_tag("wdth")
@@ -908,7 +908,7 @@ fn convert_baseline_shift(
       }
     }
   }
-  if shift.iter().all(base => base is Baseline) {
+  if shift.all(base => base is Baseline) {
     shift.clear()
   }
   shift
