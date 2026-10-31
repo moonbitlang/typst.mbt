@@ -218,7 +218,7 @@ pub impl Fold for HtmlAttrs with fn fold(self, outer) {
   // for now, this is okay.
   let out = self.0.copy()
   for pair in outer.0 {
-    if !out.iter().any(p => p.0 == pair.0) {
+    if !out.any(p => p.0 == pair.0) {
       out.push(pair)
     }
   }

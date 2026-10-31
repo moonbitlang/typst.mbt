@@ -879,13 +879,9 @@ pub fn StylisticSets::has(self : StylisticSets, ss : Int32) -> Bool {
 ///|
 /// Returns all stylistic sets to enable.
 pub fn StylisticSets::sets(self : StylisticSets) -> Array[Int32] {
-  let out = []
-  for i in 1..<=20 {
-    if self.has(i) {
-      out.push(i)
-    }
-  }
-  out
+  [
+    for i in 1..<=20 if self.has(i) => i
+  ]
 }
 
 ///|

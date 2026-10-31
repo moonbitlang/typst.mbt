@@ -694,7 +694,7 @@ pub impl Reflect for PdfStandard with fn output() {
 ///|
 pub impl Reflect for PdfStandard with fn castable(v) {
   match v {
-    Str(s) => pdf_standard_casts.iter().any(entry => entry.0 == s)
+    Str(s) => pdf_standard_casts.any(entry => entry.0 == s)
     _ => false
   }
 }

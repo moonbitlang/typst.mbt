@@ -754,7 +754,7 @@ fn upper_word_n(data : FixedArray[UInt32], n : Int32) -> Int32 {
 
 ///|
 fn DecWide::is_zero(self : DecWide) -> Bool {
-  self.data.iter().all(w => w == 0U)
+  self.data.all(w => w == 0U)
 }
 
 ///|

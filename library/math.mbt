@@ -172,7 +172,7 @@ pub impl Reflect for @unicode.MathClass with fn output() {
 ///|
 pub impl Reflect for @unicode.MathClass with fn castable(v) {
   match v {
-    Str(s) => math_class_casts.iter().any(entry => entry.0 == s)
+    Str(s) => math_class_casts.any(entry => entry.0 == s)
     _ => false
   }
 }

@@ -560,7 +560,7 @@ pub impl Reflect for DashPattern with fn output() {
 ///|
 pub impl Reflect for DashPattern with fn castable(v) {
   match v {
-    Str(s) => dash_patterns.iter().any(p => p.0 == s)
+    Str(s) => dash_patterns.any(p => p.0 == s)
     Array(_) | Dict(_) => true
     _ => false
   }

@@ -1079,7 +1079,7 @@ fn raw_preprocess(
   styles : StyleChain,
   span : @syntax.Span,
 ) -> Array[(String, @syntax.Span)] {
-  if text is Lines(lines) && lines.iter().all(l => !l.0.contains("\t")) {
+  if text is Lines(lines) && lines.all(l => !l.0.contains("\t")) {
     return lines.copy()
   }
   let mut text = text.get()

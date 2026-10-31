@@ -399,7 +399,7 @@ fn resolve_symbol(
   let italic = EquationElem::italic_in(styles)
   let span = elem.pack().span()
   for cluster in @unicode.graphemes(elem.text()) {
-    if cluster.iter().all(@unicode.is_default_ignorable) {
+    if cluster.all(@unicode.is_default_ignorable) {
       continue
     }
     let text = math_styled_text(cluster, variant, bold, italic)
