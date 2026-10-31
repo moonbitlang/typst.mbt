@@ -234,7 +234,7 @@ fn SvgFonts::resolve_variations(
   let opsz : FixedArray[Byte] = [b'o', b'p', b's', b'z']
   if span.font_optical_sizing == OpticalAuto &&
     is_supported(opsz) &&
-    !variations.iter().any(v => v.tag == opsz) {
+    !variations.any(v => v.tag == opsz) {
     variations.push(@usvg.FontVariation::new(opsz, span.font_size.get()))
   }
   variations
