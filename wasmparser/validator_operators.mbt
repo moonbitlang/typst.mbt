@@ -683,7 +683,7 @@ fn OperatorValidatorTemp::pop_push_label_types(
   self : OperatorValidatorTemp,
   label_types : ArrayView[ValType],
 ) -> Unit raise BinaryReaderError {
-  for i = label_types.length() - 1; i >= 0; i = i - 1 {
+  for i in (label_types.length() - 1)>=..0 {
     self.pop_operand(Some(label_types[i])) |> ignore
   }
   for ty in label_types {
@@ -830,11 +830,11 @@ fn OperatorValidatorTemp::match_stack_operands(
   expected_tys : ArrayView[ValType],
 ) -> Unit raise BinaryReaderError {
   let tmp = self.inner.popped_types_tmp
-  for i = expected_tys.length() - 1; i >= 0; i = i - 1 {
+  for i in (expected_tys.length() - 1)>=..0 {
     let actual_ty = self.pop_operand(Some(expected_tys[i]))
     tmp.push(actual_ty)
   }
-  for i = tmp.length() - 1; i >= 0; i = i - 1 {
+  for i in (tmp.length() - 1)>=..0 {
     self.inner.operands.push(tmp[i])
   }
   tmp.clear()
@@ -988,7 +988,7 @@ fn OperatorValidatorTemp::pop_ctrl(
   // Pop all the result types, in reverse order, from the operand stack.
   // These types will, possibly, be transferred to the next frame.
   let results = self.results(ty)
-  for i = results.length() - 1; i >= 0; i = i - 1 {
+  for i in (results.length() - 1)>=..0 {
     self.pop_operand(Some(results[i])) |> ignore
   }
 
@@ -1134,7 +1134,7 @@ fn OperatorValidatorTemp::check_call_ty(
   ty : FuncType,
 ) -> Unit raise BinaryReaderError {
   let params = ty.params()
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   for ty in ty.results() {
@@ -1150,7 +1150,7 @@ fn OperatorValidatorTemp::check_return_call_ty(
 ) -> Unit raise BinaryReaderError {
   self.check_func_type_same_results(ty)
   let params = ty.params()
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
 
@@ -1217,7 +1217,7 @@ fn OperatorValidatorTemp::check_return(
     raise self.inner.err_beyond_end(self.offset)
   }
   let results = self.results(self.inner.control[0].block_type)
-  for i = results.length() - 1; i >= 0; i = i - 1 {
+  for i in (results.length() - 1)>=..0 {
     self.pop_operand(Some(results[i])) |> ignore
   }
   self.unreachable_()
@@ -1726,7 +1726,7 @@ fn OperatorValidatorTemp::visit_block(
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_block_type(ty)
   let params = self.params(ty)
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   self.push_ctrl(Block, ty)
@@ -1739,7 +1739,7 @@ fn OperatorValidatorTemp::visit_loop(
 ) -> Unit raise BinaryReaderError {
   let ty = self.check_block_type(ty)
   let params = self.params(ty)
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   self.push_ctrl(Loop, ty)
@@ -1753,7 +1753,7 @@ fn OperatorValidatorTemp::visit_if(
   let ty = self.check_block_type(ty)
   self.pop_operand(Some(I32)) |> ignore
   let params = self.params(ty)
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   self.push_ctrl(If, ty)
@@ -1777,7 +1777,7 @@ fn OperatorValidatorTemp::visit_try_table(
 ) -> Unit raise BinaryReaderError {
   let block_ty = self.check_block_type(ty.ty)
   let params = self.params(block_ty)
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   let exn_type = ValType::Ref(reftype_exn)
@@ -1858,7 +1858,7 @@ fn OperatorValidatorTemp::visit_throw(
   // Check values associated with the exception.
   let ty = self.exception_tag_at(index)
   let params = ty.params()
-  for i = params.length() - 1; i >= 0; i = i - 1 {
+  for i in (params.length() - 1)>=..0 {
     self.pop_operand(Some(params[i])) |> ignore
   }
   self.unreachable_()
@@ -1905,7 +1905,7 @@ fn OperatorValidatorTemp::visit_br(
 ) -> Unit raise BinaryReaderError {
   let (ty, kind) = self.jump(relative_depth)
   let types = self.label_types(ty, kind)
-  for i = types.length() - 1; i >= 0; i = i - 1 {
+  for i in (types.length() - 1)>=..0 {
     self.pop_operand(Some(types[i])) |> ignore
   }
   self.unreachable_()
@@ -1941,7 +1941,7 @@ fn OperatorValidatorTemp::visit_br_table(
     }
     self.match_stack_operands(label_tys)
   }
-  for i = default_types.length() - 1; i >= 0; i = i - 1 {
+  for i in (default_types.length() - 1)>=..0 {
     self.pop_operand(Some(default_types[i])) |> ignore
   }
   self.unreachable_()
