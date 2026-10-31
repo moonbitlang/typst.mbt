@@ -1161,7 +1161,7 @@ fn render(
     // Check whether the bibliography or any citation displays citation
     // numbers. Only then does the bibliography occupy a numbering range that
     // subsequent bibliographies in the same group must skip.
-    if b.items.iter().any(displays_citation_number) ||
+    if b.items.any(displays_citation_number) ||
       rendered.citations
       .iter()
       .any(rendered => rendered.citation.find_meta(CitationNumber) is Some(_)) {
@@ -1363,7 +1363,7 @@ fn show_subgroup(
   citation : @hayagriva.RenderedCitation,
   to_entry : (String) -> Location?,
 ) -> Content raise SourceError {
-  if group.citations.iter().all(sub => sub.form(StyleChain::empty()) is None) {
+  if group.citations.all(sub => sub.form(StyleChain::empty()) is None) {
     return Content::empty()
   }
   let span = span_find(group.citations.map(elem => elem.0.span()))

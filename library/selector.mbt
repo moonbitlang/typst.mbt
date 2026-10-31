@@ -79,12 +79,11 @@ pub fn Selector::matches(
       target.elem() == element &&
       dict
       .unwrap_or([])
-      .iter()
       .all(pair => field_matches(target, pair.0, pair.1, styles))
     Label(label) => target.label() == Some(label)
     Can(cap) => target.func().can(cap)
-    Or(selectors) => selectors.iter().any(sel => sel.matches(target, styles))
-    And(selectors) => selectors.iter().all(sel => sel.matches(target, styles))
+    Or(selectors) => selectors.any(sel => sel.matches(target, styles))
+    And(selectors) => selectors.all(sel => sel.matches(target, styles))
     Location(location) => target.location() == Some(location)
     // Not supported here.
     Regex(_) | Before(..) | After(..) | Within(..) => false

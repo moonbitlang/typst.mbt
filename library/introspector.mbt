@@ -961,7 +961,7 @@ pub fn[P] ElementIntrospector::query(
         }
         let smallest = swap_remove(results, min)
         smallest.filter(candidate => {
-          results.iter().all(other => self.binary_search(other, candidate).0)
+          results.all(other => self.binary_search(other, candidate).0)
         })[:]
       }
     }

@@ -440,7 +440,7 @@ pub impl FromValue for OpenTypeTag with fn from_value(v) {
   }
   let v : String = (FromValue::from_value(v) : String)
   for cluster in @unicode.graphemes(v) {
-    if !cluster.iter().all(c => c.to_int() >= 0x20 && c.to_int() <= 0x7E) {
+    if !cluster.all(c => c.to_int() >= 0x20 && c.to_int() <= 0x7E) {
       bail_hinted("tag may contain only printable ASCII characters", [
         "found invalid cluster `\{repr_str(cluster.to_owned())}`",
       ])

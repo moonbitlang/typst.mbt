@@ -275,7 +275,7 @@ pub impl Reflect for MathVariant with fn output() {
 
 ///|
 pub impl Reflect for MathVariant with fn castable(v) {
-  math_variants.iter().any(variant => v is Str(s) && s == variant.name())
+  math_variants.any(variant => v is Str(s) && s == variant.name())
 }
 
 ///|

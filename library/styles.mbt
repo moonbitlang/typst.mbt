@@ -116,7 +116,7 @@ pub fn Styles::liftable(self : Styles) -> Styles {
 ///|
 /// Whether there is a style for the given field of the given element.
 pub fn Styles::has(self : Styles, elem : Element, id : Int32) -> Bool {
-  self.items.iter().any(s => s is Property(p) && p.is_(elem, id))
+  self.items.any(s => s is Property(p) && p.is_(elem, id))
 }
 
 ///|

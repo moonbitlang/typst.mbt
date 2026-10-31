@@ -140,7 +140,7 @@ fn impl_array_slice(
 ///|
 /// Whether the array contains the specified value.
 fn impl_array_contains(self_ : Arr, value_ : Value) -> Bool {
-  self_.items.iter().any(v => equal(v, value_))
+  self_.items.any(v => equal(v, value_))
 }
 
 ///|
@@ -795,7 +795,7 @@ fn impl_array_dedup(
   // 2. We cannot hash arbitrary `Value`.
   for value in self_.items {
     let key = key_of(value.shared())
-    if out_keys.iter().any(second => equal(key, second)) {
+    if out_keys.any(second => equal(key, second)) {
       continue
     }
     out.push(value.shared())
