@@ -1315,7 +1315,7 @@ pub fn LayoutRenderingElement::find_variable_element(
         None
       }
     Names(n) =>
-      if n.variable.iter().any(v => Variable::Name(v) == variable) {
+      if n.variable.any(v => Variable::Name(v) == variable) {
         Some(self)
       } else {
         None
@@ -3106,7 +3106,7 @@ pub fn Locale::term(
 pub fn Locale::ordinals(self : Locale) -> OrdinalLookup? {
   match self.terms {
     Some(terms) =>
-      if terms.terms.iter().any(t => t.name.is_ordinal()) {
+      if terms.terms.any(t => t.name.is_ordinal()) {
         Some(OrdinalLookup::new(terms.terms.filter(t => t.name.is_ordinal())))
       } else {
         None
@@ -3126,12 +3126,12 @@ pub struct OrdinalLookup {
 fn OrdinalLookup::new(terms : Array[LocalizedTerm]) -> OrdinalLookup {
   let mut legacy_behavior = false
   // Must not define "OtherTerm::Ordinal"
-  let defines_ordinal = terms.iter().any(t => t.name == Other(Ordinal))
+  let defines_ordinal = terms.any(t => t.name == Other(Ordinal))
   if !defines_ordinal {
     // Contains OtherTerm::OrdinalN(1) - OtherTerm::OrdinalN(4)
     legacy_behavior = true
     for n in 1..<=4 {
-      if !terms.iter().any(t => t.name == Other(OrdinalN(n))) {
+      if !terms.any(t => t.name == Other(OrdinalN(n))) {
         legacy_behavior = false
       }
     }
