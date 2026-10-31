@@ -263,7 +263,7 @@ fn conv_dasharray(node : SvgNode, state : State) -> Array[Float]? {
   }
 
   // `A negative value is an error`
-  if list.iter().any(n => is_sign_negative_f32(n)) {
+  if list.any(n => is_sign_negative_f32(n)) {
     return None
   }
 

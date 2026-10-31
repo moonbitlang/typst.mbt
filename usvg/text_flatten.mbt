@@ -230,7 +230,7 @@ fn FontDatabase::outline(
 
   // For variable fonts, we need to set default variation values to get proper outlines
   if font.is_variable() {
-    for axis in font.variation_axes().iter() {
+    for axis in font.variation_axes() {
       font.set_variation(axis.tag, axis.def_value) |> ignore
     }
   }
@@ -264,9 +264,7 @@ fn FontDatabase::outline_with_variations(
 
   // Auto-set opsz if font-optical-sizing is auto and not explicitly set
   if font_optical_sizing == OpticalAuto {
-    let has_explicit_opsz = variations
-      .iter()
-      .any(v => v.tag == b"opsz".to_fixedarray())
+    let has_explicit_opsz = variations.any(v => v.tag == b"opsz".to_fixedarray())
     if !has_explicit_opsz {
       // Check if font has opsz axis
       if font.tables().fvar is Some(axes) {

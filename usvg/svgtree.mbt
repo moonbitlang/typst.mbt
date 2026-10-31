@@ -187,7 +187,7 @@ fn SvgNode::node_attribute(self : SvgNode, aid : AId) -> SvgNode? {
 ///|
 /// Checks if an attribute is present.
 pub fn SvgNode::has_attribute(self : SvgNode, aid : AId) -> Bool {
-  self.attributes().iter().any(a => a.name == aid)
+  self.attributes().any(a => a.name == aid)
 }
 
 ///|

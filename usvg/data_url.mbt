@@ -210,7 +210,7 @@ fn parse_mime(s : String) -> (String, String)? {
     Some(i) => trimmed[0:i]
     None => trimmed
   }
-  if type_.is_empty() || !type_.iter().all(is_http_token_code_point) {
+  if type_.is_empty() || !type_.all(is_http_token_code_point) {
     return None
   }
   let rest = match slash {
@@ -226,7 +226,7 @@ fn parse_mime(s : String) -> (String, String)? {
     e -= 1
   }
   let subtype = subtype[0:e]
-  if subtype.is_empty() || !subtype.iter().all(is_http_token_code_point) {
+  if subtype.is_empty() || !subtype.all(is_http_token_code_point) {
     return None
   }
   Some(
