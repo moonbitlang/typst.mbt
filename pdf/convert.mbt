@@ -830,10 +830,7 @@ fn collect_named_destinations(
   let headings = typst_document
     .introspector()
     .query(@library.heading_elem().select())
-  let matches = []
-  for entry in anchors {
-    matches.push(entry)
-  }
+  let matches = anchors.copy()
   for elem in headings {
     if elem.location() is Some(loc) && elem.label() is Some(label) {
       matches.push((loc, label.resolve()))

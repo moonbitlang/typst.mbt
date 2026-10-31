@@ -279,10 +279,7 @@ fn pop_logical_child(
 ) -> Unit {
   // Remove all stack entries after the idx.
   if stack_idx + 1 < tree.stack.length() {
-    let stack = []
-    for i in (stack_idx + 1)..<tree.stack.length() {
-      stack.push(tree.stack[i])
-    }
+    let stack = tree.stack[stack_idx + 1:].to_owned()
     tree.stack.truncate(stack_idx + 1)
     tree.unfinished_stacks[parent.location] = stack
     tree.unfinished.push({

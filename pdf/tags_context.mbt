@@ -438,7 +438,7 @@ fn build_figure(tree : Tree, figure_id : Int32) -> Unit {
 
     // Omit an additional wrapping tag.
     figure_ctx.tag_kind = NoTag
-  } else if !group.nodes.iter().any(n => n is Group(_)) {
+  } else if !group.nodes.any(n => n is Group(_)) {
     // The figure contains only marked content.
     figure_ctx.tag_kind = Figure
   }

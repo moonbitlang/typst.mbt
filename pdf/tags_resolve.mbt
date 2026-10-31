@@ -487,7 +487,7 @@ fn validate_children_groups(
         "avoid manually calling `figure.caption`",
       ])
     }
-    if caption_spans.iter().all(s => !s.is_detached()) {
+    if caption_spans.all(s => !s.is_detached()) {
       for s in caption_spans {
         rs.errors.push(caption_error(s))
       }
