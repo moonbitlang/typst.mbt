@@ -159,8 +159,7 @@ impl RenderCsl for @citationberg.Text with fn will_render(self, ctx, var_) {
     StandardVariable(s, _) => var_ == Standard(s)
     NumberVariable(n, _) => var_ == Number(n)
     PageVariable(_) => var_ == Page(Page)
-    Macro(mac) =>
-      mac.children.iter().any(c => RenderCsl::will_render(c, ctx, var_))
+    Macro(mac) => mac.children.any(c => RenderCsl::will_render(c, ctx, var_))
     Term(_) => false
     Value(_) => false
   }
@@ -548,9 +547,9 @@ impl RenderCsl for @citationberg.Date with fn render(self, ctx) {
       month = true
       day = true
     } else {
-      year = self.date_part.iter().any(i => i.name == Year)
-      month = self.date_part.iter().any(i => i.name == Month)
-      day = self.date_part.iter().any(i => i.name == Day)
+      year = self.date_part.any(i => i.name == Year)
+      month = self.date_part.any(i => i.name == Month)
+      day = self.date_part.any(i => i.name == Day)
     }
     if year {
       // Smart hack taken from citeproc: This prints negative (BC) dates as
@@ -864,7 +863,7 @@ impl RenderCsl for @citationberg.Choose with fn render(self, ctx) {
 ///|
 impl RenderCsl for @citationberg.Choose with fn will_render(self, ctx, var_) {
   choose_children(self, ctx, (children, ctx) => {
-    children.iter().any(c => RenderCsl::will_render(c, ctx, var_))
+    children.any(c => RenderCsl::will_render(c, ctx, var_))
   }).unwrap_or(false)
 }
 
@@ -1127,7 +1126,7 @@ impl RenderCsl for @citationberg.Group with fn render(self, ctx) {
 
 ///|
 impl RenderCsl for @citationberg.Group with fn will_render(self, ctx, var_) {
-  self.children.iter().any(e => RenderCsl::will_render(e, ctx, var_))
+  self.children.any(e => RenderCsl::will_render(e, ctx, var_))
 }
 
 ///|
@@ -1209,7 +1208,7 @@ impl RenderCsl for @citationberg.Layout with fn render(self, ctx) {
 
 ///|
 impl RenderCsl for @citationberg.Layout with fn will_render(self, ctx, var_) {
-  self.elements.iter().any(e => RenderCsl::will_render(e, ctx, var_))
+  self.elements.any(e => RenderCsl::will_render(e, ctx, var_))
 }
 
 ///|

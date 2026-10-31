@@ -156,8 +156,7 @@ pub fn LanguageIdentifier::parse(s : String) -> LanguageIdentifier? {
     region = Some(@unscanny.to_ascii_uppercase(parts[i]))
     i += 1
   }
-  while i < parts.length() {
-    let p = parts[i]
+  for p in parts[i:] {
     let ok = all_alnum(p) &&
       (
         (p.length() >= 5 && p.length() <= 8) ||
@@ -167,7 +166,6 @@ pub fn LanguageIdentifier::parse(s : String) -> LanguageIdentifier? {
       return None
     }
     variants.push(@unscanny.to_ascii_lowercase(p))
-    i += 1
   }
   Some({ language, script, region, variants, })
 }

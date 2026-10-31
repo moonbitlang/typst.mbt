@@ -190,13 +190,13 @@ pub fn ElemChildren::copy(self : ElemChildren) -> ElemChildren {
 ///|
 /// Whether this container is empty.
 pub fn ElemChildren::is_empty(self : ElemChildren) -> Bool {
-  self.0.iter().all(e => e.is_empty())
+  self.0.all(e => e.is_empty())
 }
 
 ///|
 /// Whether this container has any content other than whitespace.
 pub fn ElemChildren::has_content(self : ElemChildren) -> Bool {
-  self.0.iter().any(e => e.has_content())
+  self.0.any(e => e.has_content())
 }
 
 ///|
