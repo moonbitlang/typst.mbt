@@ -1159,7 +1159,7 @@ fn parse_u8_term(s : String) -> Result[Int32, TermConversionError] {
       } else {
         s
       }
-      if !digits.is_empty() && digits.iter().all(c => c.is_ascii_digit()) {
+      if !digits.is_empty() && digits.all(c => c.is_ascii_digit()) {
         Err(OutOfRange)
       } else {
         Err(Unknown)
