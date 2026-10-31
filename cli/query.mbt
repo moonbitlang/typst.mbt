@@ -198,7 +198,7 @@ fn shell_escape(s : String) -> String {
     (c >= '0' && c <= '9') ||
     c is ('-' | '_' | '=' | '/' | ',' | '.' | '+')
   }
-  if s != "" && s.iter().all(allowed) {
+  if s != "" && s.all(allowed) {
     return s
   }
   let es = StringBuilder()

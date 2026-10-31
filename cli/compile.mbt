@@ -699,7 +699,7 @@ let indexable_templates : ReadOnlyArray[String] = ["{p}", "{0p}", "{n}"]
 
 ///|
 fn has_indexable_template(output : String) -> Bool {
-  indexable_templates.iter().any(template => output.contains(template))
+  indexable_templates.any(template => output.contains(template))
 }
 
 ///|
