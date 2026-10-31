@@ -147,9 +147,9 @@ pub fn Date::parse(
       Ok((d1, d2)) => Between(d1, d2)
       Err(e) => return Err(e.offset(span.start))
     }
-  } else if date_trimmed.find("/") is Some(pos16) {
-    let s1 = date_trimmed[:pos16].to_owned()
-    let s2 = date_trimmed[pos16 + 1:].to_owned()
+  } else if date_trimmed.split_once("/") is Some((s1, s2)) {
+    let s1 = s1.to_owned()
+    let s2 = s2.to_owned()
     let pos = @unscanny.len_utf8(s1)
     fn is_open_range(s : String) -> Bool {
       @unscanny.trim(s).is_empty() || s == ".."

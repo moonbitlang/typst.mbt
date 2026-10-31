@@ -120,14 +120,14 @@ pub fn parse_roman(s : String) -> Int32? {
   if s.is_empty() {
     return None
   }
-  let chars = if s.iter().all(c => c.is_ascii_uppercase()) {
+  let chars = if s.all(c => c.is_ascii_uppercase()) {
     @unscanny.chars(s)
-  } else if s.iter().all(c => c.is_ascii_lowercase()) {
+  } else if s.all(c => c.is_ascii_lowercase()) {
     @unscanny.chars(@unscanny.to_ascii_uppercase(s))
   } else {
     return None
   }
-  if chars.iter().any(c => !(c is ('I' | 'V' | 'X' | 'L' | 'C' | 'D' | 'M'))) {
+  if chars.any(c => !(c is ('I' | 'V' | 'X' | 'L' | 'C' | 'D' | 'M'))) {
     return None
   }
   let n = chars.length()
