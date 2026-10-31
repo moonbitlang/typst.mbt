@@ -2200,10 +2200,7 @@ pub impl FromReader for SubType with fn from_reader(reader) {
   match reader.read_u8() {
     0x4f | 0x50 as opcode => {
       let n = reader.read_iter(MAX_WASM_SUPERTYPES, "supertype idxs")
-      let idxs = []
-      for _ in 0..<n {
-        idxs.push(reader.read_var_u32())
-      }
+      let idxs = [ for _ in 0..<n => reader.read_var_u32() ]
       if idxs.length() > 1 {
         raise BinaryReaderError::new("multiple supertypes not supported", pos)
       }
@@ -2240,10 +2237,7 @@ pub extend SubType with FromReader::{from_reader}
 ///|
 pub impl FromReader for FuncType with fn from_reader(reader) {
   let n = reader.read_iter(MAX_WASM_FUNCTION_PARAMS, "function params")
-  let params_results = []
-  for _ in 0..<n {
-    params_results.push(ValType::from_reader(reader))
-  }
+  let params_results = [ for _ in 0..<n => ValType::from_reader(reader) ]
   let len_params = params_results.length()
   let n = reader.read_iter(MAX_WASM_FUNCTION_RETURNS, "function returns")
   for _ in 0..<n {
@@ -2287,10 +2281,7 @@ pub extend ArrayType with FromReader::{from_reader}
 ///|
 pub impl FromReader for StructType with fn from_reader(reader) {
   let n = reader.read_iter(MAX_WASM_STRUCT_FIELDS, "struct fields")
-  let fields = []
-  for _ in 0..<n {
-    fields.push(FieldType::from_reader(reader))
-  }
+  let fields = [ for _ in 0..<n => FieldType::from_reader(reader) ]
   { fields, }
 }
 

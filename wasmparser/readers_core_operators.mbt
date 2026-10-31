@@ -364,10 +364,7 @@ pub extend Catch with @debug.Debug::{to_repr}
 pub impl FromReader for TryTable with fn from_reader(reader) {
   let ty = reader.read_block_type()
   let n = reader.read_iter(MAX_WASM_CATCHES, "catches")
-  let catches = []
-  for _ in 0..<n {
-    catches.push(Catch::from_reader(reader))
-  }
+  let catches = [ for _ in 0..<n => Catch::from_reader(reader) ]
   { ty, catches, }
 }
 
@@ -443,10 +440,7 @@ pub fn ResumeTable::len(self : ResumeTable) -> Int32 {
 ///|
 pub impl FromReader for ResumeTable with fn from_reader(reader) {
   let n = reader.read_iter(MAX_WASM_HANDLERS, "resume table")
-  let handlers = []
-  for _ in 0..<n {
-    handlers.push(Handle::from_reader(reader))
-  }
+  let handlers = [ for _ in 0..<n => Handle::from_reader(reader) ]
   { handlers, }
 }
 

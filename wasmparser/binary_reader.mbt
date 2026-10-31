@@ -404,10 +404,7 @@ fn BinaryReader::read_br_table(
   self : BinaryReader,
 ) -> BrTable raise BinaryReaderError {
   let cnt = self.read_size(MAX_WASM_BR_TABLE_SIZE, "br_table")
-  let targets = []
-  for _ in 0..<cnt {
-    targets.push(self.read_var_u32())
-  }
+  let targets = [ for _ in 0..<cnt => self.read_var_u32() ]
   let default = self.read_var_u32()
   { targets, default, }
 }
@@ -1288,7 +1285,7 @@ pub fn BinaryReader::read_operator(
 /// `cast_flags:08b`.
 fn binary8(x : Byte) -> String {
   let buf = StringBuilder()
-  for i = 7; i >= 0; i = i - 1 {
+  for i in 7>=..0 {
     buf.write_char(if ((x.to_int() >> i) & 1) != 0 { '1' } else { '0' })
   }
   buf.to_string()
