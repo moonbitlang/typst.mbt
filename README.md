@@ -24,12 +24,13 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 ## Command-line interface
 
 `cli/` is a port of `typst-cli` (on `kit/`, a port of `typst-kit`) that
-compiles documents from the file system. It builds for `native`, `wasm-gc`
-and `wasm` (the wasm builds run in `moonrun`):
+compiles documents from the file system. Supported backends are `native`
+and `wasm` (the wasm build runs in `moonrun`). `wasm-gc` is no longer
+supported:
 
 ```sh
 moon run cli --target native --release -- compile input.typ output.pdf
-moon run cli --target wasm-gc -- compile input.typ 'page-{p}.svg'
+moon run cli --target wasm -- compile input.typ 'page-{p}.svg'
 moon run cli --target native -- compile --format html --features html in.typ
 moon run cli --target native -- eval 'query(heading).len()' --in input.typ
 moon run cli --target native -- fonts --variants
@@ -50,9 +51,9 @@ server of `watch` for HTML export (pass `--no-serve`) are
 not supported; `--jobs` is accepted for compatibility and has no effect
 (compilation is single-threaded). The embedded fonts are those of upstream
 (Libertinus Serif,
-New Computer Modern, DejaVu Sans Mono). On wasm, system font discovery
-reads every font file through moonrun's host API (slow; use
-`--ignore-system-fonts`), symlinks cannot be detected, the local time zone
+New Computer Modern, DejaVu Sans Mono). Font discovery uses `async/fs` on
+both backends, reading only the relevant tables of large fonts. On wasm,
+the synchronous platform layer cannot detect symlinks, the local time zone
 is UTC and only text can be written to stdout.
 
 `watch` recompiles when a file that the last compilation read changes
@@ -60,9 +61,8 @@ is UTC and only text can be written to stdout.
 is replaced, removed or created, like upstream's, and prints the same
 status. Every recompilation starts from scratch (upstream reuses the
 results of the previous one). It watches files through
-[`moonbitlang/async`](https://github.com/moonbitlang/async), which only
-the CLI links: the wasm-gc build has no file system events and reports
-that `watch` is not supported. On macOS a watched file is an open file
+[`moonbitlang/async`](https://github.com/moonbitlang/async), on the CLI's
+async event loop, which also runs font discovery. On macOS a watched file is an open file
 (kqueue): the native build raises its limit of open files to the hard
 limit, the wasm build runs with the limit of the shell (`ulimit -n`). On
 Linux every directory with watched files takes an inotify instance

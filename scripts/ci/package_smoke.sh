@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # CI: the package must work as a dependency (see "Publishing" in AGENTS.md).
 #
-#   scripts/ci/package_smoke.sh [target ...]      (default: native wasm-gc)
+#   scripts/ci/package_smoke.sh [target ...]      (default: native wasm)
 #
 # Packages the module like the publish workflow (`moon package`), unpacks
 # the zip and builds and runs a tiny consumer of `moonbitlang/typst/doc`
@@ -20,7 +20,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 targets=("$@")
-[ ${#targets[@]} -eq 0 ] && targets=(native wasm-gc)
+[ ${#targets[@]} -eq 0 ] && targets=(native wasm)
 
 work="$PWD/_build/ci/package"
 rm -rf "$work" _build/publish
@@ -94,7 +94,7 @@ fn report() -> @doc.Document {
     @doc.Prose("Plain text with \{@doc.Emph("emphasis")} and \{@doc.Raw("code")}."),
     @doc.Par(@doc.Text(sans_text, font=["IBM Plex Sans"])),
     @doc.Equation("sum_(k=1)^n k = (n(n+1))/2", block=true),
-    @kit.Cards(["native", "wasm-gc"], gutter=[Pt(6)], fill=Luma(235)),
+    @kit.Cards(["native", "wasm"], gutter=[Pt(6)], fill=Luma(235)),
   ])
 }
 

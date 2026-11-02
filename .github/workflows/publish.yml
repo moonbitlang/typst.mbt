@@ -32,13 +32,13 @@ jobs:
       - name: Check
         run: |
           moon check --target native
-          moon check --target wasm-gc
+          moon check --target wasm
       - name: Package
         # Pre-build steps do not run for dependencies: the package must
         # carry the generated font data (see .moonignore), and a consumer
         # that depends on the unpacked zip must build and run.
         run: |
-          scripts/ci/package_smoke.sh native wasm-gc
+          scripts/ci/package_smoke.sh native wasm
           ls -la _build/publish/
       - name: Publish
         shell: bash
