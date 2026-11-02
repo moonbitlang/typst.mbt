@@ -23,8 +23,6 @@ moonx moonbitlang/typst/cli -- <command> --help
 - HTML watching requires `--no-serve`; the built-in HTTP server is unavailable.
 - `moonx` runs this CLI on Wasm, where stdout supports text only. Write PDF
   and PNG output to files.
-- On Wasm, system font discovery reads every font file through the host API
-  and can be slow. Use `--ignore-system-fonts` when embedded fonts suffice,
-  or combine it with `--font-path` for explicit fonts.
+- Use `--ignore-system-fonts` when embedded fonts suffice, or combine it with `--font-path` for explicit fonts.
 - On Wasm, the local time zone is UTC, and file watching cannot detect
   replacement of a symlink's target.
