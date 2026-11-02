@@ -68,14 +68,13 @@ fn subset_font_memoized(
   state.write_usize(instance.font().serial())
   let variations = font.variation_coordinates()
   state.write_usize(variations.length())
-  for i in 0..<variations.length() {
-    let (tag, value) = variations[i]
+  for (tag, value) in variations {
     state.write_bytes(tag.get()[:])
     state.write_u32(value.reinterpret_as_uint())
   }
   state.write_usize(glyphs.length())
-  for i in 0..<glyphs.length() {
-    state.write_u32(glyphs[i].reinterpret_as_uint())
+  for g in glyphs {
+    state.write_u32(g.reinterpret_as_uint())
   }
   let key = state.finish128()
   subset_memo_counts[0] += 1

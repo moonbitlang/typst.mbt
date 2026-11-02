@@ -38,10 +38,10 @@ fn svg_clip_path_render(
   let mut pop_count = 0
   if is_simple_clip_path &&
     (
-      clip_rules.iter().all(f => f == NonZero) ||
+      clip_rules.all(f => f == NonZero) ||
       // For even odd, there must be at most one shape in the group, because
       // overlapping shapes with evenodd render differently in PDF
-      (clip_rules.iter().all(f => f == EvenOdd) && clip_rules.length() == 1)
+      (clip_rules.all(f => f == EvenOdd) && clip_rules.length() == 1)
     ) {
     let clips = svg_create_clip_path(
       clip_path,
