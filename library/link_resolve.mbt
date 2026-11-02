@@ -135,7 +135,7 @@ pub fn AnchorGenerator::identify(
 /// understand and explain.
 fn can_use_label_as_id(label : String) -> Bool {
   guard label.get_char(0) is Some(first) else { return false }
-  label.iter().all(c => @unicode.is_alphanumeric(c) || c is ('-' | '_')) &&
+  label.all(c => @unicode.is_alphanumeric(c) || c is ('-' | '_')) &&
   !(@unicode.is_numeric(first) || first == '-')
 }
 

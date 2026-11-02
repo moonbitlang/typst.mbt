@@ -320,7 +320,7 @@ pub extend Args with Eq::{not_equal, equal}
 pub fn Args::merge(self : Args, rhs : Args) -> Args {
   let items = self.items.filter(item => {
     match item.name {
-      Some(name) => !rhs.items.iter().any(a => a.name == Some(name))
+      Some(name) => !rhs.items.any(a => a.name == Some(name))
       None => true
     }
   })

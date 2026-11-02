@@ -609,7 +609,7 @@ pub fn contains(guard_ : BindingGuard, lhs : Value, rhs : Value) -> Bool? {
           None => false
         },
       )
-    (a, Array(b)) => Some(b.items.iter().any(v => equal(a, v)))
+    (a, Array(b)) => Some(b.items.any(v => equal(a, v)))
     _ => None
   }
 }

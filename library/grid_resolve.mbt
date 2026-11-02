@@ -41,11 +41,9 @@ fn min_int(a : Int32, b : Int32) -> Int32 {
 ///|
 /// The integers in `start..end`.
 fn int_range(start : Int32, end : Int32) -> Array[Int32] {
-  let out = []
-  for i in start..<end {
-    out.push(i)
-  }
-  out
+  [
+    for i in start..<end => i
+  ]
 }
 
 ///|
@@ -1143,7 +1141,7 @@ pub fn CellGrid::non_gutter_row_count(self : CellGrid) -> Int32 {
 
 ///|
 pub fn CellGrid::has_repeated_headers(self : CellGrid) -> Bool {
-  self.headers.iter().any(h => h.repeated)
+  self.headers.any(h => h.repeated)
 }
 
 ///|

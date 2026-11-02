@@ -424,9 +424,7 @@ pub extend PageRanges with FromValue::{from_value}
 /// Check if a page, given its number, should be included when exporting
 /// the document while restricting the exported pages to these page ranges.
 pub fn PageRanges::includes_page(self : PageRanges, page : Int32) -> Bool {
-  self.0
-  .iter()
-  .any(range => {
+  self.0.any(range => {
     match (range.start, range.end) {
       (Some(start), Some(end)) => start <= page && page <= end
       (Some(start), None) => start <= page

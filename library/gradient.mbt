@@ -846,7 +846,7 @@ fn process_stops(
   } else {
     Some(space.span)
   }
-  let has_offset = stops.iter().any(stop => stop.v.offset is Some(_))
+  let has_offset = stops.any(stop => stop.v.offset is Some(_))
   let space = resolve_color_space(space.v, stops.map(s => s.v.color))
   let convert = (s : @syntax.Spanned[GradientStop]) => {
     let color = s.v.color.to_space(space) catch {

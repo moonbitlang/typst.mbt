@@ -78,7 +78,7 @@ pub impl Reflect for CitationForm with fn output() {
 ///|
 pub impl Reflect for CitationForm with fn castable(v) {
   match v {
-    Str(s) => citation_form_casts.iter().any(entry => entry.0 == s)
+    Str(s) => citation_form_casts.any(entry => entry.0 == s)
     _ => false
   }
 }

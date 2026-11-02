@@ -1093,7 +1093,7 @@ pub fn memoized_layout(
     { content, styles, extra, },
     frames => frames.map(frame => frame.clone()),
     engine => f(engine).0,
-    cacheable=frames => frames.iter().all(frame_cacheable),
+    cacheable=frames => frames.all(frame_cacheable),
     label=input => "layout of \{input.content.elem.name()}",
   )
   Fragment(frames)
