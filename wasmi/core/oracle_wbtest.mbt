@@ -128,8 +128,8 @@ fn a_f64(s : String) -> Double {
 ///|
 fn a_v128(s : String) -> V128Value {
   {
-    hi: parse_hex(s.view(end_offset=16)),
-    lo: parse_hex(s.view(start_offset=16)),
+    hi: parse_hex(s.exact_view(end=16)),
+    lo: parse_hex(s.exact_view(start=16)),
   }
 }
 
@@ -789,7 +789,7 @@ fn oracle_simd_ops(ops : Map[String, OracleFn]) -> Unit {
   }
   ops["i8x16_shuffle"] = a => {
     let sel = FixedArray::makei(16, i => {
-      let b = parse_hex(a[2].view(start_offset=2 * i, end_offset=2 * i + 2))
+      let b = parse_hex(a[2].exact_view(start=2 * i, end=2 * i + 2))
       ImmLaneIdx32::try_from(b.to_byte()) catch {
         _ => abort("bad lane")
       }

@@ -96,7 +96,7 @@ fn rust_parse_f64(s : String) -> Double? {
     negative = s.code_unit_at(i) == '-'
     i += 1
   }
-  let rest = s.view(start_offset=i)
+  let rest = s.exact_view(start=i)
   if eq_ignore_ascii_case(rest, "inf") || eq_ignore_ascii_case(rest, "infinity") {
     return Some(if negative { @double.neg_infinity } else { @double.infinity })
   }

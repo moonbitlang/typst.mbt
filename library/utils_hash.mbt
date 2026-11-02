@@ -339,7 +339,7 @@ pub fn SipHasher128::write_str(self : SipHasher128, s : StringView) -> Unit {
   }
   // The rest, from the first character that is not ASCII (a character
   // boundary: everything before it is one code unit per character).
-  let s = s.view(start_offset=i)
+  let s = s.exact_view(start=i)
   for c in s {
     let code = c.to_int()
     if code < 0x80 {

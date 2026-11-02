@@ -379,7 +379,7 @@ fn is_rfc3339(s : String) -> Bool {
 fn is_plist_integer(s : String) -> Bool {
   if s.has_prefix("0x") {
     // `u64::from_str_radix(s.trim_start_matches("0x"), 16)`
-    let mut hex = s.view()
+    let mut hex = s[:]
     while hex.has_prefix("0x") {
       hex = hex[2:]
     }
@@ -410,7 +410,7 @@ fn count_leading_zeros(s : StringView) -> Int32 {
 ///|
 fn normalize_integer(s : String) -> String {
   if s.has_prefix("0x") {
-    let mut t = s.view()
+    let mut t = s[:]
     while t.has_prefix("0x") {
       t = t[2:]
     }
@@ -507,11 +507,11 @@ fn rust_f64_to_json(f : Double) -> String {
 /// Rust's `str::parse::<i64>`: an optional sign and decimal digits.
 fn parse_rust_i64(s : String) -> Int64? {
   let (neg, digits) = if s.has_prefix("-") {
-    (true, s.view()[1:])
+    (true, s[1:])
   } else if s.has_prefix("+") {
-    (false, s.view()[1:])
+    (false, s[1:])
   } else {
-    (false, s.view())
+    (false, s[:])
   }
   if digits.is_empty() || !digits.iter().all(c => c >= '0' && c <= '9') {
     return None
@@ -527,7 +527,7 @@ fn parse_rust_i64(s : String) -> Int64? {
 ///|
 /// Rust's `str::parse::<u64>`: an optional `+` and decimal digits.
 fn parse_rust_u64(s : String) -> UInt64? {
-  let digits = if s.has_prefix("+") { s.view()[1:] } else { s.view() }
+  let digits = if s.has_prefix("+") { s[1:] } else { s[:] }
   if digits.is_empty() || !digits.iter().all(c => c >= '0' && c <= '9') {
     return None
   }

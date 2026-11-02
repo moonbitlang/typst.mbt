@@ -75,7 +75,7 @@ fn digest(s : String) -> String {
   if s.length() <= 600 {
     return s
   }
-  "#\{s.length()} \{hex16(fnv1a64(s))} \{s.view(end_offset=200)}"
+  "#\{s.length()} \{hex16(fnv1a64(s))} \{s.clamped_view(end=200)}"
 }
 
 ///|
@@ -357,10 +357,10 @@ test "kurbo stroke oracle" {
       failed_ops[parts[0]] = n + 1
       if total - passed <= 5 {
         println(
-          "MISMATCH line \{total}: \{line.view(end_offset=clamp_len(line.length(), 300))}",
+          "MISMATCH line \{total}: \{line.clamped_view(end=clamp_len(line.length(), 300))}",
         )
         println(
-          "  actual: \{actual.view(end_offset=clamp_len(actual.length(), 300))}",
+          "  actual: \{actual.clamped_view(end=clamp_len(actual.length(), 300))}",
         )
       }
     }

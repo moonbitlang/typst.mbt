@@ -115,9 +115,9 @@ fn Utf8Slice::to_string(self : Utf8Slice) -> String {
 ///|
 /// The slice as a view of the underlying MoonBit string (no copy).
 fn Utf8Slice::view(self : Utf8Slice) -> StringView {
-  self.src.s.view(
-    start_offset=self.src.u16[self.start],
-    end_offset=self.src.u16[self.end],
+  self.src.s.exact_view(
+    start=self.src.u16[self.start],
+    end=self.src.u16[self.end],
   )
 }
 

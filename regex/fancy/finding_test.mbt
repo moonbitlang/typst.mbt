@@ -315,6 +315,6 @@ test "find_from_pos" {
   assert_eq(group.as_str(), "2")
   assert_eq(group.start(), 11)
   assert_eq(group.end(), 12)
-  let captures = re.captures(text.view(start_offset=7).to_owned()).unwrap()
+  let captures = re.captures(text.exact_view(start=7).to_owned()).unwrap()
   assert_eq(captures.get(1).unwrap().as_str(), "123")
 }

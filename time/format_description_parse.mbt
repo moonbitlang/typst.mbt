@@ -415,8 +415,8 @@ fn modifier_from_token(
   guard token.value.find(":") is Some(colon) else {
     raise InvalidModifier(value=token.value, index=token.start)
   }
-  let key = token.value.view(end_offset=colon).to_owned()
-  let value = token.value.view(start_offset=colon + 1).to_owned()
+  let key = token.value.exact_view(end=colon).to_owned()
+  let value = token.value.exact_view(start=colon + 1).to_owned()
   if key == "" {
     raise InvalidModifier(value="", index=token.start)
   }
@@ -538,7 +538,7 @@ fn from_modifier_value(
 ///|
 /// `<NonZero<u16> as FromStr>::from_str`.
 fn parse_nonzero_u16(s : String) -> Int32? {
-  let digits = if s.has_prefix("+") { s.view(start_offset=1) } else { s.view() }
+  let digits = if s.has_prefix("+") { s.exact_view(start=1) } else { s[:] }
   if digits.length() == 0 {
     return None
   }

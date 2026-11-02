@@ -29,7 +29,7 @@ fn stretch_glyph(
 fn strip_subset_prefix(name : String) -> String {
   match name.find("+") {
     Some(i) if i == 6 && name.length() >= 7 =>
-      name.view(start_offset=7).to_owned()
+      name.exact_view(start=7).to_owned()
     _ => name
   }
 }
@@ -613,9 +613,9 @@ fn unicode_from_name(name : String) -> Char? {
     }
   }
   if name.has_prefix("uni") {
-    convert(name.view(start_offset=3))
+    convert(name.exact_view(start=3))
   } else if name.has_prefix("u") {
-    convert(name.view(start_offset=1))
+    convert(name.exact_view(start=1))
   } else {
     None
   }
@@ -626,7 +626,7 @@ fn unicode_from_name(name : String) -> Char? {
 fn parse_hex_u32(input : StringView) -> UInt32? {
   let mut s = input
   if s.has_prefix("+") {
-    s = s.view(start_offset=1)
+    s = s.exact_view(start=1)
   }
   if s.is_empty() {
     return None

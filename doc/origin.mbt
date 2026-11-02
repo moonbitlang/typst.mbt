@@ -649,9 +649,8 @@ fn parse_loc(repr : String) -> (String, String, Int32, Int32, Int32, Int32) {
   // The module follows the last `@`, the range the last two `:` groups
   // around `-`.
   let (rest, module_name) = match repr.rev_find("@") {
-    Some(i) =>
-      (repr.view(end_offset=i), repr.view(start_offset=i + 1).to_owned())
-    None => (repr.view(), "")
+    Some(i) => (repr.exact_view(end=i), repr.exact_view(start=i + 1).to_owned())
+    None => (repr[:], "")
   }
   let parts = rest.split(":").map(p => p.to_owned()).collect()
   let n = parts.length()
@@ -664,8 +663,8 @@ fn parse_loc(repr : String) -> (String, String, Int32, Int32, Int32, Int32) {
   let (start_column, end_line) = match middle.find("-") {
     Some(i) =>
       (
-        parse_int(middle.view(end_offset=i)),
-        parse_int(middle.view(start_offset=i + 1)),
+        parse_int(middle.exact_view(end=i)),
+        parse_int(middle.exact_view(start=i + 1)),
       )
     None => (parse_int(middle), 0)
   }

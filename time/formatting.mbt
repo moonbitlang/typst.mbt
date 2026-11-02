@@ -182,7 +182,7 @@ fn fmt_subsecond(
     Nine => 9
     OneOrMore => subsecond_significant_len(s)
   }
-  output.write_string(s.view(end_offset=len).to_owned())
+  output.write_string(s.exact_view(end=len).to_owned())
 }
 
 ///|
@@ -202,7 +202,7 @@ fn Component::format_into(
       Day(padding~) => return format_two_digits(output, date.day(), padding)
       MonthShort(_) =>
         return output.write_string(
-          date.month().name().view(end_offset=3).to_owned(),
+          date.month().name().exact_view(end=3).to_owned(),
         )
       MonthLong(_) => return output.write_string(date.month().name())
       MonthNumerical(padding~) =>
@@ -211,7 +211,7 @@ fn Component::format_into(
         return format_three_digits(output, date.ordinal(), padding)
       WeekdayShort(_) =>
         return output.write_string(
-          date.weekday().name().view(end_offset=3).to_owned(),
+          date.weekday().name().exact_view(end=3).to_owned(),
         )
       WeekdayLong(_) => return output.write_string(date.weekday().name())
       WeekdaySunday(one_indexed~) =>

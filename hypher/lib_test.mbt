@@ -21,15 +21,15 @@ test "exact" {
 test "alloc" {
   let long_word = "thisisaverylongstringwithanunrealisticwordlengthforenglishbutitmightbepossibleinanotherlanguage"
   assert_eq(
-    @hypher.hyphenate(long_word.view(end_offset=44).to_owned(), English).length(),
+    @hypher.hyphenate(long_word.exact_view(end=44).to_owned(), English).length(),
     13,
   )
   assert_eq(
-    @hypher.hyphenate(long_word.view(end_offset=45).to_owned(), English).length(),
+    @hypher.hyphenate(long_word.exact_view(end=45).to_owned(), English).length(),
     12,
   )
   assert_eq(
-    @hypher.hyphenate(long_word.view(end_offset=46).to_owned(), English).length(),
+    @hypher.hyphenate(long_word.exact_view(end=46).to_owned(), English).length(),
     12,
   )
   assert_eq(@hypher.hyphenate(long_word, English).length(), 25)

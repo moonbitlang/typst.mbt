@@ -130,7 +130,7 @@ pub fn SvgFormatter::push_str(self : SvgFormatter, value : String) -> Unit {
     let c = value.unsafe_get(i)
     if c == '&' || c == '<' {
       if start < i {
-        self.buf.write_view(value.view(start_offset=start, end_offset=i))
+        self.buf.write_view(value.exact_view(start~, end=i))
       }
       self.buf.write_string(if c == '&' { "&amp;" } else { "&lt;" })
       start = i + 1
@@ -139,7 +139,7 @@ pub fn SvgFormatter::push_str(self : SvgFormatter, value : String) -> Unit {
   if start == 0 {
     self.buf.write_string(value)
   } else if start < value.length() {
-    self.buf.write_view(value.view(start_offset=start))
+    self.buf.write_view(value.exact_view(start~))
   }
 }
 

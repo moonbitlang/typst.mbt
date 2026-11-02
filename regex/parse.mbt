@@ -158,7 +158,7 @@ fn Parser::bump(self : Parser) -> Bool {
 ///|
 /// If the remaining pattern starts with `prefix`, advance past it.
 fn Parser::bump_if(self : Parser, prefix : String) -> Bool {
-  let rest = self.pattern.view(start_offset=self.offset())
+  let rest = self.pattern.exact_view(start=self.offset())
   if rest.has_prefix(prefix) {
     for _ in prefix {
       self.bump() |> ignore

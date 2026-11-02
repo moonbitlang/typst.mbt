@@ -80,7 +80,7 @@ fn canonicalize_svg_ids(svg : String) -> String {
   let defined : Map[String, Unit] = Map([])
   let id_attr = "id=\""
   let mut i = 0
-  while svg.view(start_offset=i).find(id_attr) is Some(at) {
+  while svg.exact_view(start=i).find(id_attr) is Some(at) {
     let start = i + at + id_attr.length()
     if dedup_id_len(svg, start) is Some(len) &&
       start + len < svg.length() &&
@@ -105,7 +105,7 @@ fn canonicalize_svg_ids(svg : String) -> String {
     } else if c == 'i' &&
       i > 0 &&
       svg.unsafe_get(i - 1) == ' ' &&
-      svg.view(start_offset=i).has_prefix(id_attr) {
+      svg.exact_view(start=i).has_prefix(id_attr) {
       Some(i + id_attr.length())
     } else {
       None

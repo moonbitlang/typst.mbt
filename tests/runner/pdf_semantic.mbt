@@ -607,29 +607,29 @@ fn PdfReader::number_tree(
 fn xmp_value(xml : String, key : String) -> String? {
   let attr = "\{key}=\""
   if xml.find(attr) is Some(at) {
-    let rest = xml.view(start_offset=at + attr.length())
+    let rest = xml.exact_view(start=at + attr.length())
     return match rest.find("\"") {
-      Some(end) => Some(xml_unescape(rest.view(end_offset=end).to_owned()))
+      Some(end) => Some(xml_unescape(rest.exact_view(end~).to_owned()))
       None => None
     }
   }
   let open = "<\{key}"
   guard xml.find(open) is Some(at) else { return None }
-  let rest = xml.view(start_offset=at + open.length())
+  let rest = xml.exact_view(start=at + open.length())
   guard rest.find(">") is Some(gt) else { return None }
-  if rest.view(end_offset=gt).has_suffix("/") {
+  if rest.exact_view(end=gt).has_suffix("/") {
     return Some("")
   }
-  let body = rest.view(start_offset=gt + 1)
+  let body = rest.exact_view(start=gt + 1)
   let close = "</\{key}>"
   guard body.find(close) is Some(end) else { return None }
-  let body = body.view(end_offset=end)
+  let body = body.exact_view(end~)
   if body.find("<rdf:li") is Some(li) {
-    let rest = body.view(start_offset=li)
+    let rest = body.exact_view(start=li)
     guard rest.find(">") is Some(gt) else { return None }
-    let inner = rest.view(start_offset=gt + 1)
+    let inner = rest.exact_view(start=gt + 1)
     guard inner.find("</rdf:li>") is Some(end) else { return None }
-    return Some(xml_unescape(inner.view(end_offset=end).to_owned()))
+    return Some(xml_unescape(inner.exact_view(end~).to_owned()))
   }
   Some(xml_unescape(body.trim().to_owned()))
 }

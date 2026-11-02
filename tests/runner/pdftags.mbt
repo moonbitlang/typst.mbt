@@ -694,13 +694,13 @@ fn canonicalize_internal_errors(dump : String) -> String {
     }
     match line.find(marker) {
       Some(at) => {
-        let head = line.view(end_offset=at + marker.length())
-        let rest = line.view(start_offset=at + marker.length())
+        let head = line.exact_view(end=at + marker.length())
+        let rest = line.exact_view(start=at + marker.length())
         match rest.find(repo) {
           Some(r) => {
             out.write_string(head.to_owned())
             out.write_string(
-              rest.view(start_offset=r + repo.length()).to_owned(),
+              rest.exact_view(start=r + repo.length()).to_owned(),
             )
           }
           None => out.write_string(line.to_owned())

@@ -39,8 +39,8 @@ fn main {
     let (path, page_sel) = match arg.find("@") {
       Some(i) =>
         (
-          arg.view(end_offset=i).to_owned(),
-          Some(@string.parse_int(arg.view(start_offset=i + 1)) catch { _ => 0 }),
+          arg.exact_view(end=i).to_owned(),
+          Some(@string.parse_int(arg.exact_view(start=i + 1)) catch { _ => 0 }),
         )
       None => (arg, None)
     }
@@ -58,11 +58,11 @@ fn main {
       }
     }
     let base = match path.rev_find("/") {
-      Some(i) => path.view(start_offset=i + 1).to_owned()
+      Some(i) => path.exact_view(start=i + 1).to_owned()
       None => path
     }
     let base = if base.has_suffix(".pdf") {
-      base.view(end_offset=base.length() - 4).to_owned()
+      base.exact_view(end=base.length() - 4).to_owned()
     } else {
       base
     }

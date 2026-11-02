@@ -43,7 +43,7 @@ fn glyph_num_string(s : String) -> UInt32? {
     return None
   }
   // `s[1..].parse::<u32>()`
-  let rest = s.view(start_offset=1)
+  let rest = s.exact_view(start=1)
   let mut v : UInt64 = 0
   let mut first = true
   for c in rest {

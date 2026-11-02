@@ -43,5 +43,5 @@ fn subsecond_significant_len(digits : String) -> Int32 {
 /// always present.
 fn truncated_subsecond_from_nanos(n : Int32) -> String {
   let digits = subsecond_from_nanos(n)
-  digits.view(end_offset=subsecond_significant_len(digits)).to_owned()
+  digits.exact_view(end=subsecond_significant_len(digits)).to_owned()
 }

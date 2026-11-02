@@ -92,7 +92,7 @@ fn modifiers_contain(set : String, m : StringView) -> Bool {
   let mut start = 0
   for i in 0..<=set.length() {
     if i == set.length() || set.code_unit_at(i) == '.' {
-      if set.view(start_offset=start, end_offset=i) == m {
+      if set.exact_view(start~, end=i) == m {
         return true
       }
       start = i + 1
@@ -131,10 +131,7 @@ pub fn[T] ModifierSet::best_match_in(
       let mut start = 0
       for i in 0..<=set.length() {
         if i == set.length() || set.code_unit_at(i) == '.' {
-          if modifiers_contain(
-              self.0,
-              set.view(start_offset=start, end_offset=i),
-            ) {
+          if modifiers_contain(self.0, set.exact_view(start~, end=i)) {
             matching += 1
           }
           total += 1
@@ -167,7 +164,7 @@ pub fn ModifierSet::is_subset(self : ModifierSet, other : ModifierSet) -> Bool {
   let mut start = 0
   for i in 0..<=set.length() {
     if i == set.length() || set.code_unit_at(i) == '.' {
-      if !modifiers_contain(other.0, set.view(start_offset=start, end_offset=i)) {
+      if !modifiers_contain(other.0, set.exact_view(start~, end=i)) {
         return false
       }
       start = i + 1
