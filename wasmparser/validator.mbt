@@ -354,8 +354,7 @@ pub fn Validator::validate_all(
     }
   })
   let mut allocs = FuncValidatorAllocations::default()
-  for item in functions_to_validate {
-    let (func, body) = item
+  for (func, body) in functions_to_validate {
     let validator = func.into_validator(allocs)
     validator.validate(body)
     allocs = validator.into_allocations()
