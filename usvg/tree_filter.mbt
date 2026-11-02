@@ -102,7 +102,7 @@ pub fn FilterKind::has_input(self : FilterKind, input : FilterInput) -> Bool {
     Flood(_) => false
     GaussianBlur(fe) => fe.input == input
     Image(_) => false
-    Merge(fe) => fe.inputs.iter().any(i => i == input)
+    Merge(fe) => fe.inputs.any(i => i == input)
     Morphology(fe) => fe.input == input
     Offset(fe) => fe.input == input
     SpecularLighting(fe) => fe.input == input

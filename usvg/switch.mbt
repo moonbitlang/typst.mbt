@@ -91,7 +91,7 @@ fn is_valid_sys_lang(node : SvgNode, opt : Options) -> Bool {
 
       // 'Evaluates to `true` if one of the languages indicated by user preferences exactly
       // equals one of the languages given in the value of this parameter.'
-      if opt.languages.iter().any(v => v == lang) {
+      if opt.languages.any(v => v == lang) {
         has_match = true
         break
       }
@@ -101,7 +101,7 @@ fn is_valid_sys_lang(node : SvgNode, opt : Options) -> Bool {
       // the first tag character following the prefix is `-`.'
       if lang.find("-") is Some(idx) {
         let lang_prefix = lang.unsafe_substring(start=0, end=idx)
-        if opt.languages.iter().any(v => v == lang_prefix) {
+        if opt.languages.any(v => v == lang_prefix) {
           has_match = true
           break
         }

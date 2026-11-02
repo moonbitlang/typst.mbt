@@ -643,8 +643,8 @@ fn resolve_baseline_shift(
   font_size : Float,
 ) -> Float {
   let mut shift : Float = 0.0
-  for i = baselines.length() - 1; i >= 0; i = i - 1 {
-    match baselines[i] {
+  for baseline in baselines.rev_iter() {
+    match baseline {
       Baseline => ()
       Subscript => shift -= font.subscript_offset(font_size)
       Superscript => shift += font.superscript_offset(font_size)
@@ -1141,7 +1141,7 @@ fn apply_letter_spacing(
   clusters : Array[GlyphCluster],
 ) -> Unit {
   // At least one span should have a non-zero spacing.
-  if !chunk.spans.iter().any(span => !approx_zero_ulps(span.letter_spacing, 4)) {
+  if !chunk.spans.any(span => !approx_zero_ulps(span.letter_spacing, 4)) {
     return
   }
   let num_clusters = clusters.length()
@@ -1180,7 +1180,7 @@ fn apply_word_spacing(
   clusters : Array[GlyphCluster],
 ) -> Unit {
   // At least one span should have a non-zero spacing.
-  if !chunk.spans.iter().any(span => !approx_zero_ulps(span.word_spacing, 4)) {
+  if !chunk.spans.any(span => !approx_zero_ulps(span.word_spacing, 4)) {
     return
   }
   for cluster in clusters {
@@ -1406,7 +1406,7 @@ fn shape_text(
         text, fallback_font, small_caps, apply_kerning, variations, font_size, font_optical_sizing,
         fontdb,
       ).unwrap_or([])
-      let all_matched = fallback_glyphs.iter().all(g => !g.is_missing())
+      let all_matched = fallback_glyphs.all(g => !g.is_missing())
       if all_matched {
         // Replace all glyphs when all of them were matched.
         glyphs = fallback_glyphs
@@ -1468,9 +1468,7 @@ fn shape_text_with_font(
   // an 'opsz' axis that isn't explicitly set, auto-set it to match font size.
   // This matches browser behavior (CSS font-optical-sizing: auto).
   if font_optical_sizing == OpticalAuto {
-    let has_explicit_opsz = variations
-      .iter()
-      .any(v => v.tag == b"opsz".to_fixedarray())
+    let has_explicit_opsz = variations.any(v => v.tag == b"opsz".to_fixedarray())
     if !has_explicit_opsz {
       // Check if font has opsz axis using the already parsed rb_font
       if rb_font.ttf().tables().fvar is Some(axes) {

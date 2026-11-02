@@ -1630,15 +1630,15 @@ fn Tree::collect_paint_servers(self : Tree) -> Unit {
     match paint {
       Color(_) => ()
       LinearGradient(lg) =>
-        if !self.linear_gradients.iter().any(other => physical_equal(lg, other)) {
+        if !self.linear_gradients.any(other => physical_equal(lg, other)) {
           self.linear_gradients.push(lg)
         }
       RadialGradient(rg) =>
-        if !self.radial_gradients.iter().any(other => physical_equal(rg, other)) {
+        if !self.radial_gradients.any(other => physical_equal(rg, other)) {
           self.radial_gradients.push(rg)
         }
       Pattern(patt) =>
-        if !self.patterns.iter().any(other => physical_equal(patt, other)) {
+        if !self.patterns.any(other => physical_equal(patt, other)) {
           self.patterns.push(patt)
         }
     }
@@ -1711,11 +1711,11 @@ fn Group::collect_clip_paths(
   for node in self.children {
     if node is Group(g) {
       if g.clip_path is Some(clip) {
-        if !clip_paths.iter().any(other => physical_equal(clip, other)) {
+        if !clip_paths.any(other => physical_equal(clip, other)) {
           clip_paths.push(clip)
         }
         if clip.clip_path is Some(sub_clip) {
-          if !clip_paths.iter().any(other => physical_equal(sub_clip, other)) {
+          if !clip_paths.any(other => physical_equal(sub_clip, other)) {
             clip_paths.push(sub_clip)
           }
         }
@@ -1733,11 +1733,11 @@ fn Group::collect_masks(self : Group, masks : Array[Mask]) -> Unit {
   for node in self.children {
     if node is Group(g) {
       if g.mask is Some(mask) {
-        if !masks.iter().any(other => physical_equal(mask, other)) {
+        if !masks.any(other => physical_equal(mask, other)) {
           masks.push(mask)
         }
         if mask.mask is Some(sub_mask) {
-          if !masks.iter().any(other => physical_equal(sub_mask, other)) {
+          if !masks.any(other => physical_equal(sub_mask, other)) {
             masks.push(sub_mask)
           }
         }
@@ -1755,7 +1755,7 @@ fn Group::collect_filters(self : Group, filters : Array[Filter]) -> Unit {
   for node in self.children {
     if node is Group(g) {
       for filter in g.filters {
-        if !filters.iter().any(other => physical_equal(filter, other)) {
+        if !filters.any(other => physical_equal(filter, other)) {
           filters.push(filter)
         }
       }
