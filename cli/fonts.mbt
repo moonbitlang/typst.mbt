@@ -2,8 +2,10 @@
 
 ///|
 /// Execute a font listing command.
-fn fonts(command : FontsCommand) -> Unit {
-  let fonts = discover_fonts(command.font)
+async fn fonts(command : FontsCommand) -> Unit raise HintedFailure {
+  let fonts = discover_fonts(command.font) catch {
+    err => raise bail(err.to_string())
+  }
   let out = StringBuilder()
   for entry in fonts.book().families() {
     let (family, indices) = entry

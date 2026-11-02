@@ -146,10 +146,10 @@ fn read_failed(path : String) -> Map[Int32, String] {
     let line = line.to_owned()
     match line.find("\t") {
       Some(i) =>
-        try @string.parse_int(line.view(end_offset=i).to_owned()) catch {
+        try @string.parse_int(line.exact_view(end=i).to_owned()) catch {
           _ => ()
         } noraise {
-          number => failed[number] = line.view(start_offset=i + 1).to_owned()
+          number => failed[number] = line.exact_view(start=i + 1).to_owned()
         }
       None => ()
     }

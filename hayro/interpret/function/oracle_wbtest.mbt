@@ -246,7 +246,7 @@ test "postscript programs match hayro-interpret" {
     let line = line.to_owned()
     // `<program>|<inputs> -> <result>`
     guard line.find(" -> ") is Some(arrow) else { continue }
-    let spec = line.view(end_offset=arrow).to_owned()
+    let spec = line.exact_view(end=arrow).to_owned()
     let parts = spec.split("|").map(s => s.to_owned()).collect()
     let inputs = parts[1]
       .split(" ")

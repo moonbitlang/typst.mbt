@@ -20,7 +20,7 @@ priv struct FontConfig {
 /// Loads the system fonts listed in the fontconfig configuration
 /// (`Database::load_fontconfig`). Returns `false` if the configuration has
 /// no font directories.
-fn FontDb::load_fontconfig(self : FontDb) -> Bool {
+async fn FontDb::load_fontconfig(self : FontDb) -> Bool {
   let fontconfig : FontConfig = {
     dirs: [],
     config_files: @hashset.HashSet([]),
@@ -77,15 +77,16 @@ fn strip_tilde(path : String) -> String {
 
 ///|
 /// Merges a configuration file. Returns whether it succeeded.
-fn FontConfig::merge_config(self : FontConfig, config_path : String) -> Bool {
-  let canonical = @platform.canonicalize(config_path) catch {
-    _ => return false
-  }
+async fn FontConfig::merge_config(
+  self : FontConfig,
+  config_path : String,
+) -> Bool {
+  let canonical = @fs.realpath(config_path) catch { _ => return false }
   if self.config_files.contains(canonical) {
     return true
   }
   self.config_files.add(canonical)
-  let data = @platform.read_file(config_path) catch { _ => return false }
+  let data = @fs.read_file(config_path).binary() catch { _ => return false }
   let text = @utf8.decode(data) catch { _ => return false }
   let doc = @xml.Document::parse_with_options(text, {
     ..@xml.ParsingOptions::default(),
@@ -136,16 +137,23 @@ fn FontConfig::merge_config(self : FontConfig, config_path : String) -> Bool {
 ///|
 /// Includes a configuration file or all files of a configuration directory
 /// (in reverse path order, like the `BinaryHeap` upstream iterates).
-fn FontConfig::include_config(self : FontConfig, include_path : String) -> Bool {
-  let kind = @platform.stat_kind(include_path) catch { _ => return false }
+async fn FontConfig::include_config(
+  self : FontConfig,
+  include_path : String,
+) -> Bool {
+  let kind = font_stat_kind(include_path) catch { _ => return false }
   if kind == File {
     return self.merge_config(include_path)
   } else if kind == Dir {
-    let entries = @platform.read_dir(include_path) catch { _ => return false }
+    let entries = @fs.readdir(include_path, sort=false) catch {
+      _ => return false
+    }
     let config_paths = []
     for name in entries {
       let path = @platform.join(include_path, name)
-      let ty = @platform.lstat_kind(path) catch { _ => continue }
+      let ty = font_stat_kind(path, follow_symlink=false) catch {
+        _ => continue
+      }
       if ty == File || ty == Symlink {
         config_paths.push(path)
       }

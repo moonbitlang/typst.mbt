@@ -12,13 +12,13 @@ fn set_failed() -> Unit {
 }
 
 ///|
-fn main {
+async fn main {
   @platform.exit(run())
 }
 
 ///|
 /// Runs the CLI and returns the exit code.
-fn run() -> Int32 {
+async fn run() -> Int32 {
   let args = parse_args(@platform.args()) catch {
     Display(text) => {
       print_out_lossy(text)
@@ -83,7 +83,7 @@ fn print_clap_error(message : String, usage : String?) -> Unit {
 
 ///|
 /// Execute the requested command.
-fn dispatch(args : CliArguments) -> Unit raise HintedFailure {
+async fn dispatch(args : CliArguments) -> Unit raise HintedFailure {
   match args.command {
     Compile(command) => compile(command)
     Watch(command) => watch(command)

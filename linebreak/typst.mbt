@@ -183,7 +183,7 @@ fn trim_end_len(s : String, pred : (Int32) -> Bool) -> Int32 {
     }
     end = start
   }
-  utf8_str_len(s.view(end_offset=end))
+  utf8_str_len(s.exact_view(end~))
 }
 
 ///|
@@ -232,10 +232,7 @@ fn Utf8Str::len(self : Utf8Str) -> Int32 {
 
 ///|
 fn Utf8Str::slice(self : Utf8Str, start : Int32, end : Int32) -> StringView {
-  self.text.view(
-    start_offset=self.to_utf16[start],
-    end_offset=self.to_utf16[end],
-  )
+  self.text.exact_view(start=self.to_utf16[start], end=self.to_utf16[end])
 }
 
 ///|
@@ -378,13 +375,13 @@ fn all_alphabetic(s : StringView) -> Bool {
 fn find_url_scheme(t : Utf8Str, base : Int32) -> (Int32, Int32)? {
   let text = t.slice(base, t.len())
   guard text.find("://") is Some(end16) else { return None }
-  let prefix = text.view(end_offset=end16)
+  let prefix = text.exact_view(end=end16)
   let mut start16 = prefix.length()
   while start16 > 0 &&
         is_valid_in_url_scheme(prefix.code_unit_at(start16 - 1).to_int()) {
     start16 -= 1
   }
-  let start = utf8_str_len(prefix.view(end_offset=start16))
+  let start = utf8_str_len(prefix.exact_view(end=start16))
   let end = utf8_str_len(prefix)
   Some((base + start, base + end))
 }

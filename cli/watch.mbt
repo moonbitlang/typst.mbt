@@ -3,7 +3,7 @@
 
 ///|
 /// Execute a watching compilation command.
-fn watch(command : WatchCommand) -> Unit raise HintedFailure {
+async fn watch(command : WatchCommand) -> Unit raise HintedFailure {
   // (Upstream's `Timer`: `--timings` is not supported by this port, see
   // `CompileConfig::new_impl`.)
   let config = CompileConfig::watching(command)
@@ -11,15 +11,16 @@ fn watch(command : WatchCommand) -> Unit raise HintedFailure {
     raise bail("cannot write document to stdout in watch mode")
   }
 
-  // Not upstream: the watcher gets its events from tasks of an event loop
-  // (notify from a thread of its own), so the rest of the command runs
-  // inside that loop. Only this command does.
+  // Not upstream: the watcher gets its events from tasks of the CLI's
+  // event loop (notify uses a thread of its own).
   let result : Ref[Result[Unit, HintedFailure]] = { val: Ok(()), }
   @watcher.run(group => {
     watching(command, config, output, group) catch {
       err => result.val = Err(err)
     }
-  })
+  }) catch {
+    err => raise bail(err.to_string())
+  }
   match result.val {
     Ok(_) => ()
     Err(err) => raise err
@@ -65,13 +66,8 @@ async fn watching(
     }
   }
 
-  // Eagerly scan fonts if we expect to need them so that it's not counted as
-  // part of the displayed compilation time. The duration of font scanning is
-  // heavily system-dependent, so it could result in confusion why compilation
-  // is so much faster/slower.
-  if config.output_format.is_paged() {
-    world.scan_fonts()
-  }
+  // World construction has already awaited font discovery, outside the
+  // displayed compilation time.
 
   // Perform initial compilation.
   compile_once(world, config)

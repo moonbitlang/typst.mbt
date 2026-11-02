@@ -186,7 +186,7 @@ fn paper() -> Document {
 }
 
 ///|
-fn run(check : Bool) -> Unit raise {
+async fn run(check : Bool) -> Unit {
   audit.check = check
   let world = @system.world(system_fonts=false, today=(2026, 1, 1))
   let compiled = paper().compile_paged(world)
@@ -220,7 +220,7 @@ fn run(check : Bool) -> Unit raise {
 }
 
 ///|
-fn main {
+async fn main {
   run(@env.args().contains("--check")) catch {
     @doc.DocError(errors) =>
       for error in errors {

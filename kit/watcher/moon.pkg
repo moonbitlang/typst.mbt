@@ -13,9 +13,8 @@ import {
   "moonbitlang/core/debug",
 } for "wbtest"
 
-// Upstream's `watcher` feature of typst-kit, as a package of its own: it is
-// the only one that depends on `moonbitlang/async`, so only an executable
-// that imports it (the CLI) links the asynchronous runtime.
+// Upstream's `watcher` feature of typst-kit, as a package of its own.
+// The CLI's async main owns the event loop, also used for font discovery.
 //
 // `@fs.Watcher` exists on the native and wasm targets only. On the others
 // the package is `unsupported.mbt` alone, and moon.pkg has no per-target

@@ -13,7 +13,7 @@ fn tr(source : String) -> String {
   let body = translation.body
   let body = match (body.strip_prefix("Document(["), body.strip_suffix("])")) {
     (Some(_), Some(_)) =>
-      body.view(start_offset=10, end_offset=body.length() - 2).to_owned()
+      body.exact_view(start=10, end=body.length() - 2).to_owned()
     _ => body
   }
   "\{translation.tier}: \{body}"

@@ -363,8 +363,8 @@ pub fn split_word_bounds(s : StringView) -> Array[StringView] {
   let mut cat = None
   while rest.length() > 0 {
     let { len, next_cat, } = next_word_bound(rest, cat)
-    out.push(rest.view(end_offset=len))
-    rest = rest.view(start_offset=len)
+    out.push(rest.exact_view(end=len))
+    rest = rest.exact_view(start=len)
     cat = next_cat
   }
   out

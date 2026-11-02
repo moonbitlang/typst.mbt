@@ -40,7 +40,7 @@ pub fn structural() -> @doc.Seq
 
 pub fn underlined_headings() -> @doc.Show
 
-pub fn write_report(String) -> Unit raise
+pub async fn write_report(String) -> Unit
 
 // Errors
 

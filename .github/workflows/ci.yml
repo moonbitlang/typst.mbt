@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [native, wasm-gc, wasm]
+        target: [native, wasm]
     steps:
       - uses: actions/checkout@v5
       - name: Install MoonBit
@@ -187,7 +187,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-moon
       - name: Consumer smoke test
-        run: scripts/ci/package_smoke.sh native wasm-gc
+        run: scripts/ci/package_smoke.sh native wasm
 
   # The upstream suite and the documentation's examples converted to the EDSL
   # and compared with the Typst path (docs/edsl-convert.md): long, so not on

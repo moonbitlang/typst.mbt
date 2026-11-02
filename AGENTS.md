@@ -1,5 +1,9 @@
 # Agent guide
 
+- Supported backends are native and wasm. wasm-gc is no longer supported;
+  references below to wasm-gc measurements or fallback implementations are
+  historical, not a CI or release requirement.
+
 - This is a MoonBit port of Typst; upstream sources live in `.repos/typst`
   (pinned by `UPSTREAM_REV`). Port faithfully: keep upstream structure,
   names, comments and error messages so diffs stay reviewable.
@@ -61,8 +65,8 @@
   `oracle/rustybuzz-tap`) and `shape-hb` (rustybuzz's own HarfBuzz test
   suite, `scripts/goldens.sh shape-hb`).
 - Before committing: `moon fmt && moon info && moon check`, run the runner.
-- Warnings: CI runs `moon check --deny-warn` on native, wasm-gc and wasm,
-  so all three must report no warning (some warnings exist on one target
+- Warnings: CI runs `moon check --deny-warn` on native and wasm,
+  so both must report no warning (some warnings exist on one target
   only). The toolchain is deliberately not pinned: a compiler release
   that adds a warning turns the check job red, and the fix is a source
   change or an attribute as below, never removing `--deny-warn`. Fix a
@@ -1413,7 +1417,7 @@
   `scripts/gen_hayro_render_pdfs.py` (blend modes, masks, images, gradients,
   strokes) at scales 1 and 0.37 (synthetic PDFs also 1.7);
   `hayro/render/cli` dumps raw pixmaps for diffs.
-- CLI: `cli/` ports `typst-cli` (`moon run cli --target native|wasm-gc|wasm
+- CLI: `cli/` ports `typst-cli` (`moon run cli --target native|wasm
   -- compile in.typ out.pdf`), `kit/` ports `typst-kit` (FileStore/FsRoot,
   local `SystemPackages`, lazy `FontStore`, fontdb-like discovery that probes
   large font files with ranged reads, `codespan-reporting` 0.11.1 renderer in
@@ -1430,7 +1434,7 @@
   Check against an upstream CLI (`cargo +1.97.1 build --release -p
   typst-cli` in `.repos/typst`): SVG/HTML/PNG pixels, diagnostics, help,
   `fonts --variants`, `query`/`eval`/`info` output are identical; outputs
-  must also be identical across native, wasm-gc and wasm.
+  must also be identical across native and wasm.
 - Font discovery (`kit/fontdb.mbt`, whose header lists how it differs from
   fontdb) is what every compilation without `--ignore-system-fonts` pays
   first: `typst fonts` takes 42 ms for the 1339 faces in 502 files of
@@ -1461,11 +1465,10 @@
   `kit/watcher/watcher.mbt`: typst-kit's `watcher.rs`, same constants and
   loop) runs on `moonbitlang/async`'s `@fs.Watcher` through the bridge
   `kit/watcher/notify.mbt`, whose header lists how it differs from
-  `notify` (read it before changing the bridge). `kit/watcher` is the only
-  package that imports `moonbitlang/async`, and only `cli` imports it: keep
-  it so (the package smoke test checks that a consumer of `doc` links no
-  async runtime). Native and wasm only; wasm-gc and js print upstream-style
-  "not supported by this build". The HTTP server of HTML watch is not
+  `notify` (read it before changing the bridge). The CLI's async main owns
+  the event loop for the watcher and font discovery (`kit` uses async/fs).
+  `doc/system.world` is also async; the engine remains synchronous. Native
+  and wasm are the supported backends. The HTTP server of HTML watch is not
   ported (`--no-serve` is required there). A recompilation finds what the
   compilations before it computed (above: "Kept across compilations";
   `@library.evict(10)` after each, where upstream calls
@@ -1612,17 +1615,17 @@
   therefore also requires that building the consumer leaves every file of
   the unpacked package as it was and adds none. Verify a release as
   a dependency (a scratch module that imports `"moonbitlang/typst@x.y.z"`
-  in its `moon.mod`, native and wasm-gc), not only by building the
+  in its `moon.mod`, native and wasm), not only by building the
   unpacked package as the root module or as a member of a workspace:
   0.1.0-0.1.2 were broken as dependencies for this reason.
 - CI (`.github/workflows/ci.yml`, scripts in `scripts/ci/`; the check to
   require for `main` is `required`): `check` (`moon check` on native,
-  wasm-gc, wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.py`: the
+  wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.py`: the
   packages in 4 shards per platform, since every test executable is a whole
   program), `stages` (every differential stage with the release runner,
   `scripts/ci/stages.py`) and `package as a dependency`
   (`scripts/ci/package_smoke.sh`: a consumer of `moonbitlang/typst/doc`
-  built against the unpacked `moon package` zip on native and wasm-gc); on
+  built against the unpacked `moon package` zip on native and wasm); on
   pushes to `main` and nightly also the EDSL conversion sweep (half an
   hour). The goldens are not stored anywhere: the `goldens` job regenerates
   them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream checkout, the

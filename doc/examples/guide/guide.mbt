@@ -217,7 +217,7 @@ pub fn half_width() -> Layout {
 ///|
 /// Section 5: a world whose fonts are the files of one directory: nothing
 /// embedded, nothing of the system.
-pub fn fonts_of(dir : String) -> DocWorld raise @system.SystemError {
+pub async fn fonts_of(dir : String) -> DocWorld raise @system.SystemError {
   @system.world(embedded_fonts=false, system_fonts=false, font_paths=[dir])
 }
 

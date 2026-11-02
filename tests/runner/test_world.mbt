@@ -278,7 +278,7 @@ fn test_files_load(id : @syntax.FileId) -> Bytes raise @library.FileError {
   // files like upstream's example world: a dev asset by its file name.
   if path.has_prefix("docs-examples/") {
     let name = match path.rev_find("/") {
-      Some(i) => path.view(start_offset=i + 1).to_owned()
+      Some(i) => path.exact_view(start=i + 1).to_owned()
       None => path
     }
     guard dev_assets_by_name().get(name) is Some(real) else {

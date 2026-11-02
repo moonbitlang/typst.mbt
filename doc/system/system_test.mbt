@@ -17,7 +17,7 @@ fn family_entries(world : @doc.DocWorld, family : String) -> String {
 }
 
 ///|
-test "world: the embedded fonts are the Typst fonts and IBM Plex Sans by name" {
+async test "world: the embedded fonts are the Typst fonts and IBM Plex Sans by name" {
   let world = @system.world(system_fonts=false)
   let book = @library.World::book(world)
   inspect(
@@ -43,7 +43,7 @@ test "world: the embedded fonts are the Typst fonts and IBM Plex Sans by name" {
 }
 
 ///|
-test "world: a font of the family from `font_paths` comes first" {
+async test "world: a font of the family from `font_paths` comes first" {
   // The caller's files of the family (here the embedded ones, from their
   // directory) are whole entries before the embedded ones, so they are
   // what a text selects: a document that brought its own IBM Plex Sans

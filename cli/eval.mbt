@@ -3,7 +3,7 @@
 ///|
 /// Evaluate an input expression, potentially as a query over an existing
 /// document.
-fn eval(command : EvalCommand) -> Unit raise HintedFailure {
+async fn eval(command : EvalCommand) -> Unit raise HintedFailure {
   let world = SystemWorld::new(command.in_, command.world, command.process) catch {
     err => raise bail("\{err}")
   }

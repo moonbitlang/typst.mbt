@@ -238,7 +238,7 @@ pub fn graphemes(s : StringView) -> Array[StringView] {
   let mut i = 0
   while i < s.length() {
     let e = grapheme_end(s, i)
-    out.push(s.view(start_offset=i, end_offset=e))
+    out.push(s.exact_view(start=i, end=e))
     i = e
   }
   out

@@ -410,7 +410,7 @@ fn dec_int(json : Json) -> Int32 raise Unsupported {
 fn hex_bits(s : String, prefix : String) -> UInt64 raise Unsupported {
   guard s.has_prefix(prefix) else { raise Unsupported("number \{s}") }
   let mut v : UInt64 = 0
-  for c in s.view(start_offset=prefix.length()) {
+  for c in s.exact_view(start=prefix.length()) {
     let d = match c {
       '0'..<='9' => c.to_int() - '0'.to_int()
       'a'..<='f' => c.to_int() - 'a'.to_int() + 10

@@ -56,7 +56,7 @@ fn read_check_drain(name : String) -> Int32 {
 }
 
 ///|
-fn main {
+async fn main {
   let args = @env.args()
   let stage = args.get(1).unwrap_or("syntax")
   let verbose = args.contains("--verbose") || args.contains("-v")

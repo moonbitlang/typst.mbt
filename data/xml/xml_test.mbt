@@ -116,7 +116,7 @@ fn typst_xml(text : String) -> String {
       let pos = e.pos()
       // `within` replaces the trailing `)` with ` at ROW:COL)`.
       let msg = format_xml_error(e)
-      let msg = msg.view(end_offset=msg.length() - 1)
+      let msg = msg.exact_view(end=msg.length() - 1)
       return "error: \{msg} at \{pos.row}:\{pos.col})"
     }
   }

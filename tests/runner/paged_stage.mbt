@@ -10,7 +10,7 @@ fn is_paged(attrs : String) -> Bool {
   .split(" ")
   .any(a => {
     let name = match a.find("(") {
-      Some(i) => a.view(end_offset=i)
+      Some(i) => a.exact_view(end=i)
       None => a
     }
     name == "paged" || name == "pdf" || name == "pdftags"

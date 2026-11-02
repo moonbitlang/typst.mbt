@@ -104,7 +104,7 @@ fn spot(
 }
 
 ///|
-test "clicks on the showcase lead to the constructor calls of its source" {
+async test "clicks on the showcase lead to the constructor calls of its source" {
   // Embedded fonts only, so that the result does not depend on the machine.
   let report = compile_document(@twins.full_showcase)
   assert_true(report.errors.is_empty())
@@ -184,7 +184,7 @@ test "clicks on the showcase lead to the constructor calls of its source" {
 }
 
 ///|
-test "selections on the showcase become feedback with the origins they cover" {
+async test "selections on the showcase become feedback with the origins they cover" {
   let report = compile_document(@twins.full_showcase)
   let text = report.review_text()
   let source = @utf8.decode(@system.read(bench_file))
@@ -623,7 +623,7 @@ test "source characters: the text of a Para resolves like the text of a Prose" {
 }
 
 ///|
-test "the showcase's feedback has source characters and excerpts" {
+async test "the showcase's feedback has source characters and excerpts" {
   let report = compile_document(@twins.full_showcase)
   let text = report.review_text(sources=@system.sources())
   let source = @utf8.decode(@system.read(bench_file))
@@ -661,7 +661,7 @@ test "the showcase's feedback has source characters and excerpts" {
 }
 
 ///|
-test "positions on the showcase: source lines lead back to the pages" {
+async test "positions on the showcase: source lines lead back to the pages" {
   let report = compile_document(@twins.full_showcase)
   let text = report.review_text(sources=@system.sources())
   let source = @utf8.decode(@system.read(bench_file))
@@ -716,7 +716,7 @@ test "positions on the showcase: source lines lead back to the pages" {
 }
 
 ///|
-test "the showcase's loop-built rows name their data row" {
+async test "the showcase's loop-built rows name their data row" {
   let report = compile_document(@twins.full_showcase)
   let text = report.review_text(sources=@system.sources())
   let source = @utf8.decode(@system.read(bench_file))

@@ -95,13 +95,13 @@ pub fn hyphenate_bounded(
     let { cp, idx, } = @unicode.decode_at(word, i)
     byte += utf8_len(cp)
     if byte < len && levels[byte - 1] % 2 == 1 {
-      syllables.push(word.view(start_offset=start, end_offset=idx))
+      syllables.push(word.exact_view(start~, end=idx))
       start = idx
     }
     continue idx
   }
   if start < word.length() {
-    syllables.push(word.view(start_offset=start))
+    syllables.push(word.exact_view(start~))
   }
   syllables
 }

@@ -27,9 +27,9 @@ pub fn home_dir() -> String?
 
 pub fn rust_trim(String) -> String
 
-pub fn scan(String) -> Array[(FontSource, @library.FontInfo)]
+pub async fn scan(String) -> Array[(FontSource, @library.FontInfo)]
 
-pub fn system() -> Array[(FontSource, @library.FontInfo)]
+pub async fn system() -> Array[(FontSource, @library.FontInfo)]
 
 pub let universe_namespace : String
 

@@ -49,7 +49,7 @@ fn compile_target(
 
 ///|
 /// Execute a query command.
-fn query(command : QueryCommand) -> Unit raise HintedFailure {
+async fn query(command : QueryCommand) -> Unit raise HintedFailure {
   let world = SystemWorld::new(
     Some(command.input),
     command.world,

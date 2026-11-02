@@ -43,7 +43,7 @@ fn str_byte_to_utf16(s : String, byte : Int32) -> Int32? {
 ///|
 /// The UTF-8 byte offset of a UTF-16 index.
 fn str_utf16_to_byte(s : String, i : Int32) -> Int32 {
-  @syntax.utf8_len(s.view(end_offset=i))
+  @syntax.utf8_len(s.exact_view(end=i))
 }
 
 ///|
@@ -375,7 +375,7 @@ fn str_match_indices(s : String, pat : String) -> Array[(Int32, Int32, Int32)] {
   }
   let mut i = 0
   while i + pat.length() <= s.length() {
-    match s.view(start_offset=i).find(pat) {
+    match s.exact_view(start=i).find(pat) {
       Some(j) => {
         let start = i + j
         out.push((str_utf16_to_byte(s, start), start, start + pat.length()))

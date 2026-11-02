@@ -16,7 +16,7 @@ pub fn translate(
 ) -> Translation {
   let root = @syntax.parse(text)
   let dir = match path.rev_find("/") {
-    Some(i) => path.view(end_offset=i).to_owned()
+    Some(i) => path.exact_view(end=i).to_owned()
     None => ""
   }
   let dir_arg = if dir == "" { "" } else { ", dir=\{mbt_str(dir)}" }

@@ -843,7 +843,7 @@ fn file_of_path(path : String) -> @syntax.FileId {
   guard path.has_prefix("@") else { return project_file(path) }
   // `@namespace/name:version/path`.
   guard path.find(":") is Some(colon) &&
-    path.view(start_offset=colon).find("/") is Some(slash) else {
+    path.exact_view(start=colon).find("/") is Some(slash) else {
     abort("recompile: bad file name in a snapshot: \{path}")
   }
   let slash = colon + slash

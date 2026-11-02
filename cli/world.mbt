@@ -8,9 +8,7 @@ priv struct SystemWorld {
   /// Typst's standard library.
   library : @library.Library
   /// Metadata about discovered fonts and lazily loaded fonts.
-  fonts : Ref[@kit.FontStore?]
-  /// The font arguments, for lazy font discovery.
-  font_args : FontArgs
+  fonts : @kit.FontStore
   /// Maps file ids to source files and buffers.
   files : @kit.FileStore[SystemFiles]
   /// The current datetime if requested. This is stored here to ensure it is
@@ -60,7 +58,7 @@ impl Show for WorldCreationError with fn output(self, logger) {
 
 ///|
 /// Creates a new system world.
-fn SystemWorld::new(
+async fn SystemWorld::new(
   input : Input?,
   world_args : WorldArgs,
   process_args : ProcessArgs,
@@ -90,14 +88,11 @@ fn SystemWorld::new(
       }
     None => @kit.Time::system()
   }
-  {
-    workdir: @platform.current_dir(),
-    library,
-    fonts: { val: None, },
-    font_args: world_args.font,
-    files: @kit.FileStore::new(SystemFiles::new(input, world_args)),
-    now,
+  let files = @kit.FileStore::new(SystemFiles::new(input, world_args))
+  let fonts = discover_fonts(world_args.font) catch {
+    err => raise Io(@platform.IoError(Other, err.to_string()))
   }
+  { workdir: @platform.current_dir(), library, fonts, files, now, }
 }
 
 ///|
@@ -135,37 +130,13 @@ fn SystemWorld::reset(self : SystemWorld) -> Unit {
 }
 
 ///|
-/// Forcibly scan fonts instead of doing it lazily upon the first access.
-///
-/// Does nothing if the fonts were already scanned.
-// Only `watch` calls it (watch.rs:58), which not every target has
-// (`watch_unsupported.mbt`).
-#warnings("-unused_value")
-fn SystemWorld::scan_fonts(self : SystemWorld) -> Unit {
-  self.font_store() |> ignore
-}
-
-///|
-/// The fonts, discovered on first access.
-fn SystemWorld::font_store(self : SystemWorld) -> @kit.FontStore {
-  match self.fonts.val {
-    Some(fonts) => fonts
-    None => {
-      let fonts = discover_fonts(self.font_args)
-      self.fonts.val = Some(fonts)
-      fonts
-    }
-  }
-}
-
-///|
 impl @library.World for SystemWorld with fn library(self) {
   self.library
 }
 
 ///|
 impl @library.World for SystemWorld with fn book(self) {
-  self.font_store().book()
+  self.fonts.book()
 }
 
 ///|
@@ -185,7 +156,7 @@ impl @library.World for SystemWorld with fn file(self, id) {
 
 ///|
 impl @library.World for SystemWorld with fn font(self, index) {
-  self.font_store().font(index)
+  self.fonts.font(index)
 }
 
 ///|
@@ -369,7 +340,7 @@ fn system_packages(args : PackageArgs) -> @kit.SystemPackages {
 ///|
 /// Discovers the fonts as specified by the CLI flags
 /// (`typst-cli/src/fonts.rs`).
-fn discover_fonts(args : FontArgs) -> @kit.FontStore {
+async fn discover_fonts(args : FontArgs) -> @kit.FontStore {
   let fonts = @kit.FontStore::new()
   if !args.ignore_system_fonts {
     fonts.extend_all(@kit.system())

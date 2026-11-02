@@ -193,7 +193,7 @@ fn reference(name : String, data : Bytes) -> Array[(UInt32, @library.FontInfo)] 
 /// Writes the files into a directory of their own, scans it, checks every
 /// file against the reference and gives the indices of the faces found per
 /// file (`-` for none).
-fn scanned(name : String, files : Array[(String, Bytes)]) -> String raise {
+async fn scanned(name : String, files : Array[(String, Bytes)]) -> String {
   let dir = "_build/kit_fonts_test/\{name}"
   for file in files {
     let path = @platform.join(dir, file.0)
@@ -226,7 +226,7 @@ fn scanned(name : String, files : Array[(String, Bytes)]) -> String raise {
 }
 
 ///|
-test "scan: extensions, subdirectories, files that are not fonts" {
+async test "scan: extensions, subdirectories, files that are not fonts" {
   let (small, large, otf) = test_fonts()
   let noise = Bytes::makei(300000, i => (i * 7919 + (i >> 8) * 31).to_byte())
   inspect(
@@ -280,7 +280,7 @@ test "scan: extensions, subdirectories, files that are not fonts" {
 }
 
 ///|
-test "scan: truncated files" {
+async test "scan: truncated files" {
   let (small, large, otf) = test_fonts()
   inspect(
     scanned("truncated", [
@@ -313,7 +313,7 @@ test "scan: truncated files" {
 }
 
 ///|
-test "scan: table records that point elsewhere" {
+async test "scan: table records that point elsewhere" {
   let (small, large, _) = test_fonts()
   let files = []
   for font in [("small", small), ("large", large)] {
@@ -469,7 +469,7 @@ fn with_more_tables(data : Bytes, n : Int32) -> Bytes {
 }
 
 ///|
-test "scan: table directories" {
+async test "scan: table directories" {
   let (small, large, _) = test_fonts()
   let files = []
   for font in [("small", small), ("large", large)] {
@@ -544,7 +544,7 @@ test "scan: table directories" {
 }
 
 ///|
-test "scan: collections" {
+async test "scan: collections" {
   let (small, large, otf) = test_fonts()
   let two = ttc([small, large])
   let first = be32(two, 12)
@@ -685,7 +685,7 @@ fn one_body(font : Bytes, n : Int32) -> Bytes {
 }
 
 ///|
-test "scan: what a collection keeps for its faces is bounded" {
+async test "scan: what a collection keeps for its faces is bounded" {
   // The faces of a collection share the tables that discovery has read. A
   // file can be made to have many large tables in little space: here 60
   // faces whose `post` tables are the outlines of the font, each one byte
@@ -880,7 +880,7 @@ fn cmap_variants(large : Bytes) -> Array[(String, Bytes)] {
 }
 
 ///|
-test "scan: character maps" {
+async test "scan: character maps" {
   let (_, large, _) = test_fonts()
   inspect(
     scanned("cmaps", cmap_variants(large)),

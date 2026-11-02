@@ -32,7 +32,7 @@ fn millis(nanos : Int64) -> String {
 }
 
 ///|
-fn run(args : Array[String]) -> Unit raise {
+async fn run(args : Array[String]) -> Unit {
   let mut path : String? = None
   let mut rounds = 2
   let mut export_only = false
@@ -110,7 +110,7 @@ fn run(args : Array[String]) -> Unit raise {
 }
 
 ///|
-fn main {
+async fn main {
   run(@env.args()) catch {
     err => {
       println("error: \{err}")

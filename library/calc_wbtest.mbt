@@ -40,7 +40,7 @@ fn calc_oracle_num(s : StringView) -> Num {
   // Accumulates negatively, so that `i64::MIN` does not overflow.
   let mut v = 0L
   let mut neg = false
-  for c in s.view(start_offset=1) {
+  for c in s.exact_view(start=1) {
     if c == '-' {
       neg = true
     } else {
@@ -68,9 +68,9 @@ fn calc_oracle_dec_num(s : StringView) -> DecNum {
 /// A number or an angle (`rad:<bits>`, `deg:<bits>`).
 fn calc_oracle_angle_like(s : StringView) -> AngleLike {
   if s.has_prefix("rad:") {
-    Angle(Angle::rad(calc_oracle_f64(s.view(start_offset=4))))
+    Angle(Angle::rad(calc_oracle_f64(s.exact_view(start=4))))
   } else if s.has_prefix("deg:") {
-    Angle(Angle::deg(calc_oracle_f64(s.view(start_offset=4))))
+    Angle(Angle::deg(calc_oracle_f64(s.exact_view(start=4))))
   } else {
     match calc_oracle_num(s) {
       Int(i) => Int(i)
@@ -155,7 +155,7 @@ test "calc oracle" {
       HintedError(err) => "!" + err.message
       err => raise err
     }
-    if actual.view() != expected {
+    if actual[:] != expected {
       failed += 1
       let op = op.to_owned()
       failures[op] = failures.get(op).unwrap_or(0) + 1

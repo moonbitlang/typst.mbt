@@ -162,7 +162,7 @@ fn lint_lines(report : @doc.CompileReport[@layout.PagedDocument]) -> String {
       }
     }
     let tail = match lint.message.find(": ") {
-      Some(i) => lint.message.view(start_offset=i + 1).to_owned()
+      Some(i) => lint.message.exact_view(start=i + 1).to_owned()
       None => ""
     }
     "\{lint.kind.name()} \{place(lint.location)} after \{place(lint.hints[0].location)}:\{tail}"

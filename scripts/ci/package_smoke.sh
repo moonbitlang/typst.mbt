@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # CI: the package must work as a dependency (see "Publishing" in AGENTS.md).
 #
-#   scripts/ci/package_smoke.sh [target ...]      (default: native wasm-gc)
+#   scripts/ci/package_smoke.sh [target ...]      (default: native wasm)
 #
 # Packages the module like the publish workflow (`moon package`), unpacks
 # the zip and builds and runs a tiny consumer of `moonbitlang/typst/doc`
@@ -20,7 +20,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 targets=("$@")
-[ ${#targets[@]} -eq 0 ] && targets=(native wasm-gc)
+[ ${#targets[@]} -eq 0 ] && targets=(native wasm)
 
 work="$PWD/_build/ci/package"
 rm -rf "$work" _build/publish
@@ -67,10 +67,12 @@ version = "0.1.0"
 
 import {
   "moonbitlang/typst@$version",
+  "moonbitlang/async@0.22.5",
 }
 EOF
 cat > "$work/consumer/cmd/moon.pkg" <<'EOF'
 import {
+  "moonbitlang/async",
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/kit",
   "moonbitlang/typst/doc/system",
@@ -92,7 +94,7 @@ fn report() -> @doc.Document {
     @doc.Prose("Plain text with \{@doc.Emph("emphasis")} and \{@doc.Raw("code")}."),
     @doc.Par(@doc.Text(sans_text, font=["IBM Plex Sans"])),
     @doc.Equation("sum_(k=1)^n k = (n(n+1))/2", block=true),
-    @kit.Cards(["native", "wasm-gc"], gutter=[Pt(6)], fill=Luma(235)),
+    @kit.Cards(["native", "wasm"], gutter=[Pt(6)], fill=Luma(235)),
   ])
 }
 
@@ -113,7 +115,7 @@ fn has_text(frame : @library.Frame, text : String, family : String) -> Bool {
 }
 
 ///|
-fn build() -> Bytes raise {
+async fn build() -> Bytes raise {
   let world = @system.world(root=".", system_fonts=false, today=(2026, 10, 5))
   let compiled = report().compile_paged(world)
   // The family of `doc/fonts` was found (an unknown family is a warning)
@@ -130,7 +132,7 @@ fn build() -> Bytes raise {
 }
 
 ///|
-fn main {
+async fn main {
   let pdf = build() catch {
     e => {
       println("consumer: failed: \{e}")

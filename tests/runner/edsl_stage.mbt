@@ -494,7 +494,7 @@ fn check_pair(
 }
 
 ///|
-fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
+async fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
   let base = @system.world(root="bench", system_fonts=false, today=(2026, 1, 1)) catch {
     err => {
       println("edsl: cannot create the world: \{err}")
