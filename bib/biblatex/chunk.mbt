@@ -548,16 +548,11 @@ pub fn split_values(
   str_idx : Int32,
 ) -> (Chunks, Chunks) {
   let src = clone_chunks(src)
-  let new = []
   if chunk_idx >= src.length() {
-    return (src, new)
+    return (src, [])
   }
-  if chunk_idx + 1 < src.length() {
-    for i in (chunk_idx + 1)..<src.length() {
-      new.push(src[i])
-    }
-    src.truncate(chunk_idx + 1)
-  }
+  let new = [ for i in (chunk_idx + 1)..<src.length() => src[i] ]
+  src.truncate(chunk_idx + 1)
   let item = src[src.length() - 1]
   let content = item.v.get()
   let i16 = byte_to_utf16(content, str_idx)

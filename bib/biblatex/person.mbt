@@ -66,7 +66,7 @@ fn Person::simple(
 ///    given, and `id`, `prefix-i`, `useprefix`.
 pub fn Person::parse(chunks : ArrayView[Spanned[Chunk]]) -> Person {
   // Extended Name Format
-  if chunks.iter().any(val => val.v.get().contains("=")) {
+  if chunks.any(val => val.v.get().contains("=")) {
     return Person::parse_extended_name_format(chunks)
   }
   // BibTeX
