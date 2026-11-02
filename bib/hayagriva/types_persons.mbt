@@ -490,11 +490,10 @@ pub fn Person::is_cjk(self : Person) -> Bool {
 ///|
 /// Get the name without the leading article.
 pub fn Person::name_without_article(self : Person) -> String {
-  match self.name.find(" ") {
-    Some(space_idx) =>
-      if space_idx + 1 != self.name.length() &&
-        rust_binary_search(articles, self.name[0:space_idx].to_owned()) {
-        self.name[space_idx + 1:].to_owned()
+  match self.name.split_once(" ") {
+    Some((article, rest)) =>
+      if !rest.is_empty() && rust_binary_search(articles, article.to_owned()) {
+        rest.to_owned()
       } else {
         self.name
       }

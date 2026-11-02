@@ -131,7 +131,7 @@ fn de_library(n : @yaml.YamlNode) -> Library raise De {
   let entries : Array[Entry] = []
   for pair in map_entries(n) {
     let (key, value) = pair
-    if entries.iter().any(e => e.key == key) {
+    if entries.any(e => e.key == key) {
       raise De("duplicate key \{key}")
     }
     // Convert immediately so errors report the correct position
