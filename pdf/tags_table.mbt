@@ -167,7 +167,7 @@ fn build_table(tree : Tree, table_id : Int32) -> Unit {
   // A show rule, can prevent the table from being properly laid out, in which
   // case cells will be missing.
   if table_ctx.cells.is_empty() ||
-    table_ctx.cells.entries.iter().any(e => e.is_missing()) {
+    table_ctx.cells.entries.any(e => e.is_missing()) {
     // Insert all children, so the content is included in the tag tree,
     // otherwise krilla might panic.
     for entry in table_ctx.cells.entries {
@@ -711,7 +711,7 @@ fn[T : Eq] resolve_sides(
       None => None
     }
   })
-  if mapped.iter().all(v => v is None || v == parent) {
+  if mapped.all(v => v is None || v == parent) {
     // All present values are equal to the parent value.
     return None
   }

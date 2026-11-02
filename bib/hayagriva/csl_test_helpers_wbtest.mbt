@@ -100,8 +100,7 @@ fn run_csl_library(
       let mut locator = None
       let mut hidden = false
       let mut purpose = None
-      for i in 1..<parts.length() {
-        let opt = parts[i]
+      for opt in parts[1:] {
         if opt.has_prefix("loc=") {
           let l = opt[4:].to_owned()
           let idx = l.find(":").unwrap()

@@ -90,7 +90,7 @@ fn write_filters(
     for fe in filter.primitives {
       if fe.kind is Image(img) {
         if img.root.children.get(0) is Some(child) {
-          if !written_fe_image_nodes.iter().any(id => id == child.id()) {
+          if !written_fe_image_nodes.any(id => id == child.id()) {
             write_element(child, false, opt, xml)
             written_fe_image_nodes.push(child.id())
           }
@@ -620,13 +620,13 @@ fn write_element(
             xml.write_svg_attribute(AId::TextRendering, "geometricPrecision")
           OptimizeLegibility => ()
         }
-        if text.rotate.iter().any(r => r != 0.0) {
+        if text.rotate.any(r => r != 0.0) {
           xml.write_numbers(AId::Rotate, text.rotate)
         }
-        if text.dx.iter().any(dx => dx != 0.0) {
+        if text.dx.any(dx => dx != 0.0) {
           xml.write_numbers(AId::Dx, text.dx)
         }
-        if text.dy.iter().any(dy => dy != 0.0) {
+        if text.dy.any(dy => dy != 0.0) {
           xml.write_numbers(AId::Dy, text.dy)
         }
         xml.set_preserve_whitespaces(true)
@@ -1009,7 +1009,7 @@ fn has_xlink(parent : Group) -> Bool {
     match node {
       Group(g) => {
         for filter in g.filters {
-          if filter.primitives.iter().any(p => p.kind is Image(_)) {
+          if filter.primitives.any(p => p.kind is Image(_)) {
             return true
           }
         }
@@ -1029,7 +1029,7 @@ fn has_xlink(parent : Group) -> Bool {
       }
       Image(_) => return true
       Text(text) =>
-        if text.chunks.iter().any(t => t.text_flow is Path(_)) {
+        if text.chunks.any(t => t.text_flow is Path(_)) {
           return true
         }
       _ => ()

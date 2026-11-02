@@ -146,7 +146,7 @@ fn descriptor_test_collect(
       Func(func) =>
         match func.inner {
           Native(data) =>
-            if !funcs.iter().any(other => physical_equal(other, data)) {
+            if !funcs.any(other => physical_equal(other, data)) {
               funcs.push(data)
               descriptor_test_collect(data.scope(), funcs, elems, types, seen)
             }
@@ -162,7 +162,7 @@ fn descriptor_test_collect(
           types.push(ty)
           descriptor_test_collect(ty.scope(), funcs, elems, types, seen)
           if ty.0.constructor_ is Some(data) &&
-            !funcs.iter().any(other => physical_equal(other, data)) {
+            !funcs.any(other => physical_equal(other, data)) {
             funcs.push(data)
           }
         }

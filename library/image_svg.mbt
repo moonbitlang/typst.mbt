@@ -275,7 +275,6 @@ fn svg_foreign_object_warning(document : @xml.Document) -> HintedString? {
   let uncovered = document
     .root()
     .descendants()
-    .iter()
     .any(node => {
       node.tag_name().name() == "foreignObject" &&
       !foreign_object_covered_by_switch(node)
@@ -591,9 +590,7 @@ fn SvgImageResolver::load_or_error(
   // Exit early if the href is an URL.
   if href.find("://") is Some(pos) {
     let scheme = href.unsafe_substring(start=0, end=pos)
-    if scheme
-      .iter()
-      .all(c => {
+    if scheme.all(c => {
         c.is_ascii_alphabetic() ||
         c.is_ascii_digit() ||
         c == '+' ||

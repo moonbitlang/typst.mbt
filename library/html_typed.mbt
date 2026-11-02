@@ -302,7 +302,7 @@ fn StringsType::input(self : StringsType) -> CastInfo {
 ///|
 fn StringsType::castable(self : StringsType, value : Value) -> Bool {
   match value {
-    Str(s) => self.strings().iter().any(pair => pair.0 == s)
+    Str(s) => self.strings().any(pair => pair.0 == s)
     _ => false
   }
 }
@@ -335,7 +335,7 @@ fn UnionType::input(self : UnionType) -> CastInfo {
 
 ///|
 fn UnionType::castable(self : UnionType, value : Value) -> Bool {
-  self.iter().iter().any(ty => ty.castable(value))
+  self.iter().any(ty => ty.castable(value))
 }
 
 ///|

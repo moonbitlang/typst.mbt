@@ -347,13 +347,13 @@ fn repr_variants(
     let (modifiers, value, _) = variant
     // Only keep variants that can still be accessed, i.e., variants that
     // contain all applied modifiers.
-    if !applied.iter().all(am => modifiers.contains(am)) {
+    if !applied.all(am => modifiers.contains(am)) {
       continue
     }
     let trimmed_modifiers = modifiers
       .iter()
       .filter(m => !applied_modifiers.contains(m))
-    if trimmed_modifiers.iter().all(m => m.is_empty()) {
+    if trimmed_modifiers.all(m => m.is_empty()) {
       parts.push(repr_str(value))
     } else {
       let trimmed_modifiers = trimmed_modifiers.join(".")

@@ -804,7 +804,7 @@ pub fn Scopes::check_std_shadowed(self : Scopes, name : String) -> Bool {
   if self.top.get(name) is Some(_) {
     return true
   }
-  self.scopes.iter().any(s => s.get(name) is Some(_))
+  self.scopes.any(s => s.get(name) is Some(_))
 }
 
 ///|

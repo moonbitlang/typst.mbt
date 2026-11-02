@@ -549,11 +549,11 @@ fn parse_ipv4(labels : Array[String]) -> Result[String, UrlParseError] {
     }
   }
   let mut ipv4 = 0L
-  for k in 0..<(nums.length() - 1) {
-    if nums[k] > 255L {
+  for n in nums[:nums.length() - 1] {
+    if n > 255L {
       return Err(InvalidIpv4Address)
     }
-    ipv4 = ipv4 * 256L + nums[k]
+    ipv4 = ipv4 * 256L + n
   }
   let last = nums[nums.length() - 1]
   let remaining = 5 - nums.length()
@@ -568,11 +568,7 @@ fn parse_ipv4(labels : Array[String]) -> Result[String, UrlParseError] {
     ipv4 *= 256L
   }
   ipv4 = ipv4 + last
-  let parts = []
-  for k in 0..<4 {
-    let shift = (3 - k) * 8
-    parts.push(((ipv4 >> shift) & 255L).to_string())
-  }
+  let parts = [ for k in 0..<4 => ((ipv4 >> ((3 - k) * 8)) & 255L).to_string() ]
   Ok(parts.join("."))
 }
 

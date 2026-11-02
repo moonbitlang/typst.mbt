@@ -399,7 +399,7 @@ fn mat_elem_rows_parse(
   let mut rows : Array[Array[Content]] = []
   let mut width = 0
   let values : Array[@syntax.Spanned[Value]] = args.all_spanned()
-  if values.iter().any(s => s.v is Array(_)) {
+  if values.any(s => s.v is Array(_)) {
     for spanned in values {
       let array : Arr = at(spanned.span, () => spanned.v.cast())
       let row = array.items.map(v => v.display())

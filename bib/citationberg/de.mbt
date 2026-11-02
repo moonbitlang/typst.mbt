@@ -229,19 +229,15 @@ fn XNode::attr(self : XNode, name : String) -> String? {
 
 ///|
 fn is_blank(s : String) -> Bool {
-  s.iter().all(c => c is (' ' | '\r' | '\n' | '\t'))
+  s.all(c => c is (' ' | '\r' | '\n' | '\t'))
 }
 
 ///|
 /// The elements with the given tag.
 fn XNode::elems(self : XNode, tag : String) -> Array[XNode] {
-  let out = []
-  for c in self.children {
-    if c is Elem(e) && e.tag == tag {
-      out.push(e)
-    }
-  }
-  out
+  [
+    for c in self.children if c is Elem(e) && e.tag == tag => e
+  ]
 }
 
 ///|

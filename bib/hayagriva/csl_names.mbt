@@ -197,7 +197,7 @@ fn renders_given_special_form(
     Some(VarOnly(Name(var_))) => {
       // Skip if none of the variables are the author and the supplement
       // does not contain the author either.
-      let contains_v = names.variable.iter().any(v => var_ == v)
+      let contains_v = names.variable.any(v => var_ == v)
       let substitute_will_render_v = is_empty &&
         (match names.substitute() {
           Some(s) =>
@@ -205,7 +205,7 @@ fn renders_given_special_form(
             .iter()
             .any(c => {
               match c {
-                Names(n) => n.variable.iter().any(v => var_ == v)
+                Names(n) => n.variable.any(v => var_ == v)
                 _ => false
               }
             })
@@ -256,7 +256,7 @@ impl RenderCsl for @citationberg.Names with fn render(self, ctx) {
   ctx.writing.push_name_options(self.options())
 
   // Write the substitute if all variables are empty.
-  let is_empty = people.iter().all(p => p.0.is_empty())
+  let is_empty = people.all(p => p.0.is_empty())
   // Suppress this variable if we are in a special form.
   if !renders_given_special_form(self, ctx, is_empty) {
     ctx.writing.pop_name_options()
@@ -401,10 +401,10 @@ impl RenderCsl for @citationberg.Names with fn render(self, ctx) {
 
 ///|
 impl RenderCsl for @citationberg.Names with fn will_render(self, ctx, var_) {
-  if self.variable.iter().any(v => @citationberg.Variable::Name(v) == var_) {
+  if self.variable.any(v => @citationberg.Variable::Name(v) == var_) {
     return true
   }
-  if self.variable.iter().all(v => ctx.resolve_name_variable(v).is_empty()) &&
+  if self.variable.all(v => ctx.resolve_name_variable(v).is_empty()) &&
     self.substitute() is Some(substitute) {
     return substitute.children
       .iter()
@@ -488,7 +488,7 @@ fn add_names(
   forms : Array[DisambiguatedNameForm?],
   variable : @citationberg.NameVariable,
 ) -> Unit {
-  let has_et_al = forms.iter().any(f => f is None)
+  let has_et_al = forms.any(f => f is None)
   let take = {
     let mut pos = persons.length()
     for i, f in forms {

@@ -214,11 +214,7 @@ fn impl_str_clusters(self_ : String) -> Arr {
 ///|
 /// Returns the Unicode codepoints of the string as an array of substrings.
 fn impl_str_codepoints(self_ : String) -> Arr {
-  let out = []
-  for c in self_ {
-    out.push(Value::Str(c.to_string()))
-  }
-  Arr::from_array(out)
+  Arr::from_array([ for c in self_ => Value::Str(c.to_string()) ])
 }
 
 ///|

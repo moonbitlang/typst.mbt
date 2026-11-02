@@ -42,13 +42,9 @@ fn convert_list(
   nodes : Array[@library.OutlineNode[@library.Content]],
   gc : GlobalContext,
 ) -> Array[@export.OutlineNode] {
-  let out = []
-  for node in nodes {
-    if convert_node(node, gc) is Some(n) {
-      out.push(n)
-    }
-  }
-  out
+  [
+    for node in nodes if convert_node(node, gc) is Some(n) => n
+  ]
 }
 
 ///|
