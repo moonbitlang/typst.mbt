@@ -6,6 +6,7 @@
 
 ///|
 /// The style of a font.
+#derive(Eq, Hash, Compare, Debug)
 pub(all) enum FontStyle {
   /// The default, typically upright style.
   Normal
@@ -13,7 +14,7 @@ pub(all) enum FontStyle {
   Italic
   /// Just a slanted version of the normal style.
   Oblique
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -110,7 +111,8 @@ pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int32 {
 
 ///|
 /// The weight of a font (100 - 900).
-pub(all) struct FontWeight(Int32) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct FontWeight(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -254,7 +256,8 @@ pub extend FontWeight with FromValue::{from_value}
 
 ///|
 /// The width of a font (stored in thousandths, 500 - 2000).
-pub(all) struct FontStretch(Int32) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct FontStretch(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -358,7 +361,8 @@ pub extend FontStretch with FromValue::{from_value}
 ///
 /// Upstream `ttf_parser::Tag`; renamed because `Tag` is the introspection
 /// tag of `introspection/tag.rs`.
-pub(all) struct OpenTypeTag(String) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct OpenTypeTag(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -470,7 +474,8 @@ pub extend OpenTypeTag with FromValue::{from_value}
 
 ///|
 /// A value for a font variation axis (an `f32` upstream).
-pub(all) struct AxisValue(Double) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct AxisValue(Double)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -527,11 +532,8 @@ pub extend AxisValue with FromValue::{from_value}
 
 ///|
 /// OpenType font variation settings.
-pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive (
-  Eq,
-  Hash,
-  Debug,
-)
+#derive(Eq, Hash, Debug)
+pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

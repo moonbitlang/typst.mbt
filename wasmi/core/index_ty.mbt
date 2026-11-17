@@ -2,12 +2,13 @@
 
 ///|
 /// The index type used for addressing memories and tables.
+#derive(Eq, Hash, Debug)
 pub(all) enum IndexType {
   /// A 32-bit address type.
   I32
   /// A 64-bit address type.
   I64
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

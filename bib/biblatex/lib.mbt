@@ -26,12 +26,13 @@ pub(all) struct Entry {
 
 ///|
 /// Errors that can occur when retrieving a field of an [`Entry`].
+#derive(Eq, Debug)
 pub(all) enum RetrievalError {
   /// The entry has no field with this name.
   Missing(String)
   /// The field contains malformed data.
   TypeError(TypeError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

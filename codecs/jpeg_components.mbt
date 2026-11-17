@@ -6,6 +6,7 @@ const MAX_SAMP_FACTOR : Int32 = 4
 
 ///|
 /// Component IDs.
+#derive(Eq)
 priv enum ComponentID {
   /// Luminance channel
   Y
@@ -15,7 +16,7 @@ priv enum ComponentID {
   Cr
   /// Q or fourth component
   Q
-} derive(Eq)
+}
 
 ///|
 fn ComponentID::debug(self : ComponentID) -> String {
@@ -29,13 +30,14 @@ fn ComponentID::debug(self : ComponentID) -> String {
 
 ///|
 /// Sub-sampling ratios.
+#derive(Eq)
 priv enum SampleRatios {
   HV
   V
   H
   Generic(Int32, Int32)
   NoSample
-} derive(Eq)
+}
 
 ///|
 fn SampleRatios::sample(self : SampleRatios) -> Int32 {

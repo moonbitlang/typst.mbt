@@ -2,13 +2,14 @@
 
 ///|
 /// A path filling rule.
+#derive(Eq, Debug)
 pub(all) enum FillRule {
   /// Specifies that "inside" is computed by a non-zero sum of signed edge
   /// crossings.
   Winding
   /// Specifies that "inside" is computed by an odd number of edge crossings.
   EvenOdd
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

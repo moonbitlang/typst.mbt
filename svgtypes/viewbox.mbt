@@ -2,12 +2,13 @@
 
 ///|
 /// List of possible [`ViewBox`] parsing errors.
+#derive(Eq, Debug)
 pub(all) suberror ViewBoxError {
   /// One of the numbers is invalid.
   InvalidNumber
   /// `ViewBox` has a negative or zero size.
   InvalidSize
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -35,12 +36,13 @@ pub extend ViewBoxError with Show::{to_string, output}
 /// Representation of the [`<viewBox>`] type.
 ///
 /// [`<viewBox>`]: https://www.w3.org/TR/SVG2/coords.html#ViewBoxAttribute
+#derive(Eq, Debug)
 pub(all) struct ViewBox {
   x : Double
   y : Double
   w : Double
   h : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

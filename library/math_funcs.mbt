@@ -120,6 +120,7 @@ fn impl_math_sscript(body_ : Content, cramped_ : Bool) -> Content {
 /// The size of elements in an equation.
 ///
 /// See the TeXbook p. 141.
+#derive(Eq, Hash, Compare, Debug)
 pub(all) enum MathSize {
   /// Second-level sub- and superscripts.
   ScriptScript
@@ -129,7 +130,7 @@ pub(all) enum MathSize {
   Text
   /// Math on its own line.
   Display
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -210,6 +211,7 @@ pub extend MathSize with FromValue::{from_value}
 
 ///|
 /// Base math styles used in Typst (upstream `codex::styling::MathVariant`).
+#derive(Eq, Hash, Debug)
 pub(all) enum MathVariant {
   Plain
   Fraktur
@@ -218,7 +220,7 @@ pub(all) enum MathVariant {
   DoubleStruck
   Chancery
   Roundhand
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

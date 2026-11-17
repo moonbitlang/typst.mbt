@@ -5,6 +5,7 @@
 
 ///|
 /// A syntax highlighting tag.
+#derive(Eq, Hash, Debug)
 pub(all) enum Tag {
   /// A line or block comment.
   Comment
@@ -50,7 +51,7 @@ pub(all) enum Tag {
   Interpolated
   /// A syntax error.
   Error
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -2,12 +2,13 @@
 
 ///|
 /// A list of persons with a common role.
+#derive(Eq, Hash, Debug)
 pub(all) struct PersonsWithRoles {
   /// The persons.
   names : Array[Person]
   /// The role the persons had in the creation of the cited item.
   role : PersonRole
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -36,6 +37,7 @@ pub fn PersonsWithRoles::new(
 ///|
 /// Specifies the role a group of persons had in the creation to the cited
 /// item.
+#derive(Eq, Hash, Debug)
 pub(all) enum PersonRole {
   /// Translated the work from a foreign language to the cited edition.
   Translator
@@ -80,7 +82,7 @@ pub(all) enum PersonRole {
   Narrator
   /// Various other roles described by the contained string.
   Unknown(String)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -127,6 +129,7 @@ pub fn PersonRole::from_str(s : String) -> PersonRole? {
 
 ///|
 /// Holds the name of a person.
+#derive(Eq, Hash, Debug)
 pub(all) struct Person {
   /// The family name.
   name : String
@@ -140,7 +143,7 @@ pub(all) struct Person {
   comma_suffix : Bool
   /// Another name (often user name) the person might be known under.
   alias_ : String?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -159,6 +162,7 @@ pub extend Person with @debug.Debug::{to_repr}
 
 ///|
 /// Error that may occur when parsing a slice of strings as a name.
+#derive(Eq, Debug)
 pub(all) enum PersonError {
   /// The name has too many parts to be appropriately parsed.
   TooManyParts
@@ -166,7 +170,7 @@ pub(all) enum PersonError {
   Empty
   /// The role is unknown.
   UnknownRole
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

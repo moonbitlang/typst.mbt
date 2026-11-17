@@ -7,7 +7,8 @@
 /// access its absolute position on the pages. You can retrieve the current
 /// location with the `here` function and the location of a queried or shown
 /// element with the `location()` method on content.
-pub(all) struct Location(U128) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Location(U128)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -94,7 +95,8 @@ pub extend Location with Fingerprint::{fingerprint}
 /// [Location] itself does not implement `Compare` because comparing hashes
 /// like this has no semantic meaning. The potential for misuse (e.g. checking
 /// whether locations have a particular relative ordering) is relatively high.
-pub(all) struct LocationKey(U128) derive(Eq, Hash, Compare)
+#derive(Eq, Hash, Compare)
+pub(all) struct LocationKey(U128)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

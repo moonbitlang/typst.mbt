@@ -4,11 +4,12 @@
 /// Predefined encodings for Adobe CFF and Type1 fonts.
 ///
 /// Encodings map character codes to glyph names.
+#derive(Eq, Debug)
 pub(all) enum PredefinedEncoding {
   Standard
   Expert
   IsoLatin1
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

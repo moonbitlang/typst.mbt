@@ -11,12 +11,13 @@
 
 ///|
 /// An error from loading a YAML bibliography (upstream `serde_yaml::Error`).
+#derive(Eq, Debug)
 pub(all) struct YamlLoadError {
   /// The error message (upstream `Display`).
   message : String
   /// The location of the error, if any (upstream `location()`).
   location : @yaml.Location?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -815,12 +816,13 @@ fn de_language(n : @yaml.YamlNode) -> LanguageIdentifier raise De {
 
 ///|
 /// Errors that may occur when parsing a BibLaTeX file.
+#derive(Eq, Debug)
 pub(all) enum BibLaTeXError {
   /// An error occurred when parsing a BibLaTeX file.
   Parse(@biblatex.ParseError)
   /// One of the BibLaTeX fields was malformed for its type.
   Type(@biblatex.TypeError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

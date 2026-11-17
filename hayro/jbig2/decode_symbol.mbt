@@ -684,6 +684,7 @@ fn export_symbols(ctx : SymbolDecodeContext) -> Array[Bitmap] raise DecodeError 
 }
 
 ///|
+#derive(Eq)
 priv enum HuffmanTableSelection {
   TableB1
   TableB2
@@ -691,7 +692,7 @@ priv enum HuffmanTableSelection {
   TableB4
   TableB5
   UserSupplied
-} derive(Eq)
+}
 
 ///|
 /// Parsed symbol dictionary segment flags (7.4.2.1.1).

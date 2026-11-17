@@ -4,7 +4,8 @@
 /// A pair of f32 numbers (`f32x2`).
 ///
 /// Mainly for internal use. Do not rely on it!
-pub(all) struct F32x2(Float, Float) derive(Eq, Debug, Default)
+#derive(Eq, Debug, Default)
+pub(all) struct F32x2(Float, Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

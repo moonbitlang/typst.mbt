@@ -13,6 +13,7 @@ const MAX_COMPONENTS : Int32 = 4
 ///
 /// Only the color spaces the JPEG decoder produces or its users (the `image`
 /// crate, hayro-syntax's `DCTDecode` filter) request are ported.
+#derive(Eq, Debug)
 pub(all) enum ColorSpace {
   RGB
   YCbCr
@@ -20,7 +21,7 @@ pub(all) enum ColorSpace {
   YCCK
   CMYK
   MultiBand(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

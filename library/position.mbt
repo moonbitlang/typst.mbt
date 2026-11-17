@@ -2,12 +2,13 @@
 
 ///|
 /// A position in a document.
+#derive(Eq)
 pub(all) enum DocumentPosition {
   /// A position in a paged document.
   Paged(PagedPosition)
   /// A position in an HTML document.
   Html(HtmlPosition)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -82,12 +83,13 @@ pub extend DocumentPosition with Fingerprint::{fingerprint}
 
 ///|
 /// A physical position in a paged document.
+#derive(Eq)
 pub(all) struct PagedPosition {
   /// The page, starting at 1.
   page : NonZeroUSize
   /// The exact coordinates on the page (from the top left, as usual).
   point : Point
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -179,13 +181,14 @@ pub extend PagedPosition with FromValue::{from_value}
 
 ///|
 /// A position in an HTML document.
+#derive(Eq)
 pub(all) struct HtmlPosition {
   /// Indices that can be used to traverse the tree from the root to the
   /// element at this position.
   priv element : Array[Int32]
   /// A more precise position inside of the element.
   priv inner : InnerHtmlPosition?
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -241,13 +244,14 @@ pub extend HtmlPosition with Fingerprint::{fingerprint}
 
 ///|
 /// A precise position inside of an HTML element.
+#derive(Eq)
 pub(all) enum InnerHtmlPosition {
   /// If the element is a frame, this specifies the position inside of the
   /// frame.
   Frame(Point)
   /// If the element is a text node, this specifies the character offset.
   Character(Int32)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

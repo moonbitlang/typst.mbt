@@ -141,10 +141,11 @@ fn interp64(a : Double, b : Double, t : Double) -> Double {
 // point64.rs
 
 ///|
+#derive(Eq)
 enum SearchAxis {
   X
   Y
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -152,10 +153,11 @@ enum SearchAxis {
 pub extend SearchAxis with Eq::{not_equal, equal}
 
 ///|
+#derive(Eq)
 struct Point64 {
   x : Double
   y : Double
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

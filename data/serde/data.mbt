@@ -9,6 +9,7 @@
 
 ///|
 /// A value in the serde data model.
+#derive(Eq, Debug)
 pub(all) enum Data {
   /// `serialize_none` / `serialize_unit` / `visit_none` / `visit_unit`.
   None
@@ -28,7 +29,7 @@ pub(all) enum Data {
   Seq(Array[Data])
   /// A map with string keys, in insertion order.
   Map(Array[(String, Data)])
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -7,12 +7,13 @@
 
 ///|
 /// The context (IFD kind) of a tag (upstream `exif::Context`).
+#derive(Eq, Hash, Debug)
 pub(all) enum ExifContext {
   Tiff
   Exif
   Gps
   Interop
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -31,6 +32,7 @@ pub extend ExifContext with @debug.Debug::{to_repr}
 
 ///|
 /// A field value (upstream `exif::Value`, numeric variants only).
+#derive(Debug)
 pub(all) enum ExifValue {
   Byte(Array[UInt32])
   Short(Array[UInt32])
@@ -39,7 +41,7 @@ pub(all) enum ExifValue {
   Rational(Array[(UInt32, UInt32)])
   /// Any other type.
   Other
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -103,9 +105,10 @@ pub let exif_tag_y_resolution : Int32 = 0x11b
 
 ///|
 /// An Exif reading error (upstream `exif::Error`).
+#derive(Debug)
 pub(all) suberror ExifError {
   ExifError(String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

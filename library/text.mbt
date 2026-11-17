@@ -6,12 +6,13 @@
 
 ///|
 /// A lowercased font family like "arial".
+#derive(Eq, Hash)
 pub(all) struct FontFamily {
   /// The name of the font family.
   name : String
   /// A regex that defines the Unicode codepoints supported by the font.
   covers : Covers?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -103,12 +104,13 @@ pub extend FontFamily with FromValue::{from_value}
 
 ///|
 /// Defines which codepoints a font family will be used for.
+#derive(Eq, Hash)
 pub(all) enum Covers {
   /// Covers all codepoints except those used both in Latin and CJK fonts.
   LatinInCjk
   /// Covers the set of codepoints for which the regex matches.
   Regex(Regex)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -179,7 +181,8 @@ pub extend Covers with FromValue::{from_value}
 /// Font family fallback list.
 ///
 /// Must contain at least one font.
-pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct FontList(Array[FontFamily])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -314,7 +317,8 @@ fn text_elem_stretch_default() -> Value {
 
 ///|
 /// The size of text.
-pub(all) struct TextSize(Length) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct TextSize(Length)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -426,12 +430,13 @@ fn text_elem_size_fold(inner : Value, outer : Value) -> Value {
 
 ///|
 /// Specifies the top edge of text.
+#derive(Eq, Hash)
 pub(all) enum TopEdge {
   /// An edge specified via font metrics or bounding box.
   Metric(TopEdgeMetric)
   /// An edge specified as a length.
   Length(Length)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -490,6 +495,7 @@ pub extend TopEdge with FromValue::{from_value}
 
 ///|
 /// Metrics that describe the top edge of text.
+#derive(Eq, Hash, Debug)
 pub(all) enum TopEdgeMetric {
   /// The font's ascender, which typically exceeds the height of all glyphs.
   Ascender
@@ -501,7 +507,7 @@ pub(all) enum TopEdgeMetric {
   Baseline
   /// The top edge of the glyph's bounding box.
   Bounds
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -581,12 +587,13 @@ fn text_elem_top_edge_default() -> Value {
 
 ///|
 /// Specifies the bottom edge of text.
+#derive(Eq, Hash)
 pub(all) enum BottomEdge {
   /// An edge specified via font metrics or bounding box.
   Metric(BottomEdgeMetric)
   /// An edge specified as a length.
   Length(Length)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -645,6 +652,7 @@ pub extend BottomEdge with FromValue::{from_value}
 
 ///|
 /// Metrics that describe the bottom edge of text.
+#derive(Eq, Hash, Debug)
 pub(all) enum BottomEdgeMetric {
   /// The baseline on which the letters rest.
   Baseline
@@ -652,7 +660,7 @@ pub(all) enum BottomEdgeMetric {
   Descender
   /// The bottom edge of the glyph's bounding box.
   Bounds
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -732,7 +740,8 @@ fn text_elem_bottom_edge_default() -> Value {
 
 ///|
 /// The direction of text and inline objects in their line.
-pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct TextDir(Smart[Dir])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -793,7 +802,8 @@ fn text_elem_dir_default() -> Value {
 
 ///|
 /// A selection into the Stylistic Alternates.
-pub(all) struct Alternates(Int64) derive(Eq, Hash, Default)
+#derive(Eq, Hash, Default)
+pub(all) struct Alternates(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -855,7 +865,8 @@ fn text_elem_alternates_default() -> Value {
 
 ///|
 /// A set of stylistic sets to enable.
-pub(all) struct StylisticSets(Int32) derive(Eq, Hash, Default)
+#derive(Eq, Hash, Default)
+pub(all) struct StylisticSets(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -960,6 +971,7 @@ fn text_elem_stylistic_set_default() -> Value {
 
 ///|
 /// Which kind of numbers / figures to select.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumberType {
   /// Numbers that fit well with capital text (the OpenType `lnum` font
   /// feature).
@@ -967,7 +979,7 @@ pub(all) enum NumberType {
   /// Numbers that fit well into a flow of upper- and lowercase text (the
   /// OpenType `onum` font feature).
   OldStyle
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1034,12 +1046,13 @@ pub extend NumberType with FromValue::{from_value}
 
 ///|
 /// The width of numbers / figures.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumberWidth {
   /// Numbers with glyph-specific widths (the OpenType `pnum` font feature).
   Proportional
   /// Numbers of equal width (the OpenType `tnum` font feature).
   Tabular
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1108,11 +1121,8 @@ pub extend NumberWidth with FromValue::{from_value}
 
 ///|
 /// OpenType font features settings.
-pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive (
-  Eq,
-  Hash,
-  Default,
-)
+#derive(Eq, Hash, Default)
+pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1265,7 +1275,8 @@ fn text_elem_variations_fold(inner : Value, outer : Value) -> Value {
 /// A toggle that turns on and off alternatingly if folded.
 ///
 /// Internal field type without upstream casts; stored as a boolean.
-pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct ItalicToggle(Bool)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1339,7 +1350,8 @@ fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
 /// A delta that is summed up when folded.
 ///
 /// Internal field type without upstream casts; stored as an integer.
-pub(all) struct WeightDelta(Int64) derive(Eq, Hash, Default)
+#derive(Eq, Hash, Default)
+pub(all) struct WeightDelta(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1418,12 +1430,13 @@ fn text_elem_delta_fold(inner : Value, outer : Value) -> Value {
 /// Costs for various layout decisions.
 ///
 /// Costs are updated (prioritizing the later value) when folded.
+#derive(Eq, Hash, Default)
 pub(all) struct Costs {
   hyphenation : Ratio?
   runt : Ratio?
   widow : Ratio?
   orphan : Ratio?
-} derive(Eq, Hash, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1581,7 +1594,8 @@ fn text_elem_costs_fold(inner : Value, outer : Value) -> Value {
 ///|
 /// A type that can never be constructed (upstream `Never`, used as
 /// `Smart<Option<Never>>`).
-pub(all) enum Never {} derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) enum Never {}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

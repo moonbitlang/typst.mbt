@@ -47,11 +47,12 @@ const MARKER_TOUCHED : Int32 = 0x30
 ///|
 /// Describes the axis to which a measurement or point movement operation
 /// applies.
+#derive(Eq)
 priv enum CoordAxis {
   Both
   X
   Y
-} derive(Eq)
+}
 
 ///|
 fn CoordAxis::touched_marker(self : CoordAxis) -> Int32 {
@@ -591,7 +592,8 @@ fn RetainedGraphicsState::copy(
 
 ///|
 /// Zone pointer: 0 = twilight, 1 = glyph.
-priv struct ZonePointer(Int32) derive(Eq)
+#derive(Eq)
+priv struct ZonePointer(Int32)
 
 ///|
 fn ZonePointer::is_twilight(self : ZonePointer) -> Bool {

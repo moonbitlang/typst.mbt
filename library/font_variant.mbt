@@ -4,6 +4,7 @@
 
 ///|
 /// Properties that distinguish a font from other fonts in the same family.
+#derive(Eq, Hash, Compare)
 pub(all) struct FontVariant {
   /// The style of the font (normal / italic / oblique).
   style : FontStyle
@@ -11,7 +12,7 @@ pub(all) struct FontVariant {
   weight : FontWeight
   /// How condensed or expanded the font is (0.5 - 2.0).
   stretch : FontStretch
-} derive(Eq, Hash, Compare)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -163,6 +164,7 @@ pub fn AxisValue::clamp(self : AxisValue, axis : FontAxis) -> AxisValue {
 
 ///|
 /// A variation axis in a font.
+#derive(Eq, Hash, Debug)
 pub(all) struct FontAxis {
   /// The OpenType tag that identifies the axis. May be a standard tag like
   /// `wght` or a custom tag.
@@ -173,7 +175,7 @@ pub(all) struct FontAxis {
   max : AxisValue
   /// The default value the font has set for this axis.
   default : AxisValue
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

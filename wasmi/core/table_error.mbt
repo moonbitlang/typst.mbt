@@ -2,6 +2,7 @@
 
 ///|
 /// Errors that may occur upon operating with table entities.
+#derive(Debug)
 pub(all) suberror TableError {
   /// Tried to allocate more virtual memory than technically possible.
   OutOfSystemMemory
@@ -25,7 +26,7 @@ pub(all) suberror TableError {
   ElementTypeMismatch
   /// The operation ran out of fuel before completion.
   OutOfFuel(required_fuel~ : UInt64)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

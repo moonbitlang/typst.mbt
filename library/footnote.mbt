@@ -4,10 +4,11 @@
 ///|
 /// The body of a footnote can be either some content or a label referencing
 /// another footnote.
+#derive(Eq)
 pub(all) enum FootnoteBody {
   Content(Content)
   Reference(Label)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -61,7 +62,8 @@ pub extend FootnoteBody with FromValue::{from_value}
 
 ///|
 /// A footnote (upstream `Packed<FootnoteElem>`).
-pub(all) struct FootnoteElem(Content) derive(Eq)
+#derive(Eq)
+pub(all) struct FootnoteElem(Content)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

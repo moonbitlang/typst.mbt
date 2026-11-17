@@ -2,12 +2,13 @@
 
 ///|
 /// A container with a horizontal and vertical component.
+#derive(Default, Eq, Hash, Debug)
 pub(all) struct Axes[T] {
   /// The horizontal component.
   x : T
   /// The vertical component.
   y : T
-} derive(Default, Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -143,12 +144,13 @@ pub extend Axes with IntoValue::{into_value}
 
 ///|
 /// The two layouting axes.
+#derive(Eq, Hash, Debug)
 pub(all) enum Axis {
   /// The horizontal axis.
   X
   /// The vertical  axis.
   Y
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

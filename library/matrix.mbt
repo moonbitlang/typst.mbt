@@ -50,7 +50,8 @@ fn cases_elem_delim_default() -> Value {
 ///
 /// Typically, the delimiter is stretched to fit the height of whatever it
 /// delimits. (upstream `math::Delimiter`)
-pub(all) struct MathDelimiter(Char?) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct MathDelimiter(Char?)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -178,10 +179,11 @@ pub extend MathDelimiter with FromValue::{from_value}
 ///|
 /// A pair of delimiters (one closing, one opening) used for matrices, vectors
 /// and cases.
+#derive(Eq, Hash, Debug)
 pub(all) struct DelimiterPair {
   open : MathDelimiter
   close : MathDelimiter
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -271,11 +273,12 @@ pub extend DelimiterPair with FromValue::{from_value}
 
 ///|
 /// Parameters specifying how augmentation lines should be drawn on a matrix.
+#derive(Eq)
 pub(all) struct Augment {
   hline : AugmentOffsets
   vline : AugmentOffsets
   stroke : Smart[Stroke]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -411,7 +414,8 @@ pub extend Augment with FromValue::{from_value}
 
 ///|
 /// The offsets at which augmentation lines should be drawn on a matrix.
-pub(all) struct AugmentOffsets(Array[Int64]) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct AugmentOffsets(Array[Int64])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -477,11 +481,12 @@ pub extend AugmentOffsets with FromValue::{from_value}
 ///|
 /// Augmentation parameters whose stroke lengths have been resolved (upstream
 /// `Augment<Abs>`).
+#derive(Eq)
 pub(all) struct ResolvedAugment {
   hline : AugmentOffsets
   vline : AugmentOffsets
   stroke : Smart[ResolvedStroke]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

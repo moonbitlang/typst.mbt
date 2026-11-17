@@ -5,7 +5,8 @@
 ///|
 /// An identifier for a natural language: an ISO 639-1/2/3 code, stored
 /// lowercased.
-pub(all) struct Lang(String) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct Lang(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -192,7 +193,8 @@ pub extend Lang with FromValue::{from_value}
 ///|
 /// An identifier for a region somewhere in the world: an ISO 3166-1 alpha-2
 /// code, stored uppercased.
-pub(all) struct Region(String) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct Region(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -270,7 +272,8 @@ pub extend Region with FromValue::{from_value}
 
 ///|
 /// An ISO 15924-type script identifier, stored lowercased.
-pub(all) struct WritingScript(String) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct WritingScript(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -351,10 +354,11 @@ pub extend WritingScript with FromValue::{from_value}
 
 ///|
 /// A locale consisting of a language and an optional region.
+#derive(Eq, Hash, Compare, Debug)
 pub(all) struct Locale {
   lang : Lang
   region : Region?
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

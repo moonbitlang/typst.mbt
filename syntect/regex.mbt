@@ -17,9 +17,10 @@ pub struct Regex {
 
 ///|
 /// A region contains text positions for capture groups in a match result.
+#derive(Eq)
 pub struct Region {
   priv positions : Array[(Int32, Int32)?]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

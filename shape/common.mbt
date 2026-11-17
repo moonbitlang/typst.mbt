@@ -9,6 +9,7 @@ pub const HB_FEATURE_GLOBAL_END : UInt32 = 0xFFFFFFFF
 
 ///|
 /// Defines the direction in which text is to be read.
+#derive(Eq, Hash, Debug)
 pub(all) enum Direction {
   /// Initial, unset direction.
   Invalid
@@ -20,7 +21,7 @@ pub(all) enum Direction {
   TopToBottom
   /// Text is set vertically from bottom to top.
   BottomToTop
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -168,7 +169,8 @@ pub fn Direction::from_str(s : String) -> Direction? {
 
 ///|
 /// A script language.
-pub(all) struct Language(String) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Language(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -219,7 +221,8 @@ fn ascii_lowercase(s : String) -> String {
 ///|
 /// A text script. In harfbuzz, despite having `hb_script_t`, script can
 /// actually have any tag (but not `HB_SCRIPT_INVALID`).
-pub(all) struct Script(@otf.Tag) derive(Eq, Compare, Hash)
+#derive(Eq, Compare, Hash)
+pub(all) struct Script(@otf.Tag)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -877,12 +880,13 @@ pub let script_myanmar_zawgyi : Script = Script::from_bytes(b"Qaag")
 ///|
 /// A feature tag with an accompanying range specifying on which subslice of
 /// `shape`s input it should be applied.
+#derive(Eq, Hash, Debug)
 pub(all) struct Feature {
   tag : @otf.Tag
   value : UInt32
   start : UInt32
   end : UInt32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1006,10 +1010,11 @@ pub fn Feature::from_str(s : String) -> Feature? {
 
 ///|
 /// A font variation.
+#derive(Eq, Debug)
 pub(all) struct Variation {
   tag : @otf.Tag
   value : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -2,6 +2,7 @@
 
 ///|
 /// A run of shaped text.
+#derive(Eq)
 pub(all) struct TextItem {
   /// The font the glyphs are contained in.
   font : FontInstance
@@ -20,7 +21,7 @@ pub(all) struct TextItem {
   /// The glyphs. The number of glyphs may be different from the number of
   /// characters in the plain text due to e.g. ligatures.
   glyphs : Array[Glyph]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -102,6 +103,7 @@ fn sum_em(glyphs : ArrayView[Glyph], f : (Glyph) -> Em) -> Em {
 
 ///|
 /// A glyph in a run of shaped text.
+#derive(Eq, Hash)
 #valtype
 pub(all) struct Glyph {
   /// The glyph's index in the font.
@@ -126,7 +128,7 @@ pub(all) struct Glyph {
   span : @syntax.Span
   /// The offset within the span.
   span_offset : UInt16
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

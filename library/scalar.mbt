@@ -2,7 +2,8 @@
 
 ///|
 /// A 64-bit float that implements `Eq`, `Ord` and `Hash` (NaN becomes zero).
-pub(all) struct Scalar(Double) derive(Default)
+#derive(Default)
+pub(all) struct Scalar(Double)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

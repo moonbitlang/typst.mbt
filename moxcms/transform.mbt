@@ -7,10 +7,11 @@
 
 ///|
 /// Barycentric interpolation weights size.
+#derive(Eq, Debug)
 pub(all) enum BarycentricWeightScale {
   /// Low scale weights is enough for common case.
   Low
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -25,10 +26,11 @@ pub extend BarycentricWeightScale with @debug.Debug::{to_repr}
 ///|
 /// Defines the interpolation method (only the default `Linear` is available
 /// without the `options` feature).
+#derive(Eq, Debug)
 pub(all) enum InterpolationMethod {
   /// Trilinear/Quadlinear interpolation
   Linear
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -42,6 +44,7 @@ pub extend InterpolationMethod with @debug.Debug::{to_repr}
 
 ///|
 /// Declares additional transformation options.
+#derive(Eq, Debug)
 pub(all) struct TransformOptions {
   rendering_intent : RenderingIntent
   /// If set it will try to use Transfer Characteristics from CICP on
@@ -53,7 +56,7 @@ pub(all) struct TransformOptions {
   interpolation_method : InterpolationMethod
   /// Barycentric weights scale.
   barycentric_weight_scale : BarycentricWeightScale
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -79,6 +82,7 @@ pub fn TransformOptions::default() -> TransformOptions {
 ///|
 /// Layout declares a data layout. For RGB it shows also the channel order.
 /// Cmyk8 uses the same layout as Rgba8.
+#derive(Eq, Debug)
 pub(all) enum Layout {
   Rgb
   Rgba
@@ -96,7 +100,7 @@ pub(all) enum Layout {
   Inks13
   Inks14
   Inks15
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

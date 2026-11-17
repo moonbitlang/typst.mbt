@@ -12,12 +12,13 @@
 /// abstraction since [`Val`] is optimized towards being a
 /// user facing type whereas [`TypedVal`] is focusing on
 /// performance and efficiency in computations.
+#derive(Eq, Debug)
 pub struct TypedVal {
   /// The type of the value.
   ty : ValType
   /// The underlying raw value.
   value : UntypedVal
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -257,13 +257,14 @@ fn Output::write(self : Output, buffer : Bytes) -> Unit raise @platform.IoError 
 
 ///|
 /// Which format to use for the generated output.
+#derive(Eq)
 priv enum OutputFormat {
   Pdf
   Png
   Svg
   Html
   Bundle
-} derive(Eq)
+}
 
 ///|
 /// Whether this format results in a `PagedDocument`.

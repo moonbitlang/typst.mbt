@@ -142,6 +142,7 @@ pub fn is_cjk_script(c : Char) -> Bool {
 
 ///|
 /// A Unicode math class, as defined in `MathClass.txt`.
+#derive(Eq, Debug, Hash)
 pub(all) enum MathClass {
   Normal
   Alphabetic
@@ -158,7 +159,7 @@ pub(all) enum MathClass {
   Unary
   Vary
   Special
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

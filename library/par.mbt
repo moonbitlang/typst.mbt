@@ -4,12 +4,13 @@
 
 ///|
 /// Configures how justification may distribute spacing.
+#derive(Eq, Hash)
 pub(all) struct JustificationLimits {
   /// Limits for spacing, relative to the space width.
   spacing : Limits[Rel[Length]]?
   /// Limits for tracking, _in addition_ to the glyph width.
   tracking : Limits[Length]?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -141,12 +142,13 @@ pub extend JustificationLimits with Fold::{fold}
 ///|
 /// Determines the minimum and maximum size by or to which spacing may be shrunk
 /// and stretched.
+#derive(Eq, Hash)
 pub(all) struct Limits[T] {
   /// Minimum allowable adjustment.
   min : T
   /// Maximum allowable adjustment.
   max : T
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -286,6 +288,7 @@ fn par_elem_justification_limits_fold(inner : Value, outer : Value) -> Value {
 
 ///|
 /// How to determine line breaks in a paragraph.
+#derive(Eq, Hash, Debug)
 pub(all) enum Linebreaks {
   /// Determine the line breaks in a simple first-fit style.
   Simple
@@ -294,7 +297,7 @@ pub(all) enum Linebreaks {
   /// Typst will try to produce more evenly filled lines of text by
   /// considering the whole paragraph when calculating line breaks.
   Optimized
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -363,12 +366,13 @@ pub extend Linebreaks with FromValue::{from_value}
 /// Configuration for first line indent.
 ///
 /// Here `None` means unspecified and fields set to it are inherited.
+#derive(Eq, Hash)
 pub(all) struct FirstLineIndent {
   /// The amount of indent.
   amount : Length?
   /// Whether to indent all paragraphs, not just consecutive ones.
   all : Bool?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -494,6 +498,7 @@ fn par_elem_first_line_indent_fold(inner : Value, outer : Value) -> Value {
 ///|
 /// Possible line numbering scope options, indicating how often the line
 /// number counter should be reset.
+#derive(Eq, Hash, Debug)
 pub(all) enum LineNumberingScope {
   /// Indicates that the line number counter spans the whole document, i.e.,
   /// it's never automatically reset.
@@ -501,7 +506,7 @@ pub(all) enum LineNumberingScope {
   /// Indicates that the line number counter should be reset at the start of
   /// every new page.
   Page
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

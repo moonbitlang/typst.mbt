@@ -5,6 +5,7 @@
 
 ///|
 /// `yaml_scalar_style_t` as requested by serde_yaml / chosen by the emitter.
+#derive(Eq)
 priv enum EStyle {
   AnyStyle
   PlainStyle
@@ -12,7 +13,7 @@ priv enum EStyle {
   DoubleQuotedStyle
   LiteralStyle
   FoldedStyle
-} derive(Eq)
+}
 
 ///|
 /// The emitter events serde_yaml produces.

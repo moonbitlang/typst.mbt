@@ -34,6 +34,7 @@ pub fn cj_segmenter() -> LineSegmenter {
 
 ///|
 /// A line break opportunity.
+#derive(Eq, Hash, Debug)
 pub(all) enum Breakpoint {
   /// Just a normal opportunity (e.g. after a space).
   Normal
@@ -42,7 +43,7 @@ pub(all) enum Breakpoint {
   /// An opportunity for hyphenating and how many chars are before/after it
   /// in the word.
   Hyphen(Int32, Int32)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -63,6 +64,7 @@ pub extend Breakpoint with @debug.Debug::{to_repr}
 /// How to trim the end of a line.
 ///
 /// It's an invariant that `self.layout <= self.shaping`.
+#derive(Eq, Debug)
 pub(all) struct Trim {
   /// The text in the range `layout..shaping` should be shaped but should not
   /// affect layout. This ensures that we trim spaces for layout purposes, but
@@ -71,7 +73,7 @@ pub(all) struct Trim {
   /// The text should only be shaped up until the given text offset. Newlines
   /// are already trimmed here.
   shaping : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -459,12 +461,13 @@ fn char_count(s : StringView) -> Int32 {
 }
 
 ///|
+#derive(Eq)
 priv enum LinkClass {
   Alphabetic
   Digit
   Open
   Other
-} derive(Eq)
+}
 
 ///|
 fn LinkClass::of(c : Int32) -> LinkClass {

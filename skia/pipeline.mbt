@@ -21,6 +21,7 @@
 ///|
 // `MoveSourceToDestination` is never pushed upstream either (tiny-skia
 // 0.12.0 src/pipeline/mod.rs:71); it has its entry in both stage tables.
+#derive(Eq, Debug)
 #warnings("-unused_constructor")
 enum Stage {
   MoveSourceToDestination
@@ -102,7 +103,7 @@ enum Stage {
   GammaExpandSrgb
   GammaExpandDestinationSrgb
   GammaCompressSrgb
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -225,12 +226,13 @@ priv struct UniformColorCtx {
 ///|
 /// A gradient color is an unpremultiplied RGBA not in a 0..1 range.
 /// It basically can have any float value.
+#derive(Eq)
 struct GradientColor {
   r : Float
   g : Float
   b : Float
   a : Float
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

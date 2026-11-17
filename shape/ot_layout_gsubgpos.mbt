@@ -19,11 +19,12 @@ fn match_class(class_def : @otf.ClassDefinition) -> MatchFunc {
 }
 
 ///|
+#derive(Eq)
 priv enum Ligbase {
   NotChecked
   MayNotSkip
   MaySkip
-} derive(Eq)
+}
 
 ///|
 /// `match_input`: returns whether the input matched; `end_position` and
@@ -225,25 +226,28 @@ priv struct SkippingIterator {
 }
 
 ///|
+#derive(Eq)
 priv enum MatchT {
   Match
   NotMatch
   Skip
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum MayMatchT {
   MatchNo
   MatchYes
   MatchMaybe
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum MaySkipT {
   SkipNo
   SkipYes
   SkipMaybe
-} derive(Eq)
+}
 
 ///|
 fn SkippingIterator::new(

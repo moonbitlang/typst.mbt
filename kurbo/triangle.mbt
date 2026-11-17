@@ -2,6 +2,7 @@
 
 ///|
 /// Triangle
+#derive(Eq, Debug)
 pub(all) struct Triangle {
   /// vertex a.
   a : Point
@@ -9,7 +10,7 @@ pub(all) struct Triangle {
   b : Point
   /// vertex c.
   c : Point
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -38,6 +38,7 @@ pub(all) enum ProcessColor {
 
 ///|
 /// An 8-bit CMYK color.
+#derive(Eq, Debug)
 pub(all) struct Cmyk {
   /// The cyan component.
   c : Float
@@ -47,7 +48,7 @@ pub(all) struct Cmyk {
   y : Float
   /// The key (black) component.
   k : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -61,12 +62,13 @@ pub extend Cmyk with @debug.Debug::{to_repr}
 
 ///|
 /// A spot color.
+#derive(Eq)
 pub(all) struct SpotColor {
   /// Which colorant to apply.
   colorant : SpotColorant
   /// How much of the colorant to apply to the medium.
   tint : Ratio
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,12 +77,13 @@ pub extend SpotColor with Eq::{not_equal, equal}
 
 ///|
 /// A spot colorant from which spot colors can be created.
+#derive(Eq)
 pub(all) struct SpotColorant {
   /// Name of the spot colorant to use, if any.
   name : SpotColorantName?
   /// How to render this color if the specified colorant is not available.
   fallback : ProcessColor
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -89,12 +92,13 @@ pub extend SpotColorant with Eq::{not_equal, equal}
 
 ///|
 /// The name of a spot colorant.
+#derive(Eq)
 pub(all) enum SpotColorantName {
   /// The special `"all"` colorant that applies to all separation colorants.
   All
   /// A custom colorant name (e.g., `"PANTONE 2221 C"`).
   Custom(String)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -103,12 +107,13 @@ pub extend SpotColorantName with Eq::{not_equal, equal}
 
 ///|
 /// A color space for color manipulation.
+#derive(Eq)
 pub(all) enum ColorSpace {
   /// A mixable color space with a well-defined color model.
   Process(ProcessColorSpace)
   /// A spot colorant.
   Spot(SpotColorant)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -117,6 +122,7 @@ pub extend ColorSpace with Eq::{not_equal, equal}
 
 ///|
 /// A color space for color manipulation.
+#derive(Eq, Debug)
 pub(all) enum ProcessColorSpace {
   /// The perceptual Oklab color space.
   Oklab
@@ -134,7 +140,7 @@ pub(all) enum ProcessColorSpace {
   Hsv
   /// The CMYK color space.
   Cmyk
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

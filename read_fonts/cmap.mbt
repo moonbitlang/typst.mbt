@@ -4,6 +4,7 @@
 
 ///|
 /// Platform identifiers.
+#derive(Eq, Debug)
 pub(all) enum PlatformId {
   Unicode
   Macintosh
@@ -11,7 +12,7 @@ pub(all) enum PlatformId {
   Windows
   Custom
   Unknown
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -57,11 +58,12 @@ pub fn Cmap::offset_data(self : Cmap) -> FontData {
 
 ///|
 /// An encoding record.
+#derive(Debug)
 pub(all) struct EncodingRecord {
   platform : Int32
   encoding : Int32
   subtable_offset : UInt32
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

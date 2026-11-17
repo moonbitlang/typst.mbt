@@ -5,6 +5,7 @@
 ///
 /// Selectors are used to apply styling rules to elements. You can also use
 /// selectors to query the document for certain types of elements.
+#derive(Eq)
 pub(all) enum Selector {
   /// Matches a specific type of element.
   ///
@@ -33,7 +34,7 @@ pub(all) enum Selector {
   ///
   /// This is not yet exposed, but used internally.
   Within(selector~ : Selector, ancestor~ : Selector)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -304,7 +305,8 @@ pub extend Selector with FromValue::{from_value}
 ///
 /// Hopefully, this is made obsolete by a more powerful query mechanism in the
 /// future.
-pub(all) struct LocatableSelector(Selector) derive(Eq)
+#derive(Eq)
+pub(all) struct LocatableSelector(Selector)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -408,7 +410,8 @@ pub extend LocatableSelector with FromValue::{from_value}
 ///
 /// Hopefully, this is made obsolete by a more powerful showing mechanism in
 /// the future.
-pub(all) struct ShowableSelector(Selector) derive(Eq)
+#derive(Eq)
+pub(all) struct ShowableSelector(Selector)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

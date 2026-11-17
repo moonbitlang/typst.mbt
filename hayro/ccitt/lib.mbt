@@ -11,6 +11,7 @@
 
 ///|
 /// An error that can occur during CCITT decoding.
+#derive(Eq)
 pub(all) suberror DecodeError {
   /// Unexpected end of input while reading bits.
   UnexpectedEof
@@ -20,7 +21,7 @@ pub(all) suberror DecodeError {
   LineLengthMismatch
   /// Arithmetic overflow in run length or position calculation.
   Overflow
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -46,6 +47,7 @@ pub extend DecodeError with Show::{to_string, output}
 
 ///|
 /// The encoding mode for CCITT fax decoding.
+#derive(Eq, Debug)
 pub(all) enum EncodingMode {
   /// Group 4 (MMR).
   Group4
@@ -53,7 +55,7 @@ pub(all) enum EncodingMode {
   Group3_1D
   /// Group 3 2D (MR).
   Group3_2D(k~ : UInt32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -112,12 +114,13 @@ pub(open) trait Decoder {
 
 ///|
 /// Pixel color in a bi-level (black and white) image.
+#derive(Eq)
 priv enum Color {
   /// White pixel.
   White
   /// Black pixel.
   Black
-} derive(Eq)
+}
 
 ///|
 /// Returns the opposite color.

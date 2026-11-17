@@ -10,6 +10,7 @@
 
 ///|
 /// A rust_decimal `Decimal`.
+#derive(Hash)
 struct RustDecimal {
   /// The mantissa, always in `0..2^96`.
   mantissa : @bigint.BigInt
@@ -17,7 +18,7 @@ struct RustDecimal {
   scale : Int32
   /// The sign bit (may be set for zero).
   negative : Bool
-} derive(Hash)
+}
 
 ///|
 pub extend RustDecimal with Hash::{hash, hash_combine}

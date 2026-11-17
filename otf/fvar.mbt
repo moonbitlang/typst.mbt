@@ -7,6 +7,7 @@
 
 ///|
 /// A [variation axis](https://docs.microsoft.com/en-us/typography/opentype/spec/fvar#variationaxisrecord).
+#derive(Eq, Debug)
 pub(all) struct VariationAxis {
   tag : Tag
   min_value : Float
@@ -15,7 +16,7 @@ pub(all) struct VariationAxis {
   /// An axis name in the `name` table.
   name_id : UInt16
   hidden : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -115,12 +116,13 @@ pub fn FvarTable::parse(data : BytesView) -> FvarTable? {
 
 ///|
 /// An axis value map.
+#derive(Debug)
 pub(all) struct AxisValueMap {
   /// A normalized coordinate value obtained using default normalization.
   from_coordinate : Int16
   /// The modified, normalized coordinate value.
   to_coordinate : Int16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

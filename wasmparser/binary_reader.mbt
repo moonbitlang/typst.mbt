@@ -8,10 +8,11 @@
 let wasm_magic_number : Bytes = b"\x00asm"
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum BinaryReaderErrorKind {
   Custom
   Invalid
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -138,10 +139,11 @@ fn[T] bail(offset : Int32, message : String) -> T raise BinaryReaderError {
 
 ///|
 /// A half-open range of byte offsets (`core::ops::Range<usize>`).
+#derive(Eq, Debug)
 pub(all) struct Range {
   start : Int32
   end : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

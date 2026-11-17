@@ -3,6 +3,7 @@
 
 ///|
 /// A CSL variable.
+#derive(Eq, Hash, Debug)
 pub(all) enum Variable {
   /// The set of variables with no other attributes.
   Standard(StandardVariable)
@@ -14,7 +15,7 @@ pub(all) enum Variable {
   Date(DateVariable)
   /// Variables that can be formatted as names.
   Name(NameVariable)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -80,6 +81,7 @@ pub fn Variable::from_str(s : String) -> Variable? {
 
 ///|
 /// The set of variables with no other attributes.
+#derive(Eq, Hash, Debug)
 pub(all) enum StandardVariable {
   Abstract
   Annote
@@ -128,7 +130,7 @@ pub(all) enum StandardVariable {
   URL
   VolumeTitle
   YearSuffix
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -230,12 +232,13 @@ pub extend StandardVariable with Show::{to_string, output}
 ///|
 /// Number variables as the CSL spec knows them, though we separate between
 /// number variables and page ranges.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumberOrPageVariable {
   /// The page variable.
   Page(PageVariable)
   /// Variables formattable as numbers.
   Number(NumberVariable)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -283,11 +286,12 @@ pub fn NumberOrPageVariable::to_term(self : NumberOrPageVariable) -> Term {
 
 ///|
 /// Variable that can be formatted as page numbers
+#derive(Eq, Hash, Debug)
 pub(all) enum PageVariable {
   /// Range of pages the item (e.g. a journal article) covers in a container
   /// (e.g. a journal issue).
   Page
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -323,6 +327,7 @@ pub extend PageVariable with Show::{to_string, output}
 
 ///|
 /// Variables that can be formatted as numbers.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumberVariable {
   ChapterNumber
   CitationNumber
@@ -341,7 +346,7 @@ pub(all) enum NumberVariable {
   SupplementNumber
   Version
   Volume
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -414,6 +419,7 @@ pub fn NumberVariable::is_number_of_variable(self : NumberVariable) -> Bool {
 
 ///|
 /// Variables that can be formatted as dates.
+#derive(Eq, Hash, Debug)
 pub(all) enum DateVariable {
   Accessed
   AvailableDate
@@ -421,7 +427,7 @@ pub(all) enum DateVariable {
   Issued
   OriginalDate
   Submitted
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -473,6 +479,7 @@ pub extend DateVariable with Show::{to_string, output}
 
 ///|
 /// Variables that can be formatted as names.
+#derive(Eq, Hash, Debug)
 pub(all) enum NameVariable {
   Author
   Chair
@@ -501,7 +508,7 @@ pub(all) enum NameVariable {
   ScriptWriter
   SeriesCreator
   Translator
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -577,6 +584,7 @@ pub extend NameVariable with Show::{to_string, output}
 
 ///|
 /// Localizable terms.
+#derive(Eq, Hash, Debug)
 pub(all) enum Term {
   /// Kind of the cited item.
   Kind(Kind)
@@ -590,7 +598,7 @@ pub(all) enum Term {
   Locator(Locator)
   /// Terms that are not defined via types, name or number variables.
   Other(OtherTerm)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -704,6 +712,7 @@ pub fn Term::is_lexically_same(self : Term, other : Term) -> Bool {
 
 ///|
 /// Kind of the cited item.
+#derive(Eq, Hash, Debug)
 pub(all) enum Kind {
   Article
   ArticleJournal
@@ -750,7 +759,7 @@ pub(all) enum Kind {
   Thesis
   Treaty
   Webpage
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -843,6 +852,7 @@ pub extend Kind with Show::{to_string, output}
 
 ///|
 /// A locator.
+#derive(Eq, Hash, Debug)
 pub(all) enum Locator {
   Act
   Appendix
@@ -876,7 +886,7 @@ pub(all) enum Locator {
   /// The custom type is a `citationberg` addition. It will render nothing in
   /// the locator's `cs:label` element.
   Custom
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -931,6 +941,7 @@ pub fn Locator::from_str(s : String) -> Locator? {
 
 ///|
 /// Terms that are not defined via types, name or number variables.
+#derive(Eq, Hash, Debug)
 pub(all) enum OtherTerm {
   // Months
   Month01
@@ -1044,7 +1055,7 @@ pub(all) enum OtherTerm {
   TelevisionSeriesEpisode
   Video
   WorkingPaper
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1106,12 +1117,13 @@ pub fn OtherTerm::season(value : Season) -> OtherTerm {
 
 ///|
 /// An error that can occur when converting a string to a term.
+#derive(Eq, Hash, Debug)
 pub(all) enum TermConversionError {
   /// The month, season, ordinal, or long ordinal is out of range.
   OutOfRange
   /// The term is unknown.
   Unknown
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1441,6 +1453,7 @@ pub extend OtherTerm with Show::{to_string, output}
 
 ///|
 /// Seasons of the year.
+#derive(Eq, Hash, Debug)
 pub(all) enum Season {
   /// Spring (CSL season 01).
   Spring
@@ -1450,7 +1463,7 @@ pub(all) enum Season {
   Autumn
   /// Winter (CSL season 04).
   Winter
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

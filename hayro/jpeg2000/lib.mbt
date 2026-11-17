@@ -30,6 +30,7 @@ let codestream_magic : Bytes = b"\xFF\x4F\xFF\x51"
 
 ///|
 /// Settings to apply during decoding.
+#derive(Debug)
 pub(all) struct DecodeSettings {
   /// Whether palette indices should be resolved.
   ///
@@ -50,7 +51,7 @@ pub(all) struct DecodeSettings {
   strict : Bool
   /// A hint for the target resolution that the image should be decoded at.
   target_resolution : (UInt32, UInt32)?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -252,6 +253,7 @@ fn resolve_alpha_and_color_space(
 
 ///|
 /// The color space of the image.
+#derive(Debug, Eq)
 pub(all) enum ColorSpace {
   /// A grayscale image.
   Gray
@@ -269,7 +271,7 @@ pub(all) enum ColorSpace {
     /// The number of channels used by the ICC profile.
     num_channels~ : Int32
   )
-} derive(Debug, Eq)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

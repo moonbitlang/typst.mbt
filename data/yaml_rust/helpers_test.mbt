@@ -38,6 +38,7 @@ fn end(p : @yaml_rust.Scanner) -> Unit raise {
 
 ///|
 /// These names match the names used in the C++ test suite.
+#derive(Eq, Debug)
 enum TestEvent {
   OnDocumentStart
   OnDocumentEnd
@@ -48,7 +49,7 @@ enum TestEvent {
   OnScalar
   OnAlias
   OnNull
-} derive(Eq, Debug)
+}
 
 ///|
 struct YamlChecker {

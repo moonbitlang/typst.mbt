@@ -2,6 +2,7 @@
 
 ///|
 /// A mask type.
+#derive(Eq, Debug)
 pub(all) enum MaskType {
   /// Transfers only the Alpha channel from `Pixmap` to `Mask`.
   Alpha
@@ -9,7 +10,7 @@ pub(all) enum MaskType {
   ///
   /// Formula: `Y = 0.2125 * R + 0.7154 * G + 0.0721 * B`
   Luminance
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

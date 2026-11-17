@@ -2,6 +2,7 @@
 
 ///|
 /// Months of the year.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) enum Month {
   January
   February
@@ -15,7 +16,7 @@ pub(all) enum Month {
   October
   November
   December
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

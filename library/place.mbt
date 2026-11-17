@@ -2,13 +2,14 @@
 
 ///|
 /// Relative to which containing scope something shall be placed.
+#derive(Eq, Hash, Debug)
 pub(all) enum PlacementScope {
   /// Place into the current column.
   Column
   /// Place relative to the parent, letting the content span over all
   /// columns.
   Parent
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

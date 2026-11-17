@@ -30,12 +30,13 @@ pub fn f64_max(a : Double, b : Double) -> Double {
 
 ///|
 /// A 2D point.
+#derive(Eq, Debug)
 pub(all) struct Point {
   /// The x coordinate.
   x : Double
   /// The y coordinate.
   y : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -101,12 +102,13 @@ pub fn Point::sub(self : Point, other : Point) -> Vec2 {
 
 ///|
 /// A 2D vector.
+#derive(Eq, Debug)
 pub(all) struct Vec2 {
   /// The x-coordinate.
   x : Double
   /// The y-coordinate.
   y : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

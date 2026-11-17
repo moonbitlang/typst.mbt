@@ -2,6 +2,7 @@
 
 ///|
 /// A repeating tiling fill.
+#derive(Eq)
 pub(all) struct Tiling {
   /// The tile's laid out body.
   frame : Frame
@@ -17,7 +18,7 @@ pub(all) struct Tiling {
   relative : Smart[RelativeTo]
   /// The fingerprint of `frame` (upstream stores the frame in a `LazyHash`).
   frame_hash : LazyFingerprint
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

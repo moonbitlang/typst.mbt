@@ -4,10 +4,11 @@
 ///|
 /// Document settings for PNG export (upstream
 /// `PngFormatOptions<Complete>`).
+#derive(Eq)
 pub(all) struct PngFormatOptions {
   /// The PPI (pixels per inch) to render at when exporting a PNG.
   ppi : Double
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -32,9 +33,10 @@ pub fn PngFormatOptions::get(
 
 ///|
 /// Partially specified PNG settings (upstream `PngFormatOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct PartialPngFormatOptions {
   ppi : Double?
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -57,6 +59,7 @@ pub fn PartialPngFormatOptions::resolve(
 
 ///|
 /// Settings for raster image export (upstream `RenderOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct RenderOptions {
   /// By default, rendered pages are bounded to the page size. In some
   /// circumstances, such as when preparing documents for print, it may be
@@ -66,7 +69,7 @@ pub(all) struct RenderOptions {
   render_bleed : Bool
   /// Format options that override the defaults set by the document.
   format : PartialPngFormatOptions
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -80,10 +83,11 @@ pub extend RenderOptions with Default::{default}
 
 ///|
 /// Resolved settings for raster export (upstream `RenderOptions<Complete>`).
+#derive(Eq)
 pub(all) struct CompleteRenderOptions {
   render_bleed : Bool
   format : PngFormatOptions
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

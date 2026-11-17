@@ -628,6 +628,7 @@ pub extend Frame with Eq::{not_equal, equal}
 /// This corresponds to whether or not the frame is considered to be the
 /// innermost parent of its contents. This is used to determine the
 /// coordinate reference system for gradients.
+#derive(Eq, Hash, Debug)
 pub(all) enum FrameKind {
   /// A container which follows its parent's size.
   ///
@@ -638,7 +639,7 @@ pub(all) enum FrameKind {
   ///
   /// This is used for pages, blocks, and boxes.
   Hard
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -679,6 +680,7 @@ pub fn FrameKind::is_hard(self : FrameKind) -> Bool {
 
 ///|
 /// The building block frames are composed of.
+#derive(Eq)
 pub(all) enum FrameItem {
   /// A subframe with optional transformation and clipping.
   Group(GroupItem)
@@ -692,7 +694,7 @@ pub(all) enum FrameItem {
   Link(Destination, Axes[Abs])
   /// An introspectable element that produced something within this frame.
   Tag(Tag)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -711,6 +713,7 @@ pub fn FrameItem::clone(self : FrameItem) -> FrameItem {
 
 ///|
 /// A subframe with optional transformation and clipping.
+#derive(Eq)
 pub(all) struct GroupItem {
   /// The group's frame.
   mut frame : Frame
@@ -725,7 +728,7 @@ pub(all) struct GroupItem {
   /// thought of as inserting the elements at the end but still inside of
   /// the parent.
   mut parent : FrameParent?
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -754,12 +757,13 @@ pub fn GroupItem::clone(self : GroupItem) -> GroupItem {
 ///|
 /// The parent of a [GroupItem]. The child will be logically ordered at the
 /// end but still inside of the parent.
+#derive(Eq, Hash, Debug)
 pub(all) struct FrameParent {
   /// The location of the parent element.
   location : Location
   /// Whether the child has inherited the parent's styles.
   inherit_ : Inherit
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -807,10 +811,11 @@ pub fn FrameParent::new(location : Location, inherit_ : Inherit) -> FrameParent 
 ///   Some text #footnote[explanation].
 /// ]
 /// ```
+#derive(Eq, Hash, Debug)
 pub(all) enum Inherit {
   Yes
   No
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

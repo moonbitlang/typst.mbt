@@ -16,6 +16,7 @@ pub let tag_list : ReadOnlyArray[Tag]
 // Errors
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Tag {
   Comment
   Punctuation
@@ -39,7 +40,7 @@ pub(all) enum Tag {
   Function
   Interpolated
   Error
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Tag::css_class(Self) -> String
 pub fn Tag::tm_scope(Self) -> String
 

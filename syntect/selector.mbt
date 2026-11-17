@@ -6,10 +6,11 @@
 ///|
 /// A single selector consisting of a stack to match and a possible stack to
 /// exclude from being matched.
+#derive(Eq)
 pub(all) struct ScopeSelector {
   path : ScopeStack
   excludes : Array[ScopeStack]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -19,10 +20,11 @@ pub extend ScopeSelector with Eq::{not_equal, equal}
 ///|
 /// A selector set that matches anything matched by any of its component
 /// selectors.
+#derive(Eq)
 pub(all) struct ScopeSelectors {
   /// The selectors, if any of them match, that this matches
   selectors : Array[ScopeSelector]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

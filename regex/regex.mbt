@@ -150,11 +150,12 @@ pub extend Regex with Show::{to_string, output}
 
 ///|
 /// A match: UTF-8 byte offsets into the haystack and the matched text.
+#derive(Eq, Debug)
 pub(all) struct Match {
   start : Int32
   end : Int32
   text : String
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

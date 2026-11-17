@@ -2,7 +2,8 @@
 
 ///|
 /// An [SVG number](https://www.w3.org/TR/SVG2/types.html#InterfaceSVGNumber).
-pub(all) struct Number(Double) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Number(Double)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

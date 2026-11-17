@@ -5,6 +5,7 @@
 let max_profile_size : Int32 = 1024 * 1024 * 10
 
 ///|
+#derive(Eq, Compare, Debug)
 pub(all) enum ProfileVersion {
   V2_0
   V2_1
@@ -17,7 +18,7 @@ pub(all) enum ProfileVersion {
   V4_3
   V4_4
   Unknown
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -80,6 +81,7 @@ fn ProfileVersion::try_from(value : UInt32) -> ProfileVersion raise CmsError {
 }
 
 ///|
+#derive(Eq, Compare, Debug)
 pub(all) enum DataColorSpace {
   Xyz
   Lab
@@ -106,7 +108,7 @@ pub(all) enum DataColorSpace {
   Color13
   Color14
   Color15
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -203,6 +205,7 @@ fn DataColorSpace::try_from(value : UInt32) -> DataColorSpace raise CmsError {
 }
 
 ///|
+#derive(Eq, Compare, Debug)
 pub(all) enum ProfileClass {
   InputDevice
   DisplayDevice
@@ -211,7 +214,7 @@ pub(all) enum ProfileClass {
   ColorSpace
   Abstract
   Named
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -248,12 +251,13 @@ fn ProfileClass::try_from(value : UInt32) -> ProfileClass raise CmsError {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum LutStore {
   /// 8-bit entries.
   Store8(FixedArray[Int32])
   /// 16-bit entries.
   Store16(FixedArray[Int32])
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -266,12 +270,13 @@ pub extend LutStore with Eq::{not_equal, equal}
 pub extend LutStore with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum LutType {
   Lut8
   Lut16
   LutMab
   LutMba
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -299,10 +304,11 @@ fn LutType::try_from(value : UInt32) -> LutType raise CmsError {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum LutWarehouse {
   Lut(LutDataType)
   Multidimensional(LutMultidimensionalType)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -315,6 +321,7 @@ pub extend LutWarehouse with Eq::{not_equal, equal}
 pub extend LutWarehouse with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct LutDataType {
   // used by lut8Type/lut16Type (mft2) only
   num_input_channels : Int32
@@ -327,7 +334,7 @@ pub(all) struct LutDataType {
   clut_table : LutStore
   output_table : LutStore
   lut_type : LutType
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -340,6 +347,7 @@ pub extend LutDataType with Eq::{not_equal, equal}
 pub extend LutDataType with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct LutMultidimensionalType {
   num_input_channels : Int32
   num_output_channels : Int32
@@ -350,7 +358,7 @@ pub(all) struct LutMultidimensionalType {
   m_curves : Array[ToneReprCurve]
   matrix : Matrix3d
   bias : Vector3d
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -363,12 +371,13 @@ pub extend LutMultidimensionalType with Eq::{not_equal, equal}
 pub extend LutMultidimensionalType with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Compare, Debug)
 pub(all) enum RenderingIntent {
   AbsoluteColorimetric
   Saturation
   RelativeColorimetric
   Perceptual
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -425,6 +434,7 @@ fn RenderingIntent::try_from(value : UInt32) -> RenderingIntent {
 }
 
 ///|
+#derive(Eq, Debug, Default)
 pub(all) struct ColorDateTime {
   year : Int32
   month : Int32
@@ -432,7 +442,7 @@ pub(all) struct ColorDateTime {
   hours : Int32
   minutes : Int32
   seconds : Int32
-} derive(Eq, Debug, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -469,12 +479,13 @@ fn ColorDateTime::new_from_slice(
 
 ///|
 /// A Coding Independent Code Point.
+#derive(Eq, Debug)
 pub(all) struct CicpProfile {
   color_primaries : CicpColorPrimaries
   transfer_characteristics : TransferCharacteristics
   matrix_coefficients : MatrixCoefficients
   full_range : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -487,11 +498,12 @@ pub extend CicpProfile with Eq::{not_equal, equal}
 pub extend CicpProfile with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct LocalizableString {
   language : String
   country : String
   value : String
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -504,13 +516,14 @@ pub extend LocalizableString with Eq::{not_equal, equal}
 pub extend LocalizableString with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct DescriptionString {
   ascii_string : String
   unicode_language_code : UInt32
   unicode_string : String
   script_code_code : Int32
   mac_string : String
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -523,11 +536,12 @@ pub extend DescriptionString with Eq::{not_equal, equal}
 pub extend DescriptionString with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum ProfileText {
   PlainString(String)
   Localizable(Array[LocalizableString])
   Description(DescriptionString)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -540,11 +554,12 @@ pub extend ProfileText with Eq::{not_equal, equal}
 pub extend ProfileText with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum StandardObserver {
   D50
   D65
   Unknown
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -568,11 +583,12 @@ fn StandardObserver::from(value : UInt32) -> StandardObserver {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct ViewingConditions {
   illuminant : Xyz
   surround : Xyz
   observer : StandardObserver
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -585,13 +601,14 @@ pub extend ViewingConditions with Eq::{not_equal, equal}
 pub extend ViewingConditions with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum MeasurementGeometry {
   Unknown
   /// 0°:45° or 45°:0°
   D45to45
   /// 0°:d or d:0°
   D0to0
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -615,6 +632,7 @@ fn MeasurementGeometry::from(value : UInt32) -> MeasurementGeometry {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum StandardIlluminant {
   Unknown
   D50
@@ -625,7 +643,7 @@ pub(all) enum StandardIlluminant {
   A
   EquiPower
   F8
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -653,13 +671,14 @@ fn StandardIlluminant::from(value : UInt32) -> StandardIlluminant {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Measurement {
   observer : StandardObserver
   backing : Xyz
   geometry : MeasurementGeometry
   flare : Float
   illuminant : StandardIlluminant
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -673,9 +692,10 @@ pub extend Measurement with @debug.Debug::{to_repr}
 
 ///|
 /// Technology signature (`TechnologySignatures`), kept as the raw signature.
+#derive(Eq, Debug)
 pub(all) struct TechnologySignatures {
   signature : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

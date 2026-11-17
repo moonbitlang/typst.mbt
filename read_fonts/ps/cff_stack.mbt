@@ -18,10 +18,11 @@ pub struct Stack {
 
 ///|
 /// Either a signed 32-bit integer or a 16.16 fixed point number.
+#derive(Eq, Debug)
 pub(all) enum Number {
   I32(Int32)
   Fixed(@font_types.Fixed)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

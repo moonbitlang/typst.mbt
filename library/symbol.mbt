@@ -14,9 +14,10 @@
 ///
 /// Moreover, you can define custom symbols with this type's constructor
 /// function.
+#derive(Eq, Hash)
 pub struct Symbol {
   priv inner : SymbolInner
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -30,6 +31,7 @@ pub extend Symbol with Hash::{hash, hash_combine}
 
 ///|
 /// The internal representation of a [Symbol].
+#derive(Eq, Hash)
 priv enum SymbolInner {
   /// A native symbol that has no named variant.
   Single(String)
@@ -37,12 +39,13 @@ priv enum SymbolInner {
   Complex(Array[SymbolVariantData])
   /// A symbol that has modifiers applied.
   Modified(Modified)
-} derive(Eq, Hash)
+}
 
 ///|
 /// A symbol with multiple named variants, where some modifiers may have been
 /// applied. Also used for symbols defined at runtime by the user with no
 /// modifier applied.
+#derive(Eq, Hash)
 priv struct Modified {
   /// The full list of variants.
   list : SymbolList
@@ -51,14 +54,15 @@ priv struct Modified {
   /// Whether we already emitted a deprecation warning for the currently
   /// applied modifiers.
   deprecated : Bool
-} derive(Eq, Hash)
+}
 
 ///|
 /// A collection of symbols (upstream `List`).
+#derive(Eq, Hash)
 priv enum SymbolList {
   Static(Array[SymbolVariantData])
   Runtime(Array[SymbolVariantData])
-} derive(Eq, Hash)
+}
 
 ///|
 /// The characters that are covered by this list.

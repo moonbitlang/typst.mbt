@@ -464,12 +464,13 @@ pub fn CslStyle::get(self : CslStyle) -> @citationberg.IndependentStyle {
 
 ///|
 /// Source for a CSL style.
+#derive(Eq, Hash)
 pub(all) enum CslSource {
   /// A predefined named style and potentially a deprecation warning.
   Named(@hayagriva.ArchivedStyle, String?)
   /// A normal data source.
   Normal(DataSource)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

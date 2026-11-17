@@ -4,7 +4,8 @@
 /// A Wasmi stack slot (register) index (upstream `i16`).
 ///
 /// Negative indices refer to function local constant values.
-pub(all) struct Slot(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Slot(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,7 +29,8 @@ pub extend Slot with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm function index (upstream `u32`).
-pub(all) struct Func(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Func(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -52,7 +54,8 @@ pub extend Func with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm function type index (upstream `u32`).
-pub(all) struct FuncType(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct FuncType(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -76,7 +79,8 @@ pub extend FuncType with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasmi internal function index (upstream `u32`).
-pub(all) struct InternalFunc(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct InternalFunc(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -100,7 +104,8 @@ pub extend InternalFunc with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm global variable index (upstream `u32`).
-pub(all) struct Global(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Global(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -124,7 +129,8 @@ pub extend Global with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm linear memory index (upstream `u32`).
-pub(all) struct Memory(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Memory(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -148,7 +154,8 @@ pub extend Memory with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm table index (upstream `u32`).
-pub(all) struct Table(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Table(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -172,7 +179,8 @@ pub extend Table with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm data segment index (upstream `u32`).
-pub(all) struct Data(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Data(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -196,7 +204,8 @@ pub extend Data with @debug.Debug::{to_repr}
 
 ///|
 /// A Wasm element segment index (upstream `u32`).
-pub(all) struct Elem(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Elem(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

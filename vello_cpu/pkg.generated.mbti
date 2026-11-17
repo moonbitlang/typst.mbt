@@ -24,10 +24,11 @@ pub fn AlphaColor::from_rgba8(Int32, Int32, Int32, Int32) -> Self
 pub fn AlphaColor::new(FixedArray[Float]) -> Self
 pub fn AlphaColor::premultiply(Self) -> FixedArray[Float]
 
+#derive(Eq)
 pub(all) struct BlendMode {
   mix : Mix
   compose : Compose
-} derive(Eq)
+}
 pub fn BlendMode::default() -> Self
 pub fn BlendMode::is_destructive(Self) -> Bool
 pub fn BlendMode::new(Mix, Compose) -> Self
@@ -38,6 +39,7 @@ pub(all) struct ColorStop {
   color : AlphaColor
 }
 
+#derive(Eq)
 pub(all) enum Compose {
   Clear
   Copy
@@ -53,18 +55,20 @@ pub(all) enum Compose {
   Xor
   Plus
   PlusLighter
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) enum Extend {
   Pad
   Repeat
   Reflect
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) enum Fill {
   NonZero
   EvenOdd
-} derive(Eq)
+}
 
 pub(all) struct Gradient {
   kind : GradientKind
@@ -86,18 +90,20 @@ pub(all) struct Image {
   sampler : ImageSampler
 }
 
+#derive(Eq)
 pub(all) enum ImageQuality {
   Low
   Medium
   High
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) struct ImageSampler {
   x_extend : Extend
   y_extend : Extend
   quality : ImageQuality
   alpha : Float
-} derive(Eq)
+}
 
 pub(all) enum ImageSource {
   Pixmap(Pixmap)
@@ -113,6 +119,7 @@ pub fn Mask::new_luminance(Pixmap) -> Self
 pub fn Mask::sample(Self, Int32, Int32) -> Int32
 pub fn Mask::width(Self) -> Int32
 
+#derive(Eq)
 pub(all) enum Mix {
   Normal
   Multiply
@@ -130,7 +137,7 @@ pub(all) enum Mix {
   Saturation
   Color
   Luminosity
-} derive(Eq)
+}
 
 pub(all) enum PaintType {
   Solid(AlphaColor)
@@ -182,7 +189,8 @@ pub fn RenderContext::stroke_path(Self, @kurbo.BezPath) -> Unit
 pub fn RenderContext::transform(Self) -> @kurbo.Affine
 pub fn RenderContext::width(Self) -> Int32
 
-type Strip derive(Eq)
+#derive(Eq)
+type Strip
 
 // Type aliases
 

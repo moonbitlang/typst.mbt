@@ -14,7 +14,8 @@ pub using @font_types {type GlyphId, type Fixed, type F26Dot6, type F2Dot14}
 
 ///|
 /// Font size in pixels per em (or unscaled).
-pub(all) struct Size(Float?) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Size(Float?)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

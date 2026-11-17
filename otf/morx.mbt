@@ -16,6 +16,7 @@
 ///|
 /// The feature table is used to compute the sub-feature flags
 /// for a list of requested features and settings.
+#derive(Debug)
 pub(all) struct MorxFeature {
   /// The type of feature.
   kind : UInt16
@@ -25,7 +26,7 @@ pub(all) struct MorxFeature {
   enable_flags : UInt32
   /// Complement of flags for the settings that this feature and setting disable.
   disable_flags : UInt32
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -55,12 +56,13 @@ pub extend MorxFeature with FromData::{size, parse}
 
 ///|
 /// A contextual subtable state table trailing data.
+#derive(Debug)
 pub(all) struct MorxContextualEntryData {
   /// A mark index.
   mark_index : UInt16
   /// A current index.
   current_index : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -162,12 +164,13 @@ fn MorxLigatureSubtable::parse(
 
 ///|
 /// A contextual subtable state table trailing data.
+#derive(Debug)
 pub(all) struct MorxInsertionEntryData {
   /// A current insert index.
   current_insert_index : UInt16
   /// A marked insert index.
   marked_insert_index : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -226,7 +229,8 @@ pub(all) enum MorxSubtableKind {
 
 ///|
 /// A subtable coverage.
-pub(all) struct MorxCoverage(Byte) derive(Debug)
+#derive(Debug)
+pub(all) struct MorxCoverage(Byte)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

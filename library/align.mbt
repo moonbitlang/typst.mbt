@@ -6,11 +6,12 @@
 /// Possible values are horizontal alignments (`start`, `end`, `left`,
 /// `center`, `right`), vertical alignments (`top`, `horizon`, `bottom`) and
 /// 2D alignments, like `{center + horizon}`.
+#derive(Eq, Hash, Debug)
 pub(all) enum Alignment {
   H(HAlignment)
   V(VAlignment)
   Both(HAlignment, VAlignment)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -265,13 +266,14 @@ pub extend Alignment with FromValue::{from_value}
 
 ///|
 /// Where to align something horizontally.
+#derive(Eq, Hash, Debug)
 pub(all) enum HAlignment {
   Start
   Left
   Center
   Right
   End
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -389,12 +391,13 @@ pub extend HAlignment with FromValue::{from_value}
 ///|
 /// A horizontal alignment which only allows `left`/`right` and `start`/`end`,
 /// thus excluding `center`.
+#derive(Eq, Hash, Debug)
 pub(all) enum OuterHAlignment {
   Start
   Left
   Right
   End
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -505,11 +508,12 @@ pub extend OuterHAlignment with FromValue::{from_value}
 
 ///|
 /// Where to align something vertically.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) enum VAlignment {
   Top
   Horizon
   Bottom
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -633,10 +637,11 @@ pub extend VAlignment with FromValue::{from_value}
 ///|
 /// A vertical alignment which only allows `top` and `bottom`, thus excluding
 /// `horizon`.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) enum OuterVAlignment {
   Top
   Bottom
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -830,11 +835,12 @@ pub extend OuterVAlignment with AlignmentComponent::{
 /// An internal representation that combines horizontal or vertical
 /// alignments. The allowed alignment positions are designated by the type
 /// parameters `H` and `V`.
+#derive(Eq, Hash, Debug)
 pub(all) enum SpecificAlignment[H, V] {
   H(H)
   V(V)
   Both(H, V)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -937,11 +943,12 @@ pub extend SpecificAlignment with FromValue::{from_value}
 ///
 /// For horizontal alignment, start is globally left and for vertical alignment
 /// it is globally top.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) enum FixedAlignment {
   Start
   Center
   End
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -13,11 +13,12 @@ fn AatMap::default() -> AatMap {
 
 ///|
 /// `feature_info_t`
+#derive(Eq)
 priv struct AatFeatureInfo {
   kind : Int32
   setting : Int32
   is_exclusive : Bool
-} derive(Eq)
+}
 
 ///|
 fn AatFeatureInfo::default() -> AatFeatureInfo {

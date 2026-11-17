@@ -2,7 +2,8 @@
 
 ///|
 /// The sign of a value (upstream `Sign<T>`, `T` being `f32` or `f64`).
-pub(all) struct Sign(Bool) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Sign(Bool)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -69,7 +70,8 @@ pub fn Sign::to_f64(self : Sign) -> Double {
 ///
 /// This defines how much the instruction pointer is offset
 /// upon taking the respective branch.
-pub(all) struct BranchOffset16(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct BranchOffset16(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -149,7 +151,8 @@ pub fn BranchOffset16::to_i16(self : BranchOffset16) -> Int32 {
 ///
 /// This defines how much the instruction pointer is offset
 /// upon taking the respective branch.
-pub(all) struct BranchOffset(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct BranchOffset(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -229,7 +232,8 @@ pub fn BranchOffset::to_i32(self : BranchOffset) -> Int32 {
 ///|
 /// The accumulated fuel to execute a block via [`Op::ConsumeFuel`]
 /// (upstream `u32`).
-pub(all) struct BlockFuel(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct BlockFuel(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -286,6 +290,7 @@ pub fn BlockFuel::to_u64(self : BlockFuel) -> UInt64 {
 
 ///|
 /// All comparators of fused compare-and-branch instructions.
+#derive(Eq, Hash, Debug)
 pub(all) enum Comparator {
   I32Eq
   I32Ne
@@ -319,7 +324,7 @@ pub(all) enum Comparator {
   F64Le
   F64NotLt
   F64NotLe
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -396,12 +401,13 @@ pub fn Comparator::to_u32(self : Comparator) -> UInt32 {
 
 ///|
 /// Encodes the parameters for the [`Op::BranchCmpFallback`] instruction.
+#derive(Eq, Debug)
 pub(all) struct ComparatorAndOffset {
   /// Encodes the actual binary operator for the conditional branch.
   cmp : Comparator
   /// Encodes the 32-bit branching offset.
   offset : BranchOffset
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -445,7 +451,8 @@ pub fn ComparatorAndOffset::as_u64(self : ComparatorAndOffset) -> UInt64 {
 ///|
 /// A typed shift amount for shift and rotate instructions (upstream
 /// `ShiftAmount<T>`, a [`Const16`]).
-pub(all) struct ShiftAmount(Const16) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ShiftAmount(Const16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -515,7 +522,8 @@ pub fn ShiftAmount::of_u32(input : UInt32, bits : UInt32) -> ShiftAmount? {
 
 ///|
 /// A 64-bit memory address offset.
-pub(all) struct Offset64(UInt64) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Offset64(UInt64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -534,7 +542,8 @@ pub extend Offset64 with @debug.Debug::{to_repr}
 
 ///|
 /// The high 32 bits of an [`Offset64`].
-pub(all) struct Offset64Hi(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Offset64Hi(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -553,7 +562,8 @@ pub extend Offset64Hi with @debug.Debug::{to_repr}
 
 ///|
 /// The low 32 bits of an [`Offset64`].
-pub(all) struct Offset64Lo(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Offset64Lo(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -592,7 +602,8 @@ pub fn Offset64::to_u64(self : Offset64) -> UInt64 {
 
 ///|
 /// An 8-bit encoded load or store address offset.
-pub(all) struct Offset8(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Offset8(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -627,7 +638,8 @@ pub fn Offset8::to_u64(self : Offset8) -> UInt64 {
 
 ///|
 /// A 16-bit encoded load or store address offset (upstream `Const16<u64>`).
-pub(all) struct Offset16(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Offset16(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -662,7 +674,8 @@ pub fn Offset16::to_u64(self : Offset16) -> UInt64 {
 
 ///|
 /// A 64-bit memory address used for some load and store instructions.
-pub(all) struct Address(UInt64) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Address(UInt64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -693,7 +706,8 @@ pub fn Address::to_u64(self : Address) -> UInt64 {
 
 ///|
 /// A 32-bit memory address used for some load and store instructions.
-pub(all) struct Address32(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Address32(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -728,7 +742,8 @@ pub fn Address32::to_u64(self : Address32) -> UInt64 {
 
 ///|
 /// A SIMD lane index immediate (upstream `ImmLaneIdx<N>`).
-pub(all) struct ImmLaneIdx(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

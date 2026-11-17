@@ -15,6 +15,7 @@ pub(open) trait Output {
 
 ///|
 /// The compilation target.
+#derive(Eq, Hash, Debug)
 pub(all) enum Target {
   /// The target that is used for paged, fully laid-out content.
   Paged
@@ -23,7 +24,7 @@ pub(all) enum Target {
   /// The target for _bundle_ export. This export target can produce multiple
   /// [documents]($document) and [assets]($asset) from a single Typst project.
   Bundle
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

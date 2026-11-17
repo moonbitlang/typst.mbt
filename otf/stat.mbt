@@ -5,12 +5,13 @@
 
 ///|
 /// Axis-value pairing for [`StatAxisValueSubtableFormat4`].
+#derive(Debug)
 pub(all) struct StatAxisValue {
   /// Zero-based index into [`StatTable::axes`].
   axis_index : UInt16
   /// Numeric value for this axis.
   value : Fixed
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -107,6 +108,7 @@ pub fn StatAxisValueSubtables::iter(
 
 ///|
 /// The [axis record](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-records) struct provides information about a single design axis.
+#derive(Debug)
 pub(all) struct StatAxisRecord {
   /// Axis tag.
   tag : Tag
@@ -114,7 +116,7 @@ pub(all) struct StatAxisRecord {
   name_id : UInt16
   /// Sort order for e.g. composing font family or face names.
   ordering : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -174,6 +176,7 @@ pub extend StatAxisValueFlags with @debug.Debug::{to_repr}
 
 ///|
 /// Axis value subtable [format 1](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-1).
+#derive(Debug)
 pub(all) struct StatAxisValueSubtableFormat1 {
   /// Zero-based index into [`StatTable::axes`].
   axis_index : UInt16
@@ -183,7 +186,7 @@ pub(all) struct StatAxisValueSubtableFormat1 {
   value_name_id : UInt16
   /// Numeric value for this record.
   value : Fixed
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -213,6 +216,7 @@ pub extend StatAxisValueSubtableFormat1 with FromData::{size, parse}
 
 ///|
 /// Axis value subtable [format 2](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-2).
+#derive(Debug)
 pub(all) struct StatAxisValueSubtableFormat2 {
   /// Zero-based index into [`StatTable::axes`].
   axis_index : UInt16
@@ -226,7 +230,7 @@ pub(all) struct StatAxisValueSubtableFormat2 {
   range_min_value : Fixed
   /// The maximum value for this record.
   range_max_value : Fixed
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -258,6 +262,7 @@ pub extend StatAxisValueSubtableFormat2 with FromData::{size, parse}
 
 ///|
 /// Axis value subtable [format 3](https://learn.microsoft.com/en-us/typography/opentype/spec/stat#axis-value-table-format-3).
+#derive(Debug)
 pub(all) struct StatAxisValueSubtableFormat3 {
   /// Zero-based index into [`StatTable::axes`].
   axis_index : UInt16
@@ -269,7 +274,7 @@ pub(all) struct StatAxisValueSubtableFormat3 {
   value : Fixed
   /// Numeric value for a style-linked mapping.
   linked_value : Fixed
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

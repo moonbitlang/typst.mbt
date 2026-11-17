@@ -51,10 +51,11 @@ pub fn IntLit::get(self : IntLit) -> Result[Int64, IntLiteralError] {
 ///|
 /// Possible errors for integer literals in the AST. Other integer errors are
 /// handled in the lexer.
+#derive(Eq, Debug)
 pub(all) enum IntLiteralError {
   PosOverflow(base~ : NonDecimalBase?, max_plus_one~ : Bool)
   InvalidDigit(NonDecimalBase, String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -124,6 +125,7 @@ pub fn Numeric::get(self : Numeric) -> (Double, NumericUnit) {
 
 ///|
 /// Unit of a numeric value.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumericUnit {
   /// Points.
   Pt
@@ -143,7 +145,7 @@ pub(all) enum NumericUnit {
   Fr
   /// Percentage: `%`.
   Percent
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

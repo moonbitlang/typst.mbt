@@ -12,7 +12,8 @@
 
 ///|
 /// Raised when data is malformed or out of bounds.
-pub suberror Malformed derive(Debug)
+#derive(Debug)
+pub suberror Malformed
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -144,7 +145,8 @@ fn be_u32(data : BytesView, i : Int32) -> UInt32 {
 /// A u24 number.
 ///
 /// Stored as u32, but encoded as 3 bytes in the font.
-pub(all) struct U24(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct U24(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -173,7 +175,8 @@ pub extend U24 with FromData::{size, parse}
 
 ///|
 /// A 16-bit signed fixed number with the low 14 bits of fraction (2.14).
-pub(all) struct F2DOT14(Int16) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct F2DOT14(Int16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -213,7 +216,8 @@ pub extend F2DOT14 with FromData::{size, parse}
 
 ///|
 /// A 32-bit signed fixed-point number (16.16).
-pub(all) struct Fixed(Float) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Fixed(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -991,7 +995,8 @@ pub impl[T : Offset] FromData for T? with fn parse(data) {
 
 ///|
 /// A type-safe u16 offset.
-pub(all) struct Offset16(UInt16) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Offset16(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1033,7 +1038,8 @@ pub extend Offset16 with FromData::{size, parse}
 
 ///|
 /// A type-safe u24 offset.
-pub(all) struct Offset24(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Offset24(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1076,7 +1082,8 @@ pub extend Offset24 with FromData::{size, parse}
 
 ///|
 /// A type-safe u32 offset.
-pub(all) struct Offset32(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Offset32(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

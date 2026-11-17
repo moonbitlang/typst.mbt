@@ -10,6 +10,7 @@ pub const DEFAULT_ACCURACY : Double = 1.0e-6
 /// The nearest position on a curve to some point.
 ///
 /// This is returned by `nearest`.
+#derive(Eq, Debug)
 pub(all) struct Nearest {
   /// The square of the distance from the nearest position on the curve
   /// to the given point.
@@ -18,7 +19,7 @@ pub(all) struct Nearest {
   ///
   /// To resolve this to a [`Point`], use `eval`.
   t : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -136,6 +136,7 @@ pub fn solve_quadratic(c0 : Double, c1 : Double, c2 : Double) -> Array[Double] {
 
 ///|
 /// Defines the connection between two segments of a stroke.
+#derive(Eq, Debug, Hash)
 pub(all) enum Join {
   /// A straight line connecting the segments.
   Bevel
@@ -143,7 +144,7 @@ pub(all) enum Join {
   Miter
   /// An arc between the segments.
   Round
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -162,6 +163,7 @@ pub extend Join with Hash::{hash, hash_combine}
 
 ///|
 /// Defines the shape to be drawn at the ends of a stroke.
+#derive(Eq, Debug, Hash)
 pub(all) enum Cap {
   /// Flat cap.
   Butt
@@ -169,7 +171,7 @@ pub(all) enum Cap {
   Square
   /// Rounded cap with radius equal to half the stroke width.
   Round
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

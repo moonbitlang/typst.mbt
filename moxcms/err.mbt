@@ -1,10 +1,11 @@
 // Port of `moxcms::err`.
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct MalformedSize {
   size : Int32
   expected : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -17,6 +18,7 @@ pub extend MalformedSize with Eq::{not_equal, equal}
 pub extend MalformedSize with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) suberror CmsError {
   LaneSizeMismatch
   LaneMultipleOfChannels
@@ -45,7 +47,7 @@ pub(all) suberror CmsError {
   MalformedTrcCurve(String)
   OutOfMemory(Int32)
   IncorrectlyFormedLut(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

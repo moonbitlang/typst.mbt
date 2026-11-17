@@ -27,7 +27,8 @@ fn u32_at(d : FontData, p : Int32) -> UInt32 {
 
 ///|
 /// A 16.16 version number (`Version16Dot16`).
-pub(all) struct Version16Dot16(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Version16Dot16(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

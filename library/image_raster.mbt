@@ -8,12 +8,13 @@
 /// Decoded pixels (upstream `image::DynamicImage`): 8-bit or 16-bit
 /// (little-endian) samples in
 /// row-major order with `color.channel_count()` channels.
+#derive(Eq, Hash)
 pub struct DynamicImage {
   width : UInt32
   height : UInt32
   color : @codecs.ColorType
   buf : Bytes
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

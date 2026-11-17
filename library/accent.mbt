@@ -3,7 +3,8 @@
 
 ///|
 /// An accent character.
-pub(all) struct Accent(Char) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Accent(Char)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

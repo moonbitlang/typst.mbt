@@ -2,11 +2,12 @@
 
 ///|
 /// An in-development feature that should be enabled.
+#derive(Eq, Hash, Debug)
 pub(all) enum Feature {
   Html
   Bundle
   A11yExtras
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -56,7 +57,8 @@ pub fn Feature::from_str(s : String) -> Feature? {
 
 ///|
 /// A selection of in-development features that should be enabled.
-pub(all) struct Features(Array[Feature]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct Features(Array[Feature])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -85,6 +87,7 @@ pub fn Features::is_enabled(self : Features, feature : Feature) -> Bool {
 
 ///|
 /// Categories of Typst's standard library (used for documentation).
+#derive(Eq, Hash, Debug)
 pub(all) enum Category {
   Foundations
   Introspection
@@ -101,7 +104,7 @@ pub(all) enum Category {
   Svg
   Png
   Bundle
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -120,10 +123,11 @@ pub extend Category with @debug.Debug::{to_repr}
 
 ///|
 /// Describes a deprecation of a binding.
+#derive(Eq, Hash, Debug)
 pub(all) struct Deprecation {
   message : String
   until : String?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -186,12 +190,13 @@ pub fn BindingGuard::silent(features : Features) -> BindingGuard {
 
 ///|
 /// What kind of construct captured a binding.
+#derive(Eq, Hash, Debug)
 pub(all) enum Capturer {
   /// Captured by a function / closure.
   Function
   /// Captured by a context expression.
   Context
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -235,6 +240,7 @@ priv enum BindingKind {
 /// Upstream's `def_site` (where the binding is defined in the Rust source,
 /// typst-library/src/foundations/scope.rs:565) is not ported: there is no
 /// Rust source location to record.
+#derive(Eq, Hash)
 pub(all) struct BindingDocumentation {
   /// The name for the binding.
   name : String
@@ -246,7 +252,7 @@ pub(all) struct BindingDocumentation {
   since : Since?
   /// The keywords associated with this binding.
   keywords : ArrayView[String]
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

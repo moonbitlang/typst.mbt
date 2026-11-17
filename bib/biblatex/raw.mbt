@@ -3,12 +3,13 @@
 
 ///|
 /// A literal representation of a bibliography entry field.
+#derive(Eq, Debug)
 pub(all) enum RawChunk {
   /// A normal field value.
   Normal(String)
   /// A field with strings and abbreviations.
   Abbreviation(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -58,12 +59,13 @@ pub(all) struct Pair {
 
 ///|
 /// An error that might occur during initial parsing of the bibliography.
+#derive(Eq, Debug)
 pub(all) struct ParseError {
   /// Where in the source the error occurred.
   span : Span
   /// What kind of error occurred.
   kind : ParseErrorKind
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -93,6 +95,7 @@ pub extend ParseError with Show::{to_string, output}
 ///|
 /// Error conditions that might occur during initial parsing of the
 /// bibliography.
+#derive(Eq, Debug)
 pub(all) enum ParseErrorKind {
   /// The file ended prematurely.
   UnexpectedEof
@@ -108,7 +111,7 @@ pub(all) enum ParseErrorKind {
   DuplicateKey(String)
   /// A type error occurred while trying to resolve cross-references.
   ResolutionError(TypeErrorKind)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -122,6 +125,7 @@ pub extend ParseErrorKind with @debug.Debug::{to_repr}
 
 ///|
 /// A token that can be encountered during parsing.
+#derive(Eq, Debug)
 pub(all) enum Token {
   /// An identifier for a field key, citation type, abbreviation, or citation
   /// key.
@@ -138,7 +142,7 @@ pub(all) enum Token {
   Equals
   /// A decimal point: `.`.
   DecimalPoint
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

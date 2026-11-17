@@ -621,10 +621,11 @@ fn convert_clip_path_elements_impl(
 }
 
 ///|
+#derive(Eq)
 priv enum Isolation {
   Auto
   Isolate
-} derive(Eq)
+}
 
 ///|
 impl Default for Isolation with fn default() {

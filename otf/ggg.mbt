@@ -10,6 +10,7 @@
 
 ///|
 /// A record that describes a range of glyph IDs.
+#derive(Debug)
 pub(all) struct RangeRecord {
   /// First glyph ID in the range
   start : GlyphId
@@ -17,7 +18,7 @@ pub(all) struct RangeRecord {
   end : GlyphId
   /// Coverage Index of first glyph ID in range.
   value : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

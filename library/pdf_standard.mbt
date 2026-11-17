@@ -8,13 +8,14 @@
 
 ///|
 /// The version of a PDF document (krilla `PdfVersion`).
+#derive(Eq, Hash, Compare, Debug)
 pub(all) enum PdfVersion {
   Pdf14
   Pdf15
   Pdf16
   Pdf17
   Pdf20
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -63,6 +64,7 @@ pub fn PdfVersion::as_str(self : PdfVersion) -> String {
 
 ///|
 /// A PDF/A standard (krilla `Archival`).
+#derive(Eq, Hash, Debug)
 pub(all) enum Archival {
   A1_A
   A1_B
@@ -75,7 +77,7 @@ pub(all) enum Archival {
   A4
   A4F
   A4E
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -133,9 +135,10 @@ pub fn Archival::max(self : Archival) -> PdfVersion {
 
 ///|
 /// A PDF/UA standard (krilla `Accessibility`).
+#derive(Eq, Hash, Debug)
 pub(all) enum Accessibility {
   UA1
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -178,12 +181,13 @@ pub fn Accessibility::max(self : Accessibility) -> PdfVersion {
 
 ///|
 /// A PDF validator for a specific conformance standard (krilla `Validator`).
+#derive(Eq, Hash, Debug)
 pub(all) enum Validator {
   /// A PDF/A validator.
   A(Archival)
   /// A PDF/UA accessibility validator.
   Ua(Accessibility)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -226,10 +230,11 @@ pub fn Validator::as_str(self : Validator) -> String {
 
 ///|
 /// The set of validators of a configuration (krilla `Validators`).
+#derive(Eq, Hash, Debug)
 pub(all) struct Validators {
   a : Archival?
   ua : Accessibility?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -317,10 +322,11 @@ fn Validators::to_and_list(self : Validators) -> String {
 
 ///|
 /// A configuration of validators and PDF version (krilla `Configuration`).
+#derive(Eq, Hash, Debug)
 pub(all) struct PdfConfiguration {
   validators : Validators
   version : PdfVersion
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -375,9 +381,10 @@ fn pdf_configuration_finish(
 
 ///|
 /// Encapsulates a list of compatible PDF standards.
+#derive(Eq, Hash)
 pub(all) struct PdfStandards {
   config : PdfConfiguration
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -563,6 +570,7 @@ pub extend PdfStandards with FromValue::{from_value}
 /// A PDF standard that Typst can enforce conformance with.
 ///
 /// Support for more standards is planned.
+#derive(Eq, Hash, Debug)
 pub(all) enum PdfStandard {
   /// PDF 1.4.
   V_1_4
@@ -598,7 +606,7 @@ pub(all) enum PdfStandard {
   A_4e
   /// PDF/UA-1.
   UA_1
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -779,6 +787,7 @@ fn pdf_attach_elem_data_parse(
 
 ///|
 /// The relationship of an attached file with the document.
+#derive(Eq, Hash, Debug)
 pub(all) enum AttachedFileRelationship {
   /// The PDF document was created from the source file.
   Source
@@ -788,7 +797,7 @@ pub(all) enum AttachedFileRelationship {
   Alternative
   /// Additional resources for the document.
   Supplement
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

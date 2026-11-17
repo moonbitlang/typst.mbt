@@ -4,10 +4,11 @@
 
 ///|
 /// `kurbo::Point` / `kurbo::Vec2`.
+#derive(Eq)
 priv struct KVec2 {
   x : Double
   y : Double
-} derive(Eq)
+}
 
 ///|
 fn KVec2::add(self : KVec2, v : KVec2) -> KVec2 {

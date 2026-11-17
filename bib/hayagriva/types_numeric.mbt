@@ -2,6 +2,7 @@
 
 ///|
 /// A numeric value that can be pluralized.
+#derive(Eq, Hash, Debug)
 pub(all) struct Numeric {
   /// The numeric value.
   value : NumericValue
@@ -9,7 +10,7 @@ pub(all) struct Numeric {
   prefix : String?
   /// A string that is appended to the value.
   suffix : String?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -307,6 +308,7 @@ pub fn Numeric::from_str(value : String) -> Result[Numeric, NumericError] {
 
 ///|
 /// Error when parsing a numeric value.
+#derive(Eq, Debug)
 pub(all) enum NumericError {
   /// No number was found.
   NoNumber
@@ -317,7 +319,7 @@ pub(all) enum NumericError {
   NotADelimiter
   /// The string does not contain a delimiter.
   MissingDelimiter
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -363,12 +365,13 @@ fn number(s : @unscanny.Scanner) -> Int32? {
 
 ///|
 /// The numeric value.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumericValue {
   /// A single number.
   Number(Int32)
   /// A set of numbers.
   Set(Array[(Int32, NumericDelimiter?)])
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -419,6 +422,7 @@ fn NumericValue::numbers(self : NumericValue) -> Array[Int32] {
 
 ///|
 /// Delimits individual numbers in a numeric value.
+#derive(Eq, Hash, Debug)
 pub(all) enum NumericDelimiter {
   /// A comma.
   Comma
@@ -426,7 +430,7 @@ pub(all) enum NumericDelimiter {
   Ampersand
   /// A hyphen. Will be converted to an en dash for display.
   Hyphen
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

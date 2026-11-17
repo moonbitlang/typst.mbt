@@ -12,6 +12,7 @@
 /// An untyped value.
 ///
 /// Provides a dense and simple interface to all functional Wasm operations.
+#derive(Eq, Compare, Hash, Debug)
 #valtype
 pub struct UntypedVal {
   /// The low 64-bits of an [`UntypedVal`].
@@ -25,7 +26,7 @@ pub struct UntypedVal {
   /// This is only used to encode or decode types which do not fit
   /// into the lower 64-bits part such as Wasm's `V128` or `i128`.
   hi64 : UInt64
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -283,10 +284,11 @@ pub fn UntypedVal::from_v128(value : V128Value) -> UntypedVal {
 
 ///|
 /// An error that may occur upon encoding or decoding slices of [`UntypedVal`].
+#derive(Debug)
 pub(all) suberror UntypedError {
   /// The [`UntypedVal`] slice length did not match `Self`.
   InvalidLen
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

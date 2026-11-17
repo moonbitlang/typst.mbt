@@ -107,6 +107,7 @@ fn HintErrorKind::message(self : HintErrorKind) -> String {
 
 ///|
 /// Describes the source for a piece of bytecode.
+#derive(Eq)
 priv enum Program {
   /// Program that initializes the function and instruction tables (fpgm).
   Font
@@ -114,7 +115,7 @@ priv enum Program {
   ControlValue
   /// Glyph specified program.
   Glyph
-} derive(Eq)
+}
 
 ///|
 fn Program::index(self : Program) -> Int32 {

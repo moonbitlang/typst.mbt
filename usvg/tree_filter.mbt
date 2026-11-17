@@ -113,11 +113,12 @@ pub fn FilterKind::has_input(self : FilterKind, input : FilterInput) -> Bool {
 
 ///|
 /// Identifies input for a filter primitive.
+#derive(Eq)
 pub(all) enum FilterInput {
   SourceGraphic
   SourceAlpha
   Reference(String)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -128,10 +129,11 @@ pub extend FilterInput with Eq::{not_equal, equal}
 /// A color interpolation mode.
 ///
 /// The default is `ColorInterpolation::LinearRGB`.
+#derive(Eq)
 pub(all) enum ColorInterpolation {
   SRGB
   LinearRGB
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -230,6 +232,7 @@ pub(all) struct FeComposite {
 
 ///|
 /// An images compositing operation.
+#derive(Eq)
 pub(all) enum CompositeOperator {
   Over
   In
@@ -237,7 +240,7 @@ pub(all) enum CompositeOperator {
   Atop
   Xor
   Arithmetic(k1~ : Float, k2~ : Float, k3~ : Float, k4~ : Float)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -324,11 +327,12 @@ pub fn ConvolveMatrixData::get(
 
 ///|
 /// An edges processing mode.
+#derive(Eq)
 pub(all) enum EdgeMode {
   EdgeNone
   Duplicate
   Wrap
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -349,12 +353,13 @@ pub(all) struct FeDisplacementMap {
 
 ///|
 /// A color channel.
+#derive(Eq)
 pub(all) enum ColorChannel {
   R
   G
   B
   A
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -501,10 +506,11 @@ pub(all) struct FeMorphology {
 
 ///|
 /// A morphology operation.
+#derive(Eq)
 pub(all) enum MorphologyOperator {
   Erode
   Dilate
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -544,10 +550,11 @@ pub(all) struct FeTurbulence {
 
 ///|
 /// A turbulence kind for the `feTurbulence` filter.
+#derive(Eq)
 pub(all) enum TurbulenceKind {
   FractalNoise
   Turbulence
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

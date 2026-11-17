@@ -74,11 +74,12 @@ fn Extents::intersect(self : Extents, o : Extents) -> Unit {
 }
 
 ///|
+#derive(Eq)
 priv enum BoundsStatus {
   Empty
   Bounded
   Unbounded
-} derive(Eq)
+}
 
 ///|
 priv struct Bounds {

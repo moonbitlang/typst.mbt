@@ -1,12 +1,13 @@
 // Port of `moxcms::trc` (tone reproduction curves).
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum ToneReprCurve {
   /// Sampled curve (`u16` entries).
   Lut(FixedArray[Int32])
   /// Parametric curve parameters.
   Parametric(FixedArray[Float])
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

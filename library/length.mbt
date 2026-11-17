@@ -3,13 +3,14 @@
 
 ///|
 /// A size or distance, possibly expressed with contextual units.
+#derive(Default, Eq, Hash)
 #valtype
 pub(all) struct Length {
   /// The absolute part.
   abs : Abs
   /// The font-relative part.
   em : Em
-} derive(Default, Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

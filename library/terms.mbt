@@ -3,7 +3,8 @@
 
 ///|
 /// A term list item (upstream `Packed<TermItem>`).
-pub(all) struct TermItem(Content) derive(Eq)
+#derive(Eq)
+pub(all) struct TermItem(Content)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

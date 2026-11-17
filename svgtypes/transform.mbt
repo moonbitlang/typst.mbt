@@ -4,6 +4,7 @@
 /// Representation of the [`<transform>`] type.
 ///
 /// [`<transform>`]: https://www.w3.org/TR/SVG2/coords.html#InterfaceSVGTransform
+#derive(Eq, Debug)
 pub(all) struct Transform {
   a : Double
   b : Double
@@ -11,7 +12,7 @@ pub(all) struct Transform {
   d : Double
   e : Double
   f : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -46,6 +47,7 @@ pub extend Transform with Default::{default}
 
 ///|
 /// Transform list token.
+#derive(Eq, Debug)
 pub(all) enum TransformListToken {
   Matrix(
     a~ : Double,
@@ -60,7 +62,7 @@ pub(all) enum TransformListToken {
   Rotate(angle~ : Double)
   SkewX(angle~ : Double)
   SkewY(angle~ : Double)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

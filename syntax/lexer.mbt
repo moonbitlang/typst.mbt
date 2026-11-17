@@ -929,11 +929,12 @@ fn Lexer::ident(self : Lexer, start : Int32) -> SyntaxKind {
 
 ///|
 /// The numeric base of a non-decimal integer literal.
+#derive(Eq, Debug)
 pub(all) enum NonDecimalBase {
   Hex
   Octal
   Binary
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

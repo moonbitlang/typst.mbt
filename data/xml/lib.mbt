@@ -22,10 +22,11 @@ const XMLNS : String = "xmlns"
 ///
 /// Position indicates a row/line and a column in the original text. Starting
 /// from 1:1. The column is counted in chars.
+#derive(Eq, Debug)
 pub(all) struct TextPos {
   row : Int32
   col : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -111,6 +112,7 @@ pub fn Document::input_text(self : Document) -> String {
 
 ///|
 /// A list of supported node types.
+#derive(Eq, Debug)
 pub(all) enum NodeType {
   /// The root node of the `Document`.
   Root
@@ -124,7 +126,7 @@ pub(all) enum NodeType {
   Comment
   /// A text node.
   Text
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -138,10 +140,11 @@ pub extend NodeType with @debug.Debug::{to_repr}
 
 ///|
 /// A processing instruction.
+#derive(Eq, Debug)
 pub(all) struct PI {
   target : String
   value : String?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -250,10 +253,11 @@ pub fn Attribute::range_value(self : Attribute) -> (Int32, Int32) {
 /// A namespace.
 ///
 /// Contains URI and *prefix* pair.
+#derive(Eq, Debug)
 pub struct Namespace {
   priv name : String?
   priv uri : String
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -364,10 +368,11 @@ fn ExpandedNameIndexed::as_expanded_name(
 /// An expanded name.
 ///
 /// Contains an namespace URI and name pair.
+#derive(Eq)
 pub(all) struct ExpandedName {
   uri : String?
   name : String
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

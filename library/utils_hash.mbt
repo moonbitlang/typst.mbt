@@ -14,13 +14,14 @@
 ///
 /// A value type: every [hash128] gives one, and they are the keys of the
 /// memoization tables.
+#derive(Eq, Compare, Default, Debug)
 #valtype
 pub(all) struct U128 {
   /// The upper 64 bits.
   hi : UInt64
   /// The lower 64 bits.
   lo : UInt64
-} derive(Eq, Compare, Default, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

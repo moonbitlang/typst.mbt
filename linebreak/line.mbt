@@ -9,6 +9,7 @@
 /// Each enum value has the same meaning with respect to the `line-break`
 /// property values in the CSS Text spec. See the details in
 /// <https://drafts.csswg.org/css-text-3/#line-break-property>.
+#derive(Eq, Debug)
 pub(all) enum LineBreakStrictness {
   /// Breaks text using the least restrictive set of line-breaking rules.
   Loose
@@ -25,7 +26,7 @@ pub(all) enum LineBreakStrictness {
   /// typographic character unit, disregarding any prohibition against line
   /// breaks.
   Anywhere
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -40,6 +41,7 @@ pub extend LineBreakStrictness with @debug.Debug::{to_repr}
 ///|
 /// An enum specifies the line break opportunities between letters. It can be
 /// passed as an argument when creating a line segmenter.
+#derive(Eq, Debug)
 pub(all) enum LineBreakWordOption {
   /// Words break according to their customary rules.
   Normal
@@ -47,7 +49,7 @@ pub(all) enum LineBreakWordOption {
   BreakAll
   /// Breaking is forbidden within "word".
   KeepAll
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

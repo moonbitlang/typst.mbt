@@ -8,12 +8,13 @@
 ///|
 /// A type of extraction query, indicating as what kind of object you want to
 /// extract the page.
+#derive(Eq, Debug)
 pub(all) enum ExtractionQueryType {
   /// Extract the page as an `XObject`.
   XObject
   /// Extract the page as a new page.
   Page
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -27,10 +28,11 @@ pub extend ExtractionQueryType with @debug.Debug::{to_repr}
 
 ///|
 /// An extraction query.
+#derive(Eq, Debug)
 pub(all) struct ExtractionQuery {
   query_type : ExtractionQueryType
   page_index : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -56,10 +58,11 @@ pub fn ExtractionQuery::new_xobject(page_index : Int32) -> ExtractionQuery {
 
 ///|
 /// An error that occurred during page extraction.
+#derive(Eq, Debug)
 pub(all) enum ExtractionError {
   /// An invalid page index was given.
   InvalidPageIndex(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -4,7 +4,8 @@
 
 ///|
 /// Track sizing definitions.
-pub(all) struct TrackSizings(Array[Sizing]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct TrackSizings(Array[Sizing])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -89,11 +90,12 @@ pub extend TrackSizings with FromValue::{from_value}
 
 ///|
 /// Any child of a grid element.
+#derive(Eq)
 pub(all) enum GridChild {
   Header(Content)
   Footer(Content)
   Item(GridItem)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -172,11 +174,12 @@ pub fn GridChild::try_from(value : Content) -> GridChild raise HintedError {
 
 ///|
 /// A grid item, which is the basic unit of grid specification.
+#derive(Eq)
 pub(all) enum GridItem {
   HLine(Content)
   VLine(Content)
   Cell(Content)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -344,6 +347,7 @@ pub extend GridCell with FromValue::{from_value}
 ///
 /// The variants are prefixed (upstream `Value`, `Func`, `Array`) to avoid
 /// ambiguity with the constructors of [Value].
+#derive(Eq)
 pub(all) enum Celled[T] {
   /// A bare value, the same for all cells.
   CelledValue(T)
@@ -351,7 +355,7 @@ pub(all) enum Celled[T] {
   CelledFunc(Func)
   /// An array of alignment values corresponding to each column.
   CelledArray(Array[T])
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -10,9 +10,10 @@ import {
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub struct Name {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn Name::as_str(Self) -> String?
 pub fn Name::data(Self) -> BytesView
 pub fn Name::decode(Self) -> Result[Bytes, PsError]
@@ -20,39 +21,44 @@ pub fn Name::decode_into(Self, Array[Byte]) -> Result[Unit, PsError]
 pub fn Name::is_literal(Self) -> Bool
 pub impl Show for Name
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Number {
   Integer(Int32)
   Real(Float)
-} derive(Eq, @debug.Debug)
+}
 pub fn Number::as_f32(Self) -> Float
 pub fn Number::as_f64(Self) -> Double
 pub fn Number::as_i32(Self) -> Int32
 pub impl Show for Number
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Object {
   Number(Number)
   Name(Name)
   String(PsString)
   Array(PsArray)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for Object
 
+#derive(Eq, @debug.Debug)
 pub struct PsArray {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn PsArray::objects(Self) -> Scanner
 pub impl Show for PsArray
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PsError {
   SyntaxError
   LimitCheck
   UnsupportedType
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for PsError
 
+#derive(Eq, @debug.Debug)
 pub struct PsString {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn PsString::decode(Self) -> Result[Bytes, PsError]
 pub fn PsString::decode_into(Self, Array[Byte]) -> Result[Unit, PsError]
 pub impl Show for PsString

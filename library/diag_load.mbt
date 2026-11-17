@@ -6,6 +6,7 @@
 /// A call site independent error that occurred during data loading. This
 /// avoids polluting the memoization with spans and file ids from source
 /// files. Can be turned into a [SourceDiagnostic] using [LoadError::within].
+#derive(Eq, Hash, Debug)
 pub(all) struct LoadError {
   /// The position in the file at which the error occurred, or `None` for
   /// binary sources.
@@ -13,7 +14,7 @@ pub(all) struct LoadError {
   /// Must contain a message formatted like this: `"failed to do thing
   /// (cause)"`.
   message : String
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -32,9 +33,10 @@ pub extend LoadError with @debug.Debug::{to_repr}
 
 ///|
 /// A data-loading error (upstream `LoadResult<T>`'s error).
+#derive(Debug)
 pub(all) suberror LoadErr {
   LoadErr(LoadError)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -190,6 +192,7 @@ fn pop_char(s : String) -> String {
 
 ///|
 /// A position in a text document at which an error was reported.
+#derive(Eq, Hash, Debug)
 pub(all) enum ReportTextPos {
   /// Contains a range, and a line/column pair.
   Full(Int32, Int32, LineCol)
@@ -200,7 +203,7 @@ pub(all) enum ReportTextPos {
   /// No position (upstream `ReportTextPos::None`, renamed to avoid clashing
   /// with `Value::None`).
   NoPos
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -277,12 +280,13 @@ fn ReportTextPos::try_line_col(self : ReportTextPos, bytes : Bytes) -> LineCol? 
 
 ///|
 /// A line/column pair.
+#derive(Eq, Hash, Debug)
 pub(all) struct LineCol {
   /// The 0-based line.
   line : Int32
   /// The 0-based column.
   col : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -353,13 +357,14 @@ pub fn LineCol::numbers(self : LineCol) -> (Int32, Int32) {
 
 ///|
 /// A UTF-8 decoding error (upstream `std::str::Utf8Error`).
+#derive(Eq, Debug)
 pub(all) struct Utf8Error {
   /// The index up to which valid UTF-8 was verified.
   valid_up_to : Int32
   /// The length of the invalid byte sequence, or `None` if the end of the
   /// input was reached unexpectedly.
   error_len : Int32?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

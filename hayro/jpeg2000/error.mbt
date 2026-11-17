@@ -3,6 +3,7 @@
 
 ///|
 /// Errors related to JP2 file format and box parsing.
+#derive(Eq, Debug)
 pub(all) enum FormatError {
   /// Invalid JP2 signature.
   InvalidSignature
@@ -14,7 +15,7 @@ pub(all) enum FormatError {
   MissingCodestream
   /// Unsupported JP2 image format.
   Unsupported
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,6 +29,7 @@ pub extend FormatError with @debug.Debug::{to_repr}
 
 ///|
 /// Errors related to codestream markers.
+#derive(Eq, Debug)
 pub(all) enum MarkerError {
   /// Invalid marker encountered.
   Invalid
@@ -39,7 +41,7 @@ pub(all) enum MarkerError {
   Missing(String)
   /// Failed to read or parse a marker.
   ParseFailure(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -53,6 +55,7 @@ pub extend MarkerError with @debug.Debug::{to_repr}
 
 ///|
 /// Errors related to tile processing.
+#derive(Eq, Debug)
 pub(all) enum TileError {
   /// Invalid image tile was encountered.
   Invalid
@@ -62,7 +65,7 @@ pub(all) enum TileError {
   InvalidOffsets
   /// PPT marker present when PPM marker exists in main header.
   PpmPptConflict
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -76,6 +79,7 @@ pub extend TileError with @debug.Debug::{to_repr}
 
 ///|
 /// Errors related to image dimensions and validation.
+#derive(Eq, Debug)
 pub(all) enum ValidationError {
   /// Invalid image dimensions.
   InvalidDimensions
@@ -99,7 +103,7 @@ pub(all) enum ValidationError {
   MissingStepSize
   /// Invalid quantization exponents.
   InvalidExponents
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -113,6 +117,7 @@ pub extend ValidationError with @debug.Debug::{to_repr}
 
 ///|
 /// Errors related to decoding operations.
+#derive(Eq, Debug)
 pub(all) enum DecodingError {
   /// An error occurred while decoding a code-block.
   CodeBlockDecodeFailure
@@ -128,7 +133,7 @@ pub(all) enum DecodingError {
   InvalidProgressionIterator
   /// Unexpected end of data.
   UnexpectedEof
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -142,6 +147,7 @@ pub extend DecodingError with @debug.Debug::{to_repr}
 
 ///|
 /// Errors related to color space and component handling.
+#derive(Eq, Debug)
 pub(all) enum ColorError {
   /// Multi-component transform failed.
   Mct
@@ -151,7 +157,7 @@ pub(all) enum ColorError {
   SyccConversionFailed
   /// Failed to convert from LAB to RGB.
   LabConversionFailed
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -165,6 +171,7 @@ pub extend ColorError with @debug.Debug::{to_repr}
 
 ///|
 /// The main error type for JPEG 2000 decoding operations.
+#derive(Eq, Debug)
 pub(all) suberror DecodeError {
   /// Errors related to JP2 file format and box parsing.
   Format(FormatError)
@@ -178,7 +185,7 @@ pub(all) suberror DecodeError {
   Decoding(DecodingError)
   /// Errors related to color space and component handling.
   Color(ColorError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

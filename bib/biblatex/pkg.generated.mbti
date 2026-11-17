@@ -112,37 +112,42 @@ pub fn Bibliography::length(Self) -> Int32
 pub fn Bibliography::new() -> Self
 pub fn Bibliography::parse(String) -> Result[Self, ParseError]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Chunk {
   Normal(String)
   Verbatim(String)
   Math(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn Chunk::get(Self) -> String
 pub fn Chunk::to_biblatex_string(Self, Bool) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Date {
   value : DateValue
   uncertain : Bool
   approximate : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn Date::parse(ArrayView[Spanned[Chunk]]) -> Result[Self, TypeError]
 pub fn Date::parse_three_fields(ArrayView[Spanned[Chunk]], ArrayView[Spanned[Chunk]]?, ArrayView[Spanned[Chunk]]?) -> Result[Self, TypeError]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DateValue {
   At(Datetime)
   After(Datetime)
   Before(Datetime)
   Between(Datetime, Datetime)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Datetime {
   year : Int32
   month : Int32?
   day : Int32?
   time : Time?
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for Datetime
 
+#derive(Eq, @debug.Debug)
 pub(all) enum EditorType {
   Editor
   Compiler
@@ -154,7 +159,7 @@ pub(all) enum EditorType {
   Organizer
   Director
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for EditorType
 
 pub(all) struct Entry {
@@ -266,6 +271,7 @@ pub fn Entry::version(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
 pub fn Entry::volume(Self) -> Result[PermissiveType[Int64], RetrievalError]
 pub fn Entry::volumes(Self) -> Result[Int64, RetrievalError]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum EntryType {
   Article
   Book
@@ -301,7 +307,7 @@ pub(all) enum EntryType {
   Set
   XData
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn EntryType::is_collection(Self) -> Bool
 pub fn EntryType::is_multi_volume(Self) -> Bool
 pub fn EntryType::new(String) -> Self
@@ -309,6 +315,7 @@ pub fn EntryType::to_biblatex(Self) -> Self
 pub fn EntryType::to_bibtex(Self) -> Self
 pub impl Show for EntryType
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Gender {
   SingularFemale
   SingularMale
@@ -316,14 +323,16 @@ pub(all) enum Gender {
   PluralFemale
   PluralMale
   PluralNeuter
-} derive(Eq, @debug.Debug)
+}
 pub fn Gender::coalesce(Array[Self]) -> Self?
 pub fn Gender::plural(Self) -> Self
 pub fn Gender::singular(Self) -> Self
 pub impl Show for Gender
 
-pub(all) struct IntRange(Int64, Int64) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct IntRange(Int64, Int64)
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Language {
   Basque
   Bulgarian
@@ -368,11 +377,12 @@ pub(all) enum Language {
   Swedish
   Turkish
   Ukrainian
-} derive(Eq, @debug.Debug)
+}
 pub fn Language::from_str(String) -> Self?
 pub fn Language::to_langid(Self) -> String
 pub impl Show for Language
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Pagination {
   Page
   Column
@@ -380,7 +390,7 @@ pub(all) enum Pagination {
   Verse
   Section
   Paragraph
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for Pagination
 
 pub(all) struct Pair {
@@ -388,13 +398,15 @@ pub(all) struct Pair {
   value : Spanned[Array[Spanned[RawChunk]]]
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ParseError {
   span : Span
   kind : ParseErrorKind
-} derive(Eq, @debug.Debug)
+}
 pub fn ParseError::new(Span, ParseErrorKind) -> Self
 pub impl Show for ParseError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ParseErrorKind {
   UnexpectedEof
   Unexpected(Token)
@@ -403,16 +415,18 @@ pub(all) enum ParseErrorKind {
   MalformedCommand
   DuplicateKey(String)
   ResolutionError(TypeErrorKind)
-} derive(Eq, @debug.Debug)
+}
 pub fn ParseErrorKind::output(Self, &Logger) -> Unit
 pub fn ParseErrorKind::to_string(Self) -> String
 pub impl Show for ParseErrorKind
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PermissiveType[T] {
   Typed(T)
   Chunks(Array[Spanned[Chunk]])
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Person {
   name : String
   given_name : String
@@ -422,7 +436,7 @@ pub(all) struct Person {
   prefix_initials : String?
   given_initials : String?
   use_prefix : Bool?
-} derive(Eq, @debug.Debug)
+}
 pub fn Person::output(Self, &Logger) -> Unit
 pub fn Person::parse(ArrayView[Spanned[Chunk]]) -> Self
 pub fn Person::to_string(Self) -> String
@@ -435,10 +449,11 @@ pub(all) struct RawBibliography {
 }
 pub fn RawBibliography::parse(String) -> Result[Self, ParseError]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RawChunk {
   Normal(String)
   Abbreviation(String)
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct RawEntry {
   key : Spanned[String]
@@ -446,40 +461,46 @@ pub(all) struct RawEntry {
   fields : Array[Pair]
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RetrievalError {
   Missing(String)
   TypeError(TypeError)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for RetrievalError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Span {
   start : Int32
   end : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn Span::is_empty(Self) -> Bool
 pub fn Span::new(Int32, Int32) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Spanned[T] {
   mut v : T
   mut span : Span
-} derive(Eq, @debug.Debug)
+}
 pub fn[T] Spanned::detached(T) -> Self[T]
 pub fn[T] Spanned::is_detached(Self[T]) -> Bool
 pub fn[T] Spanned::new(T, Span) -> Self[T]
 pub fn[T] Spanned::zero(T) -> Self[T]
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Time {
   hour : Int32
   minute : Int32
   second : Int32
   offset : TimeOffset?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TimeOffset {
   Utc
   Offset(positive~ : Bool, hours~ : Int32, minutes~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Token {
   Identifier
   OpeningBrace
@@ -488,16 +509,18 @@ pub(all) enum Token {
   QuotationMark
   Equals
   DecimalPoint
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for Token
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TypeError {
   span : Span
   kind : TypeErrorKind
-} derive(Eq, @debug.Debug)
+}
 pub fn TypeError::new(Span, TypeErrorKind) -> Self
 pub impl Show for TypeError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TypeErrorKind {
   UndefinedRange
   DayOutOfRange
@@ -512,7 +535,7 @@ pub(all) enum TypeErrorKind {
   UnknownEditorType
   UnknownLangId
   YearZeroCE
-} derive(Eq, @debug.Debug)
+}
 pub fn TypeErrorKind::output(Self, &Logger) -> Unit
 pub fn TypeErrorKind::to_string(Self) -> String
 pub impl Show for TypeErrorKind

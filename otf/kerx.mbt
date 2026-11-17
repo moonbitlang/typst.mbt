@@ -45,10 +45,11 @@ pub fn KerxSubtable0::glyphs_kerning(
 
 ///|
 /// A state machine entry.
+#derive(Debug)
 pub(all) struct KerxEntryData {
   /// An action index.
   action_index : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

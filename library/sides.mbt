@@ -2,6 +2,7 @@
 
 ///|
 /// A container with left, top, right and bottom components.
+#derive(Default, Eq, Hash, Debug)
 pub(all) struct Sides[T] {
   /// The value for the left side.
   left : T
@@ -11,7 +12,7 @@ pub(all) struct Sides[T] {
   right : T
   /// The value for the bottom side.
   bottom : T
-} derive(Default, Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -197,6 +198,7 @@ pub extend Sides with FromValue::{from_value}
 
 ///|
 /// The four sides of objects.
+#derive(Eq, Hash, Debug)
 pub(all) enum Side {
   /// The left side.
   Left
@@ -206,7 +208,7 @@ pub(all) enum Side {
   Right
   /// The bottom side.
   Bottom
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

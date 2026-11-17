@@ -86,6 +86,7 @@ pub fn Library::from_entries(entries : Array[Entry]) -> Library {
 ///|
 /// A language identifier (port of the parts of `unic_langid` that are
 /// used).
+#derive(Eq, Hash, Debug)
 pub(all) struct LanguageIdentifier {
   /// The language subtag (lowercase).
   language : String
@@ -95,7 +96,7 @@ pub(all) struct LanguageIdentifier {
   region : String?
   /// Variant subtags (lowercase).
   variants : Array[String]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -191,6 +192,7 @@ pub extend LanguageIdentifier with Show::{to_string, output}
 
 ///|
 /// A citable item in a bibliography.
+#derive(Eq, Hash, Debug)
 pub(all) struct Entry {
   /// The key of the entry.
   key : String
@@ -258,7 +260,7 @@ pub(all) struct Entry {
   /// Item in which the item was published / to which it is strongly
   /// associated to.
   mut parents : Array[Entry]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

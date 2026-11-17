@@ -367,10 +367,11 @@ fn ProgressionOrder::from_u8(value : Int32) -> ProgressionOrder? {
 
 ///|
 /// Wavelet transformation type (Table A.20).
+#derive(Eq)
 priv enum WaveletTransform {
   Irreversible97
   Reversible53
-} derive(Eq)
+}
 
 ///|
 fn WaveletTransform::from_u8(value : Int32) -> WaveletTransform? {
@@ -444,11 +445,12 @@ fn CodeBlockStyle::from_u8(value : Int32) -> CodeBlockStyle {
 
 ///|
 /// Quantization style (Table A.28).
+#derive(Eq)
 priv enum QuantizationStyle {
   NoQuantization
   ScalarDerived
   ScalarExpounded
-} derive(Eq)
+}
 
 ///|
 fn QuantizationStyle::from_u8(value : Int32) -> QuantizationStyle? {

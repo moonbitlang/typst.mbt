@@ -1,6 +1,7 @@
 ///|
 /// An interned version of [RootedPath] (see `path.mbt`; non-zero, 16 bits).
-pub struct FileId(UInt16) derive(Eq, Hash, Compare)
+#derive(Eq, Hash, Compare)
+pub struct FileId(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -43,7 +44,8 @@ pub fn FileId::into_raw(self : FileId) -> UInt16 {
 /// - Typst source file:           2 ..= 2^47-1      (one 47-bit number)
 /// - External file start:      2^47 ..= 2^47+2^46-1 (one 46-bit number)
 /// - Internal range span: 2^47+2^46 ..= 2^48-1      (two 23-bit numbers)
-pub(all) struct Span(UInt64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct Span(UInt64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -67,7 +69,8 @@ pub extend Span with @debug.Debug::{to_repr}
 
 ///|
 /// The unique number of a span within its source.
-pub(all) struct SpanNumber(UInt64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct SpanNumber(UInt64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -91,6 +94,7 @@ pub extend SpanNumber with @debug.Debug::{to_repr}
 
 ///|
 /// The possible kinds of span.
+#derive(Eq, Debug)
 pub(all) enum SpanKind {
   /// A span that does not point into any file.
   Detached
@@ -98,7 +102,7 @@ pub(all) enum SpanKind {
   Number(id~ : FileId, num~ : SpanNumber)
   /// A raw byte range in a file.
   Range(id~ : FileId, start~ : Int32, end~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -229,10 +233,11 @@ pub fn Span::or(self : Span, other : Span) -> Span {
 
 ///|
 /// A non-empty range targeting a smaller part of a spanned section of text.
+#derive(Eq, Hash, Debug)
 pub(all) struct SubRange {
   start : Int32
   end : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -274,10 +279,11 @@ pub fn SubRange::to_absolute(self : SubRange, offset : Int32) -> (Int32, Int32) 
 ///|
 /// The span of a diagnostic message: either from a Typst source file (with an
 /// optional sub-range) or from a loaded external file.
+#derive(Eq, Hash, Debug)
 pub(all) struct DiagSpan {
   span : Span
   extra : UInt64
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -296,6 +302,7 @@ pub extend DiagSpan with @debug.Debug::{to_repr}
 
 ///|
 /// The possible kinds of a diagnostic span.
+#derive(Eq, Debug)
 pub(all) enum DiagSpanKind {
   /// A span that does not point into any file.
   Detached
@@ -303,7 +310,7 @@ pub(all) enum DiagSpanKind {
   Number(id~ : FileId, num~ : SpanNumber, sub_range~ : SubRange?)
   /// A raw byte range in a file.
   Range(id~ : FileId, start~ : Int32, end~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -403,10 +410,11 @@ pub fn DiagSpan::get(self : DiagSpan) -> DiagSpanKind {
 
 ///|
 /// A value with a span locating it in the source code.
+#derive(Eq, Hash, Debug)
 pub(all) struct Spanned[T] {
   v : T
   span : Span
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -425,10 +433,11 @@ pub extend Spanned with @debug.Debug::{to_repr}
 
 ///|
 /// A value with a diagnostic span.
+#derive(Eq, Hash, Debug)
 pub(all) struct DiagSpanned[T] {
   v : T
   span : DiagSpan
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

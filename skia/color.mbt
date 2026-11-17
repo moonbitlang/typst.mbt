@@ -12,7 +12,8 @@ pub let alpha_u8_opaque : Int32 = 0xFF
 
 ///|
 /// An 8-bit RGBA color value (`r | g << 8 | b << 16 | a << 24`).
-pub(all) struct ColorU8(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct ColorU8(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -79,7 +80,8 @@ pub fn ColorU8::premultiply(self : ColorU8) -> PremultipliedColorU8 {
 
 ///|
 /// An 8-bit, premultiplied RGBA color value.
-pub(all) struct PremultipliedColorU8(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct PremultipliedColorU8(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -220,12 +222,13 @@ pub fn f32_to_u16(x : Float) -> Int32 {
 /// # Guarantees
 ///
 /// - All values are in 0..=1 range.
+#derive(Eq, Debug)
 pub(all) struct Color {
   r : Float
   g : Float
   b : Float
   a : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -348,12 +351,13 @@ pub fn Color::to_color_u8(self : Color) -> ColorU8 {
 
 ///|
 /// A premultiplied RGBA color value, holding four floating point components.
+#derive(Eq, Debug)
 pub(all) struct PremultipliedColor {
   r : Float
   g : Float
   b : Float
   a : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -428,6 +432,7 @@ fn color_f32_to_u8(r : Float, g : Float, b : Float, a : Float) -> UInt32 {
 
 ///|
 /// The colorspace used to interpret pixel values.
+#derive(Eq, Debug)
 pub(all) enum ColorSpace {
   /// Linear RGB. The default.
   Linear
@@ -437,7 +442,7 @@ pub(all) enum ColorSpace {
   SimpleSRGB
   /// Full sRGB transfer function.
   FullSRGBGamma
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

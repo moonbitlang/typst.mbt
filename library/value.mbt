@@ -95,6 +95,7 @@ pub fn Value::numeric(v : Double, unit : NumericUnit) -> Value {
 
 ///|
 /// The units of numeric literals (upstream `ast::Unit`).
+#derive(Eq, Debug)
 pub(all) enum NumericUnit {
   Pt
   Mm
@@ -105,7 +106,7 @@ pub(all) enum NumericUnit {
   Em
   Fr
   Percent
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

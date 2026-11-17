@@ -10,10 +10,11 @@
 // affects the placement of gradients on dashed curves.
 
 ///|
+#derive(Eq)
 priv struct KPoint {
   x : Double
   y : Double
-} derive(Eq)
+}
 
 ///|
 fn KPoint::add(self : KPoint, v : KPoint) -> KPoint {

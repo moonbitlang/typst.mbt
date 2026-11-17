@@ -566,6 +566,7 @@ pub extend GridCell with ResolvableCell::{
 ///|
 /// Represents an explicit grid line (horizontal or vertical) specified by the
 /// user.
+#derive(Eq)
 pub(all) struct Line {
   /// The index of the track after this line. This will be the index of the
   /// row a horizontal line is above of, or of the column right after a
@@ -587,7 +588,7 @@ pub(all) struct Line {
   stroke : ResolvedStroke?
   /// The line's position in relation to the track with its index.
   position : LinePosition
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -596,10 +597,11 @@ pub extend Line with Eq::{not_equal, equal}
 
 ///|
 /// A range of rows `start..end` (upstream `Range<usize>`).
+#derive(Eq, Hash, Debug)
 pub(all) struct RowRange {
   start : Int32
   end : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -624,6 +626,7 @@ pub fn RowRange::contains(self : RowRange, row : Int32) -> Bool {
 
 ///|
 /// A repeatable grid header. Starts at the first row.
+#derive(Eq)
 pub(all) struct Header {
   /// The range of rows included in this header.
   mut range : RowRange
@@ -639,7 +642,7 @@ pub(all) struct Header {
   /// it is at the end of the table (possibly followed by some footers at the
   /// end).
   mut short_lived : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -648,6 +651,7 @@ pub extend Header with Eq::{not_equal, equal}
 
 ///|
 /// A repeatable grid footer. Stops at the last row.
+#derive(Eq)
 pub(all) struct Footer {
   /// The first row included in this footer.
   mut start : Int32
@@ -657,7 +661,7 @@ pub(all) struct Footer {
   ///
   /// Used similarly to header level.
   level : Int32
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -676,11 +680,12 @@ pub fn Footer::range(self : Footer) -> RowRange {
 /// It still exists even when not repeatable, but must not have additional
 /// considerations by grid layout, other than for consistency (such as making
 /// a certain group of rows unbreakable).
+#derive(Eq)
 pub(all) struct Repeatable[T] {
   inner : T
   /// Whether the user requested the child to repeat.
   repeated : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -764,6 +769,7 @@ pub(all) enum ResolvableGridItem[T] {
 
 ///|
 /// Represents a cell in [CellGrid], to be laid out by `GridLayouter`.
+#derive(Eq)
 pub(all) struct Cell {
   /// The cell's body.
   body : Content
@@ -787,7 +793,7 @@ pub(all) struct Cell {
   /// By default, a cell spanning only fixed-size rows is unbreakable, while
   /// a cell spanning at least one `auto`-sized row is breakable.
   breakable : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -813,12 +819,13 @@ pub fn Cell::new(body : Content) -> Cell {
 /// its index. This is mostly only relevant when gutter is used, since, then,
 /// the position after a track is not the same as before the next
 /// non-gutter track.
+#derive(Eq, Hash, Debug)
 pub(all) enum LinePosition {
   /// The line should be drawn before its track (e.g. hline on top of a row).
   Before
   /// The line should be drawn after its track (e.g. hline below a row).
   After
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -837,13 +844,14 @@ pub extend LinePosition with @debug.Debug::{to_repr}
 
 ///|
 /// A grid entry.
+#derive(Eq)
 pub(all) enum Entry {
   /// An entry which holds a cell.
   Cell(Cell)
   /// An entry which is merged with another cell; holds the index of the cell
   /// this entry is merged with (`parent`).
   Merged(Int32)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -878,6 +886,7 @@ pub(all) enum ResolvableGridChild[T] {
 
 ///|
 /// A grid of cells, including the columns, rows, and cell data.
+#derive(Eq)
 pub(all) struct CellGrid {
   /// The grid cells.
   entries : Array[Entry]
@@ -899,7 +908,7 @@ pub(all) struct CellGrid {
   footer : Repeatable[Footer]?
   /// Whether this grid has gutters.
   has_gutter : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

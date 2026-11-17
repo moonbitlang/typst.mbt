@@ -9,10 +9,11 @@
 ///|
 /// A spanned value that is associated with a specific field of a format
 /// element (upstream `SpannedValue<E, I>`).
+#derive(Eq)
 pub(all) struct SpannedValue[T] {
   v : T
   span : @syntax.Span
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

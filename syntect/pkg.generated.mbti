@@ -119,10 +119,11 @@ pub(all) suberror SyntectError {
 pub impl Show for SyntectError
 
 // Types and methods
+#derive(Eq)
 pub(all) enum BasicScopeStackOp {
   Push(Scope)
   Pop
-} derive(Eq)
+}
 
 pub struct ByteIndex {
   // private fields
@@ -133,17 +134,19 @@ pub fn ByteIndex::slice(Self, Int32, Int32) -> String
 pub fn ByteIndex::text(Self) -> String
 pub fn ByteIndex::utf16(Self, Int32) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ClearAmount {
   TopN(Int32)
   All
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Default, Eq, Hash)
 pub(all) struct Color {
   r : Byte
   g : Byte
   b : Byte
   a : Byte
-} derive(Default, Eq, Hash)
+}
 pub fn Color::from_str(String) -> Self raise ParseThemeError
 pub impl Show for Color
 
@@ -159,25 +162,28 @@ pub(all) struct Context {
 pub fn Context::match_at(Self, Int32) -> MatchPattern raise ParsingError
 pub fn Context::new(Bool) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct ContextId {
   syntax_index : Int32
   context_index : Int32
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq)
 pub(all) enum ContextReference {
   Named(String)
   ByScope(scope~ : Scope, sub_context~ : String?, with_escape~ : Bool)
   File(name~ : String, sub_context~ : String?, with_escape~ : Bool)
   Inline(String)
   Direct(ContextId)
-} derive(Eq)
+}
 pub fn ContextReference::id(Self) -> ContextId raise ParsingError
 pub fn ContextReference::resolve(Self, SyntaxSet) -> Context raise ParsingError
 pub impl Show for ContextReference
 
+#derive(Compare, Default, Eq, Hash)
 pub(all) struct FontStyle {
   bits : Byte
-} derive(Compare, Default, Eq, Hash)
+}
 pub fn FontStyle::all() -> Self
 pub fn FontStyle::bits(Self) -> Byte
 pub fn FontStyle::contains(Self, Self) -> Bool
@@ -238,7 +244,8 @@ pub fn MatchPattern::new(Bool, String, Array[Scope], Array[(Int32, Array[Scope])
 pub fn MatchPattern::regex(Self) -> Regex
 pub fn MatchPattern::regex_with_refs(Self, Region, ByteIndex) -> Regex
 
-pub(all) struct MatchPower(Double) derive(Compare, Eq, @debug.Debug)
+#derive(Compare, Eq, @debug.Debug)
+pub(all) struct MatchPower(Double)
 pub fn MatchPower::compare(Self, Self) -> Int32
 pub fn MatchPower::op_ge(Self, Self) -> Bool
 pub fn MatchPower::op_gt(Self, Self) -> Bool
@@ -267,17 +274,19 @@ pub fn Regex::search(Self, ByteIndex, Int32, Int32, Region?) -> Bool
 pub fn Regex::search_text(Self, SearchText, Int32, Int32, Region?) -> Bool
 pub fn Regex::try_compile(String) -> String?
 
+#derive(Eq)
 pub struct Region {
   // private fields
-} derive(Eq)
+}
 pub fn Region::clone(Self) -> Self
 pub fn Region::new() -> Self
 pub fn Region::pos(Self, Int32) -> (Int32, Int32)?
 
+#derive(Compare, Default, Eq, Hash)
 pub(all) struct Scope {
   a : UInt64
   b : UInt64
-} derive(Compare, Default, Eq, Hash)
+}
 pub fn Scope::atom_at(Self, Int32) -> Int32
 pub fn Scope::build_string(Self) -> String
 pub fn Scope::debug(Self) -> String
@@ -294,25 +303,28 @@ pub fn ScopeRepository::atom_str(Self, Int32) -> String
 pub fn ScopeRepository::build(Self, StringView) -> Scope raise ParseScopeError
 pub fn ScopeRepository::to_string(Self, Scope) -> String
 
+#derive(Eq)
 pub(all) struct ScopeSelector {
   path : ScopeStack
   excludes : Array[ScopeStack]
-} derive(Eq)
+}
 pub fn ScopeSelector::does_match(Self, ArrayView[Scope]) -> MatchPower?
 pub fn ScopeSelector::extract_scopes(Self) -> Array[Scope]
 pub fn ScopeSelector::extract_single_scope(Self) -> Scope?
 pub fn ScopeSelector::from_str(StringView) -> Self raise ParseScopeError
 
+#derive(Eq)
 pub(all) struct ScopeSelectors {
   selectors : Array[ScopeSelector]
-} derive(Eq)
+}
 pub fn ScopeSelectors::does_match(Self, ArrayView[Scope]) -> MatchPower?
 pub fn ScopeSelectors::from_str(StringView) -> Self raise ParseScopeError
 
+#derive(Eq)
 pub(all) struct ScopeStack {
   clear_stack : Array[Array[Scope]]
   scopes : Array[Scope]
-} derive(Eq)
+}
 pub fn ScopeStack::apply(Self, ScopeStackOp) -> Unit raise ScopeError
 pub fn ScopeStack::apply_with_hook(Self, ScopeStackOp, (BasicScopeStackOp, ArrayView[Scope]) -> Unit) -> Unit raise ScopeError
 pub fn ScopeStack::as_slice(Self) -> ArrayView[Scope]
@@ -327,19 +339,21 @@ pub fn ScopeStack::pop(Self) -> Unit
 pub fn ScopeStack::push(Self, Scope) -> Unit
 pub impl Show for ScopeStack
 
+#derive(Eq)
 pub(all) enum ScopeStackOp {
   Push(Scope)
   Pop(Int32)
   Clear(ClearAmount)
   Restore
   Noop
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) struct ScoredStyle {
   foreground : (MatchPower, Color)
   background : (MatchPower, Color)
   font_style : (MatchPower, FontStyle)
-} derive(Eq)
+}
 
 pub struct SearchText {
   // private fields
@@ -349,6 +363,7 @@ pub fn SearchText::new(ByteIndex) -> Self
 pub fn SearchText::next_char_offset(Self, Int32) -> Int32?
 pub fn SearchText::text(Self) -> ByteIndex
 
+#derive(Eq)
 pub(all) enum Settings {
   Null
   Bool(Bool)
@@ -356,25 +371,27 @@ pub(all) enum Settings {
   String(String)
   Array(Array[Settings])
   Object(Map[String, Settings])
-} derive(Eq)
+}
 pub fn Settings::as_str(Self) -> String?
 pub fn Settings::output(Self, &Logger) -> Unit
 pub fn Settings::to_string(Self) -> String
 pub impl Show for Settings
 
+#derive(Eq, Hash)
 pub(all) struct Style {
   foreground : Color
   background : Color
   font_style : FontStyle
-} derive(Eq, Hash)
+}
 pub fn Style::apply(Self, StyleModifier) -> Self
 pub fn Style::default_style() -> Self
 
+#derive(Default, Eq)
 pub(all) struct StyleModifier {
   foreground : Color?
   background : Color?
   font_style : FontStyle?
-} derive(Default, Eq)
+}
 pub fn StyleModifier::apply(Self, Self) -> Self
 
 pub(all) struct SyntaxDefinition {
@@ -441,6 +458,7 @@ pub(all) struct ThemeSet {
 }
 pub fn ThemeSet::load_from_reader(Bytes) -> Theme raise LoadingError
 
+#derive(Default)
 pub(all) struct ThemeSettings {
   foreground : Color?
   background : Color?
@@ -472,15 +490,16 @@ pub(all) struct ThemeSettings {
   active_guide : Color?
   stack_guide : Color?
   shadow : Color?
-} derive(Default)
+}
 pub fn ThemeSettings::default() -> Self
 
+#derive(Eq)
 pub(all) enum UnderlineOption {
   None
   Underline
   StippledUnderline
   SquigglyUnderline
-} derive(Eq)
+}
 pub fn UnderlineOption::from_str(String) -> Self raise ParseThemeError
 
 // Type aliases

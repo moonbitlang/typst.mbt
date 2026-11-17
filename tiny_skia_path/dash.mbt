@@ -17,13 +17,14 @@
 /// - There is at least two dash array values.
 /// - The sum of all dash array values is positive and finite.
 /// - Dash offset is finite.
+#derive(Eq, Debug)
 pub struct StrokeDash {
   priv array : Array[Float]
   priv offset : Float
   priv interval_len : NonZeroPositiveF32
   priv first_len : Float // TODO: PositiveF32
   priv first_index : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

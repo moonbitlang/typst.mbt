@@ -4,10 +4,11 @@
 ///|
 /// An index format used by the [Index to Location Table](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/loca).
+#derive(Eq, Debug)
 pub(all) enum IndexToLocationFormat {
   Short
   Long
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -21,6 +22,7 @@ pub extend IndexToLocationFormat with @debug.Debug::{to_repr}
 
 ///|
 /// A [Font Header Table](https://docs.microsoft.com/en-us/typography/opentype/spec/head).
+#derive(Debug)
 pub(all) struct HeadTable {
   /// Units per EM.
   ///
@@ -31,7 +33,7 @@ pub(all) struct HeadTable {
   /// An index format used by the [Index to Location Table](
   /// https://docs.microsoft.com/en-us/typography/opentype/spec/loca).
   index_to_location_format : IndexToLocationFormat
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -85,6 +87,7 @@ pub fn HeadTable::parse(data : BytesView) -> HeadTable? {
 
 ///|
 /// A [Horizontal Header Table](https://docs.microsoft.com/en-us/typography/opentype/spec/hhea).
+#derive(Debug)
 pub(all) struct HheaTable {
   /// Face ascender.
   ascender : Int16
@@ -94,7 +97,7 @@ pub(all) struct HheaTable {
   line_gap : Int16
   /// Number of metrics in the `hmtx` table.
   number_of_metrics : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -125,6 +128,7 @@ pub fn HheaTable::parse(data : BytesView) -> HheaTable? {
 
 ///|
 /// A [Vertical Header Table](https://docs.microsoft.com/en-us/typography/opentype/spec/vhea).
+#derive(Debug, Default)
 pub(all) struct VheaTable {
   /// Face ascender.
   ascender : Int16
@@ -134,7 +138,7 @@ pub(all) struct VheaTable {
   line_gap : Int16
   /// Number of metrics in the `vmtx` table.
   number_of_metrics : UInt16
-} derive(Debug, Default)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -170,10 +174,11 @@ pub fn VheaTable::parse(data : BytesView) -> VheaTable? {
 
 ///|
 /// A [Maximum Profile Table](https://docs.microsoft.com/en-us/typography/opentype/spec/maxp).
+#derive(Debug)
 pub(all) struct MaxpTable {
   /// The total number of glyphs in the face (never zero).
   number_of_glyphs : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -201,12 +206,13 @@ pub fn MaxpTable::parse(data : BytesView) -> MaxpTable? {
 
 ///|
 /// Horizontal/Vertical Metrics.
+#derive(Debug)
 pub(all) struct HmtxMetrics {
   /// Width/Height advance for `hmtx`/`vmtx`.
   advance : UInt16
   /// Left/Top side bearing for `hmtx`/`vmtx`.
   side_bearing : Int16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

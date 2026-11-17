@@ -3,7 +3,8 @@
 
 ///|
 /// A local variable index.
-pub(all) struct LocalIdx(UInt32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct LocalIdx(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

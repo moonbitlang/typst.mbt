@@ -8,10 +8,11 @@
 /// A path in a specific virtual file system root.
 ///
 /// This identifies a location in a project or package.
+#derive(Eq, Hash)
 pub struct RootedPath {
   priv root : VirtualRoot
   priv vpath : VirtualPath
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -83,6 +84,7 @@ pub extend RootedPath with Show::{to_string, output}
 
 ///|
 /// The root of a virtual file system.
+#derive(Eq, Hash, Debug)
 pub(all) enum VirtualRoot {
   /// The canonical root of the Typst project.
   ///
@@ -90,7 +92,7 @@ pub(all) enum VirtualRoot {
   Project
   /// A root in a package.
   Package(PackageSpec)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -190,9 +192,10 @@ pub fn FileId::vpath(self : FileId) -> VirtualPath {
 
 ///|
 /// A path in a virtual file system.
+#derive(Eq, Hash)
 pub struct VirtualPath {
   priv segments : Segments
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -485,7 +488,8 @@ fn components(
 ///
 /// A segments is never empty, `.`, or `..` and it never contains back- or
 /// forward slashes.
-priv struct Segment(String) derive(Eq)
+#derive(Eq)
+priv struct Segment(String)
 
 ///|
 fn Segment::new(segment : String) -> Result[Segment, String] {
@@ -542,9 +546,10 @@ fn Segment::realize(self : Segment) -> String raise RealizeError {
 /// The underlying string always represents a normalized absolute path and is
 /// guaranteed to start with a slash. Segments are never empty, `.`, or `..`
 /// and they never contain back- or forward slashes.
+#derive(Eq, Hash)
 priv struct Segments {
   mut text : String
-} derive(Eq, Hash)
+}
 
 ///|
 fn Segments::new() -> Segments {
@@ -639,6 +644,7 @@ fn Segments::iter(self : Segments) -> Array[Segment] {
 ///|
 /// An error that can occur on construction or modification of a
 /// [`VirtualPath`].
+#derive(Eq, Hash, Debug)
 pub(all) suberror PathError {
   /// The constructed or modified path would escape the root. This would for
   /// instance, when trying to join `..` to the path `/`.
@@ -649,7 +655,7 @@ pub(all) suberror PathError {
   /// cross-platform compatibility hazards (since Windows uses backslashes as
   /// a path separator).
   Backslash
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -679,6 +685,7 @@ pub extend PathError with Show::{to_string, output}
 
 ///|
 /// An error that can occur in [`VirtualPath::virtualize`].
+#derive(Eq, Hash, Debug)
 pub(all) suberror VirtualizeError {
   /// A normal path error.
   Path(PathError)
@@ -688,7 +695,7 @@ pub(all) suberror VirtualizeError {
   Invalid(String)
   /// The file path contains non-UTF-8 encodable bytes.
   Utf8
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -722,12 +729,13 @@ pub extend VirtualizeError with Show::{to_string, output}
 
 ///|
 /// An error that can occur in [`VirtualPath::realize`].
+#derive(Eq, Hash, Debug)
 pub(all) suberror RealizeError {
   /// A virtual path component was of a form that would be specially
   /// interpreted on the current platform as opposed to designating just a
   /// file or directory.
   Invalid(String)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -763,12 +771,13 @@ pub extend RealizeError with Show::{to_string, output}
 
 ///|
 /// A component of a real (platform) path (upstream `std::path::Component`).
+#derive(Eq)
 priv enum RealComponent {
   RootDir
   CurDir
   ParentDir
   Normal(String)
-} derive(Eq)
+}
 
 ///|
 /// Rust's `Path::components` on Unix: repeated separators and interior `.`

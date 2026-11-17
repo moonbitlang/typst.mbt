@@ -5,12 +5,13 @@
 
 ///|
 /// A [glyph class](https://docs.microsoft.com/en-us/typography/opentype/spec/gdef#glyph-class-definition-table).
+#derive(Eq, Compare, Debug, Hash)
 pub(all) enum GlyphClass {
   Base // = 1
   Ligature // = 2
   Mark // = 3
   Component // = 4
-} derive(Eq, Compare, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

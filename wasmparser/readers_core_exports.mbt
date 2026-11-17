@@ -4,6 +4,7 @@
 /// External types as defined [here].
 ///
 /// [here]: https://webassembly.github.io/spec/core/syntax/types.html#external-types
+#derive(Eq, Debug)
 pub(all) enum ExternalKind {
   /// The external kind is a function.
   Func
@@ -15,7 +16,7 @@ pub(all) enum ExternalKind {
   Global
   /// The external kind is a tag.
   Tag
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,6 +30,7 @@ pub extend ExternalKind with @debug.Debug::{to_repr}
 
 ///|
 /// Represents an export in a WebAssembly module.
+#derive(Eq, Debug)
 pub(all) struct Export {
   /// The name of the exported item.
   name : String
@@ -36,7 +38,7 @@ pub(all) struct Export {
   kind : ExternalKind
   /// The index of the exported item.
   index : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

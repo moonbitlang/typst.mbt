@@ -195,6 +195,7 @@ fn ImageElem::determine_format(
 
 ///|
 /// A loaded raster or vector image.
+#derive(Eq, Hash)
 pub struct Image {
   /// The decoded image.
   priv kind : ImageKind
@@ -202,7 +203,7 @@ pub struct Image {
   priv alt : String?
   /// The scaling algorithm to use.
   priv scaling : Smart[ImageScaling]
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -299,6 +300,7 @@ pub fn Image::kind(self : Image) -> ImageKind {
 
 ///|
 /// A kind of image.
+#derive(Eq, Hash)
 pub(all) enum ImageKind {
   /// A raster image.
   Raster(RasterImage)
@@ -306,7 +308,7 @@ pub(all) enum ImageKind {
   Svg(SvgImage)
   /// A PDF image.
   Pdf(PdfImage)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -330,6 +332,7 @@ fn image_elem_fit_default() -> Value {
 
 ///|
 /// How an image should adjust itself to a given area,
+#derive(Eq, Hash, Debug)
 pub(all) enum ImageFit {
   /// The image should completely cover the area (preserves aspect ratio by
   /// cropping the image only horizontally or vertically). This is the
@@ -343,7 +346,7 @@ pub(all) enum ImageFit {
   /// this means that the image will be distorted (doesn't preserve aspect
   /// ratio and doesn't crop the image).
   Stretch
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -420,12 +423,13 @@ pub extend ImageFit with FromValue::{from_value}
 
 ///|
 /// A raster or vector image format.
+#derive(Eq, Hash, Debug)
 pub(all) enum ImageFormat {
   /// A raster graphics format.
   Raster(RasterFormat)
   /// A vector graphics format.
   Vector(VectorFormat)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -568,13 +572,14 @@ pub extend ImageFormat with FromValue::{from_value}
 
 ///|
 /// A vector graphics format.
+#derive(Eq, Hash, Debug)
 pub(all) enum VectorFormat {
   /// The vector graphics format of the web.
   Svg
   /// High-fidelity document and graphics format, with focus on exact
   /// reproduction in print.
   Pdf
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -640,13 +645,14 @@ pub extend VectorFormat with FromValue::{from_value}
 
 ///|
 /// The image scaling algorithm a viewer should use.
+#derive(Eq, Hash, Debug)
 pub(all) enum ImageScaling {
   /// Scale with a smoothing algorithm such as bilinear interpolation.
   Smooth
   /// Scale with nearest neighbor or a similar algorithm to preserve the
   /// pixelated look of the image.
   Pixelated
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -721,12 +727,13 @@ pub extend ImageScaling with FromValue::{from_value}
 
 ///|
 /// A raster graphics format.
+#derive(Eq, Hash, Debug)
 pub(all) enum RasterFormat {
   /// A format typically used in image exchange.
   Exchange(ExchangeFormat)
   /// A format of raw pixel data.
   Pixel(PixelFormat)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -788,6 +795,7 @@ pub extend RasterFormat with FromValue::{from_value}
 
 ///|
 /// A raster format typically used in image exchange, with efficient encoding.
+#derive(Eq, Hash, Debug)
 pub(all) enum ExchangeFormat {
   /// Raster format for illustrations and transparent graphics.
   Png
@@ -798,7 +806,7 @@ pub(all) enum ExchangeFormat {
   Gif
   /// Raster format that supports both lossy and lossless compression.
   Webp
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -909,6 +917,7 @@ pub extend ExchangeFormat with FromValue::{from_value}
 
 ///|
 /// Information that is needed to understand a pixmap buffer.
+#derive(Eq, Hash, Debug)
 pub(all) struct PixelFormat {
   /// The channel encoding.
   encoding : PixelEncoding
@@ -916,7 +925,7 @@ pub(all) struct PixelFormat {
   width : U32
   /// The pixel height.
   height : U32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -987,6 +996,7 @@ pub extend PixelFormat with FromValue::{from_value}
 
 ///|
 /// Determines the channel encoding of raw pixel data.
+#derive(Eq, Hash, Debug)
 pub(all) enum PixelEncoding {
   /// Three 8-bit channels: Red, green, blue.
   Rgb8
@@ -996,7 +1006,7 @@ pub(all) enum PixelEncoding {
   Luma8
   /// Two 8-bit channels: Luma and alpha.
   Lumaa8
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

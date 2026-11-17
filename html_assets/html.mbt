@@ -95,6 +95,7 @@ pub fn AttrInfo::new(name : String, docs : String, ty : Type) -> AttrInfo {
 ///
 /// Each variant's documentation describes which Typst type is accepted and
 /// into what kind of HTML attribute string it is converted.
+#derive(Eq, Debug)
 pub(all) enum Type {
   /// `bool` → attribute is present or absent.
   Presence
@@ -152,7 +153,7 @@ pub(all) enum Type {
   /// itself as a shorthand → a string containing the respective outputs
   /// separated by the char.
   List(Type, Char, Bool)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

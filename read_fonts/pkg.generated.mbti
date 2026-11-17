@@ -78,10 +78,11 @@ pub fn ReadError::to_string(Self) -> String
 pub impl Show for ReadError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Anchor {
   Offset(x~ : Int32, y~ : Int32)
   Point(base~ : Int32, component~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 
 pub struct CffTable {
   data : FontData
@@ -110,19 +111,21 @@ pub enum CmapSubtable {
 pub fn CmapSubtable::format(Self) -> Int32
 pub fn CmapSubtable::map_codepoint(Self, UInt32) -> @font_types.GlyphId?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Component {
   flags : Int32
   glyph : Int32
   anchor : Anchor
   transform : ComponentTransform
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ComponentTransform {
   xx : @font_types.F2Dot14
   yx : @font_types.F2Dot14
   xy : @font_types.F2Dot14
   yy : @font_types.F2Dot14
-} derive(Eq, @debug.Debug)
+}
 
 pub struct CompositeGlyph {
   data : FontData
@@ -159,11 +162,12 @@ pub fn DeviceRecord::max_width(Self) -> Int32
 pub fn DeviceRecord::pixel_size(Self) -> Int32
 pub fn DeviceRecord::widths(Self) -> BytesView
 
+#derive(@debug.Debug)
 pub(all) struct EncodingRecord {
   platform : Int32
   encoding : Int32
   subtable_offset : UInt32
-} derive(@debug.Debug)
+}
 pub fn EncodingRecord::encoding_id(Self) -> Int32
 pub fn EncodingRecord::is_mac_roman(Self) -> Bool
 pub fn EncodingRecord::is_symbol(Self) -> Bool
@@ -316,13 +320,15 @@ pub fn Name::storage_offset(Self) -> Int32
 pub fn Name::string_data(Self) -> FontData
 pub fn Name::version(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum NameEncoding {
   Utf16Be
   MacRoman
   Unknown
-} derive(Eq, @debug.Debug)
+}
 pub fn NameEncoding::new(Int32, Int32) -> Self
 
+#derive(@debug.Debug)
 pub(all) struct NameRecord {
   platform_id : Int32
   encoding_id : Int32
@@ -330,7 +336,7 @@ pub(all) struct NameRecord {
   name_id : Int32
   length : Int32
   string_offset : Int32
-} derive(@debug.Debug)
+}
 pub fn NameRecord::string(Self, FontData) -> NameString raise ReadError
 
 pub struct NameString {
@@ -362,14 +368,16 @@ pub fn Os2::x_avg_char_width(Self) -> Int32
 pub fn Os2::y_strikeout_position(Self) -> Int32
 pub fn Os2::y_strikeout_size(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PathElement {
   MoveTo(x~ : Float, y~ : Float)
   LineTo(x~ : Float, y~ : Float)
   QuadTo(cx0~ : Float, cy0~ : Float, x~ : Float, y~ : Float)
   CurveTo(cx0~ : Float, cy0~ : Float, cx1~ : Float, cy1~ : Float, x~ : Float, y~ : Float)
   Close
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PlatformId {
   Unicode
   Macintosh
@@ -377,7 +385,7 @@ pub(all) enum PlatformId {
   Windows
   Custom
   Unknown
-} derive(Eq, @debug.Debug)
+}
 pub fn PlatformId::new(Int32) -> Self
 
 pub struct Post {
@@ -417,14 +425,16 @@ pub fn TableDirectory::num_tables(Self) -> Int32
 pub fn TableDirectory::sfnt_version(Self) -> UInt32
 pub fn TableDirectory::table_records(Self) -> Array[TableRecord]
 
+#derive(@debug.Debug)
 pub(all) struct TableRecord {
   tag : @font_types.Tag
   checksum : UInt32
   offset : UInt32
   length : UInt32
-} derive(@debug.Debug)
+}
 
-pub(all) struct Version16Dot16(UInt32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Version16Dot16(UInt32)
 pub fn Version16Dot16::to_major_minor(Self) -> (Int32, Int32)
 
 // Type aliases

@@ -19,6 +19,7 @@ pub(open) trait OutlinePen {
 
 ///|
 /// Single element of a path.
+#derive(Eq, Debug)
 pub(all) enum PathElement {
   MoveTo(x~ : Float, y~ : Float)
   LineTo(x~ : Float, y~ : Float)
@@ -32,7 +33,7 @@ pub(all) enum PathElement {
     y~ : Float
   )
   Close
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

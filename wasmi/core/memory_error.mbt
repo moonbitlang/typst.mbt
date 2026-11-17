@@ -2,6 +2,7 @@
 
 ///|
 /// An error that may occur upon operating with virtual or linear memory.
+#derive(Debug)
 pub(all) suberror MemoryError {
   /// Tried to allocate more virtual memory than technically possible.
   OutOfSystemMemory
@@ -21,7 +22,7 @@ pub(all) suberror MemoryError {
   MaximumSizeOverflow
   /// Encountered if a `memory.grow` operation runs out of fuel.
   OutOfFuel(required_fuel~ : UInt64)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

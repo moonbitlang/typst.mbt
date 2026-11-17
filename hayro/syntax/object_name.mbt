@@ -3,7 +3,8 @@
 ///|
 /// A PDF name object. The (unescaped) bytes are stored as a latin-1 string,
 /// i.e. each char is one byte.
-pub(all) struct Name(String) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct Name(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

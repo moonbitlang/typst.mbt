@@ -102,6 +102,7 @@ pub(all) enum RealizationKind {
 
 ///|
 /// The kind of fragment output that realization produced.
+#derive(Eq, Hash, Debug)
 pub(all) enum FragmentKind {
   /// The fragment's contents were fully inline, and as a result, the output
   /// elements are too.
@@ -109,7 +110,7 @@ pub(all) enum FragmentKind {
   /// The fragment contained non-inline content, so inline content was forced
   /// into paragraphs, and as a result, the output elements are not inline.
   Block
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

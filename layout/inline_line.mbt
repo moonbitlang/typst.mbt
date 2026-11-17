@@ -110,6 +110,7 @@ fn Line::fr(self : Line) -> @library.Fr {
 
 ///|
 /// A dash at the end of a line.
+#derive(Eq)
 priv enum Dash {
   /// A soft hyphen added to break a word.
   Soft
@@ -117,7 +118,7 @@ priv enum Dash {
   Hard
   /// Another kind of dash. Only relevant for cost computation.
   Other
-} derive(Eq)
+}
 
 ///|
 /// Create a line which spans the given range.

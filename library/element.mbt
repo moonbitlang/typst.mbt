@@ -7,6 +7,7 @@
 
 ///|
 /// The kind of storage of an element field (upstream's field vtable kinds).
+#derive(Eq, Debug)
 pub(all) enum FieldKind {
   /// A `#[required]` field.
   Required
@@ -18,7 +19,7 @@ pub(all) enum FieldKind {
   Ghost
   /// An `#[external]` field (documentation only).
   External
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

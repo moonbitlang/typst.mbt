@@ -6,6 +6,7 @@
 /// Language and region of a name record.
 ///
 /// <https://learn.microsoft.com/en-us/typography/opentype/spec/name#windows-language-ids>
+#derive(Eq, Debug)
 pub(all) enum Language {
   Unknown
   Afrikaans_SouthAfrica
@@ -213,7 +214,7 @@ pub(all) enum Language {
   Yakut_Russia
   Yi_PRC
   Yoruba_Nigeria
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -7,9 +7,10 @@
 /// The flags are the `UInt` constants below (`MUTABLE_GLOBAL`, `SIMD`, ...,
 /// upstream's `WasmFeatures::MUTABLE_GLOBAL` etc.). `WasmFeatures` is an
 /// immutable value: `set`, `union`, ... return a new set.
+#derive(Eq, Hash)
 pub(all) struct WasmFeatures {
   bits : UInt32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

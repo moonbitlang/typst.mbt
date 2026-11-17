@@ -6,6 +6,7 @@
 //
 // Component sections are unordered and allow for duplicates,
 // so this isn't used for components.
+#derive(Eq)
 priv enum Order {
   Initial
   Type
@@ -21,7 +22,7 @@ priv enum Order {
   DataCount
   Code
   Data
-} derive(Eq)
+}
 
 ///|
 fn Order::rank(self : Order) -> Int32 {

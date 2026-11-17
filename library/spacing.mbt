@@ -2,13 +2,14 @@
 
 ///|
 /// Kinds of spacing.
+#derive(Eq, Hash)
 pub(all) enum Spacing {
   /// Spacing specified in absolute terms and relative to the parent's size.
   Rel(Rel[Length])
   /// Spacing specified as a fraction of the remaining free space in the
   /// parent.
   Fr(Fr)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -103,6 +104,7 @@ pub extend Spacing with FromValue::{from_value}
 ///|
 /// How to size something along an axis (upstream `Sizing`,
 /// `layout/container.rs`).
+#derive(Eq, Hash)
 pub(all) enum Sizing {
   /// A track that fits its item's contents.
   Auto
@@ -111,7 +113,7 @@ pub(all) enum Sizing {
   /// A size specified as a fraction of the remaining free space in the
   /// parent.
   Fr(Fr)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

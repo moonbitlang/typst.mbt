@@ -3,21 +3,23 @@
 // NOTE: this is not SkPathBuilder, but rather a reimplementation of SkPath.
 
 ///|
+#derive(Eq)
 priv enum PathDirection {
   /// Clockwise direction for adding closed contours.
   CW
   /// Counter-clockwise direction for adding closed contours.
   CCW
-} derive(Eq)
+}
 
 ///|
 /// A path builder.
+#derive(Debug)
 pub struct PathBuilder {
   priv mut verbs : Array[PathVerb]
   priv mut points : Array[Point]
   priv mut last_move_to_index : Int32
   priv mut move_to_required : Bool
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

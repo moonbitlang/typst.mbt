@@ -198,11 +198,12 @@ pub impl FromValue for @unicode.MathClass with fn from_value(v) {
 /// An iterator that alternates between the `Left` and `Right` values, if the
 /// initial value is not `None` (`None_` here; `None` would clash with
 /// `Option`/`Value`).
+#derive(Eq, Hash, Debug)
 pub(all) enum LeftRightAlternator {
   None_
   Left
   Right
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

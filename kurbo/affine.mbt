@@ -2,7 +2,8 @@
 
 ///|
 /// A 2D affine transform.
-pub(all) struct Affine(FixedArray[Double]) derive(Debug)
+#derive(Debug)
+pub(all) struct Affine(FixedArray[Double])
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -4,6 +4,7 @@
 
 ///|
 /// An error either returned by a [`ResourceLimiter`] or back to one.
+#derive(Debug)
 pub(all) suberror LimiterError {
   /// Encountered when the underlying system ran out of allocatable memory.
   OutOfSystemMemory
@@ -13,7 +14,7 @@ pub(all) suberror LimiterError {
   ResourceLimiterDeniedAllocation
   /// Encountered when an operation ran out of fuel.
   OutOfFuel(required_fuel~ : UInt64)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

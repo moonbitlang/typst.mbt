@@ -2,10 +2,11 @@
 
 ///|
 /// Errors related to reading/parsing data.
+#derive(Eq)
 pub(all) enum ParseError {
   /// Unexpected end of input.
   UnexpectedEof
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -14,6 +15,7 @@ pub extend ParseError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to file structure.
+#derive(Eq)
 pub(all) enum FormatError {
   /// Invalid file header signature.
   InvalidHeader
@@ -25,7 +27,7 @@ pub(all) enum FormatError {
   UnknownPageHeight
   /// Page has zero width or height.
   EmptyPage
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -34,6 +36,7 @@ pub extend FormatError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to segment processing.
+#derive(Eq)
 pub(all) enum SegmentError {
   /// Unknown or reserved segment type.
   UnknownType
@@ -45,7 +48,7 @@ pub(all) enum SegmentError {
   MissingEndMarker
   /// Missing required pattern dictionary.
   MissingPatternDictionary
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -54,6 +57,7 @@ pub extend SegmentError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to Huffman decoding.
+#derive(Eq)
 pub(all) enum HuffmanError {
   /// Invalid Huffman code sequence.
   InvalidCode
@@ -67,7 +71,7 @@ pub(all) enum HuffmanError {
   ConflictingCodes
   /// Prefix length exceeds maximum supported value.
   PrefixLengthTooLarge
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -76,6 +80,7 @@ pub extend HuffmanError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to region parameters.
+#derive(Eq)
 pub(all) enum RegionError {
   /// Invalid combination operator value.
   InvalidCombinationOperator
@@ -85,7 +90,7 @@ pub(all) enum RegionError {
   InvalidMmrData
   /// Gray-scale value exceeds pattern count.
   GrayScaleOutOfRange
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -94,12 +99,13 @@ pub extend RegionError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to template configuration.
+#derive(Eq)
 pub(all) enum TemplateError {
   /// An invalid template value was used.
   Invalid
   /// Invalid adaptive template pixel location.
   InvalidAtPixel
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -108,6 +114,7 @@ pub extend TemplateError with Eq::{not_equal, equal}
 
 ///|
 /// Errors related to symbol handling.
+#derive(Eq)
 pub(all) enum SymbolError {
   /// No symbols available for text region.
   NoSymbols
@@ -123,7 +130,7 @@ pub(all) enum SymbolError {
   InvalidStripDelta
   /// Too many symbol instances in a text region.
   TooManyInstances
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -132,6 +139,7 @@ pub extend SymbolError with Eq::{not_equal, equal}
 
 ///|
 /// Arithmetic overflow errors.
+#derive(Eq)
 pub(all) enum OverflowError {
   /// Bitmap dimension computation overflowed.
   BitmapDimension
@@ -145,7 +153,7 @@ pub(all) enum OverflowError {
   Index
   /// A symbol dictionary has too many symbols.
   SymbolCount
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -154,6 +162,7 @@ pub extend OverflowError with Eq::{not_equal, equal}
 
 ///|
 /// The main error type for JBIG2 decoding operations.
+#derive(Eq)
 pub(all) suberror DecodeError {
   /// Errors related to reading/parsing data.
   Parse(ParseError)
@@ -173,7 +182,7 @@ pub(all) suberror DecodeError {
   Overflow(OverflowError)
   /// Feature not yet implemented.
   Unsupported
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -2,6 +2,7 @@
 
 ///|
 /// A language that can be hyphenated (hypher 0.1.8).
+#derive(Eq, Hash, Debug)
 pub(all) enum Lang {
   Afrikaans
   Albanian
@@ -51,7 +52,7 @@ pub(all) enum Lang {
   Turkish
   Turkmen
   Ukrainian
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

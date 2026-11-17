@@ -7,6 +7,7 @@
 ///
 /// The underlying system of a named numeral system can be obtained with the
 /// [NamedNumeralSystem::system] method.
+#derive(Eq, Hash, Debug)
 pub(all) enum NamedNumeralSystem {
   /// Decimal positional notation using Western Arabic numerals.
   Arabic
@@ -69,7 +70,7 @@ pub(all) enum NamedNumeralSystem {
   BengaliLetters
   /// Symbols: `*`, `†`, `‡`, `§`, `¶`, `‖`.
   Symbols
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -634,10 +635,11 @@ pub fn NamedNumeralSystem::system(self : NamedNumeralSystem) -> NumeralSystem {
 
 ///|
 /// The Chinese script variant (upstream `chinese_variant::ChineseVariant`).
+#derive(Eq, Debug)
 pub(all) enum ChineseVariant {
   Traditional
   Simple
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -652,10 +654,11 @@ pub extend ChineseVariant with @debug.Debug::{to_repr}
 ///|
 /// Upper or lower case Chinese numerals (upstream
 /// `chinese_number::ChineseCase`).
+#derive(Eq, Debug)
 pub(all) enum ChineseCase {
   Upper
   Lower
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -690,12 +693,13 @@ pub(all) enum NumeralSystem {
 
 ///|
 /// An error that occurs when representing a number in a numeral system.
+#derive(Eq, Debug)
 pub(all) enum RepresentationError {
   /// Zero cannot be represented.
   Zero
   /// The number is too large.
   TooLarge
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

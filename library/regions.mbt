@@ -8,13 +8,14 @@
 ///|
 /// A single region to layout into (upstream `layout::Region`; renamed
 /// because `Region` is the text region of `text/lang.rs`).
+#derive(Eq, Hash)
 pub(all) struct LayoutRegion {
   /// The size of the region.
   size : Axes[Abs]
   /// Whether elements should expand to fill the regions instead of shrinking
   /// to fit the content.
   expand : Axes[Bool]
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

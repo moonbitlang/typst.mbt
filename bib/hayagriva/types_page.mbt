@@ -2,10 +2,11 @@
 
 ///|
 /// Ranges of page numbers, e.g., `1-4, 5 & 6`.
+#derive(Eq, Hash, Debug)
 pub(all) struct PageRanges {
   /// The given ranges.
   ranges : Array[PageRangesPart]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -120,6 +121,7 @@ pub fn PageRanges::from_str(
 
 ///|
 /// Parts of the page ranges.
+#derive(Eq, Hash, Debug)
 pub(all) enum PageRangesPart {
   /// An and, i.e, `&`.
   Ampersand
@@ -131,7 +133,7 @@ pub(all) enum PageRangesPart {
   SinglePage(Numeric)
   /// A full range, e.g., `1n8--1n14`.
   Range(Numeric, Numeric)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -231,6 +233,7 @@ pub extend PageRangesPart with Show::{to_string, output}
 
 ///|
 /// Parsing error for page ranges.
+#derive(Eq, Debug)
 pub(all) enum PageRangesPartErr {
   /// The string is malformed.
   Malformed
@@ -238,7 +241,7 @@ pub(all) enum PageRangesPartErr {
   Empty
   /// An error from parsing a numeric value.
   NumericErr(NumericError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -37,11 +37,12 @@ pub fn Haystack::substring(Self, Int32, Int32) -> String
 pub fn Haystack::text(Self) -> String
 pub fn Haystack::utf16_offset(Self, Int32) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Match {
   start : Int32
   end : Int32
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Regex {
   // private fields

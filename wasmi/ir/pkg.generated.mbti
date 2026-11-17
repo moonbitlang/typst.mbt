@@ -9,29 +9,34 @@ import {
 // Values
 
 // Errors
+#derive(Eq)
 pub(all) suberror IrError {
   StackSlotOutOfBounds
   BranchOffsetOutOfBounds
   ComparatorOutOfBounds
   BlockFuelOutOfBounds
-} derive(Eq)
+}
 pub fn IrError::output(Self, &Logger) -> Unit
 pub fn IrError::to_string(Self) -> String
 pub impl Show for IrError
 
-pub(all) suberror OutOfBoundsConst derive(Eq)
+#derive(Eq)
+pub(all) suberror OutOfBoundsConst
 pub impl Show for OutOfBoundsConst
 
 // Types and methods
-pub(all) struct Address(UInt64) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Address(UInt64)
 pub fn Address::to_u64(Self) -> UInt64
 pub fn Address::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Address32(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Address32(UInt32)
 pub fn Address32::to_u64(Self) -> UInt64
 pub fn Address32::try_from_address(Address) -> Self?
 
-pub(all) struct AnyConst16(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct AnyConst16(Int32)
 pub fn AnyConst16::from_i16(Int32) -> Self
 pub fn AnyConst16::from_i8(Int32) -> Self
 pub fn AnyConst16::from_u16(Int32) -> Self
@@ -47,7 +52,8 @@ pub fn AnyConst16::try_from_i64(Int64) -> Self?
 pub fn AnyConst16::try_from_u32(UInt32) -> Self?
 pub fn AnyConst16::try_from_u64(UInt64) -> Self?
 
-pub(all) struct AnyConst32(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct AnyConst32(Int32)
 pub fn AnyConst32::from_bool(Bool) -> Self
 pub fn AnyConst32::from_f32(Float) -> Self
 pub fn AnyConst32::from_f32_bits(UInt32) -> Self
@@ -63,16 +69,18 @@ pub fn AnyConst32::try_from_f64_bits(UInt64) -> Self?
 pub fn AnyConst32::try_from_i64(Int64) -> Self?
 pub fn AnyConst32::try_from_u64(UInt64) -> Self?
 
-pub(all) struct BlockFuel(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct BlockFuel(UInt32)
 pub fn BlockFuel::bump_by(Self, UInt64) -> Self raise IrError
 pub fn BlockFuel::from_u32(UInt32) -> Self
 pub fn BlockFuel::to_u64(Self) -> UInt64
 pub fn BlockFuel::try_from_u64(UInt64) -> Self raise IrError
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct BoundedSlotSpan {
   span : SlotSpan
   len : Int32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn BoundedSlotSpan::contains(Self, Slot) -> Bool
 pub fn BoundedSlotSpan::is_empty(Self) -> Bool
 pub fn BoundedSlotSpan::iter(Self) -> SlotSpanIter
@@ -80,7 +88,8 @@ pub fn BoundedSlotSpan::len(Self) -> Int32
 pub fn BoundedSlotSpan::new(SlotSpan, Int32) -> Self
 pub fn BoundedSlotSpan::span(Self) -> SlotSpan
 
-pub(all) struct BranchOffset(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct BranchOffset(Int32)
 pub fn BranchOffset::from_i32(Int32) -> Self
 pub fn BranchOffset::from_src_to_dst(UInt32, UInt32) -> Self raise IrError
 pub fn BranchOffset::init(Self, Self) -> Self
@@ -88,7 +97,8 @@ pub fn BranchOffset::is_init(Self) -> Bool
 pub fn BranchOffset::to_i32(Self) -> Int32
 pub fn BranchOffset::uninit() -> Self
 
-pub(all) struct BranchOffset16(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct BranchOffset16(Int32)
 pub fn BranchOffset16::from_i16(Int32) -> Self
 pub fn BranchOffset16::init(Self, BranchOffset) -> Self raise IrError
 pub fn BranchOffset16::is_init(Self) -> Bool
@@ -96,6 +106,7 @@ pub fn BranchOffset16::to_branch_offset(Self) -> BranchOffset
 pub fn BranchOffset16::to_i16(Self) -> Int32
 pub fn BranchOffset16::try_from(BranchOffset) -> Self raise IrError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Comparator {
   I32Eq
   I32Ne
@@ -129,19 +140,21 @@ pub(all) enum Comparator {
   F64Le
   F64NotLt
   F64NotLe
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Comparator::to_u32(Self) -> UInt32
 pub fn Comparator::try_from_u32(UInt32) -> Self raise IrError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ComparatorAndOffset {
   cmp : Comparator
   offset : BranchOffset
-} derive(Eq, @debug.Debug)
+}
 pub fn ComparatorAndOffset::as_u64(Self) -> UInt64
 pub fn ComparatorAndOffset::from_u64(UInt64) -> Self?
 pub fn ComparatorAndOffset::new(Comparator, BranchOffset) -> Self
 
-pub(all) struct Const16(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Const16(Int32)
 pub fn Const16::cast(Self) -> Self
 pub fn Const16::from_i16(Int32) -> Self
 pub fn Const16::from_u16(Int32) -> Self
@@ -155,7 +168,8 @@ pub fn Const16::try_from_i64(Int64) -> Self?
 pub fn Const16::try_from_u32(UInt32) -> Self?
 pub fn Const16::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Const32(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Const32(Int32)
 pub fn Const32::cast(Self) -> Self
 pub fn Const32::from_f32_bits(UInt32) -> Self
 pub fn Const32::from_i32(Int32) -> Self
@@ -170,11 +184,14 @@ pub fn Const32::try_from_f64_bits(UInt64) -> Self?
 pub fn Const32::try_from_i64(Int64) -> Self?
 pub fn Const32::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Data(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Data(Int32)
 
-pub(all) struct Elem(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Elem(Int32)
 
-pub(all) struct FixedSlotSpan(SlotSpan) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct FixedSlotSpan(SlotSpan)
 pub fn FixedSlotSpan::bounded(Self) -> BoundedSlotSpan
 pub fn FixedSlotSpan::contains(Self, Slot) -> Bool
 pub fn FixedSlotSpan::from_span_unchecked(SlotSpan) -> Self
@@ -184,33 +201,44 @@ pub fn FixedSlotSpan::new(SlotSpan, Int32) -> Self raise IrError
 pub fn FixedSlotSpan::span(Self) -> SlotSpan
 pub fn FixedSlotSpan::to_array(Self) -> (Slot, Slot)
 
-pub(all) struct Func(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Func(Int32)
 
-pub(all) struct FuncType(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct FuncType(Int32)
 
-pub(all) struct Global(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Global(Int32)
 
-pub(all) struct ImmLaneIdx(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ImmLaneIdx(Int32)
 
-pub(all) struct InternalFunc(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct InternalFunc(Int32)
 
-pub(all) struct Memory(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Memory(Int32)
 pub fn Memory::is_default(Self) -> Bool
 
-pub(all) struct Offset16(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset16(Int32)
 pub fn Offset16::to_u64(Self) -> UInt64
 pub fn Offset16::try_from_u64(UInt64) -> Self?
 
-pub(all) struct Offset64(UInt64) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset64(UInt64)
 pub fn Offset64::combine(Offset64Hi, Offset64Lo) -> Self
 pub fn Offset64::split(UInt64) -> (Offset64Hi, Offset64Lo)
 pub fn Offset64::to_u64(Self) -> UInt64
 
-pub(all) struct Offset64Hi(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset64Hi(UInt32)
 
-pub(all) struct Offset64Lo(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset64Lo(UInt32)
 
-pub(all) struct Offset8(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Offset8(Int32)
 pub fn Offset8::to_u64(Self) -> UInt64
 pub fn Offset8::try_from_u64(UInt64) -> Self?
 
@@ -1723,7 +1751,8 @@ pub fn Op::v128_store_offset16(Slot, Offset16, Slot) -> Self
 pub fn Op::v128_xor(Slot, Slot, Slot) -> Self
 pub fn[V : VisitResults] Op::visit_results(Self, V) -> Self
 
-pub(all) struct ShiftAmount(Const16) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ShiftAmount(Const16)
 pub fn ShiftAmount::of_i32(Int32) -> Self?
 pub fn ShiftAmount::of_i64(Int64) -> Self?
 pub fn ShiftAmount::of_u32(UInt32, UInt32) -> Self?
@@ -1731,7 +1760,8 @@ pub fn ShiftAmount::to_i32(Self) -> Int32
 pub fn ShiftAmount::to_i64(Self) -> Int64
 pub fn ShiftAmount::to_u32(Self) -> UInt32
 
-pub(all) struct Sign(Bool) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Sign(Bool)
 pub fn Sign::from_f32_bits(UInt32) -> Self
 pub fn Sign::from_f64_bits(UInt64) -> Self
 pub fn Sign::neg() -> Self
@@ -1739,7 +1769,8 @@ pub fn Sign::pos() -> Self
 pub fn Sign::to_f32(Self) -> Float
 pub fn Sign::to_f64(Self) -> Double
 
-pub(all) struct Slot(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Slot(Int32)
 pub fn Slot::is_const(Self) -> Bool
 pub fn Slot::next(Self) -> Self
 pub fn Slot::next_n(Self, Int32) -> Self
@@ -1747,17 +1778,19 @@ pub fn Slot::prev(Self) -> Self
 pub fn Slot::prev_n(Self, Int32) -> Self
 pub fn Slot::try_from_u32(UInt32) -> Self raise IrError
 
-pub(all) struct SlotSpan(Slot) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct SlotSpan(Slot)
 pub fn SlotSpan::has_overlapping_copies(Self, Self, Int32) -> Bool
 pub fn SlotSpan::head(Self) -> Slot
 pub fn SlotSpan::iter(Self, Int32) -> SlotSpanIter
 pub fn SlotSpan::iter_sized(Self, Int32) -> SlotSpanIter
 pub fn SlotSpan::new(Slot) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct SlotSpanIter {
   mut next : Int32
   mut last : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn SlotSpanIter::copy(Self) -> Self
 pub fn SlotSpanIter::from_raw_parts(Slot, Slot) -> Self
 pub fn SlotSpanIter::has_overlapping_copies(Self, Self) -> Bool
@@ -1768,7 +1801,8 @@ pub fn SlotSpanIter::next(Self) -> Slot?
 pub fn SlotSpanIter::next_back(Self) -> Slot?
 pub fn SlotSpanIter::span(Self) -> SlotSpan
 
-pub(all) struct Table(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Table(Int32)
 
 // Type aliases
 

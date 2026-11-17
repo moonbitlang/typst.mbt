@@ -2,6 +2,7 @@
 
 ///|
 /// A font stretch property.
+#derive(Eq, Compare, Hash)
 pub(all) enum FontStretch {
   UltraCondensed
   ExtraCondensed
@@ -12,7 +13,7 @@ pub(all) enum FontStretch {
   Expanded
   ExtraExpanded
   UltraExpanded
-} derive(Eq, Compare, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -101,6 +102,7 @@ pub extend FontVariation with Hash::{hash, hash_combine}
 
 ///|
 /// A font style property.
+#derive(Eq, Hash)
 pub(all) enum FontStyle {
   /// A face that is neither italic not obliqued.
   Normal
@@ -108,7 +110,7 @@ pub(all) enum FontStyle {
   Italic
   /// A typically-sloped version of the regular face.
   Oblique
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -130,13 +132,14 @@ pub extend FontStyle with Default::{default}
 
 ///|
 /// Text font properties.
+#derive(Eq)
 pub struct Font {
   priv families : Array[@svgtypes.FontFamily]
   priv style : FontStyle
   priv stretch : FontStretch
   priv weight : Int32
   priv variations : Array[FontVariation]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -177,6 +180,7 @@ pub fn Font::variations(self : Font) -> Array[FontVariation] {
 
 ///|
 /// A dominant baseline property.
+#derive(Eq)
 pub(all) enum DominantBaseline {
   Auto
   UseScript
@@ -190,7 +194,7 @@ pub(all) enum DominantBaseline {
   Middle
   TextAfterEdge
   TextBeforeEdge
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -207,6 +211,7 @@ pub extend DominantBaseline with Default::{default}
 
 ///|
 /// An alignment baseline property.
+#derive(Eq)
 pub(all) enum AlignmentBaseline {
   Auto
   Baseline
@@ -220,7 +225,7 @@ pub(all) enum AlignmentBaseline {
   Alphabetic
   Hanging
   Mathematical
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -237,12 +242,13 @@ pub extend AlignmentBaseline with Default::{default}
 
 ///|
 /// A baseline shift property.
+#derive(Eq)
 pub(all) enum BaselineShift {
   Baseline
   Subscript
   Superscript
   Number(Float)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -261,10 +267,11 @@ pub extend BaselineShift with Default::{default}
 
 ///|
 /// A length adjust property.
+#derive(Eq)
 pub(all) enum LengthAdjust {
   Spacing
   SpacingAndGlyphs
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -284,12 +291,13 @@ pub extend LengthAdjust with Default::{default}
 ///
 /// Controls automatic adjustment of the `opsz` axis in variable fonts
 /// based on font size. Matches CSS `font-optical-sizing`.
+#derive(Eq)
 pub(all) enum FontOpticalSizing {
   /// Automatically set `opsz` to match font size (browser default).
   OpticalAuto
   /// Do not automatically adjust `opsz`.
   OpticalNone
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -514,11 +522,12 @@ pub fn TextSpan::length_adjust(self : TextSpan) -> LengthAdjust {
 
 ///|
 /// A text chunk anchor property.
+#derive(Eq)
 pub(all) enum TextAnchor {
   Start
   Middle
   End
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -628,10 +637,11 @@ pub fn TextChunk::text(self : TextChunk) -> String {
 
 ///|
 /// A writing mode.
+#derive(Eq)
 pub(all) enum WritingMode {
   LeftToRight
   TopToBottom
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

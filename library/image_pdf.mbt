@@ -3,12 +3,13 @@
 
 ///|
 /// An error while loading a PDF (upstream `hayro_syntax::LoadPdfError`).
+#derive(Debug)
 pub(all) suberror LoadPdfError {
   /// The PDF is encrypted and could not be decrypted.
   Decryption
   /// The PDF is invalid.
   Invalid
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

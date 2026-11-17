@@ -9,7 +9,8 @@
 
 ///|
 /// A type-safe wrapper for glyph ID.
-pub(all) struct GlyphId(UInt16) derive(Eq, Compare, Hash, Default, Debug)
+#derive(Eq, Compare, Hash, Default, Debug)
+pub(all) struct GlyphId(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -55,11 +56,12 @@ pub extend GlyphId with FromData::{size, parse}
 /// A TrueType font magic.
 ///
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/otff#organization-of-an-opentype-font
+#derive(Eq)
 priv enum Magic {
   TrueType
   OpenType
   FontCollection
-} derive(Eq)
+}
 
 ///|
 impl FromData for Magic with fn size() {
@@ -84,7 +86,8 @@ impl FromData for Magic with fn parse(data) {
 /// Where 0 is a default value.
 ///
 /// The number is stored as f2.16
-pub struct NormalizedCoordinate(Int16) derive(Eq, Default, Debug, Hash)
+#derive(Eq, Default, Debug, Hash)
+pub struct NormalizedCoordinate(Int16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -169,12 +172,13 @@ pub fn f32_as_u8(v : Float) -> Byte {
 
 ///|
 /// A font variation value.
+#derive(Eq, Debug)
 pub(all) struct Variation {
   /// An axis tag name.
   axis : Tag
   /// An axis value.
   value : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -188,7 +192,8 @@ pub extend Variation with @debug.Debug::{to_repr}
 
 ///|
 /// A 4-byte tag.
-pub(all) struct Tag(UInt32) derive(Eq, Compare, Hash, Default)
+#derive(Eq, Compare, Hash, Default)
+pub(all) struct Tag(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -315,12 +320,13 @@ pub extend Tag with FromData::{size, parse}
 /// A line metrics.
 ///
 /// Used for underline and strikeout.
+#derive(Eq, Debug)
 pub(all) struct LineMetrics {
   /// Line position.
   mut position : Int16
   /// Line thickness.
   mut thickness : Int16
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -336,12 +342,13 @@ pub extend LineMetrics with @debug.Debug::{to_repr}
 /// A rectangle.
 ///
 /// Doesn't guarantee that `x_min` <= `x_max` and/or `y_min` <= `y_max`.
+#derive(Eq, Debug, Hash)
 pub(all) struct Rect {
   x_min : Int16
   y_min : Int16
   x_max : Int16
   y_max : Int16
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -377,6 +384,7 @@ pub fn Rect::height(self : Rect) -> Int16 {
 
 ///|
 /// A rectangle described by the left-lower and upper-right points.
+#derive(Eq, Debug)
 pub(all) struct RectF {
   /// The horizontal minimum of the rect.
   mut x_min : Float
@@ -386,7 +394,7 @@ pub(all) struct RectF {
   mut x_max : Float
   /// The vertical maximum of the rect.
   mut y_max : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -464,6 +472,7 @@ fn RectF::to_rect(self : RectF) -> Rect? {
 
 ///|
 /// An affine transform.
+#derive(Eq)
 pub(all) struct Transform {
   /// The 'a' component of the transform.
   a : Float
@@ -477,7 +486,7 @@ pub(all) struct Transform {
   e : Float
   /// The 'f' component of the transform.
   f : Float
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -586,12 +595,13 @@ pub extend Transform with @debug.Debug::{to_repr}
 
 ///|
 /// A float point.
+#derive(Eq, Debug)
 pub(all) struct PointF {
   /// The X-axis coordinate.
   mut x : Float
   /// The Y-axis coordinate.
   mut y : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -607,6 +617,7 @@ pub extend PointF with @debug.Debug::{to_repr}
 /// Phantom points.
 ///
 /// Available only for variable fonts with the `gvar` table.
+#derive(Debug)
 pub(all) struct PhantomPoints {
   /// Left side bearing point.
   left : PointF
@@ -616,7 +627,7 @@ pub(all) struct PhantomPoints {
   top : PointF
   /// Bottom side bearing point.
   bottom : PointF
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -625,12 +636,13 @@ pub extend PhantomPoints with @debug.Debug::{to_repr}
 
 ///|
 /// A RGBA color in the sRGB color space.
+#derive(Eq, Debug, Hash)
 pub(all) struct RgbaColor {
   mut red : Byte
   mut green : Byte
   mut blue : Byte
   mut alpha : Byte
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -714,6 +726,7 @@ impl OutlineBuilder for DummyOutline with fn close(_) {
 
 ///|
 /// A glyph raster image format.
+#derive(Eq, Debug)
 pub(all) enum RasterImageFormat {
   PNG
   /// A monochrome bitmap.
@@ -732,7 +745,7 @@ pub(all) enum RasterImageFormat {
   BitmapGray8
   /// A color bitmap with 32 bits per pixel (premultiplied BGRA).
   BitmapPremulBgra32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -771,12 +784,13 @@ pub(all) struct RasterGlyphImage {
 
 ///|
 /// A raw table record.
+#derive(Debug)
 pub(all) struct TableRecord {
   tag : Tag
   check_sum : UInt32
   offset : UInt32
   length : UInt32
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -801,6 +815,7 @@ pub extend TableRecord with FromData::{size, parse}
 
 ///|
 /// A list of font face parsing errors.
+#derive(Eq, Debug)
 pub(all) suberror FaceParsingError {
   /// An attempt to read out of bounds detected.
   ///
@@ -816,7 +831,7 @@ pub(all) suberror FaceParsingError {
   NoHheaTable
   /// The `maxp` table is missing or malformed.
   NoMaxpTable
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

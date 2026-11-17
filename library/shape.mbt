@@ -4,6 +4,7 @@
 
 ///|
 /// A geometric shape with optional fill and stroke.
+#derive(Eq)
 pub(all) struct Shape {
   /// The shape's geometry.
   geometry : Geometry
@@ -13,7 +14,7 @@ pub(all) struct Shape {
   fill_rule : FillRule
   /// The shape's border stroke.
   stroke : FixedStroke?
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -22,6 +23,7 @@ pub extend Shape with Eq::{not_equal, equal}
 
 ///|
 /// A shape's geometry.
+#derive(Eq)
 pub(all) enum Geometry {
   /// A line to a point (relative to its position).
   Line(Point)
@@ -29,7 +31,7 @@ pub(all) enum Geometry {
   Rect(Axes[Abs])
   /// A curve consisting of movements, lines, and Bézier segments.
   Curve(Curve)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,13 +77,14 @@ pub fn Geometry::filled_and_stroked(
 
 ///|
 /// A path filling rule.
+#derive(Eq, Hash, Debug)
 pub(all) enum FillRule {
   /// Specifies that "inside" is computed by a non-zero sum of signed edge
   /// crossings.
   NonZero
   /// Specifies that "inside" is computed by an odd number of edge crossings.
   EvenOdd
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

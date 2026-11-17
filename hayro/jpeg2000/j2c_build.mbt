@@ -223,12 +223,13 @@ priv struct SubBand {
 }
 
 ///|
+#derive(Eq)
 priv enum SubBandType {
   LowLow
   HighLow
   LowHigh
   HighHigh
-} derive(Eq)
+}
 
 ///|
 priv struct Precinct {

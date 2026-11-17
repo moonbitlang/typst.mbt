@@ -12,12 +12,13 @@ pub fn from_slice(Bytes) -> @serde.Data raise CborError
 pub fn to_bytes(@serde.Data) -> Bytes
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror CborError {
   Io(String)
   Syntax(Int32)
   Semantic(Int32?, String)
   RecursionLimitExceeded
-} derive(@debug.Debug)
+}
 pub fn CborError::message(Self) -> String
 
 // Types and methods

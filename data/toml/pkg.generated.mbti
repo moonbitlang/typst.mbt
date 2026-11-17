@@ -12,9 +12,10 @@ pub fn parse(String) -> @serde.Data raise TomlError
 pub fn to_string(@serde.Data, pretty~ : Bool) -> String raise TomlError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror TomlError {
   TomlError(message~ : String, span~ : (Int32, Int32)?)
-} derive(Eq, @debug.Debug)
+}
 
 // Types and methods
 

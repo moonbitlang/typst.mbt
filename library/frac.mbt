@@ -8,6 +8,7 @@ fn frac_elem_style_default() -> Value {
 
 ///|
 /// Fraction style
+#derive(Eq, Hash, Debug)
 pub(all) enum FracStyle {
   /// Stacked numerator and denominator with a bar.
   Vertical
@@ -16,7 +17,7 @@ pub(all) enum FracStyle {
   /// Numerator and denominator placed inline and parentheses are not
   /// absorbed.
   Horizontal
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

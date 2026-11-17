@@ -10,7 +10,8 @@
 
 ///|
 /// An error that may occur when constructing an out of bounds lane index.
-pub(all) suberror OutOfBoundsLaneIdx derive(Debug)
+#derive(Debug)
+pub(all) suberror OutOfBoundsLaneIdx
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -22,7 +23,8 @@ pub extend OutOfBoundsLaneIdx with @debug.Debug::{to_repr}
 ///
 /// Upstream `ImmLaneIdx<2>`. Values are masked to the valid range when used
 /// (like upstream's `From<ImmLaneIdx<N>> for u8`).
-pub(all) struct ImmLaneIdx2(Byte) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx2(Byte)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -41,7 +43,8 @@ pub extend ImmLaneIdx2 with @debug.Debug::{to_repr}
 
 ///|
 /// A byte with values in the range 0–3 identifying a lane.
-pub(all) struct ImmLaneIdx4(Byte) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx4(Byte)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -60,7 +63,8 @@ pub extend ImmLaneIdx4 with @debug.Debug::{to_repr}
 
 ///|
 /// A byte with values in the range 0–7 identifying a lane.
-pub(all) struct ImmLaneIdx8(Byte) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx8(Byte)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -79,7 +83,8 @@ pub extend ImmLaneIdx8 with @debug.Debug::{to_repr}
 
 ///|
 /// A byte with values in the range 0–15 identifying a lane.
-pub(all) struct ImmLaneIdx16(Byte) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx16(Byte)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -98,7 +103,8 @@ pub extend ImmLaneIdx16 with @debug.Debug::{to_repr}
 
 ///|
 /// A byte with values in the range 0–31 identifying a lane.
-pub(all) struct ImmLaneIdx32(Byte) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ImmLaneIdx32(Byte)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

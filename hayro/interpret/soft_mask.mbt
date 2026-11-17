@@ -2,12 +2,13 @@
 
 ///|
 /// Type type of mask.
+#derive(Eq, Debug)
 pub(all) enum MaskType {
   /// A luminosity mask.
   Luminosity
   /// An alpha mask.
   Alpha
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

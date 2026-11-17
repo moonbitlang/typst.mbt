@@ -6,6 +6,7 @@
 ///
 /// `Show` produces Rust's `{:?}` (derived `Debug`) text, e.g.
 /// `Hash({String("a"): Integer(1)})`.
+#derive(Eq, Hash, Debug)
 pub(all) enum Yaml {
   /// Float types are stored as String and parsed on demand.
   Real(String)
@@ -29,7 +30,7 @@ pub(all) enum Yaml {
   /// simplifies error handling in the calling code. Invalid type conversion also
   /// returns `BadValue`.
   BadValue
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

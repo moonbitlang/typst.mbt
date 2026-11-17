@@ -49,12 +49,13 @@ fn get_consonant_type(u : UInt32) -> Consonant {
 }
 
 ///|
+#derive(Eq)
 priv enum Mark {
   AV
   BV
   T
   NotMark
-} derive(Eq)
+}
 
 ///|
 fn Mark::to_int(self : Mark) -> Int32 {
@@ -77,6 +78,7 @@ fn get_mark_type(u : UInt32) -> Mark {
 }
 
 ///|
+#derive(Eq)
 priv enum Action {
   NOP
   /// Shift combining-mark down.
@@ -87,7 +89,7 @@ priv enum Action {
   SDL
   /// Remove descender from base.
   RD
-} derive(Eq)
+}
 
 ///|
 priv struct PuaMapping {

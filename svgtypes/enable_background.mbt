@@ -4,11 +4,12 @@
 /// Representation of the [`enable-background`] attribute.
 ///
 /// [`enable-background`]: https://www.w3.org/TR/SVG11/filters.html#EnableBackgroundProperty
+#derive(Eq, Debug)
 pub(all) enum EnableBackground {
   Accumulate
   New
   NewWithRegion(x~ : Double, y~ : Double, width~ : Double, height~ : Double)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -199,10 +199,11 @@ pub fn LinkedNode::next_sibling_kind(self : LinkedNode) -> SyntaxKind? {
 
 ///|
 /// Indicates whether the cursor is before the related byte index, or after.
+#derive(Eq, Debug)
 pub(all) enum Side {
   Before
   After
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -6,10 +6,11 @@
 ///
 /// For example, the output could be Rass97 or MKG+21. Corresponds to
 /// LaTeX's `alphabetical` style.
+#derive(Eq, Hash, Debug)
 pub(all) struct Alphanumerical {
   /// Defines how many letters are allowed to describe an entry.
   letters : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

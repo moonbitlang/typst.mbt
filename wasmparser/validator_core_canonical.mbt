@@ -210,6 +210,7 @@ fn Module::at_packed_index(
 }
 
 ///|
+#derive(Eq)
 priv enum CanonicalizationMode {
   /// Standard canonicalization: turns module indices into either (1)
   /// `CoreTypeId`s for inter-group references or (2) rec-group-local indices
@@ -220,7 +221,7 @@ priv enum CanonicalizationMode {
   /// exposing types to end users so they don't have to deal with
   /// rec-group-local indices.
   OnlyIds
-} derive(Eq)
+}
 
 ///|
 priv struct TypeCanonicalizer {

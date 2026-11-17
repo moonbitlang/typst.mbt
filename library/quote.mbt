@@ -3,10 +3,11 @@
 
 ///|
 /// Attribution for a quote.
+#derive(Eq)
 pub(all) enum Attribution {
   Content(Content)
   Label(Label)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

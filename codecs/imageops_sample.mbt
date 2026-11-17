@@ -11,6 +11,7 @@
 
 ///|
 /// Available Sampling Filters.
+#derive(Eq, Hash, Debug)
 pub(all) enum FilterType {
   /// Nearest Neighbor
   Nearest
@@ -22,7 +23,7 @@ pub(all) enum FilterType {
   Gaussian
   /// Lanczos with window 3
   Lanczos3
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

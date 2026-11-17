@@ -5,6 +5,7 @@
 
 ///|
 /// A list of errors that can occur during a CFF glyph outlining.
+#derive(Eq, Debug)
 pub(all) suberror CFFError {
   NoGlyph
   ReadOutOfBounds
@@ -24,7 +25,7 @@ pub(all) suberror CFFError {
   InvalidItemVariationDataIndex
   InvalidNumberOfBlendOperands
   BlendRegionsLimitReached
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -77,7 +78,8 @@ fn CffBuilder::close(self : CffBuilder) -> Unit {
 
 ///|
 /// A type-safe wrapper for string ID.
-pub(all) struct StringId(UInt16) derive(Eq, Compare, Debug)
+#derive(Eq, Compare, Debug)
+pub(all) struct StringId(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -37,7 +37,8 @@ pub let vec2_zero : Vec2
 // Errors
 
 // Types and methods
-pub(all) struct Affine(FixedArray[Double]) derive(@debug.Debug)
+#derive(@debug.Debug)
+pub(all) struct Affine(FixedArray[Double])
 pub fn Affine::apply(Self, Point) -> Point
 pub fn Affine::as_coeffs(Self) -> FixedArray[Double]
 pub fn Affine::default() -> Self
@@ -60,13 +61,14 @@ pub impl Default for Affine
 pub impl Eq for Affine
 pub impl Mul for Affine
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Arc {
   center : Point
   radii : Vec2
   start_angle : Double
   sweep_angle : Double
   x_rotation : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Arc::append_iter(Self, Double) -> ArcAppendIter
 pub fn Arc::eval(Self, Double) -> Point
 pub fn Arc::new(Point, Vec2, Double, Double, Double) -> Self
@@ -79,9 +81,10 @@ pub struct ArcAppendIter {
 }
 pub fn ArcAppendIter::next(Self) -> PathEl?
 
+#derive(Eq, @debug.Debug)
 pub struct BezPath {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn BezPath::bounding_box(Self) -> Rect
 pub fn BezPath::clone(Self) -> Self
 pub fn BezPath::close_path(Self) -> Unit
@@ -102,26 +105,29 @@ pub fn BezPath::transform(Self, Affine) -> Self
 pub fn BezPath::truncate(Self, Int32) -> Unit
 pub fn BezPath::winding(Self, Point) -> Int32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Cap {
   Butt
   Square
   Round
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Circle {
   center : Point
   radius : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Circle::contains(Self, Point) -> Bool
 pub fn Circle::new(Point, Double) -> Self
 pub fn Circle::winding(Self, Point) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CubicBez {
   p0 : Point
   p1 : Point
   p2 : Point
   p3 : Point
-} derive(Eq, @debug.Debug)
+}
 pub fn CubicBez::arclen(Self, Double) -> Double
 pub fn CubicBez::bounding_box(Self) -> Rect
 pub fn CubicBez::deriv(Self) -> QuadBez
@@ -134,21 +140,24 @@ pub fn CubicBez::subdivide(Self) -> (Self, Self)
 pub fn CubicBez::subsegment(Self, Double, Double) -> Self
 pub fn CubicBez::transform(Self, Affine) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CuspType {
   Loop
   DoubleInflection
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Join {
   Bevel
   Miter
   Round
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Line {
   p0 : Point
   p1 : Point
-} derive(Eq, @debug.Debug)
+}
 pub fn Line::arclen(Self, Double) -> Double
 pub fn Line::eval(Self, Double) -> Point
 pub fn Line::inv_arclen(Self, Double, Double) -> Double
@@ -157,27 +166,30 @@ pub fn Line::nearest(Self, Point, Double) -> Nearest
 pub fn Line::new(Point, Point) -> Self
 pub fn Line::subsegment(Self, Double, Double) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Nearest {
   distance_sq : Double
   t : Double
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PathEl {
   MoveTo(Point)
   LineTo(Point)
   QuadTo(Point, Point)
   CurveTo(Point, Point, Point)
   ClosePath
-} derive(Eq, @debug.Debug)
+}
 pub fn PathEl::end_point(Self) -> Point?
 pub fn PathEl::is_finite(Self) -> Bool
 pub fn PathEl::transform(Self, Affine) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PathSeg {
   Line(Line)
   Quad(QuadBez)
   Cubic(CubicBez)
-} derive(Eq, @debug.Debug)
+}
 pub fn PathSeg::arclen(Self, Double) -> Double
 pub fn PathSeg::as_path_el(Self) -> PathEl
 pub fn PathSeg::bounding_box(Self) -> Rect
@@ -189,10 +201,11 @@ pub fn PathSeg::start(Self) -> Point
 pub fn PathSeg::subsegment(Self, Double, Double) -> Self
 pub fn PathSeg::winding(Self, Point) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Point {
   x : Double
   y : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Point::add_vec(Self, Vec2) -> Self
 pub fn Point::is_finite(Self) -> Bool
 pub fn Point::lerp(Self, Self, Double) -> Self
@@ -202,11 +215,12 @@ pub fn Point::sub(Self, Self) -> Vec2
 pub fn Point::sub_vec(Self, Vec2) -> Self
 pub fn Point::to_vec2(Self) -> Vec2
 
+#derive(Eq, @debug.Debug)
 pub(all) struct QuadBez {
   p0 : Point
   p1 : Point
   p2 : Point
-} derive(Eq, @debug.Debug)
+}
 pub fn QuadBez::arclen(Self, Double) -> Double
 pub fn QuadBez::deriv(Self) -> Line
 pub fn QuadBez::eval(Self, Double) -> Point
@@ -218,12 +232,13 @@ pub fn QuadBez::raise_order(Self) -> CubicBez
 pub fn QuadBez::subdivide(Self) -> (Self, Self)
 pub fn QuadBez::subsegment(Self, Double, Double) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Rect {
   x0 : Double
   y0 : Double
   x1 : Double
   y1 : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Rect::abs(Self) -> Self
 pub fn Rect::area(Self) -> Double
 pub fn Rect::bounding_box(Self) -> Self
@@ -246,6 +261,7 @@ pub fn Rect::union_pt(Self, Point) -> Self
 pub fn Rect::width(Self) -> Double
 pub impl Default for Rect
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Stroke {
   width : Double
   join : Join
@@ -254,7 +270,7 @@ pub(all) struct Stroke {
   end_cap : Cap
   dash_pattern : Array[Double]
   dash_offset : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Stroke::is_finite(Self) -> Bool
 pub fn Stroke::is_nan(Self) -> Bool
 pub fn Stroke::new(Double) -> Self
@@ -266,31 +282,35 @@ pub fn Stroke::with_miter_limit(Self, Double) -> Self
 pub fn Stroke::with_start_cap(Self, Cap) -> Self
 pub impl Default for Stroke
 
+#derive(@debug.Debug)
 pub struct StrokeCtx {
   // private fields
-} derive(@debug.Debug)
+}
 pub fn StrokeCtx::new() -> Self
 pub fn StrokeCtx::output(Self) -> BezPath
 pub impl Default for StrokeCtx
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StrokeOptLevel {
   Subdivide
   Optimized
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub struct StrokeOpts {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn StrokeOpts::default() -> Self
 pub fn StrokeOpts::opt_level(Self, StrokeOptLevel) -> Self
 pub fn StrokeOpts::stable_dash_order(Self, Bool) -> Self
 pub impl Default for StrokeOpts
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Triangle {
   a : Point
   b : Point
   c : Point
-} derive(Eq, @debug.Debug)
+}
 pub fn Triangle::area(Self) -> Double
 pub fn Triangle::bounding_box(Self) -> Rect
 pub fn Triangle::centroid(Self) -> Point
@@ -299,10 +319,11 @@ pub fn Triangle::from_coords((Double, Double), (Double, Double), (Double, Double
 pub fn Triangle::new(Point, Point, Point) -> Self
 pub fn Triangle::winding(Self, Point) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Vec2 {
   x : Double
   y : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Vec2::cross(Self, Self) -> Double
 pub fn Vec2::dot(Self, Self) -> Double
 pub fn Vec2::from_angle(Double) -> Self

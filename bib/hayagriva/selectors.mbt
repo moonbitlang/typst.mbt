@@ -4,6 +4,7 @@
 
 ///|
 /// A selector used to filter bibliographies and match on entries.
+#derive(Eq, Debug)
 pub(all) enum Selector {
   /// A wildcard selector: `*`.
   Wildcard
@@ -21,7 +22,7 @@ pub(all) enum Selector {
   Multi(Array[Selector])
   /// An ancestrage selector: `a > b`.
   Ancestrage(Selector, Selector)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

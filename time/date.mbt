@@ -4,13 +4,14 @@
 /// Date in the proleptic Gregorian calendar.
 ///
 /// By default, years between ±9999 inclusive are representable.
+#derive(Eq, Compare, Hash, Debug)
 pub struct Date {
   // |     x      | xxxxxxxxxxxxxxxxxxxxx |       x       | xxxxxxxxx |
   // |   1 bit    |        21 bits        |     1 bit     |  9 bits   |
   // | unassigned |         year          | is leap year? |  ordinal  |
   // The year is 15 bits when `large-dates` is not enabled.
   priv value : Int32
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

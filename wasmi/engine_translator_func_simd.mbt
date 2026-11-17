@@ -10,6 +10,7 @@ fn fuel_simd(costs : @wasmi_core.FuelCostsProvider) -> UInt64 {
 
 ///|
 /// The lane type `T` of SIMD lane operations (upstream `IntoLaneIdx`).
+#derive(Eq)
 pub(all) enum LaneTy {
   I8
   U8
@@ -19,7 +20,7 @@ pub(all) enum LaneTy {
   I64
   F32
   F64
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

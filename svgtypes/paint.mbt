@@ -6,6 +6,7 @@
 /// Used by the [`Paint`] type.
 ///
 /// [`<paint>`]: https://www.w3.org/TR/SVG2/painting.html#SpecifyingPaint
+#derive(Eq, Debug)
 pub(all) enum PaintFallback {
   /// The `none` value.
   None
@@ -15,7 +16,7 @@ pub(all) enum PaintFallback {
   ///
   /// [`<color>`]: https://www.w3.org/TR/css-color-3/
   Color(Color)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -33,6 +34,7 @@ pub extend PaintFallback with @debug.Debug::{to_repr}
 /// `<icccolor>` isn't supported.
 ///
 /// [`<paint>`]: https://www.w3.org/TR/SVG2/painting.html#SpecifyingPaint
+#derive(Eq, Debug)
 pub(all) enum Paint {
   /// The `none` value.
   None
@@ -52,7 +54,7 @@ pub(all) enum Paint {
   ContextFill
   /// The `context-stroke` value.
   ContextStroke
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

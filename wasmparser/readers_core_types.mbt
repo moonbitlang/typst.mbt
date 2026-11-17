@@ -30,7 +30,8 @@
 // * `01`: The `index` is an index into the containing type's recursion group.
 //
 // * `10`: The `index` is a `CoreTypeId`.
-pub(all) struct PackedIndex(UInt32) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct PackedIndex(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -197,6 +198,7 @@ pub extend PackedIndex with Show::{to_string, output}
 /// The uncompressed form of a `PackedIndex`.
 ///
 /// Can be used for `match` statements.
+#derive(Eq, Hash, Debug)
 pub(all) enum UnpackedIndex {
   /// An index into a Wasm module's types space.
   Module(UInt32)
@@ -204,7 +206,7 @@ pub(all) enum UnpackedIndex {
   RecGroup(UInt32)
   /// A type identifier.
   Id(CoreTypeId)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -283,9 +285,10 @@ pub extend UnpackedIndex with Show::{to_string, output}
 
 ///|
 /// Represents a recursive type group in a WebAssembly module.
+#derive(Debug)
 pub struct RecGroup {
   priv inner : RecGroupInner
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -293,10 +296,11 @@ pub struct RecGroup {
 pub extend RecGroup with @debug.Debug::{to_repr}
 
 ///|
+#derive(Debug)
 priv enum RecGroupInner {
   Implicit(Int32, SubType)
   Explicit(Array[(Int32, SubType)])
-} derive(Debug)
+}
 
 ///|
 fn RecGroup::explicit(types : Array[(Int32, SubType)]) -> RecGroup {
@@ -399,6 +403,7 @@ pub extend RecGroup with Hash::{hash, hash_combine}
 
 ///|
 /// Represents a subtype of possible other types in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub(all) struct SubType {
   /// Is the subtype final.
   is_final : Bool
@@ -407,7 +412,7 @@ pub(all) struct SubType {
   mut supertype_idx : PackedIndex?
   /// The composite type of the subtype.
   composite_type : CompositeType
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -505,13 +510,14 @@ fn SubType::remap_indices(
 
 ///|
 /// Represents a composite type in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub(all) struct CompositeType {
   /// The type defined inside the composite type.
   inner : CompositeInnerType
   /// Is the composite type shared? This is part of the
   /// shared-everything-threads proposal.
   shared : Bool
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -530,6 +536,7 @@ pub extend CompositeType with @debug.Debug::{to_repr}
 
 ///|
 /// A [`CompositeType`] can contain one of these types.
+#derive(Eq, Hash, Debug)
 pub(all) enum CompositeInnerType {
   /// The type is for a function.
   Func(FuncType)
@@ -539,7 +546,7 @@ pub(all) enum CompositeInnerType {
   Struct(StructType)
   /// The type is for a continuation.
   Cont(ContType)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -613,12 +620,13 @@ pub fn CompositeType::unwrap_cont(self : CompositeType) -> ContType {
 
 ///|
 /// Represents a type of a function in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub struct FuncType {
   /// The combined parameters and result types.
   priv params_results : Array[ValType]
   /// The number of parameter types.
   priv len_params : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -696,7 +704,8 @@ pub fn FuncType::results(self : FuncType) -> ArrayView[ValType] {
 
 ///|
 /// Represents a type of an array in a WebAssembly module.
-pub(all) struct ArrayType(FieldType) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ArrayType(FieldType)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -715,12 +724,13 @@ pub extend ArrayType with @debug.Debug::{to_repr}
 
 ///|
 /// Represents a field type of an array or a struct.
+#derive(Eq, Hash, Debug)
 pub(all) struct FieldType {
   /// Array element type.
   mut element_type : StorageType
   /// Are elements mutable.
   mutable : Bool
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -751,6 +761,7 @@ fn FieldType::remap_indices(
 ///|
 /// Represents storage types introduced in the GC spec for array and struct
 /// fields.
+#derive(Eq, Hash, Debug)
 pub(all) enum StorageType {
   /// The storage type is i8.
   I8
@@ -758,7 +769,7 @@ pub(all) enum StorageType {
   I16
   /// The storage type is a value type.
   Val(ValType)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -808,10 +819,11 @@ pub fn StorageType::unpack(self : StorageType) -> ValType {
 
 ///|
 /// Represents a type of a struct in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub(all) struct StructType {
   /// Struct fields.
   fields : Array[FieldType]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -830,9 +842,10 @@ pub extend StructType with @debug.Debug::{to_repr}
 
 ///|
 /// Represents a type of a continuation in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub(all) struct ContType {
   mut idx : PackedIndex
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -859,6 +872,7 @@ fn ContType::remap_indices(
 
 ///|
 /// Represents the types of values in a WebAssembly module.
+#derive(Eq, Hash, Debug)
 pub(all) enum ValType {
   /// The value type is i32.
   I32
@@ -872,7 +886,7 @@ pub(all) enum ValType {
   V128
   /// The value type is a reference.
   Ref(RefType)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1024,7 +1038,8 @@ fn ValType::remap_indices(
 //
 //   0000 = none
 //   ```
-pub(all) struct RefType(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct RefType(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1518,6 +1533,7 @@ fn RefType::wat(self : RefType) -> String {
 
 ///|
 /// A heap type.
+#derive(Eq, Hash, Debug)
 pub(all) enum HeapType {
   /// An abstract heap type; e.g., `anyref`.
   Abstract(shared~ : Bool, ty~ : AbstractHeapType)
@@ -1525,7 +1541,7 @@ pub(all) enum HeapType {
   ///
   /// Introduced in the function-references proposal.
   Concrete(UnpackedIndex)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1552,6 +1568,7 @@ pub let heaptype_extern : HeapType = Abstract(shared=false, ty=Extern)
 
 ///|
 /// An abstract heap type.
+#derive(Eq, Hash, Debug)
 pub(all) enum AbstractHeapType {
   /// The abstract, untyped (any) function.
   ///
@@ -1632,7 +1649,7 @@ pub(all) enum AbstractHeapType {
   ///
   /// Introduced in the stack-switching proposal.
   NoCont
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1943,6 +1960,7 @@ pub extend AbstractHeapType with FromReader::{from_reader}
 
 ///|
 /// Represents a table's type.
+#derive(Eq, Debug)
 pub(all) struct TableType {
   /// The table's element type.
   mut element_type : RefType
@@ -1964,7 +1982,7 @@ pub(all) struct TableType {
   ///
   /// This is included the shared-everything-threads proposal.
   shared : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1988,6 +2006,7 @@ pub fn TableType::index_type(self : TableType) -> ValType {
 
 ///|
 /// Represents a memory's type.
+#derive(Eq, Debug)
 pub(all) struct MemoryType {
   /// Whether or not this is a 64-bit memory, using i64 as an index. If this
   /// is false it's a 32-bit memory using i32 as an index.
@@ -2020,7 +2039,7 @@ pub(all) struct MemoryType {
   ///
   /// [The custom-page-sizes proposal]: https://github.com/WebAssembly/custom-page-sizes
   page_size_log2 : UInt32?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2044,6 +2063,7 @@ pub fn MemoryType::index_type(self : MemoryType) -> ValType {
 
 ///|
 /// Represents a global's type.
+#derive(Eq, Debug)
 pub(all) struct GlobalType {
   /// The global's type.
   mut content_type : ValType
@@ -2051,7 +2071,7 @@ pub(all) struct GlobalType {
   mutable : Bool
   /// Whether or not the global is shared.
   shared : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2065,10 +2085,11 @@ pub extend GlobalType with @debug.Debug::{to_repr}
 
 ///|
 /// Represents a tag kind.
+#derive(Eq, Debug)
 pub(all) enum TagKind {
   /// The tag is an exception type.
   Exception
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2082,12 +2103,13 @@ pub extend TagKind with @debug.Debug::{to_repr}
 
 ///|
 /// A tag's type.
+#derive(Eq, Debug)
 pub(all) struct TagType {
   /// The kind of tag
   kind : TagKind
   /// The function type this tag uses.
   func_type_idx : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

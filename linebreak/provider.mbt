@@ -100,6 +100,7 @@ fn RuleBreakData::get_break_state_from_table(
 
 ///|
 /// The struct that stores the break state.
+#derive(Eq)
 priv enum BreakState {
   /// Break
   Break
@@ -111,7 +112,7 @@ priv enum BreakState {
   Intermediate(Int32)
   /// Index of a state.
   Index(Int32)
-} derive(Eq)
+}
 
 ///|
 fn BreakState::from_unaligned(unaligned : Int32) -> BreakState {

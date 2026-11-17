@@ -90,6 +90,7 @@ fn Tag::try_from(value : UInt32) -> Tag? {
 }
 
 ///|
+#derive(Eq)
 priv enum TagTypeDefinition {
   Text
   MultiLocalizedUnicode
@@ -112,7 +113,7 @@ priv enum TagTypeDefinition {
   U64Array
   Measurement
   NotAllowed
-} derive(Eq)
+}
 
 ///|
 fn TagTypeDefinition::from(value : UInt32) -> TagTypeDefinition {

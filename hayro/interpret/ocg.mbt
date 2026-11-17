@@ -126,11 +126,12 @@ fn OcgState::is_visible(self : OcgState) -> Bool {
 }
 
 ///|
+#derive(Eq)
 priv enum BaseState {
   On
   Off
   Unchanged
-} derive(Eq)
+}
 
 ///|
 fn BaseState::from_name(name : String) -> BaseState? {

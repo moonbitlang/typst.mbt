@@ -2,13 +2,14 @@
 
 ///|
 /// A path verb.
+#derive(Eq, Compare, Debug, Hash)
 pub(all) enum PathVerb {
   Move
   Line
   Quad
   Cubic
   Close
-} derive(Eq, Compare, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -48,11 +49,12 @@ pub extend PathVerb with Hash::{hash, hash_combine}
 /// - No duplicated Move.
 /// - No duplicated Close.
 /// - Zero-length contours are allowed.
+#derive(Eq, Debug)
 pub struct Path {
   priv verbs : Array[PathVerb]
   priv points : Array[Point]
   priv bounds : Rect
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -229,13 +231,14 @@ fn compute_cubic_extremas(
 
 ///|
 /// A path segment.
+#derive(Eq, Debug)
 pub(all) enum PathSegment {
   MoveTo(Point)
   LineTo(Point)
   QuadTo(Point, Point)
   CubicTo(Point, Point, Point)
   Close
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

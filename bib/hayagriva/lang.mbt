@@ -7,6 +7,7 @@
 
 ///|
 /// Rules for the title case transformation.
+#derive(Eq, Hash, Debug)
 pub(all) struct TitleCase {
   /// Always capitalize after a full stop, question or exclamation mark, and
   /// colon even if the punctuation is followed by a word on the
@@ -30,7 +31,7 @@ pub(all) struct TitleCase {
   trim_start : Bool
   /// Discard whitespace at the end of the title.
   trim_end : Bool
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -66,6 +67,7 @@ pub extend TitleCase with Default::{default}
 
 ///|
 /// Rules for the sentence case transformation.
+#derive(Eq, Hash, Debug)
 pub(all) struct SentenceCase {
   /// Capitalize words that contain caps in a non-start position (e. g.
   /// `fahrCard`).
@@ -82,7 +84,7 @@ pub(all) struct SentenceCase {
   trim_start : Bool
   /// Discard whitespace at the end of the title.
   trim_end : Bool
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -116,6 +118,7 @@ pub extend SentenceCase with Default::{default}
 
 ///|
 /// Which case to transform to
+#derive(Eq, Hash, Debug)
 pub(all) enum Case {
   /// Capitalize all words except for some words using customary English
   /// rules.
@@ -132,7 +135,7 @@ pub(all) enum Case {
   FirstUpper
   /// Capitalize the first letter of each word.
   AllUpper
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -181,6 +184,7 @@ pub fn Case::from_text_case(case : @citationberg.TextCase) -> Case {
 }
 
 ///|
+#derive(Eq)
 priv enum CharClass {
   NewSentence
   MaybeNewSentence
@@ -188,7 +192,7 @@ priv enum CharClass {
   MaybeSubclause
   NewWord
   InWord
-} derive(Eq)
+}
 
 ///|
 fn CharClass::step(
@@ -240,11 +244,12 @@ fn CharClass::is_in_word(self : CharClass) -> Bool {
 }
 
 ///|
+#derive(Eq)
 priv enum WordCase {
   Lowercase
   HasNonStartUpper
   AllUpper
-} derive(Eq)
+}
 
 ///|
 fn WordCase::feed(self : WordCase, is_upper : Bool, second : Bool) -> WordCase {

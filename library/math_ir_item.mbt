@@ -1105,10 +1105,11 @@ pub fn FencedBody::item(self : FencedBody) -> MathItem {
 
 ///|
 /// Stretch configuration for a glyph on both axes.
+#derive(Eq, Hash)
 pub(all) struct Stretch {
   x : StretchInfo?
   y : StretchInfo?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1242,6 +1243,7 @@ pub fn Stretch::is_explicit(self : Stretch, axis : Axis) -> Bool {
 
 ///|
 /// Information about how to stretch a glyph on one axis.
+#derive(Eq, Hash)
 pub(all) struct StretchInfo {
   /// The target size to stretch to.
   target : Rel[Abs]
@@ -1263,7 +1265,7 @@ pub(all) struct StretchInfo {
   ///
   /// Only used in paged export.
   font_size : Abs?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1358,12 +1360,13 @@ pub fn StretchInfo::mul(self : StretchInfo, rhs : StretchInfo) -> StretchInfo {
 ///|
 /// A marker representing the positioning of something above or below a base
 /// (upstream `math::ir::Position`).
+#derive(Eq, Debug)
 pub(all) enum MathPosition {
   /// Placed above the base.
   Above
   /// Placed below the base.
   Below
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

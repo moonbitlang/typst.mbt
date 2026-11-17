@@ -6,6 +6,7 @@
 /// Unlike other types, doesn't guarantee to be valid. This is Skia quirk.
 /// Meaning Transform(0, 0, 0, 0, 0, 0) is ok, while it's technically not.
 /// Non-finite values are also not an error.
+#derive(Eq, Debug)
 pub(all) struct Transform {
   sx : Float
   kx : Float
@@ -13,7 +14,7 @@ pub(all) struct Transform {
   sy : Float
   tx : Float
   ty : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -3,11 +3,12 @@
 
 ///|
 /// Combined date and time.
+#derive(Eq, Compare, Hash, Debug)
 pub struct PrimitiveDateTime {
   // The order of these fields matters for the derived `Compare`.
   priv date : Date
   priv time : Time
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

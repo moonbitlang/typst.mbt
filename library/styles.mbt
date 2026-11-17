@@ -132,6 +132,7 @@ pub extend Styles with Eq::{not_equal, equal}
 
 ///|
 /// A single style property, recipe or revocation.
+#derive(Eq)
 pub(all) enum Style {
   /// A style property originating from a set rule or constructor.
   Property(Property)
@@ -139,7 +140,7 @@ pub(all) enum Style {
   Recipe(Recipe)
   /// Disables a specific show rule recipe.
   Revocation(Int32)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -337,6 +338,7 @@ pub fn Recipe::apply(
 
 ///|
 /// A show rule transformation that can be applied to a match.
+#derive(Eq)
 pub(all) enum Transformation {
   /// Replacement content.
   Content(Content)
@@ -344,7 +346,7 @@ pub(all) enum Transformation {
   Func(Func)
   /// Apply styles to the content.
   Style(Styles)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

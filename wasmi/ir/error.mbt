@@ -2,6 +2,7 @@
 
 ///|
 /// An error that may be occurred when operating with some Wasmi IR primitives.
+#derive(Eq)
 pub(all) suberror IrError {
   /// Encountered when trying to create a [`Slot`] from an out of bounds integer.
   StackSlotOutOfBounds
@@ -11,7 +12,7 @@ pub(all) suberror IrError {
   ComparatorOutOfBounds
   /// Encountered when trying to create a [`BlockFuel`] from an out of bounds integer.
   BlockFuelOutOfBounds
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -36,7 +37,8 @@ pub extend IrError with Show::{to_string, output}
 ///|
 /// Error when trying to convert a value into an immediate that cannot
 /// represent it (upstream `OutOfBoundsConst`).
-pub(all) suberror OutOfBoundsConst derive(Eq)
+#derive(Eq)
+pub(all) suberror OutOfBoundsConst
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

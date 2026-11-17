@@ -2,6 +2,7 @@
 
 ///|
 /// The name of the cmap.
+#derive(Eq, Debug)
 pub(all) enum CMapName {
   // ── Adobe-Japan1 (Japanese) ── Shift-JIS (RKSJ) encodings ──
   /// `83pv-RKSJ-H` — Adobe-Japan1, Mac Shift-JIS (`KanjiTalk` 6), horizontal.
@@ -166,7 +167,7 @@ pub(all) enum CMapName {
   V
   /// A custom (non-predefined) `CMap` name.
   Custom(BytesView)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

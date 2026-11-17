@@ -7,13 +7,14 @@
 ///|
 /// A severity level for diagnostic messages
 /// (`codespan_reporting::diagnostic::Severity`).
+#derive(Eq, Debug)
 pub(all) enum Severity {
   Bug
   Error
   Warning
   Note
   Help
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,10 +29,11 @@ pub extend Severity with @debug.Debug::{to_repr}
 ///|
 /// The style of a label (`LabelStyle`). Ordered like upstream's derived
 /// `PartialOrd`: `Primary < Secondary`.
+#derive(Eq, Debug)
 pub(all) enum LabelStyle {
   Primary
   Secondary
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -101,10 +103,11 @@ pub(all) struct Diagnostic {
 
 ///|
 /// How a diagnostic is displayed (`term::DisplayStyle`).
+#derive(Eq, Debug)
 pub(all) enum DisplayStyle {
   Rich
   Short
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

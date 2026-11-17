@@ -8,10 +8,11 @@
 
 ///|
 /// A half-open range of byte indices (`Range<usize>`).
+#derive(Eq, Compare, Hash, Debug)
 pub(all) struct Range {
   start : Int32
   end : Int32
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -54,11 +55,12 @@ pub fn Range::contains(self : Range, i : Int32) -> Bool {
 /// Represented as a range of byte indices.
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum Direction {
   Ltr
   Rtl
   Mixed
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -72,6 +74,7 @@ pub extend Direction with @debug.Debug::{to_repr}
 
 ///|
 /// Bidi information about a single paragraph
+#derive(Eq, Debug)
 pub(all) struct ParagraphInfo {
   /// The paragraphs boundaries within the text, as byte indices.
   range : Range
@@ -79,7 +82,7 @@ pub(all) struct ParagraphInfo {
   ///
   /// <http://www.unicode.org/reports/tr9/#BD4>
   level : Level
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

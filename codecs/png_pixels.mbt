@@ -379,6 +379,7 @@ pub fn decode_png(data : BytesView) -> (ImageInfo, Bytes) raise ImageError {
 ///|
 /// What decoding a PNG with the `png` crate itself fails with
 /// ([decode_png_frame]).
+#derive(Debug)
 pub(all) suberror PngFrameError {
   /// A `png::DecodingError` of `read_info` or `next_frame`: its `Display`
   /// output.
@@ -387,7 +388,7 @@ pub(all) suberror PngFrameError {
   /// `isize::MAX` bytes. (krilla reports "image is too large", tiny-skia
   /// `DecodingError::LimitsExceeded`.)
   OutputBufferSize
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

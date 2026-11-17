@@ -2,6 +2,7 @@
 
 ///|
 /// A strip.
+#derive(Eq)
 struct Strip {
   /// The x coordinate of the strip, in user coordinates.
   x : Int32
@@ -9,7 +10,7 @@ struct Strip {
   y : Int32
   /// Packed alpha index (bits 0..=30) and fill gap flag (bit 31).
   packed_alpha_idx_fill_gap : UInt32
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

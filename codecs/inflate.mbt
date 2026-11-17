@@ -8,9 +8,10 @@
 
 ///|
 /// A decompression error.
+#derive(Debug)
 pub(all) suberror InflateError {
   InflateError(String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

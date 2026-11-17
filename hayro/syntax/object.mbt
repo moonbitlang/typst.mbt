@@ -196,12 +196,13 @@ pub extend Object with Readable::{read}
 
 ///|
 /// An identifier for a PDF object.
+#derive(Eq, Hash, Compare, Debug)
 pub(all) struct ObjectIdentifier {
   /// The object number.
   obj_number : Int32
   /// The generation number.
   gen_number : Int32
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -4,6 +4,7 @@ package "moonbitlang/typst/doc"
 import {
   "moonbitlang/core/builtin",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
   "moonbitlang/typst/layout",
   "moonbitlang/typst/library",
   "moonbitlang/typst/pdf",
@@ -622,7 +623,7 @@ pub struct Feedback {
   pages : Array[Int32]
   origins : Array[FeedbackOrigin]
 }
-pub fn Feedback::to_json(Self) -> Json
+pub fn Feedback::to_json(Self) -> @json.Json
 pub fn Feedback::to_text(Self) -> String
 
 pub struct FeedbackOrigin {
@@ -1015,12 +1016,13 @@ pub struct Lint {
 }
 pub fn Lint::render(Self) -> String
 
+#derive(Eq)
 pub(all) enum LintKind {
   AdjacentInline
   MissingGlyph
   OutsidePage
   OutsideContainer
-} derive(Eq)
+}
 pub fn LintKind::name(Self) -> String
 
 pub struct List {
@@ -2296,10 +2298,11 @@ pub impl @debug.Debug for SetV
 pub impl IntoContent for SetV
 pub impl SetRule for SetV
 
+#derive(Eq)
 pub(all) enum Severity {
   Error
   Warning
-} derive(Eq)
+}
 
 pub struct Show {
   // private fields

@@ -355,6 +355,7 @@ fn parse_procedure_inner(r : @hayro_syntax.Reader) -> Array[PostScriptOp]? {
 }
 
 ///|
+#derive(Eq, Debug)
 priv enum PostScriptOp {
   Number(@hayro_syntax.Number)
   Abs
@@ -399,7 +400,7 @@ priv enum PostScriptOp {
   Index
   Pop
   Roll
-} derive(Eq, Debug)
+}
 
 ///|
 /// `r.read::<content::Operator>()`.

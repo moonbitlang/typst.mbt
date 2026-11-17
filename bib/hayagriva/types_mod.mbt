@@ -3,6 +3,7 @@
 
 ///|
 /// Describes which kind of work a database entry refers to.
+#derive(Eq, Hash, Debug)
 pub(all) enum EntryType {
   /// A short text, possibly of journalistic or scientific nature, appearing
   /// in some greater publication.
@@ -76,7 +77,7 @@ pub(all) enum EntryType {
   Exhibition
   /// A prior publication of the same item.
   Original
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -181,12 +182,13 @@ pub fn EntryType::default_parent(self : EntryType) -> EntryType {
 
 ///|
 /// A type that may be a string or a strictly typed value.
+#derive(Eq, Hash, Debug)
 pub(all) enum MaybeTyped[T] {
   /// The typed variant.
   Typed(T)
   /// The fallback string variant.
   String(String)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -300,12 +302,13 @@ pub fn MaybeTyped::page_ranges_csl_cmp(
 
 ///|
 /// An URL, possibly with a last visited date.
+#derive(Eq, Hash, Debug)
 pub(all) struct QualifiedUrl {
   /// The [Url].
   value : Url
   /// The last visited date.
   visit_date : Date?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -349,12 +352,13 @@ pub extend QualifiedUrl with Show::{to_string, output}
 
 ///|
 /// A publisher, possibly with a location.
+#derive(Eq, Hash, Debug)
 pub(all) struct Publisher {
   /// Publisher of the item.
   name : FormatString?
   /// Physical location at which the item was published or created.
   location : FormatString?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -394,7 +398,8 @@ pub fn Publisher::from_str(
 ///|
 /// A set of serial numbers like DOIs, ISBNs, or ISSNs. Keys should be
 /// lowercase.
-pub(all) struct SerialNumber(Map[String, String]) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct SerialNumber(Map[String, String])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

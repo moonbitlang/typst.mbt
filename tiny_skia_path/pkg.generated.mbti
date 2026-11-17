@@ -41,16 +41,18 @@ pub fn valid_unit_divide(Float, Float) -> NormalizedF32Exclusive?
 // Errors
 
 // Types and methods
+#derive(Default, @debug.Debug)
 pub(all) struct CubicCoeff {
   a : F32x2
   b : F32x2
   c : F32x2
   d : F32x2
-} derive(Default, @debug.Debug)
+}
 pub fn CubicCoeff::eval(Self, F32x2) -> F32x2
 pub fn CubicCoeff::from_points(ArrayView[Point]) -> Self
 
-pub(all) struct F32x2(Float, Float) derive(Default, Eq, @debug.Debug)
+#derive(Default, Eq, @debug.Debug)
+pub(all) struct F32x2(Float, Float)
 pub fn F32x2::abs(Self) -> Self
 pub fn F32x2::default() -> Self
 pub fn F32x2::max(Self, Self) -> Self
@@ -65,7 +67,8 @@ pub impl Div for F32x2
 pub impl Mul for F32x2
 pub impl Sub for F32x2
 
-pub struct FiniteF32(Float) derive(Default, @debug.Debug)
+#derive(Default, @debug.Debug)
+pub struct FiniteF32(Float)
 pub fn FiniteF32::approx_eq_ulps(Self, Self, Int32) -> Bool
 pub fn FiniteF32::get(Self) -> Float
 pub fn FiniteF32::new(Float) -> Self?
@@ -74,7 +77,8 @@ pub impl Compare for FiniteF32
 pub impl Eq for FiniteF32
 pub impl Hash for FiniteF32
 
-pub struct FiniteF64(Double) derive(Default, @debug.Debug)
+#derive(Default, @debug.Debug)
+pub struct FiniteF64(Double)
 pub fn FiniteF64::approx_eq_ulps(Self, Self, Int64) -> Bool
 pub fn FiniteF64::get(Self) -> Double
 pub fn FiniteF64::new(Double) -> Self?
@@ -83,9 +87,10 @@ pub impl Compare for FiniteF64
 pub impl Eq for FiniteF64
 pub impl Hash for FiniteF64
 
+#derive(Eq, @debug.Debug)
 pub struct IntRect {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn IntRect::bottom(Self) -> Int32
 pub fn IntRect::contains(Self, Self) -> Bool
 pub fn IntRect::from_ltrb(Int32, Int32, Int32, Int32) -> Self?
@@ -105,9 +110,10 @@ pub fn IntRect::width(Self) -> UInt32
 pub fn IntRect::x(Self) -> Int32
 pub fn IntRect::y(Self) -> Int32
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct IntSize {
   // private fields
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn IntSize::dimensions(Self) -> (UInt32, UInt32)
 pub fn IntSize::from_wh(UInt32, UInt32) -> Self?
 pub fn IntSize::height(Self) -> UInt32
@@ -119,38 +125,43 @@ pub fn IntSize::to_int_rect(Self, Int32, Int32) -> IntRect
 pub fn IntSize::to_size(Self) -> Size
 pub fn IntSize::width(Self) -> UInt32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LineCap {
   Butt
   Round
   Square
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for LineCap
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LineJoin {
   Miter
   MiterClip
   Round
   Bevel
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for LineJoin
 
-pub struct NonZeroPositiveF32(FiniteF32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub struct NonZeroPositiveF32(FiniteF32)
 pub fn NonZeroPositiveF32::approx_eq_ulps(Self, Self, Int32) -> Bool
 pub fn NonZeroPositiveF32::get(Self) -> Float
 pub fn NonZeroPositiveF32::get_finite(Self) -> FiniteF32
 pub fn NonZeroPositiveF32::new(Float) -> Self?
 pub fn NonZeroPositiveF32::new_unchecked(Float) -> Self
 
-pub struct NonZeroPositiveF64(FiniteF64) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub struct NonZeroPositiveF64(FiniteF64)
 pub fn NonZeroPositiveF64::approx_eq_ulps(Self, Self, Int64) -> Bool
 pub fn NonZeroPositiveF64::get(Self) -> Double
 pub fn NonZeroPositiveF64::get_finite(Self) -> FiniteF64
 pub fn NonZeroPositiveF64::new(Double) -> Self?
 pub fn NonZeroPositiveF64::new_unchecked(Double) -> Self
 
+#derive(Eq, @debug.Debug)
 pub struct NonZeroRect {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn NonZeroRect::bbox_transform(Self, Self) -> Self
 pub fn NonZeroRect::bottom(Self) -> Float
 pub fn NonZeroRect::from_ltrb(Float, Float, Float, Float) -> Self?
@@ -169,7 +180,8 @@ pub fn NonZeroRect::x(Self) -> Float
 pub fn NonZeroRect::y(Self) -> Float
 pub impl Show for NonZeroRect
 
-pub struct NormalizedF32(FiniteF32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub struct NormalizedF32(FiniteF32)
 pub fn NormalizedF32::approx_eq_ulps(Self, Self, Int32) -> Bool
 pub fn NormalizedF32::get(Self) -> Float
 pub fn NormalizedF32::get_finite(Self) -> FiniteF32
@@ -184,7 +196,8 @@ pub fn NormalizedF32::to_u8(Self) -> Byte
 pub fn NormalizedF32::zero() -> Self
 pub impl Mul for NormalizedF32
 
-pub struct NormalizedF32Exclusive(FiniteF32) derive(Compare, Default, Eq, Hash, @debug.Debug)
+#derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub struct NormalizedF32Exclusive(FiniteF32)
 pub fn NormalizedF32Exclusive::any() -> Self
 pub fn NormalizedF32Exclusive::get(Self) -> Float
 pub fn NormalizedF32Exclusive::half() -> Self
@@ -192,7 +205,8 @@ pub fn NormalizedF32Exclusive::new(Float) -> Self?
 pub fn NormalizedF32Exclusive::new_bounded(Float) -> Self
 pub fn NormalizedF32Exclusive::to_normalized(Self) -> NormalizedF32
 
-pub struct NormalizedF64(FiniteF64) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub struct NormalizedF64(FiniteF64)
 pub fn NormalizedF64::approx_eq_ulps(Self, Self, Int64) -> Bool
 pub fn NormalizedF64::get(Self) -> Double
 pub fn NormalizedF64::get_finite(Self) -> FiniteF64
@@ -203,9 +217,10 @@ pub fn NormalizedF64::one() -> Self
 pub fn NormalizedF64::zero() -> Self
 pub impl Mul for NormalizedF64
 
+#derive(Eq, @debug.Debug)
 pub struct Path {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn Path::bounds(Self) -> Rect
 pub fn Path::clear(Self) -> PathBuilder
 pub fn Path::clone(Self) -> Self
@@ -219,9 +234,10 @@ pub fn Path::stroke(Self, Stroke, Float) -> Self?
 pub fn Path::transform(Self, Transform) -> Self?
 pub fn Path::verbs(Self) -> Array[PathVerb]
 
+#derive(@debug.Debug)
 pub struct PathBuilder {
   // private fields
-} derive(@debug.Debug)
+}
 pub fn PathBuilder::clear(Self) -> Unit
 pub fn PathBuilder::clone(Self) -> Self
 pub fn PathBuilder::close(Self) -> Unit
@@ -244,13 +260,14 @@ pub fn PathBuilder::quad_to(Self, Float, Float, Float, Float) -> Unit
 pub fn PathBuilder::with_capacity(Int32, Int32) -> Self
 pub impl Default for PathBuilder
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PathSegment {
   MoveTo(Point)
   LineTo(Point)
   QuadTo(Point, Point)
   CubicTo(Point, Point, Point)
   Close
-} derive(Eq, @debug.Debug)
+}
 
 pub struct PathSegmentsIter {
   // private fields
@@ -270,18 +287,20 @@ pub fn PathStroker::new() -> Self
 pub fn PathStroker::stroke(Self, Path, Stroke, Float) -> Path?
 pub impl Default for PathStroker
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) enum PathVerb {
   Move
   Line
   Quad
   Cubic
   Close
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 
+#derive(Default, Eq, @debug.Debug)
 pub(all) struct Point {
   x : Float
   y : Float
-} derive(Default, Eq, @debug.Debug)
+}
 pub fn Point::cross(Self, Self) -> Float
 pub fn Point::distance(Self, Self) -> Float
 pub fn Point::dot(Self, Self) -> Float
@@ -302,7 +321,8 @@ pub impl Mul for Point
 pub impl Neg for Point
 pub impl Sub for Point
 
-pub struct PositiveF32(FiniteF32) derive(Compare, Default, Eq, Hash, @debug.Debug)
+#derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub struct PositiveF32(FiniteF32)
 pub fn PositiveF32::approx_eq_ulps(Self, Self, Int32) -> Bool
 pub fn PositiveF32::get(Self) -> Float
 pub fn PositiveF32::get_finite(Self) -> FiniteF32
@@ -310,7 +330,8 @@ pub fn PositiveF32::new(Float) -> Self?
 pub fn PositiveF32::new_unchecked(Float) -> Self
 pub fn PositiveF32::zero() -> Self
 
-pub struct PositiveF64(FiniteF64) derive(Compare, Default, Eq, Hash, @debug.Debug)
+#derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub struct PositiveF64(FiniteF64)
 pub fn PositiveF64::approx_eq_ulps(Self, Self, Int64) -> Bool
 pub fn PositiveF64::get(Self) -> Double
 pub fn PositiveF64::get_finite(Self) -> FiniteF64
@@ -318,17 +339,19 @@ pub fn PositiveF64::new(Double) -> Self?
 pub fn PositiveF64::new_unchecked(Double) -> Self
 pub fn PositiveF64::zero() -> Self
 
+#derive(Default, @debug.Debug)
 pub(all) struct QuadCoeff {
   a : F32x2
   b : F32x2
   c : F32x2
-} derive(Default, @debug.Debug)
+}
 pub fn QuadCoeff::eval(Self, F32x2) -> F32x2
 pub fn QuadCoeff::from_points(ArrayView[Point]) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct Rect {
   // private fields
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Rect::bbox_transform(Self, NonZeroRect) -> Self
 pub fn Rect::bottom(Self) -> Float
 pub fn Rect::from_ltrb(Float, Float, Float, Float) -> Self?
@@ -352,9 +375,10 @@ pub fn Rect::x(Self) -> Float
 pub fn Rect::y(Self) -> Float
 pub impl Show for Rect
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct Size {
   // private fields
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Size::expand_to(Self, Self) -> Self
 pub fn Size::from_wh(Float, Float) -> Self?
 pub fn Size::height(Self) -> Float
@@ -367,20 +391,23 @@ pub fn Size::to_non_zero_rect(Self, Float, Float) -> NonZeroRect
 pub fn Size::to_rect(Self, Float, Float) -> Rect?
 pub fn Size::width(Self) -> Float
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Stroke {
   mut width : Float
   mut miter_limit : Float
   mut line_cap : LineCap
   mut line_join : LineJoin
   mut dash : StrokeDash?
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for Stroke
 
+#derive(Eq, @debug.Debug)
 pub struct StrokeDash {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn StrokeDash::new(Array[Float], Float) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Transform {
   sx : Float
   kx : Float
@@ -388,7 +415,7 @@ pub(all) struct Transform {
   sy : Float
   tx : Float
   ty : Float
-} derive(Eq, @debug.Debug)
+}
 pub fn Transform::default() -> Self
 pub fn Transform::from_bbox(NonZeroRect) -> Self
 pub fn Transform::from_rotate(Float) -> Self

@@ -6,7 +6,8 @@
 /// With the counter function, you can access and modify counters for pages,
 /// headings, figures, and more. Moreover, you can define custom counters for
 /// other things you want to count.
-pub(all) struct Counter(CounterKey) derive(Eq)
+#derive(Eq)
+pub(all) struct Counter(CounterKey)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -664,6 +665,7 @@ pub extend Counter with FromValue::{from_value}
 
 ///|
 /// Identifies a counter.
+#derive(Eq)
 pub(all) enum CounterKey {
   /// The page counter.
   Page
@@ -672,7 +674,7 @@ pub(all) enum CounterKey {
   Selector(Selector)
   /// Counts through manual counters with the same key.
   Str(String)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -783,6 +785,7 @@ pub fn CounterKey::repr(self : CounterKey) -> String {
 
 ///|
 /// An update to perform on a counter.
+#derive(Eq)
 pub(all) enum CounterUpdate {
   /// Set the counter to the specified state.
   Set(CounterState)
@@ -790,7 +793,7 @@ pub(all) enum CounterUpdate {
   Step(NonZeroUSize)
   /// Apply the given function to the counter's state.
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -856,7 +859,8 @@ pub extend CounterUpdate with FromValue::{from_value}
 
 ///|
 /// Counts through elements with different levels.
-pub(all) struct CounterState(Array[Int64]) derive(Eq)
+#derive(Eq)
+pub(all) struct CounterState(Array[Int64])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

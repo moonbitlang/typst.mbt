@@ -40,10 +40,11 @@ fn body_from_url(url : Url) -> Content {
 
 ///|
 /// A target where a link can go.
+#derive(Eq)
 pub(all) enum LinkTarget {
   Dest(Destination)
   Label(Label)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -95,6 +96,7 @@ pub extend LinkTarget with FromValue::{from_value}
 
 ///|
 /// A link destination.
+#derive(Eq)
 pub(all) enum Destination {
   /// A link to a URL.
   Url(Url)
@@ -102,7 +104,7 @@ pub(all) enum Destination {
   Position(PagedPosition)
   /// An unresolved link to a location in the document.
   Location(Location)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -163,7 +165,8 @@ pub extend Destination with FromValue::{from_value}
 
 ///|
 /// A uniform resource locator with a maximum length.
-pub(all) struct Url(String) derive(Eq, Hash, Compare)
+#derive(Eq, Hash, Compare)
+pub(all) struct Url(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -250,12 +253,13 @@ pub extend Url with FromValue::{from_value}
 
 ///|
 /// A contact scheme of a URL.
+#derive(Eq, Hash)
 pub(all) enum UrlContactScheme {
   /// The `mailto:` prefix.
   Mailto
   /// The `tel:` prefix.
   Tel
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

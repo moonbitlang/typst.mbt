@@ -4,12 +4,13 @@
 
 ///|
 /// Character orientation (`unicode_vo::Orientation`).
+#derive(Eq)
 priv enum VerticalOrientation {
   Upright
   Rotated
   TransformedOrUpright
   TransformedOrRotated
-} derive(Eq)
+}
 
 ///|
 /// The ranges of `unicode_vo::char_orientation` (start, end, orientation).

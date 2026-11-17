@@ -14,16 +14,18 @@ pub fn parse_nodes(Bytes) -> YamlNodes raise YamlError
 pub fn to_string(@serde.Data) -> String raise YamlError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror YamlError {
   YamlError(message~ : String, location~ : Location?)
-} derive(Eq, @debug.Debug)
+}
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) struct Location {
   index : Int32
   line : Int32
   column : Int32
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct YamlNode {
   data : @serde.Data

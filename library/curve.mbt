@@ -3,7 +3,8 @@
 
 ///|
 /// A curve consisting of movements, lines, and Bézier segments.
-pub(all) struct Curve(Array[CurveItem]) derive(Eq, Hash, Default)
+#derive(Eq, Hash, Default)
+pub(all) struct Curve(Array[CurveItem])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -22,12 +23,13 @@ pub extend Curve with Default::{default}
 
 ///|
 /// An item in a curve.
+#derive(Eq, Hash)
 pub(all) enum CurveItem {
   Move(Point)
   Line(Point)
   Cubic(Point, Point, Point)
   Close
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -193,13 +195,14 @@ pub extend CurveComponent with FromValue::{from_value}
 
 ///|
 /// How to close a curve.
+#derive(Eq, Hash, Debug)
 pub(all) enum CloseMode {
   /// Closes the curve with a smooth segment that takes into account the
   /// control point opposite the start point.
   Smooth
   /// Closes the curve with a straight line.
   Straight
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

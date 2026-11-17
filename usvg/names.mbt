@@ -3,6 +3,7 @@
 
 ///|
 /// An element ID.
+#derive(Eq, Hash)
 pub(all) enum EId {
   A
   Circle
@@ -57,7 +58,7 @@ pub(all) enum EId {
   Tref
   Tspan
   Use
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -252,6 +253,7 @@ pub fn EId::debug_name(self : EId) -> String {
 
 ///|
 /// An attribute ID.
+#derive(Eq, Hash)
 pub(all) enum AId {
   AlignmentBaseline
   Amplitude
@@ -464,7 +466,7 @@ pub(all) enum AId {
   Y2
   YChannelSelector
   Z
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -12,12 +12,13 @@ pub struct Pdf {
 
 ///|
 /// An error that occurred while loading a PDF file.
+#derive(Eq, Debug)
 pub(all) enum LoadPdfError {
   /// An error occurred while processing an encrypted document.
   Decryption(DecryptionError)
   /// The PDF was invalid or could not be parsed due to some other unknown reason.
   Invalid
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -116,6 +117,7 @@ fn find_version(data : BytesView) -> PdfVersion? {
 
 ///|
 /// The version of a PDF document.
+#derive(Eq, Compare, Debug)
 pub(all) enum PdfVersion {
   /// PDF 1.0.
   Pdf10
@@ -135,7 +137,7 @@ pub(all) enum PdfVersion {
   Pdf17
   /// PDF 2.0.
   Pdf20
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

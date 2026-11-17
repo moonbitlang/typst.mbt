@@ -3,7 +3,8 @@
 
 ///|
 /// A bullet list item (upstream `Packed<ListItem>`).
-pub(all) struct ListItem(Content) derive(Eq)
+#derive(Eq)
+pub(all) struct ListItem(Content)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -71,10 +72,11 @@ pub extend ListItem with FromValue::{from_value}
 
 ///|
 /// A list's marker.
+#derive(Eq)
 pub(all) enum ListMarker {
   Content(Array[Content])
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

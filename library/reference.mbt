@@ -3,10 +3,11 @@
 
 ///|
 /// Additional content for a reference.
+#derive(Eq)
 pub(all) enum Supplement {
   Content(Content)
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -77,12 +78,13 @@ pub fn Supplement::resolve(
 
 ///|
 /// The form of the reference.
+#derive(Eq, Hash, Debug)
 pub(all) enum RefForm {
   /// Produces a textual reference to a label.
   Normal
   /// Produces a page reference to a label.
   Page
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

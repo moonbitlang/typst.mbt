@@ -4,7 +4,8 @@
 
 ///|
 /// An immutable, finite `f32` in a 0..=1 range (`strict_num::NormalizedF32`).
-pub struct NormalizedF32(Float) derive(Eq)
+#derive(Eq)
+pub struct NormalizedF32(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -83,7 +84,8 @@ pub extend NormalizedF32 with Mul::{mul}
 
 ///|
 /// An immutable, finite `f32` that is known to be >= 0.
-pub struct PositiveF32(Float) derive(Eq)
+#derive(Eq)
+pub struct PositiveF32(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -112,7 +114,8 @@ pub fn PositiveF32::get(self : PositiveF32) -> Float {
 
 ///|
 /// An immutable, finite `f32` that is known to be > 0.
-pub struct NonZeroPositiveF32(Float) derive(Eq)
+#derive(Eq)
+pub struct NonZeroPositiveF32(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

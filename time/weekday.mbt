@@ -5,6 +5,7 @@
 ///
 /// As order is dependent on context (Sunday could be either two days after or
 /// five days before Friday), this type does not implement `Compare`.
+#derive(Eq, Hash, Debug)
 pub(all) enum Weekday {
   Monday
   Tuesday
@@ -13,7 +14,7 @@ pub(all) enum Weekday {
   Friday
   Saturday
   Sunday
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

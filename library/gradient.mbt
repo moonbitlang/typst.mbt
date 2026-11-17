@@ -3,11 +3,12 @@
 
 ///|
 /// A color gradient.
+#derive(Eq)
 pub(all) enum Gradient {
   Linear(LinearGradient)
   Radial(RadialGradient)
   Conic(ConicGradient)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -16,6 +17,7 @@ pub extend Gradient with Eq::{not_equal, equal}
 
 ///|
 /// A gradient that interpolates between two colors along an axis.
+#derive(Eq)
 pub(all) struct LinearGradient {
   /// The color stops of this gradient.
   stops : Array[(Color, Ratio)]
@@ -27,7 +29,7 @@ pub(all) struct LinearGradient {
   relative : Smart[RelativeTo]
   /// Whether to anti-alias the gradient (used for sharp gradients).
   anti_alias : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -36,6 +38,7 @@ pub extend LinearGradient with Eq::{not_equal, equal}
 
 ///|
 /// A gradient that interpolates between two colors along a circle.
+#derive(Eq)
 pub(all) struct RadialGradient {
   /// The color stops of this gradient.
   stops : Array[(Color, Ratio)]
@@ -53,7 +56,7 @@ pub(all) struct RadialGradient {
   relative : Smart[RelativeTo]
   /// Whether to anti-alias the gradient (used for sharp gradients).
   anti_alias : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -63,6 +66,7 @@ pub extend RadialGradient with Eq::{not_equal, equal}
 ///|
 /// A gradient that interpolates between two colors radially around a center
 /// point.
+#derive(Eq)
 pub(all) struct ConicGradient {
   /// The color stops of this gradient.
   stops : Array[(Color, Ratio)]
@@ -76,7 +80,7 @@ pub(all) struct ConicGradient {
   relative : Smart[RelativeTo]
   /// Whether to anti-alias the gradient (used for sharp gradients).
   anti_alias : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -629,12 +633,13 @@ pub fn ConicGradient::repr(self : ConicGradient) -> String {
 
 ///|
 /// What is the gradient relative to.
+#derive(Eq, Hash, Debug)
 pub(all) enum RelativeTo {
   /// Relative to itself (its own bounding box).
   Self_
   /// Relative to its parent (the parent's bounding box).
   Parent
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -701,12 +706,13 @@ pub extend RelativeTo with FromValue::{from_value}
 
 ///|
 /// A color stop.
+#derive(Eq)
 pub(all) struct GradientStop {
   /// The color for this stop.
   color : Color
   /// The offset of the stop along the gradient.
   offset : Ratio?
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -768,10 +774,11 @@ pub extend GradientStop with FromValue::{from_value}
 
 ///|
 /// A ratio or an angle.
+#derive(Eq)
 pub(all) enum RatioOrAngle {
   Ratio(Ratio)
   Angle(Angle)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

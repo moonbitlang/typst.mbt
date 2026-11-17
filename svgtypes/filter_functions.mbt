@@ -8,6 +8,7 @@
 ///
 /// [`<filter-function>`]: https://www.w3.org/TR/filter-effects-1/#filter-functions
 /// [`<url>`]: https://www.w3.org/TR/filter-effects-1/#typedef-filter-url
+#derive(Eq, Debug)
 pub(all) enum FilterValue {
   /// Cannot be negative and/or have a percentage units.
   Blur(Length)
@@ -33,7 +34,7 @@ pub(all) enum FilterValue {
   Saturate(Double)
   /// Cannot be empty.
   Url(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,6 +48,7 @@ pub extend FilterValue with @debug.Debug::{to_repr}
 
 ///|
 /// A list of possible [`FilterValueListParser`] errors.
+#derive(Eq, Debug)
 pub(all) suberror FilterValueListParserError {
   /// Lengths with percentage values are not allowed.
   PercentageValue(Int32)
@@ -60,7 +62,7 @@ pub(all) suberror FilterValueListParserError {
   InvalidUrl(Int32)
   /// Other errors.
   StreamErrors(SvgTypesError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

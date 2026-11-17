@@ -60,7 +60,8 @@ fn combine_type_sizes(
 /// you get identifiers out of (e.g. [`CoreTypeId`][crate::types::CoreTypeId])
 /// and then later assert that you are pairing those identifiers with the same
 /// `Validator` instance when accessing the identifier's associated data.
-pub(all) struct ValidatorId(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ValidatorId(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

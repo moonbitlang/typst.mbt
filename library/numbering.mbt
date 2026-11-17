@@ -18,12 +18,13 @@ fn impl_numbering(
 
 ///|
 /// How to number a sequence of things.
+#derive(Eq)
 pub(all) enum Numbering {
   /// A pattern with prefix, numbering, lower / upper case and suffix.
   Pattern(NumberingPattern)
   /// A closure mapping from an item's number to content.
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -125,11 +126,12 @@ pub extend Numbering with FromValue::{from_value}
 /// - `1)`
 /// - `a.`
 /// - `(I)`
+#derive(Eq)
 pub(all) struct NumberingPattern {
   pieces : Array[(String, NamedNumeralSystem)]
   suffix : String
   priv trimmed : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

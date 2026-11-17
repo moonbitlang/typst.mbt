@@ -288,11 +288,12 @@ fn to_f64_repr(f : Double) -> String {
 
 ///|
 /// `encode::StringStyle`.
+#derive(Eq)
 priv enum StringStyle {
   NewlineTriple
   OnelineTriple
   OnelineSingle
-} derive(Eq)
+}
 
 ///|
 /// `key::to_key_repr`.

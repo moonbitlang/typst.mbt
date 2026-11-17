@@ -8,6 +8,7 @@ fn cite_elem_form_default() -> Value {
 
 ///|
 /// The form of the citation.
+#derive(Eq, Hash, Debug)
 pub(all) enum CitationForm {
   /// Display in the standard way for the active style.
   Normal
@@ -19,7 +20,7 @@ pub(all) enum CitationForm {
   Author
   /// Shows only the cited work's year.
   Year
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

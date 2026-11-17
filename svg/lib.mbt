@@ -6,6 +6,7 @@
 
 ///|
 /// Settings for SVG export (upstream `SvgOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct SvgOptions {
   /// By default, SVG documents are bounded to the page size. In some
   /// circumstances, such as when preparing documents for print, it may be
@@ -15,7 +16,7 @@ pub(all) struct SvgOptions {
   render_bleed : Bool
   /// Format options that override the defaults set by the document.
   format : PartialSvgFormatOptions
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -27,10 +28,11 @@ pub extend SvgOptions with Default::{default}
 
 ///|
 /// Resolved settings for SVG export (upstream `SvgOptions<Complete>`).
+#derive(Eq)
 pub(all) struct CompleteSvgOptions {
   render_bleed : Bool
   format : SvgFormatOptions
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -583,10 +585,11 @@ fn[T] Deduplicator::is_empty(self : Deduplicator[T]) -> Bool {
 
 ///|
 /// Identifies a `<def>`.
+#derive(Eq, Hash)
 pub(all) struct DedupId {
   kind : Char
   hash : @library.U128
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

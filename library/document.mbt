@@ -4,12 +4,13 @@
 
 ///|
 /// Supported export formats for bundle documents.
+#derive(Eq, Hash, Debug)
 pub(all) enum DocumentFormat {
   /// One of the page formats.
   Paged(PagedFormat)
   /// The document format of the web.
   Html
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -116,6 +117,7 @@ fn document_format_from_path(path : @syntax.VirtualPath) -> DocumentFormat? {
 
 ///|
 /// Supported paged export formats for bundle documents.
+#derive(Eq, Hash, Debug)
 pub(all) enum PagedFormat {
   /// High-fidelity document and graphics format, with focus on exact
   /// reproduction in print.
@@ -124,7 +126,7 @@ pub(all) enum PagedFormat {
   Png
   /// The vector graphics format of the web.
   Svg
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -189,7 +191,8 @@ pub extend PagedFormat with FromValue::{from_value}
 
 ///|
 /// One element, or multiple provided as an array.
-pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct OneOrMultiple[T](Array[T])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

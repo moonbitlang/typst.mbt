@@ -153,6 +153,7 @@ fn layout_fragment_compute(
 
 ///|
 /// The mode a flow can be laid out in.
+#derive(Eq, Debug)
 pub(all) enum FlowMode {
   /// A root flow with block-level elements. Like `FlowMode::Block`, but can
   /// additionally host footnotes and line numbers.
@@ -161,7 +162,7 @@ pub(all) enum FlowMode {
   Block
   /// A flow whose children are inline-level elements.
   Inline
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

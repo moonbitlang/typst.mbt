@@ -82,12 +82,13 @@ pub extend Caseable with FromValue::{from_value}
 
 ///|
 /// A case transformation on text.
+#derive(Eq, Hash, Debug)
 pub(all) enum Case {
   /// Everything is lowercased.
   Lower
   /// Everything is uppercased.
   Upper
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

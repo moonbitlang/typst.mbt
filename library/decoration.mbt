@@ -8,10 +8,11 @@
 ///
 /// Can be positioned over, under, or on top of text, or highlight the text
 /// with a background.
+#derive(Eq)
 pub(all) struct Decoration {
   line : DecoLine
   extent : Abs
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -20,6 +21,7 @@ pub extend Decoration with Eq::{not_equal, equal}
 
 ///|
 /// A kind of decorative line.
+#derive(Eq)
 pub(all) enum DecoLine {
   Underline(
     stroke~ : ResolvedStroke,
@@ -45,7 +47,7 @@ pub(all) enum DecoLine {
     bottom_edge~ : BottomEdge,
     radius~ : Corners[Rel[Abs]]
   )
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

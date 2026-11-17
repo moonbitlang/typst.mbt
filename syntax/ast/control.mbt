@@ -188,6 +188,7 @@ pub fn ModuleImport::new_name(self : ModuleImport) -> Ident? {
 
 ///|
 /// Reasons why a bare name cannot be determined for an import source.
+#derive(Eq, Hash, Debug)
 pub(all) enum BareImportError {
   /// There is no statically resolvable binding name.
   Dynamic
@@ -196,7 +197,7 @@ pub(all) enum BareImportError {
   PathInvalid
   /// The import source is not a valid package spec.
   PackageInvalid
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

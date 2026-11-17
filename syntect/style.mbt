@@ -2,6 +2,7 @@
 
 ///|
 /// Foreground and background colors, with font style
+#derive(Eq, Hash)
 pub(all) struct Style {
   /// Foreground color
   foreground : Color
@@ -9,7 +10,7 @@ pub(all) struct Style {
   background : Color
   /// Style of the font
   font_style : FontStyle
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,6 +27,7 @@ pub extend Style with Hash::{hash, hash_combine}
 ///
 /// Fields left empty (as `None`) will not modify the corresponding field on a
 /// `Style`
+#derive(Eq, Default)
 pub(all) struct StyleModifier {
   /// Foreground color
   foreground : Color?
@@ -33,7 +35,7 @@ pub(all) struct StyleModifier {
   background : Color?
   /// Style of the font
   font_style : FontStyle?
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -53,6 +55,7 @@ pub extend StyleModifier with Default::{default}
 /// space from the theme. This can be a problem because some Sublime themes
 /// use sRGB and some don't. This is specified in an attribute syntect doesn't
 /// parse yet.
+#derive(Eq, Hash, Default)
 pub(all) struct Color {
   /// Red component
   r : Byte
@@ -62,7 +65,7 @@ pub(all) struct Color {
   b : Byte
   /// Alpha (transparency) component
   a : Byte
-} derive(Eq, Hash, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -82,9 +85,10 @@ pub extend Color with Default::{default}
 ///|
 /// The color-independent styling of a font - i.e. bold, italicized, and/or
 /// underlined
+#derive(Eq, Compare, Hash, Default)
 pub(all) struct FontStyle {
   bits : Byte
-} derive(Eq, Compare, Hash, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

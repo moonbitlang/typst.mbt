@@ -183,6 +183,7 @@ const HB_BUFFER_SCRATCH_FLAG_SHAPER0 : UInt32 = 0x01000000
 ///|
 /// Holds the positions of the glyph in both horizontal and vertical
 /// directions. All positions are relative to the current point.
+#derive(Debug)
 pub(all) struct GlyphPosition {
   /// How much the line advances after drawing this glyph when setting text
   /// in horizontal direction.
@@ -197,7 +198,7 @@ pub(all) struct GlyphPosition {
   /// not affect how much the line advances.
   mut y_offset : Int32
   mut var_ : UInt32
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -270,6 +271,7 @@ fn GlyphPosition::set_attach_type(self : GlyphPosition, n : Int32) -> Unit {
 ///
 /// `glyph_id` stores a Unicode codepoint before shaping and a glyph ID
 /// after. Just like harfbuzz, the same variable is used for two purposes.
+#derive(Debug)
 pub(all) struct GlyphInfo {
   /// A selected glyph (guaranteed to be <= `u16::MAX` after shaping).
   mut glyph_id : UInt32
@@ -278,7 +280,7 @@ pub(all) struct GlyphInfo {
   mut cluster : UInt32
   mut var1 : UInt32
   mut var2 : UInt32
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -11,13 +11,14 @@ pub(open) trait DiagnosticWorld: @library.World {
 
 ///|
 /// Which format to use for diagnostics.
+#derive(Eq, Debug)
 pub(all) enum DiagnosticFormat {
   /// Displays a richly formatted message showing the source code and
   /// context.
   Human
   /// Displays a short single-line diagnostic.
   Short
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

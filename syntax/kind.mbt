@@ -4,6 +4,7 @@
 
 ///|
 /// The syntax mode of a portion of Typst code.
+#derive(Eq, Hash, Debug)
 pub(all) enum SyntaxMode {
   /// Text and markup, as in the top level.
   Markup
@@ -11,7 +12,7 @@ pub(all) enum SyntaxMode {
   Math
   /// Keywords, literals and operators, as after hashes.
   Code
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -32,6 +33,7 @@ pub extend SyntaxMode with @debug.Debug::{to_repr}
 /// A syntactical building block of a Typst file.
 ///
 /// Can be created by the lexer or by the parser.
+#derive(Eq, Hash, Compare, Debug)
 pub(all) enum SyntaxKind {
   /// The end of token stream.
   End
@@ -309,7 +311,7 @@ pub(all) enum SyntaxKind {
   Destructuring
   /// A destructuring assignment expression: `(x, y) = (1, 2)`.
   DestructAssignment
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

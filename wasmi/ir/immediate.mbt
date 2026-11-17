@@ -7,7 +7,8 @@
 
 ///|
 /// A typed 16-bit encoded constant value (the raw 16 bits).
-pub(all) struct Const16(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Const16(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,7 +27,8 @@ pub extend Const16 with @debug.Debug::{to_repr}
 
 ///|
 /// A typed 32-bit encoded constant value (the raw 32 bits).
-pub(all) struct Const32(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Const32(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -45,7 +47,8 @@ pub extend Const32 with @debug.Debug::{to_repr}
 
 ///|
 /// A 16-bit constant value of any type (the raw 16 bits).
-pub(all) struct AnyConst16(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct AnyConst16(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -64,7 +67,8 @@ pub extend AnyConst16 with @debug.Debug::{to_repr}
 
 ///|
 /// A 32-bit constant value of any type (the raw 32 bits).
-pub(all) struct AnyConst32(Int32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct AnyConst32(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

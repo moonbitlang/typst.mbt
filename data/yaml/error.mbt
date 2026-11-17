@@ -4,11 +4,12 @@
 ///|
 /// A position as reported by `serde_yaml::Location`: the byte index of the
 /// error (libyaml's `mark.index`) and its 1-based line and column.
+#derive(Eq, Debug)
 pub(all) struct Location {
   index : Int32
   line : Int32
   column : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -23,9 +24,10 @@ pub extend Location with @debug.Debug::{to_repr}
 ///|
 /// `serde_yaml::Error` as Typst sees it: `message` is exactly its `Display`
 /// output and `location` is `error.location()`.
+#derive(Eq, Debug)
 pub(all) suberror YamlError {
   YamlError(message~ : String, location~ : Location?)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

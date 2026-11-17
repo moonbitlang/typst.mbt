@@ -135,11 +135,12 @@ pub fn FamilyIter::clone(Self) -> Self
 pub fn FamilyIter::new(Array[@library.FontFamily]) -> Self
 pub fn FamilyIter::next(Self) -> @library.FontFamily?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FlowMode {
   Root
   Block
   Inline
-} derive(Eq, @debug.Debug)
+}
 pub fn FlowMode::from_kind(@library.FragmentKind) -> Self
 
 pub struct FrameModifiers {
@@ -181,11 +182,12 @@ pub fn PagedIntrospector::position(Self, @library.Location) -> @library.PagedPos
 pub impl Show for PagedIntrospector
 pub impl @library.IntrospectorBackend for PagedIntrospector
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ParSituation {
   First
   Consecutive
   Other
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub enum StackLayoutChild {
   StackChild(@library.StackChild)

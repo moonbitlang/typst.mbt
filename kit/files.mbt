@@ -245,7 +245,8 @@ fn[L : FileLoader] FileSlot::source(
 /// A Typst project forms a root. Similarly, each package has its own root.
 /// Through this mechanism, projects and packages are isolated from each
 /// other.
-pub(all) struct FsRoot(String) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct FsRoot(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -5,6 +5,7 @@
 /// Instructions as defined [here].
 ///
 /// [here]: https://webassembly.github.io/spec/core/binary/instructions.html
+#derive(Eq, Debug)
 pub(all) enum Operator {
   Unreachable
   Nop
@@ -680,7 +681,7 @@ pub(all) enum Operator {
   I64Sub128
   I64MulWideS
   I64MulWideU
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

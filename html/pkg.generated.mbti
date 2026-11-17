@@ -44,9 +44,10 @@ pub fn resolve_inline_styles(HtmlElement) -> Unit
 // Errors
 
 // Types and methods
+#derive(Eq)
 pub(all) struct CompleteHtmlOptions {
   format : @library.HtmlFormatOptions
-} derive(Eq)
+}
 
 pub(all) enum ConversionLevel {
   Block
@@ -111,9 +112,10 @@ pub(all) enum HtmlNode {
 pub fn HtmlNode::span(Self) -> @syntax.Span
 pub fn HtmlNode::text(String, @syntax.Span) -> Self
 
+#derive(Default, Eq)
 pub(all) struct HtmlOptions {
   format : @library.PartialHtmlFormatOptions
-} derive(Default, Eq)
+}
 pub fn HtmlOptions::default() -> Self
 pub fn HtmlOptions::resolve(Self, @library.HtmlFormatOptions) -> CompleteHtmlOptions
 
@@ -124,10 +126,11 @@ pub fn HtmlOutput::nodes(Self) -> ArrayView[HtmlNode]
 pub fn HtmlOutput::root(Self) -> HtmlElement
 pub fn HtmlOutput::root_node(Self) -> HtmlNode
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Whitespace {
   Normal
   Pre
-} derive(Eq, Hash, @debug.Debug)
+}
 
 // Type aliases
 

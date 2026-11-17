@@ -51,25 +51,28 @@ pub fn ToPathError::to_string(Self) -> String
 pub impl Show for ToPathError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) struct AdjustedMetrics {
   has_overlaps : Bool
   lsb : Float?
   advance_width : Float?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Attributes {
   stretch : Stretch
   style : Style
   weight : Weight
-} derive(Eq, @debug.Debug)
+}
 pub fn Attributes::new(@read_fonts.FontRef) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct BoundingBox {
   x_min : Float
   y_min : Float
   x_max : Float
   y_max : Float
-} derive(Eq, @debug.Debug)
+}
 
 pub struct CffOutlines {
   font : @read_fonts.FontRef
@@ -92,10 +95,11 @@ pub fn Charmap::map(Self, UInt32) -> @font_types.GlyphId?
 pub fn Charmap::map_char(Self, Char) -> @font_types.GlyphId?
 pub fn Charmap::new(@read_fonts.FontRef) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Decoration {
   offset : Float
   thickness : Float
-} derive(Eq, @debug.Debug)
+}
 
 pub struct DrawSettings {
   // private fields
@@ -103,11 +107,12 @@ pub struct DrawSettings {
 pub fn DrawSettings::hinted(HintingInstance, Bool) -> Self
 pub fn DrawSettings::unhinted(Size, LocationRef) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Engine {
   Interpreter
   Auto
   AutoFallback
-} derive(Eq, @debug.Debug)
+}
 
 pub struct GlyfOutline {
   glyph_id : @font_types.GlyphId
@@ -172,16 +177,18 @@ pub fn HintingInstance::is_enabled(Self) -> Bool
 pub fn HintingInstance::new(OutlineGlyphCollection, Size, LocationRef, HintingOptions) -> Self raise DrawError
 pub fn HintingInstance::size(Self) -> Size
 
+#derive(Eq, @debug.Debug)
 pub(all) struct HintingOptions {
   engine : Engine
   target : Target
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct LocationRef(Array[@font_types.F2Dot14])
 pub fn LocationRef::coords(Self) -> Array[@font_types.F2Dot14]
 pub fn LocationRef::default() -> Self
 pub fn LocationRef::is_default(Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Metrics {
   mut units_per_em : Int32
   mut glyph_count : Int32
@@ -197,7 +204,7 @@ pub(all) struct Metrics {
   mut underline : Decoration?
   mut strikeout : Decoration?
   mut bounds : BoundingBox?
-} derive(Eq, @debug.Debug)
+}
 pub fn Metrics::new(@read_fonts.FontRef, Size, LocationRef) -> Self
 
 pub struct OutlineGlyph {
@@ -219,45 +226,52 @@ pub fn OutlineGlyphCollection::new(@read_fonts.FontRef) -> Self
 pub fn OutlineGlyphCollection::prefer_interpreter(Self) -> Bool
 pub fn OutlineGlyphCollection::require_interpreter(Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum OutlineGlyphFormat {
   Glyf
   Cff
   Cff2
   Varc
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct Size(Float?) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Size(Float?)
 pub fn Size::linear_scale(Self, Int32) -> Float
 pub fn Size::new(Float) -> Self
 pub fn Size::ppem(Self) -> Float?
 pub fn Size::unscaled() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SmoothMode {
   Normal
   Light
   Lcd
   VerticalLcd
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct Stretch(Float) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Stretch(Float)
 pub fn Stretch::new(Float) -> Self
 pub fn Stretch::normal() -> Self
 pub fn Stretch::percentage(Self) -> Float
 pub fn Stretch::ratio(Self) -> Float
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Style {
   Normal
   Italic
   Oblique(Float?)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Target {
   Mono
   Smooth(mode~ : SmoothMode, symmetric_rendering~ : Bool, preserve_linear_metrics~ : Bool)
-} derive(Eq, @debug.Debug)
+}
 pub fn Target::default() -> Self
 
-pub(all) struct Weight(Float) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Weight(Float)
 pub fn Weight::bold() -> Self
 pub fn Weight::new(Float) -> Self
 pub fn Weight::normal() -> Self

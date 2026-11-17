@@ -5,7 +5,8 @@
 
 ///|
 /// An index to a function within a Wasm module.
-pub(all) struct FuncIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct FuncIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -19,7 +20,8 @@ pub extend FuncIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a table within a Wasm module.
-pub(all) struct TableIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct TableIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -33,7 +35,8 @@ pub extend TableIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a linear memory within a Wasm module.
-pub(all) struct MemoryIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct MemoryIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,7 +50,8 @@ pub extend MemoryIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a global variable within a Wasm module.
-pub(all) struct GlobalIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct GlobalIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -61,7 +65,8 @@ pub extend GlobalIdx with @debug.Debug::{to_repr}
 
 ///|
 /// A function type index into the Wasm module's type section.
-pub(all) struct FuncTypeIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct FuncTypeIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

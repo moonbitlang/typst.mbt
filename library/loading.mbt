@@ -2,12 +2,13 @@
 
 ///|
 /// Something we can retrieve byte data from.
+#derive(Eq, Hash)
 pub(all) enum DataSource {
   /// A path to a file.
   Path(PathOrStr)
   /// Raw bytes.
   Bytes(Bytes)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -103,12 +104,13 @@ pub fn load_many(
 
 ///|
 /// Data loaded from a [DataSource].
+#derive(Eq, Hash)
 pub(all) struct Loaded {
   /// Details about where `data` was loaded from.
   source : @syntax.Spanned[LoadSource]
   /// The loaded data.
   data : Bytes
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -130,10 +132,11 @@ pub fn Loaded::new(
 
 ///|
 /// A loaded [DataSource].
+#derive(Eq, Hash)
 pub(all) enum LoadSource {
   Path(@syntax.FileId)
   Bytes
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -147,12 +150,13 @@ pub extend LoadSource with Hash::{hash, hash_combine}
 
 ///|
 /// A value that can be read from a file.
+#derive(Eq, Hash)
 pub(all) enum Readable {
   /// A decoded string.
   Str(String)
   /// Raw bytes.
   Bytes(Bytes)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

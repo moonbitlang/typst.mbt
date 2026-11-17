@@ -5,6 +5,7 @@
 ///|
 /// Enumerated property `Line_Break`, in the order of the ICU4C `ULineBreak`
 /// values.
+#derive(Eq, Hash, Debug)
 pub(all) enum LineBreak {
   Unknown // XX
   Ambiguous // AI
@@ -55,7 +56,7 @@ pub(all) enum LineBreak {
   ViramaFinal // VF
   Virama // VI
   UnambiguousHyphen // HH
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

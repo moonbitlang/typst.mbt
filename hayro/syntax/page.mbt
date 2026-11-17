@@ -10,6 +10,7 @@ priv struct PagesContext {
 
 ///|
 /// A PDF rectangle.
+#derive(Eq, Debug)
 pub(all) struct Rect {
   /// The minimum x coordinate.
   x0 : Double
@@ -19,7 +20,7 @@ pub(all) struct Rect {
   x1 : Double
   /// The maximum y coordinate.
   y1 : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -124,6 +125,7 @@ pub let a4 : Rect = {
 
 ///|
 /// The rotation of the page.
+#derive(Eq, Debug)
 pub(all) enum Rotation {
   /// No rotation (upstream `Rotation::None`).
   NoRotation
@@ -133,7 +135,7 @@ pub(all) enum Rotation {
   Flipped
   /// A rotation of 270 degrees.
   FlippedHorizontal
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

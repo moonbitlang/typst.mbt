@@ -8,6 +8,7 @@ import {
 // Values
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror DecodeError {
   Format(FormatError)
   Marker(MarkerError)
@@ -15,27 +16,29 @@ pub(all) suberror DecodeError {
   Validation(ValidationError)
   Decoding(DecodingError)
   Color(ColorError)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for DecodeError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum ColorError {
   Mct
   PaletteResolutionFailed
   SyccConversionFailed
   LabConversionFailed
-} derive(Eq, @debug.Debug)
+}
 pub fn ColorError::output(Self, &Logger) -> Unit
 pub fn ColorError::to_string(Self) -> String
 pub impl Show for ColorError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ColorSpace {
   Gray
   RGB
   CMYK
   Unknown(num_channels~ : Int32)
   Icc(profile~ : Bytes, num_channels~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn ColorSpace::num_channels(Self) -> Int32
 
 pub struct ComponentData {
@@ -44,11 +47,12 @@ pub struct ComponentData {
 pub fn ComponentData::bit_depth(Self) -> Int32
 pub fn ComponentData::samples(Self) -> ArrayView[Float]
 
+#derive(@debug.Debug)
 pub(all) struct DecodeSettings {
   resolve_palette_indices : Bool
   strict : Bool
   target_resolution : (UInt32, UInt32)?
-} derive(@debug.Debug)
+}
 pub impl Default for DecodeSettings
 
 pub struct DecodedImage {
@@ -65,6 +69,7 @@ pub fn DecoderContext::default() -> Self
 pub fn DecoderContext::new() -> Self
 pub impl Default for DecoderContext
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DecodingError {
   CodeBlockDecodeFailure
   TooManyBitplanes
@@ -73,18 +78,19 @@ pub(all) enum DecodingError {
   InvalidPrecinct
   InvalidProgressionIterator
   UnexpectedEof
-} derive(Eq, @debug.Debug)
+}
 pub fn DecodingError::output(Self, &Logger) -> Unit
 pub fn DecodingError::to_string(Self) -> String
 pub impl Show for DecodingError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FormatError {
   InvalidSignature
   InvalidFileType
   InvalidBox
   MissingCodestream
   Unsupported
-} derive(Eq, @debug.Debug)
+}
 pub fn FormatError::output(Self, &Logger) -> Unit
 pub fn FormatError::to_string(Self) -> String
 pub impl Show for FormatError
@@ -100,27 +106,30 @@ pub fn Image::new(BytesView, DecodeSettings) -> Self raise DecodeError
 pub fn Image::original_bit_depth(Self) -> Int32
 pub fn Image::width(Self) -> UInt32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MarkerError {
   Invalid
   Unsupported
   Expected(String)
   Missing(String)
   ParseFailure(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn MarkerError::output(Self, &Logger) -> Unit
 pub fn MarkerError::to_string(Self) -> String
 pub impl Show for MarkerError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TileError {
   Invalid
   InvalidIndex
   InvalidOffsets
   PpmPptConflict
-} derive(Eq, @debug.Debug)
+}
 pub fn TileError::output(Self, &Logger) -> Unit
 pub fn TileError::to_string(Self) -> String
 pub impl Show for TileError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ValidationError {
   InvalidDimensions
   ImageTooLarge
@@ -133,7 +142,7 @@ pub(all) enum ValidationError {
   InsufficientExponents
   MissingStepSize
   InvalidExponents
-} derive(Eq, @debug.Debug)
+}
 pub fn ValidationError::output(Self, &Logger) -> Unit
 pub fn ValidationError::to_string(Self) -> String
 pub impl Show for ValidationError

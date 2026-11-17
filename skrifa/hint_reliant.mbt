@@ -99,10 +99,11 @@ let hint_reliant_names : ReadOnlyArray[String] = [
 ]
 
 ///|
+#derive(Eq)
 priv struct TableId {
   checksum : UInt32
   len : UInt32
-} derive(Eq)
+}
 
 ///|
 fn TableId::from_font_and_tag(font : FontRef, tag : String) -> TableId {
@@ -118,11 +119,12 @@ fn TableId::from_font_and_tag(font : FontRef, tag : String) -> TableId {
 }
 
 ///|
+#derive(Eq)
 priv struct FontId {
   cvt : TableId
   fpgm : TableId
   prep : TableId
-} derive(Eq)
+}
 
 ///|
 fn FontId::from_font(font : FontRef) -> FontId {

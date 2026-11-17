@@ -8,6 +8,7 @@ import {
 // Values
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror CmsError {
   LaneSizeMismatch
   LaneMultipleOfChannels
@@ -36,14 +37,16 @@ pub(all) suberror CmsError {
   MalformedTrcCurve(String)
   OutOfMemory(Int32)
   IncorrectlyFormedLut(String)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for CmsError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum BarycentricWeightScale {
   Low
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CicpColorPrimaries {
   Reserved
   Bt709
@@ -58,15 +61,17 @@ pub(all) enum CicpColorPrimaries {
   Smpte431
   Smpte432
   Ebu3213
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CicpProfile {
   color_primaries : CicpColorPrimaries
   transfer_characteristics : TransferCharacteristics
   matrix_coefficients : MatrixCoefficients
   full_range : Bool
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Default, Eq, @debug.Debug)
 pub(all) struct ColorDateTime {
   year : Int32
   month : Int32
@@ -74,7 +79,7 @@ pub(all) struct ColorDateTime {
   hours : Int32
   minutes : Int32
   seconds : Int32
-} derive(Default, Eq, @debug.Debug)
+}
 
 pub(all) struct ColorProfile {
   mut pcs : DataColorSpace
@@ -124,6 +129,7 @@ pub fn ColorProfile::rgb_to_xyz_matrix(Self) -> Matrix3d
 pub fn ColorProfile::transform_matrix(Self, Self) -> Matrix3d
 pub fn ColorProfile::version(Self) -> ProfileVersion
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) enum DataColorSpace {
   Xyz
   Lab
@@ -150,21 +156,24 @@ pub(all) enum DataColorSpace {
   Color13
   Color14
   Color15
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn DataColorSpace::check_layout(Self, Layout) -> Unit raise CmsError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct DescriptionString {
   ascii_string : String
   unicode_language_code : UInt32
   unicode_string : String
   script_code_code : Int32
   mac_string : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum InterpolationMethod {
   Linear
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Layout {
   Rgb
   Rgba
@@ -182,15 +191,17 @@ pub(all) enum Layout {
   Inks13
   Inks14
   Inks15
-} derive(Eq, @debug.Debug)
+}
 pub fn Layout::channels(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocalizableString {
   language : String
   country : String
   value : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LutDataType {
   num_input_channels : Int32
   num_output_channels : Int32
@@ -202,8 +213,9 @@ pub(all) struct LutDataType {
   clut_table : LutStore
   output_table : LutStore
   lut_type : LutType
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LutMultidimensionalType {
   num_input_channels : Int32
   num_output_channels : Int32
@@ -214,40 +226,47 @@ pub(all) struct LutMultidimensionalType {
   m_curves : Array[ToneReprCurve]
   matrix : Matrix3d
   bias : Vector3d
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LutStore {
   Store8(FixedArray[Int32])
   Store16(FixedArray[Int32])
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LutType {
   Lut8
   Lut16
   LutMab
   LutMba
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LutWarehouse {
   Lut(LutDataType)
   Multidimensional(LutMultidimensionalType)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MalformedSize {
   size : Int32
   expected : Int32
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Matrix3d {
   v : FixedArray[Double]
-} derive(Eq, @debug.Debug)
+}
 pub fn Matrix3d::identity() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Matrix3f {
   v : FixedArray[Float]
-} derive(Eq, @debug.Debug)
+}
 pub fn Matrix3f::identity() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MatrixCoefficients {
   Identity
   Bt709
@@ -264,22 +283,25 @@ pub(all) enum MatrixCoefficients {
   ChromaticityDerivedNCL
   ChromaticityDerivedCL
   ICtCp
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Measurement {
   observer : StandardObserver
   backing : Xyz
   geometry : MeasurementGeometry
   flare : Float
   illuminant : StandardIlluminant
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MeasurementGeometry {
   Unknown
   D45to45
   D0to0
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) enum ProfileClass {
   InputDevice
   DisplayDevice
@@ -288,14 +310,16 @@ pub(all) enum ProfileClass {
   ColorSpace
   Abstract
   Named
-} derive(Compare, Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ProfileText {
   PlainString(String)
   Localizable(Array[LocalizableString])
   Description(DescriptionString)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) enum ProfileVersion {
   V2_0
   V2_1
@@ -308,17 +332,19 @@ pub(all) enum ProfileVersion {
   V4_3
   V4_4
   Unknown
-} derive(Compare, Eq, @debug.Debug)
+}
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) enum RenderingIntent {
   AbsoluteColorimetric
   Saturation
   RelativeColorimetric
   Perceptual
-} derive(Compare, Eq, @debug.Debug)
+}
 pub impl Default for RenderingIntent
 pub impl Show for RenderingIntent
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StandardIlluminant {
   Unknown
   D50
@@ -329,23 +355,27 @@ pub(all) enum StandardIlluminant {
   A
   EquiPower
   F8
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StandardObserver {
   D50
   D65
   Unknown
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TechnologySignatures {
   signature : UInt32
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ToneReprCurve {
   Lut(FixedArray[Int32])
   Parametric(FixedArray[Float])
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TransferCharacteristics {
   Reserved
   Bt709
@@ -365,7 +395,7 @@ pub(all) enum TransferCharacteristics {
   Smpte2084
   Smpte428
   Hlg
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Transform8BitExecutor {
   // private fields
@@ -377,46 +407,52 @@ pub struct TransformF32Executor {
 }
 pub fn TransformF32Executor::transform(Self, ArrayView[Float], FixedArray[Float]) -> Unit raise CmsError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TransformOptions {
   rendering_intent : RenderingIntent
   allow_use_cicp_transfer : Bool
   prefer_fixed_point : Bool
   interpolation_method : InterpolationMethod
   barycentric_weight_scale : BarycentricWeightScale
-} derive(Eq, @debug.Debug)
+}
 pub fn TransformOptions::default() -> Self
 
+#derive(Default, Eq, @debug.Debug)
 pub(all) struct Vector3d {
   v0 : Double
   v1 : Double
   v2 : Double
-} derive(Default, Eq, @debug.Debug)
+}
 
+#derive(Default, Eq, @debug.Debug)
 pub(all) struct Vector3f {
   v0 : Float
   v1 : Float
   v2 : Float
-} derive(Default, Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ViewingConditions {
   illuminant : Xyz
   surround : Xyz
   observer : StandardObserver
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Xyz {
   x : Float
   y : Float
   z : Float
-} derive(Eq, @debug.Debug)
+}
 pub fn Xyz::new(Float, Float, Float) -> Self
 pub fn Xyz::to_xyzd(Self) -> Xyzd
 
+#derive(Default, Eq, @debug.Debug)
 pub(all) struct Xyzd {
   x : Double
   y : Double
   z : Double
-} derive(Default, Eq, @debug.Debug)
+}
 pub fn Xyzd::new(Double, Double, Double) -> Self
 
 // Type aliases

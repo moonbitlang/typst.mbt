@@ -4,11 +4,12 @@
 /// [`paint-order`] property variants.
 ///
 /// [`paint-order`]: https://www.w3.org/TR/SVG2/painting.html#PaintOrder
+#derive(Eq, Debug, Hash)
 pub(all) enum PaintOrderKind {
   Fill
   Stroke
   Markers
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,12 +30,13 @@ pub extend PaintOrderKind with Hash::{hash, hash_combine}
 /// Representation of the [`paint-order`] property.
 ///
 /// [`paint-order`]: https://www.w3.org/TR/SVG2/painting.html#PaintOrder
+#derive(Eq, Debug)
 pub(all) struct PaintOrder {
   /// The order (always 3 elements).
   ///
   /// Guarantee to not have duplicates.
   order : FixedArray[PaintOrderKind]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

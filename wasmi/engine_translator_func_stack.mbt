@@ -136,7 +136,8 @@ pub fn ImmediateOperand::ty(self : ImmediateOperand) -> @wasmi_core.ValType {
 
 ///|
 /// A [`StackOperand`] or [`Operand`] index on the operand stack.
-pub(all) struct OperandIdx(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct OperandIdx(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -531,12 +532,13 @@ pub(all) struct ElseControlFrame {
 
 ///|
 /// The kind of a control frame.
+#derive(Eq, Debug)
 pub(all) enum ControlFrameKind {
   Block
   Loop
   If
   Else
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

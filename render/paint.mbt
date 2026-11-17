@@ -455,9 +455,10 @@ fn correct_aspect_ratio(
 ///|
 /// A panic of upstream's renderer (an `unwrap` of `None`), which aborts the
 /// rendering of the document.
+#derive(Debug)
 pub suberror RenderPanic {
   RenderPanic(String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -81,10 +81,11 @@ pub extend HintingDevice with @debug.Debug::{to_repr}
 /// A [Device Table](https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#devVarIdxTbls)
 /// indexes into [Item Variation Store](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/otvarcommonformats#IVS).
+#derive(Debug)
 pub(all) struct VariationDevice {
   outer_index : UInt16
   inner_index : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -94,10 +95,11 @@ pub extend VariationDevice with @debug.Debug::{to_repr}
 ///|
 /// A [Device Table](
 /// https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#devVarIdxTbls).
+#derive(Debug)
 pub(all) enum Device {
   Hinting(HintingDevice)
   Variation(VariationDevice)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -195,6 +197,7 @@ impl FromData for ValueFormatFlags with fn parse(data) {
 
 ///|
 /// A [Value Record](https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record).
+#derive(Debug)
 pub(all) struct ValueRecord {
   /// Horizontal adjustment for placement, in design units.
   x_placement : Int16
@@ -212,7 +215,7 @@ pub(all) struct ValueRecord {
   x_advance_device : Device?
   /// A [`Device`] table with vertical adjustment for advance.
   y_advance_device : Device?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -970,6 +973,7 @@ pub extend MarkArray with @debug.Debug::{to_repr}
 /// An [Anchor Table](https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#anchor-tables).
 ///
 /// The *Anchor Table Format 2: Design Units Plus Contour Point* is not supported.
+#derive(Debug)
 pub(all) struct Anchor {
   /// Horizontal value, in design units.
   x : Int16
@@ -979,7 +983,7 @@ pub(all) struct Anchor {
   x_device : Device?
   /// A [`Device`] table with vertical value.
   y_device : Device?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

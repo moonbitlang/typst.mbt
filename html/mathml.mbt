@@ -176,10 +176,11 @@ priv struct EmbellishmentContext {
 
 ///|
 /// The `math-shift` CSS property.
+#derive(Eq)
 priv enum MathShift {
   Normal
   Compact
-} derive(Eq)
+}
 
 ///|
 fn MathShift::to_string(self : MathShift) -> String {
@@ -191,21 +192,23 @@ fn MathShift::to_string(self : MathShift) -> String {
 
 ///|
 /// The `math-style` CSS property.
+#derive(Eq)
 priv enum MathStyle {
   Normal
   Compact
-} derive(Eq)
+}
 
 ///|
 /// The MathML Core CSS properties currently in effect.
 ///
 /// Tracked so children only emit attributes that differ from what the
 /// browser will apply via the UA styelsheet and our stylesheet.
+#derive(Eq)
 priv struct CssContext {
   math_style : MathStyle
   math_shift : MathShift
   math_depth : Int32
-} derive(Eq)
+}
 
 ///|
 fn CssContext::new(block : Bool) -> CssContext {

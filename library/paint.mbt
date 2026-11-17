@@ -2,6 +2,7 @@
 
 ///|
 /// How a fill or stroke should be painted.
+#derive(Eq)
 pub(all) enum Paint {
   /// A solid color.
   Solid(Color)
@@ -9,7 +10,7 @@ pub(all) enum Paint {
   Gradient(Gradient)
   /// A tiling.
   Tiling(Tiling)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

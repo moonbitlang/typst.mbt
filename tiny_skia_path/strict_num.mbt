@@ -8,7 +8,8 @@
 
 ///|
 /// An immutable, finite `f32`.
-pub struct FiniteF32(Float) derive(Debug, Default)
+#derive(Debug, Default)
+pub struct FiniteF32(Float)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -78,7 +79,8 @@ pub extend FiniteF32 with Hash::{hash, hash_combine}
 
 ///|
 /// An immutable, finite `f64`.
-pub struct FiniteF64(Double) derive(Debug, Default)
+#derive(Debug, Default)
+pub struct FiniteF64(Double)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -147,7 +149,8 @@ pub extend FiniteF64 with Hash::{hash, hash_combine}
 
 ///|
 /// An immutable, finite `f32` that is known to be >= 0.
-pub struct PositiveF32(FiniteF32) derive(Debug, Default, Eq, Compare, Hash)
+#derive(Debug, Default, Eq, Compare, Hash)
+pub struct PositiveF32(FiniteF32)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -205,7 +208,8 @@ pub fn PositiveF32::get_finite(self : PositiveF32) -> FiniteF32 {
 
 ///|
 /// An immutable, finite `f64` that is known to be >= 0.
-pub struct PositiveF64(FiniteF64) derive(Debug, Default, Eq, Compare, Hash)
+#derive(Debug, Default, Eq, Compare, Hash)
+pub struct PositiveF64(FiniteF64)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -263,7 +267,8 @@ pub fn PositiveF64::get_finite(self : PositiveF64) -> FiniteF64 {
 
 ///|
 /// An immutable, finite `f32` that is known to be > 0.
-pub struct NonZeroPositiveF32(FiniteF32) derive(Debug, Eq, Compare, Hash)
+#derive(Debug, Eq, Compare, Hash)
+pub struct NonZeroPositiveF32(FiniteF32)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -317,7 +322,8 @@ pub fn NonZeroPositiveF32::get_finite(self : NonZeroPositiveF32) -> FiniteF32 {
 
 ///|
 /// An immutable, finite `f64` that is known to be > 0.
-pub struct NonZeroPositiveF64(FiniteF64) derive(Debug, Eq, Compare, Hash)
+#derive(Debug, Eq, Compare, Hash)
+pub struct NonZeroPositiveF64(FiniteF64)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -371,7 +377,8 @@ pub fn NonZeroPositiveF64::get_finite(self : NonZeroPositiveF64) -> FiniteF64 {
 
 ///|
 /// An immutable, finite `f32` in a 0..=1 range.
-pub struct NormalizedF32(FiniteF32) derive(Debug, Eq, Compare, Hash)
+#derive(Debug, Eq, Compare, Hash)
+pub struct NormalizedF32(FiniteF32)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -477,7 +484,8 @@ pub extend NormalizedF32 with Mul::{mul}
 
 ///|
 /// An immutable, finite `f64` in a 0..=1 range.
-pub struct NormalizedF64(FiniteF64) derive(Debug, Eq, Compare, Hash)
+#derive(Debug, Eq, Compare, Hash)
+pub struct NormalizedF64(FiniteF64)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

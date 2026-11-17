@@ -2,7 +2,8 @@
 
 ///|
 /// 32-bit signed fixed point number with 16 bits of fraction.
-pub(all) struct Fixed(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Fixed(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,7 +27,8 @@ pub extend Fixed with @debug.Debug::{to_repr}
 
 ///|
 /// 32-bit signed fixed point number with 6 bits of fraction.
-pub(all) struct F26Dot6(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct F26Dot6(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -52,7 +54,8 @@ pub extend F26Dot6 with @debug.Debug::{to_repr}
 /// 16-bit signed fixed point number with 14 bits of fraction.
 ///
 /// The raw value is stored sign-extended in an `Int`.
-pub(all) struct F2Dot14(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct F2Dot14(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

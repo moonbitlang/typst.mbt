@@ -1400,6 +1400,7 @@ priv struct Newline {
 
 ///|
 /// How to proceed with parsing when at a newline.
+#derive(Eq)
 priv enum AtNewline {
   /// Continue at newlines.
   Continue
@@ -1411,7 +1412,7 @@ priv enum AtNewline {
   StopParBreak
   /// Require that the token's column be greater or equal to a column.
   RequireColumn(Int32)
-} derive(Eq)
+}
 
 ///|
 /// Whether to stop at a newline or continue based on the current context.

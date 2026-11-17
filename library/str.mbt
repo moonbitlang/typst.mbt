@@ -744,6 +744,7 @@ pub extend ToStr with FromValue::{from_value}
 
 ///|
 /// A Unicode normalization form.
+#derive(Eq, Hash)
 pub(all) enum UnicodeNormalForm {
   /// Canonical composition where e.g. accented letters are turned into a
   /// single Unicode codepoint.
@@ -755,7 +756,7 @@ pub(all) enum UnicodeNormalForm {
   Nfkc
   /// Like NFD, but using the Unicode compatibility decompositions.
   Nfkd
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -890,9 +891,10 @@ fn str_string_is_empty() -> String {
 ///
 /// Can be used as a show rule selector and with string methods like `find`,
 /// `split`, and `replace`.
+#derive(Eq, Hash)
 pub struct Regex {
   inner : @regex.Regex
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1032,13 +1034,14 @@ pub extend StrPattern with FromValue::{from_value}
 
 ///|
 /// A side of a string.
+#derive(Eq)
 pub(all) enum StrSide {
   /// The logical start of the string, may be left or right depending on the
   /// language.
   Start
   /// The logical end of the string.
   End
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

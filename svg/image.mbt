@@ -50,13 +50,14 @@ pub fn convert_image_scaling(
 
 ///|
 /// An image format supported on the web.
+#derive(Eq, Debug)
 pub(all) enum WebImageFormat {
   Png
   Jpg
   Gif
   Webp
   Svg
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -94,10 +95,11 @@ pub fn WebImageFormat::extension(self : WebImageFormat) -> String {
 
 ///|
 /// An image that is prepared for use in the web platform (SVG or HTML).
+#derive(Eq, Debug)
 pub(all) struct WebImage {
   format : WebImageFormat
   data : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -111,9 +113,10 @@ pub extend WebImage with @debug.Debug::{to_repr}
 
 ///|
 /// An error for image kinds whose web preparation is not ported yet.
+#derive(Debug)
 pub(all) suberror WebImageError {
   WebImageError(String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

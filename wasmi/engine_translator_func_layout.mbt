@@ -120,6 +120,7 @@ pub extend StackLayout with AllocConst::{alloc_const}
 
 ///|
 /// The [`StackSpace`] of a [`Slot`].
+#derive(Eq, Debug)
 pub(all) enum StackSpace {
   /// Stack slot referring to a local variable.
   Local
@@ -127,7 +128,7 @@ pub(all) enum StackSpace {
   Const
   /// Stack slot referring to a temporary stack operand.
   Temp
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

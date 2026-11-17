@@ -24,20 +24,23 @@ pub fn svg_in_html(@library.Frame, @library.Abs, Bool, String?, String, ArrayVie
 pub fn svg_merged(@layout.PagedDocument, SvgOptions, @library.Abs) -> String
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror WebImageError {
   WebImageError(String)
-} derive(@debug.Debug)
+}
 
 // Types and methods
+#derive(Eq)
 pub(all) struct CompleteSvgOptions {
   render_bleed : Bool
   format : SvgFormatOptions
-} derive(Eq)
+}
 
+#derive(Eq, Hash)
 pub(all) struct DedupId {
   kind : Char
   hash : @library.U128
-} derive(Eq, Hash)
+}
 pub impl SvgDisplay for DedupId
 
 pub struct LazySvgElem {
@@ -48,9 +51,10 @@ pub fn LazySvgElem::init(Self) -> SvgElem
 pub fn LazySvgElem::lazy_(Self) -> SvgElem
 pub fn LazySvgElem::new(SvgElem, String) -> Self
 
+#derive(Default, Eq)
 pub(all) struct PartialSvgFormatOptions {
   pretty : Bool?
-} derive(Default, Eq)
+}
 pub fn PartialSvgFormatOptions::resolve(Self, SvgFormatOptions) -> SvgFormatOptions
 
 pub struct SvgElem {
@@ -63,9 +67,10 @@ pub fn SvgElem::end(Self) -> Unit
 pub fn SvgElem::lazy_elem(Self, String) -> LazySvgElem
 pub fn SvgElem::new(@xmlwriter.XmlWriter, String) -> Self
 
+#derive(Eq)
 pub(all) struct SvgFormatOptions {
   pretty : @library.SpannedValue[Bool]
-} derive(Eq)
+}
 pub fn SvgFormatOptions::get(@library.DocumentFormatOptions) -> Self
 
 pub struct SvgFormatter {
@@ -83,10 +88,11 @@ pub fn SvgFormatter::to_string(Self) -> String
 pub(all) struct SvgIdRef(DedupId)
 pub impl SvgDisplay for SvgIdRef
 
+#derive(Default, Eq)
 pub(all) struct SvgOptions {
   render_bleed : Bool
   format : PartialSvgFormatOptions
-} derive(Default, Eq)
+}
 pub fn SvgOptions::default() -> Self
 pub fn SvgOptions::resolve(Self, SvgFormatOptions) -> CompleteSvgOptions
 
@@ -96,20 +102,22 @@ pub impl SvgDisplay for SvgTransform
 pub(all) struct SvgUrl(DedupId)
 pub impl SvgDisplay for SvgUrl
 
+#derive(Eq, @debug.Debug)
 pub(all) struct WebImage {
   format : WebImageFormat
   data : Bytes
-} derive(Eq, @debug.Debug)
+}
 pub fn WebImage::new(@library.Image) -> Self raise WebImageError
 pub fn WebImage::to_base64_url(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) enum WebImageFormat {
   Png
   Jpg
   Gif
   Webp
   Svg
-} derive(Eq, @debug.Debug)
+}
 pub fn WebImageFormat::extension(Self) -> String
 pub fn WebImageFormat::mime(Self) -> String
 

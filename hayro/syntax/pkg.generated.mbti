@@ -77,24 +77,27 @@ pub fn BitWriter::fill_bytes(Self, Byte, Int32) -> Unit?
 pub fn BitWriter::new(FixedArray[Byte], Int32, Int32) -> Self
 pub fn BitWriter::write(Self, UInt32) -> Unit?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DecodeFailure {
   ImageDecode
   StreamDecode
   Decryption
   Unknown
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DecryptionError {
   MissingIDEntry
   PasswordProtected
   InvalidEncryption
   UnsupportedAlgorithm
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DecryptionTarget {
   String
   Stream
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Dict {
   // private fields
@@ -120,6 +123,7 @@ pub impl ObjectLike for Dict
 pub impl Readable for Dict
 pub impl Skippable for Dict
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Filter {
   AsciiHexDecode
   Ascii85Decode
@@ -131,7 +135,7 @@ pub(all) enum Filter {
   DctDecode
   JpxDecode
   Crypt
-} derive(Eq, @debug.Debug)
+}
 pub fn Filter::apply(Self, BytesView, Dict, ImageDecodeParams) -> Result[FilterResult, DecodeFailure]
 pub fn Filter::from_name(Name) -> Self?
 
@@ -146,12 +150,13 @@ pub struct FlexArrayIter {
 }
 pub fn[T : ObjectLike] FlexArrayIter::next(Self) -> T?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ImageColorSpace {
   Gray
   Rgb
   Cmyk
   Unknown(Int32)
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct ImageData {
   alpha : Bytes?
@@ -188,10 +193,11 @@ pub struct Instruction {
   operator : Name
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LoadPdfError {
   Decryption(DecryptionError)
   Invalid
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) enum MaybeRef[T] {
   Ref(ObjRef)
@@ -202,7 +208,8 @@ pub fn[T : ObjectLike] MaybeRef::resolve(Self[T], ReaderContext) -> T?
 pub impl[T : Readable] Readable for MaybeRef[T]
 pub impl[T : Skippable] Skippable for MaybeRef[T]
 
-pub(all) struct Name(String) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct Name(String)
 pub fn Name::as_bytes(Self) -> Bytes
 pub fn Name::as_str(Self) -> String
 pub fn Name::from_string(String) -> Self
@@ -218,10 +225,11 @@ pub impl ObjectLike for Name
 pub impl Readable for Name
 pub impl Skippable for Name
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Number {
   Real(Double)
   Integer(Int64)
-} derive(Eq, @debug.Debug)
+}
 pub fn Number::as_f32(Self) -> Float
 pub fn Number::as_f64(Self) -> Double
 pub fn Number::as_i64(Self) -> Int64
@@ -232,10 +240,11 @@ pub impl ObjectLike for Number
 pub impl Readable for Number
 pub impl Skippable for Number
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct ObjRef {
   obj_number : Int32
   gen_number : Int32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn ObjRef::new(Int32, Int32) -> Self
 pub fn ObjRef::to_id(Self) -> ObjectIdentifier
 pub impl Readable for ObjRef
@@ -267,10 +276,11 @@ pub impl ObjectLike for Object
 pub impl Readable for Object
 pub impl Skippable for Object
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct ObjectIdentifier {
   obj_number : Int32
   gen_number : Int32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn ObjectIdentifier::new(Int32, Int32) -> Self
 pub fn ObjectIdentifier::skip(Reader, Bool) -> Unit?
 pub fn ObjectIdentifier::to_ref(Self) -> ObjRef
@@ -333,7 +343,8 @@ pub impl ObjectLike for PdfArray
 pub impl Readable for PdfArray
 pub impl Skippable for PdfArray
 
-pub(all) struct PdfString(Bytes) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct PdfString(Bytes)
 pub fn PdfString::as_bytes(Self) -> Bytes
 pub fn PdfString::read(Reader, ReaderContext) -> Self?
 pub impl Show for PdfString
@@ -341,6 +352,7 @@ pub impl ObjectLike for PdfString
 pub impl Readable for PdfString
 pub impl Skippable for PdfString
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) enum PdfVersion {
   Pdf10
   Pdf11
@@ -351,7 +363,7 @@ pub(all) enum PdfVersion {
   Pdf16
   Pdf17
   Pdf20
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn PdfVersion::as_str(Self) -> String
 pub fn PdfVersion::from_bytes(BytesView) -> Self?
 
@@ -409,12 +421,13 @@ pub fn ReaderContext::with_obj_number(Self, ObjectIdentifier) -> Self
 pub fn ReaderContext::with_parent(Self, ObjectIdentifier) -> Self
 pub fn ReaderContext::xref(Self) -> XRef
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Rect {
   x0 : Double
   y0 : Double
   x1 : Double
   y1 : Double
-} derive(Eq, @debug.Debug)
+}
 pub fn Rect::height(Self) -> Double
 pub fn Rect::intersect(Self, Self) -> Self
 pub fn Rect::new(Double, Double, Double, Double) -> Self
@@ -442,12 +455,13 @@ pub fn Resources::get_x_object(Self, Name) -> Stream?
 pub fn Resources::new(Dict, Self?, ReaderContext) -> Self
 pub fn Resources::parent(Self) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Rotation {
   NoRotation
   Horizontal
   Flipped
   FlippedHorizontal
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Stream {
   // private fields
@@ -466,7 +480,8 @@ pub impl ObjectLike for Stream
 pub impl Readable for Stream
 pub impl Skippable for Stream
 
-pub(all) struct Transform(FixedArray[Double]) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Transform(FixedArray[Double])
 pub fn Transform::as_coeffs(Self) -> FixedArray[Double]
 pub fn Transform::identity() -> Self
 pub fn Transform::new(FixedArray[Double]) -> Self

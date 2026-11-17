@@ -3,10 +3,11 @@
 // `src/arc.rs`).
 
 ///|
+#derive(Eq)
 priv struct KPoint {
   x : Double
   y : Double
-} derive(Eq)
+}
 
 ///|
 fn KPoint::add(self : KPoint, v : KPoint) -> KPoint {

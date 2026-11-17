@@ -9,6 +9,7 @@
 ///|
 /// The kind of an I/O error (the subset of Rust's `io::ErrorKind` the CLI
 /// distinguishes).
+#derive(Eq, Debug)
 pub(all) enum ErrorKind {
   NotFound
   PermissionDenied
@@ -17,7 +18,7 @@ pub(all) enum ErrorKind {
   InvalidInput
   Unsupported
   Other
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -31,9 +32,10 @@ pub extend ErrorKind with @debug.Debug::{to_repr}
 
 ///|
 /// An I/O error: its kind and the display text of Rust's `io::Error`.
+#derive(Debug)
 pub(all) suberror IoError {
   IoError(ErrorKind, String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -58,12 +60,13 @@ pub fn IoError::kind(self : IoError) -> ErrorKind {
 
 ///|
 /// The type of a file system entry.
+#derive(Eq, Debug)
 pub(all) enum FileKind {
   File
   Dir
   Symlink
   Other
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -87,11 +90,12 @@ pub(all) struct DirEntry {
 
 ///|
 /// The operating system the program runs on.
+#derive(Eq, Debug)
 pub(all) enum Os {
   Linux
   MacOs
   Windows
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

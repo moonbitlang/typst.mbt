@@ -19,10 +19,11 @@ fn cancel_elem_stroke_default() -> Value {
 
 ///|
 /// Defines the cancel line.
+#derive(Eq)
 pub(all) enum CancelAngle {
   Angle(Angle)
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

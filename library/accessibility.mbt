@@ -3,6 +3,7 @@
 
 ///|
 /// The type of artifact.
+#derive(Eq, Hash, Debug)
 pub(all) enum ArtifactKind {
   /// Repeats on the top of each page.
   Header
@@ -31,7 +32,7 @@ pub(all) enum ArtifactKind {
   Background
   /// Other artifacts.
   Other
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -129,6 +130,7 @@ fn artifact_elem_kind_default() -> Value {
 
 ///|
 /// The kind of a `PdfMarkerTag`.
+#derive(Eq, Hash, Debug)
 pub(all) enum PdfMarkerTagKind {
   /// `TOC`.
   OutlineBody
@@ -146,7 +148,7 @@ pub(all) enum PdfMarkerTagKind {
   TermsItemBody
   /// A generic `Lbl`.
   Label
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

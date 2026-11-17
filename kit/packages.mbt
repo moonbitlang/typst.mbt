@@ -102,7 +102,8 @@ pub fn SystemPackages::latest_version(
 /// - Top-level directories denote namespaces
 /// - Second-level directories denote packages
 /// - Third-level directories denote package versions
-pub(all) struct FsPackages(String) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct FsPackages(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

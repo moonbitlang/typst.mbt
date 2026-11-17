@@ -3,6 +3,7 @@
 
 ///|
 /// Describes the type of a bibliographical entry.
+#derive(Eq, Debug)
 pub(all) enum EntryType {
   // BibTeX
   Article
@@ -40,7 +41,7 @@ pub(all) enum EntryType {
   Set
   XData
   Unknown(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

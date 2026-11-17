@@ -4,7 +4,8 @@
 /// Representation of the [`<IRI>`] type.
 ///
 /// [`<IRI>`]: https://www.w3.org/TR/SVG11/types.html#DataTypeIRI
-pub(all) struct IRI(String) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct IRI(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -37,7 +38,8 @@ pub fn IRI::from_str(text : String) -> IRI raise SvgTypesError {
 /// Representation of the [`<FuncIRI>`] type.
 ///
 /// [`<FuncIRI>`]: https://www.w3.org/TR/SVG11/types.html#DataTypeFuncIRI
-pub(all) struct FuncIRI(String) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct FuncIRI(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

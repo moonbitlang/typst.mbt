@@ -388,12 +388,13 @@ priv struct CodespaceRange {
 
 ///|
 /// A Unicode value decoded from a cmap.
+#derive(Eq, Debug)
 pub(all) enum BfString {
   /// A single character.
   Char(Char)
   /// A string.
   String(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -420,6 +421,7 @@ pub extend BfString with Show::{to_string, output}
 
 ///|
 /// Metadata extracted from a cmap file.
+#derive(Eq, Debug)
 pub(all) struct Metadata {
   /// The referenced character collection.
   character_collection : CharacterCollection?
@@ -427,7 +429,7 @@ pub(all) struct Metadata {
   name : Bytes?
   /// The writing mode.
   writing_mode : WritingMode?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -441,6 +443,7 @@ pub extend Metadata with @debug.Debug::{to_repr}
 
 ///|
 /// The registry+ordering family of a CID character collection.
+#derive(Eq, Debug)
 pub(all) enum CidFamily {
   /// Adobe-Japan1
   AdobeJapan1
@@ -454,7 +457,7 @@ pub(all) enum CidFamily {
   AdobeIdentity
   /// A non-predefined registry/ordering pair.
   Custom(registry~ : Bytes, ordering~ : Bytes)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -523,12 +526,13 @@ pub fn CidFamily::ucs2_cmap(self : CidFamily) -> CMapName? {
 
 ///|
 /// A CID character collection identifying the character set and ordering.
+#derive(Eq, Debug)
 pub(all) struct CharacterCollection {
   /// The registry+ordering family.
   family : CidFamily
   /// The supplement number.
   supplement : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -552,12 +556,13 @@ pub extend CharacterCollection with Show::{to_string, output}
 
 ///|
 /// The writing mode of a cmap.
+#derive(Eq, Debug)
 pub(all) enum WritingMode {
   /// Horizontal writing mode.
   Horizontal
   /// Vertical writing mode.
   Vertical
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

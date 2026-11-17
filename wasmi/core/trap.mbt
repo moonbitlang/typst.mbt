@@ -138,7 +138,8 @@ pub extend Trap with Show::{to_string, output}
 
 ///|
 /// An invalid [`TrapCode`] integer value.
-pub(all) suberror InvalidTrapCode derive(Debug)
+#derive(Debug)
+pub(all) suberror InvalidTrapCode
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -151,6 +152,7 @@ pub extend InvalidTrapCode with @debug.Debug::{to_repr}
 /// See [`Trap`] for details.
 ///
 /// [`Trap`]: struct.Trap.html
+#derive(Eq, Hash, Debug)
 pub(all) suberror TrapCode {
   /// Wasm code executed `unreachable` opcode.
   ///
@@ -215,7 +217,7 @@ pub(all) suberror TrapCode {
   /// desire on the part of the embedder to trap the interpreter rather than
   /// merely fail the growth operation.
   GrowthOperationLimited
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

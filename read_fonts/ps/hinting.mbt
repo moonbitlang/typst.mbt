@@ -7,9 +7,10 @@ pub const MAX_BLUE_VALUES : Int32 = 7
 ///|
 /// Operand for the `BlueValues`, `OtherBlues`, `FamilyBlues` and
 /// `FamilyOtherBlues` operators.
+#derive(Eq, Debug)
 pub(all) struct Blues {
   values : Array[(@font_types.Fixed, @font_types.Fixed)]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -50,9 +51,10 @@ pub const MAX_STEM_SNAPS : Int32 = 12
 
 ///|
 /// Operand for the `StemSnapH` and `StemSnapV` operators.
+#derive(Eq, Debug)
 pub(all) struct StemSnaps {
   values : Array[@font_types.Fixed]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -80,6 +82,7 @@ pub fn StemSnaps::new(values : Array[@font_types.Fixed]) -> StemSnaps {
 ///|
 /// Parameters used to generate the stem and counter zones for the hinting
 /// algorithm.
+#derive(Eq, Debug)
 pub(all) struct HintingParams {
   mut blues : Blues
   mut family_blues : Blues
@@ -89,7 +92,7 @@ pub(all) struct HintingParams {
   mut blue_shift : @font_types.Fixed
   mut blue_fuzz : @font_types.Fixed
   mut language_group : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

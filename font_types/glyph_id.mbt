@@ -3,7 +3,8 @@
 
 ///|
 /// A 32-bit glyph identifier.
-pub(all) struct GlyphId(UInt32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct GlyphId(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -72,10 +73,11 @@ pub extend GlyphId with Show::{to_string, output}
 
 ///|
 /// Two dimensional point with fixed point coordinates.
+#derive(Eq, Debug)
 pub(all) struct Point[T] {
   x : T
   y : T
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -99,6 +101,7 @@ pub fn[T] Point::new(x : T, y : T) -> Point[T] {
 /// | xx xy dx |
 /// | yx yy dy |
 /// ```
+#derive(Eq, Debug)
 pub(all) struct FontMatrix {
   xx : Fixed
   yx : Fixed
@@ -106,7 +109,7 @@ pub(all) struct FontMatrix {
   yy : Fixed
   dx : Fixed
   dy : Fixed
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -154,12 +157,13 @@ pub fn FontMatrix::transform(
 
 ///|
 /// Minimum and maximum extents of a rectangular region.
+#derive(Eq, Debug)
 pub(all) struct BoundingBox[T] {
   x_min : T
   y_min : T
   x_max : T
   y_max : T
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -173,7 +177,8 @@ pub extend BoundingBox with @debug.Debug::{to_repr}
 
 ///|
 /// A 4-byte OpenType tag, stored as a big-endian `UInt`.
-pub(all) struct Tag(UInt32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Tag(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

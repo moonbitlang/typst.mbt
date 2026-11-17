@@ -2,12 +2,13 @@
 
 ///|
 /// A rectangle in 2D.
+#derive(Eq, Hash)
 pub(all) struct Rect {
   /// The top left corner (minimum coordinate).
   min : Point
   /// The bottom right corner (maximum coordinate).
   max : Point
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

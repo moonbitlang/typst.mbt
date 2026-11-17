@@ -13,7 +13,8 @@
 /// Upstream this is a copy-on-write `EcoVec`; here the methods that modify
 /// the list mutate it in place, so callers must [CssProperties::copy] a
 /// shared list first.
-pub struct CssProperties(Array[CssProperty]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct CssProperties(Array[CssProperty])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -234,13 +235,14 @@ pub fn CssPropertiesBuilder::finish(
 
 ///|
 /// A CSS property pair such as `display: block`.
+#derive(Eq, Hash, Debug)
 pub struct CssProperty {
   /// The property's name, e.g. `display`.
   // TODO: Use something similar to `HtmlAttr`.
   name : String
   /// The property's serialized value, e.g. `block`.
   value : String
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

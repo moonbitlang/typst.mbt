@@ -8,12 +8,13 @@
 ///|
 /// A [Math Value](https://docs.microsoft.com/en-us/typography/opentype/spec/math#mathvaluerecord)
 /// with optional device corrections.
+#derive(Debug)
 pub(all) struct MathValue {
   /// The X or Y value in font design units.
   value : Int16
   /// Device corrections for this value.
   device : Device?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -847,6 +848,7 @@ fn MathKernInfoRecord::get(
 ///|
 /// An [entry in a Math Kern Info Table](
 /// https://learn.microsoft.com/en-us/typography/opentype/spec/math#mathkerninforecord).
+#derive(Debug)
 pub(all) struct MathKernInfo {
   /// The kerning data for the top-right corner.
   top_right : MathKern?
@@ -856,7 +858,7 @@ pub(all) struct MathKernInfo {
   bottom_right : MathKern?
   /// The kerning data for the bottom-left corner.
   bottom_left : MathKern?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -936,7 +938,8 @@ pub extend MathGlyphInfo with FromSlice::{parse_slice}
 
 ///|
 /// Glyph part flags.
-pub(all) struct PartFlags(UInt16) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct PartFlags(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -970,6 +973,7 @@ pub extend PartFlags with FromData::{size, parse}
 
 ///|
 /// Details for a glyph part in an assembly.
+#derive(Debug)
 pub(all) struct GlyphPart {
   /// Glyph ID for the part.
   glyph_id : GlyphId
@@ -981,7 +985,7 @@ pub(all) struct GlyphPart {
   full_advance : UInt16
   /// Part flags.
   part_flags : PartFlags
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1035,12 +1039,13 @@ pub extend GlyphAssembly with FromSlice::{parse_slice}
 
 ///|
 /// Description of math glyph variants.
+#derive(Debug)
 pub(all) struct GlyphVariant {
   /// The ID of the variant glyph.
   variant_glyph : GlyphId
   /// Advance width/height, in design units, of the variant glyph.
   advance_measurement : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

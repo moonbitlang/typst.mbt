@@ -4,6 +4,7 @@
 
 ///|
 /// Internal memory type data and details.
+#derive(Eq, Hash, Debug)
 priv struct MemoryTypeInner {
   /// The initial or minimum amount of pages.
   minimum : UInt64
@@ -13,7 +14,7 @@ priv struct MemoryTypeInner {
   page_size_log2 : Byte
   /// The index type used to address a linear memory.
   index_type : IndexType
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 /// A type to indicate that a size calculation has overflown.
@@ -92,9 +93,10 @@ fn MemoryTypeInner::absolute_max(self : MemoryTypeInner) -> @bigint.BigInt {
 
 ///|
 /// The memory type of a linear memory.
+#derive(Eq, Hash, Debug)
 pub struct MemoryType {
   priv inner : MemoryTypeInner
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

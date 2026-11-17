@@ -8,6 +8,7 @@
 
 ///|
 /// The Rust type `T` of a generic upstream translation routine.
+#derive(Eq, Debug)
 pub(all) enum NumTy {
   I32
   U32
@@ -15,7 +16,7 @@ pub(all) enum NumTy {
   U64
   F32
   F64
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

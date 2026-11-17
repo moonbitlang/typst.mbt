@@ -71,13 +71,8 @@ fn sign_bit_to_2s_compliment(x : Int32) -> Int32 {
 
 ///|
 /// An immutable `f32` that is larger than 0 but less then 1.
-pub struct NormalizedF32Exclusive(FiniteF32) derive (
-  Debug,
-  Default,
-  Eq,
-  Compare,
-  Hash,
-)
+#derive(Debug, Default, Eq, Compare, Hash)
+pub struct NormalizedF32Exclusive(FiniteF32)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

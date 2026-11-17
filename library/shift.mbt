@@ -9,12 +9,13 @@
 
 ///|
 /// What becomes small capitals.
+#derive(Eq, Hash, Debug)
 pub(all) enum Smallcaps {
   /// Minuscules become small capitals.
   Minuscules
   /// All letters become small capitals.
   All
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -78,6 +79,7 @@ pub extend Smallcaps with FromValue::{from_value}
 
 ///|
 /// Configuration values for sub- or superscript text.
+#derive(Eq, Hash)
 pub(all) struct ShiftSettings {
   /// Whether the OpenType feature should be used if possible.
   typographic : Bool
@@ -97,7 +99,7 @@ pub(all) struct ShiftSettings {
   /// This is used to know which OpenType table to use to resolve `Auto`
   /// values.
   kind : ScriptKind
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -111,10 +113,11 @@ pub extend ShiftSettings with Hash::{hash, hash_combine}
 
 ///|
 /// The kind of script.
+#derive(Eq, Hash, Debug)
 pub(all) enum ScriptKind {
   Sub
   Super
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

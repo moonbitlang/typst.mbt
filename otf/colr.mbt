@@ -186,6 +186,7 @@ impl FromData for BaseGlyphPaintRecord with fn parse(data) {
 ///|
 /// A [gradient extend](
 /// https://learn.microsoft.com/en-us/typography/opentype/spec/colr#baseglyphlist-layerlist-and-cliplist).
+#derive(Eq, Debug)
 pub(all) enum GradientExtend {
   /// The `Pad` gradient extend mode.
   Pad
@@ -193,7 +194,7 @@ pub(all) enum GradientExtend {
   Repeat
   /// The `Reflect` gradient extend mode.
   Reflect
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -340,12 +341,13 @@ enum ColorLine {
 ///|
 /// A [gradient extend](
 /// https://learn.microsoft.com/en-us/typography/opentype/spec/colr#color-references-colorstop-and-colorline).
+#derive(Debug)
 pub(all) struct ColorStop {
   /// The offset of the color stop.
   stop_offset : Float
   /// The color of the color stop.
   color : RgbaColor
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -510,6 +512,7 @@ pub fn GradientStopsIter::iter(self : GradientStopsIter) -> Iter[ColorStop] {
 
 ///|
 /// A [composite mode](https://learn.microsoft.com/en-us/typography/opentype/spec/colr#format-32-paintcomposite)
+#derive(Eq, Debug)
 pub(all) enum CompositeMode {
   /// The composite mode 'Clear'.
   Clear
@@ -567,7 +570,7 @@ pub(all) enum CompositeMode {
   Color
   /// The composite mode 'Luminosity'.
   Luminosity
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

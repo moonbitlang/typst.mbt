@@ -149,12 +149,13 @@ pub fn WasmiError::message(self : WasmiError) -> String {
 
 ///|
 /// An error that may occur upon reading from a Wasm input stream (module/read.rs).
+#derive(Eq)
 pub(all) enum ReadError {
   /// The end of the stream has been reached unexpectedly.
   EndOfStream
   /// An unknown error occurred.
   UnknownError
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -174,6 +175,7 @@ pub extend ReadError with Show::{to_string, output}
 
 ///|
 /// Errors that can occur upon type checking function signatures (func/error.rs).
+#derive(Eq)
 pub(all) enum FuncError {
   /// The exported function could not be found.
   ExportedFuncNotFound
@@ -185,7 +187,7 @@ pub(all) enum FuncError {
   MismatchingResultType
   /// Specified an incorrect number of results.
   MismatchingResultLen
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

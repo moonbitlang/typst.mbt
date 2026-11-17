@@ -273,6 +273,7 @@ fn de_missing(field : String) -> TomlError {
 
 ///|
 /// Identifies a package.
+#derive(Eq, Hash)
 pub(all) struct PackageSpec {
   /// The namespace the package lives in.
   namespace_ : String
@@ -280,7 +281,7 @@ pub(all) struct PackageSpec {
   name : String
   /// The package's version.
   version : PackageVersion
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -338,12 +339,13 @@ pub extend PackageSpec with Show::{to_string, output}
 
 ///|
 /// Identifies a package, but not a specific version of it.
+#derive(Eq, Hash)
 pub(all) struct VersionlessPackageSpec {
   /// The namespace the package lives in.
   namespace_ : String
   /// The name of the package within its namespace.
   name : String
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -482,6 +484,7 @@ fn parse_version(s : PkgScanner) -> Result[PackageVersion, String] {
 
 ///|
 /// A package's version.
+#derive(Eq, Compare, Hash)
 pub(all) struct PackageVersion {
   /// The package's major version.
   major : UInt32
@@ -489,7 +492,7 @@ pub(all) struct PackageVersion {
   minor : UInt32
   /// The package's patch version.
   patch : UInt32
-} derive(Eq, Compare, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -648,6 +651,7 @@ pub extend PackageVersion with Show::{to_string, output}
 
 ///|
 /// A version bound for compatibility specification.
+#derive(Eq, Compare, Hash)
 pub(all) struct VersionBound {
   /// The bounds's major version.
   major : UInt32
@@ -655,7 +659,7 @@ pub(all) struct VersionBound {
   minor : UInt32?
   /// The bounds's patch version. Can only be present if minor is too.
   patch : UInt32?
-} derive(Eq, Compare, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

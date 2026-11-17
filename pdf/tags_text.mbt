@@ -60,13 +60,14 @@ priv enum TextAttr {
 }
 
 ///|
+#derive(Eq)
 priv struct ResolvedTextAttrs {
   strong : Bool?
   emph : Bool?
   script : ResolvedScript?
   background : @export.NaiveRgbColor??
   deco : ResolvedTextDeco?
-} derive(Eq)
+}
 
 ///|
 let resolved_text_attrs_empty : ResolvedTextAttrs = {
@@ -83,24 +84,27 @@ fn ResolvedTextAttrs::is_empty(self : ResolvedTextAttrs) -> Bool {
 }
 
 ///|
+#derive(Eq)
 priv struct ResolvedScript {
   baseline_shift : Double
   lineheight : @export.LineHeight
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv struct ResolvedTextDeco {
   kind : TextDecoKind
   color : @export.NaiveRgbColor?
   thickness : Double?
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum TextDecoKind {
   Underline
   Overline
   Strike
-} derive(Eq)
+}
 
 ///|
 fn TextDecoKind::to_export(self : TextDecoKind) -> @export.TextDecorationType {

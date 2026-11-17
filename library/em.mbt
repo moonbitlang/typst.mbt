@@ -4,7 +4,8 @@
 /// A length that is relative to the font size.
 ///
 /// `1em` is the same as the font size.
-pub(all) struct Em(Scalar) derive(Default, Eq, Compare, Hash)
+#derive(Default, Eq, Compare, Hash)
+pub(all) struct Em(Scalar)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -121,13 +121,14 @@ fn page_elem_bleed_default() -> Value {
 
 ///|
 /// Specification of the page's margins.
+#derive(Eq, Hash, Debug)
 pub(all) struct Margin[T] {
   /// The margins for each side.
   sides : Sides[T?]
   /// Whether to swap `left` and `right` to make them `inside` and `outside`
   /// (when to swap depends on the binding).
   two_sided : Bool?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -274,12 +275,13 @@ pub extend Margin with FromValue::{from_value}
 
 ///|
 /// Specification of the page's binding (upstream `Binding`).
+#derive(Eq, Hash, Debug)
 pub(all) enum PageBinding {
   /// Bound on the left, as customary in LTR languages.
   Left
   /// Bound on the right, as customary in RTL languages.
   Right
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -359,7 +361,8 @@ pub extend PageBinding with FromValue::{from_value}
 
 ///|
 /// A list of page ranges to be exported.
-pub(all) struct PageRanges(Array[PageRange]) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct PageRanges(Array[PageRange])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -439,10 +442,11 @@ pub fn PageRanges::includes_page(self : PageRanges, page : Int32) -> Bool {
 ///
 /// The range is one-indexed. For example, `1..=3` indicates the first,
 /// second and third pages should be exported.
+#derive(Eq, Hash, Debug)
 pub(all) struct PageRange {
   start : Int32?
   end : Int32?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -541,12 +545,13 @@ fn parse_page_number(nr : Int64) -> Int32 raise HintedError {
 
 ///|
 /// Whether something should be even or odd.
+#derive(Eq, Hash, Debug)
 pub(all) enum Parity {
   /// Next page will be an even page.
   Even
   /// Next page will be an odd page.
   Odd
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -624,6 +629,7 @@ pub fn Parity::matches(self : Parity, number : Int32) -> Bool {
 
 ///|
 /// Specification of a paper.
+#derive(Eq, Hash, Debug)
 pub(all) struct Paper {
   /// The name of the paper.
   name : String
@@ -631,7 +637,7 @@ pub(all) struct Paper {
   width : Double
   /// The height of the paper in millimeters.
   height : Double
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

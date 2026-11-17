@@ -2,7 +2,8 @@
 
 ///|
 /// Represents a positive or negative span of time.
-pub struct Duration(@time.Duration) derive(Eq, Hash, Compare)
+#derive(Eq, Hash, Compare)
+pub struct Duration(@time.Duration)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

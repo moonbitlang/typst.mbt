@@ -14,30 +14,35 @@ pub fn render(@layout.Page, CompleteRenderOptions) -> @skia.Pixmap raise RenderP
 pub fn render_merged(@layout.PagedDocument, RenderOptions, @library.Abs, @library.Color?) -> @skia.Pixmap raise RenderPanic
 
 // Errors
+#derive(@debug.Debug)
 pub suberror RenderPanic {
   RenderPanic(String)
-} derive(@debug.Debug)
+}
 
 // Types and methods
+#derive(Eq)
 pub(all) struct CompleteRenderOptions {
   render_bleed : Bool
   format : PngFormatOptions
-} derive(Eq)
+}
 
+#derive(Default, Eq)
 pub(all) struct PartialPngFormatOptions {
   ppi : Double?
-} derive(Default, Eq)
+}
 pub fn PartialPngFormatOptions::resolve(Self, PngFormatOptions) -> PngFormatOptions
 
+#derive(Eq)
 pub(all) struct PngFormatOptions {
   ppi : Double
-} derive(Eq)
+}
 pub fn PngFormatOptions::get(@library.DocumentFormatOptions) -> Self
 
+#derive(Default, Eq)
 pub(all) struct RenderOptions {
   render_bleed : Bool
   format : PartialPngFormatOptions
-} derive(Default, Eq)
+}
 pub fn RenderOptions::resolve(Self, PngFormatOptions) -> CompleteRenderOptions
 
 // Type aliases

@@ -2,7 +2,8 @@
 
 ///|
 /// An absolute length.
-pub(all) struct Abs(Scalar) derive(Default, Eq, Compare, Hash)
+#derive(Default, Eq, Compare, Hash)
+pub(all) struct Abs(Scalar)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -23,12 +24,13 @@ pub extend Abs with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 pub extend Abs with Hash::{hash, hash_combine}
 
 ///|
+#derive(Eq, Hash, Debug)
 pub(all) enum AbsUnit {
   Pt
   Mm
   Cm
   In
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

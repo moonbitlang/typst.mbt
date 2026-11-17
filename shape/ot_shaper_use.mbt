@@ -276,12 +276,13 @@ let use_topographical_features : ReadOnlyArray[@otf.Tag] = [
 
 ///|
 /// Same order as use_topographical_features.
+#derive(Eq)
 priv enum JoiningForm {
   Isolated
   Initial
   Medial
   Terminal
-} derive(Eq)
+}
 
 ///|
 fn JoiningForm::to_int(self : JoiningForm) -> Int32 {

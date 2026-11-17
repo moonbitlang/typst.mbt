@@ -2,6 +2,7 @@
 
 ///|
 /// A container with components for the four corners of a rectangle.
+#derive(Default, Eq, Hash, Debug)
 pub(all) struct Corners[T] {
   /// The value for the top left corner.
   top_left : T
@@ -11,7 +12,7 @@ pub(all) struct Corners[T] {
   bottom_right : T
   /// The value for the bottom left corner.
   bottom_left : T
-} derive(Default, Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -222,6 +223,7 @@ pub extend Corners with Fold::{fold}
 
 ///|
 /// The four corners of a rectangle.
+#derive(Eq, Hash, Debug)
 pub(all) enum Corner {
   /// The top left corner.
   TopLeft
@@ -231,7 +233,7 @@ pub(all) enum Corner {
   BottomRight
   /// The bottom left corner.
   BottomLeft
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

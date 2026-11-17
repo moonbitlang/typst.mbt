@@ -2,6 +2,7 @@
 
 ///|
 /// The element of a Bézier path.
+#derive(Eq, Debug)
 pub(all) enum PathEl {
   /// Move directly to the point without drawing anything, starting a new
   /// subpath.
@@ -14,7 +15,7 @@ pub(all) enum PathEl {
   CurveTo(Point, Point, Point)
   /// Close off the path.
   ClosePath
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -64,9 +65,10 @@ pub fn PathEl::transform(self : PathEl, t : Affine) -> PathEl {
 
 ///|
 /// A Bézier path.
+#derive(Eq, Debug)
 pub struct BezPath {
   priv elements : Array[PathEl]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -199,6 +201,7 @@ pub fn BezPath::bounding_box(self : BezPath) -> Rect {
 
 ///|
 /// A segment of a Bézier path.
+#derive(Eq, Debug)
 pub(all) enum PathSeg {
   /// A line segment.
   Line(Line)
@@ -206,7 +209,7 @@ pub(all) enum PathSeg {
   Quad(QuadBez)
   /// A cubic bezier segment.
   Cubic(CubicBez)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

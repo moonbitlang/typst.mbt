@@ -13,20 +13,23 @@ pub let date_part_default_delimiter : String
 // Errors
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Affixes {
   prefix : String?
   suffix : String?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Affixes::default() -> Self
 pub impl Default for Affixes
 
+#derive(Eq, @debug.Debug)
 pub(all) enum BaseLanguage {
   Iso639_1(String)
   Iana(String)
   Unregistered(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn BaseLanguage::as_str(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Bibliography {
   sort : Sort?
   layout : Layout
@@ -37,17 +40,19 @@ pub(all) struct Bibliography {
   subsequent_author_substitute : String?
   subsequent_author_substitute_rule : SubsequentAuthorSubstituteRule
   name_options : InheritableNameOptions
-} derive(Eq, @debug.Debug)
+}
 pub fn Bibliography::with_layout(Layout) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Choose {
   if_ : ChooseBranch
   else_if : Array[ChooseBranch]
   otherwise : ElseBranch?
-} derive(Eq, @debug.Debug)
+}
 pub fn Choose::branches(Self) -> Array[ChooseBranch]
 pub fn Choose::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ChooseBranch {
   disambiguate : Bool?
   is_numeric : Array[Variable]?
@@ -58,16 +63,18 @@ pub(all) struct ChooseBranch {
   variable : Array[Variable]?
   match_ : ChooseMatch
   children : Array[LayoutRenderingElement]
-} derive(Eq, @debug.Debug)
+}
 pub fn ChooseBranch::test_(Self) -> ChooseTest?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ChooseMatch {
   All
   Any
   None_
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ChooseMatch::test_(Self, Iter[Bool]) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ChooseTest {
   Disambiguate
   IsNumeric(Array[Variable])
@@ -76,8 +83,9 @@ pub(all) enum ChooseTest {
   Position(Array[TestPosition])
   Type(Array[Kind])
   Variable(Array[Variable])
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Citation {
   sort : Sort?
   layout : Layout
@@ -91,31 +99,35 @@ pub(all) struct Citation {
   after_collapse_delimiter : String?
   near_note_distance : Int32
   name_options : InheritableNameOptions
-} derive(Eq, @debug.Debug)
+}
 pub fn Citation::get_after_collapse_delimiter(Self) -> String
 pub fn Citation::get_year_suffix_delimiter(Self) -> String
 pub fn Citation::with_layout(Layout) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum CitationFormat {
   AuthorDate
   Author
   Numeric
   Label
   Note
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Collapse {
   CitationNumber
   Year
   YearSuffix
   YearSuffixRanged
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CslMacro {
   name : String
   children : Array[LayoutRenderingElement]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Date {
   variable : DateVariable?
   form : DateForm?
@@ -126,38 +138,43 @@ pub(all) struct Date {
   delimiter : String?
   display : Display?
   text_case : TextCase?
-} derive(Eq, @debug.Debug)
+}
 pub fn Date::is_localized(Self) -> Bool
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateAnyForm {
   Numeric
   NumericLeadingZeros
   Ordinal
   Long
   Short
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DateAnyForm::form_for_day(Self) -> DateDayForm
 pub fn DateAnyForm::form_for_month(Self) -> DateMonthForm
 pub fn DateAnyForm::form_for_year(Self) -> LongShortForm
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateDayForm {
   Numeric
   NumericLeadingZeros
   Ordinal
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateForm {
   Numeric
   Text
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateMonthForm {
   Long
   Short
   Numeric
   NumericLeadingZeros
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct DatePart {
   name : DatePartName
   form_ : DateAnyForm?
@@ -166,32 +183,36 @@ pub(all) struct DatePart {
   affixes : Affixes
   strip_periods : Bool
   text_case : TextCase?
-} derive(Eq, @debug.Debug)
+}
 pub fn DatePart::form(Self) -> DateStrongAnyForm
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DatePartName {
   Day
   Month
   Year
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateParts {
   Year
   YearMonth
   YearMonthDay
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DateParts::default() -> Self
 pub fn DateParts::has_day(Self) -> Bool
 pub fn DateParts::has_month(Self) -> Bool
 pub impl Default for DateParts
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateStrongAnyForm {
   Day(DateDayForm)
   Month(DateMonthForm)
   Year(LongShortForm)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DateStrongAnyForm::for_name(DatePartName, DateAnyForm?) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DateVariable {
   Accessed
   AvailableDate
@@ -199,65 +220,74 @@ pub(all) enum DateVariable {
   Issued
   OriginalDate
   Submitted
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DateVariable::from_str(String) -> Self?
 pub fn DateVariable::output(Self, &Logger) -> Unit
 pub fn DateVariable::to_string(Self) -> String
 pub impl Show for DateVariable
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DelimiterBehavior {
   Contextual
   AfterInvertedName
   Always
   Never
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DemoteNonDroppingParticle {
   Never
   SortOnly
   DisplayAndSort
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct DependentStyle {
   info : StyleInfo
   default_locale : LocaleCode?
   version : String
   parent_link : InfoLink
-} derive(Eq, @debug.Debug)
+}
 pub fn DependentStyle::from_xml(String) -> Result[Self, XmlDeError]
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DisambiguationRule {
   AllNames
   AllNamesWithInitials
   PrimaryName
   PrimaryNameWithInitials
   ByCite
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DisambiguationRule::allows_full_first_names(Self) -> Bool
 pub fn DisambiguationRule::allows_multiple_names(Self) -> Bool
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Display {
   Block
   LeftMargin
   RightInline
   Indent
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ElseBranch {
   children : Array[LayoutRenderingElement]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct EtAl {
   term : EtAlTerm
   formatting : Formatting
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum EtAlTerm {
   EtAl
   AndOthers
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn EtAlTerm::to_term(Self) -> Term
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Field {
   Anthropology
   Astronomy
@@ -285,44 +315,50 @@ pub(all) enum Field {
   Sociology
   Theology
   Zoology
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FontStyle {
   Normal
   Italic
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for FontStyle
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FontVariant {
   Normal
   SmallCaps
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for FontVariant
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FontWeight {
   Normal
   Bold
   Light
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for FontWeight
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Formatting {
   font_style : FontStyle?
   font_variant : FontVariant?
   font_weight : FontWeight?
   text_decoration : TextDecoration?
   vertical_align : VerticalAlign?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Formatting::apply(Self, Self) -> Self
 pub fn Formatting::default() -> Self
 pub fn Formatting::is_empty(Self) -> Bool
 pub impl Default for Formatting
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum GrammarGender {
   Feminine
   Masculine
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Group {
   children : Array[LayoutRenderingElement]
   font_style : FontStyle?
@@ -334,10 +370,11 @@ pub(all) struct Group {
   suffix : String?
   delimiter : String?
   display : Display?
-} derive(Eq, @debug.Debug)
+}
 pub fn Group::to_affixes(Self) -> Affixes
 pub fn Group::to_formatting(Self) -> Formatting
 
+#derive(Eq, @debug.Debug)
 pub(all) struct IndependentStyle {
   info : StyleInfo
   default_locale : LocaleCode?
@@ -347,31 +384,35 @@ pub(all) struct IndependentStyle {
   settings : IndependentStyleSettings
   macros : Array[CslMacro]
   locale : Array[Locale]
-} derive(Eq, @debug.Debug)
+}
 pub fn IndependentStyle::from_xml(String) -> Result[Self, XmlDeError]
 
+#derive(Eq, @debug.Debug)
 pub(all) struct IndependentStyleSettings {
   class : StyleClass
   initialize_with_hyphen : Bool
   page_range_format : PageRangeFormat?
   demote_non_dropping_particle : DemoteNonDroppingParticle
   options : InheritableNameOptions
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct InfoLink {
   href : String
   rel : InfoLinkRel
   description : String?
   locale : LocaleCode?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum InfoLinkRel {
   Zelf
   Template
   Documentation
   IndependentParent
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct InheritableNameOptions {
   and_ : NameAnd?
   name_delimiter : String?
@@ -388,11 +429,12 @@ pub(all) struct InheritableNameOptions {
   initialize_with : String?
   name_as_sort_order : NameAsSortOrder?
   sort_separator : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn InheritableNameOptions::apply(Self, Self) -> Self
 pub fn InheritableNameOptions::default() -> Self
 pub impl Default for InheritableNameOptions
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Kind {
   Article
   ArticleJournal
@@ -439,21 +481,24 @@ pub(all) enum Kind {
   Thesis
   Treaty
   Webpage
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Kind::from_str(String) -> Self?
 pub impl Show for Kind
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Label {
   variable : NumberOrPageVariable
   label : VariablelessLabel
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum LabelPluralize {
   Contextual
   Always
   Never
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Layout {
   elements : Array[LayoutRenderingElement]
   font_style : FontStyle?
@@ -464,13 +509,14 @@ pub(all) struct Layout {
   prefix : String?
   suffix : String?
   delimiter : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn Layout::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
 pub fn Layout::new(Array[LayoutRenderingElement], Formatting, Affixes?, String?) -> Self
 pub fn Layout::to_affixes(Self) -> Affixes
 pub fn Layout::to_formatting(Self) -> Formatting
 pub fn Layout::with_elements(Array[LayoutRenderingElement]) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LayoutRenderingElement {
   Text(Text)
   Date(Date)
@@ -479,31 +525,35 @@ pub(all) enum LayoutRenderingElement {
   Label(Label)
   Group(Group)
   Choose(Choose)
-} derive(Eq, @debug.Debug)
+}
 pub fn LayoutRenderingElement::find_variable_element(Self, Variable, Array[CslMacro]) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct License {
   name : String
   license : String?
   lang : LocaleCode?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocalString {
   lang : LocaleCode?
   value : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Locale {
   lang : LocaleCode?
   info : LocaleInfo?
   terms : Terms?
   date : Array[Date]
   style_options : LocaleOptions?
-} derive(Eq, @debug.Debug)
+}
 pub fn Locale::ordinals(Self) -> OrdinalLookup?
 pub fn Locale::term(Self, Term, TermForm) -> LocalizedTerm?
 
-pub(all) struct LocaleCode(String) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct LocaleCode(String)
 pub fn LocaleCode::en_us() -> Self
 pub fn LocaleCode::extensions(Self) -> Array[String]
 pub fn LocaleCode::fallback(Self) -> Self?
@@ -511,6 +561,7 @@ pub fn LocaleCode::is_english(Self) -> Bool
 pub fn LocaleCode::parse_base(Self) -> BaseLanguage?
 pub impl Show for LocaleCode
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocaleFile {
   version : String
   lang : LocaleCode
@@ -518,21 +569,24 @@ pub(all) struct LocaleFile {
   terms : Terms?
   date : Array[Date]
   style_options : LocaleOptions?
-} derive(Eq, @debug.Debug)
+}
 pub fn LocaleFile::from_xml(String) -> Result[Self, XmlDeError]
 pub fn LocaleFile::to_locale(Self) -> Locale
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocaleInfo {
   translators : Array[StyleAttribution]
   rights : License?
   updated : Timestamp?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocaleOptions {
   limit_day_ordinals_to_day_1 : Bool?
   punctuation_in_quote : Bool?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct LocalizedTerm {
   name : Term
   localization : String?
@@ -542,10 +596,11 @@ pub(all) struct LocalizedTerm {
   match_ : OrdinalMatch?
   gender : GrammarGender?
   gender_form : GrammarGender?
-} derive(Eq, @debug.Debug)
+}
 pub fn LocalizedTerm::multiple(Self) -> String?
 pub fn LocalizedTerm::single(Self) -> String?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Locator {
   Act
   Appendix
@@ -577,14 +632,16 @@ pub(all) enum Locator {
   Verse
   Volume
   Custom
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Locator::from_str(String) -> Self?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum LongShortForm {
   Long
   Short
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Name {
   delimiter : String?
   form : NameForm?
@@ -592,33 +649,37 @@ pub(all) struct Name {
   options_ : InheritableNameOptions
   formatting : Formatting
   affixes : Affixes
-} derive(Eq, @debug.Debug)
+}
 pub fn Name::default() -> Self
 pub fn Name::name_part_family(Self) -> NamePart?
 pub fn Name::name_part_given(Self) -> NamePart?
 pub fn Name::options(Self, InheritableNameOptions) -> NameOptions
 pub impl Default for Name
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NameAnd {
   Text
   Symbol
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NameAsSortOrder {
   First
   All
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NameForm {
   Long
   Short
   Count
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NameLabelPosition {
   AfterName
   BeforeName
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub(all) struct NameOptions {
   and_ : NameAnd?
@@ -638,18 +699,21 @@ pub(all) struct NameOptions {
 }
 pub fn NameOptions::is_suppressed(Self, Int32, Int32, Bool) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) struct NamePart {
   name : NamePartName
   formatting : Formatting
   affixes : Affixes
   text_case : TextCase?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NamePartName {
   Given
   Family
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NameVariable {
   Author
   Chair
@@ -678,12 +742,13 @@ pub(all) enum NameVariable {
   ScriptWriter
   SeriesCreator
   Translator
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn NameVariable::from_str(String) -> Self?
 pub fn NameVariable::output(Self, &Logger) -> Unit
 pub fn NameVariable::to_string(Self) -> String
 pub impl Show for NameVariable
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Names {
   variable : Array[NameVariable]
   children : Array[NamesChild]
@@ -709,7 +774,7 @@ pub(all) struct Names {
   prefix : String?
   suffix : String?
   display : Display?
-} derive(Eq, @debug.Debug)
+}
 pub fn Names::delimiter(Self, InheritableNameOptions) -> String
 pub fn Names::et_al(Self) -> EtAl?
 pub fn Names::from_names_substitute(Self, Self) -> Self
@@ -721,13 +786,15 @@ pub fn Names::to_affixes(Self) -> Affixes
 pub fn Names::to_formatting(Self) -> Formatting
 pub fn Names::with_variables(Array[NameVariable]) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum NamesChild {
   Name(Name)
   EtAl(EtAl)
   Label(VariablelessLabel)
   Substitute(Substitute)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Number {
   variable : NumberOrPageVariable
   form : NumberForm
@@ -735,23 +802,26 @@ pub(all) struct Number {
   affixes : Affixes
   display : Display?
   text_case : TextCase?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumberForm {
   Numeric
   Ordinal
   LongOrdinal
   Roman
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumberOrPageVariable {
   Page(PageVariable)
   Number(NumberVariable)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn NumberOrPageVariable::from_str(String) -> Self?
 pub fn NumberOrPageVariable::to_term(Self) -> Term
 pub fn NumberOrPageVariable::to_variable(Self) -> Variable
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumberVariable {
   ChapterNumber
   CitationNumber
@@ -770,7 +840,7 @@ pub(all) enum NumberVariable {
   SupplementNumber
   Version
   Volume
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn NumberVariable::from_str(String) -> Self?
 pub fn NumberVariable::is_number_of_variable(Self) -> Bool
 pub fn NumberVariable::output(Self, &Logger) -> Unit
@@ -784,12 +854,14 @@ pub fn OrdinalLookup::empty() -> Self
 pub fn OrdinalLookup::lookup(Self, Int32, GrammarGender?) -> String?
 pub fn OrdinalLookup::lookup_long(Self, Int32) -> String?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum OrdinalMatch {
   LastDigit
   LastTwoDigits
   WholeNumber
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum OtherTerm {
   Month01
   Month02
@@ -895,7 +967,7 @@ pub(all) enum OtherTerm {
   TelevisionSeriesEpisode
   Video
   WorkingPaper
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn OtherTerm::from_str(String) -> Result[Self, TermConversionError]
 pub fn OtherTerm::is_n_ordinal(Self) -> Bool
 pub fn OtherTerm::is_ordinal(Self) -> Bool
@@ -903,59 +975,68 @@ pub fn OtherTerm::month(Int32) -> Self?
 pub fn OtherTerm::season(Season) -> Self
 pub impl Show for OtherTerm
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum PageRangeFormat {
   Chicago15
   Chicago16
   Expanded
   Minimal
   MinimalTwo
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PageRangeFormat::default() -> Self
 pub fn PageRangeFormat::format(Self, (String) -> Unit, String, String, String?) -> Unit
 pub impl Default for PageRangeFormat
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum PageVariable {
   Page
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PageVariable::from_str(String) -> Self?
 pub fn PageVariable::output(Self, &Logger) -> Unit
 pub fn PageVariable::to_string(Self) -> String
 pub impl Show for PageVariable
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RenderingElement {
   Layout(Layout)
   Other(LayoutRenderingElement)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Season {
   Spring
   Summer
   Autumn
   Winter
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Season::to_csl_number(Self) -> Int32
 pub fn Season::try_from_csl_number(Int32) -> Self?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum SecondFieldAlign {
   Margin
   Flush
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Sort {
   keys : Array[SortKey]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum SortDirection {
   Ascending
   Descending
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SortKey {
   Variable(variable~ : Variable, sort_direction~ : SortDirection)
   MacroName(name~ : String, names_min~ : Int32?, names_use_first~ : Int32?, names_use_last~ : Bool?, sort_direction~ : SortDirection)
-} derive(Eq, @debug.Debug)
+}
 pub fn SortKey::sort_direction(Self) -> SortDirection
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum StandardVariable {
   Abstract
   Annote
@@ -1004,35 +1085,40 @@ pub(all) enum StandardVariable {
   URL
   VolumeTitle
   YearSuffix
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn StandardVariable::from_str(String) -> Self?
 pub fn StandardVariable::output(Self, &Logger) -> Unit
 pub fn StandardVariable::to_string(Self) -> String
 pub impl Show for StandardVariable
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Style {
   Independent(IndependentStyle)
   Dependent(DependentStyle)
-} derive(Eq, @debug.Debug)
+}
 pub fn Style::from_xml(String) -> Result[Self, XmlDeError]
 pub fn Style::info(Self) -> StyleInfo
 
+#derive(Eq, @debug.Debug)
 pub(all) struct StyleAttribution {
   name : String
   email : String?
   uri : String?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StyleCategory {
   CitationFormat(CitationFormat)
   Field(Field)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum StyleClass {
   InText
   Note
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct StyleInfo {
   authors : Array[StyleAttribution]
   contributors : Array[StyleAttribution]
@@ -1049,28 +1135,32 @@ pub(all) struct StyleInfo {
   title : LocalString
   title_short : LocalString?
   updated : Timestamp?
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StyleValidationError {
   MissingCitation
   MissingParent
   MissingClassAttr
-} derive(Eq, @debug.Debug)
+}
 pub fn StyleValidationError::output(Self, &Logger) -> Unit
 pub fn StyleValidationError::to_string(Self) -> String
 pub impl Show for StyleValidationError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum SubsequentAuthorSubstituteRule {
   CompleteAll
   CompleteEach
   PartialEach
   PartialFirst
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Substitute {
   children : Array[LayoutRenderingElement]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Term {
   Kind(Kind)
   NameVariable(NameVariable)
@@ -1078,7 +1168,7 @@ pub(all) enum Term {
   PageVariable
   Locator(Locator)
   Other(OtherTerm)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Term::from_str(String) -> Self?
 pub fn Term::is_gendered(Self) -> Bool
 pub fn Term::is_lexically_same(Self, Self) -> Bool
@@ -1086,33 +1176,38 @@ pub fn Term::is_n_ordinal(Self) -> Bool
 pub fn Term::is_ordinal(Self) -> Bool
 pub fn Term::term_fallback(Self) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TermConversionError {
   OutOfRange
   Unknown
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Show for TermConversionError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TermForm {
   Long
   Short
   Verb
   VerbShort
   Symbol
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn TermForm::fallback(Self) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Terms {
   terms : Array[LocalizedTerm]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TestPosition {
   First
   Subsequent
   IbidWithLocator
   Ibid
   NearNote
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Text {
   target : TextTarget
   formatting : Formatting
@@ -1121,10 +1216,11 @@ pub(all) struct Text {
   quotes : Bool
   strip_periods : Bool
   text_case : TextCase?
-} derive(Eq, @debug.Debug)
+}
 pub fn Text::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
 pub fn Text::with_target(TextTarget) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TextCase {
   Lowercase
   Uppercase
@@ -1132,37 +1228,42 @@ pub(all) enum TextCase {
   CapitalizeAll
   SentenceCase
   TitleCase
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn TextCase::is_language_independent(Self) -> Bool
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TextDecoration {
   None_
   Underline
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for TextDecoration
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TextTarget {
   Variable(var_~ : Variable, form~ : LongShortForm)
   Macro(name~ : String)
   Term(term~ : Term, form~ : TermForm, plural~ : Bool)
   Value(val~ : String)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Timestamp {
   raw : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Variable {
   Standard(StandardVariable)
   Page(PageVariable)
   Number(NumberVariable)
   Date(DateVariable)
   Name(NameVariable)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Variable::from_str(String) -> Self?
 pub fn Variable::is_number_of_variable(Self) -> Bool
 pub impl Show for Variable
 
+#derive(Eq, @debug.Debug)
 pub(all) struct VariablelessLabel {
   form : TermForm
   plural : LabelPluralize
@@ -1170,20 +1271,22 @@ pub(all) struct VariablelessLabel {
   affixes : Affixes
   text_case : TextCase?
   strip_periods : Bool
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum VerticalAlign {
   None_
   Baseline
   Sup
   Sub
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for VerticalAlign
 
+#derive(Eq, @debug.Debug)
 pub(all) struct XmlDeError {
   message : String
   path : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn XmlDeError::output(Self, &Logger) -> Unit
 pub fn XmlDeError::to_string(Self) -> String
 pub impl Show for XmlDeError

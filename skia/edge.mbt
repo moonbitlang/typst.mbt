@@ -8,11 +8,12 @@
 let max_coeff_shift : Int32 = 6
 
 ///|
+#derive(Eq)
 enum EdgeKind {
   Line
   Quadratic
   Cubic
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -12,7 +12,8 @@
 /// its label.
 ///
 /// Once constructed, you can get the name of a label using `str`.
-pub(all) struct Label(String) derive(Eq, Hash, Compare)
+#derive(Eq, Hash, Compare)
+pub(all) struct Label(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

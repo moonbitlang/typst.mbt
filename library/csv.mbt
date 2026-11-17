@@ -81,7 +81,8 @@ fn impl_csv(
 
 ///|
 /// The delimiter to use when parsing CSV files.
-pub(all) struct Delimiter(Char) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct Delimiter(Char)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -155,10 +156,11 @@ pub extend Delimiter with FromValue::{from_value}
 ///
 /// (The variants are named `RowArray`/`RowDict` instead of upstream's
 /// `Array`/`Dict` to avoid clashing with `Value::Array`/`Value::Dict`.)
+#derive(Eq, Hash, Debug)
 pub(all) enum RowType {
   RowArray
   RowDict
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

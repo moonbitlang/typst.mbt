@@ -14,6 +14,7 @@
 
 ///|
 /// Properties of a single font.
+#derive(Eq, Hash)
 pub(all) struct FontInfo {
   /// The typographic font family this font is part of.
   family : String
@@ -26,7 +27,7 @@ pub(all) struct FontInfo {
   axes : Array[FontAxis]
   /// The unicode coverage of the font.
   coverage : Coverage
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -40,7 +41,8 @@ pub extend FontInfo with Hash::{hash, hash_combine}
 
 ///|
 /// Bitflags describing characteristics of a font.
-pub(all) struct FontFlags(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct FontFlags(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -442,7 +444,8 @@ fn rust_str_trim(s : String) -> StringView {
 /// - 2 codepoints inside (18, 19)
 ///
 /// So the resulting encoding is `[2, 3, 4, 3, 3, 1, 2, 2]`.
-pub(all) struct Coverage(Array[UInt32]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct Coverage(Array[UInt32])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

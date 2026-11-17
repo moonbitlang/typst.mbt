@@ -3,12 +3,13 @@
 
 ///|
 /// The `kind` parameter of a figure.
+#derive(Eq)
 pub(all) enum FigureKind {
   /// The kind is an element function.
   Elem(Element)
   /// The kind is a name.
   Name(String)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -62,7 +63,8 @@ pub extend FigureKind with FromValue::{from_value}
 
 ///|
 /// The caption of a figure (upstream `Packed<FigureCaption>`).
-pub(all) struct FigureCaption(Content) derive(Eq)
+#derive(Eq)
+pub(all) struct FigureCaption(Content)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

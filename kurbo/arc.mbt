@@ -2,6 +2,7 @@
 
 ///|
 /// A single elliptical arc segment.
+#derive(Eq, Debug)
 pub(all) struct Arc {
   /// The arc's centre point.
   center : Point
@@ -14,7 +15,7 @@ pub(all) struct Arc {
   sweep_angle : Double
   /// How much the arc is rotated, in radians.
   x_rotation : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

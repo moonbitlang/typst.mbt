@@ -366,12 +366,13 @@ fn build_group_tag(rs : Resolver, group : Group) -> @export.TagKind? {
 }
 
 ///|
+#derive(Eq)
 priv enum ElementKind {
   Grouping
   Block
   Table
   Inline
-} derive(Eq)
+}
 
 ///|
 fn element_kind(tag : @export.TagKind) -> ElementKind {

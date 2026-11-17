@@ -4,6 +4,7 @@
 ///|
 /// An error encountered while scanning a PostScript token stream (upstream
 /// `Error`; renamed since `Error` is a builtin MoonBit type).
+#derive(Eq, Debug)
 pub(all) enum PsError {
   /// A syntax error in the input.
   SyntaxError
@@ -12,7 +13,7 @@ pub(all) enum PsError {
   /// An unsupported PostScript type was encountered (like dictionaries or
   /// procedures, which will be added in the future).
   UnsupportedType
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

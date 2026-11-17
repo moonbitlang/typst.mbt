@@ -75,6 +75,7 @@ fn Site::origin_kind(self : Site) -> String {
 
 ///|
 /// A range of a source file (`SourceLoc`).
+#derive(Eq)
 priv struct SourceRange {
   file : String
   module_name : String
@@ -82,7 +83,7 @@ priv struct SourceRange {
   start_column : Int32
   end_line : Int32
   end_column : Int32
-} derive(Eq)
+}
 
 ///|
 fn SourceRange::of(loc : SourceLoc) -> SourceRange {

@@ -9,12 +9,13 @@
 
 ///|
 /// Error type for functions that deserialize XML.
+#derive(Eq, Debug)
 pub(all) struct XmlDeError {
   /// The underlying error message.
   message : String
   /// The path to the error location in the XML.
   path : String?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

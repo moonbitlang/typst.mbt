@@ -2,12 +2,13 @@
 
 ///|
 /// An error that may occur upon operating on global variables.
+#derive(Debug)
 pub(all) suberror GlobalError {
   /// Occurs when trying to write to an immutable global variable.
   ImmutableWrite
   /// Occurs when trying writing a value with mismatching type to a global variable.
   TypeMismatch
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,12 +30,13 @@ pub extend GlobalError with Show::{to_string, output}
 
 ///|
 /// The mutability of a global variable.
+#derive(Eq, Hash, Debug)
 pub(all) enum Mutability {
   /// The value of the global variable is a constant.
   Const
   /// The value of the global variable is mutable.
   Var
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -65,12 +67,13 @@ pub fn Mutability::is_mut(self : Mutability) -> Bool {
 
 ///|
 /// The type of a global variable.
+#derive(Eq, Hash, Debug)
 pub struct GlobalType {
   /// The value type of the global variable.
   content : ValType
   /// The mutability of the global variable.
   mutability : Mutability
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

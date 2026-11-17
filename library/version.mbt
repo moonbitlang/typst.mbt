@@ -10,7 +10,8 @@
 /// zeros. This means that, for example, `0.8` is the same as `0.8.0`. As a
 /// special case, the empty version (that has no components at all) is the
 /// same as `0`, `0.0`, `0.0.0`, and so on.
-pub struct Version(Array[UInt32]) derive(Hash)
+#derive(Hash)
+pub struct Version(Array[UInt32])
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -240,6 +241,7 @@ pub extend Version with FromValue::{from_value}
 
 ///|
 /// When a feature was introduced.
+#derive(Eq, Hash)
 pub(all) enum Since {
   /// The feature was introduced before Typst 0.1.0.
   Forever
@@ -248,7 +250,7 @@ pub(all) enum Since {
   Version(UInt32, UInt32, UInt32)
   /// The feature is not present in any official Typst release.
   Unreleased
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

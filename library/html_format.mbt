@@ -14,9 +14,10 @@ fn html_format_elem_init(e : Element) -> Unit {
 ///|
 /// Document settings for HTML export (upstream
 /// `HtmlFormatOptions<Complete>`).
+#derive(Eq)
 pub(all) struct HtmlFormatOptions {
   pretty : SpannedValue[Bool]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -37,9 +38,10 @@ pub fn HtmlFormatOptions::get(
 ///|
 /// Partially specified document settings for HTML export (upstream
 /// `HtmlFormatOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct PartialHtmlFormatOptions {
   pretty : Bool?
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

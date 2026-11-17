@@ -7,13 +7,14 @@
 
 ///|
 /// The color type of a PNG image.
+#derive(Eq, Debug)
 pub(all) enum PngColorType {
   Grayscale
   Rgb
   Indexed
   GrayscaleAlpha
   Rgba
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

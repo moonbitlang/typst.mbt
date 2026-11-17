@@ -75,26 +75,31 @@ pub suberror DecodeErrors {
 }
 pub fn DecodeErrors::display(Self) -> String
 
+#derive(@debug.Debug)
 pub(all) suberror ExifError {
   ExifError(String)
-} derive(@debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) suberror ImageError {
   ImageError(String)
-} derive(@debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) suberror InflateError {
   InflateError(String)
-} derive(@debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) suberror PngFrameError {
   Decoding(String)
   OutputBufferSize
-} derive(@debug.Debug)
+}
 
 // Types and methods
 type Adler32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ColorSpace {
   RGB
   YCbCr
@@ -102,8 +107,9 @@ pub(all) enum ColorSpace {
   YCCK
   CMYK
   MultiBand(Int32)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ColorType {
   L8
   La8
@@ -113,7 +119,7 @@ pub(all) enum ColorType {
   La16
   Rgb16
   Rgba16
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ColorType::channel_count(Self) -> Int32
 
 pub struct Compressor {
@@ -135,29 +141,32 @@ pub struct Exif {
 }
 pub fn Exif::get_field(Self, ExifContext, Int32, Int32) -> ExifValue?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ExifContext {
   Tiff
   Exif
   Gps
   Interop
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) enum ExifValue {
   Byte(Array[UInt32])
   Short(Array[UInt32])
   Long(Array[UInt32])
   Rational(Array[(UInt32, UInt32)])
   Other
-} derive(@debug.Debug)
+}
 pub fn ExifValue::get_uint(Self, Int32) -> UInt32?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FilterType {
   Nearest
   Triangle
   CatmullRom
   Gaussian
   Lanczos3
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub(all) struct GifFrame {
   screen_width : Int32
@@ -169,12 +178,13 @@ pub(all) struct GifFrame {
   rgba : Bytes
 }
 
+#derive(@debug.Debug)
 pub(all) struct ImageInfo {
   width : UInt32
   height : UInt32
   color : ColorType
   icc : Bytes?
-} derive(@debug.Debug)
+}
 
 pub struct JpegDecoder {
   // private fields
@@ -187,23 +197,26 @@ pub fn JpegDecoder::input_colorspace(Self) -> ColorSpace?
 pub fn JpegDecoder::new_with_options(BytesView, DecoderOptions) -> Self
 pub fn JpegDecoder::set_options(Self, DecoderOptions) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) struct PixelDimensions {
   xppu : UInt32
   yppu : UInt32
   meter : Bool
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PngColorType {
   Grayscale
   Rgb
   Indexed
   GrayscaleAlpha
   Rgba
-} derive(Eq, @debug.Debug)
+}
 pub fn PngColorType::code(Self) -> Int32
 pub fn PngColorType::from_code(Int32) -> Self?
 pub fn PngColorType::samples(Self) -> Int32
 
+#derive(@debug.Debug)
 pub(all) struct PngInfo {
   width : UInt32
   height : UInt32
@@ -213,7 +226,7 @@ pub(all) struct PngInfo {
   trns : Bool
   pixel_dims : PixelDimensions?
   icc_profile : Bytes?
-} derive(@debug.Debug)
+}
 pub fn PngInfo::output_color_type(Self) -> ColorType
 
 pub(all) enum PngLimits {

@@ -7,6 +7,7 @@
 
 ///|
 /// Type of padding to ensure a minimum width.
+#derive(Eq, Hash, Debug)
 pub(all) enum Padding {
   /// A space character (` `) should be used as padding.
   Space
@@ -15,7 +16,7 @@ pub(all) enum Padding {
   /// There is no padding. This can result in a width below the otherwise
   /// minimum number of characters. (`Padding::None` upstream.)
   None_
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -34,6 +35,7 @@ pub extend Padding with @debug.Debug::{to_repr}
 
 ///|
 /// The number of digits present in a subsecond representation.
+#derive(Eq, Hash, Debug)
 pub(all) enum SubsecondDigits {
   /// Exactly one digit.
   One
@@ -56,7 +58,7 @@ pub(all) enum SubsecondDigits {
   /// Any number of digits (up to nine) that is at least one. When formatting,
   /// the minimum digits necessary will be used.
   OneOrMore
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,12 +77,13 @@ pub extend SubsecondDigits with @debug.Debug::{to_repr}
 
 ///|
 /// Indicate whether to permit trailing input when parsing.
+#derive(Eq, Hash, Debug)
 pub(all) enum TrailingInput {
   /// Trailing input is not permitted and will cause an error.
   Prohibit
   /// Trailing input is permitted but discarded.
   Discard
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -99,6 +102,7 @@ pub extend TrailingInput with @debug.Debug::{to_repr}
 
 ///|
 /// A component of a larger format description.
+#derive(Eq, Hash, Debug)
 pub(all) enum Component {
   /// Day of the month.
   Day(padding~ : Padding)
@@ -185,7 +189,7 @@ pub(all) enum Component {
   /// input remaining. This component neither affects formatting nor consumes
   /// any input when parsing.
   End(trailing_input~ : TrailingInput)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -206,6 +210,7 @@ pub extend Component with @debug.Debug::{to_repr}
 /// A complete description of how to format and parse a type.
 ///
 /// This unifies `BorrowedFormatItem` and `OwnedFormatItem`.
+#derive(Eq, Hash, Debug)
 pub(all) enum FormatItem {
   /// A string that is formatted as-is.
   StringLiteral(String)
@@ -221,7 +226,7 @@ pub(all) enum FormatItem {
   /// parse is used. When formatting, the first element of the slice is used.
   /// An empty slice is a no-op when formatting or parsing.
   First(Array[FormatItem])
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

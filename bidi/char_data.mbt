@@ -8,6 +8,7 @@
 ///
 /// * <http://www.unicode.org/reports/tr9/#Bidirectional_Character_Types>
 /// * <http://www.unicode.org/reports/tr44/#Bidi_Class_Values>
+#derive(Eq, Hash, Debug)
 pub(all) enum BidiClass {
   AL
   AN
@@ -32,7 +33,7 @@ pub(all) enum BidiClass {
   RLO
   S
   WS
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -104,6 +105,7 @@ fn bidi_class_of(c : Int32) -> BidiClass {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct BidiMatchedOpeningBracket {
   /// The corresponding opening bracket in this bracket pair, normalized
   ///
@@ -112,7 +114,7 @@ pub(all) struct BidiMatchedOpeningBracket {
   opening : Int32
   /// Whether or not the requested bracket was an opening bracket. True for opening
   is_open : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

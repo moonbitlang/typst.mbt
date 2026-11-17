@@ -6,7 +6,8 @@
 /// This is conceptually similar to an array of integers between `{0}` and
 /// `{255}`, but represented much more efficiently. You can iterate over it
 /// using a for loop.
-pub struct BytesValue(Bytes) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct BytesValue(Bytes)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -9,15 +9,17 @@ import {
 pub fn new_hash() -> LinkedHashMap[Yaml, Yaml]
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror ScanError {
   ScanError(mark~ : Marker, info~ : String)
-} derive(Eq, @debug.Debug)
+}
 pub fn ScanError::info(Self) -> String
 pub fn ScanError::marker(Self) -> Marker
 pub fn ScanError::new(Marker, String) -> Self
 pub impl Show for ScanError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Event {
   Nothing
   StreamStart
@@ -30,7 +32,7 @@ pub(all) enum Event {
   SequenceEnd
   MappingStart(Int32)
   MappingEnd
-} derive(Eq, @debug.Debug)
+}
 
 pub struct LinkedHashMap[K, V] {
   // private fields
@@ -54,9 +56,10 @@ pub impl[K : Hash, V : Hash] Hash for LinkedHashMap[K, V]
 pub impl[K : Show, V : Show] Show for LinkedHashMap[K, V]
 pub impl[K : @debug.Debug, V : @debug.Debug] @debug.Debug for LinkedHashMap[K, V]
 
+#derive(Eq, @debug.Debug)
 pub struct Marker {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn Marker::col(Self) -> Int32
 pub fn Marker::index(Self) -> Int32
 pub fn Marker::line(Self) -> Int32
@@ -82,10 +85,12 @@ pub fn Scanner::next_token(Self) -> Token? raise ScanError
 pub fn Scanner::stream_ended(Self) -> Bool
 pub fn Scanner::stream_started(Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TEncoding {
   Utf8
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TScalarStyle {
   Any
   Plain
@@ -93,10 +98,12 @@ pub(all) enum TScalarStyle {
   DoubleQuoted
   Literal
   Foled
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct Token(Marker, TokenType) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Token(Marker, TokenType)
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TokenType {
   NoToken
   StreamStart(TEncoding)
@@ -120,8 +127,9 @@ pub(all) enum TokenType {
   Anchor(String)
   Tag(String, String)
   Scalar(TScalarStyle, String)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Yaml {
   Real(String)
   Integer(Int64)
@@ -132,7 +140,7 @@ pub(all) enum Yaml {
   Alias(Int32)
   Null
   BadValue
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Yaml::as_bool(Self) -> Bool?
 pub fn Yaml::as_f64(Self) -> Double?
 pub fn Yaml::as_hash(Self) -> LinkedHashMap[Self, Self]?

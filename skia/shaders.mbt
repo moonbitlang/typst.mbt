@@ -2,6 +2,7 @@
 
 ///|
 /// A shader spreading mode.
+#derive(Eq, Debug)
 pub(all) enum SpreadMode {
   /// Replicate the edge color if the shader draws outside of its original
   /// bounds.
@@ -11,7 +12,7 @@ pub(all) enum SpreadMode {
   Reflect
   /// Repeat the shader's image horizontally and vertically.
   Repeat
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -138,6 +139,7 @@ pub fn Shader::apply_opacity(self : Shader, opacity : Float) -> Shader {
 
 ///|
 /// Controls how much filtering to be done when transforming images.
+#derive(Eq, Debug)
 pub(all) enum FilterQuality {
   /// Nearest-neighbor. Low quality, but fastest.
   Nearest
@@ -145,7 +147,7 @@ pub(all) enum FilterQuality {
   Bilinear
   /// Bicubic. High quality, but slow.
   Bicubic
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

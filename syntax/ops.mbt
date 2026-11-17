@@ -1,5 +1,6 @@
 ///|
 /// A unary operator.
+#derive(Eq, Hash, Debug)
 pub(all) enum UnOp {
   /// The plus operator: `+`.
   Pos
@@ -7,7 +8,7 @@ pub(all) enum UnOp {
   Neg
   /// The boolean `not`.
   Not
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -56,6 +57,7 @@ pub fn UnOp::as_str(self : UnOp) -> String {
 
 ///|
 /// A binary operator.
+#derive(Eq, Hash, Debug)
 pub(all) enum BinOp {
   Add
   Sub
@@ -76,7 +78,7 @@ pub(all) enum BinOp {
   SubAssign
   MulAssign
   DivAssign
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -134,10 +136,11 @@ pub fn BinOp::precedence(self : BinOp) -> Int32 {
 
 ///|
 /// The associativity of a binary operator.
+#derive(Eq, Hash, Debug)
 pub(all) enum Assoc {
   Left
   Right
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

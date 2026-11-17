@@ -3,10 +3,11 @@
 
 ///|
 /// Describes the rule that determines the interior portion of a shape.
+#derive(Eq)
 pub(all) enum Fill {
   NonZero
   EvenOdd
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -15,11 +16,12 @@ pub extend Fill with Eq::{not_equal, equal}
 
 ///|
 /// Describes how a paint is extended beyond its natural bounds.
+#derive(Eq)
 pub(all) enum Extend {
   Pad
   Repeat
   Reflect
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,11 +30,12 @@ pub extend Extend with Eq::{not_equal, equal}
 
 ///|
 /// Image quality for the sampler.
+#derive(Eq)
 pub(all) enum ImageQuality {
   Low
   Medium
   High
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -41,12 +44,13 @@ pub extend ImageQuality with Eq::{not_equal, equal}
 
 ///|
 /// Parameters which specify how to sample an image.
+#derive(Eq)
 pub(all) struct ImageSampler {
   x_extend : Extend
   y_extend : Extend
   quality : ImageQuality
   alpha : Float
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -55,6 +59,7 @@ pub extend ImageSampler with Eq::{not_equal, equal}
 
 ///|
 /// Defines the color mixing function for a blend operation.
+#derive(Eq)
 pub(all) enum Mix {
   Normal
   Multiply
@@ -72,7 +77,7 @@ pub(all) enum Mix {
   Saturation
   Color
   Luminosity
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -81,6 +86,7 @@ pub extend Mix with Eq::{not_equal, equal}
 
 ///|
 /// Defines the layer composition function for a blend operation.
+#derive(Eq)
 pub(all) enum Compose {
   Clear
   Copy
@@ -96,7 +102,7 @@ pub(all) enum Compose {
   Xor
   Plus
   PlusLighter
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -105,10 +111,11 @@ pub extend Compose with Eq::{not_equal, equal}
 
 ///|
 /// Blend mode consisting of color mixing and composition functions.
+#derive(Eq)
 pub(all) struct BlendMode {
   mix : Mix
   compose : Compose
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

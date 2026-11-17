@@ -19,12 +19,13 @@ pub struct Fallback {
   bytes : Int32
 }
 
+#derive(Eq)
 pub(all) enum Tier {
   T1
   T2
   T3
   T4
-} derive(Eq)
+}
 pub fn Tier::output(Self, &Logger) -> Unit
 pub fn Tier::to_string(Self) -> String
 pub impl Show for Tier

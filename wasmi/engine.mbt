@@ -154,6 +154,7 @@ pub fn EnforcedLimits::default() -> EnforcedLimits {
 
 ///|
 /// The chosen mode of Wasm to Wasmi bytecode compilation.
+#derive(Eq)
 pub(all) enum CompilationMode {
   /// The Wasm code is compiled eagerly to Wasmi bytecode.
   Eager
@@ -161,7 +162,7 @@ pub(all) enum CompilationMode {
   LazyTranslation
   /// The Wasm code is validated and translated lazily on first use.
   Lazy
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -311,11 +312,12 @@ pub fn Config::wasm_features(self : Config) -> @wasmparser.WasmFeatures {
 /// A deduplicated Wasm [`FuncType`]: its index in the registry of its
 /// [`Engine`] (equal function types share their index), guarded by the index
 /// of that engine (upstream `GuardedEntity<EngineIdx, DedupFuncTypeIdx>`).
+#derive(Eq, Hash, Debug)
 #valtype
 pub struct DedupFuncType {
   priv guard_idx : Int32
   priv entity_idx : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -535,7 +537,8 @@ pub fn BlockType::func_type_of(
 
 ///|
 /// A reference to a compiled function stored in the [`CodeMap`] of an [`Engine`].
-pub(all) struct EngineFunc(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct EngineFunc(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

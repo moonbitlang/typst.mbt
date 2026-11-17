@@ -2,11 +2,12 @@
 
 ///|
 /// Stretch, style and weight attributes of a font.
+#derive(Eq, Debug)
 pub(all) struct Attributes {
   stretch : Stretch
   style : Style
   weight : Weight
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -83,7 +84,8 @@ fn Attributes::from_head(head : @read_fonts.Head) -> Attributes {
 ///|
 /// Visual width of a font-- a relative change from the normal aspect
 /// ratio, typically in the range 0.5 to 2.0.
-pub(all) struct Stretch(Float) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Stretch(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -137,11 +139,12 @@ pub fn Stretch::percentage(self : Stretch) -> Float {
 
 ///|
 /// Visual style or 'slope' of a font.
+#derive(Eq, Debug)
 pub(all) enum Style {
   Normal
   Italic
   Oblique(Float?)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -155,7 +158,8 @@ pub extend Style with @debug.Debug::{to_repr}
 
 ///|
 /// Visual weight class of a font, typically on a scale from 1.0 to 1000.0.
-pub(all) struct Weight(Float) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Weight(Float)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

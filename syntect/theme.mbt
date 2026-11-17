@@ -18,6 +18,7 @@ pub(all) struct Theme {
 
 ///|
 /// Properties for a whole theme that is not affected by any scope.
+#derive(Default)
 pub(all) struct ThemeSettings {
   /// The default color for text.
   foreground : Color?
@@ -83,7 +84,7 @@ pub(all) struct ThemeSettings {
   /// The color of the shadow used when a text area can be horizontally
   /// scrolled.
   shadow : Color?
-} derive(Default)
+}
 
 ///|
 pub extend ThemeSettings with Default::{default}
@@ -99,12 +100,13 @@ pub(all) struct ThemeItem {
 }
 
 ///|
+#derive(Eq)
 pub(all) enum UnderlineOption {
   None
   Underline
   StippledUnderline
   SquigglyUnderline
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

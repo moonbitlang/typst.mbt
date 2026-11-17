@@ -352,10 +352,11 @@ pub const UNSCALED_COMPONENT_OFFSET : Int32 = 0x1000
 
 ///|
 /// Anchor position for a composite component.
+#derive(Eq, Debug)
 pub(all) enum Anchor {
   Offset(x~ : Int32, y~ : Int32)
   Point(base~ : Int32, component~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -369,12 +370,13 @@ pub extend Anchor with @debug.Debug::{to_repr}
 
 ///|
 /// Transform for a composite component (2.14 values).
+#derive(Eq, Debug)
 pub(all) struct ComponentTransform {
   xx : F2Dot14
   yx : F2Dot14
   xy : F2Dot14
   yy : F2Dot14
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -388,12 +390,13 @@ pub extend ComponentTransform with @debug.Debug::{to_repr}
 
 ///|
 /// A reference to another glyph. Part of [CompositeGlyph].
+#derive(Eq, Debug)
 pub(all) struct Component {
   flags : Int32
   glyph : Int32
   anchor : Anchor
   transform : ComponentTransform
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

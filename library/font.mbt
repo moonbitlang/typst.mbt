@@ -91,12 +91,13 @@ impl FontInstanceFace with fn ttf(_) {
 
 ///|
 /// A rectangle in font units (upstream `ttf_parser::Rect`).
+#derive(Eq, Hash, Debug)
 pub(all) struct GlyphRect {
   x_min : Int32
   y_min : Int32
   x_max : Int32
   y_max : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

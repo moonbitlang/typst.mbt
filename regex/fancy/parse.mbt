@@ -12,9 +12,10 @@ pub const USIZE_MAX : Int32 = 0x7FFFFFFF
 
 ///|
 /// A set of group numbers (upstream `bit_set::BitSet`), kept sorted.
+#derive(Eq, Debug)
 pub struct BitSet {
   priv items : Array[Int32]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -61,6 +62,7 @@ pub fn BitSet::last(self : BitSet) -> Int32? {
 
 ///|
 /// The parsed expression tree with information gathered while parsing.
+#derive(Debug)
 pub struct ExprTree {
   /// The expression.
   mut expr : Expr
@@ -70,7 +72,7 @@ pub struct ExprTree {
   named_groups : Map[String, Int32]
   contains_subroutines : Bool
   self_recursive : Bool
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1161,11 +1163,12 @@ fn parse_usize(s : String) -> Int32? {
 
 ///|
 /// The result of `parse_id`.
+#derive(Eq, Debug)
 pub struct ParsedId {
   id : String
   relative : Int32?
   skip : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

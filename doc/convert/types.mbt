@@ -8,6 +8,7 @@
 
 ///|
 /// How a document was expressed (docs/edsl-convert.md, section 6.5).
+#derive(Eq)
 pub(all) enum Tier {
   /// Only typed constructors, set rules, show rules and callbacks.
   T1
@@ -19,7 +20,7 @@ pub(all) enum Tier {
   T3
   /// Not convertible.
   T4
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -84,6 +85,7 @@ priv suberror Bail {
 
 ///|
 /// The static type of a translated binding: what its MoonBit variable is.
+#derive(Eq)
 priv enum Ty {
   /// `Int64`.
   TInt
@@ -100,7 +102,7 @@ priv enum Ty {
   /// The view of a show-rule callback (`true`: a typed element view, which
   /// has `.view()`).
   TView(Bool)
-} derive(Eq)
+}
 
 ///|
 /// The translated bindings in scope: Typst name to MoonBit variable and

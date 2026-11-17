@@ -11,6 +11,7 @@
 ///|
 /// What a lint checks. Later checks add cases: a `match` on the kind
 /// needs a wildcard case.
+#derive(Eq)
 pub(all) enum LintKind {
   /// L1: two neighbours in the array of a `Document` or `Seq` are text
   /// (two `Prose`, or any text where the array also holds a block): the
@@ -29,7 +30,7 @@ pub(all) enum LintKind {
   /// one, like the kit's `Canvas`). From the pages of a paged
   /// compilation.
   OutsideContainer
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

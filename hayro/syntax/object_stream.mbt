@@ -58,6 +58,7 @@ pub fn ImageDecodeParams::default() -> ImageDecodeParams {
 
 ///|
 /// A failure that can occur during decoding a data stream.
+#derive(Eq, Debug)
 pub(all) enum DecodeFailure {
   /// An image stream failed to decode.
   ImageDecode
@@ -67,7 +68,7 @@ pub(all) enum DecodeFailure {
   Decryption
   /// An unknown failure occurred.
   Unknown
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -81,6 +82,7 @@ pub extend DecodeFailure with @debug.Debug::{to_repr}
 
 ///|
 /// An image color space.
+#derive(Eq, Debug)
 pub(all) enum ImageColorSpace {
   /// Grayscale color space.
   Gray
@@ -90,7 +92,7 @@ pub(all) enum ImageColorSpace {
   Cmyk
   /// An unknown color space.
   Unknown(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

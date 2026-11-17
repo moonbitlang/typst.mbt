@@ -217,12 +217,13 @@ pub fn Content::without_field(self : Content, id : Int32) -> Content {
 
 ///|
 /// Errors when accessing a field.
+#derive(Eq, Debug)
 pub(all) suberror FieldAccessError {
   /// The element has no such field.
   Unknown
   /// The field is not set.
   Unset
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

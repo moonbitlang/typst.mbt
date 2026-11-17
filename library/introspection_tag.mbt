@@ -2,6 +2,7 @@
 
 ///|
 /// Marks the start or end of a locatable element.
+#derive(Eq)
 pub(all) enum Tag {
   /// The stored element starts here.
   ///
@@ -14,7 +15,7 @@ pub(all) enum Tag {
   /// the two enum variants more balanced in size, keeping a `Tag`'s memory
   /// size down. There are no semantic reasons for this.
   End(Location, U128, TagFlags)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -69,6 +70,7 @@ pub extend Tag with Fingerprint::{fingerprint}
 
 ///|
 /// Flags of a [Tag].
+#derive(Eq, Hash, Debug)
 pub(all) struct TagFlags {
   /// Whether the element will be inserted into the [Introspector]. Either
   /// because it is `Locatable`, has been labelled, or a location has been
@@ -76,7 +78,7 @@ pub(all) struct TagFlags {
   introspectable : Bool
   /// Whether the element is `Tagged`.
   tagged : Bool
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

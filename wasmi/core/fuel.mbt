@@ -206,12 +206,13 @@ pub fn FuelCostsProvider::fuel_for_copying_values(
 
 ///|
 /// An error that may be encountered when using [`Fuel`].
+#derive(Debug)
 pub(all) suberror FuelError {
   /// Returned by some [`Fuel`] methods when fuel metering is disabled.
   FuelMeteringDisabled
   /// Raised when trying to consume more fuel than is available.
   OutOfFuel(required_fuel~ : UInt64)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

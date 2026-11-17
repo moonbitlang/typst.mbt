@@ -3,12 +3,13 @@
 
 ///|
 /// A reference to an object.
+#derive(Eq, Hash, Debug, Compare)
 pub(all) struct ObjRef {
   /// The object number.
   obj_number : Int32
   /// The generation number.
   gen_number : Int32
-} derive(Eq, Hash, Debug, Compare)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

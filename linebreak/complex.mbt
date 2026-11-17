@@ -3,6 +3,7 @@
 // are not ported because Typst doesn't load them).
 
 ///|
+#derive(Eq)
 priv enum ComplexScript {
   None
   Myanmar
@@ -10,7 +11,7 @@ priv enum ComplexScript {
   Khmer
   Lao
   Thai
-} derive(Eq)
+}
 
 ///|
 // TODO: Use data provider

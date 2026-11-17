@@ -3,12 +3,13 @@
 ///|
 /// A set of options for expanding a template string using the contents of
 /// capture groups.
+#derive(Debug)
 pub struct Expander {
   sub_char : Char
   open : String
   close : String
   allow_undelimited_name : Bool
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

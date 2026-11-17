@@ -151,10 +151,11 @@ fn hue_into_cartesian(hue : Float) -> (Float, Float) {
 
 ///|
 /// A grayscale color in sRGB encoding with alpha (palette `Lumaa<Srgb, f32>`).
+#derive(Debug)
 pub(all) struct Luma {
   luma : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -163,12 +164,13 @@ pub extend Luma with @debug.Debug::{to_repr}
 
 ///|
 /// An Oklab color with alpha (palette `Oklaba<f32>`).
+#derive(Debug)
 pub(all) struct Oklab {
   l : Float
   a : Float
   b : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -178,12 +180,13 @@ pub extend Oklab with @debug.Debug::{to_repr}
 ///|
 /// An Oklch color with alpha (palette `Oklcha<f32>`). The hue is stored in
 /// raw (unnormalized) degrees like palette's `OklabHue`.
+#derive(Debug)
 pub(all) struct Oklch {
   l : Float
   chroma : Float
   hue : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -192,12 +195,13 @@ pub extend Oklch with @debug.Debug::{to_repr}
 
 ///|
 /// An sRGB color with alpha (palette `Srgba<f32>`).
+#derive(Debug)
 pub(all) struct Rgb {
   red : Float
   green : Float
   blue : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -206,12 +210,13 @@ pub extend Rgb with @debug.Debug::{to_repr}
 
 ///|
 /// A linear sRGB color with alpha (palette `LinSrgba<f32>`).
+#derive(Debug)
 pub(all) struct LinearRgb {
   red : Float
   green : Float
   blue : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -221,12 +226,13 @@ pub extend LinearRgb with @debug.Debug::{to_repr}
 ///|
 /// An HSL color with alpha (palette `Hsla<Srgb, f32>`). The hue is stored in
 /// raw degrees like palette's `RgbHue`.
+#derive(Debug)
 pub(all) struct Hsl {
   hue : Float
   saturation : Float
   lightness : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -235,12 +241,13 @@ pub extend Hsl with @debug.Debug::{to_repr}
 
 ///|
 /// An HSV color with alpha (palette `Hsva<Srgb, f32>`).
+#derive(Debug)
 pub(all) struct Hsv {
   hue : Float
   saturation : Float
   value : Float
   alpha : Float
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

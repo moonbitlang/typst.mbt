@@ -23,21 +23,24 @@ pub fn parse_owned_v2(String) -> FormatItem raise InvalidFormatDescription
 pub fn weeks_in_year(Int32) -> Int32
 
 // Errors
+#derive(Eq, Hash, @debug.Debug)
 pub(all) suberror ComponentRange {
   ComponentRange(name~ : String, is_conditional~ : Bool)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ComponentRange::is_conditional(Self) -> Bool
 pub fn ComponentRange::name(Self) -> String
 pub impl Show for ComponentRange
 
+#derive(Eq, @debug.Debug)
 pub(all) suberror Format {
   InsufficientTypeInformation
   InvalidComponent(String)
   ComponentRange(ComponentRange)
   StdIo(String)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for Format
 
+#derive(Eq, @debug.Debug)
 pub(all) suberror InvalidFormatDescription {
   UnclosedOpeningBracket(index~ : Int32)
   InvalidComponentName(name~ : String, index~ : Int32)
@@ -48,10 +51,11 @@ pub(all) suberror InvalidFormatDescription {
   NotSupported(what~ : String, context~ : String, index~ : Int32)
   DuplicateModifier(name~ : String, index~ : Int32)
   InvalidModifierCombination(modifier~ : String, context~ : String, index~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for InvalidFormatDescription
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Component {
   Day(padding~ : Padding)
   MonthShort(case_sensitive~ : Bool)
@@ -90,11 +94,12 @@ pub(all) enum Component {
   UnixTimestampMicrosecond(sign_is_mandatory~ : Bool)
   UnixTimestampNanosecond(sign_is_mandatory~ : Bool)
   End(trailing_input~ : TrailingInput)
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub struct Date {
   // private fields
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn Date::add_duration(Self, Duration) -> Self
 pub fn Date::checked_add(Self, Duration) -> Self?
 pub fn Date::checked_sub(Self, Duration) -> Self?
@@ -136,9 +141,10 @@ pub fn Date::with_time(Self, Time) -> PrimitiveDateTime
 pub fn Date::year(Self) -> Int32
 pub impl Show for Date
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub struct Duration {
   // private fields
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn Duration::abs(Self) -> Self
 pub fn Duration::as_seconds_f64(Self) -> Double
 pub fn Duration::checked_add(Self, Self) -> Self?
@@ -180,14 +186,16 @@ pub impl Neg for Duration
 pub impl Show for Duration
 pub impl Sub for Duration
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FormatItem {
   StringLiteral(String)
   Component(Component)
   Compound(Array[FormatItem])
   Optional(FormatItem)
   First(Array[FormatItem])
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) enum Month {
   January
   February
@@ -201,7 +209,7 @@ pub(all) enum Month {
   October
   November
   December
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn Month::length(Self, Int32) -> Int32
 pub fn Month::name(Self) -> String
 pub fn Month::next(Self) -> Self
@@ -211,15 +219,17 @@ pub fn Month::try_from(Int32) -> Self raise ComponentRange
 pub fn Month::try_from_u8(Int32) -> Self?
 pub impl Show for Month
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Padding {
   Space
   Zero
   None_
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub struct PrimitiveDateTime {
   // private fields
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn PrimitiveDateTime::add_duration(Self, Duration) -> Self
 pub fn PrimitiveDateTime::checked_add(Self, Duration) -> Self?
 pub fn PrimitiveDateTime::checked_sub(Self, Duration) -> Self?
@@ -255,6 +265,7 @@ pub fn PrimitiveDateTime::weekday(Self) -> Weekday
 pub fn PrimitiveDateTime::year(Self) -> Int32
 pub impl Show for PrimitiveDateTime
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum SubsecondDigits {
   One
   Two
@@ -266,11 +277,12 @@ pub(all) enum SubsecondDigits {
   Eight
   Nine
   OneOrMore
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub struct Time {
   // private fields
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn Time::add_duration(Self, Duration) -> Self
 pub fn Time::as_hms(Self) -> (Int32, Int32, Int32)
 pub fn Time::compare(Self, Self) -> Int32
@@ -296,11 +308,13 @@ pub fn Time::sub_duration(Self, Duration) -> Self
 pub fn Time::sub_time(Self, Self) -> Duration
 pub impl Show for Time
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum TrailingInput {
   Prohibit
   Discard
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Weekday {
   Monday
   Tuesday
@@ -309,7 +323,7 @@ pub(all) enum Weekday {
   Friday
   Saturday
   Sunday
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Weekday::name(Self) -> String
 pub fn Weekday::next(Self) -> Self
 pub fn Weekday::number_days_from_monday(Self) -> Int32

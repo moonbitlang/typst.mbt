@@ -12,6 +12,7 @@
 ///
 /// <https://www.w3.org/TR/css-display-3/#propdef-display>
 /// <https://www.w3.org/TR/mathml-core/#new-display-math-value>
+#derive(Eq, Hash, Debug)
 pub(all) enum CssDisplay {
   // <display-outside>
   Block
@@ -55,7 +56,7 @@ pub(all) enum CssDisplay {
   // MathML Core
   InlineMath
   BlockMath
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

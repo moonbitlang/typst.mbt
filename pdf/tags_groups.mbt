@@ -229,12 +229,13 @@ fn BreakOpportunity::get(
 }
 
 ///|
+#derive(Eq, Compare)
 priv enum BreakPriority {
   Par
   Span
   TextAttr
   Artifact
-} derive(Eq, Compare)
+}
 
 ///|
 let break_priority_max : BreakPriority = Artifact

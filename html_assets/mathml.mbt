@@ -5,6 +5,7 @@
 
 ///|
 /// Information about an operator.
+#derive(Eq, Debug)
 pub(all) struct OperatorInfo {
   /// An optional form for this operator.
   form : Form?
@@ -14,7 +15,7 @@ pub(all) struct OperatorInfo {
   rspace : Double
   /// The properties this operator has.
   properties : Properties
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,11 +29,12 @@ pub extend OperatorInfo with @debug.Debug::{to_repr}
 
 ///|
 /// The form an operator can have.
+#derive(Eq, Debug)
 pub(all) enum Form {
   Infix
   Prefix
   Postfix
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -46,7 +48,8 @@ pub extend Form with @debug.Debug::{to_repr}
 
 ///|
 /// Set of properties an operator can have.
-pub(all) struct Properties(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Properties(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

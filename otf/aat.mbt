@@ -102,7 +102,8 @@ pub type StateEntry = GenericStateEntry[Unit]
 
 ///|
 /// A type-safe wrapper for a kerning value offset.
-pub(all) struct ValueOffset(UInt16) derive(Debug)
+#derive(Debug)
+pub(all) struct ValueOffset(UInt16)
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

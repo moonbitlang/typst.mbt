@@ -1,10 +1,11 @@
 ///|
 /// A set of syntax kinds (bitset over [SyntaxKind::index]).
+#derive(Eq)
 pub(all) struct SyntaxSet {
   a : UInt64
   b : UInt64
   c : UInt64
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -25,6 +25,7 @@ pub(all) suberror UsvgError {
 pub impl Show for UsvgError
 
 // Types and methods
+#derive(Eq, Hash)
 pub(all) enum AId {
   AlignmentBaseline
   Amplitude
@@ -237,11 +238,12 @@ pub(all) enum AId {
   Y2
   YChannelSelector
   Z
-} derive(Eq, Hash)
+}
 pub fn AId::debug_name(Self) -> String
 pub fn AId::from_str(String) -> Self?
 pub fn AId::to_str(Self) -> String
 
+#derive(Eq)
 pub(all) enum AlignmentBaseline {
   Auto
   Baseline
@@ -255,7 +257,7 @@ pub(all) enum AlignmentBaseline {
   Alphabetic
   Hanging
   Mathematical
-} derive(Eq)
+}
 pub fn AlignmentBaseline::default() -> Self
 pub impl Default for AlignmentBaseline
 
@@ -269,14 +271,16 @@ pub struct BaseGradient {
   // private fields
 }
 
+#derive(Eq)
 pub(all) enum BaselineShift {
   Baseline
   Subscript
   Superscript
   Number(Float)
-} derive(Eq)
+}
 pub impl Default for BaselineShift
 
+#derive(Eq)
 pub(all) enum BlendMode {
   Normal
   Multiply
@@ -294,7 +298,7 @@ pub(all) enum BlendMode {
   Saturation
   Color
   Luminosity
-} derive(Eq)
+}
 pub fn BlendMode::default() -> Self
 pub fn BlendMode::output(Self, &Logger) -> Unit
 pub fn BlendMode::to_string(Self) -> String
@@ -310,26 +314,29 @@ pub fn ClipPath::id(Self) -> String
 pub fn ClipPath::root(Self) -> Group
 pub fn ClipPath::transform(Self) -> @tiny_skia_path.Transform
 
+#derive(Eq)
 pub(all) struct Color {
   red : Int32
   green : Int32
   blue : Int32
-} derive(Eq)
+}
 pub fn Color::black() -> Self
 pub fn Color::new_rgb(Int32, Int32, Int32) -> Self
 pub fn Color::white() -> Self
 
+#derive(Eq)
 pub(all) enum ColorChannel {
   R
   G
   B
   A
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) enum ColorInterpolation {
   SRGB
   LinearRGB
-} derive(Eq)
+}
 pub fn ColorInterpolation::default() -> Self
 pub impl Default for ColorInterpolation
 
@@ -342,6 +349,7 @@ pub(all) enum ColorMatrixKind {
 pub fn ColorMatrixKind::default() -> Self
 pub impl Default for ColorMatrixKind
 
+#derive(Eq)
 pub(all) enum CompositeOperator {
   Over
   In
@@ -349,7 +357,7 @@ pub(all) enum CompositeOperator {
   Atop
   Xor
   Arithmetic(k1~ : Float, k2~ : Float, k3~ : Float, k4~ : Float)
-} derive(Eq)
+}
 
 pub(all) struct ConvolveMatrixData {
   target_x : UInt32
@@ -360,11 +368,12 @@ pub(all) struct ConvolveMatrixData {
 }
 pub fn ConvolveMatrixData::get(Self, UInt32, UInt32) -> Float
 
+#derive(Eq)
 pub(all) enum DbStyle {
   Normal
   Italic
   Oblique
-} derive(Eq)
+}
 
 pub(all) struct DistantLight {
   azimuth : Float
@@ -380,6 +389,7 @@ pub fn Document::parse_tree(@xml.Document, injected_stylesheet? : String) -> Sel
 pub fn Document::root(Self) -> SvgNode
 pub fn Document::root_element(Self) -> SvgNode
 
+#derive(Eq)
 pub(all) enum DominantBaseline {
   Auto
   UseScript
@@ -393,10 +403,11 @@ pub(all) enum DominantBaseline {
   Middle
   TextAfterEdge
   TextBeforeEdge
-} derive(Eq)
+}
 pub fn DominantBaseline::default() -> Self
 pub impl Default for DominantBaseline
 
+#derive(Eq, Hash)
 pub(all) enum EId {
   A
   Circle
@@ -451,7 +462,7 @@ pub(all) enum EId {
   Tref
   Tspan
   Use
-} derive(Eq, Hash)
+}
 pub fn EId::debug_name(Self) -> String
 pub fn EId::from_str(String) -> Self?
 pub fn EId::is_gradient(Self) -> Bool
@@ -459,11 +470,12 @@ pub fn EId::is_graphic(Self) -> Bool
 pub fn EId::is_paint_server(Self) -> Bool
 pub fn EId::to_str(Self) -> String
 
+#derive(Eq)
 pub(all) enum EdgeMode {
   EdgeNone
   Duplicate
   Wrap
-} derive(Eq)
+}
 
 pub(all) struct FaceInfo {
   mut id : Int32
@@ -601,10 +613,11 @@ pub fn Fill::paint(Self) -> Paint
 pub fn Fill::rule(Self) -> FillRule
 pub impl Default for Fill
 
+#derive(Eq)
 pub(all) enum FillRule {
   NonZero
   EvenOdd
-} derive(Eq)
+}
 pub fn FillRule::default() -> Self
 pub impl Default for FillRule
 
@@ -615,11 +628,12 @@ pub fn Filter::id(Self) -> String
 pub fn Filter::primitives(Self) -> Array[Primitive]
 pub fn Filter::rect(Self) -> @tiny_skia_path.NonZeroRect
 
+#derive(Eq)
 pub(all) enum FilterInput {
   SourceGraphic
   SourceAlpha
   Reference(String)
-} derive(Eq)
+}
 
 pub(all) enum FilterKind {
   Blend(FeBlend)
@@ -642,9 +656,10 @@ pub(all) enum FilterKind {
 }
 pub fn FilterKind::has_input(Self, FilterInput) -> Bool
 
+#derive(Eq)
 pub struct Font {
   // private fields
-} derive(Eq)
+}
 pub fn Font::families(Self) -> Array[@svgtypes.FontFamily]
 pub fn Font::stretch(Self) -> FontStretch
 pub fn Font::style(Self) -> FontStyle
@@ -671,10 +686,11 @@ pub fn FontDatabase::set_sans_serif_family(Self, String) -> Unit
 pub fn FontDatabase::set_serif_family(Self, String) -> Unit
 pub fn[T] FontDatabase::with_face_data(Self, Int32, (Bytes, UInt32) -> T) -> T?
 
+#derive(Eq)
 pub(all) enum FontOpticalSizing {
   OpticalAuto
   OpticalNone
-} derive(Eq)
+}
 pub impl Default for FontOpticalSizing
 
 pub(all) struct FontQuery {
@@ -693,6 +709,7 @@ pub fn FontResolver::default_fallback_selector() -> (Char, Array[Int32], FontDat
 pub fn FontResolver::default_font_selector() -> (Font, FontDatabase) -> Int32?
 pub impl Default for FontResolver
 
+#derive(Compare, Eq, Hash)
 pub(all) enum FontStretch {
   UltraCondensed
   ExtraCondensed
@@ -703,15 +720,16 @@ pub(all) enum FontStretch {
   Expanded
   ExtraExpanded
   UltraExpanded
-} derive(Compare, Eq, Hash)
+}
 pub fn FontStretch::to_number(Self) -> Int32
 pub impl Default for FontStretch
 
+#derive(Eq, Hash)
 pub(all) enum FontStyle {
   Normal
   Italic
   Oblique
-} derive(Eq, Hash)
+}
 pub fn FontStyle::default() -> Self
 pub impl Default for FontStyle
 
@@ -775,6 +793,7 @@ pub(all) enum ImageKind {
   SVG(Tree)
 }
 
+#derive(Eq)
 pub(all) enum ImageRendering {
   OptimizeQuality
   OptimizeSpeed
@@ -782,7 +801,7 @@ pub(all) enum ImageRendering {
   HighQuality
   CrispEdges
   Pixelated
-} derive(Eq)
+}
 pub fn ImageRendering::default() -> Self
 pub impl Default for ImageRendering
 pub impl FromValue for ImageRendering
@@ -802,10 +821,11 @@ pub struct LayoutSpan {
 pub fn LayoutSpan::fill(Self) -> Fill?
 pub fn LayoutSpan::stroke(Self) -> Stroke?
 
+#derive(Eq)
 pub(all) enum LengthAdjust {
   Spacing
   SpacingAndGlyphs
-} derive(Eq)
+}
 pub fn LengthAdjust::default() -> Self
 pub impl Default for LengthAdjust
 
@@ -815,20 +835,22 @@ pub(all) enum LightSource {
   SpotLight(SpotLight)
 }
 
+#derive(Eq)
 pub(all) enum LineCap {
   Butt
   Round
   Square
-} derive(Eq)
+}
 pub fn LineCap::default() -> Self
 pub impl Default for LineCap
 
+#derive(Eq)
 pub(all) enum LineJoin {
   Miter
   MiterClip
   Round
   Bevel
-} derive(Eq)
+}
 pub fn LineJoin::default() -> Self
 pub impl Default for LineJoin
 
@@ -853,16 +875,18 @@ pub fn Mask::mask(Self) -> Self?
 pub fn Mask::rect(Self) -> @tiny_skia_path.NonZeroRect
 pub fn Mask::root(Self) -> Group
 
+#derive(Eq)
 pub(all) enum MaskType {
   Luminance
   Alpha
-} derive(Eq)
+}
 pub impl Default for MaskType
 
+#derive(Eq)
 pub(all) enum MorphologyOperator {
   Erode
   Dilate
-} derive(Eq)
+}
 
 pub(all) enum Node {
   Group(Group)
@@ -884,13 +908,15 @@ pub fn NonZeroF32::get(Self) -> Float
 pub fn NonZeroF32::new(Float) -> Self?
 
 #alias(StrokeWidth)
-pub struct NonZeroPositiveF32(Float) derive(Eq)
+#derive(Eq)
+pub struct NonZeroPositiveF32(Float)
 pub fn NonZeroPositiveF32::get(Self) -> Float
 pub fn NonZeroPositiveF32::new(Float) -> Self?
 
 #alias(Opacity)
 #alias(StopOffset)
-pub struct NormalizedF32(Float) derive(Eq)
+#derive(Eq)
+pub struct NormalizedF32(Float)
 pub fn NormalizedF32::get(Self) -> Float
 pub fn NormalizedF32::new(Float) -> Self?
 pub fn NormalizedF32::new_clamped(Float) -> Self
@@ -927,10 +953,11 @@ pub(all) enum Paint {
 }
 pub impl Eq for Paint
 
+#derive(Eq)
 pub(all) enum PaintOrder {
   FillAndStroke
   StrokeAndFill
-} derive(Eq)
+}
 pub fn PaintOrder::default() -> Self
 pub impl Default for PaintOrder
 
@@ -978,7 +1005,8 @@ pub fn PositionedGlyph::sbix_transform(Self, Float, Float, Float, Float, Float, 
 pub fn PositionedGlyph::svg_transform(Self) -> @tiny_skia_path.Transform
 pub fn PositionedGlyph::transform(Self) -> @tiny_skia_path.Transform
 
-pub struct PositiveF32(Float) derive(Eq)
+#derive(Eq)
+pub struct PositiveF32(Float)
 pub fn PositiveF32::get(Self) -> Float
 pub fn PositiveF32::new(Float) -> Self?
 pub fn PositiveF32::zero() -> Self
@@ -1005,11 +1033,12 @@ pub fn RadialGradient::spread_method(Self) -> SpreadMethod
 pub fn RadialGradient::stops(Self) -> Array[Stop]
 pub fn RadialGradient::transform(Self) -> @tiny_skia_path.Transform
 
+#derive(Eq)
 pub(all) enum ShapeRendering {
   OptimizeSpeed
   CrispEdges
   GeometricPrecision
-} derive(Eq)
+}
 pub fn ShapeRendering::default() -> Self
 pub fn ShapeRendering::use_shape_antialiasing(Self) -> Bool
 pub impl Default for ShapeRendering
@@ -1026,11 +1055,12 @@ pub(all) struct SpotLight {
   limiting_cone_angle : Float?
 }
 
+#derive(Eq)
 pub(all) enum SpreadMethod {
   Pad
   Reflect
   Repeat
-} derive(Eq)
+}
 pub fn SpreadMethod::default() -> Self
 pub impl Default for SpreadMethod
 pub impl FromValue for SpreadMethod
@@ -1108,11 +1138,12 @@ pub fn Text::rotate(Self) -> Array[Float]
 pub fn Text::stroke_bounding_box(Self) -> @tiny_skia_path.Rect
 pub fn Text::writing_mode(Self) -> WritingMode
 
+#derive(Eq)
 pub(all) enum TextAnchor {
   Start
   Middle
   End
-} derive(Eq)
+}
 pub fn TextAnchor::default() -> Self
 pub impl Default for TextAnchor
 
@@ -1151,11 +1182,12 @@ pub fn TextPath::id(Self) -> String
 pub fn TextPath::path(Self) -> @tiny_skia_path.Path
 pub fn TextPath::start_offset(Self) -> Float
 
+#derive(Eq)
 pub(all) enum TextRendering {
   OptimizeSpeed
   OptimizeLegibility
   GeometricPrecision
-} derive(Eq)
+}
 pub fn TextRendering::default() -> Self
 pub impl Default for TextRendering
 pub impl FromValue for TextRendering
@@ -1212,22 +1244,25 @@ pub fn Tree::root(Self) -> Group
 pub fn Tree::size(Self) -> @tiny_skia_path.Size
 pub fn Tree::to_string(Self, WriteOptions) -> String
 
+#derive(Eq)
 pub(all) enum TurbulenceKind {
   FractalNoise
   Turbulence
-} derive(Eq)
+}
 
+#derive(Eq)
 pub(all) enum Units {
   UserSpaceOnUse
   ObjectBoundingBox
-} derive(Eq)
+}
 pub impl FromValue for Units
 
+#derive(Eq)
 pub(all) enum Visibility {
   Visible
   Hidden
   Collapse
-} derive(Eq)
+}
 pub fn Visibility::default() -> Self
 pub impl Default for Visibility
 pub impl FromValue for Visibility
@@ -1244,10 +1279,11 @@ pub(all) struct WriteOptions {
 pub fn WriteOptions::default() -> Self
 pub impl Default for WriteOptions
 
+#derive(Eq)
 pub(all) enum WritingMode {
   LeftToRight
   TopToBottom
-} derive(Eq)
+}
 
 // Type aliases
 pub type FontId = Int32

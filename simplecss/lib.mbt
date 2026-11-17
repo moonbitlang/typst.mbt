@@ -13,6 +13,7 @@
 
 ///|
 /// A list of possible errors.
+#derive(Eq, Debug)
 pub(all) suberror CssError {
   /// The steam ended earlier than we expected.
   ///
@@ -36,7 +37,7 @@ pub(all) suberror CssError {
   InvalidAttributeSelector
   /// An invalid language pseudo-class.
   InvalidLanguagePseudoClass
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -81,10 +82,11 @@ pub extend CssError with Show::{to_string, output}
 ///
 /// Position indicates a row/line and a column in the original text. Starting
 /// from 1:1.
+#derive(Eq, Debug)
 pub(all) struct TextPos {
   row : UInt32
   col : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -115,11 +117,12 @@ pub extend TextPos with Show::{to_string, output}
 
 ///|
 /// A declaration.
+#derive(Eq, Debug)
 pub(all) struct Declaration {
   name : String
   value : String
   important : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -133,12 +136,13 @@ pub extend Declaration with @debug.Debug::{to_repr}
 
 ///|
 /// A rule.
+#derive(Debug)
 pub(all) struct Rule {
   /// A rule selector.
   selector : Selector
   /// A rule declarations.
   mut declarations : Array[Declaration]
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -147,10 +151,11 @@ pub extend Rule with @debug.Debug::{to_repr}
 
 ///|
 /// A style sheet.
+#derive(Debug)
 pub(all) struct StyleSheet {
   /// A list of rules.
   mut rules : Array[Rule]
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

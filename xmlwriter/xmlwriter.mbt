@@ -8,6 +8,7 @@
 
 ///|
 /// An XML node indention.
+#derive(Eq, Debug)
 pub(all) enum Indent {
   /// Disable indention and new lines.
   None
@@ -15,7 +16,7 @@ pub(all) enum Indent {
   Spaces(Int32)
   /// Indent with tabs.
   Tabs
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,6 +30,7 @@ pub extend Indent with @debug.Debug::{to_repr}
 
 ///|
 /// An XML writing options.
+#derive(Debug)
 pub(all) struct Options {
   /// Use single quote marks instead of double quote.
   use_single_quote : Bool
@@ -36,7 +38,7 @@ pub(all) struct Options {
   indent : Indent
   /// Set XML attributes indention.
   attributes_indent : Indent
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -52,11 +54,12 @@ pub impl Default for Options with fn default() {
 pub extend Options with Default::{default}
 
 ///|
+#derive(Eq)
 priv enum State {
   Empty
   Document
   Attributes
-} derive(Eq)
+}
 
 ///|
 priv struct DepthData {

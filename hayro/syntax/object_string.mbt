@@ -2,7 +2,8 @@
 
 ///|
 /// A PDF string object.
-pub(all) struct PdfString(Bytes) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct PdfString(Bytes)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

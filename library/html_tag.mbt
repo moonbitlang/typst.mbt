@@ -9,7 +9,8 @@
 
 ///|
 /// The tag of an HTML element.
-pub struct HtmlTag(String) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct HtmlTag(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

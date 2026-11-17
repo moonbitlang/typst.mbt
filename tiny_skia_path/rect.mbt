@@ -7,12 +7,13 @@
 ///
 /// - Width and height are in 1..=i32::MAX range.
 /// - x+width and y+height does not overflow.
+#derive(Eq, Debug)
 pub struct IntRect {
   priv x : Int32
   priv y : Int32
   priv width : UInt32
   priv height : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -218,12 +219,13 @@ pub fn IntRect::to_rect(self : IntRect) -> Rect {
 /// - Left edge is <= right.
 /// - Top edge is <= bottom.
 /// - Width and height are <= f32::MAX.
+#derive(Eq, Hash, Debug)
 pub struct Rect {
   priv left : FiniteF32
   priv top : FiniteF32
   priv right : FiniteF32
   priv bottom : FiniteF32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -553,12 +555,13 @@ fn checked_f32_sub(a : Float, b : Float) -> Float? {
 /// - Top edge is < bottom.
 /// - Width and height are <= f32::MAX.
 /// - Width and height are > 0.0
+#derive(Eq, Debug)
 pub struct NonZeroRect {
   priv left : FiniteF32
   priv top : FiniteF32
   priv right : FiniteF32
   priv bottom : FiniteF32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

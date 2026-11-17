@@ -119,10 +119,11 @@ fn resolve_tref_text(xml : @xml.Document, href : String) -> String? {
 }
 
 ///|
+#derive(Eq)
 priv enum XmlSpace {
   XmlSpaceDefault
   XmlSpacePreserve
-} derive(Eq)
+}
 
 ///|
 fn get_xmlspace(

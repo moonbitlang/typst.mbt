@@ -2,11 +2,12 @@
 
 ///|
 /// Holds CIE XYZ representation (single precision).
+#derive(Eq, Debug)
 pub(all) struct Xyz {
   x : Float
   y : Float
   z : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -30,11 +31,12 @@ pub fn Xyz::to_xyzd(self : Xyz) -> Xyzd {
 
 ///|
 /// Holds CIE XYZ representation (double precision).
+#derive(Eq, Debug, Default)
 pub(all) struct Xyzd {
   x : Double
   y : Double
   z : Double
-} derive(Eq, Debug, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -58,11 +60,12 @@ pub fn Xyzd::new(x : Double, y : Double, z : Double) -> Xyzd {
 
 ///|
 /// 3-component double vector (`Vector3d`).
+#derive(Eq, Debug, Default)
 pub(all) struct Vector3d {
   v0 : Double
   v1 : Double
   v2 : Double
-} derive(Eq, Debug, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -81,11 +84,12 @@ pub extend Vector3d with Default::{default}
 
 ///|
 /// 3-component float vector (`Vector3f`).
+#derive(Eq, Debug, Default)
 pub(all) struct Vector3f {
   v0 : Float
   v1 : Float
   v2 : Float
-} derive(Eq, Debug, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -113,9 +117,10 @@ fn Vector3d::cast(self : Vector3d) -> Vector3f {
 
 ///|
 /// Row-major 3x3 double matrix (`Matrix3d`): `v[3 * row + col]`.
+#derive(Eq, Debug)
 pub(all) struct Matrix3d {
   v : FixedArray[Double]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -129,9 +134,10 @@ pub extend Matrix3d with @debug.Debug::{to_repr}
 
 ///|
 /// Row-major 3x3 float matrix (`Matrix3f`): `v[3 * row + col]`.
+#derive(Eq, Debug)
 pub(all) struct Matrix3f {
   v : FixedArray[Float]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

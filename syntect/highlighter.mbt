@@ -128,11 +128,12 @@ pub fn HighlightState::new(
 
 ///|
 /// A style with the match power of each of its fields.
+#derive(Eq)
 pub(all) struct ScoredStyle {
   foreground : (MatchPower, Color)
   background : (MatchPower, Color)
   font_style : (MatchPower, FontStyle)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -5,12 +5,13 @@
 
 ///|
 /// The severity of a [SourceDiagnostic].
+#derive(Eq, Hash, Debug)
 pub(all) enum Severity {
   /// A fatal error.
   Error
   /// A non-fatal warning.
   Warning
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,6 +30,7 @@ pub extend Severity with @debug.Debug::{to_repr}
 
 ///|
 /// A part of a diagnostic's trace.
+#derive(Eq, Hash, Debug)
 pub(all) enum Tracepoint {
   /// A function call.
   Call(String?)
@@ -38,7 +40,7 @@ pub(all) enum Tracepoint {
   Import(String)
   /// A file include.
   Include(String)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -71,6 +73,7 @@ pub extend Tracepoint with Show::{to_string, output}
 
 ///|
 /// An error or warning in a source or text file.
+#derive(Eq, Hash, Debug)
 pub(all) struct SourceDiagnostic {
   /// Whether the diagnostic is an error or a warning.
   severity : Severity
@@ -83,7 +86,7 @@ pub(all) struct SourceDiagnostic {
   trace : Array[@syntax.Spanned[Tracepoint]]
   /// Additional hints to the user.
   hints : Array[@syntax.DiagSpanned[String]]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -221,10 +224,11 @@ pub fn SourceDiagnostic::from_syntax(
 ///|
 /// A string message with optional hints: upstream `HintedString`, used for
 /// `StrResult` and `HintedStrResult`.
+#derive(Eq, Hash, Debug)
 pub(all) struct HintedString {
   message : String
   hints : Array[String]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -289,9 +293,10 @@ pub fn HintedString::into_warning_at(
 
 ///|
 /// An error without a span: upstream `StrResult`/`HintedStrResult` error.
+#derive(Debug)
 pub(all) suberror HintedError {
   HintedError(HintedString)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -300,9 +305,10 @@ pub extend HintedError with @debug.Debug::{to_repr}
 
 ///|
 /// An error with spans: upstream `SourceResult` error.
+#derive(Debug)
 pub(all) suberror SourceError {
   SourceError(Array[SourceDiagnostic])
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -34,12 +34,13 @@ impl FromData for FeatureNameRecord with fn parse(data) {
 
 ///|
 /// A setting name.
+#derive(Debug)
 pub(all) struct SettingName {
   /// The setting.
   setting : UInt16
   /// The `name` table index for the feature's name in a 256..32768 range.
   name_index : UInt16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

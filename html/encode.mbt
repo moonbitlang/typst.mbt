@@ -2,10 +2,11 @@
 
 ///|
 /// Settings for HTML export (upstream `HtmlOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct HtmlOptions {
   /// Format options that override the defaults set by the document.
   format : @library.PartialHtmlFormatOptions
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -17,10 +18,11 @@ pub extend HtmlOptions with Default::{default}
 
 ///|
 /// Resolved settings for HTML export (upstream `HtmlOptions<Complete>`).
+#derive(Eq)
 pub(all) struct CompleteHtmlOptions {
   /// The resolved format options.
   format : @library.HtmlFormatOptions
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

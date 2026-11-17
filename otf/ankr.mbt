@@ -5,10 +5,11 @@
 
 ///|
 /// An anchor point (`ankr::Point`).
+#derive(Eq, Default, Debug)
 pub(all) struct AnkrPoint {
   x : Int16
   y : Int16
-} derive(Eq, Default, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -9,11 +9,12 @@
 
 ///|
 /// use for : eval(t) == A * t^2 + B * t + C
+#derive(Debug, Default)
 pub(all) struct QuadCoeff {
   a : F32x2
   b : F32x2
   c : F32x2
-} derive(Debug, Default)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -41,12 +42,13 @@ pub fn QuadCoeff::eval(self : QuadCoeff, t : F32x2) -> F32x2 {
 }
 
 ///|
+#derive(Debug, Default)
 pub(all) struct CubicCoeff {
   a : F32x2
   b : F32x2
   c : F32x2
   d : F32x2
-} derive(Debug, Default)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

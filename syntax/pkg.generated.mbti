@@ -63,34 +63,39 @@ pub fn utf8_slice(String, Int32, Int32) -> String
 pub fn utf8_to_utf16(String, Int32) -> Int32
 
 // Errors
+#derive(Eq, Hash, @debug.Debug)
 pub(all) suberror PathError {
   Escapes
   Backslash
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PathError::output(Self, &Logger) -> Unit
 pub fn PathError::to_string(Self) -> String
 pub impl Show for PathError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) suberror RealizeError {
   Invalid(String)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Show for RealizeError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) suberror VirtualizeError {
   Path(PathError)
   Invalid(String)
   Utf8
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn VirtualizeError::output(Self, &Logger) -> Unit
 pub fn VirtualizeError::to_string(Self) -> String
 pub impl Show for VirtualizeError
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Assoc {
   Left
   Right
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum BinOp {
   Add
   Sub
@@ -111,16 +116,17 @@ pub(all) enum BinOp {
   SubAssign
   MulAssign
   DivAssign
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn BinOp::as_str(Self) -> String
 pub fn BinOp::assoc(Self) -> Assoc
 pub fn BinOp::from_kind(SyntaxKind) -> Self?
 pub fn BinOp::precedence(Self) -> Int32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct DiagSpan {
   span : Span
   extra : UInt64
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DiagSpan::detached() -> Self
 pub fn DiagSpan::from_range(FileId, Int32, Int32) -> Self
 pub fn DiagSpan::from_span(Span, sub_range? : SubRange) -> Self
@@ -129,27 +135,31 @@ pub fn DiagSpan::id(Self) -> FileId?
 pub fn DiagSpan::is_detached(Self) -> Bool
 pub fn DiagSpan::or(Self, Self) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DiagSpanKind {
   Detached
   Number(id~ : FileId, num~ : SpanNumber, sub_range~ : SubRange?)
   Range(id~ : FileId, start~ : Int32, end~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct DiagSpanned[T] {
   v : T
   span : DiagSpan
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Diagnosis {
   errors : Bool
   warnings : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn Diagnosis::both(Self) -> Bool
 pub fn Diagnosis::default() -> Self
 pub fn Diagnosis::either(Self) -> Bool
 pub fn Diagnosis::or(Self, Self) -> Self
 
-pub struct FileId(UInt16) derive(Compare, Eq, Hash)
+#derive(Compare, Eq, Hash)
+pub struct FileId(UInt16)
 pub fn FileId::from_raw(UInt16) -> Self
 pub fn FileId::get(Self) -> RootedPath
 pub fn FileId::into_raw(Self) -> UInt16
@@ -213,11 +223,12 @@ pub fn LinkedNode::prev_sibling_with_trivia(Self) -> Self?
 pub fn LinkedNode::range(Self) -> (Int32, Int32)
 pub fn LinkedNode::rightmost_leaf(Self) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum NonDecimalBase {
   Hex
   Octal
   Binary
-} derive(Eq, @debug.Debug)
+}
 pub fn NonDecimalBase::get(Self) -> Int32
 pub fn NonDecimalBase::name(Self) -> String
 
@@ -247,11 +258,12 @@ pub(all) struct PackageManifest {
 pub fn PackageManifest::from_toml(String) -> Result[Self, String]
 pub fn PackageManifest::validate(Self, PackageSpec) -> Result[Unit, String]
 
+#derive(Eq, Hash)
 pub(all) struct PackageSpec {
   namespace_ : String
   name : String
   version : PackageVersion
-} derive(Eq, Hash)
+}
 pub fn PackageSpec::from_str(String) -> Result[Self, String]
 pub fn PackageSpec::output(Self, &Logger) -> Unit
 pub fn PackageSpec::to_string(Self) -> String
@@ -259,11 +271,12 @@ pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
 pub impl Show for PackageSpec
 pub impl @debug.Debug for PackageSpec
 
+#derive(Compare, Eq, Hash)
 pub(all) struct PackageVersion {
   major : UInt32
   minor : UInt32
   patch : UInt32
-} derive(Compare, Eq, Hash)
+}
 pub fn PackageVersion::compiler() -> Self
 pub fn PackageVersion::from_str(String) -> Result[Self, String]
 pub fn PackageVersion::matches_eq(Self, VersionBound) -> Bool
@@ -276,9 +289,10 @@ pub fn PackageVersion::to_string(Self) -> String
 pub impl Show for PackageVersion
 pub impl @debug.Debug for PackageVersion
 
+#derive(Eq, Hash)
 pub struct RootedPath {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn RootedPath::intern(Self) -> FileId
 pub fn RootedPath::map(Self, (VirtualPath) -> VirtualPath) -> Self
 pub fn RootedPath::new(VirtualRoot, VirtualPath) -> Self
@@ -289,10 +303,11 @@ pub fn RootedPath::vpath(Self) -> VirtualPath
 pub impl Show for RootedPath
 pub impl @debug.Debug for RootedPath
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Side {
   Before
   After
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Source {
   // private fields
@@ -315,7 +330,8 @@ pub fn Source::set_memo(Self, UInt64, UInt64) -> Unit
 pub fn Source::text(Self) -> String
 pub fn Source::with_root(FileId, String, SyntaxNode) -> Self
 
-pub(all) struct Span(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Span(UInt64)
 pub fn Span::detached() -> Self
 pub fn Span::from_number(FileId, SpanNumber) -> Self
 pub fn Span::from_range(FileId, Int32, Int32) -> Self
@@ -325,34 +341,40 @@ pub fn Span::is_detached(Self) -> Bool
 pub fn Span::number(Self) -> UInt64
 pub fn Span::or(Self, Self) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SpanKind {
   Detached
   Number(id~ : FileId, num~ : SpanNumber)
   Range(id~ : FileId, start~ : Int32, end~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct SpanNumber(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct SpanNumber(UInt64)
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Spanned[T] {
   v : T
   span : Span
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct SubRange {
   start : Int32
   end : Int32
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn SubRange::new(Int32, Int32) -> Self?
 pub fn SubRange::to_absolute(Self, Int32) -> (Int32, Int32)
 pub fn SubRange::to_relative(Self) -> (Int32, Int32)
 
+#derive(Eq, @debug.Debug)
 pub(all) struct SyntaxDiagnostic {
   is_error : Bool
   span : DiagSpan
   message : String
   hints : Array[DiagSpanned[String]]
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) enum SyntaxKind {
   End
   Error
@@ -492,7 +514,7 @@ pub(all) enum SyntaxKind {
   FuncReturn
   Destructuring
   DestructAssignment
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn SyntaxKind::debug_name(Self) -> String
 pub fn SyntaxKind::from_index(Int32) -> Self
 pub fn SyntaxKind::index(Self) -> Int32
@@ -506,11 +528,12 @@ pub fn SyntaxKind::is_trivia(Self) -> Bool
 pub fn SyntaxKind::name(Self) -> String
 pub impl Show for SyntaxKind
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum SyntaxMode {
   Markup
   Math
   Code
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub struct SyntaxNode {
   // private fields
@@ -537,11 +560,12 @@ pub fn SyntaxNode::spanless_eq(Self, Self) -> Bool
 pub fn SyntaxNode::synthesize(Self, Span) -> Unit
 pub fn SyntaxNode::synthesize_ranges(Self, FileId) -> Unit
 
+#derive(Eq)
 pub(all) struct SyntaxSet {
   a : UInt64
   b : UInt64
   c : UInt64
-} derive(Eq)
+}
 pub fn SyntaxSet::add(Self, SyntaxKind) -> Self
 pub fn SyntaxSet::contains(Self, SyntaxKind) -> Bool
 pub fn SyntaxSet::new() -> Self
@@ -560,30 +584,33 @@ pub(all) struct ToolInfo {
   sections : Array[String]
 }
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum UnOp {
   Pos
   Neg
   Not
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn UnOp::as_str(Self) -> String
 pub fn UnOp::from_kind(SyntaxKind) -> Self?
 pub fn UnOp::precedence(Self) -> Int32
 
+#derive(Compare, Eq, Hash)
 pub(all) struct VersionBound {
   major : UInt32
   minor : UInt32?
   patch : UInt32?
-} derive(Compare, Eq, Hash)
+}
 pub fn VersionBound::from_str(String) -> Result[Self, String]
 pub fn VersionBound::output(Self, &Logger) -> Unit
 pub fn VersionBound::to_string(Self) -> String
 pub impl Show for VersionBound
 pub impl @debug.Debug for VersionBound
 
+#derive(Eq, Hash)
 pub(all) struct VersionlessPackageSpec {
   namespace_ : String
   name : String
-} derive(Eq, Hash)
+}
 pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
 pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
 pub fn VersionlessPackageSpec::output(Self, &Logger) -> Unit
@@ -591,9 +618,10 @@ pub fn VersionlessPackageSpec::to_string(Self) -> String
 pub impl Show for VersionlessPackageSpec
 pub impl @debug.Debug for VersionlessPackageSpec
 
+#derive(Eq, Hash)
 pub struct VirtualPath {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn VirtualPath::extension(Self) -> String?
 pub fn VirtualPath::file_name(Self) -> String?
 pub fn VirtualPath::file_stem(Self) -> String?
@@ -613,10 +641,11 @@ pub fn VirtualPath::with_extension(Self, String) -> Self
 pub impl Show for VirtualPath
 pub impl @debug.Debug for VirtualPath
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum VirtualRoot {
   Project
   Package(PackageSpec)
-} derive(Eq, Hash, @debug.Debug)
+}
 
 // Type aliases
 

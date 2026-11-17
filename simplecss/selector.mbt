@@ -2,6 +2,7 @@
 
 ///|
 /// An attribute selector operator.
+#derive(Eq, Debug)
 pub(all) enum AttributeOperator {
   /// `[attr]`
   Exists
@@ -11,7 +12,7 @@ pub(all) enum AttributeOperator {
   Contains(String)
   /// `[attr|=value]`
   StartsWith(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,6 +48,7 @@ pub fn AttributeOperator::matches(
 
 ///|
 /// A pseudo-class.
+#derive(Eq, Debug)
 pub(all) enum PseudoClass {
   FirstChild
   Link
@@ -55,7 +57,7 @@ pub(all) enum PseudoClass {
   Active
   Focus
   Lang(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -102,43 +104,49 @@ pub(open) trait Element {
 }
 
 ///|
+#derive(Debug)
 priv enum SimpleSelectorType {
   Type(String)
   Universal
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 priv enum SubSelector {
   Attribute(String, AttributeOperator)
   PseudoClass(PseudoClass)
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 priv struct SimpleSelector {
   kind : SimpleSelectorType
   subselectors : Array[SubSelector]
-} derive(Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 priv enum Combinator {
   None
   Descendant
   Child
   AdjacentSibling
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Debug)
 priv struct Component {
   /// A combinator that precede the selector.
   combinator : Combinator
   selector : SimpleSelector
-} derive(Debug)
+}
 
 ///|
 /// A selector.
+#derive(Debug)
 struct Selector {
   components : Array[Component]
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -376,6 +384,7 @@ pub extend Selector with Show::{to_string, output}
 
 ///|
 /// A selector token.
+#derive(Eq, Debug)
 pub(all) enum SelectorToken {
   /// `*`
   UniversalSelector
@@ -397,7 +406,7 @@ pub(all) enum SelectorToken {
   ChildCombinator
   /// `a + b`
   AdjacentCombinator
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

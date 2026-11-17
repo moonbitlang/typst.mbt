@@ -64,13 +64,14 @@ fn Text::char_pos(self : Text, byte : Int32) -> Int32? {
 ///|
 /// The configuration forwarded to the delegated `regex` engine (upstream
 /// `regex_automata::util::syntax::Config`, reduced to the used options).
+#derive(Eq, Debug)
 pub struct SyntaxConfig {
   case_insensitive : Bool
   multi_line : Bool
   dot_matches_new_line : Bool
   ignore_whitespace : Bool
   unicode : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

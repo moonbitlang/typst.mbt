@@ -7,6 +7,7 @@
 
 ///|
 /// A position in CSV data (upstream `csv::Position`).
+#derive(Eq, Debug)
 pub(all) struct Position {
   /// The byte offset.
   byte : Int32
@@ -14,7 +15,7 @@ pub(all) struct Position {
   line : Int32
   /// The record index (starting at 0).
   record : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -29,13 +30,14 @@ pub extend Position with @debug.Debug::{to_repr}
 ///|
 /// The kind of a CSV error (upstream `csv::ErrorKind`, as far as it can
 /// occur when reading from a byte slice).
+#derive(Eq, Debug)
 pub(all) enum ErrorKind {
   /// A UTF-8 decoding error that occurred while trying to convert a byte
   /// record to a string record.
   Utf8(pos~ : Position?, field~ : Int32, valid_up_to~ : Int32)
   /// A record with a different number of fields than the first record.
   UnequalLengths(pos~ : Position?, expected_len~ : Int32, len~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -49,9 +51,10 @@ pub extend ErrorKind with @debug.Debug::{to_repr}
 
 ///|
 /// A CSV error (upstream `csv::Error`).
+#derive(Debug)
 pub(all) suberror CsvError {
   CsvError(ErrorKind)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -69,6 +72,7 @@ pub fn ErrorKind::position(self : ErrorKind) -> Position? {
 
 ///|
 /// The states of the `csv-core` NFA.
+#derive(Eq)
 priv enum NfaState {
   EndFieldTerm
   InRecordTerm
@@ -83,7 +87,7 @@ priv enum NfaState {
   EndFieldDelim
   EndRecord
   CRLF
-} derive(Eq)
+}
 
 ///|
 /// Returns true if this state indicates that a field has been parsed.

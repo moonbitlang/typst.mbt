@@ -39,10 +39,11 @@ fn NonEmptyString::get(self : NonEmptyString) -> String {
 }
 
 ///|
+#derive(Eq)
 pub(all) enum Units {
   UserSpaceOnUse
   ObjectBoundingBox
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -53,11 +54,12 @@ pub extend Units with Eq::{not_equal, equal}
 /// A visibility property.
 ///
 /// `visibility` attribute in the SVG.
+#derive(Eq)
 pub(all) enum Visibility {
   Visible
   Hidden
   Collapse
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -76,11 +78,12 @@ pub extend Visibility with Default::{default}
 /// A shape rendering method.
 ///
 /// `shape-rendering` attribute in the SVG.
+#derive(Eq)
 pub(all) enum ShapeRendering {
   OptimizeSpeed
   CrispEdges
   GeometricPrecision
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -109,11 +112,12 @@ pub extend ShapeRendering with Default::{default}
 /// A text rendering method.
 ///
 /// `text-rendering` attribute in the SVG.
+#derive(Eq)
 pub(all) enum TextRendering {
   OptimizeSpeed
   OptimizeLegibility
   GeometricPrecision
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -132,6 +136,7 @@ pub extend TextRendering with Default::{default}
 /// An image rendering method.
 ///
 /// `image-rendering` attribute in the SVG.
+#derive(Eq)
 pub(all) enum ImageRendering {
   OptimizeQuality
   OptimizeSpeed
@@ -140,7 +145,7 @@ pub(all) enum ImageRendering {
   HighQuality
   CrispEdges
   Pixelated
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -159,6 +164,7 @@ pub extend ImageRendering with Default::{default}
 /// A blending mode property.
 ///
 /// `mix-blend-mode` attribute in the SVG.
+#derive(Eq)
 pub(all) enum BlendMode {
   Normal
   Multiply
@@ -176,7 +182,7 @@ pub(all) enum BlendMode {
   Saturation
   Color
   Luminosity
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -222,11 +228,12 @@ pub extend BlendMode with Show::{to_string, output}
 /// A spread method.
 ///
 /// `spreadMethod` attribute in the SVG.
+#derive(Eq)
 pub(all) enum SpreadMethod {
   Pad
   Reflect
   Repeat
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -495,11 +502,12 @@ pub extend StrokeMiterlimit with Eq::{not_equal, equal}
 /// A line cap.
 ///
 /// `stroke-linecap` attribute in the SVG.
+#derive(Eq)
 pub(all) enum LineCap {
   Butt
   Round
   Square
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -518,12 +526,13 @@ pub extend LineCap with Default::{default}
 /// A line join.
 ///
 /// `stroke-linejoin` attribute in the SVG.
+#derive(Eq)
 pub(all) enum LineJoin {
   Miter
   MiterClip
   Round
   Bevel
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -633,10 +642,11 @@ pub fn Stroke::to_tiny_skia(self : Stroke) -> @tiny_skia_path.Stroke {
 /// A fill rule.
 ///
 /// `fill-rule` attribute in the SVG.
+#derive(Eq)
 pub(all) enum FillRule {
   NonZero
   EvenOdd
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -709,11 +719,12 @@ pub extend Fill with Default::{default}
 
 ///|
 /// A 8-bit RGB color.
+#derive(Eq)
 pub(all) struct Color {
   red : Int32
   green : Int32
   blue : Int32
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -814,12 +825,13 @@ pub fn ClipPath::root(self : ClipPath) -> Group {
 
 ///|
 /// A mask type.
+#derive(Eq)
 pub(all) enum MaskType {
   /// Indicates that the luminance values of the mask should be used.
   Luminance
   /// Indicates that the alpha values of the mask should be used.
   Alpha
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1212,10 +1224,11 @@ fn Group::subroots(self : Group, f : (Group) -> Unit) -> Unit {
 ///
 /// `usvg` will handle `markers` automatically,
 /// therefore we provide only `fill` and `stroke` variants.
+#derive(Eq)
 pub(all) enum PaintOrder {
   FillAndStroke
   StrokeAndFill
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

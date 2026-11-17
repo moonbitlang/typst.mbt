@@ -203,6 +203,7 @@ fn inline_configuration(
 ///
 /// In the form `Option<ParSituation>`, `None` implies that we are creating
 /// an inline layout that isn't a semantic paragraph.
+#derive(Eq, Hash, Debug)
 pub(all) enum ParSituation {
   /// The paragraph is the first child in the flow (i.e. in the container or
   /// page run) or right after a column break. For such paragraphs, we may
@@ -212,7 +213,7 @@ pub(all) enum ParSituation {
   Consecutive
   /// Any other kind of paragraph.
   Other
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

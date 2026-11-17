@@ -257,7 +257,8 @@ pub fn rust_parse_f64(s : String) -> Double? {
 ///|
 /// A floating-point number that must be positive (strictly greater than
 /// zero). (upstream `PositiveF64`)
-pub(all) struct PositiveF64(Double) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct PositiveF64(Double)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

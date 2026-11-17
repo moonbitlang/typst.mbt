@@ -2,7 +2,8 @@
 
 ///|
 /// An angle describing a rotation.
-pub(all) struct Angle(Scalar) derive(Default, Eq, Compare, Hash)
+#derive(Default, Eq, Compare, Hash)
+pub(all) struct Angle(Scalar)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -24,10 +25,11 @@ pub extend Angle with Hash::{hash, hash_combine}
 
 ///|
 /// Different units of angular measurement.
+#derive(Eq, Hash, Debug)
 pub(all) enum AngleUnit {
   Rad
   Deg
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -54,12 +56,13 @@ fn AngleUnit::raw_scale(self : AngleUnit) -> Double {
 
 ///|
 /// A quadrant of the Cartesian plane.
+#derive(Eq, Hash, Debug, Compare)
 pub(all) enum Quadrant {
   First
   Second
   Third
   Fourth
-} derive(Eq, Hash, Debug, Compare)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

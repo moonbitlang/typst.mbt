@@ -140,11 +140,12 @@ priv struct WarningWrapper {
 ///
 /// A value type, as upstream's is `Copy`: an edit asks every child of a
 /// node for it ([Diagnosis::any]), which must not allocate per child.
+#derive(Eq, Debug)
 #valtype
 pub(all) struct Diagnosis {
   errors : Bool
   warnings : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -193,6 +194,7 @@ fn Diagnosis::any(nodes : ArrayView[SyntaxNode]) -> Diagnosis {
 
 ///|
 /// A syntactical error or warning.
+#derive(Eq, Debug)
 pub(all) struct SyntaxDiagnostic {
   /// `true` if the diagnostic is an error, `false` if it's a warning.
   is_error : Bool
@@ -202,7 +204,7 @@ pub(all) struct SyntaxDiagnostic {
   message : String
   /// Additional hints.
   hints : Array[DiagSpanned[String]]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

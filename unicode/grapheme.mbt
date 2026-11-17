@@ -1,5 +1,6 @@
 ///|
 /// Grapheme cluster break categories (as in unicode-segmentation 1.12).
+#derive(Eq)
 priv enum GraphemeCat {
   Any
   Control
@@ -17,7 +18,7 @@ priv enum GraphemeCat {
   LV
   LVT
   RegionalIndicator
-} derive(Eq)
+}
 
 ///|
 let grapheme_cats : ReadOnlyArray[GraphemeCat] = grapheme_cat_names.map(

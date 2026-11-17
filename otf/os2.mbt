@@ -51,6 +51,7 @@ let os2_cap_height_offset : Int32 = 88
 
 ///|
 /// A face [weight](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#usweightclass).
+#derive(Eq, Debug, Hash)
 pub(all) enum Weight {
   Thin
   ExtraLight
@@ -62,7 +63,7 @@ pub(all) enum Weight {
   ExtraBold
   Black
   Other(UInt16)
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -124,6 +125,7 @@ pub extend Weight with Default::{default}
 
 ///|
 /// A face [width](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass).
+#derive(Eq, Compare, Debug, Hash)
 pub(all) enum Width {
   UltraCondensed
   ExtraCondensed
@@ -134,7 +136,7 @@ pub(all) enum Width {
   Expanded
   ExtraExpanded
   UltraExpanded
-} derive(Eq, Compare, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -184,12 +186,13 @@ pub extend Width with Default::{default}
 
 ///|
 /// Face [permissions](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#fst).
+#derive(Eq, Compare, Debug, Hash)
 pub(all) enum Permissions {
   Installable
   Restricted
   PreviewAndPrint
   Editable
-} derive(Eq, Compare, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -213,6 +216,7 @@ pub extend Permissions with Hash::{hash, hash_combine}
 
 ///|
 /// A face style.
+#derive(Eq, Debug, Hash)
 pub(all) enum Style {
   /// A face that is neither italic not obliqued.
   Normal
@@ -220,7 +224,7 @@ pub(all) enum Style {
   Italic
   /// A typically-sloped version of the regular face.
   Oblique
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -249,6 +253,7 @@ pub extend Style with Default::{default}
 
 ///|
 /// A script metrics used by subscript and superscript.
+#derive(Eq, Debug, Hash)
 pub(all) struct ScriptMetrics {
   /// Horizontal face size.
   mut x_size : Int16
@@ -258,7 +263,7 @@ pub(all) struct ScriptMetrics {
   mut x_offset : Int16
   /// Y offset.
   mut y_offset : Int16
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -279,10 +284,11 @@ pub extend ScriptMetrics with Hash::{hash, hash_combine}
 /// [Unicode Ranges](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ur).
 ///
 /// A `u128` upstream; stored as low and high 64 bits.
+#derive(Eq, Default, Debug)
 pub(all) struct UnicodeRanges {
   lo : UInt64
   hi : UInt64
-} derive(Eq, Default, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

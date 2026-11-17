@@ -41,13 +41,14 @@ pub fn rusty(font : @library.FontInstance) -> @shape.Face {
 }
 
 ///|
+#derive(Eq, Hash)
 priv struct PlanKey {
   font : @library.FontInstance
   direction : @shape.Direction
   script : @shape.Script
   language : @shape.Language?
   features : Array[@shape.Feature]
-} derive(Eq, Hash)
+}
 
 ///|
 let shape_plans : Map[PlanKey, @shape.ShapePlan] = Map([])
@@ -1802,6 +1803,7 @@ let end_punct_pat : ReadOnlyArray[Char] = [
 ]
 
 ///|
+#derive(Eq)
 priv enum CjkPunctStyle {
   /// Standard GB/T 15834-2011, used mostly in mainland China.
   Gb
@@ -1809,7 +1811,7 @@ priv enum CjkPunctStyle {
   Cns
   /// Standard JIS X 4051, used in Japan.
   Jis
-} derive(Eq)
+}
 
 ///|
 fn cjk_punct_style(

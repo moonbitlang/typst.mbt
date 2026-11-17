@@ -46,15 +46,17 @@ pub fn run_default(Prog, @regex.Haystack, Int32) -> Array[Int32]? raise FancyErr
 pub fn run_trace(Prog, @regex.Haystack, Int32) -> Array[Int32]? raise FancyError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror FancyError {
   ParseError(Int32, ParseError)
   CompileError(CompileError)
   RuntimeError(RuntimeError)
-} derive(Eq, @debug.Debug)
+}
 pub fn FancyError::to_string(Self) -> String
 pub impl Show for FancyError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Assertion {
   StartText
   EndText
@@ -64,11 +66,12 @@ pub(all) enum Assertion {
   RightWordBoundary
   WordBoundary
   NotWordBoundary
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub struct BitSet {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn BitSet::contains(Self, Int32) -> Bool
 pub fn BitSet::insert(Self, Int32) -> Bool
 pub fn BitSet::iter(Self) -> Iter[Int32]
@@ -94,6 +97,7 @@ pub fn Captures::iter(Self) -> Iter[Match?]
 pub fn Captures::len(Self) -> Int32
 pub fn Captures::name(Self, String) -> Match?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CompileError {
   InnerError(String)
   LookBehindNotConst
@@ -103,7 +107,7 @@ pub(all) enum CompileError {
   NamedBackrefOnly
   FeatureNotYetSupported(String)
   SubroutineCallTargetNotFound(String, Int32)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for CompileError
 
 pub struct Delegate {
@@ -114,12 +118,13 @@ pub struct Delegate {
   // private fields
 }
 
+#derive(@debug.Debug)
 pub struct Expander {
   sub_char : Char
   open : String
   close : String
   allow_undelimited_name : Bool
-} derive(@debug.Debug)
+}
 pub fn Expander::append_expansion(Self, StringBuilder, String, Captures) -> Unit
 pub fn Expander::check(Self, String, Regex) -> Unit raise FancyError
 pub fn Expander::default() -> Self
@@ -127,6 +132,7 @@ pub fn Expander::escape(Self, String) -> String
 pub fn Expander::expansion(Self, String, Captures) -> String
 pub fn Expander::python() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Expr {
   Empty
   Any(newline~ : Bool)
@@ -147,18 +153,19 @@ pub(all) enum Expr {
   Conditional(condition~ : Expr, true_branch~ : Expr, false_branch~ : Expr)
   SubroutineCall(Int32)
   UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn Expr::parse_tree(String) -> ExprTree raise FancyError
 pub fn Expr::parse_tree_with_flags(String, Int32) -> ExprTree raise FancyError
 pub fn Expr::to_str(Self, StringBuilder, Int32) -> Unit
 
+#derive(@debug.Debug)
 pub struct ExprTree {
   mut expr : Expr
   backrefs : BitSet
   named_groups : Map[String, Int32]
   contains_subroutines : Bool
   self_recursive : Bool
-} derive(@debug.Debug)
+}
 
 pub struct Info {
   start_group : Int32
@@ -196,12 +203,13 @@ pub(all) enum Insn {
 }
 pub impl Show for Insn
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LookAround {
   LookAhead
   LookAheadNeg
   LookBehind
   LookBehindNeg
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Match {
   // private fields
@@ -221,6 +229,7 @@ pub fn Matches::next(Self) -> Result[Match, FancyError]?
 pub fn Matches::regex(Self) -> Regex
 pub fn Matches::text(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ParseError {
   GeneralParseError(String)
   UnclosedOpenParen
@@ -238,14 +247,15 @@ pub(all) enum ParseError {
   TargetNotRepeatable
   InvalidGroupName
   InvalidGroupNameBackref(String)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for ParseError
 
+#derive(Eq, @debug.Debug)
 pub struct ParsedId {
   id : String
   relative : Int32?
   skip : Int32
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Prog {
   body : Array[Insn]
@@ -307,10 +317,11 @@ pub(all) enum Replacer {
 pub fn Replacer::no_expansion(Self) -> String?
 pub fn Replacer::replace_append(Self, Captures, StringBuilder) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RuntimeError {
   StackOverflow
   BacktrackLimitExceeded
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for RuntimeError
 
 pub struct Split {
@@ -325,13 +336,14 @@ pub struct SplitN {
 pub fn SplitN::iter(Self) -> Iter[Result[String, FancyError]]
 pub fn SplitN::next(Self) -> Result[String, FancyError]?
 
+#derive(Eq, @debug.Debug)
 pub struct SyntaxConfig {
   case_insensitive : Bool
   multi_line : Bool
   dot_matches_new_line : Bool
   ignore_whitespace : Bool
   unicode : Bool
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Text {
   // private fields

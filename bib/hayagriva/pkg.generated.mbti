@@ -34,12 +34,14 @@ pub fn[W : FmtWrite] write_year(Int32, Bool, W, String, String) -> Unit
 // Errors
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Alphanumerical {
   letters : Int32
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Alphanumerical::citation(Self, Entry) -> String
 pub fn Alphanumerical::new() -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ArchivedStyle {
   Alphanumeric
   AmericanAnthropologicalAssociation
@@ -121,7 +123,7 @@ pub(all) enum ArchivedStyle {
   Trends
   TurabianAuthorDate
   TurabianFullnote8
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ArchivedStyle::all() -> ReadOnlyArray[Self]
 pub fn ArchivedStyle::by_id(String) -> Self?
 pub fn ArchivedStyle::by_name(String) -> Self?
@@ -130,10 +132,11 @@ pub fn ArchivedStyle::display_name(Self) -> String
 pub fn ArchivedStyle::get(Self) -> @citationberg.Style
 pub fn ArchivedStyle::names(Self) -> Array[String]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum BibLaTeXError {
   Parse(@biblatex.ParseError)
   Type(@biblatex.TypeError)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for BibLaTeXError
 
 pub struct BibliographyDriver {
@@ -144,11 +147,12 @@ pub fn BibliographyDriver::finish(Self, BibliographyRequest) -> Rendered
 pub fn BibliographyDriver::new() -> Self
 pub fn BibliographyDriver::with_citation_number_offset(Self, Int32) -> Self
 
+#derive(@debug.Debug)
 pub(all) struct BibliographyItem {
   key : String
   first_field : ElemChild?
   content : ElemChildren
-} derive(@debug.Debug)
+}
 
 pub(all) struct BibliographyRequest {
   style : @citationberg.IndependentStyle
@@ -156,20 +160,23 @@ pub(all) struct BibliographyRequest {
   locale_files : Array[@citationberg.Locale]
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Brackets {
   Round
   Square
   None_
-} derive(Eq, @debug.Debug)
+}
 pub fn Brackets::left(Self) -> Char?
 pub fn Brackets::right(Self) -> Char?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum BufWriteFormat {
   Plain
   VT100
   Html
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Case {
   Title(TitleCase)
   Sentence(SentenceCase)
@@ -178,7 +185,7 @@ pub(all) enum Case {
   NoTransform
   FirstUpper
   AllUpper
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Case::from_text_case(@citationberg.TextCase) -> Self
 pub fn Case::transform(Self, String) -> String
 pub impl Default for Case
@@ -204,18 +211,21 @@ pub fn CaseFolder::set_buf_string(Self, String) -> Unit
 pub fn CaseFolder::with_config(Case) -> Self
 pub impl FmtWrite for CaseFolder
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ChunkKind {
   Normal
   Verbatim
   Math
-} derive(Eq, Hash, @debug.Debug)
+}
 
-pub(all) struct ChunkedStrParseError(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct ChunkedStrParseError(Int32)
 pub fn ChunkedStrParseError::output(Self, &Logger) -> Unit
 pub fn ChunkedStrParseError::to_string(Self) -> String
 pub impl Show for ChunkedStrParseError
 
-pub(all) struct ChunkedString(Array[StringChunk]) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ChunkedString(Array[StringChunk])
 pub fn ChunkedString::copy(Self) -> Self
 pub fn ChunkedString::extend_chunks(Self, Self) -> Unit
 pub fn[W : FmtWrite] ChunkedString::fmt_serialized(Self, W) -> Unit
@@ -260,20 +270,22 @@ pub struct CitationRequest {
 pub fn CitationRequest::from_items(Array[CitationItem], @citationberg.IndependentStyle, Array[@citationberg.Locale]) -> Self
 pub fn CitationRequest::new(Array[CitationItem], @citationberg.IndependentStyle, @citationberg.LocaleCode?, Array[@citationberg.Locale], Int32?) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum CitePurpose {
   Author
   Year
   Full
   Prose
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Date {
   year : Int32
   month : Int32?
   day : Int32?
   approximate : Bool
   season : @citationberg.Season?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Date::csl_cmp(Self, Self) -> Int32
 pub fn Date::display_year(Self) -> String
 pub fn Date::display_year_opt(Self, Bool, Bool, Bool, Bool) -> String
@@ -281,64 +293,71 @@ pub fn Date::from_str(String) -> Result[Self, DateError]
 pub fn Date::from_year(Int32) -> Self
 pub impl Show for Date
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DateError {
   UnknownFormat
   MonthOutOfBounds
   DayOutOfBounds(Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn DateError::output(Self, &Logger) -> Unit
 pub fn DateError::to_string(Self) -> String
 pub impl Show for DateError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Duration {
   days : Int32
   hours : Int32
   minutes : Int32
   seconds : Int32
   milliseconds : Int32
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Duration::cmp(Self, Self) -> Int32
 pub fn Duration::from_str(String) -> Result[Self, DurationError]
 pub fn Duration::output(Self, &Logger) -> Unit
 pub fn Duration::to_string(Self) -> String
 pub impl Show for Duration
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum DurationError {
   Malformed
   TooLarge
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DurationError::output(Self, &Logger) -> Unit
 pub fn DurationError::to_string(Self) -> String
 pub impl Show for DurationError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct DurationRange {
   start : Duration
   end : Duration
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn DurationRange::from_str(String) -> Result[Self, DurationError]
 pub fn DurationRange::new(Duration, Duration?) -> Self
 pub impl Show for DurationRange
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Elem {
   mut children : ElemChildren
   display : @citationberg.Display?
   meta : ElemMeta?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Elem::copy(Self) -> Self
 pub impl Show for Elem
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ElemChild {
   Text(Formatted)
   Elem(Elem)
   Markup(String)
   Link(text~ : Formatted, url~ : String)
   Transparent(cite_idx~ : Int32, format~ : Formatting)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ElemChild::copy(Self) -> Self
 pub fn[W : FmtWrite] ElemChild::write_buf(Self, W, BufWriteFormat) -> Unit
 pub impl Show for ElemChild
 
-pub(all) struct ElemChildren(Array[ElemChild]) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ElemChildren(Array[ElemChild])
 pub fn ElemChildren::copy(Self) -> Self
 pub fn ElemChildren::find_elem_by(Self, (Elem) -> Bool) -> Elem?
 pub fn ElemChildren::find_meta(Self, ElemMeta) -> Elem?
@@ -355,6 +374,7 @@ pub fn ElemChildren::to_string(Self) -> String
 pub fn[W : FmtWrite] ElemChildren::write_buf(Self, W, BufWriteFormat) -> Unit
 pub impl Show for ElemChildren
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ElemMeta {
   Names(Array[(Array[Person], @citationberg.NameVariable)])
   Date
@@ -365,8 +385,9 @@ pub(all) enum ElemMeta {
   Name(@citationberg.NameVariable, Int32)
   Entry(Int32)
   CitationLabel
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Entry {
   key : String
   mut entry_type : EntryType
@@ -397,7 +418,7 @@ pub(all) struct Entry {
   mut abstract__ : FormatString?
   mut genre_ : FormatString?
   mut parents : Array[Entry]
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Entry::abstract_(Self) -> FormatString?
 pub fn Entry::add_affiliated_persons(Self, Array[Person], PersonRole) -> Unit
 pub fn Entry::add_parent(Self, Self) -> Unit
@@ -458,6 +479,7 @@ pub fn Entry::url_any(Self) -> QualifiedUrl?
 pub fn Entry::volume(Self) -> MaybeTyped[Numeric]?
 pub fn Entry::volume_total(Self) -> Numeric?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum EntryType {
   Article
   Chapter
@@ -489,15 +511,16 @@ pub(all) enum EntryType {
   Audio
   Exhibition
   Original
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn EntryType::default_parent(Self) -> Self
 pub fn EntryType::from_str(String) -> Result[Self, String]
 pub impl Show for EntryType
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct FormatString {
   value : ChunkedString
   short : ChunkedString?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn FormatString::format_sentence_case(Self, SentenceCase) -> String
 pub fn FormatString::format_title_case(Self, TitleCase) -> String
 pub fn FormatString::from_str(String) -> Result[Self, ChunkedStrParseError]
@@ -509,29 +532,32 @@ pub fn FormatString::with_short(String, String) -> Self
 pub fn FormatString::with_value(String) -> Self
 pub impl Show for FormatString
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Formatted {
   mut text : String
   formatting : Formatting
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Formatting {
   font_style : @citationberg.FontStyle
   font_variant : @citationberg.FontVariant
   font_weight : @citationberg.FontWeight
   text_decoration : @citationberg.TextDecoration
   vertical_align : @citationberg.VerticalAlign
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Formatting::add_text(Self, String) -> Formatted
 pub fn Formatting::apply(Self, @citationberg.Formatting) -> Self
 pub fn Formatting::default() -> Self
 pub impl Default for Formatting
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct LanguageIdentifier {
   language : String
   script : String?
   region : String?
   variants : Array[String]
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn LanguageIdentifier::parse(String) -> Self?
 pub impl Show for LanguageIdentifier
 
@@ -549,15 +575,17 @@ pub fn Library::new() -> Self
 pub fn Library::nth(Self, Int32) -> Entry?
 pub fn Library::push(Self, Entry) -> Unit
 
+#derive(Eq)
 pub(all) enum LocatorPayload {
   Str(String)
   Transparent(TransparentLocator)
-} derive(Eq)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum MaybeTyped[T] {
   Typed(T)
   String(String)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn[T] MaybeTyped::as_typed(Self[T]) -> T?
 pub fn MaybeTyped::duration_from_str(String) -> Self[Duration]
 pub fn MaybeTyped::duration_range_from_str(String) -> Self[DurationRange]
@@ -568,11 +596,12 @@ pub fn MaybeTyped::page_ranges_from_str(String) -> Self[PageRanges]
 pub fn[T : Show] MaybeTyped::to_str(Self[T]) -> String
 pub impl[T : Show] Show for MaybeTyped[T]
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Numeric {
   value : NumericValue
   prefix : String?
   suffix : String?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Numeric::csl_cmp(Self, Self) -> Int32
 pub fn[W : FmtWrite] Numeric::fmt(Self, W) -> Unit
 pub fn[W : FmtWrite] Numeric::fmt_value(Self, W, Bool) -> Unit
@@ -588,36 +617,40 @@ pub fn Numeric::will_transform(Self) -> Bool
 pub fn[W : FmtWrite] Numeric::with_form(Self, W, @citationberg.NumberForm, @citationberg.GrammarGender?, @citationberg.OrdinalLookup) -> Unit
 pub impl Show for Numeric
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumericDelimiter {
   Comma
   Ampersand
   Hyphen
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn NumericDelimiter::as_char(Self) -> Char
 pub fn[W : FmtWrite] NumericDelimiter::fmt(Self, W) -> Unit
 pub fn NumericDelimiter::from_str(String) -> Result[Self, NumericError]
 pub fn NumericDelimiter::try_from_char(Char) -> Result[Self, NumericError]
 pub impl Show for NumericDelimiter
 
+#derive(Eq, @debug.Debug)
 pub(all) enum NumericError {
   NoNumber
   UnexpectedCharactersAfterPostfix
   NotADelimiter
   MissingDelimiter
-} derive(Eq, @debug.Debug)
+}
 pub fn NumericError::output(Self, &Logger) -> Unit
 pub fn NumericError::to_string(Self) -> String
 pub impl Show for NumericError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumericValue {
   Number(Int32)
   Set(Array[(Int32, NumericDelimiter?)])
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn NumericValue::len(Self) -> Int32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct PageRanges {
   ranges : Array[PageRangesPart]
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PageRanges::csl_cmp(Self, Self) -> Int32
 pub fn PageRanges::first(Self) -> Numeric?
 pub fn[W : FmtWrite] PageRanges::fmt(Self, W) -> Unit
@@ -627,13 +660,14 @@ pub fn PageRanges::is_plural(Self) -> Bool
 pub fn PageRanges::new(Array[PageRangesPart]) -> Self
 pub impl Show for PageRanges
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum PageRangesPart {
   Ampersand
   Comma
   EscapedRange(Numeric, Numeric)
   SinglePage(Numeric)
   Range(Numeric, Numeric)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PageRangesPart::csl_cmp(Self, Self) -> Int32
 pub fn PageRangesPart::end(Self) -> Numeric?
 pub fn[W : FmtWrite] PageRangesPart::fmt(Self, W) -> Unit
@@ -641,15 +675,17 @@ pub fn PageRangesPart::from_str(String) -> Result[Self, PageRangesPartErr]
 pub fn PageRangesPart::start(Self) -> Numeric?
 pub impl Show for PageRangesPart
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PageRangesPartErr {
   Malformed
   Empty
   NumericErr(NumericError)
-} derive(Eq, @debug.Debug)
+}
 pub fn PageRangesPartErr::output(Self, &Logger) -> Unit
 pub fn PageRangesPartErr::to_string(Self) -> String
 pub impl Show for PageRangesPartErr
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Person {
   name : String
   given_name : String?
@@ -657,7 +693,7 @@ pub(all) struct Person {
   suffix : String?
   comma_suffix : Bool
   alias_ : String?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Person::csl_cmp(Self, Self, @citationberg.LongShortForm, Bool) -> Int32
 pub fn[W : FmtWrite] Person::first_name_with_delimiter(Self, W, String?) -> Unit
 pub fn Person::from_str(String) -> Result[Self, PersonError]
@@ -672,15 +708,17 @@ pub fn Person::name_particles(Self) -> String?
 pub fn Person::name_without_article(Self) -> String
 pub fn Person::name_without_particle(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PersonError {
   TooManyParts
   Empty
   UnknownRole
-} derive(Eq, @debug.Debug)
+}
 pub fn PersonError::output(Self, &Logger) -> Unit
 pub fn PersonError::to_string(Self) -> String
 pub impl Show for PersonError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum PersonRole {
   Translator
   Afterword
@@ -703,50 +741,57 @@ pub(all) enum PersonRole {
   Illustrator
   Narrator
   Unknown(String)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PersonRole::from_str(String) -> Self?
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct PersonsWithRoles {
   names : Array[Person]
   role : PersonRole
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn PersonsWithRoles::new(Array[Person], PersonRole) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Publisher {
   name : FormatString?
   location : FormatString?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Publisher::from_str(String) -> Result[Self, ChunkedStrParseError]
 pub fn Publisher::new(FormatString?, FormatString?) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct QualifiedUrl {
   value : Url
   visit_date : Date?
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn QualifiedUrl::from_str(String) -> Result[Self, UrlParseError]
 pub fn QualifiedUrl::new(Url, Date?) -> Self
 pub fn QualifiedUrl::output(Self, &Logger) -> Unit
 pub fn QualifiedUrl::to_string(Self) -> String
 pub impl Show for QualifiedUrl
 
+#derive(@debug.Debug)
 pub(all) struct Rendered {
   bibliography : RenderedBibliography?
   citations : Array[RenderedCitation]
-} derive(@debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) struct RenderedBibliography {
   hanging_indent : Bool
   second_field_align : @citationberg.SecondFieldAlign?
   line_spacing : Int32
   entry_spacing : Int32
   items : Array[BibliographyItem]
-} derive(@debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) struct RenderedCitation {
   note_number : Int32?
   citation : ElemChildren
-} derive(@debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Selector {
   Wildcard
   Entry(EntryType)
@@ -756,11 +801,12 @@ pub(all) enum Selector {
   Alt(Array[Selector])
   Multi(Array[Selector])
   Ancestrage(Selector, Selector)
-} derive(Eq, @debug.Debug)
+}
 pub fn Selector::apply(Self, Entry) -> Map[String, Entry]?
 pub fn Selector::bound(Self, Entry, String) -> Entry?
 pub fn Selector::matches(Self, Entry) -> Bool
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct SentenceCase {
   capitalize_words_with_caps_inside : Bool
   do_not_format_after_dot : Bool
@@ -768,16 +814,18 @@ pub(all) struct SentenceCase {
   use_exception_dictionary : Bool
   trim_start : Bool
   trim_end : Bool
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn SentenceCase::default() -> Self
 pub impl Default for SentenceCase
 
-pub(all) struct SerialNumber(Map[String, String]) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct SerialNumber(Map[String, String])
 pub fn SerialNumber::get(Self, String) -> String?
 pub fn SerialNumber::sorted_keys(Self) -> Array[String]
 pub impl Hash for SerialNumber
 
-pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload) derive(Eq)
+#derive(Eq)
+pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload)
 
 pub struct StrBuf {
   // private fields
@@ -788,10 +836,11 @@ pub fn StrBuf::write_char(Self, Char) -> Unit
 pub fn StrBuf::write_str(Self, String) -> Unit
 pub impl FmtWrite for StrBuf
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct StringChunk {
   mut value : String
   kind : ChunkKind
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn StringChunk::is_empty(Self) -> Bool
 pub fn StringChunk::len(Self) -> Int32
 pub fn StringChunk::math(String) -> Self
@@ -802,6 +851,7 @@ pub fn StringChunk::to_string(Self) -> String
 pub fn StringChunk::verbatim(String) -> Self
 pub impl Show for StringChunk
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct TitleCase {
   always_capitalize_after_punctuation : Bool
   always_capitalize_last_word : Bool
@@ -811,19 +861,22 @@ pub(all) struct TitleCase {
   use_exception_dictionary : Bool
   trim_start : Bool
   trim_end : Bool
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn TitleCase::default() -> Self
 pub impl Default for TitleCase
 
-pub(all) struct TransparentLocator(String) derive(Eq)
+#derive(Eq)
+pub(all) struct TransparentLocator(String)
 pub fn TransparentLocator::new(String) -> Self
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Url {
   serialization : String
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Url::parse(String) -> Result[Self, UrlParseError]
 pub impl Show for Url
 
+#derive(Eq, @debug.Debug)
 pub(all) enum UrlParseError {
   EmptyHost
   IdnaError
@@ -832,15 +885,16 @@ pub(all) enum UrlParseError {
   InvalidIpv6Address
   InvalidDomainCharacter
   RelativeUrlWithoutBase
-} derive(Eq, @debug.Debug)
+}
 pub fn UrlParseError::output(Self, &Logger) -> Unit
 pub fn UrlParseError::to_string(Self) -> String
 pub impl Show for UrlParseError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct YamlLoadError {
   message : String
   location : @yaml.Location?
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for YamlLoadError
 
 // Type aliases

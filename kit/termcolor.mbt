@@ -4,6 +4,7 @@
 
 ///|
 /// A terminal color (`termcolor::Color`).
+#derive(Eq, Debug)
 pub(all) enum Color {
   Black
   Blue
@@ -14,7 +15,7 @@ pub(all) enum Color {
   Yellow
   White
   Ansi256(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,6 +29,7 @@ pub extend Color with @debug.Debug::{to_repr}
 
 ///|
 /// A color specification (`termcolor::ColorSpec`).
+#derive(Eq, Debug)
 pub(all) struct ColorSpec {
   fg : Color?
   bold : Bool
@@ -35,7 +37,7 @@ pub(all) struct ColorSpec {
   underline : Bool
   dimmed : Bool
   reset : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

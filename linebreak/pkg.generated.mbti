@@ -18,16 +18,18 @@ pub fn line_break(Int32) -> LineBreak
 // Errors
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Breakpoint {
   Normal
   Mandatory
   Hyphen(Int32, Int32)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Breakpoint::is_hyphen(Self) -> Bool
 pub fn Breakpoint::trim(Self, Int32, String) -> Trim
 pub fn Breakpoint::trim_by(Self, Int32, Int32, ((Int32) -> Bool) -> Int32) -> Trim
 pub fn Breakpoint::trims(Self, Int32) -> Bool
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum LineBreak {
   Unknown
   Ambiguous
@@ -78,7 +80,7 @@ pub(all) enum LineBreak {
   ViramaFinal
   Virama
   UnambiguousHyphen
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn LineBreak::short_name(Self) -> String
 
 pub(all) struct LineBreakOptions {
@@ -88,18 +90,20 @@ pub(all) struct LineBreakOptions {
 }
 pub fn LineBreakOptions::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LineBreakStrictness {
   Loose
   Normal
   Strict
   Anywhere
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LineBreakWordOption {
   Normal
   BreakAll
   KeepAll
-} derive(Eq, @debug.Debug)
+}
 
 pub struct LineSegmenter {
   // private fields
@@ -109,10 +113,11 @@ pub fn LineSegmenter::new_for_non_complex_scripts(LineBreakOptions) -> Self
 pub fn LineSegmenter::new_lstm(LineBreakOptions) -> Self
 pub fn LineSegmenter::segment_str(Self, String) -> Array[Int32]
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Trim {
   layout : Int32
   shaping : Int32
-} derive(Eq, @debug.Debug)
+}
 
 // Type aliases
 

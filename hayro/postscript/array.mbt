@@ -2,9 +2,10 @@
 
 ///|
 /// A PostScript array object (upstream `Array`).
+#derive(Eq, Debug)
 pub struct PsArray {
   priv data : BytesView
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

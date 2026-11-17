@@ -5,9 +5,10 @@
 /// snippet) and `span` is `error.span()` as UTF-8 byte offsets `(start, end)`
 /// into the input. Serialization errors (`toml::ser::Error`) use the same
 /// type with the error's `Display` output as message and no span.
+#derive(Debug, Eq)
 pub(all) suberror TomlError {
   TomlError(message~ : String, span~ : (Int32, Int32)?)
-} derive(Debug, Eq)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

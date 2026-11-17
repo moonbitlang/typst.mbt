@@ -2,10 +2,11 @@
 
 ///|
 /// A PostScript name object.
+#derive(Eq, Debug)
 pub struct Name {
   priv data : BytesView
   priv literal : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

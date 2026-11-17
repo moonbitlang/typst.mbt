@@ -15,6 +15,7 @@ let password_padding : Bytes = b"\x28\xBF\x4E\x5E\x4E\x75\x8A\x41\x64\x00\x4E\x5
 
 ///|
 /// An error that occurred during decryption.
+#derive(Eq, Debug)
 pub(all) enum DecryptionError {
   /// The ID entry is missing in the PDF.
   MissingIDEntry
@@ -25,7 +26,7 @@ pub(all) enum DecryptionError {
   InvalidEncryption
   /// The PDF uses an unsupported encryption algorithm.
   UnsupportedAlgorithm
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -38,6 +39,7 @@ pub extend DecryptionError with Eq::{not_equal, equal}
 pub extend DecryptionError with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq)
 priv enum DecryptorTag {
   /// Upstream `DecryptorTag::None` (renamed so it does not shadow
   /// `Option::None`).
@@ -45,7 +47,7 @@ priv enum DecryptorTag {
   Rc4
   Aes128
   Aes256
-} derive(Eq)
+}
 
 ///|
 fn DecryptorTag::from_name(name : Name) -> DecryptorTag? {
@@ -68,10 +70,11 @@ priv enum Decryptor {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum DecryptionTarget {
   String
   Stream
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

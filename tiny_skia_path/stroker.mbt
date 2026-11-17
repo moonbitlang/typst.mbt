@@ -9,6 +9,7 @@
 
 ///|
 /// Stroke properties.
+#derive(Eq, Debug)
 pub(all) struct Stroke {
   /// A stroke thickness.
   ///
@@ -34,7 +35,7 @@ pub(all) struct Stroke {
   ///
   /// Default: None
   mut dash : StrokeDash?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -64,6 +65,7 @@ pub extend Stroke with Default::{default}
 
 ///|
 /// Draws at the beginning and end of an open path contour.
+#derive(Eq, Debug)
 pub(all) enum LineCap {
   /// No stroke extension.
   Butt
@@ -71,7 +73,7 @@ pub(all) enum LineCap {
   Round
   /// Adds square.
   Square
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -107,6 +109,7 @@ pub extend LineCap with Default::{default}
 /// setting but may not contain the actual join. For instance, a fill path
 /// constructed with round joins does not necessarily include circles at each
 /// connected segment.
+#derive(Eq, Debug)
 pub(all) enum LineJoin {
   /// Extends to miter limit, then switches to bevel.
   Miter
@@ -116,7 +119,7 @@ pub(all) enum LineJoin {
   Round
   /// Connects outside edges.
   Bevel
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -148,6 +151,7 @@ let quad_recursive_limit : Int32 = 3
 let recursive_limits : ReadOnlyArray[Int32] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
 
 ///|
+#derive(Eq, Compare)
 priv enum ReductionType {
   Point // all curve points are practically identical
   Line // the control point is on the line between the ends
@@ -155,26 +159,29 @@ priv enum ReductionType {
   Degenerate // the control point is on the line but outside the ends
   Degenerate2 // two control points are on the line but outside ends (cubic)
   Degenerate3 // three areas of max curvature found (for cubic)
-} derive(Eq, Compare)
+}
 
 ///|
+#derive(Eq)
 priv enum StrokeType {
   Outer // = 1, use sign-opposite values later to flip perpendicular axis
   Inner // = -1
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum ResultType {
   Split // the caller should split the quad stroke in two
   Degenerate // the caller should add a line
   Quad // the caller should (continue to try to) add a quad stroke
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum IntersectRayType {
   CtrlPt
   ResultType
-} derive(Eq)
+}
 
 ///|
 /// Returns a stoked path.
@@ -1311,12 +1318,13 @@ fn is_clockwise(before : Point, after : Point) -> Bool {
 }
 
 ///|
+#derive(Eq)
 priv enum AngleType {
   Nearly180
   Sharp
   Shallow
   NearlyLine
-} derive(Eq)
+}
 
 ///|
 fn dot_to_angle_type(dot : Float) -> AngleType {

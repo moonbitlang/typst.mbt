@@ -2,6 +2,7 @@
 
 ///|
 /// A date that can be as coarse as a year and as fine-grained as a day.
+#derive(Eq, Hash, Debug)
 pub(all) struct Date {
   /// The year (1 B.C.E. is represented as 0 and so forth).
   year : Int32
@@ -13,7 +14,7 @@ pub(all) struct Date {
   approximate : Bool
   /// The season. Between 1 and 4 (inclusive).
   season : @citationberg.Season?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -63,6 +64,7 @@ fn compare_bool(a : Bool, b : Bool) -> Int32 {
 
 ///|
 /// This error can occur when trying to get a date from a string.
+#derive(Eq, Debug)
 pub(all) enum DateError {
   /// The string does not conform to the date interval.
   UnknownFormat
@@ -70,7 +72,7 @@ pub(all) enum DateError {
   MonthOutOfBounds
   /// The day is out of bounds.
   DayOutOfBounds(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -204,6 +206,7 @@ pub extend Date with Show::{to_string, output}
 
 ///|
 /// A duration.
+#derive(Eq, Hash, Debug)
 pub(all) struct Duration {
   /// Days (24 hours).
   days : Int32
@@ -215,7 +218,7 @@ pub(all) struct Duration {
   seconds : Int32
   /// Milliseconds.
   milliseconds : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -234,13 +237,14 @@ pub extend Duration with @debug.Debug::{to_repr}
 
 ///|
 /// Errors that can occur when parsing a string to a duration
+#derive(Eq, Hash, Debug)
 pub(all) enum DurationError {
   /// The string is malformed.
   Malformed
   /// The value is out of bounds when another, subsequent value is present
   /// (i.e. `01:61:48`).
   TooLarge
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -434,12 +438,13 @@ pub extend Duration with Show::{to_string, output}
 
 ///|
 /// An half-open interval of durations.
+#derive(Eq, Hash, Debug)
 pub(all) struct DurationRange {
   /// The start of the interval.
   start : Duration
   /// The end of the interval.
   end : Duration
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

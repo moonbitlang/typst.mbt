@@ -18,12 +18,13 @@
 /// `DynValue::RawContent`. Users see the string through the field's output
 /// conversion (`raw_elem_text_output`, upstream's `IntoValue`), so the
 /// lines never become a Typst value.
+#derive(Hash, Debug)
 pub(all) enum RawContent {
   /// From a string.
   Text(String)
   /// From lines of text.
   Lines(Array[(String, @syntax.Span)])
-} derive(Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")

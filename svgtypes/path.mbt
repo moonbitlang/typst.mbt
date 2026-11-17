@@ -6,6 +6,7 @@
 /// If you want to change the segment type (for example `MoveTo` to `LineTo`)
 /// you should create a new segment.
 /// But you still can change points or make segment relative or absolute.
+#derive(Eq, Debug)
 pub(all) enum PathSegment {
   MoveTo(abs~ : Bool, x~ : Double, y~ : Double)
   LineTo(abs~ : Bool, x~ : Double, y~ : Double)
@@ -40,7 +41,7 @@ pub(all) enum PathSegment {
     y~ : Double
   )
   ClosePath(abs~ : Bool)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -358,6 +359,7 @@ fn parse_flag(s : Stream) -> Bool raise SvgTypesError {
 
 ///|
 /// Representation of a simple path segment.
+#derive(Eq, Debug)
 pub(all) enum SimplePathSegment {
   MoveTo(x~ : Double, y~ : Double)
   LineTo(x~ : Double, y~ : Double)
@@ -371,7 +373,7 @@ pub(all) enum SimplePathSegment {
   )
   Quadratic(x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
   ClosePath
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

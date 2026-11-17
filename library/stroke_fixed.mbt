@@ -4,6 +4,7 @@
 
 ///|
 /// A stroke whose lengths have been resolved (upstream `Stroke<Abs>`).
+#derive(Eq)
 pub(all) struct ResolvedStroke {
   /// The stroke's paint.
   paint : Smart[Paint]
@@ -17,7 +18,7 @@ pub(all) struct ResolvedStroke {
   dash : Smart[ResolvedDashPattern?]
   /// The miter limit.
   miter_limit : Smart[Ratio]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,12 +27,13 @@ pub extend ResolvedStroke with Eq::{not_equal, equal}
 
 ///|
 /// A resolved dash pattern (upstream `DashPattern<Abs, DashLength<Abs>>`).
+#derive(Eq)
 pub(all) struct ResolvedDashPattern {
   /// The dash array.
   array : Array[ResolvedDashLength]
   /// The dash phase.
   phase : Abs
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -40,10 +42,11 @@ pub extend ResolvedDashPattern with Eq::{not_equal, equal}
 
 ///|
 /// A resolved dash length (upstream `DashLength<Abs>`).
+#derive(Eq)
 pub(all) enum ResolvedDashLength {
   LineWidth
   Length(Abs)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -163,6 +166,7 @@ pub fn ResolvedStroke::unwrap_or_default(self : ResolvedStroke) -> FixedStroke {
 
 ///|
 /// A fully specified stroke of a geometric shape.
+#derive(Eq)
 pub(all) struct FixedStroke {
   /// The stroke's paint.
   paint : Paint
@@ -176,7 +180,7 @@ pub(all) struct FixedStroke {
   dash : FixedDashPattern?
   /// The miter limit. Defaults to 4.0, same as `tiny-skia`.
   miter_limit : Ratio
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -185,12 +189,13 @@ pub extend FixedStroke with Eq::{not_equal, equal}
 
 ///|
 /// A fully resolved dash pattern (upstream `DashPattern<Abs, Abs>`).
+#derive(Eq)
 pub(all) struct FixedDashPattern {
   /// The dash array.
   array : Array[Abs]
   /// The dash phase.
   phase : Abs
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

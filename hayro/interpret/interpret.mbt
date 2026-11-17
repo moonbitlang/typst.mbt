@@ -40,6 +40,7 @@ pub(all) struct InterpreterSettings {
 
 ///|
 /// Warnings that can occur while interpreting a PDF file.
+#derive(Eq, Debug)
 pub(all) enum InterpreterWarning {
   /// An unsupported font kind was encountered.
   ///
@@ -47,7 +48,7 @@ pub(all) enum InterpreterWarning {
   UnsupportedFont
   /// An image failed to decode.
   ImageDecodeFailure
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

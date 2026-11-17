@@ -7,12 +7,13 @@
 
 ///|
 /// Errors that can occur upon type checking function signatures.
+#derive(Debug)
 pub(all) suberror FuncTypeError {
   /// Too many function parameters.
   TooManyFunctionParams
   /// Too many function results.
   TooManyFunctionResults
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -38,12 +39,13 @@ pub extend FuncTypeError with Show::{to_string, output}
 /// # Note
 ///
 /// Can be cloned cheaply.
+#derive(Eq, Hash)
 pub struct FuncType {
   /// The number of parameters.
   len_params : Int32
   /// Combined parameter and result types.
   params_results : FixedArray[ValType]
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

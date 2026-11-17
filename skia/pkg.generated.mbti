@@ -158,6 +158,7 @@ pub fn u32_to_f32(UInt32) -> Float
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum BlendMode {
   Clear
   Source
@@ -188,15 +189,16 @@ pub(all) enum BlendMode {
   Saturation
   Color
   Luminosity
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for BlendMode
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Color {
   r : Float
   g : Float
   b : Float
   a : Float
-} derive(Eq, @debug.Debug)
+}
 pub fn Color::alpha(Self) -> Float
 pub fn Color::apply_opacity(Self, Float) -> Self
 pub fn Color::blue(Self) -> Float
@@ -210,15 +212,17 @@ pub fn Color::red(Self) -> Float
 pub fn Color::to_color_u8(Self) -> ColorU8
 pub fn Color::with_alpha(Self, Float) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ColorSpace {
   Linear
   Gamma2
   SimpleSRGB
   FullSRGBGamma
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for ColorSpace
 
-pub(all) struct ColorU8(UInt32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct ColorU8(UInt32)
 pub fn ColorU8::alpha(Self) -> Int32
 pub fn ColorU8::blue(Self) -> Int32
 pub fn ColorU8::from_rgba(Int32, Int32, Int32, Int32) -> Self
@@ -227,23 +231,28 @@ pub fn ColorU8::is_opaque(Self) -> Bool
 pub fn ColorU8::premultiply(Self) -> PremultipliedColorU8
 pub fn ColorU8::red(Self) -> Int32
 
-type Combine derive(Eq)
+#derive(Eq)
+type Combine
 
-type EdgeKind derive(Eq)
+#derive(Eq)
+type EdgeKind
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FillRule {
   Winding
   EvenOdd
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for FillRule
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FilterQuality {
   Nearest
   Bilinear
   Bicubic
-} derive(Eq, @debug.Debug)
+}
 
-type FocalData derive(Eq)
+#derive(Eq)
+type FocalData
 
 pub(all) struct Gradient {
   stops : Array[GradientStop]
@@ -254,12 +263,14 @@ pub(all) struct Gradient {
   has_uniform_stops : Bool
 }
 
-type GradientColor derive(Eq)
+#derive(Eq)
+type GradientColor
 
+#derive(Eq)
 pub(all) struct GradientStop {
   position : Float
   color : Color
-} derive(Eq)
+}
 pub fn GradientStop::new(Float, Color) -> Self
 
 type GradientType
@@ -286,10 +297,11 @@ pub fn Mask::new(UInt32, UInt32) -> Self?
 pub fn Mask::size(Self) -> @tiny_skia_path.IntSize
 pub fn Mask::width(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MaskType {
   Alpha
   Luminance
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct Paint {
   mut shader : Shader
@@ -347,14 +359,16 @@ pub(all) struct PixmapPaint {
 pub fn PixmapPaint::default() -> Self
 pub impl Default for PixmapPaint
 
-type Point64 derive(Eq)
+#derive(Eq)
+type Point64
 
+#derive(Eq, @debug.Debug)
 pub(all) struct PremultipliedColor {
   r : Float
   g : Float
   b : Float
   a : Float
-} derive(Eq, @debug.Debug)
+}
 pub fn PremultipliedColor::alpha(Self) -> Float
 pub fn PremultipliedColor::blue(Self) -> Float
 pub fn PremultipliedColor::demultiply(Self) -> Color
@@ -362,7 +376,8 @@ pub fn PremultipliedColor::green(Self) -> Float
 pub fn PremultipliedColor::red(Self) -> Float
 pub fn PremultipliedColor::to_color_u8(Self) -> PremultipliedColorU8
 
-pub(all) struct PremultipliedColorU8(UInt32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct PremultipliedColorU8(UInt32)
 pub fn PremultipliedColorU8::alpha(Self) -> Int32
 pub fn PremultipliedColorU8::blue(Self) -> Int32
 pub fn PremultipliedColorU8::demultiply(Self) -> ColorU8
@@ -378,12 +393,13 @@ pub(all) struct RadialGradient {
 }
 pub fn RadialGradient::new(@tiny_skia_path.Point, Float, @tiny_skia_path.Point, Float, Array[GradientStop], SpreadMode, @tiny_skia_path.Transform) -> Shader?
 
+#derive(Eq, @debug.Debug)
 pub struct ScreenIntRect {
   x : Int32
   y : Int32
   width : Int32
   height : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn ScreenIntRect::bottom(Self) -> Int32
 pub fn ScreenIntRect::contains(Self, Self) -> Bool
 pub fn ScreenIntRect::from_xywh(UInt32, UInt32, UInt32, UInt32) -> Self?
@@ -398,7 +414,8 @@ pub fn ScreenIntRect::width(Self) -> Int32
 pub fn ScreenIntRect::x(Self) -> Int32
 pub fn ScreenIntRect::y(Self) -> Int32
 
-type SearchAxis derive(Eq)
+#derive(Eq)
+type SearchAxis
 
 pub(all) enum Shader {
   SolidColor(Color)
@@ -411,14 +428,16 @@ pub fn Shader::apply_opacity(Self, Float) -> Self
 pub fn Shader::is_opaque(Self) -> Bool
 pub fn Shader::transform(Self, @tiny_skia_path.Transform) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SpreadMode {
   Pad
   Reflect
   Repeat
-} derive(Eq, @debug.Debug)
+}
 pub impl Default for SpreadMode
 
-type Stage derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+type Stage
 
 pub(all) struct SweepGradient {
   base : Gradient

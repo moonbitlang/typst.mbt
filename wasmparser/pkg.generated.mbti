@@ -211,6 +211,7 @@ pub fn BinaryReaderError::to_string(Self) -> String
 pub impl Show for BinaryReaderError
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum AbstractHeapType {
   Func
   Extern
@@ -226,11 +227,12 @@ pub(all) enum AbstractHeapType {
   NoExn
   Cont
   NoCont
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn AbstractHeapType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for AbstractHeapType
 
-pub(all) struct ArrayType(FieldType) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ArrayType(FieldType)
 pub fn ArrayType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for ArrayType
 
@@ -270,31 +272,35 @@ pub fn BinaryReader::shrink(Self) -> Self
 pub fn BinaryReader::skip(Self, (Self) -> Unit raise BinaryReaderError) -> Self raise BinaryReaderError
 pub fn BinaryReader::skip_string(Self) -> Unit raise BinaryReaderError
 
+#derive(Eq, @debug.Debug)
 pub(all) enum BinaryReaderErrorKind {
   Custom
   Invalid
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum BlockType {
   Empty
   Type(ValType)
   FuncType(UInt32)
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct BrTable {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn BrTable::default(Self) -> UInt32
 pub fn BrTable::is_empty(Self) -> Bool
 pub fn BrTable::len(Self) -> UInt32
 pub fn BrTable::targets(Self) -> ArrayView[UInt32]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Catch {
   One(tag~ : UInt32, label~ : UInt32)
   OneRef(tag~ : UInt32, label~ : UInt32)
   All(label~ : UInt32)
   AllRef(label~ : UInt32)
-} derive(Eq, @debug.Debug)
+}
 pub fn Catch::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for Catch
 
@@ -303,17 +309,19 @@ pub(all) enum Chunk {
   Parsed(consumed~ : Int32, payload~ : Payload)
 }
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum CompositeInnerType {
   Func(FuncType)
   Array(ArrayType)
   Struct(StructType)
   Cont(ContType)
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct CompositeType {
   inner : CompositeInnerType
   shared : Bool
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn CompositeType::output(Self, &Logger) -> Unit
 pub fn CompositeType::to_string(Self) -> String
 pub fn CompositeType::unwrap_array(Self) -> ArrayType
@@ -333,15 +341,17 @@ pub fn ConstExpr::new(BinaryReader) -> Self
 pub impl Eq for ConstExpr
 pub impl FromReader for ConstExpr
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct ContType {
   mut idx : PackedIndex
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ContType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for ContType
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct CoreTypeId {
   index : UInt32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn CoreTypeId::index(Self) -> Int32
 
 pub struct CustomSectionReader {
@@ -383,40 +393,45 @@ pub(all) enum ElementKind {
   Declared
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Encoding {
   Module
   Component
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum EntityType {
   Func(CoreTypeId)
   Table(TableType)
   Memory(MemoryType)
   Global(GlobalType)
   Tag(CoreTypeId)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Export {
   name : String
   kind : ExternalKind
   index : UInt32
-} derive(Eq, @debug.Debug)
+}
 pub impl FromReader for Export
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ExternalKind {
   Func
   Table
   Memory
   Global
   Tag
-} derive(Eq, @debug.Debug)
+}
 pub fn ExternalKind::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for ExternalKind
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct FieldType {
   mut element_type : StorageType
   mutable : Bool
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn FieldType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for FieldType
 
@@ -429,6 +444,7 @@ pub(all) struct Frame {
 }
 pub impl @debug.Debug for Frame
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FrameKind {
   Block
   If
@@ -438,7 +454,7 @@ pub(all) enum FrameKind {
   LegacyTry
   LegacyCatch
   LegacyCatchAll
-} derive(Eq, @debug.Debug)
+}
 
 pub struct FuncToValidate {
   resources : ValidatorResources
@@ -452,9 +468,10 @@ pub fn FuncToValidate::into_validator(Self, FuncValidatorAllocations) -> FuncVal
 pub fn FuncToValidate::resources(Self) -> ValidatorResources
 pub fn FuncToValidate::ty(Self) -> UInt32
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct FuncType {
   // private fields
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn FuncType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn FuncType::new(Array[ValType], Array[ValType]) -> Self
 pub fn FuncType::params(Self) -> ArrayView[ValType]
@@ -503,39 +520,45 @@ pub(all) struct Global {
 }
 pub impl FromReader for Global
 
+#derive(Eq, @debug.Debug)
 pub(all) struct GlobalType {
   mut content_type : ValType
   mutable : Bool
   shared : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn GlobalType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for GlobalType
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Handle {
   OnLabel(tag~ : UInt32, label~ : UInt32)
   OnSwitch(tag~ : UInt32)
-} derive(Eq, @debug.Debug)
+}
 pub fn Handle::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for Handle
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum HeapType {
   Abstract(shared~ : Bool, ty~ : AbstractHeapType)
   Concrete(UnpackedIndex)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn HeapType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for HeapType
 
-pub(all) struct Ieee32(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Ieee32(UInt32)
 pub fn Ieee32::bits(Self) -> UInt32
 
-pub(all) struct Ieee64(UInt64) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Ieee64(UInt64)
 pub fn Ieee64::bits(Self) -> UInt64
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Import {
   module_ : String
   name : String
   ty : TypeRef
-} derive(Eq, @debug.Debug)
+}
 pub impl FromReader for Import
 
 type Locals
@@ -549,26 +572,29 @@ pub fn LocalsReader::get_count(Self) -> UInt32
 pub fn LocalsReader::original_position(Self) -> Int32
 pub fn LocalsReader::read(Self) -> (UInt32, ValType) raise BinaryReaderError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MemArg {
   align : Byte
   max_align : Byte
   offset : UInt64
   memory : UInt32
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MemoryType {
   memory64 : Bool
   shared : Bool
   initial : UInt64
   maximum : UInt64?
   page_size_log2 : UInt32?
-} derive(Eq, @debug.Debug)
+}
 pub fn MemoryType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn MemoryType::index_type(Self) -> ValType
 pub impl FromReader for MemoryType
 
 type Module
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Operator {
   Unreachable
   Nop
@@ -1188,7 +1214,7 @@ pub(all) enum Operator {
   I64Sub128
   I64MulWideS
   I64MulWideU
-} derive(Eq, @debug.Debug)
+}
 pub fn Operator::proposal(Self) -> String
 pub fn Operator::visit_name(Self) -> String
 
@@ -1219,12 +1245,14 @@ pub fn OperatorsReader::original_position(Self) -> Int32
 pub fn OperatorsReader::read(Self) -> Operator raise BinaryReaderError
 pub fn OperatorsReader::read_with_offset(Self) -> (Operator, Int32) raise BinaryReaderError
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Ordering {
   AcqRel
   SeqCst
-} derive(Eq, Hash, @debug.Debug)
+}
 
-pub(all) struct PackedIndex(UInt32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct PackedIndex(UInt32)
 pub fn PackedIndex::as_core_type_id(Self) -> CoreTypeId?
 pub fn PackedIndex::as_module_index(Self) -> UInt32?
 pub fn PackedIndex::as_rec_group_index(Self) -> UInt32?
@@ -1270,14 +1298,16 @@ pub(all) enum Payload {
 }
 pub fn Payload::as_section(Self) -> (Byte, Range)?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Range {
   start : Int32
   end : Int32
-} derive(Eq, @debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub struct RecGroup {
   // private fields
-} derive(@debug.Debug)
+}
 pub fn RecGroup::get(Self, Int32) -> SubType
 pub fn RecGroup::into_types(Self) -> Array[SubType]
 pub fn RecGroup::into_types_and_offsets(Self) -> Array[(Int32, SubType)]
@@ -1288,12 +1318,14 @@ pub impl Eq for RecGroup
 pub impl Hash for RecGroup
 pub impl FromReader for RecGroup
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct RecGroupId {
   index : UInt32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn RecGroupId::index(Self) -> Int32
 
-pub(all) struct RefType(UInt32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct RefType(UInt32)
 pub fn RefType::as_non_null(Self) -> Self
 pub fn RefType::concrete(Bool, PackedIndex) -> Self
 pub fn RefType::difference(Self, Self) -> Self
@@ -1315,9 +1347,10 @@ pub fn RefType::type_index(Self) -> PackedIndex?
 pub impl Show for RefType
 pub impl FromReader for RefType
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ResumeTable {
   handlers : Array[Handle]
-} derive(Eq, @debug.Debug)
+}
 pub fn ResumeTable::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn ResumeTable::len(Self) -> Int32
 pub impl FromReader for ResumeTable
@@ -1342,28 +1375,31 @@ pub fn[T : FromReader] SectionLimitedIntoIter::next_with_offset(Self[T]) -> (Int
 pub fn[T] SectionLimitedIntoIter::original_position(Self[T]) -> Int32
 pub fn[T] SectionLimitedIntoIter::remaining(Self[T]) -> UInt32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum StorageType {
   I8
   I16
   Val(ValType)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn StorageType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn StorageType::is_packed(Self) -> Bool
 pub fn StorageType::unpack(Self) -> ValType
 pub impl Show for StorageType
 pub impl FromReader for StorageType
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct StructType {
   fields : Array[FieldType]
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn StructType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for StructType
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct SubType {
   is_final : Bool
   mut supertype_idx : PackedIndex?
   composite_type : CompositeType
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn SubType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn SubType::func(FuncType, Bool) -> Self
 pub fn SubType::unwrap_array(Self) -> ArrayType
@@ -1384,32 +1420,36 @@ pub(all) enum TableInit {
   Expr(ConstExpr)
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TableType {
   mut element_type : RefType
   table64 : Bool
   initial : UInt64
   maximum : UInt64?
   shared : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn TableType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn TableType::index_type(Self) -> ValType
 pub impl FromReader for TableType
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TagKind {
   Exception
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TagType {
   kind : TagKind
   func_type_idx : UInt32
-} derive(Eq, @debug.Debug)
+}
 pub fn TagType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for TagType
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TryTable {
   ty : BlockType
   catches : Array[Catch]
-} derive(Eq, @debug.Debug)
+}
 pub fn TryTable::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for TryTable
 
@@ -1427,13 +1467,14 @@ pub fn TypeList::top_type(Self, HeapType) -> HeapType
 pub fn TypeList::valtype_is_shared(Self, ValType) -> Bool
 pub fn TypeList::valtype_is_subtype(Self, ValType, ValType) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TypeRef {
   Func(UInt32)
   Table(TableType)
   Memory(MemoryType)
   Global(GlobalType)
   Tag(TagType)
-} derive(Eq, @debug.Debug)
+}
 pub fn TypeRef::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub impl FromReader for TypeRef
 
@@ -1457,11 +1498,12 @@ pub fn Types::table_count(Self) -> UInt32
 pub fn Types::tag_at(Self, UInt32) -> CoreTypeId
 pub fn Types::tag_count(Self) -> UInt32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum UnpackedIndex {
   Module(UInt32)
   RecGroup(UInt32)
   Id(CoreTypeId)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn UnpackedIndex::as_core_type_id(Self) -> CoreTypeId?
 pub fn UnpackedIndex::as_module_index(Self) -> UInt32?
 pub fn UnpackedIndex::as_rec_group_index(Self) -> UInt32?
@@ -1471,9 +1513,11 @@ pub fn UnpackedIndex::pack(Self) -> PackedIndex?
 pub fn UnpackedIndex::to_string(Self) -> String
 pub impl Show for UnpackedIndex
 
-pub(all) struct V128Value(Bytes) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct V128Value(Bytes)
 pub fn V128Value::bytes(Self) -> Bytes
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum ValType {
   I32
   I64
@@ -1481,7 +1525,7 @@ pub(all) enum ValType {
   F64
   V128
   Ref(RefType)
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn ValType::as_reference_type(Self) -> RefType?
 pub fn ValType::from_reader(BinaryReader) -> Self raise BinaryReaderError
 pub fn ValType::is_defaultable(Self) -> Bool
@@ -1525,7 +1569,8 @@ pub fn Validator::unknown_section(Self, Byte, Range) -> Unit raise BinaryReaderE
 pub fn Validator::validate_all(Self, BytesView) -> Types raise BinaryReaderError
 pub fn Validator::version(Self, UInt32, Encoding, Range) -> Unit raise BinaryReaderError
 
-pub(all) struct ValidatorId(Int32) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct ValidatorId(Int32)
 
 pub struct ValidatorResources {
   // private fields
@@ -1550,9 +1595,10 @@ pub fn ValidatorResources::type_id_of_function(Self, UInt32) -> CoreTypeId?
 pub fn ValidatorResources::type_index_of_function(Self, UInt32) -> UInt32?
 pub fn ValidatorResources::types(Self) -> TypeList
 
+#derive(Eq, Hash)
 pub(all) struct WasmFeatures {
   bits : UInt32
-} derive(Eq, Hash)
+}
 pub fn WasmFeatures::all() -> Self
 pub fn WasmFeatures::bits(Self) -> UInt32
 pub fn WasmFeatures::bulk_memory(Self) -> Bool

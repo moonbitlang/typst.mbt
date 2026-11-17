@@ -113,6 +113,7 @@ pub fn Time::reset(self : Time) -> Unit {
 ///|
 /// A proleptic Gregorian date and time (like `chrono::NaiveDateTime`),
 /// computed from a UNIX timestamp.
+#derive(Eq, Debug)
 pub(all) struct UtcDateTime {
   year : Int32
   month : Int32
@@ -120,7 +121,7 @@ pub(all) struct UtcDateTime {
   hour : Int32
   minute : Int32
   second : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

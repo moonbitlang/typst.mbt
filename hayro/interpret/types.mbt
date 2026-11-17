@@ -387,12 +387,13 @@ pub extend StrokeProps with Default::{default}
 
 ///|
 /// A fill rule.
+#derive(Eq, Hash, Debug)
 pub(all) enum FillRule {
   /// Non-zero filling.
   NonZero
   /// Even-odd filling.
   EvenOdd
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -411,6 +412,7 @@ pub extend FillRule with @debug.Debug::{to_repr}
 
 ///|
 /// A blend mode.
+#derive(Eq, Hash, Debug)
 pub(all) enum BlendMode {
   /// Normal blend mode (default).
   Normal
@@ -444,7 +446,7 @@ pub(all) enum BlendMode {
   Color
   /// Luminosity blend mode.
   Luminosity
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

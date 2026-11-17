@@ -1,7 +1,8 @@
 // Port of `tiny-skia-path` 0.12.0 `src/f32x4_t.rs`.
 
 ///|
-priv struct F32x4(Float, Float, Float, Float) derive(Eq)
+#derive(Eq)
+priv struct F32x4(Float, Float, Float, Float)
 
 ///|
 fn F32x4::default() -> F32x4 {

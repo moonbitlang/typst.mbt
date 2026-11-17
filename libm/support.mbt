@@ -31,6 +31,7 @@ fn FpResult::ok(val : Double) -> FpResult {
 /// Only `Nearest` is constructed (upstream: `allow(dead_code)`, libm
 /// `src/math/support/env.rs:38`): Rust has no floating point environment, and
 /// the only caller of `cbrt_round` is `cbrt` (`src/math/cbrt.rs:13`).
+#derive(Eq)
 #warnings("-unused_constructor")
 priv enum Round {
   /// IEEE 754 nearest, `roundTiesToEven`.
@@ -41,7 +42,7 @@ priv enum Round {
   Positive
   /// IEEE 754 `roundTowardZero`.
   Zero
-} derive(Eq)
+}
 
 ///|
 /// `round as usize`.

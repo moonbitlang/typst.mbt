@@ -4,6 +4,7 @@ package "moonbitlang/typst/hayro/jbig2"
 // Values
 
 // Errors
+#derive(Eq)
 pub(all) suberror DecodeError {
   Parse(ParseError)
   Format(FormatError)
@@ -14,7 +15,7 @@ pub(all) suberror DecodeError {
   Symbol(SymbolError)
   Overflow(OverflowError)
   Unsupported
-} derive(Eq)
+}
 pub impl Show for DecodeError
 
 // Types and methods
@@ -23,17 +24,19 @@ pub struct DecoderContext {
 }
 pub fn DecoderContext::default() -> Self
 
+#derive(Eq)
 pub(all) enum FormatError {
   InvalidHeader
   ReservedBits
   MissingPageInfo
   UnknownPageHeight
   EmptyPage
-} derive(Eq)
+}
 pub fn FormatError::output(Self, &Logger) -> Unit
 pub fn FormatError::to_string(Self) -> String
 pub impl Show for FormatError
 
+#derive(Eq)
 pub(all) enum HuffmanError {
   InvalidCode
   InvalidSelection
@@ -41,7 +44,7 @@ pub(all) enum HuffmanError {
   UnexpectedOob
   ConflictingCodes
   PrefixLengthTooLarge
-} derive(Eq)
+}
 pub fn HuffmanError::output(Self, &Logger) -> Unit
 pub fn HuffmanError::to_string(Self) -> String
 pub impl Show for HuffmanError
@@ -56,6 +59,7 @@ pub fn Image::new(BytesView) -> Self raise DecodeError
 pub fn Image::new_embedded(BytesView, BytesView?) -> Self raise DecodeError
 pub fn Image::width(Self) -> UInt32
 
+#derive(Eq)
 pub(all) enum OverflowError {
   BitmapDimension
   GridDimension
@@ -63,39 +67,43 @@ pub(all) enum OverflowError {
   ReferenceOffset
   Index
   SymbolCount
-} derive(Eq)
+}
 pub fn OverflowError::output(Self, &Logger) -> Unit
 pub fn OverflowError::to_string(Self) -> String
 pub impl Show for OverflowError
 
+#derive(Eq)
 pub(all) enum ParseError {
   UnexpectedEof
-} derive(Eq)
+}
 pub fn ParseError::output(Self, &Logger) -> Unit
 pub fn ParseError::to_string(Self) -> String
 pub impl Show for ParseError
 
+#derive(Eq)
 pub(all) enum RegionError {
   InvalidCombinationOperator
   InvalidDimension
   InvalidMmrData
   GrayScaleOutOfRange
-} derive(Eq)
+}
 pub fn RegionError::output(Self, &Logger) -> Unit
 pub fn RegionError::to_string(Self) -> String
 pub impl Show for RegionError
 
+#derive(Eq)
 pub(all) enum SegmentError {
   UnknownType
   InvalidReferredCount
   InvalidReference
   MissingEndMarker
   MissingPatternDictionary
-} derive(Eq)
+}
 pub fn SegmentError::output(Self, &Logger) -> Unit
 pub fn SegmentError::to_string(Self) -> String
 pub impl Show for SegmentError
 
+#derive(Eq)
 pub(all) enum SymbolError {
   NoSymbols
   TooManySymbols
@@ -104,15 +112,16 @@ pub(all) enum SymbolError {
   Invalid
   InvalidStripDelta
   TooManyInstances
-} derive(Eq)
+}
 pub fn SymbolError::output(Self, &Logger) -> Unit
 pub fn SymbolError::to_string(Self) -> String
 pub impl Show for SymbolError
 
+#derive(Eq)
 pub(all) enum TemplateError {
   Invalid
   InvalidAtPixel
-} derive(Eq)
+}
 pub fn TemplateError::output(Self, &Logger) -> Unit
 pub fn TemplateError::to_string(Self) -> String
 pub impl Show for TemplateError

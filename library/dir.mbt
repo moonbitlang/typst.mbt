@@ -2,6 +2,7 @@
 
 ///|
 /// The four directions into which content can be laid out.
+#derive(Eq, Hash, Debug)
 pub(all) enum Dir {
   /// Left to right.
   LTR
@@ -11,7 +12,7 @@ pub(all) enum Dir {
   TTB
   /// Bottom to top.
   BTT
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

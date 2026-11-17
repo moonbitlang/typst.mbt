@@ -5,6 +5,7 @@
 
 ///|
 /// Physical pixel dimensions (upstream `png::PixelDimensions`).
+#derive(Eq, Debug)
 pub(all) struct PixelDimensions {
   /// Pixels per unit, X axis
   xppu : UInt32
@@ -13,7 +14,7 @@ pub(all) struct PixelDimensions {
   /// Whether the unit is the meter (`png::Unit::Meter`) rather than
   /// unspecified.
   meter : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -27,6 +28,7 @@ pub extend PixelDimensions with @debug.Debug::{to_repr}
 
 ///|
 /// PNG header information (upstream `png::Info`, partially).
+#derive(Debug)
 pub(all) struct PngInfo {
   width : UInt32
   height : UInt32
@@ -39,7 +41,7 @@ pub(all) struct PngInfo {
   pixel_dims : PixelDimensions?
   /// The decompressed ICC profile of the `iCCP` chunk.
   icc_profile : Bytes?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -52,10 +52,11 @@ priv struct ChannelDefinition {
 }
 
 ///|
+#derive(Eq)
 priv enum ChannelType {
   Colour
   Opacity
-} derive(Eq)
+}
 
 ///|
 fn ChannelType::from_raw(value : Int32) -> ChannelType? {

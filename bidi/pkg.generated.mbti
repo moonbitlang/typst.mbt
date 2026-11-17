@@ -59,6 +59,7 @@ pub fn utf8_char_len(Int32) -> Int32
 // Errors
 
 // Types and methods
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum BidiClass {
   AL
   AN
@@ -83,7 +84,7 @@ pub(all) enum BidiClass {
   RLO
   S
   WS
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub struct BidiInfo {
   text : String
@@ -100,16 +101,18 @@ pub fn BidiInfo::reordered_levels(Self, ParagraphInfo, Range) -> Array[Level]
 pub fn BidiInfo::reordered_levels_per_char(Self, ParagraphInfo, Range) -> Array[Level]
 pub fn BidiInfo::visual_runs(Self, ParagraphInfo, Range) -> (Array[Level], Array[Range])
 
+#derive(Eq, @debug.Debug)
 pub(all) struct BidiMatchedOpeningBracket {
   opening : Int32
   is_open : Bool
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Direction {
   Ltr
   Rtl
   Mixed
-} derive(Eq, @debug.Debug)
+}
 
 pub struct InitialInfo {
   text : String
@@ -118,7 +121,8 @@ pub struct InitialInfo {
 }
 pub fn InitialInfo::new(String, Level?) -> Self
 
-pub(all) struct Level(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Level(Int32)
 pub fn Level::bidi_class(Self) -> BidiClass
 pub fn Level::is_ltr(Self) -> Bool
 pub fn Level::is_rtl(Self) -> Bool
@@ -137,9 +141,10 @@ pub fn Level::raise_level_explicit(Self, Int32) -> Result[Self, LevelError]
 pub fn Level::rtl() -> Self
 pub fn Level::vec(Array[Int32]) -> Array[Self]
 
+#derive(Eq, @debug.Debug)
 pub(all) enum LevelError {
   OutOfRangeNumber
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Paragraph {
   info : BidiInfo
@@ -149,16 +154,18 @@ pub fn Paragraph::direction(Self) -> Direction
 pub fn Paragraph::level_at(Self, Int32) -> Level
 pub fn Paragraph::new(BidiInfo, ParagraphInfo) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ParagraphInfo {
   range : Range
   level : Level
-} derive(Eq, @debug.Debug)
+}
 pub fn ParagraphInfo::len(Self) -> Int32
 
+#derive(Compare, Eq, Hash, @debug.Debug)
 pub(all) struct Range {
   start : Int32
   end : Int32
-} derive(Compare, Eq, Hash, @debug.Debug)
+}
 pub fn Range::contains(Self, Int32) -> Bool
 pub fn Range::is_empty(Self) -> Bool
 pub fn Range::len(Self) -> Int32

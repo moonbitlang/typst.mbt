@@ -1,6 +1,7 @@
 // Port of `yaml_rust::parser` (yaml-rust 0.4.5).
 
 ///|
+#derive(Eq)
 priv enum State {
   StreamStart
   ImplicitDocumentStart
@@ -26,11 +27,12 @@ priv enum State {
   FlowMappingValue
   FlowMappingEmptyValue
   End
-} derive(Eq)
+}
 
 ///|
 /// `Event` is used with the low-level event base parsing API,
 /// see `MarkedEventReceiver` trait.
+#derive(Eq, Debug)
 pub(all) enum Event {
   /// Reserved for internal use
   Nothing
@@ -48,7 +50,7 @@ pub(all) enum Event {
   /// Anchor ID
   MappingStart(Int32)
   MappingEnd
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

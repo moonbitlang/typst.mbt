@@ -2,12 +2,13 @@
 
 ///|
 /// A length in relation to some known length.
+#derive(Default, Eq, Hash)
 pub(all) struct Rel[T] {
   /// The relative part.
   rel : Ratio
   /// The absolute part.
   abs : T
-} derive(Default, Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

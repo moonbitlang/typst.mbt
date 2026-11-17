@@ -3,9 +3,10 @@
 ///|
 /// An error type indicating that a component provided to a method was out of
 /// range, causing a failure.
+#derive(Eq, Hash, Debug)
 pub(all) suberror ComponentRange {
   ComponentRange(name~ : String, is_conditional~ : Bool)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -60,6 +61,7 @@ pub extend ComponentRange with Show::{to_string, output}
 
 ///|
 /// The format description provided was not valid.
+#derive(Eq, Debug)
 pub(all) suberror InvalidFormatDescription {
   /// There was a bracket pair that was opened but not closed.
   UnclosedOpeningBracket(index~ : Int32)
@@ -83,7 +85,7 @@ pub(all) suberror InvalidFormatDescription {
     context~ : String,
     index~ : Int32
   )
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -130,6 +132,7 @@ pub extend InvalidFormatDescription with Show::{to_string, output}
 
 ///|
 /// An error occurred when formatting.
+#derive(Eq, Debug)
 pub(all) suberror Format {
   /// The type being formatted does not contain sufficient information to
   /// format a component.
@@ -141,7 +144,7 @@ pub(all) suberror Format {
   ComponentRange(ComponentRange)
   /// A value of `std::io::Error` was returned internally.
   StdIo(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -9,6 +9,7 @@
 /// Type of a value.
 ///
 /// See [`Val`] for details.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) enum ValType {
   /// 32-bit signed or unsigned integer.
   I32
@@ -24,7 +25,7 @@ pub(all) enum ValType {
   FuncRef
   /// A nullable external reference.
   ExternRef
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -89,11 +90,12 @@ pub fn ValType::is_ref(self : ValType) -> Bool {
 /// Upstream stores the 16 little-endian bytes of a `u128`; here the value is
 /// split into its low and high 64 bits (`lo` holds bytes 0..8 = lanes with
 /// the lowest indices).
+#derive(Eq, Hash, Debug)
 #valtype
 pub struct V128Value {
   lo : UInt64
   hi : UInt64
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

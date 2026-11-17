@@ -2,6 +2,7 @@
 
 ///|
 /// Represents a reference to a type definition in a WebAssembly module.
+#derive(Eq, Debug)
 pub(all) enum TypeRef {
   /// The type is a function.
   ///
@@ -19,7 +20,7 @@ pub(all) enum TypeRef {
   ///
   /// The value is an index in the types index space.
   Tag(TagType)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -33,6 +34,7 @@ pub extend TypeRef with @debug.Debug::{to_repr}
 
 ///|
 /// Represents an import in a WebAssembly module.
+#derive(Eq, Debug)
 pub(all) struct Import {
   /// The module being imported from.
   module_ : String
@@ -40,7 +42,7 @@ pub(all) struct Import {
   name : String
   /// The type of the imported item.
   ty : TypeRef
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

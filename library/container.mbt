@@ -89,6 +89,7 @@ pub fn BlockElem::multi_layouter_content(
 
 ///|
 /// The contents of a block.
+#derive(Eq)
 pub(all) enum BlockBody {
   /// The block contains normal content.
   Content(Content)
@@ -98,7 +99,7 @@ pub(all) enum BlockBody {
   /// The block contains a layout callback that needs access to the exact
   /// regions.
   MultiLayouter(BlockMultiCallback)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -378,13 +379,14 @@ pub extend BlockMultiCallback with Eq::{not_equal, equal}
 /// Defines how to determine the baseline of a box.
 ///
 /// Here `None` means unspecified and fields set to it are inherited.
+#derive(Eq, Hash)
 pub(all) struct BaselinePos {
   /// Baseline's reference position relative to the height of the box's
   /// contents.
   at : Smart[VAlignment]?
   /// Amount to shift the baseline by.
   shift : Rel[Length]?
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

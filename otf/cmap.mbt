@@ -1092,6 +1092,7 @@ pub extend UnicodeRangeRecord with FromData::{size, parse}
 
 ///|
 /// A result of a variation glyph mapping.
+#derive(Eq, Debug)
 pub(all) enum GlyphVariationResult {
   /// Glyph was found in the variation encoding table.
   Found(GlyphId)
@@ -1100,7 +1101,7 @@ pub(all) enum GlyphVariationResult {
   /// Basically, you should use `Encoding::glyph_index` or `Face::glyph_index`
   /// in this case.
   UseDefault
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

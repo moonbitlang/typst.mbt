@@ -2,6 +2,7 @@
 
 ///|
 /// A container for elements with useful methods.
+#derive(Eq, Hash, Debug)
 pub(all) struct Elem {
   /// The children of this element.
   mut children : ElemChildren
@@ -9,7 +10,7 @@ pub(all) struct Elem {
   display : @citationberg.Display?
   /// The CSL construct that created this element.
   meta : ElemMeta?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -117,6 +118,7 @@ pub fn simplify_children(children : ElemChildren) -> ElemChildren {
 
 ///|
 /// Which CSL construct created an element.
+#derive(Eq, Hash, Debug)
 pub(all) enum ElemMeta {
   /// The element is the output of `cs:names` with the names of the
   /// corresponding variables for this elem.
@@ -139,7 +141,7 @@ pub(all) enum ElemMeta {
   /// The element is the output of `cs:text` with a `variable` set to
   /// `citation-label`.
   CitationLabel
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -158,7 +160,8 @@ pub extend ElemMeta with @debug.Debug::{to_repr}
 
 ///|
 /// A container for element children with useful methods.
-pub(all) struct ElemChildren(Array[ElemChild]) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ElemChildren(Array[ElemChild])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -303,6 +306,7 @@ pub fn ElemChildren::to_plain(self : ElemChildren) -> String {
 
 ///|
 /// Various formattable elements.
+#derive(Eq, Hash, Debug)
 pub(all) enum ElemChild {
   /// This is some text.
   Text(Formatted)
@@ -314,7 +318,7 @@ pub(all) enum ElemChild {
   Link(text~ : Formatted, url~ : String)
   /// A transparent element that must be replaced by the consumer.
   Transparent(cite_idx~ : Int32, format~ : Formatting)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -421,6 +425,7 @@ pub extend ElemChild with Show::{to_string, output}
 
 ///|
 /// The format with which to write an element.
+#derive(Eq, Debug)
 pub(all) enum BufWriteFormat {
   /// Just write text.
   Plain
@@ -428,7 +433,7 @@ pub(all) enum BufWriteFormat {
   VT100
   /// Write HTML.
   Html
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -442,12 +447,13 @@ pub extend BufWriteFormat with @debug.Debug::{to_repr}
 
 ///|
 /// A piece of formatted text.
+#derive(Eq, Hash, Debug)
 pub(all) struct Formatted {
   /// The text.
   mut text : String
   /// The formatting.
   formatting : Formatting
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -466,6 +472,7 @@ pub extend Formatted with @debug.Debug::{to_repr}
 
 ///|
 /// Some formatting information.
+#derive(Eq, Hash, Debug)
 pub(all) struct Formatting {
   /// Whether the text is italic.
   font_style : @citationberg.FontStyle
@@ -477,7 +484,7 @@ pub(all) struct Formatting {
   text_decoration : @citationberg.TextDecoration
   /// Whether the text is superscript or subscript.
   vertical_align : @citationberg.VerticalAlign
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

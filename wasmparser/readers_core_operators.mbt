@@ -3,6 +3,7 @@
 
 ///|
 /// Represents a block type.
+#derive(Eq, Hash, Debug)
 pub(all) enum BlockType {
   /// The block produces consumes nor produces any values.
   Empty
@@ -12,7 +13,7 @@ pub(all) enum BlockType {
   ///
   /// The index is to a function type in the types section.
   FuncType(UInt32)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -31,6 +32,7 @@ pub extend BlockType with @debug.Debug::{to_repr}
 
 ///|
 /// The kind of a control flow `Frame`.
+#derive(Eq, Debug)
 pub(all) enum FrameKind {
   /// A Wasm `block` control block.
   Block
@@ -64,7 +66,7 @@ pub(all) enum FrameKind {
   ///
   /// See: `WasmFeatures::legacy_exceptions` Note in `crates/wasmparser/src/features.rs`
   LegacyCatchAll
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -78,6 +80,7 @@ pub extend FrameKind with @debug.Debug::{to_repr}
 
 ///|
 /// Represents a memory immediate in a WebAssembly memory instruction.
+#derive(Eq, Debug)
 pub(all) struct MemArg {
   /// Alignment, stored as `n` where the actual alignment is `2^n`
   align : Byte
@@ -100,7 +103,7 @@ pub(all) struct MemArg {
   /// is always zero unless the multi-memory proposal of WebAssembly is
   /// enabled.
   memory : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -116,10 +119,11 @@ pub extend MemArg with @debug.Debug::{to_repr}
 /// A br_table entries representation.
 ///
 /// Upstream keeps a reader over the targets; they are already decoded here.
+#derive(Eq, Debug)
 pub(all) struct BrTable {
   priv targets : Array[UInt32]
   priv default : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -136,7 +140,8 @@ pub extend BrTable with @debug.Debug::{to_repr}
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
-pub(all) struct Ieee32(UInt32) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Ieee32(UInt32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -164,7 +169,8 @@ pub fn Ieee32::bits(self : Ieee32) -> UInt32 {
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
-pub(all) struct Ieee64(UInt64) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct Ieee64(UInt64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -191,7 +197,8 @@ pub fn Ieee64::bits(self : Ieee64) -> UInt64 {
 /// Represents a 128-bit vector value (16 bytes, little endian).
 ///
 /// Upstream `V128`, a reserved type name in MoonBit.
-pub(all) struct V128Value(Bytes) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct V128Value(Bytes)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -222,6 +229,7 @@ pub fn V128Value::bytes(self : V128Value) -> Bytes {
 ///
 /// [`memory_order`]: https://en.cppreference.com/w/cpp/atomic/memory_order
 /// [`atomic::Ordering`]: https://doc.rust-lang.org/std/sync/atomic/enum.Ordering.html
+#derive(Eq, Hash, Debug)
 pub(all) enum Ordering {
   /// For a load, it acquires; this orders all operations before the last
   /// "releasing" store. For a store, it releases; this orders all
@@ -230,7 +238,7 @@ pub(all) enum Ordering {
   /// Like `AcqRel` but all threads see all sequentially consistent
   /// operations in the same order.
   SeqCst
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -320,12 +328,13 @@ pub fn OperatorsReader::is_end_then_eof(self : OperatorsReader) -> Bool {
 
 ///|
 /// A `try_table` entries representation.
+#derive(Eq, Debug)
 pub(all) struct TryTable {
   /// The block type describing the try block itself.
   ty : BlockType
   /// Outer blocks which will receive exceptions.
   catches : Array[Catch]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -339,6 +348,7 @@ pub extend TryTable with @debug.Debug::{to_repr}
 
 ///|
 /// Catch clauses that can be specified in [`TryTable`].
+#derive(Eq, Debug)
 pub(all) enum Catch {
   /// Equivalent of `catch`
   One(tag~ : UInt32, label~ : UInt32)
@@ -348,7 +358,7 @@ pub(all) enum Catch {
   All(label~ : UInt32)
   /// Equivalent of `catch_all_ref`
   AllRef(label~ : UInt32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -396,11 +406,12 @@ pub extend Catch with FromReader::{from_reader}
 ///|
 /// A representation of dispatch tables on `resume` and `resume_throw`
 /// instructions.
+#derive(Eq, Debug)
 pub(all) struct ResumeTable {
   /// Either the outer blocks which will handle suspensions or
   /// "switch-to" handlers.
   handlers : Array[Handle]
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -414,12 +425,13 @@ pub extend ResumeTable with @debug.Debug::{to_repr}
 
 ///|
 /// Handle clauses that can be specified in [`ResumeTable`].
+#derive(Eq, Debug)
 pub(all) enum Handle {
   /// Equivalent of `(on $tag $lbl)`.
   OnLabel(tag~ : UInt32, label~ : UInt32)
   /// Equivalent of `(on $tag switch)`.
   OnSwitch(tag~ : UInt32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

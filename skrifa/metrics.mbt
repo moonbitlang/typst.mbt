@@ -3,12 +3,13 @@
 
 ///|
 /// Metrics for a text decoration.
+#derive(Eq, Debug)
 pub(all) struct Decoration {
   /// Offset to the top of the decoration from the baseline.
   offset : Float
   /// Thickness of the decoration.
   thickness : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -22,12 +23,13 @@ pub extend Decoration with @debug.Debug::{to_repr}
 
 ///|
 /// Bounding box with float coordinates.
+#derive(Eq, Debug)
 pub(all) struct BoundingBox {
   x_min : Float
   y_min : Float
   x_max : Float
   y_max : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -41,6 +43,7 @@ pub extend BoundingBox with @debug.Debug::{to_repr}
 
 ///|
 /// Metrics that apply to all glyphs in a font.
+#derive(Eq, Debug)
 pub(all) struct Metrics {
   /// Number of font design units per em unit.
   mut units_per_em : Int32
@@ -70,7 +73,7 @@ pub(all) struct Metrics {
   mut strikeout : Decoration?
   /// Union of minimum and maximum extents for all glyphs in the font.
   mut bounds : BoundingBox?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

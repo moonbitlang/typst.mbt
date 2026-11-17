@@ -345,15 +345,17 @@ let joiner_flags : UInt32 = indic_category_flag(OT_ZWJ) |
   indic_category_flag(OT_ZWNJ)
 
 ///|
+#derive(Eq)
 priv enum RephPosition {
   AfterMain
   BeforeSub
   AfterSub
   BeforePost
   AfterPost
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum RephMode {
   /// Reph formed out of initial Ra,H sequence.
   Implicit
@@ -361,15 +363,16 @@ priv enum RephMode {
   Explicit
   /// Encoded Repha character, needs reordering.
   LogRepha
-} derive(Eq)
+}
 
 ///|
+#derive(Eq)
 priv enum BlwfMode {
   /// Below-forms feature applied to pre-base and post-base.
   PreAndPost
   /// Below-forms feature applied to post-base only.
   PostOnly
-} derive(Eq)
+}
 
 ///|
 priv struct IndicConfig {

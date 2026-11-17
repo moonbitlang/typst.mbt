@@ -2,7 +2,8 @@
 
 ///|
 /// PostScript string identifier (SID).
-pub(all) struct Sid(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Sid(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

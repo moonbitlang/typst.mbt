@@ -8,6 +8,7 @@ import {
 // Values
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror CssError {
   UnexpectedEndOfStream
   InvalidIdent(TextPos)
@@ -19,25 +20,27 @@ pub(all) suberror CssError {
   UnexpectedCombinator
   InvalidAttributeSelector
   InvalidLanguagePseudoClass
-} derive(Eq, @debug.Debug)
+}
 pub fn CssError::output(Self, &Logger) -> Unit
 pub fn CssError::to_string(Self) -> String
 pub impl Show for CssError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum AttributeOperator {
   Exists
   Matches(String)
   Contains(String)
   StartsWith(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn AttributeOperator::matches(Self, String) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Declaration {
   name : String
   value : String
   important : Bool
-} derive(Eq, @debug.Debug)
+}
 
 pub struct DeclarationTokenizer {
   // private fields
@@ -46,6 +49,7 @@ pub fn DeclarationTokenizer::from(String) -> Self
 pub fn DeclarationTokenizer::iter(Self) -> Iter[Declaration]
 pub fn DeclarationTokenizer::next(Self) -> Declaration?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PseudoClass {
   FirstChild
   Link
@@ -54,20 +58,23 @@ pub(all) enum PseudoClass {
   Active
   Focus
   Lang(String)
-} derive(Eq, @debug.Debug)
+}
 pub impl Show for PseudoClass
 
+#derive(@debug.Debug)
 pub(all) struct Rule {
   selector : Selector
   mut declarations : Array[Declaration]
-} derive(@debug.Debug)
+}
 
-type Selector derive(@debug.Debug)
+#derive(@debug.Debug)
+type Selector
 pub fn[E : Element] Selector::matches(Self, E) -> Bool
 pub fn Selector::parse(String) -> Self?
 pub fn Selector::specificity(Self) -> FixedArray[Byte]
 pub impl Show for Selector
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SelectorToken {
   UniversalSelector
   TypeSelector(String)
@@ -79,7 +86,7 @@ pub(all) enum SelectorToken {
   DescendantCombinator
   ChildCombinator
   AdjacentCombinator
-} derive(Eq, @debug.Debug)
+}
 
 pub struct SelectorTokenizer {
   // private fields
@@ -88,19 +95,21 @@ pub fn SelectorTokenizer::from(String) -> Self
 pub fn SelectorTokenizer::iter(Self) -> Iter[Result[SelectorToken, CssError]]
 pub fn SelectorTokenizer::next(Self) -> Result[SelectorToken, CssError]?
 
+#derive(@debug.Debug)
 pub(all) struct StyleSheet {
   mut rules : Array[Rule]
-} derive(@debug.Debug)
+}
 pub fn StyleSheet::default() -> Self
 pub fn StyleSheet::new() -> Self
 pub fn StyleSheet::parse(String) -> Self
 pub fn StyleSheet::parse_more(Self, String) -> Unit
 pub impl Show for StyleSheet
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TextPos {
   row : UInt32
   col : UInt32
-} derive(Eq, @debug.Debug)
+}
 pub fn TextPos::new(UInt32, UInt32) -> Self
 pub impl Show for TextPos
 

@@ -188,9 +188,10 @@ priv struct Status {
 }
 
 ///|
+#derive(Eq)
 priv enum OverrideStatus {
   Neutral
   RTL
   LTR
   Isolate
-} derive(Eq)
+}

@@ -16,6 +16,7 @@ pub fn parse_font_families(
 
 ///|
 /// A type of font family.
+#derive(Eq, Debug, Hash)
 pub(all) enum FontFamily {
   /// A serif font.
   Serif
@@ -29,7 +30,7 @@ pub(all) enum FontFamily {
   Monospace
   /// A custom named font.
   Named(String)
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -117,6 +118,7 @@ pub fn Stream::parse_font_families(
 
 ///|
 /// The values of a [`font` shorthand](https://www.w3.org/TR/css-fonts-3/#font-prop).
+#derive(Eq, Debug, Hash)
 pub(all) struct FontShorthand {
   /// The font style.
   font_style : String?
@@ -130,7 +132,7 @@ pub(all) struct FontShorthand {
   font_size : String
   /// The font family.
   font_family : String
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

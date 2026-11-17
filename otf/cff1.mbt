@@ -43,6 +43,7 @@ priv struct CIDMetadata {
 
 ///|
 /// An affine transformation matrix.
+#derive(Eq, Debug)
 pub(all) struct Matrix {
   sx : Float
   ky : Float
@@ -50,7 +51,7 @@ pub(all) struct Matrix {
   sy : Float
   tx : Float
   ty : Float
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

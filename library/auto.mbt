@@ -2,12 +2,13 @@
 
 ///|
 /// A value that can be automatically determined.
+#derive(Eq, Hash, Debug)
 pub(all) enum Smart[T] {
   /// The value should be determined smartly based on the circumstances.
   Auto
   /// A specific value.
   Custom(T)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

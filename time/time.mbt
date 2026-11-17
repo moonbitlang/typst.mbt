@@ -7,13 +7,14 @@
 ///
 /// All minutes are assumed to have exactly 60 seconds; no attempt is made to
 /// handle leap seconds (either positive or negative).
+#derive(Eq, Compare, Hash, Debug)
 pub struct Time {
   // The order of these fields matters for the derived `Compare`.
   priv hour : Int32
   priv minute : Int32
   priv second : Int32
   priv nanosecond : Int32
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

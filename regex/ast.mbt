@@ -4,18 +4,20 @@
 ///|
 /// A position in the pattern. `offset` is a UTF-16 index (upstream: byte
 /// offset); `line` and `column` are 1-based, columns count chars.
+#derive(Eq, Compare)
 priv struct Position {
   offset : Int32
   line : Int32
   column : Int32
-} derive(Eq, Compare)
+}
 
 ///|
 /// A span of the pattern.
+#derive(Eq, Compare)
 priv struct Span {
   start : Position
   end : Position
-} derive(Eq, Compare)
+}
 
 ///|
 fn Span::splat(pos : Position) -> Span {
@@ -455,10 +457,11 @@ priv enum RepetitionKind {
 }
 
 ///|
+#derive(Eq)
 priv enum FlagsItemKind {
   Negation
   Flag(Char)
-} derive(Eq)
+}
 
 ///|
 priv struct FlagsItem {

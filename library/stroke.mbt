@@ -3,6 +3,7 @@
 
 ///|
 /// Defines how to draw a line.
+#derive(Eq)
 pub(all) struct Stroke {
   /// The stroke's paint.
   paint : Smart[Paint]
@@ -16,7 +17,7 @@ pub(all) struct Stroke {
   dash : Smart[DashPattern?]
   /// The miter limit.
   miter_limit : Smart[Ratio]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -241,6 +242,7 @@ pub extend Stroke with FromValue::{from_value}
 
 ///|
 /// The line cap of a stroke.
+#derive(Eq, Hash, Debug)
 pub(all) enum LineCap {
   /// Square stroke cap with the edge at the stroke's end point.
   Butt
@@ -248,7 +250,7 @@ pub(all) enum LineCap {
   Round
   /// Square stroke cap centered at the stroke's end point.
   Square
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -337,6 +339,7 @@ pub extend LineCap with FromValue::{from_value}
 
 ///|
 /// The line join of a stroke.
+#derive(Eq, Hash, Debug)
 pub(all) enum LineJoin {
   /// Segments are joined with sharp edges. Sharp bends exceeding the miter
   /// limit are bevelled instead.
@@ -346,7 +349,7 @@ pub(all) enum LineJoin {
   /// Segments are joined with a bevel (a straight edge connecting the butts
   /// of the joined segments).
   Bevel
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -432,12 +435,13 @@ pub extend LineJoin with FromValue::{from_value}
 
 ///|
 /// A line dash pattern.
+#derive(Eq)
 pub(all) struct DashPattern {
   /// The dash array.
   array : Array[DashLength]
   /// The dash phase.
   phase : Length
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -616,10 +620,11 @@ pub extend DashPattern with FromValue::{from_value}
 
 ///|
 /// The length of a dash in a line dash pattern.
+#derive(Eq)
 pub(all) enum DashLength {
   LineWidth
   Length(Length)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

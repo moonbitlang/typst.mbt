@@ -2,7 +2,8 @@
 
 ///|
 /// Defines how the remaining space in a layout is distributed.
-pub(all) struct Fr(Scalar) derive(Default, Eq, Compare, Hash)
+#derive(Default, Eq, Compare, Hash)
+pub(all) struct Fr(Scalar)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

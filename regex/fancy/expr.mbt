@@ -3,6 +3,7 @@
 
 ///|
 /// Regular expression AST. This is public for now but may change.
+#derive(Eq, Debug)
 pub(all) enum Expr {
   /// An empty expression, e.g. the last branch in `(a|b|)`
   Empty
@@ -55,7 +56,7 @@ pub(all) enum Expr {
   /// Unresolved subroutine call to the specified group name (`ix`: the
   /// position in the original regex pattern where the call is made)
   UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -69,6 +70,7 @@ pub extend Expr with @debug.Debug::{to_repr}
 
 ///|
 /// Type of look-around assertion as used for a look-around expression.
+#derive(Eq, Debug)
 pub(all) enum LookAround {
   /// Look-ahead assertion, e.g. `(?=a)`
   LookAhead
@@ -78,7 +80,7 @@ pub(all) enum LookAround {
   LookBehind
   /// Negative look-behind assertion, e.g. `(?<!a)`
   LookBehindNeg
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -92,6 +94,7 @@ pub extend LookAround with @debug.Debug::{to_repr}
 
 ///|
 /// Type of assertions
+#derive(Eq, Debug)
 pub(all) enum Assertion {
   /// Start of input text
   StartText
@@ -109,7 +112,7 @@ pub(all) enum Assertion {
   WordBoundary
   /// Not word boundary
   NotWordBoundary
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

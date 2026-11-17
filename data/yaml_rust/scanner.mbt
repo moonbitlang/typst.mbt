@@ -1,9 +1,10 @@
 // Port of `yaml_rust::scanner` (yaml-rust 0.4.5).
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum TEncoding {
   Utf8
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -16,6 +17,7 @@ pub extend TEncoding with Eq::{not_equal, equal}
 pub extend TEncoding with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum TScalarStyle {
   Any
   Plain
@@ -23,7 +25,7 @@ pub(all) enum TScalarStyle {
   DoubleQuoted
   Literal
   Foled
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -38,11 +40,12 @@ pub extend TScalarStyle with @debug.Debug::{to_repr}
 ///|
 /// A position in the input. `index` counts chars (code points), `line` starts
 /// from 1 and `col` from 0.
+#derive(Eq, Debug)
 pub struct Marker {
   priv index : Int32
   priv line : Int32
   priv col : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,9 +78,10 @@ pub fn Marker::col(self : Marker) -> Int32 {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) suberror ScanError {
   ScanError(mark~ : Marker, info~ : String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -120,6 +124,7 @@ pub impl Show for ScanError with fn output(self, logger) {
 pub extend ScanError with Show::{to_string, output}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum TokenType {
   NoToken
   StreamStart(TEncoding)
@@ -146,7 +151,7 @@ pub(all) enum TokenType {
   /// handle, suffix
   Tag(String, String)
   Scalar(TScalarStyle, String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -159,7 +164,8 @@ pub extend TokenType with Eq::{not_equal, equal}
 pub extend TokenType with @debug.Debug::{to_repr}
 
 ///|
-pub(all) struct Token(Marker, TokenType) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Token(Marker, TokenType)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -2,13 +2,14 @@
 
 ///|
 /// A point in 2D.
+#derive(Eq, Hash, Default)
 #valtype
 pub(all) struct Point {
   /// The x coordinate.
   x : Abs
   /// The y coordinate.
   y : Abs
-} derive(Eq, Hash, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

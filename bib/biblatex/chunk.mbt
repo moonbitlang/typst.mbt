@@ -2,10 +2,11 @@
 
 ///|
 /// A byte range in the source (upstream `std::ops::Range<usize>`).
+#derive(Eq, Debug)
 pub(all) struct Span {
   start : Int32
   end : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,12 +48,13 @@ fn sat_add(a : Int32, b : Int32) -> Int32 {
 ///
 /// Spans can be _detached,_ this means that they deliberately do not point
 /// into the source code.
+#derive(Eq, Debug)
 pub(all) struct Spanned[T] {
   /// The spanned value.
   mut v : T
   /// The location in source code of the value.
   mut span : Span
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -90,6 +92,7 @@ pub fn[T] Spanned::is_detached(self : Spanned[T]) -> Bool {
 
 ///|
 /// Represents one part of a field value.
+#derive(Eq, Debug)
 pub(all) enum Chunk {
   /// Normal values within quotes or single braces subject to
   /// capitalization formatting.
@@ -101,7 +104,7 @@ pub(all) enum Chunk {
   Verbatim(String)
   /// Values nested in dollar signs.
   Math(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

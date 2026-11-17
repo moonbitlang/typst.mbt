@@ -14,7 +14,8 @@
 /// The caller is responsible for providing the correct length.
 /// Due to Wasm validation guided bytecode construction we assert
 /// that the externally stored length is valid.
-pub(all) struct SlotSpan(Slot) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct SlotSpan(Slot)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -74,7 +75,8 @@ pub fn SlotSpan::has_overlapping_copies(
 ///|
 /// A [`SlotSpan`] with a statically known number of [`Slot`] (upstream
 /// `FixedSlotSpan<N>`; only `N = 2` is used by Wasmi's instructions).
-pub(all) struct FixedSlotSpan(SlotSpan) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct FixedSlotSpan(SlotSpan)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -161,12 +163,13 @@ pub fn FixedSlotSpan::len(_self : FixedSlotSpan) -> Int32 {
 
 ///|
 /// A [`SlotSpan`] with a known number of [`Slot`]s.
+#derive(Eq, Compare, Hash, Debug)
 pub(all) struct BoundedSlotSpan {
   /// The first [`Slot`] in `self`.
   span : SlotSpan
   /// The number of [`Slot`] in `self` (upstream `u16`).
   len : Int32
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -231,12 +234,13 @@ pub fn BoundedSlotSpan::is_empty(self : BoundedSlotSpan) -> Bool {
 
 ///|
 /// A [`SlotSpanIter`] iterator yielding contiguous [`Slot`].
+#derive(Eq, Debug)
 pub(all) struct SlotSpanIter {
   /// The next [`Slot`] in the [`SlotSpanIter`].
   mut next : Int32
   /// The last [`Slot`] in the [`SlotSpanIter`].
   mut last : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

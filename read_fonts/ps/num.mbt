@@ -41,6 +41,7 @@ let bcd_power_tens : ReadOnlyArray[Int32] = [
 ///|
 /// Components for computing a fixed point value for a binary coded decimal
 /// number.
+#derive(Eq, Debug)
 pub(all) struct BcdComponents {
   /// If overflow or underflow is detected early, then this contains the
   /// resulting value and we skip further processing.
@@ -51,7 +52,7 @@ pub(all) struct BcdComponents {
   exponent_add : Int32
   integer_len : Int32
   fraction_len : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

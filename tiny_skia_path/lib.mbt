@@ -14,10 +14,11 @@
 /// A point.
 ///
 /// Doesn't guarantee to be finite.
+#derive(Eq, Debug, Default)
 pub(all) struct Point {
   x : Float
   y : Float
-} derive(Eq, Debug, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

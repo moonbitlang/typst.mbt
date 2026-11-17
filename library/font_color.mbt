@@ -661,6 +661,7 @@ fn GlyphPainter::paint_sweep_gradient(
 
 ///|
 /// `tiny_skia_path::Transform` (row form `sx ky kx sy tx ty`).
+#derive(Eq)
 priv struct SkTransform {
   sx : Float
   ky : Float
@@ -668,7 +669,7 @@ priv struct SkTransform {
   sy : Float
   tx : Float
   ty : Float
-} derive(Eq)
+}
 
 ///|
 let sk_identity : SkTransform = {

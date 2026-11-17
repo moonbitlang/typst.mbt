@@ -2,12 +2,13 @@
 
 ///|
 /// An unsigned 128-bit integer (upstream `u128`), used for cache keys.
+#derive(Eq, Hash, Compare, Default, Debug)
 pub(all) struct U128 {
   /// The upper 64 bits.
   hi : UInt64
   /// The lower 64 bits.
   lo : UInt64
-} derive(Eq, Hash, Compare, Default, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

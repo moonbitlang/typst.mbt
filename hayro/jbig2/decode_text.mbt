@@ -692,12 +692,13 @@ priv struct TextRegionHuffmanTables {
 
 ///|
 /// Reference corner for symbol placement.
+#derive(Eq)
 priv enum ReferenceCorner {
   BottomLeft
   TopLeft
   BottomRight
   TopRight
-} derive(Eq)
+}
 
 ///|
 fn ReferenceCorner::from_byte(value : Int32) -> ReferenceCorner {

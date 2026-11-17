@@ -14,6 +14,7 @@
 
 ///|
 /// A kerning pair.
+#derive(Debug)
 pub(all) struct KerningPair {
   /// Glyphs pair.
   ///
@@ -22,7 +23,7 @@ pub(all) struct KerningPair {
   pair : UInt32
   /// Kerning value.
   value : Int16
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

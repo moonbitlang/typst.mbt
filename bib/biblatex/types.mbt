@@ -5,12 +5,13 @@
 ///|
 /// An error that may occur while parsing the chunks in a field into a
 /// specific type.
+#derive(Eq, Debug)
 pub(all) struct TypeError {
   /// Where in the source the error occurred.
   span : Span
   /// What kind of error occurred.
   kind : TypeErrorKind
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -51,6 +52,7 @@ pub extend TypeError with Show::{to_string, output}
 ///|
 /// Error conditions that might occur while parsing the chunks in a field
 /// into a specific type.
+#derive(Eq, Debug)
 pub(all) enum TypeErrorKind {
   /// The date range was open on both sides.
   UndefinedRange
@@ -78,7 +80,7 @@ pub(all) enum TypeErrorKind {
   UnknownLangId
   /// The year 0 CE or BCE does not exist.
   YearZeroCE
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -269,7 +271,8 @@ pub fn string_to_chunks(s : String) -> Chunks {
 
 ///|
 /// An integer range (upstream `Range<u32>`).
-pub(all) struct IntRange(Int64, Int64) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct IntRange(Int64, Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -406,12 +409,13 @@ pub fn ranges_to_chunks(ranges : Array[IntRange]) -> Chunks {
 
 ///|
 /// A value that could be either a typed value or a literal string.
+#derive(Eq, Debug)
 pub(all) enum PermissiveType[T] {
   /// A typed version of the value.
   Typed(T)
   /// A literal string, for example `"Reprinted, and revised edition"`.
   Chunks(Chunks)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -462,6 +466,7 @@ pub fn parse_languages(
 
 ///|
 /// Defines the pagination scheme to use for formatting purposes.
+#derive(Eq, Debug)
 pub(all) enum Pagination {
   Page
   Column
@@ -469,7 +474,7 @@ pub(all) enum Pagination {
   Verse
   Section
   Paragraph
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -521,6 +526,7 @@ pub fn parse_pagination(
 /// Which role the according editor had.
 ///
 /// The value of the `editor` through `editorc` fields.
+#derive(Eq, Debug)
 pub(all) enum EditorType {
   Editor
   Compiler
@@ -532,7 +538,7 @@ pub(all) enum EditorType {
   Organizer
   Director
   Unknown(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -590,6 +596,7 @@ pub fn parse_editor_type(
 
 ///|
 /// Gender of the author or editor (if no author was specified).
+#derive(Eq, Debug)
 pub(all) enum Gender {
   SingularFemale
   SingularMale
@@ -597,7 +604,7 @@ pub(all) enum Gender {
   PluralFemale
   PluralMale
   PluralNeuter
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

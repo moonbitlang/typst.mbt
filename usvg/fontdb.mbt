@@ -10,11 +10,12 @@ pub type FontId = Int32
 
 ///|
 /// A font style (upstream `fontdb::Style`).
+#derive(Eq)
 pub(all) enum DbStyle {
   Normal
   Italic
   Oblique
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

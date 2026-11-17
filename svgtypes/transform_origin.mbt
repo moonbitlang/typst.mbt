@@ -35,6 +35,7 @@ fn Position::into_length(self : Position) -> Length {
 /// Representation of the [`<transform-origin>`] type.
 ///
 /// [`<transform-origin>`]: https://drafts.csswg.org/css-transforms/#transform-origin-property
+#derive(Eq, Debug)
 pub(all) struct TransformOrigin {
   /// The x offset of the transform origin.
   x_offset : Length
@@ -42,7 +43,7 @@ pub(all) struct TransformOrigin {
   y_offset : Length
   /// The z offset of the transform origin.
   z_offset : Length
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -66,6 +67,7 @@ pub fn TransformOrigin::new(
 
 ///|
 /// List of possible [`TransformOrigin`] parsing errors.
+#derive(Eq, Debug)
 pub(all) suberror TransformOriginError {
   /// One of the numbers is invalid.
   MissingParameters
@@ -73,7 +75,7 @@ pub(all) suberror TransformOriginError {
   InvalidParameters
   /// z-index is not a percentage.
   ZIndexIsPercentage
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

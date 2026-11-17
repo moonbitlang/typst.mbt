@@ -79,13 +79,14 @@ pub let name_id_variations_post_script_name_prefix : UInt16 = 25
 
 ///|
 /// A [platform ID](https://docs.microsoft.com/en-us/typography/opentype/spec/name#platform-ids).
+#derive(Eq, Debug)
 pub(all) enum PlatformId {
   Unicode
   Macintosh
   Iso
   Windows
   Custom
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -110,10 +110,11 @@ pub fn[T] Store::set_data(self : Store[T], data : T) -> Unit {
 
 ///|
 /// A Wasm or host function reference.
+#derive(Eq, Hash)
 pub(all) struct Func {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -139,10 +140,11 @@ pub extend Func with Show::{to_string, output}
 
 ///|
 /// A Wasm linear memory reference.
+#derive(Eq, Hash)
 pub(all) struct Memory {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -168,10 +170,11 @@ pub extend Memory with Show::{to_string, output}
 
 ///|
 /// A Wasm table reference.
+#derive(Eq, Hash)
 pub(all) struct Table {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -197,10 +200,11 @@ pub extend Table with Show::{to_string, output}
 
 ///|
 /// A Wasm global variable reference.
+#derive(Eq, Hash)
 pub(all) struct Global {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -226,10 +230,11 @@ pub extend Global with Show::{to_string, output}
 
 ///|
 /// An instantiated WebAssembly [`Module`].
+#derive(Eq, Hash)
 pub(all) struct Instance {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -255,10 +260,11 @@ pub extend Instance with Show::{to_string, output}
 
 ///|
 /// A reference to a data segment.
+#derive(Eq, Hash)
 pub(all) struct DataSegment {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -272,10 +278,11 @@ pub extend DataSegment with Hash::{hash, hash_combine}
 
 ///|
 /// A reference to an element segment.
+#derive(Eq, Hash)
 pub(all) struct ElementSegment {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -289,10 +296,11 @@ pub extend ElementSegment with Hash::{hash, hash_combine}
 
 ///|
 /// Represents an opaque reference to any data within WebAssembly.
+#derive(Eq, Hash)
 pub(all) struct ExternRef {
   priv store : Int32
   priv idx : Int32
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -324,11 +332,12 @@ pub(all) struct ExternRefEntity {
 
 ///|
 /// An opaque value of any type (a stand-in for Rust's `dyn Any`).
+#derive(Eq)
 pub(all) enum Any {
   U32(UInt32)
   Str(String)
   Other
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -616,6 +625,7 @@ pub fn StoreInner::externref_from_untyped(
 
 ///|
 /// Runtime representation of a Wasm value.
+#derive(Eq)
 pub(all) enum Val {
   /// Value of 32-bit signed or unsigned integer.
   I32(Int32)
@@ -631,7 +641,7 @@ pub(all) enum Val {
   FuncRef(Func?)
   /// A nullable [`ExternRef`] reference.
   ExternRef(ExternRef?)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

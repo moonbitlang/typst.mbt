@@ -118,13 +118,14 @@ pub fn FontMetrics::vertical(
 
 ///|
 /// Metrics for a decorative line.
+#derive(Eq)
 pub(all) struct LineMetrics {
   /// The vertical offset of the line from the baseline. Positive goes
   /// upwards, negative downwards.
   position : Em
   /// The thickness of the line.
   thickness : Em
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -133,6 +134,7 @@ pub extend LineMetrics with Eq::{not_equal, equal}
 
 ///|
 /// Metrics for subscripts or superscripts.
+#derive(Eq)
 pub(all) struct ScriptMetrics {
   /// The width of those scripts, relative to the outer font size.
   width : Em
@@ -147,7 +149,7 @@ pub(all) struct ScriptMetrics {
   ///
   /// For superscripts, this is positive. For subscripts, this is negative.
   vertical_offset : Em
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -451,6 +453,7 @@ fn MathConstants::fallback(
 
 ///|
 /// Identifies a vertical metric of a font.
+#derive(Eq, Hash, Debug)
 pub(all) enum VerticalFontMetric {
   /// The font's ascender, which typically exceeds the height of all glyphs.
   Ascender
@@ -462,7 +465,7 @@ pub(all) enum VerticalFontMetric {
   Baseline
   /// The font's ascender, which typically exceeds the depth of all glyphs.
   Descender
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

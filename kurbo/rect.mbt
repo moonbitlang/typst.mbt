@@ -2,6 +2,7 @@
 
 ///|
 /// A rectangle.
+#derive(Eq, Debug)
 pub(all) struct Rect {
   /// The minimum x coordinate (left edge).
   x0 : Double
@@ -11,7 +12,7 @@ pub(all) struct Rect {
   x1 : Double
   /// The maximum y coordinate (bottom edge in y-down spaces).
   y1 : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -117,6 +117,7 @@ fn GroupingRule::finish(
 
 ///|
 /// Defines the effect of an element on a grouping.
+#derive(Eq)
 priv enum GroupingEffect {
   /// The element will trigger this kind of grouping.
   Trigger
@@ -134,7 +135,7 @@ priv enum GroupingEffect {
   Neutral
   /// The element will stop this kind of grouping.
   Interrupt
-} derive(Eq)
+}
 
 ///|
 /// A started grouping of some elements.

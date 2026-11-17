@@ -211,12 +211,13 @@ fn parse_refinement_at_pixels(
 /// - Generic refinement regions: `GRTEMPLATE` (7.4.7.2)
 /// - Symbol dictionaries: `SDRTEMPLATE` (7.4.2.1.1)
 /// - Text regions: `SBRTEMPLATE` (7.4.3.1.1)
+#derive(Eq)
 priv enum RefinementTemplate {
   /// Template 0: 13 pixels (6.3.5.3, Figure 12)
   RTemplate0
   /// Template 1: 10 pixels (6.3.5.3, Figure 13)
   RTemplate1
-} derive(Eq)
+}
 
 ///|
 fn RefinementTemplate::from_byte(value : Int32) -> RefinementTemplate {

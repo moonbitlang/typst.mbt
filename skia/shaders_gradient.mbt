@@ -8,10 +8,11 @@ let degenerate_threshold : Float = 1.0 / Float::from_int(1 << 15)
 
 ///|
 /// A gradient point.
+#derive(Eq)
 pub(all) struct GradientStop {
   position : Float
   color : Color
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -390,11 +391,12 @@ fn sdot(a : Float, b : Float, c : Float, d : Float) -> Float {
 // radial_gradient.rs
 
 ///|
+#derive(Eq)
 struct FocalData {
   r1 : Float // r1 after mapping focal point to (0, 0)
   focal_x : Float // f
   is_swapped : Bool
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

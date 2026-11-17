@@ -5,6 +5,7 @@
 
 ///|
 /// A data filter.
+#derive(Eq, Debug)
 pub(all) enum Filter {
   /// ASCII hexadecimal encoding.
   AsciiHexDecode
@@ -26,7 +27,7 @@ pub(all) enum Filter {
   JpxDecode
   /// Encryption filter.
   Crypt
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

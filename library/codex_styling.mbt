@@ -10,6 +10,7 @@
 /// Notation in mathematics uses a basic set of characters which can be
 /// styled. See the upstream documentation for the supported characters of
 /// each style.
+#derive(Eq, Hash, Debug)
 pub(all) enum MathStyle {
   /// Unstyled default. May be serif or sans-serif depending on the font.
   Plain
@@ -62,7 +63,7 @@ pub(all) enum MathStyle {
   BoldRoundhand
   /// Hebrew letterlike math symbols.
   Hebrew
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

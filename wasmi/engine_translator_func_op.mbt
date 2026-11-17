@@ -6,6 +6,7 @@
 ///|
 /// The kind of the value stored by a store operator (upstream `Value`,
 /// `Wrapped` and `Param` associated types).
+#derive(Eq)
 pub(all) enum StoreValueKind {
   /// `i32.store` (value `i32`, immediate `i16`).
   I32
@@ -21,7 +22,7 @@ pub(all) enum StoreValueKind {
   I64Wrap16
   /// `i64.store32` (value `i64` wrapped to `i32`, immediate `i16`).
   I64Wrap32
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

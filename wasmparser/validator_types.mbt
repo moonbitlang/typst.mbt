@@ -9,9 +9,10 @@
 ///|
 /// Represents a unique identifier for a core type type known to a
 /// [`crate::Validator`].
+#derive(Eq, Hash, Compare, Debug)
 pub(all) struct CoreTypeId {
   index : UInt32
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -47,9 +48,10 @@ pub fn CoreTypeId::index(self : CoreTypeId) -> Int32 {
 ///|
 /// Represents a unique identifier for a recursion group type known to a
 /// [`crate::Validator`].
+#derive(Eq, Hash, Compare, Debug)
 pub(all) struct RecGroupId {
   index : UInt32
-} derive(Eq, Hash, Compare, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -153,6 +155,7 @@ fn SubType::type_info(self : SubType) -> TypeInfo {
 
 ///|
 /// A core WebAssembly entity type.
+#derive(Eq, Debug)
 pub(all) enum EntityType {
   /// The entity is a function.
   Func(CoreTypeId)
@@ -164,7 +167,7 @@ pub(all) enum EntityType {
   Global(GlobalType)
   /// The entity is a tag.
   Tag(CoreTypeId)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

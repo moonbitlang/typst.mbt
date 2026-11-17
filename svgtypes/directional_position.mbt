@@ -2,6 +2,7 @@
 
 ///|
 /// List of all SVG directional positions.
+#derive(Eq, Debug, Hash)
 pub(all) enum DirectionalPosition {
   /// The `top` position.
   Top
@@ -13,7 +14,7 @@ pub(all) enum DirectionalPosition {
   Right
   /// The `left` position.
   Left
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

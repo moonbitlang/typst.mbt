@@ -2,6 +2,7 @@
 
 ///|
 /// A PostScript object.
+#derive(Eq, Debug)
 pub(all) enum Object {
   /// A number object.
   Number(Number)
@@ -11,7 +12,7 @@ pub(all) enum Object {
   String(PsString)
   /// An array object.
   Array(PsArray)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

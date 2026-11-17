@@ -75,13 +75,14 @@ pub fn Timestamp::new_local(
 
 ///|
 /// A timezone.
+#derive(Eq)
 pub(all) enum Timezone {
   /// The UTC timezone.
   UTC
   /// The local timezone offset from UTC (hours and minutes; the minute
   /// offset has the same sign as the hour offset).
   Local(Int32, Int32)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

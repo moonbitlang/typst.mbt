@@ -4,6 +4,7 @@
 /// JPEG markers.
 ///
 /// **NOTE** This doesn't cover all markers, just the ones zune-jpeg supports.
+#derive(Eq)
 priv enum Marker {
   /// Start of frame markers (only 0..=2 are produced by `from_u8`).
   SOF(Int32)
@@ -31,7 +32,7 @@ priv enum Marker {
   COM
   /// Unknown markers.
   UNKNOWN(Int32)
-} derive(Eq)
+}
 
 ///|
 /// Upstream `Marker::from_u8` (which always returns `Some`).

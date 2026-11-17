@@ -5,10 +5,11 @@
 
 ///|
 /// A parsed, serialized URL.
+#derive(Eq, Hash, Debug)
 pub(all) struct Url {
   /// The serialization of the URL.
   serialization : String
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -37,6 +38,7 @@ pub extend Url with Show::{to_string, output}
 
 ///|
 /// Errors that can occur during parsing (`url::ParseError`).
+#derive(Eq, Debug)
 pub(all) enum UrlParseError {
   EmptyHost
   IdnaError
@@ -45,7 +47,7 @@ pub(all) enum UrlParseError {
   InvalidIpv6Address
   InvalidDomainCharacter
   RelativeUrlWithoutBase
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

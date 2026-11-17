@@ -2,7 +2,8 @@
 
 ///|
 /// A ratio of a whole.
-pub(all) struct Ratio(Scalar) derive(Default, Eq, Compare, Hash)
+#derive(Default, Eq, Compare, Hash)
+pub(all) struct Ratio(Scalar)
 
 ///|
 #deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")

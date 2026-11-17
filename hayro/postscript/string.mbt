@@ -1,17 +1,19 @@
 // Port of `hayro-postscript/src/string.rs`.
 
 ///|
+#derive(Eq, Debug)
 priv enum StringInner {
   Literal(BytesView)
   Hex(BytesView)
   Ascii85(BytesView)
-} derive(Eq, Debug)
+}
 
 ///|
 /// A PostScript string object (upstream `String`).
+#derive(Eq, Debug)
 pub struct PsString {
   priv inner : StringInner
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

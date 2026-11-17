@@ -4,6 +4,7 @@
 
 ///|
 /// Word break categories (as in unicode-segmentation 1.12).
+#derive(Eq)
 priv enum WordCat {
   Any
   ALetter
@@ -24,7 +25,7 @@ priv enum WordCat {
   Single_Quote
   WSegSpace
   ZWJ
-} derive(Eq)
+}
 
 ///|
 let word_cats : ReadOnlyArray[WordCat] = word_cat_names.map(fn(name) {
@@ -73,6 +74,7 @@ fn seg_is_alphanumeric(c : Int32) -> Bool {
 
 ///|
 // state machine for word boundary rules
+#derive(Eq)
 priv enum WordBoundsState {
   Start
   Letter
@@ -85,25 +87,27 @@ priv enum WordBoundsState {
   Zwj
   Emoji
   WSegSpace
-} derive(Eq)
+}
 
 ///|
 // subtypes for FormatExtend state in UWordBoundsState
 // (`AcceptAny` is never constructed and omitted.)
+#derive(Eq)
 priv enum FormatExtendType {
   AcceptNone
   RequireLetter
   RequireHLetter
   AcceptQLetter
   RequireNumeric
-} derive(Eq)
+}
 
 ///|
 // (`Unknown` only occurs on backward iteration, which is not ported.)
+#derive(Eq)
 priv enum RegionalState {
   Half
   Full
-} derive(Eq)
+}
 
 ///|
 /// The length (in UTF-16 code units) of the next word-bound segment of

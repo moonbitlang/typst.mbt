@@ -274,6 +274,7 @@ fn int64_to_bytes(n : Int64, endian : Endianness) -> FixedArray[Byte] {
 ///|
 /// Represents the byte order used for converting integers and floats to bytes
 /// and vice versa.
+#derive(Eq, Hash, Debug)
 pub(all) enum Endianness {
   /// Big-endian byte order: The highest-value byte is at the beginning of the
   /// bytes.
@@ -281,7 +282,7 @@ pub(all) enum Endianness {
   /// Little-endian byte order: The lowest-value byte is at the beginning of
   /// the bytes.
   Little
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

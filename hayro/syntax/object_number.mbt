@@ -8,10 +8,11 @@ let powers_of_10 : ReadOnlyArray[Double] = [
 
 ///|
 /// A number.
+#derive(Eq, Debug)
 pub(all) enum Number {
   Real(Double)
   Integer(Int64)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

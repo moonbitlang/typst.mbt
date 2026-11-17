@@ -5,6 +5,7 @@
 ///
 /// When parsed through [`Person::parse`], the whitespace is trimmed from the
 /// fields.
+#derive(Eq, Debug)
 pub(all) struct Person {
   /// The surname / family name / last name.
   name : String
@@ -25,7 +26,7 @@ pub(all) struct Person {
   /// Whether the prefix of this name should be considered part of the family
   /// name.
   use_prefix : Bool?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

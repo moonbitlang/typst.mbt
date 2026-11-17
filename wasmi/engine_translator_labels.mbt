@@ -3,7 +3,8 @@
 
 ///|
 /// A reference to an encoded [`Op`] (its index in the instruction sequence).
-pub(all) struct Instr(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Instr(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -60,7 +61,8 @@ priv enum Label {
 
 ///|
 /// A reference to an [`Label`].
-pub(all) struct LabelRef(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct LabelRef(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

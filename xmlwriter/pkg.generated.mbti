@@ -10,17 +10,19 @@ import {
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Indent {
   None
   Spaces(Int32)
   Tabs
-} derive(Eq, @debug.Debug)
+}
 
+#derive(@debug.Debug)
 pub(all) struct Options {
   use_single_quote : Bool
   indent : Indent
   attributes_indent : Indent
-} derive(@debug.Debug)
+}
 pub fn Options::default() -> Self
 pub impl Default for Options
 

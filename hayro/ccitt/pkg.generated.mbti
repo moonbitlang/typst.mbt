@@ -9,12 +9,13 @@ import {
 pub fn[D : Decoder] decode(BytesView, D, DecoderContext) -> Int32 raise DecodeError
 
 // Errors
+#derive(Eq)
 pub(all) suberror DecodeError {
   UnexpectedEof
   InvalidCode
   LineLengthMismatch
   Overflow
-} derive(Eq)
+}
 pub impl Show for DecodeError
 
 // Types and methods
@@ -33,11 +34,12 @@ pub struct DecoderContext {
 }
 pub fn DecoderContext::new(DecodeSettings) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum EncodingMode {
   Group4
   Group3_1D
   Group3_2D(k~ : UInt32)
-} derive(Eq, @debug.Debug)
+}
 
 // Type aliases
 

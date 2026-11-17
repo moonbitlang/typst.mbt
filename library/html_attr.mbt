@@ -7,7 +7,8 @@
 
 ///|
 /// An attribute of an HTML element.
-pub struct HtmlAttr(String) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct HtmlAttr(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -117,7 +118,8 @@ pub extend HtmlAttr with FromValue::{from_value}
 /// Upstream this is a copy-on-write `EcoVec`; here the methods that modify
 /// the list mutate it in place, so callers must [HtmlAttrs::copy] a shared
 /// list first.
-pub struct HtmlAttrs(Array[(HtmlAttr, String)]) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct HtmlAttrs(Array[(HtmlAttr, String)])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

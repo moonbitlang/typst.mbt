@@ -2,6 +2,7 @@
 
 ///|
 /// List of all SVG length units.
+#derive(Eq, Debug, Hash)
 pub(all) enum LengthUnit {
   None
   Em
@@ -13,7 +14,7 @@ pub(all) enum LengthUnit {
   Pt
   Pc
   Percent
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -34,10 +35,11 @@ pub extend LengthUnit with Hash::{hash, hash_combine}
 /// Representation of the [`<length>`] type.
 ///
 /// [`<length>`]: https://www.w3.org/TR/SVG2/types.html#InterfaceSVGLength
+#derive(Eq, Debug)
 pub(all) struct Length {
   number : Double
   unit : LengthUnit
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

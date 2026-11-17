@@ -1,11 +1,12 @@
 // Port of `tiny-skia/src/edge_builder.rs`.
 
 ///|
+#derive(Eq)
 enum Combine {
   No
   Partial
   Total
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -6,10 +6,11 @@
 ///|
 /// Similar to `Option<i64>`, but the default value casts to `10` rather than
 /// `none`, so that the right default value is documented.
+#derive(Eq, Debug)
 pub(all) enum Base {
   Default
   User(Int64)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,6 +76,7 @@ pub extend Base with FromValue::{from_value}
 
 ///|
 /// Rust's `std::num::IntErrorKind`.
+#derive(Eq, Debug)
 pub(all) suberror IntErrorKind {
   /// Value being parsed is empty.
   Empty
@@ -86,7 +88,7 @@ pub(all) suberror IntErrorKind {
   NegOverflow
   /// Value was zero (for non-zero types).
   Zero
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -5,6 +5,7 @@
 
 ///|
 /// The kind of a JSON syntax error (upstream `ErrorCode`).
+#derive(Eq, Debug)
 pub(all) enum ErrorCode {
   EofWhileParsingList
   EofWhileParsingObject
@@ -26,7 +27,7 @@ pub(all) enum ErrorCode {
   TrailingCharacters
   UnexpectedEndOfHexEscape
   RecursionLimitExceeded
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,9 +76,10 @@ pub extend ErrorCode with Show::{to_string, output}
 ///|
 /// A JSON syntax error with its 1-based line and 0-based byte column
 /// (upstream `serde_json::Error`).
+#derive(Debug)
 pub(all) suberror JsonError {
   JsonError(code~ : ErrorCode, line~ : Int32, column~ : Int32)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

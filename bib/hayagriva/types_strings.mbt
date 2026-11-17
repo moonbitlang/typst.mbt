@@ -4,12 +4,13 @@
 /// A string for presentation.
 ///
 /// It can contain an optional short version and control case folding.
+#derive(Eq, Hash, Debug)
 pub(all) struct FormatString {
   /// The canonical version of the string.
   value : ChunkedString
   /// The short version of the string.
   short : ChunkedString?
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -98,7 +99,8 @@ pub fn FormatString::from_str(
 
 ///|
 /// A string whose elements can set whether they do case folding.
-pub(all) struct ChunkedString(Array[StringChunk]) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ChunkedString(Array[StringChunk])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -283,7 +285,8 @@ fn is_chunk_control(c : Char) -> Bool {
 ///
 /// Occurs when there are unbalanced braces. The field contains the position
 /// of the unmatched closing brace.
-pub(all) struct ChunkedStrParseError(Int32) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct ChunkedStrParseError(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -367,12 +370,13 @@ pub extend ChunkedString with Show::{to_string, output}
 
 ///|
 /// A chunk of a string.
+#derive(Eq, Hash, Debug)
 pub(all) struct StringChunk {
   /// The string value.
   mut value : String
   /// Whether the chunk is subject to case folding or contains math.
   kind : ChunkKind
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -469,6 +473,7 @@ fn[W : FmtWrite] StringChunk::fmt_serialized(
 
 ///|
 /// The kind of a string chunk.
+#derive(Eq, Hash, Debug)
 pub(all) enum ChunkKind {
   /// Case-folding will be applied.
   Normal
@@ -476,7 +481,7 @@ pub(all) enum ChunkKind {
   Verbatim
   /// The contained markup is expected to be evaluated using Typst.
   Math
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

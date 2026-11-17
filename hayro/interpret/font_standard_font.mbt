@@ -2,6 +2,7 @@
 
 ///|
 /// The 14 standard fonts of PDF.
+#derive(Eq, Debug)
 pub(all) enum StandardFont {
   /// Helvetica.
   Helvetica
@@ -31,7 +32,7 @@ pub(all) enum StandardFont {
   ZapfDingBats
   /// Symbol - a mathematical symbol font.
   Symbol
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

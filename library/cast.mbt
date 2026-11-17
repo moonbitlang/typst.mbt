@@ -2,6 +2,7 @@
 
 ///|
 /// Describes a possible value for a cast.
+#derive(Eq)
 pub(all) enum CastInfo {
   /// Any value is okay.
   Any
@@ -11,7 +12,7 @@ pub(all) enum CastInfo {
   Type(Type)
   /// Multiple alternatives.
   Union(Array[CastInfo])
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

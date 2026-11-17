@@ -6,10 +6,11 @@
 /// # Guarantees
 ///
 /// - Width and height are positive and non-zero.
+#derive(Eq, Debug, Hash)
 pub struct IntSize {
   priv width : UInt32
   priv height : UInt32
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -128,10 +129,11 @@ fn size_scale(s1 : IntSize, s2 : IntSize, expand : Bool) -> IntSize {
 /// # Guarantees
 ///
 /// - Width and height are positive, non-zero and finite.
+#derive(Eq, Debug, Hash)
 pub struct Size {
   priv width : NonZeroPositiveF32
   priv height : NonZeroPositiveF32
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

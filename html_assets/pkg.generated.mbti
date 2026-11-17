@@ -49,23 +49,27 @@ pub fn ElemInfo::attributes(Self) -> Array[AttrInfo]
 pub fn ElemInfo::get_attr(Self, String) -> AttrInfo?
 pub fn ElemInfo::new(String, String, Array[Int32]) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Form {
   Infix
   Prefix
   Postfix
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct OperatorInfo {
   form : Form?
   lspace : Double
   rspace : Double
   properties : Properties
-} derive(Eq, @debug.Debug)
+}
 pub fn OperatorInfo::of(String, Form, Bool) -> Self
 
-pub(all) struct Properties(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct Properties(Int32)
 pub fn Properties::contains(Self, Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Type {
   Presence
   None_
@@ -92,7 +96,7 @@ pub(all) enum Type {
   Strings(Int32, Int32)
   Union(Array[Type])
   List(Type, Char, Bool)
-} derive(Eq, @debug.Debug)
+}
 
 // Type aliases
 

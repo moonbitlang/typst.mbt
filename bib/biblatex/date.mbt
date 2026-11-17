@@ -2,6 +2,7 @@
 
 ///|
 /// A date or a range of dates and their certainty and exactness.
+#derive(Eq, Debug)
 pub(all) struct Date {
   /// The date or the date range.
   value : DateValue
@@ -9,7 +10,7 @@ pub(all) struct Date {
   uncertain : Bool
   /// Indicates the specificity of the date value.
   approximate : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -23,6 +24,7 @@ pub extend Date with @debug.Debug::{to_repr}
 
 ///|
 /// A single date or a range of dates.
+#derive(Eq, Debug)
 pub(all) enum DateValue {
   /// A single date.
   At(Datetime)
@@ -32,7 +34,7 @@ pub(all) enum DateValue {
   Before(Datetime)
   /// A range of dates with known start and end.
   Between(Datetime, Datetime)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -48,6 +50,7 @@ pub extend DateValue with @debug.Debug::{to_repr}
 /// Timezone-unaware date and time.
 ///
 /// Must specify a year and may specify month, day, and time.
+#derive(Eq, Debug)
 pub(all) struct Datetime {
   /// The year.
   ///
@@ -61,7 +64,7 @@ pub(all) struct Datetime {
   day : Int32?
   /// The timezone-unaware time.
   time : Time?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -75,6 +78,7 @@ pub extend Datetime with @debug.Debug::{to_repr}
 
 ///|
 /// A potentially timezone aware time.
+#derive(Eq, Debug)
 pub(all) struct Time {
   /// The hour (0-23).
   hour : Int32
@@ -84,7 +88,7 @@ pub(all) struct Time {
   second : Int32
   /// An optional timezone offset.
   offset : TimeOffset?
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -98,12 +102,13 @@ pub extend Time with @debug.Debug::{to_repr}
 
 ///|
 /// A timezone offset.
+#derive(Eq, Debug)
 pub(all) enum TimeOffset {
   /// Time is UTC. Do not assume an origin timezone.
   Utc
   /// Offset relative to UTC. Positiveness, hour, and minute.
   Offset(positive~ : Bool, hours~ : Int32, minutes~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

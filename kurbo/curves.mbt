@@ -3,12 +3,13 @@
 
 ///|
 /// A single line.
+#derive(Eq, Debug)
 pub(all) struct Line {
   /// The line's start point.
   p0 : Point
   /// The line's end point.
   p1 : Point
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -34,11 +35,12 @@ pub fn Line::eval(self : Line, t : Double) -> Point {
 
 ///|
 /// A single quadratic Bézier segment.
+#derive(Eq, Debug)
 pub(all) struct QuadBez {
   p0 : Point
   p1 : Point
   p2 : Point
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -91,12 +93,13 @@ pub fn QuadBez::extrema(self : QuadBez) -> Array[Double] {
 
 ///|
 /// A single cubic Bézier segment.
+#derive(Eq, Debug)
 pub(all) struct CubicBez {
   p0 : Point
   p1 : Point
   p2 : Point
   p3 : Point
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -565,12 +568,13 @@ pub fn CubicBez::inflections(self : CubicBez) -> Array[Double] {
 
 ///|
 /// Classification result for cusp detection.
+#derive(Eq, Debug)
 pub(all) enum CuspType {
   /// Cusp is a loop.
   Loop
   /// Cusp has two closely spaced inflection points.
   DoubleInflection
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

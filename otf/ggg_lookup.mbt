@@ -123,7 +123,8 @@ pub fn[T : LookupSubtable] LookupSubtablesIter::next(
 
 ///|
 /// Lookup table flags.
-pub(all) struct LookupFlags(UInt16) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct LookupFlags(UInt16)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

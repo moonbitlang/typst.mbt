@@ -3,23 +3,25 @@
 
 ///|
 /// `yaml_error_type_t` (memory errors cannot happen here).
+#derive(Eq)
 priv enum ErrorType {
   NoError
   ReaderError
   ScannerError
   ParserError
-} derive(Eq)
+}
 
 ///|
 /// `yaml_scalar_style_t` (without `YAML_ANY_SCALAR_STYLE`, which the parser
 /// never produces).
+#derive(Eq)
 priv enum ScalarStyle {
   Plain
   SingleQuoted
   DoubleQuoted
   Literal
   Folded
-} derive(Eq)
+}
 
 ///|
 /// `yaml_token_t` payloads (`yaml_token_type_t` plus `data`).
@@ -70,6 +72,7 @@ priv struct SimpleKey {
 /// `yaml_parser_state_t` (without the states libyaml never enters,
 /// `YAML_PARSE_BLOCK_NODE_OR_INDENTLESS_SEQUENCE_STATE` and
 /// `YAML_PARSE_FLOW_NODE_STATE`).
+#derive(Eq)
 priv enum ParserState {
   StreamStartState
   ImplicitDocumentStartState
@@ -93,7 +96,7 @@ priv enum ParserState {
   FlowMappingValueState
   FlowMappingEmptyValueState
   EndState
-} derive(Eq)
+}
 
 ///|
 /// `yaml_event_t` payloads, converted the way

@@ -2,12 +2,13 @@
 
 ///|
 /// List of all SVG angle units.
+#derive(Eq, Debug, Hash)
 pub(all) enum AngleUnit {
   Degrees
   Gradians
   Radians
   Turns
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -28,10 +29,11 @@ pub extend AngleUnit with Hash::{hash, hash_combine}
 /// Representation of the [`<angle>`] type.
 ///
 /// [`<angle>`]: https://www.w3.org/TR/css-values-3/#angles
+#derive(Eq, Debug)
 pub(all) struct Angle {
   number : Double
   unit : AngleUnit
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -76,11 +76,12 @@ pub fn TableElem::with_summary(
 
 ///|
 /// Any child of a table element.
+#derive(Eq)
 pub(all) enum TableChild {
   Header(Content)
   Footer(Content)
   Item(TableItem)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -159,11 +160,12 @@ pub fn TableChild::try_from(value : Content) -> TableChild raise HintedError {
 
 ///|
 /// A table item, which is the basic unit of table specification.
+#derive(Eq)
 pub(all) enum TableItem {
   HLine(Content)
   VLine(Content)
   Cell(Content)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -347,11 +349,12 @@ pub extend TableCell with FromValue::{from_value}
 ///
 /// The full Typst table model only supports header and footer rows, this is
 /// currently only used for PDF export.
+#derive(Eq, Hash, Debug)
 pub(all) enum TableCellKind {
   Header(NonZeroU32, TableHeaderScope)
   Footer
   Data
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -412,6 +415,7 @@ fn kind_from_value(value : Value) -> Smart[TableCellKind] {
 
 ///|
 /// Which table track a header cell labels.
+#derive(Eq, Hash, Debug)
 pub(all) enum TableHeaderScope {
   /// The header cell refers to both the row and the column.
   Both
@@ -419,7 +423,7 @@ pub(all) enum TableHeaderScope {
   Column
   /// The header cell refers to the row.
   Row
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

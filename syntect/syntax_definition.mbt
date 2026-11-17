@@ -7,12 +7,13 @@ pub type CaptureMapping = Array[(Int32, Array[Scope])]
 
 ///|
 /// An opaque ID for a [`Context`].
+#derive(Eq, Hash, Debug)
 pub(all) struct ContextId {
   /// Index into [`SyntaxSet::syntaxes`]
   syntax_index : Int32
   /// Index into the contexts of the [`Self::syntax_index`] syntax
   context_index : Int32
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -94,6 +95,7 @@ pub struct MatchPattern {
 }
 
 ///|
+#derive(Eq)
 pub(all) enum ContextReference {
   Named(String)
   ByScope(
@@ -108,7 +110,7 @@ pub(all) enum ContextReference {
   File(name~ : String, sub_context~ : String?, with_escape~ : Bool)
   Inline(String)
   Direct(ContextId)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

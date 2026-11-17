@@ -5,6 +5,7 @@
 
 ///|
 /// A CBOR decoding error (upstream `ciborium::de::Error<std::io::Error>`).
+#derive(Debug)
 pub(all) suberror CborError {
   /// An error occurred while reading bytes (always an unexpected EOF when
   /// reading from a slice).
@@ -15,7 +16,7 @@ pub(all) suberror CborError {
   Semantic(Int32?, String)
   /// The input caused serde to recurse too much.
   RecursionLimitExceeded
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

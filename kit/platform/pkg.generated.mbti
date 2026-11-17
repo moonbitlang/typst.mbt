@@ -89,9 +89,10 @@ pub fn write_stdout(Bytes) -> Unit raise IoError
 pub fn write_stdout_buffered(Bytes) -> Unit raise IoError
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror IoError {
   IoError(ErrorKind, String)
-} derive(@debug.Debug)
+}
 pub fn IoError::kind(Self) -> ErrorKind
 pub fn IoError::output(Self, &Logger) -> Unit
 pub fn IoError::to_string(Self) -> String
@@ -103,6 +104,7 @@ pub(all) struct DirEntry {
   kind : FileKind?
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ErrorKind {
   NotFound
   PermissionDenied
@@ -111,20 +113,22 @@ pub(all) enum ErrorKind {
   InvalidInput
   Unsupported
   Other
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FileKind {
   File
   Dir
   Symlink
   Other
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Os {
   Linux
   MacOs
   Windows
-} derive(Eq, @debug.Debug)
+}
 
 pub struct RangedFile {
   // private fields

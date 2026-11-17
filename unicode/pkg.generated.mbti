@@ -114,6 +114,7 @@ pub struct Decoded {
   idx : Int32
 }
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum MathClass {
   Normal
   Alphabetic
@@ -130,7 +131,7 @@ pub(all) enum MathClass {
   Unary
   Vary
   Special
-} derive(Eq, Hash, @debug.Debug)
+}
 
 // Type aliases
 

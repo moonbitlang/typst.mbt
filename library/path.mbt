@@ -57,10 +57,11 @@ pub impl FromValue for RootedPath with fn from_value(v) {
 /// A string or a path.
 ///
 /// This type is commonly accepted by functions that read from a path.
+#derive(Eq, Hash)
 pub(all) enum PathOrStr {
   Path(RootedPath)
   Str(String)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -211,7 +212,8 @@ fn format_resolve_error(
 /// Unlike `PathOrStr`, a string cast through this is always an absolute path
 /// instead of being resolve relative to a file. This is not used for normal
 /// paths in Typst files, but rather for output file paths in bundle mode.
-pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub struct BundlePath(@syntax.VirtualPath)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

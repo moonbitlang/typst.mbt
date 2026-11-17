@@ -84,6 +84,7 @@ pub fn AlphaColor::new(FixedArray[Float]) -> Self
 pub fn AlphaColor::premultiplied(Self) -> FixedArray[Float]
 pub fn AlphaColor::to_rgba8(Self) -> FixedArray[Byte]
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum BlendMode {
   Normal
   Multiply
@@ -101,7 +102,7 @@ pub(all) enum BlendMode {
   Saturation
   Color
   Luminosity
-} derive(Eq, Hash, @debug.Debug)
+}
 pub impl Default for BlendMode
 
 pub struct Cache {
@@ -203,16 +204,18 @@ pub(all) struct FallbackFontQuery {
 }
 pub fn FallbackFontQuery::pick_standard_font(Self) -> StandardFont
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum FillRule {
   NonZero
   EvenOdd
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub(all) enum FontQuery {
   Standard(StandardFont)
   Fallback(FallbackFontQuery)
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum FontStretch {
   Normal
   UltraCondensed
@@ -223,7 +226,7 @@ pub(all) enum FontStretch {
   Expanded
   ExtraExpanded
   UltraExpanded
-} derive(Eq, @debug.Debug)
+}
 
 pub enum Glyph {
   Outline(OutlineGlyph)
@@ -285,10 +288,11 @@ pub(all) struct InterpreterSettings {
   render_annotations : Bool
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum InterpreterWarning {
   UnsupportedFont
   ImageDecodeFailure
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct LumaData {
   data : Bytes
@@ -298,10 +302,11 @@ pub(all) struct LumaData {
   scale_factors : (Float, Float)
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MaskType {
   Luminosity
   Alpha
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct OutlineFontData {
   data : Bytes
@@ -395,6 +400,7 @@ pub fn SoftMask::transfer_function(Self) -> TransferFunction?
 pub impl Eq for SoftMask
 pub impl CacheKey for SoftMask
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StandardFont {
   Helvetica
   HelveticaBold
@@ -410,7 +416,7 @@ pub(all) enum StandardFont {
   TimesBoldItalic
   ZapfDingBats
   Symbol
-} derive(Eq, @debug.Debug)
+}
 pub fn StandardFont::as_str(Self) -> String
 pub fn StandardFont::postscript_name(Self) -> String
 
@@ -494,10 +500,11 @@ pub fn Type3Glyph::as_unicode(Self) -> @cmap.BfString?
 pub fn Type3Glyph::interpret(Self, &Device, @kurbo.Affine, @kurbo.Affine, Paint) -> Unit
 pub impl CacheKey for Type3Glyph
 
+#derive(Compare, Default, Eq, Hash, @debug.Debug)
 pub(all) struct U128 {
   hi : UInt64
   lo : UInt64
-} derive(Compare, Default, Eq, Hash, @debug.Debug)
+}
 pub fn U128::default() -> Self
 pub impl CacheKey for U128
 

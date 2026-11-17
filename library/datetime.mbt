@@ -5,6 +5,7 @@
 ///
 /// Can be created by either specifying a custom datetime using this type's
 /// constructor function or getting the current date with `datetime.today`.
+#derive(Eq, Hash)
 pub(all) enum Datetime {
   /// Representation as a date.
   Date(@time.Date)
@@ -12,7 +13,7 @@ pub(all) enum Datetime {
   Time(@time.Time)
   /// Representation as a combination of date and time.
   Datetime(@time.PrimitiveDateTime)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

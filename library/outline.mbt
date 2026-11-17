@@ -3,12 +3,13 @@
 
 ///|
 /// Defines how an outline is indented.
+#derive(Eq)
 pub(all) enum OutlineIndent {
   /// Indents by the specified length per level.
   Rel(Rel[Length])
   /// Resolve the indent for a specific level through the given function.
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

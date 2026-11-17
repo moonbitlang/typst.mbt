@@ -5,6 +5,7 @@
 
 ///|
 /// List of all errors.
+#derive(Eq, Debug)
 pub(all) suberror SvgTypesError {
   /// An input data ended earlier than expected.
   ///
@@ -36,7 +37,7 @@ pub(all) suberror SvgTypesError {
   InvalidString(Array[String], Int32)
   /// An invalid number.
   InvalidNumber(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

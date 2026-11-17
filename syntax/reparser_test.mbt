@@ -50,12 +50,13 @@ fn Edit::into_range(self : Edit, text : String) -> (Int32, Int32) {
 
 ///|
 /// What kind of reparsing happened.
+#derive(Eq)
 priv enum Reparse {
   /// The whole text was reparsed.
   All
   /// The text was parsed incrementally matching this string.
   Incr(String)
-} derive(Eq)
+}
 
 ///|
 fn show_reparse(r : Reparse) -> String {

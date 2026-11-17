@@ -299,11 +299,12 @@ let points_are_words_flag : Int32 = 0x80
 let point_run_count_mask : Int32 = 0x7F
 
 ///|
+#derive(Eq)
 priv enum PackedPointsState {
   Control
   ShortPoint
   LongPoint
-} derive(Eq)
+}
 
 ///|
 // This structure will be used by the `VariationTuples` stack buffer,
@@ -487,12 +488,13 @@ let deltas_are_words_flag : Int32 = 0x40
 let delta_run_count_mask : Int32 = 0x3F
 
 ///|
+#derive(Eq)
 priv enum PackedDeltasState {
   Control
   ZeroDelta
   ShortDelta
   LongDelta
-} derive(Eq)
+}
 
 ///|
 priv struct RunState {

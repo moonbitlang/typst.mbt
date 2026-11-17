@@ -4,12 +4,13 @@
 /// Representation of the [`<color>`] type.
 ///
 /// [`<color>`]: https://www.w3.org/TR/css-color-3/
+#derive(Eq, Debug, Hash)
 pub(all) struct Color {
   red : Byte
   green : Byte
   blue : Byte
   alpha : Byte
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

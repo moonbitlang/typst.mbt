@@ -2,6 +2,7 @@
 
 ///|
 /// A blending mode.
+#derive(Eq, Debug)
 pub(all) enum BlendMode {
   /// Replaces destination with zero: fully transparent.
   Clear
@@ -61,7 +62,7 @@ pub(all) enum BlendMode {
   Color
   /// Luminosity of source with hue and saturation of destination.
   Luminosity
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -10,12 +10,13 @@
 /// - x+width and y+height does not overflow.
 ///
 /// The unsigned upstream values are stored as `Int`s (they all fit).
+#derive(Eq, Debug)
 pub struct ScreenIntRect {
   x : Int32
   y : Int32
   width : Int32
   height : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

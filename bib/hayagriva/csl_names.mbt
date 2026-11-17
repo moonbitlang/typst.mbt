@@ -1,6 +1,7 @@
 // Port of `hayagriva/src/csl/rendering/names.rs`.
 
 ///|
+#derive(Eq, Compare)
 priv enum DisambiguatedNameForm {
   /// Count the names.
   Count
@@ -12,7 +13,7 @@ priv enum DisambiguatedNameForm {
   LongInitialized
   /// Print the full name.
   LongFull
-} derive(Eq, Compare)
+}
 
 ///|
 fn DisambiguatedNameForm::from_options(
@@ -59,6 +60,7 @@ fn DisambiguatedNameForm::is_long(self : DisambiguatedNameForm) -> Bool {
 }
 
 ///|
+#derive(Eq)
 priv struct NameDisambiguationProperties {
   /// For each variable that this term renders, there is a list of persons.
   /// This list contains the current form of the name for each person or
@@ -66,7 +68,7 @@ priv struct NameDisambiguationProperties {
   name_forms : Array[Array[DisambiguatedNameForm?]]
   mut default_name_form : DisambiguatedNameForm
   variables : Array[@citationberg.NameVariable]
-} derive(Eq)
+}
 
 ///|
 fn NameDisambiguationProperties::copy(

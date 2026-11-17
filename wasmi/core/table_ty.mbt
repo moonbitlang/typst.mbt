@@ -2,6 +2,7 @@
 
 ///|
 /// A Wasm table descriptor.
+#derive(Eq, Hash, Debug)
 pub struct TableType {
   /// The type of values stored in the [`Table`].
   priv element : ValType
@@ -13,7 +14,7 @@ pub struct TableType {
   priv max : UInt64?
   /// The index type used by the [`Table`].
   priv index_ty : IndexType
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

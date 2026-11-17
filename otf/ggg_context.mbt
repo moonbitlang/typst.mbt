@@ -102,10 +102,11 @@ pub(all) struct SequenceRule {
 
 ///|
 /// A sequence rule record.
+#derive(Debug)
 pub(all) struct SequenceLookupRecord {
   sequence_index : UInt16
   lookup_list_index : LookupIndex
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

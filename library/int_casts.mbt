@@ -4,7 +4,8 @@
 
 ///|
 /// Upstream `u8` (as a castable value).
-pub(all) struct U8(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct U8(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -81,7 +82,8 @@ pub fn U8::get(self : U8) -> Int64 {
 
 ///|
 /// Upstream `u16` (as a castable value).
-pub(all) struct U16(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct U16(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -160,7 +162,8 @@ pub fn U16::get(self : U16) -> Int64 {
 
 ///|
 /// Upstream `u32` (as a castable value).
-pub(all) struct U32(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct U32(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -235,7 +238,8 @@ pub fn U32::get(self : U32) -> Int64 {
 
 ///|
 /// Upstream `u64` (as a castable value).
-pub(all) struct U64(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct U64(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -310,7 +314,8 @@ pub fn U64::get(self : U64) -> Int64 {
 
 ///|
 /// Upstream `usize` (as a castable value).
-pub(all) struct USize(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct USize(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -389,7 +394,8 @@ pub fn USize::get(self : USize) -> Int64 {
 
 ///|
 /// Upstream `i8` (as a castable value).
-pub(all) struct I8(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct I8(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -466,7 +472,8 @@ pub fn I8::get(self : I8) -> Int64 {
 
 ///|
 /// Upstream `i16` (as a castable value).
-pub(all) struct I16(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct I16(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -543,7 +550,8 @@ pub fn I16::get(self : I16) -> Int64 {
 
 ///|
 /// Upstream `i32` (as a castable value).
-pub(all) struct I32(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct I32(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -620,7 +628,8 @@ pub fn I32::get(self : I32) -> Int64 {
 
 ///|
 /// Upstream `NonZeroU32` (as a castable value).
-pub(all) struct NonZeroU32(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct NonZeroU32(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -699,7 +708,8 @@ pub fn NonZeroU32::get(self : NonZeroU32) -> Int64 {
 
 ///|
 /// Upstream `NonZeroU64` (as a castable value).
-pub(all) struct NonZeroU64(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct NonZeroU64(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -778,7 +788,8 @@ pub fn NonZeroU64::get(self : NonZeroU64) -> Int64 {
 
 ///|
 /// Upstream `NonZeroUsize` (as a castable value).
-pub(all) struct NonZeroUSize(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct NonZeroUSize(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -851,7 +862,8 @@ pub fn NonZeroUSize::get(self : NonZeroUSize) -> Int64 {
 
 ///|
 /// Upstream `NonZeroI64` (as a castable value).
-pub(all) struct NonZeroI64(Int64) derive(Eq, Hash, Compare, Debug)
+#derive(Eq, Hash, Compare, Debug)
+pub(all) struct NonZeroI64(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

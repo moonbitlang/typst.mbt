@@ -4,9 +4,10 @@
 ///|
 /// Document settings for SVG export (upstream
 /// `SvgFormatOptions<Complete>`).
+#derive(Eq)
 pub(all) struct SvgFormatOptions {
   pretty : @library.SpannedValue[Bool]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -27,9 +28,10 @@ pub fn SvgFormatOptions::get(
 ///|
 /// Partially specified document settings for SVG export (upstream
 /// `SvgFormatOptions<Partial>`).
+#derive(Eq, Default)
 pub(all) struct PartialSvgFormatOptions {
   pretty : Bool?
-} derive(Eq, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -231,10 +231,11 @@ pub fn SmartQuotes::fallback(double : Bool) -> String {
 
 ///|
 /// An opening and closing quote.
+#derive(Eq, Hash, Debug)
 pub(all) struct SmartQuoteSet {
   open : String
   close : String
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -325,10 +326,11 @@ fn array_to_set(value : Arr) -> (String, String) raise HintedError {
 
 ///|
 /// A dict of single and double quotes.
+#derive(Eq, Hash, Debug)
 pub(all) struct SmartQuoteDict {
   double : Smart[SmartQuoteSet]
   single : Smart[SmartQuoteSet]
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

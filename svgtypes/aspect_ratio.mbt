@@ -4,6 +4,7 @@
 /// Representation of the `align` value of the [`preserveAspectRatio`] attribute.
 ///
 /// [`preserveAspectRatio`]: https://www.w3.org/TR/SVG11/coords.html#PreserveAspectRatioAttribute
+#derive(Eq, Debug, Hash)
 pub(all) enum Align {
   None
   XMinYMin
@@ -15,7 +16,7 @@ pub(all) enum Align {
   XMinYMax
   XMidYMax
   XMaxYMax
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -38,6 +39,7 @@ pub extend Align with Hash::{hash, hash_combine}
 /// SVG 2 removed the `defer` keyword, but we still support it.
 ///
 /// [`preserveAspectRatio`]: https://www.w3.org/TR/SVG11/coords.html#PreserveAspectRatioAttribute
+#derive(Eq, Debug, Hash)
 pub(all) struct AspectRatio {
   /// `<defer>` value. (Upstream's `defer`; a keyword in MoonBit.)
   ///
@@ -50,7 +52,7 @@ pub(all) struct AspectRatio {
   /// - Set to `true` when `slice` value is present.
   /// - Set to `false` when `meet` value is present or value is not set at all.
   slice : Bool
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

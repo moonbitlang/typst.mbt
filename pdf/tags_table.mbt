@@ -41,11 +41,12 @@ priv struct PrioritzedStroke {
 }
 
 ///|
+#derive(Eq, Compare)
 priv enum StrokePriority {
   GridStroke
   CellStroke
   ExplicitLine
-} derive(Eq, Compare)
+}
 
 ///|
 fn TableCtx::new(

@@ -2,12 +2,13 @@
 
 ///|
 /// A child of a stack element.
+#derive(Eq)
 pub(all) enum StackChild {
   /// Spacing between other children.
   Spacing(Spacing)
   /// Arbitrary block-level content.
   Block(Content)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

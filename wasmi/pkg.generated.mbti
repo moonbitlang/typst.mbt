@@ -105,11 +105,12 @@ pub(all) struct ActiveDataSegment {
   bytes : Bytes
 }
 
+#derive(Eq)
 pub(all) enum Any {
   U32(UInt32)
   Str(String)
   Other
-} derive(Eq)
+}
 pub impl Show for Any
 
 pub(all) struct AvgBytesPerFunctionLimit {
@@ -142,11 +143,12 @@ pub(all) enum CmpSelectFusion {
   Unapplied
 }
 
+#derive(Eq)
 pub(all) enum CompilationMode {
   Eager
   LazyTranslation
   Lazy
-} derive(Eq)
+}
 
 pub(all) struct CompiledFuncEntity {
   instrs : FixedArray[@ir.Op]
@@ -197,16 +199,18 @@ pub(all) enum ControlFrame {
 }
 pub fn ControlFrame::base(Self) -> FrameBase
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ControlFrameKind {
   Block
   Loop
   If
   Else
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, Hash)
 pub(all) struct DataSegment {
   // private fields
-} derive(Eq, Hash)
+}
 
 pub(all) struct DataSegmentEntity {
   mut bytes : Bytes?
@@ -214,13 +218,15 @@ pub(all) struct DataSegmentEntity {
 pub fn DataSegmentEntity::bytes(Self) -> Bytes
 pub fn DataSegmentEntity::drop_bytes(Self) -> Unit
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct DedupFuncType {
   // private fields
-} derive(Eq, Hash, @debug.Debug)
+}
 
+#derive(Eq, Hash)
 pub(all) struct ElementSegment {
   // private fields
-} derive(Eq, Hash)
+}
 
 pub(all) enum ElementSegmentKind {
   Passive
@@ -284,7 +290,8 @@ pub fn Engine::same(Self, Self) -> Bool
 pub fn Engine::translate_func(Self, FuncIdx, EngineFunc, Int32, BytesView, ModuleHeader, @wasmparser.FuncToValidate?) -> Unit raise WasmiError
 pub fn Engine::weak(Self) -> EngineWeak
 
-pub(all) struct EngineFunc(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct EngineFunc(Int32)
 pub fn EngineFunc::from_internal(@ir.InternalFunc) -> Self
 pub fn EngineFunc::to_internal(Self) -> @ir.InternalFunc
 
@@ -308,12 +315,13 @@ pub(all) struct EvalContext {
   get_func : (UInt32) -> @core.UntypedVal?
 }
 
+#derive(Eq)
 pub(all) enum Extern {
   Global(Global)
   Table(Table)
   Memory(Memory)
   Func(Func)
-} derive(Eq)
+}
 pub fn Extern::into_func(Self) -> Func?
 pub fn Extern::into_global(Self) -> Global?
 pub fn Extern::into_memory(Self) -> Memory?
@@ -328,9 +336,10 @@ pub(all) enum ExternIdx {
   Global(GlobalIdx)
 }
 
+#derive(Eq, Hash)
 pub(all) struct ExternRef {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] ExternRef::data(Self, Store[T]) -> Any
 pub fn[T] ExternRef::new(Store[T], Any) -> Self
 pub impl Show for ExternRef
@@ -363,9 +372,10 @@ pub fn FrameBase::label(Self) -> LabelRef
 pub fn FrameBase::len_branch_params(Self, EngineWeak) -> Int32
 pub fn FrameBase::ty(Self) -> BlockType
 
+#derive(Eq, Hash)
 pub(all) struct Func {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] Func::call(Self, Store[T], Array[Val], Array[Val]) -> Unit raise WasmiError
 pub fn[T] Func::new(Store[T], @core.FuncType, (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError) -> Self
 pub fn[T] Func::ty(Self, Store[T]) -> @core.FuncType
@@ -378,18 +388,20 @@ pub(all) enum FuncEntity {
 }
 pub fn FuncEntity::ty_dedup(Self) -> DedupFuncType
 
+#derive(Eq)
 pub(all) enum FuncError {
   ExportedFuncNotFound
   MismatchingParameterType
   MismatchingParameterLen
   MismatchingResultType
   MismatchingResultLen
-} derive(Eq)
+}
 pub fn FuncError::output(Self, &Logger) -> Unit
 pub fn FuncError::to_string(Self) -> String
 pub impl Show for FuncError
 
-pub(all) struct FuncIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct FuncIdx(Int32)
 pub fn FuncIdx::into_u32(Self) -> UInt32
 
 pub(all) struct FuncInOut {
@@ -417,18 +429,21 @@ pub fn FuncTranslator::translate_locals(Self, UInt32, @wasmparser.ValType) -> Un
 pub fn FuncTranslator::translate_unsupported_operator(Self, String) -> Unit raise WasmiError
 pub fn FuncTranslator::visit_operator(Self, @wasmparser.Operator) -> Unit raise WasmiError
 
-pub(all) struct FuncTypeIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct FuncTypeIdx(Int32)
 
+#derive(Eq, Hash)
 pub(all) struct Global {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] Global::get(Self, Store[T]) -> Val
 pub fn[T] Global::new(Store[T], Val, @core.Mutability) -> Self
 pub fn[T] Global::set(Self, Store[T], Val) -> Unit raise WasmiError
 pub fn[T] Global::ty(Self, Store[T]) -> @core.GlobalType
 pub impl Show for Global
 
-pub(all) struct GlobalIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct GlobalIdx(Int32)
 
 pub(all) struct HostFuncEntity {
   len_params : Int32
@@ -488,9 +503,10 @@ pub(all) enum Input[T] {
   Immediate(T)
 }
 
+#derive(Eq, Hash)
 pub(all) struct Instance {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] Instance::exports(Self, Store[T]) -> Array[(String, Extern)]
 pub fn[T] Instance::get_export(Self, Store[T], String) -> Extern?
 pub fn[T] Instance::get_func(Self, Store[T], String) -> Func?
@@ -541,7 +557,8 @@ pub fn InstantiationError::output(Self, &Logger) -> Unit
 pub fn InstantiationError::to_string(Self) -> String
 pub impl Show for InstantiationError
 
-pub(all) struct Instr(Int32) derive(Compare, Eq, Hash, @debug.Debug)
+#derive(Compare, Eq, Hash, @debug.Debug)
+pub(all) struct Instr(Int32)
 pub fn Instr::distance(Self, Self) -> Int32
 pub fn Instr::from_usize(Int32) -> Self
 pub fn Instr::into_usize(Self) -> Int32
@@ -567,7 +584,8 @@ pub fn InstrEncoder::try_replace_instr(Self, Instr, @ir.Op) -> Bool raise WasmiE
 pub fn InstrEncoder::try_replace_result(Self, @ir.Slot, @ir.Slot, StackLayout, ModuleHeader) -> Bool raise WasmiError
 pub fn InstrEncoder::update_branch_offset(Self, Instr, @ir.BranchOffset, StackLayout) -> Unit raise WasmiError
 
-pub(all) struct LabelRef(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct LabelRef(Int32)
 
 pub(all) struct LabelRegistry {
   // private fields
@@ -580,6 +598,7 @@ pub fn LabelRegistry::resolved_users(Self) -> Array[(Instr, Result[@ir.BranchOff
 pub fn LabelRegistry::try_pin_label(Self, LabelRef, Instr) -> Unit
 pub fn LabelRegistry::try_resolve_label(Self, LabelRef, Instr) -> @ir.BranchOffset raise WasmiError
 
+#derive(Eq)
 pub(all) enum LaneTy {
   I8
   U8
@@ -589,7 +608,7 @@ pub(all) enum LaneTy {
   I64
   F32
   F64
-} derive(Eq)
+}
 
 pub struct Linker[T] {
   // private fields
@@ -612,7 +631,8 @@ pub fn LinkerError::output(Self, &Logger) -> Unit
 pub fn LinkerError::to_string(Self) -> String
 pub impl Show for LinkerError
 
-pub(all) struct LocalIdx(UInt32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct LocalIdx(UInt32)
 
 pub(all) struct LocalOperand {
   operand_index : OperandIdx
@@ -631,9 +651,10 @@ pub fn LocalsRegistry::register(Self, Int32, @core.ValType) -> Unit raise WasmiE
 pub fn LocalsRegistry::reset(Self) -> Unit
 pub fn LocalsRegistry::ty(Self, LocalIdx) -> @core.ValType
 
+#derive(Eq, Hash)
 pub(all) struct Memory {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] Memory::data(Self, Store[T]) -> FixedArray[Byte]
 pub fn[T] Memory::data_size(Self, Store[T]) -> Int32
 pub fn[T] Memory::grow(Self, Store[T], UInt64) -> UInt64 raise @core.MemoryError
@@ -644,7 +665,8 @@ pub fn[T] Memory::ty(Self, Store[T]) -> @core.MemoryType
 pub fn[T] Memory::write(Self, Store[T], UInt64, BytesView) -> Unit raise @core.MemoryError
 pub impl Show for Memory
 
-pub(all) struct MemoryIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct MemoryIdx(Int32)
 
 pub struct Module {
   // private fields
@@ -692,6 +714,7 @@ pub(all) struct ModuleImports {
   len_tables : Int32
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum NumTy {
   I32
   U32
@@ -699,7 +722,7 @@ pub(all) enum NumTy {
   U64
   F32
   F64
-} derive(Eq, @debug.Debug)
+}
 pub fn NumTy::const16(Self, @core.TypedVal) -> @ir.Const16?
 pub fn NumTy::is_zero(Self, @core.TypedVal) -> Bool
 pub fn NumTy::shift_amount(Self, @core.TypedVal) -> @ir.ShiftAmount?
@@ -716,12 +739,14 @@ pub fn Operand::is_same(Self, Self) -> Bool
 pub fn Operand::is_temp(Self) -> Bool
 pub fn Operand::ty(Self) -> @core.ValType
 
-pub(all) struct OperandIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct OperandIdx(Int32)
 
+#derive(Eq)
 pub(all) enum ReadError {
   EndOfStream
   UnknownError
-} derive(Eq)
+}
 pub fn ReadError::output(Self, &Logger) -> Unit
 pub fn ReadError::to_string(Self) -> String
 pub impl Show for ReadError
@@ -754,11 +779,12 @@ pub fn StackLayout::stack_space(Self, @ir.Slot) -> StackSpace
 pub fn StackLayout::temp_to_reg(Self, OperandIdx) -> @ir.Slot raise WasmiError
 pub impl AllocConst for StackLayout
 
+#derive(Eq, @debug.Debug)
 pub(all) enum StackSpace {
   Local
   Const
   Temp
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Store[T] {
   inner : StoreInner
@@ -800,6 +826,7 @@ pub fn StoreInner::val_from_untyped(Self, @core.UntypedVal, @core.ValType) -> Va
 pub fn StoreInner::val_to_typed(Self, Val) -> @core.TypedVal
 pub fn StoreInner::val_to_untyped(Self, Val) -> @core.UntypedVal
 
+#derive(Eq)
 pub(all) enum StoreValueKind {
   I32
   I64
@@ -808,7 +835,7 @@ pub(all) enum StoreValueKind {
   I64Wrap8
   I64Wrap16
   I64Wrap32
-} derive(Eq)
+}
 
 pub(all) struct StoreWrapOperator {
   kind : StoreValueKind
@@ -820,16 +847,18 @@ pub(all) struct StoreWrapOperator {
   store_at_imm : (Int32, @ir.Address32) -> @ir.Op
 }
 
+#derive(Eq, Hash)
 pub(all) struct Table {
   // private fields
-} derive(Eq, Hash)
+}
 pub fn[T] Table::get(Self, Store[T], UInt64) -> Val?
 pub fn[T] Table::new(Store[T], @core.TableType, Val) -> Self raise WasmiError
 pub fn[T] Table::size(Self, Store[T]) -> UInt64
 pub fn[T] Table::ty(Self, Store[T]) -> @core.TableType
 pub impl Show for Table
 
-pub(all) struct TableIdx(Int32) derive(Eq, @debug.Debug)
+#derive(Eq, @debug.Debug)
+pub(all) struct TableIdx(Int32)
 
 pub(all) struct TempOperand {
   operand_index : OperandIdx
@@ -895,6 +924,7 @@ pub fn TranslatorStack::push_unreachable(Self, ControlFrameKind) -> Unit raise W
 pub fn TranslatorStack::register_locals(Self, Int32) -> Unit raise WasmiError
 pub fn TranslatorStack::trunc(Self, Int32) -> Unit
 
+#derive(Eq)
 pub(all) enum Val {
   I32(Int32)
   I64(Int64)
@@ -903,7 +933,7 @@ pub(all) enum Val {
   V128(@core.V128Value)
   FuncRef(Func?)
   ExternRef(ExternRef?)
-} derive(Eq)
+}
 pub fn Val::default(@core.ValType) -> Self
 pub fn Val::ty(Self) -> @core.ValType
 

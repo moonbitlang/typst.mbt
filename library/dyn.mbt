@@ -8,6 +8,7 @@
 
 ///|
 /// Internal native values stored in `Value::Dyn` (upstream `Dynamic`).
+#derive(Eq)
 pub(all) enum DynValue {
   /// `layout/align.rs`
   Alignment(Alignment)
@@ -66,7 +67,7 @@ pub(all) enum DynValue {
   /// `theme-derived` of raw elements, a pair of source and theme; upstream
   /// the derived part of `Derived<DataSource, RawTheme>`)
   RawTheme(RawTheme)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

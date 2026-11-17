@@ -75,6 +75,7 @@ fn DecompressionError::debug(self : DecompressionError) -> String {
 }
 
 ///|
+#derive(Eq)
 priv enum FdeflateState {
   ZlibHeader
   BlockHeader
@@ -84,7 +85,7 @@ priv enum FdeflateState {
   UncompressedData
   Checksum
   Done
-} derive(Eq)
+}
 
 ///|
 /// Decompressor for arbitrary zlib streams (upstream `Decompressor`, with

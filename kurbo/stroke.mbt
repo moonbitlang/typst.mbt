@@ -3,6 +3,7 @@
 
 ///|
 /// The visual style of a stroke.
+#derive(Eq, Debug)
 pub(all) struct Stroke {
   /// Width of the stroke.
   width : Double
@@ -18,7 +19,7 @@ pub(all) struct Stroke {
   dash_pattern : Array[Double]
   /// Offset of the first dash.
   dash_offset : Double
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -32,6 +33,7 @@ pub extend Stroke with @debug.Debug::{to_repr}
 
 ///|
 /// Options for path stroking.
+#derive(Eq, Debug)
 pub struct StrokeOpts {
   priv opt_level : StrokeOptLevel
   /// When `true`, dashes are emitted in the order they appear along the
@@ -40,7 +42,7 @@ pub struct StrokeOpts {
   /// both the reorder and the wraparound merge, so a dash spanning the seam
   /// is truncated there.
   priv stable_dash_order : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -60,12 +62,13 @@ pub extend StrokeOpts with @debug.Debug::{to_repr}
 /// and speed makes sense and may be added in the future, so applications
 /// should set it appropriately. For real time rendering, the appropriate
 /// value is `Subdivide`.
+#derive(Eq, Debug)
 pub(all) enum StrokeOptLevel {
   /// Adaptively subdivide segments in half.
   Subdivide
   /// Compute optimized subdivision points to minimize error.
   Optimized
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -190,6 +193,7 @@ pub fn StrokeOpts::stable_dash_order(
 /// A structure that is used for creating strokes.
 ///
 /// See also [`stroke_with`].
+#derive(Debug)
 pub struct StrokeCtx {
   // As a possible future optimization, we might not need separate storage
   // for forward and backward paths, we can add forward to the output
@@ -206,7 +210,7 @@ pub struct StrokeCtx {
   // Precomputation of the join threshold, to optimize per-join logic.
   // If hypot < (hypot + dot) * join_thresh, omit join altogether.
   priv mut join_thresh : Double
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -695,12 +699,13 @@ priv struct DashIterator {
 }
 
 ///|
+#derive(Eq)
 priv enum DashState {
   NeedInput
   ToStash
   Working
   FromStash
-} derive(Eq)
+}
 
 ///|
 fn DashIterator::next(self : DashIterator) -> PathEl? {

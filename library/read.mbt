@@ -25,10 +25,11 @@ fn impl_read(
 
 ///|
 /// An encoding of a file.
+#derive(Eq, Hash, Debug)
 pub(all) enum Encoding {
   /// The Unicode UTF-8 encoding.
   Utf8
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

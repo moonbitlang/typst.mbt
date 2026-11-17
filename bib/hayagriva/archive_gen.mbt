@@ -3,6 +3,7 @@
 
 ///|
 /// An embedded CSL style.
+#derive(Eq, Hash, Debug)
 pub(all) enum ArchivedStyle {
   /// Alphanumeric.
   ///
@@ -324,7 +325,7 @@ pub(all) enum ArchivedStyle {
   ///
   /// Authors: Andrew Dunning.
   TurabianFullnote8
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

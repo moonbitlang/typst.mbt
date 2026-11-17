@@ -4,7 +4,8 @@
 ///|
 /// A depth that is summed up when folded (upstream `Depth`, an internal
 /// field type without casts; stored as an integer).
-pub(all) struct Depth(Int64) derive(Eq, Hash, Default)
+#derive(Eq, Hash, Default)
+pub(all) struct Depth(Int64)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

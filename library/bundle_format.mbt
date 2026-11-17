@@ -57,7 +57,8 @@ pub fn asset_unsupported_rule(
 
 ///|
 /// The raw data for an asset.
-pub(all) struct AssetData(BytesValue) derive(Eq, Hash)
+#derive(Eq, Hash)
+pub(all) struct AssetData(BytesValue)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

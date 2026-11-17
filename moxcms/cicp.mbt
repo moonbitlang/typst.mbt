@@ -2,6 +2,7 @@
 
 ///|
 /// See Rec. ITU-T H.273 (12/2016) Table 2.
+#derive(Eq, Debug)
 pub(all) enum CicpColorPrimaries {
   Reserved
   Bt709
@@ -16,7 +17,7 @@ pub(all) enum CicpColorPrimaries {
   Smpte431
   Smpte432
   Ebu3213
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -51,6 +52,7 @@ fn CicpColorPrimaries::try_from(value : Int32) -> CicpColorPrimaries {
 
 ///|
 /// See Rec. ITU-T H.273 (12/2016) Table 3.
+#derive(Eq, Debug)
 pub(all) enum TransferCharacteristics {
   Reserved
   Bt709
@@ -70,7 +72,7 @@ pub(all) enum TransferCharacteristics {
   Smpte2084
   Smpte428
   Hlg
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -115,6 +117,7 @@ fn TransferCharacteristics::has_transfer_curve(
 
 ///|
 /// Matrix Coefficients Enum (from ISO/IEC 23091-4 / MPEG CICP).
+#derive(Eq, Debug)
 pub(all) enum MatrixCoefficients {
   Identity
   Bt709
@@ -131,7 +134,7 @@ pub(all) enum MatrixCoefficients {
   ChromaticityDerivedNCL
   ChromaticityDerivedCL
   ICtCp
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

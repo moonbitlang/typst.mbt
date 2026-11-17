@@ -4,6 +4,7 @@
 ///|
 /// An error as the result of parsing, compiling or running a regex
 /// (upstream `fancy_regex::Error`).
+#derive(Eq, Debug)
 pub(all) suberror FancyError {
   /// An error as a result of parsing a regex pattern, with the position
   /// (UTF-8 byte offset) where the error occurred
@@ -12,7 +13,7 @@ pub(all) suberror FancyError {
   CompileError(CompileError)
   /// An error as a result of running a regex
   RuntimeError(RuntimeError)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -26,6 +27,7 @@ pub extend FancyError with @debug.Debug::{to_repr}
 
 ///|
 /// An error for the result of parsing a regex pattern.
+#derive(Eq, Debug)
 pub(all) enum ParseError {
   /// General parsing error
   GeneralParseError(String)
@@ -59,7 +61,7 @@ pub(all) enum ParseError {
   InvalidGroupName
   /// Invalid group id in escape sequence
   InvalidGroupNameBackref(String)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -73,6 +75,7 @@ pub extend ParseError with @debug.Debug::{to_repr}
 
 ///|
 /// An error as the result of compiling a regex.
+#derive(Eq, Debug)
 pub(all) enum CompileError {
   /// Regex crate error. Upstream wraps a `regex_automata` `BuildError`
   /// (whose `Display` is just `error parsing pattern 0`); here the payload
@@ -92,7 +95,7 @@ pub(all) enum CompileError {
   FeatureNotYetSupported(String)
   /// Subroutine call to non-existent group
   SubroutineCallTargetNotFound(String, Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -106,13 +109,14 @@ pub extend CompileError with @debug.Debug::{to_repr}
 
 ///|
 /// An error as the result of executing a regex.
+#derive(Eq, Debug)
 pub(all) enum RuntimeError {
   /// Max stack size exceeded for backtracking while executing regex.
   StackOverflow
   /// Max limit for backtracking count exceeded while executing the regex.
   /// Configure using `RegexBuilder::backtrack_limit`.
   BacktrackLimitExceeded
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

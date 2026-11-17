@@ -472,13 +472,14 @@ pub fn shape_with_plan(Face, ShapePlan, UnicodeBuffer) -> GlyphBuffer
 // Types and methods
 type Buffer
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum Direction {
   Invalid
   LeftToRight
   RightToLeft
   TopToBottom
   BottomToTop
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Direction::from_script(Script) -> Self?
 pub fn Direction::from_str(String) -> Self?
 pub fn Direction::is_backward(Self) -> Bool
@@ -498,12 +499,13 @@ pub fn Face::set_variations(Self, Array[Variation]) -> Unit
 pub fn Face::ttf(Self) -> @otf.Face
 pub fn Face::units_per_em(Self) -> Int32
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Feature {
   tag : @otf.Tag
   value : UInt32
   start : UInt32
   end : UInt32
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Feature::from_str(String) -> Self?
 pub fn Feature::is_global(Self) -> Bool
 pub fn Feature::new(@otf.Tag, UInt32, start? : UInt32, end? : UInt32) -> Self
@@ -517,28 +519,32 @@ pub fn GlyphBuffer::len(Self) -> Int32
 pub fn GlyphBuffer::recycle(Self) -> UnicodeBuffer
 pub fn GlyphBuffer::serialize(Self, Face, Int32) -> String
 
+#derive(@debug.Debug)
 pub(all) struct GlyphInfo {
   mut glyph_id : UInt32
   mut mask : UInt32
   mut cluster : UInt32
   mut var1 : UInt32
   mut var2 : UInt32
-} derive(@debug.Debug)
+}
 pub fn GlyphInfo::unsafe_to_break(Self) -> Bool
 
+#derive(@debug.Debug)
 pub(all) struct GlyphPosition {
   mut x_advance : Int32
   mut y_advance : Int32
   mut x_offset : Int32
   mut y_offset : Int32
   mut var_ : UInt32
-} derive(@debug.Debug)
+}
 
-pub(all) struct Language(String) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct Language(String)
 pub fn Language::as_str(Self) -> String
 pub fn Language::from_str(String) -> Self?
 
-pub(all) struct Script(@otf.Tag) derive(Compare, Eq, Hash)
+#derive(Compare, Eq, Hash)
+pub(all) struct Script(@otf.Tag)
 pub fn Script::from_iso15924_tag(@otf.Tag) -> Self?
 pub fn Script::from_str(String) -> Self?
 pub fn Script::tag(Self) -> @otf.Tag
@@ -572,10 +578,11 @@ pub fn UnicodeBuffer::set_post_context(Self, Array[Int32]) -> Unit
 pub fn UnicodeBuffer::set_pre_context(Self, Array[Int32]) -> Unit
 pub fn UnicodeBuffer::set_script(Self, Script) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Variation {
   tag : @otf.Tag
   value : Float
-} derive(Eq, @debug.Debug)
+}
 pub fn Variation::from_str(String) -> Self?
 
 // Type aliases

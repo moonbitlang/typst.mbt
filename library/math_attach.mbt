@@ -3,6 +3,7 @@
 ///|
 /// Describes in which situation a frame should use limits for attachments
 /// (upstream `math::Limits`; `Limits` is taken by `par.mbt`).
+#derive(Eq, Debug)
 pub(all) enum MathLimits {
   /// Always scripts.
   Never
@@ -10,7 +11,7 @@ pub(all) enum MathLimits {
   Display
   /// Always limits.
   Always
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

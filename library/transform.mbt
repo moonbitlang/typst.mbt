@@ -3,10 +3,11 @@
 
 ///|
 /// To what size something shall be scaled.
+#derive(Eq, Hash)
 pub(all) enum ScaleAmount {
   Ratio(Ratio)
   Length(Length)
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -86,6 +87,7 @@ fn scale_elem_y_default() -> Value {
 
 ///|
 /// A scale-skew-translate transformation.
+#derive(Eq, Hash)
 #valtype
 pub(all) struct Transform {
   sx : Ratio
@@ -94,7 +96,7 @@ pub(all) struct Transform {
   sy : Ratio
   tx : Abs
   ty : Abs
-} derive(Eq, Hash)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

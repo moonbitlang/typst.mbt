@@ -4,6 +4,7 @@
 ///|
 /// An error that occurred while trying to load a file (upstream
 /// `diag::FileError`).
+#derive(Eq, Hash, Debug)
 pub(all) suberror FileError {
   /// A file was not found at this path.
   NotFound(String)
@@ -24,7 +25,7 @@ pub(all) suberror FileError {
   ///
   /// The optional string can give more details, if available.
   Other(String?)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -65,6 +66,7 @@ pub extend FileError with Show::{to_string, output}
 /// `diag::PackageError`).
 ///
 /// Some variants have an optional string can give more details, if available.
+#derive(Eq, Hash, Debug)
 pub(all) suberror PackageError {
   /// The specified package does not exist.
   NotFound(@syntax.PackageSpec)
@@ -76,7 +78,7 @@ pub(all) suberror PackageError {
   MalformedArchive(String?)
   /// Another error.
   Other(String?)
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

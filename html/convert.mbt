@@ -14,6 +14,7 @@ pub(all) enum ConversionLevel {
 
 ///|
 /// How to emit whitespace.
+#derive(Eq, Hash, Debug)
 pub(all) enum Whitespace {
   /// Ensures that whitespace that would otherwise be collapsed by HTML
   /// rendering engines[^1] is protected by spans with `white-space:
@@ -36,7 +37,7 @@ pub(all) enum Whitespace {
   /// - raw and escapable raw text elements as normal white space rules do not
   ///   apply to them.
   Pre
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -252,6 +253,7 @@ fn handle_html_elem(
 
 ///|
 /// Special kinds of characters.
+#derive(Eq)
 priv enum Kind {
   /// ASCII space.
   Space
@@ -262,7 +264,7 @@ priv enum Kind {
   /// A Unicode default-ignorable. Does not protect spaces from
   /// collapsing.
   Ignorable
-} derive(Eq)
+}
 
 ///|
 fn Kind::of(c : Char) -> Kind? {

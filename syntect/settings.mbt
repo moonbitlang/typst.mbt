@@ -10,6 +10,7 @@
 
 ///|
 /// A JSON value (upstream `serde_json::Value`).
+#derive(Eq)
 pub(all) enum Settings {
   Null
   Bool(Bool)
@@ -19,7 +20,7 @@ pub(all) enum Settings {
   Array(Array[Settings])
   /// An object; keys are sorted as in serde_json's default `BTreeMap`.
   Object(Map[String, Settings])
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

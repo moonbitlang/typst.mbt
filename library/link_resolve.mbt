@@ -216,6 +216,7 @@ pub fn EarlyLinkResolver::resolve(
 
 ///|
 /// A resolved internal link.
+#derive(Eq)
 pub(all) enum ResolvedLink {
   /// Should link to an anchor in the same document. If the anchor is empty,
   /// should link to the full current document.
@@ -228,7 +229,7 @@ pub(all) enum ResolvedLink {
     to~ : @syntax.VirtualPath,
     anchor~ : String
   )
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

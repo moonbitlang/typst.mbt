@@ -22,21 +22,24 @@ pub fn ExtractionContext::extract_query_into(Self, ExtractionQuery, Int32) -> Re
 pub fn ExtractionContext::new(@syntax.Pdf, () -> Int32, (Int32, @export.Indirect) -> Unit, page_tree_parent_ref? : Int32) -> Self
 pub fn ExtractionContext::write_dependencies(Self) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ExtractionError {
   InvalidPageIndex(Int32)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ExtractionQuery {
   query_type : ExtractionQueryType
   page_index : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn ExtractionQuery::new_page(Int32) -> Self
 pub fn ExtractionQuery::new_xobject(Int32) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ExtractionQueryType {
   XObject
   Page
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct ExtractionResult {
   root_refs : Array[Result[Int32, ExtractionError]]

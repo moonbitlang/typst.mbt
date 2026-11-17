@@ -4,7 +4,8 @@
 
 ///|
 /// An enumeration item (upstream `Packed<EnumItem>`).
-pub(all) struct EnumItem(Content) derive(Eq)
+#derive(Eq)
+pub(all) struct EnumItem(Content)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

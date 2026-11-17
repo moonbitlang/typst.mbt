@@ -15,7 +15,8 @@
 /// larger than 125 results in an `Error`.
 ///
 /// <http://www.unicode.org/reports/tr9/#BD2>
-pub(all) struct Level(Int32) derive(Eq, Compare, Hash, Debug)
+#derive(Eq, Compare, Hash, Debug)
+pub(all) struct Level(Int32)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -56,10 +57,11 @@ pub let max_implicit_depth : Int32 = max_depth + 1
 
 ///|
 /// Errors that can occur on Level creation or mutation
+#derive(Eq, Debug)
 pub(all) enum LevelError {
   /// Out-of-range (invalid) embedding level number.
   OutOfRangeNumber
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

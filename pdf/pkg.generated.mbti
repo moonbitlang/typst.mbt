@@ -58,10 +58,11 @@ pub(all) struct Timestamp {
 pub fn Timestamp::new_local(@library.Datetime, Int32) -> Self?
 pub fn Timestamp::new_utc(@library.Datetime) -> Self
 
+#derive(Eq)
 pub(all) enum Timezone {
   UTC
   Local(Int32, Int32)
-} derive(Eq)
+}
 
 // Type aliases
 

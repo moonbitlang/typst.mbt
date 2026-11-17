@@ -372,6 +372,7 @@ fn Encoding::map_code(self : Encoding, code : Byte) -> String? {
 
 ///|
 /// The font stretch.
+#derive(Eq, Debug)
 pub(all) enum FontStretch {
   /// Normal.
   Normal
@@ -391,7 +392,7 @@ pub(all) enum FontStretch {
   ExtraExpanded
   /// Ultra expanded.
   UltraExpanded
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

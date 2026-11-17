@@ -7,11 +7,12 @@
 /// Each `Duration` is composed of a whole number of seconds and a fractional
 /// part represented in nanoseconds. The sign of the nanoseconds always
 /// matches that of the seconds (or is zero).
+#derive(Eq, Compare, Hash, Debug)
 pub struct Duration {
   priv seconds : Int64
   // Sign must match that of `seconds` (though this is not a safety requirement).
   priv nanoseconds : Int32
-} derive(Eq, Compare, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

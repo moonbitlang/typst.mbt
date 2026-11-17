@@ -8,7 +8,8 @@
 /// Beware: The `Eq` and `Hash` implementations are dependent on the
 /// ordering of the modifiers, in opposition to what a set would usually
 /// constitute.
-pub(all) struct ModifierSet(String) derive(Eq, Hash, Debug)
+#derive(Eq, Hash, Debug)
+pub(all) struct ModifierSet(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

@@ -2,7 +2,8 @@
 
 ///|
 /// A 2D affine transform.
-pub(all) struct Transform(FixedArray[Double]) derive(Eq, Debug)
+#derive(Eq, Debug)
+pub(all) struct Transform(FixedArray[Double])
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

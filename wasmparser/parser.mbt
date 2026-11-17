@@ -27,12 +27,13 @@ let kind_component : UInt32 = 0x01
 
 ///|
 /// The supported encoding formats for the parser.
+#derive(Eq, Debug)
 pub(all) enum Encoding {
   /// The encoding format is a WebAssembly module.
   Module
   /// The encoding format is a WebAssembly component.
   Component
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

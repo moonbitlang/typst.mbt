@@ -1340,12 +1340,13 @@ priv enum CollapseVerdict {
 
 ///|
 /// The result of [`BibliographyDriver::finish`].
+#derive(Debug)
 pub(all) struct Rendered {
   /// The bibliography items.
   bibliography : RenderedBibliography?
   /// The citation items.
   citations : Array[RenderedCitation]
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1354,6 +1355,7 @@ pub extend Rendered with @debug.Debug::{to_repr}
 
 ///|
 /// A fully rendered bibliography.
+#derive(Debug)
 pub(all) struct RenderedBibliography {
   /// Render the bibliography in a hanging indent.
   hanging_indent : Bool
@@ -1368,7 +1370,7 @@ pub(all) struct RenderedBibliography {
   /// `second_field_align` is set. Then, it is the first field that must be
   /// treated specially.
   items : Array[BibliographyItem]
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1377,6 +1379,7 @@ pub extend RenderedBibliography with @debug.Debug::{to_repr}
 
 ///|
 /// A fully rendered bibliography item.
+#derive(Debug)
 pub(all) struct BibliographyItem {
   /// The item's key as specified in the bibliography.
   key : String
@@ -1385,7 +1388,7 @@ pub(all) struct BibliographyItem {
   first_field : ElemChild?
   /// The rendered item.
   content : ElemChildren
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1394,12 +1397,13 @@ pub extend BibliographyItem with @debug.Debug::{to_repr}
 
 ///|
 /// A fully rendered citation.
+#derive(Debug)
 pub(all) struct RenderedCitation {
   /// The footnote number for this citation.
   note_number : Int32?
   /// The citation.
   citation : ElemChildren
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -1407,10 +1411,11 @@ pub(all) struct RenderedCitation {
 pub extend RenderedCitation with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq)
 priv enum Sorting {
   Variable
   Macro
-} derive(Eq)
+}
 
 ///|
 /// A context that contains all information related to rendering a single
@@ -2478,6 +2483,7 @@ fn SpeculativeCiteProperties::for_bibliography(
 
 ///|
 /// Which type of citation label was used when this entry was cited.
+#derive(Eq)
 priv enum IdentifierUsage {
   /// No label was used.
   NoneUsage
@@ -2488,7 +2494,7 @@ priv enum IdentifierUsage {
   /// Both the alphanumeric citation label and the citation number were
   /// used.
   Mixed
-} derive(Eq)
+}
 
 ///|
 /// Return the identifier usage given that a label was used.
@@ -2509,12 +2515,13 @@ fn IdentifierUsage::number(self : IdentifierUsage) -> IdentifierUsage {
 }
 
 ///|
+#derive(Eq)
 priv enum DisambiguateState {
   None_
   NameDisambiguation(NameDisambiguationProperties)
   Choose
   YearSuffix(Int32)
-} derive(Eq)
+}
 
 ///|
 /// Name disambiguation can be iterated upon, so we can stay here.
@@ -2558,6 +2565,7 @@ fn DisambiguateState::max(
 }
 
 ///|
+#derive(Eq)
 priv enum IbidState {
   /// The previous cite referenced another entry, or this cite has no
   /// locator when the previous one did.
@@ -2567,7 +2575,7 @@ priv enum IbidState {
   IbidWithLocator
   /// The previous cite referenced the same entry with the same locator.
   Ibid
-} derive(Eq)
+}
 
 ///|
 fn IbidState::with_last(this : CitationItem, last : CitationItem?) -> IbidState {
@@ -2596,7 +2604,8 @@ fn IbidState::with_last(this : CitationItem, last : CitationItem?) -> IbidState 
 ///|
 /// This struct allows to add context to where the information in a cite is
 /// found in the source.
-pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload) derive(Eq)
+#derive(Eq)
+pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2605,6 +2614,7 @@ pub extend SpecificLocator with Eq::{not_equal, equal}
 
 ///|
 /// The type of content a `cs:text` element should yield for a locator.
+#derive(Eq)
 pub(all) enum LocatorPayload {
   /// Just print the string.
   Str(String)
@@ -2612,7 +2622,7 @@ pub(all) enum LocatorPayload {
   /// The consumer can then recognize this and replace it with their own
   /// content.
   Transparent(TransparentLocator)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2623,7 +2633,8 @@ pub extend LocatorPayload with Eq::{not_equal, equal}
 /// Wraps an object that is used to determine whether two locators are the
 /// same. (Upstream compares arbitrary payloads with `dyn Any`; here, the
 /// consumer provides a comparison key.)
-pub(all) struct TransparentLocator(String) derive(Eq)
+#derive(Eq)
+pub(all) struct TransparentLocator(String)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2644,6 +2655,7 @@ fn Context::set_special_form(self : Context, form : SpecialForm?) -> Unit {
 
 ///|
 /// Describes the bracket preference of a citation style.
+#derive(Eq, Debug)
 pub(all) enum Brackets {
   /// "(...)" Parentheses.
   Round
@@ -2651,7 +2663,7 @@ pub(all) enum Brackets {
   Square
   /// No brackets.
   None_
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2665,6 +2677,7 @@ pub extend Brackets with @debug.Debug::{to_repr}
 
 ///|
 /// For what purpose to generate a citation.
+#derive(Eq, Hash, Debug)
 pub(all) enum CitePurpose {
   /// The citation will only contain the name of the author.
   Author
@@ -2675,7 +2688,7 @@ pub(all) enum CitePurpose {
   Full
   /// The citation will be well-suited for inclusion in prose.
   Prose
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -2694,6 +2707,7 @@ pub extend CitePurpose with @debug.Debug::{to_repr}
 
 ///|
 /// A special citation form to use for the [`CitationItem`].
+#derive(Eq)
 priv enum SpecialForm {
   /// Only output the author.
   VarOnly(@citationberg.Variable)
@@ -2703,4 +2717,4 @@ priv enum SpecialForm {
   OnlyYearSuffix
   /// Output everything but the author.
   SuppressAuthor
-} derive(Eq)
+}

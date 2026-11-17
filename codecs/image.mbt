@@ -7,9 +7,10 @@
 /// An image decoding error. The payload is the `Display` output of upstream
 /// `image::ImageError`, e.g. `Format error decoding Png: Invalid PNG
 /// signature.`.
+#derive(Debug)
 pub(all) suberror ImageError {
   ImageError(String)
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -25,6 +26,7 @@ fn[T] decoding_error(format : String, message : String) -> T raise ImageError {
 
 ///|
 /// The color type of a decoded image (upstream `image::ColorType`).
+#derive(Eq, Hash, Debug)
 pub(all) enum ColorType {
   L8
   La8
@@ -34,7 +36,7 @@ pub(all) enum ColorType {
   La16
   Rgb16
   Rgba16
-} derive(Eq, Hash, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -65,6 +67,7 @@ pub fn ColorType::channel_count(self : ColorType) -> Int32 {
 ///|
 /// The header information of an image that is obtained without decoding the
 /// pixel data.
+#derive(Debug)
 pub(all) struct ImageInfo {
   /// The pixel width (upstream `ImageDecoder::dimensions().0`).
   width : UInt32
@@ -74,7 +77,7 @@ pub(all) struct ImageInfo {
   color : ColorType
   /// The embedded ICC profile, if any (upstream `ImageDecoder::icc_profile`).
   icc : Bytes?
-} derive(Debug)
+}
 
 ///|
 #deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")

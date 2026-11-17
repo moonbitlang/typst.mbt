@@ -35,10 +35,11 @@ pub let atom_len_bits : Int32 = 3
 /// information to a specific piece of text.
 ///
 /// For example `source.php` or `keyword.control.flow.loop.c`.
+#derive(Eq, Compare, Hash, Default)
 pub(all) struct Scope {
   a : UInt64
   b : UInt64
-} derive(Eq, Compare, Hash, Default)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -101,10 +102,11 @@ let scope_repo : ScopeRepository = ScopeRepository::new()
 ///|
 /// A stack/sequence of scopes for representing hierarchies for a given token
 /// of text.
+#derive(Eq)
 pub(all) struct ScopeStack {
   clear_stack : Array[Array[Scope]]
   scopes : Array[Scope]
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -113,10 +115,11 @@ pub extend ScopeStack with Eq::{not_equal, equal}
 
 ///|
 /// How many scopes to clear.
+#derive(Eq, Debug)
 pub(all) enum ClearAmount {
   TopN(Int32)
   All
-} derive(Eq, Debug)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -130,6 +133,7 @@ pub extend ClearAmount with @debug.Debug::{to_repr}
 
 ///|
 /// A change to a scope stack.
+#derive(Eq)
 pub(all) enum ScopeStackOp {
   Push(Scope)
   Pop(Int32)
@@ -138,7 +142,7 @@ pub(all) enum ScopeStackOp {
   /// Restores cleared scopes
   Restore
   Noop
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -147,10 +151,11 @@ pub extend ScopeStackOp with Eq::{not_equal, equal}
 
 ///|
 /// Used for `ScopeStack::apply_with_hook`.
+#derive(Eq)
 pub(all) enum BasicScopeStackOp {
   Push(Scope)
   Pop
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -328,7 +333,8 @@ pub fn Scope::debug(self : Scope) -> String {
 ///|
 /// Wrapper to get around the fact Rust `f64` doesn't implement `Ord` and
 /// there is no non-NaN float type.
-pub(all) struct MatchPower(Double) derive(Eq, Compare, Debug)
+#derive(Eq, Compare, Debug)
+pub(all) struct MatchPower(Double)
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

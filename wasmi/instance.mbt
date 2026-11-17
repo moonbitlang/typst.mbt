@@ -5,6 +5,7 @@
 ///
 /// This is returned from [`Instance::exports`]
 /// or [`Instance::get_export`].
+#derive(Eq)
 pub(all) enum Extern {
   /// A WebAssembly global which acts like a [`Cell<T>`] of sorts, supporting `get` and `set` operations.
   Global(Global)
@@ -14,7 +15,7 @@ pub(all) enum Extern {
   Memory(Memory)
   /// A WebAssembly function which can be called.
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

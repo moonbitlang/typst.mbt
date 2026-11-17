@@ -40,10 +40,11 @@ pub extend Document with IntoContent::{into_content}
 
 ///|
 /// Whether a diagnostic is an error or a warning.
+#derive(Eq)
 pub(all) enum Severity {
   Error
   Warning
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")

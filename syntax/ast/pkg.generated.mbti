@@ -67,11 +67,12 @@ pub fn Auto::span(Self) -> @syntax.Span
 pub fn Auto::to_untyped(Self) -> @syntax.SyntaxNode
 pub impl AstNode for Auto
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum BareImportError {
   Dynamic
   PathInvalid
   PackageInvalid
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub struct Binary {
   node : @syntax.SyntaxNode
@@ -456,10 +457,11 @@ pub fn IntLit::span(Self) -> @syntax.Span
 pub fn IntLit::to_untyped(Self) -> @syntax.SyntaxNode
 pub impl AstNode for IntLit
 
+#derive(Eq, @debug.Debug)
 pub(all) enum IntLiteralError {
   PosOverflow(base~ : @syntax.NonDecimalBase?, max_plus_one~ : Bool)
   InvalidDigit(@syntax.NonDecimalBase, String)
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Keyed {
   node : @syntax.SyntaxNode
@@ -790,6 +792,7 @@ pub fn Numeric::span(Self) -> @syntax.Span
 pub fn Numeric::to_untyped(Self) -> @syntax.SyntaxNode
 pub impl AstNode for Numeric
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) enum NumericUnit {
   Pt
   Mm
@@ -800,7 +803,7 @@ pub(all) enum NumericUnit {
   Em
   Fr
   Percent
-} derive(Eq, Hash, @debug.Debug)
+}
 
 pub(all) enum Param {
   Pos(Pattern)

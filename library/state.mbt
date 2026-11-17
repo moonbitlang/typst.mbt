@@ -6,12 +6,13 @@
 /// States are identified by a key and hold an initial value. Their value
 /// changes through `update`s and can be read contextually with `get`, `at`
 /// and `final`.
+#derive(Eq)
 pub(all) struct State {
   /// The key that identifies the state.
   key : String
   /// The initial value of the state.
   init : Value
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
@@ -268,12 +269,13 @@ pub extend State with FromValue::{from_value}
 
 ///|
 /// An update to perform on a state.
+#derive(Eq)
 pub(all) enum StateUpdate {
   /// Set the state to the specified value.
   Set(Value)
   /// Apply the given function to the state.
   Func(Func)
-} derive(Eq)
+}
 
 ///|
 #deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
