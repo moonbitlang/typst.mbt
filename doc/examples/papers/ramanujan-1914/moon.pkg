@@ -1,9 +1,12 @@
 import {
-  "moonbitlang/async",
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
   "moonbitlang/core/env",
   "moonbitlang/core/math",
 }
+
+import {
+  "moonbitlang/async",
+} for "wbtest"
 
 pkgtype(kind: "executable")

@@ -955,8 +955,8 @@ test "oracle/xml_c2/116" {
 ///|
 test "oracle/xml_c2/117" {
   assert_eq(
-    typst_xml("<a>\u{85} </a>"),
-    "[{\"namespace\":null,\"tag\":\"a\",\"attrs\":{},\"children\":[\"\u{85} \"]}]",
+    typst_xml("<a>\u{85}\u{2028}</a>"),
+    "[{\"namespace\":null,\"tag\":\"a\",\"attrs\":{},\"children\":[\"\u{85}\u{2028}\"]}]",
   )
 }
 

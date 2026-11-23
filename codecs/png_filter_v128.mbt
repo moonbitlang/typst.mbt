@@ -139,10 +139,10 @@ fn paeth16(a : V128, b : V128, c : V128) -> V128 {
 ///|
 #inline
 fn hsum_i32x4_to_int64(v : V128) -> Int64 {
-  UInt64::extend_uint(@v128.i32x4_extract_lane(v, 0)).reinterpret_as_int64() +
-  UInt64::extend_uint(@v128.i32x4_extract_lane(v, 1)).reinterpret_as_int64() +
-  UInt64::extend_uint(@v128.i32x4_extract_lane(v, 2)).reinterpret_as_int64() +
-  UInt64::extend_uint(@v128.i32x4_extract_lane(v, 3)).reinterpret_as_int64()
+  @v128.i32x4_extract_lane(v, 0).to_uint64().reinterpret_as_int64() +
+  @v128.i32x4_extract_lane(v, 1).to_uint64().reinterpret_as_int64() +
+  @v128.i32x4_extract_lane(v, 2).to_uint64().reinterpret_as_int64() +
+  @v128.i32x4_extract_lane(v, 3).to_uint64().reinterpret_as_int64()
 }
 
 ///|

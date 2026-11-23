@@ -171,7 +171,7 @@ fn SipHasher128::compress(self : SipHasher128, m : UInt64) -> Unit {
 ///|
 /// Write a single byte.
 pub fn SipHasher128::write_u8(self : SipHasher128, b : Byte) -> Unit {
-  self.write_short(UInt64::extend_uint(b.to_int().reinterpret_as_uint()), 1)
+  self.write_short(b.to_int().reinterpret_as_uint().to_uint64(), 1)
 }
 
 ///|
@@ -183,7 +183,7 @@ fn SipHasher128::write_short(
   n : Int32,
 ) -> Unit {
   let ntail = self.ntail
-  self.length += UInt64::extend_uint(n.reinterpret_as_uint())
+  self.length += n.reinterpret_as_uint().to_uint64()
   let word = self.tail | (v << (8 * ntail))
   let filled = ntail + n
   if filled < 8 {
@@ -236,7 +236,7 @@ pub fn SipHasher128::write_bytes(
   }
   // Whole words (little endian).
   let words_end = i + (n - i) / 8 * 8
-  self.length += UInt64::extend_uint((words_end - i).reinterpret_as_uint())
+  self.length += (words_end - i).reinterpret_as_uint().to_uint64()
   while i < words_end {
     let p = start + i
     let lo = data.unsafe_get(p).to_int() |
@@ -248,8 +248,8 @@ pub fn SipHasher128::write_bytes(
       (data.unsafe_get(p + 6).to_int() << 16) |
       (data.unsafe_get(p + 7).to_int() << 24)
     self.compress(
-      UInt64::extend_uint(lo.reinterpret_as_uint()) |
-      (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32),
+      lo.reinterpret_as_uint().to_uint64() |
+      (hi.reinterpret_as_uint().to_uint64() << 32),
     )
     i += 8
   }
@@ -263,7 +263,7 @@ pub fn SipHasher128::write_bytes(
 ///|
 /// Write a 32-bit integer.
 pub fn SipHasher128::write_u32(self : SipHasher128, v : UInt32) -> Unit {
-  self.write_short(UInt64::extend_uint(v), 4)
+  self.write_short(v.to_uint64(), 4)
 }
 
 ///|
@@ -321,8 +321,7 @@ pub fn SipHasher128::write_str(self : SipHasher128, s : StringView) -> Unit {
     if unit >= 0x80 {
       break
     }
-    tail = tail |
-      (UInt64::extend_uint(unit.reinterpret_as_uint()) << (8 * ntail))
+    tail = tail | (unit.reinterpret_as_uint().to_uint64() << (8 * ntail))
     ntail += 1
     if ntail == 8 {
       self.compress(tail)
@@ -333,7 +332,7 @@ pub fn SipHasher128::write_str(self : SipHasher128, s : StringView) -> Unit {
   }
   self.tail = tail
   self.ntail = ntail
-  self.length += UInt64::extend_uint(i.reinterpret_as_uint())
+  self.length += i.reinterpret_as_uint().to_uint64()
   if i == len {
     self.write_u8(b'\xff')
     return

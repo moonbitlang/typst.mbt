@@ -338,7 +338,7 @@ fn dump_color_frames(out : StringBuilder, inst : @library.FontInstance) -> Unit 
             let (kind, data) = match image.kind() {
               Raster(r) => ("raster", r.data())
               Svg(s) => ("svg", s.data())
-              _ => ("other", Bytes::new(0))
+              _ => ("other", b"")
             }
             "\{gid} \{abs_pt(frame.upem)} \{kind} \{abs_pt(pos.x)} \{abs_pt(pos.y)} \{abs_pt(size.x)} \{abs_pt(size.y)} \{data.length()} \{hex16(fnv_bytes(data[:]))}"
           }

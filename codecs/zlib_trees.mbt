@@ -304,7 +304,7 @@ fn encode_dist(
 /// `x as u64` for a non-negative `x` (intrinsic conversions only).
 #inline
 fn u64_of_int(x : Int32) -> UInt64 {
-  UInt64::extend_uint(x.reinterpret_as_uint())
+  x.reinterpret_as_uint().to_uint64()
 }
 
 ///|

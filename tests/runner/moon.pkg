@@ -1,5 +1,4 @@
 import {
-  "moonbitlang/async",
   "moonbitlang/typst/wasmi",
   "moonbitlang/typst/wasmi/core" @wasmi_core,
   "moonbitlang/typst/syntax",

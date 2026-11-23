@@ -232,7 +232,7 @@ fn parse_unicodes(s : String) -> Array[Int32] {
     } else {
       p
     }
-    @string.parse_int(p, base=16) catch {
+    @string.parse_int(p, radix=16) catch {
       _ => 0
     }
   })

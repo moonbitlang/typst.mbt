@@ -183,9 +183,7 @@ fn Decompressor::fill_buffer(self : Decompressor) -> Unit {
     for k in 0..<nbytes {
       input_data = input_data |
         (
-          UInt64::extend_uint(
-            self.input[self.in_pos + k].to_int().reinterpret_as_uint(),
-          ) <<
+          self.input[self.in_pos + k].to_int().reinterpret_as_uint().to_uint64() <<
           (8 * k)
         )
     }

@@ -13,8 +13,8 @@ fn load_u64_le_unchecked(window : FixedArray[Byte], i : Int32) -> UInt64 {
     (window.unsafe_get(i + 5).to_int() << 8) |
     (window.unsafe_get(i + 6).to_int() << 16) |
     (window.unsafe_get(i + 7).to_int() << 24)
-  UInt64::extend_uint(lo.reinterpret_as_uint()) |
-  (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32)
+  lo.reinterpret_as_uint().to_uint64() |
+  (hi.reinterpret_as_uint().to_uint64() << 32)
 }
 
 ///|

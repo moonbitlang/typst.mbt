@@ -42,7 +42,7 @@ fn mbt_str(s: &str) -> String {
             '\n' => out.push_str("\\n"),
             '\r' => out.push_str("\\r"),
             '\t' => out.push_str("\\t"),
-            c if (c as u32) < 0x20 || c as u32 == 0x7f => {
+            c if c < '\u{20}' || matches!(c, '\u{7f}' | '\u{2028}' | '\u{2029}') => {
                 write!(out, "\\u{{{:x}}}", c as u32).unwrap()
             }
             c => out.push(c),

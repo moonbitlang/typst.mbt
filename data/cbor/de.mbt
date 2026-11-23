@@ -455,11 +455,7 @@ fn Deserializer::deserialize_any(
       match len {
         Some(len) if (tag == tag_bigpos || tag == tag_bigneg) && len <= 16 => {
           let (neg, raw) = self.integer(Some(Tag(tag)))
-          if neg &&
-            raw >
-            @bigint.BigInt::from_string(
-              "170141183460469231731687303715884105727",
-            ) {
+          if neg && raw > 170141183460469231731687303715884105727 {
             raise Semantic(None, "integer too large")
           }
           int_data(neg, raw)

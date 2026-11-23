@@ -1,5 +1,4 @@
 import {
-  "moonbitlang/async",
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
   "moonbitlang/typst/doc/twins",

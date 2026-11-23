@@ -4013,7 +4013,7 @@ test "yaml_rust/cases/622" {
 ///|
 test "yaml_rust/cases/623" {
   assert_eq(
-    load_dump("a:  b"),
+    load_dump("a: \u{2028}b"),
     "Ok([Hash({String(\"a\"): String(\"\\u{2028}b\")})])",
   )
 }

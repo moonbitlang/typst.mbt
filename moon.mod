@@ -16,7 +16,7 @@ preferred_target = "native"
 
 import {
   "moonbitlang/x@0.5.6",
-  "moonbitlang/pdflite@0.4.1",
+  "moonbitlang/pdflite@0.4.2",
   "moonbit-community/flate@0.10.0",
-  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.9",
 }

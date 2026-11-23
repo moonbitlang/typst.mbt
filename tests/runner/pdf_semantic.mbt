@@ -1601,7 +1601,7 @@ fn parse_to_unicode(data : Bytes, map : Map[Int32, String]) -> Unit {
     while k + 1 < inner.length() {
       let v = @string.parse_int(
         inner.unsafe_substring(start=k, end=k + 2),
-        base=16,
+        radix=16,
       ) catch {
         _ => return None
       }

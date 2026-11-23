@@ -615,26 +615,26 @@ fn parse_dict_number(b0 : Byte, s : Stream) -> Double raise Malformed {
   match b0 {
     28 => {
       let n = s.read_i16().to_int()
-      Double::from_int(n)
+      n.to_double()
     }
     29 => {
       let n = s.read_i32()
-      Double::from_int(n)
+      n.to_double()
     }
     30 => parse_dict_float(s)
     32..<=246 => {
       let n = b0 - 139
-      Double::from_int(n)
+      n.to_double()
     }
     247..<=250 => {
       let b1 = s.read_u8().to_int()
       let n = (b0 - 247) * 256 + b1 + 108
-      Double::from_int(n)
+      n.to_double()
     }
     251..<=254 => {
       let b1 = s.read_u8().to_int()
       let n = -(b0 - 251) * 256 - b1 - 108
-      Double::from_int(n)
+      n.to_double()
     }
     _ => raise Malformed
   }
