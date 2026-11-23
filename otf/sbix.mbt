@@ -154,7 +154,7 @@ pub fn SbixStrikes::into_iter(self : SbixStrikes) -> SbixStrikesIter {
 /// Iterates over the strikes.
 pub fn SbixStrikes::iter(self : SbixStrikes) -> Iter[SbixStrike] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

@@ -142,7 +142,7 @@ pub fn KernSubtables::into_iter(self : KernSubtables) -> KernSubtablesIter {
 /// Iterates over the subtables.
 pub fn KernSubtables::iter(self : KernSubtables) -> Iter[KernSubtable] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

@@ -144,5 +144,5 @@ pub fn NumberListParser::next(
 pub fn NumberListParser::iter(
   self : NumberListParser,
 ) -> Iter[Result[Double, SvgTypesError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }

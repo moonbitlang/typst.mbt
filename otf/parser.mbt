@@ -507,7 +507,7 @@ pub fn[T : FromData + Compare] LazyArray16::binary_search(
 pub fn[T : FromData] LazyArray16::iter(self : LazyArray16[T]) -> Iter[T] {
   let len = self.len()
   let mut index : UInt16 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if index < len {
       index += 1
       self.get(index - 1)
@@ -617,7 +617,7 @@ pub fn[T : FromData + Compare] LazyArray32::binary_search(
 pub fn[T : FromData] LazyArray32::iter(self : LazyArray32[T]) -> Iter[T] {
   let len = self.len()
   let mut index : UInt32 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if index < len {
       index += 1
       self.get(index - 1)
@@ -710,7 +710,7 @@ pub fn[T : FromSlice] LazyOffsetArray16::iter(
 ) -> Iter[T] {
   let len = self.len()
   let mut index : UInt16 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if index < len {
       index += 1
       self.get(index - 1)

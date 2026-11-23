@@ -296,7 +296,7 @@ pub fn StoredOnlyCompressor::write_data(
 /// single empty final block).
 pub fn StoredOnlyCompressor::finish(self : StoredOnlyCompressor) -> Bytes {
   let data = self.data.to_bytes()
-  let w = Buffer(size_hint=StoredOnlyCompressor::compressed_size(data.length()))
+  let w = Buffer(capacity=StoredOnlyCompressor::compressed_size(data.length()))
   w.write_byte(0x78) // zlib header
   w.write_byte(0x01)
   let max = 65535

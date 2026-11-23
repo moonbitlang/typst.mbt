@@ -37,5 +37,5 @@ pub fn PointsParser::next(self : PointsParser) -> (Double, Double)? {
 
 ///|
 pub fn PointsParser::iter(self : PointsParser) -> Iter[(Double, Double)] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }

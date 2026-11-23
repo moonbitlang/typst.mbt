@@ -30,7 +30,7 @@ pub fn PdfArray::empty() -> PdfArray {
 pub fn PdfArray::raw_iter(self : PdfArray) -> Iter[MaybeRef[Object]] {
   let reader = Reader::new(self.data)
   let ctx = self.ctx
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     reader.skip_white_spaces_and_comments()
     if !reader.at_end() {
       // Objects are already guaranteed to be valid.
@@ -47,7 +47,7 @@ pub fn PdfArray::raw_iter(self : PdfArray) -> Iter[MaybeRef[Object]] {
 /// stops at the first item that cannot be read as a `T`.
 pub fn[T : ObjectLike] PdfArray::iter(self : PdfArray) -> Iter[T] {
   let flex = self.flex_iter()
-  Iter::new(fn() { flex.next() })
+  Iter::Iter(fn() { flex.next() })
 }
 
 ///|

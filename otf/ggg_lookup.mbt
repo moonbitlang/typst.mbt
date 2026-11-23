@@ -98,7 +98,7 @@ pub fn[T : LookupSubtable] LookupSubtables::iter(
   self : LookupSubtables,
 ) -> Iter[T] {
   let it : LookupSubtablesIter[T] = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

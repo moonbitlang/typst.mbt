@@ -320,7 +320,7 @@ pub fn stroke_with(
       style.dash_pattern,
       opts.stable_dash_order,
     )
-    stroke_undashed(Iter::new(() => dashed.next()), style, tolerance, ctx)
+    stroke_undashed(Iter::Iter(() => dashed.next()), style, tolerance, ctx)
   }
 }
 
@@ -786,7 +786,7 @@ pub fn dash(
   dashes : Array[Double],
 ) -> Iter[PathEl] {
   let it = dash_iter(inner, dash_offset, dashes, false)
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

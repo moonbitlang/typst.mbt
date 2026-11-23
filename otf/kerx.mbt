@@ -452,7 +452,7 @@ pub fn KerxSubtables::into_iter(self : KerxSubtables) -> KerxSubtablesIter {
 /// Iterates over the subtables.
 pub fn KerxSubtables::iter(self : KerxSubtables) -> Iter[KerxSubtable] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

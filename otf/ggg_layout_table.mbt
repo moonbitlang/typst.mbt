@@ -158,7 +158,7 @@ pub fn[T] RecordList::into_iter(self : RecordList[T]) -> RecordListIter[T] {
 /// Iterates over the values (stops at the first unparsable value).
 pub fn[T : RecordListItem] RecordList::iter(self : RecordList[T]) -> Iter[T] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

@@ -141,7 +141,7 @@ pub fn Regions::next(self : Regions) -> Regions {
 pub fn Regions::iter(self : Regions) -> Iter[Axes[Abs]] {
   let mut first = true
   let mut i = 0
-  Iter::new(() => {
+  Iter::Iter(() => {
     if first {
       first = false
       return Some(self.size)

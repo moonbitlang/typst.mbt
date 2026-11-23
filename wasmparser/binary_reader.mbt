@@ -901,7 +901,7 @@ pub fn BinaryReader::read_unlimited_string(
 /// `str::from_utf8`: `None` for any invalid sequence (overlong encodings,
 /// surrogates, code points above U+10FFFF, truncated sequences).
 fn decode_utf8(data : Bytes, start : Int32, len : Int32) -> String? {
-  let buf = StringBuilder(size_hint=len)
+  let buf = StringBuilder(capacity=len)
   let end = start + len
   let mut i = start
   while i < end {

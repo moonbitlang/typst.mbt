@@ -270,7 +270,7 @@ fn run_case(parts : Array[String], ctx : @kurbo.StrokeCtx) -> String {
         a[6],
       )
       let it = arc.append_iter(parse_hex(parts[2]))
-      path_str(Iter::new(() => it.next()))
+      path_str(Iter::Iter(() => it.next()))
     }
     "arclen" => hx(parse_seg(parts[1]).arclen(parse_hex(parts[2])))
     "inv_arclen" =>

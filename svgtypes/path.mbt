@@ -151,7 +151,7 @@ pub fn PathParser::next(
 pub fn PathParser::iter(
   self : PathParser,
 ) -> Iter[Result[PathSegment, SvgTypesError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|
@@ -437,7 +437,7 @@ pub fn SimplifyingPathParser::from(v : String) -> SimplifyingPathParser {
 pub fn SimplifyingPathParser::iter(
   self : SimplifyingPathParser,
 ) -> Iter[Result[SimplePathSegment, SvgTypesError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

@@ -316,7 +316,7 @@ pub fn SvgNode::has_children(self : SvgNode) -> Bool {
 /// Returns an iterator over ancestor nodes starting at this node.
 pub fn SvgNode::ancestors(self : SvgNode) -> Iter[SvgNode] {
   let mut cur = Some(self)
-  Iter::new(() => {
+  Iter::Iter(() => {
     let node = cur
     cur = match node {
       Some(n) => n.parent()
@@ -331,7 +331,7 @@ pub fn SvgNode::ancestors(self : SvgNode) -> Iter[SvgNode] {
 pub fn SvgNode::children(self : SvgNode) -> Iter[SvgNode] {
   let mut front = self.first_child()
   let mut back = self.last_child()
-  Iter::new(() => {
+  Iter::Iter(() => {
     let node = front
     if front == back {
       back = None
@@ -352,7 +352,7 @@ pub fn SvgNode::descendants(self : SvgNode) -> Iter[SvgNode] {
   let root = self
   // `Traverse` with `Edge::Open`/`Edge::Close`; only open edges are yielded.
   let mut edge : (Bool, SvgNode)? = None // (is_open, node)
-  Iter::new(() => {
+  Iter::Iter(() => {
     while true {
       match edge {
         Some((true, node)) =>
@@ -390,7 +390,7 @@ pub fn SvgNode::href_iter(self : SvgNode) -> Iter[SvgNode] {
   let mut curr = self.id
   let mut is_first = true
   let mut is_finished = false
-  Iter::new(() => {
+  Iter::Iter(() => {
     if is_finished {
       return None
     }

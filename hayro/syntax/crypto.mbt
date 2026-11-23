@@ -407,7 +407,7 @@ fn compute_hash_rev56(
         single.write_bytesview(user_string)
       }
       let single = single.contents()
-      let repeated = Buffer(size_hint=single.length() * 64)
+      let repeated = Buffer(capacity=single.length() * 64)
       for _ in 0..<64 {
         repeated.write_bytes(single)
       }
@@ -484,7 +484,7 @@ fn decryption_key_rev1234(
   // TODO: Convert to PDFDocEncoding.
   // a) Pad or truncate password to 32 bytes using PASSWORD_PADDING.
   let copy_len = @cmp.minimum(password.length(), 32)
-  let padded_password = Buffer(size_hint=32)
+  let padded_password = Buffer(capacity=32)
   padded_password.write_bytesview(password[:copy_len])
   if copy_len < 32 {
     padded_password.write_bytesview(password_padding[:32 - copy_len])

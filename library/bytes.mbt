@@ -167,7 +167,7 @@ pub fn BytesValue::concat(self : BytesValue, other : BytesValue) -> BytesValue {
   } else if self.is_empty() {
     other
   } else {
-    let buf = Buffer(size_hint=self.len() + other.len())
+    let buf = Buffer(capacity=self.len() + other.len())
     buf.write_bytes(self.0)
     buf.write_bytes(other.0)
     BytesValue(buf.to_bytes())
@@ -204,7 +204,7 @@ pub impl FromValue for ToBytes with fn from_value(v) {
       ToBytes(BytesValue::from_string(s))
     }
     Array(array) => {
-      let buf = Buffer(size_hint=array.items.length())
+      let buf = Buffer(capacity=array.items.length())
       for item in array.items {
         match item {
           Int(byte) if byte >= 0L && byte <= 255L =>

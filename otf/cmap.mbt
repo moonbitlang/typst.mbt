@@ -303,7 +303,7 @@ pub fn CmapSubtables::is_empty(self : CmapSubtables) -> Bool {
 pub fn CmapSubtables::iter(self : CmapSubtables) -> Iter[CmapSubtable] {
   let len = self.len()
   let mut index : UInt16 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if index < len {
       index += 1
       self.get(index - 1)

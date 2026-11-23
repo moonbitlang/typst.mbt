@@ -147,7 +147,7 @@ pub fn FeatureNames::into_iter(self : FeatureNames) -> FeatureNamesIter {
 /// Iterates over the feature names.
 pub fn FeatureNames::iter(self : FeatureNames) -> Iter[FeatureName] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

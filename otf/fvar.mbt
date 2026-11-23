@@ -173,7 +173,7 @@ pub fn SegmentMaps::is_empty(self : SegmentMaps) -> Bool {
 /// An iterator over maps.
 pub fn SegmentMaps::iter(self : SegmentMaps) -> Iter[LazyArray16[AxisValueMap]] {
   let stream = Stream::new(self.data)
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     try {
       let count = stream.read_u16()
       Some(stream.read_array16(count))

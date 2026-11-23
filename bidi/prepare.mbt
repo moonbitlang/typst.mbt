@@ -236,7 +236,7 @@ fn IsolatingRunSequence::iter_forwards_from(
   let runs = self.runs
   let mut k = level_run_index
   let mut i = pos
-  Iter::new(() => {
+  Iter::Iter(() => {
     while k < runs.length() {
       if i < runs[k].end {
         let r = i
@@ -270,7 +270,7 @@ fn IsolatingRunSequence::iter_backwards_from(
   let mut i = pos
   let mut k = level_run_index - 1
   let mut j = if k >= 0 { runs[k].start } else { 0 }
-  Iter::new(() => {
+  Iter::Iter(() => {
     if i > current_start {
       i -= 1
       return Some(i)

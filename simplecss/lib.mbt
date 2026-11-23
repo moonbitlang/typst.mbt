@@ -392,7 +392,7 @@ pub fn DeclarationTokenizer::next(self : DeclarationTokenizer) -> Declaration? {
 pub fn DeclarationTokenizer::iter(
   self : DeclarationTokenizer,
 ) -> Iter[Declaration] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

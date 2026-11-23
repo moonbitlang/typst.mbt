@@ -305,7 +305,7 @@ pub fn Names::is_empty(self : Names) -> Bool {
 pub fn Names::iter(self : Names) -> Iter[Name] {
   let len = self.len()
   let mut index : UInt16 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if index < len {
       index += 1
       self.get(index - 1)

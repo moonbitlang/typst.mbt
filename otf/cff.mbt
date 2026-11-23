@@ -380,7 +380,7 @@ fn CffIndex::get(self : CffIndex, index : UInt32) -> BytesView? {
 fn CffIndex::iter(self : CffIndex) -> Iter[BytesView] {
   let len = self.len()
   let mut offset_index : UInt32 = 0
-  Iter::new(fn() {
+  Iter::Iter(fn() {
     if offset_index == len {
       return None
     }

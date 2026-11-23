@@ -393,5 +393,5 @@ pub fn PathSegmentsIter::next(self : PathSegmentsIter) -> PathSegment? {
 ///|
 /// Returns the remaining segments as an `Iter`.
 pub fn PathSegmentsIter::iter(self : PathSegmentsIter) -> Iter[PathSegment] {
-  Iter::new(fn() { self.next() })
+  Iter::Iter(fn() { self.next() })
 }

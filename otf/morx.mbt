@@ -300,7 +300,7 @@ pub fn MorxSubtables::into_iter(self : MorxSubtables) -> MorxSubtablesIter {
 /// Iterates over the subtables.
 pub fn MorxSubtables::iter(self : MorxSubtables) -> Iter[MorxSubtable] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|
@@ -428,7 +428,7 @@ pub fn MorxChains::into_iter(self : MorxChains) -> MorxChainsIter {
 /// Iterates over the chains.
 pub fn MorxChains::iter(self : MorxChains) -> Iter[MorxChain] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

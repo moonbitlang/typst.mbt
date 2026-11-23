@@ -89,7 +89,7 @@ pub fn Tracks::into_iter(self : Tracks) -> TracksIter {
 /// Iterates over the tracks.
 pub fn Tracks::iter(self : Tracks) -> Iter[Track] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

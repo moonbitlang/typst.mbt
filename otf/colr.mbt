@@ -507,7 +507,7 @@ pub fn GradientStopsIter::next(self : GradientStopsIter) -> ColorStop? {
 ///|
 /// Iterates over the remaining color stops.
 pub fn GradientStopsIter::iter(self : GradientStopsIter) -> Iter[ColorStop] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

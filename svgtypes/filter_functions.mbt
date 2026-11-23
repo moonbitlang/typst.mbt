@@ -146,7 +146,7 @@ pub fn FilterValueListParser::next(
 pub fn FilterValueListParser::iter(
   self : FilterValueListParser,
 ) -> Iter[Result[FilterValue, FilterValueListParserError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

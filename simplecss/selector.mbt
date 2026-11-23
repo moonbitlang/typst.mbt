@@ -451,7 +451,7 @@ fn SelectorTokenizer::from_bytes(text : BytesView) -> SelectorTokenizer {
 pub fn SelectorTokenizer::iter(
   self : SelectorTokenizer,
 ) -> Iter[Result[SelectorToken, CssError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

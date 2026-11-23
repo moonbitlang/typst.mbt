@@ -125,7 +125,7 @@ pub fn SvgDocumentsList::into_iter(
 /// Iterates over the documents.
 pub fn SvgDocumentsList::iter(self : SvgDocumentsList) -> Iter[SvgDocument] {
   let it = self.into_iter()
-  Iter::new(() => it.next())
+  Iter::Iter(() => it.next())
 }
 
 ///|

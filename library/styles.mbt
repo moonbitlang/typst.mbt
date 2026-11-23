@@ -470,7 +470,7 @@ pub fn StyleChain::memo_hash(self : StyleChain) -> U128 {
 pub fn StyleChain::entries(self : StyleChain) -> Iter[Style] {
   let mut link : StyleChain? = Some(self)
   let mut i = self.head.length()
-  Iter::new(() => {
+  Iter::Iter(() => {
     while link is Some(l) {
       if i > 0 {
         i -= 1

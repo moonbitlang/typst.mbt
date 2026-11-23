@@ -868,7 +868,7 @@ pub fn Matches::next(self : Matches) -> Result[Match, FancyError]? {
 
 ///|
 pub fn Matches::iter(self : Matches) -> Iter[Result[Match, FancyError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|
@@ -931,7 +931,7 @@ pub fn CaptureMatches::next(
 pub fn CaptureMatches::iter(
   self : CaptureMatches,
 ) -> Iter[Result[Captures, FancyError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|
@@ -1001,7 +1001,7 @@ pub fn Captures::expand(
 /// regex. The first capture corresponds to the whole match.
 pub fn Captures::iter(self : Captures) -> Iter[Match?] {
   let mut i = 0
-  Iter::new(() => {
+  Iter::Iter(() => {
     if i < self.len() {
       let result = self.get(i)
       i += 1
@@ -1081,7 +1081,7 @@ pub fn Split::next(self : Split) -> Result[String, FancyError]? {
 
 ///|
 pub fn Split::iter(self : Split) -> Iter[Result[String, FancyError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|
@@ -1121,5 +1121,5 @@ pub fn SplitN::next(self : SplitN) -> Result[String, FancyError]? {
 
 ///|
 pub fn SplitN::iter(self : SplitN) -> Iter[Result[String, FancyError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }

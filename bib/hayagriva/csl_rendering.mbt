@@ -962,7 +962,7 @@ fn BranchConditionIter::next_case(self : BranchConditionIter) -> Unit {
 
 ///|
 fn BranchConditionIter::iter(self : BranchConditionIter) -> Iter[Bool] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

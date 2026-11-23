@@ -103,7 +103,7 @@ pub fn StatAxisValueSubtables::next(
 pub fn StatAxisValueSubtables::iter(
   self : StatAxisValueSubtables,
 ) -> Iter[StatAxisValueSubtable] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

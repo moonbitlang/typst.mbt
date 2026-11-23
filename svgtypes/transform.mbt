@@ -130,7 +130,7 @@ pub fn TransformListParser::next(
 pub fn TransformListParser::iter(
   self : TransformListParser,
 ) -> Iter[Result[TransformListToken, SvgTypesError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }
 
 ///|

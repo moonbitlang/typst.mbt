@@ -176,5 +176,5 @@ pub fn LengthListParser::next(
 pub fn LengthListParser::iter(
   self : LengthListParser,
 ) -> Iter[Result[Length, SvgTypesError]] {
-  Iter::new(() => self.next())
+  Iter::Iter(() => self.next())
 }

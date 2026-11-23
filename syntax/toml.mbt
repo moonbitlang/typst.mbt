@@ -332,7 +332,7 @@ fn TomlParser::scalar(self : TomlParser) -> TomlValue raise TomlError {
     .iter()
     .all(c => (c >= '0' && c <= '9') || c == '+' || c == '-')
   if is_int {
-    return TInteger(@string.parse_int64(digits, base=10)) catch {
+    return TInteger(@string.parse_int64(digits, radix=10)) catch {
       _ => raise TomlError("invalid TOML: invalid number")
     }
   }
@@ -462,7 +462,7 @@ fn TomlParser::basic_string(self : TomlParser) -> String raise TomlError {
         }
         let hex = self.text.unsafe_substring(start=self.pos, end=self.pos + len)
         self.pos += len
-        let code = @string.parse_int(hex, base=16) catch {
+        let code = @string.parse_int(hex, radix=16) catch {
           _ => raise TomlError("invalid TOML: invalid escape sequence")
         }
         out.write_char(Int32::unsafe_to_char(code))
