@@ -254,14 +254,14 @@ fn run_edsl_convert(
     @fs.write_string_to_file("\{edsl_gen_dir}/\{name}/gen_cases.mbt", text) catch {
       _ => {
         println("edsl-convert: cannot write the shard \{name}")
-        @sys.exit(1)
+        @env.exit(1)
       }
     }
   }
   @fs.write_string_to_file("\{edsl_gen_dir}/manifest.tsv", manifest.to_string()) catch {
     _ => {
       println("edsl-convert: cannot write the manifest")
-      @sys.exit(1)
+      @env.exit(1)
     }
   }
   println(
@@ -487,8 +487,7 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
     println(
       "edsl-suite: no converted cases; run scripts/edsl_convert.sh first (docs/edsl-convert.md, section 8)",
     )
-    @sys.exit(1)
-    return
+    @env.exit(1)
   }
   // The manifest of the conversion: the registered builders must be those
   // of the enumerated cases (number, file and name).
@@ -585,6 +584,6 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
     if passed + failed + missing == 0 {
       println("edsl-suite: no case is selected")
     }
-    @sys.exit(1)
+    @env.exit(1)
   }
 }

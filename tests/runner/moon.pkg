@@ -37,7 +37,6 @@ import {
   "moonbitlang/typst/linebreak",
   "moonbitlang/typst/hypher",
   "moonbitlang/x/fs",
-  "moonbitlang/x/sys",
   "moonbitlang/core/env",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/typst/wasmparser",

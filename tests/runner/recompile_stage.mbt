@@ -405,7 +405,7 @@ fn run_recompile_stage(
   // A run that compared nothing is not a run that passed.
   if stats.steps == 0 && failures.is_empty() {
     println("recompile: nothing was selected")
-    @sys.exit(2)
+    @env.exit(2)
   }
 }
 

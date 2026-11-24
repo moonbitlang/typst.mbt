@@ -284,7 +284,7 @@ async fn main {
     "edsl-suite" => run_edsl_suite(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
-      @sys.exit(2)
+      @env.exit(2)
     }
   }
   if read_check.val {

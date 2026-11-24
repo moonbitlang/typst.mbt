@@ -498,8 +498,7 @@ async fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
   let base = @system.world(root="bench", system_fonts=false, today=(2026, 1, 1)) catch {
     err => {
       println("edsl: cannot create the world: \{err}")
-      @sys.exit(1)
-      return
+      @env.exit(1)
     }
   }
   let mut passed = 0
@@ -537,8 +536,7 @@ async fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
           let world = @system.world(root="bench", today=(2026, 1, 1)) catch {
             err => {
               println("edsl: cannot create the world: \{err}")
-              @sys.exit(1)
-              return
+              @env.exit(1)
             }
           }
           with_system_fonts = Some(world)
@@ -586,8 +584,7 @@ async fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
         let world = @system.world(root="bench", today=(2026, 1, 1)) catch {
           err => {
             println("edsl: cannot create the world: \{err}")
-            @sys.exit(1)
-            return
+            @env.exit(1)
           }
         }
         with_system_fonts = Some(world)
@@ -615,6 +612,6 @@ async fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
   }
   println("edsl: \{passed} passed, \{failed} failed")
   if failed > 0 {
-    @sys.exit(1)
+    @env.exit(1)
   }
 }
