@@ -15,8 +15,8 @@ description = "A port of the Typst typesetting engine to MoonBit."
 preferred_target = "native"
 
 import {
-  "moonbitlang/x@0.5.6",
+  "moonbitlang/x@0.5.9",
   "moonbitlang/pdflite@0.4.2",
   "moonbit-community/flate@0.10.0",
-  "moonbitlang/async@0.22.9",
+  "moonbitlang/async@0.22.10",
 }
