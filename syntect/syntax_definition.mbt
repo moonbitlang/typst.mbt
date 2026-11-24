@@ -105,7 +105,7 @@ pub(all) enum ContextReference {
     /// there is an `escape`. In other words a reference for a context for
     /// which there "always is a way out". Enables falling back to `Plain
     /// Text` syntax in case the referenced scope is missing.
-    with_escape~ : Bool
+    with_escape~ : Bool,
   )
   File(name~ : String, sub_context~ : String?, with_escape~ : Bool)
   Inline(String)

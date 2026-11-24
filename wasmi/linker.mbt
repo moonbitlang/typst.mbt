@@ -11,7 +11,7 @@ pub(all) enum LinkerError {
   InvalidTypeDefinition(
     name~ : ImportName,
     expected~ : ExternType,
-    found~ : ExternType
+    found~ : ExternType,
   )
 }
 
@@ -44,7 +44,7 @@ priv enum Definition[T] {
   /// A [`Linker`] internal host function.
   HostFunc(
     @wasmi_core.FuncType,
-    (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError
+    (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError,
   )
 }
 

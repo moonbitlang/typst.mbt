@@ -33,7 +33,7 @@ pub suberror BinaryReaderError {
     message~ : String,
     kind~ : BinaryReaderErrorKind,
     offset~ : Int32,
-    needed_hint~ : Int32?
+    needed_hint~ : Int32?,
   )
 }
 

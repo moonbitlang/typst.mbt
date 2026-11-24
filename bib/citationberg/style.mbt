@@ -1146,7 +1146,7 @@ pub(all) enum SortKey {
     names_min~ : Int32?,
     names_use_first~ : Int32?,
     names_use_last~ : Bool?,
-    sort_direction~ : SortDirection
+    sort_direction~ : SortDirection,
   )
 }
 

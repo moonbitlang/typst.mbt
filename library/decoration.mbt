@@ -27,25 +27,25 @@ pub(all) enum DecoLine {
     stroke~ : ResolvedStroke,
     offset~ : Smart[Abs],
     evade~ : Bool,
-    background~ : Bool
+    background~ : Bool,
   )
   Strikethrough(
     stroke~ : ResolvedStroke,
     offset~ : Smart[Abs],
-    background~ : Bool
+    background~ : Bool,
   )
   Overline(
     stroke~ : ResolvedStroke,
     offset~ : Smart[Abs],
     evade~ : Bool,
-    background~ : Bool
+    background~ : Bool,
   )
   Highlight(
     fill~ : Paint?,
     stroke~ : Sides[FixedStroke?],
     top_edge~ : TopEdge,
     bottom_edge~ : BottomEdge,
-    radius~ : Corners[Rel[Abs]]
+    radius~ : Corners[Rel[Abs]],
   )
 }
 

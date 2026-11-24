@@ -269,7 +269,7 @@ pub(all) enum ColorSpace {
   Icc(
     profile~ : Bytes,
     /// The number of channels used by the ICC profile.
-    num_channels~ : Int32
+    num_channels~ : Int32,
   )
 }
 

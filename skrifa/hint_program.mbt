@@ -134,7 +134,7 @@ priv suberror HintError {
     glyph_id~ : GlyphId?,
     pc~ : Int32,
     opcode~ : Int32?,
-    kind~ : HintErrorKind
+    kind~ : HintErrorKind,
   )
 }
 

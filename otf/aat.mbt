@@ -364,7 +364,7 @@ priv enum LookupInner {
     value_size~ : UInt16,
     first_glyph~ : UInt16,
     glyph_count~ : UInt16,
-    data~ : BytesView
+    data~ : BytesView,
   )
 }
 

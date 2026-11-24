@@ -55,7 +55,7 @@ pub(all) enum TransformListToken {
     c~ : Double,
     d~ : Double,
     e~ : Double,
-    f~ : Double
+    f~ : Double,
   )
   Translate(tx~ : Double, ty~ : Double)
   Scale(sx~ : Double, sy~ : Double)

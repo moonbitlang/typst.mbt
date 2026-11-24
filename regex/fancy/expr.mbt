@@ -37,7 +37,7 @@ pub(all) enum Expr {
   BackrefWithRelativeRecursionLevel(
     group~ : Int32,
     relative_level~ : Int32,
-    casei~ : Bool
+    casei~ : Bool,
   )
   /// Atomic non-capturing group, e.g. `(?>ab|a)`
   AtomicGroup(Expr)

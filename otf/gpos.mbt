@@ -639,7 +639,7 @@ pub(all) enum PairAdjustment {
   Format2(
     coverage~ : Coverage,
     classes~ : (ClassDefinition, ClassDefinition),
-    matrix~ : ClassMatrix
+    matrix~ : ClassMatrix,
   )
 }
 

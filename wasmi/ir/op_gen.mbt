@@ -2424,7 +2424,7 @@ pub(all) enum Op {
     result~ : Slot,
     input~ : Slot,
     lane~ : ImmLaneIdx,
-    value~ : Int32
+    value~ : Int32,
   )
   /// Wasm `i16x8.replace_lane` instruction.
   ///
@@ -2945,7 +2945,7 @@ pub(all) enum Op {
     ptr~ : Slot,
     value~ : Slot,
     offset~ : Offset8,
-    lane~ : ImmLaneIdx
+    lane~ : ImmLaneIdx,
   )
   /// Variant of [`Op::V128Store8Lane`] with 32-bit immediate address.
   ///
@@ -2973,7 +2973,7 @@ pub(all) enum Op {
     ptr~ : Slot,
     value~ : Slot,
     offset~ : Offset8,
-    lane~ : ImmLaneIdx
+    lane~ : ImmLaneIdx,
   )
   /// Variant of [`Op::V128Store16Lane`] with 32-bit immediate address.
   ///
@@ -3001,7 +3001,7 @@ pub(all) enum Op {
     ptr~ : Slot,
     value~ : Slot,
     offset~ : Offset8,
-    lane~ : ImmLaneIdx
+    lane~ : ImmLaneIdx,
   )
   /// Variant of [`Op::V128Store32Lane`] with 32-bit immediate address.
   ///
@@ -3029,7 +3029,7 @@ pub(all) enum Op {
     ptr~ : Slot,
     value~ : Slot,
     offset~ : Offset8,
-    lane~ : ImmLaneIdx
+    lane~ : ImmLaneIdx,
   )
   /// Variant of [`Op::V128Store64Lane`] with 32-bit immediate address.
   ///

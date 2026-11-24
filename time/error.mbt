@@ -83,7 +83,7 @@ pub(all) suberror InvalidFormatDescription {
   InvalidModifierCombination(
     modifier~ : String,
     context~ : String,
-    index~ : Int32
+    index~ : Int32,
   )
 }
 

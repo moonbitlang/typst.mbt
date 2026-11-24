@@ -10,13 +10,13 @@ pub(all) enum ContextLookup {
   Format2(
     coverage~ : Coverage,
     classes~ : ClassDefinition,
-    sets~ : SequenceRuleSets
+    sets~ : SequenceRuleSets,
   )
   /// Coverage-based glyph contexts.
   Format3(
     coverage~ : Coverage,
     coverages~ : LazyOffsetArray16[Coverage],
-    lookups~ : LazyArray16[SequenceLookupRecord]
+    lookups~ : LazyArray16[SequenceLookupRecord],
   )
 }
 

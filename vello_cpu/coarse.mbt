@@ -15,7 +15,7 @@ priv enum RecordedCmd {
     strip_end~ : Int32,
     paint~ : Paint,
     blend_mode~ : BlendMode,
-    mask~ : Mask?
+    mask~ : Mask?,
   )
   /// Push a new (non-filter) layer to the layer stack.
   PushLayer(Int32)

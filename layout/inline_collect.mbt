@@ -36,7 +36,7 @@ priv enum InlineItem {
   /// Fractional spacing between other items.
   Fractional(
     @library.Fr,
-    (@library.BoxElem, @library.Locator, @library.StyleChain)?
+    (@library.BoxElem, @library.Locator, @library.StyleChain)?,
   )
   /// Layouted inline-level content.
   Frame(@library.Frame)

@@ -19,14 +19,14 @@ pub(all) enum PathSegment {
     x2~ : Double,
     y2~ : Double,
     x~ : Double,
-    y~ : Double
+    y~ : Double,
   )
   SmoothCurveTo(
     abs~ : Bool,
     x2~ : Double,
     y2~ : Double,
     x~ : Double,
-    y~ : Double
+    y~ : Double,
   )
   Quadratic(abs~ : Bool, x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
   SmoothQuadratic(abs~ : Bool, x~ : Double, y~ : Double)
@@ -38,7 +38,7 @@ pub(all) enum PathSegment {
     large_arc~ : Bool,
     sweep~ : Bool,
     x~ : Double,
-    y~ : Double
+    y~ : Double,
   )
   ClosePath(abs~ : Bool)
 }
@@ -369,7 +369,7 @@ pub(all) enum SimplePathSegment {
     x2~ : Double,
     y2~ : Double,
     x~ : Double,
-    y~ : Double
+    y~ : Double,
   )
   Quadratic(x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
   ClosePath
@@ -606,7 +606,7 @@ pub fn SimplifyingPathParser::next(
       large_arc~,
       sweep~,
       x~,
-      y~
+      y~,
     ) => {
       let mut x = x
       let mut y = y

@@ -112,7 +112,7 @@ priv enum EventData {
     anchor~ : Bytes?,
     tag~ : Bytes?,
     value~ : Bytes,
-    style~ : ScalarStyle
+    style~ : ScalarStyle,
   )
   SequenceStartEvent(anchor~ : Bytes?, tag~ : Bytes?)
   SequenceEndEvent

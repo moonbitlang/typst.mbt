@@ -309,7 +309,7 @@ priv enum RegexImpl {
     /// Some optimizations avoid the VM, but need to use an extra capture
     /// group to represent the match boundaries
     explicit_capture_group_0~ : Bool,
-    debug_pattern~ : String
+    debug_pattern~ : String,
   )
   Fancy(prog~ : Prog, n_groups~ : Int32, options~ : RegexOptions)
 }

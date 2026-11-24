@@ -30,7 +30,7 @@ pub enum StackLayoutChild {
   StackChild(@library.StackChild)
   /// A child with a custom layouter, producing its own frames.
   CustomLayouter(
-    (@library.Engine, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+    (@library.Engine, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError,
   )
 }
 

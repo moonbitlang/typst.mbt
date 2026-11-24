@@ -169,7 +169,7 @@ priv enum NodeKind {
   Element(
     tag_name~ : ExpandedNameIndexed,
     attributes~ : ShortRange,
-    namespaces~ : ShortRange
+    namespaces~ : ShortRange,
   )
   PI(PI)
   Comment(String)

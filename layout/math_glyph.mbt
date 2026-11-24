@@ -388,7 +388,7 @@ priv enum Action {
   Stretch(
     axis~ : @library.Axis,
     target~ : @library.Abs,
-    short_fall~ : @library.Abs
+    short_fall~ : @library.Abs,
   )
   /// Use this glyph, but warn that it claims stretchability on both axes.
   WarnBothAxes

@@ -212,12 +212,12 @@ pub(all) enum Operator {
   BrOnCast(
     relative_depth~ : UInt32,
     from_ref_type~ : RefType,
-    to_ref_type~ : RefType
+    to_ref_type~ : RefType,
   )
   BrOnCastFail(
     relative_depth~ : UInt32,
     from_ref_type~ : RefType,
-    to_ref_type~ : RefType
+    to_ref_type~ : RefType,
   )
   AnyConvertExtern
   ExternConvertAny
@@ -598,57 +598,57 @@ pub(all) enum Operator {
   StructAtomicGet(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicGetS(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicGetU(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicSet(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwAdd(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwSub(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwAnd(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwOr(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwXor(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwXchg(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   StructAtomicRmwCmpxchg(
     ordering~ : Ordering,
     struct_type_index~ : UInt32,
-    field_index~ : UInt32
+    field_index~ : UInt32,
   )
   ArrayAtomicGet(ordering~ : Ordering, array_type_index~ : UInt32)
   ArrayAtomicGetS(ordering~ : Ordering, array_type_index~ : UInt32)
@@ -674,7 +674,7 @@ pub(all) enum Operator {
   ResumeThrow(
     cont_type_index~ : UInt32,
     tag_index~ : UInt32,
-    resume_table~ : ResumeTable
+    resume_table~ : ResumeTable,
   )
   Switch(cont_type_index~ : UInt32, tag_index~ : UInt32)
   I64Add128

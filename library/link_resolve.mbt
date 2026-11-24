@@ -227,7 +227,7 @@ pub(all) enum ResolvedLink {
   Cross(
     from~ : @syntax.VirtualPath,
     to~ : @syntax.VirtualPath,
-    anchor~ : String
+    anchor~ : String,
   )
 }
 

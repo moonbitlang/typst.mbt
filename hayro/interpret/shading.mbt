@@ -75,7 +75,7 @@ pub(all) enum ShadingType {
     /// A transform to apply to the shading.
     matrix~ : @kurbo.Affine,
     /// The function that should be used to evaluate the shading.
-    function~ : ShadingFunction
+    function~ : ShadingFunction,
   )
   /// A radial-axial shading.
   ///
@@ -93,28 +93,28 @@ pub(all) enum ShadingType {
     /// The extends in the left/right direction of the shading.
     extend_~ : FixedArray[Bool],
     /// Whether the shading is axial or radial.
-    axial~ : Bool
+    axial~ : Bool,
   )
   /// A triangle-mesh shading.
   /// The triangles making up the shading.
   TriangleMesh(
     triangles~ : Array[Triangle],
     /// An optional function used for calculating the sampled color values.
-    function~ : ShadingFunction?
+    function~ : ShadingFunction?,
   )
   /// A coons-patch-mesh shading.
   /// The patches that make up the shading.
   CoonsPatchMesh(
     patches~ : Array[CoonsPatch],
     /// An optional function used for calculating the sampled color values.
-    function~ : ShadingFunction?
+    function~ : ShadingFunction?,
   )
   /// A tensor-product-patch-mesh shading.
   /// The patches that make up the shading.
   TensorProductPatchMesh(
     patches~ : Array[TensorProductPatch],
     /// An optional function used for calculating the sampled color values.
-    function~ : ShadingFunction?
+    function~ : ShadingFunction?,
   )
   /// A dummy shading that should just be drawn transparent.
   Dummy

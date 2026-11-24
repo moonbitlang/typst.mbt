@@ -12,7 +12,7 @@ pub(all) enum ChainedContextLookup {
     backtrack_classes~ : ClassDefinition,
     input_classes~ : ClassDefinition,
     lookahead_classes~ : ClassDefinition,
-    sets~ : ChainedSequenceRuleSets
+    sets~ : ChainedSequenceRuleSets,
   )
   /// Coverage-based glyph contexts.
   Format3(
@@ -20,7 +20,7 @@ pub(all) enum ChainedContextLookup {
     backtrack_coverages~ : LazyOffsetArray16[Coverage],
     input_coverages~ : LazyOffsetArray16[Coverage],
     lookahead_coverages~ : LazyOffsetArray16[Coverage],
-    lookups~ : LazyArray16[SequenceLookupRecord]
+    lookups~ : LazyArray16[SequenceLookupRecord],
   )
 }
 

@@ -374,7 +374,7 @@ pub(all) enum Target {
   Smooth(
     mode~ : SmoothMode,
     symmetric_rendering~ : Bool,
-    preserve_linear_metrics~ : Bool
+    preserve_linear_metrics~ : Bool,
   )
 }
 

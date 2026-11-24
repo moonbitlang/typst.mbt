@@ -12,22 +12,22 @@ pub(all) enum InstantiationError {
   /// Returned when a global has a mismatching type.
   GlobalTypeMismatch(
     expected~ : @wasmi_core.GlobalType,
-    actual~ : @wasmi_core.GlobalType
+    actual~ : @wasmi_core.GlobalType,
   )
   /// Returned when a function has a mismatching type.
   FuncTypeMismatch(
     expected~ : @wasmi_core.FuncType,
-    actual~ : @wasmi_core.FuncType
+    actual~ : @wasmi_core.FuncType,
   )
   /// Returned when a table has a mismatching type.
   TableTypeMismatch(
     expected~ : @wasmi_core.TableType,
-    actual~ : @wasmi_core.TableType
+    actual~ : @wasmi_core.TableType,
   )
   /// Returned when a linear memory has a mismatching type.
   MemoryTypeMismatch(
     expected~ : @wasmi_core.MemoryType,
-    actual~ : @wasmi_core.MemoryType
+    actual~ : @wasmi_core.MemoryType,
   )
   /// Caused when an element segment does not fit into the specified table instance.
   ElementSegmentDoesNotFit(table~ : Table, table_index~ : UInt64, len~ : UInt32)

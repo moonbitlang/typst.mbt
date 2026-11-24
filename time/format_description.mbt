@@ -141,12 +141,12 @@ pub(all) enum Component {
   /// The century of the calendar year (extended range).
   CalendarYearCenturyExtendedRange(
     padding~ : Padding,
-    sign_is_mandatory~ : Bool
+    sign_is_mandatory~ : Bool,
   )
   /// The century of the calendar year (standard range).
   CalendarYearCenturyStandardRange(
     padding~ : Padding,
-    sign_is_mandatory~ : Bool
+    sign_is_mandatory~ : Bool,
   )
   /// The century of the ISO week-based year (extended range).
   IsoYearCenturyExtendedRange(padding~ : Padding, sign_is_mandatory~ : Bool)

@@ -683,7 +683,7 @@ pub fn Term::is_gendered(self : Term) -> Bool {
     | Month09
     | Month10
     | Month11
-    | Month12
+    | Month12,
   )
 }
 

@@ -254,12 +254,12 @@ priv enum DecodeContext {
   HuffmanCoding(
     reader~ : Reader,
     tables~ : TextRegionHuffmanTables,
-    symbol_codes~ : HuffmanTable
+    symbol_codes~ : HuffmanTable,
   )
   ArithmeticCoding(
     decoder~ : ArithmeticDecoder,
     contexts~ : TextRegionContexts,
-    gr_contexts~ : FixedArray[Byte]
+    gr_contexts~ : FixedArray[Byte],
   )
 }
 

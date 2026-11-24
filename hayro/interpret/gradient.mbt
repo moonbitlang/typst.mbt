@@ -34,7 +34,7 @@ pub enum SvgGradientKind {
     start_center~ : @kurbo.Point,
     start_radius~ : Float,
     end_center~ : @kurbo.Point,
-    end_radius~ : Float
+    end_radius~ : Float,
   )
 }
 

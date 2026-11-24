@@ -874,12 +874,12 @@ pub(all) enum ResolvableGridChild[T] {
     repeat~ : Bool,
     level~ : NonZeroU32,
     span~ : @syntax.Span,
-    items~ : Array[ResolvableGridItem[T]]
+    items~ : Array[ResolvableGridItem[T]],
   )
   Footer(
     repeat~ : Bool,
     span~ : @syntax.Span,
-    items~ : Array[ResolvableGridItem[T]]
+    items~ : Array[ResolvableGridItem[T]],
   )
   Item(ResolvableGridItem[T])
 }

@@ -115,7 +115,7 @@ priv enum Condition {
   Format1(
     axis_index~ : UInt16,
     filter_range_min~ : Int16,
-    filter_range_max~ : Int16
+    filter_range_max~ : Int16,
   )
 }
 

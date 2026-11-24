@@ -635,7 +635,7 @@ fn chained_context_apply(
       backtrack_classes~,
       input_classes~,
       lookahead_classes~,
-      sets~
+      sets~,
     ) => {
       guard coverage.get(glyph) is Some(_) else { return None }
       let class = input_classes.get(glyph)
@@ -651,7 +651,7 @@ fn chained_context_apply(
       backtrack_coverages~,
       input_coverages~,
       lookahead_coverages~,
-      lookups~
+      lookups~,
     ) => {
       guard coverage.get(glyph) is Some(_) else { return None }
       let back = (glyph, index : Int32) => {
