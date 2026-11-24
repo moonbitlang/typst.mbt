@@ -95,5 +95,5 @@ test "class definition and lookup flags" {
   inspect(flags.ignore_marks(), content="true")
   inspect(flags.ignore_flags(), content="true")
   inspect(flags.ignore_ligatures(), content="false")
-  inspect(flags.mark_attachment_type(), content="b'\\x03'")
+  @test.assert_eq(flags.mark_attachment_type(), b'\x03')
 }

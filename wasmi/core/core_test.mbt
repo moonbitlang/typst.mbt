@@ -110,10 +110,10 @@ test "memory static buffer and growth" {
     buffer,
   )
   inspect(mem.data_size(), content="2")
-  inspect(buffer[0], content="b'\\x00'")
-  inspect(buffer[2], content="b'\\x07'")
+  @test.assert_eq(buffer[0], b'\x00')
+  @test.assert_eq(buffer[2], b'\x07')
   inspect(mem.grow(2, None, @core.ResourceLimiterRef::default()), content="2")
-  inspect(buffer[3], content="b'\\x00'")
+  @test.assert_eq(buffer[3], b'\x00')
   let err = try mem.grow(1, None, @core.ResourceLimiterRef::default()) catch {
     e => e.to_string()
   } noraise {

@@ -5,5 +5,9 @@ import {
 }
 
 import {
+  "moonbitlang/core/test",
+} for "test"
+
+import {
   "moonbitlang/x/fs",
 } for "wbtest"
